@@ -1,0 +1,46 @@
+id: RULE-D001
+type: decision
+description: Validate provided password against stored credentials for an existing user.
+conditions:
+  type: logical_combination
+  operator: AND
+  operands:
+    - type: comparison
+      field: SQLCode # System variable indicating SQL operation status
+      operator: ==
+      value: 0 # Represents successful record fetch (user exists)
+      concept: UserRecordFoundStatus # Optional concept mapping
+      label: user_exists
+    - type: comparison
+      field: PWD # Input password variable
+      operator: "!=" # Standard inequality operator
+      value_source:
+        type: field_reference
+        referenced_field: password1 # Password fetched from DB
+      concept: ProvidedPasswordMatchesStored # Optional concept mapping
+      label: password_mismatch
+outcomes:
+  - when: user_exists AND password_mismatch # Using labels for clarity
+    result:
+      type: assignments # Custom type to indicate multiple assignments
+      actions:
+        - target_field: passbys1.returncode
+          value: 100
+        - target_field: LogMSG
+          value: "'Incorrect password'" # Note YAML quotes for string literal
+outcome_type: login_status_and_message
+source_reference:
+  program: LOGMOD.SQLRPGLE
+  lines: "40-42"
+  # snippet_hash: <Optional_hash_of_lines_40_to_42>
+confidence: 0.98 # Example confidence score
+extracted_timestamp: "2024-05-16T10:30:00Z" # Placeholder timestamp
+system_version: "System_V1_LOGMOD" # Placeholder system version
+tags:
+  - login
+  - authentication
+  - security
+concepts:
+  - UserAuthentication
+  - PasswordValidation
+# notes: "Handles incorrect password entry for a known user."
