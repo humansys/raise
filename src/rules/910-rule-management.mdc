@@ -1,0 +1,77 @@
+---
+name: Gestión de Reglas Cursor en RaiSE
+description: Proporciona instrucciones sobre cómo crear, estructurar y mantener Reglas Cursor (.cursor/rules/*.mdc) de manera efectiva para el proyecto, asegurando que sean claras, mantenibles, performantes y alineadas con las necesidades del proyecto y la estructura definida en los documentos de gobernanza.
+globs: [".cursor/rules/*.mdc", "!.cursor/rules/000-global-config.mdc"]
+alwaysApply: true
+tags: ["raise", "cursor-rules", "rule-management", "meta-rule"]
+priority: 910
+category: meta-rules
+---
+
+# Gestión de Reglas Cursor en RaiSE
+
+Este documento proporciona instrucciones sobre cómo crear, estructurar y mantener Reglas Cursor (`.cursor/rules/*.mdc`) de manera efectiva para el proyecto actual, que implementa el framework RaiSE. El objetivo es asegurar que sean claras, mantenibles, performantes y alineadas con las necesidades del proyecto y la estructura definida en los documentos de gobernanza (referenciados en el frontmatter).
+
+## 1. Estructura y Ubicación
+
+*   **Directorio**: Todas las reglas específicas del proyecto DEBEN residir directamente dentro del directorio `.cursor/rules/`. **No uses subdirectorios.**
+*   **Formato de Archivo**: Cada regla debe estar en un archivo (`.mdc`) empezando con un bloque frontmatter YAML (`---`) seguido por contenido Markdown.
+*   **Modularidad y Ordenamiento**:
+    *   Prefiere múltiples archivos de reglas enfocados sobre uno monolítico.
+    *   Agrupa reglas por tema/tecnología usando nombres de archivo claros y la convención numérica definida en el `[nombre-del-proyecto]-rules-index.md`.
+    *   Usa prefijos numéricos (ej. `001-`, `010-`, `101-`, `201-`, `910-`) en los nombres de archivo para controlar estrictamente el orden de carga alfabético y la categorización semántica, según lo establecido en el índice de reglas del proyecto.
+
+## 2. Frontmatter YAML (`---`)
+
+Incluye los siguientes campos en la cabecera YAML, alineados con los documentos de gobernanza del proyecto:
+
+*   **`name`**: (Requerido) Un nombre conciso y descriptivo para la regla (ej. `Estándares de C# para el proyecto actual`).
+*   **`description`**: (Requerido) Una breve explicación del propósito de la regla.
+*   **`globs`**: (Requerido) Una lista de patrones glob especificando a qué archivos aplica la regla (ej. `["src/Api/**/*.cs"]`, `["*.csproj"]`). Sé específico para limitar el alcance y mejorar el rendimiento. Usa `!` para exclusiones (ej. `"!**/test/*"`).
+*   **`alwaysApply`**: (Opcional, default `false`) Establece a `true` si la regla debe incluirse siempre en el contexto independientemente del glob match (usa con moderación, principalmente para reglas muy generales o meta-reglas como esta).
+*   **`tags`**: (Opcional) Una lista de palabras clave relevantes para categorización (ej. `["raise", "csharp", "dotnet", "architecture", "clean-architecture"]`).
+*   **`priority`**: (Requerido) Un valor numérico que DEBE coincidir con el prefijo numérico del nombre del archivo (ej., para `010-rule.mdc`, `priority: 10`).
+*   **`category`**: (Requerido) La categoría principal a la que pertenece la regla, según la estructura definida en `[nombre-del-proyecto]-rules-index.md` (ej: `raise-methodology`, `tech-standards-csharp`, `repo-architecture-clean`, `meta-rules`).
+*   **`related`**: (Opcional) Una lista de rutas de archivo de reglas relacionadas (ej. `[".cursor/rules/101-csharp-dotnet-standards.mdc"]`) para referencia cruzada.
+*   **`references`**: (Opcional) Enlaces a documentos fuente o guías externas relevantes.
+
+**Importante**: Completar los campos **requeridos** es fundamental. La `description` permite entender el propósito, los `globs` definen la aplicabilidad automática, `priority` asegura el orden correcto y `category` ayuda a la organización según el índice del proyecto.
+
+## 3. Contenido de la Regla (Markdown)
+
+*   **Claridad y Concisión**: Escribe instrucciones claras, directas y sin ambigüedades. Usa frases cortas. Prioriza reglas de alto impacto. Busca la brevedad para conservar tokens.
+*   **Estructura**: Usa encabezados Markdown (`#`, `##`, `###`), listas y bloques de código para organizar el contenido. Secciones sugeridas:
+    *   Propósito / Definición de Regla
+    *   Principios Fundamentales / Justificación (Por qué existe esta regla)
+    *   Guías Específicas / Requisitos
+    *   Ejemplos (Correcto / Incorrecto) para C# y .NET cuando aplique.
+    *   Reglas Relacionadas / Consideraciones Adicionales
+*   **Contexto Primero**: Si aplica, empieza con un breve resumen del contexto del proyecto actual relevante a la regla.
+*   **Especifica Estándares**: Indica claramente convenciones de codificación, guías de estilo, librerías/frameworks preferidos y patrones arquitectónicos para C# y .NET.
+*   **Instrucciones Accionables**: Formula reglas como comandos directos o restricciones.
+*   **Ejemplos de Código**: Incluye ejemplos concisos de C# (` ```csharp ... ``` `) ilustrando uso correcto e incorrecto. Basa los ejemplos en patrones de código reales del proyecto si es posible.
+*   **Explica el "Por qué"**: Proporciona brevemente la justificación detrás de reglas importantes.
+
+## 4. Buenas Prácticas para el Contenido de la Regla
+
+*   **Alinear con el Proyecto**: Asegura que las reglas reflejen las prácticas, tecnologías (C#/.NET) y arquitectura observadas en el código base del proyecto actual y documentadas en `ai-rules-reasoning.md` y otras especificaciones relevantes.
+*   **Consistencia**: Evita instrucciones contradictorias dentro o entre reglas.
+*   **Rendimiento**: Mantén las reglas concisas. Evita texto excesivamente largo o `globs` demasiado amplios. Limita referencias dinámicas `@file` a menos que sea esencial.
+*   **Compatibilidad**: Asegura que las reglas se alineen con los linters, formateadores y herramientas de build del proyecto C#/.NET.
+*   **Audiencia Objetivo**: Recuerda que la regla instruye al asistente IA.
+
+## 5. Mantenimiento e Iteración
+
+*   **Control de Versiones**: Incluye los archivos de reglas en Git.
+*   **Actualizaciones**: Revisa y actualiza regularmente las reglas a medida que el proyecto actual y el framework RaiSE evolucionan. Elimina reglas obsoletas.
+*   **Ciclo de Feedback**: Al crear o modificar reglas, solicita feedback. Observa el comportamiento de la IA y refina iterativamente.
+
+Siguiendo estas guías, aseguramos que las Reglas Cursor para el proyecto actual sean efectivas, mantenibles y genuinamente útiles para guiar el desarrollo asistido por IA.
+
+
+*   **Control de Versiones**: Incluye los archivos de reglas en Git.
+*   **Actualizaciones**: Revisa y actualiza regularmente las reglas a medida que el proyecto `raise-backend-product` y el framework RaiSE evolucionan. Elimina reglas obsoletas.
+*   **Ciclo de Feedback**: Al crear o modificar reglas, solicita feedback. Observa el comportamiento de la IA y refina iterativamente.
+
+Siguiendo estas guías, aseguramos que las Reglas Cursor para el proyecto `raise-backend-product` sean efectivas, mantenibles y genuinamente útiles para guiar el desarrollo asistido por IA.
+

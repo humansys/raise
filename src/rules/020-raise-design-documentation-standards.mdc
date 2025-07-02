@@ -1,0 +1,179 @@
+---
+name: "Estándares de Documentación de Diseño y Planificación RaiSE"
+description: "Establece los estándares para la creación, estructura, ubicación y mantenimiento de documentos de diseño técnico y planificación (archivos Markdown) según la metodología RaiSE, adaptándose a la estructura existente del repositorio."
+globs:
+  - ".raise/docs/**/*.md"
+  - ".raise/templates/**/*.md"
+  - "backlog/**/*.md"
+  - ".raise/katas/**/*.md"
+# Estándares de Documentación de Diseño y Planificación RaiSE
+
+## 1. Propósito de la Regla Metodológica
+
+Esta regla establece los estándares para la creación, estructuración, ubicación y mantenimiento de los documentos de diseño técnico y planificación del proyecto. Su objetivo es:
+
+*   Reforzar el principio de RaiSE: **Documentación Precede al Código**.
+*   Asegurar que los documentos de diseño y planificación sirvan como la **fuente de verdad** (`source of truth`) para el desarrollo.
+*   Guiar tanto a los desarrolladores humanos como al asistente de IA en el uso efectivo de las plantillas de documentación del proyecto.
+*   Facilitar la **Explicabilidad Inherente** y la trazabilidad desde los requisitos hasta la implementación.
+*   **Adaptar la estructura de documentación a la organización existente del repositorio.**
+
+## 2. Principios Fundamentales de RaiSE Aplicables
+
+*   **Documentación Precede al Código (Documentation First):** Toda implementación significativa debe estar precedida por la creación o actualización de la documentación de diseño y planificación relevante.
+*   **Explicabilidad Inherente (Inherent Explicability):** Documentos claros y bien estructurados son esenciales para comprender las decisiones de diseño y los requisitos.
+*   **Desarrollo Guiado por Katas (Kata-Driven Development):** Las Katas se derivan y se basan en la información contenida en estos documentos de diseño y planificación.
+*   **Orquestación Humana, Asistencia IA (Human Orchestration, AI Assistance):** El asistente de IA juega un rol activo en la creación, referenciación y mantenimiento de esta documentación, bajo la guía del desarrollador.
+*   **Adaptabilidad Estructural:** La estructura de documentación debe adaptarse y respetar la organización existente del repositorio.
+
+## 3. Guías y Procedimientos Específicos
+
+### 3.1. Estructura General y Ubicación de la Documentación
+
+**PRINCIPIO CLAVE: Detectar y Adaptar la Estructura Existente**
+
+La ubicación de la documentación debe seguir el siguiente orden de precedencia:
+
+#### 3.1.1. Detección de Estructura Existente del Backlog
+
+**Opción A: Backlog en Directorio Raíz (Prioridad Alta)**
+- Si existe `backlog/` en la raíz del repositorio → **USAR ESTA ESTRUCTURA**
+- Estructura: `backlog/{{EpicKey}}_{{EpicName}}/{{IssueKey}}_{{IssueTitle}}/`
+
+**Opción B: Backlog en Estructura RaiSE (Prioridad Media)**
+- Si NO existe backlog en raíz pero existe `.raise/docs/` → usar `.raise/docs/backlog/`
+- Estructura: `.raise/docs/backlog/{{EpicKey}}_{{EpicName}}/{{IssueKey}}_{{IssueTitle}}/`
+
+**Opción C: Crear Nueva Estructura (Prioridad Baja)**
+- Si no existe ninguna estructura → crear en directorio raíz: `backlog/`
+
+#### 3.1.2. Estructura Adaptativa Recomendada
+
+**Para Repositorios con Backlog en Raíz:**
+```
+proyecto/
+├── backlog/                          # ← Estructura principal del backlog
+│   ├── project_backlog.md           # ← Índice principal del backlog
+│   └── {{EpicKey}}_{{EpicName}}/    # ← Directorio por épica
+│       ├── {{EpicKey}}_epic.md      # ← Documento principal de la épica
+│       └── {{IssueKey}}_{{IssueTitle}}/  # ← Directorio por issue
+│           ├── {{IssueKey}}_description.md  # ← Descripción del issue
+│           ├── {{IssueKey}}_kata.md         # ← Kata de implementación
+│           └── {{IssueKey}}_diagram.png     # ← Diagramas relacionados
+├── .raise/
+│   ├── docs/                        # ← Documentación complementaria RaiSE
+│   │   ├── planning/               # ← Planificación de alto nivel
+│   │   ├── architecture/           # ← Diseño técnico y arquitectura
+│   │   └── analysis/               # ← Informes de análisis técnico
+│   ├── katas/                      # ← Katas del proyecto
+│   └── templates/                  # ← Plantillas del proyecto
+```
+
+**Para Repositorios con Estructura RaiSE Pura:**
+```
+proyecto/
+├── .raise/
+│   ├── docs/
+│   │   ├── planning/
+│   │   ├── architecture/
+│   │   ├── analysis/
+│   │   └── backlog/                # ← Backlog dentro de la estructura RaiSE
+│   │       ├── project_backlog.md
+│   │       └── {{EpicKey}}_{{EpicName}}/
+│   ├── katas/
+│   └── templates/
+```
+
+#### 3.1.3 Estructura Específica para Elementos del Backlog
+
+**Independientemente de la ubicación (raíz o .raise/docs/), se recomienda la misma estructura jerárquica:**
+
+*   `project_backlog.md`: Documento índice principal del backlog.
+*   `{{EpicKey}}_{{EpicName}}/`: Directorio para cada Épica.
+    *   **Formato Directorio:** `{ID de Jira de la Épica}_{Nombre corto y descriptivo de la Épica}` (Ej: `EPIC-001_Implementacion_Perfil_Usuario`).
+    *   `{{EpicKey}}_epic.md`: Documento principal de la Épica (usando la plantilla correspondiente).
+    *   `{{IssueKey}}_{{IssueTitle}}/`: Directorio para cada elemento hijo (Historia de Usuario, Bug) dentro de la Épica.
+        *   **Formato Directorio:** `{ID de Jira del Issue}_{Nombre corto y descriptivo del Issue}` (Ej: `US-123_Crear_Endpoint_GET_Perfil`).
+        *   Dentro de este directorio, todos los archivos DEBEN estar prefijados con el `IssueKey`:
+            *   `{{IssueKey}}_description.md`: La descripción principal del Issue.
+            *   `{{IssueKey}}_kata.md`: Plan detallado de implementación o Kata.
+            *   `{{IssueKey}}_diagram.png`: Diagramas relacionados.
+
+Esta estructura asegura que toda la información de un elemento del backlog sea fácilmente localizable y se mantenga agrupada.
+
+### 3.2. Referencia a Plantillas
+
+Se asume que cada proyecto que utilice este sistema de reglas contendrá un directorio `.raise/templates/` con las plantillas de Markdown necesarias para cada tipo de documento. La IA debe buscar y utilizar la plantilla correspondiente del proyecto actual al crear un nuevo documento.
+
+| Documento | Plantilla Sugerida (en `.raise/templates/`) | Ubicación Adaptativa |
+|---|---|---|
+| Requisitos (PRD) | `solution/project_requirements.md` | `.raise/docs/planning/project_requirements.md` |
+| Visión de Solución | `solution/solution-vision-template.md` | `.raise/docs/planning/solution_vision.md` |
+| Diseño Técnico | `tech/tech_design.md` | `.raise/docs/architecture/tech_design.md` |
+| Épica del Backlog | `backlog/epic.md` | `{backlog_root}/{{EpicKey}}_{{EpicName}}/{{EpicKey}}_epic.md` |
+| H. de Usuario | `backlog/user_story.md` | `{backlog_root}/.../{{IssueKey}}_{{IssueTitle}}/{{IssueKey}}_description.md`|
+| Bug del Backlog | `backlog/bug.md` | `{backlog_root}/.../{{IssueKey}}_{{IssueTitle}}/{{IssueKey}}_description.md`|
+| Kata de Desarrollo | `tech/kata.md` | `{backlog_root}/.../{{IssueKey}}_{{IssueTitle}}/{{IssueKey}}_kata.md`|
+
+**Nota:** `{backlog_root}` se refiere a la ubicación detectada del backlog (`backlog/` en raíz o `.raise/docs/backlog/`).
+
+## 4. Flujo de Trabajo Asistido por IA
+
+El asistente de IA debe ser capaz de:
+
+*   **Detectar Estructura Existente**: Identificar si existe un directorio `backlog/` en la raíz del repositorio antes de crear nueva documentación.
+*   **Crear nuevos documentos**: Dado un tipo de documento (ej. User Story, Tech Design) y los detalles iniciales (incluyendo ID de Jira y título/nombre), crear el archivo Markdown en la ubicación correcta detectada usando la plantilla adecuada y aplicando las convenciones de nomenclatura.
+*   **Navegar y Referenciar**: Entender la estructura jerárquica adaptativa para localizar documentos existentes.
+*   **Mantener Documentos**: Ayudar a actualizar secciones específicas de los documentos existentes.
+*   **Extraer Información**: Leer documentos para responder preguntas sobre requisitos, diseño o análisis.
+
+## 5. Ejemplo de Estructura de Directorios Adaptativa
+
+### Para el repositorio `rpgleparser-sar` (estructura detectada):
+```
+rpgleparser-sar/
+├── backlog/                         # ← ESTRUCTURA EXISTENTE DETECTADA
+│   ├── project_backlog.md          # ← Nuevo: índice principal
+│   └── raise-rpg-analyzer/          # ← Existente: directorio de épica
+│       ├── RPG-001_epic.md         # ← Nuevo: documento de épica
+│       └── US-001_Parser_Integration/   # ← Nuevo: directorio de issue
+│           ├── US-001_description.md
+│           └── US-001_kata.md
+├── .raise/
+│   ├── docs/                       # ← Documentación complementaria
+│   │   ├── planning/
+│   │   ├── architecture/
+│   │   └── analysis/               # ← NO incluye backlog (está en raíz)
+│   ├── katas/                      # ← Katas existentes
+│   └── templates/                  # ← Plantillas del proyecto
+└── src/
+    └── ...
+```
+
+### Para un nuevo proyecto con estructura RaiSE pura:
+```
+nuevo-proyecto/
+├── .raise/
+│   ├── docs/
+│   │   ├── planning/
+│   │   ├── architecture/
+│   │   ├── analysis/
+│   │   └── backlog/                # ← Backlog dentro de estructura RaiSE
+│   │       ├── project_backlog.md
+│   │       └── EPIC-001_User_Profile/
+│   ├── katas/
+│   └── templates/
+└── src/
+    └── ...
+```
+
+## 6. Consideraciones Adicionales
+
+*   **Detección Automática**: Siempre verificar la existencia de `backlog/` en la raíz antes de crear nueva estructura.
+*   **Consistencia en Nomenclatura**: Mantener una convención uniforme para las claves de los issues (`EPIC-XXX`, `US-ZZZ`, `BUG-AAA`). Usar guiones bajos `_` en los nombres descriptivos de directorios.
+*   **Granularidad**: No todos los issues requerirán un directorio completo. Usar el juicio para agrupar issues menores si es necesario.
+*   **Sincronización con Jira**: Mantener los IDs y títulos sincronizados con la herramienta de gestión de proyectos (ej. Jira).
+*   **Migración Gradual**: Si un proyecto tiene estructura mixta, priorizar la consolidación gradual hacia la estructura detectada como principal.
+
+---
+*Esta regla está alineada con los principios de Documentación Primero y Desarrollo Guiado por Katas de la metodología RaiSE, adaptándose flexiblemente a la estructura organizacional existente del repositorio.*

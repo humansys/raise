@@ -1,0 +1,68 @@
+---
+title: "Reglas de Generación de Diagramas Mermaid"
+description: "Guías para la creación de diagramas Mermaid sintácticamente correctos y lógicamente coherentes en archivos Markdown, enfocadas en la prevención de errores de parseo y gestión de participantes."
+patterns:
+  - "**/*.md"
+  - "**/*.mdc"
+priority: 920
+category: "meta-rules"
+tags: ["mermaid", "documentation", "diagrams", "standards", "ai-guidance"]
+---
+
+# Estándares para la Generación de Diagramas Mermaid
+
+## Contexto
+Los diagramas de Mermaid son una herramienta crucial en nuestra documentación para visualizar flujos de trabajo, arquitecturas y relaciones de datos de forma clara y concisa. Para asegurar su correcto renderizado y coherencia lógica, es fundamental seguir estas directrices.
+
+## Directrices Principales
+
+-   **Sintaxis de Nodos - Siempre entrecomillar texto**: Para evitar errores de parseo, especialmente cuando el texto contiene espacios, caracteres especiales (como `( )`, `[ ]`, `{ }`) o saltos de línea (`<br>`), **siempre encierra el contenido de los nodos entre comillas dobles (`\"`).**
+    -   Esto asegura que el parser de Mermaid interprete el texto literalmente y no lo confunda con sintaxis de nodos.
+
+-   **Gestión de Líneas de Vida (`activate` / `deactivate`)**: Cada comando `activate` debe tener un único `deactivate` correspondiente al final del bloque de actividad de un participante.
+    -   Evita múltiples llamadas a `deactivate` para el mismo participante en diferentes ramas de un flujo, ya que esto provoca el error "Trying to inactivate an inactive participant".
+
+-   **Bifurcaciones Lógicas (`alt`/`else`)**: Cuando un flujo tiene condiciones que llevan a diferentes caminos, utiliza los bloques `alt` (alternativa) y `else` (en otro caso).
+    -   Esto mantiene la línea de vida del participante activa a través de todas las ramas condicionales y asegura que el `deactivate` final se aplique correctamente al terminar el bloque lógico, sin importar qué camino se tomó.
+
+-   **Concisión y Claridad**: Mantén los diagramas lo más sencillos posible, enfocándote en los detalles esenciales del flujo o la estructura que se quiere transmitir.
+
+## Ejemplos de Código Correcto
+
+### 1. Nodos con texto entrecomillado y saltos de línea
+```mermaid
+graph TD
+    A[\"Paso Inicial <br> (Datos de Entrada)\"] --> B{\"Decisión: ¿Es Válido?\"};\n    B -- Sí --> C[\"Proceso A\"];\n    B -- No --> D[\"Error <br> (Notificación al Usuario)\"];
+```
+
+### 2. Gestión Correcta de `activate`/`deactivate` con `alt/else`
+```mermaid
+sequenceDiagram
+    participant Cliente
+    participant ServicioAPI as Servicio API
+    participant BaseDeDatos as Base de Datos
+
+    Cliente->>ServicioAPI: Enviar Solicitud
+    activate ServicioAPI
+
+    alt Solicitud es Válida
+        ServicioAPI->>BaseDeDatos: Consultar Datos
+        activate BaseDeDatos
+        BaseDeDatos-->>ServicioAPI: Datos Obtenidos
+        deactivate BaseDeDatos
+        ServicioAPI-->>Cliente: Respuesta Exitosa
+    else Solicitud NO es Válida
+        ServicioAPI-->>Cliente: Respuesta de Error (400 Bad Request)
+    end
+
+    deactivate ServicioAPI
+```
+
+## Evitar
+
+-   Nodos sin comillas cuando el texto contiene espacios o caracteres especiales.
+-   Múltiples `deactivate` para un mismo `activate` en rutas condicionales.
+-   Usar `opt` para flujos donde la desactivación del participante es crítica, ya que `opt` no maneja explícitamente el camino "no tomado". Prefiere `alt/else` para esto.
+
+## Notas de Integración
+La adherencia a estos estándares facilitará la interpretación de la documentación técnica por parte de los desarrolladores humanos y permitirá que el asistente de IA genere diagramas consistentes y libres de errores de sintaxis o lógica.

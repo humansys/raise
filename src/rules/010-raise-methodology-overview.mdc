@@ -1,0 +1,67 @@
+---
+name: "Visión General de la Metodología RaiSE"
+description: "Introduce los conceptos y principios clave del framework RaiSE (Reliable AI Software Engineering)."
+globs:
+  - "**/*.cs"
+  - "**/*.md"
+priority: 10
+category: "raise-methodology"
+---
+# Visión General de la Metodología RaiSE
+
+## Propósito
+
+Esta regla introduce los conceptos y principios clave del framework RaiSE (Reliable AI Software Engineering). El objetivo de RaiSE es mejorar la confiabilidad, explicabilidad y calidad del desarrollo de software que utiliza asistentes de IA para la generación y modificación de código.
+
+## Principios Fundamentales de RaiSE
+
+1.  **Documentación Precede al Código (Documentation First)**:
+    *   Toda implementación significativa DEBE comenzar con una fase de documentación y diseño detallado.
+    *   Esta documentación (Capabilities, Features, User Stories, Katas, Tech Designs) sirve como la "fuente de verdad" y guía principal para el asistente de IA.
+    *   La calidad de la documentación impacta directamente la calidad del código generado.
+
+2.  **Explicabilidad Inherente (Inherent Explicability)**:
+    *   Cada paso del proceso de desarrollo, desde el requisito hasta la implementación, debe ser trazable y comprensible.
+    *   Las "Katas" de desarrollo describen paso a paso cómo construir una funcionalidad, proporcionando un contexto claro para la generación de código.
+
+3.  **Desarrollo Guiado por Katas (Kata-Driven Development)**:
+    *   Las funcionalidades se descomponen en "Katas", que son secuencias de pasos pequeños, verificables y bien definidos.
+    *   Cada paso de la kata especifica qué crear o modificar, cómo probarlo y qué reglas aplicar.
+    *   Esto reduce la ambigüedad y el riesgo de "alucinaciones" del asistente de IA.
+
+4.  **Orquestación Humana, Asistencia IA (Human Orchestration, AI Assistance)**:
+    *   El desarrollador humano guía y orquesta el proceso, toma
+    ndo decisiones estratégicas y de diseño.
+    *   El asistente de IA se enfoca en la generación de código y tareas repetitivas, basándose en la guía detallada proporcionada.
+
+5.  **Software Confiable o Nada (Reliable Software or Nothing)**:
+    *   Se prioriza la creación de software robusto, mantenible y bien probado.
+    *   Las reglas Cursor, las pruebas unitarias y de integración son componentes esenciales para alcanzar este objetivo.
+
+6.  **Retroalimentación Continua y Refinamiento (Continuous Feedback and Refinement)**:
+    *   El proceso y las reglas se mejoran continuamente basándose en la experiencia y los resultados obtenidos.
+
+## Flujo de Trabajo General en RaiSE
+
+1.  **Definición de Requisitos**: Captura de Capabilities, Features y User Stories.
+2.  **Diseño Técnico Detallado**: Creación de Tech Designs y especificaciones (APIs, componentes) si es necesario.
+3.  **Creación de Katas**: Desglose de la User Story en una secuencia de pasos de implementación (la "kata").
+4.  **Implementación Asistida por IA**: El desarrollador humano instruye al asistente de IA para ejecutar cada paso de la kata, aplicando las reglas Cursor relevantes.
+5.  **Pruebas y Verificación**: Pruebas unitarias y de integración en cada etapa.
+6.  **Revisión y Refinamiento**: Revisión del código generado y ajuste de la documentación o katas si es necesario.
+
+## Rol de las Reglas Cursor en RaiSE
+
+Las reglas Cursor son un pilar fundamental de RaiSE, ya que:
+
+*   Codifican los estándares tecnológicos y arquitectónicos del proyecto.
+*   Guían al asistente de IA para generar código alineado con las mejores prácticas y los patrones específicos del repositorio.
+*   Refuerzan los principios metodológicos de RaiSE durante la interacción con el asistente.
+*   Contribuyen a la consistencia y calidad del código generado.
+
+## Guía para la IA
+
+-   Al generar o modificar código, siempre considera los principios de RaiSE.
+-   Prioriza la documentación proporcionada (Katas, Tech Designs, User Stories) como tu principal fuente de contexto.
+-   Aplica rigurosamente las reglas Cursor relevantes para el archivo o componente en el que estés trabajando.
+-   Si encuentras ambigüedades en la documentación o las instrucciones, solicita clarificación antes de proceder con suposiciones.
