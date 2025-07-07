@@ -1,0 +1,66 @@
+# Regla: 320 - Protocolo de Sesiones de Workspace
+
+## 1. Propósito
+
+Este protocolo establece un flujo de trabajo basado en "sesiones" para organizar los artefactos de trabajo temporales (borradores, análisis, notas). El objetivo es mantener el repositorio principal limpio, confinando los archivos de trabajo a directorios de sesión específicos dentro de la carpeta `workspace/`.
+
+## 2. Definiciones Clave
+
+-   **Workspace**: El directorio `[root]/workspace/` es el área designada para todo el trabajo exploratorio y temporal.
+-   **Sesión**: Una unidad de trabajo con un objetivo concreto (ej. "diseño inicial de la arquitectura"). Cada sesión vive en su propio directorio.
+-   **Entregables Finales**: Archivos que son parte del producto (ej. código en `src/`, documentación final). Estos se crean en su ubicación permanente, **fuera** del `workspace/`.
+
+## 3. Proceso de Ejecución (Para el Agente)
+
+### Paso 1: Inicio de Conversación
+
+Al comienzo de CADA nueva conversación, DEBES preguntar al orquestador si desea iniciar una sesión de trabajo.
+
+> **Plantilla de pregunta:** "Hola. Antes de comenzar, ¿deseas iniciar una nueva sesión de trabajo en el `workspace`? Si es así, por favor proporciona un título breve para la sesión."
+
+### Paso 2: Creación del Directorio de Sesión
+
+Si el orquestador confirma, DEBES realizar las siguientes acciones:
+
+1.  **Anunciar el Inicio:** "Iniciando sesión de trabajo: [Título]."
+2.  **Crear el Directorio:** Genera un nuevo directorio dentro de `workspace/` con el formato `[prefijo]-[fecha]-[título]`.
+    -   `[prefijo]`: Número secuencial de 2 dígitos (01, 02, etc.).
+    -   `[fecha]`: Formato `YYMMDD`.
+    -   `[título]`: Versión corta y en formato slug del título proporcionado.
+3.  **Iniciar el Kata de Sesión (Checklist):** Crea un archivo `README.md` dentro del nuevo directorio de sesión, utilizando la siguiente plantilla.
+
+### Paso 3: Plantilla `README.md` del Kata de Sesión
+
+```markdown
+# Sesión de Trabajo: [Título Completo de la Sesión]
+
+- **Fecha de Inicio:** YYYY-MM-DD
+- **ID de Sesión:** [prefijo]-[fecha]-[título]
+
+## 1. Objetivo de la Sesión
+
+[Descripción clara y concisa del objetivo a lograr en esta sesión.]
+
+---
+## 2. Plan de Acción / Checklist
+
+- [ ] Tarea 1: [Descripción de la tarea]
+- [ ] Tarea 2: [Descripción de la tarea]
+- [ ] Tarea 3: [Descripción de la tarea]
+
+---
+## 3. Artefactos Generados (En este Directorio)
+
+- `[nombre_del_archivo.ext]`: [Breve descripción de su propósito]
+
+---
+## 4. Entregables Finales Producidos (Fuera del Workspace)
+
+- `[ruta/completa/al/entregable.ext]`: [Descripción del entregable final]
+```
+
+### Paso 4: Operación Durante la Sesión
+
+-   **Archivos Temporales**: TODO archivo temporal, borrador o de trabajo DEBE ser creado dentro del directorio de la sesión activa.
+-   **Entregables Finales**: Los archivos de código fuente, documentación final u otros artefactos permanentes DEBEN ser creados o editados en su ubicación definitiva en el repositorio, fuera del `workspace/`.
+-   **Registro**: Al final de la sesión, asegúrate de que el `README.md` de la sesión refleje los artefactos y entregables producidos.
