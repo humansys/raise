@@ -12,6 +12,7 @@ tags: [dod, historias-usuario, proceso, calidad, raiSE, agentes-ia]
 - **Título**: Definición y Uso del DoD para Historias de Usuario en Proyectos RaiSE
 - **Propósito**: Establecer un proceso repetible para definir, adaptar y aplicar una Definition of Done (DoD) coherente y verificable a nivel de Historia de Usuario (HU) en proyectos desarrollados con agentes de IA orquestados por un humano RaiSE.
 - **Contexto**: Proyectos donde el desarrollo es realizado principalmente por agentes de IA (coder, TL, QA, arquitecto, etc.) bajo la orquestación de un humano, y donde las HUs son la unidad principal de planificación, ejecución y verificación de valor entregado. Esta kata se aplica cuando el proyecto ya cuenta con los artefactos esenciales de requisitos y diseño (PRD, visión de solución, diseño técnico general o por feature, HUs definidas y un plan de implementación por HU, o artefactos equivalentes según el proceso del proyecto).
+- **Principios Rectores**: DRY (Don't Repeat Yourself), KISS (Keep It Simple, Stupid), YAGNI (You Aren't Gonna Need It) y DDD (Domain-Driven Design) como base para todas las decisiones de diseño, implementación y verificación asociadas al DoD de cada HU.
 - **Audiencia**: RaiSE Dev (humano orquestador), Product Owner, Tech Lead (humano o agente), QA (humano o agente), y cualquier agente de IA involucrado en la planificación, diseño, implementación, pruebas y documentación de HUs.
 
 ## Pre-condiciones
@@ -86,6 +87,8 @@ tags: [dod, historias-usuario, proceso, calidad, raiSE, agentes-ia]
 - **Acción**:
   - A partir de las fuentes de calidad y la plantilla estándar, instanciar los ítems técnicos que apliquen a esta HU, por ejemplo:
     - Patrón arquitectónico correcto aplicado (según katas L2/L3 relevantes).
+    - Respeto a los principios DRY, KISS y YAGNI en el diseño de la solución, evitando duplicidades innecesarias, complejidad accidental y funcionalidades no justificadas por la HU o su dominio.
+    - Alineación con los límites y conceptos del dominio definidos por DDD (bounded contexts, agregados, entidades, value objects, etc.), evitando acoplamientos indebidos entre dominios.
     - Manejo de errores y fallos con degradación controlada.
     - Validaciones de entrada y sanitización de datos.
     - Pruebas unitarias mínimas por componente/función modificada.
@@ -94,7 +97,7 @@ tags: [dod, historias-usuario, proceso, calidad, raiSE, agentes-ia]
   - Ajustar el nivel de exigencia según el riesgo de la HU (mayor riesgo ⇒ DoD técnico más estricto).
 - **Criterios de Aceptación**:
   - El DoD incluye ítems explícitos sobre:
-    - Patrón arquitectónico y convenciones técnicas.
+    - Patrón arquitectónico y convenciones técnicas, incluyendo la aplicación explícita de DRY, KISS, YAGNI y DDD cuando apliquen.
     - Testing (tipos de pruebas y cobertura mínima esperada).
     - Seguridad y manejo de errores relevantes al contexto.
   - Para cada ítem técnico se indica cómo se verificará (revisión de código, ejecución de suite de tests, revisión de logs, etc.).
