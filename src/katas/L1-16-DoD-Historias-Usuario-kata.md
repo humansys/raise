@@ -140,10 +140,20 @@ tags: [dod, historias-usuario, proceso, calidad, raiSE, agentes-ia]
   - Incluir el DoD completo (o un enlace directo a él) en el artefacto donde vive la HU (p.ej. ticket de issue tracker, YAML de HU, documento de especificación).
   - Asegurar que el plan de implementación de la HU (definido según el proceso estándar del proyecto) referencia los ítems del DoD y, cuando sea útil, los descompone en tareas técnicas o sub-tareas asignables a agentes.
   - Configurar, si aplica, automatizaciones o checklists en la herramienta de gestión para que el DoD se vea y se marque durante la ejecución.
+  - Alinear la estrategia de ramas de Git con la jerarquía de trabajo del proyecto, por ejemplo:
+    - `main` como rama principal estable.
+    - Ramas de **épica** derivadas de `main` (p.ej. `epic/KEY-123-descripcion-corta`).
+    - Ramas de **HU** derivadas de la rama de épica correspondiente (p.ej. `hu/KEY-456-descripcion-corta`).
+    - Las subtareas de la HU **no** generan ramas adicionales: se representan como **commits individuales o pequeños grupos de commits** sobre la rama de HU.
+  - Definir y aplicar una convención de mensajes de commit por subtarea, donde:
+    - Cada commit (o conjunto pequeño de commits) se asocia a una única subtarea de la HU.
+    - El mensaje de commit incluye explícitamente el identificador de la subtarea/HU en el issue tracker (p.ej. clave de Jira) y una descripción breve y atómica del cambio.
 - **Criterios de Aceptación**:
   - Cualquier persona o agente que abra la HU puede ver de forma inmediata y clara el DoD asociado.
   - Existe una trazabilidad visible entre los ítems del DoD y las tareas/sub-tareas del plan de implementación.
   - Las herramientas de gestión utilizadas (issue tracker, CI/CD, etc.) reflejan el estado de cumplimiento de los ítems del DoD.
+  - Para la HU existe una rama de HU claramente asociada (y, cuando aplique, ramas de épica) que siguen la jerarquía `main → épica → HU`, con nombres alineados a los identificadores del issue tracker.
+  - Los commits relevantes para la HU referencian explícitamente la subtarea/HU correspondiente y no mezclan, sin justificación, cambios de varias subtareas en un mismo commit.
 
 ### Paso 10: Usar el DoD como checklist de verificación al cierre de la HU
 - **Acción**:
@@ -158,6 +168,22 @@ tags: [dod, historias-usuario, proceso, calidad, raiSE, agentes-ia]
   - Para cada ítem del DoD, existe evidencia razonable de cumplimiento (en código, tests, documentación o herramientas de observabilidad).
   - Cualquier excepción o ítem diferido queda documentado con su justificación y plan de seguimiento.
 
+### Paso 11: Reflexión de aprendizaje y mejora del proceso asistida por IA
+- **Acción**:
+  - Activar un agente de reflexión de aprendizaje (p.ej. un **Agente Socrático / Agente de Reingeniería Educativa**) configurado con principios de aprendizaje de doble bucle, heutagogía técnica y trabajo con sistemas multi-agente.
+  - Mantener una breve sesión guiada con el agente centrada en:
+    - Qué funcionó bien en la sesión de desarrollo de esta HU (tanto técnica como colaborativamente con los agentes de IA).
+    - Dónde hubo fricciones, errores repetidos o falta de claridad (en requisitos, DoD, plan, herramientas, orquestación de agentes).
+    - Qué ajustes concretos se pueden hacer para la **próxima HU** (en la forma de definir DoD, de orquestar agentes, de documentar decisiones, de verificar calidad, etc.).
+  - Registrar los aprendizajes clave y acciones de mejora en un artefacto de conocimiento accesible (p.ej. `learning-log` del proyecto, sección de retrospectiva por HU, o documento equivalente), enlazando explícitamente la HU y su DoD.
+- **Criterios de Aceptación**:
+  - Existe un registro breve y concreto de la reflexión de aprendizaje asociada a la HU con al menos:
+    - 1–3 cosas que funcionaron bien.
+    - 1–3 oportunidades de mejora.
+    - 1–3 acciones concretas para próximas HUs o sesiones.
+  - Al menos una acción de mejora identificada está claramente conectada con la forma de definir/aplicar el DoD o de orquestar a los agentes de IA.
+  - El artefacto de reflexión queda almacenado en un lugar estándar del proyecto y es recuperable como contexto para futuras sesiones (humanas o agénticas).
+
 ## Post-condiciones
 - Cada HU relevante del proyecto dispone de un **DoD explícito, versionado y verificable**, asociado directamente a la HU.
 - El DoD de la HU cubre de manera balanceada:
@@ -170,6 +196,7 @@ tags: [dod, historias-usuario, proceso, calidad, raiSE, agentes-ia]
   - Ejecutar la implementación y las pruebas.
   - Verificar el cumplimiento antes de marcar la HU como Done.
 - El RaiSE Dev mantiene el control y la responsabilidad final sobre la calidad, usando el DoD como contrato explícito entre negocio, tecnología y agentes de IA.
+- Cada HU deja además un registro de reflexión y aprendizaje que alimenta la mejora continua del proceso y de la colaboración humano–IA.
 
 ## Notas Adicionales
 - Esta Kata debe revisarse y ajustarse periódicamente conforme el proyecto madure y se obtenga experiencia práctica con el uso de DoD a nivel de HUs.
