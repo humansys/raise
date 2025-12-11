@@ -12,6 +12,7 @@ tags: [dod, epicas, proceso, calidad, raiSE, agentes-ia, gestion]
 - **Título**: Definición y Uso del DoD para Épicas en Proyectos RaiSE
 - **Propósito**: Establecer un marco de trabajo estandarizado para definir, verificar y cerrar la Definition of Done (DoD) a nivel de Épica, asegurando la coherencia, integridad y calidad del entregable completo compuesto por múltiples Historias de Usuario (HUs).
 - **Contexto**: Proyectos orquestados por un humano (RaiSE Dev) donde la ejecución técnica es realizada mayoritariamente por agentes de IA. Las Épicas representan funcionalidades completas o hitos significativos. **El DoD de la Épica se define PRIMERO**, estableciendo los requisitos y restricciones que heredarán las HUs.
+- **Principios Rectores**: DRY (Don't Repeat Yourself), KISS (Keep It Simple, Stupid), YAGNI (You Aren't Gonna Need It) y DDD (Domain-Driven Design) como base para todas las decisiones de alcance, diseño y validación de la Épica.
 - **Audiencia**: RaiSE Dev (Orquestador), Product Owner, Arquitecto de Solución (Agente/Humano), Tech Lead (Agente/Humano) y agentes de gestión de proyecto.
 
 ## Pre-condiciones
