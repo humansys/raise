@@ -1,0 +1,40 @@
+00:00 Es herramienta que es el de context size mana y esto, que es lo que hace es ya seleccionar un hotel que para, para que, que ella pueda pasar a la segunda gente.
+00:11 Esta herramienta está también junto con el otro aciente para que pueda por así decirlo. que por si la persona no lo interesa y ese hotel pueda como otra vez volver a la fase de descubrimiento.
+00:24 y pues eso distra más importante y ahí creo ahorita, pues sí, la herramienta pues más creo que más importante que yo es la ahorita creo y que es necesaria como dijo ya es la de pues la de justicia de memoria y cuando se tenga los criterios En esta ha sido pues ya puede pasar a una búsqueda por palabras
+00:45 clave por así decirlo y ya la otra es la búsqueda de rá, ya sé, es con el segundo agente que lo implementa y pues de ahí pues viene lo más que creo que es lo de la modificación de igual.
+00:56 la base de datos que pues no tiene tanto tanto interés yo creo y lo de flujo de la el flujo de la gente es digamos es un flujo de como el flujo todo se determinate como con un rúter pero no es probabilístico, solamente es el contextual raíz que es el que completa cuando adjabon así te lo digo así de 
+01:34 esa forma cuando el usuario le pregunta el el primer router que se termina esta chica si en la conversación ya hubo un hotel elegido por el usuario.
+01:45 Esta se pasa al pron número 1 al primer agente, que es el que busca preguntas, el que le dice oye que te necesito si quieres y ese mismo cuando detecta palabras clave, usa el herramienta para guardarlas pero de manera determinista porque no nos gustaba la idea que dependiéramos de su memoria entonces
+02:09 En raro, digamos, la gente tiene estado en los estados. en la conversación sabemos si ya nos dilote el sitio adoté definido si no tiene el que hay que ir y eso.
+02:22 Cháremos que tendrán. Entonces. Entonces, una vez, ya tengo las palabras clave suficientes de termina que tengo suficientes. hacer llamar el segundo herramienta que es el de Busqueda, de un hotel por lo amenidades y para los palabras clave.
+02:41 las sugiere al usuario, entonces ya cuando el usuario elija una igual el primer agente va a determinar que necesito que ya se eligió uno y va a ser la tercera herramienta que es guardar el hotel que pidió con, en el context servidi y cuando se tenga definidos contexto al aire y dice pasa al segundo prón
+03:04 o segundo ¿Qué es el que ella se enfoca más? en un fron, en un fron de astia, como que ella vended un poco más la idea de lo del hotel y de esta experiencia del suario.
+03:17 que que usa el ras. Entonces ya puedes buscar el sitio del hotel y toda esta parte. y pues ese es un poco el fuloco.
+03:27 Este agente, segundo también tiene el uso de la herramienta de de modificar el contexto a daily, porque pensamos que en caso de que el usuario tal vez quiero regresar y decir no, pues no me interesa mucho este texto.
+03:41 Puede determinar que no lo quieres limpiarlo y así puede volver a regresar al agente número 1. ese es un poco de flujo y ese flujo de orquestación ¿Cómo lo vamos a hacer?
+03:59 implementar este áncomo hipómic. Pues esto, Todos se definen con el contexto de AID como nuestro bandera principal y ahí se determina si cambia o no y pues se exponiéndole, en las tres herramientas de con M.C.
+04:18 ¿Está bien en mi pantalla? este es un documento de hace un par de años de cuando se pero la maíndex y muestra uno de lo pues un poco parecido lo que estamos hablando ¿no?
+04:33 ¿Usted dijo hablar con un concierto? Este concierto esté especializado en atender al usuario. ok y quiere decir aquí es donde ponemos en branbo y se aquí es donde podemos hacer esas cosas que personalizan como como atiende al usuario final este concierto es el que mantiene el chat con el usuario.
+05:02 Entonces, este concierto comunica en este modelo. que si lo implementemos con un agente orquestador, este agente orquestador decide a de la petición del usuario, cuál de los otros subagentes o cuál de las herramientas en la capacidad de lo que está dor de evaluar si la tarea ha sido terminada o no.
+05:27 Y si la tarea ha sido terminada, pues, Entonces, le dice a la gente en continuación de gente que evalué si hay un siguiente paso, es decir, hay alguna otra, la edición que hizo el usuario o todas las tareas de sanción terminadas.
+05:43 Si si si lo ven. ¿Sí? Sí, sí. ¿Sí les parece que es algo así o que lo que tenemos que resolver?
+05:53 Sí. Bueno, esto que ve en aquí es un grafo, ¿qué? Quiere decirle, es un flujo que no termina donde quiere, es un grafón, tiene unas secuencias.
+06:10 de lugares donde van y cuando yo digo cómo vamos a implementar ese flujo es que este este grapho es una máquina de estado que nosotros tenemos que tener implementada y estas máquinas de entrada son las que se pueden implementar en tan gran.
+06:26 un paidencio que hay dependiendo de qué tan sofisticado sea el asunto. mm-hmm No tenemos que llegar a una esquema tan sofisticado de inicio ¿Qué es esto?
+06:56 Pero yo sí esperaría que nuestro diseño desde ahora, aunque tuviera lo mejor el usuario con él y llamado una herramienta.
+07:04 Y si ahora ya usáramos los granjos para asegurarnos que la gente se mantiene en la estaría, ¿no? Porque pues no se puede ir por el lado o sea el rafo.
+07:17 Ya, sí. Entonces, en este implement, Tentación técnica es la que yo creo que tenemos que resolver. Para mí, esto es la principal interrogante.
+07:28 De todo el sistema que tenemos que hacer, todo lo tengo claro, excepto cómo implementar esto. No lo tenemos que ver con ese detalle ahorita con galo, pero si es algo que nos interesa ver lo antes posible.
+07:44 En todos los proyectos hay cosas que son factores críticos de éxito, que si se de resuelven y este ya chingamos.
+07:52 este este es uno de esos acordes críticos de éxito como vamos a fiscionar el flujo agéntico para encausarlo en en las ramas que nosotros queremos, algunos te van a contestar su nombre.
+08:08 y disuñe el hotel que quieren en la primera respuesta. Algunos están diciendo y luego van a requerir otras 5 interacciones para, y eso es justamente lo que se quiere modernar aquí.
+08:26 ¿No? Bueno, ese es esta. Me parece bien que les explicamos detalles y se quieren ya Ya nada más de demostramos la gran, sí y luego hacemos una gráfica de esta cuando tengamos claridad por respecto al el altre cueste tuvieron chance de verlo Esa está haciendo, ¿sabes que tendré que levantarlo?
+08:47 y parece que me hablas con alo para que nos de para que nos yo sé cómo levantar con Tienes las, como se dice.
+09:00 Ah, yo que no. tiempo. Entonces, nosotros podríamos checar ahí nada más, pues hay que decirle, mira, la Lo verdad es que estuvimos a estén cerrando todo.
+09:11 Eso es lo que queremos hacer. Yo revisé el mar. si puedes entiendo que él ya lo probó, ojalá es igual de entenderlo, ojalá que lo único que nosotros como lo veíamos, pero yo lo veo bien, me subo, entonces creo que igual nos ponemos de acuerdo de que ya lo ponen producción y que ya saqué eso.
+09:31 y nos concentremos en esto ya quedó claro ¿Qué es lo que nos hace parte entonces? Sí, tener un grafo y ver cómo el pain d'articlo va.
+09:47 esto de implementación con gráfico es una forma de hacer Digamos que la más tradicional desde el punto de vista agente, hay otras formas de También podemos explorar más cosas.
+10:09 Deben ser bonito. ¿Es que no tengo que pasar la liga a la noche? Oh, oh, oh, Ok . . un poco No.
+11:21 por decirme contest y bueno que espézame este tema de los patrones que de los que hablamos ayer son diferentes que es manera de se incrementar ese clujo agente cuando hablamos de uso un jugoyente que estamos hablando de un diagrama de flocos como querimos, pero le potencialmente cada cajita es una gente
+11:54 . y es un l lm y se comunican con llamadas de mcp y ¡Amen! Y nos damos mucho que perdamos las cámaras.
+12:18 Y otra vez que damos 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 2, 2, 2, Ah, ah, ah.
