@@ -17,7 +17,7 @@ status: "Draft"
 # Estimación de Proyecto y Roadmap: Agente IA de Cotizaciones
 
 **Documentos Relacionados:**
-    *   **PRD:** PRD-DL3221-001
+    *   **PRD:** PRD-DL3221-001V
     *   **SoW:** SOW-DL3221-001 (Asumido)
     *   **Priorización:** PRI-DL3221-001
     *   **Backlog:** BCK-DL3221-001
