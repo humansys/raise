@@ -2,8 +2,10 @@
 ## Estructuras de Datos y Ontología
 
 **Versión:** 2.1.0  
-**Fecha:** 28 de Diciembre, 2025  
+**Fecha:** 29 de Diciembre, 2025  
 **Propósito:** Documentar las estructuras de datos, schemas y ontología canónica de RaiSE.
+
+> **Nota v2.1:** Campo `audience` añadido a Kata (ADR-009). Diagrama ER actualizado. Encoding UTF-8 corregido.
 
 ---
 
@@ -23,6 +25,12 @@ erDiagram
     
     KATA ||--o{ VALIDATION_GATE : "define_criterios"
     KATA }|--|| KATA_LEVEL : "pertenece_a"
+    KATA }|--|| KATA_AUDIENCE : "dirigida_a"
+    
+    KATA_AUDIENCE {
+        string id PK "beginner, intermediate, advanced"
+        string shuhari_mapping "shu, ha, ri (interno)"
+    }
     
     VALIDATION_GATE ||--o{ ESCALATION_GATE : "puede_triggerar"
     
@@ -164,81 +172,45 @@ erDiagram
 
 ---
 
-### Kata [v2.1: Niveles Semánticos + Jidoka Inline]
+### Kata
 
-**Definición:** Proceso estructurado que hace visible la desviación del estándar, habilitando el ciclo Jidoka (Detectar → Parar → Corregir → Continuar). Cada paso incluye verificación y guía de corrección inline.
+**Definición:** Proceso estructurado que codifica un estándar o patrón. Ejercicio deliberado de mejora.
 
 **Atributos:**
 
 | Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| id | string | ✅ | Ej. `flujo-04` |
-| level | enum | ✅ | `principios`, `flujo`, `patron`, `tecnica` |
+| id | string | ✅ | Ej. `L1-04` |
+| level | enum | ✅ | `L0`, `L1`, `L2`, `L3` (qué enseña) |
+| audience | enum | ✅ | `beginner`, `intermediate`, `advanced` (a quién) [v2.1] |
 | title | string | ✅ | Nombre descriptivo |
 | purpose | string | ✅ | Para qué sirve |
-| inputs | array | ✅ | Qué consume (hace visible si falta) |
+| inputs | array | ✅ | Qué consume |
 | outputs | array | ✅ | Qué produce |
-| steps | array | ✅ | Pasos con Jidoka inline |
-| validation_gate | object | ✅ | Sensor final de la Kata |
+| steps | array | ✅ | Pasos a seguir |
+| validation_gate | string | ❌ | Gate que este kata valida |
+| prerequisites | array | ❌ | Katas que deben completarse antes [v2.1] |
 
-**Niveles Semánticos [v2.1]:**
+**Niveles (Level) — Qué enseña:**
 
-| Nivel | Pregunta Guía | Propósito | Desviación Visible |
-|-------|---------------|-----------|-------------------|
-| **principios** | ¿Por qué? ¿Cuándo? | Aplicar §1-§8 de Constitution | "No puedo justificar esta decisión" |
-| **flujo** | ¿Cómo fluye el trabajo? | Secuencias de valor estandarizadas | "No tengo el input requerido" |
-| **patron** | ¿Qué estructura usar? | Formas recurrentes y templates | "El output no cumple la estructura" |
-| **tecnica** | ¿Cómo ejecutar esto? | Instrucciones específicas | "La validación técnica falla" |
+| Nivel | Propósito | Ejemplo |
+|-------|-----------|---------|
+| L0 | Meta-katas: filosofía | Principios RaiSE |
+| L1 | Proceso: metodología | Generación de planes |
+| L2 | Componentes: patrones | Análisis de código |
+| L3 | Técnico: especialización | Modelado de datos |
 
-**Estructura de Step (Jidoka Inline):**
+**Audiencia (Audience) — A quién está dirigida:** [v2.1 - ADR-009]
 
-```yaml
-step:
-  number: int
-  name: string
-  instructions: string
-  verification: string      # Cómo saber si funcionó
-  if_blocked:               # Jidoka inline
-    cause: string
-    resolution: string
-```
+| Audience | Características | Mapeo Interno |
+|----------|-----------------|---------------|
+| `beginner` | Pasos exactos, copiar la forma, sin variación | Shu (守) |
+| `intermediate` | Adaptación al contexto, entender el "por qué" | Ha (破) |
+| `advanced` | Crear variaciones propias, fluir sin forma | Ri (離) |
 
-**Ejemplo de Paso con Jidoka Inline:**
+> **Nota de diseño (ADR-009):** El mapeo ShuHaRi es interno para mantenedores. Los usuarios ven solo términos universales (`beginner/intermediate/advanced`). Esta decisión balancea diferenciación filosófica con simplicidad de onboarding.
 
-```markdown
-### Paso 3: Cargar Tech Design
-
-Proporciona al agente el Tech Design relevante para esta User Story.
-
-**Verificación:** El agente confirma acceso al documento.
-
-> **Si no puedes continuar:**
-> No tienes Tech Design → Ejecuta `patron-01-tech-design.md` primero.
-```
-
-**Ubicación:** `raise-config/katas/{nivel}/*.md`
-
-**Estructura de Directorios:**
-
-```
-raise-config/
-└── katas/
-    ├── principios/     # ¿Por qué? ¿Cuándo?
-    ├── flujo/          # ¿Cómo fluye?
-    ├── patron/         # ¿Qué forma?
-    └── tecnica/        # ¿Cómo hacer?
-```
-
-**Migración L0-L3 → Niveles Semánticos:**
-
-| Antes | Después | Alias |
-|-------|---------|-------|
-| `L0` | `principios` | `L0`, `meta` |
-| `L1` | `flujo` | `L1`, `proceso` |
-| `L2` | `patron` | `L2`, `componente` |
-| `L3` | `tecnica` | `L3`, `tecnico` |
-
-> Ver `kata-shuhari-schema-v2.1.md` para documentación completa del schema.
+**Ubicación:** `raise-config/katas/L{n}-*.md`
 
 ---
 
@@ -349,6 +321,7 @@ Contenido...
 id: PROJ-123
 type: user_story
 priority: P1
+audience: intermediate
 ---
 ```
 
@@ -485,8 +458,7 @@ flowchart LR
 
 | Cambio | Script |
 |--------|--------|
-| `L0-L3` → `principios/flujo/patron/tecnica` | `raise migrate katas --to-semantic` |
-| Estructura de steps con Jidoka inline | `raise lint katas --check-jidoka-inline` |
+| Añadir `audience` a Katas | Manual o `raise kata migrate` |
 
 ---
 
@@ -497,6 +469,7 @@ flowchart LR
 | Constitution | define | Guardrail |
 | Guardrail | aplica a | Project |
 | Kata | define_criterios | Validation Gate |
+| Kata | dirigida_a | Kata Audience [v2.1] |
 | Validation Gate | puede_triggerar | Escalation Gate |
 | Spec | descompone en | User Story |
 | User Story | implementa via | Task |
@@ -535,13 +508,12 @@ Constitution (Inmutable)
 
 ## Changelog
 
-### v2.1.0 (2025-12-28)
-- **BREAKING:** Niveles Kata L0-L3 → principios/flujo/patron/tecnica
-- NUEVO: Jidoka inline en estructura de steps
-- NUEVO: Campo `if_blocked` en cada step
-- ACTUALIZADO: `validation_gate` ahora es object, no string
-- ACTUALIZADO: Estructura de directorios de katas
-- Aliases L0-L3 preservados para backward compatibility
+### v2.1.0 (2025-12-29)
+- NUEVO: Campo `audience` en Kata (ADR-009)
+- NUEVO: Campo `prerequisites` en Kata
+- NUEVO: Entidad KATA_AUDIENCE en diagrama ER
+- NUEVO: Tabla de mapeo ShuHaRi (interno)
+- FIX: Encoding UTF-8 corregido en todo el documento
 
 ### v2.0.0 (2025-12-28)
 - **BREAKING:** Rule → Guardrail (schema y ubicación)
@@ -557,4 +529,4 @@ Constitution (Inmutable)
 
 ---
 
-*Este documento define la ontología canónica de RaiSE. Actualizar con cada nueva entidad. Referencias cruzadas: [10-system-architecture.md](./10-system-architecture.md), [20-glossary.md](./20-glossary.md), [kata-shuhari-schema-v2.1.md](./kata-shuhari-schema-v2.1.md).*
+*Este documento define la ontología canónica de RaiSE. Actualizar con cada nueva entidad. Referencias cruzadas: [10-system-architecture-v2.md](./10-system-architecture-v2.md), [20-glossary-v2.md](./20-glossary-v2.md), [ADR-009](./adr/adr-009-shuhari-hybrid.md).*
