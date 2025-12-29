@@ -23,6 +23,7 @@
 | ADR-007 | Guardrails over Rules | ✅ Accepted | 2025-12-28 | [adr-007](./adr-007-guardrails.md) |
 | ADR-008 | Observable Workflow local | ✅ Accepted | 2025-12-28 | [adr-008](./adr-008-observable-workflow.md) |
 | ADR-009 | ShuHaRi Hybrid Implementation | ✅ Accepted | 2025-12-29 | [adr-009](./adr-009-shuhari-hybrid.md) |
+| ADR-010 | Ontología de Comandos CLI | ✅ Accepted | 2025-12-29 | [adr-010](./adr-010-cli-ontology.md) |
 
 ---
 

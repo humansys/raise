@@ -62,7 +62,8 @@
 | ADR-006a | ✅ Accepted | adr-006a-validation-gates.md |
 | ADR-007 | ✅ Accepted | adr-007-guardrails.md |
 | ADR-008 | ✅ Accepted | adr-008-observable-workflow.md |
-| ADR-009 | ✅ Accepted | adr-009-shuhari-hybrid.md [NUEVO] |
+| ADR-009 | ✅ Accepted | adr-009-shuhari-hybrid.md |
+| ADR-010 | ✅ Accepted | adr-010-cli-ontology.md [NUEVO] | |
 
 ### Código
 - ❌ raise-kit CLI (pendiente - PRÓXIMO PASO)
@@ -93,9 +94,21 @@
 - **Versión:** 2.0.0 → 2.1.0
 - **Cambios:** Campo `audience` en Kata, diagrama ER actualizado, encoding corregido
 
-### 4. Archivo kata-shuhari-schema-v2_1.md
-- **Estado:** Propuesta incorporada en ADR-009
-- **Acción:** Puede archivarse o eliminarse
+### 4. ADR-010: Ontología de Comandos CLI ✅ [NUEVO]
+- **Decisión:** `hydrate` → `pull`, `validate` → `kata`
+- **Impacto:** Comandos clasificados por contexto (Desarrollo vs CI/CD)
+- **Principio:** Jidoka define la frontera (escalation = requiere humano)
+- **Archivo:** `adr/adr-010-cli-ontology.md`
+
+### 5. Commands Reference v2.1 ✅ [NUEVO]
+- **Reescritura completa** con nueva ontología
+- **Nuevos comandos:** `raise pull`, `raise kata`
+- **Clasificación:** Desarrollo (interactivo) vs CI/CD (automatizable)
+
+### 6. Documentos P1 Actualizados ✅ [NUEVO]
+- `30-roadmap-v2.1.md` — Comandos y backlog actualizados
+- `24-examples-library-v2.1.md` — Ejemplos con `raise pull`
+- `15-tech-stack-v2.1.md` — Estructura CLI con `kata.py`
 
 ---
 
@@ -119,6 +132,9 @@
 | ShuHaRi Hybrid | Carga cognitiva vs valor | Filosofía interna, UI simple | ADR-009 |
 | ADRs separados | Monolito difícil de mantener | 1 archivo por ADR | — |
 | Campo `audience` en Kata | Operacionalizar Heutagogía | beginner/intermediate/advanced | ADR-009 |
+| `hydrate` → `pull` | Jerga confusa | Verbo familiar de Git | ADR-010 |
+| `validate` → `kata` | Kata es proceso, no validación | Refleja semántica correcta | ADR-010 |
+| Clasificación Dev/CI-CD | Sin distinción clara | Jidoka define frontera | ADR-010 |
 
 ---
 
@@ -177,8 +193,14 @@
 | `adr/adr-007-guardrails.md` | Nuevo | ADR extraído |
 | `adr/adr-008-observable-workflow.md` | Nuevo | ADR extraído |
 | `adr/adr-009-shuhari-hybrid.md` | Nuevo | ADR nuevo |
+| `adr/adr-010-cli-ontology.md` | Nuevo | ADR nuevo - Ontología CLI |
 | `11-data-architecture-v2.1.md` | Actualizado | Schema Kata + audience |
-| `31-current-state-v2.md` | Actualizado | Este documento |
+| `15-tech-stack-v2.1.md` | Actualizado | Estructura CLI + kata.py |
+| `23-commands-reference-v2.1.md` | Reescrito | Nueva ontología de comandos |
+| `24-examples-library-v2.1.md` | Actualizado | Ejemplos con raise pull |
+| `30-roadmap-v2.1.md` | Actualizado | Backlog con nueva ontología |
+| `31-current-state-v2.1.md` | Actualizado | Este documento |
+| `adr-010-impact-analysis.md` | Nuevo | Análisis de impacto en corpus |
 
 ---
 
@@ -186,8 +208,10 @@
 
 ### 2025-12-29
 - ADR-009 (ShuHaRi Hybrid) creado y aprobado
+- ADR-010 (Ontología CLI) creado y aprobado
 - ADRs refactorizados a estructura de archivos separados
 - Data Architecture actualizado a v2.1
+- Commands Reference reescrito con nueva ontología
 - Current State actualizado
 
 ### 2025-12-28
