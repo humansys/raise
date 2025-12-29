@@ -1,9 +1,9 @@
 # RaiSE Security & Compliance
 ## Postura de Seguridad y Compliance
 
-**VersiÃ³n:** 2.0.0  
+**Versión:** 2.0.0  
 **Fecha:** 28 de Diciembre, 2025  
-**PropÃ³sito:** Documentar polÃ­ticas de seguridad, Observable Workflow y roadmap de compliance.
+**Propósito:** Documentar políticas de seguridad, Observable Workflow y roadmap de compliance.
 
 ---
 
@@ -12,23 +12,23 @@
 ```mermaid
 flowchart TB
     subgraph Threats["Vectores de Amenaza"]
-        T1[InyecciÃ³n de guardrails maliciosos]
-        T2[ExfiltraciÃ³n de cÃ³digo via agente]
+        T1[Inyección de guardrails maliciosos]
+        T2[Exfiltración de código via agente]
         T3[Secrets en Golden Data]
         T4[Supply chain attack]
         T5[MCP server compromise]
     end
     
-    subgraph Assets["Activos CrÃ­ticos"]
-        A1[CÃ³digo fuente]
+    subgraph Assets["Activos Críticos"]
+        A1[Código fuente]
         A2[Secrets/tokens]
         A3[Guardrails de governance]
-        A4[Specs/diseÃ±os]
+        A4[Specs/diseños]
         A5[Observable Traces]
     end
     
     subgraph Controls["Controles"]
-        C1[ValidaciÃ³n de guardrails]
+        C1[Validación de guardrails]
         C2[Local-first architecture]
         C3[Git-only distribution]
         C4[Dependency scanning]
@@ -44,39 +44,39 @@ flowchart TB
 
 ---
 
-## Activos CrÃ­ticos
+## Activos Críticos
 
-| Activo | ClasificaciÃ³n | Controles |
+| Activo | Clasificación | Controles |
 |--------|---------------|-----------|
-| CÃ³digo fuente | Confidencial | Local-first, no cloud |
-| API keys/secrets | CrÃ­tico | Nunca en Golden Data |
+| Código fuente | Confidencial | Local-first, no cloud |
+| API keys/secrets | Crítico | Nunca en Golden Data |
 | Guardrails (.mdc) | Interno | Versionado, code review |
-| Specs/diseÃ±os | Interno | Acceso por proyecto |
-| Constitution | PÃºblico | Versionado immutable |
-| Observable Traces | Interno | RetenciÃ³n configurable |
+| Specs/diseños | Interno | Acceso por proyecto |
+| Constitution | Público | Versionado immutable |
+| Observable Traces | Interno | Retención configurable |
 
 ---
 
-## Vectores de Ataque y MitigaciÃ³n
+## Vectores de Ataque y Mitigación
 
-### 1. InyecciÃ³n de Guardrails Maliciosos
+### 1. Inyección de Guardrails Maliciosos
 
 **Amenaza:** Atacante modifica guardrails en raise-config para alterar comportamiento de agentes.
 
-**MitigaciÃ³n:**
+**Mitigación:**
 - Code review obligatorio para cambios en guardrails
 - Branch protection en repos de config
 - Firma de commits (GPG)
-- Observable Workflow detecta cambios anÃ³malos
+- Observable Workflow detecta cambios anómalos
 - Guardrail `guard-security-review` bloquea merges sin review
 
-### 2. ExfiltraciÃ³n via Agente
+### 2. Exfiltración via Agente
 
-**Amenaza:** Agente AI envÃ­a cÃ³digo/secrets a servidor externo.
+**Amenaza:** Agente AI envía código/secrets a servidor externo.
 
-**MitigaciÃ³n:**
+**Mitigación:**
 - Arquitectura local-first (raise-mcp server local)
-- No hay telemetrÃ­a hacia cloud RaiSE
+- No hay telemetría hacia cloud RaiSE
 - Guardrails de seguridad restringen acceso a red
 - Observable Traces auditan todas las acciones del agente
 - Escalation Gate para operaciones de red
@@ -85,10 +85,10 @@ flowchart TB
 
 **Amenaza:** Usuario guarda secrets en archivos `.raise/`.
 
-**MitigaciÃ³n:**
+**Mitigación:**
 - `.gitignore` por default incluye patrones de secrets
 - Guardrail `guard-no-secrets` detecta patterns
-- ValidaciÃ³n CLI en `raise check --security`
+- Validación CLI en `raise check --security`
 - Pre-commit hooks opcionales
 - Observable Workflow alerta si secret detectado
 
@@ -96,28 +96,28 @@ flowchart TB
 
 **Amenaza:** Dependencia maliciosa en raise-kit.
 
-**MitigaciÃ³n:**
+**Mitigación:**
 - Dependency scanning (Safety, Snyk)
 - Lock files (uv.lock)
 - Minimal dependencies policy
 - Security advisories monitoring
-- SBOM generado automÃ¡ticamente
+- SBOM generado automáticamente
 
 ### 5. MCP Server Compromise [NUEVO v2.1]
 
 **Amenaza:** Atacante gana acceso al raise-mcp server.
 
-**MitigaciÃ³n:**
+**Mitigación:**
 - MCP server solo escucha en localhost
-- Sin autenticaciÃ³n porque es local-only
-- Observable Traces detectan accesos anÃ³malos
+- Sin autenticación porque es local-only
+- Observable Traces detectan accesos anómalos
 - Proceso sandboxed (sin privilegios elevados)
 
 ---
 
 ## Observable Workflow para Compliance [NUEVO v2.1]
 
-### Arquitectura de AuditorÃ­a
+### Arquitectura de Auditoría
 
 ```mermaid
 flowchart LR
@@ -144,14 +144,14 @@ flowchart LR
     R --> E
 ```
 
-### QuÃ© se Registra (MELT Framework)
+### Qué se Registra (MELT Framework)
 
-| Pilar | Datos Capturados | RetenciÃ³n |
+| Pilar | Datos Capturados | Retención |
 |-------|------------------|-----------|
-| **Metrics** | Token usage, duration, gate pass rate | 30 dÃ­as |
-| **Events** | Tool calls, resource reads, escalations | 90 dÃ­as |
-| **Logs** | Inputs/outputs de cada interacciÃ³n | 30 dÃ­as |
-| **Traces** | Flujo completo request â†’ response | 90 dÃ­as |
+| **Metrics** | Token usage, duration, gate pass rate | 30 días |
+| **Events** | Tool calls, resource reads, escalations | 90 días |
+| **Logs** | Inputs/outputs de cada interacción | 30 días |
+| **Traces** | Flujo completo request → response | 90 días |
 
 ### Formato de Trace
 
@@ -170,7 +170,7 @@ flowchart LR
 }
 ```
 
-### Comandos de AuditorÃ­a
+### Comandos de Auditoría
 
 ```bash
 # Ver traces de hoy
@@ -182,39 +182,39 @@ raise audit --from 2025-01-01 --to 2025-03-31 --format csv
 # Buscar escalaciones
 raise audit --filter "action=escalate"
 
-# MÃ©tricas de gates
+# Métricas de gates
 raise audit --metrics gates
 ```
 
 ---
 
-## PolÃ­ticas de Datos
+## Políticas de Datos
 
 ### Data Residency
 - **Principio:** Datos nunca salen del ambiente local
-- **ImplementaciÃ³n:** No hay cloud backend, todo es Git-native
+- **Implementación:** No hay cloud backend, todo es Git-native
 - **Observable Traces:** Locales en `.raise/traces/`
-- **ExcepciÃ³n:** Si usuario configura export explÃ­citamente
+- **Excepción:** Si usuario configura export explícitamente
 
 ### Encryption
 
-| Contexto | MÃ©todo |
+| Contexto | Método |
 |----------|--------|
 | At rest | Responsabilidad del sistema host |
-| In transit (Git) | SSH/HTTPS estÃ¡ndar |
+| In transit (Git) | SSH/HTTPS estándar |
 | MCP (local) | No aplica (localhost) |
 | Traces | Opcional: encryption at rest |
 
 ### Retention
 
-| Dato | RetenciÃ³n Default | Configurable |
+| Dato | Retención Default | Configurable |
 |------|-------------------|--------------|
-| Observable Traces | 90 dÃ­as | SÃ­ |
-| Metrics agregados | 1 aÃ±o | SÃ­ |
-| Session logs | 30 dÃ­as | SÃ­ |
+| Observable Traces | 90 días | Sí |
+| Metrics agregados | 1 año | Sí |
+| Session logs | 30 días | Sí |
 | Artifacts (Git) | Indefinida | Git policy |
 
-**ConfiguraciÃ³n de retenciÃ³n:**
+**Configuración de retención:**
 ```yaml
 # raise.yaml
 observability:
@@ -231,22 +231,22 @@ observability:
 
 | Framework | Estado | Target Date | Observable Workflow Support |
 |-----------|--------|-------------|----------------------------|
-| EU AI Act | ðŸ”„ En desarrollo | Q2 2025 | âœ… Trazabilidad completa |
-| SOC2 Type I | ðŸ“‹ Planificado | Q3 2026 | âœ… Audit trail |
-| ISO 27001 | ðŸ“‹ Futuro | 2027 | âœ… Controles documentados |
-| GDPR | âœ… By design | - | âœ… No PII procesado |
+| EU AI Act | 🔄 En desarrollo | Q2 2025 | ✅ Trazabilidad completa |
+| SOC2 Type I | 📋 Planificado | Q3 2026 | ✅ Audit trail |
+| ISO 27001 | 📋 Futuro | 2027 | ✅ Controles documentados |
+| GDPR | ✅ By design | - | ✅ No PII procesado |
 
 ### EU AI Act Alignment [DETALLADO v2.1]
 
 RaiSE facilita cumplimiento del EU AI Act (vigente 2025):
 
-| Requisito EU AI Act | ImplementaciÃ³n RaiSE |
+| Requisito EU AI Act | Implementación RaiSE |
 |---------------------|---------------------|
 | **Art. 9: Risk Management** | Guardrails con severity levels |
 | **Art. 11: Technical Documentation** | Specs + Constitution versionados |
 | **Art. 12: Record-keeping** | Observable Workflow traces |
 | **Art. 13: Transparency** | Escalation Gates (HITL) |
-| **Art. 14: Human Oversight** | Principio de HeutagogÃ­a |
+| **Art. 14: Human Oversight** | Principio de Heutagogía |
 | **Art. 15: Accuracy & Robustness** | Validation Gates por fase |
 
 **Reporte de compliance:**
@@ -260,17 +260,17 @@ raise compliance --framework eu-ai-act --output report.pdf
 
 ### Eventos Auditados
 
-| Evento | Datos | UbicaciÃ³n | Inmutabilidad |
+| Evento | Datos | Ubicación | Inmutabilidad |
 |--------|-------|-----------|---------------|
-| `raise init` | Timestamp, options, user | Observable Trace | âœ… |
-| `raise pull` | Guardrails actualizados | Observable Trace | âœ… |
-| `raise check` | Results, violations | Observable Trace | âœ… |
-| MCP resource_read | URI, content_hash | Observable Trace | âœ… |
-| MCP tool_call | Tool, input, output | Observable Trace | âœ… |
-| Escalation | Reason, resolution | Observable Trace | âœ… |
-| Validation Gate | Gate, status, criteria | Observable Trace | âœ… |
-| Cambios en guardrails | Git diff | raise-config repo | âœ… (Git) |
-| Cambios en specs | Git diff | Project repo | âœ… (Git) |
+| `raise init` | Timestamp, options, user | Observable Trace | ✅ |
+| `raise pull` | Guardrails actualizados | Observable Trace | ✅ |
+| `raise check` | Results, violations | Observable Trace | ✅ |
+| MCP resource_read | URI, content_hash | Observable Trace | ✅ |
+| MCP tool_call | Tool, input, output | Observable Trace | ✅ |
+| Escalation | Reason, resolution | Observable Trace | ✅ |
+| Validation Gate | Gate, status, criteria | Observable Trace | ✅ |
+| Cambios en guardrails | Git diff | raise-config repo | ✅ (Git) |
+| Cambios en specs | Git diff | Project repo | ✅ (Git) |
 
 ### Inmutabilidad de Traces
 
@@ -282,7 +282,7 @@ flowchart LR
     D --> E[Tamper detection]
 ```
 
-**VerificaciÃ³n de integridad:**
+**Verificación de integridad:**
 ```bash
 raise audit --verify-integrity --from 2025-01-01
 ```
@@ -296,8 +296,8 @@ raise audit --verify-integrity --from 2025-01-01
 ```mermaid
 flowchart LR
     A[Detectar via Traces] --> B[Evaluar severidad]
-    B --> C{CrÃ­tico?}
-    C -->|SÃ­| D[Escalar + Preservar traces]
+    B --> C{Crítico?}
+    C -->|Sí| D[Escalar + Preservar traces]
     C -->|No| E[Documentar]
     D --> F[Mitigar]
     E --> F
@@ -305,25 +305,25 @@ flowchart LR
     G --> H[Post-mortem + Guardrail nuevo]
 ```
 
-### ClasificaciÃ³n
+### Clasificación
 
-| Severidad | Criterio | Response Time | AcciÃ³n Observable |
+| Severidad | Criterio | Response Time | Acción Observable |
 |-----------|----------|---------------|-------------------|
-| CrÃ­tico | Compromiso de secrets, RCE | 4 horas | Freeze traces, notify |
+| Crítico | Compromiso de secrets, RCE | 4 horas | Freeze traces, notify |
 | Alto | Vulnerabilidad explotable | 24 horas | Export traces afectados |
-| Medio | Vulnerabilidad potencial | 7 dÃ­as | AnÃ¡lisis de traces |
+| Medio | Vulnerabilidad potencial | 7 días | Análisis de traces |
 | Bajo | Mejora de seguridad | Siguiente release | Nuevo guardrail |
 
 ### Forensics via Observable Workflow
 
 ```bash
-# Reconstruir sesiÃ³n de incidente
+# Reconstruir sesión de incidente
 raise audit --session-id <uuid> --full
 
 # Timeline de acciones
 raise audit --from "2025-01-15 14:00" --to "2025-01-15 15:00" --timeline
 
-# Detectar anomalÃ­as
+# Detectar anomalías
 raise audit --anomaly-detection --threshold 0.95
 ```
 
@@ -364,22 +364,22 @@ raise audit --anomaly-detection --threshold 0.95
 
 ### Para Organizaciones
 
-1. **raise-config privado:** No usar repo pÃºblico para guardrails internos
+1. **raise-config privado:** No usar repo público para guardrails internos
 2. **Branch protection:** Requerir PRs y reviews
-3. **Minimal permissions:** Tokens con scope mÃ­nimo
+3. **Minimal permissions:** Tokens con scope mínimo
 4. **Observable Workflow activado:** `raise.yaml` con `observability.enabled: true`
-5. **RotaciÃ³n:** Rotar tokens periÃ³dicamente
+5. **Rotación:** Rotar tokens periódicamente
 6. **SIEM integration:** Exportar traces a sistema centralizado
 
 ### Para Orquestadores
 
 1. **No secrets en .raise/:** Usar variables de entorno
-2. **Revisar guardrails:** Entender quÃ© guardrails se aplican
+2. **Revisar guardrails:** Entender qué guardrails se aplican
 3. **Actualizar:** Mantener raise-kit actualizado
 4. **Revisar escalations:** No ignorar Escalation Gates
 5. **Auditar regularmente:** `raise audit --summary weekly`
 
-### ConfiguraciÃ³n de Seguridad Recomendada
+### Configuración de Seguridad Recomendada
 
 ```yaml
 # raise.yaml - Hardened config
@@ -407,14 +407,14 @@ escalation:
 ## Changelog
 
 ### v2.1.0 (2025-12-28)
-- TerminologÃ­a: rules â†’ guardrails
-- NUEVO: SecciÃ³n completa Observable Workflow para Compliance
+- Terminología: rules → guardrails
+- NUEVO: Sección completa Observable Workflow para Compliance
 - NUEVO: Vector de amenaza MCP server compromise
-- NUEVO: EU AI Act alignment detallado por artÃ­culo
+- NUEVO: EU AI Act alignment detallado por artículo
 - NUEVO: Inmutabilidad de traces con hash chain
 - NUEVO: Comandos de forensics
 - NUEVO: Hardened config ejemplo
-- Activos crÃ­ticos: aÃ±adido Observable Traces
+- Activos críticos: añadido Observable Traces
 - Audit trail expandido con eventos MCP
 
 ---

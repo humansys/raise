@@ -1,15 +1,15 @@
 # RaiSE Data Architecture
-## Estructuras de Datos y OntologÃ­a
+## Estructuras de Datos y Ontología
 
-**VersiÃ³n:** 2.1.0  
+**Versión:** 2.1.0  
 **Fecha:** 29 de Diciembre, 2025  
-**PropÃ³sito:** Documentar las estructuras de datos, schemas y ontologÃ­a canÃ³nica de RaiSE.
+**Propósito:** Documentar las estructuras de datos, schemas y ontología canónica de RaiSE.
 
-> **Nota v2.1:** Campo `audience` aÃ±adido a Kata (ADR-009). Diagrama ER actualizado. Encoding UTF-8 corregido.
+> **Nota v2.1:** Campo `audience` añadido a Kata (ADR-009). Diagrama ER actualizado. Encoding UTF-8 corregido.
 
 ---
 
-## OntologÃ­a de Conceptos
+## Ontología de Conceptos
 
 ```mermaid
 erDiagram
@@ -51,19 +51,19 @@ erDiagram
 
 ### Constitution
 
-**DefiniciÃ³n:** Principios inmutables que gobiernan el proyecto. Documento de mÃ¡xima jerarquÃ­a.
+**Definición:** Principios inmutables que gobiernan el proyecto. Documento de máxima jerarquía.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| version | semver | âœ… | VersiÃ³n del documento |
-| identity | object | âœ… | QuÃ© es y quÃ© no es |
-| principles | array | âœ… | Principios innegociables (Â§1-Â§9) |
-| values | array | âœ… | Valores de diseÃ±o |
-| restrictions | object | âœ… | Nunca/Siempre |
+| version | semver | ✅ | Versión del documento |
+| identity | object | ✅ | Qué es y qué no es |
+| principles | array | ✅ | Principios innegociables (§1-§9) |
+| values | array | ✅ | Valores de diseño |
+| restrictions | object | ✅ | Nunca/Siempre |
 
-**UbicaciÃ³n:** `.raise/memory/constitution.md`
+**Ubicación:** `.raise/memory/constitution.md`
 
 **Referencia MCP:** `raise://constitution`
 
@@ -71,25 +71,25 @@ erDiagram
 
 ### Guardrail [v2.0: antes "Rule"]
 
-**DefiniciÃ³n:** Control que gobierna comportamiento de agentes o calidad de cÃ³digo. Los Guardrails son protecciones activas, no reglas pasivas.
+**Definición:** Control que gobierna comportamiento de agentes o calidad de código. Los Guardrails son protecciones activas, no reglas pasivas.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| id | string | âœ… | Identificador Ãºnico (ej. `guard-001-naming`) |
-| title | string | âœ… | Nombre descriptivo |
-| scope | enum | âœ… | `agent`, `code`, `process`, `security` |
-| severity | enum | âœ… | `error`, `warning`, `info` |
-| priority | int | âœ… | 1-999, menor = mayor prioridad |
-| content | markdown | âœ… | Contenido del guardrail |
-| globs | array | âŒ | Patrones de archivo donde aplica |
-| enforcement | enum | âœ… | `block`, `warn`, `log` |
+| id | string | ✅ | Identificador único (ej. `guard-001-naming`) |
+| title | string | ✅ | Nombre descriptivo |
+| scope | enum | ✅ | `agent`, `code`, `process`, `security` |
+| severity | enum | ✅ | `error`, `warning`, `info` |
+| priority | int | ✅ | 1-999, menor = mayor prioridad |
+| content | markdown | ✅ | Contenido del guardrail |
+| globs | array | ❌ | Patrones de archivo donde aplica |
+| enforcement | enum | ✅ | `block`, `warn`, `log` |
 
 **Formato humano:** `.mdc` (Markdown con frontmatter)  
-**Formato mÃ¡quina:** `.json` (compilado)
+**Formato máquina:** `.json` (compilado)
 
-**UbicaciÃ³n:**
+**Ubicación:**
 - Origen: `raise-config/guardrails/*.mdc`
 - Compilado: `.raise/memory/guardrails.json`
 
@@ -99,32 +99,32 @@ erDiagram
 
 ### Validation Gate [v2.0: antes "DoD"]
 
-**DefiniciÃ³n:** Punto de inspecciÃ³n que debe pasarse antes de avanzar a la siguiente fase. Implementa el principio Jidoka.
+**Definición:** Punto de inspección que debe pasarse antes de avanzar a la siguiente fase. Implementa el principio Jidoka.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| id | string | âœ… | Identificador (ej. `gate-design`) |
-| phase | enum | âœ… | `context`, `discovery`, `vision`, `design`, `backlog`, `plan`, `code`, `deploy` |
-| criteria | array | âœ… | Lista de criterios a validar |
-| escalation_threshold | float | âŒ | Confidence bajo el cual escalar (0.0-1.0) |
-| blocking | boolean | âœ… | Si bloquea avance o solo advierte |
+| id | string | ✅ | Identificador (ej. `gate-design`) |
+| phase | enum | ✅ | `context`, `discovery`, `vision`, `design`, `backlog`, `plan`, `code`, `deploy` |
+| criteria | array | ✅ | Lista de criterios a validar |
+| escalation_threshold | float | ❌ | Confidence bajo el cual escalar (0.0-1.0) |
+| blocking | boolean | ✅ | Si bloquea avance o solo advierte |
 
-**Fases estÃ¡ndar:**
+**Fases estándar:**
 
 | Gate | Fase | Pregunta clave |
 |------|------|----------------|
-| `gate-context` | 0 | Â¿Stakeholders y restricciones claros? |
-| `gate-discovery` | 1 | Â¿PRD completo y validado? |
-| `gate-vision` | 2 | Â¿AlineaciÃ³n negocio-tÃ©cnica? |
-| `gate-design` | 3 | Â¿Arquitectura consistente? |
-| `gate-backlog` | 4 | Â¿HUs siguen formato estÃ¡ndar? |
-| `gate-plan` | 5 | Â¿Pasos atÃ³micos y verificables? |
-| `gate-code` | 6 | Â¿CÃ³digo validado multinivel? |
-| `gate-deploy` | 7 | Â¿Feature en producciÃ³n estable? |
+| `gate-context` | 0 | ¿Stakeholders y restricciones claros? |
+| `gate-discovery` | 1 | ¿PRD completo y validado? |
+| `gate-vision` | 2 | ¿Alineación negocio-técnica? |
+| `gate-design` | 3 | ¿Arquitectura consistente? |
+| `gate-backlog` | 4 | ¿HUs siguen formato estándar? |
+| `gate-plan` | 5 | ¿Pasos atómicos y verificables? |
+| `gate-code` | 6 | ¿Código validado multinivel? |
+| `gate-deploy` | 7 | ¿Feature en producción estable? |
 
-**UbicaciÃ³n:** Definidos en katas correspondientes
+**Ubicación:** Definidos en katas correspondientes
 
 **Referencia MCP:** Tool `validate_gate`
 
@@ -132,17 +132,17 @@ erDiagram
 
 ### Escalation Gate [v2.0: NUEVO]
 
-**DefiniciÃ³n:** Trigger para intervenciÃ³n humana (HITL). Se activa cuando un Validation Gate falla o la confianza es baja.
+**Definición:** Trigger para intervención humana (HITL). Se activa cuando un Validation Gate falla o la confianza es baja.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| trigger_source | string | âœ… | Gate o condiciÃ³n que lo activÃ³ |
-| reason | string | âœ… | Por quÃ© se requiere intervenciÃ³n |
-| context | object | âœ… | InformaciÃ³n para el Orquestador |
-| options | array | âœ… | Acciones posibles |
-| timeout | duration | âŒ | Tiempo mÃ¡ximo de espera |
+| trigger_source | string | ✅ | Gate o condición que lo activó |
+| reason | string | ✅ | Por qué se requiere intervención |
+| context | object | ✅ | Información para el Orquestador |
+| options | array | ✅ | Acciones posibles |
+| timeout | duration | ❌ | Tiempo máximo de espera |
 
 **Referencia MCP:** Tool `escalate`
 
@@ -150,73 +150,73 @@ erDiagram
 
 ### Observable Trace [v2.0: NUEVO]
 
-**DefiniciÃ³n:** Registro de una interacciÃ³n agente-MCP para auditorÃ­a y Observable Workflow.
+**Definición:** Registro de una interacción agente-MCP para auditoría y Observable Workflow.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| trace_id | uuid | âœ… | Identificador Ãºnico |
-| session_id | uuid | âœ… | SesiÃ³n de trabajo |
-| timestamp | datetime | âœ… | Momento de la acciÃ³n |
-| action | string | âœ… | Tipo de acciÃ³n (resource_read, tool_call, etc.) |
-| actor | enum | âœ… | `agent`, `orchestrator`, `system` |
-| input | object | âœ… | Datos de entrada |
-| output | object | âœ… | Resultado |
-| duration_ms | int | âœ… | Tiempo de ejecuciÃ³n |
-| gate_status | enum | âŒ | `passed`, `failed`, `escalated` |
+| trace_id | uuid | ✅ | Identificador único |
+| session_id | uuid | ✅ | Sesión de trabajo |
+| timestamp | datetime | ✅ | Momento de la acción |
+| action | string | ✅ | Tipo de acción (resource_read, tool_call, etc.) |
+| actor | enum | ✅ | `agent`, `orchestrator`, `system` |
+| input | object | ✅ | Datos de entrada |
+| output | object | ✅ | Resultado |
+| duration_ms | int | ✅ | Tiempo de ejecución |
+| gate_status | enum | ❌ | `passed`, `failed`, `escalated` |
 
-**UbicaciÃ³n:** `.raise/traces/{date}/{session_id}.jsonl`
+**Ubicación:** `.raise/traces/{date}/{session_id}.jsonl`
 
-**Formato:** JSON Lines (un trace por lÃ­nea)
+**Formato:** JSON Lines (un trace por línea)
 
 ---
 
 ### Kata
 
-**DefiniciÃ³n:** Proceso estructurado que codifica un estÃ¡ndar o patrÃ³n. Ejercicio deliberado de mejora.
+**Definición:** Proceso estructurado que codifica un estándar o patrón. Ejercicio deliberado de mejora.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| id | string | âœ… | Ej. `L1-04` |
-| level | enum | âœ… | `L0`, `L1`, `L2`, `L3` (quÃ© enseÃ±a) |
-| audience | enum | âœ… | `beginner`, `intermediate`, `advanced` (a quiÃ©n) [v2.1] |
-| title | string | âœ… | Nombre descriptivo |
-| purpose | string | âœ… | Para quÃ© sirve |
-| inputs | array | âœ… | QuÃ© consume |
-| outputs | array | âœ… | QuÃ© produce |
-| steps | array | âœ… | Pasos a seguir |
-| validation_gate | string | âŒ | Gate que este kata valida |
-| prerequisites | array | âŒ | Katas que deben completarse antes [v2.1] |
+| id | string | ✅ | Ej. `L1-04` |
+| level | enum | ✅ | `L0`, `L1`, `L2`, `L3` (qué enseña) |
+| audience | enum | ✅ | `beginner`, `intermediate`, `advanced` (a quién) [v2.1] |
+| title | string | ✅ | Nombre descriptivo |
+| purpose | string | ✅ | Para qué sirve |
+| inputs | array | ✅ | Qué consume |
+| outputs | array | ✅ | Qué produce |
+| steps | array | ✅ | Pasos a seguir |
+| validation_gate | string | ❌ | Gate que este kata valida |
+| prerequisites | array | ❌ | Katas que deben completarse antes [v2.1] |
 
-**Niveles (Level) â€” QuÃ© enseÃ±a:**
+**Niveles (Level) — Qué enseña:**
 
-| Nivel | PropÃ³sito | Ejemplo |
+| Nivel | Propósito | Ejemplo |
 |-------|-----------|---------|
-| L0 | Meta-katas: filosofÃ­a | Principios RaiSE |
-| L1 | Proceso: metodologÃ­a | GeneraciÃ³n de planes |
-| L2 | Componentes: patrones | AnÃ¡lisis de cÃ³digo |
-| L3 | TÃ©cnico: especializaciÃ³n | Modelado de datos |
+| L0 | Meta-katas: filosofía | Principios RaiSE |
+| L1 | Proceso: metodología | Generación de planes |
+| L2 | Componentes: patrones | Análisis de código |
+| L3 | Técnico: especialización | Modelado de datos |
 
-**Audiencia (Audience) â€” A quiÃ©n estÃ¡ dirigida:** [v2.1 - ADR-009]
+**Audiencia (Audience) — A quién está dirigida:** [v2.1 - ADR-009]
 
-| Audience | CaracterÃ­sticas | Mapeo Interno |
+| Audience | Características | Mapeo Interno |
 |----------|-----------------|---------------|
-| `beginner` | Pasos exactos, copiar la forma, sin variaciÃ³n | Shu (å®ˆ) |
-| `intermediate` | AdaptaciÃ³n al contexto, entender el "por quÃ©" | Ha (ç ´) |
-| `advanced` | Crear variaciones propias, fluir sin forma | Ri (é›¢) |
+| `beginner` | Pasos exactos, copiar la forma, sin variación | Shu (守) |
+| `intermediate` | Adaptación al contexto, entender el "por qué" | Ha (破) |
+| `advanced` | Crear variaciones propias, fluir sin forma | Ri (離) |
 
-> **Nota de diseÃ±o (ADR-009):** El mapeo ShuHaRi es interno para mantenedores. Los usuarios ven solo tÃ©rminos universales (`beginner/intermediate/advanced`). Esta decisiÃ³n balancea diferenciaciÃ³n filosÃ³fica con simplicidad de onboarding.
+> **Nota de diseño (ADR-009):** El mapeo ShuHaRi es interno para mantenedores. Los usuarios ven solo términos universales (`beginner/intermediate/advanced`). Esta decisión balancea diferenciación filosófica con simplicidad de onboarding.
 
-**UbicaciÃ³n:** `raise-config/katas/L{n}-*.md`
+**Ubicación:** `raise-config/katas/L{n}-*.md`
 
 ---
 
 ### Spec (Specification)
 
-**DefiniciÃ³n:** Documento que describe QUÃ‰ construir. Artefacto central del Context Engineering.
+**Definición:** Documento que describe QUÉ construir. Artefacto central del Context Engineering.
 
 **Tipos:**
 - PRD (Product Requirements Document)
@@ -226,16 +226,16 @@ erDiagram
 
 **Atributos comunes:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| id | string | âœ… | Identificador (ej. JIRA ID) |
-| title | string | âœ… | Nombre descriptivo |
-| status | enum | âœ… | `draft`, `review`, `approved` |
-| version | semver | âœ… | VersiÃ³n del documento |
-| stakeholders | array | âŒ | Interesados |
-| content | markdown | âœ… | Contenido principal |
+| id | string | ✅ | Identificador (ej. JIRA ID) |
+| title | string | ✅ | Nombre descriptivo |
+| status | enum | ✅ | `draft`, `review`, `approved` |
+| version | semver | ✅ | Versión del documento |
+| stakeholders | array | ❌ | Interesados |
+| content | markdown | ✅ | Contenido principal |
 
-**UbicaciÃ³n:** `.raise/specs/{id}-{type}.md`
+**Ubicación:** `.raise/specs/{id}-{type}.md`
 
 **Referencia MCP:** `raise://specs/{id}`
 
@@ -243,50 +243,50 @@ erDiagram
 
 ### User Story
 
-**DefiniciÃ³n:** Requisito desde perspectiva del usuario.
+**Definición:** Requisito desde perspectiva del usuario.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| id | string | âœ… | Identificador |
-| title | string | âœ… | Como [rol], quiero [acciÃ³n] |
-| description | string | âœ… | Contexto y detalles |
-| acceptance_criteria | array | âœ… | Criterios BDD (Dado/Cuando/Entonces) |
-| priority | enum | âœ… | `P0`, `P1`, `P2`, `P3` |
-| story_points | int | âŒ | EstimaciÃ³n |
+| id | string | ✅ | Identificador |
+| title | string | ✅ | Como [rol], quiero [acción] |
+| description | string | ✅ | Contexto y detalles |
+| acceptance_criteria | array | ✅ | Criterios BDD (Dado/Cuando/Entonces) |
+| priority | enum | ✅ | `P0`, `P1`, `P2`, `P3` |
+| story_points | int | ❌ | Estimación |
 
 **Formato BDD para AC:**
 ```gherkin
 Dado [contexto inicial]
-Cuando [acciÃ³n del usuario]
+Cuando [acción del usuario]
 Entonces [resultado esperado]
 ```
 
-**UbicaciÃ³n:** `.raise/specs/{feature-id}/{id}-US-*.md`
+**Ubicación:** `.raise/specs/{feature-id}/{id}-US-*.md`
 
 ---
 
 ### Agent
 
-**DefiniciÃ³n:** ConfiguraciÃ³n de un agente de IA especializado.
+**Definición:** Configuración de un agente de IA especializado.
 
 **Atributos:**
 
-| Campo | Tipo | Requerido | DescripciÃ³n |
+| Campo | Tipo | Requerido | Descripción |
 |-------|------|-----------|-------------|
-| name | string | âœ… | Nombre del agente |
-| version | semver | âœ… | VersiÃ³n de la spec |
-| identity | object | âœ… | Rol, misiÃ³n, dominios |
-| behavior | object | âœ… | Principios, persistencia |
-| capabilities | object | âœ… | Tareas primarias/secundarias |
-| mcp_tools | array | âŒ | Tools MCP que puede invocar |
-| guardrails | array | âœ… | Guardrails que debe seguir |
-| safety | object | âœ… | Condiciones de rechazo |
+| name | string | ✅ | Nombre del agente |
+| version | semver | ✅ | Versión de la spec |
+| identity | object | ✅ | Rol, misión, dominios |
+| behavior | object | ✅ | Principios, persistencia |
+| capabilities | object | ✅ | Tareas primarias/secundarias |
+| mcp_tools | array | ❌ | Tools MCP que puede invocar |
+| guardrails | array | ✅ | Guardrails que debe seguir |
+| safety | object | ✅ | Condiciones de rechazo |
 
 **Formato:** YAML
 
-**UbicaciÃ³n:** `raise-config/agents/{agent-name}/spec.yaml`
+**Ubicación:** `raise-config/agents/{agent-name}/spec.yaml`
 
 ---
 
@@ -298,15 +298,15 @@ Usado para: Constitution, Specs, Katas, Plans
 
 **Estructura esperada:**
 ```markdown
-# TÃ­tulo del Documento
+# Título del Documento
 
-**VersiÃ³n:** X.Y.Z  
+**Versión:** X.Y.Z  
 **Fecha:** YYYY-MM-DD  
 **Estado:** draft|review|approved
 
 ---
 
-## SecciÃ³n Principal
+## Sección Principal
 
 Contenido...
 
@@ -329,12 +329,12 @@ audience: intermediate
 
 ### MDC (Guardrails)
 
-Markdown con configuraciÃ³n embedded para Cursor y otros IDEs.
+Markdown con configuración embedded para Cursor y otros IDEs.
 
 **Estructura:**
 ```markdown
 ---
-description: DescripciÃ³n breve del guardrail
+description: Descripción breve del guardrail
 globs:
   - "**/*.py"
   - "src/**/*.ts"
@@ -343,16 +343,16 @@ severity: error
 enforcement: block
 ---
 
-# TÃ­tulo del Guardrail
+# Título del Guardrail
 
 Contenido del guardrail en Markdown...
 ```
 
 ---
 
-### JSON (MÃ¡quinas)
+### JSON (Máquinas)
 
-Usado para: Guardrails compilados, configuraciÃ³n
+Usado para: Guardrails compilados, configuración
 
 **Schema guardrails.json:** [v2.0: renombrado de raise-rules.json]
 ```json
@@ -416,7 +416,7 @@ agent_specification:
 
 ---
 
-## Flujo de TransformaciÃ³n
+## Flujo de Transformación
 
 ```mermaid
 flowchart LR
@@ -436,35 +436,35 @@ flowchart LR
 
 ## Versionado de Schemas
 
-### PolÃ­tica de Compatibilidad
+### Política de Compatibilidad
 
-| Cambio | AcciÃ³n |
+| Cambio | Acción |
 |--------|--------|
-| Nuevo campo opcional | VersiÃ³n minor (1.x) |
-| Campo requerido nuevo | VersiÃ³n major (x.0) |
-| DeprecaciÃ³n de campo | Aviso + 2 versiones |
-| EliminaciÃ³n de campo | VersiÃ³n major (x.0) |
-| Renombre de entidad | VersiÃ³n major + migration script |
+| Nuevo campo opcional | Versión minor (1.x) |
+| Campo requerido nuevo | Versión major (x.0) |
+| Deprecación de campo | Aviso + 2 versiones |
+| Eliminación de campo | Versión major (x.0) |
+| Renombre de entidad | Versión major + migration script |
 
-### MigraciÃ³n v1.0 â†’ v2.0
+### Migración v1.0 → v2.0
 
 | Cambio | Script |
 |--------|--------|
-| `raise-rules.json` â†’ `guardrails.json` | `raise migrate --to v2` |
-| `rules/` â†’ `guardrails/` | AutomÃ¡tico en hydrate |
-| `dod` field â†’ `validation_gate` | AutomÃ¡tico en hydrate |
+| `raise-rules.json` → `guardrails.json` | `raise migrate --to v2` |
+| `rules/` → `guardrails/` | Automático en hydrate |
+| `dod` field → `validation_gate` | Automático en hydrate |
 
-### MigraciÃ³n v2.0 â†’ v2.1 [NUEVO]
+### Migración v2.0 → v2.1 [NUEVO]
 
 | Cambio | Script |
 |--------|--------|
-| AÃ±adir `audience` a Katas | Manual o `raise kata migrate` |
+| Añadir `audience` a Katas | Manual o `raise kata migrate` |
 
 ---
 
 ## Relaciones entre Entidades
 
-| Origen | RelaciÃ³n | Destino |
+| Origen | Relación | Destino |
 |--------|----------|---------|
 | Constitution | define | Guardrail |
 | Guardrail | aplica a | Project |
@@ -482,26 +482,26 @@ flowchart LR
 
 ---
 
-## JerarquÃ­a de Entidades
+## Jerarquía de Entidades
 
 ```
 Constitution (Inmutable)
-    â”‚
-    â”œâ”€â”€ Guardrails (Controles)
-    â”‚       â”‚
-    â”‚       â””â”€â”€ enforcement: block|warn|log
-    â”‚
-    â”œâ”€â”€ Validation Gates (Checkpoints)
-    â”‚       â”‚
-    â”‚       â””â”€â”€ Escalation Gates (HITL)
-    â”‚
-    â””â”€â”€ Specs (IntenciÃ³n)
-            â”‚
-            â”œâ”€â”€ User Stories
-            â”‚       â”‚
-            â”‚       â””â”€â”€ Tasks
-            â”‚
-            â””â”€â”€ Plans
+    │
+    ├── Guardrails (Controles)
+    │       │
+    │       └── enforcement: block|warn|log
+    │
+    ├── Validation Gates (Checkpoints)
+    │       │
+    │       └── Escalation Gates (HITL)
+    │
+    └── Specs (Intención)
+            │
+            ├── User Stories
+            │       │
+            │       └── Tasks
+            │
+            └── Plans
 ```
 
 ---
@@ -516,17 +516,17 @@ Constitution (Inmutable)
 - FIX: Encoding UTF-8 corregido en todo el documento
 
 ### v2.0.0 (2025-12-28)
-- **BREAKING:** Rule â†’ Guardrail (schema y ubicaciÃ³n)
-- **BREAKING:** DoD â†’ Validation Gate
-- **BREAKING:** raise-rules.json â†’ guardrails.json
+- **BREAKING:** Rule → Guardrail (schema y ubicación)
+- **BREAKING:** DoD → Validation Gate
+- **BREAKING:** raise-rules.json → guardrails.json
 - NUEVO: Entidad Escalation Gate
 - NUEVO: Entidad Observable Trace
 - NUEVO: Formato JSONL para traces
 - NUEVO: Atributos severity y enforcement en Guardrail
 - NUEVO: Atributo mcp_tools en Agent
 - Diagrama ER actualizado con nuevas entidades
-- Flujo de transformaciÃ³n incluye Observable Workflow
+- Flujo de transformación incluye Observable Workflow
 
 ---
 
-*Este documento define la ontologÃ­a canÃ³nica de RaiSE. Actualizar con cada nueva entidad. Referencias cruzadas: [10-system-architecture-v2.md](./10-system-architecture-v2.md), [20-glossary-v2.md](./20-glossary-v2.md), [ADR-009](./adr/adr-009-shuhari-hybrid.md).*
+*Este documento define la ontología canónica de RaiSE. Actualizar con cada nueva entidad. Referencias cruzadas: [10-system-architecture-v2.md](./10-system-architecture-v2.md), [20-glossary-v2.md](./20-glossary-v2.md), [ADR-009](./adr/adr-009-shuhari-hybrid.md).*

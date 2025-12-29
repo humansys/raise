@@ -1,24 +1,24 @@
 # RaiSE Roadmap
 ## Plan de Desarrollo
 
-**VersiÃƒÂ³n:** 2.1.0  
-**ÃƒÅ¡ltima ActualizaciÃƒÂ³n:** 29 de Diciembre, 2025  
-**PropÃƒÂ³sito:** Roadmap de desarrollo del proyecto RaiSE.
+**Versión:** 2.1.0  
+**Última Actualización:** 29 de Diciembre, 2025  
+**Propósito:** Roadmap de desarrollo del proyecto RaiSE.
 
-> **Nota de versiÃƒÂ³n 2.0:** Roadmap actualizado con raise-mcp como componente CORE (promovido de v0.3 a v0.2), Observable Workflow, y terminologÃƒÂ­a v2.0.
+> **Nota de versión 2.0:** Roadmap actualizado con raise-mcp como componente CORE (promovido de v0.3 a v0.2), Observable Workflow, y terminología v2.0.
 
 ---
 
-## VisiÃƒÂ³n de Releases
+## Visión de Releases
 
 ### v0.1.0 - Foundation (Target: Q1 2025)
 **Tema:** "Foundation"
 
-- [ ] CLI bÃƒÂ¡sico (init, pull, check, kata)
+- [ ] CLI básico (init, pull, check, kata)
 - [ ] Soporte 5 agentes principales (Cursor, Copilot, Claude, GPT, Gemini)
 - [ ] Templates core (PRD, spec, design, story)
 - [ ] Katas base (L0, L1)
-- [ ] DocumentaciÃƒÂ³n inicial
+- [ ] Documentación inicial
 - [ ] Corpus base completo
 
 **Release Criteria:**
@@ -35,20 +35,20 @@
 > **Cambio significativo:** raise-mcp promovido de v0.3 a v0.2. MCP es ahora componente CORE.
 
 - [ ] **raise-mcp server (CORE)** [PROMOVIDO]
-- [ ] Validation Gates completos (8 gates estÃƒÂ¡ndar)
+- [ ] Validation Gates completos (8 gates estándar)
 - [ ] Guardrails system (renombrado de rules)
 - [ ] `raise gate` command
 - [ ] `raise guardrail` command
-- [ ] Katas de validaciÃƒÂ³n (L2, L3)
+- [ ] Katas de validación (L2, L3)
 - [ ] raise-config centralizado (template repo)
 
 **MCP Primitivos Implementados:**
-| Primitivo | ImplementaciÃƒÂ³n | Status |
+| Primitivo | Implementación | Status |
 |-----------|----------------|--------|
-| Resources | Constitution, Guardrails, Specs | Ã°Å¸â€â€ž En desarrollo |
-| Tools | validate_gate, check_guardrail, escalate | Ã°Å¸â€â€ž En desarrollo |
-| Prompts | Katas como templates | Ã°Å¸â€œâ€¹ Planificado |
-| Sampling | DelegaciÃƒÂ³n razonamiento | Ã°Å¸â€œâ€¹ Planificado |
+| Resources | Constitution, Guardrails, Specs | 🔄 En desarrollo |
+| Tools | validate_gate, check_guardrail, escalate | 🔄 En desarrollo |
+| Prompts | Katas como templates | 📋 Planificado |
+| Sampling | Delegación razonamiento | 📋 Planificado |
 
 **Release Criteria:**
 - MCP server funcional con Claude, Cursor, Windsurf
@@ -66,23 +66,23 @@
 - [ ] `raise audit` command
 - [ ] JSONL trace storage
 - [ ] Escalation Gates (HITL)
-- [ ] MÃƒÂ©tricas derivadas (re-prompting rate, escalation rate)
+- [ ] Métricas derivadas (re-prompting rate, escalation rate)
 - [ ] Export OpenTelemetry (opcional)
 - [ ] EU AI Act compliance documentation
 
 **Observable Workflow Components:**
 | Component | Status |
 |-----------|--------|
-| Trace logging automÃƒÂ¡tico | Ã°Å¸â€â€ž En desarrollo |
-| Audit reports (CLI) | Ã°Å¸â€œâ€¹ Planificado |
-| Metrics aggregation | Ã°Å¸â€œâ€¹ Planificado |
-| CSV/JSON export | Ã°Å¸â€œâ€¹ Planificado |
+| Trace logging automático | 🔄 En desarrollo |
+| Audit reports (CLI) | 📋 Planificado |
+| Metrics aggregation | 📋 Planificado |
+| CSV/JSON export | 📋 Planificado |
 
 **Release Criteria:**
-- Cada acciÃƒÂ³n MCP genera trace
-- `raise audit` produce reportes ÃƒÂºtiles
+- Cada acción MCP genera trace
+- `raise audit` produce reportes útiles
 - Escalation rate calculable
-- DocumentaciÃƒÂ³n EU AI Act disponible
+- Documentación EU AI Act disponible
 
 ---
 
@@ -96,8 +96,8 @@
 - [ ] Guardrail marketplace preparation
 
 **Release Criteria:**
-- GuÃƒÂ­a enterprise publicada
-- Demo con 3+ agentes simultÃƒÂ¡neos
+- Guía enterprise publicada
+- Demo con 3+ agentes simultáneos
 
 ---
 
@@ -121,13 +121,13 @@
 
 | Milestone | Status | Target | Progress |
 |-----------|--------|--------|----------|
-| Corpus v2.0 completo | Ã¢Å“â€¦ En Progreso | 2025-12-28 | 90% |
-| OntologÃƒÂ­a v2.0 validada | Ã¢Å“â€¦ En Progreso | 2025-12-28 | 85% |
-| Fork spec-kit evaluaciÃƒÂ³n | Ã¢Å“â€¦ Done | 2025-12-26 | 100% |
-| InvestigaciÃƒÂ³n Agentic AI | Ã¢Å“â€¦ Done | 2025-12-27 | 100% |
-| ADRs v2.0 actualizados | Ã¢Å“â€¦ En Progreso | 2025-12-28 | 80% |
-| CLI v0.1 alpha | Ã°Å¸â€œâ€¹ Pending | 2025-01-31 | 0% |
-| Docs site live | Ã°Å¸â€œâ€¹ Pending | 2025-02-15 | 0% |
+| Corpus v2.0 completo | ✅ En Progreso | 2025-12-28 | 90% |
+| Ontología v2.0 validada | ✅ En Progreso | 2025-12-28 | 85% |
+| Fork spec-kit evaluación | ✅ Done | 2025-12-26 | 100% |
+| Investigación Agentic AI | ✅ Done | 2025-12-27 | 100% |
+| ADRs v2.0 actualizados | ✅ En Progreso | 2025-12-28 | 80% |
+| CLI v0.1 alpha | 📋 Pending | 2025-01-31 | 0% |
+| Docs site live | 📋 Pending | 2025-02-15 | 0% |
 
 ---
 
@@ -168,15 +168,15 @@
 
 ---
 
-## Dependencias de OntologÃƒÂ­a v2.0
+## Dependencias de Ontología v2.0
 
 | Cambio | Impacto en Roadmap | Status |
 |--------|-------------------|--------|
-| Rule Ã¢â€ â€™ Guardrail | CLI commands, file formats | Ã¢Å“â€¦ DiseÃƒÂ±ado |
-| DoD Ã¢â€ â€™ Validation Gate | CLI commands, katas | Ã¢Å“â€¦ DiseÃƒÂ±ado |
-| raise-mcp CORE | v0.2 scope aumentado | Ã¢Å“â€¦ Decidido |
-| Observable Workflow | v0.3 nuevo | Ã¢Å“â€¦ DiseÃƒÂ±ado |
-| Escalation Gate | v0.3 scope | Ã¢Å“â€¦ DiseÃƒÂ±ado |
+| Rule → Guardrail | CLI commands, file formats | ✅ Diseñado |
+| DoD → Validation Gate | CLI commands, katas | ✅ Diseñado |
+| raise-mcp CORE | v0.2 scope aumentado | ✅ Decidido |
+| Observable Workflow | v0.3 nuevo | ✅ Diseñado |
+| Escalation Gate | v0.3 scope | ✅ Diseñado |
 
 ---
 
