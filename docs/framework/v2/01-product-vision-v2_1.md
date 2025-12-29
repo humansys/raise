@@ -1,11 +1,11 @@
 # RaiSE Product Vision
 ## Reliable AI Software Engineering Framework
 
-**VersiÃ³n:** 2.0.0  
+**Versión:** 2.0.0  
 **Fecha:** 28 de Diciembre, 2025  
 **Estado:** Ratificado
 
-> **Nota de versiÃ³n 2.0:** VisiÃ³n actualizada con diferenciadores MCP-native, Observable Workflow, y terminologÃ­a v2.1 (Validation Gates, Guardrails, Orquestador).
+> **Nota de versión 2.0:** Visión actualizada con diferenciadores MCP-native, Observable Workflow, y terminología v2.1 (Validation Gates, Guardrails, Orquestador).
 
 ---
 
@@ -14,120 +14,120 @@
 ### El Dolor
 Los equipos de desarrollo adoptan herramientas de AI coding (Copilot, Cursor, Claude Code) sin governance. El resultado:
 
-- **Inconsistencia**: Cada desarrollador usa AI de forma diferente, produciendo cÃ³digo heterogÃ©neo
-- **Alucinaciones no detectadas**: Sin validaciÃ³n estructurada, errores de AI llegan a producciÃ³n
-- **PÃ©rdida de contexto**: Cada sesiÃ³n con AI empieza de cero; no hay "memoria" organizacional
-- **Atrofia cognitiva**: Desarrolladores aceptan cÃ³digo AI sin entenderlo
+- **Inconsistencia**: Cada desarrollador usa AI de forma diferente, produciendo código heterogéneo
+- **Alucinaciones no detectadas**: Sin validación estructurada, errores de AI llegan a producción
+- **Pérdida de contexto**: Cada sesión con AI empieza de cero; no hay "memoria" organizacional
+- **Atrofia cognitiva**: Desarrolladores aceptan código AI sin entenderlo
 - **Compliance gaps**: Regulaciones como EU AI Act exigen trazabilidad que no existe
-- **Opacidad de decisiones**: No hay forma de auditar *por quÃ©* el agente tomÃ³ una decisiÃ³n [NUEVO v2.1]
+- **Opacidad de decisiones**: No hay forma de auditar *por qué* el agente tomó una decisión [NUEVO v2.1]
 
 ### Evidencia
 - El mercado de AI Governance crece 35-50% CAGR, de $200M (2024) a $7B+ (2030)
-- 84% de desarrolladores usan AI tools, pero satisfacciÃ³n cayÃ³ a 60% por calidad inconsistente
+- 84% de desarrolladores usan AI tools, pero satisfacción cayó a 60% por calidad inconsistente
 - 77% de empresas iniciaron frameworks de AI governance; 90% de las que tienen deployments activos
 - EU AI Act entra en vigor 2025, mandando trazabilidad y governance
-- **11,000+ MCP servers registrados** â€” MCP es el estÃ¡ndar de facto para Context Engineering [NUEVO v2.1]
+- **11,000+ MCP servers registrados** — MCP es el estándar de facto para Context Engineering [NUEVO v2.1]
 
 ---
 
-## SoluciÃ³n Propuesta
+## Solución Propuesta
 
 **RaiSE** es un framework de Context Engineering que estructura el uso de AI en desarrollo de software mediante governance-as-code y observabilidad nativa.
 
-### CÃ³mo Funciona [ACTUALIZADO v2.1]
+### Cómo Funciona [ACTUALIZADO v2.1]
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”    â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚   raise-config      â”‚    â”‚     raise-mcp       â”‚    â”‚   AI Agent          â”‚
-â”‚   (Central Repo)    â”‚â”€â”€â”€â”€â–¶â”‚   (MCP Server)      â”‚â”€â”€â”€â”€â–¶â”‚   (Copilot,        â”‚
-â”‚                     â”‚    â”‚     LOCAL           â”‚    â”‚    Cursor, Claude)  â”‚
-â”‚  â€¢ Guardrails (.mdc)â”‚    â”‚                     â”‚    â”‚                     â”‚
-â”‚  â€¢ Katas            â”‚    â”‚  â€¢ Context Server   â”‚    â”‚  â€¢ Contexto via     â”‚
-â”‚  â€¢ Templates        â”‚    â”‚  â€¢ Validation Gates â”‚    â”‚    MCP Protocol     â”‚
-â”‚  â€¢ Constitution     â”‚    â”‚  â€¢ Observable Tracesâ”‚    â”‚  â€¢ Tools MCP        â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜    â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─────────────────────┐    ┌─────────────────────┐    ┌─────────────────────┐
+│   raise-config      │    │     raise-mcp       │    │   AI Agent          │
+│   (Central Repo)    │────▶│   (MCP Server)      │────▶│   (Copilot,        │
+│                     │    │     LOCAL           │    │    Cursor, Claude)  │
+│  • Guardrails (.mdc)│    │                     │    │                     │
+│  • Katas            │    │  • Context Server   │    │  • Contexto via     │
+│  • Templates        │    │  • Validation Gates │    │    MCP Protocol     │
+│  • Constitution     │    │  • Observable Traces│    │  • Tools MCP        │
+└─────────────────────┘    └─────────────────────┘    └─────────────────────┘
        Git                        MCP                      IDE/CLI
-                                  â”‚
-                                  â–¼
-                     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                     â”‚  .raise/traces/     â”‚
-                     â”‚  Observable Workflowâ”‚
-                     â”‚  (JSONL local)      â”‚
-                     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+                                  │
+                                  ▼
+                     ┌─────────────────────┐
+                     │  .raise/traces/     │
+                     │  Observable Workflow│
+                     │  (JSONL local)      │
+                     └─────────────────────┘
 ```
 
 ### Diferenciadores Clave [ACTUALIZADO v2.1]
 
-| Diferenciador | DescripciÃ³n | Competidores sin esto |
+| Diferenciador | Descripción | Competidores sin esto |
 |---------------|-------------|----------------------|
-| **MCP-Native** | Context Engineering via estÃ¡ndar de facto (11k+ servers) | Spec Kit, OpenSpec, Kiro |
+| **MCP-Native** | Context Engineering via estándar de facto (11k+ servers) | Spec Kit, OpenSpec, Kiro |
 | **Validation Gates** | Quality gates por fase, no solo al final | Spec Kit, OpenSpec, Kiro |
 | **Observable Workflow** | Trazabilidad completa de decisiones AI | **TODOS** |
-| **Escalation Gates** | HITL explÃ­cito con criterios definidos | **TODOS** |
-| **Katas Ejecutables** | Validaciones automÃ¡ticas de specs y cÃ³digo | Todos |
-| **HeutagogÃ­a** | Entrenamiento activo del Orquestador | Todos (focus en reemplazo) |
+| **Escalation Gates** | HITL explícito con criterios definidos | **TODOS** |
+| **Katas Ejecutables** | Validaciones automáticas de specs y código | Todos |
+| **Heutagogía** | Entrenamiento activo del Orquestador | Todos (focus en reemplazo) |
 | **Git-Native** | Sin APIs propietarias; Git como transporte | Kiro (AWS), Tessl (SaaS) |
 | **Platform Agnostic** | GitHub, GitLab, Bitbucket indistintamente | Copilot (GitHub), Kiro (AWS) |
 
 ---
 
-## Propuesta de Valor Ãšnica (UVP)
+## Propuesta de Valor Única (UVP)
 
-> **"RaiSE convierte el caos del AI-assisted development en un proceso gobernable, trazable y que mejora continuamenteâ€”sin sacrificar la velocidad. Es el Ãºnico framework MCP-native con Observable Workflow."**
+> **"RaiSE convierte el caos del AI-assisted development en un proceso gobernable, trazable y que mejora continuamente—sin sacrificar la velocidad. Es el único framework MCP-native con Observable Workflow."**
 
 ### Value Props por Stakeholder [ACTUALIZADO v2.1]
 
 | Stakeholder | Value Prop |
 |-------------|------------|
-| **Developer (Orquestador)** | "Mis herramientas AI producen cÃ³digo consistente porque tienen contexto estructurado via MCP" |
-| **Tech Lead** | "Puedo gobernar cÃ³mo mi equipo usa AI con Validation Gates automÃ¡ticos" |
-| **VP Engineering** | "Tengo Observable Workflow: trazabilidad completa para mÃ©tricas y compliance" |
-| **CISO** | "Los guardrails de seguridad se aplican automÃ¡ticamente y tengo audit trail" |
-| **Compliance Officer** | "EU AI Act cubierto: cada decisiÃ³n AI es auditable" |
+| **Developer (Orquestador)** | "Mis herramientas AI producen código consistente porque tienen contexto estructurado via MCP" |
+| **Tech Lead** | "Puedo gobernar cómo mi equipo usa AI con Validation Gates automáticos" |
+| **VP Engineering** | "Tengo Observable Workflow: trazabilidad completa para métricas y compliance" |
+| **CISO** | "Los guardrails de seguridad se aplican automáticamente y tengo audit trail" |
+| **Compliance Officer** | "EU AI Act cubierto: cada decisión AI es auditable" |
 
 ---
 
 ## User Personas
 
-### Persona A: "Elena, la MetodÃ³loga"
+### Persona A: "Elena, la Metodóloga"
 **Rol:** Staff Engineer / Platform Architect  
-**Contexto:** Empresa de 100+ developers, mÃºltiples equipos  
+**Contexto:** Empresa de 100+ developers, múltiples equipos  
 **Goals:**
-- Estandarizar prÃ¡cticas de AI-assisted development
+- Estandarizar prácticas de AI-assisted development
 - Reducir inconsistencias entre equipos
-- Preparar para auditorÃ­as de compliance
+- Preparar para auditorías de compliance
 
 **Pain Points:**
 - Cada equipo usa AI de forma diferente
-- No hay forma de medir calidad del cÃ³digo AI-generated
-- Regulaciones (EU AI Act) se acercan sin preparaciÃ³n
+- No hay forma de medir calidad del código AI-generated
+- Regulaciones (EU AI Act) se acercan sin preparación
 - **No puede auditar decisiones de agentes** [NUEVO v2.1]
 
 **Jobs-to-be-Done:**
 - Definir guardrails que todos los equipos sigan
-- Distribuir actualizaciones sin fricciÃ³n
-- Validar cumplimiento automÃ¡ticamente
+- Distribuir actualizaciones sin fricción
+- Validar cumplimiento automáticamente
 - **Generar reportes de Observable Workflow** [NUEVO v2.1]
 
 ### Persona B: "Devon, el Orquestador"
-**Rol:** Senior Developer â†’ **Orquestador** [ACTUALIZADO]  
+**Rol:** Senior Developer → **Orquestador** [ACTUALIZADO]  
 **Contexto:** Trabaja en features con AI daily  
 **Goals:**
-- Entregar features rÃ¡pido y con calidad
-- No perder tiempo en setup y configuraciÃ³n
-- Entender y poder mantener cÃ³digo AI-generated
+- Entregar features rápido y con calidad
+- No perder tiempo en setup y configuración
+- Entender y poder mantener código AI-generated
 - **Crecer como profesional, no atrofiarse** [NUEVO v2.1]
 
 **Pain Points:**
-- AI genera cÃ³digo inconsistente con patrones del proyecto
-- Tiene que "adivinar" quÃ© contexto darle al AI
-- A veces acepta cÃ³digo sin entenderlo completamente
-- **No sabe cuÃ¡ndo el agente tiene baja confianza** [NUEVO v2.1]
+- AI genera código inconsistente con patrones del proyecto
+- Tiene que "adivinar" qué contexto darle al AI
+- A veces acepta código sin entenderlo completamente
+- **No sabe cuándo el agente tiene baja confianza** [NUEVO v2.1]
 
 **Jobs-to-be-Done:**
-- Obtener contexto estructurado automÃ¡ticamente via MCP
-- Validar que su cÃ³digo pasa Validation Gates
-- Aprender de las decisiones que AI tomÃ³
+- Obtener contexto estructurado automáticamente via MCP
+- Validar que su código pasa Validation Gates
+- Aprender de las decisiones que AI tomó
 - **Responder a Escalation Gates de forma informada** [NUEVO v2.1]
 
 ### Persona C: "Carlos, el Compliance Officer"
@@ -135,18 +135,18 @@ Los equipos de desarrollo adoptan herramientas de AI coding (Copilot, Cursor, Cl
 **Contexto:** Enterprise regulada (Fintech, Healthcare)  
 **Goals:**
 - Demostrar governance de AI a auditores
-- Trazabilidad de quÃ© cÃ³digo fue AI-generated
-- PolÃ­ticas aplicadas consistentemente
+- Trazabilidad de qué código fue AI-generated
+- Políticas aplicadas consistentemente
 
 **Pain Points:**
-- No sabe quÃ© cÃ³digo es AI-generated
+- No sabe qué código es AI-generated
 - No hay audit trail de decisiones AI
-- Cada auditorÃ­a es un scramble
+- Cada auditoría es un scramble
 
 **Jobs-to-be-Done:**
-- Generar reportes de compliance automÃ¡ticos via `raise audit`
-- Tener Observable Workflow logs para auditorÃ­a
-- Demostrar guardrails como cÃ³digo versionado
+- Generar reportes de compliance automáticos via `raise audit`
+- Tener Observable Workflow logs para auditoría
+- Demostrar guardrails como código versionado
 
 ---
 
@@ -173,40 +173,40 @@ Los equipos de desarrollo adoptan herramientas de AI coding (Copilot, Cursor, Cl
 4. CI ejecuta `raise check` + `raise gate status` bloqueando non-compliance
 5. **`raise audit --format json` genera reportes agregados** [NUEVO v2.1]
 
-**Outcome:** Una sola fuente de verdad + mÃ©tricas aggregadas de Observable Workflow
+**Outcome:** Una sola fuente de verdad + métricas aggregadas de Observable Workflow
 
 ### CU-3: Desarrollo con Validation Gates [ACTUALIZADO]
 **Trigger:** Orquestador comienza feature nueva  
 **Flow:**
-1. `/raise.specify` â†’ Genera spec, valida **Gate-Discovery**
-2. `/raise.plan` â†’ Genera plan tÃ©cnico, valida **Gate-Design**
-3. `/raise.tasks` â†’ Genera tareas, valida **Gate-Backlog**
-4. `/raise.implement` â†’ Ejecuta tareas con validaciÃ³n continua
+1. `/raise.specify` → Genera spec, valida **Gate-Discovery**
+2. `/raise.plan` → Genera plan técnico, valida **Gate-Design**
+3. `/raise.tasks` → Genera tareas, valida **Gate-Backlog**
+4. `/raise.implement` → Ejecuta tareas con validación continua
 5. **Escalation Gate si agente tiene baja confianza** [NUEVO v2.1]
 6. Kata final valida **Gate-Code**
-7. **`raise audit` para revisar sesiÃ³n** [NUEVO v2.1]
+7. **`raise audit` para revisar sesión** [NUEVO v2.1]
 
 **Outcome:** Cada fase tiene Validation Gate; Orquestador mantiene ownership
 
 ### CU-4: Audit Trail para Compliance [ACTUALIZADO]
-**Trigger:** Auditor pregunta "Â¿cÃ³mo gobiernan AI?"  
+**Trigger:** Auditor pregunta "¿cómo gobiernan AI?"  
 **Flow:**
 1. Mostrar `raise-config` con guardrails versionados en Git
 2. Mostrar Observable Workflow: `.raise/traces/*.jsonl`
 3. Ejecutar `raise audit --period month --format md`
-4. Demostrar trazabilidad spec â†’ plan â†’ cÃ³digo â†’ decisiones
+4. Demostrar trazabilidad spec → plan → código → decisiones
 
 **Outcome:** EU AI Act compliance con evidencia concreta
 
-### CU-5: Escalation Gate en AcciÃ³n [NUEVO v2.1]
-**Trigger:** Agente encuentra ambigÃ¼edad durante implementaciÃ³n  
+### CU-5: Escalation Gate en Acción [NUEVO v2.1]
+**Trigger:** Agente encuentra ambigüedad durante implementación  
 **Flow:**
 1. Agente ejecuta `validate_gate` via MCP
 2. Gate falla por criterio ambiguo
 3. Agente ejecuta `escalate` tool con opciones
-4. Orquestador recibe notificaciÃ³n con contexto
+4. Orquestador recibe notificación con contexto
 5. Orquestador decide y responde
-6. DecisiÃ³n registrada en Observable Workflow
+6. Decisión registrada en Observable Workflow
 
 **Outcome:** Human-in-the-Loop estructurado, decisiones documentadas
 
@@ -214,24 +214,24 @@ Los equipos de desarrollo adoptan herramientas de AI coding (Copilot, Cursor, Cl
 
 ## Anti-Casos de Uso
 
-Lo que RaiSE **explÃ­citamente NO hace**:
+Lo que RaiSE **explícitamente NO hace**:
 
-| Anti-Caso | Por quÃ© no |
+| Anti-Caso | Por qué no |
 |-----------|------------|
-| Reemplazar al developer | HeutagogÃ­a: evolucionamos al Orquestador |
+| Reemplazar al developer | Heutagogía: evolucionamos al Orquestador |
 | Ser otro AI coding assistant | Somos governance + context layer, no generator |
 | Funcionar solo con un IDE | Platform agnostic por principio |
 | Requerir cloud/SaaS | Git-native + MCP local, funciona 100% on-premise |
-| Garantizar cÃ³digo sin bugs | Reducimos errores, no los eliminamos |
+| Garantizar código sin bugs | Reducimos errores, no los eliminamos |
 | Vigilar sin valor | Observable Workflow es para mejora, no surveillance |
 
 ---
 
-## MÃ©tricas de Ã‰xito
+## Métricas de Éxito
 
-### MÃ©tricas de AdopciÃ³n
+### Métricas de Adopción
 
-| MÃ©trica | Baseline | Target Y1 | Target Y3 |
+| Métrica | Baseline | Target Y1 | Target Y3 |
 |---------|----------|-----------|-----------|
 | Community users | 0 | 5,000 | 100,000 |
 | Pro subscribers | 0 | 50 | 2,000 |
@@ -239,20 +239,20 @@ Lo que RaiSE **explÃ­citamente NO hace**:
 | GitHub stars | 0 | 5,000 | 25,000 |
 | **MCP Registry listings** | 0 | 1 | N/A |
 
-### MÃ©tricas de Valor
+### Métricas de Valor
 
-| MÃ©trica | Baseline | Target |
+| Métrica | Baseline | Target |
 |---------|----------|--------|
-| Tiempo promedio spec â†’ cÃ³digo | Variable | -40% |
+| Tiempo promedio spec → código | Variable | -40% |
 | Defectos post-release AI code | Variable | -50% |
-| AuditorÃ­as sin hallazgos crÃ­ticos | N/A | 100% |
+| Auditorías sin hallazgos críticos | N/A | 100% |
 | Adherencia a patrones definidos | N/A | >90% |
 | **Escalation rate** | N/A | 10-15% |
 | **Re-prompting rate** | N/A | <3 |
 
-### MÃ©tricas de Engagement
+### Métricas de Engagement
 
-| MÃ©trica | Target |
+| Métrica | Target |
 |---------|--------|
 | NPS (Pro/Enterprise) | >50 |
 | Monthly active CLI users | >60% of installs |
@@ -265,21 +265,21 @@ Lo que RaiSE **explÃ­citamente NO hace**:
 
 ```
                     GOVERNANCE ENTERPRISE
-                           â†‘
+                           ↑
                            |
-    IBM Watson    â—¦        |        â—‰ RaiSE
-    Collibra      â—¦        |          (MCP-native +
-    OneTrust      â—¦        |           Observable)
+    IBM Watson    ◦        |        ◉ RaiSE
+    Collibra      ◦        |          (MCP-native +
+    OneTrust      ◦        |           Observable)
                            |
-    â†â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â†’
+    ←─────────────────────────────────────────────→
     DATA/MODEL             |            CODE/DEV
     FOCUSED                |            FOCUSED
                            |
-    OpenSpec      â—¦        |        â—¦ Cursor
-    Spec Kit      â—¦        |        â—¦ Copilot
-    Kiro          â—¦        |        â—¦ Claude Code
+    OpenSpec      ◦        |        ◦ Cursor
+    Spec Kit      ◦        |        ◦ Copilot
+    Kiro          ◦        |        ◦ Claude Code
                            |
-                           â†“
+                           ↓
                     DEVELOPER TOOLS
 ```
 
@@ -287,29 +287,29 @@ Lo que RaiSE **explÃ­citamente NO hace**:
 
 | Competidor | Fortaleza | Debilidad | Estrategia vs |
 |------------|-----------|-----------|---------------|
-| GitHub Spec Kit | 58kâ­, backing Microsoft | Sin governance, sin MCP | MCP-native + Observable Workflow |
-| AWS Kiro | IntegraciÃ³n AWS | Vendor lock-in, overkill | Platform agnostic, local-first |
-| OpenSpec | Lightweight, TypeScript | Menos features, sin HITL | Escalation Gates, HeutagogÃ­a |
-| BMAD Method | Multi-agente robusto | Complejo, curva alta | Simplicidad + MCP estÃ¡ndar |
-| **LangGraph** | Framework agentic sÃ³lido | No es para governance | Complementario, no competidor |
+| GitHub Spec Kit | 58k⭐, backing Microsoft | Sin governance, sin MCP | MCP-native + Observable Workflow |
+| AWS Kiro | Integración AWS | Vendor lock-in, overkill | Platform agnostic, local-first |
+| OpenSpec | Lightweight, TypeScript | Menos features, sin HITL | Escalation Gates, Heutagogía |
+| BMAD Method | Multi-agente robusto | Complejo, curva alta | Simplicidad + MCP estándar |
+| **LangGraph** | Framework agentic sólido | No es para governance | Complementario, no competidor |
 
-### Diferenciador Ãšnico [NUEVO v2.1]
+### Diferenciador Único [NUEVO v2.1]
 
-**NingÃºn framework combina:**
-1. MCP-native (estÃ¡ndar de facto)
+**Ningún framework combina:**
+1. MCP-native (estándar de facto)
 2. Observable Workflow (trazabilidad EU AI Act)
 3. Escalation Gates (HITL estructurado)
-4. HeutagogÃ­a (crecimiento del Orquestador)
+4. Heutagogía (crecimiento del Orquestador)
 
 ---
 
 ## Roadmap de Alto Nivel [ACTUALIZADO v2.1]
 
 ### v0.1 - Foundation (Q1 2025)
-- CLI bÃ¡sico (init, check, pull)
+- CLI básico (init, check, pull)
 - Soporte 5 agentes principales
 - Templates core
-- DocumentaciÃ³n
+- Documentación
 
 ### v0.2 - MCP-Native & Validation Gates (Q2 2025)
 - **raise-mcp server (CORE)**
@@ -338,22 +338,22 @@ Lo que RaiSE **explÃ­citamente NO hace**:
 
 ## Riesgos y Mitigaciones
 
-| Riesgo | Probabilidad | Impacto | MitigaciÃ³n |
+| Riesgo | Probabilidad | Impacto | Mitigación |
 |--------|--------------|---------|------------|
 | GitHub agrega governance a Spec Kit | Media | Alto | MCP-native + Observable son diferenciadores profundos |
 | MCP evoluciona con breaking changes | Media | Medio | Version pinning, abstraction layer |
-| Paradigma SDD no gana tracciÃ³n | Baja | Alto | Pivote a governance + observability puro |
+| Paradigma SDD no gana tracción | Baja | Alto | Pivote a governance + observability puro |
 | Competidor bien-fondeado entra | Media | Medio | First-mover en MCP + Observability |
-| EU AI Act se diluye | Baja | Medio | Value prop existe sin regulaciÃ³n |
+| EU AI Act se diluye | Baja | Medio | Value prop existe sin regulación |
 
 ---
 
 ## Preguntas Abiertas
 
-1. **Naming final**: Â¿RaiSE es el nombre definitivo? (Trademark clearance pendiente)
-2. **Pricing validation**: Â¿$29/$49/custom es el punto correcto?
-3. **First enterprise target**: Â¿QuÃ© vertical atacar primero?
-4. **MCP transport default**: Â¿stdio vs SSE para raise-mcp?
+1. **Naming final**: ¿RaiSE es el nombre definitivo? (Trademark clearance pendiente)
+2. **Pricing validation**: ¿$29/$49/custom es el punto correcto?
+3. **First enterprise target**: ¿Qué vertical atacar primero?
+4. **MCP transport default**: ¿stdio vs SSE para raise-mcp?
 
 ---
 
@@ -361,14 +361,14 @@ Lo que RaiSE **explÃ­citamente NO hace**:
 
 ### v2.1.0 (2025-12-28)
 - Diferenciadores actualizados: MCP-native, Observable Workflow
-- TerminologÃ­a: DoD â†’ Validation Gates, rules â†’ guardrails
-- Nuevo CU-5: Escalation Gate en AcciÃ³n
-- Roadmap alineado con ontologÃ­a v2.1
-- MÃ©tricas aÃ±adidas: escalation rate, re-prompting rate
+- Terminología: DoD → Validation Gates, rules → guardrails
+- Nuevo CU-5: Escalation Gate en Acción
+- Roadmap alineado con ontología v2.1
+- Métricas añadidas: escalation rate, re-prompting rate
 - Posicionamiento competitivo actualizado
 
 ### v1.0.0 (2025-12-26)
-- VisiÃ³n inicial
+- Visión inicial
 
 ---
 

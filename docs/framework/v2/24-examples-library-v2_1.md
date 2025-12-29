@@ -1,11 +1,11 @@
 # RaiSE Examples Library
-## Ejemplos PrÃ¡cticos de Uso
+## Ejemplos Prácticos de Uso
 
-**VersiÃ³n:** 2.1.0  
+**Versión:** 2.1.0  
 **Fecha:** 29 de Diciembre, 2025  
-**PropÃ³sito:** Biblioteca de ejemplos concretos para aprender RaiSE.
+**Propósito:** Biblioteca de ejemplos concretos para aprender RaiSE.
 
-> **Nota de versiÃ³n 2.0:** Ejemplos actualizados con Validation Gates, Observable Workflow, y MCP. TerminologÃ­a alineada con ontologÃ­a v2.0.
+> **Nota de versión 2.0:** Ejemplos actualizados con Validation Gates, Observable Workflow, y MCP. Terminología alineada con ontología v2.0.
 
 ---
 
@@ -13,20 +13,20 @@
 
 ### Contexto
 - **Proyecto:** API REST existente en Python
-- **Feature:** Agregar endpoint de bÃºsqueda con filtros
-- **Estimado:** 2-3 dÃ­as
+- **Feature:** Agregar endpoint de búsqueda con filtros
+- **Estimado:** 2-3 días
 
 ### Proceso Paso a Paso
 
-#### 1. InicializaciÃ³n (si no existe)
+#### 1. Inicialización (si no existe)
 ```bash
 raise init --agent cursor
 raise mcp start  # [v2.0] Iniciar MCP server
 ```
 
-#### 2. EspecificaciÃ³n
+#### 2. Especificación
 ```
-/raise.specify Agregar endpoint de bÃºsqueda de productos con filtros por categorÃ­a, precio y disponibilidad
+/raise.specify Agregar endpoint de búsqueda de productos con filtros por categoría, precio y disponibilidad
 ```
 
 **Resultado:** Spec generada en `.raise/specs/FEAT-001-busqueda-productos.md`
@@ -38,20 +38,20 @@ raise gate check --gate Gate-Discovery --artifact .raise/specs/FEAT-001-busqueda
 
 **Output:**
 ```
-âœ… Gate-Discovery PASSED
-   â”œâ”€ Stakeholders definidos: âœ“
-   â”œâ”€ Requisitos funcionales claros: âœ“
-   â”œâ”€ NFRs especificados: âœ“
-   â””â”€ Criterios de Ã©xito medibles: âœ“
+✅ Gate-Discovery PASSED
+   ├─ Stakeholders definidos: ✓
+   ├─ Requisitos funcionales claros: ✓
+   ├─ NFRs especificados: ✓
+   └─ Criterios de éxito medibles: ✓
 ```
 
-#### 4. DiseÃ±o TÃ©cnico
+#### 4. Diseño Técnico
 ```
 /raise.plan @.raise/specs/FEAT-001-busqueda-productos.md
 ```
 
-**Resultado:** Plan tÃ©cnico con:
-- DiseÃ±o de endpoint
+**Resultado:** Plan técnico con:
+- Diseño de endpoint
 - Query parameters
 - Modelo de response
 - Consideraciones de performance
@@ -73,14 +73,14 @@ raise gate check --gate Gate-Discovery --artifact .raise/specs/FEAT-001-busqueda
 4. Agregar tests
 5. Documentar API
 
-#### 7. ImplementaciÃ³n con Tracing [NUEVO v2.0]
+#### 7. Implementación con Tracing [NUEVO v2.0]
 ```
 /raise.implement @.raise/tasks/TASK-001.md
 ```
 
-Cada acciÃ³n se registra automÃ¡ticamente en Observable Workflow.
+Cada acción se registra automáticamente en Observable Workflow.
 
-#### 8. AuditorÃ­a Final [NUEVO v2.0]
+#### 8. Auditoría Final [NUEVO v2.0]
 ```bash
 raise audit --session today
 ```
@@ -88,25 +88,25 @@ raise audit --session today
 ### Artefactos Generados
 ```
 .raise/
-â”œâ”€â”€ memory/
-â”‚   â”œâ”€â”€ constitution.md
-â”‚   â””â”€â”€ guardrails.json          # [v2.0]
-â”œâ”€â”€ traces/
-â”‚   â””â”€â”€ 2025-12-28.jsonl         # [v2.0] Observable Workflow
-â”œâ”€â”€ specs/
-â”‚   â””â”€â”€ FEAT-001-busqueda-productos.md
-â”œâ”€â”€ plans/
-â”‚   â””â”€â”€ FEAT-001-plan.md
-â””â”€â”€ tasks/
-    â”œâ”€â”€ TASK-001-modelo-filtros.md
-    â”œâ”€â”€ TASK-002-query-builder.md
-    â””â”€â”€ ...
+├── memory/
+│   ├── constitution.md
+│   └── guardrails.json          # [v2.0]
+├── traces/
+│   └── 2025-12-28.jsonl         # [v2.0] Observable Workflow
+├── specs/
+│   └── FEAT-001-busqueda-productos.md
+├── plans/
+│   └── FEAT-001-plan.md
+└── tasks/
+    ├── TASK-001-modelo-filtros.md
+    ├── TASK-002-query-builder.md
+    └── ...
 ```
 
 ### Lecciones Aprendidas
-- Especificar filtros **antes** de diseÃ±ar evita retrabajos
-- Gate-Design detectÃ³ falta de paginaciÃ³n temprano
-- Observable Workflow permitiÃ³ ver dÃ³nde se gastaron mÃ¡s tokens
+- Especificar filtros **antes** de diseñar evita retrabajos
+- Gate-Design detectó falta de paginación temprano
+- Observable Workflow permitió ver dónde se gastaron más tokens
 
 ---
 
@@ -119,7 +119,7 @@ raise audit --session today
 
 ### Proceso Paso a Paso
 
-#### Fase 0: InicializaciÃ³n con MCP
+#### Fase 0: Inicialización con MCP
 ```bash
 mkdir my-service && cd my-service
 raise init --template microservice
@@ -133,11 +133,11 @@ raise mcp resources
 
 **Output:**
 ```
-â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®
-â”‚ raise://constitution      Principios del proyecto â”‚
-â”‚ raise://guardrails        Guardrails activos       â”‚
-â”‚ raise://specs/*           (vacÃ­o)                  â”‚
-â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯
+╭─────────────────────────────────────────────────╮
+│ raise://constitution      Principios del proyecto │
+│ raise://guardrails        Guardrails activos       │
+│ raise://specs/*           (vacío)                  │
+╰─────────────────────────────────────────────────╯
 ```
 
 #### Fase 1: Constitution
@@ -148,7 +148,7 @@ raise mcp resources
 **Resultado:** Constitution personalizada basada en:
 - Stack elegido
 - Patrones del equipo
-- Restricciones de la organizaciÃ³n
+- Restricciones de la organización
 
 #### Fase 2: PRD
 Usar template `project_requirements.md`:
@@ -181,7 +181,7 @@ raise gate check --gate Gate-Vision
 raise gate check --gate Gate-Design
 ```
 
-#### Fase 5+: IteraciÃ³n con Observable Workflow
+#### Fase 5+: Iteración con Observable Workflow
 Para cada feature del MVP:
 1. `/raise.specify`
 2. `raise gate check --gate Gate-Discovery`
@@ -191,7 +191,7 @@ Para cada feature del MVP:
 6. `/raise.implement`
 7. `raise gate check --gate Gate-Code`
 
-**AuditorÃ­a semanal:**
+**Auditoría semanal:**
 ```bash
 raise audit --period week --format md --output weekly-report.md
 ```
@@ -199,33 +199,33 @@ raise audit --period week --format md --output weekly-report.md
 ### Estructura Final
 ```
 my-service/
-â”œâ”€â”€ .raise/
-â”‚   â”œâ”€â”€ memory/
-â”‚   â”‚   â”œâ”€â”€ constitution.md
-â”‚   â”‚   â””â”€â”€ guardrails.json
-â”‚   â”œâ”€â”€ traces/
-â”‚   â”‚   â””â”€â”€ *.jsonl
-â”‚   â”œâ”€â”€ specs/
-â”‚   â”œâ”€â”€ plans/
-â”‚   â””â”€â”€ tasks/
-â”œâ”€â”€ src/
-â”œâ”€â”€ tests/
-â”œâ”€â”€ mcp-config.json           # [v2.0]
-â””â”€â”€ pyproject.toml
+├── .raise/
+│   ├── memory/
+│   │   ├── constitution.md
+│   │   └── guardrails.json
+│   ├── traces/
+│   │   └── *.jsonl
+│   ├── specs/
+│   ├── plans/
+│   └── tasks/
+├── src/
+├── tests/
+├── mcp-config.json           # [v2.0]
+└── pyproject.toml
 ```
 
 ---
 
-## Ejemplo 3: MigraciÃ³n de Proyecto Legacy
+## Ejemplo 3: Migración de Proyecto Legacy
 
 ### Contexto
-- **Proyecto:** Monolito PHP de 5 aÃ±os
+- **Proyecto:** Monolito PHP de 5 años
 - **Objetivo:** Adoptar RaiSE sin rewrite
-- **RestricciÃ³n:** No romper funcionalidad existente
+- **Restricción:** No romper funcionalidad existente
 
 ### Proceso Paso a Paso
 
-#### 1. AnÃ¡lisis SAR
+#### 1. Análisis SAR
 ```bash
 raise init --skip-constitution
 ```
@@ -234,7 +234,7 @@ Usar katas SAR:
 - `L2-02-Analisis-Agnostico-Codigo-Fuente.md`
 - `L2-03-Ecosystem-Discovery.md`
 
-**Resultado:** DocumentaciÃ³n de arquitectura existente
+**Resultado:** Documentación de arquitectura existente
 
 #### 2. Constitution Basada en Legado
 ```
@@ -250,7 +250,7 @@ raise guardrail add --file custom/php-naming.mdc
 raise guardrail add --file custom/directory-structure.mdc
 ```
 
-**Ejemplo de guardrail extraÃ­do:**
+**Ejemplo de guardrail extraído:**
 ```markdown
 ---
 id: "GR-PHP-001"
@@ -269,10 +269,10 @@ class ProductController extends BaseController
 ```
 ```
 
-#### 4. AdopciÃ³n Gradual con Gates
+#### 4. Adopción Gradual con Gates
 Para cada nueva feature:
-1. Crear spec siguiendo RaiSE â†’ `raise gate check --gate Gate-Discovery`
-2. Implementar con validaciÃ³n â†’ `raise gate check --gate Gate-Code`
+1. Crear spec siguiendo RaiSE → `raise gate check --gate Gate-Discovery`
+2. Implementar con validación → `raise gate check --gate Gate-Code`
 3. Legacy no tocado
 
 **Observable Workflow para tracking:**
@@ -281,8 +281,8 @@ raise audit --period month --format csv --output adoption-metrics.csv
 ```
 
 ### Lecciones Aprendidas
-- **No forzar** cambios en cÃ³digo existente
-- Documentar "deuda tÃ©cnica conocida" como guardrails deshabilitados
+- **No forzar** cambios en código existente
+- Documentar "deuda técnica conocida" como guardrails deshabilitados
 - Migrar patrones gradualmente
 
 ---
@@ -290,7 +290,7 @@ raise audit --period month --format csv --output adoption-metrics.csv
 ## Ejemplo 4: Governance Multi-Proyecto con MCP
 
 ### Contexto
-- **OrganizaciÃ³n:** 10 equipos, 50+ repos
+- **Organización:** 10 equipos, 50+ repos
 - **Objetivo:** Governance centralizada
 - **Rol:** Platform team
 
@@ -305,17 +305,17 @@ raise init --template config-repo
 Estructura [ACTUALIZADO v2.0]:
 ```
 org-raise-config/
-â”œâ”€â”€ guardrails/                # [v2.0] Antes: rules/
-â”‚   â”œâ”€â”€ GR-001-naming.mdc
-â”‚   â”œâ”€â”€ GR-002-security.mdc
-â”‚   â””â”€â”€ ...
-â”œâ”€â”€ gates/                     # [v2.0]
-â”‚   â”œâ”€â”€ Gate-Discovery.md
-â”‚   â”œâ”€â”€ Gate-Design.md
-â”‚   â””â”€â”€ ...
-â”œâ”€â”€ katas/
-â”œâ”€â”€ templates/
-â””â”€â”€ raise.yaml
+├── guardrails/                # [v2.0] Antes: rules/
+│   ├── GR-001-naming.mdc
+│   ├── GR-002-security.mdc
+│   └── ...
+├── gates/                     # [v2.0]
+│   ├── Gate-Discovery.md
+│   ├── Gate-Design.md
+│   └── ...
+├── katas/
+├── templates/
+└── raise.yaml
 ```
 
 #### 2. Configurar Repos
@@ -332,7 +332,7 @@ observable:
   retention_days: 30
 ```
 
-#### 3. SincronizaciÃ³n
+#### 3. Sincronización
 ```bash
 raise pull
 raise mcp start  # Iniciar MCP con config centralizado
@@ -378,15 +378,15 @@ jobs:
 ### Beneficios
 - Una fuente de verdad para guardrails y gates
 - Updates sin tocar repos
-- Compliance automÃ¡tico
-- **MÃ©tricas agregadas via Observable Workflow** [v2.0]
+- Compliance automático
+- **Métricas agregadas via Observable Workflow** [v2.0]
 
 ---
 
-## Ejemplo 5: Escalation en AcciÃ³n [NUEVO v2.0]
+## Ejemplo 5: Escalation en Acción [NUEVO v2.0]
 
 ### Contexto
-Agente encuentra situaciÃ³n ambigua durante implementaciÃ³n.
+Agente encuentra situación ambigua durante implementación.
 
 ### Flujo de Escalation
 
@@ -428,68 +428,68 @@ Agente encuentra situaciÃ³n ambigua durante implementaciÃ³n.
 }
 ```
 
-#### 3. Orquestador Recibe NotificaciÃ³n
+#### 3. Orquestador Recibe Notificación
 ```
-â•­â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•®
-â”‚ âš ï¸ ESCALATION: Gate-Design Failed                          â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Reason: Missing authentication strategy                     â”‚
-â”‚ Context: Spec defines API endpoints but no auth mechanism   â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Options:                                                    â”‚
-â”‚ [1] Add JWT authentication section                          â”‚
-â”‚ [2] Use existing session-based auth                         â”‚
-â”‚ [3] Mark as internal-only API (no auth required)           â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Select option (1-3): _                                      â”‚
-â•°â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â•¯
+╭─────────────────────────────────────────────────────────────╮
+│ ⚠️ ESCALATION: Gate-Design Failed                          │
+├─────────────────────────────────────────────────────────────┤
+│ Reason: Missing authentication strategy                     │
+│ Context: Spec defines API endpoints but no auth mechanism   │
+├─────────────────────────────────────────────────────────────┤
+│ Options:                                                    │
+│ [1] Add JWT authentication section                          │
+│ [2] Use existing session-based auth                         │
+│ [3] Mark as internal-only API (no auth required)           │
+├─────────────────────────────────────────────────────────────┤
+│ Select option (1-3): _                                      │
+╰─────────────────────────────────────────────────────────────╯
 ```
 
-#### 4. DecisiÃ³n Registrada en Observable Workflow
+#### 4. Decisión Registrada en Observable Workflow
 ```jsonl
 {"timestamp":"...","action":"escalation","gate":"Gate-Design","reason":"Missing auth","decision":"option_1","decided_by":"human"}
 ```
 
 ---
 
-## Anti-Ejemplos: QuÃ© NO Hacer
+## Anti-Ejemplos: Qué NO Hacer
 
 ### Anti-Ejemplo 1: Spec Demasiado Vaga
 
-âŒ **Malo:**
+❌ **Malo:**
 ```markdown
-# Feature: Mejorar bÃºsqueda
-La bÃºsqueda debe ser mejor y mÃ¡s rÃ¡pida.
+# Feature: Mejorar búsqueda
+La búsqueda debe ser mejor y más rápida.
 ```
 
-âœ… **Bueno:**
+✅ **Bueno:**
 ```markdown
-# Feature: BÃºsqueda con filtros
+# Feature: Búsqueda con filtros
 ## Requisitos Funcionales
-- Filtrar por categorÃ­a (lista predefinida)
+- Filtrar por categoría (lista predefinida)
 - Filtrar por rango de precio (min/max)
 - Filtrar por disponibilidad (boolean)
 ## NFRs
 - Response time < 200ms para 10k productos
-- Soporte de paginaciÃ³n (20 items default)
+- Soporte de paginación (20 items default)
 ```
 
-**Por quÃ© falla:** Sin criterios especÃ­ficos, el agente "inventa" y el resultado no cumple expectativas.
+**Por qué falla:** Sin criterios específicos, el agente "inventa" y el resultado no cumple expectativas.
 
-**Gate que lo detecta:** Gate-Discovery âŒ
+**Gate que lo detecta:** Gate-Discovery ❌
 
 ---
 
 ### Anti-Ejemplo 2: Saltar Validation Gates [ACTUALIZADO v2.0]
 
-âŒ **Malo:**
+❌ **Malo:**
 ```
-/raise.implement Crear sistema de autenticaciÃ³n
+/raise.implement Crear sistema de autenticación
 ```
 
-âœ… **Bueno:**
+✅ **Bueno:**
 ```
-/raise.specify Sistema de autenticaciÃ³n con SSO
+/raise.specify Sistema de autenticación con SSO
 raise gate check --gate Gate-Discovery
 /raise.plan @spec.md
 raise gate check --gate Gate-Design
@@ -497,87 +497,87 @@ raise gate check --gate Gate-Design
 raise gate check --gate Gate-Code
 ```
 
-**Por quÃ© falla:** Sin spec/plan, el cÃ³digo carece de contexto y el agente toma decisiones arbitrarias.
+**Por qué falla:** Sin spec/plan, el código carece de contexto y el agente toma decisiones arbitrarias.
 
 ---
 
 ### Anti-Ejemplo 3: Ignorar Escalations [NUEVO v2.0]
 
-âŒ **Malo:**
-Configurar `--no-escalate` para "ir mÃ¡s rÃ¡pido".
+❌ **Malo:**
+Configurar `--no-escalate` para "ir más rápido".
 
-âœ… **Bueno:**
+✅ **Bueno:**
 Responder a escalations cuando ocurren.
 
-**Por quÃ© falla:** Las decisiones no-documentadas crean deuda tÃ©cnica invisible.
+**Por qué falla:** Las decisiones no-documentadas crean deuda técnica invisible.
 
 ---
 
-### Anti-Ejemplo 4: Aceptar CÃ³digo Sin Revisar
+### Anti-Ejemplo 4: Aceptar Código Sin Revisar
 
-âŒ **Malo:**
+❌ **Malo:**
 Aceptar todo output del agente sin leer.
 
-âœ… **Bueno:**
-1. Pedir explicaciÃ³n primero: `/raise.explain`
-2. Revisar cÃ³digo generado
+✅ **Bueno:**
+1. Pedir explicación primero: `/raise.explain`
+2. Revisar código generado
 3. Solicitar cambios si necesario
 
-**Por quÃ© falla:** Viola principio de HeutagogÃ­a. El humano pierde ownership.
+**Por qué falla:** Viola principio de Heutagogía. El humano pierde ownership.
 
 ---
 
 ### Anti-Ejemplo 5: No Auditar [NUEVO v2.0]
 
-âŒ **Malo:**
+❌ **Malo:**
 Nunca ejecutar `raise audit`.
 
-âœ… **Bueno:**
+✅ **Bueno:**
 ```bash
-# AuditorÃ­a semanal
+# Auditoría semanal
 raise audit --period week --format md > weekly-review.md
 ```
 
-**Por quÃ© falla:** Sin mÃ©tricas, no hay mejora continua (Kaizen).
+**Por qué falla:** Sin métricas, no hay mejora continua (Kaizen).
 
 ---
 
 ## Patrones Recomendados
 
-### PatrÃ³n: Explicabilidad Primero
+### Patrón: Explicabilidad Primero
 ```
-Antes de implementar X, explÃ­came:
+Antes de implementar X, explícame:
 1. Tu enfoque propuesto
 2. Alternativas consideradas
 3. Trade-offs
 ```
 
-### PatrÃ³n: Gate-Driven Development [NUEVO v2.0]
+### Patrón: Gate-Driven Development [NUEVO v2.0]
 ```bash
-# Antes de cada transiciÃ³n de fase
+# Antes de cada transición de fase
 raise gate check --gate Gate-{fase_actual}
 ```
 
-### PatrÃ³n: Observable Sessions [NUEVO v2.0]
+### Patrón: Observable Sessions [NUEVO v2.0]
 ```bash
-# Al inicio de sesiÃ³n de trabajo
+# Al inicio de sesión de trabajo
 raise mcp start
 
-# Al final de sesiÃ³n
+# Al final de sesión
 raise audit --session today
 ```
 
-### PatrÃ³n: IteraciÃ³n con Contexto
+### Patrón: Iteración con Contexto
 ```
-Dado el feedback anterior, ajusta el diseÃ±o para [cambio especÃ­fico].
+Dado el feedback anterior, ajusta el diseño para [cambio específico].
 ```
 
-### PatrÃ³n: Escalation-Conscious [NUEVO v2.0]
+### Patrón: Escalation-Conscious [NUEVO v2.0]
 ```
-Si encuentras ambigÃ¼edad en la spec, escala con:
-1. El problema especÃ­fico
+Si encuentras ambigüedad en la spec, escala con:
+1. El problema específico
 2. Opciones que has considerado
-3. Tu recomendaciÃ³n (si tienes una)
+3. Tu recomendación (si tienes una)
 ```
 
 ---
@@ -589,7 +589,7 @@ Si encuentras ambigÃ¼edad en la spec, escala con:
 - **ACTUALIZADO**: Ejemplo 2 con MCP server
 - **ACTUALIZADO**: Ejemplo 3 con guardrails
 - **ACTUALIZADO**: Ejemplo 4 con CI/CD gates y audit
-- **NUEVO**: Ejemplo 5 (Escalation en AcciÃ³n)
+- **NUEVO**: Ejemplo 5 (Escalation en Acción)
 - **ACTUALIZADO**: Anti-ejemplos con Gates y Observable Workflow
 - **NUEVO**: Patrones Gate-Driven y Observable Sessions
 
@@ -598,4 +598,4 @@ Si encuentras ambigÃ¼edad en la spec, escala con:
 
 ---
 
-*Esta biblioteca crece con cada nuevo patrÃ³n aprendido. Ver [23-commands-reference-v2.md](./23-commands-reference-v2.md) para comandos.*
+*Esta biblioteca crece con cada nuevo patrón aprendido. Ver [23-commands-reference-v2.md](./23-commands-reference-v2.md) para comandos.*

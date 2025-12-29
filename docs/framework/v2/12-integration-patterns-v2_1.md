@@ -1,9 +1,9 @@
 # RaiSE Integration Patterns
-## Patrones de IntegraciÃ³n con el Ecosistema
+## Patrones de Integración con el Ecosistema
 
-**VersiÃ³n:** 2.0.0  
+**Versión:** 2.0.0  
 **Fecha:** 28 de Diciembre, 2025  
-**PropÃ³sito:** Documentar cÃ³mo RaiSE se integra con herramientas externas via MCP y otros mecanismos.
+**Propósito:** Documentar cómo RaiSE se integra con herramientas externas via MCP y otros mecanismos.
 
 ---
 
@@ -11,23 +11,23 @@
 
 | Sistema | Tipo | Mecanismo | Estado | Prioridad |
 |---------|------|-----------|--------|-----------|
-| GitHub | VCS | Git protocol | âœ… Soportado | P0 |
-| GitLab | VCS | Git protocol | âœ… Soportado | P0 |
-| Bitbucket | VCS | Git protocol | âœ… Soportado | P1 |
-| Cursor | IDE | MCP + .cursorrules | âœ… Soportado | P0 |
-| VS Code | IDE | MCP + extension | ðŸ“‹ Planificado | P1 |
-| Claude (Anthropic) | Agent | MCP native | âœ… Soportado | P0 |
-| Claude Code | Agent | MCP + CLAUDE.md | âœ… Soportado | P0 |
-| GitHub Copilot | Agent | Custom Instructions | âœ… Soportado | P0 |
-| OpenAI GPT | Agent | MCP (via bridge) | ðŸ”„ En desarrollo | P1 |
-| Jira | PM | REST API | ðŸ“‹ Planificado | P2 |
-| Linear | PM | GraphQL API | ðŸ“‹ Planificado | P2 |
+| GitHub | VCS | Git protocol | ✅ Soportado | P0 |
+| GitLab | VCS | Git protocol | ✅ Soportado | P0 |
+| Bitbucket | VCS | Git protocol | ✅ Soportado | P1 |
+| Cursor | IDE | MCP + .cursorrules | ✅ Soportado | P0 |
+| VS Code | IDE | MCP + extension | 📋 Planificado | P1 |
+| Claude (Anthropic) | Agent | MCP native | ✅ Soportado | P0 |
+| Claude Code | Agent | MCP + CLAUDE.md | ✅ Soportado | P0 |
+| GitHub Copilot | Agent | Custom Instructions | ✅ Soportado | P0 |
+| OpenAI GPT | Agent | MCP (via bridge) | 🔄 En desarrollo | P1 |
+| Jira | PM | REST API | 📋 Planificado | P2 |
+| Linear | PM | GraphQL API | 📋 Planificado | P2 |
 
 ---
 
-## PatrÃ³n Principal: MCP-Native
+## Patrón Principal: MCP-Native
 
-RaiSE es **MCP-native**: el Model Context Protocol es el mecanismo primario de integraciÃ³n con agentes AI.
+RaiSE es **MCP-native**: el Model Context Protocol es el mecanismo primario de integración con agentes AI.
 
 ### Arquitectura MCP
 
@@ -61,43 +61,43 @@ flowchart TB
 
 #### Resources (Contexto Estructurado)
 
-| URI | DescripciÃ³n | Formato |
+| URI | Descripción | Formato |
 |-----|-------------|---------|
 | `raise://constitution` | Principios del proyecto | Markdown |
 | `raise://guardrails` | Guardrails activos compilados | JSON |
-| `raise://guardrails/{id}` | Guardrail especÃ­fico | Markdown |
+| `raise://guardrails/{id}` | Guardrail específico | Markdown |
 | `raise://specs` | Lista de specs disponibles | JSON |
-| `raise://specs/{id}` | Spec especÃ­fica | Markdown |
+| `raise://specs/{id}` | Spec específica | Markdown |
 | `raise://specs/current` | Spec en trabajo actual | Markdown |
-| `raise://plans/current` | Plan de implementaciÃ³n activo | Markdown |
+| `raise://plans/current` | Plan de implementación activo | Markdown |
 | `raise://context` | Contexto agregado para tarea | JSON |
 
 #### Tools (Acciones)
 
-| Tool | DescripciÃ³n | ParÃ¡metros |
+| Tool | Descripción | Parámetros |
 |------|-------------|------------|
 | `validate_gate` | Valida artefacto contra Validation Gate | `gate_id`, `artifact_path` |
 | `check_guardrail` | Verifica compliance contra guardrail | `guardrail_id`, `content` |
 | `generate_artifact` | Crea artefacto desde template | `template_id`, `variables` |
-| `escalate` | Solicita intervenciÃ³n del Orquestador | `reason`, `context`, `options` |
-| `log_trace` | Registra acciÃ³n en Observable Workflow | `action`, `input`, `output` |
+| `escalate` | Solicita intervención del Orquestador | `reason`, `context`, `options` |
+| `log_trace` | Registra acción en Observable Workflow | `action`, `input`, `output` |
 
 #### Prompts (Templates Reutilizables)
 
-| Prompt | DescripciÃ³n | Variables |
+| Prompt | Descripción | Variables |
 |--------|-------------|-----------|
 | `constitution_context` | Inyecta Constitution en contexto | - |
-| `guardrail_check` | Template para verificaciÃ³n de guardrail | `guardrail_id` |
-| `gate_validation` | Template para validaciÃ³n de gate | `gate_id`, `criteria` |
+| `guardrail_check` | Template para verificación de guardrail | `guardrail_id` |
+| `gate_validation` | Template para validación de gate | `gate_id`, `criteria` |
 | `escalation_request` | Formato de solicitud HITL | `reason`, `options` |
 
 ---
 
-## Patrones de IntegraciÃ³n por Tipo
+## Patrones de Integración por Tipo
 
-### PatrÃ³n: VCS Provider
+### Patrón: VCS Provider
 
-**Principio:** RaiSE usa Git protocol directamente, no APIs especÃ­ficas. Esto garantiza platform agnosticism.
+**Principio:** RaiSE usa Git protocol directamente, no APIs específicas. Esto garantiza platform agnosticism.
 
 **Interface abstracta:**
 ```python
@@ -119,57 +119,57 @@ class VCSProvider(Protocol):
 
 ---
 
-### PatrÃ³n: IDE Integration
+### Patrón: IDE Integration
 
-**Mecanismos de integraciÃ³n por IDE:**
+**Mecanismos de integración por IDE:**
 
 | IDE | MCP | Archivo Config | Fallback |
 |-----|-----|----------------|----------|
-| Cursor | âœ… Native | `.cursorrules` | .mdc files |
-| VS Code | ðŸ”„ Via extension | `settings.json` | AGENTS.md |
-| JetBrains | ðŸ“‹ Planificado | `.idea/` | AGENTS.md |
-| Neovim | ðŸ“‹ Planificado | `init.lua` | AGENTS.md |
+| Cursor | ✅ Native | `.cursorrules` | .mdc files |
+| VS Code | 🔄 Via extension | `settings.json` | AGENTS.md |
+| JetBrains | 📋 Planificado | `.idea/` | AGENTS.md |
+| Neovim | 📋 Planificado | `init.lua` | AGENTS.md |
 
 **Estructura para Cursor (MCP + fallback):**
 ```
 proyecto/
-â”œâ”€â”€ .cursor/
-â”‚   â””â”€â”€ rules/
-â”‚       â”œâ”€â”€ guard-001-naming.mdc
-â”‚       â”œâ”€â”€ guard-002-security.mdc
-â”‚       â””â”€â”€ ...
-â”œâ”€â”€ .raise/
-â”‚   â””â”€â”€ memory/
-â”‚       â”œâ”€â”€ constitution.md
-â”‚       â””â”€â”€ guardrails.json
-â””â”€â”€ raise.yaml  # Configura raise-mcp
+├── .cursor/
+│   └── rules/
+│       ├── guard-001-naming.mdc
+│       ├── guard-002-security.mdc
+│       └── ...
+├── .raise/
+│   └── memory/
+│       ├── constitution.md
+│       └── guardrails.json
+└── raise.yaml  # Configura raise-mcp
 ```
 
 **Estructura para Claude Code:**
 ```
 proyecto/
-â”œâ”€â”€ CLAUDE.md              # Instructions root level
-â”œâ”€â”€ .raise/
-â”‚   â””â”€â”€ memory/
-â”‚       â””â”€â”€ constitution.md
-â””â”€â”€ raise.yaml             # Configura raise-mcp
+├── CLAUDE.md              # Instructions root level
+├── .raise/
+│   └── memory/
+│       └── constitution.md
+└── raise.yaml             # Configura raise-mcp
 ```
 
 **Estructura universal (AGENTS.md):**
 ```
 proyecto/
-â”œâ”€â”€ AGENTS.md              # EstÃ¡ndar emergente de comunidad
-â”œâ”€â”€ .raise/
-â”‚   â””â”€â”€ memory/
-â”‚       â””â”€â”€ constitution.md
-â””â”€â”€ raise.yaml
+├── AGENTS.md              # Estándar emergente de comunidad
+├── .raise/
+│   └── memory/
+│       └── constitution.md
+└── raise.yaml
 ```
 
 ---
 
-### PatrÃ³n: Agent Integration
+### Patrón: Agent Integration
 
-**Flujo MCP estÃ¡ndar:**
+**Flujo MCP estándar:**
 
 ```mermaid
 sequenceDiagram
@@ -195,19 +195,19 @@ sequenceDiagram
     Note over A: Agent genera con contexto completo
     
     A->>MCP: call_tool("validate_gate", {gate: "gate-code"})
-    MCP->>MCP: EvalÃºa criterios
+    MCP->>MCP: Evalúa criterios
     MCP-->>A: {status: "passed"}
     
     A-->>O: Resultado validado
 ```
 
-**ConfiguraciÃ³n por agente:**
+**Configuración por agente:**
 
-| Agente | ConexiÃ³n MCP | Config File |
+| Agente | Conexión MCP | Config File |
 |--------|--------------|-------------|
-| Claude Desktop | `claude_desktop_config.json` | SecciÃ³n `mcpServers` |
+| Claude Desktop | `claude_desktop_config.json` | Sección `mcpServers` |
 | Cursor | Built-in | `.cursor/mcp.json` |
-| Claude Code | AutomÃ¡tico | `raise.yaml` |
+| Claude Code | Automático | `raise.yaml` |
 | Copilot | Via bridge | Custom Instructions |
 
 **Ejemplo: claude_desktop_config.json**
@@ -224,9 +224,9 @@ sequenceDiagram
 
 ---
 
-### PatrÃ³n: Observable Workflow Integration
+### Patrón: Observable Workflow Integration
 
-**PropÃ³sito:** Generar traces auditables de todas las interacciones MCP.
+**Propósito:** Generar traces auditables de todas las interacciones MCP.
 
 ```mermaid
 flowchart LR
@@ -242,18 +242,18 @@ flowchart LR
 {"trace_id":"uuid","timestamp":"ISO8601","action":"tool_call","tool":"validate_gate","input":{"gate":"gate-code"},"output":{"status":"passed"},"duration_ms":120}
 ```
 
-**IntegraciÃ³n con sistemas externos:**
+**Integración con sistemas externos:**
 
 | Sistema | Mecanismo | Estado |
 |---------|-----------|--------|
-| Archivo local | JSONL nativo | âœ… Soportado |
-| OpenTelemetry | OTLP export | ðŸ“‹ Planificado |
-| Datadog | Log forwarding | ðŸ“‹ Planificado |
-| Splunk | HEC endpoint | ðŸ“‹ Planificado |
+| Archivo local | JSONL nativo | ✅ Soportado |
+| OpenTelemetry | OTLP export | 📋 Planificado |
+| Datadog | Log forwarding | 📋 Planificado |
+| Splunk | HEC endpoint | 📋 Planificado |
 
 ---
 
-### PatrÃ³n: Project Management (Futuro)
+### Patrón: Project Management (Futuro)
 
 **Estado:** Planificado para v0.4+
 
@@ -266,9 +266,9 @@ flowchart LR
 ```
 
 **Capacidades planificadas:**
-- Sincronizar specs â†’ issues
-- Importar issues â†’ specs
-- Mapear Validation Gates â†’ workflow states
+- Sincronizar specs → issues
+- Importar issues → specs
+- Mapear Validation Gates → workflow states
 - Actualizar estado bidireccional
 - Generar reportes de compliance
 
@@ -278,11 +278,11 @@ flowchart LR
 
 ### APIs Externas Consumidas
 
-| API | PropÃ³sito | Auth | Requerido |
+| API | Propósito | Auth | Requerido |
 |-----|-----------|------|-----------|
-| Git protocol | Clone/pull repos | SSH/HTTPS | âœ… SÃ­ |
-| GitHub API | Metadata (opcional) | Token | âŒ No |
-| GitLab API | Metadata (opcional) | Token | âŒ No |
+| Git protocol | Clone/pull repos | SSH/HTTPS | ✅ Sí |
+| GitHub API | Metadata (opcional) | Token | ❌ No |
+| GitLab API | Metadata (opcional) | Token | ❌ No |
 
 **Principio:** RaiSE funciona sin APIs externas. Git protocol es suficiente.
 
@@ -290,22 +290,22 @@ flowchart LR
 
 #### raise-mcp (MCP Server)
 
-| MÃ©todo MCP | DescripciÃ³n |
+| Método MCP | Descripción |
 |------------|-------------|
 | `list_resources` | Lista recursos disponibles |
-| `read_resource` | Lee recurso especÃ­fico |
+| `read_resource` | Lee recurso específico |
 | `list_tools` | Lista tools disponibles |
 | `call_tool` | Ejecuta herramienta |
 | `list_prompts` | Lista prompts disponibles |
 | `get_prompt` | Obtiene prompt con variables |
 
-**AutenticaciÃ³n:** Local only (no auth required)
+**Autenticación:** Local only (no auth required)
 
-**Transporte:** stdio (estÃ¡ndar MCP)
+**Transporte:** stdio (estándar MCP)
 
 #### raise-kit CLI
 
-La CLI no expone APIs HTTP. InteracciÃ³n via comandos:
+La CLI no expone APIs HTTP. Interacción via comandos:
 ```bash
 raise check --format json      # Output estructurado
 raise kata --output report.json
@@ -317,11 +317,11 @@ raise mcp                      # Inicia MCP server
 
 ## Extensibilidad
 
-### Crear Nueva IntegraciÃ³n MCP
+### Crear Nueva Integración MCP
 
 1. **Definir Resources** adicionales en `raise.yaml`
 2. **Implementar Tools** custom si necesario
-3. **Registrar** en configuraciÃ³n MCP
+3. **Registrar** en configuración MCP
 4. **Documentar** en este archivo
 
 **Ejemplo: Resource custom**
@@ -360,20 +360,20 @@ plugins:
 
 | Agente | MCP Native | Fallback 1 | Fallback 2 |
 |--------|------------|------------|------------|
-| Claude Desktop | âœ… | - | - |
-| Claude Code | âœ… | CLAUDE.md | - |
-| Cursor | âœ… | .cursorrules | AGENTS.md |
-| Copilot | âŒ | Custom Instructions | AGENTS.md |
-| GPT-4 | ðŸ”„ Bridge | System prompt | AGENTS.md |
+| Claude Desktop | ✅ | - | - |
+| Claude Code | ✅ | CLAUDE.md | - |
+| Cursor | ✅ | .cursorrules | AGENTS.md |
+| Copilot | ❌ | Custom Instructions | AGENTS.md |
+| GPT-4 | 🔄 Bridge | System prompt | AGENTS.md |
 
 ### Fallback Strategy
 
 ```mermaid
 flowchart TD
     A[Agent detectado] --> B{Soporta MCP?}
-    B -->|SÃ­| C[Conectar raise-mcp]
+    B -->|Sí| C[Conectar raise-mcp]
     B -->|No| D{Tiene config nativa?}
-    D -->|SÃ­| E[Usar .cursorrules / CLAUDE.md]
+    D -->|Sí| E[Usar .cursorrules / CLAUDE.md]
     D -->|No| F[Generar AGENTS.md]
     
     C --> G[Context Engineering completo]
@@ -381,7 +381,7 @@ flowchart TD
     F --> H
 ```
 
-**Comando de generaciÃ³n de fallback:**
+**Comando de generación de fallback:**
 ```bash
 raise export --format cursorrules  # Genera .cursorrules
 raise export --format claude       # Genera CLAUDE.md
@@ -393,15 +393,15 @@ raise export --format agents       # Genera AGENTS.md
 ## Changelog
 
 ### v2.1.0 (2025-12-28)
-- MCP promovido a patrÃ³n principal de integraciÃ³n
-- TerminologÃ­a: rules â†’ guardrails, DoD â†’ Validation Gates
+- MCP promovido a patrón principal de integración
+- Terminología: rules → guardrails, DoD → Validation Gates
 - NUEVO: Primitivos MCP detallados (Resources, Tools, Prompts)
-- NUEVO: PatrÃ³n Observable Workflow Integration
+- NUEVO: Patrón Observable Workflow Integration
 - NUEVO: Matriz de compatibilidad y fallbacks
 - NUEVO: Comando `raise export` para fallbacks
-- Tools actualizados: `validate_dod` â†’ `validate_gate`, `check_rules` â†’ `check_guardrail`
-- AÃ±adido soporte OpenAI via bridge
+- Tools actualizados: `validate_dod` → `validate_gate`, `check_rules` → `check_guardrail`
+- Añadido soporte OpenAI via bridge
 
 ---
 
-*Este documento se actualiza con cada nueva integraciÃ³n. Referencias: [10-system-architecture.md](./10-system-architecture.md), [11-data-architecture.md](./11-data-architecture.md).*
+*Este documento se actualiza con cada nueva integración. Referencias: [10-system-architecture.md](./10-system-architecture.md), [11-data-architecture.md](./11-data-architecture.md).*
