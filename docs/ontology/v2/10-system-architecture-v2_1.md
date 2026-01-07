@@ -1,9 +1,9 @@
 # RaiSE System Architecture
-## Vista Técnica del Framework
+## Vista TÃ©cnica del Framework
 
-**Versión:** 2.0.0  
+**VersiÃ³n:** 2.0.0  
 **Fecha:** 28 de Diciembre, 2025  
-**Propósito:** Documentar la arquitectura técnica de alto nivel del sistema RaiSE.
+**PropÃ³sito:** Documentar la arquitectura tÃ©cnica de alto nivel del sistema RaiSE.
 
 ---
 
@@ -54,7 +54,7 @@ C4Container
     System_Ext(git, "Git Provider")
     System_Ext(ai, "AI Agent")
 
-    Rel(dev, cli, "raise init/check/hydrate")
+    Rel(dev, cli, "raise init/check/pull")
     Rel(dev, mcp, "Context Engineering")
     Rel(cli, config, "git clone/pull")
     Rel(cli, memory, "Lee/escribe Golden Data")
@@ -69,16 +69,16 @@ C4Container
 
 ### raise-kit (CLI)
 
-**Propósito:** Interfaz principal del Orquestador con RaiSE.
+**PropÃ³sito:** Interfaz principal del Orquestador con RaiSE.
 
 **Responsabilidades:**
 - Inicializar proyectos con estructura RaiSE
 - Sincronizar guardrails desde repositorio central
 - Validar compliance contra guardrails
-- Ejecutar katas de validación
+- Ejecutar katas de validaciÃ³n
 - Gestionar Validation Gates
 
-**Stack tecnológico:**
+**Stack tecnolÃ³gico:**
 - Python 3.11+
 - Click (CLI framework)
 - Rich (terminal UI)
@@ -86,44 +86,44 @@ C4Container
 
 **Comandos principales:**
 
-| Comando | Descripción |
+| Comando | DescripciÃ³n |
 |---------|-------------|
 | `raise init` | Inicializa proyecto con estructura .raise/ |
-| `raise hydrate` | Sincroniza guardrails desde raise-config |
+| `raise pull` | Sincroniza guardrails desde raise-config |
 | `raise check` | Valida proyecto contra guardrails |
-| `raise validate` | Ejecuta katas de validación |
-| `raise gate` | Verifica Validation Gate específico |
+| `raise kata` | Ejecuta katas de validaciÃ³n |
+| `raise gate` | Verifica Validation Gate especÃ­fico |
 | `raise mcp` | Inicia raise-mcp server local |
 
 ---
 
 ### raise-config (Central Repo)
 
-**Propósito:** Fuente de verdad centralizada para guardrails, katas y templates.
+**PropÃ³sito:** Fuente de verdad centralizada para guardrails, katas y templates.
 
 **Responsabilidades:**
 - Almacenar guardrails compartidos
-- Versionar katas de validación
-- Distribuir templates estándar
-- Proveer configuración base
+- Versionar katas de validaciÃ³n
+- Distribuir templates estÃ¡ndar
+- Proveer configuraciÃ³n base
 
 **Estructura:**
 ```
 raise-config/
-├── guardrails/       # Guardrails en .mdc format [v2: renombrado de rules/]
-├── katas/            # Katas L0-L3
-├── templates/        # Templates de documentos
-├── agents/           # Definiciones de agentes
-└── raise.yaml        # Configuración base
+â”œâ”€â”€ guardrails/       # Guardrails en .mdc format [v2: renombrado de rules/]
+â”œâ”€â”€ katas/            # Katas L0-L3
+â”œâ”€â”€ templates/        # Templates de documentos
+â”œâ”€â”€ agents/           # Definiciones de agentes
+â””â”€â”€ raise.yaml        # ConfiguraciÃ³n base
 ```
 
-**Distribución:** Via Git (clone/pull), no requiere servidor.
+**DistribuciÃ³n:** Via Git (clone/pull), no requiere servidor.
 
 ---
 
-### raise-mcp (Context Server) — COMPONENTE CORE v2.0
+### raise-mcp (Context Server) â€” COMPONENTE CORE v2.0
 
-**Propósito:** Servir contexto estructurado a agentes AI via MCP protocol. **Es el motor de Context Engineering.**
+**PropÃ³sito:** Servir contexto estructurado a agentes AI via MCP protocol. **Es el motor de Context Engineering.**
 
 **Responsabilidades:**
 - Leer Golden Data local (.raise/)
@@ -133,11 +133,11 @@ raise-config/
 - Implementar Escalation Gates (HITL)
 - Generar Observable Workflow traces
 
-**Protocolo:** Model Context Protocol (Anthropic) — estándar de facto con 11,000+ servers
+**Protocolo:** Model Context Protocol (Anthropic) â€” estÃ¡ndar de facto con 11,000+ servers
 
 **Primitivos MCP expuestos:**
 
-| Primitivo | Función en RaiSE | Ejemplo |
+| Primitivo | FunciÃ³n en RaiSE | Ejemplo |
 |-----------|------------------|---------|
 | **Resources** | Golden Data estructurado | `raise://constitution`, `raise://specs/current` |
 | **Tools** | Acciones que el agente ejecuta | `validate_gate`, `check_guardrail` |
@@ -146,22 +146,22 @@ raise-config/
 
 **Resources expuestos:**
 
-| Resource URI | Descripción |
+| Resource URI | DescripciÃ³n |
 |--------------|-------------|
 | `raise://constitution` | Principios del proyecto |
 | `raise://guardrails` | Guardrails activos (compilados) |
 | `raise://specs/current` | Spec en trabajo actual |
-| `raise://plans/current` | Plan de implementación activo |
+| `raise://plans/current` | Plan de implementaciÃ³n activo |
 | `raise://context` | Contexto agregado para tarea actual |
 
 **Tools expuestos:**
 
-| Tool | Descripción |
+| Tool | DescripciÃ³n |
 |------|-------------|
 | `validate_gate` | Valida artefacto contra Validation Gate |
-| `check_guardrail` | Verifica compliance de código contra guardrail |
+| `check_guardrail` | Verifica compliance de cÃ³digo contra guardrail |
 | `generate_artifact` | Crea artefacto desde template |
-| `escalate` | Solicita intervención del Orquestador (HITL) |
+| `escalate` | Solicita intervenciÃ³n del Orquestador (HITL) |
 
 **Estado:** v0.2 (en desarrollo activo)
 
@@ -169,27 +169,27 @@ raise-config/
 
 ### .raise/ (Local Golden Data)
 
-**Propósito:** Golden Data específico del proyecto.
+**PropÃ³sito:** Golden Data especÃ­fico del proyecto.
 
-**Estructura estándar:**
+**Estructura estÃ¡ndar:**
 ```
 .raise/
-├── memory/
-│   ├── constitution.md      # Principios del proyecto
-│   └── guardrails.json      # Guardrails compilados [v2: renombrado]
-├── specs/                   # Especificaciones activas
-├── plans/                   # Planes de implementación
-├── traces/                  # Observable Workflow logs [v2: nuevo]
-└── raise.yaml               # Config local
+â”œâ”€â”€ memory/
+â”‚   â”œâ”€â”€ constitution.md      # Principios del proyecto
+â”‚   â””â”€â”€ guardrails.json      # Guardrails compilados [v2: renombrado]
+â”œâ”€â”€ specs/                   # Especificaciones activas
+â”œâ”€â”€ plans/                   # Planes de implementaciÃ³n
+â”œâ”€â”€ traces/                  # Observable Workflow logs [v2: nuevo]
+â””â”€â”€ raise.yaml               # Config local
 ```
 
-**Principio:** Todo en `.raise/` es Golden Data versionado. Lo que no está aquí, no existe para el agente.
+**Principio:** Todo en `.raise/` es Golden Data versionado. Lo que no estÃ¡ aquÃ­, no existe para el agente.
 
 ---
 
 ## Flujos de Datos Principales
 
-### Flujo 1: Inicialización de Proyecto
+### Flujo 1: InicializaciÃ³n de Proyecto
 
 ```mermaid
 sequenceDiagram
@@ -207,7 +207,7 @@ sequenceDiagram
     CLI-->>O: Proyecto inicializado + MCP ready
 ```
 
-### Flujo 2: Sincronización de Guardrails
+### Flujo 2: SincronizaciÃ³n de Guardrails
 
 ```mermaid
 sequenceDiagram
@@ -217,12 +217,12 @@ sequenceDiagram
     participant Local as .raise/
     participant MCP as raise-mcp
 
-    O->>CLI: raise hydrate
+    O->>CLI: raise pull
     CLI->>Config: git pull
     Config-->>CLI: Nuevos guardrails
-    CLI->>CLI: Compila guardrails (.mdc → .json)
+    CLI->>CLI: Compila guardrails (.mdc â†’ .json)
     CLI->>Local: Actualiza guardrails.json
-    CLI->>MCP: Notifica actualización
+    CLI->>MCP: Notifica actualizaciÃ³n
     MCP->>MCP: Recarga contexto
     CLI-->>O: Guardrails sincronizados
 ```
@@ -248,7 +248,7 @@ sequenceDiagram
     Local-->>MCP: Guardrails activos
     MCP-->>AI: Context completo
     AI->>AI: Genera spec alineada
-    AI-->>O: Spec para validación
+    AI-->>O: Spec para validaciÃ³n
 ```
 
 ### Flujo 4: Validation Gate Check [NUEVO v2.0]
@@ -263,14 +263,14 @@ sequenceDiagram
     AI->>MCP: call_tool("validate_gate", {gate: "Gate-Design", artifact: "spec.md"})
     MCP->>Local: Lee spec.md
     MCP->>Local: Lee Gate-Design criteria
-    MCP->>MCP: Evalúa compliance
+    MCP->>MCP: EvalÃºa compliance
     alt Gate PASSED
         MCP-->>AI: {status: "passed", details: [...]}
-        AI-->>O: ✓ Gate-Design passed
+        AI-->>O: âœ“ Gate-Design passed
     else Gate FAILED
         MCP-->>AI: {status: "failed", gaps: [...]}
         AI->>MCP: call_tool("escalate", {reason: "Gate failed"})
-        MCP-->>O: ⚠️ Escalation: Gate-Design failed
+        MCP-->>O: âš ï¸ Escalation: Gate-Design failed
     end
 ```
 
@@ -283,7 +283,7 @@ sequenceDiagram
     participant MCP as raise-mcp
     participant Traces as .raise/traces/
 
-    Note over MCP,Traces: Cada interacción genera trace
+    Note over MCP,Traces: Cada interacciÃ³n genera trace
     AI->>MCP: Any MCP call
     MCP->>Traces: Log: {timestamp, action, context, result}
     MCP-->>AI: Response
@@ -295,30 +295,30 @@ sequenceDiagram
 
 ---
 
-## Decisiones Arquitectónicas Clave
+## Decisiones ArquitectÃ³nicas Clave
 
-| ID | Decisión | Opciones Consideradas | Elegida | Rationale |
+| ID | DecisiÃ³n | Opciones Consideradas | Elegida | Rationale |
 |----|----------|----------------------|---------|-----------|
-| ADR-001 | CLI en Python | Python, Go, Rust | Python | Ecosistema ML/AI, facilidad de extensión |
-| ADR-002 | Git como distribución | NPM, PyPI, Git | Git | Platform agnostic, no requiere registry |
-| ADR-003 | MCP para contexto | Custom API, LSP, MCP | MCP | Estándar de facto (11k+ servers), soporte multi-agente |
+| ADR-001 | CLI en Python | Python, Go, Rust | Python | Ecosistema ML/AI, facilidad de extensiÃ³n |
+| ADR-002 | Git como distribuciÃ³n | NPM, PyPI, Git | Git | Platform agnostic, no requiere registry |
+| ADR-003 | MCP para contexto | Custom API, LSP, MCP | MCP | EstÃ¡ndar de facto (11k+ servers), soporte multi-agente |
 | ADR-004 | Markdown para humanos | YAML, TOML, MD | Markdown | Legibilidad, diff-friendly |
-| ADR-005 | JSON para máquinas | JSON, YAML | JSON | Parseo rápido, soporte universal |
+| ADR-005 | JSON para mÃ¡quinas | JSON, YAML | JSON | Parseo rÃ¡pido, soporte universal |
 | ADR-006 | Observable Workflow local | Cloud telemetry, Local logs | Local | Privacy, compliance, no vendor lock-in |
 
 > Ver [14-adr-index.md](./14-adr-index.md) para detalle completo de cada ADR.
 
 ---
 
-## Principios Técnicos
+## Principios TÃ©cnicos
 
 ### 1. Platform Agnosticism
-- Sin dependencia de GitHub/GitLab/Bitbucket específico
+- Sin dependencia de GitHub/GitLab/Bitbucket especÃ­fico
 - Git protocol como transporte universal
 - Funciona 100% on-premise
 
 ### 2. Git as API
-- Distribución via clone/pull, no API REST
+- DistribuciÃ³n via clone/pull, no API REST
 - Versionado nativo de guardrails
 - Branching para experimentos
 
@@ -328,17 +328,17 @@ sequenceDiagram
 - Datos sensibles nunca salen del ambiente
 
 ### 4. MCP-Native [NUEVO v2.0]
-- MCP es el estándar de interoperabilidad
+- MCP es el estÃ¡ndar de interoperabilidad
 - Cualquier agente MCP-compatible funciona con RaiSE
 - Context Engineering via primitivos MCP (Resources, Tools, Prompts)
 
 ### 5. Observable by Default [NUEVO v2.0]
-- Cada interacción MCP genera trace
+- Cada interacciÃ³n MCP genera trace
 - Traces locales, auditables, versionables
 - Base para compliance (EU AI Act)
 
 ### 6. Progressive Enhancement
-- Funciona con cero configuración (defaults)
+- Funciona con cero configuraciÃ³n (defaults)
 - Cada feature es opt-in
 - Complejidad solo cuando se necesita
 
@@ -346,29 +346,29 @@ sequenceDiagram
 
 ## Constraints y Trade-offs
 
-| Constraint | Implicación | Trade-off |
+| Constraint | ImplicaciÃ³n | Trade-off |
 |------------|-------------|-----------|
-| Git-only distribution | No hay auto-update | Manual `hydrate` requerido |
+| Git-only distribution | No hay auto-update | Manual `pull` requerido |
 | Local-first | No hay analytics central | Menos insights de uso agregado |
-| Platform agnostic | No deep IDE integration | Más setup inicial en algunos IDEs |
-| Python CLI | Dependency en Python runtime | Distribución como binario (PyInstaller) |
+| Platform agnostic | No deep IDE integration | MÃ¡s setup inicial en algunos IDEs |
+| Python CLI | Dependency en Python runtime | DistribuciÃ³n como binario (PyInstaller) |
 | MCP-native | Requiere agente MCP-compatible | Fallback a .cursorrules/.claude.md |
 | Observable local | No hay dashboard cloud | Reportes via CLI (`raise audit`) |
 
 ---
 
-## Roadmap Técnico
+## Roadmap TÃ©cnico
 
-| Versión | Componentes | Estado |
+| VersiÃ³n | Componentes | Estado |
 |---------|-------------|--------|
-| v0.1 | raise-kit (init, check, hydrate) | ✅ En desarrollo |
-| v0.2 | raise-mcp server, Validation Gates | 🔄 En desarrollo |
-| v0.3 | Observable Workflow, Escalation Gates | 📋 Planificado |
-| v1.0 | Stable API, Enterprise features | 📋 Futuro |
+| v0.1 | raise-kit (init, check, pull) | âœ… En desarrollo |
+| v0.2 | raise-mcp server, Validation Gates | ðŸ”„ En desarrollo |
+| v0.3 | Observable Workflow, Escalation Gates | ðŸ“‹ Planificado |
+| v1.0 | Stable API, Enterprise features | ðŸ“‹ Futuro |
 
 ---
 
-## Mapeo a Ontología v2.0
+## Mapeo a OntologÃ­a v2.0
 
 | Concepto | Componente | Primitivo MCP |
 |----------|------------|---------------|
@@ -378,23 +378,30 @@ sequenceDiagram
 | Validation Gate | Criterios en katas | Tool: `validate_gate` |
 | Kata | `raise-config/katas/` | Prompt templates |
 | Escalation Gate | HITL trigger | Tool: `escalate` |
-| Observable Workflow | `.raise/traces/` | Logging automático |
+| Observable Workflow | `.raise/traces/` | Logging automÃ¡tico |
 
 ---
 
 ## Changelog
 
+### v2.1.0 (2025-12-29)
+- **ADR-010:** Migración de ontología CLI
+  - `raise hydrate` → `raise pull` (sincronización)
+  - `raise validate` → `raise kata` (ejecución interactiva)
+- Actualización de diagramas Mermaid con nueva nomenclatura
+- Tabla de comandos raise-kit actualizada
+
 ### v2.0.0 (2025-12-28)
-- Terminología: rules → guardrails, DoD → Validation Gates
+- TerminologÃ­a: rules â†’ guardrails, DoD â†’ Validation Gates
 - raise-mcp promovido a COMPONENTE CORE
 - NUEVO: Flujo 4 (Validation Gate Check)
 - NUEVO: Flujo 5 (Observable Workflow)
 - NUEVO: Principio MCP-Native
 - NUEVO: Principio Observable by Default
 - Estructura .raise/ actualizada (guardrails.json, traces/)
-- Mapeo explícito a ontología v2.0
-- ADR-006 añadido (Observable Workflow local)
+- Mapeo explÃ­cito a ontologÃ­a v2.0
+- ADR-006 aÃ±adido (Observable Workflow local)
 
 ---
 
-*Este documento es la fuente de verdad arquitectónica de RaiSE. Referencias cruzadas verificables en [14-adr-index.md](./14-adr-index.md) y [11-data-architecture.md](./11-data-architecture.md).*
+*Este documento es la fuente de verdad arquitectÃ³nica de RaiSE. Referencias cruzadas verificables en [14-adr-index.md](./14-adr-index.md) y [11-data-architecture.md](./11-data-architecture.md).*
