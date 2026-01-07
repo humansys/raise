@@ -1,11 +1,19 @@
 # RaiSE Roadmap
 ## Plan de Desarrollo
 
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 **VersiÃƒÂ³n:** 2.1.0  
 **ÃƒÅ¡ltima ActualizaciÃƒÂ³n:** 29 de Diciembre, 2025  
 **PropÃƒÂ³sito:** Roadmap de desarrollo del proyecto RaiSE.
 
 > **Nota de versiÃƒÂ³n 2.0:** Roadmap actualizado con raise-mcp como componente CORE (promovido de v0.3 a v0.2), Observable Workflow, y terminologÃƒÂ­a v2.0.
+========
+**Versión:** 2.1.0  
+**Última Actualización:** 29 de Diciembre, 2025  
+**Propósito:** Roadmap de desarrollo del proyecto RaiSE.
+
+> **Nota de versión 2.0:** Roadmap actualizado con raise-mcp como componente CORE (promovido de v0.3 a v0.2), Observable Workflow, y terminología v2.0.
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 
 ---
 
@@ -14,7 +22,11 @@
 ### v0.1.0 - Foundation (Target: Q1 2025)
 **Tema:** "Foundation"
 
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 - [ ] CLI bÃƒÂ¡sico (init, pull, check, kata)
+========
+- [ ] CLI básico (init, pull, check, kata)
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 - [ ] Soporte 5 agentes principales (Cursor, Copilot, Claude, GPT, Gemini)
 - [ ] Templates core (PRD, spec, design, story)
 - [ ] Katas base (L0, L1)
@@ -45,10 +57,17 @@
 **MCP Primitivos Implementados:**
 | Primitivo | ImplementaciÃƒÂ³n | Status |
 |-----------|----------------|--------|
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 | Resources | Constitution, Guardrails, Specs | Ã°Å¸â€â€ž En desarrollo |
 | Tools | validate_gate, check_guardrail, escalate | Ã°Å¸â€â€ž En desarrollo |
 | Prompts | Katas como templates | Ã°Å¸â€œâ€¹ Planificado |
 | Sampling | DelegaciÃƒÂ³n razonamiento | Ã°Å¸â€œâ€¹ Planificado |
+========
+| Resources | Constitution, Guardrails, Specs | 🔄 En desarrollo |
+| Tools | validate_gate, check_guardrail, escalate | 🔄 En desarrollo |
+| Prompts | Katas como templates | 📋 Planificado |
+| Sampling | Delegación razonamiento | 📋 Planificado |
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 
 **Release Criteria:**
 - MCP server funcional con Claude, Cursor, Windsurf
@@ -66,13 +85,18 @@
 - [ ] `raise audit` command
 - [ ] JSONL trace storage
 - [ ] Escalation Gates (HITL)
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 - [ ] MÃƒÂ©tricas derivadas (re-prompting rate, escalation rate)
+========
+- [ ] Métricas derivadas (re-prompting rate, escalation rate)
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 - [ ] Export OpenTelemetry (opcional)
 - [ ] EU AI Act compliance documentation
 
 **Observable Workflow Components:**
 | Component | Status |
 |-----------|--------|
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 | Trace logging automÃƒÂ¡tico | Ã°Å¸â€â€ž En desarrollo |
 | Audit reports (CLI) | Ã°Å¸â€œâ€¹ Planificado |
 | Metrics aggregation | Ã°Å¸â€œâ€¹ Planificado |
@@ -81,6 +105,16 @@
 **Release Criteria:**
 - Cada acciÃƒÂ³n MCP genera trace
 - `raise audit` produce reportes ÃƒÂºtiles
+========
+| Trace logging automático | 🔄 En desarrollo |
+| Audit reports (CLI) | 📋 Planificado |
+| Metrics aggregation | 📋 Planificado |
+| CSV/JSON export | 📋 Planificado |
+
+**Release Criteria:**
+- Cada acción MCP genera trace
+- `raise audit` produce reportes útiles
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 - Escalation rate calculable
 - DocumentaciÃƒÂ³n EU AI Act disponible
 
@@ -96,8 +130,13 @@
 - [ ] Guardrail marketplace preparation
 
 **Release Criteria:**
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 - GuÃƒÂ­a enterprise publicada
 - Demo con 3+ agentes simultÃƒÂ¡neos
+========
+- Guía enterprise publicada
+- Demo con 3+ agentes simultáneos
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 
 ---
 
@@ -121,6 +160,7 @@
 
 | Milestone | Status | Target | Progress |
 |-----------|--------|--------|----------|
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 | Corpus v2.0 completo | Ã¢Å“â€¦ En Progreso | 2025-12-28 | 90% |
 | OntologÃƒÂ­a v2.0 validada | Ã¢Å“â€¦ En Progreso | 2025-12-28 | 85% |
 | Fork spec-kit evaluaciÃƒÂ³n | Ã¢Å“â€¦ Done | 2025-12-26 | 100% |
@@ -128,6 +168,15 @@
 | ADRs v2.0 actualizados | Ã¢Å“â€¦ En Progreso | 2025-12-28 | 80% |
 | CLI v0.1 alpha | Ã°Å¸â€œâ€¹ Pending | 2025-01-31 | 0% |
 | Docs site live | Ã°Å¸â€œâ€¹ Pending | 2025-02-15 | 0% |
+========
+| Corpus v2.0 completo | ✅ En Progreso | 2025-12-28 | 90% |
+| Ontología v2.0 validada | ✅ En Progreso | 2025-12-28 | 85% |
+| Fork spec-kit evaluación | ✅ Done | 2025-12-26 | 100% |
+| Investigación Agentic AI | ✅ Done | 2025-12-27 | 100% |
+| ADRs v2.0 actualizados | ✅ En Progreso | 2025-12-28 | 80% |
+| CLI v0.1 alpha | 📋 Pending | 2025-01-31 | 0% |
+| Docs site live | 📋 Pending | 2025-02-15 | 0% |
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 
 ---
 
@@ -168,6 +217,7 @@
 
 ---
 
+<<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 ## Dependencias de OntologÃƒÂ­a v2.0
 
 | Cambio | Impacto en Roadmap | Status |
@@ -177,6 +227,17 @@
 | raise-mcp CORE | v0.2 scope aumentado | Ã¢Å“â€¦ Decidido |
 | Observable Workflow | v0.3 nuevo | Ã¢Å“â€¦ DiseÃƒÂ±ado |
 | Escalation Gate | v0.3 scope | Ã¢Å“â€¦ DiseÃƒÂ±ado |
+========
+## Dependencias de Ontología v2.0
+
+| Cambio | Impacto en Roadmap | Status |
+|--------|-------------------|--------|
+| Rule → Guardrail | CLI commands, file formats | ✅ Diseñado |
+| DoD → Validation Gate | CLI commands, katas | ✅ Diseñado |
+| raise-mcp CORE | v0.2 scope aumentado | ✅ Decidido |
+| Observable Workflow | v0.3 nuevo | ✅ Diseñado |
+| Escalation Gate | v0.3 scope | ✅ Diseñado |
+>>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
 
 ---
 
