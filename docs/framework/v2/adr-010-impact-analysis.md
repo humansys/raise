@@ -12,18 +12,18 @@
 | Documento | Menciones `hydrate` | Menciones `validate` | Prioridad | Estado |
 |-----------|:-------------------:|:--------------------:|:---------:|:------:|
 | 23-commands-reference-v2.md | 7 | 6 | 🔴 P0 | ✅ Completado |
-| 10-system-architecture-v2.md | 5 | 1 | 🔴 P0 | ✅ Completado |
+| 10-system-architecture-v2.md | 5 | 1 | 🔴 P0 | ⬜ Pendiente |
 | 30-roadmap-v2.md | 3 | 0 | 🟡 P1 | ✅ Completado |
 | 11-data-architecture-v2.md | 3 | 0 | 🟡 P1 | ✅ Completado |
 | 24-examples-library-v2.md | 2 | 0 | 🟡 P1 | ✅ Completado |
 | 15-tech-stack-v2.md | 2 | 0 | 🟡 P1 | ✅ Completado |
-| 01-product-vision-v2.md | 2 | 0 | 🟢 P2 | ✅ Completado |
-| 12-integration-patterns-v2.md | 0 | 1 | 🟢 P2 | ✅ Completado |
-| 13-security-compliance-v2.md | 1 | 0 | 🟢 P2 | ✅ Completado |
-| 20-glossary-v2.md | 1 | 0 | 🟢 P2 | ✅ Completado |
+| 01-product-vision-v2.md | 2 | 0 | 🟢 P2 | ⬜ Pendiente |
+| 12-integration-patterns-v2.md | 0 | 1 | 🟢 P2 | ⬜ Pendiente |
+| 13-security-compliance-v2.md | 1 | 0 | 🟢 P2 | ⬜ Pendiente |
+| 20-glossary-v2.md | 1 | 0 | 🟢 P2 | ⬜ Pendiente |
 | 14-adr-index-v2.md | 1 | 0 | ⚪ N/A | Reemplazado por raise-adr/ |
 
-**Progreso:** 10/10 documentos completados (100%) ✅
+**Progreso:** 5/10 documentos completados (50%)
 
 ---
 
@@ -139,24 +139,19 @@ En **20-glossary-v2.md**:
 
 ## Plan de Ejecución
 
-### Fase 1: Sesión 2025-12-29 (AM) ✅ COMPLETADA
+### Fase 1: Sesión 2025-12-29 ✅ COMPLETADA
 1. ✅ Crear ADR-010
 2. ✅ Crear 23-commands-reference-v2.1.md (reescritura completa)
-3. ✅ Actualizar 30-roadmap-v2.1.md
-4. ✅ Actualizar 24-examples-library-v2.1.md
-5. ✅ Actualizar 15-tech-stack-v2.1.md
-6. ✅ Actualizar 11-data-architecture-v2.1.md
+3. ⬜ Actualizar 10-system-architecture (pendiente - encoding issues)
+4. ✅ Actualizar 30-roadmap-v2.1.md
+5. ✅ Actualizar 24-examples-library-v2.1.md
+6. ✅ Actualizar 15-tech-stack-v2.1.md
+7. ✅ Actualizar 11-data-architecture-v2.1.md
 
-### Fase 2: Sesión 2025-12-29 (PM) ✅ COMPLETADA
-1. ✅ Actualizar 10-system-architecture-v2.1.md (diagramas Mermaid actualizados)
-2. ✅ Actualizar 01-product-vision-v2.1.md
-3. ✅ Actualizar 12-integration-patterns-v2.1.md
-4. ✅ Actualizar 13-security-compliance-v2.1.md
-5. ✅ Actualizar 20-glossary-v2.1.md (nuevas entradas: pull, kata)
-
-### Fase 3: Pendiente
-1. ⬜ Validación de coherencia inter-documentos
-2. ⬜ Merge de archivos v2.1 al corpus principal
+### Fase 2: Siguiente Sesión
+1. ⬜ Actualizar 10-system-architecture-v2.md
+2. ⬜ Actualizar documentos P2 (vision, integration, security, glossary)
+3. ⬜ Validación de coherencia inter-documentos
 
 ---
 

@@ -1,8 +1,8 @@
 # RaiSE Tech Stack
 ## Stack Tecnológico Detallado
 
-**Versión:** 2.0.0  
-**Fecha:** 28 de Diciembre, 2025  
+**Versión:** 2.1.0  
+**Fecha:** 29 de Diciembre, 2025  
 **Propósito:** Documentar las tecnologías utilizadas en el desarrollo de RaiSE.
 
 > **Nota de versión 2.0:** Esta versión incorpora raise-mcp como componente CORE, Observable Workflow stack, y alineamiento terminológico con ontología v2.0.
@@ -211,7 +211,7 @@ raise-kit/
 │       ├── __init__.py
 │       ├── cli/              # Comandos CLI
 │       │   ├── check.py
-│       │   ├── hydrate.py
+│       │   ├── pull.py
 │       │   ├── gate.py       # [NUEVO] Validation Gates
 │       │   ├── audit.py      # [NUEVO] Observable Workflow
 │       │   └── guardrail.py  # [RENOMBRADO] antes: rule.py
@@ -243,14 +243,15 @@ raise-kit/
 
 ---
 
-## Performance Targets [ACTUALIZADO v2.0]
+## Performance Targets [ACTUALIZADO v2.1]
 
-| Operación | Target | Medición |
+| Operacion | Target | Medicion |
 |-----------|--------|----------|
 | `raise init` | < 5s | Cold start |
-| `raise hydrate` | < 10s | 100 guardrails |
+| `raise pull` | < 10s | 100 guardrails |
+| `raise kata` | Variable | Depende de kata (interactivo) |
 | `raise check` | < 3s | Proyecto medio |
-| `raise gate` | < 2s | Validación de gate |
+| `raise gate` | < 2s | Validacion de gate |
 | `raise audit` | < 5s | 1 semana de traces |
 | MCP context response | < 100ms | P95 |
 | **Trace logging** | < 5ms | Por evento |
@@ -278,7 +279,7 @@ raise-kit/
 
 ## Changelog
 
-### v2.0.0 (2025-12-28)
+### v2.1.0 (2025-12-28)
 - **NUEVO**: raise-mcp Stack (componente CORE)
 - **NUEVO**: Observable Workflow Stack (JSONL traces)
 - **NUEVO**: Primitivos MCP documentados
