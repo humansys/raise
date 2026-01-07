@@ -23,7 +23,7 @@
 **Tema:** "Foundation"
 
 <<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
-- [ ] CLI bÃƒÂ¡sico (init, pull, check, kata)
+- [ ] CLI bÃƒ¡sico (init, pull, check, kata)
 ========
 - [ ] CLI básico (init, pull, check, kata)
 >>>>>>>> 9e78262224b98fb48eedc31061e2266df08b85b2:docs/framework/v2/30-roadmap-v2_1.md
@@ -47,7 +47,7 @@
 > **Cambio significativo:** raise-mcp promovido de v0.3 a v0.2. MCP es ahora componente CORE.
 
 - [ ] **raise-mcp server (CORE)** [PROMOVIDO]
-- [ ] Validation Gates completos (8 gates estÃƒÂ¡ndar)
+- [ ] Validation Gates completos (8 gates estÃƒ¡ndar)
 - [ ] Guardrails system (renombrado de rules)
 - [ ] `raise gate` command
 - [ ] `raise guardrail` command
@@ -60,8 +60,8 @@
 <<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 | Resources | Constitution, Guardrails, Specs | Ã°Å¸â€â€ž En desarrollo |
 | Tools | validate_gate, check_guardrail, escalate | Ã°Å¸â€â€ž En desarrollo |
-| Prompts | Katas como templates | Ã°Å¸â€œâ€¹ Planificado |
-| Sampling | DelegaciÃƒÂ³n razonamiento | Ã°Å¸â€œâ€¹ Planificado |
+| Prompts | Katas como templates | Ã°Å¸“â€¹ Planificado |
+| Sampling | DelegaciÃƒÂ³n razonamiento | Ã°Å¸“â€¹ Planificado |
 ========
 | Resources | Constitution, Guardrails, Specs | 🔄 En desarrollo |
 | Tools | validate_gate, check_guardrail, escalate | 🔄 En desarrollo |
@@ -97,10 +97,10 @@
 | Component | Status |
 |-----------|--------|
 <<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
-| Trace logging automÃƒÂ¡tico | Ã°Å¸â€â€ž En desarrollo |
-| Audit reports (CLI) | Ã°Å¸â€œâ€¹ Planificado |
-| Metrics aggregation | Ã°Å¸â€œâ€¹ Planificado |
-| CSV/JSON export | Ã°Å¸â€œâ€¹ Planificado |
+| Trace logging automÃƒ¡tico | Ã°Å¸â€â€ž En desarrollo |
+| Audit reports (CLI) | Ã°Å¸“â€¹ Planificado |
+| Metrics aggregation | Ã°Å¸“â€¹ Planificado |
+| CSV/JSON export | Ã°Å¸“â€¹ Planificado |
 
 **Release Criteria:**
 - Cada acciÃƒÂ³n MCP genera trace
@@ -132,7 +132,7 @@
 **Release Criteria:**
 <<<<<<<< HEAD:docs/framework/v2/30-roadmap-v2.1.md
 - GuÃƒÂ­a enterprise publicada
-- Demo con 3+ agentes simultÃƒÂ¡neos
+- Demo con 3+ agentes simultÃƒ¡neos
 ========
 - Guía enterprise publicada
 - Demo con 3+ agentes simultáneos
@@ -166,8 +166,8 @@
 | Fork spec-kit evaluaciÃƒÂ³n | Ã¢Å“â€¦ Done | 2025-12-26 | 100% |
 | InvestigaciÃƒÂ³n Agentic AI | Ã¢Å“â€¦ Done | 2025-12-27 | 100% |
 | ADRs v2.0 actualizados | Ã¢Å“â€¦ En Progreso | 2025-12-28 | 80% |
-| CLI v0.1 alpha | Ã°Å¸â€œâ€¹ Pending | 2025-01-31 | 0% |
-| Docs site live | Ã°Å¸â€œâ€¹ Pending | 2025-02-15 | 0% |
+| CLI v0.1 alpha | Ã°Å¸“â€¹ Pending | 2025-01-31 | 0% |
+| Docs site live | Ã°Å¸“â€¹ Pending | 2025-02-15 | 0% |
 ========
 | Corpus v2.0 completo | ✅ En Progreso | 2025-12-28 | 90% |
 | Ontología v2.0 validada | ✅ En Progreso | 2025-12-28 | 85% |
@@ -222,8 +222,8 @@
 
 | Cambio | Impacto en Roadmap | Status |
 |--------|-------------------|--------|
-| Rule Ã¢â€ â€™ Guardrail | CLI commands, file formats | Ã¢Å“â€¦ DiseÃƒÂ±ado |
-| DoD Ã¢â€ â€™ Validation Gate | CLI commands, katas | Ã¢Å“â€¦ DiseÃƒÂ±ado |
+| Rule Ã¢â€ ’ Guardrail | CLI commands, file formats | Ã¢Å“â€¦ DiseÃƒÂ±ado |
+| DoD Ã¢â€ ’ Validation Gate | CLI commands, katas | Ã¢Å“â€¦ DiseÃƒÂ±ado |
 | raise-mcp CORE | v0.2 scope aumentado | Ã¢Å“â€¦ Decidido |
 | Observable Workflow | v0.3 nuevo | Ã¢Å“â€¦ DiseÃƒÂ±ado |
 | Escalation Gate | v0.3 scope | Ã¢Å“â€¦ DiseÃƒÂ±ado |
