@@ -11,6 +11,33 @@
 
 **Este NO es un repositorio de código de producción.** Es el "cerebro" del framework donde se define el "qué" y el "por qué".
 
+## Plataforma y Branching
+
+- **Git Platform**: GitLab (`gitlab.com:humansys-demos/raise1/raise-commons`)
+- **CLI Tool**: `glab` (GitLab CLI v1.36.0+)
+- **Branch Base**: `PRAISE-36-ontology-standarization` (para features de estandarización ontológica)
+- **Target para MRs**: `PRAISE-36-ontology-standarization`
+- **Configuración**: `.specify/config.json`
+
+**Nota**: Este proyecto usa GitLab, no GitHub. Todos los comandos de creación de MRs usan `glab`, no `gh`.
+
+### ⚠️ IMPORTANTE: Antes de Crear Features
+
+**SIEMPRE verifica que estás en la branch base correcta antes de `/speckit.specify`**:
+
+```bash
+# 1. Ir a la branch base
+git checkout PRAISE-36-ontology-standarization
+
+# 2. Actualizar con cambios remotos
+git pull origin PRAISE-36-ontology-standarization
+
+# 3. Ahora sí, crear el feature
+/speckit.specify <descripción>
+```
+
+El script `create-new-feature.sh` crea la nueva branch **desde donde estés actualmente**, por eso es crítico estar en la branch base correcta.
+
 ## Agente Activo: RaiSE Ontology Architect
 
 Este proyecto utiliza el agente **RaiSE Ontology Architect** como sparring partner intelectual. El agente:
@@ -99,12 +126,57 @@ raise-commons/
 
 ## Workflow Típico
 
+### Workflow Conceptual
+
 1. **Propuesta** → Articular cambio o adición a la ontología
 2. **Análisis Ontológico** → Verificar coherencia con modelo existente
 3. **Auditoría Lean** → Identificar desperdicio potencial
 4. **Validation Gate** → Pasar Gate-Coherencia y Gate-Terminología
 5. **Documentación** → Actualizar artefactos afectados
 6. **ADR** (si aplica) → Documentar decisión significativa
+
+### Workflow Técnico con spec-kit + GitLab
+
+1. **Crear Feature Branch** (desde `PRAISE-36-ontology-standarization`)
+   ```bash
+   /speckit.specify <descripción del feature>
+   # Esto crea branch 00N-<short-name> automáticamente
+   ```
+
+2. **Desarrollar Feature**
+   ```bash
+   /speckit.plan      # Generar plan
+   /speckit.tasks     # Generar tareas
+   /speckit.implement # Ejecutar implementación
+   /speckit.analyze   # Validar coherencia
+   ```
+
+3. **Commit y Push**
+   ```bash
+   git add .
+   git commit -m "..."
+   git push origin 00N-<feature-name>
+   ```
+
+4. **Crear Merge Request**
+   ```bash
+   glab mr create \
+     --title "Feature 00N: <título>" \
+     --description "<resumen>" \
+     --source-branch 00N-<feature-name> \
+     --target-branch PRAISE-36-ontology-standarization \
+     --label "ontology,spec-kit"
+   ```
+
+   **O crear manualmente en GitLab UI** y copiar el link que aparece después del push.
+
+5. **Mergear y Continuar**
+   ```bash
+   # Después de aprobación/merge
+   git checkout PRAISE-36-ontology-standarization
+   git pull
+   # Continuar con siguiente feature
+   ```
 
 ---
 
