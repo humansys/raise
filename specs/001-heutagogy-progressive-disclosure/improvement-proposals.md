@@ -430,4 +430,38 @@ Después de validar con Orquestadores reales:
 
 ---
 
+## Session Progress Tracking
+
+### Session 2026-01-11 (Features 001-003)
+
+**Completed Quick Wins**:
+
+- [x] **QW-03**: Crear "Glosario Mínimo" para Stage 0 — Feature 002 ✅ MERGED
+  - **Deliverable**: `docs/framework/v2.1/model/20a-glossary-seed.md` (366 palabras, 5 conceptos)
+  - **Impact**: 10% complexity reduction (35 → 5 concepts en Stage 0)
+  - **Pattern**: Glossary Seed con ejemplos concretos de spec-kit
+  - **MR**: https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/merge_requests/9
+
+- [x] **QW-01**: Simplificar Exposición de Jidoka — Feature 003 ✅ MERGED
+  - **Deliverable**: Updated `20-glossary-v2.1.md` (línea 82-111) y `25-ontology-bundle-v2_1.md` (línea 186-209)
+  - **Impact**: 5% complexity reduction (prerequisito TPS eliminado en Stage 0-1)
+  - **Pattern**: ADR-009 (Simple Interface + Internal Philosophy) — "Parar si algo falla" (Stage 0-1) vs 4-step cycle (Stage 3)
+  - **Gates**: Gate-Terminología ✅, Gate-Coherencia ✅
+  - **Success Criteria**: 6/6 passed (SC-001 through SC-006)
+  - **MR**: https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/merge_requests/10
+
+**Total Progress**: 2/4 Quick Wins completed (50%), 15% complexity reduction achieved
+
+**Pending Quick Wins** (Next Session):
+- [ ] **QW-04**: Agregar "Interfaz Simple" a Conceptos Avanzados — 5% complexity reduction
+- [ ] **QW-02**: Eliminar Aliases Históricos en Documentación Primaria — 3% complexity reduction
+
+**Session Handoff Notes**:
+- Base branch: `PRAISE-36-ontology-standarization`
+- Both features successfully merged and branches deleted
+- Remaining Quick Wins (QW-02, QW-04) ready for next session
+- Structural improvements (ST-01, ST-02, ST-03) pending after Quick Wins complete
+
+---
+
 *Improvement Proposals completado. Proceder a Phase 6: Polish & Validation.*
