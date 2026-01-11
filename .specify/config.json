@@ -1,0 +1,11 @@
+{
+  "base_branch": "PRAISE-36-ontology-standarization",
+  "git_platform": "gitlab",
+  "repository": "humansys-demos/raise1/raise-commons",
+  "merge_request_target": "PRAISE-36-ontology-standarization",
+  "metadata": {
+    "created": "2026-01-11",
+    "purpose": "Configuration for spec-kit workflow in raise-commons",
+    "session": "ontology-standardization"
+  }
+}
