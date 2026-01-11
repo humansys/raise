@@ -1,7 +1,7 @@
 {
   "base_branch": "PRAISE-36-ontology-standarization",
   "git_platform": "gitlab",
-  "repository": "humansys-demos/raise1/raise-commons",
+  "repository": "humansys-demos/product/raise1/raise-commons",
   "merge_request_target": "PRAISE-36-ontology-standarization",
   "metadata": {
     "created": "2026-01-11",
