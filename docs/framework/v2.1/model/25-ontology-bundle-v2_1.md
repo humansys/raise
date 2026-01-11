@@ -183,8 +183,21 @@ Directiva operacional que gobierna el comportamiento del agente o la calidad del
 ### Heutagogía
 Teoría del aprendizaje auto-determinado. En RaiSE, significa que el Orquestador diseña su propio proceso de aprendizaje a través de cada interacción con agentes de IA. El sistema "enseña a pescar" en lugar de solo "entregar el pescado".
 
-### Jidoka (自働化)
-Pilar del Toyota Production System que significa "automatización con toque humano". En RaiSE, se manifiesta como la capacidad de **parar el flujo** cuando se detecta un problema (Validation Gate no pasa), en lugar de acumular defectos.
+### Jidoka
+
+**Interfaz Simple (Stage 0-1)**: Parar si algo falla
+
+Principio de detener el trabajo cuando detectas un problema, en lugar de acumular errores. En RaiSE, se manifiesta como la capacidad de **parar el flujo** cuando se detecta un problema (Validation Gate no pasa).
+
+**Ejemplo**: Cuando ejecutas `/speckit.plan` y el gate de coherencia falla, el workflow para - no continúa generando tareas sobre una base inconsistente.
+
+---
+
+**Detalle Avanzado (Stage 3)**:
+
+Jidoka (自働化) — Pilar del Toyota Production System que significa "automatización con toque humano".
+
+**Ciclo formal**: Detectar → Parar → Corregir → Continuar
 
 **Jidoka Inline:** En las Katas, el ciclo Jidoka está embebido en cada paso:
 
