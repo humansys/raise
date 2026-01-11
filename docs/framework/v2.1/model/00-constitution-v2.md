@@ -10,7 +10,7 @@
 
 ## Identidad
 
-**RaiSE es** el sistema operativo metodológico para gobernar agentes de IA en el desarrollo de software empresarial. Es un framework de **Context Engineering** que aplica principios Lean al desarrollo AI-asistido.
+**RaiSE es** un sistema operativo metodológico para gobernar agentes de IA en el desarrollo de software empresarial. Es un framework de **Context Engineering** que aplica principios Lean al desarrollo AI-asistido.
 
 **RaiSE NO es:**
 
@@ -69,7 +69,6 @@ No existe un solo "Done". Cada fase tiene su propia **Validation Gate** que debe
 | Gate-Code      | Implementation | Código que pasa validaciones       |
 | Gate-Deploy    | Deployment     | Feature en producción              |
 
-
 ### §5. Heutagogía sobre Dependencia
 
 El sistema no solo entrega el pescado, **enseña a pescar**. Al finalizar sesiones críticas, RaiSE desafía al humano para asegurar comprensión y ownership de la solución.
@@ -107,7 +106,7 @@ RaiSE aplica los principios del Toyota Production System al desarrollo asistido 
 
 > Para desarrollo completo de la filosofía de aprendizaje, ver [05-learning-philosophy-v2.md](./05-learning-philosophy-v2.md).
 
-### §8. Observable Workflow 
+### §8. Observable Workflow
 
 Cada decisión del agente debe ser **trazable y auditable**. No hay cajas negras. La observabilidad es prerequisito para mejora continua y compliance regulatorio.
 
@@ -187,7 +186,7 @@ Cada decisión del agente debe ser **trazable y auditable**. No hay cajas negras
 - Contribuciones upstream cuando sea apropiado
 - Documentación pública y completa
 
-### Con Reguladores 
+### Con Reguladores
 
 - Trazabilidad completa de decisiones AI
 - Audit trails exportables
