@@ -14,9 +14,10 @@
 ### v0.1.0 - Foundation (Target: Q1 2025)
 **Tema:** "Foundation"
 
-- [ ] CLI básico (init, pull, check, kata)
+- [ ] CLI básico (init, pull, analysis, check)
 - [ ] Soporte 5 agentes principales (Cursor, Copilot, Claude, GPT, Gemini)
 - [ ] Templates core (PRD, spec, design, story)
+- [ ] Support para `/kata` (prompts + audit wrappers)
 - [ ] Katas base (L0, L1)
 - [ ] Documentación inicial
 - [ ] Corpus base completo
