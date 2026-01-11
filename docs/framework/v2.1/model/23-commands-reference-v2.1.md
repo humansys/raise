@@ -9,6 +9,19 @@
 
 ---
 
+## Arquitectura de Interacción: Slash vs CLI
+
+RaiSE opera bajo una arquitectura dual que separa la intención cognitiva de la ejecución determinista:
+
+| Capa | Interfaz | Ejecutor | Propósito | Ejemplo |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cognitiva** | **Slash Command** (`/`) | **Agente (LLM)** | Inyección de Contexto y Razonamiento | `/kata spec` (Carga la guía Markdown) |
+| **Determinista** | **CLI Command** (`raise`) | **Sistema Binario** | Manipulación de Archivos y Logs | `raise audit` (Escribe el log JSONL) |
+
+> **Regla de Oro:** Los Slash Commands **piensan** (usan contexto). Los Comandos CLI **actúan** (usan sistema de archivos). Un comando Slash orquesta múltiples llamadas a comandos CLI.
+
+---
+
 ## Contextos de Uso
 
 RaiSE CLI distingue dos contextos de uso con características distintas:
@@ -42,6 +55,7 @@ graph LR
 | Comando | Contexto | Descripción |
 |---------|----------|-------------|
 | `raise init` | Dev | Inicializar proyecto |
+| `raise analysis` | Dev | Analizar estructura (SAR) |
 | `raise pull` | Ambos | Sincronizar Golden Data |
 | `raise kata` | Dev | Ejecutar proceso (Jidoka) |
 | `raise check` | Ambos | Verificar guardrails |
@@ -55,6 +69,7 @@ graph LR
 Inicializa un proyecto con estructura RaiSE.
 
 **Contexto:** Desarrollo (interactivo)
+**Interfaz Slash:** `/init` (Asistente de configuración)
 
 **Sintaxis:**
 ```bash
@@ -94,6 +109,41 @@ raise init --skip-pull
 ├── raise.yaml
 └── README.md
 ```
+
+---
+
+## raise analysis
+
+Escanea la base de código para generar contexto estructural (SAR - Software Architecture Reconstruction).
+
+**Contexto:** Desarrollo (Discovery)
+**Interfaz Slash:** `/analysis` (Arquitecto de Software)
+
+**Sintaxis:**
+```bash
+raise analysis [opciones]
+```
+
+**Opciones:**
+
+| Flag | Descripción | Default |
+|------|-------------|---------|
+| `--depth <n>` | Profundidad del escaneo | 3 |
+| `--focus <path>` | Limitar análisis a directorio | . |
+| `--output <dir>` | Directorio de salida | .raise/memory/context |
+
+**Ejemplos:**
+```bash
+# Análisis estándar
+raise analysis
+
+# Análisis profundo de un módulo
+raise analysis --depth 5 --focus src/core
+```
+
+**Resultado:**
+- Genera `file-tree.txt`
+- Genera reporte preliminar de dependencias
 
 ---
 
@@ -144,20 +194,21 @@ raise pull --branch develop
 
 ---
 
-## raise kata
+## raise kata (Virtual)
 
-Ejecuta una Kata (proceso estructurado con Jidoka).
+Interfaz de ejecución de procesos para el Agente (LLM). No es un binario ejecutable directamente por el usuario en v0.1.
 
-**Contexto:** Desarrollo (interactivo) — **No usar en CI/CD**
+**Contexto:** Interacción Agente-Orquestador (Slash Command `/kata`)
 
-**Principio Jidoka:** Cada paso de la Kata tiene validación integrada. Si falla, el proceso se detiene y escala al Orquestador para decisión.
+**Propósito:**
+Abstracción lógica que permite al Agente "ejecutar" una Kata. En la práctica, el Agente lee el archivo Markdown de la Kata y traduce sus pasos en acciones, utilizando `raise audit` para registrar el inicio y fin de la sesión.
 
-**Sintaxis:**
-```bash
-raise kata <alias|id> [target] [opciones]
+**Sintaxis Lógica (Prompt):**
+```text
+/kata <alias|id> [contexto]
 ```
 
-**Aliases Disponibles:**
+**Aliases Disponibles (para /kata):**
 
 | Alias | Kata ID | Propósito |
 |-------|---------|-----------|
@@ -167,44 +218,12 @@ raise kata <alias|id> [target] [opciones]
 | `review` | L2-code-review | Revisar código |
 | `story` | L1-user-story | Crear User Story |
 
-**Opciones:**
-
-| Flag | Descripción | Default |
-|------|-------------|---------|
-| `--input <archivo>` | Archivo de entrada | - |
-| `--output <archivo>` | Archivo de salida | auto |
-| `--dry-run` | Mostrar pasos sin ejecutar | false |
-
-**Ejemplos:**
-```bash
-# Ejecutar kata de especificación
-raise kata spec FEAT-123
-
-# Por ID explícito
-raise kata L2-03 --input context.md
-
-# Ver pasos sin ejecutar
-raise kata plan --dry-run
-```
-
-**Flujo de Ejecución:**
-```mermaid
-graph TD
-    Start(["$ raise kata spec FEAT-123"]) --> Step1["[1/3] Gathering context..."]
-    Step1 -->|✓ passed| Step2["[2/3] Defining scope..."]
-    Step2 -->|✓ passed| Step3["[3/3] Writing specification..."]
-    Step3 -->|⚠ review| Escalation["Escalation: Missing security section"]
-    Escalation --> Pause[["[PAUSED] Waiting for Orchestrator decision"]]
-    Pause --- Options["(c)ontinue | (e)dit | (a)bort"]
-    
-    style Escalation fill:#fff4dd,stroke:#d4a017
-    style Pause fill:#f8d7da,stroke:#721c24
-```
-
-**¿Por qué no en CI/CD?**
-- Las Katas pueden requerir decisiones humanas (Escalation)
-- El proceso es creativo, no solo verificación
-- Sin Orquestador presente, no hay quién resuelva escalations
+**Flujo de Ejecución (Simulado por Agente):**
+1. **Invocación:** Usuario escribe `/kata spec`.
+2. **Carga:** Agente lee `katas/L1-spec-writing.md`.
+3. **Traza:** Agente invoca `raise audit start --process kata:spec`.
+4. **Ejecución:** Agente sigue los pasos Jidoka definidos en el MD.
+5. **Cierre:** Agente invoca `raise audit end`.
 
 ---
 
@@ -213,6 +232,7 @@ graph TD
 Verifica código contra guardrails activos.
 
 **Contexto:** Desarrollo + CI/CD
+**Interfaz Slash:** `/check` (Juez Semántico)
 
 **Sintaxis:**
 ```bash
@@ -274,6 +294,7 @@ graph TD
 Verifica un Validation Gate del flujo de valor.
 
 **Contexto:** Desarrollo + CI/CD
+**Interfaz Slash:** `/gate` (Revisión de Diseño)
 
 **Sintaxis:**
 ```bash
@@ -342,6 +363,7 @@ graph TD
 Exporta y reporta Observable Workflow.
 
 **Contexto:** Desarrollo + CI/CD
+**Interfaz Slash:** `/audit` (Agente Auditor - v0.3)
 
 **Sintaxis:**
 ```bash
