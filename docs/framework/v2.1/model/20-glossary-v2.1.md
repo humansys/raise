@@ -79,8 +79,27 @@ Teoría del aprendizaje auto-determinado (del griego *heutos* = "uno mismo" + *a
 ### Checkpoint Heutagógico
 Momento estructurado de reflexión al finalizar features significativas. Incluye cuatro preguntas: (1) ¿Qué aprendiste? (2) ¿Qué cambiarías del proceso? (3) ¿Hay mejoras para el framework? (4) ¿En qué eres más capaz ahora? Las respuestas alimentan el crecimiento del Orquestador y la evolución del corpus.
 
-### Jidoka (自動化)
-Pilar del Toyota Production System que significa "automatización con toque humano". En RaiSE, se manifiesta como la capacidad de **parar el flujo** cuando se detecta un problema (Validation Gate no pasa), en lugar de acumular defectos. Los cuatro pasos: Detectar → Parar → Corregir → Continuar.
+### Jidoka
+
+**Interfaz Simple (Stage 0-1)**: Parar si algo falla
+
+Principio de detener el trabajo cuando detectas un problema, en lugar de acumular errores.
+
+**Ejemplo**: Cuando ejecutas `/speckit.plan` y el gate de coherencia falla, el workflow para - no continúa generando tareas sobre una base inconsistente.
+
+---
+
+**Detalle Avanzado (Stage 3)**:
+
+Jidoka (自動化) — Automatización con toque humano.
+
+**Ciclo formal**:
+1. **Detectar**: Identificar el defecto o anomalía
+2. **Parar**: Detener el proceso inmediatamente
+3. **Corregir**: Resolver la causa raíz
+4. **Continuar**: Reanudar con mejora preventiva
+
+**Contexto histórico**: Originado en telares automáticos de Sakichi Toyoda (1896), aplicado a manufactura por Taiichi Ohno en el Toyota Production System.
 
 **Jidoka Inline [v2.1]:** En las Katas, el ciclo Jidoka está embebido en cada paso:
 
