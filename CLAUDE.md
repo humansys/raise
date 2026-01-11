@@ -13,7 +13,7 @@
 
 ## Plataforma y Branching
 
-- **Git Platform**: GitLab (`gitlab.com:humansys-demos/raise1/raise-commons`)
+- **Git Platform**: GitLab (`gitlab.com:humansys-demos/product/raise1/raise-commons`)
 - **CLI Tool**: `glab` (GitLab CLI v1.36.0+)
 - **Branch Base**: `PRAISE-36-ontology-standarization` (para features de estandarización ontológica)
 - **Target para MRs**: `PRAISE-36-ontology-standarization`
