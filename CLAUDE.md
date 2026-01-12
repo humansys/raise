@@ -181,3 +181,11 @@ raise-commons/
 ---
 
 *Constitution: `.specify/memory/constitution.md` v1.0.0*
+
+## Active Technologies
+- Markdown (CommonMark spec) + Text editor, Git 2.0+ (003-simplify-jidoka, 004-operation-layers)
+- Git version control (plain text markdown files)
+
+## Recent Changes
+- 004-operation-layers: Documento `26-work-cycles-v2.1.md` formalizando los 4 ciclos de trabajo; entrada Work Cycle en glosario
+- 003-simplify-jidoka: Added Markdown (CommonMark spec) + Text editor, Git 2.0+
