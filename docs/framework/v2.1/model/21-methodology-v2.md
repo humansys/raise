@@ -2,7 +2,9 @@
 
 ## Flujo de Valor para Desarrollo Confiable
 
-**Versión:** 2.1.0**Fecha:** 28 de Diciembre, 2025**Propósito:** Documentar el flujo metodológico completo de RaiSE.
+**Versión:** 2.1.1
+**Fecha:** 12 de Enero, 2026
+**Propósito:** Documentar el flujo metodológico completo de RaiSE.
 
 > **Nota de versión 2.1:** Actualización de niveles de Kata a nombres semánticos (Principios/Flujo/Patrón/Técnica). Jidoka inline en Katas.
 
@@ -88,7 +90,9 @@ Principios → Flujo → Patrón → Técnica
 | **Patrón**    | ¿Qué estructura usar?   | Standardized Work | Tech Design, Análisis de Código        |
 | **Técnica**   | ¿Cómo ejecutar esto?    | Work Instructions | Modelado de Datos, API Design            |
 
-**Ubicación:** `raise-config/katas/{nivel}/*.md`
+**Ubicación:** `src/katas-v2.1/{nivel}/*.md`
+
+> Ver ADR-011 para el Modelo Híbrido: Template + Kata + Validation Gate.
 
 ---
 
@@ -243,7 +247,7 @@ Principios → Flujo → Patrón → Técnica
 
 **Agente:** Coder (con kata de planificación)
 **Inputs:** User Stories, Tech Design
-**Kata:** `flujo/04-generacion-plan.md` (antes: L1-04)
+**Kata:** [`flujo-04-implementation-plan`](../../../src/katas-v2.1/flujo/04-implementation-plan.md)
 
 **Actividades:**
 
@@ -320,11 +324,33 @@ Para bugs o problemas de implementación, aplicar análisis de causa raíz antes
 
 ---
 
-## Sistema de Katas 
+## Sistema de Katas
 
-Los katas son procesos estructurados que codifican estándares y patrones. Ver [20-glossary.md](./20-glossary.md) para definición.
+Los katas son procesos estructurados que codifican estándares y patrones. Ver [20-glossary-v2.1.md](./20-glossary-v2.1.md) para definición.
 
 > **Diferenciador estratégico:** Ningún framework de agentes AI usa el término "Kata". RaiSE lo mantiene como conexión explícita con Lean y práctica deliberada.
+
+### Modelo Híbrido (ADR-011)
+
+RaiSE v2.1 adopta un modelo de tres capas para máxima adaptabilidad:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│   TEMPLATE              KATA                VALIDATION GATE │
+│   ─────────            ─────               ──────────────── │
+│   ¿QUÉ produce?        ¿CÓMO hacerlo?      ¿ESTÁ BIEN?      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Componente | Propósito | Ubicación |
+|------------|-----------|-----------|
+| **Template** | Estructura del artefacto (personalizable por proyecto) | `src/templates/` |
+| **Kata** | Proceso para crear el artefacto (genérico del framework) | `src/katas-v2.1/` |
+| **Validation Gate** | Checklist de verificación (componible) | `src/gates/` |
+
+**Beneficio:** Diferentes organizaciones pueden personalizar los templates manteniendo el proceso (kata) y los criterios de calidad (gate) del framework.
+
+> Ver [ADR-011](../adrs/adr-011-hybrid-kata-template-gate.md) para la decisión arquitectónica completa.
 
 ### Jerarquía de Niveles Semánticos
 
@@ -347,17 +373,21 @@ Los katas son procesos estructurados que codifican estándares y patrones. Ver [
 ### Estructura de Directorios
 
 ```
-raise-config/
-└── katas/
-    ├── principios/     # ¿Por qué? ¿Cuándo?
-    ├── flujo/          # ¿Cómo fluye?
-    ├── patron/         # ¿Qué forma?
-    └── tecnica/        # ¿Cómo hacer?
+src/
+├── katas-v2.1/           # Katas del framework
+│   ├── principios/       # ¿Por qué? ¿Cuándo?
+│   ├── flujo/            # ¿Cómo fluye?
+│   ├── patron/           # ¿Qué forma?
+│   └── tecnica/          # ¿Cómo hacer?
+├── gates/                # Validation Gates
+└── templates/            # Templates de artefactos
 ```
+
+> Ver [`src/katas-v2.1/README.md`](../../../src/katas-v2.1/README.md) para el índice completo.
 
 ### Uso Correcto
 
-> ⚠️ **No ejecutar katas directamente.** Siempre crear un Plan de Implementación específico para el contexto usando `flujo/04-generacion-plan.md`.
+> ⚠️ **No ejecutar katas directamente.** Siempre crear un Plan de Implementación específico para el contexto usando [`flujo-04-implementation-plan`](../../../src/katas-v2.1/flujo/04-implementation-plan.md).
 
 ---
 
@@ -403,8 +433,9 @@ Ejecutar flujo completo, dedicando tiempo extra a Fases 0-3.
 
 Agregar paso de **escaneo de legado** antes de Fase 1:
 
-- Análisis de código existente (kata `patron/02-analisis-codigo.md`)
-- Descubrimiento de ecosistema (kata `patron/03-discovery-ecosistema.md`)
+- Análisis de código existente ([`patron-01-code-analysis`](../../../src/katas-v2.1/patron/01-code-analysis.md))
+- Descubrimiento de ecosistema ([`patron-02-ecosystem-discovery`](../../../src/katas-v2.1/patron/02-ecosystem-discovery.md))
+- Tech Design consciente del stack ([`patron-03-tech-design-stack-aware`](../../../src/katas-v2.1/patron/03-tech-design-stack-aware.md))
 - Generación de guardrails desde patrones existentes
 
 ---
@@ -462,6 +493,14 @@ Al finalizar cada feature significativa:
 ---
 
 ## Changelog
+
+### v2.1.1 (2026-01-12)
+
+- NUEVO: Modelo Híbrido (Template + Kata + Validation Gate) - ADR-011
+- NUEVO: 12 katas creadas desde cero en `src/katas-v2.1/`
+- NUEVO: 6 Validation Gates en `src/gates/`
+- ACTUALIZADO: Referencias a katas con rutas correctas
+- ACTUALIZADO: Sección brownfield con nuevos patrones
 
 ### v2.1.0 (2025-12-28)
 
