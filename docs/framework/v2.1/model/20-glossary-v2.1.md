@@ -368,9 +368,31 @@ Métricas emergentes para desarrollo asistido por IA:
 
 ---
 
+## Work Cycle (Ciclo de Trabajo) [NUEVO v2.1]
+
+Contexto operacional del Orquestador que agrupa fases de la metodología, katas aplicables, y herramientas disponibles. Los ciclos son **ortogonales**—el Orquestador transita entre ellos según la naturaleza del trabajo, no en secuencia fija.
+
+**Ciclos definidos:**
+
+| Ciclo | Trigger | Fases RaiSE | spec-kit |
+|-------|---------|-------------|----------|
+| **Onboarding** | Nuevo repositorio | Fase 0 (parcial) | ❌ |
+| **Proyecto** | Nueva épica | Fases 1-3 | ❌ |
+| **Feature** | Feature priorizado | Fases 4-6 | ✅ |
+| **Mejora** | Post-trabajo | Fase 7+ | ⚠️ Parcial |
+
+**Relación con Fases:** Los ciclos agrupan fases (0-7) por contexto operacional, no por secuencia temporal. Un Orquestador puede estar en cualquier ciclo según el momento.
+
+**Relación con Katas:** Cada ciclo tiene katas asociadas. Por ejemplo, el Ciclo de Onboarding usa `L0-01`, `L2-01` a `L2-06` de `src/katas/cursor_rules/`.
+
+> Ver [26-work-cycles-v2.1.md](./26-work-cycles-v2.1.md) para documentación completa.
+
+---
+
 ## Changelog
 
 ### v2.1.0 (2025-12-29)
+- **NUEVO**: Entrada `Work Cycle (Ciclo de Trabajo)` con tabla resumen de los 4 ciclos
 - **NUEVO**: Entrada `pull` (comando CLI) — ADR-010
 - **NUEVO**: Entrada `kata` (comando CLI) — ADR-010
 - **ACTUALIZADO**: raise-config usa `raise pull` (antes: hydrate)
