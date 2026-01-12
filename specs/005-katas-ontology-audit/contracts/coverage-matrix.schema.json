@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raise.humansys.ai/schemas/kata-coverage-matrix.json",
+  "title": "Kata Coverage Matrix",
+  "description": "Complete audit result for kata ontology alignment",
+  "type": "object",
+  "required": ["metadata", "summary", "byLevel", "slots", "katas", "mappings"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["auditDate", "katasAnalyzed", "ontologyVersion", "sourceDocuments"],
+      "properties": {
+        "auditDate": { "type": "string", "format": "date" },
+        "katasAnalyzed": { "type": "integer", "minimum": 0 },
+        "ontologyVersion": { "type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$" },
+        "sourceDocuments": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": ["totalSlots", "filledSlots", "gapSlots", "totalKatas", "mappedKatas", "orphanKatas", "coveragePercentage"],
+      "properties": {
+        "totalSlots": { "type": "integer", "minimum": 0 },
+        "filledSlots": { "type": "integer", "minimum": 0 },
+        "gapSlots": { "type": "integer", "minimum": 0 },
+        "totalKatas": { "type": "integer", "minimum": 0 },
+        "mappedKatas": { "type": "integer", "minimum": 0 },
+        "orphanKatas": { "type": "integer", "minimum": 0 },
+        "coveragePercentage": { "type": "number", "minimum": 0, "maximum": 100 },
+        "jidokaCompliancePercentage": { "type": "number", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "byLevel": {
+      "type": "object",
+      "required": ["principios", "flujo", "patron", "tecnica"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["slots", "filled", "gap", "katas", "mapped", "orphan"],
+        "properties": {
+          "slots": { "type": "integer", "minimum": 0 },
+          "filled": { "type": "integer", "minimum": 0 },
+          "gap": { "type": "integer", "minimum": 0 },
+          "katas": { "type": "integer", "minimum": 0 },
+          "mapped": { "type": "integer", "minimum": 0 },
+          "orphan": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "slots": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/OntologySlot" }
+    },
+    "katas": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/Kata" }
+    },
+    "mappings": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/MappingResult" }
+    },
+    "migrationTasks": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/MigrationTask" }
+    }
+  },
+  "$defs": {
+    "Level": {
+      "type": "string",
+      "enum": ["principios", "flujo", "patron", "tecnica"]
+    },
+    "OntologySlot": {
+      "type": "object",
+      "required": ["id", "level", "topic", "sourceReference", "status"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^(PRIN|FLUJO|PATRON|TEC)-\\d{3}$" },
+        "level": { "$ref": "#/$defs/Level" },
+        "topic": { "type": "string" },
+        "sourceReference": { "type": "string" },
+        "status": { "type": "string", "enum": ["filled", "gap"] },
+        "filledBy": { "type": ["string", "null"] }
+      }
+    },
+    "Kata": {
+      "type": "object",
+      "required": ["path", "filename", "currentLevelPrefix", "targetLevel", "mappingStatus"],
+      "properties": {
+        "path": { "type": "string" },
+        "filename": { "type": "string" },
+        "currentLevelPrefix": { "type": "string", "pattern": "^L[0-3]$" },
+        "targetLevel": { "$ref": "#/$defs/Level" },
+        "title": { "type": "string" },
+        "jidokaCompliance": { "$ref": "#/$defs/JidokaCompliance" },
+        "deprecatedTerms": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "projectMarkers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "mappingStatus": { "type": "string", "enum": ["mapped", "orphan"] },
+        "mappedSlotId": { "type": ["string", "null"] },
+        "orphanReason": { "type": ["string", "null"] }
+      }
+    },
+    "JidokaCompliance": {
+      "type": "object",
+      "required": ["compliant", "totalSteps", "stepsWithVerification", "stepsWithContinueBlock"],
+      "properties": {
+        "compliant": { "type": "boolean" },
+        "totalSteps": { "type": "integer", "minimum": 0 },
+        "stepsWithVerification": { "type": "integer", "minimum": 0 },
+        "stepsWithContinueBlock": { "type": "integer", "minimum": 0 },
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["step", "missing"],
+            "properties": {
+              "step": { "type": "integer" },
+              "missing": { "type": "string", "enum": ["verification", "continueBlock", "both"] }
+            }
+          }
+        }
+      }
+    },
+    "MappingResult": {
+      "type": "object",
+      "required": ["type", "rationale"],
+      "properties": {
+        "type": { "type": "string", "enum": ["mapped", "gap", "orphan"] },
+        "slotId": { "type": ["string", "null"] },
+        "kataPath": { "type": ["string", "null"] },
+        "rationale": { "type": "string" },
+        "migrationTasks": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "MigrationTask": {
+      "type": "object",
+      "required": ["id", "type", "target", "priority", "effort"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^MIG-\\d{3}$" },
+        "type": { "type": "string", "enum": ["rename", "restructure", "archive", "create"] },
+        "source": { "type": ["string", "null"] },
+        "target": { "type": "string" },
+        "changes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["changeType", "description"],
+            "properties": {
+              "changeType": { "type": "string" },
+              "description": { "type": "string" },
+              "deprecated": { "type": "string" },
+              "canonical": { "type": "string" },
+              "occurrences": { "type": "integer" },
+              "affectedSteps": {
+                "type": "array",
+                "items": { "type": "integer" }
+              }
+            }
+          }
+        },
+        "priority": { "type": "string", "enum": ["high", "medium", "low"] },
+        "effort": { "type": "string", "enum": ["low", "medium", "high"] }
+      }
+    }
+  }
+}
