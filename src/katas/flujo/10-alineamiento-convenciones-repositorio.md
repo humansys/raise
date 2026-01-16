@@ -1,8 +1,9 @@
-# L1-10: Kata de Alineamiento con Convenciones del Repositorio
+# Kata de Alineamiento con Convenciones del Repositorio
 
+**ID**: flujo-10
 **Autor:** `raise-continuous-improvement-agent`
 **Categoría:** Proceso y Cultura
-**Propósito:** Instaurar el hábito fundamental de **verificar antes de codificar**. Esta Kata obliga al desarrollador (o al agente IA) a utilizar el código base existente como la única fuente de verdad para las convenciones de codificación, patrones arquitectónicos y uso de API, antes de escribir una nueva línea de código. Su objetivo es erradicar los errores basados en asunciones falsas.
+**Propósito:** Instaurar el hábito fundamental de **verificar antes de codificar**. Esta Kata obliga al Orquestador (o al Agente IA) a utilizar el código base existente como la única fuente de verdad para las convenciones de codificación, patrones arquitectónicos y uso de API, antes de escribir una nueva línea de código. Su objetivo es erradicar los errores basados en asunciones falsas.
 
 ---
 
@@ -24,6 +25,10 @@ Antes de crear un nuevo archivo (ej. `NewFeatureController.cs`), identifica uno 
 - **Para un nuevo Handler de CQRS:** Cualquier `...QueryHandler.cs` o `...CommandHandler.cs` en una feature similar.
 - **Para una nueva Prueba Unitaria:** Cualquier archivo `...Tests.cs` en el proyecto de pruebas.
 - **Para un nuevo Servicio de Infraestructura:** `ProfileServiceAsync.cs`.
+
+**Verificación:** Se han identificado 1-2 archivos arquetipo del mismo tipo que el componente a crear, y estos archivos son representativos del estándar del proyecto.
+
+> **Si no puedes continuar:** No se encuentran arquetipos → Buscar en otras features o módulos del proyecto; si no existen, documentar que se está creando el primer ejemplar de este tipo.
 
 ### Paso 2: Extraer las Convenciones Clave (Checklist de Verificación)
 
@@ -54,9 +59,17 @@ Abre el archivo arquetipo y responde a las siguientes preguntas. Esta no es una 
     -   *Lección de HU-002: Se entendió que los servicios devuelven el payload crudo, y los handlers lo envuelven.*
 -   [ ] **Manejo de Errores:** ¿Cómo se manejan las `RpcException`? ¿Se capturan y se relanzan como una `ApiException`?
 
+**Verificación:** El checklist correspondiente al tipo de componente está completado con respuestas concretas extraídas del arquetipo (no asunciones).
+
+> **Si no puedes continuar:** Checklist incompleto → El arquetipo no cubre todos los aspectos; buscar un segundo arquetipo complementario o consultar con el Orquestador.
+
 ### Paso 3: Aplicar las Convenciones Extraídas
 
 Con las respuestas del checklist, procede a escribir el nuevo código, aplicando rigurosamente las convenciones y patrones identificados. Cualquier desviación debe ser consciente y justificada, no producto de una asunción.
+
+**Verificación:** El nuevo código sigue las convenciones extraídas del checklist. Cualquier desviación está documentada con justificación explícita.
+
+> **Si no puedes continuar:** Desviación no justificable → Revisar el arquetipo nuevamente para entender el patrón correcto, o escalar al Orquestador si se requiere una excepción arquitectónica.
 
 ---
 
