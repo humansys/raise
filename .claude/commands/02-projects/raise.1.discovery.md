@@ -2,7 +2,7 @@
 description: Transform raw discovery notes or meeting transcripts into a structured Product Requirements Document (PRD).
 handoffs: 
   - label: Define Solution Vision
-    agent: speckit.raise.vision
+    agent: raise.2.vision
     prompt: Create the solution vision for this PRD
     send: true
 ---
