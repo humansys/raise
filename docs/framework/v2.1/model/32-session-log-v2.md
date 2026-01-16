@@ -150,4 +150,208 @@
 
 ---
 
+## Sesión 2026-01-16 - Creación Sistema Katas v2.1 (Modelo Híbrido)
+
+### Contexto de Entrada
+- **Estado previo:** Feature `006-katas-normalization` en progreso, normalizando katas legacy a ontología v2.1
+- **Objetivo inicial:** Continuar normalización de katas existentes (ajustar terminología, estructura, Jidoka inline)
+- **Agente:** Claude Opus 4.5 (RaiSE Ontology Architect)
+- **Branch:** `006-katas-normalization` → target `PRAISE-36-ontology-standarization`
+
+### Punto de Inflexión (Jidoka)
+
+**A mitad de la normalización, el Orquestador detuvo el proceso con una reflexión crítica:**
+
+> "Creo que no tiene mucho sentido el que 'ajustemos' estas katas a la ontología, si en sí mismas no SON las katas que la ontología necesita."
+
+Este momento de pausa aplicó el principio **Jidoka** (Detectar → Parar → Corregir → Continuar) y cambió completamente la dirección del trabajo:
+
+| Antes del Pivot | Después del Pivot |
+|-----------------|-------------------|
+| Normalizar katas existentes | Crear katas desde cero |
+| Ajustar terminología | Diseñar sistema coherente |
+| Preservar estructura legacy | Modelo Híbrido de 3 capas |
+
+### Análisis Realizado
+
+1. **Revisión de metodología** (`21-methodology-v2.md`):
+   - Identificamos que referenciaba katas que no existían
+   - Las fases metodológicas no tenían katas correspondientes
+
+2. **Revisión de templates** (`src/templates/`):
+   - Templates existían pero sin proceso (kata) que explicara CÓMO llenarlos
+   - Se usaban "de facto" pidiendo al agente que generara el contenido
+
+3. **Diagnóstico de incoherencia**:
+   - Templates (QUÉ) existían aislados
+   - Katas (CÓMO) no cubrían el flujo metodológico
+   - Validación (ESTÁ BIEN) estaba embebida sin uniformidad
+
+### Decisiones Tomadas
+
+| Decisión | Rationale | ADR |
+|----------|-----------|-----|
+| **Modelo Híbrido de 3 capas** | Separar Template (estructura) + Kata (proceso) + Gate (verificación) permite que organizaciones personalicen templates sin perder rigor del proceso | ADR-011 |
+| **Crear katas v2.1 desde cero** | Normalizar katas legacy perpetuaba incoherencia; mejor diseñar sistema alineado con metodología | — |
+| **Jidoka Inline en cada paso** | Patrón `**Verificación:** + > **Si no puedes continuar:**` elimina sección separada de troubleshooting, contexto inmediato | — |
+| **Validation Gates como archivos separados** | Permite composición: una kata puede referenciar múltiples gates, un gate puede usarse por múltiples katas | — |
+| **Deprecar (no eliminar) katas legacy** | Preservar historia git, proveer guía de migración, transición gradual | — |
+| **Nivel técnica vacío** | YAGNI - crear katas de técnica según demanda real, no especulativamente | — |
+
+### Trabajo Realizado
+
+#### 1. Documentación Arquitectónica
+| Archivo | Descripción |
+|---------|-------------|
+| `docs/framework/v2.1/adrs/adr-011-hybrid-kata-template-gate.md` | ADR documentando decisión del Modelo Híbrido, contexto, alternativas consideradas |
+| `docs/framework/v2.1/model/12-kata-schema-v2.1.md` | Esquema canónico: frontmatter requerido, estructura de pasos, ejemplo completo |
+
+#### 2. Katas Nivel Principios (Meta-nivel)
+| Archivo | Propósito |
+|---------|-----------|
+| `src/katas-v2.1/principios/00-meta-kata.md` | Qué es una kata, concepto ShuHaRi, cuándo usar katas vs. improvisar |
+| `src/katas-v2.1/principios/01-execution-protocol.md` | Protocolo de 7 pasos para ejecutar cualquier kata correctamente |
+
+#### 3. Katas Nivel Flujo (Por fase metodológica)
+| Archivo | Fase | Template | Gate |
+|---------|------|----------|------|
+| `src/katas-v2.1/flujo/01-discovery.md` | 1-Discovery | `prd.md` | gate-discovery |
+| `src/katas-v2.1/flujo/02-solution-vision.md` | 2-Vision | `solution_vision.md` | gate-vision |
+| `src/katas-v2.1/flujo/03-tech-design.md` | 3-Design | `tech_design.md` | gate-design |
+| `src/katas-v2.1/flujo/04-implementation-plan.md` | 5-Plan | — | gate-plan |
+| `src/katas-v2.1/flujo/05-backlog-creation.md` | 4-Backlog | `user_story.md` | gate-backlog |
+| `src/katas-v2.1/flujo/06-development.md` | 6-Dev | — | gate-code |
+
+#### 4. Katas Nivel Patrón (Estructuras reutilizables)
+| Archivo | Contexto de Uso |
+|---------|-----------------|
+| `src/katas-v2.1/patron/01-code-analysis.md` | Análisis de código en proyectos brownfield |
+| `src/katas-v2.1/patron/02-ecosystem-discovery.md` | Mapeo de integraciones, dependencias, flujos de datos |
+| `src/katas-v2.1/patron/03-tech-design-stack-aware.md` | Diseño técnico respetando stack existente |
+| `src/katas-v2.1/patron/04-dependency-validation.md` | Evaluación rigurosa antes de añadir dependencias |
+
+#### 5. Validation Gates
+| Archivo | Fase | Criterios |
+|---------|------|-----------|
+| `src/gates/gate-discovery.md` | 1 | 7 criterios obligatorios para PRD válido |
+| `src/gates/gate-vision.md` | 2 | 7 criterios para Solution Vision |
+| `src/gates/gate-design.md` | 3 | 7 criterios + validación multinivel (funcional/estructural/arquitectónica/semántica) |
+| `src/gates/gate-backlog.md` | 4 | 7 criterios para backlog priorizado |
+| `src/gates/gate-plan.md` | 5 | 7 criterios para plan atómico y verificable |
+| `src/gates/gate-code.md` | 6 | 7 criterios + validación multinivel |
+
+#### 6. Índice y Deprecación
+| Archivo | Propósito |
+|---------|-----------|
+| `src/katas-v2.1/README.md` | Índice completo, diagrama del modelo, cómo empezar |
+| `src/katas/DEPRECATED.md` | Nota de deprecación, tabla de migración legacy→v2.1 |
+
+#### 7. Actualización de Metodología
+- Versión actualizada a **v2.1.1** (12 Enero 2026)
+- Nueva sección "Modelo Híbrido (ADR-011)" con diagrama
+- Ubicación de katas corregida: `raise-config/` → `src/katas-v2.1/`
+- Sección brownfield actualizada con referencias a patron katas v2.1
+- Estructura de directorios actualizada incluyendo `gates/`
+- Changelog actualizado
+
+### Artefactos Creados/Modificados
+
+| Archivo | Tipo | Líneas |
+|---------|------|--------|
+| `docs/framework/v2.1/adrs/adr-011-hybrid-kata-template-gate.md` | Nuevo | ~150 |
+| `docs/framework/v2.1/model/12-kata-schema-v2.1.md` | Nuevo | ~200 |
+| `docs/framework/v2.1/model/21-methodology-v2.md` | Modificado | +50 |
+| `src/katas-v2.1/README.md` | Nuevo | ~95 |
+| `src/katas-v2.1/principios/*.md` (2) | Nuevo | ~300 |
+| `src/katas-v2.1/flujo/*.md` (6) | Nuevo | ~1200 |
+| `src/katas-v2.1/patron/*.md` (4) | Nuevo | ~800 |
+| `src/gates/*.md` (6) | Nuevo | ~600 |
+| `src/katas/DEPRECATED.md` | Nuevo | ~60 |
+| **Total** | 22 archivos | ~3,500 líneas |
+
+### Commits y MR
+
+| Item | Valor |
+|------|-------|
+| **Commit** | `0ed7f3b feat(ontology): Implement Hybrid Model with Katas v2.1 system` |
+| **Archivos** | 38 modificados |
+| **MR** | [!13](https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/merge_requests/13) |
+| **Source** | `006-katas-normalization` |
+| **Target** | `PRAISE-36-ontology-standarization` |
+
+### Estructura Final
+
+```
+src/
+├── katas-v2.1/           # NUEVO: Sistema Katas v2.1
+│   ├── README.md         # Índice y navegación
+│   ├── principios/       # 2 katas (meta-nivel)
+│   │   ├── 00-meta-kata.md
+│   │   └── 01-execution-protocol.md
+│   ├── flujo/            # 6 katas (por fase metodológica)
+│   │   ├── 01-discovery.md
+│   │   ├── 02-solution-vision.md
+│   │   ├── 03-tech-design.md
+│   │   ├── 04-implementation-plan.md
+│   │   ├── 05-backlog-creation.md
+│   │   └── 06-development.md
+│   ├── patron/           # 4 katas (estructuras reutilizables)
+│   │   ├── 01-code-analysis.md
+│   │   ├── 02-ecosystem-discovery.md
+│   │   ├── 03-tech-design-stack-aware.md
+│   │   └── 04-dependency-validation.md
+│   └── tecnica/          # Vacío (YAGNI)
+├── gates/                # NUEVO: Validation Gates
+│   ├── gate-discovery.md
+│   ├── gate-vision.md
+│   ├── gate-design.md
+│   ├── gate-backlog.md
+│   ├── gate-plan.md
+│   └── gate-code.md
+├── templates/            # Existente (sin cambios)
+└── katas/                # LEGACY: Deprecado
+    └── DEPRECATED.md     # Guía de migración
+```
+
+### Pendientes para Próxima Sesión
+
+1. **Merge del MR !13** después de revisión
+2. **Katas de técnica**: Crear según demanda real (nivel vacío por diseño)
+3. **Validación práctica**: Probar el Modelo Híbrido en un proyecto real
+4. **Templates faltantes**: Algunos templates referenciados pueden no existir aún
+5. **Actualizar glosario**: Añadir entrada "Modelo Híbrido" si no existe
+
+### Aprendizajes
+
+1. **Jidoka aplicado al proceso de trabajo:**
+   El momento de pausa del Orquestador ("¿tiene sentido normalizar katas que no son las correctas?") demostró el valor de Detectar → Parar → Corregir. Sin esa pausa, habríamos completado normalización de artefactos incoherentes.
+
+2. **Crear desde cero vs. adaptar:**
+   Cuando la estructura fundamental está mal, es más eficiente diseñar desde cero que parchar. El costo de "perder" trabajo previo es menor que perpetuar incoherencia.
+
+3. **Separación de concerns en documentación:**
+   El Modelo Híbrido (Template/Kata/Gate) aplica el mismo principio que en código: cada artefacto tiene una responsabilidad única. Esto facilita composición y personalización.
+
+4. **YAGNI en ontología:**
+   Dejar el nivel `tecnica/` vacío fue decisión consciente. Es preferible no tener katas que tener katas especulativas que después hay que mantener o deprecar.
+
+5. **Patrón Jidoka Inline:**
+   Embeber verificación y resolución en cada paso elimina fricción. El Orquestador no tiene que buscar en otra sección cuando algo falla.
+
+6. **Valor del sparring intelectual:**
+   La reflexión del Orquestador cambió completamente la dirección. Un agente que solo ejecuta sin cuestionar habría completado trabajo sin valor.
+
+### Métricas de Sesión
+
+| Métrica | Valor |
+|---------|-------|
+| **Duración aproximada** | ~3 horas |
+| **Archivos creados** | 22 |
+| **Líneas de documentación** | ~3,500 |
+| **Decisiones arquitectónicas** | 1 ADR |
+| **Pivots/cambios de dirección** | 1 (crítico) |
+| **Re-trabajo evitado** | Alto (no normalizamos katas incorrectas) |
+
+---
+
 *Este log es append-only. Nunca eliminar entradas anteriores. Ver [31-current-state-v2.md](./31-current-state-v2.md) para estado actual.*
