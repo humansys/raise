@@ -24,6 +24,7 @@
 | ADR-008 | Observable Workflow local | ✅ Accepted | 2025-12-28 | [adr-008](./adr-008-observable-workflow.md) |
 | ADR-009 | ShuHaRi Hybrid Implementation | ✅ Accepted | 2025-12-29 | [adr-009](./adr-009-shuhari-hybrid.md) |
 | ADR-010 | Ontología de Comandos CLI | ✅ Accepted | 2025-12-29 | [adr-010](./adr-010-cli-ontology.md) |
+| ADR-011 | Modelo Híbrido: Katas, Templates y Gates | ✅ Accepted | 2026-01-12 | [adr-011](./adr-011-hybrid-kata-template-gate.md) |
 
 ---
 

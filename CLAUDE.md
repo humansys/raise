@@ -186,6 +186,7 @@ raise-commons/
 - Markdown (CommonMark spec) + Text editor, Git 2.0+ (003-simplify-jidoka, 004-operation-layers)
 - Git version control (plain text markdown files)
 - Git repository (versioned Markdown and JSON files) (005-katas-ontology-audit)
+- Git repository (versioned Markdown files) (006-katas-normalization)
 
 ## Recent Changes
 - 004-operation-layers: Documento `26-work-cycles-v2.1.md` formalizando los 4 ciclos de trabajo; entrada Work Cycle en glosario

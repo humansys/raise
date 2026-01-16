@@ -1,17 +1,17 @@
 ---
-id: L0-03-kata-execution-protocol
-nivel: 0
+id: principios-01-kata-execution-protocol
+nivel: principios
 tags: [meta-kata, raise, protocol, collaboration, execution, agent-autonomy]
 ---
-# L0-03: Meta-Kata del Protocolo de Ejecución y Colaboración
+# Meta-Kata del Protocolo de Ejecución y Colaboración
 
 ## Metadatos
-- **Id**: L0-03-kata-execution-protocol
-- **Nivel**: 0 (Meta-Kata)
+- **Id**: principios-01-kata-execution-protocol
+- **Nivel**: Principios (Meta-Kata)
 - **Título**: Protocolo de Ejecución de Katas y Colaboración Humano-IA
-- **Propósito**: Definir un protocolo de operación estándar, claro y auditable para la ejecución de cualquier Kata RaiSE, estableciendo un modelo de colaboración que equilibra la autonomía del Agente IA con la supervisión estratégica del Orquestador Humano.
-- **Contexto**: Esta Meta-Kata es la "fuente de verdad" sobre CÓMO se ejecutan otras Katas (de Nivel L1, L2, etc.). Se aplica al inicio de cualquier sesión de trabajo que involucre la implementación de una Kata.
-- **Audiencia**: Orquestador Humano y Agente IA.
+- **Propósito**: Definir un protocolo de operación estándar, claro y auditable para la ejecución de cualquier Kata RaiSE, estableciendo un modelo de colaboración que equilibra la autonomía del Agente IA con la supervisión estratégica del Orquestador.
+- **Contexto**: Esta Meta-Kata es la "fuente de verdad" sobre CÓMO se ejecutan otras Katas (de niveles flujo, patrón, técnica). Se aplica al inicio de cualquier sesión de trabajo que involucre la implementación de una Kata.
+- **Audiencia**: Orquestador y Agente IA.
 
 ## Pre-condiciones
 - Se ha seleccionado una Kata específica (la "Kata Objetivo") para ser ejecutada.
@@ -34,8 +34,12 @@ Este protocolo consta de tres fases secuenciales que rigen el ciclo de vida de l
 - **Entregable(s)**:
   - Un "Plan de Implementación y Tracking" detallado en formato de checklist.
 - **Criterios de Aceptación**:
-  - El Orquestador Humano ha revisado el plan y confirma que representa fielmente las intenciones de la Kata Objetivo.
-  - El Orquestador Humano da su **aprobación explícita** al plan, lo que autoriza al Agente IA a proceder con la siguiente fase. Esta aprobación debe quedar registrada en el log de tracking.
+  - El Orquestador ha revisado el plan y confirma que representa fielmente las intenciones de la Kata Objetivo.
+  - El Orquestador da su **aprobación explícita** al plan, lo que autoriza al Agente IA a proceder con la siguiente fase. Esta aprobación debe quedar registrada en el log de tracking.
+
+**Verificación:** Existe un Plan de Implementación aprobado explícitamente por el Orquestador y registrado en el tracking.
+
+> **Si no puedes continuar:** Plan no aprobado → Revisar feedback del Orquestador y ajustar el plan antes de solicitar nueva aprobación.
 
 ### Fase 2: Ejecución (Autonomía Supervisada del Agente)
 
@@ -47,7 +51,11 @@ Este protocolo consta de tres fases secuenciales que rigen el ciclo de vida de l
   2. Por cada tarea completada, el Agente actualiza la checklist en el documento de tracking, marcándola como "completada" y añadiendo un breve resumen del resultado o un enlace a la evidencia (ej: un commit hash, un log de prueba exitoso).
   3. El Agente continúa ejecutando el plan sin interrupción **a menos que** se encuentre con una de las "Condiciones de Pausa" definidas en la siguiente sección.
 - **Criterios de Aceptación**:
-  - El Agente completa todas las tareas del plan sin violar las reglas de escalado.
+  - El Agente completa todas las tareas del plan sin violar los guardrails de escalado.
+
+**Verificación:** Todas las tareas de la checklist están marcadas como completadas con evidencia registrada.
+
+> **Si no puedes continuar:** Tarea fallida después de dos intentos → Escalar al Orquestador siguiendo el protocolo de Condición 2.
 
 ### Fase 3: Post-Ejecución y Cierre
 
@@ -62,7 +70,11 @@ Este protocolo consta de tres fases secuenciales que rigen el ciclo de vida de l
   - Se han cumplido todos los objetivos y post-condiciones de la "Kata Objetivo".
   - Existe un registro completo y auditable de la sesión de trabajo.
 
-## Reglas de Colaboración y Escalado (Condiciones de Pausa)
+**Verificación:** El log de tracking archivado contiene: plan aprobado, todas las tareas completadas con evidencia, y confirmación de post-condiciones cumplidas.
+
+> **Si no puedes continuar:** Post-condiciones no cumplidas → Identificar tareas pendientes y regresar a Fase 2 para completarlas.
+
+## Guardrails de Colaboración y Escalado (Condiciones de Pausa)
 
 El Agente IA DEBE detener su ejecución autónoma y escalar al Orquestador Humano únicamente si se cumple una de las siguientes condiciones:
 

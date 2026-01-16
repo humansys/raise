@@ -1,6 +1,6 @@
-# RaiSE Kata: Ecosystem Discovery & Zero-Duplication Feature Design (L1-09)
+# RaiSE Kata: Ecosystem Discovery & Zero-Duplication Feature Design
 
-**ID**: L1-09
+**ID**: flujo-09
 **Nombre**: Ecosystem Discovery & Zero-Duplication Feature Design for Microservices
 **Descripción**: Realiza análisis exhaustivo del ecosistema de microservicios existente para prevenir duplicación funcional y maximizar reutilización al diseñar nuevos features.
 **Objetivo**:
@@ -10,14 +10,14 @@
     *   Garantizar coherencia arquitectónica y patrones consistentes en el ecosistema
     *   Producir documentación de diseño que demuestre 0% duplicación funcional
 **Dependencias**:
-    *   `L1-07: Generación de Documentación Esencial desde Código Fuente` (documentación esencial debe existir)
-    *   `L0-03: Meta-Kata del Protocolo de Ejecución y Colaboración`
+    *   Kata de flujo: Generación de Documentación Esencial desde Código Fuente (documentación esencial debe existir)
+    *   Kata de principios: Meta-Kata del Protocolo de Ejecución y Colaboración
     *   Feature requirements definidos con historias de usuario
     *   Acceso a documentación esencial de todos los microservicios del ecosistema
-**Reglas Cursor Relacionadas**:
+**Guardrails Cursor Relacionados**:
     *   `010-raise-methodology-overview.mdc`
-    *   Reglas de DRY, KISS, YAGNI enforcement
-    *   Reglas de zero-duplication validation
+    *   Guardrails de DRY, KISS, YAGNI enforcement
+    *   Guardrails de zero-duplication validation
 
 ---
 
@@ -57,7 +57,7 @@ Para el feature '[FEATURE_NAME]', genera capability-matrix.yaml que mapee capaci
        existing_services: ["registrations:95%", "authentication:100%"]
        gap: "Emprendedor-specific workflow (5%)"
        recommendation: "EXTEND registrations service"
-       
+
      curp_validation:
        existing_services: ["profile:100%"]
        gap: "None"
@@ -65,6 +65,10 @@ Para el feature '[FEATURE_NAME]', genera capability-matrix.yaml que mapee capaci
    ```
 
 **Entregable Crítico**: `capability-matrix.yaml` con cobertura 100% del ecosistema
+
+**Verificación:** Existe `capability-matrix.yaml` con mapeo de ≥90% de los servicios del ecosistema y sus capacidades.
+
+> **Si no puedes continuar:** Documentación esencial faltante → Ejecutar primero la kata de flujo de Generación de Documentación Esencial para los servicios sin documentar.
 
 ### **Paso 0.2: Zero-Duplication Overlap Analysis**
 
@@ -90,6 +94,10 @@ Para el feature '[FEATURE_NAME]', genera capability-matrix.yaml que mapee capaci
 
 **Entregable Crítico**: `overlap-analysis.yaml` con validación de zero-duplication
 
+**Verificación:** Existe `overlap-analysis.yaml` con clasificación de risk levels (CRITICAL/HIGH/MEDIUM) para cada overlap detectado.
+
+> **Si no puedes continuar:** Overlap ≥90% detectado sin estrategia → STOP y documentar justificación de por qué no se puede reutilizar el servicio existente.
+
 ### **Paso 0.3: Architecture Continuity Validation**
 
 **Instrucción (Orquestador):** 
@@ -104,6 +112,10 @@ Genera architecture-validation.yaml confirmando continuity."
 3. **Evaluar complexity impact (prefer minimal changes)**
 
 **Entregable Crítico**: `architecture-validation.yaml` con score de continuity
+
+**Verificación:** Existe `architecture-validation.yaml` con status "APPROVED" y score de continuity ≥80%.
+
+> **Si no puedes continuar:** Architecture compromised → Revisar propuesta de cambios para eliminar breaking changes y preservar patrones existentes.
 
 ---
 
@@ -159,6 +171,10 @@ Genera architecture-validation.yaml confirmando continuity."
 
 **Entregable Crítico**: `impact-matrix.yaml` con assessment completo del ecosistema
 
+**Verificación:** Existe `impact-matrix.yaml` con análisis de impacto para cada servicio del ecosistema y executive summary con métricas de reutilización.
+
+> **Si no puedes continuar:** Servicios sin análisis de impacto → Completar el análisis para cada servicio antes de continuar con las opciones de diseño.
+
 ### **Paso 1.2: Reuse-First Design Options Generation**
 
 **Instrucción (Orquestador):** 
@@ -197,6 +213,10 @@ Genera architecture-validation.yaml confirmando continuity."
 
 **Entregable Crítico**: Design options con Option A >= 80% reuse mandatorio
 
+**Verificación:** Opción A documentada con reuse_percentage ≥80% y justificación basada en el análisis del ecosistema.
+
+> **Si no puedes continuar:** Opción A con reuse <80% → Revisar capability-matrix.yaml para identificar más oportunidades de reutilización antes de proceder.
+
 ---
 
 ## **FASE 2: ZERO-DUPLICATION TECHNICAL DESIGN**
@@ -231,13 +251,17 @@ Genera architecture-validation.yaml confirmando continuity."
        participant ADDR as AddressBook Service (REUSED)
        participant FILES as Files Service (REUSED)
        participant CREDIT as Credit Service (REUSED)
-       
+
        UI->>REG: CreateEmprendedorApplication (NEW)
        REG->>PROF: ValidateCURP (EXISTING)
        REG->>ADDR: ValidateAddress (EXISTING)
        REG->>FILES: CreateDocumentPlaceholders (EXISTING)
        REG->>CREDIT: SetupPaymentMethod (EXISTING)
    ```
+
+**Verificación:** Extension points definidos con lista explícita de componentes reutilizados vs nuevos, y diagrama de flujo de integración.
+
+> **Si no puedes continuar:** Integration flow con servicios no analizados → Regresar a Fase 0 para completar el discovery de esos servicios.
 
 ### **Paso 2.2: Contract Extensions Design**
 
@@ -266,6 +290,10 @@ Genera architecture-validation.yaml confirmando continuity."
      AddressInfo address = 4;
    }
    ```
+
+**Verificación:** Extensiones de contrato diseñadas son 100% backward compatible (solo operaciones aditivas, sin modificar existentes).
+
+> **Si no puedes continuar:** Breaking changes detectados → Rediseñar extensiones para que sean aditivas, o crear versión v2 del contrato si es absolutamente necesario.
 
 ---
 
@@ -303,6 +331,10 @@ Genera architecture-validation.yaml confirmando continuity."
      services_unchanged: "11 of 13 (85%)"
    ```
 
+**Verificación:** Evidence matrix documenta que cada funcionalidad requerida está cubierta por REUSE o marcada explícitamente como NEW con justificación.
+
+> **Si no puedes continuar:** Funcionalidad sin clasificar → Revisar capability-matrix.yaml y overlap-analysis.yaml para determinar si es reutilización o nueva.
+
 ### **Paso 3.2: Implementation Roadmap with Validation Gates**
 
 **Instrucción (Orquestador):** 
@@ -330,6 +362,10 @@ Genera architecture-validation.yaml confirmando continuity."
        - "≥95% functionality reused"
        - "No breaking changes detected"
    ```
+
+**Verificación:** Roadmap incluye fases con duración, entregables específicos, y validation gate por fase con criterios medibles.
+
+> **Si no puedes continuar:** Validation gates no definidos → Agregar criterios de validación específicos para cada fase antes de iniciar implementación.
 
 ---
 
