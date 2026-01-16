@@ -1,8 +1,10 @@
-# L1-12: Análisis de Granularidad de Historias de Usuario Multi-Repositorio
+# Análisis de Granularidad de Historias de Usuario Multi-Repositorio
+
+**ID**: flujo-12
 
 ## Propósito y Filosofía RaiSE
 
-Esta kata define el proceso para analizar y optimizar la granularidad de las Historias de Usuario **DESPUÉS** del análisis de ecosistema (L1-09), incorporando el contexto de repositorios impactados y dependencias inter-repo. Sigue el principio RaiSE de **"Analizar ecosistema antes de dividir"** para tomar decisiones informadas sobre la granularidad óptima.
+Esta kata define el proceso para analizar y optimizar la granularidad de las Historias de Usuario **DESPUÉS** del análisis de ecosistema (kata flujo-09), incorporando el contexto de repositorios impactados y dependencias inter-repo. Sigue el principio RaiSE de **"Analizar ecosistema antes de dividir"** para tomar decisiones informadas sobre la granularidad óptima.
 
 **🚨 PRINCIPIO CRÍTICO: PRESERVACIÓN DE CRITERIOS ORIGINALES**
 - **NUNCA inventar** nuevos criterios de aceptación
@@ -20,8 +22,8 @@ Esta kata define el proceso para analizar y optimizar la granularidad de las His
 
 ```mermaid
 graph TD
-    A[Feature Enriquecido] --> B[L1-09: Análisis Ecosistema]
-    B --> C[L1-12: Análisis Granularidad Multi-Repo]
+    A[Feature Enriquecido] --> B[flujo-09: Análisis Ecosistema]
+    B --> C[flujo-12: Análisis Granularidad Multi-Repo]
     C --> D[HUs Optimizadas]
     D --> E[Tech Design Único]
     E --> F[Historias Implementables]
@@ -32,8 +34,8 @@ graph TD
 
 ## Cuándo Aplicar Esta Kata
 
-- **DESPUÉS** del análisis de ecosistema L1-09
-- **ANTES** del diseño técnico L1-08
+- **DESPUÉS** del análisis de ecosistema (kata flujo-09)
+- **ANTES** del diseño técnico (kata flujo de Tech Design)
 - **CON CONTEXTO** de repositorios impactados y nivel de reutilización identificado
 
 ## Criterios de Evaluación Multi-Repo
@@ -95,7 +97,7 @@ cohesion_critica:
 
 #### 2. **Reutilización Alta del Ecosistema**
 
-- Si L1-09 identificó 95%+ reutilización → menor necesidad de división
+- Si flujo-09 identificó 95%+ reutilización → menor necesidad de división
 - Cambios mínimos en servicios existentes → mantener cohesión
 
 ## Proceso de Análisis Multi-Repo
@@ -130,6 +132,10 @@ contexto_ecosistema_hu:
       dependencias_externas: []
 ```
 
+**Verificación:** Existe `contexto_ecosistema_hu` con mapeo de cada HU a su repositorio principal, nivel de cambios y dependencias externas.
+
+> **Si no puedes continuar:** Análisis de ecosistema (flujo-09) incompleto → Ejecutar primero la kata flujo-09 para obtener el mapeo de servicios y dependencias.
+
 ### Paso 2: Análisis de Granularidad Informado
 
 ```yaml
@@ -154,6 +160,10 @@ analisis_granularidad_informado:
       - "Funcionalidades independientes identificadas"
       - "Reutilización alta reduce riesgo de división"
 ```
+
+**Verificación:** Cada HU evaluada tiene una `decision_informada` con acción (DIVIDIR/MANTENER) y justificación basada en factores de ecosistema y granularidad.
+
+> **Si no puedes continuar:** Decisión sin justificación → Documentar explícitamente los factores que llevan a la decisión antes de proceder.
 
 ### Paso 3: **PRESERVACIÓN Y REDISTRIBUCIÓN DE CRITERIOS ORIGINALES**
 
@@ -218,6 +228,10 @@ preservacion_criterios_originales:
 6. **✅ OBLIGATORIO:** Validar que suma de criterios = total original
 7. **✅ OBLIGATORIO:** Documentar trazabilidad criterio → sub-HU
 
+**Verificación:** `validacion_completitud` muestra: criterios_originales = criterios_redistribuidos, criterios_perdidos = 0, criterios_inventados = 0.
+
+> **Si no puedes continuar:** Criterios no balanceados → Revisar la redistribución hasta que la suma de criterios en sub-HUs iguale exactamente los criterios originales.
+
 ### Paso 4: Propuesta de División Optimizada CON CRITERIOS PRESERVADOS
 
 ```yaml
@@ -268,6 +282,10 @@ division_optimizada_con_criterios_preservados:
     preservacion_completa: true
 ```
 
+**Verificación:** Cada sub-HU tiene `criterios_originales_preservados` con texto exacto y `criterios_inventados: []` vacío.
+
+> **Si no puedes continuar:** Sub-HU con criterios inventados → Eliminar criterios no originales y redistribuir únicamente los criterios de la HU padre.
+
 ### Paso 5: Validación Multi-Repo CON PRESERVACIÓN
 
 ```yaml
@@ -294,6 +312,10 @@ validacion_multirepo_con_preservacion:
     estimaciones_precisas: true     # HUs más pequeñas
     riesgo_reducido: true           # De 8 SP a máximo 3 SP
 ```
+
+**Verificación:** `validacion_multirepo_con_preservacion` tiene todos los criterios en `true`, especialmente `criterios_inventados: false`.
+
+> **Si no puedes continuar:** Validación fallida → Revisar el paso correspondiente al criterio que falló antes de proceder con los patrones de división.
 
 ## Patrones de División Multi-Repo CON PRESERVACIÓN DE CRITERIOS
 
@@ -495,7 +517,7 @@ hus_optimizadas:
 
 granularity_analysis:
   execution_date: "2024-12-XX"
-  kata_applied: "L1-12"
+  kata_applied: "flujo-12"
   preservation_validation:  # ⭐ NUEVA SECCIÓN CRÍTICA
     total_original_criteria: 18
     total_redistributed_criteria: 18
@@ -603,7 +625,7 @@ user_stories:
 - ✅ **Granularidad Optimizada:** 0% HUs >6 SP
 - ✅ **Desarrollo Paralelo:** >80% HUs independientes  
 - ✅ **Coordinación Mínima:** <20% HUs requieren sincronización inter-repo
-- ✅ **Preservación Ecosistema:** Mantiene nivel de reutilización del L1-09
+- ✅ **Preservación Ecosistema:** Mantiene nivel de reutilización del flujo-09
 - ✅ **Preservación Criterios:** 100% criterios originales preservados, 0% criterios inventados
 - ✅ **Preservación Histórica:** HUs originales comentadas y preservadas para trazabilidad
 - ✅ **Trazabilidad Completa:** Decisiones justificadas con contexto del ecosistema y mapeo criterio→sub-HU
