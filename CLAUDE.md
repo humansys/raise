@@ -187,6 +187,7 @@ raise-commons/
 - Git version control (plain text markdown files)
 - Git repository (versioned Markdown and JSON files) (005-katas-ontology-audit)
 - Git repository (versioned Markdown files) (006-katas-normalization)
+- Markdown (CommonMark spec) + Git 2.0+, GitLab (platform) (007-public-repo-readiness)
 
 ## Recent Changes
 - 004-operation-layers: Documento `26-work-cycles-v2.1.md` formalizando los 4 ciclos de trabajo; entrada Work Cycle en glosario
