@@ -2,10 +2,10 @@
 description: Create or update the feature specification from a natural language feature description.
 handoffs: 
   - label: Build Technical Plan
-    agent: speckit.plan
+    agent: speckit.3.plan
     prompt: Create a plan for the spec. I am building with...
   - label: Clarify Spec Requirements
-    agent: speckit.clarify
+    agent: speckit.2.clarify
     prompt: Clarify specification requirements
     send: true
 ---
@@ -24,7 +24,12 @@ The text the user typed after `/speckit.specify` in the triggering message **is*
 
 Given that feature description, do this:
 
-1. **Generate a concise short name** (2-4 words) for the branch:
+1. **Upstream Verification**:
+   - Check if `specs/main/project_requirements.md` (PRD) and `specs/main/solution_vision.md` (Vision) exist.
+   - If BOTH are missing, WARN the user: "⚠️ It appears the Upstream discovery and vision phases are incomplete. For best results, it is recommended to run `/raise.1.discovery` and `/raise.2.vision` first to ensure the feature aligns with the project's strategic goals."
+   - If present, use these artifacts as primary context for generating the specification to ensure architectural and business alignment.
+
+2. **Generate a concise short name** (2-4 words) for the branch:
    - Analyze the feature description and extract the most meaningful keywords
    - Create a 2-4 word short name that captures the essence of the feature
    - Use action-noun format when possible (e.g., "add-user-auth", "fix-payment-bug")
@@ -36,7 +41,7 @@ Given that feature description, do this:
      - "Create a dashboard for analytics" → "analytics-dashboard"
      - "Fix payment processing timeout bug" → "fix-payment-timeout"
 
-2. **Check for existing branches before creating new one**:
+3. **Check for existing branches before creating new one**:
 
    a. First, fetch all remote branches to ensure we have the latest information:
 
@@ -68,9 +73,9 @@ Given that feature description, do this:
    - The JSON output will contain BRANCH_NAME and SPEC_FILE paths
    - For single quotes in args like "I'm Groot", use escape syntax: e.g 'I'\''m Groot' (or double-quote if possible: "I'm Groot")
 
-3. Load `.specify/templates/spec-template.md` to understand required sections.
+4. Load `.specify/templates/spec-template.md` to understand required sections.
 
-4. Follow this execution flow:
+5. Follow this execution flow:
 
     1. Parse user description from Input
        If empty: ERROR "No feature description provided"
@@ -96,9 +101,9 @@ Given that feature description, do this:
     7. Identify Key Entities (if data involved)
     8. Return: SUCCESS (spec ready for planning)
 
-5. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
+6. Write the specification to SPEC_FILE using the template structure, replacing placeholders with concrete details derived from the feature description (arguments) while preserving section order and headings.
 
-6. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
+7. **Specification Quality Validation**: After writing the initial spec, validate it against quality criteria:
 
    a. **Create Spec Quality Checklist**: Generate a checklist file at `FEATURE_DIR/checklists/requirements.md` using the checklist template structure with these validation items:
 
@@ -136,7 +141,7 @@ Given that feature description, do this:
       
       ## Notes
       
-      - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
+      - Items marked incomplete require spec updates before `/speckit.2.clarify` or `/speckit.3.plan`
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:
@@ -190,7 +195,7 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-7. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
+8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.2.clarify` or `/speckit.3.plan`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 

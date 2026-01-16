@@ -2,10 +2,10 @@
 description: Create or update the feature specification from a natural language feature description.
 handoffs: 
   - label: Build Technical Plan
-    agent: speckit.plan
+    agent: speckit.3.plan
     prompt: Create a plan for the spec. I am building with...
   - label: Clarify Spec Requirements
-    agent: speckit.clarify
+    agent: speckit.2.clarify
     prompt: Clarify specification requirements
     send: true
 ---
@@ -26,7 +26,7 @@ Given that feature description, do this:
 
 1. **Upstream Verification**:
    - Check if `specs/main/project_requirements.md` (PRD) and `specs/main/solution_vision.md` (Vision) exist.
-   - If BOTH are missing, WARN the user: "⚠️ It appears the Upstream discovery and vision phases are incomplete. For best results, it is recommended to run `/speckit.raise.discovery` and `/speckit.raise.vision` first to ensure the feature aligns with the project's strategic goals."
+   - If BOTH are missing, WARN the user: "⚠️ It appears the Upstream discovery and vision phases are incomplete. For best results, it is recommended to run `/raise.1.discovery` and `/raise.2.vision` first to ensure the feature aligns with the project's strategic goals."
    - If present, use these artifacts as primary context for generating the specification to ensure architectural and business alignment.
 
 2. **Generate a concise short name** (2-4 words) for the branch:
@@ -141,7 +141,7 @@ Given that feature description, do this:
       
       ## Notes
       
-      - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
+      - Items marked incomplete require spec updates before `/speckit.2.clarify` or `/speckit.3.plan`
       ```
 
    b. **Run Validation Check**: Review the spec against each checklist item:
@@ -195,7 +195,7 @@ Given that feature description, do this:
 
    d. **Update Checklist**: After each validation iteration, update the checklist file with current pass/fail status
 
-8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.clarify` or `/speckit.plan`).
+8. Report completion with branch name, spec file path, checklist results, and readiness for the next phase (`/speckit.2.clarify` or `/speckit.3.plan`).
 
 **NOTE:** The script creates and checks out the new branch and initializes the spec file before writing.
 
