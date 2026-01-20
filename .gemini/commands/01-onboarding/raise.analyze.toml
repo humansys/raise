@@ -1,0 +1,70 @@
+description = "Perform an integral brownfield codebase analysis using Raise SAR templates."
+
+prompt = """
+---
+description: Perform an integral brownfield codebase analysis using Raise SAR templates.
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You **MUST** consider the user input before proceeding (if not empty).
+
+## Outline
+
+Goal: Perform an integral brownfield codebase analysis to understand structure, patterns, and quality following the `patron-01-code-analysis`.
+
+1. **Initialize Environment**:
+   - Run `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` to get REPO_ROOT and paths.
+   - Load Raise SAR templates from `.specify/templates/raise/sar/`.
+
+2. **Evidence Discovery Flow**:
+   - **Directory Mapping**: Use `fd` or `ls -R` to understand folder organization.
+   - **Entry Points**: Find main components, indexes or app entry points.
+   - **Dependencies**: Extract technologies and libraries from config files.
+   - **Verificación**: Existe contexto visual de la estructura del repositorio.
+   - > **Si no puedes continuar**: Estructura desconocida → Solicitar al usuario que especifique los paths de código fuente (`src/`, `app/`, etc.).
+
+3. **Pattern Analysis**:
+   - Identify Clean Code and Architecture patterns (or anti-patterns).
+   - **Verificación**: Los patrones detectados están respaldados por evidencia en el código.
+   - > **Si no puedes continuar**: Código sin patrones claros → Documentar como "Sin patrón dominante" y describir la realidad actual sin forzar categorías.
+
+4. **Generate SAR Reports**:
+   - Write all 7 standard reports into `specs/main/analysis/` in **Spanish**:
+     - `resumen_repositorio.md`: General stack.
+     - `descripcion_general_arquitectura.md`: Detected layers and Mermaid diagram.
+     - `informe_analisis_codigo_limpio.md`: Clean Code violations with code examples.
+     - `informe_analisis_arquitectura_limpia.md`: Dependency rules check.
+     - `informe_desglose_componentes.md`: Modules/projects deep dive.
+     - `informe_mapa_dependencias.md`: Internal dependency graph.
+     - `recomendaciones_refactorizacion.md`: Prioritized refactors with business impact.
+
+5. **Quality Validation**:
+   - Create a checklist at `specs/main/analysis/checklists/analysis_quality.md`:
+     - [ ] All 7 SAR reports have been generated.
+     - [ ] Code examples are provided for every violation.
+     - [ ] Architecture diagram (Mermaid) is present.
+     - [ ] Technical debt is categorized by impact on business.
+
+6. **Finalize**:
+   - Run `.specify/scripts/bash/update-agent-context.sh gemini`.
+   - Confirm directory content with `check_dir "specs/main/analysis/" "System Analysis (SAR)"`.
+
+## High-Signaling Guidelines
+
+- **Focus**: Objectivity and actionability over academic perfection.
+- **Language**: Instructions English; Content **SPANISH**.
+- **Jidoka**: Stop and ask for paths if the entry points cannot be determined.
+
+## AI Guidance
+
+When executing this workflow:
+1. **Be Pragmatic**: Analyze "what is" before suggesting "what should be".
+2. **Impact-Oriented**: Translate technical issues into business risk.
+3. **No Hallucinations**: Every finding must be backed by a file path or code snippet.
+4. **Consistency**: Use the 7-SAR report standard consistently.
+"""

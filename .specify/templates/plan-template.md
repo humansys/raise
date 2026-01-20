@@ -30,15 +30,8 @@
 ## Constitution Check
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
-*Reference: `.specify/memory/constitution.md`*
 
-| Principio | Verificación | Estado |
-|-----------|--------------|--------|
-| I. Coherencia Semántica | Términos alineados con glosario | [ ] |
-| II. Governance como Código | Artefactos versionados en Git | [ ] |
-| III. Validación en Cada Fase | Gates definidos para cada entregable | [ ] |
-| IV. Simplicidad | Sin abstracciones innecesarias | [ ] |
-| V. Mejora Continua | Feedback loops identificados | [ ] |
+[Gates determined based on constitution file]
 
 ## Project Structure
 
