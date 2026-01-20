@@ -1,113 +1,50 @@
-<!--
-SYNC IMPACT REPORT
-==================
-Version change: 0.0.0 → 1.0.0
-Modified principles: N/A (initial population from template)
-Added sections:
-  - 5 Core Principles derived from RaiSE Constitution v2.0.0
-  - Restricciones de Trabajo section
-  - Proceso de Cambios section
-  - Complete Governance section
-Removed sections: N/A (template placeholders replaced)
-Templates requiring updates:
-  - .specify/templates/plan-template.md: ✅ updated (Constitution Check table added)
-  - .specify/templates/spec-template.md: ✅ reviewed (compatible)
-  - .specify/templates/tasks-template.md: ✅ reviewed (compatible)
-  - .specify/templates/checklist-template.md: ✅ reviewed (compatible)
-  - .specify/templates/agent-file-template.md: ✅ reviewed (compatible)
-Follow-up TODOs: None
--->
+# [PROJECT_NAME] Constitution
+<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
 
-# RaiSE Commons Constitution
+## Core Principles
 
-## Principios Fundamentales
+### [PRINCIPLE_1_NAME]
+<!-- Example: I. Library-First -->
+[PRINCIPLE_1_DESCRIPTION]
+<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
 
-### I. Coherencia Semántica Primero
+### [PRINCIPLE_2_NAME]
+<!-- Example: II. CLI Interface -->
+[PRINCIPLE_2_DESCRIPTION]
+<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
 
-Toda documentación y artefacto DEBE mantener coherencia semántica con la ontología RaiSE. Los términos, conceptos y relaciones definidos en el glosario son la fuente de verdad. Ningún documento puede contradecir o redefinir términos establecidos sin proceso formal de enmienda.
+### [PRINCIPLE_3_NAME]
+<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
+[PRINCIPLE_3_DESCRIPTION]
+<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
 
-**Implicación práctica:** Antes de crear o modificar documentación, verificar alineación con `20-glossary-v2.1.md` y la ontología vigente.
+### [PRINCIPLE_4_NAME]
+<!-- Example: IV. Integration Testing -->
+[PRINCIPLE_4_DESCRIPTION]
+<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
 
-### II. Governance como Código
+### [PRINCIPLE_5_NAME]
+<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
+[PRINCIPLE_5_DESCRIPTION]
+<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
 
-Las políticas, estructuras y estándares son artefactos versionados en Git, no documentos estáticos. Lo que no está en el repositorio, no existe oficialmente. Cada cambio a la ontología requiere trazabilidad completa.
+## [SECTION_2_NAME]
+<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
 
-**Jerarquía de documentos:**
-```
-Constitution (Principios inmutables)
-    ↓
-ADRs (Decisiones arquitectónicas)
-    ↓
-Modelo Ontológico (Glosario, Metodología, Templates)
-    ↓
-Artefactos Derivados (Specs, Plans, Tasks)
-```
+[SECTION_2_CONTENT]
+<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
 
-### III. Validación en Cada Fase
+## [SECTION_3_NAME]
+<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
 
-No existe un solo "Done". Cada artefacto tiene criterios de validación que DEBEN cumplirse antes de considerarse completo. La calidad semántica no es un evento final; es un proceso continuo.
-
-**Validation Gates para este repositorio:**
-| Gate | Artefacto | Criterio |
-|------|-----------|----------|
-| Gate-Terminología | Glosario | Términos sin ambigüedad, definiciones completas |
-| Gate-Coherencia | Cualquier .md | Sin contradicciones con ontología existente |
-| Gate-Trazabilidad | ADRs, Cambios | Historial y rationale documentado |
-| Gate-Estructura | Templates | Secciones requeridas presentes |
-
-### IV. Simplicidad sobre Completitud
-
-Preferir documentación concisa que cubra el 80% de casos sobre documentación exhaustiva que nadie lee. Los conceptos complejos DEBEN descomponerse en unidades comprensibles. Evitar abstracciones prematuras en la ontología.
-
-**Principio YAGNI aplicado:** No crear términos, categorías o estructuras "por si acaso". Cada adición a la ontología debe justificarse con uso concreto.
-
-### V. Mejora Continua (Kaizen)
-
-Si un término genera confusión o un template no se usa correctamente, se refina. El sistema aprende de sus fallos y mejora para la siguiente iteración. Toda retroalimentación sobre la ontología es valiosa.
-
-**Ciclo de mejora:**
-```
-Documentar → Usar → Observar fricciones → Reflexionar → Mejorar → Documentar...
-```
-
-## Restricciones de Trabajo
-
-### Nunca:
-- Crear documentación sin verificar coherencia con ontología existente
-- Introducir términos nuevos sin definición en el glosario
-- Modificar definiciones establecidas sin ADR que lo justifique
-- Sacrificar claridad por brevedad
-- Usar terminología inconsistente entre documentos
-
-### Siempre:
-- Validar specs y plans contra esta constitution
-- Documentar decisiones significativas en ADRs
-- Mantener referencias cruzadas entre documentos relacionados
-- Proveer ejemplos concretos para conceptos abstractos
-- Incluir fecha y versión en documentos formales
-
-## Proceso de Cambios
-
-Esta Constitution puede modificarse bajo las siguientes condiciones:
-
-1. **Propuesta documentada** con rationale claro
-2. **Evaluación de impacto** en documentos dependientes
-3. **Aprobación** del maintainer del repositorio
-4. **Actualización** de documentos afectados
-5. **Comunicación** del cambio con changelog
+[SECTION_3_CONTENT]
+<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
 
 ## Governance
+<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-**Política de versionado:**
-- MAJOR: Cambios incompatibles en principios o estructura
-- MINOR: Nuevas secciones o expansión de guidance
-- PATCH: Clarificaciones, correcciones menores
+[GOVERNANCE_RULES]
+<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
 
-**Revisión de compliance:**
-- Todo PR debe verificar que no viola principios de esta constitution
-- Cambios a la ontología requieren revisión explícita de coherencia
-- Los templates deben mantenerse alineados con los principios
-
-**Archivo de referencia:** `.specify/memory/constitution.md` es la fuente de verdad para governance del workflow speckit en este repositorio.
-
-**Versión**: 1.0.0 | **Ratificada**: 2026-01-11 | **Última Enmienda**: 2026-01-11
+**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
+<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->

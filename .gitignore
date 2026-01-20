@@ -1,2 +1,11 @@
 .specstory/
 .cursor/
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# Script generated folders (if testing locally)
+.specify-raise/commands/
