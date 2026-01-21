@@ -191,6 +191,8 @@ raise-commons/
 - Git-based text files (Markdown with YAML frontmatter) (009-backlog-command)
 - Markdown (CommonMark spec) for command file + template, Bash for prerequisite scripts (010-estimation-command)
 - Git repository (versioned Markdown files in `specs/main/`) (010-estimation-command)
+- Markdown (for command definition) + Bash (for scripts) + `raise-kit` existing scripts (`check-prerequisites.sh`, `update-agent-context.sh`) (001-sow-command)
+- Local Filesystem (reading inputs from `specs/main/`, writing output to `specs/main/`) (001-sow-command)
 
 ## Recent Changes
 - 004-operation-layers: Documento `26-work-cycles-v2.1.md` formalizando los 4 ciclos de trabajo; entrada Work Cycle en glosario
