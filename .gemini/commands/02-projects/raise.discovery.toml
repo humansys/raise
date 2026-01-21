@@ -5,7 +5,7 @@ prompt = """
 description: Transform raw discovery notes or meeting transcripts into a structured Product Requirements Document (PRD).
 handoffs: 
   - label: Define Solution Vision
-    agent: raise.vision
+    agent: raise.2.vision
     prompt: Create the solution vision for this PRD
     send: true
 ---
@@ -66,16 +66,36 @@ Goal: Transform initial discovery notes into a validated PRD in `specs/main/proj
    - **Verificación**: Cada riesgo tiene una estrategia de mitigación asociada.
    - > **Si no puedes continuar**: No se identifican riesgos → Usar técnica de pre-mortem: "Imagina que el proyecto fracasó, ¿qué salió mal?".
 
-10. **Paso 9: Validar PRD**:
-    - Generar el contenido final en `specs/main/project_requirements.md`.
+10. **Paso 9: Validar PRD con Stakeholders**:
+    - **IMPORTANTE**: Primero GENERA el archivo `specs/main/project_requirements.md` con todo el contenido del PRD.
     - **LIMIT: Maximum 3 [NEEDS CLARIFICATION] markers total**.
-    - **Verificación**: El PRD está completo y listo para validación formal.
-    - > **Si no puedes continuar**: Información crítica faltante → Documentar como "pendiente aprobación formal" y establecer deadline.
+    - Luego, presenta el PRD para revisión y aprobación:
+      1. Indicar que el PRD debe enviarse con 24-48 horas de anticipación
+      2. Recomendar agendar sesión de revisión (30-60 min)
+      3. Capturar feedback y ajustar
+      4. Obtener aprobación explícita
+    - **Verificación**: El PRD tiene aprobación explícita (email, comentario en documento, o acta de reunión) de al menos un stakeholder clave.
+    - > **Si no puedes continuar**: Stakeholder no disponible → Documentar intento de validación (fecha, canal) y proceder con nota de "pendiente aprobación formal". Establecer deadline para aprobación antes de iniciar Fase 2.
 
 11. **Finalize & Validate**:
+    - Confirm file existence with `check_file "specs/main/project_requirements.md" "PRD Generation"`.
     - Ejecutar validación usando `.specify/gates/raise/gate-discovery.md`.
     - Run `.specify/scripts/bash/update-agent-context.sh gemini`.
-    - Confirm file existence with `check_file "specs/main/project_requirements.md" "PRD Generation"`.
+    - Verificar que el PRD cumple los criterios del gate:
+      - [ ] Problema de negocio articulado claramente
+      - [ ] Metas y métricas de éxito definidas con números
+      - [ ] Alcance (in/out) explícito
+      - [ ] Requisitos funcionales testeables
+      - [ ] Requisitos no funcionales cuantificados
+      - [ ] Supuestos y riesgos documentados
+      - [ ] Aprobación de al menos un stakeholder
+
+## Notas
+
+### Para Proyectos Brownfield
+Antes de ejecutar este flujo, considerar ejecutar:
+- Análisis de código existente para entender la base actual
+- Mapeo de dependencias del ecosistema
 
 ## High-Signaling Guidelines
 

@@ -1,6 +1,3 @@
-description = "Automated rule generation engine based on patterns detected in the code. Implements Katas L2-01 and L2-03."
-
-prompt = """
 ---
 description: Automated rule generation engine based on patterns detected in the code. Implements Katas L2-01 and L2-03.
 handoffs: 
@@ -19,7 +16,7 @@ You can specify a directory or component to analyze (e.g., `src/components`). If
 
 ## Outline
 
-Goal: Identify recurring patterns and formalize them as AI rules (.md) following Raise Katas L2-01 and L2-03, using `specs/` for governance.
+Goal: Identify recurring patterns and formalize them as Cursor rules (.mdc) following Raise Katas L2-01 and L2-03, using `specs/` for governance.
 
 1. **Initialize Environment**:
    - Run `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` to get REPO_ROOT and paths.
@@ -35,7 +32,7 @@ Goal: Identify recurring patterns and formalize them as AI rules (.md) following
      - **a. Evidence Collection**: Find 3-5 real examples and 2 anti-examples in the code.
      - **b. Analysis Document**: Create `specs/main/analysis/rules/analysis-for-[rule-name].md` in **Spanish** documented the reasoning, examples, and justification.
      - **c. Rule Design**: Define YAML front matter (`name`, `description`, `globs`, `tags`) and clear instructions in Spanish.
-     - **d. File Writing**: Generate `.agent/rules/[ID]-[name].md`.
+     - **d. File Writing**: Generate `.cursor/rules/[ID]-[name].mdc`.
 
 4. **Update Governance Registry**:
    - Update `specs/main/ai-rules-reasoning.md` in **Spanish**.
@@ -43,7 +40,7 @@ Goal: Identify recurring patterns and formalize them as AI rules (.md) following
 
 5. **Finalize**:
    - Run `.specify/scripts/bash/update-agent-context.sh gemini`.
-   - Confirm file existence with `check_file ".agent/rules/[ID]-[name].md" "Rule Metadata"`.
+   - Confirm file existence with `check_file ".cursor/rules/[ID]-[name].mdc" "Rule Metadata"`.
 
 ## High-Signaling Guidelines
 
@@ -71,4 +68,3 @@ When executing this workflow:
 1. **Be Precise**: Globs must be restrictive enough to target only the intended files.
 2. **Real over Theoretical**: Prioritize actual observed patterns in the repo over general best practices.
 3. **Memory Sync**: The `ai-rules-reasoning.md` file is your long-term memory; never skip updating it.
-"""
