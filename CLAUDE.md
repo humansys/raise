@@ -189,6 +189,8 @@ raise-commons/
 - Git repository (versioned Markdown files) (006-katas-normalization)
 - Markdown (CommonMark spec) for command file, Bash for scripts (009-backlog-command)
 - Git-based text files (Markdown with YAML frontmatter) (009-backlog-command)
+- Markdown (CommonMark spec) for command file + template, Bash for prerequisite scripts (010-estimation-command)
+- Git repository (versioned Markdown files in `specs/main/`) (010-estimation-command)
 
 ## Recent Changes
 - 004-operation-layers: Documento `26-work-cycles-v2.1.md` formalizando los 4 ciclos de trabajo; entrada Work Cycle en glosario
