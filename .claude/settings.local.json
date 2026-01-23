@@ -3,7 +3,14 @@
     "allow": [
       "Bash(ls:*)",
       "Bash(.specify/scripts/bash/setup-plan.sh:*)",
-      "Bash(.specify/scripts/bash/check-prerequisites.sh --json)"
+      "Bash(.specify/scripts/bash/check-prerequisites.sh --json)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:github.blog)",
+      "WebFetch(domain:deepwiki.com)",
+      "WebFetch(domain:den.dev)",
+      "WebFetch(domain:blog.scottlogic.com)",
+      "Bash(find:*)"
     ]
   }
 }

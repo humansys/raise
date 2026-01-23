@@ -25,6 +25,7 @@
 | ADR-009 | ShuHaRi Hybrid Implementation | ✅ Accepted | 2025-12-29 | [adr-009](./adr-009-shuhari-hybrid.md) |
 | ADR-010 | Ontología de Comandos CLI | ✅ Accepted | 2025-12-29 | [adr-010](./adr-010-cli-ontology.md) |
 | ADR-011 | Modelo Híbrido: Katas, Templates y Gates | ✅ Accepted | 2026-01-12 | [adr-011](./adr-011-hybrid-kata-template-gate.md) |
+| ADR-012 | Consolidación de Comandos spec-kit | 📝 Proposed | 2026-01-22 | [adr-012](./adr-012-speckit-command-consolidation.md) |
 
 ---
 
@@ -93,6 +94,9 @@ Usar este template para nuevos ADRs. Guardar como `adr-XXX-titulo-kebab-case.md`
 ---
 
 ## Changelog
+
+### v2.2.0 (2026-01-22)
+- **NUEVO**: ADR-012 Consolidación de Comandos spec-kit (Proposed)
 
 ### v2.1.0 (2025-12-29)
 - **REFACTOR**: Un archivo por ADR (antes: monolito)
