@@ -10,7 +10,18 @@
       "WebFetch(domain:deepwiki.com)",
       "WebFetch(domain:den.dev)",
       "WebFetch(domain:blog.scottlogic.com)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "WebFetch(domain:www.arsturn.com)",
+      "WebFetch(domain:dev.to)",
+      "WebFetch(domain:www.speakeasy.com)",
+      "WebFetch(domain:mikhail.io)",
+      "WebFetch(domain:lucumr.pocoo.org)",
+      "WebFetch(domain:www.lyzr.ai)",
+      "WebFetch(domain:medium.com)",
+      "Bash(wc:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nresearch: critical spec-kit & MCP vs CLI+Skills architecture analysis for RaiSE differentiation\n\nTwo comprehensive research projects executed to inform critical architectural decisions:\n\n1. Spec-Kit Critiques Analysis\n   - Created research prompt \\(full + concise versions\\)\n   - Identified 32 product limitations, 12 philosophical tensions\n   - Key findings: 10x slower, 3.7:1 doc overhead, brownfield failures\n   - Deliverables: critique taxonomy, differentiation strategy, feature specs\n   - Output: ~20K words of evidence-based analysis\n\n2. MCP vs CLI+Skills Architecture Research\n   - Created research prompt \\(full + concise versions\\)\n   - Validated 70% token reduction claim \\(actual: 80-99%\\)\n   - MCP confirmed: 50-100K tokens for 100-200 tools\n   - Recommended: Hybrid multi-tier architecture \\(92% savings\\)\n   - Deliverables: comparative analysis, decision matrix, POC spec\n   - Output: ~24K words with empirical measurements\n\nStrategic Impact:\n- Clear differentiation path for RaiSE spec-kit fork\n- Hybrid architecture: Hot \\(static\\) + Warm \\(skills\\) + Cold \\(RAG\\)\n- Positioning: \"Enterprise-scale AI governance without context exhaustion\"\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
