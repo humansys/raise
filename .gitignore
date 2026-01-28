@@ -1,6 +1,9 @@
 .specstory/
 .cursor/
 
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+
 # Temporary files
 *.tmp
 *.log
