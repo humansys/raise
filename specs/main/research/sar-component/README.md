@@ -1,35 +1,49 @@
-# SAR Component - Research & Specifications
+# RaiSE Governance Components
 
-**SAR = Software Architecture Reconstruction**
+Este directorio contiene la documentacion de los componentes de gobernanza de RaiSE.
 
-Este directorio contiene toda la documentacion de research y especificaciones para el componente SAR de RaiSE.
+## Arquitectura
 
-## Vision General
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    RAISE GOVERNANCE ARCHITECTURE                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                          │
+│  ┌─────────────────────┐         ┌─────────────────────────────────┐   │
+│  │        SAR          │         │          raise.ctx              │   │
+│  │   (Extracción)      │         │      (Entrega de MVC)           │   │
+│  ├─────────────────────┤         ├─────────────────────────────────┤   │
+│  │ • Analiza codebase  │ ──────▶ │ • Lee rules + graph             │   │
+│  │ • Extrae patrones   │ genera  │ • Traversal determinista        │   │
+│  │ • Genera reglas     │  data   │ • Filtra por task/scope         │   │
+│  │ • Construye grafo   │         │ • Entrega MVC al agente         │   │
+│  ├─────────────────────┤         ├─────────────────────────────────┤   │
+│  │ CLI: raise sar      │         │ CLI: raise ctx                  │   │
+│  │ Frecuencia: Batch   │         │ Frecuencia: On-demand           │   │
+│  └─────────────────────┘         └─────────────────────────────────┘   │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
-SAR es el componente que:
-1. **Extrae** patrones y convenciones de codebases brownfield
-2. **Representa** esas convenciones como reglas en un grafo de conocimiento
-3. **Entrega** el Minimum-Viable Context (MVC) a agentes LLM
-
-## Estrategia de Producto
-
-SAR sigue un modelo **Open Core**:
-
-| Tier | Caracteristicas | Target |
-|------|-----------------|--------|
-| **Open Core** (Free) | SAR no-determinista, stack-agnostico, metodologia completa | Developers, equipos pequenos |
-| **Licensed** (Paid) | SAR determinista, pipeline observable, integraciones enterprise | Empresas, equipos grandes |
-
-El Open Core usa el patron **"Deterministic Rails, Non-Deterministic Engine"**: workflow estructurado (spec-kit harness) + LLM synthesis (BMAD patterns).
+| Componente | Responsabilidad | Frecuencia |
+|------------|-----------------|------------|
+| **SAR** | Extraer patrones, generar reglas y grafo | Batch (cuando codebase cambia) |
+| **raise.ctx** | Entregar MVC a agentes | On-demand (cada task) |
 
 ## Documentos
 
-### Core (Solution)
+### Solution Visions
+
+| Documento | Componente | Status |
+|-----------|------------|--------|
+| [solution-vision.md](./solution-vision.md) | SAR (Extracción) | Aprobado v1.1.0 |
+| [solution-vision-context.md](./solution-vision-context.md) | raise.ctx (Entrega) | Borrador v1.0.0 |
+
+### Roadmap
 
 | Documento | Proposito | Status |
 |-----------|-----------|--------|
-| [solution-vision.md](./solution-vision.md) | Vision estrategica del componente (v1.0.0) | Aprobado |
-| [solution-roadmap.md](./solution-roadmap.md) | Roadmap tactico y fases de implementacion | Activo |
+| [solution-roadmap.md](./solution-roadmap.md) | Roadmap de implementacion | Activo |
 
 ### Research
 
@@ -37,52 +51,87 @@ El Open Core usa el patron **"Deterministic Rails, Non-Deterministic Engine"**: 
 |-----------|-----------|--------|
 | [semantic-density/](./semantic-density/) | Formatos de representacion de reglas | Completado |
 
-### Research Relacionado (otros directorios)
+### Archivo
 
-| Documento | Proposito |
-|-----------|-----------|
-| [../deterministic-rule-extraction/](../deterministic-rule-extraction/) | Patrones de extraccion determinista |
-| [../rule-extraction-alignment/](../rule-extraction-alignment/) | Alineacion de extraccion de reglas |
-| [../bmad-brownfield-analysis/](../bmad-brownfield-analysis/) | Analisis de codebase brownfield (BMAD patterns) |
-| [../speckit-critiques/](../speckit-critiques/) | Analisis de spec-kit (harness determinista) |
+| Documento | Nota |
+|-----------|------|
+| [solution-vision-sar.md](./solution-vision-sar.md) | Version anterior combinada |
 
 ## Conceptos Clave
 
-### Regla Unitaria
-Documento YAML+Markdown auto-contenido que representa una convencion o patron.
+### SAR (Software Architecture Reconstruction)
 
-### Grafo de Conocimiento
-Estructura que conecta reglas con relaciones semanticas:
-- `requires` - dependencia
-- `conflicts_with` - exclusion mutua
-- `supersedes` - deprecacion
-- `related_to` - informacional
+- **Que hace**: Analiza codebase brownfield, extrae patrones, genera reglas
+- **Output**: `.raise/rules/*.yaml`, `.raise/graph.yaml`
+- **CLI**: `raise sar analyze [path]`
+- **Tiers**: Open Core (LLM) / Licensed (determinista)
+
+### raise.ctx (RaiSE Context)
+
+- **Que hace**: Entrega Minimum-Viable Context a agentes
+- **Input**: Query (task + scope) + datos de SAR
+- **Output**: MVC (reglas + contexto + warnings)
+- **CLI**: `raise ctx get --task "..." --scope "..."`
+- **Caracteristica**: Siempre determinista
 
 ### Minimum-Viable Context (MVC)
-Conjunto minimo de reglas + contexto relacional necesario para que un agente complete una tarea.
+
+Conjunto minimo de reglas + contexto relacional para una tarea:
+- `primary_rules`: Reglas directamente aplicables
+- `context_rules`: Reglas relacionadas (summaries)
+- `warnings`: Conflictos, deprecaciones, low-confidence
+- `graph_context`: Subgrafo relevante
+
+### Data Store (`.raise/`)
+
+Output de SAR, input de raise.ctx:
+```
+.raise/
+├── rules/
+│   └── *.yaml           # Reglas unitarias
+├── graph.yaml           # Grafo de relaciones
+├── conventions.md       # Documentacion human-readable
+└── project-profile.yaml # Metadata del proyecto
+```
 
 ## Roadmap
 
 ### Track A: Open Core (Prioridad)
-- [ ] A1: Foundation - Schemas y templates de output
-- [ ] A2: Comando `raise.sar.analyze` (no-determinista)
-- [ ] A3: CLI `raise get rules`
-- [ ] A4: Documentacion y launch open source
 
-### Track B: Licensed (Post-validacion Open Core)
-- [ ] B1: Pipeline determinista (ast-grep, ripgrep)
-- [ ] B2: LLM synthesis mejorada
-- [ ] B3: Observabilidad y enterprise features
-- [ ] B4: Graph intelligence avanzado
+| Fase | SAR | raise.ctx |
+|------|-----|-----------|
+| A1 | Schemas y templates | - |
+| A2 | Comando `raise.sar.analyze` | - |
+| A3 | - | CLI `raise ctx get` basico |
+| A4 | Documentacion | Integracion con agentes |
 
-Ver [solution-roadmap.md](./solution-roadmap.md) para detalles completos.
+### Track B: Licensed
 
-## Open Questions
+| Fase | SAR | raise.ctx |
+|------|-----|-----------|
+| B1 | Pipeline determinista | - |
+| B2 | LLM synthesis mejorada | Graph traversal completo |
+| B3 | Observabilidad | Cache y optimizacion |
 
-Ver seccion "Open Questions" en [solution-roadmap.md](./solution-roadmap.md).
+Ver [solution-roadmap.md](./solution-roadmap.md) para detalles.
 
-## Archivo
+## Quick Start (Futuro)
 
-| Documento | Nota |
-|-----------|------|
-| [solution-vision-sar.md](./solution-vision-sar.md) | Version anterior (v0.3.0) - ahora separado en vision + roadmap |
+```bash
+# 1. Ejecutar SAR para extraer reglas
+raise sar analyze ./my-project
+
+# 2. Obtener contexto para una tarea
+raise ctx get --task "implement user service" --scope "src/services/"
+
+# 3. O usar slash command en Claude Code
+/raise.ctx
+```
+
+## Research Relacionado
+
+| Directorio | Proposito |
+|------------|-----------|
+| [../bmad-brownfield-analysis/](../bmad-brownfield-analysis/) | Analisis de BMAD (benchmark) |
+| [../speckit-critiques/](../speckit-critiques/) | Analisis de spec-kit (harness pattern) |
+| [../deterministic-rule-extraction/](../deterministic-rule-extraction/) | Patrones de extraccion determinista |

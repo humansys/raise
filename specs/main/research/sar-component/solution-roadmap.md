@@ -1,12 +1,13 @@
-# SAR Component - Solution Roadmap
+# RaiSE Governance - Solution Roadmap
 
-**Document ID**: ROAD-SAR-001
-**Version**: 1.0.0
+**Document ID**: ROAD-GOV-001
+**Version**: 1.1.0
 **Date**: 2026-01-28
 **Author**: Emilio + Claude Opus 4.5
 **Status**: Activo
 **Related Docs**:
-  - [Solution Vision](./solution-vision.md) - Vision estrategica
+  - [SAR Solution Vision](./solution-vision.md) - Componente de extraccion
+  - [raise.ctx Solution Vision](./solution-vision-context.md) - Componente de entrega
   - [Semantic Density Research](./semantic-density/) - Research de formatos
 
 ---
@@ -21,10 +22,10 @@
 
 ```
 Track A: Open Core
-├── A1: Foundation & Schemas     [ ] En progreso
-├── A2: Comando SAR              [ ] Pendiente
-├── A3: CLI raise get rules      [ ] Pendiente
-└── A4: Documentacion & Launch   [ ] Pendiente
+├── A1: Foundation & Schemas     [ ] En progreso     (SAR)
+├── A2: Comando SAR              [ ] Pendiente       (SAR)
+├── A3: CLI raise ctx            [ ] Pendiente       (raise.ctx)
+└── A4: Documentacion & Launch   [ ] Pendiente       (Ambos)
 
 Track B: Licensed
 └── (Pendiente validacion Open Core)
@@ -40,14 +41,14 @@ El Open Core es el primer entregable, usando el patron "Deterministic Rails, Non
 
 **Entregables:**
 
-| # | Entregable | Descripcion |
-|---|------------|-------------|
-| 1 | Comando `raise.sar.analyze` | Pipeline completo via LLM synthesis |
-| 2 | JSON Schemas | Schemas para rule.yaml, graph.yaml |
-| 3 | CLI `raise get rules` | Query de reglas con MVC |
-| 4 | Documentacion | Guia de uso, ejemplos por stack |
+| # | Componente | Entregable | Descripcion |
+|---|------------|------------|-------------|
+| 1 | SAR | Comando `raise sar analyze` | Pipeline de extraccion via LLM |
+| 2 | SAR | JSON Schemas | Schemas para rule.yaml, graph.yaml |
+| 3 | raise.ctx | CLI `raise ctx get` | Retrieval determinista de MVC |
+| 4 | Ambos | Documentacion | Guia de uso, ejemplos |
 
-**Caracteristicas del comando SAR:**
+**SAR - Caracteristicas:**
 - Pipeline LLM: DETECT → SCAN → DESCRIBE → GOVERN
 - Prompts estructurados con secciones esperadas
 - Schemas JSON/YAML para validar outputs
@@ -55,11 +56,18 @@ El Open Core es el primer entregable, usando el patron "Deterministic Rails, Non
 - Context management (chunking, purging)
 - Stack-agnostico (React, PydanticAI, PHP, Vite, Next.js)
 
-**Formato de outputs:**
-- `specs/main/sar/project-profile.yaml`
-- `specs/main/sar/conventions.md`
-- `specs/main/sar/rules/*.yaml`
-- `specs/main/sar/graph.yaml`
+**raise.ctx - Caracteristicas:**
+- Retrieval determinista (mismo input = mismo output)
+- Graph traversal para reglas relacionadas
+- Filtering por confidence threshold
+- Token budget management
+- Output optimizado para context window
+
+**Data Store (output de SAR, input de raise.ctx):**
+- `.raise/project-profile.yaml`
+- `.raise/conventions.md`
+- `.raise/rules/*.yaml`
+- `.raise/graph.yaml`
 
 ### Tier 2: Licensed
 
@@ -173,42 +181,55 @@ El producto Licensed agrega capacidades enterprise sobre Open Core.
 
 ---
 
-### Fase A3: CLI `raise get rules`
+### Fase A3: CLI `raise ctx` (raise.ctx component)
 
 **Duracion estimada**: 1 semana
-**Objetivo**: Implementar la interfaz de query de reglas
+**Objetivo**: Implementar el componente de entrega de MVC (raise.ctx)
+**Componente**: raise.ctx
 
 **Tareas:**
 
-- [ ] **A3.1** Implementar query por tarea
-  - `--task "implement user service"`
-  - Matching semantico de reglas relevantes
+- [ ] **A3.1** Implementar comando base `raise ctx get`
+  - Lee `.raise/rules/*.yaml` y `.raise/graph.yaml`
+  - Parsea y valida datos de SAR
 
-- [ ] **A3.2** Implementar query por scope
+- [ ] **A3.2** Implementar query por tarea y scope
+  - `--task "implement user service"`
   - `--scope "src/services/"`
   - `--file "src/services/UserService.ts"`
-  - Filtering por path patterns
+  - Scope matching por file patterns
 
 - [ ] **A3.3** Implementar filter por confidence
-  - `--min-confidence 0.80`
-  - `--include-all` para todo
+  - `--min-confidence 0.80` (default)
+  - `--include-all` para incluir todo
 
 - [ ] **A3.4** Implementar output MVC
   - Formato YAML por default
   - `--format json` option
-  - primary_rules, context_rules, warnings, graph_context
+  - `--format markdown` para humanos
+  - Estructura: primary_rules, context_rules, warnings, graph_context
 
-- [ ] **A3.5** Integracion con Claude Code
-  - Skill invocable desde agente
-  - Context injection automatico
+- [ ] **A3.5** Implementar graph traversal basico
+  - Traverse `requires` edges (dependencias)
+  - Traverse `related_to` edges (1 nivel)
+  - Detectar `conflicts_with` y `supersedes` para warnings
+
+- [ ] **A3.6** Implementar token budget management
+  - `--max-tokens 4000` (default)
+  - Truncar context_rules si excede budget
+
+- [ ] **A3.7** Integracion con Claude Code
+  - Slash command `/raise.ctx`
+  - Infiere task del contexto de conversacion
 
 **Criterio de completitud:**
 - CLI funciona con todos los flags documentados
-- Output MVC contiene todas las secciones esperadas
+- Output MVC es determinista (mismo input = mismo output)
 - Integracion con Claude Code verificada
+- Graph traversal incluye reglas relacionadas correctamente
 
 **Dependencias:**
-- A2 completado (necesita reglas extraidas para probar)
+- A2 completado (necesita datos de SAR para probar)
 
 ---
 
