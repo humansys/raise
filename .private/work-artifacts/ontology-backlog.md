@@ -1,10 +1,10 @@
 # RaiSE Ontology Backlog
 ## Registro de Mejoras Ontológicas desde Conversaciones
 
-**Versión:** 1.1.0  
-**Fecha:** 06 de Enero, 2026  
-**Última actualización:** 06 de Enero, 2026  
-**Propósito:** Capturar refinamientos ontológicos emergentes de conversaciones donde se explica RaiSE.
+**Versión:** 1.2.0
+**Fecha:** 06 de Enero, 2026
+**Última actualización:** 28 de Enero, 2026
+**Propósito:** Capturar refinamientos ontológicos emergentes de conversaciones donde se explica RaiSE, y desviaciones estructurales entre documentación y implementación.
 
 > **Filosofía:** Cada conversación donde Emilio explica RaiSE es un experimento heutagógico. Las fricciones, metáforas efectivas, y conceptos articulados son señales para refinar el framework.
 
@@ -14,12 +14,13 @@
 
 | Métrica | Valor |
 |---------|-------|
-| Total items | 26 |
-| P0 (Críticos) | 1 |
-| P1 (Importantes) | 11 |
-| P2 (Mejoras) | 10 |
+| Total items | 35 |
+| P0 (Críticos) | 3 |
+| P1 (Importantes) | 15 |
+| P2 (Mejoras) | 13 |
 | P3 (Nice-to-have) | 4 |
 | Transcripts procesados | 3 |
+| Análisis estructurales | 1 (2026-01-28) |
 
 ---
 
@@ -30,6 +31,8 @@
 | ID | Tipo | Concepto | Descripción | Fuente | Documento Afectado | Estado |
 |----|------|----------|-------------|--------|-------------------|--------|
 | ONT-004 | `COR` | "prácticas" vs "técnica" | Emilio dice "Katas de prácticas" donde corpus dice "Katas de técnica". Verificar si es sinónimo intencional o inconsistencia. | Héctor 2026-01 | 20-glossary-v2.md | 🔲 Verificar |
+| ONT-029 | `STR` | Architecture vs Implementation | La arquitectura v2.1 (`specs/raise/commands/architecture.md`) define 7 categorías con naming `verb-noun`, pero la implementación (`.raise/commands/`) tiene 2 categorías con naming `raise.N.name`. Requiere reconciliación. | Análisis 2026-01-28 | specs/raise/commands/architecture.md, .raise/commands/ | 🔲 Reconciliar |
+| ONT-030 | `STR` | Validation Gates Mismatch | Constitution (`docs/core/constitution.md`) define 8 gates, pero commands define 11 diferentes. Faltan: Gate-Context, Gate-Code, Gate-Deploy. Sobran: validate-ecosystem, validate-prioritization, validate-estimation, validate-feature-design, validate-stories, validate-requirements. | Análisis 2026-01-28 | docs/core/constitution.md, specs/raise/commands/architecture.md | 🔲 Reconciliar |
 
 ### 🟡 P1 - Importantes (Refinamientos de alto impacto)
 
@@ -46,6 +49,10 @@
 | ONT-022 | `ARQ` | Transpiración MD→LinkML | Flujo completo: Markdown (humano) → transpiración → LinkML/formatos formales (máquina). "El humano habla Markdown... transpiramos las reglas... las generamos en formatos LinkML." | Fer/Aquiles 2026-01 | 10-system-architecture-v2.md, 15-tech-stack-v2.md | 🔲 Pendiente |
 | ONT-023 | `ADD` | Evals (Framework de evaluación) | "Los evals son las pruebas de lo que el desarrollador de RaiSE tiene que mejorar. Las pruebas unitarias quien las tiene que cumplir es el agente, pero nosotros tenemos que darle el contexto." | Fer/Aquiles 2026-01 | 20-glossary-v2.md, 15-tech-stack-v2.md | 🔲 Pendiente |
 | ONT-027 | `SCP` | Modo con/sin MCP | Clarificar scope MVP: raise-kit sin MCP = comandos + katas (contexto probabilístico). Con MCP = RAG estructurado + ontología bajo demanda (contexto determinista). | Fer/Aquiles 2026-01 | 10-system-architecture-v2.md, 30-roadmap-v2.md | 🔲 Pendiente |
+| ONT-031 | `STR` | Phase-to-Category Mapping | Metodología define 8 fases (0-7), arquitectura define 7 categorías. No hay mapeo documentado. Faltan en arquitectura: Fase 7 (UAT & Deploy). Faltan en metodología: context/, validate/, tools/. | Análisis 2026-01-28 | docs/core/methodology.md, specs/raise/commands/architecture.md | 🔲 Documentar |
+| ONT-032 | `STR` | Missing Glossary Terms | Nuevos conceptos v2.1 no están en glossary: SAR (Software Architecture Reconstruction), CTX (Context Component), MVC (Minimum Viable Context), Rule (como artefacto YAML distinto de Guardrail). | Análisis 2026-01-28 | docs/core/glossary.md, specs/raise/schemas/ | 🔲 Agregar |
+| ONT-033 | `STR` | Command Naming Inconsistency | Tres patrones de naming coexisten: `speckit.N.name` (spec-kit), `raise.N.name` (actual .raise/), `verb-noun` (architecture doc). Requiere decisión y consolidación. | Análisis 2026-01-28 | .claude/commands/, .raise/commands/, specs/raise/commands/architecture.md | 🔲 Decidir |
+| ONT-034 | `STR` | Work Cycles vs Categories | Glossary define 4 Work Cycles (Onboarding, Proyecto, Feature, Mejora). Arquitectura define 7 categorías. No hay mapeo. `context/`, `validate/`, `tools/` no tienen ciclo asignado. | Análisis 2026-01-28 | docs/core/glossary.md, specs/raise/commands/architecture.md | 🔲 Mapear |
 
 ### 🟢 P2 - Mejoras (Completan la ontología)
 
@@ -61,6 +68,9 @@
 | ONT-024 | `REF` | Built-in Quality (Calidad incluida) | Referencia explícita a TPS: "La máquina que te construye también te ayuda a hacer la prueba unitaria del trabajo terminado. Es un principio de automatización Lean." | Fer/Aquiles 2026-01 | 05-learning-philosophy-v2.md | 🔲 Pendiente |
 | ONT-025 | `ADD` | Rigor epistemológico | Principio de diseño: "Cada paso documentable, verificable, repetible, que está basado en un tren de pensamiento que es explicable." Diferenciador de mercado. | Fer/Aquiles 2026-01 | 00-constitution-v2.md, 20-glossary-v2.md | 🔲 Pendiente |
 | ONT-026 | `ARQ` | Framework de evaluación organizacional | Capacidad: configurar tanto generación como evaluación por organización. "Configuras cómo se va a generar, pero al mismo tiempo estás configurando cómo se va a evaluar." | Fer/Aquiles 2026-01 | 10-system-architecture-v2.md (futuro) | 🔲 Pendiente |
+| ONT-035 | `STR` | Missing Feature Commands | Arquitectura v2.1 define `feature/` con 5 comandos (design-feature, create-backlog, generate-stories, plan-implementation, implement). Implementación actual no tiene categoría feature/. | Análisis 2026-01-28 | specs/raise/commands/architecture.md, .raise/commands/ | 🔲 Implementar |
+| ONT-036 | `STR` | Missing CTX Commands | Arquitectura v2.1 define `context/` con 3 comandos (get, check, explain). No existen en implementación. Relacionado con roadmap A3. | Análisis 2026-01-28 | specs/raise/commands/architecture.md, specs/raise/roadmap.md | 🔲 Implementar |
+| ONT-037 | `STR` | Rule File Renamed | Regla `.claude/rules/110-raise-kit-command-creation.md` renombrada a `110-raise-command-creation.md`. Estructura actualizada de `.raise-kit/` a `.raise/`. | Análisis 2026-01-28 | .claude/rules/110-raise-command-creation.md | ✅ Completado |
 
 ### ⚪ P3 - Nice-to-have (Metáforas y comunicación)
 
@@ -221,6 +231,7 @@
 
 | Fecha | Cambio | Items |
 |-------|--------|-------|
+| 2026-01-28 | Análisis estructural: docs/core vs specs/raise mismatch | +9 items (ONT-029 a ONT-037) |
 | 2026-01-06 | Añadido transcript Fernando+Aquiles | +12 items (ONT-017 a ONT-028) |
 | 2026-01-06 | Creación inicial con 2 transcripts | 14 items |
 

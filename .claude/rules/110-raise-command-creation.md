@@ -1,22 +1,24 @@
 ---
-name: RaiSE Kit Command Creation
-description: Patrón para crear y agregar comandos al espacio .raise-kit siguiendo estructura estandarizada con spec, plan, tasks, y convenciones de referencias portables
+name: RaiSE Command Creation
+description: Patrón para crear y agregar comandos al espacio .raise siguiendo estructura estandarizada con spec, plan, tasks, y convenciones de referencias portables
 globs:
-  - ".raise-kit/commands/**/*.md"
+  - ".raise/commands/**/*.md"
   - "specs/*/spec.md"
   - "specs/*/plan.md"
   - "specs/*/tasks.md"
 tags:
-  - raise-kit
+  - raise
   - commands
   - templates
   - gates
   - governance
 ---
 
-# Regla: Creación de Comandos en .raise-kit
+# Regla: Creación de Comandos en .raise
 
-Esta regla documenta el patrón completo para crear y agregar comandos al espacio `.raise-kit`, basado en el análisis del feature `001-tech-design-command`.
+Esta regla documenta el patrón completo para crear y agregar comandos al espacio `.raise`, basado en el análisis del feature `001-tech-design-command`.
+
+> **Nota v2.1**: Estructura migrada de `.raise` a `.raise`. Ver arquitectura de comandos en `specs/raise/commands/architecture.md`.
 
 ## Análisis Detallado
 
@@ -28,35 +30,56 @@ Para el análisis completo del patrón, consultar:
 
 Esta regla aplica cuando:
 
-1. Se crea un nuevo comando en `.raise-kit/commands/`
-2. Se agrega un nuevo template a `.raise-kit/templates/raise/`
-3. Se crea un nuevo gate en `.raise-kit/gates/raise/`
+1. Se crea un nuevo comando en `.raise/commands/`
+2. Se agrega un nuevo template a `.raise/templates/`
+3. Se crea un nuevo gate en `.raise/gates/`
 4. Se documenta el proceso de creación de comandos
 
-## Arquitectura de .raise-kit
+## Arquitectura de .raise
 
 ```
-.raise-kit/
+.raise/
 ├── commands/
-│   ├── 01-onboarding/      # Comandos de preparación inicial
-│   └── 02-projects/         # Comandos de flujo de proyecto
+│   ├── 01-onboarding/           # Comandos SAR y setup (brownfield)
+│   │   ├── raise.1.analyze.code.md
+│   │   ├── raise.rules.edit.md
+│   │   └── raise.rules.generate.md
+│   └── 02-projects/             # Comandos de flujo de proyecto
+│       ├── raise.1.discovery.md
+│       ├── raise.2.vision.md
+│       ├── raise.3.ecosystem.md
+│       ├── raise.4.tech-design.md
+│       ├── raise.5.backlog.md
+│       ├── raise.6.estimation.md
+│       └── raise.7.sow.md
 ├── templates/
-│   └── raise/
-│       ├── solution/        # Templates de solución (PRD, Vision)
-│       ├── tech/            # Templates técnicos (Tech Design)
-│       └── rules/           # Templates de reglas
-├── gates/
-│   └── raise/              # Gates de validación
+│   ├── solution/                # Templates de solución (Vision)
+│   ├── tech/                    # Templates técnicos (Tech Design)
+│   ├── backlog/                 # Templates de backlog
+│   └── architecture/            # Templates de arquitectura (ADRs)
+├── gates/                       # Gates de validación
+│   ├── gate-discovery.md
+│   ├── gate-vision.md
+│   ├── gate-architecture.md
+│   ├── gate-design.md
+│   ├── gate-backlog.md
+│   └── gate-estimation.md
+├── katas/                       # Katas del framework
 └── scripts/
-    └── transform-commands.sh  # Script de inyección a proyectos target
+    └── bash/raise/
+        └── transform-commands.sh  # Script de inyección a proyectos target
 ```
 
-**Flujo de inyección**:
+**Convención de nombres de comandos**: `raise.N.nombre` donde N indica orden en el flujo.
 
-1. **Desarrollo**: Artefactos se crean en `.raise-kit/`
-2. **Referencias portables**: Comandos usan rutas `.specify/` (NO `.raise-kit/`)
-3. **Inyección**: `transform-commands.sh` copia todo a `.specify/` del proyecto target
+**Flujo de inyección** (para proyectos target):
+
+1. **Desarrollo**: Artefactos se crean en `.raise/`
+2. **Referencias portables**: Comandos usan rutas `.raise/` (relativas al proyecto)
+3. **Inyección**: `transform-commands.sh` copia a `.specify/` del proyecto target
 4. **Ejecución**: Comando encuentra dependencias en `.specify/` del proyecto
+
+> **Nota**: En raise-commons (este repo), los comandos viven en `.raise/` Y `.claude/commands/` (duplicados para Claude Code).
 
 ## Proceso de Creación (4 Fases)
 
@@ -99,13 +122,13 @@ El `plan.md` debe incluir:
 Completar:
 
 1. **Setup** (crear directorios, copiar templates/gates)
-2. **Crear archivo del comando** en `.raise-kit/commands/[categoria]/`
+2. **Crear archivo del comando** en `.raise/commands/[categoria]/`
 3. **Escribir cada paso** siguiendo estructura del kata
 4. **Validar convenciones** (referencias, handoffs, etc.)
 
 ### Fase 4: Validación
 
-- Verificar referencias usan `.specify/` (NO `.raise-kit/`)
+- Verificar referencias usan `.specify/` (NO `.raise/`)
 - Comparar estructura con comandos existentes
 - Verificar handoffs en frontmatter YAML
 - Confirmar que template y gate existen
@@ -199,9 +222,9 @@ When executing this workflow:
 **❌ INCORRECTO**:
 
 ```markdown
-- Cargar template desde `.raise-kit/templates/raise/tech/tech_design.md`
-- Ejecutar gate `.raise-kit/gates/raise/gate-design.md`
-- Run script `.raise-kit/scripts/bash/check-prerequisites.sh`
+- Cargar template desde `.raise/templates/raise/tech/tech_design.md`
+- Ejecutar gate `.raise/gates/raise/gate-design.md`
+- Run script `.raise/scripts/bash/check-prerequisites.sh`
 ```
 
 **✅ CORRECTO**:
@@ -212,7 +235,7 @@ When executing this workflow:
 - Run script `.specify/scripts/bash/check-prerequisites.sh`
 ```
 
-**Razón**: Los comandos se ejecutan en proyectos target donde `.raise-kit/` NO existe. Solo existe `.specify/` después de la inyección vía `transform-commands.sh`.
+**Razón**: Los comandos se ejecutan en proyectos target donde `.raise/` NO existe. Solo existe `.specify/` después de la inyección vía `transform-commands.sh`.
 
 ### Estructura de Pasos
 
@@ -254,16 +277,16 @@ Para agregar un comando que depende de un template nuevo:
 
 ```bash
 # 1. Crear directorio del template (si no existe)
-mkdir -p .raise-kit/templates/raise/[categoria]/
+mkdir -p .raise/templates/raise/[categoria]/
 
 # 2. Copiar template desde src (si existe en src/)
-cp src/templates/[categoria]/[template].md .raise-kit/templates/raise/[categoria]/
+cp src/templates/[categoria]/[template].md .raise/templates/raise/[categoria]/
 
 # 3. Verificar/crear gate (si se requiere)
-touch .raise-kit/gates/raise/gate-[nombre].md
+touch .raise/gates/raise/gate-[nombre].md
 
 # 4. Crear el comando
-touch .raise-kit/commands/[categoria]/[nombre-comando].md
+touch .raise/commands/[categoria]/[nombre-comando].md
 ```
 
 **IMPORTANTE**: NO modificar `transform-commands.sh` - el script ya copia recursivamente todos los subdirectorios.
@@ -276,8 +299,8 @@ touch .raise-kit/commands/[categoria]/[nombre-comando].md
 
 ```bash
 # Setup mínimo (solo gate nuevo si se requiere)
-touch .raise-kit/gates/raise/gate-review.md
-touch .raise-kit/commands/02-projects/raise.6.review.md
+touch .raise/gates/raise/gate-review.md
+touch .raise/commands/02-projects/raise.6.review.md
 ```
 
 **Comando** (fragmento):
@@ -315,10 +338,10 @@ Goal: Validate `specs/main/tech_design.md` against quality criteria.
 
 ```bash
 # Setup completo
-mkdir -p .raise-kit/templates/raise/estimation/
-cp src/templates/estimation/estimation.md .raise-kit/templates/raise/estimation/
-touch .raise-kit/gates/raise/gate-estimation.md
-touch .raise-kit/commands/02-projects/raise.7.estimation.md
+mkdir -p .raise/templates/raise/estimation/
+cp src/templates/estimation/estimation.md .raise/templates/raise/estimation/
+touch .raise/gates/raise/gate-estimation.md
+touch .raise/commands/02-projects/raise.7.estimation.md
 ```
 
 **Referencias en el comando**:
@@ -345,9 +368,9 @@ N. **Finalize & Validate**:
 ### Setup
 
 - [ ] Directorio de templates creado si es necesario
-- [ ] Template copiado desde `src/` a `.raise-kit/templates/raise/` (si aplica)
-- [ ] Gate verificado/creado en `.raise-kit/gates/raise/`
-- [ ] Archivo del comando creado en `.raise-kit/commands/[categoria]/`
+- [ ] Template copiado desde `src/` a `.raise/templates/raise/` (si aplica)
+- [ ] Gate verificado/creado en `.raise/gates/raise/`
+- [ ] Archivo del comando creado en `.raise/commands/[categoria]/`
 
 ### Estructura del Comando
 
@@ -362,7 +385,7 @@ N. **Finalize & Validate**:
 
 ### Convenciones
 
-- [ ] Todas las referencias usan `.specify/` (NO `.raise-kit/`)
+- [ ] Todas las referencias usan `.specify/` (NO `.raise/`)
 - [ ] Template referenciado como `.specify/templates/raise/[...]`
 - [ ] Gate referenciado como `.specify/gates/raise/[...]`
 - [ ] Scripts referenciados como `.specify/scripts/bash/[...]`
@@ -380,12 +403,12 @@ N. **Finalize & Validate**:
 ### ❌ Anti-Patrón 1: Referencias Incorrectas
 
 ```markdown
-# MAL: Referencias a .raise-kit en lugar de .specify
-- Cargar `.raise-kit/templates/raise/tech/tech_design.md`
-- Ejecutar `.raise-kit/gates/raise/gate-design.md`
+# MAL: Referencias a .raise en lugar de .specify
+- Cargar `.raise/templates/raise/tech/tech_design.md`
+- Ejecutar `.raise/gates/raise/gate-design.md`
 ```
 
-**Por qué es malo**: Cuando el comando se ejecuta en un proyecto target, `.raise-kit/` no existe. Solo existe `.specify/` después de la inyección.
+**Por qué es malo**: Cuando el comando se ejecuta en un proyecto target, `.raise/` no existe. Solo existe `.specify/` después de la inyección.
 
 ### ❌ Anti-Patrón 2: Pasos Sin Verificación
 
@@ -430,13 +453,15 @@ description: Generate Tech Design
 
 ## Referencias
 
+- **Arquitectura de comandos v2.1**: `specs/raise/commands/architecture.md`
 - **Documento de análisis completo**: `specs/main/analysis/rules/analysis-for-raise-kit-command-creation.md`
 - **Feature de referencia**: `specs/001-tech-design-command/`
-- **Comandos de referencia**: `.raise-kit/commands/02-projects/raise.{1,2,4}.*`
-- **Script de inyección**: `.raise-kit/scripts/transform-commands.sh`
-- **Constitution RaiSE**: `docs/framework/v2.1/model/00-constitution-v2.md`
-- **Glosario**: `docs/framework/v2.1/model/20-glossary-v2.1.md`
+- **Comandos de referencia**: `.raise/commands/02-projects/raise.{1,2,4}.*`
+- **Script de inyección**: `.raise/scripts/bash/raise/transform-commands.sh`
+- **Constitution RaiSE**: `docs/core/constitution.md`
+- **Glosario**: `docs/core/glossary.md`
+- **Metodología**: `docs/core/methodology.md`
 
 ---
 
-**Uso de esta regla**: Al crear un nuevo comando en `.raise-kit/commands/`, seguir este patrón estrictamente para mantener consistencia, trazabilidad y calidad en todo el framework RaiSE.
+**Uso de esta regla**: Al crear un nuevo comando en `.raise/commands/`, seguir este patrón estrictamente para mantener consistencia, trazabilidad y calidad en todo el framework RaiSE.

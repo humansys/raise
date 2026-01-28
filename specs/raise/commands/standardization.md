@@ -2,8 +2,9 @@
 
 **Estado**: 📝 Active - Living Document
 **Fecha Inicio**: 2026-01-23
+**Actualizado**: 2026-01-28 (v2.1 - 7 categorías)
 **Objetivo**: Refactorizar comandos RaiSE aplicando patrones extraídos de spec-kit GitHub
-**Referencias**: ADR-012, specs/main/analysis/architecture/
+**Referencias**: ADR-012, specs/main/analysis/architecture/, [commands/architecture.md](./architecture.md)
 
 ---
 
@@ -15,11 +16,14 @@ Hemos analizado 8 comandos de spec-kit GitHub y extraído 12 patrones arquitect�
 - Eliminar inconsistencias de nomenclatura
 - Reducir carga cognitiva
 
-**Cambios principales**:
-- 18 comandos → 16 comandos (reducción 11%, pero +3 nuevos CTX)
+**Cambios principales** (v2.1):
+- 18 comandos legacy → 35 ejecutables (24 comandos + 11 gates)
+- **7 categorías**: setup, context, project, feature, validate, improve, tools
 - Absorber comandos QA en comandos core
 - Renombrar para claridad (verbo + sustantivo)
 - Agregar categoría `context/` para comandos CTX (entrega de MVC)
+- Agregar categoría `validate/` para gates on-demand
+- Agregar categoría `improve/` para mejora continua
 - Aplicar patrones de diseño consistentes
 
 ---
@@ -29,36 +33,61 @@ Hemos analizado 8 comandos de spec-kit GitHub y extraído 12 patrones arquitect�
 ### Comandos Afectados
 
 ```
-ACTUAL (18):                    OBJETIVO (16):
+ACTUAL (18 legacy):             OBJETIVO (35 ejecutables en 7 categorías):
 
-01-onboarding/                  setup/
+01-onboarding/                  setup/ (4)
 ├── raise.1.analyze.code    →   ├── analyze-codebase      (SAR)
 ├── raise.rules.generate    →   ├── generate-rules        (SAR)
 ├── raise.rules.edit        →   ├── edit-rule             (SAR)
 └── speckit.2.constitution  →   └── init-project
 
-[NUEVO]                         context/                   (CTX)
+[NUEVO]                         context/ (3)               (CTX Component)
                             →   ├── get                    (CTX: obtener MVC)
                             →   ├── check                  (CTX: verificar compliance)
                             →   └── explain                (CTX: explicar regla)
 
-02-projects/                    project/
+02-projects/                    project/ (7)
 ├── raise.1.discovery       →   ├── create-prd
 ├── raise.2.vision          →   ├── define-vision
 ├── raise.3.ecosystem       →   ├── map-ecosystem
 ├── raise.4.tech-design     →   ├── design-architecture
+│                           →   ├── prioritize-features    [NUEVO]
 ├── raise.5.backlog         →   ├── create-backlog
 └── raise.6.estimation      →   └── estimate-effort
 
-03-feature/                     feature/
-├── speckit.1.specify       →   ├── create-spec
-├── speckit.2.clarify       →   [ABSORBER en create-spec]
-├── speckit.3.plan          →   ├── plan-implementation
-├── speckit.4.tasks         →   ├── generate-tasks
-├── speckit.5.analyze       →   [ABSORBER en generate-tasks]
+03-feature/                     feature/ (5)
+├── speckit.1.specify       →   ├── design-feature         (incluye spec funcional)
+├── speckit.2.clarify       →   [ABSORBER en design-feature]
+│                           →   ├── create-backlog         (feature-level backlog)
+│                           →   ├── generate-stories       [NUEVO]
+├── speckit.3.plan          →   ├── plan-implementation    (incluye tasks)
+├── speckit.4.tasks         →   [ABSORBER en plan-implementation]
+├── speckit.5.analyze       →   [ABSORBER en plan-implementation]
 ├── speckit.6.implement     →   └── implement
 ├── speckit.util.checklist  →   [DEPRECAR]
 └── speckit.util.issues     →   tools/export-issues
+
+[NUEVO]                         validate/ (11)             (Gates On-Demand)
+                            →   ├── validate-prd
+                            →   ├── validate-vision
+                            →   ├── validate-ecosystem
+                            →   ├── validate-architecture
+                            →   ├── validate-prioritization
+                            →   ├── validate-backlog
+                            →   ├── validate-estimation
+                            →   ├── validate-feature-design
+                            →   ├── validate-stories
+                            →   ├── validate-plan
+                            →   └── validate-requirements
+
+[NUEVO]                         improve/ (3)               (Mejora Continua)
+                            →   ├── manage-kata
+                            →   ├── run-retrospective      (Planned)
+                            →   └── audit-conventions      (Planned)
+
+[NUEVO]                         tools/ (2)                 (Utilidades)
+                            →   ├── export-issues
+                            →   └── generate-contract      (movido de project/)
 ```
 
 ---
@@ -291,12 +320,12 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
 | Métrica | Baseline | Target | Medición |
 |---------|----------|--------|----------|
-| Comandos totales | 18 | 16 | Cuenta archivos (5 categorías) |
-| Categorías | 3 (dispersas) | 5 (organizadas) | setup, context, project, feature, tools |
+| Comandos totales | 18 | 35 (24 cmd + 11 gates) | Cuenta archivos |
+| Categorías | 3 (dispersas) | 7 (organizadas) | setup, context, project, feature, validate, improve, tools |
 | Prefijos diferentes | 3 | 0 | Análisis nombres |
 | Colisiones nombre | 1 | 0 | Búsqueda duplicados |
-| Comandos con IEF | 4/18 (22%) | 14/14 (100%) | Manual review |
-| Comandos con gates | 4/18 (22%) | ~10/14 (71%) | Script analysis |
+| Comandos con IEF | 4/18 (22%) | 24/24 (100%) | Manual review |
+| Comandos con gates | 4/18 (22%) | 24/24 (100%) | Todos tienen validate/ correspondiente |
 | Anti-patrones detectados | ? | 0 | Code review |
 
 ### Cualitativas
