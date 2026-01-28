@@ -16,9 +16,10 @@ Hemos analizado 8 comandos de spec-kit GitHub y extraído 12 patrones arquitect�
 - Reducir carga cognitiva
 
 **Cambios principales**:
-- 18 comandos → 14 comandos (reducción 22%)
+- 18 comandos → 16 comandos (reducción 11%, pero +3 nuevos CTX)
 - Absorber comandos QA en comandos core
 - Renombrar para claridad (verbo + sustantivo)
+- Agregar categoría `context/` para comandos CTX (entrega de MVC)
 - Aplicar patrones de diseño consistentes
 
 ---
@@ -28,13 +29,18 @@ Hemos analizado 8 comandos de spec-kit GitHub y extraído 12 patrones arquitect�
 ### Comandos Afectados
 
 ```
-ACTUAL (18):                    OBJETIVO (14):
+ACTUAL (18):                    OBJETIVO (16):
 
 01-onboarding/                  setup/
-├── raise.1.analyze.code    →   ├── analyze-codebase
-├── raise.rules.generate    →   ├── generate-rules
-├── raise.rules.edit        →   ├── edit-rule
+├── raise.1.analyze.code    →   ├── analyze-codebase      (SAR)
+├── raise.rules.generate    →   ├── generate-rules        (SAR)
+├── raise.rules.edit        →   ├── edit-rule             (SAR)
 └── speckit.2.constitution  →   └── init-project
+
+[NUEVO]                         context/                   (CTX)
+                            →   ├── get                    (CTX: obtener MVC)
+                            →   ├── check                  (CTX: verificar compliance)
+                            →   └── explain                (CTX: explicar regla)
 
 02-projects/                    project/
 ├── raise.1.discovery       →   ├── create-prd
@@ -81,23 +87,27 @@ ACTUAL (18):                    OBJETIVO (14):
 
 ---
 
-### Wave 2: Setup & Tools (IMPORTANTE - Hacer segundo)
+### Wave 2: Setup, Context & Tools (IMPORTANTE - Hacer segundo)
 
-**Objetivo**: Comandos de soporte y herramientas auxiliares.
+**Objetivo**: Comandos de soporte, contexto (CTX), y herramientas auxiliares.
 
 | # | Comando Actual | Comando Nuevo | Acción | Prioridad | Status |
 |---|----------------|---------------|--------|-----------|--------|
 | 2.1 | speckit.2.constitution | setup/init-project | Refactor + reubicar | P1 | ⏸️ Pending |
-| 2.2 | raise.1.analyze.code | setup/analyze-codebase | Refactor | P1 | ⏸️ Pending |
-| 2.3 | raise.rules.generate | setup/generate-rules | Refactor | P1 | ⏸️ Pending |
-| 2.4 | raise.rules.edit | setup/edit-rule | Refactor | P1 | ⏸️ Pending |
-| 2.5 | speckit.util.issues | tools/export-issues | Refactor | P2 | ⏸️ Pending |
-| 2.6 | speckit.util.checklist | deprecated/checklist | Deprecar | P2 | ⏸️ Pending |
+| 2.2 | raise.1.analyze.code | setup/analyze-codebase | Refactor (SAR) | P1 | ⏸️ Pending |
+| 2.3 | raise.rules.generate | setup/generate-rules | Refactor (SAR) | P1 | ⏸️ Pending |
+| 2.4 | raise.rules.edit | setup/edit-rule | Refactor (SAR) | P1 | ⏸️ Pending |
+| 2.5 | [NUEVO] | **context/get** | Crear (CTX) | P1 | ⏸️ Pending |
+| 2.6 | [NUEVO] | **context/check** | Crear (CTX) | P1 | ⏸️ Pending |
+| 2.7 | [NUEVO] | **context/explain** | Crear (CTX) | P2 | ⏸️ Pending |
+| 2.8 | speckit.util.issues | tools/export-issues | Refactor | P2 | ⏸️ Pending |
+| 2.9 | speckit.util.checklist | deprecated/checklist | Deprecar | P2 | ⏸️ Pending |
 
-**Duración estimada**: 2 sesiones de trabajo
+**Duración estimada**: 3 sesiones de trabajo
 
 **Criterios de Done para Wave 2**:
-- [ ] Comandos setup refactorizados
+- [ ] Comandos setup refactorizados (SAR)
+- [ ] Comandos context creados (CTX: get, check, explain)
 - [ ] export-issues en tools/
 - [ ] checklist movido a deprecated/ con nota
 - [ ] Todos pasan checklist de estandarización
@@ -281,7 +291,8 @@ Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>"
 
 | Métrica | Baseline | Target | Medición |
 |---------|----------|--------|----------|
-| Comandos totales | 18 | 14 | Cuenta archivos |
+| Comandos totales | 18 | 16 | Cuenta archivos (5 categorías) |
+| Categorías | 3 (dispersas) | 5 (organizadas) | setup, context, project, feature, tools |
 | Prefijos diferentes | 3 | 0 | Análisis nombres |
 | Colisiones nombre | 1 | 0 | Búsqueda duplicados |
 | Comandos con IEF | 4/18 (22%) | 14/14 (100%) | Manual review |
