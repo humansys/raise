@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raise.dev/schemas/mvc-schema.json",
+  "title": "RaiSE MVC Schema",
+  "description": "Schema for Minimum Viable Context output from CTX component (raise ctx get)",
+  "type": "object",
+  "required": ["query", "primary_rules", "context_rules", "warnings", "graph_context", "metadata"],
+  "additionalProperties": false,
+  "properties": {
+    "query": {
+      "type": "object",
+      "description": "The original query parameters used to generate this MVC",
+      "required": ["task", "scope", "min_confidence"],
+      "additionalProperties": false,
+      "properties": {
+        "task": {
+          "type": "string",
+          "description": "Task description provided by the user/agent",
+          "examples": ["implement user authentication service"]
+        },
+        "scope": {
+          "type": "string",
+          "description": "File pattern or path scope for the query",
+          "examples": ["src/services/", "src/components/**/*.tsx"]
+        },
+        "min_confidence": {
+          "type": "number",
+          "description": "Minimum confidence threshold used for filtering",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "examples": [0.80]
+        }
+      }
+    },
+    "primary_rules": {
+      "type": "array",
+      "description": "Rules directly applicable to the task/scope (full content)",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "intent", "confidence", "enforcement", "pattern", "examples"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Rule identifier",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable title"
+          },
+          "intent": {
+            "type": "string",
+            "description": "The 'why' behind this rule"
+          },
+          "confidence": {
+            "type": "number",
+            "description": "Confidence score",
+            "minimum": 0.0,
+            "maximum": 1.0
+          },
+          "enforcement": {
+            "type": "string",
+            "description": "Enforcement level",
+            "enum": ["hard", "strong", "moderate", "advisory", "none"]
+          },
+          "pattern": {
+            "type": "object",
+            "description": "Detection pattern",
+            "properties": {
+              "type": { "type": "string" },
+              "query": { "type": "string" },
+              "scope": { "type": "string" }
+            }
+          },
+          "examples": {
+            "type": "object",
+            "description": "Code examples",
+            "properties": {
+              "positive": { "type": "array" },
+              "negative": { "type": "array" }
+            }
+          }
+        }
+      }
+    },
+    "context_rules": {
+      "type": "array",
+      "description": "Related rules included for context (summaries only, not full content)",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "relevance"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Rule identifier",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "title": {
+            "type": "string",
+            "description": "Human-readable title"
+          },
+          "relevance": {
+            "type": "string",
+            "description": "Why this rule was included in context",
+            "examples": ["Required by ts-service-suffix", "Related to error handling patterns"]
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "description": "Warnings about conflicts, deprecations, or low-confidence rules",
+      "items": {
+        "type": "object",
+        "required": ["type", "rule_id", "message"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of warning",
+            "enum": ["conflict", "deprecated", "low_confidence"]
+          },
+          "rule_id": {
+            "type": "string",
+            "description": "Rule ID this warning relates to",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable warning message",
+            "examples": [
+              "Rule ts-old-pattern is deprecated, use ts-new-pattern instead",
+              "Rule ts-jwt-pattern has 65% adoption, consider but don't enforce"
+            ]
+          }
+        }
+      }
+    },
+    "graph_context": {
+      "type": "object",
+      "description": "Relevant subgraph showing relationships between returned rules",
+      "required": ["nodes", "edges"],
+      "additionalProperties": false,
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "description": "Rule IDs included in this context",
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "description": "Relationships between context rules",
+          "items": {
+            "type": "object",
+            "required": ["from", "to", "type"],
+            "additionalProperties": false,
+            "properties": {
+              "from": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+              },
+              "to": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9]*(-[a-z0-9]+)*$"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["requires", "conflicts_with", "supersedes", "related_to"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadata about this MVC retrieval",
+      "required": ["total_rules_matched", "token_estimate", "retrieval_time_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "total_rules_matched": {
+          "type": "integer",
+          "description": "Total number of rules that matched the query before filtering",
+          "minimum": 0
+        },
+        "token_estimate": {
+          "type": "integer",
+          "description": "Estimated token count for this MVC",
+          "minimum": 0
+        },
+        "retrieval_time_ms": {
+          "type": "integer",
+          "description": "Time taken to retrieve this MVC in milliseconds",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}
