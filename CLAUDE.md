@@ -90,6 +90,56 @@ Este proyecto utiliza el agente **RaiSE Ontology Architect** como sparring partn
 | `/speckit.constitution` | Actualizar constitution |
 | `/speckit.clarify` | Clarificar requisitos ambiguos |
 
+## Dogfooding: Usar RaiSE para Construir RaiSE
+
+**CRÍTICO**: Siempre aplicar la metodología RaiSE al desarrollar el propio framework. No improvisar.
+
+### Traducción: Roadmap → Features
+
+El roadmap (`specs/raise/roadmap.md`) contiene **Fases** con **Tareas** (e.g., A1.1, A1.2). La traducción es:
+
+| Roadmap | Artefacto RaiSE | Comando |
+|---------|-----------------|---------|
+| Fase (A1, A2...) | Épica/Milestone | Manual tracking |
+| Tarea (A1.1, A1.2...) | **Feature** | `/speckit.specify` |
+| Subtareas | Tasks en `tasks.md` | `/speckit.tasks` |
+
+### Flujo Obligatorio por Tarea del Roadmap
+
+```
+1. Roadmap Task identificada (e.g., "A1.3: Create SAR output templates")
+         ↓
+2. /speckit.specify "A1.3: Create SAR output templates"
+         ↓
+3. Genera: specs/NNN-sar-output-templates/spec.md
+         ↓
+4. /speckit.plan → plan.md
+         ↓
+5. /speckit.tasks → tasks.md
+         ↓
+6. Implementar siguiendo tasks.md
+         ↓
+7. Commit, Push, MR
+         ↓
+8. Actualizar checkbox en roadmap.md
+```
+
+### Agrupación de Tareas
+
+Tareas relacionadas pueden agruparse en un solo Feature:
+
+- ✅ `A1.1 + A1.2` → Feature "Create JSON Schemas" (schemas relacionados)
+- ❌ `A1.1 + A2.1` → NO agrupar (fases diferentes, dependencias)
+
+### Jidoka: Detección de Violación
+
+Si el agente o el Orquestador empieza a implementar **sin** haber pasado por `/speckit.specify`:
+
+> **STOP** - Violación de metodología detectada.
+> → Crear el feature spec primero, luego continuar.
+
+**Excepción**: Fixes triviales (<5 líneas) o correcciones de typos.
+
 ## Principios de Trabajo
 
 ### Heutagogía (Aprendizaje Auto-Dirigido)
