@@ -1,0 +1,70 @@
+---
+description: Automated rule generation engine based on patterns detected in the code. Implements Katas L2-01 and L2-03.
+handoffs: 
+  - label: Edit Generated Rule
+    agent: setup/edit-rule
+    prompt: I want to refine the rule you just generated
+---
+
+## User Input
+
+```text
+$ARGUMENTS
+```
+
+You can specify a directory or component to analyze (e.g., `src/components`). If empty, the current context will be analyzed.
+
+## Outline
+
+Goal: Identify recurring patterns and formalize them as Cursor rules (.mdc) following Raise Katas L2-01 and L2-03, using `specs/` for governance.
+
+1. **Initialize Environment**:
+   - Run `.specify/scripts/bash/check-prerequisites.sh --json --paths-only` to get REPO_ROOT and paths.
+   - Verify existence of `specs/main/ai-rules-reasoning.md` (create if missing).
+
+2. **Exploratory Analysis (Kata L2-01)**:
+   - **Action**: Analyze the specified directory (or full project) to identify patterns in naming, architecture, folder structure, and common libraries.
+   - **Detection**: Use `grep_search` and `list_dir` to find recurring code structures.
+   - **Output**: List 1-3 candidate patterns for rule generation.
+
+3. **Iterative Extraction & Generation (Kata L2-03)**:
+   - For each identified pattern (Loop):
+     - **a. Evidence Collection**: Find 3-5 real examples and 2 anti-examples in the code.
+     - **b. Analysis Document**: Create `specs/main/analysis/rules/analysis-for-[rule-name].md` in **Spanish** documented the reasoning, examples, and justification.
+     - **c. Rule Design**: Define YAML front matter (`name`, `description`, `globs`, `tags`) and clear instructions in Spanish.
+     - **d. File Writing**: Generate `.cursor/rules/[ID]-[name].mdc`.
+
+4. **Update Governance Registry**:
+   - Update `specs/main/ai-rules-reasoning.md` in **Spanish**.
+   - Add entry: ID, Rule Name, Date, Goal, and link to the analysis document in `specs/main/analysis/rules/`.
+
+5. **Finalize**:
+   - Run `.specify/scripts/bash/update-agent-context.sh gemini`.
+   - Confirm file existence with `check_file ".cursor/rules/[ID]-[name].mdc" "Rule Metadata"`.
+
+## High-Signaling Guidelines
+
+- **Focus**: Objectivity based on actual code evidence.
+- **Language**: Instructions English; Content **SPANISH**.
+- **Governance**: Every rule MUST have an analysis document in `specs/`.
+
+## AI Guidance
+
+When executing this workflow:
+1. **Iterate**: Don't just generate one rule; look for related patterns that form a set.
+2. **Precision**: Globs must be restrictive (e.g., `src/components/**/*.tsx` not `**/*.tsx`).
+3. **Traceability**: The analysis document is the "Why" that justifies the rule's existence.
+4. **Context**: Ensure `ai-rules-reasoning.md` reflects the current state of governance.
+
+## High-Signaling Guidelines
+
+- **Focus**: Consistency and automation.
+- **Language**: Instructions English; Content **SPANISH**.
+- **Specificity**: Precision in Globs is critical to avoid false positives.
+
+## AI Guidance
+
+When executing this workflow:
+1. **Be Precise**: Globs must be restrictive enough to target only the intended files.
+2. **Real over Theoretical**: Prioritize actual observed patterns in the repo over general best practices.
+3. **Memory Sync**: The `ai-rules-reasoning.md` file is your long-term memory; never skip updating it.
