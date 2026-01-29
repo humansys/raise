@@ -189,6 +189,12 @@ Segunda capa del modelo ontológico RaiSE. Proceso estructurado que hace visible
 ### Kata Harness (Capability) [NUEVO v2.3]
 Capability de plataforma RaiSE: motor de ejecución que interpreta definiciones de proceso (Katas) e invoca operaciones atómicas (Skills).
 
+**Alcance:** El Kata Harness ejecuta **TODAS las katas de cualquier Work Cycle**:
+- `project/`: discovery, vision, design, backlog
+- `feature/`: stories, plan, implement, review
+- `setup/`: analyze, ecosystem
+- `improve/`: retrospective, evolve-kata
+
 **Responsabilidades:**
 - Interpretar Katas y ejecutar sus pasos
 - Invocar Skills con inputs/outputs definidos
