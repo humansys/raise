@@ -2,11 +2,11 @@
 description: Execute an Implementation Plan task by task, following dependencies, verifying checkpoints (Jidoka), and producing specified artifacts.
 handoffs:
   - label: Validate Feature
-    agent: raise.validate.feature
+    agent: validate/validate-feature
     prompt: Validate the implemented feature
     send: true
   - label: Re-plan Feature
-    agent: raise.feature.plan
+    agent: feature/plan-implementation
     prompt: Re-plan the feature if blocked
     send: false
 ---
@@ -40,7 +40,7 @@ Goal: Execute the Implementation Plan (`specs/features/{feature-id}/tasks.md`) t
    - Si progress.md existe, cargar estado actual.
    - Identificar primera task pendiente.
    - **Verificación**: Tasks cargadas y punto de inicio determinado.
-   - > **Si no puedes continuar**: tasks.md no encontrado → **JIDOKA**: Ejecutar `/raise.feature.plan {feature-id}` primero.
+   - > **Si no puedes continuar**: tasks.md no encontrado → **JIDOKA**: Ejecutar `/feature/plan-implementation {feature-id}` primero.
 
 3. **Paso 2: Validar Dependencias de Task Actual**:
    - Para la task actual, verificar que todas las dependencias están "done".
@@ -89,7 +89,7 @@ Goal: Execute the Implementation Plan (`specs/features/{feature-id}/tasks.md`) t
      > 1. Loguear en progress.md: qué falló, qué se intentó
      > 2. Consultar sección "If Blocked" de la task
      > 3. Si no se puede resolver: pausar y escalar
-     > 4. Mostrar: "⚠ Task {ID} bloqueada. Resolver manualmente y ejecutar `/raise.feature.implement {feature} --start-from {ID}`"
+     > 4. Mostrar: "⚠ Task {ID} bloqueada. Resolver manualmente y ejecutar `/feature/implement {feature} --start-from {ID}`"
 
 7. **Paso 6: Registrar Completitud**:
    - Actualizar progress.md:
@@ -131,7 +131,7 @@ Goal: Execute the Implementation Plan (`specs/features/{feature-id}/tasks.md`) t
 
      📋 Progress Log: specs/features/{feature-id}/progress.md
 
-     → Siguiente paso: `/raise.validate.feature {feature-id}`
+     → Siguiente paso: `/validate/validate-feature {feature-id}`
      ═══════════════════════════════════════════
      ```
    - **Verificación**: Resumen mostrado, progress.md finalizado.

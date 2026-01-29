@@ -2,7 +2,7 @@
 description: Guided creation or modification of a specific rule through user interaction. Implements Kata L2-C1.
 handoffs: 
   - label: Generate more rules
-    agent: speckit.raise.rules-generate
+    agent: setup/generate-rules
     prompt: Analyze other patterns in the code
 ---
 
@@ -25,7 +25,7 @@ Goal: Adapt a set of rules to the specific needs of the project, deciding whethe
 2. **Paso 1: Auditoría y Selección de Regla**:
    - **Acción**: Si se especificó una regla, cargarla. Si no, listar `.cursor/rules/` y pedir al usuario que seleccione una.
    - **Análisis**: Verificar que el archivo existe y es una regla válida.
-   - > **Si no puedes continuar**: Regla no encontrada → Verificar que el archivo `.mdc` existe en `.cursor/rules/`. Si es nueva, referir a `/speckit.raise.rules-generate`.
+   - > **Si no puedes continuar**: Regla no encontrada → Verificar que el archivo `.mdc` existe en `.cursor/rules/`. Si es nueva, referir a `/setup/generate-rules`.
 
 3. **Paso 2: Análisis de Relevancia (Kata Step 2)**:
    - **Acción**: Buscar ejemplos de código en el repositorio que implementen o violen los patrones de la regla.

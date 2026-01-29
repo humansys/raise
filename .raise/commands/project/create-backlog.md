@@ -2,7 +2,7 @@
 description: Generate a Project Backlog from an approved Tech Design, following the 10 steps of kata flujo-05-backlog-creation.
 handoffs:
   - label: Create Estimation Roadmap
-    agent: raise.6.estimation
+    agent: project/estimate-effort
     prompt: Generate estimation roadmap and timeline from this backlog
     send: true
 ---
@@ -33,7 +33,7 @@ Goal: Populate the Project Backlog template (`.specify/templates/raise/backlog/p
    - Identificar componentes, funcionalidades y scope MVP desde el Tech Design.
    - Analizar secciones clave: Arquitectura y Componentes, Contratos de API, Modelo de Datos, Scope MVP.
    - **Verificación**: Tech Design exists and contains required sections (components, architecture, MVP scope).
-   - > **Si no puedes continuar**: Tech Design missing → **JIDOKA**: Execute `/raise.4.tech-design` first to create Tech Design. Tech Design incomplete (missing components/architecture sections) → **JIDOKA**: List missing sections and request completion before continuing.
+   - > **Si no puedes continuar**: Tech Design missing → **JIDOKA**: Execute `/project/design-architecture` first to create Tech Design. Tech Design incomplete (missing components/architecture sections) → **JIDOKA**: List missing sections and request completion before continuing.
 
 3. **Paso 2: Instanciar Template Backlog**:
    - Copiar template a `specs/main/project_backlog.md`.
@@ -126,8 +126,8 @@ Goal: Populate the Project Backlog template (`.specify/templates/raise/backlog/p
     - **Si gate FALLA**: Listar criterios fallidos específicos, sugerir correcciones concretas, permitir iteración antes de continuar.
     - **Si gate PASA**: Mostrar resumen del backlog (cantidad de Epics, Features, User Stories, Total SP, MVP SP, ratio MVP/Total).
     - Ejecutar `.specify/scripts/bash/update-agent-context.sh` para actualizar contexto del agente.
-    - Mostrar handoff al siguiente comando: "→ Siguiente paso: `/raise.6.estimation` - Create estimation roadmap and timeline from this backlog".
-    - **Verificación**: Gate executed, validation results shown (pass/fail with details), handoff to raise.6.estimation offered.
+    - Mostrar handoff al siguiente comando: "→ Siguiente paso: `/project/estimate-effort` - Create estimation roadmap and timeline from this backlog".
+    - **Verificación**: Gate executed, validation results shown (pass/fail with details), handoff to project/estimate-effort offered.
     - > **Si no puedes continuar**: Gate failures (criterios obligatorios fallidos) → **JIDOKA**: Iterate on failed criteria before proceeding - no continuar con backlog inválido. Gate script not found → **JIDOKA**: Verify .raise-kit setup.
 
 ---

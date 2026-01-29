@@ -29,7 +29,7 @@ Goal: Create a formal `statement_of_work.md` by consolidating project data from 
      - `estimation_roadmap.md` (Roadmap)
    - Load template from `.specify/templates/raise/solution/statement_of_work.md`
    - **Verification**: All 5 input files must be found. The template must be loaded.
-   - > **Si no puedes continuar**: Missing `estimation_roadmap.md` → **JIDOKA**: Stop and suggest running `/raise.6.estimation`. Missing other files → Warn user but proceed if Roadmap exists.
+   - > **Si no puedes continuar**: Missing `estimation_roadmap.md` → **JIDOKA**: Stop and suggest running `/project/estimate-effort`. Missing other files → Warn user but proceed if Roadmap exists.
 
 2. **Phase 1: Project Overview & Objectives**:
    - Extract `Introduction` and `Vision` from `project_requirements.md` and `solution_vision.md`.

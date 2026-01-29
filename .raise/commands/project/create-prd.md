@@ -1,8 +1,8 @@
 ---
 description: Transform raw discovery notes or meeting transcripts into a structured Product Requirements Document (PRD).
-handoffs: 
+handoffs:
   - label: Define Solution Vision
-    agent: raise.2.vision
+    agent: project/define-vision
     prompt: Create the solution vision for this PRD
     send: true
 ---

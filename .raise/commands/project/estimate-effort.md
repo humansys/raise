@@ -2,7 +2,7 @@
 description: Generate Estimation Roadmap from Project Backlog with Story Point projections and sprint timeline
 handoffs:
   - label: Create Statement of Work
-    agent: raise.7.sow
+    agent: tools/generate-contract
     prompt: Generate Statement of Work from this estimation roadmap
     send: true
 ---
@@ -27,7 +27,7 @@ Goal: Populate the Estimation Roadmap template (`.specify/templates/raise/soluti
    - Identify MVP Features (marked in backlog).
    - Prepare output file at `specs/main/estimation_roadmap.md`.
    - **Verificación**: Template loaded, backlog parsed, Total SP calculated, MVP Features identified.
-   - > **Si no puedes continuar**: Template not found → **JIDOKA**: Check .raise-kit setup, verify template was copied to .specify/. Backlog not found → **JIDOKA**: Execute `/raise.5.backlog` first. Backlog has no SP estimates → **JIDOKA**: Propose preliminary estimates based on complexity (1-2 SP low, 3-5 SP medium, 8 SP high) and warn user to refine in planning poker.
+   - > **Si no puedes continuar**: Template not found → **JIDOKA**: Check .raise-kit setup, verify template was copied to .specify/. Backlog not found → **JIDOKA**: Execute `/project/create-backlog` first. Backlog has no SP estimates → **JIDOKA**: Propose preliminary estimates based on complexity (1-2 SP low, 3-5 SP medium, 8 SP high) and warn user to refine in planning poker.
 
 2. **Paso 1: Completar Guía de Estimación (Sección 1 del Template)**:
    - Instantiate template with metadata: document_id (EST-[PROJECT]-001), title, project_name, client, version (1.0), date, author.
@@ -124,7 +124,7 @@ Goal: Populate the Estimation Roadmap template (`.specify/templates/raise/soluti
    - If gate PASSES:
      - Show summary: Total SP, MVP SP/ratio, iterations, team capacity, backlog coverage
      - Run `.specify/scripts/bash/update-agent-context.sh` to update agent context
-     - Display handoff: "→ Siguiente paso: `/raise.7.sow` - Generate Statement of Work from this roadmap"
+     - Display handoff: "→ Siguiente paso: `/tools/generate-contract` - Generate Statement of Work from this roadmap"
    - **Verificación**: Gate executed (results shown). If pass: summary displayed + handoff offered. If fail: specific issues listed + execution stopped.
    - > **Si no puedes continuar**: Gate mandatory criteria failed → **JIDOKA**: Iterate on failed criteria before proceeding - do NOT continue with invalid roadmap. Gate file not found → **JIDOKA**: Verify .raise-kit setup, check if gate file exists at .specify/gates/raise/.
 
@@ -199,7 +199,7 @@ for iteration in 1..iterations_needed:
 
 - **Language**: Instructions in English for AI agent. Generated roadmap content in **SPANISH** (sections, tables, notes - all in Spanish).
 
-- **Jidoka**: Stop immediately if: (1) Backlog missing or incomplete → execute /raise.5.backlog first, (2) Team capacity < 8 SP/sprint → alert project too long, (3) Gate mandatory criteria fail → list specific failures and do NOT offer handoff until fixed.
+- **Jidoka**: Stop immediately if: (1) Backlog missing or incomplete → execute /project/create-backlog first, (2) Team capacity < 8 SP/sprint → alert project too long, (3) Gate mandatory criteria fail → list specific failures and do NOT offer handoff until fixed.
 
 ---
 
@@ -211,7 +211,7 @@ When executing this workflow:
 
 2. **Be proactive**: Propose reasonable defaults for team parameters (16 SP/sprint) if user provides no arguments. Propose preliminary estimates for User Stories missing SP (based on complexity heuristics). Signal when estimates need refinement but don't block execution.
 
-3. **Follow Katas**: This command implements **Kata L1-04 Step 6** but does NOT have a dedicated kata flujo like raise.5.backlog.
+3. **Follow Katas**: This command implements **Kata L1-04 Step 6** but does NOT have a dedicated kata flujo like project/create-backlog.
 
    Instead, it follows:
    - **Template structure**: `estimation_roadmap.md` has 5 sections (steps 2-6 map 1:1 to these sections)
@@ -232,7 +232,7 @@ When executing this workflow:
 5. **Gates**: Execute `gate-estimation.md` at step 7. This gate has 7 mandatory criteria that MUST pass:
    - C1-C7 check completeness of all 5 sections + metadata
    - If gate fails, identify specific issues (e.g., "C2: Table only 87% coverage, missing US-023, US-031...") and guide user through fixes
-   - Do NOT offer handoff to `/raise.7.sow` until gate passes (Jidoka principle)
+   - Do NOT offer handoff to `/tools/generate-contract` until gate passes (Jidoka principle)
 
 6. **Heutagogy**: This command facilitates learning about agile estimation, not just mechanical execution. Explain the "why":
    - Why Fibonacci scale? (Reflects increasing uncertainty at larger sizes)

@@ -1,9 +1,14 @@
 ---
 description: Translate an approved PRD into a high-level Solution Vision that aligns business objectives with technical decisions.
-handoffs: 
-  - label: Create Feature Spec
-    agent: speckit.1.specify
-    prompt: Create the specification for a specific feature derived from this vision
+handoffs:
+  - label: Map Ecosystem
+    agent: project/map-ecosystem
+    prompt: Map the ecosystem dependencies for this solution
+    send: true
+  - label: Design Architecture
+    agent: project/design-architecture
+    prompt: Create the technical architecture from this vision
+    send: false
 ---
 
 ## User Input
@@ -26,7 +31,7 @@ Goal: Bridge the gap between PRD ("what") and Technical Design ("how") following
    - Cargar `specs/main/project_requirements.md`.
    - Recopilar stack, restricciones técnicas e integraciones.
    - **Verificación**: El PRD existe y hay un resumen del contexto técnico.
-   - > **Si no puedes continuar**: PRD no encontrado → Ejecutar `/raise.1.discovery` primero. Contexto técnico desconocido → Ejecutar `/raise.1.analyze`.
+   - > **Si no puedes continuar**: PRD no encontrado → Ejecutar `/project/create-prd` primero. Contexto técnico desconocido → Ejecutar análisis de código existente.
 
 3. **Paso 2: Instanciar Template Solution Vision**:
    - Preparar el archivo `specs/main/solution_vision.md` basado en el template.
