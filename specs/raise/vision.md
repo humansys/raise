@@ -1,14 +1,14 @@
 ---
 id: "VIS-RAISE-002"
 title: "RaiSE Framework v2.0 - Solution Vision"
-version: "2.1.0"
-date: "2026-01-28"
+version: "2.2.0"
+date: "2026-01-29"
 status: "Draft"
 author: "Emilio + Claude Opus 4.5"
 supersedes: "VIS-RAISE-001 (governance-only, pre-v2)"
 related_docs:
-  - "[SAR Component Vision](./sar/vision.md)"
-  - "[CTX Component Vision](./ctx/vision.md)"
+  - "[Setup Commands Detail](./sar/vision.md)"
+  - "[Context Commands Detail](./ctx/vision.md)"
   - "[Architecture](./architecture.md)"
   - "[Tech Design](./design.md)"
   - "[Roadmap](./roadmap.md)"
@@ -25,17 +25,17 @@ template: "lean-spec-v1"
 
 | Aspecto | v1.x | v2.0 |
 |---------|------|------|
-| Scope | Infraestructura (SAR + CTX) | Framework completo (3 capas) |
+| Scope | Infraestructura (setup + context) | Framework completo (3 capas) |
 | Specification | Templates verbosos | **Lean Spec** (MVS) |
 | Context | Full dump | **MVC** (Minimum Viable Context) |
 | Commands | Fragmentados (raise.*, speckit.*) | 7 categorías unificadas |
 | Workflows | Ad-hoc | **Katas** con Jidoka inline |
 
-**Componentes principales:**
-- **SAR**: Extrae convenciones de codebases brownfield (Layer 2)
-- **CTX**: Entrega contexto mínimo viable a agentes (Layer 2)
-- **Commands**: Workflows ejecutables en 5 categorías (Layer 3)
-- **Data Store**: Reglas y grafo versionados (Layer 1)
+**Capas principales:**
+- **setup/ commands**: Extraen convenciones de codebases brownfield
+- **context/ commands**: Entregan contexto mínimo viable a agentes
+- **project/ + feature/ commands**: Workflows de desarrollo
+- **Data Store**: Reglas y grafo versionados (.raise/)
 
 ---
 
@@ -60,11 +60,11 @@ template: "lean-spec-v1"
 │  └─────────────────────────────┬──────────────────────────────────────────┘ │
 │                                │ usa                                         │
 │                                ▼                                             │
-│  LAYER 2: COMPONENTS (Infraestructura de gobernanza)                        │
+│  LAYER 2: GOVERNANCE INFRASTRUCTURE                                        │
 │  ┌────────────────────────────────────────────────────────────────────────┐ │
 │  │                                                                         │ │
 │  │  ┌─────────────────────────┐       ┌─────────────────────────────────┐ │ │
-│  │  │          SAR            │       │           CTX                   │ │ │
+│  │  │      setup/ commands    │       │     context/ commands           │ │ │
 │  │  │    (Extracción)         │       │    (Entrega de MVC)             │ │ │
 │  │  ├─────────────────────────┤       ├─────────────────────────────────┤ │ │
 │  │  │ • Analiza codebase      │       │ • Lee rules + graph             │ │ │
@@ -76,7 +76,7 @@ template: "lean-spec-v1"
 │  │  │ Método: LLM synthesis   │       │ Método: Determinista            │ │ │
 │  │  └─────────────────────────┘       └─────────────────────────────────┘ │ │
 │  │                                                                         │ │
-│  │  Ver: solution-vision-sar.md        Ver: solution-vision-context.md    │ │
+│  │  Detalle: sar/vision.md             Detalle: ctx/vision.md             │ │
 │  │                                                                         │ │
 │  └─────────────────────────────┬──────────────────────────────────────────┘ │
 │                                │ produce/consume                             │
@@ -117,10 +117,10 @@ Los equipos de desarrollo tienen **conocimiento tribal implícito** sobre conven
 
 RaiSE transforma conocimiento tribal implícito en **gobernanza explícita, versionada, y ejecutable**:
 
-1. **SAR extrae** convenciones de codebases existentes (facts, not gaps)
-2. **Data Store persiste** reglas en formato estructurado (YAML + Graph)
-3. **CTX entrega** contexto mínimo viable a agentes cuando lo necesitan
-4. **Commands orquestan** workflows de desarrollo con gobernanza integrada
+1. **setup/ commands** extraen convenciones de codebases existentes (facts, not gaps)
+2. **Data Store** persiste reglas en formato estructurado (YAML + Graph)
+3. **context/ commands** entregan contexto mínimo viable a agentes cuando lo necesitan
+4. **project/ + feature/ commands** orquestan workflows de desarrollo con gobernanza integrada
 
 **Resultado**: Código AI-generated que pasa code review en el primer intento.
 
@@ -133,16 +133,16 @@ RaiSE transforma conocimiento tribal implícito en **gobernanza explícita, vers
 ```
 COMMANDS (35 totales: 24 comandos + 11 gates):
 
-setup/                          (SAR + Init - 1x brownfield)
+setup/                          (Extracción de convenciones - 1x brownfield)
 ├── init-project                # Inicializar proyecto con constitution
-├── analyze-codebase            # SAR: analizar codebase brownfield
-├── generate-rules              # SAR: generar reglas desde análisis
-└── edit-rule                   # SAR: editar regla existente
+├── analyze-codebase            # Analizar codebase brownfield
+├── generate-rules              # Generar reglas desde análisis
+└── edit-rule                   # Editar regla existente
 
-context/                        (CTX - on-demand)
-├── get                         # CTX: obtener MVC para tarea
-├── check                       # CTX: verificar compliance de código
-└── explain                     # CTX: explicar regla específica
+context/                        (Entrega de MVC - on-demand)
+├── get                         # Obtener MVC para tarea
+├── check                       # Verificar compliance de código
+└── explain                     # Explicar regla específica
 
 project/                        (Project Flow - 1x proyecto)
 ├── create-prd                  # Discovery → PRD
@@ -224,7 +224,7 @@ Cada comando se implementa usando el patrón spec-kit:
 
 ## 4. Componentes de Infraestructura (Layer 2)
 
-### SAR (Software Architecture Reconstruction)
+### setup/ commands (Extracción de Convenciones)
 
 **Responsabilidad**: Extraer convenciones de codebases brownfield.
 
@@ -236,11 +236,13 @@ Cada comando se implementa usando el patrón spec-kit:
 | **Frecuencia** | Batch (cuando codebase cambia significativamente) |
 | **Principio** | "Facts Not Gaps" - describe lo que ES, no evalúa |
 
-**Pipeline**: DETECT → SCAN → DESCRIBE → GOVERN
+**Pipeline conceptual**: DETECT → SCAN → DESCRIBE → GOVERN
+
+**Comandos**: `/setup/analyze-codebase`, `/setup/generate-rules`, `/setup/edit-rule`
 
 **Detalle**: [sar/vision.md](./sar/vision.md)
 
-### CTX (Context Delivery)
+### context/ commands (Entrega de MVC)
 
 **Responsabilidad**: Entregar Minimum-Viable Context a agentes.
 
@@ -252,7 +254,9 @@ Cada comando se implementa usando el patrón spec-kit:
 | **Frecuencia** | On-demand (cada vez que agente necesita contexto) |
 | **Principio** | Mismo input = mismo output (100% reproducible) |
 
-**Pipeline**: SCOPE MATCH → GRAPH TRAVERSE → FILTER → ASSEMBLE MVC
+**Pipeline conceptual**: SCOPE MATCH → GRAPH TRAVERSE → FILTER → ASSEMBLE MVC
+
+**Comandos**: `/context/get`, `/context/check`, `/context/explain`
 
 **Detalle**: [ctx/vision.md](./ctx/vision.md)
 
@@ -306,8 +310,8 @@ Cada comando se implementa usando el patrón spec-kit:
 │                                                                  │
 │  OPEN CORE (Free)              LICENSED (Paid)                  │
 │  ┌─────────────────────┐       ┌─────────────────────────────┐  │
-│  │ • SAR LLM synthesis │       │ • SAR determinista          │  │
-│  │ • CTX completo      │       │ • Observabilidad            │  │
+│  │ • setup/ LLM synth  │       │ • setup/ determinista       │  │
+│  │ • context/ completo │       │ • Observabilidad            │  │
 │  │ • Todos los commands│       │ • CI/CD integrations        │  │
 │  │ • Katas + Gates     │       │ • Multi-repo governance     │  │
 │  │ • Templates         │       │ • Soporte enterprise        │  │
@@ -338,7 +342,7 @@ Upgrade a Licensed
 
 ### Facts Not Gaps
 
-SAR describe "lo que ES", no evalúa contra estándares externos.
+Los setup/ commands describen "lo que ES", no evalúan contra estándares externos.
 
 | ✅ Lo que RaiSE hace | ❌ Lo que RaiSE NO hace |
 |---------------------|------------------------|
@@ -348,8 +352,8 @@ SAR describe "lo que ES", no evalúa contra estándares externos.
 
 ### Deterministic Rails, Non-Deterministic Engine
 
-- **Rails** (determinista): CTX retrieval, Gates, Templates
-- **Engine** (no-determinista): SAR LLM synthesis
+- **Rails** (determinista): context/ retrieval, Gates, Templates
+- **Engine** (no-determinista): setup/ LLM synthesis
 
 ### Jidoka (Stop and Fix)
 
@@ -367,14 +371,14 @@ Cada paso en katas tiene:
 |---------|--------|-------------|
 | Code review pass rate | >80% | Código con MVC pasa review |
 | Rule precision | >85% | Reglas extraídas son correctas |
-| CTX latency | <200ms | Tiempo de respuesta |
+| context/ latency | <200ms | Tiempo de respuesta |
 | Command adoption | 100% | Todos los workflows usan RaiSE |
 
 ### Métricas de Adopción
 
 | Métrica | Target |
 |---------|--------|
-| Proyectos con SAR ejecutado | 10+ (Open Core) |
+| Proyectos con setup/ ejecutado | 10+ (Open Core) |
 | Reglas extraídas total | 500+ |
 | Upgrade rate a Licensed | 10% |
 
@@ -387,15 +391,15 @@ Cada paso en katas tiene:
 | Fase | Entregables | Estado |
 |------|-------------|--------|
 | A1: Foundation | Schemas, templates | ⏳ En progreso |
-| A2: SAR Command | `setup/analyze-codebase` | Pendiente |
-| A3: CTX Commands | `context/get`, `check`, `explain` | Pendiente |
+| A2: setup/ commands | `setup/analyze-codebase` | Pendiente |
+| A3: context/ commands | `context/get`, `check`, `explain` | Pendiente |
 | A4: Documentation | Guías, ejemplos | Pendiente |
 
 ### Track B: Licensed
 
 | Fase | Entregables | Estado |
 |------|-------------|--------|
-| B1: SAR Determinista | ast-grep, ripgrep integration | Post-validación A |
+| B1: setup/ Determinista | ast-grep, ripgrep integration | Post-validación A |
 | B2: Observabilidad | Dashboard, métricas | Post-validación A |
 | B3: Enterprise | CI/CD, multi-repo | Post-validación A |
 
@@ -407,8 +411,8 @@ Cada paso en katas tiene:
 
 | Documento | Propósito |
 |-----------|-----------|
-| [sar/vision.md](./sar/vision.md) | Detalle componente SAR |
-| [ctx/vision.md](./ctx/vision.md) | Detalle componente CTX |
+| [sar/vision.md](./sar/vision.md) | Detalle setup/ commands |
+| [ctx/vision.md](./ctx/vision.md) | Detalle context/ commands |
 | [architecture.md](./architecture.md) | Arquitectura C4 |
 | [design.md](./design.md) | Diseño técnico |
 | [roadmap.md](./roadmap.md) | Roadmap táctico |
@@ -421,10 +425,11 @@ Cada paso en katas tiene:
 
 | Version | Fecha | Cambios |
 |---------|-------|---------|
-| 1.0.0 | 2026-01-28 | Visión inicial (solo SAR + CTX como "governance") |
+| 1.0.0 | 2026-01-28 | Visión inicial (solo setup + context como "governance") |
 | 2.0.0 | 2026-01-28 | **Major refactor**: Framework completo con 3 capas, Lean Spec, MVC, 5 categorías de comandos |
 | 2.0.0 | 2026-01-28 | Visión unificada incluyendo Layer 3 (Commands) |
 | 2.1.0 | 2026-01-28 | **7 categorías**: setup, context, project, feature, validate, improve, tools |
+| 2.2.0 | 2026-01-29 | **Simplificación terminológica**: SAR → setup/ commands, CTX → context/ commands |
 
 ---
 
