@@ -91,7 +91,7 @@ El Niwashi transmite sabiduría cultural adaptable a cada jardín. Las Katas son
 │    • evolve-kata.md   - Evolución de katas                       │
 │                                                                  │
 │  Adaptable por: Cada Dojo (personalización del equipo)           │
-│  Ejecutado por: Kata Executor Harness                            │
+│  Ejecutado por: Kata Harness                                     │
 │  Invocable como: /project/discovery, /feature/implement, etc.    │
 └──────────────────────────────────────────────────────────────────┘
                               │
@@ -133,13 +133,19 @@ La jerarquía de directorios no representa niveles de abstracción, sino **ciclo
 
 Esta estructura habilita slash commands semánticos: `/project/discovery`, `/feature/implement`.
 
-### Kata Executor Harness
+### Kata Harness (Capability)
 
-Introducir un **Kata Executor Harness** que generaliza la contribución de spec-kit al control de flujo LLM:
+Introducir el **Kata Harness** como capability de plataforma que generaliza la contribución de spec-kit al control de flujo LLM.
+
+**Nota terminológica:** El término "harness" en AI tiene dos contextos distintos:
+- **Agent Harness** (ejecución): Infraestructura que envuelve un LLM para gestionar tareas de larga duración, invocación de herramientas, y gestión de contexto. *RaiSE usa este significado.*
+- **Evaluation Harness** (testing): Framework de benchmarking para evaluar LLMs (e.g., EleutherAI lm-evaluation-harness).
+
+**Alineamiento industria:** El Kata Harness se alinea con LangChain DeepAgents y Anthropic Claude Agent SDK (2024-2026).
 
 ```yaml
-# Conceptual: .raise/harness/kata-executor.yaml
-harness:
+# Conceptual: .raise/harness/config.yaml
+kata_harness:
   version: "1.0"
 
   # La kata es el "programa"
@@ -198,9 +204,8 @@ harness:
 │   ├── generate-rules.yaml
 │   └── edit-rule.yaml
 │
-├── harness/                       # Configuración del executor
-│   ├── schema.yaml                # Schema de kata
-│   ├── executor-config.yaml       # Comportamiento del harness
+├── harness/                       # Configuración del Kata Harness
+│   ├── config.yaml                # Comportamiento del harness
 │   └── dojo-overrides/            # Personalizaciones por equipo
 │
 ├── context/                       # Sabiduría (reference material)
@@ -405,7 +410,7 @@ implementation:
 | **Migración requerida** | Reestructurar archivos existentes | Plan de migración incremental |
 | **Documentación existente** | Referencias a niveles L0-L3, SAR, CTX obsoletas | Notas de migración + aliases |
 | **Curva de aprendizaje** | Usuarios existentes deben re-aprender | Guía de migración clara |
-| **Kata Executor Harness** | Nuevo componente a construir | Basado en spec-kit existente |
+| **Kata Harness** | Nueva capability a construir | Basado en spec-kit existente |
 
 ### Riesgos
 
@@ -454,8 +459,8 @@ implementation:
 - [ ] Migrar `commands/validate/*.md` → `skills/run-gate.yaml`
 - [ ] Migrar `katas/principios/` → `context/philosophy/`
 
-### Fase 3: Implementar Kata Executor Harness
-- [ ] Definir `harness/schema.yaml`
+### Fase 3: Implementar Kata Harness
+- [ ] Definir `harness/config.yaml`
 - [ ] Extraer lógica común de comandos actuales (AI Guidance, High-Signaling, handoffs)
 - [ ] Implementar interpretación de katas
 - [ ] Implementar invocación de skills
@@ -475,7 +480,7 @@ implementation:
 | **Work Cycle** | Contexto operacional que agrupa katas: `project`, `feature`, `setup`, `improve`. |
 | **Skill** | Operación atómica con inputs/outputs definidos. Invocable por katas o directamente. |
 | **Dojo** | Equipo que adapta las katas base a su contexto específico. |
-| **Harness** | Motor de ejecución que interpreta katas e invoca skills. |
+| **Kata Harness** | Capability de plataforma: motor de ejecución que interpreta katas e invoca skills. Alineado con "Agent Harness" (no "Evaluation Harness"). |
 | **Gate** | Criterios de validación (data) consumidos por el skill `run-gate`. |
 
 ## Anti-Términos (Deprecated)
