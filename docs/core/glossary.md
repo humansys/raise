@@ -1,13 +1,15 @@
 # RaiSE Glossary
 ## Vocabulario Canónico del Framework
 
-**Versión:** 2.2.0
-**Fecha:** 29 de Enero, 2026  
+**Versión:** 2.3.0
+**Fecha:** 29 de Enero, 2026
 **Propósito:** Definiciones canónicas de términos usados en el ecosistema RaiSE.
 
 > **Nota de versión 2.1:** Actualización de niveles de Kata (L0-L3 → Principios/Flujo/Patrón/Técnica), adición de ShuHaRi como lente del Orquestador, y Jidoka inline.
 
 > **Nota de versión 2.2:** Simplificación terminológica - se eliminan nombres de componentes (SAR, CTX) en favor de categorías de comandos (setup/, context/).
+
+> **Nota de versión 2.3:** Simplificación ontológica ADR-008 — modelo de 3 capas (Context/Kata/Skill), eliminación de niveles de kata, introducción de Work Cycles como organización, y Kata Harness como capability de plataforma.
 
 ---
 
@@ -32,6 +34,18 @@ Sistema de IA que ejecuta tareas de desarrollo de software bajo la orquestación
 | `tools/` | Utilidades (export, contratos) | Ad-hoc |
 
 > **Nota de diseño v2.2:** Las categorías reemplazan los nombres de componentes (SAR, CTX) para reducir carga cognitiva. Los comandos SON la implementación, no hay capa de abstracción adicional.
+
+### Context (Capa de Sabiduría) [NUEVO v2.3]
+Primera capa del modelo ontológico RaiSE. Todo lo que INFORMA pero no se EJECUTA:
+- Constitution (principios, filosofía)
+- Patterns (estructuras de referencia, anti-patrones)
+- Rules/Guardrails (convenciones, restricciones)
+- Golden Data (hechos del proyecto, conocimiento del ecosistema)
+- Templates (scaffolds, no procesos)
+
+**Metáfora Niwashi:** La sabiduría del jardinero — cuándo podar, por qué ciertas formas.
+
+> Ver ADR-008 para modelo completo Context/Kata/Skill.
 
 ### Constitution (Constitución)
 Conjunto de principios inmutables que gobiernan todas las decisiones en un proyecto RaiSE. Es el documento de mayor jerarquía y raramente cambia.
@@ -150,25 +164,47 @@ Adquisición de conocimiento exactamente cuando se necesita, integrado al flujo 
 ### Kaizen
 Filosofía japonesa de mejora continua incremental. En RaiSE, opera en dos niveles: (1) mejora del framework con cada feature implementada, y (2) crecimiento profesional del Orquestador. Si un prompt falló o el código requirió muchas iteraciones, los guardrails y katas se refinan. El sistema aprende de sus errores.
 
-### Kata [v2.1: Niveles Semánticos + Jidoka Inline]
-Proceso estructurado que hace visible la desviación del estándar, habilitando el ciclo Jidoka. Inspirado en las katas de artes marciales (práctica deliberada).
+### Kata [v2.3: Work Cycles + Jidoka Inline]
+Segunda capa del modelo ontológico RaiSE. Proceso estructurado que hace visible la desviación del estándar, habilitando el ciclo Jidoka. Inspirado en las katas de artes marciales (práctica deliberada).
 
 **Propósito:** La Kata no es documentación pasiva—es un **sensor** que detecta cuándo algo no va bien, permitiendo al Orquestador parar, corregir y continuar.
 
 **Diferenciador estratégico**: Ningún framework de agentes AI usa este término. RaiSE lo mantiene como conexión explícita con Lean y como concepto único en la industria.
 
-**Niveles Semánticos [v2.1]:**
+**Metáfora Niwashi:** La práctica del jardinero — ciclo de cuidado estacional, flujo de trabajo.
 
-| Nivel | Pregunta Guía | Propósito | Desviación Visible |
-|-------|---------------|-----------|-------------------|
-| **Principios** | ¿Por qué? ¿Cuándo? | Aplicar Constitution | "No puedo justificar" |
-| **Flujo** | ¿Cómo fluye? | Secuencias de valor | "Falta input" |
-| **Patrón** | ¿Qué forma? | Estructuras recurrentes | "Output incorrecto" |
-| **Técnica** | ¿Cómo hacer? | Instrucciones específicas | "Validación falla" |
+**Organización por Work Cycle [v2.3]:**
+
+| Work Cycle | Frecuencia | Katas |
+|------------|------------|-------|
+| `project/` | 1x por épica | discovery, vision, design, backlog |
+| `feature/` | Nx por feature | plan, implement, review |
+| `setup/` | 1x brownfield | analyze, ecosystem |
+| `improve/` | Continuo | retrospective, evolve-kata |
 
 **Jidoka Inline:** Cada paso de una Kata incluye verificación y guía de corrección embebida, no en sección separada.
 
-> Ver [kata-shuhari-schema-v2.1.md](./kata-shuhari-schema-v2.1.md) para schema completo.
+> **Migración v2.3:** Los niveles semánticos (principios/flujo/patrón/técnica) fueron eliminados por ADR-008. Las katas se organizan por Work Cycle, no por nivel de abstracción.
+
+### Kata Harness (Capability) [NUEVO v2.3]
+Capability de plataforma RaiSE: motor de ejecución que interpreta definiciones de proceso (Katas) e invoca operaciones atómicas (Skills).
+
+**Responsabilidades:**
+- Interpretar Katas y ejecutar sus pasos
+- Invocar Skills con inputs/outputs definidos
+- Gestionar el ciclo de vida del contexto
+- Manejar handoffs entre Katas
+- Aplicar verificaciones Jidoka inline
+
+**Nota terminológica:** El término "harness" en AI tiene dos contextos:
+- **Agent Harness** (ejecución): Infraestructura que envuelve un LLM para tareas largas. *RaiSE usa este significado.*
+- **Evaluation Harness** (testing): Framework de benchmarking para evaluar LLMs (e.g., EleutherAI lm-evaluation-harness).
+
+**Alineamiento industria:** Alineado con LangChain DeepAgents y Anthropic Claude Agent SDK (2024-2026).
+
+**Ubicación:** Configuración en `.raise/harness/config.yaml`. El runtime es externo (instalado separadamente).
+
+> Ver ADR-008 para arquitectura completa.
 
 ### ShuHaRi (守破離) [NUEVO v2.1]
 Modelo de maestría de las artes marciales japonesas que describe tres fases de aprendizaje. En RaiSE, ShuHaRi es una **lente** que describe cómo el Orquestador se relaciona con las Katas—no una clasificación de las Katas mismas.
@@ -183,8 +219,31 @@ Modelo de maestría de las artes marciales japonesas que describe tres fases de 
 
 > **Coherencia filosófica:** Kata, ShuHaRi, Jidoka, Kaizen—todos de origen japonés, alineados con Lean/TPS.
 
+### Skill (Capa de Acción) [NUEVO v2.3]
+Tercera capa del modelo ontológico RaiSE. Operación atómica con inputs/outputs claros, definida en YAML.
+
+**Características:**
+- **Contrato explícito**: Input/output types definidos en schema
+- **Atómico**: Una operación, un propósito
+- **Invocable**: Por katas, por el harness, o directamente
+- **Determinista**: Comportamiento predecible
+
+**Metáfora Niwashi:** Las herramientas del jardinero — tijeras, rastrillo, pala.
+
+**Skills disponibles:**
+| Skill | Propósito |
+|-------|-----------|
+| `retrieve-mvc` | Obtener Minimum Viable Context para tarea |
+| `run-gate` | Ejecutar Validation Gate |
+| `check-compliance` | Verificar código contra reglas |
+| `explain-rule` | Explicar regla con rationale |
+
+**Ubicación:** `.raise/skills/*.yaml`
+
+> Ver ADR-008 para modelo completo Context/Kata/Skill.
+
 ### setup/ (Categoría de Comandos)
-**[NUEVO v2.2]** Comandos que analizan codebases existentes (brownfield) y extraen convenciones como reglas versionadas.
+**[ACTUALIZADO v2.3]** Comandos que analizan codebases existentes (brownfield) y extraen convenciones como reglas versionadas.
 
 **Comandos:**
 - `/setup/init-project` — Inicializar proyecto con constitution
@@ -381,19 +440,26 @@ Constitution > Vision > Architecture > Domain > Execution
 Constitution (Principios) → Guardrails (Reglas) → Specs (Contratos) → Validation Gates (Checkpoints)
 ```
 
-### Jerarquía de Katas [v2.1]
+### Jerarquía Ontológica [v2.3]
 ```
-Principios > Flujo > Patrón > Técnica
+Context (Sabiduría) → Kata (Práctica) → Skill (Acción)
 ```
 
-| Nivel | Pregunta | Conexión Lean |
-|-------|----------|---------------|
-| **Principios** | ¿Por qué? | Toyota Way Principles |
-| **Flujo** | ¿Cómo fluye? | Value Stream |
-| **Patrón** | ¿Qué forma? | Standardized Work |
-| **Técnica** | ¿Cómo hacer? | Work Instructions |
+| Capa | Pregunta | Metáfora Niwashi |
+|------|----------|------------------|
+| **Context** | ¿Por qué? ¿Qué sé? | Sabiduría del jardinero |
+| **Kata** | ¿Cómo fluye? | Práctica del jardinero |
+| **Skill** | ¿Cómo hacer? | Herramientas del jardinero |
 
-**Migración:** `L0`→`principios`, `L1`→`flujo`, `L2`→`patron`, `L3`→`tecnica` (aliases preservados).
+### Organización de Katas por Work Cycle [v2.3]
+```
+katas/project/   → 1x por épica (discovery, vision, design, backlog)
+katas/feature/   → Nx por feature (plan, implement, review)
+katas/setup/     → 1x brownfield (analyze, ecosystem)
+katas/improve/   → Continuo (retrospective, evolve-kata)
+```
+
+> **Migración v2.3:** Los niveles de abstracción (principios/flujo/patrón/técnica) fueron eliminados. Ver ADR-008.
 
 ---
 
@@ -426,8 +492,11 @@ Para referenciar un principio RaiSE en documentos:
 | "Magic" | "Proceso automatizado" | Principio de transparencia |
 | "DoD Fractal" | "Validation Gate" | Terminología HITL estándar (migración v2.0) |
 | "Rule" (aislado) | "Guardrail" | Más específico, connota protección activa |
-| "L0/L1/L2/L3" (aislado) | "principios/flujo/patron/tecnica" | Nombres semánticos con pregunta guía implícita (migración v2.1) |
+| "L0/L1/L2/L3" (aislado) | Work Cycle + kata name | Niveles de abstracción eliminados por ADR-008 (migración v2.3) |
+| "principios/flujo/patrón/técnica" | Work Cycle (project/feature/setup/improve) | Niveles de abstracción eliminados por ADR-008 (migración v2.3) |
 | "micro-kaizen" | "Jidoka inline" | El ciclo de corrección está embebido en cada paso, no separado |
+| "Kata Executor Harness" | "Kata Harness" | Simplificación terminológica (migración v2.3) |
+| "Command" | "Kata" o "Skill" | Commands mezclaban proceso con ejecución (migración v2.3) |
 | "SAR" | "`setup/` commands" | Los comandos SON la implementación, no hay componente abstracto (migración v2.2) |
 | "CTX" | "`context/` commands" | Los comandos SON la implementación, no hay componente abstracto (migración v2.2) |
 | "SAR Component" | "setup commands" | Reducción de carga cognitiva (migración v2.2) |
@@ -449,28 +518,41 @@ Métricas emergentes para desarrollo asistido por IA:
 
 ---
 
-## Work Cycle (Ciclo de Trabajo) [NUEVO v2.1]
+## Work Cycle (Ciclo de Trabajo) [ACTUALIZADO v2.3]
 
-Contexto operacional del Orquestador que agrupa fases de la metodología, katas aplicables, y herramientas disponibles. Los ciclos son **ortogonales**—el Orquestador transita entre ellos según la naturaleza del trabajo, no en secuencia fija.
+Contexto operacional del Orquestador que agrupa katas aplicables y define la frecuencia de ejecución. Los ciclos son **ortogonales**—el Orquestador transita entre ellos según la naturaleza del trabajo, no en secuencia fija.
 
-**Ciclos definidos:**
+**Ciclos definidos [v2.3]:**
 
-| Ciclo | Trigger | Fases RaiSE | spec-kit |
-|-------|---------|-------------|----------|
-| **Onboarding** | Nuevo repositorio | Fase 0 (parcial) | ❌ |
-| **Proyecto** | Nueva épica | Fases 1-3 | ❌ |
-| **Feature** | Feature priorizado | Fases 4-6 | ✅ |
-| **Mejora** | Post-trabajo | Fase 7+ | ⚠️ Parcial |
+| Ciclo | Directorio | Frecuencia | Katas |
+|-------|------------|------------|-------|
+| **project** | `katas/project/` | 1x por épica | discovery, vision, design, backlog |
+| **feature** | `katas/feature/` | Nx por feature | plan, implement, review |
+| **setup** | `katas/setup/` | 1x brownfield | analyze, ecosystem |
+| **improve** | `katas/improve/` | Continuo | retrospective, evolve-kata |
 
-**Relación con Fases:** Los ciclos agrupan fases (0-7) por contexto operacional, no por secuencia temporal. Un Orquestador puede estar en cualquier ciclo según el momento.
+**Cambio v2.3:** Los Work Cycles ahora son la estructura organizativa principal de las katas, reemplazando los niveles de abstracción (principios/flujo/patrón/técnica).
 
-**Relación con Katas:** Cada ciclo tiene katas asociadas. Por ejemplo, el Ciclo de Onboarding usa `L0-01`, `L2-01` a `L2-06` de `src/katas/cursor_rules/`.
+**Slash commands:** Los Work Cycles habilitan comandos semánticos como `/project/discovery`, `/feature/implement`.
 
-> Ver [26-work-cycles-v2.1.md](./26-work-cycles-v2.1.md) para documentación completa.
+> Ver ADR-008 para decisión arquitectónica.
 
 ---
 
 ## Changelog
+
+### v2.3.0 (2026-01-29)
+- **NUEVO**: Modelo ontológico de 3 capas: Context/Kata/Skill (ADR-008)
+- **NUEVO**: Entrada `Context (Capa de Sabiduría)` — primera capa ontológica
+- **NUEVO**: Entrada `Skill (Capa de Acción)` — tercera capa ontológica
+- **NUEVO**: Entrada `Kata Harness (Capability)` — motor de ejecución de katas
+- **ACTUALIZADO**: Entrada `Kata` — ahora organizada por Work Cycle, no por nivel de abstracción
+- **ACTUALIZADO**: Entrada `Work Cycle` — ahora estructura organizativa principal de katas
+- **ACTUALIZADO**: Jerarquía de Katas → Jerarquía Ontológica + Organización por Work Cycle
+- **DEPRECADO**: Niveles de kata (principios/flujo/patrón/técnica) — usar Work Cycles
+- **DEPRECADO**: Término "Command" — usar Kata o Skill según corresponda
+- **NOTA TERMINOLÓGICA**: "Harness" = Agent Harness (ejecución), no Evaluation Harness (testing)
+- **REFERENCIA**: ADR-008 para decisión arquitectónica completa
 
 ### v2.2.0 (2026-01-29)
 - **NUEVO**: Entrada `Command Category (Categoría de Comando)` con tabla de 7 categorías
