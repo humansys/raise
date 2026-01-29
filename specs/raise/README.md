@@ -1,74 +1,53 @@
-# RaiSE Framework v2.0
+# RaiSE Framework v2.3
 
 > **Reliable AI Software Engineering** — Gobernanza explícita para desarrollo AI-assisted
 
 ---
 
-## What's New in v2.0
+## What's New in v2.3
 
-| Aspecto | v1.x (Legacy) | v2.0 |
-|---------|---------------|------|
-| **Scope** | SAR + CTX (infraestructura only) | Framework completo (3 capas) |
-| **Architecture** | 2 componentes aislados | 3 capas integradas: Data → Components → Commands |
-| **Commands** | raise.* + speckit.* (fragmentado) | 7 categorías unificadas: setup, context, project, feature, validate, improve, tools |
-| **Specification** | Templates verbosos | **Lean Spec** (MVS - Minimum Viable Specification) |
-| **Context Delivery** | Full dump de reglas | **MVC** (Minimum Viable Context) - determinista |
-| **Workflows** | Ad-hoc | **Katas** con Jidoka inline (self-correcting) |
+| Aspecto | v2.2 (Archived) | v2.3 |
+|---------|-----------------|------|
+| **Ontología** | 7 command categories + SAR/CTX | **Context/Kata/Skill** (3 capas) |
+| **Organización** | Commands by function | **Work Cycles** (project/feature/setup/improve) |
+| **Ejecución** | spec-kit harness | **Kata Harness** (platform capability) |
+| **Terminología** | SAR, CTX, Regla, Command | setup/, context/, Guardrail, Kata/Skill |
 
 ---
 
-## Arquitectura de 3 Capas
+## Modelo de 3 Capas
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                        RAISE FRAMEWORK v2.0                                  │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  LAYER 3: COMMANDS                                                          │
-│  ┌────────────────────────────────────────────────────────────────────────┐ │
-│  │  setup/    context/   project/   feature/   validate/  improve/  tools/ │ │
-│  │  (SAR)          (CTX)           (workflows)      (workflows)           │ │
-│  │                                                                         │ │
-│  │  [Implementados con Spec-Kit: katas + gates + templates]               │ │
-│  └─────────────────────────────────┬──────────────────────────────────────┘ │
-│                                    │                                         │
-│  LAYER 2: COMPONENTS               │                                         │
-│  ┌─────────────────────────────────┴──────────────────────────────────────┐ │
-│  │      SAR (Extracción)           │         CTX (Entrega MVC)            │ │
-│  │      Batch · LLM synthesis      │         On-demand · Determinista     │ │
-│  └─────────────────────────────────┬──────────────────────────────────────┘ │
-│                                    │                                         │
-│  LAYER 1: DATA STORE               │                                         │
-│  ┌─────────────────────────────────┴──────────────────────────────────────┐ │
-│  │  .raise/  →  rules/*.yaml  │  graph.yaml  │  conventions.md            │ │
-│  └────────────────────────────────────────────────────────────────────────┘ │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│                      RAISE FRAMEWORK v2.3                               │
+├────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  CONTEXT (Sabiduría)     →  Informa pero no ejecuta                    │
+│  constitution, guardrails, patterns, golden data, templates, gates     │
+│                                  │                                      │
+│                                  ▼                                      │
+│  KATA (Práctica)         →  Procesos SDLC por Work Cycle               │
+│  project/: discovery, vision, design, backlog                          │
+│  feature/: stories, plan, implement, review                            │
+│  setup/:   analyze, ecosystem                                          │
+│  improve/: retrospective, evolve-kata                                  │
+│                                  │                                      │
+│                                  ▼                                      │
+│  SKILL (Acción)          →  Operaciones atómicas                       │
+│  retrieve-mvc, run-gate, check-compliance, explain-rule                │
+│                                                                         │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
 ## Principios Core
 
-### Lean Specification
-- **MVS** (Minimum Viable Specification): 4 secciones requeridas, resto opcional
-- **Progressive Discovery**: Documentar cuando se necesita, no antes
-- **Target**: <1.5:1 ratio markdown:code (vs 3.7:1 tradicional)
-
-### Minimum Viable Context (MVC)
-- **Relevante**: Solo reglas que aplican al task/scope
-- **Denso**: Summaries para context, full content para primary
-- **Determinista**: Mismo input = mismo output (100%)
-
-### Facts Not Gaps
-- SAR describe "lo que ES", no evalúa contra estándares externos
-- Confidence basado en adoption rate objetivo
-- Sin juicios subjetivos ("buena práctica")
-
-### Jidoka (Stop and Fix)
-- Cada paso en katas tiene verificación + recovery
-- Parar en defectos, no propagar errores
-- Self-correcting workflows
+- **Heutagogía**: Orquestador dirige su propio aprendizaje
+- **Jidoka**: Parar en defectos, no propagar errores
+- **Facts Not Gaps**: Describir "lo que ES", no evaluar contra externos
+- **Governance as Code**: Todo versionado en Git
+- **Lean**: 3 conceptos vs 10+ anteriores
 
 ---
 
@@ -76,109 +55,93 @@
 
 | Documento | Propósito |
 |-----------|-----------|
-| [vision.md](./vision.md) | **Solution Vision** - Framework completo |
-| [architecture.md](./architecture.md) | Arquitectura C4 (Context + Container) |
-| [design.md](./design.md) | Tech Design (SAR + CTX) |
-| [roadmap.md](./roadmap.md) | Roadmap táctico |
+| [vision.md](./vision.md) | **Solution Vision v2.3** - Documento completo |
+| [adrs/](./adrs/) | Architecture Decision Records |
+| [schemas/](./schemas/) | JSON Schemas para rule, graph, MVC |
 
-### Componentes
-
-| Componente | Documento | Propósito |
-|------------|-----------|-----------|
-| **SAR** | [sar/vision.md](./sar/vision.md) | Software Architecture Reconstruction |
-| **CTX** | [ctx/vision.md](./ctx/vision.md) | Context Delivery (MVC) |
-
-### Commands
+### Context (en .raise/)
 
 | Documento | Propósito |
 |-----------|-----------|
-| [commands/standardization.md](./commands/standardization.md) | Roadmap de estandarización |
+| [constitution.md](../../.raise/context/constitution.md) | Principios fundamentales |
+| [glossary.md](../../.raise/context/glossary.md) | Terminología canónica v2.3 |
+| [work-cycles.md](../../.raise/context/work-cycles.md) | Definición de ciclos de trabajo |
+| [philosophy.md](../../.raise/context/philosophy.md) | Filosofía de aprendizaje |
 
-### ADRs
+### ADRs Clave
 
 | ADR | Decisión |
 |-----|----------|
-| [ADR-001](./adrs/adr-001-sar-pipeline-phases.md) | Pipeline SAR de 4 fases |
-| [ADR-002](./adrs/adr-002-deterministic-context-delivery.md) | CTX siempre determinista |
-| [ADR-003](./adrs/adr-003-yaml-rule-format.md) | YAML para reglas |
-| [ADR-004](./adrs/adr-004-separate-graph.md) | Grafo separado de reglas |
-| [ADR-005](./adrs/adr-005-confidence-adoption-rate.md) | Confidence por adoption rate |
-| [ADR-006](./adrs/adr-006-mvc-summaries.md) | MVC con summaries |
+| [ADR-008](./adrs/adr-008-kata-skill-context-simplification.md) | **Context/Kata/Skill ontology** |
+| [ADR-007](./adrs/adr-007-terminology-simplification.md) | Simplificación terminológica |
 
 ---
 
 ## Quick Start
 
 ```bash
-# 1. Setup: Extraer convenciones del codebase (brownfield)
-/setup/analyze-codebase
-/setup/generate-rules
+# Work Cycle: Setup (1x brownfield)
+/setup/analyze
+/setup/ecosystem
 
-# 2. Project: Crear documentación de proyecto
-/project/create-prd
-/project/define-vision
-/project/design-architecture
-/project/prioritize-features
+# Work Cycle: Project (1x por épica)
+/project/discovery
+/project/vision
+/project/design
+/project/backlog
 
-# 3. Feature: Desarrollar features
-/feature/design-feature "FID-001: Auth Module"
-/feature/create-backlog
-/feature/generate-stories "Item 1"
-/feature/plan-implementation
+# Work Cycle: Feature (Nx por feature)
+/feature/stories
+/feature/plan
 /feature/implement
+/feature/review
 
-# 4. Validate: Validar artefactos on-demand
-/validate/validate-prd
-/validate/validate-plan
+# Work Cycle: Improve (continuo)
+/improve/retrospective
 
-# 5. Context: Consultar reglas cuando necesites
-/context/get --task "implement auth service"
-/context/check --file "src/services/AuthService.ts"
-
-# 6. Improve: Mejora continua
-/improve/manage-kata
+# Skills (on-demand)
+/skill/retrieve-mvc --scope "src/services/"
+/skill/check-compliance --file "AuthService.ts"
+/skill/run-gate --gate "gate-vision"
 ```
 
 ---
 
-## Estructura de Directorio
+## Estructura
 
 ```
 specs/raise/
 ├── README.md              # Este archivo
-├── vision.md              # Solution Vision v2.0
-├── architecture.md        # Arquitectura C4
-├── design.md              # Tech Design
-├── roadmap.md             # Roadmap táctico
-│
-├── sar/                   # Componente SAR
-│   └── vision.md          # SAR Solution Vision
-│
-├── ctx/                   # Componente CTX
-│   └── vision.md          # CTX Solution Vision
-│
-├── commands/              # Command Layer (7 categorías)
-│   ├── architecture.md    # Arquitectura de comandos v2.1
-│   └── standardization.md # Migration roadmap
-│
-└── adrs/                  # Architecture Decision Records
-    ├── README.md
-    └── adr-001..006.md
+├── vision.md              # Solution Vision v2.3
+├── adrs/                  # Architecture Decision Records (inmutables)
+│   ├── adr-001..008.md
+│   └── README.md
+└── schemas/               # JSON Schemas para validación
+    ├── rule-schema.json
+    ├── graph-schema.json
+    └── mvc-schema.json
+
+.raise/                    # Data Store (en raíz del proyecto)
+├── context/               # Sabiduría
+├── katas/                 # Procesos por Work Cycle
+├── skills/                # Operaciones atómicas
+├── gates/                 # Criterios de validación
+├── templates/             # Scaffolds
+└── harness/               # Configuración del Kata Harness
 ```
 
 ---
 
-## Status
+## Archived (v2.2)
 
-| Fase | Estado |
-|------|--------|
-| A1: Foundation & Schemas | ⏳ En progreso |
-| A2: SAR Command | Pendiente |
-| A3: CTX Commands | Pendiente |
-| A4: Documentation | Pendiente |
+Los documentos v2.2 que usaban terminología SAR/CTX y 7 command categories están archivados en:
 
-**Track activo**: Open Core (Track A)
+```
+.raise-v1-archive/specs-v2.2/
+```
+
+Ver [archive README](../../.raise-v1-archive/specs-v2.2/README.md) para detalles de migración.
 
 ---
 
-*RaiSE Framework v2.0 — Gobernanza explícita para desarrollo AI-assisted*
+*RaiSE Framework v2.3 — Context informa. Kata guía. Skill ejecuta.*
