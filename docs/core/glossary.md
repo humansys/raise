@@ -1,11 +1,13 @@
 # RaiSE Glossary
 ## Vocabulario Canónico del Framework
 
-**Versión:** 2.1.0  
-**Fecha:** 28 de Diciembre, 2025  
+**Versión:** 2.2.0
+**Fecha:** 29 de Enero, 2026  
 **Propósito:** Definiciones canónicas de términos usados en el ecosistema RaiSE.
 
 > **Nota de versión 2.1:** Actualización de niveles de Kata (L0-L3 → Principios/Flujo/Patrón/Técnica), adición de ShuHaRi como lente del Orquestador, y Jidoka inline.
+
+> **Nota de versión 2.2:** Simplificación terminológica - se eliminan nombres de componentes (SAR, CTX) en favor de categorías de comandos (setup/, context/).
 
 ---
 
@@ -16,6 +18,21 @@ Sistema de IA que ejecuta tareas de desarrollo de software bajo la orquestación
 
 > **Principio relacionado:** Los agentes son ejecutores, no decisores autónomos. Ver [00-constitution.md](./00-constitution.md) §1.
 
+### Command Category (Categoría de Comando)
+**[NUEVO v2.2]** Agrupación semántica de comandos RaiSE según su propósito. Las 7 categorías son:
+
+| Categoría | Propósito | Frecuencia |
+|-----------|-----------|------------|
+| `setup/` | Análisis de codebase, extracción de reglas | 1x brownfield |
+| `context/` | Entrega de contexto mínimo viable a agentes | On-demand |
+| `project/` | Flujo de proyecto (PRD → Backlog) | 1x proyecto |
+| `feature/` | Flujo de feature (Design → Implement) | Nx feature |
+| `validate/` | Gates de validación bajo demanda | On-demand |
+| `improve/` | Mejora continua (katas, retrospectivas) | Continuo |
+| `tools/` | Utilidades (export, contratos) | Ad-hoc |
+
+> **Nota de diseño v2.2:** Las categorías reemplazan los nombres de componentes (SAR, CTX) para reducir carga cognitiva. Los comandos SON la implementación, no hay capa de abstracción adicional.
+
 ### Constitution (Constitución)
 Conjunto de principios inmutables que gobiernan todas las decisiones en un proyecto RaiSE. Es el documento de mayor jerarquía y raramente cambia.
 
@@ -25,6 +42,23 @@ Conjunto de principios inmutables que gobiernan todas las decisiones en un proye
 - **Comunidad**: CLAUDE.md, .cursorrules, AGENTS.md
 
 > **Nota**: RaiSE mantiene "Constitution" por su alineamiento con Constitutional AI (Anthropic, 2022) y spec-kit de GitHub.
+
+### context/ (Categoría de Comandos)
+**[NUEVO v2.2]** Comandos que entregan Minimum Viable Context (MVC) a agentes LLM.
+
+**Comandos:**
+- `/context/get` — Obtener MVC para una tarea específica
+- `/context/check` — Verificar compliance de código contra reglas
+- `/context/explain` — Explicar una regla específica
+
+**Características:**
+- **Input**: Task + Scope + Confidence threshold
+- **Output**: MVC (primary_rules, context_rules, warnings)
+- **Método**: Determinista (graph traversal, pattern matching)
+- **Frecuencia**: On-demand (cada vez que agente necesita contexto)
+- **Principio**: Mismo input = mismo output (100% reproducible)
+
+> **Evolución v2.2:** Reemplaza "CTX Component" como terminología. Los comandos son la implementación directa, no hay componente abstracto separado.
 
 ### Context Engineering
 **[NUEVO v2.0]** Disciplina de diseñar el ambiente informacional completo que un LLM consume para ejecutar tareas. Evolución de "prompt engineering" hacia una práctica arquitectónica.
@@ -149,10 +183,53 @@ Modelo de maestría de las artes marciales japonesas que describe tres fases de 
 
 > **Coherencia filosófica:** Kata, ShuHaRi, Jidoka, Kaizen—todos de origen japonés, alineados con Lean/TPS.
 
+### setup/ (Categoría de Comandos)
+**[NUEVO v2.2]** Comandos que analizan codebases existentes (brownfield) y extraen convenciones como reglas versionadas.
+
+**Comandos:**
+- `/setup/init-project` — Inicializar proyecto con constitution
+- `/setup/analyze-codebase` — Analizar codebase brownfield
+- `/setup/generate-rules` — Generar reglas desde análisis
+- `/setup/edit-rule` — Editar regla existente
+
+**Características:**
+- **Input**: Codebase brownfield
+- **Output**: `rules/*.yaml`, `graph.yaml`, `conventions.md`
+- **Método**: LLM synthesis (Open Core) / Determinista (Licensed)
+- **Frecuencia**: Batch (cuando codebase cambia significativamente)
+- **Principio**: "Facts Not Gaps" — describe lo que ES, no evalúa
+
+**Pipeline conceptual:** DETECT → SCAN → DESCRIBE → GOVERN
+
+> **Evolución v2.2:** Reemplaza "SAR Component" como terminología. Los comandos son la implementación directa, no hay componente abstracto separado.
+
 ### Lean Software Development
 Adaptación de los principios del Toyota Production System al desarrollo de software. RaiSE es fundamentalmente un framework Lean que integra IA como acelerador del flujo de valor. Los siete principios Lean (eliminar desperdicio, amplificar aprendizaje, decidir tarde, entregar rápido, empoderar al equipo, construir integridad, ver el todo) guían todas las decisiones de diseño de RaiSE.
 
 > Ver [05-learning-philosophy.md](./05-learning-philosophy.md) para desarrollo completo.
+
+### MVC (Minimum Viable Context)
+**[NUEVO v2.2]** El contexto mínimo necesario para que un agente LLM ejecute una tarea correctamente, sin información innecesaria que aumente tokens o confunda.
+
+**Estructura del MVC:**
+```yaml
+query:
+  task: "descripción de la tarea"
+  scope: "path/pattern"
+  min_confidence: 0.80
+
+primary_rules:     # Reglas directamente aplicables (contenido completo)
+context_rules:     # Reglas relacionadas (solo resúmenes)
+warnings:          # Conflictos, deprecaciones, baja confianza
+graph_context:     # Subgrafo de relaciones relevantes
+```
+
+**Principios:**
+- **Determinista**: Mismo input = mismo output (sin LLM en retrieval)
+- **Token-efficient**: Resúmenes para reglas de contexto, completas para primarias
+- **Graph-aware**: Traversal de relaciones entre reglas
+
+> **Comando asociado:** `/context/get` entrega el MVC para una tarea específica.
 
 ### Observable Workflow
 **[NUEVO v2.0]** Flujo de trabajo donde cada decisión del agente es trazable y auditable. Alineado con el framework MELT (Metrics, Events, Logs, Traces) de observabilidad.
@@ -351,6 +428,10 @@ Para referenciar un principio RaiSE en documentos:
 | "Rule" (aislado) | "Guardrail" | Más específico, connota protección activa |
 | "L0/L1/L2/L3" (aislado) | "principios/flujo/patron/tecnica" | Nombres semánticos con pregunta guía implícita (migración v2.1) |
 | "micro-kaizen" | "Jidoka inline" | El ciclo de corrección está embebido en cada paso, no separado |
+| "SAR" | "`setup/` commands" | Los comandos SON la implementación, no hay componente abstracto (migración v2.2) |
+| "CTX" | "`context/` commands" | Los comandos SON la implementación, no hay componente abstracto (migración v2.2) |
+| "SAR Component" | "setup commands" | Reducción de carga cognitiva (migración v2.2) |
+| "CTX Component" | "context commands" | Reducción de carga cognitiva (migración v2.2) |
 
 ---
 
@@ -390,6 +471,15 @@ Contexto operacional del Orquestador que agrupa fases de la metodología, katas 
 ---
 
 ## Changelog
+
+### v2.2.0 (2026-01-29)
+- **NUEVO**: Entrada `Command Category (Categoría de Comando)` con tabla de 7 categorías
+- **NUEVO**: Entrada `context/` (Categoría de Comandos) — reemplaza "CTX Component"
+- **NUEVO**: Entrada `setup/` (Categoría de Comandos) — reemplaza "SAR Component"
+- **NUEVO**: Entrada `MVC (Minimum Viable Context)` con estructura YAML
+- **DEPRECADO**: Términos "SAR" y "CTX" como nombres de componentes
+- **AÑADIDO**: Anti-términos SAR, CTX, SAR Component, CTX Component
+- **DECISIÓN**: Los comandos SON la implementación, no hay capa de abstracción adicional
 
 ### v2.1.0 (2025-12-29)
 - **NUEVO**: Entrada `Work Cycle (Ciclo de Trabajo)` con tabla resumen de los 4 ciclos
