@@ -2,11 +2,11 @@
 description: Generate a Feature Tech Design from a prioritized feature in the backlog, using the lean tech-design-feature template.
 handoffs:
   - label: Generate User Stories
-    agent: raise.feature.stories
+    agent: feature/generate-stories
     prompt: Generate user stories for this feature design
     send: true
   - label: Plan Implementation
-    agent: raise.feature.plan
+    agent: feature/plan-implementation
     prompt: Create implementation plan for this feature
     send: false
 ---
@@ -38,7 +38,7 @@ Goal: Create a lean Feature Tech Design (`specs/features/{feature-id}/tech-desig
      - `specs/main/tech_design.md` (arquitectura del proyecto)
      - `specs/main/solution_vision.md` (visión general)
    - **Verificación**: El feature está identificado y existe contexto de proyecto.
-   - > **Si no puedes continuar**: Feature no encontrado en backlog → Verificar que `/raise.5.backlog` se ejecutó. Sin contexto de proyecto → Ejecutar `/raise.4.tech-design` primero para proyectos nuevos.
+   - > **Si no puedes continuar**: Feature no encontrado en backlog → Verificar que `/project/create-backlog` se ejecutó. Sin contexto de proyecto → Ejecutar `/project/design-architecture` primero para proyectos nuevos.
 
 3. **Paso 2: Crear Estructura de Feature**:
    - Crear directorio `specs/features/{feature-id}/` si no existe.
@@ -102,13 +102,13 @@ Goal: Create a lean Feature Tech Design (`specs/features/{feature-id}/tech-desig
    - Mostrar resumen:
      - "✓ Feature Tech Design generado en specs/features/{feature-id}/tech-design.md"
      - Para secciones opcionales vacías: "ℹ Sección '[nombre]' omitida (no aplica)"
-   - Mostrar handoff: "→ Siguiente paso: `/raise.feature.stories` para generar User Stories"
+   - Mostrar handoff: "→ Siguiente paso: `/feature/generate-stories` para generar User Stories"
 
 ## Notas
 
 ### Diferencia con Tech Design de Proyecto
-- **Proyecto** (`/raise.4.tech-design`): Arquitectura completa, 15+ secciones, decisiones fundamentales.
-- **Feature** (`/raise.feature.design`): Diseño lean, 3-4 secciones, enfocado en implementación específica.
+- **Proyecto** (`/project/design-architecture`): Arquitectura completa, 15+ secciones, decisiones fundamentales.
+- **Feature** (`/feature/design-feature`): Diseño lean, 3-4 secciones, enfocado en implementación específica.
 
 ### Cuándo Usar Este Comando
 - Feature ya priorizado en backlog
@@ -116,8 +116,8 @@ Goal: Create a lean Feature Tech Design (`specs/features/{feature-id}/tech-desig
 - Necesidad de documentar approach antes de implementar
 
 ### Cuándo NO Usar Este Comando
-- Feature requiere cambios arquitectónicos mayores → Usar `/raise.4.tech-design` para actualizar arquitectura primero
-- Feature es trivial (< 2 horas de trabajo) → Ir directo a `/raise.feature.plan`
+- Feature requiere cambios arquitectónicos mayores → Usar `/project/design-architecture` para actualizar arquitectura primero
+- Feature es trivial (< 2 horas de trabajo) → Ir directo a `/feature/plan-implementation`
 
 ## High-Signaling Guidelines
 

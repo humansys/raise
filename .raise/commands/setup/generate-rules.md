@@ -2,7 +2,7 @@
 description: Automated rule generation engine based on patterns detected in the code. Implements Katas L2-01 and L2-03.
 handoffs: 
   - label: Edit Generated Rule
-    agent: speckit.raise.rules-edit
+    agent: setup/edit-rule
     prompt: I want to refine the rule you just generated
 ---
 

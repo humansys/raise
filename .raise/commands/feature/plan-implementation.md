@@ -2,11 +2,11 @@
 description: Generate an Implementation Plan from User Stories, ordering tasks by dependencies and producing atomic task lists for deterministic execution.
 handoffs:
   - label: Implement Feature
-    agent: raise.feature.implement
+    agent: feature/implement
     prompt: Implement this feature following the plan
     send: true
   - label: Validate Plan
-    agent: raise.validate.plan
+    agent: validate/validate-plan
     prompt: Validate the implementation plan
     send: false
 ---
@@ -35,7 +35,7 @@ Goal: Generate an Implementation Plan (`specs/features/{feature-id}/plan.md`) an
    - Parsear frontmatter YAML de cada story (id, title, priority, estimate).
    - Leer index.md para obtener resumen y dependencias.
    - **Verificación**: Al menos 1 story cargada con frontmatter válido.
-   - > **Si no puedes continuar**: Stories no encontradas → **JIDOKA**: Ejecutar `/raise.feature.stories {feature-id}` primero. Frontmatter inválido → Corregir formato de stories.
+   - > **Si no puedes continuar**: Stories no encontradas → **JIDOKA**: Ejecutar `/feature/generate-stories {feature-id}` primero. Frontmatter inválido → Corregir formato de stories.
 
 3. **Paso 2: Construir Grafo de Dependencias**:
    - Para cada story, identificar dependencias:
@@ -146,7 +146,7 @@ Goal: Generate an Implementation Plan (`specs/features/{feature-id}/plan.md`) an
     - Mostrar warnings si aplican:
       - "⚠ Esfuerzo XL: considerar dividir feature en sub-features"
       - "⚠ Tasks sin dependencias claras: verificar orden manualmente"
-    - Mostrar handoff: "→ Siguiente paso: `/raise.feature.implement` para ejecutar el plan"
+    - Mostrar handoff: "→ Siguiente paso: `/feature/implement` para ejecutar el plan"
 
 ## Notas
 

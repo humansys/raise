@@ -2,7 +2,7 @@
 description: Generate a Technical Design document from an approved Solution Vision, following the 15 steps of kata flujo-03-tech-design.
 handoffs:
   - label: Create Project Backlog
-    agent: raise.5.backlog
+    agent: project/create-backlog
     prompt: Create the project backlog from this Tech Design
     send: true
 ---
@@ -29,7 +29,7 @@ Goal: Populate the Tech Design template (`.specify/templates/raise/tech/tech_des
    - Cargar `specs/main/project_requirements.md` (PRD) como referencia de requisitos.
    - Recopilar documentación técnica adicional si existe (APIs, schemas, etc.).
    - **Verificación**: La Solution Vision existe y el contexto técnico del proyecto está claro.
-   - > **Si no puedes continuar**: Solution Vision no encontrada → **JIDOKA**: Ejecutar `/raise.2.vision` primero. PRD faltante → Ejecutar `/raise.1.discovery` primero. Contexto técnico desconocido → Para brownfield, ejecutar `/raise.1.analyze`.
+   - > **Si no puedes continuar**: Solution Vision no encontrada → **JIDOKA**: Ejecutar `/project/define-vision` primero. PRD faltante → Ejecutar `/project/create-prd` primero. Contexto técnico desconocido → Para brownfield, ejecutar análisis de código.
 
 3. **Paso 2: Instanciar Template Tech Design**:
    - Copiar template a `specs/main/tech_design.md`.
@@ -173,13 +173,13 @@ Goal: Populate the Tech Design template (`.specify/templates/raise/tech/tech_des
     - Mostrar resumen:
       - "✓ Tech Design generado en specs/main/tech_design.md"
       - Para secciones vacías: "⚠ Sección '[nombre]' está vacía - revisar manualmente"
-    - Mostrar handoff: "→ Siguiente paso: `/raise.5.backlog`"
+    - Mostrar handoff: "→ Siguiente paso: `/project/create-backlog`"
 
 ## Notas
 
 ### Para Proyectos Brownfield
 Antes de ejecutar este flujo, considerar ejecutar:
-- `/raise.1.analyze` para análisis de código existente
+- Análisis de código existente (comando setup pending)
 - Mapeo de dependencias del ecosistema
 
 ### Nivel de Detalle por Tipo de Proyecto
@@ -210,4 +210,4 @@ When executing this workflow:
 4. **Traceability**: Every technical decision should link back to a requirement in the PRD or a goal in the Vision.
 5. **Gates**: Always run the reference gate at the end.
 6. **Diagrams**: Use Mermaid syntax for architecture diagrams to ensure they render in Markdown viewers.
-7. **Consistency**: Follow the structure pattern of `raise.1.discovery` and `raise.2.vision` commands.
+7. **Consistency**: Follow the structure pattern of `project/create-prd` and `project/define-vision` commands.

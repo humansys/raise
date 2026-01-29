@@ -1,5 +1,10 @@
 ---
 description: Map the ecosystem of an existing system, including services, integrations, and data flows.
+handoffs:
+  - label: Design Architecture
+    agent: project/design-architecture
+    prompt: Create the technical architecture incorporating this ecosystem map
+    send: true
 ---
 
 ## User Input

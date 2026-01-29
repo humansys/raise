@@ -2,11 +2,11 @@
 description: Generate User Stories from a Feature Tech Design, decomposing technical approach into implementable work units with clear acceptance criteria.
 handoffs:
   - label: Plan Implementation
-    agent: raise.feature.plan
+    agent: feature/plan-implementation
     prompt: Create implementation plan from these user stories
     send: true
   - label: Validate Stories
-    agent: raise.validate.stories
+    agent: validate/validate-stories
     prompt: Validate the generated user stories
     send: false
 ---
@@ -38,7 +38,7 @@ Goal: Generate User Stories from a Feature Tech Design (`specs/features/{feature
      - "Interfaz / Contrato" → definición de contrato
      - "Consideraciones" → decisiones y riesgos
    - **Verificación**: Tech Design existe y tiene las 3 secciones obligatorias.
-   - > **Si no puedes continuar**: Tech Design no encontrado → **JIDOKA**: Ejecutar `/raise.feature.design {feature-id}` primero. Secciones faltantes → Completar tech-design antes de generar stories.
+   - > **Si no puedes continuar**: Tech Design no encontrado → **JIDOKA**: Ejecutar `/feature/design-feature {feature-id}` primero. Secciones faltantes → Completar tech-design antes de generar stories.
 
 3. **Paso 2: Generar Stories por Componente**:
    - Para cada componente en "Componentes afectados":
@@ -165,7 +165,7 @@ Goal: Generate User Stories from a Feature Tech Design (`specs/features/{feature
    - Mostrar warnings si aplican:
      - "⚠ Pocas stories (< 3): verificar si el feature está sub-descompuesto"
      - "⚠ Muchas stories (> 7): considerar dividir en sub-features"
-   - Mostrar handoff: "→ Siguiente paso: `/raise.feature.plan` para crear plan de implementación"
+   - Mostrar handoff: "→ Siguiente paso: `/feature/plan-implementation` para crear plan de implementación"
 
 ## Notas
 
