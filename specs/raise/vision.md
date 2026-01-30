@@ -1,20 +1,25 @@
 ---
-id: "VIS-RAISE-003"
-title: "RaiSE Framework v2.3 - Solution Vision"
-version: "2.3.1"
-date: "2026-01-29"
+id: "VIS-RAISE-004"
+title: "RaiSE Framework v2.4 - Solution Vision"
+version: "2.4.0"
+date: "2026-01-30"
 status: "Active"
 author: "Emilio + Claude Opus 4.5"
-supersedes: "VIS-RAISE-002 (v2.2 - 7 command categories)"
+supersedes: "VIS-RAISE-003 (v2.3 - Context/Kata/Skill ontology)"
 related_docs:
+  - "[ADR-010: Three-Level Artifact Hierarchy](./adrs/adr-010-three-level-artifact-hierarchy.md)"
+  - "[ADR-009: Continuous Governance Model](./adrs/adr-009-continuous-governance-model.md)"
   - "[ADR-008: Context/Kata/Skill Simplification](./adrs/adr-008-kata-skill-context-simplification.md)"
-  - "[Glossary v2.3](.raise/context/glossary.md)"
+  - "[Glossary v2.4](.raise/context/glossary.md)"
   - "[Constitution](.raise/context/constitution.md)"
   - "[Work Cycles](.raise/context/work-cycles.md)"
   - "[Kata Harness Hybrid Gates Design](../main/research/outputs/kata-harness-hybrid-gates-design.md)"
   - "[Kata Harness Design Recommendation](../main/research/outputs/kata-harness-design-recommendation.md)"
 template: "lean-spec-v1"
 changelog:
+  - version: "2.4.0"
+    date: "2026-01-30"
+    changes: "Three-Level Artifact Hierarchy (ADR-010): Solution/Project/Codebase levels, solution/ work cycle, governance kata"
   - version: "2.3.1"
     date: "2026-01-29"
     changes: "Added tiered Kata Harness model (Open Core vs Enterprise)"
@@ -23,13 +28,23 @@ changelog:
     changes: "Initial v2.3 with Context/Kata/Skill ontology"
 ---
 
-# RaiSE Framework v2.3 - Solution Vision
+# RaiSE Framework v2.4 - Solution Vision
 
 ## Resumen Ejecutivo
 
-**RaiSE v2.3** (Reliable AI Software Engineering) es un framework de gobernanza para desarrollo AI-assisted. Transforma conocimiento tribal implícito en **gobernanza explícita, versionada, y ejecutable**.
+**RaiSE v2.4** (Reliable AI Software Engineering) es un framework de gobernanza para desarrollo AI-assisted. Transforma conocimiento tribal implícito en **gobernanza explícita, versionada, y ejecutable**.
 
-### Evolución desde v2.2
+### Evolución desde v2.3
+
+| Aspecto | v2.3 | v2.4 |
+|---------|------|------|
+| **Jerarquía** | Plana (project → feature) | **3 Niveles** (Solution → Project → Codebase) |
+| **Work Cycles** | 4 ciclos | **5 ciclos** (+solution/) |
+| **Governance** | Standalone | **Derivada de Solution Vision** |
+| **Artefactos** | Solution Vision (proyecto) | **Project Vision** (proyecto) + **Solution Vision** (sistema) |
+| **Business Case** | No existía | **Nuevo artefacto** nivel solución |
+
+### Evolución desde v2.2 a v2.3
 
 | Aspecto | v2.2 | v2.3 |
 |---------|------|------|
@@ -67,6 +82,10 @@ graph TB
         end
 
         subgraph KATA["KATA (Capa de Práctica)"]
+            subgraph SOLUTION["katas/solution/"]
+                SOL1["discovery.md"]
+                SOL2["vision.md"]
+            end
             subgraph PROJECT["katas/project/"]
                 P1["discovery.md"]
                 P2["vision.md"]
@@ -80,8 +99,9 @@ graph TB
                 F4["review.md"]
             end
             subgraph SETUP["katas/setup/"]
-                S1["analyze.md"]
-                S2["ecosystem.md"]
+                S1["governance.md"]
+                S2["rules.md"]
+                S3["ecosystem.md"]
             end
             subgraph IMPROVE["katas/improve/"]
                 I1["retrospective.md"]
@@ -184,33 +204,61 @@ RaiSE transforma conocimiento tribal implícito en **gobernanza explícita, vers
 
 ## 3. Work Cycles (Ciclos de Trabajo)
 
-Los Work Cycles reemplazan las 7 categorías de comandos de v2.2, organizando las katas por **contexto operacional**:
+Los Work Cycles organizan las katas por **contexto operacional** y **nivel de jerarquía**:
 
-### Los Cuatro Ciclos
+### Jerarquía de Tres Niveles (ADR-010)
+
+```
+SOLUTION LEVEL (Sistema - perdura)
+├── solution/discovery    → Business Case
+├── solution/vision       → Solution Vision
+└── setup/governance      → Governance (guardrails)
+        │
+        │ constrains all projects
+        ▼
+PROJECT LEVEL (Iniciativa - time-bound)
+├── project/discovery     → PRD
+├── project/vision        → Project Vision
+├── project/design        → Tech Design
+└── project/backlog       → Backlog
+        │
+        │ implements via features
+        ▼
+CODEBASE LEVEL (Implementación)
+├── feature/plan          → Implementation plan
+├── feature/implement     → Working code
+└── feature/review        → Retrospective
+```
+
+### Los Cinco Ciclos
 
 | Ciclo | Frecuencia | Pregunta que Responde | Katas |
 |-------|------------|----------------------|-------|
+| **solution/** | 1x por sistema | "¿Por qué existe este sistema?" | discovery, vision |
 | **project/** | 1x por épica | "¿Qué hago al iniciar un proyecto?" | discovery, vision, design, backlog |
 | **feature/** | Nx por feature | "¿Qué hago para implementar un feature?" | stories, plan, implement, review |
-| **setup/** | 1x brownfield | "¿Qué hago al entrar a un repo existente?" | analyze, ecosystem |
+| **setup/** | 1x por sistema | "¿Cómo gobierno este sistema?" | governance, rules, ecosystem |
 | **improve/** | Continuo | "¿Qué hago para mejorar?" | retrospective, evolve-kata |
 
 ### Flujo entre Ciclos
 
 ```mermaid
 flowchart TD
-    SETUP["setup/<br/>(Onboarding)"]
+    SOLUTION["solution/<br/>(System Definition)"]
+    SETUP["setup/<br/>(Governance)"]
     PROJECT["project/<br/>(Planning)"]
     FEATURE["feature/<br/>(Execution)"]
     IMPROVE["improve/<br/>(Kaizen)"]
 
-    SETUP -->|"habilita"| PROJECT
+    SOLUTION -->|"define"| SETUP
+    SETUP -->|"constrains"| PROJECT
     PROJECT -->|"genera features"| FEATURE
     FEATURE -->|"alimenta"| IMPROVE
-    IMPROVE -->|"refina"| SETUP
+    IMPROVE -->|"refina"| SOLUTION
     IMPROVE -->|"refina"| PROJECT
     IMPROVE -->|"refina"| FEATURE
 
+    style SOLUTION fill:#e1bee7
     style SETUP fill:#e3f2fd
     style PROJECT fill:#fff8e1
     style FEATURE fill:#e8f5e9
@@ -218,9 +266,10 @@ flowchart TD
 ```
 
 **Notas:**
+- **solution/** es el punto de partida para sistemas greenfield
 - Los ciclos son **ortogonales**: un Orquestador puede estar en cualquiera según el momento
 - El Ciclo de Mejora **retroalimenta** todos los demás ciclos
-- Proyectos pequeños pueden saltar de setup/ directo a feature/
+- Proyectos brownfield pueden empezar en setup/ y luego project/
 - **Kata Harness ejecuta katas de TODOS los ciclos**, no solo de uno específico
 
 ---
@@ -230,9 +279,10 @@ flowchart TD
 El **Kata Harness** es la capability de plataforma que generaliza el control de flujo LLM, basado en la innovación de spec-kit.
 
 **Alcance**: El Kata Harness ejecuta **TODAS las katas** de cualquier Work Cycle:
+- `/solution/discovery`, `/solution/vision`
 - `/project/discovery`, `/project/vision`, `/project/design`, `/project/backlog`
 - `/feature/stories`, `/feature/plan`, `/feature/implement`, `/feature/review`
-- `/setup/analyze`, `/setup/ecosystem`
+- `/setup/governance`, `/setup/rules`, `/setup/ecosystem`
 - `/improve/retrospective`, `/improve/evolve-kata`
 
 ### Terminología de Industria
@@ -480,11 +530,15 @@ Cada paso en las katas implementa el patrón Jidoka:
 │   └── patterns/                   # Patrones de referencia
 │
 ├── katas/                          # Procesos SDLC por Work Cycle
+│   ├── solution/                   # Work Cycle: Sistema (NEW v2.4)
+│   │   ├── discovery.md            # → Business Case
+│   │   └── vision.md               # → Solution Vision
+│   │
 │   ├── project/                    # Work Cycle: Proyecto
-│   │   ├── discovery.md
-│   │   ├── vision.md
-│   │   ├── design.md
-│   │   └── backlog.md
+│   │   ├── discovery.md            # → PRD
+│   │   ├── vision.md               # → Project Vision (renamed v2.4)
+│   │   ├── design.md               # → Tech Design
+│   │   └── backlog.md              # → Backlog
 │   │
 │   ├── feature/                    # Work Cycle: Feature
 │   │   ├── stories.md
@@ -492,9 +546,10 @@ Cada paso en las katas implementa el patrón Jidoka:
 │   │   ├── implement.md
 │   │   └── review.md
 │   │
-│   ├── setup/                      # Work Cycle: Onboarding
-│   │   ├── analyze.md
-│   │   └── ecosystem.md
+│   ├── setup/                      # Work Cycle: Governance
+│   │   ├── governance.md           # → Guardrails (NEW v2.4)
+│   │   ├── rules.md                # → Codebase rules
+│   │   └── ecosystem.md            # → Ecosystem map
 │   │
 │   └── improve/                    # Work Cycle: Mejora Continua
 │       ├── retrospective.md
@@ -516,9 +571,16 @@ Cada paso en las katas implementa el patrón Jidoka:
 │   └── gate-code.md
 │
 ├── templates/                      # Scaffolds para artefactos
-│   ├── project_requirements.md
-│   ├── solution_vision.md
-│   ├── tech_design.md
+│   ├── solution/                   # Solution-level templates (NEW v2.4)
+│   │   ├── business_case.md
+│   │   └── solution_vision.md
+│   ├── project/                    # Project-level templates
+│   │   └── project_vision.md       # (renamed from solution_vision v2.4)
+│   ├── tech/
+│   │   └── tech_design.md
+│   ├── governance/                 # Governance templates (NEW v2.4)
+│   │   ├── guardrail.mdc
+│   │   └── governance-policy.md
 │   └── ...
 │
 ├── harness/                        # Configuración del Kata Harness
@@ -666,8 +728,10 @@ Los **Gates** son criterios de validación consumidos por el skill `run-gate`.
 
 | Work Cycle | Gate | Propósito |
 |------------|------|-----------|
+| solution/ | gate-business-case | Validar Business Case completeness |
+| solution/ | gate-solution-vision | Validar Solution Vision |
 | project/ | gate-discovery | Validar PRD completeness |
-| project/ | gate-vision | Validar Solution Vision |
+| project/ | gate-vision | Validar Project Vision (renamed v2.4) |
 | project/ | gate-design | Validar Technical Design |
 | feature/ | gate-plan | Validar Implementation Plan |
 | feature/ | gate-code | Validar código vs guardrails |
@@ -678,9 +742,9 @@ Los **Gates** son criterios de validación consumidos por el skill `run-gate`.
 ---
 id: gate-vision
 work_cycle: project
-titulo: "Gate-Vision: Validación de Solution Vision"
+titulo: "Gate-Vision: Validación de Project Vision"
 blocking: true
-version: 2.0.0
+version: 2.1.0
 ---
 
 # Gate-Vision
@@ -772,25 +836,31 @@ flowchart TD
 
 ---
 
-## 11. Terminología Canónica (v2.3)
+## 11. Terminología Canónica (v2.4)
 
 | Término | Definición |
 |---------|------------|
+| **Solution Level** | Nivel de artefactos del sistema que perdura entre proyectos: Business Case, Solution Vision, Governance. |
+| **Project Level** | Nivel de artefactos de proyecto (time-bound): PRD, Project Vision, Tech Design, Backlog. |
+| **Business Case** | Artefacto de nivel solución que justifica por qué debe existir el sistema. |
+| **Solution Vision** | Artefacto de nivel solución que define QUÉ ES el sistema. Deriva governance. |
+| **Project Vision** | Artefacto de nivel proyecto que traduce PRD en visión técnica. (Antes: Solution Vision a nivel proyecto) |
 | **Context** | Sabiduría que informa pero no se ejecuta: constitution, patterns, guardrails, golden data. |
 | **Kata** | Proceso SDLC que los equipos practican y adaptan. Organizadas por Work Cycle. |
-| **Work Cycle** | Contexto operacional que agrupa katas: `project`, `feature`, `setup`, `improve`. |
+| **Work Cycle** | Contexto operacional que agrupa katas: `solution`, `project`, `feature`, `setup`, `improve`. |
 | **Skill** | Operación atómica con inputs/outputs definidos. Invocable por katas o directamente. |
-| **Guardrail** | Convención o restricción extraída del código, con confidence score. |
+| **Guardrail** | Convención o restricción derivada de Solution Vision o extraída del código. |
 | **Dojo** | Equipo que adapta las katas base a su contexto específico. |
 | **Kata Harness** | Capability de plataforma: motor de ejecución que interpreta katas e invoca skills. |
 | **Gate** | Criterios de validación (data) consumidos por el skill `run-gate`. |
 | **MVC** | Minimum Viable Context: conjunto mínimo de guardrails para una tarea. |
 | **Orquestador** | Humano que dirige al agente LLM usando katas y skills. |
 
-### Terminología Deprecated (v2.2 y anteriores)
+### Terminología Deprecated (v2.3 y anteriores)
 
 | Evitar | Usar en su lugar | Razón |
 |--------|------------------|-------|
+| Solution Vision (nivel proyecto) | **Project Vision** | Renombrado en v2.4 (ADR-010) |
 | SAR | setup/ katas | Componente eliminado |
 | CTX | context/ skills | Componente eliminado |
 | Regla | Guardrail | Claridad semántica |
@@ -840,19 +910,21 @@ flowchart TD
 
 | ADR | Decisión |
 |-----|----------|
-| [ADR-007](./adrs/adr-007-terminology-simplification.md) | Simplificación terminológica (SAR/CTX → setup/context) |
+| [ADR-010](./adrs/adr-010-three-level-artifact-hierarchy.md) | **Three-Level Artifact Hierarchy (Solution/Project/Codebase)** |
+| [ADR-009](./adrs/adr-009-continuous-governance-model.md) | **Continuous Governance Model** |
 | [ADR-008](./adrs/adr-008-kata-skill-context-simplification.md) | Context/Kata/Skill ontology |
-| [ADR-001](./adrs/adr-001-sar-pipeline-phases.md) | Pipeline de 4 fases (histórico) |
-| [ADR-002](./adrs/adr-002-deterministic-context-delivery.md) | MVC siempre determinista |
-| [ADR-003](./adrs/adr-003-yaml-rule-format.md) | YAML para guardrails |
-| [ADR-004](./adrs/adr-004-separate-graph.md) | Grafo separado de guardrails |
-| [ADR-005](./adrs/adr-005-confidence-adoption-rate.md) | Confidence por adoption rate |
+| [ADR-007](./adrs/adr-007-terminology-simplification.md) | Simplificación terminológica (SAR/CTX → setup/context) |
 | [ADR-006](./adrs/adr-006-mvc-summaries.md) | MVC con summaries |
+| [ADR-005](./adrs/adr-005-confidence-adoption-rate.md) | Confidence por adoption rate |
+| [ADR-004](./adrs/adr-004-separate-graph.md) | Grafo separado de guardrails |
+| [ADR-003](./adrs/adr-003-yaml-rule-format.md) | YAML para guardrails |
+| [ADR-002](./adrs/adr-002-deterministic-context-delivery.md) | MVC siempre determinista |
+| [ADR-001](./adrs/adr-001-sar-pipeline-phases.md) | Pipeline de 4 fases (histórico) |
 
 ### Context Documents
 
 - [Constitution](.raise/context/constitution.md)
-- [Glossary v2.3](.raise/context/glossary.md)
+- [Glossary v2.4](.raise/context/glossary.md)
 - [Work Cycles](.raise/context/work-cycles.md)
 - [Philosophy](.raise/context/philosophy.md)
 - [Compliance](.raise/context/compliance.md)
@@ -871,9 +943,11 @@ flowchart TD
 |---------|-------|---------|
 | 2.0.0 | 2026-01-28 | Framework completo con 3 capas, SAR/CTX components |
 | 2.2.0 | 2026-01-29 | 7 command categories, Lean Spec, MVC |
-| **2.3.0** | **2026-01-29** | **Context/Kata/Skill ontology, Work Cycles, Kata Harness** |
+| 2.3.0 | 2026-01-29 | Context/Kata/Skill ontology, Work Cycles, Kata Harness |
+| **2.4.0** | **2026-01-30** | **Three-Level Hierarchy (ADR-010), solution/ Work Cycle, governance kata, Project Vision rename** |
 
 ---
 
-*RaiSE Framework v2.3: Gobernanza explícita para desarrollo AI-assisted.*
+*RaiSE Framework v2.4: Gobernanza explícita para desarrollo AI-assisted.*
+*Solution define. Project planea. Feature implementa.*
 *Context informa. Kata guía. Skill ejecuta.*

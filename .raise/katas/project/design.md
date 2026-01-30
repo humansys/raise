@@ -17,24 +17,24 @@ shuhari:
   ha: "Adaptar nivel de detalle según complejidad del proyecto"
   ri: "Crear kata de Design para arquitecturas específicas (microservices, serverless)"
 
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Design: Technical Architecture
 
 ## Propósito
 
-Traducir la Solution Vision en una arquitectura técnica detallada siguiendo el modelo C4 (Context, Container, Component). Este documento guía la implementación y sirve como referencia para decisiones técnicas.
+Traducir la Project Vision en una arquitectura técnica detallada siguiendo el modelo C4 (Context, Container, Component). Este documento guía la implementación y sirve como referencia para decisiones técnicas.
 
 ## Contexto
 
 **Cuándo usar:**
-- Después de tener una Solution Vision aprobada
+- Después de tener una Project Vision aprobada
 - Antes de crear el backlog de implementación
 - Cuando se necesita definir la arquitectura del sistema
 
 **Inputs requeridos:**
-- Solution Vision aprobada (`specs/main/solution_vision.md`)
+- Project Vision aprobada (`specs/main/project_vision.md`)
 - Contexto técnico del ecosistema
 
 **Output:**
@@ -44,9 +44,9 @@ Traducir la Solution Vision en una arquitectura técnica detallada siguiendo el 
 
 ### Paso 1: Cargar Vision y Contexto
 
-Cargar la Solution Vision y recopilar información del contexto técnico actual.
+Cargar la Project Vision y recopilar información del contexto técnico actual.
 
-**Verificación:** La Solution Vision existe y el contexto técnico está claro.
+**Verificación:** La Project Vision existe y el contexto técnico está claro.
 
 > **Si no puedes continuar:** Vision no encontrada → Ejecutar `project/vision` primero.
 

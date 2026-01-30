@@ -1,17 +1,44 @@
-# RaiSE Framework v2.3
+# RaiSE Framework v2.4
 
 > **Reliable AI Software Engineering** — Gobernanza explícita para desarrollo AI-assisted
 
 ---
 
-## What's New in v2.3
+## What's New in v2.4
 
-| Aspecto | v2.2 (Archived) | v2.3 |
-|---------|-----------------|------|
-| **Ontología** | 7 command categories + SAR/CTX | **Context/Kata/Skill** (3 capas) |
-| **Organización** | Commands by function | **Work Cycles** (project/feature/setup/improve) |
-| **Ejecución** | spec-kit harness | **Kata Harness** (platform capability) |
-| **Terminología** | SAR, CTX, Regla, Command | setup/, context/, Guardrail, Kata/Skill |
+| Aspecto | v2.3 | v2.4 |
+|---------|------|------|
+| **Jerarquía** | Plana (project → feature) | **3 Niveles** (Solution → Project → Codebase) |
+| **Work Cycles** | 4 ciclos | **5 ciclos** (+solution/) |
+| **Governance** | Standalone | **Derivada de Solution Vision** |
+| **Artefactos** | Solution Vision (proyecto) | **Project Vision** (proyecto) + **Solution Vision** (sistema) |
+| **Business Case** | No existía | **Nuevo artefacto** nivel solución |
+
+---
+
+## Jerarquía de Tres Niveles (ADR-010)
+
+```
+SOLUTION LEVEL (Sistema - perdura)
+├── solution/discovery    → Business Case
+├── solution/vision       → Solution Vision
+└── setup/governance      → Governance (guardrails)
+        │
+        │ constrains all projects
+        ▼
+PROJECT LEVEL (Iniciativa - time-bound)
+├── project/discovery     → PRD
+├── project/vision        → Project Vision (renamed from Solution Vision)
+├── project/design        → Tech Design
+└── project/backlog       → Backlog
+        │
+        │ implements via features
+        ▼
+CODEBASE LEVEL (Implementación)
+├── feature/plan          → Implementation plan
+├── feature/implement     → Working code
+└── feature/review        → Retrospective
+```
 
 ---
 
@@ -19,7 +46,7 @@
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                      RAISE FRAMEWORK v2.3                               │
+│                      RAISE FRAMEWORK v2.4                               │
 ├────────────────────────────────────────────────────────────────────────┤
 │                                                                         │
 │  CONTEXT (Sabiduría)     →  Informa pero no ejecuta                    │
@@ -27,10 +54,11 @@
 │                                  │                                      │
 │                                  ▼                                      │
 │  KATA (Práctica)         →  Procesos SDLC por Work Cycle               │
-│  project/: discovery, vision, design, backlog                          │
-│  feature/: stories, plan, implement, review                            │
-│  setup/:   analyze, ecosystem                                          │
-│  improve/: retrospective, evolve-kata                                  │
+│  solution/: discovery, vision                                          │
+│  project/:  discovery, vision, design, backlog                         │
+│  feature/:  stories, plan, implement, review                           │
+│  setup/:    governance, rules, ecosystem                               │
+│  improve/:  retrospective, evolve-kata                                 │
 │                                  │                                      │
 │                                  ▼                                      │
 │  SKILL (Acción)          →  Operaciones atómicas                       │
@@ -55,7 +83,7 @@
 
 | Documento | Propósito |
 |-----------|-----------|
-| [vision.md](./vision.md) | **Solution Vision v2.3** - Documento completo |
+| [vision.md](./vision.md) | **Solution Vision v2.4** - Documento completo |
 | [adrs/](./adrs/) | Architecture Decision Records |
 | [schemas/](./schemas/) | JSON Schemas para rule, graph, MVC |
 
@@ -64,7 +92,7 @@
 | Documento | Propósito |
 |-----------|-----------|
 | [constitution.md](../../.raise/context/constitution.md) | Principios fundamentales |
-| [glossary.md](../../.raise/context/glossary.md) | Terminología canónica v2.3 |
+| [glossary.md](../../.raise/context/glossary.md) | Terminología canónica v2.4 |
 | [work-cycles.md](../../.raise/context/work-cycles.md) | Definición de ciclos de trabajo |
 | [philosophy.md](../../.raise/context/philosophy.md) | Filosofía de aprendizaje |
 
@@ -72,7 +100,9 @@
 
 | ADR | Decisión |
 |-----|----------|
-| [ADR-008](./adrs/adr-008-kata-skill-context-simplification.md) | **Context/Kata/Skill ontology** |
+| [ADR-010](./adrs/adr-010-three-level-artifact-hierarchy.md) | **Three-Level Artifact Hierarchy** |
+| [ADR-009](./adrs/adr-009-continuous-governance-model.md) | **Continuous Governance Model** |
+| [ADR-008](./adrs/adr-008-kata-skill-context-simplification.md) | Context/Kata/Skill ontology |
 | [ADR-007](./adrs/adr-007-terminology-simplification.md) | Simplificación terminológica |
 
 ---
@@ -80,15 +110,20 @@
 ## Quick Start
 
 ```bash
-# Work Cycle: Setup (1x brownfield)
-/setup/analyze
-/setup/ecosystem
+# Work Cycle: Solution (1x por sistema - greenfield)
+/solution/discovery        # → Business Case
+/solution/vision           # → Solution Vision
+
+# Work Cycle: Setup (1x por sistema)
+/setup/governance          # → Guardrails (derivado de Solution Vision)
+/setup/rules               # → Codebase rules
+/setup/ecosystem           # → Ecosystem map
 
 # Work Cycle: Project (1x por épica)
-/project/discovery
-/project/vision
-/project/design
-/project/backlog
+/project/discovery         # → PRD
+/project/vision            # → Project Vision
+/project/design            # → Tech Design
+/project/backlog           # → Backlog
 
 # Work Cycle: Feature (Nx por feature)
 /feature/stories
@@ -112,9 +147,9 @@
 ```
 specs/raise/
 ├── README.md              # Este archivo
-├── vision.md              # Solution Vision v2.3
+├── vision.md              # Solution Vision v2.4
 ├── adrs/                  # Architecture Decision Records (inmutables)
-│   ├── adr-001..008.md
+│   ├── adr-001..010.md
 │   └── README.md
 └── schemas/               # JSON Schemas para validación
     ├── rule-schema.json
@@ -124,15 +159,32 @@ specs/raise/
 .raise/                    # Data Store (en raíz del proyecto)
 ├── context/               # Sabiduría
 ├── katas/                 # Procesos por Work Cycle
+│   ├── solution/          # NEW v2.4
+│   ├── project/
+│   ├── feature/
+│   ├── setup/
+│   └── improve/
 ├── skills/                # Operaciones atómicas
 ├── gates/                 # Criterios de validación
 ├── templates/             # Scaffolds
+│   ├── solution/          # NEW v2.4
+│   ├── project/           # NEW v2.4
+│   └── ...
 └── harness/               # Configuración del Kata Harness
 ```
 
 ---
 
-## Archived (v2.2)
+## Migration from v2.3
+
+See [Migration Guide](../../docs/migration/v2.3-to-v2.4-migration.md) for details on:
+- Renaming `solution_vision.md` to `project_vision.md` at project level
+- Creating solution-level artifacts (Business Case, Solution Vision)
+- Updating kata and gate references
+
+---
+
+## Archived (v2.2 and earlier)
 
 Los documentos v2.2 que usaban terminología SAR/CTX y 7 command categories están archivados en:
 
@@ -140,8 +192,7 @@ Los documentos v2.2 que usaban terminología SAR/CTX y 7 command categories est�
 .raise-v1-archive/specs-v2.2/
 ```
 
-Ver [archive README](../../.raise-v1-archive/specs-v2.2/README.md) para detalles de migración.
-
 ---
 
-*RaiSE Framework v2.3 — Context informa. Kata guía. Skill ejecuta.*
+*RaiSE Framework v2.4 — Solution define. Project planea. Feature implementa.*
+*Context informa. Kata guía. Skill ejecuta.*
