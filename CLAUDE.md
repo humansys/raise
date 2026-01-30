@@ -49,15 +49,34 @@ Este proyecto utiliza el agente **RaiSE Ontology Architect** como sparring partn
 
 **Prompt del agente:** `.raise/agents/raise-ontology-arch-agent/raise-ontology-architect-opus45.md`
 
+## Three-Directory Model (ADR-011)
+
+```
+raise-commons/
+├── .raise/           # Framework engine (katas, gates, templates, skills)
+├── framework/        # Framework governance (vision, context, decisions)
+├── governance/       # Project governance (solution artifacts)
+├── work/             # Active work (features, proposals, research)
+└── dev/              # Internal tooling (governance maintenance)
+```
+
+| Directory | Purpose | Audience |
+|-----------|---------|----------|
+| `.raise/` | How to govern (the engine) | All users |
+| `framework/` | What governs the framework | Framework maintainers |
+| `governance/` | What governs projects | Project teams |
+| `work/` | Active work in progress | Contributors |
+| `dev/` | Governance maintenance tools | Framework maintainers |
+
 ## Fuentes de Verdad (Golden Data)
 
 | Prioridad | Documento | Propósito |
 |-----------|-----------|-----------|
-| 1 | `.specify/memory/constitution.md` | Principios spec-kit |
-| 2 | `docs/framework/v2.1/model/00-constitution-v2.md` | Constitution RaiSE completa |
-| 3 | `docs/framework/v2.1/model/20-glossary-v2.1.md` | Terminología canónica |
-| 4 | `docs/framework/v2.1/model/21-methodology-v2.md` | Metodología |
-| 5 | `docs/framework/v2.1/adrs/*.md` | Decisiones arquitectónicas |
+| 1 | `framework/reference/constitution.md` | Constitution RaiSE |
+| 2 | `framework/reference/glossary.md` | Terminología canónica v2.5 |
+| 3 | `framework/vision.md` | Framework vision |
+| 4 | `dev/decisions/framework/*.md` | ADRs (Architecture Decisions) |
+| 5 | `.specify/memory/constitution.md` | Principios spec-kit |
 
 ## Terminología Canónica (v2.1)
 
@@ -96,7 +115,7 @@ Este proyecto utiliza el agente **RaiSE Ontology Architect** como sparring partn
 
 ### Traducción: Roadmap → Features
 
-El roadmap (`specs/raise/roadmap.md`) contiene **Fases** con **Tareas** (e.g., A1.1, A1.2). La traducción es:
+El roadmap (`governance/solution/roadmap.md`) contiene **Fases** con **Tareas** (e.g., A1.1, A1.2). La traducción es:
 
 | Roadmap | Artefacto RaiSE | Comando |
 |---------|-----------------|---------|
@@ -111,7 +130,7 @@ El roadmap (`specs/raise/roadmap.md`) contiene **Fases** con **Tareas** (e.g., A
          ↓
 2. /speckit.specify "A1.3: Create SAR output templates"
          ↓
-3. Genera: specs/NNN-sar-output-templates/spec.md
+3. Genera: work/features/{NNN-feature-name}/spec.md
          ↓
 4. /speckit.plan → plan.md
          ↓
@@ -154,24 +173,43 @@ Todo lo que no está en Git, no existe oficialmente. Políticas, decisiones y es
 ### Simplicidad sobre Completitud
 Preferir documentación concisa que cubra 80% de casos. Evitar abstracciones prematuras. YAGNI aplicado a la ontología.
 
-## Estructura del Repositorio
+## Estructura del Repositorio (ADR-011)
 
 ```
 raise-commons/
 ├── CLAUDE.md                    # Este archivo
 ├── .claude/commands/            # Comandos spec-kit
-├── .specify/
-│   ├── memory/constitution.md   # Constitution spec-kit
-│   └── templates/               # Templates de artefactos
-├── .raise/agents/               # Prompts de agentes
-├── docs/
-│   ├── framework/v2.1/          # Modelo ontológico actual
-│   │   ├── model/               # Documentos core
-│   │   ├── adrs/                # Decisiones arquitectónicas
-│   │   └── katas/               # Ejercicios y validaciones
-│   ├── research/                # Investigación
-│   └── archive/                 # Versiones anteriores
-└── README.md
+├── .specify/                    # spec-kit configuration
+│
+├── .raise/                      # Framework engine
+│   ├── katas/                   # Process definitions
+│   ├── gates/                   # Validation criteria
+│   ├── templates/               # Scaffolds
+│   ├── skills/                  # Atomic operations
+│   └── agents/                  # Agent prompts
+│
+├── framework/                   # Framework textbook (PUBLIC)
+│   ├── README.md                # What is RaiSE?
+│   ├── vision.md                # Framework vision
+│   ├── getting-started/         # Adoption guides (greenfield, brownfield)
+│   ├── concepts/                # Core concepts explained
+│   └── reference/               # Glossary, constitution, philosophy
+│
+├── governance/                  # Project governance (dogfooding)
+│   ├── index.yaml               # Manifest
+│   ├── solution/                # Solution-level artifacts
+│   └── projects/                # Project-level artifacts
+│
+├── work/                        # Active work
+│   ├── features/                # Feature specs
+│   ├── proposals/               # Draft ADRs
+│   └── research/                # Spikes
+│
+├── dev/                         # Framework maintenance tools
+│   ├── skills/                  # governance-sync, audit, impact-analysis
+│   └── framework-index.yaml     # Meta-index
+│
+└── docs/                        # Human-readable docs, archive
 ```
 
 ## Workflow Típico
@@ -240,9 +278,9 @@ raise-commons/
 - Markdown (CommonMark spec) for command file, Bash for scripts (009-backlog-command)
 - Git-based text files (Markdown with YAML frontmatter) (009-backlog-command)
 - Markdown (CommonMark spec) for command file + template, Bash for prerequisite scripts (010-estimation-command)
-- Git repository (versioned Markdown files in `specs/main/`) (010-estimation-command)
+- Git repository (versioned Markdown files in `governance/projects/`) (010-estimation-command)
 - Markdown (for command definition) + Bash (for scripts) + `raise-kit` existing scripts (`check-prerequisites.sh`, `update-agent-context.sh`) (001-sow-command)
-- Local Filesystem (reading inputs from `specs/main/`, writing output to `specs/main/`) (001-sow-command)
+- Local Filesystem (reading inputs from `governance/`, writing output to `governance/`) (001-sow-command)
 
 ## Recent Changes
 - 004-operation-layers: Documento `26-work-cycles-v2.1.md` formalizando los 4 ciclos de trabajo; entrada Work Cycle en glosario

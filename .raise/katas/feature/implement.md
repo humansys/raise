@@ -34,12 +34,12 @@ Ejecutar el plan de implementación task por task, verificando cada paso, y prod
 - Repetido para cada task del plan
 
 **Inputs requeridos:**
-- Plan de implementación (`specs/{feature}/plan.md`)
+- Plan de implementación (`work/features/{feature}/plan.md`)
 - Contexto de reglas del proyecto
 
 **Output:**
 - Código implementado y verificado
-- `specs/{feature}/progress.md` - Registro de progreso
+- `work/features/{feature}/progress.md` - Registro de progreso
 
 ## Pasos
 
@@ -83,7 +83,7 @@ Ejecutar verificación definida en el plan:
 
 ### Paso 5: Registrar Progreso
 
-Actualizar `specs/{feature}/progress.md`:
+Actualizar `work/features/{feature}/progress.md`:
 - Task completado
 - Tiempo real vs estimado
 - Notas o descubrimientos

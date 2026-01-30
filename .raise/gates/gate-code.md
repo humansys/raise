@@ -160,7 +160,7 @@ git push origin feature-branch
 
 ## Referencias
 
-- Kata asociada: [`flujo-06-development`](../katas-v2.1/flujo/06-development.md)
-- Gate previo: [`gate-plan`](./gate-plan.md)
+- Kata asociada: `.raise/katas/feature/implement.md`
+- Gate previo: `gate-plan.md`
 - Siguiente: UAT & Deploy (Gate-Deploy)
-- Metodología: [`21-methodology-v2.md`](../../docs/framework/v2.1/model/21-methodology-v2.md) §Fase 6
+- Work Cycles: `framework/reference/work-cycles.md`

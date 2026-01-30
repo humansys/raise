@@ -1,22 +1,24 @@
 ---
 id: gate-vision
 work_cycle: project
-titulo: "Gate-Vision: Validación de Solution Vision"
+titulo: "Gate-Vision: Validación de Project Vision"
 blocking: true
-version: 2.0.0
+version: 2.1.0
 ---
 
-# Gate-Vision: Validación de Solution Vision
+# Gate-Vision: Validación de Project Vision
 
 ## Propósito
 
-Verificar que la Solution Vision está completa, alinea negocio con técnica, y tiene la calidad necesaria para proceder a la siguiente kata (project/design).
+Verificar que la Project Vision está completa, alinea negocio con técnica, y tiene la calidad necesaria para proceder a la siguiente kata (project/design).
+
+> **Nota ADR-010**: Este gate valida la Project Vision (nivel proyecto). Para validación de Solution Vision (nivel sistema), ver `gate-solution-vision.md`.
 
 ## Cuándo Aplicar
 
 - Después de completar `katas/project/vision.md`
 - Antes de iniciar `katas/project/design.md`
-- El documento debe existir en `specs/main/solution_vision.md`
+- El documento debe existir en `work/projects/{project}/vision.md` (draft) or `governance/projects/{project}/vision.md` (approved)
 
 ---
 
@@ -50,12 +52,12 @@ Verificar que la Solution Vision está completa, alinea negocio con técnica, y 
 
 Confirmar que:
 - Todos los goals del PRD aparecen en el alineamiento
-- El scope de la Vision es subset o igual al PRD (no añade scope)
+- El scope de la Project Vision es subset o igual al PRD (no añade scope)
 - Las métricas de negocio del PRD están traducidas
 
 **Verificación:** No hay goals, scope o métricas "huérfanas" en ningún documento.
 
-> **Si no puedes continuar:** Discrepancias encontradas → Revisar PRD y Vision lado a lado. Documentar diferencias.
+> **Si no puedes continuar:** Discrepancias encontradas → Revisar PRD y Project Vision lado a lado. Documentar diferencias.
 
 ### Paso 2: Validar factibilidad técnica
 
@@ -132,7 +134,16 @@ Verificar aprobaciones:
 ## Referencias
 
 - Kata asociada: `katas/project/vision.md`
-- Template: `templates/solution/solution-vision.md`
+- Template: `templates/project/project_vision.md`
 - Gate previo: `gates/gate-discovery.md`
 - Siguiente kata: `katas/project/design.md`
 - Siguiente gate: `gates/gate-design.md`
+- ADR: `dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md`
+
+## Post-Gate Action
+
+When this gate passes, promote the artifact:
+```
+work/projects/{project}/vision.md → governance/projects/{project}/vision.md
+```
+Update `governance/index.yaml` with the new approved artifact.

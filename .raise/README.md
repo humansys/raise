@@ -130,8 +130,8 @@ Old command structure moved to `.raise-archive/`:
 - `commands/` → replaced by `katas/`
 - `templates/_legacy/` → replaced by `templates/`
 
-See: `specs/raise/adrs/adr-008-kata-skill-context-simplification.md`
+See: `dev/decisions/framework/adr-008-kata-skill-context-simplification.md`
 
 ---
 
-*RaiSE Framework v2.1 — Context/Kata/Skill Ontology*
+*RaiSE Framework v2.5 — Three-Directory Model*
