@@ -387,16 +387,16 @@ PROJECT LEVEL:
 | **Arquitectura** | "¿Qué es?" + "¿Cómo hacemos las cosas aquí?" | Solution Vision, Golden Data, ADRs |
 | **Guardrails** | "¿Qué hacer?" + "¿Cómo verificar?" | `.raise/governance/guardrails/*.mdc` |
 
-> **Research reference**: `specs/main/research/outputs/layered-grounding-analysis.md`
+> **Research reference**: `work/research/outputs/layered-grounding-analysis.md`
 
 ## Referencias
 
-- **ADR-010**: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`
-- **ADR-009**: `framework/decisions/adr-009-continuous-governance-model.md`
-- **ADR-011**: `framework/decisions/adr-011-three-directory-model.md`
+- **ADR-010**: `dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md`
+- **ADR-009**: `dev/decisions/framework/adr-009-continuous-governance-model.md`
+- **ADR-011**: `dev/decisions/framework/adr-011-three-directory-model.md`
 - **Research**: Layered Grounding Analysis (RES-LAYERED-GROUNDING-001)
 - **Template**: `.raise/templates/governance/guardrails.md`
 - **Questions Catalog**: `.raise/templates/governance/governance-questions.md`
-- **Constitution RaiSE**: `framework/context/constitution.md`
+- **Constitution RaiSE**: `framework/reference/constitution.md`
 - **Prerequisite kata**: `solution/vision`
 - **Siguiente kata**: `setup/rules`

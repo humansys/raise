@@ -72,10 +72,10 @@ raise-commons/
 
 | Prioridad | Documento | Propósito |
 |-----------|-----------|-----------|
-| 1 | `framework/context/constitution.md` | Constitution RaiSE |
-| 2 | `framework/context/glossary.md` | Terminología canónica v2.4 |
+| 1 | `framework/reference/constitution.md` | Constitution RaiSE |
+| 2 | `framework/reference/glossary.md` | Terminología canónica v2.5 |
 | 3 | `framework/vision.md` | Framework vision |
-| 4 | `framework/decisions/*.md` | ADRs (Architecture Decisions) |
+| 4 | `dev/decisions/framework/*.md` | ADRs (Architecture Decisions) |
 | 5 | `.specify/memory/constitution.md` | Principios spec-kit |
 
 ## Terminología Canónica (v2.1)
@@ -115,7 +115,7 @@ raise-commons/
 
 ### Traducción: Roadmap → Features
 
-El roadmap (`specs/raise/roadmap.md`) contiene **Fases** con **Tareas** (e.g., A1.1, A1.2). La traducción es:
+El roadmap (`governance/solution/roadmap.md`) contiene **Fases** con **Tareas** (e.g., A1.1, A1.2). La traducción es:
 
 | Roadmap | Artefacto RaiSE | Comando |
 |---------|-----------------|---------|
@@ -130,7 +130,7 @@ El roadmap (`specs/raise/roadmap.md`) contiene **Fases** con **Tareas** (e.g., A
          ↓
 2. /speckit.specify "A1.3: Create SAR output templates"
          ↓
-3. Genera: work/features/NNN-sar-output-templates/spec.md
+3. Genera: work/features/{NNN-feature-name}/spec.md
          ↓
 4. /speckit.plan → plan.md
          ↓
@@ -188,12 +188,12 @@ raise-commons/
 │   ├── skills/                  # Atomic operations
 │   └── agents/                  # Agent prompts
 │
-├── framework/                   # Framework governance (meta)
-│   ├── index.yaml               # Manifest
-│   ├── vision.md                # What RaiSE IS
-│   ├── context/                 # Glossary, constitution, philosophy
-│   ├── decisions/               # ADRs
-│   └── schemas/                 # JSON Schemas
+├── framework/                   # Framework textbook (PUBLIC)
+│   ├── README.md                # What is RaiSE?
+│   ├── vision.md                # Framework vision
+│   ├── getting-started/         # Adoption guides (greenfield, brownfield)
+│   ├── concepts/                # Core concepts explained
+│   └── reference/               # Glossary, constitution, philosophy
 │
 ├── governance/                  # Project governance (dogfooding)
 │   ├── index.yaml               # Manifest
@@ -278,9 +278,9 @@ raise-commons/
 - Markdown (CommonMark spec) for command file, Bash for scripts (009-backlog-command)
 - Git-based text files (Markdown with YAML frontmatter) (009-backlog-command)
 - Markdown (CommonMark spec) for command file + template, Bash for prerequisite scripts (010-estimation-command)
-- Git repository (versioned Markdown files in `specs/main/`) (010-estimation-command)
+- Git repository (versioned Markdown files in `governance/projects/`) (010-estimation-command)
 - Markdown (for command definition) + Bash (for scripts) + `raise-kit` existing scripts (`check-prerequisites.sh`, `update-agent-context.sh`) (001-sow-command)
-- Local Filesystem (reading inputs from `specs/main/`, writing output to `specs/main/`) (001-sow-command)
+- Local Filesystem (reading inputs from `governance/`, writing output to `governance/`) (001-sow-command)
 
 ## Recent Changes
 - 004-operation-layers: Documento `26-work-cycles-v2.1.md` formalizando los 4 ciclos de trabajo; entrada Work Cycle en glosario

@@ -1,22 +1,23 @@
 ---
-id: "VIS-RAISE-004"
-title: "RaiSE Framework v2.4 - Solution Vision"
-version: "2.4.0"
+id: "VIS-RAISE-005"
+title: "RaiSE Framework v2.5 - Solution Vision"
+version: "2.5.0"
 date: "2026-01-30"
 status: "Active"
 author: "Emilio + Claude Opus 4.5"
-supersedes: "VIS-RAISE-003 (v2.3 - Context/Kata/Skill ontology)"
+supersedes: "VIS-RAISE-004 (v2.4 - Three-Level Artifact Hierarchy)"
 related_docs:
-  - "[ADR-010: Three-Level Artifact Hierarchy](./adrs/adr-010-three-level-artifact-hierarchy.md)"
-  - "[ADR-009: Continuous Governance Model](./adrs/adr-009-continuous-governance-model.md)"
-  - "[ADR-008: Context/Kata/Skill Simplification](./adrs/adr-008-kata-skill-context-simplification.md)"
-  - "[Glossary v2.4](.raise/context/glossary.md)"
-  - "[Constitution](.raise/context/constitution.md)"
-  - "[Work Cycles](.raise/context/work-cycles.md)"
-  - "[Kata Harness Hybrid Gates Design](../main/research/outputs/kata-harness-hybrid-gates-design.md)"
-  - "[Kata Harness Design Recommendation](../main/research/outputs/kata-harness-design-recommendation.md)"
+  - "[ADR-011: Three-Directory Model](../dev/decisions/framework/adr-011-three-directory-model.md)"
+  - "[ADR-010: Three-Level Artifact Hierarchy](../dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md)"
+  - "[ADR-009: Continuous Governance Model](../dev/decisions/framework/adr-009-continuous-governance-model.md)"
+  - "[Glossary v2.5](./reference/glossary.md)"
+  - "[Constitution](./reference/constitution.md)"
+  - "[Work Cycles](./reference/work-cycles.md)"
 template: "lean-spec-v1"
 changelog:
+  - version: "2.5.0"
+    date: "2026-01-30"
+    changes: "Three-Directory Model (ADR-011): .raise/governance/work structure, framework as textbook, consistency audit"
   - version: "2.4.0"
     date: "2026-01-30"
     changes: "Three-Level Artifact Hierarchy (ADR-010): Solution/Project/Codebase levels, solution/ work cycle, governance kata"
@@ -132,7 +133,7 @@ graph TB
 
 | Capa | Propósito | Contenido | Ubicación |
 |------|-----------|-----------|-----------|
-| **CONTEXT** | Sabiduría que INFORMA pero no se EJECUTA | Constitution, Patterns, Guardrails, Golden Data, Templates, Gates | `.raise/context/`, `.raise/templates/`, `.raise/gates/` |
+| **CONTEXT** | Sabiduría que INFORMA pero no se EJECUTA | Constitution, Patterns, Guardrails, Golden Data, Templates, Gates | `framework/reference/`, `.raise/templates/`, `.raise/gates/` |
 | **KATA** | Procesos que los equipos PRACTICAN y ADAPTAN | Katas organizadas por Work Cycle (project/feature/setup/improve) | `.raise/katas/{work_cycle}/` |
 | **SKILL** | Operaciones ATÓMICAS con inputs/outputs claros | retrieve-mvc, run-gate, check-compliance, explain-rule, generate-rules, edit-rule | `.raise/skills/` |
 
@@ -923,11 +924,11 @@ flowchart TD
 
 ### Context Documents
 
-- [Constitution](.raise/context/constitution.md)
-- [Glossary v2.4](.raise/context/glossary.md)
-- [Work Cycles](.raise/context/work-cycles.md)
-- [Philosophy](.raise/context/philosophy.md)
-- [Compliance](.raise/context/compliance.md)
+- [Constitution](framework/reference/constitution.md)
+- [Glossary v2.4](framework/reference/glossary.md)
+- [Work Cycles](framework/reference/work-cycles.md)
+- [Philosophy](framework/reference/philosophy.md)
+- [Compliance](framework/reference/compliance.md)
 
 ### Research
 

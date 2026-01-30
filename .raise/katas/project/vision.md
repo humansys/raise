@@ -180,4 +180,4 @@ Todas las decisiones técnicas DEBEN justificar un objetivo de negocio. Si una d
 - Gate de validación: `gates/gate-vision.md`
 - Template: `templates/project/project_vision.md`
 - Kata previa: `project/discovery`
-- ADR: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`
+- ADR: `dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md`

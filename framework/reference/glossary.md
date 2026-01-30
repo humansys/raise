@@ -1,7 +1,7 @@
 # RaiSE Glossary
 ## Vocabulario Canónico del Framework
 
-**Versión:** 2.4.0
+**Versión:** 2.5.0
 **Fecha:** 30 de Enero, 2026
 **Propósito:** Definiciones canónicas de términos usados en el ecosistema RaiSE.
 
@@ -403,7 +403,7 @@ Artefacto de nivel **solución** que documenta la justificación de negocio para
 - Riesgos y mitigaciones
 - Recomendación (Go/No-Go)
 
-**Ubicación:** `specs/main/business_case.md`
+**Ubicación:** `governance/solution/business_case.md`
 **Kata:** `solution/discovery`
 
 ### Solution Vision [ACTUALIZADO v2.4]
@@ -419,7 +419,7 @@ Artefacto de nivel **solución** que define QUÉ ES el sistema. Responde: "¿Qu�
 - Quality attributes y security level
 - Integraciones
 
-**Ubicación:** `specs/main/solution_vision.md`
+**Ubicación:** `governance/solution/vision.md`
 **Kata:** `solution/vision`
 **Deriva:** Governance (guardrails del sistema)
 
