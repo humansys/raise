@@ -6,9 +6,10 @@ session_name: solution-discovery
 branch: solution-discovery
 participants: [Orchestrator, Claude Opus 4.5]
 kata: solution/discovery
-status: in-progress
-artifacts_target:
+status: completed
+artifacts_created:
   - governance/solution/business_case.md
+  - governance/solution/vision.md
 ---
 
 # Kata Execution: solution/discovery - RaiSE Business Case
