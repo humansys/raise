@@ -26,6 +26,8 @@ work/
 │   └── adr-NNN-*.md
 ├── research/           # Spikes and investigations
 │   └── {topic}/
+├── analysis/           # Code and system analysis
+│   └── {topic}/
 └── projects/           # Draft project-level work
     └── {project-name}/
         ├── vision.md   # Draft project vision
