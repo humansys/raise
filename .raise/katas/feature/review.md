@@ -103,7 +103,7 @@ Crear documento de retrospectiva:
 ## Output
 
 - **Artefacto:** Retrospectiva
-- **Ubicación:** `specs/{feature}/retrospective.md`
+- **Ubicación:** `work/features/{feature}/retrospective.md`
 - **Gate:** N/A
 - **Siguiente kata:** Próximo feature o mejora continua
 

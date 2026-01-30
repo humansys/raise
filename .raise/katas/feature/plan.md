@@ -38,7 +38,7 @@ Descomponer user stories en tasks atómicos ejecutables, identificar dependencia
 - Technical Design para contexto arquitectónico
 
 **Output:**
-- `specs/{feature}/plan.md` - Plan de implementación
+- `work/features/{feature}/plan.md` - Plan de implementación
 
 ## Pasos
 
@@ -109,7 +109,7 @@ Crear documento de plan con:
 ## Output
 
 - **Artefacto:** Implementation Plan
-- **Ubicación:** `specs/{feature}/plan.md`
+- **Ubicación:** `work/features/{feature}/plan.md`
 - **Gate:** `gates/gate-plan.md`
 - **Siguiente kata:** `feature/implement`
 

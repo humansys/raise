@@ -4,7 +4,7 @@
 > **Fecha**: [YYYY-MM-DD]
 > **Autor**: [Nombre]
 > **Versión**: 1.0.0
-> **PRD Referencia**: `specs/main/project_requirements.md`
+> **PRD Referencia**: `governance/projects/{project}/prd.md`
 
 ---
 
@@ -189,9 +189,9 @@
 
 | Fuente | Artefacto | Relación |
 |--------|-----------|----------|
-| PRD | `specs/main/project_requirements.md` | Input principal |
-| Solution Vision | `specs/main/solution_vision.md` | Contexto de sistema |
-| Tech Design | `specs/main/tech_design.md` | Output (siguiente) |
+| PRD | `governance/projects/{project}/prd.md` | Input principal |
+| Solution Vision | `governance/solution/vision.md` | Contexto de sistema |
+| Tech Design | `governance/projects/{project}/design.md` | Output (siguiente) |
 
 ---
 

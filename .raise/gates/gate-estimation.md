@@ -1,6 +1,6 @@
 # Gate: Estimation Roadmap Validation
 
-**Purpose**: Validate that `specs/main/estimation_roadmap.md` is complete, accurate, and ready for Statement of Work generation.
+**Purpose**: Validate that `governance/projects/{project}/estimation.md` is complete, accurate, and ready for Statement of Work generation.
 
 **Executed by**: raise.6.estimation command at Step 7 (Finalize & Validate)
 
@@ -32,7 +32,7 @@
 
 **How to verify**:
 1. Count table rows (excluding header and TOTAL)
-2. Load `specs/main/project_backlog.md` and count Epics + Features + User Stories
+2. Load `governance/projects/{project}/backlog.md` and count Epics + Features + User Stories
 3. Verify: table_rows == backlog_items
 4. Verify: sum(SP column) == TOTAL row value
 

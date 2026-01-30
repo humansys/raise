@@ -112,11 +112,11 @@ Cuando un guardrail no puede cumplirse, el proceso es:
 
 ## Referencias
 
-- **ADR-009**: `framework/decisions/adr-009-continuous-governance-model.md`
-- **ADR-010**: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`
-- **ADR-011**: `framework/decisions/adr-011-three-directory-model.md`
+- **ADR-009**: `dev/decisions/framework/adr-009-continuous-governance-model.md`
+- **ADR-010**: `dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md`
+- **ADR-011**: `dev/decisions/framework/adr-011-three-directory-model.md`
 - **Solution Vision**: `governance/solution/vision.md`
-- **RaiSE Constitution**: `framework/context/constitution.md`
+- **RaiSE Constitution**: `framework/reference/constitution.md`
 
 ---
 

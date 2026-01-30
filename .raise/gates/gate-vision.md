@@ -138,7 +138,7 @@ Verificar aprobaciones:
 - Gate previo: `gates/gate-discovery.md`
 - Siguiente kata: `katas/project/design.md`
 - Siguiente gate: `gates/gate-design.md`
-- ADR: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`
+- ADR: `dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md`
 
 ## Post-Gate Action
 

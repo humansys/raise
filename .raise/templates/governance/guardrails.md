@@ -119,7 +119,7 @@ Cuando un guardrail no puede cumplirse, el proceso es:
 - **ADR-010**: Jerarquía de Tres Niveles
 - **ADR-011**: Modelo de Tres Directorios
 - **Solution Vision**: `governance/solution/vision.md`
-- **RaiSE Constitution**: `framework/context/constitution.md`
+- **RaiSE Constitution**: `framework/reference/constitution.md`
 
 ---
 
