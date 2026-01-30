@@ -1,7 +1,7 @@
 ---
 id: "VIS-RAISE-003"
 title: "RaiSE Framework v2.3 - Solution Vision"
-version: "2.3.0"
+version: "2.3.1"
 date: "2026-01-29"
 status: "Active"
 author: "Emilio + Claude Opus 4.5"
@@ -11,7 +11,16 @@ related_docs:
   - "[Glossary v2.3](.raise/context/glossary.md)"
   - "[Constitution](.raise/context/constitution.md)"
   - "[Work Cycles](.raise/context/work-cycles.md)"
+  - "[Kata Harness Hybrid Gates Design](../main/research/outputs/kata-harness-hybrid-gates-design.md)"
+  - "[Kata Harness Design Recommendation](../main/research/outputs/kata-harness-design-recommendation.md)"
 template: "lean-spec-v1"
+changelog:
+  - version: "2.3.1"
+    date: "2026-01-29"
+    changes: "Added tiered Kata Harness model (Open Core vs Enterprise)"
+  - version: "2.3.0"
+    date: "2026-01-29"
+    changes: "Initial v2.3 with Context/Kata/Skill ontology"
 ---
 
 # RaiSE Framework v2.3 - Solution Vision
@@ -26,7 +35,7 @@ template: "lean-spec-v1"
 |---------|------|------|
 | **Ontología** | 7 command categories + SAR/CTX components | **Context/Kata/Skill** (3 capas) |
 | **Organización** | Commands by function | **Work Cycles** (project/feature/setup/improve) |
-| **Ejecución** | spec-kit harness | **Kata Harness** (platform capability) |
+| **Ejecución** | spec-kit harness | **Kata Harness** (Open Core + Enterprise tiers) |
 | **Carga cognitiva** | 10+ concepts | **3 concepts** (Context, Kata, Skill) |
 | **Terminología** | SAR, CTX, Regla, Command | setup/, context/, Guardrail, Kata/Skill |
 
@@ -233,38 +242,205 @@ El **Kata Harness** es la capability de plataforma que generaliza el control de 
 | **Agent Harness** | Ejecución: infraestructura que envuelve un LLM para gestionar tareas | **Kata Harness usa este significado** |
 | **Evaluation Harness** | Testing: framework de benchmarking (e.g., EleutherAI) | No aplica |
 
-### Componentes del Kata Harness
+### 4.1 Modelo Tiered: Open Core vs Enterprise
 
-```yaml
-# Conceptual: .raise/harness/config.yaml
-kata_harness:
-  version: "1.0"
+RaiSE ofrece **dos niveles de Kata Harness** según las necesidades de governance:
 
-  # La kata es el "programa"
-  kata_schema:
-    - frontmatter (id, titulo, work_cycle, prerequisites, template, gate)
-    - proposito (por qué existe)
-    - contexto (cuándo aplicar)
-    - pasos (con Jidoka inline)
-    - output (artefacto resultante)
+```mermaid
+graph TB
+    subgraph OPEN["OPEN CORE (Hybrid Gates)"]
+        direction TB
+        OC1["Markdown Katas"]
+        OC2["YAML Gate Configs"]
+        OC3["Generic Gate Runner"]
+        OC4["JSONL Traces"]
+        OC1 --> OC3
+        OC2 --> OC3
+        OC3 --> OC4
+    end
 
-  # El harness es el "runtime"
-  execution:
-    - input_handling: "$ARGUMENTS"
-    - environment_init: "check-prerequisites"
-    - progress_tracking: "specs/{feature}/progress.md"
-    - jidoka_behavior: "pause-on-verification-fail"
-    - handoff_orchestration: "suggest-next-kata"
+    subgraph ENT["ENTERPRISE (Full Harness)"]
+        direction TB
+        E1["Markdown Katas"]
+        E2["YAML Policies"]
+        E3["Kata Compiler"]
+        E4["State Machine"]
+        E5["Full Observability"]
+        E1 --> E3
+        E2 --> E3
+        E3 --> E4
+        E4 --> E5
+    end
 
-  # Los skills son las "syscalls"
-  skills:
-    - retrieve-mvc
-    - run-gate
-    - check-prerequisites
-    - update-agent-context
+    OPEN -->|"upgrade path"| ENT
+
+    style OPEN fill:#e8f5e9
+    style ENT fill:#fff3e0
 ```
 
-### Jidoka (Stop and Fix)
+| Aspecto | Open Core (Hybrid Gates) | Enterprise (Full Harness) |
+|---------|--------------------------|---------------------------|
+| **Enforcement** | Gates en boundaries (pre/post kata) | 100% determinista por step |
+| **Authoring** | Markdown + YAML configs | Markdown + YAML policies |
+| **Execution** | LLM interpreta steps | State machine controla flow |
+| **Observability** | JSONL traces | OpenTelemetry + full audit |
+| **Resumability** | Manual (re-run) | Automática (checkpoints) |
+| **Compliance** | Básico | SOC2, ISO 27001, EU AI Act |
+| **Implementación** | 2 semanas | 16 semanas |
+| **Target** | Startups, OSS, indie devs | Enterprise, regulated industries |
+
+### 4.2 Open Core: Hybrid Gates
+
+El modelo **Hybrid Gates** provee enforcement determinista en los boundaries de cada kata, manteniendo la simplicidad de authoring:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  HYBRID GATES EXECUTION FLOW                                 │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  1. User invokes: /project/discovery                         │
+│                    │                                         │
+│  2. PRE-GATE ─────►│ .raise/gates/discovery.yaml             │
+│     (deterministic)│   - file_exists: README.md             │
+│                    │   - directory_writable: specs/main/     │
+│                    │                                         │
+│                    │ EXIT 0 → Continue                       │
+│                    │ EXIT 1 → JIDOKA (block + recovery)      │
+│                    ▼                                         │
+│  3. LLM EXECUTION  │ Kata steps (markdown)                   │
+│     (as today)     │   - Paso 1, Paso 2, ...                │
+│                    │   - Inline Jidoka checks               │
+│                    ▼                                         │
+│  4. POST-GATE ────►│ .raise/gates/discovery.yaml             │
+│     (deterministic)│   - file_exists: project_requirements  │
+│                    │   - count_pattern: FR-* >= 5           │
+│                    │   - section_present: Success Criteria  │
+│                    │                                         │
+│                    │ EXIT 0 → Handoff to next kata           │
+│                    │ EXIT 1 → JIDOKA (block + fix)          │
+│                    ▼                                         │
+│  5. TRACE ────────►│ .raise/traces/kata-execution.jsonl     │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Gate Configuration (YAML):**
+
+```yaml
+# .raise/gates/discovery.yaml
+kata_id: discovery
+version: 1.0.0
+output_file: specs/main/project_requirements.md
+
+pre:
+  - id: context_docs
+    check: any_file_exists
+    paths: [README.md, docs/context.md]
+    severity: warning
+
+  - id: output_writable
+    check: directory_writable
+    path: specs/main/
+    severity: error
+
+post:
+  - id: prd_exists
+    check: file_exists
+    path: "{{output_file}}"
+    severity: error
+
+  - id: min_requirements
+    check: count_pattern
+    path: "{{output_file}}"
+    pattern: "^### FR-[0-9]+"
+    min: 5
+    severity: error
+```
+
+**Built-in Validators:** `file_exists`, `directory_writable`, `any_file_exists`, `frontmatter_field`, `section_present`, `count_pattern`, `pattern_present`, `gate_passed`
+
+### 4.3 Enterprise: Full Compiled Harness
+
+El modelo **Full Harness** compila katas a un execution graph determinista, ejecutado por un state machine:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  FULL HARNESS EXECUTION FLOW                                 │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  LAYER 1: AUTHORING                                          │
+│  ┌─────────────┐  ┌─────────────┐                           │
+│  │ kata.md     │  │ policy.yaml │                           │
+│  │ (markdown)  │  │ (rules)     │                           │
+│  └──────┬──────┘  └──────┬──────┘                           │
+│         └────────┬───────┘                                   │
+│                  ▼                                           │
+│  LAYER 2: COMPILATION                                        │
+│  ┌─────────────────────────────────┐                        │
+│  │        Kata Compiler            │                        │
+│  │  (Markdown → JSON Exec Graph)   │                        │
+│  └──────────────┬──────────────────┘                        │
+│                 ▼                                            │
+│  ┌─────────────────────────────────┐                        │
+│  │   execution-graph.json          │                        │
+│  │   - nodes: [step1, step2, ...]  │                        │
+│  │   - edges: [transitions]        │                        │
+│  │   - gates: [pre, inline, post]  │                        │
+│  └──────────────┬──────────────────┘                        │
+│                 ▼                                            │
+│  LAYER 3: EXECUTION                                          │
+│  ┌─────────────────────────────────┐                        │
+│  │      State Machine (XState)     │                        │
+│  │  - Deterministic transitions    │                        │
+│  │  - Checkpointing (auto-resume)  │                        │
+│  │  - Gate enforcement (blocking)  │                        │
+│  │  - Step-level observability     │                        │
+│  └──────────────┬──────────────────┘                        │
+│                 ▼                                            │
+│  ┌─────────────────────────────────┐                        │
+│  │     Full Observability Stack    │                        │
+│  │  - OpenTelemetry traces         │                        │
+│  │  - Compliance audit logs        │                        │
+│  │  - Governance dashboard         │                        │
+│  └─────────────────────────────────┘                        │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Garantías del Full Harness:**
+
+| Garantía | Descripción |
+|----------|-------------|
+| **100% Determinismo de flujo** | State machine controla transiciones, no el LLM |
+| **Gate enforcement real** | Código bloquea ejecución, no sugerencias |
+| **Resumability automática** | Checkpoints permiten continuar después de fallas |
+| **Audit trail completo** | Cada decisión trazable para compliance |
+| **Step-level observability** | Métricas por paso, no solo por kata |
+
+### 4.4 Upgrade Path
+
+El diseño permite **migración incremental** de Open Core a Enterprise:
+
+```mermaid
+flowchart LR
+    A["Phase 0<br/>LLM-only<br/>(status quo)"]
+    B["Phase 1<br/>Hybrid Gates<br/>(Open Core)"]
+    C["Phase 2<br/>Enhanced Gates<br/>(más validators)"]
+    D["Phase 3<br/>Full Harness<br/>(Enterprise)"]
+
+    A -->|"2 weeks"| B
+    B -->|"4 weeks"| C
+    C -->|"8 weeks"| D
+
+    style A fill:#ffcdd2
+    style B fill:#c8e6c9
+    style C fill:#fff9c4
+    style D fill:#bbdefb
+```
+
+**No hay throw-away work**: Los YAML gate configs de Open Core se convierten en policy files del Full Harness.
+
+### 4.5 Jidoka (Stop and Fix)
 
 Cada paso en las katas implementa el patrón Jidoka:
 
@@ -279,6 +455,13 @@ Cada paso en las katas implementa el patrón Jidoka:
 ```
 
 **Principio**: Parar en defectos inmediatamente, no propagar errores. El Orquestador decide cómo resolver antes de continuar.
+
+**Implementación por tier:**
+
+| Tier | Cómo se implementa Jidoka |
+|------|---------------------------|
+| **Open Core** | Gate runner detecta `severity: error` → bloquea + muestra recovery |
+| **Enterprise** | State machine transiciona a estado `jidoka` → pausa ejecución |
 
 ---
 
