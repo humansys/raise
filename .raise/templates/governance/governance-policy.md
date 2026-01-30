@@ -112,10 +112,11 @@ Cuando un guardrail no puede cumplirse, el proceso es:
 
 ## Referencias
 
-- **ADR-009**: Modelo de Gobernanza Continua
-- **ADR-010**: Jerarquía de Tres Niveles
-- **Solution Vision**: `specs/main/solution_vision.md` (nivel sistema - deriva governance)
-- **RaiSE Constitution**: `docs/framework/v2.1/model/00-constitution-v2.md`
+- **ADR-009**: `framework/decisions/adr-009-continuous-governance-model.md`
+- **ADR-010**: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`
+- **ADR-011**: `framework/decisions/adr-011-three-directory-model.md`
+- **Solution Vision**: `governance/solution/vision.md`
+- **RaiSE Constitution**: `framework/context/constitution.md`
 
 ---
 
