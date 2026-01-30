@@ -8,7 +8,7 @@ schema_version: "1.0.0"
 framework:
   name: "RaiSE Framework"
   description: "Reliable AI Software Engineering - Explicit governance for AI-assisted development"
-  version: "2.4.0"
+  version: "2.5.0"
   status: active
 
 # Framework artifacts
@@ -122,7 +122,7 @@ artifacts:
   - path: decisions/adr-011-three-directory-model.md
     type: decision
     version: 1.0.0
-    status: proposed
+    status: accepted
     description: ".raise/, governance/, work/ directory structure"
 
   # Schemas
