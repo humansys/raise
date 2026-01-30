@@ -73,7 +73,7 @@ available_gates:
     validates: specs/main/project_requirements.md
   - id: gate-vision
     path: gates/gate-vision.md
-    validates: specs/main/solution_vision.md
+    validates: specs/main/project_vision.md
   - id: gate-architecture
     path: gates/gate-architecture.md
     validates: specs/main/tech_design.md

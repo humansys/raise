@@ -25,7 +25,7 @@ version: 1.0.0
 
 Transformar notas de reuniones de discovery y transcripciones en un Product Requirements Document (PRD) estructurado que capture el problema de negocio, metas, alcance, y requisitos de forma clara y testeable.
 
-Esta kata es el punto de partida del ciclo de proyecto. Un PRD bien elaborado reduce ambigüedad, alinea stakeholders, y proporciona la base para la Solution Vision.
+Esta kata es el punto de partida del ciclo de proyecto. Un PRD bien elaborado reduce ambigüedad, alinea stakeholders, y proporciona la base para la Project Vision.
 
 ## Contexto
 

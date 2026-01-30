@@ -1,8 +1,8 @@
 # RaiSE Glossary
 ## Vocabulario Canónico del Framework
 
-**Versión:** 2.3.0
-**Fecha:** 29 de Enero, 2026
+**Versión:** 2.4.0
+**Fecha:** 30 de Enero, 2026
 **Propósito:** Definiciones canónicas de términos usados en el ecosistema RaiSE.
 
 > **Nota de versión 2.1:** Actualización de niveles de Kata (L0-L3 → Principios/Flujo/Patrón/Técnica), adición de ShuHaRi como lente del Orquestador, y Jidoka inline.
@@ -10,6 +10,8 @@
 > **Nota de versión 2.2:** Simplificación terminológica - se eliminan nombres de componentes (SAR, CTX) en favor de categorías de comandos (setup/, context/).
 
 > **Nota de versión 2.3:** Simplificación ontológica ADR-008 — modelo de 3 capas (Context/Kata/Skill), eliminación de niveles de kata, introducción de Work Cycles como organización, y Kata Harness como capability de plataforma.
+
+> **Nota de versión 2.4:** Jerarquía de tres niveles ADR-010 — Solution Level (Business Case, Solution Vision, Governance), Project Level (PRD, Project Vision, Tech Design), Codebase Level. "Solution Vision" renombrada a "Project Vision" a nivel proyecto.
 
 ---
 
@@ -375,14 +377,73 @@ Patrones de desarrollo con LLMs identificados por Andrew Ng. RaiSE integra expl�
 
 ## Artefactos del Flujo de Trabajo
 
-### PRD (Product Requirements Document)
-Artefacto de la fase Discovery que captura requisitos del producto desde la perspectiva de negocio y usuarios.
+### Jerarquía de Tres Niveles (ADR-010) [NUEVO v2.4]
 
-### Solution Vision
-Artefacto de la fase de visión que describe el futuro estado deseado del producto o sistema, incluyendo decisiones de alto nivel.
+RaiSE organiza artefactos en tres niveles que reflejan la estructura natural de desarrollo:
+
+```
+SOLUTION LEVEL (Sistema - perdura)
+├── Business Case → Solution Vision → Governance
+│
+PROJECT LEVEL (Iniciativa - time-bound)
+├── PRD → Project Vision → Tech Design → Backlog
+│
+CODEBASE LEVEL (Reglas - heredadas + locales)
+└── Governance (heredado) → Rules (repo-specific)
+```
+
+### Business Case [NUEVO v2.4]
+Artefacto de nivel **solución** que documenta la justificación de negocio para un sistema. Responde: "¿Por qué debe existir este sistema?"
+
+**Secciones clave:**
+- Oportunidad de negocio (problema, causas, mercado)
+- Propuesta de valor y diferenciadores
+- Stakeholders y usuarios
+- Constraints y métricas de éxito
+- Riesgos y mitigaciones
+- Recomendación (Go/No-Go)
+
+**Ubicación:** `specs/main/business_case.md`
+**Kata:** `solution/discovery`
+
+### Solution Vision [ACTUALIZADO v2.4]
+Artefacto de nivel **solución** que define QUÉ ES el sistema. Responde: "¿Qué sistema construimos para resolver el Business Case?"
+
+**Cambio v2.4:** Antes aplicaba a nivel proyecto. Ahora es exclusivamente nivel solución y define el sistema completo.
+
+**Secciones clave:**
+- Identidad del sistema (nombre, tipo, misión)
+- Alcance y boundaries
+- Capacidades core
+- Dirección técnica (stack, patrones, decisiones)
+- Quality attributes y security level
+- Integraciones
+
+**Ubicación:** `specs/main/solution_vision.md`
+**Kata:** `solution/vision`
+**Deriva:** Governance (guardrails del sistema)
+
+### Project Vision [NUEVO v2.4]
+Artefacto de nivel **proyecto** que traduce un PRD en visión técnica de alto nivel. Responde: "¿Cómo abordamos este proyecto específico?"
+
+**Cambio v2.4:** Renombrado desde "Solution Vision" a nivel proyecto para distinguirlo del artefacto de nivel solución.
+
+**Secciones clave:**
+- Problem statement técnico
+- Visión de alto nivel
+- Alineamiento estratégico (goals ↔ mecanismos técnicos)
+- MVP scope (Must/Should/Could)
+- Métricas de éxito técnicas
+- Constraints y assumptions
+
+**Ubicación:** `specs/main/project_vision.md`
+**Kata:** `project/vision`
+
+### PRD (Product Requirements Document)
+Artefacto de nivel **proyecto** en la fase Discovery que captura requisitos del producto desde la perspectiva de negocio y usuarios.
 
 ### Technical Design
-Especificación técnica que traduce la Solution Vision en arquitectura, componentes y decisiones de implementación.
+Especificación técnica que traduce la Project Vision en arquitectura, componentes y decisiones de implementación.
 
 ### Implementation Plan
 Plan paso a paso que guía la ejecución determinista de una tarea. Incluye tasks atómicas, dependencias y criterios de verificación.
@@ -524,28 +585,43 @@ Métricas emergentes para desarrollo asistido por IA:
 
 ---
 
-## Work Cycle (Ciclo de Trabajo) [ACTUALIZADO v2.3]
+## Work Cycle (Ciclo de Trabajo) [ACTUALIZADO v2.4]
 
 Contexto operacional del Orquestador que agrupa katas aplicables y define la frecuencia de ejecución. Los ciclos son **ortogonales**—el Orquestador transita entre ellos según la naturaleza del trabajo, no en secuencia fija.
 
-**Ciclos definidos [v2.3]:**
+**Ciclos definidos [v2.4]:**
 
 | Ciclo | Directorio | Frecuencia | Katas |
 |-------|------------|------------|-------|
+| **solution** | `katas/solution/` | 1x por sistema | discovery, vision |
 | **project** | `katas/project/` | 1x por épica | discovery, vision, design, backlog |
 | **feature** | `katas/feature/` | Nx por feature | plan, implement, review |
-| **setup** | `katas/setup/` | 1x brownfield | analyze, ecosystem |
+| **setup** | `katas/setup/` | 1x por sistema | governance, rules, ecosystem |
 | **improve** | `katas/improve/` | Continuo | retrospective, evolve-kata |
+
+**Cambio v2.4:** Añadido ciclo `solution/` para artefactos de nivel sistema (Business Case, Solution Vision). El ciclo `setup/` ahora incluye `governance` kata.
 
 **Cambio v2.3:** Los Work Cycles ahora son la estructura organizativa principal de las katas, reemplazando los niveles de abstracción (principios/flujo/patrón/técnica).
 
-**Slash commands:** Los Work Cycles habilitan comandos semánticos como `/project/discovery`, `/feature/implement`.
+**Slash commands:** Los Work Cycles habilitan comandos semánticos como `/solution/discovery`, `/project/vision`, `/feature/implement`.
 
-> Ver ADR-008 para decisión arquitectónica.
+> Ver ADR-008 y ADR-010 para decisiones arquitectónicas.
 
 ---
 
 ## Changelog
+
+### v2.4.0 (2026-01-30)
+- **NUEVO**: Jerarquía de tres niveles: Solution → Project → Codebase (ADR-010)
+- **NUEVO**: Entrada `Business Case` — justificación de negocio a nivel solución
+- **NUEVO**: Entrada `Solution Vision` — definición del sistema a nivel solución
+- **NUEVO**: Entrada `Project Vision` — visión técnica a nivel proyecto (antes: Solution Vision)
+- **NUEVO**: Sección `Jerarquía de Tres Niveles` en Artefactos del Flujo de Trabajo
+- **NUEVO**: Work Cycle `solution/` con katas discovery y vision
+- **ACTUALIZADO**: Work Cycle `setup/` ahora incluye kata governance
+- **ACTUALIZADO**: Entrada `Work Cycle` con tabla actualizada de 5 ciclos
+- **RENOMBRADO**: "Solution Vision" (nivel proyecto) → "Project Vision"
+- **REFERENCIA**: ADR-010 para decisión arquitectónica completa
 
 ### v2.3.0 (2026-01-29)
 - **NUEVO**: Modelo ontológico de 3 capas: Context/Kata/Skill (ADR-008)
