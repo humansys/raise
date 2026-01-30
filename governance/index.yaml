@@ -1,0 +1,40 @@
+# Governance Index
+# Manifest of all authoritative artifacts that govern this solution
+# See ADR-011 for the Three-Directory Model specification
+
+schema_version: "1.0.0"
+
+solution:
+  name: "RaiSE Commons"
+  description: "Conceptual and ontological repository for the RaiSE framework"
+  status: active
+
+# Artifacts are populated as work is promoted through gates
+# Format:
+#   - path: relative path from governance/
+#     level: solution | project
+#     type: vision | guardrails | design | decision | context
+#     version: semver
+#     status: draft | approved | deprecated
+#     approved_date: ISO date (if approved)
+#     derives_from: path to parent artifact (if applicable)
+
+artifacts: []
+  # Example (to be populated):
+  # - path: solution/vision.md
+  #   level: solution
+  #   type: vision
+  #   version: 1.0.0
+  #   status: approved
+  #   approved_date: 2026-01-30
+
+relationships: []
+  # Example:
+  # - from: solution/guardrails.md
+  #   to: solution/vision.md
+  #   type: derives_from
+
+# Metadata
+created: 2026-01-30
+last_updated: 2026-01-30
+maintained_by: "Kata Harness"

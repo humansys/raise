@@ -1,0 +1,159 @@
+# Framework Index
+# Manifest of all authoritative artifacts that govern the RaiSE framework itself
+# This is the "governance of the framework" - parallel to governance/ for consumer projects
+# See ADR-011 for the Three-Directory Model specification
+
+schema_version: "1.0.0"
+
+framework:
+  name: "RaiSE Framework"
+  description: "Reliable AI Software Engineering - Explicit governance for AI-assisted development"
+  version: "2.4.0"
+  status: active
+
+# Framework artifacts
+# Format:
+#   - path: relative path from framework/
+#     type: vision | schema | decision | context
+#     version: semver
+#     status: draft | accepted | deprecated
+#     description: brief description
+
+artifacts:
+  # Vision
+  - path: vision.md
+    type: vision
+    version: 2.4.0
+    status: accepted
+    description: "RaiSE Framework Solution Vision - defines what RaiSE IS"
+
+  # Context
+  - path: context/glossary.md
+    type: context
+    version: 2.4.0
+    status: accepted
+    description: "Canonical terminology for the framework"
+
+  - path: context/constitution.md
+    type: context
+    version: 2.0.0
+    status: accepted
+    description: "Core principles that govern the framework"
+
+  - path: context/philosophy.md
+    type: context
+    version: 1.0.0
+    status: accepted
+    description: "Learning philosophy (Heutagogy, Jidoka)"
+
+  - path: context/work-cycles.md
+    type: context
+    version: 2.4.0
+    status: accepted
+    description: "Definition of the 5 work cycles"
+
+  - path: context/compliance.md
+    type: context
+    version: 1.0.0
+    status: accepted
+    description: "Compliance patterns and requirements"
+
+  # Decisions (ADRs)
+  - path: decisions/adr-001-sar-pipeline-phases.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "Pipeline SAR de 4 Fases"
+
+  - path: decisions/adr-002-deterministic-context-delivery.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "CTX Siempre Determinista"
+
+  - path: decisions/adr-003-yaml-rule-format.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "YAML para Formato de Reglas"
+
+  - path: decisions/adr-004-separate-graph.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "Grafo de Relaciones Separado"
+
+  - path: decisions/adr-005-confidence-adoption-rate.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "Confidence Basado en Adoption Rate"
+
+  - path: decisions/adr-006-mvc-summaries.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "MVC con Summaries para Context Rules"
+
+  - path: decisions/adr-007-terminology-simplification.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "Simplificación Terminológica"
+
+  - path: decisions/adr-008-kata-skill-context-simplification.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "Context/Kata/Skill ontology (3-layer model)"
+
+  - path: decisions/adr-009-continuous-governance-model.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "Continuous Governance Model"
+
+  - path: decisions/adr-010-three-level-artifact-hierarchy.md
+    type: decision
+    version: 1.0.0
+    status: accepted
+    description: "Solution -> Project -> Codebase hierarchy"
+
+  - path: decisions/adr-011-three-directory-model.md
+    type: decision
+    version: 1.0.0
+    status: proposed
+    description: ".raise/, governance/, work/ directory structure"
+
+  # Schemas
+  - path: schemas/rule-schema.json
+    type: schema
+    version: 1.0.0
+    status: accepted
+    description: "JSON Schema for rule definitions"
+
+  - path: schemas/graph-schema.json
+    type: schema
+    version: 1.0.0
+    status: accepted
+    description: "JSON Schema for relationship graphs"
+
+  - path: schemas/mvc-schema.json
+    type: schema
+    version: 1.0.0
+    status: accepted
+    description: "JSON Schema for MVC summaries"
+
+relationships:
+  - from: decisions/adr-011-three-directory-model.md
+    to: decisions/adr-010-three-level-artifact-hierarchy.md
+    type: extends
+
+  - from: context/glossary.md
+    to: vision.md
+    type: derives_from
+
+# Metadata
+created: 2026-01-30
+last_updated: 2026-01-30
+maintained_by: "RaiSE Framework Maintainers"

@@ -60,13 +60,13 @@ PROJECT LEVEL:
 | **Brownfield** | Codebase existente + Deuda técnica | Extraer patrones, identificar brechas, formalizar |
 
 **Inputs requeridos:**
-- Greenfield: `specs/main/solution_vision.md` (nivel solución)
+- Greenfield: `governance/solution/vision.md` (nivel solución)
 - Brownfield: Acceso al repositorio
 - Ambos: Decisiones del equipo sobre estándares
 
 **Output:**
-- `.raise/governance/governance.md` — Documento de política
-- `.raise/governance/guardrails/*.mdc` — Guardrails individuales
+- `governance/solution/guardrails.md` — Documento de política y guardrails
+- `governance/guardrails/*.mdc` — Guardrails individuales (si se separan)
 
 ## Pasos
 
@@ -84,8 +84,8 @@ Identificar si es greenfield o brownfield:
 ### Paso 2: Cargar Contexto Base
 
 **Greenfield:**
-- Cargar `specs/main/solution_vision.md` (Solution Vision - nivel sistema)
-- Cargar `specs/main/business_case.md` si existe (Business Case)
+- Cargar `governance/solution/vision.md` (Solution Vision - nivel sistema)
+- Cargar `governance/solution/business_case.md` si existe (Business Case)
 - Cargar principios RaiSE desde constitution
 - Identificar restricciones técnicas declaradas en Solution Vision:
   - Stack tecnológico
@@ -101,7 +101,7 @@ Identificar si es greenfield o brownfield:
 
 **Verificación:** Contexto cargado y documentado.
 
-> **Si no puedes continuar:** Solution Vision no encontrada → Ejecutar `solution/vision` primero. Documentos no encontrados → Verificar rutas y estructura del proyecto.
+> **Si no puedes continuar:** Solution Vision no encontrada → Ejecutar `solution/vision` primero. Documentos no encontrados → Verificar `governance/solution/` directory.
 
 ### Paso 3: Derivar Guardrails de Solution Vision
 
@@ -154,7 +154,7 @@ Para cada guardrail identificado, asignar nivel:
 Para cada guardrail, crear archivo `.mdc`:
 
 ```yaml
-# .raise/governance/guardrails/{categoria}.mdc
+# governance/guardrails/{categoria}.mdc
 ---
 id: {LEVEL}-{CATEGORY}-{NUMBER}
 level: MUST | SHOULD | MAY
@@ -196,14 +196,14 @@ on_failure:
 
 **Verificación:** Archivos .mdc creados con todas las secciones.
 
-> **Si no puedes continuar:** Schema incorrecto → Verificar contra template en `.raise/templates/raise/governance/guardrail.mdc`.
+> **Si no puedes continuar:** Schema incorrecto → Verificar contra template en `.raise/templates/governance/guardrail.mdc`.
 
 ### Paso 6: Crear Documento de Política
 
-Crear `.raise/governance/governance.md`:
+Crear `governance/solution/guardrails.md`:
 
 ```markdown
-# Governance Policy: [Nombre del Sistema]
+# Guardrails: [Nombre del Sistema]
 
 ## Contexto del Sistema
 [Breve descripción del sistema - referencia a Solution Vision]
@@ -211,8 +211,8 @@ Crear `.raise/governance/governance.md`:
 ## Trazabilidad
 | Fuente | Artefacto |
 |--------|-----------|
-| Business Case | `specs/main/business_case.md` |
-| Solution Vision | `specs/main/solution_vision.md` |
+| Business Case | `governance/solution/business_case.md` |
+| Solution Vision | `governance/solution/vision.md` |
 
 ## Principios Rectores
 [Principios derivados de Solution Vision que guían estas decisiones]
@@ -267,9 +267,9 @@ El kata puede resumirse desde cualquier punto.
 ## Output
 
 - **Artefactos:**
-  - `.raise/governance/governance.md` — Documento de política
-  - `.raise/governance/guardrails/*.mdc` — Guardrails individuales
-- **Ubicación:** `.raise/governance/`
+  - `governance/solution/guardrails.md` — Documento de política y guardrails
+  - `governance/guardrails/*.mdc` — Guardrails individuales (optional, for complex systems)
+- **Ubicación:** `governance/solution/` y `governance/guardrails/`
 - **Gate:** N/A (validación integrada en Paso 7)
 - **Siguiente kata:** `setup/rules`
 
@@ -391,11 +391,12 @@ PROJECT LEVEL:
 
 ## Referencias
 
-- **ADR-010**: Jerarquía de Artefactos de Tres Niveles
-- **ADR-009**: Modelo de Gobernanza Continua
+- **ADR-010**: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`
+- **ADR-009**: `framework/decisions/adr-009-continuous-governance-model.md`
+- **ADR-011**: `framework/decisions/adr-011-three-directory-model.md`
 - **Research**: Layered Grounding Analysis (RES-LAYERED-GROUNDING-001)
-- **Template**: `.raise/templates/raise/governance/guardrail.mdc`
+- **Template**: `.raise/templates/governance/guardrails.md`
 - **Questions Catalog**: `.raise/templates/governance/governance-questions.md`
-- **Constitution RaiSE**: `docs/framework/v2.1/model/00-constitution-v2.md`
+- **Constitution RaiSE**: `framework/context/constitution.md`
 - **Prerequisite kata**: `solution/vision`
 - **Siguiente kata**: `setup/rules`

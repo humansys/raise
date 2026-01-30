@@ -40,7 +40,7 @@ Esta kata es el punto de partida del ciclo de proyecto. Un PRD bien elaborado re
 - Contexto del problema de negocio
 
 **Output:**
-- `specs/main/project_requirements.md` - PRD estructurado y validado
+- `governance/projects/{project}/prd.md` - PRD estructurado y validado
 
 ## Pasos
 
@@ -54,7 +54,7 @@ Recopilar todas las notas de reuniones y documentos previos disponibles. Consoli
 
 ### Paso 2: Instanciar Template PRD
 
-Crear el archivo `specs/main/project_requirements.md` basado en el template de PRD.
+Crear el archivo `governance/projects/{project}/prd.md` basado en el template de PRD.
 
 **Verificación:** El archivo está listo para ser llenado con las secciones del template.
 
@@ -141,7 +141,7 @@ Presentar el PRD para revisión y aprobación:
 ## Output
 
 - **Artefacto:** Product Requirements Document (PRD)
-- **Ubicación:** `specs/main/project_requirements.md`
+- **Ubicación:** `governance/projects/{project}/prd.md`
 - **Gate:** `gates/gate-discovery.md`
 - **Siguiente kata:** `project/vision`
 
