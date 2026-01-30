@@ -218,8 +218,7 @@ Growth comes from individual professionals → teams → maybe orgs. Enterprises
 
 | Rol | Nombre | Fecha | Decisión |
 |-----|--------|-------|----------|
-| Founder/CEO | Emilio Osorio | | |
-| | | | |
+| Founder/CEO | Emilio Osorio | 2026-01-30 | **APPROVED** |
 
 ---
 
