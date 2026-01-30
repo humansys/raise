@@ -1,13 +1,13 @@
 ---
 id: vision
-titulo: "Vision: Solution Vision"
+titulo: "Vision: Project Vision"
 work_cycle: project
 frequency: once-per-epic
 fase_metodologia: 2
 
 prerequisites:
   - project/discovery
-template: templates/solution/solution-vision_es.md
+template: templates/project/project_vision.md
 gate: gates/gate-vision.md
 next_kata: project/design
 
@@ -17,16 +17,18 @@ shuhari:
   ha: "Combinar pasos de alineamiento si los stakeholders ya están alineados"
   ri: "Crear kata de Vision específica del dominio (ej: Vision-Microservices, Vision-Monolith)"
 
-version: 1.0.0
+version: 2.0.0
 ---
 
-# Vision: Solution Vision
+# Vision: Project Vision
 
 ## Propósito
 
-Traducir un PRD aprobado en una Solution Vision de alto nivel que alinee objetivos de negocio con decisiones técnicas. Este documento es el puente entre el "qué" (PRD) y el "cómo" (Technical Design).
+Traducir un PRD aprobado en una Project Vision de alto nivel que alinee objetivos de negocio con decisiones técnicas. Este documento es el puente entre el "qué" (PRD) y el "cómo" (Technical Design).
 
-La Solution Vision asegura que el equipo técnico entienda el valor de negocio y que los stakeholders de negocio comprendan las implicaciones técnicas.
+La Project Vision asegura que el equipo técnico entienda el valor de negocio y que los stakeholders de negocio comprendan las implicaciones técnicas.
+
+> **Nota ADR-010**: "Project Vision" es el artefacto a nivel de proyecto. Para visión a nivel de sistema/solución, ver `solution/vision` kata.
 
 ## Contexto
 
@@ -36,11 +38,11 @@ La Solution Vision asegura que el equipo técnico entienda el valor de negocio y
 - Cuando se necesita alinear negocio y tecnología
 
 **Inputs requeridos:**
-- PRD aprobado (`specs/main/project_requirements.md`)
+- PRD aprobado (`governance/projects/{project}/prd.md` or `work/projects/{project}/prd.md` if draft)
 - Contexto técnico (stack actual, restricciones, integraciones)
 
 **Output:**
-- `specs/main/solution_vision.md` - Solution Vision estructurada
+- `governance/projects/{project}/vision.md` - Project Vision estructurada (after gate passes)
 
 ## Pasos
 
@@ -52,13 +54,13 @@ Cargar el PRD aprobado y recopilar información del contexto técnico: stack act
 
 > **Si no puedes continuar:** PRD no encontrado → Ejecutar `project/discovery` primero. Contexto técnico desconocido → Ejecutar `setup/analyze` para entender el código existente.
 
-### Paso 2: Instanciar Template Solution Vision
+### Paso 2: Instanciar Template Project Vision
 
-Crear el archivo `specs/main/solution_vision.md` basado en el template de Solution Vision.
+Crear el archivo `work/projects/{project}/vision.md` basado en el template de Project Vision. After gate passes, promote to `governance/projects/{project}/vision.md`.
 
 **Verificación:** Existe el archivo con todas las secciones del template presentes.
 
-> **Si no puedes continuar:** Template no encontrado → Verificar que existe el template de Solution Vision.
+> **Si no puedes continuar:** Template no encontrado → Verificar que existe el template de Project Vision.
 
 ### Paso 3: Sintetizar Problem Statement
 
@@ -146,7 +148,7 @@ Esbozar servicios/módulos principales:
 
 ### Paso 11: Validar con Stakeholders
 
-Presentar la Solution Vision para validación:
+Presentar la Project Vision para validación:
 - Revisión con stakeholders de negocio (alineamiento)
 - Revisión con equipo técnico (factibilidad)
 - Documentar trade-offs acordados
@@ -157,8 +159,9 @@ Presentar la Solution Vision para validación:
 
 ## Output
 
-- **Artefacto:** Solution Vision
-- **Ubicación:** `specs/main/solution_vision.md`
+- **Artefacto:** Project Vision
+- **Ubicación (draft):** `work/projects/{project}/vision.md`
+- **Ubicación (approved):** `governance/projects/{project}/vision.md`
 - **Gate:** `gates/gate-vision.md`
 - **Siguiente kata:** `project/design`
 
@@ -175,5 +178,6 @@ Todas las decisiones técnicas DEBEN justificar un objetivo de negocio. Si una d
 ## Referencias
 
 - Gate de validación: `gates/gate-vision.md`
-- Template: `templates/solution/solution-vision_es.md`
+- Template: `templates/project/project_vision.md`
 - Kata previa: `project/discovery`
+- ADR: `dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md`

@@ -1,0 +1,101 @@
+# Framework Meta-Index
+# Index for tracking framework documentation and detecting change impact
+# Used by dev/skills/ for governance maintenance
+# See ADR-011 for context
+
+schema_version: "1.0.0"
+
+# Concept definitions - terms and where they're authoritatively defined
+concepts:
+  - term: "Solution Vision"
+    defined_in: framework/context/glossary.md
+    scope: solution-level
+    related_terms: ["Project Vision", "Business Case"]
+
+  - term: "Project Vision"
+    defined_in: framework/context/glossary.md
+    scope: project-level
+    related_terms: ["Solution Vision", "Tech Design"]
+
+  - term: "Governance"
+    defined_in: framework/context/glossary.md
+    scope: framework
+    related_terms: ["Guardrails", "Gates"]
+
+  - term: "Work Cycle"
+    defined_in: framework/context/work-cycles.md
+    scope: framework
+    related_terms: ["Kata", "solution/", "project/", "feature/"]
+
+  - term: "Kata"
+    defined_in: framework/context/glossary.md
+    scope: framework
+    related_terms: ["Skill", "Context", "Gate"]
+
+  - term: "Three-Directory Model"
+    defined_in: framework/decisions/adr-011-three-directory-model.md
+    scope: framework
+    related_terms: ["governance/", "work/", ".raise/"]
+
+# File categories for impact analysis
+categories:
+  golden_data:
+    description: "Authoritative framework knowledge"
+    paths:
+      - framework/vision.md
+      - framework/context/*.md
+      - framework/decisions/adr-*.md
+    impact_level: high
+
+  schemas:
+    description: "Validation schemas"
+    paths:
+      - framework/schemas/*.json
+    impact_level: high
+
+  engine:
+    description: "Framework execution engine"
+    paths:
+      - .raise/katas/**/*.md
+      - .raise/gates/*.md
+      - .raise/templates/**/*.md
+      - .raise/skills/*.yaml
+    impact_level: medium
+
+  tooling:
+    description: "Internal development tools"
+    paths:
+      - dev/**/*
+    impact_level: low
+
+# Change propagation rules
+propagation_rules:
+  - trigger: "glossary term change"
+    affects:
+      - "all files referencing the term"
+      - "related terms in glossary"
+    action: "search and update references"
+
+  - trigger: "ADR status change to accepted"
+    affects:
+      - "framework/index.yaml"
+      - "framework/decisions/README.md"
+    action: "update indexes and status"
+
+  - trigger: "schema change"
+    affects:
+      - "all files validated by schema"
+      - "documentation referencing schema"
+    action: "validate existing data, update docs"
+
+  - trigger: "kata output path change"
+    affects:
+      - "gates validating that output"
+      - "skills referencing that path"
+      - "documentation mentioning the path"
+    action: "update all path references"
+
+# Metadata
+created: 2026-01-30
+last_updated: 2026-01-30
+purpose: "Enable impact analysis for framework changes"
