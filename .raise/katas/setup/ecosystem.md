@@ -101,7 +101,7 @@ Visualizar el ecosistema:
 ## Output
 
 - **Artefacto:** Mapa de ecosistema
-- **Ubicación:** `specs/main/ecosystem_map.md`
+- **Ubicación:** `governance/solution/ecosystem.md`
 - **Gate:** N/A
 - **Siguiente kata:** `project/discovery`
 

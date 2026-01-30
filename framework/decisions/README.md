@@ -1,6 +1,8 @@
 # Architecture Decision Records - RaiSE Framework v2.4
 
 > Decisiones arquitectónicas para el framework RaiSE
+>
+> **Location**: `framework/decisions/` (moved from `specs/raise/adrs/` per ADR-011)
 
 ## Índice de ADRs
 
@@ -95,7 +97,8 @@ Data Layer             │           │
 - **Naming**: `adr-NNN-slug-descriptivo.md`
 - **Status**: Proposed → Accepted → [Deprecated|Superseded]
 - **Template**: Ver `.raise/templates/architecture/adr.md`
+- **New ADR drafts**: Create in `work/proposals/` first, promote here after acceptance
 
 ---
 
-*Parte de [RaiSE Framework v2.4](../vision.md)*
+*Parte de [RaiSE Framework v2.4](../vision.md) | Index: [framework/index.yaml](../index.yaml)*

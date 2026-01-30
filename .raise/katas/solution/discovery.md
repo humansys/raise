@@ -59,7 +59,7 @@ SOLUTION LEVEL:
 - Constraints organizacionales conocidos
 
 **Output:**
-- `specs/main/business_case.md` — Documento de Business Case
+- `governance/solution/business_case.md` — Documento de Business Case
 
 ## Pasos
 
@@ -206,7 +206,7 @@ Identificar qué puede salir mal:
 
 ### Paso 8: Compilar Business Case
 
-Crear `specs/main/business_case.md` con estructura:
+Crear `governance/solution/business_case.md` con estructura:
 
 ```markdown
 # Business Case: [Nombre del Sistema]
@@ -266,8 +266,8 @@ Presentar Business Case a stakeholders para decisión:
 
 ## Output
 
-- **Artefacto:** `specs/main/business_case.md`
-- **Ubicación:** `specs/main/`
+- **Artefacto:** `governance/solution/business_case.md`
+- **Ubicación:** `governance/solution/`
 - **Gate:** N/A (validación por aprobación de stakeholders)
 - **Siguiente kata:** `solution/vision`
 

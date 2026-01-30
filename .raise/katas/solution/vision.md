@@ -60,12 +60,12 @@ PROJECT LEVEL:
 | **Brownfield** | Sistema existente | Documentar arquitectura actual |
 
 **Inputs requeridos:**
-- `specs/main/business_case.md` (prerequisito)
+- `governance/solution/business_case.md` (prerequisito)
 - Acceso a Technical Lead / Architect
 - Constraints técnicos organizacionales
 
 **Output:**
-- `specs/main/solution_vision.md` — Documento de Solution Vision
+- `governance/solution/vision.md` — Documento de Solution Vision
 
 ## Pasos
 
@@ -220,7 +220,7 @@ Mapear con qué sistemas se integra:
 
 ### Paso 8: Compilar Solution Vision
 
-Crear `specs/main/solution_vision.md`:
+Crear `governance/solution/vision.md`:
 
 ```markdown
 # Solution Vision: [Nombre del Sistema]
@@ -266,7 +266,7 @@ Crear `specs/main/solution_vision.md`:
 ## Trazabilidad
 | Fuente | Artefacto |
 |--------|-----------|
-| Business Case | `specs/main/business_case.md` |
+| Business Case | `governance/solution/business_case.md` |
 
 ## Aprobaciones
 | Rol | Nombre | Fecha |
@@ -291,8 +291,8 @@ Revisar Solution Vision con:
 
 ## Output
 
-- **Artefacto:** `specs/main/solution_vision.md`
-- **Ubicación:** `specs/main/`
+- **Artefacto:** `governance/solution/vision.md`
+- **Ubicación:** `governance/solution/`
 - **Gate:** N/A (validación por revisión de stakeholders)
 - **Siguiente kata:** `setup/governance`
 

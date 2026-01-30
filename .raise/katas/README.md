@@ -56,8 +56,8 @@ katas/
 
 | Kata | Purpose | Output |
 |------|---------|--------|
-| `discovery.md` | Business Case creation | `specs/main/business_case.md` |
-| `vision.md` | Solution Vision | `specs/main/solution_vision.md` |
+| `discovery.md` | Business Case creation | `governance/solution/business_case.md` |
+| `vision.md` | Solution Vision | `governance/solution/vision.md` |
 
 > **Flow**: `discovery` → `vision` → `setup/governance`
 
@@ -65,31 +65,34 @@ katas/
 
 | Kata | Purpose | Output |
 |------|---------|--------|
-| `governance.md` | System-wide Guardrails | `.raise/governance/guardrails/*.mdc` |
+| `governance.md` | System-wide Guardrails | `governance/solution/guardrails.md` |
 | `rules.md` | Codebase Patterns | `.cursor/rules/*.mdc` |
-| `ecosystem.md` | Dependency Mapping | `specs/main/ecosystem_map.md` |
+| `ecosystem.md` | Dependency Mapping | `governance/solution/ecosystem.md` |
 
 > **Flow**: `governance` → `rules` → `ecosystem` (see ADR-009)
 > **Prerequisite**: `solution/vision` for greenfield governance
 
 ### project/ (Per-Project)
 
-| Kata | Purpose | Output |
-|------|---------|--------|
-| `discovery.md` | PRD creation | `specs/main/project_requirements.md` |
-| `vision.md` | Project Vision | `specs/main/project_vision.md` |
-| `design.md` | Technical Architecture | `specs/main/tech_design.md` |
-| `backlog.md` | Product Backlog | `specs/main/project_backlog.md` |
+| Kata | Purpose | Output (approved) |
+|------|---------|-------------------|
+| `discovery.md` | PRD creation | `governance/projects/{name}/prd.md` |
+| `vision.md` | Project Vision | `governance/projects/{name}/vision.md` |
+| `design.md` | Technical Architecture | `governance/projects/{name}/design.md` |
+| `backlog.md` | Product Backlog | `governance/projects/{name}/backlog.md` |
 
 > **Note**: Project Vision was renamed from "Solution Vision" in v2.4 (ADR-010)
+> **Note**: Drafts are created in `work/projects/{name}/`, promoted to `governance/` after gate passes
 
 ### feature/ (Per-Feature)
 
 | Kata | Purpose | Output |
 |------|---------|--------|
-| `plan.md` | Implementation Planning | `specs/{feature}/plan.md` |
+| `plan.md` | Implementation Planning | `work/features/{NNN-name}/plan.md` |
 | `implement.md` | Development Workflow | Working code |
-| `review.md` | Retrospective & Learning | `specs/{feature}/retrospective.md` |
+| `review.md` | Retrospective & Learning | `work/features/{NNN-name}/retrospective.md` |
+
+> **Note**: Feature artifacts are transient and stay in `work/` (ADR-011)
 
 ---
 
@@ -146,8 +149,21 @@ This enables **stopping on defects** and correcting before proceeding.
 
 ---
 
+## Three-Directory Model (ADR-011)
+
+Artifacts are stored in:
+
+| Directory | Purpose | Examples |
+|-----------|---------|----------|
+| `governance/` | Approved, authoritative artifacts | Solution Vision, Project Vision (after gate) |
+| `work/` | Work-in-progress | Feature specs, draft proposals |
+| `.raise/` | Framework configuration | Katas, gates, templates |
+
+**Promotion flow**: `work/` → (gate passes) → `governance/`
+
 ## References
 
+- **ADR-011**: Three-Directory Model (governance/, work/, .raise/)
 - **ADR-010**: Three-Level Artifact Hierarchy (Solution → Project → Feature)
 - **ADR-009**: Continuous Governance Model
 - **ADR-008**: Kata/Skill/Context Simplification

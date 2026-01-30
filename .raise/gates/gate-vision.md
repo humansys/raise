@@ -18,7 +18,7 @@ Verificar que la Project Vision está completa, alinea negocio con técnica, y t
 
 - Después de completar `katas/project/vision.md`
 - Antes de iniciar `katas/project/design.md`
-- El documento debe existir en `specs/main/project_vision.md`
+- El documento debe existir en `work/projects/{project}/vision.md` (draft) or `governance/projects/{project}/vision.md` (approved)
 
 ---
 
@@ -138,4 +138,12 @@ Verificar aprobaciones:
 - Gate previo: `gates/gate-discovery.md`
 - Siguiente kata: `katas/project/design.md`
 - Siguiente gate: `gates/gate-design.md`
-- ADR: `specs/raise/adrs/adr-010-three-level-artifact-hierarchy.md`
+- ADR: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`
+
+## Post-Gate Action
+
+When this gate passes, promote the artifact:
+```
+work/projects/{project}/vision.md → governance/projects/{project}/vision.md
+```
+Update `governance/index.yaml` with the new approved artifact.

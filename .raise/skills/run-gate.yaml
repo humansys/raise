@@ -67,25 +67,26 @@ behavior:
   description: "FAIL en mandatory bloquea avance"
 
 # Gates disponibles
+# Note: Paths use governance/ for approved artifacts, work/ for drafts
 available_gates:
   - id: gate-discovery
     path: gates/gate-discovery.md
-    validates: specs/main/project_requirements.md
+    validates: governance/projects/{project}/prd.md
   - id: gate-vision
     path: gates/gate-vision.md
-    validates: specs/main/project_vision.md
+    validates: governance/projects/{project}/vision.md
   - id: gate-architecture
     path: gates/gate-architecture.md
-    validates: specs/main/tech_design.md
+    validates: governance/projects/{project}/design.md
   - id: gate-design
     path: gates/gate-design.md
-    validates: specs/main/tech_design.md
+    validates: governance/projects/{project}/design.md
   - id: gate-backlog
     path: gates/gate-backlog.md
-    validates: specs/main/project_backlog.md
+    validates: governance/projects/{project}/backlog.md
   - id: gate-estimation
     path: gates/gate-estimation.md
-    validates: specs/main/estimation_roadmap.md
+    validates: governance/projects/{project}/estimation.md
 
 # Implementación
 implementation:

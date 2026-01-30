@@ -38,11 +38,11 @@ La Project Vision asegura que el equipo técnico entienda el valor de negocio y 
 - Cuando se necesita alinear negocio y tecnología
 
 **Inputs requeridos:**
-- PRD aprobado (`specs/main/project_requirements.md`)
+- PRD aprobado (`governance/projects/{project}/prd.md` or `work/projects/{project}/prd.md` if draft)
 - Contexto técnico (stack actual, restricciones, integraciones)
 
 **Output:**
-- `specs/main/project_vision.md` - Project Vision estructurada
+- `governance/projects/{project}/vision.md` - Project Vision estructurada (after gate passes)
 
 ## Pasos
 
@@ -56,7 +56,7 @@ Cargar el PRD aprobado y recopilar información del contexto técnico: stack act
 
 ### Paso 2: Instanciar Template Project Vision
 
-Crear el archivo `specs/main/project_vision.md` basado en el template de Project Vision.
+Crear el archivo `work/projects/{project}/vision.md` basado en el template de Project Vision. After gate passes, promote to `governance/projects/{project}/vision.md`.
 
 **Verificación:** Existe el archivo con todas las secciones del template presentes.
 
@@ -160,7 +160,8 @@ Presentar la Project Vision para validación:
 ## Output
 
 - **Artefacto:** Project Vision
-- **Ubicación:** `specs/main/project_vision.md`
+- **Ubicación (draft):** `work/projects/{project}/vision.md`
+- **Ubicación (approved):** `governance/projects/{project}/vision.md`
 - **Gate:** `gates/gate-vision.md`
 - **Siguiente kata:** `project/design`
 
@@ -179,4 +180,4 @@ Todas las decisiones técnicas DEBEN justificar un objetivo de negocio. Si una d
 - Gate de validación: `gates/gate-vision.md`
 - Template: `templates/project/project_vision.md`
 - Kata previa: `project/discovery`
-- ADR: `specs/raise/adrs/adr-010-three-level-artifact-hierarchy.md`
+- ADR: `framework/decisions/adr-010-three-level-artifact-hierarchy.md`

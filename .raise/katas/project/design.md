@@ -34,11 +34,11 @@ Traducir la Project Vision en una arquitectura técnica detallada siguiendo el m
 - Cuando se necesita definir la arquitectura del sistema
 
 **Inputs requeridos:**
-- Project Vision aprobada (`specs/main/project_vision.md`)
+- Project Vision aprobada (`governance/projects/{project}/vision.md`)
 - Contexto técnico del ecosistema
 
 **Output:**
-- `specs/main/tech_design.md` - Technical Design estructurado
+- `governance/projects/{project}/design.md` - Technical Design estructurado
 
 ## Pasos
 
@@ -152,7 +152,7 @@ Revisar diseño con peers:
 ## Output
 
 - **Artefacto:** Technical Design
-- **Ubicación:** `specs/main/tech_design.md`
+- **Ubicación:** `governance/projects/{project}/design.md`
 - **Gate:** `gates/gate-architecture.md`
 - **Siguiente kata:** `project/backlog`
 
