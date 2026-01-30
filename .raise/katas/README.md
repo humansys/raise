@@ -69,7 +69,8 @@ katas/
 | `rules.md` | Codebase Patterns | `.cursor/rules/*.mdc` |
 | `ecosystem.md` | Dependency Mapping | `governance/solution/ecosystem.md` |
 
-> **Flow**: `governance` → `rules` → `ecosystem` (see ADR-009)
+> **Greenfield flow**: `governance` → `rules` → `project/discovery`
+> **Brownfield flow**: `analyze` → `ecosystem` → `project/discovery`
 > **Prerequisite**: `solution/vision` for greenfield governance
 
 ### project/ (Per-Project)

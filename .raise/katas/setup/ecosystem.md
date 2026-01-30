@@ -6,7 +6,8 @@ frequency: once-brownfield
 fase_metodologia: 0
 
 prerequisites:
-  - setup/analyze
+  greenfield: []
+  brownfield: [setup/analyze]
 template: null
 gate: null
 next_kata: project/discovery
@@ -25,6 +26,8 @@ version: 1.0.0
 ## Propósito
 
 Mapear el ecosistema de integraciones, dependencias externas, y sistemas relacionados para entender el contexto operacional del proyecto.
+
+> **Note:** This kata is primarily for **brownfield** projects where you need to understand existing integrations. For greenfield projects, proceed directly to `project/discovery` after `setup/rules`.
 
 ## Contexto
 
