@@ -12,6 +12,9 @@
 | [ADR-004](./adr-004-separate-graph.md) | Grafo de Relaciones Separado | Accepted | Layer 1 (Data) |
 | [ADR-005](./adr-005-confidence-adoption-rate.md) | Confidence Basado en Adoption Rate | Accepted | Layer 2 (SAR) |
 | [ADR-006](./adr-006-mvc-summaries.md) | MVC con Summaries para Context Rules | Accepted | Layer 2 (CTX) |
+| [ADR-007](./adr-007-terminology-simplification.md) | Simplificación Terminológica | Accepted | Ontology |
+| [ADR-008](./adr-008-kata-skill-context-simplification.md) | Context/Kata/Skill Simplification | Accepted | Ontology |
+| [ADR-009](./adr-009-continuous-governance-model.md) | Modelo de Gobernanza Continua | Proposed | Governance |
 
 ## Grafo de Dependencias
 
