@@ -10,7 +10,9 @@ prerequisites:
   brownfield: []
 template: templates/raise/governance/ide-rules.md
 gate: null
-next_kata: setup/ecosystem
+next_kata:
+  greenfield: project/discovery
+  brownfield: setup/ecosystem
 
 adaptable: true
 shuhari:
@@ -311,7 +313,9 @@ Update governance index if applicable.
   - `.cursor/rules/*.mdc` — Granular Cursor rules (optional)
 - **Ubicación:** Project root
 - **Gate:** N/A (validation in Step 8)
-- **Siguiente kata:** `setup/ecosystem`
+- **Siguiente kata:**
+  - Greenfield: `project/discovery` (start defining your first project)
+  - Brownfield: `setup/ecosystem` (map existing integrations)
 
 ## Notas por Modo
 
@@ -401,4 +405,4 @@ This project follows Lean principles:
 - **ADR-010**: `dev/decisions/framework/adr-010-three-level-artifact-hierarchy.md`
 - **Constitution**: `framework/reference/constitution.md`
 - **Prerequisite**: `setup/governance` (greenfield) or `setup/analyze` (brownfield)
-- **Siguiente kata**: `setup/ecosystem`
+- **Siguiente kata**: `project/discovery` (greenfield) or `setup/ecosystem` (brownfield)
