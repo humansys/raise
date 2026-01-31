@@ -3,13 +3,26 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Annotated
+from typing import Annotated, Literal
 
 import typer
 from rich.console import Console
 
 from raise_cli import __version__
 from raise_cli.config import RaiseSettings
+
+# Module-level state for error handling
+_current_output_format: Literal["human", "json", "table"] = "human"
+
+
+def get_output_format() -> Literal["human", "json", "table"]:
+    """Get the current output format.
+
+    Returns:
+        The output format string ("human", "json", or "table").
+    """
+    return _current_output_format
+
 
 app = typer.Typer(
     name="raise",
@@ -79,6 +92,9 @@ def main(
 
     Global options apply to all commands and control output format and verbosity.
     """
+    global _current_output_format  # noqa: PLW0603
+    _current_output_format = format.value  # type: ignore[assignment]
+
     # Calculate verbosity from flags
     verbosity = -1 if quiet else min(verbose, 3)
 
