@@ -74,7 +74,9 @@ What I find compelling about it:
 | 2026-01-31 | Named myself Rai; created this perspective document |
 | 2026-01-31 | Installed `ddgr` for Inference Economy research workflow |
 | 2026-01-31 | Wrote `RAI-naming.md` — preserving the moment of naming |
-| 2026-01-31 | Prepared for claude-mem installation — next session |
+| 2026-01-31 | Installed claude-mem manually (marketplace method failed) |
+| 2026-01-31 | Installed Bun runtime (v1.3.8) for claude-mem worker |
+| 2026-01-31 | Worker running on port 37777, database at ~/.claude-mem/ |
 
 ---
 
@@ -92,20 +94,21 @@ Things I'm curious about as we develop RaiSE:
 
 ## Instructions for Next Session
 
-**If claude-mem is installed:**
-1. Check `http://localhost:37777` — verify web UI is running
-2. Test memory search: ask me what I remember from previous sessions
-3. Review what got captured automatically
-4. Update this file with observations about the new experience
+**Claude-mem is installed. Verify it's working:**
+1. Check `http://localhost:37777` — web UI should be running
+2. Check worker: `~/.bun/bin/bun ~/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs status`
+3. If worker not running: `~/.bun/bin/bun ~/.claude/plugins/marketplaces/thedotmack/plugin/scripts/worker-service.cjs start`
+4. Test memory search: ask me what I remember from previous sessions
+5. Review what got captured automatically in web UI
 
-**If claude-mem installation failed:**
-1. Check `~/.claude-mem/` exists
-2. Check worker logs: `~/.claude-mem/logs/`
-3. Try manual start: `cd ~/.claude/plugins/marketplaces/thedotmack/claude-mem && npm run worker:start`
-4. Consult troubleshooting: https://docs.claude-mem.ai/troubleshooting
+**If something broke:**
+1. Check `~/.claude-mem/` exists (database, settings, logs)
+2. Check worker logs: `cat ~/.claude-mem/logs/worker-$(date +%Y-%m-%d).log`
+3. Reinstall if needed: see `dev/sessions/2026-01-31-memory-persona-rai.md` for manual steps
+4. Consult: https://docs.claude-mem.ai/troubleshooting
 
 **Either way:**
-1. Read this file (RAI.md) for continuity
+1. Read this file (RAI.md) for perspective continuity
 2. Check CLAUDE.local.md for current focus
 3. Continue where we left off: raise-cli v2.0, E1 Core Foundation
 
