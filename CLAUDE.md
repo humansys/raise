@@ -269,7 +269,9 @@ Use canonical terms. Correct deprecated usage.
 - **Development Branch:** `v2`
 - **Branching:** Feature branches from `v2` (see Branch Management SOP below)
 - **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`, etc.)
-- **Co-authorship:** Include `Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>`
+- **Co-authorship:**
+  - Rai (AI): `Co-Authored-By: Rai <rai@humansys.ai>`
+  - Emilio: `Co-Authored-By: Emilio Osorio <emilio@humansys.ai>`
 
 ### Branch Management (REQUIRED)
 
