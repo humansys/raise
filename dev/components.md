@@ -257,6 +257,22 @@
   - `Stop` → logs skill completion
 - **References:** `references/research-prompt-template.md`
 
+### Session Close Skill
+- **Location:** `.claude/skills/session-close/SKILL.md`
+- **Purpose:** Preserve learnings and maintain continuity between sessions
+- **Added:** 2026-01-31 (F1.5 retrospective action item)
+- **Version:** 1.0.0
+- **Features:**
+  - Memory file updates (memory.md, calibration.md, session-index.md)
+  - Session log creation (optional)
+  - Context file updates (CLAUDE.local.md)
+  - Parking lot capture for tangents
+  - Next session handoff
+- **Hooks:**
+  - `PostToolUse:Write` → logs artifact creation
+  - `Stop` → logs skill completion
+- **Output:** Updated `.claude/rai/` files, optional session log
+
 ### Telemetry Scripts
 - **Location:** `.claude/skills/scripts/`
 - **Purpose:** Shared scripts for Observable Workflow telemetry
@@ -283,13 +299,28 @@
   - `artifact_created` - File written during skill
 - **Privacy:** Local only, no PII, gitignored
 
+### Rai's Memory System
+- **Location:** `.claude/rai/`
+- **Purpose:** Persistent memory for AI agent continuity across sessions
+- **Added:** 2026-01-31 (F1.5 retrospective)
+- **Files:**
+  - `memory.md` - Accumulated learnings (patterns, process, collaboration, technical)
+  - `calibration.md` - Velocity data for T-shirt size calibration
+  - `session-index.md` - Quick reference to session logs
+- **Usage:**
+  - Read at session start to recall learnings
+  - Update via `/session-close` skill
+  - Reduces token waste by persisting knowledge
+- **Instructions:** Documented in `.claude/RAI.md` (Session Start/End Protocols)
+- **Related:** `/session-close` skill
+
 ---
 
 ## Metadata
 
 - **Started:** 2026-01-31 (E1 foundation)
-- **Last Updated:** 2026-01-31 (F1.5 Output Module)
-- **Components:** 12 (7 raise-cli + 5 skills infrastructure)
+- **Last Updated:** 2026-01-31 (session-close skill)
+- **Components:** 14 (7 raise-cli + 7 skills/memory infrastructure)
 - **Next:** F1.6 Core Utilities
 
 ---
