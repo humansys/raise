@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Annotated
 
 import typer
@@ -19,6 +20,14 @@ app = typer.Typer(
 console = Console()
 
 
+class OutputFormat(str, Enum):
+    """Output format options."""
+
+    human = "human"
+    json = "json"
+    table = "table"
+
+
 def version_callback(value: bool) -> None:
     """Print version and exit."""
     if value:
@@ -28,6 +37,7 @@ def version_callback(value: bool) -> None:
 
 @app.callback()
 def main(
+    ctx: typer.Context,
     version: Annotated[
         bool,
         typer.Option(
@@ -38,9 +48,41 @@ def main(
             help="Show version and exit",
         ),
     ] = False,
+    format: Annotated[
+        OutputFormat,
+        typer.Option(
+            "--format",
+            "-f",
+            help="Output format (human, json, table)",
+        ),
+    ] = OutputFormat.human,
+    verbose: Annotated[
+        int,
+        typer.Option(
+            "--verbose",
+            "-v",
+            count=True,
+            help="Increase verbosity (-v, -vv, -vvv)",
+        ),
+    ] = 0,
+    quiet: Annotated[
+        bool,
+        typer.Option(
+            "--quiet",
+            "-q",
+            help="Suppress non-error output",
+        ),
+    ] = False,
 ) -> None:
-    """RaiSE CLI - Reliable AI Software Engineering governance framework."""
-    pass
+    """RaiSE CLI - Reliable AI Software Engineering governance framework.
+
+    Global options apply to all commands and control output format and verbosity.
+    """
+    # Store options in context for subcommands
+    ctx.ensure_object(dict)
+    ctx.obj["format"] = format.value
+    ctx.obj["verbosity"] = -1 if quiet else min(verbose, 3)
+    ctx.obj["quiet"] = quiet
 
 
 if __name__ == "__main__":
