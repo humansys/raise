@@ -128,6 +128,32 @@ def execute_kata(kata_id, context):
     ...
 ```
 
+**Pattern: Using `cast()` for `Any` in containers**
+
+When pyright strict mode reports "partially unknown type" for values extracted from `dict[str, Any]` or `list[Any]`, use `typing.cast()` to assert the expected type:
+
+```python
+from typing import Any, cast
+
+def process_nested(data: dict[str, Any]) -> None:
+    for key, value in data.items():
+        if isinstance(value, dict):
+            # cast() tells pyright the exact type after isinstance check
+            nested = cast(dict[str, Any], value)
+            process_nested(nested)
+        elif isinstance(value, list):
+            items = cast(list[Any], value)
+            for item in items:
+                ...
+```
+
+Use `cast()` when:
+- Processing recursive structures with `Any` values
+- After `isinstance()` checks where pyright can't narrow the type
+- Working with external data (JSON, TOML) where structure is validated elsewhere
+
+**Do NOT** use `cast()` to silence legitimate type errors.
+
 ---
 
 ### MUST-CODE-002: Ruff Linting Passes
@@ -391,6 +417,7 @@ repos:
 |-------|---------|--------|
 | 2026-01-30 | 1.0.0 | Initial guardrails derived from Solution Vision |
 | 2026-01-31 | 1.1.0 | Added Inference Economy principle and guardrails (SHOULD-INF-*) |
+| 2026-01-31 | 1.2.0 | Added `cast()` pattern for pyright strict mode (F1.5 retro) |
 
 ---
 
