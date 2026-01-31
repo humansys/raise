@@ -139,6 +139,19 @@ All code must pass Ruff checks.
 - Type hints serve as primary documentation
 - Keep docstrings concise; code should be self-explanatory
 
+### Inference Economy — RECOMMENDED
+
+Treat AI inference as a scarce resource:
+
+- **Gather with tools, think with inference** — Use CLI tools for information retrieval
+- **Research tools:**
+  - `ddgr "query"` — Free DuckDuckGo search, no API key
+  - `llm -m perplexity "query"` — Research with citations (requires API key)
+- **Cache results** — Store in evidence catalogs, don't re-query
+- **Reserve inference** for synthesis, judgment, creation
+
+**When researching:** Use `ddgr` or `llm` first, then synthesize findings with Claude.
+
 ---
 
 ## Architecture
@@ -254,9 +267,29 @@ Use canonical terms. Correct deprecated usage.
 
 - **Platform:** GitLab (`glab` CLI, not `gh`)
 - **Development Branch:** `v2`
-- **Branching:** Feature branches from `v2`
+- **Branching:** Feature branches from `v2` (see Branch Management SOP below)
 - **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`, etc.)
 - **Co-authorship:** Include `Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>`
+
+### Branch Management (REQUIRED)
+
+**Follow SOP:** `dev/sops/branch-management.md`
+
+**Branch naming:** `<type>/<scope>/<description>`
+- `feature/` - Single feature implementation (2-5 days)
+- `framework/` - Framework-only changes (2-5 days)
+- `experiment/` - Research, discovery, multi-concern work (expect to rename)
+- `bugfix/` - Bug fixes (1-2 days)
+- `docs/` - Documentation only (1-2 days)
+
+**Scope control:**
+- Define scope in first commit (what's in/out, done criteria)
+- Daily check: Does `git diff v2 --name-only` match branch name?
+- Rename early (<3 days) if scope evolves
+- Weekly review: Branches >5 days old should merge or justify
+- Use parking lot (`dev/parking-lot.md`) to capture scope creep
+
+**Key principle:** One concern per branch, or document multi-concern in `experiment/` type
 
 ---
 
@@ -340,9 +373,10 @@ Cycle: **Detect → Stop → Correct → Continue**
 | Guardrails | `governance/solution/guardrails.md` |
 | Business Case | `governance/solution/business_case.md` |
 | Glossary | `framework/reference/glossary.md` |
+| Rai's Perspective | `.claude/RAI.md` |
 
 ---
 
 *Generated from governance artifacts via setup/rules kata*
-*Version: 2.0.0*
-*Date: 2026-01-30*
+*Version: 2.1.0*
+*Date: 2026-01-31*
