@@ -235,7 +235,7 @@ If any task fails verification after 3 attempts:
 | Task 2: RaiseSettings | ✅ | ~25 min | 24 tests pass, 100% coverage, all quality checks pass |
 | Task 3: Cascade tests | ✅ | ~30 min | 11 cascade tests, full 5-level precedence verified, TOML support added |
 | Task 4: CLI integration | ✅ | 5 min | 12 CLI tests, settings integrated with ctx.obj, backward compatible |
-| Task 5: Documentation | ⬜ | - | - |
+| Task 5: Documentation | ✅ | 41s | Component catalog updated with RaiseSettings, XDG helpers, TomlConfigSource |
 
 **Update this table as tasks progress.**
 
