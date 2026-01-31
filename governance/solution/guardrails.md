@@ -28,6 +28,7 @@ Derived from Solution Vision:
 3. **Security by Default** — No secrets, no vulnerabilities, audit-ready
 4. **Test What Matters** — >90% coverage, property-based tests for critical paths
 5. **Modern Python** — pyproject.toml, uv, Python 3.12+ features
+6. **Inference Economy** — Treat AI inference as scarce; offload gathering to deterministic tools
 
 ---
 
@@ -73,6 +74,14 @@ Derived from Solution Vision:
 | `MUST-DEV-001` | MUST | Pre-commit hooks configured | `.pre-commit-config.yaml` exists and runs | Best practices |
 | `MUST-DEV-002` | MUST | pyproject.toml for config | All tool config in `pyproject.toml` | Best practices |
 | `SHOULD-DEV-001` | SHOULD | uv for dependency management | `uv.lock` exists | Solution Vision §Stack |
+
+### Inference Economy
+
+| ID | Level | Guardrail | Verificación | Derivado de |
+|----|-------|-----------|--------------|-------------|
+| `SHOULD-INF-001` | SHOULD | Use CLI tools for information gathering | Research uses `ddgr`, `llm`, etc. before inference | Lean §7 |
+| `SHOULD-INF-002` | SHOULD | Cache research results | Evidence catalogs prevent re-querying | Lean §7 |
+| `SHOULD-INF-003` | SHOULD | Reserve inference for synthesis | Gathering is deterministic, thinking is inference | Lean §7 |
 
 ---
 
@@ -296,6 +305,34 @@ on_failure:
 
 ---
 
+### SHOULD-INF-001: Use CLI Tools for Information Gathering
+
+**Regla:** Prefer deterministic CLI tools over inference for information gathering.
+
+**Contexto (Golden Context para Agentes):**
+```
+When researching or gathering information:
+- Use `ddgr "query"` for quick web searches (free, no API key)
+- Use `llm -m perplexity "query"` for research with citations (API key required)
+- Use `WebSearch` only when CLI tools unavailable
+- Reserve inference (Claude) for synthesis, judgment, and creation
+- Cache results in evidence catalogs to prevent re-querying
+```
+
+**Verificación:**
+```yaml
+check: process
+criteria: Research sessions use CLI tools before inference
+blocking: false
+on_failure:
+  message: "Consider using deterministic tools for gathering."
+  recovery: "Install ddgr: apt install ddgr"
+```
+
+**Rationale:** Inference is expensive (tokens, latency, environmental cost). Gathering is deterministic work; synthesis is where inference adds value.
+
+---
+
 ## Proceso de Excepción
 
 To request an exception to any guardrail:
@@ -353,6 +390,7 @@ repos:
 | Fecha | Versión | Cambio |
 |-------|---------|--------|
 | 2026-01-30 | 1.0.0 | Initial guardrails derived from Solution Vision |
+| 2026-01-31 | 1.1.0 | Added Inference Economy principle and guardrails (SHOULD-INF-*) |
 
 ---
 
