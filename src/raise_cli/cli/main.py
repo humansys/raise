@@ -9,6 +9,7 @@ import typer
 from rich.console import Console
 
 from raise_cli import __version__
+from raise_cli.config import RaiseSettings
 
 app = typer.Typer(
     name="raise",
@@ -78,10 +79,23 @@ def main(
 
     Global options apply to all commands and control output format and verbosity.
     """
-    # Store options in context for subcommands
+    # Calculate verbosity from flags
+    verbosity = -1 if quiet else min(verbose, 3)
+
+    # Create settings with CLI overrides (highest priority)
+    settings = RaiseSettings(
+        output_format=format.value,  # type: ignore[arg-type]
+        verbosity=verbosity,
+    )
+
+    # Store in context for subcommands
     ctx.ensure_object(dict)
+    ctx.obj["settings"] = settings
+
+    # Backward compatibility: keep individual values in ctx.obj
+    # (Can be removed once all commands migrate to using settings)
     ctx.obj["format"] = format.value
-    ctx.obj["verbosity"] = -1 if quiet else min(verbose, 3)
+    ctx.obj["verbosity"] = verbosity
     ctx.obj["quiet"] = quiet
 
 
