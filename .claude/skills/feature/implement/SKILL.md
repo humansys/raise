@@ -1,0 +1,178 @@
+---
+name: feature-implement
+description: >
+  Execute the implementation plan task by task, verifying each step, and
+  producing quality code that passes validation gates. Use after planning
+  is complete.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: feature
+  raise.frequency: per-feature
+  raise.fase: "6"
+  raise.prerequisites: feature-plan
+  raise.next: feature-review
+  raise.gate: gate-code
+  raise.adaptable: "true"
+  raise.version: "1.0.0"
+
+hooks:
+  PostToolUse:
+    - matcher: "Write|Edit"
+      hooks:
+        - type: command
+          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-artifact-created.sh"
+  Stop:
+    - hooks:
+        - type: command
+          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+---
+
+# Implement: Development Workflow
+
+## Purpose
+
+Execute the implementation plan task by task, verifying each step, and producing quality code that passes validation gates.
+
+## Mastery Levels (ShuHaRi)
+
+**Shu (守)**: Execute tasks in order, verify each one before proceeding.
+
+**Ha (破)**: Adjust plan based on discoveries during implementation.
+
+**Ri (離)**: Create implementation patterns for specific stacks.
+
+## Context
+
+**When to use:**
+- After having an implementation plan
+- For each feature being developed
+- Repeated for each task in the plan
+
+**Inputs required:**
+- Implementation plan (`work/features/{feature}/plan.md`)
+- Project rules and guardrails context
+
+**Output:**
+- Implemented and verified code
+- `work/features/{feature}/progress.md` - Progress log
+
+## Steps
+
+### Step 1: Load Plan and Context
+
+Load the implementation plan and obtain applicable rules context.
+
+**Verification:** Plan loaded and context available.
+
+> **If you can't continue:** Plan not found → Execute `/feature-plan` first.
+
+### Step 2: Identify Next Task
+
+Select the next uncompleted task according to plan order.
+
+**Timestamp tracking:** Capture start time for accurate measurement.
+
+**Verification:** Task identified with its dependencies resolved.
+
+> **If you can't continue:** Dependencies unresolved → Resolve dependencies first.
+
+### Step 3: Execute Task
+
+Implement the code for the task following:
+- Project rules and guardrails
+- Established patterns
+- Required tests
+
+**Verification:** Code implemented and compiles/runs.
+
+> **If you can't continue:** Implementation error → Document blocker and escalate.
+
+### Step 4: Verify Task
+
+Execute verification defined in the plan:
+- Unit tests
+- Linting
+- Type checking
+
+**Verification:** All verifications pass.
+
+> **If you can't continue:** Verification fails → Fix and re-verify (max 3 attempts).
+
+### Step 5: Log Progress
+
+Update `work/features/{feature}/progress.md`:
+- Task completed
+- Actual time vs estimated
+- Notes or discoveries
+
+**Verification:** Progress logged with accurate time.
+
+### Step 6: Iterate or Finalize
+
+If more tasks → return to Step 2.
+If all tasks completed → execute code gate.
+
+**Verification:** All plan tasks completed.
+
+> **If you can't continue:** Tasks blocked → Document and escalate.
+
+## Output
+
+- **Artifact:** Implemented code
+- **Location:** Per project architecture
+- **Gate:** `gates/gate-code.md`
+- **Next:** `/feature-review`
+
+## Progress Template
+
+```markdown
+# Progress: {Feature Name}
+
+## Status
+- **Started:** YYYY-MM-DD HH:MM
+- **Current Task:** N of M
+- **Status:** In Progress / Complete / Blocked
+
+## Completed Tasks
+
+### Task 1: {Name}
+- **Started:** HH:MM
+- **Completed:** HH:MM
+- **Duration:** X min (estimated: Y min)
+- **Notes:** ...
+
+### Task 2: {Name}
+- **Started:** HH:MM
+- **Completed:** HH:MM
+- **Duration:** X min (estimated: Y min)
+- **Notes:** ...
+
+## Blockers
+- {None / Description of blocker}
+
+## Discoveries
+- {Learnings during implementation}
+```
+
+## Notes
+
+### Resumability
+
+Progress is persisted in `progress.md`, allowing implementation to resume if interrupted.
+
+### Attempt Limits
+
+Maximum 3 attempts per failed verification before escalating.
+
+### Jidoka
+
+If you detect a defect or guardrail violation: **STOP**. Do not accumulate errors.
+
+Cycle: **Detect → Stop → Correct → Continue**
+
+## References
+
+- Gate: `gates/gate-code.md`
+- Next skill: `/feature-review`
