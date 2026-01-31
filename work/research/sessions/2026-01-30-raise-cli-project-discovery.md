@@ -16,20 +16,14 @@ Execute project-level katas for the raise-cli project, starting with project/dis
 
 ### Completed
 
-| Kata | Status | Output |
-|------|--------|--------|
-| **project/discovery** | COMPLETED | `governance/projects/raise-cli/prd.md` |
+| Kata | Status | Output | Version |
+|------|--------|--------|---------|
+| **project/discovery** | COMPLETED | `governance/projects/raise-cli/prd.md` | v1.1.0 |
+| **project/vision** | COMPLETED | `governance/projects/raise-cli/vision.md` | v1.0.0 |
+| **project/design** | COMPLETED | `governance/projects/raise-cli/design.md` | v1.1.0 |
+| **project/backlog** | COMPLETED | `governance/projects/raise-cli/backlog.md` | v1.0.0 |
 
-### In Progress
-
-| Kata | Status | Notes |
-|------|--------|-------|
-| **project/vision** | PENDING | Next kata |
-
-### Pending
-
-- project/design
-- project/backlog
+All project-level katas complete. Ready for feature implementation.
 
 ---
 
@@ -127,14 +121,17 @@ Execute project-level katas for the raise-cli project, starting with project/dis
 | Hash | Message |
 |------|---------|
 | fd18340 | feat(project): Add raise-cli PRD with Agent Skills ecosystem positioning |
+| 480b9f2 | feat(project): Add raise-cli Project Vision |
+| c1d268e | feat(project): Add raise-cli Technical Design v1.1.0 |
+| a1111e2 | feat(project): Add raise-cli Product Backlog |
 
 ---
 
 ## Next Steps
 
-1. Execute `project/vision` kata
-2. Create Project Vision document
-3. Pass gate-vision
+1. Begin feature implementation with `feature/plan` kata
+2. Start with Epic E1 (Core Foundation)
+3. First feature: F1.1 Project Scaffolding
 
 ---
 
