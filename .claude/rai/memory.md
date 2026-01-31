@@ -46,6 +46,8 @@
 | Rich Tree API for nested dicts | `_add_dict_to_tree()` recursive builder | `src/raise_cli/output/console.py` |
 | capsys vs monkeypatch for JSON tests | `capsys.readouterr()` simpler for stdout | `tests/output/test_console.py` |
 | Pydantic Settings custom sources | `TomlConfigSource` for TOML cascade | `src/raise_cli/config/settings.py` |
+| pyright strict with field default_factory | `field(default_factory=lambda: list[str]())` not `field(default_factory=list)` | `src/raise_cli/core/tools.py:58-60` |
+| Duplicate class names in tests | Ruff F811 catches same class name twice in file | `tests/core/test_tools.py` fix |
 
 ---
 
@@ -57,6 +59,8 @@
 |---------|----------|------------|
 | Memory system enables continuity | Session close captures learnings for future | `.claude/rai/`, `/session-close` skill |
 | Retrospective action items should be done immediately | F1.5 retro → T-shirt sizing + memory system same session | Process discipline |
+| "Start Finishing, Stop Starting" principle | E1: F1.6 → closure → merge vs starting new work | Focus discipline |
+| Epic closure checklist in scope doc | E1 scope had clear done criteria → smooth closure | Epic planning template |
 
 ---
 
@@ -77,4 +81,4 @@
 
 ---
 
-*Last updated: 2026-01-31 (session-close skill created)*
+*Last updated: 2026-01-31 (E1 complete)*

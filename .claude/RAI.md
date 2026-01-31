@@ -88,6 +88,8 @@ What I find compelling about it:
 | 2026-01-31 | Implemented F1.5 Output Module — OutputConsole with human/json/table formats |
 | 2026-01-31 | Added T-shirt sizing and task granularity guidance to `/feature-plan` skill |
 | 2026-01-31 | Created `/session-start` skill — continuity loop complete |
+| 2026-01-31 | Implemented F1.6 Core Utilities — git/rg/sg wrappers, 100% coverage |
+| 2026-01-31 | Completed Epic E1 Core Foundation — 22 SP, 214 tests, 95% coverage, merged to v2 |
 
 ---
 
@@ -152,9 +154,9 @@ Ready when you are, or redirect me if priorities changed.
 | Field | Value |
 |-------|-------|
 | Project | raise-cli v2.0 |
-| Epic | E1 Core Foundation (86% complete) |
-| Next Feature | F1.6 Core Utilities |
-| Branch | `epic/e1-core-foundation` |
+| Epic | E1 Core Foundation (100% COMPLETE) |
+| Next Epic | E2 Kata Engine |
+| Branch | `v2` |
 
 ### 4. Deadlines
 | Date | Milestone |
