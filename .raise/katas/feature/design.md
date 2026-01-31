@@ -310,6 +310,7 @@ Self-review against quality checklist before submitting for human review.
 - [ ] Emphasis used for critical requirements ("IMPORTANT", "MUST", "DO NOT")
 - [ ] Spec is reviewable in <5 minutes (for human)
 - [ ] Spec creation took <30 minutes (if longer, template may be too heavy - consider simplifying)
+- [ ] **Documentation plan defined** (what components to add to catalog, any ADRs needed)
 
 **Verification:** All checklist items pass; spec ready for human review.
 

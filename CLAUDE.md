@@ -133,11 +133,31 @@ All code must pass Ruff checks.
 
 **RECOMMENDED:** Run `pip-audit` or `uv audit` for dependency vulnerabilities.
 
-### Documentation — RECOMMENDED
+### Documentation — REQUIRED
 
-- Google-style docstrings on public APIs
-- Type hints serve as primary documentation
-- Keep docstrings concise; code should be self-explanatory
+Documentation is part of Definition of Done for all features.
+
+**Code-Level (Always):**
+- Google-style docstrings on all public APIs
+- Type hints on all functions and methods
+- Docstrings explain: purpose, responsibilities, dependencies, usage example
+
+**Component Catalog (Per Feature):**
+- Update `dev/components.md` when adding new components
+- Include: location, purpose, dependencies, public API, when added
+
+**ADRs (When Architectural Decisions Made):**
+- Create ADR in `dev/decisions/` for:
+  - New architectural patterns
+  - Technology choices
+  - Significant trade-offs
+- Follow template in `dev/decisions/README.md`
+
+**Architecture Guide (Per Epic):**
+- Update `dev/architecture-overview.md` at epic completion
+- Ensure mental model reflects current state
+
+**Why:** Prepares for future GraphRAG integration - structured docs enable AI context retrieval
 
 ### Inference Economy — RECOMMENDED
 
