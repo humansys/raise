@@ -1,0 +1,2 @@
+# Telemetry data is local, not committed
+*.jsonl
