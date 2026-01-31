@@ -267,9 +267,29 @@ Use canonical terms. Correct deprecated usage.
 
 - **Platform:** GitLab (`glab` CLI, not `gh`)
 - **Development Branch:** `v2`
-- **Branching:** Feature branches from `v2`
+- **Branching:** Feature branches from `v2` (see Branch Management SOP below)
 - **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`, etc.)
 - **Co-authorship:** Include `Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>`
+
+### Branch Management (REQUIRED)
+
+**Follow SOP:** `dev/sops/branch-management.md`
+
+**Branch naming:** `<type>/<scope>/<description>`
+- `feature/` - Single feature implementation (2-5 days)
+- `framework/` - Framework-only changes (2-5 days)
+- `experiment/` - Research, discovery, multi-concern work (expect to rename)
+- `bugfix/` - Bug fixes (1-2 days)
+- `docs/` - Documentation only (1-2 days)
+
+**Scope control:**
+- Define scope in first commit (what's in/out, done criteria)
+- Daily check: Does `git diff v2 --name-only` match branch name?
+- Rename early (<3 days) if scope evolves
+- Weekly review: Branches >5 days old should merge or justify
+- Use parking lot (`dev/parking-lot.md`) to capture scope creep
+
+**Key principle:** One concern per branch, or document multi-concern in `experiment/` type
 
 ---
 
