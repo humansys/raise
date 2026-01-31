@@ -47,6 +47,7 @@ katas/
 ├── project/      # Per-project (once) — initiative artifacts
 ├── feature/      # Per-feature (many) — implementation cycles
 ├── setup/        # Per-solution (once) — governance & environment
+├── tools/        # As-needed — methodology patterns (research, etc.)
 └── improve/      # Continuous — retrospective and evolution
 ```
 
@@ -94,6 +95,14 @@ katas/
 | `review.md` | Retrospective & Learning | `work/features/{NNN-name}/retrospective.md` |
 
 > **Note**: Feature artifacts are transient and stay in `work/` (ADR-011)
+
+### tools/ (As-Needed)
+
+| Kata | Purpose | Output |
+|------|---------|--------|
+| `research.md` | Evidence-based investigation | `work/research/{topic}/` |
+
+> **Note**: Tool katas are methodology patterns usable across work cycles
 
 ---
 
