@@ -35,10 +35,10 @@
 
 > User-facing commands
 
-### Global Options (F1.2, updated F1.4)
+### Global Options (F1.2, updated F1.3)
 - **Location:** `src/raise_cli/cli/main.py`
 - **Purpose:** Global options for all commands (format, verbosity, quiet)
-- **Added:** F1.2 (Epic E1), integrated with RaiseSettings in F1.4
+- **Added:** F1.2 (Epic E1), integrated with RaiseSettings in F1.3
 - **API:**
   - `--format/-f` (human|json|table)
   - `--verbose/-v` (count, up to -vvv)
@@ -47,6 +47,22 @@
   - `ctx.obj["settings"]` (RaiseSettings instance) - primary
   - `ctx.obj["format"]`, `ctx.obj["verbosity"]`, `ctx.obj["quiet"]` - backward compat
 - **Dependencies:** `RaiseSettings` (F1.3)
+
+### Error Handler (F1.4)
+- **Location:** `src/raise_cli/cli/error_handler.py`
+- **Purpose:** Format and display errors with Rich output or JSON
+- **Added:** F1.4 (Epic E1)
+- **Public API:**
+  - `handle_error(error, output_format) -> int` - Display error, return exit code
+  - `get_error_console() -> Console` - Get stderr console singleton
+  - `set_error_console(console)` - Override console (for testing)
+- **Features:**
+  - Rich Panel with error code title and message
+  - Details section (key-value pairs)
+  - Hint section (cyan text)
+  - JSON output mode for `--format json`
+- **Dependencies:** `RaiseError` hierarchy, Rich
+- **Tests:** 22 unit tests (100% coverage)
 
 ---
 
@@ -113,6 +129,41 @@
   - Graceful degradation for malformed/missing TOML
 - **Python Compatibility:** Uses `tomllib` (3.11+) or `tomli` (3.10)
 - **Tests:** Covered by cascade integration tests
+
+---
+
+## Exceptions (Core Layer)
+
+> Centralized error hierarchy with exit codes
+
+### RaiseError Hierarchy (F1.4)
+- **Location:** `src/raise_cli/exceptions.py`
+- **Purpose:** Centralized exceptions with exit codes, error codes, hints
+- **Added:** F1.4 (Epic E1)
+- **Export:** All exceptions exported from `raise_cli` package root
+- **Base Class:** `RaiseError`
+  - `exit_code: int` - Process exit code
+  - `error_code: str` - Unique identifier (E000-E010)
+  - `message: str` - Human-readable description
+  - `hint: str | None` - Resolution suggestion
+  - `details: dict` - Structured debugging data
+  - `to_dict() -> dict` - JSON serialization
+- **Exception Classes:**
+
+| Exception | Exit Code | Error Code | Use Case |
+|-----------|-----------|------------|----------|
+| `RaiseError` | 1 | E000 | General errors |
+| `ConfigurationError` | 2 | E001 | Config file issues |
+| `KataNotFoundError` | 3 | E002 | Missing kata |
+| `GateNotFoundError` | 3 | E003 | Missing gate |
+| `ArtifactNotFoundError` | 4 | E004 | Missing artifact file |
+| `DependencyError` | 5 | E005 | External tool unavailable |
+| `StateError` | 6 | E006 | Corrupted state file |
+| `ValidationError` | 7 | E007 | Schema/artifact validation |
+| `GateFailedError` | 10 | E010 | Gate criteria not met |
+
+- **Related ADRs:** Design §4 (Error Handling)
+- **Tests:** 43 unit tests (100% coverage)
 
 ---
 
@@ -190,9 +241,9 @@
 ## Metadata
 
 - **Started:** 2026-01-31 (E1 foundation)
-- **Last Updated:** 2026-01-31 (Skills infrastructure added)
-- **Components:** 8 (4 raise-cli + 4 skills infrastructure)
-- **Next:** F1.4 Exception Hierarchy, remaining kata migrations
+- **Last Updated:** 2026-01-31 (F1.4 Exception Hierarchy)
+- **Components:** 10 (6 raise-cli + 4 skills infrastructure)
+- **Next:** F1.5 Output Module, F1.6 Core Utilities
 
 ---
 
