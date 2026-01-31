@@ -6,6 +6,13 @@
 
 ---
 
+## Urgent
+
+- [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
+- [ ] **Rovo AI integration** - Required for Mar 14 webinar (Atlassian agentic dev platform)
+
+---
+
 ## Ideas
 
 ### Framework Improvements
