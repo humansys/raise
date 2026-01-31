@@ -44,10 +44,10 @@
 
 | Date | Type | Summary |
 |------|------|---------|
-| 2026-01-31 | maintenance | Session logs → dev/sessions/, created parking-lot.md, context.md |
+| 2026-01-31 | maintenance | Session infrastructure: context.md, parking-lot.md, deadlines, session protocol |
+| 2026-01-31 | maintenance | Session logs → dev/sessions/, reorganization |
 | 2026-01-30 | kata | All project katas complete (PRD, Vision, Design, Backlog) |
 | 2026-01-30 | research | Agent Skills ecosystem, Python CLI architecture |
-| 2026-01-30 | kata | Solution foundation katas |
 
 ---
 
