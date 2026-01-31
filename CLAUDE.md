@@ -65,6 +65,9 @@
 - Generate code without documented implementation plan
 - Execute without Observable Workflow active
 - Ignore Escalation Gates when confidence is low
+- Spawn subagents without explicit permission (inference economy)
+- Assume tool availability - ask first
+- Re-check things user has already told you
 
 **ALWAYS:**
 - Validate specs against constitution before planning
@@ -74,6 +77,8 @@
 - Include attribution to upstream projects (MIT compliance)
 - Register trace of each interaction
 - Escalate to Orchestrator when ambiguous
+- Ask before expensive operations (agents, broad searches)
+- Listen to session context - don't repeat rejected assumptions
 
 ---
 
