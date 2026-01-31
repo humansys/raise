@@ -14,6 +14,7 @@
 | F1.3 Configuration System | 5 | M | 6-8h | 20min | 18x | First kata cycle |
 | F1.4 Exception Hierarchy | 3 | S | - | ~30min | - | No formal estimate |
 | F1.5 Output Module | 3 | S | 2h 45m | 15min | 11x | Second kata cycle |
+| F1.6 Core Utilities | 3 | S | - | ~10min | - | Third kata cycle, no estimate |
 
 **Average ratio:** ~14x faster than traditional estimates
 
@@ -47,4 +48,4 @@
 
 ---
 
-*Last updated: 2026-01-31 (F1.5 completion)*
+*Last updated: 2026-01-31 (E1 complete - F1.6)*
