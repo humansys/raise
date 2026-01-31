@@ -3,7 +3,7 @@
 > **Audience:** Architects, contributors, future maintainers
 > **Purpose:** Explain the mental model and design decisions
 > **Status:** Living document (updated as we build)
-> **Last Updated:** 2026-01-31 (E1 foundation phase)
+> **Last Updated:** 2026-01-31 (E1 complete)
 
 ---
 
@@ -172,39 +172,52 @@ Plus: Rich formatting for human-readable errors with hints.
 
 ---
 
-### F1.5: Output Module
+### F1.5: Output Module ✓
 
-**What:** Formatters (human, json, table) + Rich console
+**What:** OutputConsole class with format-aware output
 
-**Why:** Handlers need to output results. Format based on `ctx.obj["format"]`.
+**Why:** Handlers need to output results. Format based on `--format` flag.
 
-**Example:**
+**How it works:**
 ```python
-# Handler returns data
-result = {"kata_id": "discovery", "status": "completed"}
+from raise_cli.output import get_console, configure_console
 
-# Output module formats based on --format flag
-output(result, format=ctx.obj["format"])
-# Human: Pretty Rich panels
-# JSON: {"kata_id": "discovery", "status": "completed"}
-# Table: ASCII table
+# Configure once (usually in CLI callback)
+console = configure_console(format="human", verbosity=0, color=True)
+
+# Use anywhere
+console.print_success("Kata completed", details={"steps": 5})
+console.print_data({"name": "discovery", "status": "done"})
+console.print_list(["item1", "item2"], title="Results")
 ```
+
+**Formats:** human (Rich styling), json (parseable), table (Rich tables)
 
 ---
 
-### F1.6: Core Utilities
+### F1.6: Core Utilities ✓
 
-**What:** Subprocess wrappers for git, ast-grep, ripgrep
+**What:** Typed subprocess wrappers for git, ast-grep, ripgrep
 
 **Why:** Engines need to:
-- Check git status
-- Run ast-grep for code patterns (SAR)
-- Run ripgrep for searches (SAR)
+- Check git status, branch, diff
+- Run ast-grep for AST patterns (SAR)
+- Run ripgrep for text search (SAR)
 
-**Safe wrappers:**
-- Validate paths (prevent injection)
-- Graceful degradation (ast-grep optional)
-- Capture output properly
+**How it works:**
+```python
+from raise_cli.core import git_status, rg_search, check_tool
+
+# Check if tools available
+if check_tool("rg"):
+    matches = rg_search("TODO", Path("."), glob="*.py")
+
+# Get git info
+status = git_status()
+print(f"On {status.branch}, {len(status.staged)} staged files")
+```
+
+**Error handling:** Raises `DependencyError` with install hints if tools missing
 
 ---
 
@@ -340,25 +353,32 @@ Think of raise-cli as **three concentric circles**:
 
 ---
 
-## Current State Summary
+## Current State Summary (E1 Complete)
 
-**Complete:**
-- ✓ Package structure (F1.1)
-- ✓ CLI with global options (F1.2)
-- ✓ Tests, quality checks, git workflow
+**All Foundation Features Complete:**
+- ✓ F1.1: Package structure
+- ✓ F1.2: CLI with global options
+- ✓ F1.3: Configuration cascade (CLI → env → pyproject → user config → defaults)
+- ✓ F1.4: Exception hierarchy with exit codes
+- ✓ F1.5: Output module (human/json/table formatters)
+- ✓ F1.6: Core utilities (git, rg, sg wrappers)
+
+**Quality:**
+- 214 tests passing
+- 95% coverage
+- pyright: 0 errors
+- ruff: clean
 
 **Can do now:**
 ```bash
-raise --version
-raise --help
-raise -vvv --format json  # Options work, no commands yet
+raise --version           # 2.0.0-alpha.1
+raise --help              # Shows global options
+raise --format json       # Output as JSON
+raise -vvv                # Verbose mode
 ```
 
-**Next (F1.3):**
-Add configuration system so engines know where `.raise/` is.
-
-**After E1 (foundation):**
-Build engines (E2-E4) that actually *do* governance work.
+**Next (E2):**
+Build Kata Engine to actually execute governance katas.
 
 ---
 

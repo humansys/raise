@@ -202,7 +202,32 @@
 
 ## Utilities (Core Layer)
 
-### [No utilities yet - F1.6 will add subprocess wrappers]
+### Tool Wrappers (F1.6)
+- **Location:** `src/raise_cli/core/tools.py`
+- **Purpose:** Typed subprocess wrappers for external tools
+- **Added:** F1.6 (Epic E1)
+- **Export:** `raise_cli.core`
+- **Tools Wrapped:**
+  - `git` - Version control operations
+  - `rg` (ripgrep) - Fast text search
+  - `sg` (ast-grep) - AST-based code search
+- **Public API:**
+  - `check_tool(name) -> bool` - Check if tool is available
+  - `require_tool(name)` - Raise `DependencyError` if missing
+  - `run_tool(args, cwd, check) -> ToolResult` - Run command and capture output
+  - `git_root(cwd) -> Path` - Get git repository root
+  - `git_branch(cwd) -> str` - Get current branch name
+  - `git_status(cwd) -> GitStatus` - Structured git status (staged, modified, untracked)
+  - `git_diff(staged, cwd) -> str` - Get diff output
+  - `rg_search(pattern, path, glob, ignore_case) -> list[SearchMatch]` - Search with ripgrep
+  - `sg_search(pattern, path, lang) -> list[SearchMatch]` - Search with ast-grep
+- **Data Classes:**
+  - `ToolResult` - returncode, stdout, stderr, success property
+  - `GitStatus` - staged, modified, untracked, branch
+  - `SearchMatch` - path, line, text
+- **Error Handling:** Raises `DependencyError` with install hints for missing tools
+- **Dependencies:** None (stdlib subprocess, shutil)
+- **Tests:** 34 unit tests (100% coverage)
 
 ---
 
@@ -336,9 +361,9 @@
 ## Metadata
 
 - **Started:** 2026-01-31 (E1 foundation)
-- **Last Updated:** 2026-01-31 (session-close skill)
-- **Components:** 15 (7 raise-cli + 8 skills/memory infrastructure)
-- **Next:** F1.6 Core Utilities
+- **Last Updated:** 2026-01-31 (F1.6 Core Utilities)
+- **Components:** 16 (8 raise-cli + 8 skills/memory infrastructure)
+- **Next:** E1 complete → E2 Kata Engine
 
 ---
 

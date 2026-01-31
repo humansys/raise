@@ -21,11 +21,11 @@ Build the foundational CLI infrastructure: package structure, command framework,
 | F1.3 | Configuration System | 5 | ✓ Complete | 20min |
 | F1.4 | Exception Hierarchy | 3 | ✓ Complete | ~30min |
 | F1.5 | Output Module | 3 | ✓ Complete | ~15min |
-| F1.6 | Core Utilities | 3 | Next | - |
+| F1.6 | Core Utilities | 3 | ✓ Complete | ~10min |
 
 **Total:** 22 SP
-**Completed:** 19 SP (86%)
-**Velocity:** ~12 SP/hour (based on F1.1-F1.5 data)
+**Completed:** 22 SP (100%)
+**Velocity:** ~12 SP/hour (based on F1.1-F1.6 data)
 
 ---
 
@@ -73,11 +73,11 @@ Build the foundational CLI infrastructure: package structure, command framework,
 - [ ] All quality checks pass (ruff, pyright, bandit)
 
 ### Epic Complete
-- [ ] All 6 features complete (F1.1-F1.6)
-- [ ] `raise --version` and `raise --help` work
-- [ ] All tests pass
-- [ ] **Architecture guide updated** (`dev/architecture-overview.md`)
-- [ ] README updated with installation instructions
+- [x] All 6 features complete (F1.1-F1.6)
+- [x] `raise --version` and `raise --help` work
+- [x] All tests pass (214 tests, 95% coverage)
+- [x] **Architecture guide updated** (`dev/architecture-overview.md`)
+- [ ] README updated with installation instructions (deferred: pre-release, no PyPI yet)
 - [ ] Epic merged to v2
 
 ---
