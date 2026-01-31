@@ -55,6 +55,13 @@ Cargar el plan de implementación y obtener contexto de reglas aplicables.
 
 Seleccionar el próximo task no completado según el orden del plan.
 
+**Timestamp tracking:** Capturar hora de inicio para medición precisa.
+```bash
+# Capture task start time
+TASK_START_TIME=$(date +%s)
+echo "Task started at: $(date +'%Y-%m-%d %H:%M:%S')"
+```
+
 **Verificación:** Task identificado con sus dependencias resueltas.
 
 > **Si no puedes continuar:** Dependencias no resueltas → Resolver dependencias primero.
@@ -85,10 +92,27 @@ Ejecutar verificación definida en el plan:
 
 Actualizar `work/features/{feature}/progress.md`:
 - Task completado
-- Tiempo real vs estimado
+- Tiempo real vs estimado (calculado de timestamp)
 - Notas o descubrimientos
 
-**Verificación:** Progreso registrado.
+**Calcular duración real:**
+```bash
+# Calculate actual task duration
+TASK_END_TIME=$(date +%s)
+DURATION_SECONDS=$((TASK_END_TIME - TASK_START_TIME))
+DURATION_MINUTES=$((DURATION_SECONDS / 60))
+echo "Task completed in: ${DURATION_MINUTES} minutes (${DURATION_SECONDS}s)"
+```
+
+**Alternativa (usar git):** Si commiteas por task, puedes calcular duración entre commits:
+```bash
+# Get time of previous commit
+PREV_COMMIT_TIME=$(git log -1 --format='%ad' --date=format:'%H:%M:%S' HEAD^)
+CURRENT_TIME=$(date +'%H:%M:%S')
+# Manual calculation or use for retrospective analysis
+```
+
+**Verificación:** Progreso registrado con tiempo preciso.
 
 > **Si no puedes continuar:** N/A.
 
