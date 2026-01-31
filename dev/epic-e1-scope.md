@@ -17,14 +17,14 @@ Build the foundational CLI infrastructure: package structure, command framework,
 | ID | Feature | SP | Status |
 |----|---------|----|----|
 | F1.1 | Project Scaffolding | 3 | ✓ Complete |
-| F1.2 | CLI Skeleton | 5 | Next |
-| F1.3 | Configuration System | 5 | Pending |
+| F1.2 | CLI Skeleton | 5 | ✓ Complete |
+| F1.3 | Configuration System | 5 | Next |
 | F1.4 | Exception Hierarchy | 3 | Pending |
 | F1.5 | Output Module | 3 | Pending |
 | F1.6 | Core Utilities | 3 | Pending |
 
 **Total:** 22 SP
-**Completed:** 3 SP (14%)
+**Completed:** 8 SP (36%)
 
 ---
 
