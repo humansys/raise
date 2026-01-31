@@ -231,7 +231,7 @@ If any task fails verification after 3 attempts:
 
 | Task | Status | Actual Time | Notes |
 |------|--------|-------------|-------|
-| Task 1: XDG helpers | ⬜ | - | - |
+| Task 1: XDG helpers | ✅ | ~20 min | All tests pass, 100% coverage, pyright + ruff clean |
 | Task 2: RaiseSettings | ⬜ | - | - |
 | Task 3: Cascade tests | ⬜ | - | - |
 | Task 4: CLI integration | ⬜ | - | - |
