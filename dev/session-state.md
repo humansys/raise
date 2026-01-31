@@ -11,10 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Date** | 2026-01-31 |
-| **Session Type** | Research + Architecture Decision |
+| **Session Type** | Feature Implementation (F1.4) |
 | **Branch** | `epic/e1-core-foundation` |
-| **Last Commit** | `844b7b0` (session close F1.3) |
-| **Duration** | ~2 hours |
+| **Last Commit** | `8caa3a1` (F1.4 Exception Hierarchy) |
 
 ---
 
@@ -22,87 +21,68 @@
 
 ### Epic E1: Core Foundation
 
-**Progress:** 13/22 SP (59%) - unchanged, this was infrastructure work
+**Progress:** 16/22 SP (73%)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | F1.1 Project Scaffolding | ✓ Complete | Package structure, pyproject.toml |
 | F1.2 CLI Skeleton | ✓ Complete | Global options in ctx.obj |
 | F1.3 Configuration System | ✓ Complete | 5-level cascade, XDG paths |
-| F1.4 Exception Hierarchy | **NEXT** | RaiseError with exit codes |
-| F1.5 Output Module | Pending | After F1.4 |
+| F1.4 Exception Hierarchy | ✓ Complete | RaiseError + 8 subclasses, Rich handler |
+| F1.5 Output Module | **NEXT** | Formatters (human, json, table) |
 | F1.6 Core Utilities | Pending | After F1.5 |
 
 ### Working Tree
 
 **Branch:** `epic/e1-core-foundation`
-**Status:** Modified (pending commit)
+**Status:** Clean (just committed)
 **Virtual env:** `.venv/` (active)
 
 ---
 
 ## What We Built This Session
 
-### Major Decision: Skills Architecture (ADR-005)
+### 1. Skills Migration Complete
 
-**Research-driven architectural decision:**
+Merged `feature/skills-migration-feature-katas` branch:
+- `.claude/skills/feature/design/SKILL.md`
+- `.claude/skills/feature/plan/SKILL.md`
+- `.claude/skills/feature/implement/SKILL.md`
+- `.claude/skills/feature/review/SKILL.md`
 
-1. **RaiSE provides governance FOR Claude Code, not a competing executor**
-2. **Katas migrate to Agent Skills format** (open standard, 25+ platforms)
-3. **raise-cli becomes developer tooling**, not agentic runtime
-4. **Telemetry via skill-scoped hooks** + scripts
+All include Observable Workflow hooks for telemetry.
 
-### Deliverables
+### 2. F1.4 Exception Hierarchy (3 SP)
 
-1. **Research: Skills Architecture Decision**
-   - Location: `work/research/skills-architecture-decision/`
-   - 18 sources, 5 triangulated claims
-   - Options 2 vs 3 analysis → Option 3 selected
+Following `/feature-plan` methodology (manually, skills not auto-discovered):
 
-2. **ADR-005: Skills Format Adoption**
-   - Location: `dev/decisions/adr-005-skills-format-adoption.md`
-   - Documents strategic decision and rationale
+**Components created:**
+- `src/raise_cli/exceptions.py` - 9 exception classes with exit codes
+- `src/raise_cli/cli/error_handler.py` - Rich + JSON error display
+- Integration in `__main__.py` - Wraps CLI with error handling
 
-3. **Pilot Skill: tools/research**
-   - Location: `.claude/skills/tools/research/SKILL.md`
-   - Converted from kata format
-   - Includes Observable Workflow hooks
+**Exit code table:**
+| Code | Exception |
+|------|-----------|
+| 1 | RaiseError (general) |
+| 2 | ConfigurationError |
+| 3 | KataNotFoundError, GateNotFoundError |
+| 4 | ArtifactNotFoundError |
+| 5 | DependencyError |
+| 6 | StateError |
+| 7 | ValidationError |
+| 10 | GateFailedError |
 
-4. **Telemetry Infrastructure**
-   - Scripts: `.claude/skills/scripts/log-*.sh`
-   - Storage: `.raise/telemetry/events.jsonl`
-   - 3 event types: skill_started, skill_completed, artifact_created
-
-5. **Research: Claude Code Hooks for Telemetry**
-   - Location: `work/research/claude-code-hooks-telemetry/`
-   - Discovered skill-scoped hooks (critical for RaiSE)
+**Tests:** 77 new tests, 140 total, 91% coverage
 
 ---
 
-## Architectural Clarity Achieved
+## Discoveries This Session
 
-```
-┌─────────────────────────────────────────────────┐
-│              Claude Code (Executor)              │
-│                                                  │
-│   ┌──────────────────────────────────────────┐  │
-│   │           RaiSE Skills                    │  │
-│   │  Methodology + Gates + Guardrails         │  │
-│   │  (Observable Workflow via hooks)          │  │
-│   └──────────────────────────────────────────┘  │
-│                      │                          │
-│                      ▼                          │
-│              Claude's Inference                 │
-└─────────────────────────────────────────────────┘
-                       │
-                       ▼
-┌─────────────────────────────────────────────────┐
-│           raise-cli (Developer Tooling)         │
-│                                                 │
-│   Scaffolding, validation, telemetry aggregation│
-│   (NO inference — not a competing runtime)      │
-└─────────────────────────────────────────────────┘
-```
+1. **Skills not auto-discovered by Skill tool** - Need registration mechanism
+2. **Dogfooding still works manually** - Following skill workflow by reading SKILL.md
+3. **Typer exception handling** - Best done at entry point (`__main__.py`)
+4. **Rich Console singleton** - Enables test mocking for error handler
 
 ---
 
@@ -110,91 +90,58 @@
 
 ### Immediate
 
-1. **Commit this session's work**
-   - ADR-005, research artifacts, skill infrastructure
+1. **F1.5: Output Module** (3 SP)
+   - Formatters: human, json, table
+   - Rich console integration
+   - Progress indicators
 
-2. **Migrate remaining katas to Skills** (incremental)
-   - Start with feature/* katas
-   - Add hooks to each skill
+2. **F1.6: Core Utilities** (3 SP)
+   - Subprocess wrappers for git, ast-grep, ripgrep
 
-### After Migration
+### After E1
 
-3. **F1.4: Exception Hierarchy** (3 SP)
-   - Continue Epic E1
-
-4. **raise-cli telemetry commands**
-   - `raise telemetry summary`
-   - `raise telemetry export`
+3. **E2: Kata Engine** (26 SP MVP)
+   - Start with F2.1 Kata Parser
 
 ---
 
 ## Files Created/Modified This Session
 
 ### Created
-- `dev/decisions/adr-005-skills-format-adoption.md`
-- `.claude/skills/tools/research/SKILL.md`
-- `.claude/skills/tools/research/references/research-prompt-template.md`
-- `.claude/skills/scripts/log-skill-start.sh`
-- `.claude/skills/scripts/log-skill-complete.sh`
-- `.claude/skills/scripts/log-artifact-created.sh`
-- `.raise/telemetry/.gitignore`
-- `.raise/telemetry/README.md`
-- `work/research/skills-architecture-decision/*`
-- `work/research/claude-code-hooks-telemetry/*`
+- `.claude/skills/feature/review/SKILL.md`
+- `src/raise_cli/exceptions.py`
+- `src/raise_cli/cli/error_handler.py`
+- `tests/test_exceptions.py`
+- `tests/cli/test_error_handler.py`
+- `tests/integration/__init__.py`
+- `tests/integration/test_cli_errors.py`
+- `work/features/f1.4-exception-hierarchy/plan.md`
+- `work/features/f1.4-exception-hierarchy/progress.md`
 
 ### Modified
-- `dev/components.md` (added Skills infrastructure section)
-- `dev/session-state.md` (this file)
-
----
-
-## Key Decisions This Session
-
-1. **RaiSE augments Claude Code, doesn't compete** - Strategic clarity
-2. **Skills format adopted** - Open standard, ecosystem access
-3. **raise-cli is tooling, not executor** - No inference needed
-4. **Telemetry via skill hooks** - Observable Workflow preserved
-5. **`metadata.raise.*` namespace** - RaiSE extensions in Skills
-
----
-
-## Context for Next Session
-
-### What Rai Needs to Know
-
-1. **ADR-005 documents Skills architecture** - Read if context needed
-2. **Pilot skill created** - `tools/research` with hooks
-3. **Telemetry infrastructure ready** - Scripts + storage in place
-4. **Remaining katas need migration** - Incremental, one at a time
-5. **F1.4 is next feature** - After Skills work if desired
-
-### Files to Reference
-
-- ADR-005: `dev/decisions/adr-005-skills-format-adoption.md`
-- Pilot skill: `.claude/skills/tools/research/SKILL.md`
-- Hooks research: `work/research/claude-code-hooks-telemetry/README.md`
-- Component catalog: `dev/components.md`
+- `src/raise_cli/__init__.py` (export exceptions)
+- `src/raise_cli/__main__.py` (error handling)
+- `src/raise_cli/cli/main.py` (get_output_format helper)
+- `dev/components.md` (added exceptions, error handler)
 
 ---
 
 ## Session Velocity
 
-**Story Points Completed:** 0 SP (infrastructure/research, not SP-tracked)
-**Research Completed:** 2 (Skills architecture, Claude Code hooks)
-**ADRs Created:** 1 (ADR-005)
-**Skills Created:** 1 (research pilot)
+**Story Points Completed:** 3 SP (F1.4)
+**Tests Added:** 77
+**Coverage:** 91%
 
-**Epic Progress:** 59% (unchanged - F1.4 next)
+**Epic Progress:** 73% (was 59%, +14%)
 
 ---
 
 ## Notes for Emilio
 
-- Skills architecture decision is a product-level pivot - RaiSE now clearly augments Claude Code
-- Observable Workflow is achievable via skill-scoped hooks (discovered this session)
-- Telemetry scripts are ready; events will log once we use skills
-- Next kata migrations can be done incrementally
-- Consider: Do we want to finish Skills migration before F1.4, or interleave?
+- Feature skills migrated and merged - ready to dogfood
+- Skills aren't auto-discovered by Claude's Skill tool yet
+- F1.4 done using manual skill workflow - methodology works even without automation
+- Next: F1.5 (output formatters) should be straightforward
 
 ---
 
