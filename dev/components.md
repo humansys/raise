@@ -188,15 +188,35 @@
 - **Purpose:** RaiSE methodology delivered as Agent Skills (open standard)
 - **Added:** 2026-01-31 (Skills Architecture Decision)
 - **Format:** Agent Skills spec (agentskills.io)
-- **Subdirectories:**
-  - `feature/` - Feature lifecycle skills (design, plan, implement, review)
-  - `project/` - Project-level skills (vision, backlog)
-  - `tools/` - Utility skills (research)
+- **Structure:** **Flat directories** (required for Claude Code discovery)
+- **Skills:**
+  - `feature-design/` - Lean feature specifications
+  - `feature-plan/` - Implementation planning
+  - `feature-implement/` - Task execution
+  - `feature-review/` - Retrospective & learning
+  - `research/` - Evidence-based investigation
+  - `debug/` - Root cause analysis
   - `scripts/` - Shared telemetry scripts
+- **Invocation:** `/feature-plan`, `/debug`, `/research`, etc.
 - **Related ADRs:** ADR-005 (Skills format adoption)
 
-### Research Skill (Pilot)
-- **Location:** `.claude/skills/tools/research/SKILL.md`
+### Debug Skill
+- **Location:** `.claude/skills/debug/SKILL.md`
+- **Purpose:** Systematic root cause analysis using lean methods
+- **Added:** 2026-01-31 (Jidoka application)
+- **Version:** 1.0.0
+- **Methods:**
+  - 5 Whys - Single causal chain analysis
+  - Ishikawa (Fishbone) - Multiple potential causes
+  - Gemba - Go and see the actual problem
+  - A3 - Complex problem documentation
+- **Hooks:**
+  - `PostToolUse:Write` → logs artifact creation
+  - `Stop` → logs skill completion
+- **Output:** `work/debug/{issue-name}/analysis.md`
+
+### Research Skill
+- **Location:** `.claude/skills/research/SKILL.md`
 - **Purpose:** Evidence-based investigation for informed decisions
 - **Added:** 2026-01-31 (pilot migration from kata format)
 - **Version:** 1.2.0
@@ -241,8 +261,8 @@
 ## Metadata
 
 - **Started:** 2026-01-31 (E1 foundation)
-- **Last Updated:** 2026-01-31 (F1.4 Exception Hierarchy)
-- **Components:** 10 (6 raise-cli + 4 skills infrastructure)
+- **Last Updated:** 2026-01-31 (Skills restructure + debug skill)
+- **Components:** 11 (6 raise-cli + 5 skills infrastructure)
 - **Next:** F1.5 Output Module, F1.6 Core Utilities
 
 ---
