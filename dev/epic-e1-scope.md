@@ -19,13 +19,13 @@ Build the foundational CLI infrastructure: package structure, command framework,
 | F1.1 | Project Scaffolding | 3 | ✓ Complete | ~30min |
 | F1.2 | CLI Skeleton | 5 | ✓ Complete | ~45min |
 | F1.3 | Configuration System | 5 | ✓ Complete | 20min |
-| F1.4 | Exception Hierarchy | 3 | Next | - |
-| F1.5 | Output Module | 3 | Pending | - |
-| F1.6 | Core Utilities | 3 | Pending | - |
+| F1.4 | Exception Hierarchy | 3 | ✓ Complete | ~30min |
+| F1.5 | Output Module | 3 | ✓ Complete | ~15min |
+| F1.6 | Core Utilities | 3 | Next | - |
 
 **Total:** 22 SP
-**Completed:** 13 SP (59%)
-**Velocity:** ~15 SP/hour (based on F1.3 data)
+**Completed:** 19 SP (86%)
+**Velocity:** ~12 SP/hour (based on F1.1-F1.5 data)
 
 ---
 

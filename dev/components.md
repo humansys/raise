@@ -169,7 +169,34 @@
 
 ## Output Formatters (Core Layer)
 
-### [No formatters yet - F1.5 will add human/json/table formatters]
+> Format-aware output for CLI commands
+
+### OutputConsole (F1.5)
+- **Location:** `src/raise_cli/output/console.py`
+- **Purpose:** Unified output interface respecting `--format` flag
+- **Added:** F1.5 (Epic E1)
+- **Export:** `raise_cli.output`
+- **Formats Supported:**
+  - `human` - Rich styling (colors, checkmarks, tables, trees)
+  - `json` - Valid JSON to stdout (parseable by `jq`)
+  - `table` - Rich Table for structured lists
+- **Public API:**
+  - `OutputConsole(format, verbosity, color)` - Constructor
+  - `print_message(message, style)` - Simple text output
+  - `print_success(message, details)` - Green checkmark + optional details
+  - `print_warning(message, details)` - Yellow warning symbol
+  - `print_data(data, title)` - Dict → tree/json/key-value table
+  - `print_list(items, columns, title)` - List → bullets/json array/table
+- **Module Functions:**
+  - `get_console()` - Get singleton instance
+  - `set_console(console)` - Override singleton (for testing)
+  - `configure_console(format, verbosity, color)` - Configure and return singleton
+- **Verbosity:**
+  - `-1` (quiet): Suppresses all non-error output
+  - `0` (normal): Standard output
+  - `1-3` (verbose): Reserved for future use
+- **Dependencies:** Rich
+- **Tests:** 40 unit tests (95% coverage)
 
 ---
 
@@ -261,9 +288,9 @@
 ## Metadata
 
 - **Started:** 2026-01-31 (E1 foundation)
-- **Last Updated:** 2026-01-31 (Skills restructure + debug skill)
-- **Components:** 11 (6 raise-cli + 5 skills infrastructure)
-- **Next:** F1.5 Output Module, F1.6 Core Utilities
+- **Last Updated:** 2026-01-31 (F1.5 Output Module)
+- **Components:** 12 (7 raise-cli + 5 skills infrastructure)
+- **Next:** F1.6 Core Utilities
 
 ---
 
