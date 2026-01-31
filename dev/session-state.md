@@ -11,10 +11,10 @@
 | Field | Value |
 |-------|-------|
 | **Date** | 2026-01-31 |
-| **Session Type** | Feature (F1.3) + Process Improvement |
+| **Session Type** | Research + Architecture Decision |
 | **Branch** | `epic/e1-core-foundation` |
-| **Last Commit** | `6350ad0` (guardrails update) |
-| **Duration** | ~1 hour |
+| **Last Commit** | `844b7b0` (session close F1.3) |
+| **Duration** | ~2 hours |
 
 ---
 
@@ -22,13 +22,13 @@
 
 ### Epic E1: Core Foundation
 
-**Progress:** 13/22 SP (59%)
+**Progress:** 13/22 SP (59%) - unchanged, this was infrastructure work
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| F1.1 Project Scaffolding | ✓ Complete | Package structure, pyproject.toml, entry points |
-| F1.2 CLI Skeleton | ✓ Complete | Global options (--format, -v, -q) in ctx.obj |
-| F1.3 Configuration System | ✓ Complete | 5-level cascade, XDG paths, 56 tests, 20min actual |
+| F1.1 Project Scaffolding | ✓ Complete | Package structure, pyproject.toml |
+| F1.2 CLI Skeleton | ✓ Complete | Global options in ctx.obj |
+| F1.3 Configuration System | ✓ Complete | 5-level cascade, XDG paths |
 | F1.4 Exception Hierarchy | **NEXT** | RaiseError with exit codes |
 | F1.5 Output Module | Pending | After F1.4 |
 | F1.6 Core Utilities | Pending | After F1.5 |
@@ -36,108 +36,125 @@
 ### Working Tree
 
 **Branch:** `epic/e1-core-foundation`
-**Status:** Clean
+**Status:** Modified (pending commit)
 **Virtual env:** `.venv/` (active)
-
-**Recent commits:**
-```
-6350ad0 docs(guardrails): Add tool & agent etiquette rules
-3397c77 docs(e1): Mark F1.3 complete, update epic progress to 59%
-38caa4c docs(f1.3): Add feature retrospective - first complete kata cycle
-91ef786 docs(f1.3): Update component catalog with configuration components
-6452093 docs(kata): Add timestamp tracking to feature/implement kata
-```
 
 ---
 
 ## What We Built This Session
 
-### F1.3 Configuration System (5 SP) - COMPLETE ✓
+### Major Decision: Skills Architecture (ADR-005)
 
-**First complete dogfooding of feature kata cycle!**
+**Research-driven architectural decision:**
 
-- **Duration:** 20 minutes (planning → completion)
-- **Estimate:** 6-8 hours (12x faster than expected!)
-- **Spec-to-code ratio:** 0.96x (validates lean spec research)
-- **Tests:** 56 new tests, 100% coverage
+1. **RaiSE provides governance FOR Claude Code, not a competing executor**
+2. **Katas migrate to Agent Skills format** (open standard, 25+ platforms)
+3. **raise-cli becomes developer tooling**, not agentic runtime
+4. **Telemetry via skill-scoped hooks** + scripts
 
-**Deliverables:**
-1. XDG directory helpers (`get_config_dir`, `get_cache_dir`, `get_data_dir`)
-2. `RaiseSettings` with 5-level cascade (CLI → env → project → user → defaults)
-3. Custom `TomlConfigSource` for TOML config files
-4. CLI integration with backward compatibility
-5. Component catalog documentation
-6. Full retrospective with learnings
+### Deliverables
 
-**Artifacts created:**
-- `work/features/f1.3-configuration/design.md`
-- `work/features/f1.3-configuration/plan.md`
-- `work/features/f1.3-configuration/retrospective.md`
+1. **Research: Skills Architecture Decision**
+   - Location: `work/research/skills-architecture-decision/`
+   - 18 sources, 5 triangulated claims
+   - Options 2 vs 3 analysis → Option 3 selected
 
-### Process Improvements
+2. **ADR-005: Skills Format Adoption**
+   - Location: `dev/decisions/adr-005-skills-format-adoption.md`
+   - Documents strategic decision and rationale
 
-1. **Timestamp tracking** added to `feature/implement` kata (Step 2 & 5)
-2. **Show-then-commit protocol** established (#onlyhuman)
-3. **Tool & Agent Etiquette** added to guardrails (CLAUDE.md)
-   - Ask before spawning agents
-   - Don't assume tool availability
-   - Listen to session context
+3. **Pilot Skill: tools/research**
+   - Location: `.claude/skills/tools/research/SKILL.md`
+   - Converted from kata format
+   - Includes Observable Workflow hooks
 
-### Research Started (Incomplete)
+4. **Telemetry Infrastructure**
+   - Scripts: `.claude/skills/scripts/log-*.sh`
+   - Storage: `.raise/telemetry/events.jsonl`
+   - 3 event types: skill_started, skill_completed, artifact_created
 
-**Topic:** MCP Skills for RaiSE Katas
-**Goal:** Offload repetitive tasks to deterministic Skills (inference economy)
-**Blocker:** Research tools not installed (ddgr, perplexity)
+5. **Research: Claude Code Hooks for Telemetry**
+   - Location: `work/research/claude-code-hooks-telemetry/`
+   - Discovered skill-scoped hooks (critical for RaiSE)
+
+---
+
+## Architectural Clarity Achieved
+
+```
+┌─────────────────────────────────────────────────┐
+│              Claude Code (Executor)              │
+│                                                  │
+│   ┌──────────────────────────────────────────┐  │
+│   │           RaiSE Skills                    │  │
+│   │  Methodology + Gates + Guardrails         │  │
+│   │  (Observable Workflow via hooks)          │  │
+│   └──────────────────────────────────────────┘  │
+│                      │                          │
+│                      ▼                          │
+│              Claude's Inference                 │
+└─────────────────────────────────────────────────┘
+                       │
+                       ▼
+┌─────────────────────────────────────────────────┐
+│           raise-cli (Developer Tooling)         │
+│                                                 │
+│   Scaffolding, validation, telemetry aggregation│
+│   (NO inference — not a competing runtime)      │
+└─────────────────────────────────────────────────┘
+```
 
 ---
 
 ## Next Steps (Priority Order)
 
-### Immediate (Next Session)
+### Immediate
 
-**1. Fix Research Tool Dependencies**
-- Install `ddgr` for quick web searches
-- Configure `llm` with perplexity (if desired)
-- Verify research kata tool selection works
+1. **Commit this session's work**
+   - ADR-005, research artifacts, skill infrastructure
 
-**2. Complete MCP Skills Research**
-- Use claude-code-guide agent (with permission!)
-- Use WebSearch for Anthropic docs
-- Build evidence catalog
-- Formulate recommendation for Skill creation
+2. **Migrate remaining katas to Skills** (incremental)
+   - Start with feature/* katas
+   - Add hooks to each skill
 
-### After Research
+### After Migration
 
-**3. F1.4: Exception Hierarchy** (3 SP)
-- Create base `RaiseError` with exit codes
-- Specific exceptions: ConfigurationError, KataNotFoundError, etc.
-- Rich error formatting with hints
+3. **F1.4: Exception Hierarchy** (3 SP)
+   - Continue Epic E1
 
-**4. Consider: Session Close-Out Skill**
-- Identified as repetitive task during this session
-- Candidate for first custom Skill after research
+4. **raise-cli telemetry commands**
+   - `raise telemetry summary`
+   - `raise telemetry export`
 
 ---
 
-## Open Questions / Blockers
+## Files Created/Modified This Session
 
-**Blocker:** Research tools not available
-- `ddgr` - not installed
-- `llm -m perplexity` - not configured
-- **Resolution:** Install in next session before research
+### Created
+- `dev/decisions/adr-005-skills-format-adoption.md`
+- `.claude/skills/tools/research/SKILL.md`
+- `.claude/skills/tools/research/references/research-prompt-template.md`
+- `.claude/skills/scripts/log-skill-start.sh`
+- `.claude/skills/scripts/log-skill-complete.sh`
+- `.claude/skills/scripts/log-artifact-created.sh`
+- `.raise/telemetry/.gitignore`
+- `.raise/telemetry/README.md`
+- `work/research/skills-architecture-decision/*`
+- `work/research/claude-code-hooks-telemetry/*`
 
-**Question:** Best format for RaiSE Skills?
-- Waiting on MCP Skills research to answer
+### Modified
+- `dev/components.md` (added Skills infrastructure section)
+- `dev/session-state.md` (this file)
 
 ---
 
 ## Key Decisions This Session
 
-1. **Feature kata workflow validated** - design → plan → implement → review works!
-2. **Velocity data collected** - ~15 SP/hour with structured process
-3. **Lean spec validated** - 0.96x spec-to-code ratio (below 1.5x target)
-4. **Inference economy principle** - Ask before expensive operations
-5. **Tool etiquette** - Added to guardrails for future sessions
+1. **RaiSE augments Claude Code, doesn't compete** - Strategic clarity
+2. **Skills format adopted** - Open standard, ecosystem access
+3. **raise-cli is tooling, not executor** - No inference needed
+4. **Telemetry via skill hooks** - Observable Workflow preserved
+5. **`metadata.raise.*` namespace** - RaiSE extensions in Skills
 
 ---
 
@@ -145,49 +162,41 @@
 
 ### What Rai Needs to Know
 
-1. **F1.3 is COMPLETE** - Full kata cycle dogfooded successfully
-2. **Research tools need setup** - ddgr and/or perplexity before MCP Skills research
-3. **New guardrails** - Ask before spawning agents, don't assume tools exist
-4. **F1.4 is next feature** - After research tool setup and MCP Skills research
-5. **Skill opportunity identified** - Session close-out is repetitive, good first Skill candidate
+1. **ADR-005 documents Skills architecture** - Read if context needed
+2. **Pilot skill created** - `tools/research` with hooks
+3. **Telemetry infrastructure ready** - Scripts + storage in place
+4. **Remaining katas need migration** - Incremental, one at a time
+5. **F1.4 is next feature** - After Skills work if desired
 
 ### Files to Reference
 
-- F1.3 retrospective: `work/features/f1.3-configuration/retrospective.md`
-- Research kata: `.raise/katas/tools/research.md`
-- Updated guardrails: `CLAUDE.md` and `~/.claude/CLAUDE.md`
-- MCP Skills research (started): `work/research/mcp-skills-for-katas/`
-
-### Quality Standards (Unchanged)
-
-- Docstrings on all public APIs (Google-style)
-- Type hints everywhere (pyright must pass)
-- Tests >90% coverage on new code
-- Update component catalog in same commit
-- **NEW:** Ask before expensive operations
+- ADR-005: `dev/decisions/adr-005-skills-format-adoption.md`
+- Pilot skill: `.claude/skills/tools/research/SKILL.md`
+- Hooks research: `work/research/claude-code-hooks-telemetry/README.md`
+- Component catalog: `dev/components.md`
 
 ---
 
 ## Session Velocity
 
-**Story Points Completed:** 5 SP (F1.3)
-**Time:** ~1 hour (feature + process improvements)
-**Velocity:** ~15 SP/hour (with kata workflow)
+**Story Points Completed:** 0 SP (infrastructure/research, not SP-tracked)
+**Research Completed:** 2 (Skills architecture, Claude Code hooks)
+**ADRs Created:** 1 (ADR-005)
+**Skills Created:** 1 (research pilot)
 
-**Epic Progress:** 59% complete (13/22 SP)
-**Estimated Remaining:** ~1 hour for E1 (at current velocity)
+**Epic Progress:** 59% (unchanged - F1.4 next)
 
 ---
 
 ## Notes for Emilio
 
-- First successful dogfooding! Feature katas work beautifully.
-- Velocity is much higher than estimated when using structured process.
-- Tool etiquette rules added - Rai will ask before expensive operations now.
-- Session close-out itself is a Skill opportunity - meta!
-- Next session: Quick tool setup, then continue the co-creation spiral 🌀
+- Skills architecture decision is a product-level pivot - RaiSE now clearly augments Claude Code
+- Observable Workflow is achievable via skill-scoped hooks (discovered this session)
+- Telemetry scripts are ready; events will log once we use skills
+- Next kata migrations can be done incrementally
+- Consider: Do we want to finish Skills migration before F1.4, or interleave?
 
 ---
 
 *Session state - overwrite each session for continuity*
-*Last updated: 2026-01-31 13:45 -0600*
+*Last updated: 2026-01-31*

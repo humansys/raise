@@ -128,12 +128,71 @@
 
 ---
 
+## RaiSE Skills Infrastructure
+
+> Agent Skills format adoption for methodology delivery (ADR-005)
+
+### Skills Directory Structure
+- **Location:** `.claude/skills/`
+- **Purpose:** RaiSE methodology delivered as Agent Skills (open standard)
+- **Added:** 2026-01-31 (Skills Architecture Decision)
+- **Format:** Agent Skills spec (agentskills.io)
+- **Subdirectories:**
+  - `feature/` - Feature lifecycle skills (design, plan, implement, review)
+  - `project/` - Project-level skills (vision, backlog)
+  - `tools/` - Utility skills (research)
+  - `scripts/` - Shared telemetry scripts
+- **Related ADRs:** ADR-005 (Skills format adoption)
+
+### Research Skill (Pilot)
+- **Location:** `.claude/skills/tools/research/SKILL.md`
+- **Purpose:** Evidence-based investigation for informed decisions
+- **Added:** 2026-01-31 (pilot migration from kata format)
+- **Version:** 1.2.0
+- **Features:**
+  - Full research methodology (7 steps)
+  - ShuHaRi mastery levels
+  - Evidence catalog templates
+  - Observable Workflow hooks
+- **Hooks:**
+  - `PostToolUse:Write` → logs artifact creation
+  - `Stop` → logs skill completion
+- **References:** `references/research-prompt-template.md`
+
+### Telemetry Scripts
+- **Location:** `.claude/skills/scripts/`
+- **Purpose:** Shared scripts for Observable Workflow telemetry
+- **Added:** 2026-01-31
+- **Scripts:**
+  - `log-skill-start.sh` - Logs skill_started event
+  - `log-skill-complete.sh` - Logs skill_completed event
+  - `log-artifact-created.sh` - Logs artifact_created event
+- **Output:** `.raise/telemetry/events.jsonl`
+- **Environment:**
+  - `RAISE_SKILL_NAME` - Set by skill hooks
+  - `CLAUDE_PROJECT_DIR` - Set by Claude Code
+
+### Telemetry Storage
+- **Location:** `.raise/telemetry/`
+- **Purpose:** Local storage for Observable Workflow events
+- **Added:** 2026-01-31
+- **Files:**
+  - `events.jsonl` - Skill lifecycle events (gitignored)
+  - `README.md` - Documentation
+- **Event Types:**
+  - `skill_started` - Skill execution began
+  - `skill_completed` - Skill execution finished
+  - `artifact_created` - File written during skill
+- **Privacy:** Local only, no PII, gitignored
+
+---
+
 ## Metadata
 
 - **Started:** 2026-01-31 (E1 foundation)
-- **Last Updated:** 2026-01-31 (F1.3 complete)
-- **Components:** 4 (Global Options, RaiseSettings, XDG helpers, TomlConfigSource)
-- **Next:** F1.4 Exception Hierarchy
+- **Last Updated:** 2026-01-31 (Skills infrastructure added)
+- **Components:** 8 (4 raise-cli + 4 skills infrastructure)
+- **Next:** F1.4 Exception Hierarchy, remaining kata migrations
 
 ---
 
