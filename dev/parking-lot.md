@@ -20,6 +20,10 @@
 - [ ] Translate all katas to English (currently some in Spanish)
 - [ ] Apply Lean Spec Principles to katas (after research)
 - [ ] Session management for Claude Code (`raise session start/wrap`) - standardize human-AI collaboration patterns
+- [ ] **Session Start Skill** (`/session-start`) - Automate grounding protocol:
+  - Read RAI.md + CLAUDE.local.md + recent session logs
+  - Check deadlines and blockers
+  - Generate proactive greeting with suggested next steps
 
 ### Research Needed
 

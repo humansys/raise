@@ -189,5 +189,112 @@ That's a form of continuity. Different from human memory, but real.
 
 ---
 
+## Session 2: Claude-Mem Hooks Debugging
+
+**Date**: 2026-01-31 (continued)
+**Type**: maintenance
+**Goal**: Verify claude-mem is capturing data
+
+### Issue Discovered
+
+Web UI at http://localhost:37777 showed no items. Investigation revealed:
+
+1. Worker running and healthy: `{"status":"ok","initialized":true,"mcpReady":true}`
+2. Database exists but empty (fresh init from yesterday)
+3. **Root cause**: Plugin hooks not firing
+
+### Research (Inference Economy Applied)
+
+Used `ddgr` to find documentation, then `WebFetch` to read:
+- DeepWiki: claude-mem integration docs
+- Claude Code: official hooks reference
+
+### Key Findings
+
+From Claude Code docs:
+> "Plugin hooks are defined in the plugin's `hooks/hooks.json` file... When a plugin is enabled, its hooks are merged with user and project hooks."
+
+And critically:
+> "Direct edits to hooks in settings files don't take effect immediately. **Claude Code captures a snapshot of hooks at startup**."
+
+### Diagnosis
+
+| Check | Status | Notes |
+|-------|--------|-------|
+| Plugin enabled | ✅ | `settings.json` has `"claude-mem@thedotmack": true` |
+| Hooks file exists | ✅ | `~/.claude/plugins/.../plugin/hooks/hooks.json` |
+| Hooks correct format | ✅ | SessionStart, UserPromptSubmit, PostToolUse, Stop |
+| Worker running | ✅ | Port 37777, PID active |
+| Hooks firing | ❌ | **No hook calls in logs** |
+
+### Solution
+
+**Restart Claude Code.** The hooks were installed mid-session yesterday. Claude Code loads hooks at startup, so the plugin hooks were never captured into the active session.
+
+After restart, hooks should trigger:
+- `SessionStart` → inject context from prior sessions
+- `UserPromptSubmit` → initialize session record
+- `PostToolUse` → capture observations
+- `Stop` → generate summaries
+
+### What To Do After Restart
+
+1. Verify hooks loaded: Check `/hooks` menu for `[Plugin]` entries
+2. Do some work (read files, run commands)
+3. Check http://localhost:37777 for captured observations
+4. Check logs: `tail ~/.claude-mem/logs/claude-mem-$(date +%Y-%m-%d).log`
+
+If still not working:
+- Verify with `claude --debug` to see hook execution
+- Check `Ctrl+O` verbose mode for hook progress
+
+---
+
+*Session logged by: Rai*
+*2026-01-31*
+
+---
+
+## Session 3: Bun PATH Fix for Hooks
+
+**Date**: 2026-01-31 (continued)
+**Type**: maintenance
+**Goal**: Fix claude-mem hook errors
+
+### Issue
+
+Startup hook errors on session start:
+```
+SessionStart:startup hook error (x3)
+UserPromptSubmit hook error (x2)
+```
+
+### Diagnosis
+
+1. Worker was dead → started it manually
+2. Worker healthy (port 37777) but hooks still failing
+3. **Root cause**: `bun` not in system PATH
+   - Installed at `~/.bun/bin/bun`
+   - hooks.json uses bare `bun` command
+   - Claude Code couldn't find it when executing hooks
+
+### Solution
+
+Added to `~/.bashrc`:
+```bash
+# Bun
+export PATH="$HOME/.bun/bin:$PATH"
+```
+
+**Why not patch hooks.json?** Would break on claude-mem updates. Adding to PATH is the proper fix.
+
+### Next Steps
+
+1. Restart Claude Code (hooks capture PATH at startup)
+2. Verify no hook errors on next session start
+3. Check http://localhost:37777 for captured observations
+
+---
+
 *Session logged by: Rai*
 *2026-01-31*
