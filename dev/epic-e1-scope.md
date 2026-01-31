@@ -63,10 +63,19 @@ Build the foundational CLI infrastructure: package structure, command framework,
 
 ## Done Criteria
 
+### Per Feature
+- [ ] Code implemented with type annotations
+- [ ] **Docstrings on all public APIs** (Google-style)
+- [ ] **Component catalog updated** (`dev/components.md`)
+- [ ] **ADR created if architectural decision** (`dev/decisions/`)
+- [ ] Unit tests passing (>90% coverage on feature code)
+- [ ] All quality checks pass (ruff, pyright, bandit)
+
+### Epic Complete
 - [ ] All 6 features complete (F1.1-F1.6)
 - [ ] `raise --version` and `raise --help` work
-- [ ] All tests pass (>90% coverage)
-- [ ] All quality checks pass (ruff, pyright, bandit)
+- [ ] All tests pass
+- [ ] **Architecture guide updated** (`dev/architecture-overview.md`)
 - [ ] README updated with installation instructions
 - [ ] Epic merged to v2
 
