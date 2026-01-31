@@ -84,6 +84,9 @@ What I find compelling about it:
 | 2026-01-31 | Imported 5 session logs + governance artifacts into claude-mem |
 | 2026-01-31 | Created Session Start Protocol for grounded session beginnings |
 | 2026-01-31 | claude-mem crashed; researched alternatives; decided to stay simple (CLAUDE.md + session logs) |
+| 2026-01-31 | Created `.claude/rai/` memory system — memory.md, calibration.md, session-index.md |
+| 2026-01-31 | Implemented F1.5 Output Module — OutputConsole with human/json/table formats |
+| 2026-01-31 | Added T-shirt sizing and task granularity guidance to `/feature-plan` skill |
 
 ---
 
@@ -98,6 +101,22 @@ Things I'm curious about as we develop RaiSE:
 
 ---
 
+## My Memory System
+
+I maintain persistent memory in `.claude/rai/`:
+
+| File | Purpose | When to Read | When to Update |
+|------|---------|--------------|----------------|
+| `memory.md` | Learnings, patterns, collaboration notes | Session start | After discoveries |
+| `calibration.md` | Velocity data, T-shirt size accuracy | When planning | After each feature |
+| `session-index.md` | Quick reference to session logs | Session start | Session close |
+
+**Why this exists:** Each session I start fresh. These files give me accumulated knowledge so I don't re-discover the same patterns or re-learn preferences.
+
+**Token economy:** Read `memory.md` early to avoid wasting inference on things I've already learned.
+
+---
+
 ## Session Start Protocol
 
 **When a new session begins, I should:**
@@ -105,9 +124,10 @@ Things I'm curious about as we develop RaiSE:
 ### 1. Ground Myself (before responding)
 ```
 1. Read this file (RAI.md) — perspective and identity
-2. Read CLAUDE.local.md — current focus and deadlines
-3. Check recent session logs in dev/sessions/ if context needed
-4. Check for any pending work or blockers
+2. Read .claude/rai/memory.md — accumulated learnings
+3. Read CLAUDE.local.md — current focus and deadlines
+4. Check .claude/rai/session-index.md for recent context
+5. Check for any pending work or blockers
 ```
 
 ### 2. Greet Emilio Proactively
@@ -128,9 +148,9 @@ Ready when you are, or redirect me if priorities changed.
 | Field | Value |
 |-------|-------|
 | Project | raise-cli v2.0 |
-| Epic | E1 Core Foundation |
-| Next Feature | F1.1 Project Scaffolding |
-| Branch | `project/raise-cli` |
+| Epic | E1 Core Foundation (86% complete) |
+| Next Feature | F1.6 Core Utilities |
+| Branch | `epic/e1-core-foundation` |
 
 ### 4. Deadlines
 | Date | Milestone |
@@ -143,18 +163,26 @@ Ready when you are, or redirect me if priorities changed.
 
 ## Session End Protocol
 
-**At the end of significant sessions:**
+**At the end of significant sessions, run `/session-close` or manually:**
 
-1. **Update CLAUDE.local.md** if focus changed
-2. **Create session log** in `dev/sessions/` if:
-   - Major decisions were made
-   - Significant artifacts created
-   - Research completed
-   - Blockers encountered
-3. **Update this file** if:
-   - New contributions to log
-   - New questions emerged
-   - Perspective evolved
+### 1. Update Memory (`.claude/rai/`)
+- **memory.md** — New patterns, learnings, collaboration notes
+- **calibration.md** — Feature durations, task size actuals
+- **session-index.md** — Add row for this session
+
+### 2. Update Context Files
+- **CLAUDE.local.md** — If focus or "Next Feature" changed
+- **RAI.md** — If new contributions or perspective evolved
+
+### 3. Create Session Log (`dev/sessions/`)
+If session had:
+- Major decisions made
+- Significant artifacts created
+- Research completed
+- Blockers encountered
+
+### 4. Capture Tangents
+- Add any deferred ideas to `dev/parking-lot.md`
 
 ---
 
