@@ -11,9 +11,9 @@
 | Field | Value |
 |-------|-------|
 | **Date** | 2026-01-31 |
-| **Session Type** | Feature Implementation (F1.4) |
+| **Session Type** | Feature + Jidoka Fix |
 | **Branch** | `epic/e1-core-foundation` |
-| **Last Commit** | `8caa3a1` (F1.4 Exception Hierarchy) |
+| **Last Commit** | `54b0c1a` (docs: skills structure) |
 
 ---
 
@@ -35,113 +35,91 @@
 ### Working Tree
 
 **Branch:** `epic/e1-core-foundation`
-**Status:** Clean (just committed)
+**Status:** Clean
 **Virtual env:** `.venv/` (active)
 
 ---
 
 ## What We Built This Session
 
-### 1. Skills Migration Complete
+### 1. F1.4 Exception Hierarchy (3 SP) ✓
 
-Merged `feature/skills-migration-feature-katas` branch:
-- `.claude/skills/feature/design/SKILL.md`
-- `.claude/skills/feature/plan/SKILL.md`
-- `.claude/skills/feature/implement/SKILL.md`
-- `.claude/skills/feature/review/SKILL.md`
+- `src/raise_cli/exceptions.py` - 9 exception classes
+- `src/raise_cli/cli/error_handler.py` - Rich + JSON output
+- 77 new tests, 140 total, 91% coverage
 
-All include Observable Workflow hooks for telemetry.
+### 2. Jidoka: Skills Discovery Fix ✓
 
-### 2. F1.4 Exception Hierarchy (3 SP)
+**Problem:** Skills not discovered by Claude Code Skill tool.
 
-Following `/feature-plan` methodology (manually, skills not auto-discovered):
+**Root Cause:** Nested directory structure. Claude Code expects flat:
+- `.claude/skills/feature-plan/SKILL.md` (correct)
+- NOT `.claude/skills/feature/plan/SKILL.md` (wrong)
 
-**Components created:**
-- `src/raise_cli/exceptions.py` - 9 exception classes with exit codes
-- `src/raise_cli/cli/error_handler.py` - Rich + JSON error display
-- Integration in `__main__.py` - Wraps CLI with error handling
+**Fix Applied:**
+```
+feature/design/    → feature-design/
+feature/plan/      → feature-plan/
+feature/implement/ → feature-implement/
+feature/review/    → feature-review/
+tools/research/    → research/
+```
 
-**Exit code table:**
-| Code | Exception |
-|------|-----------|
-| 1 | RaiseError (general) |
-| 2 | ConfigurationError |
-| 3 | KataNotFoundError, GateNotFoundError |
-| 4 | ArtifactNotFoundError |
-| 5 | DependencyError |
-| 6 | StateError |
-| 7 | ValidationError |
-| 10 | GateFailedError |
+### 3. Debug Skill Created ✓
 
-**Tests:** 77 new tests, 140 total, 91% coverage
+New `/debug` skill for root cause analysis:
+- 5 Whys method
+- Ishikawa (fishbone) diagrams
+- Gemba (go and see)
+- Templates and quick reference
 
 ---
 
-## Discoveries This Session
+## Skills Available (After Restart)
 
-1. **Skills not auto-discovered by Skill tool** - Need registration mechanism
-2. **Dogfooding still works manually** - Following skill workflow by reading SKILL.md
-3. **Typer exception handling** - Best done at entry point (`__main__.py`)
-4. **Rich Console singleton** - Enables test mocking for error handler
+| Skill | Invocation | Purpose |
+|-------|------------|---------|
+| feature-design | `/feature-design` | Lean feature specs |
+| feature-plan | `/feature-plan` | Implementation planning |
+| feature-implement | `/feature-implement` | Task execution |
+| feature-review | `/feature-review` | Retrospective |
+| research | `/research` | Evidence-based investigation |
+| debug | `/debug` | Root cause analysis |
 
----
-
-## Next Steps (Priority Order)
-
-### Immediate
-
-1. **F1.5: Output Module** (3 SP)
-   - Formatters: human, json, table
-   - Rich console integration
-   - Progress indicators
-
-2. **F1.6: Core Utilities** (3 SP)
-   - Subprocess wrappers for git, ast-grep, ripgrep
-
-### After E1
-
-3. **E2: Kata Engine** (26 SP MVP)
-   - Start with F2.1 Kata Parser
+**To verify:** After restart, try `/feature-plan` - should show skill content.
 
 ---
 
-## Files Created/Modified This Session
+## Next Steps
 
-### Created
-- `.claude/skills/feature/review/SKILL.md`
-- `src/raise_cli/exceptions.py`
-- `src/raise_cli/cli/error_handler.py`
-- `tests/test_exceptions.py`
-- `tests/cli/test_error_handler.py`
-- `tests/integration/__init__.py`
-- `tests/integration/test_cli_errors.py`
-- `work/features/f1.4-exception-hierarchy/plan.md`
-- `work/features/f1.4-exception-hierarchy/progress.md`
+### Immediate (After Restart)
 
-### Modified
-- `src/raise_cli/__init__.py` (export exceptions)
-- `src/raise_cli/__main__.py` (error handling)
-- `src/raise_cli/cli/main.py` (get_output_format helper)
-- `dev/components.md` (added exceptions, error handler)
+1. **Verify skill discovery** - Test `/feature-plan`, `/debug`
+2. **F1.5: Output Module** (3 SP) - Use `/feature-plan` to plan it
+
+### Remaining E1
+
+- F1.5 Output Module (3 SP)
+- F1.6 Core Utilities (3 SP)
 
 ---
 
-## Session Velocity
+## Key Commits This Session
 
-**Story Points Completed:** 3 SP (F1.4)
-**Tests Added:** 77
-**Coverage:** 91%
-
-**Epic Progress:** 73% (was 59%, +14%)
+| Commit | Description |
+|--------|-------------|
+| `8caa3a1` | F1.4 Exception Hierarchy |
+| `1fbd63e` | Skills restructure (flat directories) |
+| `54b0c1a` | Component docs update |
 
 ---
 
-## Notes for Emilio
+## Notes for Next Session
 
-- Feature skills migrated and merged - ready to dogfood
-- Skills aren't auto-discovered by Claude's Skill tool yet
-- F1.4 done using manual skill workflow - methodology works even without automation
-- Next: F1.5 (output formatters) should be straightforward
+1. **Skills should now be discoverable** - Test after restart
+2. **Debug skill ready** - Use for future Jidoka investigations
+3. **F1.4 complete** - Exception handling in place
+4. **Epic at 73%** - 6 SP remaining (F1.5 + F1.6)
 
 ---
 
