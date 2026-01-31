@@ -22,13 +22,14 @@
 
 ### Epic E1: Core Foundation
 
-**Progress:** 8/22 SP (36%)
+**Progress:** 13/22 SP (59%)
 
 | Feature | Status | Notes |
 |---------|--------|-------|
 | F1.1 Project Scaffolding | ✓ Complete | Package structure, pyproject.toml, entry points |
 | F1.2 CLI Skeleton | ✓ Complete | Global options (--format, -v, -q) in ctx.obj |
-| F1.3 Configuration System | **NEXT** | Pydantic Settings with cascade |
+| F1.3 Configuration System | ✓ Complete | 5-level cascade, XDG paths, 56 tests, 20min actual |
+| F1.4 Exception Hierarchy | **NEXT** | RaiseError with exit codes |
 | F1.4 Exception Hierarchy | Pending | After F1.3 |
 | F1.5 Output Module | Pending | After F1.4 |
 | F1.6 Core Utilities | Pending | After F1.5 |
