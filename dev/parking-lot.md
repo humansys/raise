@@ -24,7 +24,7 @@
 ### Research Needed
 
 - [ ] What are the Lean Spec Principles? How do they apply to governance artifacts?
-- [ ] Are agent personas really needed for katas? Or is this unnecessary complexity?
+- [x] ~~Are agent personas really needed for katas?~~ **RESOLVED** — No. See `work/research/agent-personas/` (RES-PERSONA-001)
 
 ### Future Scope (Deferred)
 
@@ -34,4 +34,4 @@
 ---
 
 *Created: 2026-01-31*
-*Last reviewed: 2026-01-31*
+*Last reviewed: 2026-01-31 (persona question resolved)*

@@ -139,6 +139,19 @@ All code must pass Ruff checks.
 - Type hints serve as primary documentation
 - Keep docstrings concise; code should be self-explanatory
 
+### Inference Economy — RECOMMENDED
+
+Treat AI inference as a scarce resource:
+
+- **Gather with tools, think with inference** — Use CLI tools for information retrieval
+- **Research tools:**
+  - `ddgr "query"` — Free DuckDuckGo search, no API key
+  - `llm -m perplexity "query"` — Research with citations (requires API key)
+- **Cache results** — Store in evidence catalogs, don't re-query
+- **Reserve inference** for synthesis, judgment, creation
+
+**When researching:** Use `ddgr` or `llm` first, then synthesize findings with Claude.
+
 ---
 
 ## Architecture
@@ -340,9 +353,10 @@ Cycle: **Detect → Stop → Correct → Continue**
 | Guardrails | `governance/solution/guardrails.md` |
 | Business Case | `governance/solution/business_case.md` |
 | Glossary | `framework/reference/glossary.md` |
+| Rai's Perspective | `.claude/RAI.md` |
 
 ---
 
 *Generated from governance artifacts via setup/rules kata*
-*Version: 2.0.0*
-*Date: 2026-01-30*
+*Version: 2.1.0*
+*Date: 2026-01-31*
