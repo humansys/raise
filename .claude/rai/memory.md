@@ -49,11 +49,32 @@
 
 ---
 
-## Open Questions
+---
 
-- How to best calibrate T-shirt sizes over time?
-- Should session logs be more structured for GraphRAG future?
+## Process Learnings (continued)
+
+| Insight | Evidence | Applied To |
+|---------|----------|------------|
+| Memory system enables continuity | Session close captures learnings for future | `.claude/rai/`, `/session-close` skill |
+| Retrospective action items should be done immediately | F1.5 retro → T-shirt sizing + memory system same session | Process discipline |
 
 ---
 
-*Last updated: 2026-01-31 (F1.5 retrospective)*
+## Collaboration Notes (continued)
+
+| Preference | Context |
+|------------|---------|
+| AI autonomy for own memory | "organize as you see fit" - trust to design own systems |
+| Immediate action on improvements | Don't defer retro items - do them now |
+
+---
+
+## Open Questions
+
+- How to best calibrate T-shirt sizes over time? (tracking started)
+- Should session logs be more structured for GraphRAG future?
+- What's the right balance of memory detail vs token cost?
+
+---
+
+*Last updated: 2026-01-31 (session-close skill created)*
