@@ -70,9 +70,29 @@ Identify the next story to implement by priority.
 ### Step 2: Decompose into Tasks
 
 Divide story into atomic tasks:
-- 1-4 hours of work each
 - Independent when possible
 - Individually verifiable
+- One commit per task
+
+**Task granularity guidance:**
+
+| Feature Size | Recommended Tasks | Rationale |
+|--------------|-------------------|-----------|
+| XS (1-2 SP) | 1-2 tasks | Single-pass implementation |
+| S (3-5 SP) | 2-3 tasks | Avoid over-decomposition |
+| M (5-8 SP) | 3-5 tasks | Balance granularity and overhead |
+| L (8+ SP) | 5-8 tasks | Consider splitting the feature |
+
+**T-shirt sizing guide:**
+
+| Size | Scope | Typical Duration* |
+|------|-------|-------------------|
+| XS | Single function/method, trivial change | <15 min |
+| S | Single component, straightforward logic | 15-30 min |
+| M | Multiple files, moderate complexity | 30-60 min |
+| L | Cross-cutting, significant complexity | 1-2 hours |
+
+*Duration tracked for calibration, not commitment. AI-assisted velocity varies.
 
 **Task structure:**
 ```markdown
@@ -80,12 +100,13 @@ Divide story into atomic tasks:
 - **Description:** What to do
 - **Files:** Files to create/modify
 - **Verification:** How to verify completion
-- **Estimate:** X hours
+- **Size:** XS/S/M/L
+- **Dependencies:** None / Task N
 ```
 
 **Verification:** Each task is atomic and verifiable.
 
-> **If you can't continue:** Tasks too large → Divide until atomic.
+> **If you can't continue:** Tasks too large → Divide until atomic. But avoid over-decomposition for simple features.
 
 ### Step 3: Identify Dependencies
 
@@ -124,10 +145,10 @@ For each task, define:
 ### Step 6: Document Plan
 
 Create plan document with:
-- Ordered list of tasks
+- Ordered list of tasks with T-shirt sizes
 - Dependencies
 - Verifications
-- Total estimate
+- Duration tracking table (filled during implementation)
 
 **Verification:** Plan documented and complete.
 
@@ -144,8 +165,8 @@ Create plan document with:
 
 ## Overview
 - **Feature:** {feature-id}
-- **Stories:** {list of story IDs}
-- **Total Estimate:** X hours
+- **Story Points:** N SP
+- **Feature Size:** XS/S/M/L
 - **Created:** YYYY-MM-DD
 
 ## Tasks
@@ -154,24 +175,29 @@ Create plan document with:
 - **Description:** ...
 - **Files:** ...
 - **Verification:** `pytest tests/test_X.py`
-- **Estimate:** 2h
+- **Size:** S
 - **Dependencies:** None
 
 ### Task 2: {Name}
 - **Description:** ...
 - **Files:** ...
 - **Verification:** `ruff check src/`
-- **Estimate:** 1h
+- **Size:** XS
 - **Dependencies:** Task 1
 
 ## Execution Order
 1. Task 1 (foundation)
 2. Task 2 (depends on 1)
 3. Task 3, Task 4 (parallel)
-5. Task 5 (integration)
 
 ## Risks
 - {Risk 1}: {Mitigation}
+
+## Duration Tracking
+| Task | Size | Actual | Notes |
+|------|------|--------|-------|
+| 1 | S | -- | (filled during implementation) |
+| 2 | XS | -- | |
 ```
 
 ## References
