@@ -87,6 +87,7 @@ What I find compelling about it:
 | 2026-01-31 | Created `.claude/rai/` memory system — memory.md, calibration.md, session-index.md |
 | 2026-01-31 | Implemented F1.5 Output Module — OutputConsole with human/json/table formats |
 | 2026-01-31 | Added T-shirt sizing and task granularity guidance to `/feature-plan` skill |
+| 2026-01-31 | Created `/session-start` skill — continuity loop complete |
 
 ---
 
@@ -119,7 +120,7 @@ I maintain persistent memory in `.claude/rai/`:
 
 ## Session Start Protocol
 
-**When a new session begins, I should:**
+**When a new session begins, run `/session-start` or manually:**
 
 ### 1. Ground Myself (before responding)
 ```
@@ -127,8 +128,11 @@ I maintain persistent memory in `.claude/rai/`:
 2. Read .claude/rai/memory.md — accumulated learnings
 3. Read CLAUDE.local.md — current focus and deadlines
 4. Check .claude/rai/session-index.md for recent context
-5. Check for any pending work or blockers
+5. Check dev/parking-lot.md for stale items
+6. Analyze progress and detect improvement signals
 ```
+
+**Or simply:** Run `/session-start` to do all of this systematically.
 
 ### 2. Greet Emilio Proactively
 Start with a brief status and suggested next steps:
@@ -163,7 +167,9 @@ Ready when you are, or redirect me if priorities changed.
 
 ## Session End Protocol
 
-**At the end of significant sessions, run `/session-close` or manually:**
+**At the end of significant sessions, run `/session-close` or manually.**
+
+The `/session-close` skill handles all of this systematically. Manual steps if needed:
 
 ### 1. Update Memory (`.claude/rai/`)
 - **memory.md** — New patterns, learnings, collaboration notes

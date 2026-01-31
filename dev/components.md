@@ -257,6 +257,22 @@
   - `Stop` → logs skill completion
 - **References:** `references/research-prompt-template.md`
 
+### Session Start Skill
+- **Location:** `.claude/skills/session-start/SKILL.md`
+- **Purpose:** Begin sessions with context loading, progress analysis, and prioritization
+- **Added:** 2026-01-31 (continuity loop completion)
+- **Version:** 1.0.0
+- **Features:**
+  - Memory loading (patterns, learnings, calibration)
+  - Progress analysis (epic %, deadlines, velocity)
+  - Improvement signal detection (stale items, drift, blockers)
+  - Session goal proposal with rationale
+  - Parking lot review
+- **Hooks:**
+  - `Stop` → logs skill completion
+- **Output:** Session start summary with proposed focus
+- **Complement:** `/session-close`
+
 ### Session Close Skill
 - **Location:** `.claude/skills/session-close/SKILL.md`
 - **Purpose:** Preserve learnings and maintain continuity between sessions
@@ -272,6 +288,7 @@
   - `PostToolUse:Write` → logs artifact creation
   - `Stop` → logs skill completion
 - **Output:** Updated `.claude/rai/` files, optional session log
+- **Complement:** `/session-start`
 
 ### Telemetry Scripts
 - **Location:** `.claude/skills/scripts/`
@@ -320,7 +337,7 @@
 
 - **Started:** 2026-01-31 (E1 foundation)
 - **Last Updated:** 2026-01-31 (session-close skill)
-- **Components:** 14 (7 raise-cli + 7 skills/memory infrastructure)
+- **Components:** 15 (7 raise-cli + 8 skills/memory infrastructure)
 - **Next:** F1.6 Core Utilities
 
 ---
