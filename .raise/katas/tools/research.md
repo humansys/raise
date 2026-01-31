@@ -6,17 +6,18 @@ frequency: as-needed
 fase_metodologia: 0
 
 prerequisites: []
-template: templates/raise/tools/research-report.md
+template: templates/tools/research-report.md
+prompt_template: templates/tools/research-prompt.md
 gate: null
 next_kata: null
 
 adaptable: true
 shuhari:
-  shu: "Follow all steps with full evidence catalog"
-  ha: "Scale depth to decision importance"
-  ri: "Create domain-specific research protocols"
+  shu: "Follow all steps with full evidence catalog and research prompt template"
+  ha: "Scale depth to decision importance; adapt prompt template"
+  ri: "Create domain-specific research protocols and custom prompts"
 
-version: 1.0.0
+version: 1.1.0
 ---
 
 # Research: Evidence-Based Investigation
@@ -54,12 +55,16 @@ Conduct epistemologically rigorous research to inform decisions. Standing on the
 
 ## Evidence Levels
 
+Engineering-specific evidence hierarchy (optimized for software engineering research):
+
 | Level | Criteria | Examples |
 |-------|----------|----------|
-| **Very High** | Peer-reviewed, production-proven, >1000 stars | Academic papers, official docs, major OSS |
-| **High** | Expert practitioners, well-maintained projects | Engineering blogs (FAANG), 100+ star repos |
-| **Medium** | Community validated, emerging consensus | Dev.to, tutorials with engagement |
-| **Low** | Single source, unvalidated claims | Random blogs, no corroboration |
+| **Very High** | Peer-reviewed, production-proven at scale, >10k stars | Academic papers, official framework docs, foundational OSS (Linux, PostgreSQL) |
+| **High** | Expert practitioners at established companies, >1k stars | Engineering blogs (FAANG, GitLab, Atlassian), popular frameworks (Django, React) |
+| **Medium** | Community-validated, emerging consensus, >100 stars | Dev.to with engagement, emerging OSS tools, conference talks |
+| **Low** | Single source, unvalidated, <100 stars or no corroboration | Personal blogs without peer review, brand new repos, anecdotal claims |
+
+**Rationale**: GitHub stars serve as proxy for community validation in software engineering contexts.
 
 ## Steps
 
@@ -74,6 +79,61 @@ Define research scope:
 **Verification:** Question is specific and falsifiable.
 
 > **If you can't continue:** Question too vague → Decompose into sub-questions.
+
+### Step 1.5: Create Research Prompt & Select Tool
+
+Using the research prompt template (`.raise/templates/tools/research-prompt.md`), document:
+- Role definition for research specialist
+- Search strategy with specific keywords
+- Evidence evaluation criteria
+- Output format requirements
+- Quality checklist
+
+**Verification:** Research prompt file created in `work/research/{topic}/prompt.md`
+
+> **If you can't continue:** Question not clear enough → Return to Step 1 framing
+
+#### Tool Selection
+
+Choose research delegation approach based on depth and tool availability:
+
+| Tool | When to Use | Availability Check | Best For |
+|------|-------------|-------------------|----------|
+| `ddgr` | Quick scans (1-2h) | `which ddgr` | Simple questions, no API key needed |
+| `llm -m perplexity` | Standard/Deep (4h+) | `llm models list \| grep perplexity` | Citations required, complex synthesis |
+| `WebSearch` | Any depth | Built-in (always available) | Reliable fallback, current info |
+| Manual + Task agent | Complex multi-query | Always available | Strategic research, novel domains |
+
+**Tool Selection Logic:**
+
+```bash
+# Check tool availability
+echo "Research tool availability:"
+
+if command -v ddgr &> /dev/null; then
+    echo "✓ ddgr available (quick scans)"
+else
+    echo "✗ ddgr not installed (optional: brew install ddgr)"
+fi
+
+if command -v llm &> /dev/null && llm models list | grep -q perplexity; then
+    echo "✓ perplexity available (deep research with citations)"
+else
+    echo "✗ perplexity not configured (optional: llm install perplexity)"
+fi
+
+echo "✓ WebSearch available (built-in fallback)"
+```
+
+**Delegation Pattern:**
+1. Create research prompt using template
+2. If depth=deep-dive AND perplexity available: `llm -m perplexity "$(cat prompt.md)"`
+3. Else if depth=quick-scan AND ddgr available: Execute ddgr searches, manual synthesis
+4. Else: Use WebSearch + manual synthesis (or Task agent for complex research)
+
+**Reproducibility:** Document tool/model used in research metadata
+
+> **If you can't continue:** All tools fail → Fall back to manual research; document in findings
 
 ### Step 2: Survey the Landscape
 
