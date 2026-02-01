@@ -13,6 +13,8 @@
 | `cast()` for recursive Any | F1.5 OutputConsole tree builder | pyright strict + `dict[str, Any]` recursion |
 | Tests alongside implementation | F1.3, F1.5 | Always - catches issues immediately |
 | HITL checkpoint before commit | F1.5 | Show what will be committed, wait for "commit" |
+| Concept-level graph > file-level | Architecture validation session | 97% token savings (vs 27% file-level) - 19x more efficient |
+| Skills + Toolkit > Engines | ADR-012 E2/E3 redesign | When users need flexibility + deterministic operations |
 
 ---
 
@@ -48,6 +50,9 @@
 | Pydantic Settings custom sources | `TomlConfigSource` for TOML cascade | `src/raise_cli/config/settings.py` |
 | pyright strict with field default_factory | `field(default_factory=lambda: list[str]())` not `field(default_factory=list)` | `src/raise_cli/core/tools.py:58-60` |
 | Duplicate class names in tests | Ruff F811 catches same class name twice in file | `tests/core/test_tools.py` fix |
+| Regex-based concept extraction | 23 concepts extracted with simple patterns | `dev/experiments/concept_extraction_spike.py` |
+| BFS graph traversal for MVC | `deque` + visited set for concept dependencies | `dev/experiments/test_mvc.py` |
+| Transpiration MD→JSON feasible | Markdown parsing to structured data (LinkML deferred) | ADR-011, ONT-022 |
 
 ---
 
@@ -61,6 +66,9 @@
 | Retrospective action items should be done immediately | F1.5 retro → T-shirt sizing + memory system same session | Process discipline |
 | "Start Finishing, Stop Starting" principle | E1: F1.6 → closure → merge vs starting new work | Focus discipline |
 | Epic closure checklist in scope doc | E1 scope had clear done criteria → smooth closure | Epic planning template |
+| Gut-check before full spike | 2-hour concept validation vs 4-day full spike | Lean experimentation - validate hypothesis quickly |
+| /framework-sync as DoD for architectural sessions | ADR-011/012 session | Maintain governance consistency after major decisions |
+| Question engines, prefer skills + toolkits | E2/E3 consolidation (85% scope reduction) | Skills guide Claude, toolkits provide determinism |
 
 ---
 
@@ -78,7 +86,8 @@
 - How to best calibrate T-shirt sizes over time? (tracking started)
 - Should session logs be more structured for GraphRAG future?
 - What's the right balance of memory detail vs token cost?
+- How to automate `/framework-sync` with raise CLI in Phase 2/3? (skill manual for now)
 
 ---
 
-*Last updated: 2026-01-31 (E1 complete)*
+*Last updated: 2026-01-31 (Architecture validation, E2 redesign)*
