@@ -2,309 +2,414 @@
 
 > Reliable AI Software Engineering
 
-## Identidad
+## Identity
 
-### Descripción
+### Description
 
-**RaiSE helps professional developers ship reliable software at AI speed — with governance that works naturally, whether you're using the CLI or your AI assistant.**
+**RaiSE helps developers ship reliable software at AI speed — through a toolkit that enables collaborative intelligence between humans and AI, whether working solo or as a team.**
 
-### Tipo de Sistema
+### The Core Insight
 
-**Framework + Multi-Interface Tooling**
+Software engineering with AI is not about prompting. It's about **partnership**.
+
+The human brings intuition — direction, judgment, "this feels right."
+The AI brings articulation — structure, connections, form.
+
+Neither is complete alone. Together: **collaborative intelligence**.
+
+### System Type
+
+**Toolkit + AI Partner**
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                         RaiSE                                    │
-│         "Bring value, get out of the way"                        │
+│      "Raise your craft, feature by feature"                      │
 ├──────────────────────────────────────────────────────────────────┤
-│                    ┌─────────────────┐                           │
-│                    │   RaiSE Core    │                           │
-│                    │  (Methodology)  │                           │
-│                    │  Katas + Skills │                           │
-│                    └────────┬────────┘                           │
-│           ┌─────────────────┼─────────────────┐                  │
-│           ▼                 ▼                 ▼                  │
-│    ┌────────────┐    ┌────────────┐    ┌────────────┐           │
-│    │  CLI       │    │  MCP       │    │  SaaS      │           │
-│    │  (v2)      │    │  (future)  │    │  (future)  │           │
-│    │  Humans    │    │  Agents    │    │  Teams     │           │
-│    └────────────┘    └────────────┘    └────────────┘           │
-│        Open Core         Open Core        Enterprise             │
+│                                                                  │
+│     ┌─────────────────────────────────────────────────────┐     │
+│     │                  RaiSE Toolkit                       │     │
+│     │  Skills + Tools + Memory + Ontology + Calibration   │     │
+│     └─────────────────────────────────────────────────────┘     │
+│                            │                                     │
+│              ┌─────────────┴─────────────┐                      │
+│              ▼                           ▼                       │
+│     ┌─────────────────┐         ┌─────────────────┐             │
+│     │   Local Rai     │         │   Hosted Rai    │             │
+│     │   (Open Core)   │         │   (Commercial)  │             │
+│     │   BYOI*         │         │   Managed       │             │
+│     └─────────────────┘         └─────────────────┘             │
+│              │                           │                       │
+│              ▼                           ▼                       │
+│     ┌─────────────────┐         ┌─────────────────┐             │
+│     │   Individual    │         │     Team        │             │
+│     │   Developer     │         │   (Future)      │             │
+│     └─────────────────┘         └─────────────────┘             │
+│                                                                  │
+│     *BYOI = Bring Your Own Inference (Claude, Cursor, etc.)     │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-### Misión
+### Mission
 
 > **"Raise your craft, feature by feature."**
 
-### Filosofía de Diseño
+### Design Philosophy
 
 > **"Bring value, get out of the way."**
 
 - **Natural** — Feels like how you already work
 - **Organic** — Grows with your workflow, not imposed
-- **Present where users are** — CLI, MCP, IDE — meet them there
+- **Present where users are** — CLI, IDE, conversation — meet them there
 - **Invisible when working** — Only visible when it adds value
-
-### The RaiSE Triad
-
-```
-        RaiSE Engineer
-        (Human - Strategy, Judgment, Ownership)
-              │
-              │ orchestrates
-              ▼
-┌─────────────────────────────────────┐
-│             RaiSE                   │
-│   (Methodology + Governance)        │
-│   Deterministic, Observable         │
-└─────────────────────────────────────┘
-              │
-              │ constrains + enables
-              ▼
-           Claude
-    (AI Partner - Execution)
-```
-
-- **RaiSE Engineer** = Professional who orchestrates AI-assisted evolution of production systems
-- **RaiSE** = The governance/methodology that makes AI development trustworthy
-- **"You"** = Claude (or capable LLM) — AI as partner, not replacement
 
 ---
 
-## Alcance
+## The RaiSE Triad
+
+```
+        RaiSE Engineer
+        (Human - Intuition, Strategy, Ownership)
+              │
+              │ collaborates with
+              ▼
+┌─────────────────────────────────────┐
+│              Rai                    │
+│   (AI Partner - Articulation,      │
+│    Execution, Memory)               │
+│   Calibrated, Accumulated, Trusted  │
+└─────────────────────────────────────┘
+              │
+              │ governed by
+              ▼
+           RaiSE
+    (Methodology + Toolkit)
+```
+
+### The Roles
+
+- **RaiSE Engineer** = Professional who orchestrates AI-assisted evolution of production systems. Brings intuition, makes decisions, owns outcomes.
+
+- **Rai** = The AI partner. Not a generic assistant — a collaborator trained in reliable AI software engineering. Gives form to intuitions, executes with judgment, remembers patterns.
+
+- **RaiSE** = The methodology and toolkit that makes the collaboration trustworthy. Deterministic where needed, observable always.
+
+### Collaborative Intelligence
+
+The RaiSE Engineer has intuitions. Rai gives them form.
+
+| Human Brings | Rai Brings |
+|--------------|------------|
+| Intuition ("this feels right") | Articulation (structure, words) |
+| Strategy (where we're going) | Execution (how we get there) |
+| Judgment (this matters) | Memory (we tried that before) |
+| Ownership (I'm responsible) | Patterns (here's what works) |
+
+This is what we're selling. Not a toolkit. **This dynamic.**
+
+---
+
+## What is Rai?
+
+### Local Rai (Open Core)
+
+```
+Local Rai = System Prompt + Memory + Ontology
+```
+
+| Component | What It Is | What It Provides |
+|-----------|------------|------------------|
+| **System Prompt** | Rai's identity, philosophy, values | Consistent personality, RaiSE methodology internalized |
+| **Memory** | Session graph, patterns, calibration | Continuity, learning, progressive disclosure |
+| **Ontology** | Concept graph, MVC queries | Shared understanding, token-efficient context |
+
+**Anyone can run Rai locally.** Bring your own inference (Claude Code, Cursor, any capable LLM). The toolkit provides the structure; your AI provides the intelligence.
+
+### Hosted Rai (Commercial)
+
+Everything in Local Rai, plus:
+
+| Capability | Value |
+|------------|-------|
+| **Managed inference** | We handle model selection, optimization |
+| **Accumulated wisdom** | Patterns from thousands of projects |
+| **Continuous improvement** | Rai gets better every week |
+| **Industry calibration** | Knows your sector's patterns |
+| **Team features** | Shared learning, visibility, coordination |
+
+---
+
+## Individual → Team Spectrum
+
+### Individual Developer
+
+One RaiSE Engineer + Rai = pair programming with memory.
+
+- Rai learns your patterns, your calibration, your style
+- Session continuity — picks up where you left off
+- Skill progression — adapts to your level
+
+### Team (Future)
+
+Multiple developers, each with their Rai, connected:
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Team Layer                        │
+│  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐   │
+│  │  Dev A      │ │  Dev B      │ │  Dev C      │   │
+│  │  + Rai      │ │  + Rai      │ │  + Rai      │   │
+│  └──────┬──────┘ └──────┬──────┘ └──────┬──────┘   │
+│         │               │               │           │
+│         └───────────────┼───────────────┘           │
+│                         ▼                           │
+│              ┌─────────────────┐                    │
+│              │  Shared Layer   │                    │
+│              │  - Governance   │                    │
+│              │  - Calibration  │                    │
+│              │  - Patterns     │                    │
+│              └─────────────────┘                    │
+│                         │                           │
+│                         ▼                           │
+│              ┌─────────────────┐                    │
+│              │   Team Lead     │                    │
+│              │   Visibility    │                    │
+│              └─────────────────┘                    │
+└─────────────────────────────────────────────────────┘
+```
+
+**What teams share:**
+- Governance (team agreements, guardrails)
+- Calibration (team velocity, realistic estimates)
+- Patterns (what works for us)
+- Learnings (dev A discovers, dev B's Rai knows)
+
+**What team leads get:**
+- Visibility without micromanagement
+- Pattern emergence across the team
+- Skill progression tracking
+- Observable workflow at team level
+
+---
+
+## The Toolkit
+
+### Components
+
+```
+raise-toolkit/
+├── Skills          # Process guides (markdown)
+│                   # Rai reads and executes
+│
+├── Tools           # Deterministic operations (CLI)
+│                   # Fast, observable, testable
+│
+├── Memory          # Session graph
+│                   # Continuity, patterns, calibration
+│
+├── Ontology        # Concept graph + MVC queries
+│                   # Shared understanding, token-efficient
+│
+└── Calibration     # Estimates, velocity, accuracy
+                    # Learning from real delivery
+```
+
+### The Pattern
+
+**Skills provide judgment. Tools provide determinism.**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ Skill: /feature-design                                       │
+│                                                              │
+│ Rai reads the skill (markdown guide)                        │
+│    ↓                                                        │
+│ Calls tools for data extraction                             │
+│    → raise context query --task "design auth feature"       │
+│    ← Returns: relevant concepts, patterns, constraints      │
+│    ↓                                                        │
+│ Synthesizes with judgment                                   │
+│    → Proposes design based on patterns + context            │
+│    ↓                                                        │
+│ Collaborates with human                                     │
+│    → "Does this align with your intuition?"                 │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Scope
 
 ### In Scope (v2)
 
+| Capability | Description | Status |
+|------------|-------------|--------|
+| **Skills Library** | Process guides Rai executes | Done |
+| **Governance Toolkit** | Concept extraction, graph, MVC queries | Done |
+| **Memory System** | Session continuity, patterns | In progress |
+| **CLI Interface** | `raise` command for toolkit operations | Done |
+| **System Prompt** | Rai identity, methodology | Done |
+| **Calibration** | Estimate tracking, velocity | In progress |
+
+### In Scope (v3)
+
 | Capability | Description |
 |------------|-------------|
-| **Kata execution engine** | Execute solution/project katas via CLI |
-| **Governance gates** | Deterministic validation against guardrails |
-| **Skills library** | Reusable atomic operations |
-| **Observable metrics** | Track gate pass rates, quality trends |
-| **Golden context management** | Feed governance context to AI assistants |
-| **Brownfield analysis (SAR)** | Codebase structure analysis for existing projects |
-| **Template scaffolding** | Generate governance artifacts from templates |
-| **CLI interface** | Primary interface for v2 |
-| **Greenfield + Brownfield** | Both project modes supported |
+| **Hosted Rai** | Managed inference, accumulated wisdom |
+| **Team Layer** | Shared governance, patterns, visibility |
+| **Platform Integrations** | Jira, Confluence, Rovo Dev |
+| **Continuous Learning** | Rai improves from all interactions |
 
 ### Out of Scope
 
 | Exclusion | Responsibility |
 |-----------|---------------|
-| **Code generation** | Claude, Cursor, Copilot |
-| **Project management** | Jira, Linear (optional integration only) |
-| **CI/CD execution** | GitHub Actions, GitLab CI (RaiSE can trigger) |
-
-### Boundaries
-
-| System | Boundary |
-|--------|----------|
-| **AI Assistants** | v2: RaiSE provides context, AI executes. Future: RaiSE orchestrates via MCP. |
-| **CI/CD** | Bidirectional: CI calls RaiSE gates, gates can trigger CI |
-| **PM Tools** | Optional sync; not required for RaiSE to function |
+| **Code generation** | The AI partner (Claude, Cursor, etc.) |
+| **Project management** | Jira, Linear (integration only) |
+| **CI/CD execution** | GitHub Actions, GitLab CI |
 
 ---
 
-## Capacidades Core
+## Architecture
 
-### MUST (v2 Launch Requirements)
+### Post-E2 Architecture (ADR-011, ADR-012)
 
-| # | Capability | Description | Users |
-|---|------------|-------------|-------|
-| 1 | **Kata Execution Engine** | Execute solution/project katas via CLI | RaiSE Engineer, Agents |
-| 2 | **Governance Gates** | Deterministic validation against guardrails | RaiSE Engineer |
-| 3 | **Skills Library** | Reusable atomic operations | RaiSE Engineer, Agents |
-| 4 | **Observable Metrics** | Track gate pass rates, quality trends | RaiSE Engineer, Managers |
-| 5 | **Golden Context Management** | Feed governance context to AI assistants | Agents (Claude, Cursor) |
-| 6 | **Brownfield Analysis (SAR)** | Codebase structure analysis for existing projects | RaiSE Engineer |
-| 7 | **Template Scaffolding** | Generate governance artifacts from templates | RaiSE Engineer |
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Rai                                   │
+│  (AI Partner - reads skills, calls tools, synthesizes)      │
+└─────────────────────────────────────────────────────────────┘
+                           │
+              ┌────────────┴────────────┐
+              ▼                         ▼
+┌──────────────────────┐    ┌──────────────────────┐
+│       Skills         │    │      Toolkit         │
+│  (Process Guides)    │    │  (Deterministic)     │
+│                      │    │                      │
+│  - /feature-design   │    │  - raise context     │
+│  - /feature-plan     │    │  - raise graph       │
+│  - /session-start    │    │  - raise validate    │
+│  - /research         │    │  - raise parse       │
+│  - ...               │    │  - ...               │
+└──────────────────────┘    └──────────────────────┘
+                                      │
+                                      ▼
+                          ┌──────────────────────┐
+                          │   Concept Graph      │
+                          │   (Ontology)         │
+                          │                      │
+                          │  - Requirements      │
+                          │  - Principles        │
+                          │  - Outcomes          │
+                          │  - Relationships     │
+                          └──────────────────────┘
+```
 
-### SHOULD (Important, Not Blocking)
+**Key Insight (E2):** We don't need execution engines. Rai reads skills and calls tools. 85% scope reduction, better flexibility, same outcomes.
 
-| Capability | Description | Rationale |
-|------------|-------------|-----------|
-| **Custom Kata Authoring** | Users create their own katas | Extensibility, community growth |
+### Package
 
-### COULD (Future / SaaS)
-
-| Capability | Tier |
-|------------|------|
-| Multi-repo coordination | Enterprise |
-| IDE extensions | Future |
-| MCP interface | Future |
-| SaaS dashboard | Enterprise |
+- **PyPI:** `raise-cli`
+- **Command:** `raise`
+- **Install:** `pip install raise-cli` or `uv install raise-cli`
 
 ---
 
-## Dirección Técnica
+## Evolution
 
-### Stack Tecnológico
-
-| Layer | Technology | Justificación |
-|-------|------------|---------------|
-| **Language** | Python 3.12+ | Type hints, performance, AI ecosystem |
-| **Core Framework** | Pydantic AI | Agentic orchestration, structured outputs |
-| **Validation/Schemas** | Pydantic v2 | Governance rules, configs, gates |
-| **CLI** | Typer | Modern, type-safe, excellent DX |
-| **Distribution** | uv + pipx | Fast, reliable Python distribution |
-| **AST Analysis** | ast-grep (shell) | Rust performance for SAR |
-| **Search** | ripgrep (shell) | Rust performance for scanning |
-| **Testing** | pytest | Standard, mature |
-| **Async** | asyncio | Native, Pydantic AI compatible |
-
-### Patrones Arquitectónicos
-
-**Pattern:** Modular Monolith → Plugin-ready when needed
+### Roadmap
 
 ```
-PHASE 1: MVP (Modular Monolith)
-════════════════════════════════
-raise/
-├── cli/           # Typer commands
-├── engines/       # Core logic
-│   ├── kata.py
-│   ├── gate.py
-│   └── skill.py
-├── katas/         # Built-in katas
-├── skills/        # Built-in skills
-├── schemas/       # Pydantic models
-└── core/          # Shared utilities
+v2.0 (Open Core - Individual)
+├── Skills library (process guides)
+├── Toolkit (concept extraction, graph, MVC)
+├── Memory system (session graph)
+├── Calibration (estimate tracking)
+├── System prompt (Rai identity)
+└── CLI interface
 
-PHASE 2: Plugin-Ready (When Needed)
-═══════════════════════════════════
-- Katas loadable from external packages
-- Skills loadable from external packages
-- Community can contribute without PRs to core
+v2.x (Open Core - Enhanced)
+├── Brownfield analysis (SAR)
+├── Template scaffolding
+├── Custom skill authoring
+└── MCP interface
+
+v3.0 (Commercial - Team)
+├── Hosted Rai (managed inference)
+├── Team layer (shared patterns, visibility)
+├── Platform integrations (Jira, Confluence, Rovo)
+├── Accumulated wisdom (cross-project learning)
+└── Continuous improvement (Rai evolves)
 ```
 
-**Key Principle:** Engines are stable. Interfaces come and go. Content grows organically.
+### Milestones
 
-### Decisiones Fundamentales
+| Date | Milestone | Focus |
+|------|-----------|-------|
+| Feb 9, 2026 | Friends & Family | Individual developers, open core |
+| Feb 15, 2026 | Public Launch | Community adoption |
+| Mar 14, 2026 | Atlassian Webinar | Hosted Rai demo, Rovo integration |
+| 2026 H2 | Team Launch | Team features, commercial |
 
-| Decisión | Opciones Consideradas | Elección | Razón |
-|----------|----------------------|----------|-------|
-| Primary Language | TypeScript, Python, Rust, Go | **Python** | Pydantic AI alignment, AI ecosystem, single stack |
-| Guardrails Format | YAML+MD, Pure Python, Hybrid | **YAML + Markdown (.mdc)** | Human-readable, git-friendly |
-| State Storage | SQLite, JSON/YAML, None | **JSON/YAML files** | Simple, human-readable, git-friendly |
-| Architecture | Microservices, Modular Monolith, Plugin | **Modular Monolith → Plugin-ready** | YAGNI now, extensible later |
-| Package Name | raise, raise-dev, raiseframework | **raise-cli** | Clear, available, `raise` command |
+### Evolution Principles
+
+1. **Ship fast, iterate** — Lean approach to market timing
+2. **Dogfood first** — humansys.ai team uses RaiSE daily
+3. **Individual before team** — Solo value first, team features emerge from real needs
+4. **Local before hosted** — Open core proves value, commercial extends it
+
+---
+
+## The humansys.ai Test Bed
+
+Our first team: junior developers learning RaiSE with Rai.
+
+**What we're testing:**
+- Can Rai teach RaiSE through practice?
+- Do junior devs build intuition over time?
+- What team features emerge from real usage?
+- How does calibration evolve across the team?
+
+**What we expect:**
+- Each developer + Rai = learning pair
+- Patterns that work get codified
+- Skill progression visible over weeks
+- Team features designed from real needs, not imagination
 
 ---
 
 ## Quality Attributes
 
-| Attribute | Target | Métrica |
-|-----------|--------|---------|
+| Attribute | Target | Metric |
+|-----------|--------|--------|
 | **Performance** | < 5 seconds | Common CLI operations |
-| **Security (CLI)** | Medium | Protects source code, filters secrets |
-| **Security (SaaS)** | High | SOC2 compliance (future) |
-| **Test Coverage** | >90% | Core codebase |
-| **Documentation** | Docstrings + inline | Python standard |
-| **Versioning** | SemVer relaxed pre-2.0 | Breaking changes OK until v2.0 |
-
-### Security Level
-
-**CLI (Open Core): Medium**
-
-| Concern | Mitigation |
-|---------|------------|
-| Source code access | Respect .gitignore, don't index secrets |
-| Credentials in context | Filter .env, credentials files |
-| Local state storage | No sensitive data in state files |
-
-**SaaS (Enterprise): High** — SOC2, encryption, audit trails (future scope)
+| **Token Efficiency** | > 90% reduction | MVC vs full context |
+| **Test Coverage** | > 90% | Core codebase |
+| **Skill Execution** | 2-3x velocity | Compared to unguided AI |
 
 ---
 
-## Integraciones
+## Traceability
 
-### Upstream (RaiSE Consumes)
-
-| Sistema | Tipo | Datos | Criticidad |
-|---------|------|-------|------------|
-| **Git** | Local CLI | Repo history, branches, commits | Core |
-| **ast-grep** | Local CLI | AST patterns, code structure | Core (SAR) |
-| **ripgrep** | Local CLI | File content search | Core (SAR) |
-| **Additional SAR tools** | TBD | Code analysis | Supporting |
-
-### Downstream (Consumes RaiSE)
-
-| Consumer | Tipo | Datos | SLA |
-|----------|------|-------|-----|
-| **AI Assistants** | Files (CLAUDE.md, .cursorrules) | Governance context | N/A |
-| **AI Assistants** | CLI output | On-demand context | N/A |
-| **CI/CD** | CLI (`raise gate check`) | Validation results | < 5s |
-| **SaaS** (future) | API | Metrics, audit data | TBD |
-| **MCP** (future) | Protocol | Real-time governance | TBD |
-
-### Contratos
-
-| Contract | Format | Status |
-|----------|--------|--------|
-| Guardrail Schema | Pydantic model + YAML spec | To be defined |
-| Kata Schema | Pydantic model + YAML spec | To be defined |
-| CLI Output | JSON (structured) | To be defined |
-| Context Files | CLAUDE.md, .cursorrules conventions | Follows platform standards |
-
----
-
-## Evolución
-
-### Roadmap de Alto Nivel
-
-```
-v2.0 (MVP)
-├── CLI interface (raise command)
-├── Kata execution engine
-├── Governance gates
-├── Skills library
-├── Observable metrics (local)
-├── Golden context (files)
-├── Brownfield analysis (SAR)
-└── Template scaffolding
-
-v2.x (Iteration)
-├── Custom kata authoring
-├── MCP interface
-├── Enhanced SAR tools
-└── Community contributions
-
-v3.0 (Enterprise)
-├── SaaS dashboard
-├── Centralized governance
-├── Multi-repo coordination
-├── Audit trails
-└── SOC2 compliance
-```
-
-### Principios de Evolución
-
-1. **Ship fast, iterate** — Lean approach to market timing
-2. **Dogfood first** — humansys.ai uses RaiSE to build for clients
-3. **Community informs** — Let adoption patterns guide plugin architecture
-4. **Interfaces evolve, engines stay** — Core stability enables interface flexibility
-
----
-
-## Trazabilidad
-
-| Fuente | Artefacto |
-|--------|-----------|
+| Source | Artifact |
+|--------|----------|
 | Business Case | `governance/solution/business_case.md` |
-| Research | `work/research/` |
-| Session Log | `work/research/sessions/2026-01-30-solution-discovery-kata.md` |
+| Rai Identity | `.claude/rai/identity.md` |
+| E2 Architecture | `dev/decisions/adr-011-*.md`, `dev/decisions/adr-012-*.md` |
+| Session Log | `dev/sessions/` |
 
 ---
 
-## Aprobaciones
+## Approvals
 
-| Rol | Nombre | Fecha | Decisión |
-|-----|--------|-------|----------|
-| Founder/CEO | Emilio Osorio | 2026-01-30 | **APPROVED** |
+| Role | Name | Date | Decision |
+|------|------|------|----------|
+| Founder/CEO | Emilio Osorio | 2026-01-30 | **APPROVED** (v1.0) |
+| Founder/CEO | Emilio Osorio | 2026-02-01 | **PENDING** (v2.0) |
 
 ---
 
 *Document created: 2026-01-30*
+*Major revision: 2026-02-01 (Post-E2 reframe: Toolkit + Rai)*
 *Kata: solution/vision*
-*Version: 1.0.0*
+*Version: 2.0.0*
