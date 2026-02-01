@@ -1,0 +1,69 @@
+# Graph MVC Validation Spike
+# Purpose: Test if graph-based Minimum Viable Context provides tangible benefits
+# Date: 2026-01-31
+# Duration: 2-hour gut-check experiment
+
+nodes:
+  prd:
+    file: governance/projects/raise-cli/prd.md
+    type: artifact
+    description: Product Requirements Document
+
+  vision:
+    file: governance/solution/vision.md
+    type: artifact
+    description: Solution Vision
+
+  design:
+    file: governance/projects/raise-cli/design.md
+    type: artifact
+    description: Technical Design
+
+  constitution:
+    file: framework/reference/constitution.md
+    type: principle
+    description: Core principles and values
+
+  guardrails:
+    file: governance/solution/guardrails.md
+    type: standard
+    description: Code standards and quality gates
+
+  backlog:
+    file: governance/projects/raise-cli/backlog.md
+    type: artifact
+    description: Feature backlog
+
+edges:
+  # PRD relationships
+  - from: prd
+    to: vision
+    type: depends_on
+    reason: "PRD objectives must align with vision outcomes"
+
+  - from: prd
+    to: constitution
+    type: governed_by
+    reason: "PRD must respect constitutional principles"
+
+  # Design relationships
+  - from: design
+    to: prd
+    type: implements
+    reason: "Design implements PRD requirements"
+
+  - from: design
+    to: guardrails
+    type: governed_by
+    reason: "Design follows code standards"
+
+  # Backlog relationships
+  - from: backlog
+    to: prd
+    type: implements
+    reason: "Backlog breaks down PRD features"
+
+  - from: backlog
+    to: design
+    type: references
+    reason: "Features reference design sections"
