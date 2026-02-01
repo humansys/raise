@@ -10,6 +10,12 @@
 
 - [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
 - [ ] **Rovo AI integration** - Required for Mar 14 webinar (Atlassian agentic dev platform)
+- [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
+  - Rai = trained RaiSE agent (not generic Claude)
+  - Value: accumulated judgment, calibration, collaborative intelligence
+  - Integration: Jira, Confluence, Rovo Dev (Atlassian ecosystem)
+  - Architecture: V2 decisions should enable V3 (session graph, memory persistence)
+  - See: `.claude/rai/identity.md` for vision
 
 ---
 
@@ -17,6 +23,11 @@
 
 ### Framework Improvements
 
+- [ ] **Session Graph Enabler Epic** - Apply E2 pattern (extract→graph→query) to session continuity:
+  - Extract session concepts (outcomes, learnings, blockers, patterns)
+  - Build temporal graph with momentum tracking
+  - Progressive disclosure for context loading (reduce token consumption)
+  - Similar to governance graph: 97% token savings potential
 - [ ] Translate all katas to English (currently some in Spanish)
 - [ ] Apply Lean Spec Principles to katas (after research)
 - [ ] Session management for Claude Code (`raise session start/wrap`) - standardize human-AI collaboration patterns

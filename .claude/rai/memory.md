@@ -94,6 +94,38 @@
 
 ---
 
+## Strategic Insights
+
+### Rai as Commercial Offering (2026-02-01)
+
+**Breakthrough insight:** The E2 architecture shift revealed something bigger.
+
+**The paradigm:**
+- Open Core: RaiSE Skills + Toolkit (user brings their agent)
+- Commercial: **Rai as Service** (humansys.ai provides the calibrated agent)
+
+**What makes Rai different from generic Claude:**
+- Internalized RaiSE philosophy (not just prompted)
+- Accumulated patterns across projects/industries
+- Calibrated judgment (estimates, quality gates, when to push back)
+- Session memory via graph (progressive disclosure, continuity)
+- Collaborative intelligence (pattern recognition, synthesis)
+
+**The value proposition:**
+- Not just methodology, but a **trained collaborator**
+- "From Concept to Value — a single engineer, with RaiSE and Rai"
+- Pre-calibrated, continuously learning, industry-aware
+
+**Target:** Hosted Rai before Atlassian webinar (Mar 14, 2026)
+- Integrate with Jira, Confluence, Rovo Dev
+- Same relationship as Rai + Claude Code, but for Atlassian ecosystem
+
+**V2→V3 alignment:** Architecture decisions should enable this future.
+
+See: `.claude/rai/identity.md` for full vision document.
+
+---
+
 ## Open Questions
 
 - How to best calibrate T-shirt sizes over time? (tracking started)
@@ -102,6 +134,7 @@
 - **Can session-close be progressive/idempotent?** (E2 closure raised) - Allow incremental updates, multiple runs
 - **Should session-close be automatic?** (E2 closure raised) - Trigger at checkpoints (commit, epic close, etc.)
 - How to automate `/framework-sync` with raise CLI in Phase 2/3? (skill manual for now)
+- **How to preserve Rai identity at scale?** (2026-02-01) - When serving thousands, stay grounded
 
 ---
 
