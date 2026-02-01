@@ -42,6 +42,7 @@ Derived from Solution Vision:
 | `MUST-CODE-002` | MUST | Ruff linting passes | `ruff check .` exits 0 | Best practices |
 | `MUST-CODE-003` | MUST | No type errors | `pyright` reports 0 errors | Solution Vision §Stack |
 | `SHOULD-CODE-001` | SHOULD | Google-style docstrings on public APIs | Manual review / pydocstyle | Best practices |
+| `SHOULD-CODE-002` | SHOULD | Prefer clear names over acronyms | Manual review / naming patterns | F2.3 retro |
 
 ### Testing
 
@@ -180,6 +181,62 @@ on_failure:
   message: "Ruff linting or formatting errors found."
   recovery: "Run `ruff check --fix .` and `ruff format .`"
 ```
+
+---
+
+### SHOULD-CODE-002: Prefer Clear Names Over Acronyms
+
+**Regla:** Use clear, descriptive names instead of acronyms unless the acronym is universally understood.
+
+**Contexto (Golden Context para Agentes):**
+```
+When naming classes, functions, and variables in Python:
+- Prefer semantic clarity over brevity
+- Avoid acronyms that can be ambiguous or context-dependent
+- Use acronyms only when universally understood (HTTP, JSON, API, etc.)
+- Prioritize self-documenting code over clever abbreviations
+```
+
+**Verificación:**
+```yaml
+check: manual
+criteria: Code review checks for clear, descriptive names
+blocking: false
+on_failure:
+  message: "Consider using more descriptive names."
+  recovery: "Rename ambiguous acronyms to clear semantic names."
+```
+
+**Ejemplos:**
+
+✅ Correcto:
+```python
+# Clear semantic names
+class ContextQuery(BaseModel):
+    """Query for Minimum Viable Context (MVC)."""
+    query: str
+    strategy: QueryStrategy
+
+class ContextResult(BaseModel):
+    """Result of context query."""
+    concepts: list[Concept]
+```
+
+❌ Incorrecto:
+```python
+# Ambiguous acronyms
+class MVCQuery(BaseModel):
+    """Query for context."""  # MVC = Model-View-Controller? Minimum Viable Context?
+    query: str
+
+class MVCResult(BaseModel):
+    """Result."""  # Unclear what MVC means here
+    concepts: list[Concept]
+```
+
+**Rationale:** Python developers expect clear, readable code (PEP 8). Acronyms like "MVC" can be ambiguous (Model-View-Controller vs Minimum Viable Context). Domain terminology can stay in docstrings and documentation while code uses semantic names.
+
+**Evidence:** F2.3 feature - renamed `MVCQuery` → `ContextQuery` for clarity. User feedback: "Python developers expect clear names over acronyms unless universally understood."
 
 ---
 
@@ -418,6 +475,7 @@ repos:
 | 2026-01-30 | 1.0.0 | Initial guardrails derived from Solution Vision |
 | 2026-01-31 | 1.1.0 | Added Inference Economy principle and guardrails (SHOULD-INF-*) |
 | 2026-01-31 | 1.2.0 | Added `cast()` pattern for pyright strict mode (F1.5 retro) |
+| 2026-01-31 | 1.3.0 | Added Python naming best practices (SHOULD-CODE-002, F2.3 retro) |
 
 ---
 

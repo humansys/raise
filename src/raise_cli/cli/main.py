@@ -9,6 +9,7 @@ import typer
 from rich.console import Console
 
 from raise_cli import __version__
+from raise_cli.cli.commands.context import context_app
 from raise_cli.cli.commands.graph import graph_app
 from raise_cli.config import RaiseSettings
 
@@ -34,6 +35,7 @@ app = typer.Typer(
 
 # Register command groups
 app.add_typer(graph_app, name="graph")
+app.add_typer(context_app, name="context")
 
 console = Console()
 
