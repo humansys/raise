@@ -165,3 +165,120 @@ class TestGraphExtractCommand:
         assert "concepts" in result.stdout
         assert "total" in result.stdout
         assert "type" in result.stdout
+
+
+class TestGraphBuildCommand:
+    """Tests for `raise graph build` command."""
+
+    def test_graph_build_help(self) -> None:
+        """Should display help for graph build command."""
+        result = runner.invoke(app, ["graph", "build", "--help"])
+
+        assert result.exit_code == 0
+        assert "Build concept graph" in result.stdout
+        assert "--concepts" in result.stdout
+        assert "--output" in result.stdout
+
+    def test_graph_build_from_extraction(
+        self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should build graph from extracted concepts."""
+        monkeypatch.chdir(tmp_governance_for_cli)
+
+        # Build graph
+        result = runner.invoke(app, ["graph", "build"])
+
+        assert result.exit_code == 0
+        assert "Building concept graph" in result.stdout
+        assert "Inferred" in result.stdout
+        assert "Graph:" in result.stdout
+        assert "nodes" in result.stdout
+        assert "edges" in result.stdout
+
+    def test_graph_build_with_custom_output(
+        self, tmp_governance_for_cli: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should save graph to custom location."""
+        monkeypatch.chdir(tmp_governance_for_cli)
+
+        output_file = tmp_path / "custom_graph.json"
+        result = runner.invoke(app, ["graph", "build", "--output", str(output_file)])
+
+        assert result.exit_code == 0
+        assert output_file.exists()
+
+        # Verify it's valid JSON
+        data = json.loads(output_file.read_text())
+        assert "nodes" in data
+        assert "edges" in data
+        assert "metadata" in data
+
+    def test_graph_build_creates_cache_directory(
+        self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should create .raise/cache directory if it doesn't exist."""
+        monkeypatch.chdir(tmp_governance_for_cli)
+
+        result = runner.invoke(app, ["graph", "build"])
+
+        assert result.exit_code == 0
+
+        cache_dir = tmp_governance_for_cli / ".raise" / "cache"
+        assert cache_dir.exists()
+        assert (cache_dir / "graph.json").exists()
+
+
+class TestGraphValidateCommand:
+    """Tests for `raise graph validate` command."""
+
+    def test_graph_validate_help(self) -> None:
+        """Should display help for graph validate command."""
+        result = runner.invoke(app, ["graph", "validate", "--help"])
+
+        assert result.exit_code == 0
+        assert "Validate graph structure" in result.stdout
+        assert "--graph" in result.stdout
+
+    def test_graph_validate_missing_file(self) -> None:
+        """Should error when graph file doesn't exist."""
+        result = runner.invoke(app, ["graph", "validate", "--graph", "/nonexistent/graph.json"])
+
+        assert result.exit_code == 1
+        assert "Error" in result.stdout or "not found" in result.stdout.lower()
+        assert "raise graph build" in result.stdout
+
+    def test_graph_validate_valid_graph(
+        self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should validate a valid graph."""
+        monkeypatch.chdir(tmp_governance_for_cli)
+
+        # Build graph first
+        build_result = runner.invoke(app, ["graph", "build"])
+        assert build_result.exit_code == 0
+
+        # Validate it
+        result = runner.invoke(app, ["graph", "validate"])
+
+        assert result.exit_code == 0
+        assert "Validating graph" in result.stdout
+        assert "valid" in result.stdout.lower()
+        assert "relationships valid" in result.stdout.lower()
+
+    def test_graph_validate_custom_graph_file(
+        self, tmp_governance_for_cli: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should validate custom graph file."""
+        monkeypatch.chdir(tmp_governance_for_cli)
+
+        custom_graph = tmp_path / "my_graph.json"
+
+        # Build to custom location
+        build_result = runner.invoke(app, ["graph", "build", "--output", str(custom_graph)])
+        assert build_result.exit_code == 0
+
+        # Validate custom file
+        result = runner.invoke(app, ["graph", "validate", "--graph", str(custom_graph)])
+
+        assert result.exit_code == 0
+        assert "valid" in result.stdout.lower()

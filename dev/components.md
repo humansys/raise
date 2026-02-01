@@ -134,28 +134,159 @@
 - **Tests:** 14 unit + integration tests
 - **Related:** ADR-011
 
-### Graph Extract CLI Command (F2.1)
+### Graph Module (F2.2)
+- **Location:** `src/raise_cli/governance/graph/`
+- **Purpose:** Build and query concept-level directed graphs from extracted concepts
+- **Added:** F2.2 (Epic E2)
+- **Sub-modules:**
+  - `models.py` - Pydantic models for ConceptGraph and Relationship
+  - `relationships.py` - Rule-based relationship inference (4 rules)
+  - `traversal.py` - BFS graph traversal with depth limits
+  - `builder.py` - GraphBuilder orchestrator
+- **Public API:**
+  - `ConceptGraph(BaseModel)` - Graph with nodes dict, edges list, metadata
+  - `Relationship(BaseModel)` - Directed edge with source, target, type, metadata
+  - `RelationshipType` - Literal type (implements, governed_by, depends_on, related_to, validates)
+  - `GraphBuilder().build(concepts) -> ConceptGraph` - Build graph from concepts
+  - `traverse_bfs(graph, start_id, edge_types, max_depth) -> list[Concept]` - BFS traversal
+- **Relationship Inference Rules:**
+  1. `implements` - Requirement → Outcome (keyword matching in content)
+  2. `governed_by` - Requirement/Outcome → Principle (§N references)
+  3. `depends_on` - Concept → Concept (explicit "depends on RF-XX")
+  4. `related_to` - Concept ↔ Concept (>3 shared keywords)
+- **Features:**
+  - JSON serialization/deserialization (to_json/from_json)
+  - Graph query methods (get_node, get_outgoing_edges, get_incoming_edges)
+  - Build metadata (timestamp, version, edge statistics)
+  - Cycle handling in BFS (visited set)
+  - Keyword extraction with stopword filtering
+- **Performance:**
+  - Build <2s for 50 concepts (measured)
+  - BFS <100ms for 50-node graph (measured)
+- **Coverage:** models 100%, relationships 86%, traversal 100%, builder 92%
+- **Tests:** 14 (models) + 19 (relationships) + 11 (traversal) + 9 (builder) + 10 (integration) = 63 tests
+- **Dependencies:** F2.1 Concept models
+- **Related:** ADR-011 (concept-level graph architecture)
+
+### Graph CLI Commands (F2.1, F2.2)
 - **Location:** `src/raise_cli/cli/commands/graph.py`
-- **Purpose:** CLI interface for concept extraction
-- **Added:** F2.1 (Epic E2)
+- **Purpose:** CLI interface for concept graph operations (extract, build, validate)
+- **Added:** F2.1 (extract), F2.2 (build, validate) - Epic E2
 - **Commands:**
   - `raise graph extract [FILE_PATH]` - Extract concepts from governance files
-- **Options:**
+  - `raise graph build` - Build concept graph with relationship inference
+  - `raise graph validate` - Validate graph structure and relationships
+- **Options (extract):**
   - `--format/-f` (human|json) - Output format
+- **Options (build):**
+  - `--concepts/-c PATH` - Custom concepts JSON file (default: `.raise/cache/concepts.json`)
+  - `--output/-o PATH` - Custom output location (default: `.raise/cache/graph.json`)
+- **Options (validate):**
+  - `--graph/-g PATH` - Custom graph file to validate (default: `.raise/cache/graph.json`)
 - **Features:**
   - Human-readable output with Rich formatting (✓ checkmarks, colors, statistics)
-  - JSON output for machine processing
-  - Extract from single file or all governance files
-  - Error display for missing files
-- **Example Output (human):**
+  - JSON output for machine processing (extract)
+  - Auto-extraction if concepts not cached (build)
+  - Graph validation (all edges valid, cycle detection, reachability)
+  - Automatic cache directory creation
+- **Example Output (build):**
   ```
-  Extracting concepts from governance files...
-    📄 prd.md → 8 requirements
-    📄 vision.md → 8 outcomes
-    📄 constitution.md → 8 principles
-  → Total: 24 concepts extracted
+  Building concept graph...
+    ✓ Loaded 24 concepts
+    ✓ Inferred 33 relationships
+      - related_to: 33
+    ✓ Saved to .raise/cache/graph.json
+
+  Graph: 23 nodes, 33 edges
   ```
-- **Dependencies:** GovernanceExtractor, Rich
+- **Example Output (validate):**
+  ```
+  Validating graph...
+    ✓ All relationships valid
+    ✓ No cycles detected
+    ✓ 23/23 concepts reachable
+
+  Graph is valid.
+  ```
+- **Dependencies:** GovernanceExtractor, GraphBuilder, ConceptGraph, Rich
+- **Tests:** 8 (extract) + 4 (build) + 4 (validate) = 16 CLI integration tests
+- **Related:** ADR-011
+
+### MVC Query Engine (F2.3)
+- **Location:** `src/raise_cli/governance/query/`
+- **Purpose:** Extract Minimum Viable Context (MVC) from concept graph, achieving >90% token savings vs loading full files
+- **Added:** F2.3 (Epic E2)
+- **Type:** Query orchestrator with 4 strategies, multiple output formats
+- **Public API:**
+  - `ContextQueryEngine(graph)` - Initialize with concept graph
+  - `ContextQueryEngine.from_cache(path) -> ContextQueryEngine` - Load from cached graph JSON
+  - `engine.query(ContextQuery) -> ContextResult` - Execute query and return results
+  - `ContextQuery(query, strategy, max_depth, filters)` - Query parameters
+  - `ContextResult(concepts, metadata)` - Query results with metadata
+  - `result.to_json() -> str` - Serialize to JSON
+  - `result.to_file(path, format)` - Save to file (markdown or json)
+- **Query Strategies:**
+  1. `CONCEPT_LOOKUP` - Direct ID lookup + 1-hop dependencies (governed_by, implements)
+  2. `KEYWORD_SEARCH` - Keyword matching with optional type filter
+  3. `RELATIONSHIP_TRAVERSAL` - Follow specific edge types via BFS
+  4. `RELATED_CONCEPTS` - Semantic similarity via shared keywords (>2 shared)
+- **Output Formats:**
+  - **Markdown:** AI-optimized with headers, relationship annotations, token estimates
+  - **JSON:** Structured output with concepts array + metadata object
+- **Metadata Tracked:**
+  - Token estimate (words * 1.3 heuristic, spike-validated)
+  - Execution time (ms)
+  - Relationship paths (for explainability)
+  - Traversal depth (actual vs max)
+- **Features:**
+  - Reuses F2.2 BFS traversal (no duplication)
+  - Simple keyword matching (no NLP dependencies)
+  - Relationship path tracing for "why this concept?" explanations
+  - Token savings estimation vs manual file loading
+- **Performance:**
+  - Direct lookup: <50ms (target)
+  - Keyword search: <200ms (target)
+  - BFS traversal: <100ms (target)
+  - Token savings: >90% (measured vs ~6,000 token baseline)
+- **Coverage:** models 100%, strategies 98%, engine 98%, formatters 100%
+- **Tests:** 14 (models) + 27 (strategies) + 22 (engine) + 17 (formatters) + 8 (CLI) + 11 (integration) = 99 tests
+- **Dependencies:** F2.1 Concept models, F2.2 ConceptGraph + BFS traversal
+- **Related:** ADR-011 (97% token savings validated)
+
+### Context CLI Commands (F2.3)
+- **Location:** `src/raise_cli/cli/commands/context.py`
+- **Purpose:** CLI interface for querying concept graph and retrieving MVC
+- **Added:** F2.3 (Epic E2)
+- **Commands:**
+  - `raise context query <QUERY>` - Query concept graph for Minimum Viable Context
+- **Options:**
+  - `--format/-f (markdown|json)` - Output format (default: markdown)
+  - `--output/-o PATH` - Save to file instead of stdout
+  - `--strategy/-s STRATEGY` - Explicit strategy selection
+  - `--max-depth/-d INT` - Maximum traversal depth (0-5, default: 1)
+  - `--edge-types/-e TYPES` - Comma-separated edge types to follow (e.g., "governed_by,implements")
+  - `--type/-t TYPE` - Filter by concept type (requirement, principle, outcome)
+- **Examples:**
+  ```bash
+  # Query by concept ID
+  raise context query "req-rf-05"
+
+  # Keyword search in requirements only
+  raise context query "validation" --type requirement
+
+  # Traverse relationships
+  raise context query "req-rf-05" --strategy relationship_traversal --edge-types governed_by
+
+  # Save to file as JSON
+  raise context query "req-rf-05" --output context.json --format json
+  ```
+- **Features:**
+  - Human-readable markdown output (default) optimized for AI consumption
+  - JSON output for tool integration
+  - Error handling with helpful messages (graph not found → suggests `raise graph build`)
+  - Token estimate and savings displayed in output
+  - Execution time tracking
+- **Dependencies:** ContextQueryEngine, ConceptGraph, Rich
 - **Tests:** 8 CLI integration tests
 - **Related:** ADR-011
 
