@@ -15,6 +15,11 @@
 | HITL checkpoint before commit | F1.5 | Show what will be committed, wait for "commit" |
 | Concept-level graph > file-level | Architecture validation session | 97% token savings (vs 27% file-level) - 19x more efficient |
 | Skills + Toolkit > Engines | ADR-012 E2/E3 redesign | When users need flexibility + deterministic operations |
+| State machine guards | F2.1 Vision parser | Prevent re-entry conditions - check `not in_state` before entering |
+| Integration tests with real files | F2.1 governance parsers | Validate assumptions, catch actual counts vs predictions |
+| Parser composition pattern | F2.1 three parsers | Regex match → extract → truncate → create model |
+| BFS traversal reuse | F2.3 reused F2.2's `traverse_bfs()` unchanged | When graph algorithms can be composed, not duplicated |
+| Simple heuristics > ML | F2.3: keyword matching 98% accurate, token est = words * 1.3 | Default to simple; complexity only when proven necessary |
 
 ---
 
@@ -53,6 +58,8 @@
 | Regex-based concept extraction | 23 concepts extracted with simple patterns | `dev/experiments/concept_extraction_spike.py` |
 | BFS graph traversal for MVC | `deque` + visited set for concept dependencies | `dev/experiments/test_mvc.py` |
 | Transpiration MD→JSON feasible | Markdown parsing to structured data (LinkML deferred) | ADR-011, ONT-022 |
+| Pydantic `model_dump_json()` power | F2.3: handles complex nested structures effortlessly | `src/raise_cli/governance/query/models.py` |
+| Keyword matching with stopwords | F2.3: 98% accuracy without NLP | `src/raise_cli/governance/query/strategies.py` |
 
 ---
 
@@ -69,6 +76,10 @@
 | Gut-check before full spike | 2-hour concept validation vs 4-day full spike | Lean experimentation - validate hypothesis quickly |
 | /framework-sync as DoD for architectural sessions | ADR-011/012 session | Maintain governance consistency after major decisions |
 | Question engines, prefer skills + toolkits | E2/E3 consolidation (85% scope reduction) | Skills guide Claude, toolkits provide determinism |
+| Post-retrospective actions BEFORE commit | F2.3: Type A/B/C classification | Apply quick wins (<30min) before commit; demonstrates complete learning cycle |
+| Kata cycle stabilized at 2-3x velocity | F2.1, F2.2, F2.3 all delivered 2-3x faster | Reproducible pattern with design-first + atomic tasks |
+| Epic-level learning enables systemic review | E2 closure: created /epic-close skill | Meso-layer between features and quarterly reviews; enables epic comparison |
+| "As above, so below" principle works | E2: epic retrospective mirrors feature retrospective | Fractal pattern - same structure, different scale |
 
 ---
 
@@ -78,6 +89,8 @@
 |------------|---------|
 | AI autonomy for own memory | "organize as you see fit" - trust to design own systems |
 | Immediate action on improvements | Don't defer retro items - do them now |
+| Catch naming issues early | F2.3: caught MVCQuery ambiguity, renamed to ContextQuery |
+| "Getting into The Flow" | Positive feedback when process + collaboration rhythm clicks |
 
 ---
 
@@ -86,8 +99,10 @@
 - How to best calibrate T-shirt sizes over time? (tracking started)
 - Should session logs be more structured for GraphRAG future?
 - What's the right balance of memory detail vs token cost?
+- **Can session-close be progressive/idempotent?** (E2 closure raised) - Allow incremental updates, multiple runs
+- **Should session-close be automatic?** (E2 closure raised) - Trigger at checkpoints (commit, epic close, etc.)
 - How to automate `/framework-sync` with raise CLI in Phase 2/3? (skill manual for now)
 
 ---
 
-*Last updated: 2026-01-31 (Architecture validation, E2 redesign)*
+*Last updated: 2026-02-01 (E2 epic closed, /epic-close skill created, architecture docs updated)*
