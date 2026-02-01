@@ -1,0 +1,396 @@
+{
+  "nodes": {
+    "req-rf-01": {
+      "id": "req-rf-01",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-01: Kata Execution Engine",
+      "lines": [
+        159,
+        179
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-01.1 | The system MUST execute solution-level katas (discovery, vision) | Must |\n| RF-01.2 | The system MUST execute project-level katas (discovery, vision, design, backlog) | Must |\n| RF-01.3 | The system MUST execute feature-level katas (plan, implement, review) | Must |\n| RF-01.4 | The system MUST track kata execution state (not started, in progress, completed) | Must |\n| RF-01.5 | The system SHOULD support `--interactive` mode for guided execution | Should |\n| RF-01.6 | The system SHOULD display Jidoka inline prompts during execution | Should |\n\n**Command:** `raise kata run <kata-id> [--project <name>] [--interactive]`",
+      "metadata": {
+        "requirement_id": "RF-01",
+        "title": "Kata Execution Engine"
+      }
+    },
+    "req-rf-02": {
+      "id": "req-rf-02",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-02: Gate Validation Engine",
+      "lines": [
+        172,
+        192
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-02.1 | The system MUST validate governance artifacts against gate criteria | Must |\n| RF-02.2 | The system MUST return structured validation results (pass/fail + details) | Must |\n| RF-02.3 | The system MUST support solution, project, and feature gates | Must |\n| RF-02.4 | The system SHOULD provide `--fix` suggestions for failed validations | Should |\n| RF-02.5 | The system COULD integrate with CI/CD via exit codes | Could |\n\n**Command:** `raise gate check <gate-id> [--artifact <path>]`",
+      "metadata": {
+        "requirement_id": "RF-02",
+        "title": "Gate Validation Engine"
+      }
+    },
+    "req-rf-03": {
+      "id": "req-rf-03",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-03: Commands Library",
+      "lines": [
+        184,
+        204
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-03.1 | The system MUST provide git wrapper commands (status, diff, log) | Must |\n| RF-03.2 | The system MUST provide ast-grep wrapper commands (pattern search) | Must |\n| RF-03.3 | The system MUST provide ripgrep wrapper commands (content search) | Must |\n| RF-03.4 | The system SHOULD provide file manipulation commands (read, write, template) | Should |\n| RF-03.5 | The system SHOULD provide structured output (JSON) for AI consumption | Should |\n\n**Command:** `raise <command> [args...] [--json]`",
+      "metadata": {
+        "requirement_id": "RF-03",
+        "title": "Commands Library"
+      }
+    },
+    "req-rf-04": {
+      "id": "req-rf-04",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-04: Template Scaffolding",
+      "lines": [
+        196,
+        216
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-04.1 | The system MUST scaffold governance artifacts from templates | Must |\n| RF-04.2 | The system MUST support variable substitution in templates | Must |\n| RF-04.3 | The system SHOULD validate scaffolded artifacts against schemas | Should |\n\n**Command:** `raise template scaffold <template-id> [--output <path>]`",
+      "metadata": {
+        "requirement_id": "RF-04",
+        "title": "Template Scaffolding"
+      }
+    },
+    "req-rf-05": {
+      "id": "req-rf-05",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-05: Golden Context Generation",
+      "lines": [
+        206,
+        226
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-05.1 | The system MUST generate CLAUDE.md from governance artifacts | Must |\n| RF-05.2 | The system SHOULD generate .cursorrules from guardrails | Should |\n| RF-05.3 | The system SHOULD support custom output formats | Could |\n\n**Command:** `raise context generate [--format claude|cursor|both]`",
+      "metadata": {
+        "requirement_id": "RF-05",
+        "title": "Golden Context Generation"
+      }
+    },
+    "req-rf-06": {
+      "id": "req-rf-06",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-06: Brownfield Analysis (SAR)",
+      "lines": [
+        216,
+        236
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-06.1 | The system MUST analyze codebase structure (files, directories) | Must |\n| RF-06.2 | The system MUST identify code patterns via ast-grep | Must |\n| RF-06.3 | The system MUST generate Structure Analysis Report (SAR) | Must |\n| RF-06.4 | The system SHOULD detect technology stack automatically | Should |\n| RF-06.5 | The system SHOULD identify architectural patterns | Should |\n\n**Command:** `raise analyze [--path <dir>] [--output <path>]`",
+      "metadata": {
+        "requirement_id": "RF-06",
+        "title": "Brownfield Analysis (SAR)"
+      }
+    },
+    "req-rf-07": {
+      "id": "req-rf-07",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-07: Observability",
+      "lines": [
+        228,
+        248
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-07.1 | The system MUST track kata execution history | Must |\n| RF-07.2 | The system MUST track gate validation history | Must |\n| RF-07.3 | The system SHOULD generate summary reports | Should |\n| RF-07.4 | The system SHOULD export metrics in JSON format | Should |\n\n**Command:** `raise metrics [show|export] [--format json]`",
+      "metadata": {
+        "requirement_id": "RF-07",
+        "title": "Observability"
+      }
+    },
+    "req-rf-08": {
+      "id": "req-rf-08",
+      "type": "requirement",
+      "file": "projects/raise-cli/prd.md",
+      "section": "RF-08: Agent Skill Distribution",
+      "lines": [
+        239,
+        259
+      ],
+      "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-08.1 | The system MUST include a `raise` Agent Skill for ecosystem distribution | Must |\n| RF-08.2 | The skill MUST follow Anthropic Agent Skills specification (SKILL.md format) | Must |\n| RF-08.3 | The skill SHOULD document core CLI commands and workflows | Should |\n| RF-08.4 | The skill SHOULD be publishable to Claude Code plugins marketplace | Should |\n\n**Artifact:** `raise/SKILL.md` (bootstrap skill)\n\n---\n\n## Requisitos No Funcionales",
+      "metadata": {
+        "requirement_id": "RF-08",
+        "title": "Agent Skill Distribution"
+      }
+    },
+    "outcome-brownfield-analysis-sar": {
+      "id": "outcome-brownfield-analysis-sar",
+      "type": "outcome",
+      "file": "governance/solution/vision.md",
+      "section": "Brownfield analysis (SAR)",
+      "lines": [
+        86,
+        86
+      ],
+      "content": "Codebase structure analysis for existing projects",
+      "metadata": {
+        "outcome_name": "Brownfield analysis (SAR)"
+      }
+    },
+    "outcome-template-scaffolding": {
+      "id": "outcome-template-scaffolding",
+      "type": "outcome",
+      "file": "governance/solution/vision.md",
+      "section": "Template scaffolding",
+      "lines": [
+        87,
+        87
+      ],
+      "content": "Generate governance artifacts from templates",
+      "metadata": {
+        "outcome_name": "Template scaffolding"
+      }
+    },
+    "outcome-cli-interface": {
+      "id": "outcome-cli-interface",
+      "type": "outcome",
+      "file": "governance/solution/vision.md",
+      "section": "CLI interface",
+      "lines": [
+        88,
+        88
+      ],
+      "content": "Primary interface for v2",
+      "metadata": {
+        "outcome_name": "CLI interface"
+      }
+    },
+    "outcome-greenfield-+-brownfield": {
+      "id": "outcome-greenfield-+-brownfield",
+      "type": "outcome",
+      "file": "governance/solution/vision.md",
+      "section": "Greenfield + Brownfield",
+      "lines": [
+        89,
+        89
+      ],
+      "content": "Both project modes supported",
+      "metadata": {
+        "outcome_name": "Greenfield + Brownfield"
+      }
+    },
+    "outcome-ci/cd": {
+      "id": "outcome-ci/cd",
+      "type": "outcome",
+      "file": "governance/solution/vision.md",
+      "section": "CI/CD",
+      "lines": [
+        237,
+        237
+      ],
+      "content": "CLI (`raise gate check`)",
+      "metadata": {
+        "outcome_name": "CI/CD"
+      }
+    },
+    "outcome-pm-tools": {
+      "id": "outcome-pm-tools",
+      "type": "outcome",
+      "file": "governance/solution/vision.md",
+      "section": "PM Tools",
+      "lines": [
+        105,
+        105
+      ],
+      "content": "Optional sync; not required for RaiSE to function",
+      "metadata": {
+        "outcome_name": "PM Tools"
+      }
+    },
+    "principle-humanos-definen-m\u00e1quinas-ejecutan": {
+      "id": "principle-humanos-definen-m\u00e1quinas-ejecutan",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a71. Humanos Definen, M\u00e1quinas Ejecutan",
+      "lines": [
+        27,
+        57
+      ],
+      "content": "Los humanos especifican el **\"Qu\u00e9\"** en lenguaje natural (Markdown). Las m\u00e1quinas reciben el **\"C\u00f3mo\"** en formato estructurado (JSON). La especificaci\u00f3n es la fuente de verdad; el c\u00f3digo es su expresi\u00f3n.\n\n**Implicaci\u00f3n pr\u00e1ctica:** El rol del desarrollador evoluciona a **Orquestador**\u2014quien dise\u00f1a contexto, valida outputs, y mantiene ownership del sistema.",
+      "metadata": {
+        "principle_number": "1",
+        "principle_name": "Humanos Definen, M\u00e1quinas Ejecutan"
+      }
+    },
+    "principle-governance-as-code": {
+      "id": "principle-governance-as-code",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a72. Governance as Code",
+      "lines": [
+        33,
+        63
+      ],
+      "content": "Las pol\u00edticas, guardrails y est\u00e1ndares son artefactos versionados en Git, no documentos est\u00e1ticos en wikis olvidadas. Lo que no est\u00e1 en el repositorio, no existe.\n\n**Jerarqu\u00eda de Governance:**\n\n```\nConstitution (Principios inmutables)\n    \u2193\nGuardrails (Directivas operacionales)\n    \u2193\nSpecs (Contratos de implementaci\u00f3n)\n    \u2193\nValidation Gates (Puntos de control)\n```",
+      "metadata": {
+        "principle_number": "2",
+        "principle_name": "Governance as Code"
+      }
+    },
+    "principle-platform-agnosticism": {
+      "id": "principle-platform-agnosticism",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a73. Platform Agnosticism",
+      "lines": [
+        49,
+        79
+      ],
+      "content": "RaiSE funciona donde funciona Git. No hay dependencia de GitHub, GitLab, Bitbucket, ni ning\u00fan proveedor espec\u00edfico. El protocolo Git es el transporte universal.\n\n**Extensi\u00f3n MCP v2.0:** Adoptamos MCP (Model Context Protocol) como est\u00e1ndar de integraci\u00f3n con agentes, pero sin lock-in\u2014el fallback a archivos est\u00e1ticos (.cursorrules, .claude.md) siempre existe.",
+      "metadata": {
+        "principle_number": "3",
+        "principle_name": "Platform Agnosticism"
+      }
+    },
+    "principle-validation-gates-en-cada-fase": {
+      "id": "principle-validation-gates-en-cada-fase",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a74. Validation Gates en Cada Fase",
+      "lines": [
+        55,
+        85
+      ],
+      "content": "No existe un solo \"Done\". Cada fase tiene su propia **Validation Gate** que debe cruzarse antes de avanzar. La calidad no es un evento final; es un proceso continuo.\n\n**Los 8 Validation Gates est\u00e1ndar:**\n\n| Gate           | Fase           | Criterio Core                       |\n| -------------- | -------------- | ----------------------------------- |\n| Gate-Context   | Discovery      | Stakeholders y restricciones claras |\n| Gate-Discovery | Discovery      | PRD validado                        |\n| Gate-Vision    | Vision         | Solution Vision aprobada            |\n| Gate-Design    | Design         | Tech Design completo                |\n| Gate-Backlog   | Planning       | HUs priorizadas                     |\n| Gate-Plan      | Planning       | Implementation Plan verificado      |\n| Gate-Code      | Implementation | C\u00f3digo que pasa validaciones       |\n| Gate-Deploy    | Deployment     | Feature en producci\u00f3n              |",
+      "metadata": {
+        "principle_number": "4",
+        "principle_name": "Validation Gates en Cada Fase"
+      }
+    },
+    "principle-heutagog\u00eda-sobre-dependencia": {
+      "id": "principle-heutagog\u00eda-sobre-dependencia",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a75. Heutagog\u00eda sobre Dependencia",
+      "lines": [
+        72,
+        102
+      ],
+      "content": "El sistema no solo entrega el pescado, **ense\u00f1a a pescar**. Al finalizar sesiones cr\u00edticas, RaiSE desaf\u00eda al humano para asegurar comprensi\u00f3n y ownership de la soluci\u00f3n.\n\n**Las 4 preguntas heutag\u00f3gicas:**\n\n1. \u00bfQu\u00e9 aprendiste que no sab\u00edas antes?\n2. \u00bfQu\u00e9 cambiar\u00edas del proceso?\n3. \u00bfHay mejoras para el framework?\n4. \u00bfEn qu\u00e9 eres m\u00e1s capaz ahora?",
+      "metadata": {
+        "principle_number": "5",
+        "principle_name": "Heutagog\u00eda sobre Dependencia"
+      }
+    },
+    "principle-mejora-continua-(kaizen)": {
+      "id": "principle-mejora-continua-(kaizen)",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a76. Mejora Continua (Kaizen)",
+      "lines": [
+        83,
+        113
+      ],
+      "content": "Si un prompt fall\u00f3 o el c\u00f3digo requiri\u00f3 muchas iteraciones, los guardrails y katas se refinan. El sistema aprende de sus errores y mejora para la siguiente vez.\n\n**Ciclo Kaizen en RaiSE:**\n\n```\nImplementar \u2192 Observar \u2192 Reflexionar \u2192 Mejorar \u2192 Implementar...\n```",
+      "metadata": {
+        "principle_number": "6",
+        "principle_name": "Mejora Continua (Kaizen)"
+      }
+    },
+    "principle-lean-software-development": {
+      "id": "principle-lean-software-development",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a77. Lean Software Development",
+      "lines": [
+        93,
+        123
+      ],
+      "content": "RaiSE aplica los principios del Toyota Production System al desarrollo asistido por IA:\n\n| Principio Lean         | Manifestaci\u00f3n en RaiSE           |\n| ---------------------- | --------------------------------- |\n| Eliminar desperdicio   | Context-first (no hallucinations) |\n| Amplificar aprendizaje | Checkpoints heutag\u00f3gicos         |\n| Decidir tarde          | Specs antes de c\u00f3digo            |\n| Entregar r\u00e1pido       | Validation Gates (no batch)       |\n| Empoderar al equipo    | Modelo Orquestador                |\n| Construir integridad   | Jidoka (parar en defectos)        |\n| Ver el todo            | Golden Data coherente             |\n\n> Para desarrollo completo de la filosof\u00eda de aprendizaje, ver [05-learning-philosophy-v2.md](./05-learning-philosophy-v2.md).",
+      "metadata": {
+        "principle_number": "7",
+        "principle_name": "Lean Software Development"
+      }
+    },
+    "principle-observable-workflow": {
+      "id": "principle-observable-workflow",
+      "type": "principle",
+      "file": "framework/reference/constitution.md",
+      "section": "\u00a78. Observable Workflow",
+      "lines": [
+        109,
+        139
+      ],
+      "content": "Cada decisi\u00f3n del agente debe ser **trazable y auditable**. No hay cajas negras. La observabilidad es prerequisito para mejora continua y compliance regulatorio.\n\n**Componentes de Observable Workflow:**\n\n| Pilar MELT        | Funci\u00f3n en RaiSE                           |\n| ----------------- | ------------------------------------------- |\n| **Metrics** | Tokens, re-prompting rate, escalation rate  |\n| **Events**  | Gates pasados/fallidos, escalaciones        |\n| **Logs**    | Razonamiento del agente (cuando disponible) |\n| **Traces**  | Flujo completo spec \u2192 plan \u2192 c\u00f3digo      |\n\n**Principio operativo:** Si no puedes auditar c\u00f3mo se tom\u00f3 una decisi\u00f3n, no puedes mejorarla ni defenderla ante reguladores.\n\n**Almacenamiento:** Local (JSONL), privacy-first, compatible con OpenTelemetry para export.\n\n> Este principio habilita compliance con EU AI Act y es fundamento para Kaizen basado en datos.\n\n---\n\n## Valores de Dise\u00f1o\n\n| Valor                    | Sobre          | Explicaci\u00f3n                                        |\n| ------------------------ | -------------- | --------------------------------------------------- |\n| **Simplicidad**    | Completitud    | Preferir soluciones simples que cubran 80% de casos |\n| **Composabilidad** | Monolitos      | Componentes peque\u00f1os que se combinan               |\n| **Transparencia**  | Magia          | Todo debe ser inspeccionable y explicable           |\n| **Convenci\u00f3n**    | Configuraci\u00f3n | Defaults sensatos, override cuando necesario        |\n| **Evoluci\u00f3n**     | Revoluci\u00f3n    | Cambios incrementales sobre rewrites totales        |\n| **Observabilidad** | Opacidad       | [NUEVO v2.0] Trazabilidad por defecto               |",
+      "metadata": {
+        "principle_number": "8",
+        "principle_name": "Observable Workflow"
+      }
+    }
+  },
+  "edges": [
+    {
+      "from": "req-rf-02",
+      "to": "outcome-ci/cd",
+      "type": "implements",
+      "reason": "Requirement mentions 'CI/CD'"
+    },
+    {
+      "from": "req-rf-02",
+      "to": "outcome-ci/cd",
+      "type": "implements",
+      "reason": "Requirement mentions 'CI/CD'"
+    },
+    {
+      "from": "req-rf-02",
+      "to": "principle-governance-as-code",
+      "type": "governed_by",
+      "reason": "Requirement relates to 'Governance as Code'"
+    },
+    {
+      "from": "req-rf-02",
+      "to": "principle-validation-gates-en-cada-fase",
+      "type": "governed_by",
+      "reason": "Requirement relates to 'Validation Gates en Cada Fase'"
+    },
+    {
+      "from": "req-rf-03",
+      "to": "outcome-template-scaffolding",
+      "type": "implements",
+      "reason": "Requirement mentions 'Template scaffolding'"
+    },
+    {
+      "from": "req-rf-04",
+      "to": "outcome-template-scaffolding",
+      "type": "implements",
+      "reason": "Requirement mentions 'Template scaffolding'"
+    },
+    {
+      "from": "req-rf-04",
+      "to": "principle-governance-as-code",
+      "type": "governed_by",
+      "reason": "Requirement relates to 'Governance as Code'"
+    },
+    {
+      "from": "req-rf-05",
+      "to": "principle-governance-as-code",
+      "type": "governed_by",
+      "reason": "Requirement relates to 'Governance as Code'"
+    },
+    {
+      "from": "req-rf-06",
+      "to": "outcome-brownfield-analysis-sar",
+      "type": "implements",
+      "reason": "Requirement mentions 'Brownfield analysis (SAR)'"
+    },
+    {
+      "from": "req-rf-07",
+      "to": "principle-validation-gates-en-cada-fase",
+      "type": "governed_by",
+      "reason": "Requirement relates to 'Validation Gates en Cada Fase'"
+    },
+    {
+      "from": "req-rf-08",
+      "to": "principle-observable-workflow",
+      "type": "governed_by",
+      "reason": "Requirement relates to 'Observable Workflow'"
+    }
+  ]
+}
