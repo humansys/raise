@@ -70,7 +70,94 @@
 
 > Pydantic models for type-safe data structures
 
-### [No schemas yet - will be added as engines are built]
+### Governance Models (F2.1)
+- **Location:** `src/raise_cli/governance/models.py`
+- **Purpose:** Pydantic models for concept extraction from governance files
+- **Added:** F2.1 (Epic E2)
+- **Public API:**
+  - `ConceptType(Enum)` - REQUIREMENT, OUTCOME, PRINCIPLE, PATTERN, PRACTICE
+  - `Concept(BaseModel)` - Semantic concept with id, type, file, section, lines, content, metadata
+  - `ExtractionResult(BaseModel)` - Result with concepts list, total, files_processed, errors
+- **Features:**
+  - Type-safe concept representation
+  - Line range validation (start <= end)
+  - Serialization/deserialization support
+- **Dependencies:** Pydantic v2
+- **Tests:** 11 unit tests (100% coverage)
+
+---
+
+## Governance Module (E2)
+
+> Concept extraction from governance markdown files
+
+### Governance Parsers (F2.1)
+- **Location:** `src/raise_cli/governance/parsers/`
+- **Purpose:** Extract semantic concepts from governance markdown files
+- **Added:** F2.1 (Epic E2)
+- **Sub-modules:**
+  - `prd.py` - Extract requirements (RF-XX format) from PRD files
+  - `vision.py` - Extract outcomes from Vision markdown tables
+  - `constitution.py` - Extract principles (§N format) from Constitution
+- **Public API:**
+  - `extract_requirements(file_path, project_root) -> list[Concept]`
+  - `extract_outcomes(file_path, project_root) -> list[Concept]`
+  - `extract_principles(file_path, project_root) -> list[Concept]`
+- **Features:**
+  - Regex-based pattern matching for structured markdown
+  - Content truncation (500 chars or 20-30 lines)
+  - Graceful handling of missing files, malformed sections
+  - ID sanitization for concept identifiers
+- **Coverage:** PRD 91%, Vision 95%, Constitution 95%
+- **Tests:** 15 (PRD) + 18 (Vision) + 15 (Constitution) = 48 unit tests
+- **Related:** ADR-011 (concept-level graph architecture)
+
+### Governance Extractor (F2.1)
+- **Location:** `src/raise_cli/governance/extractor.py`
+- **Purpose:** Orchestrate concept extraction from all governance files
+- **Added:** F2.1 (Epic E2)
+- **Public API:**
+  - `GovernanceExtractor(project_root)` - Initialize extractor
+  - `.extract_from_file(file_path, concept_type) -> list[Concept]` - Extract from single file
+  - `.extract_all() -> list[Concept]` - Extract from all standard locations
+  - `.extract_with_result() -> ExtractionResult` - Extract with metadata
+- **Standard Locations:**
+  - `governance/projects/*/prd.md` (requirements)
+  - `governance/solution/vision.md` (outcomes)
+  - `framework/reference/constitution.md` (principles)
+- **Features:**
+  - Automatic concept type inference from file path
+  - Error collection without crashing
+  - Logging of extraction progress
+- **Dependencies:** All parsers (prd, vision, constitution)
+- **Coverage:** 78% (logger statements and exception paths untested)
+- **Tests:** 14 unit + integration tests
+- **Related:** ADR-011
+
+### Graph Extract CLI Command (F2.1)
+- **Location:** `src/raise_cli/cli/commands/graph.py`
+- **Purpose:** CLI interface for concept extraction
+- **Added:** F2.1 (Epic E2)
+- **Commands:**
+  - `raise graph extract [FILE_PATH]` - Extract concepts from governance files
+- **Options:**
+  - `--format/-f` (human|json) - Output format
+- **Features:**
+  - Human-readable output with Rich formatting (✓ checkmarks, colors, statistics)
+  - JSON output for machine processing
+  - Extract from single file or all governance files
+  - Error display for missing files
+- **Example Output (human):**
+  ```
+  Extracting concepts from governance files...
+    📄 prd.md → 8 requirements
+    📄 vision.md → 8 outcomes
+    📄 constitution.md → 8 principles
+  → Total: 24 concepts extracted
+  ```
+- **Dependencies:** GovernanceExtractor, Rich
+- **Tests:** 8 CLI integration tests
+- **Related:** ADR-011
 
 ---
 

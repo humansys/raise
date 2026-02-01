@@ -9,6 +9,7 @@ import typer
 from rich.console import Console
 
 from raise_cli import __version__
+from raise_cli.cli.commands.graph import graph_app
 from raise_cli.config import RaiseSettings
 
 # Module-level state for error handling
@@ -30,6 +31,9 @@ app = typer.Typer(
     no_args_is_help=True,
     add_completion=False,
 )
+
+# Register command groups
+app.add_typer(graph_app, name="graph")
 
 console = Console()
 
