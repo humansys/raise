@@ -1,8 +1,8 @@
 # RaiSE Glossary
 ## Vocabulario Canónico del Framework
 
-**Versión:** 2.5.0
-**Fecha:** 30 de Enero, 2026
+**Versión:** 2.6.0
+**Fecha:** 31 de Enero, 2026
 **Propósito:** Definiciones canónicas de términos usados en el ecosistema RaiSE.
 
 > **Nota de versión 2.1:** Actualización de niveles de Kata (L0-L3 → Principios/Flujo/Patrón/Técnica), adición de ShuHaRi como lente del Orquestador, y Jidoka inline.
@@ -12,6 +12,8 @@
 > **Nota de versión 2.3:** Simplificación ontológica ADR-008 — modelo de 3 capas (Context/Kata/Skill), eliminación de niveles de kata, introducción de Work Cycles como organización, y Kata Harness como capability de plataforma.
 
 > **Nota de versión 2.4:** Jerarquía de tres niveles ADR-010 — Solution Level (Business Case, Solution Vision, Governance), Project Level (PRD, Project Vision, Tech Design), Codebase Level. "Solution Vision" renombrada a "Project Vision" a nivel proyecto.
+
+> **Nota de versión 2.6:** Arquitectura Skills + Toolkit (ADR-011, ADR-012) — Concept-level graph para MVC (97% token savings), deprecación de Kata/Gate engines en favor de skills + CLI toolkit. Governance Toolkit reemplaza engines con 85% scope reduction.
 
 ---
 
@@ -129,6 +131,97 @@ Teoría del aprendizaje auto-determinado (del griego *heutos* = "uno mismo" + *a
 ### Checkpoint Heutagógico
 Momento estructurado de reflexión al finalizar features significativas. Incluye cuatro preguntas: (1) ¿Qué aprendiste? (2) ¿Qué cambiarías del proceso? (3) ¿Hay mejoras para el framework? (4) ¿En qué eres más capaz ahora? Las respuestas alimentan el crecimiento del Orquestador y la evolución del corpus.
 
+### Concept **[NUEVO v2.6]**
+Unidad semántica extraída de documentos de governance (requirement, principle, outcome, pattern). Los concepts son nodos en el concept graph.
+
+**Tipos de concepts:**
+- **Requirement**: Requisitos funcionales (PRD RF-XX)
+- **Principle**: Principios constitucionales (§1-8)
+- **Outcome**: Resultados clave (Vision)
+- **Pattern**: Patrones arquitectónicos (Design)
+- **Practice**: Prácticas de desarrollo (Katas)
+
+**Estructura:**
+```yaml
+id: req-rf-05
+type: requirement
+file: governance/projects/raise-cli/prd.md
+section: "RF-05: Golden Context Generation"
+lines: [206, 214]
+content: "The system MUST generate..."
+metadata: {requirement_id: "RF-05"}
+```
+
+**Vs archivos completos:** Concepts permiten granularidad de sección vs cargar archivos enteros (97% token savings).
+
+> Introducido en ADR-011. Ver también: Concept Graph, MVC.
+
+### Concept Graph **[NUEVO v2.6]**
+Grafo dirigido de concepts de governance y sus relaciones semánticas. Base del sistema de Minimum Viable Context (MVC).
+
+**Estructura:**
+- **Nodes**: Concepts (requirements, principles, outcomes)
+- **Edges**: Relaciones (implements, governed_by, depends_on)
+
+**Tipos de relaciones:**
+| Tipo | Significado | Ejemplo |
+|------|-------------|---------|
+| `implements` | Requirement implementa outcome | req-rf-05 → outcome-context-generation |
+| `governed_by` | Artifact gobernado por principle | req-rf-05 → principle-governance-as-code |
+| `depends_on` | Concept depende de otro | outcome-A → principle-B |
+| `related_to` | Relación semántica | principle-A → pattern-B |
+
+**Operación:**
+- Query: "validate PRD RF-05" → Graph traversal → Returns MVC (2-5 concepts)
+- Determinista: Same query → Same result
+- Observable: Explain why each concept included
+
+**Token savings:** 97% vs manual (13,657 → 351 tokens)
+
+> Introducido en ADR-011. Reemplaza file-level graph.
+
+### Gate Engine ⚠️ **DEPRECATED v2.6**
+**Status:** Deprecated as of 2026-01-31 (see ADR-012)
+
+**Replacement:** Validation skills + Governance Toolkit
+
+**Migration:**
+- Gate definitions → Skills in `.claude/skills/validate-*`
+- Gate validation → `raise validate` CLI commands
+- Gate execution → Skills guide Claude through validation
+
+**Rationale:** Skills + toolkit approach provides same functionality with 85% less complexity (29 SP → merged into 9 SP toolkit).
+
+> See: Governance Toolkit, Validation Skills
+
+### Governance Toolkit **[NUEVO v2.6]**
+CLI toolset providing deterministic operations for skills to call. Replaces Kata Engine and Gate Engine with simpler architecture.
+
+**Core functions:**
+- **Concept extraction**: Parse governance into semantic concepts
+- **Graph building**: Build concept graph with relationships
+- **MVC queries**: Query graph for minimum viable context
+- **Validation**: Deterministic structure/reference checking
+
+**Commands:**
+```bash
+raise graph build                    # Build concept graph
+raise context query --task <task>   # Get MVC for task
+raise validate structure <file>     # Check structure
+raise parse <file> --type <type>    # Extract concepts
+```
+
+**Architecture:** Skills + Toolkit
+- **Skills** (markdown): Process guidance, judgment
+- **Toolkit** (CLI): Deterministic data extraction
+- **Claude**: Orchestrates tools, synthesizes guidance
+
+**Scope reduction:** 60 SP (engines) → 9 SP (toolkit) = 85% less complexity
+
+**Token savings:** 97% via concept-level MVC queries
+
+> Introduced in ADR-012. Implements ADR-011 concept graph.
+
 ### Jidoka
 
 **Interfaz Simple (Stage 0-1)**: Parar si algo falla
@@ -188,21 +281,34 @@ Segunda capa del modelo ontológico RaiSE. Proceso estructurado que hace visible
 
 > **Migración v2.3:** Los niveles semánticos (principios/flujo/patrón/técnica) fueron eliminados por ADR-008. Las katas se organizan por Work Cycle, no por nivel de abstracción.
 
-### Kata Harness (Capability) [NUEVO v2.3]
-Capability de plataforma RaiSE: motor de ejecución que interpreta definiciones de proceso (Katas) e invoca operaciones atómicas (Skills).
+### Kata Engine ⚠️ **DEPRECATED v2.6**
+**Status:** Deprecated as of 2026-01-31 (see ADR-012)
 
-**Alcance:** El Kata Harness ejecuta **TODAS las katas de cualquier Work Cycle**:
-- `project/`: discovery, vision, design, backlog
-- `feature/`: stories, plan, implement, review
-- `setup/`: analyze, ecosystem
-- `improve/`: retrospective, evolve-kata
+**Replacement:** Kata Skills + Governance Toolkit
 
-**Responsabilidades:**
-- Interpretar Katas y ejecutar sus pasos
-- Invocar Skills con inputs/outputs definidos
-- Gestionar el ciclo de vida del contexto
-- Manejar handoffs entre Katas
-- Aplicar verificaciones Jidoka inline
+**Migration:**
+- Kata definitions remain as `.claude/skills/*` markdown
+- Kata execution → Claude reads skill, follows steps
+- State tracking → Git commits + session logs
+- Interactive prompts → Skills guide Claude
+
+**Rationale:** Katas work better as Agent Skills (markdown guides Claude reads) than programmatic engine. Skills + toolkit provides same functionality with 85% less complexity (31 SP → merged into 9 SP toolkit).
+
+> See: Governance Toolkit, Skills
+
+### Kata Harness (Capability) ⚠️ **EVOLVING v2.6**
+**Status:** Concept under revision per ADR-012
+
+**v2.3 definition:** Motor de ejecución que interpreta definiciones de proceso (Katas) e invoca operaciones atómicas (Skills).
+
+**v2.6 evolution:** With Skills + Toolkit architecture, "Kata Harness" role shifts:
+- **Before**: Programmatic engine executing katas
+- **After**: Claude Code + Skills = natural kata execution
+- **Toolkit**: Provides deterministic operations skills call
+
+**Open question:** Is "Kata Harness" still a useful concept, or is it just "Claude Code + Skills"?
+
+> This term may be deprecated or redefined in future version.
 
 **Nota terminológica:** El término "harness" en AI tiene dos contextos:
 - **Agent Harness** (ejecución): Infraestructura que envuelve un LLM para tareas largas. *RaiSE usa este significado.*
@@ -275,28 +381,41 @@ Adaptación de los principios del Toyota Production System al desarrollo de soft
 
 > Ver [05-learning-philosophy.md](./05-learning-philosophy.md) para desarrollo completo.
 
-### MVC (Minimum Viable Context)
-**[NUEVO v2.2]** El contexto mínimo necesario para que un agente LLM ejecute una tarea correctamente, sin información innecesaria que aumente tokens o confunda.
+### MVC (Minimum Viable Context) **[ACTUALIZADO v2.6]**
+El contexto mínimo necesario para que un agente LLM ejecute una tarea correctamente, sin información innecesaria que aumente tokens o confunda.
 
-**Estructura del MVC:**
+**v2.6 Implementation (Concept-level):**
+Query concept graph → Returns only relevant concepts → 97% token savings
+
+**Estructura del MVC (v2.6):**
 ```yaml
-query:
-  task: "descripción de la tarea"
-  scope: "path/pattern"
-  min_confidence: 0.80
-
-primary_rules:     # Reglas directamente aplicables (contenido completo)
-context_rules:     # Reglas relacionadas (solo resúmenes)
-warnings:          # Conflictos, deprecaciones, baja confianza
-graph_context:     # Subgrafo de relaciones relevantes
+task: "validate-prd"
+concepts:
+  - id: req-rf-05
+    type: requirement
+    file: governance/projects/raise-cli/prd.md
+    section: "RF-05"
+    content: "The system MUST generate..."
+  - id: principle-governance-as-code
+    type: principle
+    file: framework/reference/constitution.md
+    section: "§2"
+    content: "Standards versioned in Git..."
+total_concepts: 2
+total_tokens: 132
 ```
 
 **Principios:**
-- **Determinista**: Mismo input = mismo output (sin LLM en retrieval)
-- **Token-efficient**: Resúmenes para reglas de contexto, completas para primarias
-- **Graph-aware**: Traversal de relaciones entre reglas
+- **Determinista**: Graph traversal (same query → same concepts)
+- **Token-efficient**: Return sections, not entire files (97% savings)
+- **Graph-aware**: Traversal de concept relationships
+- **Observable**: Can explain why each concept included
 
-> **Comando asociado:** `/context/get` entrega el MVC para una tarea específica.
+**Evolution:**
+- v2.2: Rule-based (files)
+- v2.6: Concept-based (sections) - 97% token reduction
+
+> **Comando asociado:** `raise context query --task <task>` returns MVC via concept graph (ADR-011)
 
 ### Observable Workflow
 **[NUEVO v2.0]** Flujo de trabajo donde cada decisión del agente es trazable y auditable. Alineado con el framework MELT (Metrics, Events, Logs, Traces) de observabilidad.
@@ -442,8 +561,60 @@ Artefacto de nivel **proyecto** que traduce un PRD en visión técnica de alto n
 ### PRD (Product Requirements Document)
 Artefacto de nivel **proyecto** en la fase Discovery que captura requisitos del producto desde la perspectiva de negocio y usuarios.
 
+### Toolkit **[NUEVO v2.6]**
+CLI toolset providing deterministic operations for skills. Component of Governance Toolkit architecture.
+
+**Purpose:** Extract data, validate structure, query graphs - operations that would waste inference tokens if Claude did them manually.
+
+**Common commands:**
+```bash
+raise parse <file> --type <type>     # Extract concepts
+raise validate structure <file>      # Check structure
+raise context query --task <task>    # Get MVC
+raise graph build                    # Build concept graph
+```
+
+**Design principle:** Return structured JSON for Claude to interpret, not human-readable text.
+
+**Inference economy:** Gather with CLI (cheap), synthesize with Claude (valuable).
+
+> Introduced in ADR-012. See: Governance Toolkit.
+
 ### Technical Design
 Especificación técnica que traduce la Project Vision en arquitectura, componentes y decisiones de implementación.
+
+### Transpiration **[NUEVO v2.6]**
+Automated extraction of structured data from human-readable markdown into machine-processable formats.
+
+**Process:**
+```
+Markdown (human-authored)
+  ↓ Parsing (regex, markdown parsers)
+Structured concepts (JSON)
+  ↓ Serialization
+Formal schemas (LinkML, JSON Schema) [future]
+```
+
+**Example:**
+```markdown
+### RF-05: Golden Context Generation
+| ID | Requirement | Priority |
+...
+```
+↓ Transpiration ↓
+```json
+{
+  "id": "req-rf-05",
+  "type": "requirement",
+  "content": "The system MUST generate..."
+}
+```
+
+**Rationale:** Humans write markdown, machines process structured data. Transpiration bridges the gap.
+
+**Status:** MD → JSON implemented (ADR-011). MD → LinkML deferred to E2.5.
+
+> Implements ONT-022 vision. See: Concept, Concept Graph.
 
 ### Implementation Plan
 Plan paso a paso que guía la ejecución determinista de una tarea. Incluye tasks atómicas, dependencias y criterios de verificación.
