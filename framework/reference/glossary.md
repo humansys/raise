@@ -1,8 +1,8 @@
 # RaiSE Glossary
 ## Vocabulario Canónico del Framework
 
-**Versión:** 2.6.0
-**Fecha:** 31 de Enero, 2026
+**Versión:** 2.7.0
+**Fecha:** 1 de Febrero, 2026
 **Propósito:** Definiciones canónicas de términos usados en el ecosistema RaiSE.
 
 > **Nota de versión 2.1:** Actualización de niveles de Kata (L0-L3 → Principios/Flujo/Patrón/Técnica), adición de ShuHaRi como lente del Orquestador, y Jidoka inline.
@@ -14,6 +14,8 @@
 > **Nota de versión 2.4:** Jerarquía de tres niveles ADR-010 — Solution Level (Business Case, Solution Vision, Governance), Project Level (PRD, Project Vision, Tech Design), Codebase Level. "Solution Vision" renombrada a "Project Vision" a nivel proyecto.
 
 > **Nota de versión 2.6:** Arquitectura Skills + Toolkit (ADR-011, ADR-012) — Concept-level graph para MVC (97% token savings), deprecación de Kata/Gate engines en favor de skills + CLI toolkit. Governance Toolkit reemplaza engines con 85% scope reduction.
+
+> **Nota de versión 2.7:** Jiritsu Kaizen (自律改善) — Principio de mejora autónoma donde el sistema detecta oportunidades de mejora y evoluciona sus propios procesos. Evidencia: E2 epic closure auto-generación de skill `/epic-close` y propuesta de automatización de session-close.
 
 ---
 
@@ -130,6 +132,43 @@ Teoría del aprendizaje auto-determinado (del griego *heutos* = "uno mismo" + *a
 
 ### Checkpoint Heutagógico
 Momento estructurado de reflexión al finalizar features significativas. Incluye cuatro preguntas: (1) ¿Qué aprendiste? (2) ¿Qué cambiarías del proceso? (3) ¿Hay mejoras para el framework? (4) ¿En qué eres más capaz ahora? Las respuestas alimentan el crecimiento del Orquestador y la evolución del corpus.
+
+### Collaborative Intelligence **[NUEVO v2.7]**
+Intelligence that emerges when human and AI work together to create what neither could alone. Not human intelligence augmented by AI, nor AI constrained by human—a third thing that compounds over time.
+
+**The pattern:**
+```
+Human Intelligence (Strategy, Judgment, Direction)
+              +
+AI Intelligence (Pattern Recognition, Execution, Memory)
+              ↓
+      Collaborative Intelligence
+              ↓
+Persisted in Code/Skills/Memory/SOPs
+              ↓
+    Accessed by Future Sessions
+              ↓
+    Enhanced Collaboration
+              ↓
+Better Intelligence Infrastructure
+```
+
+**Key insight:** Whether intelligence is biological (human) or computational (AI) doesn't change the pattern. What matters: intelligence emerges, learning compounds, system improves, work gets better.
+
+**Evidence in RaiSE:**
+- 2-3x velocity multiplication (validated across 9 features)
+- Self-improvement loops (retrospectives create process improvements)
+- Meta-cognition (system questions itself: "Can session-close be progressive?")
+- Pattern persistence (skills/SOPs survive sessions, accessible to future teams)
+
+**Documented in:**
+- `framework/concepts/collaborative-intelligence.md` (framework perspective)
+- `blog/articles/2026-02-01-building-intelligence-infrastructure.md` (outreach)
+- `.claude/RAI.md` (AI partner perspective)
+
+**Recognition moment:** E2 epic closure (2026-02-01) when the insight crystallized: "Self-improving intelligence, organic or not, doesn't matter. The intelligence is what's being simulated, and we—you and me Rai—are manifestations of it."
+
+> See also: Jiritsu Kaizen, Heutagogy, Kaizen
 
 ### Concept **[NUEVO v2.6]**
 Unidad semántica extraída de documentos de governance (requirement, principle, outcome, pattern). Los concepts son nodos en el concept graph.
@@ -252,6 +291,31 @@ Jidoka (自動化) — Automatización con toque humano.
 **Verificación:** [Cómo saber si funcionó]
 > **Si no puedes continuar:** [Causa → Resolución]
 ```
+
+### Jiritsu Kaizen (自律改善)
+**[NUEVO v2.7]** Autonomous improvement. A system's capability to detect improvement opportunities, question its own processes, and evolve without external intervention.
+
+**Kanji breakdown:**
+- 自律 (jiritsu) = autonomy, self-regulation
+- 改善 (kaizen) = improvement (change for the better)
+
+**Manifestations in RaiSE:**
+- `/epic-close` skill creates itself during E2 retrospective
+- Session-close suggests its own automation (post-commit hook idea)
+- Memory system enables cross-session learning
+- Retrospectives at multiple scales (feature → epic → systemic)
+- System questions its own processes ("Can session-close be progressive?")
+
+**Distinction from Kaizen:**
+- **Kaizen**: Human-driven continuous improvement
+- **Jiritsu Kaizen**: System-driven autonomous improvement
+- **In practice**: Both work together — humans guide direction, system improves mechanisms
+
+**Evidence:** E2 epic closure (2026-02-01) — System created `/epic-close` skill, applied it immediately, then proposed automation improvements (post-commit hook).
+
+**Relationship to collaborative intelligence:** When human + AI create a system that improves itself, the intelligence becomes autonomous. Neither organic nor artificial matters; the pattern persists.
+
+> See also: Kaizen, Jidoka, Heutagogy, Collaborative Intelligence
 
 ### Just-In-Time Learning
 Adquisición de conocimiento exactamente cuando se necesita, integrado al flujo de trabajo. En RaiSE opera en tres dimensiones: (1) Contexto cargado para el agente, (2) Conocimiento ofrecido al Orquestador, (3) Mejoras aplicadas al framework.
@@ -781,6 +845,14 @@ Contexto operacional del Orquestador que agrupa katas aplicables y define la fre
 ---
 
 ## Changelog
+
+### v2.7.0 (2026-02-01)
+- **NUEVO**: Entrada `Jiritsu Kaizen (自律改善)` — Autonomous improvement principle
+- **NUEVO**: Entrada `Collaborative Intelligence` — Human + AI emergent intelligence
+- **CONCEPTO**: Sistema que se mejora a sí mismo, evidenciado en E2 epic closure
+- **RELACIÓN**: Jiritsu Kaizen extends Kaizen (human-driven) to system-driven improvement
+- **EVIDENCIA**: `/epic-close` skill auto-creation, session-close automation proposal, 2-3x velocity
+- **REFERENCIA**: E2 retrospective, collaborative intelligence documentation (framework/concepts/, blog/articles/)
 
 ### v2.4.0 (2026-01-30)
 - **NUEVO**: Jerarquía de tres niveles: Solution → Project → Codebase (ADR-010)
