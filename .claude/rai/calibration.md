@@ -15,8 +15,12 @@
 | F1.4 Exception Hierarchy | 3 | S | - | ~30min | - | No formal estimate |
 | F1.5 Output Module | 3 | S | 2h 45m | 15min | 11x | Second kata cycle |
 | F1.6 Core Utilities | 3 | S | - | ~10min | - | Third kata cycle, no estimate |
+| F2.1 Concept Extraction | 3 | S | 2-4h | 52min | 3.5x | Spike + design-first, 7 tasks, 81 tests |
+| F2.2 Graph Builder | 2 | S | 150-210min | 65min | 2.3-3.2x | Full kata cycle, BFS traversal, 63 tests |
+| F2.3 MVC Query Engine | 2 | S | 190min | 90min | 2.1x | Full kata cycle, 4 strategies, 99 tests |
 
-**Average ratio:** ~14x faster than traditional estimates
+**Average ratio (kata-optimized):** ~2-3x faster with full kata cycle
+**Pattern:** Design-first + concrete examples + atomic tasks = 2-3x velocity multiplier (stabilized)
 
 ---
 
@@ -36,16 +40,21 @@
 1. **AI-assisted velocity is dramatically higher** than traditional estimates assume
 2. **Well-defined specs** (design.md with concrete examples) reduce implementation time
 3. **Task bundling** happens naturally - Tasks 1-5 in F1.5 were really one atomic unit
-4. **Calibration needs more data** - sample sizes too small for confidence
+4. **Spike validation multiplier** - F2.1 had working spike, achieved 3.5x vs ~14x without spike
+5. **Design quality impacts velocity** - Concrete examples in design.md = copy-paste implementation
+6. **Calibration stabilized at 2-3x** - Full kata cycle (F2.1, F2.2, F2.3) consistently delivers 2-3x velocity
+7. **Kata cycle effect is real** - Three consecutive features with full cycle all delivered at 2-3x
+8. **Simple > Complex** - Keyword matching, token heuristics outperform ML approaches on velocity
+9. **Architecture reuse compounds** - F2.3 reused F2.2's BFS traversal without modification
 
 ---
 
 ## Calibration Goals
 
-- [ ] Collect 5+ samples per size category
-- [ ] Identify which factors predict faster/slower completion
-- [ ] Adjust T-shirt size ranges based on data
+- [x] Collect 5+ samples per size category (9 features total)
+- [x] Identify which factors predict faster/slower completion (kata cycle = 2-3x)
+- [ ] Adjust T-shirt size ranges based on data (apply 0.5x multiplier for kata-optimized features)
 
 ---
 
-*Last updated: 2026-01-31 (E1 complete - F1.6)*
+*Last updated: 2026-01-31 (E2 in progress - F2.3 complete)*

@@ -194,28 +194,37 @@ Treat AI inference as a scarce resource:
 | Search | ripgrep (shell) |
 | Testing | pytest |
 
-### Pattern: Modular Monolith
+### Pattern: Skills + Toolkit (ADR-012)
+
+**Architecture decision (E2):** Instead of monolithic engines, use:
+- **Skills:** Process guides (markdown) for AI to execute
+- **CLI Toolkit:** Deterministic operations for data extraction/validation
 
 ```
 src/raise_cli/
-├── engines/       # Stable core logic (DO NOT import content)
-│   ├── kata.py    # Kata execution engine
-│   ├── gate.py    # Gate validation engine
-│   └── skill.py   # Skill execution engine
-├── katas/         # Built-in kata definitions (content)
-├── skills/        # Built-in skill definitions (content)
-├── schemas/       # Pydantic models for ALL data structures
+├── governance/    # E2 Governance Toolkit
+│   ├── extraction/    # Parse governance files → concepts
+│   ├── graph/         # Build concept graph with relationships
+│   └── query/         # MVC queries (97% token savings)
 ├── cli/           # Typer CLI commands
-└── core/          # Shared utilities
+│   ├── commands/      # Command modules (context, graph, etc.)
+│   └── main.py        # CLI app entry point
+├── schemas/       # Pydantic models for ALL data structures
+├── config/        # Settings with cascade (CLI → env → file → defaults)
+├── output/        # Output formatters (human/json/table)
+├── core/          # Shared utilities (git, file ops)
+├── exceptions.py  # Exception hierarchy with exit codes
+├── engines/       # Reserved for future engines (empty)
+└── handlers/      # Reserved for orchestration (empty)
 ```
 
-**Key Principle:** Engines are stable. Interfaces come and go. Content grows organically.
+**Key Principle:** Build dumb tools + smart context, not smart engines.
 
 **Rules:**
-- Engines import schemas, NEVER content (katas/, skills/)
-- Content uses engines via well-defined interfaces
-- New katas/skills don't require engine changes
-- All config/data structures use Pydantic BaseModel (not dict or TypedDict)
+- Governance modules provide deterministic operations
+- Skills (in `.claude/skills/`) orchestrate CLI toolkit
+- All data structures use Pydantic BaseModel (not dict or TypedDict)
+- CLI commands can call modules directly (no handlers needed for simple operations)
 
 ### Package
 

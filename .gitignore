@@ -5,6 +5,9 @@
 .claude/settings.local.json
 CLAUDE.local.md
 
+# RaiSE generated/cache files
+.raise/cache/
+
 # Temporary files
 *.tmp
 *.log

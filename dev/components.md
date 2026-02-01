@@ -70,7 +70,225 @@
 
 > Pydantic models for type-safe data structures
 
-### [No schemas yet - will be added as engines are built]
+### Governance Models (F2.1)
+- **Location:** `src/raise_cli/governance/models.py`
+- **Purpose:** Pydantic models for concept extraction from governance files
+- **Added:** F2.1 (Epic E2)
+- **Public API:**
+  - `ConceptType(Enum)` - REQUIREMENT, OUTCOME, PRINCIPLE, PATTERN, PRACTICE
+  - `Concept(BaseModel)` - Semantic concept with id, type, file, section, lines, content, metadata
+  - `ExtractionResult(BaseModel)` - Result with concepts list, total, files_processed, errors
+- **Features:**
+  - Type-safe concept representation
+  - Line range validation (start <= end)
+  - Serialization/deserialization support
+- **Dependencies:** Pydantic v2
+- **Tests:** 11 unit tests (100% coverage)
+
+---
+
+## Governance Module (E2)
+
+> Concept extraction from governance markdown files
+
+### Governance Parsers (F2.1)
+- **Location:** `src/raise_cli/governance/parsers/`
+- **Purpose:** Extract semantic concepts from governance markdown files
+- **Added:** F2.1 (Epic E2)
+- **Sub-modules:**
+  - `prd.py` - Extract requirements (RF-XX format) from PRD files
+  - `vision.py` - Extract outcomes from Vision markdown tables
+  - `constitution.py` - Extract principles (§N format) from Constitution
+- **Public API:**
+  - `extract_requirements(file_path, project_root) -> list[Concept]`
+  - `extract_outcomes(file_path, project_root) -> list[Concept]`
+  - `extract_principles(file_path, project_root) -> list[Concept]`
+- **Features:**
+  - Regex-based pattern matching for structured markdown
+  - Content truncation (500 chars or 20-30 lines)
+  - Graceful handling of missing files, malformed sections
+  - ID sanitization for concept identifiers
+- **Coverage:** PRD 91%, Vision 95%, Constitution 95%
+- **Tests:** 15 (PRD) + 18 (Vision) + 15 (Constitution) = 48 unit tests
+- **Related:** ADR-011 (concept-level graph architecture)
+
+### Governance Extractor (F2.1)
+- **Location:** `src/raise_cli/governance/extractor.py`
+- **Purpose:** Orchestrate concept extraction from all governance files
+- **Added:** F2.1 (Epic E2)
+- **Public API:**
+  - `GovernanceExtractor(project_root)` - Initialize extractor
+  - `.extract_from_file(file_path, concept_type) -> list[Concept]` - Extract from single file
+  - `.extract_all() -> list[Concept]` - Extract from all standard locations
+  - `.extract_with_result() -> ExtractionResult` - Extract with metadata
+- **Standard Locations:**
+  - `governance/projects/*/prd.md` (requirements)
+  - `governance/solution/vision.md` (outcomes)
+  - `framework/reference/constitution.md` (principles)
+- **Features:**
+  - Automatic concept type inference from file path
+  - Error collection without crashing
+  - Logging of extraction progress
+- **Dependencies:** All parsers (prd, vision, constitution)
+- **Coverage:** 78% (logger statements and exception paths untested)
+- **Tests:** 14 unit + integration tests
+- **Related:** ADR-011
+
+### Graph Module (F2.2)
+- **Location:** `src/raise_cli/governance/graph/`
+- **Purpose:** Build and query concept-level directed graphs from extracted concepts
+- **Added:** F2.2 (Epic E2)
+- **Sub-modules:**
+  - `models.py` - Pydantic models for ConceptGraph and Relationship
+  - `relationships.py` - Rule-based relationship inference (4 rules)
+  - `traversal.py` - BFS graph traversal with depth limits
+  - `builder.py` - GraphBuilder orchestrator
+- **Public API:**
+  - `ConceptGraph(BaseModel)` - Graph with nodes dict, edges list, metadata
+  - `Relationship(BaseModel)` - Directed edge with source, target, type, metadata
+  - `RelationshipType` - Literal type (implements, governed_by, depends_on, related_to, validates)
+  - `GraphBuilder().build(concepts) -> ConceptGraph` - Build graph from concepts
+  - `traverse_bfs(graph, start_id, edge_types, max_depth) -> list[Concept]` - BFS traversal
+- **Relationship Inference Rules:**
+  1. `implements` - Requirement → Outcome (keyword matching in content)
+  2. `governed_by` - Requirement/Outcome → Principle (§N references)
+  3. `depends_on` - Concept → Concept (explicit "depends on RF-XX")
+  4. `related_to` - Concept ↔ Concept (>3 shared keywords)
+- **Features:**
+  - JSON serialization/deserialization (to_json/from_json)
+  - Graph query methods (get_node, get_outgoing_edges, get_incoming_edges)
+  - Build metadata (timestamp, version, edge statistics)
+  - Cycle handling in BFS (visited set)
+  - Keyword extraction with stopword filtering
+- **Performance:**
+  - Build <2s for 50 concepts (measured)
+  - BFS <100ms for 50-node graph (measured)
+- **Coverage:** models 100%, relationships 86%, traversal 100%, builder 92%
+- **Tests:** 14 (models) + 19 (relationships) + 11 (traversal) + 9 (builder) + 10 (integration) = 63 tests
+- **Dependencies:** F2.1 Concept models
+- **Related:** ADR-011 (concept-level graph architecture)
+
+### Graph CLI Commands (F2.1, F2.2)
+- **Location:** `src/raise_cli/cli/commands/graph.py`
+- **Purpose:** CLI interface for concept graph operations (extract, build, validate)
+- **Added:** F2.1 (extract), F2.2 (build, validate) - Epic E2
+- **Commands:**
+  - `raise graph extract [FILE_PATH]` - Extract concepts from governance files
+  - `raise graph build` - Build concept graph with relationship inference
+  - `raise graph validate` - Validate graph structure and relationships
+- **Options (extract):**
+  - `--format/-f` (human|json) - Output format
+- **Options (build):**
+  - `--concepts/-c PATH` - Custom concepts JSON file (default: `.raise/cache/concepts.json`)
+  - `--output/-o PATH` - Custom output location (default: `.raise/cache/graph.json`)
+- **Options (validate):**
+  - `--graph/-g PATH` - Custom graph file to validate (default: `.raise/cache/graph.json`)
+- **Features:**
+  - Human-readable output with Rich formatting (✓ checkmarks, colors, statistics)
+  - JSON output for machine processing (extract)
+  - Auto-extraction if concepts not cached (build)
+  - Graph validation (all edges valid, cycle detection, reachability)
+  - Automatic cache directory creation
+- **Example Output (build):**
+  ```
+  Building concept graph...
+    ✓ Loaded 24 concepts
+    ✓ Inferred 33 relationships
+      - related_to: 33
+    ✓ Saved to .raise/cache/graph.json
+
+  Graph: 23 nodes, 33 edges
+  ```
+- **Example Output (validate):**
+  ```
+  Validating graph...
+    ✓ All relationships valid
+    ✓ No cycles detected
+    ✓ 23/23 concepts reachable
+
+  Graph is valid.
+  ```
+- **Dependencies:** GovernanceExtractor, GraphBuilder, ConceptGraph, Rich
+- **Tests:** 8 (extract) + 4 (build) + 4 (validate) = 16 CLI integration tests
+- **Related:** ADR-011
+
+### MVC Query Engine (F2.3)
+- **Location:** `src/raise_cli/governance/query/`
+- **Purpose:** Extract Minimum Viable Context (MVC) from concept graph, achieving >90% token savings vs loading full files
+- **Added:** F2.3 (Epic E2)
+- **Type:** Query orchestrator with 4 strategies, multiple output formats
+- **Public API:**
+  - `ContextQueryEngine(graph)` - Initialize with concept graph
+  - `ContextQueryEngine.from_cache(path) -> ContextQueryEngine` - Load from cached graph JSON
+  - `engine.query(ContextQuery) -> ContextResult` - Execute query and return results
+  - `ContextQuery(query, strategy, max_depth, filters)` - Query parameters
+  - `ContextResult(concepts, metadata)` - Query results with metadata
+  - `result.to_json() -> str` - Serialize to JSON
+  - `result.to_file(path, format)` - Save to file (markdown or json)
+- **Query Strategies:**
+  1. `CONCEPT_LOOKUP` - Direct ID lookup + 1-hop dependencies (governed_by, implements)
+  2. `KEYWORD_SEARCH` - Keyword matching with optional type filter
+  3. `RELATIONSHIP_TRAVERSAL` - Follow specific edge types via BFS
+  4. `RELATED_CONCEPTS` - Semantic similarity via shared keywords (>2 shared)
+- **Output Formats:**
+  - **Markdown:** AI-optimized with headers, relationship annotations, token estimates
+  - **JSON:** Structured output with concepts array + metadata object
+- **Metadata Tracked:**
+  - Token estimate (words * 1.3 heuristic, spike-validated)
+  - Execution time (ms)
+  - Relationship paths (for explainability)
+  - Traversal depth (actual vs max)
+- **Features:**
+  - Reuses F2.2 BFS traversal (no duplication)
+  - Simple keyword matching (no NLP dependencies)
+  - Relationship path tracing for "why this concept?" explanations
+  - Token savings estimation vs manual file loading
+- **Performance:**
+  - Direct lookup: <50ms (target)
+  - Keyword search: <200ms (target)
+  - BFS traversal: <100ms (target)
+  - Token savings: >90% (measured vs ~6,000 token baseline)
+- **Coverage:** models 100%, strategies 98%, engine 98%, formatters 100%
+- **Tests:** 14 (models) + 27 (strategies) + 22 (engine) + 17 (formatters) + 8 (CLI) + 11 (integration) = 99 tests
+- **Dependencies:** F2.1 Concept models, F2.2 ConceptGraph + BFS traversal
+- **Related:** ADR-011 (97% token savings validated)
+
+### Context CLI Commands (F2.3)
+- **Location:** `src/raise_cli/cli/commands/context.py`
+- **Purpose:** CLI interface for querying concept graph and retrieving MVC
+- **Added:** F2.3 (Epic E2)
+- **Commands:**
+  - `raise context query <QUERY>` - Query concept graph for Minimum Viable Context
+- **Options:**
+  - `--format/-f (markdown|json)` - Output format (default: markdown)
+  - `--output/-o PATH` - Save to file instead of stdout
+  - `--strategy/-s STRATEGY` - Explicit strategy selection
+  - `--max-depth/-d INT` - Maximum traversal depth (0-5, default: 1)
+  - `--edge-types/-e TYPES` - Comma-separated edge types to follow (e.g., "governed_by,implements")
+  - `--type/-t TYPE` - Filter by concept type (requirement, principle, outcome)
+- **Examples:**
+  ```bash
+  # Query by concept ID
+  raise context query "req-rf-05"
+
+  # Keyword search in requirements only
+  raise context query "validation" --type requirement
+
+  # Traverse relationships
+  raise context query "req-rf-05" --strategy relationship_traversal --edge-types governed_by
+
+  # Save to file as JSON
+  raise context query "req-rf-05" --output context.json --format json
+  ```
+- **Features:**
+  - Human-readable markdown output (default) optimized for AI consumption
+  - JSON output for tool integration
+  - Error handling with helpful messages (graph not found → suggests `raise graph build`)
+  - Token estimate and savings displayed in output
+  - Execution time tracking
+- **Dependencies:** ContextQueryEngine, ConceptGraph, Rich
+- **Tests:** 8 CLI integration tests
+- **Related:** ADR-011
 
 ---
 
