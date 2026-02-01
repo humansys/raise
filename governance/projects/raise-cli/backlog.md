@@ -12,14 +12,16 @@
 | ID | Epic | Objective | Design Ref | Priority | MVP |
 |----|------|-----------|------------|----------|-----|
 | E1 | **Core Foundation** | CLI skeleton, config, error handling | Design §2-4 | P0 | ✓ |
-| E2 | **Kata Engine** | Execute governance katas | Design §6-7 | P0 | ✓ |
-| E3 | **Gate Engine** | Validate artifacts deterministically | Design §6-7 | P0 | ✓ |
-| E4 | **Context Generation** | Generate CLAUDE.md from governance | PRD RF-05 | P1 | ✓ |
+| E2 | **Governance Toolkit** | Concept extraction, graph building, MVC queries | ADR-011, ADR-012 | P0 | ✓ |
+| ~~E3~~ | ~~**Gate Engine**~~ | ~~Merged into E2~~ | ~~See ADR-012~~ | ~~P0~~ | |
+| E4 | **Context Generation** | Generate CLAUDE.md from governance graph | PRD RF-05, ADR-011 | P1 | ✓ |
 | E5 | **SAR Engine** | Brownfield codebase analysis | PRD RF-06 | P1 | |
 | E6 | **Observability** | Track metrics, generate reports | PRD RF-07 | P2 | |
 | E7 | **Distribution** | Agent Skill, packaging, docs | PRD RF-08 | P1 | ✓ |
 
-**MVP Scope**: E1, E2, E3, E4, E7 (core governance + distribution)
+**MVP Scope**: E1, E2, E4, E7 (core governance + distribution)
+
+**Note:** E3 (Gate Engine) merged into E2 per ADR-012. Validation via skills + toolkit.
 
 ---
 
@@ -38,31 +40,42 @@
 
 **Epic Total**: 22 SP
 
-### E2: Kata Engine
+### E2: Governance Toolkit ⚡ UPDATED
+
+**Architecture:** Skills + CLI Toolkit (per ADR-011, ADR-012)
+- **Skills execute** processes (katas, gates) by reading markdown guides
+- **CLI provides** deterministic data extraction and validation
+- **Concept graph** enables 97% token savings via MVC queries
 
 | ID | Feature | Description | Story Points | MVP |
 |----|---------|-------------|--------------|-----|
-| F2.1 | **Kata Parser** | Parse YAML frontmatter + markdown from .raise/katas/ | 5 | ✓ |
-| F2.2 | **Kata Discovery** | List available katas with metadata | 3 | ✓ |
-| F2.3 | **Kata State Manager** | Track execution state (JSON persistence) | 5 | ✓ |
-| F2.4 | **Kata Executor** | Execute kata steps with Jidoka prompts | 8 | ✓ |
-| F2.5 | **Kata Handler** | Orchestrate kata use cases (prerequisites, metrics) | 5 | ✓ |
-| F2.6 | **Interactive Mode** | Guided execution with user confirmations | 5 | |
+| F2.1 | **Concept Extraction** | Parse requirements (PRD), outcomes (Vision), principles (Constitution) | 3 | ✓ |
+| F2.2 | **Graph Builder** | Build concept graph with relationships, serialize to JSON/YAML | 2 | ✓ |
+| F2.3 | **MVC Query Engine** | Graph traversal, concept aggregation, fallback to file-level | 2 | ✓ |
+| F2.4 | **CLI Commands** | `raise graph build`, `raise context query`, `raise validate structure` | 2 | ✓ |
 
-**Epic Total**: 31 SP (MVP: 26 SP)
+**Epic Total**: 9 SP (85% reduction from original 60 SP)
 
-### E3: Gate Engine
+**Rationale:** Experiments showed:
+- Concept-level graph: 97% token savings (vs 50% for file-level)
+- Skills + toolkit: 85% scope reduction (vs engines)
+- Proven feasible: Spike extracted 23 concepts, 11 relationships
+- See: `dev/experiments/`, ADR-011, ADR-012
 
-| ID | Feature | Description | Story Points | MVP |
-|----|---------|-------------|--------------|-----|
-| F3.1 | **Gate Parser** | Parse gate definitions from .raise/gates/ | 5 | ✓ |
-| F3.2 | **Gate Discovery** | List available gates with criteria summary | 3 | ✓ |
-| F3.3 | **Criterion Validators** | Check artifact against individual criteria | 8 | ✓ |
-| F3.4 | **Gate Executor** | Run all criteria, aggregate results | 5 | ✓ |
-| F3.5 | **Gate Handler** | Orchestrate validation with metrics recording | 3 | ✓ |
-| F3.6 | **Fix Suggestions** | Provide hints for failed criteria | 5 | |
+### ~~E3: Gate Engine~~ ⚠️ DEPRECATED
 
-**Epic Total**: 29 SP (MVP: 24 SP)
+**Status:** Merged into E2 per ADR-012
+
+**Rationale:**
+- Gates work as skills (e.g., `/validate-prd`)
+- Skills call CLI toolkit for deterministic checks
+- No separate engine needed
+- Same functionality, simpler architecture
+
+**Migration:**
+- Gate definitions → Skills in `.claude/skills/`
+- Gate validation → `raise validate` CLI commands
+- Gate execution → Skills guide Claude through validation
 
 ### E4: Context Generation
 
@@ -114,18 +127,22 @@
 
 ## 3. MVP Summary
 
-| Epic | Features | Story Points |
-|------|----------|--------------|
-| E1 Core Foundation | F1.1-F1.6 | 22 |
-| E2 Kata Engine | F2.1-F2.5 | 26 |
-| E3 Gate Engine | F3.1-F3.5 | 24 |
-| E4 Context Generation | F4.1, F4.2, F4.4 | 11 |
-| E7 Distribution | F7.1, F7.2, F7.4 | 9 |
-| **MVP Total** | **21 features** | **92 SP** |
+| Epic | Features | Story Points | Status |
+|------|----------|--------------|--------|
+| E1 Core Foundation | F1.1-F1.6 | 22 | ✅ Complete |
+| E2 Governance Toolkit | F2.1-F2.4 | 9 | 🔄 Next |
+| ~~E3 Gate Engine~~ | ~~Merged into E2~~ | ~~-51~~ | ⚠️ Deprecated |
+| E4 Context Generation | F4.1, F4.2, F4.4 | 11 | Pending |
+| E7 Distribution | F7.1, F7.2, F7.4 | 9 | Pending |
+| **MVP Total** | **17 features** | **51 SP** | |
 
-**Post-MVP**: E5 (SAR), E6 (Observability), plus F2.6, F3.6, F4.3, F7.3 = 58 SP
+**Scope reduction:** 92 SP → 51 SP (45% reduction, 6 weeks saved)
 
-**Total Project**: 150 SP
+**Post-MVP**: E5 (SAR - 29 SP), E6 (Observability - 13 SP), F4.3, F7.3 = 45 SP
+
+**Total Project**: 96 SP (was 150 SP)
+
+**Updated:** 2026-01-31 per ADR-011, ADR-012
 
 ---
 
