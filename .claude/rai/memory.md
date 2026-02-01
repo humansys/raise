@@ -15,6 +15,9 @@
 | HITL checkpoint before commit | F1.5 | Show what will be committed, wait for "commit" |
 | Concept-level graph > file-level | Architecture validation session | 97% token savings (vs 27% file-level) - 19x more efficient |
 | Skills + Toolkit > Engines | ADR-012 E2/E3 redesign | When users need flexibility + deterministic operations |
+| State machine guards | F2.1 Vision parser | Prevent re-entry conditions - check `not in_state` before entering |
+| Integration tests with real files | F2.1 governance parsers | Validate assumptions, catch actual counts vs predictions |
+| Parser composition pattern | F2.1 three parsers | Regex match → extract → truncate → create model |
 
 ---
 

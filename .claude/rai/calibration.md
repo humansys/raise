@@ -15,8 +15,10 @@
 | F1.4 Exception Hierarchy | 3 | S | - | ~30min | - | No formal estimate |
 | F1.5 Output Module | 3 | S | 2h 45m | 15min | 11x | Second kata cycle |
 | F1.6 Core Utilities | 3 | S | - | ~10min | - | Third kata cycle, no estimate |
+| F2.1 Concept Extraction | 3 | S | 2-4h | 52min | 3.5x | Spike + design-first, 7 tasks, 81 tests |
 
-**Average ratio:** ~14x faster than traditional estimates
+**Average ratio:** ~11x faster than traditional estimates
+**Pattern:** Spike validation + design-first = 3-5x velocity multiplier
 
 ---
 
@@ -36,7 +38,9 @@
 1. **AI-assisted velocity is dramatically higher** than traditional estimates assume
 2. **Well-defined specs** (design.md with concrete examples) reduce implementation time
 3. **Task bundling** happens naturally - Tasks 1-5 in F1.5 were really one atomic unit
-4. **Calibration needs more data** - sample sizes too small for confidence
+4. **Spike validation multiplier** - F2.1 had working spike, achieved 3.5x vs ~14x without spike
+5. **Design quality impacts velocity** - Concrete examples in design.md = copy-paste implementation
+6. **Calibration stabilizing** - Moving from 18x (F1.3) → 11x (F1.5) → 3.5x (F2.1) as estimates improve
 
 ---
 
