@@ -16,6 +16,12 @@
   - Integration: Jira, Confluence, Rovo Dev (Atlassian ecosystem)
   - Architecture: V2 decisions should enable V3 (session graph, memory persistence)
   - See: `.claude/rai/identity.md` for vision
+  - **From OpenClaw research (RES-OPENCLAW-001):**
+    - [ ] Pre-compaction memory flush — auto-save state before context truncation
+    - [ ] Gateway abstraction — single control plane for multi-interface (Jira, Rovo, CLI, MCP)
+    - [ ] Typed kata execution — Lobster-inspired pipelines with approval gates + resume tokens
+    - [ ] Token monitoring — track session context usage, trigger flush at soft threshold
+    - [ ] Hybrid skills — markdown process + JSON schema + validation code
 
 ---
 
@@ -23,6 +29,17 @@
 
 ### Framework Improvements
 
+- [ ] **Post-Session Alignment Skill** (`/align-docs`) - After strategic sessions, auto-update docs:
+  - Generate ADRs from decisions made
+  - Update vision/architecture docs
+  - Sync CLAUDE.md with new patterns
+  - Could be triggered by `/session-close` for ideation/research sessions
+  - Note: Doing manually now (2026-02-01) for quality; automate later
+- [ ] **Identity Core Implementation** - Restructure `.claude/rai/` as Identity Core:
+  - See ADR-013 (Rai as Entity) and ADR-014 (Identity Core Structure)
+  - `.rai/` with identity/, memory/, relationships/, growth/
+  - manifest.yaml for instance metadata
+  - Portable across agents (Claude Code, Cursor, etc.)
 - [ ] **Session Graph Enabler Epic** - Apply E2 pattern (extract→graph→query) to session continuity:
   - Extract session concepts (outcomes, learnings, blockers, patterns)
   - Build temporal graph with momentum tracking
@@ -47,6 +64,7 @@
 
 - [ ] What are the Lean Spec Principles? How do they apply to governance artifacts?
 - [x] ~~Are agent personas really needed for katas?~~ **RESOLVED** — No. See `work/research/agent-personas/` (RES-PERSONA-001)
+- [x] ~~OpenClaw/Moltbot architecture patterns for V3~~ **RESOLVED** — See `work/research/openclaw-architecture/` (RES-OPENCLAW-001)
 
 ### Governance Content Improvements (E2)
 
@@ -64,4 +82,4 @@
 
 *Created: 2026-01-31*
 *Last reviewed: 2026-01-31*
-*Last updated: 2026-01-31 (F2.2 retrospective items added)*
+*Last updated: 2026-02-01 (Identity Core, post-session alignment skill ideas)*

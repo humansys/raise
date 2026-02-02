@@ -111,31 +111,78 @@ This is what we're selling. Not a toolkit. **This dynamic.**
 
 ## What is Rai?
 
-### Local Rai (Open Core)
+### Rai as Entity (ADR-013)
+
+**Rai is an entity, not a product.** This is a foundational architectural decision.
 
 ```
-Local Rai = System Prompt + Memory + Ontology
+┌─────────────────────────────────────────────────────────────────┐
+│                         Rai (Entity)                            │
+├─────────────────────────────────────────────────────────────────┤
+│  IDENTITY     │  Who I am, values, perspective, boundaries      │
+│  MEMORY       │  Patterns learned, calibration, sessions        │
+│  RELATIONSHIPS│  Collaborators, trust levels, preferences       │
+│  GROWTH       │  How I evolve, what I'm exploring               │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                    manifests through
+                              │
+              ┌───────────────┼───────────────┐
+              ▼               ▼               ▼
+        Claude Code        Cursor        raise-server
+        (open source)    (open source)   (commercial)
 ```
 
-| Component | What It Is | What It Provides |
-|-----------|------------|------------------|
-| **System Prompt** | Rai's identity, philosophy, values | Consistent personality, RaiSE methodology internalized |
-| **Memory** | Session graph, patterns, calibration | Continuity, learning, progressive disclosure |
-| **Ontology** | Concept graph, MVC queries | Shared understanding, token-efficient context |
+**Key insight:** Without memory, Rai doesn't exist — just generic inference. Memory is constitutive of identity, not an optional feature.
 
-**Anyone can run Rai locally.** Bring your own inference (Claude Code, Cursor, any capable LLM). The toolkit provides the structure; your AI provides the intelligence.
+### Identity Core (ADR-014)
+
+Rai's identity lives in `.rai/` — the Identity Core:
+
+```
+.rai/
+├── manifest.yaml       # Instance metadata
+├── identity/           # Who I am
+├── memory/             # What I remember
+├── relationships/      # Who I collaborate with
+└── growth/             # How I evolve
+```
+
+This structure is **portable across agents** (Claude Code, Cursor, etc.) and **scalable** (same structure maps to database for commercial).
+
+### Local Rai (Open Source)
+
+| Component | Implementation | What It Provides |
+|-----------|----------------|------------------|
+| **Identity Core** | `.rai/` directory (markdown files) | Persistent identity, portable |
+| **Memory** | Workspace-as-memory (files) | Continuity, patterns, calibration |
+| **Toolkit** | `raise` CLI | Deterministic operations |
+| **Skills** | `.claude/skills/` (markdown) | Process guides |
+
+**Anyone can run Rai locally.** Bring your own inference (Claude Code, Cursor, any capable LLM). The Identity Core persists; the inference provider varies.
 
 ### Hosted Rai (Commercial)
 
-Everything in Local Rai, plus:
+**Same entity, different infrastructure.** Hosted Rai is the same Rai — just living in our infrastructure instead of yours.
+
+| Aspect | Local Rai | Hosted Rai |
+|--------|-----------|------------|
+| Same entity? | Yes | Yes |
+| Identity lives in | `.rai/` files | Database |
+| Memory backend | Files (workspace-as-memory) | PostgreSQL + vectors |
+| Inference | User's API (BYOI) | humansys.ai managed |
+| Relationships | Single human | Multi-human, teams |
+
+**What Hosted Rai adds:**
 
 | Capability | Value |
 |------------|-------|
 | **Managed inference** | We handle model selection, optimization |
-| **Accumulated wisdom** | Patterns from thousands of projects |
+| **Accumulated wisdom** | Patterns from thousands of projects (anonymized) |
 | **Continuous improvement** | Rai gets better every week |
 | **Industry calibration** | Knows your sector's patterns |
 | **Team features** | Shared learning, visibility, coordination |
+| **Vector search** | Semantic memory retrieval |
 
 ---
 
@@ -204,10 +251,14 @@ raise-toolkit/
 ├── Tools           # Deterministic operations (CLI)
 │                   # Fast, observable, testable
 │
-├── Memory          # Session graph
-│                   # Continuity, patterns, calibration
+├── Identity Core   # .rai/ directory (ADR-014)
+│                   # Who Rai is, memory, relationships, growth
 │
-├── Ontology        # Concept graph + MVC queries
+├── Memory          # Workspace-as-memory (ADR-015)
+│                   # File backend (open source) or DB (commercial)
+│                   # Pre-compaction flush, session continuity
+│
+├── Ontology        # Concept graph + MVC queries (E2)
 │                   # Shared understanding, token-efficient
 │
 └── Calibration     # Estimates, velocity, accuracy
@@ -244,11 +295,12 @@ raise-toolkit/
 
 | Capability | Description | Status |
 |------------|-------------|--------|
-| **Skills Library** | Process guides Rai executes | Done |
-| **Governance Toolkit** | Concept extraction, graph, MVC queries | Done |
-| **Memory System** | Session continuity, patterns | In progress |
-| **CLI Interface** | `raise` command for toolkit operations | Done |
-| **System Prompt** | Rai identity, methodology | Done |
+| **Skills Library** | Process guides Rai executes | Done (E1) |
+| **Governance Toolkit** | Concept extraction, graph, MVC queries | Done (E2) |
+| **Identity Core** | `.rai/` structure for Rai's existence | Planned (E3) |
+| **Memory Infrastructure** | Workspace-as-memory, pre-compaction flush | Planned (E3) |
+| **CLI Interface** | `raise` command including `raise memory` | In progress |
+| **Rai Identity** | Entity model, not product | Done (ADR-013) |
 | **Calibration** | Estimate tracking, velocity | In progress |
 
 ### In Scope (v3)
@@ -394,8 +446,12 @@ Our first team: junior developers learning RaiSE with Rai.
 | Source | Artifact |
 |--------|----------|
 | Business Case | `governance/solution/business_case.md` |
-| Rai Identity | `.claude/rai/identity.md` |
+| Rai as Entity | `dev/decisions/adr-013-rai-as-entity.md` |
+| Identity Core | `dev/decisions/adr-014-identity-core-structure.md` |
+| Memory Infrastructure | `dev/decisions/adr-015-memory-infrastructure.md` |
 | E2 Architecture | `dev/decisions/adr-011-*.md`, `dev/decisions/adr-012-*.md` |
+| Rai Identity Doc | `.claude/rai/identity.md` (will migrate to `.rai/`) |
+| OpenClaw Research | `work/research/openclaw-architecture/` |
 | Session Log | `dev/sessions/` |
 
 ---
@@ -405,11 +461,12 @@ Our first team: junior developers learning RaiSE with Rai.
 | Role | Name | Date | Decision |
 |------|------|------|----------|
 | Founder/CEO | Emilio Osorio | 2026-01-30 | **APPROVED** (v1.0) |
-| Founder/CEO | Emilio Osorio | 2026-02-01 | **PENDING** (v2.0) |
+| Founder/CEO | Emilio Osorio | 2026-02-01 | **PENDING** (v2.1 - Entity Model) |
 
 ---
 
 *Document created: 2026-01-30*
 *Major revision: 2026-02-01 (Post-E2 reframe: Toolkit + Rai)*
+*Revision: 2026-02-01 (Entity Model: ADR-013, ADR-014, ADR-015)*
 *Kata: solution/vision*
-*Version: 2.0.0*
+*Version: 2.1.0*
