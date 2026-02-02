@@ -17,24 +17,26 @@
 | E4 | **Context Generation** | ✅ Via Skills | — | — |
 | E5 | **SAR Engine** | Deferred | — | P2 |
 | E6 | **Observability** | → Replaced by E9 | — | — |
-| E7 | **Distribution & Onboarding** | 📋 DRAFT | `dev/epic-e7-scope.md` | P0 |
-| E8 | **Work Tracking Graph** | 📋 DRAFT | `dev/epic-e8-scope.md` | **P0 (next)** |
-| E9 | **Telemetry & Self-Awareness** | 📋 DRAFT | `dev/epic-e9-scope.md` | P1 |
+| E7 | **Distribution & Onboarding** | 📋 Ready | `dev/epic-e7-scope.md` | **P0 (next)** |
+| E8 | **Work Tracking Graph** | ✅ Complete | `dev/epic-e8-scope.md` | — |
+| E9 | **Local Learning & Self-Awareness** | 📋 Ready | `dev/epic-e9-scope.md` | P1 |
+| E10 | **Collective Intelligence** | 📋 Explored | `dev/epic-e10-scope.md` | P2 (V3) |
 
-**F&F Scope (Feb 9):** E8 → E7 → E9 (partial)
+**F&F Scope (Feb 9):** E7 → E9 (Phase 1 if time)
 
 **Sequence:**
 ```
-E8 Work Tracking Graph    ← Foundational (fix today's problem)
-    ↓
 E7 Distribution & Onboard ← User experience (pip install → /session-start)
     ↓
-E9 Telemetry              ← Learning loop (data-driven retros)
+E9 Local Learning         ← Signals + local insights (Rai as coach)
+    ↓
+E10 Collective Intel      ← Pattern sharing + aggregate telemetry (V3)
 ```
 
 **Notes:**
-- E6 Observability replaced by E9 Telemetry (more focused scope)
-- E8 is foundational — enables graph queries for work tracking
+- E8 complete — enables graph queries for work tracking
+- E9 renamed "Local Learning" — local-first signals and coaching
+- E10 new — collective intelligence with lineage (post-F&F)
 - Each epic has detailed scope doc in `dev/`
 
 ---

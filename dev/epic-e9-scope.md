@@ -1,214 +1,212 @@
-# Epic E9: Telemetry & Self-Awareness - Scope
+# Epic E9: Local Learning & Self-Awareness
 
-> **Status:** DRAFT
-> **Branch:** TBD (`feature/e9/telemetry`)
+> **Status:** DRAFT → Enhanced with local insights
+> **Branch:** `feature/e9/local-learning`
 > **Created:** 2026-02-02
-> **Target:** Post-F&F (Feb 15+)
-> **Depends on:** E8 Work Tracking Graph
+> **Target:** Post-E7 (F&F if time allows)
+> **Depends on:** E7 Distribution
+> **Research:** `work/research/collective-intelligence-lineage/telemetry-model.md`
 
 ---
 
-## Problem Statement
+## Strategic Context
 
-Retrospectives are currently manual and subjective. Rai doesn't have objective data about:
-- How long features actually take vs estimates
-- Where time is spent (design vs implementation vs debugging)
-- Which patterns lead to better outcomes
-- Session productivity trends
+**The principle:** Feedback cycles should be objective and deterministic. How can we REALLY improve otherwise?
 
-**Without telemetry:** Retros rely on memory and gut feel.
-**With telemetry:** Retros are informed by data, calibration improves automatically.
+**The problem:** Retrospectives rely on memory and gut feel. Rai doesn't have objective data about performance, and can't coach you based on your actual patterns.
+
+**The vision:** Local Rai learns from your signals and becomes a coach — surfacing insights, detecting drift, suggesting improvements. All local, no network required.
 
 ---
 
 ## Objective
 
-Instrument the development workflow to collect objective metrics that inform:
-1. **Rai's self-awareness** — Know how we're performing
-2. **Retrospectives** — Data-driven insights, not just opinions
-3. **Calibration** — Automatic adjustment of estimates based on actuals
-4. **Continuous improvement** — Detect patterns, suggest process changes
+Collect deterministic signals from the development workflow and use them locally to:
 
-**Value proposition:** Close the learning loop. Every session contributes to getting better.
+1. **Coach the user** — "You abandon /feature-design for small features — skip for XS?"
+2. **Inform retros** — Objective data, not opinions
+3. **Calibrate estimates** — Automatic adjustment based on actuals
+4. **Detect patterns** — Surface what works and what doesn't
+
+**Value proposition:** Every session makes Rai smarter about *you*. No network required.
 
 ---
 
-## What to Measure
+## Core Principle: Local-First
 
-### Session Metrics
+```
+┌─────────────────────────────────────────────────────────┐
+│                    LOCAL LOOP                           │
+│                                                         │
+│   User works  →  Signals collected  →  Local Rai       │
+│                     (always)             analyzes       │
+│                                            │            │
+│                                            ▼            │
+│                                    Personalized         │
+│                                    coaching             │
+└─────────────────────────────────────────────────────────┘
+```
 
-| Metric | Source | Purpose |
-|--------|--------|---------|
-| Session duration | Start/end timestamps | Productivity patterns |
-| Features touched | Git diff + graph query | Focus vs context switching |
-| Commits made | Git log | Output cadence |
-| Tests added/modified | Git diff | Quality investment |
-| Lines changed | Git diff | Scope indicator |
+**Open core promise:** Works fully offline. Your data stays yours. Rai learns your patterns locally.
 
-### Feature Metrics
+---
 
-| Metric | Source | Purpose |
-|--------|--------|---------|
-| Estimated size | Epic scope (T-shirt) | Baseline |
-| Actual duration | Session logs | Calibration |
-| Velocity ratio | Actual / Estimated | Drift detection |
-| Blockers encountered | Manual tag or detection | Process improvement |
-| Rework count | Same file touched >2 sessions | Quality signal |
+## Minimum Viable Signals
 
-### Process Metrics
+Five deterministic signals that enable continuous improvement:
 
-| Metric | Source | Purpose |
-|--------|--------|---------|
-| Kata adherence | Skill invocations | Process discipline |
-| Retro completion rate | Session logs | Learning loop closure |
-| Parking lot growth | Parking lot file | Scope creep indicator |
-| Memory updates | .rai/memory/ changes | Learning capture |
+| Signal | What it captures | Insight it enables |
+|--------|------------------|-------------------|
+| `skill_event` | start/complete/abandon, duration | Which skills work? Where's friction? |
+| `session_event` | type, outcome, duration | What session types succeed? |
+| `calibration` | estimate vs actual | Are estimates accurate? |
+| `error_event` | tool, type, recoverable | What breaks? What needs fixing? |
+| `command_usage` | command, subcommand | What features matter? |
+
+**What we DON'T collect:** Content, code, file paths, identity. Just signals.
 
 ---
 
 ## Features
 
-| ID | Feature | Size | Priority | Description |
-|----|---------|:----:|:--------:|-------------|
-| F9.1 | **Session Tracker** | S | P0 | Record session start/end, features touched |
-| F9.2 | **Feature Timer** | S | P0 | Track actual time per feature |
-| F9.3 | **Velocity Calculator** | S | P0 | Compute estimated vs actual ratios |
-| F9.4 | **Telemetry Storage** | S | P0 | JSONL storage in `.rai/telemetry/` |
-| F9.5 | **Telemetry CLI** | M | P1 | `raise telemetry velocity`, `raise telemetry drift` |
-| F9.6 | **Retro Integration** | S | P1 | `/feature-review` queries telemetry automatically |
-| F9.7 | **Calibration Updater** | M | P2 | Auto-update calibration.jsonl from actuals |
-| F9.8 | **Dashboard Export** | M | P2 | Export metrics for visualization |
+### Phase 1: Signal Collection (F&F)
 
-**F&F Scope:** F9.1-F9.4 (collection + storage)
-**Post-F&F:** F9.5-F9.8 (CLI + integration)
+| ID | Feature | Size | Status | Description |
+|----|---------|:----:|:------:|-------------|
+| F9.1 | **Signal Schema** | XS | Pending | Define signal types in Pydantic models |
+| F9.2 | **Signal Writer** | S | Pending | Append signals to `.rai/telemetry/signals.jsonl` |
+| F9.3 | **Skill Emitters** | S | Pending | Emit skill_event on start/complete/abandon |
+| F9.4 | **Session Emitters** | S | Pending | Emit session_event from /session-close |
+| F9.5 | **Error Emitters** | XS | Pending | Emit error_event on tool failures |
+
+**Effort:** 4-5 hours | **Cost:** $0
+
+### Phase 2: Local Insights (Post-F&F)
+
+| ID | Feature | Size | Status | Description |
+|----|---------|:----:|:------:|-------------|
+| F9.6 | **Signal Analyzer** | M | Future | Analyze signals.jsonl for patterns |
+| F9.7 | **Insight Generator** | M | Future | Generate insights.jsonl from analysis |
+| F9.8 | **Session Start Integration** | S | Future | Surface insights in /session-start |
+| F9.9 | **Calibration Updater** | S | Future | Auto-update calibration from actuals |
+
+**Effort:** 1-2 days | **Cost:** $0
+
+### Phase 3: Telemetry CLI (Post-F&F)
+
+| ID | Feature | Size | Status | Description |
+|----|---------|:----:|:------:|-------------|
+| F9.10 | **Telemetry Commands** | M | Future | `raise telemetry velocity`, `drift`, `insights` |
+| F9.11 | **Retro Integration** | S | Future | /feature-review queries telemetry |
+
+**Effort:** 1 day | **Cost:** $0
 
 ---
 
 ## Architecture
 
-### Data Flow
-
-```
-Session Start (hook)
-    ↓
-    Record: timestamp, goal, focus_epic, focus_feature
-    ↓
-Work happens...
-    ↓
-    Track: commits, files changed, skill invocations
-    ↓
-Session Close (hook/skill)
-    ↓
-    Record: duration, outcome, blockers
-    ↓
-    Calculate: velocity, drift
-    ↓
-    Store: .rai/telemetry/sessions.jsonl
-    ↓
-Feature Complete
-    ↓
-    Aggregate: total time, sessions count, velocity ratio
-    ↓
-    Store: .rai/telemetry/features.jsonl
-    ↓
-/feature-review
-    ↓
-    Query: telemetry for objective data
-    ↓
-    Enrich: retro with metrics
-```
-
 ### Storage Structure
 
 ```
 .rai/
-├── telemetry/
-│   ├── sessions.jsonl      # Per-session metrics
-│   ├── features.jsonl      # Per-feature aggregates
-│   └── daily.jsonl         # Daily summaries
-└── memory/
-    └── calibration.jsonl   # Updated by telemetry
+├── memory/
+│   ├── patterns.jsonl      # Knowledge (→ E10 for sharing)
+│   ├── calibration.jsonl   # Updated by telemetry
+│   └── sessions/
+│
+└── telemetry/              # E9 scope
+    ├── signals.jsonl       # Raw events (append-only)
+    ├── insights.jsonl      # Rai's observations
+    └── config.json         # Local preferences
 ```
 
-### Session Record Schema
+### Signal Schemas
 
-```jsonl
+**skill_event:**
+```json
 {
-  "id": "SESSION-2026-02-02-001",
-  "date": "2026-02-02",
-  "start": "2026-02-02T08:00:00Z",
-  "end": "2026-02-02T12:30:00Z",
-  "duration_min": 270,
-  "type": "feature",
-  "goal": "Implement E8 Work Tracking Graph",
-  "epic": "E8",
-  "features": ["F8.1", "F8.2"],
-  "outcome": "complete",
-  "commits": 5,
-  "files_changed": 12,
-  "lines_added": 450,
-  "lines_removed": 120,
-  "tests_added": 15,
-  "skills_used": ["/feature-implement", "/session-close"],
-  "blockers": [],
-  "notes": "Smooth session, parser worked first try"
+  "type": "skill_event",
+  "timestamp": "2026-02-02T14:30:00Z",
+  "skill": "feature-design",
+  "event": "complete",
+  "duration_sec": 1800
 }
 ```
 
-### Feature Record Schema
-
-```jsonl
+**session_event:**
+```json
 {
-  "id": "F8.1",
-  "epic": "E8",
-  "name": "Backlog Parser",
-  "size": "S",
-  "estimated_hours": 2,
-  "actual_hours": 1.5,
-  "velocity_ratio": 1.33,
-  "sessions": ["SESSION-2026-02-02-001"],
-  "started": "2026-02-02",
-  "completed": "2026-02-02",
-  "blockers_count": 0,
-  "rework_count": 0
+  "type": "session_event",
+  "timestamp": "2026-02-02T16:00:00Z",
+  "session_type": "feature",
+  "outcome": "success",
+  "duration_min": 90,
+  "features": ["F8.1", "F8.2"]
+}
+```
+
+**calibration:**
+```json
+{
+  "type": "calibration",
+  "timestamp": "2026-02-02T16:00:00Z",
+  "feature_id": "F8.1",
+  "feature_size": "S",
+  "estimated_min": 45,
+  "actual_min": 30,
+  "velocity": 1.5
+}
+```
+
+**error_event:**
+```json
+{
+  "type": "error_event",
+  "timestamp": "2026-02-02T15:00:00Z",
+  "tool": "Bash",
+  "error_type": "command_not_found",
+  "context": "pytest",
+  "recoverable": true
+}
+```
+
+**command_usage:**
+```json
+{
+  "type": "command_usage",
+  "timestamp": "2026-02-02T14:00:00Z",
+  "command": "memory",
+  "subcommand": "query"
+}
+```
+
+### Insight Schema
+
+```json
+{
+  "id": "INS-001",
+  "created": "2026-02-02",
+  "signal_type": "calibration",
+  "pattern": "S estimates trending 1.5x optimistic",
+  "suggestion": "Apply 1.5x multiplier to S estimates",
+  "confidence": "high",
+  "sample_size": 12
 }
 ```
 
 ---
 
-## CLI Commands
+## Local Insights Examples
 
-```bash
-# Session metrics
-$ raise telemetry session --last
-Session: 2026-02-02 (4.5h)
-  Features: F8.1, F8.2
-  Commits: 5
-  Velocity: 1.33x (faster than estimated)
+What Rai surfaces based on signal patterns:
 
-# Velocity trends
-$ raise telemetry velocity --last 10
-Feature     Est    Actual  Ratio
-F3.1        2h     0.25h   8.0x   ← Kata cycle boost
-F3.3        2h     1h      2.0x
-F8.1        2h     1.5h    1.33x
-Average:                   2.5x
-
-# Drift detection
-$ raise telemetry drift --threshold 0.5
-⚠ Calibration drift detected
-  S features: Estimated 2h, Actual avg 0.8h
-  Recommendation: Adjust S estimate to 1h
-
-# Feature summary (for retros)
-$ raise telemetry feature F8.1
-Feature: F8.1 Backlog Parser
-  Size: S (estimated 2h)
-  Actual: 1.5h across 1 session
-  Velocity: 1.33x
-  Blockers: None
-  Rework: None
-```
+| Signal pattern | Insight |
+|----------------|---------|
+| skill_event: /feature-design abandoned 3/5 times for XS | "Consider skipping design for XS features" |
+| session_event: Research 90% success, Feature 60% | "What's different about feature sessions?" |
+| calibration: S estimates consistently 2x off | "Your S estimates are optimistic — adjust?" |
+| error_event: pytest not found 5x this week | "Add pytest to your shell profile?" |
+| command_usage: Never uses `raise context query` | "This command could help with X" |
 
 ---
 
@@ -217,86 +215,81 @@ Feature: F8.1 Backlog Parser
 ### /session-start
 
 ```markdown
-## Telemetry Context
+## Local Insights
 
-Last 5 sessions: avg 3.2h, velocity 2.1x
-Current streak: 3 sessions completing goals
-Calibration status: Healthy (drift < 0.3x)
+Based on your last 10 sessions:
+- Velocity: 1.8x average (you're faster than you think)
+- Pattern: Morning sessions complete 2x more often
+- Suggestion: Your S estimates are 1.5x optimistic
+
+Last session: Feature (success, 90min)
 ```
 
 ### /session-close
 
 ```markdown
-## Session Telemetry
+## Session Signals Recorded
 
-Duration: 4.5h
-Features: F8.1 ✓, F8.2 ✓
-Velocity this session: 1.5x
-Commits: 5 (healthy cadence)
+- Duration: 90 min
+- Outcome: success
+- Features: F8.1, F8.2
+- Skills: /feature-implement ✓, /session-close ✓
 
-→ Recorded to .rai/telemetry/sessions.jsonl
+→ Saved to .rai/telemetry/signals.jsonl
 ```
 
 ### /feature-review
 
 ```markdown
-## Objective Metrics (from telemetry)
+## Objective Metrics
 
-| Metric | Value | Benchmark |
-|--------|-------|-----------|
-| Actual time | 1.5h | Est: 2h |
-| Velocity | 1.33x | Avg: 2.1x |
-| Sessions | 1 | Target: 1-2 |
-| Blockers | 0 | Avg: 0.3 |
+| Metric | Value | Your average |
+|--------|-------|--------------|
+| Duration | 45 min | 60 min |
+| Velocity | 2.0x | 1.5x |
+| Blockers | 0 | 0.3 |
 
-Interpretation: Feature completed efficiently, no rework.
+This feature was 33% faster than your typical S feature.
 ```
 
 ---
 
-## Privacy & Data Ownership
-
-**Principle:** All telemetry is local. User owns their data.
-
-- Stored in `.rai/telemetry/` (git-ignored by default)
-- No external transmission
-- User can delete anytime
-- Export for personal analysis only
-
-**Future (V3):** Opt-in team aggregation with anonymization.
-
----
-
-## In Scope (F&F)
+## In Scope (Phase 1 — F&F)
 
 **MUST:**
-- [ ] Session start/end recording
-- [ ] Feature time tracking
-- [ ] JSONL storage structure
-- [ ] Basic velocity calculation
+- [ ] Signal schema (Pydantic models)
+- [ ] Signal writer (append to signals.jsonl)
+- [ ] Skill event emitters (start/complete/abandon)
+- [ ] Session event emitter (in /session-close)
 
 **SHOULD:**
-- [ ] Hook into /session-start and /session-close
-- [ ] `raise telemetry session --last`
+- [ ] Error event emitter
+- [ ] Command usage tracking
 
 ---
 
-## Out of Scope
+## Out of Scope (E9)
 
-- Team aggregation (V3)
-- External dashboards (V3)
-- Predictive analytics (V4)
-- Automated recommendations (V4)
+- Pattern sharing (→ E10)
+- Aggregate telemetry (→ E10)
+- Team/org features (→ E10)
+- Network sync (→ E10)
+- External dashboards
 
 ---
 
 ## Done Criteria
 
-- [ ] Sessions automatically recorded
-- [ ] Feature time tracked accurately
-- [ ] `raise telemetry velocity` shows trends
-- [ ] /feature-review can query telemetry
-- [ ] Data stored locally, git-ignored
+### Phase 1
+- [ ] Signals emitted from skills
+- [ ] Signals stored in signals.jsonl
+- [ ] No impact on existing functionality
+- [ ] Tests pass
+
+### Phase 2
+- [ ] Insights generated from signals
+- [ ] Insights surfaced in /session-start
+- [ ] Calibration auto-updated
 
 ---
 
@@ -304,22 +297,36 @@ Interpretation: Feature completed efficiently, no rework.
 
 | Metric | Target |
 |--------|--------|
-| Session capture rate | 100% (when using skills) |
-| Velocity calculation accuracy | ±10% of manual tracking |
-| Retro data availability | Every feature has metrics |
+| Signal capture rate | 100% (when using skills) |
+| Insight relevance | User finds 80% of insights useful |
+| Calibration drift | < 1.5x after 10 features |
 
 ---
 
-## Future Vision
+## Relationship to E10
 
-Telemetry enables:
+| E9 (Local Learning) | E10 (Collective Intelligence) |
+|---------------------|-------------------------------|
+| Signals stay local | Signals shared (opt-in) |
+| Rai coaches you | Community learns together |
+| No infrastructure | Requires sync infrastructure |
+| F&F scope | Post-F&F scope |
+| Patterns stay local | Patterns shared with lineage |
 
-1. **Predictive estimation** — "Based on history, this M feature will take ~4h"
-2. **Pattern detection** — "You're faster in morning sessions"
-3. **Team insights** — "Team velocity is 2.3x with RaiSE vs 1.0x without"
-4. **Process optimization** — "Kata cycle adds 30min but saves 2h in rework"
+**E9 is prerequisite for E10** — collect locally first, share later.
 
 ---
 
-*Draft created: 2026-02-02*
-*Status: Ready for review*
+## Origin
+
+From exploration session (2026-02-02):
+
+> "Feedback cycles should be as objective and deterministic as possible. How can we REALLY improve otherwise?" — Emilio
+
+> "The local open core user and your local version Rai should also be able to use that signal." — Emilio
+
+---
+
+*Epic scope - local-first learning*
+*Created: 2026-02-02*
+*Contributors: Emilio Osorio, Rai*
