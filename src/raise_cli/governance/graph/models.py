@@ -12,13 +12,15 @@ from pydantic import BaseModel, Field
 
 from raise_cli.governance.models import Concept
 
-# Relationship types (5 max per ADR-011)
+# Relationship types (E8: extended for work tracking)
 RelationshipType = Literal[
     "implements",  # Requirement implements outcome
     "governed_by",  # Artifact governed by principle
     "depends_on",  # Concept depends on another
     "related_to",  # Semantic relationship
     "validates",  # Gate validates concept (future)
+    "contains",  # Project contains Epic, Epic contains Feature (E8)
+    "current_focus",  # Project's current active Epic (E8)
 ]
 
 
