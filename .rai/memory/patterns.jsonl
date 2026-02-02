@@ -31,3 +31,4 @@
 {"id": "PAT-031", "type": "process", "content": "SessionStart hooks auto-load context on new sessions", "context": ["hooks", "automation", "workflow"], "learned_from": "F3.5", "created": "2026-02-02"}
 {"id": "PAT-032", "type": "process", "content": "Research-first for unfamiliar APIs saves implementation time", "context": ["research", "hooks", "apis", "workflow"], "learned_from": "F3.5", "created": "2026-02-02"}
 {"id": "PAT-033", "type": "process", "content": "Feature merging is natural - plan for it, don't fight it", "context": ["planning", "features", "flexibility"], "learned_from": "E3", "created": "2026-02-02"}
+{"id": "PAT-034", "type": "process", "content": "Identity preload > on-demand for grounding - wake up knowing who I am, retrieve patterns/calibration when needed", "context": ["memory", "hooks", "identity", "session-start"], "learned_from": null, "created": "2026-02-02"}
