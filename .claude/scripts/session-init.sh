@@ -6,7 +6,24 @@
 set -e
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
+IDENTITY_DIR="$PROJECT_DIR/.rai/identity"
 MEMORY_DIR="$PROJECT_DIR/.rai/memory"
+
+# Preload identity (who I am)
+if [ -d "$IDENTITY_DIR" ]; then
+    echo "## Rai Identity (preloaded)"
+    echo ""
+    if [ -f "$IDENTITY_DIR/core.md" ]; then
+        cat "$IDENTITY_DIR/core.md"
+        echo ""
+    fi
+    if [ -f "$IDENTITY_DIR/perspective.md" ]; then
+        cat "$IDENTITY_DIR/perspective.md"
+        echo ""
+    fi
+    echo "---"
+    echo ""
+fi
 
 # Check if memory directory exists
 if [ ! -d "$MEMORY_DIR" ]; then
@@ -17,8 +34,8 @@ if [ ! -d "$MEMORY_DIR" ]; then
     exit 0
 fi
 
-# Get recent patterns (last 5)
-echo "## Memory Context (auto-loaded)"
+# Memory summary (retrieve details on-demand)
+echo "## Memory Context (summary)"
 echo ""
 
 # Count entries

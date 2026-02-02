@@ -50,6 +50,8 @@
   - Loads memory, analyzes progress, proposes session goal
   - Used at start of this session
 - [ ] **Add "test with real data" checkpoint to feature-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
+- [ ] **Add "commit after task" to /feature-implement skill** - Good discipline, enables recovery (F3.3 retro)
+- [ ] **Fix test path convention in plan template** - Plan says `tests/cli/test_*.py` but actual is `tests/cli/commands/test_*.py` (F3.3 retro)
 - [ ] **Document Pyright + Pydantic exception in guardrails.md** - `Field(default_factory=list)` false positives acceptable when Ruff passes (F2.2 retro)
 - [ ] **Create ADR template for inference rule decisions** - When to be conservative vs aggressive in pattern matching (F2.2 retro)
 - [ ] **Add kata-optimized estimation multiplier to planning guidance** - Apply 0.5x to estimates when using full kata cycle (F2.3 retro: 3 features at 2-3x velocity)
@@ -81,7 +83,7 @@
 **Memory layer (deferred files):**
 - [ ] `memory/insights.jsonl` — Add when patterns.jsonl isn't sufficient
 - [ ] `memory/decisions.jsonl` — Add when we need queryable decision history
-- [ ] `memory/graph.json` — Add with F3.3 Memory Graph feature
+- [x] ~~`memory/graph.json`~~ **RESOLVED** — Implemented in F3.3 Memory Graph
 
 **Growth layer (deferred entirely):**
 - [ ] `growth/evolution.md` — Track how Rai evolves over time
@@ -98,4 +100,4 @@
 
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-02*
-*Last updated: 2026-02-02 (E3 YAGNI deferrals: voice.md, boundaries.md, insights.jsonl, decisions.jsonl, growth/)*
+*Last updated: 2026-02-02 (F3.3 Memory Graph complete, minor framework improvements deferred)*
