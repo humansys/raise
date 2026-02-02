@@ -8,6 +8,11 @@
 
 ## Urgent
 
+- [x] **F&F Readiness (Feb 9)** — See `governance/projects/raise-cli/backlog.md` §4
+  - [x] README update (v2 structure) — Done 2026-02-02
+  - [x] Installation guide — In README
+  - [x] Getting started guide — In README
+  - **Validation method:** Dogfooding invertido — simulate F&F user on fresh clone
 - [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
 - [ ] **Rovo AI integration** - Required for Mar 14 webinar (Atlassian agentic dev platform)
 - [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
