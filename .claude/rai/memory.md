@@ -135,7 +135,18 @@ See: `.claude/rai/identity.md` for full vision document.
 - **Should session-close be automatic?** (E2 closure raised) - Trigger at checkpoints (commit, epic close, etc.)
 - How to automate `/framework-sync` with raise CLI in Phase 2/3? (skill manual for now)
 - ~~**How to preserve Rai identity at scale?** (2026-02-01)~~ → Addressed by Entity model + Identity Core (ADR-013, ADR-014)
-- **How to migrate from `.claude/rai/` to `.rai/`?** - Symlink strategy defined in ADR-014, implementation pending
+- ~~**How to migrate from `.claude/rai/` to `.rai/`?**~~ → E3 will implement, ADR-016 defines format (JSONL + Graph)
+
+---
+
+## Process Learnings (continued)
+
+| Insight | Evidence | Applied To |
+|---------|----------|------------|
+| Use skills on your own work | Ran /epic-design on E3 scope | Framework discipline |
+| Subagents can create skills autonomously | /epic-design created by subagent | Skill development |
+| Origin documents accelerate skill execution | E3 scope existed, skill refined it | /epic-design workflow |
+| "As above, so below" applies to memory | Same MVC pattern: governance (E2) and memory (E3) | ADR-016 |
 
 ---
 
