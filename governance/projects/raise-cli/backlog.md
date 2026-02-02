@@ -1,27 +1,41 @@
 # Backlog: raise-cli
 
-> **Status**: Draft
-> **Date**: 2026-01-30
-> **Version**: 1.0.0
+> **Status**: Active
+> **Date**: 2026-02-02
+> **Version**: 1.1.0
 > **Related**: PRD v1.1.0, Vision v1.0.0, Design v1.1.0
 
 ---
 
 ## 1. Epics Overview
 
-| ID | Epic | Objective | Design Ref | Priority | MVP |
-|----|------|-----------|------------|----------|-----|
-| E1 | **Core Foundation** | CLI skeleton, config, error handling | Design §2-4 | P0 | ✓ |
-| E2 | **Governance Toolkit** | Concept extraction, graph building, MVC queries | ADR-011, ADR-012 | P0 | ✓ |
-| ~~E3~~ | ~~**Gate Engine**~~ | ~~Merged into E2~~ | ~~See ADR-012~~ | ~~P0~~ | |
-| E4 | **Context Generation** | Generate CLAUDE.md from governance graph | PRD RF-05, ADR-011 | P1 | ✓ |
-| E5 | **SAR Engine** | Brownfield codebase analysis | PRD RF-06 | P1 | |
-| E6 | **Observability** | Track metrics, generate reports | PRD RF-07 | P2 | |
-| E7 | **Distribution** | Agent Skill, packaging, docs | PRD RF-08 | P1 | ✓ |
+| ID | Epic | Status | Scope Doc | Priority |
+|----|------|--------|-----------|----------|
+| E1 | **Core Foundation** | ✅ Complete | `dev/epic-e1-scope.md` | — |
+| E2 | **Governance Toolkit** | ✅ Complete | `dev/epic-e2-scope.md` | — |
+| E3 | **Identity Core** | ✅ Complete | `dev/epic-e3-scope.md` | — |
+| E4 | **Context Generation** | ✅ Via Skills | — | — |
+| E5 | **SAR Engine** | Deferred | — | P2 |
+| E6 | **Observability** | → Replaced by E9 | — | — |
+| E7 | **Distribution & Onboarding** | 📋 DRAFT | `dev/epic-e7-scope.md` | P0 |
+| E8 | **Work Tracking Graph** | 📋 DRAFT | `dev/epic-e8-scope.md` | **P0 (next)** |
+| E9 | **Telemetry & Self-Awareness** | 📋 DRAFT | `dev/epic-e9-scope.md` | P1 |
 
-**MVP Scope**: E1, E2, E4, E7 (core governance + distribution)
+**F&F Scope (Feb 9):** E8 → E7 → E9 (partial)
 
-**Note:** E3 (Gate Engine) merged into E2 per ADR-012. Validation via skills + toolkit.
+**Sequence:**
+```
+E8 Work Tracking Graph    ← Foundational (fix today's problem)
+    ↓
+E7 Distribution & Onboard ← User experience (pip install → /session-start)
+    ↓
+E9 Telemetry              ← Learning loop (data-driven retros)
+```
+
+**Notes:**
+- E6 Observability replaced by E9 Telemetry (more focused scope)
+- E8 is foundational — enables graph queries for work tracking
+- Each epic has detailed scope doc in `dev/`
 
 ---
 
@@ -62,31 +76,52 @@
 - Proven feasible: Spike extracted 23 concepts, 11 relationships
 - See: `dev/experiments/`, ADR-011, ADR-012
 
-### ~~E3: Gate Engine~~ ⚠️ DEPRECATED
+### E3: Identity Core ✅ COMPLETE (Feb 2026)
 
-**Status:** Merged into E2 per ADR-012
+**Architecture:** Three-Layer Memory Model (per ADR-013, ADR-014, ADR-015, ADR-016)
+- **Identity Layer** (markdown, always loaded) — core.md, perspective.md
+- **Memory Layer** (JSONL + Graph, MVC queryable) — patterns, calibration, sessions
+- **Long-term Layer** (on-demand) — session archives
+
+| ID | Feature | Description | Story Points | Status |
+|----|---------|-------------|--------------|--------|
+| F3.1 | **Identity Core Structure** | Create `.rai/` with identity (md) + memory (jsonl) | 2 | ✅ Complete |
+| F3.2 | **Content Migration** | Migrate `.claude/rai/` → `.rai/` JSONL format | 1 | ✅ Complete |
+| F3.3 | **Memory Graph** | Build concept graph from JSONL, BFS traversal | 3 | ✅ Complete |
+| F3.4 | **Memory Query CLI** | `raise memory query`, `raise memory dump` | 2 | ✅ Complete |
+| F3.5 | **Skills Integration** | /session-start queries graph, /session-close writes JSONL | 1 | ✅ Complete |
+
+**Epic Total**: 9 SP
+**Actual Delivery**: 1 day (Feb 2, 2026) — 2.5x velocity with kata cycle
+**Tests**: 123 total, 96-100% coverage
+
+**Note:** E3 ID was previously "Gate Engine" (deprecated, merged into E2). Reused for Identity Core.
+
+---
+
+### ~~E3: Gate Engine~~ ⚠️ DEPRECATED (Jan 2026)
+
+**Status:** Merged into E2 per ADR-012. E3 ID reused for Identity Core.
 
 **Rationale:**
 - Gates work as skills (e.g., `/validate-prd`)
 - Skills call CLI toolkit for deterministic checks
 - No separate engine needed
-- Same functionality, simpler architecture
 
-**Migration:**
-- Gate definitions → Skills in `.claude/skills/`
-- Gate validation → `raise validate` CLI commands
-- Gate execution → Skills guide Claude through validation
+### E4: Context Generation ⚠️ VIA SKILLS
 
-### E4: Context Generation
+**Implementation:** Via `/framework-sync` skill instead of CLI commands.
+This aligns with Skills + Toolkit architecture (ADR-012): skills orchestrate, CLI provides data.
 
-| ID | Feature | Description | Story Points | MVP |
-|----|---------|-------------|--------------|-----|
-| F4.1 | **Governance Loader** | Load constitution, guardrails, vision from governance/ | 3 | ✓ |
-| F4.2 | **CLAUDE.md Generator** | Produce CLAUDE.md from governance artifacts | 5 | ✓ |
-| F4.3 | **Cursorrules Generator** | Produce .cursorrules from guardrails | 3 | |
-| F4.4 | **Context Handler** | Orchestrate generation with format selection | 3 | ✓ |
+| ID | Feature | Description | Story Points | Status |
+|----|---------|-------------|--------------|--------|
+| F4.1 | **Governance Loader** | Load constitution, guardrails, vision from governance/ | 3 | ✅ Via E2 parsers |
+| F4.2 | **CLAUDE.md Generator** | Produce CLAUDE.md from governance artifacts | 5 | ✅ Via /framework-sync |
+| F4.3 | **Cursorrules Generator** | Produce .cursorrules from guardrails | 3 | Deferred |
+| F4.4 | **Context Handler** | Orchestrate generation with format selection | 3 | ✅ Via skill |
 
 **Epic Total**: 14 SP (MVP: 11 SP)
+**Note:** No `raise context generate` CLI command — skill-based generation is sufficient for v2.0
 
 ### E5: SAR Engine (Brownfield Analysis)
 
@@ -112,81 +147,100 @@
 
 **Epic Total**: 13 SP (not in MVP)
 
-### E7: Distribution
+### E7: Distribution & Onboarding
 
-| ID | Feature | Description | Story Points | MVP |
-|----|---------|-------------|--------------|-----|
-| F7.1 | **Agent Skill** | Create raise/SKILL.md following Anthropic spec | 2 | ✓ |
-| F7.2 | **Package Metadata** | Complete pyproject.toml for PyPI | 2 | ✓ |
-| F7.3 | **Shell Completion** | Bash/Zsh/Fish completions | 3 | |
-| F7.4 | **README & Docs** | User documentation | 5 | ✓ |
+→ **See:** `dev/epic-e7-scope.md`
 
-**Epic Total**: 12 SP (MVP: 9 SP)
+Quick summary: `raise onboard` wizard + `raise status` health check.
 
----
+### E8: Work Tracking Graph
 
-## 3. MVP Summary
+→ **See:** `dev/epic-e8-scope.md`
 
-| Epic | Features | Story Points | Status |
-|------|----------|--------------|--------|
-| E1 Core Foundation | F1.1-F1.6 | 22 | ✅ Complete |
-| E2 Governance Toolkit | F2.1-F2.4 | 9 | 🔄 Next |
-| ~~E3 Gate Engine~~ | ~~Merged into E2~~ | ~~-51~~ | ⚠️ Deprecated |
-| E4 Context Generation | F4.1, F4.2, F4.4 | 11 | Pending |
-| E7 Distribution | F7.1, F7.2, F7.4 | 9 | Pending |
-| **MVP Total** | **17 features** | **51 SP** | |
+Quick summary: Extend governance graph to include projects/epics/features. Enables `raise context query "current work"`.
 
-**Scope reduction:** 92 SP → 51 SP (45% reduction, 6 weeks saved)
+### E9: Telemetry & Self-Awareness
 
-**Post-MVP**: E5 (SAR - 29 SP), E6 (Observability - 13 SP), F4.3, F7.3 = 45 SP
+→ **See:** `dev/epic-e9-scope.md`
 
-**Total Project**: 96 SP (was 150 SP)
-
-**Updated:** 2026-01-31 per ADR-011, ADR-012
+Quick summary: Session/feature metrics for data-driven retrospectives.
 
 ---
 
-## 4. Dependencies
+## 3. F&F Release Summary (Feb 9)
 
+| Epic | Status | Remaining |
+|------|--------|-----------|
+| E1-E4 | ✅ Complete | — |
+| E8 Work Tracking Graph | 📋 Draft | 4 features (~4-6h) |
+| E7 Distribution | 📋 Draft | 2 features (~3-4h) |
+| E9 Telemetry | 📋 Draft | 4 features (~4h) — partial |
+
+**What's done:**
+- CLI: `raise graph`, `raise context`, `raise memory` commands
+- Skills: 11 skills for full development lifecycle
+- Memory: Identity + graph infrastructure for session continuity
+- Tests: 123 tests, 96-100% coverage
+- README: Updated with v2 structure, installation, getting started
+
+**F&F Critical Path:**
 ```
-F1.1 ──▶ F1.2 ──▶ F1.3 ──▶ F1.4 ──▶ F1.5
-                    │
-                    ▼
-              ┌─────┴─────┐
-              ▼           ▼
-           F2.1        F3.1
-              │           │
-              ▼           ▼
-           F2.2        F3.2
-              │           │
-              ▼           ▼
-           F2.3        F3.3
-              │           │
-              ▼           ▼
-           F2.4        F3.4
-              │           │
-              ▼           ▼
-           F2.5        F3.5
-              │           │
-              └─────┬─────┘
-                    ▼
-                  F4.1
-                    │
-                    ▼
-                  F4.2
-                    │
-                    ▼
-                  F7.1 ──▶ F7.2 ──▶ F7.4
+E8 (graph) → E7 (onboard) → E9 (telemetry basics)
+   4-6h         3-4h            4h
 ```
 
-| Blocker | Blocked | Type | Reason |
-|---------|---------|------|--------|
-| F1.2 | F2.*, F3.* | Technical | CLI skeleton required |
-| F1.3 | F2.*, F3.*, F4.* | Technical | Config system required |
-| F1.4 | All features | Technical | Error handling required |
-| F2.1 | F2.2-F2.5 | Technical | Parser needed first |
-| F3.1 | F3.2-F3.5 | Technical | Parser needed first |
-| F2.5, F3.5 | F4.1 | Technical | Engines must work before context |
+**Estimated total:** 11-14 hours (3-4 sessions)
+
+**Post-MVP**: E5 (SAR - 29 SP), E6 (Observability - 13 SP), F4.3, F7.3
+
+**Updated:** 2026-02-02
+
+---
+
+## 4. F&F Readiness (Feb 9, 2026)
+
+### Epic Sequence
+
+| Order | Epic | Purpose | Est. |
+|:-----:|------|---------|------|
+| 1 | **E8 Work Tracking Graph** | Fix alignment problem, queryable backlog | 4-6h |
+| 2 | **E7 Onboarding** | `raise onboard` → pip install to productive | 3-4h |
+| 3 | **E9 Telemetry** | Data for retros, self-awareness | 4h |
+
+### Completed
+
+- [x] README update (v2 structure) — 2026-02-02
+- [x] Installation guide in README
+- [x] Research: OpenClaw onboarding (RES-ONBOARD-001)
+- [x] Epic scopes drafted (E7, E8, E9)
+
+### User Journey (Target)
+
+```
+pip install raise-cli       # Install
+cd my-project               # Their project
+raise onboard               # Wizard creates CLAUDE.md + skills
+raise status                # Verify setup
+/session-start              # In Claude Code → productive
+```
+
+### Validation
+
+**Dogfooding invertido:** Test on fresh repo before sharing with F&F.
+
+---
+
+## 5. Dependencies
+
+```
+E1 (Foundation) ──▶ E2 (Governance) ──▶ E3 (Identity) ──▶ E4 (Context)
+                                                              │
+                                                              ▼
+                                                         E7 (Distribution)
+```
+
+**Current blockers for F&F:**
+- F7.4 (README) blocks F&F launch — no other technical dependencies
 
 ---
 
@@ -398,9 +452,10 @@ Each feature is complete when:
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 1.1.0 | 2026-02-02 | Rai | Sync with reality: E1-E3 complete, E4 via skills, F&F readiness section |
 | 1.0.0 | 2026-01-30 | Claude Opus 4.5 | Initial backlog |
 
 ---
 
-*Generated by: `project/backlog` kata*
-*Template: backlog v1*
+*Updated by: Rai + Emilio*
+*Last sync: 2026-02-02*
