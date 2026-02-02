@@ -58,7 +58,7 @@ Close a working session by preserving learnings, updating memory files, and prep
 
 **Inputs required:**
 - Conversation context (current session)
-- Access to memory files (`.claude/rai/`)
+- Access to memory files (`.rai/memory/`)
 
 **Output:**
 - Updated memory files
@@ -102,20 +102,24 @@ Identify learnings worth preserving:
 
 ### Step 3: Update Memory Files
 
-Update `.claude/rai/` files as appropriate:
+Update `.rai/memory/` files as appropriate:
 
-**memory.md** — Add new entries to relevant sections:
-- Codebase Patterns
-- Process Learnings
-- Collaboration Notes
-- Technical Discoveries
+**patterns.jsonl** — Add new patterns via CLI or direct append:
+```bash
+raise memory add-pattern "Pattern description" -c "context,keywords" -t process
+```
 
-**calibration.md** — If features were completed:
-- Add row to Feature Durations table
-- Update Task Size Calibration if new data
+**calibration.jsonl** — If features were completed:
+```bash
+raise memory add-calibration F3.5 "Feature Name" XS 20 -e 60
+```
 
-**session-index.md** — Add row for this session:
-- Date, Type, Topic, Key Outcomes, Log path
+**sessions/index.jsonl** — Add session record:
+```bash
+raise memory add-session "Session Topic" -o "outcome1,outcome2,outcome3" -t feature
+```
+
+**Note:** CLI commands auto-generate IDs and invalidate graph cache.
 
 **Verification:** Memory files updated with session learnings.
 
@@ -183,11 +187,12 @@ Provide a brief handoff for the next session:
 
 ## Output
 
-- **Memory:** `.claude/rai/memory.md` (updated)
-- **Calibration:** `.claude/rai/calibration.md` (if features completed)
-- **Session Index:** `.claude/rai/session-index.md` (updated)
-- **Context:** `CLAUDE.local.md` (updated)
+- **Patterns:** `.rai/memory/patterns.jsonl` (appended via CLI)
+- **Calibration:** `.rai/memory/calibration.jsonl` (if features completed)
+- **Session Index:** `.rai/memory/sessions/index.jsonl` (appended via CLI)
+- **Context:** `CLAUDE.local.md` (updated manually)
 - **Session Log:** `dev/sessions/YYYY-MM-DD-{topic}.md` (if significant)
+- **Graph:** `.rai/memory/graph.json` (auto-rebuilt on next query)
 
 ## Session Log Template
 
@@ -285,7 +290,7 @@ Each session builds on previous ones. The memory system creates a form of contin
 
 ## References
 
-- Memory files: `.claude/rai/`
+- Memory files: `.rai/memory/`
 - Session logs: `dev/sessions/`
 - Parking lot: `dev/parking-lot.md`
 - RAI perspective: `.claude/RAI.md`

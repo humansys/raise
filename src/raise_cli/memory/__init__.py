@@ -13,10 +13,21 @@ from raise_cli.memory.models import (
     MemoryConceptType,
     MemoryRelationship,
     MemoryRelationshipType,
+    PatternSubType,
 )
 from raise_cli.memory.query import MemoryQuery, MemoryQueryResult
+from raise_cli.memory.writer import (
+    CalibrationInput,
+    PatternInput,
+    SessionInput,
+    WriteResult,
+    append_calibration,
+    append_pattern,
+    append_session,
+)
 
 __all__ = [
+    "CalibrationInput",
     "MemoryCache",
     "MemoryConcept",
     "MemoryConceptType",
@@ -26,5 +37,12 @@ __all__ = [
     "MemoryQueryResult",
     "MemoryRelationship",
     "MemoryRelationshipType",
+    "PatternInput",
+    "PatternSubType",
+    "SessionInput",
+    "WriteResult",
+    "append_calibration",
+    "append_pattern",
+    "append_session",
     "traverse_bfs",
 ]

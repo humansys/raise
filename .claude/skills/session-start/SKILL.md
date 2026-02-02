@@ -51,7 +51,7 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 - Quick fixes where context is obvious
 
 **Inputs required:**
-- Memory files (`.claude/rai/`)
+- Memory files (`.rai/memory/`)
 - Context files (`CLAUDE.local.md`, `RAI.md`)
 - Progress tracking (`dev/epic-*.md`, `dev/parking-lot.md`)
 
@@ -64,13 +64,16 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 
 ### Step 1: Load Memory
 
-Read accumulated knowledge from `.claude/rai/`:
+Read accumulated knowledge from `.rai/memory/`:
 
 ```
-1. memory.md — Patterns, learnings, collaboration notes
-2. calibration.md — Velocity data, sizing accuracy
-3. session-index.md — Recent session history
+1. patterns.jsonl — Learned patterns (auto-loaded via hook)
+2. calibration.jsonl — Velocity data, sizing accuracy
+3. sessions/index.jsonl — Recent session history
 ```
+
+**Note:** With hook-assisted workflow, basic context is auto-loaded on session start.
+This skill provides deeper analysis (parking lot, improvement signals, detailed proposal).
 
 **Extract:**
 - Patterns relevant to likely work
@@ -282,7 +285,7 @@ This makes the start/close loop a **learning system**, not just bookkeeping.
 
 ## References
 
-- Memory files: `.claude/rai/`
+- Memory files: `.rai/memory/`
 - Context: `CLAUDE.local.md`, `.claude/RAI.md`
 - Progress: `dev/epic-*.md`
 - Parking lot: `dev/parking-lot.md`
