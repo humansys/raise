@@ -11,3 +11,4 @@
 {"id": "CAL-011", "feature": "F3.3", "name": "Memory Graph", "size": "S", "sp": 2, "estimated_min": 60, "actual_min": 60, "ratio": 1.0, "kata_cycle": true, "notes": "Full kata cycle, 109 tests, 96-100% coverage, on target", "created": "2026-02-02"}
 {"id": "CAL-012", "feature": "F3.5", "name": "Skills Integration", "size": "XS", "sp": 1, "estimated_min": 30, "actual_min": 45, "ratio": 0.7, "kata_cycle": true, "notes": "Hook-assisted workflow, skipped design kata", "created": "2026-02-02"}
 {"feature_id":"F8.1","feature_name":"Backlog Parser","epic":"E8","size":"S","sp":2,"estimated_min":45,"actual_min":45,"velocity":1.0,"tests":34,"coverage":93,"date":"2026-02-02","notes":"Full kata cycle (design→plan→implement→review)"}
+{"feature_id":"F8.2","feature_name":"Epic Parser","epic":"E8","size":"S","sp":2,"estimated_min":45,"actual_min":20,"velocity":1.5,"tests":27,"coverage":89,"date":"2026-02-02","notes":"Pattern reuse from F8.1, faster implementation"}
