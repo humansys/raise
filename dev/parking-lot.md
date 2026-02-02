@@ -17,7 +17,7 @@
   - Architecture: V2 decisions should enable V3 (session graph, memory persistence)
   - See: `.claude/rai/identity.md` for vision
   - **From OpenClaw research (RES-OPENCLAW-001):**
-    - [ ] Pre-compaction memory flush — auto-save state before context truncation
+    - [x] ~~Pre-compaction memory flush~~ **→ E3** (F3.5 /session-close flush)
     - [ ] Gateway abstraction — single control plane for multi-interface (Jira, Rovo, CLI, MCP)
     - [ ] Typed kata execution — Lobster-inspired pipelines with approval gates + resume tokens
     - [ ] Token monitoring — track session context usage, trigger flush at soft threshold
@@ -35,23 +35,20 @@
   - Sync CLAUDE.md with new patterns
   - Could be triggered by `/session-close` for ideation/research sessions
   - Note: Doing manually now (2026-02-01) for quality; automate later
-- [ ] **Identity Core Implementation** - Restructure `.claude/rai/` as Identity Core:
-  - See ADR-013 (Rai as Entity) and ADR-014 (Identity Core Structure)
+- [x] ~~**Identity Core Implementation**~~ **→ PROMOTED to E3** - See `dev/epic-e3-scope.md`
   - `.rai/` with identity/, memory/, relationships/, growth/
-  - manifest.yaml for instance metadata
-  - Portable across agents (Claude Code, Cursor, etc.)
-- [ ] **Session Graph Enabler Epic** - Apply E2 pattern (extract→graph→query) to session continuity:
-  - Extract session concepts (outcomes, learnings, blockers, patterns)
-  - Build temporal graph with momentum tracking
-  - Progressive disclosure for context loading (reduce token consumption)
-  - Similar to governance graph: 97% token savings potential
+  - JSONL + Graph for memory (MVC pattern from E2)
+  - ADR-013, ADR-014, ADR-015 define architecture
+- [x] ~~**Session Graph Enabler Epic**~~ **→ ADDRESSED by E3** - Memory Graph (F3.3)
+  - Same pattern: extract→graph→query for memory
+  - JSONL storage + concept graph + BFS traversal
+  - Reuses E2 infrastructure
 - [ ] Translate all katas to English (currently some in Spanish)
 - [ ] Apply Lean Spec Principles to katas (after research)
 - [ ] Session management for Claude Code (`raise session start/wrap`) - standardize human-AI collaboration patterns
-- [ ] **Session Start Skill** (`/session-start`) - Automate grounding protocol:
-  - Read RAI.md + CLAUDE.local.md + recent session logs
-  - Check deadlines and blockers
-  - Generate proactive greeting with suggested next steps
+- [x] ~~**Session Start Skill** (`/session-start`)~~ **RESOLVED** — Already exists at `.claude/skills/session-start/`
+  - Loads memory, analyzes progress, proposes session goal
+  - Used at start of this session
 - [ ] **Add "test with real data" checkpoint to feature-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
 - [ ] **Document Pyright + Pydantic exception in guardrails.md** - `Field(default_factory=list)` false positives acceptable when Ruff passes (F2.2 retro)
 - [ ] **Create ADR template for inference rule decisions** - When to be conservative vs aggressive in pattern matching (F2.2 retro)
@@ -62,7 +59,7 @@
 
 ### Research Needed
 
-- [ ] What are the Lean Spec Principles? How do they apply to governance artifacts?
+- [ ] What are the Lean Spec Principles? How do they apply to governance artifacts? **← In progress (subagent researching for /epic-design skill)**
 - [x] ~~Are agent personas really needed for katas?~~ **RESOLVED** — No. See `work/research/agent-personas/` (RES-PERSONA-001)
 - [x] ~~OpenClaw/Moltbot architecture patterns for V3~~ **RESOLVED** — See `work/research/openclaw-architecture/` (RES-OPENCLAW-001)
 
@@ -81,5 +78,5 @@
 ---
 
 *Created: 2026-01-31*
-*Last reviewed: 2026-01-31*
-*Last updated: 2026-02-01 (Identity Core, post-session alignment skill ideas)*
+*Last reviewed: 2026-02-01*
+*Last updated: 2026-02-01 (E3 promotions: Identity Core, Session Graph, Pre-compaction flush; Session Start resolved)*
