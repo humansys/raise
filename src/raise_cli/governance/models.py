@@ -21,6 +21,9 @@ class ConceptType(str, Enum):
         PRINCIPLE: Core principles from Constitution (§N format).
         PATTERN: Design patterns from technical design (future).
         PRACTICE: Process practices from katas (future).
+        PROJECT: Project from backlog (governance/projects/*/backlog.md).
+        EPIC: Epic from backlog or epic scope documents.
+        FEATURE: Feature from epic scope documents.
     """
 
     REQUIREMENT = "requirement"
@@ -28,6 +31,10 @@ class ConceptType(str, Enum):
     PRINCIPLE = "principle"
     PATTERN = "pattern"
     PRACTICE = "practice"
+    # Work tracking types (E8)
+    PROJECT = "project"
+    EPIC = "epic"
+    FEATURE = "feature"
 
 
 class Concept(BaseModel):
