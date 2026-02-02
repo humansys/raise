@@ -1,6 +1,6 @@
 # Epic E3: Identity Core + Memory Graph - Scope
 
-> **Status:** IN PROGRESS (80% complete — M1 Walking Skeleton done)
+> **Status:** COMPLETE (100% — all features delivered)
 > **Branch:** `feature/e3/identity-core`
 > **Created:** 2026-02-01
 > **Target:** Feb 9, 2026 (Friends & Family pre-launch)
