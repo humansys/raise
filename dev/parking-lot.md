@@ -14,7 +14,11 @@
   - [x] Getting started guide — In README
   - **Validation method:** Dogfooding invertido — simulate F&F user on fresh clone
 - [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
-- [ ] **Rovo AI integration** - Required for Mar 14 webinar (Atlassian agentic dev platform)
+- [x] ~~**Rovo AI integration research**~~ **RESOLVED** — See `work/research/rovo-atlassian-integration/` (RES-ROVO-001)
+  - Integration strategy draft created
+  - MCP is primary integration mechanism
+  - E8 design informed by Teamwork Graph compatibility
+- [ ] **Rovo AI integration implementation** - Required for Mar 14 webinar (V3 scope)
 - [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
   - Rai = trained RaiSE agent (not generic Claude)
   - Value: accumulated judgment, calibration, collaborative intelligence
@@ -56,6 +60,7 @@
   - Used at start of this session
 - [ ] **Add "test with real data" checkpoint to feature-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
 - [ ] **Add "commit after task" to /feature-implement skill** - Good discipline, enables recovery (F3.3 retro)
+- [ ] **Add branch creation to epic/feature skills** - Forgot to create branch before E8 implementation; should `/epic-plan` or `/feature-implement` auto-create? (E8 retro)
 - [ ] **Fix test path convention in plan template** - Plan says `tests/cli/test_*.py` but actual is `tests/cli/commands/test_*.py` (F3.3 retro)
 - [ ] **Document Pyright + Pydantic exception in guardrails.md** - `Field(default_factory=list)` false positives acceptable when Ruff passes (F2.2 retro)
 - [ ] **Create ADR template for inference rule decisions** - When to be conservative vs aggressive in pattern matching (F2.2 retro)
@@ -69,6 +74,7 @@
 - [ ] What are the Lean Spec Principles? How do they apply to governance artifacts? **← In progress (subagent researching for /epic-design skill)**
 - [x] ~~Are agent personas really needed for katas?~~ **RESOLVED** — No. See `work/research/agent-personas/` (RES-PERSONA-001)
 - [x] ~~OpenClaw/Moltbot architecture patterns for V3~~ **RESOLVED** — See `work/research/openclaw-architecture/` (RES-OPENCLAW-001)
+- [x] ~~Rovo AI / Atlassian Teamwork Graph research~~ **RESOLVED** — See `work/research/rovo-atlassian-integration/` (RES-ROVO-001)
 
 ### Governance Content Improvements (E2)
 
@@ -105,4 +111,4 @@
 
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-02*
-*Last updated: 2026-02-02 (F3.3 Memory Graph complete, minor framework improvements deferred)*
+*Last updated: 2026-02-02 (RES-ROVO-001 complete, E8 design informed)*
