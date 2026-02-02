@@ -51,12 +51,19 @@ def sample_graph() -> ConceptGraph:
 class TestContextQueryCommand:
     """Tests for `raise context query` command."""
 
-    def test_query_requires_graph(self) -> None:
+    def test_query_requires_graph(self, tmp_path: Path) -> None:
         """Test query command fails if graph not found."""
-        result = runner.invoke(app, ["context", "query", "req-rf-05"])
+        import os
 
-        assert result.exit_code == 1
-        assert "Graph file not found" in result.stdout or "Error" in result.stdout
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(app, ["context", "query", "req-rf-05"])
+
+            assert result.exit_code == 1
+            assert "Graph file not found" in result.stdout or "Error" in result.stdout
+        finally:
+            os.chdir(original_cwd)
 
     def test_query_basic(self, sample_graph: ConceptGraph, tmp_path: Path) -> None:
         """Test basic query command."""
