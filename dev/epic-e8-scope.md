@@ -648,12 +648,12 @@ Stream 2: F8.2 (Epic Parser) ─────┘
 | Feature | Size | SP | Status | Actual | Velocity | Notes |
 |---------|:----:|:--:|:------:|:------:|:--------:|-------|
 | F8.1 Backlog Parser | S | 2 | ✅ Complete | ~45 min | 1.0x | 34 tests, 93% coverage |
-| F8.2 Epic Parser | S | 2 | Pending | — | — | |
+| F8.2 Epic Parser | S | 2 | ✅ Complete | ~20 min | 1.5x | 27 tests, 89% coverage |
 | F8.3 Graph Extension | S | 2 | Pending | — | — | |
 | F8.4 Work Queries | S | 2 | Pending | — | — | |
 
 **Milestone Progress:**
-- [ ] M1: Graph with Work (target: Day 2) — F8.1 complete, F8.2 + F8.3 remaining
+- [ ] M1: Graph with Work (target: Day 2) — F8.1 ✓, F8.2 ✓, F8.3 remaining
 - [ ] M2: Epic Complete (target: Day 3)
 
 ### Sequencing Rationale
