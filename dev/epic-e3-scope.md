@@ -1,9 +1,10 @@
 # Epic E3: Identity Core + Memory Graph - Scope
 
-> **Status:** IN PROGRESS
-> Branch: `feature/e3/identity-core`
-> Created: 2026-02-01
-> Target: Feb 9, 2026 (Friends & Family pre-launch)
+> **Status:** IN PROGRESS (80% complete — M1 Walking Skeleton done)
+> **Branch:** `feature/e3/identity-core`
+> **Created:** 2026-02-01
+> **Target:** Feb 9, 2026 (Friends & Family pre-launch)
+> **Updated:** 2026-02-02 (F3.1-F3.4 complete, F3.5 remaining)
 
 ---
 
@@ -26,10 +27,10 @@ Build the infrastructure for Rai's existence as an entity. Apply the same MVC (M
 
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
-| F3.1 | Identity Core Structure | S | Pending | Create `.rai/` with identity (md) + memory (jsonl) |
-| F3.2 | Content Migration | S | Pending | Convert `.claude/rai/` markdown → `.rai/` JSONL |
-| F3.3 | Memory Graph | S | Pending | Reuse E2 ConceptGraph for memory concepts |
-| F3.4 | Memory Query CLI | S | Pending | `raise memory query` + `raise memory dump` |
+| F3.1 | Identity Core Structure | S | **COMPLETE** | Create `.rai/` with identity (md) + memory (jsonl) |
+| F3.2 | Content Migration | S | **COMPLETE** | Migrated with F3.1 — `.claude/rai/` → `.rai/` JSONL |
+| F3.3 | Memory Graph | S | **COMPLETE** | 6 modules, 109 tests, graph builds from JSONL |
+| F3.4 | Memory Query CLI | S | **COMPLETE** | Implemented with F3.3 — `query` + `dump` commands |
 | F3.5 | Skills Integration | XS | Pending | /session-start queries graph, /session-close writes JSONL |
 
 **Total:** 5 features
@@ -166,11 +167,11 @@ Extracted from sessions, queryable via graph:
 - [ ] All quality checks pass (ruff, pyright, bandit)
 
 ### Epic Complete
-- [ ] `.rai/` structure created (identity/ as md, memory/ as jsonl)
-- [ ] Content migrated from `.claude/rai/` to JSONL format
-- [ ] Memory graph builds successfully from JSONL
-- [ ] `raise memory query` returns relevant results
-- [ ] `raise memory dump --format md` produces readable output
+- [x] `.rai/` structure created (identity/ as md, memory/ as jsonl)
+- [x] Content migrated from `.claude/rai/` to JSONL format
+- [x] Memory graph builds successfully from JSONL (47 nodes, 49 edges)
+- [x] `raise memory query` returns relevant results (0.24ms query time)
+- [x] `raise memory dump --format md` produces readable output
 - [ ] /session-start queries memory graph for context
 - [ ] /session-close appends to JSONL and rebuilds graph
 - [ ] Token savings measured (target: >80% vs loading all memory files)
@@ -350,14 +351,14 @@ Day 7-8:  Buffer / polish / epic close
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F3.1 Identity Core Structure | S | **COMPLETE** | 15 min | 2.8x | 7 files, 43 JSONL entries, 955 tokens minimal |
-| F3.3 Memory Graph | S | Pending | - | - | |
-| F3.2 Content Migration | S | Pending | - | - | |
-| F3.4 Memory Query CLI | S | Pending | - | - | |
+| F3.2 Content Migration | S | **COMPLETE** | — | — | Migrated with F3.1, `.claude/rai/` removed |
+| F3.3 Memory Graph | S | **COMPLETE** | 60 min | 1.0x | 6 modules, 109 tests, 96-100% coverage |
+| F3.4 Memory Query CLI | S | **COMPLETE** | — | — | Implemented with F3.3, `query` + `dump` |
 | F3.5 Skills Integration | XS | Pending | - | - | |
 
 **Milestone Progress:**
-- [ ] M1: Walking Skeleton (Feb 4) — F3.1 complete, F3.3 next
-- [ ] M2: Epic Complete (Feb 9)
+- [x] M1: Walking Skeleton (Feb 4) — **COMPLETE EARLY** (Feb 2)
+- [ ] M2: Epic Complete (Feb 9) — F3.5 remaining
 
 ### Sequencing Rationale
 
@@ -395,12 +396,14 @@ Day 7-8:  Buffer / polish / epic close
 
 | Day | Date | Features | Cumulative |
 |:---:|------|----------|:----------:|
-| 1 | Feb 2 | F3.1 | 20% |
-| 2 | Feb 3 | F3.3 | 40% |
-| 3 | Feb 4 | F3.2 | 60% — **M1 Walking Skeleton** |
-| 4-5 | Feb 5-6 | F3.4 | 80% |
-| 6 | Feb 7 | F3.5 | 100% |
-| 7-8 | Feb 8-9 | Buffer, polish, `/epic-close` | **M2 Epic Complete** |
+| 1 | Feb 2 | F3.1 ✓ | 20% |
+| 1 | Feb 2 | F3.2 ✓ (with F3.1) | 40% |
+| 1 | Feb 2 | F3.3 ✓ | 60% |
+| 1 | Feb 2 | F3.4 ✓ (with F3.3) | 80% — **M1 COMPLETE** |
+| 2 | Feb 3 | F3.5 | 100% |
+| 3-7 | Feb 4-8 | Buffer, polish, `/epic-close` | **M2 Epic Complete** |
+
+**Ahead of schedule:** M1 completed Day 1 (planned Day 3). 5 days buffer remaining.
 
 ---
 

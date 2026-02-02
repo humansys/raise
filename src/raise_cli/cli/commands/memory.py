@@ -1,4 +1,4 @@
-"""CLI commands for memory queries."""
+"""CLI commands for memory queries and writes."""
 
 from __future__ import annotations
 
@@ -9,7 +9,19 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from raise_cli.memory import MemoryCache, MemoryGraph, MemoryQuery, MemoryQueryResult
+from raise_cli.memory import (
+    CalibrationInput,
+    MemoryCache,
+    MemoryGraph,
+    MemoryQuery,
+    MemoryQueryResult,
+    PatternInput,
+    PatternSubType,
+    SessionInput,
+    append_calibration,
+    append_pattern,
+    append_session,
+)
 
 memory_app = typer.Typer(
     name="memory",
@@ -272,3 +284,217 @@ def _print_graph_table(graph: MemoryGraph) -> None:
     # Edges summary
     if graph.edges:
         console.print(f"\n[dim]Relationships: {len(graph.edges)} edges[/dim]")
+
+
+# --- Append Commands ---
+
+
+@memory_app.command("add-pattern")
+def add_pattern(
+    content: Annotated[str, typer.Argument(help="Pattern description")],
+    context: Annotated[
+        str,
+        typer.Option("--context", "-c", help="Context keywords (comma-separated)"),
+    ] = "",
+    sub_type: Annotated[
+        str,
+        typer.Option(
+            "--type", "-t", help="Pattern type (codebase, process, architecture, technical)"
+        ),
+    ] = "process",
+    learned_from: Annotated[
+        str | None,
+        typer.Option("--from", "-f", help="Feature/session where learned"),
+    ] = None,
+    memory_dir: Annotated[
+        Path | None,
+        typer.Option("--memory-dir", "-m", help="Memory directory path"),
+    ] = None,
+) -> None:
+    """Add a new pattern to memory.
+
+    Examples:
+        # Add a process pattern
+        $ raise memory add-pattern "HITL before commits" -c "git,workflow"
+
+        # Add a technical pattern
+        $ raise memory add-pattern "Use capsys for stdout tests" -t technical -c "pytest,testing"
+
+        # Add with source reference
+        $ raise memory add-pattern "BFS reuse across modules" -t architecture --from F2.3
+    """
+    mem_dir = memory_dir or _get_default_memory_dir()
+    if not mem_dir.exists():
+        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
+        raise typer.Exit(1)
+
+    # Parse context
+    context_list = [c.strip() for c in context.split(",") if c.strip()]
+
+    # Parse sub_type
+    try:
+        pattern_type = PatternSubType(sub_type)
+    except ValueError:
+        console.print(f"[red]Error:[/red] Invalid pattern type: {sub_type}")
+        console.print("Valid types: codebase, process, architecture, technical")
+        raise typer.Exit(1) from None
+
+    input_data = PatternInput(
+        content=content,
+        sub_type=pattern_type,
+        context=context_list,
+        learned_from=learned_from,
+    )
+
+    result = append_pattern(mem_dir, input_data)
+
+    if result.success:
+        console.print(f"\n[green]✓[/green] {result.message}")
+        console.print(f"  ID: [cyan]{result.id}[/cyan]")
+        console.print(f"  Content: {content[:60]}...")
+        if context_list:
+            console.print(f"  Context: {', '.join(context_list)}")
+        console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
+    else:
+        console.print(f"[red]Error:[/red] {result.message}")
+        raise typer.Exit(1)
+
+
+@memory_app.command("add-calibration")
+def add_calibration_cmd(
+    feature: Annotated[str, typer.Argument(help="Feature ID (e.g., F3.5)")],
+    name: Annotated[str, typer.Argument(help="Feature name")],
+    size: Annotated[str, typer.Argument(help="T-shirt size (XS, S, M, L, XL)")],
+    actual: Annotated[int, typer.Argument(help="Actual minutes")],
+    estimated: Annotated[
+        int | None,
+        typer.Option("--estimated", "-e", help="Estimated minutes"),
+    ] = None,
+    sp: Annotated[
+        int | None,
+        typer.Option("--sp", help="Story points"),
+    ] = None,
+    kata: Annotated[
+        bool,
+        typer.Option("--kata/--no-kata", help="Kata cycle followed (default: yes)"),
+    ] = True,
+    notes: Annotated[
+        str | None,
+        typer.Option("--notes", "-n", help="Additional notes"),
+    ] = None,
+    memory_dir: Annotated[
+        Path | None,
+        typer.Option("--memory-dir", "-m", help="Memory directory path"),
+    ] = None,
+) -> None:
+    """Add calibration data for a completed feature.
+
+    Examples:
+        # Basic calibration
+        $ raise memory add-calibration F3.5 "Skills Integration" XS 20
+
+        # With estimate for velocity calculation
+        $ raise memory add-calibration F3.5 "Skills Integration" XS 20 -e 60
+
+        # Full details
+        $ raise memory add-calibration F3.5 "Skills Integration" XS 20 -e 60 --sp 2 -n "Hook-assisted workflow"
+    """
+    mem_dir = memory_dir or _get_default_memory_dir()
+    if not mem_dir.exists():
+        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
+        raise typer.Exit(1)
+
+    # Validate size
+    valid_sizes = ["XS", "S", "M", "L", "XL"]
+    if size.upper() not in valid_sizes:
+        console.print(f"[red]Error:[/red] Invalid size: {size}")
+        console.print(f"Valid sizes: {', '.join(valid_sizes)}")
+        raise typer.Exit(1)
+
+    input_data = CalibrationInput(
+        feature=feature,
+        name=name,
+        size=size.upper(),
+        sp=sp,
+        estimated_min=estimated,
+        actual_min=actual,
+        kata_cycle=kata,
+        notes=notes,
+    )
+
+    result = append_calibration(mem_dir, input_data)
+
+    if result.success:
+        console.print(f"\n[green]✓[/green] {result.message}")
+        console.print(f"  ID: [cyan]{result.id}[/cyan]")
+        console.print(f"  Feature: {feature} ({name})")
+        console.print(f"  Size: {size.upper()}, Actual: {actual}min")
+        if estimated:
+            ratio = round(estimated / actual, 1)
+            console.print(f"  Velocity: {ratio}x (estimated {estimated}min)")
+        console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
+    else:
+        console.print(f"[red]Error:[/red] {result.message}")
+        raise typer.Exit(1)
+
+
+@memory_app.command("add-session")
+def add_session_cmd(
+    topic: Annotated[str, typer.Argument(help="Session topic")],
+    outcomes: Annotated[
+        str,
+        typer.Option("--outcomes", "-o", help="Session outcomes (comma-separated)"),
+    ] = "",
+    session_type: Annotated[
+        str,
+        typer.Option("--type", "-t", help="Session type (feature, research, etc.)"),
+    ] = "feature",
+    log_path: Annotated[
+        str | None,
+        typer.Option("--log", "-l", help="Path to session log file"),
+    ] = None,
+    memory_dir: Annotated[
+        Path | None,
+        typer.Option("--memory-dir", "-m", help="Memory directory path"),
+    ] = None,
+) -> None:
+    """Add a session record to memory.
+
+    Examples:
+        # Basic session
+        $ raise memory add-session "F3.5 Skills Integration"
+
+        # With outcomes
+        $ raise memory add-session "F3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
+
+        # Full details
+        $ raise memory add-session "F3.5 Skills Integration" -t feature -o "Writer API,Hooks" -l "dev/sessions/2026-02-02-f3.5.md"
+    """
+    mem_dir = memory_dir or _get_default_memory_dir()
+    if not mem_dir.exists():
+        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
+        raise typer.Exit(1)
+
+    # Parse outcomes
+    outcomes_list = [o.strip() for o in outcomes.split(",") if o.strip()]
+
+    input_data = SessionInput(
+        topic=topic,
+        session_type=session_type,
+        outcomes=outcomes_list,
+        log_path=log_path,
+    )
+
+    result = append_session(mem_dir, input_data)
+
+    if result.success:
+        console.print(f"\n[green]✓[/green] {result.message}")
+        console.print(f"  ID: [cyan]{result.id}[/cyan]")
+        console.print(f"  Topic: {topic}")
+        console.print(f"  Type: {session_type}")
+        if outcomes_list:
+            console.print(f"  Outcomes: {', '.join(outcomes_list[:3])}")
+        console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
+    else:
+        console.print(f"[red]Error:[/red] {result.message}")
+        raise typer.Exit(1)

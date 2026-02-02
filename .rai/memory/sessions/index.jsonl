@@ -9,3 +9,4 @@
 {"id": "SES-009", "date": "2026-01-31", "type": "feature", "topic": "E1 Complete (F1.6)", "outcomes": ["Core utilities", "Epic closure", "Merged to v2"], "log_path": null}
 {"id": "SES-010", "date": "2026-01-31", "type": "feature", "topic": "F1.5 + Memory System", "outcomes": ["OutputConsole", "Memory system created", "/session-close skill"], "log_path": "dev/sessions/2026-01-31-f1.5-memory-system.md"}
 {"id": "SES-011", "date": "2026-02-02", "type": "feature", "topic": "F3.1 Identity Core Structure", "outcomes": [".rai/ structure created", "7 files (md+jsonl)", "Process discipline learned", "Constitution v2.1"], "log_path": "dev/sessions/2026-02-02-f3.1-identity-core.md"}
+{"id": "SES-012", "date": "2026-02-02", "type": "feature", "topic": "F3.3 Memory Graph", "outcomes": ["Memory module complete", "109 tests", "CLI commands", "Research saved RES-MEMORY-001"], "log_path": null}
