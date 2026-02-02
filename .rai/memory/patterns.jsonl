@@ -29,3 +29,4 @@
 {"id": "PAT-029", "type": "architecture", "content": "Knowledge reuse > code reuse - same patterns without coupling beats wrapping dependencies", "context": ["architecture", "reuse", "coupling", "independence"], "learned_from": "F3.3 (MemoryGraph vs wrapping E2)", "created": "2026-02-02"}
 {"id": "PAT-030", "type": "technical", "content": "Recency weighting: 0.5 ** (days_old / 30) - score halves every 30 days, simple exponential decay", "context": ["algorithms", "scoring", "recency", "memory"], "learned_from": "F3.3 query.py", "created": "2026-02-02"}
 {"id": "PAT-031", "type": "process", "content": "SessionStart hooks auto-load context on new sessions", "context": ["hooks", "automation", "workflow"], "learned_from": "F3.5", "created": "2026-02-02"}
+{"id": "PAT-032", "type": "process", "content": "Research-first for unfamiliar APIs saves implementation time", "context": ["research", "hooks", "apis", "workflow"], "learned_from": "F3.5", "created": "2026-02-02"}
