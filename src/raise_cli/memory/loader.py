@@ -42,12 +42,17 @@ def load_pattern(data: dict[str, Any]) -> MemoryConcept:
     Returns:
         MemoryConcept for the pattern.
     """
+    # Handle schema variations: 'content' or 'pattern' field
+    content = data.get("content") or data.get("pattern", "")
+    # Handle date field variations: 'created' or 'date'
+    date_str = data.get("created") or data.get("date", "")
+
     return MemoryConcept(
         id=data["id"],
         type=MemoryConceptType.PATTERN,
-        content=data["content"],
+        content=content,
         context=data.get("context", []),
-        created=parse_date(data["created"]),
+        created=parse_date(date_str),
         metadata={
             "sub_type": data.get("type", "unknown"),
             "learned_from": data.get("learned_from"),
@@ -64,33 +69,41 @@ def load_calibration(data: dict[str, Any]) -> MemoryConcept:
     Returns:
         MemoryConcept for the calibration.
     """
+    # Handle schema variations for name and feature fields
+    name = data.get("name") or data.get("feature_name", "unknown")
+    feature = data.get("feature") or data.get("feature_id", "unknown")
+    # Handle date field variations: 'created' or 'date'
+    date_str = data.get("created") or data.get("date", "")
+    # Handle velocity field variations: 'ratio' or 'velocity'
+    velocity = data.get("ratio") or data.get("velocity")
+
     # Build content summary from calibration data
-    content_parts = [f"{data['name']} ({data['feature']})"]
+    content_parts = [f"{name} ({feature})"]
     if data.get("actual_min"):
         content_parts.append(f"actual: {data['actual_min']}min")
-    if data.get("ratio"):
-        content_parts.append(f"velocity: {data['ratio']}x")
+    if velocity:
+        content_parts.append(f"velocity: {velocity}x")
     content = " - ".join(content_parts)
 
     # Build context from feature and size
-    context = [data["feature"], data["size"].lower()]
+    context = [feature, data["size"].lower()]
     if data.get("kata_cycle"):
         context.append("kata-cycle")
 
     return MemoryConcept(
-        id=data["id"],
+        id=data.get("id") or data.get("feature_id", "unknown"),
         type=MemoryConceptType.CALIBRATION,
         content=content,
         context=context,
-        created=parse_date(data["created"]),
+        created=parse_date(date_str),
         metadata={
-            "feature": data["feature"],
-            "name": data["name"],
+            "feature": feature,
+            "name": name,
             "size": data["size"],
             "sp": data.get("sp"),
             "estimated_min": data.get("estimated_min"),
             "actual_min": data.get("actual_min"),
-            "ratio": data.get("ratio"),
+            "ratio": velocity,
             "kata_cycle": data.get("kata_cycle", False),
             "notes": data.get("notes"),
         },
@@ -106,14 +119,17 @@ def load_session(data: dict[str, Any]) -> MemoryConcept:
     Returns:
         MemoryConcept for the session.
     """
+    # Handle schema variations: 'topic' or 'summary'
+    topic = data.get("topic") or data.get("summary", "unknown")
+
     # Build content from topic and outcomes
     outcomes_str = ", ".join(data.get("outcomes", [])[:3])
-    content = f"{data['topic']}: {outcomes_str}"
+    content = f"{topic}: {outcomes_str}"
 
     # Build context from type and outcomes keywords
     context = [data["type"]]
     # Extract keywords from topic
-    topic_words = data["topic"].lower().split()
+    topic_words = topic.lower().split()
     context.extend([w for w in topic_words if len(w) > 3][:3])
 
     return MemoryConcept(
@@ -124,7 +140,7 @@ def load_session(data: dict[str, Any]) -> MemoryConcept:
         created=parse_date(data["date"]),
         metadata={
             "session_type": data["type"],
-            "topic": data["topic"],
+            "topic": topic,
             "outcomes": data.get("outcomes", []),
             "log_path": data.get("log_path"),
         },
