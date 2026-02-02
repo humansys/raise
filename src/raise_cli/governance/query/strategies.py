@@ -18,10 +18,10 @@ from raise_cli.governance.models import Concept
 def normalize_concept_id(query: str) -> str:
     """Normalize concept ID from various formats.
 
-    Converts user-friendly formats (RF-05, §2) to canonical IDs.
+    Converts user-friendly formats (RF-05, §2, E8, F8.1) to canonical IDs.
 
     Args:
-        query: Query string (may be RF-05, req-rf-05, §2, etc.).
+        query: Query string (may be RF-05, req-rf-05, §2, E8, F8.1, etc.).
 
     Returns:
         Normalized concept ID.
@@ -33,14 +33,28 @@ def normalize_concept_id(query: str) -> str:
         'req-rf-05'
         >>> normalize_concept_id("§2")
         'principle-governance-as-code'
+        >>> normalize_concept_id("E8")
+        'epic-e8'
+        >>> normalize_concept_id("F8.1")
+        'feature-f8-1'
     """
     # Already normalized
-    if query.startswith(("req-", "outcome-", "principle-")):
+    if query.startswith(
+        ("req-", "outcome-", "principle-", "epic-", "feature-", "project-")
+    ):
         return query
 
     # RF-XX format → req-rf-xx
     if re.match(r"^RF-\d+$", query, re.IGNORECASE):
         return f"req-{query.lower()}"
+
+    # EN format → epic-eN
+    if re.match(r"^E\d+$", query, re.IGNORECASE):
+        return f"epic-{query.lower()}"
+
+    # FN.N format → feature-fN-N
+    if re.match(r"^F\d+\.\d+$", query, re.IGNORECASE):
+        return f"feature-{query.lower().replace('.', '-')}"
 
     # §N format → look up by section (handled by caller)
     return query.lower().replace(" ", "-")
@@ -273,4 +287,119 @@ def query_related_concepts(
     scored_concepts.sort(key=lambda x: x[1], reverse=True)
 
     # Return top N concepts
-    return [concept for concept, score, _ in scored_concepts[:limit]]
+    return [concept for concept, _score, _ in scored_concepts[:limit]]
+
+
+def query_work_context(
+    graph: ConceptGraph,
+    query: str,
+) -> list[Concept]:
+    """Query work tracking concepts (projects, epics, features).
+
+    Handles special queries:
+    - "current work" / "current epic" → project's current_focus epic
+    - "E8" → epic with its features
+    - "F8.1" → specific feature
+    - "E8 features" → all features in epic
+
+    Args:
+        graph: Concept graph to query.
+        query: Work-related query string.
+
+    Returns:
+        List of matching work concepts with context.
+
+    Examples:
+        >>> concepts = query_work_context(graph, "current work")
+        >>> concepts[0].type.value in ("project", "epic")
+        True
+    """
+    from raise_cli.governance.models import ConceptType
+
+    query_lower = query.lower().strip()
+    concepts: list[Concept] = []
+
+    # "current work" / "current epic" / "what am I working on"
+    if any(kw in query_lower for kw in ["current work", "current epic", "working on"]):
+        # Find project with current_focus
+        for edge in graph.edges:
+            if edge.type == "current_focus":
+                project = graph.get_node(edge.source)
+                epic = graph.get_node(edge.target)
+                if project:
+                    concepts.append(project)
+                if epic:
+                    concepts.append(epic)
+                    # Add features of current epic
+                    for feature_edge in graph.get_outgoing_edges(
+                        epic.id, edge_type="contains"
+                    ):
+                        feature = graph.get_node(feature_edge.target)
+                        if feature:
+                            concepts.append(feature)
+                break
+        return concepts
+
+    # "E8 features" pattern
+    epic_features_match = re.match(r"^(E\d+)\s+features?$", query, re.IGNORECASE)
+    if epic_features_match:
+        epic_id = normalize_concept_id(epic_features_match.group(1))
+        epic = graph.get_node(epic_id)
+        if epic:
+            concepts.append(epic)
+            # Get all features
+            for edge in graph.get_outgoing_edges(epic_id, edge_type="contains"):
+                feature = graph.get_node(edge.target)
+                if feature:
+                    concepts.append(feature)
+        return concepts
+
+    # Direct epic/feature lookup (E8, F8.1)
+    concept_id = normalize_concept_id(query)
+    if concept_id.startswith("epic-"):
+        epic = graph.get_node(concept_id)
+        if epic:
+            concepts.append(epic)
+            # Add features
+            for edge in graph.get_outgoing_edges(concept_id, edge_type="contains"):
+                feature = graph.get_node(edge.target)
+                if feature:
+                    concepts.append(feature)
+        return concepts
+
+    if concept_id.startswith("feature-"):
+        feature = graph.get_node(concept_id)
+        if feature:
+            concepts.append(feature)
+            # Add parent epic
+            for edge in graph.edges:
+                if edge.type == "contains" and edge.target == concept_id:
+                    epic = graph.get_node(edge.source)
+                    if epic and epic.type == ConceptType.EPIC:
+                        concepts.insert(0, epic)
+                        break
+        return concepts
+
+    # Project lookup
+    if concept_id.startswith("project-") or "project" in query_lower:
+        for concept in graph.nodes.values():
+            if concept.type == ConceptType.PROJECT:
+                concepts.append(concept)
+        return concepts
+
+    # Fallback: keyword search in work concepts
+    for concept in graph.nodes.values():
+        if concept.type in (ConceptType.PROJECT, ConceptType.EPIC, ConceptType.FEATURE):
+            text = (concept.section + " " + concept.content[:300]).lower()
+            if any(kw in text for kw in extract_keywords(query)):
+                concepts.append(concept)
+
+    # Deduplicate by ID (keep first occurrence)
+    seen_ids: set[str] = set()
+    unique_concepts: list[Concept] = []
+    for c in concepts:
+        if c.id not in seen_ids:
+            seen_ids.add(c.id)
+            unique_concepts.append(c)
+
+    return unique_concepts[:10]  # Limit results
