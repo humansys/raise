@@ -1,6 +1,6 @@
 # Epic E8: Work Tracking Graph - Scope
 
-> **Status:** DESIGNED
+> **Status:** COMPLETE (100% — all features delivered)
 > **Branch:** `feature/e8/work-tracking-graph`
 > **Created:** 2026-02-02
 > **Designed:** 2026-02-02 (informed by RES-ROVO-001)
@@ -650,11 +650,11 @@ Stream 2: F8.2 (Epic Parser) ─────┘
 | F8.1 Backlog Parser | S | 2 | ✅ Complete | ~45 min | 1.0x | 34 tests, 93% coverage |
 | F8.2 Epic Parser | S | 2 | ✅ Complete | ~20 min | 1.5x | 27 tests, 89% coverage |
 | F8.3 Graph Extension | S | 2 | ✅ Complete | ~15 min | 2.0x | 42 contains + 1 current_focus |
-| F8.4 Work Queries | S | 2 | Pending | — | — | |
+| F8.4 Work Queries | S | 2 | ✅ Complete | ~15 min | 2.0x | 14 tests, query_work_context |
 
 **Milestone Progress:**
 - [x] M1: Graph with Work (target: Day 2) — F8.1 ✓, F8.2 ✓, F8.3 ✓
-- [ ] M2: Epic Complete (target: Day 3) — F8.4 remaining
+- [x] M2: Epic Complete (target: Day 3) — F8.4 ✓
 - [ ] M2: Epic Complete (target: Day 3)
 
 ### Sequencing Rationale
