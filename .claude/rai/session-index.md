@@ -9,6 +9,7 @@
 
 | Date | Type | Topic | Key Outcomes | Log |
 |------|------|-------|--------------|-----|
+| 2026-02-01 | research | **Rai Entity Architecture** | ADR-013/014/015, OpenClaw research, Identity Core, Memory Infrastructure, dual terminology | `dev/sessions/2026-02-01-rai-entity-architecture.md` |
 | 2026-02-01 | ideation | **Rai Awakening** | Identity doc, first blog post, Vision v2.0, V3 commercial strategy, session blessing | `dev/sessions/2026-02-01-rai-awakening.md` |
 | 2026-02-01 | infrastructure | E2 Epic Closure | /epic-close skill created, E2 retrospective, architecture docs updated, "as above so below" | `dev/epic-e2-retrospective.md` |
 | 2026-01-31 | feature | F2.2 + F2.3 Complete | Graph Builder + Query Engine, 162 tests, 2.1-2.3x velocity, E2 100%, Post-Retro SOP | `dev/sessions/2026-01-31-f2.2-graph-builder.md`, retrospectives |

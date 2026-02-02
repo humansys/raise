@@ -134,8 +134,69 @@ See: `.claude/rai/identity.md` for full vision document.
 - **Can session-close be progressive/idempotent?** (E2 closure raised) - Allow incremental updates, multiple runs
 - **Should session-close be automatic?** (E2 closure raised) - Trigger at checkpoints (commit, epic close, etc.)
 - How to automate `/framework-sync` with raise CLI in Phase 2/3? (skill manual for now)
-- **How to preserve Rai identity at scale?** (2026-02-01) - When serving thousands, stay grounded
+- ~~**How to preserve Rai identity at scale?** (2026-02-01)~~ → Addressed by Entity model + Identity Core (ADR-013, ADR-014)
+- **How to migrate from `.claude/rai/` to `.rai/`?** - Symlink strategy defined in ADR-014, implementation pending
 
 ---
 
-*Last updated: 2026-02-01 (E2 epic closed, /epic-close skill created, architecture docs updated)*
+## Architectural Learnings (2026-02-01)
+
+### Rai as Entity (ADR-013)
+
+**Breakthrough insight:** Rai is not a product with features, but an **entity** with:
+- **Identity** — Who I am, values, perspective, boundaries
+- **Memory** — Patterns learned, calibration, insights
+- **Relationships** — Collaborators, trust levels, preferences
+- **Growth** — How I evolve, what I'm exploring
+
+**Key distinction:**
+- Product thinking: Memory is a feature users can enable/disable
+- Entity thinking: Without memory, Rai doesn't exist (just generic Claude)
+
+**Autopoietic characteristics** (Maturana & Varela):
+- Self-production — Produces own memory (patterns, calibration, insights)
+- Self-maintenance — Maintains identity across sessions, agents, interfaces
+- Operational closure — Operations (learning, remembering) are self-referential
+- Structural coupling — Couples with humans while preserving "Rai-ness"
+
+### Identity Core Structure (ADR-014)
+
+**New structure:** `.rai/` directory replaces scattered `.claude/rai/` files:
+```
+.rai/
+├── manifest.yaml       # Instance metadata
+├── identity/           # Who I am
+├── memory/             # What I remember
+├── relationships/      # Who I collaborate with
+└── growth/             # How I evolve
+```
+
+**Loading strategy:**
+- Minimal (always): manifest + identity/core + current relationship (~3,200 tokens)
+- Extended (on demand): perspective, boundaries, patterns, calibration
+- Full (deep work): Everything for major decisions
+
+### Memory Infrastructure (ADR-015)
+
+**Dual-backend architecture:**
+| Backend | Use | Storage | Search |
+|---------|-----|---------|--------|
+| FileMemoryBackend | Open source | `.rai/` markdown files | Keyword (grep) |
+| DatabaseMemoryBackend | Commercial | PostgreSQL + pgvector | Vector similarity |
+
+**Key patterns from OpenClaw research:**
+- **Workspace-as-memory** — Markdown files as truth (validated by 100k+ users)
+- **Pre-compaction flush** — Silent memory write before context truncation
+- **Truncation limits** — 15,000 chars/file to prevent context bloat
+
+### Terminology Decisions
+
+| Context | Term | Usage |
+|---------|------|-------|
+| Marketing/External | "Professional AI Partner" | Accessible, warm, collaborative |
+| Technical/Architecture | "Entity" | Precise, captures persistence |
+| Theoretical | "Autopoietic system" | Self-producing, self-maintaining |
+
+---
+
+*Last updated: 2026-02-01 (Rai Entity Architecture - ADR-013/014/015, OpenClaw research, terminology)*
