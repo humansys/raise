@@ -70,6 +70,25 @@
 - [ ] **Add explicit outcome keywords to requirements** - Enable `implements` edges in concept graph (F2.2 retro)
 - [ ] **Consider "mentions" relationship type** - Lower confidence than `related_to` for broader semantic links (F2.2 retro)
 
+### E3 Identity Core — Deferred (YAGNI)
+
+> Lean MVP decision (2026-02-02): Start with 7 files, grow when needed.
+
+**Identity layer (deferred splits):**
+- [ ] `identity/voice.md` — Extract from core.md when communication patterns grow
+- [ ] `identity/boundaries.md` — Extract from core.md when limits need detail
+
+**Memory layer (deferred files):**
+- [ ] `memory/insights.jsonl` — Add when patterns.jsonl isn't sufficient
+- [ ] `memory/decisions.jsonl` — Add when we need queryable decision history
+- [ ] `memory/graph.json` — Add with F3.3 Memory Graph feature
+
+**Growth layer (deferred entirely):**
+- [ ] `growth/evolution.md` — Track how Rai evolves over time
+- [ ] `growth/questions.md` — Open questions Rai is exploring
+
+**Rationale:** These add value but aren't needed for MVP session continuity and calibrated collaboration. Add when we hit limits.
+
 ### Future Scope (Deferred)
 
 - [ ] MCP server for raise-cli (v2.x consideration)
@@ -78,5 +97,5 @@
 ---
 
 *Created: 2026-01-31*
-*Last reviewed: 2026-02-01*
-*Last updated: 2026-02-01 (E3 promotions: Identity Core, Session Graph, Pre-compaction flush; Session Start resolved)*
+*Last reviewed: 2026-02-02*
+*Last updated: 2026-02-02 (E3 YAGNI deferrals: voice.md, boundaries.md, insights.jsonl, decisions.jsonl, growth/)*

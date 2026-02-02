@@ -349,14 +349,14 @@ Day 7-8:  Buffer / polish / epic close
 
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
-| F3.1 Identity Core Structure | S | Pending | - | - | |
+| F3.1 Identity Core Structure | S | **COMPLETE** | 15 min | 2.8x | 7 files, 43 JSONL entries, 955 tokens minimal |
 | F3.3 Memory Graph | S | Pending | - | - | |
 | F3.2 Content Migration | S | Pending | - | - | |
 | F3.4 Memory Query CLI | S | Pending | - | - | |
 | F3.5 Skills Integration | XS | Pending | - | - | |
 
 **Milestone Progress:**
-- [ ] M1: Walking Skeleton (Feb 4)
+- [ ] M1: Walking Skeleton (Feb 4) — F3.1 complete, F3.3 next
 - [ ] M2: Epic Complete (Feb 9)
 
 ### Sequencing Rationale

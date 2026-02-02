@@ -2,7 +2,9 @@
 
 ## Principios Inmutables para Reliable AI Software Engineering
 
-**Versión:** 2.0.0**Estado:** Ratificada**Fecha:** 28 de Diciembre, 2025
+**Versión:** 2.1.0
+**Estado:** Ratificada
+**Fecha:** 2 de Febrero, 2026
 
 > **Nota de versión 2.0:** Esta enmienda incorpora el principio §8 (Observable Workflow) y alinea terminología con ontología v2.0. Ver changelog al final.
 
@@ -161,6 +163,7 @@ Cada decisión del agente debe ser **trazable y auditable**. No hay cajas negras
 - Incluir atribución a proyectos upstream (MIT compliance)
 - **Registrar trace de cada interacción MCP** [NUEVO v2.0]
 - **Escalar al Orquestador ante ambigüedad** [NUEVO v2.0]
+- **Dogfooding: cuando construyas RaiSE, sigue RaiSE** [NUEVO v2.1] — Saltarse el proceso = saltarse la validación = entregar metodología no probada
 
 ---
 
@@ -218,6 +221,7 @@ Esta Constitution puede ser modificada bajo las siguientes condiciones:
 | 2.0.0    | 2025-12-28 | Valor añadido: Observabilidad          | —       |
 | 2.0.0    | 2025-12-28 | Restricciones Observable Workflow       | —       |
 | 2.0.0    | 2025-12-28 | Compromisos con Reguladores             | —       |
+| 2.1.0    | 2026-02-02 | Restricción añadida: Dogfooding        | —       |
 
 ---
 

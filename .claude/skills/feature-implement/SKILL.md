@@ -109,7 +109,23 @@ Update `work/features/{feature}/progress.md`:
 
 **Verification:** Progress logged with accurate time.
 
-### Step 6: Iterate or Finalize
+### Step 6: HITL Checkpoint
+
+**IMPORTANT:** Pause after each task for human review unless explicitly told "autonomous mode".
+
+Present:
+- What was completed
+- Files created/modified
+- Verification results
+- "Ready for next task?"
+
+**Rationale:** Slow is smooth, smooth is fast. HITL builds trust and catches issues early.
+
+**Verification:** Human acknowledged task completion.
+
+> **If you can't continue:** No response → Wait. Don't rush ahead.
+
+### Step 7: Iterate or Finalize
 
 If more tasks → return to Step 2.
 If all tasks completed → execute code gate.

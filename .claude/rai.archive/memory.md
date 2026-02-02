@@ -147,6 +147,8 @@ See: `.claude/rai/identity.md` for full vision document.
 | Subagents can create skills autonomously | /epic-design created by subagent | Skill development |
 | Origin documents accelerate skill execution | E3 scope existed, skill refined it | /epic-design workflow |
 | "As above, so below" applies to memory | Same MVC pattern: governance (E2) and memory (E3) | ADR-016 |
+| Risk-First reorders by uncertainty, not dependency | E3: F3.3 before F3.2 to validate E2 reuse early | `/epic-plan` execution |
+| Subagents can create substantial artifacts | `/epic-plan` skill (700 lines) created autonomously | Background agent pattern |
 
 ---
 
