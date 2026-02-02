@@ -291,6 +291,120 @@ F3.5 (Skills Integration)
 
 ---
 
+## Implementation Plan
+
+> Added by `/epic-plan` - 2026-02-01
+> Strategy: **Risk-First** | Milestones: **2** | Demo: **All features for Feb 9**
+
+### Feature Sequence (Risk-First)
+
+| Order | Feature | Size | Dependencies | Milestone | Rationale |
+|:-----:|---------|:----:|--------------|-----------|-----------|
+| 1 | F3.1 Identity Core Structure | S | None | M1 | Foundation — blocks all others |
+| 2 | F3.3 Memory Graph | S | F3.1 | M1 | **Highest risk** — validates E2 reuse early |
+| 3 | F3.2 Content Migration | S | F3.3 (schema) | M2 | Depends on graph schema being defined |
+| 4 | F3.4 Memory Query CLI | S | F3.2, F3.3 | M2 | Wires graph to CLI — straightforward |
+| 5 | F3.5 Skills Integration | XS | F3.4 | M2 | Updates existing skills — minimal risk |
+
+### Milestones
+
+| Milestone | Features | Target | Success Criteria | Demo |
+|-----------|----------|--------|------------------|------|
+| **M1: Walking Skeleton** | F3.1, F3.3 | Day 3 (Feb 4) | `.rai/` exists, graph builds from test JSONL | Graph query returns memory concepts |
+| **M2: Epic Complete** | All 5 features | Day 8 (Feb 9) | All done criteria met | `/session-start` queries graph, full CLI works |
+
+### Updated Dependencies (Risk-First Order)
+
+```
+F3.1 (Identity Core Structure) ← CRITICAL PATH START
+  ↓
+F3.3 (Memory Graph) ← HIGHEST RISK - validate E2 reuse
+  ↓ (schema defined)
+F3.2 (Content Migration)
+  ↓
+F3.4 (Memory Query CLI)
+  ↓
+F3.5 (Skills Integration) ← CRITICAL PATH END
+```
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Day 1-2:  F3.1 ────► F3.3 (graph)
+                        ↓ (schema defined)
+Day 3-4:              F3.2 (migration) ────► F3.4 (CLI)
+Day 5-6:                                       ↓
+                                            F3.5 (skills)
+Day 7-8:  Buffer / polish / epic close
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+         M1: Walking Skeleton              M2: Epic Complete
+              (Day 3)                          (Day 8)
+```
+
+**Note:** Limited parallelism due to single developer. F3.2 starts after F3.3 defines schema.
+
+### Progress Tracking
+
+| Feature | Size | Status | Actual | Velocity | Notes |
+|---------|:----:|:------:|:------:|:--------:|-------|
+| F3.1 Identity Core Structure | S | Pending | - | - | |
+| F3.3 Memory Graph | S | Pending | - | - | |
+| F3.2 Content Migration | S | Pending | - | - | |
+| F3.4 Memory Query CLI | S | Pending | - | - | |
+| F3.5 Skills Integration | XS | Pending | - | - | |
+
+**Milestone Progress:**
+- [ ] M1: Walking Skeleton (Feb 4)
+- [ ] M2: Epic Complete (Feb 9)
+
+### Sequencing Rationale
+
+**F3.1 → F3.3 (Risk-First):**
+- F3.3 is highest uncertainty — does E2's ConceptGraph work for memory concepts?
+- If graph reuse fails, we learn on Day 2, not Day 5
+- Graph schema informs JSONL structure for F3.2
+
+**F3.3 before F3.2:**
+- Original order was F3.2 → F3.3 (migration before graph)
+- Risk-First reverses: define graph schema first, then migrate to match
+- Avoids rework if graph needs different structure
+
+**F3.5 last:**
+- Lowest risk (updating existing skills)
+- Can demo CLI without skills integration
+- If time runs short, manual `/session-start` is acceptable fallback
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| E2 ConceptGraph doesn't fit memory concepts | Medium | High | Spike first 30min of F3.3; pivot to simpler graph if needed |
+| JSONL schema needs iteration after migration starts | Medium | Medium | Define schema in F3.3 before F3.2; test with sample data |
+| Skills integration breaks existing session flow | Low | Medium | Keep `.claude/rai/` as fallback until validated |
+
+### Velocity Assumptions
+
+- **Baseline:** 2.3-2.8x multiplier with kata cycle (from E2 calibration)
+- **E2 reuse factor:** F3.3 should benefit from proven patterns
+- **Buffer:** 2 days for integration, polish, and epic close
+- **Estimated total:** ~4-5 hours implementation + buffer
+
+### Timeline
+
+| Day | Date | Features | Cumulative |
+|:---:|------|----------|:----------:|
+| 1 | Feb 2 | F3.1 | 20% |
+| 2 | Feb 3 | F3.3 | 40% |
+| 3 | Feb 4 | F3.2 | 60% — **M1 Walking Skeleton** |
+| 4-5 | Feb 5-6 | F3.4 | 80% |
+| 6 | Feb 7 | F3.5 | 100% |
+| 7-8 | Feb 8-9 | Buffer, polish, `/epic-close` | **M2 Epic Complete** |
+
+---
+
 *Epic tracking - update per feature completion*
 *Created: 2026-02-01*
 *Architecture revised: 2026-02-01 (JSONL + Graph model)*
+*Implementation plan added: 2026-02-01 (Risk-First, 2 milestones)*
