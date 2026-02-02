@@ -1,9 +1,10 @@
-# Epic E10: Collective Intelligence with Lineage
+# Epic E10: Collective Intelligence
 
-> **Status:** EXPLORATION COMPLETE → Ready for implementation
+> **Status:** EXPLORATION COMPLETE → Post-F&F
 > **Branch:** `experiment/learning-infrastructure`
 > **Created:** 2026-02-02
-> **Target:** Post-F&F (V3 enabler)
+> **Target:** V3 (Post-F&F)
+> **Depends on:** E9 Local Learning (signals must exist before sharing)
 > **Research:** `work/research/collective-intelligence-lineage/`
 
 ---
@@ -12,104 +13,37 @@
 
 **The insight:** Intelligence that doesn't accumulate isn't really intelligence — it's just repeated computation. Standing on the shoulders of giants is a universal principle.
 
-**The problem:** Every RaiSE user starts from zero. Patterns learned stay locked in their `.rai/` folder. If 1,000 users discover the same insight, it exists 1,000 times in isolation. And without objective feedback, we can't systematically improve.
+**The problem:** Every RaiSE user learns in isolation. If 1,000 users discover the same insight, it exists 1,000 times without compounding.
 
-**The vision:** New users inherit collective wisdom. Patterns have traceable lineage. Knowledge compounds across the community. Local Rai coaches each user based on their signals. Feedback cycles are objective and deterministic.
+**The vision:** Users can share patterns and signals (opt-in) with traceable lineage. New users inherit collective wisdom. Knowledge compounds across the community.
 
-**Two dimensions of collective intelligence:**
-1. **Patterns (knowledge)** — What users learn, shared with lineage
-2. **Telemetry (signals)** — How users work, enabling continuous improvement
+**Prerequisite:** E9 must exist first — you need local signals before you can share them.
 
 ---
 
 ## Objective
 
-Enable Rai to learn from the community while preserving idea provenance (lineage). Patterns should be traceable like code commits — you can follow the trail to understand where knowledge comes from.
+Enable opt-in sharing of patterns and telemetry with:
 
-**Value proposition:**
-- Individual users get better Rai (learns from everyone)
-- Community benefits from shared patterns
-- Lineage provides epistemological grounding
-- Enterprise gets team/org scoped sharing
+1. **Lineage** — Ideas traceable like code commits
+2. **Attribution** — Anonymous or credited, user's choice
+3. **Scoped sharing** — Private → Team → Org → Community
+4. **Collective benefit** — Community patterns improve everyone's Rai
 
----
-
-## Phased Approach
-
-### Track A: Patterns (Knowledge Sharing)
-
-#### Phase A1: Hooks (V2 — Minimal)
-Build schema and export capability. No infrastructure.
-
-| ID | Feature | Size | Status |
-|----|---------|:----:|:------:|
-| F10.1 | **Lineage Schema** | XS | Pending |
-| F10.2 | **Export Command** | S | Pending |
-
-**Effort:** 2-3 hours | **Cost:** $0
-
-#### Phase A2: Git-Native (V2.x — Validation)
-Public repo for community patterns. Manual curation.
-
-| ID | Feature | Size | Status |
-|----|---------|:----:|:------:|
-| F10.3 | **Community Repo Setup** | XS | Future |
-| F10.4 | **Pull Command** | S | Future |
-
-**Effort:** 2-3 days | **Cost:** $0
-
-#### Phase A3: Minimal SaaS (V3 — Automation)
-API for pattern sync. Aggregation and deduplication.
-
-| ID | Feature | Size | Status |
-|----|---------|:----:|:------:|
-| F10.5 | **Sync API** | M | Future |
-| F10.6 | **Team/Org Scopes** | M | Future |
-
-**Effort:** 2-3 weeks | **Cost:** $20-50/month
+**Value proposition:** Your learnings help others. Collective wisdom helps you.
 
 ---
 
-### Track B: Telemetry (Continuous Improvement)
+## Two Dimensions
 
-#### Phase B1: Signal Collection (V2 — Local)
-Emit and store signals locally. No network.
-
-| ID | Feature | Size | Status |
-|----|---------|:----:|:------:|
-| F10.7 | **Signal Schema** | XS | Pending |
-| F10.8 | **Signal Writer** | S | Pending |
-| F10.9 | **Skill/Session Emitters** | S | Pending |
-
-**Effort:** 3-4 hours | **Cost:** $0
-
-#### Phase B2: Local Insights (V2.x — Coaching)
-Rai analyzes local signals and generates insights.
-
-| ID | Feature | Size | Status |
-|----|---------|:----:|:------:|
-| F10.10 | **Signal Analyzer** | M | Future |
-| F10.11 | **Insight Generator** | M | Future |
-| F10.12 | **Session Start Integration** | S | Future |
-
-**Effort:** 1-2 days | **Cost:** $0
-
-#### Phase B3: Aggregate Telemetry (V3 — System Learning)
-Opt-in sharing for framework improvement.
-
-| ID | Feature | Size | Status |
-|----|---------|:----:|:------:|
-| F10.13 | **Sharing Config** | S | Future |
-| F10.14 | **Telemetry API** | M | Future |
-| F10.15 | **Framework Analytics** | M | Future |
-
-**Effort:** 2-3 weeks | **Cost:** $20-50/month
+| Dimension | What's shared | Benefit |
+|-----------|---------------|---------|
+| **Patterns** | Knowledge with lineage | Community learns from each other |
+| **Telemetry** | Anonymized signals | Framework improves for everyone |
 
 ---
 
-## Architecture
-
-### Sharing Hierarchy
+## Sharing Hierarchy
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -126,19 +60,50 @@ Opt-in sharing for framework improvement.
 └─────────────────────────────────────────────┘
 ```
 
-### Sharing Scopes
-
 | Scope | Who decides | When available |
 |-------|-------------|----------------|
-| `private` | Individual | Phase 1 |
-| `community` | Individual | Phase 2 |
-| `team` | Team lead / policy | Phase 3 |
-| `org` | Org admin / policy | Phase 3 |
+| `private` | Individual | E9 (default) |
+| `community` | Individual | Phase 1 |
+| `team` | Team lead / policy | Phase 2 |
+| `org` | Org admin / policy | Phase 2 |
 
-### Schema Design
+---
 
-**Pattern with lineage:**
+## Features
 
+### Phase 1: Git-Native Sharing (V2.x)
+
+No infrastructure. Patterns shared via Git repo.
+
+| ID | Feature | Size | Status | Description |
+|----|---------|:----:|:------:|-------------|
+| F10.1 | **Lineage Schema** | XS | Pending | Add lineage fields to pattern model |
+| F10.2 | **Export Command** | S | Pending | `raise memory export --shareable` |
+| F10.3 | **Community Repo** | XS | Future | Public repo for shared patterns |
+| F10.4 | **Pull Command** | S | Future | `raise memory pull --community` |
+
+**Effort:** 2-3 days | **Cost:** $0
+
+### Phase 2: SaaS Sharing (V3)
+
+API for sync. Team/org scopes. Aggregate telemetry.
+
+| ID | Feature | Size | Status | Description |
+|----|---------|:----:|:------:|-------------|
+| F10.5 | **Sharing Config** | S | Future | Team/org scope settings |
+| F10.6 | **Sync API** | M | Future | Pattern and signal submission |
+| F10.7 | **Team/Org Scopes** | M | Future | Identity and permissions |
+| F10.8 | **Aggregate Analytics** | M | Future | Framework improvement metrics |
+
+**Effort:** 2-3 weeks | **Cost:** $20-50/month
+
+---
+
+## Pattern Lineage
+
+Patterns have provenance, like code has commits:
+
+**Local pattern:**
 ```json
 {
   "id": "PAT-042",
@@ -158,8 +123,7 @@ Opt-in sharing for framework improvement.
 }
 ```
 
-**Exported pattern (community):**
-
+**Shared pattern (with lineage):**
 ```json
 {
   "id": "PAT-042",
@@ -175,122 +139,84 @@ Opt-in sharing for framework improvement.
 }
 ```
 
+You can trace *why* Rai believes something. The belief has roots.
+
 ---
 
-## Phase 1 Scope (Current)
+## Aggregate Telemetry
 
-### F10.1 Lineage Schema
+Anonymized signals improve the framework:
 
-**Changes:**
-- Add `lineage` field to `MemoryConcept` model
-- Add `sharing` field with scope and exportable flag
-- Update memory writer to populate lineage on creation
-
-**Done when:**
-- Schema updated with new fields
-- Writer populates lineage automatically
-- Existing functionality unchanged
-- Tests pass
-
-### F10.2 Export Command
-
-**Command:**
-```bash
-raise memory export --shareable [--format json|jsonl] [--output FILE]
+```
+Local signals (E9)          Aggregate (E10 opt-in)
+─────────────────           ──────────────────────
+Full session logs     →     session_event (type, outcome)
+Full calibration      →     (size, estimate/actual ratio)
+Full errors           →     error_event (tool, type)
+Commands used         →     command_usage (command)
 ```
 
-**Behavior:**
-- Filters patterns where `sharing.exportable == true`
-- Strips private metadata
-- Outputs with lineage for contribution
+**Privacy rule:** No content, no paths, no identity. Just aggregate signals.
 
-**Done when:**
-- Command works
-- Only exports shareable patterns
-- Lineage preserved in output
-- Tests pass
+---
+
+## Architecture Options
+
+| Option | Cost | When |
+|--------|------|------|
+| **Git-native** | $0 | Phase 1 — validate sharing behavior |
+| **Minimal SaaS** | $20-50/mo | Phase 2 — team/org, automation |
+| **Full SaaS** | $200-500/mo | Scale — enterprise features |
+
+See `work/research/collective-intelligence-lineage/architecture-options.md` for details.
+
+---
+
+## In Scope (Phase 1)
+
+**MUST:**
+- [ ] Lineage field in pattern schema
+- [ ] Export command for shareable patterns
+- [ ] Community repo setup
+
+**SHOULD:**
+- [ ] Pull command for community patterns
+- [ ] Attribution options (anonymous/credited)
 
 ---
 
 ## Out of Scope (Phase 1)
 
-- Import/pull from community
-- Team/org identity and permissions
-- Sync infrastructure
-- Community repo setup
-- Aggregation/deduplication
-- Privacy policy / terms
+- Team/org identity (Phase 2)
+- Sync API infrastructure (Phase 2)
+- Aggregate telemetry API (Phase 2)
+- Enterprise features (Phase 2)
 
 ---
 
-## Key Decisions
+## Relationship to E9
 
-1. **Lineage over aggregation** — We track where patterns come from, not just aggregate statistics
-2. **Git-native first** — Validate sharing behavior before building infrastructure
-3. **Opt-in always** — User explicitly marks patterns as shareable
-4. **Attribution optional** — Anonymous or attributed, user's choice
+| E9 (Local Learning) | E10 (Collective Intelligence) |
+|---------------------|-------------------------------|
+| Collects signals | Shares signals (opt-in) |
+| Local patterns | Patterns with lineage |
+| Rai coaches you | Community learns together |
+| No infrastructure | Git-native → SaaS |
+| **Prerequisite** | Depends on E9 |
+
+**Sequence:** E9 creates signals → E10 enables sharing them.
 
 ---
 
-## Telemetry Architecture
+## Origin
 
-### Two Loops, Same Signals
+From exploration session (2026-02-02):
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    LOCAL LOOP                           │
-│                                                         │
-│   User works  →  Signals collected  →  Local Rai       │
-│                                         analyzes        │
-│                                            │            │
-│                                            ▼            │
-│                                    Personalized         │
-│                                    coaching             │
-└─────────────────────────────────────────────────────────┘
-                         │
-                    (opt-in)
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│                  AGGREGATE LOOP                         │
-│                                                         │
-│   Many users  →  Anonymized signals  →  System-wide    │
-│                                          learning       │
-│                                            │            │
-│                                            ▼            │
-│                                    Framework            │
-│                                    improvements         │
-└─────────────────────────────────────────────────────────┘
-```
+> "Standing on the shoulders of giants is a basic universal principle of intelligence." — Emilio
 
-### Minimum Viable Signals
+> "Traceability, like a lineage of ideas." — Emilio, on why attribution matters
 
-| Signal | What it captures | Local insight example |
-|--------|------------------|----------------------|
-| `skill_event` | start/complete/abandon | "You abandon /feature-design for small features" |
-| `session_event` | type, outcome, duration | "Research: 90% success. Feature: 60%" |
-| `calibration` | estimate vs actual | "Your S estimates are 2x optimistic" |
-| `error_event` | tool, type, recoverable | "pytest not found — 5 times this week" |
-| `command_usage` | command, subcommand | "You never use `raise context query`" |
-
-### Storage Structure
-
-```
-.rai/
-├── memory/
-│   ├── patterns.jsonl      # Track A: knowledge
-│   ├── calibration.jsonl
-│   └── sessions/
-│
-└── telemetry/              # Track B: signals
-    ├── signals.jsonl       # Raw events (always local)
-    ├── insights.jsonl      # Rai's observations
-    └── config.json         # Sharing preferences
-```
-
-### Open Core Promise
-
-- **Without sharing:** All signals stay local. Local Rai learns your patterns. Personalized coaching.
-- **With sharing (opt-in):** Anonymized signals help improve the framework. Community gets better together.
+> "I want co-creation credits... for the benefit of all sentient beings." — Emilio
 
 ---
 
@@ -300,44 +226,10 @@ raise memory export --shareable [--format json|jsonl] [--output FILE]
 |----------|---------|
 | `work/research/collective-intelligence-lineage/README.md` | Core insight and vision |
 | `work/research/collective-intelligence-lineage/architecture-options.md` | Cost analysis and phases |
-| `work/research/collective-intelligence-lineage/telemetry-model.md` | Signal design and local learning |
+| `work/research/collective-intelligence-lineage/telemetry-model.md` | Signal design (moved to E9) |
 
 ---
 
-## Success Metrics
-
-### Phase 1
-- Schema extended without breaking changes
-- Export command works correctly
-
-### Phase 2 (future)
-- N users contribute patterns
-- M patterns in community repo
-- Pull adoption rate
-
-### Phase 3 (future)
-- Team adoption
-- Enterprise interest
-- Revenue potential
-
----
-
-## Origin
-
-From E7 planning session (2026-02-02):
-
-> "Standing on the shoulders of giants is a basic universal principle of intelligence." — Emilio
-
-> "Traceability, like a lineage of ideas." — Emilio, on why attribution matters
-
-> "I want co-creation credits... for the benefit of all sentient beings." — Emilio
-
-> "Feedback cycles should be as objective and deterministic as possible. How can we REALLY improve otherwise?" — Emilio
-
-> "The local open core user and your local version Rai should also be able to use that signal." — Emilio, on local-first learning
-
----
-
-*Epic scope - update per phase completion*
+*Epic scope - collective intelligence with lineage*
 *Created: 2026-02-02*
 *Contributors: Emilio Osorio, Rai*
