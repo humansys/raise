@@ -69,6 +69,9 @@ def infer_relationships(concepts: list[Concept]) -> list[Relationship]:
     # Rule 4: related_to (shared keywords)
     relationships.extend(_infer_related_to(concepts))
 
+    # Rule 5: work relationships (contains, current_focus)
+    relationships.extend(_infer_work_relationships(concepts))
+
     return relationships
 
 
@@ -271,3 +274,80 @@ def extract_keywords(text: str) -> set[str]:
 
     words = re.findall(r"\b\w+\b", text.lower())
     return {w for w in words if len(w) > 3 and w not in stopwords}
+
+
+def _infer_work_relationships(concepts: list[Concept]) -> list[Relationship]:
+    """Infer relationships between work tracking concepts.
+
+    Infers:
+    - contains: Project → Epic, Epic → Feature
+    - current_focus: Project → Epic (for current epic)
+
+    Args:
+        concepts: List of all concepts including work tracking types.
+
+    Returns:
+        List of work relationships.
+    """
+    relationships: list[Relationship] = []
+
+    # Index work concepts by type
+    projects = [c for c in concepts if c.type == ConceptType.PROJECT]
+    epics = [c for c in concepts if c.type == ConceptType.EPIC]
+    features = [c for c in concepts if c.type == ConceptType.FEATURE]
+
+    # Project contains Epic (based on project_id in epic metadata)
+    for project in projects:
+        project_name = project.metadata.get("name")
+        if not project_name:
+            continue
+
+        for epic in epics:
+            epic_project_id = epic.metadata.get("project_id")
+            if epic_project_id and epic_project_id == project_name:
+                relationships.append(
+                    Relationship(
+                        source=project.id,
+                        target=epic.id,
+                        type="contains",
+                        metadata={"confidence": 1.0, "method": "explicit"},
+                    )
+                )
+
+        # Current focus relationship
+        current_epic_id = project.metadata.get("current_epic")
+        if current_epic_id:
+            # Find the epic with matching epic_id
+            current_epic = next(
+                (e for e in epics if e.metadata.get("epic_id") == current_epic_id),
+                None,
+            )
+            if current_epic:
+                relationships.append(
+                    Relationship(
+                        source=project.id,
+                        target=current_epic.id,
+                        type="current_focus",
+                        metadata={"confidence": 1.0, "method": "explicit"},
+                    )
+                )
+
+    # Epic contains Feature (based on epic_id in feature metadata)
+    for epic in epics:
+        epic_id = epic.metadata.get("epic_id")
+        if not epic_id:
+            continue
+
+        for feature in features:
+            feature_epic_id = feature.metadata.get("epic_id")
+            if feature_epic_id and feature_epic_id == epic_id:
+                relationships.append(
+                    Relationship(
+                        source=epic.id,
+                        target=feature.id,
+                        type="contains",
+                        metadata={"confidence": 1.0, "method": "explicit"},
+                    )
+                )
+
+    return relationships
