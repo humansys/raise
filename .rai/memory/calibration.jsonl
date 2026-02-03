@@ -16,3 +16,4 @@
 {"feature_id":"F8.4","feature_name":"Work Queries","epic":"E8","size":"S","sp":2,"estimated_min":45,"actual_min":15,"velocity":2.0,"tests":14,"coverage":50,"date":"2026-02-02","notes":"query_work_context + normalize_concept_id extensions"}
 {"feature_id":"F9.1","feature_name":"Signal Schema","epic":"E9","size":"XS","sp":1,"estimated_min":25,"actual_min":18,"velocity":1.4,"tests":25,"coverage":100,"date":"2026-02-03","notes":"ADR-018 specified schemas, full kata cycle"}
 {"feature_id":"F9.2","feature_name":"Signal Writer","epic":"E9","size":"S","sp":2,"estimated_min":45,"actual_min":22,"velocity":2.0,"tests":17,"coverage":91,"date":"2026-02-03","notes":"Full kata cycle, convenience functions, file locking"}
+{"feature_id":"F9.3","feature_name":"Skill Emitters","epic":"E9","size":"S","sp":2,"estimated_min":30,"actual_min":8,"velocity":3.75,"tests":0,"coverage":0,"date":"2026-02-03","notes":"Shell script update, existing infrastructure, duration tracking"}
