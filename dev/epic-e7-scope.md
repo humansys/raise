@@ -1,11 +1,11 @@
 # Epic E7: Distribution & Onboarding - Scope
 
-> **Status:** DRAFT (blocked by E8)
+> **Status:** READY (after E9 Phase 1)
 > **Branch:** `feature/e7/distribution`
 > **Created:** 2026-02-02
 > **Target:** Feb 9, 2026 (Friends & Family pre-launch)
 > **Research:** `work/research/openclaw-onboarding/` (RES-ONBOARD-001)
-> **Depends on:** E8 Work Tracking Graph (for `raise status` to query graph)
+> **Depends on:** E9 Phase 1 (telemetry infrastructure)
 
 ---
 
@@ -188,7 +188,7 @@ F7.1 (Onboard) ← NEXT
 F7.3 (Status)
 ```
 
-**Blockers:** None — F7.2 and F7.4 complete
+**Blockers:** E9 Phase 1 (telemetry) — then F7.1, F7.3
 
 ---
 
