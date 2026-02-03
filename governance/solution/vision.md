@@ -237,6 +237,58 @@ Multiple developers, each with their Rai, connected:
 - Skill progression tracking
 - Observable workflow at team level
 
+### Collective Intelligence (Future)
+
+> "Standing on the shoulders of giants is a universal principle of intelligence."
+
+Beyond teams: a community where **knowledge compounds**.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                 Collective Intelligence                      │
+│                                                              │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │
+│   │  Dev A   │  │  Dev B   │  │  Team X  │  │  Team Y  │  │
+│   │  + Rai   │  │  + Rai   │  │  + Rai   │  │  + Rai   │  │
+│   └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  │
+│        │             │             │             │          │
+│        └─────────────┴──────┬──────┴─────────────┘          │
+│                             ▼                                │
+│               ┌─────────────────────────┐                   │
+│               │   Community Patterns     │                   │
+│               │   (opt-in, with lineage) │                   │
+│               └─────────────────────────┘                   │
+│                             │                                │
+│                             ▼                                │
+│                    New user's Rai                           │
+│                    starts with wisdom                        │
+│                    from thousands                           │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**The problem today:** Every developer learns in isolation. If 1,000 users discover the same insight, it exists 1,000 times without compounding.
+
+**The vision:** Opt-in sharing with traceable lineage. Your patterns help others. Collective wisdom helps you.
+
+**How it works:**
+
+| Aspect | Implementation |
+|--------|----------------|
+| **Local-first** | Everything works offline. Sharing is opt-in. |
+| **Lineage** | Patterns trace to their source, like code traces to commits |
+| **Privacy** | No content, no code, no identity. Just patterns. |
+| **Attribution** | Anonymous by default. Credit if you want it. |
+
+**Sharing hierarchy:**
+
+```
+Individual → Team → Organization → Community
+```
+
+Enterprise sharing is a governance decision. A developer can't share org patterns without policy approval.
+
+**The principle:** Intelligence that doesn't accumulate isn't really intelligence — it's just repeated computation.
+
 ---
 
 ## The Toolkit
