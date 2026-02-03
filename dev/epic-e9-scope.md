@@ -78,7 +78,7 @@ Five deterministic signals that enable continuous improvement:
 |----|---------|:----:|:------:|-------------|
 | F9.1 | **Signal Schema** | XS | ✓ Done | Define signal types in Pydantic models |
 | F9.2 | **Signal Writer** | S | ✓ Done | Append signals to `.rai/telemetry/signals.jsonl` |
-| F9.3 | **Skill Emitters** | S | Pending | Emit skill_event on start/complete/abandon |
+| F9.3 | **Skill Emitters** | S | ✓ Done | Emit skill_event on start/complete/abandon |
 | F9.4 | **Session Emitters** | S | Pending | Emit session_event from /session-close |
 | F9.5 | **Error Emitters** | XS | Pending | Emit error_event on tool failures |
 
@@ -514,7 +514,7 @@ Stream 3:         F9.5 ─────► merge (parallel after F9.2)
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F9.1 Signal Schema | XS | ✓ Done | 18m | 1.4x | ADR-specified |
 | F9.2 Signal Writer | S | ✓ Done | 22m | 2.0x | Convenience funcs added |
-| F9.3 Skill Emitters | S | Pending | - | - | |
+| F9.3 Skill Emitters | S | ✓ Done | 8m | 3.75x | Shell scripts, minimal change |
 | F9.4 Session Emitters | S | Pending | - | - | |
 | F9.5 Error Emitters | XS | Pending | - | - | |
 
