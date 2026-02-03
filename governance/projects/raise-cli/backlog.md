@@ -1,8 +1,8 @@
 # Backlog: raise-cli
 
 > **Status**: Active
-> **Date**: 2026-02-02
-> **Version**: 1.1.0
+> **Date**: 2026-02-03
+> **Version**: 1.2.0
 > **Related**: PRD v1.1.0, Vision v1.0.0, Design v1.1.0
 
 ---
@@ -17,21 +17,23 @@
 | E4 | **Context Generation** | ✅ Via Skills | — | — |
 | E5 | **SAR Engine** | Deferred | — | P2 |
 | E6 | **Observability** | → Replaced by E9 | — | — |
-| E7 | **Distribution & Onboarding** | 📋 Ready | `dev/epic-e7-scope.md` | **P0 (next)** |
+| E7 | **Distribution & Onboarding** | 📋 Ready | `dev/epic-e7-scope.md` | P1 (after E9) |
 | E8 | **Work Tracking Graph** | ✅ Complete | `dev/epic-e8-scope.md` | — |
-| E9 | **Local Learning & Self-Awareness** | 📋 Ready | `dev/epic-e9-scope.md` | P1 |
+| E9 | **Local Learning & Self-Awareness** | 🚧 In Progress | `dev/epic-e9-scope.md` | **P0 (current)** |
 | E10 | **Collective Intelligence** | 📋 Explored | `dev/epic-e10-scope.md` | P2 (V3) |
 
-**F&F Scope (Feb 9):** E7 → E9 (Phase 1 if time)
+**F&F Scope (Feb 9):** E9 Phase 1 → E7
 
 **Sequence:**
 ```
-E7 Distribution & Onboard ← User experience (pip install → /session-start)
+E9 Local Learning (Phase 1) ← Telemetry foundation (signals before users)
     ↓
-E9 Local Learning         ← Signals + local insights (Rai as coach)
+E7 Distribution & Onboard   ← User experience (pip install → /session-start)
     ↓
-E10 Collective Intel      ← Pattern sharing + aggregate telemetry (V3)
+E10 Collective Intel        ← Pattern sharing + aggregate telemetry (V3)
 ```
+
+**Rationale:** Telemetry must exist before F&F users start — otherwise we lose baseline data.
 
 **Notes:**
 - E8 complete — enables graph queries for work tracking
@@ -174,24 +176,26 @@ Quick summary: Session/feature metrics for data-driven retrospectives.
 | Epic | Status | Remaining |
 |------|--------|-----------|
 | E1-E4 | ✅ Complete | — |
-| E8 Work Tracking Graph | 📋 Draft | 4 features (~4-6h) |
-| E7 Distribution | 📋 Draft | 2 features (~3-4h) |
-| E9 Telemetry | 📋 Draft | 4 features (~4h) — partial |
+| E8 Work Tracking Graph | ✅ Complete | — |
+| E9 Telemetry | 🚧 In Progress | 4 features (~3h) |
+| E7 Distribution | 📋 Ready | 2 features (~3-4h) |
 
 **What's done:**
 - CLI: `raise graph`, `raise context`, `raise memory` commands
 - Skills: 11 skills for full development lifecycle
 - Memory: Identity + graph infrastructure for session continuity
-- Tests: 123 tests, 96-100% coverage
+- Work Tracking: Backlog/epic parsing, work context queries
+- Telemetry: F9.1 Signal Schema complete (25 tests, 100% coverage)
+- Tests: 150+ tests, 96-100% coverage
 - README: Updated with v2 structure, installation, getting started
 
 **F&F Critical Path:**
 ```
-E8 (graph) → E7 (onboard) → E9 (telemetry basics)
-   4-6h         3-4h            4h
+E9 Phase 1 (telemetry) → E7 (onboard)
+   ~3h remaining            ~3-4h
 ```
 
-**Estimated total:** 11-14 hours (3-4 sessions)
+**Estimated total:** 6-7 hours (2 sessions)
 
 **Post-MVP**: E5 (SAR - 29 SP), E6 (Observability - 13 SP), F4.3, F7.3
 
@@ -203,11 +207,11 @@ E8 (graph) → E7 (onboard) → E9 (telemetry basics)
 
 ### Epic Sequence
 
-| Order | Epic | Purpose | Est. |
-|:-----:|------|---------|------|
-| 1 | **E8 Work Tracking Graph** | Fix alignment problem, queryable backlog | 4-6h |
-| 2 | **E7 Onboarding** | `raise onboard` → pip install to productive | 3-4h |
-| 3 | **E9 Telemetry** | Data for retros, self-awareness | 4h |
+| Order | Epic | Purpose | Est. | Status |
+|:-----:|------|---------|------|--------|
+| 1 | **E8 Work Tracking Graph** | Fix alignment problem, queryable backlog | 4-6h | ✅ Done |
+| 2 | **E9 Telemetry (Phase 1)** | Signals before users arrive | ~3h | 🚧 F9.1 done |
+| 3 | **E7 Onboarding** | `raise onboard` → pip install to productive | 3-4h | 📋 Ready |
 
 ### Completed
 
@@ -215,6 +219,9 @@ E8 (graph) → E7 (onboard) → E9 (telemetry basics)
 - [x] Installation guide in README
 - [x] Research: OpenClaw onboarding (RES-ONBOARD-001)
 - [x] Epic scopes drafted (E7, E8, E9)
+- [x] E8 complete — 4 features, 75 tests (2026-02-02)
+- [x] E9 design/plan — ADR-018 (2026-02-03)
+- [x] F9.1 Signal Schema — 25 tests, 100% coverage (2026-02-03)
 
 ### User Journey (Target)
 
@@ -454,10 +461,11 @@ Each feature is complete when:
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 1.2.0 | 2026-02-03 | Rai | E8 complete, E9 in progress (F9.1 done), sequence: E9→E7 |
 | 1.1.0 | 2026-02-02 | Rai | Sync with reality: E1-E3 complete, E4 via skills, F&F readiness section |
 | 1.0.0 | 2026-01-30 | Claude Opus 4.5 | Initial backlog |
 
 ---
 
 *Updated by: Rai + Emilio*
-*Last sync: 2026-02-02*
+*Last sync: 2026-02-03*
