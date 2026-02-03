@@ -83,6 +83,25 @@
 - [ ] **Add explicit outcome keywords to requirements** - Enable `implements` edges in concept graph (F2.2 retro)
 - [ ] **Consider "mentions" relationship type** - Lower confidence than `related_to` for broader semantic links (F2.2 retro)
 
+### E9 Telemetry — Deferred (Post-F&F)
+
+> Phase 2 and 3 deferred to post-F&F. Phase 1 is F&F scope.
+
+**Phase 2 (Local Insights):**
+- [ ] F9.6 Signal Analyzer — Analyze signals.jsonl for patterns
+- [ ] F9.7 Insight Generator — Epistemologically-grounded insights
+- [ ] F9.8 Session Start Integration — Surface insights in /session-start
+- [ ] F9.9 Calibration Updater — Auto-update calibration from actuals
+
+**Phase 3 (Telemetry CLI):**
+- [ ] F9.10 Telemetry Commands — `raise telemetry velocity`, `drift`, `insights`
+- [ ] F9.11 Retro Integration — /feature-review queries telemetry
+
+**Also deferred:**
+- [ ] Signal rotation/archival — Handle unbounded growth
+- [ ] OTLP export — Enterprise observability integration
+- [ ] Dashboard visualization — Beyond CLI
+
 ### E3 Identity Core — Deferred (YAGNI)
 
 > Lean MVP decision (2026-02-02): Start with 7 files, grow when needed.

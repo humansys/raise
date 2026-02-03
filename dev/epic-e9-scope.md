@@ -1,13 +1,14 @@
 # Epic E9: Local Learning & Self-Awareness
 
-> **Status:** DRAFT → Epistemologically grounded
+> **Status:** ACTIVE — Phase 1 for F&F MVP
 > **Branch:** `feature/e9/local-learning`
 > **Created:** 2026-02-02
-> **Target:** Post-E7 (F&F if time allows)
-> **Depends on:** E7 Distribution
+> **Target:** Feb 9, 2026 (F&F) — Phase 1 only
+> **Depends on:** None (E7 depends on E9 Phase 1)
 > **Research:**
 > - `work/research/collective-intelligence-lineage/telemetry-model.md`
 > - `work/research/collective-intelligence-lineage/prior-art-epistemology.md`
+> **ADR:** ADR-018 (Local Telemetry Architecture)
 
 ---
 
@@ -370,15 +371,63 @@ This feature was 33% faster than your typical S feature.
 
 ---
 
+## Dependencies
+
+### Internal (Phase 1)
+
+```
+F9.1 (Signal Schema)
+  ↓
+F9.2 (Signal Writer) ← depends on schemas
+  ↓
+┌─────────────────────────────────────┐
+│  F9.3 (Skill Emitters)              │
+│  F9.4 (Session Emitters)            │ ← all depend on writer
+│  F9.5 (Error Emitters)              │
+└─────────────────────────────────────┘
+```
+
+**Critical path:** F9.1 → F9.2 → F9.3/F9.4/F9.5 (parallel)
+
+### External
+
+- **E7 depends on E9 Phase 1** — Onboarding should include telemetry setup
+- **E10 depends on E9** — Can't share signals that don't exist
+
+---
+
+## Risk Register
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| Signal overhead slows workflow | Low | Medium | Async writes, batch if needed |
+| Schema changes break compatibility | Medium | Medium | Version field in signals, migration script |
+| Users distrust telemetry | Low | High | Clear docs, no content/code/paths, local-only |
+| Storage grows unbounded | Medium | Low | Log rotation, archive old signals |
+| Skill integration breaks existing tests | Low | Medium | Feature flag, opt-out for tests |
+
+---
+
 ## Done Criteria
 
-### Phase 1
-- [ ] Signals emitted from skills
-- [ ] Signals stored in signals.jsonl
-- [ ] No impact on existing functionality
-- [ ] Tests pass
+### Per Feature (Standard)
+- [ ] Code implemented with type annotations
+- [ ] Docstrings on all public APIs (Google-style)
+- [ ] Unit tests passing (>90% coverage on feature code)
+- [ ] All quality checks pass (ruff, pyright, bandit)
+- [ ] Component catalog updated (`dev/components.md`)
 
-### Phase 2
+### Phase 1 (Epic)
+- [ ] Signal schemas defined (F9.1)
+- [ ] Signal writer appends to signals.jsonl (F9.2)
+- [ ] Skill events emitted on start/complete/abandon (F9.3)
+- [ ] Session events emitted from /session-close (F9.4)
+- [ ] Error events emitted on tool failures (F9.5)
+- [ ] No impact on existing functionality
+- [ ] All tests pass
+- [ ] ADR-018 created ✓
+
+### Phase 2 (Epic)
 - [ ] Insights generated from signals
 - [ ] Insights surfaced in /session-start
 - [ ] Calibration auto-updated
@@ -419,6 +468,110 @@ From exploration session (2026-02-02):
 
 ---
 
+---
+
+## Implementation Plan (Phase 1)
+
+> Added by `/epic-plan` — 2026-02-03
+
+### Feature Sequence
+
+| Order | Feature | Size | Est. | Dependencies | Milestone | Rationale |
+|:-----:|---------|:----:|:----:|--------------|-----------|-----------|
+| 1 | F9.1 Signal Schema | XS | 25m | None | M1 | Foundation — all features depend on schemas |
+| 2 | F9.2 Signal Writer | S | 45m | F9.1 | M1 | Core infrastructure — enables all emitters |
+| 3 | F9.3 Skill Emitters | S | 45m | F9.2 | M2 | High value — captures skill usage patterns |
+| 4 | F9.4 Session Emitters | S | 45m | F9.2 | M2 | High value — captures session outcomes |
+| 5 | F9.5 Error Emitters | XS | 20m | F9.2 | M2 | Quick win — completes signal types |
+
+**Total estimated:** ~3 hours (with kata cycle velocity)
+
+### Milestones
+
+| Milestone | Features | Target | Success Criteria | Demo |
+|-----------|----------|--------|------------------|------|
+| **M1: Walking Skeleton** | F9.1, F9.2 | Hour 1 | Can write a signal to signals.jsonl | `raise telemetry emit --test` works |
+| **M2: Signal Collection** | F9.3, F9.4, F9.5 | Hour 3 | Skills and sessions emit signals | Run /session-close, check signals.jsonl |
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stream 1: F9.1 ─► F9.2 ─► F9.3 (critical path)
+                    ↓
+Stream 2:         F9.4 ─────► merge (parallel after F9.2)
+                    ↓
+Stream 3:         F9.5 ─────► merge (parallel after F9.2)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Merge point:** After F9.2, emitters (F9.3, F9.4, F9.5) can run in parallel.
+
+### Progress Tracking
+
+| Feature | Size | Status | Actual | Velocity | Notes |
+|---------|:----:|:------:|:------:|:--------:|-------|
+| F9.1 Signal Schema | XS | Pending | - | - | |
+| F9.2 Signal Writer | S | Pending | - | - | |
+| F9.3 Skill Emitters | S | Pending | - | - | |
+| F9.4 Session Emitters | S | Pending | - | - | |
+| F9.5 Error Emitters | XS | Pending | - | - | |
+
+**Milestone Progress:**
+- [ ] M1: Walking Skeleton
+- [ ] M2: Signal Collection (Phase 1 Complete)
+
+### Sequencing Rationale
+
+**F9.1 first (Risk-First + Foundation):**
+- All other features depend on schemas
+- Low risk (Pydantic models are well-understood)
+- Quick win to validate approach
+
+**F9.2 second (Walking Skeleton):**
+- Proves write path works
+- Enables parallel development of emitters
+- Can demo immediately after completion
+
+**F9.3, F9.4, F9.5 parallel (Maximize throughput):**
+- All depend only on F9.2 (no mutual dependencies)
+- Different integration points (skills, session-close, errors)
+- Can merge independently
+
+### Velocity Assumptions
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| **Baseline velocity** | 1.5x | E8 average (pattern reuse) |
+| **XS actual** | 20-30 min | F3.5 calibration |
+| **S actual** | 30-60 min | E8 calibration |
+| **Buffer** | 20% | Integration, tests |
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| Schema changes during implementation | Medium | Low | Version field from start |
+| Writer async complexity | Low | Medium | Start sync, optimize later |
+| Skill hook integration tricky | Medium | Medium | Test with one skill first |
+
+---
+
+## Summary
+
+| Metric | Value |
+|--------|-------|
+| **Features (Phase 1)** | 5 (F9.1-F9.5) |
+| **Effort (Phase 1)** | 4-5 hours |
+| **Features (Total)** | 11 (F9.1-F9.11) |
+| **ADRs** | ADR-018 (Local Telemetry Architecture) |
+| **Critical Path** | F9.1 → F9.2 → F9.3/F9.4/F9.5 |
+
+---
+
 *Epic scope - local-first learning*
 *Created: 2026-02-02*
+*Designed: 2026-02-03 (via /epic-design)*
+*Planned: 2026-02-03 (via /epic-plan)*
 *Contributors: Emilio Osorio, Rai*
