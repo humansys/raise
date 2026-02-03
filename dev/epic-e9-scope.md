@@ -76,7 +76,7 @@ Five deterministic signals that enable continuous improvement:
 
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
-| F9.1 | **Signal Schema** | XS | Pending | Define signal types in Pydantic models |
+| F9.1 | **Signal Schema** | XS | ✓ Done | Define signal types in Pydantic models |
 | F9.2 | **Signal Writer** | S | Pending | Append signals to `.rai/telemetry/signals.jsonl` |
 | F9.3 | **Skill Emitters** | S | Pending | Emit skill_event on start/complete/abandon |
 | F9.4 | **Session Emitters** | S | Pending | Emit session_event from /session-close |
@@ -512,14 +512,14 @@ Stream 3:         F9.5 ─────► merge (parallel after F9.2)
 
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
-| F9.1 Signal Schema | XS | Pending | - | - | |
+| F9.1 Signal Schema | XS | ✓ Done | 18m | 1.4x | ADR-specified |
 | F9.2 Signal Writer | S | Pending | - | - | |
 | F9.3 Skill Emitters | S | Pending | - | - | |
 | F9.4 Session Emitters | S | Pending | - | - | |
 | F9.5 Error Emitters | XS | Pending | - | - | |
 
 **Milestone Progress:**
-- [ ] M1: Walking Skeleton
+- [ ] M1: Walking Skeleton (1/2 features done)
 - [ ] M2: Signal Collection (Phase 1 Complete)
 
 ### Sequencing Rationale
