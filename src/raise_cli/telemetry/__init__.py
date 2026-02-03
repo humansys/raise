@@ -17,12 +17,24 @@ from raise_cli.telemetry.schemas import (
     Signal,
     SkillEvent,
 )
+from raise_cli.telemetry.writer import (
+    EmitResult,
+    emit,
+    emit_command_usage,
+    emit_error_event,
+    emit_skill_event,
+)
 
 __all__ = [
     "CalibrationEvent",
     "CommandUsage",
+    "EmitResult",
     "ErrorEvent",
     "SessionEvent",
     "Signal",
     "SkillEvent",
+    "emit",
+    "emit_command_usage",
+    "emit_error_event",
+    "emit_skill_event",
 ]
