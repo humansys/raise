@@ -1,0 +1,212 @@
+"""Writer module for appending telemetry signals to JSONL.
+
+This module provides the `emit()` function to append signals to
+`.rai/telemetry/signals.jsonl` as specified in ADR-018.
+
+Signals are written as JSON lines (one JSON object per line),
+which is append-friendly and git-friendly.
+"""
+
+from __future__ import annotations
+
+import fcntl
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from raise_cli.telemetry.schemas import (
+        CalibrationEvent,
+        CommandUsage,
+        ErrorEvent,
+        SessionEvent,
+        SkillEvent,
+    )
+
+# Default telemetry directory relative to project root
+DEFAULT_TELEMETRY_DIR = ".rai/telemetry"
+DEFAULT_SIGNALS_FILE = "signals.jsonl"
+
+
+@dataclass
+class EmitResult:
+    """Result of emitting a signal.
+
+    Attributes:
+        success: Whether the signal was written successfully.
+        path: Path where the signal was written.
+        error: Error message if failed, None otherwise.
+    """
+
+    success: bool
+    path: Path | None = None
+    error: str | None = None
+
+
+def _get_telemetry_path(base_path: Path | None = None) -> Path:
+    """Get the path to the signals.jsonl file.
+
+    Args:
+        base_path: Base directory for telemetry. Defaults to current directory.
+
+    Returns:
+        Path to signals.jsonl file.
+    """
+    if base_path is None:
+        base_path = Path.cwd()
+    return base_path / DEFAULT_TELEMETRY_DIR / DEFAULT_SIGNALS_FILE
+
+
+def _ensure_directory(path: Path) -> None:
+    """Ensure the parent directory exists.
+
+    Args:
+        path: Path to file whose parent directory should exist.
+    """
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+
+def emit(
+    signal: SkillEvent | SessionEvent | CalibrationEvent | ErrorEvent | CommandUsage,
+    *,
+    base_path: Path | None = None,
+) -> EmitResult:
+    """Emit a telemetry signal to the signals.jsonl file.
+
+    Appends the signal as a JSON line to `.rai/telemetry/signals.jsonl`.
+    Creates the directory if it doesn't exist. Uses file locking for
+    thread-safe writes.
+
+    Args:
+        signal: The signal to emit (any of the 5 signal types).
+        base_path: Base directory for telemetry. Defaults to current directory.
+
+    Returns:
+        EmitResult with success status and path or error message.
+
+    Examples:
+        >>> from datetime import datetime, timezone
+        >>> from raise_cli.telemetry import SkillEvent, emit
+        >>> event = SkillEvent(
+        ...     timestamp=datetime.now(timezone.utc),
+        ...     skill="feature-design",
+        ...     event="start"
+        ... )
+        >>> result = emit(event)
+        >>> result.success
+        True
+    """
+    path = _get_telemetry_path(base_path)
+
+    try:
+        _ensure_directory(path)
+
+        # Serialize signal to JSON line
+        json_line = signal.model_dump_json() + "\n"
+
+        # Append with file locking for thread safety
+        with open(path, "a", encoding="utf-8") as f:
+            # Acquire exclusive lock (blocking)
+            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            try:
+                f.write(json_line)
+            finally:
+                # Release lock
+                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+
+        return EmitResult(success=True, path=path)
+
+    except PermissionError as e:
+        return EmitResult(
+            success=False, error=f"Permission denied writing to {path}: {e}"
+        )
+    except OSError as e:
+        return EmitResult(success=False, error=f"OS error writing to {path}: {e}")
+
+
+def emit_skill_event(
+    skill: str,
+    event: str,
+    duration_sec: int | None = None,
+    *,
+    base_path: Path | None = None,
+) -> EmitResult:
+    """Convenience function to emit a skill event.
+
+    Args:
+        skill: Name of the skill (e.g., "feature-design").
+        event: Event type ("start", "complete", "abandon").
+        duration_sec: Duration in seconds (for complete/abandon).
+        base_path: Base directory for telemetry.
+
+    Returns:
+        EmitResult with success status.
+    """
+    from raise_cli.telemetry.schemas import SkillEvent
+
+    signal = SkillEvent(
+        timestamp=datetime.now(UTC),
+        skill=skill,
+        event=event,  # type: ignore[arg-type]
+        duration_sec=duration_sec,
+    )
+    return emit(signal, base_path=base_path)
+
+
+def emit_command_usage(
+    command: str,
+    subcommand: str | None = None,
+    *,
+    base_path: Path | None = None,
+) -> EmitResult:
+    """Convenience function to emit a command usage event.
+
+    Args:
+        command: Main command name (e.g., "memory").
+        subcommand: Subcommand name if any (e.g., "query").
+        base_path: Base directory for telemetry.
+
+    Returns:
+        EmitResult with success status.
+    """
+    from raise_cli.telemetry.schemas import CommandUsage
+
+    signal = CommandUsage(
+        timestamp=datetime.now(UTC),
+        command=command,
+        subcommand=subcommand,
+    )
+    return emit(signal, base_path=base_path)
+
+
+def emit_error_event(
+    tool: str,
+    error_type: str,
+    context: str,
+    recoverable: bool,
+    *,
+    base_path: Path | None = None,
+) -> EmitResult:
+    """Convenience function to emit an error event.
+
+    Args:
+        tool: Name of the tool that failed (e.g., "Bash").
+        error_type: Type of error (e.g., "command_not_found").
+        context: Brief context (no sensitive data).
+        recoverable: Whether the error was recoverable.
+        base_path: Base directory for telemetry.
+
+    Returns:
+        EmitResult with success status.
+    """
+    from raise_cli.telemetry.schemas import ErrorEvent
+
+    signal = ErrorEvent(
+        timestamp=datetime.now(UTC),
+        tool=tool,
+        error_type=error_type,
+        context=context,
+        recoverable=recoverable,
+    )
+    return emit(signal, base_path=base_path)
