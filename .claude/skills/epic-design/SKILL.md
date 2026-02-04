@@ -78,6 +78,16 @@ Design an epic that bridges strategic objectives to executable features. Create 
 
 ## Steps
 
+### Step 0: Emit Epic Start (Telemetry)
+
+Record the start of the design phase:
+
+```bash
+raise telemetry emit epic {epic_id} --event start --phase design
+```
+
+**Example:** `raise telemetry emit epic E9 -e start -p design`
+
 ### Step 1: Frame the Epic Objective
 
 Define what this epic accomplishes at a strategic level.
@@ -368,6 +378,18 @@ Self-review checklist before proceeding:
 1. Can someone unfamiliar with this work understand what the epic delivers?
 2. Is there a clear path from first feature to epic completion?
 3. Are architectural decisions documented, not assumed?
+
+---
+
+### Step 13: Emit Epic Complete (Telemetry)
+
+Record the completion of the design phase:
+
+```bash
+raise telemetry emit epic {epic_id} --event complete --phase design
+```
+
+**Example:** `raise telemetry emit epic E9 -e complete -p design`
 
 ---
 

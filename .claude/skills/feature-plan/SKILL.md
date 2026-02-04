@@ -64,10 +64,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-raise telemetry emit-feature {feature_id} --event start --phase plan
+raise telemetry emit feature {feature_id} --event start --phase plan
 ```
 
-**Example:** `raise telemetry emit-feature F9.4 -e start -p plan`
+**Example:** `raise telemetry emit feature F9.4 -e start -p plan`
 
 ### Step 1: Select Story
 
@@ -167,10 +167,10 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-raise telemetry emit-feature {feature_id} --event complete --phase plan
+raise telemetry emit feature {feature_id} --event complete --phase plan
 ```
 
-**Example:** `raise telemetry emit-feature F9.4 -e complete -p plan`
+**Example:** `raise telemetry emit feature F9.4 -e complete -p plan`
 
 ## Output
 

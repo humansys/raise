@@ -20,9 +20,9 @@ if TYPE_CHECKING:
         CalibrationEvent,
         CommandUsage,
         ErrorEvent,
-        FeatureLifecycle,
         SessionEvent,
         SkillEvent,
+        WorkLifecycle,
     )
 
 # Default telemetry directory relative to project root
@@ -75,7 +75,7 @@ def emit(
         | CalibrationEvent
         | ErrorEvent
         | CommandUsage
-        | FeatureLifecycle
+        | WorkLifecycle
     ),
     *,
     base_path: Path | None = None,

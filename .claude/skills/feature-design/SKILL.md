@@ -75,10 +75,10 @@ Create a lean feature specification that optimizes for both human understanding 
 Record the start of the design phase:
 
 ```bash
-raise telemetry emit-feature {feature_id} --event start --phase design
+raise telemetry emit feature {feature_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit-feature F9.4 -e start -p design`
+**Example:** `raise telemetry emit feature F9.4 -e start -p design`
 
 ### Step 1: Assess Complexity
 
@@ -201,10 +201,10 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-raise telemetry emit-feature {feature_id} --event complete --phase design
+raise telemetry emit feature {feature_id} --event complete --phase design
 ```
 
-**Example:** `raise telemetry emit-feature F9.4 -e complete -p design`
+**Example:** `raise telemetry emit feature F9.4 -e complete -p design`
 
 ## Output
 

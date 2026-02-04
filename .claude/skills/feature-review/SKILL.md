@@ -65,10 +65,10 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-raise telemetry emit-feature {feature_id} --event start --phase review
+raise telemetry emit feature {feature_id} --event start --phase review
 ```
 
-**Example:** `raise telemetry emit-feature F9.4 -e start -p review`
+**Example:** `raise telemetry emit feature F9.4 -e start -p review`
 
 ### Step 1: Gather Data
 
@@ -155,10 +155,10 @@ raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
 Record the completion of the entire feature lifecycle:
 
 ```bash
-raise telemetry emit-feature {feature_id} --event complete --phase review
+raise telemetry emit feature {feature_id} --event complete --phase review
 ```
 
-**Example:** `raise telemetry emit-feature F9.4 -e complete -p review`
+**Example:** `raise telemetry emit feature F9.4 -e complete -p review`
 
 **Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
 
