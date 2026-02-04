@@ -104,10 +104,14 @@ ls dev/epic-{epic_id}-scope.md 2>/dev/null || echo "WARN: No epic context"
 Load relevant architecture patterns and ADRs from unified context:
 
 ```bash
-raise context query "architecture patterns ADR" --unified --types pattern,feature --limit 5
+raise context query "architecture patterns ADR" --unified --types pattern,decision --limit 5
 ```
 
-Review returned patterns before proceeding. Key patterns inform design decisions.
+Review returned patterns and prior ADRs before proceeding. Key patterns and architectural decisions inform design.
+
+**What this returns:**
+- Learned patterns from prior features
+- Prior architectural decisions (ADRs) relevant to this feature
 
 **Verification:** Context loaded; relevant patterns noted.
 

@@ -15,7 +15,7 @@ metadata:
   raise.next: feature-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
 
 hooks:
   Stop:
@@ -107,7 +107,13 @@ git checkout -b feature/{epic_id}/{feature_id}
 - Epic feature: `git checkout -b feature/e12/f12-2`
 - Standalone: `git checkout -b feature/standalone/fx-123`
 
-**Verification:** On new feature branch.
+**Skip condition:** For S/XS features already on an epic branch (`epic/{id}/...`), skip branch creation and work directly on the epic branch. State the skip explicitly:
+
+> "F12.5 is S-sized and we're on epic branch. Skipping feature branch per skip condition."
+
+**Rationale:** Small features within an epic don't need per-feature branch isolation — the epic branch already isolates from main. Avoids branch proliferation for trivial changes.
+
+**Verification:** On new feature branch OR on epic branch with skip stated.
 
 > **If you can't continue:** Branch exists → Check out existing branch or rename.
 
@@ -206,8 +212,8 @@ raise telemetry emit feature {feature_id} --event start --phase design
 
 ## Output
 
-- **Branch:** `feature/{epic_id}/{feature_id}` created and active
-- **Commit:** Scope commit with in/out and done criteria
+- **Branch:** `feature/{epic_id}/{feature_id}` created and active (or epic branch for S/XS)
+- **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
 - **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: start)
 - **Next:** `/feature-design` or `/feature-plan`
 
@@ -246,7 +252,8 @@ The scope commit serves multiple purposes:
 
 | Type | Branch Pattern | Epic Check |
 |------|----------------|------------|
-| Epic feature | `feature/{epic}/{feature}` | Required |
+| Epic feature (M/L) | `feature/{epic}/{feature}` | Required |
+| Epic feature (S/XS) | Stay on `epic/{id}/...` branch | Required |
 | Standalone | `feature/standalone/{id}` | Skip |
 | Experiment | `experiment/{topic}` | Skip |
 
