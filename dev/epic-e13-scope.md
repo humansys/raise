@@ -1,7 +1,7 @@
 # Epic E13: Discovery — Codebase Understanding for Rai
 
-> **Status:** IN PROGRESS (M2 complete, 92%)
-> **Branch:** `feature/e13/discovery`
+> **Status:** ✓ COMPLETE (merged to v2, 2026-02-04)
+> **Branch:** `feature/e13/discovery` → merged
 > **Created:** 2026-02-04
 > **Target:** Feb 9, 2026 (F&F MVP)
 > **Research:** `work/research/architecture-representation-for-ai/` (RES-ARCH-REP-001)
@@ -45,7 +45,7 @@ EXTRACT (deterministic)  →  SYNTHESIZE (LLM)  →  VALIDATE (human)  →  POPU
 | F13.2 | Extraction Toolkit | M (4) | ✓ Complete | CLI commands to scan codebase and extract symbols via ast-grep |
 | F13.3 | Discovery Skills | M (4) | ✓ Complete | `/discover-*` skills with LLM synthesis and human validation loop |
 | F13.4 | Graph Integration | S (2) | ✓ Complete | Populate unified graph with validated components, enable queries |
-| F13.5 | Drift Detection | XS (1) | Pending | Basic check: new files against established patterns |
+| F13.5 | Drift Detection | XS (1) | ✓ Complete | Basic check: new files against established patterns |
 
 **Total:** 5 features, ~13 SP estimated (3-4 days with kata cycle)
 

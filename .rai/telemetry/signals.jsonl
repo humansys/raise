@@ -690,3 +690,4 @@
 {"type":"skill_event","timestamp":"2026-02-04T19:30:21Z","skill":"feature-plan","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T19:30:21Z","skill":"feature-review","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T19:31:08Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T19:32:38.956419Z","work_type":"feature","work_id":"F13.5","event":"complete","phase":"review","blocker":null}
