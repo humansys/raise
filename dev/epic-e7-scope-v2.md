@@ -1,26 +1,15 @@
-# Epic E7: Onboarding & Reliability Setup - Scope (v2.1)
+# Epic E7: Onboarding & Reliability Setup - Scope
 
-> **Status:** DRAFT
+> **Status:** IN PROGRESS
 > **Branch:** `feature/e7/onboarding`
 > **Created:** 2026-02-02 (original)
-> **Revised:** 2026-02-04 (v2 brownfield-first, v2.1 personal memory + education)
+> **Design complete:** 2026-02-04
 > **Target:** Feb 9, 2026 (Friends & Family pre-launch)
 > **Research:**
 >   - `work/research/openclaw-onboarding/` (RES-ONBOARD-001)
 >   - `work/research/onboarding-dx-competitors/` (RES-ONBOARD-DX-001)
-> **Depends on:** E13 Discovery (complete), E9 Phase 1 (complete)
-
----
-
-## Revision History
-
-| Version | Date | Changes |
-|---------|------|---------|
-| v1 | 2026-02-02 | Original: quick setup, minimal friction |
-| v2 | 2026-02-04 | Brownfield-first, auto-detection, governance generation |
-| v2.1 | 2026-02-04 | Personal memory, onboarding as education, adaptive interaction |
-
-**Key insight (v2.1):** Rai is about to meet new developers. Each relationship is personal. The setup process is education, not just configuration.
+> **ADR:** ADR-021 Brownfield-First Onboarding
+> **Depends on:** E13 Discovery ✅, E9 Phase 1 ✅
 
 ---
 
@@ -197,21 +186,21 @@ What are we working on?"
 
 ---
 
-## Features
+## Features (17 SP)
 
-| ID | Feature | Size | Status | Description |
-|----|---------|:----:|:------:|-------------|
-| F7.1 | **`raise init` Command** | M | Pending | Core initialization with project detection |
-| F7.2 | **Convention Detection** | M | Pending | Auto-detect code style, naming, structure |
-| F7.3 | **Governance Generation** | S | Pending | Generate guardrails.md from conventions |
-| F7.4 | **Enhanced CLAUDE.md** | S | Pending | Context-rich with architecture, components |
-| F7.5 | **`raise status` Command** | XS | Pending | Project health check |
-| F7.6 | **Skills Bundling** | XS | ✅ Done | Skills in package, copy on init |
-| F7.7 | **Guided First Session** | M | Pending | Educational onboarding in /session-start |
-| F7.8 | **Personal Memory** | S | Pending | ~/.rai/developer.yaml + adaptive interaction |
-| F7.9 | **Emilio Migration** | XS | Pending | Bootstrap Emilio's personal profile from history |
+| ID | Feature | Size | SP | Status | Description |
+|----|---------|:----:|:--:|:------:|-------------|
+| F7.1 | **`raise init` Command** | M | 3 | Pending | Core initialization with project detection |
+| F7.2 | **Convention Detection** | M | 3 | Pending | Auto-detect code style, naming, structure |
+| F7.3 | **Governance Generation** | S | 2 | Pending | Generate guardrails.md from conventions |
+| F7.4 | **Enhanced CLAUDE.md** | S | 2 | Pending | Context-rich with architecture, components |
+| F7.5 | **`raise status` Command** | XS | 1 | Pending | Project health check |
+| F7.6 | **Skills Bundling** | XS | 1 | ✅ Done | Skills in package, copy on init |
+| F7.7 | **Guided First Session** | M | 3 | Pending | Educational onboarding in /session-start |
+| F7.8 | **Personal Memory** | S | 2 | Pending | ~/.rai/developer.yaml + adaptive interaction |
+| F7.9 | **Emilio Migration** | XS | 1 | Pending | Bootstrap Emilio's personal profile from history |
 
-**Total:** 9 features, ~1.5-2 days with kata cycle
+**Total:** 9 features, 17 SP (~1.5-2 days with kata cycle @ 2x velocity)
 
 ---
 
@@ -466,21 +455,93 @@ Rai: "This is complex. /feature-design first?"
 
 ---
 
-## Implementation Sequence
+## Implementation Plan
 
-| Order | Feature | Effort | Cumulative |
-|:-----:|---------|:------:|:----------:|
-| 1 | F7.6 Skills Bundling | ✅ | — |
-| 2 | F7.8 Personal Memory (schema + read/write) | S | 15% |
-| 3 | F7.9 Emilio Migration | XS | 20% |
-| 4 | F7.1 `raise init` (detection + scaffolding) | M | 40% |
-| 5 | F7.2 Convention Detection | M | 60% |
-| 6 | F7.3 Governance Generation | S | 70% |
-| 7 | F7.4 Enhanced CLAUDE.md | S | 80% |
-| 8 | F7.7 Guided First Session (adaptive) | M | 95% |
-| 9 | F7.5 `raise status` | XS | 100% |
+> Added by `/epic-plan` - 2026-02-04
 
-**Estimated total:** ~12-15 hours with kata cycle (1.5-2 days)
+### Feature Sequence
+
+| Order | Feature | Size | SP | Dependencies | Milestone | Rationale |
+|:-----:|---------|:----:|:--:|--------------|-----------|-----------|
+| 1 | F7.8 Personal Memory | S | 2 | F7.6 ✅ | M1 | Foundation for adaptive behavior |
+| 2 | F7.9 Emilio Migration | XS | 1 | F7.8 | M1 | Validates schema, provides Ri template |
+| 3 | F7.1 `raise init` | M | 3 | F7.8 | M1 | Core command, walking skeleton |
+| 4 | F7.2 Convention Detection | M | 3 | F7.1 | M2 | HIGH RISK: new capability |
+| 5 | F7.3 Governance Generation | S | 2 | F7.2 | M2 | Templates from detected conventions |
+| 6 | F7.4 Enhanced CLAUDE.md | S | 2 | F7.1 | M2 | Can parallel with F7.3 |
+| 7 | F7.7 Guided First Session | M | 3 | F7.3, F7.4, F7.8 | M3 | Depends on all adaptive components |
+| 8 | F7.5 `raise status` | XS | 1 | F7.1 | M3 | Polish, after core complete |
+
+**Done:** F7.6 Skills Bundling ✅ (1 SP)
+
+### Milestones
+
+| Milestone | Features | Target | Success Criteria | Demo |
+|-----------|----------|--------|------------------|------|
+| **M1: Walking Skeleton** | F7.8, F7.9, F7.1 | Day 1 | `raise init` works on greenfield with personal memory | New project init, Emilio profile loaded |
+| **M2: Brownfield MVP** | +F7.2, F7.3, F7.4 | Day 2-3 | Full brownfield onboarding with governance | Fer's project: conventions detected, guardrails generated |
+| **M3: Adaptive Experience** | +F7.7, F7.5 | Day 4 | Shu/Ri interaction adapts, status works | Shu user gets education, Ri user gets efficiency |
+| **M4: Epic Complete** | — | Day 5 | Done criteria met, retrospective | `/epic-close` ready |
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Day 1:  F7.8 ─► F7.9 ─► F7.1 (M1: Walking Skeleton)
+                          │
+Day 2:                    ├──► F7.2 ─► F7.3 ─┐
+                          │                   │
+Day 3:                    └──► F7.4 ─────────┼► (M2: Brownfield MVP)
+                                              │
+Day 4:                              F7.7 ◄───┘─► F7.5 (M3: Adaptive)
+                                              │
+Day 5:                                        └► Retro, polish (M4: Complete)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Parallel opportunities:**
+- F7.3 + F7.4 after F7.2 starts (both depend on init, can work concurrently)
+- F7.5 can start while F7.7 is in progress (independent)
+
+### Progress Tracking
+
+| Feature | Size | SP | Status | Actual | Velocity | Notes |
+|---------|:----:|:--:|:------:|:------:|:--------:|-------|
+| F7.6 Skills Bundling | XS | 1 | ✅ Done | — | — | Pre-E7 |
+| F7.8 Personal Memory | S | 2 | Pending | — | — | |
+| F7.9 Emilio Migration | XS | 1 | Pending | — | — | |
+| F7.1 `raise init` | M | 3 | Pending | — | — | |
+| F7.2 Convention Detection | M | 3 | Pending | — | — | HIGH RISK |
+| F7.3 Governance Generation | S | 2 | Pending | — | — | |
+| F7.4 Enhanced CLAUDE.md | S | 2 | Pending | — | — | |
+| F7.7 Guided First Session | M | 3 | Pending | — | — | |
+| F7.5 `raise status` | XS | 1 | Pending | — | — | |
+
+**Milestone Progress:**
+- [ ] M1: Walking Skeleton (Day 1 - Feb 4)
+- [ ] M2: Brownfield MVP (Day 3 - Feb 6)
+- [ ] M3: Adaptive Experience (Day 4 - Feb 7)
+- [ ] M4: Epic Complete (Day 5 - Feb 8)
+
+**Buffer:** 1 day before F&F (Feb 9)
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| F7.2 detection accuracy low | Medium | High | Confidence scores, user review, start with Python only |
+| M1 takes longer than day 1 | Low | Medium | F7.8+F7.9 are small, F7.1 is well-scoped |
+| F7.7 adaptive logic complex | Medium | Medium | Keep Shu/Ha/Ri simple (3 levels), no ML |
+| Integration issues at M2 | Low | Medium | Test on real brownfield (Fer's project) early |
+
+### Velocity Assumptions
+
+- **Baseline:** 2x multiplier with kata cycle (from calibration PAT-016)
+- **T-shirt to time:** XS=30min, S=1h, M=2h (with kata)
+- **Total estimated:** ~11 hours work + 2h integration/polish = ~13h
+- **Buffer:** 20% for unknowns → ~16h total (~2 days)
+- **Available:** 5 days → comfortable margin
 
 ---
 
@@ -557,6 +618,7 @@ Emilio's profile becomes the template for Ri-level users:
 ---
 
 *Epic tracking - update per feature completion*
-*Created: 2026-02-02 (v1)*
-*Revised: 2026-02-04 (v2 brownfield-first)*
-*Revised: 2026-02-04 (v2.1 personal memory + education)*
+*Created: 2026-02-02*
+*Design complete: 2026-02-04*
+*Plan complete: 2026-02-04*
+*Next: `/feature-design` for F7.8 Personal Memory*
