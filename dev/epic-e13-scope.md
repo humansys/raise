@@ -1,6 +1,6 @@
 # Epic E13: Discovery — Codebase Understanding for Rai
 
-> **Status:** DESIGNED
+> **Status:** PLANNED
 > **Branch:** `feature/e13/discovery`
 > **Created:** 2026-02-04
 > **Target:** Feb 9, 2026 (F&F MVP)
@@ -278,6 +278,95 @@ This epic builds on completed research:
 
 ---
 
-*Epic tracking — update per feature completion*
-*Created: 2026-02-04*
-*Phase: DESIGNED — ready for /epic-plan*
+## Implementation Plan
+
+> Added by `/epic-plan` — 2026-02-04
+
+### Feature Sequence
+
+| Order | Feature | Size | Dependencies | Milestone | Rationale |
+|:-----:|---------|:----:|--------------|-----------|-----------|
+| 1 | F13.1 Schema Extension | S (2) | None | M1 | Foundation — all features need node types |
+| 2 | F13.2 Extraction Toolkit | M (4) | F13.1 | M1 | Risk-first — ast-grep integration is key uncertainty |
+| 3 | F13.3 Discovery Skills | M (4) | F13.2 | M2 | Needs extraction output to synthesize descriptions |
+| 4 | F13.4 Graph Integration | S (2) | F13.3 | M2 | Connects skills to persistent storage |
+| 5 | F13.5 Drift Detection | XS (1) | F13.4 | M3 | Needs baseline in graph to compare against |
+
+**Sequencing Strategy:** Risk-first. F13.2 (Extraction) has highest uncertainty (ast-grep patterns for Python). Tackle early while energy is high and time for pivots exists.
+
+### Milestones
+
+| Milestone | Features | Target | Success Criteria | Demo |
+|-----------|----------|--------|------------------|------|
+| **M1: Walking Skeleton** | F13.1, F13.2 | Feb 5 | `raise discover scan src/` outputs JSON with symbols | Show extracted components from raise-commons |
+| **M2: Discovery Flow** | F13.3, F13.4 | Feb 7 | Full `/discover-*` skill flow works, components in graph | Run discovery on raise-commons, query results |
+| **M3: F&F Ready** | F13.5 + polish | Feb 8 | Drift detection warns on non-conforming code | Demo drift warning on test file |
+
+### Timeline
+
+| Day | Date | Features | Milestone | Cumulative |
+|:---:|------|----------|-----------|:----------:|
+| 1 | Feb 5 | F13.1 Schema + F13.2 Extraction | M1: Walking Skeleton | 46% (6 SP) |
+| 2 | Feb 6 | F13.3 Discovery Skills | — | 77% (10 SP) |
+| 3 | Feb 7 | F13.4 Graph Integration | M2: Discovery Flow | 92% (12 SP) |
+| 4 | Feb 8 | F13.5 Drift + polish | M3: F&F Ready | 100% (13 SP) |
+| — | Feb 9 | Buffer / dogfooding | **F&F Launch** | Done |
+
+### Work Streams
+
+```
+Day 1          Day 2          Day 3          Day 4
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+F13.1 ─► F13.2 ─► F13.3 ─────► F13.4 ─────► F13.5
+(Schema)  (Extract)  (Skills)    (Graph)     (Drift)
+         ↓                      ↓
+      M1: Skeleton           M2: Flow      M3: Ready
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Note:** Sequential rather than parallel because:
+- Each feature builds on previous output
+- Single implementer (Rai + human)
+- Integration risk higher with parallel streams
+
+### Progress Tracking
+
+| Feature | Size | Status | Actual | Velocity | Notes |
+|---------|:----:|:------:|:------:|:--------:|-------|
+| F13.1 Schema Extension | S (2) | Pending | — | — | |
+| F13.2 Extraction Toolkit | M (4) | Pending | — | — | |
+| F13.3 Discovery Skills | M (4) | Pending | — | — | |
+| F13.4 Graph Integration | S (2) | Pending | — | — | |
+| F13.5 Drift Detection | XS (1) | Pending | — | — | |
+
+**Milestone Progress:**
+- [ ] M1: Walking Skeleton (Feb 5)
+- [ ] M2: Discovery Flow (Feb 7)
+- [ ] M3: F&F Ready (Feb 8)
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| ast-grep patterns don't capture Python classes well | Medium | High | Day 1 spike; fall back to tree-sitter direct if needed |
+| Skills take longer due to LLM synthesis complexity | Medium | Medium | Timebox synthesis to essential fields only |
+| Graph integration reveals schema issues | Low | Medium | F13.1 tests validate schema before F13.4 |
+
+### Velocity Assumptions
+
+- **Baseline:** 2x multiplier with kata cycle (from PAT-016, E12 calibration)
+- **Adjustment:** New domain (code extraction) — conservative estimate
+- **Buffer:** Day 5 (Feb 9) reserved for integration issues
+
+### Definition of Ready (per feature)
+
+Before starting each feature:
+- [ ] Previous feature complete (or F13.1 for first)
+- [ ] Design understood (epic scope document)
+- [ ] Test strategy clear
+- [ ] No external blockers
+
+---
+
+*Plan created: 2026-02-04*
+*Next: `/feature-start` for F13.1 Schema Extension*
