@@ -55,7 +55,7 @@
 | F12.3 | **Glossary Extractor** | S | ✅ Done | Extract glossary terms for terminology |
 | F12.4 | **Schema Extension** | XS | ✅ Done | Add `decision`, `guardrail`, `term` to NodeType |
 | F12.5 | **Skill Query Alignment** | S | ✅ Done | Fix query/type mismatches in feature cycle skills |
-| F12.6 | **Memory Write CLI** | M | Pending | `raise memory add-pattern` command |
+| F12.6 | **Memory Write CLI** | M | ✅ Done | `raise memory add-pattern` command |
 
 **Total:** 6 features, ~10 SP estimated
 
@@ -209,12 +209,12 @@ raise memory add-pattern "Pattern content" \
 - [ ] All quality checks pass (ruff, pyright, bandit)
 
 ### Epic Complete
-- [ ] All 6 features complete (F12.1-F12.6)
-- [ ] `raise context query "ADR" --unified --types decision` works
-- [ ] `raise context query "testing" --unified --types guardrail` works
-- [ ] `/feature-design` queries return ADR nodes
-- [ ] `/feature-review` can persist patterns via CLI
-- [ ] ADR-020 status updated to "Accepted"
+- [x] All 6 features complete (F12.1-F12.6)
+- [x] `raise context query "ADR" --unified --types decision` works
+- [x] `raise context query "type hints" --unified --types guardrail` works
+- [x] `/feature-design` queries return ADR nodes (via `--types decision`)
+- [x] `/feature-review` can persist patterns via CLI (Step 4.5 added in v1.1.0)
+- [x] ADR-020 status updated to "Accepted"
 - [ ] Epic merged to v2
 
 ---
@@ -332,7 +332,7 @@ Stream 4 (Independent):      F12.6 ───────────────
 | F12.1: ADR Extractor | M | ✅ Done | ~20 min | 2x | YAML frontmatter only (26 ADRs), fixed project NodeType |
 | F12.2: Guardrails Extractor | S | ✅ Done | ~20 min | 1.5x | 20 guardrails, PAT-059 documented |
 | F12.3: Glossary Extractor | S | ✅ Done | ~20 min | 1.75x | 59 terms, PAT-038 validated |
-| F12.6: Memory Write CLI | M | Pending | - | - | |
+| F12.6: Memory Write CLI | M | ✅ Done | ~5 min | Fast | Already implemented; added /feature-review integration |
 | F12.5: Skill Query Alignment | S | Pending | - | - | |
 
 **Milestone Progress:**
