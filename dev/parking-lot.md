@@ -41,6 +41,13 @@
 - [ ] **Research output extraction** — Extract `work/research/*/` into unified graph (deferred from E12, complex format variance)
 - [ ] **Component catalog extraction** — Extract `dev/components.md` into graph (deferred from E12, nice-to-have)
 - [ ] **Session-aware context loading** — Skip redundant queries in same session (deferred from E12, optimization — re-querying is <1ms)
+- [ ] **Epic-close skill** (`/epic-close`) - Formalize epic closure ritual (retrospective, merge, cleanup). Currently manual. (E12 close, 2026-02-04)
+- [ ] **Feature pre-verification in /feature-start** - Check if feature already implemented before starting work. (F12.6 was already done, 2026-02-04)
+- [ ] **Memory system improvements** (E12 retrospective, 2026-02-04):
+  - Semantic search for queries (keyword brittleness — "testing" misses "type hints")
+  - Better calibration query patterns or dedicated report command
+  - Pattern deduplication (content similarity check before add)
+  - Pattern pruning/archival when noise overwhelms signal
 - [ ] **Post-Session Alignment Skill** (`/align-docs`) - After strategic sessions, auto-update docs:
   - Generate ADRs from decisions made
   - Update vision/architecture docs
@@ -139,4 +146,4 @@
 
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-02*
-*Last updated: 2026-02-02 (RES-ROVO-001 complete, E8 design informed)*
+*Last updated: 2026-02-04 (E12 close, memory system improvements added)*
