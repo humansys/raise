@@ -69,6 +69,25 @@ raise telemetry emit feature {feature_id} --event start --phase plan
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p plan`
 
+### Step 0.1: Verify Prerequisites (Deterministic)
+
+Check design document for complex features:
+
+```bash
+ls work/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No design"
+```
+
+**Decision:**
+- design.md exists → Load and reference
+- design.md missing + Simple feature → Continue (design optional)
+- design.md missing + Moderate/Complex → Suggest `/feature-design` first
+
+**Skip condition:** Simple features (per complexity matrix in /feature-design).
+
+**Verification:** Design loaded OR simple feature confirmed.
+
+> **If you can't continue:** Complex feature without design → Run `/feature-design` first.
+
 ### Step 0.5: Query Context
 
 Load relevant patterns and calibration from unified context:

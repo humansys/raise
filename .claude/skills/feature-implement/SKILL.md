@@ -70,6 +70,25 @@ raise telemetry emit feature {feature_id} --event start --phase implement
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p implement`
 
+### Step 0.1: Verify Prerequisites (REQUIRED - No Skip)
+
+Implementation plan is mandatory:
+
+```bash
+PLAN="work/features/{feature_id}/plan.md"
+if [ ! -f "$PLAN" ]; then
+    echo "ERROR: Plan not found: $PLAN"
+    echo "Run /feature-plan first"
+    exit 4  # ArtifactNotFoundError
+fi
+```
+
+**No skip:** Planning provides task decomposition and verification criteria.
+
+**Verification:** Plan exists and is readable.
+
+> **If you can't continue:** Run `/feature-plan`. No exceptions.
+
 ### Step 0.5: Query Context
 
 Load relevant codebase patterns from unified context:
@@ -90,7 +109,7 @@ Load the implementation plan and obtain applicable rules context.
 
 **Verification:** Plan loaded and context available.
 
-> **If you can't continue:** Plan not found → Execute `/feature-plan` first.
+> **If you can't continue:** Plan not found → Prerequisite check (Step 0.1) should have caught this.
 
 ### Step 2: Identify Next Task
 

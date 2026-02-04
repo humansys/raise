@@ -80,6 +80,25 @@ raise telemetry emit feature {feature_id} --event start --phase design
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p design`
 
+### Step 0.1: Verify Prerequisites (Deterministic)
+
+Check epic context for complex features:
+
+```bash
+ls dev/epic-{epic_id}-scope.md 2>/dev/null || echo "WARN: No epic context"
+```
+
+**Decision:**
+- Epic exists → Continue, reference in design
+- Epic missing + simple feature → Continue with note
+- Epic missing + complex feature → Suggest `/feature-start` first
+
+**Skip condition:** Standalone bugfixes or experiments without epic.
+
+**Verification:** Epic context loaded OR explicitly standalone.
+
+> **If you can't continue:** Complex feature without epic → Run `/feature-start` first.
+
 ### Step 0.5: Query Context
 
 Load relevant architecture patterns and ADRs from unified context:
