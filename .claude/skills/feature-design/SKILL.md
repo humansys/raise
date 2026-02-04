@@ -70,6 +70,16 @@ Create a lean feature specification that optimizes for both human understanding 
 
 ## Steps
 
+### Step 0: Emit Feature Start (Telemetry)
+
+Record the start of the design phase:
+
+```bash
+raise telemetry emit-feature {feature_id} --event start --phase design
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e start -p design`
+
 ### Step 1: Assess Complexity
 
 Determine if feature needs a specification document.
@@ -186,9 +196,20 @@ Self-review checklist:
 - [ ] Spec reviewable in <5 minutes
 - [ ] Spec creation took <30 minutes
 
+### Step 9: Emit Feature Complete (Telemetry)
+
+Record the completion of the design phase:
+
+```bash
+raise telemetry emit-feature {feature_id} --event complete --phase design
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e complete -p design`
+
 ## Output
 
 - **Artifact**: `work/features/{feature-id}/design.md`
+- **Telemetry**: `.rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-feature-v2.md`
 - **Next**: `/feature-plan`
 

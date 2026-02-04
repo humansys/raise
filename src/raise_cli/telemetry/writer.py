@@ -20,6 +20,7 @@ if TYPE_CHECKING:
         CalibrationEvent,
         CommandUsage,
         ErrorEvent,
+        FeatureLifecycle,
         SessionEvent,
         SkillEvent,
     )
@@ -68,7 +69,14 @@ def _ensure_directory(path: Path) -> None:
 
 
 def emit(
-    signal: SkillEvent | SessionEvent | CalibrationEvent | ErrorEvent | CommandUsage,
+    signal: (
+        SkillEvent
+        | SessionEvent
+        | CalibrationEvent
+        | ErrorEvent
+        | CommandUsage
+        | FeatureLifecycle
+    ),
     *,
     base_path: Path | None = None,
 ) -> EmitResult:

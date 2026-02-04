@@ -60,6 +60,16 @@ Execute the implementation plan task by task, verifying each step, and producing
 
 ## Steps
 
+### Step 0: Emit Feature Start (Telemetry)
+
+Record the start of the implement phase:
+
+```bash
+raise telemetry emit-feature {feature_id} --event start --phase implement
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e start -p implement`
+
 ### Step 1: Load Plan and Context
 
 Load the implementation plan and obtain applicable rules context.
@@ -134,10 +144,21 @@ If all tasks completed → execute code gate.
 
 > **If you can't continue:** Tasks blocked → Document and escalate.
 
+### Step 8: Emit Feature Complete (Telemetry)
+
+Record the completion of the implement phase:
+
+```bash
+raise telemetry emit-feature {feature_id} --event complete --phase implement
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e complete -p implement`
+
 ## Output
 
 - **Artifact:** Implemented code
 - **Location:** Per project architecture
+- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
 - **Gate:** `gates/gate-code.md`
 - **Next:** `/feature-review`
 

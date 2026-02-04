@@ -59,6 +59,16 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 
 ## Steps
 
+### Step 0: Emit Feature Start (Telemetry)
+
+Record the start of the plan phase:
+
+```bash
+raise telemetry emit-feature {feature_id} --event start --phase plan
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e start -p plan`
+
 ### Step 1: Select Story
 
 Identify the next story to implement by priority.
@@ -152,9 +162,20 @@ Create plan document with:
 
 **Verification:** Plan documented and complete.
 
+### Step 7: Emit Feature Complete (Telemetry)
+
+Record the completion of the plan phase:
+
+```bash
+raise telemetry emit-feature {feature_id} --event complete --phase plan
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e complete -p plan`
+
 ## Output
 
 - **Artifact:** `work/features/{feature}/plan.md`
+- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
 - **Next:** `/feature-implement`
 

@@ -19,6 +19,7 @@ from raise_cli.telemetry import (
     CalibrationEvent,
     CommandUsage,
     ErrorEvent,
+    FeatureLifecycle,
     SessionEvent,
     Signal,
     SkillEvent,
@@ -280,6 +281,99 @@ class TestCommandUsage:
         assert data["subcommand"] == "query"
 
 
+# --- FeatureLifecycle Tests ---
+
+
+class TestFeatureLifecycle:
+    """Tests for FeatureLifecycle schema (Lean flow analysis)."""
+
+    def test_create_start_event(self, now: datetime) -> None:
+        """Create a feature start event."""
+        event = FeatureLifecycle(
+            timestamp=now,
+            feature="F9.4",
+            event="start",
+            phase="design",
+        )
+
+        assert event.type == "feature_lifecycle"
+        assert event.feature == "F9.4"
+        assert event.event == "start"
+        assert event.phase == "design"
+        assert event.blocker is None
+
+    def test_create_complete_event(self, now: datetime) -> None:
+        """Create a feature complete event."""
+        event = FeatureLifecycle(
+            timestamp=now,
+            feature="F9.4",
+            event="complete",
+            phase="review",
+        )
+
+        assert event.event == "complete"
+        assert event.phase == "review"
+
+    def test_create_blocked_event_with_blocker(self, now: datetime) -> None:
+        """Create a blocked event with blocker description."""
+        event = FeatureLifecycle(
+            timestamp=now,
+            feature="F9.4",
+            event="blocked",
+            phase="plan",
+            blocker="unclear requirements",
+        )
+
+        assert event.event == "blocked"
+        assert event.blocker == "unclear requirements"
+
+    def test_create_abandoned_event(self, now: datetime) -> None:
+        """Create an abandoned event."""
+        event = FeatureLifecycle(
+            timestamp=now,
+            feature="F9.4",
+            event="abandoned",
+            phase="implement",
+        )
+
+        assert event.event == "abandoned"
+
+    def test_invalid_event_type(self, now: datetime) -> None:
+        """Invalid event type raises ValidationError."""
+        with pytest.raises(ValidationError):
+            FeatureLifecycle(
+                timestamp=now,
+                feature="F9.4",
+                event="invalid",  # type: ignore[arg-type]
+                phase="design",
+            )
+
+    def test_invalid_phase(self, now: datetime) -> None:
+        """Invalid phase raises ValidationError."""
+        with pytest.raises(ValidationError):
+            FeatureLifecycle(
+                timestamp=now,
+                feature="F9.4",
+                event="start",
+                phase="invalid",  # type: ignore[arg-type]
+            )
+
+    def test_serialization(self, now: datetime) -> None:
+        """Event serializes to JSON correctly."""
+        event = FeatureLifecycle(
+            timestamp=now,
+            feature="F9.4",
+            event="blocked",
+            phase="plan",
+            blocker="waiting for ADR",
+        )
+        data = json.loads(event.model_dump_json())
+
+        assert data["type"] == "feature_lifecycle"
+        assert data["feature"] == "F9.4"
+        assert data["blocker"] == "waiting for ADR"
+
+
 # --- Signal Union Tests ---
 
 
@@ -362,6 +456,23 @@ class TestSignalUnion:
 
         assert isinstance(signal, CommandUsage)
         assert signal.command == "memory"
+
+    def test_parse_feature_lifecycle(self, now: datetime) -> None:
+        """Parse FeatureLifecycle from JSON via discriminated union."""
+        data = {
+            "type": "feature_lifecycle",
+            "timestamp": now.isoformat(),
+            "feature": "F9.4",
+            "event": "blocked",
+            "phase": "plan",
+            "blocker": "waiting for ADR",
+        }
+        adapter = TypeAdapter(Signal)
+        signal = adapter.validate_python(data)
+
+        assert isinstance(signal, FeatureLifecycle)
+        assert signal.feature == "F9.4"
+        assert signal.blocker == "waiting for ADR"
 
     def test_invalid_type_discriminator(self, now: datetime) -> None:
         """Invalid type discriminator raises ValidationError."""
