@@ -595,3 +595,11 @@
 {"type":"skill_event","timestamp":"2026-02-04T17:57:10Z","skill":"feature-close","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T17:57:10Z","skill":"feature-design","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T17:57:10Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T17:58:50Z","skill":"feature-implement","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T17:58:50Z","skill":"feature-review","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T17:58:50Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T17:58:50Z","skill":"feature-plan","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T17:58:50Z","skill":"feature-design","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T17:58:50Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T17:58:50Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T18:02:42.715504Z","session_type":"feature","outcome":"success","duration_min":90,"features":["F13.3"]}
