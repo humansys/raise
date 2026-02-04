@@ -576,12 +576,78 @@
 
 ---
 
+## Discovery Module (E13)
+
+> Codebase understanding for consistent reuse and drift detection
+
+### Scanner (F13.2)
+- **Location:** `src/raise_cli/discovery/scanner.py`
+- **Purpose:** Extract code symbols (classes, functions, methods) from source files
+- **Added:** F13.2 (Epic E13)
+- **Languages:** Python (ast), TypeScript/JavaScript (tree-sitter)
+- **Public API:**
+  - `Symbol(BaseModel)` - Extracted code symbol with name, kind, file, line, signature, docstring
+  - `ScanResult(BaseModel)` - Scan results with symbols list, files_scanned, errors
+  - `scan_directory(path, language, pattern, exclude_patterns) -> ScanResult`
+  - `extract_python_symbols(source, file_path) -> list[Symbol]`
+  - `extract_typescript_symbols(source, file_path) -> list[Symbol]`
+  - `detect_language(file_path) -> Language | None`
+- **Tests:** 49 unit tests
+- **Dependencies:** ast (stdlib), tree-sitter (optional for TS/JS)
+
+### Drift Detection (F13.5)
+- **Location:** `src/raise_cli/discovery/drift.py`
+- **Purpose:** Detect architectural drift between new code and established patterns
+- **Added:** F13.5 (Epic E13)
+- **Public API:**
+  - `DriftWarning(BaseModel)` - Warning with file, issue, severity, suggestion
+  - `DriftSeverity` - Literal type ("info", "warning", "error")
+  - `detect_drift(baseline, scanned) -> list[DriftWarning]`
+- **Detection Rules:**
+  1. **Location drift** - Files in unexpected directories
+  2. **Naming drift** - Classes not PascalCase, functions not following patterns
+  3. **Docstring drift** - Missing docs when baseline has them
+- **Internal Helpers:**
+  - `_normalize_path(path) -> str` - Normalize paths for comparison (strips `src/` prefix, trailing slashes). Use when comparing paths from different sources where one may be relative to project root and another relative to scan directory.
+  - `_extract_directory_patterns(baseline) -> dict[str, set[str]]` - Extract valid directories by kind
+  - `_extract_naming_patterns(baseline) -> dict[str, dict[str, int]]` - Extract naming prefixes with counts
+  - `_check_location_drift(symbol, patterns) -> DriftWarning | None`
+  - `_check_naming_drift(symbol, patterns) -> DriftWarning | None`
+  - `_check_docstring_drift(symbol, has_docstrings) -> DriftWarning | None`
+- **Tests:** 10 unit tests (94% coverage)
+- **Dependencies:** Scanner module (Symbol)
+
+### Discovery CLI Commands (F13.2, F13.5)
+- **Location:** `src/raise_cli/cli/commands/discover.py`
+- **Purpose:** CLI interface for codebase discovery and drift detection
+- **Added:** F13.2 (scan, build), F13.5 (drift) - Epic E13
+- **Commands:**
+  - `raise discover scan [PATH]` - Scan directory for code symbols
+  - `raise discover build` - Build unified graph with discovered components
+  - `raise discover drift [PATH]` - Check for architectural drift
+- **Options (scan):**
+  - `--language/-l` - Language filter (python, typescript, javascript)
+  - `--output/-o` - Output format (human, json, summary)
+  - `--pattern/-p` - Glob pattern for files
+  - `--exclude/-e` - Patterns to exclude
+- **Options (drift):**
+  - `--project-root/-r` - Project root directory
+  - `--output/-o` - Output format (human, json, summary)
+- **Features:**
+  - Baseline size warning when <10 components
+  - Exit code 0 (clean) or 1 (drift found)
+  - JSON output for CI integration
+- **Tests:** 16 CLI integration tests
+- **Dependencies:** Scanner, Drift modules, UnifiedGraphBuilder
+
+---
+
 ## Metadata
 
 - **Started:** 2026-01-31 (E1 foundation)
-- **Last Updated:** 2026-01-31 (F1.6 Core Utilities)
-- **Components:** 16 (8 raise-cli + 8 skills/memory infrastructure)
-- **Next:** E1 complete → E2 Kata Engine
+- **Last Updated:** 2026-02-04 (E13 Discovery complete)
+- **Components:** 19 (11 raise-cli + 8 skills/memory infrastructure)
+- **Next:** E13 complete → E7 Onboarding
 
 ---
 

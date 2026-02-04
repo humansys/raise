@@ -275,6 +275,96 @@ class TestLoadSkills:
         assert nodes == []
 
 
+class TestLoadComponents:
+    """Tests for load_components method."""
+
+    def test_loads_components_from_validated_json(self, tmp_path: Path) -> None:
+        """Should load components from components-validated.json."""
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "source_file": "work/discovery/components-draft.yaml",
+            "component_count": 2,
+            "components": [
+                {
+                    "id": "comp-scanner-symbol",
+                    "type": "component",
+                    "content": "Core data model for code symbols",
+                    "source_file": "src/discovery/scanner.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {
+                        "name": "Symbol",
+                        "kind": "class",
+                        "line": 44,
+                        "category": "model",
+                    },
+                },
+                {
+                    "id": "comp-scanner-scan-dir",
+                    "type": "component",
+                    "content": "Scan directory for symbols",
+                    "source_file": "src/discovery/scanner.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {
+                        "name": "scan_directory",
+                        "kind": "function",
+                        "line": 100,
+                        "category": "utility",
+                    },
+                },
+            ],
+        }))
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_components()
+
+        assert len(nodes) == 2
+        assert nodes[0].id == "comp-scanner-symbol"
+        assert nodes[0].type == "component"
+        assert nodes[0].content == "Core data model for code symbols"
+        assert nodes[0].metadata.get("name") == "Symbol"
+        assert nodes[0].metadata.get("category") == "model"
+
+    def test_handles_missing_components_file(self, tmp_path: Path) -> None:
+        """Should return empty list if components-validated.json doesn't exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_components()
+
+        assert nodes == []
+
+    def test_handles_empty_components_list(self, tmp_path: Path) -> None:
+        """Should return empty list if components array is empty."""
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "components": [],
+        }))
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_components()
+
+        assert nodes == []
+
+    def test_handles_invalid_json(self, tmp_path: Path) -> None:
+        """Should return empty list on invalid JSON."""
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text("not valid json")
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_components()
+
+        assert nodes == []
+
+
 class TestBuild:
     """Tests for build method."""
 
@@ -299,12 +389,14 @@ class TestBuild:
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
-        # Mock governance and work loaders
+        # Mock governance, work, and components loaders
         with patch.object(builder, "load_governance") as mock_gov:
             mock_gov.return_value = []
             with patch.object(builder, "load_work") as mock_work:
                 mock_work.return_value = []
-                graph = builder.build()
+                with patch.object(builder, "load_components") as mock_comp:
+                    mock_comp.return_value = []
+                    graph = builder.build()
 
         # Should have memory + skills
         assert graph.node_count >= 2
@@ -319,9 +411,45 @@ class TestBuild:
             with patch.object(builder, "load_memory", return_value=[]):
                 with patch.object(builder, "load_work", return_value=[]):
                     with patch.object(builder, "load_skills", return_value=[]):
-                        graph = builder.build()
+                        with patch.object(builder, "load_components", return_value=[]):
+                            graph = builder.build()
 
         assert isinstance(graph, UnifiedGraph)
+
+    def test_build_includes_components(self, tmp_path: Path) -> None:
+        """Should include components in the built graph."""
+        # Setup components file
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "components": [
+                {
+                    "id": "comp-test",
+                    "type": "component",
+                    "content": "Test component",
+                    "source_file": "src/test.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {"name": "TestClass", "kind": "class"},
+                },
+            ],
+        }))
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "load_governance", return_value=[]):
+            with patch.object(builder, "load_memory", return_value=[]):
+                with patch.object(builder, "load_work", return_value=[]):
+                    with patch.object(builder, "load_skills", return_value=[]):
+                        graph = builder.build()
+
+        assert graph.node_count == 1
+        node = graph.get_concept("comp-test")
+        assert node is not None
+        assert node.type == "component"
+        assert node.content == "Test component"
 
 
 class TestInferRelationships:
@@ -505,7 +633,8 @@ class TestInferRelationships:
         with patch.object(builder, "load_governance", return_value=[]):
             with patch.object(builder, "load_work", return_value=[]):
                 with patch.object(builder, "load_skills", return_value=[]):
-                    graph = builder.build()
+                    with patch.object(builder, "load_components", return_value=[]):
+                        graph = builder.build()
 
         # Should have edges
         assert graph.edge_count >= 1
