@@ -772,6 +772,22 @@
       }
     },
     {
+      "id": "PAT-051",
+      "type": "pattern",
+      "content": "Test fixture YAML frontmatter: use dedent backslash-triple-quote-backslash-dash-dash-dash to avoid leading newline breaking caret-dash-dash-dash regex pattern",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "testing",
+          "yaml",
+          "fixtures",
+          "regex"
+        ],
+        "learned_from": null
+      }
+    },
+    {
       "id": "CAL-001",
       "type": "calibration",
       "content": "F1.1: Project Scaffolding",
@@ -1359,11 +1375,44 @@
       }
     },
     {
+      "id": "SES-018",
+      "type": "session",
+      "content": "F11.2 Graph Builder Tasks 4-5",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "F11.2 Graph Builder Tasks 4-5",
+        "outcomes": [
+          "CLI --unified flag",
+          "Integration test 151 nodes 255 edges",
+          "Feature review complete"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-019",
+      "type": "session",
+      "content": "F11.3 Unified Query Tasks 1-2",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "F11.3 Unified Query Tasks 1-2",
+        "outcomes": [
+          "Query module with keyword_search and concept_lookup",
+          "CLI --unified flag integration",
+          "37 new tests",
+          "Branch management correction"
+        ],
+        "log_path": null
+      }
+    },
+    {
       "id": "epic-e1",
       "type": "epic",
       "content": "Core Foundation - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947429+00:00",
+      "created": "2026-02-04T03:35:39.551075+00:00",
       "metadata": {
         "epic_id": "E1",
         "name": "Core Foundation",
@@ -1378,7 +1427,7 @@
       "type": "epic",
       "content": "Governance Toolkit - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947437+00:00",
+      "created": "2026-02-04T03:35:39.551084+00:00",
       "metadata": {
         "epic_id": "E2",
         "name": "Governance Toolkit",
@@ -1393,7 +1442,7 @@
       "type": "epic",
       "content": "Identity Core - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947441+00:00",
+      "created": "2026-02-04T03:35:39.551089+00:00",
       "metadata": {
         "epic_id": "E3",
         "name": "Identity Core",
@@ -1408,7 +1457,7 @@
       "type": "epic",
       "content": "Context Generation - \u2705 Via Skills",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947445+00:00",
+      "created": "2026-02-04T03:35:39.551093+00:00",
       "metadata": {
         "epic_id": "E4",
         "name": "Context Generation",
@@ -1423,7 +1472,7 @@
       "type": "epic",
       "content": "SAR Engine - Deferred",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947449+00:00",
+      "created": "2026-02-04T03:35:39.551100+00:00",
       "metadata": {
         "epic_id": "E5",
         "name": "SAR Engine",
@@ -1438,7 +1487,7 @@
       "type": "epic",
       "content": "Observability - \u2192 Replaced by E9",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947456+00:00",
+      "created": "2026-02-04T03:35:39.551104+00:00",
       "metadata": {
         "epic_id": "E6",
         "name": "Observability",
@@ -1453,7 +1502,7 @@
       "type": "epic",
       "content": "Distribution & Onboarding - \ud83d\udccb Ready",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947460+00:00",
+      "created": "2026-02-04T03:35:39.551108+00:00",
       "metadata": {
         "epic_id": "E7",
         "name": "Distribution & Onboarding",
@@ -1468,7 +1517,7 @@
       "type": "epic",
       "content": "Work Tracking Graph - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947464+00:00",
+      "created": "2026-02-04T03:35:39.551112+00:00",
       "metadata": {
         "epic_id": "E8",
         "name": "Work Tracking Graph",
@@ -1483,7 +1532,7 @@
       "type": "epic",
       "content": "Local Learning & Self-Awareness - \ud83d\udea7 In Progress",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947512+00:00",
+      "created": "2026-02-04T03:35:39.551116+00:00",
       "metadata": {
         "epic_id": "E9",
         "name": "Local Learning & Self-Awareness",
@@ -1498,7 +1547,7 @@
       "type": "epic",
       "content": "Collective Intelligence - \ud83d\udccb Explored",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T03:10:29.947517+00:00",
+      "created": "2026-02-04T03:35:39.551120+00:00",
       "metadata": {
         "epic_id": "E10",
         "name": "Collective Intelligence",
@@ -1513,7 +1562,7 @@
       "type": "feature",
       "content": "F7.1: Onboard Command (pending) - `raise onboard` wizard with templates",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T03:10:29.949616+00:00",
+      "created": "2026-02-04T03:35:39.553503+00:00",
       "metadata": {
         "feature_id": "F7.1",
         "name": "Onboard Command",
@@ -1529,7 +1578,7 @@
       "type": "feature",
       "content": "F7.2: Package Metadata (complete) - pyproject.toml for PyPI",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T03:10:29.949628+00:00",
+      "created": "2026-02-04T03:35:39.553552+00:00",
       "metadata": {
         "feature_id": "F7.2",
         "name": "Package Metadata",
@@ -1545,7 +1594,7 @@
       "type": "feature",
       "content": "F7.3: Status Command (pending) - `raise status` health check",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T03:10:29.949632+00:00",
+      "created": "2026-02-04T03:35:39.553561+00:00",
       "metadata": {
         "feature_id": "F7.3",
         "name": "Status Command",
@@ -1561,7 +1610,7 @@
       "type": "feature",
       "content": "F7.4: README & Docs (complete) - Updated 2026-02-02",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T03:10:29.949636+00:00",
+      "created": "2026-02-04T03:35:39.553568+00:00",
       "metadata": {
         "feature_id": "F7.4",
         "name": "README & Docs",
@@ -1577,7 +1626,7 @@
       "type": "feature",
       "content": "F7.5: Doctor Command (deferred) - `raise doctor` diagnostics (P1)",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T03:10:29.949640+00:00",
+      "created": "2026-02-04T03:35:39.553575+00:00",
       "metadata": {
         "feature_id": "F7.5",
         "name": "Doctor Command",
@@ -1593,7 +1642,7 @@
       "type": "feature",
       "content": "F1.1: Project Scaffolding (complete) - ~30min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T03:10:29.949644+00:00",
+      "created": "2026-02-04T03:35:39.553581+00:00",
       "metadata": {
         "feature_id": "F1.1",
         "name": "Project Scaffolding",
@@ -1609,7 +1658,7 @@
       "type": "feature",
       "content": "F1.2: CLI Skeleton (complete) - ~45min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T03:10:29.949648+00:00",
+      "created": "2026-02-04T03:35:39.553588+00:00",
       "metadata": {
         "feature_id": "F1.2",
         "name": "CLI Skeleton",
@@ -1625,7 +1674,7 @@
       "type": "feature",
       "content": "F1.3: Configuration System (complete)",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T03:10:29.949652+00:00",
+      "created": "2026-02-04T03:35:39.553594+00:00",
       "metadata": {
         "feature_id": "F1.3",
         "name": "Configuration System",
@@ -1641,7 +1690,7 @@
       "type": "feature",
       "content": "F1.4: Exception Hierarchy (complete) - ~30min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T03:10:29.949656+00:00",
+      "created": "2026-02-04T03:35:39.553611+00:00",
       "metadata": {
         "feature_id": "F1.4",
         "name": "Exception Hierarchy",
@@ -1657,7 +1706,7 @@
       "type": "feature",
       "content": "F1.5: Output Module (complete) - ~15min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T03:10:29.949662+00:00",
+      "created": "2026-02-04T03:35:39.553621+00:00",
       "metadata": {
         "feature_id": "F1.5",
         "name": "Output Module",
@@ -1673,7 +1722,7 @@
       "type": "feature",
       "content": "F1.6: Core Utilities (complete) - ~10min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T03:10:29.949666+00:00",
+      "created": "2026-02-04T03:35:39.553627+00:00",
       "metadata": {
         "feature_id": "F1.6",
         "name": "Core Utilities",
@@ -1689,7 +1738,7 @@
       "type": "feature",
       "content": "F2.1: Concept Extraction (complete)",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T03:10:29.949670+00:00",
+      "created": "2026-02-04T03:35:39.553636+00:00",
       "metadata": {
         "feature_id": "F2.1",
         "name": "Concept Extraction",
@@ -1705,7 +1754,7 @@
       "type": "feature",
       "content": "F2.2: Graph Builder (complete)",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T03:10:29.949676+00:00",
+      "created": "2026-02-04T03:35:39.553643+00:00",
       "metadata": {
         "feature_id": "F2.2",
         "name": "Graph Builder",
@@ -1721,7 +1770,7 @@
       "type": "feature",
       "content": "F2.3: MVC Query Engine (complete)",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T03:10:29.949679+00:00",
+      "created": "2026-02-04T03:35:39.553649+00:00",
       "metadata": {
         "feature_id": "F2.3",
         "name": "MVC Query Engine",
@@ -1737,7 +1786,7 @@
       "type": "feature",
       "content": "F2.4: CLI Commands (pending) - -",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T03:10:29.949683+00:00",
+      "created": "2026-02-04T03:35:39.553653+00:00",
       "metadata": {
         "feature_id": "F2.4",
         "name": "CLI Commands",
@@ -1753,7 +1802,7 @@
       "type": "feature",
       "content": "F8.1: Backlog Parser (pending)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T03:10:29.949707+00:00",
+      "created": "2026-02-04T03:35:39.553685+00:00",
       "metadata": {
         "feature_id": "F8.1",
         "name": "Backlog Parser",
@@ -1769,7 +1818,7 @@
       "type": "feature",
       "content": "F8.2: Epic Parser (deferred)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T03:10:29.949693+00:00",
+      "created": "2026-02-04T03:35:39.553665+00:00",
       "metadata": {
         "feature_id": "F8.2",
         "name": "Epic Parser",
@@ -1785,7 +1834,7 @@
       "type": "feature",
       "content": "F8.3: Graph Extension (pending)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T03:10:29.949699+00:00",
+      "created": "2026-02-04T03:35:39.553672+00:00",
       "metadata": {
         "feature_id": "F8.3",
         "name": "Graph Extension",
@@ -1801,7 +1850,7 @@
       "type": "feature",
       "content": "F8.4: Work Queries (pending)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T03:10:29.949703+00:00",
+      "created": "2026-02-04T03:35:39.553678+00:00",
       "metadata": {
         "feature_id": "F8.4",
         "name": "Work Queries",
@@ -1817,7 +1866,7 @@
       "type": "feature",
       "content": "F3.1: Identity Core Structure (complete) - Create `.rai/` with identity (md) + memory (jsonl)",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T03:10:29.949710+00:00",
+      "created": "2026-02-04T03:35:39.553692+00:00",
       "metadata": {
         "feature_id": "F3.1",
         "name": "Identity Core Structure",
@@ -1833,7 +1882,7 @@
       "type": "feature",
       "content": "F3.2: Content Migration (complete) - Migrated with F3.1 \u2014 `.claude/rai/` \u2192 `.rai/` JSONL",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T03:10:29.949714+00:00",
+      "created": "2026-02-04T03:35:39.553702+00:00",
       "metadata": {
         "feature_id": "F3.2",
         "name": "Content Migration",
@@ -1849,7 +1898,7 @@
       "type": "feature",
       "content": "F3.3: Memory Graph (complete) - 6 modules, 109 tests, graph builds from JSONL",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T03:10:29.949720+00:00",
+      "created": "2026-02-04T03:35:39.553709+00:00",
       "metadata": {
         "feature_id": "F3.3",
         "name": "Memory Graph",
@@ -1865,7 +1914,7 @@
       "type": "feature",
       "content": "F3.4: Memory Query CLI (complete) - Implemented with F3.3 \u2014 `query` + `dump` commands",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T03:10:29.949724+00:00",
+      "created": "2026-02-04T03:35:39.553716+00:00",
       "metadata": {
         "feature_id": "F3.4",
         "name": "Memory Query CLI",
@@ -1881,7 +1930,7 @@
       "type": "feature",
       "content": "F3.5: Skills Integration (pending) - /session-start queries graph, /session-close writes JSONL",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T03:10:29.949728+00:00",
+      "created": "2026-02-04T03:35:39.553725+00:00",
       "metadata": {
         "feature_id": "F3.5",
         "name": "Skills Integration",
@@ -1897,7 +1946,7 @@
       "type": "feature",
       "content": "F11.1: Unified Graph Schema (pending) - Pydantic models, NetworkX wrapper, serialization",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T03:10:29.949734+00:00",
+      "created": "2026-02-04T03:35:39.553732+00:00",
       "metadata": {
         "feature_id": "F11.1",
         "name": "Unified Graph Schema",
@@ -1913,7 +1962,7 @@
       "type": "feature",
       "content": "F11.2: Graph Builder (pending) - Merge governance + memory + work + skills into unified graph",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T03:10:29.949738+00:00",
+      "created": "2026-02-04T03:35:39.553739+00:00",
       "metadata": {
         "feature_id": "F11.2",
         "name": "Graph Builder",
@@ -1929,7 +1978,7 @@
       "type": "feature",
       "content": "F11.3: Unified Query (pending) - `raise context query` with BFS + keyword matching",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T03:10:29.949742+00:00",
+      "created": "2026-02-04T03:35:39.553748+00:00",
       "metadata": {
         "feature_id": "F11.3",
         "name": "Unified Query",
@@ -1945,7 +1994,7 @@
       "type": "feature",
       "content": "F11.4: Skill Integration (pending) - Add \"Query Context\" step to 9 workflow skills",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T03:10:29.949746+00:00",
+      "created": "2026-02-04T03:35:39.553755+00:00",
       "metadata": {
         "feature_id": "F11.4",
         "name": "Skill Integration",
@@ -1961,7 +2010,7 @@
       "type": "feature",
       "content": "F10.1: Lineage Schema (pending) - Add lineage fields to pattern model",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949750+00:00",
+      "created": "2026-02-04T03:35:39.553761+00:00",
       "metadata": {
         "feature_id": "F10.1",
         "name": "Lineage Schema",
@@ -1977,7 +2026,7 @@
       "type": "feature",
       "content": "F10.2: Export Command (pending) - `raise memory export --shareable`",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949753+00:00",
+      "created": "2026-02-04T03:35:39.553768+00:00",
       "metadata": {
         "feature_id": "F10.2",
         "name": "Export Command",
@@ -1993,7 +2042,7 @@
       "type": "feature",
       "content": "F10.3: Community Repo (pending) - Public repo for shared patterns",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949757+00:00",
+      "created": "2026-02-04T03:35:39.553773+00:00",
       "metadata": {
         "feature_id": "F10.3",
         "name": "Community Repo",
@@ -2009,7 +2058,7 @@
       "type": "feature",
       "content": "F10.4: Pull Command (pending) - `raise memory pull --community`",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949765+00:00",
+      "created": "2026-02-04T03:35:39.553780+00:00",
       "metadata": {
         "feature_id": "F10.4",
         "name": "Pull Command",
@@ -2025,7 +2074,7 @@
       "type": "feature",
       "content": "F10.5: Sharing Config (pending) - Team/org scope settings",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949769+00:00",
+      "created": "2026-02-04T03:35:39.553785+00:00",
       "metadata": {
         "feature_id": "F10.5",
         "name": "Sharing Config",
@@ -2041,7 +2090,7 @@
       "type": "feature",
       "content": "F10.6: Sync API (pending) - Pattern and signal submission",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949775+00:00",
+      "created": "2026-02-04T03:35:39.553791+00:00",
       "metadata": {
         "feature_id": "F10.6",
         "name": "Sync API",
@@ -2057,7 +2106,7 @@
       "type": "feature",
       "content": "F10.7: Team/Org Scopes (pending) - Identity and permissions",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949779+00:00",
+      "created": "2026-02-04T03:35:39.553798+00:00",
       "metadata": {
         "feature_id": "F10.7",
         "name": "Team/Org Scopes",
@@ -2073,7 +2122,7 @@
       "type": "feature",
       "content": "F10.8: Aggregate Analytics (pending) - Framework improvement metrics",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T03:10:29.949782+00:00",
+      "created": "2026-02-04T03:35:39.553803+00:00",
       "metadata": {
         "feature_id": "F10.8",
         "name": "Aggregate Analytics",
@@ -2089,7 +2138,7 @@
       "type": "feature",
       "content": "F9.1: Signal Schema (pending) - Define signal types in Pydantic models",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949786+00:00",
+      "created": "2026-02-04T03:35:39.553809+00:00",
       "metadata": {
         "feature_id": "F9.1",
         "name": "Signal Schema",
@@ -2105,7 +2154,7 @@
       "type": "feature",
       "content": "F9.2: Signal Writer (pending) - Append signals to `.rai/telemetry/signals.jsonl`",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949790+00:00",
+      "created": "2026-02-04T03:35:39.553815+00:00",
       "metadata": {
         "feature_id": "F9.2",
         "name": "Signal Writer",
@@ -2121,7 +2170,7 @@
       "type": "feature",
       "content": "F9.3: Skill Emitters (pending) - Emit skill_event on start/complete/abandon",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949793+00:00",
+      "created": "2026-02-04T03:35:39.553823+00:00",
       "metadata": {
         "feature_id": "F9.3",
         "name": "Skill Emitters",
@@ -2137,7 +2186,7 @@
       "type": "feature",
       "content": "F9.4: Session Emitters (pending) - Emit session_event from /session-close",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949799+00:00",
+      "created": "2026-02-04T03:35:39.553832+00:00",
       "metadata": {
         "feature_id": "F9.4",
         "name": "Session Emitters",
@@ -2153,7 +2202,7 @@
       "type": "feature",
       "content": "F9.5: Error Emitters (pending) - Emit error_event on tool failures",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949805+00:00",
+      "created": "2026-02-04T03:35:39.553838+00:00",
       "metadata": {
         "feature_id": "F9.5",
         "name": "Error Emitters",
@@ -2169,7 +2218,7 @@
       "type": "feature",
       "content": "F9.6: Signal Analyzer (pending) - Analyze signals.jsonl for patterns",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949809+00:00",
+      "created": "2026-02-04T03:35:39.553847+00:00",
       "metadata": {
         "feature_id": "F9.6",
         "name": "Signal Analyzer",
@@ -2185,7 +2234,7 @@
       "type": "feature",
       "content": "F9.7: Insight Generator (pending) - Generate epistemologically-grounded insights",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949813+00:00",
+      "created": "2026-02-04T03:35:39.553853+00:00",
       "metadata": {
         "feature_id": "F9.7",
         "name": "Insight Generator",
@@ -2201,7 +2250,7 @@
       "type": "feature",
       "content": "F9.8: Session Start Integration (pending) - Surface insights in /session-start",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949817+00:00",
+      "created": "2026-02-04T03:35:39.553859+00:00",
       "metadata": {
         "feature_id": "F9.8",
         "name": "Session Start Integration",
@@ -2217,7 +2266,7 @@
       "type": "feature",
       "content": "F9.9: Calibration Updater (pending) - Auto-update calibration from actuals",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949821+00:00",
+      "created": "2026-02-04T03:35:39.553867+00:00",
       "metadata": {
         "feature_id": "F9.9",
         "name": "Calibration Updater",
@@ -2233,7 +2282,7 @@
       "type": "feature",
       "content": "F9.10: Telemetry Commands (pending) - `raise telemetry velocity`, `drift`, `insights`",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949825+00:00",
+      "created": "2026-02-04T03:35:39.553873+00:00",
       "metadata": {
         "feature_id": "F9.10",
         "name": "Telemetry Commands",
@@ -2249,7 +2298,7 @@
       "type": "feature",
       "content": "F9.11: Retro Integration (pending) - /feature-review queries telemetry",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T03:10:29.949828+00:00",
+      "created": "2026-02-04T03:35:39.553881+00:00",
       "metadata": {
         "feature_id": "F9.11",
         "name": "Retro Integration",
@@ -2282,7 +2331,7 @@
       "type": "skill",
       "content": "Decompose user stories into atomic executable tasks, identify dependencies, and create a deterministic implementation plan. Use after design spec is ready or for simple features that skip design.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-plan/SKILL.md",
-      "created": "2026-02-04T02:03:30.308285+00:00",
+      "created": "2026-02-04T03:22:26.000395+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
         "raise.frequency": "per-feature",
@@ -2443,9 +2492,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pyright",
         "strict",
-        "typing",
-        "pyright"
+        "typing"
       ],
       "source": "PAT-002",
       "target": "PAT-027",
@@ -2506,8 +2555,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commit",
-        "workflow"
+        "workflow",
+        "commit"
       ],
       "source": "PAT-004",
       "target": "PAT-017",
@@ -2518,8 +2567,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "hitl",
-        "collaboration",
-        "workflow"
+        "workflow",
+        "collaboration"
       ],
       "source": "PAT-004",
       "target": "PAT-025",
@@ -2529,9 +2578,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commit",
         "git",
-        "workflow"
+        "workflow",
+        "commit"
       ],
       "source": "PAT-004",
       "target": "PAT-028",
@@ -2563,8 +2612,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "users"
+        "users",
+        "skills"
       ],
       "source": "PAT-006",
       "target": "PAT-046",
@@ -2588,8 +2637,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "assumptions",
-        "validate"
+        "validate",
+        "assumptions"
       ],
       "source": "PAT-008",
       "target": "PAT-020",
@@ -2712,8 +2761,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "task",
-        "planning"
+        "planning",
+        "task"
       ],
       "source": "PAT-013",
       "target": "/feature-implement",
@@ -2730,8 +2779,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "patterns",
-        "pattern"
+        "pattern",
+        "patterns"
       ],
       "source": "PAT-015",
       "target": "PAT-019",
@@ -2764,8 +2813,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "atomic",
-        "tasks"
+        "tasks",
+        "atomic"
       ],
       "source": "PAT-016",
       "target": "/feature-plan",
@@ -2782,8 +2831,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commit",
-        "workflow"
+        "workflow",
+        "commit"
       ],
       "source": "PAT-017",
       "target": "PAT-028",
@@ -2869,9 +2918,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "dogfooding",
         "discipline",
-        "methodology"
+        "methodology",
+        "dogfooding"
       ],
       "source": "PAT-024",
       "target": "PAT-026",
@@ -2881,8 +2930,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "isnt",
-        "raise"
+        "raise",
+        "isnt"
       ],
       "source": "PAT-024",
       "target": "PAT-046",
@@ -2903,8 +2952,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "enables",
-        "discipline"
+        "discipline",
+        "enables"
       ],
       "source": "PAT-026",
       "target": "PAT-028",
@@ -2914,8 +2963,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "work"
+        "work",
+        "skills"
       ],
       "source": "PAT-026",
       "target": "feature-f11-2",
@@ -2925,8 +2974,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "creates"
+        "creates",
+        "work"
       ],
       "source": "PAT-026",
       "target": "/session-start",
@@ -3001,8 +3050,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "workflow"
+        "workflow",
+        "context"
       ],
       "source": "PAT-031",
       "target": "feature-f11-4",
@@ -3030,8 +3079,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unfamiliar",
-        "research"
+        "research",
+        "unfamiliar"
       ],
       "source": "PAT-032",
       "target": "/research",
@@ -3048,9 +3097,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
+        "features",
         "feature",
-        "features"
+        "plan"
       ],
       "source": "PAT-033",
       "target": "/epic-plan",
@@ -3060,8 +3109,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
-        "features"
+        "features",
+        "plan"
       ],
       "source": "PAT-033",
       "target": "/feature-plan",
@@ -3071,9 +3120,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
+        "features",
         "planning",
-        "features"
+        "feature"
       ],
       "source": "PAT-033",
       "target": "/feature-design",
@@ -3083,8 +3132,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
-        "planning"
+        "planning",
+        "plan"
       ],
       "source": "PAT-033",
       "target": "/feature-implement",
@@ -3094,8 +3143,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
-        "features"
+        "features",
+        "feature"
       ],
       "source": "PAT-033",
       "target": "/epic-design",
@@ -3162,9 +3211,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "graph",
         "work",
-        "tracking",
-        "graph"
+        "tracking"
       ],
       "source": "PAT-037",
       "target": "ses-1770068415",
@@ -3174,9 +3223,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "graph",
         "work",
-        "tracking",
-        "graph"
+        "tracking"
       ],
       "source": "PAT-037",
       "target": "epic-e8",
@@ -3186,9 +3235,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
         "governance",
-        "graph"
+        "graph",
+        "work"
       ],
       "source": "PAT-037",
       "target": "feature-f11-2",
@@ -3198,8 +3247,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
         "features",
+        "work",
         "tracking"
       ],
       "source": "PAT-037",
@@ -3210,8 +3259,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "features"
+        "features",
+        "work"
       ],
       "source": "PAT-037",
       "target": "/epic-design",
@@ -3221,8 +3270,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signals",
-        "telemetry"
+        "telemetry",
+        "signals"
       ],
       "source": "PAT-040",
       "target": "PAT-042",
@@ -3232,8 +3281,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signals",
-        "telemetry"
+        "telemetry",
+        "signals"
       ],
       "source": "PAT-040",
       "target": "PAT-047",
@@ -3254,8 +3303,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "grounding",
-        "epistemological"
+        "epistemological",
+        "grounding"
       ],
       "source": "PAT-041",
       "target": "PAT-044",
@@ -3277,8 +3326,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "raise",
-        "signals",
-        "telemetry"
+        "telemetry",
+        "signals"
       ],
       "source": "PAT-042",
       "target": "PAT-047",
@@ -3310,8 +3359,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "giants",
         "shoulders",
+        "giants",
         "standing"
       ],
       "source": "PAT-043",
@@ -3322,10 +3371,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "designplanimplementreview",
+        "telemetry",
         "worklifecycle",
         "phases",
-        "telemetry"
+        "designplanimplementreview"
       ],
       "source": "PAT-045",
       "target": "PAT-047",
@@ -3346,8 +3395,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "analysis",
-        "lean"
+        "lean",
+        "analysis"
       ],
       "source": "PAT-045",
       "target": "/debug",
@@ -3381,8 +3430,8 @@
       "shared_keywords": [
         "node",
         "nodes",
-        "networkx",
-        "graph"
+        "graph",
+        "networkx"
       ],
       "source": "PAT-048",
       "target": "PAT-050",
@@ -3392,8 +3441,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "architecture"
+        "architecture",
+        "unified"
       ],
       "source": "PAT-048",
       "target": "SES-015",
@@ -3403,8 +3452,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "graph"
+        "graph",
+        "unified"
       ],
       "source": "PAT-048",
       "target": "SES-016",
@@ -3414,9 +3463,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
+        "graph",
         "networkx",
-        "graph"
+        "unified"
       ],
       "source": "PAT-048",
       "target": "feature-f11-1",
@@ -3426,8 +3475,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "graph"
+        "graph",
+        "unified"
       ],
       "source": "PAT-048",
       "target": "feature-f11-2",
@@ -3459,8 +3508,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "decisions",
-        "research"
+        "research",
+        "decisions"
       ],
       "source": "PAT-049",
       "target": "/research",
@@ -3470,9 +3519,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "design",
         "decisions",
-        "architectural",
-        "design"
+        "architectural"
       ],
       "source": "PAT-049",
       "target": "/epic-design",
@@ -3489,11 +3538,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "models",
         "pydantic",
         "networkx",
-        "graph",
-        "serialization"
+        "serialization",
+        "models",
+        "graph"
       ],
       "source": "PAT-050",
       "target": "feature-f11-1",
@@ -3503,8 +3552,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pydantic",
-        "models"
+        "models",
+        "pydantic"
       ],
       "source": "PAT-050",
       "target": "feature-f9-1",
@@ -3514,8 +3563,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "scaffolding",
-        "project"
+        "project",
+        "scaffolding"
       ],
       "source": "CAL-001",
       "target": "feature-f1-1",
@@ -3525,8 +3574,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "system",
-        "configuration"
+        "configuration",
+        "system"
       ],
       "source": "CAL-003",
       "target": "feature-f1-3",
@@ -3547,8 +3596,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "output",
-        "module"
+        "module",
+        "output"
       ],
       "source": "CAL-005",
       "target": "feature-f1-5",
@@ -3558,8 +3607,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "core",
-        "utilities"
+        "utilities",
+        "core"
       ],
       "source": "CAL-006",
       "target": "feature-f1-6",
@@ -3569,8 +3618,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "extraction",
-        "concept"
+        "concept",
+        "extraction"
       ],
       "source": "CAL-007",
       "target": "SES-007",
@@ -3580,8 +3629,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "extraction",
-        "concept"
+        "concept",
+        "extraction"
       ],
       "source": "CAL-007",
       "target": "feature-f2-1",
@@ -3591,8 +3640,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "builder",
-        "graph"
+        "graph",
+        "builder"
       ],
       "source": "CAL-008",
       "target": "SES-017",
@@ -3602,8 +3651,19 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "builder",
-        "graph"
+        "graph",
+        "builder"
+      ],
+      "source": "CAL-008",
+      "target": "SES-018",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
       ],
       "source": "CAL-008",
       "target": "feature-f2-2",
@@ -3613,8 +3673,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "builder",
-        "graph"
+        "graph",
+        "builder"
       ],
       "source": "CAL-008",
       "target": "feature-f11-2",
@@ -3635,9 +3695,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "identity",
+        "structure",
         "core",
-        "structure"
+        "identity"
       ],
       "source": "CAL-010",
       "target": "SES-011",
@@ -3658,9 +3718,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "identity",
+        "structure",
         "core",
-        "structure"
+        "identity"
       ],
       "source": "CAL-010",
       "target": "feature-f3-1",
@@ -3670,8 +3730,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "graph"
+        "graph",
+        "memory"
       ],
       "source": "CAL-011",
       "target": "SES-012",
@@ -3681,8 +3741,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "graph"
+        "graph",
+        "memory"
       ],
       "source": "CAL-011",
       "target": "feature-f3-3",
@@ -3692,8 +3752,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "graph"
+        "graph",
+        "memory"
       ],
       "source": "CAL-011",
       "target": "feature-f11-2",
@@ -3703,8 +3763,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "CAL-012",
       "target": "SES-013",
@@ -3714,8 +3774,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "CAL-012",
       "target": "feature-f3-5",
@@ -3725,8 +3785,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "CAL-012",
       "target": "feature-f11-4",
@@ -3736,8 +3796,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
-        "implementation"
+        "implementation",
+        "plan"
       ],
       "source": "SES-001",
       "target": "/epic-plan",
@@ -3747,8 +3807,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
-        "implementation"
+        "implementation",
+        "plan"
       ],
       "source": "SES-001",
       "target": "/feature-plan",
@@ -3758,8 +3818,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
-        "implementation"
+        "implementation",
+        "plan"
       ],
       "source": "SES-001",
       "target": "/feature-implement",
@@ -3769,8 +3829,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "epic",
-        "design"
+        "design",
+        "epic"
       ],
       "source": "SES-002",
       "target": "/epic-design",
@@ -3780,8 +3840,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "extraction",
-        "concept"
+        "concept",
+        "extraction"
       ],
       "source": "SES-007",
       "target": "feature-f2-1",
@@ -3813,9 +3873,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "identity",
+        "structure",
         "core",
-        "structure"
+        "identity"
       ],
       "source": "SES-011",
       "target": "feature-f3-1",
@@ -3825,8 +3885,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "graph"
+        "graph",
+        "memory"
       ],
       "source": "SES-012",
       "target": "feature-f3-3",
@@ -3836,8 +3896,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "graph"
+        "graph",
+        "memory"
       ],
       "source": "SES-012",
       "target": "feature-f11-2",
@@ -3847,8 +3907,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "SES-013",
       "target": "feature-f3-5",
@@ -3858,8 +3918,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "SES-013",
       "target": "feature-f11-4",
@@ -3880,9 +3940,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "graph",
         "work",
-        "tracking",
-        "graph"
+        "tracking"
       ],
       "source": "ses-1770068415",
       "target": "epic-e8",
@@ -3892,8 +3952,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "graph"
+        "graph",
+        "work"
       ],
       "source": "ses-1770068415",
       "target": "feature-f11-2",
@@ -3914,8 +3974,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "collective",
-        "intelligence"
+        "intelligence",
+        "collective"
       ],
       "source": "ses-1770089999",
       "target": "epic-e10",
@@ -3925,8 +3985,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "context"
+        "context",
+        "unified"
       ],
       "source": "SES-015",
       "target": "feature-f11-3",
@@ -3937,9 +3997,9 @@
       "weight": 0.5,
       "shared_keywords": [
         "schema",
-        "unified",
+        "graph",
         "f111",
-        "graph"
+        "unified"
       ],
       "source": "SES-016",
       "target": "feature-f11-1",
@@ -3949,8 +4009,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "graph"
+        "graph",
+        "unified"
       ],
       "source": "SES-016",
       "target": "feature-f11-2",
@@ -3960,8 +4020,21 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "builder",
-        "graph"
+        "tasks",
+        "f112",
+        "graph",
+        "builder"
+      ],
+      "source": "SES-017",
+      "target": "SES-018",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
       ],
       "source": "SES-017",
       "target": "feature-f2-2",
@@ -3972,8 +4045,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "f112",
-        "builder",
-        "graph"
+        "graph",
+        "builder"
       ],
       "source": "SES-017",
       "target": "feature-f11-2",
@@ -3983,8 +4056,43 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "core",
-        "complete"
+        "graph",
+        "builder"
+      ],
+      "source": "SES-018",
+      "target": "feature-f2-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "f112",
+        "graph",
+        "builder"
+      ],
+      "source": "SES-018",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "query",
+        "f113",
+        "unified"
+      ],
+      "source": "SES-019",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "core"
       ],
       "source": "epic-e1",
       "target": "epic-e3",
@@ -3994,8 +4102,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "core",
-        "complete"
+        "complete",
+        "core"
       ],
       "source": "epic-e1",
       "target": "feature-f1-6",
@@ -4005,8 +4113,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "core",
-        "complete"
+        "complete",
+        "core"
       ],
       "source": "epic-e1",
       "target": "feature-f3-1",
@@ -4016,8 +4124,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "core",
-        "complete"
+        "complete",
+        "core"
       ],
       "source": "epic-e3",
       "target": "feature-f1-6",
@@ -4027,9 +4135,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "identity",
+        "complete",
         "core",
-        "complete"
+        "identity"
       ],
       "source": "epic-e3",
       "target": "feature-f3-1",
@@ -4072,8 +4180,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "graph"
+        "graph",
+        "work"
       ],
       "source": "epic-e8",
       "target": "feature-f11-2",
@@ -4094,8 +4202,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "raise",
+        "command",
         "pending"
       ],
       "source": "feature-f7-1",
@@ -4106,8 +4214,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
-        "raise"
+        "raise",
+        "command"
       ],
       "source": "feature-f7-1",
       "target": "feature-f7-5",
@@ -4128,8 +4236,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "raise",
+        "command",
         "pending"
       ],
       "source": "feature-f7-1",
@@ -4140,8 +4248,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "raise",
+        "command",
         "pending"
       ],
       "source": "feature-f7-1",
@@ -4163,8 +4271,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
-        "raise"
+        "raise",
+        "command"
       ],
       "source": "feature-f7-3",
       "target": "feature-f7-5",
@@ -4185,8 +4293,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "raise",
+        "command",
         "pending"
       ],
       "source": "feature-f7-3",
@@ -4197,8 +4305,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "raise",
+        "command",
         "pending"
       ],
       "source": "feature-f7-3",
@@ -4220,8 +4328,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
-        "raise"
+        "raise",
+        "command"
       ],
       "source": "feature-f7-5",
       "target": "feature-f10-2",
@@ -4231,8 +4339,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
-        "raise"
+        "raise",
+        "command"
       ],
       "source": "feature-f7-5",
       "target": "feature-f10-4",
@@ -4253,8 +4361,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "core",
-        "complete"
+        "complete",
+        "core"
       ],
       "source": "feature-f1-6",
       "target": "feature-f3-1",
@@ -4275,8 +4383,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "builder",
-        "graph"
+        "graph",
+        "builder"
       ],
       "source": "feature-f2-2",
       "target": "feature-f11-2",
@@ -4308,8 +4416,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "pending"
+        "pending",
+        "graph"
       ],
       "source": "feature-f8-3",
       "target": "feature-f3-5",
@@ -4319,8 +4427,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "pending"
+        "pending",
+        "graph"
       ],
       "source": "feature-f8-3",
       "target": "feature-f11-1",
@@ -4330,8 +4438,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "pending"
+        "pending",
+        "graph"
       ],
       "source": "feature-f8-3",
       "target": "feature-f11-2",
@@ -4352,8 +4460,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "pending"
+        "pending",
+        "work"
       ],
       "source": "feature-f8-4",
       "target": "feature-f11-2",
@@ -4385,9 +4493,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
         "complete",
-        "jsonl"
+        "jsonl",
+        "memory"
       ],
       "source": "feature-f3-1",
       "target": "feature-f3-3",
@@ -4397,8 +4505,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "complete"
+        "complete",
+        "memory"
       ],
       "source": "feature-f3-1",
       "target": "feature-f3-4",
@@ -4419,8 +4527,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "complete"
+        "complete",
+        "memory"
       ],
       "source": "feature-f3-3",
       "target": "feature-f3-4",
@@ -4430,8 +4538,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "jsonl",
-        "graph"
+        "graph",
+        "jsonl"
       ],
       "source": "feature-f3-3",
       "target": "feature-f3-5",
@@ -4441,8 +4549,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "graph"
+        "graph",
+        "memory"
       ],
       "source": "feature-f3-3",
       "target": "feature-f11-2",
@@ -4463,9 +4571,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
         "pending",
-        "graph"
+        "graph",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "feature-f11-2",
@@ -4475,9 +4583,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
         "integration",
-        "pending"
+        "pending",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "feature-f11-4",
@@ -4498,8 +4606,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "sessionstart",
         "integration",
+        "sessionstart",
         "pending"
       ],
       "source": "feature-f3-5",
@@ -4510,8 +4618,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pending",
         "integration",
+        "pending",
         "queries"
       ],
       "source": "feature-f3-5",
@@ -4522,9 +4630,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
         "pending",
-        "graph"
+        "graph",
+        "unified"
       ],
       "source": "feature-f11-1",
       "target": "feature-f11-2",
@@ -4534,8 +4642,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "pending"
+        "pending",
+        "unified"
       ],
       "source": "feature-f11-1",
       "target": "feature-f11-3",
@@ -4556,10 +4664,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pydantic",
-        "schema",
         "models",
-        "pending"
+        "schema",
+        "pending",
+        "pydantic"
       ],
       "source": "feature-f11-1",
       "target": "feature-f9-1",
@@ -4569,8 +4677,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "pending"
+        "pending",
+        "unified"
       ],
       "source": "feature-f11-2",
       "target": "feature-f11-3",
@@ -4580,8 +4688,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "pending"
+        "pending",
+        "skills"
       ],
       "source": "feature-f11-2",
       "target": "feature-f11-4",
@@ -4591,8 +4699,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "pending"
+        "pending",
+        "memory"
       ],
       "source": "feature-f11-2",
       "target": "feature-f10-2",
@@ -4602,8 +4710,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "pending"
+        "pending",
+        "memory"
       ],
       "source": "feature-f11-2",
       "target": "feature-f10-4",
@@ -4624,9 +4732,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
         "query",
-        "pending"
+        "pending",
+        "context"
       ],
       "source": "feature-f11-3",
       "target": "feature-f11-4",
@@ -4702,8 +4810,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pattern",
-        "pending"
+        "pending",
+        "pattern"
       ],
       "source": "feature-f10-1",
       "target": "feature-f10-6",
@@ -4724,10 +4832,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
-        "memory",
         "raise",
-        "pending"
+        "command",
+        "pending",
+        "memory"
       ],
       "source": "feature-f10-2",
       "target": "feature-f10-4",
@@ -4759,8 +4867,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "patterns",
-        "pending"
+        "pending",
+        "patterns"
       ],
       "source": "feature-f10-3",
       "target": "feature-f9-6",
@@ -4792,8 +4900,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signal",
-        "pending"
+        "pending",
+        "signal"
       ],
       "source": "feature-f10-6",
       "target": "feature-f9-1",
@@ -4803,8 +4911,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signal",
-        "pending"
+        "pending",
+        "signal"
       ],
       "source": "feature-f10-6",
       "target": "feature-f9-2",
@@ -4814,8 +4922,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signal",
-        "pending"
+        "pending",
+        "signal"
       ],
       "source": "feature-f10-6",
       "target": "feature-f9-6",
@@ -4825,8 +4933,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signal",
-        "pending"
+        "pending",
+        "signal"
       ],
       "source": "feature-f9-1",
       "target": "feature-f9-2",
@@ -4836,8 +4944,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signal",
-        "pending"
+        "pending",
+        "signal"
       ],
       "source": "feature-f9-1",
       "target": "feature-f9-6",
@@ -4847,8 +4955,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "signal",
-        "pending"
+        "pending",
+        "signal"
       ],
       "source": "feature-f9-2",
       "target": "feature-f9-6",
@@ -4858,9 +4966,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pending",
         "emit",
-        "emitters",
-        "pending"
+        "emitters"
       ],
       "source": "feature-f9-3",
       "target": "feature-f9-4",
@@ -4870,9 +4978,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pending",
         "emit",
-        "emitters",
-        "pending"
+        "emitters"
       ],
       "source": "feature-f9-3",
       "target": "feature-f9-5",
@@ -4882,9 +4990,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pending",
         "emit",
-        "emitters",
-        "pending"
+        "emitters"
       ],
       "source": "feature-f9-4",
       "target": "feature-f9-5",
@@ -4894,8 +5002,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "session",
-        "pending"
+        "pending",
+        "session"
       ],
       "source": "feature-f9-4",
       "target": "feature-f9-8",
@@ -4905,8 +5013,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "insights",
-        "pending"
+        "pending",
+        "insights"
       ],
       "source": "feature-f9-7",
       "target": "feature-f9-8",
@@ -4916,8 +5024,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "insights",
-        "pending"
+        "pending",
+        "insights"
       ],
       "source": "feature-f9-7",
       "target": "feature-f9-10",
@@ -4927,8 +5035,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "insights",
-        "pending"
+        "pending",
+        "insights"
       ],
       "source": "feature-f9-8",
       "target": "feature-f9-10",
@@ -4949,8 +5057,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "telemetry",
-        "pending"
+        "pending",
+        "telemetry"
       ],
       "source": "feature-f9-10",
       "target": "feature-f9-11",
@@ -4967,10 +5075,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "features",
         "starting",
         "work",
-        "feature",
-        "features"
+        "feature"
       ],
       "source": "/epic-plan",
       "target": "/epic-design",
@@ -4987,9 +5095,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
         "features",
-        "create"
+        "create",
+        "feature"
       ],
       "source": "/epic-plan",
       "target": "/feature-design",
@@ -4999,11 +5107,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "features",
-        "implementation",
-        "create",
         "dependencies",
+        "features",
         "executable",
+        "create",
+        "implementation",
         "plan"
       ],
       "source": "/epic-plan",
@@ -5014,8 +5122,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "progress"
+        "progress",
+        "work"
       ],
       "source": "/epic-plan",
       "target": "/session-start",
@@ -5025,8 +5133,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "implementation",
-        "features"
+        "features",
+        "implementation"
       ],
       "source": "/epic-plan",
       "target": "/feature-review",
@@ -5036,8 +5144,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
-        "implementation"
+        "implementation",
+        "plan"
       ],
       "source": "/epic-plan",
       "target": "/feature-implement",
@@ -5054,8 +5162,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "plan",
-        "implementation"
+        "implementation",
+        "plan"
       ],
       "source": "/feature-plan",
       "target": "/feature-implement",
@@ -5076,9 +5184,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "implementation",
         "identify",
-        "features"
+        "features",
+        "implementation"
       ],
       "source": "/feature-plan",
       "target": "/feature-review",
@@ -5106,8 +5214,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "code",
-        "planning"
+        "planning",
+        "code"
       ],
       "source": "/feature-design",
       "target": "/feature-implement",
@@ -5131,10 +5239,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "sessions",
         "continuity",
-        "memory",
-        "session"
+        "sessions",
+        "session",
+        "memory"
       ],
       "source": "/session-close",
       "target": "/session-start",
@@ -5144,8 +5252,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "learnings",
-        "close"
+        "close",
+        "learnings"
       ],
       "source": "/session-close",
       "target": "/feature-review",
@@ -5162,8 +5270,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "implementation",
-        "complete"
+        "complete",
+        "implementation"
       ],
       "source": "/feature-review",
       "target": "/feature-implement",

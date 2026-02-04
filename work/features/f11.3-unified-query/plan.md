@@ -83,7 +83,7 @@
 
 | Task | Size | Estimated | Actual | Notes |
 |------|:----:|:---------:|:------:|-------|
-| 1 | M | 30-45m | -- | |
-| 2 | S | 15-25m | -- | |
-| 3 | XS | 5-10m | -- | |
-| **Total** | **S** | **50-80m** | -- | |
+| 1 | M | 30-45m | ~35m | Query module + 37 tests |
+| 2 | S | 15-25m | ~20m | CLI integration + formatters |
+| 3 | XS | 5-10m | ~8m | All integration tests pass |
+| **Total** | **S** | **50-80m** | **~63m** | 1.1x velocity |
