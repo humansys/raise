@@ -57,8 +57,9 @@ Close a working session by preserving learnings, updating memory files, and prep
 - Interrupted sessions (run when resuming instead)
 
 **Inputs required:**
+- Unified graph (`.raise/graph/unified.json`) — for existing patterns
 - Conversation context (current session)
-- Access to memory files (`.rai/memory/`)
+- Memory files (`.rai/memory/`) — for writing new learnings
 
 **Output:**
 - Updated memory files
@@ -67,21 +68,29 @@ Close a working session by preserving learnings, updating memory files, and prep
 
 ## Steps
 
-### Step 0.5: Query Context (Optional)
+### Step 1: Query Context for Pattern Extraction (Required)
 
-If unified graph is available, query for pattern extraction context:
+Query the unified graph to understand existing patterns. This helps identify what's **new** vs what's already captured.
 
 ```bash
-raise context query "session patterns learnings" --unified --types pattern,session --limit 5
+raise context query "patterns learnings process" --unified --types pattern --limit 10
 ```
 
-Review returned patterns to inform what learnings to extract.
+**Why this matters:**
+- Avoid adding duplicate patterns
+- See related patterns to link new learnings
+- Understand what categories of patterns exist
 
-**Verification:** Context loaded or graph not available (proceed without).
+**Extract from results:**
+- Existing patterns in relevant areas
+- Pattern ID format for new additions
+- Gaps where new patterns would fit
 
-> **If context unavailable:** Run `raise graph build --unified` first, or skip to Step 1.
+**Verification:** Existing patterns reviewed; ready to identify new learnings.
 
-### Step 1: Gather Session Summary
+> **If graph unavailable:** Run `raise graph build --unified` first, or proceed without (risk duplicates).
+
+### Step 2: Gather Session Summary
 
 Review what happened in this session:
 - What was the goal?
@@ -93,7 +102,7 @@ Review what happened in this session:
 
 > **If you can't continue:** Session too scattered → Focus on the most significant outcome.
 
-### Step 2: Extract Learnings
+### Step 3: Extract Learnings
 
 Identify learnings worth preserving:
 
@@ -114,7 +123,7 @@ Identify learnings worth preserving:
 
 > **If you can't continue:** Nothing learned → That's fine; skip to Step 4.
 
-### Step 3: Update Memory Files
+### Step 4: Update Memory Files
 
 Update `.rai/memory/` files as appropriate:
 
@@ -139,7 +148,7 @@ raise memory add-session "Session Topic" -o "outcome1,outcome2,outcome3" -t feat
 
 > **If you can't continue:** No significant learnings → Update session-index only.
 
-### Step 4: Update Context Files
+### Step 5: Update Context Files
 
 Update as needed:
 
@@ -157,7 +166,7 @@ Update as needed:
 
 > **If you can't continue:** Minimal changes → At least update "Next Feature" if changed.
 
-### Step 5: Create Session Log (Optional)
+### Step 6: Create Session Log (Optional)
 
 If session was significant, create `dev/sessions/YYYY-MM-DD-{topic}.md`:
 
@@ -176,7 +185,7 @@ If session was significant, create `dev/sessions/YYYY-MM-DD-{topic}.md`:
 
 > **If you can't continue:** Uncertain significance → Err on the side of logging.
 
-### Step 6: Capture Tangents
+### Step 7: Capture Tangents
 
 Check for any ideas or tangents that came up but weren't pursued:
 
@@ -185,7 +194,7 @@ Check for any ideas or tangents that came up but weren't pursued:
 
 **Verification:** Parking lot updated OR no tangents to capture.
 
-### Step 7: Suggest Next Session
+### Step 8: Suggest Next Session
 
 Provide a brief handoff for the next session:
 
@@ -199,7 +208,7 @@ Provide a brief handoff for the next session:
 
 **Verification:** Clear handoff documented.
 
-### Step 8: Emit Session Telemetry
+### Step 9: Emit Session Telemetry
 
 Record the session signal for local learning:
 
@@ -332,7 +341,8 @@ Each session builds on previous ones. The memory system creates a form of contin
 
 ## References
 
-- Memory files: `.rai/memory/`
+- Unified graph: `.raise/graph/unified.json` (for pattern lookup)
+- Memory files: `.rai/memory/` (for writing learnings)
 - Session logs: `dev/sessions/`
 - Parking lot: `dev/parking-lot.md`
-- RAI perspective: `.claude/RAI.md`
+- Complement: `/session-start`
