@@ -54,7 +54,7 @@
 | F12.2 | **Guardrails Extractor** | S | ✅ Done | Extract guardrails as queryable nodes |
 | F12.3 | **Glossary Extractor** | S | ✅ Done | Extract glossary terms for terminology |
 | F12.4 | **Schema Extension** | XS | ✅ Done | Add `decision`, `guardrail`, `term` to NodeType |
-| F12.5 | **Skill Query Alignment** | S | Pending | Fix query/type mismatches in feature cycle skills |
+| F12.5 | **Skill Query Alignment** | S | ✅ Done | Fix query/type mismatches in feature cycle skills |
 | F12.6 | **Memory Write CLI** | M | Pending | `raise memory add-pattern` command |
 
 **Total:** 6 features, ~10 SP estimated

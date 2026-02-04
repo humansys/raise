@@ -93,10 +93,14 @@ raise telemetry emit epic {epic_id} --event start --phase design
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-raise context query "architecture ADR epic" --unified --types pattern,epic --limit 5
+raise context query "architecture ADR epic" --unified --types pattern,decision --limit 5
 ```
 
-Review returned patterns before proceeding. Prior epic learnings inform scope decisions.
+Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
+
+**What this returns:**
+- Learned patterns from prior epics
+- Prior architectural decisions (ADRs) relevant to this epic
 
 **Verification:** Context loaded; relevant patterns noted.
 
