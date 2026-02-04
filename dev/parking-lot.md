@@ -86,6 +86,17 @@
 - [ ] **Add `get_all_*` aliases to UnifiedGraph** - `iter_concepts()` is efficient but `get_all_concepts()` is more discoverable for CLI integration (F11.2 retro, low priority)
 - [ ] **Pre-design research phase in lifecycle** - Before `/epic-design`, sometimes need targeted research (e.g., reverse engineering prior art like Aider's repo map). Consider formalizing as optional phase in epic lifecycle. (E13 discussion, 2026-02-04)
 
+### E13 Discovery — Deferred (Post-F&F)
+
+> Items explicitly deferred from E13 MVP scope.
+
+- [ ] **Function-level granularity** — Too noisy for MVP; component level sufficient for reuse discovery
+- [ ] **Call graphs / data flow analysis** — Complex; not needed for component catalog
+- [ ] **Git history integration** — Nice-to-have for evolution tracking
+- [ ] **CI/CD drift blocking** — Start with warnings, add blocking after validation
+- [ ] **PageRank ranking** — Simpler heuristics (public/exported) sufficient for MVP
+- [ ] **Multi-language support** — Start with Python, expand based on need
+
 ### Research Needed
 
 - [ ] What are the Lean Spec Principles? How do they apply to governance artifacts? **← In progress (subagent researching for /epic-design skill)**
