@@ -69,6 +69,20 @@ raise telemetry emit feature {feature_id} --event start --phase plan
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p plan`
 
+### Step 0.5: Query Context
+
+Load relevant patterns and calibration from unified context:
+
+```bash
+raise context query "planning estimation calibration" --unified --types pattern,calibration --limit 5
+```
+
+Review returned patterns before proceeding. Key patterns inform task structure and sizing.
+
+**Verification:** Context loaded; relevant patterns noted.
+
+> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+
 ### Step 1: Select Story
 
 Identify the next story to implement by priority.
