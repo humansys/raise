@@ -1,0 +1,511 @@
+"""Tests for UnifiedGraphBuilder."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from textwrap import dedent
+from typing import Any
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+from raise_cli.context.builder import UnifiedGraphBuilder
+from raise_cli.context.models import ConceptNode
+
+
+class TestUnifiedGraphBuilderInit:
+    """Tests for UnifiedGraphBuilder initialization."""
+
+    def test_initializes_with_project_root(self, tmp_path: Path) -> None:
+        """Should accept project root path."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        assert builder.project_root == tmp_path
+
+    def test_uses_cwd_when_no_root_provided(self) -> None:
+        """Should use current directory when no root provided."""
+        builder = UnifiedGraphBuilder()
+        assert builder.project_root == Path.cwd()
+
+
+class TestLoadGovernance:
+    """Tests for load_governance method."""
+
+    def test_converts_concepts_to_nodes(self, tmp_path: Path) -> None:
+        """Should convert governance Concept to ConceptNode."""
+        # Create mock concept
+        from raise_cli.governance.models import Concept, ConceptType
+
+        mock_concept = Concept(
+            id="principle-1",
+            type=ConceptType.PRINCIPLE,
+            file="framework/reference/constitution.md",
+            section="§1 Core Principle",
+            lines=(10, 20),
+            content="This is a core principle.",
+            metadata={"principle_number": "§1"},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "_get_governance_extractor") as mock_extractor:
+            mock_extractor.return_value.extract_all.return_value = [mock_concept]
+            nodes = builder.load_governance()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "principle-1"
+        assert node.type == "principle"
+        assert node.content == "This is a core principle."
+        assert node.source_file == "framework/reference/constitution.md"
+
+    def test_handles_empty_extraction(self, tmp_path: Path) -> None:
+        """Should return empty list when no concepts extracted."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "_get_governance_extractor") as mock_extractor:
+            mock_extractor.return_value.extract_all.return_value = []
+            nodes = builder.load_governance()
+
+        assert nodes == []
+
+
+class TestLoadMemory:
+    """Tests for load_memory method."""
+
+    def test_loads_patterns_from_jsonl(self, tmp_path: Path) -> None:
+        """Should load patterns from patterns.jsonl."""
+        # Create .rai/memory structure
+        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        patterns_file = memory_dir / "patterns.jsonl"
+        patterns_file.write_text(
+            json.dumps({
+                "id": "PAT-001",
+                "type": "codebase",
+                "content": "Singleton pattern for testing",
+                "context": ["testing", "patterns"],
+                "created": "2026-01-31",
+            })
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "PAT-001"
+        assert node.type == "pattern"
+        assert node.content == "Singleton pattern for testing"
+        assert "testing" in node.metadata.get("context", [])
+
+    def test_loads_calibration_from_jsonl(self, tmp_path: Path) -> None:
+        """Should load calibration from calibration.jsonl."""
+        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        calibration_file = memory_dir / "calibration.jsonl"
+        calibration_file.write_text(
+            json.dumps({
+                "id": "CAL-001",
+                "feature": "F1.1",
+                "name": "Project Scaffolding",
+                "size": "S",
+                "sp": 3,
+                "actual_min": 30,
+                "created": "2026-01-31",
+            })
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "CAL-001"
+        assert node.type == "calibration"
+        assert "F1.1" in node.content
+
+    def test_loads_sessions_from_jsonl(self, tmp_path: Path) -> None:
+        """Should load sessions from sessions/index.jsonl."""
+        sessions_dir = tmp_path / ".rai" / "memory" / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        sessions_file = sessions_dir / "index.jsonl"
+        sessions_file.write_text(
+            json.dumps({
+                "id": "SES-001",
+                "date": "2026-02-01",
+                "type": "feature",
+                "topic": "E3 Implementation",
+                "outcomes": ["Feature complete", "Tests passing"],
+            })
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "SES-001"
+        assert node.type == "session"
+        assert "E3 Implementation" in node.content
+
+    def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
+        """Should return empty list if .rai/memory doesn't exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert nodes == []
+
+    def test_loads_all_memory_types(self, tmp_path: Path) -> None:
+        """Should load patterns, calibration, and sessions together."""
+        memory_dir = tmp_path / ".rai" / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        (memory_dir / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-001", "type": "process", "content": "Pattern", "created": "2026-01-31"}) + "\n"
+        )
+        (memory_dir / "calibration.jsonl").write_text(
+            json.dumps({"id": "CAL-001", "feature": "F1.1", "name": "Test", "created": "2026-01-31"}) + "\n"
+        )
+        (sessions_dir / "index.jsonl").write_text(
+            json.dumps({"id": "SES-001", "date": "2026-02-01", "topic": "Session"}) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 3
+        types = {n.type for n in nodes}
+        assert types == {"pattern", "calibration", "session"}
+
+
+class TestLoadWork:
+    """Tests for load_work method."""
+
+    def test_converts_epics_to_nodes(self, tmp_path: Path) -> None:
+        """Should convert epic Concept to ConceptNode."""
+        from raise_cli.governance.models import Concept, ConceptType
+
+        mock_epic = Concept(
+            id="E11",
+            type=ConceptType.EPIC,
+            file="governance/projects/raise-cli/backlog.md",
+            section="E11: Unified Context",
+            lines=(50, 60),
+            content="Unified context architecture epic",
+            metadata={"status": "In Progress"},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "_extract_epics") as mock_extract:
+            mock_extract.return_value = [mock_epic]
+            with patch.object(builder, "_extract_features") as mock_features:
+                mock_features.return_value = []
+                nodes = builder.load_work()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "E11"
+        assert node.type == "epic"
+
+    def test_converts_features_to_nodes(self, tmp_path: Path) -> None:
+        """Should convert feature Concept to ConceptNode."""
+        from raise_cli.governance.models import Concept, ConceptType
+
+        mock_feature = Concept(
+            id="F11.2",
+            type=ConceptType.FEATURE,
+            file="dev/epic-e11-scope.md",
+            section="F11.2: Graph Builder",
+            lines=(70, 80),
+            content="Build unified graph from sources",
+            metadata={"size": "M", "status": "Pending"},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "_extract_epics") as mock_epics:
+            mock_epics.return_value = []
+            with patch.object(builder, "_extract_features") as mock_extract:
+                mock_extract.return_value = [mock_feature]
+                nodes = builder.load_work()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "F11.2"
+        assert node.type == "feature"
+
+
+class TestLoadSkills:
+    """Tests for load_skills method."""
+
+    def test_loads_skills_from_directory(self, tmp_path: Path) -> None:
+        """Should load skills from .claude/skills directory."""
+        skills_dir = tmp_path / ".claude" / "skills" / "test-skill"
+        skills_dir.mkdir(parents=True)
+
+        (skills_dir / "SKILL.md").write_text(dedent("""\
+            ---
+            name: test-skill
+            description: A test skill
+            ---
+            # Test
+        """))
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_skills()
+
+        assert len(nodes) == 1
+        assert nodes[0].id == "/test-skill"
+        assert nodes[0].type == "skill"
+
+    def test_handles_missing_skills_directory(self, tmp_path: Path) -> None:
+        """Should return empty list if .claude/skills doesn't exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_skills()
+
+        assert nodes == []
+
+
+class TestBuild:
+    """Tests for build method."""
+
+    def test_builds_graph_with_all_sources(self, tmp_path: Path) -> None:
+        """Should combine all sources into UnifiedGraph."""
+        # Setup minimal fixtures
+        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir.mkdir(parents=True)
+        (memory_dir / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-001", "type": "process", "content": "Test", "created": "2026-01-31"}) + "\n"
+        )
+
+        skills_dir = tmp_path / ".claude" / "skills" / "test"
+        skills_dir.mkdir(parents=True)
+        (skills_dir / "SKILL.md").write_text(dedent("""\
+            ---
+            name: test
+            description: Test skill
+            ---
+            # Test
+        """))
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        # Mock governance and work loaders
+        with patch.object(builder, "load_governance") as mock_gov:
+            mock_gov.return_value = []
+            with patch.object(builder, "load_work") as mock_work:
+                mock_work.return_value = []
+                graph = builder.build()
+
+        # Should have memory + skills
+        assert graph.node_count >= 2
+
+    def test_build_returns_unified_graph(self, tmp_path: Path) -> None:
+        """Should return UnifiedGraph instance."""
+        from raise_cli.context.graph import UnifiedGraph
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "load_governance", return_value=[]):
+            with patch.object(builder, "load_memory", return_value=[]):
+                with patch.object(builder, "load_work", return_value=[]):
+                    with patch.object(builder, "load_skills", return_value=[]):
+                        graph = builder.build()
+
+        assert isinstance(graph, UnifiedGraph)
+
+
+class TestInferRelationships:
+    """Tests for infer_relationships method."""
+
+    def test_infers_learned_from_edges(self, tmp_path: Path) -> None:
+        """Should create learned_from edges from pattern.learned_from field."""
+        pattern = ConceptNode(
+            id="PAT-001",
+            type="pattern",
+            content="Test pattern",
+            source_file=".rai/memory/patterns.jsonl",
+            created="2026-01-31",
+            metadata={"learned_from": "F1.5"},
+        )
+        session = ConceptNode(
+            id="SES-010",
+            type="session",
+            content="F1.5 session",
+            source_file=".rai/memory/sessions/index.jsonl",
+            created="2026-01-31",
+            metadata={"topic": "F1.5 Output Module"},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        edges = builder.infer_relationships([pattern, session])
+
+        learned_edges = [e for e in edges if e.type == "learned_from"]
+        assert len(learned_edges) >= 1
+        edge = learned_edges[0]
+        assert edge.source == "PAT-001"
+        assert edge.weight == 1.0
+
+    def test_infers_part_of_edges(self, tmp_path: Path) -> None:
+        """Should create part_of edges from feature to epic."""
+        feature = ConceptNode(
+            id="F11.2",
+            type="feature",
+            content="Graph Builder",
+            source_file="dev/epic-e11-scope.md",
+            created="2026-02-03",
+            metadata={},
+        )
+        epic = ConceptNode(
+            id="E11",
+            type="epic",
+            content="Unified Context",
+            source_file="governance/projects/raise-cli/backlog.md",
+            created="2026-02-03",
+            metadata={},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        edges = builder.infer_relationships([feature, epic])
+
+        part_of_edges = [e for e in edges if e.type == "part_of"]
+        assert len(part_of_edges) == 1
+        assert part_of_edges[0].source == "F11.2"
+        assert part_of_edges[0].target == "E11"
+        assert part_of_edges[0].weight == 1.0
+
+    def test_infers_skill_prerequisite_edges(self, tmp_path: Path) -> None:
+        """Should create needs_context edges from skill prerequisites."""
+        skill = ConceptNode(
+            id="/feature-plan",
+            type="skill",
+            content="Plan implementation tasks",
+            source_file=".claude/skills/feature-plan/SKILL.md",
+            created="2026-02-03",
+            metadata={"raise.prerequisites": "project-backlog"},
+        )
+        prereq = ConceptNode(
+            id="/project-backlog",
+            type="skill",
+            content="Manage project backlog",
+            source_file=".claude/skills/project-backlog/SKILL.md",
+            created="2026-02-03",
+            metadata={},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        edges = builder.infer_relationships([skill, prereq])
+
+        needs_edges = [e for e in edges if e.type == "needs_context"]
+        assert len(needs_edges) == 1
+        assert needs_edges[0].source == "/feature-plan"
+        assert needs_edges[0].target == "/project-backlog"
+        assert needs_edges[0].weight == 1.0
+
+    def test_infers_skill_next_edges(self, tmp_path: Path) -> None:
+        """Should create related_to edges from skill.raise.next."""
+        skill = ConceptNode(
+            id="/feature-plan",
+            type="skill",
+            content="Plan tasks",
+            source_file=".claude/skills/feature-plan/SKILL.md",
+            created="2026-02-03",
+            metadata={"raise.next": "feature-implement"},
+        )
+        next_skill = ConceptNode(
+            id="/feature-implement",
+            type="skill",
+            content="Implement feature",
+            source_file=".claude/skills/feature-implement/SKILL.md",
+            created="2026-02-03",
+            metadata={},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        edges = builder.infer_relationships([skill, next_skill])
+
+        next_edges = [e for e in edges if e.source == "/feature-plan" and e.target == "/feature-implement"]
+        assert len(next_edges) == 1
+        assert next_edges[0].type == "related_to"
+        assert next_edges[0].weight == 1.0
+
+    def test_infers_related_to_by_shared_keywords(self, tmp_path: Path) -> None:
+        """Should create related_to edges for concepts with shared keywords."""
+        pattern = ConceptNode(
+            id="PAT-012",
+            type="pattern",
+            content="Design-first eliminates ambiguity in implementation planning",
+            source_file=".rai/memory/patterns.jsonl",
+            created="2026-01-31",
+            metadata={"context": ["planning", "implementation"]},
+        )
+        skill = ConceptNode(
+            id="/feature-plan",
+            type="skill",
+            content="Planning implementation tasks for feature development",
+            source_file=".claude/skills/feature-plan/SKILL.md",
+            created="2026-02-03",
+            metadata={},
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        edges = builder.infer_relationships([pattern, skill])
+
+        related_edges = [e for e in edges if e.type == "related_to"]
+        # Should find shared keywords "planning" and "implementation"
+        assert len(related_edges) >= 1
+        # Inferred edges have weight < 1.0
+        inferred = [e for e in related_edges if e.weight < 1.0]
+        assert len(inferred) >= 1
+
+    def test_returns_empty_for_no_nodes(self, tmp_path: Path) -> None:
+        """Should return empty list when no nodes provided."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        edges = builder.infer_relationships([])
+
+        assert edges == []
+
+    def test_build_includes_inferred_edges(self, tmp_path: Path) -> None:
+        """Build should include edges from infer_relationships."""
+        memory_dir = tmp_path / ".rai" / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        # Pattern with learned_from
+        (memory_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-001",
+                "type": "process",
+                "content": "Test pattern",
+                "learned_from": "F1.5",
+                "created": "2026-01-31",
+            }) + "\n"
+        )
+
+        # Session that matches
+        (sessions_dir / "index.jsonl").write_text(
+            json.dumps({
+                "id": "SES-010",
+                "date": "2026-01-31",
+                "topic": "F1.5 Output Module",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "load_governance", return_value=[]):
+            with patch.object(builder, "load_work", return_value=[]):
+                with patch.object(builder, "load_skills", return_value=[]):
+                    graph = builder.build()
+
+        # Should have edges
+        assert graph.edge_count >= 1

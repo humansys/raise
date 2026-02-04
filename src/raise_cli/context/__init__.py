@@ -10,6 +10,7 @@ Components:
 
 from __future__ import annotations
 
+from raise_cli.context.builder import UnifiedGraphBuilder
 from raise_cli.context.graph import UnifiedGraph
 from raise_cli.context.models import ConceptEdge, ConceptNode, EdgeType, NodeType
 
@@ -19,4 +20,5 @@ __all__ = [
     "EdgeType",
     "NodeType",
     "UnifiedGraph",
+    "UnifiedGraphBuilder",
 ]
