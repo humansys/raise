@@ -50,7 +50,7 @@
 
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
-| F12.1 | **ADR Extractor** | M | Pending | Extract ADRs as `decision` nodes from `dev/decisions/` |
+| F12.1 | **ADR Extractor** | M | ✅ Done | Extract ADRs as `decision` nodes from `dev/decisions/` |
 | F12.2 | **Guardrails Extractor** | S | Pending | Extract guardrails as queryable nodes |
 | F12.3 | **Glossary Extractor** | S | Pending | Extract glossary terms for terminology |
 | F12.4 | **Schema Extension** | XS | ✅ Done | Add `decision`, `guardrail`, `term` to NodeType |
@@ -329,14 +329,14 @@ Stream 4 (Independent):      F12.6 ───────────────
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F12.4: Schema Extension | XS | ✅ Done | ~5 min | Fast | Added 3 types to both models |
-| F12.1: ADR Extractor | M | Pending | - | - | |
+| F12.1: ADR Extractor | M | ✅ Done | ~20 min | 2x | YAML frontmatter only (26 ADRs), fixed project NodeType |
 | F12.2: Guardrails Extractor | S | Pending | - | - | |
 | F12.3: Glossary Extractor | S | Pending | - | - | |
 | F12.6: Memory Write CLI | M | Pending | - | - | |
 | F12.5: Skill Query Alignment | S | Pending | - | - | |
 
 **Milestone Progress:**
-- [ ] M1: Walking Skeleton (Day 1-2)
+- [x] M1: Walking Skeleton (Day 1-2) — F12.4 + F12.1 complete, 19 ADR nodes in graph
 - [ ] M2: Full Extraction (Day 3-4)
 - [ ] M3: Skills Aligned (Day 5)
 - [ ] M4: Epic Complete (Day 6)
