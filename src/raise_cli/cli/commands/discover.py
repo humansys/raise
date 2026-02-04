@@ -1,20 +1,21 @@
-"""Discovery CLI commands for codebase scanning.
+"""Discovery CLI commands for codebase scanning and graph integration.
 
-This module provides commands to scan codebases and extract structural
-information for the unified context graph.
+This module provides commands to scan codebases, extract structural
+information, and integrate discovered components into the unified context graph.
 
 Supports Python, TypeScript, and JavaScript.
 
 Example:
     $ raise discover scan src/
     $ raise discover scan . --language typescript --output json
+    $ raise discover build --input work/discovery/components-validated.json
 """
 
 from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 from rich.console import Console
@@ -196,3 +197,153 @@ def scan_command(
                 console.print(f"  [dim]{error}[/dim]")
             if len(result.errors) > 5:
                 console.print(f"  [dim]... and {len(result.errors) - 5} more[/dim]")
+
+
+@discover_app.command("build")
+def build_command(
+    input_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--input",
+            "-i",
+            help="Path to validated components JSON (default: work/discovery/components-validated.json)",
+        ),
+    ] = None,
+    project_root: Annotated[
+        Path,
+        typer.Option(
+            "--project-root",
+            "-r",
+            help="Project root directory (default: current directory)",
+        ),
+    ] = Path("."),
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Output format: human, json, or summary",
+        ),
+    ] = "human",
+) -> None:
+    """Build unified graph with discovered components.
+
+    Reads validated components from JSON and integrates them into the unified
+    context graph. Components become queryable via `raise context query`.
+
+    The graph is rebuilt from all sources (governance, memory, work, skills,
+    and components) and saved to `.raise/graph/unified.json`.
+
+    Examples:
+        # Build with default input file
+        raise discover build
+
+        # Build with custom input
+        raise discover build --input my-components.json
+
+        # Build and show JSON output
+        raise discover build --output json
+    """
+    root = project_root.resolve()
+
+    # Resolve input file path
+    if input_file is None:
+        input_path = root / "work" / "discovery" / "components-validated.json"
+    else:
+        input_path = input_file.resolve()
+
+    # Check input file exists
+    if not input_path.exists():
+        console.print(
+            f"[red]Error: Components file not found: {input_path}[/red]\n"
+            "[dim]Run /discover-complete to generate validated components.[/dim]"
+        )
+        raise typer.Exit(1)
+
+    # Load components to validate and count
+    try:
+        data: dict[str, Any] = json.loads(input_path.read_text(encoding="utf-8"))
+        components: list[dict[str, Any]] = data.get("components", [])
+        component_count = len(components)
+    except (json.JSONDecodeError, KeyError) as e:
+        console.print(f"[red]Error: Invalid JSON in {input_path}: {e}[/red]")
+        raise typer.Exit(1) from None
+
+    if component_count == 0:
+        console.print(
+            "[yellow]Warning: No components found in input file.[/yellow]\n"
+            "[dim]Run /discover-validate to validate components first.[/dim]"
+        )
+        raise typer.Exit(1)
+
+    # Build unified graph (includes components automatically)
+    from raise_cli.context.builder import UnifiedGraphBuilder
+
+    builder = UnifiedGraphBuilder(project_root=root)
+    graph = builder.build()
+
+    # Save graph
+    graph_dir = root / ".raise" / "graph"
+    graph_dir.mkdir(parents=True, exist_ok=True)
+    graph_path = graph_dir / "unified.json"
+    graph.save(graph_path)
+
+    # Count component nodes in graph
+    component_nodes = [n for n in graph.iter_concepts() if n.type == "component"]
+    components_in_graph = len(component_nodes)
+
+    if output == "json":
+        output_data = {
+            "status": "success",
+            "input_file": str(input_path),
+            "graph_file": str(graph_path),
+            "components_loaded": component_count,
+            "components_in_graph": components_in_graph,
+            "total_nodes": graph.node_count,
+            "total_edges": graph.edge_count,
+        }
+        console.print_json(json.dumps(output_data))
+
+    elif output == "summary":
+        console.print("[bold]Graph Build Summary[/bold]")
+        console.print(f"  Components loaded: {components_in_graph}")
+        console.print(f"  Total nodes: {graph.node_count}")
+        console.print(f"  Total edges: {graph.edge_count}")
+
+    else:
+        # Human-readable output
+        console.print("[bold green]Graph built successfully[/bold green]\n")
+        console.print(f"[bold]Input:[/bold] {input_path}")
+        console.print(f"[bold]Output:[/bold] {graph_path}\n")
+
+        # Component summary
+        console.print(f"[bold]Components:[/bold] {components_in_graph} loaded")
+
+        # Show by category if available
+        categories: dict[str, int] = {}
+        for comp in component_nodes:
+            category = comp.metadata.get("category", "unknown")
+            categories[category] = categories.get(category, 0) + 1
+
+        if categories:
+            console.print("\n[bold]By Category:[/bold]")
+            for cat, count in sorted(categories.items()):
+                console.print(f"  {cat}: {count}")
+
+        # Graph totals
+        console.print("\n[bold]Graph Totals:[/bold]")
+        console.print(f"  Nodes: {graph.node_count}")
+        console.print(f"  Edges: {graph.edge_count}")
+
+        # Sample components
+        if component_nodes:
+            console.print("\n[bold]Sample Components:[/bold]")
+            for comp in component_nodes[:3]:
+                name = comp.metadata.get("name", comp.id)
+                kind = comp.metadata.get("kind", "")
+                console.print(f"  [cyan]{name}[/cyan] ({kind}) — {comp.content[:60]}...")
+
+        # Next steps
+        console.print("\n[dim]Query components:[/dim]")
+        console.print('  [dim]raise context query --type component "keyword"[/dim]')
+        console.print("  [dim]raise context query --unified --type component[/dim]")
