@@ -60,6 +60,16 @@ Reflect on the completed feature to extract learnings, identify process improvem
 
 ## Steps
 
+### Step 0: Emit Feature Start (Telemetry)
+
+Record the start of the review phase:
+
+```bash
+raise telemetry emit-feature {feature_id} --event start --phase review
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e start -p review`
+
 ### Step 1: Gather Data
 
 Review the feature development:
@@ -140,10 +150,22 @@ raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
 
 > **If you can't continue:** CLI not available → Skip; telemetry is optional.
 
+### Step 7: Emit Feature Complete (Telemetry)
+
+Record the completion of the entire feature lifecycle:
+
+```bash
+raise telemetry emit-feature {feature_id} --event complete --phase review
+```
+
+**Example:** `raise telemetry emit-feature F9.4 -e complete -p review`
+
+**Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
+
 ## Output
 
 - **Artifact:** `work/features/{feature}/retrospective.md`
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (calibration event via CLI)
+- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement
 

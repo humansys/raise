@@ -10,6 +10,7 @@ Signal types:
 - CalibrationEvent: Tracks estimate vs actual for velocity calibration
 - ErrorEvent: Tracks tool failures
 - CommandUsage: Tracks CLI command usage
+- FeatureLifecycle: Tracks feature flow through phases (Lean flow analysis)
 """
 
 from __future__ import annotations
@@ -196,9 +197,68 @@ class CommandUsage(BaseModel):
     subcommand: str | None = Field(default=None, description="Subcommand name if any")
 
 
+class FeatureLifecycle(BaseModel):
+    """A feature lifecycle event for Lean flow analysis.
+
+    Tracks feature progression through phases to enable:
+    - Lead time calculation (start to complete)
+    - Wait time detection (gaps between phases)
+    - WIP tracking (started but not completed)
+    - Bottleneck identification (longest phase)
+    - Flow efficiency (active time / lead time)
+
+    Attributes:
+        type: Discriminator field, always "feature_lifecycle".
+        timestamp: When the event occurred (UTC).
+        feature: Feature identifier (e.g., "F9.4").
+        event: Lifecycle event type.
+        phase: Current phase in the workflow.
+        blocker: Description of blocker (only for blocked event).
+
+    Examples:
+        >>> from datetime import datetime, timezone
+        >>> event = FeatureLifecycle(
+        ...     timestamp=datetime.now(timezone.utc),
+        ...     feature="F9.4",
+        ...     event="start",
+        ...     phase="design"
+        ... )
+        >>> event.type
+        'feature_lifecycle'
+
+        >>> blocked = FeatureLifecycle(
+        ...     timestamp=datetime.now(timezone.utc),
+        ...     feature="F9.4",
+        ...     event="blocked",
+        ...     phase="plan",
+        ...     blocker="unclear requirements"
+        ... )
+        >>> blocked.blocker
+        'unclear requirements'
+    """
+
+    type: Literal["feature_lifecycle"] = "feature_lifecycle"
+    timestamp: datetime = Field(..., description="When the event occurred (UTC)")
+    feature: str = Field(..., description="Feature identifier (e.g., 'F9.4')")
+    event: Literal["start", "complete", "blocked", "unblocked", "abandoned"] = Field(
+        ..., description="Lifecycle event type"
+    )
+    phase: Literal["design", "plan", "implement", "review"] = Field(
+        ..., description="Current phase in the workflow"
+    )
+    blocker: str | None = Field(
+        default=None, description="Description of blocker (for blocked event)"
+    )
+
+
 # Union type for type-safe signal handling
 Signal = Annotated[
-    SkillEvent | SessionEvent | CalibrationEvent | ErrorEvent | CommandUsage,
+    SkillEvent
+    | SessionEvent
+    | CalibrationEvent
+    | ErrorEvent
+    | CommandUsage
+    | FeatureLifecycle,
     Field(discriminator="type"),
 ]
 """Union of all signal types with discriminator for type-safe parsing."""
