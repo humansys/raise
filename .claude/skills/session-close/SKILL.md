@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
 
 hooks:
   PostToolUse:
@@ -57,9 +57,9 @@ Close a working session by preserving learnings, updating memory files, and prep
 - Interrupted sessions (run when resuming instead)
 
 **Inputs required:**
-- Unified graph (`.raise/graph/unified.json`) — for existing patterns
+- Unified graph (`.raise/graph/unified.json`) — query existing patterns to avoid duplicates
 - Conversation context (current session)
-- Memory files (`.rai/memory/`) — for writing new learnings
+- Memory files (`.rai/memory/`) — write destination for new learnings
 
 **Output:**
 - Updated memory files
@@ -153,21 +153,17 @@ raise memory add-session "Session Topic" -o "outcome1,outcome2,outcome3" -t feat
 
 ### Step 5: Update Context Files
 
-Update as needed:
+Update `CLAUDE.local.md` as needed:
 
-**CLAUDE.local.md:**
 - Current Focus (if changed)
 - Recent Sessions table
-- Next Feature (if changed)
+- Next Work (if changed)
 
-**RAI.md** (if applicable):
-- New contributions to log
-- New questions emerged
-- Perspective evolved
+**Note:** Identity files (`.rai/identity/`) are stable — only update after significant identity evolution, not routine sessions.
 
-**Verification:** Context files reflect current state.
+**Verification:** Context file reflects current state.
 
-> **If you can't continue:** Minimal changes → At least update "Next Feature" if changed.
+> **If you can't continue:** Minimal changes → At least update "Recent Sessions" table.
 
 ### Step 6: Create Session Log (Optional)
 
@@ -344,8 +340,9 @@ Each session builds on previous ones. The memory system creates a form of contin
 
 ## References
 
-- Unified graph: `.raise/graph/unified.json` (for pattern lookup)
-- Memory files: `.rai/memory/` (for writing learnings)
-- Session logs: `dev/sessions/`
-- Parking lot: `dev/parking-lot.md`
-- Complement: `/session-start`
+- **Query:** Unified graph (`.raise/graph/unified.json`) — check existing patterns before adding
+- **Write:** Memory files (`.rai/memory/`) — patterns, calibration, sessions via CLI
+- **Update:** `CLAUDE.local.md` — human context (deadlines, focus, recent sessions)
+- **Capture:** `dev/parking-lot.md` — tangents and deferred ideas
+- **Optional:** `dev/sessions/` — detailed logs for significant sessions
+- **Complement:** `/session-start`
