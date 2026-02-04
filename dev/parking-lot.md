@@ -61,6 +61,7 @@
 - [ ] **Add "test with real data" checkpoint to feature-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
 - [ ] **Add "commit after task" to /feature-implement skill** - Good discipline, enables recovery (F3.3 retro)
 - [ ] **`/feature-start` skill** - Lightweight skill to create feature branch from epic branch with scope commit. Replaces ad-hoc branch creation. (E8 retro, E11 discussion 2026-02-03)
+- [ ] **Branch verification in merge workflow** - Add checklist to /feature-review: verify target branch per CLAUDE.md, check epic branch exists, enforce feature→epic→dev flow. Prevents merging to wrong branch. (E11 F11.3/F11.4 retro, 2026-02-03)
 - [ ] **Epic implement skill (`/epic-implement`)** - Do we need one? Current thinking: probably not, epic implementation IS feature implementation. Alternatives: fold progress tracking into `/feature-review`, add `raise epic status` CLI command, keep `/session-start` as "where am I?" mechanism. (E11 discussion, 2026-02-03)
 - [ ] **Design revision process** - What happens when a design needs to be updated after initial creation? Should we emit `design revision` signals? How does this affect downstream phases? (F11.1 discussion, 2026-02-03)
 - [ ] **HITL approval before completion signals** - Telemetry "complete" events should only emit AFTER user approval, not when Rai finishes drafting. Update skills to require explicit sign-off before completion telemetry. (F11.1 discussion, 2026-02-03)
