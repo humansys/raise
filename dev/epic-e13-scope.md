@@ -1,6 +1,6 @@
 # Epic E13: Discovery — Codebase Understanding for Rai
 
-> **Status:** IN PROGRESS (M1 complete)
+> **Status:** IN PROGRESS (M2 complete, 92%)
 > **Branch:** `feature/e13/discovery`
 > **Created:** 2026-02-04
 > **Target:** Feb 9, 2026 (F&F MVP)
@@ -44,7 +44,7 @@ EXTRACT (deterministic)  →  SYNTHESIZE (LLM)  →  VALIDATE (human)  →  POPU
 | F13.1 | Schema Extension | S (2) | ✓ Complete | Add system/module/component/convention node types to unified graph |
 | F13.2 | Extraction Toolkit | M (4) | ✓ Complete | CLI commands to scan codebase and extract symbols via ast-grep |
 | F13.3 | Discovery Skills | M (4) | ✓ Complete | `/discover-*` skills with LLM synthesis and human validation loop |
-| F13.4 | Graph Integration | S (2) | Pending | Populate unified graph with validated components, enable queries |
+| F13.4 | Graph Integration | S (2) | ✓ Complete | Populate unified graph with validated components, enable queries |
 | F13.5 | Drift Detection | XS (1) | Pending | Basic check: new files against established patterns |
 
 **Total:** 5 features, ~13 SP estimated (3-4 days with kata cycle)
@@ -336,12 +336,12 @@ F13.1 ─► F13.2 ─► F13.3 ─────► F13.4 ─────► F13.
 | F13.1 Schema Extension | S (2) | ✓ Complete | 1 session | 2x | Combined with F13.2 |
 | F13.2 Extraction Toolkit | M (4) | ✓ Complete | 1 session | 2x | Multi-language (Py/TS/JS), 39 tests |
 | F13.3 Discovery Skills | M (4) | ✓ Complete | 90 min | 1.33x | 4 skills, full kata cycle |
-| F13.4 Graph Integration | S (2) | Pending | — | — | |
+| F13.4 Graph Integration | S (2) | ✓ Complete | 30 min | 2x | NodeType extended, load_components(), 47 tests |
 | F13.5 Drift Detection | XS (1) | Pending | — | — | |
 
 **Milestone Progress:**
 - [x] M1: Walking Skeleton (Feb 5) ✓ Complete 2026-02-04
-- [ ] M2: Discovery Flow (Feb 7)
+- [x] M2: Discovery Flow (Feb 7) ✓ Complete 2026-02-04
 - [ ] M3: F&F Ready (Feb 8)
 
 ### Sequencing Risks
@@ -370,4 +370,5 @@ Before starting each feature:
 
 *Plan created: 2026-02-04*
 *M1 complete: 2026-02-04*
-*Next: F13.3 Discovery Skills*
+*M2 complete: 2026-02-04*
+*Next: F13.5 Drift Detection*
