@@ -86,6 +86,20 @@ raise telemetry emit epic {epic_id} --event start --phase plan
 
 **Example:** `raise telemetry emit epic E9 -e start -p plan`
 
+### Step 0.5: Query Context
+
+Load relevant sequencing patterns and calibration from unified context:
+
+```bash
+raise context query "sequencing calibration planning" --unified --types pattern,calibration --limit 5
+```
+
+Review returned patterns before proceeding. Calibration data informs realistic estimates.
+
+**Verification:** Context loaded; relevant patterns noted.
+
+> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+
 ### Step 1: Review Epic Design Output
 
 Load and understand the epic scope before planning.
