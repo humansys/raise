@@ -1,0 +1,77 @@
+---
+id: explain-rule
+name: "Explain Rule"
+type: skill
+version: 1.0.0
+
+description: |
+  Explica una regla específica incluyendo su rationale, ejemplos,
+  anti-ejemplos, y guía de aplicación práctica.
+
+# Contrato de entrada
+input:
+  rule_id:
+    type: string
+    required: true
+    description: "ID o nombre de la regla a explicar (ej: 200-clean-architecture)"
+
+# Contrato de salida
+output:
+  type: object
+  properties:
+    rule:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        globs: { type: array, items: { type: string } }
+        tags: { type: array, items: { type: string } }
+    explanation:
+      type: object
+      properties:
+        purpose: { type: string, description: "Por qué existe esta regla" }
+        key_instructions: { type: array, items: { type: string } }
+        examples:
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              explanation: { type: string }
+        anti_examples:
+          type: array
+          items:
+            type: object
+            properties:
+              code: { type: string }
+              why_wrong: { type: string }
+        practical_application: { type: string }
+        related_rules: { type: array, items: { type: string } }
+    evidence:
+      type: object
+      properties:
+        files_matching: { type: array, items: { type: string } }
+        example_usages: { type: array, items: { type: string } }
+
+# Comportamiento
+behavior:
+  deterministic: false
+  description: "Puede buscar ejemplos en el repositorio"
+
+# Implementación
+implementation:
+  type: inline
+  steps:
+    - "Buscar regla por ID o nombre parcial"
+    - "Cargar contenido completo de la regla"
+    - "Extraer propósito de la descripción"
+    - "Identificar instrucciones clave"
+    - "Buscar ejemplos en el repositorio (archivos que matchean globs)"
+    - "Buscar analysis document si existe"
+    - "Construir explicación estructurada"
+
+# Jidoka
+jidoka:
+  on_rule_not_found: "Listar reglas similares y sugerir"
+  on_no_examples: "Generar explicación inferida y marcar"
+---

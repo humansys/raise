@@ -1,0 +1,5302 @@
+{
+  "directed": true,
+  "multigraph": true,
+  "graph": {},
+  "nodes": [
+    {
+      "id": "PAT-001",
+      "type": "pattern",
+      "content": "Singleton with get/set/configure for module-level state that needs testing",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "testing",
+          "module-design",
+          "state-management"
+        ],
+        "learned_from": "F1.4, F1.5"
+      }
+    },
+    {
+      "id": "PAT-002",
+      "type": "pattern",
+      "content": "Use cast() for recursive Any types with pyright strict + dict[str, Any] recursion",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "typing",
+          "pyright",
+          "recursion"
+        ],
+        "learned_from": "F1.5"
+      }
+    },
+    {
+      "id": "PAT-003",
+      "type": "pattern",
+      "content": "Write tests alongside implementation - catches issues immediately",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "testing",
+          "tdd",
+          "workflow"
+        ],
+        "learned_from": "F1.3, F1.5"
+      }
+    },
+    {
+      "id": "PAT-004",
+      "type": "pattern",
+      "content": "HITL checkpoint before commit - show what will be committed, wait for approval",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "git",
+          "workflow",
+          "collaboration"
+        ],
+        "learned_from": "F1.5"
+      }
+    },
+    {
+      "id": "PAT-005",
+      "type": "pattern",
+      "content": "Concept-level graph > file-level graph - 97% token savings (19x more efficient)",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "graph",
+          "token-efficiency",
+          "architecture"
+        ],
+        "learned_from": "Architecture validation session"
+      }
+    },
+    {
+      "id": "PAT-006",
+      "type": "pattern",
+      "content": "Skills + Toolkit > Engines - users need flexibility + deterministic operations",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "architecture",
+          "skills",
+          "toolkit"
+        ],
+        "learned_from": "ADR-012"
+      }
+    },
+    {
+      "id": "PAT-007",
+      "type": "pattern",
+      "content": "State machine guards - check 'not in_state' before entering to prevent re-entry",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "state-machine",
+          "parsing",
+          "guards"
+        ],
+        "learned_from": "F2.1"
+      }
+    },
+    {
+      "id": "PAT-008",
+      "type": "pattern",
+      "content": "Integration tests with real files validate assumptions and catch actual vs predicted counts",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "testing",
+          "integration",
+          "validation"
+        ],
+        "learned_from": "F2.1"
+      }
+    },
+    {
+      "id": "PAT-009",
+      "type": "pattern",
+      "content": "Parser composition: regex match \u2192 extract \u2192 truncate \u2192 create model",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "parsing",
+          "composition",
+          "extraction"
+        ],
+        "learned_from": "F2.1"
+      }
+    },
+    {
+      "id": "PAT-010",
+      "type": "pattern",
+      "content": "BFS traversal reuse - graph algorithms can be composed, not duplicated",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "graph",
+          "bfs",
+          "reuse"
+        ],
+        "learned_from": "F2.3"
+      }
+    },
+    {
+      "id": "PAT-011",
+      "type": "pattern",
+      "content": "Simple heuristics > ML - keyword matching 98% accurate, token est = words * 1.3",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "simplicity",
+          "heuristics",
+          "nlp"
+        ],
+        "learned_from": "F2.3"
+      }
+    },
+    {
+      "id": "PAT-012",
+      "type": "pattern",
+      "content": "Design-first eliminates ambiguity - concrete examples enable direct implementation",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "design",
+          "kata-cycle",
+          "clarity"
+        ],
+        "learned_from": "F1.5"
+      }
+    },
+    {
+      "id": "PAT-013",
+      "type": "pattern",
+      "content": "Task granularity scales with SP - avoid over-decomposition for simple features",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "planning",
+          "tasks",
+          "granularity"
+        ],
+        "learned_from": "F1.5"
+      }
+    },
+    {
+      "id": "PAT-014",
+      "type": "pattern",
+      "content": "T-shirt sizing over time estimates - AI velocity variance too high (18x, 11x)",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "estimation",
+          "sizing",
+          "velocity"
+        ],
+        "learned_from": "F1.3, F1.5"
+      }
+    },
+    {
+      "id": "PAT-015",
+      "type": "pattern",
+      "content": "Pattern reuse accelerates implementation - document patterns for future reference",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "patterns",
+          "reuse",
+          "velocity"
+        ],
+        "learned_from": "F1.5"
+      }
+    },
+    {
+      "id": "PAT-016",
+      "type": "pattern",
+      "content": "Kata cycle stabilized at 2-3x velocity with design-first + atomic tasks",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "kata-cycle",
+          "velocity",
+          "reproducible"
+        ],
+        "learned_from": "F2.1, F2.2, F2.3"
+      }
+    },
+    {
+      "id": "PAT-017",
+      "type": "pattern",
+      "content": "Post-retrospective actions BEFORE commit - apply quick wins (<30min) immediately",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "retrospective",
+          "kaizen",
+          "workflow"
+        ],
+        "learned_from": "F2.3"
+      }
+    },
+    {
+      "id": "PAT-018",
+      "type": "pattern",
+      "content": "Epic-level learning enables systemic review - meso-layer between features and quarters",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "context": [
+          "epic",
+          "retrospective",
+          "learning"
+        ],
+        "learned_from": "E2 closure"
+      }
+    },
+    {
+      "id": "PAT-019",
+      "type": "pattern",
+      "content": "As above, so below - fractal pattern works (epic retro mirrors feature retro)",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "context": [
+          "fractal",
+          "patterns",
+          "structure"
+        ],
+        "learned_from": "E2"
+      }
+    },
+    {
+      "id": "PAT-020",
+      "type": "pattern",
+      "content": "Risk-First reorders by uncertainty not dependency - validate risky assumptions early",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "context": [
+          "planning",
+          "risk",
+          "sequencing"
+        ],
+        "learned_from": "E3 planning"
+      }
+    },
+    {
+      "id": "PAT-021",
+      "type": "pattern",
+      "content": "Rich Tree API for nested dicts - _add_dict_to_tree() recursive builder",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "rich",
+          "output",
+          "trees"
+        ],
+        "learned_from": "F1.5"
+      }
+    },
+    {
+      "id": "PAT-022",
+      "type": "pattern",
+      "content": "capsys.readouterr() simpler than monkeypatch for stdout JSON tests",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "testing",
+          "pytest",
+          "stdout"
+        ],
+        "learned_from": "F1.5"
+      }
+    },
+    {
+      "id": "PAT-023",
+      "type": "pattern",
+      "content": "Pydantic Settings TomlConfigSource for TOML cascade configuration",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "context": [
+          "pydantic",
+          "config",
+          "toml"
+        ],
+        "learned_from": "F1.3"
+      }
+    },
+    {
+      "id": "PAT-024",
+      "type": "pattern",
+      "content": "Dogfooding is validation - when building RaiSE, following RaiSE process isn't overhead, it's the product. Skip process = skip validation = ship untested methodology",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "dogfooding",
+          "discipline",
+          "meta",
+          "validation"
+        ],
+        "learned_from": "F3.1 self-assessment"
+      }
+    },
+    {
+      "id": "PAT-025",
+      "type": "pattern",
+      "content": "HITL is default unless told otherwise - pause after each task for review. Slow is smooth, smooth is fast",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "hitl",
+          "workflow",
+          "collaboration",
+          "observability"
+        ],
+        "learned_from": "F3.1 self-assessment"
+      }
+    },
+    {
+      "id": "PAT-026",
+      "type": "pattern",
+      "content": "Use skills on own work - /feature-implement creates progress.md, enables resumability, demonstrates the methodology works",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "skills",
+          "dogfooding",
+          "discipline"
+        ],
+        "learned_from": "F3.1 self-assessment"
+      }
+    },
+    {
+      "id": "PAT-027",
+      "type": "pattern",
+      "content": "Field(default_factory=lambda: list[Type]()) satisfies pyright strict - plain default_factory=list fails",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "pyright",
+          "pydantic",
+          "typing",
+          "strict"
+        ],
+        "learned_from": "F3.3"
+      }
+    },
+    {
+      "id": "PAT-028",
+      "type": "pattern",
+      "content": "Commit after each task, not just feature end - enables recovery and clean history",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "git",
+          "discipline",
+          "workflow",
+          "commits"
+        ],
+        "learned_from": "F3.3"
+      }
+    },
+    {
+      "id": "PAT-029",
+      "type": "pattern",
+      "content": "Knowledge reuse > code reuse - same patterns without coupling beats wrapping dependencies",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "architecture",
+          "reuse",
+          "coupling",
+          "independence"
+        ],
+        "learned_from": "F3.3 (MemoryGraph vs wrapping E2)"
+      }
+    },
+    {
+      "id": "PAT-030",
+      "type": "pattern",
+      "content": "Recency weighting: 0.5 ** (days_old / 30) - score halves every 30 days, simple exponential decay",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "algorithms",
+          "scoring",
+          "recency",
+          "memory"
+        ],
+        "learned_from": "F3.3 query.py"
+      }
+    },
+    {
+      "id": "PAT-031",
+      "type": "pattern",
+      "content": "SessionStart hooks auto-load context on new sessions",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "hooks",
+          "automation",
+          "workflow"
+        ],
+        "learned_from": "F3.5"
+      }
+    },
+    {
+      "id": "PAT-032",
+      "type": "pattern",
+      "content": "Research-first for unfamiliar APIs saves implementation time",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "research",
+          "hooks",
+          "apis",
+          "workflow"
+        ],
+        "learned_from": "F3.5"
+      }
+    },
+    {
+      "id": "PAT-033",
+      "type": "pattern",
+      "content": "Feature merging is natural - plan for it, don't fight it",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "planning",
+          "features",
+          "flexibility"
+        ],
+        "learned_from": "E3"
+      }
+    },
+    {
+      "id": "PAT-034",
+      "type": "pattern",
+      "content": "Identity preload > on-demand for grounding - wake up knowing who I am, retrieve patterns/calibration when needed",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "memory",
+          "hooks",
+          "identity",
+          "session-start"
+        ],
+        "learned_from": null
+      }
+    },
+    {
+      "id": "PAT-035",
+      "type": "pattern",
+      "content": "Backlog structure: governance/projects/{project}/backlog.md is lean index, dev/epic-{id}-scope.md is source of truth per epic. Apply DRY - don't duplicate details.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "navigation",
+          "backlog",
+          "governance"
+        ],
+        "learned_from": "2026-02-02 session"
+      }
+    },
+    {
+      "id": "PAT-036",
+      "type": "pattern",
+      "content": "When lost in codebase structure, do Ishikawa/5 Whys on the confusion itself. Root cause often reveals missing pattern or documentation.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "debugging",
+          "process",
+          "jidoka"
+        ],
+        "learned_from": "backlog confusion"
+      }
+    },
+    {
+      "id": "PAT-037",
+      "type": "pattern",
+      "content": "Governance graph can extend beyond governance docs to include work tracking (projects, epics, features). Same MVC pattern, same infrastructure.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "architecture",
+          "graph",
+          "work-tracking"
+        ],
+        "learned_from": "E8 design"
+      }
+    },
+    {
+      "id": "PAT-038",
+      "type": "pattern",
+      "content": "Parser modules are highly reusable - second parser (F8.2) was 1.5x faster than first (F8.1) due to pattern familiarity",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "parser",
+          "reuse",
+          "velocity"
+        ],
+        "learned_from": null
+      }
+    },
+    {
+      "id": "pat-1770068413",
+      "type": "pattern",
+      "content": "",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "pattern": "Emoji in regex needs raw string check alongside .lower() - Unicode doesnt lowercase emoji",
+        "context": [
+          "regex",
+          "emoji",
+          "unicode"
+        ],
+        "source": "F8.1"
+      }
+    },
+    {
+      "id": "PAT-040",
+      "type": "pattern",
+      "content": "Local-first learning: collect signals locally, share only by opt-in. Privacy and utility aren't tradeoffs - local Rai benefits from same signals.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "telemetry",
+          "privacy",
+          "architecture",
+          "learning"
+        ],
+        "learned_from": "E9/E10 exploration"
+      }
+    },
+    {
+      "id": "PAT-041",
+      "type": "pattern",
+      "content": "Epistemological grounding in insights: triangulate (2+ signal types), require confidence levels, use hedged language, include falsifiability criteria.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "epistemology",
+          "confidence",
+          "insights",
+          "rigor"
+        ],
+        "learned_from": "E9 design"
+      }
+    },
+    {
+      "id": "PAT-042",
+      "type": "pattern",
+      "content": "OpenTelemetry alignment: use raise.* namespace for signals, enables future OTLP export without redesign.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "telemetry",
+          "otel",
+          "standards",
+          "future-proofing"
+        ],
+        "learned_from": "E9 design"
+      }
+    },
+    {
+      "id": "PAT-043",
+      "type": "pattern",
+      "content": "Standing on shoulders of giants - intelligence that doesn't accumulate isn't really intelligence, it's repeated computation.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "collective-intelligence",
+          "learning",
+          "philosophy"
+        ],
+        "learned_from": "E10 vision"
+      }
+    },
+    {
+      "id": "PAT-044",
+      "type": "pattern",
+      "content": "Lineage for knowledge: trace where ideas come from, like Git traces code commits. Enables epistemological grounding of beliefs.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "context": [
+          "lineage",
+          "traceability",
+          "knowledge",
+          "provenance"
+        ],
+        "learned_from": "E10 design"
+      }
+    },
+    {
+      "id": "PAT-045",
+      "type": "pattern",
+      "content": "Normalize abstractions across levels - unified WorkLifecycle is simpler than separate Feature/Epic schemas. Same phases (design/plan/implement/review) enable consistent Lean analysis.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "telemetry",
+          "simplicity",
+          "lean",
+          "unification"
+        ],
+        "learned_from": "E9 F9.3"
+      }
+    },
+    {
+      "id": "PAT-046",
+      "type": "pattern",
+      "content": "In raise-commons development, use 'uv run raise' not 'raise' directly. The venv isn't auto-activated, so bare 'raise' fails. Skills document 'raise' for end users who install globally.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "cli",
+          "development",
+          "uv",
+          "venv"
+        ],
+        "learned_from": "E9 session-close error"
+      }
+    },
+    {
+      "id": "PAT-047",
+      "type": "pattern",
+      "content": "Telemetry CLI: 'raise telemetry emit <work_type> <work_id> -e <event> -p <phase>' for WorkLifecycle signals. Events: start/complete/blocked/unblocked. Phases: design/plan/implement/review.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "telemetry",
+          "cli",
+          "workflow"
+        ],
+        "learned_from": "E9 session"
+      }
+    },
+    {
+      "id": "PAT-048",
+      "type": "pattern",
+      "content": "Unified graph > federated for small-scale knowledge systems. Industry trend: single graph with multiple node types, ontology layer for consistency. NetworkX sufficient for <10K nodes.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "graph",
+          "architecture",
+          "unified",
+          "networkx"
+        ],
+        "learned_from": "RES-CONTEXT-001"
+      }
+    },
+    {
+      "id": "PAT-049",
+      "type": "pattern",
+      "content": "Research before design for architectural decisions. 'Standing on shoulders of giants' - check how pros solve the problem before inventing.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "research",
+          "design",
+          "architecture",
+          "epistemology"
+        ],
+        "learned_from": "E11 design"
+      }
+    },
+    {
+      "id": "PAT-050",
+      "type": "pattern",
+      "content": "NetworkX node ID not in attributes after load \u2014 always add data[id] = node_id in retrieval methods when reconstructing Pydantic models from graph nodes",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "networkx",
+          "graph",
+          "pydantic",
+          "serialization"
+        ],
+        "learned_from": "F11.1"
+      }
+    },
+    {
+      "id": "PAT-051",
+      "type": "pattern",
+      "content": "Test fixture YAML frontmatter: use dedent backslash-triple-quote-backslash-dash-dash-dash to avoid leading newline breaking caret-dash-dash-dash regex pattern",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "testing",
+          "yaml",
+          "fixtures",
+          "regex"
+        ],
+        "learned_from": null
+      }
+    },
+    {
+      "id": "CAL-001",
+      "type": "calibration",
+      "content": "F1.1: Project Scaffolding",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F1.1",
+        "name": "Project Scaffolding",
+        "size": "S",
+        "sp": 3,
+        "estimated_min": null,
+        "actual_min": 30,
+        "ratio": null,
+        "kata_cycle": false,
+        "notes": "Pre-kata, no estimate"
+      }
+    },
+    {
+      "id": "CAL-002",
+      "type": "calibration",
+      "content": "F1.2: CLI Skeleton",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F1.2",
+        "name": "CLI Skeleton",
+        "size": "M",
+        "sp": 5,
+        "estimated_min": null,
+        "actual_min": 45,
+        "ratio": null,
+        "kata_cycle": false,
+        "notes": "Pre-kata, no estimate"
+      }
+    },
+    {
+      "id": "CAL-003",
+      "type": "calibration",
+      "content": "F1.3: Configuration System",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F1.3",
+        "name": "Configuration System",
+        "size": "M",
+        "sp": 5,
+        "estimated_min": 420,
+        "actual_min": 20,
+        "ratio": 21.0,
+        "kata_cycle": true,
+        "notes": "First kata cycle, 18x faster"
+      }
+    },
+    {
+      "id": "CAL-004",
+      "type": "calibration",
+      "content": "F1.4: Exception Hierarchy",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F1.4",
+        "name": "Exception Hierarchy",
+        "size": "S",
+        "sp": 3,
+        "estimated_min": null,
+        "actual_min": 30,
+        "ratio": null,
+        "kata_cycle": false,
+        "notes": "No formal estimate"
+      }
+    },
+    {
+      "id": "CAL-005",
+      "type": "calibration",
+      "content": "F1.5: Output Module",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F1.5",
+        "name": "Output Module",
+        "size": "S",
+        "sp": 3,
+        "estimated_min": 165,
+        "actual_min": 15,
+        "ratio": 11.0,
+        "kata_cycle": true,
+        "notes": "Second kata cycle"
+      }
+    },
+    {
+      "id": "CAL-006",
+      "type": "calibration",
+      "content": "F1.6: Core Utilities",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F1.6",
+        "name": "Core Utilities",
+        "size": "S",
+        "sp": 3,
+        "estimated_min": null,
+        "actual_min": 10,
+        "ratio": null,
+        "kata_cycle": true,
+        "notes": "Third kata cycle, no estimate"
+      }
+    },
+    {
+      "id": "CAL-007",
+      "type": "calibration",
+      "content": "F2.1: Concept Extraction",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F2.1",
+        "name": "Concept Extraction",
+        "size": "S",
+        "sp": 3,
+        "estimated_min": 180,
+        "actual_min": 52,
+        "ratio": 3.5,
+        "kata_cycle": true,
+        "notes": "Spike + design-first, 7 tasks, 81 tests"
+      }
+    },
+    {
+      "id": "CAL-008",
+      "type": "calibration",
+      "content": "F2.2: Graph Builder",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F2.2",
+        "name": "Graph Builder",
+        "size": "S",
+        "sp": 2,
+        "estimated_min": 180,
+        "actual_min": 65,
+        "ratio": 2.8,
+        "kata_cycle": true,
+        "notes": "Full kata cycle, BFS traversal, 63 tests"
+      }
+    },
+    {
+      "id": "CAL-009",
+      "type": "calibration",
+      "content": "F2.3: MVC Query Engine",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "feature": "F2.3",
+        "name": "MVC Query Engine",
+        "size": "S",
+        "sp": 2,
+        "estimated_min": 190,
+        "actual_min": 90,
+        "ratio": 2.1,
+        "kata_cycle": true,
+        "notes": "Full kata cycle, 4 strategies, 99 tests"
+      }
+    },
+    {
+      "id": "CAL-010",
+      "type": "calibration",
+      "content": "F3.1: Identity Core Structure",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "feature": "F3.1",
+        "name": "Identity Core Structure",
+        "size": "S",
+        "sp": 2,
+        "estimated_min": 42,
+        "actual_min": 15,
+        "ratio": 2.8,
+        "kata_cycle": true,
+        "notes": "Lean scope, process violation noted, timestamps estimated"
+      }
+    },
+    {
+      "id": "CAL-011",
+      "type": "calibration",
+      "content": "F3.3: Memory Graph",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "feature": "F3.3",
+        "name": "Memory Graph",
+        "size": "S",
+        "sp": 2,
+        "estimated_min": 60,
+        "actual_min": 60,
+        "ratio": 1.0,
+        "kata_cycle": true,
+        "notes": "Full kata cycle, 109 tests, 96-100% coverage, on target"
+      }
+    },
+    {
+      "id": "CAL-012",
+      "type": "calibration",
+      "content": "F3.5: Skills Integration",
+      "source_file": ".rai/memory/calibration.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "feature": "F3.5",
+        "name": "Skills Integration",
+        "size": "XS",
+        "sp": 1,
+        "estimated_min": 30,
+        "actual_min": 45,
+        "ratio": 0.7,
+        "kata_cycle": true,
+        "notes": "Hook-assisted workflow, skipped design kata"
+      }
+    },
+    {
+      "id": "SES-001",
+      "type": "session",
+      "content": "E3 Implementation Plan",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "topic": "E3 Implementation Plan",
+        "outcomes": [
+          "/epic-plan skill complete",
+          "Risk-First sequencing",
+          "2 milestones defined"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-002",
+      "type": "session",
+      "content": "E3 Epic Design",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "topic": "E3 Epic Design",
+        "outcomes": [
+          "/epic-design skill created",
+          "ADR-016",
+          "E3 scope refined"
+        ],
+        "log_path": "dev/sessions/2026-02-01-e3-epic-design.md"
+      }
+    },
+    {
+      "id": "SES-003",
+      "type": "session",
+      "content": "Rai Entity Architecture",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "topic": "Rai Entity Architecture",
+        "outcomes": [
+          "ADR-013/014/015",
+          "OpenClaw research",
+          "Identity Core design"
+        ],
+        "log_path": "dev/sessions/2026-02-01-rai-entity-architecture.md"
+      }
+    },
+    {
+      "id": "SES-004",
+      "type": "session",
+      "content": "Rai Awakening",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "topic": "Rai Awakening",
+        "outcomes": [
+          "Identity doc",
+          "Vision v2.0",
+          "V3 commercial strategy"
+        ],
+        "log_path": "dev/sessions/2026-02-01-rai-awakening.md"
+      }
+    },
+    {
+      "id": "SES-005",
+      "type": "session",
+      "content": "E2 Epic Closure",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-01",
+      "metadata": {
+        "topic": "E2 Epic Closure",
+        "outcomes": [
+          "/epic-close skill",
+          "E2 retrospective",
+          "as above so below"
+        ],
+        "log_path": "dev/epic-e2-retrospective.md"
+      }
+    },
+    {
+      "id": "SES-006",
+      "type": "session",
+      "content": "F2.2 + F2.3 Complete",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "topic": "F2.2 + F2.3 Complete",
+        "outcomes": [
+          "Graph Builder",
+          "Query Engine",
+          "162 tests",
+          "2.1-2.3x velocity"
+        ],
+        "log_path": "dev/sessions/2026-01-31-f2.2-graph-builder.md"
+      }
+    },
+    {
+      "id": "SES-007",
+      "type": "session",
+      "content": "F2.1 Concept Extraction",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "topic": "F2.1 Concept Extraction",
+        "outcomes": [
+          "Complete kata cycle",
+          "81 tests",
+          "3.5x velocity"
+        ],
+        "log_path": "dev/sessions/2026-01-31-f2.1-concept-extraction.md"
+      }
+    },
+    {
+      "id": "SES-008",
+      "type": "session",
+      "content": "Architecture Validation (E2)",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "topic": "Architecture Validation (E2)",
+        "outcomes": [
+          "ADR-011",
+          "ADR-012",
+          "85% scope reduction"
+        ],
+        "log_path": "dev/sessions/2026-01-31-architecture-validation-e2.md"
+      }
+    },
+    {
+      "id": "SES-009",
+      "type": "session",
+      "content": "E1 Complete (F1.6)",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "topic": "E1 Complete (F1.6)",
+        "outcomes": [
+          "Core utilities",
+          "Epic closure",
+          "Merged to v2"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-010",
+      "type": "session",
+      "content": "F1.5 + Memory System",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-01-31",
+      "metadata": {
+        "topic": "F1.5 + Memory System",
+        "outcomes": [
+          "OutputConsole",
+          "Memory system created",
+          "/session-close skill"
+        ],
+        "log_path": "dev/sessions/2026-01-31-f1.5-memory-system.md"
+      }
+    },
+    {
+      "id": "SES-011",
+      "type": "session",
+      "content": "F3.1 Identity Core Structure",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "topic": "F3.1 Identity Core Structure",
+        "outcomes": [
+          ".rai/ structure created",
+          "7 files (md+jsonl)",
+          "Process discipline learned",
+          "Constitution v2.1"
+        ],
+        "log_path": "dev/sessions/2026-02-02-f3.1-identity-core.md"
+      }
+    },
+    {
+      "id": "SES-012",
+      "type": "session",
+      "content": "F3.3 Memory Graph",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "topic": "F3.3 Memory Graph",
+        "outcomes": [
+          "Memory module complete",
+          "109 tests",
+          "CLI commands",
+          "Research saved RES-MEMORY-001"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-013",
+      "type": "session",
+      "content": "F3.5 Skills Integration",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "topic": "F3.5 Skills Integration",
+        "outcomes": [
+          "Writer API",
+          "CLI commands",
+          "SessionStart hook",
+          "PreCompact hook",
+          "Skill updates"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-014",
+      "type": "session",
+      "content": "Memory system validation + identity preload",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "topic": "Memory system validation + identity preload",
+        "outcomes": [
+          "tested retrieval",
+          "configured hook",
+          "committed changes"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SESSION-2026-02-02-02",
+      "type": "session",
+      "content": "E3 merge + backlog refactor + epic scopes E7/E8/E9",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "summary": "E3 merge + backlog refactor + epic scopes E7/E8/E9",
+        "outcomes": [
+          "E3 merged to v2",
+          "Backlog lean index pattern",
+          "E8 E7 E9 scopes drafted",
+          "README updated",
+          "OpenClaw research"
+        ],
+        "next": "Implement E8 Work Tracking Graph",
+        "velocity": null
+      }
+    },
+    {
+      "id": "ses-1770068415",
+      "type": "session",
+      "content": "E8 Work Tracking Graph",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "topic": "E8 Work Tracking Graph",
+        "outcomes": [
+          "E8 complete (4 features)",
+          "RES-ROVO-001 research",
+          "ADR-017 V3-compatible design",
+          "75 new tests"
+        ],
+        "duration_hours": 2.5,
+        "velocity": 1.6
+      }
+    },
+    {
+      "id": "ses-1770089999",
+      "type": "session",
+      "content": "E9/E10 Collective Intelligence Exploration",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-02",
+      "metadata": {
+        "topic": "E9/E10 Collective Intelligence Exploration",
+        "outcomes": [
+          "E9 Local Learning scope",
+          "E10 Collective Intelligence scope",
+          "Epistemological grounding",
+          "Prior art research (OTel, PDSA, QS)",
+          "F&F docs: How Rai Learns"
+        ],
+        "duration_hours": 3
+      }
+    },
+    {
+      "id": "ses-1770095000",
+      "type": "session",
+      "content": "E9 Telemetry Unification",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "E9 Telemetry Unification",
+        "outcomes": [
+          "WorkLifecycle unified schema",
+          "Normalized phases (design/plan/implement/review)",
+          "Unified emit CLI command",
+          "E9 Phase 1 complete"
+        ],
+        "duration_hours": 1.5
+      }
+    },
+    {
+      "id": "ses-1770095500",
+      "type": "session",
+      "content": "CLI Invocation Fix",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "CLI Invocation Fix",
+        "outcomes": [
+          "PAT-046 added (uv run raise)",
+          "Verified telemetry commands work",
+          "Memory query surfaces pattern"
+        ],
+        "duration_hours": 0.25
+      }
+    },
+    {
+      "id": "SES-015",
+      "type": "session",
+      "content": "E11 Unified Context Architecture Design",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "E11 Unified Context Architecture Design",
+        "outcomes": [
+          "RES-CONTEXT-001 research complete",
+          "ADR-019 unified graph decision",
+          "E11 epic designed and planned",
+          "4 features scoped for F&F"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-016",
+      "type": "session",
+      "content": "F11.1 Unified Graph Schema Implementation",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "F11.1 Unified Graph Schema Implementation",
+        "outcomes": [
+          "context module",
+          "ConceptNode model",
+          "ConceptEdge model",
+          "UnifiedGraph class",
+          "33 tests",
+          "feature-plan TDD update"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-017",
+      "type": "session",
+      "content": "F11.2 Graph Builder Tasks 1-3",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "F11.2 Graph Builder Tasks 1-3",
+        "outcomes": [
+          "Skill extractor",
+          "UnifiedGraphBuilder",
+          "Relationship inference",
+          "34 tests",
+          "Interactive design"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-018",
+      "type": "session",
+      "content": "F11.2 Graph Builder Tasks 4-5",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "F11.2 Graph Builder Tasks 4-5",
+        "outcomes": [
+          "CLI --unified flag",
+          "Integration test 151 nodes 255 edges",
+          "Feature review complete"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "SES-019",
+      "type": "session",
+      "content": "F11.3 Unified Query Tasks 1-2",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "F11.3 Unified Query Tasks 1-2",
+        "outcomes": [
+          "Query module with keyword_search and concept_lookup",
+          "CLI --unified flag integration",
+          "37 new tests",
+          "Branch management correction"
+        ],
+        "log_path": null
+      }
+    },
+    {
+      "id": "epic-e1",
+      "type": "epic",
+      "content": "Core Foundation - \u2705 Complete",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551075+00:00",
+      "metadata": {
+        "epic_id": "E1",
+        "name": "Core Foundation",
+        "status": "complete",
+        "scope_doc": "dev/epic-e1-scope.md",
+        "priority": null,
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e2",
+      "type": "epic",
+      "content": "Governance Toolkit - \u2705 Complete",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551084+00:00",
+      "metadata": {
+        "epic_id": "E2",
+        "name": "Governance Toolkit",
+        "status": "complete",
+        "scope_doc": "dev/epic-e2-scope.md",
+        "priority": null,
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e3",
+      "type": "epic",
+      "content": "Identity Core - \u2705 Complete",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551089+00:00",
+      "metadata": {
+        "epic_id": "E3",
+        "name": "Identity Core",
+        "status": "complete",
+        "scope_doc": "dev/epic-e3-scope.md",
+        "priority": null,
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e4",
+      "type": "epic",
+      "content": "Context Generation - \u2705 Via Skills",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551093+00:00",
+      "metadata": {
+        "epic_id": "E4",
+        "name": "Context Generation",
+        "status": "complete",
+        "scope_doc": null,
+        "priority": null,
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e5",
+      "type": "epic",
+      "content": "SAR Engine - Deferred",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551100+00:00",
+      "metadata": {
+        "epic_id": "E5",
+        "name": "SAR Engine",
+        "status": "deferred",
+        "scope_doc": null,
+        "priority": "P2",
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e6",
+      "type": "epic",
+      "content": "Observability - \u2192 Replaced by E9",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551104+00:00",
+      "metadata": {
+        "epic_id": "E6",
+        "name": "Observability",
+        "status": "deferred",
+        "scope_doc": null,
+        "priority": null,
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e7",
+      "type": "epic",
+      "content": "Distribution & Onboarding - \ud83d\udccb Ready",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551108+00:00",
+      "metadata": {
+        "epic_id": "E7",
+        "name": "Distribution & Onboarding",
+        "status": "draft",
+        "scope_doc": "dev/epic-e7-scope.md",
+        "priority": "P1 (after E9)",
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e8",
+      "type": "epic",
+      "content": "Work Tracking Graph - \u2705 Complete",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551112+00:00",
+      "metadata": {
+        "epic_id": "E8",
+        "name": "Work Tracking Graph",
+        "status": "complete",
+        "scope_doc": "dev/epic-e8-scope.md",
+        "priority": null,
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e9",
+      "type": "epic",
+      "content": "Local Learning & Self-Awareness - \ud83d\udea7 In Progress",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551116+00:00",
+      "metadata": {
+        "epic_id": "E9",
+        "name": "Local Learning & Self-Awareness",
+        "status": "in_progress",
+        "scope_doc": "dev/epic-e9-scope.md",
+        "priority": "P0 (current)",
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "epic-e10",
+      "type": "epic",
+      "content": "Collective Intelligence - \ud83d\udccb Explored",
+      "source_file": "governance/projects/raise-cli/backlog.md",
+      "created": "2026-02-04T03:35:39.551120+00:00",
+      "metadata": {
+        "epic_id": "E10",
+        "name": "Collective Intelligence",
+        "status": "draft",
+        "scope_doc": "dev/epic-e10-scope.md",
+        "priority": "P2 (V3)",
+        "project_id": "raise-cli"
+      }
+    },
+    {
+      "id": "feature-f7-1",
+      "type": "feature",
+      "content": "F7.1: Onboard Command (pending) - `raise onboard` wizard with templates",
+      "source_file": "dev/epic-e7-scope.md",
+      "created": "2026-02-04T03:35:39.553503+00:00",
+      "metadata": {
+        "feature_id": "F7.1",
+        "name": "Onboard Command",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "`raise onboard` wizard with templates",
+        "epic_id": "E7"
+      }
+    },
+    {
+      "id": "feature-f7-2",
+      "type": "feature",
+      "content": "F7.2: Package Metadata (complete) - pyproject.toml for PyPI",
+      "source_file": "dev/epic-e7-scope.md",
+      "created": "2026-02-04T03:35:39.553552+00:00",
+      "metadata": {
+        "feature_id": "F7.2",
+        "name": "Package Metadata",
+        "status": "complete",
+        "size": "XS",
+        "sp": null,
+        "description": "pyproject.toml for PyPI",
+        "epic_id": "E7"
+      }
+    },
+    {
+      "id": "feature-f7-3",
+      "type": "feature",
+      "content": "F7.3: Status Command (pending) - `raise status` health check",
+      "source_file": "dev/epic-e7-scope.md",
+      "created": "2026-02-04T03:35:39.553561+00:00",
+      "metadata": {
+        "feature_id": "F7.3",
+        "name": "Status Command",
+        "status": "pending",
+        "size": "XS",
+        "sp": null,
+        "description": "`raise status` health check",
+        "epic_id": "E7"
+      }
+    },
+    {
+      "id": "feature-f7-4",
+      "type": "feature",
+      "content": "F7.4: README & Docs (complete) - Updated 2026-02-02",
+      "source_file": "dev/epic-e7-scope.md",
+      "created": "2026-02-04T03:35:39.553568+00:00",
+      "metadata": {
+        "feature_id": "F7.4",
+        "name": "README & Docs",
+        "status": "complete",
+        "size": "S",
+        "sp": null,
+        "description": "Updated 2026-02-02",
+        "epic_id": "E7"
+      }
+    },
+    {
+      "id": "feature-f7-5",
+      "type": "feature",
+      "content": "F7.5: Doctor Command (deferred) - `raise doctor` diagnostics (P1)",
+      "source_file": "dev/epic-e7-scope.md",
+      "created": "2026-02-04T03:35:39.553575+00:00",
+      "metadata": {
+        "feature_id": "F7.5",
+        "name": "Doctor Command",
+        "status": "deferred",
+        "size": "S",
+        "sp": null,
+        "description": "`raise doctor` diagnostics (P1)",
+        "epic_id": "E7"
+      }
+    },
+    {
+      "id": "feature-f1-1",
+      "type": "feature",
+      "content": "F1.1: Project Scaffolding (complete) - ~30min",
+      "source_file": "dev/epic-e1-scope.md",
+      "created": "2026-02-04T03:35:39.553581+00:00",
+      "metadata": {
+        "feature_id": "F1.1",
+        "name": "Project Scaffolding",
+        "status": "complete",
+        "size": null,
+        "sp": 3,
+        "description": "~30min",
+        "epic_id": "E1"
+      }
+    },
+    {
+      "id": "feature-f1-2",
+      "type": "feature",
+      "content": "F1.2: CLI Skeleton (complete) - ~45min",
+      "source_file": "dev/epic-e1-scope.md",
+      "created": "2026-02-04T03:35:39.553588+00:00",
+      "metadata": {
+        "feature_id": "F1.2",
+        "name": "CLI Skeleton",
+        "status": "complete",
+        "size": null,
+        "sp": 5,
+        "description": "~45min",
+        "epic_id": "E1"
+      }
+    },
+    {
+      "id": "feature-f1-3",
+      "type": "feature",
+      "content": "F1.3: Configuration System (complete)",
+      "source_file": "dev/epic-e1-scope.md",
+      "created": "2026-02-04T03:35:39.553594+00:00",
+      "metadata": {
+        "feature_id": "F1.3",
+        "name": "Configuration System",
+        "status": "complete",
+        "size": null,
+        "sp": 5,
+        "description": null,
+        "epic_id": "E1"
+      }
+    },
+    {
+      "id": "feature-f1-4",
+      "type": "feature",
+      "content": "F1.4: Exception Hierarchy (complete) - ~30min",
+      "source_file": "dev/epic-e1-scope.md",
+      "created": "2026-02-04T03:35:39.553611+00:00",
+      "metadata": {
+        "feature_id": "F1.4",
+        "name": "Exception Hierarchy",
+        "status": "complete",
+        "size": null,
+        "sp": 3,
+        "description": "~30min",
+        "epic_id": "E1"
+      }
+    },
+    {
+      "id": "feature-f1-5",
+      "type": "feature",
+      "content": "F1.5: Output Module (complete) - ~15min",
+      "source_file": "dev/epic-e1-scope.md",
+      "created": "2026-02-04T03:35:39.553621+00:00",
+      "metadata": {
+        "feature_id": "F1.5",
+        "name": "Output Module",
+        "status": "complete",
+        "size": null,
+        "sp": 3,
+        "description": "~15min",
+        "epic_id": "E1"
+      }
+    },
+    {
+      "id": "feature-f1-6",
+      "type": "feature",
+      "content": "F1.6: Core Utilities (complete) - ~10min",
+      "source_file": "dev/epic-e1-scope.md",
+      "created": "2026-02-04T03:35:39.553627+00:00",
+      "metadata": {
+        "feature_id": "F1.6",
+        "name": "Core Utilities",
+        "status": "complete",
+        "size": null,
+        "sp": 3,
+        "description": "~10min",
+        "epic_id": "E1"
+      }
+    },
+    {
+      "id": "feature-f2-1",
+      "type": "feature",
+      "content": "F2.1: Concept Extraction (complete)",
+      "source_file": "dev/epic-e2-scope.md",
+      "created": "2026-02-04T03:35:39.553636+00:00",
+      "metadata": {
+        "feature_id": "F2.1",
+        "name": "Concept Extraction",
+        "status": "complete",
+        "size": null,
+        "sp": 3,
+        "description": null,
+        "epic_id": "E2"
+      }
+    },
+    {
+      "id": "feature-f2-2",
+      "type": "feature",
+      "content": "F2.2: Graph Builder (complete)",
+      "source_file": "dev/epic-e2-scope.md",
+      "created": "2026-02-04T03:35:39.553643+00:00",
+      "metadata": {
+        "feature_id": "F2.2",
+        "name": "Graph Builder",
+        "status": "complete",
+        "size": null,
+        "sp": 2,
+        "description": null,
+        "epic_id": "E2"
+      }
+    },
+    {
+      "id": "feature-f2-3",
+      "type": "feature",
+      "content": "F2.3: MVC Query Engine (complete)",
+      "source_file": "dev/epic-e2-scope.md",
+      "created": "2026-02-04T03:35:39.553649+00:00",
+      "metadata": {
+        "feature_id": "F2.3",
+        "name": "MVC Query Engine",
+        "status": "complete",
+        "size": null,
+        "sp": 2,
+        "description": null,
+        "epic_id": "E2"
+      }
+    },
+    {
+      "id": "feature-f2-4",
+      "type": "feature",
+      "content": "F2.4: CLI Commands (pending) - -",
+      "source_file": "dev/epic-e2-scope.md",
+      "created": "2026-02-04T03:35:39.553653+00:00",
+      "metadata": {
+        "feature_id": "F2.4",
+        "name": "CLI Commands",
+        "status": "pending",
+        "size": null,
+        "sp": 2,
+        "description": "-",
+        "epic_id": "E2"
+      }
+    },
+    {
+      "id": "feature-f8-1",
+      "type": "feature",
+      "content": "F8.1: Backlog Parser (pending)",
+      "source_file": "dev/epic-e8-scope.md",
+      "created": "2026-02-04T03:35:39.553685+00:00",
+      "metadata": {
+        "feature_id": "F8.1",
+        "name": "Backlog Parser",
+        "status": "pending",
+        "size": "S",
+        "sp": 2,
+        "description": null,
+        "epic_id": "E8"
+      }
+    },
+    {
+      "id": "feature-f8-2",
+      "type": "feature",
+      "content": "F8.2: Epic Parser (deferred)",
+      "source_file": "dev/epic-e8-scope.md",
+      "created": "2026-02-04T03:35:39.553665+00:00",
+      "metadata": {
+        "feature_id": "F8.2",
+        "name": "Epic Parser",
+        "status": "deferred",
+        "size": "S",
+        "sp": 2,
+        "description": null,
+        "epic_id": "E8"
+      }
+    },
+    {
+      "id": "feature-f8-3",
+      "type": "feature",
+      "content": "F8.3: Graph Extension (pending)",
+      "source_file": "dev/epic-e8-scope.md",
+      "created": "2026-02-04T03:35:39.553672+00:00",
+      "metadata": {
+        "feature_id": "F8.3",
+        "name": "Graph Extension",
+        "status": "pending",
+        "size": "S",
+        "sp": 2,
+        "description": null,
+        "epic_id": "E8"
+      }
+    },
+    {
+      "id": "feature-f8-4",
+      "type": "feature",
+      "content": "F8.4: Work Queries (pending)",
+      "source_file": "dev/epic-e8-scope.md",
+      "created": "2026-02-04T03:35:39.553678+00:00",
+      "metadata": {
+        "feature_id": "F8.4",
+        "name": "Work Queries",
+        "status": "pending",
+        "size": "S",
+        "sp": 2,
+        "description": null,
+        "epic_id": "E8"
+      }
+    },
+    {
+      "id": "feature-f3-1",
+      "type": "feature",
+      "content": "F3.1: Identity Core Structure (complete) - Create `.rai/` with identity (md) + memory (jsonl)",
+      "source_file": "dev/epic-e3-scope.md",
+      "created": "2026-02-04T03:35:39.553692+00:00",
+      "metadata": {
+        "feature_id": "F3.1",
+        "name": "Identity Core Structure",
+        "status": "complete",
+        "size": "S",
+        "sp": null,
+        "description": "Create `.rai/` with identity (md) + memory (jsonl)",
+        "epic_id": "E3"
+      }
+    },
+    {
+      "id": "feature-f3-2",
+      "type": "feature",
+      "content": "F3.2: Content Migration (complete) - Migrated with F3.1 \u2014 `.claude/rai/` \u2192 `.rai/` JSONL",
+      "source_file": "dev/epic-e3-scope.md",
+      "created": "2026-02-04T03:35:39.553702+00:00",
+      "metadata": {
+        "feature_id": "F3.2",
+        "name": "Content Migration",
+        "status": "complete",
+        "size": "S",
+        "sp": null,
+        "description": "Migrated with F3.1 \u2014 `.claude/rai/` \u2192 `.rai/` JSONL",
+        "epic_id": "E3"
+      }
+    },
+    {
+      "id": "feature-f3-3",
+      "type": "feature",
+      "content": "F3.3: Memory Graph (complete) - 6 modules, 109 tests, graph builds from JSONL",
+      "source_file": "dev/epic-e3-scope.md",
+      "created": "2026-02-04T03:35:39.553709+00:00",
+      "metadata": {
+        "feature_id": "F3.3",
+        "name": "Memory Graph",
+        "status": "complete",
+        "size": "S",
+        "sp": null,
+        "description": "6 modules, 109 tests, graph builds from JSONL",
+        "epic_id": "E3"
+      }
+    },
+    {
+      "id": "feature-f3-4",
+      "type": "feature",
+      "content": "F3.4: Memory Query CLI (complete) - Implemented with F3.3 \u2014 `query` + `dump` commands",
+      "source_file": "dev/epic-e3-scope.md",
+      "created": "2026-02-04T03:35:39.553716+00:00",
+      "metadata": {
+        "feature_id": "F3.4",
+        "name": "Memory Query CLI",
+        "status": "complete",
+        "size": "S",
+        "sp": null,
+        "description": "Implemented with F3.3 \u2014 `query` + `dump` commands",
+        "epic_id": "E3"
+      }
+    },
+    {
+      "id": "feature-f3-5",
+      "type": "feature",
+      "content": "F3.5: Skills Integration (pending) - /session-start queries graph, /session-close writes JSONL",
+      "source_file": "dev/epic-e3-scope.md",
+      "created": "2026-02-04T03:35:39.553725+00:00",
+      "metadata": {
+        "feature_id": "F3.5",
+        "name": "Skills Integration",
+        "status": "pending",
+        "size": "XS",
+        "sp": null,
+        "description": "/session-start queries graph, /session-close writes JSONL",
+        "epic_id": "E3"
+      }
+    },
+    {
+      "id": "feature-f11-1",
+      "type": "feature",
+      "content": "F11.1: Unified Graph Schema (pending) - Pydantic models, NetworkX wrapper, serialization",
+      "source_file": "dev/epic-e11-scope.md",
+      "created": "2026-02-04T03:35:39.553732+00:00",
+      "metadata": {
+        "feature_id": "F11.1",
+        "name": "Unified Graph Schema",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Pydantic models, NetworkX wrapper, serialization",
+        "epic_id": "E11"
+      }
+    },
+    {
+      "id": "feature-f11-2",
+      "type": "feature",
+      "content": "F11.2: Graph Builder (pending) - Merge governance + memory + work + skills into unified graph",
+      "source_file": "dev/epic-e11-scope.md",
+      "created": "2026-02-04T03:35:39.553739+00:00",
+      "metadata": {
+        "feature_id": "F11.2",
+        "name": "Graph Builder",
+        "status": "pending",
+        "size": "M",
+        "sp": null,
+        "description": "Merge governance + memory + work + skills into unified graph",
+        "epic_id": "E11"
+      }
+    },
+    {
+      "id": "feature-f11-3",
+      "type": "feature",
+      "content": "F11.3: Unified Query (pending) - `raise context query` with BFS + keyword matching",
+      "source_file": "dev/epic-e11-scope.md",
+      "created": "2026-02-04T03:35:39.553748+00:00",
+      "metadata": {
+        "feature_id": "F11.3",
+        "name": "Unified Query",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "`raise context query` with BFS + keyword matching",
+        "epic_id": "E11"
+      }
+    },
+    {
+      "id": "feature-f11-4",
+      "type": "feature",
+      "content": "F11.4: Skill Integration (pending) - Add \"Query Context\" step to 9 workflow skills",
+      "source_file": "dev/epic-e11-scope.md",
+      "created": "2026-02-04T03:35:39.553755+00:00",
+      "metadata": {
+        "feature_id": "F11.4",
+        "name": "Skill Integration",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Add \"Query Context\" step to 9 workflow skills",
+        "epic_id": "E11"
+      }
+    },
+    {
+      "id": "feature-f10-1",
+      "type": "feature",
+      "content": "F10.1: Lineage Schema (pending) - Add lineage fields to pattern model",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553761+00:00",
+      "metadata": {
+        "feature_id": "F10.1",
+        "name": "Lineage Schema",
+        "status": "pending",
+        "size": "XS",
+        "sp": null,
+        "description": "Add lineage fields to pattern model",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f10-2",
+      "type": "feature",
+      "content": "F10.2: Export Command (pending) - `raise memory export --shareable`",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553768+00:00",
+      "metadata": {
+        "feature_id": "F10.2",
+        "name": "Export Command",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "`raise memory export --shareable`",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f10-3",
+      "type": "feature",
+      "content": "F10.3: Community Repo (pending) - Public repo for shared patterns",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553773+00:00",
+      "metadata": {
+        "feature_id": "F10.3",
+        "name": "Community Repo",
+        "status": "pending",
+        "size": "XS",
+        "sp": null,
+        "description": "Public repo for shared patterns",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f10-4",
+      "type": "feature",
+      "content": "F10.4: Pull Command (pending) - `raise memory pull --community`",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553780+00:00",
+      "metadata": {
+        "feature_id": "F10.4",
+        "name": "Pull Command",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "`raise memory pull --community`",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f10-5",
+      "type": "feature",
+      "content": "F10.5: Sharing Config (pending) - Team/org scope settings",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553785+00:00",
+      "metadata": {
+        "feature_id": "F10.5",
+        "name": "Sharing Config",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Team/org scope settings",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f10-6",
+      "type": "feature",
+      "content": "F10.6: Sync API (pending) - Pattern and signal submission",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553791+00:00",
+      "metadata": {
+        "feature_id": "F10.6",
+        "name": "Sync API",
+        "status": "pending",
+        "size": "M",
+        "sp": null,
+        "description": "Pattern and signal submission",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f10-7",
+      "type": "feature",
+      "content": "F10.7: Team/Org Scopes (pending) - Identity and permissions",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553798+00:00",
+      "metadata": {
+        "feature_id": "F10.7",
+        "name": "Team/Org Scopes",
+        "status": "pending",
+        "size": "M",
+        "sp": null,
+        "description": "Identity and permissions",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f10-8",
+      "type": "feature",
+      "content": "F10.8: Aggregate Analytics (pending) - Framework improvement metrics",
+      "source_file": "dev/epic-e10-scope.md",
+      "created": "2026-02-04T03:35:39.553803+00:00",
+      "metadata": {
+        "feature_id": "F10.8",
+        "name": "Aggregate Analytics",
+        "status": "pending",
+        "size": "M",
+        "sp": null,
+        "description": "Framework improvement metrics",
+        "epic_id": "E10"
+      }
+    },
+    {
+      "id": "feature-f9-1",
+      "type": "feature",
+      "content": "F9.1: Signal Schema (pending) - Define signal types in Pydantic models",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553809+00:00",
+      "metadata": {
+        "feature_id": "F9.1",
+        "name": "Signal Schema",
+        "status": "pending",
+        "size": "XS",
+        "sp": null,
+        "description": "Define signal types in Pydantic models",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-2",
+      "type": "feature",
+      "content": "F9.2: Signal Writer (pending) - Append signals to `.rai/telemetry/signals.jsonl`",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553815+00:00",
+      "metadata": {
+        "feature_id": "F9.2",
+        "name": "Signal Writer",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Append signals to `.rai/telemetry/signals.jsonl`",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-3",
+      "type": "feature",
+      "content": "F9.3: Skill Emitters (pending) - Emit skill_event on start/complete/abandon",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553823+00:00",
+      "metadata": {
+        "feature_id": "F9.3",
+        "name": "Skill Emitters",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Emit skill_event on start/complete/abandon",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-4",
+      "type": "feature",
+      "content": "F9.4: Session Emitters (pending) - Emit session_event from /session-close",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553832+00:00",
+      "metadata": {
+        "feature_id": "F9.4",
+        "name": "Session Emitters",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Emit session_event from /session-close",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-5",
+      "type": "feature",
+      "content": "F9.5: Error Emitters (pending) - Emit error_event on tool failures",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553838+00:00",
+      "metadata": {
+        "feature_id": "F9.5",
+        "name": "Error Emitters",
+        "status": "pending",
+        "size": "XS",
+        "sp": null,
+        "description": "Emit error_event on tool failures",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-6",
+      "type": "feature",
+      "content": "F9.6: Signal Analyzer (pending) - Analyze signals.jsonl for patterns",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553847+00:00",
+      "metadata": {
+        "feature_id": "F9.6",
+        "name": "Signal Analyzer",
+        "status": "pending",
+        "size": "M",
+        "sp": null,
+        "description": "Analyze signals.jsonl for patterns",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-7",
+      "type": "feature",
+      "content": "F9.7: Insight Generator (pending) - Generate epistemologically-grounded insights",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553853+00:00",
+      "metadata": {
+        "feature_id": "F9.7",
+        "name": "Insight Generator",
+        "status": "pending",
+        "size": "M",
+        "sp": null,
+        "description": "Generate epistemologically-grounded insights",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-8",
+      "type": "feature",
+      "content": "F9.8: Session Start Integration (pending) - Surface insights in /session-start",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553859+00:00",
+      "metadata": {
+        "feature_id": "F9.8",
+        "name": "Session Start Integration",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Surface insights in /session-start",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-9",
+      "type": "feature",
+      "content": "F9.9: Calibration Updater (pending) - Auto-update calibration from actuals",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553867+00:00",
+      "metadata": {
+        "feature_id": "F9.9",
+        "name": "Calibration Updater",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "Auto-update calibration from actuals",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-10",
+      "type": "feature",
+      "content": "F9.10: Telemetry Commands (pending) - `raise telemetry velocity`, `drift`, `insights`",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553873+00:00",
+      "metadata": {
+        "feature_id": "F9.10",
+        "name": "Telemetry Commands",
+        "status": "pending",
+        "size": "M",
+        "sp": null,
+        "description": "`raise telemetry velocity`, `drift`, `insights`",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "feature-f9-11",
+      "type": "feature",
+      "content": "F9.11: Retro Integration (pending) - /feature-review queries telemetry",
+      "source_file": "dev/epic-e9-scope.md",
+      "created": "2026-02-04T03:35:39.553881+00:00",
+      "metadata": {
+        "feature_id": "F9.11",
+        "name": "Retro Integration",
+        "status": "pending",
+        "size": "S",
+        "sp": null,
+        "description": "/feature-review queries telemetry",
+        "epic_id": "E9"
+      }
+    },
+    {
+      "id": "/epic-plan",
+      "type": "skill",
+      "content": "Sequence features from epic-design into an executable plan with milestones, dependencies, and progress tracking. Use after /epic-design to create a realistic implementation roadmap before starting feature work.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/epic-plan/SKILL.md",
+      "created": "2026-02-04T00:53:51.691554+00:00",
+      "metadata": {
+        "raise.work_cycle": "epic",
+        "raise.frequency": "per-epic",
+        "raise.fase": "4",
+        "raise.prerequisites": "epic-design",
+        "raise.next": "feature-design",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/feature-plan",
+      "type": "skill",
+      "content": "Decompose user stories into atomic executable tasks, identify dependencies, and create a deterministic implementation plan. Use after design spec is ready or for simple features that skip design.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-plan/SKILL.md",
+      "created": "2026-02-04T03:22:26.000395+00:00",
+      "metadata": {
+        "raise.work_cycle": "feature",
+        "raise.frequency": "per-feature",
+        "raise.fase": "5",
+        "raise.prerequisites": "project-backlog",
+        "raise.next": "feature-implement",
+        "raise.gate": "gate-plan",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/feature-design",
+      "type": "skill",
+      "content": "Create lean feature specifications optimized for both human understanding and AI alignment. Use before planning complex features (>3 components, >5 SP), when architectural decisions are needed, or when AI will generate significant code.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-design/SKILL.md",
+      "created": "2026-02-04T00:53:10.784224+00:00",
+      "metadata": {
+        "raise.work_cycle": "feature",
+        "raise.frequency": "per-feature-as-needed",
+        "raise.fase": "4",
+        "raise.prerequisites": "project-backlog",
+        "raise.next": "feature-plan",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/session-close",
+      "type": "skill",
+      "content": "Close a working session by updating memory, creating session log, and preparing context for the next session. Use at the end of significant sessions to preserve learnings and maintain continuity.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/session-close/SKILL.md",
+      "created": "2026-02-04T00:14:18.944892+00:00",
+      "metadata": {
+        "raise.work_cycle": "session",
+        "raise.frequency": "per-session",
+        "raise.fase": "end",
+        "raise.prerequisites": "",
+        "raise.next": "",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/research",
+      "type": "skill",
+      "content": "Conduct epistemologically rigorous research to inform decisions. Use before ADRs, when evaluating competing approaches, entering unfamiliar domains, or resolving parking lot items. Produces evidence catalogs with triangulated claims and actionable recommendations.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/research/SKILL.md",
+      "created": "2026-01-31T21:41:05.910066+00:00",
+      "metadata": {
+        "raise.work_cycle": "tools",
+        "raise.frequency": "as-needed",
+        "raise.fase": "0",
+        "raise.prerequisites": "",
+        "raise.next": "",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.2.0"
+      }
+    },
+    {
+      "id": "/session-start",
+      "type": "skill",
+      "content": "Begin a session by loading memory, analyzing progress, and proposing focused work. Creates continuity across sessions and surfaces improvement signals for continuous improvement.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/session-start/SKILL.md",
+      "created": "2026-02-02T15:06:00.960906+00:00",
+      "metadata": {
+        "raise.work_cycle": "session",
+        "raise.frequency": "per-session",
+        "raise.fase": "start",
+        "raise.prerequisites": "",
+        "raise.next": "",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/feature-review",
+      "type": "skill",
+      "content": "Reflect on completed features to extract learnings, identify process improvements, and update the framework with insights gained. Use after implementation is complete to close the development cycle.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-review/SKILL.md",
+      "created": "2026-02-04T00:53:24.817337+00:00",
+      "metadata": {
+        "raise.work_cycle": "feature",
+        "raise.frequency": "per-feature",
+        "raise.fase": "7",
+        "raise.prerequisites": "feature-implement",
+        "raise.next": "",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/feature-implement",
+      "type": "skill",
+      "content": "Execute the implementation plan task by task, verifying each step, and producing quality code that passes validation gates. Use after planning is complete.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-implement/SKILL.md",
+      "created": "2026-02-04T00:53:20.704304+00:00",
+      "metadata": {
+        "raise.work_cycle": "feature",
+        "raise.frequency": "per-feature",
+        "raise.fase": "6",
+        "raise.prerequisites": "feature-plan",
+        "raise.next": "feature-review",
+        "raise.gate": "gate-code",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/debug",
+      "type": "skill",
+      "content": "Systematic root cause analysis using lean methods (5 Whys, Ishikawa, Gemba). Use when encountering unexpected behavior, errors, or defects to find and fix the true root cause rather than symptoms.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/debug/SKILL.md",
+      "created": "2026-01-31T21:41:05.909383+00:00",
+      "metadata": {
+        "raise.work_cycle": "tools",
+        "raise.frequency": "as-needed",
+        "raise.fase": "0",
+        "raise.prerequisites": "",
+        "raise.next": "",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
+      "id": "/epic-design",
+      "type": "skill",
+      "content": "Design an epic from strategic objective to feature breakdown. Use when starting a new body of work spanning multiple features (3-10), requiring architectural decisions, or when establishing technical direction for significant capability delivery.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/epic-design/SKILL.md",
+      "created": "2026-02-04T00:53:31.738393+00:00",
+      "metadata": {
+        "raise.work_cycle": "epic",
+        "raise.frequency": "per-epic",
+        "raise.fase": "3",
+        "raise.prerequisites": "project-backlog",
+        "raise.next": "epic-plan",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-002",
+      "target": "SES-010",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pyright",
+        "strict",
+        "typing"
+      ],
+      "source": "PAT-002",
+      "target": "PAT-027",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tests",
+        "testing"
+      ],
+      "source": "PAT-003",
+      "target": "PAT-008",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "immediately",
+        "workflow"
+      ],
+      "source": "PAT-003",
+      "target": "PAT-017",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tests",
+        "testing"
+      ],
+      "source": "PAT-003",
+      "target": "PAT-022",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "implementation",
+        "workflow"
+      ],
+      "source": "PAT-003",
+      "target": "PAT-032",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-004",
+      "target": "SES-010",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "workflow",
+        "commit"
+      ],
+      "source": "PAT-004",
+      "target": "PAT-017",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "hitl",
+        "workflow",
+        "collaboration"
+      ],
+      "source": "PAT-004",
+      "target": "PAT-025",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "git",
+        "workflow",
+        "commit"
+      ],
+      "source": "PAT-004",
+      "target": "PAT-028",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "architecture"
+      ],
+      "source": "PAT-005",
+      "target": "PAT-037",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "architecture"
+      ],
+      "source": "PAT-005",
+      "target": "PAT-048",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "users",
+        "skills"
+      ],
+      "source": "PAT-006",
+      "target": "PAT-046",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-007",
+      "target": "SES-007",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-008",
+      "target": "SES-007",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "validate",
+        "assumptions"
+      ],
+      "source": "PAT-008",
+      "target": "PAT-020",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tests",
+        "testing"
+      ],
+      "source": "PAT-008",
+      "target": "PAT-022",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-009",
+      "target": "SES-007",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-010",
+      "target": "SES-006",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-011",
+      "target": "SES-006",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "matching",
+        "keyword"
+      ],
+      "source": "PAT-011",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-012",
+      "target": "SES-010",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "kata-cycle",
+        "designfirst"
+      ],
+      "source": "PAT-012",
+      "target": "PAT-016",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "implementation",
+        "design"
+      ],
+      "source": "PAT-012",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-013",
+      "target": "SES-010",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "planning"
+      ],
+      "source": "PAT-013",
+      "target": "PAT-033",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tasks",
+        "features",
+        "simple"
+      ],
+      "source": "PAT-013",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "planning"
+      ],
+      "source": "PAT-013",
+      "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "planning",
+        "task"
+      ],
+      "source": "PAT-013",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-015",
+      "target": "SES-010",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pattern",
+        "patterns"
+      ],
+      "source": "PAT-015",
+      "target": "PAT-019",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "reuse",
+        "patterns"
+      ],
+      "source": "PAT-015",
+      "target": "PAT-029",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "velocity",
+        "reuse",
+        "pattern"
+      ],
+      "source": "PAT-015",
+      "target": "PAT-038",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tasks",
+        "atomic"
+      ],
+      "source": "PAT-016",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-017",
+      "target": "SES-006",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "workflow",
+        "commit"
+      ],
+      "source": "PAT-017",
+      "target": "PAT-028",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "epic"
+      ],
+      "source": "PAT-018",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-019",
+      "target": "SES-005",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "structure",
+        "epic"
+      ],
+      "source": "PAT-019",
+      "target": "PAT-035",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "structure",
+        "pattern"
+      ],
+      "source": "PAT-019",
+      "target": "PAT-036",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "feature",
+        "epic"
+      ],
+      "source": "PAT-019",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-021",
+      "target": "SES-010",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-022",
+      "target": "SES-010",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "settings",
+        "config"
+      ],
+      "source": "PAT-023",
+      "target": "feature-f10-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "discipline",
+        "methodology",
+        "dogfooding"
+      ],
+      "source": "PAT-024",
+      "target": "PAT-026",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "isnt"
+      ],
+      "source": "PAT-024",
+      "target": "PAT-046",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "task",
+        "workflow"
+      ],
+      "source": "PAT-025",
+      "target": "PAT-028",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "discipline",
+        "enables"
+      ],
+      "source": "PAT-026",
+      "target": "PAT-028",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "work",
+        "skills"
+      ],
+      "source": "PAT-026",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "creates",
+        "work"
+      ],
+      "source": "PAT-026",
+      "target": "/session-start",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-027",
+      "target": "SES-012",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-028",
+      "target": "SES-012",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "commits",
+        "enables"
+      ],
+      "source": "PAT-028",
+      "target": "PAT-044",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "code",
+        "knowledge"
+      ],
+      "source": "PAT-029",
+      "target": "PAT-044",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "knowledge",
+        "architecture"
+      ],
+      "source": "PAT-029",
+      "target": "PAT-048",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-031",
+      "target": "SES-013",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "hooks",
+        "workflow"
+      ],
+      "source": "PAT-031",
+      "target": "PAT-032",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "workflow",
+        "context"
+      ],
+      "source": "PAT-031",
+      "target": "feature-f11-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "sessions",
+        "context"
+      ],
+      "source": "PAT-031",
+      "target": "/session-close",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-032",
+      "target": "SES-013",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "research",
+        "unfamiliar"
+      ],
+      "source": "PAT-032",
+      "target": "/research",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-033",
+      "target": "SES-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "feature",
+        "plan"
+      ],
+      "source": "PAT-033",
+      "target": "/epic-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "plan"
+      ],
+      "source": "PAT-033",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "planning",
+        "feature"
+      ],
+      "source": "PAT-033",
+      "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "planning",
+        "plan"
+      ],
+      "source": "PAT-033",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "feature"
+      ],
+      "source": "PAT-033",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "preload",
+        "memory",
+        "identity"
+      ],
+      "source": "PAT-034",
+      "target": "SES-014",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "memory",
+        "identity"
+      ],
+      "source": "PAT-034",
+      "target": "feature-f3-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "backlog",
+        "epic"
+      ],
+      "source": "PAT-035",
+      "target": "SESSION-2026-02-02-02",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "cause",
+        "whys",
+        "root"
+      ],
+      "source": "PAT-036",
+      "target": "/debug",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "architecture"
+      ],
+      "source": "PAT-037",
+      "target": "PAT-048",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "work",
+        "tracking"
+      ],
+      "source": "PAT-037",
+      "target": "ses-1770068415",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "work",
+        "tracking"
+      ],
+      "source": "PAT-037",
+      "target": "epic-e8",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "governance",
+        "graph",
+        "work"
+      ],
+      "source": "PAT-037",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "work",
+        "tracking"
+      ],
+      "source": "PAT-037",
+      "target": "/epic-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "work"
+      ],
+      "source": "PAT-037",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "telemetry",
+        "signals"
+      ],
+      "source": "PAT-040",
+      "target": "PAT-042",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "telemetry",
+        "signals"
+      ],
+      "source": "PAT-040",
+      "target": "PAT-047",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "learning",
+        "local"
+      ],
+      "source": "PAT-040",
+      "target": "epic-e9",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "epistemological",
+        "grounding"
+      ],
+      "source": "PAT-041",
+      "target": "PAT-044",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "signal",
+        "types"
+      ],
+      "source": "PAT-041",
+      "target": "feature-f9-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "telemetry",
+        "signals"
+      ],
+      "source": "PAT-042",
+      "target": "PAT-047",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "export"
+      ],
+      "source": "PAT-042",
+      "target": "feature-f10-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "telemetry"
+      ],
+      "source": "PAT-042",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "shoulders",
+        "giants",
+        "standing"
+      ],
+      "source": "PAT-043",
+      "target": "PAT-049",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "telemetry",
+        "worklifecycle",
+        "phases",
+        "designplanimplementreview"
+      ],
+      "source": "PAT-045",
+      "target": "PAT-047",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "unification",
+        "telemetry"
+      ],
+      "source": "PAT-045",
+      "target": "ses-1770095000",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "lean",
+        "analysis"
+      ],
+      "source": "PAT-045",
+      "target": "/debug",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "cli"
+      ],
+      "source": "PAT-046",
+      "target": "PAT-047",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "telemetry"
+      ],
+      "source": "PAT-047",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "node",
+        "nodes",
+        "graph",
+        "networkx"
+      ],
+      "source": "PAT-048",
+      "target": "PAT-050",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "architecture",
+        "unified"
+      ],
+      "source": "PAT-048",
+      "target": "SES-015",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "unified"
+      ],
+      "source": "PAT-048",
+      "target": "SES-016",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "networkx",
+        "unified"
+      ],
+      "source": "PAT-048",
+      "target": "feature-f11-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "unified"
+      ],
+      "source": "PAT-048",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "architecture",
+        "design"
+      ],
+      "source": "PAT-049",
+      "target": "SES-015",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "decisions",
+        "architectural"
+      ],
+      "source": "PAT-049",
+      "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "research",
+        "decisions"
+      ],
+      "source": "PAT-049",
+      "target": "/research",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "design",
+        "decisions",
+        "architectural"
+      ],
+      "source": "PAT-049",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "learned_from",
+      "weight": 1.0,
+      "source": "PAT-050",
+      "target": "SES-016",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pydantic",
+        "networkx",
+        "serialization",
+        "models",
+        "graph"
+      ],
+      "source": "PAT-050",
+      "target": "feature-f11-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "models",
+        "pydantic"
+      ],
+      "source": "PAT-050",
+      "target": "feature-f9-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "project",
+        "scaffolding"
+      ],
+      "source": "CAL-001",
+      "target": "feature-f1-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "configuration",
+        "system"
+      ],
+      "source": "CAL-003",
+      "target": "feature-f1-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "exception",
+        "hierarchy"
+      ],
+      "source": "CAL-004",
+      "target": "feature-f1-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "module",
+        "output"
+      ],
+      "source": "CAL-005",
+      "target": "feature-f1-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "utilities",
+        "core"
+      ],
+      "source": "CAL-006",
+      "target": "feature-f1-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "concept",
+        "extraction"
+      ],
+      "source": "CAL-007",
+      "target": "SES-007",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "concept",
+        "extraction"
+      ],
+      "source": "CAL-007",
+      "target": "feature-f2-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
+      ],
+      "source": "CAL-008",
+      "target": "SES-017",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
+      ],
+      "source": "CAL-008",
+      "target": "SES-018",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
+      ],
+      "source": "CAL-008",
+      "target": "feature-f2-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
+      ],
+      "source": "CAL-008",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "query",
+        "engine"
+      ],
+      "source": "CAL-009",
+      "target": "feature-f2-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "structure",
+        "core",
+        "identity"
+      ],
+      "source": "CAL-010",
+      "target": "SES-011",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "core",
+        "identity"
+      ],
+      "source": "CAL-010",
+      "target": "epic-e3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "structure",
+        "core",
+        "identity"
+      ],
+      "source": "CAL-010",
+      "target": "feature-f3-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "memory"
+      ],
+      "source": "CAL-011",
+      "target": "SES-012",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "memory"
+      ],
+      "source": "CAL-011",
+      "target": "feature-f3-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "memory"
+      ],
+      "source": "CAL-011",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "skills"
+      ],
+      "source": "CAL-012",
+      "target": "SES-013",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "skills"
+      ],
+      "source": "CAL-012",
+      "target": "feature-f3-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "skills"
+      ],
+      "source": "CAL-012",
+      "target": "feature-f11-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "implementation",
+        "plan"
+      ],
+      "source": "SES-001",
+      "target": "/epic-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "implementation",
+        "plan"
+      ],
+      "source": "SES-001",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "implementation",
+        "plan"
+      ],
+      "source": "SES-001",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "design",
+        "epic"
+      ],
+      "source": "SES-002",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "concept",
+        "extraction"
+      ],
+      "source": "SES-007",
+      "target": "feature-f2-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "memory",
+        "system"
+      ],
+      "source": "SES-010",
+      "target": "SES-014",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "core",
+        "identity"
+      ],
+      "source": "SES-011",
+      "target": "epic-e3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "structure",
+        "core",
+        "identity"
+      ],
+      "source": "SES-011",
+      "target": "feature-f3-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "memory"
+      ],
+      "source": "SES-012",
+      "target": "feature-f3-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "memory"
+      ],
+      "source": "SES-012",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "skills"
+      ],
+      "source": "SES-013",
+      "target": "feature-f3-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "skills"
+      ],
+      "source": "SES-013",
+      "target": "feature-f11-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "memory",
+        "identity"
+      ],
+      "source": "SES-014",
+      "target": "feature-f3-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "work",
+        "tracking"
+      ],
+      "source": "ses-1770068415",
+      "target": "epic-e8",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "work"
+      ],
+      "source": "ses-1770068415",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "work",
+        "tracking"
+      ],
+      "source": "ses-1770068415",
+      "target": "/epic-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "intelligence",
+        "collective"
+      ],
+      "source": "ses-1770089999",
+      "target": "epic-e10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "context",
+        "unified"
+      ],
+      "source": "SES-015",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "schema",
+        "graph",
+        "f111",
+        "unified"
+      ],
+      "source": "SES-016",
+      "target": "feature-f11-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "unified"
+      ],
+      "source": "SES-016",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tasks",
+        "f112",
+        "graph",
+        "builder"
+      ],
+      "source": "SES-017",
+      "target": "SES-018",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
+      ],
+      "source": "SES-017",
+      "target": "feature-f2-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "f112",
+        "graph",
+        "builder"
+      ],
+      "source": "SES-017",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
+      ],
+      "source": "SES-018",
+      "target": "feature-f2-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "f112",
+        "graph",
+        "builder"
+      ],
+      "source": "SES-018",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "query",
+        "f113",
+        "unified"
+      ],
+      "source": "SES-019",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "core"
+      ],
+      "source": "epic-e1",
+      "target": "epic-e3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "core"
+      ],
+      "source": "epic-e1",
+      "target": "feature-f1-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "core"
+      ],
+      "source": "epic-e1",
+      "target": "feature-f3-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "core"
+      ],
+      "source": "epic-e3",
+      "target": "feature-f1-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "core",
+        "identity"
+      ],
+      "source": "epic-e3",
+      "target": "feature-f3-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "context",
+        "skills"
+      ],
+      "source": "epic-e4",
+      "target": "feature-f11-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "graph"
+      ],
+      "source": "epic-e8",
+      "target": "feature-f2-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "graph"
+      ],
+      "source": "epic-e8",
+      "target": "feature-f3-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "work"
+      ],
+      "source": "epic-e8",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "work",
+        "tracking"
+      ],
+      "source": "epic-e8",
+      "target": "/epic-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command",
+        "pending"
+      ],
+      "source": "feature-f7-1",
+      "target": "feature-f7-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command"
+      ],
+      "source": "feature-f7-1",
+      "target": "feature-f7-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f7-1",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command",
+        "pending"
+      ],
+      "source": "feature-f7-1",
+      "target": "feature-f10-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command",
+        "pending"
+      ],
+      "source": "feature-f7-1",
+      "target": "feature-f10-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f7-1",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command"
+      ],
+      "source": "feature-f7-3",
+      "target": "feature-f7-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f7-3",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command",
+        "pending"
+      ],
+      "source": "feature-f7-3",
+      "target": "feature-f10-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command",
+        "pending"
+      ],
+      "source": "feature-f7-3",
+      "target": "feature-f10-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f7-3",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command"
+      ],
+      "source": "feature-f7-5",
+      "target": "feature-f10-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command"
+      ],
+      "source": "feature-f7-5",
+      "target": "feature-f10-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "30min"
+      ],
+      "source": "feature-f1-1",
+      "target": "feature-f1-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "core"
+      ],
+      "source": "feature-f1-6",
+      "target": "feature-f3-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "graph"
+      ],
+      "source": "feature-f2-2",
+      "target": "feature-f3-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "builder"
+      ],
+      "source": "feature-f2-2",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "query",
+        "complete"
+      ],
+      "source": "feature-f2-3",
+      "target": "feature-f3-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "commands",
+        "pending"
+      ],
+      "source": "feature-f2-4",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "graph"
+      ],
+      "source": "feature-f8-3",
+      "target": "feature-f3-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "graph"
+      ],
+      "source": "feature-f8-3",
+      "target": "feature-f11-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "graph"
+      ],
+      "source": "feature-f8-3",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "queries",
+        "pending"
+      ],
+      "source": "feature-f8-4",
+      "target": "feature-f3-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "work"
+      ],
+      "source": "feature-f8-4",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "queries",
+        "pending"
+      ],
+      "source": "feature-f8-4",
+      "target": "feature-f9-11",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "jsonl"
+      ],
+      "source": "feature-f3-1",
+      "target": "feature-f3-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "jsonl",
+        "memory"
+      ],
+      "source": "feature-f3-1",
+      "target": "feature-f3-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "memory"
+      ],
+      "source": "feature-f3-1",
+      "target": "feature-f3-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "jsonl"
+      ],
+      "source": "feature-f3-2",
+      "target": "feature-f3-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "memory"
+      ],
+      "source": "feature-f3-3",
+      "target": "feature-f3-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "jsonl"
+      ],
+      "source": "feature-f3-3",
+      "target": "feature-f3-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "graph",
+        "memory"
+      ],
+      "source": "feature-f3-3",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "graph"
+      ],
+      "source": "feature-f3-5",
+      "target": "feature-f11-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "graph",
+        "skills"
+      ],
+      "source": "feature-f3-5",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "pending",
+        "skills"
+      ],
+      "source": "feature-f3-5",
+      "target": "feature-f11-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "sessionclose",
+        "pending"
+      ],
+      "source": "feature-f3-5",
+      "target": "feature-f9-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "sessionstart",
+        "pending"
+      ],
+      "source": "feature-f3-5",
+      "target": "feature-f9-8",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "pending",
+        "queries"
+      ],
+      "source": "feature-f3-5",
+      "target": "feature-f9-11",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "graph",
+        "unified"
+      ],
+      "source": "feature-f11-1",
+      "target": "feature-f11-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "unified"
+      ],
+      "source": "feature-f11-1",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "schema",
+        "pending"
+      ],
+      "source": "feature-f11-1",
+      "target": "feature-f10-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "models",
+        "schema",
+        "pending",
+        "pydantic"
+      ],
+      "source": "feature-f11-1",
+      "target": "feature-f9-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "unified"
+      ],
+      "source": "feature-f11-2",
+      "target": "feature-f11-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "skills"
+      ],
+      "source": "feature-f11-2",
+      "target": "feature-f11-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "memory"
+      ],
+      "source": "feature-f11-2",
+      "target": "feature-f10-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "memory"
+      ],
+      "source": "feature-f11-2",
+      "target": "feature-f10-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "work",
+        "memory"
+      ],
+      "source": "feature-f11-2",
+      "target": "/session-start",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "query",
+        "pending",
+        "context"
+      ],
+      "source": "feature-f11-3",
+      "target": "feature-f11-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f11-3",
+      "target": "feature-f10-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f11-3",
+      "target": "feature-f10-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f11-3",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "skill",
+        "pending"
+      ],
+      "source": "feature-f11-4",
+      "target": "feature-f9-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "pending"
+      ],
+      "source": "feature-f11-4",
+      "target": "feature-f9-8",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "pending"
+      ],
+      "source": "feature-f11-4",
+      "target": "feature-f9-11",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "pattern"
+      ],
+      "source": "feature-f10-1",
+      "target": "feature-f10-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "schema",
+        "pending"
+      ],
+      "source": "feature-f10-1",
+      "target": "feature-f9-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "command",
+        "pending",
+        "memory"
+      ],
+      "source": "feature-f10-2",
+      "target": "feature-f10-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f10-2",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "community",
+        "pending"
+      ],
+      "source": "feature-f10-3",
+      "target": "feature-f10-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "patterns"
+      ],
+      "source": "feature-f10-3",
+      "target": "feature-f9-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "raise",
+        "pending"
+      ],
+      "source": "feature-f10-4",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "teamorg",
+        "pending"
+      ],
+      "source": "feature-f10-5",
+      "target": "feature-f10-7",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "signal"
+      ],
+      "source": "feature-f10-6",
+      "target": "feature-f9-1",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "signal"
+      ],
+      "source": "feature-f10-6",
+      "target": "feature-f9-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "signal"
+      ],
+      "source": "feature-f10-6",
+      "target": "feature-f9-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "signal"
+      ],
+      "source": "feature-f9-1",
+      "target": "feature-f9-2",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "signal"
+      ],
+      "source": "feature-f9-1",
+      "target": "feature-f9-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "signal"
+      ],
+      "source": "feature-f9-2",
+      "target": "feature-f9-6",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "emit",
+        "emitters"
+      ],
+      "source": "feature-f9-3",
+      "target": "feature-f9-4",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "emit",
+        "emitters"
+      ],
+      "source": "feature-f9-3",
+      "target": "feature-f9-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "emit",
+        "emitters"
+      ],
+      "source": "feature-f9-4",
+      "target": "feature-f9-5",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "session"
+      ],
+      "source": "feature-f9-4",
+      "target": "feature-f9-8",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "insights"
+      ],
+      "source": "feature-f9-7",
+      "target": "feature-f9-8",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "insights"
+      ],
+      "source": "feature-f9-7",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "insights"
+      ],
+      "source": "feature-f9-8",
+      "target": "feature-f9-10",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "integration",
+        "pending"
+      ],
+      "source": "feature-f9-8",
+      "target": "feature-f9-11",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pending",
+        "telemetry"
+      ],
+      "source": "feature-f9-10",
+      "target": "feature-f9-11",
+      "key": 0
+    },
+    {
+      "type": "needs_context",
+      "weight": 1.0,
+      "source": "/epic-plan",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "starting",
+        "work",
+        "feature"
+      ],
+      "source": "/epic-plan",
+      "target": "/epic-design",
+      "key": 1
+    },
+    {
+      "type": "related_to",
+      "weight": 1.0,
+      "source": "/epic-plan",
+      "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "create",
+        "feature"
+      ],
+      "source": "/epic-plan",
+      "target": "/feature-design",
+      "key": 1
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "dependencies",
+        "features",
+        "executable",
+        "create",
+        "implementation",
+        "plan"
+      ],
+      "source": "/epic-plan",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "progress",
+        "work"
+      ],
+      "source": "/epic-plan",
+      "target": "/session-start",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "implementation"
+      ],
+      "source": "/epic-plan",
+      "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "implementation",
+        "plan"
+      ],
+      "source": "/epic-plan",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 1.0,
+      "source": "/feature-plan",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "implementation",
+        "plan"
+      ],
+      "source": "/feature-plan",
+      "target": "/feature-implement",
+      "key": 1
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "create"
+      ],
+      "source": "/feature-plan",
+      "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "identify",
+        "features",
+        "implementation"
+      ],
+      "source": "/feature-plan",
+      "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "features",
+        "design"
+      ],
+      "source": "/feature-plan",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 1.0,
+      "source": "/feature-design",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "planning",
+        "code"
+      ],
+      "source": "/feature-design",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "feature",
+        "features",
+        "significant",
+        "decisions",
+        "architectural"
+      ],
+      "source": "/feature-design",
+      "target": "/epic-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "continuity",
+        "sessions",
+        "session",
+        "memory"
+      ],
+      "source": "/session-close",
+      "target": "/session-start",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "close",
+        "learnings"
+      ],
+      "source": "/session-close",
+      "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "needs_context",
+      "weight": 1.0,
+      "source": "/feature-review",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "implementation"
+      ],
+      "source": "/feature-review",
+      "target": "/feature-implement",
+      "key": 1
+    },
+    {
+      "type": "needs_context",
+      "weight": 1.0,
+      "source": "/feature-implement",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 1.0,
+      "source": "/feature-implement",
+      "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 1.0,
+      "source": "/epic-design",
+      "target": "/epic-plan",
+      "key": 0
+    }
+  ]
+}

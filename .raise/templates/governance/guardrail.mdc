@@ -1,0 +1,59 @@
+---
+id: "{LEVEL}-{CATEGORY}-{NUMBER}"
+level: "MUST | SHOULD | MAY"
+scope: "**/*.{ext}"
+version: "1.0.0"
+category: "{architecture | testing | security | api | code | errors | documentation}"
+---
+
+# {Título del Guardrail}
+
+## Regla
+
+{Descripción clara y concisa de QUÉ debe cumplirse. Una o dos oraciones que definan la regla sin ambigüedad.}
+
+## Contexto
+
+{Golden Context para agentes AI. Instrucciones detalladas de CÓMO aplicar esta regla durante la generación de código o artefactos.}
+
+Al generar código/artefactos:
+- {Instrucción específica 1}
+- {Instrucción específica 2}
+- {Instrucción específica 3}
+
+## Verificación
+
+```yaml
+check: {manual | automated | coverage | lint | test}
+command: "{comando de verificación si aplica}"
+threshold: {valor numérico si aplica}
+blocking: {true para MUST, false para SHOULD}
+on_failure:
+  message: "{mensaje de error descriptivo}"
+  recovery: "{acción de recuperación sugerida}"
+```
+
+## Ejemplos
+
+### Correcto
+
+```{lang}
+{Ejemplo de código/artefacto que CUMPLE la regla}
+```
+
+### Incorrecto
+
+```{lang}
+{Ejemplo de código/artefacto que VIOLA la regla}
+```
+
+---
+
+## Metadata
+
+| Campo | Valor |
+|-------|-------|
+| **Creado** | {fecha} |
+| **Autor** | {autor/equipo} |
+| **Rationale** | {Por qué existe esta regla} |
+| **Excepciones** | {Casos donde no aplica, si los hay} |
