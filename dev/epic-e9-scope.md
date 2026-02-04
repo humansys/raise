@@ -79,8 +79,8 @@ Five deterministic signals that enable continuous improvement:
 | F9.1 | **Signal Schema** | XS | ✓ Done | Define signal types in Pydantic models |
 | F9.2 | **Signal Writer** | S | ✓ Done | Append signals to `.rai/telemetry/signals.jsonl` |
 | F9.3 | **Skill Emitters** | S | ✓ Done | Emit skill_event on start/complete/abandon |
-| F9.4 | **Session Emitters** | S | Pending | Emit session_event from /session-close |
-| F9.5 | **Error Emitters** | XS | Pending | Emit error_event on tool failures |
+| F9.4 | **Session Emitters** | S | ✓ Done | Emit session_event from /session-close |
+| F9.5 | **Error Emitters** | XS | ✓ Done | Emit error_event on tool failures |
 
 **Effort:** 4-5 hours | **Cost:** $0
 
@@ -350,14 +350,14 @@ This feature was 33% faster than your typical S feature.
 ## In Scope (Phase 1 — F&F)
 
 **MUST:**
-- [ ] Signal schema (Pydantic models)
-- [ ] Signal writer (append to signals.jsonl)
-- [ ] Skill event emitters (start/complete/abandon)
-- [ ] Session event emitter (in /session-close)
+- [x] Signal schema (Pydantic models)
+- [x] Signal writer (append to signals.jsonl)
+- [x] Skill event emitters (start/complete/abandon)
+- [x] Session event emitter (in /session-close)
 
 **SHOULD:**
-- [ ] Error event emitter
-- [ ] Command usage tracking
+- [x] Error event emitter
+- [ ] Command usage tracking (deferred — CLI commands not yet implemented)
 
 ---
 
@@ -515,12 +515,12 @@ Stream 3:         F9.5 ─────► merge (parallel after F9.2)
 | F9.1 Signal Schema | XS | ✓ Done | 18m | 1.4x | ADR-specified |
 | F9.2 Signal Writer | S | ✓ Done | 22m | 2.0x | Convenience funcs added |
 | F9.3 Skill Emitters | S | ✓ Done | 8m | 3.75x | Shell scripts, minimal change |
-| F9.4 Session Emitters | S | Pending | - | - | |
-| F9.5 Error Emitters | XS | Pending | - | - | |
+| F9.4 Session Emitters | S | ✓ Done | 23m | 2.6x | CLI approach + emit-calibration bonus |
+| F9.5 Error Emitters | XS | ✓ Done | 3m | 5.0x | Pattern reuse |
 
 **Milestone Progress:**
 - [x] M1: Walking Skeleton (F9.1 + F9.2 complete)
-- [ ] M2: Signal Collection (Phase 1 Complete)
+- [x] M2: Signal Collection (Phase 1 Complete)
 
 ### Sequencing Rationale
 

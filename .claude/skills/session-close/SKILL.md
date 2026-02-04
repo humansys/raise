@@ -185,11 +185,39 @@ Provide a brief handoff for the next session:
 
 **Verification:** Clear handoff documented.
 
+### Step 8: Emit Session Telemetry
+
+Record the session signal for local learning:
+
+```bash
+raise telemetry emit-session \
+  --type {session_type} \
+  --outcome {success|partial|abandoned} \
+  --duration {minutes} \
+  --features {F1,F2,F3}
+```
+
+**Parameters:**
+- `--type`: Session type from Step 1 (feature, research, maintenance, etc.)
+- `--outcome`: How did it end? (success, partial, abandoned)
+- `--duration`: Approximate session length in minutes
+- `--features`: Comma-separated list of features worked on (if applicable)
+
+**Example:**
+```bash
+raise telemetry emit-session -t feature -o success -d 90 -f F9.1,F9.2,F9.3
+```
+
+**Verification:** Command runs and shows "Session event recorded".
+
+> **If you can't continue:** CLI not available → Skip; telemetry is optional.
+
 ## Output
 
 - **Patterns:** `.rai/memory/patterns.jsonl` (appended via CLI)
 - **Calibration:** `.rai/memory/calibration.jsonl` (if features completed)
 - **Session Index:** `.rai/memory/sessions/index.jsonl` (appended via CLI)
+- **Telemetry:** `.rai/telemetry/signals.jsonl` (session event via CLI)
 - **Context:** `CLAUDE.local.md` (updated manually)
 - **Session Log:** `dev/sessions/YYYY-MM-DD-{topic}.md` (if significant)
 - **Graph:** `.rai/memory/graph.json` (auto-rebuilt on next query)
