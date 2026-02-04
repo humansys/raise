@@ -646,3 +646,17 @@
 {"type":"skill_event","timestamp":"2026-02-04T18:36:51Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T18:44:45Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T19:04:31Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T19:07:19.900888Z","work_type":"feature","work_id":"F13.5","event":"start","phase":"design","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:07:29Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:07:29Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T19:08:09.673320Z","work_type":"feature","work_id":"F13.5","event":"start","phase":"plan","blocker":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T19:09:48.354972Z","work_type":"feature","work_id":"F13.5","event":"complete","phase":"plan","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:09:54Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:09:54Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:09:54Z","skill":"feature-plan","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T19:10:32.224700Z","work_type":"feature","work_id":"F13.5","event":"start","phase":"implement","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:13:44Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:13:44Z","skill":"feature-plan","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:13:44Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:13:44Z","skill":"feature-implement","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T19:20:13.103093Z","work_type":"feature","work_id":"F13.5","event":"complete","phase":"implement","blocker":null}
