@@ -22,8 +22,10 @@
 | E9 | **Local Learning & Self-Awareness** | ✅ Phase 1 Complete | `dev/epic-e9-scope.md` | — |
 | E10 | **Collective Intelligence** | 📋 Explored | `dev/epic-e10-scope.md` | P2 (V3) |
 | E11 | **Unified Context Architecture** | ✅ Complete | `dev/epic-e11-scope.md` | — |
+| E12 | **Complete Knowledge Graph** | 📋 Draft | `dev/epic-e12-scope.md` | P1 (post-F&F) |
 
 **F&F Scope (Feb 9):** E7 remaining
+**Post-F&F:** E12 (knowledge graph completion for MVC)
 
 **Sequence:**
 ```
