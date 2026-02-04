@@ -312,3 +312,4 @@
 {"type":"skill_event","timestamp":"2026-02-04T03:32:38Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T03:32:38Z","skill":"feature-design","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T03:32:38Z","skill":"feature-implement","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T03:34:02.481151Z","session_type":"feature","outcome":"partial","duration_min":45,"features":["F11.3"]}
