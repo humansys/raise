@@ -13,6 +13,7 @@ from raise_cli.governance.parsers.adr import extract_all_decisions
 from raise_cli.governance.parsers.backlog import extract_epics, extract_project
 from raise_cli.governance.parsers.constitution import extract_principles
 from raise_cli.governance.parsers.epic import extract_epic_details, extract_features
+from raise_cli.governance.parsers.guardrails import extract_all_guardrails
 from raise_cli.governance.parsers.prd import extract_requirements
 from raise_cli.governance.parsers.vision import extract_outcomes
 
@@ -173,6 +174,14 @@ class GovernanceExtractor:
         except Exception as e:
             logger.error(f"Error extracting ADRs: {e}")
 
+        # Extract Guardrails (E12 F12.2)
+        try:
+            guardrail_concepts = extract_all_guardrails(self.project_root)
+            concepts.extend(guardrail_concepts)
+            logger.info(f"Extracted {len(guardrail_concepts)} guardrails")
+        except Exception as e:
+            logger.error(f"Error extracting guardrails: {e}")
+
         return concepts
 
     def extract_with_result(self) -> ExtractionResult:
@@ -248,6 +257,16 @@ class GovernanceExtractor:
             files_processed += adr_root_count + adr_v2_count
         except Exception as e:
             errors.append(f"Error extracting ADRs: {e}")
+
+        # Extract Guardrails (E12 F12.2)
+        guardrails_file = self.project_root / "governance" / "solution" / "guardrails.md"
+        if guardrails_file.exists():
+            try:
+                guardrail_concepts = extract_all_guardrails(self.project_root)
+                concepts.extend(guardrail_concepts)
+                files_processed += 1
+            except Exception as e:
+                errors.append(f"Error extracting guardrails: {e}")
 
         return ExtractionResult(
             concepts=concepts,
@@ -340,6 +359,8 @@ class GovernanceExtractor:
             return ConceptType.PROJECT
         elif "epic" in file_name and "scope" in file_name:
             return ConceptType.EPIC
+        elif "guardrails" in file_name:
+            return ConceptType.GUARDRAIL
         else:
             raise ValueError(
                 f"Cannot infer concept type from file path: {file_path}. "

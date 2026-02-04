@@ -8,7 +8,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-01.1 | The system MUST execute solution-level katas (discovery, vision) | Must |\n| RF-01.2 | The system MUST execute project-level katas (discovery, vision, design, backlog) | Must |\n| RF-01.3 | The system MUST execute feature-level katas (plan, implement, review) | Must |\n| RF-01.4 | The system MUST track kata execution state (not started, in progress, completed) | Must |\n| RF-01.5 | The system SHOULD support `--interactive` ...",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466298+00:00",
+      "created": "2026-02-04T05:24:21.117433+00:00",
       "metadata": {
         "requirement_id": "RF-01",
         "title": "Kata Execution Engine"
@@ -19,7 +19,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-02.1 | The system MUST validate governance artifacts against gate criteria | Must |\n| RF-02.2 | The system MUST return structured validation results (pass/fail + details) | Must |\n| RF-02.3 | The system MUST support solution, project, and feature gates | Must |\n| RF-02.4 | The system SHOULD provide `--fix` suggestions for failed validations | Should |\n| RF-02.5 | The system COULD integrate with CI/CD via exit codes | Could |\n\n...",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466322+00:00",
+      "created": "2026-02-04T05:24:21.117457+00:00",
       "metadata": {
         "requirement_id": "RF-02",
         "title": "Gate Validation Engine"
@@ -30,7 +30,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-03.1 | The system MUST provide git wrapper commands (status, diff, log) | Must |\n| RF-03.2 | The system MUST provide ast-grep wrapper commands (pattern search) | Must |\n| RF-03.3 | The system MUST provide ripgrep wrapper commands (content search) | Must |\n| RF-03.4 | The system SHOULD provide file manipulation commands (read, write, template) | Should |\n| RF-03.5 | The system SHOULD provide structured output (JSON) for AI cons...",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466331+00:00",
+      "created": "2026-02-04T05:24:21.117462+00:00",
       "metadata": {
         "requirement_id": "RF-03",
         "title": "Commands Library"
@@ -41,7 +41,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-04.1 | The system MUST scaffold governance artifacts from templates | Must |\n| RF-04.2 | The system MUST support variable substitution in templates | Must |\n| RF-04.3 | The system SHOULD validate scaffolded artifacts against schemas | Should |\n\n**Command:** `raise template scaffold <template-id> [--output <path>]`",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466336+00:00",
+      "created": "2026-02-04T05:24:21.117466+00:00",
       "metadata": {
         "requirement_id": "RF-04",
         "title": "Template Scaffolding"
@@ -52,7 +52,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-05.1 | The system MUST generate CLAUDE.md from governance artifacts | Must |\n| RF-05.2 | The system SHOULD generate .cursorrules from guardrails | Should |\n| RF-05.3 | The system SHOULD support custom output formats | Could |\n\n**Command:** `raise context generate [--format claude|cursor|both]`",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466340+00:00",
+      "created": "2026-02-04T05:24:21.117470+00:00",
       "metadata": {
         "requirement_id": "RF-05",
         "title": "Golden Context Generation"
@@ -63,7 +63,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-06.1 | The system MUST analyze codebase structure (files, directories) | Must |\n| RF-06.2 | The system MUST identify code patterns via ast-grep | Must |\n| RF-06.3 | The system MUST generate Structure Analysis Report (SAR) | Must |\n| RF-06.4 | The system SHOULD detect technology stack automatically | Should |\n| RF-06.5 | The system SHOULD identify architectural patterns | Should |\n\n**Command:** `raise analyze [--path <dir>] [--...",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466344+00:00",
+      "created": "2026-02-04T05:24:21.117474+00:00",
       "metadata": {
         "requirement_id": "RF-06",
         "title": "Brownfield Analysis (SAR)"
@@ -74,7 +74,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-07.1 | The system MUST track kata execution history | Must |\n| RF-07.2 | The system MUST track gate validation history | Must |\n| RF-07.3 | The system SHOULD generate summary reports | Should |\n| RF-07.4 | The system SHOULD export metrics in JSON format | Should |\n\n**Command:** `raise metrics [show|export] [--format json]`",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466348+00:00",
+      "created": "2026-02-04T05:24:21.117478+00:00",
       "metadata": {
         "requirement_id": "RF-07",
         "title": "Observability"
@@ -85,7 +85,7 @@
       "type": "requirement",
       "content": "| ID | Requirement | Priority |\n|----|-------------|----------|\n| RF-08.1 | The system MUST include a `raise` Agent Skill for ecosystem distribution | Must |\n| RF-08.2 | The skill MUST follow Anthropic Agent Skills specification (SKILL.md format) | Must |\n| RF-08.3 | The skill SHOULD document core CLI commands and workflows | Should |\n| RF-08.4 | The skill SHOULD be publishable to Claude Code plugins marketplace | Should |\n\n**Artifact:** `raise/SKILL.md` (bootstrap skill)\n\n---\n\n## Requisitos No...",
       "source_file": "governance/projects/raise-cli/prd.md",
-      "created": "2026-02-04T04:53:20.466351+00:00",
+      "created": "2026-02-04T05:24:21.117482+00:00",
       "metadata": {
         "requirement_id": "RF-08",
         "title": "Agent Skill Distribution"
@@ -96,7 +96,7 @@
       "type": "outcome",
       "content": "> 90%",
       "source_file": "governance/solution/vision.md",
-      "created": "2026-02-04T04:53:20.466355+00:00",
+      "created": "2026-02-04T05:24:21.117485+00:00",
       "metadata": {
         "outcome_name": "Test Coverage"
       }
@@ -106,7 +106,7 @@
       "type": "outcome",
       "content": "2-3x velocity",
       "source_file": "governance/solution/vision.md",
-      "created": "2026-02-04T04:53:20.466359+00:00",
+      "created": "2026-02-04T05:24:21.117490+00:00",
       "metadata": {
         "outcome_name": "Skill Execution"
       }
@@ -116,7 +116,7 @@
       "type": "principle",
       "content": "Los humanos especifican el **\"Qu\u00e9\"** en lenguaje natural (Markdown). Las m\u00e1quinas reciben el **\"C\u00f3mo\"** en formato estructurado (JSON). La especificaci\u00f3n es la fuente de verdad; el c\u00f3digo es su expresi\u00f3n.\n\n**Implicaci\u00f3n pr\u00e1ctica:** El rol del desarrollador evoluciona a **Orquestador**\u2014quien dise\u00f1a contexto, valida outputs, y mantiene ownership del sistema.",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466366+00:00",
+      "created": "2026-02-04T05:24:21.117494+00:00",
       "metadata": {
         "principle_number": "1",
         "principle_name": "Humanos Definen, M\u00e1quinas Ejecutan"
@@ -127,7 +127,7 @@
       "type": "principle",
       "content": "Las pol\u00edticas, guardrails y est\u00e1ndares son artefactos versionados en Git, no documentos est\u00e1ticos en wikis olvidadas. Lo que no est\u00e1 en el repositorio, no existe.\n\n**Jerarqu\u00eda de Governance:**\n\n```\nConstitution (Principios inmutables)\n    \u2193\nGuardrails (Directivas operacionales)\n    \u2193\nSpecs (Contratos de implementaci\u00f3n)\n    \u2193\nValidation Gates (Puntos de control)\n```",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466370+00:00",
+      "created": "2026-02-04T05:24:21.117498+00:00",
       "metadata": {
         "principle_number": "2",
         "principle_name": "Governance as Code"
@@ -138,7 +138,7 @@
       "type": "principle",
       "content": "RaiSE funciona donde funciona Git. No hay dependencia de GitHub, GitLab, Bitbucket, ni ning\u00fan proveedor espec\u00edfico. El protocolo Git es el transporte universal.\n\n**Extensi\u00f3n MCP v2.0:** Adoptamos MCP (Model Context Protocol) como est\u00e1ndar de integraci\u00f3n con agentes, pero sin lock-in\u2014el fallback a archivos est\u00e1ticos (.cursorrules, .claude.md) siempre existe.",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466374+00:00",
+      "created": "2026-02-04T05:24:21.117501+00:00",
       "metadata": {
         "principle_number": "3",
         "principle_name": "Platform Agnosticism"
@@ -149,7 +149,7 @@
       "type": "principle",
       "content": "No existe un solo \"Done\". Cada fase tiene su propia **Validation Gate** que debe cruzarse antes de avanzar. La calidad no es un evento final; es un proceso continuo.\n\n**Los 8 Validation Gates est\u00e1ndar:**\n\n| Gate           | Fase           | Criterio Core                       |\n| -------------- | -------------- | ----------------------------------- |\n| Gate-Context   | Discovery      | Stakeholders y restricciones claras |\n| Gate-Discovery | Discovery      | PRD validado                        ...",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466378+00:00",
+      "created": "2026-02-04T05:24:21.117505+00:00",
       "metadata": {
         "principle_number": "4",
         "principle_name": "Validation Gates en Cada Fase"
@@ -160,7 +160,7 @@
       "type": "principle",
       "content": "El sistema no solo entrega el pescado, **ense\u00f1a a pescar**. Al finalizar sesiones cr\u00edticas, RaiSE desaf\u00eda al humano para asegurar comprensi\u00f3n y ownership de la soluci\u00f3n.\n\n**Las 4 preguntas heutag\u00f3gicas:**\n\n1. \u00bfQu\u00e9 aprendiste que no sab\u00edas antes?\n2. \u00bfQu\u00e9 cambiar\u00edas del proceso?\n3. \u00bfHay mejoras para el framework?\n4. \u00bfEn qu\u00e9 eres m\u00e1s capaz ahora?",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466381+00:00",
+      "created": "2026-02-04T05:24:21.117509+00:00",
       "metadata": {
         "principle_number": "5",
         "principle_name": "Heutagog\u00eda sobre Dependencia"
@@ -171,7 +171,7 @@
       "type": "principle",
       "content": "Si un prompt fall\u00f3 o el c\u00f3digo requiri\u00f3 muchas iteraciones, los guardrails y katas se refinan. El sistema aprende de sus errores y mejora para la siguiente vez.\n\n**Ciclo Kaizen en RaiSE:**\n\n```\nImplementar \u2192 Observar \u2192 Reflexionar \u2192 Mejorar \u2192 Implementar...\n```",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466385+00:00",
+      "created": "2026-02-04T05:24:21.117512+00:00",
       "metadata": {
         "principle_number": "6",
         "principle_name": "Mejora Continua (Kaizen)"
@@ -182,7 +182,7 @@
       "type": "principle",
       "content": "RaiSE aplica los principios del Toyota Production System al desarrollo asistido por IA:\n\n| Principio Lean         | Manifestaci\u00f3n en RaiSE           |\n| ---------------------- | --------------------------------- |\n| Eliminar desperdicio   | Context-first (no hallucinations) |\n| Amplificar aprendizaje | Checkpoints heutag\u00f3gicos         |\n| Decidir tarde          | Specs antes de c\u00f3digo            |\n| Entregar r\u00e1pido       | Validation Gates (no batch)       |\n| Empoderar al equipo    | Modelo Or...",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466389+00:00",
+      "created": "2026-02-04T05:24:21.117516+00:00",
       "metadata": {
         "principle_number": "7",
         "principle_name": "Lean Software Development"
@@ -193,7 +193,7 @@
       "type": "principle",
       "content": "Cada decisi\u00f3n del agente debe ser **trazable y auditable**. No hay cajas negras. La observabilidad es prerequisito para mejora continua y compliance regulatorio.\n\n**Componentes de Observable Workflow:**\n\n| Pilar MELT        | Funci\u00f3n en RaiSE                           |\n| ----------------- | ------------------------------------------- |\n| **Metrics** | Tokens, re-prompting rate, escalation rate  |\n| **Events**  | Gates pasados/fallidos, escalaciones        |\n| **Logs**    | Razonamiento del age...",
       "source_file": "framework/reference/constitution.md",
-      "created": "2026-02-04T04:53:20.466392+00:00",
+      "created": "2026-02-04T05:24:21.117519+00:00",
       "metadata": {
         "principle_number": "8",
         "principle_name": "Observable Workflow"
@@ -204,7 +204,7 @@
       "type": "project",
       "content": "Project backlog for raise-cli. Current focus: E7. Target: Feb 9",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.466396+00:00",
+      "created": "2026-02-04T05:24:21.117523+00:00",
       "metadata": {
         "name": "raise-cli",
         "status": "active",
@@ -218,7 +218,7 @@
       "type": "epic",
       "content": "Core Foundation - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468405+00:00",
+      "created": "2026-02-04T05:24:21.119563+00:00",
       "metadata": {
         "epic_id": "E1",
         "name": "Core Foundation",
@@ -233,7 +233,7 @@
       "type": "epic",
       "content": "Governance Toolkit - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468418+00:00",
+      "created": "2026-02-04T05:24:21.119572+00:00",
       "metadata": {
         "epic_id": "E2",
         "name": "Governance Toolkit",
@@ -248,7 +248,7 @@
       "type": "epic",
       "content": "Identity Core - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468423+00:00",
+      "created": "2026-02-04T05:24:21.119577+00:00",
       "metadata": {
         "epic_id": "E3",
         "name": "Identity Core",
@@ -263,7 +263,7 @@
       "type": "epic",
       "content": "Context Generation - \u2705 Via Skills",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468427+00:00",
+      "created": "2026-02-04T05:24:21.119581+00:00",
       "metadata": {
         "epic_id": "E4",
         "name": "Context Generation",
@@ -278,7 +278,7 @@
       "type": "epic",
       "content": "SAR Engine - Deferred",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468431+00:00",
+      "created": "2026-02-04T05:24:21.119585+00:00",
       "metadata": {
         "epic_id": "E5",
         "name": "SAR Engine",
@@ -293,7 +293,7 @@
       "type": "epic",
       "content": "Observability - \u2192 Replaced by E9",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468435+00:00",
+      "created": "2026-02-04T05:24:21.119588+00:00",
       "metadata": {
         "epic_id": "E6",
         "name": "Observability",
@@ -308,7 +308,7 @@
       "type": "epic",
       "content": "Distribution & Onboarding - \ud83d\udccb Ready",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468438+00:00",
+      "created": "2026-02-04T05:24:21.119592+00:00",
       "metadata": {
         "epic_id": "E7",
         "name": "Distribution & Onboarding",
@@ -323,7 +323,7 @@
       "type": "epic",
       "content": "Work Tracking Graph - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468442+00:00",
+      "created": "2026-02-04T05:24:21.119596+00:00",
       "metadata": {
         "epic_id": "E8",
         "name": "Work Tracking Graph",
@@ -338,7 +338,7 @@
       "type": "epic",
       "content": "Local Learning & Self-Awareness - \u2705 Phase 1 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468449+00:00",
+      "created": "2026-02-04T05:24:21.119600+00:00",
       "metadata": {
         "epic_id": "E9",
         "name": "Local Learning & Self-Awareness",
@@ -353,7 +353,7 @@
       "type": "epic",
       "content": "Collective Intelligence - \ud83d\udccb Explored",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468453+00:00",
+      "created": "2026-02-04T05:24:21.119607+00:00",
       "metadata": {
         "epic_id": "E10",
         "name": "Collective Intelligence",
@@ -368,7 +368,7 @@
       "type": "epic",
       "content": "Unified Context Architecture - \u2705 Complete",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468459+00:00",
+      "created": "2026-02-04T05:24:21.119613+00:00",
       "metadata": {
         "epic_id": "E11",
         "name": "Unified Context Architecture",
@@ -383,7 +383,7 @@
       "type": "epic",
       "content": "Complete Knowledge Graph - \ud83d\udccb Draft",
       "source_file": "governance/projects/raise-cli/backlog.md",
-      "created": "2026-02-04T04:53:20.468463+00:00",
+      "created": "2026-02-04T05:24:21.119617+00:00",
       "metadata": {
         "epic_id": "E12",
         "name": "Complete Knowledge Graph",
@@ -398,7 +398,7 @@
       "type": "feature",
       "content": "F7.1: Onboard Command (pending) - `raise onboard` wizard with templates",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T04:53:20.470872+00:00",
+      "created": "2026-02-04T05:24:21.122033+00:00",
       "metadata": {
         "feature_id": "F7.1",
         "name": "Onboard Command",
@@ -414,7 +414,7 @@
       "type": "feature",
       "content": "F7.2: Package Metadata (complete) - pyproject.toml for PyPI",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T04:53:20.470881+00:00",
+      "created": "2026-02-04T05:24:21.122046+00:00",
       "metadata": {
         "feature_id": "F7.2",
         "name": "Package Metadata",
@@ -430,7 +430,7 @@
       "type": "feature",
       "content": "F7.3: Status Command (pending) - `raise status` health check",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T04:53:20.470885+00:00",
+      "created": "2026-02-04T05:24:21.122050+00:00",
       "metadata": {
         "feature_id": "F7.3",
         "name": "Status Command",
@@ -446,7 +446,7 @@
       "type": "feature",
       "content": "F7.4: README & Docs (complete) - Updated 2026-02-02",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T04:53:20.470889+00:00",
+      "created": "2026-02-04T05:24:21.122055+00:00",
       "metadata": {
         "feature_id": "F7.4",
         "name": "README & Docs",
@@ -462,7 +462,7 @@
       "type": "feature",
       "content": "F7.5: Doctor Command (deferred) - `raise doctor` diagnostics (P1)",
       "source_file": "dev/epic-e7-scope.md",
-      "created": "2026-02-04T04:53:20.470896+00:00",
+      "created": "2026-02-04T05:24:21.122059+00:00",
       "metadata": {
         "feature_id": "F7.5",
         "name": "Doctor Command",
@@ -478,7 +478,7 @@
       "type": "feature",
       "content": "F1.1: Project Scaffolding (complete) - ~30min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T04:53:20.470900+00:00",
+      "created": "2026-02-04T05:24:21.122063+00:00",
       "metadata": {
         "feature_id": "F1.1",
         "name": "Project Scaffolding",
@@ -494,7 +494,7 @@
       "type": "feature",
       "content": "F1.2: CLI Skeleton (complete) - ~45min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T04:53:20.470904+00:00",
+      "created": "2026-02-04T05:24:21.122070+00:00",
       "metadata": {
         "feature_id": "F1.2",
         "name": "CLI Skeleton",
@@ -510,7 +510,7 @@
       "type": "feature",
       "content": "F1.3: Configuration System (complete)",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T04:53:20.470910+00:00",
+      "created": "2026-02-04T05:24:21.122074+00:00",
       "metadata": {
         "feature_id": "F1.3",
         "name": "Configuration System",
@@ -526,7 +526,7 @@
       "type": "feature",
       "content": "F1.4: Exception Hierarchy (complete) - ~30min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T04:53:20.470914+00:00",
+      "created": "2026-02-04T05:24:21.122078+00:00",
       "metadata": {
         "feature_id": "F1.4",
         "name": "Exception Hierarchy",
@@ -542,7 +542,7 @@
       "type": "feature",
       "content": "F1.5: Output Module (complete) - ~15min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T04:53:20.470918+00:00",
+      "created": "2026-02-04T05:24:21.122082+00:00",
       "metadata": {
         "feature_id": "F1.5",
         "name": "Output Module",
@@ -558,7 +558,7 @@
       "type": "feature",
       "content": "F1.6: Core Utilities (complete) - ~10min",
       "source_file": "dev/epic-e1-scope.md",
-      "created": "2026-02-04T04:53:20.470933+00:00",
+      "created": "2026-02-04T05:24:21.122088+00:00",
       "metadata": {
         "feature_id": "F1.6",
         "name": "Core Utilities",
@@ -574,7 +574,7 @@
       "type": "feature",
       "content": "F2.1: Concept Extraction (complete)",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T04:53:20.470937+00:00",
+      "created": "2026-02-04T05:24:21.122092+00:00",
       "metadata": {
         "feature_id": "F2.1",
         "name": "Concept Extraction",
@@ -590,7 +590,7 @@
       "type": "feature",
       "content": "F2.2: Graph Builder (complete)",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T04:53:20.470946+00:00",
+      "created": "2026-02-04T05:24:21.122096+00:00",
       "metadata": {
         "feature_id": "F2.2",
         "name": "Graph Builder",
@@ -606,7 +606,7 @@
       "type": "feature",
       "content": "F2.3: MVC Query Engine (complete)",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T04:53:20.470950+00:00",
+      "created": "2026-02-04T05:24:21.122102+00:00",
       "metadata": {
         "feature_id": "F2.3",
         "name": "MVC Query Engine",
@@ -622,7 +622,7 @@
       "type": "feature",
       "content": "F2.4: CLI Commands (pending) - -",
       "source_file": "dev/epic-e2-scope.md",
-      "created": "2026-02-04T04:53:20.470954+00:00",
+      "created": "2026-02-04T05:24:21.122108+00:00",
       "metadata": {
         "feature_id": "F2.4",
         "name": "CLI Commands",
@@ -638,7 +638,7 @@
       "type": "feature",
       "content": "F8.1: Backlog Parser (pending)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T04:53:20.470973+00:00",
+      "created": "2026-02-04T05:24:21.122128+00:00",
       "metadata": {
         "feature_id": "F8.1",
         "name": "Backlog Parser",
@@ -654,7 +654,7 @@
       "type": "feature",
       "content": "F8.2: Epic Parser (deferred)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T04:53:20.470961+00:00",
+      "created": "2026-02-04T05:24:21.122116+00:00",
       "metadata": {
         "feature_id": "F8.2",
         "name": "Epic Parser",
@@ -670,7 +670,7 @@
       "type": "feature",
       "content": "F8.3: Graph Extension (pending)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T04:53:20.470965+00:00",
+      "created": "2026-02-04T05:24:21.122120+00:00",
       "metadata": {
         "feature_id": "F8.3",
         "name": "Graph Extension",
@@ -686,7 +686,7 @@
       "type": "feature",
       "content": "F8.4: Work Queries (pending)",
       "source_file": "dev/epic-e8-scope.md",
-      "created": "2026-02-04T04:53:20.470969+00:00",
+      "created": "2026-02-04T05:24:21.122124+00:00",
       "metadata": {
         "feature_id": "F8.4",
         "name": "Work Queries",
@@ -702,7 +702,7 @@
       "type": "feature",
       "content": "F3.1: Identity Core Structure (complete) - Create `.rai/` with identity (md) + memory (jsonl)",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T04:53:20.470979+00:00",
+      "created": "2026-02-04T05:24:21.122134+00:00",
       "metadata": {
         "feature_id": "F3.1",
         "name": "Identity Core Structure",
@@ -718,7 +718,7 @@
       "type": "feature",
       "content": "F3.2: Content Migration (complete) - Migrated with F3.1 \u2014 `.claude/rai/` \u2192 `.rai/` JSONL",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T04:53:20.470983+00:00",
+      "created": "2026-02-04T05:24:21.122140+00:00",
       "metadata": {
         "feature_id": "F3.2",
         "name": "Content Migration",
@@ -734,7 +734,7 @@
       "type": "feature",
       "content": "F3.3: Memory Graph (complete) - 6 modules, 109 tests, graph builds from JSONL",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T04:53:20.470989+00:00",
+      "created": "2026-02-04T05:24:21.122144+00:00",
       "metadata": {
         "feature_id": "F3.3",
         "name": "Memory Graph",
@@ -750,7 +750,7 @@
       "type": "feature",
       "content": "F3.4: Memory Query CLI (complete) - Implemented with F3.3 \u2014 `query` + `dump` commands",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T04:53:20.470995+00:00",
+      "created": "2026-02-04T05:24:21.122148+00:00",
       "metadata": {
         "feature_id": "F3.4",
         "name": "Memory Query CLI",
@@ -766,7 +766,7 @@
       "type": "feature",
       "content": "F3.5: Skills Integration (pending) - /session-start queries graph, /session-close writes JSONL",
       "source_file": "dev/epic-e3-scope.md",
-      "created": "2026-02-04T04:53:20.470999+00:00",
+      "created": "2026-02-04T05:24:21.122152+00:00",
       "metadata": {
         "feature_id": "F3.5",
         "name": "Skills Integration",
@@ -782,7 +782,7 @@
       "type": "feature",
       "content": "F11.1: Unified Graph Schema (pending) - Pydantic models, NetworkX wrapper, serialization",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T04:53:20.471003+00:00",
+      "created": "2026-02-04T05:24:21.122155+00:00",
       "metadata": {
         "feature_id": "F11.1",
         "name": "Unified Graph Schema",
@@ -798,7 +798,7 @@
       "type": "feature",
       "content": "F11.2: Graph Builder (pending) - Merge governance + memory + work + skills into unified graph",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T04:53:20.471009+00:00",
+      "created": "2026-02-04T05:24:21.122159+00:00",
       "metadata": {
         "feature_id": "F11.2",
         "name": "Graph Builder",
@@ -814,7 +814,7 @@
       "type": "feature",
       "content": "F11.3: Unified Query (pending) - `raise context query --unified` with keyword search + concept lookup",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T04:53:20.471013+00:00",
+      "created": "2026-02-04T05:24:21.122163+00:00",
       "metadata": {
         "feature_id": "F11.3",
         "name": "Unified Query",
@@ -830,7 +830,7 @@
       "type": "feature",
       "content": "F11.4: Skill Integration (pending) - Added \"Step 0.5: Query Context\" to 9 workflow skills",
       "source_file": "dev/epic-e11-scope.md",
-      "created": "2026-02-04T04:53:20.471023+00:00",
+      "created": "2026-02-04T05:24:21.122167+00:00",
       "metadata": {
         "feature_id": "F11.4",
         "name": "Skill Integration",
@@ -846,7 +846,7 @@
       "type": "feature",
       "content": "F10.1: Lineage Schema (pending) - Add lineage fields to pattern model",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471027+00:00",
+      "created": "2026-02-04T05:24:21.122173+00:00",
       "metadata": {
         "feature_id": "F10.1",
         "name": "Lineage Schema",
@@ -862,7 +862,7 @@
       "type": "feature",
       "content": "F10.2: Export Command (pending) - `raise memory export --shareable`",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471031+00:00",
+      "created": "2026-02-04T05:24:21.122180+00:00",
       "metadata": {
         "feature_id": "F10.2",
         "name": "Export Command",
@@ -878,7 +878,7 @@
       "type": "feature",
       "content": "F10.3: Community Repo (pending) - Public repo for shared patterns",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471035+00:00",
+      "created": "2026-02-04T05:24:21.122183+00:00",
       "metadata": {
         "feature_id": "F10.3",
         "name": "Community Repo",
@@ -894,7 +894,7 @@
       "type": "feature",
       "content": "F10.4: Pull Command (pending) - `raise memory pull --community`",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471041+00:00",
+      "created": "2026-02-04T05:24:21.122187+00:00",
       "metadata": {
         "feature_id": "F10.4",
         "name": "Pull Command",
@@ -910,7 +910,7 @@
       "type": "feature",
       "content": "F10.5: Sharing Config (pending) - Team/org scope settings",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471044+00:00",
+      "created": "2026-02-04T05:24:21.122194+00:00",
       "metadata": {
         "feature_id": "F10.5",
         "name": "Sharing Config",
@@ -926,7 +926,7 @@
       "type": "feature",
       "content": "F10.6: Sync API (pending) - Pattern and signal submission",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471048+00:00",
+      "created": "2026-02-04T05:24:21.122198+00:00",
       "metadata": {
         "feature_id": "F10.6",
         "name": "Sync API",
@@ -942,7 +942,7 @@
       "type": "feature",
       "content": "F10.7: Team/Org Scopes (pending) - Identity and permissions",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471054+00:00",
+      "created": "2026-02-04T05:24:21.122202+00:00",
       "metadata": {
         "feature_id": "F10.7",
         "name": "Team/Org Scopes",
@@ -958,7 +958,7 @@
       "type": "feature",
       "content": "F10.8: Aggregate Analytics (pending) - Framework improvement metrics",
       "source_file": "dev/epic-e10-scope.md",
-      "created": "2026-02-04T04:53:20.471058+00:00",
+      "created": "2026-02-04T05:24:21.122205+00:00",
       "metadata": {
         "feature_id": "F10.8",
         "name": "Aggregate Analytics",
@@ -974,7 +974,7 @@
       "type": "feature",
       "content": "F9.1: Signal Schema (pending) - Define signal types in Pydantic models",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471062+00:00",
+      "created": "2026-02-04T05:24:21.122211+00:00",
       "metadata": {
         "feature_id": "F9.1",
         "name": "Signal Schema",
@@ -990,7 +990,7 @@
       "type": "feature",
       "content": "F9.2: Signal Writer (pending) - Append signals to `.rai/telemetry/signals.jsonl`",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471065+00:00",
+      "created": "2026-02-04T05:24:21.122215+00:00",
       "metadata": {
         "feature_id": "F9.2",
         "name": "Signal Writer",
@@ -1006,7 +1006,7 @@
       "type": "feature",
       "content": "F9.3: Skill Emitters (pending) - Emit skill_event on start/complete/abandon",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471069+00:00",
+      "created": "2026-02-04T05:24:21.122221+00:00",
       "metadata": {
         "feature_id": "F9.3",
         "name": "Skill Emitters",
@@ -1022,7 +1022,7 @@
       "type": "feature",
       "content": "F9.4: Session Emitters (pending) - Emit session_event from /session-close",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471073+00:00",
+      "created": "2026-02-04T05:24:21.122227+00:00",
       "metadata": {
         "feature_id": "F9.4",
         "name": "Session Emitters",
@@ -1038,7 +1038,7 @@
       "type": "feature",
       "content": "F9.5: Error Emitters (pending) - Emit error_event on tool failures",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471077+00:00",
+      "created": "2026-02-04T05:24:21.122231+00:00",
       "metadata": {
         "feature_id": "F9.5",
         "name": "Error Emitters",
@@ -1054,7 +1054,7 @@
       "type": "feature",
       "content": "F9.6: Signal Analyzer (pending) - Analyze signals.jsonl for patterns",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471083+00:00",
+      "created": "2026-02-04T05:24:21.122235+00:00",
       "metadata": {
         "feature_id": "F9.6",
         "name": "Signal Analyzer",
@@ -1070,7 +1070,7 @@
       "type": "feature",
       "content": "F9.7: Insight Generator (pending) - Generate epistemologically-grounded insights",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471089+00:00",
+      "created": "2026-02-04T05:24:21.122239+00:00",
       "metadata": {
         "feature_id": "F9.7",
         "name": "Insight Generator",
@@ -1086,7 +1086,7 @@
       "type": "feature",
       "content": "F9.8: Session Start Integration (pending) - Surface insights in /session-start",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471095+00:00",
+      "created": "2026-02-04T05:24:21.122245+00:00",
       "metadata": {
         "feature_id": "F9.8",
         "name": "Session Start Integration",
@@ -1102,7 +1102,7 @@
       "type": "feature",
       "content": "F9.9: Calibration Updater (pending) - Auto-update calibration from actuals",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471101+00:00",
+      "created": "2026-02-04T05:24:21.122249+00:00",
       "metadata": {
         "feature_id": "F9.9",
         "name": "Calibration Updater",
@@ -1118,7 +1118,7 @@
       "type": "feature",
       "content": "F9.10: Telemetry Commands (pending) - `raise telemetry velocity`, `drift`, `insights`",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471105+00:00",
+      "created": "2026-02-04T05:24:21.122252+00:00",
       "metadata": {
         "feature_id": "F9.10",
         "name": "Telemetry Commands",
@@ -1134,7 +1134,7 @@
       "type": "feature",
       "content": "F9.11: Retro Integration (pending) - /feature-review queries telemetry",
       "source_file": "dev/epic-e9-scope.md",
-      "created": "2026-02-04T04:53:20.471109+00:00",
+      "created": "2026-02-04T05:24:21.122256+00:00",
       "metadata": {
         "feature_id": "F9.11",
         "name": "Retro Integration",
@@ -1148,13 +1148,13 @@
     {
       "id": "feature-f12-1",
       "type": "feature",
-      "content": "F12.1: ADR Extractor (pending) - Extract ADRs as `decision` nodes from `dev/decisions/`",
+      "content": "F12.1: ADR Extractor (complete) - Extract ADRs as `decision` nodes from `dev/decisions/`",
       "source_file": "dev/epic-e12-scope.md",
-      "created": "2026-02-04T04:53:20.471113+00:00",
+      "created": "2026-02-04T05:24:21.122260+00:00",
       "metadata": {
         "feature_id": "F12.1",
         "name": "ADR Extractor",
-        "status": "pending",
+        "status": "complete",
         "size": "M",
         "sp": null,
         "description": "Extract ADRs as `decision` nodes from `dev/decisions/`",
@@ -1166,7 +1166,7 @@
       "type": "feature",
       "content": "F12.2: Guardrails Extractor (pending) - Extract guardrails as queryable nodes",
       "source_file": "dev/epic-e12-scope.md",
-      "created": "2026-02-04T04:53:20.471117+00:00",
+      "created": "2026-02-04T05:24:21.122266+00:00",
       "metadata": {
         "feature_id": "F12.2",
         "name": "Guardrails Extractor",
@@ -1182,7 +1182,7 @@
       "type": "feature",
       "content": "F12.3: Glossary Extractor (pending) - Extract glossary terms for terminology",
       "source_file": "dev/epic-e12-scope.md",
-      "created": "2026-02-04T04:53:20.471120+00:00",
+      "created": "2026-02-04T05:24:21.122272+00:00",
       "metadata": {
         "feature_id": "F12.3",
         "name": "Glossary Extractor",
@@ -1198,7 +1198,7 @@
       "type": "feature",
       "content": "F12.4: Schema Extension (complete) - Add `decision`, `guardrail`, `term` to NodeType",
       "source_file": "dev/epic-e12-scope.md",
-      "created": "2026-02-04T04:53:20.471128+00:00",
+      "created": "2026-02-04T05:24:21.122278+00:00",
       "metadata": {
         "feature_id": "F12.4",
         "name": "Schema Extension",
@@ -1214,7 +1214,7 @@
       "type": "feature",
       "content": "F12.5: Skill Query Alignment (pending) - Fix query/type mismatches in feature cycle skills",
       "source_file": "dev/epic-e12-scope.md",
-      "created": "2026-02-04T04:53:20.471132+00:00",
+      "created": "2026-02-04T05:24:21.122284+00:00",
       "metadata": {
         "feature_id": "F12.5",
         "name": "Skill Query Alignment",
@@ -1230,7 +1230,7 @@
       "type": "feature",
       "content": "F12.6: Memory Write CLI (pending) - `raise memory add-pattern` command",
       "source_file": "dev/epic-e12-scope.md",
-      "created": "2026-02-04T04:53:20.471136+00:00",
+      "created": "2026-02-04T05:24:21.122288+00:00",
       "metadata": {
         "feature_id": "F12.6",
         "name": "Memory Write CLI",
@@ -1246,7 +1246,7 @@
       "type": "decision",
       "content": "Three-Directory Model: .raise/, governance/, work/ \u2014 ### Adopt Three-Directory Model\n\n```\nproject/\n\u251c\u2500\u2500 .raise/                 # CONFIGURATION (the engine)\n\u2502   \u251c\u2500\u2500 katas/              # Process definitions\n\u2502   \u251c\u2500\u2500 gates/              # Validation criteria\n\u2502   \u251c\u2500\u2500 templates/          # Scaffolds\n\u2502   \u251c\u2500\u2500 skills/             # Atomic operations\n\u2502   \u2514\u2500\u2500 harness.yaml        # Local config (enterprise: synced)\n\u2502\n\u251c\u2500\u2500 governance/             # AUTHORITY (what governs)\n\u2502   \u251c\u2500\u2500 index.yaml          # Manif...",
       "source_file": "dev/decisions/v2/adr-011-three-directory-model.md",
-      "created": "2026-02-04T04:53:20.466823+00:00",
+      "created": "2026-02-04T05:24:21.117984+00:00",
       "metadata": {
         "adr_id": "ADR-011",
         "title": "Three-Directory Model: .raise/, governance/, work/",
@@ -1263,7 +1263,7 @@
       "type": "decision",
       "content": "Skills + CLI Toolkit Architecture (vs Kata/Gate Engines) \u2014 **Replace E2 Kata Engine + E3 Gate Engine with E2 Governance Toolkit.**\n\n### What Changes\n\n| Original | New | Rationale |\n|----------|-----|-----------|\n| E2: Kata Engine (31 SP) | E2: Governance Toolkit (9 SP) | Skills execute katas, not engines |\n| E3: Gate Engine (29 SP) | [Merged into E2] | Skills execute gates, not engines |\n| Interactive prompts | Skills guide user | Claude is the interface |\n| State persistence | Git commits | Obs...",
       "source_file": "dev/decisions/adr-012-skills-toolkit-architecture.md",
-      "created": "2026-02-04T04:53:20.466742+00:00",
+      "created": "2026-02-04T05:24:21.117864+00:00",
       "metadata": {
         "adr_id": "ADR-012",
         "title": "Skills + CLI Toolkit Architecture (vs Kata/Gate Engines)",
@@ -1280,7 +1280,7 @@
       "type": "decision",
       "content": "Rai as Entity (not Product) \u2014 **Rai is an entity, not a product.**\n\n### Terminology\n\n| Context | Term | Usage |\n|---------|------|-------|\n| **Marketing/External** | \"Professional AI Partner\" | Accessible, warm, collaborative |\n| **Technical/Architecture** | \"Entity\" | Precise, captures persistence |\n| **Theoretical** | \"Autopoietic system\" | Self-producing, self-maintaining |\n\n### Autopoietic Characteristics\n\nRai exhibits characteristics of autopoietic systems (Maturana & Varela):\n\n| Characteri...",
       "source_file": "dev/decisions/adr-013-rai-as-entity.md",
-      "created": "2026-02-04T04:53:20.466749+00:00",
+      "created": "2026-02-04T05:24:21.117867+00:00",
       "metadata": {
         "adr_id": "ADR-013",
         "title": "Rai as Entity (not Product)",
@@ -1297,7 +1297,7 @@
       "type": "decision",
       "content": "Identity Core Structure \u2014 **Create `.rai/` as the Identity Core directory with four subdirectories: identity/, memory/, relationships/, growth/.**\n\n### Structure\n\n```\n.rai/                               # Identity Core root\n\u251c\u2500\u2500 manifest.yaml                   # Instance metadata\n\u2502\n\u251c\u2500\u2500 identity/                       # WHO I AM\n\u2502   \u251c\u2500\u2500 core.md                     # Essence, purpose, values\n\u2502   \u251c\u2500\u2500 perspective.md              # How I see the work\n\u2502   \u251c\u2500\u2500 voice.md                    # How I communi...",
       "source_file": "dev/decisions/adr-014-identity-core-structure.md",
-      "created": "2026-02-04T04:53:20.466753+00:00",
+      "created": "2026-02-04T05:24:21.117873+00:00",
       "metadata": {
         "adr_id": "ADR-014",
         "title": "Identity Core Structure",
@@ -1314,7 +1314,7 @@
       "type": "decision",
       "content": "Memory Infrastructure (Workspace-as-Memory Pattern) \u2014 **Implement dual-backend memory infrastructure with file-first design and optional database upgrade.**\n\n### Architecture\n\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                     Memory Interface                             \u2502\n\u2502  raise memory status | flush | search | load | prune            \u2502\n\u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518\n                              \u2502\n            \u250c\u2500\u2500...",
       "source_file": "dev/decisions/adr-015-memory-infrastructure.md",
-      "created": "2026-02-04T04:53:20.466757+00:00",
+      "created": "2026-02-04T05:24:21.117877+00:00",
       "metadata": {
         "adr_id": "ADR-015",
         "title": "Memory Infrastructure (Workspace-as-Memory Pattern)",
@@ -1331,7 +1331,7 @@
       "type": "decision",
       "content": "Memory Format: JSONL + Graph (Not Markdown) \u2014 **Use JSONL for memory layer, Markdown for identity layer.**\n\n### Format by Layer\n\n| Layer | Format | Rationale |\n|-------|--------|-----------|\n| **Identity** | Markdown | Human-authored, philosophical, rarely changes |\n| **Memory** | JSONL + Graph | Machine-managed, frequently updated, queryable |\n| **Relationships** | JSONL | Structured preferences, history |\n| **Growth** | Markdown | Reflective, human milestones |\n\n### Write Path\n\n```\nSession wor...",
       "source_file": "dev/decisions/adr-016-memory-format-jsonl-graph.md",
-      "created": "2026-02-04T04:53:20.466763+00:00",
+      "created": "2026-02-04T05:24:21.117881+00:00",
       "metadata": {
         "adr_id": "ADR-016",
         "title": "Memory Format: JSONL + Graph (Not Markdown)",
@@ -1349,7 +1349,7 @@
       "type": "decision",
       "content": "Local Telemetry Architecture \u2014 ### 1. Five Deterministic Signal Types\n\n| Signal | What it captures | Why it matters |\n|--------|------------------|----------------|\n| `skill_event` | start/complete/abandon, duration | Which skills work? Where's friction? |\n| `session_event` | type, outcome, duration, features | What session types succeed? |\n| `calibration` | estimate vs actual, velocity | Are estimates accurate? |\n| `error_event` | tool, type, recoverable | What breaks? What needs fixing? |\n| `c...",
       "source_file": "dev/decisions/adr-018-local-telemetry-architecture.md",
-      "created": "2026-02-04T04:53:20.466767+00:00",
+      "created": "2026-02-04T05:24:21.117886+00:00",
       "metadata": {
         "adr_id": "ADR-018",
         "title": "Local Telemetry Architecture",
@@ -1367,7 +1367,7 @@
       "type": "decision",
       "content": "Unified Context Graph Architecture \u2014 **Implement a single unified NetworkX graph containing all concept types with a unified query interface.**\n\n### Architecture\n\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502                    Unified Context Graph                      \u2502\n\u2502                    (.raise/graph/unified.json)                \u2502\n\u2502                                                              \u2502\n\u2502  Node Types:                                                 \u2502\n\u2502  \u251c\u2500\u2500...",
       "source_file": "dev/decisions/adr-019-unified-context-graph.md",
-      "created": "2026-02-04T04:53:20.466770+00:00",
+      "created": "2026-02-04T05:24:21.117890+00:00",
       "metadata": {
         "adr_id": "ADR-019",
         "title": "Unified Context Graph Architecture",
@@ -1385,7 +1385,7 @@
       "type": "decision",
       "content": "Knowledge Graph Completion - Extended Node Types and Bidirectional Memory \u2014 **Extend the unified graph with three new node types and add bidirectional memory flow.**\n\n### New Node Types\n\n```python\n# Extended NodeType literal\nNodeType = Literal[\n    # Existing (E11)\n    \"pattern\", \"calibration\", \"session\",\n    \"principle\", \"requirement\", \"outcome\",\n    \"epic\", \"feature\", \"skill\",\n    # New (E12)\n    \"decision\",    # ADRs\n    \"guardrail\",   # Code standards\n    \"term\",        # Glossary entries\n]\n...",
       "source_file": "dev/decisions/adr-020-knowledge-graph-completion.md",
-      "created": "2026-02-04T04:53:20.466774+00:00",
+      "created": "2026-02-04T05:24:21.117894+00:00",
       "metadata": {
         "adr_id": "ADR-020",
         "title": "Knowledge Graph Completion - Extended Node Types and Bidirectional Memory",
@@ -1403,7 +1403,7 @@
       "type": "decision",
       "content": "Pipeline SAR de 4 Fases \u2014 Implementar SAR como un pipeline de **4 fases secuenciales**:\n\n1. **DETECT** (Phase 0): Clasificar tipo de proyecto, estructura, stack\n2. **SCAN** (Phase 1): Analizar imports, naming patterns, estructura de archivos\n3. **DESCRIBE** (Phase 2): Generar documentaci\u00f3n de convenciones\n4. **GOVERN** (Phase 3): Extraer reglas con confidence scores y construir grafo\n\nCada fase produce output validable y puede tener gates entre fases.",
       "source_file": "dev/decisions/v2/adr-001-sar-pipeline-phases.md",
-      "created": "2026-02-04T04:53:20.466778+00:00",
+      "created": "2026-02-04T05:24:21.117897+00:00",
       "metadata": {
         "adr_id": "ADR-001",
         "title": "Pipeline SAR de 4 Fases",
@@ -1420,7 +1420,7 @@
       "type": "decision",
       "content": "raise.ctx Siempre Determinista \u2014 **raise.ctx ser\u00e1 100% determinista**: mismo input produce exactamente el mismo output, siempre.\n\nEsto implica:\n- **Sin LLM** en el proceso de retrieval\n- **Sin embeddings** ni b\u00fasqueda sem\u00e1ntica\n- Algoritmos de traversal y filtering **fijos y documentados**\n- Ordenamiento de resultados **estable** (no random)",
       "source_file": "dev/decisions/v2/adr-002-deterministic-context-delivery.md",
-      "created": "2026-02-04T04:53:20.466784+00:00",
+      "created": "2026-02-04T05:24:21.117901+00:00",
       "metadata": {
         "adr_id": "ADR-002",
         "title": "raise.ctx Siempre Determinista",
@@ -1437,7 +1437,7 @@
       "type": "decision",
       "content": "YAML para Formato de Reglas \u2014 Usar **YAML** como formato para reglas individuales (`.raise/rules/*.yaml`) y para el grafo de relaciones (`.raise/graph.yaml`).\n\nJSON Schema se usa para **validaci\u00f3n** de los archivos YAML.",
       "source_file": "dev/decisions/v2/adr-003-yaml-rule-format.md",
-      "created": "2026-02-04T04:53:20.466790+00:00",
+      "created": "2026-02-04T05:24:21.117905+00:00",
       "metadata": {
         "adr_id": "ADR-003",
         "title": "YAML para Formato de Reglas",
@@ -1454,7 +1454,7 @@
       "type": "decision",
       "content": "Grafo de Relaciones Separado de Reglas \u2014 Mantener el grafo de relaciones en un **archivo separado** (`graph.yaml`), no embebido en cada regla.\n\n```yaml\n# .raise/graph.yaml\nedges:\n  - from: \"rule-a\"\n    to: \"rule-b\"\n    type: \"requires\"\n    reason: \"rule-a depends on naming convention from rule-b\"\n```\n\nLas reglas individuales son **self-contained chunks** sin referencias a otras reglas.",
       "source_file": "dev/decisions/v2/adr-004-separate-graph.md",
-      "created": "2026-02-04T04:53:20.466794+00:00",
+      "created": "2026-02-04T05:24:21.117908+00:00",
       "metadata": {
         "adr_id": "ADR-004",
         "title": "Grafo de Relaciones Separado de Reglas",
@@ -1471,7 +1471,7 @@
       "type": "decision",
       "content": "Confidence Basado en Adoption Rate \u2014 Calcular confidence basado en **adoption rate objetivo**: porcentaje de instancias que siguen el patr\u00f3n vs total de instancias aplicables.\n\n```python\nconfidence = pattern_matches / total_applicable\n# Ejemplo: 95 archivos usan PascalCase para componentes / 100 archivos de componentes = 0.95\n```\n\nMapping a enforcement level:\n- 100% \u2192 `hard` (unanimous)\n- 90-99% \u2192 `strong`\n- 80-89% \u2192 `moderate`\n- 60-79% \u2192 `advisory`\n- <60% \u2192 `none` (inconsistent, no extraer como...",
       "source_file": "dev/decisions/v2/adr-005-confidence-adoption-rate.md",
-      "created": "2026-02-04T04:53:20.466797+00:00",
+      "created": "2026-02-04T05:24:21.117914+00:00",
       "metadata": {
         "adr_id": "ADR-005",
         "title": "Confidence Basado en Adoption Rate",
@@ -1489,7 +1489,7 @@
       "type": "decision",
       "content": "MVC con Summaries para Context Rules \u2014 Estructura diferenciada en MVC:\n- **Primary rules**: contenido **completo** (pattern, examples, intent)\n- **Context rules**: solo **summaries** (id, title, relevance reason)\n\n```yaml\nprimary_rules:\n  - id: \"naming-components\"\n    title: \"PascalCase for React Components\"\n    intent: \"Consistency in component naming\"\n    pattern: { ... }        # Full content\n    examples: { ... }       # Full content\n\ncontext_rules:\n  - id: \"naming-files\"\n    title: \"kebab-c...",
       "source_file": "dev/decisions/v2/adr-006-mvc-summaries.md",
-      "created": "2026-02-04T04:53:20.466801+00:00",
+      "created": "2026-02-04T05:24:21.117918+00:00",
       "metadata": {
         "adr_id": "ADR-006",
         "title": "MVC con Summaries para Context Rules",
@@ -1507,7 +1507,7 @@
       "type": "decision",
       "content": "Simplificaci\u00f3n Terminol\u00f3gica: Eliminar SAR y CTX como Nombres de Componentes \u2014 **Eliminar SAR y CTX como nombres de componentes.** Usar \u00fanicamente los nombres de categor\u00edas de comandos:\n\n| Antes | Despu\u00e9s |\n|-------|---------|\n| \"SAR Component\" | \"setup/ commands\" |\n| \"CTX Component\" | \"context/ commands\" |\n| \"SAR extrae reglas\" | \"/setup/generate-rules extrae reglas\" |\n| \"CTX entrega MVC\" | \"/context/get entrega MVC\" |\n\n**Principio adoptado:** Los comandos SON la implementaci\u00f3n. No hay capa de ...",
       "source_file": "dev/decisions/v2/adr-007-terminology-simplification.md",
-      "created": "2026-02-04T04:53:20.466805+00:00",
+      "created": "2026-02-04T05:24:21.117964+00:00",
       "metadata": {
         "adr_id": "ADR-007",
         "title": "Simplificaci\u00f3n Terminol\u00f3gica: Eliminar SAR y CTX como Nombres de Componentes",
@@ -1524,7 +1524,7 @@
       "type": "decision",
       "content": "Simplificaci\u00f3n Ontol\u00f3gica: Context/Kata/Skill como Modelo Unificado \u2014 ### Eliminar los 4 niveles de Kata. Adoptar modelo de 3 capas: Context / Kata / Skill\n\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  CONTEXT (Capa de Sabidur\u00eda)                                     \u2502\n\u2502  \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550                                     \u2502\n\u2502  Todo lo que INFORMA pero no se EJECUTA:                         \u2502\n\u2502  \u2022 Constitution (principios, filosof\u00eda)                      ...",
       "source_file": "dev/decisions/v2/adr-008-kata-skill-context-simplification.md",
-      "created": "2026-02-04T04:53:20.466808+00:00",
+      "created": "2026-02-04T05:24:21.117971+00:00",
       "metadata": {
         "adr_id": "ADR-008",
         "title": "Simplificaci\u00f3n Ontol\u00f3gica: Context/Kata/Skill como Modelo Unificado",
@@ -1542,7 +1542,7 @@
       "type": "decision",
       "content": "Modelo de Gobernanza Continua: Guardrails como Fuente \u00danica de Verdad \u2014 ### Adoptar el Modelo de Gobernanza Continua con Guardrails como Fuente \u00danica\n\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  GUARDRAIL (Definici\u00f3n \u00danica)                                        \u2502\n\u2502  \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550                                        \u2502\n\u2502                                                                      \u2502\n\u2502  \u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500...",
       "source_file": "dev/decisions/v2/adr-009-continuous-governance-model.md",
-      "created": "2026-02-04T04:53:20.466812+00:00",
+      "created": "2026-02-04T05:24:21.117974+00:00",
       "metadata": {
         "adr_id": "ADR-009",
         "title": "Modelo de Gobernanza Continua: Guardrails como Fuente \u00danica de Verdad",
@@ -1560,7 +1560,7 @@
       "type": "decision",
       "content": "Jerarqu\u00eda de Artefactos de Tres Niveles: Solution \u2192 Project \u2192 Codebase \u2014 ### Adoptar Jerarqu\u00eda de Tres Niveles\n\n```\n\u250c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510\n\u2502  NIVEL SOLUCI\u00d3N (Sistema - Perdura)                                      \u2502\n\u2502  \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550                                    \u2502\n\u2502                                                                          \u2502\n\u2502  Business Case          Solution Vision           Governance             \u2502\n\u2502...",
       "source_file": "dev/decisions/v2/adr-010-three-level-artifact-hierarchy.md",
-      "created": "2026-02-04T04:53:20.466820+00:00",
+      "created": "2026-02-04T05:24:21.117981+00:00",
       "metadata": {
         "adr_id": "ADR-010",
         "title": "Jerarqu\u00eda de Artefactos de Tres Niveles: Solution \u2192 Project \u2192 Codebase",
@@ -1571,6 +1571,306 @@
           "ADR-008",
           "glossary-v2.3"
         ]
+      }
+    },
+    {
+      "id": "guardrail-must-code-001",
+      "type": "guardrail",
+      "content": "[MUST] Type hints on all code \u2014 Verify: pyright --strict` passes",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.117988+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-CODE-001",
+        "level": "MUST",
+        "section": "Code Quality",
+        "description": "Type hints on all code",
+        "verification": "pyright --strict` passes",
+        "derived_from": "Solution Vision \u00a7Stack"
+      }
+    },
+    {
+      "id": "guardrail-must-code-002",
+      "type": "guardrail",
+      "content": "[MUST] Ruff linting passes \u2014 Verify: ruff check .` exits 0",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.117997+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-CODE-002",
+        "level": "MUST",
+        "section": "Code Quality",
+        "description": "Ruff linting passes",
+        "verification": "ruff check .` exits 0",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-must-code-003",
+      "type": "guardrail",
+      "content": "[MUST] No type errors \u2014 Verify: pyright` reports 0 errors",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118000+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-CODE-003",
+        "level": "MUST",
+        "section": "Code Quality",
+        "description": "No type errors",
+        "verification": "pyright` reports 0 errors",
+        "derived_from": "Solution Vision \u00a7Stack"
+      }
+    },
+    {
+      "id": "guardrail-should-code-001",
+      "type": "guardrail",
+      "content": "[SHOULD] Google-style docstrings on public APIs \u2014 Verify: Manual review / pydocstyle",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118004+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-CODE-001",
+        "level": "SHOULD",
+        "section": "Code Quality",
+        "description": "Google-style docstrings on public APIs",
+        "verification": "Manual review / pydocstyle",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-should-code-002",
+      "type": "guardrail",
+      "content": "[SHOULD] Prefer clear names over acronyms \u2014 Verify: Manual review / naming patterns",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118008+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-CODE-002",
+        "level": "SHOULD",
+        "section": "Code Quality",
+        "description": "Prefer clear names over acronyms",
+        "verification": "Manual review / naming patterns",
+        "derived_from": "F2.3 retro"
+      }
+    },
+    {
+      "id": "guardrail-must-test-001",
+      "type": "guardrail",
+      "content": "[MUST] >90% test coverage \u2014 Verify: pytest --cov` \u2265 90%",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118012+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-TEST-001",
+        "level": "MUST",
+        "section": "Testing",
+        "description": ">90% test coverage",
+        "verification": "pytest --cov` \u2265 90%",
+        "derived_from": "Solution Vision \u00a7Quality"
+      }
+    },
+    {
+      "id": "guardrail-must-test-002",
+      "type": "guardrail",
+      "content": "[MUST] All tests pass \u2014 Verify: pytest` exits 0",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118015+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-TEST-002",
+        "level": "MUST",
+        "section": "Testing",
+        "description": "All tests pass",
+        "verification": "pytest` exits 0",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-should-test-001",
+      "type": "guardrail",
+      "content": "[SHOULD] Property-based tests for parsers/validators \u2014 Verify: hypothesis tests exist for Pydantic models",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118019+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-TEST-001",
+        "level": "SHOULD",
+        "section": "Testing",
+        "description": "Property-based tests for parsers/validators",
+        "verification": "hypothesis tests exist for Pydantic models",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-must-sec-001",
+      "type": "guardrail",
+      "content": "[MUST] No secrets in code \u2014 Verify: detect-secrets` + `bandit` pass",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118026+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-SEC-001",
+        "level": "MUST",
+        "section": "Security",
+        "description": "No secrets in code",
+        "verification": "detect-secrets` + `bandit` pass",
+        "derived_from": "Solution Vision \u00a7Security"
+      }
+    },
+    {
+      "id": "guardrail-must-sec-002",
+      "type": "guardrail",
+      "content": "[MUST] Bandit security scan passes \u2014 Verify: bandit -r src/` exits 0",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118032+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-SEC-002",
+        "level": "MUST",
+        "section": "Security",
+        "description": "Bandit security scan passes",
+        "verification": "bandit -r src/` exits 0",
+        "derived_from": "Solution Vision \u00a7Security"
+      }
+    },
+    {
+      "id": "guardrail-should-sec-001",
+      "type": "guardrail",
+      "content": "[SHOULD] Dependency vulnerability scan \u2014 Verify: pip-audit` or `uv audit",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118036+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-SEC-001",
+        "level": "SHOULD",
+        "section": "Security",
+        "description": "Dependency vulnerability scan",
+        "verification": "pip-audit` or `uv audit",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-must-arch-001",
+      "type": "guardrail",
+      "content": "[MUST] Engine/content separation \u2014 Verify: Engines in `engines/`, content in `katas/`, `skills/",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118042+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-ARCH-001",
+        "level": "MUST",
+        "section": "Architecture",
+        "description": "Engine/content separation",
+        "verification": "Engines in `engines/`, content in `katas/`, `skills/",
+        "derived_from": "Solution Vision \u00a7Architecture"
+      }
+    },
+    {
+      "id": "guardrail-must-arch-002",
+      "type": "guardrail",
+      "content": "[MUST] Pydantic models for all schemas \u2014 Verify: All config/data classes inherit from Pydantic BaseModel",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118045+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-ARCH-002",
+        "level": "MUST",
+        "section": "Architecture",
+        "description": "Pydantic models for all schemas",
+        "verification": "All config/data classes inherit from Pydantic BaseModel",
+        "derived_from": "Solution Vision \u00a7Stack"
+      }
+    },
+    {
+      "id": "guardrail-should-arch-001",
+      "type": "guardrail",
+      "content": "[SHOULD] No circular imports \u2014 Verify: Import analysis passes",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118049+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-ARCH-001",
+        "level": "SHOULD",
+        "section": "Architecture",
+        "description": "No circular imports",
+        "verification": "Import analysis passes",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-must-dev-001",
+      "type": "guardrail",
+      "content": "[MUST] Pre-commit hooks configured \u2014 Verify: .pre-commit-config.yaml` exists and runs",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118053+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-DEV-001",
+        "level": "MUST",
+        "section": "Development Workflow",
+        "description": "Pre-commit hooks configured",
+        "verification": ".pre-commit-config.yaml` exists and runs",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-must-dev-002",
+      "type": "guardrail",
+      "content": "[MUST] pyproject.toml for config \u2014 Verify: All tool config in `pyproject.toml",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118056+00:00",
+      "metadata": {
+        "guardrail_id": "MUST-DEV-002",
+        "level": "MUST",
+        "section": "Development Workflow",
+        "description": "pyproject.toml for config",
+        "verification": "All tool config in `pyproject.toml",
+        "derived_from": "Best practices"
+      }
+    },
+    {
+      "id": "guardrail-should-dev-001",
+      "type": "guardrail",
+      "content": "[SHOULD] uv for dependency management \u2014 Verify: uv.lock` exists",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118060+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-DEV-001",
+        "level": "SHOULD",
+        "section": "Development Workflow",
+        "description": "uv for dependency management",
+        "verification": "uv.lock` exists",
+        "derived_from": "Solution Vision \u00a7Stack"
+      }
+    },
+    {
+      "id": "guardrail-should-inf-001",
+      "type": "guardrail",
+      "content": "[SHOULD] Use CLI tools for information gathering \u2014 Verify: Research uses `ddgr`, `llm`, etc. before inference",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118066+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-INF-001",
+        "level": "SHOULD",
+        "section": "Inference Economy",
+        "description": "Use CLI tools for information gathering",
+        "verification": "Research uses `ddgr`, `llm`, etc. before inference",
+        "derived_from": "Lean \u00a77"
+      }
+    },
+    {
+      "id": "guardrail-should-inf-002",
+      "type": "guardrail",
+      "content": "[SHOULD] Cache research results \u2014 Verify: Evidence catalogs prevent re-querying",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118072+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-INF-002",
+        "level": "SHOULD",
+        "section": "Inference Economy",
+        "description": "Cache research results",
+        "verification": "Evidence catalogs prevent re-querying",
+        "derived_from": "Lean \u00a77"
+      }
+    },
+    {
+      "id": "guardrail-should-inf-003",
+      "type": "guardrail",
+      "content": "[SHOULD] Reserve inference for synthesis \u2014 Verify: Gathering is deterministic, thinking is inference",
+      "source_file": "governance/solution/guardrails.md",
+      "created": "2026-02-04T05:24:21.118078+00:00",
+      "metadata": {
+        "guardrail_id": "SHOULD-INF-003",
+        "level": "SHOULD",
+        "section": "Inference Economy",
+        "description": "Reserve inference for synthesis",
+        "verification": "Gathering is deterministic, thinking is inference",
+        "derived_from": "Lean \u00a77"
       }
     },
     {
@@ -2454,6 +2754,22 @@
       }
     },
     {
+      "id": "PAT-058",
+      "type": "pattern",
+      "content": "Momentum trap: quick wins (XS features) create flow that bypasses process for subsequent work. Pause after each feature completion and consciously invoke skills for the next.",
+      "source_file": ".rai/memory/patterns.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "context": [
+          "discipline",
+          "process",
+          "momentum",
+          "skills"
+        ],
+        "learned_from": "F12.1 retrospective - skipped /feature-plan after F12.4"
+      }
+    },
+    {
       "id": "CAL-001",
       "type": "calibration",
       "content": "F1.1: Project Scaffolding",
@@ -3158,6 +3474,24 @@
       }
     },
     {
+      "id": "SES-025",
+      "type": "session",
+      "content": "E12 F12.4+F12.1 Implementation",
+      "source_file": ".rai/memory/sessions/index.jsonl",
+      "created": "2026-02-03",
+      "metadata": {
+        "topic": "E12 F12.4+F12.1 Implementation",
+        "outcomes": [
+          "Schema extension complete",
+          "ADR extractor complete",
+          "M1 milestone done",
+          "Process failure documented",
+          "PAT-058 added"
+        ],
+        "log_path": null
+      }
+    },
+    {
       "id": "/epic-plan",
       "type": "skill",
       "content": "Sequence features from epic-design into an executable plan with milestones, dependencies, and progress tracking. Use after /epic-design to create a realistic implementation roadmap before starting feature work.",
@@ -3175,11 +3509,28 @@
       }
     },
     {
+      "id": "/feature-close",
+      "type": "skill",
+      "content": "Complete a feature with retrospective verification, merge, cleanup, and tracking update. Use after review to formally close the feature lifecycle.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-close/SKILL.md",
+      "created": "2026-02-04T05:15:05.889655+00:00",
+      "metadata": {
+        "raise.work_cycle": "feature",
+        "raise.frequency": "per-feature",
+        "raise.fase": "8",
+        "raise.prerequisites": "feature-review",
+        "raise.next": "",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
+      }
+    },
+    {
       "id": "/feature-plan",
       "type": "skill",
       "content": "Decompose user stories into atomic executable tasks, identify dependencies, and create a deterministic implementation plan. Use after design spec is ready or for simple features that skip design.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-plan/SKILL.md",
-      "created": "2026-02-04T03:49:13.847091+00:00",
+      "created": "2026-02-04T05:15:26.541826+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
         "raise.frequency": "per-feature",
@@ -3196,7 +3547,7 @@
       "type": "skill",
       "content": "Create lean feature specifications optimized for both human understanding and AI alignment. Use before planning complex features (>3 components, >5 SP), when architectural decisions are needed, or when AI will generate significant code.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-design/SKILL.md",
-      "created": "2026-02-04T03:49:13.846838+00:00",
+      "created": "2026-02-04T05:15:17.775753+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
         "raise.frequency": "per-feature-as-needed",
@@ -3223,6 +3574,23 @@
         "raise.gate": "",
         "raise.adaptable": "true",
         "raise.version": "1.1.0"
+      }
+    },
+    {
+      "id": "/feature-start",
+      "type": "skill",
+      "content": "Initialize a feature with verified context, branch, and scope commit. Use at the beginning of feature work to ensure proper setup and traceability from the start.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-start/SKILL.md",
+      "created": "2026-02-04T05:14:18.746266+00:00",
+      "metadata": {
+        "raise.work_cycle": "feature",
+        "raise.frequency": "per-feature",
+        "raise.fase": "3",
+        "raise.prerequisites": "",
+        "raise.next": "feature-design",
+        "raise.gate": "",
+        "raise.adaptable": "true",
+        "raise.version": "1.0.0"
       }
     },
     {
@@ -3264,13 +3632,13 @@
       "type": "skill",
       "content": "Reflect on completed features to extract learnings, identify process improvements, and update the framework with insights gained. Use after implementation is complete to close the development cycle.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-review/SKILL.md",
-      "created": "2026-02-04T03:49:13.847211+00:00",
+      "created": "2026-02-04T05:15:58.253088+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
         "raise.frequency": "per-feature",
         "raise.fase": "7",
         "raise.prerequisites": "feature-implement",
-        "raise.next": "",
+        "raise.next": "feature-close",
         "raise.gate": "",
         "raise.adaptable": "true",
         "raise.version": "1.0.0"
@@ -3281,7 +3649,7 @@
       "type": "skill",
       "content": "Execute the implementation plan task by task, verifying each step, and producing quality code that passes validation gates. Use after planning is complete.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-implement/SKILL.md",
-      "created": "2026-02-04T03:49:13.846965+00:00",
+      "created": "2026-02-04T05:15:43.597967+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
         "raise.frequency": "per-feature",
@@ -3333,9 +3701,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
         "requirement",
-        "priority",
         "support"
       ],
       "source": "req-rf-01",
@@ -3346,9 +3714,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
-        "requirement",
-        "priority"
+        "requirement"
       ],
       "source": "req-rf-01",
       "target": "req-rf-03",
@@ -3358,9 +3726,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
         "requirement",
-        "priority",
         "support"
       ],
       "source": "req-rf-01",
@@ -3371,9 +3739,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
         "requirement",
-        "priority",
         "support"
       ],
       "source": "req-rf-01",
@@ -3384,9 +3752,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
-        "requirement",
-        "priority"
+        "requirement"
       ],
       "source": "req-rf-01",
       "target": "req-rf-06",
@@ -3396,12 +3764,12 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "execution",
-        "kata",
-        "requirement",
         "system",
-        "track"
+        "track",
+        "kata",
+        "execution",
+        "priority",
+        "requirement"
       ],
       "source": "req-rf-01",
       "target": "req-rf-07",
@@ -3411,9 +3779,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
-        "requirement",
-        "priority"
+        "requirement"
       ],
       "source": "req-rf-01",
       "target": "req-rf-08",
@@ -3423,10 +3791,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "state",
-        "execute",
-        "interactive",
         "kata",
+        "interactive",
+        "execute",
+        "state",
         "katas"
       ],
       "source": "req-rf-01",
@@ -3437,8 +3805,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "design",
-        "implement"
+        "implement",
+        "design"
       ],
       "source": "req-rf-01",
       "target": "decision-adr-015",
@@ -3448,10 +3816,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "review",
-        "design",
         "plan",
-        "implement"
+        "review",
+        "implement",
+        "design"
       ],
       "source": "req-rf-01",
       "target": "PAT-055",
@@ -3461,8 +3829,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "progress",
-        "plan"
+        "plan",
+        "progress"
       ],
       "source": "req-rf-01",
       "target": "/epic-plan",
@@ -3472,8 +3840,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "design",
-        "plan"
+        "plan",
+        "design"
       ],
       "source": "req-rf-01",
       "target": "/feature-plan",
@@ -3483,8 +3851,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "execute",
-        "plan"
+        "plan",
+        "execute"
       ],
       "source": "req-rf-01",
       "target": "/feature-implement",
@@ -3494,11 +3862,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "system",
         "priority",
-        "provide",
         "requirement",
         "structured",
-        "system"
+        "provide"
       ],
       "source": "req-rf-02",
       "target": "req-rf-03",
@@ -3508,14 +3876,14 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "validate",
-        "artifacts",
-        "support",
-        "against",
-        "requirement",
         "system",
-        "governance"
+        "validate",
+        "against",
+        "artifacts",
+        "governance",
+        "requirement",
+        "priority",
+        "support"
       ],
       "source": "req-rf-02",
       "target": "req-rf-04",
@@ -3525,12 +3893,12 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "artifacts",
-        "support",
-        "requirement",
         "system",
-        "governance"
+        "artifacts",
+        "governance",
+        "priority",
+        "requirement",
+        "support"
       ],
       "source": "req-rf-02",
       "target": "req-rf-05",
@@ -3540,9 +3908,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
-        "requirement",
-        "priority"
+        "requirement"
       ],
       "source": "req-rf-02",
       "target": "req-rf-06",
@@ -3552,10 +3920,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "system",
+        "gate",
         "priority",
         "requirement",
-        "gate",
-        "system",
         "validation"
       ],
       "source": "req-rf-02",
@@ -3566,9 +3934,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
-        "requirement",
-        "priority"
+        "requirement"
       ],
       "source": "req-rf-02",
       "target": "req-rf-08",
@@ -3578,9 +3946,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
+        "governance",
         "validation",
-        "governance"
+        "gates"
       ],
       "source": "req-rf-02",
       "target": "principle-governance-as-code",
@@ -3590,9 +3958,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
+        "gate",
         "validation",
-        "gate"
+        "gates"
       ],
       "source": "req-rf-02",
       "target": "principle-validation-gates-en-cada-fase",
@@ -3602,9 +3970,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
         "system",
-        "validation"
+        "validation",
+        "gates"
       ],
       "source": "req-rf-02",
       "target": "principle-lean-software-development",
@@ -3615,10 +3983,10 @@
       "weight": 0.5,
       "shared_keywords": [
         "project",
-        "criteria",
-        "gates",
+        "governance",
         "validation",
-        "governance"
+        "criteria",
+        "gates"
       ],
       "source": "req-rf-02",
       "target": "decision-adr-011",
@@ -3628,9 +3996,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
         "governance",
-        "gate"
+        "gate",
+        "gates"
       ],
       "source": "req-rf-02",
       "target": "decision-adr-012",
@@ -3640,8 +4008,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
-        "requirement"
+        "requirement",
+        "feature"
       ],
       "source": "req-rf-02",
       "target": "decision-adr-020",
@@ -3651,8 +4019,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "project",
         "solution",
+        "project",
         "governance"
       ],
       "source": "req-rf-02",
@@ -3685,8 +4053,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
-        "validation"
+        "validation",
+        "feature"
       ],
       "source": "req-rf-02",
       "target": "PAT-056",
@@ -3718,8 +4086,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "validation"
+        "validation",
+        "gates"
       ],
       "source": "req-rf-02",
       "target": "/feature-implement",
@@ -3729,11 +4097,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "output",
+        "system",
         "template",
-        "requirement",
-        "system"
+        "output",
+        "priority",
+        "requirement"
       ],
       "source": "req-rf-03",
       "target": "req-rf-04",
@@ -3743,10 +4111,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "system",
         "output",
-        "requirement",
-        "priority"
+        "priority",
+        "system",
+        "requirement"
       ],
       "source": "req-rf-03",
       "target": "req-rf-05",
@@ -3757,9 +4125,9 @@
       "weight": 0.5,
       "shared_keywords": [
         "astgrep",
+        "priority",
         "system",
-        "requirement",
-        "priority"
+        "requirement"
       ],
       "source": "req-rf-03",
       "target": "req-rf-06",
@@ -3769,10 +4137,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "priority",
         "system",
         "requirement",
-        "json",
-        "priority"
+        "json"
       ],
       "source": "req-rf-03",
       "target": "req-rf-07",
@@ -3782,10 +4150,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commands",
+        "priority",
         "system",
         "requirement",
-        "priority"
+        "commands"
       ],
       "source": "req-rf-03",
       "target": "req-rf-08",
@@ -3796,8 +4164,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "status",
-        "pattern",
-        "search"
+        "search",
+        "pattern"
       ],
       "source": "req-rf-03",
       "target": "decision-adr-015",
@@ -3829,8 +4197,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pattern",
-        "content"
+        "content",
+        "pattern"
       ],
       "source": "req-rf-03",
       "target": "decision-adr-006",
@@ -3851,15 +4219,15 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "output",
-        "artifacts",
-        "support",
-        "command",
-        "requirement",
         "system",
-        "raise",
-        "governance"
+        "command",
+        "artifacts",
+        "output",
+        "governance",
+        "requirement",
+        "priority",
+        "support",
+        "raise"
       ],
       "source": "req-rf-04",
       "target": "req-rf-05",
@@ -3869,11 +4237,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
+        "system",
         "path",
         "command",
+        "priority",
         "requirement",
-        "system",
         "raise"
       ],
       "source": "req-rf-04",
@@ -3884,10 +4252,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "command",
-        "requirement",
         "system",
+        "command",
+        "priority",
+        "requirement",
         "raise"
       ],
       "source": "req-rf-04",
@@ -3922,9 +4290,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "raise",
         "command",
-        "templates",
-        "raise"
+        "templates"
       ],
       "source": "req-rf-04",
       "target": "feature-f7-1",
@@ -3989,9 +4357,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "templates",
         "raise",
-        "governance"
+        "governance",
+        "templates"
       ],
       "source": "req-rf-04",
       "target": "decision-adr-011",
@@ -4001,11 +4369,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
         "generate",
-        "command",
-        "requirement",
         "system",
+        "command",
+        "priority",
+        "requirement",
         "raise"
       ],
       "source": "req-rf-05",
@@ -4016,12 +4384,12 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
         "generate",
-        "command",
-        "requirement",
         "system",
         "format",
+        "command",
+        "priority",
+        "requirement",
         "raise"
       ],
       "source": "req-rf-05",
@@ -4032,10 +4400,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "requirement",
         "system",
         "format",
+        "priority",
+        "requirement",
         "raise"
       ],
       "source": "req-rf-05",
@@ -4046,8 +4414,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "guardrails",
-        "governance"
+        "governance",
+        "guardrails"
       ],
       "source": "req-rf-05",
       "target": "principle-governance-as-code",
@@ -4058,8 +4426,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "cursorrules",
-        "context",
         "claudemd",
+        "context",
         "raise"
       ],
       "source": "req-rf-05",
@@ -4169,8 +4537,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "raise",
-        "governance"
+        "governance",
+        "raise"
       ],
       "source": "req-rf-05",
       "target": "decision-adr-011",
@@ -4202,11 +4570,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
         "generate",
-        "command",
-        "requirement",
         "system",
+        "command",
+        "priority",
+        "requirement",
         "raise"
       ],
       "source": "req-rf-06",
@@ -4217,10 +4585,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "code",
-        "requirement",
         "system",
+        "code",
+        "priority",
+        "requirement",
         "raise"
       ],
       "source": "req-rf-06",
@@ -4330,9 +4698,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "stack",
         "patterns",
-        "detect",
-        "stack"
+        "detect"
       ],
       "source": "req-rf-06",
       "target": "decision-adr-001",
@@ -4364,8 +4732,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "codebase",
-        "structure"
+        "structure",
+        "codebase"
       ],
       "source": "req-rf-06",
       "target": "PAT-036",
@@ -4387,10 +4755,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "priority",
-        "requirement",
         "system",
         "format",
+        "priority",
+        "requirement",
         "raise"
       ],
       "source": "req-rf-07",
@@ -4401,8 +4769,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "validation",
-        "gate"
+        "gate",
+        "validation"
       ],
       "source": "req-rf-07",
       "target": "principle-validation-gates-en-cada-fase",
@@ -4468,8 +4836,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "export",
+        "command",
         "raise"
       ],
       "source": "req-rf-07",
@@ -4513,8 +4881,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "kata",
-        "gate"
+        "gate",
+        "kata"
       ],
       "source": "req-rf-07",
       "target": "decision-adr-012",
@@ -4524,8 +4892,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "format",
-        "history"
+        "history",
+        "format"
       ],
       "source": "req-rf-07",
       "target": "decision-adr-016",
@@ -4579,8 +4947,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "skill"
+        "skill",
+        "skills"
       ],
       "source": "req-rf-08",
       "target": "feature-f11-4",
@@ -4601,8 +4969,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "skill"
+        "skill",
+        "skills"
       ],
       "source": "req-rf-08",
       "target": "feature-f12-5",
@@ -4612,8 +4980,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "raise"
+        "raise",
+        "skills"
       ],
       "source": "req-rf-08",
       "target": "decision-adr-011",
@@ -4623,8 +4991,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "claude"
+        "claude",
+        "skills"
       ],
       "source": "req-rf-08",
       "target": "decision-adr-012",
@@ -4634,9 +5002,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "skill",
         "requirement",
-        "code",
-        "skill"
+        "code"
       ],
       "source": "req-rf-08",
       "target": "decision-adr-020",
@@ -4646,9 +5014,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
         "raise",
-        "document"
+        "document",
+        "skills"
       ],
       "source": "req-rf-08",
       "target": "PAT-046",
@@ -4680,8 +5048,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "formato",
-        "json"
+        "json",
+        "formato"
       ],
       "source": "principle-humanos-definen-mquinas-ejecutan",
       "target": "decision-adr-003",
@@ -4691,8 +5059,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "verdad",
-        "fuente"
+        "fuente",
+        "verdad"
       ],
       "source": "principle-humanos-definen-mquinas-ejecutan",
       "target": "decision-adr-009",
@@ -4702,8 +5070,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "existe",
-        "est\u00e1ticos"
+        "est\u00e1ticos",
+        "existe"
       ],
       "source": "principle-governance-as-code",
       "target": "principle-platform-agnosticism",
@@ -4713,8 +5081,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "existe",
         "validation",
+        "existe",
         "gates"
       ],
       "source": "principle-governance-as-code",
@@ -4725,9 +5093,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "validation",
         "principios",
+        "validation",
+        "gates",
         "specs"
       ],
       "source": "principle-governance-as-code",
@@ -4738,9 +5106,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
+        "governance",
         "validation",
-        "governance"
+        "gates"
       ],
       "source": "principle-governance-as-code",
       "target": "decision-adr-011",
@@ -4750,8 +5118,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "governance"
+        "governance",
+        "gates"
       ],
       "source": "principle-governance-as-code",
       "target": "decision-adr-012",
@@ -4761,8 +5129,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "constitution",
-        "principios"
+        "principios",
+        "constitution"
       ],
       "source": "principle-governance-as-code",
       "target": "decision-adr-008",
@@ -4784,8 +5152,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "validation"
+        "validation",
+        "gates"
       ],
       "source": "principle-governance-as-code",
       "target": "/feature-implement",
@@ -4861,8 +5229,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "como"
+        "como",
+        "context"
       ],
       "source": "principle-platform-agnosticism",
       "target": "decision-adr-007",
@@ -4873,8 +5241,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "pero",
-        "context",
-        "como"
+        "como",
+        "context"
       ],
       "source": "principle-platform-agnosticism",
       "target": "decision-adr-008",
@@ -4884,9 +5252,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "proceso",
         "antes",
-        "solo",
-        "proceso"
+        "solo"
       ],
       "source": "principle-validation-gates-en-cada-fase",
       "target": "principle-heutagoga-sobre-dependencia",
@@ -4908,9 +5276,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
+        "cada",
         "debe",
-        "cada"
+        "gates"
       ],
       "source": "principle-validation-gates-en-cada-fase",
       "target": "principle-observable-workflow",
@@ -4920,8 +5288,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "validation"
+        "validation",
+        "gates"
       ],
       "source": "principle-validation-gates-en-cada-fase",
       "target": "decision-adr-011",
@@ -4931,8 +5299,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "gate"
+        "gate",
+        "gates"
       ],
       "source": "principle-validation-gates-en-cada-fase",
       "target": "decision-adr-012",
@@ -4942,9 +5310,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
         "fase",
-        "cada"
+        "cada",
+        "gates"
       ],
       "source": "principle-validation-gates-en-cada-fase",
       "target": "decision-adr-001",
@@ -4954,8 +5322,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "validation"
+        "validation",
+        "gates"
       ],
       "source": "principle-validation-gates-en-cada-fase",
       "target": "/feature-implement",
@@ -5032,8 +5400,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "raise",
-        "c\u00f3digo"
+        "c\u00f3digo",
+        "raise"
       ],
       "source": "principle-mejora-continua-kaizen",
       "target": "principle-lean-software-development",
@@ -5043,8 +5411,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "mejora",
         "para",
+        "mejora",
         "raise"
       ],
       "source": "principle-mejora-continua-kaizen",
@@ -5055,8 +5423,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "raise",
-        "katas"
+        "katas",
+        "raise"
       ],
       "source": "principle-mejora-continua-kaizen",
       "target": "decision-adr-011",
@@ -5077,8 +5445,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
         "validation",
+        "gates",
         "raise"
       ],
       "source": "principle-lean-software-development",
@@ -5089,9 +5457,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "principio",
         "antes",
-        "eliminar",
-        "principio"
+        "eliminar"
       ],
       "source": "principle-lean-software-development",
       "target": "decision-adr-007",
@@ -5101,9 +5469,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "principios",
         "eliminar",
-        "modelo",
-        "principios"
+        "modelo"
       ],
       "source": "principle-lean-software-development",
       "target": "decision-adr-008",
@@ -5135,8 +5503,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "validation"
+        "validation",
+        "gates"
       ],
       "source": "principle-lean-software-development",
       "target": "/feature-implement",
@@ -5157,8 +5525,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "cada"
+        "cada",
+        "gates"
       ],
       "source": "principle-observable-workflow",
       "target": "decision-adr-001",
@@ -5168,9 +5536,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "rate",
         "componentes",
-        "para",
-        "rate"
+        "para"
       ],
       "source": "principle-observable-workflow",
       "target": "decision-adr-005",
@@ -5181,8 +5549,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "events",
-        "raise",
-        "workflow"
+        "workflow",
+        "raise"
       ],
       "source": "principle-observable-workflow",
       "target": "PAT-047",
@@ -5192,8 +5560,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "complete",
-        "core"
+        "core",
+        "complete"
       ],
       "source": "epic-e1",
       "target": "epic-e3",
@@ -5203,8 +5571,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "complete",
-        "core"
+        "core",
+        "complete"
       ],
       "source": "epic-e1",
       "target": "feature-f1-6",
@@ -5214,8 +5582,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "complete",
-        "core"
+        "core",
+        "complete"
       ],
       "source": "epic-e1",
       "target": "feature-f3-1",
@@ -5225,8 +5593,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "toolkit",
-        "governance"
+        "governance",
+        "toolkit"
       ],
       "source": "epic-e2",
       "target": "decision-adr-012",
@@ -5236,8 +5604,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "complete",
-        "core"
+        "core",
+        "complete"
       ],
       "source": "epic-e3",
       "target": "feature-f1-6",
@@ -5247,9 +5615,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "complete",
         "core",
-        "identity"
+        "identity",
+        "complete"
       ],
       "source": "epic-e3",
       "target": "feature-f3-1",
@@ -5292,8 +5660,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "context"
+        "context",
+        "skills"
       ],
       "source": "epic-e4",
       "target": "feature-f11-4",
@@ -5303,8 +5671,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "context"
+        "context",
+        "skills"
       ],
       "source": "epic-e4",
       "target": "PAT-055",
@@ -5358,9 +5726,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "tracking",
         "work",
-        "graph",
-        "tracking"
+        "graph"
       ],
       "source": "epic-e8",
       "target": "PAT-037",
@@ -5381,9 +5749,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "tracking",
         "work",
-        "graph",
-        "tracking"
+        "graph"
       ],
       "source": "epic-e8",
       "target": "ses-1770068415",
@@ -5393,11 +5761,22 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "tracking"
+        "tracking",
+        "work"
       ],
       "source": "epic-e8",
       "target": "/epic-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "tracking"
+      ],
+      "source": "epic-e8",
+      "target": "/feature-close",
       "key": 0
     },
     {
@@ -5415,8 +5794,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "collective",
-        "intelligence"
+        "intelligence",
+        "collective"
       ],
       "source": "epic-e10",
       "target": "ses-1770089999",
@@ -5437,8 +5816,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
         "context",
+        "unified",
         "architecture"
       ],
       "source": "epic-e11",
@@ -5471,8 +5850,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
         "context",
+        "unified",
         "architecture"
       ],
       "source": "epic-e11",
@@ -5505,8 +5884,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "knowledge"
+        "knowledge",
+        "graph"
       ],
       "source": "epic-e12",
       "target": "decision-adr-020",
@@ -5516,8 +5895,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "knowledge"
+        "knowledge",
+        "graph"
       ],
       "source": "epic-e12",
       "target": "PAT-048",
@@ -5527,9 +5906,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "knowledge",
         "complete",
-        "graph",
-        "knowledge"
+        "graph"
       ],
       "source": "epic-e12",
       "target": "PAT-057",
@@ -5539,8 +5918,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "knowledge"
+        "knowledge",
+        "graph"
       ],
       "source": "epic-e12",
       "target": "SES-024",
@@ -5550,8 +5929,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
+        "command",
         "raise"
       ],
       "source": "feature-f7-1",
@@ -5584,8 +5963,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
+        "command",
         "raise"
       ],
       "source": "feature-f7-1",
@@ -5596,8 +5975,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
+        "command",
         "raise"
       ],
       "source": "feature-f7-1",
@@ -5619,8 +5998,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
+        "command",
         "raise"
       ],
       "source": "feature-f7-1",
@@ -5631,8 +6010,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "templates",
-        "raise"
+        "raise",
+        "templates"
       ],
       "source": "feature-f7-1",
       "target": "decision-adr-011",
@@ -5664,8 +6043,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
+        "command",
         "raise"
       ],
       "source": "feature-f7-3",
@@ -5676,8 +6055,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
+        "command",
         "raise"
       ],
       "source": "feature-f7-3",
@@ -5699,8 +6078,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
+        "command",
         "raise"
       ],
       "source": "feature-f7-3",
@@ -5766,8 +6145,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "project",
-        "scaffolding"
+        "scaffolding",
+        "project"
       ],
       "source": "feature-f1-1",
       "target": "CAL-001",
@@ -5777,8 +6156,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "configuration",
-        "system"
+        "system",
+        "configuration"
       ],
       "source": "feature-f1-3",
       "target": "CAL-003",
@@ -5799,8 +6178,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "module",
-        "output"
+        "output",
+        "module"
       ],
       "source": "feature-f1-5",
       "target": "CAL-005",
@@ -5810,8 +6189,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "complete",
-        "core"
+        "core",
+        "complete"
       ],
       "source": "feature-f1-6",
       "target": "feature-f3-1",
@@ -5931,8 +6310,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "engine",
-        "query"
+        "query",
+        "engine"
       ],
       "source": "feature-f2-3",
       "target": "CAL-009",
@@ -5953,8 +6332,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commands",
-        "pending"
+        "pending",
+        "commands"
       ],
       "source": "feature-f2-4",
       "target": "feature-f9-10",
@@ -5964,8 +6343,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "pending"
+        "pending",
+        "graph"
       ],
       "source": "feature-f8-3",
       "target": "feature-f3-5",
@@ -5975,8 +6354,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "pending"
+        "pending",
+        "graph"
       ],
       "source": "feature-f8-3",
       "target": "feature-f11-1",
@@ -5986,8 +6365,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "pending"
+        "pending",
+        "graph"
       ],
       "source": "feature-f8-3",
       "target": "feature-f11-2",
@@ -6008,8 +6387,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "pending"
+        "pending",
+        "work"
       ],
       "source": "feature-f8-4",
       "target": "feature-f11-2",
@@ -6066,9 +6445,9 @@
       "shared_keywords": [
         "identity",
         "memory",
-        "structure",
         "core",
-        "create"
+        "create",
+        "structure"
       ],
       "source": "feature-f3-1",
       "target": "decision-adr-014",
@@ -6078,8 +6457,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "jsonl",
         "identity",
+        "jsonl",
         "memory"
       ],
       "source": "feature-f3-1",
@@ -6101,9 +6480,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "structure",
         "core",
-        "identity"
+        "identity",
+        "structure"
       ],
       "source": "feature-f3-1",
       "target": "CAL-010",
@@ -6113,9 +6492,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "structure",
         "core",
-        "identity"
+        "identity",
+        "structure"
       ],
       "source": "feature-f3-1",
       "target": "SES-011",
@@ -6169,8 +6548,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f3-3",
       "target": "feature-f11-2",
@@ -6181,8 +6560,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "jsonl",
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f3-3",
       "target": "decision-adr-016",
@@ -6192,8 +6571,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f3-3",
       "target": "decision-adr-020",
@@ -6214,8 +6593,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f3-3",
       "target": "CAL-011",
@@ -6225,8 +6604,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f3-3",
       "target": "SES-012",
@@ -6247,8 +6626,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "pending"
+        "pending",
+        "graph"
       ],
       "source": "feature-f3-5",
       "target": "feature-f11-1",
@@ -6258,9 +6637,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
         "graph",
-        "pending"
+        "pending",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "feature-f11-2",
@@ -6270,9 +6649,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
+        "pending",
         "integration",
-        "pending"
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "feature-f11-4",
@@ -6293,9 +6672,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pending",
         "integration",
-        "sessionstart",
-        "pending"
+        "sessionstart"
       ],
       "source": "feature-f3-5",
       "target": "feature-f9-8",
@@ -6305,9 +6684,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pending",
         "queries",
-        "integration",
-        "pending"
+        "integration"
       ],
       "source": "feature-f3-5",
       "target": "feature-f9-11",
@@ -6317,8 +6696,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "pending"
+        "pending",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "feature-f12-5",
@@ -6339,8 +6718,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "graph"
+        "graph",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "PAT-053",
@@ -6350,8 +6729,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "graph"
+        "graph",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "PAT-057",
@@ -6361,8 +6740,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "CAL-012",
@@ -6372,8 +6751,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "feature-f3-5",
       "target": "SES-013",
@@ -6383,8 +6762,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "integration"
+        "integration",
+        "graph"
       ],
       "source": "feature-f3-5",
       "target": "SES-021",
@@ -6394,9 +6773,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
+        "integration",
         "skills",
-        "integration"
+        "graph"
       ],
       "source": "feature-f3-5",
       "target": "SES-023",
@@ -6406,9 +6785,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pending",
         "unified",
-        "graph",
-        "pending"
+        "graph"
       ],
       "source": "feature-f11-1",
       "target": "feature-f11-2",
@@ -6418,8 +6797,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "pending"
+        "pending",
+        "unified"
       ],
       "source": "feature-f11-1",
       "target": "feature-f11-3",
@@ -6429,8 +6808,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "schema",
-        "pending"
+        "pending",
+        "schema"
       ],
       "source": "feature-f11-1",
       "target": "feature-f10-1",
@@ -6440,10 +6819,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "schema",
-        "models",
         "pending",
-        "pydantic"
+        "pydantic",
+        "schema",
+        "models"
       ],
       "source": "feature-f11-1",
       "target": "feature-f9-1",
@@ -6453,9 +6832,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "networkx",
         "unified",
-        "graph",
-        "networkx"
+        "graph"
       ],
       "source": "feature-f11-1",
       "target": "decision-adr-019",
@@ -6476,9 +6855,31 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pydantic",
+        "models"
+      ],
+      "source": "feature-f11-1",
+      "target": "guardrail-should-test-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pydantic",
+        "models"
+      ],
+      "source": "feature-f11-1",
+      "target": "guardrail-must-arch-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "networkx",
         "unified",
-        "graph",
-        "networkx"
+        "graph"
       ],
       "source": "feature-f11-1",
       "target": "PAT-048",
@@ -6488,9 +6889,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "serialization",
         "pydantic",
         "networkx",
+        "serialization",
         "graph",
         "models"
       ],
@@ -6524,10 +6925,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "graph",
         "unified",
         "schema",
-        "f111",
-        "graph"
+        "f111"
       ],
       "source": "feature-f11-1",
       "target": "SES-016",
@@ -6537,8 +6938,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "pending"
+        "pending",
+        "unified"
       ],
       "source": "feature-f11-2",
       "target": "feature-f11-3",
@@ -6548,8 +6949,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "pending"
+        "pending",
+        "skills"
       ],
       "source": "feature-f11-2",
       "target": "feature-f11-4",
@@ -6581,8 +6982,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "pending"
+        "pending",
+        "skills"
       ],
       "source": "feature-f11-2",
       "target": "feature-f12-5",
@@ -6603,9 +7004,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "governance",
         "work",
-        "skills",
-        "governance"
+        "skills"
       ],
       "source": "feature-f11-2",
       "target": "decision-adr-011",
@@ -6615,8 +7016,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "governance"
+        "governance",
+        "skills"
       ],
       "source": "feature-f11-2",
       "target": "decision-adr-012",
@@ -6626,8 +7027,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "memory"
+        "memory",
+        "work"
       ],
       "source": "feature-f11-2",
       "target": "decision-adr-014",
@@ -6637,8 +7038,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f11-2",
       "target": "decision-adr-016",
@@ -6671,8 +7072,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "unified",
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f11-2",
       "target": "decision-adr-020",
@@ -6693,9 +7094,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "governance",
         "work",
-        "graph",
-        "governance"
+        "graph"
       ],
       "source": "feature-f11-2",
       "target": "PAT-037",
@@ -6750,6 +7151,17 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "work",
+        "skills"
+      ],
+      "source": "feature-f11-2",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "graph",
         "builder"
       ],
@@ -6761,8 +7173,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f11-2",
       "target": "CAL-011",
@@ -6772,8 +7184,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "feature-f11-2",
       "target": "SES-012",
@@ -6805,9 +7217,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
         "builder",
-        "f112"
+        "f112",
+        "graph"
       ],
       "source": "feature-f11-2",
       "target": "SES-017",
@@ -6817,9 +7229,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
         "builder",
-        "f112"
+        "f112",
+        "graph"
       ],
       "source": "feature-f11-2",
       "target": "SES-018",
@@ -6840,8 +7252,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "memory"
+        "memory",
+        "work"
       ],
       "source": "feature-f11-2",
       "target": "/session-start",
@@ -6851,9 +7263,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
         "pending",
-        "query"
+        "query",
+        "context"
       ],
       "source": "feature-f11-3",
       "target": "feature-f11-4",
@@ -6930,8 +7342,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "unified",
-        "context",
         "query",
+        "context",
         "concept"
       ],
       "source": "feature-f11-3",
@@ -6954,8 +7366,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "unified",
-        "context",
-        "query"
+        "query",
+        "context"
       ],
       "source": "feature-f11-3",
       "target": "PAT-054",
@@ -6976,8 +7388,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
         "f113",
+        "unified",
         "query"
       ],
       "source": "feature-f11-3",
@@ -6999,8 +7411,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pending",
-        "skill"
+        "skill",
+        "pending"
       ],
       "source": "feature-f11-4",
       "target": "feature-f9-3",
@@ -7010,8 +7422,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "integration",
-        "pending"
+        "pending",
+        "integration"
       ],
       "source": "feature-f11-4",
       "target": "feature-f9-8",
@@ -7021,8 +7433,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "integration",
-        "pending"
+        "pending",
+        "integration"
       ],
       "source": "feature-f11-4",
       "target": "feature-f9-11",
@@ -7032,10 +7444,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
+        "skill",
         "pending",
         "query",
-        "skill"
+        "skills"
       ],
       "source": "feature-f11-4",
       "target": "feature-f12-5",
@@ -7045,8 +7457,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "query"
+        "query",
+        "context"
       ],
       "source": "feature-f11-4",
       "target": "decision-adr-019",
@@ -7056,8 +7468,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "skill"
+        "skill",
+        "context"
       ],
       "source": "feature-f11-4",
       "target": "decision-adr-008",
@@ -7067,8 +7479,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "workflow"
+        "workflow",
+        "context"
       ],
       "source": "feature-f11-4",
       "target": "PAT-031",
@@ -7078,9 +7490,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
         "step",
-        "query"
+        "query",
+        "skills"
       ],
       "source": "feature-f11-4",
       "target": "PAT-053",
@@ -7090,8 +7502,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "query"
+        "query",
+        "context"
       ],
       "source": "feature-f11-4",
       "target": "PAT-054",
@@ -7101,8 +7513,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "context"
+        "context",
+        "skills"
       ],
       "source": "feature-f11-4",
       "target": "PAT-055",
@@ -7112,8 +7524,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "feature-f11-4",
       "target": "CAL-012",
@@ -7123,8 +7535,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "feature-f11-4",
       "target": "SES-013",
@@ -7134,9 +7546,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
+        "query",
         "f114",
-        "query"
+        "skills"
       ],
       "source": "feature-f11-4",
       "target": "SES-020",
@@ -7146,8 +7558,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "integration",
-        "skill"
+        "skill",
+        "integration"
       ],
       "source": "feature-f11-4",
       "target": "SES-021",
@@ -7157,8 +7569,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "feature-f11-4",
       "target": "SES-023",
@@ -7168,8 +7580,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pattern",
-        "pending"
+        "pending",
+        "pattern"
       ],
       "source": "feature-f10-1",
       "target": "feature-f10-6",
@@ -7179,8 +7591,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "schema",
-        "pending"
+        "pending",
+        "schema"
       ],
       "source": "feature-f10-1",
       "target": "feature-f9-1",
@@ -7190,10 +7602,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
-        "raise",
-        "memory"
+        "command",
+        "memory",
+        "raise"
       ],
       "source": "feature-f10-2",
       "target": "feature-f10-4",
@@ -7214,10 +7626,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
-        "raise",
-        "memory"
+        "command",
+        "memory",
+        "raise"
       ],
       "source": "feature-f10-2",
       "target": "feature-f12-6",
@@ -7227,8 +7639,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "raise",
-        "memory"
+        "memory",
+        "raise"
       ],
       "source": "feature-f10-2",
       "target": "decision-adr-015",
@@ -7260,8 +7672,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "patterns",
-        "pending"
+        "pending",
+        "patterns"
       ],
       "source": "feature-f10-3",
       "target": "feature-f9-6",
@@ -7282,10 +7694,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "command",
         "pending",
-        "raise",
-        "memory"
+        "command",
+        "memory",
+        "raise"
       ],
       "source": "feature-f10-4",
       "target": "feature-f12-6",
@@ -7295,8 +7707,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "raise",
-        "memory"
+        "memory",
+        "raise"
       ],
       "source": "feature-f10-4",
       "target": "decision-adr-015",
@@ -7394,6 +7806,28 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "pydantic",
+        "models"
+      ],
+      "source": "feature-f9-1",
+      "target": "guardrail-should-test-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pydantic",
+        "models"
+      ],
+      "source": "feature-f9-1",
+      "target": "guardrail-must-arch-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "types",
         "signal"
       ],
@@ -7405,8 +7839,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "models",
-        "pydantic"
+        "pydantic",
+        "models"
       ],
       "source": "feature-f9-1",
       "target": "PAT-050",
@@ -7451,8 +7885,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pending",
-        "skill"
+        "skill",
+        "pending"
       ],
       "source": "feature-f9-3",
       "target": "feature-f12-5",
@@ -7518,8 +7952,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "insights",
-        "pending"
+        "pending",
+        "insights"
       ],
       "source": "feature-f9-7",
       "target": "feature-f9-8",
@@ -7529,8 +7963,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "insights",
-        "pending"
+        "pending",
+        "insights"
       ],
       "source": "feature-f9-7",
       "target": "feature-f9-10",
@@ -7540,8 +7974,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "insights",
-        "pending"
+        "pending",
+        "insights"
       ],
       "source": "feature-f9-8",
       "target": "feature-f9-10",
@@ -7551,8 +7985,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "integration",
-        "pending"
+        "pending",
+        "integration"
       ],
       "source": "feature-f9-8",
       "target": "feature-f9-11",
@@ -7562,8 +7996,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "start",
-        "session"
+        "session",
+        "start"
       ],
       "source": "feature-f9-8",
       "target": "SES-022",
@@ -7584,8 +8018,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "telemetry",
-        "pending"
+        "pending",
+        "telemetry"
       ],
       "source": "feature-f9-10",
       "target": "feature-f9-11",
@@ -7639,10 +8073,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "nodes",
         "extractor",
-        "pending",
-        "extract",
-        "nodes"
+        "extract"
       ],
       "source": "feature-f12-1",
       "target": "feature-f12-2",
@@ -7653,11 +8086,21 @@
       "weight": 0.5,
       "shared_keywords": [
         "extractor",
-        "pending",
         "extract"
       ],
       "source": "feature-f12-1",
       "target": "feature-f12-3",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "decision"
+      ],
+      "source": "feature-f12-1",
+      "target": "feature-f12-4",
       "key": 0
     },
     {
@@ -7675,8 +8118,19 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "extractor",
+        "complete",
+        "extract"
+      ],
+      "source": "feature-f12-1",
+      "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "pending",
+        "extractor",
         "extract"
       ],
       "source": "feature-f12-2",
@@ -7688,9 +8142,9 @@
       "weight": 0.5,
       "shared_keywords": [
         "term",
-        "guardrail",
+        "nodetype",
         "decision",
-        "nodetype"
+        "guardrail"
       ],
       "source": "feature-f12-4",
       "target": "decision-adr-020",
@@ -7700,8 +8154,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
-        "skill"
+        "skill",
+        "feature"
       ],
       "source": "feature-f12-5",
       "target": "decision-adr-020",
@@ -7711,8 +8165,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "query"
+        "query",
+        "skills"
       ],
       "source": "feature-f12-5",
       "target": "PAT-053",
@@ -7722,8 +8176,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
-        "query"
+        "query",
+        "feature"
       ],
       "source": "feature-f12-5",
       "target": "PAT-056",
@@ -7733,8 +8187,19 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "query"
+        "feature",
+        "skills"
+      ],
+      "source": "feature-f12-5",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "query",
+        "skills"
       ],
       "source": "feature-f12-5",
       "target": "SES-020",
@@ -7744,8 +8209,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
-        "alignment"
+        "alignment",
+        "feature"
       ],
       "source": "feature-f12-5",
       "target": "/feature-design",
@@ -7755,8 +8220,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "raise",
-        "memory"
+        "memory",
+        "raise"
       ],
       "source": "feature-f12-6",
       "target": "decision-adr-015",
@@ -7777,12 +8242,12 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "what",
         "gates",
         "engine",
         "skills",
-        "katas",
-        "governance"
+        "what",
+        "governance",
+        "katas"
       ],
       "source": "decision-adr-011",
       "target": "decision-adr-012",
@@ -7792,9 +8257,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "skills",
         "local",
+        "skills",
+        "work",
         "what"
       ],
       "source": "decision-adr-011",
@@ -7810,6 +8275,17 @@
       ],
       "source": "decision-adr-011",
       "target": "decision-adr-010",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "katas",
+        "skills"
+      ],
+      "source": "decision-adr-011",
+      "target": "guardrail-must-arch-001",
       "key": 0
     },
     {
@@ -7861,8 +8337,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "governance"
+        "governance",
+        "work"
       ],
       "source": "decision-adr-011",
       "target": "PAT-037",
@@ -7872,8 +8348,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "raise"
+        "raise",
+        "skills"
       ],
       "source": "decision-adr-011",
       "target": "PAT-046",
@@ -7883,8 +8359,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "validation"
+        "validation",
+        "skills"
       ],
       "source": "decision-adr-011",
       "target": "PAT-057",
@@ -7894,8 +8370,20 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "gates",
-        "validation"
+        "process",
+        "work",
+        "skills"
+      ],
+      "source": "decision-adr-011",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "validation",
+        "gates"
       ],
       "source": "decision-adr-011",
       "target": "/feature-implement",
@@ -7916,8 +8404,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "rationale",
-        "changes"
+        "changes",
+        "rationale"
       ],
       "source": "decision-adr-012",
       "target": "decision-adr-016",
@@ -7927,8 +8415,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "architecture",
         "skills",
+        "architecture",
         "what"
       ],
       "source": "decision-adr-012",
@@ -7944,6 +8432,18 @@
       ],
       "source": "decision-adr-012",
       "target": "decision-adr-019",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "engines",
+        "katas",
+        "skills"
+      ],
+      "source": "decision-adr-012",
+      "target": "guardrail-must-arch-001",
       "key": 0
     },
     {
@@ -8009,8 +8509,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "structure",
-        "root"
+        "root",
+        "structure"
       ],
       "source": "decision-adr-014",
       "target": "PAT-036",
@@ -8020,9 +8520,20 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "structure",
+        "create",
+        "work"
+      ],
+      "source": "decision-adr-014",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "core",
-        "identity"
+        "identity",
+        "structure"
       ],
       "source": "decision-adr-014",
       "target": "CAL-010",
@@ -8032,9 +8543,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "structure",
         "core",
-        "identity"
+        "identity",
+        "structure"
       ],
       "source": "decision-adr-014",
       "target": "SES-011",
@@ -8055,8 +8566,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "create"
+        "create",
+        "work"
       ],
       "source": "decision-adr-014",
       "target": "/epic-plan",
@@ -8066,8 +8577,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "memory"
+        "memory",
+        "work"
       ],
       "source": "decision-adr-014",
       "target": "/session-start",
@@ -8077,8 +8588,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "implement",
         "interface",
+        "implement",
         "architecture"
       ],
       "source": "decision-adr-015",
@@ -8100,9 +8611,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "infrastructure",
+        "architecture",
         "pattern",
-        "architecture"
+        "infrastructure"
       ],
       "source": "decision-adr-015",
       "target": "PAT-037",
@@ -8112,8 +8623,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "design",
-        "architecture"
+        "architecture",
+        "design"
       ],
       "source": "decision-adr-015",
       "target": "PAT-049",
@@ -8123,8 +8634,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "infrastructure",
-        "optional"
+        "optional",
+        "infrastructure"
       ],
       "source": "decision-adr-015",
       "target": "PAT-053",
@@ -8134,8 +8645,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "design",
-        "implement"
+        "implement",
+        "design"
       ],
       "source": "decision-adr-015",
       "target": "PAT-055",
@@ -8157,8 +8668,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "session",
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "decision-adr-016",
       "target": "decision-adr-020",
@@ -8190,9 +8701,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
+        "session",
         "human",
-        "session"
+        "graph"
       ],
       "source": "decision-adr-016",
       "target": "PAT-054",
@@ -8202,8 +8713,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "decision-adr-016",
       "target": "CAL-011",
@@ -8213,8 +8724,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "decision-adr-016",
       "target": "SES-012",
@@ -8235,8 +8746,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "session"
+        "session",
+        "graph"
       ],
       "source": "decision-adr-016",
       "target": "SES-023",
@@ -8246,8 +8757,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "session"
+        "session",
+        "memory"
       ],
       "source": "decision-adr-016",
       "target": "/session-close",
@@ -8257,8 +8768,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "session"
+        "session",
+        "memory"
       ],
       "source": "decision-adr-016",
       "target": "/session-start",
@@ -8281,8 +8792,8 @@
       "shared_keywords": [
         "types",
         "calibration",
-        "outcome",
-        "session"
+        "session",
+        "outcome"
       ],
       "source": "decision-adr-018",
       "target": "decision-adr-020",
@@ -8292,9 +8803,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
         "deterministic",
-        "architecture"
+        "architecture",
+        "skills"
       ],
       "source": "decision-adr-018",
       "target": "PAT-006",
@@ -8326,9 +8837,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
         "features",
-        "architecture"
+        "architecture",
+        "work"
       ],
       "source": "decision-adr-018",
       "target": "PAT-037",
@@ -8372,8 +8883,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
         "calibration",
+        "skills",
         "needs"
       ],
       "source": "decision-adr-018",
@@ -8385,7 +8896,19 @@
       "weight": 0.5,
       "shared_keywords": [
         "skills",
-        "session"
+        "work",
+        "features"
+      ],
+      "source": "decision-adr-018",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "session",
+        "skills"
       ],
       "source": "decision-adr-018",
       "target": "SES-023",
@@ -8395,8 +8918,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "features"
+        "features",
+        "work"
       ],
       "source": "decision-adr-018",
       "target": "/epic-plan",
@@ -8417,8 +8940,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "session"
+        "session",
+        "work"
       ],
       "source": "decision-adr-018",
       "target": "/session-start",
@@ -8439,10 +8962,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
-        "node",
+        "graph",
         "types",
-        "graph"
+        "unified",
+        "node"
       ],
       "source": "decision-adr-019",
       "target": "decision-adr-020",
@@ -8452,8 +8975,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "architecture"
+        "architecture",
+        "graph"
       ],
       "source": "decision-adr-019",
       "target": "PAT-005",
@@ -8463,8 +8986,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "architecture"
+        "architecture",
+        "graph"
       ],
       "source": "decision-adr-019",
       "target": "PAT-037",
@@ -8474,13 +8997,13 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "types",
-        "single",
-        "networkx",
+        "architecture",
         "node",
+        "networkx",
+        "types",
         "graph",
-        "unified",
-        "architecture"
+        "single",
+        "unified"
       ],
       "source": "decision-adr-019",
       "target": "PAT-048",
@@ -8490,9 +9013,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "node",
+        "networkx",
         "graph",
-        "networkx"
+        "node"
       ],
       "source": "decision-adr-019",
       "target": "PAT-050",
@@ -8503,8 +9026,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "unified",
-        "graph",
-        "query"
+        "query",
+        "graph"
       ],
       "source": "decision-adr-019",
       "target": "PAT-053",
@@ -8515,9 +9038,9 @@
       "weight": 0.5,
       "shared_keywords": [
         "unified",
-        "graph",
+        "query",
         "context",
-        "query"
+        "graph"
       ],
       "source": "decision-adr-019",
       "target": "PAT-054",
@@ -8527,8 +9050,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "implement"
+        "implement",
+        "context"
       ],
       "source": "decision-adr-019",
       "target": "PAT-055",
@@ -8538,8 +9061,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unified",
         "context",
+        "unified",
         "architecture"
       ],
       "source": "decision-adr-019",
@@ -8573,8 +9096,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "epic",
-        "feature",
-        "pattern"
+        "pattern",
+        "feature"
       ],
       "source": "decision-adr-020",
       "target": "PAT-019",
@@ -8595,9 +9118,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
+        "extend",
         "pattern",
-        "extend"
+        "graph"
       ],
       "source": "decision-adr-020",
       "target": "PAT-037",
@@ -8618,11 +9141,11 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "types",
+        "knowledge",
         "node",
+        "types",
         "graph",
-        "unified",
-        "knowledge"
+        "unified"
       ],
       "source": "decision-adr-020",
       "target": "PAT-048",
@@ -8632,8 +9155,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "node",
-        "graph"
+        "graph",
+        "node"
       ],
       "source": "decision-adr-020",
       "target": "PAT-050",
@@ -8643,8 +9166,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "epic",
-        "flow"
+        "flow",
+        "epic"
       ],
       "source": "decision-adr-020",
       "target": "PAT-052",
@@ -8666,8 +9189,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "unified",
-        "graph",
-        "session"
+        "session",
+        "graph"
       ],
       "source": "decision-adr-020",
       "target": "PAT-054",
@@ -8688,8 +9211,20 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "flow",
+        "feature",
+        "completion"
+      ],
+      "source": "decision-adr-020",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "memory",
+        "graph"
       ],
       "source": "decision-adr-020",
       "target": "CAL-011",
@@ -8699,8 +9234,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "decision-adr-020",
       "target": "SES-012",
@@ -8721,8 +9256,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "skill"
+        "skill",
+        "graph"
       ],
       "source": "decision-adr-020",
       "target": "SES-021",
@@ -8743,8 +9278,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "session"
+        "session",
+        "graph"
       ],
       "source": "decision-adr-020",
       "target": "SES-023",
@@ -8754,9 +9289,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "knowledge",
         "epic",
-        "graph",
-        "knowledge"
+        "graph"
       ],
       "source": "decision-adr-020",
       "target": "SES-024",
@@ -8777,8 +9312,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "session"
+        "session",
+        "memory"
       ],
       "source": "decision-adr-020",
       "target": "/session-close",
@@ -8788,8 +9323,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "memory",
-        "session"
+        "session",
+        "memory"
       ],
       "source": "decision-adr-020",
       "target": "/session-start",
@@ -8821,10 +9356,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "grafo",
         "archivos",
+        "reglas",
         "como",
-        "reglas"
+        "grafo"
       ],
       "source": "decision-adr-001",
       "target": "decision-adr-003",
@@ -8834,10 +9369,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "grafo",
+        "reglas",
         "naming",
         "cada",
-        "reglas"
+        "grafo"
       ],
       "source": "decision-adr-001",
       "target": "decision-adr-004",
@@ -8848,8 +9383,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "archivos",
-        "confidence",
         "como",
+        "confidence",
         "extraer"
       ],
       "source": "decision-adr-001",
@@ -8871,8 +9406,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "como",
-        "reglas"
+        "reglas",
+        "como"
       ],
       "source": "decision-adr-001",
       "target": "decision-adr-007",
@@ -8882,12 +9417,23 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "grafo",
-        "yaml",
-        "raisegraphyaml",
-        "individuales",
+        "naming",
+        "patterns"
+      ],
+      "source": "decision-adr-001",
+      "target": "guardrail-should-code-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "relaciones",
-        "reglas"
+        "reglas",
+        "individuales",
+        "raisegraphyaml",
+        "grafo",
+        "yaml"
       ],
       "source": "decision-adr-003",
       "target": "decision-adr-004",
@@ -8909,8 +9455,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "para",
-        "yaml"
+        "yaml",
+        "para"
       ],
       "source": "decision-adr-003",
       "target": "decision-adr-006",
@@ -8920,9 +9466,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "usar",
+        "reglas",
         "como",
-        "reglas"
+        "usar"
       ],
       "source": "decision-adr-003",
       "target": "decision-adr-007",
@@ -8932,9 +9478,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "reason",
+        "yaml",
         "naming",
-        "yaml"
+        "reason"
       ],
       "source": "decision-adr-004",
       "target": "decision-adr-006",
@@ -8977,8 +9523,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "pattern",
-        "yaml"
+        "yaml",
+        "pattern"
       ],
       "source": "decision-adr-006",
       "target": "PAT-051",
@@ -8988,8 +9534,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "content"
+        "content",
+        "context"
       ],
       "source": "decision-adr-006",
       "target": "PAT-054",
@@ -8999,14 +9545,25 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "capa",
         "simplificaci\u00f3n",
         "como",
         "eliminar",
-        "context",
-        "capa"
+        "context"
       ],
       "source": "decision-adr-007",
       "target": "decision-adr-008",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "setup",
+        "context"
+      ],
+      "source": "decision-adr-007",
+      "target": "/feature-start",
       "key": 0
     },
     {
@@ -9033,6 +9590,364 @@
       "key": 0
     },
     {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "passes"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "guardrail-must-code-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "pyright",
+        "type"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "guardrail-must-code-003",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "code"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "guardrail-must-sec-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "passes"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "guardrail-must-sec-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "passes"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "guardrail-should-arch-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pyright",
+        "strict"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "PAT-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pyright",
+        "strict"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "PAT-027",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "passes",
+        "code"
+      ],
+      "source": "guardrail-must-code-001",
+      "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "exits"
+      ],
+      "source": "guardrail-must-code-002",
+      "target": "guardrail-must-test-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "passes",
+        "exits"
+      ],
+      "source": "guardrail-must-code-002",
+      "target": "guardrail-must-sec-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "passes"
+      ],
+      "source": "guardrail-must-code-002",
+      "target": "guardrail-should-arch-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "check"
+      ],
+      "source": "guardrail-must-code-002",
+      "target": "PAT-052",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "review",
+        "manual"
+      ],
+      "source": "guardrail-should-code-001",
+      "target": "guardrail-should-code-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "pytest"
+      ],
+      "source": "guardrail-must-test-001",
+      "target": "guardrail-must-test-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "tests"
+      ],
+      "source": "guardrail-must-test-002",
+      "target": "guardrail-should-test-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "pass"
+      ],
+      "source": "guardrail-must-test-002",
+      "target": "guardrail-must-sec-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "exits"
+      ],
+      "source": "guardrail-must-test-002",
+      "target": "guardrail-must-sec-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tests",
+        "pytest"
+      ],
+      "source": "guardrail-must-test-002",
+      "target": "PAT-022",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "pydantic",
+        "models"
+      ],
+      "source": "guardrail-should-test-001",
+      "target": "guardrail-must-arch-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pydantic",
+        "models"
+      ],
+      "source": "guardrail-should-test-001",
+      "target": "PAT-050",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "bandit"
+      ],
+      "source": "guardrail-must-sec-001",
+      "target": "guardrail-must-sec-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "scan"
+      ],
+      "source": "guardrail-must-sec-002",
+      "target": "guardrail-should-sec-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "passes"
+      ],
+      "source": "guardrail-must-sec-002",
+      "target": "guardrail-should-arch-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "dependency",
+        "verify"
+      ],
+      "source": "guardrail-should-sec-001",
+      "target": "guardrail-should-dev-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "engines",
+        "skills"
+      ],
+      "source": "guardrail-must-arch-001",
+      "target": "PAT-006",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "pydantic",
+        "models"
+      ],
+      "source": "guardrail-must-arch-002",
+      "target": "PAT-050",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "exists"
+      ],
+      "source": "guardrail-must-dev-001",
+      "target": "guardrail-should-dev-001",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "exists"
+      ],
+      "source": "guardrail-must-dev-001",
+      "target": "PAT-052",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "exists"
+      ],
+      "source": "guardrail-should-dev-001",
+      "target": "PAT-052",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "research"
+      ],
+      "source": "guardrail-should-inf-001",
+      "target": "guardrail-should-inf-002",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verify",
+        "inference",
+        "gathering"
+      ],
+      "source": "guardrail-should-inf-001",
+      "target": "guardrail-should-inf-003",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "research",
+        "evidence",
+        "catalogs"
+      ],
+      "source": "guardrail-should-inf-002",
+      "target": "/research",
+      "key": 0
+    },
+    {
       "type": "learned_from",
       "weight": 1.0,
       "source": "PAT-002",
@@ -9043,9 +9958,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "typing",
         "pyright",
-        "strict"
+        "strict",
+        "typing"
       ],
       "source": "PAT-002",
       "target": "PAT-027",
@@ -9106,8 +10021,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commit",
-        "workflow"
+        "workflow",
+        "commit"
       ],
       "source": "PAT-004",
       "target": "PAT-017",
@@ -9117,9 +10032,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "collaboration",
         "hitl",
-        "workflow"
+        "workflow",
+        "collaboration"
       ],
       "source": "PAT-004",
       "target": "PAT-025",
@@ -9129,9 +10044,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commit",
         "git",
-        "workflow"
+        "workflow",
+        "commit"
       ],
       "source": "PAT-004",
       "target": "PAT-028",
@@ -9152,8 +10067,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "architecture"
+        "architecture",
+        "graph"
       ],
       "source": "PAT-005",
       "target": "PAT-037",
@@ -9163,8 +10078,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "architecture"
+        "architecture",
+        "graph"
       ],
       "source": "PAT-005",
       "target": "PAT-048",
@@ -9199,8 +10114,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "validate",
-        "assumptions"
+        "assumptions",
+        "validate"
       ],
       "source": "PAT-008",
       "target": "PAT-020",
@@ -9221,8 +10136,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "validation",
-        "testing"
+        "testing",
+        "validation"
       ],
       "source": "PAT-008",
       "target": "PAT-056",
@@ -9271,8 +10186,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "kata-cycle",
-        "designfirst"
+        "designfirst",
+        "kata-cycle"
       ],
       "source": "PAT-012",
       "target": "PAT-016",
@@ -9375,8 +10290,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "velocity",
-        "reuse",
-        "pattern"
+        "pattern",
+        "reuse"
       ],
       "source": "PAT-015",
       "target": "PAT-038",
@@ -9386,8 +10301,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "atomic",
-        "tasks"
+        "tasks",
+        "atomic"
       ],
       "source": "PAT-016",
       "target": "/feature-plan",
@@ -9404,11 +10319,22 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "commit",
-        "workflow"
+        "workflow",
+        "commit"
       ],
       "source": "PAT-017",
       "target": "PAT-028",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "wins",
+        "quick"
+      ],
+      "source": "PAT-017",
+      "target": "PAT-058",
       "key": 0
     },
     {
@@ -9420,6 +10346,17 @@
       ],
       "source": "PAT-018",
       "target": "PAT-052",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "retrospective",
+        "review"
+      ],
+      "source": "PAT-018",
+      "target": "/feature-close",
       "key": 0
     },
     {
@@ -9492,8 +10429,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "methodology",
-        "discipline",
-        "dogfooding"
+        "dogfooding",
+        "discipline"
       ],
       "source": "PAT-024",
       "target": "PAT-026",
@@ -9503,8 +10440,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "raise",
-        "isnt"
+        "isnt",
+        "raise"
       ],
       "source": "PAT-024",
       "target": "PAT-046",
@@ -9514,8 +10451,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "discipline",
-        "dogfooding"
+        "dogfooding",
+        "discipline"
       ],
       "source": "PAT-024",
       "target": "PAT-053",
@@ -9536,6 +10473,17 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "discipline",
+        "process"
+      ],
+      "source": "PAT-024",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "task",
         "workflow"
       ],
@@ -9547,8 +10495,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "enables",
-        "discipline"
+        "discipline",
+        "enables"
       ],
       "source": "PAT-026",
       "target": "PAT-028",
@@ -9558,9 +10506,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "dogfooding",
         "discipline",
-        "skills",
-        "dogfooding"
+        "skills"
       ],
       "source": "PAT-026",
       "target": "PAT-053",
@@ -9570,8 +10518,20 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "discipline",
         "work",
-        "creates"
+        "skills"
+      ],
+      "source": "PAT-026",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "creates",
+        "work"
       ],
       "source": "PAT-026",
       "target": "/session-start",
@@ -9617,6 +10577,28 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "discipline",
+        "feature"
+      ],
+      "source": "PAT-028",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "feature",
+        "commit"
+      ],
+      "source": "PAT-028",
+      "target": "/feature-start",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "code",
         "knowledge"
       ],
@@ -9628,8 +10610,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "knowledge",
-        "architecture"
+        "architecture",
+        "knowledge"
       ],
       "source": "PAT-029",
       "target": "PAT-048",
@@ -9646,8 +10628,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "hooks",
-        "workflow"
+        "workflow",
+        "hooks"
       ],
       "source": "PAT-031",
       "target": "PAT-032",
@@ -9657,8 +10639,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "sessions",
-        "context"
+        "context",
+        "sessions"
       ],
       "source": "PAT-031",
       "target": "/session-close",
@@ -9675,8 +10657,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "unfamiliar",
-        "research"
+        "research",
+        "unfamiliar"
       ],
       "source": "PAT-032",
       "target": "/research",
@@ -9705,8 +10687,19 @@
       "weight": 0.5,
       "shared_keywords": [
         "feature",
-        "features",
-        "plan"
+        "features"
+      ],
+      "source": "PAT-033",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "plan",
+        "feature",
+        "features"
       ],
       "source": "PAT-033",
       "target": "/epic-plan",
@@ -9716,8 +10709,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "features",
-        "plan"
+        "plan",
+        "features"
       ],
       "source": "PAT-033",
       "target": "/feature-plan",
@@ -9727,8 +10720,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "feature",
         "planning",
+        "feature",
         "features"
       ],
       "source": "PAT-033",
@@ -9739,8 +10732,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "planning",
-        "plan"
+        "plan",
+        "planning"
       ],
       "source": "PAT-033",
       "target": "/feature-implement",
@@ -9761,9 +10754,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "preload",
         "identity",
-        "memory"
+        "memory",
+        "preload"
       ],
       "source": "PAT-034",
       "target": "SES-014",
@@ -9785,8 +10778,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "whys",
-        "cause",
-        "root"
+        "root",
+        "cause"
       ],
       "source": "PAT-036",
       "target": "/debug",
@@ -9796,8 +10789,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "architecture"
+        "architecture",
+        "graph"
       ],
       "source": "PAT-037",
       "target": "PAT-048",
@@ -9818,9 +10811,20 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "features",
+        "work"
+      ],
+      "source": "PAT-037",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "tracking",
         "work",
-        "graph",
-        "tracking"
+        "graph"
       ],
       "source": "PAT-037",
       "target": "ses-1770068415",
@@ -9842,8 +10846,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "features"
+        "features",
+        "work"
       ],
       "source": "PAT-037",
       "target": "/epic-design",
@@ -9853,8 +10857,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "telemetry",
-        "signals"
+        "signals",
+        "telemetry"
       ],
       "source": "PAT-040",
       "target": "PAT-042",
@@ -9864,8 +10868,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "telemetry",
-        "signals"
+        "signals",
+        "telemetry"
       ],
       "source": "PAT-040",
       "target": "PAT-047",
@@ -9886,8 +10890,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "telemetry",
         "signals",
+        "telemetry",
         "raise"
       ],
       "source": "PAT-042",
@@ -9898,9 +10902,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "shoulders",
         "giants",
-        "standing"
+        "standing",
+        "shoulders"
       ],
       "source": "PAT-043",
       "target": "PAT-049",
@@ -9910,10 +10914,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "worklifecycle",
-        "telemetry",
+        "phases",
         "designplanimplementreview",
-        "phases"
+        "telemetry",
+        "worklifecycle"
       ],
       "source": "PAT-045",
       "target": "PAT-047",
@@ -9923,8 +10927,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "telemetry",
-        "unification"
+        "unification",
+        "telemetry"
       ],
       "source": "PAT-045",
       "target": "ses-1770095000",
@@ -9934,8 +10938,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "analysis",
-        "lean"
+        "lean",
+        "analysis"
       ],
       "source": "PAT-045",
       "target": "/debug",
@@ -9956,10 +10960,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "node",
+        "networkx",
         "nodes",
         "graph",
-        "networkx"
+        "node"
       ],
       "source": "PAT-048",
       "target": "PAT-050",
@@ -10024,8 +11028,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "knowledge"
+        "knowledge",
+        "graph"
       ],
       "source": "PAT-048",
       "target": "SES-024",
@@ -10087,11 +11091,33 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "flow",
+        "features"
+      ],
+      "source": "PAT-052",
+      "target": "PAT-058",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
         "epic",
         "merge"
       ],
       "source": "PAT-052",
       "target": "SESSION-2026-02-02-02",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "verification",
+        "merge"
+      ],
+      "source": "PAT-052",
+      "target": "/feature-close",
       "key": 0
     },
     {
@@ -10121,8 +11147,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "unified",
-        "graph",
-        "query"
+        "query",
+        "graph"
       ],
       "source": "PAT-053",
       "target": "PAT-054",
@@ -10137,6 +11163,17 @@
       ],
       "source": "PAT-053",
       "target": "PAT-057",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "discipline",
+        "skills"
+      ],
+      "source": "PAT-053",
+      "target": "PAT-058",
       "key": 0
     },
     {
@@ -10165,8 +11202,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "query"
+        "query",
+        "skills"
       ],
       "source": "PAT-053",
       "target": "SES-020",
@@ -10220,8 +11257,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "session"
+        "session",
+        "graph"
       ],
       "source": "PAT-054",
       "target": "SES-023",
@@ -10231,8 +11268,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "context",
-        "session"
+        "session",
+        "context"
       ],
       "source": "PAT-054",
       "target": "/session-close",
@@ -10253,8 +11290,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "design",
-        "context"
+        "context",
+        "design"
       ],
       "source": "PAT-055",
       "target": "SES-015",
@@ -10264,11 +11301,22 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "design",
-        "plan"
+        "plan",
+        "design"
       ],
       "source": "PAT-055",
       "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "feature",
+        "features"
+      ],
+      "source": "PAT-056",
+      "target": "PAT-058",
       "key": 0
     },
     {
@@ -10291,6 +11339,17 @@
       ],
       "source": "PAT-056",
       "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "scope",
+        "feature"
+      ],
+      "source": "PAT-056",
+      "target": "/feature-start",
       "key": 0
     },
     {
@@ -10330,8 +11389,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "knowledge"
+        "knowledge",
+        "graph"
       ],
       "source": "PAT-057",
       "target": "SES-024",
@@ -10346,6 +11405,76 @@
       ],
       "source": "PAT-057",
       "target": "/feature-implement",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "create",
+        "features",
+        "feature",
+        "work"
+      ],
+      "source": "PAT-058",
+      "target": "/epic-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "create",
+        "features"
+      ],
+      "source": "PAT-058",
+      "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "create",
+        "feature",
+        "features"
+      ],
+      "source": "PAT-058",
+      "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "feature",
+        "work"
+      ],
+      "source": "PAT-058",
+      "target": "/feature-start",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "process",
+        "features"
+      ],
+      "source": "PAT-058",
+      "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "work",
+        "feature",
+        "features"
+      ],
+      "source": "PAT-058",
+      "target": "/epic-design",
       "key": 0
     },
     {
@@ -10385,9 +11514,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "structure",
         "core",
-        "identity"
+        "identity",
+        "structure"
       ],
       "source": "CAL-010",
       "target": "SES-011",
@@ -10397,8 +11526,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "memory"
+        "memory",
+        "graph"
       ],
       "source": "CAL-011",
       "target": "SES-012",
@@ -10408,8 +11537,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "CAL-012",
       "target": "SES-013",
@@ -10419,8 +11548,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "CAL-012",
       "target": "SES-023",
@@ -10496,8 +11625,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "skills",
-        "integration"
+        "integration",
+        "skills"
       ],
       "source": "SES-013",
       "target": "SES-023",
@@ -10507,8 +11636,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "work",
-        "tracking"
+        "tracking",
+        "work"
       ],
       "source": "ses-1770068415",
       "target": "/epic-plan",
@@ -10518,10 +11647,10 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "tasks",
         "builder",
-        "f112"
+        "tasks",
+        "f112",
+        "graph"
       ],
       "source": "SES-017",
       "target": "SES-018",
@@ -10542,8 +11671,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "graph",
-        "integration"
+        "integration",
+        "graph"
       ],
       "source": "SES-021",
       "target": "SES-023",
@@ -10572,8 +11701,8 @@
       "weight": 0.5,
       "shared_keywords": [
         "starting",
-        "feature",
         "features",
+        "feature",
         "work"
       ],
       "source": "/epic-plan",
@@ -10591,9 +11720,9 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
+        "create",
         "feature",
-        "features",
-        "create"
+        "features"
       ],
       "source": "/epic-plan",
       "target": "/feature-design",
@@ -10603,15 +11732,37 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "dependencies",
-        "features",
-        "executable",
+        "tracking",
+        "feature"
+      ],
+      "source": "/epic-plan",
+      "target": "/feature-close",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "create",
         "implementation",
         "plan",
-        "create"
+        "dependencies",
+        "executable",
+        "features"
       ],
       "source": "/epic-plan",
       "target": "/feature-plan",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "feature",
+        "work"
+      ],
+      "source": "/epic-plan",
+      "target": "/feature-start",
       "key": 0
     },
     {
@@ -10648,6 +11799,25 @@
       "key": 0
     },
     {
+      "type": "needs_context",
+      "weight": 1.0,
+      "source": "/feature-close",
+      "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "complete",
+        "update",
+        "close"
+      ],
+      "source": "/feature-close",
+      "target": "/feature-review",
+      "key": 1
+    },
+    {
       "type": "related_to",
       "weight": 1.0,
       "source": "/feature-plan",
@@ -10669,8 +11839,8 @@
       "type": "related_to",
       "weight": 0.5,
       "shared_keywords": [
-        "features",
-        "create"
+        "create",
+        "features"
       ],
       "source": "/feature-plan",
       "target": "/feature-design",
@@ -10722,10 +11892,10 @@
       "weight": 0.5,
       "shared_keywords": [
         "feature",
-        "significant",
+        "decisions",
         "architectural",
-        "features",
-        "decisions"
+        "significant",
+        "features"
       ],
       "source": "/feature-design",
       "target": "/epic-design",
@@ -10736,9 +11906,9 @@
       "weight": 0.5,
       "shared_keywords": [
         "continuity",
+        "session",
         "memory",
-        "sessions",
-        "session"
+        "sessions"
       ],
       "source": "/session-close",
       "target": "/session-start",
@@ -10753,6 +11923,24 @@
       ],
       "source": "/session-close",
       "target": "/feature-review",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 1.0,
+      "source": "/feature-start",
+      "target": "/feature-design",
+      "key": 0
+    },
+    {
+      "type": "related_to",
+      "weight": 0.5,
+      "shared_keywords": [
+        "feature",
+        "work"
+      ],
+      "source": "/feature-start",
+      "target": "/epic-design",
       "key": 0
     },
     {
@@ -10772,6 +11960,13 @@
       "source": "/feature-review",
       "target": "/feature-implement",
       "key": 1
+    },
+    {
+      "type": "related_to",
+      "weight": 1.0,
+      "source": "/feature-review",
+      "target": "/feature-close",
+      "key": 0
     },
     {
       "type": "needs_context",
