@@ -114,9 +114,36 @@ Create retrospective document:
 
 **Verification:** Retrospective documented.
 
+### Step 6: Emit Calibration Telemetry
+
+Record the calibration signal for velocity tracking:
+
+```bash
+raise telemetry emit-calibration {feature_id} \
+  --size {XS|S|M|L} \
+  --estimated {minutes} \
+  --actual {minutes}
+```
+
+**Parameters:**
+- `feature_id`: Feature ID from the plan (e.g., F9.4)
+- `--size`: T-shirt size from the plan
+- `--estimated`: Total estimated minutes from the plan
+- `--actual`: Total actual minutes from progress log
+
+**Example:**
+```bash
+raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
+```
+
+**Verification:** Command shows velocity and "Calibration event recorded".
+
+> **If you can't continue:** CLI not available → Skip; telemetry is optional.
+
 ## Output
 
 - **Artifact:** `work/features/{feature}/retrospective.md`
+- **Telemetry:** `.rai/telemetry/signals.jsonl` (calibration event via CLI)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement
 
