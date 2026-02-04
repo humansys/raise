@@ -24,6 +24,9 @@ NodeType = Literal[
     "epic",  # E* — epic scopes
     "feature",  # F*.* — feature work items
     "skill",  # /name — skill metadata
+    "decision",  # ADR-* — architecture decisions (E12)
+    "guardrail",  # GR-* — code standards (E12)
+    "term",  # TERM-* — glossary definitions (E12)
 ]
 
 # Edge types for relationships between concepts
