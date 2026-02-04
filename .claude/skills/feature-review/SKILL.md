@@ -12,7 +12,7 @@ metadata:
   raise.frequency: per-feature
   raise.fase: "7"
   raise.prerequisites: feature-implement
-  raise.next: ""
+  raise.next: feature-close
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
@@ -69,6 +69,25 @@ raise telemetry emit feature {feature_id} --event start --phase review
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p review`
+
+### Step 0.1: Verify Prerequisites (Deterministic)
+
+Implementation must be complete:
+
+```bash
+uv run pytest --tb=no -q || {
+    echo "ERROR: Tests must pass before review"
+    exit 10  # GateFailedError
+}
+```
+
+**Decision:**
+- Tests pass → Continue with review
+- Tests fail → Fix tests first, then review
+
+**Verification:** All tests passing.
+
+> **If you can't continue:** Fix failing tests. Review requires green tests.
 
 ### Step 0.5: Query Context
 
