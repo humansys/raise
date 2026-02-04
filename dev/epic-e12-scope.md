@@ -1,6 +1,6 @@
 # Epic E12: Complete Knowledge Graph
 
-> **Status:** DESIGNED — Ready for /epic-plan
+> **Status:** PLANNED — Ready for implementation
 > **Branch:** `epic/e12/complete-knowledge-graph`
 > **Created:** 2026-02-03
 > **Target:** Post-F&F (Feb 15+)
@@ -280,6 +280,135 @@ Still well under 1K — no performance concerns.
 
 ---
 
-*Epic designed: 2026-02-03*
+## Implementation Plan
+
+> Added by `/epic-plan` — 2026-02-03
+
+### Feature Sequence
+
+| Order | Feature | Size | Dependencies | Milestone | Rationale |
+|:-----:|---------|:----:|--------------|-----------|-----------|
+| 1 | F12.4: Schema Extension | XS | None | M1 | Foundation — types must exist first |
+| 2 | F12.1: ADR Extractor | M | F12.4 | M1 | Risk-first — highest uncertainty (format variance) |
+| 3 | F12.2: Guardrails Extractor | S | F12.4 | M2 | Parallel with F12.3, leverages parser pattern |
+| 3 | F12.3: Glossary Extractor | S | F12.4 | M2 | Parallel with F12.2, leverages parser pattern |
+| 4 | F12.6: Memory Write CLI | M | None | M2 | Independent track, can start after M1 |
+| 5 | F12.5: Skill Query Alignment | S | F12.1-F12.4 | M3 | Last — depends on all types existing |
+
+### Milestones
+
+| Milestone | Features | Target | Success Criteria | Demo |
+|-----------|----------|--------|------------------|------|
+| **M1: Walking Skeleton** | F12.4, F12.1 | Day 1-2 | `raise context query "ADR" --types decision` works | Query returns ADR-019, ADR-020 |
+| **M2: Full Extraction** | +F12.2, F12.3, F12.6 | Day 3-4 | All governance types extractable, memory write works | Query guardrails, glossary; add pattern via CLI |
+| **M3: Skills Aligned** | +F12.5 | Day 5 | All feature cycle skills use correct types | /feature-design finds ADRs |
+| **M4: Epic Complete** | Integration | Day 6 | Done criteria met, ADR-020 accepted | Full demo, retrospective |
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stream 1 (Critical): F12.4 ─► F12.1 ──────────────► F12.5
+                              ↓ enables
+Stream 2 (Parallel):         F12.2 ───────────────► merge
+                              ↓ parallel            ↑
+Stream 3 (Parallel):         F12.3 ────────────────┘
+
+Stream 4 (Independent):      F12.6 ─────────────────────────
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**Merge points:**
+- After F12.4: Split into parallel extractor streams
+- Before F12.5: Merge all extractors, align skill queries
+- F12.6 independent: Can start anytime after M1, no merge needed
+
+### Progress Tracking
+
+| Feature | Size | Status | Actual | Velocity | Notes |
+|---------|:----:|:------:|:------:|:--------:|-------|
+| F12.4: Schema Extension | XS | Pending | - | - | |
+| F12.1: ADR Extractor | M | Pending | - | - | |
+| F12.2: Guardrails Extractor | S | Pending | - | - | |
+| F12.3: Glossary Extractor | S | Pending | - | - | |
+| F12.6: Memory Write CLI | M | Pending | - | - | |
+| F12.5: Skill Query Alignment | S | Pending | - | - | |
+
+**Milestone Progress:**
+- [ ] M1: Walking Skeleton (Day 1-2)
+- [ ] M2: Full Extraction (Day 3-4)
+- [ ] M3: Skills Aligned (Day 5)
+- [ ] M4: Epic Complete (Day 6)
+
+### Sequencing Rationale
+
+#### F12.4: Schema Extension (First)
+- **Position:** First
+- **Rationale:** All extractors need new types to exist; XS size means quick unblock
+- **Dependencies:** None
+- **Enables:** F12.1, F12.2, F12.3
+- **Risk:** Low (additive change, no breaking)
+- **Parallel:** No (blocking)
+
+#### F12.1: ADR Extractor (Second)
+- **Position:** Second (after F12.4)
+- **Rationale:** Risk-first — format variance is highest uncertainty; most value (40+ nodes)
+- **Dependencies:** F12.4
+- **Enables:** F12.5
+- **Risk:** Medium (three ADR formats to handle)
+- **Parallel:** No (on critical path for M1)
+
+#### F12.2 + F12.3: Guardrails + Glossary (Parallel)
+- **Position:** Third (parallel after F12.1)
+- **Rationale:** Lower risk; leverage parser pattern from F12.1; 1.3-1.5x velocity expected
+- **Dependencies:** F12.4
+- **Enables:** F12.5
+- **Risk:** Low (single format each, familiar pattern)
+- **Parallel:** Yes (with each other and F12.6)
+
+#### F12.6: Memory Write CLI (Independent)
+- **Position:** Flexible (start after M1)
+- **Rationale:** Independent track; doesn't block extractors
+- **Dependencies:** None (uses existing patterns.jsonl)
+- **Enables:** /feature-review integration
+- **Risk:** Medium (deduplication logic)
+- **Parallel:** Yes (fully independent)
+
+#### F12.5: Skill Query Alignment (Last)
+- **Position:** Fifth (after all extractors)
+- **Rationale:** Depends on all types existing; validates end-to-end flow
+- **Dependencies:** F12.1, F12.2, F12.3, F12.4
+- **Enables:** Epic complete
+- **Risk:** Low (configuration changes only)
+- **Parallel:** No (depends on all extractors)
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| ADR v1 format harder than expected | Medium | Medium | Timebox to 2h; fallback to root+v2 only |
+| Parallel extractors conflict on extractor.py | Low | Low | Clear integration points; feature branches |
+| Memory write dedup blocks review | Medium | Low | Start simple (exact match); iterate |
+
+### Velocity Assumptions
+
+- **Baseline:** 2-3x multiplier with kata cycle (PAT-016)
+- **Parser familiarity:** 1.3-1.5x for F12.2, F12.3 (PAT-038)
+- **Schema extension:** Fast (XS = <30 min)
+- **Buffer:** 20% for integration, polish
+
+**Expected timeline:**
+| Size | Estimate | With Buffer |
+|:----:|:--------:|:-----------:|
+| XS | 20-30 min | 30 min |
+| S | 40-90 min | 1-1.5h |
+| M | 1.5-3h | 2-4h |
+
+**Total:** ~10 SP ≈ 8-12 hours ≈ 2-3 days focused work
+
+---
+
+*Epic planned: 2026-02-03*
 *ADR: ADR-020 (Proposed)*
-*Next: /epic-plan for task breakdown*
+*Next: `/feature-design` for F12.4 (Schema Extension)*
