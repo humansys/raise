@@ -76,6 +76,16 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 
 ## Steps
 
+### Step 0: Emit Epic Start (Telemetry)
+
+Record the start of the plan phase:
+
+```bash
+raise telemetry emit epic {epic_id} --event start --phase plan
+```
+
+**Example:** `raise telemetry emit epic E9 -e start -p plan`
+
 ### Step 1: Review Epic Design Output
 
 Load and understand the epic scope before planning.
@@ -475,6 +485,18 @@ Self-review checklist before starting implementation.
 **Verification:** All validation checkboxes checked.
 
 > **If you can't continue:** Validation fails → Address gaps before starting implementation.
+
+---
+
+### Step 12: Emit Epic Complete (Telemetry)
+
+Record the completion of the plan phase:
+
+```bash
+raise telemetry emit epic {epic_id} --event complete --phase plan
+```
+
+**Example:** `raise telemetry emit epic E9 -e complete -p plan`
 
 ---
 

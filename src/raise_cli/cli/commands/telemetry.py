@@ -15,8 +15,8 @@ from rich.console import Console
 
 from raise_cli.telemetry.schemas import (
     CalibrationEvent,
-    FeatureLifecycle,
     SessionEvent,
+    WorkLifecycle,
 )
 from raise_cli.telemetry.writer import emit
 
@@ -197,11 +197,15 @@ def emit_calibration(
         raise typer.Exit(1)
 
 
-@telemetry_app.command("emit-feature")
-def emit_feature(
-    feature: Annotated[
+@telemetry_app.command("emit")
+def emit_work(
+    work_type: Annotated[
         str,
-        typer.Argument(help="Feature ID (e.g., F9.4)"),
+        typer.Argument(help="Work type (epic, feature)"),
+    ],
+    work_id: Annotated[
+        str,
+        typer.Argument(help="Work ID (e.g., E9, F9.4)"),
     ],
     event_type: Annotated[
         str,
@@ -218,33 +222,46 @@ def emit_feature(
         typer.Option("--blocker", "-b", help="Blocker description (for blocked events)"),
     ] = "",
 ) -> None:
-    """Emit a feature lifecycle event for Lean flow analysis.
+    """Emit a work lifecycle event for Lean flow analysis.
 
-    Tracks feature progression through phases to enable:
+    Tracks work items (epics, features) through normalized phases to enable:
     - Lead time: total time from start to complete
     - Wait time: gaps between phases
-    - WIP: features started but not completed
+    - WIP: work started but not completed
     - Bottlenecks: which phase takes longest
+    - Cross-level analysis: compare epic vs feature flow
 
-    Call at the start and end of each phase (design, plan, implement, review).
+    Phases (normalized across all work types):
+    - design: Scope definition and specification
+    - plan: Task/feature decomposition and sequencing
+    - implement: Active development work
+    - review: Retrospective and learnings
 
     Examples:
-        # Starting design phase
-        $ raise telemetry emit-feature F9.4 --event start --phase design
+        # Epic lifecycle
+        $ raise telemetry emit epic E9 --event start --phase design
+        $ raise telemetry emit epic E9 -e complete -p design
+        $ raise telemetry emit epic E9 -e start -p plan
 
-        # Completing design, starting plan
-        $ raise telemetry emit-feature F9.4 -e complete -p design
-        $ raise telemetry emit-feature F9.4 -e start -p plan
+        # Feature lifecycle
+        $ raise telemetry emit feature F9.4 --event start --phase design
+        $ raise telemetry emit feature F9.4 -e complete -p implement
+        $ raise telemetry emit feature F9.4 -e start -p review
 
-        # Feature blocked
-        $ raise telemetry emit-feature F9.4 -e blocked -p plan -b "unclear requirements"
+        # Work blocked
+        $ raise telemetry emit feature F9.4 -e blocked -p plan -b "unclear requirements"
 
-        # Feature unblocked
-        $ raise telemetry emit-feature F9.4 -e unblocked -p plan
-
-        # Feature complete (after review)
-        $ raise telemetry emit-feature F9.4 -e complete -p review
+        # Work unblocked
+        $ raise telemetry emit feature F9.4 -e unblocked -p plan
     """
+    # Validate work type
+    valid_work_types: list[Literal["epic", "feature"]] = ["epic", "feature"]
+    work_type_lower = work_type.lower()
+    if work_type_lower not in valid_work_types:
+        console.print(f"[red]Error:[/red] Invalid work type: {work_type}")
+        console.print(f"Valid types: {', '.join(valid_work_types)}")
+        raise typer.Exit(1)
+
     # Validate event type
     valid_events: list[Literal["start", "complete", "blocked", "unblocked", "abandoned"]] = [
         "start",
@@ -276,9 +293,10 @@ def emit_feature(
         console.print("[yellow]Warning:[/yellow] No blocker description provided for blocked event")
 
     # Create event
-    lifecycle_event = FeatureLifecycle(
+    lifecycle_event = WorkLifecycle(
         timestamp=datetime.now(UTC),
-        feature=feature,
+        work_type=work_type_lower,  # type: ignore[arg-type]
+        work_id=work_id,
         event=event_type,  # type: ignore[arg-type]
         phase=phase,  # type: ignore[arg-type]
         blocker=blocker_value,
@@ -288,19 +306,22 @@ def emit_feature(
     result = emit(lifecycle_event)
 
     if result.success:
+        # Format label based on work type
+        label = f"{work_type_lower.capitalize()} {work_id}"
+
         # Format output based on event type
         if event_type == "start":
-            console.print(f"\n[green]▶[/green] Feature {feature} → {phase} started")
+            console.print(f"\n[green]▶[/green] {label} → {phase} started")
         elif event_type == "complete":
-            console.print(f"\n[green]✓[/green] Feature {feature} → {phase} complete")
+            console.print(f"\n[green]✓[/green] {label} → {phase} complete")
         elif event_type == "blocked":
-            console.print(f"\n[red]⏸[/red] Feature {feature} → {phase} blocked")
+            console.print(f"\n[red]⏸[/red] {label} → {phase} blocked")
             if blocker_value:
                 console.print(f"  Blocker: {blocker_value}")
         elif event_type == "unblocked":
-            console.print(f"\n[green]▶[/green] Feature {feature} → {phase} unblocked")
+            console.print(f"\n[green]▶[/green] {label} → {phase} unblocked")
         elif event_type == "abandoned":
-            console.print(f"\n[yellow]✗[/yellow] Feature {feature} → {phase} abandoned")
+            console.print(f"\n[yellow]✗[/yellow] {label} → {phase} abandoned")
 
         console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
     else:

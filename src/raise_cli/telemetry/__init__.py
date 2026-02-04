@@ -13,10 +13,10 @@ from raise_cli.telemetry.schemas import (
     CalibrationEvent,
     CommandUsage,
     ErrorEvent,
-    FeatureLifecycle,
     SessionEvent,
     Signal,
     SkillEvent,
+    WorkLifecycle,
 )
 from raise_cli.telemetry.writer import (
     EmitResult,
@@ -31,10 +31,10 @@ __all__ = [
     "CommandUsage",
     "EmitResult",
     "ErrorEvent",
-    "FeatureLifecycle",
     "SessionEvent",
     "Signal",
     "SkillEvent",
+    "WorkLifecycle",
     "emit",
     "emit_command_usage",
     "emit_error_event",

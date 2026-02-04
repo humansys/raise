@@ -19,10 +19,10 @@ from raise_cli.telemetry import (
     CalibrationEvent,
     CommandUsage,
     ErrorEvent,
-    FeatureLifecycle,
     SessionEvent,
     Signal,
     SkillEvent,
+    WorkLifecycle,
 )
 
 
@@ -281,32 +281,49 @@ class TestCommandUsage:
         assert data["subcommand"] == "query"
 
 
-# --- FeatureLifecycle Tests ---
+# --- WorkLifecycle Tests ---
 
 
-class TestFeatureLifecycle:
-    """Tests for FeatureLifecycle schema (Lean flow analysis)."""
+class TestWorkLifecycle:
+    """Tests for WorkLifecycle schema (unified Lean flow analysis)."""
 
-    def test_create_start_event(self, now: datetime) -> None:
+    def test_create_feature_start_event(self, now: datetime) -> None:
         """Create a feature start event."""
-        event = FeatureLifecycle(
+        event = WorkLifecycle(
             timestamp=now,
-            feature="F9.4",
+            work_type="feature",
+            work_id="F9.4",
             event="start",
             phase="design",
         )
 
-        assert event.type == "feature_lifecycle"
-        assert event.feature == "F9.4"
+        assert event.type == "work_lifecycle"
+        assert event.work_type == "feature"
+        assert event.work_id == "F9.4"
         assert event.event == "start"
         assert event.phase == "design"
         assert event.blocker is None
 
-    def test_create_complete_event(self, now: datetime) -> None:
-        """Create a feature complete event."""
-        event = FeatureLifecycle(
+    def test_create_epic_start_event(self, now: datetime) -> None:
+        """Create an epic start event."""
+        event = WorkLifecycle(
             timestamp=now,
-            feature="F9.4",
+            work_type="epic",
+            work_id="E9",
+            event="start",
+            phase="design",
+        )
+
+        assert event.type == "work_lifecycle"
+        assert event.work_type == "epic"
+        assert event.work_id == "E9"
+
+    def test_create_complete_event(self, now: datetime) -> None:
+        """Create a complete event."""
+        event = WorkLifecycle(
+            timestamp=now,
+            work_type="feature",
+            work_id="F9.4",
             event="complete",
             phase="review",
         )
@@ -316,9 +333,10 @@ class TestFeatureLifecycle:
 
     def test_create_blocked_event_with_blocker(self, now: datetime) -> None:
         """Create a blocked event with blocker description."""
-        event = FeatureLifecycle(
+        event = WorkLifecycle(
             timestamp=now,
-            feature="F9.4",
+            work_type="feature",
+            work_id="F9.4",
             event="blocked",
             phase="plan",
             blocker="unclear requirements",
@@ -329,21 +347,34 @@ class TestFeatureLifecycle:
 
     def test_create_abandoned_event(self, now: datetime) -> None:
         """Create an abandoned event."""
-        event = FeatureLifecycle(
+        event = WorkLifecycle(
             timestamp=now,
-            feature="F9.4",
+            work_type="epic",
+            work_id="E9",
             event="abandoned",
             phase="implement",
         )
 
         assert event.event == "abandoned"
 
+    def test_invalid_work_type(self, now: datetime) -> None:
+        """Invalid work type raises ValidationError."""
+        with pytest.raises(ValidationError):
+            WorkLifecycle(
+                timestamp=now,
+                work_type="sprint",  # type: ignore[arg-type]
+                work_id="S1",
+                event="start",
+                phase="design",
+            )
+
     def test_invalid_event_type(self, now: datetime) -> None:
         """Invalid event type raises ValidationError."""
         with pytest.raises(ValidationError):
-            FeatureLifecycle(
+            WorkLifecycle(
                 timestamp=now,
-                feature="F9.4",
+                work_type="feature",
+                work_id="F9.4",
                 event="invalid",  # type: ignore[arg-type]
                 phase="design",
             )
@@ -351,27 +382,54 @@ class TestFeatureLifecycle:
     def test_invalid_phase(self, now: datetime) -> None:
         """Invalid phase raises ValidationError."""
         with pytest.raises(ValidationError):
-            FeatureLifecycle(
+            WorkLifecycle(
                 timestamp=now,
-                feature="F9.4",
+                work_type="feature",
+                work_id="F9.4",
                 event="start",
-                phase="invalid",  # type: ignore[arg-type]
+                phase="active",  # type: ignore[arg-type] - not valid with normalized phases
             )
 
     def test_serialization(self, now: datetime) -> None:
         """Event serializes to JSON correctly."""
-        event = FeatureLifecycle(
+        event = WorkLifecycle(
             timestamp=now,
-            feature="F9.4",
+            work_type="feature",
+            work_id="F9.4",
             event="blocked",
             phase="plan",
             blocker="waiting for ADR",
         )
         data = json.loads(event.model_dump_json())
 
-        assert data["type"] == "feature_lifecycle"
-        assert data["feature"] == "F9.4"
+        assert data["type"] == "work_lifecycle"
+        assert data["work_type"] == "feature"
+        assert data["work_id"] == "F9.4"
         assert data["blocker"] == "waiting for ADR"
+
+    def test_epic_review_phase(self, now: datetime) -> None:
+        """Epic can use review phase (normalized from 'close')."""
+        event = WorkLifecycle(
+            timestamp=now,
+            work_type="epic",
+            work_id="E9",
+            event="complete",
+            phase="review",
+        )
+
+        assert event.phase == "review"
+
+    def test_epic_implement_phase(self, now: datetime) -> None:
+        """Epic can use implement phase (normalized from 'active')."""
+        event = WorkLifecycle(
+            timestamp=now,
+            work_type="epic",
+            work_id="E9",
+            event="start",
+            phase="implement",
+        )
+
+        assert event.phase == "implement"
 
 
 # --- Signal Union Tests ---
@@ -457,12 +515,13 @@ class TestSignalUnion:
         assert isinstance(signal, CommandUsage)
         assert signal.command == "memory"
 
-    def test_parse_feature_lifecycle(self, now: datetime) -> None:
-        """Parse FeatureLifecycle from JSON via discriminated union."""
+    def test_parse_work_lifecycle_feature(self, now: datetime) -> None:
+        """Parse WorkLifecycle for feature from JSON via discriminated union."""
         data = {
-            "type": "feature_lifecycle",
+            "type": "work_lifecycle",
             "timestamp": now.isoformat(),
-            "feature": "F9.4",
+            "work_type": "feature",
+            "work_id": "F9.4",
             "event": "blocked",
             "phase": "plan",
             "blocker": "waiting for ADR",
@@ -470,9 +529,28 @@ class TestSignalUnion:
         adapter = TypeAdapter(Signal)
         signal = adapter.validate_python(data)
 
-        assert isinstance(signal, FeatureLifecycle)
-        assert signal.feature == "F9.4"
+        assert isinstance(signal, WorkLifecycle)
+        assert signal.work_type == "feature"
+        assert signal.work_id == "F9.4"
         assert signal.blocker == "waiting for ADR"
+
+    def test_parse_work_lifecycle_epic(self, now: datetime) -> None:
+        """Parse WorkLifecycle for epic from JSON via discriminated union."""
+        data = {
+            "type": "work_lifecycle",
+            "timestamp": now.isoformat(),
+            "work_type": "epic",
+            "work_id": "E9",
+            "event": "complete",
+            "phase": "review",
+        }
+        adapter = TypeAdapter(Signal)
+        signal = adapter.validate_python(data)
+
+        assert isinstance(signal, WorkLifecycle)
+        assert signal.work_type == "epic"
+        assert signal.work_id == "E9"
+        assert signal.phase == "review"
 
     def test_invalid_type_discriminator(self, now: datetime) -> None:
         """Invalid type discriminator raises ValidationError."""

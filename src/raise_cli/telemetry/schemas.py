@@ -10,7 +10,7 @@ Signal types:
 - CalibrationEvent: Tracks estimate vs actual for velocity calibration
 - ErrorEvent: Tracks tool failures
 - CommandUsage: Tracks CLI command usage
-- FeatureLifecycle: Tracks feature flow through phases (Lean flow analysis)
+- WorkLifecycle: Tracks work items (epic/feature) through phases (Lean flow analysis)
 """
 
 from __future__ import annotations
@@ -197,38 +197,58 @@ class CommandUsage(BaseModel):
     subcommand: str | None = Field(default=None, description="Subcommand name if any")
 
 
-class FeatureLifecycle(BaseModel):
-    """A feature lifecycle event for Lean flow analysis.
+class WorkLifecycle(BaseModel):
+    """A unified work lifecycle event for Lean flow analysis.
 
-    Tracks feature progression through phases to enable:
+    Tracks work items (epics, features, etc.) through normalized phases to enable:
     - Lead time calculation (start to complete)
     - Wait time detection (gaps between phases)
     - WIP tracking (started but not completed)
     - Bottleneck identification (longest phase)
     - Flow efficiency (active time / lead time)
+    - Cross-level analysis (compare epic vs feature flow)
+
+    Phases (normalized across all work types):
+    - design: Scope definition and specification
+    - plan: Task/feature decomposition and sequencing
+    - implement: Active development work
+    - review: Retrospective and learnings
 
     Attributes:
-        type: Discriminator field, always "feature_lifecycle".
+        type: Discriminator field, always "work_lifecycle".
         timestamp: When the event occurred (UTC).
-        feature: Feature identifier (e.g., "F9.4").
+        work_type: Type of work item (epic, feature, etc.).
+        work_id: Work item identifier (e.g., "E9", "F9.4").
         event: Lifecycle event type.
         phase: Current phase in the workflow.
         blocker: Description of blocker (only for blocked event).
 
     Examples:
         >>> from datetime import datetime, timezone
-        >>> event = FeatureLifecycle(
+        >>> event = WorkLifecycle(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     feature="F9.4",
+        ...     work_type="feature",
+        ...     work_id="F9.4",
         ...     event="start",
         ...     phase="design"
         ... )
         >>> event.type
-        'feature_lifecycle'
+        'work_lifecycle'
 
-        >>> blocked = FeatureLifecycle(
+        >>> epic = WorkLifecycle(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     feature="F9.4",
+        ...     work_type="epic",
+        ...     work_id="E9",
+        ...     event="complete",
+        ...     phase="review"
+        ... )
+        >>> epic.work_type
+        'epic'
+
+        >>> blocked = WorkLifecycle(
+        ...     timestamp=datetime.now(timezone.utc),
+        ...     work_type="feature",
+        ...     work_id="F9.4",
         ...     event="blocked",
         ...     phase="plan",
         ...     blocker="unclear requirements"
@@ -237,9 +257,12 @@ class FeatureLifecycle(BaseModel):
         'unclear requirements'
     """
 
-    type: Literal["feature_lifecycle"] = "feature_lifecycle"
+    type: Literal["work_lifecycle"] = "work_lifecycle"
     timestamp: datetime = Field(..., description="When the event occurred (UTC)")
-    feature: str = Field(..., description="Feature identifier (e.g., 'F9.4')")
+    work_type: Literal["epic", "feature"] = Field(
+        ..., description="Type of work item (epic, feature)"
+    )
+    work_id: str = Field(..., description="Work item identifier (e.g., 'E9', 'F9.4')")
     event: Literal["start", "complete", "blocked", "unblocked", "abandoned"] = Field(
         ..., description="Lifecycle event type"
     )
@@ -258,7 +281,7 @@ Signal = Annotated[
     | CalibrationEvent
     | ErrorEvent
     | CommandUsage
-    | FeatureLifecycle,
+    | WorkLifecycle,
     Field(discriminator="type"),
 ]
 """Union of all signal types with discriminator for type-safe parsing."""
