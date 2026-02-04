@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 
 from raise_cli.governance.models import Concept, ConceptType, ExtractionResult
+from raise_cli.governance.parsers.adr import extract_all_decisions
 from raise_cli.governance.parsers.backlog import extract_epics, extract_project
 from raise_cli.governance.parsers.constitution import extract_principles
 from raise_cli.governance.parsers.epic import extract_epic_details, extract_features
@@ -164,6 +165,14 @@ class GovernanceExtractor:
         # Extract work concepts (E8)
         concepts.extend(self._extract_work_concepts())
 
+        # Extract ADR decisions (E12)
+        try:
+            adr_concepts = extract_all_decisions(self.project_root)
+            concepts.extend(adr_concepts)
+            logger.info(f"Extracted {len(adr_concepts)} ADR decisions")
+        except Exception as e:
+            logger.error(f"Error extracting ADRs: {e}")
+
         return concepts
 
     def extract_with_result(self) -> ExtractionResult:
@@ -226,6 +235,19 @@ class GovernanceExtractor:
         )
         epic_count = len(list(self.project_root.glob("dev/epic-*-scope.md")))
         files_processed += backlog_count + epic_count
+
+        # Extract ADR decisions (E12)
+        try:
+            adr_concepts = extract_all_decisions(self.project_root)
+            concepts.extend(adr_concepts)
+            # Count ADR files processed
+            adr_root_count = len(list(self.project_root.glob("dev/decisions/adr-*.md")))
+            adr_v2_count = len(
+                list(self.project_root.glob("dev/decisions/v2/adr-*.md"))
+            )
+            files_processed += adr_root_count + adr_v2_count
+        except Exception as e:
+            errors.append(f"Error extracting ADRs: {e}")
 
         return ExtractionResult(
             concepts=concepts,

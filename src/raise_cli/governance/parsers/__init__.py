@@ -1,9 +1,14 @@
 """Parsers for governance markdown files.
 
 This module contains parsers for different governance document types
-(PRD, Vision, Constitution, Backlog, Epic) that extract semantic concepts.
+(PRD, Vision, Constitution, Backlog, Epic, ADR) that extract semantic concepts.
 """
 
+from raise_cli.governance.parsers.adr import (
+    extract_all_decisions,
+    extract_decision_from_file,
+    extract_decisions,
+)
 from raise_cli.governance.parsers.backlog import extract_epics, extract_project
 from raise_cli.governance.parsers.constitution import extract_principles
 from raise_cli.governance.parsers.epic import extract_epic_details, extract_features
@@ -18,4 +23,7 @@ __all__ = [
     "extract_epics",
     "extract_epic_details",
     "extract_features",
+    "extract_decisions",
+    "extract_decision_from_file",
+    "extract_all_decisions",
 ]
