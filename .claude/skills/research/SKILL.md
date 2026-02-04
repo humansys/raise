@@ -85,6 +85,20 @@ Engineering-specific evidence hierarchy:
 
 ## Steps
 
+### Step 0.5: Query Context (Optional)
+
+If unified graph is available, query for prior research and methodology patterns:
+
+```bash
+raise context query "research methodology evidence" --unified --types pattern,session --limit 5
+```
+
+Review returned patterns to avoid duplicating prior research.
+
+**Verification:** Context loaded or graph not available (proceed without).
+
+> **If context unavailable:** Run `raise graph build --unified` first, or skip to Step 1.
+
 ### Step 1: Frame the Question
 
 Define research scope:
