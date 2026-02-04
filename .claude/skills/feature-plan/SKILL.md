@@ -109,14 +109,32 @@ Divide story into atomic tasks:
 ### Task N: [Name]
 - **Description:** What to do
 - **Files:** Files to create/modify
-- **Verification:** How to verify completion
+- **TDD Cycle:** RED (write failing test) → GREEN (implement) → REFACTOR
+- **Verification:** How to verify completion (test command)
 - **Size:** XS/S/M/L
 - **Dependencies:** None / Task N
 ```
 
+**TDD Guidance (RED/GREEN cycles):**
+- **RED:** Write a failing test first that defines expected behavior
+- **GREEN:** Write minimal code to make the test pass
+- **REFACTOR:** Clean up while keeping tests green
+- For infrastructure/setup tasks, TDD cycle may be optional
+
 **Verification:** Each task is atomic and verifiable.
 
 > **If you can't continue:** Tasks too large → Divide until atomic. But avoid over-decomposition for simple features.
+
+**Required final task:** Always include a manual integration test task as the last task:
+```markdown
+### Task N (Final): Manual Integration Test
+- **Description:** Validate feature works end-to-end with running software
+- **Verification:** Demo the feature working (not just unit tests passing)
+- **Size:** XS
+- **Dependencies:** All previous tasks
+```
+
+This validates the implementation with real usage before marking the feature complete.
 
 ### Step 3: Identify Dependencies
 
@@ -195,6 +213,7 @@ raise telemetry emit feature {feature_id} --event complete --phase plan
 ### Task 1: {Name}
 - **Description:** ...
 - **Files:** ...
+- **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/test_X.py`
 - **Size:** S
 - **Dependencies:** None
@@ -202,14 +221,22 @@ raise telemetry emit feature {feature_id} --event complete --phase plan
 ### Task 2: {Name}
 - **Description:** ...
 - **Files:** ...
+- **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `ruff check src/`
 - **Size:** XS
 - **Dependencies:** Task 1
+
+### Task N (Final): Manual Integration Test
+- **Description:** Validate feature works end-to-end with running software
+- **Verification:** Demo the feature working interactively
+- **Size:** XS
+- **Dependencies:** All previous tasks
 
 ## Execution Order
 1. Task 1 (foundation)
 2. Task 2 (depends on 1)
 3. Task 3, Task 4 (parallel)
+4. Task N - Manual Integration Test (final validation)
 
 ## Risks
 - {Risk 1}: {Mitigation}
@@ -219,6 +246,7 @@ raise telemetry emit feature {feature_id} --event complete --phase plan
 |------|------|--------|-------|
 | 1 | S | -- | (filled during implementation) |
 | 2 | XS | -- | |
+| N | XS | -- | Integration test |
 ```
 
 ## References
