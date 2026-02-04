@@ -287,3 +287,4 @@
 {"type":"skill_event","timestamp":"2026-02-04T03:14:50Z","skill":"session-close","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T03:14:50Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T03:14:50Z","skill":"feature-review","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T03:17:59.772142Z","session_type":"feature","outcome":"success","duration_min":30,"features":["F11.2"]}
