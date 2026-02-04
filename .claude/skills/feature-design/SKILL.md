@@ -80,6 +80,20 @@ raise telemetry emit feature {feature_id} --event start --phase design
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p design`
 
+### Step 0.5: Query Context
+
+Load relevant architecture patterns and ADRs from unified context:
+
+```bash
+raise context query "architecture patterns ADR" --unified --types pattern,feature --limit 5
+```
+
+Review returned patterns before proceeding. Key patterns inform design decisions.
+
+**Verification:** Context loaded; relevant patterns noted.
+
+> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+
 ### Step 1: Assess Complexity
 
 Determine if feature needs a specification document.

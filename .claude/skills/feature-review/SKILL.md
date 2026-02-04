@@ -70,6 +70,20 @@ raise telemetry emit feature {feature_id} --event start --phase review
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p review`
 
+### Step 0.5: Query Context
+
+Load relevant process patterns and prior retrospectives from unified context:
+
+```bash
+raise context query "retrospective process patterns" --unified --types pattern,session --limit 5
+```
+
+Review returned patterns before proceeding. Prior learnings inform retrospective focus.
+
+**Verification:** Context loaded; relevant patterns noted.
+
+> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+
 ### Step 1: Gather Data
 
 Review the feature development:

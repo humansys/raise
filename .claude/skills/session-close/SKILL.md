@@ -67,6 +67,20 @@ Close a working session by preserving learnings, updating memory files, and prep
 
 ## Steps
 
+### Step 0.5: Query Context (Optional)
+
+If unified graph is available, query for pattern extraction context:
+
+```bash
+raise context query "session patterns learnings" --unified --types pattern,session --limit 5
+```
+
+Review returned patterns to inform what learnings to extract.
+
+**Verification:** Context loaded or graph not available (proceed without).
+
+> **If context unavailable:** Run `raise graph build --unified` first, or skip to Step 1.
+
 ### Step 1: Gather Session Summary
 
 Review what happened in this session:
