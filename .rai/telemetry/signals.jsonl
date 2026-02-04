@@ -485,3 +485,7 @@
 {"type":"skill_event","timestamp":"2026-02-04T05:58:51Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T06:00:03Z","skill":"feature-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T06:00:03Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:00:59Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:00:59Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:00:59Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T06:01:49.932237Z","session_type":"feature","outcome":"success","duration_min":30,"features":["F12.5"]}

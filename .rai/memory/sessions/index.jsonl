@@ -30,3 +30,4 @@
 {"id": "SES-025", "date": "2026-02-03", "type": "feature", "topic": "E12 F12.4+F12.1 Implementation", "outcomes": ["Schema extension complete", "ADR extractor complete", "M1 milestone done", "Process failure documented", "PAT-058 added"], "log_path": null}
 {"id": "SES-026", "date": "2026-02-03", "type": "feature", "topic": "Feature Lifecycle Skills + F12.2 Guardrails", "outcomes": ["feature-start skill", "feature-close skill", "prerequisite gates", "F12.2 complete", "20 guardrails", "PAT-059", "PAT-060"], "log_path": null}
 {"id": "SES-027", "date": "2026-02-03", "type": "feature", "topic": "F12.3 Glossary Extractor", "outcomes": ["59 terms extracted", "17 tests", "1.75x velocity"], "log_path": null}
+{"id": "SES-028", "date": "2026-02-04", "type": "feature", "topic": "F12.5 Skill Query Alignment", "outcomes": ["4 skills updated", "feature-start v1.1.0", "PAT-061 added", "2x velocity"], "log_path": null}
