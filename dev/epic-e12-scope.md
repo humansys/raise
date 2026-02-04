@@ -1,6 +1,6 @@
 # Epic E12: Complete Knowledge Graph
 
-> **Status:** PLANNED — Ready for implementation
+> **Status:** ✅ COMPLETE — Merged to v2 (2026-02-04)
 > **Branch:** `epic/e12/complete-knowledge-graph`
 > **Created:** 2026-02-03
 > **Target:** Post-F&F (Feb 15+)
@@ -215,7 +215,7 @@ raise memory add-pattern "Pattern content" \
 - [x] `/feature-design` queries return ADR nodes (via `--types decision`)
 - [x] `/feature-review` can persist patterns via CLI (Step 4.5 added in v1.1.0)
 - [x] ADR-020 status updated to "Accepted"
-- [ ] Epic merged to v2
+- [x] Epic merged to v2
 
 ---
 
