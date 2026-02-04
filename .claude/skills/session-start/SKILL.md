@@ -62,6 +62,20 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 
 ## Steps
 
+### Step 0.5: Query Context (Optional)
+
+If unified graph is available, query for session-relevant patterns:
+
+```bash
+raise context query "session epic patterns" --unified --types session,pattern --limit 5
+```
+
+Review returned patterns for session continuity context.
+
+**Verification:** Context loaded or graph not available (proceed without).
+
+> **If context unavailable:** Run `raise graph build --unified` first, or skip to Step 1.
+
 ### Step 1: Load Memory
 
 Read accumulated knowledge from `.rai/memory/`:
