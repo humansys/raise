@@ -49,7 +49,7 @@ class UnifiedGraphBuilder:
     def build(self) -> UnifiedGraph:
         """Build unified graph from all sources.
 
-        Loads concepts from governance, memory, work, and skills,
+        Loads concepts from governance, memory, work, skills, and components,
         then builds a UnifiedGraph with all nodes.
 
         Returns:
@@ -63,6 +63,7 @@ class UnifiedGraphBuilder:
         all_nodes.extend(self.load_memory())
         all_nodes.extend(self.load_work())
         all_nodes.extend(self.load_skills())
+        all_nodes.extend(self.load_components())
 
         # Add nodes to graph
         for node in all_nodes:
@@ -152,6 +153,38 @@ class UnifiedGraphBuilder:
         """
         skills_dir = self.project_root / ".claude" / "skills"
         return extract_all_skills(skills_dir)
+
+    def load_components(self) -> list[ConceptNode]:
+        """Load discovered components from validated JSON.
+
+        Reads components-validated.json from work/discovery directory.
+
+        Returns:
+            List of ConceptNode for component concepts.
+        """
+        validated_file = self.project_root / "work" / "discovery" / "components-validated.json"
+        if not validated_file.exists():
+            return []
+
+        try:
+            data: dict[str, Any] = json.loads(validated_file.read_text(encoding="utf-8"))
+            components_list: list[dict[str, Any]] = data.get("components", [])
+
+            nodes: list[ConceptNode] = []
+            for comp in components_list:
+                node = ConceptNode(
+                    id=comp.get("id", ""),
+                    type="component",
+                    content=comp.get("content", ""),
+                    source_file=comp.get("source_file"),
+                    created=comp.get("created", datetime.now(tz=UTC).isoformat()),
+                    metadata=comp.get("metadata", {}),
+                )
+                nodes.append(node)
+
+            return nodes
+        except (json.JSONDecodeError, KeyError):
+            return []
 
     def _get_governance_extractor(self) -> GovernanceExtractor:
         """Get governance extractor instance.

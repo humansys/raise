@@ -28,6 +28,7 @@ NodeType = Literal[
     "decision",  # ADR-* — architecture decisions (E12)
     "guardrail",  # GR-* — code standards (E12)
     "term",  # TERM-* — glossary definitions (E12)
+    "component",  # comp-* — discovered code components (E13)
 ]
 
 # Edge types for relationships between concepts
