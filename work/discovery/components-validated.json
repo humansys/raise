@@ -1,57 +1,2840 @@
 {
-  "generated_at": "2026-02-04T12:10:00Z",
+  "generated_at": "2026-02-04T13:46:53.979819Z",
   "source_file": "work/discovery/components-draft.yaml",
-  "component_count": 3,
+  "component_count": 156,
   "components": [
     {
-      "id": "comp-scanner-symbol",
+      "id": "comp-__main__-main",
       "type": "component",
-      "content": "Core data model representing an extracted code symbol (class, function, method). Used as output from all extraction functions.",
+      "content": "Run the CLI application with error handling. Catches RaiseError exceptions and displays them with proper formatting,",
+      "source_file": "src/raise_cli/__main__.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "main",
+        "kind": "function",
+        "line": 11,
+        "signature": "def main() -> None",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979852Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-raiseerror",
+      "type": "component",
+      "content": "Base exception for all raise-cli errors. All raise-cli exceptions inherit from this class, providing:",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "RaiseError",
+        "kind": "class",
+        "line": 25,
+        "signature": "class RaiseError(Exception)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979858Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-configurationerror",
+      "type": "component",
+      "content": "Configuration-related errors. Raised when:",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ConfigurationError",
+        "kind": "class",
+        "line": 80,
+        "signature": "class ConfigurationError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979862Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-katanotfounderror",
+      "type": "component",
+      "content": "Kata definition not found. Raised when a requested kata ID does not exist in .raise/katas/.",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "KataNotFoundError",
+        "kind": "class",
+        "line": 95,
+        "signature": "class KataNotFoundError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979864Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-gatenotfounderror",
+      "type": "component",
+      "content": "Gate definition not found. Raised when a requested gate ID does not exist in .raise/gates/.",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "GateNotFoundError",
+        "kind": "class",
+        "line": 107,
+        "signature": "class GateNotFoundError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979891Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-artifactnotfounderror",
+      "type": "component",
+      "content": "Artifact file not found. Raised when a referenced artifact path does not exist.",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ArtifactNotFoundError",
+        "kind": "class",
+        "line": 119,
+        "signature": "class ArtifactNotFoundError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979893Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-dependencyerror",
+      "type": "component",
+      "content": "External dependency not available. Raised when a required external tool is not installed or accessible:",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "DependencyError",
+        "kind": "class",
+        "line": 131,
+        "signature": "class DependencyError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979895Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-stateerror",
+      "type": "component",
+      "content": "State file corrupted or invalid. Raised when:",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "StateError",
+        "kind": "class",
+        "line": 146,
+        "signature": "class StateError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979898Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-validationerror",
+      "type": "component",
+      "content": "Schema or artifact validation failed. Raised when:",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ValidationError",
+        "kind": "class",
+        "line": 161,
+        "signature": "class ValidationError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979900Z"
+      }
+    },
+    {
+      "id": "comp-exceptions-gatefailederror",
+      "type": "component",
+      "content": "Gate validation did not pass. Raised when one or more required gate criteria fail.",
+      "source_file": "src/raise_cli/exceptions.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "GateFailedError",
+        "kind": "class",
+        "line": 176,
+        "signature": "class GateFailedError(RaiseError)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979902Z"
+      }
+    },
+    {
+      "id": "comp-config-get-config-dir",
+      "type": "component",
+      "content": "Get the XDG config directory for raise-cli. Returns the directory where user configuration files should be stored.",
+      "source_file": "src/raise_cli/config/paths.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "get_config_dir",
+        "kind": "function",
+        "line": 13,
+        "signature": "def get_config_dir() -> Path",
+        "category": "model",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979904Z"
+      }
+    },
+    {
+      "id": "comp-config-get-cache-dir",
+      "type": "component",
+      "content": "Get the XDG cache directory for raise-cli. Returns the directory where cached data should be stored.",
+      "source_file": "src/raise_cli/config/paths.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "get_cache_dir",
+        "kind": "function",
+        "line": 31,
+        "signature": "def get_cache_dir() -> Path",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979907Z"
+      }
+    },
+    {
+      "id": "comp-config-tomlconfigsource",
+      "type": "component",
+      "content": "Custom settings source for TOML configuration files.",
+      "source_file": "src/raise_cli/config/settings.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "TomlConfigSource",
+        "kind": "class",
+        "line": 32,
+        "signature": "class TomlConfigSource(PydanticBaseSettingsSource)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979909Z"
+      }
+    },
+    {
+      "id": "comp-config-get-data-dir",
+      "type": "component",
+      "content": "Get the XDG data directory for raise-cli. Returns the directory where user data files should be stored.",
+      "source_file": "src/raise_cli/config/paths.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "get_data_dir",
+        "kind": "function",
+        "line": 49,
+        "signature": "def get_data_dir() -> Path",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979913Z"
+      }
+    },
+    {
+      "id": "comp-config-raisesettings",
+      "type": "component",
+      "content": "Configuration settings for raise-cli with proper cascade precedence.",
+      "source_file": "src/raise_cli/config/settings.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "RaiseSettings",
+        "kind": "class",
+        "line": 79,
+        "signature": "class RaiseSettings(BaseSettings)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979916Z"
+      }
+    },
+    {
+      "id": "comp-core-toolresult",
+      "type": "component",
+      "content": "Result from running an external tool. Attributes:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ToolResult",
+        "kind": "class",
+        "line": 28,
+        "signature": "class ToolResult",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979918Z"
+      }
+    },
+    {
+      "id": "comp-core-gitstatus",
+      "type": "component",
+      "content": "Parsed git status output. Attributes:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "GitStatus",
+        "kind": "class",
+        "line": 48,
+        "signature": "class GitStatus",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979920Z"
+      }
+    },
+    {
+      "id": "comp-core-searchmatch",
+      "type": "component",
+      "content": "A search match from rg or sg. Attributes:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "SearchMatch",
+        "kind": "class",
+        "line": 65,
+        "signature": "class SearchMatch",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979922Z"
+      }
+    },
+    {
+      "id": "comp-core-check-tool",
+      "type": "component",
+      "content": "Check if an external tool is available. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "check_tool",
+        "kind": "function",
+        "line": 79,
+        "signature": "def check_tool(name: str) -> bool",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979924Z"
+      }
+    },
+    {
+      "id": "comp-core-require-tool",
+      "type": "component",
+      "content": "Require an external tool, raising if unavailable. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "require_tool",
+        "kind": "function",
+        "line": 95,
+        "signature": "def require_tool(name: str) -> None",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979926Z"
+      }
+    },
+    {
+      "id": "comp-core-run-tool",
+      "type": "component",
+      "content": "Run an external tool and capture output. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "run_tool",
+        "kind": "function",
+        "line": 122,
+        "signature": "def run_tool(args: list[str], *, cwd: Path | None=None, check: bool=False) -> ToolResult",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979929Z"
+      }
+    },
+    {
+      "id": "comp-core-git-root",
+      "type": "component",
+      "content": "Get the root directory of the git repository. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "git_root",
+        "kind": "function",
+        "line": 172,
+        "signature": "def git_root(cwd: Path | None=None) -> Path",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979931Z"
+      }
+    },
+    {
+      "id": "comp-core-git-branch",
+      "type": "component",
+      "content": "Get the current git branch name. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "git_branch",
+        "kind": "function",
+        "line": 198,
+        "signature": "def git_branch(cwd: Path | None=None) -> str",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979933Z"
+      }
+    },
+    {
+      "id": "comp-core-git-status",
+      "type": "component",
+      "content": "Get structured git status. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "git_status",
+        "kind": "function",
+        "line": 224,
+        "signature": "def git_status(cwd: Path | None=None) -> GitStatus",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979935Z"
+      }
+    },
+    {
+      "id": "comp-core-git-diff",
+      "type": "component",
+      "content": "Get git diff output. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "git_diff",
+        "kind": "function",
+        "line": 277,
+        "signature": "def git_diff(staged: bool=False, cwd: Path | None=None) -> str",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979937Z"
+      }
+    },
+    {
+      "id": "comp-core-rg-search",
+      "type": "component",
+      "content": "Search files using ripgrep. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "rg_search",
+        "kind": "function",
+        "line": 308,
+        "signature": "def rg_search(pattern: str, path: Path | None=None, *, glob: str | None=None, ignore_case: bool=False) -> list[SearchMatch]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979940Z"
+      }
+    },
+    {
+      "id": "comp-core-sg-search",
+      "type": "component",
+      "content": "Search files using ast-grep. Args:",
+      "source_file": "src/raise_cli/core/tools.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "sg_search",
+        "kind": "function",
+        "line": 371,
+        "signature": "def sg_search(pattern: str, path: Path | None=None, *, lang: str | None=None) -> list[SearchMatch]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979942Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-skillevent",
+      "type": "component",
+      "content": "A skill invocation event. Emitted when a skill starts, completes, or is abandoned.",
+      "source_file": "src/raise_cli/telemetry/schemas.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "SkillEvent",
+        "kind": "class",
+        "line": 24,
+        "signature": "class SkillEvent(BaseModel)",
+        "category": "schema",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979945Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-emitresult",
+      "type": "component",
+      "content": "Result of emitting a signal. Attributes:",
+      "source_file": "src/raise_cli/telemetry/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "EmitResult",
+        "kind": "class",
+        "line": 34,
+        "signature": "class EmitResult",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979947Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-sessionevent",
+      "type": "component",
+      "content": "A session lifecycle event. Emitted when a session closes, capturing its outcome.",
+      "source_file": "src/raise_cli/telemetry/schemas.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "SessionEvent",
+        "kind": "class",
+        "line": 59,
+        "signature": "class SessionEvent(BaseModel)",
+        "category": "schema",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979949Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-emit",
+      "type": "component",
+      "content": "Emit a telemetry signal to the signals.jsonl file.",
+      "source_file": "src/raise_cli/telemetry/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "emit",
+        "kind": "function",
+        "line": 71,
+        "signature": "def emit(signal: SkillEvent | SessionEvent | CalibrationEvent | ErrorEvent | CommandUsage | WorkLifecycle, *, base_path: Path | None=None) -> EmitResult",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979952Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-calibrationevent",
+      "type": "component",
+      "content": "A calibration data point for velocity tracking. Emitted when a feature is completed, comparing estimate to actual.",
+      "source_file": "src/raise_cli/telemetry/schemas.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "CalibrationEvent",
+        "kind": "class",
+        "line": 99,
+        "signature": "class CalibrationEvent(BaseModel)",
+        "category": "schema",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979954Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-emit-skill-event",
+      "type": "component",
+      "content": "Convenience function to emit a skill event. Args:",
+      "source_file": "src/raise_cli/telemetry/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "emit_skill_event",
+        "kind": "function",
+        "line": 136,
+        "signature": "def emit_skill_event(skill: str, event: str, duration_sec: int | None=None, *, base_path: Path | None=None) -> EmitResult",
+        "category": "schema",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979956Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-errorevent",
+      "type": "component",
+      "content": "A tool error event. Emitted when a tool fails, for pattern detection.",
+      "source_file": "src/raise_cli/telemetry/schemas.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ErrorEvent",
+        "kind": "class",
+        "line": 138,
+        "signature": "class ErrorEvent(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979958Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-emit-command-usage",
+      "type": "component",
+      "content": "Convenience function to emit a command usage event.",
+      "source_file": "src/raise_cli/telemetry/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "emit_command_usage",
+        "kind": "function",
+        "line": 165,
+        "signature": "def emit_command_usage(command: str, subcommand: str | None=None, *, base_path: Path | None=None) -> EmitResult",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979960Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-commandusage",
+      "type": "component",
+      "content": "A CLI command usage event. Emitted when a raise CLI command is invoked.",
+      "source_file": "src/raise_cli/telemetry/schemas.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "CommandUsage",
+        "kind": "class",
+        "line": 172,
+        "signature": "class CommandUsage(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979962Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-emit-error-event",
+      "type": "component",
+      "content": "Convenience function to emit an error event. Args:",
+      "source_file": "src/raise_cli/telemetry/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "emit_error_event",
+        "kind": "function",
+        "line": 191,
+        "signature": "def emit_error_event(tool: str, error_type: str, context: str, recoverable: bool, *, base_path: Path | None=None) -> EmitResult",
+        "category": "model",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979964Z"
+      }
+    },
+    {
+      "id": "comp-telemetry-worklifecycle",
+      "type": "component",
+      "content": "A unified work lifecycle event for Lean flow analysis.",
+      "source_file": "src/raise_cli/telemetry/schemas.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "WorkLifecycle",
+        "kind": "class",
+        "line": 200,
+        "signature": "class WorkLifecycle(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979967Z"
+      }
+    },
+    {
+      "id": "comp-memory-memorycache",
+      "type": "component",
+      "content": "Cache for memory graph with staleness detection. Caches the built graph to a JSON file and checks JSONL file mtimes",
+      "source_file": "src/raise_cli/memory/cache.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryCache",
+        "kind": "class",
+        "line": 15,
+        "signature": "class MemoryCache",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979969Z"
+      }
+    },
+    {
+      "id": "comp-memory-memoryconcepttype",
+      "type": "component",
+      "content": "Types of memory concepts. Attributes:",
+      "source_file": "src/raise_cli/memory/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryConceptType",
+        "kind": "class",
+        "line": 16,
+        "signature": "class MemoryConceptType(str, Enum)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979971Z"
+      }
+    },
+    {
+      "id": "comp-memory-parse-date",
+      "type": "component",
+      "content": "Parse a date string in YYYY-MM-DD format. Args:",
+      "source_file": "src/raise_cli/memory/loader.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "parse_date",
+        "kind": "function",
+        "line": 21,
+        "signature": "def parse_date(date_str: str) -> date",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979973Z"
+      }
+    },
+    {
+      "id": "comp-memory-patterninput",
+      "type": "component",
+      "content": "Input for creating a new pattern entry. Attributes:",
+      "source_file": "src/raise_cli/memory/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "PatternInput",
+        "kind": "class",
+        "line": 21,
+        "signature": "class PatternInput(BaseModel)",
+        "category": "schema",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979976Z"
+      }
+    },
+    {
+      "id": "comp-memory-memorygraph",
+      "type": "component",
+      "content": "In-memory graph of memory concepts. Represents a directed graph of memory concepts (patterns, calibrations,",
+      "source_file": "src/raise_cli/memory/builder.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryGraph",
+        "kind": "class",
+        "line": 23,
+        "signature": "class MemoryGraph(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979979Z"
+      }
+    },
+    {
+      "id": "comp-memory-memoryqueryresult",
+      "type": "component",
+      "content": "Result of a memory query. Attributes:",
+      "source_file": "src/raise_cli/memory/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryQueryResult",
+        "kind": "class",
+        "line": 25,
+        "signature": "class MemoryQueryResult(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979982Z"
+      }
+    },
+    {
+      "id": "comp-memory-patternsubtype",
+      "type": "component",
+      "content": "Sub-types for pattern concepts. Attributes:",
+      "source_file": "src/raise_cli/memory/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "PatternSubType",
+        "kind": "class",
+        "line": 30,
+        "signature": "class PatternSubType(str, Enum)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979984Z"
+      }
+    },
+    {
+      "id": "comp-memory-load-pattern",
+      "type": "component",
+      "content": "Load a pattern concept from JSONL data. Args:",
+      "source_file": "src/raise_cli/memory/loader.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "load_pattern",
+        "kind": "function",
+        "line": 36,
+        "signature": "def load_pattern(data: dict[str, Any]) -> MemoryConcept",
+        "category": "service",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979987Z"
+      }
+    },
+    {
+      "id": "comp-memory-calibrationinput",
+      "type": "component",
+      "content": "Input for creating a new calibration entry. Attributes:",
+      "source_file": "src/raise_cli/memory/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "CalibrationInput",
+        "kind": "class",
+        "line": 41,
+        "signature": "class CalibrationInput(BaseModel)",
+        "category": "schema",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979989Z"
+      }
+    },
+    {
+      "id": "comp-memory-memoryrelationshiptype",
+      "type": "component",
+      "content": "Types of relationships between memory concepts. Attributes:",
+      "source_file": "src/raise_cli/memory/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryRelationshipType",
+        "kind": "class",
+        "line": 46,
+        "signature": "class MemoryRelationshipType(str, Enum)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979992Z"
+      }
+    },
+    {
+      "id": "comp-memory-scoredconcept",
+      "type": "component",
+      "content": "A concept with a relevance score for ranking.",
+      "source_file": "src/raise_cli/memory/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ScoredConcept",
+        "kind": "class",
+        "line": 48,
+        "signature": "class ScoredConcept",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979994Z"
+      }
+    },
+    {
+      "id": "comp-memory-memoryquery",
+      "type": "component",
+      "content": "Query engine for memory graph with keyword search and recency weighting.",
+      "source_file": "src/raise_cli/memory/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryQuery",
+        "kind": "class",
+        "line": 56,
+        "signature": "class MemoryQuery",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979996Z"
+      }
+    },
+    {
+      "id": "comp-memory-memoryconcept",
+      "type": "component",
+      "content": "A memory concept extracted from JSONL files. Represents a single unit of Rai's memory (pattern, calibration record,",
+      "source_file": "src/raise_cli/memory/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryConcept",
+        "kind": "class",
+        "line": 62,
+        "signature": "class MemoryConcept(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.979999Z"
+      }
+    },
+    {
+      "id": "comp-memory-load-calibration",
+      "type": "component",
+      "content": "Load a calibration concept from JSONL data. Args:",
+      "source_file": "src/raise_cli/memory/loader.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "load_calibration",
+        "kind": "function",
+        "line": 63,
+        "signature": "def load_calibration(data: dict[str, Any]) -> MemoryConcept",
+        "category": "service",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980002Z"
+      }
+    },
+    {
+      "id": "comp-memory-sessioninput",
+      "type": "component",
+      "content": "Input for creating a new session entry. Attributes:",
+      "source_file": "src/raise_cli/memory/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "SessionInput",
+        "kind": "class",
+        "line": 65,
+        "signature": "class SessionInput(BaseModel)",
+        "category": "schema",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980004Z"
+      }
+    },
+    {
+      "id": "comp-memory-writeresult",
+      "type": "component",
+      "content": "Result of a write operation. Attributes:",
+      "source_file": "src/raise_cli/memory/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "WriteResult",
+        "kind": "class",
+        "line": 83,
+        "signature": "class WriteResult(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980007Z"
+      }
+    },
+    {
+      "id": "comp-memory-memoryrelationship",
+      "type": "component",
+      "content": "A relationship between two memory concepts. Attributes:",
+      "source_file": "src/raise_cli/memory/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryRelationship",
+        "kind": "class",
+        "line": 108,
+        "signature": "class MemoryRelationship(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980009Z"
+      }
+    },
+    {
+      "id": "comp-memory-traverse-bfs",
+      "type": "component",
+      "content": "BFS traversal from start node with depth limit. Args:",
+      "source_file": "src/raise_cli/memory/builder.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "traverse_bfs",
+        "kind": "function",
+        "line": 112,
+        "signature": "def traverse_bfs(graph: MemoryGraph, start_id: str, edge_types: list[MemoryRelationshipType] | None=None, max_depth: int=3) -> list[MemoryConcept]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980012Z"
+      }
+    },
+    {
+      "id": "comp-memory-load-session",
+      "type": "component",
+      "content": "Load a session concept from JSONL data. Args:",
+      "source_file": "src/raise_cli/memory/loader.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "load_session",
+        "kind": "function",
+        "line": 113,
+        "signature": "def load_session(data: dict[str, Any]) -> MemoryConcept",
+        "category": "service",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980014Z"
+      }
+    },
+    {
+      "id": "comp-memory-memoryloadresult",
+      "type": "component",
+      "content": "Result of loading memory from JSONL files. Attributes:",
+      "source_file": "src/raise_cli/memory/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryLoadResult",
+        "kind": "class",
+        "line": 136,
+        "signature": "class MemoryLoadResult(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980017Z"
+      }
+    },
+    {
+      "id": "comp-memory-append-pattern",
+      "type": "component",
+      "content": "Append a new pattern to patterns.jsonl. Args:",
+      "source_file": "src/raise_cli/memory/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "append_pattern",
+        "kind": "function",
+        "line": 144,
+        "signature": "def append_pattern(memory_dir: Path, input_data: PatternInput, created: date | None=None) -> WriteResult",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980019Z"
+      }
+    },
+    {
+      "id": "comp-memory-load-jsonl-file",
+      "type": "component",
+      "content": "Load concepts from a single JSONL file. Args:",
+      "source_file": "src/raise_cli/memory/loader.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "load_jsonl_file",
+        "kind": "function",
+        "line": 150,
+        "signature": "def load_jsonl_file(file_path: Path, concept_type: MemoryConceptType) -> tuple[list[MemoryConcept], list[str]]",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980022Z"
+      }
+    },
+    {
+      "id": "comp-memory-memorygraphbuilder",
+      "type": "component",
+      "content": "Builder for constructing memory graphs with inferred relationships.",
+      "source_file": "src/raise_cli/memory/builder.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "MemoryGraphBuilder",
+        "kind": "class",
+        "line": 156,
+        "signature": "class MemoryGraphBuilder",
+        "category": "builder",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980024Z"
+      }
+    },
+    {
+      "id": "comp-memory-append-calibration",
+      "type": "component",
+      "content": "Append a new calibration to calibration.jsonl. Args:",
+      "source_file": "src/raise_cli/memory/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "append_calibration",
+        "kind": "function",
+        "line": 186,
+        "signature": "def append_calibration(memory_dir: Path, input_data: CalibrationInput, created: date | None=None) -> WriteResult",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980026Z"
+      }
+    },
+    {
+      "id": "comp-memory-load-memory-from-directory",
+      "type": "component",
+      "content": "Load all memory concepts from a .rai/memory/ directory.",
+      "source_file": "src/raise_cli/memory/loader.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "load_memory_from_directory",
+        "kind": "function",
+        "line": 190,
+        "signature": "def load_memory_from_directory(memory_dir: Path) -> MemoryLoadResult",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980029Z"
+      }
+    },
+    {
+      "id": "comp-memory-append-session",
+      "type": "component",
+      "content": "Append a new session to sessions/index.jsonl. Args:",
+      "source_file": "src/raise_cli/memory/writer.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "append_session",
+        "kind": "function",
+        "line": 238,
+        "signature": "def append_session(memory_dir: Path, input_data: SessionInput, session_date: date | None=None) -> WriteResult",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980031Z"
+      }
+    },
+    {
+      "id": "comp-memory-create-memory-query",
+      "type": "component",
+      "content": "Create a MemoryQuery from a memory directory. Convenience function that loads/caches the graph and creates a query engine.",
+      "source_file": "src/raise_cli/memory/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "create_memory_query",
+        "kind": "function",
+        "line": 339,
+        "signature": "def create_memory_query(memory_dir: Path, recency_weight: float=0.3) -> tuple[MemoryQuery, MemoryGraph]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980033Z"
+      }
+    },
+    {
+      "id": "comp-context-unifiedgraph",
+      "type": "component",
+      "content": "NetworkX-based unified context graph. Wraps a NetworkX MultiDiGraph to provide typed operations for adding,",
+      "source_file": "src/raise_cli/context/graph.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "UnifiedGraph",
+        "kind": "class",
+        "line": 21,
+        "signature": "class UnifiedGraph",
+        "category": "model",
+        "depends_on": [
+          "UnifiedGraph"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980036Z"
+      }
+    },
+    {
+      "id": "comp-context-extract-skill-metadata",
+      "type": "component",
+      "content": "Extract metadata from SKILL.md YAML frontmatter. Args:",
+      "source_file": "src/raise_cli/context/extractors/skills.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_skill_metadata",
+        "kind": "function",
+        "line": 22,
+        "signature": "def extract_skill_metadata(skill_path: Path) -> ConceptNode | None",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path",
+          "ConceptNode"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980039Z"
+      }
+    },
+    {
+      "id": "comp-context-unifiedquerystrategy",
+      "type": "component",
+      "content": "Query strategy for unified context retrieval. Attributes:",
+      "source_file": "src/raise_cli/context/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "UnifiedQueryStrategy",
+        "kind": "class",
+        "line": 22,
+        "signature": "class UnifiedQueryStrategy(str, Enum)",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980041Z"
+      }
+    },
+    {
+      "id": "comp-context-unifiedgraphbuilder",
+      "type": "component",
+      "content": "Builds unified context graph from all sources. Merges governance documents, memory JSONL files, work tracking,",
+      "source_file": "src/raise_cli/context/builder.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "UnifiedGraphBuilder",
+        "kind": "class",
+        "line": 25,
+        "signature": "class UnifiedGraphBuilder",
+        "category": "builder",
+        "depends_on": [
+          "UnifiedGraph"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980043Z"
+      }
+    },
+    {
+      "id": "comp-context-unifiedquery",
+      "type": "component",
+      "content": "Query parameters for unified context retrieval. Attributes:",
+      "source_file": "src/raise_cli/context/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "UnifiedQuery",
+        "kind": "class",
+        "line": 34,
+        "signature": "class UnifiedQuery(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980046Z"
+      }
+    },
+    {
+      "id": "comp-context-conceptnode",
+      "type": "component",
+      "content": "A node in the unified context graph. Represents any concept type (pattern, principle, skill, etc.) with",
+      "source_file": "src/raise_cli/context/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ConceptNode",
+        "kind": "class",
+        "line": 46,
+        "signature": "class ConceptNode(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel",
+          "ConceptNode"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980048Z"
+      }
+    },
+    {
+      "id": "comp-context-unifiedquerymetadata",
+      "type": "component",
+      "content": "Metadata about unified query result. Attributes:",
+      "source_file": "src/raise_cli/context/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "UnifiedQueryMetadata",
+        "kind": "class",
+        "line": 76,
+        "signature": "class UnifiedQueryMetadata(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980051Z"
+      }
+    },
+    {
+      "id": "comp-context-conceptedge",
+      "type": "component",
+      "content": "An edge in the unified context graph. Represents a directed relationship between two concepts.",
+      "source_file": "src/raise_cli/context/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ConceptEdge",
+        "kind": "class",
+        "line": 94,
+        "signature": "class ConceptEdge(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel",
+          "ConceptEdge"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980053Z"
+      }
+    },
+    {
+      "id": "comp-context-extract-all-skills",
+      "type": "component",
+      "content": "Extract metadata from all skills in a directory. Searches for SKILL.md files in subdirectories of the given path.",
+      "source_file": "src/raise_cli/context/extractors/skills.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_all_skills",
+        "kind": "function",
+        "line": 95,
+        "signature": "def extract_all_skills(skills_dir: Path) -> list[ConceptNode]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path",
+          "ConceptNode"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980055Z"
+      }
+    },
+    {
+      "id": "comp-context-unifiedqueryresult",
+      "type": "component",
+      "content": "Result of unified context query. Attributes:",
+      "source_file": "src/raise_cli/context/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "UnifiedQueryResult",
+        "kind": "class",
+        "line": 109,
+        "signature": "class UnifiedQueryResult(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980058Z"
+      }
+    },
+    {
+      "id": "comp-context-estimate-tokens",
+      "type": "component",
+      "content": "Estimate token count for text. Uses heuristic: character count // 4 (roughly 4 chars per token).",
+      "source_file": "src/raise_cli/context/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "estimate_tokens",
+        "kind": "function",
+        "line": 149,
+        "signature": "def estimate_tokens(text: str) -> int",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980061Z"
+      }
+    },
+    {
+      "id": "comp-context-calculate-relevance-score",
+      "type": "component",
+      "content": "Calculate relevance score for a concept. Score = (keyword_hits * 10) + recency_bonus",
+      "source_file": "src/raise_cli/context/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "calculate_relevance_score",
+        "kind": "function",
+        "line": 163,
+        "signature": "def calculate_relevance_score(content: str, keywords: list[str], created: str) -> float",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980063Z"
+      }
+    },
+    {
+      "id": "comp-context-unifiedqueryengine",
+      "type": "component",
+      "content": "Query engine for unified context graph. Provides keyword search and concept lookup capabilities for",
+      "source_file": "src/raise_cli/context/query.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "UnifiedQueryEngine",
+        "kind": "class",
+        "line": 193,
+        "signature": "class UnifiedQueryEngine",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980067Z"
+      }
+    },
+    {
+      "id": "comp-governance-format-markdown",
+      "type": "component",
+      "content": "Format ContextResult as markdown for AI consumption.",
+      "source_file": "src/raise_cli/governance/query/formatters.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "format_markdown",
+        "kind": "function",
+        "line": 12,
+        "signature": "def format_markdown(result: ContextResult) -> str",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980070Z"
+      }
+    },
+    {
+      "id": "comp-governance-normalize-status",
+      "type": "component",
+      "content": "Normalize epic status to standard values. Converts various status representations (emoji, text) to lowercase",
+      "source_file": "src/raise_cli/governance/parsers/backlog.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "normalize_status",
+        "kind": "function",
+        "line": 14,
+        "signature": "def normalize_status(raw: str) -> str",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980072Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-requirements",
+      "type": "component",
+      "content": "Extract RF-XX requirements from PRD markdown file.",
+      "source_file": "src/raise_cli/governance/parsers/prd.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_requirements",
+        "kind": "function",
+        "line": 14,
+        "signature": "def extract_requirements(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980075Z"
+      }
+    },
+    {
+      "id": "comp-governance-infer-relationships",
+      "type": "component",
+      "content": "Infer relationships between concepts using rule-based patterns.",
+      "source_file": "src/raise_cli/governance/graph/relationships.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "infer_relationships",
+        "kind": "function",
+        "line": 15,
+        "signature": "def infer_relationships(concepts: list[Concept]) -> list[Relationship]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980078Z"
+      }
+    },
+    {
+      "id": "comp-governance-traverse-bfs",
+      "type": "component",
+      "content": "BFS traversal from start node with depth limit. Performs breadth-first search traversal of the concept graph starting",
+      "source_file": "src/raise_cli/governance/graph/traversal.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "traverse_bfs",
+        "kind": "function",
+        "line": 15,
+        "signature": "def traverse_bfs(graph: ConceptGraph, start_id: str, edge_types: list[RelationshipType] | None=None, max_depth: int=3) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980080Z"
+      }
+    },
+    {
+      "id": "comp-governance-concepttype",
+      "type": "component",
+      "content": "Types of concepts extracted from governance documents.",
+      "source_file": "src/raise_cli/governance/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ConceptType",
+        "kind": "class",
+        "line": 15,
+        "signature": "class ConceptType(str, Enum)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980083Z"
+      }
+    },
+    {
+      "id": "comp-governance-graphbuilder",
+      "type": "component",
+      "content": "Builder for constructing concept graphs from concepts.",
+      "source_file": "src/raise_cli/governance/graph/builder.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "GraphBuilder",
+        "kind": "class",
+        "line": 16,
+        "signature": "class GraphBuilder",
+        "category": "builder",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980085Z"
+      }
+    },
+    {
+      "id": "comp-governance-querystrategy",
+      "type": "component",
+      "content": "Query strategy for MVC extraction. Attributes:",
+      "source_file": "src/raise_cli/governance/query/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "QueryStrategy",
+        "kind": "class",
+        "line": 18,
+        "signature": "class QueryStrategy(str, Enum)",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980088Z"
+      }
+    },
+    {
+      "id": "comp-governance-normalize-concept-id",
+      "type": "component",
+      "content": "Normalize concept ID from various formats. Converts user-friendly formats (RF-05, \u00a72, E8, F8.1) to canonical IDs.",
+      "source_file": "src/raise_cli/governance/query/strategies.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "normalize_concept_id",
+        "kind": "function",
+        "line": 18,
+        "signature": "def normalize_concept_id(query: str) -> str",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980090Z"
+      }
+    },
+    {
+      "id": "comp-governance-governanceextractor",
+      "type": "component",
+      "content": "Orchestrates extraction of concepts from governance markdown files.",
+      "source_file": "src/raise_cli/governance/extractor.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "GovernanceExtractor",
+        "kind": "class",
+        "line": 24,
+        "signature": "class GovernanceExtractor",
+        "category": "parser",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980093Z"
+      }
+    },
+    {
+      "id": "comp-governance-relationship",
+      "type": "component",
+      "content": "Directed edge in concept graph. Represents a semantic relationship between two concepts in the",
+      "source_file": "src/raise_cli/governance/graph/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "Relationship",
+        "kind": "class",
+        "line": 27,
+        "signature": "class Relationship(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980095Z"
+      }
+    },
+    {
+      "id": "comp-governance-contextqueryengine",
+      "type": "component",
+      "content": "Query engine for extracting Minimum Viable Context from concept graphs.",
+      "source_file": "src/raise_cli/governance/query/engine.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ContextQueryEngine",
+        "kind": "class",
+        "line": 29,
+        "signature": "class ContextQueryEngine",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980098Z"
+      }
+    },
+    {
+      "id": "comp-governance-contextquery",
+      "type": "component",
+      "content": "MVC query parameters. Represents a query for extracting Minimum Viable Context from the",
+      "source_file": "src/raise_cli/governance/query/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ContextQuery",
+        "kind": "class",
+        "line": 34,
+        "signature": "class ContextQuery(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980100Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-principles",
+      "type": "component",
+      "content": "Extract \u00a7N principles from Constitution markdown file.",
+      "source_file": "src/raise_cli/governance/parsers/constitution.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_principles",
+        "kind": "function",
+        "line": 43,
+        "signature": "def extract_principles(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980103Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-outcomes",
+      "type": "component",
+      "content": "Extract outcomes from Vision markdown tables. Parses Vision markdown files looking for tables with bold outcome names",
+      "source_file": "src/raise_cli/governance/parsers/vision.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_outcomes",
+        "kind": "function",
+        "line": 43,
+        "signature": "def extract_outcomes(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980105Z"
+      }
+    },
+    {
+      "id": "comp-governance-concept",
+      "type": "component",
+      "content": "A semantic concept extracted from governance markdown.",
+      "source_file": "src/raise_cli/governance/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "Concept",
+        "kind": "class",
+        "line": 47,
+        "signature": "class Concept(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980108Z"
+      }
+    },
+    {
+      "id": "comp-governance-conceptgraph",
+      "type": "component",
+      "content": "In-memory concept graph. Represents a directed graph of governance concepts with semantic",
+      "source_file": "src/raise_cli/governance/graph/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ConceptGraph",
+        "kind": "class",
+        "line": 61,
+        "signature": "class ConceptGraph(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980111Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-keywords",
+      "type": "component",
+      "content": "Extract meaningful keywords from text. Args:",
+      "source_file": "src/raise_cli/governance/query/strategies.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_keywords",
+        "kind": "function",
+        "line": 63,
+        "signature": "def extract_keywords(text: str) -> set[str]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980113Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-epic-details",
+      "type": "component",
+      "content": "Extract detailed Epic concept from epic scope document.",
+      "source_file": "src/raise_cli/governance/parsers/epic.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_epic_details",
+        "kind": "function",
+        "line": 65,
+        "signature": "def extract_epic_details(file_path: Path, project_root: Path | None=None) -> Concept | None",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980116Z"
+      }
+    },
+    {
+      "id": "comp-governance-contextmetadata",
+      "type": "component",
+      "content": "Metadata about MVC query result. Attributes:",
+      "source_file": "src/raise_cli/governance/query/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ContextMetadata",
+        "kind": "class",
+        "line": 78,
+        "signature": "class ContextMetadata(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980119Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-decisions",
+      "type": "component",
+      "content": "Extract ADR decisions from a directory. Parses ADR files with YAML frontmatter containing id, title, status, date.",
+      "source_file": "src/raise_cli/governance/parsers/adr.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_decisions",
+        "kind": "function",
+        "line": 101,
+        "signature": "def extract_decisions(directory: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980121Z"
+      }
+    },
+    {
+      "id": "comp-governance-query-concept-lookup",
+      "type": "component",
+      "content": "Lookup concept by ID and include immediate dependencies.",
+      "source_file": "src/raise_cli/governance/query/strategies.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "query_concept_lookup",
+        "kind": "function",
+        "line": 103,
+        "signature": "def query_concept_lookup(graph: ConceptGraph, query: str, max_depth: int=1, edge_types: list[RelationshipType] | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980124Z"
+      }
+    },
+    {
+      "id": "comp-governance-extractionresult",
+      "type": "component",
+      "content": "Result of a concept extraction operation. Contains the extracted concepts along with metadata about the",
+      "source_file": "src/raise_cli/governance/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ExtractionResult",
+        "kind": "class",
+        "line": 104,
+        "signature": "class ExtractionResult(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel",
+          "ExtractionResult"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980126Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-project",
+      "type": "component",
+      "content": "Extract Project concept from backlog.md file. Parses the backlog file header to extract project metadata including",
+      "source_file": "src/raise_cli/governance/parsers/backlog.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_project",
+        "kind": "function",
+        "line": 107,
+        "signature": "def extract_project(file_path: Path, project_root: Path | None=None) -> Concept | None",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980128Z"
+      }
+    },
+    {
+      "id": "comp-governance-contextresult",
+      "type": "component",
+      "content": "MVC query result with concepts and metadata. Represents the result of a Minimum Viable Context query, including",
+      "source_file": "src/raise_cli/governance/query/models.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ContextResult",
+        "kind": "class",
+        "line": 116,
+        "signature": "class ContextResult(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980132Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-guardrails",
+      "type": "component",
+      "content": "Extract guardrails from a guardrails markdown file.",
+      "source_file": "src/raise_cli/governance/parsers/guardrails.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_guardrails",
+        "kind": "function",
+        "line": 127,
+        "signature": "def extract_guardrails(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980134Z"
+      }
+    },
+    {
+      "id": "comp-governance-format-json",
+      "type": "component",
+      "content": "Format ContextResult as JSON. Args:",
+      "source_file": "src/raise_cli/governance/query/formatters.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "format_json",
+        "kind": "function",
+        "line": 130,
+        "signature": "def format_json(result: ContextResult) -> str",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980137Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-decision-from-file",
+      "type": "component",
+      "content": "Extract a single ADR decision from a file. Args:",
+      "source_file": "src/raise_cli/governance/parsers/adr.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_decision_from_file",
+        "kind": "function",
+        "line": 141,
+        "signature": "def extract_decision_from_file(file_path: Path, project_root: Path | None=None) -> Concept | None",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980139Z"
+      }
+    },
+    {
+      "id": "comp-governance-estimate-tokens",
+      "type": "component",
+      "content": "Estimate token count for text. Uses spike-validated heuristic: word count * 1.3",
+      "source_file": "src/raise_cli/governance/query/formatters.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "estimate_tokens",
+        "kind": "function",
+        "line": 147,
+        "signature": "def estimate_tokens(text: str) -> int",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980142Z"
+      }
+    },
+    {
+      "id": "comp-governance-query-keyword-search",
+      "type": "component",
+      "content": "Search concepts by keyword with optional type filter.",
+      "source_file": "src/raise_cli/governance/query/strategies.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "query_keyword_search",
+        "kind": "function",
+        "line": 153,
+        "signature": "def query_keyword_search(graph: ConceptGraph, query: str, concept_type: str | None=None, limit: int=10) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980145Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-glossary-terms",
+      "type": "component",
+      "content": "Extract glossary terms from a glossary markdown file.",
+      "source_file": "src/raise_cli/governance/parsers/glossary.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_glossary_terms",
+        "kind": "function",
+        "line": 172,
+        "signature": "def extract_glossary_terms(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980147Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-features",
+      "type": "component",
+      "content": "Extract Feature concepts from epic scope document.",
+      "source_file": "src/raise_cli/governance/parsers/epic.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_features",
+        "kind": "function",
+        "line": 174,
+        "signature": "def extract_features(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980150Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-epics",
+      "type": "component",
+      "content": "Extract Epic concepts from backlog.md Epics Overview table.",
+      "source_file": "src/raise_cli/governance/parsers/backlog.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_epics",
+        "kind": "function",
+        "line": 200,
+        "signature": "def extract_epics(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980153Z"
+      }
+    },
+    {
+      "id": "comp-governance-query-relationship-traversal",
+      "type": "component",
+      "content": "Traverse graph following specific relationship types.",
+      "source_file": "src/raise_cli/governance/query/strategies.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "query_relationship_traversal",
+        "kind": "function",
+        "line": 203,
+        "signature": "def query_relationship_traversal(graph: ConceptGraph, query: str, edge_types: list[RelationshipType], max_depth: int=2) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980155Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-all-guardrails",
+      "type": "component",
+      "content": "Extract all guardrails from standard location. Looks for governance/solution/guardrails.md.",
+      "source_file": "src/raise_cli/governance/parsers/guardrails.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_all_guardrails",
+        "kind": "function",
+        "line": 217,
+        "signature": "def extract_all_guardrails(project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980157Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-all-decisions",
+      "type": "component",
+      "content": "Extract all ADR decisions from standard locations.",
+      "source_file": "src/raise_cli/governance/parsers/adr.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_all_decisions",
+        "kind": "function",
+        "line": 220,
+        "signature": "def extract_all_decisions(project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980160Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-keywords",
+      "type": "component",
+      "content": "Extract meaningful keywords from text. Filters out stopwords and keeps only words longer than 3 characters.",
+      "source_file": "src/raise_cli/governance/graph/relationships.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_keywords",
+        "kind": "function",
+        "line": 228,
+        "signature": "def extract_keywords(text: str) -> set[str]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980163Z"
+      }
+    },
+    {
+      "id": "comp-governance-query-related-concepts",
+      "type": "component",
+      "content": "Find concepts related to query via keyword overlap.",
+      "source_file": "src/raise_cli/governance/query/strategies.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "query_related_concepts",
+        "kind": "function",
+        "line": 242,
+        "signature": "def query_related_concepts(graph: ConceptGraph, query: str, min_shared_keywords: int=2, limit: int=5) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980166Z"
+      }
+    },
+    {
+      "id": "comp-governance-extract-all-terms",
+      "type": "component",
+      "content": "Extract all glossary terms from standard location.",
+      "source_file": "src/raise_cli/governance/parsers/glossary.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_all_terms",
+        "kind": "function",
+        "line": 272,
+        "signature": "def extract_all_terms(project_root: Path | None=None) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980168Z"
+      }
+    },
+    {
+      "id": "comp-governance-query-work-context",
+      "type": "component",
+      "content": "Query work tracking concepts (projects, epics, features).",
+      "source_file": "src/raise_cli/governance/query/strategies.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "query_work_context",
+        "kind": "function",
+        "line": 293,
+        "signature": "def query_work_context(graph: ConceptGraph, query: str) -> list[Concept]",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980171Z"
+      }
+    },
+    {
+      "id": "comp-discovery-driftwarning",
+      "type": "component",
+      "content": "A warning about architectural drift. Attributes:",
+      "source_file": "src/raise_cli/discovery/drift.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "DriftWarning",
+        "kind": "class",
+        "line": 31,
+        "signature": "class DriftWarning(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980173Z"
+      }
+    },
+    {
+      "id": "comp-discovery-symbol",
+      "type": "component",
+      "content": "A code symbol extracted from source. Attributes:",
       "source_file": "src/raise_cli/discovery/scanner.py",
-      "created": "2026-02-04T12:10:00Z",
+      "created": "2026-02-04T18:50:00Z",
       "metadata": {
         "name": "Symbol",
         "kind": "class",
         "line": 44,
         "signature": "class Symbol(BaseModel)",
         "category": "model",
-        "depends_on": ["pydantic.BaseModel"],
-        "validated_by": "human",
-        "validated_at": "2026-02-04T12:05:00Z"
+        "depends_on": [
+          "pydantic.BaseModel",
+          "Symbol"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980176Z"
       }
     },
     {
-      "id": "comp-scanner-extract-python-symbols",
+      "id": "comp-discovery-scanresult",
       "type": "component",
-      "content": "Parse Python source code and extract all classes, functions, and methods with their signatures and docstrings.",
+      "content": "Result of scanning a directory or file. Attributes:",
       "source_file": "src/raise_cli/discovery/scanner.py",
-      "created": "2026-02-04T12:10:00Z",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "ScanResult",
+        "kind": "class",
+        "line": 77,
+        "signature": "class ScanResult(BaseModel)",
+        "category": "model",
+        "depends_on": [
+          "pydantic.BaseModel",
+          "ScanResult"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980178Z"
+      }
+    },
+    {
+      "id": "comp-discovery-extract-python-symbols",
+      "type": "component",
+      "content": "Extract symbols from Python source code. Parses the source code and extracts all classes, functions, and methods",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T18:50:00Z",
       "metadata": {
         "name": "extract_python_symbols",
         "kind": "function",
         "line": 121,
         "signature": "def extract_python_symbols(source: str, file_path: str) -> list[Symbol]",
-        "category": "parser",
-        "depends_on": ["ast", "Symbol"],
-        "validated_by": "human",
-        "validated_at": "2026-02-04T12:05:00Z"
+        "category": "utility",
+        "depends_on": [
+          "Symbol"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980181Z"
       }
     },
     {
-      "id": "comp-scanner-scan-directory",
+      "id": "comp-discovery-detect-drift",
       "type": "component",
-      "content": "Main entry point for directory scanning. Recursively finds and parses source files, aggregating all extracted symbols.",
+      "content": "Detect architectural drift between baseline and new code.",
+      "source_file": "src/raise_cli/discovery/drift.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "detect_drift",
+        "kind": "function",
+        "line": 271,
+        "signature": "def detect_drift(baseline: list[dict[str, Any]], scanned: list[Symbol]) -> list[DriftWarning]",
+        "category": "service",
+        "depends_on": [
+          "Symbol"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980183Z"
+      }
+    },
+    {
+      "id": "comp-discovery-extract-typescript-symbols",
+      "type": "component",
+      "content": "Extract symbols from TypeScript source code. Uses tree-sitter to parse TypeScript and extract classes, functions,",
       "source_file": "src/raise_cli/discovery/scanner.py",
-      "created": "2026-02-04T12:10:00Z",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_typescript_symbols",
+        "kind": "function",
+        "line": 309,
+        "signature": "def extract_typescript_symbols(source: str, file_path: str) -> list[Symbol]",
+        "category": "utility",
+        "depends_on": [
+          "Symbol"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980186Z"
+      }
+    },
+    {
+      "id": "comp-discovery-extract-javascript-symbols",
+      "type": "component",
+      "content": "Extract symbols from JavaScript source code. Uses tree-sitter to parse JavaScript and extract classes, functions,",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_javascript_symbols",
+        "kind": "function",
+        "line": 339,
+        "signature": "def extract_javascript_symbols(source: str, file_path: str) -> list[Symbol]",
+        "category": "utility",
+        "depends_on": [
+          "Symbol"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980188Z"
+      }
+    },
+    {
+      "id": "comp-discovery-detect-language",
+      "type": "component",
+      "content": "Detect language from file extension. Args:",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "detect_language",
+        "kind": "function",
+        "line": 469,
+        "signature": "def detect_language(file_path: str | Path) -> Language | None",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980190Z"
+      }
+    },
+    {
+      "id": "comp-discovery-extract-symbols",
+      "type": "component",
+      "content": "Extract symbols from source code in any supported language.",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract_symbols",
+        "kind": "function",
+        "line": 489,
+        "signature": "def extract_symbols(source: str, file_path: str, language: Language) -> list[Symbol]",
+        "category": "utility",
+        "depends_on": [
+          "Symbol"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980193Z"
+      }
+    },
+    {
+      "id": "comp-discovery-scan-directory",
+      "type": "component",
+      "content": "Scan a directory for code symbols. Recursively walks the directory, extracts symbols from source files,",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T18:50:00Z",
       "metadata": {
         "name": "scan_directory",
         "kind": "function",
         "line": 519,
         "signature": "def scan_directory(path: Path, *, language: Language | None=None, pattern: str | None=None, exclude_patterns: list[str] | None=None) -> ScanResult",
+        "category": "service",
+        "depends_on": [
+          "pathlib.Path",
+          "ScanResult"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980195Z"
+      }
+    },
+    {
+      "id": "comp-output-outputconsole",
+      "type": "component",
+      "content": "Output abstraction that respects --format flag. Provides consistent output formatting across human-readable, JSON,",
+      "source_file": "src/raise_cli/output/console.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "OutputConsole",
+        "kind": "class",
+        "line": 30,
+        "signature": "class OutputConsole",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980197Z"
+      }
+    },
+    {
+      "id": "comp-output-get-console",
+      "type": "component",
+      "content": "Get or create the output console singleton. Returns:",
+      "source_file": "src/raise_cli/output/console.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "get_console",
+        "kind": "function",
+        "line": 329,
+        "signature": "def get_console() -> OutputConsole",
         "category": "utility",
-        "depends_on": ["ScanResult", "Symbol", "extract_symbols"],
-        "validated_by": "human",
-        "validated_at": "2026-02-04T12:05:00Z"
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980200Z"
+      }
+    },
+    {
+      "id": "comp-output-set-console",
+      "type": "component",
+      "content": "Set the output console (for testing or reconfiguration).",
+      "source_file": "src/raise_cli/output/console.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "set_console",
+        "kind": "function",
+        "line": 345,
+        "signature": "def set_console(console: OutputConsole | None) -> None",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980202Z"
+      }
+    },
+    {
+      "id": "comp-output-configure-console",
+      "type": "component",
+      "content": "Configure and return the global console. Creates a new OutputConsole with the given settings and sets it",
+      "source_file": "src/raise_cli/output/console.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "configure_console",
+        "kind": "function",
+        "line": 360,
+        "signature": "def configure_console(format: OutputFormat='human', verbosity: int=0, color: bool=True) -> OutputConsole",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980204Z"
+      }
+    },
+    {
+      "id": "comp-cli-get-output-format",
+      "type": "component",
+      "content": "Get the current output format. Returns:",
+      "source_file": "src/raise_cli/cli/main.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "get_output_format",
+        "kind": "function",
+        "line": 23,
+        "signature": "def get_output_format() -> Literal['human', 'json', 'table']",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980206Z"
+      }
+    },
+    {
+      "id": "comp-cli-extract",
+      "type": "component",
+      "content": "Extract concepts from governance markdown files. If no file path is provided, extracts from all standard governance locations:",
+      "source_file": "src/raise_cli/cli/commands/graph.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "extract",
+        "kind": "function",
+        "line": 26,
+        "signature": "def extract(file_path: Annotated[Path | None, typer.Argument(help='Path to governance file (optional, extracts all if not provided)')]=None, format: Annotated[str, typer.Option('--format', '-f', help='Output format (human or json)')]='human') -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980208Z"
+      }
+    },
+    {
+      "id": "comp-cli-get-error-console",
+      "type": "component",
+      "content": "Get or create the stderr console singleton. Returns:",
+      "source_file": "src/raise_cli/cli/error_handler.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "get_error_console",
+        "kind": "function",
+        "line": 30,
+        "signature": "def get_error_console() -> Console",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980211Z"
+      }
+    },
+    {
+      "id": "comp-cli-format-unified-markdown",
+      "type": "component",
+      "content": "Format UnifiedQueryResult as markdown for human consumption.",
+      "source_file": "src/raise_cli/cli/commands/context.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "format_unified_markdown",
+        "kind": "function",
+        "line": 33,
+        "signature": "def format_unified_markdown(result: UnifiedQueryResult) -> str",
+        "category": "command",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980213Z"
+      }
+    },
+    {
+      "id": "comp-cli-emit-session",
+      "type": "component",
+      "content": "Emit a session event to telemetry. Records a session completion signal for local learning and insights.",
+      "source_file": "src/raise_cli/cli/commands/telemetry.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "emit_session",
+        "kind": "function",
+        "line": 33,
+        "signature": "def emit_session(session_type: Annotated[str, typer.Option('--type', '-t', help='Session type (e.g., feature, research, maintenance)')]='feature', outcome: Annotated[str, typer.Option('--outcome', '-o', help='Session outcome (success, partial, abandoned)')]='success', duration: Annotated[int, typer.Option('--duration', '-d', help='Session duration in minutes')]=0, features: Annotated[str, typer.Option('--features', '-f', help='Features worked on (comma-separated)')]='') -> None",
+        "category": "command",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980215Z"
+      }
+    },
+    {
+      "id": "comp-cli-scan-command",
+      "type": "component",
+      "content": "Scan a directory and extract code symbols. Extracts classes, functions, methods, interfaces, and module docstrings",
+      "source_file": "src/raise_cli/cli/commands/discover.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "scan_command",
+        "kind": "function",
+        "line": 36,
+        "signature": "def scan_command(path: Annotated[Path, typer.Argument(help='Directory to scan for source files', exists=True, file_okay=False, dir_okay=True, resolve_path=True)]=Path('.'), language: Annotated[str | None, typer.Option('--language', '-l', help='Language to scan: python, typescript, javascript (auto-detect if not set)')]=None, output: Annotated[str, typer.Option('--output', '-o', help='Output format: human, json, or summary')]='human', pattern: Annotated[str | None, typer.Option('--pattern', '-p', help='Glob pattern for files (default: language-specific)')]=None, exclude: Annotated[list[str] | None, typer.Option('--exclude', '-e', help='Patterns to exclude (can be repeated)')]=None) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980218Z"
+      }
+    },
+    {
+      "id": "comp-cli-query",
+      "type": "component",
+      "content": "Query memory graph for relevant concepts. Searches Rai's memory (patterns, calibrations, sessions) using",
+      "source_file": "src/raise_cli/cli/commands/memory.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "query",
+        "kind": "function",
+        "line": 41,
+        "signature": "def query(query_str: Annotated[str, typer.Argument(help='Search query (keywords)')], format: Annotated[str, typer.Option('--format', '-f', help='Output format (markdown or json)')]='markdown', output: Annotated[Path | None, typer.Option('--output', '-o', help='Output file path (default: stdout)')]=None, max_results: Annotated[int, typer.Option('--max-results', '-n', help='Maximum number of results (1-50)')]=10, expand: Annotated[bool, typer.Option('--expand/--no-expand', help='Expand results via BFS traversal')]=True, max_depth: Annotated[int, typer.Option('--max-depth', '-d', help='Maximum traversal depth (1-3)')]=2, memory_dir: Annotated[Path | None, typer.Option('--memory-dir', '-m', help='Memory directory path')]=None) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980221Z"
+      }
+    },
+    {
+      "id": "comp-cli-set-error-console",
+      "type": "component",
+      "content": "Set the error console (for testing). Args:",
+      "source_file": "src/raise_cli/cli/error_handler.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "set_error_console",
+        "kind": "function",
+        "line": 42,
+        "signature": "def set_error_console(console: Console | None) -> None",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980223Z"
+      }
+    },
+    {
+      "id": "comp-cli-outputformat",
+      "type": "component",
+      "content": "Output format options.",
+      "source_file": "src/raise_cli/cli/main.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "OutputFormat",
+        "kind": "class",
+        "line": 49,
+        "signature": "class OutputFormat(str, Enum)",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980225Z"
+      }
+    },
+    {
+      "id": "comp-cli-handle-error",
+      "type": "component",
+      "content": "Format and display error, return exit code. Args:",
+      "source_file": "src/raise_cli/cli/error_handler.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "handle_error",
+        "kind": "function",
+        "line": 52,
+        "signature": "def handle_error(error: RaiseError, *, output_format: Literal['human', 'json', 'table']='human') -> int",
+        "category": "model",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980228Z"
+      }
+    },
+    {
+      "id": "comp-cli-version-callback",
+      "type": "component",
+      "content": "Print version and exit.",
+      "source_file": "src/raise_cli/cli/main.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "version_callback",
+        "kind": "function",
+        "line": 57,
+        "signature": "def version_callback(value: bool) -> None",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980230Z"
+      }
+    },
+    {
+      "id": "comp-cli-main",
+      "type": "component",
+      "content": "RaiSE CLI - Reliable AI Software Engineering governance framework.",
+      "source_file": "src/raise_cli/cli/main.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "main",
+        "kind": "function",
+        "line": 65,
+        "signature": "def main(ctx: typer.Context, version: Annotated[bool, typer.Option('--version', '-V', callback=version_callback, is_eager=True, help='Show version and exit')]=False, format: Annotated[OutputFormat, typer.Option('--format', '-f', help='Output format (human, json, table)')]=OutputFormat.human, verbose: Annotated[int, typer.Option('--verbose', '-v', count=True, help='Increase verbosity (-v, -vv, -vvv)')]=0, quiet: Annotated[bool, typer.Option('--quiet', '-q', help='Suppress non-error output')]=False) -> None",
+        "category": "utility",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980233Z"
+      }
+    },
+    {
+      "id": "comp-cli-format-unified-json",
+      "type": "component",
+      "content": "Format UnifiedQueryResult as JSON. Args:",
+      "source_file": "src/raise_cli/cli/commands/context.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "format_unified_json",
+        "kind": "function",
+        "line": 112,
+        "signature": "def format_unified_json(result: UnifiedQueryResult) -> str",
+        "category": "command",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980235Z"
+      }
+    },
+    {
+      "id": "comp-cli-emit-calibration",
+      "type": "component",
+      "content": "Emit a calibration event to telemetry. Records estimate vs actual for velocity tracking and pattern detection.",
+      "source_file": "src/raise_cli/cli/commands/telemetry.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "emit_calibration",
+        "kind": "function",
+        "line": 112,
+        "signature": "def emit_calibration(feature: Annotated[str, typer.Argument(help='Feature ID (e.g., F9.4)')], size: Annotated[str, typer.Option('--size', '-s', help='T-shirt size (XS, S, M, L)')]='S', estimated: Annotated[int, typer.Option('--estimated', '-e', help='Estimated duration in minutes')]=0, actual: Annotated[int, typer.Option('--actual', '-a', help='Actual duration in minutes')]=0) -> None",
+        "category": "command",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980237Z"
+      }
+    },
+    {
+      "id": "comp-cli-query",
+      "type": "component",
+      "content": "Query concept graph for Minimum Viable Context. Retrieves relevant concepts from the concept graph based on the query,",
+      "source_file": "src/raise_cli/cli/commands/context.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "query",
+        "kind": "function",
+        "line": 125,
+        "signature": "def query(query_str: Annotated[str, typer.Argument(help='Query string (concept ID or keywords)')], format: Annotated[str, typer.Option('--format', '-f', help='Output format (markdown or json)')]='markdown', output: Annotated[Path | None, typer.Option('--output', '-o', help='Output file path (default: stdout)')]=None, strategy: Annotated[str | None, typer.Option('--strategy', '-s', help='Query strategy (concept_lookup, keyword_search, relationship_traversal, related_concepts)')]=None, max_depth: Annotated[int, typer.Option('--max-depth', '-d', help='Maximum graph traversal depth (0-5)')]=1, edge_types: Annotated[str | None, typer.Option('--edge-types', '-e', help='Edge types to follow (comma-separated: governed_by,implements)')]=None, concept_type: Annotated[str | None, typer.Option('--type', '-t', help='Filter by concept type (requirement, principle, etc.)')]=None, unified: Annotated[bool, typer.Option('--unified', '-u', help='Query unified context graph (includes memory, work, skills)')]=False, types: Annotated[str | None, typer.Option('--types', help='Filter by node types for unified query (comma-separated: pattern,calibration,skill)')]=None, limit: Annotated[int, typer.Option('--limit', '-l', help='Maximum number of results (unified only)')]=10) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980240Z"
+      }
+    },
+    {
+      "id": "comp-cli-dump",
+      "type": "component",
+      "content": "Dump full memory graph for inspection. Shows all concepts and relationships in the memory graph,",
+      "source_file": "src/raise_cli/cli/commands/memory.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "dump",
+        "kind": "function",
+        "line": 134,
+        "signature": "def dump(format: Annotated[str, typer.Option('--format', '-f', help='Output format (markdown, json, or table)')]='table', output: Annotated[Path | None, typer.Option('--output', '-o', help='Output file path (default: stdout)')]=None, memory_dir: Annotated[Path | None, typer.Option('--memory-dir', '-m', help='Memory directory path')]=None) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980242Z"
+      }
+    },
+    {
+      "id": "comp-cli-build",
+      "type": "component",
+      "content": "Build concept graph from extracted concepts. Loads concepts (from file or extraction), infers relationships, and",
+      "source_file": "src/raise_cli/cli/commands/graph.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "build",
+        "kind": "function",
+        "line": 157,
+        "signature": "def build(concepts: Annotated[Path | None, typer.Option('--concepts', '-c', help='Path to concepts JSON file')]=None, output: Annotated[Path | None, typer.Option('--output', '-o', help='Path to save graph JSON')]=None, unified: Annotated[bool, typer.Option('--unified', '-u', help='Build unified context graph (merges all sources)')]=False) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980244Z"
+      }
+    },
+    {
+      "id": "comp-cli-emit-work",
+      "type": "component",
+      "content": "Emit a work lifecycle event for Lean flow analysis.",
+      "source_file": "src/raise_cli/cli/commands/telemetry.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "emit_work",
+        "kind": "function",
+        "line": 201,
+        "signature": "def emit_work(work_type: Annotated[str, typer.Argument(help='Work type (epic, feature)')], work_id: Annotated[str, typer.Argument(help='Work ID (e.g., E9, F9.4)')], event_type: Annotated[str, typer.Option('--event', '-e', help='Event type (start, complete, blocked, unblocked, abandoned)')]='start', phase: Annotated[str, typer.Option('--phase', '-p', help='Phase (design, plan, implement, review)')]='design', blocker: Annotated[str, typer.Option('--blocker', '-b', help='Blocker description (for blocked events)')]='') -> None",
+        "category": "command",
+        "depends_on": [],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980247Z"
+      }
+    },
+    {
+      "id": "comp-cli-build-command",
+      "type": "component",
+      "content": "Build unified graph with discovered components. Reads validated components from JSON and integrates them into the unified",
+      "source_file": "src/raise_cli/cli/commands/discover.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "build_command",
+        "kind": "function",
+        "line": 203,
+        "signature": "def build_command(input_file: Annotated[Path | None, typer.Option('--input', '-i', help='Path to validated components JSON (default: work/discovery/components-validated.json)')]=None, project_root: Annotated[Path, typer.Option('--project-root', '-r', help='Project root directory (default: current directory)')]=Path('.'), output: Annotated[str, typer.Option('--output', '-o', help='Output format: human, json, or summary')]='human') -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980249Z"
+      }
+    },
+    {
+      "id": "comp-cli-validate",
+      "type": "component",
+      "content": "Validate graph structure and relationships. Checks for:",
+      "source_file": "src/raise_cli/cli/commands/graph.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "validate",
+        "kind": "function",
+        "line": 283,
+        "signature": "def validate(graph_file: Annotated[Path | None, typer.Option('--graph', '-g', help='Path to graph JSON file')]=None) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980251Z"
+      }
+    },
+    {
+      "id": "comp-cli-add-pattern",
+      "type": "component",
+      "content": "Add a new pattern to memory. Examples:",
+      "source_file": "src/raise_cli/cli/commands/memory.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "add_pattern",
+        "kind": "function",
+        "line": 293,
+        "signature": "def add_pattern(content: Annotated[str, typer.Argument(help='Pattern description')], context: Annotated[str, typer.Option('--context', '-c', help='Context keywords (comma-separated)')]='', sub_type: Annotated[str, typer.Option('--type', '-t', help='Pattern type (codebase, process, architecture, technical)')]='process', learned_from: Annotated[str | None, typer.Option('--from', '-f', help='Feature/session where learned')]=None, memory_dir: Annotated[Path | None, typer.Option('--memory-dir', '-m', help='Memory directory path')]=None) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980254Z"
+      }
+    },
+    {
+      "id": "comp-cli-drift-command",
+      "type": "component",
+      "content": "Check for architectural drift against baseline components.",
+      "source_file": "src/raise_cli/cli/commands/discover.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "drift_command",
+        "kind": "function",
+        "line": 353,
+        "signature": "def drift_command(path: Annotated[Path | None, typer.Argument(help='Directory to scan for drift (default: src/)')]=None, project_root: Annotated[Path, typer.Option('--project-root', '-r', help='Project root directory (default: current directory)')]=Path('.'), output: Annotated[str, typer.Option('--output', '-o', help='Output format: human, json, or summary')]='human') -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980256Z"
+      }
+    },
+    {
+      "id": "comp-cli-add-calibration-cmd",
+      "type": "component",
+      "content": "Add calibration data for a completed feature. Examples:",
+      "source_file": "src/raise_cli/cli/commands/memory.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "add_calibration_cmd",
+        "kind": "function",
+        "line": 364,
+        "signature": "def add_calibration_cmd(feature: Annotated[str, typer.Argument(help='Feature ID (e.g., F3.5)')], name: Annotated[str, typer.Argument(help='Feature name')], size: Annotated[str, typer.Argument(help='T-shirt size (XS, S, M, L, XL)')], actual: Annotated[int, typer.Argument(help='Actual minutes')], estimated: Annotated[int | None, typer.Option('--estimated', '-e', help='Estimated minutes')]=None, sp: Annotated[int | None, typer.Option('--sp', help='Story points')]=None, kata: Annotated[bool, typer.Option('--kata/--no-kata', help='Kata cycle followed (default: yes)')]=True, notes: Annotated[str | None, typer.Option('--notes', '-n', help='Additional notes')]=None, memory_dir: Annotated[Path | None, typer.Option('--memory-dir', '-m', help='Memory directory path')]=None) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980258Z"
+      }
+    },
+    {
+      "id": "comp-cli-add-session-cmd",
+      "type": "component",
+      "content": "Add a session record to memory. Examples:",
+      "source_file": "src/raise_cli/cli/commands/memory.py",
+      "created": "2026-02-04T18:50:00Z",
+      "metadata": {
+        "name": "add_session_cmd",
+        "kind": "function",
+        "line": 442,
+        "signature": "def add_session_cmd(topic: Annotated[str, typer.Argument(help='Session topic')], outcomes: Annotated[str, typer.Option('--outcomes', '-o', help='Session outcomes (comma-separated)')]='', session_type: Annotated[str, typer.Option('--type', '-t', help='Session type (feature, research, etc.)')]='feature', log_path: Annotated[str | None, typer.Option('--log', '-l', help='Path to session log file')]=None, memory_dir: Annotated[Path | None, typer.Option('--memory-dir', '-m', help='Memory directory path')]=None) -> None",
+        "category": "command",
+        "depends_on": [
+          "pathlib.Path"
+        ],
+        "validated_by": "bulk-approve",
+        "validated_at": "2026-02-04T13:46:53.980260Z"
       }
     }
   ]
