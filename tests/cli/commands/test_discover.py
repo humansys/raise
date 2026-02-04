@@ -428,3 +428,42 @@ class TestDiscoverDrift:
 
         assert result.exit_code == 0
         assert "Drift" in result.output or "Summary" in result.output
+
+    def test_drift_warns_on_small_baseline(self, tmp_path: Path) -> None:
+        """Should warn when baseline has fewer than 10 components."""
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        # Create baseline with only 3 components (below threshold of 10)
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "components": [
+                {
+                    "id": f"comp-{i}",
+                    "type": "component",
+                    "content": f"Component {i}",
+                    "source_file": f"src/module/comp{i}.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {"name": f"Comp{i}", "kind": "class"},
+                }
+                for i in range(3)  # Only 3 components
+            ],
+        }))
+
+        # Create matching source
+        src_dir = tmp_path / "src" / "module"
+        src_dir.mkdir(parents=True)
+        for i in range(3):
+            (src_dir / f"comp{i}.py").write_text(
+                f"class Comp{i}:\n    '''Component {i}.'''\n    pass\n"
+            )
+
+        result = runner.invoke(
+            app,
+            ["discover", "drift", "--project-root", str(tmp_path)],
+        )
+
+        # Should show warning about small baseline
+        assert "only 3 component" in result.output.lower()
+        assert "10+" in result.output or "10 " in result.output

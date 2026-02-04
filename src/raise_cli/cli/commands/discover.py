@@ -446,6 +446,16 @@ def drift_command(
             )
         raise typer.Exit(0)
 
+    # Warn if baseline is too small for meaningful drift detection
+    min_baseline_size = 10
+    if len(baseline) < min_baseline_size and output == "human":
+        console.print(
+            f"[yellow]Note: Baseline has only {len(baseline)} component(s).[/yellow]\n"
+            f"[dim]Drift detection works best with {min_baseline_size}+ components "
+            "for meaningful patterns.[/dim]\n"
+            "[dim]Run /discover-scan and /discover-validate to expand the baseline.[/dim]\n"
+        )
+
     # Scan for new symbols
     if not scan_path.exists():
         if output == "json":
