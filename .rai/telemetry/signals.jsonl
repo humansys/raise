@@ -385,3 +385,4 @@
 {"type":"work_lifecycle","timestamp":"2026-02-04T04:56:56.708251Z","work_type":"feature","work_id":"F12.1","event":"complete","phase":"review","blocker":null}
 {"type":"skill_event","timestamp":"2026-02-04T04:57:04Z","skill":"feature-review","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T04:57:04Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T04:58:32.141258Z","session_type":"feature","outcome":"success","duration_min":45,"features":["F12.4","F12.1"]}

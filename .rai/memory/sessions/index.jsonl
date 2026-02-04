@@ -27,3 +27,4 @@
 {"id": "SES-022", "date": "2026-02-03", "type": "maintenance", "topic": "Session Start Debug + Skill Fix", "outcomes": ["Ishikawa on CLI failure", "Updated session skills with dev note", "Committed fix"], "log_path": null}
 {"id": "SES-023", "date": "2026-02-03", "type": "maintenance", "topic": "Session Skills Graph Integration", "outcomes": ["session-start v1.1.0", "session-close v1.1.0", "PAT-054 graph-first loading"], "log_path": null}
 {"id": "SES-024", "date": "2026-02-03", "type": "feature", "topic": "E12 Knowledge Graph Epic Design", "outcomes": ["epic-scope-created", "adr-020-written", "epic-plan-complete", "branch-created"], "log_path": null}
+{"id": "SES-025", "date": "2026-02-03", "type": "feature", "topic": "E12 F12.4+F12.1 Implementation", "outcomes": ["Schema extension complete", "ADR extractor complete", "M1 milestone done", "Process failure documented", "PAT-058 added"], "log_path": null}
