@@ -1,714 +1,381 @@
-# raise-cli Architecture Overview
+# RaiSE Architecture Overview
 
 > **Audience:** Architects, contributors, future maintainers
 > **Purpose:** Explain the mental model and design decisions
-> **Status:** Living document (updated as we build)
-> **Last Updated:** 2026-02-01 (E1 complete, E2 complete)
+> **Generated from:** Knowledge Graph (481 nodes, 3213 edges)
+> **Last Updated:** 2026-02-04
 
 ---
 
-## The Big Picture: What is raise-cli?
+## 1. System Overview
 
-**Core Problem:**
-RaiSE methodology exists as static markdown files. Engineers and AI assistants can't *execute* governance - they just read and hope to follow it.
+**RaiSE** (Reliable AI Software Engineering) is a framework + CLI tooling that helps professional developers ship reliable software at AI speed.
 
-**Solution:**
-A CLI tool that makes governance *executable* and *deterministic*. Think: "governance as code" that both humans and AI can run.
+### The RaiSE Triad
+
+```
+        RaiSE Engineer
+        (Human - Strategy, Judgment, Ownership)
+              │
+              │ orchestrates
+              ▼
+┌─────────────────────────────────────┐
+│             RaiSE                   │
+│   (Methodology + Governance)        │
+│   Deterministic, Observable         │
+└─────────────────────────────────────┘
+              │
+              │ constrains + enables
+              ▼
+           Rai
+    (AI Partner - Execution)
+    Persistent Identity + Memory
+```
+
+**Key Insight:** Rai is an *entity*, not a product. It has persistent identity, accumulated memory, and calibrated judgment across sessions. (See ADR-013)
 
 ---
 
-## System Architecture (Mental Model)
+## 2. Directory Structure
 
-### Three-Layer Pattern (Ports & Adapters)
+Based on **ADR-011: Three-Directory Model**:
 
 ```
-┌─────────────────────────────────────────────────┐
-│         PRESENTATION (CLI)                      │
-│  "How users interact with the system"           │
-│  - Commands (kata, gate, context)               │
-│  - Output formatting (human/json/table)         │
-│  - Error presentation                           │
-└───────────────┬─────────────────────────────────┘
-                │ calls
-┌───────────────▼─────────────────────────────────┐
-│         APPLICATION (Handlers)                  │
-│  "Orchestration and use case logic"             │
-│  - Validate inputs                              │
-│  - Coordinate engines                           │
-│  - Manage state/metrics                         │
-└───────────────┬─────────────────────────────────┘
-                │ uses
-┌───────────────▼─────────────────────────────────┐
-│         DOMAIN (Engines)                        │
-│  "Pure business logic - the 'what'"             │
-│  - KataEngine: Execute governance katas         │
-│  - GateEngine: Validate artifacts               │
-│  - SAREngine: Analyze codebases                 │
-│  - ContextGenerator: Produce CLAUDE.md          │
-└───────────────┬─────────────────────────────────┘
-                │ operates on
-┌───────────────▼─────────────────────────────────┐
-│         CORE (Schemas, Config, State)           │
-│  "Shared data structures and utilities"         │
-│  - Pydantic models (type-safe)                  │
-│  - Configuration system                         │
-│  - State persistence                            │
-└─────────────────────────────────────────────────┘
+raise-commons/
+├── .raise/              # Framework engine (katas, gates, templates)
+│   ├── katas/           # Process definitions
+│   ├── gates/           # Validation criteria
+│   ├── templates/       # Scaffolds
+│   └── graph/           # Unified context graph
+│
+├── .rai/                # Rai's persistent state (ADR-014)
+│   ├── identity/        # Who Rai is (core.md, perspective.md)
+│   └── memory/          # What Rai learns (patterns.jsonl, calibration.jsonl)
+│
+├── .claude/             # Claude Code integration
+│   └── skills/          # 16 executable skills
+│
+├── framework/           # Framework textbook (PUBLIC)
+│   ├── reference/       # Constitution, glossary
+│   └── concepts/        # Core concepts
+│
+├── governance/          # Project governance
+│   ├── solution/        # Vision, guardrails, business case
+│   └── projects/        # Project-level artifacts (PRD, backlog)
+│
+├── src/raise_cli/       # CLI implementation
+│
+├── work/                # Active work
+│   ├── features/        # Feature specs
+│   └── research/        # Research sessions
+│
+└── dev/                 # Framework maintenance
+    ├── decisions/       # ADRs (19 total)
+    └── sessions/        # Session logs
 ```
-
-**Key Insight:** Layers only depend *downward*. Engines never know about CLI. This means:
-- Engines can be used by MCP servers, web UI, or direct Python imports
-- CLI can change without touching business logic
-- Easy to test each layer independently
 
 ---
 
-## What We've Built (E1 Foundation)
+## 3. Core Architecture: Skills + Toolkit
 
-### F1.1: Project Scaffolding ✓
+Based on **ADR-012: Skills + CLI Toolkit Architecture**:
 
-**What:** Package structure, entry points, dependencies
-
-**Why:** You can't build a house without a foundation. This is the concrete slab.
-
-**Created:**
 ```
-src/raise_cli/          # Package root
-├── cli/                # Presentation (empty structure)
-├── handlers/           # Application (empty structure)
-├── engines/            # Domain (empty structure)
-├── schemas/            # Core data models (empty structure)
-├── config/             # Configuration (empty structure)
-├── output/             # Formatters (empty structure)
-└── core/               # Utilities (empty structure)
+┌─────────────────────────────────────────────────────────────┐
+│                     Claude (AI Partner)                      │
+│   Reads skills, follows steps, makes judgment calls          │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            │ invokes
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Governance Toolkit                        │
+│   raise context query    → MVC retrieval (97% token savings) │
+│   raise graph build      → Build concept graphs              │
+│   raise discover scan    → Extract code components           │
+│   raise telemetry emit   → Capture learning signals          │
+└─────────────────────────────────────────────────────────────┘
+                            │
+                            │ reads/writes
+                            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Governance Artifacts                      │
+│   Constitution, Guardrails, PRD, ADRs, Memory JSONL          │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-Plus: `pyproject.toml`, tests/, .gitignore, venv setup
-
-**Metaphor:** Built the directory structure and plumbing. Rooms exist but are empty.
+**Design Principle:** Build dumb tools + smart context, not smart engines.
 
 ---
 
-### F1.2: CLI Skeleton ✓
+## 4. CLI Module Structure
 
-**What:** Global options infrastructure (--format, -v, -q)
-
-**Why:** Every command needs these options. Set them up once, all future commands inherit them.
-
-**How it works:**
-```python
-@app.callback()
-def main(ctx: typer.Context, format: str, verbose: int, quiet: bool):
-    # Store options in context
-    ctx.obj["format"] = format
-    ctx.obj["verbosity"] = -1 if quiet else min(verbose, 3)
-
-    # Future commands access via: ctx.obj["format"]
+```
+src/raise_cli/
+├── cli/                    # Typer CLI layer
+│   ├── commands/           # Command modules
+│   │   ├── context.py      # MVC queries
+│   │   ├── graph.py        # Graph operations
+│   │   ├── memory.py       # Memory management
+│   │   ├── discover.py     # Codebase discovery
+│   │   └── telemetry.py    # Signal emission
+│   ├── main.py             # CLI app entry point
+│   └── error_handler.py    # Unified error display
+│
+├── context/                # Unified Context Graph (E11)
+│   ├── models.py           # ConceptNode, ConceptEdge
+│   ├── graph.py            # UnifiedGraph (NetworkX wrapper)
+│   ├── builder.py          # UnifiedGraphBuilder
+│   └── query.py            # UnifiedQueryEngine
+│
+├── governance/             # Governance parsing & queries (E2)
+│   ├── parsers/            # ADR, constitution, guardrails, etc.
+│   ├── graph/              # ConceptGraph (legacy)
+│   └── query/              # ContextQueryEngine (legacy MVC)
+│
+├── memory/                 # Memory infrastructure (E3)
+│   ├── models.py           # MemoryNode, Pattern, Calibration
+│   ├── builder.py          # MemoryGraphBuilder
+│   ├── loader.py           # JSONL file loaders
+│   ├── writer.py           # Pattern/calibration writers
+│   └── cache.py            # Graph cache with staleness
+│
+├── discovery/              # Codebase discovery (E13)
+│   ├── scanner.py          # Code symbol extraction
+│   └── drift.py            # Architectural drift detection
+│
+├── telemetry/              # Learning signals (E9)
+│   ├── schemas.py          # Signal Pydantic models
+│   └── writer.py           # JSONL signal emitter
+│
+├── config/                 # Configuration
+│   ├── settings.py         # Pydantic Settings
+│   └── paths.py            # Standard paths
+│
+├── exceptions.py           # Exception hierarchy (7 types)
+└── output/                 # Console formatting
+    └── console.py          # Rich console wrapper
 ```
 
-When we add `raise kata list`, it automatically gets:
-- `raise kata list --format json`
-- `raise kata list -vvv`
-- `raise kata list -q`
+### Components by Category
 
-**Metaphor:** Installed the electrical panel. Every room will plug into it, but no rooms wired yet.
+| Category | Count | Examples |
+|----------|-------|----------|
+| **Utility** | 60 | `main()`, path helpers, search tools |
+| **Model** | 54 | `RaiseError`, `ConceptNode`, `Pattern` |
+| **Command** | 16 | `query`, `emit_session`, `scan_command` |
+| **Service** | 13 | `emit()`, `load_pattern()`, `load_calibration()` |
+| **Schema** | 7 | `SkillEvent`, `CalibrationEvent` |
+| **Builder** | 3 | `UnifiedGraphBuilder`, `MemoryGraphBuilder` |
+| **Parser** | 1 | `GovernanceExtractor` |
+
+**Total: 154 code components indexed in Knowledge Graph**
 
 ---
 
-## What's Coming Next (Architecture Preview)
+## 5. Knowledge Graph Architecture
 
-### F1.3: Configuration System
+Based on **ADR-019: Unified Context Graph** and **ADR-020: Knowledge Graph Completion**:
 
-**What:** Pydantic Settings with cascade
-
-**Why:** Users need to configure:
-- Where `.raise/` directory is
-- Output preferences
-- External tool paths (ast-grep, ripgrep)
-
-**Cascade (priority order):**
 ```
-CLI args > Environment vars > pyproject.toml > ~/.config/raise/config.toml > defaults
-```
-
-**Example:**
-```python
-# User runs: raise kata list --format json
-# With RAISE_OUTPUT_FORMAT=table in env
-# Result: Uses "json" (CLI wins)
-
-settings = RaiseSettings()  # Auto-loads with cascade
-# settings.output_format
-# settings.raise_dir
-# settings.verbosity
+┌──────────────────────────────────────────────────────────────┐
+│                    Unified Context Graph                      │
+│                    (481 nodes, 3213 edges)                    │
+├──────────────────────────────────────────────────────────────┤
+│  Node Types:                                                  │
+│  ├── Governance: principle, requirement, guardrail, term      │
+│  ├── Memory: pattern, calibration, session                    │
+│  ├── Work: epic, feature, decision                           │
+│  ├── Skills: skill                                           │
+│  └── Code: component                                         │
+├──────────────────────────────────────────────────────────────┤
+│  Edge Types:                                                  │
+│  ├── governed_by    (requirement → principle)                │
+│  ├── implements     (component → requirement)                │
+│  ├── depends_on     (feature → feature)                      │
+│  ├── related_to     (pattern → pattern)                      │
+│  └── extracted_from (component → source_file)                │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-**Why now:** Handlers (F2+) need to know where `.raise/` is, what format to output, etc.
+### Query Interface
 
----
-
-### F1.4: Exception Hierarchy
-
-**What:** Structured errors with exit codes
-
-**Why:** Different errors need different exit codes for scripting:
 ```bash
-raise kata run discovery || echo "Kata failed with code $?"
-# Exit 3 = not found
-# Exit 10 = gate failed
-# Exit 5 = dependency missing
-```
-
-**Structure:**
-```python
-RaiseError (base)
-├── ConfigurationError (exit 2)
-├── KataNotFoundError (exit 3)
-├── GateFailedError (exit 10)
-└── DependencyError (exit 5)
-```
-
-Plus: Rich formatting for human-readable errors with hints.
-
----
-
-### F1.5: Output Module ✓
-
-**What:** OutputConsole class with format-aware output
-
-**Why:** Handlers need to output results. Format based on `--format` flag.
-
-**How it works:**
-```python
-from raise_cli.output import get_console, configure_console
-
-# Configure once (usually in CLI callback)
-console = configure_console(format="human", verbosity=0, color=True)
-
-# Use anywhere
-console.print_success("Kata completed", details={"steps": 5})
-console.print_data({"name": "discovery", "status": "done"})
-console.print_list(["item1", "item2"], title="Results")
-```
-
-**Formats:** human (Rich styling), json (parseable), table (Rich tables)
-
----
-
-### F1.6: Core Utilities ✓
-
-**What:** Typed subprocess wrappers for git, ast-grep, ripgrep
-
-**Why:** Engines need to:
-- Check git status, branch, diff
-- Run ast-grep for AST patterns (SAR)
-- Run ripgrep for text search (SAR)
-
-**How it works:**
-```python
-from raise_cli.core import git_status, rg_search, check_tool
-
-# Check if tools available
-if check_tool("rg"):
-    matches = rg_search("TODO", Path("."), glob="*.py")
-
-# Get git info
-status = git_status()
-print(f"On {status.branch}, {len(status.staged)} staged files")
-```
-
-**Error handling:** Raises `DependencyError` with install hints if tools missing
-
----
-
-## What We've Built (E2 Governance Toolkit)
-
-### Architecture Decision: Skills + Toolkit Pattern
-
-**Major pivot from original design:**
-- **Original plan:** Monolithic engines (KataEngine, GateEngine, SAREngine)
-- **Actual delivery:** Skills + CLI Toolkit pattern (ADR-011, ADR-012)
-
-**Why the change:**
-- Concept-level graph provides 97% token savings (vs 27% file-level)
-- Skills execute processes by reading markdown guides (AI-friendly)
-- CLI toolkit provides deterministic data extraction (machine-friendly)
-- 85% scope reduction (60 SP → 9 SP → 7 SP delivered)
-
-**The Pattern:**
-```
-┌──────────────────────────────────────────────────┐
-│   CLAUDE (AI Partner)                            │
-│   - Reads Skills (process guides in markdown)    │
-│   - Calls CLI Toolkit for deterministic ops      │
-│   - Uses Concept Graph for context               │
-└──────────────────┬───────────────────────────────┘
-                   │ orchestrates
-┌──────────────────▼───────────────────────────────┐
-│   CLI TOOLKIT (Deterministic Operations)         │
-│   - raise governance extract                     │
-│   - raise graph build                            │
-│   - raise graph validate                         │
-│   - raise context query                          │
-└──────────────────┬───────────────────────────────┘
-                   │ operates on
-┌──────────────────▼───────────────────────────────┐
-│   GOVERNANCE FILES (Markdown)                    │
-│   - Constitution, Vision, PRD, Guardrails        │
-│   - Versioned in Git                             │
-│   - Human-readable, machine-parseable            │
-└──────────────────────────────────────────────────┘
-```
-
-**Key insight:** Don't build "engines" that try to be smart. Build dumb tools + smart context.
-
----
-
-### F2.1: Concept Extraction ✓
-
-**What:** Parse governance markdown files into structured concept data
-
-**Why:** Transform static docs into queryable knowledge graph
-
-**Created:**
-```
-src/raise_cli/governance/extraction/
-├── parsers.py          # Constitution, Vision, Guardrails parsers
-└── models.py           # Concept, Component, Guardrail models
-
-CLI: raise governance extract [--output FILE] [--format json|markdown]
-```
-
-**How it works:**
-```python
-from raise_cli.governance.extraction import extract_concepts
-
-# Extract from raise-commons governance
-concepts = extract_concepts(
-    constitution_path=Path("framework/reference/constitution.md"),
-    vision_path=Path("governance/solution/vision.md"),
-    guardrails_path=Path("governance/solution/guardrails.md")
-)
-
-# Result: 23 concepts extracted
-# - 8 principles (from Constitution)
-# - 9 components (from Vision)
-# - 6 guardrails (from Guardrails)
-```
-
-**Parsers:**
-- **Constitution:** Regex-based extraction of principles (§N format)
-- **Vision:** Component extraction with dependencies
-- **Guardrails:** Rule extraction with verification commands
-
-**Metaphor:** Built the librarian that catalogs all books in the governance library.
-
----
-
-### F2.2: Graph Builder ✓
-
-**What:** Build concept graph with relationships and traversal
-
-**Why:** Enable semantic navigation and dependency analysis
-
-**Created:**
-```
-src/raise_cli/governance/graph/
-├── models.py           # ConceptGraph, Edge, RelationshipType
-├── builder.py          # Graph construction from concepts
-├── traversal.py        # BFS traversal with cycle detection
-└── relationships.py    # Relationship inference rules
-
-CLI: raise graph build [--output FILE] [--validate]
-CLI: raise graph validate [--graph FILE]
-```
-
-**How it works:**
-```python
-from raise_cli.governance.graph import ConceptGraphBuilder
-
-# Build graph from extracted concepts
-builder = ConceptGraphBuilder()
-graph = builder.build_from_concepts(concepts)
-
-# Graph structure:
-# - 23 concepts (nodes)
-# - 47 edges (relationships)
-# - 5 relationship types: governed_by, implements, validates, depends_on, related_to
-
-# Serialize to JSON for caching
-graph_json = graph.to_json()
-# Save to: .raise/cache/graph.json
-```
-
-**Relationship types:**
-- `governed_by`: Concept adheres to principle/rule
-- `implements`: Feature implements requirement
-- `validates`: Gate validates artifact
-- `depends_on`: Technical dependency
-- `related_to`: Semantic relationship
-
-**Traversal:**
-```python
-from raise_cli.governance.graph import traverse_bfs
-
-# Find all concepts within 2 hops of REQ-RF-05
-context = traverse_bfs(
-    graph=graph,
-    start_id="req-rf-05",
-    max_depth=2,
-    edge_types=["governed_by", "implements"]
-)
-```
-
-**Metaphor:** Built the map showing how all governance concepts connect.
-
----
-
-### F2.3: MVC Query Engine ✓
-
-**What:** Query concept graph for Minimum Viable Context (MVC)
-
-**Why:** 97% token savings for AI context queries
-
-**Created:**
-```
-src/raise_cli/governance/query/
-├── models.py           # ContextQuery, ContextResult
-├── strategies.py       # 4 query strategies
-├── engine.py           # ContextQueryEngine orchestrator
-└── formatters.py       # Markdown, JSON output + token estimation
-
-CLI: raise context query QUERY [--strategy STRATEGY] [--format FORMAT]
-```
-
-**How it works:**
-```python
-from raise_cli.governance.query import ContextQueryEngine, ContextQuery, QueryStrategy
-
-# Load graph from cache
-engine = ContextQueryEngine.from_cache()
-
-# Query for concept
-query = ContextQuery(
-    query="req-rf-05",
-    strategy=QueryStrategy.CONCEPT_LOOKUP,
-    max_depth=1
-)
-
-result = engine.query(query)
-
-# Result:
-# - 1 concept found
-# - 67 tokens (vs 2000+ for full file)
-# - 97% token savings
-# - <1ms query time
-```
-
-**Query strategies:**
-1. **concept_lookup:** Find exact concept by ID
-2. **keyword_search:** Find concepts containing keywords (stopword filtering)
-3. **relationship_traversal:** BFS from concept following relationships
-4. **related_concepts:** Find semantically related concepts
-
-**Output formats:**
-- **Markdown:** Human-readable with headers, sections
-- **JSON:** Machine-parseable with full metadata
-
-**Token estimation:**
-```python
-# Simple heuristic (spike-validated):
-tokens = len(text.split()) * 1.3
-
-# Accurate enough for MVC queries
-# No ML/NLP needed
-```
-
-**Performance:**
-- Query speed: <1ms (0.01-0.17ms measured)
-- Token savings: 97-99% (single concept), 97% average
-- Graph build: <1s for 23 concepts
-
-**Metaphor:** Built the reference librarian who finds exactly what you need, not the whole library.
-
----
-
-### E2 Architecture Summary
-
-**Modules added:**
-```
-src/raise_cli/governance/
-├── extraction/          # F2.1 - Parse governance files
-│   ├── parsers.py       # Constitution, Vision, Guardrails parsers
-│   └── models.py        # Concept, Component, Guardrail models
-├── graph/               # F2.2 - Build concept graph
-│   ├── models.py        # ConceptGraph, Edge, RelationshipType
-│   ├── builder.py       # Graph construction from concepts
-│   ├── traversal.py     # BFS traversal with cycle detection
-│   └── relationships.py # Relationship inference rules
-└── query/               # F2.3 - Query concept graph
-    ├── models.py        # ContextQuery, ContextResult
-    ├── strategies.py    # 4 query strategies
-    ├── engine.py        # ContextQueryEngine orchestrator
-    └── formatters.py    # Markdown, JSON output + token estimation
-```
-
-**CLI commands added:**
-```bash
-raise governance extract  # F2.1
-raise graph build         # F2.2
-raise graph validate      # F2.2
-raise context query       # F2.3
-```
-
-**Data flow:**
-```
-Governance Files (*.md)
-        ↓ extract
-    Concepts (23)
-        ↓ build
-   Concept Graph (23 nodes, 47 edges)
-        ↓ serialize
-   graph.json (.raise/cache/)
-        ↓ load + query
-   Minimum Viable Context (97% token savings)
-```
-
-**Foundation pieces used:**
-- F1.2: Global options (--format, -v, -q)
-- F1.3: Settings (where is .raise/? where to cache?)
-- F1.4: Exceptions (ConceptNotFoundError, GraphValidationError)
-- F1.5: Output formatting (human/json/table)
-- F1.6: Not used (E2 doesn't need git/rg/sg)
-
----
-
-## How Future Epics Will Use Governance Toolkit
-
-### Epic E3/E4: Context Generation (Using E2 Output)
-
-**Flow:**
-```
-User: raise context query "req-rf-05" --format markdown
-
-1. CLI (presentation):
-   - Parse args: query="req-rf-05", format="markdown"
-   - Read ctx.obj["format"], ctx.obj["verbosity"]
-
-2. CLI command (no handler needed for simple queries):
-   - Load graph from cache (.raise/cache/graph.json)
-   - Create ContextQueryEngine
-   - Create ContextQuery with strategy
-   - Call engine.query(query)
-
-3. Query engine (domain):
-   - Parse query string
-   - Execute strategy (concept_lookup)
-   - Format result (markdown formatter)
-   - Estimate tokens
-   - Return ContextResult
-
-4. CLI (presentation):
-   - Format output (F1.5: human/json/table)
-   - Handle errors (F1.4: ConceptNotFoundError)
-   - Display to user
-```
-
-**Foundation pieces used:**
-- F1.2: Global options (--format, -v, -q)
-- F1.3: Settings (cache directory location)
-- F1.4: Exceptions (ConceptNotFoundError, GraphValidationError)
-- F1.5: Output formatting (markdown/json)
-- F1.6: Not used (E2 doesn't need git/rg/sg)
-
----
-
-## Key Architectural Decisions
-
-### Why Three Layers?
-
-**Alternative:** CLI → Engine (direct)
-
-**Problem:**
-- Engine becomes aware of CLI concerns (formatting, state, metrics)
-- Can't reuse engine in MCP server or web UI
-- Hard to test business logic
-
-**Our approach:** Handlers orchestrate, engines focus on pure logic
-
----
-
-### Why Pydantic Everywhere?
-
-**Alternative:** dict, TypedDict, dataclasses
-
-**Why Pydantic:**
-- Runtime validation (catch bad data early)
-- JSON serialization (for state, metrics, API)
-- Settings cascade (F1.3)
-- Documentation (auto-generated schemas)
-
-**Example:**
-```python
-# This fails at parse time, not in engine
-kata = KataDefinition(**yaml_data)  # Validates structure
+# Query with MVC (Minimum Viable Context)
+raise context query "error handling" --unified --type component
+
+# Result: 7 concepts, 118 tokens, 2.8ms
+# vs reading files directly: ~5000 tokens (97% savings)
 ```
 
 ---
 
-### Why Rich for Output?
+## 6. Memory Infrastructure
 
-**Alternative:** print() statements
+Based on **ADR-015** and **ADR-016**:
 
-**Why Rich:**
-- Color/formatting for humans
-- Tables, panels, progress bars
-- Terminal detection (auto-disable in CI)
-- Consistent UX
-
----
-
-### Why XDG Directories?
-
-**Alternative:** `~/.raise/` for everything
-
-**Why XDG:**
-- Standard on Linux/Mac
-- Separates concerns:
-  - `~/.config/raise/` - User configuration
-  - `~/.cache/raise/` - Temp data
-  - `~/.local/share/raise/` - State, metrics
-- Respects user environment variables
-
----
-
-## The Mental Model
-
-Think of raise-cli as **three concentric circles**:
-
-1. **Outer (CLI):** User-facing interface. Changes frequently as we add commands.
-
-2. **Middle (Handlers):** Orchestration. Knows about both CLI and engines. Coordinates workflows.
-
-3. **Inner (Engines):** Pure logic. Stable. Doesn't know about CLI or handlers. Just does the work.
-
-**Foundation (E1):** Building the outer circle infrastructure so when we build engines (E2-E4), they have a solid platform.
-
----
-
-## What Makes This "Governance as Code"?
-
-**Traditional:**
-1. Read governance docs (.md files)
-2. Manually follow steps
-3. Hope you did it right
-
-**RaiSE CLI:**
-1. `raise kata run project/discovery` → Executes governance
-2. `raise gate check prd` → Validates you followed governance
-3. `raise context generate` → Configures AI with governance
-
-**Deterministic:** Same inputs → same outputs. Auditable. Repeatable.
-
----
-
-## Current State Summary (E1 + E2 Complete)
-
-**E1 Foundation Features Complete:**
-- ✓ F1.1: Package structure
-- ✓ F1.2: CLI with global options
-- ✓ F1.3: Configuration cascade (CLI → env → pyproject → user config → defaults)
-- ✓ F1.4: Exception hierarchy with exit codes
-- ✓ F1.5: Output module (human/json/table formatters)
-- ✓ F1.6: Core utilities (git, rg, sg wrappers)
-
-**E2 Governance Toolkit Features Complete:**
-- ✓ F2.1: Concept Extraction (parse governance files)
-- ✓ F2.2: Graph Builder (build concept graph with relationships)
-- ✓ F2.3: MVC Query Engine (97% token savings for AI context)
-
-**Quality:**
-- 457 tests passing (214 from E1 + 243 from E2)
-- 95-100% coverage
-- pyright: 0 errors
-- ruff: clean
-- bandit: clean
-
-**Can do now:**
-```bash
-# Foundation
-raise --version           # 2.0.0-alpha.1
-raise --help              # Shows global options
-raise --format json       # Output as JSON
-raise -vvv                # Verbose mode
-
-# Governance Toolkit
-raise governance extract  # Extract 23 concepts from governance files
-raise graph build         # Build concept graph (23 nodes, 47 edges)
-raise graph validate      # Validate graph structure
-raise context query "req-rf-05"  # Query for MVC (97% token savings)
-raise context query "authentication" --strategy keyword  # Keyword search
+```
+.rai/
+├── identity/                    # Markdown (human-authored)
+│   ├── core.md                  # Who Rai is
+│   └── perspective.md           # How Rai sees work
+│
+└── memory/                      # JSONL + Graph (machine-managed)
+    ├── patterns.jsonl           # 68 learned patterns
+    ├── calibration.jsonl        # 12 velocity data points
+    ├── sessions/
+    │   └── index.jsonl          # 35 session records
+    └── graph.json               # Memory relationships
 ```
 
-**Impact:**
-- 23 concepts extracted from raise-commons governance
-- 97% token savings for AI context queries (<1ms query time)
-- Concept graph ready for E4 (Context Generation)
-
-**Next (E3+):**
-Build context generation, skills execution, or continue with backlog features.
+**Key Pattern:** Identity is Markdown (philosophical, stable). Memory is JSONL (queryable, evolving).
 
 ---
 
-## For Contributors
+## 7. Skills System
 
-**Adding a new engine:**
-1. Create domain logic in `engines/` (pure Python, no I/O)
-2. Define data models in `schemas/`
-3. Create handler in `handlers/` (orchestration)
-4. Add CLI commands in `cli/commands/`
-5. Write tests at each layer
+16 skills organized by lifecycle phase:
 
-**The dependency rule:**
-- CLI can import handlers, schemas, config
-- Handlers can import engines, schemas, config
-- Engines can import schemas only
-- Nobody imports CLI (except tests)
+### Session Management
+| Skill | Purpose |
+|-------|---------|
+| `/session-start` | Load memory, propose focus |
+| `/session-close` | Extract learnings, update memory |
 
-**Testing strategy:**
-- Unit tests: engines (pure logic)
-- Integration tests: handlers (orchestration)
-- CLI tests: commands (Typer CliRunner)
-- E2E tests: full workflows
+### Epic Lifecycle
+| Skill | Purpose |
+|-------|---------|
+| `/epic-design` | Strategic objective → feature breakdown |
+| `/epic-plan` | Sequence features with milestones |
 
----
+### Feature Lifecycle
+| Skill | Purpose |
+|-------|---------|
+| `/feature-start` | Branch, context, scope commit |
+| `/feature-design` | Lean spec for complex features |
+| `/feature-plan` | Decompose to atomic tasks |
+| `/feature-implement` | Execute plan with verification |
+| `/feature-review` | Retrospective, learnings |
+| `/feature-close` | Merge, cleanup, tracking |
 
-## References
-
-**Epic Tracking:**
-- `dev/epic-e1-scope.md` - E1 Core Foundation (complete)
-- `dev/epic-e2-scope.md` - E2 Governance Toolkit (complete)
-- `dev/epic-e2-retrospective.md` - E2 retrospective with learnings
-
-**Architecture Decisions:**
-- `dev/decisions/framework/ADR-011-concept-graph-architecture.md` - 97% token savings
-- `dev/decisions/framework/ADR-012-skills-toolkit-pattern.md` - 85% scope reduction
-
-**Design Documents:**
-- `governance/projects/raise-cli/design.md` - Original design
-- `governance/projects/raise-cli/backlog.md` - Feature backlog
-- `work/features/f2.1-concept-extraction/design.md` - F2.1 design
-- `work/features/f2.2-graph-builder/design.md` - F2.2 design
-- `work/features/f2.3-mvc-query-engine/design.md` - F2.3 design
-
-**Component Catalog:**
-- `dev/components.md` - Complete module documentation (E1 + E2)
-
-**Research:**
-- `work/research/outputs/python-cli-architecture-analysis.md` - CLI architecture research
+### Discovery & Research
+| Skill | Purpose |
+|-------|---------|
+| `/discover-start` | Initialize codebase scan |
+| `/discover-scan` | Extract code symbols |
+| `/discover-validate` | Human review of descriptions |
+| `/discover-complete` | Export to graph |
+| `/research` | Epistemological investigation |
+| `/debug` | Ishikawa root cause analysis |
 
 ---
 
-*Architecture guide - created 2026-01-31 during E1, updated 2026-02-01 for E2*
-*Co-Authored-By: Rai <rai@humansys.ai>*
-*Co-Authored-By: Emilio Osorio <emilio@humansys.ai>*
+## 8. Guardrails
+
+### MUST (Blocking)
+
+| ID | Guardrail | Verification |
+|----|-----------|--------------|
+| CODE-001 | Type hints on all code | `pyright --strict` |
+| CODE-002 | Ruff linting passes | `ruff check .` |
+| CODE-003 | No type errors | `pyright` 0 errors |
+| TEST-001 | >90% test coverage | `pytest --cov` ≥ 90% |
+| TEST-002 | All tests pass | `pytest` exits 0 |
+| SEC-001 | No secrets in code | `detect-secrets` + `bandit` |
+| SEC-002 | Bandit security scan | `bandit -r src/` |
+| ARCH-001 | Pydantic models for schemas | All data classes inherit BaseModel |
+
+### SHOULD (Recommended)
+
+| ID | Guardrail |
+|----|-----------|
+| DOC-001 | Google-style docstrings on public APIs |
+| NAME-001 | Prefer clear names over acronyms |
+| TEST-003 | Property-based tests for parsers |
+| SEC-003 | Dependency vulnerability scan |
+| ARCH-002 | No circular imports |
+
+---
+
+## 9. Key ADRs
+
+| ADR | Decision | Impact |
+|-----|----------|--------|
+| **ADR-011** | Three-Directory Model | `.raise/`, `governance/`, `work/` separation |
+| **ADR-012** | Skills + Toolkit (not Engines) | Simpler architecture, Claude executes skills |
+| **ADR-013** | Rai as Entity | Persistent identity, not stateless assistant |
+| **ADR-015** | Workspace-as-Memory | `.rai/` directory for state |
+| **ADR-016** | JSONL + Graph format | Queryable memory, not flat markdown |
+| **ADR-019** | Unified Context Graph | Single graph for all concept types |
+| **ADR-020** | Knowledge Graph Completion | Components, conventions, bidirectional flow |
+
+Full ADR list (19 total):
+- ADR-001 through ADR-010: Early decisions (pipeline, formats, ontology)
+- ADR-011 through ADR-016: Architecture foundations
+- ADR-018 through ADR-020: Learning infrastructure
+
+---
+
+## 10. Data Flow
+
+### Build Phase
+```
+Governance Files    →  Parsers  →  ConceptNodes  →
+Memory JSONL        →  Loaders  →  MemoryNodes   →  UnifiedGraph
+Skills Markdown     →  Extractor→  SkillNodes    →     ↓
+Code (Python/TS)    →  Scanner  →  Components    →  unified.json
+```
+
+### Query Phase
+```
+User Query  →  UnifiedQueryEngine  →  Keyword Search  →  MVC Result
+                                   →  BFS Traversal   →  (minimal tokens)
+```
+
+### Learning Phase
+```
+Session Work  →  Telemetry Writer  →  signals.jsonl
+              →  Memory Writer     →  patterns.jsonl
+              →  /session-close    →  sessions/index.jsonl
+```
+
+---
+
+## 11. Technology Stack
+
+| Layer | Technology |
+|-------|------------|
+| Language | Python 3.12+ |
+| CLI Framework | Typer |
+| Validation | Pydantic v2 |
+| Graph | NetworkX |
+| Package Manager | uv |
+| Testing | pytest + hypothesis |
+| Linting | Ruff |
+| Type Checking | Pyright |
+| Security | Bandit + detect-secrets |
+
+---
+
+## 12. Extension Points
+
+### Adding a New Parser
+1. Create `src/raise_cli/governance/parsers/new_type.py`
+2. Implement `extract_*` functions returning `Concept` objects
+3. Register in `UnifiedGraphBuilder._extract_*` method
+4. Add tests in `tests/governance/parsers/`
+
+### Adding a New Skill
+1. Create `.claude/skills/skill-name/SKILL.md`
+2. Follow ShuHaRi structure (Steps, Verification, Notes)
+3. Register in CLAUDE.md if user-invocable
+
+### Adding a New Node Type
+1. Extend `NodeType` literal in `context/models.py`
+2. Add extraction logic in `context/builder.py`
+3. Update `raise graph build --unified` if needed
+
+---
+
+*This document was generated by Rai querying its own Knowledge Graph.*
+*Source: 481 nodes across governance, memory, work, skills, and code.*
