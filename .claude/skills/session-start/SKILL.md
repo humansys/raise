@@ -71,6 +71,9 @@ Query the unified graph for session-relevant context. This is the **primary** me
 raise context query "session epic patterns calibration" --unified --limit 10
 ```
 
+> **Development note:** In raise-commons, use `uv run raise` instead of bare `raise`.
+> The venv isn't auto-activated. See PAT-046.
+
 **What this returns:**
 - Recent session history with outcomes
 - Relevant patterns for likely work

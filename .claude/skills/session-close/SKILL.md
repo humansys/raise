@@ -76,6 +76,9 @@ Query the unified graph to understand existing patterns. This helps identify wha
 raise context query "patterns learnings process" --unified --types pattern --limit 10
 ```
 
+> **Development note:** In raise-commons, use `uv run raise` instead of bare `raise`.
+> The venv isn't auto-activated. See PAT-046.
+
 **Why this matters:**
 - Avoid adding duplicate patterns
 - See related patterns to link new learnings
