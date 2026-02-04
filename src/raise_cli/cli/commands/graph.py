@@ -26,7 +26,9 @@ console = Console()
 def extract(
     file_path: Annotated[
         Path | None,
-        typer.Argument(help="Path to governance file (optional, extracts all if not provided)"),
+        typer.Argument(
+            help="Path to governance file (optional, extracts all if not provided)"
+        ),
     ] = None,
     format: Annotated[
         str,
@@ -80,10 +82,14 @@ def extract(
             console.print(json.dumps(output, indent=2))
         else:
             # Human-readable output
-            console.print(f"\nExtracting concepts from [cyan]{file_path.name}[/cyan]...")
+            console.print(
+                f"\nExtracting concepts from [cyan]{file_path.name}[/cyan]..."
+            )
 
             for concept in concepts:
-                console.print(f"  ✓ Found {concept.metadata.get('requirement_id') or concept.metadata.get('principle_number') or concept.section}")
+                console.print(
+                    f"  ✓ Found {concept.metadata.get('requirement_id') or concept.metadata.get('principle_number') or concept.section}"
+                )
 
             console.print(f"→ Extracted [green]{len(concepts)}[/green] concepts\n")
 
@@ -137,7 +143,9 @@ def extract(
                     f"  📄 constitution.md → [green]{len(principles)}[/green] principles"
                 )
 
-            console.print(f"→ Total: [green]{result.total}[/green] concepts extracted\n")
+            console.print(
+                f"→ Total: [green]{result.total}[/green] concepts extracted\n"
+            )
 
             if result.errors:
                 console.print("[yellow]Warnings:[/yellow]")
@@ -155,11 +163,23 @@ def build(
         Path | None,
         typer.Option("--output", "-o", help="Path to save graph JSON"),
     ] = None,
+    unified: Annotated[
+        bool,
+        typer.Option(
+            "--unified", "-u", help="Build unified context graph (merges all sources)"
+        ),
+    ] = False,
 ) -> None:
     """Build concept graph from extracted concepts.
 
     Loads concepts (from file or extraction), infers relationships, and
     saves the resulting graph.
+
+    With --unified flag, builds a unified context graph that merges:
+    - Governance documents (constitution, PRD, vision)
+    - Memory (patterns, calibration, sessions)
+    - Work tracking (epics, features)
+    - Skills (SKILL.md metadata)
 
     Examples:
         # Build graph from default location
@@ -170,7 +190,13 @@ def build(
 
         # Save to custom location
         $ raise graph build --output my_graph.json
+
+        # Build unified context graph
+        $ raise graph build --unified
     """
+    if unified:
+        _build_unified_graph(output)
+        return
     # Default paths
     default_concepts = Path(".raise/cache/concepts.json")
     default_output = Path(".raise/cache/graph.json")
@@ -287,7 +313,9 @@ def validate(
         json_str = f.read()
 
     graph = ConceptGraph.from_json(json_str)
-    console.print(f"  ✓ Loaded graph with {len(graph.nodes)} nodes, {len(graph.edges)} edges")
+    console.print(
+        f"  ✓ Loaded graph with {len(graph.nodes)} nodes, {len(graph.edges)} edges"
+    )
 
     console.print("\nValidating graph...")
 
@@ -313,7 +341,9 @@ def validate(
     if depends_edges:
         cycles = _detect_cycles(graph, depends_edges)
         if cycles:
-            console.print(f"  [yellow]⚠[/yellow]  {len(cycles)} cycle(s) detected in depends_on relationships")
+            console.print(
+                f"  [yellow]⚠[/yellow]  {len(cycles)} cycle(s) detected in depends_on relationships"
+            )
             for cycle in cycles[:3]:  # Show first 3
                 console.print(f"      {' → '.join(cycle)}")
         else:
@@ -325,9 +355,7 @@ def validate(
     console.print("\n[green]Graph is valid.[/green]\n")
 
 
-def _detect_cycles(
-    graph: ConceptGraph, edges: list
-) -> list[list[str]]:
+def _detect_cycles(graph: ConceptGraph, edges: list) -> list[list[str]]:
     """Detect cycles in a set of edges using DFS.
 
     Args:
@@ -367,3 +395,54 @@ def _detect_cycles(
             dfs(node, [])
 
     return cycles
+
+
+def _build_unified_graph(output: Path | None) -> None:
+    """Build unified context graph from all sources.
+
+    Args:
+        output: Optional custom output path.
+    """
+    from raise_cli.context import UnifiedGraphBuilder
+
+    default_output = Path(".raise/graph/unified.json")
+    output_path = output or default_output
+
+    console.print("\n[cyan]Building unified context graph...[/cyan]")
+
+    # Build unified graph
+    builder = UnifiedGraphBuilder()
+    graph = builder.build()
+
+    # Count nodes by type
+    node_counts: dict[str, int] = {}
+    for node in graph.iter_concepts():
+        node_type = node.type
+        node_counts[node_type] = node_counts.get(node_type, 0) + 1
+
+    # Count edges by type
+    edge_counts: dict[str, int] = {}
+    for edge in graph.iter_relationships():
+        edge_type = edge.type
+        edge_counts[edge_type] = edge_counts.get(edge_type, 0) + 1
+
+    # Display node counts
+    console.print("\n[bold]Nodes by type:[/bold]")
+    for node_type, count in sorted(node_counts.items()):
+        console.print(f"  {node_type}: [green]{count}[/green]")
+
+    console.print(f"\n[bold]Total nodes:[/bold] [green]{graph.node_count}[/green]")
+
+    # Display edge counts
+    if edge_counts:
+        console.print("\n[bold]Edges by type:[/bold]")
+        for edge_type, count in sorted(edge_counts.items()):
+            console.print(f"  {edge_type}: [green]{count}[/green]")
+
+    console.print(f"\n[bold]Total edges:[/bold] [green]{graph.edge_count}[/green]")
+
+    # Save graph
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    graph.save(output_path)
+
+    console.print(f"\n✓ Saved to [cyan]{output_path}[/cyan]\n")

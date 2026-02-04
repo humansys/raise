@@ -54,7 +54,7 @@ Complete Rai's self-improvement infrastructure by unifying memory, governance, a
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
 | F11.1 | **Unified Graph Schema** | S | **Done** | Pydantic models, NetworkX wrapper, serialization |
-| F11.2 | **Graph Builder** | M | Pending | Merge governance + memory + work + skills into unified graph |
+| F11.2 | **Graph Builder** | M | **Done** | Merge governance + memory + work + skills into unified graph |
 | F11.3 | **Unified Query** | S | Pending | `raise context query` with BFS + keyword matching |
 | F11.4 | **Skill Integration** | S | Pending | Add "Query Context" step to 9 workflow skills |
 
@@ -302,13 +302,13 @@ Stream 1: F11.1 ─► F11.2 ─► F11.3 ─► F11.4 (critical path, linear)
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F11.1 Schema | S | **Done** | ~57m | 1.1x | 33 tests, 100% coverage |
-| F11.2 Builder | M | Pending | -- | -- | |
+| F11.2 Builder | M | **Done** | ~80m | 1.1x | 40 tests, 151 nodes, 255 edges |
 | F11.3 Query | S | Pending | -- | -- | |
 | F11.4 Skills | S | Pending | -- | -- | |
 
 **Milestone Progress:**
 - [x] M1: Schema Ready ✓
-- [ ] M2: Graph Builds
+- [x] M2: Graph Builds ✓
 - [ ] M3: Queryable
 - [ ] M4: Complete
 
