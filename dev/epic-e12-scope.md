@@ -51,7 +51,7 @@
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
 | F12.1 | **ADR Extractor** | M | ✅ Done | Extract ADRs as `decision` nodes from `dev/decisions/` |
-| F12.2 | **Guardrails Extractor** | S | Pending | Extract guardrails as queryable nodes |
+| F12.2 | **Guardrails Extractor** | S | ✅ Done | Extract guardrails as queryable nodes |
 | F12.3 | **Glossary Extractor** | S | Pending | Extract glossary terms for terminology |
 | F12.4 | **Schema Extension** | XS | ✅ Done | Add `decision`, `guardrail`, `term` to NodeType |
 | F12.5 | **Skill Query Alignment** | S | Pending | Fix query/type mismatches in feature cycle skills |
@@ -330,7 +330,7 @@ Stream 4 (Independent):      F12.6 ───────────────
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F12.4: Schema Extension | XS | ✅ Done | ~5 min | Fast | Added 3 types to both models |
 | F12.1: ADR Extractor | M | ✅ Done | ~20 min | 2x | YAML frontmatter only (26 ADRs), fixed project NodeType |
-| F12.2: Guardrails Extractor | S | Pending | - | - | |
+| F12.2: Guardrails Extractor | S | ✅ Done | ~20 min | 1.5x | 20 guardrails, PAT-059 documented |
 | F12.3: Glossary Extractor | S | Pending | - | - | |
 | F12.6: Memory Write CLI | M | Pending | - | - | |
 | F12.5: Skill Query Alignment | S | Pending | - | - | |
