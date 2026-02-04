@@ -38,6 +38,9 @@
 
 ### Framework Improvements
 
+- [ ] **Research output extraction** — Extract `work/research/*/` into unified graph (deferred from E12, complex format variance)
+- [ ] **Component catalog extraction** — Extract `dev/components.md` into graph (deferred from E12, nice-to-have)
+- [ ] **Session-aware context loading** — Skip redundant queries in same session (deferred from E12, optimization — re-querying is <1ms)
 - [ ] **Post-Session Alignment Skill** (`/align-docs`) - After strategic sessions, auto-update docs:
   - Generate ADRs from decisions made
   - Update vision/architecture docs
