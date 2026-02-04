@@ -43,7 +43,7 @@ EXTRACT (deterministic)  →  SYNTHESIZE (LLM)  →  VALIDATE (human)  →  POPU
 |----|---------|:----:|:------:|-------------|
 | F13.1 | Schema Extension | S (2) | ✓ Complete | Add system/module/component/convention node types to unified graph |
 | F13.2 | Extraction Toolkit | M (4) | ✓ Complete | CLI commands to scan codebase and extract symbols via ast-grep |
-| F13.3 | Discovery Skills | M (4) | Pending | `/discover-*` skills with LLM synthesis and human validation loop |
+| F13.3 | Discovery Skills | M (4) | ✓ Complete | `/discover-*` skills with LLM synthesis and human validation loop |
 | F13.4 | Graph Integration | S (2) | Pending | Populate unified graph with validated components, enable queries |
 | F13.5 | Drift Detection | XS (1) | Pending | Basic check: new files against established patterns |
 
@@ -335,7 +335,7 @@ F13.1 ─► F13.2 ─► F13.3 ─────► F13.4 ─────► F13.
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F13.1 Schema Extension | S (2) | ✓ Complete | 1 session | 2x | Combined with F13.2 |
 | F13.2 Extraction Toolkit | M (4) | ✓ Complete | 1 session | 2x | Multi-language (Py/TS/JS), 39 tests |
-| F13.3 Discovery Skills | M (4) | Pending | — | — | |
+| F13.3 Discovery Skills | M (4) | ✓ Complete | 90 min | 1.33x | 4 skills, full kata cycle |
 | F13.4 Graph Integration | S (2) | Pending | — | — | |
 | F13.5 Drift Detection | XS (1) | Pending | — | — | |
 
