@@ -1,0 +1,58 @@
+{
+  "generated_at": "2026-02-04T12:10:00Z",
+  "source_file": "work/discovery/components-draft.yaml",
+  "component_count": 3,
+  "components": [
+    {
+      "id": "comp-scanner-symbol",
+      "type": "component",
+      "content": "Core data model representing an extracted code symbol (class, function, method). Used as output from all extraction functions.",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T12:10:00Z",
+      "metadata": {
+        "name": "Symbol",
+        "kind": "class",
+        "line": 44,
+        "signature": "class Symbol(BaseModel)",
+        "category": "model",
+        "depends_on": ["pydantic.BaseModel"],
+        "validated_by": "human",
+        "validated_at": "2026-02-04T12:05:00Z"
+      }
+    },
+    {
+      "id": "comp-scanner-extract-python-symbols",
+      "type": "component",
+      "content": "Parse Python source code and extract all classes, functions, and methods with their signatures and docstrings.",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T12:10:00Z",
+      "metadata": {
+        "name": "extract_python_symbols",
+        "kind": "function",
+        "line": 121,
+        "signature": "def extract_python_symbols(source: str, file_path: str) -> list[Symbol]",
+        "category": "parser",
+        "depends_on": ["ast", "Symbol"],
+        "validated_by": "human",
+        "validated_at": "2026-02-04T12:05:00Z"
+      }
+    },
+    {
+      "id": "comp-scanner-scan-directory",
+      "type": "component",
+      "content": "Main entry point for directory scanning. Recursively finds and parses source files, aggregating all extracted symbols.",
+      "source_file": "src/raise_cli/discovery/scanner.py",
+      "created": "2026-02-04T12:10:00Z",
+      "metadata": {
+        "name": "scan_directory",
+        "kind": "function",
+        "line": 519,
+        "signature": "def scan_directory(path: Path, *, language: Language | None=None, pattern: str | None=None, exclude_patterns: list[str] | None=None) -> ScanResult",
+        "category": "utility",
+        "depends_on": ["ScanResult", "Symbol", "extract_symbols"],
+        "validated_by": "human",
+        "validated_at": "2026-02-04T12:05:00Z"
+      }
+    }
+  ]
+}
