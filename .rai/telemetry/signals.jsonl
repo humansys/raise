@@ -740,3 +740,4 @@
 {"type":"skill_event","timestamp":"2026-02-04T20:49:07Z","skill":"research","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T20:49:07Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T20:49:07Z","skill":"epic-design","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T20:53:05.367800Z","session_type":"research","outcome":"success","duration_min":120,"features":[]}
