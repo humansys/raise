@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
 
 hooks:
   Stop:
@@ -51,10 +51,10 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 - Quick fixes where context is obvious
 
 **Inputs required:**
-- Unified graph (`.raise/graph/unified.json`) — primary source
-- Memory files (`.rai/memory/`) — fallback if graph unavailable
-- Context files (`CLAUDE.local.md`) — for local session context
-- Progress tracking (`dev/parking-lot.md`) — for improvement signals
+- Unified graph (`.raise/graph/unified.json`) — primary source (sessions, patterns, work items, calibration)
+- Memory files (`.rai/memory/`) — fallback only if graph unavailable
+- `CLAUDE.local.md` — deadlines, human notes (not in graph)
+- `dev/parking-lot.md` — improvement signals (not in graph)
 
 **Output:**
 - Session start summary with proposed focus
@@ -106,24 +106,28 @@ raise context query "session epic patterns calibration" --unified --limit 10
 
 > **If you can't continue:** Memory files missing → Create them via `/session-close` pattern.
 
-### Step 2: Load Context
+### Step 2: Load Human Context
 
-Read current state from context files:
+Read **only** what the graph doesn't contain:
 
 ```
-1. CLAUDE.local.md — Current focus, deadlines, recent sessions
-2. RAI.md — Perspective, protocols, contribution log
-3. dev/epic-{current}.md — Epic progress and scope
+CLAUDE.local.md — Deadlines, human notes, quick references
 ```
+
+**Why only this file:**
+- Identity is preloaded via SessionStart hook (no need to read RAI.md)
+- Epic/feature info is in the unified graph (work items)
+- Session history is in the unified graph (session nodes)
+- CLAUDE.local.md has human-maintained context: deadlines, focus notes, references
 
 **Extract:**
-- Current epic and feature
-- Deadline pressure
-- Last session outcome
+- Deadline pressure (dates not in graph)
+- Human notes about current focus
+- Quick reference paths
 
-**Verification:** Know where we are and where we're going.
+**Verification:** Deadlines and human context loaded.
 
-> **If you can't continue:** Context files outdated → Note and update during session.
+> **If you can't continue:** File outdated → Note and update during session.
 
 ### Step 3: Analyze Progress
 
@@ -145,7 +149,7 @@ Calculate progress metrics:
 
 ### Step 4: Check Parking Lot
 
-Review `dev/parking-lot.md` for:
+Read `dev/parking-lot.md` (not in unified graph — informal capture, not structured):
 
 - Items deferred >3 sessions (decay risk)
 - Items blocking other work
@@ -307,8 +311,8 @@ This makes the start/close loop a **learning system**, not just bookkeeping.
 
 ## References
 
-- Unified graph: `.raise/graph/unified.json` (primary)
-- Memory files: `.rai/memory/` (fallback)
-- Context: `CLAUDE.local.md`
-- Parking lot: `dev/parking-lot.md`
-- Complement: `/session-close`
+- **Primary:** Unified graph (`.raise/graph/unified.json`) — sessions, patterns, work items, calibration
+- **Fallback:** Memory files (`.rai/memory/`) — only if graph unavailable
+- **Human context:** `CLAUDE.local.md` — deadlines, notes (not in graph)
+- **Improvement signals:** `dev/parking-lot.md` — informal captures (not in graph)
+- **Complement:** `/session-close`
