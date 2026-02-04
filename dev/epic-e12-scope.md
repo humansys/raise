@@ -1,40 +1,12 @@
 # Epic E12: Complete Knowledge Graph
 
-> **Status:** DRAFT — Needs /epic-design and /epic-plan
-> **Branch:** TBD
+> **Status:** DESIGNED — Ready for /epic-plan
+> **Branch:** `epic/e12/complete-knowledge-graph`
 > **Created:** 2026-02-03
 > **Target:** Post-F&F (Feb 15+)
 > **Depends on:** E11 (Unified Context Architecture)
+> **ADR:** ADR-020 (Knowledge Graph Completion)
 > **Research:** Session analysis (2026-02-03) — Memory recall assessment
-
----
-
-## Problem Statement
-
-The unified context graph (E11) provides infrastructure but is incomplete. **Skills query for context they cannot find:**
-
-| Skill | Queries For | Available Types | Gap |
-|-------|-------------|-----------------|-----|
-| /feature-design | "architecture patterns ADR" | pattern, feature, skill | **ADRs missing** |
-| /feature-implement | "codebase testing patterns" | pattern | Guardrails not queryable |
-| /feature-review | "retrospective patterns" | pattern, session | Calibration not queried |
-
-**Current graph inventory (157 nodes):**
-- pattern: 52
-- feature: 47
-- session: 25
-- calibration: 12
-- epic: 11
-- skill: 10
-
-**Missing governance data (40+ files):**
-- ADRs: 40+ architectural decisions in `dev/decisions/`
-- Guardrails: Code standards in `governance/solution/guardrails.md`
-- Glossary: Terminology in `framework/reference/glossary.md`
-- Research: 5+ research outputs in `work/research/`
-- Components: Catalog in `dev/components.md`
-
-**Additionally:** Skills only **read** from graph — none **write** to memory. Pattern extraction only happens in `/session-close`.
 
 ---
 
@@ -45,98 +17,88 @@ The unified context graph (E11) provides infrastructure but is incomplete. **Ski
 **Value proposition:**
 - /feature-design sees prior ADRs before making architecture decisions
 - /feature-implement has guardrails surfaced contextually
-- /feature-review can compare against calibration data
-- Patterns learned during features are persisted immediately
+- /feature-review can compare against calibration and persist patterns immediately
+- Knowledge compounds — learnings during features aren't lost
 
 ---
 
-## Success Criteria
+## In Scope
 
-1. **All governance sources extracted** — ADRs, guardrails, glossary in graph
-2. **Skill queries match available types** — No query/type mismatches
-3. **Skills have phase-appropriate MVC** — Each phase gets right context
-4. **Bidirectional memory flow** — Skills can read AND write patterns
-5. **Zero redundant queries** — Session-aware context loading
+**MUST:**
+- ADR extraction into unified graph (40+ decisions)
+- Guardrails extraction (code standards queryable)
+- Skill query alignment (fix type mismatches)
+- Memory write from /feature-review (bidirectional flow)
 
----
-
-## Architecture Extension
-
-Building on ADR-019 (Unified Context Graph):
-
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    Unified Context Graph                      │
-│                    (.raise/graph/unified.json)                │
-│                                                               │
-│  EXISTING:                                                    │
-│  - patterns, calibration, sessions (memory)                   │
-│  - principles, requirements, outcomes (governance)            │
-│  - epics, features (work)                                     │
-│  - skills (process)                                           │
-│                                                               │
-│  NEW (E12):                                                   │
-│  + decisions (ADRs)          ← /feature-design               │
-│  + guardrails                ← /feature-implement            │
-│  + terms (glossary)          ← terminology alignment         │
-│  + research                  ← prior findings                │
-│  + components                ← codebase structure            │
-└──────────────────────────────────────────────────────────────┘
-```
+**SHOULD:**
+- Glossary extraction (terminology alignment)
+- Phase-specific MVC documentation per skill
+- Domain hints for targeted queries
 
 ---
 
-## Features (Draft)
+## Out of Scope (defer to parking lot)
 
-| ID | Feature | Size | Priority | Description |
-|----|---------|:----:|:--------:|-------------|
-| F12.1 | **ADR Extractor** | M | P0 | Extract ADRs into graph as `decision` nodes |
-| F12.2 | **Guardrails Extractor** | S | P1 | Extract guardrails as queryable nodes |
-| F12.3 | **Glossary Extractor** | S | P2 | Extract glossary terms for terminology |
-| F12.4 | **Skill Query Alignment** | S | P0 | Fix query/type mismatches in all skills |
-| F12.5 | **Phase-Specific MVC** | M | P1 | Define and implement MVC per skill phase |
-| F12.6 | **Memory Write from Skills** | M | P1 | Enable pattern persistence from /feature-review |
-| F12.7 | **Session-Aware Loading** | S | P2 | Skip redundant queries in same session |
-
-**Estimated:** 7 features, ~12-15 SP
+- **Research output extraction** → Lower priority, complex format variance
+- **Component catalog extraction** → Nice-to-have, not blocking MVC
+- **Session-aware loading** → Optimization; re-querying is cheap (<1ms)
+- **Embedding/vector search** → Future enhancement per ADR-019
 
 ---
 
-## Feature Details (Draft)
+## Features (10 SP estimated)
 
-### F12.1: ADR Extractor
+| ID | Feature | Size | Status | Description |
+|----|---------|:----:|:------:|-------------|
+| F12.1 | **ADR Extractor** | M | Pending | Extract ADRs as `decision` nodes from `dev/decisions/` |
+| F12.2 | **Guardrails Extractor** | S | Pending | Extract guardrails as queryable nodes |
+| F12.3 | **Glossary Extractor** | S | Pending | Extract glossary terms for terminology |
+| F12.4 | **Schema Extension** | XS | Pending | Add `decision`, `guardrail`, `term` to NodeType |
+| F12.5 | **Skill Query Alignment** | S | Pending | Fix query/type mismatches in feature cycle skills |
+| F12.6 | **Memory Write CLI** | M | Pending | `raise memory add-pattern` command |
+
+**Total:** 6 features, ~10 SP estimated
+
+---
+
+## Feature Details
+
+### F12.1: ADR Extractor (M)
 
 **Problem:** 40+ ADRs exist but /feature-design can't query them.
 
 **Scope:**
 - New parser: `src/raise_cli/governance/parsers/adr.py`
-- Extract: ID, title, status, context, decision, consequences
+- Extract: ID, title, status, decision summary, related ADRs
 - Node type: `decision`
-- Handle v1, v2, and root-level ADRs
+- Handle three formats:
+  - Root level: `dev/decisions/adr-*.md` (YAML frontmatter)
+  - v1: `dev/decisions/v1/adr-*.md` (older format)
+  - v2: `dev/decisions/v2/adr-*.md` (sub-directory)
 
-**Source files:**
-- `dev/decisions/adr-*.md` (root)
-- `dev/decisions/v1/adr-*.md`
-- `dev/decisions/v2/adr-*.md`
+**Files:**
+- `src/raise_cli/governance/parsers/adr.py` (new)
+- `src/raise_cli/governance/extractor.py` (integrate)
+- `tests/governance/parsers/test_adr.py` (new)
 
-**Example extraction:**
+**Example output:**
 ```json
 {
   "id": "ADR-019",
   "type": "decision",
-  "content": "Unified Context Graph Architecture - Single unified NetworkX graph with multiple node types",
+  "content": "Unified Context Graph Architecture - Single unified NetworkX graph",
   "source_file": "dev/decisions/adr-019-unified-context-graph.md",
   "metadata": {
     "status": "accepted",
-    "context": ["E11", "memory", "governance", "graph"],
-    "consequences": ["single query interface", "cross-domain relationships"]
+    "date": "2026-02-03",
+    "related_to": ["ADR-011", "ADR-015"]
   }
 }
 ```
 
 ---
 
-### F12.2: Guardrails Extractor
+### F12.2: Guardrails Extractor (S)
 
 **Problem:** Guardrails are in CLAUDE.md but not queryable by topic.
 
@@ -144,13 +106,17 @@ Building on ADR-019 (Unified Context Graph):
 - New parser: `src/raise_cli/governance/parsers/guardrails.py`
 - Extract sections: Type Safety, Linting, Testing, Security, Documentation
 - Node type: `guardrail`
-- Enable queries like "testing guardrails" → specific rules
+
+**Files:**
+- `src/raise_cli/governance/parsers/guardrails.py` (new)
+- `src/raise_cli/governance/extractor.py` (integrate)
+- `tests/governance/parsers/test_guardrails.py` (new)
 
 **Source:** `governance/solution/guardrails.md`
 
 ---
 
-### F12.3: Glossary Extractor
+### F12.3: Glossary Extractor (S)
 
 **Problem:** Terminology in glossary but not surfaced in queries.
 
@@ -158,163 +124,162 @@ Building on ADR-019 (Unified Context Graph):
 - New parser: `src/raise_cli/governance/parsers/glossary.py`
 - Extract: Term, definition, deprecated alternatives
 - Node type: `term`
-- Enable terminology alignment
+
+**Files:**
+- `src/raise_cli/governance/parsers/glossary.py` (new)
+- `src/raise_cli/governance/extractor.py` (integrate)
+- `tests/governance/parsers/test_glossary.py` (new)
 
 **Source:** `framework/reference/glossary.md`
 
 ---
 
-### F12.4: Skill Query Alignment
+### F12.4: Schema Extension (XS)
+
+**Problem:** New node types not in schema.
+
+**Scope:**
+- Add `decision`, `guardrail`, `term` to `NodeType` literal
+- Update `context/models.py`
+- Update `governance/models.py` ConceptType enum
+
+**Files:**
+- `src/raise_cli/context/models.py`
+- `src/raise_cli/governance/models.py`
+
+---
+
+### F12.5: Skill Query Alignment (S)
 
 **Problem:** Skills query for types that don't exist.
 
 **Current mismatches:**
-| Skill | Query | Types Filter | Issue |
-|-------|-------|--------------|-------|
-| /feature-design | "ADR" | pattern, feature | ADRs aren't patterns |
-| /feature-review | "retrospective" | pattern, session | Retros are in progress.md |
+| Skill | Current Query | Issue |
+|-------|---------------|-------|
+| /feature-design | `--types pattern,feature` | Needs `decision` |
+| /feature-review | `--types pattern,session` | Needs `calibration` |
 
 **Scope:**
-- Audit all skill queries
-- Match query terms to available types
-- Add `--types decision,pattern` for design
-- Add `--types calibration,pattern` for review
+- Audit all 9 skill queries
+- Update type filters to match phase MVC
+- Document MVC in each skill
 
-**Files:** `.claude/skills/*/SKILL.md` (9 skills)
+**Files:** `.claude/skills/*/SKILL.md` (6 feature cycle skills)
+
+**MVC per phase:**
+| Phase | Types to Query |
+|-------|----------------|
+| design | decision, pattern |
+| plan | calibration, pattern |
+| implement | pattern, guardrail |
+| review | calibration, pattern, session |
 
 ---
 
-### F12.5: Phase-Specific MVC
+### F12.6: Memory Write CLI (M)
 
-**Problem:** Generic queries waste tokens; phases need different context.
-
-**MVC Definition per phase:**
-
-| Phase | Must Have | Nice to Have | Don't Load |
-|-------|-----------|--------------|------------|
-| **design** | decisions (ADRs), patterns | similar features | calibration, sessions |
-| **plan** | calibration, estimation patterns | prior plans | architecture |
-| **implement** | codebase patterns, guardrails | similar implementations | calibration |
-| **review** | calibration (comparison), patterns | sessions | architecture |
+**Problem:** Patterns only persist via /session-close.
 
 **Scope:**
-- Document MVC per skill in skill files
-- Tune queries to match MVC
-- Add domain hints (optional)
+- New command: `raise memory add-pattern`
+- Add to patterns.jsonl immediately
+- Deduplicate by content similarity
+- Integrate into /feature-review
+
+**Files:**
+- `src/raise_cli/cli/commands/memory.py` (extend)
+- `src/raise_cli/memory/patterns.py` (new or extend)
+- `.claude/skills/feature-review/SKILL.md` (integrate)
+
+**CLI signature:**
+```bash
+raise memory add-pattern "Pattern content" \
+  --context testing,workflow \
+  --learned-from F12.1
+```
 
 ---
 
-### F12.6: Memory Write from Skills
+## Done Criteria
 
-**Problem:** Patterns only extracted in /session-close; learnings during features lost.
+### Per Feature
+- [ ] Code implemented with type annotations
+- [ ] Docstrings on all public APIs (Google-style)
+- [ ] Unit tests passing (>90% coverage on feature code)
+- [ ] All quality checks pass (ruff, pyright, bandit)
 
-**Current flow:**
-```
-/feature-review → retrospective.md → /session-close → patterns.jsonl
-```
-
-**Proposed flow:**
-```
-/feature-review → patterns.jsonl (immediate) + retrospective.md
-```
-
-**Scope:**
-- Add `raise memory add-pattern` CLI command
-- Integrate into /feature-review Step 4 (Update Framework)
-- Emit pattern immediately when identified
-- Deduplicate with existing patterns
-
----
-
-### F12.7: Session-Aware Loading
-
-**Problem:** If design→plan→implement runs in one session, each re-queries.
-
-**Scope:**
-- Track queries made in session (via telemetry or state)
-- Skip redundant queries
-- Or: Accept re-querying is cheap (graph query <1ms)
-
-**Decision needed:** Is this worth the complexity?
+### Epic Complete
+- [ ] All 6 features complete (F12.1-F12.6)
+- [ ] `raise context query "ADR" --unified --types decision` works
+- [ ] `raise context query "testing" --unified --types guardrail` works
+- [ ] `/feature-design` queries return ADR nodes
+- [ ] `/feature-review` can persist patterns via CLI
+- [ ] ADR-020 status updated to "Accepted"
+- [ ] Epic merged to v2
 
 ---
 
 ## Dependencies
 
 ```
-E11 (Unified Context) ← E12 (Complete Knowledge Graph)
-     └── context/ module
-     └── UnifiedGraphBuilder
-     └── raise context query --unified
+F12.4 (Schema Extension)
+  ↓
+F12.1 (ADR Extractor) ──┐
+F12.2 (Guardrails)      ├─► F12.5 (Skill Query Alignment)
+F12.3 (Glossary)    ────┘
+
+F12.6 (Memory Write CLI) — Independent track
 ```
 
-**Internal dependencies:**
-- F12.1-F12.3 (extractors) → F12.4 (query alignment)
-- F12.4 → F12.5 (MVC definition)
-- F12.6 is independent (memory write)
-- F12.7 can be deferred (optimization)
+**External blockers:** None (E11 complete)
+
+---
+
+## Architecture References
+
+| Decision | Document | Key Insight |
+|----------|----------|-------------|
+| Unified Graph | ADR-019 | Single graph, multiple node types |
+| Knowledge Completion | ADR-020 | Extend with decision, guardrail, term |
+| Concept-Level MVC | ADR-011 | 97% token savings via concept extraction |
 
 ---
 
 ## Risks
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| ADR format varies (v1 vs v2) | Extraction fails | Flexible parser with fallbacks |
-| Over-engineering MVC | Complexity without value | Start simple, iterate |
-| Memory write conflicts | Duplicate patterns | Deduplication logic |
-| Graph grows too large | Query performance | Monitor, optimize if needed |
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| ADR format variance | Medium | Medium | Flexible parser with fallbacks |
+| Guardrails structure changes | Low | Low | Section-based extraction resilient |
+| Pattern deduplication complex | Medium | Low | Simple content hash first |
+| Schema change breaks existing code | Low | High | Add types, don't remove |
 
 ---
 
-## Open Questions
+## Notes
 
-1. **Research outputs** — Should `work/research/*/` be extracted? (Lower priority)
-2. **Components catalog** — Should `dev/components.md` be extracted? (Nice to have)
-3. **Session-aware loading** — Worth the complexity or just accept re-querying?
-4. **Memory write trigger** — Automatic or explicit user approval?
+### Why Now (Post-F&F)
 
----
+- E11 provides foundation (unified graph works)
+- F&F release doesn't require complete MVC
+- Post-F&F allows quality implementation
+- Improves all future development velocity
 
-## Milestones (Draft)
+### Parser Velocity
 
-**M1: Core Extractors (F12.1, F12.2, F12.4)**
-- ADR extraction working
-- Guardrails extraction working
-- Skill queries aligned
-- /feature-design can find ADRs
+Per PAT-038: Second parser was 1.5x faster than first due to pattern familiarity. Expect:
+- F12.1 (ADR): Normal velocity
+- F12.2 (Guardrails): 1.3x
+- F12.3 (Glossary): 1.5x
 
-**M2: Complete MVC (F12.3, F12.5, F12.6)**
-- Glossary extraction
-- Phase-specific queries tuned
-- Memory write from /feature-review
-- Bidirectional knowledge flow
+### Graph Growth
 
-**M3: Optimization (F12.7)**
-- Session-aware loading (if needed)
-- Performance tuning
+Current: 157 nodes
+Expected after E12: ~220-250 nodes (40 ADRs + 10 guardrails + 30 terms)
+Still well under 1K — no performance concerns.
 
 ---
 
-## Validation
-
-- [ ] `raise graph build --unified` includes decisions, guardrails, terms
-- [ ] `raise context query "ADR architecture"` returns ADR nodes
-- [ ] /feature-design queries return relevant ADRs
-- [ ] /feature-review can persist patterns immediately
-- [ ] All skill queries return expected types
-
----
-
-## References
-
-- **ADR-019:** Unified Context Graph Architecture
-- **E11:** Unified Context Architecture (foundation)
-- **Session analysis:** Memory recall assessment (2026-02-03)
-- **Parking lot:** Framework improvements section
-
----
-
-*Epic draft created: 2026-02-03*
-*Status: Needs /epic-design for research + architecture decisions*
-*Status: Needs /epic-plan for task breakdown*
+*Epic designed: 2026-02-03*
+*ADR: ADR-020 (Proposed)*
+*Next: /epic-plan for task breakdown*
