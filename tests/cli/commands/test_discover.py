@@ -259,3 +259,172 @@ class TestDiscoverBuild:
         assert "By Category:" in result.output
         assert "model: 1" in result.output
         assert "service: 1" in result.output
+
+
+class TestDiscoverDrift:
+    """Tests for discover drift command."""
+
+    def test_drift_no_baseline_exits_gracefully(self, tmp_path: Path) -> None:
+        """Should exit with info when no baseline exists."""
+        result = runner.invoke(
+            app,
+            ["discover", "drift", "--project-root", str(tmp_path)],
+        )
+
+        # No baseline = exit 0 with info message
+        assert result.exit_code == 0
+        assert "No baseline" in result.output or "no components" in result.output.lower()
+
+    def test_drift_no_warnings(self, tmp_path: Path) -> None:
+        """Should exit 0 when no drift detected."""
+        # Create baseline with a class in discovery/
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "components": [
+                {
+                    "id": "comp-symbol",
+                    "type": "component",
+                    "content": "A symbol class.",
+                    "source_file": "src/discovery/scanner.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {
+                        "name": "Symbol",
+                        "kind": "class",
+                        "line": 10,
+                    },
+                },
+            ],
+        }))
+
+        # Create source file that follows convention
+        src_dir = tmp_path / "src" / "discovery"
+        src_dir.mkdir(parents=True)
+        (src_dir / "scanner.py").write_text(dedent("""\
+            '''Scanner module.'''
+            class Symbol:
+                '''A symbol.'''
+                pass
+        """))
+
+        result = runner.invoke(
+            app,
+            ["discover", "drift", "--project-root", str(tmp_path)],
+        )
+
+        assert result.exit_code == 0
+        assert "No drift" in result.output or "0 warnings" in result.output.lower()
+
+    def test_drift_detects_location_drift(self, tmp_path: Path) -> None:
+        """Should detect files in unexpected locations."""
+        # Baseline: classes in src/discovery/
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "components": [
+                {
+                    "id": "comp-symbol",
+                    "type": "component",
+                    "content": "A model in discovery.",
+                    "source_file": "src/discovery/scanner.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {
+                        "name": "Symbol",
+                        "kind": "class",
+                    },
+                },
+            ],
+        }))
+
+        # Create file in WRONG location (src/cli/ instead of src/discovery/)
+        wrong_dir = tmp_path / "src" / "cli"
+        wrong_dir.mkdir(parents=True)
+        (wrong_dir / "wrong_place.py").write_text(dedent("""\
+            '''Wrong module.'''
+            class WrongClass:
+                '''This class is in the wrong place.'''
+                pass
+        """))
+
+        result = runner.invoke(
+            app,
+            ["discover", "drift", "--project-root", str(tmp_path)],
+        )
+
+        # Should detect drift and exit with warning code
+        assert result.exit_code == 1
+        assert "drift" in result.output.lower() or "warning" in result.output.lower()
+
+    def test_drift_json_output(self, tmp_path: Path) -> None:
+        """Should output JSON when requested."""
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "components": [
+                {
+                    "id": "comp-1",
+                    "type": "component",
+                    "content": "Test component.",
+                    "source_file": "src/module/test.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {"name": "Test", "kind": "class"},
+                },
+            ],
+        }))
+
+        # Create matching source
+        src_dir = tmp_path / "src" / "module"
+        src_dir.mkdir(parents=True)
+        (src_dir / "test.py").write_text("class Test:\n    '''Test.'''\n    pass\n")
+
+        result = runner.invoke(
+            app,
+            ["discover", "drift", "--project-root", str(tmp_path), "--output", "json"],
+        )
+
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert "warnings" in output
+        assert "warning_count" in output
+
+    def test_drift_summary_output(self, tmp_path: Path) -> None:
+        """Should show summary when requested."""
+        discovery_dir = tmp_path / "work" / "discovery"
+        discovery_dir.mkdir(parents=True)
+
+        validated_file = discovery_dir / "components-validated.json"
+        validated_file.write_text(json.dumps({
+            "generated_at": "2026-02-04T12:10:00Z",
+            "components": [
+                {
+                    "id": "comp-1",
+                    "type": "component",
+                    "content": "Test component.",
+                    "source_file": "src/module/test.py",
+                    "created": "2026-02-04T12:10:00Z",
+                    "metadata": {"name": "Test", "kind": "class"},
+                },
+            ],
+        }))
+
+        # Create matching source
+        src_dir = tmp_path / "src" / "module"
+        src_dir.mkdir(parents=True)
+        (src_dir / "test.py").write_text("class Test:\n    '''Test.'''\n    pass\n")
+
+        result = runner.invoke(
+            app,
+            ["discover", "drift", "--project-root", str(tmp_path), "--output", "summary"],
+        )
+
+        assert result.exit_code == 0
+        assert "Drift" in result.output or "Summary" in result.output
