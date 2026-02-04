@@ -691,3 +691,17 @@
 {"type":"skill_event","timestamp":"2026-02-04T19:30:21Z","skill":"feature-review","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T19:31:08Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"work_lifecycle","timestamp":"2026-02-04T19:32:38.956419Z","work_type":"feature","work_id":"F13.5","event":"complete","phase":"review","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:33:05Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:33:05Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:33:53Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:33:53Z","skill":"discover-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:33:53Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:36:09Z","skill":"discover-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:36:09Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:36:09Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:36:09Z","skill":"discover-scan","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"discover-validate","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"discover-scan","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"discover-start","event":"complete","duration_sec":null}
