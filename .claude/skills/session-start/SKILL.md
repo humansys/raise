@@ -51,9 +51,10 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 - Quick fixes where context is obvious
 
 **Inputs required:**
-- Memory files (`.rai/memory/`)
-- Context files (`CLAUDE.local.md`, `RAI.md`)
-- Progress tracking (`dev/epic-*.md`, `dev/parking-lot.md`)
+- Unified graph (`.raise/graph/unified.json`) — primary source
+- Memory files (`.rai/memory/`) — fallback if graph unavailable
+- Context files (`CLAUDE.local.md`) — for local session context
+- Progress tracking (`dev/parking-lot.md`) — for improvement signals
 
 **Output:**
 - Session start summary with proposed focus
@@ -62,39 +63,43 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 
 ## Steps
 
-### Step 0.5: Query Context (Optional)
+### Step 1: Query Unified Context (Required)
 
-If unified graph is available, query for session-relevant patterns:
+Query the unified graph for session-relevant context. This is the **primary** method — more efficient than reading raw files.
 
 ```bash
-raise context query "session epic patterns" --unified --types session,pattern --limit 5
+raise context query "session epic patterns calibration" --unified --limit 10
 ```
 
-Review returned patterns for session continuity context.
+**What this returns:**
+- Recent session history with outcomes
+- Relevant patterns for likely work
+- Calibration data for estimation
+- Current epic/feature context
 
-**Verification:** Context loaded or graph not available (proceed without).
+**Extract from results:**
+- Patterns relevant to likely work
+- Recent session outcomes
+- Calibration signals (velocity, sizing accuracy)
+- Any open questions from previous sessions
 
-> **If context unavailable:** Run `raise graph build --unified` first, or skip to Step 1.
+**Verification:** Context loaded; key patterns recalled.
 
-### Step 1: Load Memory
+> **If graph unavailable:** Run `raise graph build --unified` first, or fall back to Step 1b.
 
-Read accumulated knowledge from `.rai/memory/`:
+### Step 1b: Load Memory Files (Fallback)
+
+**Only if unified graph is unavailable**, read raw files from `.rai/memory/`:
 
 ```
-1. patterns.jsonl — Learned patterns (auto-loaded via hook)
+1. patterns.jsonl — Learned patterns
 2. calibration.jsonl — Velocity data, sizing accuracy
 3. sessions/index.jsonl — Recent session history
 ```
 
-**Note:** With hook-assisted workflow, basic context is auto-loaded on session start.
-This skill provides deeper analysis (parking lot, improvement signals, detailed proposal).
+**Note:** This is less efficient than the unified query — use only as fallback.
 
-**Extract:**
-- Patterns relevant to likely work
-- Recent session outcomes
-- Any open questions
-
-**Verification:** Memory loaded; key patterns recalled.
+**Verification:** Memory loaded from raw files.
 
 > **If you can't continue:** Memory files missing → Create them via `/session-close` pattern.
 
@@ -299,8 +304,8 @@ This makes the start/close loop a **learning system**, not just bookkeeping.
 
 ## References
 
-- Memory files: `.rai/memory/`
-- Context: `CLAUDE.local.md`, `.claude/RAI.md`
-- Progress: `dev/epic-*.md`
+- Unified graph: `.raise/graph/unified.json` (primary)
+- Memory files: `.rai/memory/` (fallback)
+- Context: `CLAUDE.local.md`
 - Parking lot: `dev/parking-lot.md`
 - Complement: `/session-close`
