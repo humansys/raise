@@ -365,3 +365,7 @@
 {"type":"skill_event","timestamp":"2026-02-04T04:37:54Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"work_lifecycle","timestamp":"2026-02-04T04:38:48.985965Z","work_type":"epic","work_id":"E12","event":"start","phase":"plan","blocker":null}
 {"type":"work_lifecycle","timestamp":"2026-02-04T04:39:47.400956Z","work_type":"epic","work_id":"E12","event":"complete","phase":"plan","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T04:40:06Z","skill":"epic-design","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T04:40:06Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T04:40:06Z","skill":"epic-plan","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T04:42:11.037406Z","session_type":"feature","outcome":"success","duration_min":60,"features":["E12-design","E12-plan"]}
