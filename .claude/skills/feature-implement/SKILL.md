@@ -70,6 +70,20 @@ raise telemetry emit feature {feature_id} --event start --phase implement
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p implement`
 
+### Step 0.5: Query Context
+
+Load relevant codebase patterns from unified context:
+
+```bash
+raise context query "codebase testing patterns" --unified --types pattern --limit 5
+```
+
+Review returned patterns before proceeding. Key patterns inform implementation approach.
+
+**Verification:** Context loaded; relevant patterns noted.
+
+> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+
 ### Step 1: Load Plan and Context
 
 Load the implementation plan and obtain applicable rules context.
