@@ -107,7 +107,8 @@ LEVEL 2: PLANNING (evoluciona con backlog)
 │   └── features complejos → Tech Design (Feature)
 │
 └── Tech Design (Feature)  HOW - diseño por feature (on-demand)
-    template: tech/tech-design-feature.md
+    template: tech/tech-design-feature-v2.md (recommended)
+    legacy: tech/tech-design-feature.md
 
 LEVEL 3: EXECUTION (transitorio)
 └── Tasks                  Viven en issue tracker
@@ -146,9 +147,14 @@ Backlog
 │   └── adr.md
 ├── tech/
 │   ├── tech-design.md
-│   └── tech-design-feature.md
+│   ├── tech-design-feature.md        # v1 (legacy)
+│   └── tech-design-feature-v2.md     # v2 (lean, AI-optimized)
 ├── backlog/
 │   └── backlog.md
+├── tools/
+│   ├── research-prompt.md
+│   ├── evidence-catalog.md
+│   └── research-report.md
 └── _legacy/                      # templates anteriores
 ```
 
@@ -158,8 +164,12 @@ Backlog
 | `architecture-overview.md` | 4 + 3 opt | 80 | Arquitectura C4 L1-L2 |
 | `adr.md` | 4 | 30 | Decisión arquitectónica |
 | `tech-design.md` | 4 + 4 opt | 100 | Diseño técnico sistema |
-| `tech-design-feature.md` | 3 + 2 opt | 50 | Diseño por feature |
+| `tech-design-feature.md` | 3 + 2 opt | 50 | Diseño por feature (v1 - legacy) |
+| `tech-design-feature-v2.md` | 4 + 4 opt | 50-150 | **Lean feature spec (v2 - recommended)** |
 | `backlog.md` | 3 + 2 opt | 60 | Backlog de proyecto |
+| `research-prompt.md` | 7 core | 120 | Structured AI research prompt |
+| `evidence-catalog.md` | 1 | 20 | Research source tracking |
+| `research-report.md` | 3 + opt | 80 | Research findings synthesis |
 
 ---
 
@@ -173,6 +183,9 @@ Backlog
 | Tech Design (System) | Concerns cross-cutting |
 | Backlog | Después de Architecture |
 | Tech Design (Feature) | Feature complejo* |
+| Research Prompt | Antes de research para ADR/tech decisions |
+| Evidence Catalog | Durante research (fuentes y ratings) |
+| Research Report | Después de research (findings + recommendation) |
 
 *Feature complejo = toca >3 componentes, >2 integraciones, algoritmo no trivial, o >8 SP
 

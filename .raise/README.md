@@ -1,67 +1,88 @@
 # .raise/
 
-> **RaiSE Methodology Artifacts** — Todo lo necesario para aplicar Lean Specification
+> **RaiSE Methodology Artifacts** — Context/Kata/Skill Ontology (v2.1)
 
 ---
 
-## Estructura
+## Structure
 
 ```
 .raise/
-├── templates/        # Formatos de output (qué estructura tiene el entregable)
-├── katas/            # Workflows (cómo crear el entregable)
-├── gates/            # Validación (cómo saber si está bien)
-├── commands/         # Comandos slash (automatización)
-├── scripts/          # Scripts de soporte
-└── README.md         ← estás aquí
+├── katas/            # Work Cycle processes (WHAT to do)
+├── skills/           # Atomic operations with YAML contracts (HOW to do it)
+├── context/          # Knowledge sources (WHY)
+├── harness/          # Kata Executor runtime (future)
+├── gates/            # Validation criteria
+├── templates/        # Output formats
+├── scripts/          # Automation scripts
+└── README.md         ← you are here
 ```
 
-## Filosofía
+## Ontology (ADR-008)
 
-| Principio | Aplicación |
-|-----------|------------|
-| **MVS** (Minimum Viable Specification) | 4 secciones requeridas, resto opcional |
-| **Lean Spec** | Ratio markdown:code < 1.5:1 |
-| **Progressive Discovery** | Documentar cuando se necesita, no antes |
-| **MVC** (Minimum Viable Context) | Solo contexto relevante para la tarea |
+| Layer | Purpose | Example |
+|-------|---------|---------|
+| **Context** | Wisdom, golden data, patterns | `context/golden-data/` |
+| **Kata** | Work Cycle processes | `katas/project/discovery.md` |
+| **Skill** | Atomic operations | `skills/retrieve-mvc.yaml` |
 
 ---
 
-## Directorios
+## Directories
 
-### `/templates/` — Formatos de Output
+### `/katas/` — Work Cycle Processes
 
-Estructuras lean para documentos. Ver [templates/README.md](./templates/README.md).
-
-```
-templates/
-├── solution/solution-vision.md
-├── architecture/architecture-overview.md
-├── architecture/adr.md
-├── tech/tech-design.md
-├── tech/tech-design-feature.md
-├── backlog/backlog.md
-└── _legacy/                      # Templates anteriores (verbose)
-```
-
-### `/katas/` — Workflows
-
-Procesos paso a paso para crear entregables. Cada kata define:
-- Cuándo aplicar
-- Pasos con verificación Jidoka
-- Output esperado
+Katas organized by Work Cycle, not abstraction level:
 
 ```
 katas/
-├── README.md                     # Guía de katas lean
-└── [categoria]/[kata].md
+├── project/          # Per-epic (once)
+│   ├── discovery.md  # PRD creation
+│   ├── vision.md     # Solution Vision
+│   ├── design.md     # Technical Architecture
+│   └── backlog.md    # Product Backlog
+├── feature/          # Per-feature (many)
+│   ├── plan.md       # Implementation Planning
+│   ├── implement.md  # Development Workflow
+│   └── review.md     # Retrospective & Learning
+├── setup/            # Per-project (once)
+│   ├── analyze.md    # Codebase Analysis
+│   └── ecosystem.md  # Dependency Mapping
+└── improve/          # Continuous
+    └── (future)
 ```
 
-### `/gates/` — Validación
+Each kata includes:
+- ShuHaRi adaptation levels
+- Jidoka inline (stop on defects)
+- Prerequisites and next kata
 
-Criterios para validar entregables. Cada gate define:
-- Checklist de validación
-- Criterios pass/fail
+### `/skills/` — Atomic Operations
+
+YAML-defined skills with input/output contracts:
+
+```
+skills/
+├── retrieve-mvc.yaml    # Get Minimum Viable Context
+├── check-compliance.yaml # Verify code against rules
+├── run-gate.yaml        # Execute validation gate
+└── explain-rule.yaml    # Explain rule with rationale
+```
+
+### `/context/` — Knowledge Sources
+
+```
+context/
+├── golden-data/      # Canonical documents (constitution, glossary)
+├── patterns/         # Reusable patterns
+└── philosophy/       # Lean principles, Niwashi metaphor
+```
+
+### `/harness/` — Kata Executor (Future)
+
+Runtime that interprets katas and invokes skills. Built on spec-kit.
+
+### `/gates/` — Validation
 
 ```
 gates/
@@ -72,87 +93,45 @@ gates/
 └── gate-estimation.md
 ```
 
-### `/commands/` — Comandos Slash
-
-Comandos ejecutables para Claude/Cursor. Organizados por flujo:
+### `/templates/` — Output Formats
 
 ```
-commands/
-├── 01-onboarding/               # Setup inicial
-│   ├── raise.1.analyze.code.md
-│   ├── raise.rules.generate.md
-│   └── raise.rules.edit.md
-├── 02-projects/                 # Flujo de proyecto
-│   ├── raise.1.discovery.md
-│   ├── raise.2.vision.md
-│   ├── raise.3.ecosystem.md
-│   ├── raise.4.tech-design.md
-│   ├── raise.5.backlog.md
-│   ├── raise.6.estimation.md
-│   └── raise.7.sow.md
-└── 03-governance/               # SAR + raise.ctx (futuro)
+templates/
+├── solution/         # Solution Vision
+├── architecture/     # Architecture Overview, ADRs
+├── tech/             # Tech Design
+└── backlog/          # Product Backlog
 ```
 
-### `/scripts/` — Scripts de Soporte
+### `/scripts/` — Automation
 
 ```
 scripts/
-├── bash/raise/                  # Scripts Bash
-└── powershell/raise/            # Scripts PowerShell
+├── bash/raise/       # Bash scripts
+└── powershell/raise/ # PowerShell scripts
 ```
 
 ---
 
-## Jerarquía de Documentos
+## Philosophy
 
-```
-LEVEL 0: STRATEGY
-├── Solution Vision        → templates/solution/solution-vision.md
-└── Architecture Overview  → templates/architecture/architecture-overview.md
-    └── ADRs              → templates/architecture/adr.md
-
-LEVEL 1: DESIGN
-└── Tech Design (System)   → templates/tech/tech-design.md
-
-LEVEL 2: PLANNING
-├── Backlog               → templates/backlog/backlog.md
-└── Tech Design (Feature) → templates/tech/tech-design-feature.md
-```
+| Principle | Application |
+|-----------|-------------|
+| **Niwashi (庭師)** | Gardener cultivates context, executes katas, applies skills |
+| **ShuHaRi** | Follow → Adapt → Transcend (each kata) |
+| **Jidoka** | Stop on defects, fix, continue |
+| **MVC** | Minimum Viable Context for each task |
 
 ---
 
-## Uso
+## Archived
 
-### Para Nuevos Proyectos
+Old command structure moved to `.raise-archive/`:
+- `commands/` → replaced by `katas/`
+- `templates/_legacy/` → replaced by `templates/`
 
-Inyectar `.raise/` en un proyecto:
-
-```bash
-# Bash
-bash .raise/scripts/bash/raise/transform-commands.sh <proyecto>
-
-# PowerShell
-powershell -File .raise/scripts/powershell/raise/transform-commands.ps1 -ProjectName <proyecto>
-```
-
-### Flujo Típico
-
-```
-/raise.1.discovery  → PRD
-/raise.2.vision     → Solution Vision
-/raise.4.tech-design → Tech Design
-/raise.5.backlog    → Backlog
-```
+See: `dev/decisions/framework/adr-008-kata-skill-context-simplification.md`
 
 ---
 
-## Contribuir
-
-1. **Templates**: Seguir formato MVS (4 secciones + opcionales colapsadas)
-2. **Katas**: Seguir formato lean (Cuándo/Pasos/Output)
-3. **Gates**: Checklist verificable, criterios objetivos
-4. **Commands**: Referencias a `.specify/` (no `.raise/`)
-
----
-
-*RaiSE Framework — Lean Specification v1.0*
+*RaiSE Framework v2.5 — Three-Directory Model*

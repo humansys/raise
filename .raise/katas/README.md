@@ -1,67 +1,179 @@
 # Katas
 
-> **Workflows lean** para crear entregables de forma consistente
+> **Work Cycle processes** — Cultural wisdom for software development
 
 ---
 
-## Qué es una Kata
+## What is a Kata
 
-Una kata es un workflow paso a paso que guía la creación de un entregable.
+A kata is a process pattern adapted to a Work Cycle context. Each kata encodes:
 
-| Componente | Propósito |
-|------------|-----------|
-| **Cuándo Aplicar** | Trigger para usar la kata |
-| **Pasos** | Acciones con verificación Jidoka |
-| **Output** | Entregable + template + gate |
+| Component | Purpose |
+|-----------|---------|
+| **Work Cycle** | When this kata applies (solution, project, feature, setup, improve) |
+| **Frequency** | How often executed (once-per-solution, once-per-project, per-feature, continuous) |
+| **ShuHaRi** | Mastery levels for adaptation |
+| **Jidoka Inline** | Stop-on-defect pattern in each step |
 
-## Estructura Lean
+## Three-Level Hierarchy (ADR-010)
 
-```markdown
-# Kata: [Nombre]
-
-## Cuándo Aplicar
-[1-2 oraciones]
-
-## Pasos
-### 1. [Acción]
-[Descripción]
-**Output**: [qué produce]
-**Verificación**: [criterio]
-> ⚠️ **Si falla**: [acción]
-
-## Output Final
-- Archivo: [path]
-- Gate: [validación]
+```
+SOLUTION LEVEL (System - endures)
+├── solution/discovery    → Business Case
+├── solution/vision       → Solution Vision
+└── setup/governance      → Governance (guardrails)
+        │
+        │ constrains all projects
+        ▼
+PROJECT LEVEL (Initiative - time-bound)
+├── project/discovery     → PRD
+├── project/vision        → Project Vision
+├── project/design        → Tech Design
+└── project/backlog       → Backlog
+        │
+        │ implements via features
+        ▼
+FEATURE LEVEL (Implementation)
+├── feature/plan          → Implementation plan
+├── feature/implement     → Working code
+└── feature/review        → Retrospective
 ```
 
-## Patrón Jidoka Inline
+## Work Cycles
 
-Cada paso incluye verificación y acción correctiva:
-
-```markdown
-**Verificación**: [cómo saber que está bien]
-> ⚠️ **Si falla**: [qué hacer]
+```
+katas/
+├── solution/     # Per-solution (once) — system definition
+├── project/      # Per-project (once) — initiative artifacts
+├── feature/      # Per-feature (many) — implementation cycles
+├── setup/        # Per-solution (once) — governance & environment
+├── tools/        # As-needed — methodology patterns (research, etc.)
+└── improve/      # Continuous — retrospective and evolution
 ```
 
-Esto permite **parar en defectos** y corregir antes de continuar.
+## Available Katas
+
+### solution/ (Per-Solution) — NEW in v2.4
+
+| Kata | Purpose | Output |
+|------|---------|--------|
+| `discovery.md` | Business Case creation | `governance/solution/business_case.md` |
+| `vision.md` | Solution Vision | `governance/solution/vision.md` |
+
+> **Flow**: `discovery` → `vision` → `setup/governance`
+
+### setup/ (Per-Solution)
+
+| Kata | Purpose | Output |
+|------|---------|--------|
+| `governance.md` | System-wide Guardrails | `governance/solution/guardrails.md` |
+| `rules.md` | Codebase Patterns | `.cursor/rules/*.mdc` |
+| `ecosystem.md` | Dependency Mapping | `governance/solution/ecosystem.md` |
+
+> **Greenfield flow**: `governance` → `rules` → `project/discovery`
+> **Brownfield flow**: `analyze` → `ecosystem` → `project/discovery`
+> **Prerequisite**: `solution/vision` for greenfield governance
+
+### project/ (Per-Project)
+
+| Kata | Purpose | Output (approved) |
+|------|---------|-------------------|
+| `discovery.md` | PRD creation | `governance/projects/{name}/prd.md` |
+| `vision.md` | Project Vision | `governance/projects/{name}/vision.md` |
+| `design.md` | Technical Architecture | `governance/projects/{name}/design.md` |
+| `backlog.md` | Product Backlog | `governance/projects/{name}/backlog.md` |
+
+> **Note**: Project Vision was renamed from "Solution Vision" in v2.4 (ADR-010)
+> **Note**: Drafts are created in `work/projects/{name}/`, promoted to `governance/` after gate passes
+
+### feature/ (Per-Feature)
+
+| Kata | Purpose | Output |
+|------|---------|--------|
+| `plan.md` | Implementation Planning | `work/features/{NNN-name}/plan.md` |
+| `implement.md` | Development Workflow | Working code |
+| `review.md` | Retrospective & Learning | `work/features/{NNN-name}/retrospective.md` |
+
+> **Note**: Feature artifacts are transient and stay in `work/` (ADR-011)
+
+### tools/ (As-Needed)
+
+| Kata | Purpose | Output |
+|------|---------|--------|
+| `research.md` | Evidence-based investigation | `work/research/{topic}/` |
+
+> **Note**: Tool katas are methodology patterns usable across work cycles
 
 ---
 
-## Katas Disponibles
+## Kata Schema
 
-| Kata | Categoría | Output |
-|------|-----------|--------|
-| `architecture/create-architecture-overview.md` | architecture | Architecture Overview |
-| *(más por crear)* | | |
+```yaml
+---
+id: solution-discovery
+titulo: "Solution Discovery: Crear Business Case"
+work_cycle: solution
+frequency: once-per-solution
+fase_metodologia: 0
+
+prerequisites: []
+template: templates/raise/solution/business_case.md
+gate: null
+next_kata: solution/vision
+
+adaptable: true
+shuhari:
+  shu: "Seguir todos los pasos exactamente"
+  ha: "Combinar pasos si métricas claras"
+  ri: "Crear kata específica del dominio"
+
+version: 1.0.0
+---
+```
+
+## Jidoka Inline Pattern
+
+Each step includes verification and recovery action:
+
+```markdown
+### Paso N: [Action]
+
+[Description]
+
+**Verificación**: [How to know it's correct]
+
+> **Si no puedes continuar**: [Condition] → [Recovery action]
+```
+
+This enables **stopping on defects** and correcting before proceeding.
 
 ---
 
-## Crear Nueva Kata
+## ShuHaRi Levels
 
-1. Usar template: `.raise/templates/kata.md`
-2. Ubicar en categoría: `.raise/katas/[categoria]/`
-3. Nombrar: `[verbo]-[sustantivo].md` (ej: `create-architecture-overview.md`)
+| Level | Meaning | Application |
+|-------|---------|-------------|
+| **Shu (守)** | Follow | Execute kata exactly as written |
+| **Ha (破)** | Adapt | Modify steps based on context |
+| **Ri (離)** | Transcend | Create domain-specific katas |
 
 ---
 
-*Template: `.raise/templates/kata.md`*
+## Three-Directory Model (ADR-011)
+
+Artifacts are stored in:
+
+| Directory | Purpose | Examples |
+|-----------|---------|----------|
+| `governance/` | Approved, authoritative artifacts | Solution Vision, Project Vision (after gate) |
+| `work/` | Work-in-progress | Feature specs, draft proposals |
+| `.raise/` | Framework configuration | Katas, gates, templates |
+
+**Promotion flow**: `work/` → (gate passes) → `governance/`
+
+## References
+
+- **ADR-011**: Three-Directory Model (governance/, work/, .raise/)
+- **ADR-010**: Three-Level Artifact Hierarchy (Solution → Project → Feature)
+- **ADR-009**: Continuous Governance Model
+- **ADR-008**: Kata/Skill/Context Simplification

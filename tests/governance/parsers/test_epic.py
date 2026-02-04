@@ -1,0 +1,331 @@
+"""Tests for epic scope parser."""
+
+from pathlib import Path
+from textwrap import dedent
+
+import pytest
+
+from raise_cli.governance.models import ConceptType
+from raise_cli.governance.parsers.epic import (
+    extract_epic_details,
+    extract_features,
+)
+
+
+@pytest.fixture
+def tmp_epic_file(tmp_path: Path) -> Path:
+    """Create a temporary epic scope file for testing.
+
+    Args:
+        tmp_path: Pytest temp directory fixture.
+
+    Returns:
+        Path to temporary epic scope file.
+    """
+    epic_content = dedent(
+        """\
+        # Epic E8: Work Tracking Graph - Scope
+
+        > **Status:** DRAFT
+        > **Branch:** `feature/e8/work-tracking-graph`
+        > **Created:** 2026-02-02
+        > **Target:** Feb 9, 2026
+
+        ---
+
+        ## Objective
+
+        Extend the governance graph to include work tracking concepts.
+
+        ---
+
+        ## Features
+
+        | ID | Feature | Size | Status | Description |
+        |----|---------|:----:|:------:|-------------|
+        | F8.1 | Backlog Parser | S | Pending | Parse backlog.md |
+        | F8.2 | **Epic Parser** | S | Pending | Parse epic scopes |
+        | F8.3 | Graph Extension | M | Pending | Add work to graph |
+        | F8.4 | Work Queries | S | **COMPLETE** | Query work items |
+        """
+    )
+
+    epic_file = tmp_path / "dev" / "epic-e8-scope.md"
+    epic_file.parent.mkdir(parents=True, exist_ok=True)
+    epic_file.write_text(epic_content)
+
+    return epic_file
+
+
+class TestExtractEpicDetails:
+    """Tests for extract_epic_details function."""
+
+    def test_extract_epic_id(self, tmp_epic_file: Path) -> None:
+        """Should extract epic ID from filename."""
+        epic = extract_epic_details(tmp_epic_file, tmp_epic_file.parent.parent)
+
+        assert epic is not None
+        assert epic.metadata["epic_id"] == "E8"
+
+    def test_extract_epic_name(self, tmp_epic_file: Path) -> None:
+        """Should extract epic name from H1."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert epic.metadata["name"] == "Work Tracking Graph"
+
+    def test_extract_concept_id(self, tmp_epic_file: Path) -> None:
+        """Should generate correct concept ID."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert epic.id == "epic-e8"
+
+    def test_extract_concept_type(self, tmp_epic_file: Path) -> None:
+        """Should have EPIC concept type."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert epic.type == ConceptType.EPIC
+
+    def test_extract_status(self, tmp_epic_file: Path) -> None:
+        """Should extract status from frontmatter."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert epic.metadata["status"] == "draft"
+
+    def test_extract_target(self, tmp_epic_file: Path) -> None:
+        """Should extract target date from frontmatter."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert epic.metadata["target"] == "Feb 9, 2026"
+
+    def test_extract_branch(self, tmp_epic_file: Path) -> None:
+        """Should extract branch from frontmatter."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert epic.metadata["branch"] == "`feature/e8/work-tracking-graph`"
+
+    def test_extract_feature_count(self, tmp_epic_file: Path) -> None:
+        """Should count features in table."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert epic.metadata["feature_count"] == 4
+
+    def test_extract_scope_doc(self, tmp_epic_file: Path) -> None:
+        """Should include scope doc path in metadata."""
+        epic = extract_epic_details(tmp_epic_file, tmp_epic_file.parent.parent)
+
+        assert epic is not None
+        assert epic.metadata["scope_doc"] == "dev/epic-e8-scope.md"
+
+    def test_content_includes_objective(self, tmp_epic_file: Path) -> None:
+        """Should include objective in content."""
+        epic = extract_epic_details(tmp_epic_file)
+
+        assert epic is not None
+        assert "work tracking" in epic.content.lower()
+
+    def test_missing_file_returns_none(self, tmp_path: Path) -> None:
+        """Should return None for missing file."""
+        missing_file = tmp_path / "missing.md"
+
+        epic = extract_epic_details(missing_file)
+
+        assert epic is None
+
+    def test_complete_status(self, tmp_path: Path) -> None:
+        """Should normalize COMPLETE status."""
+        epic_content = dedent(
+            """\
+            # Epic E3: Identity Core - Scope
+
+            > **Status:** COMPLETE (100%)
+            """
+        )
+        epic_file = tmp_path / "dev" / "epic-e3-scope.md"
+        epic_file.parent.mkdir(parents=True, exist_ok=True)
+        epic_file.write_text(epic_content)
+
+        epic = extract_epic_details(epic_file)
+
+        assert epic is not None
+        assert epic.metadata["status"] == "complete"
+
+    def test_status_with_emoji(self, tmp_path: Path) -> None:
+        """Should handle status with emoji."""
+        epic_content = dedent(
+            """\
+            # Epic E2: Governance Toolkit - Scope
+
+            > **Status:** COMPLETE ✅
+            """
+        )
+        epic_file = tmp_path / "dev" / "epic-e2-scope.md"
+        epic_file.parent.mkdir(parents=True, exist_ok=True)
+        epic_file.write_text(epic_content)
+
+        epic = extract_epic_details(epic_file)
+
+        assert epic is not None
+        assert epic.metadata["status"] == "complete"
+
+
+class TestExtractFeatures:
+    """Tests for extract_features function."""
+
+    def test_extract_all_features(self, tmp_epic_file: Path) -> None:
+        """Should extract all features from table."""
+        features = extract_features(tmp_epic_file)
+
+        assert len(features) == 4
+
+    def test_feature_type(self, tmp_epic_file: Path) -> None:
+        """Should have FEATURE concept type."""
+        features = extract_features(tmp_epic_file)
+
+        assert all(f.type == ConceptType.FEATURE for f in features)
+
+    def test_feature_ids(self, tmp_epic_file: Path) -> None:
+        """Should generate correct feature IDs."""
+        features = extract_features(tmp_epic_file)
+
+        ids = [f.id for f in features]
+        assert "feature-f8-1" in ids
+        assert "feature-f8-2" in ids
+        assert "feature-f8-3" in ids
+        assert "feature-f8-4" in ids
+
+    def test_feature_names(self, tmp_epic_file: Path) -> None:
+        """Should extract feature names without bold markers."""
+        features = extract_features(tmp_epic_file)
+
+        f2 = next(f for f in features if f.id == "feature-f8-2")
+        assert f2.metadata["name"] == "Epic Parser"
+
+    def test_feature_status_normalization(self, tmp_epic_file: Path) -> None:
+        """Should normalize feature statuses."""
+        features = extract_features(tmp_epic_file)
+
+        f1 = next(f for f in features if f.id == "feature-f8-1")
+        assert f1.metadata["status"] == "pending"
+
+        f4 = next(f for f in features if f.id == "feature-f8-4")
+        assert f4.metadata["status"] == "complete"
+
+    def test_feature_size(self, tmp_epic_file: Path) -> None:
+        """Should extract feature size."""
+        features = extract_features(tmp_epic_file)
+
+        f1 = next(f for f in features if f.id == "feature-f8-1")
+        assert f1.metadata["size"] == "S"
+
+        f3 = next(f for f in features if f.id == "feature-f8-3")
+        assert f3.metadata["size"] == "M"
+
+    def test_feature_epic_id(self, tmp_epic_file: Path) -> None:
+        """Should include epic_id for relationship inference."""
+        features = extract_features(tmp_epic_file)
+
+        for feature in features:
+            assert feature.metadata["epic_id"] == "E8"
+
+    def test_feature_section(self, tmp_epic_file: Path) -> None:
+        """Should have correct section format."""
+        features = extract_features(tmp_epic_file)
+
+        f1 = next(f for f in features if f.id == "feature-f8-1")
+        assert f1.section == "F8.1: Backlog Parser"
+
+    def test_missing_file_returns_empty(self, tmp_path: Path) -> None:
+        """Should return empty list for missing file."""
+        missing_file = tmp_path / "missing.md"
+
+        features = extract_features(missing_file)
+
+        assert features == []
+
+    def test_sp_format_table(self, tmp_path: Path) -> None:
+        """Should handle SP format table (E2 style)."""
+        epic_content = dedent(
+            """\
+            # Epic E2: Governance Toolkit - Scope
+
+            ## Features (9 SP)
+
+            | ID | Feature | SP | Status | Actual Time | Velocity |
+            |----|---------|:--:|:------:|:-----------:|:--------:|
+            | F2.1 | Concept Extraction | 3 | ✅ Complete | 52 min | 3.5x |
+            | F2.2 | Graph Builder | 2 | ✅ Complete | 65 min | 2.8x |
+            """
+        )
+        epic_file = tmp_path / "dev" / "epic-e2-scope.md"
+        epic_file.parent.mkdir(parents=True, exist_ok=True)
+        epic_file.write_text(epic_content)
+
+        features = extract_features(epic_file)
+
+        assert len(features) == 2
+
+        f1 = next(f for f in features if f.id == "feature-f2-1")
+        assert f1.metadata["sp"] == 3
+        assert f1.metadata["status"] == "complete"
+
+    def test_relative_file_path(self, tmp_epic_file: Path) -> None:
+        """Should calculate correct relative file path."""
+        project_root = tmp_epic_file.parent.parent
+        features = extract_features(tmp_epic_file, project_root)
+
+        for feature in features:
+            assert feature.file == "dev/epic-e8-scope.md"
+
+
+class TestIntegrationWithRealEpics:
+    """Integration tests with real epic scope documents."""
+
+    def test_extract_details_from_real_e3(self) -> None:
+        """Should extract details from real E3 scope."""
+        scope_path = Path("dev/epic-e3-scope.md")
+
+        if not scope_path.exists():
+            pytest.skip("Real epic scope file not found")
+
+        epic = extract_epic_details(scope_path)
+
+        assert epic is not None
+        assert epic.id == "epic-e3"
+        assert epic.type == ConceptType.EPIC
+        assert epic.metadata["epic_id"] == "E3"
+        assert "Identity" in epic.metadata["name"]
+
+    def test_extract_features_from_real_e3(self) -> None:
+        """Should extract features from real E3 scope."""
+        scope_path = Path("dev/epic-e3-scope.md")
+
+        if not scope_path.exists():
+            pytest.skip("Real epic scope file not found")
+
+        features = extract_features(scope_path)
+
+        # E3 has 5 features (F3.1-F3.5)
+        assert len(features) >= 4
+
+        feature_ids = {f.metadata["feature_id"] for f in features}
+        assert "F3.1" in feature_ids
+
+    def test_extract_all_real_epics(self) -> None:
+        """Should extract details from all real epic scopes."""
+        epic_files = list(Path("dev").glob("epic-e*-scope.md"))
+
+        if not epic_files:
+            pytest.skip("No real epic scope files found")
+
+        for epic_file in epic_files:
+            epic = extract_epic_details(epic_file)
+            assert epic is not None, f"Failed to parse {epic_file}"
+            assert epic.type == ConceptType.EPIC
+            assert epic.metadata["epic_id"] is not None
