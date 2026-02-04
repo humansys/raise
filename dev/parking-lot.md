@@ -71,6 +71,8 @@
 - [ ] **Add Python naming best practices to guardrails** - "Prefer clear names over acronyms unless universally understood" (F2.3 retro: MVCQuery→ContextQuery)
 - [ ] **Document "compose, don't duplicate" architecture pattern** - Create ADR or concept doc with F2.2→F2.3 BFS reuse example (F2.3 retro)
 - [ ] **Add "Simple First" concrete examples to constitution** - Keyword matching (no NLP), token heuristics; elevate from value to principle (F2.3 retro)
+- [ ] **Document test fixture YAML frontmatter pattern** - Use `dedent("""\---` not `dedent("""\n---` to avoid leading newline breaking `^---` regex (F11.2 retro)
+- [ ] **Add `get_all_*` aliases to UnifiedGraph** - `iter_concepts()` is efficient but `get_all_concepts()` is more discoverable for CLI integration (F11.2 retro, low priority)
 
 ### Research Needed
 

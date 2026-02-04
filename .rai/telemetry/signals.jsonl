@@ -281,3 +281,9 @@
 {"type":"skill_event","timestamp":"2026-02-04T03:06:48Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T03:12:25Z","skill":"session-close","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T03:12:25Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T03:14:00.993270Z","work_type":"feature","work_id":"F11.2","event":"start","phase":"review","blocker":null}
+{"type":"calibration","timestamp":"2026-02-04T03:14:43.289543Z","feature_id":"F11.2","feature_size":"M","estimated_min":90,"actual_min":80,"velocity":1.12}
+{"type":"work_lifecycle","timestamp":"2026-02-04T03:14:44.165817Z","work_type":"feature","work_id":"F11.2","event":"complete","phase":"review","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T03:14:50Z","skill":"session-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T03:14:50Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T03:14:50Z","skill":"feature-review","event":"complete","duration_sec":null}
