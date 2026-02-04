@@ -1,6 +1,6 @@
 # Epic E9: Local Learning & Self-Awareness
 
-> **Status:** ACTIVE — Phase 1 for F&F MVP
+> **Status:** PHASE 1 COMPLETE — Phase 2 deferred to post-F&F
 > **Branch:** `feature/e9/local-learning`
 > **Created:** 2026-02-02
 > **Target:** Feb 9, 2026 (F&F) — Phase 1 only
@@ -417,15 +417,18 @@ F9.2 (Signal Writer) ← depends on schemas
 - [ ] All quality checks pass (ruff, pyright, bandit)
 - [ ] Component catalog updated (`dev/components.md`)
 
-### Phase 1 (Epic)
-- [ ] Signal schemas defined (F9.1)
-- [ ] Signal writer appends to signals.jsonl (F9.2)
-- [ ] Skill events emitted on start/complete/abandon (F9.3)
-- [ ] Session events emitted from /session-close (F9.4)
-- [ ] Error events emitted on tool failures (F9.5)
-- [ ] No impact on existing functionality
-- [ ] All tests pass
-- [ ] ADR-018 created ✓
+### Phase 1 (Epic) ✓ COMPLETE
+- [x] Signal schemas defined (F9.1)
+- [x] Signal writer appends to signals.jsonl (F9.2)
+- [x] Skill events emitted on start/complete/abandon (F9.3)
+- [x] Session events emitted from /session-close (F9.4)
+- [x] Error events emitted on tool failures (F9.5)
+- [x] No impact on existing functionality
+- [x] All tests pass
+- [x] ADR-018 created
+- [x] **BONUS:** WorkLifecycle unified schema (epic + feature)
+- [x] **BONUS:** Unified `raise telemetry emit` CLI command
+- [x] **BONUS:** Normalized phases (design/plan/implement/review)
 
 ### Phase 2 (Epic)
 - [ ] Insights generated from signals
