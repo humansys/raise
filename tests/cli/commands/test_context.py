@@ -332,6 +332,34 @@ class TestUnifiedContextQuery:
         finally:
             os.chdir(original_cwd)
 
+    def test_unified_query_with_type_singular_filter(
+        self, unified_graph: UnifiedGraph, tmp_path: Path
+    ) -> None:
+        """Test unified query with --type (singular) filter.
+
+        Regression test: --type was ignored when --unified was used.
+        See bugfix/context-query-type-filter branch.
+        """
+        import os
+
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            (tmp_path / ".raise/graph").mkdir(parents=True, exist_ok=True)
+            unified_graph.save(tmp_path / ".raise/graph/unified.json")
+
+            result = runner.invoke(
+                app,
+                ["context", "query", "a", "--unified", "--type", "pattern"],
+            )
+
+            assert result.exit_code == 0
+            # Should only return pattern nodes (PAT-001), not calibration or skill
+            assert "PAT-001" in result.stdout
+            assert "CAL-001" not in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
     def test_unified_query_concept_lookup(
         self, unified_graph: UnifiedGraph, tmp_path: Path
     ) -> None:

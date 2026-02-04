@@ -217,6 +217,7 @@ def query(
             max_depth=max_depth,
             types=types,
             limit=limit,
+            concept_type=concept_type,
         )
     else:
         _query_governance(
@@ -238,6 +239,7 @@ def _query_unified(
     max_depth: int,
     types: str | None,
     limit: int,
+    concept_type: str | None = None,
 ) -> None:
     """Execute query against unified context graph."""
     # Load engine
@@ -250,10 +252,12 @@ def _query_unified(
         )
         raise typer.Exit(1) from None
 
-    # Parse types filter
+    # Parse types filter (--types takes precedence, --type as fallback)
     types_list: list[str] | None = None
     if types:
         types_list = [t.strip() for t in types.split(",")]
+    elif concept_type:
+        types_list = [concept_type]
 
     # Determine strategy
     query_strategy = UnifiedQueryStrategy.KEYWORD_SEARCH  # Default
