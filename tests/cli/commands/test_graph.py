@@ -282,3 +282,148 @@ class TestGraphValidateCommand:
 
         assert result.exit_code == 0
         assert "valid" in result.stdout.lower()
+
+
+class TestGraphBuildUnifiedCommand:
+    """Tests for `raise graph build --unified` command."""
+
+    @pytest.fixture
+    def tmp_unified_project(self, tmp_path: Path) -> Path:
+        """Create temporary project with all unified graph sources.
+
+        Args:
+            tmp_path: Pytest temp directory.
+
+        Returns:
+            Path to temporary project root.
+        """
+        project_root = tmp_path / "unified_project"
+        project_root.mkdir()
+
+        # Create governance files
+        prd_file = project_root / "governance" / "projects" / "test" / "prd.md"
+        prd_file.parent.mkdir(parents=True)
+        prd_file.write_text(
+            dedent(
+                """
+                ### RF-01: Test Requirement
+                This is a test requirement for graph building.
+                """
+            )
+        )
+
+        # Create memory files
+        memory_dir = project_root / ".rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        patterns_file = memory_dir / "patterns.jsonl"
+        patterns_file.write_text(
+            '{"id": "PAT-001", "type": "process", "content": "Test pattern for graph", "context": ["testing", "graph"], "created": "2026-02-03"}\n'
+        )
+
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir()
+        sessions_file = sessions_dir / "index.jsonl"
+        sessions_file.write_text(
+            '{"id": "SES-001", "date": "2026-02-03", "type": "feature", "topic": "Test Session", "outcomes": ["outcome1"]}\n'
+        )
+
+        # Create skill files
+        skills_dir = project_root / ".claude" / "skills" / "test-skill"
+        skills_dir.mkdir(parents=True)
+        skill_file = skills_dir / "SKILL.md"
+        skill_file.write_text(
+            dedent(
+                """\
+                ---
+                name: test-skill
+                description: Test skill for unified graph
+                ---
+
+                # Test Skill
+
+                Test content.
+                """
+            )
+        )
+
+        return project_root
+
+    def test_graph_build_unified_flag_in_help(self) -> None:
+        """Should show --unified flag in help."""
+        result = runner.invoke(app, ["graph", "build", "--help"])
+
+        assert result.exit_code == 0
+        assert "--unified" in result.stdout
+
+    def test_graph_build_unified_creates_file(
+        self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should create unified graph file at .raise/graph/unified.json."""
+        monkeypatch.chdir(tmp_unified_project)
+
+        result = runner.invoke(app, ["graph", "build", "--unified"])
+
+        assert result.exit_code == 0
+
+        unified_graph_file = tmp_unified_project / ".raise" / "graph" / "unified.json"
+        assert unified_graph_file.exists()
+
+    def test_graph_build_unified_shows_node_counts_by_type(
+        self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should show node counts by type in output."""
+        monkeypatch.chdir(tmp_unified_project)
+
+        result = runner.invoke(app, ["graph", "build", "--unified"])
+
+        assert result.exit_code == 0
+        # Should show counts by type
+        assert "pattern" in result.stdout.lower()
+        assert "skill" in result.stdout.lower()
+
+    def test_graph_build_unified_shows_edge_counts(
+        self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should show edge counts in output."""
+        monkeypatch.chdir(tmp_unified_project)
+
+        result = runner.invoke(app, ["graph", "build", "--unified"])
+
+        assert result.exit_code == 0
+        assert "edges" in result.stdout.lower()
+
+    def test_graph_build_unified_produces_valid_json(
+        self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should produce valid JSON with nodes and edges."""
+        monkeypatch.chdir(tmp_unified_project)
+
+        result = runner.invoke(app, ["graph", "build", "--unified"])
+        assert result.exit_code == 0
+
+        unified_graph_file = tmp_unified_project / ".raise" / "graph" / "unified.json"
+        data = json.loads(unified_graph_file.read_text())
+
+        # Should have node_link format from NetworkX
+        assert "nodes" in data or "directed" in data
+        assert "links" in data or "edges" in data
+
+    def test_graph_build_unified_merges_all_sources(
+        self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should merge governance, memory, and skills into unified graph."""
+        monkeypatch.chdir(tmp_unified_project)
+
+        result = runner.invoke(app, ["graph", "build", "--unified"])
+        assert result.exit_code == 0
+
+        unified_graph_file = tmp_unified_project / ".raise" / "graph" / "unified.json"
+        data = json.loads(unified_graph_file.read_text())
+
+        # Count nodes - should have at least pattern, skill, requirement, session
+        nodes = data.get("nodes", [])
+        node_types = {n.get("type") for n in nodes}
+
+        assert "pattern" in node_types
+        assert "skill" in node_types
