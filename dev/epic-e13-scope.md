@@ -1,6 +1,6 @@
 # Epic E13: Discovery — Codebase Understanding for Rai
 
-> **Status:** PLANNED
+> **Status:** IN PROGRESS (M1 complete)
 > **Branch:** `feature/e13/discovery`
 > **Created:** 2026-02-04
 > **Target:** Feb 9, 2026 (F&F MVP)
@@ -41,8 +41,8 @@ EXTRACT (deterministic)  →  SYNTHESIZE (LLM)  →  VALIDATE (human)  →  POPU
 
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
-| F13.1 | Schema Extension | S (2) | Pending | Add system/module/component/convention node types to unified graph |
-| F13.2 | Extraction Toolkit | M (4) | Pending | CLI commands to scan codebase and extract symbols via ast-grep |
+| F13.1 | Schema Extension | S (2) | ✓ Complete | Add system/module/component/convention node types to unified graph |
+| F13.2 | Extraction Toolkit | M (4) | ✓ Complete | CLI commands to scan codebase and extract symbols via ast-grep |
 | F13.3 | Discovery Skills | M (4) | Pending | `/discover-*` skills with LLM synthesis and human validation loop |
 | F13.4 | Graph Integration | S (2) | Pending | Populate unified graph with validated components, enable queries |
 | F13.5 | Drift Detection | XS (1) | Pending | Basic check: new files against established patterns |
@@ -54,8 +54,8 @@ EXTRACT (deterministic)  →  SYNTHESIZE (LLM)  →  VALIDATE (human)  →  POPU
 ## In Scope
 
 **MUST:**
-- [ ] New node types in unified graph schema (system, module, component, convention)
-- [ ] `raise discover scan` — Extract symbols from codebase using ast-grep
+- [x] New node types in unified graph schema (system, module, component, convention)
+- [x] `raise discover scan` — Extract symbols from codebase using ast-grep
 - [ ] `raise discover build` — Build component nodes from scan output
 - [ ] `/discover-start` skill — Initialize discovery, detect project type
 - [ ] `/discover-scan` skill — Run extraction, LLM synthesizes descriptions
@@ -333,14 +333,14 @@ F13.1 ─► F13.2 ─► F13.3 ─────► F13.4 ─────► F13.
 
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
-| F13.1 Schema Extension | S (2) | Pending | — | — | |
-| F13.2 Extraction Toolkit | M (4) | Pending | — | — | |
+| F13.1 Schema Extension | S (2) | ✓ Complete | 1 session | 2x | Combined with F13.2 |
+| F13.2 Extraction Toolkit | M (4) | ✓ Complete | 1 session | 2x | Multi-language (Py/TS/JS), 39 tests |
 | F13.3 Discovery Skills | M (4) | Pending | — | — | |
 | F13.4 Graph Integration | S (2) | Pending | — | — | |
 | F13.5 Drift Detection | XS (1) | Pending | — | — | |
 
 **Milestone Progress:**
-- [ ] M1: Walking Skeleton (Feb 5)
+- [x] M1: Walking Skeleton (Feb 5) ✓ Complete 2026-02-04
 - [ ] M2: Discovery Flow (Feb 7)
 - [ ] M3: F&F Ready (Feb 8)
 
@@ -369,4 +369,5 @@ Before starting each feature:
 ---
 
 *Plan created: 2026-02-04*
-*Next: `/feature-start` for F13.1 Schema Extension*
+*M1 complete: 2026-02-04*
+*Next: F13.3 Discovery Skills*
