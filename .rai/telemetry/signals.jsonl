@@ -500,3 +500,7 @@
 {"type":"work_lifecycle","timestamp":"2026-02-04T06:08:03.125139Z","work_type":"feature","work_id":"F12.6","event":"start","phase":"review","blocker":null}
 {"type":"calibration","timestamp":"2026-02-04T06:08:47.839576Z","feature_id":"F12.6","feature_size":"M","estimated_min":120,"actual_min":10,"velocity":12.0}
 {"type":"work_lifecycle","timestamp":"2026-02-04T06:08:51.523940Z","work_type":"feature","work_id":"F12.6","event":"complete","phase":"review","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:09:47Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:09:47Z","skill":"feature-review","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:09:47Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:09:47Z","skill":"feature-start","event":"complete","duration_sec":null}
