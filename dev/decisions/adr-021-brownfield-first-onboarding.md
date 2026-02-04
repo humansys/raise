@@ -1,6 +1,6 @@
 # ADR-021: Brownfield-First Onboarding with Personal Memory
 
-> **Status:** PROPOSED
+> **Status:** ACCEPTED
 > **Date:** 2026-02-04
 > **Decision Makers:** Emilio, Rai
 > **Informs:** E7 Onboarding

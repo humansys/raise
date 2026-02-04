@@ -86,6 +86,17 @@
 - [ ] **Add `get_all_*` aliases to UnifiedGraph** - `iter_concepts()` is efficient but `get_all_concepts()` is more discoverable for CLI integration (F11.2 retro, low priority)
 - [ ] **Pre-design research phase in lifecycle** - Before `/epic-design`, sometimes need targeted research (e.g., reverse engineering prior art like Aider's repo map). Consider formalizing as optional phase in epic lifecycle. (E13 discussion, 2026-02-04)
 
+### E7 Onboarding — Deferred (Post-F&F)
+
+> Items explicitly deferred from E7 scope (ADR-021).
+
+- [ ] **Team memory** — V3 scope, see E10 Collective Intelligence
+- [ ] **`raise doctor` command** — Project health diagnostics (nice-to-have)
+- [ ] **Full ~/.rai/ expansion** — YAGNI for F&F, start with developer.yaml only
+- [ ] **Multi-language convention detection** — Python first, TypeScript/JS later
+- [ ] **Auto-progress Shu→Ha→Ri** — Experience level progression (manual for now)
+- [ ] **Communication style preferences** — Full customization (minimal for F&F)
+
 ### E13 Discovery — Deferred (Post-F&F)
 
 > Items explicitly deferred from E13 MVP scope.
@@ -158,4 +169,4 @@
 
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-02*
-*Last updated: 2026-02-04 (E12 close, memory system improvements added)*
+*Last updated: 2026-02-04 (E7 design complete, deferred items added)*
