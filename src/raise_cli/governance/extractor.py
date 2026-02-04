@@ -9,9 +9,12 @@ import logging
 from pathlib import Path
 
 from raise_cli.governance.models import Concept, ConceptType, ExtractionResult
+from raise_cli.governance.parsers.adr import extract_all_decisions
 from raise_cli.governance.parsers.backlog import extract_epics, extract_project
 from raise_cli.governance.parsers.constitution import extract_principles
 from raise_cli.governance.parsers.epic import extract_epic_details, extract_features
+from raise_cli.governance.parsers.glossary import extract_all_terms
+from raise_cli.governance.parsers.guardrails import extract_all_guardrails
 from raise_cli.governance.parsers.prd import extract_requirements
 from raise_cli.governance.parsers.vision import extract_outcomes
 
@@ -164,6 +167,30 @@ class GovernanceExtractor:
         # Extract work concepts (E8)
         concepts.extend(self._extract_work_concepts())
 
+        # Extract ADR decisions (E12)
+        try:
+            adr_concepts = extract_all_decisions(self.project_root)
+            concepts.extend(adr_concepts)
+            logger.info(f"Extracted {len(adr_concepts)} ADR decisions")
+        except Exception as e:
+            logger.error(f"Error extracting ADRs: {e}")
+
+        # Extract Guardrails (E12 F12.2)
+        try:
+            guardrail_concepts = extract_all_guardrails(self.project_root)
+            concepts.extend(guardrail_concepts)
+            logger.info(f"Extracted {len(guardrail_concepts)} guardrails")
+        except Exception as e:
+            logger.error(f"Error extracting guardrails: {e}")
+
+        # Extract Glossary terms (E12 F12.3)
+        try:
+            term_concepts = extract_all_terms(self.project_root)
+            concepts.extend(term_concepts)
+            logger.info(f"Extracted {len(term_concepts)} glossary terms")
+        except Exception as e:
+            logger.error(f"Error extracting glossary terms: {e}")
+
         return concepts
 
     def extract_with_result(self) -> ExtractionResult:
@@ -226,6 +253,41 @@ class GovernanceExtractor:
         )
         epic_count = len(list(self.project_root.glob("dev/epic-*-scope.md")))
         files_processed += backlog_count + epic_count
+
+        # Extract ADR decisions (E12)
+        try:
+            adr_concepts = extract_all_decisions(self.project_root)
+            concepts.extend(adr_concepts)
+            # Count ADR files processed
+            adr_root_count = len(list(self.project_root.glob("dev/decisions/adr-*.md")))
+            adr_v2_count = len(
+                list(self.project_root.glob("dev/decisions/v2/adr-*.md"))
+            )
+            files_processed += adr_root_count + adr_v2_count
+        except Exception as e:
+            errors.append(f"Error extracting ADRs: {e}")
+
+        # Extract Guardrails (E12 F12.2)
+        guardrails_file = (
+            self.project_root / "governance" / "solution" / "guardrails.md"
+        )
+        if guardrails_file.exists():
+            try:
+                guardrail_concepts = extract_all_guardrails(self.project_root)
+                concepts.extend(guardrail_concepts)
+                files_processed += 1
+            except Exception as e:
+                errors.append(f"Error extracting guardrails: {e}")
+
+        # Extract Glossary terms (E12 F12.3)
+        glossary_file = self.project_root / "framework" / "reference" / "glossary.md"
+        if glossary_file.exists():
+            try:
+                term_concepts = extract_all_terms(self.project_root)
+                concepts.extend(term_concepts)
+                files_processed += 1
+            except Exception as e:
+                errors.append(f"Error extracting glossary terms: {e}")
 
         return ExtractionResult(
             concepts=concepts,
@@ -318,6 +380,10 @@ class GovernanceExtractor:
             return ConceptType.PROJECT
         elif "epic" in file_name and "scope" in file_name:
             return ConceptType.EPIC
+        elif "guardrails" in file_name:
+            return ConceptType.GUARDRAIL
+        elif "glossary" in file_name:
+            return ConceptType.TERM
         else:
             raise ValueError(
                 f"Cannot infer concept type from file path: {file_path}. "

@@ -24,6 +24,9 @@ class ConceptType(str, Enum):
         PROJECT: Project from backlog (governance/projects/*/backlog.md).
         EPIC: Epic from backlog or epic scope documents.
         FEATURE: Feature from epic scope documents.
+        DECISION: Architecture decision records (ADR-XXX format).
+        GUARDRAIL: Code standards and quality rules.
+        TERM: Glossary definitions for canonical terminology.
     """
 
     REQUIREMENT = "requirement"
@@ -35,6 +38,10 @@ class ConceptType(str, Enum):
     PROJECT = "project"
     EPIC = "epic"
     FEATURE = "feature"
+    # Knowledge graph completion types (E12)
+    DECISION = "decision"
+    GUARDRAIL = "guardrail"
+    TERM = "term"
 
 
 class Concept(BaseModel):

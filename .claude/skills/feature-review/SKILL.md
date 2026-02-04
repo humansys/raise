@@ -12,10 +12,10 @@ metadata:
   raise.frequency: per-feature
   raise.fase: "7"
   raise.prerequisites: feature-implement
-  raise.next: ""
+  raise.next: feature-close
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
 
 hooks:
   PostToolUse:
@@ -70,15 +70,38 @@ raise telemetry emit feature {feature_id} --event start --phase review
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p review`
 
+### Step 0.1: Verify Prerequisites (Deterministic)
+
+Implementation must be complete:
+
+```bash
+uv run pytest --tb=no -q || {
+    echo "ERROR: Tests must pass before review"
+    exit 10  # GateFailedError
+}
+```
+
+**Decision:**
+- Tests pass → Continue with review
+- Tests fail → Fix tests first, then review
+
+**Verification:** All tests passing.
+
+> **If you can't continue:** Fix failing tests. Review requires green tests.
+
 ### Step 0.5: Query Context
 
 Load relevant process patterns and prior retrospectives from unified context:
 
 ```bash
-raise context query "retrospective process patterns" --unified --types pattern,session --limit 5
+raise context query "retrospective learnings velocity" --unified --types pattern,calibration --limit 5
 ```
 
-Review returned patterns before proceeding. Prior learnings inform retrospective focus.
+Review returned patterns and calibration data before proceeding. Prior learnings and velocity data inform retrospective focus.
+
+**What this returns:**
+- Process patterns from prior retrospectives
+- Calibration data (feature completion times for velocity comparison)
 
 **Verification:** Context loaded; relevant patterns noted.
 
@@ -128,6 +151,40 @@ If improvements identified:
 **Verification:** Improvements applied to framework.
 
 > **If you can't continue:** Complex improvement → Create issue for future.
+
+### Step 4.5: Persist Patterns to Memory
+
+For learnings worth preserving across sessions, add to memory via CLI:
+
+```bash
+raise memory add-pattern "Pattern description" \
+  -c "context,keywords" \
+  -t process \
+  --from {feature_id}
+```
+
+**Pattern types:**
+- `process` — How to work (workflow, collaboration)
+- `technical` — Code techniques, gotchas, APIs
+- `architecture` — Design decisions, module patterns
+- `codebase` — Project-specific conventions
+
+**Examples:**
+```bash
+# Process pattern
+raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
+
+# Technical pattern
+raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
+```
+
+**Decision:**
+- Pattern is project-agnostic or reusable → Add to memory
+- Pattern is one-off or context-specific → Document in retrospective only
+
+**Verification:** Patterns persisted via CLI (or explicitly skipped).
+
+> **If you can't continue:** CLI not available → Add patterns manually to `.rai/memory/patterns.jsonl`.
 
 ### Step 5: Document Retrospective
 
@@ -179,6 +236,7 @@ raise telemetry emit feature {feature_id} --event complete --phase review
 ## Output
 
 - **Artifact:** `work/features/{feature}/retrospective.md`
+- **Memory:** `.rai/memory/patterns.jsonl` (patterns persisted via CLI)
 - **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement

@@ -313,7 +313,7 @@ class TestIntegrationWithRealBacklog:
         assert project.id == "project-raise-cli"
         assert project.type == ConceptType.PROJECT
         assert project.metadata["name"] == "raise-cli"
-        assert project.metadata["current_epic"] == "E8"
+        assert project.metadata["current_epic"] == "E7"
 
     def test_extract_epics_from_real_backlog(self) -> None:
         """Should extract all epics from real raise-cli backlog."""
@@ -324,18 +324,18 @@ class TestIntegrationWithRealBacklog:
 
         epics = extract_epics(backlog_path)
 
-        # Should have 9 epics (E1-E9)
-        assert len(epics) == 9
+        # Should have 12 epics (E1-E12)
+        assert len(epics) == 12
 
         # Verify specific epics
         epic_ids = {e.metadata["epic_id"] for e in epics}
         assert "E1" in epic_ids
         assert "E8" in epic_ids
-        assert "E9" in epic_ids
+        assert "E12" in epic_ids
 
         # Verify statuses
         e1 = next(e for e in epics if e.metadata["epic_id"] == "E1")
         assert e1.metadata["status"] == "complete"
 
         e8 = next(e for e in epics if e.metadata["epic_id"] == "E8")
-        assert e8.metadata["status"] == "draft"
+        assert e8.metadata["status"] == "complete"

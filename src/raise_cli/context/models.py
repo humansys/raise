@@ -21,9 +21,13 @@ NodeType = Literal[
     "principle",  # §N — constitution principles
     "requirement",  # RF-* — PRD requirements
     "outcome",  # OUT-* — vision outcomes
+    "project",  # PRJ-* — project definitions
     "epic",  # E* — epic scopes
     "feature",  # F*.* — feature work items
     "skill",  # /name — skill metadata
+    "decision",  # ADR-* — architecture decisions (E12)
+    "guardrail",  # GR-* — code standards (E12)
+    "term",  # TERM-* — glossary definitions (E12)
 ]
 
 # Edge types for relationships between concepts
