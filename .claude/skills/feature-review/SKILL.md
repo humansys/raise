@@ -15,7 +15,7 @@ metadata:
   raise.next: feature-close
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
 
 hooks:
   PostToolUse:
@@ -152,6 +152,40 @@ If improvements identified:
 
 > **If you can't continue:** Complex improvement → Create issue for future.
 
+### Step 4.5: Persist Patterns to Memory
+
+For learnings worth preserving across sessions, add to memory via CLI:
+
+```bash
+raise memory add-pattern "Pattern description" \
+  -c "context,keywords" \
+  -t process \
+  --from {feature_id}
+```
+
+**Pattern types:**
+- `process` — How to work (workflow, collaboration)
+- `technical` — Code techniques, gotchas, APIs
+- `architecture` — Design decisions, module patterns
+- `codebase` — Project-specific conventions
+
+**Examples:**
+```bash
+# Process pattern
+raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
+
+# Technical pattern
+raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
+```
+
+**Decision:**
+- Pattern is project-agnostic or reusable → Add to memory
+- Pattern is one-off or context-specific → Document in retrospective only
+
+**Verification:** Patterns persisted via CLI (or explicitly skipped).
+
+> **If you can't continue:** CLI not available → Add patterns manually to `.rai/memory/patterns.jsonl`.
+
 ### Step 5: Document Retrospective
 
 Create retrospective document:
@@ -202,6 +236,7 @@ raise telemetry emit feature {feature_id} --event complete --phase review
 ## Output
 
 - **Artifact:** `work/features/{feature}/retrospective.md`
+- **Memory:** `.rai/memory/patterns.jsonl` (patterns persisted via CLI)
 - **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement

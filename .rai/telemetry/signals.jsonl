@@ -489,3 +489,14 @@
 {"type":"skill_event","timestamp":"2026-02-04T06:00:59Z","skill":"feature-close","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T06:00:59Z","skill":"feature-start","event":"complete","duration_sec":null}
 {"type":"session_event","timestamp":"2026-02-04T06:01:49.932237Z","session_type":"feature","outcome":"success","duration_min":30,"features":["F12.5"]}
+{"type":"skill_event","timestamp":"2026-02-04T06:02:10Z","skill":"session-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:02:10Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:02:10Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:02:10Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:02:48Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T06:07:04.705428Z","work_type":"feature","work_id":"F12.6","event":"complete","phase":"implement","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:07:17Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-04T06:07:17Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-04T06:08:03.125139Z","work_type":"feature","work_id":"F12.6","event":"start","phase":"review","blocker":null}
+{"type":"calibration","timestamp":"2026-02-04T06:08:47.839576Z","feature_id":"F12.6","feature_size":"M","estimated_min":120,"actual_min":10,"velocity":12.0}
+{"type":"work_lifecycle","timestamp":"2026-02-04T06:08:51.523940Z","work_type":"feature","work_id":"F12.6","event":"complete","phase":"review","blocker":null}

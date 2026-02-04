@@ -2,7 +2,7 @@
 id: "ADR-020"
 title: "Knowledge Graph Completion - Extended Node Types and Bidirectional Memory"
 date: "2026-02-03"
-status: "Proposed"
+status: "Accepted"
 related_to: ["ADR-019", "ADR-011", "ADR-016"]
 supersedes: []
 research: "Session analysis (2026-02-03)"
