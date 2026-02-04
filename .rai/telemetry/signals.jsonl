@@ -705,3 +705,4 @@
 {"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"feature-close","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"discover-scan","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-04T19:39:45Z","skill":"discover-start","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-04T19:43:41.811726Z","session_type":"feature","outcome":"success","duration_min":45,"features":["E13","F13.5"]}
