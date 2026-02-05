@@ -46,7 +46,7 @@ Close a session by preserving learnings and preparing handoff.
 
 **Query** (parallel):
 ```bash
-uv run raise context query "patterns" --unified --types pattern --limit 5
+uv run raise context unified "patterns" --types pattern --limit 5
 ```
 
 This helps avoid duplicate patterns. Query is fast (<3ms) — always run it.

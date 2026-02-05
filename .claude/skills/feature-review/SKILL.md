@@ -94,7 +94,7 @@ uv run pytest --tb=no -q || {
 Load relevant process patterns and prior retrospectives from unified context:
 
 ```bash
-uv run raise context query "retrospective learnings velocity" --unified --types pattern,calibration --limit 5
+uv run raise context unified "retrospective learnings velocity" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns and calibration data before proceeding. Prior learnings and velocity data inform retrospective focus.

@@ -58,7 +58,7 @@ Run these in parallel (all independent):
 uv run raise profile show
 
 # Unified graph context
-uv run raise context query "session epic patterns" --unified --limit 10
+uv run raise context unified "session epic patterns" --limit 10
 
 # Human context (deadlines, notes)
 # Read: CLAUDE.local.md
