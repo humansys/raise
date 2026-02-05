@@ -6,62 +6,57 @@
 
 ---
 
+## Resolution Status
+
+| Phase | Status | Commit | Items Fixed |
+|-------|--------|--------|-------------|
+| Phase 1 | ✅ DONE | `f8d93f9` | H1, H2 — cli_error() helper, 36 patterns consolidated |
+| Phase 2 | ✅ DONE | `9516722` | M3, M8 — extract_keywords(), should_exclude_dir() to core/ |
+| Phase 3 | DEFERRED | — | Post-F&F refactoring (fat commands, long functions) |
+
+**Remaining violations:** 65 (4 fixed) — mostly Low priority tech debt
+
+---
+
 ## Executive Summary
 
 | Module | Violations | High | Medium | Low |
 |--------|------------|------|--------|-----|
-| cli/ | 23 | 2 | 9 | 12 |
+| cli/ | 23 → 21 | ~~2~~ 0 | 9 | 12 |
 | core/ | 4 | 0 | 0 | 4 |
-| governance/ | 7 | 0 | 4 | 3 |
+| governance/ | 7 → 6 | 0 | ~~4~~ 3 | 3 |
 | context/ | 2 | 0 | 1 | 1 |
 | memory/ | 4 | 0 | 2 | 2 |
-| onboarding/ | 21 | 0 | 3 | 18 |
+| onboarding/ | 21 → 20 | 0 | ~~3~~ 2 | 18 |
 | telemetry/ | 2 | 0 | 1 | 1 |
 | discovery/ | 6 | 0 | 4 | 2 |
-| **TOTAL** | **69** | **2** | **24** | **43** |
+| **TOTAL** | **69 → 65** | ~~**2**~~ **0** | **22** | **43** |
 
-**Quality Assessment:** The codebase is fundamentally sound. No critical security vulnerabilities. The 2 High-severity issues are architectural (exit codes, error handling DRY) not functional bugs.
+**Quality Assessment:** The codebase is fundamentally sound. No critical security vulnerabilities. All High-severity issues resolved.
 
 ---
 
 ## High Priority Fixes (Block F&F if not addressed)
 
-### H1. [CLI 2.3] Generic Exit Code 1 Everywhere (36 occurrences)
+### ✅ H1. [CLI 2.3] Generic Exit Code 1 Everywhere (36 occurrences) — RESOLVED
 
 **Problem:** All CLI commands use `typer.Exit(1)` regardless of error type. The exception hierarchy with distinct exit codes exists (`exceptions.py`) but is not used.
 
-**Impact:** Scripts and CI/CD pipelines cannot distinguish error types.
+**Resolution:** Created `cli_error()` helper in `cli/error_handler.py` with proper exit codes:
+- Exit 4: ArtifactNotFoundError (file/graph not found)
+- Exit 7: ValidationError (invalid input)
 
-**Files affected:**
-- `cli/commands/context.py`: 4 occurrences (lines 253, 272, 322, 344)
-- `cli/commands/graph.py`: 2 occurrences (lines 61, 309)
-- `cli/commands/discover.py`: 2 occurrences (lines 108, 261)
-- `cli/commands/memory.py`: 10 occurrences
-- `cli/commands/telemetry.py`: 8 occurrences
-- `cli/commands/profile.py`: multiple
-
-**Introduced:** Various commits across E2, E9, E11, E13
-
-**Fix:** Create centralized `cli_error()` helper that maps to exception hierarchy exit codes.
-
-```python
-# cli/error_handler.py
-def cli_error(message: str, error_type: type[RaiseError] = RaiseError, hint: str | None = None) -> NoReturn:
-    console.print(f"[red]Error:[/red] {message}")
-    if hint:
-        console.print(f"[dim]Hint: {hint}[/dim]")
-    raise typer.Exit(error_type.exit_code)
-```
+**Commit:** `f8d93f9` (2026-02-05)
 
 ---
 
-### H2. [CLI 5.1] DRY - Error Pattern Duplicated 30+ Times
+### ✅ H2. [CLI 5.1] DRY - Error Pattern Duplicated 30+ Times — RESOLVED
 
 **Problem:** Pattern `console.print(f"[red]Error:[/red] ...") + raise typer.Exit(1)` repeated across all command files.
 
-**Files affected:** memory.py (10), telemetry.py (8), context.py (4), graph.py (2), discover.py (6+)
+**Resolution:** All 36 occurrences now use `cli_error()` helper.
 
-**Fix:** Same as H1 - extract to shared helper.
+**Commit:** `f8d93f9` (2026-02-05)
 
 ---
 
@@ -93,15 +88,15 @@ def cli_error(message: str, error_type: type[RaiseError] = RaiseError, hint: str
 
 ---
 
-### M3. [Governance 5.1] Duplicated `extract_keywords` Function
+### ✅ M3. [Governance 5.1] Duplicated `extract_keywords` Function — RESOLVED
 
 **Files:**
 - `governance/graph/relationships.py:228-276`
 - `governance/query/strategies.py:63-100`
 
-**Introduced:** 007cd664 (2026-02-01, F2.2/F2.3)
+**Resolution:** Extracted to `core/text.py` with unified `STOPWORDS` constant.
 
-**Fix:** Extract to `core/text.py` alongside existing `sanitize_id()`.
+**Commit:** `9516722` (2026-02-05)
 
 ---
 
@@ -155,15 +150,15 @@ Recent code (2026-02-05), not deprecated.
 
 ---
 
-### M8. [Onboarding 5.1] Duplicated _should_exclude_dir
+### ✅ M8. [Onboarding 5.1] Duplicated _should_exclude_dir — RESOLVED
 
 **Files:**
 - `onboarding/detection.py:122-136`
 - `onboarding/conventions.py:223-228`
 
-**Introduced:** 48d12e3f, 8a26989e (2026-02-05, F7.1/F7.2)
+**Resolution:** Extracted to `core/files.py` with `should_exclude_dir()` and `EXCLUDED_DIRS` constant.
 
-**Fix:** Extract to `core/files.py`.
+**Commit:** `9516722` (2026-02-05)
 
 ---
 
@@ -309,16 +304,13 @@ Most memory/ violations are in deprecated code (`MemoryGraph`, `MemoryQuery`). N
 
 ## Recommended Fix Order
 
-### Phase 1: F&F Blocking (Do Now)
-1. **H1 + H2:** Create `cli_error()` helper (1-2 hours)
-   - Single location for error pattern
-   - Maps to exception hierarchy exit codes
-   - Update all 36 occurrences
+### ✅ Phase 1: F&F Blocking — COMPLETE
+1. **H1 + H2:** ✅ Created `cli_error()` helper — `f8d93f9`
 
-### Phase 2: F&F Polish (If Time)
-2. **M11:** Fix type ignore in telemetry (15 min)
-3. **M3, M8:** Extract duplicated functions to core/ (30 min each)
-4. **M6:** Extract stopwords constant (15 min)
+### ✅ Phase 2: F&F Polish — COMPLETE
+2. **M3, M8:** ✅ Extracted duplicated functions to core/ — `9516722`
+3. **M11:** Fix type ignore in telemetry (15 min) — deferred
+4. **M6:** Extract stopwords constant (15 min) — deferred
 
 ### Phase 3: Post-F&F Refactoring
 5. Fat commands (M1) - 2-3 hours
