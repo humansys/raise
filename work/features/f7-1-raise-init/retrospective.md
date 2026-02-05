@@ -50,7 +50,8 @@
 
 ## Improvements Applied
 
-None directly — learnings documented for future reference.
+1. **SHOULD-DEV-002** added to guardrails — Run tests after ruff --fix
+2. **SHOULD-CLI-001** added to guardrails — Explicit path parameters for testability
 
 ## Patterns to Persist
 
@@ -59,8 +60,8 @@ None directly — learnings documented for future reference.
 
 ## Action Items
 
-- [ ] Consider adding "run tests after ruff fix" to pre-commit workflow
-- [ ] Document CLI testing pattern in guardrails (future)
+- [x] ~~Consider adding "run tests after ruff fix" to pre-commit workflow~~ → Added SHOULD-DEV-002
+- [x] ~~Document CLI testing pattern in guardrails~~ → Added SHOULD-CLI-001
 
 ---
 

@@ -75,6 +75,13 @@ Derived from Solution Vision:
 | `MUST-DEV-001` | MUST | Pre-commit hooks configured | `.pre-commit-config.yaml` exists and runs | Best practices |
 | `MUST-DEV-002` | MUST | pyproject.toml for config | All tool config in `pyproject.toml` | Best practices |
 | `SHOULD-DEV-001` | SHOULD | uv for dependency management | `uv.lock` exists | Solution Vision §Stack |
+| `SHOULD-DEV-002` | SHOULD | Run tests after ruff --fix | Tests pass after auto-fix | F7.1 retro |
+
+### CLI Development
+
+| ID | Level | Guardrail | Verificación | Derivado de |
+|----|-------|-----------|--------------|-------------|
+| `SHOULD-CLI-001` | SHOULD | Explicit path parameters for testability | CLI commands use `--path` option, not `cwd()` | F7.1 retro |
 
 ### Inference Economy
 
@@ -416,6 +423,80 @@ on_failure:
 
 ---
 
+### SHOULD-DEV-002: Run Tests After Ruff --fix
+
+**Regla:** Always run tests after using `ruff check --fix` to verify auto-fixes didn't break code.
+
+**Contexto (Golden Context para Agentes):**
+```
+When using Ruff auto-fix:
+- `ruff check --fix` can remove "unused" imports
+- Those imports might be used in tests or dynamically
+- Always verify: ruff check --fix . && pytest
+- If tests fail after fix, investigate the removed imports
+```
+
+**Verificación:**
+```yaml
+check: process
+criteria: Tests pass after ruff auto-fix
+blocking: false
+on_failure:
+  message: "Auto-fix may have broken tests."
+  recovery: "Restore removed imports if tests fail."
+```
+
+**Evidence:** F7.1 feature - `ruff --fix` removed `get_rai_home` import, breaking 8 tests that patched it.
+
+---
+
+### SHOULD-CLI-001: Explicit Path Parameters for Testability
+
+**Regla:** CLI commands should use explicit `--path` parameters instead of relying on `cwd()`.
+
+**Contexto (Golden Context para Agentes):**
+```
+When designing CLI commands with directory operations:
+- Add `--path PATH` option defaulting to current directory
+- Avoid mocking `Path.cwd()` in tests
+- Tests can pass explicit paths without complex patching
+- Also simplifies scripting: `raise init --path /some/dir`
+```
+
+**Verificación:**
+```yaml
+check: design_review
+criteria: CLI commands with directory operations have --path option
+blocking: false
+on_failure:
+  message: "Consider adding --path option for testability."
+  recovery: "Add `--path` parameter defaulting to `Path.cwd()`."
+```
+
+**Ejemplos:**
+
+✅ Correcto:
+```python
+@app.command()
+def init(
+    path: Annotated[Path | None, typer.Option("--path", "-p")] = None,
+) -> None:
+    project_path = path if path is not None else Path.cwd()
+    # ... use project_path
+```
+
+❌ Incorrecto:
+```python
+@app.command()
+def init() -> None:
+    project_path = Path.cwd()  # Hard to test without mocking
+    # ...
+```
+
+**Evidence:** F7.1 feature - using `--path` simplified test mocking from 3 patch points to 1.
+
+---
+
 ## Proceso de Excepción
 
 To request an exception to any guardrail:
@@ -476,6 +557,7 @@ repos:
 | 2026-01-31 | 1.1.0 | Added Inference Economy principle and guardrails (SHOULD-INF-*) |
 | 2026-01-31 | 1.2.0 | Added `cast()` pattern for pyright strict mode (F1.5 retro) |
 | 2026-01-31 | 1.3.0 | Added Python naming best practices (SHOULD-CODE-002, F2.3 retro) |
+| 2026-02-05 | 1.4.0 | Added SHOULD-DEV-002 (tests after ruff fix) and SHOULD-CLI-001 (path params), F7.1 retro |
 
 ---
 
