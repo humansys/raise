@@ -35,7 +35,7 @@ Close a session by preserving learnings and preparing handoff.
 
 **Skip if:** Trivial session with no learnings.
 
-## Steps (5)
+## Steps (6)
 
 ### Step 1: Reflect & Query (Parallel)
 
@@ -92,7 +92,15 @@ Check conversation for ideas mentioned but not pursued.
 
 **Don't skip this step** — tangents exist only in conversation context.
 
-### Step 5: Handoff
+### Step 5: Clear Session State
+
+```bash
+raise profile session-end
+```
+
+This clears `current_session` in `~/.rai/developer.yaml`, marking the session as properly closed. Without this step, the next `/session-start` will warn about an unclosed session.
+
+### Step 6: Handoff
 
 Output brief suggestion:
 
@@ -120,6 +128,7 @@ Experience level affects **communication style**, not **operations**.
 Patterns: PAT-097, PAT-098, PAT-099 added
 Session: SES-049 recorded
 Context: CLAUDE.local.md updated
+State: Cleared
 Tangents: None
 Next: E14 design phase
 ```
@@ -131,6 +140,7 @@ Next: E14 design phase
 | `.rai/memory/patterns.jsonl` | New patterns (CLI) |
 | `.rai/memory/sessions/index.jsonl` | Session record (CLI) |
 | `.rai/telemetry/signals.jsonl` | Session event (CLI) |
+| `~/.rai/developer.yaml` | Session state cleared (CLI) |
 | `CLAUDE.local.md` | Single Write |
 | `dev/parking-lot.md` | Tangents (if any) |
 
