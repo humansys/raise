@@ -54,18 +54,18 @@ WELCOME_BACK_RI = "[dim]Welcome back, {name}.[/dim]"
 
 PROJECT_DETECTED_SHU = """
 [bold]Project detected:[/bold] {project_type} ({file_count} code files)
-[bold]Created:[/bold] .raise/manifest.yaml
-{profile_status}
+{files_section}
 
-[bold cyan]Next steps:[/bold cyan]
+[bold cyan]What's next?[/bold cyan]
 
-  [bold]In Claude Code[/bold] (AI coding assistant):
-    Type [bold cyan]/session-start[/bold cyan] to begin our first session
+  [bold]1. Start a session[/bold] (in Claude Code / AI editor):
+     Type [bold cyan]/session-start[/bold cyan]
+     [dim]→ Loads your context, remembers patterns, proposes focused work[/dim]
 
-  [bold]In terminal[/bold] (CLI commands):
-    [dim]raise --help[/dim]      — see available commands
-    [dim]raise context[/dim]     — query project context
-    [dim]raise memory[/dim]      — query Rai's memory
+  [bold]2. Explore the CLI[/bold] (in terminal):
+     [dim]raise --help[/dim]      — see all commands
+     [dim]raise context[/dim]     — query project context
+     [dim]raise memory[/dim]      — query Rai's memory
 
 [dim]Don't have Claude Code? https://claude.ai/download[/dim]
 """
@@ -97,15 +97,25 @@ def _get_project_message(
 ) -> str:
     """Get project detection message based on experience level."""
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
-        profile_status = (
-            "[bold]Created:[/bold] ~/.rai/developer.yaml (first time setup)"
-            if created_profile
-            else "[bold]Loaded:[/bold] ~/.rai/developer.yaml"
-        )
+        # Build files section with descriptions
+        lines = [
+            "[bold]Created:[/bold] .raise/manifest.yaml  [dim]— project metadata[/dim]"
+        ]
+        if created_profile:
+            lines.append(
+                "[bold]Created:[/bold] ~/.rai/developer.yaml  "
+                "[dim]— your preferences (first time)[/dim]"
+            )
+        else:
+            lines.append(
+                "[bold]Loaded:[/bold]  ~/.rai/developer.yaml  [dim]— your preferences[/dim]"
+            )
+        files_section = "\n".join(lines)
+
         return PROJECT_DETECTED_SHU.format(
             project_type=project_type.capitalize(),
             file_count=file_count,
-            profile_status=profile_status,
+            files_section=files_section,
         )
     else:
         return PROJECT_DETECTED_RI.format(
