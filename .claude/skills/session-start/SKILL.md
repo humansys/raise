@@ -25,27 +25,38 @@ hooks:
 
 # Session Start
 
-Load context, analyze progress, propose focused work.
+## Purpose
 
-## When to Use
+Load context, analyze progress, propose focused work. Creates continuity across sessions by loading memory and adapting to experience level.
 
+## Mastery Levels (ShuHaRi)
+
+**Shu (守)**: Detailed explanations, teach concepts. All steps executed.
+
+**Ha (破)**: Balanced output, explain new concepts only. All steps executed.
+
+**Ri (離)**: Minimal output, essentials only. All steps executed.
+
+Experience level affects **communication style**, not **operations**. All levels load the same data.
+
+## Context
+
+**When to use:**
 - Beginning of working session
 - After break or context switch
 - Resuming interrupted work
 
-**Skip if:** Immediate continuation in same conversation.
+**When to skip:**
+- Immediate continuation in same conversation
 
-## Shu/Ha/Ri Adaptation
+**Inputs required:**
+- Developer profile (`~/.rai/developer.yaml`)
+- Unified graph (`.raise/graph/unified.json`)
+- Human context (`CLAUDE.local.md`)
 
-Experience level affects **communication style**, not **operations**.
-
-| Level | Output Style | Operations |
-|-------|--------------|------------|
-| Shu | Detailed explanations, teach concepts | All steps |
-| Ha | Balanced, explain new concepts only | All steps |
-| Ri | Minimal, essentials only | All steps |
-
-**All levels load the same data.** Only output verbosity differs.
+**Output:**
+- Session summary (displayed)
+- Session count update (`~/.rai/developer.yaml`)
 
 ## Steps (4)
 
