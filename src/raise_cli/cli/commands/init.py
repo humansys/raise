@@ -72,7 +72,7 @@ PROJECT_DETECTED_SHU = """
 
 PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
-[dim]Claude Code:[/dim] /session-start    [dim]Terminal:[/dim] raise --help
+[dim]Editor:[/dim] /session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
 """
 
 
