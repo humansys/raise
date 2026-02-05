@@ -178,17 +178,13 @@ Updated 10 skills to use new command names.
 
 ---
 
-### 13. Skill Section Names Inconsistent
+### 13. Skill Section Names Inconsistent ✅ RESOLVED
 
-| Pattern | Skills Using |
-|---------|--------------|
-| "## Purpose" | 17 skills |
-| "## When to Use" | session-start, session-close |
-| "## Integration with Memory Model" | epic-design, epic-plan |
-| "## Relationship to Other Skills" | Some skills |
-| (No integration section) | feature-design, feature-plan |
+**Resolution:** Standardized session-start and session-close to match the majority pattern (commit c4d91ec):
+- "When to Use" → "Purpose" + "Context"
+- "Shu/Ha/Ri Adaptation" → "Mastery Levels (ShuHaRi)"
 
-**Fix:** Enforce standard template with consistent sections.
+All 19 skills now follow: Purpose → Mastery Levels → Context → Steps → Output.
 
 ---
 
@@ -232,7 +228,7 @@ Updated 10 skills to use new command names.
 | #9 Graph base class | 2h | Medium | Pending |
 | #11 Convention schema | - | - | ✅ Not an issue (models are distinct) |
 | #12 XDG path helpers | - | - | ✅ Already extracted |
-| #13 Skill section names | 1h | Low | Pending |
+| #13 Skill section names | 1h | Low | ✅ Done |
 | #14 Output format names | - | - | ✅ Done |
 | #15 Metadata dict fields | - | - | ✅ Not an issue (legitimately used) |
 
