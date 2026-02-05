@@ -1,7 +1,8 @@
 # Epic E7: Onboarding & Reliability Setup - Scope
 
-> **Status:** IN PROGRESS
-> **Branch:** `feature/e7/onboarding`
+> **Status:** COMPLETE
+> **Completed:** 2026-02-05 (3 days ahead of F&F target)
+> **Branch:** `epic/e7/onboarding` (merged to v2)
 > **Created:** 2026-02-02 (original)
 > **Design complete:** 2026-02-04
 > **Target:** Feb 9, 2026 (Friends & Family pre-launch)

@@ -48,7 +48,7 @@ echo ""
 
 # Get last session
 if [ -f "$MEMORY_DIR/sessions/index.jsonl" ]; then
-    LAST_SESSION=$(tail -1 "$MEMORY_DIR/sessions/index.jsonl" 2>/dev/null | jq -r '.topic // "Unknown"' 2>/dev/null || echo "Unknown")
+    LAST_SESSION=$(tail -1 "$MEMORY_DIR/sessions/index.jsonl" 2>/dev/null | jq -r '.summary // "Unknown"' 2>/dev/null || echo "Unknown")
     LAST_DATE=$(tail -1 "$MEMORY_DIR/sessions/index.jsonl" 2>/dev/null | jq -r '.date // "Unknown"' 2>/dev/null || echo "Unknown")
     echo "**Last session:** $LAST_SESSION ($LAST_DATE)"
 fi
@@ -58,7 +58,7 @@ if [ -f "$PROJECT_DIR/CLAUDE.local.md" ]; then
     # Extract Epic line (contains "| Epic |")
     EPIC=$(grep "| Epic |" "$PROJECT_DIR/CLAUDE.local.md" 2>/dev/null | sed 's/.*| Epic | \(.*\) |/\1/' | sed 's/\*//g' | head -c 60 || echo "Unknown")
     # Extract Next Work line
-    NEXT=$(grep "| Next Work |" "$PROJECT_DIR/CLAUDE.local.md" 2>/dev/null | sed 's/.*| Next Work | \(.*\) |/\1/' | head -c 60 || echo "Unknown")
+    NEXT=$(grep "| Next |" "$PROJECT_DIR/CLAUDE.local.md" 2>/dev/null | sed 's/.*| Next | \(.*\) |/\1/' | head -c 60 || echo "")
     echo "**Current focus:** $EPIC"
     echo "**Next work:** $NEXT"
 fi
