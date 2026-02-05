@@ -1,12 +1,12 @@
 # ISSUE-005: DX Audit Findings — Pre-F&F Quality Review
 
-> **Status:** Partially Resolved
+> **Status:** RESOLVED
 > **Priority:** HIGH (F&F quality gate)
 > **Created:** 2026-02-05
 > **Updated:** 2026-02-05
 > **Scope:** Skills, CLI, Schemas, New User Experience, Code Quality
 >
-> **Resolved:** #1 (init output), #2 (context command split), #4 (MemoryGraph removed), #6 (post-init guidance)
+> **Resolved:** #1, #2, #4, #5, #6, #8, #10 — All F&F and Feb 15 items complete
 
 ---
 
@@ -95,18 +95,13 @@ Epic-plan includes 50+ lines of "Sequencing Strategies Deep Dive" — reference 
 
 ---
 
-### 5. Governance vs Context Query Duplication
+### 5. Governance vs Context Query Duplication ✅ RESOLVED
 
 **Severity:** HIGH
 **Impact:** Maintenance, API confusion
+**Resolution:** Deleted governance/query module as dead code (commit 5f26b24). The unified query in context/query.py is the only query system now. Removed 2,689 lines and 112 tests.
 
-**Problem:** Two query systems:
-- `governance/query/models.py` → ContextQuery, ContextResult
-- `context/query.py` → UnifiedQuery, UnifiedQueryResult
-
-Both define similar Query + Metadata + Result patterns with 85% overlap.
-
-**Fix:** Consolidate to single query interface before public launch.
+**Problem:** Two query systems with 85% overlap — governance/query operated on the old ConceptGraph while context/query operates on UnifiedGraph. Since ADR-019 unified everything, governance/query was dead code.
 
 ---
 
@@ -139,15 +134,9 @@ Both define similar Query + Metadata + Result patterns with 85% overlap.
 
 ---
 
-### 8. ID Sanitization Duplicated
+### 8. ID Sanitization Duplicated ✅ RESOLVED
 
-**Files:**
-- `governance/parsers/vision.py:14-40` (_sanitize_id)
-- `governance/parsers/constitution.py:14-40` (_sanitize_principle_id)
-
-Identical 26-line functions.
-
-**Fix:** Extract to `core/text.py` shared utility.
+**Resolution:** Already extracted to `core/text.py` as `sanitize_id()`. Both parsers import from there. Issue was stale when written.
 
 ---
 
@@ -164,19 +153,14 @@ Identical 26-line functions.
 
 ---
 
-### 10. Inconsistent Command Naming
+### 10. Inconsistent Command Naming ✅ RESOLVED
 
-| Command | Issue |
-|---------|-------|
-| `raise profile session` | Starts session, but no `session-start` |
-| `raise profile session-end` | Inconsistent with `session` |
-| `raise telemetry emit` | Bare, while others are `emit-session`, `emit-calibration` |
-| `raise memory dump` | "dump" sounds raw; should be `list` or `export` |
+**Resolution:** Standardized command naming (commit 6cb2eb8):
+- `raise profile session` → `raise profile session-start` (matches session-end)
+- `raise telemetry emit` → `raise telemetry emit-work` (matches emit-session, emit-calibration)
+- `raise memory dump` was already `raise memory list` (stale info)
 
-**Fix:** Standardize naming:
-- `raise profile session-start` / `session-end`
-- `raise telemetry emit-work` (not bare `emit`)
-- `raise memory list` (not `dump`)
+Updated 10 skills to use new command names.
 
 ---
 
@@ -249,14 +233,14 @@ Three nearly identical functions for config/cache/data directories.
 | #6 Post-init guidance | 2h | High | ✅ Done |
 | #4 Deprecation cleanup (decision) | 1h | High | ✅ Done (was already removed) |
 
-### Before Public Launch (Feb 15) — Should Fix
+### Before Public Launch (Feb 15) — Should Fix ✅ ALL RESOLVED
 
 | Issue | Effort | Impact | Status |
 |-------|--------|--------|--------|
 | #2 Split context query command | 3h | Critical | ✅ Done |
-| #5 Consolidate query schemas | 2h | High | Pending |
-| #10 Command naming consistency | 2h | Medium | Pending |
-| #8 ID sanitization extraction | 30m | Low | Pending |
+| #5 Consolidate query schemas | 2h | High | ✅ Done (dead code removed) |
+| #10 Command naming consistency | 2h | Medium | ✅ Done |
+| #8 ID sanitization extraction | 30m | Low | ✅ Done (was already extracted) |
 
 ### Post-Launch — Nice to Have
 
