@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.1.0"
 
 hooks:
   Stop:
@@ -260,6 +260,7 @@ Look for patterns indicating process issues:
 | **Memory staleness** | memory.md not updated recently | Update during session |
 | **Deadline pressure** | <3 days to milestone | Focus on critical path |
 | **Velocity drop** | Slower than historical average | Investigate cause |
+| **Stale branches** | `git branch` shows >5 branches | Run `/epic-close` cleanup or delete merged branches |
 
 **Verification:** Signals identified or explicitly none.
 

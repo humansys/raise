@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
 
 hooks:
   Stop:
@@ -207,19 +207,25 @@ Mark the feature complete in the epic scope:
 
 > **If you can't continue:** Standalone feature → Skip epic update.
 
-### Step 6: Delete Feature Branch (Local)
+### Step 6: Delete Feature Branch (REQUIRED)
 
-Clean up the local feature branch:
+Clean up the feature branch after merge:
 
 ```bash
-git branch -d {feature_branch}
+# Delete local branch (use -D since merge is verified)
+git branch -D {feature_branch}
+
+# Delete remote branch if it exists
+git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch to delete"
 ```
 
-**Note:** Use `-d` (not `-D`) to verify the branch is fully merged.
+**Why `-D` not `-d`:** After Step 4's merge, the branch content is in the parent. Using `-d` fails if there's a remote tracking branch, leading to branch accumulation. Since we've verified the merge, `-D` is safe.
 
-**Verification:** Feature branch deleted locally.
+**Why delete remote:** Prevents branch accumulation. The merge commit preserves history; the branch is no longer needed.
 
-> **If you can't continue:** Branch not fully merged → Check merge was successful.
+**Verification:** Feature branch deleted (local and remote).
+
+> **If you can't continue:** Branch deletion fails → Check you're not on the feature branch (should be on parent after Step 4).
 
 ### Step 7: Emit Feature Complete (Telemetry)
 
@@ -301,14 +307,14 @@ Feature lifecycle complete.
 /feature-close (fase 8) ← YOU ARE HERE
 ```
 
-### Why No Remote Branch Deletion
+### Branch Hygiene Philosophy
 
-Remote branch cleanup is left to:
-1. Merge request/PR automation
-2. Periodic housekeeping
-3. CI/CD policies
+**Clean as you go.** Branches are deleted immediately after merge because:
+1. The merge commit preserves all history
+2. Accumulated branches create confusion and technical debt
+3. "I'll clean later" leads to 20+ stale branches (learned 2026-02-05)
 
-Local cleanup is immediate; remote cleanup follows project policies.
+If your workflow requires preserving remote branches (PR automation, audit trails), adjust Step 6 to skip remote deletion.
 
 ### Quick Close (Minimal)
 
