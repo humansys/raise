@@ -800,3 +800,12 @@
 {"type":"skill_event","timestamp":"2026-02-05T00:10:26Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T00:10:26Z","skill":"feature-implement","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T00:10:26Z","skill":"feature-review","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"epic-plan","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"feature-review","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"feature-plan","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"epic-design","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"feature-implement","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T00:17:49Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-05T00:19:08.025375Z","session_type":"feature","outcome":"success","duration_min":45,"features":["F7.8"]}
