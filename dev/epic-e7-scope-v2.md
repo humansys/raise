@@ -192,11 +192,11 @@ What are we working on?"
 |----|---------|:----:|:--:|:------:|-------------|
 | F7.1 | **`raise init` Command** | M | 3 | Pending | Core initialization with project detection |
 | F7.2 | **Convention Detection** | M | 3 | Pending | Auto-detect code style, naming, structure |
-| F7.3 | **Governance Generation** | S | 2 | Pending | Generate guardrails.md from conventions |
-| F7.4 | **Enhanced CLAUDE.md** | S | 2 | Pending | Context-rich with architecture, components |
+| F7.3 | **Governance Generation** | S | 2 | ✅ Done | Generate guardrails.md from conventions |
+| F7.4 | **Enhanced CLAUDE.md** | S | 2 | ✅ Done | Context-rich with architecture, components |
 | F7.5 | **`raise status` Command** | XS | 1 | Pending | Project health check |
 | F7.6 | **Skills Bundling** | XS | 1 | ✅ Done | Skills in package, copy on init |
-| F7.7 | **Guided First Session** | M | 3 | Pending | Educational onboarding in /session-start |
+| F7.7 | **Guided First Session** | M | 3 | ✅ Done | Educational onboarding in /session-start |
 | F7.8 | **Personal Memory** | S | 2 | ✅ Done | ~/.rai/developer.yaml + adaptive interaction |
 | F7.9 | **Emilio Migration** | XS | 1 | ✅ Done | Bootstrap Emilio's personal profile from history |
 
@@ -397,18 +397,18 @@ Rai: "This is complex. /feature-design first?"
 ### MUST
 
 - [x] Skills bundled in package (F7.6 ✅)
-- [ ] `raise init` with greenfield/brownfield detection (F7.1)
-- [ ] Convention detection for Python projects (F7.2)
-- [ ] Generate guardrails.md from detected conventions (F7.3)
-- [ ] Enhanced CLAUDE.md with architecture context (F7.4)
+- [x] `raise init` with greenfield/brownfield detection (F7.1 ✅)
+- [x] Convention detection for Python projects (F7.2 ✅)
+- [x] Generate guardrails.md from detected conventions (F7.3 ✅)
+- [x] Enhanced CLAUDE.md with architecture context (F7.4 ✅)
 - [ ] `raise status` health check (F7.5)
-- [ ] Personal memory: `~/.rai/developer.yaml` (F7.8)
-- [ ] Adaptive interaction based on experience_level (F7.7)
-- [ ] Emilio profile migration (F7.9)
+- [x] Personal memory: `~/.rai/developer.yaml` (F7.8 ✅)
+- [x] Adaptive interaction based on experience_level (F7.7 ✅)
+- [x] Emilio profile migration (F7.9 ✅)
 
 ### SHOULD
 
-- [ ] Guided first-session education for Shu users (F7.7)
+- [x] Guided first-session education for Shu users (F7.7 ✅)
 - [ ] Skill mastery tracking
 - [ ] Universal pattern promotion ("remember this everywhere?")
 - [ ] `--quick` flag to skip discovery
@@ -513,16 +513,16 @@ Day 5:                                        └► Retro, polish (M4: Complete
 | F7.9 Emilio Migration | XS | 1 | ✅ Done | 15 min | 2.0x | Extended model |
 | F7.1 `raise init` | M | 3 | ✅ Done | 40 min | 2.25x | M1 complete |
 | F7.2 Convention Detection | M | 3 | ✅ Done | 40 min | 3.75x | Risk mitigated |
-| F7.3 Governance Generation | S | 2 | Pending | — | — | |
-| F7.4 Enhanced CLAUDE.md | S | 2 | Pending | — | — | |
-| F7.7 Guided First Session | M | 3 | Pending | — | — | |
+| F7.3 Governance Generation | S | 2 | ✅ Done | 20 min | 4.0x | |
+| F7.4 Enhanced CLAUDE.md | S | 2 | ✅ Done | 16 min | 5.0x | |
+| F7.7 Guided First Session | M | 3 | ✅ Done | 26 min | 3.3x | Parallel subagents |
 | F7.5 `raise status` | XS | 1 | Pending | — | — | |
 
 **Milestone Progress:**
 - [x] M1: Walking Skeleton (Day 1 - Feb 4) ✅ Complete (F7.8, F7.9, F7.1)
-- [ ] M2: Brownfield MVP (Day 3 - Feb 6)
-- [ ] M3: Adaptive Experience (Day 4 - Feb 7)
-- [ ] M4: Epic Complete (Day 5 - Feb 8)
+- [x] M2: Brownfield MVP (Day 2 - Feb 5) ✅ Complete (F7.2, F7.3, F7.4)
+- [x] M3: Adaptive Experience (Day 2 - Feb 5) ✅ Complete (F7.7) — ahead of schedule
+- [ ] M4: Epic Complete (F7.5 remaining)
 
 **Buffer:** 1 day before F&F (Feb 9)
 
