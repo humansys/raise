@@ -13,7 +13,7 @@ import fcntl
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
     from raise_cli.telemetry.schemas import (
@@ -24,6 +24,9 @@ if TYPE_CHECKING:
         SkillEvent,
         WorkLifecycle,
     )
+
+# Type alias for skill event types (matches SkillEvent.event)
+SkillEventType = Literal["start", "complete", "abandon"]
 
 # Default telemetry directory relative to project root
 DEFAULT_TELEMETRY_DIR = ".rai/telemetry"
@@ -135,7 +138,7 @@ def emit(
 
 def emit_skill_event(
     skill: str,
-    event: str,
+    event: SkillEventType,
     duration_sec: int | None = None,
     *,
     base_path: Path | None = None,
@@ -156,7 +159,7 @@ def emit_skill_event(
     signal = SkillEvent(
         timestamp=datetime.now(UTC),
         skill=skill,
-        event=event,  # type: ignore[arg-type]
+        event=event,
         duration_sec=duration_sec,
     )
     return emit(signal, base_path=base_path)

@@ -251,6 +251,73 @@ def query_related_concepts(
     return [concept for concept, _score, _ in scored_concepts[:limit]]
 
 
+def _query_current_work(graph: ConceptGraph) -> list[Concept]:
+    """Get current work focus (project + epic + features)."""
+    concepts: list[Concept] = []
+    for edge in graph.edges:
+        if edge.type == "current_focus":
+            project = graph.get_node(edge.source)
+            epic = graph.get_node(edge.target)
+            if project:
+                concepts.append(project)
+            if epic:
+                concepts.append(epic)
+                for feature_edge in graph.get_outgoing_edges(epic.id, edge_type="contains"):
+                    feature = graph.get_node(feature_edge.target)
+                    if feature:
+                        concepts.append(feature)
+            break
+    return concepts
+
+
+def _query_epic_with_features(graph: ConceptGraph, epic_id: str) -> list[Concept]:
+    """Get epic and all its features."""
+    concepts: list[Concept] = []
+    epic = graph.get_node(epic_id)
+    if epic:
+        concepts.append(epic)
+        for edge in graph.get_outgoing_edges(epic_id, edge_type="contains"):
+            feature = graph.get_node(edge.target)
+            if feature:
+                concepts.append(feature)
+    return concepts
+
+
+def _query_feature_with_parent(graph: ConceptGraph, feature_id: str) -> list[Concept]:
+    """Get feature and its parent epic."""
+    from raise_cli.governance.models import ConceptType
+
+    concepts: list[Concept] = []
+    feature = graph.get_node(feature_id)
+    if feature:
+        concepts.append(feature)
+        for edge in graph.edges:
+            if edge.type == "contains" and edge.target == feature_id:
+                epic = graph.get_node(edge.source)
+                if epic and epic.type == ConceptType.EPIC:
+                    concepts.insert(0, epic)
+                    break
+    return concepts
+
+
+def _query_all_projects(graph: ConceptGraph) -> list[Concept]:
+    """Get all project concepts."""
+    from raise_cli.governance.models import ConceptType
+
+    return [c for c in graph.nodes.values() if c.type == ConceptType.PROJECT]
+
+
+def _deduplicate_concepts(concepts: list[Concept], limit: int = 10) -> list[Concept]:
+    """Deduplicate concepts by ID, keeping first occurrence."""
+    seen_ids: set[str] = set()
+    unique: list[Concept] = []
+    for c in concepts:
+        if c.id not in seen_ids:
+            seen_ids.add(c.id)
+            unique.append(c)
+    return unique[:limit]
+
+
 def query_work_context(
     graph: ConceptGraph,
     query: str,
@@ -278,89 +345,35 @@ def query_work_context(
     from raise_cli.governance.models import ConceptType
 
     query_lower = query.lower().strip()
-    concepts: list[Concept] = []
 
     # "current work" / "current epic" / "what am I working on"
     if any(kw in query_lower for kw in ["current work", "current epic", "working on"]):
-        # Find project with current_focus
-        for edge in graph.edges:
-            if edge.type == "current_focus":
-                project = graph.get_node(edge.source)
-                epic = graph.get_node(edge.target)
-                if project:
-                    concepts.append(project)
-                if epic:
-                    concepts.append(epic)
-                    # Add features of current epic
-                    for feature_edge in graph.get_outgoing_edges(
-                        epic.id, edge_type="contains"
-                    ):
-                        feature = graph.get_node(feature_edge.target)
-                        if feature:
-                            concepts.append(feature)
-                break
-        return concepts
+        return _query_current_work(graph)
 
     # "E8 features" pattern
     epic_features_match = re.match(r"^(E\d+)\s+features?$", query, re.IGNORECASE)
     if epic_features_match:
         epic_id = normalize_concept_id(epic_features_match.group(1))
-        epic = graph.get_node(epic_id)
-        if epic:
-            concepts.append(epic)
-            # Get all features
-            for edge in graph.get_outgoing_edges(epic_id, edge_type="contains"):
-                feature = graph.get_node(edge.target)
-                if feature:
-                    concepts.append(feature)
-        return concepts
+        return _query_epic_with_features(graph, epic_id)
 
     # Direct epic/feature lookup (E8, F8.1)
     concept_id = normalize_concept_id(query)
     if concept_id.startswith("epic-"):
-        epic = graph.get_node(concept_id)
-        if epic:
-            concepts.append(epic)
-            # Add features
-            for edge in graph.get_outgoing_edges(concept_id, edge_type="contains"):
-                feature = graph.get_node(edge.target)
-                if feature:
-                    concepts.append(feature)
-        return concepts
+        return _query_epic_with_features(graph, concept_id)
 
     if concept_id.startswith("feature-"):
-        feature = graph.get_node(concept_id)
-        if feature:
-            concepts.append(feature)
-            # Add parent epic
-            for edge in graph.edges:
-                if edge.type == "contains" and edge.target == concept_id:
-                    epic = graph.get_node(edge.source)
-                    if epic and epic.type == ConceptType.EPIC:
-                        concepts.insert(0, epic)
-                        break
-        return concepts
+        return _query_feature_with_parent(graph, concept_id)
 
     # Project lookup
     if concept_id.startswith("project-") or "project" in query_lower:
-        for concept in graph.nodes.values():
-            if concept.type == ConceptType.PROJECT:
-                concepts.append(concept)
-        return concepts
+        return _query_all_projects(graph)
 
     # Fallback: keyword search in work concepts
+    concepts: list[Concept] = []
     for concept in graph.nodes.values():
         if concept.type in (ConceptType.PROJECT, ConceptType.EPIC, ConceptType.FEATURE):
             text = (concept.section + " " + concept.content[:300]).lower()
             if any(kw in text for kw in extract_keywords(query)):
                 concepts.append(concept)
 
-    # Deduplicate by ID (keep first occurrence)
-    seen_ids: set[str] = set()
-    unique_concepts: list[Concept] = []
-    for c in concepts:
-        if c.id not in seen_ids:
-            seen_ids.add(c.id)
-            unique_concepts.append(c)
-
-    return unique_concepts[:10]  # Limit results
+    return _deduplicate_concepts(concepts)

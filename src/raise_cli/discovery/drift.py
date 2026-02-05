@@ -18,7 +18,7 @@ Example:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -52,14 +52,41 @@ class DriftWarning(BaseModel):
     suggestion: str = Field(default="", description="Suggested fix")
 
 
-def _extract_directory_patterns(baseline: list[dict[str, Any]]) -> dict[str, set[str]]:
+class BaselineComponentMetadata(BaseModel):
+    """Metadata for a baseline component."""
+
+    name: str = Field(default="", description="Symbol name")
+    kind: str = Field(default="unknown", description="Symbol kind (class, function, etc.)")
+
+
+class BaselineComponent(BaseModel):
+    """A component from the validated baseline.
+
+    Represents a component from work/discovery/components-validated.json
+    used for drift detection.
+
+    Attributes:
+        source_file: Path to the source file.
+        content: Content/docstring of the component.
+        metadata: Component metadata (name, kind).
+    """
+
+    source_file: str = Field(default="", description="Path to source file")
+    content: str = Field(default="", description="Component content/docstring")
+    metadata: BaselineComponentMetadata = Field(
+        default_factory=BaselineComponentMetadata,
+        description="Component metadata",
+    )
+
+
+def _extract_directory_patterns(baseline: list[BaselineComponent]) -> dict[str, set[str]]:
     """Extract directory patterns from baseline by category/kind.
 
     Groups baseline components by their kind and extracts the directories
     they're typically found in.
 
     Args:
-        baseline: List of validated component dictionaries.
+        baseline: List of validated baseline components.
 
     Returns:
         Dict mapping kind (class, function, etc.) to set of valid directories.
@@ -67,13 +94,9 @@ def _extract_directory_patterns(baseline: list[dict[str, Any]]) -> dict[str, set
     patterns: dict[str, set[str]] = {}
 
     for comp in baseline:
-        source_file = comp.get("source_file", "")
-        metadata = comp.get("metadata", {})
-        kind = metadata.get("kind", "unknown")
-
-        if source_file:
-            # Extract directory from source file
-            directory = str(Path(source_file).parent)
+        if comp.source_file:
+            kind = comp.metadata.kind
+            directory = str(Path(comp.source_file).parent)
             if kind not in patterns:
                 patterns[kind] = set()
             patterns[kind].add(directory)
@@ -81,13 +104,13 @@ def _extract_directory_patterns(baseline: list[dict[str, Any]]) -> dict[str, set
     return patterns
 
 
-def _extract_naming_patterns(baseline: list[dict[str, Any]]) -> dict[str, dict[str, int]]:
+def _extract_naming_patterns(baseline: list[BaselineComponent]) -> dict[str, dict[str, int]]:
     """Extract naming patterns from baseline by kind.
 
     Looks for common prefixes/suffixes in symbol names and counts occurrences.
 
     Args:
-        baseline: List of validated component dictionaries.
+        baseline: List of validated baseline components.
 
     Returns:
         Dict mapping kind to dict of prefix -> count.
@@ -95,9 +118,8 @@ def _extract_naming_patterns(baseline: list[dict[str, Any]]) -> dict[str, dict[s
     patterns: dict[str, dict[str, int]] = {}
 
     for comp in baseline:
-        metadata = comp.get("metadata", {})
-        kind = metadata.get("kind", "unknown")
-        name = metadata.get("name", "")
+        kind = comp.metadata.kind
+        name = comp.metadata.name
 
         if not name:
             continue
@@ -113,11 +135,11 @@ def _extract_naming_patterns(baseline: list[dict[str, Any]]) -> dict[str, dict[s
     return patterns
 
 
-def _check_baseline_has_docstrings(baseline: list[dict[str, Any]]) -> bool:
+def _check_baseline_has_docstrings(baseline: list[BaselineComponent]) -> bool:
     """Check if baseline components typically have docstrings.
 
     Args:
-        baseline: List of validated component dictionaries.
+        baseline: List of validated baseline components.
 
     Returns:
         True if majority of baseline components have content (docstrings).
@@ -125,7 +147,7 @@ def _check_baseline_has_docstrings(baseline: list[dict[str, Any]]) -> bool:
     if not baseline:
         return False
 
-    with_content = sum(1 for c in baseline if c.get("content"))
+    with_content = sum(1 for c in baseline if c.content)
     return with_content / len(baseline) > 0.5
 
 
@@ -269,7 +291,7 @@ def _check_docstring_drift(
 
 
 def detect_drift(
-    baseline: list[dict[str, Any]],
+    baseline: list[BaselineComponent],
     scanned: list[Symbol],
 ) -> list[DriftWarning]:
     """Detect architectural drift between baseline and new code.
@@ -278,7 +300,7 @@ def detect_drift(
     to identify potential drift issues.
 
     Args:
-        baseline: List of validated component dictionaries from
+        baseline: List of validated baseline components from
             work/discovery/components-validated.json.
         scanned: List of Symbol objects from scanning new/modified files.
 
@@ -286,7 +308,7 @@ def detect_drift(
         List of DriftWarning objects describing detected issues.
 
     Examples:
-        >>> baseline = [{"metadata": {"name": "Foo", "kind": "class"}, ...}]
+        >>> baseline = [BaselineComponent(metadata=BaselineComponentMetadata(name="Foo", kind="class"))]
         >>> scanned = [Symbol(name="bar", kind="class", ...)]
         >>> warnings = detect_drift(baseline, scanned)
         >>> len(warnings) > 0

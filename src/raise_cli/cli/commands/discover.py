@@ -393,7 +393,7 @@ def drift_command(
         # Output as JSON
         raise discover drift --output json
     """
-    from raise_cli.discovery.drift import DriftWarning, detect_drift
+    from raise_cli.discovery.drift import BaselineComponent, DriftWarning, detect_drift
 
     root = project_root.resolve()
     scan_path = path.resolve() if path else root / "src"
@@ -423,7 +423,10 @@ def drift_command(
         baseline_data: dict[str, Any] = json.loads(
             baseline_file.read_text(encoding="utf-8")
         )
-        baseline: list[dict[str, Any]] = baseline_data.get("components", [])
+        baseline_dicts: list[dict[str, Any]] = baseline_data.get("components", [])
+        baseline: list[BaselineComponent] = [
+            BaselineComponent.model_validate(comp) for comp in baseline_dicts
+        ]
     except (json.JSONDecodeError, KeyError) as e:
         cli_error(f"Error reading baseline: {e}")
 
