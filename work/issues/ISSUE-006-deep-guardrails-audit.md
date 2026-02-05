@@ -14,7 +14,7 @@
 | Phase 2 | ✅ DONE | `9516722` | M3, M8 — extract_keywords(), should_exclude_dir() to core/ |
 | Phase 3 | ✅ DONE | (pending) | M4, M5, M6, M7, M9, M10, M11, M12, M13 — All medium items resolved |
 
-**Remaining violations:** 43 (26 fixed) — Only Low priority tech debt remains
+**Remaining violations:** 41 (28 fixed) — Only Low priority tech debt remains (L1-L3, L5)
 
 ---
 
@@ -242,17 +242,20 @@ Commands without format support:
 
 `governance/models.py:89-101` uses `model_post_init` instead of `@field_validator(mode='after')`.
 
-### L4. [Memory] Deprecated Code
+### ✅ L4. [Memory] Deprecated Code — RESOLVED
 
-Most memory/ violations are in deprecated code (`MemoryGraph`, `MemoryQuery`). Not worth fixing.
+**Resolution:** Removed deprecated classes entirely:
+- Deleted: `memory/builder.py`, `memory/cache.py`, `memory/query.py`
+- Deleted: `tests/memory/test_builder.py`, `test_cache.py`, `test_query.py`
+- Updated: `memory/__init__.py` to only export active code
 
 ### L5. [Onboarding] Multiple 50-75 Line Functions
 
 10 functions slightly exceed 50-line guideline. Marginal violations.
 
-### L6. [Telemetry 5.1] Signal Union Redeclared
+### ✅ L6. [Telemetry 5.1] Signal Union Redeclared — RESOLVED
 
-`writer.py:72-79` redeclares Signal union instead of importing from `schemas.py`.
+**Resolution:** Import `Signal` from `schemas.py` instead of redeclaring inline in `writer.py`.
 
 ---
 
@@ -339,7 +342,7 @@ Most memory/ violations are in deprecated code (`MemoryGraph`, `MemoryQuery`). N
 - **Total violations found:** 69
 - **High severity:** 2 → 0 (all resolved)
 - **Medium severity:** 24 → 0 (all resolved in Phase 1-3)
-- **Low severity:** 43 (deferred, post-F&F)
+- **Low severity:** 41 (4 deferred to post-F&F: L1-L3, L5)
 - **Security vulnerabilities:** 0
 - **Review methodology:** Parallel agent review with git blame traceability
 
