@@ -63,3 +63,4 @@ coverage.xml
 dmypy.json
 .pyright/
 .rai/memory/graph.json
+.envrc

@@ -2,15 +2,76 @@
 
 Thank you for your interest in contributing to RaiSE Commons.
 
-## This is a Conceptual Repository
+## What This Repository Contains
 
-RaiSE Commons is a **methodology and documentation repository**, not a code repository. Contributions focus on:
+RaiSE Commons includes both **methodology** and **tooling**:
 
-- Terminology refinements
-- Methodology improvements
-- Kata enhancements
-- Template updates
-- Documentation clarifications
+- **Framework** — Methodology, katas, templates, governance artifacts
+- **raise-cli** — CLI tool for governance operations (`src/raise_cli/`)
+
+Contributions can focus on either area.
+
+## Development Setup
+
+### Prerequisites
+
+- Python 3.12+
+- [uv](https://docs.astral.sh/uv/) (fast Python package manager)
+- Git
+
+### Quick Start
+
+```bash
+# Clone and enter the repository
+git clone https://gitlab.com/humansys/raise-commons.git
+cd raise-commons
+
+# Install dependencies
+uv sync
+
+# Run CLI via uv
+uv run raise --version
+```
+
+### Recommended: direnv for Seamless CLI Access
+
+To use `raise` directly (without `uv run` prefix):
+
+```bash
+# Install direnv (Ubuntu/Debian)
+sudo apt install direnv
+
+# Add hook to your shell (~/.bashrc or ~/.zshrc)
+echo 'eval "$(direnv hook bash)"' >> ~/.bashrc  # or ~/.zshrc for zsh
+
+# Restart your shell or source the config
+source ~/.bashrc
+
+# In the project directory, create and allow .envrc
+echo 'source .venv/bin/activate' > .envrc
+direnv allow
+
+# Now 'raise' works directly
+raise --version
+```
+
+direnv auto-activates the virtual environment when you enter the project directory.
+
+### Running Tests
+
+```bash
+uv run pytest                          # All tests
+uv run pytest --cov=src                # With coverage
+uv run pytest tests/cli/               # Specific directory
+```
+
+### Code Quality
+
+```bash
+uv run ruff check .                    # Linting
+uv run ruff format .                   # Formatting
+uv run pyright --strict src/           # Type checking
+```
 
 ## How to Provide Feedback
 
@@ -39,31 +100,30 @@ For methodology improvements or new content:
 
 1. **Open an Issue** describing the change
 2. **Fork** the repository
-3. **Create a feature branch** from `main`
+3. **Create a feature branch** from `v2` (development branch)
 4. **Make your changes** following the style guidelines
-5. **Submit a Merge Request** referencing the issue
+5. **Run tests and quality checks** (see Development Setup)
+6. **Submit a Merge Request** referencing the issue
 
 ## Style Guidelines
 
 ### Terminology
 
-Use canonical v2.1 terminology from the [Glossary](docs/core/glossary.md):
+Use canonical terminology from the [Glossary](framework/reference/glossary.md):
 
 | Use | Don't Use |
 |-----|-----------|
 | Validation Gate | DoD, Definition of Done |
 | Guardrail | Rule, constraint |
-| Orquestador | Developer, user |
+| RaiSE Engineer | Developer, user |
 | Kata | Tutorial, lesson |
 
 ### Writing Style
 
-Follow the [Brand Voice Guide](docs/BRAND-VOICE.md):
-
-- **Empowering, not prescriptive** - Provide frameworks, let users decide
-- **Precise and unambiguous** - Every term has a specific meaning
-- **Concise and direct** - Cover 80% of cases, avoid over-documentation
-- **Action-oriented** - Focus on what users can do
+- **Empowering, not prescriptive** — Provide frameworks, let users decide
+- **Precise and unambiguous** — Every term has a specific meaning
+- **Concise and direct** — Cover 80% of cases, avoid over-documentation
+- **Action-oriented** — Focus on what users can do
 
 ### Language
 
