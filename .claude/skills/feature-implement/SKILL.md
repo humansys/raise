@@ -94,7 +94,7 @@ fi
 Load relevant codebase patterns from unified context:
 
 ```bash
-uv run raise context unified "testing coverage type annotations security" --types pattern,guardrail --limit 5
+uv run raise context query "testing coverage type annotations security" --types pattern,guardrail --limit 5
 ```
 
 Review returned patterns and guardrails before proceeding. Key patterns inform implementation approach; guardrails ensure code standards compliance.

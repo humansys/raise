@@ -57,11 +57,12 @@ Don't have Claude Code? Visit: https://claude.ai/claude-code
 
 **Severity:** CRITICAL
 **Impact:** Usability, discoverability
-**Resolution:** Split into two distinct commands (commit 70de211):
-- `raise context query` — governance graph (--strategy, --edge-types, --type)
-- `raise context unified` — unified graph (--types, --limit)
+**Resolution:** Simplified to ONE command querying ONE graph:
+- `raise context query` — queries unified graph (all context in one place)
+- Removed governance-only query (unified includes everything)
+- Options: `--types`, `--limit`, `--strategy`, `--format`, `--output`
 
-Updated 10 skills, docstrings, and formatter examples to use new syntax.
+One graph, one command. Updated 10 skills and all references.
 
 ---
 
