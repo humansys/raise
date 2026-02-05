@@ -6,7 +6,7 @@
 > **Updated:** 2026-02-05
 > **Scope:** Skills, CLI, Schemas, New User Experience, Code Quality
 >
-> **Resolved:** #1 (init output), #4 (MemoryGraph removed), #6 (post-init guidance)
+> **Resolved:** #1 (init output), #2 (context command split), #4 (MemoryGraph removed), #6 (post-init guidance)
 
 ---
 
@@ -53,25 +53,15 @@ Don't have Claude Code? Visit: https://claude.ai/claude-code
 
 ---
 
-### 2. `raise context query` Is Two Commands
+### 2. `raise context query` Is Two Commands ✅ RESOLVED
 
 **Severity:** CRITICAL
 **Impact:** Usability, discoverability
+**Resolution:** Split into two distinct commands (commit 70de211):
+- `raise context query` — governance graph (--strategy, --edge-types, --type)
+- `raise context unified` — unified graph (--types, --limit)
 
-**Problem:** One command with 9 options that behaves completely differently based on `--unified` flag:
-
-| Without --unified | With --unified |
-|-------------------|----------------|
-| Queries governance graph | Queries unified graph |
-| Uses `--strategy` | Ignores `--strategy` |
-| Uses `--edge-types` | Uses `--types` |
-| Different output format | Different output format |
-
-**Evidence:** `src/raise_cli/cli/commands/context.py` — options conditional on flag
-
-**Fix:** Split into two commands:
-- `raise context query` → governance only (simpler)
-- `raise context unified` → unified graph (advanced)
+Updated 10 skills, docstrings, and formatter examples to use new syntax.
 
 ---
 
@@ -260,12 +250,12 @@ Three nearly identical functions for config/cache/data directories.
 
 ### Before Public Launch (Feb 15) — Should Fix
 
-| Issue | Effort | Impact |
-|-------|--------|--------|
-| #2 Split context query command | 3h | Critical |
-| #5 Consolidate query schemas | 2h | High |
-| #10 Command naming consistency | 2h | Medium |
-| #8 ID sanitization extraction | 30m | Low |
+| Issue | Effort | Impact | Status |
+|-------|--------|--------|--------|
+| #2 Split context query command | 3h | Critical | ✅ Done |
+| #5 Consolidate query schemas | 2h | High | Pending |
+| #10 Command naming consistency | 2h | Medium | Pending |
+| #8 ID sanitization extraction | 30m | Low | Pending |
 
 ### Post-Launch — Nice to Have
 
