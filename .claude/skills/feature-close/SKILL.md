@@ -50,15 +50,9 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 - Feature continuing in next session (not complete yet)
 
 **Inputs required:**
-- Completed retrospective (see Path Convention below)
+- Completed retrospective: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
 - Passing tests
 - Feature branch ready for merge
-
-**Path Convention (ISSUE-004):**
-| Epic | Feature Artifacts Location |
-|------|---------------------------|
-| E14+ (new) | `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/` |
-| E1-E13 (legacy) | `work/features/{feature-id}/` |
 
 **Output:**
 - Feature merged to parent branch
@@ -73,11 +67,9 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 Retrospective and tests are required before closing:
 
 ```bash
-# Check retrospective exists (E14+ tree or legacy)
-RETRO=$(ls work/epics/e*/features/{feature_id}/retrospective.md 2>/dev/null || \
-        ls work/features/{feature_id}/retrospective.md 2>/dev/null)
-if [ -z "$RETRO" ]; then
-    echo "ERROR: Retrospective not found for {feature_id}"
+RETRO="work/epics/e{N}-{name}/features/{feature_id}/retrospective.md"
+if [ ! -f "$RETRO" ]; then
+    echo "ERROR: Retrospective not found: $RETRO"
     echo "Run /feature-review first"
     exit 4  # ArtifactNotFoundError
 fi
@@ -100,9 +92,7 @@ uv run pytest --tb=no -q || {
 Confirm feature is complete:
 
 ```bash
-# Determine feature artifacts path (E14+ tree or legacy)
-FEATURE_DIR=$(ls -d work/epics/e*/features/{feature_id} 2>/dev/null || \
-              ls -d work/features/{feature_id} 2>/dev/null)
+FEATURE_DIR="work/epics/e{N}-{name}/features/{feature_id}"
 
 # Show feature artifacts
 ls -la "$FEATURE_DIR/"
@@ -191,7 +181,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 Mark the feature complete in the epic scope:
 
 ```bash
-# In epic scope (E14+: work/epics/.../scope.md or legacy: dev/epic-{epic_id}-scope.md), update feature status
+# In epic scope (work/epics/e{N}-{name}/scope.md), update feature status
 # Change: - [ ] F12.2 Guardrails Extractor
 # To:     - [x] F12.2 Guardrails Extractor ✓
 ```
@@ -291,7 +281,6 @@ Update `CLAUDE.local.md` to reflect completion:
 - `{FEATURE_DIR}/plan.md`
 - `{FEATURE_DIR}/retrospective.md`
 
-*Note: FEATURE_DIR is `work/epics/.../features/{feature_id}` for E14+ or `work/features/{feature_id}` for legacy*
 
 ### Epic Progress
 - **{epic_id}:** N/M features complete (X%)
@@ -350,6 +339,4 @@ If feature is abandoned (not completed):
 
 - Previous skill: `/feature-review`
 - Complement: `/feature-start`
-- Epic scope:
-  - E14+: `work/epics/e{N}-{name}/scope.md`
-  - E1-E13 (legacy): `dev/epic-{id}-scope.md`
+- Epic scope: `work/epics/e{N}-{name}/scope.md`

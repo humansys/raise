@@ -62,9 +62,7 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 - Epics already in progress (use for new epics only)
 
 **Inputs required:**
-- Epic scope document from `/epic-design`:
-  - E14+: `work/epics/e{N}-{name}/scope.md`
-  - E1-E13 (legacy): `dev/epic-e{N}-scope.md`
+- Epic scope document: `work/epics/e{N}-{name}/scope.md`
 - Feature list with sizes and dependencies
 - Calibration data (`.raise/rai/memory/calibration.jsonl` if available)
 - External constraints (deadlines, dependencies, resource availability)
@@ -518,9 +516,7 @@ uv run raise telemetry emit epic {epic_id} --event complete --phase plan
 
 ## Output
 
-- **Primary:** Updated epic scope document with implementation plan
-  - E14+: `work/epics/e{N}-{name}/scope.md`
-  - E1-E13 (legacy): `dev/epic-e{N}-scope.md`
+- **Primary:** `work/epics/e{N}-{name}/scope.md` — updated with implementation plan
 - **Sections added:** Feature sequence, milestones, parallel opportunities, progress tracking
 - **Next:** `/feature-design` for first feature in sequence
 
@@ -701,9 +697,7 @@ This skill supports the three-layer memory model:
 ## References
 
 - **Epic Design:** `/epic-design` (produces input for this skill)
-- **Epic Scope Examples:**
-  - E14+ (tree): `work/epics/e14-rai-distribution/scope.md`
-  - E1-E13 (legacy): `dev/epic-e1-scope.md`, `dev/epic-e2-scope.md`
+- **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
 - **Feature Planning:** `/feature-plan` (similar concept at feature level)
 - **Epic Close:** `/epic-close` (retrospective after completion)
 - **Calibration Data:** `.raise/rai/memory/calibration.jsonl` (velocity patterns)

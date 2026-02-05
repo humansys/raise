@@ -65,14 +65,8 @@ Create a lean feature specification that optimizes for both human understanding 
 - Clarity on problem and value proposition
 
 **Output:**
-- Feature specification (see Path Convention below)
+- Feature specification: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/design.md`
 - Uses lean template v2 (YAML + Markdown + Examples + Acceptance Criteria)
-
-**Path Convention (ISSUE-004):**
-| Epic | Feature Artifacts Location |
-|------|---------------------------|
-| E14+ (new) | `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/` |
-| E1-E13 (legacy) | `work/features/{feature-id}/` |
 
 ## Steps
 
@@ -91,10 +85,7 @@ uv run raise telemetry emit feature {feature_id} --event start --phase design
 Check epic context for complex features:
 
 ```bash
-# Check E14+ tree structure first, then legacy
-ls work/epics/e{N}-*/scope.md 2>/dev/null || \
-ls dev/epic-e{N}-scope.md 2>/dev/null || \
-echo "WARN: No epic context"
+ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic context"
 ```
 
 **Decision:**
@@ -283,9 +274,7 @@ uv run raise telemetry emit feature {feature_id} --event complete --phase design
 
 ## Output
 
-- **Artifact**: Feature design document
-  - E14+: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/design.md`
-  - E1-E13 (legacy): `work/features/{feature-id}/design.md`
+- **Artifact**: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/design.md`
 - **Telemetry**: `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-feature-v2.md`
 - **Next**: `/feature-plan`
