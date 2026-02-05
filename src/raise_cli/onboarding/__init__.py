@@ -1,10 +1,22 @@
 """Onboarding module for RaiSE CLI.
 
-Handles developer profile management and project initialization.
+Handles developer profile management, project initialization, and convention detection.
 """
 
 from __future__ import annotations
 
+from raise_cli.onboarding.conventions import (
+    Confidence,
+    ConventionResult,
+    IndentationConvention,
+    LineLengthConvention,
+    NamingConvention,
+    NamingConventions,
+    QuoteConvention,
+    StructureConventions,
+    StyleConventions,
+    detect_conventions,
+)
 from raise_cli.onboarding.detection import (
     CODE_EXTENSIONS,
     DetectionResult,
@@ -30,6 +42,17 @@ from raise_cli.onboarding.profile import (
 )
 
 __all__ = [
+    # Conventions
+    "Confidence",
+    "ConventionResult",
+    "IndentationConvention",
+    "LineLengthConvention",
+    "NamingConvention",
+    "NamingConventions",
+    "QuoteConvention",
+    "StructureConventions",
+    "StyleConventions",
+    "detect_conventions",
     # Detection
     "CODE_EXTENSIONS",
     "DetectionResult",
