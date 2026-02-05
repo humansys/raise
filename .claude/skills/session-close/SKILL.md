@@ -25,15 +25,38 @@ hooks:
 
 # Session Close
 
-Close a session by preserving learnings and preparing handoff.
+## Purpose
 
-## When to Use
+Close a session by preserving learnings and preparing handoff. Updates memory, captures tangents, and creates continuity for the next session.
 
+## Mastery Levels (ShuHaRi)
+
+**Shu (守)**: Explain each step and why. All steps executed.
+
+**Ha (破)**: Brief explanations. All steps executed.
+
+**Ri (離)**: Minimal output. All steps executed.
+
+Experience level affects **communication style**, not **operations**. All levels perform the same memory operations.
+
+## Context
+
+**When to use:**
 - End of working session
 - After completing feature or significant work
 - Before break or context switch
 
-**Skip if:** Trivial session with no learnings.
+**When to skip:**
+- Trivial session with no learnings
+
+**Inputs required:**
+- Conversation context (learnings, tangents)
+- Existing patterns (for deduplication)
+
+**Output:**
+- Memory updates (patterns, sessions, telemetry)
+- Context file update (`CLAUDE.local.md`)
+- Session state cleared
 
 ## Steps (6)
 
@@ -109,28 +132,6 @@ Output brief suggestion:
 **Continue:** [next step]
 **Alternative:** [if blocked]
 **Open:** [unresolved questions]
-```
-
-## Shu/Ha/Ri Adaptation
-
-Experience level affects **communication style**, not **operations**.
-
-| Level | Style | Operations |
-|-------|-------|------------|
-| Shu | Explain each step and why | All steps |
-| Ha | Brief explanations | All steps |
-| Ri | Minimal output | All steps |
-
-**All levels perform the same memory operations.** The difference is verbosity, not data quality.
-
-**Ri-level output example:**
-```
-Patterns: PAT-097, PAT-098, PAT-099 added
-Session: SES-049 recorded
-Context: CLAUDE.local.md updated
-State: Cleared
-Tangents: None
-Next: E14 design phase
 ```
 
 ## Output
