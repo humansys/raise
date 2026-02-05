@@ -38,6 +38,17 @@
 
 ### Framework Improvements
 
+- [ ] **Separation of Builder and Verifier (Lean Quality)** — (F7.2 discussion, 2026-02-05)
+  - **Problem:** Self-review checklists in skills (e.g., /feature-design Step 8) have builder verifying own work = muda
+  - **Lean principle:** TPS separates production from quality inspection. Jidoka catches defects, but verification is external.
+  - **Possible approaches:**
+    1. **Quality Gate Subagent** — Different Rai prompt focused on critical review, not building
+    2. **Poka-yoke in skills** — Design process so defects can't happen (structured templates, required fields)
+    3. **Human gate** — Explicit approval before phase transition (friction vs. quality tradeoff)
+    4. **Automated checks** — Deterministic validation where possible (schema validation, coverage gates)
+  - **Research needed:** How do lean masters handle creative/judgment work quality? Six Thinking Hats? Devil's Advocate pattern?
+  - **Potential skill:** `/quality-review` — invoke reviewer-Rai before proceeding to next phase
+
 - [ ] **Research output extraction** — Extract `work/research/*/` into unified graph (deferred from E12, complex format variance)
 - [ ] **Component catalog extraction** — Extract `dev/components.md` into graph (deferred from E12, nice-to-have)
 - [ ] **Session-aware context loading** — Skip redundant queries in same session (deferred from E12, optimization — re-querying is <1ms)
