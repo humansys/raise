@@ -1,6 +1,6 @@
 """Parser for epic scope documents.
 
-Extracts detailed Epic and Feature concepts from dev/epic-*-scope.md files.
+Extracts detailed Epic and Feature concepts from work/epics/*/scope.md files.
 """
 
 from __future__ import annotations
@@ -71,9 +71,9 @@ def extract_epic_details(
     objective, status, target date, and feature count.
 
     Args:
-        file_path: Path to epic scope document (dev/epic-*-scope.md).
+        file_path: Path to epic scope document (work/epics/*/scope.md).
         project_root: Project root for relative path calculation.
-            If None, uses file_path.parent.parent.
+            If None, uses file_path.parent.parent.parent.
 
     Returns:
         Epic Concept with full details if successfully parsed, None if file
@@ -81,7 +81,7 @@ def extract_epic_details(
 
     Examples:
         >>> from pathlib import Path
-        >>> scope_doc = Path("dev/epic-e8-scope.md")
+        >>> scope_doc = Path("work/epics/e08-backlog/scope.md")
         >>> epic = extract_epic_details(scope_doc)
         >>> epic.id
         'epic-e8'
@@ -92,19 +92,19 @@ def extract_epic_details(
         return None
 
     if project_root is None:
-        # dev/epic-*.md -> project root is 1 level up
-        project_root = file_path.parent.parent
+        # work/epics/e08-name/scope.md -> project root is 4 levels up
+        project_root = file_path.parent.parent.parent.parent
 
     text = file_path.read_text(encoding="utf-8")
     lines = text.split("\n")
 
-    # Extract epic ID from filename: epic-e8-scope.md -> E8
-    filename = file_path.stem  # epic-e8-scope
-    epic_id_match = re.search(r"epic-(e\d+)", filename, re.IGNORECASE)
+    # Extract epic ID from parent directory: e08-backlog -> E8
+    parent_dir = file_path.parent.name  # e08-backlog
+    epic_id_match = re.search(r"^e(\d+)", parent_dir, re.IGNORECASE)
     if not epic_id_match:
         return None
 
-    epic_id = epic_id_match.group(1).upper()  # E8
+    epic_id = f"E{int(epic_id_match.group(1))}"  # E8 (normalize: e08 -> E8)
 
     # Extract epic name from H1: # Epic E8: Work Tracking Graph - Scope
     epic_name = None
@@ -180,9 +180,9 @@ def extract_features(
     various table formats found in epic scope documents.
 
     Args:
-        file_path: Path to epic scope document (dev/epic-*-scope.md).
+        file_path: Path to epic scope document (work/epics/*/scope.md).
         project_root: Project root for relative path calculation.
-            If None, uses file_path.parent.parent.
+            If None, uses file_path.parent.parent.parent.parent.
 
     Returns:
         List of Feature Concepts extracted from the table. Returns empty list
@@ -190,7 +190,7 @@ def extract_features(
 
     Examples:
         >>> from pathlib import Path
-        >>> scope_doc = Path("dev/epic-e8-scope.md")
+        >>> scope_doc = Path("work/epics/e08-backlog/scope.md")
         >>> features = extract_features(scope_doc)
         >>> len(features)
         4
@@ -201,15 +201,15 @@ def extract_features(
         return []
 
     if project_root is None:
-        project_root = file_path.parent.parent
+        project_root = file_path.parent.parent.parent.parent
 
     text = file_path.read_text(encoding="utf-8")
     lines = text.split("\n")
 
-    # Extract epic ID from filename
-    filename = file_path.stem
-    epic_id_match = re.search(r"epic-(e\d+)", filename, re.IGNORECASE)
-    epic_id = epic_id_match.group(1).upper() if epic_id_match else "E0"
+    # Extract epic ID from parent directory: e08-backlog -> E8
+    parent_dir = file_path.parent.name
+    epic_id_match = re.search(r"^e(\d+)", parent_dir, re.IGNORECASE)
+    epic_id = f"E{int(epic_id_match.group(1))}" if epic_id_match else "E0"
 
     # Calculate relative file path
     try:
