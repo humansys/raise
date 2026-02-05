@@ -512,7 +512,7 @@ Day 5:                                        └► Retro, polish (M4: Complete
 | F7.8 Personal Memory | S | 2 | ✅ Done | 17 min | 2.94x | |
 | F7.9 Emilio Migration | XS | 1 | ✅ Done | 15 min | 2.0x | Extended model |
 | F7.1 `raise init` | M | 3 | ✅ Done | 40 min | 2.25x | M1 complete |
-| F7.2 Convention Detection | M | 3 | Pending | — | — | HIGH RISK |
+| F7.2 Convention Detection | M | 3 | ✅ Done | 40 min | 3.75x | Risk mitigated |
 | F7.3 Governance Generation | S | 2 | Pending | — | — | |
 | F7.4 Enhanced CLAUDE.md | S | 2 | Pending | — | — | |
 | F7.7 Guided First Session | M | 3 | Pending | — | — | |
