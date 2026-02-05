@@ -97,7 +97,7 @@ class GovernanceExtractor:
         - governance/solution/vision.md (outcomes)
         - framework/reference/constitution.md (principles)
         - governance/projects/*/backlog.md (epics)
-        - dev/epic-*-scope.md (features)
+        - work/epics/*/scope.md (features)
         - dev/decisions/adr-*.md (decisions)
         - governance/solution/guardrails.md (guardrails)
         - framework/reference/glossary.md (terms)
@@ -174,7 +174,7 @@ class GovernanceExtractor:
         backlog_count = len(
             list(self.project_root.glob("governance/projects/*/backlog.md"))
         )
-        epic_count = len(list(self.project_root.glob("dev/epic-*-scope.md")))
+        epic_count = len(list(self.project_root.glob("work/epics/*/scope.md")))
         files_processed += backlog_count + epic_count
 
         # Extract ADR decisions (E12)
@@ -224,7 +224,7 @@ class GovernanceExtractor:
 
         Extracts from:
         - governance/projects/*/backlog.md (Project + Epic index)
-        - dev/epic-*-scope.md (Epic details + Features)
+        - work/epics/*/scope.md (Epic details + Features)
 
         Returns:
             List of work tracking concepts.
@@ -250,7 +250,7 @@ class GovernanceExtractor:
                 logger.error(f"Error extracting from {backlog_file}: {e}")
 
         # Extract from epic scope documents
-        for scope_file in self.project_root.glob("dev/epic-*-scope.md"):
+        for scope_file in self.project_root.glob("work/epics/*/scope.md"):
             try:
                 # Extract detailed Epic concept
                 epic_detail = extract_epic_details(scope_file, self.project_root)
