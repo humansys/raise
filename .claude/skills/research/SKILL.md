@@ -90,7 +90,7 @@ Engineering-specific evidence hierarchy:
 If unified graph is available, query for prior research and methodology patterns:
 
 ```bash
-raise context query "research methodology evidence" --unified --types pattern,session --limit 5
+uv run raise context query "research methodology evidence" --unified --types pattern,session --limit 5
 ```
 
 Review returned patterns to avoid duplicating prior research.

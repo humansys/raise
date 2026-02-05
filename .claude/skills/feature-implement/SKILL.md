@@ -65,7 +65,7 @@ Execute the implementation plan task by task, verifying each step, and producing
 Record the start of the implement phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase implement
+uv run raise telemetry emit feature {feature_id} --event start --phase implement
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p implement`
@@ -94,7 +94,7 @@ fi
 Load relevant codebase patterns from unified context:
 
 ```bash
-raise context query "testing coverage type annotations security" --unified --types pattern,guardrail --limit 5
+uv run raise context query "testing coverage type annotations security" --unified --types pattern,guardrail --limit 5
 ```
 
 Review returned patterns and guardrails before proceeding. Key patterns inform implementation approach; guardrails ensure code standards compliance.
@@ -186,7 +186,7 @@ If all tasks completed → execute code gate.
 Record the completion of the implement phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase implement
+uv run raise telemetry emit feature {feature_id} --event complete --phase implement
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e complete -p implement`

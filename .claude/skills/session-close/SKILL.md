@@ -46,7 +46,7 @@ Close a session by preserving learnings and preparing handoff.
 
 **Query** (parallel):
 ```bash
-raise context query "patterns" --unified --types pattern --limit 5
+uv run raise context query "patterns" --unified --types pattern --limit 5
 ```
 
 This helps avoid duplicate patterns. Query is fast (<3ms) — always run it.
@@ -57,13 +57,13 @@ Run these in parallel (all independent):
 
 ```bash
 # Patterns (if any new ones)
-raise memory add-pattern "Description" -c "context,tags" -t process
+uv run raise memory add-pattern "Description" -c "context,tags" -t process
 
 # Session record (always)
-raise memory add-session "Topic" -o "outcome1,outcome2" -t {type}
+uv run raise memory add-session "Topic" -o "outcome1,outcome2" -t {type}
 
 # Telemetry (always)
-raise telemetry emit-session -t {type} -o {outcome} -d {minutes}
+uv run raise telemetry emit-session -t {type} -o {outcome} -d {minutes}
 ```
 
 **Types:** feature, research, maintenance, infrastructure, ideation
@@ -95,7 +95,7 @@ Check conversation for ideas mentioned but not pursued.
 ### Step 5: Clear Session State
 
 ```bash
-raise profile session-end
+uv run raise profile session-end
 ```
 
 This clears `current_session` in `~/.rai/developer.yaml`, marking the session as properly closed. Without this step, the next `/session-start` will warn about an unclosed session.
@@ -152,7 +152,7 @@ Next: E14 design phase
 
 **Calibration:** If features completed, also run:
 ```bash
-raise memory add-calibration {feature_id} "Name" {size} {estimated_mins} -e {actual_mins}
+uv run raise memory add-calibration {feature_id} "Name" {size} {estimated_mins} -e {actual_mins}
 ```
 
 ## References

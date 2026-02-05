@@ -81,7 +81,7 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 Record the start of the plan phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event start --phase plan
+uv run raise telemetry emit epic {epic_id} --event start --phase plan
 ```
 
 **Example:** `raise telemetry emit epic E9 -e start -p plan`
@@ -91,7 +91,7 @@ raise telemetry emit epic {epic_id} --event start --phase plan
 Load relevant sequencing patterns and calibration from unified context:
 
 ```bash
-raise context query "sequencing calibration planning" --unified --types pattern,calibration --limit 5
+uv run raise context query "sequencing calibration planning" --unified --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Calibration data informs realistic estimates.
@@ -507,7 +507,7 @@ Self-review checklist before starting implementation.
 Record the completion of the plan phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event complete --phase plan
+uv run raise telemetry emit epic {epic_id} --event complete --phase plan
 ```
 
 **Example:** `raise telemetry emit epic E9 -e complete -p plan`

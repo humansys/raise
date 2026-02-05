@@ -64,7 +64,7 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase plan
+uv run raise telemetry emit feature {feature_id} --event start --phase plan
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p plan`
@@ -93,7 +93,7 @@ ls work/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No design"
 Load relevant patterns and calibration from unified context:
 
 ```bash
-raise context query "planning estimation calibration" --unified --types pattern,calibration --limit 5
+uv run raise context query "planning estimation calibration" --unified --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Key patterns inform task structure and sizing.
@@ -218,7 +218,7 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase plan
+uv run raise telemetry emit feature {feature_id} --event complete --phase plan
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e complete -p plan`
