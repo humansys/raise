@@ -17,6 +17,7 @@ from typing import Annotated
 import typer
 import yaml
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.memory.writer import validate_session_index
 from raise_cli.onboarding.profile import (
     DeveloperProfile,
@@ -94,11 +95,10 @@ def session(
     if profile is None:
         # First-time user - need name to create profile
         if name is None:
-            typer.echo(
-                "No developer profile found. Provide --name for first-time setup:\n"
-                "  raise profile session --name 'Your Name'"
+            cli_error(
+                "No developer profile found",
+                hint="Provide --name for first-time setup: raise profile session --name 'Your Name'",
             )
-            raise typer.Exit(1)
 
         # Create new profile
         profile = DeveloperProfile(name=name)
@@ -157,8 +157,7 @@ def session_end() -> None:
     profile = load_developer_profile()
 
     if profile is None:
-        typer.echo("No developer profile found.")
-        raise typer.Exit(1)
+        cli_error("No developer profile found")
 
     if profile.current_session is None:
         typer.echo("No active session to end.")

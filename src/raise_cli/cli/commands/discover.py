@@ -21,6 +21,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.discovery.scanner import Language, scan_directory
 
 discover_app = typer.Typer(
@@ -101,11 +102,11 @@ def scan_command(
     lang: Language | None = None
     if language:
         if language not in ("python", "typescript", "javascript"):
-            console.print(
-                f"[red]Error: Unsupported language '{language}'. "
-                "Supported: python, typescript, javascript[/red]"
+            cli_error(
+                f"Unsupported language: {language}",
+                hint="Supported: python, typescript, javascript",
+                exit_code=7,
             )
-            raise typer.Exit(1)
         lang = language  # type: ignore[assignment]
 
     # Set default excludes if none provided
@@ -254,11 +255,11 @@ def build_command(
 
     # Check input file exists
     if not input_path.exists():
-        console.print(
-            f"[red]Error: Components file not found: {input_path}[/red]\n"
-            "[dim]Run /discover-complete to generate validated components.[/dim]"
+        cli_error(
+            f"Components file not found: {input_path}",
+            hint="Run /discover-complete to generate validated components",
+            exit_code=4,
         )
-        raise typer.Exit(1)
 
     # Load components to validate and count
     try:
@@ -266,15 +267,13 @@ def build_command(
         components: list[dict[str, Any]] = data.get("components", [])
         component_count = len(components)
     except (json.JSONDecodeError, KeyError) as e:
-        console.print(f"[red]Error: Invalid JSON in {input_path}: {e}[/red]")
-        raise typer.Exit(1) from None
+        cli_error(f"Invalid JSON in {input_path}: {e}")
 
     if component_count == 0:
-        console.print(
-            "[yellow]Warning: No components found in input file.[/yellow]\n"
-            "[dim]Run /discover-validate to validate components first.[/dim]"
+        cli_error(
+            "No components found in input file",
+            hint="Run /discover-validate to validate components first",
         )
-        raise typer.Exit(1)
 
     # Build unified graph (includes components automatically)
     from raise_cli.context.builder import UnifiedGraphBuilder
@@ -426,8 +425,7 @@ def drift_command(
         )
         baseline: list[dict[str, Any]] = baseline_data.get("components", [])
     except (json.JSONDecodeError, KeyError) as e:
-        console.print(f"[red]Error reading baseline: {e}[/red]")
-        raise typer.Exit(1) from None
+        cli_error(f"Error reading baseline: {e}")
 
     if not baseline:
         if output == "json":

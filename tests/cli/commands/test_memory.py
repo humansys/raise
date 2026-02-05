@@ -79,8 +79,9 @@ class TestMemoryQueryCommand:
             os.chdir(tmp_path)
             result = runner.invoke(app, ["memory", "query", "testing"])
 
-            assert result.exit_code == 1
-            assert "Unified graph not found" in result.stdout
+            assert result.exit_code == 4  # ArtifactNotFoundError
+            # cli_error outputs to stderr, check output (combined stdout+stderr)
+            assert "Unified graph not found" in result.output
         finally:
             os.chdir(original_cwd)
 
@@ -192,8 +193,9 @@ class TestMemoryListCommand:
             os.chdir(tmp_path)
             result = runner.invoke(app, ["memory", "list"])
 
-            assert result.exit_code == 1
-            assert "Unified graph not found" in result.stdout
+            assert result.exit_code == 4  # ArtifactNotFoundError
+            # cli_error outputs to stderr, check output (combined stdout+stderr)
+            assert "Unified graph not found" in result.output
         finally:
             os.chdir(original_cwd)
 

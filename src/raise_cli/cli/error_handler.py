@@ -109,7 +109,49 @@ def _handle_error_json(error: RaiseError) -> None:
     print(output, file=sys.stderr)
 
 
+def cli_error(
+    message: str,
+    *,
+    hint: str | None = None,
+    exit_code: int = 1,
+) -> None:
+    """Print error message and exit with code.
+
+    This is the standard pattern for CLI error handling. Use this instead of
+    manually printing errors and calling typer.Exit().
+
+    Exit codes (from exceptions.py):
+        1 - General error
+        2 - Configuration error
+        3 - Resource not found (kata, gate)
+        4 - Artifact not found
+        5 - Dependency unavailable
+        6 - State corruption
+        7 - Validation error
+        10 - Gate failed
+
+    Args:
+        message: Error message to display.
+        hint: Optional suggestion for resolution.
+        exit_code: Process exit code (default 1).
+
+    Raises:
+        typer.Exit: Always raises to exit the CLI.
+
+    Example:
+        >>> cli_error("File not found", hint="Check the path", exit_code=4)
+    """
+    import typer
+
+    console = get_error_console()
+    console.print(f"[red]Error:[/red] {message}")
+    if hint:
+        console.print(f"[dim]Hint: {hint}[/dim]")
+    raise typer.Exit(exit_code)
+
+
 __all__ = [
+    "cli_error",
     "handle_error",
     "get_error_console",
     "set_error_console",

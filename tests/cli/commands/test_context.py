@@ -62,8 +62,9 @@ class TestContextQueryCommand:
             os.chdir(tmp_path)
             result = runner.invoke(app, ["context", "query", "req-rf-05"])
 
-            assert result.exit_code == 1
-            assert "Graph file not found" in result.stdout or "Error" in result.stdout
+            assert result.exit_code == 4  # ArtifactNotFoundError
+            # cli_error outputs to stderr, check output (combined stdout+stderr)
+            assert "not found" in result.output.lower() or "error" in result.output.lower()
         finally:
             os.chdir(original_cwd)
 
@@ -155,8 +156,8 @@ class TestContextQueryCommand:
             app, ["context", "query", "test", "--strategy", "invalid"]
         )
 
-        # Should error before trying to load graph
-        assert result.exit_code == 1
+        # Should error before trying to load graph - ValidationError
+        assert result.exit_code == 7
 
     def test_query_with_edge_types(
         self, sample_graph: ConceptGraph, tmp_path: Path
@@ -260,8 +261,9 @@ class TestUnifiedContextQuery:
                 app, ["context", "query", "planning", "--unified"]
             )
 
-            assert result.exit_code == 1
-            assert "Graph file not found" in result.stdout or "Error" in result.stdout
+            assert result.exit_code == 4  # ArtifactNotFoundError
+            # cli_error outputs to stderr, check output (combined stdout+stderr)
+            assert "not found" in result.output.lower() or "error" in result.output.lower()
         finally:
             os.chdir(original_cwd)
 
@@ -412,8 +414,8 @@ class TestUnifiedContextQuery:
                 ],
             )
 
-            assert result.exit_code == 1
-            assert "Invalid strategy" in result.stdout
+            assert result.exit_code == 7  # ValidationError
+            assert "Invalid strategy" in result.output
         finally:
             os.chdir(original_cwd)
 

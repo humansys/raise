@@ -107,8 +107,9 @@ class TestGraphExtractCommand:
         """Should error gracefully for missing file."""
         result = runner.invoke(app, ["graph", "extract", "/nonexistent/file.md"])
 
-        assert result.exit_code == 1
-        assert "Error" in result.stdout or "not found" in result.stdout.lower()
+        assert result.exit_code == 4  # ArtifactNotFoundError
+        # cli_error outputs to stderr, check output (combined stdout+stderr)
+        assert "Error" in result.output or "not found" in result.output.lower()
 
     def test_graph_extract_all_files(self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Should extract from all governance files."""
@@ -243,9 +244,10 @@ class TestGraphValidateCommand:
         """Should error when graph file doesn't exist."""
         result = runner.invoke(app, ["graph", "validate", "--graph", "/nonexistent/graph.json"])
 
-        assert result.exit_code == 1
-        assert "Error" in result.stdout or "not found" in result.stdout.lower()
-        assert "raise graph build" in result.stdout
+        assert result.exit_code == 4  # ArtifactNotFoundError
+        # cli_error outputs to stderr, check output (combined stdout+stderr)
+        assert "Error" in result.output or "not found" in result.output.lower()
+        assert "raise graph build" in result.output
 
     def test_graph_validate_valid_graph(
         self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch

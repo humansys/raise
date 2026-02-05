@@ -9,6 +9,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.governance import ConceptType, GovernanceExtractor
 from raise_cli.governance.graph import ConceptGraph
 from raise_cli.governance.graph.builder import GraphBuilder
@@ -57,8 +58,7 @@ def extract(
     if file_path:
         # Extract from single file
         if not file_path.exists():
-            console.print(f"[red]Error:[/red] File not found: {file_path}")
-            raise typer.Exit(1)
+            cli_error(f"File not found: {file_path}", exit_code=4)
 
         concepts = extractor.extract_from_file(file_path)
 
@@ -304,9 +304,11 @@ def validate(
     graph_path = graph_file or default_graph
 
     if not graph_path.exists():
-        console.print(f"[red]Error:[/red] Graph file not found: {graph_path}")
-        console.print("\nRun [cyan]raise graph build[/cyan] first to create a graph.")
-        raise typer.Exit(1)
+        cli_error(
+            f"Graph file not found: {graph_path}",
+            hint="Run 'raise graph build' first to create a graph",
+            exit_code=4,
+        )
 
     console.print(f"\nLoading graph from [cyan]{graph_path}[/cyan]...")
     with graph_path.open() as f:
