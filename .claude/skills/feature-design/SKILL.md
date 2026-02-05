@@ -275,7 +275,7 @@ uv run raise telemetry emit feature {feature_id} --event complete --phase design
 ## Output
 
 - **Artifact**: `work/features/{feature-id}/design.md`
-- **Telemetry**: `.rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
+- **Telemetry**: `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-feature-v2.md`
 - **Next**: `/feature-plan`
 

@@ -231,7 +231,7 @@ uv run raise telemetry emit feature {feature_id} --event start --phase design
 
 - **Branch:** `feature/{epic_id}/{feature_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: start)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: start)
 - **Next:** `/feature-design` or `/feature-plan`
 
 ## Feature Start Summary Template

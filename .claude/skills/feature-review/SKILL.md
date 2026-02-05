@@ -184,7 +184,7 @@ uv run raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytes
 
 **Verification:** Patterns persisted via CLI (or explicitly skipped).
 
-> **If you can't continue:** CLI not available → Add patterns manually to `.rai/memory/patterns.jsonl`.
+> **If you can't continue:** CLI not available → Add patterns manually to `.raise/rai/memory/patterns.jsonl`.
 
 ### Step 5: Document Retrospective
 
@@ -236,8 +236,8 @@ uv run raise telemetry emit feature {feature_id} --event complete --phase review
 ## Output
 
 - **Artifact:** `work/features/{feature}/retrospective.md`
-- **Memory:** `.rai/memory/patterns.jsonl` (patterns persisted via CLI)
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
+- **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement
 

@@ -226,7 +226,7 @@ uv run raise telemetry emit feature {feature_id} --event complete --phase plan
 ## Output
 
 - **Artifact:** `work/features/{feature}/plan.md`
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
 - **Next:** `/feature-implement`
 

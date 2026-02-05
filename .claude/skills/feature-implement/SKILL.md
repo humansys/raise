@@ -195,7 +195,7 @@ uv run raise telemetry emit feature {feature_id} --event complete --phase implem
 
 - **Artifact:** Implemented code
 - **Location:** Per project architecture
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
 - **Gate:** `gates/gate-code.md`
 - **Next:** `/feature-review`
 

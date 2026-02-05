@@ -261,7 +261,7 @@ Update `CLAUDE.local.md` to reflect completion:
 - **Merge:** Feature merged to parent branch with `--no-ff`
 - **Cleanup:** Feature branch deleted locally
 - **Epic:** Feature marked complete in epic scope
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature complete)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Feature Close Summary Template
