@@ -89,7 +89,9 @@ class DeveloperProfile(BaseModel):
 
     name: str
     experience_level: ExperienceLevel = ExperienceLevel.SHU
-    communication: CommunicationPreferences = Field(default_factory=CommunicationPreferences)
+    communication: CommunicationPreferences = Field(
+        default_factory=CommunicationPreferences
+    )
     skills_mastered: list[str] = Field(default_factory=list)
     universal_patterns: list[str] = Field(default_factory=list)
     sessions_total: int = 0
@@ -156,6 +158,8 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
     # Convert to dict with proper serialization
     data = profile.model_dump(mode="json")
 
-    content = yaml.dump(data, default_flow_style=False, allow_unicode=True, sort_keys=False)
+    content = yaml.dump(
+        data, default_flow_style=False, allow_unicode=True, sort_keys=False
+    )
     profile_path.write_text(content, encoding="utf-8")
     logger.debug("Saved developer profile: %s", profile_path)
