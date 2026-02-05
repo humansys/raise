@@ -7,7 +7,7 @@ between Rai and individual developers.
 from __future__ import annotations
 
 import logging
-from datetime import date
+from datetime import UTC, date, datetime
 from enum import Enum
 from pathlib import Path
 
@@ -69,6 +69,34 @@ class CommunicationPreferences(BaseModel):
     redirect_when_dispersing: bool = False
 
 
+class CurrentSession(BaseModel):
+    """Active session state for detecting orphaned sessions.
+
+    Tracks when a session started and in which project, enabling detection
+    of sessions that were started but never closed (e.g., due to interruption).
+
+    Attributes:
+        started_at: UTC timestamp when session began.
+        project: Absolute path to the project directory.
+    """
+
+    started_at: datetime
+    project: str
+
+    def is_stale(self, hours: int = 24) -> bool:
+        """Check if session is stale (started more than N hours ago).
+
+        Args:
+            hours: Number of hours after which a session is considered stale.
+
+        Returns:
+            True if session started more than `hours` ago.
+        """
+        now = datetime.now(UTC)
+        age = now - self.started_at
+        return age.total_seconds() > hours * 3600
+
+
 class DeveloperProfile(BaseModel):
     """Personal profile for a developer using RaiSE.
 
@@ -85,6 +113,7 @@ class DeveloperProfile(BaseModel):
         first_session: Date of first RaiSE session.
         last_session: Date of most recent session.
         projects: List of project paths worked on.
+        current_session: Active session state, or None if no session active.
     """
 
     name: str
@@ -98,6 +127,7 @@ class DeveloperProfile(BaseModel):
     first_session: date | None = None
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
+    current_session: CurrentSession | None = None
 
 
 # Constants
@@ -190,3 +220,38 @@ def increment_session(
         updates["projects"] = [*profile.projects, project_path]
 
     return profile.model_copy(update=updates)
+
+
+def start_session(profile: DeveloperProfile, project_path: str) -> DeveloperProfile:
+    """Mark a session as active.
+
+    Sets current_session with timestamp and project. Use this at the
+    beginning of /session-start to track active sessions.
+
+    Args:
+        profile: The developer profile to update.
+        project_path: Absolute path to the project directory.
+
+    Returns:
+        Updated profile with current_session set.
+    """
+    session = CurrentSession(
+        started_at=datetime.now(UTC),
+        project=project_path,
+    )
+    return profile.model_copy(update={"current_session": session})
+
+
+def end_session(profile: DeveloperProfile) -> DeveloperProfile:
+    """Clear the active session state.
+
+    Clears current_session. Use this at the end of /session-close
+    to mark the session as properly closed.
+
+    Args:
+        profile: The developer profile to update.
+
+    Returns:
+        Updated profile with current_session cleared.
+    """
+    return profile.model_copy(update={"current_session": None})

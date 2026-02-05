@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -12,12 +12,15 @@ from pydantic import ValidationError
 from raise_cli.onboarding.profile import (
     CommunicationPreferences,
     CommunicationStyle,
+    CurrentSession,
     DeveloperProfile,
     ExperienceLevel,
+    end_session,
     get_rai_home,
     increment_session,
     load_developer_profile,
     save_developer_profile,
+    start_session,
 )
 
 
@@ -219,27 +222,39 @@ class TestGetRaiHome:
 class TestLoadDeveloperProfile:
     """Tests for load_developer_profile function."""
 
-    def test_returns_none_if_file_missing(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_returns_none_if_file_missing(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """load_developer_profile returns None if file doesn't exist."""
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: tmp_path / ".rai")
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: tmp_path / ".rai"
+        )
         result = load_developer_profile()
         assert result is None
 
-    def test_returns_none_if_directory_missing(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_returns_none_if_directory_missing(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """load_developer_profile returns None if ~/.rai/ doesn't exist."""
         fake_home = tmp_path / "nonexistent" / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: fake_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: fake_home
+        )
         result = load_developer_profile()
         assert result is None
 
-    def test_loads_valid_profile(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_loads_valid_profile(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """load_developer_profile returns DeveloperProfile if file is valid."""
         rai_home = tmp_path / ".rai"
         rai_home.mkdir(parents=True)
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Fer\nexperience_level: shu\nsessions_total: 5\n")
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         result = load_developer_profile()
 
         assert result is not None
@@ -247,25 +262,33 @@ class TestLoadDeveloperProfile:
         assert result.experience_level == ExperienceLevel.SHU
         assert result.sessions_total == 5
 
-    def test_returns_none_for_invalid_yaml(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_returns_none_for_invalid_yaml(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """load_developer_profile returns None for invalid YAML."""
         rai_home = tmp_path / ".rai"
         rai_home.mkdir(parents=True)
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("invalid: yaml: content: [")
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         result = load_developer_profile()
         assert result is None
 
-    def test_returns_none_for_invalid_schema(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_returns_none_for_invalid_schema(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """load_developer_profile returns None for invalid schema."""
         rai_home = tmp_path / ".rai"
         rai_home.mkdir(parents=True)
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("not_a_name: Test\n")  # Missing required 'name' field
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         result = load_developer_profile()
         assert result is None
 
@@ -273,10 +296,14 @@ class TestLoadDeveloperProfile:
 class TestSaveDeveloperProfile:
     """Tests for save_developer_profile function."""
 
-    def test_creates_rai_directory_if_missing(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_creates_rai_directory_if_missing(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """save_developer_profile creates ~/.rai/ if it doesn't exist."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
         profile = DeveloperProfile(name="Test")
         save_developer_profile(profile)
@@ -284,12 +311,18 @@ class TestSaveDeveloperProfile:
         assert rai_home.exists()
         assert rai_home.is_dir()
 
-    def test_writes_valid_yaml(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_writes_valid_yaml(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """save_developer_profile writes valid YAML file."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
-        profile = DeveloperProfile(name="Fer", experience_level=ExperienceLevel.HA, sessions_total=10)
+        profile = DeveloperProfile(
+            name="Fer", experience_level=ExperienceLevel.HA, sessions_total=10
+        )
         save_developer_profile(profile)
 
         profile_file = rai_home / "developer.yaml"
@@ -300,10 +333,14 @@ class TestSaveDeveloperProfile:
         assert content["experience_level"] == "ha"
         assert content["sessions_total"] == 10
 
-    def test_roundtrip_save_load(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_roundtrip_save_load(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Saved profile can be loaded back correctly."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
         communication = CommunicationPreferences(
             style=CommunicationStyle.DIRECT,
@@ -336,14 +373,18 @@ class TestSaveDeveloperProfile:
         assert loaded.last_session == original.last_session
         assert loaded.projects == original.projects
 
-    def test_overwrites_existing_profile(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_overwrites_existing_profile(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """save_developer_profile overwrites existing file."""
         rai_home = tmp_path / ".rai"
         rai_home.mkdir(parents=True)
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Old\n")
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
         profile = DeveloperProfile(name="New")
         save_developer_profile(profile)
@@ -419,3 +460,153 @@ class TestIncrementSession:
         assert updated.skills_mastered == ["skill1", "skill2"]
         assert updated.universal_patterns == ["pattern1"]
         assert updated.first_session == date(2026, 1, 1)
+
+
+class TestCurrentSession:
+    """Tests for CurrentSession model."""
+
+    def test_requires_started_at_and_project(self) -> None:
+        """CurrentSession requires both started_at and project."""
+        now = datetime.now(UTC)
+        session = CurrentSession(started_at=now, project="/home/user/project")
+        assert session.started_at == now
+        assert session.project == "/home/user/project"
+
+    def test_is_stale_returns_false_for_recent_session(self) -> None:
+        """is_stale returns False for session started recently."""
+        now = datetime.now(UTC)
+        session = CurrentSession(started_at=now, project="/test")
+        assert session.is_stale() is False
+
+    def test_is_stale_returns_true_for_old_session(self) -> None:
+        """is_stale returns True for session started more than 24h ago."""
+        old_time = datetime.now(UTC) - timedelta(hours=25)
+        session = CurrentSession(started_at=old_time, project="/test")
+        assert session.is_stale() is True
+
+    def test_is_stale_custom_hours(self) -> None:
+        """is_stale respects custom hours parameter."""
+        old_time = datetime.now(UTC) - timedelta(hours=5)
+        session = CurrentSession(started_at=old_time, project="/test")
+        assert session.is_stale(hours=4) is True
+        assert session.is_stale(hours=6) is False
+
+    def test_is_stale_boundary_at_24_hours(self) -> None:
+        """is_stale boundary: under 24h is not stale, over 24h is."""
+        # Just under 24 hours - not stale
+        under_24h = datetime.now(UTC) - timedelta(hours=23, minutes=59)
+        session = CurrentSession(started_at=under_24h, project="/test")
+        assert session.is_stale() is False
+
+        # Just over 24 hours - stale
+        over_24h = datetime.now(UTC) - timedelta(hours=24, minutes=1)
+        session_old = CurrentSession(started_at=over_24h, project="/test")
+        assert session_old.is_stale() is True
+
+
+class TestStartSession:
+    """Tests for start_session function."""
+
+    def test_sets_current_session(self) -> None:
+        """start_session sets current_session field."""
+        profile = DeveloperProfile(name="Test")
+        updated = start_session(profile, "/home/user/project")
+        assert updated.current_session is not None
+        assert updated.current_session.project == "/home/user/project"
+
+    def test_sets_started_at_to_now(self) -> None:
+        """start_session sets started_at to current UTC time."""
+        profile = DeveloperProfile(name="Test")
+        before = datetime.now(UTC)
+        updated = start_session(profile, "/test")
+        after = datetime.now(UTC)
+
+        assert updated.current_session is not None
+        assert before <= updated.current_session.started_at <= after
+
+    def test_returns_new_instance(self) -> None:
+        """start_session returns new profile instance (immutable)."""
+        profile = DeveloperProfile(name="Test")
+        updated = start_session(profile, "/test")
+        assert profile is not updated
+        assert profile.current_session is None  # Original unchanged
+
+    def test_preserves_other_fields(self) -> None:
+        """start_session preserves all other profile fields."""
+        profile = DeveloperProfile(
+            name="Emilio",
+            experience_level=ExperienceLevel.RI,
+            sessions_total=40,
+        )
+        updated = start_session(profile, "/test")
+        assert updated.name == "Emilio"
+        assert updated.experience_level == ExperienceLevel.RI
+        assert updated.sessions_total == 40
+
+
+class TestEndSession:
+    """Tests for end_session function."""
+
+    def test_clears_current_session(self) -> None:
+        """end_session clears current_session field."""
+        profile = DeveloperProfile(name="Test")
+        with_session = start_session(profile, "/test")
+        assert with_session.current_session is not None
+
+        ended = end_session(with_session)
+        assert ended.current_session is None
+
+    def test_works_when_no_session_active(self) -> None:
+        """end_session is a no-op when no session is active."""
+        profile = DeveloperProfile(name="Test")
+        assert profile.current_session is None
+        ended = end_session(profile)
+        assert ended.current_session is None
+
+    def test_returns_new_instance(self) -> None:
+        """end_session returns new profile instance (immutable)."""
+        profile = DeveloperProfile(name="Test")
+        with_session = start_session(profile, "/test")
+        ended = end_session(with_session)
+        assert with_session is not ended
+        assert with_session.current_session is not None  # Original unchanged
+
+    def test_preserves_other_fields(self) -> None:
+        """end_session preserves all other profile fields."""
+        profile = DeveloperProfile(
+            name="Emilio",
+            experience_level=ExperienceLevel.RI,
+            sessions_total=40,
+        )
+        with_session = start_session(profile, "/test")
+        ended = end_session(with_session)
+        assert ended.name == "Emilio"
+        assert ended.experience_level == ExperienceLevel.RI
+        assert ended.sessions_total == 40
+
+
+class TestDeveloperProfileCurrentSession:
+    """Tests for current_session field in DeveloperProfile."""
+
+    def test_default_current_session_is_none(self) -> None:
+        """New profiles have no active session."""
+        profile = DeveloperProfile(name="Test")
+        assert profile.current_session is None
+
+    def test_current_session_roundtrip(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """current_session survives save/load roundtrip."""
+        rai_home = tmp_path / ".rai"
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
+
+        profile = DeveloperProfile(name="Test")
+        with_session = start_session(profile, "/test/project")
+        save_developer_profile(with_session)
+
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert loaded.current_session is not None
+        assert loaded.current_session.project == "/test/project"

@@ -142,12 +142,17 @@ Ha is between these — balanced detail.
 raise profile session --project "$(pwd)"
 ```
 
-This increments session count and updates last_session date.
+This command:
+- Increments session count and updates last_session date
+- Sets `current_session` state (for orphan detection)
+- **Warns** if a previous session wasn't closed (stale >24h = warning, recent = note)
 
 **First-time user:** Ask name, then:
 ```bash
 raise profile session --name "Name" --project "$(pwd)"
 ```
+
+**If warned about unclosed session:** Inform the user that learnings from the previous session may have been lost. Suggest using `/session-close` before ending work.
 
 ## Output
 
