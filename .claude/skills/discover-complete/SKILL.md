@@ -302,7 +302,7 @@ uv run raise discover build --input work/discovery/components-validated.json
 
 # Then query components
 uv run raise context query --type component "service"
-uv run raise context unified "authentication" --types component
+uv run raise context query "authentication" --types component
 ```
 
 ### Component Type in Graph

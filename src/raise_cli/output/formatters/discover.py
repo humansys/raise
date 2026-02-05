@@ -321,5 +321,4 @@ def _format_build_human(
 
     # Next steps
     _console.print("\n[dim]Query components:[/dim]")
-    _console.print('  [dim]raise context query "keyword" --type component[/dim]')
-    _console.print('  [dim]raise context unified "keyword" --types component[/dim]')
+    _console.print('  [dim]raise context query "keyword" --types component[/dim]')

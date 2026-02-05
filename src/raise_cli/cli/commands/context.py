@@ -1,4 +1,11 @@
-"""CLI commands for MVC context queries."""
+"""CLI commands for context queries.
+
+Queries the unified context graph which includes all sources:
+- Governance (principles, requirements, terms)
+- Memory (patterns, calibration, sessions)
+- Skills (workflow metadata)
+- Work (epics, features, decisions)
+"""
 
 from __future__ import annotations
 
@@ -16,30 +23,21 @@ from raise_cli.context.query import (
     UnifiedQueryResult,
     UnifiedQueryStrategy,
 )
-from raise_cli.governance.query import ContextQuery, ContextQueryEngine, QueryStrategy
-from raise_cli.governance.query.formatters import format_json, format_markdown
 
 context_app = typer.Typer(
     name="context",
-    help="Query concept graph for Minimum Viable Context (MVC)",
+    help="Query the unified context graph",
     no_args_is_help=True,
 )
 
 console = Console()
 
-# Default unified graph path
+# Unified graph path
 UNIFIED_GRAPH_PATH = Path(".raise/graph/unified.json")
 
 
-def format_unified_markdown(result: UnifiedQueryResult) -> str:
-    """Format UnifiedQueryResult as markdown for human consumption.
-
-    Args:
-        result: Unified query result to format.
-
-    Returns:
-        Formatted markdown string.
-    """
+def _format_markdown(result: UnifiedQueryResult) -> str:
+    """Format query result as markdown for human consumption."""
     lines: list[str] = []
 
     # Header
@@ -110,91 +108,13 @@ def format_unified_markdown(result: UnifiedQueryResult) -> str:
     return "\n".join(lines)
 
 
-def format_unified_json(result: UnifiedQueryResult) -> str:
-    """Format UnifiedQueryResult as JSON.
-
-    Args:
-        result: Unified query result to format.
-
-    Returns:
-        JSON string representation.
-    """
+def _format_json(result: UnifiedQueryResult) -> str:
+    """Format query result as JSON."""
     return result.to_json()
 
 
 @context_app.command()
 def query(
-    query_str: Annotated[
-        str, typer.Argument(help="Query string (concept ID or keywords)")
-    ],
-    format: Annotated[
-        str,
-        typer.Option("--format", "-f", help="Output format (markdown or json)"),
-    ] = "markdown",
-    output: Annotated[
-        Path | None,
-        typer.Option("--output", "-o", help="Output file path (default: stdout)"),
-    ] = None,
-    strategy: Annotated[
-        str | None,
-        typer.Option(
-            "--strategy",
-            "-s",
-            help="Query strategy (concept_lookup, keyword_search, relationship_traversal, related_concepts)",
-        ),
-    ] = None,
-    max_depth: Annotated[
-        int,
-        typer.Option("--max-depth", "-d", help="Maximum graph traversal depth (0-5)"),
-    ] = 1,
-    edge_types: Annotated[
-        str | None,
-        typer.Option(
-            "--edge-types",
-            "-e",
-            help="Edge types to follow (comma-separated: governed_by,implements)",
-        ),
-    ] = None,
-    concept_type: Annotated[
-        str | None,
-        typer.Option(
-            "--type", "-t", help="Filter by concept type (requirement, principle, etc.)"
-        ),
-    ] = None,
-) -> None:
-    """Query governance graph for Minimum Viable Context.
-
-    Retrieves relevant concepts from the governance graph based on the query,
-    reducing token usage by >90% vs loading full files.
-
-    For unified context (memory, skills, work items), use `raise context unified`.
-
-    Examples:
-        # Query by concept ID
-        $ raise context query "req-rf-05"
-
-        # Keyword search in requirements only
-        $ raise context query "validation" --type requirement
-
-        # Follow relationship edges
-        $ raise context query "req-rf-05" --edge-types governed_by
-
-        # Output as JSON
-        $ raise context query "req-rf-05" --format json
-    """
-    _query_governance(
-        query_str=query_str,
-        format=format,
-        output=output,
-        strategy=strategy,
-        max_depth=max_depth,
-        edge_types=edge_types,
-        concept_type=concept_type,
-    )
-
-
-@context_app.command()
-def unified(
     query_str: Annotated[
         str, typer.Argument(help="Query string (keywords or concept ID)")
     ],
@@ -219,7 +139,7 @@ def unified(
         typer.Option(
             "--types",
             "-t",
-            help="Filter by node types (comma-separated: pattern,calibration,skill,decision,epic,feature)",
+            help="Filter by node types (comma-separated: pattern,calibration,skill,principle,requirement,epic,feature)",
         ),
     ] = None,
     limit: Annotated[
@@ -227,69 +147,41 @@ def unified(
         typer.Option("--limit", "-l", help="Maximum number of results"),
     ] = 10,
 ) -> None:
-    """Query unified context graph (memory + governance + skills + work).
+    """Query the unified context graph.
 
-    The unified graph consolidates all context sources:
-    - Patterns (learned from sessions)
-    - Calibration (velocity data)
+    The unified graph includes all context sources:
+    - Governance (principles, requirements, terms)
+    - Memory (patterns, calibration, sessions)
     - Skills (workflow metadata)
-    - Governance (principles, requirements)
-    - Work (epics, features)
-
-    For governance-only queries, use `raise context query`.
+    - Work (epics, features, decisions)
 
     Examples:
-        # Search for planning context
-        $ raise context unified "planning estimation"
+        # Search by keywords
+        $ raise context query "planning estimation"
 
         # Filter by types
-        $ raise context unified "pattern" --types pattern,calibration
+        $ raise context query "pattern" --types pattern,calibration
 
-        # Lookup specific concept
-        $ raise context unified "PAT-001" --strategy concept_lookup
+        # Lookup specific concept by ID
+        $ raise context query "PAT-001" --strategy concept_lookup
 
         # Output as JSON
-        $ raise context unified "velocity" --format json
+        $ raise context query "velocity" --format json
     """
-    _query_unified(
-        query_str=query_str,
-        format=format,
-        output=output,
-        strategy=strategy,
-        max_depth=1,
-        types=types,
-        limit=limit,
-        concept_type=None,
-    )
-
-
-def _query_unified(
-    query_str: str,
-    format: str,
-    output: Path | None,
-    strategy: str | None,
-    max_depth: int,
-    types: str | None,
-    limit: int,
-    concept_type: str | None = None,
-) -> None:
-    """Execute query against unified context graph."""
     # Load engine
     try:
         engine = UnifiedQueryEngine.from_file(UNIFIED_GRAPH_PATH)
     except FileNotFoundError as e:
         cli_error(
             str(e),
-            hint="Run 'raise graph build --unified' first to create the graph",
+            hint="Run 'raise graph build' first to create the graph",
             exit_code=4,
         )
 
-    # Parse types filter (--types takes precedence, --type as fallback)
+    # Parse types filter
     types_list: list[str] | None = None
     if types:
         types_list = [t.strip() for t in types.split(",")]
-    elif concept_type:
-        types_list = [concept_type]
 
     # Determine strategy
     query_strategy = UnifiedQueryStrategy.KEYWORD_SEARCH  # Default
@@ -299,103 +191,31 @@ def _query_unified(
         except ValueError:
             cli_error(
                 f"Invalid strategy: {strategy}",
-                hint="Valid strategies for unified: keyword_search, concept_lookup",
+                hint="Valid strategies: keyword_search, concept_lookup",
                 exit_code=7,
             )
 
-    # Build query
+    # Build and execute query
     unified_query = UnifiedQuery(
         query=query_str,
         strategy=query_strategy,
-        max_depth=max_depth,
+        max_depth=1,
         types=types_list,  # type: ignore[arg-type]
         limit=limit,
     )
 
-    # Execute query
     console.print(f"\nQuerying unified context graph for: [cyan]{query_str}[/cyan]")
     console.print(f"Strategy: [yellow]{query_strategy.value}[/yellow]\n")
 
     result = engine.query(unified_query)
 
     # Format output
-    if format == "json":
-        output_text = format_unified_json(result)
-    else:
-        output_text = format_unified_markdown(result)
+    output_text = _format_json(result) if format == "json" else _format_markdown(result)
 
     # Write to file or stdout
     if output:
         output.write_text(output_text)
         console.print(f"✓ Context written to [cyan]{output}[/cyan]")
-        console.print(f"  Concepts: {result.metadata.total_concepts}")
-        console.print(f"  Tokens: ~{result.metadata.token_estimate}")
-        console.print(f"  Execution: {result.metadata.execution_time_ms:.2f}ms\n")
-    else:
-        console.print(output_text)
-
-
-def _query_governance(
-    query_str: str,
-    format: str,
-    output: Path | None,
-    strategy: str | None,
-    max_depth: int,
-    edge_types: str | None,
-    concept_type: str | None,
-) -> None:
-    """Execute query against governance concept graph."""
-    # Load graph
-    try:
-        engine = ContextQueryEngine.from_cache()
-    except FileNotFoundError as e:
-        cli_error(
-            str(e),
-            hint="Run 'raise graph build' first to create the graph",
-            exit_code=4,
-        )
-
-    # Build query
-    filters: dict[str, list[str] | str] = {}
-
-    if edge_types:
-        filters["edge_types"] = [et.strip() for et in edge_types.split(",")]
-
-    if concept_type:
-        filters["type"] = concept_type
-
-    # Determine strategy
-    query_strategy = QueryStrategy.CONCEPT_LOOKUP  # Default
-    if strategy:
-        try:
-            query_strategy = QueryStrategy(strategy)
-        except ValueError:
-            cli_error(
-                f"Invalid strategy: {strategy}",
-                hint="Valid strategies: concept_lookup, keyword_search, relationship_traversal, related_concepts",
-                exit_code=7,
-            )
-
-    mvc_query = ContextQuery(
-        query=query_str,
-        strategy=query_strategy,
-        max_depth=max_depth,
-        filters=filters,
-    )
-
-    # Execute query
-    console.print(f"\nQuerying concept graph for: [cyan]{query_str}[/cyan]")
-    console.print(f"Strategy: [yellow]{query_strategy.value}[/yellow]\n")
-
-    result = engine.query(mvc_query)
-
-    # Format output
-    output_text = format_json(result) if format == "json" else format_markdown(result)
-
-    # Write to file or stdout
-    if output:
-        output.write_text(output_text)
-        console.print(f"✓ MVC written to [cyan]{output}[/cyan]")
         console.print(f"  Concepts: {result.metadata.total_concepts}")
         console.print(f"  Tokens: ~{result.metadata.token_estimate}")
         console.print(f"  Execution: {result.metadata.execution_time_ms:.2f}ms\n")
