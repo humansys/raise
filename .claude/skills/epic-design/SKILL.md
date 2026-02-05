@@ -93,7 +93,7 @@ uv run raise telemetry emit epic {epic_id} --event start --phase design
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-uv run raise context query "architecture ADR epic" --unified --types pattern,decision --limit 5
+uv run raise context unified "architecture ADR epic" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.

@@ -91,7 +91,7 @@ uv run raise telemetry emit epic {epic_id} --event start --phase plan
 Load relevant sequencing patterns and calibration from unified context:
 
 ```bash
-uv run raise context query "sequencing calibration planning" --unified --types pattern,calibration --limit 5
+uv run raise context unified "sequencing calibration planning" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Calibration data informs realistic estimates.

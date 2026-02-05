@@ -161,75 +161,106 @@ def query(
             "--type", "-t", help="Filter by concept type (requirement, principle, etc.)"
         ),
     ] = None,
-    unified: Annotated[
-        bool,
+) -> None:
+    """Query governance graph for Minimum Viable Context.
+
+    Retrieves relevant concepts from the governance graph based on the query,
+    reducing token usage by >90% vs loading full files.
+
+    For unified context (memory, skills, work items), use `raise context unified`.
+
+    Examples:
+        # Query by concept ID
+        $ raise context query "req-rf-05"
+
+        # Keyword search in requirements only
+        $ raise context query "validation" --type requirement
+
+        # Follow relationship edges
+        $ raise context query "req-rf-05" --edge-types governed_by
+
+        # Output as JSON
+        $ raise context query "req-rf-05" --format json
+    """
+    _query_governance(
+        query_str=query_str,
+        format=format,
+        output=output,
+        strategy=strategy,
+        max_depth=max_depth,
+        edge_types=edge_types,
+        concept_type=concept_type,
+    )
+
+
+@context_app.command()
+def unified(
+    query_str: Annotated[
+        str, typer.Argument(help="Query string (keywords or concept ID)")
+    ],
+    format: Annotated[
+        str,
+        typer.Option("--format", "-f", help="Output format (markdown or json)"),
+    ] = "markdown",
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output file path (default: stdout)"),
+    ] = None,
+    strategy: Annotated[
+        str | None,
         typer.Option(
-            "--unified",
-            "-u",
-            help="Query unified context graph (includes memory, work, skills)",
+            "--strategy",
+            "-s",
+            help="Query strategy (keyword_search, concept_lookup)",
         ),
-    ] = False,
+    ] = None,
     types: Annotated[
         str | None,
         typer.Option(
             "--types",
-            help="Filter by node types for unified query (comma-separated: pattern,calibration,skill)",
+            "-t",
+            help="Filter by node types (comma-separated: pattern,calibration,skill,decision,epic,feature)",
         ),
     ] = None,
     limit: Annotated[
         int,
-        typer.Option("--limit", "-l", help="Maximum number of results (unified only)"),
+        typer.Option("--limit", "-l", help="Maximum number of results"),
     ] = 10,
 ) -> None:
-    """Query concept graph for Minimum Viable Context.
+    """Query unified context graph (memory + governance + skills + work).
 
-    Retrieves relevant concepts from the concept graph based on the query,
-    reducing token usage by >90% vs loading full files.
-
-    Use --unified to query the unified context graph which includes:
+    The unified graph consolidates all context sources:
     - Patterns (learned from sessions)
     - Calibration (velocity data)
     - Skills (workflow metadata)
     - Governance (principles, requirements)
     - Work (epics, features)
 
+    For governance-only queries, use `raise context query`.
+
     Examples:
-        # Query governance graph by concept ID
-        $ raise context query "req-rf-05"
+        # Search for planning context
+        $ raise context unified "planning estimation"
 
-        # Query unified graph for planning context
-        $ raise context query "planning estimation" --unified
+        # Filter by types
+        $ raise context unified "pattern" --types pattern,calibration
 
-        # Filter unified by types
-        $ raise context query "pattern" --unified --types pattern,calibration
-
-        # Keyword search in requirements only
-        $ raise context query "validation" --type requirement
+        # Lookup specific concept
+        $ raise context unified "PAT-001" --strategy concept_lookup
 
         # Output as JSON
-        $ raise context query "req-rf-05" --format json
+        $ raise context unified "velocity" --format json
     """
-    if unified:
-        _query_unified(
-            query_str=query_str,
-            format=format,
-            output=output,
-            strategy=strategy,
-            max_depth=max_depth,
-            types=types,
-            limit=limit,
-            concept_type=concept_type,
-        )
-    else:
-        _query_governance(
-            query_str=query_str,
-            format=format,
-            output=output,
-            strategy=strategy,
-            max_depth=max_depth,
-            edge_types=edge_types,
-            concept_type=concept_type,
-        )
+    _query_unified(
+        query_str=query_str,
+        format=format,
+        output=output,
+        strategy=strategy,
+        max_depth=1,
+        types=types,
+        limit=limit,
+        concept_type=None,
+    )
 
 
 def _query_unified(

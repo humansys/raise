@@ -248,7 +248,7 @@ def unified_graph() -> UnifiedGraph:
 
 
 class TestUnifiedContextQuery:
-    """Tests for `raise context query --unified` command."""
+    """Tests for `raise context unified` command."""
 
     def test_unified_query_requires_graph(self, tmp_path: Path) -> None:
         """Test unified query fails if graph not found."""
@@ -257,9 +257,7 @@ class TestUnifiedContextQuery:
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(
-                app, ["context", "query", "planning", "--unified"]
-            )
+            result = runner.invoke(app, ["context", "unified", "planning"])
 
             assert result.exit_code == 4  # ArtifactNotFoundError
             # cli_error outputs to stderr, check output (combined stdout+stderr)
@@ -279,9 +277,7 @@ class TestUnifiedContextQuery:
             (tmp_path / ".raise/graph").mkdir(parents=True, exist_ok=True)
             unified_graph.save(tmp_path / ".raise/graph/unified.json")
 
-            result = runner.invoke(
-                app, ["context", "query", "multiplier", "--unified"]
-            )
+            result = runner.invoke(app, ["context", "unified", "multiplier"])
 
             assert result.exit_code == 0
             assert "Unified Context Results" in result.stdout
@@ -302,7 +298,7 @@ class TestUnifiedContextQuery:
             unified_graph.save(tmp_path / ".raise/graph/unified.json")
 
             result = runner.invoke(
-                app, ["context", "query", "multiplier", "--unified", "--format", "json"]
+                app, ["context", "unified", "multiplier", "--format", "json"]
             )
 
             assert result.exit_code == 0
@@ -325,40 +321,12 @@ class TestUnifiedContextQuery:
 
             result = runner.invoke(
                 app,
-                ["context", "query", "a", "--unified", "--types", "calibration"],
+                ["context", "unified", "a", "--types", "calibration"],
             )
 
             assert result.exit_code == 0
             # Should only return calibration nodes
             assert "Calibration" in result.stdout or "calibration" in result.stdout
-        finally:
-            os.chdir(original_cwd)
-
-    def test_unified_query_with_type_singular_filter(
-        self, unified_graph: UnifiedGraph, tmp_path: Path
-    ) -> None:
-        """Test unified query with --type (singular) filter.
-
-        Regression test: --type was ignored when --unified was used.
-        See bugfix/context-query-type-filter branch.
-        """
-        import os
-
-        original_cwd = os.getcwd()
-        try:
-            os.chdir(tmp_path)
-            (tmp_path / ".raise/graph").mkdir(parents=True, exist_ok=True)
-            unified_graph.save(tmp_path / ".raise/graph/unified.json")
-
-            result = runner.invoke(
-                app,
-                ["context", "query", "a", "--unified", "--type", "pattern"],
-            )
-
-            assert result.exit_code == 0
-            # Should only return pattern nodes (PAT-001), not calibration or skill
-            assert "PAT-001" in result.stdout
-            assert "CAL-001" not in result.stdout
         finally:
             os.chdir(original_cwd)
 
@@ -376,14 +344,7 @@ class TestUnifiedContextQuery:
 
             result = runner.invoke(
                 app,
-                [
-                    "context",
-                    "query",
-                    "PAT-001",
-                    "--unified",
-                    "--strategy",
-                    "concept_lookup",
-                ],
+                ["context", "unified", "PAT-001", "--strategy", "concept_lookup"],
             )
 
             assert result.exit_code == 0
@@ -404,14 +365,7 @@ class TestUnifiedContextQuery:
 
             result = runner.invoke(
                 app,
-                [
-                    "context",
-                    "query",
-                    "test",
-                    "--unified",
-                    "--strategy",
-                    "invalid_strategy",
-                ],
+                ["context", "unified", "test", "--strategy", "invalid_strategy"],
             )
 
             assert result.exit_code == 7  # ValidationError
@@ -431,9 +385,7 @@ class TestUnifiedContextQuery:
             (tmp_path / ".raise/graph").mkdir(parents=True, exist_ok=True)
             unified_graph.save(tmp_path / ".raise/graph/unified.json")
 
-            result = runner.invoke(
-                app, ["context", "query", "xyznonexistent", "--unified"]
-            )
+            result = runner.invoke(app, ["context", "unified", "xyznonexistent"])
 
             assert result.exit_code == 0
             assert "No concepts found" in result.stdout
