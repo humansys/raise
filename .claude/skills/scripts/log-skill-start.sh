@@ -8,14 +8,14 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 SKILL_NAME="${RAISE_SKILL_NAME:-unknown}"
 
 # Ensure telemetry directory exists
-mkdir -p "$CLAUDE_PROJECT_DIR/.rai/telemetry"
+mkdir -p "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry"
 
 # Store start timestamp for duration calculation
-TIMESTAMP_FILE="$CLAUDE_PROJECT_DIR/.rai/telemetry/.skill_start_${SKILL_NAME}"
+TIMESTAMP_FILE="$CLAUDE_PROJECT_DIR/.raise/rai/telemetry/.skill_start_${SKILL_NAME}"
 echo "$TIMESTAMP" > "$TIMESTAMP_FILE"
 
 # Emit SkillEvent (ADR-018 format)
 echo "{\"type\":\"skill_event\",\"timestamp\":\"$TIMESTAMP\",\"skill\":\"$SKILL_NAME\",\"event\":\"start\",\"duration_sec\":null}" \
-  >> "$CLAUDE_PROJECT_DIR/.rai/telemetry/signals.jsonl"
+  >> "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry/signals.jsonl"
 
 exit 0
