@@ -9,11 +9,18 @@
 
 ## Resolution
 
-1. **E14 migrated to new tree structure** ✓
-2. **All skills updated to support both structures** ✓
-   - Skills check E14+ tree structure first, then fall back to legacy
-   - Path Convention tables added to all 9 lifecycle skills
-   - Backward compatible with E1-E13 legacy paths
+1. **All epics (E1-E14) migrated to tree structure** ✓
+   - E1-E13 migrated from `dev/epic-e{N}-scope.md` to `work/epics/e{NN}-{name}/scope.md`
+   - 12 orphan pre-epic features deleted (F1.3, F2.x, F3.x, etc.)
+
+2. **All 9 lifecycle skills updated to use ONLY new structure** ✓
+   - No fallback to legacy paths — single source of truth
+   - Path references: `work/epics/e{N}-{name}/scope.md` and `/features/f{N}.{M}-{name}/`
+
+3. **Extractor and parser code updated** ✓
+   - `extractor.py`: glob pattern `work/epics/*/scope.md`
+   - `epic.py`: extract epic ID from parent directory (`e08-backlog` → `E8`)
+   - Tests updated for new paths
 
 **Skills Updated (9 total):**
 - `/epic-design`, `/epic-plan`, `/epic-close`
@@ -22,23 +29,38 @@
 
 ## Final Structure
 
-**E14+ (new tree):**
+**All epics (unified tree):**
 ```
-work/epics/e14-rai-distribution/
-├── scope.md
-└── features/
-    └── f14.0-dx-quality-gate/
-        ├── scope.md
-        └── plan.md
+work/epics/
+├── e01-foundation/
+│   └── scope.md
+├── e02-governance/
+│   └── scope.md
+├── e03-identity/
+│   └── scope.md
+├── e07-onboarding/
+│   └── scope.md
+├── e08-backlog/
+│   └── scope.md
+├── e09-telemetry/
+│   └── scope.md
+├── e10-collective/
+│   └── scope.md
+├── e11-unified-graph/
+│   └── scope.md
+├── e12-extractors/
+│   └── scope.md
+├── e13-discovery/
+│   └── scope.md
+└── e14-rai-distribution/
+    ├── scope.md
+    └── features/
+        └── f14.0-dx-quality-gate/
+            ├── scope.md
+            └── plan.md
 ```
 
-**E1-E13 (legacy, unchanged):**
-```
-dev/epic-e{N}-scope.md
-work/features/{feature-id}/
-```
-
-Old epics (E1-E13) remain in `dev/` — will migrate post-F&F if needed.
+**Note:** Retrospectives remain at original locations for now. Feature subdirectories created as needed.
 
 ---
 
