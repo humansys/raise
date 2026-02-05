@@ -122,7 +122,7 @@ def session(
 
     # Jidoka: Validate session index if project specified
     if project is not None:
-        memory_dir = Path(project) / ".rai" / "memory"
+        memory_dir = Path(project) / ".raise" / "rai" / "memory"
         if memory_dir.exists():
             validation = validate_session_index(memory_dir)
             if not validation.is_valid:
