@@ -65,10 +65,10 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-uv run raise telemetry emit feature {feature_id} --event start --phase review
+uv run raise telemetry emit-work feature {feature_id} --event start --phase review
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e start -p review`
+**Example:** `raise telemetry emit-work feature F9.4 -e start -p review`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -226,10 +226,10 @@ uv run raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
 Record the completion of the entire feature lifecycle:
 
 ```bash
-uv run raise telemetry emit feature {feature_id} --event complete --phase review
+uv run raise telemetry emit-work feature {feature_id} --event complete --phase review
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e complete -p review`
+**Example:** `raise telemetry emit-work feature F9.4 -e complete -p review`
 
 **Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
 

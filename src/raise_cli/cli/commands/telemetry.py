@@ -198,7 +198,7 @@ def emit_calibration(
         cli_error(result.error or "Failed to emit calibration event")
 
 
-@telemetry_app.command("emit")
+@telemetry_app.command("emit-work")
 def emit_work(
     work_type: Annotated[
         str,
@@ -240,20 +240,20 @@ def emit_work(
 
     Examples:
         # Epic lifecycle
-        $ raise telemetry emit epic E9 --event start --phase design
-        $ raise telemetry emit epic E9 -e complete -p design
-        $ raise telemetry emit epic E9 -e start -p plan
+        $ raise telemetry emit-work epic E9 --event start --phase design
+        $ raise telemetry emit-work epic E9 -e complete -p design
+        $ raise telemetry emit-work epic E9 -e start -p plan
 
         # Feature lifecycle
-        $ raise telemetry emit feature F9.4 --event start --phase design
-        $ raise telemetry emit feature F9.4 -e complete -p implement
-        $ raise telemetry emit feature F9.4 -e start -p review
+        $ raise telemetry emit-work feature F9.4 --event start --phase design
+        $ raise telemetry emit-work feature F9.4 -e complete -p implement
+        $ raise telemetry emit-work feature F9.4 -e start -p review
 
         # Work blocked
-        $ raise telemetry emit feature F9.4 -e blocked -p plan -b "unclear requirements"
+        $ raise telemetry emit-work feature F9.4 -e blocked -p plan -b "unclear requirements"
 
         # Work unblocked
-        $ raise telemetry emit feature F9.4 -e unblocked -p plan
+        $ raise telemetry emit-work feature F9.4 -e unblocked -p plan
     """
     # Validate work type
     valid_work_types: list[Literal["epic", "feature"]] = ["epic", "feature"]
