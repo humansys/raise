@@ -8,6 +8,22 @@
 
 ## Urgent
 
+- [ ] **E14: Rai Distribution** — How new users "meet" Rai (CRITICAL for DX)
+  - **The gap:** Users get CLI + skills, but NOT Rai as entity
+  - **Research needed:**
+    - What's "base Rai" vs "personal Rai"?
+    - Which patterns are universal (methodology) vs accumulated (relationship)?
+    - How do other AI tools handle personality/identity distribution?
+    - What's the minimum viable first-contact experience?
+  - **Design needed:**
+    - What ships in package (starter identity, base patterns)?
+    - How does first `/session-start` initialize Rai?
+    - How does personal Rai diverge over time?
+    - How do "base Rai" updates propagate to existing users?
+  - **Priority:** P0 for post-F&F — crucial for public launch DX
+  - **Workaround for F&F:** Manually seed test profile with starter patterns
+  - **See:** ADR-013 (Rai as Entity), E7 onboarding discussion (2026-02-05)
+
 - [x] **F&F Readiness (Feb 9)** — See `governance/projects/raise-cli/backlog.md` §4
   - [x] README update (v2 structure) — Done 2026-02-02
   - [x] Installation guide — In README
