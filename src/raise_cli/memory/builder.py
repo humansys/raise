@@ -2,10 +2,15 @@
 
 This module provides the MemoryGraph class and builder for constructing
 graphs from memory concepts with inferred relationships.
+
+.. deprecated::
+    MemoryGraph and MemoryGraphBuilder are deprecated.
+    Use UnifiedGraph from raise_cli.context instead.
 """
 
 from __future__ import annotations
 
+import warnings
 from collections import deque
 from datetime import datetime
 from typing import Any
@@ -26,11 +31,23 @@ class MemoryGraph(BaseModel):
     Represents a directed graph of memory concepts (patterns, calibrations,
     sessions) with semantic relationships.
 
+    .. deprecated::
+        Use UnifiedGraph from raise_cli.context instead.
+
     Attributes:
         nodes: Memory concepts indexed by ID.
         edges: Relationships between concepts.
         metadata: Graph metadata (build time, stats).
     """
+
+    def __init__(self, **data: Any) -> None:
+        """Initialize MemoryGraph with deprecation warning."""
+        warnings.warn(
+            "MemoryGraph is deprecated. Use UnifiedGraph from raise_cli.context instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(**data)
 
     nodes: dict[str, MemoryConcept] = Field(
         default_factory=dict, description="Concepts indexed by ID"
@@ -162,14 +179,22 @@ class MemoryGraphBuilder:
     - related_to: shared context keywords
     - validates: calibration → pattern (same feature)
     - applies_to: pattern → context domains
+
+    .. deprecated::
+        Use UnifiedGraphBuilder from raise_cli.context.builder instead.
     """
 
     def __init__(self, min_shared_keywords: int = 2) -> None:
-        """Initialize builder.
+        """Initialize builder with deprecation warning.
 
         Args:
             min_shared_keywords: Minimum shared keywords for related_to inference.
         """
+        warnings.warn(
+            "MemoryGraphBuilder is deprecated. Use UnifiedGraphBuilder from raise_cli.context.builder instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.min_shared_keywords = min_shared_keywords
 
     def build(self, concepts: list[MemoryConcept]) -> MemoryGraph:

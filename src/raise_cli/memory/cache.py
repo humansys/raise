@@ -2,10 +2,14 @@
 
 This module provides caching for memory graphs with mtime-based
 staleness detection to avoid unnecessary rebuilds.
+
+.. deprecated::
+    MemoryCache is deprecated. Use UnifiedGraph from raise_cli.context instead.
 """
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 
 from raise_cli.memory.builder import MemoryGraph, MemoryGraphBuilder
@@ -18,17 +22,26 @@ class MemoryCache:
     Caches the built graph to a JSON file and checks JSONL file mtimes
     to determine if a rebuild is needed.
 
+    .. deprecated::
+        Use UnifiedGraph from raise_cli.context instead.
+        The unified graph at .raise/graph/unified.json replaces this.
+
     Attributes:
         memory_dir: Path to the .rai/memory/ directory.
         cache_path: Path to the cached graph.json file.
     """
 
     def __init__(self, memory_dir: Path) -> None:
-        """Initialize cache.
+        """Initialize cache with deprecation warning.
 
         Args:
             memory_dir: Path to the memory directory.
         """
+        warnings.warn(
+            "MemoryCache is deprecated. Use UnifiedGraph from raise_cli.context instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.memory_dir = memory_dir
         self.cache_path = memory_dir / "graph.json"
         self._builder = MemoryGraphBuilder()

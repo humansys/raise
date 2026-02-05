@@ -1,7 +1,15 @@
-"""CLI commands for memory queries and writes."""
+"""CLI commands for memory queries and writes.
+
+Memory queries now use the UnifiedGraph (ADR-019) with type filters,
+rather than a separate MemoryGraph. This consolidation provides:
+- Single source of truth for all context
+- Cross-domain queries (patterns + skills + governance)
+- Simpler cache invalidation
+"""
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from typing import Annotated
 
@@ -9,12 +17,15 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from raise_cli.context.graph import UnifiedGraph
+from raise_cli.context.models import ConceptNode
+from raise_cli.context.query import (
+    UnifiedQuery,
+    UnifiedQueryEngine,
+    UnifiedQueryResult,
+)
 from raise_cli.memory import (
     CalibrationInput,
-    MemoryCache,
-    MemoryGraph,
-    MemoryQuery,
-    MemoryQueryResult,
     PatternInput,
     PatternSubType,
     SessionInput,
@@ -22,6 +33,9 @@ from raise_cli.memory import (
     append_pattern,
     append_session,
 )
+
+# Memory types for filtering unified graph
+MEMORY_TYPES = ["pattern", "calibration", "session"]
 
 memory_app = typer.Typer(
     name="memory",
@@ -35,6 +49,11 @@ console = Console()
 def _get_default_memory_dir() -> Path:
     """Get default memory directory (.rai/memory)."""
     return Path(".rai/memory")
+
+
+def _get_default_graph_path() -> Path:
+    """Get default unified graph path (.raise/graph/unified.json)."""
+    return Path(".raise/graph/unified.json")
 
 
 @memory_app.command()
@@ -60,15 +79,25 @@ def query(
         int,
         typer.Option("--max-depth", "-d", help="Maximum traversal depth (1-3)"),
     ] = 2,
+    graph_path: Annotated[
+        Path | None,
+        typer.Option("--graph", "-g", help="Unified graph path"),
+    ] = None,
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path"),
+        typer.Option(
+            "--memory-dir",
+            "-m",
+            help="[DEPRECATED] Use --graph instead",
+            hidden=True,
+        ),
     ] = None,
 ) -> None:
-    """Query memory graph for relevant concepts.
+    """Query memory for relevant concepts.
 
     Searches Rai's memory (patterns, calibrations, sessions) using
-    keyword matching, BFS traversal, and recency weighting.
+    keyword matching and relevance scoring. Uses the unified graph
+    with memory type filters.
 
     Examples:
         # Simple keyword search
@@ -77,55 +106,59 @@ def query(
         # Limit results
         $ raise memory query "velocity" --max-results 5
 
-        # Disable traversal expansion
-        $ raise memory query "singleton" --no-expand
-
         # Output as JSON
         $ raise memory query "calibration" --format json
 
         # Save to file
         $ raise memory query "architecture" --output context.md
     """
-    # Resolve memory directory
-    mem_dir = memory_dir or _get_default_memory_dir()
-    if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        console.print("\nEnsure .rai/memory/ exists with JSONL files.")
+    # Handle deprecated option
+    if memory_dir is not None:
+        warnings.warn(
+            "--memory-dir is deprecated, use --graph instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+    # Resolve graph path
+    unified_path = graph_path or _get_default_graph_path()
+    if not unified_path.exists():
+        console.print(f"[red]Error:[/red] Unified graph not found: {unified_path}")
+        console.print("\nRun 'raise graph build --unified' to create the graph first.")
         raise typer.Exit(1)
 
-    # Load graph via cache
+    # Load unified graph and create query engine
     try:
-        cache = MemoryCache(mem_dir)
-        graph = cache.get_graph()
+        engine = UnifiedQueryEngine.from_file(unified_path)
     except Exception as e:
-        console.print(f"[red]Error loading memory graph:[/red] {e}")
+        console.print(f"[red]Error loading unified graph:[/red] {e}")
         raise typer.Exit(1) from None
 
-    # Create query engine and search
-    engine = MemoryQuery(graph)
-    result = engine.search(
+    # Query with memory type filter
+    unified_query = UnifiedQuery(
         query=query_str,
-        max_results=min(max(1, max_results), 50),
-        expand_traversal=expand,
-        max_depth=min(max(1, max_depth), 3),
+        types=MEMORY_TYPES,  # type: ignore[arg-type]
+        limit=min(max(1, max_results), 50),
+        max_depth=min(max(1, max_depth), 3) if expand else 0,
     )
+    result = engine.query(unified_query)
 
     console.print(f"\nSearching memory for: [cyan]{query_str}[/cyan]")
     console.print(f"Found: [yellow]{len(result.concepts)}[/yellow] concepts")
-    console.print(f"Query time: {result.query_time_ms:.2f}ms\n")
+    console.print(f"Query time: {result.metadata.execution_time_ms:.2f}ms\n")
 
     # Format output
     if format == "json":
         output_text = result.model_dump_json(indent=2)
     else:
-        output_text = _format_markdown(result)
+        output_text = _format_unified_markdown(result)
 
     # Write to file or stdout
     if output:
         output.write_text(output_text)
         console.print(f"✓ Results written to [cyan]{output}[/cyan]")
         console.print(f"  Concepts: {len(result.concepts)}")
-        console.print(f"  Tokens: ~{result.token_estimate}\n")
+        console.print(f"  Tokens: ~{result.metadata.token_estimate}\n")
     else:
         console.print(output_text)
 
@@ -140,133 +173,150 @@ def dump(
         Path | None,
         typer.Option("--output", "-o", help="Output file path (default: stdout)"),
     ] = None,
+    graph_path: Annotated[
+        Path | None,
+        typer.Option("--graph", "-g", help="Unified graph path"),
+    ] = None,
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path"),
+        typer.Option(
+            "--memory-dir",
+            "-m",
+            help="[DEPRECATED] Use --graph instead",
+            hidden=True,
+        ),
     ] = None,
 ) -> None:
-    """Dump full memory graph for inspection.
+    """Dump memory concepts for inspection.
 
-    Shows all concepts and relationships in the memory graph,
-    useful for debugging and verification.
+    Shows all memory concepts (patterns, calibrations, sessions)
+    from the unified graph, useful for debugging and verification.
 
     Examples:
         # Show summary table
         $ raise memory dump
 
         # Export as JSON
-        $ raise memory dump --format json --output graph.json
+        $ raise memory dump --format json --output memory.json
 
         # Export as Markdown
         $ raise memory dump --format markdown --output memory.md
     """
-    # Resolve memory directory
-    mem_dir = memory_dir or _get_default_memory_dir()
-    if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        console.print("\nEnsure .rai/memory/ exists with JSONL files.")
+    # Handle deprecated option
+    if memory_dir is not None:
+        warnings.warn(
+            "--memory-dir is deprecated, use --graph instead",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
+    # Resolve graph path
+    unified_path = graph_path or _get_default_graph_path()
+    if not unified_path.exists():
+        console.print(f"[red]Error:[/red] Unified graph not found: {unified_path}")
+        console.print("\nRun 'raise graph build --unified' to create the graph first.")
         raise typer.Exit(1)
 
-    # Load graph via cache
+    # Load unified graph
     try:
-        cache = MemoryCache(mem_dir)
-        graph = cache.get_graph()
+        graph = UnifiedGraph.load(unified_path)
     except Exception as e:
-        console.print(f"[red]Error loading memory graph:[/red] {e}")
+        console.print(f"[red]Error loading unified graph:[/red] {e}")
         raise typer.Exit(1) from None
 
-    console.print(f"\nMemory Graph: [cyan]{mem_dir}[/cyan]")
-    console.print(f"Nodes: [yellow]{len(graph.nodes)}[/yellow]")
-    console.print(f"Edges: [yellow]{len(graph.edges)}[/yellow]\n")
+    # Filter to memory types only
+    memory_concepts = [
+        c for c in graph.iter_concepts() if c.type in MEMORY_TYPES
+    ]
+
+    console.print(f"\nMemory Concepts from: [cyan]{unified_path}[/cyan]")
+    console.print(f"Concepts: [yellow]{len(memory_concepts)}[/yellow]\n")
 
     # Format output
     if format == "json":
-        output_text = graph.to_json()
+        import json
+
+        output_text = json.dumps(
+            [c.model_dump(mode="json") for c in memory_concepts],
+            indent=2,
+        )
     elif format == "markdown":
-        output_text = _format_graph_markdown(graph)
+        output_text = _format_concepts_markdown(memory_concepts)
     else:  # table
-        _print_graph_table(graph)
+        _print_concepts_table(memory_concepts)
         if output:
             # For file output in table mode, use markdown
-            output_text = _format_graph_markdown(graph)
+            output_text = _format_concepts_markdown(memory_concepts)
         else:
             return
 
     # Write to file or stdout
     if output:
         output.write_text(output_text)
-        console.print(f"✓ Graph written to [cyan]{output}[/cyan]\n")
+        console.print(f"✓ Memory dump written to [cyan]{output}[/cyan]\n")
     elif format != "table":
         console.print(output_text)
 
 
-def _format_markdown(result: MemoryQueryResult) -> str:
-    """Format query result as markdown."""
+def _format_unified_markdown(result: UnifiedQueryResult) -> str:
+    """Format unified query result as markdown."""
 
     lines = ["# Memory Query Results\n"]
     lines.append(f"**Concepts:** {len(result.concepts)}")
-    lines.append(f"**Tokens:** ~{result.token_estimate}")
-    lines.append(f"**Query time:** {result.query_time_ms:.2f}ms\n")
+    lines.append(f"**Tokens:** ~{result.metadata.token_estimate}")
+    lines.append(f"**Query time:** {result.metadata.execution_time_ms:.2f}ms\n")
 
     if result.concepts:
         lines.append("## Concepts\n")
         for concept in result.concepts:
-            lines.append(f"### {concept.id} ({concept.type.value})")
+            lines.append(f"### {concept.id} ({concept.type})")
             lines.append(f"\n{concept.content}\n")
-            if concept.context:
-                lines.append(f"**Context:** {', '.join(concept.context)}")
+            if concept.source_file:
+                lines.append(f"**Source:** {concept.source_file}")
             lines.append(f"**Created:** {concept.created}\n")
 
-    if result.relationships:
-        lines.append("## Relationships\n")
-        for rel in result.relationships:
-            lines.append(f"- {rel.source} --[{rel.type.value}]--> {rel.target}")
-
     return "\n".join(lines)
 
 
-def _format_graph_markdown(graph: MemoryGraph) -> str:
-    """Format full graph as markdown."""
+def _format_concepts_markdown(concepts: list[ConceptNode]) -> str:
+    """Format concepts list as markdown."""
 
-    lines = ["# Memory Graph\n"]
-    lines.append(f"**Nodes:** {len(graph.nodes)}")
-    lines.append(f"**Edges:** {len(graph.edges)}\n")
+    lines = ["# Memory Concepts\n"]
+    lines.append(f"**Total:** {len(concepts)}\n")
 
     # Group by type
-    by_type: dict[str, list[str]] = {}
-    for concept in graph.nodes.values():
-        type_name = concept.type.value
+    by_type: dict[str, list[ConceptNode]] = {}
+    for concept in concepts:
+        type_name = concept.type
         if type_name not in by_type:
             by_type[type_name] = []
-        by_type[type_name].append(concept.id)
+        by_type[type_name].append(concept)
 
     lines.append("## Concepts by Type\n")
-    for type_name, ids in sorted(by_type.items()):
-        lines.append(f"### {type_name.title()} ({len(ids)})\n")
-        for concept_id in sorted(ids):
-            concept = graph.nodes[concept_id]
-            lines.append(f"- **{concept_id}**: {concept.content[:60]}...")
+    for type_name, type_concepts in sorted(by_type.items()):
+        lines.append(f"### {type_name.title()} ({len(type_concepts)})\n")
+        for concept in sorted(type_concepts, key=lambda c: c.id):
+            content = (
+                concept.content[:60] + "..."
+                if len(concept.content) > 60
+                else concept.content
+            )
+            lines.append(f"- **{concept.id}**: {content}")
         lines.append("")
-
-    if graph.edges:
-        lines.append("## Relationships\n")
-        for edge in graph.edges:
-            lines.append(f"- {edge.source} --[{edge.type.value}]--> {edge.target}")
 
     return "\n".join(lines)
 
 
-def _print_graph_table(graph: MemoryGraph) -> None:
-    """Print graph as rich table."""
+def _print_concepts_table(concepts: list[ConceptNode]) -> None:
+    """Print concepts as rich table."""
 
-    # Concepts table
     table = Table(title="Memory Concepts")
     table.add_column("ID", style="cyan")
     table.add_column("Type", style="yellow")
     table.add_column("Content", max_width=50)
     table.add_column("Created")
 
-    for concept in sorted(graph.nodes.values(), key=lambda c: c.id):
+    for concept in sorted(concepts, key=lambda c: c.id):
         content = (
             concept.content[:47] + "..."
             if len(concept.content) > 50
@@ -274,16 +324,12 @@ def _print_graph_table(graph: MemoryGraph) -> None:
         )
         table.add_row(
             concept.id,
-            concept.type.value,
+            concept.type,
             content,
-            str(concept.created),
+            concept.created,
         )
 
     console.print(table)
-
-    # Edges summary
-    if graph.edges:
-        console.print(f"\n[dim]Relationships: {len(graph.edges)} edges[/dim]")
 
 
 # --- Append Commands ---

@@ -242,7 +242,7 @@ raise telemetry emit-session -t feature -o success -d 90 -f F9.1,F9.2,F9.3
 - **Telemetry:** `.rai/telemetry/signals.jsonl` (session event via CLI)
 - **Context:** `CLAUDE.local.md` (updated manually)
 - **Session Log:** `dev/sessions/YYYY-MM-DD-{topic}.md` (if significant)
-- **Graph:** `.rai/memory/graph.json` (auto-rebuilt on next query)
+- **Unified Graph:** `.raise/graph/unified.json` (rebuild with `raise graph build --unified`)
 
 ## Session Log Template
 
