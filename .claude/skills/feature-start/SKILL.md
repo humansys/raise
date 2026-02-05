@@ -85,17 +85,12 @@ git branch --list "epic/e{N}/*" | head -1
 Verify the epic scope document exists:
 
 ```bash
-# Check for E14+ tree structure first, then legacy
-ls work/epics/e{N}-*/scope.md 2>/dev/null || \
-ls dev/epic-e{N}-scope.md 2>/dev/null || \
-echo "WARN: No epic scope"
+ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic scope"
 ```
 
-**Path Convention (ISSUE-004):**
-| Epic | Scope Location | Features Location |
-|------|----------------|-------------------|
-| E14+ (new) | `work/epics/e{N}-{name}/scope.md` | `work/epics/e{N}-{name}/features/` |
-| E1-E13 (legacy) | `dev/epic-e{N}-scope.md` | `work/features/` |
+**Paths:**
+- Epic scope: `work/epics/e{N}-{name}/scope.md`
+- Features: `work/epics/e{N}-{name}/features/`
 
 **Decision:**
 - Scope exists → Load and verify feature is listed
@@ -110,8 +105,7 @@ echo "WARN: No epic scope"
 Confirm the feature is listed in the epic scope:
 
 ```bash
-# Check E14+ tree structure first, then legacy
-SCOPE=$(ls work/epics/e{N}-*/scope.md 2>/dev/null || ls dev/epic-e{N}-scope.md 2>/dev/null)
+SCOPE="work/epics/e{N}-{name}/scope.md"
 grep -q "{feature_id}" "$SCOPE" && echo "Feature found in epic" || echo "WARN: Feature not in epic scope"
 ```
 
@@ -298,6 +292,4 @@ Full scope documentation can follow in `/feature-design` or `/feature-plan`.
 
 - Next skill: `/feature-design` or `/feature-plan`
 - Complement: `/feature-close`
-- Epic context:
-  - E14+: `work/epics/e{N}-{name}/scope.md`
-  - E1-E13 (legacy): `dev/epic-{id}-scope.md`
+- Epic context: `work/epics/e{N}-{name}/scope.md`

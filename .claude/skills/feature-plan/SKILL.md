@@ -55,13 +55,7 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 - Technical Design for architectural context (if complex)
 
 **Output:**
-- Implementation plan (see Path Convention)
-
-**Path Convention (ISSUE-004):**
-| Epic | Feature Artifacts Location |
-|------|---------------------------|
-| E14+ (new) | `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/` |
-| E1-E13 (legacy) | `work/features/{feature-id}/` |
+- Implementation plan: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
 
 ## Steps
 
@@ -80,10 +74,7 @@ uv run raise telemetry emit feature {feature_id} --event start --phase plan
 Check design document for complex features:
 
 ```bash
-# Check E14+ tree structure first, then legacy
-ls work/epics/e*/features/{feature_id}/design.md 2>/dev/null || \
-ls work/features/{feature_id}/design.md 2>/dev/null || \
-echo "INFO: No design"
+ls work/epics/e*/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No design"
 ```
 
 **Decision:**
@@ -234,9 +225,7 @@ uv run raise telemetry emit feature {feature_id} --event complete --phase plan
 
 ## Output
 
-- **Artifact:** Feature plan document
-  - E14+: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
-  - E1-E13 (legacy): `work/features/{feature}/plan.md`
+- **Artifact:** `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
 - **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
 - **Next:** `/feature-implement`
