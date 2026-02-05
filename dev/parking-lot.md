@@ -8,6 +8,22 @@
 
 ## Urgent
 
+- [ ] **E14: Rai Distribution** — How new users "meet" Rai (CRITICAL for DX)
+  - **The gap:** Users get CLI + skills, but NOT Rai as entity
+  - **Research needed:**
+    - What's "base Rai" vs "personal Rai"?
+    - Which patterns are universal (methodology) vs accumulated (relationship)?
+    - How do other AI tools handle personality/identity distribution?
+    - What's the minimum viable first-contact experience?
+  - **Design needed:**
+    - What ships in package (starter identity, base patterns)?
+    - How does first `/session-start` initialize Rai?
+    - How does personal Rai diverge over time?
+    - How do "base Rai" updates propagate to existing users?
+  - **Priority:** P0 for post-F&F — crucial for public launch DX
+  - **Workaround for F&F:** Manually seed test profile with starter patterns
+  - **See:** ADR-013 (Rai as Entity), E7 onboarding discussion (2026-02-05)
+
 - [x] **F&F Readiness (Feb 9)** — See `governance/projects/raise-cli/backlog.md` §4
   - [x] README update (v2 structure) — Done 2026-02-02
   - [x] Installation guide — In README
@@ -37,6 +53,22 @@
 ## Ideas
 
 ### Framework Improvements
+
+- [ ] **Parallel task execution in /feature-implement** — (F7.7 discussion, 2026-02-05)
+  - When tasks have no dependencies, allow spawning subagents in parallel
+  - Combined HITL checkpoint after parallel tasks complete
+  - Pattern: identify independent tasks in plan → spawn parallel → converge → continue sequential
+
+- [ ] **Separation of Builder and Verifier (Lean Quality)** — (F7.2 discussion, 2026-02-05)
+  - **Problem:** Self-review checklists in skills (e.g., /feature-design Step 8) have builder verifying own work = muda
+  - **Lean principle:** TPS separates production from quality inspection. Jidoka catches defects, but verification is external.
+  - **Possible approaches:**
+    1. **Quality Gate Subagent** — Different Rai prompt focused on critical review, not building
+    2. **Poka-yoke in skills** — Design process so defects can't happen (structured templates, required fields)
+    3. **Human gate** — Explicit approval before phase transition (friction vs. quality tradeoff)
+    4. **Automated checks** — Deterministic validation where possible (schema validation, coverage gates)
+  - **Research needed:** How do lean masters handle creative/judgment work quality? Six Thinking Hats? Devil's Advocate pattern?
+  - **Potential skill:** `/quality-review` — invoke reviewer-Rai before proceeding to next phase
 
 - [ ] **Research output extraction** — Extract `work/research/*/` into unified graph (deferred from E12, complex format variance)
 - [ ] **Component catalog extraction** — Extract `dev/components.md` into graph (deferred from E12, nice-to-have)
