@@ -60,6 +60,19 @@
 
 ### Framework Improvements
 
+- [ ] **System Open Ends Audit** — (Post-E14, 2026-02-05)
+  - **Trigger:** Found 22 stale branches because no cleanup in lifecycle skills
+  - **Goal:** Systematic review to find similar "open ends" in RaiSE system
+  - **Method:** Walk through each lifecycle skill, each process rule, each integration point
+  - **Questions to ask:**
+    - What accumulates without cleanup? (branches, files, cache, telemetry)
+    - What can fail silently? (git -d vs -D, missing hooks)
+    - What requires manual memory that Rai should enforce?
+    - Where do skills assume state that may not exist?
+  - **Output:** List of gaps → prioritize → fix or add to backlog
+  - **Priority:** Post-E14, before V3 complexity increase
+  - **Pattern:** PAT-096 — Periodic system hygiene audits catch drift before accumulation
+
 - [ ] **Parallel task execution in /feature-implement** — (F7.7 discussion, 2026-02-05)
   - When tasks have no dependencies, allow spawning subagents in parallel
   - Combined HITL checkpoint after parallel tasks complete
@@ -79,7 +92,7 @@
 - [ ] **Research output extraction** — Extract `work/research/*/` into unified graph (deferred from E12, complex format variance)
 - [ ] **Component catalog extraction** — Extract `dev/components.md` into graph (deferred from E12, nice-to-have)
 - [ ] **Session-aware context loading** — Skip redundant queries in same session (deferred from E12, optimization — re-querying is <1ms)
-- [ ] **Epic-close skill** (`/epic-close`) - Formalize epic closure ritual (retrospective, merge, cleanup). Currently manual. (E12 close, 2026-02-04)
+- [x] ~~**Epic-close skill** (`/epic-close`)~~ **DONE** — Implemented 2026-02-05, v1.0.0. Includes retrospective, metrics, branch cleanup.
 - [ ] **Feature pre-verification in /feature-start** - Check if feature already implemented before starting work. (F12.6 was already done, 2026-02-04)
 - [ ] **Memory system improvements** (E12 retrospective, 2026-02-04):
   - Semantic search for queries (keyword brittleness — "testing" misses "type hints")
