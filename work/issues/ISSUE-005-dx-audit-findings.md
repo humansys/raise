@@ -166,23 +166,15 @@ Updated 10 skills to use new command names.
 
 ## Medium Priority Issues
 
-### 11. Convention Schema Over-Engineered
+### 11. Convention Schema Over-Engineered — NOT AN ISSUE
 
-**File:** `onboarding/conventions.py`
-
-8 Pydantic models for style detection where 3-4 would suffice. Each convention type (indentation, quote, line_length, naming) has identical fields.
-
-**Fix:** Flatten to single `Convention` model with `type` discriminator.
+**Analysis:** Each convention type has distinct fields (style vs pattern vs max_length). The shared fields (confidence, sample_count) provide consistent structure but the models are NOT identical. Collapsing them would lose type safety. Current design is appropriate.
 
 ---
 
-### 12. XDG Path Helpers Repeated
+### 12. XDG Path Helpers Repeated ✅ RESOLVED
 
-**File:** `config/paths.py:13-64`
-
-Three nearly identical functions for config/cache/data directories.
-
-**Fix:** Extract parameterized `_get_xdg_dir(var_name, fallback)` helper.
+**Resolution:** Already extracted — `_get_xdg_dir()` helper exists at line 117-129. Issue was stale when written.
 
 ---
 
@@ -200,26 +192,15 @@ Three nearly identical functions for config/cache/data directories.
 
 ---
 
-### 14. Output Format Names Inconsistent
+### 14. Output Format Names Inconsistent ✅ RESOLVED
 
-| Command | Formats |
-|---------|---------|
-| discover scan | human, json, summary |
-| memory dump | table, json, markdown |
-| context query | markdown, json |
-| graph extract | human, json |
-
-"markdown" vs "human" inconsistency.
-
-**Fix:** Standardize on `human`, `json`, `table` everywhere.
+**Resolution:** Standardized on `human`, `json`, `table` (commit 7afce95). Changed context.py and memory.py from "markdown" to "human".
 
 ---
 
-### 15. Generic `metadata: dict` Escape Hatches
+### 15. Generic `metadata: dict` Escape Hatches — NOT AN ISSUE
 
-7 models have `metadata: dict[str, Any]` with <8 actual usages. YAGNI violation.
-
-**Fix:** Remove or convert to specific typed fields when actually used.
+**Analysis:** The metadata fields are actually used extensively for domain-specific data (requirement_id, epic_id, needs_context, learned_from, etc.). They're legitimate extension points, not escape hatches. 20+ usages found across parsers, graph building, and CLI output.
 
 ---
 
@@ -244,12 +225,16 @@ Three nearly identical functions for config/cache/data directories.
 
 ### Post-Launch — Nice to Have
 
-| Issue | Effort | Impact |
-|-------|--------|--------|
-| #3 Skill bloat refactor | 4h | Medium |
-| #7 Skill boilerplate extraction | 2h | Medium |
-| #9 Graph base class | 2h | Medium |
-| #11-15 Polish items | 4h total | Low |
+| Issue | Effort | Impact | Status |
+|-------|--------|--------|--------|
+| #3 Skill bloat refactor | 4h | Medium | Pending |
+| #7 Skill boilerplate extraction | 2h | Medium | Pending |
+| #9 Graph base class | 2h | Medium | Pending |
+| #11 Convention schema | - | - | ✅ Not an issue (models are distinct) |
+| #12 XDG path helpers | - | - | ✅ Already extracted |
+| #13 Skill section names | 1h | Low | Pending |
+| #14 Output format names | - | - | ✅ Done |
+| #15 Metadata dict fields | - | - | ✅ Not an issue (legitimately used) |
 
 ---
 
