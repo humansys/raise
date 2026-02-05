@@ -230,14 +230,14 @@ class TestMemoryListCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_list_markdown_format(
+    def test_list_human_format(
         self, sample_unified_graph: Path, tmp_path: Path
     ) -> None:
-        """Test list with markdown format."""
+        """Test list with human-readable format."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(app, ["memory", "list", "--format", "markdown"])
+            result = runner.invoke(app, ["memory", "list", "--format", "human"])
 
             assert result.exit_code == 0
             assert "# Memory Concepts" in result.stdout
