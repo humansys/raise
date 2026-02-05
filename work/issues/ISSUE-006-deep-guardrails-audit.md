@@ -14,7 +14,7 @@
 | Phase 2 | ✅ DONE | `9516722` | M3, M8 — extract_keywords(), should_exclude_dir() to core/ |
 | Phase 3 | ✅ DONE | (pending) | M4, M5, M6, M7, M9, M10, M11, M12, M13 — All medium items resolved |
 
-**Remaining violations:** 41 (28 fixed) — Only Low priority tech debt remains (L1-L3, L5)
+**Final status:** All actionable items resolved. L1 deferred (low value), 7 marginal functions accepted.
 
 ---
 
@@ -226,13 +226,15 @@
 
 ## Low Priority (Tech Debt - Post F&F)
 
-### L1. [CLI 2.2] Missing --format Option
+### L1. [CLI 2.2] Missing --format Option — DEFERRED
 
 Commands without format support:
 - `profile show` (YAML only)
 - `profile session` (text only)
 - `status` (text only)
 - `telemetry emit-*` (text only)
+
+**Deferred:** Low value for F&F. Not visible as "carelessness" — these are internal/developer commands. Add in post-F&F polish if needed.
 
 ### ✅ L2. [Core 3.4] Path Traversal Prevention — BY DESIGN
 
