@@ -511,7 +511,7 @@ Day 5:                                        └► Retro, polish (M4: Complete
 | F7.6 Skills Bundling | XS | 1 | ✅ Done | — | — | Pre-E7 |
 | F7.8 Personal Memory | S | 2 | ✅ Done | 17 min | 2.94x | |
 | F7.9 Emilio Migration | XS | 1 | ✅ Done | 15 min | 2.0x | Extended model |
-| F7.1 `raise init` | M | 3 | Pending | — | — | |
+| F7.1 `raise init` | M | 3 | ✅ Done | 40 min | 2.25x | M1 complete |
 | F7.2 Convention Detection | M | 3 | Pending | — | — | HIGH RISK |
 | F7.3 Governance Generation | S | 2 | Pending | — | — | |
 | F7.4 Enhanced CLAUDE.md | S | 2 | Pending | — | — | |
@@ -519,7 +519,7 @@ Day 5:                                        └► Retro, polish (M4: Complete
 | F7.5 `raise status` | XS | 1 | Pending | — | — | |
 
 **Milestone Progress:**
-- [ ] M1: Walking Skeleton (Day 1 - Feb 4)
+- [x] M1: Walking Skeleton (Day 1 - Feb 4) ✅ Complete (F7.8, F7.9, F7.1)
 - [ ] M2: Brownfield MVP (Day 3 - Feb 6)
 - [ ] M3: Adaptive Experience (Day 4 - Feb 7)
 - [ ] M4: Epic Complete (Day 5 - Feb 8)
