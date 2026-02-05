@@ -17,6 +17,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.context.graph import UnifiedGraph
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
@@ -24,7 +25,6 @@ from raise_cli.context.query import (
     UnifiedQueryEngine,
     UnifiedQueryResult,
 )
-from raise_cli.cli.error_handler import cli_error
 from raise_cli.memory import (
     CalibrationInput,
     PatternInput,
@@ -228,9 +228,7 @@ def list_memory(
         cli_error(f"Error loading unified graph: {e}")
 
     # Filter to memory types only
-    memory_concepts = [
-        c for c in graph.iter_concepts() if c.type in MEMORY_TYPES
-    ]
+    memory_concepts = [c for c in graph.iter_concepts() if c.type in MEMORY_TYPES]
 
     console.print(f"\nMemory Concepts from: [cyan]{unified_path}[/cyan]")
     console.print(f"Concepts: [yellow]{len(memory_concepts)}[/yellow]\n")
@@ -348,7 +346,9 @@ def add_pattern(
     sub_type: Annotated[
         str,
         typer.Option(
-            "--type", "-t", help="Pattern type (codebase, process, architecture, technical)"
+            "--type",
+            "-t",
+            help="Pattern type (codebase, process, architecture, technical)",
         ),
     ] = "process",
     learned_from: Annotated[
@@ -412,9 +412,18 @@ def add_pattern(
 @memory_app.command("add-calibration")
 def add_calibration_cmd(
     feature: Annotated[str, typer.Argument(help="Feature ID (e.g., F3.5)")],
-    name: Annotated[str, typer.Argument(help="Feature name")],
-    size: Annotated[str, typer.Argument(help="T-shirt size (XS, S, M, L, XL)")],
-    actual: Annotated[int, typer.Argument(help="Actual minutes")],
+    name: Annotated[
+        str,
+        typer.Option("--name", help="Feature name (required)"),
+    ],
+    size: Annotated[
+        str,
+        typer.Option("--size", "-s", help="T-shirt size: XS, S, M, L, XL (required)"),
+    ],
+    actual: Annotated[
+        int,
+        typer.Option("--actual", "-a", help="Actual minutes spent (required)"),
+    ],
     estimated: Annotated[
         int | None,
         typer.Option("--estimated", "-e", help="Estimated minutes"),
@@ -440,13 +449,13 @@ def add_calibration_cmd(
 
     Examples:
         # Basic calibration
-        $ raise memory add-calibration F3.5 "Skills Integration" XS 20
+        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
 
         # With estimate for velocity calculation
-        $ raise memory add-calibration F3.5 "Skills Integration" XS 20 -e 60
+        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60
 
         # Full details
-        $ raise memory add-calibration F3.5 "Skills Integration" XS 20 -e 60 --sp 2 -n "Hook-assisted workflow"
+        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
     """
     mem_dir = memory_dir or _get_default_memory_dir()
     if not mem_dir.exists():

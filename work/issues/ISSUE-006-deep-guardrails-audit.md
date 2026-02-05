@@ -62,27 +62,44 @@
 
 ## Medium Priority Fixes (Address before F&F if time permits)
 
-### M1. [CLI 2.5] Fat Commands - Business Logic in Commands
+### ⚡ M1. [CLI 2.5] Fat Commands - Business Logic in Commands — PARTIAL
 
-| File | Function | Lines | Issue |
-|------|----------|-------|-------|
-| `discover.py` | `scan_command` | 165 | Output formatting inline |
-| `discover.py` | `drift_command` | 189 | Output formatting inline |
-| `graph.py` | `build` | 123 | Caching/serialization inline |
-| `context.py` | `query` | 107 | Branch logic for unified vs governance |
+| File | Function | Lines | Issue | Status |
+|------|----------|-------|-------|--------|
+| `discover.py` | `scan_command` | 165 → 8 | Output formatting inline | ✅ Extracted |
+| `discover.py` | `drift_command` | 189 → 15 | Output formatting inline | ✅ Extracted |
+| `discover.py` | `build_command` | ~55 | Output formatting inline | Deferred |
+| `graph.py` | `build` | 123 | Caching/serialization inline | Deferred |
+| `context.py` | `query` | 107 | Branch logic for unified vs governance | Already factored |
 
 **Introduced:** F13.2 (discover), F2.2/F2.3 (graph), F11.3 (context)
 
-**Fix:** Extract formatting to `raise_cli/output/` module. Commands should orchestrate only.
+**Resolution (Partial):** Created `output/formatters/discover.py` with `format_scan_result()` and `format_drift_result()`. Commands now delegate formatting to dedicated module.
+
+**Files changed:**
+- `src/raise_cli/output/formatters/__init__.py` (new)
+- `src/raise_cli/output/formatters/discover.py` (new, 214 lines)
+- `src/raise_cli/cli/commands/discover.py` (543 → 427 lines)
+
+**Remaining:** `build_command` in discover.py, `build` in graph.py have inline formatting but lower impact. `context.py` already has helper functions extracted.
 
 ---
 
-### M2. [CLI 2.1] Multiple Positional Arguments
+### ⚡ M2. [CLI 2.1] Multiple Positional Arguments — PARTIAL
 
-| File | Command | Positionals | Should Be |
-|------|---------|-------------|-----------|
-| `memory.py:411` | `add-calibration` | 4 (feature, name, size, actual) | 1 + 3 flags |
-| `telemetry.py:204` | `emit` | 2 (work_type, work_id) | 1 + 1 flag |
+| File | Command | Before | After | Status |
+|------|---------|--------|-------|--------|
+| `memory.py` | `add-calibration` | 4 positionals | 1 + 3 flags | ✅ Fixed |
+| `telemetry.py` | `emit` | 2 positionals | — | Deferred |
+
+**Resolution (Partial):**
+- `add-calibration`: Changed to `<feature> --name NAME -s SIZE -a ACTUAL`
+- `emit`: Deferred — 12 skills depend on current syntax, ergonomic as-is
+
+**Files updated:**
+- `src/raise_cli/cli/commands/memory.py`
+- `.claude/skills/session-close/SKILL.md` (fixed parameter order bug)
+- `.claude/scripts/pre-compact-reminder.sh`
 
 **Introduced:** E9 (F9.4 Session Emitters)
 
@@ -305,8 +322,13 @@ Most memory/ violations are in deprecated code (`MemoryGraph`, `MemoryQuery`). N
 10. **M12:** ✅ Added BaselineComponent Pydantic model
 11. **M13:** ✅ Refactored scanner.py long functions
 
+### ⚡ Phase 4: CLI Polish — PARTIAL
+12. **M1:** ⚡ Extracted formatters for discover.py (scan, drift)
+13. **M2:** ⚡ Fixed add-calibration (1 positional + 3 flags)
+
 ### Remaining: Low Priority Tech Debt
-- M1 (fat commands), M2 (positional args) — defer to post-F&F
+- M1 remaining: `build_command` in discover.py, `build` in graph.py
+- M2 remaining: `emit` in telemetry.py (deferred — 12 skills depend on it)
 - L1-L6 — cosmetic improvements
 
 ---

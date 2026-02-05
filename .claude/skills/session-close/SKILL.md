@@ -152,7 +152,7 @@ Next: E14 design phase
 
 **Calibration:** If features completed, also run:
 ```bash
-uv run raise memory add-calibration {feature_id} "Name" {size} {estimated_mins} -e {actual_mins}
+uv run raise memory add-calibration {feature_id} --name "Name" -s {size} -a {actual_mins} -e {estimated_mins}
 ```
 
 ## References
