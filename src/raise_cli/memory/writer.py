@@ -142,7 +142,7 @@ def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
     duplicates, and large gaps in sequence.
 
     Args:
-        memory_dir: Path to .rai/memory/ directory.
+        memory_dir: Path to .raise/rai/memory/ directory.
 
     Returns:
         SessionIndexValidation with findings.
@@ -313,7 +313,7 @@ def append_pattern(
     """Append a new pattern to patterns.jsonl.
 
     Args:
-        memory_dir: Path to .rai/memory/ directory.
+        memory_dir: Path to .raise/rai/memory/ directory.
         input_data: Pattern input data.
         created: Date created (defaults to today).
 
@@ -351,7 +351,7 @@ def append_calibration(
     """Append a new calibration to calibration.jsonl.
 
     Args:
-        memory_dir: Path to .rai/memory/ directory.
+        memory_dir: Path to .raise/rai/memory/ directory.
         input_data: Calibration input data.
         created: Date created (defaults to today).
 
@@ -399,7 +399,7 @@ def append_session(
     """Append a new session to sessions/index.jsonl.
 
     Args:
-        memory_dir: Path to .rai/memory/ directory.
+        memory_dir: Path to .raise/rai/memory/ directory.
         input_data: Session input data.
         session_date: Session date (defaults to today).
 

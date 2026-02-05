@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from raise_cli.config.paths import get_memory_dir
 from raise_cli.context.extractors.skills import extract_all_skills
 from raise_cli.context.graph import UnifiedGraph
 from raise_cli.context.models import ConceptEdge, ConceptNode
@@ -101,7 +102,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of ConceptNode for memory concepts.
         """
-        memory_dir = self.project_root / ".rai" / "memory"
+        memory_dir = get_memory_dir(self.project_root)
         if not memory_dir.exists():
             return []
 

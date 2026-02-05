@@ -78,7 +78,7 @@ class GuardrailGenerator:
     def _generate_style_guardrails(
         self,
         conventions: ConventionResult,
-        next_id: "Callable[[GuardrailLevel, str], str]",
+        next_id: Callable[[GuardrailLevel, str], str],
     ) -> list[GeneratedGuardrail]:
         """Generate style-related guardrails (indentation, quotes, line length)."""
         guardrails: list[GeneratedGuardrail] = []
@@ -134,7 +134,7 @@ class GuardrailGenerator:
     def _generate_naming_guardrails(
         self,
         conventions: ConventionResult,
-        next_id: "Callable[[GuardrailLevel, str], str]",
+        next_id: Callable[[GuardrailLevel, str], str],
     ) -> list[GeneratedGuardrail]:
         """Generate naming convention guardrails."""
         guardrails: list[GeneratedGuardrail] = []
@@ -181,7 +181,7 @@ class GuardrailGenerator:
     def _generate_structure_guardrails(
         self,
         conventions: ConventionResult,
-        next_id: "Callable[[GuardrailLevel, str], str]",
+        next_id: Callable[[GuardrailLevel, str], str],
     ) -> list[GeneratedGuardrail]:
         """Generate project structure guardrails."""
         guardrails: list[GeneratedGuardrail] = []

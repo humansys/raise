@@ -218,7 +218,7 @@ def unified_graph() -> UnifiedGraph:
             id="PAT-001",
             type="pattern",
             content="Apply 0.5x multiplier to estimates when using kata cycle",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-02-01",
             metadata={"sub_type": "process"},
         )
@@ -228,7 +228,7 @@ def unified_graph() -> UnifiedGraph:
             id="CAL-001",
             type="calibration",
             content="F2.1 Concept Extraction: Size S, Est 180m, Actual 52m",
-            source_file=".rai/memory/calibration.jsonl",
+            source_file=".raise/rai/memory/calibration.jsonl",
             created="2026-01-31",
             metadata={"feature": "F2.1"},
         )

@@ -1,7 +1,7 @@
 """JSONL loader for memory concepts.
 
 This module provides functions to load memory concepts from JSONL files
-in the .rai/memory/ directory.
+in the .raise/rai/memory/ directory.
 """
 
 from __future__ import annotations
@@ -188,7 +188,7 @@ def load_jsonl_file(
 
 
 def load_memory_from_directory(memory_dir: Path) -> MemoryLoadResult:
-    """Load all memory concepts from a .rai/memory/ directory.
+    """Load all memory concepts from a .raise/rai/memory/ directory.
 
     Args:
         memory_dir: Path to the memory directory.

@@ -75,8 +75,8 @@ class TestLoadMemory:
 
     def test_loads_patterns_from_jsonl(self, tmp_path: Path) -> None:
         """Should load patterns from patterns.jsonl."""
-        # Create .rai/memory structure
-        memory_dir = tmp_path / ".rai" / "memory"
+        # Create .raise/rai/memory structure
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
 
         patterns_file = memory_dir / "patterns.jsonl"
@@ -103,7 +103,7 @@ class TestLoadMemory:
 
     def test_loads_calibration_from_jsonl(self, tmp_path: Path) -> None:
         """Should load calibration from calibration.jsonl."""
-        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
 
         calibration_file = memory_dir / "calibration.jsonl"
@@ -131,7 +131,7 @@ class TestLoadMemory:
 
     def test_loads_sessions_from_jsonl(self, tmp_path: Path) -> None:
         """Should load sessions from sessions/index.jsonl."""
-        sessions_dir = tmp_path / ".rai" / "memory" / "sessions"
+        sessions_dir = tmp_path / ".raise/rai" / "memory" / "sessions"
         sessions_dir.mkdir(parents=True)
 
         sessions_file = sessions_dir / "index.jsonl"
@@ -156,7 +156,7 @@ class TestLoadMemory:
         assert "E3 Implementation" in node.content
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
-        """Should return empty list if .rai/memory doesn't exist."""
+        """Should return empty list if .raise/rai/memory doesn't exist."""
         builder = UnifiedGraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
@@ -164,7 +164,7 @@ class TestLoadMemory:
 
     def test_loads_all_memory_types(self, tmp_path: Path) -> None:
         """Should load patterns, calibration, and sessions together."""
-        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         sessions_dir = memory_dir / "sessions"
         sessions_dir.mkdir(parents=True)
 
@@ -371,7 +371,7 @@ class TestBuild:
     def test_builds_graph_with_all_sources(self, tmp_path: Path) -> None:
         """Should combine all sources into UnifiedGraph."""
         # Setup minimal fixtures
-        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
         (memory_dir / "patterns.jsonl").write_text(
             json.dumps({"id": "PAT-001", "type": "process", "content": "Test", "created": "2026-01-31"}) + "\n"
@@ -461,7 +461,7 @@ class TestInferRelationships:
             id="PAT-001",
             type="pattern",
             content="Test pattern",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-01-31",
             metadata={"learned_from": "F1.5"},
         )
@@ -469,7 +469,7 @@ class TestInferRelationships:
             id="SES-010",
             type="session",
             content="F1.5 session",
-            source_file=".rai/memory/sessions/index.jsonl",
+            source_file=".raise/rai/memory/sessions/index.jsonl",
             created="2026-01-31",
             metadata={"topic": "F1.5 Output Module"},
         )
@@ -540,7 +540,7 @@ class TestInferRelationships:
         assert needs_edges[0].weight == 1.0
 
     def test_infers_skill_next_edges(self, tmp_path: Path) -> None:
-        """Should create related_to edges from skill.raise.next."""
+        """Should create related_to edges from skill.raise/raise.next."""
         skill = ConceptNode(
             id="/feature-plan",
             type="skill",
@@ -572,7 +572,7 @@ class TestInferRelationships:
             id="PAT-012",
             type="pattern",
             content="Design-first eliminates ambiguity in implementation planning",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-01-31",
             metadata={"context": ["planning", "implementation"]},
         )
@@ -604,7 +604,7 @@ class TestInferRelationships:
 
     def test_build_includes_inferred_edges(self, tmp_path: Path) -> None:
         """Build should include edges from infer_relationships."""
-        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         sessions_dir = memory_dir / "sessions"
         sessions_dir.mkdir(parents=True)
 

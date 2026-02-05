@@ -2,7 +2,7 @@
 
 This module provides CLI commands to emit telemetry signals as specified
 in ADR-018. These commands are designed to be called by AI agents or
-humans to record signals to .rai/telemetry/signals.jsonl.
+humans to record signals to .raise/rai/telemetry/signals.jsonl.
 """
 
 from __future__ import annotations
