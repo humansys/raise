@@ -52,11 +52,17 @@ Reflect on the completed feature to extract learnings, identify process improvem
 
 **Inputs required:**
 - Completed feature
-- Progress log (`work/features/{feature}/progress.md`)
+- Progress log (see Path Convention below)
 - Team feedback (if available)
 
 **Output:**
-- `work/features/{feature}/retrospective.md` - Documented retrospective
+- Retrospective document (see Path Convention)
+
+**Path Convention (ISSUE-004):**
+| Epic | Feature Artifacts Location |
+|------|---------------------------|
+| E14+ (new) | `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/` |
+| E1-E13 (legacy) | `work/features/{feature-id}/` |
 
 ## Steps
 
@@ -235,7 +241,9 @@ uv run raise telemetry emit feature {feature_id} --event complete --phase review
 
 ## Output
 
-- **Artifact:** `work/features/{feature}/retrospective.md`
+- **Artifact:** Feature retrospective document
+  - E14+: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
+  - E1-E13 (legacy): `work/features/{feature}/retrospective.md`
 - **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
 - **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None

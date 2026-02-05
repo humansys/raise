@@ -71,10 +71,16 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - Constraints (timeline, resources, dependencies)
 
 **Outputs:**
-- Epic scope document (`dev/epic-{id}-scope.md`)
+- Epic scope document (see Path Convention below)
 - ADRs for significant architectural decisions (`dev/decisions/adr-*.md`)
 - Feature list with sizes, dependencies, and sequencing
 - Updated parking lot with deferred items
+
+**Path Convention (ISSUE-004):**
+| Epic | Scope Location | Features Location |
+|------|----------------|-------------------|
+| E14+ (new) | `work/epics/e{N}-{name}/scope.md` | `work/epics/e{N}-{name}/features/` |
+| E1-E13 (legacy) | `dev/epic-e{N}-scope.md` | `work/features/` |
 
 ## Steps
 
@@ -342,7 +348,9 @@ Identify what could go wrong and how to address it.
 
 Consolidate all design work into the epic scope document.
 
-**Location:** `dev/epic-{id}-scope.md`
+**Location:**
+- E14+: `work/epics/e{N}-{name}/scope.md`
+- E1-E13 (legacy): `dev/epic-e{N}-scope.md`
 
 **Required sections:**
 1. Objective (from Step 1)
@@ -413,7 +421,9 @@ uv run raise telemetry emit epic {epic_id} --event complete --phase design
 
 ## Output
 
-- **Primary:** `dev/epic-{id}-scope.md` - Epic scope document
+- **Primary:** Epic scope document
+  - E14+: `work/epics/e{N}-{name}/scope.md`
+  - E1-E13 (legacy): `dev/epic-e{N}-scope.md`
 - **Secondary:** `dev/decisions/adr-*.md` - ADRs for architectural decisions (0-3 typical)
 - **Updated:** `dev/parking-lot.md` - Deferred items captured
 - **Next:** `/epic-plan` (sequence features, plan milestones)
@@ -571,7 +581,9 @@ This skill supports the three-layer memory model:
 
 ## References
 
-- **Epic Scope Examples:** `dev/epic-e1-scope.md`, `dev/epic-e2-scope.md`, `dev/epic-e3-scope.md`
+- **Epic Scope Examples:**
+  - E14+ (tree): `work/epics/e14-rai-distribution/scope.md`
+  - E1-E13 (legacy): `dev/epic-e1-scope.md`, `dev/epic-e2-scope.md`, `dev/epic-e3-scope.md`
 - **ADR Template:** `.raise/templates/architecture/adr.md`
 - **Feature Design:** `/feature-design` (next level down)
 - **Epic Plan:** `/epic-plan` (sequence features after design)

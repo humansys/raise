@@ -52,7 +52,9 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 - Epic continuing (not all features done yet)
 
 **Inputs required:**
-- Epic scope document (`dev/epic-{id}-scope.md`)
+- Epic scope document:
+  - E14+: `work/epics/e{N}-{name}/scope.md`
+  - E1-E13 (legacy): `dev/epic-e{N}-scope.md`
 - All features complete with retrospectives
 - Epic branch with all work merged
 - Passing tests
@@ -71,11 +73,18 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 Check that all features are done:
 
 ```bash
+# Determine scope path (E14+ vs legacy)
+if [ -d "work/epics/e{N}-{name}" ]; then
+    SCOPE="work/epics/e{N}-{name}/scope.md"
+else
+    SCOPE="dev/epic-e{N}-scope.md"
+fi
+
 # Review epic scope for feature checklist
-cat dev/epic-{epic_id}-scope.md | grep -E "^\s*-\s*\[.\]"
+cat "$SCOPE" | grep -E "^\s*-\s*\[.\]"
 
 # Verify no incomplete features
-if grep -E "^\s*-\s*\[ \]" dev/epic-{epic_id}-scope.md | grep -i "F{epic_id}"; then
+if grep -E "^\s*-\s*\[ \]" "$SCOPE" | grep -i "F{epic_id}"; then
     echo "ERROR: Incomplete features found"
     exit 4
 fi
@@ -101,7 +110,11 @@ uv run pytest --tb=short
 
 ### Step 3: Create Epic Retrospective (REQUIRED)
 
-Create `dev/epic-{epic_id}-retrospective.md` with:
+Create retrospective document:
+- E14+: `work/epics/e{N}-{name}/retrospective.md`
+- E1-E13 (legacy): `dev/epic-{epic_id}-retrospective.md`
+
+Template:
 
 ```markdown
 # Epic Retrospective: E{N} {Epic Name}
@@ -162,8 +175,8 @@ Create `dev/epic-{epic_id}-retrospective.md` with:
 
 ## Artifacts
 
-- **Scope:** `dev/epic-{id}-scope.md`
-- **Features:** `work/features/` (N feature directories)
+- **Scope:** (E14+: `work/epics/.../scope.md` | Legacy: `dev/epic-{id}-scope.md`)
+- **Features:** (E14+: `work/epics/.../features/` | Legacy: `work/features/`)
 - **ADRs:** [list any ADRs created]
 - **Tests:** N new tests
 
@@ -285,7 +298,9 @@ Update `CLAUDE.local.md`:
 
 ## Output
 
-- **Retrospective:** `dev/epic-{epic_id}-retrospective.md`
+- **Retrospective:**
+  - E14+: `work/epics/e{N}-{name}/retrospective.md`
+  - E1-E13 (legacy): `dev/epic-{epic_id}-retrospective.md`
 - **Merge:** Epic merged to v2 with `--no-ff`
 - **Cleanup:** All epic and feature branches deleted (local and remote)
 - **Backlog:** Epic marked complete
@@ -366,6 +381,8 @@ If epic is abandoned (not completed):
 ## References
 
 - Previous: All feature `/feature-close` completions
-- Epic scope: `dev/epic-{id}-scope.md`
+- Epic scope:
+  - E14+: `work/epics/e{N}-{name}/scope.md`
+  - E1-E13 (legacy): `dev/epic-{id}-scope.md`
 - Backlog: `governance/projects/raise-cli/backlog.md`
 - Next: `/epic-design` for next epic
