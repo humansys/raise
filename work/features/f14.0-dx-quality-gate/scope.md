@@ -1,6 +1,7 @@
 # Feature Scope: F14.0 DX Quality Gate
 
 > Pre-distribution cleanup to ensure raise-cli quality before F&F release.
+> **Philosophy:** Clean house before inviting guests. Fix our code against our own standards.
 
 **Epic:** E14 Rai Distribution
 **Branch:** `feature/e14/f14.0-dx-quality-gate`
@@ -10,28 +11,53 @@
 
 ## In Scope
 
-### Critical Fixes (Must)
-- [ ] Fix `raise init` output to clarify CLI vs Claude Code skills gap
-- [ ] Add post-init guidance (what to do next)
-- [ ] Resolve MemoryGraph deprecation (complete migration or remove warnings)
+### Phase 1: Establish Standards (Guardrails)
 
-### Code Quality (Should)
-- [ ] Extract duplicated ID sanitization to shared utility
-- [ ] Extract duplicated graph methods to base class/mixin
-- [ ] Extract duplicated XDG path helpers to parameterized function
+**1.1 Synthesize Research into Guardrails**
+- [ ] Create `governance/solution/guardrails-stack.md`
+- [ ] Synthesize 6 research catalogs into actionable patterns:
+  - Pydantic v2 patterns and anti-patterns
+  - Typer CLI design principles
+  - Security checklist (OWASP, Bandit rules)
+  - Pytest best practices
+  - DRY/SOLID for Python (Rule of Three)
+- [ ] Format: Pattern | Anti-pattern | Why | Example
+
+**1.2 Update Framework Integration**
+- [ ] Add Jidoka checkpoint to `/feature-review` skill
+- [ ] Update `.pre-commit-config.yaml` (add pip-audit, detect-secrets)
+- [ ] Reference guardrails-stack.md from CLAUDE.md
+
+### Phase 2: Scan and Fix Codebase
+
+**2.1 Critical Fixes (ISSUE-005)**
+- [ ] Fix `raise init` output — clarify CLI vs Claude Code skills gap
+- [ ] Add post-init guidance — what to do next
+- [ ] Resolve MemoryGraph deprecation — complete migration or remove
+
+**2.2 DRY Violations (from audit)**
+- [ ] Extract ID sanitization to `core/text.py` (vision.py, constitution.py)
+- [ ] Extract graph methods to base class/mixin (ConceptGraph, UnifiedGraph)
+- [ ] Extract XDG path helpers to parameterized function (paths.py)
+- [ ] Consolidate memory loaders if rule-of-three applies
+
+**2.3 Code Hygiene**
 - [ ] Delete duplicate `/epic-close/skill.md` (old version)
+- [ ] Standardize skill headers ("When to Use" → "Purpose")
+- [ ] Rename `raise memory dump` → `raise memory list`
+- [ ] Fix any security issues found by new pre-commit hooks
 
-### Guardrails Update (Should)
-- [ ] Add stack best practices section from research:
-  - Pydantic v2 patterns
-  - Typer CLI patterns
-  - Security checklist
-  - DRY/SOLID guidelines for Python
-- [ ] Add Jidoka checkpoint referencing new guardrails
+**2.4 Validate Against New Guardrails**
+- [ ] Run full codebase scan against guardrails-stack.md
+- [ ] Fix violations found (prioritize by severity)
+- [ ] Document any intentional exceptions with rationale
 
-### Quick Wins (Should)
-- [ ] Standardize session skill headers ("When to Use" → "Purpose")
-- [ ] Fix command naming: `raise memory dump` → `raise memory list`
+### Phase 3: Verification
+
+- [ ] All tests pass (>90% coverage)
+- [ ] All pre-commit hooks pass (including new ones)
+- [ ] Manual review of `raise init` flow
+- [ ] Retrospective and learnings captured
 
 ---
 
@@ -43,22 +69,26 @@
 - Schema consolidation (governance/query vs context/query)
 - Telemetry boilerplate extraction from skills
 - Convention schema flattening (8 models → 3)
+- ISSUE-003/004 directory restructuring
 
 ### Deferred to V3
-- Full codebase security audit
+- Property-based testing adoption (Hypothesis)
 - Performance optimization
-- Property-based testing adoption
+- Full test coverage for edge cases
 
 ---
 
 ## Done Criteria
 
-- [ ] `raise init` output clearly distinguishes CLI commands from Claude Code skills
+- [ ] `guardrails-stack.md` created with synthesized best practices
+- [ ] `/feature-review` has Jidoka checkpoint for stack patterns
+- [ ] Pre-commit hooks updated (pip-audit, detect-secrets)
+- [ ] `raise init` output clearly distinguishes CLI/Skills
 - [ ] No deprecated code warnings in normal usage paths
 - [ ] Zero duplicated utility functions (sanitizers, paths, graph methods)
-- [ ] `guardrails.md` updated with stack best practices section
+- [ ] Codebase passes scan against new guardrails
 - [ ] All tests pass (>90% coverage maintained)
-- [ ] Quality checks pass (ruff, pyright, bandit)
+- [ ] All quality checks pass (ruff, pyright, bandit, new hooks)
 - [ ] Retrospective complete
 
 ---
