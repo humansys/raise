@@ -265,7 +265,7 @@ Mark the epic complete in `governance/projects/raise-cli/backlog.md`:
 Record the epic completion:
 
 ```bash
-uv run raise telemetry emit epic {epic_id} --event complete
+uv run raise telemetry emit-work epic {epic_id} --event complete
 ```
 
 **Verification:** Telemetry emitted.

@@ -223,10 +223,10 @@ Show the feature lifecycle for orientation:
 Record the start of the feature lifecycle:
 
 ```bash
-uv run raise telemetry emit feature {feature_id} --event start --phase design
+uv run raise telemetry emit-work feature {feature_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit feature F12.2 -e start -p design`
+**Example:** `raise telemetry emit-work feature F12.2 -e start -p design`
 
 **Verification:** Telemetry emitted.
 
