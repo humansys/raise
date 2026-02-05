@@ -38,6 +38,11 @@
 
 ### Framework Improvements
 
+- [ ] **Parallel task execution in /feature-implement** — (F7.7 discussion, 2026-02-05)
+  - When tasks have no dependencies, allow spawning subagents in parallel
+  - Combined HITL checkpoint after parallel tasks complete
+  - Pattern: identify independent tasks in plan → spawn parallel → converge → continue sequential
+
 - [ ] **Separation of Builder and Verifier (Lean Quality)** — (F7.2 discussion, 2026-02-05)
   - **Problem:** Self-review checklists in skills (e.g., /feature-design Step 8) have builder verifying own work = muda
   - **Lean principle:** TPS separates production from quality inspection. Jidoka catches defects, but verification is external.

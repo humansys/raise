@@ -15,6 +15,7 @@ from raise_cli.onboarding.profile import (
     DeveloperProfile,
     ExperienceLevel,
     get_rai_home,
+    increment_session,
     load_developer_profile,
     save_developer_profile,
 )
@@ -349,3 +350,72 @@ class TestSaveDeveloperProfile:
 
         content = yaml.safe_load(profile_file.read_text())
         assert content["name"] == "New"
+
+
+class TestIncrementSession:
+    """Tests for increment_session function."""
+
+    def test_increments_sessions_total(self) -> None:
+        """increment_session increases sessions_total by 1."""
+        profile = DeveloperProfile(name="Test", sessions_total=5)
+        updated = increment_session(profile)
+        assert updated.sessions_total == 6
+
+    def test_updates_last_session_to_today(self) -> None:
+        """increment_session sets last_session to today's date."""
+        profile = DeveloperProfile(name="Test", last_session=date(2026, 1, 1))
+        updated = increment_session(profile)
+        assert updated.last_session == date.today()
+
+    def test_adds_new_project_path(self) -> None:
+        """increment_session adds project_path to projects list."""
+        profile = DeveloperProfile(name="Test", projects=[])
+        updated = increment_session(profile, project_path="/home/user/project")
+        assert "/home/user/project" in updated.projects
+
+    def test_does_not_duplicate_project_path(self) -> None:
+        """increment_session doesn't add duplicate project paths."""
+        profile = DeveloperProfile(name="Test", projects=["/home/user/project"])
+        updated = increment_session(profile, project_path="/home/user/project")
+        assert updated.projects.count("/home/user/project") == 1
+        assert len(updated.projects) == 1
+
+    def test_preserves_existing_projects(self) -> None:
+        """increment_session preserves existing projects when adding new one."""
+        profile = DeveloperProfile(name="Test", projects=["/home/user/project1"])
+        updated = increment_session(profile, project_path="/home/user/project2")
+        assert "/home/user/project1" in updated.projects
+        assert "/home/user/project2" in updated.projects
+        assert len(updated.projects) == 2
+
+    def test_works_without_project_path(self) -> None:
+        """increment_session works when project_path is None."""
+        profile = DeveloperProfile(name="Test", projects=["/existing"])
+        updated = increment_session(profile)
+        assert updated.sessions_total == 1
+        assert updated.last_session == date.today()
+        assert updated.projects == ["/existing"]
+
+    def test_returns_new_instance(self) -> None:
+        """increment_session returns a new profile instance (immutable)."""
+        profile = DeveloperProfile(name="Test", sessions_total=5)
+        updated = increment_session(profile)
+        assert profile is not updated
+        assert profile.sessions_total == 5  # Original unchanged
+
+    def test_preserves_other_fields(self) -> None:
+        """increment_session preserves all other profile fields."""
+        profile = DeveloperProfile(
+            name="Emilio",
+            experience_level=ExperienceLevel.RI,
+            skills_mastered=["skill1", "skill2"],
+            universal_patterns=["pattern1"],
+            first_session=date(2026, 1, 1),
+            sessions_total=10,
+        )
+        updated = increment_session(profile, project_path="/new/project")
+        assert updated.name == "Emilio"
+        assert updated.experience_level == ExperienceLevel.RI
+        assert updated.skills_mastered == ["skill1", "skill2"]
+        assert updated.universal_patterns == ["pattern1"]
+        assert updated.first_session == date(2026, 1, 1)
