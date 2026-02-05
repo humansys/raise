@@ -30,6 +30,12 @@ from raise_cli.onboarding.manifest import (
     load_manifest,
     save_manifest,
 )
+from raise_cli.onboarding.governance import (
+    GeneratedGuardrail,
+    GuardrailGenerator,
+    GuardrailLevel,
+    generate_guardrails,
+)
 from raise_cli.onboarding.migration import migrate_emilio_profile
 from raise_cli.onboarding.profile import (
     CommunicationPreferences,
@@ -59,6 +65,11 @@ __all__ = [
     "ProjectType",
     "count_code_files",
     "detect_project_type",
+    # Governance
+    "GeneratedGuardrail",
+    "GuardrailGenerator",
+    "GuardrailLevel",
+    "generate_guardrails",
     # Manifest
     "ProjectInfo",
     "ProjectManifest",
