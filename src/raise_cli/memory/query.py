@@ -2,10 +2,14 @@
 
 This module provides MemoryQuery for searching memory concepts
 using keyword matching, graph traversal, and recency scoring.
+
+.. deprecated::
+    MemoryQuery is deprecated. Use UnifiedQueryEngine from raise_cli.context.query instead.
 """
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -61,6 +65,9 @@ class MemoryQuery:
     2. BFS traversal from matched concepts
     3. Recency weighting (newer entries score higher)
 
+    .. deprecated::
+        Use UnifiedQueryEngine from raise_cli.context.query instead.
+
     Attributes:
         graph: The memory graph to search.
         recency_weight: Weight for recency scoring (0.0-1.0).
@@ -115,12 +122,17 @@ class MemoryQuery:
     )
 
     def __init__(self, graph: MemoryGraph, recency_weight: float = 0.3) -> None:
-        """Initialize query engine.
+        """Initialize query engine with deprecation warning.
 
         Args:
             graph: Memory graph to search.
             recency_weight: Weight for recency scoring (0.0-1.0, default: 0.3).
         """
+        warnings.warn(
+            "MemoryQuery is deprecated. Use UnifiedQueryEngine from raise_cli.context.query instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.graph = graph
         self.recency_weight = max(0.0, min(1.0, recency_weight))
         self._today = date.today()
@@ -343,6 +355,9 @@ def create_memory_query(
 
     Convenience function that loads/caches the graph and creates a query engine.
 
+    .. deprecated::
+        Use UnifiedQueryEngine from raise_cli.context.query instead.
+
     Args:
         memory_dir: Path to .rai/memory/ directory.
         recency_weight: Weight for recency scoring.
@@ -350,6 +365,11 @@ def create_memory_query(
     Returns:
         Tuple of (MemoryQuery, MemoryGraph).
     """
+    warnings.warn(
+        "create_memory_query is deprecated. Use UnifiedQueryEngine from raise_cli.context.query instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     cache = MemoryCache(memory_dir)
     graph = cache.get_graph()
     query = MemoryQuery(graph, recency_weight)

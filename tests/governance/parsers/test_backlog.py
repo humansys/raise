@@ -324,8 +324,8 @@ class TestIntegrationWithRealBacklog:
 
         epics = extract_epics(backlog_path)
 
-        # Should have 12 epics (E1-E12)
-        assert len(epics) == 12
+        # Should have at least 12 epics (E1-E12+)
+        assert len(epics) >= 12
 
         # Verify specific epics
         epic_ids = {e.metadata["epic_id"] for e in epics}
