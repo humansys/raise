@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 
+from raise_cli.core.text import extract_keywords
 from raise_cli.governance.graph.models import ConceptGraph, RelationshipType
 from raise_cli.governance.models import Concept
 
@@ -58,46 +59,6 @@ def normalize_concept_id(query: str) -> str:
 
     # §N format → look up by section (handled by caller)
     return query.lower().replace(" ", "-")
-
-
-def extract_keywords(text: str) -> set[str]:
-    """Extract meaningful keywords from text.
-
-    Args:
-        text: Text to extract keywords from.
-
-    Returns:
-        Set of lowercase keywords (>3 chars, no stopwords).
-
-    Examples:
-        >>> keywords = extract_keywords("The system MUST validate inputs")
-        >>> "system" in keywords
-        True
-        >>> "the" in keywords
-        False
-    """
-    stopwords = {
-        "the",
-        "a",
-        "an",
-        "and",
-        "or",
-        "but",
-        "in",
-        "on",
-        "at",
-        "to",
-        "for",
-        "with",
-        "from",
-        "must",
-        "should",
-        "will",
-        "can",
-        "may",
-    }
-    words = re.findall(r"\b\w+\b", text.lower())
-    return {w for w in words if len(w) > 3 and w not in stopwords}
 
 
 def query_concept_lookup(
