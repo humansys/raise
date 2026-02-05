@@ -137,9 +137,9 @@ Next: E14 design phase
 
 | File | Update |
 |------|--------|
-| `.rai/memory/patterns.jsonl` | New patterns (CLI) |
-| `.rai/memory/sessions/index.jsonl` | Session record (CLI) |
-| `.rai/telemetry/signals.jsonl` | Session event (CLI) |
+| `.raise/rai/memory/patterns.jsonl` | New patterns (CLI) |
+| `.raise/rai/memory/sessions/index.jsonl` | Session record (CLI) |
+| `.raise/rai/telemetry/signals.jsonl` | Session event (CLI) |
 | `~/.rai/developer.yaml` | Session state cleared (CLI) |
 | `CLAUDE.local.md` | Single Write |
 | `dev/parking-lot.md` | Tangents (if any) |
@@ -158,6 +158,6 @@ uv run raise memory add-calibration {feature_id} --name "Name" -s {size} -a {act
 ## References
 
 - Complement: `/session-start`
-- Memory: `.rai/memory/`
+- Memory: `.raise/rai/memory/`
 - Context: `CLAUDE.local.md`
 - Tangents: `dev/parking-lot.md`
