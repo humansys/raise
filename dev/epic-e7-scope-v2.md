@@ -194,7 +194,7 @@ What are we working on?"
 | F7.2 | **Convention Detection** | M | 3 | Pending | Auto-detect code style, naming, structure |
 | F7.3 | **Governance Generation** | S | 2 | ✅ Done | Generate guardrails.md from conventions |
 | F7.4 | **Enhanced CLAUDE.md** | S | 2 | ✅ Done | Context-rich with architecture, components |
-| F7.5 | **`raise status` Command** | XS | 1 | Pending | Project health check |
+| F7.5 | **`raise status` Command** | XS | 1 | ✅ Done | Project health check |
 | F7.6 | **Skills Bundling** | XS | 1 | ✅ Done | Skills in package, copy on init |
 | F7.7 | **Guided First Session** | M | 3 | ✅ Done | Educational onboarding in /session-start |
 | F7.8 | **Personal Memory** | S | 2 | ✅ Done | ~/.rai/developer.yaml + adaptive interaction |
@@ -401,7 +401,7 @@ Rai: "This is complex. /feature-design first?"
 - [x] Convention detection for Python projects (F7.2 ✅)
 - [x] Generate guardrails.md from detected conventions (F7.3 ✅)
 - [x] Enhanced CLAUDE.md with architecture context (F7.4 ✅)
-- [ ] `raise status` health check (F7.5)
+- [x] `raise status` health check (F7.5 ✅)
 - [x] Personal memory: `~/.rai/developer.yaml` (F7.8 ✅)
 - [x] Adaptive interaction based on experience_level (F7.7 ✅)
 - [x] Emilio profile migration (F7.9 ✅)
@@ -516,13 +516,13 @@ Day 5:                                        └► Retro, polish (M4: Complete
 | F7.3 Governance Generation | S | 2 | ✅ Done | 20 min | 4.0x | |
 | F7.4 Enhanced CLAUDE.md | S | 2 | ✅ Done | 16 min | 5.0x | |
 | F7.7 Guided First Session | M | 3 | ✅ Done | 26 min | 3.3x | Parallel subagents |
-| F7.5 `raise status` | XS | 1 | Pending | — | — | |
+| F7.5 `raise status` | XS | 1 | ✅ Done | 8 min | 3.75x | |
 
 **Milestone Progress:**
 - [x] M1: Walking Skeleton (Day 1 - Feb 4) ✅ Complete (F7.8, F7.9, F7.1)
 - [x] M2: Brownfield MVP (Day 2 - Feb 5) ✅ Complete (F7.2, F7.3, F7.4)
-- [x] M3: Adaptive Experience (Day 2 - Feb 5) ✅ Complete (F7.7) — ahead of schedule
-- [ ] M4: Epic Complete (F7.5 remaining)
+- [x] M3: Adaptive Experience (Day 2 - Feb 5) ✅ Complete (F7.7, F7.5) — ahead of schedule
+- [x] M4: Epic Complete (Feb 5) ✅ All features done
 
 **Buffer:** 1 day before F&F (Feb 9)
 
