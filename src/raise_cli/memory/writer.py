@@ -16,7 +16,6 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from raise_cli.memory.cache import MemoryCache
 from raise_cli.memory.models import PatternSubType
 
 
@@ -305,10 +304,6 @@ def append_pattern(
 
     _append_jsonl(file_path, entry)
 
-    # Invalidate cache to trigger rebuild
-    cache = MemoryCache(memory_dir)
-    cache.invalidate()
-
     return WriteResult(
         success=True,
         id=pattern_id,
@@ -357,10 +352,6 @@ def append_calibration(
 
     _append_jsonl(file_path, entry)
 
-    # Invalidate cache to trigger rebuild
-    cache = MemoryCache(memory_dir)
-    cache.invalidate()
-
     return WriteResult(
         success=True,
         id=cal_id,
@@ -398,10 +389,6 @@ def append_session(
     }
 
     _append_jsonl(file_path, entry)
-
-    # Invalidate cache to trigger rebuild
-    cache = MemoryCache(memory_dir)
-    cache.invalidate()
 
     return WriteResult(
         success=True,

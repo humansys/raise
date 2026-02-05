@@ -58,17 +58,21 @@ PROJECT_DETECTED_SHU = """
 {profile_status}
 
 [bold cyan]Next steps:[/bold cyan]
-1. Open Claude Code in this directory
-2. Run [bold]/session-start[/bold] to begin our first session together
-3. I'll guide you through understanding your project
 
-Questions? Visit https://raise.dev/docs
+  [bold]In Claude Code[/bold] (AI coding assistant):
+    Type [bold cyan]/session-start[/bold cyan] to begin our first session
+
+  [bold]In terminal[/bold] (CLI commands):
+    [dim]raise --help[/dim]      — see available commands
+    [dim]raise context[/dim]     — query project context
+    [dim]raise memory[/dim]      — query Rai's memory
+
+[dim]Don't have Claude Code? https://claude.ai/download[/dim]
 """
 
-PROJECT_DETECTED_RI = """{project_type} project initialized ({file_count} files).
-Created .rai/manifest.yaml
+PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .rai/manifest.yaml
 
-Run [bold]/session-start[/bold] when ready.
+[dim]Claude Code:[/dim] /session-start    [dim]Terminal:[/dim] raise --help
 """
 
 
