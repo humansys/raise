@@ -5,6 +5,19 @@ Handles developer profile management and project initialization.
 
 from __future__ import annotations
 
+from raise_cli.onboarding.detection import (
+    CODE_EXTENSIONS,
+    DetectionResult,
+    ProjectType,
+    count_code_files,
+    detect_project_type,
+)
+from raise_cli.onboarding.manifest import (
+    ProjectInfo,
+    ProjectManifest,
+    load_manifest,
+    save_manifest,
+)
 from raise_cli.onboarding.migration import migrate_emilio_profile
 from raise_cli.onboarding.profile import (
     CommunicationPreferences,
@@ -17,6 +30,18 @@ from raise_cli.onboarding.profile import (
 )
 
 __all__ = [
+    # Detection
+    "CODE_EXTENSIONS",
+    "DetectionResult",
+    "ProjectType",
+    "count_code_files",
+    "detect_project_type",
+    # Manifest
+    "ProjectInfo",
+    "ProjectManifest",
+    "load_manifest",
+    "save_manifest",
+    # Profile
     "CommunicationPreferences",
     "CommunicationStyle",
     "DeveloperProfile",
