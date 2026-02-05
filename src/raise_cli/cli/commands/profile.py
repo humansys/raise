@@ -11,11 +11,13 @@ Example:
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated
 
 import typer
 import yaml
 
+from raise_cli.memory.writer import validate_session_index
 from raise_cli.onboarding.profile import (
     DeveloperProfile,
     end_session,
@@ -117,6 +119,15 @@ def session(
                 f"Note: Session already active (project: {prev.project})\n"
                 "Starting new session anyway. Previous session not closed."
             )
+
+    # Jidoka: Validate session index if project specified
+    if project is not None:
+        memory_dir = Path(project) / ".rai" / "memory"
+        if memory_dir.exists():
+            validation = validate_session_index(memory_dir)
+            if not validation.is_valid:
+                typer.echo(f"Warning: {validation.summary()}")
+                typer.echo("Run `raise memory validate` to fix data quality issues.\n")
 
     # Increment session count
     updated = increment_session(profile, project_path=project)
