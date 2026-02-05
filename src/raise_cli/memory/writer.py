@@ -8,6 +8,8 @@ and cache invalidation.
 from __future__ import annotations
 
 import json
+import re
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -16,6 +18,138 @@ from pydantic import BaseModel, Field
 
 from raise_cli.memory.cache import MemoryCache
 from raise_cli.memory.models import PatternSubType
+
+
+@dataclass
+class SessionIndexValidation:
+    """Result of session index validation.
+
+    Attributes:
+        is_valid: True if no issues found.
+        total_entries: Number of entries in index.
+        entries_without_id: Entries missing ID field.
+        non_standard_ids: IDs not matching SES-NNN format.
+        duplicate_ids: IDs that appear more than once.
+        max_id: Highest SES-NNN number found.
+        gaps: List of (start, end) tuples for gaps > 5 in sequence.
+    """
+
+    is_valid: bool
+    total_entries: int
+    entries_without_id: int
+    non_standard_ids: list[str]
+    duplicate_ids: list[str]
+    max_id: int
+    gaps: list[tuple[int, int]]
+
+    def summary(self) -> str:
+        """Generate human-readable summary of validation issues."""
+        if self.is_valid:
+            return f"Session index OK: {self.total_entries} entries, max ID: SES-{self.max_id:03d}"
+
+        issues: list[str] = []
+        if self.entries_without_id > 0:
+            issues.append(f"{self.entries_without_id} entries missing ID")
+        if self.non_standard_ids:
+            issues.append(f"{len(self.non_standard_ids)} non-standard IDs")
+        if self.duplicate_ids:
+            issues.append(f"duplicates: {', '.join(self.duplicate_ids)}")
+        if self.gaps:
+            gap_strs = [f"{s}-{e}" for s, e in self.gaps]
+            issues.append(f"gaps: {', '.join(gap_strs)}")
+
+        return f"Session index issues: {'; '.join(issues)}"
+
+
+def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
+    """Validate session index for data quality issues.
+
+    Jidoka check: detect entries without IDs, non-standard formats,
+    duplicates, and large gaps in sequence.
+
+    Args:
+        memory_dir: Path to .rai/memory/ directory.
+
+    Returns:
+        SessionIndexValidation with findings.
+    """
+    file_path = memory_dir / "sessions" / "index.jsonl"
+
+    if not file_path.exists():
+        return SessionIndexValidation(
+            is_valid=True,
+            total_entries=0,
+            entries_without_id=0,
+            non_standard_ids=[],
+            duplicate_ids=[],
+            max_id=0,
+            gaps=[],
+        )
+
+    entries_without_id = 0
+    non_standard_ids: list[str] = []
+    id_counts: dict[str, int] = {}
+    ses_numbers: list[int] = []
+
+    ses_pattern = re.compile(r"^SES-(\d{3})$")
+
+    with file_path.open("r", encoding="utf-8") as f:
+        total_entries = 0
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            total_entries += 1
+            try:
+                data = json.loads(line)
+                entry_id = data.get("id")
+
+                if entry_id is None:
+                    entries_without_id += 1
+                    continue
+
+                id_counts[entry_id] = id_counts.get(entry_id, 0) + 1
+
+                match = ses_pattern.match(entry_id)
+                if match:
+                    ses_numbers.append(int(match.group(1)))
+                else:
+                    non_standard_ids.append(entry_id)
+
+            except json.JSONDecodeError:
+                entries_without_id += 1
+
+    # Find duplicates
+    duplicate_ids = [k for k, v in id_counts.items() if v > 1]
+
+    # Find gaps > 5 in sequence
+    gaps: list[tuple[int, int]] = []
+    if ses_numbers:
+        ses_numbers.sort()
+        max_id = ses_numbers[-1]
+        for i in range(1, len(ses_numbers)):
+            gap = ses_numbers[i] - ses_numbers[i - 1]
+            if gap > 5:
+                gaps.append((ses_numbers[i - 1], ses_numbers[i]))
+    else:
+        max_id = 0
+
+    is_valid = (
+        entries_without_id == 0
+        and len(non_standard_ids) == 0
+        and len(duplicate_ids) == 0
+        and len(gaps) == 0
+    )
+
+    return SessionIndexValidation(
+        is_valid=is_valid,
+        total_entries=total_entries,
+        entries_without_id=entries_without_id,
+        non_standard_ids=non_standard_ids,
+        duplicate_ids=duplicate_ids,
+        max_id=max_id,
+        gaps=gaps,
+    )
 
 
 class PatternInput(BaseModel):

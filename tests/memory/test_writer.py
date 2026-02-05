@@ -17,6 +17,7 @@ from raise_cli.memory.writer import (
     append_calibration,
     append_pattern,
     append_session,
+    validate_session_index,
 )
 from raise_cli.memory.models import PatternSubType
 
@@ -253,3 +254,164 @@ class TestCacheInvalidation:
         append_session(memory_dir, input_data)
 
         assert not cache_file.exists()
+
+
+class TestValidateSessionIndex:
+    """Tests for validate_session_index function (Jidoka check)."""
+
+    def test_valid_index_returns_is_valid_true(self, tmp_path: Path) -> None:
+        """Clean index should validate successfully."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text(
+            '{"id": "SES-001", "date": "2026-02-01", "topic": "First"}\n'
+            '{"id": "SES-002", "date": "2026-02-01", "topic": "Second"}\n'
+            '{"id": "SES-003", "date": "2026-02-02", "topic": "Third"}\n'
+        )
+
+        result = validate_session_index(memory_dir)
+
+        assert result.is_valid is True
+        assert result.total_entries == 3
+        assert result.max_id == 3
+        assert result.entries_without_id == 0
+        assert result.non_standard_ids == []
+        assert result.duplicate_ids == []
+        assert result.gaps == []
+
+    def test_detects_missing_id(self, tmp_path: Path) -> None:
+        """Should detect entries without ID field."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text(
+            '{"id": "SES-001", "date": "2026-02-01", "topic": "First"}\n'
+            '{"date": "2026-02-01", "topic": "Missing ID"}\n'
+            '{"id": "SES-003", "date": "2026-02-02", "topic": "Third"}\n'
+        )
+
+        result = validate_session_index(memory_dir)
+
+        assert result.is_valid is False
+        assert result.entries_without_id == 1
+
+    def test_detects_non_standard_ids(self, tmp_path: Path) -> None:
+        """Should detect IDs not matching SES-NNN format."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text(
+            '{"id": "SES-001", "date": "2026-02-01", "topic": "First"}\n'
+            '{"id": "SESSION-2026-01-01", "date": "2026-01-01", "topic": "Legacy"}\n'
+            '{"id": "ses-1234567890", "date": "2026-02-01", "topic": "Timestamp"}\n'
+        )
+
+        result = validate_session_index(memory_dir)
+
+        assert result.is_valid is False
+        assert len(result.non_standard_ids) == 2
+        assert "SESSION-2026-01-01" in result.non_standard_ids
+        assert "ses-1234567890" in result.non_standard_ids
+
+    def test_detects_duplicate_ids(self, tmp_path: Path) -> None:
+        """Should detect duplicate IDs."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text(
+            '{"id": "SES-001", "date": "2026-02-01", "topic": "First"}\n'
+            '{"id": "SES-002", "date": "2026-02-01", "topic": "Second"}\n'
+            '{"id": "SES-001", "date": "2026-02-02", "topic": "Duplicate!"}\n'
+        )
+
+        result = validate_session_index(memory_dir)
+
+        assert result.is_valid is False
+        assert "SES-001" in result.duplicate_ids
+
+    def test_detects_large_gaps(self, tmp_path: Path) -> None:
+        """Should detect gaps > 5 in sequence."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text(
+            '{"id": "SES-001", "date": "2026-02-01", "topic": "First"}\n'
+            '{"id": "SES-002", "date": "2026-02-01", "topic": "Second"}\n'
+            '{"id": "SES-010", "date": "2026-02-02", "topic": "Jump!"}\n'
+        )
+
+        result = validate_session_index(memory_dir)
+
+        assert result.is_valid is False
+        assert (2, 10) in result.gaps
+
+    def test_small_gaps_are_valid(self, tmp_path: Path) -> None:
+        """Gaps <= 5 should not trigger validation failure."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text(
+            '{"id": "SES-001", "date": "2026-02-01", "topic": "First"}\n'
+            '{"id": "SES-005", "date": "2026-02-01", "topic": "Fifth"}\n'
+        )
+
+        result = validate_session_index(memory_dir)
+
+        assert result.is_valid is True
+        assert result.gaps == []
+
+    def test_nonexistent_index_is_valid(self, tmp_path: Path) -> None:
+        """Missing index file should validate as empty but valid."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        result = validate_session_index(memory_dir)
+
+        assert result.is_valid is True
+        assert result.total_entries == 0
+
+    def test_summary_for_valid_index(self, tmp_path: Path) -> None:
+        """Summary should indicate OK for valid index."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text('{"id": "SES-042", "date": "2026-02-01", "topic": "Test"}\n')
+
+        result = validate_session_index(memory_dir)
+
+        assert "OK" in result.summary()
+        assert "42" in result.summary()
+
+    def test_summary_for_invalid_index(self, tmp_path: Path) -> None:
+        """Summary should list issues for invalid index."""
+        memory_dir = tmp_path / "memory"
+        sessions_dir = memory_dir / "sessions"
+        sessions_dir.mkdir(parents=True)
+
+        index_file = sessions_dir / "index.jsonl"
+        index_file.write_text(
+            '{"date": "2026-02-01", "topic": "No ID"}\n'
+            '{"id": "legacy-format", "date": "2026-02-01", "topic": "Bad ID"}\n'
+        )
+
+        result = validate_session_index(memory_dir)
+
+        summary = result.summary()
+        assert "issues" in summary
+        assert "missing ID" in summary
+        assert "non-standard" in summary
