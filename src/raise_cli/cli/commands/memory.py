@@ -163,8 +163,8 @@ def query(
         console.print(output_text)
 
 
-@memory_app.command()
-def dump(
+@memory_app.command("list")
+def list_memory(
     format: Annotated[
         str,
         typer.Option("--format", "-f", help="Output format (markdown, json, or table)"),
@@ -187,20 +187,20 @@ def dump(
         ),
     ] = None,
 ) -> None:
-    """Dump memory concepts for inspection.
+    """List all memory concepts.
 
     Shows all memory concepts (patterns, calibrations, sessions)
-    from the unified graph, useful for debugging and verification.
+    from the unified graph for inspection and debugging.
 
     Examples:
         # Show summary table
-        $ raise memory dump
+        $ raise memory list
 
         # Export as JSON
-        $ raise memory dump --format json --output memory.json
+        $ raise memory list --format json --output memory.json
 
         # Export as Markdown
-        $ raise memory dump --format markdown --output memory.md
+        $ raise memory list --format markdown --output memory.md
     """
     # Handle deprecated option
     if memory_dir is not None:
