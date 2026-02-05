@@ -15,7 +15,7 @@ metadata:
   raise.next: feature-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
 
 hooks:
   PostToolUse:
@@ -137,6 +137,35 @@ Determine if feature needs a specification document.
 - **Complex** → Create spec, include optional sections as needed
 
 > **If you can't continue:** Complexity unclear → Default to creating spec (safe choice)
+
+### Step 1.5: Risk Assessment (Conditional)
+
+**For features marked HIGH RISK in the epic scope**, pause to discuss risks before designing.
+
+> *"Estudio en la duda, acción en la fe."* — Study in doubt, act in faith.
+
+**Check for risk markers:**
+```bash
+grep -i "high risk\|HIGH RISK" dev/epic-*-scope*.md 2>/dev/null | grep -i "{feature_id}" || echo "No explicit risk marker"
+```
+
+**If HIGH RISK detected, discuss:**
+
+1. **What makes this risky?** — Name the specific concerns (new capability, accuracy requirements, external dependencies, unclear scope)
+
+2. **What could go wrong?** — Concrete failure modes, not abstract worries
+
+3. **What would make you comfortable?** — Clear scope boundaries, honest confidence, user review steps, validation approach
+
+4. **Scope decision:** Is this feature trying to solve a bigger problem than its SP suggests? Should we scope down?
+
+**Output:** Document risk assessment in the design spec's Approach section or as a dedicated "Risks" section.
+
+**Skip condition:** Feature not marked HIGH RISK and complexity is Simple/Moderate.
+
+**Rationale:** Risk conversations before implementation clarify scope and build confidence. The doubt informs how we act, not whether we act.
+
+> **If you can't continue:** Risks too unclear → Consider `/research` skill first, or timebox a spike.
 
 ### Step 2: Frame What & Why
 
@@ -268,6 +297,11 @@ raise telemetry emit feature {feature_id} --event complete --phase design
 3. **Untestable criteria** — Make them specific and measurable
 4. **Filling optional sections "just because"** — Match to complexity
 5. **Skipping spec for complex features** — Trust the complexity assessment
+6. **Skipping risk discussion for HIGH RISK features** — The doubt clarifies scope
+
+## Known Limitations
+
+**Self-review (Step 8):** The builder verifying their own work is a form of muda (waste). Lean principles suggest separation of production and inspection. Future improvement: `/quality-review` skill with a reviewer-focused prompt. See `dev/parking-lot.md` → "Separation of Builder and Verifier".
 
 ## References
 
