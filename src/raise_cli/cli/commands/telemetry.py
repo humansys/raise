@@ -13,6 +13,7 @@ from typing import Annotated, Literal
 import typer
 from rich.console import Console
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.telemetry.schemas import (
     CalibrationEvent,
     SessionEvent,
@@ -76,9 +77,11 @@ def emit_session(
         "abandoned",
     ]
     if outcome not in valid_outcomes:
-        console.print(f"[red]Error:[/red] Invalid outcome: {outcome}")
-        console.print(f"Valid outcomes: {', '.join(valid_outcomes)}")
-        raise typer.Exit(1)
+        cli_error(
+            f"Invalid outcome: {outcome}",
+            hint=f"Valid outcomes: {', '.join(valid_outcomes)}",
+            exit_code=7,
+        )
 
     # Parse features
     features_list = [f.strip() for f in features.split(",") if f.strip()]
@@ -104,8 +107,7 @@ def emit_session(
             console.print(f"  Features: {', '.join(features_list)}")
         console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.error}")
-        raise typer.Exit(1)
+        cli_error(result.error or "Failed to emit session event")
 
 
 @telemetry_app.command("emit-calibration")
@@ -150,17 +152,17 @@ def emit_calibration(
     valid_sizes = ["XS", "S", "M", "L", "XL"]
     size_upper = size.upper()
     if size_upper not in valid_sizes:
-        console.print(f"[red]Error:[/red] Invalid size: {size}")
-        console.print(f"Valid sizes: {', '.join(valid_sizes)}")
-        raise typer.Exit(1)
+        cli_error(
+            f"Invalid size: {size}",
+            hint=f"Valid sizes: {', '.join(valid_sizes)}",
+            exit_code=7,
+        )
 
     # Validate durations
     if estimated <= 0:
-        console.print("[red]Error:[/red] Estimated duration must be > 0")
-        raise typer.Exit(1)
+        cli_error("Estimated duration must be > 0", exit_code=7)
     if actual <= 0:
-        console.print("[red]Error:[/red] Actual duration must be > 0")
-        raise typer.Exit(1)
+        cli_error("Actual duration must be > 0", exit_code=7)
 
     # Calculate velocity
     velocity = round(estimated / actual, 2)
@@ -193,8 +195,7 @@ def emit_calibration(
             console.print(" (on target)")
         console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.error}")
-        raise typer.Exit(1)
+        cli_error(result.error or "Failed to emit calibration event")
 
 
 @telemetry_app.command("emit")
@@ -258,9 +259,11 @@ def emit_work(
     valid_work_types: list[Literal["epic", "feature"]] = ["epic", "feature"]
     work_type_lower = work_type.lower()
     if work_type_lower not in valid_work_types:
-        console.print(f"[red]Error:[/red] Invalid work type: {work_type}")
-        console.print(f"Valid types: {', '.join(valid_work_types)}")
-        raise typer.Exit(1)
+        cli_error(
+            f"Invalid work type: {work_type}",
+            hint=f"Valid types: {', '.join(valid_work_types)}",
+            exit_code=7,
+        )
 
     # Validate event type
     valid_events: list[Literal["start", "complete", "blocked", "unblocked", "abandoned"]] = [
@@ -271,9 +274,11 @@ def emit_work(
         "abandoned",
     ]
     if event_type not in valid_events:
-        console.print(f"[red]Error:[/red] Invalid event: {event_type}")
-        console.print(f"Valid events: {', '.join(valid_events)}")
-        raise typer.Exit(1)
+        cli_error(
+            f"Invalid event: {event_type}",
+            hint=f"Valid events: {', '.join(valid_events)}",
+            exit_code=7,
+        )
 
     # Validate phase
     valid_phases: list[Literal["design", "plan", "implement", "review"]] = [
@@ -283,9 +288,11 @@ def emit_work(
         "review",
     ]
     if phase not in valid_phases:
-        console.print(f"[red]Error:[/red] Invalid phase: {phase}")
-        console.print(f"Valid phases: {', '.join(valid_phases)}")
-        raise typer.Exit(1)
+        cli_error(
+            f"Invalid phase: {phase}",
+            hint=f"Valid phases: {', '.join(valid_phases)}",
+            exit_code=7,
+        )
 
     # Blocker is required for blocked events
     blocker_value = blocker if blocker else None
@@ -325,5 +332,4 @@ def emit_work(
 
         console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.error}")
-        raise typer.Exit(1)
+        cli_error(result.error or "Failed to emit work lifecycle event")

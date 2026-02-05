@@ -15,6 +15,7 @@ from raise_cli.context.query import (
     UnifiedQueryResult,
     UnifiedQueryStrategy,
 )
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.governance.query import ContextQuery, ContextQueryEngine, QueryStrategy
 from raise_cli.governance.query.formatters import format_json, format_markdown
 
@@ -246,11 +247,11 @@ def _query_unified(
     try:
         engine = UnifiedQueryEngine.from_file(UNIFIED_GRAPH_PATH)
     except FileNotFoundError as e:
-        console.print(f"[red]Error:[/red] {e}")
-        console.print(
-            "\nRun [cyan]raise graph build --unified[/cyan] first to create the graph."
+        cli_error(
+            str(e),
+            hint="Run 'raise graph build --unified' first to create the graph",
+            exit_code=4,
         )
-        raise typer.Exit(1) from None
 
     # Parse types filter (--types takes precedence, --type as fallback)
     types_list: list[str] | None = None
@@ -265,11 +266,11 @@ def _query_unified(
         try:
             query_strategy = UnifiedQueryStrategy(strategy)
         except ValueError:
-            console.print(f"[red]Error:[/red] Invalid strategy: {strategy}")
-            console.print(
-                "Valid strategies for unified: keyword_search, concept_lookup"
+            cli_error(
+                f"Invalid strategy: {strategy}",
+                hint="Valid strategies for unified: keyword_search, concept_lookup",
+                exit_code=7,
             )
-            raise typer.Exit(1) from None
 
     # Build query
     unified_query = UnifiedQuery(
@@ -317,9 +318,11 @@ def _query_governance(
     try:
         engine = ContextQueryEngine.from_cache()
     except FileNotFoundError as e:
-        console.print(f"[red]Error:[/red] {e}")
-        console.print("\nRun [cyan]raise graph build[/cyan] first to create the graph.")
-        raise typer.Exit(1) from None
+        cli_error(
+            str(e),
+            hint="Run 'raise graph build' first to create the graph",
+            exit_code=4,
+        )
 
     # Build query
     filters: dict[str, list[str] | str] = {}
@@ -336,12 +339,11 @@ def _query_governance(
         try:
             query_strategy = QueryStrategy(strategy)
         except ValueError:
-            console.print(f"[red]Error:[/red] Invalid strategy: {strategy}")
-            console.print(
-                "Valid strategies: concept_lookup, keyword_search, "
-                "relationship_traversal, related_concepts"
+            cli_error(
+                f"Invalid strategy: {strategy}",
+                hint="Valid strategies: concept_lookup, keyword_search, relationship_traversal, related_concepts",
+                exit_code=7,
             )
-            raise typer.Exit(1) from None
 
     mvc_query = ContextQuery(
         query=query_str,

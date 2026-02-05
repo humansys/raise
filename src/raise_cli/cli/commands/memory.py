@@ -24,6 +24,7 @@ from raise_cli.context.query import (
     UnifiedQueryEngine,
     UnifiedQueryResult,
 )
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.memory import (
     CalibrationInput,
     PatternInput,
@@ -123,16 +124,17 @@ def query(
     # Resolve graph path
     unified_path = graph_path or _get_default_graph_path()
     if not unified_path.exists():
-        console.print(f"[red]Error:[/red] Unified graph not found: {unified_path}")
-        console.print("\nRun 'raise graph build --unified' to create the graph first.")
-        raise typer.Exit(1)
+        cli_error(
+            f"Unified graph not found: {unified_path}",
+            hint="Run 'raise graph build --unified' to create the graph first",
+            exit_code=4,
+        )
 
     # Load unified graph and create query engine
     try:
         engine = UnifiedQueryEngine.from_file(unified_path)
     except Exception as e:
-        console.print(f"[red]Error loading unified graph:[/red] {e}")
-        raise typer.Exit(1) from None
+        cli_error(f"Error loading unified graph: {e}")
 
     # Query with memory type filter
     unified_query = UnifiedQuery(
@@ -213,16 +215,17 @@ def list_memory(
     # Resolve graph path
     unified_path = graph_path or _get_default_graph_path()
     if not unified_path.exists():
-        console.print(f"[red]Error:[/red] Unified graph not found: {unified_path}")
-        console.print("\nRun 'raise graph build --unified' to create the graph first.")
-        raise typer.Exit(1)
+        cli_error(
+            f"Unified graph not found: {unified_path}",
+            hint="Run 'raise graph build --unified' to create the graph first",
+            exit_code=4,
+        )
 
     # Load unified graph
     try:
         graph = UnifiedGraph.load(unified_path)
     except Exception as e:
-        console.print(f"[red]Error loading unified graph:[/red] {e}")
-        raise typer.Exit(1) from None
+        cli_error(f"Error loading unified graph: {e}")
 
     # Filter to memory types only
     memory_concepts = [
@@ -371,8 +374,7 @@ def add_pattern(
     """
     mem_dir = memory_dir or _get_default_memory_dir()
     if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        raise typer.Exit(1)
+        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
 
     # Parse context
     context_list = [c.strip() for c in context.split(",") if c.strip()]
@@ -381,9 +383,11 @@ def add_pattern(
     try:
         pattern_type = PatternSubType(sub_type)
     except ValueError:
-        console.print(f"[red]Error:[/red] Invalid pattern type: {sub_type}")
-        console.print("Valid types: codebase, process, architecture, technical")
-        raise typer.Exit(1) from None
+        cli_error(
+            f"Invalid pattern type: {sub_type}",
+            hint="Valid types: codebase, process, architecture, technical",
+            exit_code=7,
+        )
 
     input_data = PatternInput(
         content=content,
@@ -402,8 +406,7 @@ def add_pattern(
             console.print(f"  Context: {', '.join(context_list)}")
         console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.message}")
-        raise typer.Exit(1)
+        cli_error(result.message)
 
 
 @memory_app.command("add-calibration")
@@ -447,15 +450,16 @@ def add_calibration_cmd(
     """
     mem_dir = memory_dir or _get_default_memory_dir()
     if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        raise typer.Exit(1)
+        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
 
     # Validate size
     valid_sizes = ["XS", "S", "M", "L", "XL"]
     if size.upper() not in valid_sizes:
-        console.print(f"[red]Error:[/red] Invalid size: {size}")
-        console.print(f"Valid sizes: {', '.join(valid_sizes)}")
-        raise typer.Exit(1)
+        cli_error(
+            f"Invalid size: {size}",
+            hint=f"Valid sizes: {', '.join(valid_sizes)}",
+            exit_code=7,
+        )
 
     input_data = CalibrationInput(
         feature=feature,
@@ -480,8 +484,7 @@ def add_calibration_cmd(
             console.print(f"  Velocity: {ratio}x (estimated {estimated}min)")
         console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.message}")
-        raise typer.Exit(1)
+        cli_error(result.message)
 
 
 @memory_app.command("add-session")
@@ -518,8 +521,7 @@ def add_session_cmd(
     """
     mem_dir = memory_dir or _get_default_memory_dir()
     if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        raise typer.Exit(1)
+        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
 
     # Parse outcomes
     outcomes_list = [o.strip() for o in outcomes.split(",") if o.strip()]
@@ -542,5 +544,4 @@ def add_session_cmd(
             console.print(f"  Outcomes: {', '.join(outcomes_list[:3])}")
         console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.message}")
-        raise typer.Exit(1)
+        cli_error(result.message)
