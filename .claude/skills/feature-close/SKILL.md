@@ -185,16 +185,25 @@ Mark the feature complete in the epic scope:
 # To:     - [x] F12.2 Guardrails Extractor ✓
 ```
 
-**Update pattern:**
+**Update patterns:**
+
+1. **Feature checklist** (if present):
 ```markdown
 ## Features
-
 - [x] F12.1 ADR Extractor ✓ (completed 2026-02-03)
 - [x] F12.2 Guardrails Extractor ✓ (completed 2026-02-03)
 - [ ] F12.3 Term Extractor — In progress
 ```
 
-**Verification:** Epic scope reflects feature completion.
+2. **Progress Tracking table** (if present):
+```markdown
+| Feature | Size | SP | Status | Actual | Velocity | Notes |
+|---------|:----:|:--:|:------:|:------:|:--------:|-------|
+| F7.2 Convention Detection | M | 3 | ✅ Done | 40 min | 3.75x | |
+| F7.3 Governance Generation | S | 2 | ✅ Done | 20 min | 4.0x | ← UPDATE |
+```
+
+**Verification:** Epic scope reflects feature completion (both formats if present).
 
 > **If you can't continue:** Standalone feature → Skip epic update.
 
