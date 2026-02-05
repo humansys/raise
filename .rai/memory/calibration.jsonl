@@ -19,3 +19,4 @@
 {"feature_id":"F9.3","feature_name":"Skill Emitters","epic":"E9","size":"S","sp":2,"estimated_min":30,"actual_min":8,"velocity":3.75,"tests":0,"coverage":0,"date":"2026-02-03","notes":"Shell script update, existing infrastructure, duration tracking"}
 {"feature_id":"F9.4","feature_name":"Session Emitters","epic":"E9","size":"S","sp":2,"estimated_min":60,"actual_min":23,"velocity":2.6,"tests":0,"coverage":0,"date":"2026-02-03","notes":"CLI approach after hook limitation discovered, added emit-calibration bonus"}
 {"id": "CAL-013", "feature": "F13.4", "name": "Graph Integration", "size": "S", "sp": null, "estimated_min": 60, "actual_min": 30, "ratio": 2.0, "kata_cycle": true, "notes": null, "created": "2026-02-04"}
+{"id": "CAL-014", "feature": "F7.1", "name": "raise init command", "size": "M", "sp": null, "estimated_min": 90, "actual_min": 40, "ratio": 2.2, "kata_cycle": true, "notes": null, "created": "2026-02-05"}
