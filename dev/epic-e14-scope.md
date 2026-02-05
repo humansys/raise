@@ -294,6 +294,90 @@ V3: Corporate documentation + team overrides
 
 ---
 
-*Epic tracking — update per feature completion*
-*Created: 2026-02-05*
-*Research: RES-RAI-DIST-001 (complete)*
+## Implementation Plan
+
+> Added by `/epic-plan` — 2026-02-05
+
+### Feature Sequence
+
+| Order | Feature | Size | Dependencies | Milestone | Rationale |
+|:-----:|---------|:----:|--------------|-----------|-----------|
+| 1 | F14.1 Base Identity | S | None | M1 | Content creation, can parallel |
+| 2 | F14.2 Base Patterns | M | None | M1 | Content creation, can parallel |
+| 3 | F14.3 Methodology | S | None | M1 | Content creation, can parallel |
+| 4 | F14.4 Bootstrap | M | F14.1-3 | M2 | Integration, needs all content |
+| 5 | F14.6 Versioning | S | F14.2 | M3 | Schema work, enables update tracking |
+| 6 | F14.5 MEMORY.md | M | F14.3, F14.4 | M3 | Generation from methodology.yaml |
+| 7 | F14.7 Base Show | XS | F14.4 | M4 | CLI polish, needs bootstrap |
+
+### Milestones
+
+| Milestone | Features | Target | Success Criteria | Demo |
+|-----------|----------|--------|------------------|------|
+| **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1 | All content in `src/raise_cli/rai_base/` | Files exist, valid format |
+| **M2: Bootstrap** | F14.4 | Day 2 | `raise init` copies base to `.rai/` | Init creates identity + patterns |
+| **M3: MEMORY.md** | F14.5, F14.6 | Day 3 | Auto-generated with skills/gates | MEMORY.md has full process |
+| **M4: Complete** | F14.7 + validation | Day 4 | New user simulation passes | Full flow demo |
+
+### Parallel Work Streams
+
+```
+Day 1 (Content Creation — All Parallel):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+F14.1 (Identity)    ─────┐
+F14.2 (Patterns)    ─────┼─► M1: Base Assets
+F14.3 (Methodology) ─────┘
+
+Day 2 (Integration):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+F14.4 (Bootstrap) ───────────► M2: Bootstrap Working
+F14.6 (Versioning) ──► (parallel, schema only)
+
+Day 3 (Generation):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+F14.5 (MEMORY.md) ───────────► M3: MEMORY.md
+F14.7 (Base Show) ──► (parallel, CLI only)
+
+Day 4 (Validation):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+New user simulation ─────────► M4: Epic Complete
+Buffer for fixes
+```
+
+### Progress Tracking
+
+| Feature | Size | Status | Actual | Velocity | Notes |
+|---------|:----:|:------:|:------:|:--------:|-------|
+| F14.1 Base Identity | S | Pending | — | — | |
+| F14.2 Base Patterns | M | Pending | — | — | |
+| F14.3 Methodology | S | Pending | — | — | |
+| F14.4 Bootstrap | M | Pending | — | — | |
+| F14.5 MEMORY.md | M | Pending | — | — | |
+| F14.6 Versioning | S | Pending | — | — | |
+| F14.7 Base Show | XS | Pending | — | — | |
+
+**Milestone Progress:**
+- [ ] M1: Base Assets (Day 1)
+- [ ] M2: Bootstrap (Day 2)
+- [ ] M3: MEMORY.md (Day 3)
+- [ ] M4: Epic Complete (Day 4)
+
+### Sequencing Risks
+
+| Risk | L | I | Mitigation |
+|------|:-:|:-:|------------|
+| Pattern curation takes longer than expected | M | M | Start with 15, add more later |
+| methodology.yaml schema needs iteration | M | M | Start simple, evolve |
+| MEMORY.md generation complex | M | H | Template-based, not dynamic |
+
+### Velocity Assumptions
+
+- **Baseline:** 3x multiplier with kata cycle (PAT-082)
+- **Day 1:** Content creation is fast (mostly copying/editing)
+- **Day 2-3:** Integration work, normal velocity
+- **Buffer:** Day 4 for validation and fixes
+
+---
+
+*Plan created: 2026-02-05*
+*Next: F14.1, F14.2, F14.3 (parallel)*

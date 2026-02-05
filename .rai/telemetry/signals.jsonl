@@ -1206,3 +1206,8 @@
 {"type":"skill_event","timestamp":"2026-02-05T18:01:43Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T18:01:43Z","skill":"epic-design","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T18:01:43Z","skill":"epic-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T18:03:05Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T18:03:05Z","skill":"epic-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T18:03:05Z","skill":"epic-design","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-05T18:03:47.440363Z","work_type":"epic","work_id":"E14","event":"start","phase":"plan","blocker":null}
+{"type":"work_lifecycle","timestamp":"2026-02-05T18:04:48.737459Z","work_type":"epic","work_id":"E14","event":"complete","phase":"plan","blocker":null}
