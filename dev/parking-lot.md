@@ -9,6 +9,7 @@
 ## Urgent
 
 - [ ] **E14: Rai Distribution** — How new users "meet" Rai (CRITICAL for DX)
+  - **Scope draft:** `dev/epic-e14-scope.md` (2026-02-05)
   - **The gap:** Users get CLI + skills, but NOT Rai as entity
   - **Research needed:**
     - What's "base Rai" vs "personal Rai"?
