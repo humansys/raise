@@ -1,9 +1,12 @@
 # ISSUE-005: DX Audit Findings — Pre-F&F Quality Review
 
-> **Status:** Open
+> **Status:** Partially Resolved
 > **Priority:** HIGH (F&F quality gate)
 > **Created:** 2026-02-05
+> **Updated:** 2026-02-05
 > **Scope:** Skills, CLI, Schemas, New User Experience, Code Quality
+>
+> **Resolved:** #1 (init output), #4 (MemoryGraph removed), #6 (post-init guidance)
 
 ---
 
@@ -15,10 +18,11 @@ Comprehensive DX audit of raise-cli revealed **5 critical issues** and **10+ hig
 
 ## Critical Issues (Block F&F Quality)
 
-### 1. CLI → Claude Code Skills Gap
+### 1. CLI → Claude Code Skills Gap ✅ RESOLVED
 
 **Severity:** CRITICAL
 **Impact:** All new users
+**Resolution:** Updated Ri output to use "Editor:" vs "CLI:" labels with download link (commit 9daac97)
 
 **Problem:**
 - User runs `raise init`
@@ -92,20 +96,11 @@ Epic-plan includes 50+ lines of "Sequencing Strategies Deep Dive" — reference 
 
 ---
 
-### 4. Deprecated MemoryGraph Still Active
+### 4. Deprecated MemoryGraph Still Active ✅ RESOLVED
 
 **Severity:** HIGH
 **Impact:** Code quality, confusion
-
-**Problem:**
-- `MemoryGraph` marked deprecated with warnings
-- Still used in `cache.py` (11 references)
-- Still used in `cli/commands/memory.py`
-- Still exported from `memory/__init__.py`
-
-**Fix:** Either:
-- Complete migration to UnifiedGraph
-- Or remove deprecation warnings and support both
+**Resolution:** MemoryGraph fully removed in commit 299d982. Deleted: cache.py, builder.py, query.py and their tests. Only remaining "deprecated" is CLI `--memory-dir` option (backward compat, appropriate to keep).
 
 ---
 
@@ -126,17 +121,18 @@ Both define similar Query + Metadata + Result patterns with 85% overlap.
 
 ## High Priority Issues
 
-### 6. No Post-Init Guidance
+### 6. No Post-Init Guidance ✅ RESOLVED
 
 **Problem:** After `raise init`, user sees brief "Next steps" but:
 - No explanation of what `/session-start` does
 - No explanation of what was created
 - No "first 5 minutes" guide
 
-**Fix:**
-- Add `raise init` output showing manifest contents
-- Create "First 5 Minutes" quick start guide
-- Add `raise help getting-started` command
+**Resolution:** Updated Shu output (commit a59a8a4):
+- Files now show purpose: "manifest.yaml — project metadata", "developer.yaml — your preferences"
+- /session-start explains: "Loads your context, remembers patterns, proposes focused work"
+- Numbered steps with clear action items
+- "First 5 minutes guide" and `raise help` command deferred (YAGNI for F&F)
 
 ---
 
@@ -254,13 +250,13 @@ Three nearly identical functions for config/cache/data directories.
 
 ## Recommendations by Phase
 
-### Before F&F (Feb 9) — Must Fix
+### Before F&F (Feb 9) — Must Fix ✅ ALL RESOLVED
 
-| Issue | Effort | Impact |
-|-------|--------|--------|
-| #1 CLI→Skills gap (init output) | 1h | Critical |
-| #6 Post-init guidance | 2h | High |
-| #4 Deprecation cleanup (decision) | 1h | High |
+| Issue | Effort | Impact | Status |
+|-------|--------|--------|--------|
+| #1 CLI→Skills gap (init output) | 1h | Critical | ✅ Done |
+| #6 Post-init guidance | 2h | High | ✅ Done |
+| #4 Deprecation cleanup (decision) | 1h | High | ✅ Done (was already removed) |
 
 ### Before Public Launch (Feb 15) — Should Fix
 
