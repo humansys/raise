@@ -60,37 +60,24 @@ class SessionIndexValidation:
         return f"Session index issues: {'; '.join(issues)}"
 
 
-def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
-    """Validate session index for data quality issues.
+@dataclass
+class _ParsedSessionEntries:
+    """Intermediate result from parsing session index entries."""
 
-    Jidoka check: detect entries without IDs, non-standard formats,
-    duplicates, and large gaps in sequence.
+    total_entries: int
+    entries_without_id: int
+    non_standard_ids: list[str]
+    id_counts: dict[str, int]
+    ses_numbers: list[int]
 
-    Args:
-        memory_dir: Path to .rai/memory/ directory.
 
-    Returns:
-        SessionIndexValidation with findings.
-    """
-    file_path = memory_dir / "sessions" / "index.jsonl"
-
-    if not file_path.exists():
-        return SessionIndexValidation(
-            is_valid=True,
-            total_entries=0,
-            entries_without_id=0,
-            non_standard_ids=[],
-            duplicate_ids=[],
-            max_id=0,
-            gaps=[],
-        )
-
+def _parse_session_entries(file_path: Path) -> _ParsedSessionEntries:
+    """Parse session index JSONL and collect statistics."""
+    ses_pattern = re.compile(r"^SES-(\d{3})$")
     entries_without_id = 0
     non_standard_ids: list[str] = []
     id_counts: dict[str, int] = {}
     ses_numbers: list[int] = []
-
-    ses_pattern = re.compile(r"^SES-(\d{3})$")
 
     with file_path.open("r", encoding="utf-8") as f:
         total_entries = 0
@@ -118,33 +105,77 @@ def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
             except json.JSONDecodeError:
                 entries_without_id += 1
 
-    # Find duplicates
-    duplicate_ids = [k for k, v in id_counts.items() if v > 1]
+    return _ParsedSessionEntries(
+        total_entries=total_entries,
+        entries_without_id=entries_without_id,
+        non_standard_ids=non_standard_ids,
+        id_counts=id_counts,
+        ses_numbers=ses_numbers,
+    )
 
-    # Find gaps > 5 in sequence
+
+def _find_sequence_gaps(ses_numbers: list[int], gap_threshold: int = 5) -> tuple[int, list[tuple[int, int]]]:
+    """Find gaps in session number sequence.
+
+    Returns:
+        Tuple of (max_id, list of gap tuples).
+    """
+    if not ses_numbers:
+        return 0, []
+
+    sorted_nums = sorted(ses_numbers)
+    max_id = sorted_nums[-1]
     gaps: list[tuple[int, int]] = []
-    if ses_numbers:
-        ses_numbers.sort()
-        max_id = ses_numbers[-1]
-        for i in range(1, len(ses_numbers)):
-            gap = ses_numbers[i] - ses_numbers[i - 1]
-            if gap > 5:
-                gaps.append((ses_numbers[i - 1], ses_numbers[i]))
-    else:
-        max_id = 0
+
+    for i in range(1, len(sorted_nums)):
+        gap = sorted_nums[i] - sorted_nums[i - 1]
+        if gap > gap_threshold:
+            gaps.append((sorted_nums[i - 1], sorted_nums[i]))
+
+    return max_id, gaps
+
+
+def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
+    """Validate session index for data quality issues.
+
+    Jidoka check: detect entries without IDs, non-standard formats,
+    duplicates, and large gaps in sequence.
+
+    Args:
+        memory_dir: Path to .rai/memory/ directory.
+
+    Returns:
+        SessionIndexValidation with findings.
+    """
+    file_path = memory_dir / "sessions" / "index.jsonl"
+
+    if not file_path.exists():
+        return SessionIndexValidation(
+            is_valid=True,
+            total_entries=0,
+            entries_without_id=0,
+            non_standard_ids=[],
+            duplicate_ids=[],
+            max_id=0,
+            gaps=[],
+        )
+
+    parsed = _parse_session_entries(file_path)
+    duplicate_ids = [k for k, v in parsed.id_counts.items() if v > 1]
+    max_id, gaps = _find_sequence_gaps(parsed.ses_numbers)
 
     is_valid = (
-        entries_without_id == 0
-        and len(non_standard_ids) == 0
+        parsed.entries_without_id == 0
+        and len(parsed.non_standard_ids) == 0
         and len(duplicate_ids) == 0
         and len(gaps) == 0
     )
 
     return SessionIndexValidation(
         is_valid=is_valid,
-        total_entries=total_entries,
-        entries_without_id=entries_without_id,
-        non_standard_ids=non_standard_ids,
+        total_entries=parsed.total_entries,
+        entries_without_id=parsed.entries_without_id,
+        non_standard_ids=parsed.non_standard_ids,
         duplicate_ids=duplicate_ids,
         max_id=max_id,
         gaps=gaps,

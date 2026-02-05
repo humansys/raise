@@ -7,16 +7,23 @@ from __future__ import annotations
 
 import re
 
-# Common English stopwords for keyword extraction
+# Comprehensive English stopwords for keyword extraction
 STOPWORDS: frozenset[str] = frozenset(
     {
-        # Articles and conjunctions
+        # Articles
         "the",
         "a",
         "an",
+        # Conjunctions
         "and",
-        "or",
         "but",
+        "or",
+        "nor",
+        "so",
+        "yet",
+        "both",
+        "either",
+        "neither",
         # Prepositions
         "in",
         "on",
@@ -27,11 +34,23 @@ STOPWORDS: frozenset[str] = frozenset(
         "with",
         "from",
         "by",
-        # Demonstratives
+        "as",
+        "into",
+        "through",
+        "during",
+        "before",
+        "after",
+        "above",
+        "below",
+        "between",
+        "under",
+        # Demonstratives and pronouns
         "this",
         "that",
         "these",
         "those",
+        "it",
+        "its",
         # Be verbs
         "is",
         "are",
@@ -40,12 +59,61 @@ STOPWORDS: frozenset[str] = frozenset(
         "be",
         "been",
         "being",
-        # Modal verbs (governance keywords)
-        "must",
-        "should",
+        # Have verbs
+        "have",
+        "has",
+        "had",
+        # Do verbs
+        "do",
+        "does",
+        "did",
+        # Modal verbs
         "will",
-        "can",
+        "would",
+        "could",
+        "should",
         "may",
+        "might",
+        "must",
+        "shall",
+        "can",
+        "need",
+        "dare",
+        "ought",
+        "used",
+        # Adverbs
+        "again",
+        "further",
+        "then",
+        "once",
+        "not",
+        "only",
+        "own",
+        "same",
+        "than",
+        "too",
+        "very",
+        "just",
+        "also",
+        "now",
+        "here",
+        "there",
+        "when",
+        "where",
+        "why",
+        "how",
+        # Quantifiers
+        "all",
+        "each",
+        "every",
+        "few",
+        "more",
+        "most",
+        "other",
+        "some",
+        "such",
+        "no",
+        "any",
     }
 )
 
