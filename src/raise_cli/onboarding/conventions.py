@@ -15,7 +15,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from raise_cli.onboarding.detection import EXCLUDED_DIRS
+from raise_cli.core.files import should_exclude_dir
 
 
 class Confidence(str, Enum):
@@ -220,14 +220,6 @@ def calculate_confidence(consistent: int, total: int) -> Confidence:
 # =============================================================================
 
 
-def _should_exclude_dir(dir_path: Path) -> bool:
-    """Check if a directory should be excluded from scanning."""
-    name = dir_path.name
-    if name.startswith("."):
-        return True
-    return name in EXCLUDED_DIRS
-
-
 def collect_python_files(directory: Path, max_files: int = 200) -> list[Path]:
     """Collect Python files from a directory recursively.
 
@@ -251,7 +243,7 @@ def collect_python_files(directory: Path, max_files: int = 200) -> list[Path]:
                 if len(files) >= max_files:
                     return
                 if item.is_dir():
-                    if not _should_exclude_dir(item):
+                    if not should_exclude_dir(item):
                         _collect(item)
                 elif item.is_file() and item.suffix == ".py":
                     files.append(item)

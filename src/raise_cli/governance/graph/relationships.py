@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 
+from raise_cli.core.text import extract_keywords
 from raise_cli.governance.graph.models import Relationship
 from raise_cli.governance.models import Concept, ConceptType
 
@@ -223,57 +224,6 @@ def _infer_related_to(concepts: list[Concept]) -> list[Relationship]:
                 )
 
     return relationships
-
-
-def extract_keywords(text: str) -> set[str]:
-    """Extract meaningful keywords from text.
-
-    Filters out stopwords and keeps only words longer than 3 characters.
-
-    Args:
-        text: Text to extract keywords from.
-
-    Returns:
-        Set of lowercase keywords.
-
-    Examples:
-        >>> keywords = extract_keywords("The Context Generation System")
-        >>> keywords == {"context", "generation", "system"}
-        True
-        >>> "the" in keywords
-        False
-    """
-    stopwords = {
-        "the",
-        "a",
-        "an",
-        "and",
-        "or",
-        "but",
-        "in",
-        "on",
-        "at",
-        "to",
-        "for",
-        "of",
-        "with",
-        "from",
-        "by",
-        "this",
-        "that",
-        "these",
-        "those",
-        "is",
-        "are",
-        "was",
-        "were",
-        "be",
-        "been",
-        "being",
-    }
-
-    words = re.findall(r"\b\w+\b", text.lower())
-    return {w for w in words if len(w) > 3 and w not in stopwords}
 
 
 def _infer_work_relationships(concepts: list[Concept]) -> list[Relationship]:
