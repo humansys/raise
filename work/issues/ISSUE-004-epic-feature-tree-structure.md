@@ -1,9 +1,24 @@
 # ISSUE-004: Epic/Feature Tree Structure
 
-> **Status:** Open
+> **Status:** PARTIAL (E14 adopted new structure)
 > **Priority:** Medium (DX improvement, not blocking)
 > **Created:** 2026-02-05
+> **Updated:** 2026-02-05
 > **Related:** ISSUE-003 (directory ontology)
+
+## Progress
+
+**E14 migrated to new structure:**
+```
+work/epics/e14-rai-distribution/
+├── scope.md
+└── features/
+    └── f14.0-dx-quality-gate/
+        ├── scope.md
+        └── plan.md
+```
+
+Old epics (E1-E13) remain in `dev/` — will migrate post-F&F if needed.
 
 ---
 

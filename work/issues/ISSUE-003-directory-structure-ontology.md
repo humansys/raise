@@ -1,9 +1,31 @@
 # ISSUE-003: Directory Structure Ontology Confusion
 
-> **Status:** Open
+> **Status:** RESOLVED
 > **Priority:** High (blocks clean F&F experience)
 > **Created:** 2026-02-05
+> **Resolved:** 2026-02-05
+> **Resolution Commit:** 2229f5e
 > **Related:** E14 Rai Distribution, ADR-022
+
+## Resolution
+
+Implemented `.raise/rai/` nested structure that separates concerns:
+
+| Directory | Purpose | Contents |
+|-----------|---------|----------|
+| `.raise/` | Framework presence (per-project) | manifest.yaml, graph/, future config |
+| `.raise/rai/` | AI partner state | memory/, telemetry/, identity/ |
+| `~/.rai/` | Global developer profile | developer.yaml (unchanged) |
+
+**Key insight:** RaiSE framework ≠ Rai AI partner. The framework is the methodology; Rai is the AI that uses it. Nesting `rai/` inside `.raise/` preserves this distinction while keeping a single visible directory.
+
+**Implementation:**
+- Centralized 17 path constants + 10 helper functions in `config/paths.py`
+- Updated 16 source files to use path helpers
+- Updated 11 test files to match new paths
+- All 1106 tests pass, 90.47% coverage
+
+---
 
 ---
 
