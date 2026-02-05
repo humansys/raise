@@ -13,6 +13,10 @@ from raise_cli.cli.error_handler import cli_error
 from raise_cli.governance import ConceptType, GovernanceExtractor
 from raise_cli.governance.graph import ConceptGraph
 from raise_cli.governance.graph.builder import GraphBuilder
+from raise_cli.output.formatters.graph import (
+    format_governance_build_result,
+    format_unified_build_result,
+)
 
 graph_app = typer.Typer(
     name="graph",
@@ -197,6 +201,7 @@ def build(
     if unified:
         _build_unified_graph(output)
         return
+
     # Default paths
     default_concepts = Path(".raise/cache/concepts.json")
     default_output = Path(".raise/cache/graph.json")
@@ -205,8 +210,8 @@ def build(
     output_path = output or default_output
 
     # Load concepts
-    if concepts_path.exists():
-        console.print(f"\nLoading concepts from [cyan]{concepts_path}[/cyan]...")
+    from_cache = concepts_path.exists()
+    if from_cache:
         with concepts_path.open() as f:
             data = json.load(f)
             concept_data = data.get("concepts", [])
@@ -228,7 +233,6 @@ def build(
         ]
     else:
         # Extract fresh
-        console.print("\nNo cached concepts found. Extracting from governance files...")
         extractor = GovernanceExtractor()
         result = extractor.extract_with_result()
         loaded_concepts = result.concepts
@@ -253,29 +257,28 @@ def build(
         with concepts_path.open("w") as f:
             json.dump(concepts_output, f, indent=2)
 
-    console.print(f"  ✓ Loaded [green]{len(loaded_concepts)}[/green] concepts")
-
     # Build graph
-    console.print("\nBuilding concept graph...")
     builder = GraphBuilder()
     graph = builder.build(loaded_concepts)
 
-    # Display statistics
+    # Get edge statistics
     stats = graph.metadata.get("stats", {})
-    edge_counts = stats.get("edges_by_type", {})
-
-    console.print(f"  ✓ Inferred [green]{len(graph.edges)}[/green] relationships")
-    for edge_type, count in edge_counts.items():
-        console.print(f"    - {edge_type}: {count}")
+    edge_counts: dict[str, int] = stats.get("edges_by_type", {})
 
     # Save graph
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w") as f:
         f.write(graph.to_json())
 
-    console.print(f"  ✓ Saved to [cyan]{output_path}[/cyan]")
-    console.print(
-        f"\nGraph: [green]{len(graph.nodes)}[/green] nodes, [green]{len(graph.edges)}[/green] edges\n"
+    # Format output
+    format_governance_build_result(
+        concepts_path=concepts_path,
+        output_path=output_path,
+        concepts_loaded=len(loaded_concepts),
+        edge_counts=edge_counts,
+        total_nodes=len(graph.nodes),
+        total_edges=len(graph.edges),
+        from_cache=from_cache,
     )
 
 
@@ -410,8 +413,6 @@ def _build_unified_graph(output: Path | None) -> None:
     default_output = Path(".raise/graph/unified.json")
     output_path = output or default_output
 
-    console.print("\n[cyan]Building unified context graph...[/cyan]")
-
     # Build unified graph
     builder = UnifiedGraphBuilder()
     graph = builder.build()
@@ -419,32 +420,22 @@ def _build_unified_graph(output: Path | None) -> None:
     # Count nodes by type
     node_counts: dict[str, int] = {}
     for node in graph.iter_concepts():
-        node_type = node.type
-        node_counts[node_type] = node_counts.get(node_type, 0) + 1
+        node_counts[node.type] = node_counts.get(node.type, 0) + 1
 
     # Count edges by type
     edge_counts: dict[str, int] = {}
     for edge in graph.iter_relationships():
-        edge_type = edge.type
-        edge_counts[edge_type] = edge_counts.get(edge_type, 0) + 1
-
-    # Display node counts
-    console.print("\n[bold]Nodes by type:[/bold]")
-    for node_type, count in sorted(node_counts.items()):
-        console.print(f"  {node_type}: [green]{count}[/green]")
-
-    console.print(f"\n[bold]Total nodes:[/bold] [green]{graph.node_count}[/green]")
-
-    # Display edge counts
-    if edge_counts:
-        console.print("\n[bold]Edges by type:[/bold]")
-        for edge_type, count in sorted(edge_counts.items()):
-            console.print(f"  {edge_type}: [green]{count}[/green]")
-
-    console.print(f"\n[bold]Total edges:[/bold] [green]{graph.edge_count}[/green]")
+        edge_counts[edge.type] = edge_counts.get(edge.type, 0) + 1
 
     # Save graph
     output_path.parent.mkdir(parents=True, exist_ok=True)
     graph.save(output_path)
 
-    console.print(f"\n✓ Saved to [cyan]{output_path}[/cyan]\n")
+    # Format output
+    format_unified_build_result(
+        output_path=output_path,
+        node_counts=node_counts,
+        edge_counts=edge_counts,
+        total_nodes=graph.node_count,
+        total_edges=graph.edge_count,
+    )

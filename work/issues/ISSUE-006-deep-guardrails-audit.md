@@ -62,26 +62,28 @@
 
 ## Medium Priority Fixes (Address before F&F if time permits)
 
-### ⚡ M1. [CLI 2.5] Fat Commands - Business Logic in Commands — PARTIAL
+### ✅ M1. [CLI 2.5] Fat Commands - Business Logic in Commands — RESOLVED
 
 | File | Function | Lines | Issue | Status |
 |------|----------|-------|-------|--------|
 | `discover.py` | `scan_command` | 165 → 8 | Output formatting inline | ✅ Extracted |
 | `discover.py` | `drift_command` | 189 → 15 | Output formatting inline | ✅ Extracted |
-| `discover.py` | `build_command` | ~55 | Output formatting inline | Deferred |
-| `graph.py` | `build` | 123 | Caching/serialization inline | Deferred |
+| `discover.py` | `build_command` | ~55 → ~25 | Output formatting inline | ✅ Extracted |
+| `graph.py` | `build` | 123 → ~65 | Output formatting inline | ✅ Extracted |
 | `context.py` | `query` | 107 | Branch logic for unified vs governance | Already factored |
 
 **Introduced:** F13.2 (discover), F2.2/F2.3 (graph), F11.3 (context)
 
-**Resolution (Partial):** Created `output/formatters/discover.py` with `format_scan_result()` and `format_drift_result()`. Commands now delegate formatting to dedicated module.
+**Resolution:** Created output formatters for all fat commands:
+- `format_scan_result()`, `format_drift_result()`, `format_build_result()` in `discover.py` formatter
+- `format_unified_build_result()`, `format_governance_build_result()` in `graph.py` formatter
 
 **Files changed:**
 - `src/raise_cli/output/formatters/__init__.py` (new)
-- `src/raise_cli/output/formatters/discover.py` (new, 214 lines)
-- `src/raise_cli/cli/commands/discover.py` (543 → 427 lines)
-
-**Remaining:** `build_command` in discover.py, `build` in graph.py have inline formatting but lower impact. `context.py` already has helper functions extracted.
+- `src/raise_cli/output/formatters/discover.py` (325 lines)
+- `src/raise_cli/output/formatters/graph.py` (new, 90 lines)
+- `src/raise_cli/cli/commands/discover.py` (543 → 405 lines)
+- `src/raise_cli/cli/commands/graph.py` (451 → 441 lines)
 
 ---
 
@@ -322,14 +324,12 @@ Most memory/ violations are in deprecated code (`MemoryGraph`, `MemoryQuery`). N
 10. **M12:** ✅ Added BaselineComponent Pydantic model
 11. **M13:** ✅ Refactored scanner.py long functions
 
-### ⚡ Phase 4: CLI Polish — PARTIAL
-12. **M1:** ⚡ Extracted formatters for discover.py (scan, drift)
-13. **M2:** ⚡ Fixed add-calibration (1 positional + 3 flags)
+### ✅ Phase 4: CLI Polish — COMPLETE
+12. **M1:** ✅ Extracted all formatters (discover scan/drift/build, graph build/unified)
+13. **M2:** ✅ Fixed add-calibration (1 positional + 3 flags), emit deferred (12 skills depend)
 
 ### Remaining: Low Priority Tech Debt
-- M1 remaining: `build_command` in discover.py, `build` in graph.py
-- M2 remaining: `emit` in telemetry.py (deferred — 12 skills depend on it)
-- L1-L6 — cosmetic improvements
+- L1-L6 — cosmetic improvements (deferred to post-F&F)
 
 ---
 

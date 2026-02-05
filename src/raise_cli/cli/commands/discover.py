@@ -22,7 +22,11 @@ from rich.console import Console
 
 from raise_cli.cli.error_handler import cli_error
 from raise_cli.discovery.scanner import Language, scan_directory
-from raise_cli.output.formatters.discover import format_drift_result, format_scan_result
+from raise_cli.output.formatters.discover import (
+    format_build_result,
+    format_drift_result,
+    format_scan_result,
+)
 
 discover_app = typer.Typer(
     name="discover",
@@ -196,6 +200,7 @@ def build_command(
         )
 
     # Load components to validate and count
+    component_count = 0
     try:
         data: dict[str, Any] = json.loads(input_path.read_text(encoding="utf-8"))
         components: list[dict[str, Any]] = data.get("components", [])
@@ -225,61 +230,33 @@ def build_command(
     component_nodes = [n for n in graph.iter_concepts() if n.type == "component"]
     components_in_graph = len(component_nodes)
 
-    if output == "json":
-        output_data = {
-            "status": "success",
-            "input_file": str(input_path),
-            "graph_file": str(graph_path),
-            "components_loaded": component_count,
-            "components_in_graph": components_in_graph,
-            "total_nodes": graph.node_count,
-            "total_edges": graph.edge_count,
-        }
-        console.print_json(json.dumps(output_data))
+    # Build categories dict
+    categories: dict[str, int] = {}
+    for comp in component_nodes:
+        category = comp.metadata.get("category", "unknown")
+        categories[category] = categories.get(category, 0) + 1
 
-    elif output == "summary":
-        console.print("[bold]Graph Build Summary[/bold]")
-        console.print(f"  Components loaded: {components_in_graph}")
-        console.print(f"  Total nodes: {graph.node_count}")
-        console.print(f"  Total edges: {graph.edge_count}")
+    # Build sample components list
+    sample_components = [
+        (
+            comp.metadata.get("name", comp.id),
+            comp.metadata.get("kind", ""),
+            comp.content[:60],
+        )
+        for comp in component_nodes[:3]
+    ]
 
-    else:
-        # Human-readable output
-        console.print("[bold green]Graph built successfully[/bold green]\n")
-        console.print(f"[bold]Input:[/bold] {input_path}")
-        console.print(f"[bold]Output:[/bold] {graph_path}\n")
-
-        # Component summary
-        console.print(f"[bold]Components:[/bold] {components_in_graph} loaded")
-
-        # Show by category if available
-        categories: dict[str, int] = {}
-        for comp in component_nodes:
-            category = comp.metadata.get("category", "unknown")
-            categories[category] = categories.get(category, 0) + 1
-
-        if categories:
-            console.print("\n[bold]By Category:[/bold]")
-            for cat, count in sorted(categories.items()):
-                console.print(f"  {cat}: {count}")
-
-        # Graph totals
-        console.print("\n[bold]Graph Totals:[/bold]")
-        console.print(f"  Nodes: {graph.node_count}")
-        console.print(f"  Edges: {graph.edge_count}")
-
-        # Sample components
-        if component_nodes:
-            console.print("\n[bold]Sample Components:[/bold]")
-            for comp in component_nodes[:3]:
-                name = comp.metadata.get("name", comp.id)
-                kind = comp.metadata.get("kind", "")
-                console.print(f"  [cyan]{name}[/cyan] ({kind}) — {comp.content[:60]}...")
-
-        # Next steps
-        console.print("\n[dim]Query components:[/dim]")
-        console.print('  [dim]raise context query --type component "keyword"[/dim]')
-        console.print("  [dim]raise context query --unified --type component[/dim]")
+    format_build_result(
+        input_path=input_path,
+        graph_path=graph_path,
+        component_count=component_count,
+        components_in_graph=components_in_graph,
+        node_count=graph.node_count,
+        edge_count=graph.edge_count,
+        categories=categories,
+        sample_components=sample_components,
+        output_format=output,
+    )
 
 
 @discover_app.command("drift")
@@ -353,12 +330,13 @@ def drift_command(
         raise typer.Exit(0)
 
     # Load baseline
+    baseline: list[BaselineComponent] = []
     try:
         baseline_data: dict[str, Any] = json.loads(
             baseline_file.read_text(encoding="utf-8")
         )
         baseline_dicts: list[dict[str, Any]] = baseline_data.get("components", [])
-        baseline: list[BaselineComponent] = [
+        baseline = [
             BaselineComponent.model_validate(comp) for comp in baseline_dicts
         ]
     except (json.JSONDecodeError, KeyError) as e:
