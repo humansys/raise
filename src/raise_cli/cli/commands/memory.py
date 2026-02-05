@@ -18,6 +18,7 @@ from rich.console import Console
 from rich.table import Table
 
 from raise_cli.cli.error_handler import cli_error
+from raise_cli.config.paths import get_graph_dir, get_memory_dir
 from raise_cli.context.graph import UnifiedGraph
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
@@ -48,13 +49,13 @@ console = Console()
 
 
 def _get_default_memory_dir() -> Path:
-    """Get default memory directory (.rai/memory)."""
-    return Path(".rai/memory")
+    """Get default memory directory (.raise/rai/memory)."""
+    return get_memory_dir()
 
 
 def _get_default_graph_path() -> Path:
     """Get default unified graph path (.raise/graph/unified.json)."""
-    return Path(".raise/graph/unified.json")
+    return get_graph_dir() / "unified.json"
 
 
 @memory_app.command()

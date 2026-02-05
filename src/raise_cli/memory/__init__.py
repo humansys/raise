@@ -7,7 +7,7 @@ For queries, use the UnifiedGraph from raise_cli.context:
 - CLI: `raise context query "keywords" --unified --types pattern,calibration,session`
 - Programmatic: `UnifiedQueryEngine` from `raise_cli.context.query`
 
-The JSONL files (.rai/memory/*.jsonl) remain the source of truth.
+The JSONL files (.raise/rai/memory/*.jsonl) remain the source of truth.
 The unified graph consolidates memory with governance, skills, and work items.
 """
 

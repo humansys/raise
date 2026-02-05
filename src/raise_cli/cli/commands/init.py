@@ -2,7 +2,7 @@
 
 This module provides the `raise init` command that:
 - Detects if the project is greenfield or brownfield
-- Creates .rai/manifest.yaml with project metadata
+- Creates .raise/manifest.yaml with project metadata
 - Loads or creates ~/.rai/developer.yaml for personal profile
 - Outputs adaptive messages based on experience level
 - Optionally detects conventions and generates guardrails (--detect)
@@ -54,7 +54,7 @@ WELCOME_BACK_RI = "[dim]Welcome back, {name}.[/dim]"
 
 PROJECT_DETECTED_SHU = """
 [bold]Project detected:[/bold] {project_type} ({file_count} code files)
-[bold]Created:[/bold] .rai/manifest.yaml
+[bold]Created:[/bold] .raise/manifest.yaml
 {profile_status}
 
 [bold cyan]Next steps:[/bold cyan]
@@ -70,7 +70,7 @@ PROJECT_DETECTED_SHU = """
 [dim]Don't have Claude Code? https://claude.ai/download[/dim]
 """
 
-PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .rai/manifest.yaml
+PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
 [dim]Claude Code:[/dim] /session-start    [dim]Terminal:[/dim] raise --help
 """
@@ -166,7 +166,7 @@ def init_command(
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
-    Detects project type (greenfield/brownfield), creates .rai/manifest.yaml,
+    Detects project type (greenfield/brownfield), creates .raise/manifest.yaml,
     and sets up developer profile for personalized interaction.
 
     With --detect, also analyzes code conventions and generates guardrails.

@@ -16,14 +16,14 @@ class TestConceptNode:
             id="PAT-001",
             type="pattern",
             content="Singleton with get/set/configure pattern",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-01-31",
             metadata={"sub_type": "codebase", "context": ["testing"]},
         )
         assert node.id == "PAT-001"
         assert node.type == "pattern"
         assert "Singleton" in node.content
-        assert node.source_file == ".rai/memory/patterns.jsonl"
+        assert node.source_file == ".raise/rai/memory/patterns.jsonl"
         assert node.metadata["sub_type"] == "codebase"
 
     def test_create_principle_node(self) -> None:

@@ -170,7 +170,7 @@ class ClaudeMdGenerator:
         lines.append(
             "- `governance/solution/guardrails.md` — Code standards and verification"
         )
-        lines.append("- `.rai/manifest.yaml` — Project metadata")
+        lines.append("- `.raise/manifest.yaml` — Project metadata")
         lines.append("")
 
     def _add_footer(self, lines: list[str]) -> None:

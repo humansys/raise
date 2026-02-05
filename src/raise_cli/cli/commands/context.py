@@ -8,6 +8,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
     UnifiedQuery,
@@ -15,7 +16,6 @@ from raise_cli.context.query import (
     UnifiedQueryResult,
     UnifiedQueryStrategy,
 )
-from raise_cli.cli.error_handler import cli_error
 from raise_cli.governance.query import ContextQuery, ContextQueryEngine, QueryStrategy
 from raise_cli.governance.query.formatters import format_json, format_markdown
 

@@ -62,7 +62,7 @@ class ConceptNode(BaseModel):
         ...     id="PAT-001",
         ...     type="pattern",
         ...     content="Singleton with get/set/configure pattern",
-        ...     source_file=".rai/memory/patterns.jsonl",
+        ...     source_file=".raise/rai/memory/patterns.jsonl",
         ...     created="2026-01-31",
         ...     metadata={"sub_type": "codebase", "context": ["testing"]}
         ... )

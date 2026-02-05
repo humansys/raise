@@ -315,7 +315,7 @@ class TestGraphBuildUnifiedCommand:
         )
 
         # Create memory files
-        memory_dir = project_root / ".rai" / "memory"
+        memory_dir = project_root / ".raise" / "rai" / "memory"
         memory_dir.mkdir(parents=True)
 
         patterns_file = memory_dir / "patterns.jsonl"

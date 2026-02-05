@@ -174,7 +174,7 @@ class TestMigrateEmilioProfile:
     def test_extracts_sessions_from_real_data(self, tmp_path: Path) -> None:
         """Extracts session data from memory directory."""
         # Create mock memory structure
-        memory_path = tmp_path / ".rai" / "memory" / "sessions"
+        memory_path = tmp_path / ".raise/rai" / "memory" / "sessions"
         memory_path.mkdir(parents=True)
         index_path = memory_path / "index.jsonl"
         index_path.write_text(
@@ -193,7 +193,7 @@ class TestMigrateEmilioProfile:
         assert "epic-design" in profile.skills_mastered
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
-        """Handles missing .rai/memory directory gracefully."""
+        """Handles missing .raise/rai/memory directory gracefully."""
         profile = migrate_emilio_profile(tmp_path)
         assert profile.sessions_total == 0
         assert profile.first_session is None
@@ -210,7 +210,7 @@ class TestMigrateEmilioProfile:
 
     def test_merges_detected_and_additional_skills(self, tmp_path: Path) -> None:
         """Merges detected skills with additional skills."""
-        memory_path = tmp_path / ".rai" / "memory" / "sessions"
+        memory_path = tmp_path / ".raise/rai" / "memory" / "sessions"
         memory_path.mkdir(parents=True)
         index_path = memory_path / "index.jsonl"
         index_path.write_text('{"id": "SES-001", "outcomes": ["debug used"]}\n')
