@@ -20,6 +20,11 @@
     - How does first `/session-start` initialize Rai?
     - How does personal Rai diverge over time?
     - How do "base Rai" updates propagate to existing users?
+  - **Critical insight (PAT-095):** Base Rai must have internalized framework knowledge:
+    - Full skills list and when to use each
+    - Lifecycle gates (epic-close before merge, etc.)
+    - Process rules (TDD, commit after task, etc.)
+    - Users shouldn't have to remember; Rai guides
   - **Priority:** P0 for post-F&F — crucial for public launch DX
   - **Workaround for F&F:** Manually seed test profile with starter patterns
   - **See:** ADR-013 (Rai as Entity), E7 onboarding discussion (2026-02-05)
