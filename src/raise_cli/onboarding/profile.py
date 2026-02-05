@@ -163,3 +163,30 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
     )
     profile_path.write_text(content, encoding="utf-8")
     logger.debug("Saved developer profile: %s", profile_path)
+
+
+def increment_session(
+    profile: DeveloperProfile, project_path: str | None = None
+) -> DeveloperProfile:
+    """Increment session count and update session metadata.
+
+    Pure function that returns a new profile instance without modifying
+    the original. Does NOT persist to disk - caller is responsible for saving.
+
+    Args:
+        profile: The developer profile to update.
+        project_path: Optional project path to add to projects list.
+
+    Returns:
+        Updated profile with incremented session count.
+    """
+    updates: dict[str, object] = {
+        "sessions_total": profile.sessions_total + 1,
+        "last_session": date.today(),
+    }
+
+    # Add project path if provided and not already present
+    if project_path is not None and project_path not in profile.projects:
+        updates["projects"] = [*profile.projects, project_path]
+
+    return profile.model_copy(update=updates)

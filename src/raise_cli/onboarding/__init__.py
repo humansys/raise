@@ -5,6 +5,10 @@ Handles developer profile management, project initialization, and convention det
 
 from __future__ import annotations
 
+from raise_cli.onboarding.claudemd import (
+    ClaudeMdGenerator,
+    generate_claude_md,
+)
 from raise_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
@@ -24,21 +28,17 @@ from raise_cli.onboarding.detection import (
     count_code_files,
     detect_project_type,
 )
-from raise_cli.onboarding.manifest import (
-    ProjectInfo,
-    ProjectManifest,
-    load_manifest,
-    save_manifest,
-)
-from raise_cli.onboarding.claudemd import (
-    ClaudeMdGenerator,
-    generate_claude_md,
-)
 from raise_cli.onboarding.governance import (
     GeneratedGuardrail,
     GuardrailGenerator,
     GuardrailLevel,
     generate_guardrails,
+)
+from raise_cli.onboarding.manifest import (
+    ProjectInfo,
+    ProjectManifest,
+    load_manifest,
+    save_manifest,
 )
 from raise_cli.onboarding.migration import migrate_emilio_profile
 from raise_cli.onboarding.profile import (
@@ -47,6 +47,7 @@ from raise_cli.onboarding.profile import (
     DeveloperProfile,
     ExperienceLevel,
     get_rai_home,
+    increment_session,
     load_developer_profile,
     save_developer_profile,
 )
@@ -88,6 +89,7 @@ __all__ = [
     "DeveloperProfile",
     "ExperienceLevel",
     "get_rai_home",
+    "increment_session",
     "load_developer_profile",
     "migrate_emilio_profile",
     "save_developer_profile",

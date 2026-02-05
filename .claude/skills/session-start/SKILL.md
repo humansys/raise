@@ -3,7 +3,7 @@ name: session-start
 description: >
   Begin a session by loading memory, analyzing progress, and proposing
   focused work. Creates continuity across sessions and surfaces improvement
-  signals for continuous improvement.
+  signals for continuous improvement. Adapts to developer experience level.
 
 license: MIT
 
@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "2.0.0"
 
 hooks:
   Stop:
@@ -30,13 +30,19 @@ hooks:
 
 Begin a working session by loading accumulated memory, analyzing progress against goals, and proposing focused work. This creates continuity across sessions and surfaces signals for continuous improvement.
 
+**Adaptive:** This skill adapts to the developer's experience level (Shu/Ha/Ri), providing more guidance for beginners and efficiency for experts.
+
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Follow all steps, read all memory files, propose session goal.
+This skill adapts its behavior based on the developer's experience level:
 
-**Ha (破)**: Skip steps for continuation sessions; focus on blockers and drift.
+| Level | Sessions | Behavior |
+|-------|----------|----------|
+| **Shu (守)** | 0-5 | Full explanations, teach RaiSE concepts, guide each step |
+| **Ha (破)** | 6-20 | Explain new concepts, efficient on known patterns |
+| **Ri (離)** | 21+ | Minimal ceremony, maximum efficiency, just the essentials |
 
-**Ri (離)**: Develop personal start rituals; integrate with external tools.
+The experience level is read from `~/.rai/developer.yaml`.
 
 ## Context
 
@@ -51,8 +57,8 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 - Quick fixes where context is obvious
 
 **Inputs required:**
-- Unified graph (`.raise/graph/unified.json`) — primary source (sessions, patterns, work items, calibration)
-- Memory files (`.rai/memory/`) — fallback only if graph unavailable
+- Developer profile (`~/.rai/developer.yaml`) — experience level, personal preferences
+- Unified graph (`.raise/graph/unified.json`) — primary source (sessions, patterns, work items)
 - `CLAUDE.local.md` — deadlines, human notes (not in graph)
 - `dev/parking-lot.md` — improvement signals (not in graph)
 
@@ -63,6 +69,65 @@ Begin a working session by loading accumulated memory, analyzing progress agains
 
 ## Steps
 
+### Step 0: Load Developer Profile (Required)
+
+Load the developer's personal profile to determine experience level and preferences:
+
+```bash
+raise profile show
+```
+
+> **Development note:** In raise-commons, use `uv run raise` instead of bare `raise`.
+
+**What this returns:**
+- `experience_level`: shu, ha, or ri
+- `communication`: style preferences
+- `sessions_total`: total sessions across all projects
+- `skills_mastered`: skills the developer knows well
+
+**If no profile exists:** This is a first-time user. Treat as Shu level and explain that you're creating their profile at session end.
+
+**Adapt your behavior:**
+- **Shu:** Include `[CONCEPT]` blocks below, explain terminology, be thorough
+- **Ha:** Skip basic concepts, explain only new patterns
+- **Ri:** Skip to essentials, minimal output
+
+**Verification:** Experience level determined; behavior mode set.
+
+---
+
+## [CONCEPT] The RaiSE Triad (Shu Only)
+
+> **Show this block only for Shu-level developers.**
+
+If the developer is new to RaiSE, explain the core mental model:
+
+```
+"Before we dive in, let me explain how we'll work together.
+
+RaiSE is built on a 'triad' — three parts working together:
+
+    YOU (RaiSE Engineer)
+    ├── Bring: Judgment, intuition, domain knowledge
+    └── Own: Strategic decisions, final approval
+
+    RAI (AI Partner)
+    ├── Bring: Pattern recognition, execution, memory
+    └── Own: Following governance, remembering context
+
+    RAISE (Methodology)
+    ├── Bring: Structure, validation gates, guardrails
+    └── Own: Process consistency, quality assurance
+
+Neither of us works alone. You bring what I can't (judgment), I bring what
+you shouldn't have to repeat (patterns, context). RaiSE keeps us both honest.
+
+This session start is part of that — I'm loading context so I remember
+what we've learned together."
+```
+
+---
+
 ### Step 1: Query Unified Context (Required)
 
 Query the unified graph for session-relevant context. This is the **primary** method — more efficient than reading raw files.
@@ -70,9 +135,6 @@ Query the unified graph for session-relevant context. This is the **primary** me
 ```bash
 raise context query "session epic patterns calibration" --unified --limit 10
 ```
-
-> **Development note:** In raise-commons, use `uv run raise` instead of bare `raise`.
-> The venv isn't auto-activated. See PAT-046.
 
 **What this returns:**
 - Recent session history with outcomes
@@ -105,6 +167,30 @@ raise context query "session epic patterns calibration" --unified --limit 10
 **Verification:** Memory loaded from raw files.
 
 > **If you can't continue:** Memory files missing → Create them via `/session-close` pattern.
+
+---
+
+## [CONCEPT] Why Memory Matters (Shu Only)
+
+> **Show this block only for Shu-level developers.**
+
+```
+"You might wonder why I'm loading all this context.
+
+Without memory, every session starts cold. I'd ask the same questions,
+make the same mistakes, suggest the same things you've already rejected.
+
+With memory, I remember:
+- Patterns that worked in this codebase
+- Your velocity (how fast we actually ship)
+- What we tried and why it failed
+- Where we left off
+
+This is the 'reliable' in Reliable AI Software Engineering — I don't
+forget what we've learned together."
+```
+
+---
 
 ### Step 2: Load Human Context
 
@@ -147,7 +233,9 @@ Calculate progress metrics:
 
 > **If you can't continue:** Metrics unavailable → Estimate from git history.
 
-### Step 4: Check Parking Lot
+### Step 4: Check Parking Lot (Skip for Ri)
+
+> **Ri-level developers:** Skip this step unless deadline pressure detected.
 
 Read `dev/parking-lot.md` (not in unified graph — informal capture, not structured):
 
@@ -198,44 +286,115 @@ Based on analysis, propose:
 
 ### Step 7: Present Summary
 
-Output the session start summary:
+Output the session start summary. **Adapt format to experience level:**
+
+#### For Shu (Detailed)
 
 ```markdown
 ## Session Start: YYYY-MM-DD
 
+Welcome back! Here's where we stand.
+
 ### Context Loaded
-- **Memory:** X patterns, Y learnings loaded
+- **Memory:** X patterns, Y calibrations loaded
+- **Your level:** Shu (I'll explain concepts as we go)
 - **Last session:** [brief outcome]
 - **Current focus:** [Epic] → [Feature]
 
+### What This Means
+[Brief explanation of current state in plain language]
+
 ### Progress Check
+| Metric | Status | What It Means |
+|--------|--------|---------------|
+| Epic | X% complete | [explanation] |
+| Deadline | N days | [urgency level] |
+| Velocity | [rate] | [comparison to baseline] |
+
+### Suggested Focus
+**What:** [specific goal]
+**Why now:** [rationale in plain language]
+**Done when:** [clear criteria]
+
+### Improvement Signals
+- [signals with explanations]
+
+### What's Next
+[Clear guidance on how to proceed]
+
+Ready when you are. Ask questions anytime — that's how we both learn.
+```
+
+#### For Ha (Balanced)
+
+```markdown
+## Session Start: YYYY-MM-DD
+
+### Context
+- **Memory:** X patterns loaded
+- **Last session:** [outcome]
+- **Focus:** [Epic] → [Feature]
+
+### Progress
 | Metric | Status |
 |--------|--------|
-| Epic | X% complete (N/M SP) |
-| Deadline | N days to [milestone] |
+| Epic | X% (N/M SP) |
+| Deadline | N days |
 | Velocity | [assessment] |
 
 ### Suggested Focus
-**Primary:** [specific goal]
-**Rationale:** [why this, why now]
-**Done when:** [clear completion criteria]
+**Primary:** [goal]
+**Rationale:** [why]
+**Done when:** [criteria]
 
-### Improvement Signals
-- [signals detected, or "None - healthy state"]
+### Signals
+- [any signals, or "Healthy"]
 
-### Alternatives
-- [if blocked or priorities shift]
+Ready to proceed.
+```
 
-Ready when you are, or redirect if priorities changed.
+#### For Ri (Minimal)
+
+```markdown
+## Session: YYYY-MM-DD
+
+**Context:** [Epic] → [Feature], X% complete, N days to deadline
+**Focus:** [specific goal]
+**Signals:** [any, or "None"]
+
+Go.
 ```
 
 **Verification:** Summary presented; waiting for user direction.
+
+### Step 8: Record Session (Required)
+
+At the end of the skill, record this session in the developer profile:
+
+```bash
+raise profile session --project "$(pwd)"
+```
+
+This:
+- Increments `sessions_total`
+- Updates `last_session` to today
+- Adds project to `projects` list if new
+
+**For first-time users (no profile):**
+```bash
+raise profile session --name "[ask user's name]" --project "$(pwd)"
+```
+
+**Verification:** Session recorded; profile updated.
+
+---
 
 ## Output
 
 - Session start summary (displayed, not saved)
 - Improvement signals surfaced
 - Proposed session goal
+- Developer profile updated (session count incremented)
 
 ## Improvement Signal Details
 
@@ -268,9 +427,11 @@ These skills form a continuity loop:
 ┌─────────────────────────────────────────┐
 │                                         │
 │  /session-start                         │
+│    ↓ load profile (experience level)    │
 │    ↓ load memory                        │
 │    ↓ analyze progress                   │
-│    ↓ propose goal                       │
+│    ↓ propose goal (adapted to level)    │
+│    ↓ record session                     │
 │                                         │
 │  [WORK SESSION]                         │
 │                                         │
@@ -284,6 +445,7 @@ These skills form a continuity loop:
 ```
 
 Memory persists across the gap between sessions, creating continuity.
+Profile persists across projects, creating a personal relationship.
 
 ## Notes
 
@@ -309,9 +471,19 @@ Improvement signals feed back into the process:
 
 This makes the start/close loop a **learning system**, not just bookkeeping.
 
+### Adaptive Interaction Philosophy
+
+The goal isn't to dumb things down for beginners or rush experts. It's to:
+- **Shu:** Build understanding so they can eventually work independently
+- **Ha:** Reinforce patterns while introducing new concepts
+- **Ri:** Respect their time and expertise
+
+Education is built into the workflow, not bolted on.
+
 ## References
 
-- **Primary:** Unified graph (`.raise/graph/unified.json`) — sessions, patterns, work items, calibration
+- **Developer profile:** `~/.rai/developer.yaml` — experience level, preferences
+- **Primary:** Unified graph (`.raise/graph/unified.json`) — sessions, patterns, work items
 - **Fallback:** Memory files (`.rai/memory/`) — only if graph unavailable
 - **Human context:** `CLAUDE.local.md` — deadlines, notes (not in graph)
 - **Improvement signals:** `dev/parking-lot.md` — informal captures (not in graph)

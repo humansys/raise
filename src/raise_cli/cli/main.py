@@ -14,6 +14,7 @@ from raise_cli.cli.commands.discover import discover_app
 from raise_cli.cli.commands.graph import graph_app
 from raise_cli.cli.commands.init import init_command
 from raise_cli.cli.commands.memory import memory_app
+from raise_cli.cli.commands.profile import profile_app
 from raise_cli.cli.commands.telemetry import telemetry_app
 from raise_cli.config import RaiseSettings
 
@@ -42,6 +43,7 @@ app.add_typer(context_app, name="context")
 app.add_typer(discover_app, name="discover")
 app.add_typer(graph_app, name="graph")
 app.add_typer(memory_app, name="memory")
+app.add_typer(profile_app, name="profile")
 app.add_typer(telemetry_app, name="telemetry")
 
 # Register standalone commands
