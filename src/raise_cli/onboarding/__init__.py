@@ -30,6 +30,10 @@ from raise_cli.onboarding.manifest import (
     load_manifest,
     save_manifest,
 )
+from raise_cli.onboarding.claudemd import (
+    ClaudeMdGenerator,
+    generate_claude_md,
+)
 from raise_cli.onboarding.governance import (
     GeneratedGuardrail,
     GuardrailGenerator,
@@ -59,6 +63,9 @@ __all__ = [
     "StructureConventions",
     "StyleConventions",
     "detect_conventions",
+    # ClaudeMd
+    "ClaudeMdGenerator",
+    "generate_claude_md",
     # Detection
     "CODE_EXTENSIONS",
     "DetectionResult",
