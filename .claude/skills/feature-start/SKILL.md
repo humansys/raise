@@ -15,7 +15,7 @@ metadata:
   raise.next: feature-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "1.2.0"
 
 hooks:
   Stop:
@@ -62,24 +62,41 @@ Initialize a feature with verified context, dedicated branch, and scope commit. 
 
 ## Steps
 
-### Step 1: Verify Epic Context (Conditional)
+### Step 1: Verify Epic Branch Exists (Poka-Yoke)
 
-For epic features, verify the epic scope exists:
+For epic features, verify the epic branch exists:
 
 ```bash
-ls dev/epic-{epic_id}-scope.md 2>/dev/null || echo "WARN: No epic context"
+git branch --list "epic/e{N}/*" | head -1
 ```
 
 **Decision:**
-- Epic exists → Load and verify feature is listed
-- Epic missing + complex feature → Consider creating epic scope first
-- Epic missing + simple feature → Continue with standalone note
+- Epic branch exists → Continue (will create feature sub-branch)
+- Epic branch missing → **STOP.** Run `/epic-start` first.
 
-**Verification:** Epic context loaded OR explicitly standalone.
+> **Poka-yoke:** Feature branches MUST nest under epic branches. Creating a feature branch without its epic branch breaks the merge flow.
 
-> **If you can't continue:** Complex feature without epic → Run `/epic-design` first.
+**Verification:** Epic branch `epic/e{N}/*` exists.
 
-### Step 2: Verify Feature in Epic (If Epic Exists)
+> **If you can't continue:** Run `/epic-start` first to create the epic branch.
+
+### Step 2: Verify Epic Scope Document
+
+Verify the epic scope document exists:
+
+```bash
+ls dev/epic-e{N}-scope.md 2>/dev/null || echo "WARN: No epic scope"
+```
+
+**Decision:**
+- Scope exists → Load and verify feature is listed
+- Scope missing → Consider running `/epic-design` after `/epic-start`
+
+**Verification:** Epic scope loaded OR noted for creation.
+
+> **If you can't continue:** Complex feature without epic scope → Run `/epic-design` first.
+
+### Step 3: Verify Feature in Epic (If Epic Exists)
 
 Confirm the feature is listed in the epic scope:
 
@@ -95,7 +112,7 @@ grep -q "{feature_id}" dev/epic-{epic_id}-scope.md && echo "Feature found in epi
 
 > **If you can't continue:** Should be in epic but isn't → Update epic scope first.
 
-### Step 3: Create Feature Branch
+### Step 4: Create Feature Branch
 
 Create a dedicated branch for the feature:
 
@@ -117,7 +134,7 @@ git checkout -b feature/{epic_id}/{feature_id}
 
 > **If you can't continue:** Branch exists → Check out existing branch or rename.
 
-### Step 4: Define Scope
+### Step 5: Define Scope
 
 Document what's in and out of scope, plus done criteria.
 
@@ -144,7 +161,7 @@ Document what's in and out of scope, plus done criteria.
 
 > **If you can't continue:** Scope unclear → Clarify with stakeholder or timebox discovery.
 
-### Step 5: Create Scope Commit
+### Step 6: Create Scope Commit
 
 Create the initial commit with scope documentation:
 
@@ -170,7 +187,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 
 > **If you can't continue:** Nothing to commit → Create scope as plan.md or design.md first.
 
-### Step 6: Display Lifecycle Stages
+### Step 7: Display Lifecycle Stages
 
 Show the feature lifecycle for orientation:
 
@@ -196,7 +213,7 @@ Show the feature lifecycle for orientation:
 
 **Verification:** Lifecycle displayed; next step clear.
 
-### Step 7: Emit Feature Start (Telemetry)
+### Step 8: Emit Feature Start (Telemetry)
 
 Record the start of the feature lifecycle:
 
