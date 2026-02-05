@@ -358,7 +358,7 @@ class Handler{i}:
         # Should mention convention detection
         assert "convention" in output_lower or "guardrail" in output_lower
 
-    def test_detect_skipped_for_greenfield(
+    def test_detect_greenfield_skips_guardrails(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
         """--detect on greenfield doesn't create guardrails (nothing to detect)."""
@@ -377,6 +377,9 @@ class Handler{i}:
         )
         # Greenfield has no code to analyze - guardrails not generated
         assert not guardrails_path.exists()
+        # But CLAUDE.md is still created
+        claude_md_path = greenfield_project / "CLAUDE.md"
+        assert claude_md_path.exists()
 
     def test_detect_includes_project_name_in_guardrails(
         self, python_project: Path, mock_home: Path
@@ -395,3 +398,63 @@ class Handler{i}:
         guardrails_path = python_project / "governance" / "solution" / "guardrails.md"
         content = guardrails_path.read_text()
         assert "my-api" in content
+
+    def test_detect_generates_claude_md(
+        self, python_project: Path, mock_home: Path
+    ) -> None:
+        """--detect generates CLAUDE.md for brownfield projects."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(python_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        claude_md_path = python_project / "CLAUDE.md"
+        assert claude_md_path.exists(), f"Expected {claude_md_path} to exist"
+
+    def test_detect_claude_md_contains_conventions(
+        self, python_project: Path, mock_home: Path
+    ) -> None:
+        """Generated CLAUDE.md contains convention summary."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(python_project), "--detect", "--name", "my-api"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        claude_md_path = python_project / "CLAUDE.md"
+        content = claude_md_path.read_text()
+
+        # Should contain project name
+        assert "my-api" in content
+        # Should contain conventions summary
+        assert "Conventions" in content or "convention" in content.lower()
+        # Should reference guardrails
+        assert "guardrails" in content.lower()
+
+    def test_detect_greenfield_generates_claude_md(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--detect on greenfield generates minimal CLAUDE.md."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        claude_md_path = greenfield_project / "CLAUDE.md"
+        assert claude_md_path.exists()
+        content = claude_md_path.read_text()
+        assert "greenfield" in content.lower()

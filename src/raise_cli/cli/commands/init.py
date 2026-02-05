@@ -23,6 +23,7 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
+from raise_cli.onboarding.claudemd import generate_claude_md
 from raise_cli.onboarding.conventions import detect_conventions
 from raise_cli.onboarding.detection import ProjectType, detect_project_type
 from raise_cli.onboarding.governance import generate_guardrails
@@ -221,7 +222,7 @@ def init_command(
         console.print(Panel(welcome.strip(), border_style="cyan"))
         console.print(project_msg)
 
-    # Convention detection and guardrails generation
+    # Convention detection, guardrails, and CLAUDE.md generation
     if detect and detection.project_type == ProjectType.BROWNFIELD:
         conventions = detect_conventions(project_path)
 
@@ -237,23 +238,43 @@ def init_command(
             guardrails_path = guardrails_dir / "guardrails.md"
             guardrails_path.write_text(guardrails_content)
 
+            # Generate CLAUDE.md
+            claude_md_content = generate_claude_md(
+                project_name=project_name,
+                detection=detection,
+                conventions=conventions,
+            )
+            claude_md_path = project_path / "CLAUDE.md"
+            claude_md_path.write_text(claude_md_content)
+
             # Output summary
             conf = conventions.overall_confidence.value.upper()
             if profile.experience_level == ExperienceLevel.RI:
                 console.print(
                     f"\n[dim]Conventions detected ({conventions.files_analyzed} files, "
-                    f"{conf} confidence). Guardrails written to {guardrails_path}[/dim]"
+                    f"{conf} confidence). Generated guardrails.md and CLAUDE.md[/dim]"
                 )
             else:
                 console.print(
                     f"\n[bold cyan]Convention Detection[/bold cyan]\n"
                     f"Analyzed {conventions.files_analyzed} files with {conf} confidence.\n"
-                    f"Generated guardrails at: [bold]{guardrails_path}[/bold]\n\n"
-                    f"[dim]Review the guardrails and adjust as needed.[/dim]"
+                    f"Generated:\n"
+                    f"  - [bold]{guardrails_path}[/bold] (code standards)\n"
+                    f"  - [bold]{claude_md_path}[/bold] (project context)\n\n"
+                    f"[dim]Review and adjust as needed.[/dim]"
                 )
     elif detect and detection.project_type == ProjectType.GREENFIELD:
+        # Generate minimal CLAUDE.md for greenfield
+        claude_md_content = generate_claude_md(
+            project_name=project_name,
+            detection=detection,
+            conventions=None,
+        )
+        claude_md_path = project_path / "CLAUDE.md"
+        claude_md_path.write_text(claude_md_content)
+
         if profile.experience_level != ExperienceLevel.RI:
             console.print(
-                "\n[dim]No code to analyze yet. Guardrails will be generated "
-                "when conventions are established.[/dim]"
+                f"\n[dim]Created {claude_md_path}. No code to analyze yet — "
+                "guardrails will be generated when conventions are established.[/dim]"
             )
