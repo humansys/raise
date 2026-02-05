@@ -55,16 +55,16 @@ Run these in parallel (all independent):
 
 ```bash
 # Developer profile
-raise profile show
+uv run raise profile show
 
 # Unified graph context
-raise context query "session epic patterns" --unified --limit 10
+uv run raise context query "session epic patterns" --unified --limit 10
 
 # Human context (deadlines, notes)
 # Read: CLAUDE.local.md
 ```
 
-**If graph unavailable:** Run `raise graph build --unified` first.
+**If graph unavailable:** Run `uv run raise graph build --unified` first.
 
 **Extract from results:**
 - Experience level (for output style)
@@ -139,7 +139,7 @@ Ha is between these — balanced detail.
 ### Step 4: Record Session
 
 ```bash
-raise profile session --project "$(pwd)"
+uv run raise profile session --project "$(pwd)"
 ```
 
 This command:
@@ -149,7 +149,7 @@ This command:
 
 **First-time user:** Ask name, then:
 ```bash
-raise profile session --name "Name" --project "$(pwd)"
+uv run raise profile session --name "Name" --project "$(pwd)"
 ```
 
 **If warned about unclosed session:** Inform the user that learnings from the previous session may have been lost. Suggest using `/session-close` before ending work.

@@ -83,7 +83,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event start --phase design
+uv run raise telemetry emit epic {epic_id} --event start --phase design
 ```
 
 **Example:** `raise telemetry emit epic E9 -e start -p design`
@@ -93,7 +93,7 @@ raise telemetry emit epic {epic_id} --event start --phase design
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-raise context query "architecture ADR epic" --unified --types pattern,decision --limit 5
+uv run raise context query "architecture ADR epic" --unified --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
@@ -404,7 +404,7 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event complete --phase design
+uv run raise telemetry emit epic {epic_id} --event complete --phase design
 ```
 
 **Example:** `raise telemetry emit epic E9 -e complete -p design`

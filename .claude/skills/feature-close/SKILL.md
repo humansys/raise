@@ -232,7 +232,7 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 Record the completion of the entire feature lifecycle:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase review
+uv run raise telemetry emit feature {feature_id} --event complete --phase review
 ```
 
 **Example:** `raise telemetry emit feature F12.2 -e complete -p review`

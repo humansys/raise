@@ -65,7 +65,7 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase review
+uv run raise telemetry emit feature {feature_id} --event start --phase review
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p review`
@@ -94,7 +94,7 @@ uv run pytest --tb=no -q || {
 Load relevant process patterns and prior retrospectives from unified context:
 
 ```bash
-raise context query "retrospective learnings velocity" --unified --types pattern,calibration --limit 5
+uv run raise context query "retrospective learnings velocity" --unified --types pattern,calibration --limit 5
 ```
 
 Review returned patterns and calibration data before proceeding. Prior learnings and velocity data inform retrospective focus.
@@ -157,7 +157,7 @@ If improvements identified:
 For learnings worth preserving across sessions, add to memory via CLI:
 
 ```bash
-raise memory add-pattern "Pattern description" \
+uv run raise memory add-pattern "Pattern description" \
   -c "context,keywords" \
   -t process \
   --from {feature_id}
@@ -172,10 +172,10 @@ raise memory add-pattern "Pattern description" \
 **Examples:**
 ```bash
 # Process pattern
-raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
+uv run raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
 
 # Technical pattern
-raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
+uv run raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
 ```
 
 **Decision:**
@@ -200,7 +200,7 @@ Create retrospective document:
 Record the calibration signal for velocity tracking:
 
 ```bash
-raise telemetry emit-calibration {feature_id} \
+uv run raise telemetry emit-calibration {feature_id} \
   --size {XS|S|M|L} \
   --estimated {minutes} \
   --actual {minutes}
@@ -214,7 +214,7 @@ raise telemetry emit-calibration {feature_id} \
 
 **Example:**
 ```bash
-raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
+uv run raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
 ```
 
 **Verification:** Command shows velocity and "Calibration event recorded".
@@ -226,7 +226,7 @@ raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
 Record the completion of the entire feature lifecycle:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase review
+uv run raise telemetry emit feature {feature_id} --event complete --phase review
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e complete -p review`

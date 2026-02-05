@@ -75,7 +75,7 @@ Create a lean feature specification that optimizes for both human understanding 
 Record the start of the design phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase design
+uv run raise telemetry emit feature {feature_id} --event start --phase design
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e start -p design`
@@ -104,7 +104,7 @@ ls dev/epic-{epic_id}-scope.md 2>/dev/null || echo "WARN: No epic context"
 Load relevant architecture patterns and ADRs from unified context:
 
 ```bash
-raise context query "architecture patterns ADR" --unified --types pattern,decision --limit 5
+uv run raise context query "architecture patterns ADR" --unified --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Key patterns and architectural decisions inform design.
@@ -267,7 +267,7 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase design
+uv run raise telemetry emit feature {feature_id} --event complete --phase design
 ```
 
 **Example:** `raise telemetry emit feature F9.4 -e complete -p design`
