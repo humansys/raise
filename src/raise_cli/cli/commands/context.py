@@ -120,8 +120,8 @@ def query(
     ],
     format: Annotated[
         str,
-        typer.Option("--format", "-f", help="Output format (markdown or json)"),
-    ] = "markdown",
+        typer.Option("--format", "-f", help="Output format (human or json)"),
+    ] = "human",
     output: Annotated[
         Path | None,
         typer.Option("--output", "-o", help="Output file path (default: stdout)"),

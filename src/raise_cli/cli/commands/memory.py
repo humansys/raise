@@ -63,8 +63,8 @@ def query(
     query_str: Annotated[str, typer.Argument(help="Search query (keywords)")],
     format: Annotated[
         str,
-        typer.Option("--format", "-f", help="Output format (markdown or json)"),
-    ] = "markdown",
+        typer.Option("--format", "-f", help="Output format (human or json)"),
+    ] = "human",
     output: Annotated[
         Path | None,
         typer.Option("--output", "-o", help="Output file path (default: stdout)"),
@@ -170,7 +170,7 @@ def query(
 def list_memory(
     format: Annotated[
         str,
-        typer.Option("--format", "-f", help="Output format (markdown, json, or table)"),
+        typer.Option("--format", "-f", help="Output format (human, json, or table)"),
     ] = "table",
     output: Annotated[
         Path | None,
@@ -202,8 +202,8 @@ def list_memory(
         # Export as JSON
         $ raise memory list --format json --output memory.json
 
-        # Export as Markdown
-        $ raise memory list --format markdown --output memory.md
+        # Export as human-readable markdown
+        $ raise memory list --format human --output memory.md
     """
     # Handle deprecated option
     if memory_dir is not None:
@@ -242,7 +242,7 @@ def list_memory(
             [c.model_dump(mode="json") for c in memory_concepts],
             indent=2,
         )
-    elif format == "markdown":
+    elif format == "human":
         output_text = _format_concepts_markdown(memory_concepts)
     else:  # table
         _print_concepts_table(memory_concepts)
