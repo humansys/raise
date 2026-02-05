@@ -950,3 +950,4 @@
 {"type":"skill_event","timestamp":"2026-02-05T12:54:21Z","skill":"feature-implement","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T12:54:21Z","skill":"feature-plan","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T12:54:21Z","skill":"feature-review","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-05T12:56:02.879506Z","session_type":"feature","outcome":"success","duration_min":60,"features":["F7.2"]}
