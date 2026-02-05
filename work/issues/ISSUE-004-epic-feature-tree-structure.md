@@ -1,14 +1,28 @@
 # ISSUE-004: Epic/Feature Tree Structure
 
-> **Status:** PARTIAL (E14 adopted new structure)
+> **Status:** ✅ COMPLETE
 > **Priority:** Medium (DX improvement, not blocking)
 > **Created:** 2026-02-05
 > **Updated:** 2026-02-05
+> **Completed:** 2026-02-05
 > **Related:** ISSUE-003 (directory ontology)
 
-## Progress
+## Resolution
 
-**E14 migrated to new structure:**
+1. **E14 migrated to new tree structure** ✓
+2. **All skills updated to support both structures** ✓
+   - Skills check E14+ tree structure first, then fall back to legacy
+   - Path Convention tables added to all 9 lifecycle skills
+   - Backward compatible with E1-E13 legacy paths
+
+**Skills Updated (9 total):**
+- `/epic-design`, `/epic-plan`, `/epic-close`
+- `/feature-start`, `/feature-design`, `/feature-plan`
+- `/feature-implement`, `/feature-review`, `/feature-close`
+
+## Final Structure
+
+**E14+ (new tree):**
 ```
 work/epics/e14-rai-distribution/
 ├── scope.md
@@ -16,6 +30,12 @@ work/epics/e14-rai-distribution/
     └── f14.0-dx-quality-gate/
         ├── scope.md
         └── plan.md
+```
+
+**E1-E13 (legacy, unchanged):**
+```
+dev/epic-e{N}-scope.md
+work/features/{feature-id}/
 ```
 
 Old epics (E1-E13) remain in `dev/` — will migrate post-F&F if needed.

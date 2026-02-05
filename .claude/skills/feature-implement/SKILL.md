@@ -51,12 +51,18 @@ Execute the implementation plan task by task, verifying each step, and producing
 - Repeated for each task in the plan
 
 **Inputs required:**
-- Implementation plan (`work/features/{feature}/plan.md`)
+- Implementation plan (see Path Convention below)
 - Project rules and guardrails context
 
 **Output:**
 - Implemented and verified code
-- `work/features/{feature}/progress.md` - Progress log
+- Progress log (see Path Convention)
+
+**Path Convention (ISSUE-004):**
+| Epic | Feature Artifacts Location |
+|------|---------------------------|
+| E14+ (new) | `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/` |
+| E1-E13 (legacy) | `work/features/{feature-id}/` |
 
 ## Steps
 
@@ -75,9 +81,11 @@ uv run raise telemetry emit feature {feature_id} --event start --phase implement
 Implementation plan is mandatory:
 
 ```bash
-PLAN="work/features/{feature_id}/plan.md"
-if [ ! -f "$PLAN" ]; then
-    echo "ERROR: Plan not found: $PLAN"
+# Check E14+ tree structure first, then legacy
+PLAN=$(ls work/epics/e*/features/{feature_id}/plan.md 2>/dev/null || \
+       ls work/features/{feature_id}/plan.md 2>/dev/null)
+if [ -z "$PLAN" ]; then
+    echo "ERROR: Plan not found for {feature_id}"
     echo "Run /feature-plan first"
     exit 4  # ArtifactNotFoundError
 fi
@@ -149,7 +157,7 @@ Execute verification defined in the plan:
 
 ### Step 5: Log Progress
 
-Update `work/features/{feature}/progress.md`:
+Update progress log (E14+: `work/epics/.../features/{feature}/progress.md` or legacy: `work/features/{feature}/progress.md`):
 - Task completed
 - Actual time vs estimated
 - Notes or discoveries
