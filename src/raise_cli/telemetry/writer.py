@@ -16,14 +16,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 if TYPE_CHECKING:
-    from raise_cli.telemetry.schemas import (
-        CalibrationEvent,
-        CommandUsage,
-        ErrorEvent,
-        SessionEvent,
-        SkillEvent,
-        WorkLifecycle,
-    )
+    from raise_cli.telemetry.schemas import Signal
 
 # Type alias for skill event types (matches SkillEvent.event)
 SkillEventType = Literal["start", "complete", "abandon"]
@@ -72,14 +65,7 @@ def _ensure_directory(path: Path) -> None:
 
 
 def emit(
-    signal: (
-        SkillEvent
-        | SessionEvent
-        | CalibrationEvent
-        | ErrorEvent
-        | CommandUsage
-        | WorkLifecycle
-    ),
+    signal: Signal,
     *,
     base_path: Path | None = None,
 ) -> EmitResult:
