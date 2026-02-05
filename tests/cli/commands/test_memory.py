@@ -182,29 +182,29 @@ class TestMemoryQueryCommand:
             os.chdir(original_cwd)
 
 
-class TestMemoryDumpCommand:
-    """Tests for `raise memory dump` command."""
+class TestMemoryListCommand:
+    """Tests for `raise memory list` command."""
 
-    def test_dump_no_graph(self, tmp_path: Path) -> None:
-        """Test dump fails if unified graph not found."""
+    def test_list_no_graph(self, tmp_path: Path) -> None:
+        """Test list fails if unified graph not found."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(app, ["memory", "dump"])
+            result = runner.invoke(app, ["memory", "list"])
 
             assert result.exit_code == 1
             assert "Unified graph not found" in result.stdout
         finally:
             os.chdir(original_cwd)
 
-    def test_dump_table_format(
+    def test_list_table_format(
         self, sample_unified_graph: Path, tmp_path: Path
     ) -> None:
-        """Test dump with table format (default)."""
+        """Test list with table format (default)."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(app, ["memory", "dump"])
+            result = runner.invoke(app, ["memory", "list"])
 
             assert result.exit_code == 0
             assert "Memory Concepts" in result.stdout
@@ -212,14 +212,14 @@ class TestMemoryDumpCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_dump_json_format(
+    def test_list_json_format(
         self, sample_unified_graph: Path, tmp_path: Path
     ) -> None:
-        """Test dump with JSON format."""
+        """Test list with JSON format."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(app, ["memory", "dump", "--format", "json"])
+            result = runner.invoke(app, ["memory", "list", "--format", "json"])
 
             assert result.exit_code == 0
             # JSON array of concepts
@@ -228,31 +228,31 @@ class TestMemoryDumpCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_dump_markdown_format(
+    def test_list_markdown_format(
         self, sample_unified_graph: Path, tmp_path: Path
     ) -> None:
-        """Test dump with markdown format."""
+        """Test list with markdown format."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(app, ["memory", "dump", "--format", "markdown"])
+            result = runner.invoke(app, ["memory", "list", "--format", "markdown"])
 
             assert result.exit_code == 0
             assert "# Memory Concepts" in result.stdout
         finally:
             os.chdir(original_cwd)
 
-    def test_dump_with_output_file(
+    def test_list_with_output_file(
         self, sample_unified_graph: Path, tmp_path: Path
     ) -> None:
-        """Test dump saves to output file."""
+        """Test list saves to output file."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
             output_file = tmp_path / "memory.json"
             result = runner.invoke(
                 app,
-                ["memory", "dump", "--format", "json", "--output", str(output_file)],
+                ["memory", "list", "--format", "json", "--output", str(output_file)],
             )
 
             assert result.exit_code == 0
@@ -262,16 +262,16 @@ class TestMemoryDumpCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_dump_with_custom_graph(
+    def test_list_with_custom_graph(
         self, sample_unified_graph: Path, tmp_path: Path
     ) -> None:
-        """Test dump with explicit graph path."""
+        """Test list with explicit graph path."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "dump", "--graph", str(sample_unified_graph)],
+                ["memory", "list", "--graph", str(sample_unified_graph)],
             )
 
             assert result.exit_code == 0
@@ -298,10 +298,10 @@ class TestMemoryHelp:
         assert "query" in result.stdout.lower()
         assert "--max-results" in result.stdout
 
-    def test_memory_dump_help(self) -> None:
-        """Test memory dump command shows help."""
-        result = runner.invoke(app, ["memory", "dump", "--help"])
+    def test_memory_list_help(self) -> None:
+        """Test memory list command shows help."""
+        result = runner.invoke(app, ["memory", "list", "--help"])
 
         assert result.exit_code == 0
-        assert "dump" in result.stdout.lower()
+        assert "list" in result.stdout.lower()
         assert "--format" in result.stdout
