@@ -212,3 +212,114 @@ def _format_drift_human(
         f"[dim]Scanned {files_scanned} files, "
         f"checked {symbols_checked} symbols[/dim]"
     )
+
+
+def format_build_result(
+    input_path: Path,
+    graph_path: Path,
+    component_count: int,
+    components_in_graph: int,
+    node_count: int,
+    edge_count: int,
+    categories: dict[str, int],
+    sample_components: list[tuple[str, str, str]],
+    output_format: str,
+) -> None:
+    """Format and print discover build results.
+
+    Args:
+        input_path: Path to the input components file.
+        graph_path: Path to the output graph file.
+        component_count: Number of components loaded from input.
+        components_in_graph: Number of component nodes in graph.
+        node_count: Total nodes in graph.
+        edge_count: Total edges in graph.
+        categories: Component counts by category.
+        sample_components: List of (name, kind, content_preview) tuples.
+        output_format: Output format ("json", "summary", or "human").
+    """
+    if output_format == "json":
+        _format_build_json(
+            input_path, graph_path, component_count,
+            components_in_graph, node_count, edge_count,
+        )
+    elif output_format == "summary":
+        _format_build_summary(components_in_graph, node_count, edge_count)
+    else:
+        _format_build_human(
+            input_path, graph_path, components_in_graph,
+            node_count, edge_count, categories, sample_components,
+        )
+
+
+def _format_build_json(
+    input_path: Path,
+    graph_path: Path,
+    component_count: int,
+    components_in_graph: int,
+    node_count: int,
+    edge_count: int,
+) -> None:
+    """Format build result as JSON."""
+    output_data = {
+        "status": "success",
+        "input_file": str(input_path),
+        "graph_file": str(graph_path),
+        "components_loaded": component_count,
+        "components_in_graph": components_in_graph,
+        "total_nodes": node_count,
+        "total_edges": edge_count,
+    }
+    _console.print_json(json.dumps(output_data))
+
+
+def _format_build_summary(
+    components_in_graph: int,
+    node_count: int,
+    edge_count: int,
+) -> None:
+    """Format build result as summary statistics."""
+    _console.print("[bold]Graph Build Summary[/bold]")
+    _console.print(f"  Components loaded: {components_in_graph}")
+    _console.print(f"  Total nodes: {node_count}")
+    _console.print(f"  Total edges: {edge_count}")
+
+
+def _format_build_human(
+    input_path: Path,
+    graph_path: Path,
+    components_in_graph: int,
+    node_count: int,
+    edge_count: int,
+    categories: dict[str, int],
+    sample_components: list[tuple[str, str, str]],
+) -> None:
+    """Format build result as human-readable output."""
+    _console.print("[bold green]Graph built successfully[/bold green]\n")
+    _console.print(f"[bold]Input:[/bold] {input_path}")
+    _console.print(f"[bold]Output:[/bold] {graph_path}\n")
+
+    # Component summary
+    _console.print(f"[bold]Components:[/bold] {components_in_graph} loaded")
+
+    # Show by category if available
+    if categories:
+        _console.print("\n[bold]By Category:[/bold]")
+        for cat, count in sorted(categories.items()):
+            _console.print(f"  {cat}: {count}")
+
+    # Graph totals
+    _console.print("\n[bold]Graph Totals:[/bold]")
+    _console.print(f"  Nodes: {node_count}")
+    _console.print(f"  Edges: {edge_count}")
+
+    # Sample components
+    if sample_components:
+        _console.print("\n[bold]Sample Components:[/bold]")
+        for name, kind, content in sample_components[:3]:
+            _console.print(f"  [cyan]{name}[/cyan] ({kind}) — {content}...")
+
+    # Next steps
+    _console.print("\n[dim]Query components:[/dim]")
+    _console.print('  [dim]raise context query --type component "keyword"[/dim]')
+    _console.print("  [dim]raise context query --unified --type component[/dim]")
