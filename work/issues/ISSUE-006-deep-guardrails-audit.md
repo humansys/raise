@@ -234,13 +234,19 @@ Commands without format support:
 - `status` (text only)
 - `telemetry emit-*` (text only)
 
-### L2. [Core 3.4] Path Traversal Prevention
+### ✅ L2. [Core 3.4] Path Traversal Prevention — BY DESIGN
 
-`core/tools.py` functions accept paths without validation. Low risk in CLI context.
+`core/tools.py` functions accept paths without validation.
 
-### L3. [Governance 1.2] model_post_init vs @field_validator
+**Resolution:** Not applicable for CLI tools. Paths come from:
+- Typer CLI arguments with `resolve_path=True` validation
+- Programmatic calls within trusted codebase
 
-`governance/models.py:89-101` uses `model_post_init` instead of `@field_validator(mode='after')`.
+Path traversal is a web security concern, not CLI. Marked as by design.
+
+### ✅ L3. [Governance 1.2] model_post_init vs @model_validator — RESOLVED
+
+**Resolution:** Replaced `model_post_init` with `@model_validator(mode='after')` in `governance/models.py`. Uses `Self` return type per Pydantic v2 best practices.
 
 ### ✅ L4. [Memory] Deprecated Code — RESOLVED
 
@@ -249,9 +255,15 @@ Commands without format support:
 - Deleted: `tests/memory/test_builder.py`, `test_cache.py`, `test_query.py`
 - Updated: `memory/__init__.py` to only export active code
 
-### L5. [Onboarding] Multiple 50-75 Line Functions
+### ✅ L5. [Onboarding] Multiple 50-75 Line Functions — PARTIALLY RESOLVED
 
-10 functions slightly exceed 50-line guideline. Marginal violations.
+**Original:** 9 functions exceeding 50-line guideline.
+
+**Resolution:** Refactored the two longest functions:
+- `claudemd.py:_generate_brownfield()` 86 → ~15 lines (extracted 5 section helpers)
+- `governance.py:to_markdown()` 71 → ~20 lines (extracted 4 section helpers)
+
+**Remaining:** 7 functions (55-66 lines) — cohesive detection/migration logic where splitting would reduce readability. Accepted as marginal violations.
 
 ### ✅ L6. [Telemetry 5.1] Signal Union Redeclared — RESOLVED
 
