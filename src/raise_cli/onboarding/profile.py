@@ -33,6 +33,42 @@ class ExperienceLevel(str, Enum):
     RI = "ri"
 
 
+class CommunicationStyle(str, Enum):
+    """Communication style preference.
+
+    Determines how much explanation Rai provides by default.
+
+    Styles:
+        EXPLANATORY: Detailed explanations, good for learning
+        BALANCED: Mix of explanation and efficiency
+        DIRECT: Minimal explanation, maximum efficiency
+    """
+
+    EXPLANATORY = "explanatory"
+    BALANCED = "balanced"
+    DIRECT = "direct"
+
+
+class CommunicationPreferences(BaseModel):
+    """Communication preferences for a developer.
+
+    Controls how Rai interacts with this developer.
+
+    Attributes:
+        style: Explanation verbosity (explanatory/balanced/direct).
+        language: Preferred language code (e.g., "en", "es").
+        skip_praise: Avoid unnecessary praise or validation.
+        detailed_explanations: Provide thorough explanations (overrides style).
+        redirect_when_dispersing: Permission to gently redirect off-topic.
+    """
+
+    style: CommunicationStyle = CommunicationStyle.BALANCED
+    language: str = "en"
+    skip_praise: bool = False
+    detailed_explanations: bool = True
+    redirect_when_dispersing: bool = False
+
+
 class DeveloperProfile(BaseModel):
     """Personal profile for a developer using RaiSE.
 
@@ -42,6 +78,9 @@ class DeveloperProfile(BaseModel):
     Attributes:
         name: Developer's name for personalized interaction.
         experience_level: Current Shu-Ha-Ri level (affects verbosity).
+        communication: Communication style preferences.
+        skills_mastered: List of skill names the developer has mastered.
+        universal_patterns: Patterns that apply across all projects.
         sessions_total: Total sessions across all projects.
         first_session: Date of first RaiSE session.
         last_session: Date of most recent session.
@@ -50,6 +89,9 @@ class DeveloperProfile(BaseModel):
 
     name: str
     experience_level: ExperienceLevel = ExperienceLevel.SHU
+    communication: CommunicationPreferences = Field(default_factory=CommunicationPreferences)
+    skills_mastered: list[str] = Field(default_factory=list)
+    universal_patterns: list[str] = Field(default_factory=list)
     sessions_total: int = 0
     first_session: date | None = None
     last_session: date | None = None

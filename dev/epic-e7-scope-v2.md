@@ -198,7 +198,7 @@ What are we working on?"
 | F7.6 | **Skills Bundling** | XS | 1 | ✅ Done | Skills in package, copy on init |
 | F7.7 | **Guided First Session** | M | 3 | Pending | Educational onboarding in /session-start |
 | F7.8 | **Personal Memory** | S | 2 | ✅ Done | ~/.rai/developer.yaml + adaptive interaction |
-| F7.9 | **Emilio Migration** | XS | 1 | Pending | Bootstrap Emilio's personal profile from history |
+| F7.9 | **Emilio Migration** | XS | 1 | ✅ Done | Bootstrap Emilio's personal profile from history |
 
 **Total:** 9 features, 17 SP (~1.5-2 days with kata cycle @ 2x velocity)
 
@@ -510,7 +510,7 @@ Day 5:                                        └► Retro, polish (M4: Complete
 |---------|:----:|:--:|:------:|:------:|:--------:|-------|
 | F7.6 Skills Bundling | XS | 1 | ✅ Done | — | — | Pre-E7 |
 | F7.8 Personal Memory | S | 2 | ✅ Done | 17 min | 2.94x | |
-| F7.9 Emilio Migration | XS | 1 | Pending | — | — | |
+| F7.9 Emilio Migration | XS | 1 | ✅ Done | 15 min | 2.0x | Extended model |
 | F7.1 `raise init` | M | 3 | Pending | — | — | |
 | F7.2 Convention Detection | M | 3 | Pending | — | — | HIGH RISK |
 | F7.3 Governance Generation | S | 2 | Pending | — | — | |

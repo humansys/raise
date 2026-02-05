@@ -10,6 +10,8 @@ import yaml
 from pydantic import ValidationError
 
 from raise_cli.onboarding.profile import (
+    CommunicationPreferences,
+    CommunicationStyle,
     DeveloperProfile,
     ExperienceLevel,
     get_rai_home,
@@ -36,6 +38,75 @@ class TestExperienceLevel:
     def test_only_three_levels(self) -> None:
         """ExperienceLevel has exactly three levels."""
         assert len(ExperienceLevel) == 3
+
+
+class TestCommunicationStyle:
+    """Tests for CommunicationStyle enum."""
+
+    def test_has_explanatory_style(self) -> None:
+        """CommunicationStyle has explanatory option."""
+        assert CommunicationStyle.EXPLANATORY.value == "explanatory"
+
+    def test_has_balanced_style(self) -> None:
+        """CommunicationStyle has balanced option."""
+        assert CommunicationStyle.BALANCED.value == "balanced"
+
+    def test_has_direct_style(self) -> None:
+        """CommunicationStyle has direct option."""
+        assert CommunicationStyle.DIRECT.value == "direct"
+
+    def test_only_three_styles(self) -> None:
+        """CommunicationStyle has exactly three options."""
+        assert len(CommunicationStyle) == 3
+
+
+class TestCommunicationPreferences:
+    """Tests for CommunicationPreferences model."""
+
+    def test_default_style_is_balanced(self) -> None:
+        """Default communication style is balanced."""
+        prefs = CommunicationPreferences()
+        assert prefs.style == CommunicationStyle.BALANCED
+
+    def test_default_language_is_english(self) -> None:
+        """Default language is English."""
+        prefs = CommunicationPreferences()
+        assert prefs.language == "en"
+
+    def test_default_skip_praise_is_false(self) -> None:
+        """Default skip_praise is False (praise allowed)."""
+        prefs = CommunicationPreferences()
+        assert prefs.skip_praise is False
+
+    def test_default_detailed_explanations_is_true(self) -> None:
+        """Default detailed_explanations is True."""
+        prefs = CommunicationPreferences()
+        assert prefs.detailed_explanations is True
+
+    def test_default_redirect_is_false(self) -> None:
+        """Default redirect_when_dispersing is False."""
+        prefs = CommunicationPreferences()
+        assert prefs.redirect_when_dispersing is False
+
+    def test_custom_preferences(self) -> None:
+        """CommunicationPreferences accepts all custom values."""
+        prefs = CommunicationPreferences(
+            style=CommunicationStyle.DIRECT,
+            language="es",
+            skip_praise=True,
+            detailed_explanations=False,
+            redirect_when_dispersing=True,
+        )
+        assert prefs.style == CommunicationStyle.DIRECT
+        assert prefs.language == "es"
+        assert prefs.skip_praise is True
+        assert prefs.detailed_explanations is False
+        assert prefs.redirect_when_dispersing is True
+
+    def test_style_from_string(self) -> None:
+        """CommunicationStyle can be set from string value."""
+        prefs = CommunicationPreferences(style="direct")
+        assert prefs.style == CommunicationStyle.DIRECT
 
 
 class TestDeveloperProfile:
@@ -72,11 +143,37 @@ class TestDeveloperProfile:
         profile = DeveloperProfile(name="Fer")
         assert profile.projects == []
 
+    def test_default_communication_preferences(self) -> None:
+        """New profiles have default communication preferences."""
+        profile = DeveloperProfile(name="Fer")
+        assert profile.communication.style == CommunicationStyle.BALANCED
+        assert profile.communication.language == "en"
+
+    def test_default_skills_mastered_is_empty(self) -> None:
+        """New profiles have no mastered skills."""
+        profile = DeveloperProfile(name="Fer")
+        assert profile.skills_mastered == []
+
+    def test_default_universal_patterns_is_empty(self) -> None:
+        """New profiles have no universal patterns."""
+        profile = DeveloperProfile(name="Fer")
+        assert profile.universal_patterns == []
+
     def test_full_profile(self) -> None:
         """DeveloperProfile accepts all fields."""
+        communication = CommunicationPreferences(
+            style=CommunicationStyle.DIRECT,
+            language="en",
+            skip_praise=True,
+            detailed_explanations=False,
+            redirect_when_dispersing=True,
+        )
         profile = DeveloperProfile(
             name="Emilio",
             experience_level=ExperienceLevel.RI,
+            communication=communication,
+            skills_mastered=["session-start", "feature-plan"],
+            universal_patterns=["Commit after each task"],
             sessions_total=40,
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
@@ -84,6 +181,10 @@ class TestDeveloperProfile:
         )
         assert profile.name == "Emilio"
         assert profile.experience_level == ExperienceLevel.RI
+        assert profile.communication.style == CommunicationStyle.DIRECT
+        assert profile.communication.skip_praise is True
+        assert len(profile.skills_mastered) == 2
+        assert len(profile.universal_patterns) == 1
         assert profile.sessions_total == 40
         assert profile.first_session == date(2026, 2, 1)
         assert profile.last_session == date(2026, 2, 4)
@@ -203,9 +304,17 @@ class TestSaveDeveloperProfile:
         rai_home = tmp_path / ".rai"
         monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
+        communication = CommunicationPreferences(
+            style=CommunicationStyle.DIRECT,
+            skip_praise=True,
+            redirect_when_dispersing=True,
+        )
         original = DeveloperProfile(
             name="Emilio",
             experience_level=ExperienceLevel.RI,
+            communication=communication,
+            skills_mastered=["session-start", "feature-plan"],
+            universal_patterns=["Commit after each task"],
             sessions_total=40,
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
@@ -217,6 +326,10 @@ class TestSaveDeveloperProfile:
         assert loaded is not None
         assert loaded.name == original.name
         assert loaded.experience_level == original.experience_level
+        assert loaded.communication.style == original.communication.style
+        assert loaded.communication.skip_praise == original.communication.skip_praise
+        assert loaded.skills_mastered == original.skills_mastered
+        assert loaded.universal_patterns == original.universal_patterns
         assert loaded.sessions_total == original.sessions_total
         assert loaded.first_session == original.first_session
         assert loaded.last_session == original.last_session
