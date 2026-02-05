@@ -139,7 +139,10 @@ class TestInitCommand:
 
         assert result.exit_code == 0
         # Should welcome back existing user
-        assert "test user" in result.output.lower() or "welcome back" in result.output.lower()
+        assert (
+            "test user" in result.output.lower()
+            or "welcome back" in result.output.lower()
+        )
 
 
 class TestInitOutputAdaptation:
@@ -255,3 +258,140 @@ class TestInitWithCustomName:
         manifest = load_manifest(greenfield_project)
         assert manifest is not None
         assert manifest.project.name == "greenfield-project"
+
+
+class TestInitWithDetect:
+    """Tests for --detect option (convention detection and guardrails generation)."""
+
+    @pytest.fixture
+    def python_project(self, tmp_path: Path) -> Path:
+        """Create a Python project with detectable conventions."""
+        project = tmp_path / "python-project"
+        project.mkdir()
+        src = project / "src" / "mypackage"
+        src.mkdir(parents=True)
+        (src / "__init__.py").write_text('"""Package init."""\n')
+
+        # Files with consistent style for HIGH confidence detection
+        for i in range(15):
+            content = f'''"""Module {i}."""
+
+
+def function_{i}(value: str) -> str:
+    """Process value."""
+    return value.upper()
+
+
+class Handler{i}:
+    """Handler class."""
+
+    def handle(self) -> None:
+        """Handle request."""
+        pass
+'''
+            (src / f"module_{i}.py").write_text(content)
+
+        # Tests directory
+        tests = project / "tests"
+        tests.mkdir()
+        (tests / "__init__.py").write_text("")
+        (tests / "test_main.py").write_text("def test_example(): pass\n")
+
+        return project
+
+    def test_detect_generates_guardrails_file(
+        self, python_project: Path, mock_home: Path
+    ) -> None:
+        """--detect generates governance/solution/guardrails.md."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(python_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        guardrails_path = python_project / "governance" / "solution" / "guardrails.md"
+        assert guardrails_path.exists(), f"Expected {guardrails_path} to exist"
+
+    def test_detect_guardrails_contain_conventions(
+        self, python_project: Path, mock_home: Path
+    ) -> None:
+        """Generated guardrails reflect detected conventions."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(python_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        guardrails_path = python_project / "governance" / "solution" / "guardrails.md"
+        content = guardrails_path.read_text()
+
+        # Should contain style guardrails
+        assert "Code Style" in content
+        # Should contain naming guardrails
+        assert "Naming" in content
+        # Should have structure (src layout detected)
+        assert "src/" in content
+
+    def test_detect_outputs_summary(
+        self, python_project: Path, mock_home: Path
+    ) -> None:
+        """--detect outputs detection summary to console."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(python_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        output_lower = result.output.lower()
+        # Should mention convention detection
+        assert "convention" in output_lower or "guardrail" in output_lower
+
+    def test_detect_skipped_for_greenfield(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--detect on greenfield doesn't create guardrails (nothing to detect)."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        guardrails_path = (
+            greenfield_project / "governance" / "solution" / "guardrails.md"
+        )
+        # Greenfield has no code to analyze - guardrails not generated
+        assert not guardrails_path.exists()
+
+    def test_detect_includes_project_name_in_guardrails(
+        self, python_project: Path, mock_home: Path
+    ) -> None:
+        """Generated guardrails include project name."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(python_project), "--detect", "--name", "my-api"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        guardrails_path = python_project / "governance" / "solution" / "guardrails.md"
+        content = guardrails_path.read_text()
+        assert "my-api" in content

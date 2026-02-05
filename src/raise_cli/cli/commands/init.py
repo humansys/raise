@@ -5,10 +5,12 @@ This module provides the `raise init` command that:
 - Creates .rai/manifest.yaml with project metadata
 - Loads or creates ~/.rai/developer.yaml for personal profile
 - Outputs adaptive messages based on experience level
+- Optionally detects conventions and generates guardrails (--detect)
 
 Example:
     $ raise init
     $ raise init --name my-custom-name
+    $ raise init --detect  # Detect conventions and generate guardrails
 """
 
 from __future__ import annotations
@@ -21,7 +23,9 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-from raise_cli.onboarding.detection import detect_project_type
+from raise_cli.onboarding.conventions import detect_conventions
+from raise_cli.onboarding.detection import ProjectType, detect_project_type
+from raise_cli.onboarding.governance import generate_guardrails
 from raise_cli.onboarding.manifest import ProjectInfo, ProjectManifest, save_manifest
 from raise_cli.onboarding.profile import (
     DeveloperProfile,
@@ -146,16 +150,27 @@ def init_command(
             help="Project path (defaults to current directory)",
         ),
     ] = None,
+    detect: Annotated[
+        bool,
+        typer.Option(
+            "--detect",
+            "-d",
+            help="Detect conventions and generate guardrails.md",
+        ),
+    ] = False,
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
     Detects project type (greenfield/brownfield), creates .rai/manifest.yaml,
     and sets up developer profile for personalized interaction.
 
+    With --detect, also analyzes code conventions and generates guardrails.
+
     Examples:
         $ raise init
         $ raise init --name my-api
         $ raise init --path /path/to/project
+        $ raise init --detect  # Detect conventions and generate guardrails
     """
     # Determine project path
     project_path = path if path is not None else Path.cwd()
@@ -205,3 +220,40 @@ def init_command(
         # Rich output for new/learning users
         console.print(Panel(welcome.strip(), border_style="cyan"))
         console.print(project_msg)
+
+    # Convention detection and guardrails generation
+    if detect and detection.project_type == ProjectType.BROWNFIELD:
+        conventions = detect_conventions(project_path)
+
+        if conventions.files_analyzed > 0:
+            # Generate guardrails markdown
+            guardrails_content = generate_guardrails(
+                conventions, project_name=project_name
+            )
+
+            # Write to governance/solution/guardrails.md
+            guardrails_dir = project_path / "governance" / "solution"
+            guardrails_dir.mkdir(parents=True, exist_ok=True)
+            guardrails_path = guardrails_dir / "guardrails.md"
+            guardrails_path.write_text(guardrails_content)
+
+            # Output summary
+            conf = conventions.overall_confidence.value.upper()
+            if profile.experience_level == ExperienceLevel.RI:
+                console.print(
+                    f"\n[dim]Conventions detected ({conventions.files_analyzed} files, "
+                    f"{conf} confidence). Guardrails written to {guardrails_path}[/dim]"
+                )
+            else:
+                console.print(
+                    f"\n[bold cyan]Convention Detection[/bold cyan]\n"
+                    f"Analyzed {conventions.files_analyzed} files with {conf} confidence.\n"
+                    f"Generated guardrails at: [bold]{guardrails_path}[/bold]\n\n"
+                    f"[dim]Review the guardrails and adjust as needed.[/dim]"
+                )
+    elif detect and detection.project_type == ProjectType.GREENFIELD:
+        if profile.experience_level != ExperienceLevel.RI:
+            console.print(
+                "\n[dim]No code to analyze yet. Guardrails will be generated "
+                "when conventions are established.[/dim]"
+            )
