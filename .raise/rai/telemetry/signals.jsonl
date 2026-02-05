@@ -1371,3 +1371,5 @@
 {"type":"skill_event","timestamp":"2026-02-05T23:39:02Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T23:40:01Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T23:44:35Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-05T23:48:02Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-05T23:48:35.277826Z","session_type":"feature","outcome":"success","duration_min":45,"features":[]}
