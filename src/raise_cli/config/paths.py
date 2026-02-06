@@ -222,6 +222,32 @@ def get_personal_dir(project_root: Path | None = None) -> Path:
     return get_rai_dir(project_root) / PERSONAL_SUBDIR
 
 
+def get_claude_memory_path(project_root: Path) -> Path:
+    """Get the Claude Code MEMORY.md path for a project.
+
+    Claude Code stores per-project memory at:
+        ~/.claude/projects/{encoded_path}/memory/MEMORY.md
+
+    Where {encoded_path} replaces '/' with '-' and prepends '-'.
+    This is the first IDE-specific path helper — future IDEs
+    (Cursor, Windsurf, etc.) will have sibling functions.
+
+    Args:
+        project_root: Absolute path to the project root.
+
+    Returns:
+        Path to the Claude Code MEMORY.md file.
+
+    Example:
+        >>> get_claude_memory_path(Path("/home/user/Code/my-project"))
+        PosixPath('/home/user/.claude/projects/-home-user-Code-my-project/memory/MEMORY.md')
+    """
+    # Claude Code convention: replace / with - , prepend -
+    path_str = str(project_root)
+    encoded = path_str.replace("/", "-")
+    return Path.home() / ".claude" / "projects" / encoded / "memory" / "MEMORY.md"
+
+
 def _get_xdg_dir(env_var: str, fallback: str) -> Path:
     """Get an XDG directory for raise-cli.
 
