@@ -402,8 +402,9 @@ Buffer for fixes
 ## F14.15: Multi-Developer Architecture
 
 > **Priority:** HIGH — Must fix before F&F to avoid architectural debt
-> **Size:** M (3 SP)
+> **Size:** L (5 SP) — Upgraded after research showed memory system impact
 > **Added:** 2026-02-05
+> **Research:** RES-MULTIDEV-001 (config patterns), RES-MULTIDEV-002 (memory impact)
 
 ### Problem
 
@@ -418,27 +419,46 @@ Current architecture stores personal data in `.raise/rai/` (committed to git):
 3. Privacy leak (session topics visible to all)
 4. Pattern pollution (personal learnings become project patterns)
 
-### Solution
+### Solution (Option B: Expanded Global Identity)
 
-Separate personal data from shared project data:
+Three-tier architecture separating global developer identity from project data:
 
 ```
-SHARED (committed in .raise/rai/):
+GLOBAL (~/.rai/) — Follows developer across repos:
+  developer.yaml         # Identity, preferences, experience
+  calibration.jsonl      # How Rai works with ME (universal)
+  patterns.jsonl         # MY universal learnings
+
+SHARED (.raise/rai/) — Project's Rai, committed:
   identity/              # Rai's project identity
   memory/
-    patterns.jsonl       # Project patterns only (curated)
+    patterns.jsonl       # Curated project patterns
+    index.json           # Memory index
 
-PERSONAL (in ~/.rai/projects/{hash}/):
+PERSONAL (.raise/rai/personal/) — My work HERE, gitignored:
   sessions/
-    index.jsonl          # My sessions
+    index.jsonl          # My sessions in this repo
   telemetry/
-    signals.jsonl        # My signals
-  memory/
-    patterns.jsonl       # My learnings (future: merge to project)
-    calibration.jsonl    # My calibration
+    signals.jsonl        # My signals in this repo
+  calibration.jsonl      # Project-specific calibration
+  patterns.jsonl         # Project-specific learnings
 ```
 
-**Project hash:** SHA256(absolute_project_path)[:12] — stable, collision-resistant
+### Key Architectural Principle
+
+**Graph as abstraction layer:** The memory graph is the PRIMARY query interface. Agents should NOT know which JSON file data came from. The graph:
+1. Loads from all sources (global, shared, personal)
+2. Merges with precedence rules
+3. Returns unified results with provenance as metadata
+4. Hides file system complexity from consumers
+
+```
+Agent queries: "patterns about TDD"
+     ↓
+Memory Graph (unified view)
+     ↓
+Returns: [{content: "...", source: "global"}, {content: "...", source: "project"}]
+```
 
 ### In Scope
 
