@@ -139,7 +139,7 @@ def check_name_command(
     name: Annotated[
         str,
         typer.Argument(
-            help="Proposed skill name to check (e.g., 'feature-validate').",
+            help="Proposed skill name to check (e.g., 'story-validate').",
         ),
     ],
     format: Annotated[
@@ -175,7 +175,7 @@ def scaffold_command(
     name: Annotated[
         str,
         typer.Argument(
-            help="Skill name to create (e.g., 'feature-validate').",
+            help="Skill name to create (e.g., 'story-validate').",
         ),
     ],
     lifecycle: Annotated[
@@ -183,7 +183,7 @@ def scaffold_command(
         typer.Option(
             "--lifecycle",
             "-l",
-            help="Lifecycle: session, epic, feature, discovery, utility, meta. Inferred from name if not specified.",
+            help="Lifecycle: session, epic, story, discovery, utility, meta. Inferred from name if not specified.",
         ),
     ] = None,
     after: Annotated[

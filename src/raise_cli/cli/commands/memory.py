@@ -857,10 +857,10 @@ def add_pattern(
 
 @memory_app.command("add-calibration")
 def add_calibration_cmd(
-    feature: Annotated[str, typer.Argument(help="Feature ID (e.g., F3.5)")],
+    feature: Annotated[str, typer.Argument(help="Story ID (e.g., F3.5)")],
     name: Annotated[
         str,
-        typer.Option("--name", help="Feature name (required)"),
+        typer.Option("--name", help="Story name (required)"),
     ],
     size: Annotated[
         str,
@@ -897,7 +897,7 @@ def add_calibration_cmd(
         ),
     ] = None,
 ) -> None:
-    """Add calibration data for a completed feature.
+    """Add calibration data for a completed story.
 
     Examples:
         # Basic calibration (default: project scope)
@@ -954,7 +954,7 @@ def add_calibration_cmd(
     if result.success:
         console.print(f"\n[green]✓[/green] {result.message}")
         console.print(f"  ID: [cyan]{result.id}[/cyan]")
-        console.print(f"  Feature: {feature} ({name})")
+        console.print(f"  Story: {feature} ({name})")
         console.print(f"  Size: {size.upper()}, Actual: {actual}min")
         if estimated:
             ratio = round(estimated / actual, 1)
@@ -973,7 +973,7 @@ def add_session_cmd(
     ] = "",
     session_type: Annotated[
         str,
-        typer.Option("--type", "-t", help="Session type (feature, research, etc.)"),
+        typer.Option("--type", "-t", help="Session type (story, research, etc.)"),
     ] = "story",
     log_path: Annotated[
         str | None,
@@ -996,7 +996,7 @@ def add_session_cmd(
         $ raise memory add-session "F3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
 
         # Full details
-        $ raise memory add-session "F3.5 Skills Integration" -t feature -o "Writer API,Hooks" -l "dev/sessions/2026-02-02-f3.5.md"
+        $ raise memory add-session "F3.5 Skills Integration" -t story -o "Writer API,Hooks" -l "dev/sessions/2026-02-02-f3.5.md"
     """
     # Sessions always go to personal directory (developer-specific)
     mem_dir = memory_dir or get_personal_dir()
@@ -1036,7 +1036,7 @@ def add_session_cmd(
 def emit_work(
     work_type: Annotated[
         str,
-        typer.Argument(help="Work type (epic, feature)"),
+        typer.Argument(help="Work type (epic, story)"),
     ],
     work_id: Annotated[
         str,
@@ -1063,16 +1063,16 @@ def emit_work(
 ) -> None:
     """Emit a work lifecycle event for Lean flow analysis.
 
-    Tracks work items (epics, features) through normalized phases to enable:
+    Tracks work items (epics, stories) through normalized phases to enable:
     - Lead time: total time from start to complete
     - Wait time: gaps between phases
     - WIP: work started but not completed
     - Bottlenecks: which phase takes longest
-    - Cross-level analysis: compare epic vs feature flow
+    - Cross-level analysis: compare epic vs story flow
 
     Phases (normalized across all work types):
     - design: Scope definition and specification
-    - plan: Task/feature decomposition and sequencing
+    - plan: Task/story decomposition and sequencing
     - implement: Active development work
     - review: Retrospective and learnings
 
@@ -1082,16 +1082,16 @@ def emit_work(
         $ raise memory emit-work epic E9 -e complete -p design
         $ raise memory emit-work epic E9 -e start -p plan
 
-        # Feature lifecycle
-        $ raise memory emit-work feature F9.4 --event start --phase design
-        $ raise memory emit-work feature F9.4 -e complete -p implement
-        $ raise memory emit-work feature F9.4 -e start -p review
+        # Story lifecycle
+        $ raise memory emit-work story F9.4 --event start --phase design
+        $ raise memory emit-work story F9.4 -e complete -p implement
+        $ raise memory emit-work story F9.4 -e start -p review
 
         # Work blocked
-        $ raise memory emit-work feature F9.4 -e blocked -p plan -b "unclear requirements"
+        $ raise memory emit-work story F9.4 -e blocked -p plan -b "unclear requirements"
 
         # Work unblocked
-        $ raise memory emit-work feature F9.4 -e unblocked -p plan
+        $ raise memory emit-work story F9.4 -e unblocked -p plan
     """
     # Validate work type
     valid_work_types: list[Literal["epic", "story"]] = ["epic", "story"]
@@ -1183,7 +1183,7 @@ def emit_session_event(
     session_type: Annotated[
         str,
         typer.Option(
-            "--type", "-t", help="Session type (e.g., feature, research, maintenance)"
+            "--type", "-t", help="Session type (e.g., story, research, maintenance)"
         ),
     ] = "story",
     outcome: Annotated[
@@ -1200,7 +1200,7 @@ def emit_session_event(
     ] = 0,
     features: Annotated[
         str,
-        typer.Option("--features", "-f", help="Features worked on (comma-separated)"),
+        typer.Option("--stories", "-f", help="Stories worked on (comma-separated)"),
     ] = "",
 ) -> None:
     """Emit a session event to telemetry.
@@ -1210,10 +1210,10 @@ def emit_session_event(
 
     Examples:
         # Basic session complete
-        $ raise memory emit-session --type feature --outcome success
+        $ raise memory emit-session --type story --outcome success
 
-        # With duration and features
-        $ raise memory emit-session -t feature -o success -d 45 -f F9.1,F9.2,F9.3
+        # With duration and stories
+        $ raise memory emit-session -t story -o success -d 45 -f F9.1,F9.2,F9.3
 
         # Research session
         $ raise memory emit-session --type research --outcome partial --duration 90
@@ -1231,8 +1231,8 @@ def emit_session_event(
             exit_code=7,
         )
 
-    # Parse features
-    features_list = [f.strip() for f in features.split(",") if f.strip()]
+    # Parse stories
+    stories_list = [f.strip() for f in features.split(",") if f.strip()]
 
     # Create event
     event = SessionEvent(
@@ -1240,7 +1240,7 @@ def emit_session_event(
         session_type=session_type,
         outcome=outcome,  # type: ignore[arg-type]
         duration_min=duration,
-        features=features_list,
+        stories=stories_list,
     )
 
     # Emit signal
@@ -1251,8 +1251,8 @@ def emit_session_event(
         console.print(f"  Type: {session_type}")
         console.print(f"  Outcome: {outcome}")
         console.print(f"  Duration: {duration} min")
-        if features_list:
-            console.print(f"  Features: {', '.join(features_list)}")
+        if stories_list:
+            console.print(f"  Stories: {', '.join(stories_list)}")
         console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
     else:
         cli_error(result.error or "Failed to emit session event")
@@ -1262,7 +1262,7 @@ def emit_session_event(
 def emit_calibration_event(
     feature: Annotated[
         str,
-        typer.Argument(help="Feature ID (e.g., F9.4)"),
+        typer.Argument(help="Story ID (e.g., F9.4)"),
     ],
     size: Annotated[
         str,
@@ -1287,10 +1287,10 @@ def emit_calibration_event(
     - velocity < 1.0 means slower than estimated
 
     Examples:
-        # Feature completed faster than estimated
+        # Story completed faster than estimated
         $ raise memory emit-calibration F9.4 --size S --estimated 30 --actual 15
 
-        # Feature took longer
+        # Story took longer
         $ raise memory emit-calibration F9.4 -s M -e 60 -a 90
 
         # Short form
@@ -1330,7 +1330,7 @@ def emit_calibration_event(
 
     if result.success:
         console.print("\n[green]✓[/green] Calibration event recorded")
-        console.print(f"  Feature: {feature}")
+        console.print(f"  Story: {feature}")
         console.print(f"  Size: {size_upper}")
         console.print(f"  Estimated: {estimated} min")
         console.print(f"  Actual: {actual} min")

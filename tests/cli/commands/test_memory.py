@@ -804,7 +804,7 @@ class TestMemoryEmitSessionCommand:
 
             assert result.exit_code == 0
             assert "Duration: 90" in result.stdout
-            assert "Features:" in result.stdout
+            assert "Stories:" in result.stdout
         finally:
             os.chdir(original_cwd)
 
