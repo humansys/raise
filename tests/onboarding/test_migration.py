@@ -185,7 +185,6 @@ class TestMigrateEmilioProfile:
 
         profile = migrate_emilio_profile(tmp_path)
 
-        assert profile.sessions_total == 3
         assert profile.first_session == date(2026, 2, 1)
         assert profile.last_session == date(2026, 2, 3)
         assert "session-start" in profile.skills_mastered
@@ -195,7 +194,6 @@ class TestMigrateEmilioProfile:
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
         """Handles missing .raise/rai/memory directory gracefully."""
         profile = migrate_emilio_profile(tmp_path)
-        assert profile.sessions_total == 0
         assert profile.first_session is None
         assert profile.last_session is None
 

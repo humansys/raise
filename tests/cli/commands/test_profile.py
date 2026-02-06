@@ -35,7 +35,6 @@ class TestProfileShowCommand:
         profile = DeveloperProfile(
             name="Test Developer",
             experience_level=ExperienceLevel.HA,
-            sessions_total=15,
             projects=["/path/to/project1", "/path/to/project2"],
         )
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
@@ -48,7 +47,6 @@ class TestProfileShowCommand:
         # Should contain YAML output with profile data
         assert "name: Test Developer" in result.output
         assert "experience_level: ha" in result.output
-        assert "sessions_total: 15" in result.output
 
     def test_show_no_profile_shows_helpful_message(self, mock_home: Path) -> None:
         """Show outputs helpful message when no profile exists."""
@@ -69,7 +67,7 @@ class TestProfileShowCommand:
         profile = DeveloperProfile(
             name="Expert User",
             experience_level=ExperienceLevel.RI,
-            sessions_total=50,
+            
             skills_mastered=["tdd", "epic-planning"],
             universal_patterns=["always-use-types"],
         )

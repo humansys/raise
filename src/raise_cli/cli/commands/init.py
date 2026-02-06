@@ -130,7 +130,6 @@ def _create_new_profile(project_path: Path) -> DeveloperProfile:
     return DeveloperProfile(
         name="Developer",  # Will be personalized later
         experience_level=ExperienceLevel.SHU,
-        sessions_total=0,
         first_session=today,
         last_session=today,
         projects=[str(project_path.resolve())],

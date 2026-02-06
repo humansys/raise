@@ -53,9 +53,9 @@ class TestSessionStart:
         assert "Session recorded" in result.output
         mock_save.assert_called_once()
 
-    def test_start_existing_profile_increments_session(self) -> None:
-        """Existing user starts session, counter increments."""
-        profile = DeveloperProfile(name="Bob", sessions_total=5)
+    def test_start_existing_profile_updates_metadata(self) -> None:
+        """Existing user starts session, metadata updates."""
+        profile = DeveloperProfile(name="Bob")
 
         with (
             patch(
@@ -70,7 +70,6 @@ class TestSessionStart:
 
         assert result.exit_code == 0
         assert "Session recorded" in result.output
-        assert "Total sessions: 6" in result.output
         mock_save.assert_called_once()
 
     def test_start_with_project_path(self, tmp_path: Path) -> None:

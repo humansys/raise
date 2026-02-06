@@ -116,10 +116,7 @@ def start(
 
     save_developer_profile(updated)
 
-    typer.echo(
-        f"Session recorded. Total sessions: {updated.sessions_total} "
-        f"(last: {updated.last_session})"
-    )
+    typer.echo(f"Session recorded. (last: {updated.last_session})")
 
 
 @session_app.command()
