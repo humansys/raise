@@ -6,31 +6,10 @@ from textwrap import dedent
 import pytest
 
 from raise_cli.governance.models import ConceptType
-from raise_cli.governance.parsers.vision import _sanitize_id, extract_outcomes
+from raise_cli.governance.parsers.vision import extract_outcomes
 
 
-class TestSanitizeId:
-    """Tests for _sanitize_id helper function."""
-
-    def test_basic_sanitization(self) -> None:
-        """Should convert to lowercase and replace spaces with hyphens."""
-        assert _sanitize_id("Context Generation") == "context-generation"
-
-    def test_remove_parentheses(self) -> None:
-        """Should remove parentheses."""
-        assert _sanitize_id("Generation (MVC)") == "generation-mvc"
-
-    def test_remove_special_characters(self) -> None:
-        """Should remove special characters except hyphens."""
-        assert _sanitize_id("Test & Example!") == "test-example"
-
-    def test_remove_duplicate_hyphens(self) -> None:
-        """Should collapse multiple hyphens into one."""
-        assert _sanitize_id("Test  -  Example") == "test-example"
-
-    def test_strip_hyphens(self) -> None:
-        """Should remove leading/trailing hyphens."""
-        assert _sanitize_id("-Test-") == "test"
+# Note: sanitize_id tests are in tests/core/test_text.py
 
 
 @pytest.fixture

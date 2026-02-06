@@ -15,7 +15,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from raise_cli.onboarding.detection import EXCLUDED_DIRS
+from raise_cli.core.files import should_exclude_dir
 
 
 class Confidence(str, Enum):
@@ -220,14 +220,6 @@ def calculate_confidence(consistent: int, total: int) -> Confidence:
 # =============================================================================
 
 
-def _should_exclude_dir(dir_path: Path) -> bool:
-    """Check if a directory should be excluded from scanning."""
-    name = dir_path.name
-    if name.startswith("."):
-        return True
-    return name in EXCLUDED_DIRS
-
-
 def collect_python_files(directory: Path, max_files: int = 200) -> list[Path]:
     """Collect Python files from a directory recursively.
 
@@ -251,7 +243,7 @@ def collect_python_files(directory: Path, max_files: int = 200) -> list[Path]:
                 if len(files) >= max_files:
                     return
                 if item.is_dir():
-                    if not _should_exclude_dir(item):
+                    if not should_exclude_dir(item):
                         _collect(item)
                 elif item.is_file() and item.suffix == ".py":
                     files.append(item)
@@ -265,6 +257,55 @@ def collect_python_files(directory: Path, max_files: int = 200) -> list[Path]:
 # =============================================================================
 # Style Detection
 # =============================================================================
+
+
+def _get_first_indent(file_path: Path) -> tuple[str, int] | None:
+    """Get the first indentation character and width from a file.
+
+    Returns:
+        Tuple of (char, width) where char is 'tab' or 'space', or None if no indent found.
+    """
+    try:
+        content = file_path.read_text(encoding="utf-8", errors="ignore")
+    except (OSError, UnicodeDecodeError):
+        return None
+
+    for line in content.splitlines():
+        if not line or line[0] not in (" ", "\t"):
+            continue
+        if line[0] == "\t":
+            return ("tab", 0)
+        # Count leading spaces
+        stripped = line.lstrip(" ")
+        indent = len(line) - len(stripped)
+        if indent > 0:
+            return ("space", indent)
+
+    return None
+
+
+def _determine_indent_style(
+    tabs_count: int, spaces_count: int, indent_widths: list[int]
+) -> tuple[Literal["spaces", "tabs", "mixed"], int | None, int]:
+    """Determine indentation style from collected samples.
+
+    Returns:
+        Tuple of (style, width, consistent_count).
+    """
+    if tabs_count > 0 and spaces_count > 0:
+        return ("mixed", None, 0)
+
+    if tabs_count > spaces_count:
+        return ("tabs", None, tabs_count)
+
+    # Spaces style - find most common width
+    if indent_widths:
+        width_counts = Counter(indent_widths)
+        width = width_counts.most_common(1)[0][0]
+        consistent = width_counts[width]
+        return ("spaces", width, consistent)
+
+    return ("spaces", 4, spaces_count)
 
 
 def detect_indentation(files: list[Path]) -> IndentationConvention:
@@ -284,26 +325,17 @@ def detect_indentation(files: list[Path]) -> IndentationConvention:
     spaces_count = 0
 
     for file_path in files:
-        try:
-            content = file_path.read_text(encoding="utf-8", errors="ignore")
-            for line in content.splitlines():
-                if line and line[0] in (" ", "\t"):
-                    # Found first indented line
-                    if line[0] == "\t":
-                        tabs_count += 1
-                    else:
-                        # Count leading spaces
-                        stripped = line.lstrip(" ")
-                        indent = len(line) - len(stripped)
-                        if indent > 0:
-                            spaces_count += 1
-                            indent_widths.append(indent)
-                    break
-        except (OSError, UnicodeDecodeError):
+        result = _get_first_indent(file_path)
+        if result is None:
             continue
+        char_type, width = result
+        if char_type == "tab":
+            tabs_count += 1
+        else:
+            spaces_count += 1
+            indent_widths.append(width)
 
     total = tabs_count + spaces_count
-
     if total == 0:
         return IndentationConvention(
             style="spaces",
@@ -313,26 +345,7 @@ def detect_indentation(files: list[Path]) -> IndentationConvention:
             consistent_count=0,
         )
 
-    # Determine style
-    if tabs_count > 0 and spaces_count > 0:
-        style: Literal["spaces", "tabs", "mixed"] = "mixed"
-        width = None
-        consistent = 0
-    elif tabs_count > spaces_count:
-        style = "tabs"
-        width = None
-        consistent = tabs_count
-    else:
-        style = "spaces"
-        # Find most common indent width
-        if indent_widths:
-            width_counts = Counter(indent_widths)
-            width = width_counts.most_common(1)[0][0]
-            consistent = width_counts[width]
-        else:
-            width = 4
-            consistent = spaces_count
-
+    style, width, consistent = _determine_indent_style(tabs_count, spaces_count, indent_widths)
     confidence = calculate_confidence(consistent, total)
 
     return IndentationConvention(

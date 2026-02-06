@@ -52,17 +52,17 @@ class TestGetTelemetryPath:
     """Tests for _get_telemetry_path helper."""
 
     def test_default_path(self, tmp_path: Path) -> None:
-        """Returns path under .rai/telemetry/signals.jsonl."""
+        """Returns path under .raise/rai/telemetry/signals.jsonl."""
         path = _get_telemetry_path(tmp_path)
 
-        assert path == tmp_path / ".rai/telemetry/signals.jsonl"
+        assert path == tmp_path / ".raise/rai/telemetry/signals.jsonl"
 
     def test_none_uses_cwd(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         """None base_path uses current working directory."""
         monkeypatch.chdir(tmp_path)
         path = _get_telemetry_path(None)
 
-        assert path == tmp_path / ".rai/telemetry/signals.jsonl"
+        assert path == tmp_path / ".raise/rai/telemetry/signals.jsonl"
 
 
 # --- Emit Function Tests ---
@@ -177,13 +177,13 @@ class TestEmit:
     def test_creates_directory_if_missing(
         self, temp_telemetry_dir: Path, now: datetime
     ) -> None:
-        """Creates .rai/telemetry/ directory if it doesn't exist."""
+        """Creates .raise/rai/telemetry/ directory if it doesn't exist."""
         event = SkillEvent(
             timestamp=now, skill="test", event="start"
         )
 
         # Directory doesn't exist yet
-        telemetry_dir = temp_telemetry_dir / ".rai/telemetry"
+        telemetry_dir = temp_telemetry_dir / ".raise/rai/telemetry"
         assert not telemetry_dir.exists()
 
         result = emit(event, base_path=temp_telemetry_dir)

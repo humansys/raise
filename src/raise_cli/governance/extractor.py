@@ -96,6 +96,11 @@ class GovernanceExtractor:
         - governance/projects/*/prd.md (requirements)
         - governance/solution/vision.md (outcomes)
         - framework/reference/constitution.md (principles)
+        - governance/projects/*/backlog.md (epics)
+        - work/epics/*/scope.md (features)
+        - dev/decisions/adr-*.md (decisions)
+        - governance/solution/guardrails.md (guardrails)
+        - framework/reference/glossary.md (terms)
 
         Returns:
             List of all extracted concepts.
@@ -106,92 +111,10 @@ class GovernanceExtractor:
             >>> len(all_concepts) >= 20
             True
         """
-        concepts: list[Concept] = []
-        errors: list[str] = []
-        files_processed = 0
-
-        # Standard file locations
-        vision_file = self.project_root / "governance" / "solution" / "vision.md"
-        constitution_file = (
-            self.project_root / "framework" / "reference" / "constitution.md"
-        )
-
-        # Extract from PRD files (may be multiple projects)
-        for prd_file in self.project_root.glob("governance/projects/*/prd.md"):
-            try:
-                prd_concepts = extract_requirements(prd_file, self.project_root)
-                concepts.extend(prd_concepts)
-                files_processed += 1
-                logger.info(
-                    f"Extracted {len(prd_concepts)} requirements from {prd_file.name}"
-                )
-            except Exception as e:
-                error_msg = f"Error extracting from {prd_file}: {e}"
-                logger.error(error_msg)
-                errors.append(error_msg)
-
-        # Extract from Vision
-        if vision_file.exists():
-            try:
-                vision_concepts = extract_outcomes(vision_file, self.project_root)
-                concepts.extend(vision_concepts)
-                files_processed += 1
-                logger.info(
-                    f"Extracted {len(vision_concepts)} outcomes from {vision_file.name}"
-                )
-            except Exception as e:
-                error_msg = f"Error extracting from {vision_file}: {e}"
-                logger.error(error_msg)
-                errors.append(error_msg)
-        else:
-            logger.warning(f"Vision file not found: {vision_file}")
-
-        # Extract from Constitution
-        if constitution_file.exists():
-            try:
-                constitution_concepts = extract_principles(
-                    constitution_file, self.project_root
-                )
-                concepts.extend(constitution_concepts)
-                files_processed += 1
-                logger.info(
-                    f"Extracted {len(constitution_concepts)} principles from {constitution_file.name}"
-                )
-            except Exception as e:
-                error_msg = f"Error extracting from {constitution_file}: {e}"
-                logger.error(error_msg)
-                errors.append(error_msg)
-        else:
-            logger.warning(f"Constitution file not found: {constitution_file}")
-
-        # Extract work concepts (E8)
-        concepts.extend(self._extract_work_concepts())
-
-        # Extract ADR decisions (E12)
-        try:
-            adr_concepts = extract_all_decisions(self.project_root)
-            concepts.extend(adr_concepts)
-            logger.info(f"Extracted {len(adr_concepts)} ADR decisions")
-        except Exception as e:
-            logger.error(f"Error extracting ADRs: {e}")
-
-        # Extract Guardrails (E12 F12.2)
-        try:
-            guardrail_concepts = extract_all_guardrails(self.project_root)
-            concepts.extend(guardrail_concepts)
-            logger.info(f"Extracted {len(guardrail_concepts)} guardrails")
-        except Exception as e:
-            logger.error(f"Error extracting guardrails: {e}")
-
-        # Extract Glossary terms (E12 F12.3)
-        try:
-            term_concepts = extract_all_terms(self.project_root)
-            concepts.extend(term_concepts)
-            logger.info(f"Extracted {len(term_concepts)} glossary terms")
-        except Exception as e:
-            logger.error(f"Error extracting glossary terms: {e}")
-
-        return concepts
+        result = self.extract_with_result()
+        for error in result.errors:
+            logger.error(error)
+        return result.concepts
 
     def extract_with_result(self) -> ExtractionResult:
         """Extract all concepts and return detailed result.
@@ -251,7 +174,7 @@ class GovernanceExtractor:
         backlog_count = len(
             list(self.project_root.glob("governance/projects/*/backlog.md"))
         )
-        epic_count = len(list(self.project_root.glob("dev/epic-*-scope.md")))
+        epic_count = len(list(self.project_root.glob("work/epics/*/scope.md")))
         files_processed += backlog_count + epic_count
 
         # Extract ADR decisions (E12)
@@ -301,7 +224,7 @@ class GovernanceExtractor:
 
         Extracts from:
         - governance/projects/*/backlog.md (Project + Epic index)
-        - dev/epic-*-scope.md (Epic details + Features)
+        - work/epics/*/scope.md (Epic details + Features)
 
         Returns:
             List of work tracking concepts.
@@ -327,7 +250,7 @@ class GovernanceExtractor:
                 logger.error(f"Error extracting from {backlog_file}: {e}")
 
         # Extract from epic scope documents
-        for scope_file in self.project_root.glob("dev/epic-*-scope.md"):
+        for scope_file in self.project_root.glob("work/epics/*/scope.md"):
             try:
                 # Extract detailed Epic concept
                 epic_detail = extract_epic_details(scope_file, self.project_root)

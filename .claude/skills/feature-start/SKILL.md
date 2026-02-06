@@ -85,8 +85,12 @@ git branch --list "epic/e{N}/*" | head -1
 Verify the epic scope document exists:
 
 ```bash
-ls dev/epic-e{N}-scope.md 2>/dev/null || echo "WARN: No epic scope"
+ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic scope"
 ```
+
+**Paths:**
+- Epic scope: `work/epics/e{N}-{name}/scope.md`
+- Features: `work/epics/e{N}-{name}/features/`
 
 **Decision:**
 - Scope exists → Load and verify feature is listed
@@ -101,7 +105,8 @@ ls dev/epic-e{N}-scope.md 2>/dev/null || echo "WARN: No epic scope"
 Confirm the feature is listed in the epic scope:
 
 ```bash
-grep -q "{feature_id}" dev/epic-{epic_id}-scope.md && echo "Feature found in epic" || echo "WARN: Feature not in epic scope"
+SCOPE="work/epics/e{N}-{name}/scope.md"
+grep -q "{feature_id}" "$SCOPE" && echo "Feature found in epic" || echo "WARN: Feature not in epic scope"
 ```
 
 **Decision:**
@@ -218,10 +223,10 @@ Show the feature lifecycle for orientation:
 Record the start of the feature lifecycle:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase design
+uv run raise telemetry emit-work feature {feature_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit feature F12.2 -e start -p design`
+**Example:** `raise telemetry emit-work feature F12.2 -e start -p design`
 
 **Verification:** Telemetry emitted.
 
@@ -231,7 +236,7 @@ raise telemetry emit feature {feature_id} --event start --phase design
 
 - **Branch:** `feature/{epic_id}/{feature_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: start)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: start)
 - **Next:** `/feature-design` or `/feature-plan`
 
 ## Feature Start Summary Template
@@ -287,4 +292,4 @@ Full scope documentation can follow in `/feature-design` or `/feature-plan`.
 
 - Next skill: `/feature-design` or `/feature-plan`
 - Complement: `/feature-close`
-- Epic context: `dev/epic-{id}-scope.md`
+- Epic context: `work/epics/e{N}-{name}/scope.md`

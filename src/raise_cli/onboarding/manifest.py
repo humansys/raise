@@ -1,6 +1,6 @@
 """Project manifest schema and persistence.
 
-The manifest file (.rai/manifest.yaml) stores project metadata detected
+The manifest file (.raise/manifest.yaml) stores project metadata detected
 during initialization, including project type and code file count.
 """
 
@@ -13,14 +13,10 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, ValidationError
 
+from raise_cli.config.paths import MANIFEST_FILE, get_raise_dir
 from raise_cli.onboarding.detection import ProjectType
 
 logger = logging.getLogger(__name__)
-
-
-# Constants
-RAI_PROJECT_DIR = ".rai"
-MANIFEST_FILE = "manifest.yaml"
 
 
 class ProjectInfo(BaseModel):
@@ -40,7 +36,7 @@ class ProjectInfo(BaseModel):
 
 
 class ProjectManifest(BaseModel):
-    """Project manifest stored in .rai/manifest.yaml.
+    """Project manifest stored in .raise/manifest.yaml.
 
     Attributes:
         version: Manifest schema version.
@@ -52,18 +48,18 @@ class ProjectManifest(BaseModel):
 
 
 def save_manifest(manifest: ProjectManifest, project_root: Path) -> None:
-    """Save project manifest to .rai/manifest.yaml.
+    """Save project manifest to .raise/manifest.yaml.
 
-    Creates .rai/ directory if it doesn't exist.
+    Creates .raise/ directory if it doesn't exist.
 
     Args:
         manifest: The manifest to save.
         project_root: Root directory of the project.
     """
-    rai_dir = project_root / RAI_PROJECT_DIR
-    rai_dir.mkdir(parents=True, exist_ok=True)
+    raise_dir = get_raise_dir(project_root)
+    raise_dir.mkdir(parents=True, exist_ok=True)
 
-    manifest_path = rai_dir / MANIFEST_FILE
+    manifest_path = raise_dir / MANIFEST_FILE
 
     # Convert to dict with proper serialization
     data = manifest.model_dump(mode="json")
@@ -76,7 +72,7 @@ def save_manifest(manifest: ProjectManifest, project_root: Path) -> None:
 
 
 def load_manifest(project_root: Path) -> ProjectManifest | None:
-    """Load project manifest from .rai/manifest.yaml.
+    """Load project manifest from .raise/manifest.yaml.
 
     Args:
         project_root: Root directory of the project.
@@ -84,7 +80,7 @@ def load_manifest(project_root: Path) -> ProjectManifest | None:
     Returns:
         ProjectManifest if file exists and is valid, None otherwise.
     """
-    manifest_path = project_root / RAI_PROJECT_DIR / MANIFEST_FILE
+    manifest_path = get_raise_dir(project_root) / MANIFEST_FILE
 
     if not manifest_path.exists():
         logger.debug("Manifest not found: %s", manifest_path)

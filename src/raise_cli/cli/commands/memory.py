@@ -17,6 +17,8 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
+from raise_cli.cli.error_handler import cli_error
+from raise_cli.config.paths import get_graph_dir, get_memory_dir
 from raise_cli.context.graph import UnifiedGraph
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
@@ -47,13 +49,13 @@ console = Console()
 
 
 def _get_default_memory_dir() -> Path:
-    """Get default memory directory (.rai/memory)."""
-    return Path(".rai/memory")
+    """Get default memory directory (.raise/rai/memory)."""
+    return get_memory_dir()
 
 
 def _get_default_graph_path() -> Path:
     """Get default unified graph path (.raise/graph/unified.json)."""
-    return Path(".raise/graph/unified.json")
+    return get_graph_dir() / "unified.json"
 
 
 @memory_app.command()
@@ -61,8 +63,8 @@ def query(
     query_str: Annotated[str, typer.Argument(help="Search query (keywords)")],
     format: Annotated[
         str,
-        typer.Option("--format", "-f", help="Output format (markdown or json)"),
-    ] = "markdown",
+        typer.Option("--format", "-f", help="Output format (human or json)"),
+    ] = "human",
     output: Annotated[
         Path | None,
         typer.Option("--output", "-o", help="Output file path (default: stdout)"),
@@ -123,16 +125,17 @@ def query(
     # Resolve graph path
     unified_path = graph_path or _get_default_graph_path()
     if not unified_path.exists():
-        console.print(f"[red]Error:[/red] Unified graph not found: {unified_path}")
-        console.print("\nRun 'raise graph build --unified' to create the graph first.")
-        raise typer.Exit(1)
+        cli_error(
+            f"Unified graph not found: {unified_path}",
+            hint="Run 'raise graph build --unified' to create the graph first",
+            exit_code=4,
+        )
 
     # Load unified graph and create query engine
     try:
         engine = UnifiedQueryEngine.from_file(unified_path)
     except Exception as e:
-        console.print(f"[red]Error loading unified graph:[/red] {e}")
-        raise typer.Exit(1) from None
+        cli_error(f"Error loading unified graph: {e}")
 
     # Query with memory type filter
     unified_query = UnifiedQuery(
@@ -163,11 +166,11 @@ def query(
         console.print(output_text)
 
 
-@memory_app.command()
-def dump(
+@memory_app.command("list")
+def list_memory(
     format: Annotated[
         str,
-        typer.Option("--format", "-f", help="Output format (markdown, json, or table)"),
+        typer.Option("--format", "-f", help="Output format (human, json, or table)"),
     ] = "table",
     output: Annotated[
         Path | None,
@@ -187,20 +190,20 @@ def dump(
         ),
     ] = None,
 ) -> None:
-    """Dump memory concepts for inspection.
+    """List all memory concepts.
 
     Shows all memory concepts (patterns, calibrations, sessions)
-    from the unified graph, useful for debugging and verification.
+    from the unified graph for inspection and debugging.
 
     Examples:
         # Show summary table
-        $ raise memory dump
+        $ raise memory list
 
         # Export as JSON
-        $ raise memory dump --format json --output memory.json
+        $ raise memory list --format json --output memory.json
 
-        # Export as Markdown
-        $ raise memory dump --format markdown --output memory.md
+        # Export as human-readable markdown
+        $ raise memory list --format human --output memory.md
     """
     # Handle deprecated option
     if memory_dir is not None:
@@ -213,21 +216,20 @@ def dump(
     # Resolve graph path
     unified_path = graph_path or _get_default_graph_path()
     if not unified_path.exists():
-        console.print(f"[red]Error:[/red] Unified graph not found: {unified_path}")
-        console.print("\nRun 'raise graph build --unified' to create the graph first.")
-        raise typer.Exit(1)
+        cli_error(
+            f"Unified graph not found: {unified_path}",
+            hint="Run 'raise graph build --unified' to create the graph first",
+            exit_code=4,
+        )
 
     # Load unified graph
     try:
         graph = UnifiedGraph.load(unified_path)
     except Exception as e:
-        console.print(f"[red]Error loading unified graph:[/red] {e}")
-        raise typer.Exit(1) from None
+        cli_error(f"Error loading unified graph: {e}")
 
     # Filter to memory types only
-    memory_concepts = [
-        c for c in graph.iter_concepts() if c.type in MEMORY_TYPES
-    ]
+    memory_concepts = [c for c in graph.iter_concepts() if c.type in MEMORY_TYPES]
 
     console.print(f"\nMemory Concepts from: [cyan]{unified_path}[/cyan]")
     console.print(f"Concepts: [yellow]{len(memory_concepts)}[/yellow]\n")
@@ -240,7 +242,7 @@ def dump(
             [c.model_dump(mode="json") for c in memory_concepts],
             indent=2,
         )
-    elif format == "markdown":
+    elif format == "human":
         output_text = _format_concepts_markdown(memory_concepts)
     else:  # table
         _print_concepts_table(memory_concepts)
@@ -345,7 +347,9 @@ def add_pattern(
     sub_type: Annotated[
         str,
         typer.Option(
-            "--type", "-t", help="Pattern type (codebase, process, architecture, technical)"
+            "--type",
+            "-t",
+            help="Pattern type (codebase, process, architecture, technical)",
         ),
     ] = "process",
     learned_from: Annotated[
@@ -371,8 +375,7 @@ def add_pattern(
     """
     mem_dir = memory_dir or _get_default_memory_dir()
     if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        raise typer.Exit(1)
+        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
 
     # Parse context
     context_list = [c.strip() for c in context.split(",") if c.strip()]
@@ -381,9 +384,11 @@ def add_pattern(
     try:
         pattern_type = PatternSubType(sub_type)
     except ValueError:
-        console.print(f"[red]Error:[/red] Invalid pattern type: {sub_type}")
-        console.print("Valid types: codebase, process, architecture, technical")
-        raise typer.Exit(1) from None
+        cli_error(
+            f"Invalid pattern type: {sub_type}",
+            hint="Valid types: codebase, process, architecture, technical",
+            exit_code=7,
+        )
 
     input_data = PatternInput(
         content=content,
@@ -402,16 +407,24 @@ def add_pattern(
             console.print(f"  Context: {', '.join(context_list)}")
         console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.message}")
-        raise typer.Exit(1)
+        cli_error(result.message)
 
 
 @memory_app.command("add-calibration")
 def add_calibration_cmd(
     feature: Annotated[str, typer.Argument(help="Feature ID (e.g., F3.5)")],
-    name: Annotated[str, typer.Argument(help="Feature name")],
-    size: Annotated[str, typer.Argument(help="T-shirt size (XS, S, M, L, XL)")],
-    actual: Annotated[int, typer.Argument(help="Actual minutes")],
+    name: Annotated[
+        str,
+        typer.Option("--name", help="Feature name (required)"),
+    ],
+    size: Annotated[
+        str,
+        typer.Option("--size", "-s", help="T-shirt size: XS, S, M, L, XL (required)"),
+    ],
+    actual: Annotated[
+        int,
+        typer.Option("--actual", "-a", help="Actual minutes spent (required)"),
+    ],
     estimated: Annotated[
         int | None,
         typer.Option("--estimated", "-e", help="Estimated minutes"),
@@ -437,25 +450,26 @@ def add_calibration_cmd(
 
     Examples:
         # Basic calibration
-        $ raise memory add-calibration F3.5 "Skills Integration" XS 20
+        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
 
         # With estimate for velocity calculation
-        $ raise memory add-calibration F3.5 "Skills Integration" XS 20 -e 60
+        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60
 
         # Full details
-        $ raise memory add-calibration F3.5 "Skills Integration" XS 20 -e 60 --sp 2 -n "Hook-assisted workflow"
+        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
     """
     mem_dir = memory_dir or _get_default_memory_dir()
     if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        raise typer.Exit(1)
+        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
 
     # Validate size
     valid_sizes = ["XS", "S", "M", "L", "XL"]
     if size.upper() not in valid_sizes:
-        console.print(f"[red]Error:[/red] Invalid size: {size}")
-        console.print(f"Valid sizes: {', '.join(valid_sizes)}")
-        raise typer.Exit(1)
+        cli_error(
+            f"Invalid size: {size}",
+            hint=f"Valid sizes: {', '.join(valid_sizes)}",
+            exit_code=7,
+        )
 
     input_data = CalibrationInput(
         feature=feature,
@@ -480,8 +494,7 @@ def add_calibration_cmd(
             console.print(f"  Velocity: {ratio}x (estimated {estimated}min)")
         console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.message}")
-        raise typer.Exit(1)
+        cli_error(result.message)
 
 
 @memory_app.command("add-session")
@@ -518,8 +531,7 @@ def add_session_cmd(
     """
     mem_dir = memory_dir or _get_default_memory_dir()
     if not mem_dir.exists():
-        console.print(f"[red]Error:[/red] Memory directory not found: {mem_dir}")
-        raise typer.Exit(1)
+        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
 
     # Parse outcomes
     outcomes_list = [o.strip() for o in outcomes.split(",") if o.strip()]
@@ -542,5 +554,4 @@ def add_session_cmd(
             console.print(f"  Outcomes: {', '.join(outcomes_list[:3])}")
         console.print("\n[dim]Graph will rebuild on next query.[/dim]\n")
     else:
-        console.print(f"[red]Error:[/red] {result.message}")
-        raise typer.Exit(1)
+        cli_error(result.message)

@@ -53,7 +53,7 @@ class TestInitCommand:
     def test_init_creates_manifest(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """Init creates .rai/manifest.yaml."""
+        """Init creates .raise/manifest.yaml."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):

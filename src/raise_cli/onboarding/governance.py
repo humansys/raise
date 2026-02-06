@@ -6,6 +6,7 @@ confidence-based levels (MUST/SHOULD/COULD).
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from datetime import date
 from enum import Enum
 
@@ -74,25 +75,15 @@ class GuardrailGenerator:
         }
         return mapping[confidence]
 
-    def generate(self, conventions: ConventionResult) -> list[GeneratedGuardrail]:
-        """Generate guardrails from conventions.
-
-        Args:
-            conventions: Detected conventions from analysis.
-
-        Returns:
-            List of generated guardrails.
-        """
+    def _generate_style_guardrails(
+        self,
+        conventions: ConventionResult,
+        next_id: Callable[[GuardrailLevel, str], str],
+    ) -> list[GeneratedGuardrail]:
+        """Generate style-related guardrails (indentation, quotes, line length)."""
         guardrails: list[GeneratedGuardrail] = []
-        counters: dict[str, int] = {}
 
-        def next_id(level: GuardrailLevel, category: str) -> str:
-            """Generate next ID for a category."""
-            key = f"{level.value}-{category.upper()}"
-            counters[key] = counters.get(key, 0) + 1
-            return f"{key}-{counters[key]:03d}"
-
-        # Style: Indentation
+        # Indentation
         indent = conventions.style.indentation
         indent_level = self.confidence_to_level(indent.confidence)
         if indent.style == "spaces" and indent.width:
@@ -108,47 +99,47 @@ class GuardrailGenerator:
                 level=indent_level,
                 category="Code Style",
                 description=indent_desc,
-                verification="ruff check ."
-                if indent_level == GuardrailLevel.MUST
-                else None,
+                verification="ruff check ." if indent_level == GuardrailLevel.MUST else None,
             )
         )
 
-        # Style: Quote style
+        # Quote style
         quotes = conventions.style.quote_style
         quote_level = self.confidence_to_level(quotes.confidence)
-        quote_desc = f"Use {quotes.style} quotes for strings"
-
         guardrails.append(
             GeneratedGuardrail(
                 id=next_id(quote_level, "STYLE"),
                 level=quote_level,
                 category="Code Style",
-                description=quote_desc,
-                verification="ruff check ."
-                if quote_level == GuardrailLevel.MUST
-                else None,
+                description=f"Use {quotes.style} quotes for strings",
+                verification="ruff check ." if quote_level == GuardrailLevel.MUST else None,
             )
         )
 
-        # Style: Line length
+        # Line length
         line_length = conventions.style.line_length
         line_level = self.confidence_to_level(line_length.confidence)
-        line_desc = f"Maximum line length: {line_length.max_length} characters"
-
         guardrails.append(
             GeneratedGuardrail(
                 id=next_id(line_level, "STYLE"),
                 level=line_level,
                 category="Code Style",
-                description=line_desc,
-                verification="ruff check ."
-                if line_level == GuardrailLevel.MUST
-                else None,
+                description=f"Maximum line length: {line_length.max_length} characters",
+                verification="ruff check ." if line_level == GuardrailLevel.MUST else None,
             )
         )
 
-        # Naming: Functions
+        return guardrails
+
+    def _generate_naming_guardrails(
+        self,
+        conventions: ConventionResult,
+        next_id: Callable[[GuardrailLevel, str], str],
+    ) -> list[GeneratedGuardrail]:
+        """Generate naming convention guardrails."""
+        guardrails: list[GeneratedGuardrail] = []
+
+        # Functions
         func_naming = conventions.naming.functions
         func_level = self.confidence_to_level(func_naming.confidence)
         guardrails.append(
@@ -160,7 +151,7 @@ class GuardrailGenerator:
             )
         )
 
-        # Naming: Classes
+        # Classes
         class_naming = conventions.naming.classes
         class_level = self.confidence_to_level(class_naming.confidence)
         guardrails.append(
@@ -172,7 +163,7 @@ class GuardrailGenerator:
             )
         )
 
-        # Naming: Constants (only if meaningful samples)
+        # Constants (only if meaningful samples)
         const_naming = conventions.naming.constants
         if const_naming.sample_count >= 3:
             const_level = self.confidence_to_level(const_naming.confidence)
@@ -185,8 +176,17 @@ class GuardrailGenerator:
                 )
             )
 
-        # Structure: Only if clear layout detected
+        return guardrails
+
+    def _generate_structure_guardrails(
+        self,
+        conventions: ConventionResult,
+        next_id: Callable[[GuardrailLevel, str], str],
+    ) -> list[GeneratedGuardrail]:
+        """Generate project structure guardrails."""
+        guardrails: list[GeneratedGuardrail] = []
         structure = conventions.structure
+
         if structure.has_src_layout and structure.source_dir:
             guardrails.append(
                 GeneratedGuardrail(
@@ -209,6 +209,29 @@ class GuardrailGenerator:
 
         return guardrails
 
+    def generate(self, conventions: ConventionResult) -> list[GeneratedGuardrail]:
+        """Generate guardrails from conventions.
+
+        Args:
+            conventions: Detected conventions from analysis.
+
+        Returns:
+            List of generated guardrails.
+        """
+        counters: dict[str, int] = {}
+
+        def next_id(level: GuardrailLevel, category: str) -> str:
+            """Generate next ID for a category."""
+            key = f"{level.value}-{category.upper()}"
+            counters[key] = counters.get(key, 0) + 1
+            return f"{key}-{counters[key]:03d}"
+
+        guardrails: list[GeneratedGuardrail] = []
+        guardrails.extend(self._generate_style_guardrails(conventions, next_id))
+        guardrails.extend(self._generate_naming_guardrails(conventions, next_id))
+        guardrails.extend(self._generate_structure_guardrails(conventions, next_id))
+        return guardrails
+
     def to_markdown(
         self,
         conventions: ConventionResult,
@@ -224,28 +247,38 @@ class GuardrailGenerator:
             Markdown content for guardrails.md.
         """
         guardrails = self.generate(conventions)
+        by_category = self._group_by_category(guardrails)
 
-        # Group by category
+        lines: list[str] = []
+        self._add_md_header(lines, project_name)
+        self._add_md_context(lines, conventions)
+        self._add_md_guardrail_tables(lines, by_category)
+        self._add_md_footer(lines)
+        return "\n".join(lines)
+
+    def _group_by_category(
+        self, guardrails: list[GeneratedGuardrail]
+    ) -> dict[str, list[GeneratedGuardrail]]:
+        """Group guardrails by category."""
         by_category: dict[str, list[GeneratedGuardrail]] = {}
         for g in guardrails:
             by_category.setdefault(g.category, []).append(g)
+        return by_category
 
-        # Build markdown
-        lines: list[str] = []
-
-        # Header
+    def _add_md_header(self, lines: list[str], project_name: str | None) -> None:
+        """Add markdown document header."""
         title = f"Guardrails: {project_name}" if project_name else "Guardrails"
         lines.append(f"# {title}")
         lines.append("")
         lines.append("> Auto-generated from detected conventions")
         lines.append("")
 
-        # Context section
+    def _add_md_context(self, lines: list[str], conventions: ConventionResult) -> None:
+        """Add context section with confidence info."""
         lines.append("## Context")
         lines.append("")
-        conf_text = conventions.overall_confidence.value
         lines.append(f"- **Files analyzed:** {conventions.files_analyzed}")
-        lines.append(f"- **Overall confidence:** {conf_text}")
+        lines.append(f"- **Overall confidence:** {conventions.overall_confidence.value}")
         lines.append(f"- **Generated:** {date.today().isoformat()}")
         lines.append("")
 
@@ -256,7 +289,10 @@ class GuardrailGenerator:
             )
             lines.append("")
 
-        # Guardrails by category
+    def _add_md_guardrail_tables(
+        self, lines: list[str], by_category: dict[str, list[GeneratedGuardrail]]
+    ) -> None:
+        """Add guardrail tables grouped by category."""
         for category, cat_guardrails in by_category.items():
             lines.append(f"## {category}")
             lines.append("")
@@ -268,18 +304,16 @@ class GuardrailGenerator:
                 lines.append(
                     f"| `{g.id}` | {g.level.value} | {g.description} | {verification} |"
                 )
-
             lines.append("")
 
-        # Footer
+    def _add_md_footer(self, lines: list[str]) -> None:
+        """Add document footer."""
         lines.append("---")
         lines.append("")
         lines.append(
             "*Generated by `raise init --detect`. Review and adjust as needed.*"
         )
         lines.append("")
-
-        return "\n".join(lines)
 
 
 def generate_guardrails(

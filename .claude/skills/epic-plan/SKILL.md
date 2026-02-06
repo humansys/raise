@@ -62,9 +62,9 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 - Epics already in progress (use for new epics only)
 
 **Inputs required:**
-- Epic scope document (`dev/epic-{id}-scope.md`) from `/epic-design`
+- Epic scope document: `work/epics/e{N}-{name}/scope.md`
 - Feature list with sizes and dependencies
-- Calibration data (`.claude/rai/calibration.md` if available)
+- Calibration data (`.raise/rai/memory/calibration.jsonl` if available)
 - External constraints (deadlines, dependencies, resource availability)
 
 **Outputs:**
@@ -81,24 +81,24 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 Record the start of the plan phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event start --phase plan
+uv run raise telemetry emit-work epic {epic_id} --event start --phase plan
 ```
 
-**Example:** `raise telemetry emit epic E9 -e start -p plan`
+**Example:** `raise telemetry emit-work epic E9 -e start -p plan`
 
 ### Step 0.5: Query Context
 
 Load relevant sequencing patterns and calibration from unified context:
 
 ```bash
-raise context query "sequencing calibration planning" --unified --types pattern,calibration --limit 5
+uv run raise context query "sequencing calibration planning" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Calibration data informs realistic estimates.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Review Epic Design Output
 
@@ -203,6 +203,8 @@ Include early features that:
 **Verification:** Each feature has sequencing rationale documented.
 
 > **If you can't continue:** Multiple valid orderings → Choose risk-first as default; document alternatives.
+
+> **Deep dive:** See `_references/sequencing-strategies.md` for detailed philosophy and anti-patterns.
 
 ---
 
@@ -507,16 +509,16 @@ Self-review checklist before starting implementation.
 Record the completion of the plan phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event complete --phase plan
+uv run raise telemetry emit-work epic {epic_id} --event complete --phase plan
 ```
 
-**Example:** `raise telemetry emit epic E9 -e complete -p plan`
+**Example:** `raise telemetry emit-work epic E9 -e complete -p plan`
 
 ---
 
 ## Output
 
-- **Primary:** Updated `dev/epic-{id}-scope.md` with implementation plan
+- **Primary:** `work/epics/e{N}-{name}/scope.md` — updated with implementation plan
 - **Sections added:** Feature sequence, milestones, parallel opportunities, progress tracking
 - **Next:** `/feature-design` for first feature in sequence
 
@@ -619,61 +621,6 @@ Stream 3 (Parallel):        F{N}.4 ───┘
 7. **Planning without calibration** — Estimates based on intuition instead of measured velocity
 8. **Sunk cost sequencing** — "We already started X, so finish it" instead of re-evaluating
 
-## Sequencing Strategies Deep Dive
-
-### Risk-First (Primary)
-
-**Philosophy:** Uncertainty decreases as you learn. Early features teach you about the codebase, the problem, and your velocity. Tackling risky features early means:
-- More time to recover from surprises
-- Learning informs later features
-- Confidence grows throughout epic
-
-**Identify risky features by:**
-- New technology or unfamiliar patterns
-- Integration with external systems
-- Unclear requirements (even after design)
-- Performance or scalability unknowns
-- Team has never done something similar
-
-**Anti-pattern:** "Let's do the easy features first to build momentum" — This feels good but front-loads certainty and back-loads risk. By the time you hit the hard features, deadline pressure is highest.
-
-### Walking Skeleton
-
-**Philosophy:** Prove the architecture works before investing heavily. A walking skeleton is the smallest end-to-end path through the system that demonstrates:
-- Key architectural decisions are valid
-- Integration points work
-- Development environment is productive
-- Deployment pipeline functions
-
-**Walking skeleton features:**
-- Minimal but complete path from input to output
-- Touches all layers (UI, API, data, infrastructure)
-- Can be demonstrated (not just "it compiles")
-- Provides foundation for rest of features
-
-**Example:** For a governance toolkit epic, walking skeleton might be:
-- F1: Extract one concept from one file
-- F2: Build minimal graph with one relationship
-- F3: Query graph and return result
-
-**Anti-pattern:** Building all of layer 1 before touching layer 2. This delays integration risk discovery.
-
-### Quick Wins
-
-**Philosophy:** Early success builds momentum and validates process. Quick wins are features that:
-- Can be completed in one session
-- Provide visible, demonstrable value
-- Don't block other features
-- Build confidence in approach
-
-**Use quick wins when:**
-- Starting a new codebase or technology
-- Team morale needs boost
-- Stakeholders need early visibility
-- Validating development process
-
-**Anti-pattern:** Only quick wins — avoiding hard features indefinitely. Quick wins support risk-first; they don't replace it.
-
 ## Integration with Memory Model
 
 This skill supports the three-layer memory model:
@@ -697,10 +644,10 @@ This skill supports the three-layer memory model:
 ## References
 
 - **Epic Design:** `/epic-design` (produces input for this skill)
-- **Epic Scope Examples:** `dev/epic-e1-scope.md`, `dev/epic-e2-scope.md`, `dev/epic-e3-scope.md`
+- **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
 - **Feature Planning:** `/feature-plan` (similar concept at feature level)
 - **Epic Close:** `/epic-close` (retrospective after completion)
-- **Calibration Data:** `.claude/rai/calibration.md` (velocity patterns)
+- **Calibration Data:** `.raise/rai/memory/calibration.jsonl` (velocity patterns)
 - **Constitution:** `framework/reference/constitution.md` (Lean principles)
 - **Guardrails:** `governance/solution/guardrails.md` (quality standards)
 

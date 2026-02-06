@@ -2,7 +2,7 @@
 
 This module provides the `raise init` command that:
 - Detects if the project is greenfield or brownfield
-- Creates .rai/manifest.yaml with project metadata
+- Creates .raise/manifest.yaml with project metadata
 - Loads or creates ~/.rai/developer.yaml for personal profile
 - Outputs adaptive messages based on experience level
 - Optionally detects conventions and generates guardrails (--detect)
@@ -54,21 +54,25 @@ WELCOME_BACK_RI = "[dim]Welcome back, {name}.[/dim]"
 
 PROJECT_DETECTED_SHU = """
 [bold]Project detected:[/bold] {project_type} ({file_count} code files)
-[bold]Created:[/bold] .rai/manifest.yaml
-{profile_status}
+{files_section}
 
-[bold cyan]Next steps:[/bold cyan]
-1. Open Claude Code in this directory
-2. Run [bold]/session-start[/bold] to begin our first session together
-3. I'll guide you through understanding your project
+[bold cyan]What's next?[/bold cyan]
 
-Questions? Visit https://raise.dev/docs
+  [bold]1. Start a session[/bold] (in Claude Code / AI editor):
+     Type [bold cyan]/session-start[/bold cyan]
+     [dim]→ Loads your context, remembers patterns, proposes focused work[/dim]
+
+  [bold]2. Explore the CLI[/bold] (in terminal):
+     [dim]raise --help[/dim]      — see all commands
+     [dim]raise context[/dim]     — query project context
+     [dim]raise memory[/dim]      — query Rai's memory
+
+[dim]Don't have Claude Code? https://claude.ai/download[/dim]
 """
 
-PROJECT_DETECTED_RI = """{project_type} project initialized ({file_count} files).
-Created .rai/manifest.yaml
+PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
-Run [bold]/session-start[/bold] when ready.
+[dim]Editor:[/dim] /session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
 """
 
 
@@ -93,15 +97,25 @@ def _get_project_message(
 ) -> str:
     """Get project detection message based on experience level."""
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
-        profile_status = (
-            "[bold]Created:[/bold] ~/.rai/developer.yaml (first time setup)"
-            if created_profile
-            else "[bold]Loaded:[/bold] ~/.rai/developer.yaml"
-        )
+        # Build files section with descriptions
+        lines = [
+            "[bold]Created:[/bold] .raise/manifest.yaml  [dim]— project metadata[/dim]"
+        ]
+        if created_profile:
+            lines.append(
+                "[bold]Created:[/bold] ~/.rai/developer.yaml  "
+                "[dim]— your preferences (first time)[/dim]"
+            )
+        else:
+            lines.append(
+                "[bold]Loaded:[/bold]  ~/.rai/developer.yaml  [dim]— your preferences[/dim]"
+            )
+        files_section = "\n".join(lines)
+
         return PROJECT_DETECTED_SHU.format(
             project_type=project_type.capitalize(),
             file_count=file_count,
-            profile_status=profile_status,
+            files_section=files_section,
         )
     else:
         return PROJECT_DETECTED_RI.format(
@@ -162,7 +176,7 @@ def init_command(
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
-    Detects project type (greenfield/brownfield), creates .rai/manifest.yaml,
+    Detects project type (greenfield/brownfield), creates .raise/manifest.yaml,
     and sets up developer profile for personalized interaction.
 
     With --detect, also analyzes code conventions and generates guardrails.

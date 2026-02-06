@@ -50,7 +50,7 @@ def tmp_epic_file(tmp_path: Path) -> Path:
         """
     )
 
-    epic_file = tmp_path / "dev" / "epic-e8-scope.md"
+    epic_file = tmp_path / "work" / "epics" / "e08-backlog" / "scope.md"
     epic_file.parent.mkdir(parents=True, exist_ok=True)
     epic_file.write_text(epic_content)
 
@@ -61,8 +61,10 @@ class TestExtractEpicDetails:
     """Tests for extract_epic_details function."""
 
     def test_extract_epic_id(self, tmp_epic_file: Path) -> None:
-        """Should extract epic ID from filename."""
-        epic = extract_epic_details(tmp_epic_file, tmp_epic_file.parent.parent)
+        """Should extract epic ID from parent directory."""
+        # tmp_path / work / epics / e08-backlog / scope.md -> project_root is 4 levels up
+        project_root = tmp_epic_file.parent.parent.parent.parent
+        epic = extract_epic_details(tmp_epic_file, project_root)
 
         assert epic is not None
         assert epic.metadata["epic_id"] == "E8"
@@ -118,10 +120,12 @@ class TestExtractEpicDetails:
 
     def test_extract_scope_doc(self, tmp_epic_file: Path) -> None:
         """Should include scope doc path in metadata."""
-        epic = extract_epic_details(tmp_epic_file, tmp_epic_file.parent.parent)
+        # tmp_path / work / epics / e08-backlog / scope.md -> project_root is 4 levels up
+        project_root = tmp_epic_file.parent.parent.parent.parent
+        epic = extract_epic_details(tmp_epic_file, project_root)
 
         assert epic is not None
-        assert epic.metadata["scope_doc"] == "dev/epic-e8-scope.md"
+        assert epic.metadata["scope_doc"] == "work/epics/e08-backlog/scope.md"
 
     def test_content_includes_objective(self, tmp_epic_file: Path) -> None:
         """Should include objective in content."""
@@ -147,7 +151,7 @@ class TestExtractEpicDetails:
             > **Status:** COMPLETE (100%)
             """
         )
-        epic_file = tmp_path / "dev" / "epic-e3-scope.md"
+        epic_file = tmp_path / "work" / "epics" / "e03-identity" / "scope.md"
         epic_file.parent.mkdir(parents=True, exist_ok=True)
         epic_file.write_text(epic_content)
 
@@ -165,7 +169,7 @@ class TestExtractEpicDetails:
             > **Status:** COMPLETE ✅
             """
         )
-        epic_file = tmp_path / "dev" / "epic-e2-scope.md"
+        epic_file = tmp_path / "work" / "epics" / "e02-governance" / "scope.md"
         epic_file.parent.mkdir(parents=True, exist_ok=True)
         epic_file.write_text(epic_content)
 
@@ -263,7 +267,7 @@ class TestExtractFeatures:
             | F2.2 | Graph Builder | 2 | ✅ Complete | 65 min | 2.8x |
             """
         )
-        epic_file = tmp_path / "dev" / "epic-e2-scope.md"
+        epic_file = tmp_path / "work" / "epics" / "e02-governance" / "scope.md"
         epic_file.parent.mkdir(parents=True, exist_ok=True)
         epic_file.write_text(epic_content)
 
@@ -277,11 +281,12 @@ class TestExtractFeatures:
 
     def test_relative_file_path(self, tmp_epic_file: Path) -> None:
         """Should calculate correct relative file path."""
-        project_root = tmp_epic_file.parent.parent
+        # tmp_path / work / epics / e08-backlog / scope.md -> project_root is 4 levels up
+        project_root = tmp_epic_file.parent.parent.parent.parent
         features = extract_features(tmp_epic_file, project_root)
 
         for feature in features:
-            assert feature.file == "dev/epic-e8-scope.md"
+            assert feature.file == "work/epics/e08-backlog/scope.md"
 
 
 class TestIntegrationWithRealEpics:
@@ -289,7 +294,7 @@ class TestIntegrationWithRealEpics:
 
     def test_extract_details_from_real_e3(self) -> None:
         """Should extract details from real E3 scope."""
-        scope_path = Path("dev/epic-e3-scope.md")
+        scope_path = Path("work/epics/e03-identity/scope.md")
 
         if not scope_path.exists():
             pytest.skip("Real epic scope file not found")
@@ -304,7 +309,7 @@ class TestIntegrationWithRealEpics:
 
     def test_extract_features_from_real_e3(self) -> None:
         """Should extract features from real E3 scope."""
-        scope_path = Path("dev/epic-e3-scope.md")
+        scope_path = Path("work/epics/e03-identity/scope.md")
 
         if not scope_path.exists():
             pytest.skip("Real epic scope file not found")
@@ -319,7 +324,7 @@ class TestIntegrationWithRealEpics:
 
     def test_extract_all_real_epics(self) -> None:
         """Should extract details from all real epic scopes."""
-        epic_files = list(Path("dev").glob("epic-e*-scope.md"))
+        epic_files = list(Path("work/epics").glob("*/scope.md"))
 
         if not epic_files:
             pytest.skip("No real epic scope files found")

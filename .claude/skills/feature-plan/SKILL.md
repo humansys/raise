@@ -55,7 +55,7 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 - Technical Design for architectural context (if complex)
 
 **Output:**
-- `work/features/{feature}/plan.md` - Implementation plan
+- Implementation plan: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
 
 ## Steps
 
@@ -64,17 +64,17 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase plan
+uv run raise telemetry emit-work feature {feature_id} --event start --phase plan
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e start -p plan`
+**Example:** `raise telemetry emit-work feature F9.4 -e start -p plan`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
 Check design document for complex features:
 
 ```bash
-ls work/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No design"
+ls work/epics/e*/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No design"
 ```
 
 **Decision:**
@@ -93,14 +93,14 @@ ls work/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No design"
 Load relevant patterns and calibration from unified context:
 
 ```bash
-raise context query "planning estimation calibration" --unified --types pattern,calibration --limit 5
+uv run raise context query "planning estimation calibration" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Key patterns inform task structure and sizing.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Select Story
 
@@ -218,15 +218,15 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase plan
+uv run raise telemetry emit-work feature {feature_id} --event complete --phase plan
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e complete -p plan`
+**Example:** `raise telemetry emit-work feature F9.4 -e complete -p plan`
 
 ## Output
 
-- **Artifact:** `work/features/{feature}/plan.md`
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
+- **Artifact:** `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
 - **Next:** `/feature-implement`
 

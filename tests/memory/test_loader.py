@@ -271,10 +271,10 @@ class TestLoadMemoryFromDirectory:
         assert MemoryConceptType.SESSION in types
 
     def test_load_with_real_rai_directory(self) -> None:
-        """Load from actual .rai/memory directory if available."""
-        rai_memory = Path(".rai/memory")
+        """Load from actual .raise/rai/memory directory if available."""
+        rai_memory = Path(".raise/rai/memory")
         if not rai_memory.exists():
-            pytest.skip(".rai/memory directory not found")
+            pytest.skip(".raise/rai/memory directory not found")
 
         result = load_memory_from_directory(rai_memory)
 

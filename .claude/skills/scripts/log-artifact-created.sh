@@ -10,10 +10,10 @@ FILE_PATH=$(echo "$INPUT" | jq -r '.tool_input.file_path // "unknown"')
 SKILL_NAME="${RAISE_SKILL_NAME:-unknown}"
 
 # Ensure telemetry directory exists
-mkdir -p "$CLAUDE_PROJECT_DIR/.raise/telemetry"
+mkdir -p "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry"
 
 # Log event
 echo "{\"event\":\"artifact_created\",\"skill\":\"$SKILL_NAME\",\"tool\":\"$TOOL_NAME\",\"path\":\"$FILE_PATH\",\"session_id\":\"$SESSION_ID\",\"timestamp\":\"$TIMESTAMP\"}" \
-  >> "$CLAUDE_PROJECT_DIR/.raise/telemetry/events.jsonl"
+  >> "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry/events.jsonl"
 
 exit 0

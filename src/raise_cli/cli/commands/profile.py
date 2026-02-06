@@ -4,9 +4,9 @@ This module provides the `raise profile` command group for viewing
 and managing the developer profile stored in ~/.rai/developer.yaml.
 
 Example:
-    $ raise profile show        # View current profile in YAML format
-    $ raise profile session     # Start/record a new session
-    $ raise profile session-end # End the current session
+    $ raise profile show          # View current profile in YAML format
+    $ raise profile session-start # Start/record a new session
+    $ raise profile session-end   # End the current session
 """
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ from typing import Annotated
 import typer
 import yaml
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.memory.writer import validate_session_index
 from raise_cli.onboarding.profile import (
     DeveloperProfile,
@@ -60,8 +61,8 @@ def show() -> None:
     typer.echo(output.rstrip())
 
 
-@profile_app.command()
-def session(
+@profile_app.command(name="session-start")
+def session_start(
     name: Annotated[
         str | None,
         typer.Option(
@@ -85,20 +86,19 @@ def session(
     For first-time users, creates a new developer profile.
 
     Examples:
-        $ raise profile session                    # Start session
-        $ raise profile session --name "Alice"    # First-time setup
-        $ raise profile session --project /my/proj # Start with project path
+        $ raise profile session-start                    # Start session
+        $ raise profile session-start --name "Alice"    # First-time setup
+        $ raise profile session-start --project /my/proj # Start with project path
     """
     profile = load_developer_profile()
 
     if profile is None:
         # First-time user - need name to create profile
         if name is None:
-            typer.echo(
-                "No developer profile found. Provide --name for first-time setup:\n"
-                "  raise profile session --name 'Your Name'"
+            cli_error(
+                "No developer profile found",
+                hint="Provide --name for first-time setup: raise profile session --name 'Your Name'",
             )
-            raise typer.Exit(1)
 
         # Create new profile
         profile = DeveloperProfile(name=name)
@@ -122,7 +122,7 @@ def session(
 
     # Jidoka: Validate session index if project specified
     if project is not None:
-        memory_dir = Path(project) / ".rai" / "memory"
+        memory_dir = Path(project) / ".raise" / "rai" / "memory"
         if memory_dir.exists():
             validation = validate_session_index(memory_dir)
             if not validation.is_valid:
@@ -157,8 +157,7 @@ def session_end() -> None:
     profile = load_developer_profile()
 
     if profile is None:
-        typer.echo("No developer profile found.")
-        raise typer.Exit(1)
+        cli_error("No developer profile found")
 
     if profile.current_session is None:
         typer.echo("No active session to end.")
