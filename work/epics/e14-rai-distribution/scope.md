@@ -53,7 +53,7 @@ V3:
 | F14.2 | Base Patterns Catalog | M | 3 | ✅ Done | Define ~20 universal methodology patterns |
 | F14.3 | Methodology Core | S | 2 | ✅ Done | methodology.yaml with skills, gates, rules |
 | F14.4 | Bootstrap on Init | M | 3 | ✅ Done | Copy bundled base to .raise/rai/ during raise init |
-| F14.5 | Two-Part MEMORY.md | M | 3 | Pending | Generate MEMORY.md with static process + dynamic context |
+| F14.5 | Two-Part MEMORY.md | M | 3 | ✅ Done | Generate MEMORY.md with static process + dynamic context |
 | F14.6 | Pattern Versioning | S | 2 | Pending | Add base/version fields to pattern schema |
 | F14.7 | Base Show Command | XS | 1 | Pending | `raise base show` displays current base info |
 | F14.15 | Multi-Developer Architecture | L | 5 | ✅ Done | Separate personal data from shared project data |
