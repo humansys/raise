@@ -1,1 +1,0 @@
-{"url": "https://docs.google.com/document/d/1qpL5RVyL9R7bBDZuVS_dzpF4Rhytt-sZGAVwkhU9HYU/edit?usp=drivesdk", "file_id": "1qpL5RVyL9R7bBDZuVS_dzpF4Rhytt-sZGAVwkhU9HYU", "account_email": "minoru@sistemashumanos.com"}

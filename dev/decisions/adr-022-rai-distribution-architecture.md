@@ -1,4 +1,4 @@
-# ADR-022: Rai Distribution Architecture
+# YesADR-022: Rai Distribution Architecture
 
 **Status:** Accepted
 **Date:** 2026-02-05
@@ -21,6 +21,7 @@ E14 needs to distribute "Base Rai" — identity, methodology knowledge, and univ
 ### The Corporate Scenario
 
 Enterprises adopting RaiSE will want:
+
 - Custom methodology (different gates, custom skills)
 - Corporate patterns (company coding standards)
 - Internal distribution (not dependent on public PyPI)
