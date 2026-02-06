@@ -9,7 +9,7 @@
 
 ## Purpose
 
-Ensure that learnings from feature retrospectives are systematically applied to the framework and codebase **before** committing the feature, creating a complete learning cycle within each feature delivery.
+Ensure that learnings from story retrospectives are systematically applied to the framework and codebase **before** committing the feature, creating a complete learning cycle within each story delivery.
 
 **Problem this solves:** Retrospective insights often languish in parking lots or action item lists, never getting implemented. Meanwhile, the feature is committed without the improvements that were learned during its development.
 
@@ -109,7 +109,7 @@ When reviewing retrospective improvements, classify each into one of three types
 
 ### Step 1: Complete Feature Retrospective
 
-Follow `/feature-review` skill:
+Follow `/story-review` skill:
 - Extract learnings
 - Identify improvements
 - Answer heutagogical questions
@@ -199,7 +199,7 @@ For each Type B improvement:
   - **Next step:** [Specific action - design, ADR, spike, etc.]
   - **Depends on:** [Blockers or prerequisites]
   - **Evidence:** [What showed need - quote from retro]
-  - **Details:** See `work/features/[feature]/retrospective.md`
+  - **Details:** See `work/stories/[feature]/retrospective.md`
 ```
 
 **Verification:** All Type B improvements captured with actionable next steps.
@@ -372,13 +372,13 @@ Framework improvements from Feature N directly speed up Feature N+1. The kata cy
 | F2.3 | 2 | 2 | 2 | ~25 min | Protocol creation session |
 
 **Healthy ratios:**
-- Type A: 1-3 per feature (quick wins common, but not overwhelming)
-- Type B: 1-2 per feature (strategic improvements identified but deferred)
+- Type A: 1-3 per story (quick wins common, but not overwhelming)
+- Type B: 1-2 per story (strategic improvements identified but deferred)
 - Type C: Always 1+ (always track metrics)
 
 **Red flags:**
 - Zero Type A for 3+ features → Framework may be stagnating
-- 5+ Type B per feature → May need framework stabilization sprint
+- 5+ Type B per story → May need framework stabilization sprint
 - Zero Type C → Not tracking, can't improve
 
 ### Adjust Protocol Based on Data
@@ -405,7 +405,7 @@ Evolve protocol based on evidence.
 - Memory files updated by Type C tracking
 
 ### Feature Review Skill
-- Feature review (`/feature-review`) triggers this protocol
+- Feature review (`/story-review`) triggers this protocol
 - Retrospective document is input to protocol
 - Protocol execution completes the review cycle
 
@@ -437,7 +437,7 @@ Evolve protocol based on evidence.
 
 ## References
 
-- **Feature Review Skill:** `.claude/skills/feature-review/`
+- **Feature Review Skill:** `.claude/skills/story-review/`
 - **Session Close Skill:** `.claude/skills/session-close/`
 - **Branch Management SOP:** `dev/sops/branch-management.md`
 - **Kaizen (Continuous Improvement):** Toyota Production System

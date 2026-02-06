@@ -85,7 +85,7 @@ This research investigated how to represent software architecture at a level tha
 **Claim**: A searchable catalog of components with metadata enables reuse discovery.
 **Confidence**: HIGH
 **Evidence**:
-- [Backstage](https://backstage.io/docs/features/software-catalog/): Spotify's production-proven catalog; teams maintain via Git
+- [Backstage](https://backstage.io/docs/stories/software-catalog/): Spotify's production-proven catalog; teams maintain via Git
 - [Atlassian Compass](https://support.atlassian.com/compass/docs/search-the-component-catalog/): Enterprise component discovery
 - [Discover](https://technology.discover.com/posts/reuse-basics): "Reusable components need documentation so target audience can consume with little assistance"
 

@@ -205,7 +205,7 @@ Design parsers as **adapters** from the start:
 
 1. **RaiSE as Source of Truth for Governance**
    - Constitution, guardrails, principles → Confluence pages
-   - Epic scopes, feature designs → Confluence + Jira epics
+   - Epic scopes, story designs → Confluence + Jira epics
 
 2. **Jira as Source of Truth for Execution**
    - Sprint status, assignees → synced from Jira

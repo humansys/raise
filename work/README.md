@@ -17,7 +17,7 @@ This directory contains **active work** that has not yet been promoted to `gover
 
 ```
 work/
-├── features/           # Feature-level work
+├── stories/           # Feature-level work
 │   └── NNN-feature-name/
 │       ├── spec.md     # Feature specification
 │       ├── plan.md     # Implementation plan
@@ -40,7 +40,7 @@ Work here is **transient**. It either:
 
 1. **Gets promoted** to `governance/` after passing a gate
 2. **Gets archived** if abandoned
-3. **Stays ephemeral** (feature work that doesn't produce governance artifacts)
+3. **Stays ephemeral** (story work that doesn't produce governance artifacts)
 
 ```
 work/                              governance/
@@ -55,7 +55,7 @@ Feature spec/plan   →  done  →     (nothing - ephemeral)
 ### Features
 
 ```
-work/features/NNN-short-name/
+work/stories/NNN-short-name/
 ```
 
 - `NNN` = sequential number (001, 002, ...)

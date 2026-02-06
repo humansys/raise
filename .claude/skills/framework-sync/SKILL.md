@@ -64,7 +64,7 @@ Read dev/decisions/adr-XXX-<name>.md
 
 | Impact Type | Affected Document | Update Type |
 |-------------|------------------|-------------|
-| **Scope changed** | `governance/projects/*/backlog.md` | Epic/feature scope, SP estimates |
+| **Scope changed** | `governance/projects/*/backlog.md` | Epic/story scope, SP estimates |
 | **Terminology changed** | `framework/reference/glossary.md` | Add/deprecate/update terms |
 | **Ontology validated** | `work/tracking/ontology-backlog.md` | Close items, update status |
 | **Outcomes changed** | `governance/solution/vision.md` | Update key outcomes |
@@ -402,11 +402,11 @@ If governance documents conflict with ADR:
 
 **Before framework-sync:**
 - `/research` → Evidence gathering
-- `/feature-design` → Create design spec
+- `/story-design` → Create design spec
 - Create ADR documenting decision
 
 **After framework-sync:**
-- `/feature-plan` → Plan implementation
+- `/story-plan` → Plan implementation
 - `/session-close` → Log session with sync
 
 **Framework sync bridges decision → implementation.**

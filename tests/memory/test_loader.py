@@ -1,6 +1,5 @@
 """Tests for memory loader."""
 
-import json
 from datetime import date
 from pathlib import Path
 
@@ -129,7 +128,7 @@ class TestLoadSession:
         data = {
             "id": "SES-001",
             "date": "2026-02-01",
-            "type": "feature",
+            "type": "story",
             "topic": "E3 Implementation Plan",
             "outcomes": ["/epic-plan skill complete", "Risk-First sequencing"],
             "log_path": "dev/sessions/2026-02-01-e3.md",
@@ -140,8 +139,8 @@ class TestLoadSession:
         assert concept.type == MemoryConceptType.SESSION
         assert "E3 Implementation Plan" in concept.content
         assert "/epic-plan skill complete" in concept.content
-        assert "feature" in concept.context
-        assert concept.metadata["session_type"] == "feature"
+        assert "story" in concept.context
+        assert concept.metadata["session_type"] == "story"
         assert concept.metadata["log_path"] == "dev/sessions/2026-02-01-e3.md"
 
     def test_load_session_minimal(self) -> None:
@@ -255,7 +254,7 @@ class TestLoadMemoryFromDirectory:
         sessions_dir = tmp_path / "sessions"
         sessions_dir.mkdir()
         (sessions_dir / "index.jsonl").write_text(
-            '{"id": "SES-001", "date": "2026-02-01", "type": "feature", "topic": "Test"}\n'
+            '{"id": "SES-001", "date": "2026-02-01", "type": "story", "topic": "Test"}\n'
         )
 
         result = load_memory_from_directory(tmp_path)
@@ -365,7 +364,7 @@ class TestLoadSessionWithScope:
         data = {
             "id": "SES-001",
             "date": "2026-02-01",
-            "type": "feature",
+            "type": "story",
             "topic": "Test session",
         }
         concept = load_session(data, scope=MemoryScope.PERSONAL)

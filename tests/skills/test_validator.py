@@ -4,11 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from raise_cli.skills.validator import (
     ValidationResult,
-    ValidationSeverity,
     validate_skill,
     validate_skill_file,
 )

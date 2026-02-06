@@ -15,7 +15,7 @@
 
 2. **All 9 lifecycle skills updated to use ONLY new structure** ✓
    - No fallback to legacy paths — single source of truth
-   - Path references: `work/epics/e{N}-{name}/scope.md` and `/features/f{N}.{M}-{name}/`
+   - Path references: `work/epics/e{N}-{name}/scope.md` and `/stories/f{N}.{M}-{name}/`
 
 3. **Extractor and parser code updated** ✓
    - `extractor.py`: glob pattern `work/epics/*/scope.md`
@@ -24,8 +24,8 @@
 
 **Skills Updated (9 total):**
 - `/epic-design`, `/epic-plan`, `/epic-close`
-- `/feature-start`, `/feature-design`, `/feature-plan`
-- `/feature-implement`, `/feature-review`, `/feature-close`
+- `/story-start`, `/story-design`, `/story-plan`
+- `/story-implement`, `/story-review`, `/story-close`
 
 ## Final Structure
 
@@ -54,7 +54,7 @@ work/epics/
 │   └── scope.md
 └── e14-rai-distribution/
     ├── scope.md
-    └── features/
+    └── stories/
         └── f14.0-dx-quality-gate/
             ├── scope.md
             └── plan.md
@@ -109,10 +109,10 @@ dev/
 - No grouping of epic artifacts
 - Hard to see "what belongs to E7?"
 
-### Features: Flat in `work/features/`
+### Features: Flat in `work/stories/`
 
 ```
-work/features/
+work/stories/
 ├── 006-katas-normalization      # Old numeric prefix
 ├── 007-public-repo-readiness
 ├── F11.1                        # Uppercase, no name
@@ -145,7 +145,7 @@ work/
     ├── e01-foundation/
     │   ├── scope.md
     │   ├── retrospective.md
-    │   └── features/
+    │   └── stories/
     │       ├── f01.1-cli-structure/
     │       │   ├── spec.md
     │       │   └── plan.md
@@ -155,7 +155,7 @@ work/
     ├── e02-governance/
     │   ├── scope.md
     │   ├── retrospective.md
-    │   └── features/
+    │   └── stories/
     │       ├── f02.1-concept-extraction/
     │       ├── f02.2-graph-builder/
     │       └── f02.3-mvc-query/
@@ -163,7 +163,7 @@ work/
     ├── e07-onboarding/
     │   ├── scope.md
     │   ├── retrospective.md
-    │   └── features/
+    │   └── stories/
     │       ├── f07.1-raise-init/
     │       ├── f07.2-convention-detection/
     │       └── ...
@@ -172,7 +172,7 @@ work/
         ├── scope.md
         ├── plan.md              # If separate from scope
         ├── retrospective.md     # Created at epic-close
-        └── features/
+        └── stories/
             ├── f14.1-base-identity/
             ├── f14.2-base-patterns/
             └── ...
@@ -237,8 +237,8 @@ Skills that reference epic/feature paths:
 | `/epic-design` | `dev/epic-{id}-scope.md` | Yes |
 | `/epic-plan` | Appends to scope.md | Yes |
 | `/epic-close` | `dev/epic-{id}-retrospective.md` | Yes |
-| `/feature-start` | `work/features/` | Yes |
-| `/feature-design` | `work/features/{id}/` | Yes |
+| `/story-start` | `work/stories/` | Yes |
+| `/story-design` | `work/stories/{id}/` | Yes |
 | CLAUDE.local.md | Manual references | Yes |
 
 ---
@@ -261,7 +261,7 @@ Skills that reference epic/feature paths:
 
 4. **Should closed features have all artifacts?**
    - spec.md, plan.md — keep for history
-   - Working files — clean up at feature-close
+   - Working files — clean up at story-close
    - Recommendation: Keep spec/plan, clean temp files
 
 ---

@@ -28,8 +28,8 @@ Skills can define their own hooks in YAML frontmatter:
 
 ```yaml
 ---
-name: feature-design
-description: Create feature specifications
+name: story-design
+description: Create story specifications
 hooks:
   PostToolUse:
     - matcher: "Write|Edit"
@@ -133,7 +133,7 @@ Each RaiSE skill should include hooks for telemetry:
 
 ```yaml
 ---
-name: feature-design
+name: story-design
 description: ...
 hooks:
   Stop:

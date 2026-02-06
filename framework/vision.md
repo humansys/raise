@@ -93,7 +93,7 @@ graph TB
                 P3["design.md"]
                 P4["backlog.md"]
             end
-            subgraph FEATURE["katas/feature/"]
+            subgraph FEATURE["katas/story/"]
                 F1["stories.md"]
                 F2["plan.md"]
                 F3["implement.md"]

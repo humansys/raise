@@ -8,12 +8,12 @@ version: 1
 lifecycle:
   epic:
     phases: [start, design, plan, implement, close]
-    flow: "/epic-start → /epic-design → /epic-plan → [features] → /epic-close"
+    flow: "/epic-start → /epic-design → /epic-plan → [stories] → /epic-close"
 
-  feature:
+  story:
     phases: [start, design, plan, implement, review, close]
-    flow: "/feature-start → /feature-design* → /feature-plan → /feature-implement → /feature-review → /feature-close"
-    note: "*design optional for S/XS features"
+    flow: "/story-start → /story-design* → /story-plan → /story-implement → /story-review → /story-close"
+    note: "*design optional for S/XS stories"
 
   session:
     phases: [start, work, close]
@@ -43,7 +43,7 @@ skills:
     - name: /epic-design
       purpose: Design epic scope, features, architecture
       when: After epic branch exists
-      creates: Epic scope document with feature breakdown
+      creates: Epic scope document with story breakdown
 
     - name: /epic-plan
       purpose: Sequence features with milestones and dependencies
@@ -55,35 +55,35 @@ skills:
       when: All features complete
       creates: Retrospective, branch cleanup
 
-  feature:
-    - name: /feature-start
-      purpose: Create feature branch and scope commit
-      when: Starting a new feature
-      creates: Feature branch, scope documentation
+  story:
+    - name: /story-start
+      purpose: Create story branch and scope commit
+      when: Starting a new story
+      creates: Story branch, scope documentation
       verifies: Epic branch exists
 
-    - name: /feature-design
-      purpose: Create lean specification for complex features
-      when: Feature has >3 components or needs architectural decisions
+    - name: /story-design
+      purpose: Create lean specification for complex stories
+      when: Story has >3 components or needs architectural decisions
       creates: Design spec optimized for AI alignment
-      optional_for: S/XS sized features
+      optional_for: S/XS sized stories
 
-    - name: /feature-plan
+    - name: /story-plan
       purpose: Decompose into atomic executable tasks
-      when: After design (or directly for simple features)
+      when: After design (or directly for simple stories)
       creates: Task list with dependencies
 
-    - name: /feature-implement
+    - name: /story-implement
       purpose: Execute tasks with TDD and validation gates
       when: Plan exists
       creates: Working code, tests, documentation
 
-    - name: /feature-review
+    - name: /story-review
       purpose: Extract learnings, identify improvements
       when: Implementation complete
       creates: Retrospective, pattern updates
 
-    - name: /feature-close
+    - name: /story-close
       purpose: Verify, merge, cleanup
       when: Review complete
       creates: Merged code, deleted branch
@@ -140,19 +140,19 @@ gates:
       enforced_by: /epic-start
       rationale: Features nest under epic branches
 
-    - before: Feature work
-      require: Feature branch and scope commit
-      enforced_by: /feature-start
+    - before: Story work
+      require: Story branch and scope commit
+      enforced_by: /story-start
       rationale: Traceability from first commit
 
     - before: Implementation
       require: Plan exists
-      enforced_by: /feature-plan
+      enforced_by: /story-plan
       rationale: No coding without decomposed tasks
 
-    - before: Feature close
+    - before: Story close
       require: Retrospective complete
-      enforced_by: /feature-review
+      enforced_by: /story-review
       rationale: Learning is part of done
 
     - before: Epic merge
@@ -183,11 +183,11 @@ principles:
       rationale: Tests are specification, not afterthought
 
     - name: Commit After Task
-      rule: Commit after each completed task, not just feature end
+      rule: Commit after each completed task, not just story end
       rationale: Enables recovery, shows progress
 
     - name: Full Skill Cycle
-      rule: Use skills even for small features
+      rule: Use skills even for small stories
       rationale: Structure helps; overhead is minimal
 
     - name: Ask Before Subagents
@@ -232,9 +232,9 @@ branches:
     main (stable)
       └── v2 (development)
             └── epic/e{N}/{name}
-                  └── feature/f{N}.{M}/{name}
+                  └── story/s{N}.{M}/{name}
 
   flow:
-    - Features merge to epic branch
+    - Stories merge to epic branch
     - Epics merge to development branch (v2)
     - Development merges to main at release

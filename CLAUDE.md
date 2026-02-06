@@ -1,6 +1,6 @@
 # RaiSE - Reliable AI Software Engineering
 
-> "Raise your craft, feature by feature."
+> "Raise your craft, one story at a time."
 
 ## Project Identity
 
@@ -140,7 +140,7 @@ All code must pass Ruff checks.
 
 ### Documentation — REQUIRED
 
-Documentation is part of Definition of Done for all features.
+Documentation is part of Definition of Done for all stories.
 
 **Code-Level (Always):**
 - Google-style docstrings on all public APIs
@@ -254,7 +254,7 @@ raise-commons/
 │   └── projects/     # Project-level artifacts
 │
 ├── work/             # Active work
-│   ├── epics/        # Epic and feature specs
+│   ├── epics/        # Epic and story specs
 │   └── research/     # Research sessions
 │
 ├── dev/              # Framework maintenance
@@ -315,7 +315,7 @@ Use canonical terms. Correct deprecated usage. See `framework/reference/glossary
 **Follow SOP:** `dev/sops/branch-management.md`
 
 **Branch naming:** `<type>/<scope>/<description>`
-- `feature/` - Single feature implementation (2-5 days)
+- `story/` - Single story implementation (2-5 days)
 - `framework/` - Framework-only changes (2-5 days)
 - `experiment/` - Research, discovery, multi-concern work (expect to rename)
 - `bugfix/` - Bug fixes (1-2 days)

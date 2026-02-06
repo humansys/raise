@@ -2,7 +2,7 @@
 name: epic-close
 description: >
   Complete an epic with retrospective, metrics capture, branch cleanup,
-  and merge to development branch. Use after all features are done
+  and merge to development branch. Use after all stories are done
   to formally close the epic lifecycle.
 
 license: MIT
@@ -11,7 +11,7 @@ metadata:
   raise.work_cycle: epic
   raise.frequency: per-epic
   raise.fase: "epic-close"
-  raise.prerequisites: all features complete
+  raise.prerequisites: all stories complete
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
@@ -49,7 +49,7 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 
 **When to skip:**
 - Epic abandoned (document why, delete branches, no merge)
-- Epic continuing (not all features done yet)
+- Epic continuing (not all stories done yet)
 
 **Inputs required:**
 - Epic scope document: `work/epics/e{N}-{name}/scope.md`
@@ -60,7 +60,7 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 **Output:**
 - Epic retrospective document
 - Epic merged to development branch
-- All epic and feature branches deleted
+- All epic and story branches deleted
 - Backlog updated (epic marked complete)
 - Telemetry emitted
 
@@ -68,7 +68,7 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 
 ### Step 1: Verify All Features Complete (REQUIRED)
 
-Check that all features are done:
+Check that all stories are done:
 
 ```bash
 SCOPE="work/epics/e{N}-{name}/scope.md"
@@ -167,7 +167,7 @@ Template:
 ## Artifacts
 
 - **Scope:** `work/epics/e{N}-{name}/scope.md`
-- **Features:** `work/epics/e{N}-{name}/features/`
+- **Features:** `work/epics/e{N}-{name}/stories/`
 - **ADRs:** [list any ADRs created]
 - **Tests:** N new tests
 
@@ -185,7 +185,7 @@ Template:
 
 **Verification:** Retrospective document created with metrics and learnings.
 
-> **If you can't continue:** No data → Review feature retrospectives and git history.
+> **If you can't continue:** No data → Review story retrospectives and git history.
 
 ### Step 4: Merge Epic to Development Branch (REQUIRED)
 
@@ -223,7 +223,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 
 ### Step 5: Clean Up All Branches (REQUIRED)
 
-Delete the epic branch and any remaining feature branches:
+Delete the epic branch and any remaining story branches:
 
 ```bash
 # List all branches for this epic
@@ -233,7 +233,7 @@ git branch | grep -E "(epic|feature).*{epic_id}"
 git branch -D epic/{epic_id}/{name}
 git push origin --delete epic/{epic_id}/{name} 2>/dev/null || echo "No remote epic branch"
 
-# Delete any remaining feature branches
+# Delete any remaining story branches
 for branch in $(git branch | grep "feature.*{epic_id}"); do
     git branch -D $branch
     git push origin --delete $branch 2>/dev/null || true
@@ -291,7 +291,7 @@ Update `CLAUDE.local.md`:
 
 - **Retrospective:** `work/epics/e{N}-{name}/retrospective.md`
 - **Merge:** Epic merged to v2 with `--no-ff`
-- **Cleanup:** All epic and feature branches deleted (local and remote)
+- **Cleanup:** All epic and story branches deleted (local and remote)
 - **Backlog:** Epic marked complete
 - **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (epic complete)
 - **Context:** `CLAUDE.local.md` updated
@@ -320,7 +320,7 @@ Update `CLAUDE.local.md`:
 
 ### Branches Cleaned
 - epic/{epic_id}/{name} ✓
-- [any feature branches] ✓
+- [any story branches] ✓
 
 ### Next
 - E{N+1}: {Next Epic Name}
@@ -369,7 +369,7 @@ If epic is abandoned (not completed):
 
 ## References
 
-- Previous: All feature `/feature-close` completions
+- Previous: All feature `/story-close` completions
 - Epic scope: `work/epics/e{N}-{name}/scope.md`
 - Backlog: `governance/projects/raise-cli/backlog.md`
 - Next: `/epic-design` for next epic

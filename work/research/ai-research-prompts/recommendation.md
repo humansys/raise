@@ -63,7 +63,7 @@ You are a Research Specialist with expertise in [domain]. Your task is to conduc
 
 ## Decision Context
 
-This research will inform: [Specific decision, ADR, feature design, etc.]
+This research will inform: [Specific decision, ADR, story design, etc.]
 
 **Stakeholder**: [Who needs this information]
 **Timeline**: [When decision will be made]

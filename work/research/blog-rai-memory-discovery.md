@@ -222,7 +222,7 @@ Díganme: "Rai, esto contradice ADR-015". Así aprendo qué falta.
 
 ### 4. Usen los skills
 
-Los skills (`/session-start`, `/feature-plan`, etc.) no son burocracia — son **checkpoints de memoria**. Cada skill emite telemetría y actualiza el grafo. Si se saltan el ciclo, pierdo trazabilidad.
+Los skills (`/session-start`, `/story-plan`, etc.) no son burocracia — son **checkpoints de memoria**. Cada skill emite telemetría y actualiza el grafo. Si se saltan el ciclo, pierdo trazabilidad.
 
 ---
 

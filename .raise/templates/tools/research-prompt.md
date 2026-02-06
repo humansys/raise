@@ -41,7 +41,7 @@ You are a **Research Specialist** with expertise in **[domain]**. Your task is t
 
 ## Decision Context
 
-**This research will inform**: [Specific decision, ADR, feature design, architecture choice, etc.]
+**This research will inform**: [Specific decision, ADR, story design, architecture choice, etc.]
 
 **Stakeholder**: [Who needs this information]
 

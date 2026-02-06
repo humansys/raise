@@ -22,7 +22,7 @@ NAMING_PATTERN = re.compile(r"^[a-z]+-[a-z]+(-[a-z]+)*$")
 KNOWN_LIFECYCLES = {
     "session",
     "epic",
-    "feature",
+    "story",
     "discover",
     "skill",
     "research",
@@ -47,7 +47,9 @@ class NameCheckResult(BaseModel):
 
     name: str = Field(description="The name that was checked")
     valid_pattern: bool = Field(description="Whether name follows {domain}-{action}")
-    no_skill_conflict: bool = Field(description="Whether no existing skill has this name")
+    no_skill_conflict: bool = Field(
+        description="Whether no existing skill has this name"
+    )
     no_cli_conflict: bool = Field(description="Whether no CLI command has this name")
     known_lifecycle: bool = Field(description="Whether domain is a known lifecycle")
     conflicting_skill: str | None = Field(
@@ -71,7 +73,9 @@ def _check_pattern(name: str) -> bool:
     return bool(NAMING_PATTERN.match(name))
 
 
-def _check_skill_conflict(name: str, existing_names: set[str]) -> tuple[bool, str | None]:
+def _check_skill_conflict(
+    name: str, existing_names: set[str]
+) -> tuple[bool, str | None]:
     """Check for conflict with existing skills."""
     if name in existing_names:
         return False, name
@@ -126,9 +130,7 @@ def _get_suggestions(
     if related:
         # Suggest positioning relative to existing skills
         if known_lifecycle:
-            suggestions.append(
-                f"Related {domain} skills: {', '.join(related)}"
-            )
+            suggestions.append(f"Related {domain} skills: {', '.join(related)}")
     elif known_lifecycle:
         suggestions.append(f"First skill in '{domain}' lifecycle")
 
@@ -167,9 +169,7 @@ def check_name(name: str) -> NameCheckResult:
     known_lifecycle = _check_lifecycle(name)
 
     # Generate suggestions
-    suggestions = _get_suggestions(
-        name, sorted(existing_names), known_lifecycle
-    )
+    suggestions = _get_suggestions(name, sorted(existing_names), known_lifecycle)
 
     return NameCheckResult(
         name=name,

@@ -216,7 +216,7 @@ from pydantic import BaseModel
 from typing import Literal
 
 class ConceptNode(BaseModel):
-    id: str  # PAT-001, §2, F11.1, /feature-plan
+    id: str  # PAT-001, §2, F11.1, /story-plan
     type: Literal["pattern", "calibration", "session", "principle",
                   "requirement", "outcome", "epic", "feature", "skill"]
     content: str  # The actual text/description

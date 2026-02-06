@@ -106,7 +106,7 @@ memory-bank/
 
 **Sources:**
 - [Mem0 GitHub](https://github.com/mem0ai/mem0)
-- [Mem0 Graph Memory Docs](https://docs.mem0.ai/open-source/features/graph-memory)
+- [Mem0 Graph Memory Docs](https://docs.mem0.ai/open-source/stories/graph-memory)
 - [Mem0 Research Paper](https://arxiv.org/html/2504.19413v1)
 
 ---

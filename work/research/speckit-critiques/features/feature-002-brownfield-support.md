@@ -64,12 +64,12 @@
 
 ---
 
-### US4: As an architect, I want multi-repo feature specs so I can coordinate changes across microservices
+### US4: As an architect, I want multi-repo story specs so I can coordinate changes across microservices
 
 **Acceptance Criteria**:
 - [ ] Single spec references multiple repos (YAML frontmatter)
 - [ ] Cross-repo consistency checks
-- [ ] Validate: All affected repos updated before feature complete
+- [ ] Validate: All affected repos updated before story complete
 - [ ] Link PRs across repos
 
 **Priority**: P0

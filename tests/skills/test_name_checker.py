@@ -73,7 +73,7 @@ class TestCheckName:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = check_name("feature-validate")
+        result = check_name("story-validate")
 
         assert result.is_valid
         assert result.valid_pattern
@@ -160,7 +160,7 @@ metadata:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        known = ["session", "epic", "feature", "discover", "skill"]
+        known = ["session", "epic", "story", "discover", "skill"]
         for lifecycle in known:
             result = check_name(f"{lifecycle}-test")
             assert result.known_lifecycle, f"{lifecycle} should be known"

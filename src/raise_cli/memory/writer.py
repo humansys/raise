@@ -115,7 +115,9 @@ def _parse_session_entries(file_path: Path) -> _ParsedSessionEntries:
     )
 
 
-def _find_sequence_gaps(ses_numbers: list[int], gap_threshold: int = 5) -> tuple[int, list[tuple[int, int]]]:
+def _find_sequence_gaps(
+    ses_numbers: list[int], gap_threshold: int = 5
+) -> tuple[int, list[tuple[int, int]]]:
     """Find gaps in session number sequence.
 
     Returns:
@@ -190,7 +192,7 @@ class PatternInput(BaseModel):
         content: Pattern description.
         sub_type: Pattern sub-type (codebase, process, architecture, technical).
         context: Context keywords for retrieval.
-        learned_from: Feature/session where pattern was learned.
+        learned_from: Story/session where pattern was learned.
     """
 
     content: str = Field(..., description="Pattern description")
@@ -199,7 +201,7 @@ class PatternInput(BaseModel):
     )
     context: list[str] = Field(default_factory=list, description="Context keywords")
     learned_from: str | None = Field(
-        default=None, description="Feature/session where learned"
+        default=None, description="Story/session where learned"
     )
 
 
@@ -207,8 +209,8 @@ class CalibrationInput(BaseModel):
     """Input for creating a new calibration entry.
 
     Attributes:
-        feature: Feature ID (e.g., 'F3.5').
-        name: Feature name.
+        story: Story ID (e.g., 'F3.5').
+        name: Story name.
         size: T-shirt size (XS, S, M, L, XL).
         sp: Story points.
         estimated_min: Estimated minutes (if any).
@@ -217,8 +219,8 @@ class CalibrationInput(BaseModel):
         notes: Additional notes.
     """
 
-    feature: str = Field(..., description="Feature ID (e.g., 'F3.5')")
-    name: str = Field(..., description="Feature name")
+    story: str = Field(..., description="Story ID (e.g., 'F3.5')")
+    name: str = Field(..., description="Story name")
     size: str = Field(..., description="T-shirt size (XS, S, M, L, XL)")
     sp: int | None = Field(default=None, description="Story points")
     estimated_min: int | None = Field(default=None, description="Estimated minutes")
@@ -232,14 +234,14 @@ class SessionInput(BaseModel):
 
     Attributes:
         topic: Session topic.
-        session_type: Session type (feature, research, maintenance, etc.).
+        session_type: Session type (story, research, maintenance, etc.).
         outcomes: List of session outcomes.
         log_path: Path to session log file (if any).
     """
 
     topic: str = Field(..., description="Session topic")
     session_type: str = Field(
-        default="feature", description="Session type (feature, research, etc.)"
+        default="story", description="Session type (story, research, etc.)"
     )
     outcomes: list[str] = Field(default_factory=list, description="Session outcomes")
     log_path: str | None = Field(default=None, description="Path to session log")
@@ -261,7 +263,9 @@ class WriteResult(BaseModel):
     message: str = Field(default="", description="Status message")
 
 
-def get_memory_dir_for_scope(scope: MemoryScope, project_root: Path | None = None) -> Path:
+def get_memory_dir_for_scope(
+    scope: MemoryScope, project_root: Path | None = None
+) -> Path:
     """Get the appropriate memory directory for a given scope.
 
     Args:
@@ -398,7 +402,7 @@ def append_calibration(
 
     entry = {
         "id": cal_id,
-        "feature": input_data.feature,
+        "story": input_data.story,
         "name": input_data.name,
         "size": input_data.size,
         "sp": input_data.sp,

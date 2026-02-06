@@ -12,7 +12,6 @@ from raise_cli.skills.locator import (
     get_default_skill_dir,
     list_skills,
 )
-from raise_cli.skills.schema import Skill
 
 
 @pytest.fixture
@@ -35,18 +34,18 @@ def skill_dir(tmp_path: Path) -> Path:
         # Session Start
     """))
 
-    # Create feature-plan skill
-    feature_plan = skills / "feature-plan"
+    # Create story-plan skill
+    feature_plan = skills / "story-plan"
     feature_plan.mkdir()
     (feature_plan / "SKILL.md").write_text(dedent("""\
         ---
-        name: feature-plan
+        name: story-plan
         description: Plan a feature
         metadata:
-          raise.work_cycle: feature
+          raise.work_cycle: story
           raise.version: "1.0.0"
         ---
-        # Feature Plan
+        # Story Plan
     """))
 
     # Create debug skill (utility)
@@ -95,7 +94,7 @@ class TestSkillLocator:
         dirs = locator.find_skill_dirs()
         assert len(dirs) == 3
         names = {d.name for d in dirs}
-        assert names == {"session-start", "feature-plan", "debug"}
+        assert names == {"session-start", "story-plan", "debug"}
 
     def test_find_skill_dirs_empty(self, tmp_path: Path) -> None:
         """Handle empty skill directory."""
@@ -131,7 +130,7 @@ class TestSkillLocator:
         skills = locator.load_all_skills()
         assert len(skills) == 3
         names = {s.name for s in skills}
-        assert names == {"session-start", "feature-plan", "debug"}
+        assert names == {"session-start", "story-plan", "debug"}
 
     def test_load_all_skills_sorted(self, skill_dir: Path) -> None:
         """Skills are sorted by name."""
@@ -147,10 +146,10 @@ class TestSkillLocator:
         grouped = locator.group_by_lifecycle(skills)
 
         assert "session" in grouped
-        assert "feature" in grouped
+        assert "story" in grouped
         assert "utility" in grouped
         assert len(grouped["session"]) == 1
-        assert len(grouped["feature"]) == 1
+        assert len(grouped["story"]) == 1
         assert len(grouped["utility"]) == 1
         assert grouped["session"][0].name == "session-start"
 

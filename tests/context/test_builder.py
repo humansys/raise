@@ -5,14 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from textwrap import dedent
-from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from raise_cli.context.builder import UnifiedGraphBuilder
 from raise_cli.context.models import ConceptNode
-from raise_cli.memory.models import MemoryScope
 
 
 class TestUnifiedGraphBuilderInit:
@@ -141,7 +139,7 @@ class TestLoadMemory:
             json.dumps({
                 "id": "SES-001",
                 "date": "2026-02-01",
-                "type": "feature",
+                "type": "story",
                 "topic": "E3 Implementation",
                 "outcomes": ["Feature complete", "Tests passing"],
             })
@@ -330,14 +328,14 @@ class TestLoadMemoryMultiSource:
         project_sessions = tmp_path / ".raise/rai" / "memory" / "sessions"
         project_sessions.mkdir(parents=True)
         (project_sessions / "index.jsonl").write_text(
-            json.dumps({"id": "SES-PROJECT", "date": "2026-02-01", "type": "feature", "topic": "Project session"}) + "\n"
+            json.dumps({"id": "SES-PROJECT", "date": "2026-02-01", "type": "story", "topic": "Project session"}) + "\n"
         )
 
         # Personal sessions (SHOULD be loaded)
         personal_sessions = tmp_path / ".raise/rai" / "personal" / "sessions"
         personal_sessions.mkdir(parents=True)
         (personal_sessions / "index.jsonl").write_text(
-            json.dumps({"id": "SES-PERSONAL", "date": "2026-02-01", "type": "feature", "topic": "Personal session"}) + "\n"
+            json.dumps({"id": "SES-PERSONAL", "date": "2026-02-01", "type": "story", "topic": "Personal session"}) + "\n"
         )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
@@ -520,7 +518,7 @@ class TestLoadWork:
 
         with patch.object(builder, "_extract_epics") as mock_extract:
             mock_extract.return_value = [mock_epic]
-            with patch.object(builder, "_extract_features") as mock_features:
+            with patch.object(builder, "_extract_stories") as mock_features:
                 mock_features.return_value = []
                 nodes = builder.load_work()
 
@@ -535,7 +533,7 @@ class TestLoadWork:
 
         mock_feature = Concept(
             id="F11.2",
-            type=ConceptType.FEATURE,
+            type=ConceptType.STORY,
             file="dev/epic-e11-scope.md",
             section="F11.2: Graph Builder",
             lines=(70, 80),
@@ -547,14 +545,14 @@ class TestLoadWork:
 
         with patch.object(builder, "_extract_epics") as mock_epics:
             mock_epics.return_value = []
-            with patch.object(builder, "_extract_features") as mock_extract:
+            with patch.object(builder, "_extract_stories") as mock_extract:
                 mock_extract.return_value = [mock_feature]
                 nodes = builder.load_work()
 
         assert len(nodes) == 1
         node = nodes[0]
         assert node.id == "F11.2"
-        assert node.type == "feature"
+        assert node.type == "story"
 
 
 class TestLoadSkills:
@@ -800,7 +798,7 @@ class TestInferRelationships:
         """Should create part_of edges from feature to epic."""
         feature = ConceptNode(
             id="F11.2",
-            type="feature",
+            type="story",
             content="Graph Builder",
             source_file="dev/epic-e11-scope.md",
             created="2026-02-03",
@@ -827,10 +825,10 @@ class TestInferRelationships:
     def test_infers_skill_prerequisite_edges(self, tmp_path: Path) -> None:
         """Should create needs_context edges from skill prerequisites."""
         skill = ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Plan implementation tasks",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-02-03",
             metadata={"raise.prerequisites": "project-backlog"},
         )
@@ -848,25 +846,25 @@ class TestInferRelationships:
 
         needs_edges = [e for e in edges if e.type == "needs_context"]
         assert len(needs_edges) == 1
-        assert needs_edges[0].source == "/feature-plan"
+        assert needs_edges[0].source == "/story-plan"
         assert needs_edges[0].target == "/project-backlog"
         assert needs_edges[0].weight == 1.0
 
     def test_infers_skill_next_edges(self, tmp_path: Path) -> None:
         """Should create related_to edges from skill.raise/raise.next."""
         skill = ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Plan tasks",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-02-03",
-            metadata={"raise.next": "feature-implement"},
+            metadata={"raise.next": "story-implement"},
         )
         next_skill = ConceptNode(
-            id="/feature-implement",
+            id="/story-implement",
             type="skill",
             content="Implement feature",
-            source_file=".claude/skills/feature-implement/SKILL.md",
+            source_file=".claude/skills/story-implement/SKILL.md",
             created="2026-02-03",
             metadata={},
         )
@@ -874,7 +872,7 @@ class TestInferRelationships:
         builder = UnifiedGraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([skill, next_skill])
 
-        next_edges = [e for e in edges if e.source == "/feature-plan" and e.target == "/feature-implement"]
+        next_edges = [e for e in edges if e.source == "/story-plan" and e.target == "/story-implement"]
         assert len(next_edges) == 1
         assert next_edges[0].type == "related_to"
         assert next_edges[0].weight == 1.0
@@ -890,10 +888,10 @@ class TestInferRelationships:
             metadata={"context": ["planning", "implementation"]},
         )
         skill = ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Planning implementation tasks for feature development",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-02-03",
             metadata={},
         )
@@ -942,7 +940,7 @@ class TestInferRelationships:
             json.dumps({
                 "id": "SES-010",
                 "date": "2026-01-31",
-                "type": "feature",
+                "type": "story",
                 "topic": "F1.5 Output Module",
             }) + "\n"
         )

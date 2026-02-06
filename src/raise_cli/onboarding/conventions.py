@@ -345,7 +345,9 @@ def detect_indentation(files: list[Path]) -> IndentationConvention:
             consistent_count=0,
         )
 
-    style, width, consistent = _determine_indent_style(tabs_count, spaces_count, indent_widths)
+    style, width, consistent = _determine_indent_style(
+        tabs_count, spaces_count, indent_widths
+    )
     confidence = calculate_confidence(consistent, total)
 
     return IndentationConvention(

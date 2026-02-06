@@ -27,7 +27,7 @@ Cline is an open-source VS Code extension (formerly Claude Dev) that positions i
 
 | Source | Type | Rating |
 |--------|------|--------|
-| [docs.cline.bot/features/cline-rules](https://docs.cline.bot/features/cline-rules) | Official docs | Primary |
+| [docs.cline.bot/stories/cline-rules](https://docs.cline.bot/stories/cline-rules) | Official docs | Primary |
 | [cline.ghost.io/clinerules](https://cline.ghost.io/clinerules-version-controlled-shareable-and-ai-editable-instructions/) | Official blog | Primary |
 | [GitHub src/core/prompts/system-prompt](https://github.com/cline/cline/tree/main/src/core/prompts/system-prompt) | Source code | Primary |
 | [elifuzz/awesome-system-prompts/cline](https://elifuzz.github.io/awesome-system-prompts/cline) | Community extraction | Secondary |
@@ -93,7 +93,7 @@ Cline is an open-source VS Code extension (formerly Claude Dev) that positions i
 | Source | Type | Rating |
 |--------|------|--------|
 | [docs.cline.bot/getting-started/installing-cline](https://docs.cline.bot/getting-started/installing-cline) | Official docs | Primary |
-| [docs.cline.bot/features/plan-and-act](https://docs.cline.bot/features/plan-and-act) | Official docs | Primary |
+| [docs.cline.bot/stories/plan-and-act](https://docs.cline.bot/stories/plan-and-act) | Official docs | Primary |
 | [cline.bot/blog/plan-smarter-code-faster](https://cline.bot/blog/plan-smarter-code-faster-clines-plan-act-is-the-paradigm-for-agentic-coding) | Official blog | Primary |
 | [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=saoudrizwan.claude-dev) | Official listing | Primary |
 | [DataCamp tutorial](https://www.datacamp.com/tutorial/cline-ai) | Tutorial | Secondary |

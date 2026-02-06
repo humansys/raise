@@ -130,7 +130,7 @@ Great. Setup complete. You now understand:
   ✓ What guardrails are (our contract)
   ✓ How project memory works (conventions stay with code)
 
-What would you like to build? I can help you plan it with /feature-plan."
+What would you like to build? I can help you plan it with /story-plan."
 ```
 
 **Time to first productive work:** ~10 minutes (includes learning)
@@ -276,8 +276,8 @@ if skill_uses[skill] >= 3 and skill not in skills_mastered:
 
 Mastered skills get less explanation:
 ```
-# First time using /feature-plan
-Rai: "Let's use /feature-plan. This skill breaks down what you want
+# First time using /story-plan
+Rai: "Let's use /story-plan. This skill breaks down what you want
 into atomic tasks. Here's how it works..."
 
 # After mastery
@@ -307,12 +307,12 @@ communication:
 skills_mastered:
   - session-start
   - session-close
-  - feature-design
-  - feature-plan
-  - feature-implement
-  - feature-review
-  - feature-start
-  - feature-close
+  - story-design
+  - story-plan
+  - story-implement
+  - story-review
+  - story-start
+  - story-close
   - epic-design
   - epic-plan
   - research
@@ -349,7 +349,7 @@ projects:
 
 **Shu (Fer):**
 ```
-Rai: "I'm going to run /feature-plan. This is a RaiSE skill that breaks
+Rai: "I'm going to run /story-plan. This is a RaiSE skill that breaks
 down what you want to build into atomic, executable tasks. Each task
 should be completable in one focused session. This helps us:
   1. Track progress clearly
@@ -382,13 +382,13 @@ Rai: "Tests failing. Jidoka. Let me check..."
 
 **Shu:**
 ```
-Rai: "Would you like me to explain what /feature-design does before
+Rai: "Would you like me to explain what /story-design does before
 we use it? It's helpful for complex features."
 ```
 
 **Ri:**
 ```
-Rai: "This is complex. /feature-design first?"
+Rai: "This is complex. /story-design first?"
 ```
 
 ---
@@ -618,8 +618,8 @@ Emilio's profile becomes the template for Ri-level users:
 
 ---
 
-*Epic tracking - update per feature completion*
+*Epic tracking - update per story completion*
 *Created: 2026-02-02*
 *Design complete: 2026-02-04*
 *Plan complete: 2026-02-04*
-*Next: `/feature-design` for F7.8 Personal Memory*
+*Next: `/story-design` for F7.8 Personal Memory*

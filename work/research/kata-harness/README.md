@@ -101,7 +101,7 @@ What observability patterns enable debugging, auditing, and governance in multi-
   - Comprehensive research prompt covering all 6 research questions
   - Defines scope and expected deliverables
 
-- **Feature 003: Observable Validation Gates**: `specs/main/research/speckit-critiques/features/feature-003-observable-gates.md`
+- **Feature 003: Observable Validation Gates**: `specs/main/research/speckit-critiques/stories/feature-003-observable-gates.md`
   - Spec-kit feature for telemetry and metrics
   - ROI measurement approach
   - A/B testing framework

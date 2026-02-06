@@ -67,7 +67,7 @@ class TestProfileShowCommand:
         profile = DeveloperProfile(
             name="Expert User",
             experience_level=ExperienceLevel.RI,
-            
+
             skills_mastered=["tdd", "epic-planning"],
             universal_patterns=["always-use-types"],
         )

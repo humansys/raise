@@ -25,7 +25,11 @@ from raise_cli.output.formatters.skill import (
 from raise_cli.skills.locator import SkillLocator, get_default_skill_dir
 from raise_cli.skills.name_checker import check_name
 from raise_cli.skills.scaffold import scaffold_skill
-from raise_cli.skills.validator import ValidationResult, validate_skill, validate_skill_file
+from raise_cli.skills.validator import (
+    ValidationResult,
+    validate_skill,
+    validate_skill_file,
+)
 
 skill_app = typer.Typer(
     name="skill",
@@ -97,15 +101,19 @@ def validate_command(
             if skill_file.exists():
                 results.append(validate_skill_file(skill_file))
             else:
-                results.append(ValidationResult(
-                    path=str(target),
-                    errors=[f"No SKILL.md found in {target}"],
-                ))
+                results.append(
+                    ValidationResult(
+                        path=str(target),
+                        errors=[f"No SKILL.md found in {target}"],
+                    )
+                )
         else:
-            results.append(ValidationResult(
-                path=str(target),
-                errors=[f"Path not found: {target}"],
-            ))
+            results.append(
+                ValidationResult(
+                    path=str(target),
+                    errors=[f"Path not found: {target}"],
+                )
+            )
     else:
         # Validate all skills
         skill_dir = get_default_skill_dir()
@@ -131,7 +139,7 @@ def check_name_command(
     name: Annotated[
         str,
         typer.Argument(
-            help="Proposed skill name to check (e.g., 'feature-validate').",
+            help="Proposed skill name to check (e.g., 'story-validate').",
         ),
     ],
     format: Annotated[
@@ -167,7 +175,7 @@ def scaffold_command(
     name: Annotated[
         str,
         typer.Argument(
-            help="Skill name to create (e.g., 'feature-validate').",
+            help="Skill name to create (e.g., 'story-validate').",
         ),
     ],
     lifecycle: Annotated[
@@ -175,7 +183,7 @@ def scaffold_command(
         typer.Option(
             "--lifecycle",
             "-l",
-            help="Lifecycle: session, epic, feature, discovery, utility, meta. Inferred from name if not specified.",
+            help="Lifecycle: session, epic, story, discovery, utility, meta. Inferred from name if not specified.",
         ),
     ] = None,
     after: Annotated[

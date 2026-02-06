@@ -99,8 +99,8 @@ User → Claude Code
 .claude/skills/
 ├── session-start/SKILL.md     # Load context, analyze progress
 ├── session-close/SKILL.md     # Extract learnings, update memory
-├── feature-design/SKILL.md    # Design a feature
-├── feature-plan/SKILL.md      # Plan implementation
+├── story-design/SKILL.md    # Design a feature
+├── story-plan/SKILL.md      # Plan implementation
 ├── validate-prd/SKILL.md      # Validate PRD quality
 └── research/SKILL.md          # Conduct research
 ```
@@ -311,8 +311,8 @@ raise analyze patterns <dir>
 **Already have:**
 - ✅ `/session-start`
 - ✅ `/session-close`
-- ✅ `/feature-design`
-- ✅ `/feature-plan`
+- ✅ `/story-design`
+- ✅ `/story-plan`
 - ✅ `/research`
 
 **Add as needed:**

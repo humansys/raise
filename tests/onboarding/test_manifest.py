@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-import pytest
 import yaml
 
 from raise_cli.onboarding.detection import ProjectType
@@ -29,7 +28,7 @@ class TestProjectInfo:
 
     def test_full_project_info(self) -> None:
         """ProjectInfo with all fields."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         info = ProjectInfo(
             name="my-api",
             project_type=ProjectType.BROWNFIELD,
@@ -168,7 +167,7 @@ class TestLoadManifest:
 
     def test_roundtrip(self, tmp_path: Path) -> None:
         """Save and load produces equivalent manifest."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         project = ProjectInfo(
             name="roundtrip-test",
             project_type=ProjectType.BROWNFIELD,

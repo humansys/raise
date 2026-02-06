@@ -13,6 +13,11 @@ The unified graph consolidates memory with governance, skills, and work items.
 
 from __future__ import annotations
 
+from raise_cli.memory.migration import (
+    MigrationResult,
+    migrate_to_personal,
+    needs_migration,
+)
 from raise_cli.memory.models import (
     MemoryConcept,
     MemoryConceptType,
@@ -20,11 +25,6 @@ from raise_cli.memory.models import (
     MemoryRelationshipType,
     MemoryScope,
     PatternSubType,
-)
-from raise_cli.memory.migration import (
-    MigrationResult,
-    migrate_to_personal,
-    needs_migration,
 )
 from raise_cli.memory.writer import (
     CalibrationInput,

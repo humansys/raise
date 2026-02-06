@@ -1022,7 +1022,7 @@ This research will be successful if it produces:
 specs/main/research/speckit-critiques/
 ├── critique-taxonomy.md              # Deliverable 1 (~5-7K words)
 ├── differentiation-strategy.md       # Deliverable 2 (~4-6K words)
-├── features/                         # Deliverable 3
+├── stories/                         # Deliverable 3
 │   ├── feature-001-[name].md
 │   ├── feature-002-[name].md
 │   └── ...

@@ -269,4 +269,4 @@ The payoff is a system where humans can predict behavior and AI can generate cor
 
 ---
 
-*This post emerged from the F14.13 CLI/Skill Ontology Cleanup feature in the RaiSE framework. The full analysis is at `work/epics/e14-rai-distribution/features/f14.13-ontology-cleanup/ontology-analysis.md`.*
+*This post emerged from the F14.13 CLI/Skill Ontology Cleanup feature in the RaiSE framework. The full analysis is at `work/epics/e14-rai-distribution/stories/f14.13-ontology-cleanup/ontology-analysis.md`.*

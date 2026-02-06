@@ -146,8 +146,8 @@ gates:
   blocking:
     - before: epic design
       require: Epic branch exists (/epic-start)
-    - before: feature work
-      require: Feature branch and scope commit (/feature-start)
+    - before: story work
+      require: Feature branch and scope commit (/story-start)
     # ...
 
 principles:
@@ -289,7 +289,7 @@ Without E14, users get CLI + skills but NOT Rai. The "reliable" promise depends 
 **Process:** TDD cycle, commit after task, full kata cycle, ask before subagents
 **Technical:** Pydantic models, explicit CLI paths, type annotations
 **Collaboration:** Direct communication, redirect when dispersing
-**Lifecycle:** epic-start before design, feature-start before work, epic-close before merge
+**Lifecycle:** epic-start before design, story-start before work, epic-close before merge
 
 ### Post-F&F Roadmap
 

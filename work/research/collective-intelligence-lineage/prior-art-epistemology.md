@@ -320,7 +320,7 @@ To be integration-ready:
   "severity": "INFO",
   "event.name": "raise.skill.complete",
   "attributes": {
-    "raise.skill.name": "feature-design",
+    "raise.skill.name": "story-design",
     "raise.skill.duration_sec": 1800,
     "raise.session.id": "ses-123",
     "raise.feature.id": "F8.1"

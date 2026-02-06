@@ -55,7 +55,7 @@ Systematically identify and fix the root cause of defects, errors, or unexpected
 **When NOT to use:**
 - Obvious typos or simple syntax errors
 - Well-documented known issues
-- Feature requests (use `/feature-plan` instead)
+- Feature requests (use `/story-plan` instead)
 
 **Inputs required:**
 - Clear problem statement

@@ -286,7 +286,7 @@ This epic builds on completed research:
 
 | Order | Feature | Size | Dependencies | Milestone | Rationale |
 |:-----:|---------|:----:|--------------|-----------|-----------|
-| 1 | F13.1 Schema Extension | S (2) | None | M1 | Foundation — all features need node types |
+| 1 | F13.1 Schema Extension | S (2) | None | M1 | Foundation — all stories need node types |
 | 2 | F13.2 Extraction Toolkit | M (4) | F13.1 | M1 | Risk-first — ast-grep integration is key uncertainty |
 | 3 | F13.3 Discovery Skills | M (4) | F13.2 | M2 | Needs extraction output to synthesize descriptions |
 | 4 | F13.4 Graph Integration | S (2) | F13.3 | M2 | Connects skills to persistent storage |
@@ -358,10 +358,10 @@ F13.1 ─► F13.2 ─► F13.3 ─────► F13.4 ─────► F13.
 - **Adjustment:** New domain (code extraction) — conservative estimate
 - **Buffer:** Day 5 (Feb 9) reserved for integration issues
 
-### Definition of Ready (per feature)
+### Definition of Ready (per story)
 
-Before starting each feature:
-- [ ] Previous feature complete (or F13.1 for first)
+Before starting each story:
+- [ ] Previous story complete (or F13.1 for first)
 - [ ] Design understood (epic scope document)
 - [ ] Test strategy clear
 - [ ] No external blockers

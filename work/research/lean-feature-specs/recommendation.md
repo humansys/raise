@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-**Decision**: Implement a lean feature spec template with YAML frontmatter + Markdown body, emphasizing concrete examples and acceptance criteria over prose descriptions
+**Decision**: Implement a lean story spec template with YAML frontmatter + Markdown body, emphasizing concrete examples and acceptance criteria over prose descriptions
 
 **Confidence**: HIGH
 
@@ -35,11 +35,11 @@
 
 ### Template Design
 
-Create `.raise/templates/tech/tech-design-feature-v2.md`:
+Create `.raise/templates/tech/tech-design-story-v2.md`:
 
 ```markdown
 ---
-feature_id: "[F#.#]"
+story_id: "[F#.#]"
 title: "[Feature Name]"
 epic_ref: "[E# Epic Name]"
 story_points: [number]
@@ -218,7 +218,7 @@ def complex_operation(input_data):
 ```
 
 **Confidence**: HIGH
-**Implementation**: Replace existing `tech-design-feature.md` or create v2 variant
+**Implementation**: Replace existing `tech-design-story.md` or create v2 variant
 
 ---
 
@@ -226,20 +226,20 @@ def complex_operation(input_data):
 
 ### Create New Kata
 
-Create `.raise/katas/feature/design.md`:
+Create `.raise/katas/story/design.md`:
 
 ```yaml
 ---
-id: feature-design
+id: story-design
 titulo: "Design: Feature Specification"
 work_cycle: feature
-frequency: per-feature-as-needed
+frequency: per-story-as-needed
 fase_metodologia: 4
 
 prerequisites:
   - project/backlog
-template: templates/tech/tech-design-feature-v2.md
-gate: gates/gate-feature-design.md
+template: templates/tech/tech-design-story-v2.md
+gate: gates/gate-story-design.md
 next_kata: feature/plan
 
 adaptable: true
@@ -255,7 +255,7 @@ version: 1.0.0
 
 ## Purpose
 
-Create a lean feature specification that optimizes for both human understanding (quick review) and AI alignment (accurate code generation), based on evidence from 25+ sources.
+Create a lean story specification that optimizes for both human understanding (quick review) and AI alignment (accurate code generation), based on evidence from 25+ sources.
 
 ## Context
 
@@ -275,7 +275,7 @@ Create a lean feature specification that optimizes for both human understanding 
 - Technical Design (project-level) for architectural context
 
 **Output:**
-- Feature spec in `work/features/{feature-id}/design.md`
+- Feature spec in `work/stories/{feature-id}/design.md`
 
 ## Steps
 
@@ -292,7 +292,7 @@ Determine if feature needs full spec:
 
 **Decision**:
 - Simple → Skip design, go directly to feature/plan
-- Moderate/Complex → Create feature spec using template
+- Moderate/Complex → Create story spec using template
 
 **Verification:** Complexity assessed and documented.
 
@@ -387,8 +387,8 @@ Self-review against checklist:
 ## Output
 
 - **Artefact**: Feature Specification
-- **Ubicación**: `work/features/{feature-id}/design.md`
-- **Gate**: `gates/gate-feature-design.md` (if exists)
+- **Ubicación**: `work/stories/{feature-id}/design.md`
+- **Gate**: `gates/gate-story-design.md` (if exists)
 - **Next kata**: `feature/plan` (decompose into tasks)
 
 ## Quality Checklist
@@ -404,7 +404,7 @@ Self-review against checklist:
 
 ## References
 
-- Template: `.raise/templates/tech/tech-design-feature-v2.md`
+- Template: `.raise/templates/tech/tech-design-story-v2.md`
 - Research: `work/research/lean-feature-specs/`
 - Related kata: `feature/plan`
 ```
@@ -416,12 +416,12 @@ Self-review against checklist:
 
 ## Recommendation 3: Update Existing Template
 
-### Migrate Existing tech-design-feature.md
+### Migrate Existing tech-design-story.md
 
-Current template (`.raise/templates/tech/tech-design-feature.md`) → Create v2 variant
+Current template (`.raise/templates/tech/tech-design-story.md`) → Create v2 variant
 
 **Migration strategy**:
-1. Create new file: `tech-design-feature-v2.md` (don't break existing)
+1. Create new file: `tech-design-story-v2.md` (don't break existing)
 2. Update template README to list both versions
 3. Reference v2 from new feature/design kata
 4. Mark v1 as "legacy" after validation period
@@ -436,7 +436,7 @@ Current template (`.raise/templates/tech/tech-design-feature.md`) → Create v2 
 ### Test with F1.1 (Project Scaffolding)
 
 **Apply template to F1.1**:
-1. Create `work/features/f1.1-project-scaffolding/design.md` using v2 template
+1. Create `work/stories/f1.1-project-scaffolding/design.md` using v2 template
 2. Measure:
    - Creation time (target: <30 min)
    - Human review time (target: <5 min to understand)
@@ -458,10 +458,10 @@ Current template (`.raise/templates/tech/tech-design-feature.md`) → Create v2 
 
 ### Create ADR-XXX: Lean Feature Spec Format
 
-**Decision**: Adopt YAML+Markdown lean feature spec template with examples-first approach
+**Decision**: Adopt YAML+Markdown lean story spec template with examples-first approach
 
 **Alternatives considered**:
-1. **Full Gherkin for all features** - Rejected: Too verbose for simple features
+1. **Full Gherkin for all stories** - Rejected: Too verbose for simple features
 2. **Prose-only specs** - Rejected: Poor AI alignment (evidence from 5 sources)
 3. **Formal specs (ACSL, Lean)** - Rejected: Overkill for web/CLI context
 4. **No specs, direct to code** - Rejected: High misalignment risk (evidence from 6 sources)
@@ -476,8 +476,8 @@ Current template (`.raise/templates/tech/tech-design-feature.md`) → Create v2 
 
 ### Phase 1: Template Creation (Immediate)
 
-- [ ] Create `.raise/templates/tech/tech-design-feature-v2.md`
-- [ ] Create `.raise/katas/feature/design.md`
+- [ ] Create `.raise/templates/tech/tech-design-story-v2.md`
+- [ ] Create `.raise/katas/story/design.md`
 - [ ] Update `.raise/templates/README.md` to reference v2 template
 
 **Time estimate**: 1 hour
@@ -506,7 +506,7 @@ Current template (`.raise/templates/tech/tech-design-feature.md`) → Create v2 
 
 ### Accept: Examples Take Time to Write
 
-**Cost**: ~10 minutes per feature to write good examples
+**Cost**: ~10 minutes per story to write good examples
 **Benefit**: 5+ sources show examples improve AI accuracy significantly
 **RaiSE Alignment**: "Specs are source of truth; code is expression"
 
@@ -618,14 +618,14 @@ Current template (`.raise/templates/tech/tech-design-feature.md`) → Create v2 
 
 ### Backlog Impact
 
-- **No change to F1.1-F7.4 feature scope**
+- **No change to F1.1-F7.4 story scope**
 - **Adds**: Feature spec creation time (~30 min per moderate/complex feature)
 - **Reduces**: Misalignment rework time (expected net positive)
 - **Enables**: Faster review, better AI code generation
 
 ### Parking Lot Resolution
 
-This research resolves: "What makes a good lean feature spec for human-AI collaboration?"
+This research resolves: "What makes a good lean story spec for human-AI collaboration?"
 **Status**: Resolved with actionable recommendation
 
 ---

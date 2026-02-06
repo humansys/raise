@@ -12,12 +12,12 @@
 
 ## Objective
 
-**Complete the knowledge graph** so that all feature cycle skills have MVC (Minimum Viable Context) through graph recall, and skills can write back learnings for continuous improvement.
+**Complete the knowledge graph** so that all story cycle skills have MVC (Minimum Viable Context) through graph recall, and skills can write back learnings for continuous improvement.
 
 **Value proposition:**
-- /feature-design sees prior ADRs before making architecture decisions
-- /feature-implement has guardrails surfaced contextually
-- /feature-review can compare against calibration and persist patterns immediately
+- /story-design sees prior ADRs before making architecture decisions
+- /story-implement has guardrails surfaced contextually
+- /story-review can compare against calibration and persist patterns immediately
 - Knowledge compounds — learnings during features aren't lost
 
 ---
@@ -28,7 +28,7 @@
 - ADR extraction into unified graph (40+ decisions)
 - Guardrails extraction (code standards queryable)
 - Skill query alignment (fix type mismatches)
-- Memory write from /feature-review (bidirectional flow)
+- Memory write from /story-review (bidirectional flow)
 
 **SHOULD:**
 - Glossary extraction (terminology alignment)
@@ -54,7 +54,7 @@
 | F12.2 | **Guardrails Extractor** | S | ✅ Done | Extract guardrails as queryable nodes |
 | F12.3 | **Glossary Extractor** | S | ✅ Done | Extract glossary terms for terminology |
 | F12.4 | **Schema Extension** | XS | ✅ Done | Add `decision`, `guardrail`, `term` to NodeType |
-| F12.5 | **Skill Query Alignment** | S | ✅ Done | Fix query/type mismatches in feature cycle skills |
+| F12.5 | **Skill Query Alignment** | S | ✅ Done | Fix query/type mismatches in story cycle skills |
 | F12.6 | **Memory Write CLI** | M | ✅ Done | `raise memory add-pattern` command |
 
 **Total:** 6 features, ~10 SP estimated
@@ -65,7 +65,7 @@
 
 ### F12.1: ADR Extractor (M)
 
-**Problem:** 40+ ADRs exist but /feature-design can't query them.
+**Problem:** 40+ ADRs exist but /story-design can't query them.
 
 **Scope:**
 - New parser: `src/raise_cli/governance/parsers/adr.py`
@@ -156,15 +156,15 @@
 **Current mismatches:**
 | Skill | Current Query | Issue |
 |-------|---------------|-------|
-| /feature-design | `--types pattern,feature` | Needs `decision` |
-| /feature-review | `--types pattern,session` | Needs `calibration` |
+| /story-design | `--types pattern,feature` | Needs `decision` |
+| /story-review | `--types pattern,session` | Needs `calibration` |
 
 **Scope:**
 - Audit all 9 skill queries
 - Update type filters to match phase MVC
 - Document MVC in each skill
 
-**Files:** `.claude/skills/*/SKILL.md` (6 feature cycle skills)
+**Files:** `.claude/skills/*/SKILL.md` (6 story cycle skills)
 
 **MVC per phase:**
 | Phase | Types to Query |
@@ -184,12 +184,12 @@
 - New command: `raise memory add-pattern`
 - Add to patterns.jsonl immediately
 - Deduplicate by content similarity
-- Integrate into /feature-review
+- Integrate into /story-review
 
 **Files:**
 - `src/raise_cli/cli/commands/memory.py` (extend)
 - `src/raise_cli/memory/patterns.py` (new or extend)
-- `.claude/skills/feature-review/SKILL.md` (integrate)
+- `.claude/skills/story-review/SKILL.md` (integrate)
 
 **CLI signature:**
 ```bash
@@ -212,8 +212,8 @@ raise memory add-pattern "Pattern content" \
 - [x] All 6 features complete (F12.1-F12.6)
 - [x] `raise context query "ADR" --unified --types decision` works
 - [x] `raise context query "type hints" --unified --types guardrail` works
-- [x] `/feature-design` queries return ADR nodes (via `--types decision`)
-- [x] `/feature-review` can persist patterns via CLI (Step 4.5 added in v1.1.0)
+- [x] `/story-design` queries return ADR nodes (via `--types decision`)
+- [x] `/story-review` can persist patterns via CLI (Step 4.5 added in v1.1.0)
 - [x] ADR-020 status updated to "Accepted"
 - [x] Epic merged to v2
 
@@ -301,7 +301,7 @@ Still well under 1K — no performance concerns.
 |-----------|----------|--------|------------------|------|
 | **M1: Walking Skeleton** | F12.4, F12.1 | Day 1-2 | `raise context query "ADR" --types decision` works | Query returns ADR-019, ADR-020 |
 | **M2: Full Extraction** | +F12.2, F12.3, F12.6 | Day 3-4 | All governance types extractable, memory write works | Query guardrails, glossary; add pattern via CLI |
-| **M3: Skills Aligned** | +F12.5 | Day 5 | All feature cycle skills use correct types | /feature-design finds ADRs |
+| **M3: Skills Aligned** | +F12.5 | Day 5 | All story cycle skills use correct types | /story-design finds ADRs |
 | **M4: Epic Complete** | Integration | Day 6 | Done criteria met, ADR-020 accepted | Full demo, retrospective |
 
 ### Parallel Work Streams
@@ -332,7 +332,7 @@ Stream 4 (Independent):      F12.6 ───────────────
 | F12.1: ADR Extractor | M | ✅ Done | ~20 min | 2x | YAML frontmatter only (26 ADRs), fixed project NodeType |
 | F12.2: Guardrails Extractor | S | ✅ Done | ~20 min | 1.5x | 20 guardrails, PAT-059 documented |
 | F12.3: Glossary Extractor | S | ✅ Done | ~20 min | 1.75x | 59 terms, PAT-038 validated |
-| F12.6: Memory Write CLI | M | ✅ Done | ~5 min | Fast | Already implemented; added /feature-review integration |
+| F12.6: Memory Write CLI | M | ✅ Done | ~5 min | Fast | Already implemented; added /story-review integration |
 | F12.5: Skill Query Alignment | S | Pending | - | - | |
 
 **Milestone Progress:**
@@ -371,7 +371,7 @@ Stream 4 (Independent):      F12.6 ───────────────
 - **Position:** Flexible (start after M1)
 - **Rationale:** Independent track; doesn't block extractors
 - **Dependencies:** None (uses existing patterns.jsonl)
-- **Enables:** /feature-review integration
+- **Enables:** /story-review integration
 - **Risk:** Medium (deduplication logic)
 - **Parallel:** Yes (fully independent)
 
@@ -388,7 +388,7 @@ Stream 4 (Independent):      F12.6 ───────────────
 | Risk | Likelihood | Impact | Mitigation |
 |------|:----------:|:------:|------------|
 | ADR v1 format harder than expected | Medium | Medium | Timebox to 2h; fallback to root+v2 only |
-| Parallel extractors conflict on extractor.py | Low | Low | Clear integration points; feature branches |
+| Parallel extractors conflict on extractor.py | Low | Low | Clear integration points; story branches |
 | Memory write dedup blocks review | Medium | Low | Start simple (exact match); iterate |
 
 ### Velocity Assumptions
@@ -411,4 +411,4 @@ Stream 4 (Independent):      F12.6 ───────────────
 
 *Epic planned: 2026-02-03*
 *ADR: ADR-020 (Proposed)*
-*Next: `/feature-design` for F12.4 (Schema Extension)*
+*Next: `/story-design` for F12.4 (Schema Extension)*

@@ -164,7 +164,7 @@ Based on triangulated evidence:
 
 ```yaml
 ---
-feature_id: "F1.1"
+story_id: "F1.1"
 title: "Project Scaffolding"
 epic: "E1 Core Foundation"
 story_points: 3
@@ -208,7 +208,7 @@ Use `**IMPORTANT:**`, `**MUST:**`, `**DO NOT:**` for critical requirements
 ```markdown
 ---
 # YAML Frontmatter (CSF-3)
-feature_id: "[F#.#]"
+story_id: "[F#.#]"
 title: "[Feature Name]"
 epic: "[E# Epic Name]"
 complexity: "[simple|moderate|complex]"

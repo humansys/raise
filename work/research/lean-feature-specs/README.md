@@ -1,6 +1,6 @@
 # Research: Lean Feature Specification Format
 
-> What makes a good feature spec for human understanding + AI alignment?
+> What makes a good story spec for human understanding + AI alignment?
 > Research completed: 2026-01-31
 > Confidence: HIGH
 
@@ -10,11 +10,11 @@
 
 ### Research Question
 
-**What are the critical success factors for a lean feature specification format that optimizes for both human understanding (reviewability, clarity) and AI alignment (sufficient context for accurate code generation)?**
+**What are the critical success factors for a lean story specification format that optimizes for both human understanding (reviewability, clarity) and AI alignment (sufficient context for accurate code generation)?**
 
 ### Decision Context
 
-Design of `feature/design` kata and `.raise/templates/tech/tech-design-feature-v2.md` template for RaiSE framework
+Design of `feature/design` kata and `.raise/templates/tech/tech-design-story-v2.md` template for RaiSE framework
 
 ### Key Finding
 
@@ -25,8 +25,8 @@ Design of `feature/design` kata and `.raise/templates/tech/tech-design-feature-v
 
 ### Recommendation
 
-**Implement lean feature spec template with:**
-1. **YAML frontmatter** - Structured metadata (feature_id, complexity, etc.)
+**Implement lean story spec template with:**
+1. **YAML frontmatter** - Structured metadata (story_id, complexity, etc.)
 2. **4 Required sections** - What/Why, Approach, Examples, Acceptance Criteria
 3. **4 Optional sections** - Scenarios, Algorithm, Constraints, Testing (use for complex features)
 4. **Concrete examples** - Code samples, not just prose (most critical for AI)
@@ -123,8 +123,8 @@ Design of `feature/design` kata and `.raise/templates/tech/tech-design-feature-v
 ## Implementation Checklist
 
 ### Phase 1: Template Creation ✓ NEXT
-- [ ] Create `.raise/templates/tech/tech-design-feature-v2.md`
-- [ ] Create `.raise/katas/feature/design.md`
+- [ ] Create `.raise/templates/tech/tech-design-story-v2.md`
+- [ ] Create `.raise/katas/story/design.md`
 - [ ] Update `.raise/templates/README.md`
 
 ### Phase 2: Validation
