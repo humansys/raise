@@ -286,8 +286,8 @@ class TestCommandUsage:
 class TestWorkLifecycle:
     """Tests for WorkLifecycle schema (unified Lean flow analysis)."""
 
-    def test_create_feature_start_event(self, now: datetime) -> None:
-        """Create a feature start event."""
+    def test_create_story_start_event(self, now: datetime) -> None:
+        """Create a story start event."""
         event = WorkLifecycle(
             timestamp=now,
             work_type="story",
@@ -514,8 +514,8 @@ class TestSignalUnion:
         assert isinstance(signal, CommandUsage)
         assert signal.command == "memory"
 
-    def test_parse_work_lifecycle_feature(self, now: datetime) -> None:
-        """Parse WorkLifecycle for feature from JSON via discriminated union."""
+    def test_parse_work_lifecycle_story(self, now: datetime) -> None:
+        """Parse WorkLifecycle for story from JSON via discriminated union."""
         data = {
             "type": "work_lifecycle",
             "timestamp": now.isoformat(),

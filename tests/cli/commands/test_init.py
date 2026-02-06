@@ -552,3 +552,23 @@ class TestInitBootstrap:
         assert result.exit_code == 0
         output_lower = result.output.lower()
         assert "identity" in output_lower or "rai" in output_lower
+
+    def test_init_generates_canonical_memory_md(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should generate MEMORY.md to canonical location."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        canonical = (
+            greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
+        )
+        assert canonical.exists()
+        content = canonical.read_text()
+        assert "# Rai Memory" in content
+        assert "RaiSE Framework Process" in content

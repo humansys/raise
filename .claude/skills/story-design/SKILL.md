@@ -2,13 +2,13 @@
 name: story-design
 description: >
   Create lean story specifications optimized for both human understanding
-  and AI alignment. Use before planning complex features (>3 components, >5 SP),
+  and AI alignment. Use before planning complex stories (>3 components, >5 SP),
   when architectural decisions are needed, or when AI will generate significant code.
 
 license: MIT
 
 metadata:
-  raise.work_cycle: feature
+  raise.work_cycle: story
   raise.frequency: per-story-as-needed
   raise.fase: "4"
   raise.prerequisites: project-backlog

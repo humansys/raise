@@ -123,8 +123,8 @@ def extract_epic_details(
     # Extract frontmatter
     frontmatter = _extract_frontmatter(text)
 
-    # Count features in table
-    feature_count = len(re.findall(r"^\|\s*F\d+\.\d+\s*\|", text, re.MULTILINE))
+    # Count stories in table
+    story_count = len(re.findall(r"^\|\s*F\d+\.\d+\s*\|", text, re.MULTILINE))
 
     # Calculate relative file path
     try:
@@ -165,7 +165,7 @@ def extract_epic_details(
             "branch": frontmatter["branch"],
             "created": frontmatter["created"],
             "completed": frontmatter["completed"],
-            "feature_count": feature_count,
+            "story_count": story_count,
             "scope_doc": relative_path,
         },
     )
@@ -189,8 +189,8 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
     Examples:
         >>> from pathlib import Path
         >>> scope_doc = Path("work/epics/e08-backlog/scope.md")
-        >>> features = extract_stories(scope_doc)
-        >>> len(features)
+        >>> stories = extract_stories(scope_doc)
+        >>> len(stories)
         4
         >>> features[0].metadata["story_id"]
         'F8.1'

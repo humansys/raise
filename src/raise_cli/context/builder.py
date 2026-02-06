@@ -218,7 +218,7 @@ class UnifiedGraphBuilder:
     def load_work(self) -> list[ConceptNode]:
         """Load concepts from work tracking (backlog, epics).
 
-        Uses E8 parsers to extract epics and features.
+        Uses E8 parsers to extract epics and stories.
 
         Returns:
             List of ConceptNode for work concepts.
@@ -229,9 +229,9 @@ class UnifiedGraphBuilder:
         epics = self._extract_epics()
         nodes.extend(self._concept_to_node(e) for e in epics)
 
-        # Load features from epic scopes
-        features = self._extract_stories()
-        nodes.extend(self._concept_to_node(f) for f in features)
+        # Load stories from epic scopes
+        stories = self._extract_stories()
+        nodes.extend(self._concept_to_node(s) for s in stories)
 
         return nodes
 
@@ -430,24 +430,24 @@ class UnifiedGraphBuilder:
         return epics
 
     def _extract_stories(self) -> list[Concept]:
-        """Extract features from epic scope files.
+        """Extract stories from epic scope files.
 
         Returns:
             List of story Concept objects.
         """
         from raise_cli.governance.parsers.epic import extract_stories
 
-        features: list[Concept] = []
+        stories: list[Concept] = []
 
         # Find epic scope files
         for epic_path in self._find_epic_scopes():
             try:
                 extracted = extract_stories(epic_path, self.project_root)
-                features.extend(extracted)
+                stories.extend(extracted)
             except Exception:
                 continue
 
-        return features
+        return stories
 
     def _find_backlogs(self) -> list[Path]:
         """Find backlog.md files in project.

@@ -1,7 +1,7 @@
 ---
 id: plan
 titulo: "Plan: Implementation Planning"
-work_cycle: feature
+work_cycle: story
 frequency: per-story
 fase_metodologia: 5
 
@@ -9,7 +9,7 @@ prerequisites:
   - project/backlog
 template: null
 gate: gates/gate-plan.md
-next_kata: feature/implement
+next_kata: story/implement
 
 adaptable: true
 shuhari:
