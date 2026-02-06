@@ -8,6 +8,9 @@ CLAUDE.local.md
 # RaiSE generated/cache files
 .raise/cache/
 
+# RaiSE personal directory (per-developer, not shared)
+.raise/rai/personal/
+
 # Temporary files
 *.tmp
 *.log

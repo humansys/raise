@@ -23,7 +23,7 @@ from rich.console import Console
 from rich.table import Table
 
 from raise_cli.cli.error_handler import cli_error
-from raise_cli.config.paths import get_memory_dir
+from raise_cli.config.paths import get_memory_dir, get_personal_dir
 from raise_cli.context import UnifiedGraph, UnifiedGraphBuilder
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
@@ -35,12 +35,14 @@ from raise_cli.context.query import (
 from raise_cli.governance import ConceptType, GovernanceExtractor
 from raise_cli.memory import (
     CalibrationInput,
+    MemoryScope,
     PatternInput,
     PatternSubType,
     SessionInput,
     append_calibration,
     append_pattern,
     append_session,
+    get_memory_dir_for_scope,
 )
 from raise_cli.telemetry.schemas import (
     CalibrationEvent,
@@ -776,15 +778,19 @@ def add_pattern(
         str | None,
         typer.Option("--from", "-f", help="Feature/session where learned"),
     ] = None,
+    scope: Annotated[
+        str,
+        typer.Option("--scope", "-s", help="Memory scope (global, project, personal)"),
+    ] = "project",
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path"),
+        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
     ] = None,
 ) -> None:
     """Add a new pattern to memory.
 
     Examples:
-        # Add a process pattern
+        # Add a process pattern (default: project scope)
         $ raise memory add-pattern "HITL before commits" -c "git,workflow"
 
         # Add a technical pattern
@@ -792,10 +798,28 @@ def add_pattern(
 
         # Add with source reference
         $ raise memory add-pattern "BFS reuse across modules" -t architecture --from F2.3
+
+        # Add to global scope (universal pattern)
+        $ raise memory add-pattern "Universal TDD pattern" --scope global
+
+        # Add to personal scope (my learnings)
+        $ raise memory add-pattern "My workflow preference" --scope personal
     """
-    mem_dir = memory_dir or _get_default_memory_dir()
+    # Parse scope
+    try:
+        memory_scope = MemoryScope(scope)
+    except ValueError:
+        cli_error(
+            f"Invalid scope: {scope}",
+            hint="Valid scopes: global, project, personal",
+            exit_code=7,
+        )
+        return  # cli_error exits, but this satisfies pyright
+
+    # Determine directory (explicit dir overrides scope)
+    mem_dir = memory_dir or get_memory_dir_for_scope(memory_scope)
     if not mem_dir.exists():
-        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
+        mem_dir.mkdir(parents=True, exist_ok=True)
 
     # Parse context
     context_list = [c.strip() for c in context.split(",") if c.strip()]
@@ -809,6 +833,7 @@ def add_pattern(
             hint="Valid types: codebase, process, architecture, technical",
             exit_code=7,
         )
+        return  # cli_error exits, but this satisfies pyright
 
     input_data = PatternInput(
         content=content,
@@ -817,7 +842,7 @@ def add_pattern(
         learned_from=learned_from,
     )
 
-    result = append_pattern(mem_dir, input_data)
+    result = append_pattern(mem_dir, input_data, scope=memory_scope)
 
     if result.success:
         console.print(f"\n[green]✓[/green] {result.message}")
@@ -861,15 +886,19 @@ def add_calibration_cmd(
         str | None,
         typer.Option("--notes", "-n", help="Additional notes"),
     ] = None,
+    scope: Annotated[
+        str,
+        typer.Option("--scope", help="Memory scope (global, project, personal)"),
+    ] = "project",
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path"),
+        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
     ] = None,
 ) -> None:
     """Add calibration data for a completed feature.
 
     Examples:
-        # Basic calibration
+        # Basic calibration (default: project scope)
         $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
 
         # With estimate for velocity calculation
@@ -877,10 +906,25 @@ def add_calibration_cmd(
 
         # Full details
         $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
+
+        # Add to personal scope
+        $ raise memory add-calibration F3.5 --name "Skills" -s XS -a 20 --scope personal
     """
-    mem_dir = memory_dir or _get_default_memory_dir()
+    # Parse scope
+    try:
+        memory_scope = MemoryScope(scope)
+    except ValueError:
+        cli_error(
+            f"Invalid scope: {scope}",
+            hint="Valid scopes: global, project, personal",
+            exit_code=7,
+        )
+        return  # cli_error exits, but this satisfies pyright
+
+    # Determine directory (explicit dir overrides scope)
+    mem_dir = memory_dir or get_memory_dir_for_scope(memory_scope)
     if not mem_dir.exists():
-        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
+        mem_dir.mkdir(parents=True, exist_ok=True)
 
     # Validate size
     valid_sizes = ["XS", "S", "M", "L", "XL"]
@@ -890,6 +934,7 @@ def add_calibration_cmd(
             hint=f"Valid sizes: {', '.join(valid_sizes)}",
             exit_code=7,
         )
+        return  # cli_error exits, but this satisfies pyright
 
     input_data = CalibrationInput(
         feature=feature,
@@ -902,7 +947,7 @@ def add_calibration_cmd(
         notes=notes,
     )
 
-    result = append_calibration(mem_dir, input_data)
+    result = append_calibration(mem_dir, input_data, scope=memory_scope)
 
     if result.success:
         console.print(f"\n[green]✓[/green] {result.message}")
@@ -937,7 +982,9 @@ def add_session_cmd(
         typer.Option("--memory-dir", "-m", help="Memory directory path"),
     ] = None,
 ) -> None:
-    """Add a session record to memory.
+    """Add a session record to memory (personal scope).
+
+    Sessions are developer-specific and always written to personal directory.
 
     Examples:
         # Basic session
@@ -949,9 +996,10 @@ def add_session_cmd(
         # Full details
         $ raise memory add-session "F3.5 Skills Integration" -t feature -o "Writer API,Hooks" -l "dev/sessions/2026-02-02-f3.5.md"
     """
-    mem_dir = memory_dir or _get_default_memory_dir()
+    # Sessions always go to personal directory (developer-specific)
+    mem_dir = memory_dir or get_personal_dir()
     if not mem_dir.exists():
-        cli_error(f"Memory directory not found: {mem_dir}", exit_code=4)
+        mem_dir.mkdir(parents=True, exist_ok=True)
 
     # Parse outcomes
     outcomes_list = [o.strip() for o in outcomes.split(",") if o.strip()]

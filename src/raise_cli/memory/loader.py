@@ -15,6 +15,7 @@ from raise_cli.memory.models import (
     MemoryConcept,
     MemoryConceptType,
     MemoryLoadResult,
+    MemoryScope,
 )
 
 
@@ -33,11 +34,14 @@ def parse_date(date_str: str) -> date:
     return date.fromisoformat(date_str)
 
 
-def load_pattern(data: dict[str, Any]) -> MemoryConcept:
+def load_pattern(
+    data: dict[str, Any], scope: MemoryScope = MemoryScope.PROJECT
+) -> MemoryConcept:
     """Load a pattern concept from JSONL data.
 
     Args:
         data: Dictionary from JSONL line.
+        scope: Memory scope (global, project, or personal).
 
     Returns:
         MemoryConcept for the pattern.
@@ -56,15 +60,19 @@ def load_pattern(data: dict[str, Any]) -> MemoryConcept:
         metadata={
             "sub_type": data.get("type", "unknown"),
             "learned_from": data.get("learned_from"),
+            "scope": scope.value,
         },
     )
 
 
-def load_calibration(data: dict[str, Any]) -> MemoryConcept:
+def load_calibration(
+    data: dict[str, Any], scope: MemoryScope = MemoryScope.PROJECT
+) -> MemoryConcept:
     """Load a calibration concept from JSONL data.
 
     Args:
         data: Dictionary from JSONL line.
+        scope: Memory scope (global, project, or personal).
 
     Returns:
         MemoryConcept for the calibration.
@@ -106,15 +114,19 @@ def load_calibration(data: dict[str, Any]) -> MemoryConcept:
             "ratio": velocity,
             "kata_cycle": data.get("kata_cycle", False),
             "notes": data.get("notes"),
+            "scope": scope.value,
         },
     )
 
 
-def load_session(data: dict[str, Any]) -> MemoryConcept:
+def load_session(
+    data: dict[str, Any], scope: MemoryScope = MemoryScope.PROJECT
+) -> MemoryConcept:
     """Load a session concept from JSONL data.
 
     Args:
         data: Dictionary from JSONL line.
+        scope: Memory scope (global, project, or personal).
 
     Returns:
         MemoryConcept for the session.
@@ -143,18 +155,22 @@ def load_session(data: dict[str, Any]) -> MemoryConcept:
             "topic": topic,
             "outcomes": data.get("outcomes", []),
             "log_path": data.get("log_path"),
+            "scope": scope.value,
         },
     )
 
 
 def load_jsonl_file(
-    file_path: Path, concept_type: MemoryConceptType
+    file_path: Path,
+    concept_type: MemoryConceptType,
+    scope: MemoryScope = MemoryScope.PROJECT,
 ) -> tuple[list[MemoryConcept], list[str]]:
     """Load concepts from a single JSONL file.
 
     Args:
         file_path: Path to the JSONL file.
         concept_type: Type of concepts in the file.
+        scope: Memory scope to assign to loaded concepts.
 
     Returns:
         Tuple of (concepts list, errors list).
@@ -179,7 +195,7 @@ def load_jsonl_file(
                 continue
             try:
                 data = json.loads(line)
-                concept = loader(data)
+                concept = loader(data, scope=scope)
                 concepts.append(concept)
             except (json.JSONDecodeError, KeyError, ValueError) as e:
                 errors.append(f"{file_path.name}:{line_num}: {e}")
