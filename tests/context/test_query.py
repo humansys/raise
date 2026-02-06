@@ -55,17 +55,17 @@ def sample_graph() -> UnifiedGraph:
             content="F2.1 Concept Extraction: Size S, Est 180m, Actual 52m, Velocity 3.5x",
             source_file=".raise/rai/memory/calibration.jsonl",
             created="2026-01-31",
-            metadata={"feature": "F2.1", "velocity": 3.5},
+            metadata={"story": "F2.1", "velocity": 3.5},
         )
     )
 
     # Add skill nodes
     graph.add_concept(
         ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Decompose user stories into atomic executable tasks",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-01-30",
             metadata={"needs_context": ["pattern", "calibration"]},
         )

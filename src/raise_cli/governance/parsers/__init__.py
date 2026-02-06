@@ -11,7 +11,7 @@ from raise_cli.governance.parsers.adr import (
 )
 from raise_cli.governance.parsers.backlog import extract_epics, extract_project
 from raise_cli.governance.parsers.constitution import extract_principles
-from raise_cli.governance.parsers.epic import extract_epic_details, extract_features
+from raise_cli.governance.parsers.epic import extract_epic_details, extract_stories
 from raise_cli.governance.parsers.guardrails import (
     extract_all_guardrails,
     extract_guardrails,
@@ -26,7 +26,7 @@ __all__ = [
     "extract_project",
     "extract_epics",
     "extract_epic_details",
-    "extract_features",
+    "extract_stories",
     "extract_decisions",
     "extract_decision_from_file",
     "extract_all_decisions",

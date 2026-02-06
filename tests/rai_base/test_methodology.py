@@ -71,7 +71,7 @@ class TestMethodologySkills:
 
     def test_has_skill_categories(self, skills: dict) -> None:
         """Has expected skill categories."""
-        expected = {"session", "epic", "feature", "discovery", "meta", "other"}
+        expected = {"session", "epic", "story", "discovery", "meta", "other"}
         assert expected.issubset(set(skills.keys()))
 
     def test_session_skills_present(self, skills: dict) -> None:
@@ -90,15 +90,15 @@ class TestMethodologySkills:
         assert "/epic-plan" in names
         assert "/epic-close" in names
 
-    def test_feature_skills_present(self, skills: dict) -> None:
-        """Feature skills are defined."""
-        feature_skills = skills["feature"]
+    def test_story_skills_present(self, skills: dict) -> None:
+        """Story skills are defined."""
+        feature_skills = skills["story"]
         names = [s["name"] for s in feature_skills]
-        assert "/feature-start" in names
-        assert "/feature-plan" in names
-        assert "/feature-implement" in names
-        assert "/feature-review" in names
-        assert "/feature-close" in names
+        assert "/story-start" in names
+        assert "/story-plan" in names
+        assert "/story-implement" in names
+        assert "/story-review" in names
+        assert "/story-close" in names
 
     def test_skills_have_required_fields(self, skills: dict) -> None:
         """All skills have name, purpose, when fields."""
@@ -147,10 +147,10 @@ class TestMethodologyGates:
         befores = [g["before"].lower() for g in gates["blocking"]]
         assert any("epic" in b for b in befores)
 
-    def test_feature_branch_gate_exists(self, gates: dict) -> None:
-        """Feature branch gate exists."""
+    def test_story_branch_gate_exists(self, gates: dict) -> None:
+        """Story branch gate exists."""
         befores = [g["before"].lower() for g in gates["blocking"]]
-        assert any("feature" in b for b in befores)
+        assert any("story" in b for b in befores)
 
 
 class TestMethodologyPrinciples:
@@ -199,9 +199,9 @@ class TestMethodologyLifecycle:
         return methodology["lifecycle"]
 
     def test_has_lifecycle_levels(self, lifecycle: dict) -> None:
-        """Has epic, feature, session lifecycles."""
+        """Has epic, story, session lifecycles."""
         assert "epic" in lifecycle
-        assert "feature" in lifecycle
+        assert "story" in lifecycle
         assert "session" in lifecycle
 
     def test_lifecycles_have_flow(self, lifecycle: dict) -> None:

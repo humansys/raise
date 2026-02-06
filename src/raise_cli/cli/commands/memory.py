@@ -937,7 +937,7 @@ def add_calibration_cmd(
         return  # cli_error exits, but this satisfies pyright
 
     input_data = CalibrationInput(
-        feature=feature,
+        story=feature,
         name=name,
         size=size.upper(),
         sp=sp,
@@ -972,7 +972,7 @@ def add_session_cmd(
     session_type: Annotated[
         str,
         typer.Option("--type", "-t", help="Session type (feature, research, etc.)"),
-    ] = "feature",
+    ] = "story",
     log_path: Annotated[
         str | None,
         typer.Option("--log", "-l", help="Path to session log file"),
@@ -1088,7 +1088,7 @@ def emit_work(
         $ raise memory emit-work feature F9.4 -e unblocked -p plan
     """
     # Validate work type
-    valid_work_types: list[Literal["epic", "feature"]] = ["epic", "feature"]
+    valid_work_types: list[Literal["epic", "story"]] = ["epic", "story"]
     work_type_lower = work_type.lower()
     if work_type_lower not in valid_work_types:
         cli_error(
@@ -1175,7 +1175,7 @@ def emit_session_event(
         typer.Option(
             "--type", "-t", help="Session type (e.g., feature, research, maintenance)"
         ),
-    ] = "feature",
+    ] = "story",
     outcome: Annotated[
         str,
         typer.Option(
@@ -1270,7 +1270,7 @@ def emit_calibration_event(
     """Emit a calibration event to telemetry.
 
     Records estimate vs actual for velocity tracking and pattern detection.
-    Called at the end of /feature-review to capture calibration data.
+    Called at the end of /story-review to capture calibration data.
 
     Velocity is calculated automatically: estimated / actual.
     - velocity > 1.0 means faster than estimated
@@ -1308,8 +1308,8 @@ def emit_calibration_event(
     # Create event
     event = CalibrationEvent(
         timestamp=datetime.now(UTC),
-        feature_id=feature,
-        feature_size=size_upper,
+        story_id=feature,
+        story_size=size_upper,
         estimated_min=estimated,
         actual_min=actual,
         velocity=velocity,

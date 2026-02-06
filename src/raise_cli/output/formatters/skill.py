@@ -33,7 +33,7 @@ def format_skill_list_human(
     console.print(f"[bold]Skills[/bold] ({len(skills)} found)\n")
 
     # Define lifecycle order for consistent output
-    lifecycle_order = ["session", "epic", "feature", "discovery", "utility", "meta", "unknown"]
+    lifecycle_order = ["session", "epic", "story", "discovery", "utility", "meta", "unknown"]
 
     for lifecycle in lifecycle_order:
         if lifecycle not in grouped:

@@ -226,7 +226,7 @@ class UnifiedGraphBuilder:
         nodes.extend(self._concept_to_node(e) for e in epics)
 
         # Load features from epic scopes
-        features = self._extract_features()
+        features = self._extract_stories()
         nodes.extend(self._concept_to_node(f) for f in features)
 
         return nodes
@@ -367,8 +367,8 @@ class UnifiedGraphBuilder:
         if node_type == "pattern":
             content = record.get("content", "")
         elif node_type == "calibration":
-            # Calibration uses feature + name
-            feature = record.get("feature", "")
+            # Calibration uses story + name (backward compat: "feature" key)
+            feature = record.get("story") or record.get("feature", "")
             name = record.get("name", "")
             content = f"{feature}: {name}" if feature else name
         elif node_type == "session":
@@ -421,20 +421,20 @@ class UnifiedGraphBuilder:
 
         return epics
 
-    def _extract_features(self) -> list[Concept]:
+    def _extract_stories(self) -> list[Concept]:
         """Extract features from epic scope files.
 
         Returns:
             List of feature Concept objects.
         """
-        from raise_cli.governance.parsers.epic import extract_features
+        from raise_cli.governance.parsers.epic import extract_stories
 
         features: list[Concept] = []
 
         # Find epic scope files
         for epic_path in self._find_epic_scopes():
             try:
-                extracted = extract_features(epic_path, self.project_root)
+                extracted = extract_stories(epic_path, self.project_root)
                 features.extend(extracted)
             except Exception:
                 continue
@@ -561,14 +561,14 @@ class UnifiedGraphBuilder:
         edges: list[ConceptEdge] = []
 
         for node in nodes:
-            if node.type != "feature":
+            if node.type != "story":
                 continue
 
             # Extract epic ID from feature ID (e.g., F11.2 -> E11)
-            feature_id = node.id
-            if feature_id.startswith("F"):
+            story_id = node.id
+            if story_id.startswith("F"):
                 # Parse epic number from feature ID
-                parts = feature_id[1:].split(".")
+                parts = story_id[1:].split(".")
                 if parts:
                     epic_id = f"E{parts[0]}"
                     if epic_id in node_by_id:

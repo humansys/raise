@@ -12,7 +12,7 @@ from raise_cli.governance.models import Concept, ConceptType, ExtractionResult
 from raise_cli.governance.parsers.adr import extract_all_decisions
 from raise_cli.governance.parsers.backlog import extract_epics, extract_project
 from raise_cli.governance.parsers.constitution import extract_principles
-from raise_cli.governance.parsers.epic import extract_epic_details, extract_features
+from raise_cli.governance.parsers.epic import extract_epic_details, extract_stories
 from raise_cli.governance.parsers.glossary import extract_all_terms
 from raise_cli.governance.parsers.guardrails import extract_all_guardrails
 from raise_cli.governance.parsers.prd import extract_requirements
@@ -269,7 +269,7 @@ class GovernanceExtractor:
                     logger.info(f"Extracted epic details from {scope_file.name}")
 
                 # Extract Feature concepts
-                features = extract_features(scope_file, self.project_root)
+                features = extract_stories(scope_file, self.project_root)
                 concepts.extend(features)
                 logger.info(
                     f"Extracted {len(features)} features from {scope_file.name}"

@@ -16,7 +16,7 @@ from raise_cli.skills.locator import get_default_skill_dir
 DOMAIN_TO_LIFECYCLE = {
     "session": "session",
     "epic": "epic",
-    "feature": "feature",
+    "story": "story",
     "discover": "discovery",
     "skill": "meta",
     "research": "utility",
@@ -60,7 +60,7 @@ def _generate_skill_content(
     frequency_map = {
         "session": "per-session",
         "epic": "per-epic",
-        "feature": "per-feature",
+        "story": "per-story",
         "discovery": "per-project",
         "utility": "on-demand",
         "meta": "on-demand",

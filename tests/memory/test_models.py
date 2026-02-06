@@ -94,7 +94,7 @@ class TestMemoryConcept:
             content="F2.1 Concept Extraction - actual: 52min - velocity: 3.5x",
             context=["F2.1", "s", "kata-cycle"],
             created=date(2026, 1, 31),
-            metadata={"feature": "F2.1", "ratio": 3.5},
+            metadata={"story": "F2.1", "ratio": 3.5},
         )
         assert concept.id == "CAL-001"
         assert concept.type == MemoryConceptType.CALIBRATION
@@ -106,13 +106,13 @@ class TestMemoryConcept:
             id="SES-001",
             type=MemoryConceptType.SESSION,
             content="E3 Implementation Plan: /epic-plan skill complete",
-            context=["feature", "epic", "implementation"],
+            context=["story", "epic", "implementation"],
             created=date(2026, 2, 1),
-            metadata={"session_type": "feature", "topic": "E3 Implementation Plan"},
+            metadata={"session_type": "story", "topic": "E3 Implementation Plan"},
         )
         assert concept.id == "SES-001"
         assert concept.type == MemoryConceptType.SESSION
-        assert concept.metadata["session_type"] == "feature"
+        assert concept.metadata["session_type"] == "story"
 
     def test_default_context_is_empty_list(self) -> None:
         """Context defaults to empty list."""

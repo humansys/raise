@@ -88,7 +88,7 @@ def emit(
         >>> from raise_cli.telemetry import SkillEvent, emit
         >>> event = SkillEvent(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     skill="feature-design",
+        ...     skill="story-design",
         ...     event="start"
         ... )
         >>> result = emit(event)
@@ -133,7 +133,7 @@ def emit_skill_event(
     """Convenience function to emit a skill event.
 
     Args:
-        skill: Name of the skill (e.g., "feature-design").
+        skill: Name of the skill (e.g., "story-design").
         event: Event type ("start", "complete", "abandon").
         duration_sec: Duration in seconds (for complete/abandon).
         base_path: Base directory for telemetry.

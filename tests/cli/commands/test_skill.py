@@ -32,18 +32,18 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         # Session Start
     """))
 
-    # Create feature-plan skill
-    feature_plan = skills / "feature-plan"
+    # Create story-plan skill
+    feature_plan = skills / "story-plan"
     feature_plan.mkdir()
     (feature_plan / "SKILL.md").write_text(dedent("""\
         ---
-        name: feature-plan
+        name: story-plan
         description: Plan a feature implementation
         metadata:
-          raise.work_cycle: feature
+          raise.work_cycle: story
           raise.version: "1.0.0"
         ---
-        # Feature Plan
+        # Story Plan
     """))
 
     # Create debug skill
@@ -75,7 +75,7 @@ class TestSkillList:
         result = runner.invoke(app, ["skill", "list"])
         assert result.exit_code == 0
         assert "session-start" in result.stdout
-        assert "feature-plan" in result.stdout
+        assert "story-plan" in result.stdout
         assert "debug" in result.stdout
 
     def test_list_skills_json(self, skill_project: Path) -> None:
@@ -86,7 +86,7 @@ class TestSkillList:
         assert "skills" in data
         assert len(data["skills"]) == 3
         names = {s["name"] for s in data["skills"]}
-        assert names == {"session-start", "feature-plan", "debug"}
+        assert names == {"session-start", "story-plan", "debug"}
 
     def test_list_skills_json_structure(self, skill_project: Path) -> None:
         """Verify JSON output structure."""
@@ -107,7 +107,7 @@ class TestSkillList:
         assert result.exit_code == 0
         # Check that lifecycle headers appear
         assert "session" in result.stdout.lower()
-        assert "feature" in result.stdout.lower()
+        assert "story" in result.stdout.lower()
         assert "utility" in result.stdout.lower()
 
     def test_list_skills_empty_dir(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -368,10 +368,10 @@ class TestSkillScaffold:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--after", "feature-start"])
+        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--after", "story-start"])
         assert result.exit_code == 0
         content = (skills / "test-action" / "SKILL.md").read_text()
-        assert "feature-start" in content
+        assert "story-start" in content
 
     def test_scaffold_with_before(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Scaffold with next skill."""
@@ -379,10 +379,10 @@ class TestSkillScaffold:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--before", "feature-close"])
+        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--before", "story-close"])
         assert result.exit_code == 0
         content = (skills / "test-action" / "SKILL.md").read_text()
-        assert "feature-close" in content
+        assert "story-close" in content
 
     def test_scaffold_json_output(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """JSON output format works."""

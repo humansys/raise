@@ -136,7 +136,7 @@ class TestAppendCalibration:
         memory_dir.mkdir()
 
         input_data = CalibrationInput(
-            feature="F3.5",
+            story="F3.5",
             name="Skills Integration",
             size="XS",
             sp=2,
@@ -153,7 +153,7 @@ class TestAppendCalibration:
 
         cal_file = memory_dir / "calibration.jsonl"
         data = json.loads(cal_file.read_text().strip())
-        assert data["feature"] == "F3.5"
+        assert data["story"] == "F3.5"
         assert data["ratio"] == 3.0  # 60 / 20
 
     def test_no_ratio_without_estimate(self, tmp_path: Path) -> None:
@@ -162,7 +162,7 @@ class TestAppendCalibration:
         memory_dir.mkdir()
 
         input_data = CalibrationInput(
-            feature="F1.1",
+            story="F1.1",
             name="Test Feature",
             size="S",
             actual_min=30,
@@ -185,7 +185,7 @@ class TestAppendSession:
 
         input_data = SessionInput(
             topic="F3.5 Skills Integration",
-            session_type="feature",
+            session_type="story",
             outcomes=["Writer API", "Hooks setup", "CLI commands"],
             log_path="dev/sessions/2026-02-02-f3.5.md",
         )
@@ -470,7 +470,7 @@ class TestAppendCalibrationWithScope:
         personal_dir.mkdir(parents=True)
 
         input_data = CalibrationInput(
-            feature="F1.1",
+            story="F1.1",
             name="Test Feature",
             size="S",
             actual_min=30,

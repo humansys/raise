@@ -23,7 +23,7 @@ class ConceptType(str, Enum):
         PRACTICE: Process practices from katas (future).
         PROJECT: Project from backlog (governance/projects/*/backlog.md).
         EPIC: Epic from backlog or epic scope documents.
-        FEATURE: Feature from epic scope documents.
+        STORY: Story from epic scope documents.
         DECISION: Architecture decision records (ADR-XXX format).
         GUARDRAIL: Code standards and quality rules.
         TERM: Glossary definitions for canonical terminology.
@@ -37,7 +37,7 @@ class ConceptType(str, Enum):
     # Work tracking types (E8)
     PROJECT = "project"
     EPIC = "epic"
-    FEATURE = "feature"
+    STORY = "story"
     # Knowledge graph completion types (E12)
     DECISION = "decision"
     GUARDRAIL = "guardrail"

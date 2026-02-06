@@ -207,8 +207,8 @@ class CalibrationInput(BaseModel):
     """Input for creating a new calibration entry.
 
     Attributes:
-        feature: Feature ID (e.g., 'F3.5').
-        name: Feature name.
+        story: Story ID (e.g., 'F3.5').
+        name: Story name.
         size: T-shirt size (XS, S, M, L, XL).
         sp: Story points.
         estimated_min: Estimated minutes (if any).
@@ -217,8 +217,8 @@ class CalibrationInput(BaseModel):
         notes: Additional notes.
     """
 
-    feature: str = Field(..., description="Feature ID (e.g., 'F3.5')")
-    name: str = Field(..., description="Feature name")
+    story: str = Field(..., description="Story ID (e.g., 'F3.5')")
+    name: str = Field(..., description="Story name")
     size: str = Field(..., description="T-shirt size (XS, S, M, L, XL)")
     sp: int | None = Field(default=None, description="Story points")
     estimated_min: int | None = Field(default=None, description="Estimated minutes")
@@ -239,7 +239,7 @@ class SessionInput(BaseModel):
 
     topic: str = Field(..., description="Session topic")
     session_type: str = Field(
-        default="feature", description="Session type (feature, research, etc.)"
+        default="story", description="Session type (feature, research, etc.)"
     )
     outcomes: list[str] = Field(default_factory=list, description="Session outcomes")
     log_path: str | None = Field(default=None, description="Path to session log")
@@ -398,7 +398,7 @@ def append_calibration(
 
     entry = {
         "id": cal_id,
-        "feature": input_data.feature,
+        "story": input_data.story,
         "name": input_data.name,
         "size": input_data.size,
         "sp": input_data.sp,
