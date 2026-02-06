@@ -61,8 +61,8 @@ Export validated components to JSON format ready for graph integration. This tra
 
 Read the draft file:
 
-```bash
-cat work/discovery/components-draft.yaml
+```
+Read: work/discovery/components-draft.yaml
 ```
 
 **Count:**

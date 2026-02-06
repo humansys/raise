@@ -63,8 +63,8 @@ Present synthesized component descriptions to the human for validation. The huma
 
 Read the draft file:
 
-```bash
-cat work/discovery/components-draft.yaml
+```
+Read: work/discovery/components-draft.yaml
 ```
 
 **Extract:**
