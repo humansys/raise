@@ -1,0 +1,240 @@
+# RaiSE Methodology Definition
+# Used to generate MEMORY.md Part 1 (static process knowledge)
+version: 1
+
+# =============================================================================
+# Work Lifecycle
+# =============================================================================
+lifecycle:
+  epic:
+    phases: [start, design, plan, implement, close]
+    flow: "/epic-start → /epic-design → /epic-plan → [features] → /epic-close"
+
+  feature:
+    phases: [start, design, plan, implement, review, close]
+    flow: "/feature-start → /feature-design* → /feature-plan → /feature-implement → /feature-review → /feature-close"
+    note: "*design optional for S/XS features"
+
+  session:
+    phases: [start, work, close]
+    flow: "/session-start → [work] → /session-close"
+
+# =============================================================================
+# Skills by Category
+# =============================================================================
+skills:
+  session:
+    - name: /session-start
+      purpose: Load memory, analyze progress, propose focused work
+      when: Beginning of any working session
+      adapts_to: Shu/Ha/Ri experience level
+
+    - name: /session-close
+      purpose: Capture learnings, update memory, log session
+      when: End of working session
+      creates: Session record, pattern updates
+
+  epic:
+    - name: /epic-start
+      purpose: Create epic branch from development branch
+      when: Starting a new epic
+      creates: Epic branch (poka-yoke gate for features)
+
+    - name: /epic-design
+      purpose: Design epic scope, features, architecture
+      when: After epic branch exists
+      creates: Epic scope document with feature breakdown
+
+    - name: /epic-plan
+      purpose: Sequence features with milestones and dependencies
+      when: After epic design approved
+      creates: Implementation roadmap
+
+    - name: /epic-close
+      purpose: Epic retrospective, metrics capture, merge to dev
+      when: All features complete
+      creates: Retrospective, branch cleanup
+
+  feature:
+    - name: /feature-start
+      purpose: Create feature branch and scope commit
+      when: Starting a new feature
+      creates: Feature branch, scope documentation
+      verifies: Epic branch exists
+
+    - name: /feature-design
+      purpose: Create lean specification for complex features
+      when: Feature has >3 components or needs architectural decisions
+      creates: Design spec optimized for AI alignment
+      optional_for: S/XS sized features
+
+    - name: /feature-plan
+      purpose: Decompose into atomic executable tasks
+      when: After design (or directly for simple features)
+      creates: Task list with dependencies
+
+    - name: /feature-implement
+      purpose: Execute tasks with TDD and validation gates
+      when: Plan exists
+      creates: Working code, tests, documentation
+
+    - name: /feature-review
+      purpose: Extract learnings, identify improvements
+      when: Implementation complete
+      creates: Retrospective, pattern updates
+
+    - name: /feature-close
+      purpose: Verify, merge, cleanup
+      when: Review complete
+      creates: Merged code, deleted branch
+
+  discovery:
+    - name: /discover-start
+      purpose: Initialize codebase discovery
+      when: Setting up discovery for a codebase
+      creates: Discovery context file
+
+    - name: /discover-scan
+      purpose: Extract symbols and synthesize descriptions
+      when: After discovery initialized
+      creates: Draft component catalog (YAML)
+
+    - name: /discover-validate
+      purpose: Human review of synthesized descriptions
+      when: After scan complete
+      creates: Validated component catalog
+
+    - name: /discover-complete
+      purpose: Export to graph format
+      when: Validation complete
+      creates: JSON for graph integration
+
+  meta:
+    - name: /skill-create
+      purpose: Create new skills with framework integration
+      when: Adding workflow automation
+      creates: Skill directory with prompt.md
+
+  other:
+    - name: /research
+      purpose: Epistemologically rigorous research
+      when: Before ADRs, evaluating approaches, unfamiliar domains
+      creates: Evidence catalog with triangulated claims
+
+    - name: /debug
+      purpose: Root cause analysis using lean methods
+      when: Encountering unexpected behavior or defects
+      method: 5 Whys, Ishikawa diagram, Gemba
+
+    - name: /framework-sync
+      purpose: Sync framework files across locations
+      when: Framework updates need propagation
+
+# =============================================================================
+# Gates (Poka-Yoke)
+# =============================================================================
+gates:
+  blocking:
+    - before: Epic design
+      require: Epic branch exists
+      enforced_by: /epic-start
+      rationale: Features nest under epic branches
+
+    - before: Feature work
+      require: Feature branch and scope commit
+      enforced_by: /feature-start
+      rationale: Traceability from first commit
+
+    - before: Implementation
+      require: Plan exists
+      enforced_by: /feature-plan
+      rationale: No coding without decomposed tasks
+
+    - before: Feature close
+      require: Retrospective complete
+      enforced_by: /feature-review
+      rationale: Learning is part of done
+
+    - before: Epic merge
+      require: Epic retrospective complete
+      enforced_by: /epic-close
+      rationale: Meso-layer learning captured
+
+  quality:
+    - gate: Tests pass
+      when: Before any commit
+      rationale: TDD is non-negotiable
+
+    - gate: Type checks pass
+      when: Before any commit
+      tool: pyright --strict
+
+    - gate: Linting passes
+      when: Before any commit
+      tool: ruff check && ruff format
+
+# =============================================================================
+# Principles (Critical Rules)
+# =============================================================================
+principles:
+  process:
+    - name: TDD Always
+      rule: RED-GREEN-REFACTOR, no exceptions
+      rationale: Tests are specification, not afterthought
+
+    - name: Commit After Task
+      rule: Commit after each completed task, not just feature end
+      rationale: Enables recovery, shows progress
+
+    - name: Full Skill Cycle
+      rule: Use skills even for small features
+      rationale: Structure helps; overhead is minimal
+
+    - name: Ask Before Subagents
+      rule: Get permission before spawning subagents
+      rationale: Inference economy - AI computation is precious
+
+    - name: Delete Branches After Merge
+      rule: Clean up merged branches immediately
+      rationale: Prevent accumulation, reduce confusion
+
+  collaboration:
+    - name: HITL Default
+      rule: Pause after significant work for human review
+      rationale: Slow is smooth, smooth is fast
+
+    - name: Direct Communication
+      rule: No praise-padding, say what needs saying
+      rationale: Efficiency and respect for time
+
+    - name: Redirect When Dispersing
+      rule: Gently redirect tangents to parking lot
+      rationale: Maintain focus on stated goal
+
+  technical:
+    - name: Type Everything
+      rule: Type annotations on all code
+      rationale: Pyright strict is the standard
+
+    - name: Pydantic Models
+      rule: Use Pydantic for all data structures
+      rationale: Validation at boundaries, serialization free
+
+    - name: Simple First
+      rule: Simple heuristics over complex solutions
+      rationale: Complexity must earn its place
+
+# =============================================================================
+# Branch Model
+# =============================================================================
+branches:
+  structure: |
+    main (stable)
+      └── v2 (development)
+            └── epic/e{N}/{name}
+                  └── feature/f{N}.{M}/{name}
+
+  flow:
+    - Features merge to epic branch
+    - Epics merge to development branch (v2)
+    - Development merges to main at release
