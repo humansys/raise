@@ -56,8 +56,9 @@ V3:
 | F14.5 | Auto MEMORY.md Generation | M | 3 | Pending | Generate Claude auto memory from methodology.yaml |
 | F14.6 | Pattern Versioning | S | 2 | Pending | Add base/version fields to pattern schema |
 | F14.7 | Base Show Command | XS | 1 | Pending | `raise base show` displays current base info |
+| F14.15 | Multi-Developer Architecture | M | 3 | Pending | Separate personal data from shared project data |
 
-**Total F&F:** 7 features, 16 SP
+**Total F&F:** 8 features, 19 SP
 
 ### Post-F&F (Deferred)
 
@@ -205,6 +206,9 @@ raise init
 ## Dependencies
 
 ```
+F14.15 (Multi-Dev) ─── Foundation: personal vs shared paths
+        │
+        ↓
 F14.1 (Identity) ──┐
 F14.2 (Patterns) ──┼── F14.4 (Bootstrap) ── F14.5 (MEMORY.md)
 F14.3 (Methodology)┘         │
@@ -215,6 +219,7 @@ F14.3 (Methodology)┘         │
 ```
 
 **External:** None — builds on E3, E7, E11 (all complete)
+**Sequencing:** F14.15 first — establishes path architecture for remaining features
 
 ---
 
@@ -302,9 +307,10 @@ V3: Corporate documentation + team overrides
 
 | Order | Feature | Size | Dependencies | Milestone | Rationale |
 |:-----:|---------|:----:|--------------|-----------|-----------|
-| 1 | F14.1 Base Identity | S | None | M1 | Content creation, can parallel |
-| 2 | F14.2 Base Patterns | M | None | M1 | Content creation, can parallel |
-| 3 | F14.3 Methodology | S | None | M1 | Content creation, can parallel |
+| 0 | F14.15 Multi-Dev Arch | M | None | M0 | Foundation: personal vs shared paths |
+| 1 | F14.1 Base Identity | S | F14.15 | M1 | Content creation, can parallel |
+| 2 | F14.2 Base Patterns | M | F14.15 | M1 | Content creation, can parallel |
+| 3 | F14.3 Methodology | S | F14.15 | M1 | Content creation, can parallel |
 | 4 | F14.4 Bootstrap | M | F14.1-3 | M2 | Integration, needs all content |
 | 5 | F14.6 Versioning | S | F14.2 | M3 | Schema work, enables update tracking |
 | 6 | F14.5 MEMORY.md | M | F14.3, F14.4 | M3 | Generation from methodology.yaml |
@@ -314,19 +320,22 @@ V3: Corporate documentation + team overrides
 
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
-| **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1 | All content in `src/raise_cli/rai_base/` | Files exist, valid format |
-| **M2: Bootstrap** | F14.4 | Day 2 | `raise init` copies base to `.rai/` | Init creates identity + patterns |
+| **M0: Multi-Dev** | F14.15 | Day 1 | Personal data separated from shared | No merge conflicts on sessions |
+| **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1-2 | All content in `src/raise_cli/rai_base/` | Files exist, valid format |
+| **M2: Bootstrap** | F14.4 | Day 2-3 | `raise init` copies base to `.rai/` | Init creates identity + patterns |
 | **M3: MEMORY.md** | F14.5, F14.6 | Day 3 | Auto-generated with skills/gates | MEMORY.md has full process |
 | **M4: Complete** | F14.7 + validation | Day 4 | New user simulation passes | Full flow demo |
 
 ### Parallel Work Streams
 
 ```
-Day 1 (Content Creation — All Parallel):
+Day 1 (Architecture + Content):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-F14.1 (Identity)    ─────┐
-F14.2 (Patterns)    ─────┼─► M1: Base Assets
-F14.3 (Methodology) ─────┘
+F14.15 (Multi-Dev) ──────────► M0: Personal/Shared separation
+        │
+        ├── F14.1 (Identity)    ─────┐
+        ├── F14.2 (Patterns)    ─────┼─► M1: Base Assets
+        └── F14.3 (Methodology) ─────┘
 
 Day 2 (Integration):
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -359,10 +368,12 @@ Buffer for fixes
 | F14.12 Memory Ontology | XS | ✅ Done | 1 session | — | graph→memory, simpler CLI |
 | F14.13 Ontology Cleanup | M | ✅ Done | 90 min | 1.33x | CLI restructure, /skill-create, 9 patterns |
 | F14.14 Skill CLI | M | ✅ Done | ~3 sessions | 1.5x | 4 CLI commands, skill audit, 79 new tests |
+| F14.15 Multi-Dev Arch | M | Pending | — | — | Personal data separation |
 
 **Milestone Progress:**
-- [ ] M1: Base Assets (Day 1)
-- [ ] M2: Bootstrap (Day 2)
+- [ ] M0: Multi-Dev Architecture (Day 1)
+- [ ] M1: Base Assets (Day 1-2)
+- [ ] M2: Bootstrap (Day 2-3)
 - [ ] M3: MEMORY.md (Day 3)
 - [ ] M4: Epic Complete (Day 4)
 
@@ -384,4 +395,105 @@ Buffer for fixes
 ---
 
 *Plan created: 2026-02-05*
-*Next: F14.1, F14.2, F14.3 (parallel)*
+*Next: F14.15 (multi-dev arch), then F14.1-F14.7*
+
+---
+
+## F14.15: Multi-Developer Architecture
+
+> **Priority:** HIGH — Must fix before F&F to avoid architectural debt
+> **Size:** M (3 SP)
+> **Added:** 2026-02-05
+
+### Problem
+
+Current architecture stores personal data in `.raise/rai/` (committed to git):
+- `memory/sessions/index.jsonl` — 68 personal session entries
+- `telemetry/signals.jsonl` — 1507 personal telemetry entries
+- `memory/patterns.jsonl` — Mixed personal/project patterns
+
+**Multi-developer issues:**
+1. Merge conflicts on every PR (both devs modify sessions)
+2. Mixed telemetry (Dev A's velocity mixed with Dev B's)
+3. Privacy leak (session topics visible to all)
+4. Pattern pollution (personal learnings become project patterns)
+
+### Solution
+
+Separate personal data from shared project data:
+
+```
+SHARED (committed in .raise/rai/):
+  identity/              # Rai's project identity
+  memory/
+    patterns.jsonl       # Project patterns only (curated)
+
+PERSONAL (in ~/.rai/projects/{hash}/):
+  sessions/
+    index.jsonl          # My sessions
+  telemetry/
+    signals.jsonl        # My signals
+  memory/
+    patterns.jsonl       # My learnings (future: merge to project)
+    calibration.jsonl    # My calibration
+```
+
+**Project hash:** SHA256(absolute_project_path)[:12] — stable, collision-resistant
+
+### In Scope
+
+**MUST:**
+- [ ] Add `get_personal_project_dir(project_root)` to `paths.py`
+- [ ] Migrate session writing to personal dir
+- [ ] Migrate telemetry writing to personal dir
+- [ ] Migrate calibration to personal dir
+- [ ] Add `.raise/rai/memory/sessions/` to `.gitignore`
+- [ ] Add `.raise/rai/telemetry/` to `.gitignore`
+- [ ] Migration: move existing personal data on first access
+- [ ] Update `raise session` commands to use personal paths
+- [ ] Update `raise memory emit-*` to use personal paths
+- [ ] Update context builder to load from personal paths
+
+**SHOULD:**
+- [ ] Add `personal: true` field to pattern schema (future: promote to project)
+
+### Out of Scope
+
+- Pattern promotion workflow (personal → project)
+- Cross-developer pattern sharing (V3/E10)
+- Telemetry aggregation across developers
+
+### Files to Modify
+
+| File | Change |
+|------|--------|
+| `config/paths.py` | Add `get_personal_project_dir()` |
+| `memory/writer.py` | Write sessions/calibration to personal |
+| `telemetry/writer.py` | Write signals to personal |
+| `context/builder.py` | Load sessions from personal |
+| `cli/commands/memory.py` | Use personal paths |
+| `cli/commands/session.py` | Use personal paths |
+| `onboarding/migration.py` | Migrate existing data |
+| `.gitignore` | Add personal data paths |
+
+### Migration Strategy
+
+On first access to personal data:
+1. Check if `~/.rai/projects/{hash}/` exists
+2. If not, create and migrate from `.raise/rai/`:
+   - Copy `sessions/index.jsonl`
+   - Copy `telemetry/signals.jsonl`
+   - Copy `calibration.jsonl`
+3. After migration, data stays in personal dir
+
+**Existing `.raise/rai/` files:** Left in place (git history), but gitignored for future.
+
+### Done Criteria
+
+- [ ] Personal data written to `~/.rai/projects/{hash}/`
+- [ ] Personal paths gitignored
+- [ ] Existing data migrated on first access
+- [ ] `raise session start` works with new paths
+- [ ] `raise memory emit-*` works with new paths
+- [ ] Tests for migration and new paths
+- [ ] No merge conflicts on sessions/telemetry in multi-dev scenario
