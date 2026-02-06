@@ -18,6 +18,7 @@ from raise_cli.memory.models import (
     MemoryConceptType,
     MemoryRelationship,
     MemoryRelationshipType,
+    MemoryScope,
     PatternSubType,
 )
 from raise_cli.memory.writer import (
@@ -28,6 +29,7 @@ from raise_cli.memory.writer import (
     append_calibration,
     append_pattern,
     append_session,
+    get_memory_dir_for_scope,
 )
 
 __all__ = [
@@ -36,6 +38,7 @@ __all__ = [
     "MemoryConceptType",
     "MemoryRelationship",
     "MemoryRelationshipType",
+    "MemoryScope",
     "PatternInput",
     "PatternSubType",
     "SessionInput",
@@ -43,4 +46,5 @@ __all__ = [
     "append_calibration",
     "append_pattern",
     "append_session",
+    "get_memory_dir_for_scope",
 ]
