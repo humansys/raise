@@ -44,6 +44,11 @@
 
 ### Framework Improvements
 
+- [ ] **Add graph-rebuild to /story-close when Pydantic models change** — (S14.16 retro, 2026-02-06)
+  - Schema Literal changes invalidate cached unified graph (PAT-152)
+  - Stale `unified.json` breaks `raise memory query` with ValidationError
+  - Consider: auto-detect model changes via git diff, or add optional flag to /story-close
+
 - [ ] **Session-start continuity improvement** — (2026-02-05)
   - **Problem:** Output focuses on backlog-oriented memory query results, lacks continuity from last session
   - **Observed:** Memory query "session epic patterns" returns deferred features (E9, E10) not previous session outcomes
