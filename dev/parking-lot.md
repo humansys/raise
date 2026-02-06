@@ -44,6 +44,14 @@
 
 ### Framework Improvements
 
+- [ ] **Session-start continuity improvement** — (2026-02-05)
+  - **Problem:** Output focuses on backlog-oriented memory query results, lacks continuity from last session
+  - **Observed:** Memory query "session epic patterns" returns deferred features (E9, E10) not previous session outcomes
+  - **Expected:** Surface last session's outcomes (SES-069: `session command`, `memory emit`, etc.) and clear next action
+  - **Current workaround:** CLAUDE.local.md "Next" field provides focus, but session index (SES-069) not surfaced
+  - **Fix:** Query session index for last session outcomes, present as "Last session" → "Continue with" flow
+  - **Priority:** Post-F&F polish
+
 - [ ] **System Open Ends Audit** — (Post-E14, 2026-02-05)
   - **Trigger:** Found 22 stale branches because no cleanup in lifecycle skills
   - **Goal:** Systematic review to find similar "open ends" in RaiSE system
