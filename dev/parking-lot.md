@@ -44,6 +44,13 @@
 
 ### Framework Improvements
 
+- [ ] **Stale terminology grep as rename gate** — (Ishikawa analysis, 2026-02-06)
+  - S14.16 declared complete with 21 files still containing "feature" remnants (PAT-151)
+  - Root cause: verification was behavioral (tests pass) not lexical (no stale terms)
+  - **Countermeasure:** Add `grep -ri "<old_term>"` as mandatory final gate for rename stories
+  - Consider: automated `raise lint terms` command that checks against glossary
+  - Priority: Add to rename story template now; automated linter post-F&F
+
 - [ ] **Add graph-rebuild to /story-close when Pydantic models change** — (S14.16 retro, 2026-02-06)
   - Schema Literal changes invalidate cached unified graph (PAT-152)
   - Stale `unified.json` breaks `raise memory query` with ValidationError
