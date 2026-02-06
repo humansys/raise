@@ -66,9 +66,9 @@
 
 1. **TDD discipline compounds** — Every feature used RED-GREEN-REFACTOR. By F7.4, pattern was so smooth that 5x velocity achieved. Confidence in code quality high.
 
-2. **Full kata cycle even on XS features** — PAT-082 validated: the overhead of /feature-start → plan → implement → review is minimal and the structure helps maintain quality even when "it's just a small thing."
+2. **Full kata cycle even on XS features** — PAT-082 validated: the overhead of /story-start → plan → implement → review is minimal and the structure helps maintain quality even when "it's just a small thing."
 
-3. **Parallel subagent execution** — PAT-092 from F7.7: when tasks have no dependencies, spawning parallel subagents cuts wall time significantly. Should add to /feature-implement.
+3. **Parallel subagent execution** — PAT-092 from F7.7: when tasks have no dependencies, spawning parallel subagents cuts wall time significantly. Should add to /story-implement.
 
 **Velocity patterns:**
 - Started slower (2.0x) on first features as patterns established
@@ -77,7 +77,7 @@
 
 **Friction points:**
 - Global coverage check noise (--no-cov workaround)
-- Some feature retrospectives missing (F7.3, F7.4, F7.6, F7.9)
+- Some story retrospectives missing (F7.3, F7.4, F7.6, F7.9)
 
 ### Architecture Patterns
 
@@ -145,7 +145,7 @@ src/raise_cli/onboarding/
 
 **Would do differently:**
 - Register skills automatically (avoid skill.md exists but not invokable)
-- Ensure all features have retrospectives (some skipped)
+- Ensure all stories have retrospectives (some skipped)
 
 ### System Evolution
 
@@ -169,14 +169,14 @@ src/raise_cli/onboarding/
 
 | Innovation | Introduced In | Adopted Across Features? | ROI |
 |------------|---------------|--------------------------|-----|
-| Risk assessment step | F7.2 | Yes (added to /feature-design v1.1.0) | High |
+| Risk assessment step | F7.2 | Yes (added to /story-design v1.1.0) | High |
 | Parallel subagents | F7.7 | Experiment (parking lot) | High |
 | [CONCEPT] blocks in skills | F7.7 | Adopted in session-start | High |
 | Session recording in profile | F7.8 | All subsequent features | Medium |
 
 ### Skills/SOPs Updated
 
-- `/feature-design` v1.1.0 — Added Step 1.5: Risk Assessment
+- `/story-design` v1.1.0 — Added Step 1.5: Risk Assessment
 - `/session-start` v2.0.0 — Adaptive Shu/Ha/Ri behavior
 - `guardrails.md` v1.4.0 — SHOULD-DEV-002, SHOULD-CLI-001 added
 
@@ -188,7 +188,7 @@ src/raise_cli/onboarding/
 - Risk assessment conversation before HIGH RISK features
 
 **Type B (deferred to parking lot):**
-- Parallel task execution in /feature-implement
+- Parallel task execution in /story-implement
 - Builder/verifier separation research
 - Skill mastery auto-tracking
 
@@ -220,7 +220,7 @@ src/raise_cli/onboarding/
 
 ### Deferred with Intent (Medium Priority)
 
-- [ ] **Parallel task execution in /feature-implement**
+- [ ] **Parallel task execution in /story-implement**
   - Priority: Medium
   - Deferred because: Works manually, formalization can wait
   - Review date: Post-F&F
@@ -292,7 +292,7 @@ src/raise_cli/onboarding/
 
 ### Experiment (What to Try)
 
-- Formalize parallel subagent pattern in /feature-implement
+- Formalize parallel subagent pattern in /story-implement
 - Hook-based session increment (auto on session-start)
 
 ### Stop (What Didn't Work)
@@ -328,7 +328,7 @@ Checklist for quarterly/milestone systemic reviews:
 
 ### 2. How did our process evolve during this epic?
 
-- Added risk assessment step to /feature-design (v1.1.0)
+- Added risk assessment step to /story-design (v1.1.0)
 - Discovered parallel subagent pattern for independent tasks
 - Established [CONCEPT] blocks as adaptive mechanism in skills
 
@@ -344,7 +344,7 @@ Checklist for quarterly/milestone systemic reviews:
 - Building adaptive systems that respond to user expertise
 - Convention detection with confidence scoring
 - Personal cross-project memory management
-- 3.3x velocity on complex feature work
+- 3.3x velocity on complex story work
 
 ---
 

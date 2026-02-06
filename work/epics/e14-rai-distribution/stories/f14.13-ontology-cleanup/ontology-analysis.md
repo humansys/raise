@@ -38,8 +38,8 @@ raise
 ```
 Session:     session-start, session-close
 Epic:        epic-start, epic-design, epic-plan, epic-close
-Feature:     feature-start, feature-design, feature-plan,
-             feature-implement, feature-review, feature-close
+Feature:     story-start, story-design, story-plan,
+             story-implement, story-review, story-close
 Discovery:   discover-start, discover-scan, discover-validate, discover-complete
 Other:       research, debug, framework-sync, scripts
 ```
@@ -212,7 +212,7 @@ Minimal changes:
 {domain}-{action}
 ├── session-start, session-close
 ├── epic-start, epic-design, epic-plan, epic-close
-├── feature-start, feature-design, feature-plan, feature-implement, feature-review, feature-close
+├── story-start, story-design, story-plan, story-implement, story-review, story-close
 └── discover-start, discover-scan, discover-validate, discover-complete
 ```
 

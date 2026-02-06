@@ -1,5 +1,5 @@
 ---
-name: feature-close
+name: story-close
 description: >
   Complete a feature with retrospective verification, merge, cleanup,
   and tracking update. Use after review to formally close the feature
@@ -9,9 +9,9 @@ license: MIT
 
 metadata:
   raise.work_cycle: feature
-  raise.frequency: per-feature
+  raise.frequency: per-story
   raise.fase: "8"
-  raise.prerequisites: feature-review
+  raise.prerequisites: story-review
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
@@ -21,14 +21,14 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-close \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=story-close \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Close: Feature Completion
 
 ## Purpose
 
-Complete a feature by verifying the retrospective is done, merging to the parent branch, cleaning up the feature branch, and updating tracking. This formally closes the feature lifecycle with full traceability.
+Complete a feature by verifying the retrospective is done, merging to the parent branch, cleaning up the story branch, and updating tracking. This formally closes the story lifecycle with full traceability.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -41,7 +41,7 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 ## Context
 
 **When to use:**
-- After `/feature-review` retrospective is complete
+- After `/story-review` retrospective is complete
 - Feature implementation is verified and tests pass
 - Ready to merge work into parent branch
 
@@ -50,7 +50,7 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 - Feature continuing in next session (not complete yet)
 
 **Inputs required:**
-- Completed retrospective: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
+- Completed retrospective: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
 - Passing tests
 - Feature branch ready for merge
 
@@ -67,10 +67,10 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 Retrospective and tests are required before closing:
 
 ```bash
-RETRO="work/epics/e{N}-{name}/features/{feature_id}/retrospective.md"
+RETRO="work/epics/e{N}-{name}/stories/{story_id}/retrospective.md"
 if [ ! -f "$RETRO" ]; then
     echo "ERROR: Retrospective not found: $RETRO"
-    echo "Run /feature-review first"
+    echo "Run /story-review first"
     exit 4  # ArtifactNotFoundError
 fi
 
@@ -85,14 +85,14 @@ uv run pytest --tb=no -q || {
 
 **Verification:** Retrospective exists and tests pass.
 
-> **If you can't continue:** Run `/feature-review` first. No exceptions.
+> **If you can't continue:** Run `/story-review` first. No exceptions.
 
 ### Step 1: Verify Feature Ready
 
 Confirm feature is complete:
 
 ```bash
-FEATURE_DIR="work/epics/e{N}-{name}/features/{feature_id}"
+FEATURE_DIR="work/epics/e{N}-{name}/stories/{story_id}"
 
 # Show feature artifacts
 ls -la "$FEATURE_DIR/"
@@ -158,7 +158,7 @@ Merge with a clear merge commit:
 git checkout {parent_branch}
 
 # Merge with no-ff to preserve feature history
-git merge --no-ff {feature_branch} -m "feat({feature_id}): merge complete feature
+git merge --no-ff {feature_branch} -m "feat({story_id}): merge complete feature
 
 Completed:
 - [summary of what was delivered]
@@ -170,7 +170,7 @@ Artifacts:
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
-**Why `--no-ff`:** Preserves feature branch history as a unit; enables easy revert if needed.
+**Why `--no-ff`:** Preserves story branch history as a unit; enables easy revert if needed.
 
 **Verification:** Merge commit created on parent branch.
 
@@ -178,7 +178,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 
 ### Step 5: Update Epic Scope (If Epic Feature)
 
-Mark the feature complete in the epic scope:
+Mark the story complete in the epic scope:
 
 ```bash
 # In epic scope (work/epics/e{N}-{name}/scope.md), update feature status
@@ -210,7 +210,7 @@ Mark the feature complete in the epic scope:
 
 ### Step 6: Delete Feature Branch (REQUIRED)
 
-Clean up the feature branch after merge:
+Clean up the story branch after merge:
 
 ```bash
 # Delete local branch (use -D since merge is verified)
@@ -226,14 +226,14 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 
 **Verification:** Feature branch deleted (local and remote).
 
-> **If you can't continue:** Branch deletion fails → Check you're not on the feature branch (should be on parent after Step 4).
+> **If you can't continue:** Branch deletion fails → Check you're not on the story branch (should be on parent after Step 4).
 
 ### Step 7: Emit Feature Complete (Telemetry)
 
-Record the completion of the entire feature lifecycle:
+Record the completion of the entire story lifecycle:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event complete --phase review
+uv run raise memory emit-work feature {story_id} --event complete --phase review
 ```
 
 **Example:** `raise memory emit-work feature F12.2 -e complete -p review`
@@ -262,15 +262,15 @@ Update `CLAUDE.local.md` to reflect completion:
 - **Merge:** Feature merged to parent branch with `--no-ff`
 - **Cleanup:** Feature branch deleted locally
 - **Epic:** Feature marked complete in epic scope
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature complete)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (story complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Feature Close Summary Template
 
 ```markdown
-## Feature Closed: {feature_id}
+## Feature Closed: {story_id}
 
-**Branch:** `feature/{epic_id}/{feature_id}` → merged to `{parent}`
+**Branch:** `feature/{epic_id}/{story_id}` → merged to `{parent}`
 **Merge commit:** {commit_hash}
 
 ### Delivered
@@ -286,7 +286,7 @@ Update `CLAUDE.local.md` to reflect completion:
 - **{epic_id}:** N/M features complete (X%)
 
 ### Next Feature
-- **{next_feature_id}:** {description}
+- **{next_story_id}:** {description}
 
 Feature lifecycle complete.
 ```
@@ -296,17 +296,17 @@ Feature lifecycle complete.
 ### Feature Lifecycle Summary
 
 ```
-/feature-start (fase 3)
+/story-start (fase 3)
       ↓
-/feature-design (fase 4)
+/story-design (fase 4)
       ↓
-/feature-plan (fase 5)
+/story-plan (fase 5)
       ↓
-/feature-implement (fase 6)
+/story-implement (fase 6)
       ↓
-/feature-review (fase 7)
+/story-review (fase 7)
       ↓
-/feature-close (fase 8) ← YOU ARE HERE
+/story-close (fase 8) ← YOU ARE HERE
 ```
 
 ### Branch Hygiene Philosophy
@@ -337,6 +337,6 @@ If feature is abandoned (not completed):
 
 ## References
 
-- Previous skill: `/feature-review`
-- Complement: `/feature-start`
+- Previous skill: `/story-review`
+- Complement: `/story-start`
 - Epic scope: `work/epics/e{N}-{name}/scope.md`

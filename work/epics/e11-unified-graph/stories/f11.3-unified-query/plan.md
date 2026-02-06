@@ -55,7 +55,7 @@
 - **Dependencies:** Task 1
 
 ### Task 3 (Final): Manual Integration Test
-- **Description:** Validate feature works end-to-end:
+- **Description:** Validate story works end-to-end:
   1. Build unified graph: `uv run raise graph build --unified`
   2. Query with keywords: `uv run raise context query "planning" --unified`
   3. Query with type filter: `uv run raise context query "pattern" --unified --types pattern`

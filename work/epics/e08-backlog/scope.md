@@ -1,6 +1,6 @@
 # Epic E8: Work Tracking Graph - Scope
 
-> **Status:** COMPLETE (100% — all features delivered)
+> **Status:** COMPLETE (100% — all stories delivered)
 > **Branch:** `feature/e8/work-tracking-graph`
 > **Created:** 2026-02-02
 > **Designed:** 2026-02-02 (informed by RES-ROVO-001)
@@ -115,7 +115,7 @@ All work concepts use existing `Concept` model with type-specific metadata:
 **Feature metadata:**
 ```python
 {
-    "feature_id": "F8.1",
+    "story_id": "F8.1",
     "name": "Backlog Parser",
     "status": "pending",
     "size": "S",
@@ -192,7 +192,7 @@ class WorkItemParser(ABC):
         ...
 
     @abstractmethod
-    def extract_features(self, epic_path: Path) -> list[Concept]:
+    def extract_stories(self, epic_path: Path) -> list[Concept]:
         """Extract feature concepts from epic source."""
         ...
 ```
@@ -216,7 +216,7 @@ class BacklogParser(WorkItemParser):
 class EpicScopeParser(WorkItemParser):
     """Parse local epic scope documents."""
 
-    def extract_features(self, epic_path: Path) -> list[Concept]:
+    def extract_stories(self, epic_path: Path) -> list[Concept]:
         """Parse dev/epic-*-scope.md → Feature concepts."""
         ...
 ```
@@ -731,4 +731,4 @@ Stream 2: F8.2 (Epic Parser) ─────┘
 
 *Epic planned: 2026-02-02*
 *Informed by: RES-ROVO-001, calibration data*
-*Next: `/feature-design` for F8.1 or F8.2 (can start either)*
+*Next: `/story-design` for F8.1 or F8.2 (can start either)*

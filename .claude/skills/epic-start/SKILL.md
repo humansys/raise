@@ -2,7 +2,7 @@
 name: epic-start
 description: >
   Initialize an epic with branch and scope commit.
-  Creates the epic branch from v2 that feature branches will nest under.
+  Creates the epic branch from v2 that story branches will nest under.
 
 license: MIT
 
@@ -37,7 +37,7 @@ Initialize an epic with a dedicated branch from v2 and a scope commit. Feature b
 - Creating isolation for a significant capability
 
 **When to skip:**
-- Small fixes or single features (use feature branch from v2)
+- Small fixes or single features (use story branch from v2)
 - Continuation of existing epic (branch already exists)
 
 **Inputs required:**
@@ -55,7 +55,7 @@ Initialize an epic with a dedicated branch from v2 and a scope commit. Feature b
 main (stable)
   └── v2 (development)
         └── epic/e{N}/{name}        ← THIS SKILL CREATES
-              └── feature/f{N}.{M}/{name}  ← /feature-start creates
+              └── feature/f{N}.{M}/{name}  ← /story-start creates
 ```
 
 ## Steps
@@ -162,7 +162,7 @@ uv run raise memory emit-work epic E{N} --event start --phase init
      ↓
 /epic-plan (sequence, milestones)
      ↓
-[features via /feature-start → ... → /feature-close]
+[features via /story-start → ... → /story-close]
      ↓
 /epic-close (retrospective, merge to v2)
 ```
@@ -218,6 +218,6 @@ v2 ──┬── epic/e14/rai-distribution
 ## References
 
 - Next: `/epic-design`
-- Features: `/feature-start` (verifies epic branch exists)
+- Features: `/story-start` (verifies epic branch exists)
 - Close: `/epic-close`
 - Branch model: `CLAUDE.md` § Git Practices

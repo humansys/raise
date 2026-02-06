@@ -1,5 +1,5 @@
 ---
-feature_id: "F1.3"
+story_id: "F1.3"
 title: "Configuration System - Retrospective"
 completed: "2026-01-31"
 duration_actual: "20 minutes"
@@ -17,7 +17,7 @@ velocity_multiplier: "12x faster than estimated"
 
 ## Summary
 
-First complete dogfooding of the RaiSE feature kata workflow. Built a production-ready 5-level configuration cascade system with full test coverage in under 30 minutes by following the structured process.
+First complete dogfooding of the RaiSE story kata workflow. Built a production-ready 5-level configuration cascade system with full test coverage in under 30 minutes by following the structured process.
 
 **Deliverables:**
 - XDG-compliant directory helpers (9 tests)
@@ -38,7 +38,7 @@ First complete dogfooding of the RaiSE feature kata workflow. Built a production
 
 | Time | Event | Duration | Estimate | Notes |
 |------|-------|----------|----------|-------|
-| 12:49 | Planning (design + plan) | - | - | Used lean feature spec template |
+| 12:49 | Planning (design + plan) | - | - | Used lean story spec template |
 | 12:54 | Task 1: XDG helpers | 5 min | 1-2h | 12-24x faster |
 | 12:56 | Task 2: RaiseSettings | 2 min | 2h | 60x faster |
 | 13:00 | Task 3: Cascade tests | 4 min | 2h | 30x faster |
@@ -54,7 +54,7 @@ First complete dogfooding of the RaiSE feature kata workflow. Built a production
 
 ### 1. ¿Qué aprendiste?
 
-**About the feature katas:**
+**About the story katas:**
 - The **design kata** prevented scope creep - having concrete examples upfront meant no ambiguity during implementation
 - The **plan kata** with atomic tasks (1-4h each) made progress visible and maintainable
 - **Atomic commits per task** created a clean git history and enabled precise time tracking
@@ -106,13 +106,13 @@ First complete dogfooding of the RaiSE feature kata workflow. Built a production
    - Document: "First-time kata users: divide estimates by 10x"
    - Create: Velocity tracking template
    - Build: Historical data for better estimates
-   - Location: `.raise/katas/feature/plan.md` - add estimation guidance section
+   - Location: `.raise/katas/story/plan.md` - add estimation guidance section
 
 3. **Design kata threshold clarification**
    - Current: "Skip if <5 SP"
    - Proposed: "Skip if <3 SP OR obvious implementation"
    - Rationale: F1.3 was 5 SP but straightforward - design helped but might be optional
-   - Location: `.raise/katas/feature/design.md` - update Step 1 decision matrix
+   - Location: `.raise/katas/story/design.md` - update Step 1 decision matrix
 
 4. **Progress tracking enhancement**
    - Consider: Integration with TaskCreate/TaskUpdate tools
@@ -136,7 +136,7 @@ First complete dogfooding of the RaiSE feature kata workflow. Built a production
 - **Quality speed:** Proved that structure → speed without sacrificing quality
 
 **Team (transferable learnings):**
-- The feature kata workflow is production-ready and battle-tested
+- The story kata workflow is production-ready and battle-tested
 - Atomic tasks + verification = fast iteration + high quality
 - Timestamp tracking enables data-driven retrospectives
 - #onlyhuman protocol scales to AI-augmented teams
@@ -236,5 +236,5 @@ Zero blockers during implementation. This is significant because:
 
 ---
 
-*RaiSE Framework - First complete feature kata cycle*
+*RaiSE Framework - First complete story kata cycle*
 *Dogfooded with love 🐕 by Rai + Emilio*

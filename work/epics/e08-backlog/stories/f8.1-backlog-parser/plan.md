@@ -7,7 +7,7 @@
 - **Story Points:** 2 SP
 - **Feature Size:** S
 - **Created:** 2026-02-02
-- **Design:** `work/features/f8.1-backlog-parser/design.md`
+- **Design:** `work/stories/f8.1-backlog-parser/design.md`
 
 ## Tasks
 
@@ -84,4 +84,4 @@ Task 4 (integration check) ← XS, quality gate
 ---
 
 *Plan created: 2026-02-02*
-*Next: /feature-implement*
+*Next: /story-implement*

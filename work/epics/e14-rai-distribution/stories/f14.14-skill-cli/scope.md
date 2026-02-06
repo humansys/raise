@@ -95,7 +95,7 @@ Lifecycle: session
   session-close    v2.0.0  Capture learnings, update memory
 
 Lifecycle: feature
-  feature-start    v1.2.0  Initialize feature with branch
+  story-start    v1.2.0  Initialize feature with branch
   ...
 
 Platform: .claude/skills/ (Claude Code)

@@ -22,14 +22,14 @@
 ## Patterns Identified
 
 ### PAT-092: Parallel Subagents for Independent Tasks
-When plan identifies independent tasks (no dependencies), spawn subagents in parallel. Significant time savings with no quality loss. Add to /feature-implement skill later.
+When plan identifies independent tasks (no dependencies), spawn subagents in parallel. Significant time savings with no quality loss. Add to /story-implement skill later.
 
 ### PAT-093: Skill Markdown as Primary Adaptive Mechanism
 For AI behavior changes, skill markdown is more effective than code. The `[CONCEPT]` block pattern with "Shu Only" markers provides clear conditional guidance without runtime complexity.
 
 ## Action Items
 
-- [x] Parking lot: Parallel task execution in /feature-implement
+- [x] Parking lot: Parallel task execution in /story-implement
 - [ ] Consider: Hook-based session increment (auto on session-start stop hook)
 
 ## Metrics

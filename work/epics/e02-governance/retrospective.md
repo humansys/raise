@@ -92,8 +92,8 @@
 **Design-first compounds:**
 - All three features used design.md with concrete examples
 - Zero implementation ambiguity across entire epic
-- Design time: ~15-20 min per feature
-- Savings: ~30-60 min per feature in avoided rework
+- Design time: ~15-20 min per story
+- Savings: ~30-60 min per story in avoided rework
 
 **ROI:** Design-first pays 2-3x return on time invested.
 
@@ -278,9 +278,9 @@ CLI commands:
 3. SHOULD-CODE-002 guardrail (Python naming best practices)
 
 **Inherited from E1, refined in E2:**
-- `/feature-design` - Used in all 3 features
-- `/feature-plan` - Used in all 3 features
-- `/feature-review` - Used in all 3 features
+- `/story-design` - Used in all 3 features
+- `/story-plan` - Used in all 3 features
+- `/story-review` - Used in all 3 features
 - `/session-close` - Used consistently
 
 ### Framework Improvements Applied
@@ -321,7 +321,7 @@ CLI commands:
 
 **High ROI (double down):**
 - **Design-first:** 15-20 min investment → 30-60 min savings = 2-3x ROI
-- **Kata cycle:** Consistent 2-3x velocity across all features
+- **Kata cycle:** Consistent 2-3x velocity across all stories
 - **Architecture reuse:** F2.2 investment → F2.3 zero-effort reuse
 
 **Medium ROI (continue):**
@@ -345,12 +345,12 @@ CLI commands:
 
 ### Deferred with Intent (Medium Priority)
 
-- [ ] **Add "test with real data" checkpoint to feature-plan kata**
+- [ ] **Add "test with real data" checkpoint to story-plan kata**
   - Priority: Medium
   - Effort: Small (~30 min)
   - Deferred because: Framework improvement, not blocking
   - Review date: Before E3 planning
-  - Conditions for promotion: When refining feature-plan kata
+  - Conditions for promotion: When refining story-plan kata
 
 - [ ] **Document Pyright + Pydantic exception in guardrails.md**
   - Priority: Low
@@ -407,7 +407,7 @@ CLI commands:
 
 | Epic | SP | Duration | Avg Velocity | Tests | Coverage | Process Innovations |
 |------|:--:|:--------:|:------------:|:-----:|:--------:|---------------------|
-| E1 Core Foundation | 22 | ~8-10 hrs | 11x → 3.5x | 214 | 95% | Memory system, /session-close, /feature-review |
+| E1 Core Foundation | 22 | ~8-10 hrs | 11x → 3.5x | 214 | 95% | Memory system, /session-close, /story-review |
 | E2 Governance Toolkit | 7 | 3.45 hrs | 3.5x → 2.1x | 243 | 95-100% | Post-retro protocol, /epic-close, SHOULD-CODE-002 |
 
 ### Velocity Trends
@@ -431,7 +431,7 @@ CLI commands:
 **Tests:** Growing efficiently
 - E1: 214 tests / 22 SP = 9.7 tests/SP
 - E2: 243 tests / 7 SP = 34.7 tests/SP
-- **More thorough testing per feature** (graph/query modules inherently more complex)
+- **More thorough testing per story** (graph/query modules inherently more complex)
 
 **Bugs:** Zero bugs found during development in both epics
 - Pre-commit hooks working
@@ -448,8 +448,8 @@ CLI commands:
 **Friction:** Decreasing
 - E1: Invented memory system mid-epic
 - E2: Used memory system from start
-- E1: Created /feature-review during epic
-- E2: Used /feature-review for all features
+- E1: Created /story-review during epic
+- E2: Used /story-review for all stories
 - **Stabilizing process** - less invention, more execution
 
 **Innovation stickiness:** High
@@ -519,7 +519,7 @@ CLI commands:
 
 ⚠️ **Estimation calibration documentation:**
 - Have clear 2-3x pattern, not yet codified in planning guidance
-- **Improvement:** Update feature-plan kata with kata-optimized multiplier
+- **Improvement:** Update story-plan kata with kata-optimized multiplier
 - **Action:** Document 0.5x sizing adjustment for kata cycle features (in parking lot)
 
 ⚠️ **Architecture documentation lag:**
@@ -537,12 +537,12 @@ CLI commands:
 🧪 **Integration testing checkpoint mid-epic:**
 - Caught all issues in final integration tests
 - Might catch issues earlier if tested at F2.2 completion
-- **Experiment:** Add "integration test after each feature" to epic workflow
+- **Experiment:** Add "integration test after each story" to epic workflow
 
 🧪 **Parking lot review mid-epic:**
 - Triaged parking lot at epic end
 - Some items might be quick wins if addressed mid-epic
-- **Experiment:** Review parking lot after each feature, promote Type A items immediately
+- **Experiment:** Review parking lot after each story, promote Type A items immediately
 
 ### Stop (What Didn't Work)
 
@@ -600,7 +600,7 @@ Checklist for quarterly/milestone systemic reviews:
 ### 2. How did our process evolve during this epic?
 
 **From invention to execution:**
-- E1: Invented memory system, session-close, feature-review
+- E1: Invented memory system, session-close, story-review
 - E2: Used all E1 innovations, added only 3 new ones
 - **Shift:** Less process experimentation, more process execution
 

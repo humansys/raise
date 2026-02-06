@@ -25,8 +25,8 @@
 
 | Expected | Actual |
 |----------|--------|
-| `/feature-plan` decomposition | None |
-| `/feature-implement` with HITL | Dove straight into coding |
+| `/story-plan` decomposition | None |
+| `/story-implement` with HITL | Dove straight into coding |
 | Task-by-task commits | One big commit at the end |
 | Progress tracking | None |
 | Telemetry signals | None until this retrospective |
@@ -55,7 +55,7 @@
 
 ### What would you change about the process?
 
-1. **Mandatory skill invocation for M+ features.** Before any M-sized feature, MUST run `/feature-plan` regardless of how simple it seems.
+1. **Mandatory skill invocation for M+ features.** Before any M-sized feature, MUST run `/story-plan` regardless of how simple it seems.
 
 2. **Session discipline checkpoint.** After completing any feature, pause and ask: "Did I follow the process?"
 
@@ -63,7 +63,7 @@
 
 ### Are there improvements for the framework?
 
-1. **Add process reminder to session-start.** When suggesting focus, remind: "Use /feature-plan before implementation."
+1. **Add process reminder to session-start.** When suggesting focus, remind: "Use /story-plan before implementation."
 
 2. **Document the "momentum trap."** Add pattern about how quick wins can lead to process skipping.
 
@@ -88,14 +88,14 @@
 ### Deferred (parking lot)
 
 1. [ ] Add process reminder to `/session-start` skill
-2. [ ] Create `/feature-start` skill (atomic branch + plan)
+2. [ ] Create `/story-start` skill (atomic branch + plan)
 3. [ ] Add "Did I follow process?" checkpoint to skills
 
 ## Action Items
 
 - [x] Complete this retrospective (learning from failure)
 - [x] Add PAT-058 (momentum trap pattern)
-- [ ] Follow `/feature-plan` → `/feature-implement` for F12.2+
+- [ ] Follow `/story-plan` → `/story-implement` for F12.2+
 - [ ] Emit telemetry BEFORE starting next feature
 
 ## Technical Notes

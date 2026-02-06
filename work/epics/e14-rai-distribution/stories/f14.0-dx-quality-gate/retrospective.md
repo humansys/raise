@@ -52,7 +52,7 @@
 
 **Context:** F14.0 was created to "clean house before inviting guests" — fixing our own code against our own standards before F&F release.
 
-**Pattern:** Before major releases or new feature work, run a comprehensive audit:
+**Pattern:** Before major releases or new story work, run a comprehensive audit:
 1. New user simulation (fresh perspective)
 2. DRY/duplication scan
 3. Dead code detection

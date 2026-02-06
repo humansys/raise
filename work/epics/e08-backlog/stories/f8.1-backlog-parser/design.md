@@ -200,4 +200,4 @@ def normalize_status(raw: str) -> str:
 ---
 
 *Design created: 2026-02-02*
-*Next: /feature-plan*
+*Next: /story-plan*

@@ -45,7 +45,7 @@
 
 ### Are there improvements for the framework?
 
-1. **Feature risk tags** — Epic scopes mark features as HIGH RISK but skills don't have a formal "risk assessment" step. Consider adding to `/feature-design`.
+1. **Feature risk tags** — Epic scopes mark features as HIGH RISK but skills don't have a formal "risk assessment" step. Consider adding to `/story-design`.
 
 2. **Builder-verifier separation** — Self-review checklists are muda. Worth researching lean approaches to quality gates. (Already parking-lotted)
 
@@ -58,7 +58,7 @@
 ## Improvements Applied
 
 1. **Parking lot updated** — Added "Separation of Builder and Verifier (Lean Quality)" item with research directions.
-2. **`/feature-design` v1.1.0** — Added Step 1.5: Risk Assessment for HIGH RISK features with "estudio en la duda" principle.
+2. **`/story-design` v1.1.0** — Added Step 1.5: Risk Assessment for HIGH RISK features with "estudio en la duda" principle.
 3. **Known Limitations section** — Added acknowledgment of self-review limitation with pointer to parking lot.
 
 ## Patterns to Persist
@@ -68,7 +68,7 @@
 
 ## Action Items
 
-- [x] Add risk assessment step to `/feature-design` for HIGH RISK features ✅ Done (v1.1.0)
+- [x] Add risk assessment step to `/story-design` for HIGH RISK features ✅ Done (v1.1.0)
 - [x] Research lean quality gate approaches ✅ Parking lot item created, acknowledged in skill
 
 ## Metrics

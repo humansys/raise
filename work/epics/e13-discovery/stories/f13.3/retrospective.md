@@ -14,7 +14,7 @@
 
 1. **Full kata cycle paid off** — Design → Plan → Implement → Review created clean, consistent skills with clear documentation.
 
-2. **Template reuse** — Using `feature-start` as a template for skill structure ensured consistency across all 4 discovery skills (frontmatter, hooks, ShuHaRi).
+2. **Template reuse** — Using `story-start` as a template for skill structure ensured consistency across all 4 discovery skills (frontmatter, hooks, ShuHaRi).
 
 3. **Integration test validated the design** — Running the full flow on a real module caught nothing broken — the design was solid.
 

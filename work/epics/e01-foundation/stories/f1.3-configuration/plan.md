@@ -1,5 +1,5 @@
 ---
-feature_id: "F1.3"
+story_id: "F1.3"
 title: "Configuration System - Implementation Plan"
 created: "2026-01-31"
 status: "ready"
@@ -217,7 +217,7 @@ After all tasks complete, verify against F1.3 acceptance criteria:
 ## Rollback Plan
 
 If any task fails verification after 3 attempts:
-1. Document the blocker in `work/features/f1.3-configuration/blockers.md`
+1. Document the blocker in `work/stories/f1.3-configuration/blockers.md`
 2. Determine if it's a design issue or implementation issue
 3. If design issue: Update design.md and restart task
 4. If implementation issue: Pair debug or escalate

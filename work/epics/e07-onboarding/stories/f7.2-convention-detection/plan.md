@@ -5,7 +5,7 @@
 - **Story Points:** 3 SP
 - **Feature Size:** M
 - **Created:** 2026-02-05
-- **Design:** `work/features/f7.2-convention-detection/design.md`
+- **Design:** `work/stories/f7.2-convention-detection/design.md`
 
 ## Tasks
 
@@ -153,4 +153,4 @@ Task 7 (fixtures) ─┘                          ├──► Task 4 (naming) �
 ---
 
 *Plan created: 2026-02-05*
-*Next: `/feature-implement`*
+*Next: `/story-implement`*

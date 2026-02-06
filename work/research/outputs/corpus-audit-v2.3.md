@@ -344,12 +344,12 @@ docs/katas/
 | flow/solution-vision.md | Vision creation | .raise/katas/project/vision.md |
 | flow/tech-design.md | Tech design | .raise/katas/project/design.md |
 | flow/backlog-creation.md | Backlog creation | .raise/katas/project/backlog.md |
-| flow/implementation-plan.md | Implementation plan | .raise/katas/feature/plan.md |
-| flow/development.md | Development | .raise/katas/feature/implement.md |
+| flow/implementation-plan.md | Implementation plan | .raise/katas/story/plan.md |
+| flow/development.md | Development | .raise/katas/story/implement.md |
 | patterns/code-analysis.md | Code analysis | .raise/katas/setup/analyze.md |
 | patterns/ecosystem-discovery.md | Ecosystem mapping | .raise/katas/setup/ecosystem.md |
 | patterns/tech-design-stack.md | Stack-aware design | .raise/katas/project/design.md (merge) |
-| patterns/dependency-validation.md | Dependency check | .raise/katas/feature/review.md (merge) |
+| patterns/dependency-validation.md | Dependency check | .raise/katas/story/review.md (merge) |
 
 ### Recommendation
 
@@ -549,7 +549,7 @@ Create `docs/archive/v2.1/` and move all deprecated content there with a README 
 │   │   ├── vision.md
 │   │   ├── design.md
 │   │   └── backlog.md
-│   ├── feature/                     # Nx per feature
+│   ├── feature/                     # Nx per story
 │   │   ├── plan.md
 │   │   ├── implement.md
 │   │   └── review.md

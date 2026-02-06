@@ -233,7 +233,7 @@ Para cada comando refactorizado, verificar:
 
 ### 1. Preparación
 ```bash
-# Crear feature branch
+# Crear story branch
 git checkout -b refactor-command-{nombre}
 
 # Leer análisis arquitectónico relevante

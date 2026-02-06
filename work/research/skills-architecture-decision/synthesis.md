@@ -142,8 +142,8 @@ next_kata: feature/review
 ```
 
 **Options**:
-1. Metadata: `metadata.next_kata: feature-review`
-2. Body instructions: "After completing, run `/feature-review`"
+1. Metadata: `metadata.next_kata: story-review`
+2. Body instructions: "After completing, run `/story-review`"
 3. RaiSE Engine: Engine handles workflow, Skills are atoms
 
 **Recommendation**: Option 3 - workflow orchestration is engine responsibility, not format responsibility.

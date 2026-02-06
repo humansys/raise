@@ -21,7 +21,7 @@
 ## Heutagogical Checkpoint
 
 ### What did you learn?
-- Consistent patterns compound — each feature faster
+- Consistent patterns compound — each story faster
 - Shell scripts as telemetry emitters are simple and reliable
 
 ### What would you change about the process?

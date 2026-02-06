@@ -296,6 +296,6 @@ def onboard(
 
 ---
 
-*Epic tracking - update per feature completion*
+*Epic tracking - update per story completion*
 *Created: 2026-02-02*
 *Research input: RES-ONBOARD-001 (OpenClaw onboarding)*

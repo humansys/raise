@@ -24,7 +24,7 @@ Neither is complete alone. Together: **collaborative intelligence**.
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │                         RaiSE                                    │
-│      "Raise your craft, feature by feature"                      │
+│      "Raise your craft, one story at a time"                      │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │     ┌─────────────────────────────────────────────────────┐     │
@@ -52,7 +52,7 @@ Neither is complete alone. Together: **collaborative intelligence**.
 
 ### Mission
 
-> **"Raise your craft, feature by feature."**
+> **"Raise your craft, one story at a time."**
 
 ### Design Philosophy
 
@@ -323,7 +323,7 @@ raise-toolkit/
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│ Skill: /feature-design                                       │
+│ Skill: /story-design                                       │
 │                                                              │
 │ Rai reads the skill (markdown guide)                        │
 │    ↓                                                        │
@@ -390,8 +390,8 @@ raise-toolkit/
 │       Skills         │    │      Toolkit         │
 │  (Process Guides)    │    │  (Deterministic)     │
 │                      │    │                      │
-│  - /feature-design   │    │  - raise memory      │
-│  - /feature-plan     │    │  - raise discover    │
+│  - /story-design   │    │  - raise memory      │
+│  - /story-plan     │    │  - raise discover    │
 │  - /session-start    │    │  - raise status      │
 │  - /research         │    │  - raise telemetry   │
 │  - ...               │    │  - ...               │

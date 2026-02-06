@@ -111,7 +111,7 @@ Project ready with governance + skills + CLAUDE.md
 ```
 ? Install development lifecycle skills? (Y/n)
   - /session-start, /session-close
-  - /feature-design, /feature-plan, /feature-implement, /feature-review
+  - /story-design, /story-plan, /story-implement, /story-review
   - /research, /debug
 ```
 
@@ -145,7 +145,7 @@ project/
 └── .claude/skills/        # Development skills
     ├── session-start/
     ├── session-close/
-    ├── feature-design/
+    ├── story-design/
     └── ...
 ```
 

@@ -43,7 +43,7 @@
 - Added `raise telemetry emit-session` command
 - Added `raise telemetry emit-calibration` command
 - Updated `/session-close` with Step 8
-- Updated `/feature-review` with Step 6
+- Updated `/story-review` with Step 6
 
 ## Action Items
 - [ ] Document agent-portability pattern in ADR or reference doc (parking lot)

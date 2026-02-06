@@ -319,5 +319,5 @@ This enables filtered queries: `--type component`
 
 - Previous skill: `/discover-validate`
 - Graph integration: F13.4 (future)
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`
 - Unified graph schema: `src/raise_cli/context/models.py`

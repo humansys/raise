@@ -124,10 +124,10 @@ raise context query "planning estimation" --max-depth 2 --types pattern,calibrat
 |-------|-------------|
 | `/session-start` | Session type + current epic |
 | `/session-close` | Session patterns (for extraction hints) |
-| `/feature-design` | Architecture patterns, ADRs |
-| `/feature-plan` | Planning patterns, calibration |
-| `/feature-implement` | Codebase patterns, guardrails |
-| `/feature-review` | Process patterns, retrospectives |
+| `/story-design` | Architecture patterns, ADRs |
+| `/story-plan` | Planning patterns, calibration |
+| `/story-implement` | Codebase patterns, guardrails |
+| `/story-review` | Process patterns, retrospectives |
 | `/epic-design` | Architecture decisions, prior epics |
 | `/epic-plan` | Sequencing patterns, calibration |
 | `/research` | Prior research, methodology |
@@ -193,7 +193,7 @@ F11.2 (Builder) ─────► F11.3 (Query)
 - [x] Unified graph builds successfully (151 nodes, 255 edges)
 - [x] Query returns relevant results for planning context
 - [x] 9 skills have "Query Context" step
-- [x] **Validation:** `/feature-plan` surfaces relevant patterns
+- [x] **Validation:** `/story-plan` surfaces relevant patterns
 - [x] ADR-019 created
 - [x] Component catalog updated
 
@@ -270,7 +270,7 @@ From RES-CONTEXT-001:
 
 | Order | Feature | Size | Est. | Dependencies | Milestone | Rationale |
 |:-----:|---------|:----:|:----:|--------------|-----------|-----------|
-| 1 | F11.1 Unified Graph Schema | S | 45m | None | M1 | Foundation — all features depend on schema |
+| 1 | F11.1 Unified Graph Schema | S | 45m | None | M1 | Foundation — all stories depend on schema |
 | 2 | F11.2 Graph Builder | M | 90m | F11.1 | M2 | Integration risk — merge 4 sources |
 | 3 | F11.3 Unified Query | S | 45m | F11.1, F11.2 | M3 | Enables skill integration |
 | 4 | F11.4 Skill Integration | S | 60m | F11.3 | M4 | Final integration — 9 skills |
@@ -284,7 +284,7 @@ From RES-CONTEXT-001:
 | **M1: Schema Ready** | F11.1 | Hour 1 | Models pass pyright, tests pass | `UnifiedGraph` can add/serialize nodes |
 | **M2: Graph Builds** | F11.2 | Hour 2.5 | All 4 sources merged into graph | `raise graph build --unified` produces JSON |
 | **M3: Queryable** | F11.3 | Hour 3.5 | Query returns relevant context | `raise context query "planning"` works |
-| **M4: Complete** | F11.4 | Hour 4.5 | Skills use unified context | `/feature-plan` shows queried patterns |
+| **M4: Complete** | F11.4 | Hour 4.5 | Skills use unified context | `/story-plan` shows queried patterns |
 
 ### Parallel Work Streams
 

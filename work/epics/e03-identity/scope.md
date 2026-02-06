@@ -1,6 +1,6 @@
 # Epic E3: Identity Core + Memory Graph - Scope
 
-> **Status:** COMPLETE (100% — all features delivered)
+> **Status:** COMPLETE (100% — all stories delivered)
 > **Branch:** `feature/e3/identity-core`
 > **Created:** 2026-02-01
 > **Target:** Feb 9, 2026 (Friends & Family pre-launch)
@@ -407,7 +407,7 @@ Day 7-8:  Buffer / polish / epic close
 
 ---
 
-*Epic tracking - update per feature completion*
+*Epic tracking - update per story completion*
 *Created: 2026-02-01*
 *Architecture revised: 2026-02-01 (JSONL + Graph model)*
 *Implementation plan added: 2026-02-01 (Risk-First, 2 milestones)*

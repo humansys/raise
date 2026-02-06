@@ -224,7 +224,7 @@
 
 ## Component Catalogs and Reuse
 
-**Source**: [Backstage Software Catalog](https://backstage.io/docs/features/software-catalog/)
+**Source**: [Backstage Software Catalog](https://backstage.io/docs/stories/software-catalog/)
 - **Type**: Primary
 - **Evidence Level**: Very High
 - **Key Finding**: Spotify's catalog makes all software discoverable. Teams maintain metadata via Git workflow. Auto-updates after merge.

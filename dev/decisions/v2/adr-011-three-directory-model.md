@@ -94,7 +94,7 @@ project/
 │       └── adr-NNN.md
 │
 └── work/                   # ACTIVITY (the workbench)
-    ├── features/           # Feature-level work
+    ├── stories/           # Feature-level work
     │   └── NNN-name/
     │       ├── spec.md
     │       ├── plan.md
@@ -191,8 +191,8 @@ work/ (workbench)                     governance/ (authority)
 work/proposals/adr-011.md      →      governance/decisions/adr-011.md
      (draft)                               (accepted)
 
-work/features/NNN/             →      (nothing — ephemeral)
-     (feature work)
+work/stories/NNN/             →      (nothing — ephemeral)
+     (story work)
 
 work/projects/new-project/     →      governance/projects/new-project/
   project_vision.md                     vision.md
@@ -302,7 +302,7 @@ These tools are for **framework maintainers and orchestrators**, not end users. 
 | `specs/main/solution_vision.md` | `governance/solution/vision.md` | Move + rename |
 | `specs/main/governance.md` | `governance/solution/guardrails.md` | Move + rename |
 | `specs/main/tech_design.md` | `governance/projects/{name}/design.md` | Move |
-| `specs/NNN-feature/` | `work/features/NNN-feature/` | Move |
+| `specs/NNN-feature/` | `work/stories/NNN-feature/` | Move |
 | `specs/raise/adrs/` | `governance/decisions/` (for consumer projects) | Move |
 | `.raise/context/glossary.md` | `governance/context/glossary.md` | Move |
 
@@ -380,7 +380,7 @@ These tools are for **framework maintainers and orchestrators**, not end users. 
 | Término | Definición |
 |---------|------------|
 | **Governance Directory** | The authoritative source of curated, approved artifacts that govern a solution. Contains stable artifacts that have passed validation gates. |
-| **Work Directory** | The workbench for governed work-in-progress. Contains drafts, proposals, and feature work that has not yet been promoted to governance. |
+| **Work Directory** | The workbench for governed work-in-progress. Contains drafts, proposals, and story work that has not yet been promoted to governance. |
 | **Governance Index** | A manifest file (`governance/index.yaml`) that describes all artifacts in the governance directory, enabling agents to understand the project without exploration. |
 | **Governance Promotion** | The process of moving an artifact from `work/` to `governance/` after passing a validation gate. |
 | **Golden Data Drift** | The condition where governance artifacts become stale and no longer reflect the reality of the codebase or project state. |
@@ -423,7 +423,7 @@ raise-commons/
 │   └── ...                 # If we treat raise-commons as a project
 │
 ├── work/                   # Active development work
-│   ├── features/           # Feature-level work
+│   ├── stories/           # Feature-level work
 │   ├── proposals/          # Draft ADRs
 │   └── research/           # Spikes, investigations
 │

@@ -94,7 +94,7 @@ Only after dogfooding proves the guardrails work, integrate into framework.
 
 | Task | Description | Depends On | Est |
 |------|-------------|------------|-----|
-| T4.1 | Update `/feature-review` with Jidoka checkpoint | Phase 3 | 15m |
+| T4.1 | Update `/story-review` with Jidoka checkpoint | Phase 3 | 15m |
 | T4.2 | Update `.pre-commit-config.yaml` (pip-audit, detect-secrets) | Phase 3 | 10m |
 | T4.3 | Reference guardrails-stack.md from CLAUDE.md | Phase 3 | 5m |
 | T4.4 | Update scope.md with completed items | Phase 3 | 5m |
@@ -134,7 +134,7 @@ Session 3:
 ├── T2.14-T2.16 (guardrail validation) → Commit
 ├── T3.1-T3.4 (verification) → Commit
 ├── T4.1-T4.4 (framework integration) → Commit
-└── /feature-review → /feature-close
+└── /story-review → /story-close
 ```
 
 ---
@@ -153,9 +153,9 @@ Session 3:
 
 - Research completed (6 catalogs) ✓
 - ISSUE-005 documented ✓
-- On feature branch ✓
+- On story branch ✓
 
 ---
 
 *Plan created: 2026-02-05*
-*Ready for /feature-implement*
+*Ready for /story-implement*

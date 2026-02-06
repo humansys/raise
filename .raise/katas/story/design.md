@@ -1,13 +1,13 @@
 ---
-id: feature-design
+id: story-design
 titulo: "Design: Feature Specification"
 work_cycle: feature
-frequency: per-feature-as-needed
+frequency: per-story-as-needed
 fase_metodologia: 4
 
 prerequisites:
   - project/backlog
-template: templates/tech/tech-design-feature-v2.md
+template: templates/tech/tech-design-story-v2.md
 gate: null
 next_kata: feature/plan
 
@@ -24,7 +24,7 @@ version: 1.0.0
 
 ## Purpose
 
-Create a lean feature specification that optimizes for both human understanding (quick review, clear intent) and AI alignment (accurate code generation), based on evidence from 25+ research sources.
+Create a lean story specification that optimizes for both human understanding (quick review, clear intent) and AI alignment (accurate code generation), based on evidence from 25+ research sources.
 
 **Core principle**: Specs are consumed by both humans AND AI - optimize for both.
 
@@ -48,7 +48,7 @@ Create a lean feature specification that optimizes for both human understanding 
 - Clarity on problem and value proposition
 
 **Output:**
-- Feature specification in `work/features/{feature-id}/design.md`
+- Feature specification in `work/stories/{feature-id}/design.md`
 - Uses lean template v2 (YAML + Markdown + Examples + Acceptance Criteria)
 
 ## Steps
@@ -70,8 +70,8 @@ Determine if feature needs a specification document.
 
 **Decision matrix**:
 - **Simple** (1-2 criteria match Simple) → Skip design kata, go to `feature/plan`
-- **Moderate** (3+ criteria match Moderate) → Create feature spec, use core sections only
-- **Complex** (2+ criteria match Complex) → Create feature spec, include optional sections as needed
+- **Moderate** (3+ criteria match Moderate) → Create story spec, use core sections only
+- **Complex** (2+ criteria match Complex) → Create story spec, include optional sections as needed
 
 **Verification:** Complexity level determined and documented.
 
@@ -301,7 +301,7 @@ Apply Claude Code optimization patterns.
 Self-review against quality checklist before submitting for human review.
 
 **Checklist:**
-- [ ] YAML frontmatter complete (feature_id, complexity, story_points, etc.)
+- [ ] YAML frontmatter complete (story_id, complexity, story_points, etc.)
 - [ ] What & Why clear - can explain to teammate in 2 minutes
 - [ ] Approach describes WHAT at right level (not too vague, not over-specified HOW)
 - [ ] **Examples are concrete and runnable** (not placeholders)
@@ -321,8 +321,8 @@ Self-review against quality checklist before submitting for human review.
 ## Output
 
 - **Artefacto**: Feature Specification (Lean Format v2)
-- **Ubicación**: `work/features/{feature-id}/design.md`
-- **Gate**: `gates/gate-feature-design.md` (if exists - validates spec quality)
+- **Ubicación**: `work/stories/{feature-id}/design.md`
+- **Gate**: `gates/gate-story-design.md` (if exists - validates spec quality)
 - **Next kata**: `feature/plan` (decompose spec into implementation tasks)
 
 ---
@@ -389,7 +389,7 @@ Full research: `work/research/lean-feature-specs/`
 
 ## References
 
-- **Template**: `.raise/templates/tech/tech-design-feature-v2.md`
+- **Template**: `.raise/templates/tech/tech-design-story-v2.md`
 - **Research**: `work/research/lean-feature-specs/` (evidence base for design decisions)
 - **Related kata**: `feature/plan` (next step: task decomposition)
 

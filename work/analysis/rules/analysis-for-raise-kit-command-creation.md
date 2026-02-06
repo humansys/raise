@@ -85,7 +85,7 @@ $ARGUMENTS
 
 **Fase 1: Especificación**
 
-1. Crear feature branch con `/speckit.specify`
+1. Crear story branch con `/speckit.specify`
 2. Generar `spec.md` con:
    - User Stories (priorizadas P1-P3)
    - Functional Requirements (FR-XXX)

@@ -1431,4 +1431,4 @@ Next step: /raise.2.vision
 
 **Status**: Ready for implementation
 **Estimated Effort**: 1-2 weeks (10 days)
-**Next Steps**: Assign to implementation team, create feature branch, begin Week 1 tasks
+**Next Steps**: Assign to implementation team, create story branch, begin Week 1 tasks

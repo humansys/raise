@@ -21,10 +21,10 @@
 |-------|----------------|--------------|
 | `/session-start` | session, epic, patterns | session, pattern |
 | `/session-close` | session, patterns, learnings | pattern, session |
-| `/feature-design` | architecture, patterns, ADR | pattern, feature |
-| `/feature-plan` | planning, estimation, calibration | pattern, calibration |
-| `/feature-implement` | codebase, testing, patterns | pattern |
-| `/feature-review` | retrospective, process, patterns | pattern, session |
+| `/story-design` | architecture, patterns, ADR | pattern, feature |
+| `/story-plan` | planning, estimation, calibration | pattern, calibration |
+| `/story-implement` | codebase, testing, patterns | pattern |
+| `/story-review` | retrospective, process, patterns | pattern, session |
 | `/epic-design` | architecture, ADR, epic | pattern, epic |
 | `/epic-plan` | sequencing, calibration, planning | pattern, calibration |
 | `/research` | research, methodology, evidence | pattern, session |

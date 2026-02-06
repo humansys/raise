@@ -6,7 +6,7 @@
 - **Story Points:** 2 SP (lean scope)
 - **Feature Size:** S
 - **Created:** 2026-02-02
-- **Design:** `work/features/f3.1-identity-core-structure/design.md`
+- **Design:** `work/stories/f3.1-identity-core-structure/design.md`
 
 ## Tasks
 

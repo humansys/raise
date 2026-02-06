@@ -65,13 +65,13 @@
   - **Priority:** Post-E14, before V3 complexity increase
   - **Pattern:** PAT-096 — Periodic system hygiene audits catch drift before accumulation
 
-- [ ] **Parallel task execution in /feature-implement** — (F7.7 discussion, 2026-02-05)
+- [ ] **Parallel task execution in /story-implement** — (F7.7 discussion, 2026-02-05)
   - When tasks have no dependencies, allow spawning subagents in parallel
   - Combined HITL checkpoint after parallel tasks complete
   - Pattern: identify independent tasks in plan → spawn parallel → converge → continue sequential
 
 - [ ] **Separation of Builder and Verifier (Lean Quality)** — (F7.2 discussion, 2026-02-05)
-  - **Problem:** Self-review checklists in skills (e.g., /feature-design Step 8) have builder verifying own work = muda
+  - **Problem:** Self-review checklists in skills (e.g., /story-design Step 8) have builder verifying own work = muda
   - **Lean principle:** TPS separates production from quality inspection. Jidoka catches defects, but verification is external.
   - **Possible approaches:**
     1. **Quality Gate Subagent** — Different Rai prompt focused on critical review, not building
@@ -85,7 +85,7 @@
 - [ ] **Component catalog extraction** — Extract `dev/components.md` into graph (deferred from E12, nice-to-have)
 - [ ] **Session-aware context loading** — Skip redundant queries in same session (deferred from E12, optimization — re-querying is <1ms)
 - [x] ~~**Epic-close skill** (`/epic-close`)~~ **DONE** — Implemented 2026-02-05, v1.0.0. Includes retrospective, metrics, branch cleanup.
-- [ ] **Feature pre-verification in /feature-start** - Check if feature already implemented before starting work. (F12.6 was already done, 2026-02-04)
+- [ ] **Feature pre-verification in /story-start** - Check if feature already implemented before starting work. (F12.6 was already done, 2026-02-04)
 - [ ] **Memory system improvements** (E12 retrospective, 2026-02-04):
   - Semantic search for queries (keyword brittleness — "testing" misses "type hints")
   - Better calibration query patterns or dedicated report command
@@ -111,11 +111,11 @@
 - [x] ~~**Session Start Skill** (`/session-start`)~~ **RESOLVED** — Already exists at `.claude/skills/session-start/`
   - Loads memory, analyzes progress, proposes session goal
   - Used at start of this session
-- [ ] **Add "test with real data" checkpoint to feature-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
-- [ ] **Add "commit after task" to /feature-implement skill** - Good discipline, enables recovery (F3.3 retro)
-- [ ] **`/feature-start` skill** - Lightweight skill to create feature branch from epic branch with scope commit. Replaces ad-hoc branch creation. (E8 retro, E11 discussion 2026-02-03)
-- [ ] **Branch verification in merge workflow** - Add checklist to /feature-review: verify target branch per CLAUDE.md, check epic branch exists, enforce feature→epic→dev flow. Prevents merging to wrong branch. (E11 F11.3/F11.4 retro, 2026-02-03)
-- [ ] **Epic implement skill (`/epic-implement`)** - Do we need one? Current thinking: probably not, epic implementation IS feature implementation. Alternatives: fold progress tracking into `/feature-review`, add `raise epic status` CLI command, keep `/session-start` as "where am I?" mechanism. (E11 discussion, 2026-02-03)
+- [ ] **Add "test with real data" checkpoint to story-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
+- [ ] **Add "commit after task" to /story-implement skill** - Good discipline, enables recovery (F3.3 retro)
+- [ ] **`/story-start` skill** - Lightweight skill to create story branch from epic branch with scope commit. Replaces ad-hoc branch creation. (E8 retro, E11 discussion 2026-02-03)
+- [ ] **Branch verification in merge workflow** - Add checklist to /story-review: verify target branch per CLAUDE.md, check epic branch exists, enforce feature→epic→dev flow. Prevents merging to wrong branch. (E11 F11.3/F11.4 retro, 2026-02-03)
+- [ ] **Epic implement skill (`/epic-implement`)** - Do we need one? Current thinking: probably not, epic implementation IS feature implementation. Alternatives: fold progress tracking into `/story-review`, add `raise epic status` CLI command, keep `/session-start` as "where am I?" mechanism. (E11 discussion, 2026-02-03)
 - [ ] **Design revision process** - What happens when a design needs to be updated after initial creation? Should we emit `design revision` signals? How does this affect downstream phases? (F11.1 discussion, 2026-02-03)
 - [ ] **HITL approval before completion signals** - Telemetry "complete" events should only emit AFTER user approval, not when Rai finishes drafting. Update skills to require explicit sign-off before completion telemetry. (F11.1 discussion, 2026-02-03)
 - [ ] **Fix test path convention in plan template** - Plan says `tests/cli/test_*.py` but actual is `tests/cli/commands/test_*.py` (F3.3 retro)
@@ -187,7 +187,7 @@
 
 **Phase 3 (Telemetry CLI):**
 - [ ] F9.10 Telemetry Commands — `raise telemetry velocity`, `drift`, `insights`
-- [ ] F9.11 Retro Integration — /feature-review queries telemetry
+- [ ] F9.11 Retro Integration — /story-review queries telemetry
 
 **Also deferred:**
 - [ ] Signal rotation/archival — Handle unbounded growth

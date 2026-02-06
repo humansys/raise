@@ -128,7 +128,7 @@ src/raise_cli/memory/           # Memory Toolkit
 - Research-first for unfamiliar domains
 
 ### Improve
-- Run feature review BEFORE commit (add checkpoint)
+- Run story review BEFORE commit (add checkpoint)
 - Accept feature merging in planning (group related work)
 - Account for research time in estimates
 

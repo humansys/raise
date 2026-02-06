@@ -48,7 +48,7 @@ raise context query "planning" --unified --types pattern,calibration
 raise context query "PAT-001" --unified --max-depth 2
 
 # JSON output for programmatic use
-raise context query "feature-plan" --unified --format json
+raise context query "story-plan" --unified --format json
 ```
 
 ### Expected Output (Human Format)
@@ -79,8 +79,8 @@ Size: S | Est: 180m | Actual: 52m | Velocity: 3.5x
 
 ---
 
-## /feature-plan
-**Type:** skill | **Source:** .claude/skills/feature-plan/SKILL.md
+## /story-plan
+**Type:** skill | **Source:** .claude/skills/story-plan/SKILL.md
 
 Decompose user stories into atomic executable tasks.
 **Needs context:** pattern, calibration, feature

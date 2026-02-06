@@ -184,5 +184,5 @@ F2.4 (CLI Commands)
 
 ---
 
-*Epic tracking - update per feature completion*
+*Epic tracking - update per story completion*
 *Epic complete: 2026-01-31*

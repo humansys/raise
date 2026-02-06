@@ -1,5 +1,5 @@
 ---
-name: feature-review
+name: story-review
 description: >
   Reflect on completed features to extract learnings, identify process
   improvements, and update the framework with insights gained. Use after
@@ -9,10 +9,10 @@ license: MIT
 
 metadata:
   raise.work_cycle: feature
-  raise.frequency: per-feature
+  raise.frequency: per-story
   raise.fase: "7"
-  raise.prerequisites: feature-implement
-  raise.next: feature-close
+  raise.prerequisites: story-implement
+  raise.next: story-close
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.1.0"
@@ -22,11 +22,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-review \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=story-review \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-review \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=story-review \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Review: Retrospective & Learning
@@ -52,11 +52,11 @@ Reflect on the completed feature to extract learnings, identify process improvem
 
 **Inputs required:**
 - Completed feature
-- Progress log: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/progress.md`
+- Progress log: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/progress.md`
 - Team feedback (if available)
 
 **Output:**
-- Retrospective: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
+- Retrospective: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
 
 ## Steps
 
@@ -65,7 +65,7 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event start --phase review
+uv run raise memory emit-work feature {story_id} --event start --phase review
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e start -p review`
@@ -150,7 +150,7 @@ For learnings worth preserving across sessions, add to memory via CLI:
 uv run raise memory add-pattern "Pattern description" \
   -c "context,keywords" \
   -t process \
-  --from {feature_id}
+  --from {story_id}
 ```
 
 **Pattern types:**
@@ -190,14 +190,14 @@ Create retrospective document:
 Record the calibration signal for velocity tracking:
 
 ```bash
-uv run raise memory emit-calibration {feature_id} \
+uv run raise memory emit-calibration {story_id} \
   --size {XS|S|M|L} \
   --estimated {minutes} \
   --actual {minutes}
 ```
 
 **Parameters:**
-- `feature_id`: Feature ID from the plan (e.g., F9.4)
+- `story_id`: Feature ID from the plan (e.g., F9.4)
 - `--size`: T-shirt size from the plan
 - `--estimated`: Total estimated minutes from the plan
 - `--actual`: Total actual minutes from progress log
@@ -213,10 +213,10 @@ uv run raise memory emit-calibration F9.4 -s S -e 30 -a 15
 
 ### Step 7: Emit Feature Complete (Telemetry)
 
-Record the completion of the entire feature lifecycle:
+Record the completion of the entire story lifecycle:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event complete --phase review
+uv run raise memory emit-work feature {story_id} --event complete --phase review
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e complete -p review`
@@ -225,7 +225,7 @@ uv run raise memory emit-work feature {feature_id} --event complete --phase revi
 
 ## Output
 
-- **Artifact:** `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
+- **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
 - **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
 - **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
@@ -278,10 +278,10 @@ This skill implements the Kaizen principle of continuous improvement. Each retro
 
 ### Closing the Loop
 
-The retrospective completes the feature cycle and feeds learnings back into the framework, enabling organic evolution.
+The retrospective completes the story cycle and feeds learnings back into the framework, enabling organic evolution.
 
 ## References
 
 - Heutagogical Checkpoint: `framework/reference/glossary.md`
 - Kaizen: Toyota Production System
-- Previous skill: `/feature-implement`
+- Previous skill: `/story-implement`

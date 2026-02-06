@@ -80,4 +80,4 @@
 ---
 
 *Retrospective completed: 2026-02-06*
-*Next: /feature-close*
+*Next: /story-close*

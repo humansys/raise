@@ -2018,7 +2018,7 @@ Retry Step 2? [y/N]
 - **ADR-007 (Guardrails)**: `.private/decisions/adr-007-guardrails.md`
 - **Governance Bridge Spec**: `specs/main/research/bmad-brownfield-analysis/governance-bridge-spec.md`
 - **Kata Discrepancy Analysis**: `specs/main/research/outputs/kata-command-discrepancy-analysis.md`
-- **Observable Gates Feature**: `specs/main/research/speckit-critiques/features/feature-003-observable-gates.md`
+- **Observable Gates Feature**: `specs/main/research/speckit-critiques/stories/feature-003-observable-gates.md`
 - **Semantic Density Research**: `specs/main/research/sar-component/semantic-density/semantic-density-research-report.md`
 
 ### Academic & Industry Papers

@@ -33,8 +33,8 @@
 
 ### What would you change about the process?
 
-- Nothing significant — the full kata cycle (/feature-start → plan → implement → review) worked well for this S-sized feature
-- Could consider skipping /feature-plan for XS features with obvious implementation
+- Nothing significant — the full kata cycle (/story-start → plan → implement → review) worked well for this S-sized feature
+- Could consider skipping /story-plan for XS features with obvious implementation
 
 ### Are there improvements for the framework?
 
@@ -58,7 +58,7 @@ None needed — process worked smoothly.
 
 ## Action Items
 
-- [ ] Consider XS feature process optimization (skip /feature-plan?)
+- [ ] Consider XS feature process optimization (skip /story-plan?)
 - [ ] F7.9 can now use this module for Emilio migration
 
 ---

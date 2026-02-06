@@ -37,7 +37,7 @@
 
 ### Are there improvements for the framework?
 
-1. `/feature-implement`: Add optional "commit after task" step.
+1. `/story-implement`: Add optional "commit after task" step.
 2. Plan template: Fix test path convention to match `tests/cli/commands/`.
 
 ### What are you more capable of now?
@@ -53,7 +53,7 @@
 
 ## Action Items
 
-- [ ] Update `/feature-implement` skill: add commit-after-task guidance (parking lot)
+- [ ] Update `/story-implement` skill: add commit-after-task guidance (parking lot)
 - [ ] Fix plan template test paths (parking lot)
 
 ## Artifacts Produced
@@ -63,9 +63,9 @@
 | Memory module | `src/raise_cli/memory/` (6 files) |
 | CLI commands | `src/raise_cli/cli/commands/memory.py` |
 | Tests | `tests/memory/` (5 files), `tests/cli/commands/test_memory.py` |
-| Design | `work/features/f3.3-memory-graph/design.md` |
-| Plan | `work/features/f3.3-memory-graph/plan.md` |
-| Progress | `work/features/f3.3-memory-graph/progress.md` |
+| Design | `work/stories/f3.3-memory-graph/design.md` |
+| Plan | `work/stories/f3.3-memory-graph/plan.md` |
+| Progress | `work/stories/f3.3-memory-graph/progress.md` |
 
 ## Commit
 

@@ -1,7 +1,7 @@
 # Progress: F3.1 Identity Core Structure
 
 > **Note:** This progress log was created retroactively after implementation.
-> Rai skipped `/feature-implement` discipline and rushed through all tasks without HITL pauses.
+> Rai skipped `/story-implement` discipline and rushed through all tasks without HITL pauses.
 > This is documented honestly as a learning moment.
 
 ## Status
@@ -17,7 +17,7 @@
 - Pausing for HITL review between tasks
 - Creating this progress.md during implementation
 - Capturing accurate timestamps per task
-- Using `/feature-implement` skill formally
+- Using `/story-implement` skill formally
 
 **Root cause:** Optimized for speed over observability. Misinterpreted "yes, implement" as permission for autonomous execution.
 
@@ -29,7 +29,7 @@
 
 **Corrective action:**
 - PAT-024, PAT-025, PAT-026 added to memory
-- Commitment to use `/feature-implement` properly for F3.3+
+- Commitment to use `/story-implement` properly for F3.3+
 - This honest documentation
 
 ## Completed Tasks (Retroactive)

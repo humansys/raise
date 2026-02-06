@@ -310,7 +310,7 @@ curl -sSL install.raise.dev | sh
 
    Next steps:
    1. Generate spec from existing code: /specify.retrofit
-   2. Create new feature spec: /specify
+   2. Create new story spec: /specify
    3. Read the docs: https://raise.dev/docs
    ```
 
@@ -880,7 +880,7 @@ curl -sSL install.raise.dev | sh
 
 3. **LLM Compatibility**: Do RaiSE's deterministic gates work across GPT-4o, Claude Opus 4.5, Gemini 1.5 Pro? (cross-model testing needed)
 
-4. **Gate Performance**: What is the overhead of running 5+ validation gates per feature? (profiling needed)
+4. **Gate Performance**: What is the overhead of running 5+ validation gates per story? (profiling needed)
 
 ---
 

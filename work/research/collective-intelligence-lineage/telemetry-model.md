@@ -56,7 +56,7 @@ Five deterministic signals that enable continuous improvement:
 {
   "type": "skill_event",
   "timestamp": "2026-02-02T14:30:00Z",
-  "skill": "feature-design",
+  "skill": "story-design",
   "event": "complete",
   "duration_sec": 1800
 }
@@ -159,7 +159,7 @@ What local Rai does with signals (no network required):
 
 | Signal | Local insight example |
 |--------|----------------------|
-| skill_event | "You abandon /feature-design on small features — consider skipping for XS/S" |
+| skill_event | "You abandon /story-design on small stories — consider skipping for XS/S" |
 | session_event | "Research sessions: 90% success. Feature sessions: 60%. What's different?" |
 | calibration | "Your S estimates are consistently 2x off — consider adjusting mental model" |
 | error_event | "You've hit 'pytest not found' 5 times — add to your shell profile?" |
@@ -189,8 +189,8 @@ What local Rai does with signals (no network required):
 Raw event stream. Append-only. Local always.
 
 ```jsonl
-{"type":"skill_event","timestamp":"...","skill":"feature-design","event":"start","duration_sec":null}
-{"type":"skill_event","timestamp":"...","skill":"feature-design","event":"complete","duration_sec":1800}
+{"type":"skill_event","timestamp":"...","skill":"story-design","event":"start","duration_sec":null}
+{"type":"skill_event","timestamp":"...","skill":"story-design","event":"complete","duration_sec":1800}
 {"type":"calibration","timestamp":"...","feature_size":"S","estimated_min":45,"actual_min":30}
 ```
 
@@ -200,7 +200,7 @@ Rai's analysis based on signal patterns.
 
 ```jsonl
 {"id":"INS-001","created":"2026-02-02","signal":"calibration","insight":"S estimates trending 1.5x optimistic","suggestion":"Apply 1.5x multiplier to S estimates","confidence":"high"}
-{"id":"INS-002","created":"2026-02-02","signal":"skill_event","insight":"feature-design abandoned 3/5 times for XS features","suggestion":"Consider skipping design for XS","confidence":"medium"}
+{"id":"INS-002","created":"2026-02-02","signal":"skill_event","insight":"story-design abandoned 3/5 times for XS features","suggestion":"Consider skipping design for XS","confidence":"medium"}
 ```
 
 ### config.json

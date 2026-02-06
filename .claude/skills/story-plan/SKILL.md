@@ -1,5 +1,5 @@
 ---
-name: feature-plan
+name: story-plan
 description: >
   Decompose user stories into atomic executable tasks, identify dependencies,
   and create a deterministic implementation plan. Use after design spec is ready
@@ -9,10 +9,10 @@ license: MIT
 
 metadata:
   raise.work_cycle: feature
-  raise.frequency: per-feature
+  raise.frequency: per-story
   raise.fase: "5"
   raise.prerequisites: project-backlog
-  raise.next: feature-implement
+  raise.next: story-implement
   raise.gate: gate-plan
   raise.adaptable: "true"
   raise.version: "1.0.0"
@@ -22,11 +22,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=story-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=story-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Plan: Implementation Planning
@@ -48,14 +48,14 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 **When to use:**
 - After having prioritized stories in the backlog
 - Before starting feature implementation
-- For each feature to be developed
+- For each story to be developed
 
 **Inputs required:**
 - User stories for the feature to implement
 - Technical Design for architectural context (if complex)
 
 **Output:**
-- Implementation plan: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
+- Implementation plan: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
 
 ## Steps
 
@@ -64,7 +64,7 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event start --phase plan
+uv run raise memory emit-work feature {story_id} --event start --phase plan
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e start -p plan`
@@ -74,19 +74,19 @@ uv run raise memory emit-work feature {feature_id} --event start --phase plan
 Check design document for complex features:
 
 ```bash
-ls work/epics/e*/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No design"
+ls work/epics/e*/stories/{story_id}/design.md 2>/dev/null || echo "INFO: No design"
 ```
 
 **Decision:**
 - design.md exists → Load and reference
 - design.md missing + Simple feature → Continue (design optional)
-- design.md missing + Moderate/Complex → Suggest `/feature-design` first
+- design.md missing + Moderate/Complex → Suggest `/story-design` first
 
-**Skip condition:** Simple features (per complexity matrix in /feature-design).
+**Skip condition:** Simple features (per complexity matrix in /story-design).
 
 **Verification:** Design loaded OR simple feature confirmed.
 
-> **If you can't continue:** Complex feature without design → Run `/feature-design` first.
+> **If you can't continue:** Complex feature without design → Run `/story-design` first.
 
 ### Step 0.5: Query Context
 
@@ -161,13 +161,13 @@ Divide story into atomic tasks:
 **Required final task:** Always include a manual integration test task as the last task:
 ```markdown
 ### Task N (Final): Manual Integration Test
-- **Description:** Validate feature works end-to-end with running software
-- **Verification:** Demo the feature working (not just unit tests passing)
+- **Description:** Validate story works end-to-end with running software
+- **Verification:** Demo the story working (not just unit tests passing)
 - **Size:** XS
 - **Dependencies:** All previous tasks
 ```
 
-This validates the implementation with real usage before marking the feature complete.
+This validates the implementation with real usage before marking the story complete.
 
 ### Step 3: Identify Dependencies
 
@@ -218,17 +218,17 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event complete --phase plan
+uv run raise memory emit-work feature {story_id} --event complete --phase plan
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e complete -p plan`
 
 ## Output
 
-- **Artifact:** `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
+- **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
 - **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
-- **Next:** `/feature-implement`
+- **Next:** `/story-implement`
 
 ## Plan Template
 
@@ -260,8 +260,8 @@ uv run raise memory emit-work feature {feature_id} --event complete --phase plan
 - **Dependencies:** Task 1
 
 ### Task N (Final): Manual Integration Test
-- **Description:** Validate feature works end-to-end with running software
-- **Verification:** Demo the feature working interactively
+- **Description:** Validate story works end-to-end with running software
+- **Verification:** Demo the story working interactively
 - **Size:** XS
 - **Dependencies:** All previous tasks
 
@@ -285,4 +285,4 @@ uv run raise memory emit-work feature {feature_id} --event complete --phase plan
 ## References
 
 - Gate: `gates/gate-plan.md`
-- Next skill: `/feature-implement`
+- Next skill: `/story-implement`

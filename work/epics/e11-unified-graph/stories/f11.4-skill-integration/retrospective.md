@@ -27,7 +27,7 @@
 - **Root cause:** Rai assumed `main` was the development branch without checking CLAUDE.md
 
 **Problem 2: Skipped epic branch**
-- Even after fixing to v2, merged feature branches directly to v2
+- Even after fixing to v2, merged story branches directly to v2
 - Correct flow: Feature → Epic → v2
 - **Root cause:** Rai didn't verify the branch workflow before merging
 
@@ -58,7 +58,7 @@
 
 ### Are there improvements for the framework?
 
-1. **Branch management checklist in merge operations** — Add to /feature-review or create /feature-merge skill
+1. **Branch management checklist in merge operations** — Add to /story-review or create /feature-merge skill
 2. **Document branch hierarchy explicitly** — `dev/sops/branch-management.md` exists but wasn't consulted
 3. **Pattern for epic branch workflow** — Make explicit: features merge to epic, epic merges to dev
 
@@ -87,7 +87,7 @@
 
 ### Parking Lot (future)
 
-1. [ ] Add branch verification step to /feature-review skill
+1. [ ] Add branch verification step to /story-review skill
 2. [ ] Consider /feature-merge skill or checklist
 3. [ ] Update CLAUDE.local.md template to include current epic branch
 4. [ ] Add pattern: "Verify merge target before git merge operations"
@@ -95,7 +95,7 @@
 ## Action Items
 
 - [ ] Add PAT-052: Branch verification before merge operations
-- [ ] Update /feature-review to include merge verification checklist
+- [ ] Update /story-review to include merge verification checklist
 - [ ] Review `dev/sops/branch-management.md` and extract key rules to skills
 
 ## Metrics

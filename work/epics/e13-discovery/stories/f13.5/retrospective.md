@@ -15,7 +15,7 @@
 ## What Went Well
 
 - **TDD discipline:** RED→GREEN→REFACTOR cycle worked perfectly
-- **Teaching opportunity:** Fer observed full feature lifecycle
+- **Teaching opportunity:** Fer observed full story lifecycle
 - **Clean implementation:** Ruff + Pyright passed on first try after refactor
 - **15 new tests:** 10 unit + 5 CLI integration
 

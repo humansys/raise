@@ -48,7 +48,7 @@ Examples:
 
 > "Your S estimates may be 1.5x optimistic — consider adjusting."
 
-> "You tend to abandon /feature-design for small features. Skip it for XS?"
+> "You tend to abandon /story-design for small stories. Skip it for XS?"
 
 > "Morning sessions complete goals 2x more often than afternoon ones."
 

@@ -66,7 +66,7 @@ raise-commons/
 ├── src/raise_cli/       # CLI implementation
 │
 ├── work/                # Active work
-│   ├── features/        # Feature specs
+│   ├── stories/        # Feature specs
 │   └── research/        # Research sessions
 │
 └── dev/                 # Framework maintenance
@@ -251,12 +251,12 @@ Based on **ADR-015** and **ADR-016**:
 ### Feature Lifecycle
 | Skill | Purpose |
 |-------|---------|
-| `/feature-start` | Branch, context, scope commit |
-| `/feature-design` | Lean spec for complex features |
-| `/feature-plan` | Decompose to atomic tasks |
-| `/feature-implement` | Execute plan with verification |
-| `/feature-review` | Retrospective, learnings |
-| `/feature-close` | Merge, cleanup, tracking |
+| `/story-start` | Branch, context, scope commit |
+| `/story-design` | Lean spec for complex features |
+| `/story-plan` | Decompose to atomic tasks |
+| `/story-implement` | Execute plan with verification |
+| `/story-review` | Retrospective, learnings |
+| `/story-close` | Merge, cleanup, tracking |
 
 ### Discovery & Research
 | Skill | Purpose |

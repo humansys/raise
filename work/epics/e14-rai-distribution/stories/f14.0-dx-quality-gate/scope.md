@@ -24,7 +24,7 @@
 - [ ] Format: Pattern | Anti-pattern | Why | Example
 
 **1.2 Update Framework Integration**
-- [ ] Add Jidoka checkpoint to `/feature-review` skill
+- [ ] Add Jidoka checkpoint to `/story-review` skill
 - [ ] Update `.pre-commit-config.yaml` (add pip-audit, detect-secrets)
 - [ ] Reference guardrails-stack.md from CLAUDE.md
 
@@ -81,7 +81,7 @@
 ## Done Criteria
 
 - [ ] `guardrails-stack.md` created with synthesized best practices
-- [ ] `/feature-review` has Jidoka checkpoint for stack patterns
+- [ ] `/story-review` has Jidoka checkpoint for stack patterns
 - [ ] Pre-commit hooks updated (pip-audit, detect-secrets)
 - [ ] `raise init` output clearly distinguishes CLI/Skills
 - [ ] No deprecated code warnings in normal usage paths

@@ -105,7 +105,7 @@ Signals follow OTel semantic conventions for future OTLP export:
 class SkillEvent(BaseModel):
     type: Literal["skill_event"] = "skill_event"
     timestamp: datetime
-    skill: str  # e.g., "feature-design"
+    skill: str  # e.g., "story-design"
     event: Literal["start", "complete", "abandon"]
     duration_sec: int | None = None
 
@@ -120,7 +120,7 @@ class SessionEvent(BaseModel):
 class CalibrationEvent(BaseModel):
     type: Literal["calibration"] = "calibration"
     timestamp: datetime
-    feature_id: str
+    story_id: str
     feature_size: str  # T-shirt size
     estimated_min: int
     actual_min: int

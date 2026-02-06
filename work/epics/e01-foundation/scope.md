@@ -97,4 +97,4 @@ F1.6 can be parallel with F1.5
 
 ---
 
-*Epic tracking - updated per feature completion*
+*Epic tracking - updated per story completion*

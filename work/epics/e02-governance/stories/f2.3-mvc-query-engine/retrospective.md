@@ -90,7 +90,7 @@
 - **Rationale:** 3 consecutive features delivered 2-3x faster; adjust baseline
 
 **Task Granularity:**
-- **Current:** 6 tasks for 2 SP feature worked well
+- **Current:** 6 tasks for 2 SP story worked well
 - **Keep:** Atomic tasks (15-min actual vs 20-45min estimates)
 - **Why:** Small tasks enable fast feedback loops, easy parallelization
 
@@ -165,7 +165,7 @@
 
 ### 📋 Deferred (Action Items Below)
 
-These require broader framework changes beyond single feature scope:
+These require broader framework changes beyond single story scope:
 
 1. **Update estimation guidelines with kata multiplier**
 2. **Add Python naming best practices to guardrails**

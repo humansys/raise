@@ -41,8 +41,8 @@
 - **Duration:** ~5 min
 - **Files:**
   - `src/raise_cli/cli/commands/telemetry.py` (extended)
-  - `.claude/skills/feature-review/SKILL.md` (modified)
-- **Notes:** Added `raise telemetry emit-calibration` + Step 6 in feature-review
+  - `.claude/skills/story-review/SKILL.md` (modified)
+- **Notes:** Added `raise telemetry emit-calibration` + Step 6 in story-review
 
 ## Blockers
 - None

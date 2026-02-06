@@ -1,5 +1,5 @@
 ---
-feature_id: "F2.2"
+story_id: "F2.2"
 title: "Graph Builder"
 epic: "E2: Governance Toolkit"
 story_points: 2
@@ -487,4 +487,4 @@ def test_graph_serialization_roundtrip():
 ---
 
 *Created: 2026-01-31*
-*Ready for: `/feature-plan`*
+*Ready for: `/story-plan`*

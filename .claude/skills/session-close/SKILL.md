@@ -153,7 +153,7 @@ Output brief suggestion:
 
 **Calibration:** If features completed, also run:
 ```bash
-uv run raise memory add-calibration {feature_id} --name "Name" -s {size} -a {actual_mins} -e {estimated_mins}
+uv run raise memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins} -e {estimated_mins}
 ```
 
 ## References

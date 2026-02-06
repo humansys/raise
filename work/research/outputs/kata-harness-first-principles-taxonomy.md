@@ -389,7 +389,7 @@ Step 1 → [Gate: confidence < 0.8] → Pause → Human approval → Step 2
 
 ```markdown
 1. **Initialize Environment**:
-   - Load or create `specs/features/{feature-id}/progress.md`
+   - Load or create `specs/stories/{feature-id}/progress.md`
    - Determine starting point (--start-from, progress.md, or T1)
 ```
 
@@ -1007,7 +1007,7 @@ From RaiSE Constitution §8:
 {
   "trace_id": "kata-discovery-f14-20260129-103045",
   "kata_id": "flujo-04-discovery",
-  "feature_id": "F1.4",
+  "story_id": "F1.4",
   "started_at": "2026-01-29T10:30:45Z",
   "status": "in_progress",
   "current_step": "paso-2",
@@ -1070,7 +1070,7 @@ cat traces/*.jsonl | jq '.steps[].verification | select(.gate_id == "gate-prd-lo
 cat traces/*.jsonl | jq '.steps[] | select(.step_id == "paso-2") | .actions[].tokens_used' | jq -s 'add/length'
 
 # Which features had escalations?
-cat traces/*.jsonl | jq 'select(.context.escalations > 0) | .feature_id'
+cat traces/*.jsonl | jq 'select(.context.escalations > 0) | .story_id'
 ```
 
 ---

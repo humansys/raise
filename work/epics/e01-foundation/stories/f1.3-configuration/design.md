@@ -1,5 +1,5 @@
 ---
-feature_id: "F1.3"
+story_id: "F1.3"
 title: "Configuration System"
 epic_ref: "E1 Core Foundation"
 story_points: 5

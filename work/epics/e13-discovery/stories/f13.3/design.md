@@ -443,4 +443,4 @@ Rai can understand relationships better when seeing module context.
 ---
 
 *Design created: 2026-02-04*
-*Next: `/feature-plan` to decompose into tasks*
+*Next: `/story-plan` to decompose into tasks*

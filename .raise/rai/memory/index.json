@@ -430,7 +430,7 @@
       "source_file": "work/epics/e02-governance/scope.md",
       "created": "2026-02-06T04:43:33.002836+00:00",
       "metadata": {
-        "feature_id": "F2.1",
+        "story_id": "F2.1",
         "name": "Concept Extraction",
         "status": "complete",
         "size": null,
@@ -446,7 +446,7 @@
       "source_file": "work/epics/e02-governance/scope.md",
       "created": "2026-02-06T04:43:33.002843+00:00",
       "metadata": {
-        "feature_id": "F2.2",
+        "story_id": "F2.2",
         "name": "Graph Builder",
         "status": "complete",
         "size": null,
@@ -462,7 +462,7 @@
       "source_file": "work/epics/e02-governance/scope.md",
       "created": "2026-02-06T04:43:33.002849+00:00",
       "metadata": {
-        "feature_id": "F2.3",
+        "story_id": "F2.3",
         "name": "MVC Query Engine",
         "status": "complete",
         "size": null,
@@ -478,7 +478,7 @@
       "source_file": "work/epics/e02-governance/scope.md",
       "created": "2026-02-06T04:43:33.002853+00:00",
       "metadata": {
-        "feature_id": "F2.4",
+        "story_id": "F2.4",
         "name": "CLI Commands",
         "status": "pending",
         "size": null,
@@ -494,7 +494,7 @@
       "source_file": "work/epics/e12-extractors/scope.md",
       "created": "2026-02-06T04:43:33.002857+00:00",
       "metadata": {
-        "feature_id": "F12.1",
+        "story_id": "F12.1",
         "name": "ADR Extractor",
         "status": "complete",
         "size": "M",
@@ -510,7 +510,7 @@
       "source_file": "work/epics/e12-extractors/scope.md",
       "created": "2026-02-06T04:43:33.002861+00:00",
       "metadata": {
-        "feature_id": "F12.2",
+        "story_id": "F12.2",
         "name": "Guardrails Extractor",
         "status": "complete",
         "size": "S",
@@ -526,7 +526,7 @@
       "source_file": "work/epics/e12-extractors/scope.md",
       "created": "2026-02-06T04:43:33.002865+00:00",
       "metadata": {
-        "feature_id": "F12.3",
+        "story_id": "F12.3",
         "name": "Glossary Extractor",
         "status": "complete",
         "size": "S",
@@ -542,7 +542,7 @@
       "source_file": "work/epics/e12-extractors/scope.md",
       "created": "2026-02-06T04:43:33.002871+00:00",
       "metadata": {
-        "feature_id": "F12.4",
+        "story_id": "F12.4",
         "name": "Schema Extension",
         "status": "complete",
         "size": "XS",
@@ -554,16 +554,16 @@
     {
       "id": "feature-f12-5",
       "type": "feature",
-      "content": "F12.5: Skill Query Alignment (complete) - Fix query/type mismatches in feature cycle skills",
+      "content": "F12.5: Skill Query Alignment (complete) - Fix query/type mismatches in story cycle skills",
       "source_file": "work/epics/e12-extractors/scope.md",
       "created": "2026-02-06T04:43:33.002875+00:00",
       "metadata": {
-        "feature_id": "F12.5",
+        "story_id": "F12.5",
         "name": "Skill Query Alignment",
         "status": "complete",
         "size": "S",
         "sp": null,
-        "description": "Fix query/type mismatches in feature cycle skills",
+        "description": "Fix query/type mismatches in story cycle skills",
         "epic_id": "E12"
       }
     },
@@ -574,7 +574,7 @@
       "source_file": "work/epics/e12-extractors/scope.md",
       "created": "2026-02-06T04:43:33.002879+00:00",
       "metadata": {
-        "feature_id": "F12.6",
+        "story_id": "F12.6",
         "name": "Memory Write CLI",
         "status": "complete",
         "size": "M",
@@ -590,7 +590,7 @@
       "source_file": "work/epics/e08-backlog/scope.md",
       "created": "2026-02-06T04:43:33.002905+00:00",
       "metadata": {
-        "feature_id": "F8.1",
+        "story_id": "F8.1",
         "name": "Backlog Parser",
         "status": "pending",
         "size": "S",
@@ -606,7 +606,7 @@
       "source_file": "work/epics/e08-backlog/scope.md",
       "created": "2026-02-06T04:43:33.002891+00:00",
       "metadata": {
-        "feature_id": "F8.2",
+        "story_id": "F8.2",
         "name": "Epic Parser",
         "status": "deferred",
         "size": "S",
@@ -622,7 +622,7 @@
       "source_file": "work/epics/e08-backlog/scope.md",
       "created": "2026-02-06T04:43:33.002897+00:00",
       "metadata": {
-        "feature_id": "F8.3",
+        "story_id": "F8.3",
         "name": "Graph Extension",
         "status": "pending",
         "size": "S",
@@ -638,7 +638,7 @@
       "source_file": "work/epics/e08-backlog/scope.md",
       "created": "2026-02-06T04:43:33.002901+00:00",
       "metadata": {
-        "feature_id": "F8.4",
+        "story_id": "F8.4",
         "name": "Work Queries",
         "status": "pending",
         "size": "S",
@@ -654,7 +654,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002909+00:00",
       "metadata": {
-        "feature_id": "F10.1",
+        "story_id": "F10.1",
         "name": "Lineage Schema",
         "status": "pending",
         "size": "XS",
@@ -670,7 +670,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002913+00:00",
       "metadata": {
-        "feature_id": "F10.2",
+        "story_id": "F10.2",
         "name": "Export Command",
         "status": "pending",
         "size": "S",
@@ -686,7 +686,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002916+00:00",
       "metadata": {
-        "feature_id": "F10.3",
+        "story_id": "F10.3",
         "name": "Community Repo",
         "status": "pending",
         "size": "XS",
@@ -702,7 +702,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002923+00:00",
       "metadata": {
-        "feature_id": "F10.4",
+        "story_id": "F10.4",
         "name": "Pull Command",
         "status": "pending",
         "size": "S",
@@ -718,7 +718,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002926+00:00",
       "metadata": {
-        "feature_id": "F10.5",
+        "story_id": "F10.5",
         "name": "Sharing Config",
         "status": "pending",
         "size": "S",
@@ -734,7 +734,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002932+00:00",
       "metadata": {
-        "feature_id": "F10.6",
+        "story_id": "F10.6",
         "name": "Sync API",
         "status": "pending",
         "size": "M",
@@ -750,7 +750,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002936+00:00",
       "metadata": {
-        "feature_id": "F10.7",
+        "story_id": "F10.7",
         "name": "Team/Org Scopes",
         "status": "pending",
         "size": "M",
@@ -766,7 +766,7 @@
       "source_file": "work/epics/e10-collective/scope.md",
       "created": "2026-02-06T04:43:33.002940+00:00",
       "metadata": {
-        "feature_id": "F10.8",
+        "story_id": "F10.8",
         "name": "Aggregate Analytics",
         "status": "pending",
         "size": "M",
@@ -782,7 +782,7 @@
       "source_file": "work/epics/e07-onboarding/scope.md",
       "created": "2026-02-06T04:43:33.002944+00:00",
       "metadata": {
-        "feature_id": "F7.1",
+        "story_id": "F7.1",
         "name": "Onboard Command",
         "status": "pending",
         "size": "S",
@@ -798,7 +798,7 @@
       "source_file": "work/epics/e07-onboarding/scope.md",
       "created": "2026-02-06T04:43:33.002947+00:00",
       "metadata": {
-        "feature_id": "F7.2",
+        "story_id": "F7.2",
         "name": "Package Metadata",
         "status": "complete",
         "size": "XS",
@@ -814,7 +814,7 @@
       "source_file": "work/epics/e07-onboarding/scope.md",
       "created": "2026-02-06T04:43:33.002954+00:00",
       "metadata": {
-        "feature_id": "F7.3",
+        "story_id": "F7.3",
         "name": "Status Command",
         "status": "pending",
         "size": "XS",
@@ -830,7 +830,7 @@
       "source_file": "work/epics/e07-onboarding/scope.md",
       "created": "2026-02-06T04:43:33.002957+00:00",
       "metadata": {
-        "feature_id": "F7.4",
+        "story_id": "F7.4",
         "name": "README & Docs",
         "status": "complete",
         "size": "S",
@@ -846,7 +846,7 @@
       "source_file": "work/epics/e07-onboarding/scope.md",
       "created": "2026-02-06T04:43:33.002961+00:00",
       "metadata": {
-        "feature_id": "F7.5",
+        "story_id": "F7.5",
         "name": "Doctor Command",
         "status": "deferred",
         "size": "S",
@@ -862,7 +862,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.002965+00:00",
       "metadata": {
-        "feature_id": "F14.1",
+        "story_id": "F14.1",
         "name": "Base Identity Package",
         "status": "pending",
         "size": "S",
@@ -878,7 +878,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.002969+00:00",
       "metadata": {
-        "feature_id": "F14.2",
+        "story_id": "F14.2",
         "name": "Base Patterns Catalog",
         "status": "pending",
         "size": "M",
@@ -894,7 +894,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.002977+00:00",
       "metadata": {
-        "feature_id": "F14.3",
+        "story_id": "F14.3",
         "name": "Methodology Core",
         "status": "pending",
         "size": "S",
@@ -910,7 +910,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.002981+00:00",
       "metadata": {
-        "feature_id": "F14.4",
+        "story_id": "F14.4",
         "name": "Bootstrap on Init",
         "status": "pending",
         "size": "M",
@@ -926,7 +926,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.002987+00:00",
       "metadata": {
-        "feature_id": "F14.5",
+        "story_id": "F14.5",
         "name": "Auto MEMORY.md Generation",
         "status": "pending",
         "size": "M",
@@ -942,7 +942,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.002990+00:00",
       "metadata": {
-        "feature_id": "F14.6",
+        "story_id": "F14.6",
         "name": "Pattern Versioning",
         "status": "pending",
         "size": "S",
@@ -958,7 +958,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.002994+00:00",
       "metadata": {
-        "feature_id": "F14.7",
+        "story_id": "F14.7",
         "name": "Base Show Command",
         "status": "pending",
         "size": "XS",
@@ -974,7 +974,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.003000+00:00",
       "metadata": {
-        "feature_id": "F14.15",
+        "story_id": "F14.15",
         "name": "Multi-Developer Architecture",
         "status": "pending",
         "size": "M",
@@ -990,7 +990,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.003004+00:00",
       "metadata": {
-        "feature_id": "F14.8",
+        "story_id": "F14.8",
         "name": "Config Support",
         "status": "pending",
         "size": "S",
@@ -1006,7 +1006,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.003008+00:00",
       "metadata": {
-        "feature_id": "F14.9",
+        "story_id": "F14.9",
         "name": "Git Source Resolution",
         "status": "pending",
         "size": "M",
@@ -1022,7 +1022,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.003011+00:00",
       "metadata": {
-        "feature_id": "F14.10",
+        "story_id": "F14.10",
         "name": "Base Update Command",
         "status": "pending",
         "size": "S",
@@ -1038,7 +1038,7 @@
       "source_file": "work/epics/e14-rai-distribution/scope.md",
       "created": "2026-02-06T04:43:33.003015+00:00",
       "metadata": {
-        "feature_id": "F14.11",
+        "story_id": "F14.11",
         "name": "Update Detection",
         "status": "pending",
         "size": "S",
@@ -1054,7 +1054,7 @@
       "source_file": "work/epics/e01-foundation/scope.md",
       "created": "2026-02-06T04:43:33.003021+00:00",
       "metadata": {
-        "feature_id": "F1.1",
+        "story_id": "F1.1",
         "name": "Project Scaffolding",
         "status": "complete",
         "size": null,
@@ -1070,7 +1070,7 @@
       "source_file": "work/epics/e01-foundation/scope.md",
       "created": "2026-02-06T04:43:33.003028+00:00",
       "metadata": {
-        "feature_id": "F1.2",
+        "story_id": "F1.2",
         "name": "CLI Skeleton",
         "status": "complete",
         "size": null,
@@ -1086,7 +1086,7 @@
       "source_file": "work/epics/e01-foundation/scope.md",
       "created": "2026-02-06T04:43:33.003032+00:00",
       "metadata": {
-        "feature_id": "F1.3",
+        "story_id": "F1.3",
         "name": "Configuration System",
         "status": "complete",
         "size": null,
@@ -1102,7 +1102,7 @@
       "source_file": "work/epics/e01-foundation/scope.md",
       "created": "2026-02-06T04:43:33.003035+00:00",
       "metadata": {
-        "feature_id": "F1.4",
+        "story_id": "F1.4",
         "name": "Exception Hierarchy",
         "status": "complete",
         "size": null,
@@ -1118,7 +1118,7 @@
       "source_file": "work/epics/e01-foundation/scope.md",
       "created": "2026-02-06T04:43:33.003039+00:00",
       "metadata": {
-        "feature_id": "F1.5",
+        "story_id": "F1.5",
         "name": "Output Module",
         "status": "complete",
         "size": null,
@@ -1134,7 +1134,7 @@
       "source_file": "work/epics/e01-foundation/scope.md",
       "created": "2026-02-06T04:43:33.003043+00:00",
       "metadata": {
-        "feature_id": "F1.6",
+        "story_id": "F1.6",
         "name": "Core Utilities",
         "status": "complete",
         "size": null,
@@ -1150,7 +1150,7 @@
       "source_file": "work/epics/e11-unified-graph/scope.md",
       "created": "2026-02-06T04:43:33.003047+00:00",
       "metadata": {
-        "feature_id": "F11.1",
+        "story_id": "F11.1",
         "name": "Unified Graph Schema",
         "status": "pending",
         "size": "S",
@@ -1166,7 +1166,7 @@
       "source_file": "work/epics/e11-unified-graph/scope.md",
       "created": "2026-02-06T04:43:33.003051+00:00",
       "metadata": {
-        "feature_id": "F11.2",
+        "story_id": "F11.2",
         "name": "Graph Builder",
         "status": "pending",
         "size": "M",
@@ -1182,7 +1182,7 @@
       "source_file": "work/epics/e11-unified-graph/scope.md",
       "created": "2026-02-06T04:43:33.003057+00:00",
       "metadata": {
-        "feature_id": "F11.3",
+        "story_id": "F11.3",
         "name": "Unified Query",
         "status": "pending",
         "size": "S",
@@ -1198,7 +1198,7 @@
       "source_file": "work/epics/e11-unified-graph/scope.md",
       "created": "2026-02-06T04:43:33.003065+00:00",
       "metadata": {
-        "feature_id": "F11.4",
+        "story_id": "F11.4",
         "name": "Skill Integration",
         "status": "pending",
         "size": "S",
@@ -1214,7 +1214,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003071+00:00",
       "metadata": {
-        "feature_id": "F9.1",
+        "story_id": "F9.1",
         "name": "Signal Schema",
         "status": "pending",
         "size": "XS",
@@ -1230,7 +1230,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003075+00:00",
       "metadata": {
-        "feature_id": "F9.2",
+        "story_id": "F9.2",
         "name": "Signal Writer",
         "status": "pending",
         "size": "S",
@@ -1246,7 +1246,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003078+00:00",
       "metadata": {
-        "feature_id": "F9.3",
+        "story_id": "F9.3",
         "name": "Skill Emitters",
         "status": "pending",
         "size": "S",
@@ -1262,7 +1262,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003082+00:00",
       "metadata": {
-        "feature_id": "F9.4",
+        "story_id": "F9.4",
         "name": "Session Emitters",
         "status": "pending",
         "size": "S",
@@ -1278,7 +1278,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003086+00:00",
       "metadata": {
-        "feature_id": "F9.5",
+        "story_id": "F9.5",
         "name": "Error Emitters",
         "status": "pending",
         "size": "XS",
@@ -1294,7 +1294,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003090+00:00",
       "metadata": {
-        "feature_id": "F9.6",
+        "story_id": "F9.6",
         "name": "Signal Analyzer",
         "status": "pending",
         "size": "M",
@@ -1310,7 +1310,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003093+00:00",
       "metadata": {
-        "feature_id": "F9.7",
+        "story_id": "F9.7",
         "name": "Insight Generator",
         "status": "pending",
         "size": "M",
@@ -1326,7 +1326,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003099+00:00",
       "metadata": {
-        "feature_id": "F9.8",
+        "story_id": "F9.8",
         "name": "Session Start Integration",
         "status": "pending",
         "size": "S",
@@ -1342,7 +1342,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003103+00:00",
       "metadata": {
-        "feature_id": "F9.9",
+        "story_id": "F9.9",
         "name": "Calibration Updater",
         "status": "pending",
         "size": "S",
@@ -1358,7 +1358,7 @@
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003109+00:00",
       "metadata": {
-        "feature_id": "F9.10",
+        "story_id": "F9.10",
         "name": "Telemetry Commands",
         "status": "pending",
         "size": "M",
@@ -1370,16 +1370,16 @@
     {
       "id": "feature-f9-11",
       "type": "feature",
-      "content": "F9.11: Retro Integration (pending) - /feature-review queries telemetry",
+      "content": "F9.11: Retro Integration (pending) - /story-review queries telemetry",
       "source_file": "work/epics/e09-telemetry/scope.md",
       "created": "2026-02-06T04:43:33.003113+00:00",
       "metadata": {
-        "feature_id": "F9.11",
+        "story_id": "F9.11",
         "name": "Retro Integration",
         "status": "pending",
         "size": "S",
         "sp": null,
-        "description": "/feature-review queries telemetry",
+        "description": "/story-review queries telemetry",
         "epic_id": "E9"
       }
     },
@@ -1390,7 +1390,7 @@
       "source_file": "work/epics/e03-identity/scope.md",
       "created": "2026-02-06T04:43:33.003117+00:00",
       "metadata": {
-        "feature_id": "F3.1",
+        "story_id": "F3.1",
         "name": "Identity Core Structure",
         "status": "complete",
         "size": "S",
@@ -1406,7 +1406,7 @@
       "source_file": "work/epics/e03-identity/scope.md",
       "created": "2026-02-06T04:43:33.003120+00:00",
       "metadata": {
-        "feature_id": "F3.2",
+        "story_id": "F3.2",
         "name": "Content Migration",
         "status": "complete",
         "size": "S",
@@ -1422,7 +1422,7 @@
       "source_file": "work/epics/e03-identity/scope.md",
       "created": "2026-02-06T04:43:33.003124+00:00",
       "metadata": {
-        "feature_id": "F3.3",
+        "story_id": "F3.3",
         "name": "Memory Graph",
         "status": "complete",
         "size": "S",
@@ -1438,7 +1438,7 @@
       "source_file": "work/epics/e03-identity/scope.md",
       "created": "2026-02-06T04:43:33.003130+00:00",
       "metadata": {
-        "feature_id": "F3.4",
+        "story_id": "F3.4",
         "name": "Memory Query CLI",
         "status": "complete",
         "size": "S",
@@ -1454,7 +1454,7 @@
       "source_file": "work/epics/e03-identity/scope.md",
       "created": "2026-02-06T04:43:33.003134+00:00",
       "metadata": {
-        "feature_id": "F3.5",
+        "story_id": "F3.5",
         "name": "Skills Integration",
         "status": "pending",
         "size": "XS",
@@ -1470,7 +1470,7 @@
       "source_file": "work/epics/e13-discovery/scope.md",
       "created": "2026-02-06T04:43:33.003145+00:00",
       "metadata": {
-        "feature_id": "F13.1",
+        "story_id": "F13.1",
         "name": "Schema Extension",
         "status": "complete",
         "size": "S ",
@@ -1486,7 +1486,7 @@
       "source_file": "work/epics/e13-discovery/scope.md",
       "created": "2026-02-06T04:43:33.003151+00:00",
       "metadata": {
-        "feature_id": "F13.2",
+        "story_id": "F13.2",
         "name": "Extraction Toolkit",
         "status": "complete",
         "size": "M ",
@@ -1502,7 +1502,7 @@
       "source_file": "work/epics/e13-discovery/scope.md",
       "created": "2026-02-06T04:43:33.003154+00:00",
       "metadata": {
-        "feature_id": "F13.3",
+        "story_id": "F13.3",
         "name": "Discovery Skills",
         "status": "complete",
         "size": "M ",
@@ -1518,7 +1518,7 @@
       "source_file": "work/epics/e13-discovery/scope.md",
       "created": "2026-02-06T04:43:33.003160+00:00",
       "metadata": {
-        "feature_id": "F13.4",
+        "story_id": "F13.4",
         "name": "Graph Integration",
         "status": "complete",
         "size": "S ",
@@ -1534,7 +1534,7 @@
       "source_file": "work/epics/e13-discovery/scope.md",
       "created": "2026-02-06T04:43:33.003164+00:00",
       "metadata": {
-        "feature_id": "F13.5",
+        "story_id": "F13.5",
         "name": "Drift Detection",
         "status": "complete",
         "size": "XS",
@@ -3390,7 +3390,7 @@
     {
       "id": "PAT-026",
       "type": "pattern",
-      "content": "Use skills on own work - /feature-implement creates progress.md, enables resumability, demonstrates the methodology works",
+      "content": "Use skills on own work - /story-implement creates progress.md, enables resumability, demonstrates the methodology works",
       "source_file": ".raise/rai/memory/patterns.jsonl",
       "created": "2026-02-02",
       "metadata": {
@@ -3925,7 +3925,7 @@
     {
       "id": "PAT-058",
       "type": "pattern",
-      "content": "Momentum trap: quick wins (XS features) create flow that bypasses process for subsequent work. Pause after each feature completion and consciously invoke skills for the next.",
+      "content": "Momentum trap: quick wins (XS features) create flow that bypasses process for subsequent work. Pause after each story completion and consciously invoke skills for the next.",
       "source_file": ".raise/rai/memory/patterns.jsonl",
       "created": "2026-02-03",
       "metadata": {
@@ -3935,7 +3935,7 @@
           "momentum",
           "skills"
         ],
-        "learned_from": "F12.1 retrospective - skipped /feature-plan after F12.4",
+        "learned_from": "F12.1 retrospective - skipped /story-plan after F12.4",
         "scope": "project"
       }
     },
@@ -3959,7 +3959,7 @@
     {
       "id": "PAT-060",
       "type": "pattern",
-      "content": "Feature lifecycle bookends (/feature-start, /feature-close) with prerequisite gates create enforceable workflow without excessive friction. Soft gates warn, hard gates block.",
+      "content": "Feature lifecycle bookends (/story-start, /story-close) with prerequisite gates create enforceable workflow without excessive friction. Soft gates warn, hard gates block.",
       "source_file": ".raise/rai/memory/patterns.jsonl",
       "created": "2026-02-03",
       "metadata": {
@@ -4319,7 +4319,7 @@
     {
       "id": "PAT-082",
       "type": "pattern",
-      "content": "Full kata cycle on S-sized features yields ~3x velocity - dont skip phases for small features, the overhead is minimal and the structure helps",
+      "content": "Full kata cycle on S-sized features yields ~3x velocity - dont skip phases for small stories, the overhead is minimal and the structure helps",
       "source_file": ".raise/rai/memory/patterns.jsonl",
       "created": "2026-02-04",
       "metadata": {
@@ -4710,7 +4710,7 @@
     {
       "id": "PAT-106",
       "type": "pattern",
-      "content": "Poka-yoke chain: epic-start creates branch that feature-start verifies \u2014 prevents orphan feature branches",
+      "content": "Poka-yoke chain: epic-start creates branch that story-start verifies \u2014 prevents orphan story branches",
       "source_file": ".raise/rai/memory/patterns.jsonl",
       "created": "2026-02-05",
       "metadata": {
@@ -4940,7 +4940,7 @@
     {
       "id": "PAT-120",
       "type": "pattern",
-      "content": "Tree structure for epics: work/epics/e{NN}-{name}/features/f{NN}.{M}-{name}/ - clear containment, consistent naming, better navigation (ISSUE-004)",
+      "content": "Tree structure for epics: work/epics/e{NN}-{name}/stories/f{NN}.{M}-{name}/ - clear containment, consistent naming, better navigation (ISSUE-004)",
       "source_file": ".raise/rai/memory/patterns.jsonl",
       "created": "2026-02-05",
       "metadata": {
@@ -5629,14 +5629,14 @@
     {
       "id": "/epic-close",
       "type": "skill",
-      "content": "Complete an epic with retrospective, metrics capture, branch cleanup, and merge to development branch. Use after all features are done to formally close the epic lifecycle.",
+      "content": "Complete an epic with retrospective, metrics capture, branch cleanup, and merge to development branch. Use after all stories are done to formally close the epic lifecycle.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/epic-close/SKILL.md",
       "created": "2026-02-06T02:49:18.213313+00:00",
       "metadata": {
         "raise.work_cycle": "epic",
         "raise.frequency": "per-epic",
         "raise.fase": "epic-close",
-        "raise.prerequisites": "all features complete",
+        "raise.prerequisites": "all stories complete",
         "raise.next": "",
         "raise.gate": "",
         "raise.adaptable": "true",
@@ -5697,7 +5697,7 @@
     {
       "id": "/epic-plan",
       "type": "skill",
-      "content": "Sequence features from epic-design into an executable plan with milestones, dependencies, and progress tracking. Use after /epic-design to create a realistic implementation roadmap before starting feature work.",
+      "content": "Sequence features from epic-design into an executable plan with milestones, dependencies, and progress tracking. Use after /epic-design to create a realistic implementation roadmap before starting story work.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/epic-plan/SKILL.md",
       "created": "2026-02-06T02:49:18.213999+00:00",
       "metadata": {
@@ -5705,23 +5705,23 @@
         "raise.frequency": "per-epic",
         "raise.fase": "4",
         "raise.prerequisites": "epic-design",
-        "raise.next": "feature-design",
+        "raise.next": "story-design",
         "raise.gate": "",
         "raise.adaptable": "true",
         "raise.version": "1.0.0"
       }
     },
     {
-      "id": "/feature-close",
+      "id": "/story-close",
       "type": "skill",
-      "content": "Complete a feature with retrospective verification, merge, cleanup, and tracking update. Use after review to formally close the feature lifecycle.",
-      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-close/SKILL.md",
+      "content": "Complete a feature with retrospective verification, merge, cleanup, and tracking update. Use after review to formally close the story lifecycle.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/story-close/SKILL.md",
       "created": "2026-02-06T02:49:18.213999+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
-        "raise.frequency": "per-feature",
+        "raise.frequency": "per-story",
         "raise.fase": "8",
-        "raise.prerequisites": "feature-review",
+        "raise.prerequisites": "story-review",
         "raise.next": "",
         "raise.gate": "",
         "raise.adaptable": "true",
@@ -5763,34 +5763,34 @@
       }
     },
     {
-      "id": "/feature-plan",
+      "id": "/story-plan",
       "type": "skill",
       "content": "Decompose user stories into atomic executable tasks, identify dependencies, and create a deterministic implementation plan. Use after design spec is ready or for simple features that skip design.",
-      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-plan/SKILL.md",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/story-plan/SKILL.md",
       "created": "2026-02-06T02:49:18.214999+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
-        "raise.frequency": "per-feature",
+        "raise.frequency": "per-story",
         "raise.fase": "5",
         "raise.prerequisites": "project-backlog",
-        "raise.next": "feature-implement",
+        "raise.next": "story-implement",
         "raise.gate": "gate-plan",
         "raise.adaptable": "true",
         "raise.version": "1.0.0"
       }
     },
     {
-      "id": "/feature-design",
+      "id": "/story-design",
       "type": "skill",
-      "content": "Create lean feature specifications optimized for both human understanding and AI alignment. Use before planning complex features (>3 components, >5 SP), when architectural decisions are needed, or when AI will generate significant code.",
-      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-design/SKILL.md",
+      "content": "Create lean story specifications optimized for both human understanding and AI alignment. Use before planning complex features (>3 components, >5 SP), when architectural decisions are needed, or when AI will generate significant code.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/story-design/SKILL.md",
       "created": "2026-02-06T03:44:10.326037+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
-        "raise.frequency": "per-feature-as-needed",
+        "raise.frequency": "per-story-as-needed",
         "raise.fase": "4",
         "raise.prerequisites": "project-backlog",
-        "raise.next": "feature-plan",
+        "raise.next": "story-plan",
         "raise.gate": "",
         "raise.adaptable": "true",
         "raise.version": "1.1.0"
@@ -5814,17 +5814,17 @@
       }
     },
     {
-      "id": "/feature-start",
+      "id": "/story-start",
       "type": "skill",
-      "content": "Initialize a feature with verified context, branch, and scope commit. Use at the beginning of feature work to ensure proper setup and traceability from the start.",
-      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-start/SKILL.md",
+      "content": "Initialize a feature with verified context, branch, and scope commit. Use at the beginning of story work to ensure proper setup and traceability from the start.",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/story-start/SKILL.md",
       "created": "2026-02-06T02:49:18.214999+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
-        "raise.frequency": "per-feature",
+        "raise.frequency": "per-story",
         "raise.fase": "3",
         "raise.prerequisites": "",
-        "raise.next": "feature-design",
+        "raise.next": "story-design",
         "raise.gate": "",
         "raise.adaptable": "true",
         "raise.version": "1.2.0"
@@ -5865,34 +5865,34 @@
       }
     },
     {
-      "id": "/feature-review",
+      "id": "/story-review",
       "type": "skill",
       "content": "Reflect on completed features to extract learnings, identify process improvements, and update the framework with insights gained. Use after implementation is complete to close the development cycle.",
-      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-review/SKILL.md",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/story-review/SKILL.md",
       "created": "2026-02-06T03:44:10.326168+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
-        "raise.frequency": "per-feature",
+        "raise.frequency": "per-story",
         "raise.fase": "7",
-        "raise.prerequisites": "feature-implement",
-        "raise.next": "feature-close",
+        "raise.prerequisites": "story-implement",
+        "raise.next": "story-close",
         "raise.gate": "",
         "raise.adaptable": "true",
         "raise.version": "1.1.0"
       }
     },
     {
-      "id": "/feature-implement",
+      "id": "/story-implement",
       "type": "skill",
       "content": "Execute the implementation plan task by task, verifying each step, and producing quality code that passes validation gates. Use after planning is complete.",
-      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/feature-implement/SKILL.md",
+      "source_file": "/home/emilio/Code/raise-commons/.claude/skills/story-implement/SKILL.md",
       "created": "2026-02-06T02:49:18.213999+00:00",
       "metadata": {
         "raise.work_cycle": "feature",
-        "raise.frequency": "per-feature",
+        "raise.frequency": "per-story",
         "raise.fase": "6",
-        "raise.prerequisites": "feature-plan",
-        "raise.next": "feature-review",
+        "raise.prerequisites": "story-plan",
+        "raise.next": "story-review",
         "raise.gate": "gate-code",
         "raise.adaptable": "true",
         "raise.version": "1.0.0"
@@ -5935,7 +5935,7 @@
     {
       "id": "/epic-start",
       "type": "skill",
-      "content": "Initialize an epic with branch and scope commit. Creates the epic branch from v2 that feature branches will nest under.",
+      "content": "Initialize an epic with branch and scope commit. Creates the epic branch from v2 that story branches will nest under.",
       "source_file": "/home/emilio/Code/raise-commons/.claude/skills/epic-start/SKILL.md",
       "created": "2026-02-06T03:44:10.325372+00:00",
       "metadata": {
@@ -7934,10 +7934,10 @@
       "source_file": "src/raise_cli/governance/parsers/epic.py",
       "created": "2026-02-04T18:50:00Z",
       "metadata": {
-        "name": "extract_features",
+        "name": "extract_stories",
         "kind": "function",
         "line": 174,
-        "signature": "def extract_features(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "signature": "def extract_stories(file_path: Path, project_root: Path | None=None) -> list[Concept]",
         "category": "utility",
         "depends_on": [
           "pathlib.Path"
@@ -9051,7 +9051,7 @@
         "plan"
       ],
       "source": "req-rf-01",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -9062,7 +9062,7 @@
         "plan"
       ],
       "source": "req-rf-01",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -9481,7 +9481,7 @@
         "gates"
       ],
       "source": "req-rf-02",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -11267,7 +11267,7 @@
         "generate"
       ],
       "source": "req-rf-06",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -12693,7 +12693,7 @@
         "gates"
       ],
       "source": "principle-governance-as-code",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -13296,7 +13296,7 @@
         "gates"
       ],
       "source": "principle-validation-gates-en-cada-fase",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -14394,7 +14394,7 @@
         "gates"
       ],
       "source": "principle-lean-software-development",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -15074,7 +15074,7 @@
         "complete"
       ],
       "source": "epic-e8",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -15729,7 +15729,7 @@
         "complete"
       ],
       "source": "feature-f12-1",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -15786,7 +15786,7 @@
         "complete"
       ],
       "source": "feature-f12-2",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -15842,7 +15842,7 @@
         "complete"
       ],
       "source": "feature-f12-3",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -16114,7 +16114,7 @@
         "complete"
       ],
       "source": "feature-f12-5",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -16125,7 +16125,7 @@
         "feature"
       ],
       "source": "feature-f12-5",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -16136,7 +16136,7 @@
         "cycle"
       ],
       "source": "feature-f12-5",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -20529,7 +20529,7 @@
         "complete"
       ],
       "source": "feature-f13-2",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -20743,7 +20743,7 @@
         "complete"
       ],
       "source": "feature-f13-3",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -21543,7 +21543,7 @@
         "gates"
       ],
       "source": "decision-adr-011",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -21943,7 +21943,7 @@
         "gates"
       ],
       "source": "decision-adr-012",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -23446,7 +23446,7 @@
         "deterministic"
       ],
       "source": "decision-adr-018",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -24550,7 +24550,7 @@
         "code"
       ],
       "source": "decision-adr-020",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -25964,7 +25964,7 @@
         "context"
       ],
       "source": "decision-adr-007",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -26462,7 +26462,7 @@
         "code"
       ],
       "source": "guardrail-must-code-001",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -27514,7 +27514,7 @@
         "context"
       ],
       "source": "term-command-category",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -28322,7 +28322,7 @@
         "scope"
       ],
       "source": "term-context",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -29619,7 +29619,7 @@
         "framework"
       ],
       "source": "term-checkpoint-heutag-gico",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -29741,7 +29741,7 @@
         "create"
       ],
       "source": "term-collaborative-intelligence",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -34269,7 +34269,7 @@
         "implementation"
       ],
       "source": "term-mvc",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -34696,7 +34696,7 @@
         "plan"
       ],
       "source": "term-observable-workflow",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -34708,7 +34708,7 @@
         "gates"
       ],
       "source": "term-observable-workflow",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -37065,7 +37065,7 @@
         "plan"
       ],
       "source": "term-implementation-plan",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -37511,7 +37511,7 @@
         "design"
       ],
       "source": "PAT-012",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -37534,7 +37534,7 @@
         "simple"
       ],
       "source": "PAT-013",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -37545,7 +37545,7 @@
         "features"
       ],
       "source": "PAT-013",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -37556,7 +37556,7 @@
         "task"
       ],
       "source": "PAT-013",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -37658,7 +37658,7 @@
         "tasks"
       ],
       "source": "PAT-016",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -37737,7 +37737,7 @@
         "retrospective"
       ],
       "source": "PAT-018",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -38205,7 +38205,7 @@
         "commit"
       ],
       "source": "PAT-028",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -38383,7 +38383,7 @@
         "plan"
       ],
       "source": "PAT-033",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -38395,7 +38395,7 @@
         "features"
       ],
       "source": "PAT-033",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -38406,7 +38406,7 @@
         "plan"
       ],
       "source": "PAT-033",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -39628,7 +39628,7 @@
         "architectural"
       ],
       "source": "PAT-049",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -39876,7 +39876,7 @@
         "merge"
       ],
       "source": "PAT-052",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -39887,7 +39887,7 @@
         "features"
       ],
       "source": "PAT-052",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -40582,7 +40582,7 @@
         "plan"
       ],
       "source": "PAT-055",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -40638,7 +40638,7 @@
         "features"
       ],
       "source": "PAT-056",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -40649,7 +40649,7 @@
         "scope"
       ],
       "source": "PAT-056",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -40759,7 +40759,7 @@
         "complete"
       ],
       "source": "PAT-057",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -40952,7 +40952,7 @@
         "create"
       ],
       "source": "PAT-058",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -40964,7 +40964,7 @@
         "create"
       ],
       "source": "PAT-058",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -40975,7 +40975,7 @@
         "work"
       ],
       "source": "PAT-058",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -40986,7 +40986,7 @@
         "process"
       ],
       "source": "PAT-058",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -41447,7 +41447,7 @@
         "lifecycle"
       ],
       "source": "PAT-060",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -41470,7 +41470,7 @@
         "create"
       ],
       "source": "PAT-060",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -41595,7 +41595,7 @@
         "create"
       ],
       "source": "PAT-061",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -42012,7 +42012,7 @@
         "implementation"
       ],
       "source": "PAT-063",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -42024,7 +42024,7 @@
         "process"
       ],
       "source": "PAT-063",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -42358,7 +42358,7 @@
         "cycle"
       ],
       "source": "PAT-070",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -42946,7 +42946,7 @@
         "features"
       ],
       "source": "PAT-082",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -42958,7 +42958,7 @@
         "cycle"
       ],
       "source": "PAT-082",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -43101,7 +43101,7 @@
         "design"
       ],
       "source": "PAT-088",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -43112,7 +43112,7 @@
         "process"
       ],
       "source": "PAT-088",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -43145,7 +43145,7 @@
         "retrospective"
       ],
       "source": "PAT-089",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -43457,7 +43457,7 @@
         "process"
       ],
       "source": "PAT-095",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -43638,7 +43638,7 @@
         "implementation"
       ],
       "source": "PAT-098",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -43650,7 +43650,7 @@
         "lean"
       ],
       "source": "PAT-098",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -43661,7 +43661,7 @@
         "implementation"
       ],
       "source": "PAT-098",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -43999,7 +43999,7 @@
         "lifecycle"
       ],
       "source": "PAT-106",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -44010,7 +44010,7 @@
         "branch"
       ],
       "source": "PAT-106",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -44100,7 +44100,7 @@
         "quality"
       ],
       "source": "PAT-109",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -44331,7 +44331,7 @@
         "quality"
       ],
       "source": "PAT-114",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -44487,7 +44487,7 @@
         "extract"
       ],
       "source": "PAT-117",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -45402,7 +45402,7 @@
         "implementation"
       ],
       "source": "PAT-125",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -45413,7 +45413,7 @@
         "implementation"
       ],
       "source": "PAT-125",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -45703,7 +45703,7 @@
         "cleanup"
       ],
       "source": "PAT-127",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -46205,7 +46205,7 @@
         "create"
       ],
       "source": "PAT-133",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -46382,7 +46382,7 @@
         "start"
       ],
       "source": "PAT-137",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -46416,7 +46416,7 @@
         "process"
       ],
       "source": "PAT-138",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -46499,7 +46499,7 @@
         "quality"
       ],
       "source": "PAT-142",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -46926,7 +46926,7 @@
         "lifecycle"
       ],
       "source": "/epic-close",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -46939,7 +46939,7 @@
         "close"
       ],
       "source": "/epic-close",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -47250,7 +47250,7 @@
       "type": "related_to",
       "weight": 1.0,
       "source": "/epic-plan",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -47262,7 +47262,7 @@
         "create"
       ],
       "source": "/epic-plan",
-      "target": "/feature-design",
+      "target": "/story-design",
       "key": 1
     },
     {
@@ -47273,7 +47273,7 @@
         "tracking"
       ],
       "source": "/epic-plan",
-      "target": "/feature-close",
+      "target": "/story-close",
       "key": 0
     },
     {
@@ -47288,7 +47288,7 @@
         "create"
       ],
       "source": "/epic-plan",
-      "target": "/feature-plan",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -47299,7 +47299,7 @@
         "work"
       ],
       "source": "/epic-plan",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -47321,7 +47321,7 @@
         "implementation"
       ],
       "source": "/epic-plan",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -47332,7 +47332,7 @@
         "plan"
       ],
       "source": "/epic-plan",
-      "target": "/feature-implement",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -47372,8 +47372,8 @@
     {
       "type": "needs_context",
       "weight": 1.0,
-      "source": "/feature-close",
-      "target": "/feature-review",
+      "source": "/story-close",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -47384,8 +47384,8 @@
         "update",
         "close"
       ],
-      "source": "/feature-close",
-      "target": "/feature-review",
+      "source": "/story-close",
+      "target": "/story-review",
       "key": 1
     },
     {
@@ -47395,7 +47395,7 @@
         "tracking",
         "feature"
       ],
-      "source": "/feature-close",
+      "source": "/story-close",
       "target": "comp-telemetry-calibrationevent",
       "key": 0
     },
@@ -47425,7 +47425,7 @@
         "context"
       ],
       "source": "/discover-start",
-      "target": "/feature-start",
+      "target": "/story-start",
       "key": 0
     },
     {
@@ -47464,8 +47464,8 @@
     {
       "type": "related_to",
       "weight": 1.0,
-      "source": "/feature-plan",
-      "target": "/feature-implement",
+      "source": "/story-plan",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -47475,8 +47475,8 @@
         "implementation",
         "plan"
       ],
-      "source": "/feature-plan",
-      "target": "/feature-implement",
+      "source": "/story-plan",
+      "target": "/story-implement",
       "key": 1
     },
     {
@@ -47486,8 +47486,8 @@
         "features",
         "create"
       ],
-      "source": "/feature-plan",
-      "target": "/feature-design",
+      "source": "/story-plan",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -47498,8 +47498,8 @@
         "features",
         "implementation"
       ],
-      "source": "/feature-plan",
-      "target": "/feature-review",
+      "source": "/story-plan",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -47509,15 +47509,15 @@
         "features",
         "design"
       ],
-      "source": "/feature-plan",
+      "source": "/story-plan",
       "target": "/epic-design",
       "key": 0
     },
     {
       "type": "related_to",
       "weight": 1.0,
-      "source": "/feature-design",
-      "target": "/feature-plan",
+      "source": "/story-design",
+      "target": "/story-plan",
       "key": 0
     },
     {
@@ -47527,8 +47527,8 @@
         "planning",
         "code"
       ],
-      "source": "/feature-design",
-      "target": "/feature-implement",
+      "source": "/story-design",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -47541,7 +47541,7 @@
         "significant",
         "architectural"
       ],
-      "source": "/feature-design",
+      "source": "/story-design",
       "target": "/epic-design",
       "key": 0
     },
@@ -47552,7 +47552,7 @@
         "architectural",
         "code"
       ],
-      "source": "/feature-design",
+      "source": "/story-design",
       "target": "comp-discovery-detect-drift",
       "key": 0
     },
@@ -47563,7 +47563,7 @@
         "architectural",
         "components"
       ],
-      "source": "/feature-design",
+      "source": "/story-design",
       "target": "comp-cli-drift-command",
       "key": 0
     },
@@ -47587,7 +47587,7 @@
         "close"
       ],
       "source": "/session-close",
-      "target": "/feature-review",
+      "target": "/story-review",
       "key": 0
     },
     {
@@ -47615,8 +47615,8 @@
     {
       "type": "related_to",
       "weight": 1.0,
-      "source": "/feature-start",
-      "target": "/feature-design",
+      "source": "/story-start",
+      "target": "/story-design",
       "key": 0
     },
     {
@@ -47626,7 +47626,7 @@
         "feature",
         "work"
       ],
-      "source": "/feature-start",
+      "source": "/story-start",
       "target": "/epic-design",
       "key": 0
     },
@@ -47640,7 +47640,7 @@
         "initialize",
         "commit"
       ],
-      "source": "/feature-start",
+      "source": "/story-start",
       "target": "/epic-start",
       "key": 0
     },
@@ -47651,7 +47651,7 @@
         "work",
         "context"
       ],
-      "source": "/feature-start",
+      "source": "/story-start",
       "target": "comp-context-unifiedgraphbuilder",
       "key": 0
     },
@@ -47662,7 +47662,7 @@
         "feature",
         "scope"
       ],
-      "source": "/feature-start",
+      "source": "/story-start",
       "target": "comp-governance-extract-features",
       "key": 0
     },
@@ -47713,8 +47713,8 @@
     {
       "type": "needs_context",
       "weight": 1.0,
-      "source": "/feature-review",
-      "target": "/feature-implement",
+      "source": "/story-review",
+      "target": "/story-implement",
       "key": 0
     },
     {
@@ -47724,29 +47724,29 @@
         "implementation",
         "complete"
       ],
-      "source": "/feature-review",
-      "target": "/feature-implement",
+      "source": "/story-review",
+      "target": "/story-implement",
       "key": 1
     },
     {
       "type": "related_to",
       "weight": 1.0,
-      "source": "/feature-review",
-      "target": "/feature-close",
+      "source": "/story-review",
+      "target": "/story-close",
       "key": 0
     },
     {
       "type": "needs_context",
       "weight": 1.0,
-      "source": "/feature-implement",
-      "target": "/feature-plan",
+      "source": "/story-implement",
+      "target": "/story-plan",
       "key": 0
     },
     {
       "type": "related_to",
       "weight": 1.0,
-      "source": "/feature-implement",
-      "target": "/feature-review",
+      "source": "/story-implement",
+      "target": "/story-review",
       "key": 0
     },
     {

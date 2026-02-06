@@ -113,4 +113,4 @@ Linear dependency chain — each task builds on the previous.
 ---
 
 *Plan created: 2026-02-03*
-*Ready for: /feature-implement*
+*Ready for: /story-implement*

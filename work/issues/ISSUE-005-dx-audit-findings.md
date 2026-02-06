@@ -127,8 +127,8 @@ Epic-plan includes 50+ lines of "Sequencing Strategies Deep Dive" — reference 
 ### 7. Telemetry Boilerplate in 7 Skills
 
 **Problem:** Step 0 (telemetry emit) and Step 0.5 (context query) duplicated in:
-- epic-design, epic-plan, feature-design, feature-plan
-- feature-implement, feature-review, research
+- epic-design, epic-plan, story-design, story-plan
+- story-implement, story-review, research
 
 ~30-50 lines × 7 skills = 210-350 lines of duplication
 

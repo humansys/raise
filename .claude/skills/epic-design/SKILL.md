@@ -58,7 +58,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - When multiple features need coordination or share dependencies
 
 **When to skip:**
-- Single-feature work (go directly to `/feature-design`)
+- Single-story work (go directly to `/story-design`)
 - Bug fixes or maintenance (use issue tracker)
 - Infrastructure tasks with obvious implementation
 - Exploratory spikes (use `/research` skill first)
@@ -177,7 +177,7 @@ Break the epic into features that can be independently designed, planned, and de
 - Features are small enough to complete in 1-5 days (not weeks)
 - Features can have clear acceptance criteria
 
-**For each feature, capture:**
+**For each story, capture:**
 - **ID**: F{epic}.{seq} (e.g., F3.1, F3.2)
 - **Name**: Short descriptive name
 - **Description**: 1-2 sentences of what it delivers
@@ -530,7 +530,7 @@ F{N}.4
 
 ---
 
-*Epic tracking - update per feature completion*
+*Epic tracking - update per story completion*
 *Created: YYYY-MM-DD*
 ```
 
@@ -552,7 +552,7 @@ F{N}.4
 4. **Too few features** — If <3 features, consider if this is really an epic
 5. **ADRs for everything** — Only document significant decisions; implementation details don't need ADRs
 6. **No ADRs at all** — Architectural decisions without documentation are lost knowledge
-7. **Over-specifying features** — Save details for `/feature-design`; epic level is high-level
+7. **Over-specifying features** — Save details for `/story-design`; epic level is high-level
 8. **Ignoring dependencies** — Unmapped dependencies cause blocked work during implementation
 9. **Unclear done criteria** — "We'll know it when we see it" is not a done criterion
 
@@ -573,7 +573,7 @@ This skill supports the three-layer memory model:
 
 - **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
 - **ADR Template:** `.raise/templates/architecture/adr.md`
-- **Feature Design:** `/feature-design` (next level down)
+- **Feature Design:** `/story-design` (next level down)
 - **Epic Plan:** `/epic-plan` (sequence features after design)
 - **Epic Close:** `/epic-close` (retrospective after completion)
 - **Constitution:** `framework/reference/constitution.md` (principles governing design)
@@ -588,7 +588,7 @@ Project Level
     ↓
 /epic-plan    ← Sequence features, milestones
     ↓
-/feature-design → /feature-plan → /feature-implement → /feature-review
+/story-design → /story-plan → /story-implement → /story-review
     ↓
 /epic-close   ← Retrospective, learnings
 ```

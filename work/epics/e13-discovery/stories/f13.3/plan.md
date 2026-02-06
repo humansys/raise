@@ -6,7 +6,7 @@
 - **Story Points:** 4 SP (M)
 - **Feature Size:** M
 - **Created:** 2026-02-04
-- **Design:** `work/features/f13.3/design.md`
+- **Design:** `work/stories/f13.3/design.md`
 
 ## Tasks
 
@@ -135,7 +135,7 @@ Sequential execution — each skill depends on the previous skill's output.
 
 | Risk | Mitigation |
 |------|------------|
-| Skill markdown format errors | Copy from existing skill (feature-start) as template |
+| Skill markdown format errors | Copy from existing skill (story-start) as template |
 | Stop hook not triggering | Test with `/discover-start` first, verify signals.jsonl |
 | YAML output format issues | Document exact schema in skill, validate manually |
 
@@ -154,7 +154,7 @@ Sequential execution — each skill depends on the previous skill's output.
 
 ### Skill Structure Consistency
 
-All skills must follow the established pattern from `feature-start`:
+All skills must follow the established pattern from `story-start`:
 - YAML frontmatter with name, description, license, metadata, hooks
 - Stop hook pointing to `log-skill-complete.sh`
 - Purpose, ShuHaRi, Context, Steps, Output, Notes sections
@@ -184,4 +184,4 @@ Should show `skill_event` with skill name and duration.
 ---
 
 *Plan created: 2026-02-04*
-*Next: `/feature-implement` to execute tasks*
+*Next: `/story-implement` to execute tasks*

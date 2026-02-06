@@ -1,5 +1,5 @@
 ---
-feature_id: "F2.3"
+story_id: "F2.3"
 title: "MVC Query Engine"
 epic: "E2: Governance Toolkit"
 story_points: 2
@@ -700,7 +700,7 @@ def test_cli_context_query_command():
 
 ## References
 
-- **F2.2 Graph Builder**: `work/features/f2.2-graph-builder/` (provides graph + traversal)
+- **F2.2 Graph Builder**: `work/stories/f2.2-graph-builder/` (provides graph + traversal)
 - **Spike validation**: `dev/experiments/test_mvc.py` (97% token savings proven)
 - **Architecture**: `dev/decisions/adr-011-concept-level-graph-architecture.md`
 - **Epic scope**: `dev/epic-e2-scope.md`
@@ -709,4 +709,4 @@ def test_cli_context_query_command():
 ---
 
 *Created: 2026-01-31*
-*Ready for: `/feature-plan`*
+*Ready for: `/story-plan`*

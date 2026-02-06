@@ -36,7 +36,7 @@ NodeType = Literal[
     "requirement",  # RF-* — PRD requirements
     "outcome",      # OUT-* — vision outcomes
     "epic",         # E* — epic scopes
-    "feature",      # F*.* — feature work
+    "feature",      # F*.* — story work
     "skill",        # /name — skill metadata
 ]
 ```
@@ -59,7 +59,7 @@ EdgeType = Literal[
 
 ```python
 class ConceptNode(BaseModel):
-    id: str                      # PAT-001, §2, F11.1, /feature-plan
+    id: str                      # PAT-001, §2, F11.1, /story-plan
     type: NodeType               # Node type
     content: str                 # Main text/description
     source_file: str | None      # Where it came from

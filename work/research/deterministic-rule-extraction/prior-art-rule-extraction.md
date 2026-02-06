@@ -430,7 +430,7 @@ npx bmad-method flatten --input /path/to/source --output my-project.xml
 
 **References**:
 - [Refact.ai Blog: Open-Source Fine-Tuning](https://refact.ai/blog/2023/open-source-fine-tuning-with-refact/)
-- [Refact Documentation: Context](https://docs.refact.ai/features/context/)
+- [Refact Documentation: Context](https://docs.refact.ai/stories/context/)
 
 ---
 
@@ -477,7 +477,7 @@ npx bmad-method flatten --input /path/to/source --output my-project.xml
 
 ### 3.4 GitHub Copilot Workspace
 
-**Source**: [GitHub Copilot](https://github.com/features/copilot) | [GitHub Next](https://githubnext.com/projects/copilot-workspace)
+**Source**: [GitHub Copilot](https://github.com/stories/copilot) | [GitHub Next](https://githubnext.com/projects/copilot-workspace)
 
 **Approach**: Copilot Workspace reads codebase and generates specifications with current vs desired state.
 

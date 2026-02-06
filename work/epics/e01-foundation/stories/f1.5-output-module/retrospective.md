@@ -48,7 +48,7 @@
 
 ### Are there improvements for the framework?
 
-1. **Task granularity guidance** — Add to `/feature-plan` skill: "For features ≤5 SP, prefer 2-3 tasks max"
+1. **Task granularity guidance** — Add to `/story-plan` skill: "For features ≤5 SP, prefer 2-3 tasks max"
 2. **pyright cast() pattern** — Document in guardrails when `cast()` is appropriate
 3. **Spec-to-code ratio** — Track this metric; F1.5 was ~0.8x (healthy)
 
@@ -63,14 +63,14 @@
 
 | Improvement | Status | Location |
 |-------------|--------|----------|
-| Task granularity guidance | ✓ **Done** | `.claude/skills/feature-plan/SKILL.md` |
-| T-shirt sizing (XS/S/M/L) | ✓ **Done** | `.claude/skills/feature-plan/SKILL.md` |
+| Task granularity guidance | ✓ **Done** | `.claude/skills/story-plan/SKILL.md` |
+| T-shirt sizing (XS/S/M/L) | ✓ **Done** | `.claude/skills/story-plan/SKILL.md` |
 | Duration tracking table | ✓ **Done** | Plan template |
 | cast() pattern docs | ✓ **Done** | `governance/solution/guardrails.md` |
 
 ## Action Items
 
-- [x] Update `/feature-plan` skill with task granularity guidance
+- [x] Update `/story-plan` skill with task granularity guidance
 - [x] Add T-shirt sizing (XS/S/M/L) instead of hour estimates
 - [x] Add duration tracking table to plan template for calibration
 - [x] Add pyright `cast()` pattern to guardrails

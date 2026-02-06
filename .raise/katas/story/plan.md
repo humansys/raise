@@ -2,7 +2,7 @@
 id: plan
 titulo: "Plan: Implementation Planning"
 work_cycle: feature
-frequency: per-feature
+frequency: per-story
 fase_metodologia: 5
 
 prerequisites:
@@ -38,7 +38,7 @@ Descomponer user stories en tasks atómicos ejecutables, identificar dependencia
 - Technical Design para contexto arquitectónico
 
 **Output:**
-- `work/features/{feature}/plan.md` - Plan de implementación
+- `work/stories/{feature}/plan.md` - Plan de implementación
 
 ## Pasos
 
@@ -109,7 +109,7 @@ Crear documento de plan con:
 ## Output
 
 - **Artefacto:** Implementation Plan
-- **Ubicación:** `work/features/{feature}/plan.md`
+- **Ubicación:** `work/stories/{feature}/plan.md`
 - **Gate:** `gates/gate-plan.md`
 - **Siguiente kata:** `feature/implement`
 

@@ -86,7 +86,7 @@
 
 **Yes - 3 improvements identified:**
 
-1. **Update feature-plan kata:** Add reminder to validate inference rules/patterns against real data during planning, not just design
+1. **Update story-plan kata:** Add reminder to validate inference rules/patterns against real data during planning, not just design
 
 2. **Update guardrails:** Document Pyright + Pydantic false positive exception explicitly in `governance/solution/guardrails.md`
 
@@ -169,7 +169,7 @@
 
 ### Framework Improvements (Low Priority)
 - [ ] Create ADR template for inference rule decisions (when to be conservative vs aggressive)
-- [ ] Add "test with real data" checkpoint to feature-plan kata (after design validation)
+- [ ] Add "test with real data" checkpoint to story-plan kata (after design validation)
 - [ ] Update guardrails.md with Pyright + Pydantic exception pattern
 
 ## Conclusion

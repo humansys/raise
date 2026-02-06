@@ -38,7 +38,7 @@
 | `.raise/gates/gate-discovery.md` | 21 | refs `specs/main/project_requirements.md` |
 | `.raise/gates/gate-estimation.md` | 3,35 | refs `specs/main/*.md` |
 | `.raise/gates/gate-design.md` | 19 | refs `.raise/specs/` |
-| `.raise/katas/feature/*.md` | various | refs `specs/{feature}/` |
+| `.raise/katas/story/*.md` | various | refs `specs/{feature}/` |
 | `.raise/katas/setup/governance.md` | 390 | refs `specs/main/research/` |
 | `.raise/README.md` | 133 | refs `specs/raise/adrs/` |
 
@@ -185,7 +185,7 @@ grep -n "specs/\|docs/framework\|\.raise/context" CLAUDE.md
 | `specs/main/project_requirements.md` | `governance/projects/{project}/prd.md` |
 | `specs/main/tech_design.md` | `governance/projects/{project}/design.md` |
 | `specs/main/project_backlog.md` | `governance/projects/{project}/backlog.md` |
-| `specs/{feature}/` | `work/features/{feature}/` |
+| `specs/{feature}/` | `work/stories/{feature}/` |
 | `specs/raise/adrs/` | `dev/decisions/framework/` |
 | `.raise/context/*.md` | `framework/reference/*.md` |
 | `framework/context/*.md` | `framework/reference/*.md` |
@@ -210,9 +210,9 @@ grep -n "specs/\|docs/framework\|\.raise/context" CLAUDE.md
 - [ ] `.raise/gates/gate-vision.md`
 
 ### Batch 3: .raise/ katas
-- [ ] `.raise/katas/feature/implement.md`
-- [ ] `.raise/katas/feature/plan.md`
-- [ ] `.raise/katas/feature/review.md`
+- [ ] `.raise/katas/story/implement.md`
+- [ ] `.raise/katas/story/plan.md`
+- [ ] `.raise/katas/story/review.md`
 - [ ] `.raise/katas/project/vision.md`
 - [ ] `.raise/katas/setup/governance.md`
 

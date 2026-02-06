@@ -119,7 +119,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 
 | Capability | Description |
 |------------|-------------|
-| **Kata execution engine** | Execute solution/project/feature katas via CLI |
+| **Kata execution engine** | Execute solution/project/story katas via CLI |
 | **Gate validation engine** | Deterministic validation of governance artifacts |
 | **Commands library** | Reusable atomic operations (git, ast-grep, ripgrep wrappers) |
 | **Template scaffolding** | Generate governance artifacts from templates |

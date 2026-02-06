@@ -168,4 +168,4 @@ Task 1
 ---
 
 *Created: 2026-01-31*
-*Ready for: `/feature-implement`*
+*Ready for: `/story-implement`*

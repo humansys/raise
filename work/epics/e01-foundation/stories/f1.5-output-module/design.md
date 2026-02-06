@@ -1,5 +1,5 @@
 ---
-feature_id: "F1.5"
+story_id: "F1.5"
 title: "Output Module"
 epic_ref: "E1 Core Foundation"
 story_points: 3

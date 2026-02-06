@@ -503,12 +503,12 @@ personas:
 - `/dev-story` → Implement work
 - `/code-review` → Validate quality
 
-**Use Case**: Bug fixes, small features, clear scope (<200 LOC estimated)
+**Use Case**: Bug fixes, small stories, clear scope (<200 LOC estimated)
 
 **Strengths**:
 - Lightweight (skips PRD + Architecture)
 - Fast (3 commands vs. 30-step PRD path)
-- Acknowledges not all features need full planning
+- Acknowledges not all stories need full planning
 
 **Weaknesses**:
 - Still generates documentation (just less interactive)
@@ -1341,7 +1341,7 @@ personas:
 
 **Planned** (Gap 5: Multi-Repo & Microservices Coordination):
 - **Cross-Repo Spec Linking**: YAML frontmatter `repos: [web, api, shared]`
-- **Dependency Management**: Validate all repos updated before feature complete
+- **Dependency Management**: Validate all repos updated before story complete
 - **Distributed Gates**: Gates check across all repos (centralized dashboard)
 - **Monorepo & Polyrepo Support**: Detect structure automatically; adapt workflow
 
@@ -1398,7 +1398,7 @@ personas:
 **Planned** (Gap 10: Spec Evolution & Versioning):
 - **Semantic Versioning**: `version: 1.0.0` in spec frontmatter
 - **Diff & Merge Tools**: Visual diff (spec v1 vs. v2), merge conflict resolution
-- **Incremental Addition**: Add new feature spec without regenerating existing
+- **Incremental Addition**: Add new story spec without regenerating existing
 - **Lifecycle Management**: States (Draft → Active → Deprecated → Archived)
 
 **Also**: `/specify.iterate` command (Philosophy 1: Lean Iterative)

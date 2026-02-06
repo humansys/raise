@@ -29,7 +29,7 @@ A **RaiSE-enhanced fork** addresses these by applying **Lean + Jidoka + Observab
 | 2 | **Brownfield-First Architecture** | Installation fails on existing projects | Incremental spec adoption; reverse-engineer specs from code | 70% market expansion |
 | 3 | **Observable Validation Gates** | No effectiveness metrics | Measure spec utilization, AI adherence, quality outcomes | Prove ROI empirically |
 | 4 | **Agile Integration** | Sequential waterfall workflow | Iterative spec refinement; parallel explore/specify | Compatibility with modern dev |
-| 5 | **Multi-Repo Coordination** | Single-repo assumption | Cross-repo spec linking; unified feature specs | Enterprise scalability |
+| 5 | **Multi-Repo Coordination** | Single-repo assumption | Cross-repo spec linking; unified story specs | Enterprise scalability |
 
 ---
 
@@ -203,7 +203,7 @@ A **RaiSE-enhanced fork** addresses these by applying **Lean + Jidoka + Observab
    - Alert: When AI deviates significantly
 
 3. **Quality Outcome Correlation**
-   - Track: Defects per feature (spec'd vs. non-spec'd)
+   - Track: Defects per story (spec'd vs. non-spec'd)
    - Measure: Rework hours; review cycles
    - Prove: Does spec reduce defects? Quantify ROI
 
@@ -327,7 +327,7 @@ A **RaiSE-enhanced fork** addresses these by applying **Lean + Jidoka + Observab
 
 2. **Dependency Management**
    - Declare: "Feature requires changes in repos A, B, C"
-   - Validate: All repos updated before feature complete
+   - Validate: All repos updated before story complete
    - Coordinate: PRs linked; merged atomically
 
 3. **Distributed Validation Gates**
@@ -356,7 +356,7 @@ A **RaiSE-enhanced fork** addresses these by applying **Lean + Jidoka + Observab
 
 **Success Metrics**:
 - 90% of enterprise users have multi-repo features
-- Spec successfully coordinates 3+ repos per feature
+- Spec successfully coordinates 3+ repos per story
 - Coordination overhead <10% of dev time
 
 **Effort**: High (multi-repo orchestration complex)
@@ -638,8 +638,8 @@ A **RaiSE-enhanced fork** addresses these by applying **Lean + Jidoka + Observab
    - History: Audit trail of spec changes
 
 3. **Incremental Spec Addition**
-   - Add new feature spec without regenerating existing
-   - Namespace: specs/features/001-auth, specs/features/002-billing
+   - Add new story spec without regenerating existing
+   - Namespace: specs/stories/001-auth, specs/stories/002-billing
    - Preserve: User modifications across updates
 
 4. **Spec Lifecycle Management**
@@ -1270,5 +1270,5 @@ RaiSE Spec-Kit Fork is not a competitor to spec-kit but an **evolution**:
 ---
 
 **Document Status**: Complete
-**Next Steps**: See `features/` directory for detailed feature specifications (Deliverable 3)
-**Related**: `critique-taxonomy.md` (evidence base), feature specs (implementation details)
+**Next Steps**: See `stories/` directory for detailed story specifications (Deliverable 3)
+**Related**: `critique-taxonomy.md` (evidence base), story specs (implementation details)

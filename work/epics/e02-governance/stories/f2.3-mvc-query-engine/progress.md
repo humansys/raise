@@ -88,4 +88,4 @@ None
 - **Performance:** <200ms queries, >90% token savings validated
 - **Documentation:** Component catalog updated, all APIs documented
 
-Ready for `/feature-review`!
+Ready for `/story-review`!

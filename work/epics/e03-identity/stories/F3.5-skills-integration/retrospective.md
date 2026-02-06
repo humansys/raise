@@ -33,13 +33,13 @@
 
 ### What would you change about the process?
 
-1. Run `/feature-review` BEFORE commit, not after
+1. Run `/story-review` BEFORE commit, not after
 2. Consider research as separate session when >10 min
 3. Even XS features benefit from quick design sketch
 
 ### Are there improvements for the framework?
 
-1. Add "review checkpoint" to `/feature-implement` before commit step
+1. Add "review checkpoint" to `/story-implement` before commit step
 2. Document hook-assisted workflow as architecture pattern (ADR candidate)
 3. Clarify when to skip design kata (truly trivial only)
 
@@ -58,9 +58,9 @@
 
 ## Action Items (Parking Lot)
 
-- [ ] Add "review before commit" to /feature-implement skill
+- [ ] Add "review before commit" to /story-implement skill
 - [ ] Document hook-assisted workflow pattern (ADR candidate)
-- [ ] Clarify XS feature design guidance in skills
+- [ ] Clarify XS story design guidance in skills
 
 ---
 

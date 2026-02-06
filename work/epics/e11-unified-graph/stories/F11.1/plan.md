@@ -8,7 +8,7 @@
 | Epic | E11 Unified Context Architecture |
 | Size | S (2 SP) |
 | Status | Plan |
-| Design | `work/features/F11.1/design.md` |
+| Design | `work/stories/F11.1/design.md` |
 
 ## Tasks
 
@@ -96,4 +96,4 @@ Linear dependency chain — no parallel opportunities.
 ---
 
 *Plan created: 2026-02-03*
-*Design: work/features/F11.1/design.md*
+*Design: work/stories/F11.1/design.md*

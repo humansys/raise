@@ -1,5 +1,5 @@
 ---
-feature_id: "F7.2"
+story_id: "F7.2"
 title: "Convention Detection"
 epic_ref: "E7 Onboarding"
 story_points: 3
@@ -363,4 +363,4 @@ tests/fixtures/conventions/
 ---
 
 *Design created: 2026-02-05*
-*Next: `/feature-plan` to decompose into tasks*
+*Next: `/story-plan` to decompose into tasks*

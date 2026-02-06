@@ -8,7 +8,7 @@
 - **Feature Size:** S
 - **Created:** 2026-02-04
 
-## Scope (from /feature-start)
+## Scope (from /story-start)
 
 **In:**
 - `~/.rai/developer.yaml` schema (Pydantic model)
@@ -86,7 +86,7 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
 
 ### Task 3: Manual Integration Test
 
-- **Description:** Validate feature works end-to-end with real ~/.rai/ directory
+- **Description:** Validate story works end-to-end with real ~/.rai/ directory
 - **Verification:**
   1. Delete ~/.rai/developer.yaml (backup first if exists)
   2. Run Python: `from raise_cli.onboarding.profile import *`
@@ -121,4 +121,4 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
 ---
 
 *Plan created: 2026-02-04*
-*Next: `/feature-implement`*
+*Next: `/story-implement`*

@@ -233,7 +233,7 @@ Discussion #152 - "Evolving specs"[^github-disc-152]
 **Use Case**: Long-lived projects; incremental spec updates; keeping specs in sync with changing code
 
 **User Quote**:
-> "Re-running specify init overwrites user-modified files (like constitution.md). There's no documented workflow for incrementally adding feature specs without regenerating everything."
+> "Re-running specify init overwrites user-modified files (like constitution.md). There's no documented workflow for incrementally adding story specs without regenerating everything."
 
 **Current State**: No official spec evolution workflow; community workarounds unreliable
 
@@ -363,7 +363,7 @@ Parallel branch development creates "natural conflicts"[^team-size]
 **Impact**: Coordination overhead negates productivity gains
 
 **User Quote**:
-> "Teams using Spec-Kit in models different from its design have found limitations when developing multiple feature branches in parallel."
+> "Teams using Spec-Kit in models different from its design have found limitations when developing multiple story branches in parallel."
 
 ---
 
@@ -516,7 +516,7 @@ Community extension "SpecKit Companion" fills gap[^vscode-companion]
 #### PA-002: Single-Author Assumption
 **Assumption**: One developer owns spec from conception to implementation
 
-**Validity**: Partially valid for small features; breaks at team scale
+**Validity**: Partially valid for small stories; breaks at team scale
 **Evidence**: Branch numbering conflicts; no collaborative editing support[^team-size]
 
 **Counter-Reality**:
@@ -882,7 +882,7 @@ Community extension "SpecKit Companion" fills gap[^vscode-companion]
 | **BMAD-METHOD** | Complex domain logic w/ AI team simulation | Multi-agent collaboration (Analyst, PM, Architect); deep PRD generation | Complex setup; overkill for simple features | If simple workflow; solo dev; lightweight preferred |
 | **PromptX** | Custom context for existing AI tools | MCP-based; augments Cursor/Claude; minimal overhead | Requires MCP understanding; less structured | If want full workflow; enforce gates; need templates |
 | **Amazon PR/FAQ** | Product ideation & validation | Customer-centric; concise (1-1.5 pages); stakeholder alignment | Not technical; doesn't generate code; no AI integration | If need technical implementation; AI code generation; detailed arch |
-| **ADR (Architecture Decision Records)** | Documenting arch decisions | Lightweight; point-in-time snapshots; why > how; append-only | Not comprehensive specs; no task breakdown; no AI integration | If need full feature spec; task planning; AI agent alignment |
+| **ADR (Architecture Decision Records)** | Documenting arch decisions | Lightweight; point-in-time snapshots; why > how; append-only | Not comprehensive specs; no task breakdown; no AI integration | If need full story spec; task planning; AI agent alignment |
 | **RFC (Rust/Python/IETF style)** | Technical proposals & standards | Community review process; change management; detailed rationale | Heavyweight; slow; not for every feature | If fast iteration; AI-assisted; less formality needed |
 | **Shape Up (Basecamp)** | Product development w/ fixed time | Appetite-driven; fast (6-week cycles); problem-focused pitches | Not AI-optimized; less technical detail; no code generation | If AI agents need detail; want comprehensive specs; no time constraints |
 | **GitHub Issues → PRs** | Lightweight issue tracking | Simple; integrated w/ GitHub; flexible; low ceremony | No spec template; no AI optimization; ad-hoc quality | If want structure; enforce quality; AI alignment; comprehensive docs |
@@ -910,7 +910,7 @@ Community extension "SpecKit Companion" fills gap[^vscode-companion]
 ---
 
 #### Hybrid 2: Spec-Kit + GitHub Issues
-**Pattern**: Use Spec-Kit for feature specs; sync to GitHub Issues/Projects for tracking
+**Pattern**: Use Spec-Kit for story specs; sync to GitHub Issues/Projects for tracking
 
 **Benefits**:
 - Spec-Kit provides AI alignment
@@ -929,7 +929,7 @@ Community extension "SpecKit Companion" fills gap[^vscode-companion]
 ---
 
 #### Hybrid 3: Spec-Kit + ADR
-**Pattern**: Use Spec-Kit for feature specs; ADRs for architectural decisions
+**Pattern**: Use Spec-Kit for story specs; ADRs for architectural decisions
 
 **Benefits**:
 - Spec-Kit handles "what"; ADR handles "why" and "architectural choices"
@@ -940,7 +940,7 @@ Community extension "SpecKit Companion" fills gap[^vscode-companion]
 - Potential duplication in architecture section
 - Unclear which doc is source of truth for arch decisions
 
-**Best For**: Teams valuing architectural decision history alongside feature specs
+**Best For**: Teams valuing architectural decision history alongside story specs
 
 ---
 
@@ -1523,4 +1523,4 @@ Community extension "SpecKit Companion" fills gap[^vscode-companion]
 **Document Status**: Complete
 **Total Critiques Identified**: 32 product limitations + 12 philosophical tensions
 **Evidence Sources**: 40+ distinct references
-**Next Steps**: See companion documents for differentiation strategy and feature specifications
+**Next Steps**: See companion documents for differentiation strategy and story specifications

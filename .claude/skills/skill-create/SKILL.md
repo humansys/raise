@@ -102,7 +102,7 @@ Existing skills that new skills can reference or complement:
 |-----------|--------|
 | Session | `session-start` → `session-close` |
 | Epic | `epic-start` → `epic-design` → `epic-plan` → `epic-close` |
-| Feature | `feature-start` → `feature-design` → `feature-plan` → `feature-implement` → `feature-review` → `feature-close` |
+| Feature | `story-start` → `story-design` → `story-plan` → `story-implement` → `story-review` → `story-close` |
 | Discovery | `discover-start` → `discover-scan` → `discover-validate` → `discover-complete` |
 | Utility | `research`, `debug`, `framework-sync` |
 | Meta | `skill-create` (this skill) |
@@ -124,7 +124,7 @@ Existing skills that new skills can reference or complement:
         └── SKILL.md
 
 work/                       # Active work
-└── epics/                  # Epic/feature scopes
+└── epics/                  # Epic/story scopes
 
 framework/                  # Public framework docs
 └── reference/              # Constitution, glossary
@@ -151,7 +151,7 @@ Query memory for details: `raise memory query "ontology cli design"`
 Answer these questions:
 
 1. **Name:** What's the `{domain}-{action}` pattern?
-   - Examples: `session-close`, `feature-plan`, `discover-scan`
+   - Examples: `session-close`, `story-plan`, `discover-scan`
 
 2. **Lifecycle:** Which lifecycle does it belong to?
    - Session / Epic / Feature / Discovery / Utility / Meta
@@ -234,7 +234,7 @@ license: MIT
 
 metadata:
   raise.work_cycle: {session|epic|feature|discovery|utility|meta}
-  raise.frequency: {per-session|per-epic|per-feature|as-needed}
+  raise.frequency: {per-session|per-epic|per-story|as-needed}
   raise.fase: "{number or 'meta'}"
   raise.prerequisites: "{previous-skill or empty}"
   raise.next: "{next-skill or empty}"
@@ -392,8 +392,8 @@ uv run raise memory add-pattern "{Brief description of the pattern}" -c "{contex
 | Pattern | Examples | Use For |
 |---------|----------|---------|
 | `{domain}-start` | `session-start`, `epic-start` | Begin lifecycle |
-| `{domain}-close` | `session-close`, `feature-close` | End lifecycle |
-| `{domain}-{phase}` | `feature-design`, `feature-plan` | Lifecycle phases |
+| `{domain}-close` | `session-close`, `story-close` | End lifecycle |
+| `{domain}-{phase}` | `story-design`, `story-plan` | Lifecycle phases |
 | `{domain}-{action}` | `discover-scan`, `discover-validate` | Domain operations |
 | `{verb}` | `research`, `debug` | Standalone utilities |
 
@@ -431,7 +431,7 @@ New skill is warranted when the workflow is distinct enough to warrant separate 
 
 ## References
 
-- Skill structure: `.claude/skills/feature-start/SKILL.md` (template example)
+- Skill structure: `.claude/skills/story-start/SKILL.md` (template example)
 - Hook scripts: `.raise/scripts/`
 - Ontology patterns: `raise memory query "ontology"`
 - CLI toolkit: `raise --help`

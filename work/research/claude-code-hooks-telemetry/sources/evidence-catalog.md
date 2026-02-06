@@ -118,7 +118,7 @@
 
 ```yaml
 ---
-name: feature-design
+name: story-design
 description: ...
 hooks:
   PostToolUse:

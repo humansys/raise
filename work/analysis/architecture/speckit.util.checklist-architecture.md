@@ -128,7 +128,7 @@ Consolidate low-impact edge cases
 If checklist file exists → append to existing
 Create unique filename based on domain
 ```
-**Diseño**: Support múltiples checklists per feature.
+**Diseño**: Support múltiples checklists per story.
 
 ## 7. State Management
 

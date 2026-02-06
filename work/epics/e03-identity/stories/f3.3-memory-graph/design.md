@@ -1,7 +1,7 @@
 # Feature Design: F3.3 Memory Graph
 
 ```yaml
-feature_id: F3.3
+story_id: F3.3
 title: Memory Graph
 size: S
 status: design

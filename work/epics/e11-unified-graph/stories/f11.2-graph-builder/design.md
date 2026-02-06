@@ -23,7 +23,7 @@ Build a unified context graph by merging governance, memory, work, and skills in
 │                                                            │
 │  load_governance() ─► GovernanceExtractor.extract_all()    │
 │  load_memory()     ─► Read JSONL directly                  │
-│  load_work()       ─► extract_epics(), extract_features()  │
+│  load_work()       ─► extract_epics(), extract_stories()  │
 │  load_skills()     ─► Parse SKILL.md frontmatter (new)     │
 │                                                            │
 │  infer_relationships() ─► Explicit + heuristic edges       │
@@ -52,7 +52,7 @@ Build a unified context graph by merging governance, memory, work, and skills in
 | calibration.jsonl | Direct JSONL | `calibration` | `CAL-*` |
 | sessions/index.jsonl | Direct JSONL | `session` | `SES-*` |
 | backlog.md | `extract_epics()` | `epic` | `E*` |
-| epic-*.md | `extract_features()` | `feature` | `F*.*` |
+| epic-*.md | `extract_stories()` | `feature` | `F*.*` |
 | SKILL.md | New parser | `skill` | `/name` |
 
 ### Field Mapping
@@ -293,4 +293,4 @@ def extract_all_skills(skills_dir: Path) -> list[ConceptNode]:
 ---
 
 *Design complete: 2026-02-03*
-*Ready for: /feature-plan*
+*Ready for: /story-plan*

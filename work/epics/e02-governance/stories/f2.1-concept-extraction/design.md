@@ -1,5 +1,5 @@
 ---
-feature_id: "F2.1"
+story_id: "F2.1"
 title: "Concept Extraction"
 epic: "E2: Governance Toolkit"
 story_points: 3
@@ -320,4 +320,4 @@ def test_extract_all_governance():
 ---
 
 *Created: 2026-01-31*
-*Ready for: `/feature-plan`*
+*Ready for: `/story-plan`*

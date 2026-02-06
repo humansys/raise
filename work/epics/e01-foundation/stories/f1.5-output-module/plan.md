@@ -3,7 +3,7 @@
 ## Overview
 
 - **Feature:** F1.5 Output Module
-- **Design:** `work/features/f1.5-output-module/design.md`
+- **Design:** `work/stories/f1.5-output-module/design.md`
 - **Total Estimate:** 2-3 hours
 - **Created:** 2026-01-31
 
@@ -115,4 +115,4 @@ Co-Authored-By: Rai <rai@humansys.ai>
 ---
 
 **Plan Version:** 1.0
-**Ready for:** `/feature-implement`
+**Ready for:** `/story-implement`

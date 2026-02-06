@@ -40,11 +40,11 @@
 
 ## What Could Improve
 
-⚠️ **Forgot to create feature branch initially**
+⚠️ **Forgot to create story branch initially**
 - Started implementing on `v2` instead of `feature/e2/governance-toolkit`
 - Caught during review, fixed by creating branch and moving work
 - **Impact:** Low (easily corrected)
-- **Lesson:** Branch creation should be step 0 of `/feature-implement`
+- **Lesson:** Branch creation should be step 0 of `/story-implement`
 
 ⚠️ **Coverage configuration caused confusion**
 - Global `pyproject.toml` coverage settings check entire codebase
@@ -76,7 +76,7 @@
 ### What would you change about the process?
 
 **Feature-implement skill enhancement:**
-1. Add "Step 0: Create feature branch" before loading plan
+1. Add "Step 0: Create story branch" before loading plan
 2. Verify branch name follows SOP pattern (`feature/`, `framework/`, etc.)
 3. Fail fast if on wrong branch (e.g., implementing on `main` or `v2`)
 
@@ -94,7 +94,7 @@
 **Immediate improvements to apply:**
 
 1. **Feature-implement skill**: Add branch creation/verification step
-   - Location: `.claude/skills/feature-implement/README.md`
+   - Location: `.claude/skills/story-implement/README.md`
    - Change: Add Step 0 before "Load Plan"
    - Rationale: Prevent working on wrong branch
 
@@ -163,7 +163,7 @@
 - [x] Update memory.md with state machine pattern
 - [x] Update calibration.md with F2.1 velocity data
 - [x] Component catalog complete
-- [ ] **For next session:** Create feature branch FIRST (before any implementation)
+- [ ] **For next session:** Create story branch FIRST (before any implementation)
 - [ ] **Future:** Document CLI testing patterns in guardrails
 - [ ] **Future:** Consider pre-commit hook for branch name validation
 
@@ -186,12 +186,12 @@
 ## Celebration 🎉
 
 **F2.1 shipped successfully!**
-- ✅ Full feature complete in under 1 hour
+- ✅ Full story complete in under 1 hour
 - ✅ High test coverage and quality
 - ✅ Real-world validation with 24 concepts extracted
 - ✅ Foundation ready for F2.2 Graph Builder
 - ✅ No blockers encountered
-- ✅ Clean commit history on feature branch
+- ✅ Clean commit history on story branch
 
 **What made this successful:**
 1. Spike de-risked the approach

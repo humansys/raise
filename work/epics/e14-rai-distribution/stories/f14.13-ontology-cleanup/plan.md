@@ -52,12 +52,12 @@ Restructure CLI commands to align with domain-centric ontology (Option A):
   - `.claude/skills/epic-design/SKILL.md`
   - `.claude/skills/epic-plan/SKILL.md`
   - `.claude/skills/epic-close/SKILL.md`
-  - `.claude/skills/feature-start/SKILL.md`
-  - `.claude/skills/feature-design/SKILL.md`
-  - `.claude/skills/feature-plan/SKILL.md`
-  - `.claude/skills/feature-implement/SKILL.md`
-  - `.claude/skills/feature-review/SKILL.md`
-  - `.claude/skills/feature-close/SKILL.md`
+  - `.claude/skills/story-start/SKILL.md`
+  - `.claude/skills/story-design/SKILL.md`
+  - `.claude/skills/story-plan/SKILL.md`
+  - `.claude/skills/story-implement/SKILL.md`
+  - `.claude/skills/story-review/SKILL.md`
+  - `.claude/skills/story-close/SKILL.md`
 - **TDD Cycle:** N/A (markdown only)
 - **Verification:** `grep -r "raise telemetry" .claude/skills/` returns nothing
 - **Size:** M
@@ -124,7 +124,7 @@ Restructure CLI commands to align with domain-centric ontology (Option A):
   5. `raise telemetry` fails (removed)
   6. Run `/session-start` skill — uses new CLI
   7. All tests pass
-- **Verification:** Demo the feature working interactively
+- **Verification:** Demo the story working interactively
 - **Size:** S
 - **Dependencies:** All previous tasks
 

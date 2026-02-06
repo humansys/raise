@@ -460,14 +460,14 @@
 - **Format:** Agent Skills spec (agentskills.io)
 - **Structure:** **Flat directories** (required for Claude Code discovery)
 - **Skills:**
-  - `feature-design/` - Lean feature specifications
-  - `feature-plan/` - Implementation planning
-  - `feature-implement/` - Task execution
-  - `feature-review/` - Retrospective & learning
+  - `story-design/` - Lean story specifications
+  - `story-plan/` - Implementation planning
+  - `story-implement/` - Task execution
+  - `story-review/` - Retrospective & learning
   - `research/` - Evidence-based investigation
   - `debug/` - Root cause analysis
   - `scripts/` - Shared telemetry scripts
-- **Invocation:** `/feature-plan`, `/debug`, `/research`, etc.
+- **Invocation:** `/story-plan`, `/debug`, `/research`, etc.
 - **Related ADRs:** ADR-005 (Skills format adoption)
 
 ### Debug Skill
@@ -651,4 +651,4 @@
 
 ---
 
-*Component catalog - updated per feature completion*
+*Component catalog - updated per story completion*

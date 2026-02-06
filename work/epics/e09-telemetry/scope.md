@@ -26,7 +26,7 @@
 
 Collect deterministic signals from the development workflow and use them locally to:
 
-1. **Coach the user** — "You abandon /feature-design for small features — skip for XS?"
+1. **Coach the user** — "You abandon /story-design for small stories — skip for XS?"
 2. **Inform retros** — Objective data, not opinions
 3. **Calibrate estimates** — Automatic adjustment based on actuals
 4. **Detect patterns** — Surface what works and what doesn't
@@ -117,7 +117,7 @@ The insight generator SHOULD:
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
 | F9.10 | **Telemetry Commands** | M | Future | `raise telemetry velocity`, `drift`, `insights` |
-| F9.11 | **Retro Integration** | S | Future | /feature-review queries telemetry |
+| F9.11 | **Retro Integration** | S | Future | /story-review queries telemetry |
 
 **Effort:** 1 day | **Cost:** $0
 
@@ -147,7 +147,7 @@ The insight generator SHOULD:
 {
   "type": "skill_event",
   "timestamp": "2026-02-02T14:30:00Z",
-  "skill": "feature-design",
+  "skill": "story-design",
   "event": "complete",
   "duration_sec": 1800
 }
@@ -170,7 +170,7 @@ The insight generator SHOULD:
 {
   "type": "calibration",
   "timestamp": "2026-02-02T16:00:00Z",
-  "feature_id": "F8.1",
+  "story_id": "F8.1",
   "feature_size": "S",
   "estimated_min": 45,
   "actual_min": 30,
@@ -295,7 +295,7 @@ What Rai surfaces based on signal patterns:
 
 | Signal pattern | Insight |
 |----------------|---------|
-| skill_event: /feature-design abandoned 3/5 times for XS | "Consider skipping design for XS features" |
+| skill_event: /story-design abandoned 3/5 times for XS | "Consider skipping design for XS features" |
 | session_event: Research 90% success, Feature 60% | "What's different about feature sessions?" |
 | calibration: S estimates consistently 2x off | "Your S estimates are optimistic — adjust?" |
 | error_event: pytest not found 5x this week | "Add pytest to your shell profile?" |
@@ -326,12 +326,12 @@ Last session: Feature (success, 90min)
 - Duration: 90 min
 - Outcome: success
 - Features: F8.1, F8.2
-- Skills: /feature-implement ✓, /session-close ✓
+- Skills: /story-implement ✓, /session-close ✓
 
 → Saved to .rai/telemetry/signals.jsonl
 ```
 
-### /feature-review
+### /story-review
 
 ```markdown
 ## Objective Metrics
@@ -481,7 +481,7 @@ From exploration session (2026-02-02):
 
 | Order | Feature | Size | Est. | Dependencies | Milestone | Rationale |
 |:-----:|---------|:----:|:----:|--------------|-----------|-----------|
-| 1 | F9.1 Signal Schema | XS | 25m | None | M1 | Foundation — all features depend on schemas |
+| 1 | F9.1 Signal Schema | XS | 25m | None | M1 | Foundation — all stories depend on schemas |
 | 2 | F9.2 Signal Writer | S | 45m | F9.1 | M1 | Core infrastructure — enables all emitters |
 | 3 | F9.3 Skill Emitters | S | 45m | F9.2 | M2 | High value — captures skill usage patterns |
 | 4 | F9.4 Session Emitters | S | 45m | F9.2 | M2 | High value — captures session outcomes |

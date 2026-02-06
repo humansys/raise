@@ -1443,11 +1443,11 @@ components:
     validated_by: auto-high-confidence
 
   - id: comp-governance-extract-features
-    name: extract_features
+    name: extract_stories
     kind: function
     file: src/raise_cli/governance/parsers/epic.py
     line: 174
-    signature: "def extract_features(file_path: Path, project_root: Path | None=None) -> list[Concept]"
+    signature: "def extract_stories(file_path: Path, project_root: Path | None=None) -> list[Concept]"
     purpose: "Extract Feature concepts from epic scope document."
     category: utility
     depends_on: ['pathlib.Path']

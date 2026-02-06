@@ -189,8 +189,8 @@ After plan approval:
 2. Track actual duration for calibration
 3. Update `progress.md` as tasks complete
 4. Run full test suite before PR
-5. Create retrospective after feature complete
+5. Create retrospective after story complete
 
 ---
 
-*Ready for: `/feature-implement`*
+*Ready for: `/story-implement`*

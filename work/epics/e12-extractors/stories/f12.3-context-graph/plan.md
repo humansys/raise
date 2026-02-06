@@ -94,4 +94,4 @@
 ---
 
 *Plan created: 2026-02-03*
-*Next: `/feature-implement`*
+*Next: `/story-implement`*

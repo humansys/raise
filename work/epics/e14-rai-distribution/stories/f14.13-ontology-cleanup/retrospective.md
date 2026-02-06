@@ -87,7 +87,7 @@
 | Ontology principles | PAT-130 through PAT-136 in memory |
 | Skill creation guide | `/skill-create` skill |
 | Design documentation | `work/proposals/ontology-design-principles.md` |
-| F14.14 scope | `work/epics/e14-rai-distribution/features/f14.14-skill-cli/` |
+| F14.14 scope | `work/epics/e14-rai-distribution/stories/f14.14-skill-cli/` |
 
 ## Patterns Recorded
 

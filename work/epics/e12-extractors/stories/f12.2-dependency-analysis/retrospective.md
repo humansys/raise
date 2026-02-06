@@ -13,7 +13,7 @@
 - Table parsing worked on first attempt
 - All 20 guardrails extracted correctly (13 MUST, 7 SHOULD)
 - Integration with unified graph seamless
-- New lifecycle skills (/feature-start, /feature-close) worked smoothly
+- New lifecycle skills (/story-start, /story-close) worked smoothly
 
 ## What Could Improve
 - Nothing significant — pattern reuse worked as expected
@@ -27,7 +27,7 @@
 - Markdown table parsing with regex is reliable when structure is consistent
 
 ### What would you change about the process?
-- Nothing — /feature-start → /feature-plan → /feature-implement flow is working well
+- Nothing — /story-start → /story-plan → /story-implement flow is working well
 - The prerequisite gates (Step 0.1) add minimal overhead but ensure quality
 
 ### Are there improvements for the framework?
