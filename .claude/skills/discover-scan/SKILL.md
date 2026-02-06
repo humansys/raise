@@ -62,8 +62,8 @@ Extract symbols from the codebase using the `raise discover scan` CLI command, t
 
 Read the context file to determine scan scope:
 
-```bash
-cat work/discovery/context.yaml
+```
+Read: work/discovery/context.yaml
 ```
 
 **Extract:**
