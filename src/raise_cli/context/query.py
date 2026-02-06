@@ -228,8 +228,8 @@ class UnifiedQueryEngine:
         """
         if not path.exists():
             raise FileNotFoundError(
-                f"Graph file not found: {path}\n"
-                f"Run 'raise graph build --unified' to create the graph first."
+                f"Memory index not found: {path}\n"
+                f"Run 'raise memory build' to create the index first."
             )
         graph = UnifiedGraph.load(path)
         return cls(graph)

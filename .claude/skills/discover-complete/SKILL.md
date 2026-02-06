@@ -228,7 +228,7 @@ uv run raise discover build --input work/discovery/components-validated.json
 
 This will add components to the unified context graph, enabling queries like:
 ```bash
-uv run raise context query --type component "scanner"
+uv run raise memory query --type component "scanner"
 ```
 
 ### Re-discovery
@@ -301,8 +301,8 @@ The JSON output is designed to be consumed by F13.4's `raise discover build` com
 uv run raise discover build --input work/discovery/components-validated.json
 
 # Then query components
-uv run raise context query --type component "service"
-uv run raise context query "authentication" --types component
+uv run raise memory query --type component "service"
+uv run raise memory query "authentication" --types component
 ```
 
 ### Component Type in Graph

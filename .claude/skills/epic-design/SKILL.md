@@ -93,7 +93,7 @@ uv run raise telemetry emit-work epic {epic_id} --event start --phase design
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-uv run raise context query "architecture ADR epic" --types pattern,decision --limit 5
+uv run raise memory query "architecture ADR epic" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
@@ -104,7 +104,7 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Frame the Epic Objective
 

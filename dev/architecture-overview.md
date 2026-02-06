@@ -90,8 +90,8 @@ Based on **ADR-012: Skills + CLI Toolkit Architecture**:
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    Governance Toolkit                        │
-│   raise context query    → MVC retrieval (97% token savings) │
-│   raise graph build      → Build concept graphs              │
+│   raise memory query    → MVC retrieval (97% token savings) │
+│   raise memory build      → Build concept graphs              │
 │   raise discover scan    → Extract code components           │
 │   raise telemetry emit   → Capture learning signals          │
 └─────────────────────────────────────────────────────────────┘
@@ -202,7 +202,7 @@ Based on **ADR-019: Unified Context Graph** and **ADR-020: Knowledge Graph Compl
 
 ```bash
 # Query with MVC (Minimum Viable Context)
-raise context query "error handling" --unified --type component
+raise memory query "error handling" --unified --type component
 
 # Result: 7 concepts, 118 tokens, 2.8ms
 # vs reading files directly: ~5000 tokens (97% savings)
@@ -373,7 +373,7 @@ Session Work  →  Telemetry Writer  →  signals.jsonl
 ### Adding a New Node Type
 1. Extend `NodeType` literal in `context/models.py`
 2. Add extraction logic in `context/builder.py`
-3. Update `raise graph build --unified` if needed
+3. Update `raise memory build --unified` if needed
 
 ---
 

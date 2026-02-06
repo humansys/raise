@@ -93,14 +93,14 @@ ls work/epics/e*/features/{feature_id}/design.md 2>/dev/null || echo "INFO: No d
 Load relevant patterns and calibration from unified context:
 
 ```bash
-uv run raise context query "planning estimation calibration" --types pattern,calibration --limit 5
+uv run raise memory query "planning estimation calibration" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Key patterns inform task structure and sizing.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Select Story
 

@@ -91,14 +91,14 @@ uv run raise telemetry emit-work epic {epic_id} --event start --phase plan
 Load relevant sequencing patterns and calibration from unified context:
 
 ```bash
-uv run raise context query "sequencing calibration planning" --types pattern,calibration --limit 5
+uv run raise memory query "sequencing calibration planning" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Calibration data informs realistic estimates.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Review Epic Design Output
 
