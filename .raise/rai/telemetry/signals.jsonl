@@ -1564,3 +1564,7 @@
 {"type":"work_lifecycle","timestamp":"2026-02-06T04:47:43.894892Z","work_type":"feature","work_id":"F14.15","event":"start","phase":"review","blocker":null}
 {"type":"calibration","timestamp":"2026-02-06T04:49:04.592196Z","feature_id":"F14.15","feature_size":"L","estimated_min":240,"actual_min":150,"velocity":1.6}
 {"type":"work_lifecycle","timestamp":"2026-02-06T04:49:14.039909Z","work_type":"feature","work_id":"F14.15","event":"complete","phase":"review","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-06T04:49:32Z","skill":"session-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T04:49:32Z","skill":"feature-implement","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T04:49:32Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T04:49:32Z","skill":"feature-review","event":"complete","duration_sec":null}
