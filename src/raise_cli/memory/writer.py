@@ -234,14 +234,14 @@ class SessionInput(BaseModel):
 
     Attributes:
         topic: Session topic.
-        session_type: Session type (feature, research, maintenance, etc.).
+        session_type: Session type (story, research, maintenance, etc.).
         outcomes: List of session outcomes.
         log_path: Path to session log file (if any).
     """
 
     topic: str = Field(..., description="Session topic")
     session_type: str = Field(
-        default="story", description="Session type (feature, research, etc.)"
+        default="story", description="Session type (story, research, etc.)"
     )
     outcomes: list[str] = Field(default_factory=list, description="Session outcomes")
     log_path: str | None = Field(default=None, description="Path to session log")

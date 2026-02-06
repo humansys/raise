@@ -20,7 +20,7 @@ class SkillMetadata(BaseModel):
     """
 
     work_cycle: str = Field(
-        description="Lifecycle: session, epic, feature, discovery, utility, meta"
+        description="Lifecycle: session, epic, story, discovery, utility, meta"
     )
     version: str = Field(description="Semantic version of the skill")
     frequency: str | None = Field(
