@@ -22,11 +22,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-plan \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=feature-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-plan \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=feature-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Plan: Implementation Planning
@@ -64,10 +64,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-uv run raise telemetry emit-work feature {feature_id} --event start --phase plan
+uv run raise memory emit-work feature {feature_id} --event start --phase plan
 ```
 
-**Example:** `raise telemetry emit-work feature F9.4 -e start -p plan`
+**Example:** `raise memory emit-work feature F9.4 -e start -p plan`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -218,10 +218,10 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-uv run raise telemetry emit-work feature {feature_id} --event complete --phase plan
+uv run raise memory emit-work feature {feature_id} --event complete --phase plan
 ```
 
-**Example:** `raise telemetry emit-work feature F9.4 -e complete -p plan`
+**Example:** `raise memory emit-work feature F9.4 -e complete -p plan`
 
 ## Output
 

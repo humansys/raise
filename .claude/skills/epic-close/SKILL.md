@@ -21,7 +21,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-close \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=epic-close \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Epic Close: Epic Completion & Retrospective
@@ -265,7 +265,7 @@ Mark the epic complete in `governance/projects/raise-cli/backlog.md`:
 Record the epic completion:
 
 ```bash
-uv run raise telemetry emit-work epic {epic_id} --event complete
+uv run raise memory emit-work epic {epic_id} --event complete
 ```
 
 **Verification:** Telemetry emitted.
