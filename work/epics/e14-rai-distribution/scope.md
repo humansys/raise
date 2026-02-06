@@ -22,7 +22,7 @@ Enable new users to experience Rai as a knowledgeable partner from day one, with
 ```
 F&F (this epic):
   raise-cli package bundles base Rai
-  raise init → copies bundled base to .rai/
+  raise init → copies bundled base to .raise/rai/
 
 Post-F&F:
   ~/.rai/config.yaml can specify base_source: <git-url>
@@ -37,8 +37,8 @@ V3:
 ```
 1. Base Rai (bundled or git)  ← E14 scope (bundled only for F&F)
 2. Personal (~/.rai/)         ← E7 complete
-3. Project (.rai/)            ← E3/E7 complete
-4. Team (.rai/team/)          ← V3 scope
+3. Project (.raise/rai/)      ← E3/E7 complete
+4. Team (.raise/rai/team/)    ← V3 scope
 ```
 
 ---
@@ -52,8 +52,8 @@ V3:
 | F14.1 | Base Identity Package | S | 2 | Pending | Bundle core.md + perspective.md in package |
 | F14.2 | Base Patterns Catalog | M | 3 | Pending | Define ~20 universal methodology patterns |
 | F14.3 | Methodology Core | S | 2 | Pending | methodology.yaml with skills, gates, rules |
-| F14.4 | Bootstrap on Init | M | 3 | Pending | Copy bundled base to .rai/ during raise init |
-| F14.5 | Auto MEMORY.md Generation | M | 3 | Pending | Generate Claude auto memory from methodology.yaml |
+| F14.4 | Bootstrap on Init | M | 3 | Pending | Copy bundled base to .raise/rai/ during raise init |
+| F14.5 | Two-Part MEMORY.md | M | 3 | Pending | Generate MEMORY.md with static process + dynamic context |
 | F14.6 | Pattern Versioning | S | 2 | Pending | Add base/version fields to pattern schema |
 | F14.7 | Base Show Command | XS | 1 | Pending | `raise base show` displays current base info |
 | F14.15 | Multi-Developer Architecture | L | 5 | ✅ Done | Separate personal data from shared project data |
@@ -77,10 +77,11 @@ V3:
 - Base identity files (core.md, perspective.md) bundled in `src/raise_cli/rai_base/`
 - Universal methodology patterns (~20 base patterns) in JSONL
 - methodology.yaml with skills list, gates, process rules
-- Bootstrap flow in `raise init` copies bundled base to `.rai/`
-- Auto MEMORY.md generation for Claude context
+- Bootstrap flow in `raise init` copies bundled base to `.raise/rai/`
+- Two-part MEMORY.md generation (static process + dynamic context)
 - Pattern versioning schema (base: true, version: N)
 - `raise base show` command
+- Legacy file cleanup (graph.json, migration artifacts)
 
 **SHOULD:**
 - Base version embedded in manifest for future update detection
@@ -167,15 +168,17 @@ raise init
     ├── (NEW) Resolve base source
     │   F&F: always bundled (importlib.resources)
     │
-    ├── (NEW) Copy base identity
-    │   rai_base/identity/ → .rai/identity/
+    ├── (NEW) Copy base identity (if not exists)
+    │   rai_base/identity/ → .raise/rai/identity/
     │
-    ├── (NEW) Copy base patterns
-    │   patterns-base.jsonl → .rai/memory/patterns.jsonl
+    ├── (NEW) Copy base patterns (merge with base: true)
+    │   patterns-base.jsonl → .raise/rai/memory/patterns.jsonl
     │   Mark all with: base: true, version: 1
     │
-    ├── (NEW) Generate MEMORY.md
-    │   Parse methodology.yaml → ~/.claude/projects/{hash}/memory/MEMORY.md
+    ├── (NEW) Generate MEMORY.md (two-part)
+    │   Part 1: Static process from methodology.yaml
+    │   Part 2: Dynamic context from project state
+    │   Output: ~/.claude/projects/{hash}/memory/MEMORY.md
     │
     └── (existing) build graph, generate guardrails
 ```
@@ -192,11 +195,12 @@ raise init
 - [ ] Quality checks pass (ruff, pyright, bandit)
 
 ### Epic Complete (F&F)
-- [ ] All 7 F&F features complete
-- [ ] `raise init` creates `.rai/` with base identity + patterns
-- [ ] MEMORY.md generated with skills and gates
+- [ ] All 8 F&F features complete
+- [ ] `raise init` creates `.raise/rai/` with base identity + patterns
+- [ ] Two-part MEMORY.md generated (process + context)
 - [ ] Pattern versioning schema working (base: true)
 - [ ] `raise base show` displays base info
+- [ ] Legacy files cleaned up (graph.json, migration artifacts)
 - [ ] New user simulation test passes
 - [ ] Epic retrospective completed (`/epic-close`)
 - [ ] Merged to v2
@@ -228,7 +232,7 @@ F14.3 (Methodology)┘         │
 | Milestone | Features | Target | Success Criteria |
 |-----------|----------|--------|------------------|
 | **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1-2 | Identity + patterns + methodology created |
-| **M2: Bootstrap** | F14.4, F14.5 | Day 2-3 | `raise init` creates full .rai/ + MEMORY.md |
+| **M2: Bootstrap** | F14.4, F14.5 | Day 2-3 | `raise init` creates full .raise/rai/ + MEMORY.md |
 | **M3: CLI** | F14.6, F14.7 | Day 3-4 | Versioning schema + `raise base show` |
 | **M4: Validation** | — | Day 4 | New user simulation passes |
 
@@ -322,7 +326,7 @@ V3: Corporate documentation + team overrides
 |-----------|----------|--------|------------------|------|
 | **M0: Multi-Dev** | F14.15 | Day 1 | Personal data separated from shared | No merge conflicts on sessions |
 | **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1-2 | All content in `src/raise_cli/rai_base/` | Files exist, valid format |
-| **M2: Bootstrap** | F14.4 | Day 2-3 | `raise init` copies base to `.rai/` | Init creates identity + patterns |
+| **M2: Bootstrap** | F14.4 | Day 2-3 | `raise init` copies base to `.raise/rai/` | Init creates identity + patterns |
 | **M3: MEMORY.md** | F14.5, F14.6 | Day 3 | Auto-generated with skills/gates | MEMORY.md has full process |
 | **M4: Complete** | F14.7 + validation | Day 4 | New user simulation passes | Full flow demo |
 
@@ -368,10 +372,10 @@ Buffer for fixes
 | F14.12 Memory Ontology | XS | ✅ Done | 1 session | — | graph→memory, simpler CLI |
 | F14.13 Ontology Cleanup | M | ✅ Done | 90 min | 1.33x | CLI restructure, /skill-create, 9 patterns |
 | F14.14 Skill CLI | M | ✅ Done | ~3 sessions | 1.5x | 4 CLI commands, skill audit, 79 new tests |
-| F14.15 Multi-Dev Arch | M | Pending | — | — | Personal data separation |
+| F14.15 Multi-Dev Arch | L | ✅ Done | 2 sessions | — | Personal data separation |
 
 **Milestone Progress:**
-- [ ] M0: Multi-Dev Architecture (Day 1)
+- [x] M0: Multi-Dev Architecture (Day 1)
 - [ ] M1: Base Assets (Day 1-2)
 - [ ] M2: Bootstrap (Day 2-3)
 - [ ] M3: MEMORY.md (Day 3)
@@ -396,6 +400,39 @@ Buffer for fixes
 
 *Plan created: 2026-02-05*
 *Next: F14.15 (multi-dev arch), then F14.1-F14.7*
+
+---
+
+## Legacy Cleanup (Pre-Epic Complete)
+
+> **Added:** 2026-02-05 (drift review)
+> **When:** Before M4 validation
+
+### Files to Remove
+
+| File | Location | Reason |
+|------|----------|--------|
+| `graph.json` | `.raise/rai/memory/` | Replaced by `index.json` (123KB legacy) |
+| `index.jsonl.backup` | `.raise/rai/memory/sessions/` | Migration artifact from F14.15 |
+
+### Verification
+
+```bash
+# Confirm index.json is working
+uv run raise memory query "test" --limit 1
+
+# Then remove legacy files
+rm .raise/rai/memory/graph.json
+rm .raise/rai/memory/sessions/index.jsonl.backup
+rmdir .raise/rai/memory/sessions  # if empty
+```
+
+### Gitignore Updates (if not already done)
+
+Ensure `.gitignore` includes:
+```
+.raise/rai/personal/
+```
 
 ---
 
@@ -517,3 +554,105 @@ On first access to personal data:
 - [ ] `raise memory emit-*` works with new paths
 - [ ] Tests for migration and new paths
 - [ ] No merge conflicts on sessions/telemetry in multi-dev scenario
+
+---
+
+## F14.5: Two-Part MEMORY.md Generation
+
+> **Size:** M (3 SP)
+> **Dependencies:** F14.3 (methodology.yaml), F14.4 (bootstrap)
+> **Clarified:** 2026-02-05 (drift review)
+
+### Problem
+
+MEMORY.md serves two purposes that conflict with simple auto-generation:
+
+1. **Static process knowledge** — Skills, gates, rules (from methodology.yaml)
+2. **Dynamic project context** — Current epic, patterns, deadlines (from project state)
+
+Original scope said "generate from methodology.yaml" which would lose dynamic context.
+
+### Solution: Two-Part Architecture
+
+MEMORY.md has two distinct sections:
+
+```markdown
+# Rai Memory — {project_name}
+
+> Permanent knowledge for this project. Loaded into system prompt.
+
+---
+
+## PART 1: RaiSE Process (from methodology.yaml)
+
+### Work Lifecycle
+[Generated from methodology.yaml skills section]
+
+### Gate Requirements
+[Generated from methodology.yaml gates section]
+
+### Available Skills
+[Generated from methodology.yaml skills list]
+
+### Critical Process Rules
+[Generated from methodology.yaml principles section]
+
+---
+
+## PART 2: Project Context (from project state)
+
+### Current State
+[Generated from: active epic, feature, deadlines]
+
+### Key Patterns
+[Generated from: top N patterns by relevance]
+
+### Branch Model
+[Generated from: manifest.yaml or detected git structure]
+
+---
+
+*Last updated: {timestamp}*
+```
+
+### Generation Logic
+
+**Part 1 (Static):** Generated once during `raise init`, updated on `raise base update` (post-F&F)
+
+**Part 2 (Dynamic):** Regenerated on:
+- `raise memory build` (explicit)
+- `raise session start` (optional flag: `--refresh-memory`)
+- When stale (>24h since last update)
+
+### In Scope
+
+**MUST:**
+- [ ] Parse methodology.yaml to generate Part 1
+- [ ] Query project state for Part 2 (epic, patterns, deadlines from CLAUDE.local.md)
+- [ ] Generate to `~/.claude/projects/{hash}/memory/MEMORY.md`
+- [ ] Preserve user edits in designated "custom" section (if present)
+- [ ] Add `raise memory generate` command (explicit generation)
+
+**SHOULD:**
+- [ ] Auto-refresh on `raise session start`
+
+### Out of Scope
+
+- Real-time updates (too complex for F&F)
+- Per-session MEMORY.md variants
+
+### Files to Modify
+
+| File | Change |
+|------|--------|
+| `memory/generator.py` | NEW: MEMORY.md generation logic |
+| `cli/commands/memory.py` | Add `generate` subcommand |
+| `onboarding/init.py` | Call generator after bootstrap |
+
+### Done Criteria
+
+- [ ] `raise init` generates two-part MEMORY.md
+- [ ] `raise memory generate` regenerates from current state
+- [ ] Part 1 matches methodology.yaml content
+- [ ] Part 2 reflects current epic/patterns
+- [ ] Tests for generation logic
