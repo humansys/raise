@@ -35,6 +35,7 @@ MEMORY_SUBDIR = "memory"
 TELEMETRY_SUBDIR = "telemetry"
 IDENTITY_SUBDIR = "identity"
 GRAPH_SUBDIR = "graph"
+FRAMEWORK_SUBDIR = "framework"
 
 # File names
 MANIFEST_FILE = "manifest.yaml"
@@ -92,6 +93,30 @@ def get_telemetry_dir(project_root: Path | None = None) -> Path:
         Path to telemetry directory.
     """
     return get_rai_dir(project_root) / TELEMETRY_SUBDIR
+
+
+def get_identity_dir(project_root: Path | None = None) -> Path:
+    """Get the .raise/rai/identity/ directory.
+
+    Args:
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to identity directory.
+    """
+    return get_rai_dir(project_root) / IDENTITY_SUBDIR
+
+
+def get_framework_dir(project_root: Path | None = None) -> Path:
+    """Get the .raise/rai/framework/ directory.
+
+    Args:
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to framework directory.
+    """
+    return get_rai_dir(project_root) / FRAMEWORK_SUBDIR
 
 
 def get_graph_dir(project_root: Path | None = None) -> Path:
