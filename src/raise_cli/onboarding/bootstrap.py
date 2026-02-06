@@ -17,8 +17,8 @@ Example:
 from __future__ import annotations
 
 import logging
-from importlib.abc import Traversable
 from importlib.resources import files
+from importlib.resources.abc import Traversable
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -73,7 +73,9 @@ def bootstrap_rai_base(project_root: Path) -> BootstrapResult:
     return result
 
 
-def _copy_identity(base: Traversable, project_root: Path, result: BootstrapResult) -> None:
+def _copy_identity(
+    base: Traversable, project_root: Path, result: BootstrapResult
+) -> None:
     """Copy base identity files to .raise/rai/identity/.
 
     Args:
@@ -104,7 +106,9 @@ def _copy_identity(base: Traversable, project_root: Path, result: BootstrapResul
     result.identity_copied = copied_any
 
 
-def _copy_patterns(base: Traversable, project_root: Path, result: BootstrapResult) -> None:
+def _copy_patterns(
+    base: Traversable, project_root: Path, result: BootstrapResult
+) -> None:
     """Copy base patterns to .raise/rai/memory/patterns.jsonl.
 
     Args:
