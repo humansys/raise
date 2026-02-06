@@ -70,42 +70,32 @@ uv run raise memory emit-work feature {feature_id} --event start --phase review
 
 **Example:** `raise memory emit-work feature F9.4 -e start -p review`
 
-### Step 0.1: Verify Prerequisites (Deterministic)
+### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
-Implementation must be complete:
+Run these in parallel (all independent):
 
 ```bash
+# Verify tests pass
 uv run pytest --tb=no -q || {
     echo "ERROR: Tests must pass before review"
     exit 10  # GateFailedError
 }
-```
 
-**Decision:**
-- Tests pass → Continue with review
-- Tests fail → Fix tests first, then review
-
-**Verification:** All tests passing.
-
-> **If you can't continue:** Fix failing tests. Review requires green tests.
-
-### Step 0.5: Query Context
-
-Load relevant process patterns and prior retrospectives from unified context:
-
-```bash
+# Query retrospective patterns and calibration data
 uv run raise memory query "retrospective learnings velocity" --types pattern,calibration --limit 5
 ```
 
-Review returned patterns and calibration data before proceeding. Prior learnings and velocity data inform retrospective focus.
+**From tests:**
+- Tests pass → Continue with review
+- Tests fail → Fix tests first, then review
 
-**What this returns:**
+**From memory query:**
 - Process patterns from prior retrospectives
 - Calibration data (feature completion times for velocity comparison)
 
-**Verification:** Context loaded; relevant patterns noted.
+**Verification:** All tests passing; patterns noted.
 
-> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
+> **If you can't continue:** Fix failing tests. Review requires green tests.
 
 ### Step 1: Gather Data
 

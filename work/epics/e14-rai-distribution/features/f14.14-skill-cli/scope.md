@@ -1,6 +1,6 @@
 # F14.14: Skill CLI Commands
 
-> Platform-agnostic skill management for inference economy.
+> Deterministic skill management for inference economy.
 
 ## Context
 
@@ -17,29 +17,37 @@ These operations should be deterministic CLI commands.
 ## Problem Statement
 
 1. **Inference waste:** AI spends tokens discovering what CLI could report instantly
-2. **Platform coupling:** Current skills assume `.claude/skills/` (Claude Code specific)
-3. **No validation:** Skill structure errors caught late (when AI tries to use them)
-4. **Manual naming checks:** Ontology compliance (PAT-132) not enforced
+2. **No validation:** Skill structure errors caught late (when AI tries to use them)
+3. **Manual naming checks:** Ontology compliance (PAT-132) not enforced
 
-## Research Needed
+## Research Findings (RES-SKILL-FMT-001)
 
-### Platform Skill Formats
+**Completed:** 2026-02-05 — See `work/research/ai-ide-skill-formats/`
 
-| Platform | Skill Location | Format | Research Status |
-|----------|---------------|--------|-----------------|
-| Claude Code | `.claude/skills/` | SKILL.md (YAML+Markdown) | Known |
-| Cursor | `.cursor/` ? | Unknown | Needs research |
-| Windsurf | ? | Unknown | Needs research |
-| Continue.dev | `.continue/` ? | Unknown | Needs research |
-| Generic | `.raise/skills/` ? | RaiSE native | To define |
+### Key Findings
 
-**Key question:** Should RaiSE skills be platform-specific (`.claude/skills/`) or have a canonical location (`.raise/skills/`) with platform adapters?
+1. **AGENTS.md is the emerging standard** — Linux Foundation-backed, 20+ tools support it
+2. **Common patterns:** Markdown + YAML frontmatter (5/8 tools), glob patterns (4/8)
+3. **Zed's approach:** Priority fallback chain across multiple file conventions
 
-### Research Tasks
+### Platform Comparison
 
-1. How do Cursor, Windsurf, Continue.dev handle custom skills/prompts?
-2. Is there an emerging standard for AI tool skills?
-3. What's the minimal common format across platforms?
+| Platform | Location | Format |
+|----------|----------|--------|
+| Claude Code | `.claude/skills/*/SKILL.md` | YAML + Markdown |
+| Cursor | `.cursor/rules/*.mdc` | YAML + Markdown |
+| GitHub Copilot | `.github/instructions/*.instructions.md` | YAML + Markdown |
+| Zed | `.rules` (with fallback chain) | Plain Markdown |
+| Windsurf | `.windsurf/rules/` | Markdown |
+
+### Architecture Decision
+
+**Standards-first approach** (not platform detection):
+1. `.claude/skills/` — Claude Code native (F&F target)
+2. `.raise/skills/` — RaiSE canonical (future, deferred)
+3. AGENTS.md awareness — Deferred, simple to add later
+
+**Rationale:** Claude Code is our target. AGENTS.md handles cross-platform portability when needed. Skip complex platform detection.
 
 ---
 
@@ -197,19 +205,18 @@ Suggestion: Position after 'session-start', before 'session-close'
 - [ ] `raise skill scaffold <name>` with template generation
 - [ ] `raise skill validate` for structure checking
 - [ ] `raise skill check-name` for ontology compliance
-- [ ] Platform detection (Claude Code at minimum)
+- [ ] Skill schema (Pydantic model for SKILL.md parsing)
 - [ ] Tests for all commands
 
 **SHOULD:**
-- [ ] Support `.raise/skills/` as fallback location
-- [ ] Skill schema validation (Pydantic model)
+- [ ] `/skill-create` updated to use new CLI commands
 
 **COULD:**
-- [ ] Multi-platform detection (Cursor, Windsurf)
-- [ ] Skill migration between platforms
+- [ ] Support `.raise/skills/` as additional location
 
 ## Out of Scope
 
+- Platform detection for Cursor/Windsurf/etc (use AGENTS.md for portability)
 - Skill execution (that's the AI's job)
 - Skill marketplace/sharing
 - Remote skill repositories
@@ -218,7 +225,7 @@ Suggestion: Position after 'session-start', before 'session-close'
 ## Done Criteria
 
 - [ ] All four commands implemented
-- [ ] Platform detection works for Claude Code
+- [ ] Works with `.claude/skills/` directory
 - [ ] `/skill-create` updated to use new CLI commands
 - [ ] Tests pass (target: 15-20 new tests)
 - [ ] Coverage maintained (>90%)
@@ -228,15 +235,16 @@ Suggestion: Position after 'session-start', before 'session-close'
 
 ## Size
 
-**M** — New command group, platform abstraction, ~5-8 files
+**S/M** — New command group, no platform abstraction needed, ~4-6 files
 
 ## Dependencies
 
-- F14.13 (ontology cleanup) — For ontology patterns to enforce
+- F14.13 (ontology cleanup) ✓ — Ontology patterns ready
 - `/skill-create` skill — Will be updated to use these commands
 
 ## References
 
 - `/skill-create` skill: `.claude/skills/skill-create/SKILL.md`
 - Ontology patterns: PAT-130 through PAT-136
+- Research: `work/research/ai-ide-skill-formats/README.md`
 - Inference economy: CLAUDE.md, Emilio's personal memory

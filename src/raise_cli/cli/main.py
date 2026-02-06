@@ -14,6 +14,7 @@ from raise_cli.cli.commands.init import init_command
 from raise_cli.cli.commands.memory import memory_app
 from raise_cli.cli.commands.profile import profile_app
 from raise_cli.cli.commands.session import session_app
+from raise_cli.cli.commands.skill import skill_app
 from raise_cli.config import RaiseSettings
 
 # Module-level state for error handling
@@ -41,6 +42,7 @@ app.add_typer(discover_app, name="discover")
 app.add_typer(memory_app, name="memory")
 app.add_typer(profile_app, name="profile")
 app.add_typer(session_app, name="session")
+app.add_typer(skill_app, name="skill")
 
 # Register standalone commands
 app.command("init")(init_command)
