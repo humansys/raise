@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "2.0.0"
 
 hooks:
   Stop:
@@ -81,6 +81,11 @@ raise
 │   ├── emit-work           # Emit lifecycle event
 │   ├── emit-session        # Emit session event
 │   └── emit-calibration    # Emit calibration event
+├── skill                   # Skill management
+│   ├── list                # List all skills
+│   ├── validate            # Validate skill structure
+│   ├── check-name          # Check naming conventions
+│   └── scaffold            # Create new skill from template
 ├── discover                # Codebase analysis
 │   ├── scan                # Extract symbols
 │   ├── build               # Build graph
@@ -147,7 +152,6 @@ Answer these questions:
 
 1. **Name:** What's the `{domain}-{action}` pattern?
    - Examples: `session-close`, `feature-plan`, `discover-scan`
-   - Check: Does a CLI command with similar name exist? Names must align (PAT-132).
 
 2. **Lifecycle:** Which lifecycle does it belong to?
    - Session / Epic / Feature / Discovery / Utility / Meta
@@ -158,7 +162,20 @@ Answer these questions:
 
 4. **Purpose:** One sentence describing what it does.
 
-**Verification:** Name follows `{domain}-{action}` pattern. No naming conflicts.
+**Verify naming with CLI:**
+
+```bash
+# Check name follows pattern, no conflicts, known lifecycle
+uv run raise skill check-name {skill-name}
+```
+
+This validates:
+- ✓ Follows `{domain}-{action}` pattern
+- ✓ No conflict with existing skills
+- ✓ No CLI command conflict (PAT-132)
+- ✓ Domain is a known lifecycle
+
+**Verification:** `raise skill check-name` returns valid.
 
 ### Step 2: Check Ontology Compliance
 
@@ -179,17 +196,33 @@ uv run raise memory query "ontology naming" --types pattern --limit 5
 
 **Verification:** All checklist items addressed.
 
-### Step 3: Create Skill Directory
+### Step 3: Scaffold the Skill
+
+Use the CLI to create the skill with proper structure:
 
 ```bash
-mkdir -p .claude/skills/{skill-name}
+# Create skill with inferred lifecycle
+uv run raise skill scaffold {skill-name}
+
+# Or specify lifecycle and positioning explicitly
+uv run raise skill scaffold {skill-name} --lifecycle {lifecycle} --after {previous-skill} --before {next-skill}
 ```
 
-**Verification:** Directory exists.
+This creates:
+- `.claude/skills/{skill-name}/` directory
+- `SKILL.md` with valid frontmatter, sections, and telemetry hook
 
-### Step 4: Create SKILL.md
+**Verification:** Skill directory and SKILL.md created.
 
-Use this template:
+### Step 4: Customize SKILL.md
+
+Edit the scaffolded SKILL.md to add:
+- Description of what the skill does
+- Context (when to use, when to skip, inputs, outputs)
+- Detailed steps with verification criteria
+- Output table
+
+Reference this template for structure:
 
 ```markdown
 ---
@@ -287,20 +320,22 @@ uv run raise {command}
 
 **Verification:** SKILL.md created with all sections.
 
-### Step 5: Verify Hook Integration
+### Step 5: Validate Skill Structure
 
-Check that the hook script exists:
+Use the CLI to validate the skill:
 
 ```bash
-ls -la .raise/scripts/log-skill-complete.sh
+uv run raise skill validate .claude/skills/{skill-name}/
 ```
 
-The hook command in SKILL.md should be:
-```
-RAISE_SKILL_NAME={skill-name} "$CLAUDE_PROJECT_DIR"/.raise/scripts/log-skill-complete.sh
-```
+This checks:
+- ✓ Frontmatter is valid YAML
+- ✓ Required fields present (name, description, metadata)
+- ✓ Required sections exist (Purpose, Context, Steps, Output)
+- ✓ Name follows `{domain}-{action}` pattern
+- ⚠ Hook script paths (warns if not found)
 
-**Verification:** Hook script exists and path is correct.
+**Verification:** `raise skill validate` returns no errors.
 
 ### Step 6: Update Skill Catalog
 
