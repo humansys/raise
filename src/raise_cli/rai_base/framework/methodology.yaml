@@ -43,7 +43,7 @@ skills:
     - name: /epic-design
       purpose: Design epic scope, features, architecture
       when: After epic branch exists
-      creates: Epic scope document with feature breakdown
+      creates: Epic scope document with story breakdown
 
     - name: /epic-plan
       purpose: Sequence features with milestones and dependencies
@@ -183,7 +183,7 @@ principles:
       rationale: Tests are specification, not afterthought
 
     - name: Commit After Task
-      rule: Commit after each completed task, not just feature end
+      rule: Commit after each completed task, not just story end
       rationale: Enables recovery, shows progress
 
     - name: Full Skill Cycle

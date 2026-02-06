@@ -220,11 +220,11 @@ class GovernanceExtractor:
         )
 
     def _extract_work_concepts(self) -> list[Concept]:
-        """Extract work tracking concepts (Project, Epic, Feature).
+        """Extract work tracking concepts (Project, Epic, Story).
 
         Extracts from:
         - governance/projects/*/backlog.md (Project + Epic index)
-        - work/epics/*/scope.md (Epic details + Features)
+        - work/epics/*/scope.md (Epic details + Stories)
 
         Returns:
             List of work tracking concepts.
@@ -268,11 +268,11 @@ class GovernanceExtractor:
                         concepts.append(epic_detail)
                     logger.info(f"Extracted epic details from {scope_file.name}")
 
-                # Extract Feature concepts
-                features = extract_stories(scope_file, self.project_root)
-                concepts.extend(features)
+                # Extract Story concepts
+                stories = extract_stories(scope_file, self.project_root)
+                concepts.extend(stories)
                 logger.info(
-                    f"Extracted {len(features)} features from {scope_file.name}"
+                    f"Extracted {len(stories)} stories from {scope_file.name}"
                 )
             except Exception as e:
                 logger.error(f"Error extracting from {scope_file}: {e}")

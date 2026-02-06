@@ -1,6 +1,6 @@
 """Parser for epic scope documents.
 
-Extracts detailed Epic and Feature concepts from work/epics/*/scope.md files.
+Extracts detailed Epic and Story concepts from work/epics/*/scope.md files.
 """
 
 from __future__ import annotations
@@ -68,7 +68,7 @@ def extract_epic_details(
     """Extract detailed Epic concept from epic scope document.
 
     Parses the epic scope document to extract full epic metadata including
-    objective, status, target date, and feature count.
+    objective, status, target date, and story count.
 
     Args:
         file_path: Path to epic scope document (work/epics/*/scope.md).
@@ -172,9 +172,9 @@ def extract_epic_details(
 
 
 def extract_stories(file_path: Path, project_root: Path | None = None) -> list[Concept]:
-    """Extract Feature concepts from epic scope document.
+    """Extract Story concepts from epic scope document.
 
-    Parses the "Features" table to extract feature metadata. Supports
+    Parses the "Stories" table to extract story metadata. Supports
     various table formats found in epic scope documents.
 
     Args:
@@ -183,8 +183,8 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
             If None, uses file_path.parent.parent.parent.parent.
 
     Returns:
-        List of Feature Concepts extracted from the table. Returns empty list
-        if file doesn't exist or no features found.
+        List of Story Concepts extracted from the table. Returns empty list
+        if file doesn't exist or no stories found.
 
     Examples:
         >>> from pathlib import Path
@@ -217,21 +217,21 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
 
     concepts: list[Concept] = []
 
-    # Parse feature table rows
+    # Parse story table rows
     # Pattern variants:
     # | F8.1 | Backlog Parser | S | Pending | Description |
     # | F8.1 | Backlog Parser | S | 2 | Pending | Description |
     # | F2.1 | Concept Extraction | 3 | ✅ Complete | 52 min | 3.5x |
-    feature_pattern = re.compile(
-        r"^\|\s*(F\d+\.\d+)\s*\|"  # Feature ID
-        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"  # Feature name (with optional bold)
+    story_pattern = re.compile(
+        r"^\|\s*(F\d+\.\d+)\s*\|"  # Story ID
+        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"  # Story name (with optional bold)
         r"\s*([^|]+?)\s*\|"  # Size or SP
         r"\s*([^|]+?)\s*\|"  # Status or SP (depends on format)
         r"(?:\s*([^|]*?)\s*\|)?"  # Optional: Description or Status or Time
     )
 
     for i, line in enumerate(lines, 1):
-        match = feature_pattern.match(line)
+        match = story_pattern.match(line)
         if match:
             story_id = match.group(1).strip()
             name = match.group(2).strip()
