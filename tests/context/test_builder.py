@@ -5,8 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from textwrap import dedent
-from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -75,19 +74,21 @@ class TestLoadMemory:
 
     def test_loads_patterns_from_jsonl(self, tmp_path: Path) -> None:
         """Should load patterns from patterns.jsonl."""
-        # Create .rai/memory structure
-        memory_dir = tmp_path / ".rai" / "memory"
+        # Create .raise/rai/memory structure
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
 
         patterns_file = memory_dir / "patterns.jsonl"
         patterns_file.write_text(
-            json.dumps({
-                "id": "PAT-001",
-                "type": "codebase",
-                "content": "Singleton pattern for testing",
-                "context": ["testing", "patterns"],
-                "created": "2026-01-31",
-            })
+            json.dumps(
+                {
+                    "id": "PAT-001",
+                    "type": "codebase",
+                    "content": "Singleton pattern for testing",
+                    "context": ["testing", "patterns"],
+                    "created": "2026-01-31",
+                }
+            )
             + "\n"
         )
 
@@ -103,20 +104,22 @@ class TestLoadMemory:
 
     def test_loads_calibration_from_jsonl(self, tmp_path: Path) -> None:
         """Should load calibration from calibration.jsonl."""
-        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
 
         calibration_file = memory_dir / "calibration.jsonl"
         calibration_file.write_text(
-            json.dumps({
-                "id": "CAL-001",
-                "feature": "F1.1",
-                "name": "Project Scaffolding",
-                "size": "S",
-                "sp": 3,
-                "actual_min": 30,
-                "created": "2026-01-31",
-            })
+            json.dumps(
+                {
+                    "id": "CAL-001",
+                    "feature": "F1.1",
+                    "name": "Project Scaffolding",
+                    "size": "S",
+                    "sp": 3,
+                    "actual_min": 30,
+                    "created": "2026-01-31",
+                }
+            )
             + "\n"
         )
 
@@ -130,19 +133,22 @@ class TestLoadMemory:
         assert "F1.1" in node.content
 
     def test_loads_sessions_from_jsonl(self, tmp_path: Path) -> None:
-        """Should load sessions from sessions/index.jsonl."""
-        sessions_dir = tmp_path / ".rai" / "memory" / "sessions"
+        """Should load sessions from personal/sessions/index.jsonl."""
+        # Sessions now only load from personal directory (multi-dev architecture)
+        sessions_dir = tmp_path / ".raise/rai" / "personal" / "sessions"
         sessions_dir.mkdir(parents=True)
 
         sessions_file = sessions_dir / "index.jsonl"
         sessions_file.write_text(
-            json.dumps({
-                "id": "SES-001",
-                "date": "2026-02-01",
-                "type": "feature",
-                "topic": "E3 Implementation",
-                "outcomes": ["Feature complete", "Tests passing"],
-            })
+            json.dumps(
+                {
+                    "id": "SES-001",
+                    "date": "2026-02-01",
+                    "type": "story",
+                    "topic": "E3 Implementation",
+                    "outcomes": ["Feature complete", "Tests passing"],
+                }
+            )
             + "\n"
         )
 
@@ -156,7 +162,7 @@ class TestLoadMemory:
         assert "E3 Implementation" in node.content
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
-        """Should return empty list if .rai/memory doesn't exist."""
+        """Should return empty list if .raise/rai/memory doesn't exist."""
         builder = UnifiedGraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
@@ -164,18 +170,40 @@ class TestLoadMemory:
 
     def test_loads_all_memory_types(self, tmp_path: Path) -> None:
         """Should load patterns, calibration, and sessions together."""
-        memory_dir = tmp_path / ".rai" / "memory"
-        sessions_dir = memory_dir / "sessions"
+        # Project directory for patterns and calibration
+        memory_dir = tmp_path / ".raise/rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        # Personal directory for sessions (multi-dev architecture)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        sessions_dir = personal_dir / "sessions"
         sessions_dir.mkdir(parents=True)
 
         (memory_dir / "patterns.jsonl").write_text(
-            json.dumps({"id": "PAT-001", "type": "process", "content": "Pattern", "created": "2026-01-31"}) + "\n"
+            json.dumps(
+                {
+                    "id": "PAT-001",
+                    "type": "process",
+                    "content": "Pattern",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
         )
         (memory_dir / "calibration.jsonl").write_text(
-            json.dumps({"id": "CAL-001", "feature": "F1.1", "name": "Test", "created": "2026-01-31"}) + "\n"
+            json.dumps(
+                {
+                    "id": "CAL-001",
+                    "feature": "F1.1",
+                    "name": "Test",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
         )
         (sessions_dir / "index.jsonl").write_text(
-            json.dumps({"id": "SES-001", "date": "2026-02-01", "topic": "Session"}) + "\n"
+            json.dumps({"id": "SES-001", "date": "2026-02-01", "topic": "Session"})
+            + "\n"
         )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
@@ -184,6 +212,465 @@ class TestLoadMemory:
         assert len(nodes) == 3
         types = {n.type for n in nodes}
         assert types == {"pattern", "calibration", "session"}
+
+
+class TestLoadMemoryBaseVersion:
+    """Tests for base/version passthrough in graph builder (F14.6)."""
+
+    def test_base_pattern_preserves_base_version_in_metadata(
+        self, tmp_path: Path
+    ) -> None:
+        """Base pattern fields should pass through to ConceptNode metadata."""
+        memory_dir = tmp_path / ".raise/rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        (memory_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "BASE-001",
+                    "type": "process",
+                    "content": "TDD cycle discipline",
+                    "context": ["tdd", "testing"],
+                    "base": True,
+                    "version": 1,
+                    "created": "2026-02-05",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.metadata.get("base") is True
+        assert node.metadata.get("version") == 1
+
+    def test_personal_pattern_has_no_base_version(self, tmp_path: Path) -> None:
+        """Personal patterns should not have base/version in metadata."""
+        memory_dir = tmp_path / ".raise/rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        (memory_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-001",
+                    "type": "codebase",
+                    "content": "My custom pattern",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert "base" not in node.metadata
+        assert "version" not in node.metadata
+
+
+class TestLoadMemoryMultiSource:
+    """Tests for multi-source memory loading (global, project, personal)."""
+
+    def test_loads_from_global_directory(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should load patterns from ~/.rai/ with global scope."""
+        # Setup global directory
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        (global_rai / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-GLOBAL",
+                    "type": "universal",
+                    "content": "Universal pattern",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "PAT-GLOBAL"
+        assert node.metadata.get("scope") == "global"
+
+    def test_loads_from_project_directory(self, tmp_path: Path) -> None:
+        """Should load patterns from .raise/rai/memory/ with project scope."""
+        memory_dir = tmp_path / ".raise/rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        (memory_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-PROJECT",
+                    "type": "codebase",
+                    "content": "Project pattern",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "PAT-PROJECT"
+        assert node.metadata.get("scope") == "project"
+
+    def test_loads_from_personal_directory(self, tmp_path: Path) -> None:
+        """Should load patterns from .raise/rai/personal/ with personal scope."""
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-PERSONAL",
+                    "type": "process",
+                    "content": "Personal pattern",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "PAT-PERSONAL"
+        assert node.metadata.get("scope") == "personal"
+
+    def test_loads_from_all_three_tiers(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should load from global, project, and personal directories."""
+        # Setup global
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+        (global_rai / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-G1",
+                    "type": "universal",
+                    "content": "Global",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        # Setup project
+        project_memory = tmp_path / ".raise/rai" / "memory"
+        project_memory.mkdir(parents=True)
+        (project_memory / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-P1",
+                    "type": "codebase",
+                    "content": "Project",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        # Setup personal
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-L1",
+                    "type": "process",
+                    "content": "Personal",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 3
+        scopes = {n.metadata.get("scope") for n in nodes}
+        assert scopes == {"global", "project", "personal"}
+
+    def test_loads_calibration_from_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should load calibration from ~/.rai/ with global scope."""
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        (global_rai / "calibration.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "CAL-GLOBAL",
+                    "feature": "F1.1",
+                    "name": "Global Cal",
+                    "size": "S",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        assert nodes[0].id == "CAL-GLOBAL"
+        assert nodes[0].metadata.get("scope") == "global"
+
+    def test_loads_sessions_from_personal_only(self, tmp_path: Path) -> None:
+        """Sessions should only load from personal directory (developer-specific)."""
+        # Project sessions (should NOT be loaded in multi-dev mode)
+        project_sessions = tmp_path / ".raise/rai" / "memory" / "sessions"
+        project_sessions.mkdir(parents=True)
+        (project_sessions / "index.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "SES-PROJECT",
+                    "date": "2026-02-01",
+                    "type": "story",
+                    "topic": "Project session",
+                }
+            )
+            + "\n"
+        )
+
+        # Personal sessions (SHOULD be loaded)
+        personal_sessions = tmp_path / ".raise/rai" / "personal" / "sessions"
+        personal_sessions.mkdir(parents=True)
+        (personal_sessions / "index.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "SES-PERSONAL",
+                    "date": "2026-02-01",
+                    "type": "story",
+                    "topic": "Personal session",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have personal session
+        session_nodes = [n for n in nodes if n.type == "session"]
+        assert len(session_nodes) == 1
+        assert session_nodes[0].id == "SES-PERSONAL"
+        assert session_nodes[0].metadata.get("scope") == "personal"
+
+
+class TestPrecedenceLogic:
+    """Tests for memory scope precedence (personal > project > global)."""
+
+    def test_personal_overrides_project(self, tmp_path: Path) -> None:
+        """Personal scope should override project scope for same ID."""
+        # Project pattern
+        project_dir = tmp_path / ".raise/rai" / "memory"
+        project_dir.mkdir(parents=True)
+        (project_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-001",
+                    "type": "codebase",
+                    "content": "Project version",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        # Personal pattern with same ID
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-001",
+                    "type": "codebase",
+                    "content": "Personal override",
+                    "created": "2026-02-01",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have one PAT-001, from personal
+        pat_nodes = [n for n in nodes if n.id == "PAT-001"]
+        assert len(pat_nodes) == 1
+        assert pat_nodes[0].content == "Personal override"
+        assert pat_nodes[0].metadata.get("scope") == "personal"
+
+    def test_project_overrides_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Project scope should override global scope for same ID."""
+        # Global pattern
+        global_dir = tmp_path / "global_rai"
+        global_dir.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_dir))
+        (global_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-002",
+                    "type": "universal",
+                    "content": "Global version",
+                    "created": "2026-01-30",
+                }
+            )
+            + "\n"
+        )
+
+        # Project pattern with same ID
+        project_dir = tmp_path / ".raise/rai" / "memory"
+        project_dir.mkdir(parents=True)
+        (project_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-002",
+                    "type": "codebase",
+                    "content": "Project override",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have one PAT-002, from project
+        pat_nodes = [n for n in nodes if n.id == "PAT-002"]
+        assert len(pat_nodes) == 1
+        assert pat_nodes[0].content == "Project override"
+        assert pat_nodes[0].metadata.get("scope") == "project"
+
+    def test_personal_overrides_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Personal scope should override global scope for same ID."""
+        # Global pattern
+        global_dir = tmp_path / "global_rai"
+        global_dir.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_dir))
+        (global_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-003",
+                    "type": "universal",
+                    "content": "Global version",
+                    "created": "2026-01-30",
+                }
+            )
+            + "\n"
+        )
+
+        # Personal pattern with same ID (skipping project)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-003",
+                    "type": "process",
+                    "content": "Personal override",
+                    "created": "2026-02-01",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have one PAT-003, from personal
+        pat_nodes = [n for n in nodes if n.id == "PAT-003"]
+        assert len(pat_nodes) == 1
+        assert pat_nodes[0].content == "Personal override"
+        assert pat_nodes[0].metadata.get("scope") == "personal"
+
+    def test_unique_ids_all_preserved(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Unique IDs from all tiers should be preserved."""
+        # Global pattern
+        global_dir = tmp_path / "global_rai"
+        global_dir.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_dir))
+        (global_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-G1",
+                    "type": "universal",
+                    "content": "Global",
+                    "created": "2026-01-30",
+                }
+            )
+            + "\n"
+        )
+
+        # Project pattern (different ID)
+        project_dir = tmp_path / ".raise/rai" / "memory"
+        project_dir.mkdir(parents=True)
+        (project_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-P1",
+                    "type": "codebase",
+                    "content": "Project",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
+        )
+
+        # Personal pattern (different ID)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps(
+                {
+                    "id": "PAT-L1",
+                    "type": "process",
+                    "content": "Personal",
+                    "created": "2026-02-01",
+                }
+            )
+            + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # All three should be preserved
+        assert len(nodes) == 3
+        ids = {n.id for n in nodes}
+        assert ids == {"PAT-G1", "PAT-P1", "PAT-L1"}
 
 
 class TestLoadWork:
@@ -207,7 +694,7 @@ class TestLoadWork:
 
         with patch.object(builder, "_extract_epics") as mock_extract:
             mock_extract.return_value = [mock_epic]
-            with patch.object(builder, "_extract_features") as mock_features:
+            with patch.object(builder, "_extract_stories") as mock_features:
                 mock_features.return_value = []
                 nodes = builder.load_work()
 
@@ -222,7 +709,7 @@ class TestLoadWork:
 
         mock_feature = Concept(
             id="F11.2",
-            type=ConceptType.FEATURE,
+            type=ConceptType.STORY,
             file="dev/epic-e11-scope.md",
             section="F11.2: Graph Builder",
             lines=(70, 80),
@@ -234,14 +721,14 @@ class TestLoadWork:
 
         with patch.object(builder, "_extract_epics") as mock_epics:
             mock_epics.return_value = []
-            with patch.object(builder, "_extract_features") as mock_extract:
+            with patch.object(builder, "_extract_stories") as mock_extract:
                 mock_extract.return_value = [mock_feature]
                 nodes = builder.load_work()
 
         assert len(nodes) == 1
         node = nodes[0]
         assert node.id == "F11.2"
-        assert node.type == "feature"
+        assert node.type == "story"
 
 
 class TestLoadSkills:
@@ -252,13 +739,15 @@ class TestLoadSkills:
         skills_dir = tmp_path / ".claude" / "skills" / "test-skill"
         skills_dir.mkdir(parents=True)
 
-        (skills_dir / "SKILL.md").write_text(dedent("""\
+        (skills_dir / "SKILL.md").write_text(
+            dedent("""\
             ---
             name: test-skill
             description: A test skill
             ---
             # Test
-        """))
+        """)
+        )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
         nodes = builder.load_skills()
@@ -284,39 +773,43 @@ class TestLoadComponents:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "source_file": "work/discovery/components-draft.yaml",
-            "component_count": 2,
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-scanner-symbol",
-                    "type": "component",
-                    "content": "Core data model for code symbols",
-                    "source_file": "src/discovery/scanner.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {
-                        "name": "Symbol",
-                        "kind": "class",
-                        "line": 44,
-                        "category": "model",
-                    },
-                },
-                {
-                    "id": "comp-scanner-scan-dir",
-                    "type": "component",
-                    "content": "Scan directory for symbols",
-                    "source_file": "src/discovery/scanner.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {
-                        "name": "scan_directory",
-                        "kind": "function",
-                        "line": 100,
-                        "category": "utility",
-                    },
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "source_file": "work/discovery/components-draft.yaml",
+                    "component_count": 2,
+                    "components": [
+                        {
+                            "id": "comp-scanner-symbol",
+                            "type": "component",
+                            "content": "Core data model for code symbols",
+                            "source_file": "src/discovery/scanner.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {
+                                "name": "Symbol",
+                                "kind": "class",
+                                "line": 44,
+                                "category": "model",
+                            },
+                        },
+                        {
+                            "id": "comp-scanner-scan-dir",
+                            "type": "component",
+                            "content": "Scan directory for symbols",
+                            "source_file": "src/discovery/scanner.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {
+                                "name": "scan_directory",
+                                "kind": "function",
+                                "line": 100,
+                                "category": "utility",
+                            },
+                        },
+                    ],
+                }
+            )
+        )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
         nodes = builder.load_components()
@@ -341,10 +834,14 @@ class TestLoadComponents:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [],
-        }))
+        validated_file.write_text(
+            json.dumps(
+                {
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [],
+                }
+            )
+        )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
         nodes = builder.load_components()
@@ -371,21 +868,31 @@ class TestBuild:
     def test_builds_graph_with_all_sources(self, tmp_path: Path) -> None:
         """Should combine all sources into UnifiedGraph."""
         # Setup minimal fixtures
-        memory_dir = tmp_path / ".rai" / "memory"
+        memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
         (memory_dir / "patterns.jsonl").write_text(
-            json.dumps({"id": "PAT-001", "type": "process", "content": "Test", "created": "2026-01-31"}) + "\n"
+            json.dumps(
+                {
+                    "id": "PAT-001",
+                    "type": "process",
+                    "content": "Test",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
         )
 
         skills_dir = tmp_path / ".claude" / "skills" / "test"
         skills_dir.mkdir(parents=True)
-        (skills_dir / "SKILL.md").write_text(dedent("""\
+        (skills_dir / "SKILL.md").write_text(
+            dedent("""\
             ---
             name: test
             description: Test skill
             ---
             # Test
-        """))
+        """)
+        )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
@@ -423,19 +930,23 @@ class TestBuild:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-test",
-                    "type": "component",
-                    "content": "Test component",
-                    "source_file": "src/test.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {"name": "TestClass", "kind": "class"},
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": "comp-test",
+                            "type": "component",
+                            "content": "Test component",
+                            "source_file": "src/test.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {"name": "TestClass", "kind": "class"},
+                        },
+                    ],
+                }
+            )
+        )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
@@ -461,7 +972,7 @@ class TestInferRelationships:
             id="PAT-001",
             type="pattern",
             content="Test pattern",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-01-31",
             metadata={"learned_from": "F1.5"},
         )
@@ -469,7 +980,7 @@ class TestInferRelationships:
             id="SES-010",
             type="session",
             content="F1.5 session",
-            source_file=".rai/memory/sessions/index.jsonl",
+            source_file=".raise/rai/memory/sessions/index.jsonl",
             created="2026-01-31",
             metadata={"topic": "F1.5 Output Module"},
         )
@@ -487,7 +998,7 @@ class TestInferRelationships:
         """Should create part_of edges from feature to epic."""
         feature = ConceptNode(
             id="F11.2",
-            type="feature",
+            type="story",
             content="Graph Builder",
             source_file="dev/epic-e11-scope.md",
             created="2026-02-03",
@@ -514,10 +1025,10 @@ class TestInferRelationships:
     def test_infers_skill_prerequisite_edges(self, tmp_path: Path) -> None:
         """Should create needs_context edges from skill prerequisites."""
         skill = ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Plan implementation tasks",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-02-03",
             metadata={"raise.prerequisites": "project-backlog"},
         )
@@ -535,25 +1046,25 @@ class TestInferRelationships:
 
         needs_edges = [e for e in edges if e.type == "needs_context"]
         assert len(needs_edges) == 1
-        assert needs_edges[0].source == "/feature-plan"
+        assert needs_edges[0].source == "/story-plan"
         assert needs_edges[0].target == "/project-backlog"
         assert needs_edges[0].weight == 1.0
 
     def test_infers_skill_next_edges(self, tmp_path: Path) -> None:
-        """Should create related_to edges from skill.raise.next."""
+        """Should create related_to edges from skill.raise/raise.next."""
         skill = ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Plan tasks",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-02-03",
-            metadata={"raise.next": "feature-implement"},
+            metadata={"raise.next": "story-implement"},
         )
         next_skill = ConceptNode(
-            id="/feature-implement",
+            id="/story-implement",
             type="skill",
             content="Implement feature",
-            source_file=".claude/skills/feature-implement/SKILL.md",
+            source_file=".claude/skills/story-implement/SKILL.md",
             created="2026-02-03",
             metadata={},
         )
@@ -561,7 +1072,11 @@ class TestInferRelationships:
         builder = UnifiedGraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([skill, next_skill])
 
-        next_edges = [e for e in edges if e.source == "/feature-plan" and e.target == "/feature-implement"]
+        next_edges = [
+            e
+            for e in edges
+            if e.source == "/story-plan" and e.target == "/story-implement"
+        ]
         assert len(next_edges) == 1
         assert next_edges[0].type == "related_to"
         assert next_edges[0].weight == 1.0
@@ -572,15 +1087,15 @@ class TestInferRelationships:
             id="PAT-012",
             type="pattern",
             content="Design-first eliminates ambiguity in implementation planning",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-01-31",
             metadata={"context": ["planning", "implementation"]},
         )
         skill = ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Planning implementation tasks for feature development",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-02-03",
             metadata={},
         )
@@ -604,28 +1119,40 @@ class TestInferRelationships:
 
     def test_build_includes_inferred_edges(self, tmp_path: Path) -> None:
         """Build should include edges from infer_relationships."""
-        memory_dir = tmp_path / ".rai" / "memory"
-        sessions_dir = memory_dir / "sessions"
+        # Project directory for patterns
+        memory_dir = tmp_path / ".raise/rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        # Personal directory for sessions (multi-dev architecture)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        sessions_dir = personal_dir / "sessions"
         sessions_dir.mkdir(parents=True)
 
         # Pattern with learned_from
         (memory_dir / "patterns.jsonl").write_text(
-            json.dumps({
-                "id": "PAT-001",
-                "type": "process",
-                "content": "Test pattern",
-                "learned_from": "F1.5",
-                "created": "2026-01-31",
-            }) + "\n"
+            json.dumps(
+                {
+                    "id": "PAT-001",
+                    "type": "process",
+                    "content": "Test pattern",
+                    "learned_from": "F1.5",
+                    "created": "2026-01-31",
+                }
+            )
+            + "\n"
         )
 
-        # Session that matches
+        # Session that matches (in personal directory)
         (sessions_dir / "index.jsonl").write_text(
-            json.dumps({
-                "id": "SES-010",
-                "date": "2026-01-31",
-                "topic": "F1.5 Output Module",
-            }) + "\n"
+            json.dumps(
+                {
+                    "id": "SES-010",
+                    "date": "2026-01-31",
+                    "type": "story",
+                    "topic": "F1.5 Output Module",
+                }
+            )
+            + "\n"
         )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)

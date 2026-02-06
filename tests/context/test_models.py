@@ -16,14 +16,14 @@ class TestConceptNode:
             id="PAT-001",
             type="pattern",
             content="Singleton with get/set/configure pattern",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-01-31",
             metadata={"sub_type": "codebase", "context": ["testing"]},
         )
         assert node.id == "PAT-001"
         assert node.type == "pattern"
         assert "Singleton" in node.content
-        assert node.source_file == ".rai/memory/patterns.jsonl"
+        assert node.source_file == ".raise/rai/memory/patterns.jsonl"
         assert node.metadata["sub_type"] == "codebase"
 
     def test_create_principle_node(self) -> None:
@@ -42,28 +42,28 @@ class TestConceptNode:
     def test_create_skill_node(self) -> None:
         """Test creating a skill node."""
         node = ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Decompose user stories into atomic executable tasks",
-            source_file=".claude/skills/feature-plan/SKILL.md",
+            source_file=".claude/skills/story-plan/SKILL.md",
             created="2026-02-03",
             metadata={"phases": ["plan"]},
         )
-        assert node.id == "/feature-plan"
+        assert node.id == "/story-plan"
         assert node.type == "skill"
 
     def test_create_feature_node(self) -> None:
         """Test creating a feature node."""
         node = ConceptNode(
             id="F11.1",
-            type="feature",
+            type="story",
             content="Unified Graph Schema - Pydantic models and NetworkX wrapper",
             source_file="dev/epic-e11-scope.md",
             created="2026-02-03",
             metadata={"size": "S", "epic": "E11"},
         )
         assert node.id == "F11.1"
-        assert node.type == "feature"
+        assert node.type == "story"
         assert node.metadata["epic"] == "E11"
 
     def test_all_node_types_valid(self) -> None:
@@ -76,7 +76,7 @@ class TestConceptNode:
             ("RF-01", "requirement"),
             ("OUT-001", "outcome"),
             ("E11", "epic"),
-            ("F11.1", "feature"),
+            ("F11.1", "story"),
             ("/test", "skill"),
         ]
         for node_id, node_type in node_types:

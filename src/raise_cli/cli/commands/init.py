@@ -2,7 +2,7 @@
 
 This module provides the `raise init` command that:
 - Detects if the project is greenfield or brownfield
-- Creates .rai/manifest.yaml with project metadata
+- Creates .raise/manifest.yaml with project metadata
 - Loads or creates ~/.rai/developer.yaml for personal profile
 - Outputs adaptive messages based on experience level
 - Optionally detects conventions and generates guardrails (--detect)
@@ -17,7 +17,10 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
+
+if TYPE_CHECKING:
+    from raise_cli.onboarding.bootstrap import BootstrapResult
 
 import typer
 from rich.console import Console
@@ -54,21 +57,25 @@ WELCOME_BACK_RI = "[dim]Welcome back, {name}.[/dim]"
 
 PROJECT_DETECTED_SHU = """
 [bold]Project detected:[/bold] {project_type} ({file_count} code files)
-[bold]Created:[/bold] .rai/manifest.yaml
-{profile_status}
+{files_section}
 
-[bold cyan]Next steps:[/bold cyan]
-1. Open Claude Code in this directory
-2. Run [bold]/session-start[/bold] to begin our first session together
-3. I'll guide you through understanding your project
+[bold cyan]What's next?[/bold cyan]
 
-Questions? Visit https://raise.dev/docs
+  [bold]1. Start a session[/bold] (in Claude Code / AI editor):
+     Type [bold cyan]/session-start[/bold cyan]
+     [dim]→ Loads your context, remembers patterns, proposes focused work[/dim]
+
+  [bold]2. Explore the CLI[/bold] (in terminal):
+     [dim]raise --help[/dim]      — see all commands
+     [dim]raise context[/dim]     — query project context
+     [dim]raise memory[/dim]      — query Rai's memory
+
+[dim]Don't have Claude Code? https://claude.ai/download[/dim]
 """
 
-PROJECT_DETECTED_RI = """{project_type} project initialized ({file_count} files).
-Created .rai/manifest.yaml
+PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
-Run [bold]/session-start[/bold] when ready.
+[dim]Editor:[/dim] /session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
 """
 
 
@@ -90,23 +97,78 @@ def _get_project_message(
     file_count: int,
     profile: DeveloperProfile | None,
     created_profile: bool,
+    bootstrap_result: BootstrapResult | None = None,
 ) -> str:
-    """Get project detection message based on experience level."""
+    """Get project detection message based on experience level.
+
+    Args:
+        project_type: Detected project type (greenfield/brownfield).
+        file_count: Number of code files detected.
+        profile: Developer profile (None for new users).
+        created_profile: Whether profile was just created.
+        bootstrap_result: Result of base Rai bootstrap (None if not run).
+
+    Returns:
+        Formatted message string for console output.
+    """
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
-        profile_status = (
-            "[bold]Created:[/bold] ~/.rai/developer.yaml (first time setup)"
-            if created_profile
-            else "[bold]Loaded:[/bold] ~/.rai/developer.yaml"
-        )
+        # Build files section with descriptions
+        lines = [
+            "[bold]Created:[/bold] .raise/manifest.yaml  [dim]— project metadata[/dim]"
+        ]
+        if created_profile:
+            lines.append(
+                "[bold]Created:[/bold] ~/.rai/developer.yaml  "
+                "[dim]— your preferences (first time)[/dim]"
+            )
+        else:
+            lines.append(
+                "[bold]Loaded:[/bold]  ~/.rai/developer.yaml  [dim]— your preferences[/dim]"
+            )
+
+        # Bootstrap info
+        if bootstrap_result is not None:
+            if bootstrap_result.already_existed:
+                lines.append(
+                    "[bold]Loaded:[/bold]  .raise/rai/  "
+                    "[dim]— Rai base already present[/dim]"
+                )
+            else:
+                if bootstrap_result.identity_copied:
+                    lines.append(
+                        "[bold]Created:[/bold] .raise/rai/identity/  "
+                        "[dim]— Rai's base identity[/dim]"
+                    )
+                if bootstrap_result.patterns_copied:
+                    lines.append(
+                        "[bold]Created:[/bold] .raise/rai/memory/  "
+                        "[dim]— 20 universal patterns[/dim]"
+                    )
+                if bootstrap_result.methodology_copied:
+                    lines.append(
+                        "[bold]Created:[/bold] .raise/rai/framework/  "
+                        "[dim]— methodology definition[/dim]"
+                    )
+
+        files_section = "\n".join(lines)
+
         return PROJECT_DETECTED_SHU.format(
             project_type=project_type.capitalize(),
             file_count=file_count,
-            profile_status=profile_status,
+            files_section=files_section,
         )
     else:
-        return PROJECT_DETECTED_RI.format(
-            project_type=project_type.capitalize(),
-            file_count=file_count,
+        bootstrap_msg = ""
+        if bootstrap_result is not None and not bootstrap_result.already_existed:
+            bootstrap_msg = (
+                f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
+            )
+        return (
+            PROJECT_DETECTED_RI.format(
+                project_type=project_type.capitalize(),
+                file_count=file_count,
+            )
+            + bootstrap_msg
         )
 
 
@@ -116,7 +178,6 @@ def _create_new_profile(project_path: Path) -> DeveloperProfile:
     return DeveloperProfile(
         name="Developer",  # Will be personalized later
         experience_level=ExperienceLevel.SHU,
-        sessions_total=0,
         first_session=today,
         last_session=today,
         projects=[str(project_path.resolve())],
@@ -162,7 +223,7 @@ def init_command(
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
-    Detects project type (greenfield/brownfield), creates .rai/manifest.yaml,
+    Detects project type (greenfield/brownfield), creates .raise/manifest.yaml,
     and sets up developer profile for personalized interaction.
 
     With --detect, also analyzes code conventions and generates guardrails.
@@ -204,6 +265,38 @@ def init_command(
     manifest = ProjectManifest(project=project_info)
     save_manifest(manifest, project_path)
 
+    # Bootstrap Rai base assets
+    from raise_cli.onboarding.bootstrap import bootstrap_rai_base
+
+    bootstrap_result = bootstrap_rai_base(project_path)
+
+    # Generate MEMORY.md (canonical + Claude Code)
+    from raise_cli.config.paths import (
+        get_claude_memory_path,
+        get_framework_dir,
+        get_memory_dir,
+    )
+    from raise_cli.onboarding.memory_md import generate_memory_md
+
+    methodology_path = get_framework_dir(project_path) / "methodology.yaml"
+    patterns_path = get_memory_dir(project_path) / "patterns.jsonl"
+
+    memory_content = generate_memory_md(
+        methodology_path=methodology_path,
+        patterns_path=patterns_path,
+        project_name=project_name,
+    )
+
+    # Write canonical copy
+    canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
+    canonical_memory.parent.mkdir(parents=True, exist_ok=True)
+    canonical_memory.write_text(memory_content)
+
+    # Write Claude Code copy
+    claude_memory = get_claude_memory_path(project_path)
+    claude_memory.parent.mkdir(parents=True, exist_ok=True)
+    claude_memory.write_text(memory_content)
+
     # Output messages based on experience level
     welcome = _get_welcome_message(profile if not created_profile else None)
     project_msg = _get_project_message(
@@ -211,6 +304,7 @@ def init_command(
         file_count=detection.code_file_count,
         profile=profile,
         created_profile=created_profile,
+        bootstrap_result=bootstrap_result,
     )
 
     if profile.experience_level == ExperienceLevel.RI and not created_profile:

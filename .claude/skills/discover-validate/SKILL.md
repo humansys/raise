@@ -20,7 +20,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=discover-validate \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=discover-validate \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Discovery Validate: Human Review Loop
@@ -63,8 +63,8 @@ Present synthesized component descriptions to the human for validation. The huma
 
 Read the draft file:
 
-```bash
-cat work/discovery/components-draft.yaml
+```
+Read: work/discovery/components-draft.yaml
 ```
 
 **Extract:**
@@ -296,4 +296,4 @@ Progress is saved to YAML after each batch. If interrupted:
 
 - Previous skill: `/discover-scan`
 - Next skill: `/discover-complete`
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`

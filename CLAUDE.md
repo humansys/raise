@@ -1,6 +1,6 @@
 # RaiSE - Reliable AI Software Engineering
 
-> "Raise your craft, feature by feature."
+> "Raise your craft, one story at a time."
 
 ## Project Identity
 
@@ -140,7 +140,7 @@ All code must pass Ruff checks.
 
 ### Documentation — REQUIRED
 
-Documentation is part of Definition of Done for all features.
+Documentation is part of Definition of Done for all stories.
 
 **Code-Level (Always):**
 - Google-style docstrings on all public APIs
@@ -202,20 +202,20 @@ Treat AI inference as a scarce resource:
 
 ```
 src/raise_cli/
-├── governance/    # E2 Governance Toolkit
-│   ├── extraction/    # Parse governance files → concepts
-│   ├── graph/         # Build concept graph with relationships
-│   └── query/         # MVC queries (97% token savings)
 ├── cli/           # Typer CLI commands
-│   ├── commands/      # Command modules (context, graph, etc.)
+│   ├── commands/      # Command modules (memory, discover, etc.)
 │   └── main.py        # CLI app entry point
-├── schemas/       # Pydantic models for ALL data structures
 ├── config/        # Settings with cascade (CLI → env → file → defaults)
-├── output/        # Output formatters (human/json/table)
+├── context/       # Context delivery for governance
 ├── core/          # Shared utilities (git, file ops)
-├── exceptions.py  # Exception hierarchy with exit codes
-├── engines/       # Reserved for future engines (empty)
-└── handlers/      # Reserved for orchestration (empty)
+├── discovery/     # Codebase discovery and analysis
+├── governance/    # Governance extraction and parsing
+├── memory/        # Rai's memory system (patterns, calibration)
+├── onboarding/    # Developer onboarding
+├── output/        # Output formatters (human/json/table)
+├── schemas/       # Pydantic models for ALL data structures
+├── telemetry/     # Local telemetry signals
+└── exceptions.py  # Exception hierarchy with exit codes
 ```
 
 **Key Principle:** Build dumb tools + smart context, not smart engines.
@@ -254,12 +254,13 @@ raise-commons/
 │   └── projects/     # Project-level artifacts
 │
 ├── work/             # Active work
-│   ├── features/     # Feature specs
-│   ├── proposals/    # Draft ADRs
+│   ├── epics/        # Epic and story specs
 │   └── research/     # Research sessions
 │
-└── dev/              # Framework maintenance
-    └── decisions/    # ADRs
+├── dev/              # Framework maintenance
+│   └── decisions/    # ADRs
+│
+└── archive/          # Historical artifacts (read-only)
 ```
 
 | Directory | Purpose | Audience |
@@ -291,9 +292,11 @@ raise-commons/
 | DoD | Validation Gate |
 | Rule | Guardrail |
 | Developer | Orchestrator / RaiSE Engineer |
-| Kata levels L0-L3 | Principio/Flujo/Patrón/Técnica |
+| graph build/query | memory build/query |
+| SAR, CTX | setup/, context/ commands |
+| Kata Engine, Gate Engine | Skills + Toolkit |
 
-Use canonical terms. Correct deprecated usage.
+Use canonical terms. Correct deprecated usage. See `framework/reference/glossary.md` for full terminology.
 
 ---
 
@@ -312,7 +315,7 @@ Use canonical terms. Correct deprecated usage.
 **Follow SOP:** `dev/sops/branch-management.md`
 
 **Branch naming:** `<type>/<scope>/<description>`
-- `feature/` - Single feature implementation (2-5 days)
+- `story/` - Single story implementation (2-5 days)
 - `framework/` - Framework-only changes (2-5 days)
 - `experiment/` - Research, discovery, multi-concern work (expect to rename)
 - `bugfix/` - Bug fixes (1-2 days)
@@ -409,10 +412,11 @@ Cycle: **Detect → Stop → Correct → Continue**
 | Guardrails | `governance/solution/guardrails.md` |
 | Business Case | `governance/solution/business_case.md` |
 | Glossary | `framework/reference/glossary.md` |
-| Rai's Perspective | `.claude/RAI.md` |
+| Rai's Identity | `.raise/rai/identity/core.md` |
+| Rai's Perspective | `.raise/rai/identity/perspective.md` |
 
 ---
 
 *Generated from governance artifacts via setup/rules kata*
-*Version: 2.1.0*
-*Date: 2026-01-31*
+*Version: 2.2.0*
+*Date: 2026-02-05*

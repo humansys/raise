@@ -118,6 +118,49 @@ def _get_signature(node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef) 
     return f"{prefix} {node.name}({args_str})"
 
 
+def _extract_module_symbol(tree: ast.Module, file_path: str) -> Symbol | None:
+    """Extract module-level symbol if docstring exists."""
+    module_docstring = ast.get_docstring(tree)
+    if not module_docstring:
+        return None
+    return Symbol(
+        name=Path(file_path).stem,
+        kind="module",
+        file=file_path,
+        line=1,
+        signature=f"module {Path(file_path).stem}",
+        docstring=module_docstring,
+    )
+
+
+def _extract_class_symbols(node: ast.ClassDef, file_path: str) -> list[Symbol]:
+    """Extract class and its methods as symbols."""
+    symbols: list[Symbol] = [
+        Symbol(
+            name=node.name,
+            kind="class",
+            file=file_path,
+            line=node.lineno,
+            signature=_get_signature(node),
+            docstring=ast.get_docstring(node),
+        )
+    ]
+    for item in node.body:
+        if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            symbols.append(
+                Symbol(
+                    name=item.name,
+                    kind="method",
+                    file=file_path,
+                    line=item.lineno,
+                    signature=_get_signature(item),
+                    docstring=ast.get_docstring(item),
+                    parent=node.name,
+                )
+            )
+    return symbols
+
+
 def extract_python_symbols(source: str, file_path: str) -> list[Symbol]:
     """Extract symbols from Python source code.
 
@@ -150,56 +193,17 @@ def extract_python_symbols(source: str, file_path: str) -> list[Symbol]:
     tree = ast.parse(source)
     symbols: list[Symbol] = []
 
-    # Extract module docstring
-    module_docstring = ast.get_docstring(tree)
-    if module_docstring:
-        symbols.append(
-            Symbol(
-                name=Path(file_path).stem,
-                kind="module",
-                file=file_path,
-                line=1,
-                signature=f"module {Path(file_path).stem}",
-                docstring=module_docstring,
-            )
-        )
+    # Module docstring
+    module_symbol = _extract_module_symbol(tree, file_path)
+    if module_symbol:
+        symbols.append(module_symbol)
 
+    # Classes and their methods
     for node in ast.walk(tree):
         if isinstance(node, ast.ClassDef):
-            # Extract class
-            symbols.append(
-                Symbol(
-                    name=node.name,
-                    kind="class",
-                    file=file_path,
-                    line=node.lineno,
-                    signature=_get_signature(node),
-                    docstring=ast.get_docstring(node),
-                )
-            )
+            symbols.extend(_extract_class_symbols(node, file_path))
 
-            # Extract methods from this class
-            for item in node.body:
-                if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                    symbols.append(
-                        Symbol(
-                            name=item.name,
-                            kind="method",
-                            file=file_path,
-                            line=item.lineno,
-                            signature=_get_signature(item),
-                            docstring=ast.get_docstring(item),
-                            parent=node.name,
-                        )
-                    )
-
-        elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            # Only top-level functions (not methods)
-            # Check if this function is at module level
-            # We already captured methods when walking classes
-            pass
-
-    # Separate pass for top-level functions to avoid duplicates
+    # Top-level functions (separate pass to avoid duplicates with methods)
     for node in ast.iter_child_nodes(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             symbols.append(
@@ -516,6 +520,48 @@ def extract_symbols(source: str, file_path: str, language: Language) -> list[Sym
         raise ValueError(f"Unsupported language: {language}")
 
 
+# Default patterns to exclude when scanning directories
+DEFAULT_EXCLUDE_PATTERNS: list[str] = [
+    "**/__pycache__/**",
+    "**/.venv/**",
+    "**/venv/**",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.git/**",
+]
+
+# Language-specific default glob patterns
+DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, str] = {
+    "python": "**/*.py",
+    "typescript": "**/*.ts",
+    "javascript": "**/*.js",
+    None: "**/*",  # Auto-detect: scan all files
+}
+
+
+def _should_exclude(file_path: Path, exclude_patterns: list[str]) -> bool:
+    """Check if a file should be excluded based on patterns."""
+    return any(file_path.match(pattern) for pattern in exclude_patterns)
+
+
+def _process_source_file(
+    file_path: Path, rel_str: str, language: Language, result: ScanResult
+) -> None:
+    """Extract symbols from a source file and update result."""
+    try:
+        source = file_path.read_text(encoding="utf-8")
+        symbols = extract_symbols(source, rel_str, language)
+        result.symbols.extend(symbols)
+        result.files_scanned += 1
+    except SyntaxError as e:
+        result.errors.append(f"{rel_str}: {e}")
+    except UnicodeDecodeError as e:
+        result.errors.append(f"{rel_str}: {e}")
+    except Exception as e:
+        result.errors.append(f"{rel_str}: {e}")
+
+
 def scan_directory(
     path: Path,
     *,
@@ -541,66 +587,31 @@ def scan_directory(
         >>> result = scan_directory(Path("src/"))  # Auto-detect
         >>> result = scan_directory(Path("src/"), language="typescript")
     """
-    # Default exclude patterns
     if exclude_patterns is None:
-        exclude_patterns = [
-            "**/__pycache__/**",
-            "**/.venv/**",
-            "**/venv/**",
-            "**/node_modules/**",
-            "**/dist/**",
-            "**/build/**",
-            "**/.git/**",
-        ]
-
-    # Language-specific default patterns
-    default_patterns: dict[Language | None, str] = {
-        "python": "**/*.py",
-        "typescript": "**/*.ts",
-        "javascript": "**/*.js",
-        None: "**/*",  # Auto-detect: scan all files
-    }
+        exclude_patterns = DEFAULT_EXCLUDE_PATTERNS
 
     if pattern is None:
-        pattern = default_patterns.get(language, "**/*")
+        pattern = DEFAULT_LANGUAGE_PATTERNS.get(language, "**/*")
 
     result = ScanResult()
     root = path.resolve()
 
     for file_path in path.glob(pattern):
-        # Skip directories
         if file_path.is_dir():
             continue
 
-        # Skip excluded patterns
+        if _should_exclude(file_path, exclude_patterns):
+            continue
+
         rel_path = (
             file_path.relative_to(root) if file_path.is_relative_to(root) else file_path
         )
         rel_str = str(rel_path)
 
-        skip = False
-        for exclude in exclude_patterns:
-            if file_path.match(exclude):
-                skip = True
-                break
-        if skip:
-            continue
-
-        # Determine language for this file
         file_language = language or detect_language(file_path)
         if file_language is None:
-            continue  # Skip unsupported files
+            continue
 
-        try:
-            source = file_path.read_text(encoding="utf-8")
-            symbols = extract_symbols(source, rel_str, file_language)
-            result.symbols.extend(symbols)
-            result.files_scanned += 1
-        except SyntaxError as e:
-            result.errors.append(f"{rel_str}: {e}")
-        except UnicodeDecodeError as e:
-            result.errors.append(f"{rel_str}: {e}")
-        except Exception as e:
-            result.errors.append(f"{rel_str}: {e}")
+        _process_source_file(file_path, rel_str, file_language, result)
 
     return result

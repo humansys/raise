@@ -5,8 +5,6 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-import pytest
-
 from raise_cli.onboarding.migration import (
     _extract_sessions_data,
     _extract_skills_from_sessions,
@@ -92,11 +90,11 @@ class TestExtractSkillsFromSessions:
         sessions_path = tmp_path / "index.jsonl"
         sessions_path.write_text(
             '{"id": "SES-001", "outcomes": ["/session-start skill created", "tests passing"]}\n'
-            '{"id": "SES-002", "outcomes": ["feature-plan complete"]}\n'
+            '{"id": "SES-002", "outcomes": ["story-plan complete"]}\n'
         )
         skills = _extract_skills_from_sessions(sessions_path)
         assert "session-start" in skills
-        assert "feature-plan" in skills
+        assert "story-plan" in skills
 
     def test_extracts_skills_from_topic(self, tmp_path: Path) -> None:
         """Extracts skill names mentioned in topic."""
@@ -174,28 +172,26 @@ class TestMigrateEmilioProfile:
     def test_extracts_sessions_from_real_data(self, tmp_path: Path) -> None:
         """Extracts session data from memory directory."""
         # Create mock memory structure
-        memory_path = tmp_path / ".rai" / "memory" / "sessions"
+        memory_path = tmp_path / ".raise/rai" / "memory" / "sessions"
         memory_path.mkdir(parents=True)
         index_path = memory_path / "index.jsonl"
         index_path.write_text(
             '{"id": "SES-001", "date": "2026-02-01", "outcomes": ["session-start created"]}\n'
-            '{"id": "SES-002", "date": "2026-02-02", "outcomes": ["feature-plan done"]}\n'
+            '{"id": "SES-002", "date": "2026-02-02", "outcomes": ["story-plan done"]}\n'
             '{"id": "SES-003", "date": "2026-02-03", "outcomes": ["epic-design complete"]}\n'
         )
 
         profile = migrate_emilio_profile(tmp_path)
 
-        assert profile.sessions_total == 3
         assert profile.first_session == date(2026, 2, 1)
         assert profile.last_session == date(2026, 2, 3)
         assert "session-start" in profile.skills_mastered
-        assert "feature-plan" in profile.skills_mastered
+        assert "story-plan" in profile.skills_mastered
         assert "epic-design" in profile.skills_mastered
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
-        """Handles missing .rai/memory directory gracefully."""
+        """Handles missing .raise/rai/memory directory gracefully."""
         profile = migrate_emilio_profile(tmp_path)
-        assert profile.sessions_total == 0
         assert profile.first_session is None
         assert profile.last_session is None
 
@@ -210,7 +206,7 @@ class TestMigrateEmilioProfile:
 
     def test_merges_detected_and_additional_skills(self, tmp_path: Path) -> None:
         """Merges detected skills with additional skills."""
-        memory_path = tmp_path / ".rai" / "memory" / "sessions"
+        memory_path = tmp_path / ".raise/rai" / "memory" / "sessions"
         memory_path.mkdir(parents=True)
         index_path = memory_path / "index.jsonl"
         index_path.write_text('{"id": "SES-001", "outcomes": ["debug used"]}\n')

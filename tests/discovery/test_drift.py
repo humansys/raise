@@ -6,12 +6,12 @@ and established component patterns.
 
 from __future__ import annotations
 
-import pytest
-
 from raise_cli.discovery.drift import (
+    BaselineComponent,
+    BaselineComponentMetadata,
+    DriftSeverity,
     DriftWarning,
     detect_drift,
-    DriftSeverity,
 )
 from raise_cli.discovery.scanner import Symbol
 
@@ -52,15 +52,10 @@ class TestDetectDrift:
     def test_no_drift_when_symbols_match_baseline(self) -> None:
         """No warnings when new symbols follow baseline patterns."""
         baseline = [
-            {
-                "id": "comp-1",
-                "metadata": {
-                    "name": "UserService",
-                    "kind": "class",
-                    "category": "service",
-                },
-                "source_file": "src/raise_cli/services/user.py",
-            }
+            BaselineComponent(
+                source_file="src/raise_cli/services/user.py",
+                metadata=BaselineComponentMetadata(name="UserService", kind="class"),
+            )
         ]
         scanned = [
             Symbol(
@@ -78,15 +73,10 @@ class TestDetectDrift:
     def test_detect_location_drift(self) -> None:
         """Detect when file is in unexpected location."""
         baseline = [
-            {
-                "id": "comp-1",
-                "metadata": {
-                    "name": "Symbol",
-                    "kind": "class",
-                    "category": "model",
-                },
-                "source_file": "src/raise_cli/discovery/scanner.py",
-            }
+            BaselineComponent(
+                source_file="src/raise_cli/discovery/scanner.py",
+                metadata=BaselineComponentMetadata(name="Symbol", kind="class"),
+            )
         ]
         # New class in wrong location (cli/ instead of discovery/)
         scanned = [
@@ -108,15 +98,11 @@ class TestDetectDrift:
     def test_detect_missing_docstring(self) -> None:
         """Detect public class without docstring when baseline has them."""
         baseline = [
-            {
-                "id": "comp-1",
-                "metadata": {
-                    "name": "Symbol",
-                    "kind": "class",
-                },
-                "source_file": "src/raise_cli/discovery/scanner.py",
-                "content": "Core data model representing an extracted code symbol.",
-            }
+            BaselineComponent(
+                source_file="src/raise_cli/discovery/scanner.py",
+                content="Core data model representing an extracted code symbol.",
+                metadata=BaselineComponentMetadata(name="Symbol", kind="class"),
+            )
         ]
         # New class without docstring
         scanned = [
@@ -138,22 +124,14 @@ class TestDetectDrift:
     def test_detect_naming_drift(self) -> None:
         """Detect when naming doesn't follow conventions."""
         baseline = [
-            {
-                "id": "comp-1",
-                "metadata": {
-                    "name": "extract_python_symbols",
-                    "kind": "function",
-                },
-                "source_file": "src/raise_cli/discovery/scanner.py",
-            },
-            {
-                "id": "comp-2",
-                "metadata": {
-                    "name": "extract_typescript_symbols",
-                    "kind": "function",
-                },
-                "source_file": "src/raise_cli/discovery/scanner.py",
-            },
+            BaselineComponent(
+                source_file="src/raise_cli/discovery/scanner.py",
+                metadata=BaselineComponentMetadata(name="extract_python_symbols", kind="function"),
+            ),
+            BaselineComponent(
+                source_file="src/raise_cli/discovery/scanner.py",
+                metadata=BaselineComponentMetadata(name="extract_typescript_symbols", kind="function"),
+            ),
         ]
         # Function that doesn't follow extract_* pattern
         scanned = [
@@ -175,14 +153,10 @@ class TestDetectDrift:
     def test_ignores_private_symbols(self) -> None:
         """Private symbols (starting with _) are not checked for drift."""
         baseline = [
-            {
-                "id": "comp-1",
-                "metadata": {
-                    "name": "Symbol",
-                    "kind": "class",
-                },
-                "source_file": "src/raise_cli/discovery/scanner.py",
-            }
+            BaselineComponent(
+                source_file="src/raise_cli/discovery/scanner.py",
+                metadata=BaselineComponentMetadata(name="Symbol", kind="class"),
+            )
         ]
         # Private function - should be ignored
         scanned = [
@@ -201,16 +175,11 @@ class TestDetectDrift:
     def test_multiple_drift_issues(self) -> None:
         """Multiple drift issues can be detected at once."""
         baseline = [
-            {
-                "id": "comp-1",
-                "metadata": {
-                    "name": "UserService",
-                    "kind": "class",
-                    "category": "service",
-                },
-                "source_file": "src/raise_cli/services/user.py",
-                "content": "User service with docstring.",
-            }
+            BaselineComponent(
+                source_file="src/raise_cli/services/user.py",
+                content="User service with docstring.",
+                metadata=BaselineComponentMetadata(name="UserService", kind="class"),
+            )
         ]
         # File with multiple issues
         scanned = [

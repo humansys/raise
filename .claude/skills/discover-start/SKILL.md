@@ -20,7 +20,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=discover-start \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=discover-start \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Discovery Start: Initialize Codebase Discovery
@@ -60,10 +60,12 @@ Initialize codebase discovery by detecting project type, identifying key directo
 
 ### Step 1: Detect Languages Present
 
-Scan the project for source files and identify languages:
+Scan the project for source files and identify languages.
+
+Run these counts in parallel (all independent):
 
 ```bash
-# Count files by extension
+# Count files by extension (run in parallel)
 find . -type f -name "*.py" | wc -l    # Python
 find . -type f -name "*.ts" | wc -l    # TypeScript
 find . -type f -name "*.js" | wc -l    # JavaScript
@@ -213,5 +215,5 @@ Running `/discover-start` again will overwrite `context.yaml`. This is intention
 ## References
 
 - Next skill: `/discover-scan`
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`
 - Epic: E13 Discovery

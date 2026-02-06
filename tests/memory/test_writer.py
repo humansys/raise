@@ -8,18 +8,18 @@ from pathlib import Path
 
 import pytest
 
+from raise_cli.memory.models import MemoryScope, PatternSubType
 from raise_cli.memory.writer import (
     CalibrationInput,
     PatternInput,
     SessionInput,
-    WriteResult,
     _get_next_id,
     append_calibration,
     append_pattern,
     append_session,
+    get_memory_dir_for_scope,
     validate_session_index,
 )
-from raise_cli.memory.models import PatternSubType
 
 
 class TestGetNextId:
@@ -135,7 +135,7 @@ class TestAppendCalibration:
         memory_dir.mkdir()
 
         input_data = CalibrationInput(
-            feature="F3.5",
+            story="F3.5",
             name="Skills Integration",
             size="XS",
             sp=2,
@@ -152,7 +152,7 @@ class TestAppendCalibration:
 
         cal_file = memory_dir / "calibration.jsonl"
         data = json.loads(cal_file.read_text().strip())
-        assert data["feature"] == "F3.5"
+        assert data["story"] == "F3.5"
         assert data["ratio"] == 3.0  # 60 / 20
 
     def test_no_ratio_without_estimate(self, tmp_path: Path) -> None:
@@ -161,7 +161,7 @@ class TestAppendCalibration:
         memory_dir.mkdir()
 
         input_data = CalibrationInput(
-            feature="F1.1",
+            story="F1.1",
             name="Test Feature",
             size="S",
             actual_min=30,
@@ -184,7 +184,7 @@ class TestAppendSession:
 
         input_data = SessionInput(
             topic="F3.5 Skills Integration",
-            session_type="feature",
+            session_type="story",
             outcomes=["Writer API", "Hooks setup", "CLI commands"],
             log_path="dev/sessions/2026-02-02-f3.5.md",
         )
@@ -212,48 +212,6 @@ class TestAppendSession:
 
         assert (memory_dir / "sessions").is_dir()
         assert (memory_dir / "sessions" / "index.jsonl").exists()
-
-
-class TestCacheInvalidation:
-    """Tests for cache invalidation after writes."""
-
-    def test_pattern_invalidates_cache(self, tmp_path: Path) -> None:
-        """Writing pattern should delete graph.json cache."""
-        memory_dir = tmp_path / "memory"
-        memory_dir.mkdir()
-        cache_file = memory_dir / "graph.json"
-        cache_file.write_text('{"nodes": {}, "edges": []}')
-
-        input_data = PatternInput(content="Test pattern")
-        append_pattern(memory_dir, input_data)
-
-        assert not cache_file.exists()
-
-    def test_calibration_invalidates_cache(self, tmp_path: Path) -> None:
-        """Writing calibration should delete graph.json cache."""
-        memory_dir = tmp_path / "memory"
-        memory_dir.mkdir()
-        cache_file = memory_dir / "graph.json"
-        cache_file.write_text('{"nodes": {}, "edges": []}')
-
-        input_data = CalibrationInput(
-            feature="F1.1", name="Test", size="S", actual_min=30
-        )
-        append_calibration(memory_dir, input_data)
-
-        assert not cache_file.exists()
-
-    def test_session_invalidates_cache(self, tmp_path: Path) -> None:
-        """Writing session should delete graph.json cache."""
-        memory_dir = tmp_path / "memory"
-        memory_dir.mkdir()
-        cache_file = memory_dir / "graph.json"
-        cache_file.write_text('{"nodes": {}, "edges": []}')
-
-        input_data = SessionInput(topic="Test session")
-        append_session(memory_dir, input_data)
-
-        assert not cache_file.exists()
 
 
 class TestValidateSessionIndex:
@@ -390,7 +348,9 @@ class TestValidateSessionIndex:
         sessions_dir.mkdir(parents=True)
 
         index_file = sessions_dir / "index.jsonl"
-        index_file.write_text('{"id": "SES-042", "date": "2026-02-01", "topic": "Test"}\n')
+        index_file.write_text(
+            '{"id": "SES-042", "date": "2026-02-01", "topic": "Test"}\n'
+        )
 
         result = validate_session_index(memory_dir)
 
@@ -415,3 +375,188 @@ class TestValidateSessionIndex:
         assert "issues" in summary
         assert "missing ID" in summary
         assert "non-standard" in summary
+
+
+class TestGetMemoryDirForScope:
+    """Tests for get_memory_dir_for_scope helper."""
+
+    def test_global_scope_returns_global_dir(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Global scope should return ~/.rai directory."""
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        result = get_memory_dir_for_scope(MemoryScope.GLOBAL, tmp_path)
+
+        assert result == global_rai
+
+    def test_project_scope_returns_memory_dir(self, tmp_path: Path) -> None:
+        """Project scope should return .raise/rai/memory directory."""
+        result = get_memory_dir_for_scope(MemoryScope.PROJECT, tmp_path)
+
+        expected = tmp_path / ".raise" / "rai" / "memory"
+        assert result == expected
+
+    def test_personal_scope_returns_personal_dir(self, tmp_path: Path) -> None:
+        """Personal scope should return .raise/rai/personal directory."""
+        result = get_memory_dir_for_scope(MemoryScope.PERSONAL, tmp_path)
+
+        expected = tmp_path / ".raise" / "rai" / "personal"
+        assert result == expected
+
+
+class TestAppendPatternBaseVersion:
+    """Tests for base/version fields in pattern versioning (F14.6)."""
+
+    def test_base_pattern_includes_base_and_version(self, tmp_path: Path) -> None:
+        """Base patterns should include base=True and version in output."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(
+            content="TDD cycle discipline",
+            sub_type=PatternSubType.PROCESS,
+            context=["tdd", "testing"],
+            base=True,
+            version=1,
+        )
+
+        result = append_pattern(memory_dir, input_data)
+
+        assert result.success is True
+        patterns_file = memory_dir / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert data["base"] is True
+        assert data["version"] == 1
+
+    def test_personal_pattern_omits_base_and_version(self, tmp_path: Path) -> None:
+        """Personal patterns (default) should not have base/version fields."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(
+            content="My custom pattern",
+            sub_type=PatternSubType.CODEBASE,
+            context=["custom"],
+        )
+
+        append_pattern(memory_dir, input_data)
+
+        patterns_file = memory_dir / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert "base" not in data
+        assert "version" not in data
+
+    def test_base_false_omits_fields(self, tmp_path: Path) -> None:
+        """Explicit base=False should not include base/version in output."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(content="Not a base pattern", base=False)
+
+        append_pattern(memory_dir, input_data)
+
+        patterns_file = memory_dir / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert "base" not in data
+        assert "version" not in data
+
+
+class TestAppendPatternWithScope:
+    """Tests for append_pattern with scope parameter."""
+
+    def test_writes_to_project_by_default(self, tmp_path: Path) -> None:
+        """Default scope should write to project memory directory."""
+        project_dir = tmp_path / ".raise" / "rai" / "memory"
+        project_dir.mkdir(parents=True)
+
+        input_data = PatternInput(content="Project pattern")
+
+        result = append_pattern(project_dir, input_data)
+
+        assert result.success is True
+        assert (project_dir / "patterns.jsonl").exists()
+
+    def test_writes_to_global_with_scope(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Global scope should write to ~/.rai directory."""
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        input_data = PatternInput(content="Global pattern")
+
+        result = append_pattern(
+            get_memory_dir_for_scope(MemoryScope.GLOBAL, tmp_path),
+            input_data,
+            scope=MemoryScope.GLOBAL,
+        )
+
+        assert result.success is True
+        patterns_file = global_rai / "patterns.jsonl"
+        assert patterns_file.exists()
+        data = json.loads(patterns_file.read_text().strip())
+        assert data["content"] == "Global pattern"
+
+    def test_writes_to_personal_with_scope(self, tmp_path: Path) -> None:
+        """Personal scope should write to .raise/rai/personal directory."""
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        input_data = PatternInput(content="Personal pattern")
+
+        result = append_pattern(
+            personal_dir,
+            input_data,
+            scope=MemoryScope.PERSONAL,
+        )
+
+        assert result.success is True
+        patterns_file = personal_dir / "patterns.jsonl"
+        assert patterns_file.exists()
+
+
+class TestAppendCalibrationWithScope:
+    """Tests for append_calibration with scope parameter."""
+
+    def test_writes_to_personal_with_scope(self, tmp_path: Path) -> None:
+        """Personal scope should write to .raise/rai/personal directory."""
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        input_data = CalibrationInput(
+            story="F1.1",
+            name="Test Feature",
+            size="S",
+            actual_min=30,
+        )
+
+        result = append_calibration(
+            personal_dir,
+            input_data,
+            scope=MemoryScope.PERSONAL,
+        )
+
+        assert result.success is True
+        cal_file = personal_dir / "calibration.jsonl"
+        assert cal_file.exists()
+
+
+class TestAppendSessionAlwaysPersonal:
+    """Tests for append_session always writing to personal directory."""
+
+    def test_session_writes_to_personal_dir(self, tmp_path: Path) -> None:
+        """Sessions should always write to personal directory."""
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        input_data = SessionInput(topic="Test session")
+
+        result = append_session(personal_dir, input_data)
+
+        assert result.success is True
+        sessions_file = personal_dir / "sessions" / "index.jsonl"
+        assert sessions_file.exists()

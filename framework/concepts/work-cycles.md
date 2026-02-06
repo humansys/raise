@@ -85,8 +85,8 @@ RaiSE organizes all work into **five cycles**. Each cycle has a specific purpose
 - `feature/review` — Validation and review
 
 **Artifacts Produced:**
-- `work/features/{name}/spec.md`
-- `work/features/{name}/plan.md`
+- `work/stories/{name}/spec.md`
+- `work/stories/{name}/plan.md`
 - Actual code and tests
 
 ---

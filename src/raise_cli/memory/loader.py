@@ -1,7 +1,7 @@
 """JSONL loader for memory concepts.
 
 This module provides functions to load memory concepts from JSONL files
-in the .rai/memory/ directory.
+in the .raise/rai/memory/ directory.
 """
 
 from __future__ import annotations
@@ -15,6 +15,7 @@ from raise_cli.memory.models import (
     MemoryConcept,
     MemoryConceptType,
     MemoryLoadResult,
+    MemoryScope,
 )
 
 
@@ -33,11 +34,14 @@ def parse_date(date_str: str) -> date:
     return date.fromisoformat(date_str)
 
 
-def load_pattern(data: dict[str, Any]) -> MemoryConcept:
+def load_pattern(
+    data: dict[str, Any], scope: MemoryScope = MemoryScope.PROJECT
+) -> MemoryConcept:
     """Load a pattern concept from JSONL data.
 
     Args:
         data: Dictionary from JSONL line.
+        scope: Memory scope (global, project, or personal).
 
     Returns:
         MemoryConcept for the pattern.
@@ -47,57 +51,70 @@ def load_pattern(data: dict[str, Any]) -> MemoryConcept:
     # Handle date field variations: 'created' or 'date'
     date_str = data.get("created") or data.get("date", "")
 
+    metadata: dict[str, Any] = {
+        "sub_type": data.get("type", "unknown"),
+        "learned_from": data.get("learned_from"),
+        "scope": scope.value,
+    }
+
+    # Surface base/version for pattern versioning (F14.6)
+    if data.get("base") is not None:
+        metadata["base"] = data["base"]
+    if data.get("version") is not None:
+        metadata["version"] = data["version"]
+
     return MemoryConcept(
         id=data["id"],
         type=MemoryConceptType.PATTERN,
         content=content,
         context=data.get("context", []),
         created=parse_date(date_str),
-        metadata={
-            "sub_type": data.get("type", "unknown"),
-            "learned_from": data.get("learned_from"),
-        },
+        metadata=metadata,
     )
 
 
-def load_calibration(data: dict[str, Any]) -> MemoryConcept:
+def load_calibration(
+    data: dict[str, Any], scope: MemoryScope = MemoryScope.PROJECT
+) -> MemoryConcept:
     """Load a calibration concept from JSONL data.
 
     Args:
         data: Dictionary from JSONL line.
+        scope: Memory scope (global, project, or personal).
 
     Returns:
         MemoryConcept for the calibration.
     """
-    # Handle schema variations for name and feature fields
+    # Handle schema variations for name and story fields
     name = data.get("name") or data.get("feature_name", "unknown")
-    feature = data.get("feature") or data.get("feature_id", "unknown")
+    # Backward compat: try "story" (new), then "feature" (old data)
+    story = data.get("story") or data.get("feature") or data.get("story_id", "unknown")
     # Handle date field variations: 'created' or 'date'
     date_str = data.get("created") or data.get("date", "")
     # Handle velocity field variations: 'ratio' or 'velocity'
     velocity = data.get("ratio") or data.get("velocity")
 
     # Build content summary from calibration data
-    content_parts = [f"{name} ({feature})"]
+    content_parts = [f"{name} ({story})"]
     if data.get("actual_min"):
         content_parts.append(f"actual: {data['actual_min']}min")
     if velocity:
         content_parts.append(f"velocity: {velocity}x")
     content = " - ".join(content_parts)
 
-    # Build context from feature and size
-    context = [feature, data["size"].lower()]
+    # Build context from story and size
+    context = [story, data["size"].lower()]
     if data.get("kata_cycle"):
         context.append("kata-cycle")
 
     return MemoryConcept(
-        id=data.get("id") or data.get("feature_id", "unknown"),
+        id=data.get("id") or data.get("story_id", "unknown"),
         type=MemoryConceptType.CALIBRATION,
         content=content,
         context=context,
         created=parse_date(date_str),
         metadata={
-            "feature": feature,
+            "story": story,
             "name": name,
             "size": data["size"],
             "sp": data.get("sp"),
@@ -106,15 +123,19 @@ def load_calibration(data: dict[str, Any]) -> MemoryConcept:
             "ratio": velocity,
             "kata_cycle": data.get("kata_cycle", False),
             "notes": data.get("notes"),
+            "scope": scope.value,
         },
     )
 
 
-def load_session(data: dict[str, Any]) -> MemoryConcept:
+def load_session(
+    data: dict[str, Any], scope: MemoryScope = MemoryScope.PROJECT
+) -> MemoryConcept:
     """Load a session concept from JSONL data.
 
     Args:
         data: Dictionary from JSONL line.
+        scope: Memory scope (global, project, or personal).
 
     Returns:
         MemoryConcept for the session.
@@ -143,18 +164,22 @@ def load_session(data: dict[str, Any]) -> MemoryConcept:
             "topic": topic,
             "outcomes": data.get("outcomes", []),
             "log_path": data.get("log_path"),
+            "scope": scope.value,
         },
     )
 
 
 def load_jsonl_file(
-    file_path: Path, concept_type: MemoryConceptType
+    file_path: Path,
+    concept_type: MemoryConceptType,
+    scope: MemoryScope = MemoryScope.PROJECT,
 ) -> tuple[list[MemoryConcept], list[str]]:
     """Load concepts from a single JSONL file.
 
     Args:
         file_path: Path to the JSONL file.
         concept_type: Type of concepts in the file.
+        scope: Memory scope to assign to loaded concepts.
 
     Returns:
         Tuple of (concepts list, errors list).
@@ -179,7 +204,7 @@ def load_jsonl_file(
                 continue
             try:
                 data = json.loads(line)
-                concept = loader(data)
+                concept = loader(data, scope=scope)
                 concepts.append(concept)
             except (json.JSONDecodeError, KeyError, ValueError) as e:
                 errors.append(f"{file_path.name}:{line_num}: {e}")
@@ -188,7 +213,7 @@ def load_jsonl_file(
 
 
 def load_memory_from_directory(memory_dir: Path) -> MemoryLoadResult:
-    """Load all memory concepts from a .rai/memory/ directory.
+    """Load all memory concepts from a .raise/rai/memory/ directory.
 
     Args:
         memory_dir: Path to the memory directory.

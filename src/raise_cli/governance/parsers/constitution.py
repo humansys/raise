@@ -8,39 +8,13 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from raise_cli.core.text import sanitize_id
 from raise_cli.governance.models import Concept, ConceptType
 
 
-def _sanitize_principle_id(name: str) -> str:
-    """Sanitize principle name for use as ID.
-
-    Args:
-        name: Principle name to sanitize.
-
-    Returns:
-        Sanitized ID string (lowercase, hyphens, no special chars).
-
-    Examples:
-        >>> _sanitize_principle_id("Governance as Code")
-        'governance-as-code'
-    """
-    # Convert to lowercase
-    sanitized = name.lower()
-    # Replace spaces with hyphens
-    sanitized = sanitized.replace(" ", "-")
-    # Remove commas
-    sanitized = sanitized.replace(",", "")
-    # Remove other special characters except hyphens
-    sanitized = re.sub(r"[^a-z0-9-]", "", sanitized)
-    # Remove duplicate hyphens
-    sanitized = re.sub(r"-+", "-", sanitized)
-    # Remove leading/trailing hyphens
-    sanitized = sanitized.strip("-")
-
-    return sanitized
-
-
-def extract_principles(file_path: Path, project_root: Path | None = None) -> list[Concept]:
+def extract_principles(
+    file_path: Path, project_root: Path | None = None
+) -> list[Concept]:
     """Extract §N principles from Constitution markdown file.
 
     Parses Constitution markdown files looking for principle sections with the
@@ -94,7 +68,7 @@ def extract_principles(file_path: Path, project_root: Path | None = None) -> lis
                 content = content[:500] + "..."
 
             # Generate ID from principle name
-            principle_id = _sanitize_principle_id(principle_name)
+            principle_id = sanitize_id(principle_name)
 
             # Calculate relative file path
             try:

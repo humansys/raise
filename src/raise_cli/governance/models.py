@@ -7,9 +7,9 @@ concepts extracted from governance markdown files.
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any
+from typing import Any, Self
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class ConceptType(str, Enum):
@@ -23,7 +23,7 @@ class ConceptType(str, Enum):
         PRACTICE: Process practices from katas (future).
         PROJECT: Project from backlog (governance/projects/*/backlog.md).
         EPIC: Epic from backlog or epic scope documents.
-        FEATURE: Feature from epic scope documents.
+        STORY: Story from epic scope documents.
         DECISION: Architecture decision records (ADR-XXX format).
         GUARDRAIL: Code standards and quality rules.
         TERM: Glossary definitions for canonical terminology.
@@ -37,7 +37,7 @@ class ConceptType(str, Enum):
     # Work tracking types (E8)
     PROJECT = "project"
     EPIC = "epic"
-    FEATURE = "feature"
+    STORY = "story"
     # Knowledge graph completion types (E12)
     DECISION = "decision"
     GUARDRAIL = "guardrail"
@@ -86,11 +86,12 @@ class Concept(BaseModel):
         default_factory=dict, description="Type-specific metadata"
     )
 
-    def model_post_init(self, __context: Any) -> None:
-        """Validate model after initialization.
+    @model_validator(mode="after")
+    def validate_line_range(self) -> Self:
+        """Validate that line range is valid (start <= end).
 
-        Args:
-            __context: Pydantic validation context (unused).
+        Returns:
+            Self if valid.
 
         Raises:
             ValueError: If line range is invalid (start > end).
@@ -99,6 +100,7 @@ class Concept(BaseModel):
             raise ValueError(
                 f"Invalid line range: start ({self.lines[0]}) > end ({self.lines[1]})"
             )
+        return self
 
 
 class ExtractionResult(BaseModel):

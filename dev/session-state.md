@@ -53,15 +53,15 @@
 **Problem:** Skills not discovered by Claude Code Skill tool.
 
 **Root Cause:** Nested directory structure. Claude Code expects flat:
-- `.claude/skills/feature-plan/SKILL.md` (correct)
+- `.claude/skills/story-plan/SKILL.md` (correct)
 - NOT `.claude/skills/feature/plan/SKILL.md` (wrong)
 
 **Fix Applied:**
 ```
-feature/design/    → feature-design/
-feature/plan/      → feature-plan/
-feature/implement/ → feature-implement/
-feature/review/    → feature-review/
+feature/design/    → story-design/
+feature/plan/      → story-plan/
+feature/implement/ → story-implement/
+feature/review/    → story-review/
 tools/research/    → research/
 ```
 
@@ -79,14 +79,14 @@ New `/debug` skill for root cause analysis:
 
 | Skill | Invocation | Purpose |
 |-------|------------|---------|
-| feature-design | `/feature-design` | Lean feature specs |
-| feature-plan | `/feature-plan` | Implementation planning |
-| feature-implement | `/feature-implement` | Task execution |
-| feature-review | `/feature-review` | Retrospective |
+| story-design | `/story-design` | Lean story specs |
+| story-plan | `/story-plan` | Implementation planning |
+| story-implement | `/story-implement` | Task execution |
+| story-review | `/story-review` | Retrospective |
 | research | `/research` | Evidence-based investigation |
 | debug | `/debug` | Root cause analysis |
 
-**To verify:** After restart, try `/feature-plan` - should show skill content.
+**To verify:** After restart, try `/story-plan` - should show skill content.
 
 ---
 
@@ -94,8 +94,8 @@ New `/debug` skill for root cause analysis:
 
 ### Immediate (After Restart)
 
-1. **Verify skill discovery** - Test `/feature-plan`, `/debug`
-2. **F1.5: Output Module** (3 SP) - Use `/feature-plan` to plan it
+1. **Verify skill discovery** - Test `/story-plan`, `/debug`
+2. **F1.5: Output Module** (3 SP) - Use `/story-plan` to plan it
 
 ### Remaining E1
 

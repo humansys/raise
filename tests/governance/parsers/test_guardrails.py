@@ -9,9 +9,9 @@ import pytest
 
 from raise_cli.governance.models import ConceptType
 from raise_cli.governance.parsers.guardrails import (
-    extract_guardrails,
-    extract_all_guardrails,
     _parse_guardrail_table,
+    extract_all_guardrails,
+    extract_guardrails,
 )
 
 

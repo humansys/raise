@@ -13,6 +13,26 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+class MemoryScope(str, Enum):
+    """Scope/tier for memory data.
+
+    Determines where memory data is stored and its visibility:
+    - GLOBAL: ~/.rai/ - Cross-repo, universal patterns
+    - PROJECT: .raise/rai/memory/ - Shared, committed to repo
+    - PERSONAL: .raise/rai/personal/ - Developer-specific, gitignored
+
+    Precedence for same-ID concepts: PERSONAL > PROJECT > GLOBAL
+    """
+
+    GLOBAL = "global"
+    PROJECT = "project"
+    PERSONAL = "personal"
+
+    def __str__(self) -> str:
+        """Return value for string interpolation."""
+        return self.value
+
+
 class MemoryConceptType(str, Enum):
     """Types of memory concepts.
 

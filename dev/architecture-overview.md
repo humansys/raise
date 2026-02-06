@@ -66,7 +66,7 @@ raise-commons/
 ├── src/raise_cli/       # CLI implementation
 │
 ├── work/                # Active work
-│   ├── features/        # Feature specs
+│   ├── stories/        # Feature specs
 │   └── research/        # Research sessions
 │
 └── dev/                 # Framework maintenance
@@ -90,8 +90,8 @@ Based on **ADR-012: Skills + CLI Toolkit Architecture**:
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    Governance Toolkit                        │
-│   raise context query    → MVC retrieval (97% token savings) │
-│   raise graph build      → Build concept graphs              │
+│   raise memory query    → MVC retrieval (97% token savings) │
+│   raise memory build      → Build concept graphs              │
 │   raise discover scan    → Extract code components           │
 │   raise telemetry emit   → Capture learning signals          │
 └─────────────────────────────────────────────────────────────┘
@@ -202,7 +202,7 @@ Based on **ADR-019: Unified Context Graph** and **ADR-020: Knowledge Graph Compl
 
 ```bash
 # Query with MVC (Minimum Viable Context)
-raise context query "error handling" --unified --type component
+raise memory query "error handling" --unified --type component
 
 # Result: 7 concepts, 118 tokens, 2.8ms
 # vs reading files directly: ~5000 tokens (97% savings)
@@ -251,12 +251,12 @@ Based on **ADR-015** and **ADR-016**:
 ### Feature Lifecycle
 | Skill | Purpose |
 |-------|---------|
-| `/feature-start` | Branch, context, scope commit |
-| `/feature-design` | Lean spec for complex features |
-| `/feature-plan` | Decompose to atomic tasks |
-| `/feature-implement` | Execute plan with verification |
-| `/feature-review` | Retrospective, learnings |
-| `/feature-close` | Merge, cleanup, tracking |
+| `/story-start` | Branch, context, scope commit |
+| `/story-design` | Lean spec for complex features |
+| `/story-plan` | Decompose to atomic tasks |
+| `/story-implement` | Execute plan with verification |
+| `/story-review` | Retrospective, learnings |
+| `/story-close` | Merge, cleanup, tracking |
 
 ### Discovery & Research
 | Skill | Purpose |
@@ -373,7 +373,7 @@ Session Work  →  Telemetry Writer  →  signals.jsonl
 ### Adding a New Node Type
 1. Extend `NodeType` literal in `context/models.py`
 2. Add extraction logic in `context/builder.py`
-3. Update `raise graph build --unified` if needed
+3. Update `raise memory build --unified` if needed
 
 ---
 

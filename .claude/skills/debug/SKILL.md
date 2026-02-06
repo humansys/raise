@@ -22,11 +22,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=debug \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=debug \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=debug \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=debug \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Debug: Root Cause Analysis
@@ -55,7 +55,7 @@ Systematically identify and fix the root cause of defects, errors, or unexpected
 **When NOT to use:**
 - Obvious typos or simple syntax errors
 - Well-documented known issues
-- Feature requests (use `/feature-plan` instead)
+- Feature requests (use `/story-plan` instead)
 
 **Inputs required:**
 - Clear problem statement

@@ -20,7 +20,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=discover-complete \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=discover-complete \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Discovery Complete: Export Validated Components
@@ -61,8 +61,8 @@ Export validated components to JSON format ready for graph integration. This tra
 
 Read the draft file:
 
-```bash
-cat work/discovery/components-draft.yaml
+```
+Read: work/discovery/components-draft.yaml
 ```
 
 **Count:**
@@ -223,12 +223,12 @@ Present completion summary:
 
 **Graph Integration (F13.4):**
 ```bash
-raise discover build --input work/discovery/components-validated.json
+uv run raise discover build --input work/discovery/components-validated.json
 ```
 
 This will add components to the unified context graph, enabling queries like:
 ```bash
-raise context query --type component "scanner"
+uv run raise memory query --type component "scanner"
 ```
 
 ### Re-discovery
@@ -298,11 +298,11 @@ The JSON output is designed to be consumed by F13.4's `raise discover build` com
 
 ```bash
 # Add components to unified graph
-raise discover build --input work/discovery/components-validated.json
+uv run raise discover build --input work/discovery/components-validated.json
 
 # Then query components
-raise context query --type component "service"
-raise context query --type component --unified "authentication"
+uv run raise memory query --type component "service"
+uv run raise memory query "authentication" --types component
 ```
 
 ### Component Type in Graph
@@ -319,5 +319,5 @@ This enables filtered queries: `--type component`
 
 - Previous skill: `/discover-validate`
 - Graph integration: F13.4 (future)
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`
 - Unified graph schema: `src/raise_cli/context/models.py`

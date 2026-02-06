@@ -51,10 +51,10 @@ Each session builds on previous sessions. Each feature teaches the next. Each ep
 ### 1. Structured Processes
 
 **Not ad-hoc conversation, but repeatable patterns:**
-- `/feature-design` → Create specs with concrete examples
-- `/feature-plan` → Atomic tasks with verification
-- `/feature-implement` → Execute with quality gates
-- `/feature-review` → Extract learnings
+- `/story-design` → Create specs with concrete examples
+- `/story-plan` → Atomic tasks with verification
+- `/story-implement` → Execute with quality gates
+- `/story-review` → Extract learnings
 - `/epic-close` → Aggregate patterns across features
 
 **Why this matters:** Structure enables **predictable collaboration**. Both human and AI know what to expect, what to deliver, when to reflect.
@@ -106,7 +106,7 @@ Systemic Review      → Cross-epic strategy
 
 **Why fractal?** Because **learning compounds through aggregation**.
 
-A pattern discovered in one feature becomes a process for all features. A process validated across an epic becomes a principle for all epics.
+A pattern discovered in one feature becomes a process for all stories. A process validated across an epic becomes a principle for all epics.
 
 **Organic growth, not top-down design.**
 
@@ -204,7 +204,7 @@ A pattern discovered in one feature becomes a process for all features. A proces
 
 ### How We Built It
 
-**Full kata cycle for each feature:**
+**Full kata cycle for each story:**
 1. Design with concrete examples (15-20 min)
 2. Plan with atomic tasks (10-15 min)
 3. Implement with tests (50-90 min)
@@ -272,7 +272,7 @@ A pattern discovered in one feature becomes a process for all features. A proces
 - "This learning is important"
 - "Defer that one"
 
-**Result:** Complete learning cycle in single commit. Framework improves with each feature.
+**Result:** Complete learning cycle in single commit. Framework improves with each story.
 
 ---
 

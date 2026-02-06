@@ -16,8 +16,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from raise_cli.memory.cache import MemoryCache
-from raise_cli.memory.models import PatternSubType
+from raise_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
+from raise_cli.memory.models import MemoryScope, PatternSubType
 
 
 @dataclass
@@ -61,37 +61,24 @@ class SessionIndexValidation:
         return f"Session index issues: {'; '.join(issues)}"
 
 
-def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
-    """Validate session index for data quality issues.
+@dataclass
+class _ParsedSessionEntries:
+    """Intermediate result from parsing session index entries."""
 
-    Jidoka check: detect entries without IDs, non-standard formats,
-    duplicates, and large gaps in sequence.
+    total_entries: int
+    entries_without_id: int
+    non_standard_ids: list[str]
+    id_counts: dict[str, int]
+    ses_numbers: list[int]
 
-    Args:
-        memory_dir: Path to .rai/memory/ directory.
 
-    Returns:
-        SessionIndexValidation with findings.
-    """
-    file_path = memory_dir / "sessions" / "index.jsonl"
-
-    if not file_path.exists():
-        return SessionIndexValidation(
-            is_valid=True,
-            total_entries=0,
-            entries_without_id=0,
-            non_standard_ids=[],
-            duplicate_ids=[],
-            max_id=0,
-            gaps=[],
-        )
-
+def _parse_session_entries(file_path: Path) -> _ParsedSessionEntries:
+    """Parse session index JSONL and collect statistics."""
+    ses_pattern = re.compile(r"^SES-(\d{3})$")
     entries_without_id = 0
     non_standard_ids: list[str] = []
     id_counts: dict[str, int] = {}
     ses_numbers: list[int] = []
-
-    ses_pattern = re.compile(r"^SES-(\d{3})$")
 
     with file_path.open("r", encoding="utf-8") as f:
         total_entries = 0
@@ -119,33 +106,79 @@ def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
             except json.JSONDecodeError:
                 entries_without_id += 1
 
-    # Find duplicates
-    duplicate_ids = [k for k, v in id_counts.items() if v > 1]
+    return _ParsedSessionEntries(
+        total_entries=total_entries,
+        entries_without_id=entries_without_id,
+        non_standard_ids=non_standard_ids,
+        id_counts=id_counts,
+        ses_numbers=ses_numbers,
+    )
 
-    # Find gaps > 5 in sequence
+
+def _find_sequence_gaps(
+    ses_numbers: list[int], gap_threshold: int = 5
+) -> tuple[int, list[tuple[int, int]]]:
+    """Find gaps in session number sequence.
+
+    Returns:
+        Tuple of (max_id, list of gap tuples).
+    """
+    if not ses_numbers:
+        return 0, []
+
+    sorted_nums = sorted(ses_numbers)
+    max_id = sorted_nums[-1]
     gaps: list[tuple[int, int]] = []
-    if ses_numbers:
-        ses_numbers.sort()
-        max_id = ses_numbers[-1]
-        for i in range(1, len(ses_numbers)):
-            gap = ses_numbers[i] - ses_numbers[i - 1]
-            if gap > 5:
-                gaps.append((ses_numbers[i - 1], ses_numbers[i]))
-    else:
-        max_id = 0
+
+    for i in range(1, len(sorted_nums)):
+        gap = sorted_nums[i] - sorted_nums[i - 1]
+        if gap > gap_threshold:
+            gaps.append((sorted_nums[i - 1], sorted_nums[i]))
+
+    return max_id, gaps
+
+
+def validate_session_index(memory_dir: Path) -> SessionIndexValidation:
+    """Validate session index for data quality issues.
+
+    Jidoka check: detect entries without IDs, non-standard formats,
+    duplicates, and large gaps in sequence.
+
+    Args:
+        memory_dir: Path to .raise/rai/memory/ directory.
+
+    Returns:
+        SessionIndexValidation with findings.
+    """
+    file_path = memory_dir / "sessions" / "index.jsonl"
+
+    if not file_path.exists():
+        return SessionIndexValidation(
+            is_valid=True,
+            total_entries=0,
+            entries_without_id=0,
+            non_standard_ids=[],
+            duplicate_ids=[],
+            max_id=0,
+            gaps=[],
+        )
+
+    parsed = _parse_session_entries(file_path)
+    duplicate_ids = [k for k, v in parsed.id_counts.items() if v > 1]
+    max_id, gaps = _find_sequence_gaps(parsed.ses_numbers)
 
     is_valid = (
-        entries_without_id == 0
-        and len(non_standard_ids) == 0
+        parsed.entries_without_id == 0
+        and len(parsed.non_standard_ids) == 0
         and len(duplicate_ids) == 0
         and len(gaps) == 0
     )
 
     return SessionIndexValidation(
         is_valid=is_valid,
-        total_entries=total_entries,
-        entries_without_id=entries_without_id,
-        non_standard_ids=non_standard_ids,
+        total_entries=parsed.total_entries,
+        entries_without_id=parsed.entries_without_id,
+        non_standard_ids=parsed.non_standard_ids,
         duplicate_ids=duplicate_ids,
         max_id=max_id,
         gaps=gaps,
@@ -159,7 +192,7 @@ class PatternInput(BaseModel):
         content: Pattern description.
         sub_type: Pattern sub-type (codebase, process, architecture, technical).
         context: Context keywords for retrieval.
-        learned_from: Feature/session where pattern was learned.
+        learned_from: Story/session where pattern was learned.
     """
 
     content: str = Field(..., description="Pattern description")
@@ -168,7 +201,11 @@ class PatternInput(BaseModel):
     )
     context: list[str] = Field(default_factory=list, description="Context keywords")
     learned_from: str | None = Field(
-        default=None, description="Feature/session where learned"
+        default=None, description="Story/session where learned"
+    )
+    base: bool = Field(default=False, description="Whether this is a base pattern")
+    version: int | None = Field(
+        default=None, description="Base pattern version (for update tracking)"
     )
 
 
@@ -176,8 +213,8 @@ class CalibrationInput(BaseModel):
     """Input for creating a new calibration entry.
 
     Attributes:
-        feature: Feature ID (e.g., 'F3.5').
-        name: Feature name.
+        story: Story ID (e.g., 'F3.5').
+        name: Story name.
         size: T-shirt size (XS, S, M, L, XL).
         sp: Story points.
         estimated_min: Estimated minutes (if any).
@@ -186,8 +223,8 @@ class CalibrationInput(BaseModel):
         notes: Additional notes.
     """
 
-    feature: str = Field(..., description="Feature ID (e.g., 'F3.5')")
-    name: str = Field(..., description="Feature name")
+    story: str = Field(..., description="Story ID (e.g., 'F3.5')")
+    name: str = Field(..., description="Story name")
     size: str = Field(..., description="T-shirt size (XS, S, M, L, XL)")
     sp: int | None = Field(default=None, description="Story points")
     estimated_min: int | None = Field(default=None, description="Estimated minutes")
@@ -201,14 +238,14 @@ class SessionInput(BaseModel):
 
     Attributes:
         topic: Session topic.
-        session_type: Session type (feature, research, maintenance, etc.).
+        session_type: Session type (story, research, maintenance, etc.).
         outcomes: List of session outcomes.
         log_path: Path to session log file (if any).
     """
 
     topic: str = Field(..., description="Session topic")
     session_type: str = Field(
-        default="feature", description="Session type (feature, research, etc.)"
+        default="story", description="Session type (story, research, etc.)"
     )
     outcomes: list[str] = Field(default_factory=list, description="Session outcomes")
     log_path: str | None = Field(default=None, description="Path to session log")
@@ -228,6 +265,32 @@ class WriteResult(BaseModel):
     id: str = Field(..., description="Generated ID")
     file_path: str = Field(..., description="Path to file written")
     message: str = Field(default="", description="Status message")
+
+
+def get_memory_dir_for_scope(
+    scope: MemoryScope, project_root: Path | None = None
+) -> Path:
+    """Get the appropriate memory directory for a given scope.
+
+    Args:
+        scope: Memory scope (GLOBAL, PROJECT, or PERSONAL).
+        project_root: Project root path. Defaults to cwd.
+
+    Returns:
+        Path to the memory directory for that scope.
+
+    Example:
+        >>> dir_path = get_memory_dir_for_scope(MemoryScope.GLOBAL)
+        >>> # Returns ~/.rai/
+        >>> dir_path = get_memory_dir_for_scope(MemoryScope.PROJECT, Path("."))
+        >>> # Returns .raise/rai/memory/
+    """
+    if scope == MemoryScope.GLOBAL:
+        return get_global_rai_dir()
+    elif scope == MemoryScope.PERSONAL:
+        return get_personal_dir(project_root)
+    else:  # PROJECT
+        return get_memory_dir(project_root)
 
 
 def _get_next_id(file_path: Path, prefix: str) -> str:
@@ -279,13 +342,15 @@ def append_pattern(
     memory_dir: Path,
     input_data: PatternInput,
     created: date | None = None,
+    scope: MemoryScope = MemoryScope.PROJECT,
 ) -> WriteResult:
     """Append a new pattern to patterns.jsonl.
 
     Args:
-        memory_dir: Path to .rai/memory/ directory.
+        memory_dir: Path to memory directory (global, project, or personal).
         input_data: Pattern input data.
         created: Date created (defaults to today).
+        scope: Memory scope for this pattern (affects ID generation context).
 
     Returns:
         WriteResult with generated ID and status.
@@ -294,7 +359,7 @@ def append_pattern(
     pattern_id = _get_next_id(file_path, "PAT")
     created_date = created or date.today()
 
-    entry = {
+    entry: dict[str, Any] = {
         "id": pattern_id,
         "type": input_data.sub_type.value,
         "content": input_data.content,
@@ -303,17 +368,18 @@ def append_pattern(
         "created": created_date.isoformat(),
     }
 
-    _append_jsonl(file_path, entry)
+    # Include base/version only for base patterns (clean output for personal patterns)
+    if input_data.base:
+        entry["base"] = True
+        entry["version"] = input_data.version or 1
 
-    # Invalidate cache to trigger rebuild
-    cache = MemoryCache(memory_dir)
-    cache.invalidate()
+    _append_jsonl(file_path, entry)
 
     return WriteResult(
         success=True,
         id=pattern_id,
         file_path=str(file_path),
-        message=f"Pattern {pattern_id} appended to {file_path.name}",
+        message=f"Pattern {pattern_id} appended to {file_path.name} (scope: {scope.value})",
     )
 
 
@@ -321,13 +387,15 @@ def append_calibration(
     memory_dir: Path,
     input_data: CalibrationInput,
     created: date | None = None,
+    scope: MemoryScope = MemoryScope.PROJECT,
 ) -> WriteResult:
     """Append a new calibration to calibration.jsonl.
 
     Args:
-        memory_dir: Path to .rai/memory/ directory.
+        memory_dir: Path to memory directory (global, project, or personal).
         input_data: Calibration input data.
         created: Date created (defaults to today).
+        scope: Memory scope for this calibration (affects ID generation context).
 
     Returns:
         WriteResult with generated ID and status.
@@ -343,7 +411,7 @@ def append_calibration(
 
     entry = {
         "id": cal_id,
-        "feature": input_data.feature,
+        "story": input_data.story,
         "name": input_data.name,
         "size": input_data.size,
         "sp": input_data.sp,
@@ -357,15 +425,11 @@ def append_calibration(
 
     _append_jsonl(file_path, entry)
 
-    # Invalidate cache to trigger rebuild
-    cache = MemoryCache(memory_dir)
-    cache.invalidate()
-
     return WriteResult(
         success=True,
         id=cal_id,
         file_path=str(file_path),
-        message=f"Calibration {cal_id} appended to {file_path.name}",
+        message=f"Calibration {cal_id} appended to {file_path.name} (scope: {scope.value})",
     )
 
 
@@ -377,7 +441,7 @@ def append_session(
     """Append a new session to sessions/index.jsonl.
 
     Args:
-        memory_dir: Path to .rai/memory/ directory.
+        memory_dir: Path to .raise/rai/memory/ directory.
         input_data: Session input data.
         session_date: Session date (defaults to today).
 
@@ -398,10 +462,6 @@ def append_session(
     }
 
     _append_jsonl(file_path, entry)
-
-    # Invalidate cache to trigger rebuild
-    cache = MemoryCache(memory_dir)
-    cache.invalidate()
 
     return WriteResult(
         success=True,

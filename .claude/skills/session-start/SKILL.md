@@ -20,32 +20,43 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=session-start \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=session-start \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Session Start
 
-Load context, analyze progress, propose focused work.
+## Purpose
 
-## When to Use
+Load context, analyze progress, propose focused work. Creates continuity across sessions by loading memory and adapting to experience level.
 
+## Mastery Levels (ShuHaRi)
+
+**Shu (守)**: Detailed explanations, teach concepts. All steps executed.
+
+**Ha (破)**: Balanced output, explain new concepts only. All steps executed.
+
+**Ri (離)**: Minimal output, essentials only. All steps executed.
+
+Experience level affects **communication style**, not **operations**. All levels load the same data.
+
+## Context
+
+**When to use:**
 - Beginning of working session
 - After break or context switch
 - Resuming interrupted work
 
-**Skip if:** Immediate continuation in same conversation.
+**When to skip:**
+- Immediate continuation in same conversation
 
-## Shu/Ha/Ri Adaptation
+**Inputs required:**
+- Developer profile (`~/.rai/developer.yaml`)
+- Unified graph (`.raise/graph/unified.json`)
+- Human context (`CLAUDE.local.md`)
 
-Experience level affects **communication style**, not **operations**.
-
-| Level | Output Style | Operations |
-|-------|--------------|------------|
-| Shu | Detailed explanations, teach concepts | All steps |
-| Ha | Balanced, explain new concepts only | All steps |
-| Ri | Minimal, essentials only | All steps |
-
-**All levels load the same data.** Only output verbosity differs.
+**Output:**
+- Session summary (displayed)
+- Session count update (`~/.rai/developer.yaml`)
 
 ## Steps (4)
 
@@ -55,16 +66,16 @@ Run these in parallel (all independent):
 
 ```bash
 # Developer profile
-raise profile show
+uv run raise profile show
 
 # Unified graph context
-raise context query "session epic patterns" --unified --limit 10
+uv run raise memory query "session epic patterns" --limit 10
 
 # Human context (deadlines, notes)
 # Read: CLAUDE.local.md
 ```
 
-**If graph unavailable:** Run `raise graph build --unified` first.
+**If graph unavailable:** Run `uv run raise memory build` first.
 
 **Extract from results:**
 - Experience level (for output style)
@@ -139,7 +150,7 @@ Ha is between these — balanced detail.
 ### Step 4: Record Session
 
 ```bash
-raise profile session --project "$(pwd)"
+uv run raise session start --project "$(pwd)"
 ```
 
 This command:
@@ -149,7 +160,7 @@ This command:
 
 **First-time user:** Ask name, then:
 ```bash
-raise profile session --name "Name" --project "$(pwd)"
+uv run raise session start --name "Name" --project "$(pwd)"
 ```
 
 **If warned about unclosed session:** Inform the user that learnings from the previous session may have been lost. Suggest using `/session-close` before ending work.

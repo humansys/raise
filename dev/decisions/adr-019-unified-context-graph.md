@@ -61,7 +61,7 @@ Key sources: Microsoft GraphRAG, Neo4j, Graphiti/Zep, LlamaIndex Property Graph.
 │  ├── requirement (RF-*)   — PRD requirements                 │
 │  ├── outcome (OUT-*)      — vision outcomes                  │
 │  ├── epic (E*)            — epic scopes                      │
-│  ├── feature (F*.*)       — feature work                     │
+│  ├── feature (F*.*)       — story work                     │
 │  └── skill (/name)        — skill metadata                   │
 │                                                              │
 │  Edge Types:                                                 │
@@ -154,7 +154,7 @@ class UnifiedGraph:
 ### Query Flow
 
 ```
-User invokes /feature-plan F11.1
+User invokes /story-plan F11.1
     │
     ▼
 Skill Step 0.5: Query Context
@@ -271,7 +271,7 @@ raise context query "planning estimation"
 # - PAT-013, PAT-014 (planning patterns)
 # - Calibration data for similar features
 # - §5 Validation Gates
-# - /feature-plan skill
+# - /story-plan skill
 ```
 
 ## References

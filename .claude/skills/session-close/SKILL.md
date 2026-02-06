@@ -20,20 +20,43 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=session-close \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=session-close \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Session Close
 
-Close a session by preserving learnings and preparing handoff.
+## Purpose
 
-## When to Use
+Close a session by preserving learnings and preparing handoff. Updates memory, captures tangents, and creates continuity for the next session.
 
+## Mastery Levels (ShuHaRi)
+
+**Shu (守)**: Explain each step and why. All steps executed.
+
+**Ha (破)**: Brief explanations. All steps executed.
+
+**Ri (離)**: Minimal output. All steps executed.
+
+Experience level affects **communication style**, not **operations**. All levels perform the same memory operations.
+
+## Context
+
+**When to use:**
 - End of working session
 - After completing feature or significant work
 - Before break or context switch
 
-**Skip if:** Trivial session with no learnings.
+**When to skip:**
+- Trivial session with no learnings
+
+**Inputs required:**
+- Conversation context (learnings, tangents)
+- Existing patterns (for deduplication)
+
+**Output:**
+- Memory updates (patterns, sessions, telemetry)
+- Context file update (`CLAUDE.local.md`)
+- Session state cleared
 
 ## Steps (6)
 
@@ -46,7 +69,7 @@ Close a session by preserving learnings and preparing handoff.
 
 **Query** (parallel):
 ```bash
-raise context query "patterns" --unified --types pattern --limit 5
+uv run raise memory query "patterns" --types pattern --limit 5
 ```
 
 This helps avoid duplicate patterns. Query is fast (<3ms) — always run it.
@@ -57,13 +80,13 @@ Run these in parallel (all independent):
 
 ```bash
 # Patterns (if any new ones)
-raise memory add-pattern "Description" -c "context,tags" -t process
+uv run raise memory add-pattern "Description" -c "context,tags" -t process
 
 # Session record (always)
-raise memory add-session "Topic" -o "outcome1,outcome2" -t {type}
+uv run raise memory add-session "Topic" -o "outcome1,outcome2" -t {type}
 
 # Telemetry (always)
-raise telemetry emit-session -t {type} -o {outcome} -d {minutes}
+uv run raise memory emit-session -t {type} -o {outcome} -d {minutes}
 ```
 
 **Types:** feature, research, maintenance, infrastructure, ideation
@@ -95,7 +118,7 @@ Check conversation for ideas mentioned but not pursued.
 ### Step 5: Clear Session State
 
 ```bash
-raise profile session-end
+uv run raise session close
 ```
 
 This clears `current_session` in `~/.rai/developer.yaml`, marking the session as properly closed. Without this step, the next `/session-start` will warn about an unclosed session.
@@ -111,35 +134,13 @@ Output brief suggestion:
 **Open:** [unresolved questions]
 ```
 
-## Shu/Ha/Ri Adaptation
-
-Experience level affects **communication style**, not **operations**.
-
-| Level | Style | Operations |
-|-------|-------|------------|
-| Shu | Explain each step and why | All steps |
-| Ha | Brief explanations | All steps |
-| Ri | Minimal output | All steps |
-
-**All levels perform the same memory operations.** The difference is verbosity, not data quality.
-
-**Ri-level output example:**
-```
-Patterns: PAT-097, PAT-098, PAT-099 added
-Session: SES-049 recorded
-Context: CLAUDE.local.md updated
-State: Cleared
-Tangents: None
-Next: E14 design phase
-```
-
 ## Output
 
 | File | Update |
 |------|--------|
-| `.rai/memory/patterns.jsonl` | New patterns (CLI) |
-| `.rai/memory/sessions/index.jsonl` | Session record (CLI) |
-| `.rai/telemetry/signals.jsonl` | Session event (CLI) |
+| `.raise/rai/memory/patterns.jsonl` | New patterns (CLI) |
+| `.raise/rai/memory/sessions/index.jsonl` | Session record (CLI) |
+| `.raise/rai/telemetry/signals.jsonl` | Session event (CLI) |
 | `~/.rai/developer.yaml` | Session state cleared (CLI) |
 | `CLAUDE.local.md` | Single Write |
 | `dev/parking-lot.md` | Tangents (if any) |
@@ -152,12 +153,12 @@ Next: E14 design phase
 
 **Calibration:** If features completed, also run:
 ```bash
-raise memory add-calibration {feature_id} "Name" {size} {estimated_mins} -e {actual_mins}
+uv run raise memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins} -e {estimated_mins}
 ```
 
 ## References
 
 - Complement: `/session-start`
-- Memory: `.rai/memory/`
+- Memory: `.raise/rai/memory/`
 - Context: `CLAUDE.local.md`
 - Tangents: `dev/parking-lot.md`

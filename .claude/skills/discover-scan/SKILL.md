@@ -20,7 +20,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=discover-scan \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=discover-scan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Discovery Scan: Extract & Synthesize
@@ -62,8 +62,8 @@ Extract symbols from the codebase using the `raise discover scan` CLI command, t
 
 Read the context file to determine scan scope:
 
-```bash
-cat work/discovery/context.yaml
+```
+Read: work/discovery/context.yaml
 ```
 
 **Extract:**
@@ -82,7 +82,7 @@ Execute the `raise discover scan` command:
 
 ```bash
 # For each root_dir in context
-raise discover scan {root_dir} --language {language} --output json
+uv run raise discover scan {root_dir} --language {language} --output json
 ```
 
 **Example:**
@@ -310,4 +310,4 @@ This overrides context.yaml root_dirs for this scan.
 - Previous skill: `/discover-start`
 - Next skill: `/discover-validate`
 - CLI docs: `raise discover scan --help`
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`

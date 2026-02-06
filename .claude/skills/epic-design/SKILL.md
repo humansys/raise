@@ -23,11 +23,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Design: Epic Specification
@@ -58,7 +58,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - When multiple features need coordination or share dependencies
 
 **When to skip:**
-- Single-feature work (go directly to `/feature-design`)
+- Single-story work (go directly to `/story-design`)
 - Bug fixes or maintenance (use issue tracker)
 - Infrastructure tasks with obvious implementation
 - Exploratory spikes (use `/research` skill first)
@@ -71,7 +71,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - Constraints (timeline, resources, dependencies)
 
 **Outputs:**
-- Epic scope document (`dev/epic-{id}-scope.md`)
+- Epic scope document: `work/epics/e{N}-{name}/scope.md`
 - ADRs for significant architectural decisions (`dev/decisions/adr-*.md`)
 - Feature list with sizes, dependencies, and sequencing
 - Updated parking lot with deferred items
@@ -83,17 +83,17 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event start --phase design
+uv run raise memory emit-work epic {epic_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit epic E9 -e start -p design`
+**Example:** `raise memory emit-work epic E9 -e start -p design`
 
 ### Step 0.5: Query Context
 
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-raise context query "architecture ADR epic" --unified --types pattern,decision --limit 5
+uv run raise memory query "architecture ADR epic" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
@@ -104,7 +104,7 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Frame the Epic Objective
 
@@ -177,7 +177,7 @@ Break the epic into features that can be independently designed, planned, and de
 - Features are small enough to complete in 1-5 days (not weeks)
 - Features can have clear acceptance criteria
 
-**For each feature, capture:**
+**For each story, capture:**
 - **ID**: F{epic}.{seq} (e.g., F3.1, F3.2)
 - **Name**: Short descriptive name
 - **Description**: 1-2 sentences of what it delivers
@@ -342,7 +342,7 @@ Identify what could go wrong and how to address it.
 
 Consolidate all design work into the epic scope document.
 
-**Location:** `dev/epic-{id}-scope.md`
+**Location:** `work/epics/e{N}-{name}/scope.md`
 
 **Required sections:**
 1. Objective (from Step 1)
@@ -404,16 +404,16 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event complete --phase design
+uv run raise memory emit-work epic {epic_id} --event complete --phase design
 ```
 
-**Example:** `raise telemetry emit epic E9 -e complete -p design`
+**Example:** `raise memory emit-work epic E9 -e complete -p design`
 
 ---
 
 ## Output
 
-- **Primary:** `dev/epic-{id}-scope.md` - Epic scope document
+- **Primary:** `work/epics/e{N}-{name}/scope.md`
 - **Secondary:** `dev/decisions/adr-*.md` - ADRs for architectural decisions (0-3 typical)
 - **Updated:** `dev/parking-lot.md` - Deferred items captured
 - **Next:** `/epic-plan` (sequence features, plan milestones)
@@ -530,7 +530,7 @@ F{N}.4
 
 ---
 
-*Epic tracking - update per feature completion*
+*Epic tracking - update per story completion*
 *Created: YYYY-MM-DD*
 ```
 
@@ -552,7 +552,7 @@ F{N}.4
 4. **Too few features** — If <3 features, consider if this is really an epic
 5. **ADRs for everything** — Only document significant decisions; implementation details don't need ADRs
 6. **No ADRs at all** — Architectural decisions without documentation are lost knowledge
-7. **Over-specifying features** — Save details for `/feature-design`; epic level is high-level
+7. **Over-specifying features** — Save details for `/story-design`; epic level is high-level
 8. **Ignoring dependencies** — Unmapped dependencies cause blocked work during implementation
 9. **Unclear done criteria** — "We'll know it when we see it" is not a done criterion
 
@@ -571,9 +571,9 @@ This skill supports the three-layer memory model:
 
 ## References
 
-- **Epic Scope Examples:** `dev/epic-e1-scope.md`, `dev/epic-e2-scope.md`, `dev/epic-e3-scope.md`
+- **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
 - **ADR Template:** `.raise/templates/architecture/adr.md`
-- **Feature Design:** `/feature-design` (next level down)
+- **Feature Design:** `/story-design` (next level down)
 - **Epic Plan:** `/epic-plan` (sequence features after design)
 - **Epic Close:** `/epic-close` (retrospective after completion)
 - **Constitution:** `framework/reference/constitution.md` (principles governing design)
@@ -588,7 +588,7 @@ Project Level
     ↓
 /epic-plan    ← Sequence features, milestones
     ↓
-/feature-design → /feature-plan → /feature-implement → /feature-review
+/story-design → /story-plan → /story-implement → /story-review
     ↓
 /epic-close   ← Retrospective, learnings
 ```

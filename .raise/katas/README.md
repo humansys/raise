@@ -11,7 +11,7 @@ A kata is a process pattern adapted to a Work Cycle context. Each kata encodes:
 | Component | Purpose |
 |-----------|---------|
 | **Work Cycle** | When this kata applies (solution, project, feature, setup, improve) |
-| **Frequency** | How often executed (once-per-solution, once-per-project, per-feature, continuous) |
+| **Frequency** | How often executed (once-per-solution, once-per-project, per-story, continuous) |
 | **ShuHaRi** | Mastery levels for adaptation |
 | **Jidoka Inline** | Stop-on-defect pattern in each step |
 
@@ -90,9 +90,9 @@ katas/
 
 | Kata | Purpose | Output |
 |------|---------|--------|
-| `plan.md` | Implementation Planning | `work/features/{NNN-name}/plan.md` |
+| `plan.md` | Implementation Planning | `work/stories/{NNN-name}/plan.md` |
 | `implement.md` | Development Workflow | Working code |
-| `review.md` | Retrospective & Learning | `work/features/{NNN-name}/retrospective.md` |
+| `review.md` | Retrospective & Learning | `work/stories/{NNN-name}/retrospective.md` |
 
 > **Note**: Feature artifacts are transient and stay in `work/` (ADR-011)
 

@@ -12,6 +12,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
+from raise_cli.config.paths import get_memory_dir
 from raise_cli.onboarding.profile import (
     CommunicationPreferences,
     CommunicationStyle,
@@ -82,12 +83,12 @@ def _extract_skills_from_sessions(sessions_path: Path) -> list[str]:
     known_skills = {
         "session-start",
         "session-close",
-        "feature-design",
-        "feature-plan",
-        "feature-implement",
-        "feature-review",
-        "feature-start",
-        "feature-close",
+        "story-design",
+        "story-plan",
+        "story-implement",
+        "story-review",
+        "story-start",
+        "story-close",
         "epic-design",
         "epic-plan",
         "research",
@@ -137,7 +138,7 @@ def migrate_emilio_profile(
     """Create Emilio's profile from existing memory data.
 
     Extracts session history, skills used, and communication preferences
-    from the project's .rai/ memory directory.
+    from the project's .raise/rai/memory/ directory.
 
     Args:
         project_path: Path to the raise-commons project root.
@@ -147,11 +148,11 @@ def migrate_emilio_profile(
     Returns:
         DeveloperProfile populated from historical data.
     """
-    memory_path = project_path / ".rai" / "memory"
+    memory_path = get_memory_dir(project_path)
     sessions_path = memory_path / "sessions" / "index.jsonl"
 
-    # Extract session statistics
-    sessions_total, first_session, last_session = _extract_sessions_data(sessions_path)
+    # Extract session statistics (sessions_total now derived from index)
+    _, first_session, last_session = _extract_sessions_data(sessions_path)
 
     # Extract skills from session history
     skills_mastered = _extract_skills_from_sessions(sessions_path)
@@ -172,7 +173,7 @@ def migrate_emilio_profile(
     # Universal patterns that apply across all projects
     universal_patterns = [
         "Commit after each completed task",
-        "TDD for complex features",
+        "TDD for complex stories",
         "Ask before spawning subagents",
         "Inference economy: gather with tools, think with inference",
         "Permission granted to redirect when dispersing",
@@ -185,7 +186,6 @@ def migrate_emilio_profile(
         communication=communication,
         skills_mastered=skills_mastered,
         universal_patterns=universal_patterns,
-        sessions_total=sessions_total,
         first_session=first_session,
         last_session=last_session,
         projects=[str(project_path)],
