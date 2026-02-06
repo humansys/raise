@@ -17,7 +17,10 @@ from __future__ import annotations
 
 from datetime import date
 from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
+
+if TYPE_CHECKING:
+    from raise_cli.onboarding.bootstrap import BootstrapResult
 
 import typer
 from rich.console import Console
@@ -94,8 +97,20 @@ def _get_project_message(
     file_count: int,
     profile: DeveloperProfile | None,
     created_profile: bool,
+    bootstrap_result: BootstrapResult | None = None,
 ) -> str:
-    """Get project detection message based on experience level."""
+    """Get project detection message based on experience level.
+
+    Args:
+        project_type: Detected project type (greenfield/brownfield).
+        file_count: Number of code files detected.
+        profile: Developer profile (None for new users).
+        created_profile: Whether profile was just created.
+        bootstrap_result: Result of base Rai bootstrap (None if not run).
+
+    Returns:
+        Formatted message string for console output.
+    """
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
         # Build files section with descriptions
         lines = [
@@ -110,6 +125,31 @@ def _get_project_message(
             lines.append(
                 "[bold]Loaded:[/bold]  ~/.rai/developer.yaml  [dim]— your preferences[/dim]"
             )
+
+        # Bootstrap info
+        if bootstrap_result is not None:
+            if bootstrap_result.already_existed:
+                lines.append(
+                    "[bold]Loaded:[/bold]  .raise/rai/  "
+                    "[dim]— Rai base already present[/dim]"
+                )
+            else:
+                if bootstrap_result.identity_copied:
+                    lines.append(
+                        "[bold]Created:[/bold] .raise/rai/identity/  "
+                        "[dim]— Rai's base identity[/dim]"
+                    )
+                if bootstrap_result.patterns_copied:
+                    lines.append(
+                        "[bold]Created:[/bold] .raise/rai/memory/  "
+                        "[dim]— 20 universal patterns[/dim]"
+                    )
+                if bootstrap_result.methodology_copied:
+                    lines.append(
+                        "[bold]Created:[/bold] .raise/rai/framework/  "
+                        "[dim]— methodology definition[/dim]"
+                    )
+
         files_section = "\n".join(lines)
 
         return PROJECT_DETECTED_SHU.format(
@@ -118,9 +158,17 @@ def _get_project_message(
             files_section=files_section,
         )
     else:
-        return PROJECT_DETECTED_RI.format(
-            project_type=project_type.capitalize(),
-            file_count=file_count,
+        bootstrap_msg = ""
+        if bootstrap_result is not None and not bootstrap_result.already_existed:
+            bootstrap_msg = (
+                f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
+            )
+        return (
+            PROJECT_DETECTED_RI.format(
+                project_type=project_type.capitalize(),
+                file_count=file_count,
+            )
+            + bootstrap_msg
         )
 
 
@@ -217,6 +265,11 @@ def init_command(
     manifest = ProjectManifest(project=project_info)
     save_manifest(manifest, project_path)
 
+    # Bootstrap Rai base assets
+    from raise_cli.onboarding.bootstrap import bootstrap_rai_base
+
+    bootstrap_result = bootstrap_rai_base(project_path)
+
     # Output messages based on experience level
     welcome = _get_welcome_message(profile if not created_profile else None)
     project_msg = _get_project_message(
@@ -224,6 +277,7 @@ def init_command(
         file_count=detection.code_file_count,
         profile=profile,
         created_profile=created_profile,
+        bootstrap_result=bootstrap_result,
     )
 
     if profile.experience_level == ExperienceLevel.RI and not created_profile:
