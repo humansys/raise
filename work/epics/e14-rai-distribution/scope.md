@@ -358,7 +358,7 @@ Buffer for fixes
 | F14.7 Base Show | XS | Pending | — | — | |
 | F14.12 Memory Ontology | XS | ✅ Done | 1 session | — | graph→memory, simpler CLI |
 | F14.13 Ontology Cleanup | M | ✅ Done | 90 min | 1.33x | CLI restructure, /skill-create, 9 patterns |
-| F14.14 Skill CLI | M | Scoped | — | — | Platform-agnostic skill management |
+| F14.14 Skill CLI | M | ✅ Done | ~3 sessions | 1.5x | 4 CLI commands, skill audit, 79 new tests |
 
 **Milestone Progress:**
 - [ ] M1: Base Assets (Day 1)
