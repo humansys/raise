@@ -29,6 +29,27 @@ hooks:
 
 Initialize an epic with a dedicated branch from v2 and a scope commit. Feature branches will be created as sub-branches of this epic branch.
 
+## Context
+
+**When to use:**
+- Starting a new body of work (3-10 features)
+- Beginning a planned epic from the backlog
+- Creating isolation for a significant capability
+
+**When to skip:**
+- Small fixes or single features (use feature branch from v2)
+- Continuation of existing epic (branch already exists)
+
+**Inputs required:**
+- Epic number (E{N})
+- Epic name/slug
+- High-level objective
+
+**Output:**
+- Epic branch created from v2
+- Scope commit documenting boundaries
+- Telemetry recorded
+
 **Branch model:**
 ```
 main (stable)
