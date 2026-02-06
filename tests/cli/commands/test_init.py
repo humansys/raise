@@ -458,3 +458,97 @@ class Handler{i}:
         assert claude_md_path.exists()
         content = claude_md_path.read_text()
         assert "greenfield" in content.lower()
+
+
+class TestInitBootstrap:
+    """Tests for bootstrap integration in raise init."""
+
+    def test_init_creates_identity_files(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should copy base identity files to .raise/rai/identity/."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        identity_dir = greenfield_project / ".raise" / "rai" / "identity"
+        assert (identity_dir / "core.md").exists()
+        assert (identity_dir / "perspective.md").exists()
+
+    def test_init_creates_patterns_file(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should copy base patterns to .raise/rai/memory/patterns.jsonl."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        patterns = greenfield_project / ".raise" / "rai" / "memory" / "patterns.jsonl"
+        assert patterns.exists()
+        assert "BASE-001" in patterns.read_text()
+
+    def test_init_creates_methodology_file(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should copy methodology.yaml to .raise/rai/framework/."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        methodology = (
+            greenfield_project / ".raise" / "rai" / "framework" / "methodology.yaml"
+        )
+        assert methodology.exists()
+        assert "version:" in methodology.read_text()
+
+    def test_init_does_not_overwrite_existing_identity(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Re-running init should not overwrite existing identity files."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        # First init
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        # Modify identity
+        core_path = greenfield_project / ".raise" / "rai" / "identity" / "core.md"
+        core_path.write_text("# Custom identity")
+
+        # Second init
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        assert core_path.read_text() == "# Custom identity"
+
+    def test_shu_output_includes_bootstrap_info(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Shu users should see bootstrap details in output."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        output_lower = result.output.lower()
+        assert "identity" in output_lower or "rai" in output_lower

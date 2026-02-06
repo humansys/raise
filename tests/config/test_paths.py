@@ -11,7 +11,9 @@ from raise_cli.config.paths import (
     get_cache_dir,
     get_config_dir,
     get_data_dir,
+    get_framework_dir,
     get_global_rai_dir,
+    get_identity_dir,
     get_personal_dir,
 )
 
@@ -114,6 +116,48 @@ class TestGetGlobalRaiDir:
         """Should return a Path object, not a string."""
         monkeypatch.delenv("RAI_HOME", raising=False)
         result = get_global_rai_dir()
+        assert isinstance(result, Path)
+
+
+class TestGetIdentityDir:
+    """Tests for get_identity_dir() function."""
+
+    def test_default_identity_dir(self, tmp_path: Path) -> None:
+        """Should return .raise/rai/identity/ within project root."""
+        result = get_identity_dir(tmp_path)
+        expected = tmp_path / ".raise" / "rai" / "identity"
+        assert result == expected
+
+    def test_identity_dir_current_directory(self) -> None:
+        """Should use cwd when no project_root provided."""
+        result = get_identity_dir()
+        expected = Path.cwd() / ".raise" / "rai" / "identity"
+        assert result == expected
+
+    def test_returns_path_object(self, tmp_path: Path) -> None:
+        """Should return a Path object, not a string."""
+        result = get_identity_dir(tmp_path)
+        assert isinstance(result, Path)
+
+
+class TestGetFrameworkDir:
+    """Tests for get_framework_dir() function."""
+
+    def test_default_framework_dir(self, tmp_path: Path) -> None:
+        """Should return .raise/rai/framework/ within project root."""
+        result = get_framework_dir(tmp_path)
+        expected = tmp_path / ".raise" / "rai" / "framework"
+        assert result == expected
+
+    def test_framework_dir_current_directory(self) -> None:
+        """Should use cwd when no project_root provided."""
+        result = get_framework_dir()
+        expected = Path.cwd() / ".raise" / "rai" / "framework"
+        assert result == expected
+
+    def test_returns_path_object(self, tmp_path: Path) -> None:
+        """Should return a Path object, not a string."""
+        result = get_framework_dir(tmp_path)
         assert isinstance(result, Path)
 
 
