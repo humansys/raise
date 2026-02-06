@@ -94,7 +94,7 @@ uv run pytest --tb=no -q || {
 Load relevant process patterns and prior retrospectives from unified context:
 
 ```bash
-uv run raise context query "retrospective learnings velocity" --types pattern,calibration --limit 5
+uv run raise memory query "retrospective learnings velocity" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns and calibration data before proceeding. Prior learnings and velocity data inform retrospective focus.
@@ -105,7 +105,7 @@ Review returned patterns and calibration data before proceeding. Prior learnings
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Gather Data
 

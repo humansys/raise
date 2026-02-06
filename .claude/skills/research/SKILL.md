@@ -90,14 +90,14 @@ Engineering-specific evidence hierarchy:
 If unified graph is available, query for prior research and methodology patterns:
 
 ```bash
-uv run raise context query "research methodology evidence" --types pattern,session --limit 5
+uv run raise memory query "research methodology evidence" --types pattern,session --limit 5
 ```
 
 Review returned patterns to avoid duplicating prior research.
 
 **Verification:** Context loaded or graph not available (proceed without).
 
-> **If context unavailable:** Run `raise graph build` first, or skip to Step 1.
+> **If context unavailable:** Run `raise memory build` first, or skip to Step 1.
 
 ### Step 1: Frame the Question
 

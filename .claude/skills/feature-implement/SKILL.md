@@ -94,7 +94,7 @@ fi
 Load relevant codebase patterns from unified context:
 
 ```bash
-uv run raise context query "testing coverage type annotations security" --types pattern,guardrail --limit 5
+uv run raise memory query "testing coverage type annotations security" --types pattern,guardrail --limit 5
 ```
 
 Review returned patterns and guardrails before proceeding. Key patterns inform implementation approach; guardrails ensure code standards compliance.
@@ -105,7 +105,7 @@ Review returned patterns and guardrails before proceeding. Key patterns inform i
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Load Plan and Context
 

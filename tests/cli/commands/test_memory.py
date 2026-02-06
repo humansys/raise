@@ -19,11 +19,11 @@ runner = CliRunner()
 
 @pytest.fixture
 def sample_unified_graph(tmp_path: Path) -> Path:
-    """Create sample unified graph with memory concepts."""
-    graph_dir = tmp_path / ".raise" / "graph"
-    graph_dir.mkdir(parents=True)
+    """Create sample memory index with concepts."""
+    memory_dir = tmp_path / ".raise" / "rai" / "memory"
+    memory_dir.mkdir(parents=True)
 
-    # Create unified graph with memory nodes
+    # Create memory index with concepts
     graph_data = {
         "nodes": [
             {
@@ -63,10 +63,10 @@ def sample_unified_graph(tmp_path: Path) -> Path:
         "metadata": {"version": "1.0", "created": "2026-01-31"},
     }
 
-    graph_path = graph_dir / "unified.json"
-    graph_path.write_text(json.dumps(graph_data, indent=2))
+    index_path = memory_dir / "index.json"
+    index_path.write_text(json.dumps(graph_data, indent=2))
 
-    return graph_path
+    return index_path
 
 
 class TestMemoryQueryCommand:
@@ -81,7 +81,7 @@ class TestMemoryQueryCommand:
 
             assert result.exit_code == 4  # ArtifactNotFoundError
             # cli_error outputs to stderr, check output (combined stdout+stderr)
-            assert "Unified graph not found" in result.output
+            assert "Memory index not found" in result.output
         finally:
             os.chdir(original_cwd)
 
@@ -93,7 +93,7 @@ class TestMemoryQueryCommand:
             result = runner.invoke(app, ["memory", "query", "singleton pattern"])
 
             assert result.exit_code == 0
-            assert "Searching memory" in result.stdout
+            assert "Querying memory" in result.stdout
             assert "singleton" in result.stdout.lower() or "PAT-001" in result.stdout
         finally:
             os.chdir(original_cwd)
@@ -142,28 +142,17 @@ class TestMemoryQueryCommand:
         try:
             os.chdir(tmp_path)
             result = runner.invoke(
-                app, ["memory", "query", "python", "--max-results", "1"]
+                app, ["memory", "query", "python", "--limit", "1"]
             )
 
             assert result.exit_code == 0
         finally:
             os.chdir(original_cwd)
 
-    def test_query_no_expand(self, sample_unified_graph: Path, tmp_path: Path) -> None:
-        """Test query without traversal expansion."""
-        original_cwd = os.getcwd()
-        try:
-            os.chdir(tmp_path)
-            result = runner.invoke(app, ["memory", "query", "singleton", "--no-expand"])
-
-            assert result.exit_code == 0
-        finally:
-            os.chdir(original_cwd)
-
-    def test_query_with_custom_graph(
+    def test_query_with_custom_index(
         self, sample_unified_graph: Path, tmp_path: Path
     ) -> None:
-        """Test query with explicit graph path."""
+        """Test query with explicit index path."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
@@ -173,7 +162,7 @@ class TestMemoryQueryCommand:
                     "memory",
                     "query",
                     "testing",
-                    "--graph",
+                    "--index",
                     str(sample_unified_graph),
                 ],
             )
@@ -195,7 +184,7 @@ class TestMemoryListCommand:
 
             assert result.exit_code == 4  # ArtifactNotFoundError
             # cli_error outputs to stderr, check output (combined stdout+stderr)
-            assert "Unified graph not found" in result.output
+            assert "Memory index not found" in result.output
         finally:
             os.chdir(original_cwd)
 
@@ -273,7 +262,7 @@ class TestMemoryListCommand:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "list", "--graph", str(sample_unified_graph)],
+                ["memory", "list", "--index", str(sample_unified_graph)],
             )
 
             assert result.exit_code == 0
@@ -298,7 +287,7 @@ class TestMemoryHelp:
 
         assert result.exit_code == 0
         assert "query" in result.stdout.lower()
-        assert "--max-results" in result.stdout
+        assert "--limit" in result.stdout
 
     def test_memory_list_help(self) -> None:
         """Test memory list command shows help."""
@@ -307,3 +296,78 @@ class TestMemoryHelp:
         assert result.exit_code == 0
         assert "list" in result.stdout.lower()
         assert "--format" in result.stdout
+
+    def test_memory_build_help(self) -> None:
+        """Test memory build command shows help."""
+        result = runner.invoke(app, ["memory", "build", "--help"])
+
+        assert result.exit_code == 0
+        assert "build" in result.stdout.lower()
+        assert "--output" in result.stdout
+
+    def test_memory_validate_help(self) -> None:
+        """Test memory validate command shows help."""
+        result = runner.invoke(app, ["memory", "validate", "--help"])
+
+        assert result.exit_code == 0
+        assert "validate" in result.stdout.lower()
+        assert "--index" in result.stdout
+
+    def test_memory_extract_help(self) -> None:
+        """Test memory extract command shows help."""
+        result = runner.invoke(app, ["memory", "extract", "--help"])
+
+        assert result.exit_code == 0
+        assert "extract" in result.stdout.lower()
+        assert "--format" in result.stdout
+
+
+class TestMemoryBuildCommand:
+    """Tests for `raise memory build` command."""
+
+    def test_build_basic(self, tmp_path: Path) -> None:
+        """Test basic build command creates index."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            # Create minimal structure
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+
+            result = runner.invoke(app, ["memory", "build"])
+
+            assert result.exit_code == 0
+            assert "Building memory index" in result.stdout
+            assert (memory_dir / "index.json").exists()
+        finally:
+            os.chdir(original_cwd)
+
+
+class TestMemoryValidateCommand:
+    """Tests for `raise memory validate` command."""
+
+    def test_validate_no_index(self, tmp_path: Path) -> None:
+        """Test validate fails if index not found."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(app, ["memory", "validate"])
+
+            assert result.exit_code == 4  # ArtifactNotFoundError
+            assert "Index file not found" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_validate_basic(
+        self, sample_unified_graph: Path, tmp_path: Path
+    ) -> None:
+        """Test basic validate command."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(app, ["memory", "validate"])
+
+            assert result.exit_code == 0
+            assert "Memory index is valid" in result.stdout
+        finally:
+            os.chdir(original_cwd)

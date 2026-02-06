@@ -95,15 +95,18 @@ def get_telemetry_dir(project_root: Path | None = None) -> Path:
 
 
 def get_graph_dir(project_root: Path | None = None) -> Path:
-    """Get the .raise/graph/ directory.
+    """Get the memory index directory (.raise/rai/memory/).
+
+    The "graph" is an implementation detail — it's really memory indexing.
+    This function returns the memory directory where index.json lives.
 
     Args:
         project_root: Project root path. Defaults to current directory.
 
     Returns:
-        Path to graph directory.
+        Path to memory directory (contains index.json).
     """
-    return get_raise_dir(project_root) / GRAPH_SUBDIR
+    return get_memory_dir(project_root)
 
 
 # =============================================================================

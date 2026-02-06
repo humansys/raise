@@ -69,13 +69,13 @@ Run these in parallel (all independent):
 uv run raise profile show
 
 # Unified graph context
-uv run raise context query "session epic patterns" --limit 10
+uv run raise memory query "session epic patterns" --limit 10
 
 # Human context (deadlines, notes)
 # Read: CLAUDE.local.md
 ```
 
-**If graph unavailable:** Run `uv run raise graph build` first.
+**If graph unavailable:** Run `uv run raise memory build` first.
 
 **Extract from results:**
 - Experience level (for output style)

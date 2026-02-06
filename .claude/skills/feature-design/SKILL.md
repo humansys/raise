@@ -104,7 +104,7 @@ ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic context"
 Load relevant architecture patterns and ADRs from unified context:
 
 ```bash
-uv run raise context query "architecture patterns ADR" --types pattern,decision --limit 5
+uv run raise memory query "architecture patterns ADR" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Key patterns and architectural decisions inform design.
@@ -115,7 +115,7 @@ Review returned patterns and prior ADRs before proceeding. Key patterns and arch
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Assess Complexity
 

@@ -69,7 +69,7 @@ Experience level affects **communication style**, not **operations**. All levels
 
 **Query** (parallel):
 ```bash
-uv run raise context query "patterns" --types pattern --limit 5
+uv run raise memory query "patterns" --types pattern --limit 5
 ```
 
 This helps avoid duplicate patterns. Query is fast (<3ms) — always run it.
