@@ -2,8 +2,6 @@
 
 from datetime import date
 
-import pytest
-
 from raise_cli.memory.models import (
     MemoryConcept,
     MemoryConceptType,

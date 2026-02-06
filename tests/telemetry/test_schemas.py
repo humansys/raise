@@ -10,7 +10,7 @@ Tests cover:
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import TypeAdapter, ValidationError
@@ -25,14 +25,13 @@ from raise_cli.telemetry import (
     WorkLifecycle,
 )
 
-
 # --- Fixtures ---
 
 
 @pytest.fixture
 def now() -> datetime:
     """Return current UTC timestamp."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 # --- SkillEvent Tests ---

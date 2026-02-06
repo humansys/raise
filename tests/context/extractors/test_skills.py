@@ -5,13 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-import pytest
-
 from raise_cli.context.extractors.skills import (
     extract_all_skills,
     extract_skill_metadata,
 )
-from raise_cli.context.models import ConceptNode
 
 
 class TestExtractSkillMetadata:

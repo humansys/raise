@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
-
 from raise_cli.skills.schema import (
+    Skill,
+    SkillFrontmatter,
     SkillHook,
     SkillHookCommand,
     SkillMetadata,
-    SkillFrontmatter,
-    Skill,
 )
 
 

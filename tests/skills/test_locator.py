@@ -12,7 +12,6 @@ from raise_cli.skills.locator import (
     get_default_skill_dir,
     list_skills,
 )
-from raise_cli.skills.schema import Skill
 
 
 @pytest.fixture

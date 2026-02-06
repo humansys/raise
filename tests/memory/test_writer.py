@@ -8,11 +8,11 @@ from pathlib import Path
 
 import pytest
 
+from raise_cli.memory.models import MemoryScope, PatternSubType
 from raise_cli.memory.writer import (
     CalibrationInput,
     PatternInput,
     SessionInput,
-    WriteResult,
     _get_next_id,
     append_calibration,
     append_pattern,
@@ -20,7 +20,6 @@ from raise_cli.memory.writer import (
     get_memory_dir_for_scope,
     validate_session_index,
 )
-from raise_cli.memory.models import MemoryScope, PatternSubType
 
 
 class TestGetNextId:

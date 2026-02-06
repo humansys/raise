@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from raise_cli.memory.migration import (
     MigrationResult,
     migrate_to_personal,

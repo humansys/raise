@@ -8,7 +8,6 @@ import pytest
 from raise_cli.governance.models import ConceptType
 from raise_cli.governance.parsers.vision import extract_outcomes
 
-
 # Note: sanitize_id tests are in tests/core/test_text.py
 
 

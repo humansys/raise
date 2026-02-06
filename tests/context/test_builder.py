@@ -5,14 +5,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from textwrap import dedent
-from typing import Any
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
 from raise_cli.context.builder import UnifiedGraphBuilder
 from raise_cli.context.models import ConceptNode
-from raise_cli.memory.models import MemoryScope
 
 
 class TestUnifiedGraphBuilderInit:

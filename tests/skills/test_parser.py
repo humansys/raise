@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.skills.parser import parse_skill, parse_frontmatter, ParseError
+from raise_cli.skills.parser import ParseError, parse_frontmatter, parse_skill
 
 
 class TestParseFrontmatter:
