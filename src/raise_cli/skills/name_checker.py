@@ -22,7 +22,7 @@ NAMING_PATTERN = re.compile(r"^[a-z]+-[a-z]+(-[a-z]+)*$")
 KNOWN_LIFECYCLES = {
     "session",
     "epic",
-    "feature",
+    "story",
     "discover",
     "skill",
     "research",

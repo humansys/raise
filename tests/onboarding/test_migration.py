@@ -92,11 +92,11 @@ class TestExtractSkillsFromSessions:
         sessions_path = tmp_path / "index.jsonl"
         sessions_path.write_text(
             '{"id": "SES-001", "outcomes": ["/session-start skill created", "tests passing"]}\n'
-            '{"id": "SES-002", "outcomes": ["feature-plan complete"]}\n'
+            '{"id": "SES-002", "outcomes": ["story-plan complete"]}\n'
         )
         skills = _extract_skills_from_sessions(sessions_path)
         assert "session-start" in skills
-        assert "feature-plan" in skills
+        assert "story-plan" in skills
 
     def test_extracts_skills_from_topic(self, tmp_path: Path) -> None:
         """Extracts skill names mentioned in topic."""
@@ -179,7 +179,7 @@ class TestMigrateEmilioProfile:
         index_path = memory_path / "index.jsonl"
         index_path.write_text(
             '{"id": "SES-001", "date": "2026-02-01", "outcomes": ["session-start created"]}\n'
-            '{"id": "SES-002", "date": "2026-02-02", "outcomes": ["feature-plan done"]}\n'
+            '{"id": "SES-002", "date": "2026-02-02", "outcomes": ["story-plan done"]}\n'
             '{"id": "SES-003", "date": "2026-02-03", "outcomes": ["epic-design complete"]}\n'
         )
 
@@ -188,7 +188,7 @@ class TestMigrateEmilioProfile:
         assert profile.first_session == date(2026, 2, 1)
         assert profile.last_session == date(2026, 2, 3)
         assert "session-start" in profile.skills_mastered
-        assert "feature-plan" in profile.skills_mastered
+        assert "story-plan" in profile.skills_mastered
         assert "epic-design" in profile.skills_mastered
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:

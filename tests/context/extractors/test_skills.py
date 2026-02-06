@@ -22,7 +22,7 @@ class TestExtractSkillMetadata:
         skill_md = tmp_path / "SKILL.md"
         skill_md.write_text(dedent("""\
             ---
-            name: feature-plan
+            name: story-plan
             description: Plan implementation tasks
             ---
             # Feature Plan
@@ -32,7 +32,7 @@ class TestExtractSkillMetadata:
         node = extract_skill_metadata(skill_md)
 
         assert node is not None
-        assert node.id == "/feature-plan"
+        assert node.id == "/story-plan"
         assert node.type == "skill"
         assert node.content == "Plan implementation tasks"
         assert node.source_file == str(skill_md)
@@ -47,7 +47,7 @@ class TestExtractSkillMetadata:
             metadata:
               raise.prerequisites: other-skill
               raise.next: next-skill
-              raise.work_cycle: feature
+              raise.work_cycle: story
             ---
             # Test
         """))
@@ -57,7 +57,7 @@ class TestExtractSkillMetadata:
         assert node is not None
         assert node.metadata["raise.prerequisites"] == "other-skill"
         assert node.metadata["raise.next"] == "next-skill"
-        assert node.metadata["raise.work_cycle"] == "feature"
+        assert node.metadata["raise.work_cycle"] == "story"
 
     def test_handles_multiline_description(self, tmp_path: Path) -> None:
         """Should handle YAML multiline description."""

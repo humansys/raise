@@ -171,7 +171,7 @@ def extract_epic_details(
     )
 
 
-def extract_features(
+def extract_stories(
     file_path: Path, project_root: Path | None = None
 ) -> list[Concept]:
     """Extract Feature concepts from epic scope document.
@@ -191,10 +191,10 @@ def extract_features(
     Examples:
         >>> from pathlib import Path
         >>> scope_doc = Path("work/epics/e08-backlog/scope.md")
-        >>> features = extract_features(scope_doc)
+        >>> features = extract_stories(scope_doc)
         >>> len(features)
         4
-        >>> features[0].metadata["feature_id"]
+        >>> features[0].metadata["story_id"]
         'F8.1'
     """
     if not file_path.exists():
@@ -235,7 +235,7 @@ def extract_features(
     for i, line in enumerate(lines, 1):
         match = feature_pattern.match(line)
         if match:
-            feature_id = match.group(1).strip()
+            story_id = match.group(1).strip()
             name = match.group(2).strip()
             col3 = match.group(3).strip()
             col4 = match.group(4).strip()
@@ -273,21 +273,21 @@ def extract_features(
                 description = col5
 
             # Build content
-            content = f"{feature_id}: {name}"
+            content = f"{story_id}: {name}"
             if status:
                 content += f" ({status})"
             if description:
                 content += f" - {description}"
 
             concept = Concept(
-                id=f"feature-{feature_id.lower().replace('.', '-')}",
-                type=ConceptType.FEATURE,
+                id=f"story-{story_id.lower().replace('.', '-')}",
+                type=ConceptType.STORY,
                 file=relative_path,
-                section=f"{feature_id}: {name}",
+                section=f"{story_id}: {name}",
                 lines=(i, i),
                 content=content[:500],
                 metadata={
-                    "feature_id": feature_id,
+                    "story_id": story_id,
                     "name": name,
                     "status": status or "pending",
                     "size": size,

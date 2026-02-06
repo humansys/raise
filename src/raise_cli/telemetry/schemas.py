@@ -10,7 +10,7 @@ Signal types:
 - CalibrationEvent: Tracks estimate vs actual for velocity calibration
 - ErrorEvent: Tracks tool failures
 - CommandUsage: Tracks CLI command usage
-- WorkLifecycle: Tracks work items (epic/feature) through phases (Lean flow analysis)
+- WorkLifecycle: Tracks work items (epic/story) through phases (Lean flow analysis)
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ class SkillEvent(BaseModel):
     Attributes:
         type: Discriminator field, always "skill_event".
         timestamp: When the event occurred (UTC).
-        skill: Name of the skill (e.g., "feature-design").
+        skill: Name of the skill (e.g., "story-design").
         event: Event type (start, complete, abandon).
         duration_sec: Duration in seconds (only for complete/abandon).
 
@@ -37,7 +37,7 @@ class SkillEvent(BaseModel):
         >>> from datetime import datetime, timezone
         >>> event = SkillEvent(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     skill="feature-design",
+        ...     skill="story-design",
         ...     event="complete",
         ...     duration_sec=1800
         ... )
@@ -47,7 +47,7 @@ class SkillEvent(BaseModel):
 
     type: Literal["skill_event"] = "skill_event"
     timestamp: datetime = Field(..., description="When the event occurred (UTC)")
-    skill: str = Field(..., description="Name of the skill (e.g., 'feature-design')")
+    skill: str = Field(..., description="Name of the skill (e.g., 'story-design')")
     event: Literal["start", "complete", "abandon"] = Field(
         ..., description="Event type"
     )
@@ -64,19 +64,19 @@ class SessionEvent(BaseModel):
     Attributes:
         type: Discriminator field, always "session_event".
         timestamp: When the event occurred (UTC).
-        session_type: Type of session (e.g., "feature", "research").
+        session_type: Type of session (e.g., "story", "research").
         outcome: How the session ended.
         duration_min: Duration in minutes.
-        features: Feature IDs worked on during the session.
+        stories: Story IDs worked on during the session.
 
     Examples:
         >>> from datetime import datetime, timezone
         >>> event = SessionEvent(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     session_type="feature",
+        ...     session_type="story",
         ...     outcome="success",
         ...     duration_min=90,
-        ...     features=["F9.1", "F9.2"]
+        ...     stories=["F9.1", "F9.2"]
         ... )
         >>> event.type
         'session_event'
@@ -85,27 +85,27 @@ class SessionEvent(BaseModel):
     type: Literal["session_event"] = "session_event"
     timestamp: datetime = Field(..., description="When the event occurred (UTC)")
     session_type: str = Field(
-        ..., description="Type of session (e.g., 'feature', 'research')"
+        ..., description="Type of session (e.g., 'story', 'research')"
     )
     outcome: Literal["success", "partial", "abandoned"] = Field(
         ..., description="How the session ended"
     )
     duration_min: int = Field(..., description="Duration in minutes")
-    features: list[str] = Field(
-        default_factory=list, description="Feature IDs worked on"
+    stories: list[str] = Field(
+        default_factory=list, description="Story IDs worked on"
     )
 
 
 class CalibrationEvent(BaseModel):
     """A calibration data point for velocity tracking.
 
-    Emitted when a feature is completed, comparing estimate to actual.
+    Emitted when a story is completed, comparing estimate to actual.
 
     Attributes:
         type: Discriminator field, always "calibration".
         timestamp: When the event occurred (UTC).
-        feature_id: Feature identifier (e.g., "F9.1").
-        feature_size: T-shirt size (XS, S, M, L).
+        story_id: Story identifier (e.g., "F9.1").
+        story_size: T-shirt size (XS, S, M, L).
         estimated_min: Estimated duration in minutes.
         actual_min: Actual duration in minutes.
         velocity: Ratio of estimated to actual (>1 means faster than expected).
@@ -114,8 +114,8 @@ class CalibrationEvent(BaseModel):
         >>> from datetime import datetime, timezone
         >>> event = CalibrationEvent(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     feature_id="F9.1",
-        ...     feature_size="XS",
+        ...     story_id="F9.1",
+        ...     story_size="XS",
         ...     estimated_min=25,
         ...     actual_min=20,
         ...     velocity=1.25
@@ -126,8 +126,8 @@ class CalibrationEvent(BaseModel):
 
     type: Literal["calibration"] = "calibration"
     timestamp: datetime = Field(..., description="When the event occurred (UTC)")
-    feature_id: str = Field(..., description="Feature identifier (e.g., 'F9.1')")
-    feature_size: str = Field(..., description="T-shirt size (XS, S, M, L)")
+    story_id: str = Field(..., description="Story identifier (e.g., 'F9.1')")
+    story_size: str = Field(..., description="T-shirt size (XS, S, M, L)")
     estimated_min: int = Field(..., description="Estimated duration in minutes")
     actual_min: int = Field(..., description="Actual duration in minutes")
     velocity: float = Field(
@@ -200,24 +200,24 @@ class CommandUsage(BaseModel):
 class WorkLifecycle(BaseModel):
     """A unified work lifecycle event for Lean flow analysis.
 
-    Tracks work items (epics, features, etc.) through normalized phases to enable:
+    Tracks work items (epics, stories, etc.) through normalized phases to enable:
     - Lead time calculation (start to complete)
     - Wait time detection (gaps between phases)
     - WIP tracking (started but not completed)
     - Bottleneck identification (longest phase)
     - Flow efficiency (active time / lead time)
-    - Cross-level analysis (compare epic vs feature flow)
+    - Cross-level analysis (compare epic vs story flow)
 
     Phases (normalized across all work types):
     - design: Scope definition and specification
-    - plan: Task/feature decomposition and sequencing
+    - plan: Task/story decomposition and sequencing
     - implement: Active development work
     - review: Retrospective and learnings
 
     Attributes:
         type: Discriminator field, always "work_lifecycle".
         timestamp: When the event occurred (UTC).
-        work_type: Type of work item (epic, feature, etc.).
+        work_type: Type of work item (epic, story, etc.).
         work_id: Work item identifier (e.g., "E9", "F9.4").
         event: Lifecycle event type.
         phase: Current phase in the workflow.
@@ -227,7 +227,7 @@ class WorkLifecycle(BaseModel):
         >>> from datetime import datetime, timezone
         >>> event = WorkLifecycle(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     work_type="feature",
+        ...     work_type="story",
         ...     work_id="F9.4",
         ...     event="start",
         ...     phase="design"
@@ -247,7 +247,7 @@ class WorkLifecycle(BaseModel):
 
         >>> blocked = WorkLifecycle(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     work_type="feature",
+        ...     work_type="story",
         ...     work_id="F9.4",
         ...     event="blocked",
         ...     phase="plan",
@@ -259,8 +259,8 @@ class WorkLifecycle(BaseModel):
 
     type: Literal["work_lifecycle"] = "work_lifecycle"
     timestamp: datetime = Field(..., description="When the event occurred (UTC)")
-    work_type: Literal["epic", "feature"] = Field(
-        ..., description="Type of work item (epic, feature)"
+    work_type: Literal["epic", "story"] = Field(
+        ..., description="Type of work item (epic, story)"
     )
     work_id: str = Field(..., description="Work item identifier (e.g., 'E9', 'F9.4')")
     event: Literal["start", "complete", "blocked", "unblocked", "abandoned"] = Field(

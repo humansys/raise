@@ -8,7 +8,7 @@ import pytest
 from raise_cli.governance.models import ConceptType
 from raise_cli.governance.parsers.epic import (
     extract_epic_details,
-    extract_features,
+    extract_stories,
 )
 
 
@@ -180,76 +180,76 @@ class TestExtractEpicDetails:
 
 
 class TestExtractFeatures:
-    """Tests for extract_features function."""
+    """Tests for extract_stories function."""
 
     def test_extract_all_features(self, tmp_epic_file: Path) -> None:
         """Should extract all features from table."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
         assert len(features) == 4
 
     def test_feature_type(self, tmp_epic_file: Path) -> None:
         """Should have FEATURE concept type."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
-        assert all(f.type == ConceptType.FEATURE for f in features)
+        assert all(f.type == ConceptType.STORY for f in features)
 
-    def test_feature_ids(self, tmp_epic_file: Path) -> None:
+    def test_story_ids(self, tmp_epic_file: Path) -> None:
         """Should generate correct feature IDs."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
         ids = [f.id for f in features]
-        assert "feature-f8-1" in ids
-        assert "feature-f8-2" in ids
-        assert "feature-f8-3" in ids
-        assert "feature-f8-4" in ids
+        assert "story-f8-1" in ids
+        assert "story-f8-2" in ids
+        assert "story-f8-3" in ids
+        assert "story-f8-4" in ids
 
     def test_feature_names(self, tmp_epic_file: Path) -> None:
         """Should extract feature names without bold markers."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
-        f2 = next(f for f in features if f.id == "feature-f8-2")
+        f2 = next(f for f in features if f.id == "story-f8-2")
         assert f2.metadata["name"] == "Epic Parser"
 
     def test_feature_status_normalization(self, tmp_epic_file: Path) -> None:
         """Should normalize feature statuses."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
-        f1 = next(f for f in features if f.id == "feature-f8-1")
+        f1 = next(f for f in features if f.id == "story-f8-1")
         assert f1.metadata["status"] == "pending"
 
-        f4 = next(f for f in features if f.id == "feature-f8-4")
+        f4 = next(f for f in features if f.id == "story-f8-4")
         assert f4.metadata["status"] == "complete"
 
     def test_feature_size(self, tmp_epic_file: Path) -> None:
         """Should extract feature size."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
-        f1 = next(f for f in features if f.id == "feature-f8-1")
+        f1 = next(f for f in features if f.id == "story-f8-1")
         assert f1.metadata["size"] == "S"
 
-        f3 = next(f for f in features if f.id == "feature-f8-3")
+        f3 = next(f for f in features if f.id == "story-f8-3")
         assert f3.metadata["size"] == "M"
 
     def test_feature_epic_id(self, tmp_epic_file: Path) -> None:
         """Should include epic_id for relationship inference."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
         for feature in features:
             assert feature.metadata["epic_id"] == "E8"
 
     def test_feature_section(self, tmp_epic_file: Path) -> None:
         """Should have correct section format."""
-        features = extract_features(tmp_epic_file)
+        features = extract_stories(tmp_epic_file)
 
-        f1 = next(f for f in features if f.id == "feature-f8-1")
+        f1 = next(f for f in features if f.id == "story-f8-1")
         assert f1.section == "F8.1: Backlog Parser"
 
     def test_missing_file_returns_empty(self, tmp_path: Path) -> None:
         """Should return empty list for missing file."""
         missing_file = tmp_path / "missing.md"
 
-        features = extract_features(missing_file)
+        features = extract_stories(missing_file)
 
         assert features == []
 
@@ -271,11 +271,11 @@ class TestExtractFeatures:
         epic_file.parent.mkdir(parents=True, exist_ok=True)
         epic_file.write_text(epic_content)
 
-        features = extract_features(epic_file)
+        features = extract_stories(epic_file)
 
         assert len(features) == 2
 
-        f1 = next(f for f in features if f.id == "feature-f2-1")
+        f1 = next(f for f in features if f.id == "story-f2-1")
         assert f1.metadata["sp"] == 3
         assert f1.metadata["status"] == "complete"
 
@@ -283,7 +283,7 @@ class TestExtractFeatures:
         """Should calculate correct relative file path."""
         # tmp_path / work / epics / e08-backlog / scope.md -> project_root is 4 levels up
         project_root = tmp_epic_file.parent.parent.parent.parent
-        features = extract_features(tmp_epic_file, project_root)
+        features = extract_stories(tmp_epic_file, project_root)
 
         for feature in features:
             assert feature.file == "work/epics/e08-backlog/scope.md"
@@ -307,20 +307,20 @@ class TestIntegrationWithRealEpics:
         assert epic.metadata["epic_id"] == "E3"
         assert "Identity" in epic.metadata["name"]
 
-    def test_extract_features_from_real_e3(self) -> None:
+    def test_extract_stories_from_real_e3(self) -> None:
         """Should extract features from real E3 scope."""
         scope_path = Path("work/epics/e03-identity/scope.md")
 
         if not scope_path.exists():
             pytest.skip("Real epic scope file not found")
 
-        features = extract_features(scope_path)
+        features = extract_stories(scope_path)
 
         # E3 has 5 features (F3.1-F3.5)
         assert len(features) >= 4
 
-        feature_ids = {f.metadata["feature_id"] for f in features}
-        assert "F3.1" in feature_ids
+        story_ids = {f.metadata["story_id"] for f in features}
+        assert "F3.1" in story_ids
 
     def test_extract_all_real_epics(self) -> None:
         """Should extract details from all real epic scopes."""

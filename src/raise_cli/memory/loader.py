@@ -77,35 +77,36 @@ def load_calibration(
     Returns:
         MemoryConcept for the calibration.
     """
-    # Handle schema variations for name and feature fields
+    # Handle schema variations for name and story fields
     name = data.get("name") or data.get("feature_name", "unknown")
-    feature = data.get("feature") or data.get("feature_id", "unknown")
+    # Backward compat: try "story" (new), then "feature" (old data)
+    story = data.get("story") or data.get("feature") or data.get("story_id", "unknown")
     # Handle date field variations: 'created' or 'date'
     date_str = data.get("created") or data.get("date", "")
     # Handle velocity field variations: 'ratio' or 'velocity'
     velocity = data.get("ratio") or data.get("velocity")
 
     # Build content summary from calibration data
-    content_parts = [f"{name} ({feature})"]
+    content_parts = [f"{name} ({story})"]
     if data.get("actual_min"):
         content_parts.append(f"actual: {data['actual_min']}min")
     if velocity:
         content_parts.append(f"velocity: {velocity}x")
     content = " - ".join(content_parts)
 
-    # Build context from feature and size
-    context = [feature, data["size"].lower()]
+    # Build context from story and size
+    context = [story, data["size"].lower()]
     if data.get("kata_cycle"):
         context.append("kata-cycle")
 
     return MemoryConcept(
-        id=data.get("id") or data.get("feature_id", "unknown"),
+        id=data.get("id") or data.get("story_id", "unknown"),
         type=MemoryConceptType.CALIBRATION,
         content=content,
         context=context,
         created=parse_date(date_str),
         metadata={
-            "feature": feature,
+            "story": story,
             "name": name,
             "size": data["size"],
             "sp": data.get("sp"),

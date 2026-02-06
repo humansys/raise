@@ -642,7 +642,7 @@ class TestMemoryAddSessionCommand:
                 [
                     "memory", "add-session", "Feature work",
                     "-o", "Task 1 done,Task 2 done,Task 3 done",
-                    "-t", "feature",
+                    "-t", "story",
                 ],
             )
 
@@ -666,12 +666,12 @@ class TestMemoryEmitWorkCommand:
 
             result = runner.invoke(
                 app,
-                ["memory", "emit-work", "feature", "F1.1", "-e", "start", "-p", "design"],
+                ["memory", "emit-work", "story", "F1.1", "-e", "start", "-p", "design"],
             )
 
             assert result.exit_code == 0
             assert "started" in result.stdout
-            assert "Feature F1.1" in result.stdout
+            assert "Story F1.1" in result.stdout
         finally:
             os.chdir(original_cwd)
 
@@ -705,7 +705,7 @@ class TestMemoryEmitWorkCommand:
             result = runner.invoke(
                 app,
                 [
-                    "memory", "emit-work", "feature", "F1.2",
+                    "memory", "emit-work", "story", "F1.2",
                     "-e", "blocked", "-p", "plan", "-b", "waiting for API"
                 ],
             )
@@ -738,7 +738,7 @@ class TestMemoryEmitWorkCommand:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "emit-work", "feature", "F1.1", "-e", "invalid"],
+                ["memory", "emit-work", "story", "F1.1", "-e", "invalid"],
             )
 
             assert result.exit_code == 7
@@ -753,7 +753,7 @@ class TestMemoryEmitWorkCommand:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "emit-work", "feature", "F1.1", "-e", "start", "-p", "invalid"],
+                ["memory", "emit-work", "story", "F1.1", "-e", "start", "-p", "invalid"],
             )
 
             assert result.exit_code == 7
@@ -775,7 +775,7 @@ class TestMemoryEmitSessionCommand:
 
             result = runner.invoke(
                 app,
-                ["memory", "emit-session", "-t", "feature", "-o", "success"],
+                ["memory", "emit-session", "-t", "story", "-o", "success"],
             )
 
             assert result.exit_code == 0

@@ -42,11 +42,11 @@ class TestScaffoldSkill:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = scaffold_skill("feature-test", after="feature-start")
+        result = scaffold_skill("feature-test", after="story-start")
 
         assert result.created
         content = (skills / "feature-test" / "SKILL.md").read_text()
-        assert "feature-start" in content
+        assert "story-start" in content
 
     def test_scaffold_with_next(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Scaffold uses specified next skill."""
@@ -54,11 +54,11 @@ class TestScaffoldSkill:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = scaffold_skill("feature-test", before="feature-close")
+        result = scaffold_skill("feature-test", before="story-close")
 
         assert result.created
         content = (skills / "feature-test" / "SKILL.md").read_text()
-        assert "feature-close" in content
+        assert "story-close" in content
 
     def test_scaffold_infers_lifecycle_from_name(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Scaffold infers lifecycle from skill name domain."""

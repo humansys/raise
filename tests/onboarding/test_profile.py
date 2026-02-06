@@ -171,7 +171,7 @@ class TestDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "feature-plan"],
+            skills_mastered=["session-start", "story-plan"],
             universal_patterns=["Commit after each task"],
             
             first_session=date(2026, 2, 1),
@@ -343,7 +343,7 @@ class TestSaveDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "feature-plan"],
+            skills_mastered=["session-start", "story-plan"],
             universal_patterns=["Commit after each task"],
             
             first_session=date(2026, 2, 1),
