@@ -146,13 +146,15 @@ def _format_drift_json(
 ) -> None:
     """Format drift result as JSON."""
     _console.print_json(
-        json.dumps({
-            "status": "drift" if warnings else "clean",
-            "warnings": [w.model_dump() for w in warnings],
-            "warning_count": len(warnings),
-            "files_scanned": files_scanned,
-            "symbols_checked": symbols_checked,
-        })
+        json.dumps(
+            {
+                "status": "drift" if warnings else "clean",
+                "warnings": [w.model_dump() for w in warnings],
+                "warning_count": len(warnings),
+                "files_scanned": files_scanned,
+                "symbols_checked": symbols_checked,
+            }
+        )
     )
 
 
@@ -209,8 +211,7 @@ def _format_drift_human(
         _console.print()
 
     _console.print(
-        f"[dim]Scanned {files_scanned} files, "
-        f"checked {symbols_checked} symbols[/dim]"
+        f"[dim]Scanned {files_scanned} files, checked {symbols_checked} symbols[/dim]"
     )
 
 
@@ -240,15 +241,24 @@ def format_build_result(
     """
     if output_format == "json":
         _format_build_json(
-            input_path, graph_path, component_count,
-            components_in_graph, node_count, edge_count,
+            input_path,
+            graph_path,
+            component_count,
+            components_in_graph,
+            node_count,
+            edge_count,
         )
     elif output_format == "summary":
         _format_build_summary(components_in_graph, node_count, edge_count)
     else:
         _format_build_human(
-            input_path, graph_path, components_in_graph,
-            node_count, edge_count, categories, sample_components,
+            input_path,
+            graph_path,
+            components_in_graph,
+            node_count,
+            edge_count,
+            categories,
+            sample_components,
         )
 
 

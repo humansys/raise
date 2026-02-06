@@ -63,7 +63,7 @@ def parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
         raise ParseError("No YAML frontmatter found")
 
     yaml_content = match.group(1)
-    body = content[match.end():]
+    body = content[match.end() :]
 
     # Parse YAML
     frontmatter: dict[str, Any] = {}

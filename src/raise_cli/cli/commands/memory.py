@@ -183,9 +183,7 @@ def query(
     result = engine.query(unified_query)
 
     # Format output
-    output_text = (
-        _format_json(result) if format == "json" else _format_markdown(result)
-    )
+    output_text = _format_json(result) if format == "json" else _format_markdown(result)
 
     # Write to file or stdout
     if output:
@@ -784,7 +782,9 @@ def add_pattern(
     ] = "project",
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
+        typer.Option(
+            "--memory-dir", "-m", help="Memory directory path (overrides scope)"
+        ),
     ] = None,
 ) -> None:
     """Add a new pattern to memory.
@@ -892,7 +892,9 @@ def add_calibration_cmd(
     ] = "project",
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
+        typer.Option(
+            "--memory-dir", "-m", help="Memory directory path (overrides scope)"
+        ),
     ] = None,
 ) -> None:
     """Add calibration data for a completed feature.
@@ -1043,7 +1045,9 @@ def emit_work(
     event_type: Annotated[
         str,
         typer.Option(
-            "--event", "-e", help="Event type (start, complete, blocked, unblocked, abandoned)"
+            "--event",
+            "-e",
+            help="Event type (start, complete, blocked, unblocked, abandoned)",
         ),
     ] = "start",
     phase: Annotated[
@@ -1052,7 +1056,9 @@ def emit_work(
     ] = "design",
     blocker: Annotated[
         str,
-        typer.Option("--blocker", "-b", help="Blocker description (for blocked events)"),
+        typer.Option(
+            "--blocker", "-b", help="Blocker description (for blocked events)"
+        ),
     ] = "",
 ) -> None:
     """Emit a work lifecycle event for Lean flow analysis.
@@ -1098,7 +1104,9 @@ def emit_work(
         )
 
     # Validate event type
-    valid_events: list[Literal["start", "complete", "blocked", "unblocked", "abandoned"]] = [
+    valid_events: list[
+        Literal["start", "complete", "blocked", "unblocked", "abandoned"]
+    ] = [
         "start",
         "complete",
         "blocked",
@@ -1130,7 +1138,9 @@ def emit_work(
     # Blocker is required for blocked events
     blocker_value = blocker if blocker else None
     if event_type == "blocked" and not blocker_value:
-        console.print("[yellow]Warning:[/yellow] No blocker description provided for blocked event")
+        console.print(
+            "[yellow]Warning:[/yellow] No blocker description provided for blocked event"
+        )
 
     # Create event
     lifecycle_event = WorkLifecycle(

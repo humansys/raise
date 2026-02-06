@@ -12,7 +12,9 @@ from raise_cli.core.text import sanitize_id
 from raise_cli.governance.models import Concept, ConceptType
 
 
-def extract_outcomes(file_path: Path, project_root: Path | None = None) -> list[Concept]:
+def extract_outcomes(
+    file_path: Path, project_root: Path | None = None
+) -> list[Concept]:
     """Extract outcomes from Vision markdown tables.
 
     Parses Vision markdown files looking for tables with bold outcome names

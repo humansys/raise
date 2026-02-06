@@ -114,21 +114,27 @@ class UnifiedGraphBuilder:
         global_dir = get_global_rai_dir()
         if global_dir.exists():
             nodes.extend(
-                self._load_memory_from_dir(global_dir, MemoryScope.GLOBAL, sessions=False)
+                self._load_memory_from_dir(
+                    global_dir, MemoryScope.GLOBAL, sessions=False
+                )
             )
 
         # 2. Load from project directory (.raise/rai/memory/)
         project_dir = get_memory_dir(self.project_root)
         if project_dir.exists():
             nodes.extend(
-                self._load_memory_from_dir(project_dir, MemoryScope.PROJECT, sessions=False)
+                self._load_memory_from_dir(
+                    project_dir, MemoryScope.PROJECT, sessions=False
+                )
             )
 
         # 3. Load from personal directory (.raise/rai/personal/)
         personal_dir = get_personal_dir(self.project_root)
         if personal_dir.exists():
             nodes.extend(
-                self._load_memory_from_dir(personal_dir, MemoryScope.PERSONAL, sessions=True)
+                self._load_memory_from_dir(
+                    personal_dir, MemoryScope.PERSONAL, sessions=True
+                )
             )
 
         # Apply precedence: personal > project > global
@@ -170,9 +176,7 @@ class UnifiedGraphBuilder:
 
         return nodes
 
-    def _deduplicate_by_precedence(
-        self, nodes: list[ConceptNode]
-    ) -> list[ConceptNode]:
+    def _deduplicate_by_precedence(self, nodes: list[ConceptNode]) -> list[ConceptNode]:
         """Deduplicate nodes by ID using scope precedence.
 
         When the same ID appears in multiple tiers, keep only the
@@ -250,12 +254,16 @@ class UnifiedGraphBuilder:
         Returns:
             List of ConceptNode for component concepts.
         """
-        validated_file = self.project_root / "work" / "discovery" / "components-validated.json"
+        validated_file = (
+            self.project_root / "work" / "discovery" / "components-validated.json"
+        )
         if not validated_file.exists():
             return []
 
         try:
-            data: dict[str, Any] = json.loads(validated_file.read_text(encoding="utf-8"))
+            data: dict[str, Any] = json.loads(
+                validated_file.read_text(encoding="utf-8")
+            )
             components_list: list[dict[str, Any]] = data.get("components", [])
 
             nodes: list[ConceptNode] = []

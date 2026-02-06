@@ -13,7 +13,13 @@ from pathlib import Path
 from raise_cli.core.files import EXCLUDED_DIRS, should_exclude_dir
 
 # Re-export for backward compatibility
-__all__ = ["CODE_EXTENSIONS", "EXCLUDED_DIRS", "ProjectType", "DetectionResult", "detect_project_type"]
+__all__ = [
+    "CODE_EXTENSIONS",
+    "EXCLUDED_DIRS",
+    "ProjectType",
+    "DetectionResult",
+    "detect_project_type",
+]
 
 # Common code file extensions to detect
 CODE_EXTENSIONS: frozenset[str] = frozenset(

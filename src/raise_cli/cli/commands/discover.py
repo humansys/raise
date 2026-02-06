@@ -315,12 +315,14 @@ def drift_command(
     if not baseline_file.exists():
         if output == "json":
             console.print_json(
-                json.dumps({
-                    "status": "no_baseline",
-                    "warnings": [],
-                    "warning_count": 0,
-                    "message": "No baseline components found",
-                })
+                json.dumps(
+                    {
+                        "status": "no_baseline",
+                        "warnings": [],
+                        "warning_count": 0,
+                        "message": "No baseline components found",
+                    }
+                )
             )
         else:
             console.print(
@@ -336,21 +338,21 @@ def drift_command(
             baseline_file.read_text(encoding="utf-8")
         )
         baseline_dicts: list[dict[str, Any]] = baseline_data.get("components", [])
-        baseline = [
-            BaselineComponent.model_validate(comp) for comp in baseline_dicts
-        ]
+        baseline = [BaselineComponent.model_validate(comp) for comp in baseline_dicts]
     except (json.JSONDecodeError, KeyError) as e:
         cli_error(f"Error reading baseline: {e}")
 
     if not baseline:
         if output == "json":
             console.print_json(
-                json.dumps({
-                    "status": "empty_baseline",
-                    "warnings": [],
-                    "warning_count": 0,
-                    "message": "Baseline has no components",
-                })
+                json.dumps(
+                    {
+                        "status": "empty_baseline",
+                        "warnings": [],
+                        "warning_count": 0,
+                        "message": "Baseline has no components",
+                    }
+                )
             )
         else:
             console.print(
@@ -373,12 +375,14 @@ def drift_command(
     if not scan_path.exists():
         if output == "json":
             console.print_json(
-                json.dumps({
-                    "status": "no_source",
-                    "warnings": [],
-                    "warning_count": 0,
-                    "message": f"Scan path not found: {scan_path}",
-                })
+                json.dumps(
+                    {
+                        "status": "no_source",
+                        "warnings": [],
+                        "warning_count": 0,
+                        "message": f"Scan path not found: {scan_path}",
+                    }
+                )
             )
         else:
             console.print(f"[yellow]Scan path not found: {scan_path}[/yellow]")
