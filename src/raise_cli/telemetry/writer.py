@@ -1,10 +1,12 @@
 """Writer module for appending telemetry signals to JSONL.
 
 This module provides the `emit()` function to append signals to
-`.raise/rai/telemetry/signals.jsonl` as specified in ADR-018.
+`.raise/rai/personal/telemetry/signals.jsonl` (gitignored, per-developer).
 
 Signals are written as JSON lines (one JSON object per line),
 which is append-friendly and git-friendly.
+
+Note: Telemetry is personal data (F14.15) and should not be committed.
 """
 
 from __future__ import annotations
@@ -15,7 +17,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-from raise_cli.config.paths import SIGNALS_FILE, get_telemetry_dir
+from raise_cli.config.paths import SIGNALS_FILE, TELEMETRY_SUBDIR, get_personal_dir
 
 if TYPE_CHECKING:
     from raise_cli.telemetry.schemas import Signal
@@ -40,15 +42,18 @@ class EmitResult:
 
 
 def _get_telemetry_path(base_path: Path | None = None) -> Path:
-    """Get the path to the signals.jsonl file.
+    """Get the path to the signals.jsonl file in personal directory.
+
+    Telemetry is personal data (per-developer, gitignored) per F14.15.
+    Path: .raise/rai/personal/telemetry/signals.jsonl
 
     Args:
-        base_path: Base directory for telemetry. Defaults to current directory.
+        base_path: Project root directory. Defaults to current directory.
 
     Returns:
-        Path to signals.jsonl file.
+        Path to signals.jsonl file in personal directory.
     """
-    return get_telemetry_dir(base_path) / SIGNALS_FILE
+    return get_personal_dir(base_path) / TELEMETRY_SUBDIR / SIGNALS_FILE
 
 
 def _ensure_directory(path: Path) -> None:
@@ -67,9 +72,9 @@ def emit(
 ) -> EmitResult:
     """Emit a telemetry signal to the signals.jsonl file.
 
-    Appends the signal as a JSON line to `.raise/rai/telemetry/signals.jsonl`.
+    Appends the signal as a JSON line to `.raise/rai/personal/telemetry/signals.jsonl`.
     Creates the directory if it doesn't exist. Uses file locking for
-    thread-safe writes.
+    thread-safe writes. Telemetry is personal data (gitignored).
 
     Args:
         signal: The signal to emit (any of the 5 signal types).
