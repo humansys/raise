@@ -127,3 +127,147 @@ class TestSkillList:
         result = runner.invoke(app, ["skill", "list"])
         assert result.exit_code == 0
         assert "No skills found" in result.stdout or "0" in result.stdout
+
+
+@pytest.fixture
+def valid_skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    """Create a temporary project with valid skills (including required sections)."""
+    skills = tmp_path / ".claude" / "skills"
+    skills.mkdir(parents=True)
+
+    # Create valid session-start skill
+    session_start = skills / "session-start"
+    session_start.mkdir()
+    (session_start / "SKILL.md").write_text(dedent("""\
+        ---
+        name: session-start
+        description: Begin a session by loading memory
+        metadata:
+          raise.work_cycle: session
+          raise.version: "3.0.0"
+        ---
+        # Session Start
+
+        ## Purpose
+
+        Load context and propose work.
+
+        ## Context
+
+        When to use this skill.
+
+        ## Steps (1)
+
+        Do the thing.
+
+        ## Output
+
+        What this produces.
+    """))
+
+    monkeypatch.chdir(tmp_path)
+    return tmp_path
+
+
+class TestSkillValidate:
+    """Tests for raise skill validate command."""
+
+    def test_validate_all_skills(self, valid_skill_project: Path) -> None:
+        """Validate all skills in skill directory."""
+        result = runner.invoke(app, ["skill", "validate"])
+        assert result.exit_code == 0
+        assert "valid" in result.stdout.lower()
+
+    def test_validate_specific_file(self, valid_skill_project: Path) -> None:
+        """Validate a specific skill file."""
+        skill_path = valid_skill_project / ".claude" / "skills" / "session-start" / "SKILL.md"
+        result = runner.invoke(app, ["skill", "validate", str(skill_path)])
+        assert result.exit_code == 0
+        # Check for success indicators (path may be wrapped by Rich)
+        assert "valid" in result.stdout.lower() or "passed" in result.stdout.lower()
+
+    def test_validate_specific_dir(self, valid_skill_project: Path) -> None:
+        """Validate a skill directory (looks for SKILL.md)."""
+        skill_dir = valid_skill_project / ".claude" / "skills" / "session-start"
+        result = runner.invoke(app, ["skill", "validate", str(skill_dir)])
+        assert result.exit_code == 0
+
+    def test_validate_invalid_skill(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Invalid skill returns exit code 1."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+
+        # Create invalid skill (missing metadata)
+        bad_skill = skills / "bad-skill"
+        bad_skill.mkdir()
+        (bad_skill / "SKILL.md").write_text(dedent("""\
+            ---
+            name: bad-skill
+            description: Missing metadata
+            ---
+            # Bad Skill
+
+            No sections.
+        """))
+
+        monkeypatch.chdir(tmp_path)
+        result = runner.invoke(app, ["skill", "validate"])
+        assert result.exit_code == 1
+        assert "error" in result.stdout.lower() or "✗" in result.stdout
+
+    def test_validate_json_output(self, valid_skill_project: Path) -> None:
+        """Validate with JSON output format."""
+        result = runner.invoke(app, ["skill", "validate", "--format", "json"])
+        assert result.exit_code == 0
+        data = json.loads(result.stdout)
+        assert "results" in data
+        assert "all_valid" in data
+        assert data["all_valid"] is True
+
+    def test_validate_nonexistent_path(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Handle nonexistent path."""
+        monkeypatch.chdir(tmp_path)
+        result = runner.invoke(app, ["skill", "validate", "/nonexistent/path"])
+        assert result.exit_code == 1
+        assert "not found" in result.stdout.lower()
+
+    def test_validate_shows_warnings(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Warnings are displayed (e.g., naming convention)."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+
+        # Create skill with bad naming (missing hyphen)
+        bad_name = skills / "badname"
+        bad_name.mkdir()
+        (bad_name / "SKILL.md").write_text(dedent("""\
+            ---
+            name: badname
+            description: Skill with bad name
+            metadata:
+              raise.work_cycle: utility
+              raise.version: "1.0.0"
+            ---
+            # Badname
+
+            ## Purpose
+
+            Test.
+
+            ## Context
+
+            Test.
+
+            ## Steps (1)
+
+            Test.
+
+            ## Output
+
+            Test.
+        """))
+
+        monkeypatch.chdir(tmp_path)
+        result = runner.invoke(app, ["skill", "validate"])
+        # Valid but with warnings
+        assert result.exit_code == 0
+        assert "warning" in result.stdout.lower() or "⚠" in result.stdout
