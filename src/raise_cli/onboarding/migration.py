@@ -151,8 +151,8 @@ def migrate_emilio_profile(
     memory_path = get_memory_dir(project_path)
     sessions_path = memory_path / "sessions" / "index.jsonl"
 
-    # Extract session statistics
-    sessions_total, first_session, last_session = _extract_sessions_data(sessions_path)
+    # Extract session statistics (sessions_total now derived from index)
+    _, first_session, last_session = _extract_sessions_data(sessions_path)
 
     # Extract skills from session history
     skills_mastered = _extract_skills_from_sessions(sessions_path)
@@ -186,7 +186,6 @@ def migrate_emilio_profile(
         communication=communication,
         skills_mastered=skills_mastered,
         universal_patterns=universal_patterns,
-        sessions_total=sessions_total,
         first_session=first_session,
         last_session=last_session,
         projects=[str(project_path)],

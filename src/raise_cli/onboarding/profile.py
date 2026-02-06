@@ -109,7 +109,6 @@ class DeveloperProfile(BaseModel):
         communication: Communication style preferences.
         skills_mastered: List of skill names the developer has mastered.
         universal_patterns: Patterns that apply across all projects.
-        sessions_total: Total sessions across all projects.
         first_session: Date of first RaiSE session.
         last_session: Date of most recent session.
         projects: List of project paths worked on.
@@ -123,7 +122,6 @@ class DeveloperProfile(BaseModel):
     )
     skills_mastered: list[str] = Field(default_factory=list)
     universal_patterns: list[str] = Field(default_factory=list)
-    sessions_total: int = 0
     first_session: date | None = None
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
@@ -198,20 +196,21 @@ def save_developer_profile(profile: DeveloperProfile) -> None:
 def increment_session(
     profile: DeveloperProfile, project_path: str | None = None
 ) -> DeveloperProfile:
-    """Increment session count and update session metadata.
+    """Update session metadata (last_session date and projects list).
 
     Pure function that returns a new profile instance without modifying
     the original. Does NOT persist to disk - caller is responsible for saving.
+
+    Note: Session count is derived from sessions/index.jsonl, not tracked here.
 
     Args:
         profile: The developer profile to update.
         project_path: Optional project path to add to projects list.
 
     Returns:
-        Updated profile with incremented session count.
+        Updated profile with session metadata.
     """
     updates: dict[str, object] = {
-        "sessions_total": profile.sessions_total + 1,
         "last_session": date.today(),
     }
 
