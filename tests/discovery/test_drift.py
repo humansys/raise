@@ -6,8 +6,6 @@ and established component patterns.
 
 from __future__ import annotations
 
-import pytest
-
 from raise_cli.discovery.drift import (
     BaselineComponent,
     BaselineComponentMetadata,

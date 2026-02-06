@@ -16,7 +16,6 @@ from raise_cli.context.query import (
     UnifiedQueryStrategy,
 )
 
-
 # --- Fixtures ---
 
 

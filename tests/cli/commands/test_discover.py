@@ -6,7 +6,6 @@ import json
 from pathlib import Path
 from textwrap import dedent
 
-import pytest
 from typer.testing import CliRunner
 
 from raise_cli.cli.main import app
