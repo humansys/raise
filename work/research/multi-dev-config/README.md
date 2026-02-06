@@ -18,7 +18,9 @@ How do AI coding assistants handle personal vs shared configuration in multi-dev
 
 **Key pattern:** Personal files are gitignored by default, not moved to a separate location.
 
-**Recommendation:** Adopt the **Claude Code pattern** — keep personal data in `.raise/rai/personal/` (gitignored) rather than moving to `~/.rai/projects/{hash}/`. Simpler, proven, lower migration complexity.
+**Initial Recommendation:** Adopt the **Claude Code pattern** — keep personal data in `.raise/rai/personal/` (gitignored).
+
+**Final Decision:** Expand to **three-tier architecture** with global developer identity in `~/.rai/` for cross-repo continuity. See RES-MULTIDEV-002 for memory system impact.
 
 ## Tool Analysis
 
@@ -113,6 +115,10 @@ Instead of `~/.rai/projects/{hash}/`, adopt the simpler in-place gitignore patte
 - Industry-standard pattern
 - No hash management
 - Easier debugging (files are where you expect)
+
+## Related Research
+
+- **RES-MULTIDEV-002:** Memory system impact analysis → `memory-impact/README.md`
 
 ## References
 
