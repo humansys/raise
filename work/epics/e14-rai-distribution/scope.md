@@ -348,6 +348,7 @@ Buffer for fixes
 
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
+| F14.0 DX Quality Gate | M | ✅ Done | ~6 sessions | — | -5200 lines, graph consolidated |
 | F14.1 Base Identity | S | Pending | — | — | |
 | F14.2 Base Patterns | M | Pending | — | — | |
 | F14.3 Methodology | S | Pending | — | — | |
