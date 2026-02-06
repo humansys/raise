@@ -8,27 +8,11 @@
 
 ## Urgent
 
-- [ ] **E14: Rai Distribution** — How new users "meet" Rai (CRITICAL for DX)
-  - **Scope draft:** `dev/epic-e14-scope.md` (2026-02-05)
-  - **The gap:** Users get CLI + skills, but NOT Rai as entity
-  - **Research needed:**
-    - What's "base Rai" vs "personal Rai"?
-    - Which patterns are universal (methodology) vs accumulated (relationship)?
-    - How do other AI tools handle personality/identity distribution?
-    - What's the minimum viable first-contact experience?
-  - **Design needed:**
-    - What ships in package (starter identity, base patterns)?
-    - How does first `/session-start` initialize Rai?
-    - How does personal Rai diverge over time?
-    - How do "base Rai" updates propagate to existing users?
-  - **Critical insight (PAT-095):** Base Rai must have internalized framework knowledge:
-    - Full skills list and when to use each
-    - Lifecycle gates (epic-close before merge, etc.)
-    - Process rules (TDD, commit after task, etc.)
-    - Users shouldn't have to remember; Rai guides
-  - **Priority:** P0 for post-F&F — crucial for public launch DX
-  - **Workaround for F&F:** Manually seed test profile with starter patterns
-  - **See:** ADR-013 (Rai as Entity), E7 onboarding discussion (2026-02-05)
+- [x] ~~**E14: Rai Distribution**~~ **PROMOTED TO ACTIVE EPIC** (2026-02-05)
+  - **Scope:** `dev/epic-e14-scope.md`
+  - **Branch:** `epic/e14/rai-distribution`
+  - **Research:** `work/research/rai-distribution/` (complete)
+  - **ADR:** ADR-022 (distribution architecture)
 
 - [x] **F&F Readiness (Feb 9)** — See `governance/projects/raise-cli/backlog.md` §4
   - [x] README update (v2 structure) — Done 2026-02-02
@@ -60,6 +44,26 @@
 
 ### Framework Improvements
 
+- [ ] **Stale terminology grep as rename gate** — (Ishikawa analysis, 2026-02-06)
+  - S14.16 declared complete with 21 files still containing "feature" remnants (PAT-151)
+  - Root cause: verification was behavioral (tests pass) not lexical (no stale terms)
+  - **Countermeasure:** Add `grep -ri "<old_term>"` as mandatory final gate for rename stories
+  - Consider: automated `raise lint terms` command that checks against glossary
+  - Priority: Add to rename story template now; automated linter post-F&F
+
+- [ ] **Add graph-rebuild to /story-close when Pydantic models change** — (S14.16 retro, 2026-02-06)
+  - Schema Literal changes invalidate cached unified graph (PAT-152)
+  - Stale `unified.json` breaks `raise memory query` with ValidationError
+  - Consider: auto-detect model changes via git diff, or add optional flag to /story-close
+
+- [ ] **Session-start continuity improvement** — (2026-02-05)
+  - **Problem:** Output focuses on backlog-oriented memory query results, lacks continuity from last session
+  - **Observed:** Memory query "session epic patterns" returns deferred features (E9, E10) not previous session outcomes
+  - **Expected:** Surface last session's outcomes (SES-069: `session command`, `memory emit`, etc.) and clear next action
+  - **Current workaround:** CLAUDE.local.md "Next" field provides focus, but session index (SES-069) not surfaced
+  - **Fix:** Query session index for last session outcomes, present as "Last session" → "Continue with" flow
+  - **Priority:** Post-F&F polish
+
 - [ ] **System Open Ends Audit** — (Post-E14, 2026-02-05)
   - **Trigger:** Found 22 stale branches because no cleanup in lifecycle skills
   - **Goal:** Systematic review to find similar "open ends" in RaiSE system
@@ -73,13 +77,13 @@
   - **Priority:** Post-E14, before V3 complexity increase
   - **Pattern:** PAT-096 — Periodic system hygiene audits catch drift before accumulation
 
-- [ ] **Parallel task execution in /feature-implement** — (F7.7 discussion, 2026-02-05)
+- [ ] **Parallel task execution in /story-implement** — (F7.7 discussion, 2026-02-05)
   - When tasks have no dependencies, allow spawning subagents in parallel
   - Combined HITL checkpoint after parallel tasks complete
   - Pattern: identify independent tasks in plan → spawn parallel → converge → continue sequential
 
 - [ ] **Separation of Builder and Verifier (Lean Quality)** — (F7.2 discussion, 2026-02-05)
-  - **Problem:** Self-review checklists in skills (e.g., /feature-design Step 8) have builder verifying own work = muda
+  - **Problem:** Self-review checklists in skills (e.g., /story-design Step 8) have builder verifying own work = muda
   - **Lean principle:** TPS separates production from quality inspection. Jidoka catches defects, but verification is external.
   - **Possible approaches:**
     1. **Quality Gate Subagent** — Different Rai prompt focused on critical review, not building
@@ -93,7 +97,7 @@
 - [ ] **Component catalog extraction** — Extract `dev/components.md` into graph (deferred from E12, nice-to-have)
 - [ ] **Session-aware context loading** — Skip redundant queries in same session (deferred from E12, optimization — re-querying is <1ms)
 - [x] ~~**Epic-close skill** (`/epic-close`)~~ **DONE** — Implemented 2026-02-05, v1.0.0. Includes retrospective, metrics, branch cleanup.
-- [ ] **Feature pre-verification in /feature-start** - Check if feature already implemented before starting work. (F12.6 was already done, 2026-02-04)
+- [ ] **Feature pre-verification in /story-start** - Check if feature already implemented before starting work. (F12.6 was already done, 2026-02-04)
 - [ ] **Memory system improvements** (E12 retrospective, 2026-02-04):
   - Semantic search for queries (keyword brittleness — "testing" misses "type hints")
   - Better calibration query patterns or dedicated report command
@@ -119,11 +123,11 @@
 - [x] ~~**Session Start Skill** (`/session-start`)~~ **RESOLVED** — Already exists at `.claude/skills/session-start/`
   - Loads memory, analyzes progress, proposes session goal
   - Used at start of this session
-- [ ] **Add "test with real data" checkpoint to feature-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
-- [ ] **Add "commit after task" to /feature-implement skill** - Good discipline, enables recovery (F3.3 retro)
-- [ ] **`/feature-start` skill** - Lightweight skill to create feature branch from epic branch with scope commit. Replaces ad-hoc branch creation. (E8 retro, E11 discussion 2026-02-03)
-- [ ] **Branch verification in merge workflow** - Add checklist to /feature-review: verify target branch per CLAUDE.md, check epic branch exists, enforce feature→epic→dev flow. Prevents merging to wrong branch. (E11 F11.3/F11.4 retro, 2026-02-03)
-- [ ] **Epic implement skill (`/epic-implement`)** - Do we need one? Current thinking: probably not, epic implementation IS feature implementation. Alternatives: fold progress tracking into `/feature-review`, add `raise epic status` CLI command, keep `/session-start` as "where am I?" mechanism. (E11 discussion, 2026-02-03)
+- [ ] **Add "test with real data" checkpoint to story-plan kata** - After design validation, verify patterns/rules against real project data (F2.2 retro)
+- [ ] **Add "commit after task" to /story-implement skill** - Good discipline, enables recovery (F3.3 retro)
+- [ ] **`/story-start` skill** - Lightweight skill to create story branch from epic branch with scope commit. Replaces ad-hoc branch creation. (E8 retro, E11 discussion 2026-02-03)
+- [ ] **Branch verification in merge workflow** - Add checklist to /story-review: verify target branch per CLAUDE.md, check epic branch exists, enforce feature→epic→dev flow. Prevents merging to wrong branch. (E11 F11.3/F11.4 retro, 2026-02-03)
+- [ ] **Epic implement skill (`/epic-implement`)** - Do we need one? Current thinking: probably not, epic implementation IS feature implementation. Alternatives: fold progress tracking into `/story-review`, add `raise epic status` CLI command, keep `/session-start` as "where am I?" mechanism. (E11 discussion, 2026-02-03)
 - [ ] **Design revision process** - What happens when a design needs to be updated after initial creation? Should we emit `design revision` signals? How does this affect downstream phases? (F11.1 discussion, 2026-02-03)
 - [ ] **HITL approval before completion signals** - Telemetry "complete" events should only emit AFTER user approval, not when Rai finishes drafting. Update skills to require explicit sign-off before completion telemetry. (F11.1 discussion, 2026-02-03)
 - [ ] **Fix test path convention in plan template** - Plan says `tests/cli/test_*.py` but actual is `tests/cli/commands/test_*.py` (F3.3 retro)
@@ -147,6 +151,16 @@
 - [ ] **Multi-language convention detection** — Python first, TypeScript/JS later
 - [ ] **Auto-progress Shu→Ha→Ri** — Experience level progression (manual for now)
 - [ ] **Communication style preferences** — Full customization (minimal for F&F)
+
+### E14 Rai Distribution — Deferred (V3/Future)
+
+> Items explicitly deferred from E14 scope.
+
+- [ ] **Team/org shared patterns** — Multi-tenant complexity, defer to E10 Collective Intelligence
+- [ ] **Pattern marketplace** — Community feature, future consideration
+- [ ] **Cross-project pattern sync** — Complex state management
+- [ ] **AI-generated base pattern updates** — Keep human-curated for trust/quality
+- [ ] **Progressive reveal intro** — Nice-to-have polish, post-F&F
 
 ### E13 Discovery — Deferred (Post-F&F)
 
@@ -185,7 +199,7 @@
 
 **Phase 3 (Telemetry CLI):**
 - [ ] F9.10 Telemetry Commands — `raise telemetry velocity`, `drift`, `insights`
-- [ ] F9.11 Retro Integration — /feature-review queries telemetry
+- [ ] F9.11 Retro Integration — /story-review queries telemetry
 
 **Also deferred:**
 - [ ] Signal rotation/archival — Handle unbounded growth

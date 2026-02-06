@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-**WHAT is happening:** Skills created in `.claude/skills/feature/*/SKILL.md` return "Unknown skill" when invoked via `/feature-plan` or Skill tool.
+**WHAT is happening:** Skills created in `.claude/skills/feature/*/SKILL.md` return "Unknown skill" when invoked via `/story-plan` or Skill tool.
 
 **WHEN it happens:** When trying to invoke any skill created in nested directory structure.
 
@@ -14,11 +14,11 @@
 
 **Problem:** Skills in `.claude/skills/feature/plan/SKILL.md` not discovered.
 
-1. **Why?** Claude Code's Skill tool reports "Unknown skill: feature-plan"
+1. **Why?** Claude Code's Skill tool reports "Unknown skill: story-plan"
    → Because: The skill directory doesn't exist at the expected path.
 
 2. **Why?** The skill directory doesn't exist at expected path?
-   → Because: Claude Code expects `.claude/skills/feature-plan/SKILL.md` (flat), but we created `.claude/skills/feature/plan/SKILL.md` (nested).
+   → Because: Claude Code expects `.claude/skills/story-plan/SKILL.md` (flat), but we created `.claude/skills/feature/plan/SKILL.md` (nested).
 
 3. **Why?** Did we use nested structure?
    → Because: We organized skills by work_cycle (feature/, tools/, project/) for logical grouping, following kata directory conventions.
@@ -29,7 +29,7 @@
 5. **Why?** Is this a design constraint?
    → Because: Skills are invoked by name (`/skill-name`), and the discovery mechanism maps directory names directly to invocation names.
 
-**Root Cause:** **Directory structure mismatch** - RaiSE used nested organization (feature/plan), but Claude Code expects flat structure (feature-plan).
+**Root Cause:** **Directory structure mismatch** - RaiSE used nested organization (feature/plan), but Claude Code expects flat structure (story-plan).
 
 ## Ishikawa Analysis
 
@@ -69,10 +69,10 @@ DISCOVERED ◄────────┤    ✓ SKILL.md format is correct
 
 | Current (nested) | Required (flat) |
 |-----------------|-----------------|
-| `.claude/skills/feature/design/` | `.claude/skills/feature-design/` |
-| `.claude/skills/feature/plan/` | `.claude/skills/feature-plan/` |
-| `.claude/skills/feature/implement/` | `.claude/skills/feature-implement/` |
-| `.claude/skills/feature/review/` | `.claude/skills/feature-review/` |
+| `.claude/skills/feature/design/` | `.claude/skills/story-design/` |
+| `.claude/skills/feature/plan/` | `.claude/skills/story-plan/` |
+| `.claude/skills/feature/implement/` | `.claude/skills/story-implement/` |
+| `.claude/skills/feature/review/` | `.claude/skills/story-review/` |
 | `.claude/skills/tools/research/` | `.claude/skills/research/` |
 
 ## Prevention
@@ -91,16 +91,16 @@ DISCOVERED ◄────────┤    ✓ SKILL.md format is correct
 
 ```bash
 # Renamed nested to flat
-.claude/skills/feature/design/    → .claude/skills/feature-design/
-.claude/skills/feature/plan/      → .claude/skills/feature-plan/
-.claude/skills/feature/implement/ → .claude/skills/feature-implement/
-.claude/skills/feature/review/    → .claude/skills/feature-review/
+.claude/skills/feature/design/    → .claude/skills/story-design/
+.claude/skills/feature/plan/      → .claude/skills/story-plan/
+.claude/skills/feature/implement/ → .claude/skills/story-implement/
+.claude/skills/feature/review/    → .claude/skills/story-review/
 .claude/skills/tools/research/    → .claude/skills/research/
 ```
 
 ## Verification
 
 After Claude Code restart, test with:
-- `/feature-plan` - Should show skill content
+- `/story-plan` - Should show skill content
 - `/debug` - Should show debug skill
 - `/research` - Should show research skill

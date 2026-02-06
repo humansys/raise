@@ -55,7 +55,7 @@ Zero observability; no metrics or telemetry. Cannot answer: "Does spec-kit actua
 ### US3: As a manager, I want to prove ROI of spec-driven development so I can justify the time investment
 
 **Acceptance Criteria**:
-- [ ] Track: Defects per feature (spec'd vs. non-spec'd)
+- [ ] Track: Defects per story (spec'd vs. non-spec'd)
 - [ ] Measure: Rework hours, review cycles, cycle time
 - [ ] Calculate: ROI (defect cost avoidance - spec overhead)
 - [ ] Dashboard: Real-time ROI metrics
@@ -161,7 +161,7 @@ Compare implementation vs. acceptance criteria.
 Track defects, rework, cycle time; correlate with spec coverage.
 
 **Metrics Collected**:
-- **Defects**: Bugs per feature (from issue tracker)
+- **Defects**: Bugs per story (from issue tracker)
 - **Rework**: Hours spent fixing after initial implementation
 - **Review Cycles**: Number of PR review rounds
 - **Cycle Time**: Time from spec → deployed
@@ -262,7 +262,7 @@ Defect Data + Time Tracking → Statistical Analysis → ROI Report
 ```
 
 **Inputs**:
-- Defect count per feature
+- Defect count per story
 - Hours spent: Spec creation, rework, review
 - Hourly cost (configurable)
 

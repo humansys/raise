@@ -117,7 +117,9 @@ class OutputConsole:
             # Human and table format
             detail_str = ""
             if details:
-                detail_str = " (" + ", ".join(f"{k}: {v}" for k, v in details.items()) + ")"
+                detail_str = (
+                    " (" + ", ".join(f"{k}: {v}" for k, v in details.items()) + ")"
+                )
             if self.color:
                 self._console.print(f"[green]✓[/] {message}{detail_str}")
             else:
@@ -148,15 +150,15 @@ class OutputConsole:
             # Human and table format
             detail_str = ""
             if details:
-                detail_str = " (" + ", ".join(f"{k}: {v}" for k, v in details.items()) + ")"
+                detail_str = (
+                    " (" + ", ".join(f"{k}: {v}" for k, v in details.items()) + ")"
+                )
             if self.color:
                 self._console.print(f"[yellow]⚠[/] {message}{detail_str}")
             else:
                 self._console.print(f"⚠ {message}{detail_str}")
 
-    def print_data(
-        self, data: dict[str, Any], *, title: str | None = None
-    ) -> None:
+    def print_data(self, data: dict[str, Any], *, title: str | None = None) -> None:
         """Print a data structure.
 
         Renders as:

@@ -1988,10 +1988,10 @@
       "source_file": "src/raise_cli/governance/parsers/epic.py",
       "created": "2026-02-04T18:50:00Z",
       "metadata": {
-        "name": "extract_features",
+        "name": "extract_stories",
         "kind": "function",
         "line": 174,
-        "signature": "def extract_features(file_path: Path, project_root: Path | None=None) -> list[Concept]",
+        "signature": "def extract_stories(file_path: Path, project_root: Path | None=None) -> list[Concept]",
         "category": "utility",
         "depends_on": [
           "pathlib.Path"

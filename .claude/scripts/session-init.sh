@@ -6,8 +6,8 @@
 set -e
 
 PROJECT_DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
-IDENTITY_DIR="$PROJECT_DIR/.rai/identity"
-MEMORY_DIR="$PROJECT_DIR/.rai/memory"
+IDENTITY_DIR="$PROJECT_DIR/.raise/rai/identity"
+MEMORY_DIR="$PROJECT_DIR/.raise/rai/memory"
 
 # Preload identity (who I am)
 if [ -d "$IDENTITY_DIR" ]; then

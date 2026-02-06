@@ -366,7 +366,7 @@ Individual spec files for top differentiation features:
 specs/main/research/speckit-critiques/
 ├── critique-taxonomy.md              # D1 (~5-7K words)
 ├── differentiation-strategy.md       # D2 (~4-6K words)
-├── features/                         # D3
+├── stories/                         # D3
 │   ├── feature-001-[name].md
 │   ├── feature-002-[name].md
 │   └── ...
@@ -398,7 +398,7 @@ specs/main/research/speckit-critiques/
 3. **Synthesis phase** (2-3 hours):
    - Write critique taxonomy
    - Formulate differentiation strategy
-   - Create feature specs for top opportunities
+   - Create story specs for top opportunities
 
 4. **Validation**:
    - Check against success criteria

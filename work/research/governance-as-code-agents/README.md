@@ -420,7 +420,7 @@ raise/kata_executor/executor.py           ← Harness (engine)
 - **ADR-007 (Guardrails)**: `.private/decisions/adr-007-guardrails.md`
 - **Governance Bridge**: `specs/main/research/bmad-brownfield-analysis/governance-bridge-spec.md`
 - **Kata Discrepancy Analysis**: `specs/main/research/outputs/kata-command-discrepancy-analysis.md`
-- **Observable Gates Feature**: `specs/main/research/speckit-critiques/features/feature-003-observable-gates.md`
+- **Observable Gates Feature**: `specs/main/research/speckit-critiques/stories/feature-003-observable-gates.md`
 
 ---
 

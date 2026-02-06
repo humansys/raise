@@ -160,7 +160,7 @@ git push origin feature-branch
 
 ## Referencias
 
-- Kata asociada: `.raise/katas/feature/implement.md`
+- Kata asociada: `.raise/katas/story/implement.md`
 - Gate previo: `gate-plan.md`
 - Siguiente: UAT & Deploy (Gate-Deploy)
 - Work Cycles: `framework/reference/work-cycles.md`

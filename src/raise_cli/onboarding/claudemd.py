@@ -86,7 +86,22 @@ class ClaudeMdGenerator:
         conventions: ConventionResult | None,
     ) -> str:
         """Generate CLAUDE.md for brownfield project."""
-        # Project overview
+        self._add_overview_section(lines, detection, conventions)
+        if conventions:
+            self._add_conventions_section(lines, conventions)
+        if conventions and conventions.structure.source_dir:
+            self._add_structure_section(lines, project_name, conventions)
+        self._add_governance_section(lines)
+        self._add_footer(lines)
+        return "\n".join(lines)
+
+    def _add_overview_section(
+        self,
+        lines: list[str],
+        detection: DetectionResult,
+        conventions: ConventionResult | None,
+    ) -> None:
+        """Add project overview section."""
         lines.append("## Project Overview")
         lines.append("")
         lines.append(f"- **Type:** Brownfield ({detection.code_file_count} code files)")
@@ -96,55 +111,58 @@ class ClaudeMdGenerator:
             )
         lines.append("")
 
-        # Conventions section
-        if conventions:
-            lines.append("## Code Conventions")
-            lines.append("")
-            lines.append("Detected conventions for this project:")
-            lines.append("")
+    def _add_conventions_section(
+        self, lines: list[str], conventions: ConventionResult
+    ) -> None:
+        """Add code conventions section with style and naming."""
+        lines.append("## Code Conventions")
+        lines.append("")
+        lines.append("Detected conventions for this project:")
+        lines.append("")
 
-            # Style
-            style = conventions.style
-            lines.append("### Style")
-            lines.append("")
-            if style.indentation.width:
-                lines.append(f"- **Indentation:** {style.indentation.width} spaces")
-            else:
-                lines.append(f"- **Indentation:** {style.indentation.style}")
-            lines.append(f"- **Quotes:** {style.quote_style.style}")
-            lines.append(
-                f"- **Line length:** {style.line_length.max_length} characters"
-            )
-            lines.append("")
+        # Style
+        style = conventions.style
+        lines.append("### Style")
+        lines.append("")
+        if style.indentation.width:
+            lines.append(f"- **Indentation:** {style.indentation.width} spaces")
+        else:
+            lines.append(f"- **Indentation:** {style.indentation.style}")
+        lines.append(f"- **Quotes:** {style.quote_style.style}")
+        lines.append(f"- **Line length:** {style.line_length.max_length} characters")
+        lines.append("")
 
-            # Naming
-            naming = conventions.naming
-            lines.append("### Naming")
-            lines.append("")
-            lines.append(f"- **Functions:** {naming.functions.pattern}")
-            lines.append(f"- **Classes:** {naming.classes.pattern}")
-            lines.append(f"- **Constants:** {naming.constants.pattern}")
-            lines.append("")
+        # Naming
+        naming = conventions.naming
+        lines.append("### Naming")
+        lines.append("")
+        lines.append(f"- **Functions:** {naming.functions.pattern}")
+        lines.append(f"- **Classes:** {naming.classes.pattern}")
+        lines.append(f"- **Constants:** {naming.constants.pattern}")
+        lines.append("")
 
-        # Structure section
-        if conventions and conventions.structure.source_dir:
-            lines.append("## Project Structure")
-            lines.append("")
-            structure = conventions.structure
-            lines.append("```")
-            lines.append(f"{project_name}/")
-            if structure.source_dir:
-                lines.append(f"├── {structure.source_dir}/    # Source code")
-            if structure.test_dir:
-                lines.append(f"├── {structure.test_dir}/    # Tests")
-            if structure.common_patterns:
-                for pattern in structure.common_patterns[:5]:
-                    lines.append(f"│   ├── {pattern}")
-            lines.append("└── ...")
-            lines.append("```")
-            lines.append("")
+    def _add_structure_section(
+        self, lines: list[str], project_name: str, conventions: ConventionResult
+    ) -> None:
+        """Add project structure section."""
+        lines.append("## Project Structure")
+        lines.append("")
+        structure = conventions.structure
+        lines.append("```")
+        lines.append(f"{project_name}/")
+        if structure.source_dir:
+            lines.append(f"├── {structure.source_dir}/    # Source code")
+        if structure.test_dir:
+            lines.append(f"├── {structure.test_dir}/    # Tests")
+        if structure.common_patterns:
+            for pattern in structure.common_patterns[:5]:
+                lines.append(f"│   ├── {pattern}")
+        lines.append("└── ...")
+        lines.append("```")
+        lines.append("")
 
-        # Governance reference
+    def _add_governance_section(self, lines: list[str]) -> None:
+        """Add governance reference section."""
         lines.append("## Governance")
         lines.append("")
         lines.append("This project uses RaiSE governance. Key files:")
@@ -152,18 +170,18 @@ class ClaudeMdGenerator:
         lines.append(
             "- `governance/solution/guardrails.md` — Code standards and verification"
         )
-        lines.append("- `.rai/manifest.yaml` — Project metadata")
+        lines.append("- `.raise/manifest.yaml` — Project metadata")
         lines.append("")
 
-        # Footer
+    def _add_footer(self, lines: list[str]) -> None:
+        """Add document footer."""
         lines.append("---")
         lines.append("")
         lines.append(
-            f"*Generated by RaiSE on {date.today().isoformat()}. Review and customize as needed.*"
+            f"*Generated by RaiSE on {date.today().isoformat()}. "
+            "Review and customize as needed.*"
         )
         lines.append("")
-
-        return "\n".join(lines)
 
 
 def generate_claude_md(

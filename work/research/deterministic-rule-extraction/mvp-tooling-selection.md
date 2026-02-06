@@ -122,7 +122,7 @@ ast-grep: "0.32.3"  # Last verified: 2026-01-24
 
 2. **Native JSON Output**: The `--json` flag emits JSON Lines (JSONL) format with structured message types including file paths, line numbers, match positions, and context. This is what VS Code uses for its ripgrep integration ([ripgrep man page](https://www.mankier.com/1/rg)).
 
-3. **Gitignore Support**: "ripgrep implements full support for .gitignore, whereas there are many bugs related to that functionality in The Silver Searcher" per feature comparison.
+3. **Gitignore Support**: "ripgrep implements full support for .gitignore, whereas there are many bugs related to that functionality in The Silver Searcher" per story comparison.
 
 4. **Unicode Support**: "ripgrep is the only tool with proper Unicode support that doesn't make you pay dearly for it."
 

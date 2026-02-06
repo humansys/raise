@@ -214,9 +214,9 @@ Observable Workflow is preserved — the telemetry just originates from Claude C
 ```yaml
 ---
 # === Required by Agent Skills Spec ===
-name: feature-design
+name: story-design
 description: >
-  Create lean feature specifications optimized for human understanding
+  Create lean story specifications optimized for human understanding
   and AI alignment. Use when designing features before implementation.
 
 # === Optional Agent Skills Fields ===
@@ -226,12 +226,12 @@ license: MIT
 metadata:
   # Workflow
   raise.work_cycle: feature
-  raise.frequency: per-feature-as-needed
+  raise.frequency: per-story-as-needed
   raise.fase: "4"
 
   # Chaining
   raise.prerequisites: project-backlog
-  raise.next: feature-plan
+  raise.next: story-plan
 
   # Validation
   raise.gate: gate-design
@@ -245,7 +245,7 @@ metadata:
 
 ## Purpose
 
-Create a lean feature specification that optimizes for both human
+Create a lean story specification that optimizes for both human
 understanding and AI alignment.
 
 ## Mastery Levels (ShuHaRi)
@@ -284,8 +284,8 @@ Before proceeding to planning, validate:
 
 ## Output
 
-- **Artifact**: `work/features/{feature}/design.md`
-- **Next**: `/feature-plan`
+- **Artifact**: `work/stories/{feature}/design.md`
+- **Next**: `/story-plan`
 ```
 
 ---

@@ -6,26 +6,9 @@ from textwrap import dedent
 import pytest
 
 from raise_cli.governance.models import ConceptType
-from raise_cli.governance.parsers.constitution import (
-    _sanitize_principle_id,
-    extract_principles,
-)
+from raise_cli.governance.parsers.constitution import extract_principles
 
-
-class TestSanitizePrincipleId:
-    """Tests for _sanitize_principle_id helper function."""
-
-    def test_basic_sanitization(self) -> None:
-        """Should convert to lowercase and replace spaces with hyphens."""
-        assert _sanitize_principle_id("Governance as Code") == "governance-as-code"
-
-    def test_remove_commas(self) -> None:
-        """Should remove commas."""
-        assert _sanitize_principle_id("Test, Example") == "test-example"
-
-    def test_remove_special_characters(self) -> None:
-        """Should remove special characters except hyphens."""
-        assert _sanitize_principle_id("Test & Example!") == "test-example"
+# Note: sanitize_id tests are in tests/core/test_text.py
 
 
 @pytest.fixture

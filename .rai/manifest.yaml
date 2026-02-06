@@ -1,6 +1,0 @@
-version: '1.0'
-project:
-  name: raise-commons
-  project_type: brownfield
-  code_file_count: 145
-  detected_at: '2026-02-05T12:09:45.470997Z'

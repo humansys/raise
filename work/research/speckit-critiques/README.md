@@ -130,12 +130,12 @@ Each gap includes:
 ---
 
 ### ⚙️ Deliverable 3: Feature Specifications (3 detailed specs)
-**Directory**: [`features/`](./features/)
+**Directory**: [`stories/`](./stories/)
 
 Detailed implementation specifications for top differentiation opportunities:
 
 #### Feature 001: Lean Specification Templates
-**File**: [`feature-001-lean-specification.md`](./features/feature-001-lean-specification.md)
+**File**: [`feature-001-lean-specification.md`](./stories/feature-001-lean-specification.md)
 **Priority**: P0 | **Effort**: Medium (4-6 weeks) | **Impact**: High
 
 **Goal**: Reduce markdown:code ratio from 3.7:1 to <1.5:1
@@ -156,7 +156,7 @@ Detailed implementation specifications for top differentiation opportunities:
 ---
 
 #### Feature 002: Brownfield-First Architecture
-**File**: [`feature-002-brownfield-support.md`](./features/feature-002-brownfield-support.md)
+**File**: [`feature-002-brownfield-support.md`](./stories/feature-002-brownfield-support.md)
 **Priority**: P0 | **Effort**: High (8-12 weeks) | **Impact**: Critical
 
 **Goal**: Enable spec-driven development on existing codebases (70% market expansion)
@@ -165,7 +165,7 @@ Detailed implementation specifications for top differentiation opportunities:
 - Reverse spec generation (AI analyzes code → drafts spec)
 - Incremental spec adoption (start small, expand coverage)
 - Spec-code drift detection (CI/CD integration)
-- Multi-repo feature specs (coordinate across microservices)
+- Multi-repo story specs (coordinate across microservices)
 - Current state spec template (brownfield variant)
 
 **Success Metrics**:
@@ -179,7 +179,7 @@ Detailed implementation specifications for top differentiation opportunities:
 ---
 
 #### Feature 003: Observable Validation Gates
-**File**: [`feature-003-observable-gates.md`](./features/feature-003-observable-gates.md)
+**File**: [`feature-003-observable-gates.md`](./stories/feature-003-observable-gates.md)
 **Priority**: P1 | **Effort**: Medium (6-8 weeks) | **Impact**: High
 
 **Goal**: Prove spec-driven development works with empirical metrics
@@ -386,6 +386,6 @@ https://github.com/[repo]/specs/main/research/speckit-critiques/
 
 **Total Research Output**: ~18,000 words across 4 documents
 **Research Duration**: ~6 hours (web search, analysis, synthesis, documentation)
-**Success Criteria Met**: ✅ 32 limitations, ✅ 12 tensions, ✅ 8 opportunities, ✅ 40+ sources, ✅ 3 feature specs
+**Success Criteria Met**: ✅ 32 limitations, ✅ 12 tensions, ✅ 8 opportunities, ✅ 40+ sources, ✅ 3 story specs
 
 *End of README*

@@ -1,10 +1,12 @@
 """Writer module for appending telemetry signals to JSONL.
 
 This module provides the `emit()` function to append signals to
-`.rai/telemetry/signals.jsonl` as specified in ADR-018.
+`.raise/rai/personal/telemetry/signals.jsonl` (gitignored, per-developer).
 
 Signals are written as JSON lines (one JSON object per line),
 which is append-friendly and git-friendly.
+
+Note: Telemetry is personal data (F14.15) and should not be committed.
 """
 
 from __future__ import annotations
@@ -13,21 +15,15 @@ import fcntl
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
+
+from raise_cli.config.paths import SIGNALS_FILE, TELEMETRY_SUBDIR, get_personal_dir
 
 if TYPE_CHECKING:
-    from raise_cli.telemetry.schemas import (
-        CalibrationEvent,
-        CommandUsage,
-        ErrorEvent,
-        SessionEvent,
-        SkillEvent,
-        WorkLifecycle,
-    )
+    from raise_cli.telemetry.schemas import Signal
 
-# Default telemetry directory relative to project root
-DEFAULT_TELEMETRY_DIR = ".rai/telemetry"
-DEFAULT_SIGNALS_FILE = "signals.jsonl"
+# Type alias for skill event types (matches SkillEvent.event)
+SkillEventType = Literal["start", "complete", "abandon"]
 
 
 @dataclass
@@ -46,17 +42,18 @@ class EmitResult:
 
 
 def _get_telemetry_path(base_path: Path | None = None) -> Path:
-    """Get the path to the signals.jsonl file.
+    """Get the path to the signals.jsonl file in personal directory.
+
+    Telemetry is personal data (per-developer, gitignored) per F14.15.
+    Path: .raise/rai/personal/telemetry/signals.jsonl
 
     Args:
-        base_path: Base directory for telemetry. Defaults to current directory.
+        base_path: Project root directory. Defaults to current directory.
 
     Returns:
-        Path to signals.jsonl file.
+        Path to signals.jsonl file in personal directory.
     """
-    if base_path is None:
-        base_path = Path.cwd()
-    return base_path / DEFAULT_TELEMETRY_DIR / DEFAULT_SIGNALS_FILE
+    return get_personal_dir(base_path) / TELEMETRY_SUBDIR / SIGNALS_FILE
 
 
 def _ensure_directory(path: Path) -> None:
@@ -69,22 +66,15 @@ def _ensure_directory(path: Path) -> None:
 
 
 def emit(
-    signal: (
-        SkillEvent
-        | SessionEvent
-        | CalibrationEvent
-        | ErrorEvent
-        | CommandUsage
-        | WorkLifecycle
-    ),
+    signal: Signal,
     *,
     base_path: Path | None = None,
 ) -> EmitResult:
     """Emit a telemetry signal to the signals.jsonl file.
 
-    Appends the signal as a JSON line to `.rai/telemetry/signals.jsonl`.
+    Appends the signal as a JSON line to `.raise/rai/personal/telemetry/signals.jsonl`.
     Creates the directory if it doesn't exist. Uses file locking for
-    thread-safe writes.
+    thread-safe writes. Telemetry is personal data (gitignored).
 
     Args:
         signal: The signal to emit (any of the 5 signal types).
@@ -98,7 +88,7 @@ def emit(
         >>> from raise_cli.telemetry import SkillEvent, emit
         >>> event = SkillEvent(
         ...     timestamp=datetime.now(timezone.utc),
-        ...     skill="feature-design",
+        ...     skill="story-design",
         ...     event="start"
         ... )
         >>> result = emit(event)
@@ -135,7 +125,7 @@ def emit(
 
 def emit_skill_event(
     skill: str,
-    event: str,
+    event: SkillEventType,
     duration_sec: int | None = None,
     *,
     base_path: Path | None = None,
@@ -143,7 +133,7 @@ def emit_skill_event(
     """Convenience function to emit a skill event.
 
     Args:
-        skill: Name of the skill (e.g., "feature-design").
+        skill: Name of the skill (e.g., "story-design").
         event: Event type ("start", "complete", "abandon").
         duration_sec: Duration in seconds (for complete/abandon).
         base_path: Base directory for telemetry.
@@ -156,7 +146,7 @@ def emit_skill_event(
     signal = SkillEvent(
         timestamp=datetime.now(UTC),
         skill=skill,
-        event=event,  # type: ignore[arg-type]
+        event=event,
         duration_sec=duration_sec,
     )
     return emit(signal, base_path=base_path)

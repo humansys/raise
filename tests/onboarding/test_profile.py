@@ -131,11 +131,6 @@ class TestDeveloperProfile:
         profile = DeveloperProfile(name="Fer")
         assert profile.experience_level == ExperienceLevel.SHU
 
-    def test_default_sessions_total_is_zero(self) -> None:
-        """New developers start with zero sessions."""
-        profile = DeveloperProfile(name="Fer")
-        assert profile.sessions_total == 0
-
     def test_default_dates_are_none(self) -> None:
         """New profiles have no session dates."""
         profile = DeveloperProfile(name="Fer")
@@ -176,9 +171,9 @@ class TestDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "feature-plan"],
+            skills_mastered=["session-start", "story-plan"],
             universal_patterns=["Commit after each task"],
-            sessions_total=40,
+
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
             projects=["/home/emilio/Code/raise-commons"],
@@ -189,7 +184,6 @@ class TestDeveloperProfile:
         assert profile.communication.skip_praise is True
         assert len(profile.skills_mastered) == 2
         assert len(profile.universal_patterns) == 1
-        assert profile.sessions_total == 40
         assert profile.first_session == date(2026, 2, 1)
         assert profile.last_session == date(2026, 2, 4)
         assert len(profile.projects) == 1
@@ -250,7 +244,7 @@ class TestLoadDeveloperProfile:
         rai_home = tmp_path / ".rai"
         rai_home.mkdir(parents=True)
         profile_file = rai_home / "developer.yaml"
-        profile_file.write_text("name: Fer\nexperience_level: shu\nsessions_total: 5\n")
+        profile_file.write_text("name: Fer\nexperience_level: shu\n")
 
         monkeypatch.setattr(
             "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
@@ -260,7 +254,6 @@ class TestLoadDeveloperProfile:
         assert result is not None
         assert result.name == "Fer"
         assert result.experience_level == ExperienceLevel.SHU
-        assert result.sessions_total == 5
 
     def test_returns_none_for_invalid_yaml(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -321,7 +314,7 @@ class TestSaveDeveloperProfile:
         )
 
         profile = DeveloperProfile(
-            name="Fer", experience_level=ExperienceLevel.HA, sessions_total=10
+            name="Fer", experience_level=ExperienceLevel.HA
         )
         save_developer_profile(profile)
 
@@ -331,7 +324,6 @@ class TestSaveDeveloperProfile:
         content = yaml.safe_load(profile_file.read_text())
         assert content["name"] == "Fer"
         assert content["experience_level"] == "ha"
-        assert content["sessions_total"] == 10
 
     def test_roundtrip_save_load(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -351,9 +343,9 @@ class TestSaveDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "feature-plan"],
+            skills_mastered=["session-start", "story-plan"],
             universal_patterns=["Commit after each task"],
-            sessions_total=40,
+
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
             projects=["/home/emilio/Code/raise-commons"],
@@ -368,7 +360,6 @@ class TestSaveDeveloperProfile:
         assert loaded.communication.skip_praise == original.communication.skip_praise
         assert loaded.skills_mastered == original.skills_mastered
         assert loaded.universal_patterns == original.universal_patterns
-        assert loaded.sessions_total == original.sessions_total
         assert loaded.first_session == original.first_session
         assert loaded.last_session == original.last_session
         assert loaded.projects == original.projects
@@ -395,12 +386,6 @@ class TestSaveDeveloperProfile:
 
 class TestIncrementSession:
     """Tests for increment_session function."""
-
-    def test_increments_sessions_total(self) -> None:
-        """increment_session increases sessions_total by 1."""
-        profile = DeveloperProfile(name="Test", sessions_total=5)
-        updated = increment_session(profile)
-        assert updated.sessions_total == 6
 
     def test_updates_last_session_to_today(self) -> None:
         """increment_session sets last_session to today's date."""
@@ -433,16 +418,15 @@ class TestIncrementSession:
         """increment_session works when project_path is None."""
         profile = DeveloperProfile(name="Test", projects=["/existing"])
         updated = increment_session(profile)
-        assert updated.sessions_total == 1
         assert updated.last_session == date.today()
         assert updated.projects == ["/existing"]
 
     def test_returns_new_instance(self) -> None:
         """increment_session returns a new profile instance (immutable)."""
-        profile = DeveloperProfile(name="Test", sessions_total=5)
+        profile = DeveloperProfile(name="Test", last_session=date(2026, 1, 1))
         updated = increment_session(profile)
         assert profile is not updated
-        assert profile.sessions_total == 5  # Original unchanged
+        assert profile.last_session == date(2026, 1, 1)  # Original unchanged
 
     def test_preserves_other_fields(self) -> None:
         """increment_session preserves all other profile fields."""
@@ -452,7 +436,7 @@ class TestIncrementSession:
             skills_mastered=["skill1", "skill2"],
             universal_patterns=["pattern1"],
             first_session=date(2026, 1, 1),
-            sessions_total=10,
+
         )
         updated = increment_session(profile, project_path="/new/project")
         assert updated.name == "Emilio"
@@ -536,12 +520,10 @@ class TestStartSession:
         profile = DeveloperProfile(
             name="Emilio",
             experience_level=ExperienceLevel.RI,
-            sessions_total=40,
         )
         updated = start_session(profile, "/test")
         assert updated.name == "Emilio"
         assert updated.experience_level == ExperienceLevel.RI
-        assert updated.sessions_total == 40
 
 
 class TestEndSession:
@@ -576,13 +558,11 @@ class TestEndSession:
         profile = DeveloperProfile(
             name="Emilio",
             experience_level=ExperienceLevel.RI,
-            sessions_total=40,
         )
         with_session = start_session(profile, "/test")
         ended = end_session(with_session)
         assert ended.name == "Emilio"
         assert ended.experience_level == ExperienceLevel.RI
-        assert ended.sessions_total == 40
 
 
 class TestDeveloperProfileCurrentSession:

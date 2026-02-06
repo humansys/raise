@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
-import pytest
 import yaml
 
 from raise_cli.onboarding.detection import ProjectType
@@ -29,7 +28,7 @@ class TestProjectInfo:
 
     def test_full_project_info(self) -> None:
         """ProjectInfo with all fields."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         info = ProjectInfo(
             name="my-api",
             project_type=ProjectType.BROWNFIELD,
@@ -63,13 +62,13 @@ class TestSaveManifest:
     """Tests for save_manifest function."""
 
     def test_creates_rai_directory(self, tmp_path: Path) -> None:
-        """Creates .rai directory if it doesn't exist."""
+        """Creates .raise directory if it doesn't exist."""
         project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
         manifest = ProjectManifest(project=project)
 
         save_manifest(manifest, tmp_path)
 
-        assert (tmp_path / ".rai").is_dir()
+        assert (tmp_path / ".raise").is_dir()
 
     def test_creates_manifest_file(self, tmp_path: Path) -> None:
         """Creates manifest.yaml file."""
@@ -78,7 +77,7 @@ class TestSaveManifest:
 
         save_manifest(manifest, tmp_path)
 
-        manifest_path = tmp_path / ".rai" / "manifest.yaml"
+        manifest_path = tmp_path / ".raise" / "manifest.yaml"
         assert manifest_path.exists()
 
     def test_manifest_content_is_valid_yaml(self, tmp_path: Path) -> None:
@@ -92,7 +91,7 @@ class TestSaveManifest:
 
         save_manifest(manifest, tmp_path)
 
-        manifest_path = tmp_path / ".rai" / "manifest.yaml"
+        manifest_path = tmp_path / ".raise" / "manifest.yaml"
         content = manifest_path.read_text()
         data = yaml.safe_load(content)
 
@@ -103,7 +102,7 @@ class TestSaveManifest:
 
     def test_overwrites_existing_manifest(self, tmp_path: Path) -> None:
         """Overwrites existing manifest file."""
-        rai_dir = tmp_path / ".rai"
+        rai_dir = tmp_path / ".raise"
         rai_dir.mkdir()
         (rai_dir / "manifest.yaml").write_text("old: content")
 
@@ -126,7 +125,7 @@ class TestLoadManifest:
         assert result is None
 
     def test_returns_none_if_rai_dir_missing(self, tmp_path: Path) -> None:
-        """Returns None if .rai directory doesn't exist."""
+        """Returns None if .raise directory doesn't exist."""
         result = load_manifest(tmp_path)
         assert result is None
 
@@ -150,7 +149,7 @@ class TestLoadManifest:
 
     def test_returns_none_for_invalid_yaml(self, tmp_path: Path) -> None:
         """Returns None for invalid YAML."""
-        rai_dir = tmp_path / ".rai"
+        rai_dir = tmp_path / ".raise"
         rai_dir.mkdir()
         (rai_dir / "manifest.yaml").write_text("invalid: yaml: content: [")
 
@@ -159,7 +158,7 @@ class TestLoadManifest:
 
     def test_returns_none_for_invalid_schema(self, tmp_path: Path) -> None:
         """Returns None for valid YAML but invalid schema."""
-        rai_dir = tmp_path / ".rai"
+        rai_dir = tmp_path / ".raise"
         rai_dir.mkdir()
         (rai_dir / "manifest.yaml").write_text("random: data\nno_project: true")
 
@@ -168,7 +167,7 @@ class TestLoadManifest:
 
     def test_roundtrip(self, tmp_path: Path) -> None:
         """Save and load produces equivalent manifest."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         project = ProjectInfo(
             name="roundtrip-test",
             project_type=ProjectType.BROWNFIELD,

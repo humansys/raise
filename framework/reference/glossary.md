@@ -819,7 +819,7 @@ Context (Sabiduría) → Kata (Práctica) → Skill (Acción)
 ### Organización de Katas por Work Cycle [v2.3]
 ```
 katas/project/   → 1x por épica (discovery, vision, design, backlog)
-katas/feature/   → Nx por feature (plan, implement, review)
+katas/story/   → Nx por feature (plan, implement, review)
 katas/setup/     → 1x brownfield (analyze, ecosystem)
 katas/improve/   → Continuo (retrospective, evolve-kata)
 ```
@@ -893,7 +893,7 @@ Contexto operacional del Orquestador que agrupa katas aplicables y define la fre
 |-------|------------|------------|-------|
 | **solution** | `katas/solution/` | 1x por sistema | discovery, vision |
 | **project** | `katas/project/` | 1x por épica | discovery, vision, design, backlog |
-| **feature** | `katas/feature/` | Nx por feature | plan, implement, review |
+| **feature** | `katas/story/` | Nx por feature | plan, implement, review |
 | **setup** | `katas/setup/` | 1x por sistema | governance, rules, ecosystem |
 | **improve** | `katas/improve/` | Continuo | retrospective, evolve-kata |
 

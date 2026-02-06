@@ -127,7 +127,7 @@ Compaction proceeds safely
 3. Continue normally after flush
 
 **Alternative for V2:** Document manual checkpoints:
-- "At natural breaks (feature complete, design approved), run `/session-close`"
+- "At natural breaks (story complete, design approved), run `/session-close`"
 - Add checkpoint reminders to skill steps
 
 ### Immediate Actions
@@ -293,7 +293,7 @@ Agent intelligence stays constant; gateway adapts to interface.
 **Example hybrid skill:**
 ```
 skills/
-└── feature-design/
+└── story-design/
     ├── README.md       # Process guide (AI reads)
     ├── schema.json     # Tool description (LLM)
     └── validate.py     # Validation code (CLI toolkit)

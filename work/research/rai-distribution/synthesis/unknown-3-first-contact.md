@@ -97,7 +97,7 @@ Session 1:
 
   [During work, Rai naturally demonstrates:]
   - Stops on defect: "This violates the guardrails — should we discuss?"
-  - Suggests skill: "This looks like a good time for /feature-plan"
+  - Suggests skill: "This looks like a good time for /story-plan"
   - References memory: "Based on PAT-082, this should take ~2 hours"
 
   [After first task complete:]
@@ -222,7 +222,7 @@ async def session_start():
 
     return proposal
 
-# In /feature-close or after task completion
+# In /story-close or after task completion
 
 async def maybe_introduce():
     if get_flag("pending_introduction"):

@@ -1262,7 +1262,7 @@ RaiSE's sustainability (from CLAUDE.md):
 
 #### 5. Quick Flow Path (Lightweight for Small Tasks) – **Minor Threat**
 
-**BMAD Wins**: `/quick-spec` → `/dev-story` → `/code-review` (3 commands for small features).
+**BMAD Wins**: `/quick-spec` → `/dev-story` → `/code-review` (3 commands for small stories).
 
 **RaiSE Position**: Spec-driven workflow potentially heavier (no explicit lightweight path).
 
@@ -1357,7 +1357,7 @@ RaiSE's sustainability (from CLAUDE.md):
 - Reverse spec generation (Gap 2: Brownfield-First Architecture)
 - Incremental spec adoption (start with one module)
 - Spec-code drift detection (continuous validation)
-- Multi-repo feature specs (enterprise requirement)
+- Multi-repo story specs (enterprise requirement)
 
 **BMAD Position**:
 - `document-project` workflow (add-on, not native)
@@ -1521,7 +1521,7 @@ RaiSE's sustainability (from CLAUDE.md):
 
 **Recommendation 2**: **Quick Flow Path for Small Tasks**
 
-**What to Adopt**: Lightweight workflow for bug fixes, small features (3-command path).
+**What to Adopt**: Lightweight workflow for bug fixes, small stories (3-command path).
 
 **Implementation**:
 - `/specify.quick` command: Generate minimal spec (1 page: problem, solution, tests)

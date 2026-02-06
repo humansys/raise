@@ -1,6 +1,6 @@
 ---
 research_id: "lean-feature-specs-20260131"
-primary_question: "What are the critical success factors for a lean feature specification format that optimizes for both human understanding and AI alignment in software development?"
+primary_question: "What are the critical success factors for a lean story specification format that optimizes for both human understanding and AI alignment in software development?"
 decision_context: "Design feature-level spec template for RaiSE framework (feature/design kata)"
 depth: "standard"
 created: "2026-01-31"
@@ -11,7 +11,7 @@ template: "research-prompt-v1"
 # Research Prompt: Lean Feature Specification Format
 
 > Dogfooding the research prompt template
-> For RaiSE feature spec design (human-AI collaboration context)
+> For RaiSE story spec design (human-AI collaboration context)
 
 ---
 
@@ -30,7 +30,7 @@ You are a **Research Specialist** with expertise in **requirements engineering, 
 
 ## Research Question
 
-**Primary**: What are the critical success factors for a lean feature specification format that optimizes for both human understanding (reviewability, clarity) and AI alignment (sufficient context for accurate implementation)?
+**Primary**: What are the critical success factors for a lean story specification format that optimizes for both human understanding (reviewability, clarity) and AI alignment (sufficient context for accurate implementation)?
 
 **Secondary** (supporting questions):
 1. What specification elements are most critical for AI code generation accuracy?
@@ -44,7 +44,7 @@ You are a **Research Specialist** with expertise in **requirements engineering, 
 
 ## Decision Context
 
-**This research will inform**: Design of `feature/design` kata and `.raise/templates/tech/tech-design-feature.md` template updates
+**This research will inform**: Design of `feature/design` kata and `.raise/templates/tech/tech-design-story.md` template updates
 
 **Stakeholder**: RaiSE framework users (developers working with AI assistants like Claude)
 
@@ -86,7 +86,7 @@ Execute searches across these source types:
 **Keywords to search**:
 - "lean specification AI code generation 2024 2025"
 - "requirements engineering AI assisted development"
-- "feature spec format for language models"
+- "story spec format for language models"
 - "human AI collaboration software specifications"
 - "minimal viable specification AI alignment"
 - "acceptance criteria AI code generation"
@@ -116,7 +116,7 @@ For each source you find, assess and record:
 
 - **Key Finding**: One-line takeaway relevant to spec format design
 
-- **Relevance**: How does this inform our lean feature spec template?
+- **Relevance**: How does this inform our lean story spec template?
 
 - **Date**: Publication date (field evolving rapidly - recency critical)
 
@@ -158,7 +158,7 @@ For each source:
 - **Evidence Level**: Very High/High/Medium/Low
 - **Date**: [YYYY-MM-DD]
 - **Key Finding**: [Specific insight about spec formats]
-- **Relevance**: [How it applies to RaiSE feature specs]
+- **Relevance**: [How it applies to RaiSE story specs]
 ```
 
 Include summary statistics:
@@ -192,7 +192,7 @@ Example structure:
 
 #### Critical Success Factors
 
-Ranked list of what makes a good feature spec for human-AI collaboration:
+Ranked list of what makes a good story spec for human-AI collaboration:
 1. [Factor 1] - [Why critical] - [Evidence sources]
 2. [Factor 2] - [Why critical] - [Evidence sources]
 ...
@@ -222,7 +222,7 @@ Comparison matrix:
 ```markdown
 ## Recommendation
 
-**Decision**: [Specific feature spec template structure]
+**Decision**: [Specific story spec template structure]
 
 **Confidence**: HIGH/MEDIUM/LOW
 
@@ -256,7 +256,7 @@ Your research output will be validated against this checklist:
 
 **Question & Scope**
 - [x] Research question is specific and falsifiable
-- [x] Decision context clearly stated (feature spec template design)
+- [x] Decision context clearly stated (story spec template design)
 - [x] Scope boundaries defined (feature-level, not project-level)
 
 **Evidence Gathering**
@@ -332,7 +332,7 @@ Your research output will be validated against this checklist:
 ## Expected Outcomes
 
 This research should answer:
-1. What sections go in the feature spec template?
+1. What sections go in the story spec template?
 2. How detailed should each section be?
 3. Should we use Gherkin for acceptance criteria?
 4. How important are code examples vs prose?

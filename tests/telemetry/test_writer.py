@@ -29,7 +29,6 @@ from raise_cli.telemetry import (
 )
 from raise_cli.telemetry.writer import EmitResult, _get_telemetry_path
 
-
 # --- Fixtures ---
 
 
@@ -52,17 +51,18 @@ class TestGetTelemetryPath:
     """Tests for _get_telemetry_path helper."""
 
     def test_default_path(self, tmp_path: Path) -> None:
-        """Returns path under .rai/telemetry/signals.jsonl."""
+        """Returns path under .raise/rai/personal/telemetry/signals.jsonl."""
         path = _get_telemetry_path(tmp_path)
 
-        assert path == tmp_path / ".rai/telemetry/signals.jsonl"
+        # Telemetry is personal data per F14.15
+        assert path == tmp_path / ".raise/rai/personal/telemetry/signals.jsonl"
 
     def test_none_uses_cwd(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         """None base_path uses current working directory."""
         monkeypatch.chdir(tmp_path)
         path = _get_telemetry_path(None)
 
-        assert path == tmp_path / ".rai/telemetry/signals.jsonl"
+        assert path == tmp_path / ".raise/rai/personal/telemetry/signals.jsonl"
 
 
 # --- Emit Function Tests ---
@@ -76,7 +76,7 @@ class TestEmit:
     ) -> None:
         """Emit a skill event to signals.jsonl."""
         event = SkillEvent(
-            timestamp=now, skill="feature-design", event="start"
+            timestamp=now, skill="story-design", event="start"
         )
 
         result = emit(event, base_path=temp_telemetry_dir)
@@ -90,7 +90,7 @@ class TestEmit:
         content = result.path.read_text()
         data = json.loads(content.strip())
         assert data["type"] == "skill_event"
-        assert data["skill"] == "feature-design"
+        assert data["skill"] == "story-design"
         assert data["event"] == "start"
 
     def test_emit_session_event(
@@ -99,7 +99,7 @@ class TestEmit:
         """Emit a session event."""
         event = SessionEvent(
             timestamp=now,
-            session_type="feature",
+            session_type="story",
             outcome="success",
             duration_min=90,
             features=["F9.1"],
@@ -120,8 +120,8 @@ class TestEmit:
         """Emit a calibration event."""
         event = CalibrationEvent(
             timestamp=now,
-            feature_id="F9.1",
-            feature_size="XS",
+            story_id="F9.1",
+            story_size="XS",
             estimated_min=25,
             actual_min=18,
             velocity=1.4,
@@ -177,13 +177,13 @@ class TestEmit:
     def test_creates_directory_if_missing(
         self, temp_telemetry_dir: Path, now: datetime
     ) -> None:
-        """Creates .rai/telemetry/ directory if it doesn't exist."""
+        """Creates .raise/rai/personal/telemetry/ directory if it doesn't exist."""
         event = SkillEvent(
             timestamp=now, skill="test", event="start"
         )
 
-        # Directory doesn't exist yet
-        telemetry_dir = temp_telemetry_dir / ".rai/telemetry"
+        # Directory doesn't exist yet (personal telemetry path per F14.15)
+        telemetry_dir = temp_telemetry_dir / ".raise/rai/personal/telemetry"
         assert not telemetry_dir.exists()
 
         result = emit(event, base_path=temp_telemetry_dir)
@@ -246,7 +246,7 @@ class TestEmitSkillEvent:
     def test_emit_start_event(self, temp_telemetry_dir: Path) -> None:
         """Emit a skill start event."""
         result = emit_skill_event(
-            skill="feature-design",
+            skill="story-design",
             event="start",
             base_path=temp_telemetry_dir,
         )
@@ -256,7 +256,7 @@ class TestEmitSkillEvent:
         content = result.path.read_text()
         data = json.loads(content.strip())
         assert data["type"] == "skill_event"
-        assert data["skill"] == "feature-design"
+        assert data["skill"] == "story-design"
         assert data["event"] == "start"
         assert data["duration_sec"] is None
 
@@ -265,7 +265,7 @@ class TestEmitSkillEvent:
     ) -> None:
         """Emit a skill complete event with duration."""
         result = emit_skill_event(
-            skill="feature-implement",
+            skill="story-implement",
             event="complete",
             duration_sec=1800,
             base_path=temp_telemetry_dir,

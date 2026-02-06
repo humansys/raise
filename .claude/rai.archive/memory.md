@@ -27,8 +27,8 @@
 
 | Insight | Evidence | Applied To |
 |---------|----------|------------|
-| Design-first eliminates ambiguity | F1.5: concrete examples → direct implementation | `/feature-design` skill |
-| Task granularity scales with SP | F1.5: 6 tasks for 3 SP was overkill | `/feature-plan` skill |
+| Design-first eliminates ambiguity | F1.5: concrete examples → direct implementation | `/story-design` skill |
+| Task granularity scales with SP | F1.5: 6 tasks for 3 SP was overkill | `/story-plan` skill |
 | Time estimates not useful at AI velocity | F1.3: 18x, F1.5: 11x variance | Replaced with T-shirt sizing |
 | Pattern reuse accelerates implementation | F1.5 followed F1.4 patterns | Document patterns here |
 
@@ -79,7 +79,7 @@
 | Post-retrospective actions BEFORE commit | F2.3: Type A/B/C classification | Apply quick wins (<30min) before commit; demonstrates complete learning cycle |
 | Kata cycle stabilized at 2-3x velocity | F2.1, F2.2, F2.3 all delivered 2-3x faster | Reproducible pattern with design-first + atomic tasks |
 | Epic-level learning enables systemic review | E2 closure: created /epic-close skill | Meso-layer between features and quarterly reviews; enables epic comparison |
-| "As above, so below" principle works | E2: epic retrospective mirrors feature retrospective | Fractal pattern - same structure, different scale |
+| "As above, so below" principle works | E2: epic retrospective mirrors story retrospective | Fractal pattern - same structure, different scale |
 
 ---
 

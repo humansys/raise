@@ -10,7 +10,7 @@ Tests cover:
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import TypeAdapter, ValidationError
@@ -25,14 +25,13 @@ from raise_cli.telemetry import (
     WorkLifecycle,
 )
 
-
 # --- Fixtures ---
 
 
 @pytest.fixture
 def now() -> datetime:
     """Return current UTC timestamp."""
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 # --- SkillEvent Tests ---
@@ -43,17 +42,17 @@ class TestSkillEvent:
 
     def test_create_start_event(self, now: datetime) -> None:
         """Create a skill start event."""
-        event = SkillEvent(timestamp=now, skill="feature-design", event="start")
+        event = SkillEvent(timestamp=now, skill="story-design", event="start")
 
         assert event.type == "skill_event"
-        assert event.skill == "feature-design"
+        assert event.skill == "story-design"
         assert event.event == "start"
         assert event.duration_sec is None
 
     def test_create_complete_event_with_duration(self, now: datetime) -> None:
         """Create a skill complete event with duration."""
         event = SkillEvent(
-            timestamp=now, skill="feature-implement", event="complete", duration_sec=1800
+            timestamp=now, skill="story-implement", event="complete", duration_sec=1800
         )
 
         assert event.event == "complete"
@@ -76,12 +75,12 @@ class TestSkillEvent:
     def test_serialization(self, now: datetime) -> None:
         """Event serializes to JSON correctly."""
         event = SkillEvent(
-            timestamp=now, skill="feature-design", event="complete", duration_sec=1200
+            timestamp=now, skill="story-design", event="complete", duration_sec=1200
         )
         data = json.loads(event.model_dump_json())
 
         assert data["type"] == "skill_event"
-        assert data["skill"] == "feature-design"
+        assert data["skill"] == "story-design"
         assert data["event"] == "complete"
         assert data["duration_sec"] == 1200
 
@@ -96,17 +95,17 @@ class TestSessionEvent:
         """Create a successful session event."""
         event = SessionEvent(
             timestamp=now,
-            session_type="feature",
+            session_type="story",
             outcome="success",
             duration_min=90,
-            features=["F9.1", "F9.2"],
+            stories=["F9.1", "F9.2"],
         )
 
         assert event.type == "session_event"
-        assert event.session_type == "feature"
+        assert event.session_type == "story"
         assert event.outcome == "success"
         assert event.duration_min == 90
-        assert event.features == ["F9.1", "F9.2"]
+        assert event.stories == ["F9.1", "F9.2"]
 
     def test_create_partial_event(self, now: datetime) -> None:
         """Create a partial session event."""
@@ -115,7 +114,7 @@ class TestSessionEvent:
         )
 
         assert event.outcome == "partial"
-        assert event.features == []  # Default empty list
+        assert event.stories == []  # Default empty list
 
     def test_create_abandoned_event(self, now: datetime) -> None:
         """Create an abandoned session event."""
@@ -139,15 +138,15 @@ class TestSessionEvent:
         """Event serializes to JSON correctly."""
         event = SessionEvent(
             timestamp=now,
-            session_type="feature",
+            session_type="story",
             outcome="success",
             duration_min=60,
-            features=["F9.1"],
+            stories=["F9.1"],
         )
         data = json.loads(event.model_dump_json())
 
         assert data["type"] == "session_event"
-        assert data["features"] == ["F9.1"]
+        assert data["stories"] == ["F9.1"]
 
 
 # --- CalibrationEvent Tests ---
@@ -160,16 +159,16 @@ class TestCalibrationEvent:
         """Create a calibration event."""
         event = CalibrationEvent(
             timestamp=now,
-            feature_id="F9.1",
-            feature_size="XS",
+            story_id="F9.1",
+            story_size="XS",
             estimated_min=25,
             actual_min=20,
             velocity=1.25,
         )
 
         assert event.type == "calibration"
-        assert event.feature_id == "F9.1"
-        assert event.feature_size == "XS"
+        assert event.story_id == "F9.1"
+        assert event.story_size == "XS"
         assert event.estimated_min == 25
         assert event.actual_min == 20
         assert event.velocity == 1.25
@@ -178,8 +177,8 @@ class TestCalibrationEvent:
         """Velocity < 1 means slower than expected."""
         event = CalibrationEvent(
             timestamp=now,
-            feature_id="F9.2",
-            feature_size="S",
+            story_id="F9.2",
+            story_size="S",
             estimated_min=30,
             actual_min=45,
             velocity=0.67,
@@ -191,8 +190,8 @@ class TestCalibrationEvent:
         """Event serializes to JSON correctly."""
         event = CalibrationEvent(
             timestamp=now,
-            feature_id="F9.1",
-            feature_size="XS",
+            story_id="F9.1",
+            story_size="XS",
             estimated_min=25,
             actual_min=20,
             velocity=1.25,
@@ -287,18 +286,18 @@ class TestCommandUsage:
 class TestWorkLifecycle:
     """Tests for WorkLifecycle schema (unified Lean flow analysis)."""
 
-    def test_create_feature_start_event(self, now: datetime) -> None:
-        """Create a feature start event."""
+    def test_create_story_start_event(self, now: datetime) -> None:
+        """Create a story start event."""
         event = WorkLifecycle(
             timestamp=now,
-            work_type="feature",
+            work_type="story",
             work_id="F9.4",
             event="start",
             phase="design",
         )
 
         assert event.type == "work_lifecycle"
-        assert event.work_type == "feature"
+        assert event.work_type == "story"
         assert event.work_id == "F9.4"
         assert event.event == "start"
         assert event.phase == "design"
@@ -322,7 +321,7 @@ class TestWorkLifecycle:
         """Create a complete event."""
         event = WorkLifecycle(
             timestamp=now,
-            work_type="feature",
+            work_type="story",
             work_id="F9.4",
             event="complete",
             phase="review",
@@ -335,7 +334,7 @@ class TestWorkLifecycle:
         """Create a blocked event with blocker description."""
         event = WorkLifecycle(
             timestamp=now,
-            work_type="feature",
+            work_type="story",
             work_id="F9.4",
             event="blocked",
             phase="plan",
@@ -373,7 +372,7 @@ class TestWorkLifecycle:
         with pytest.raises(ValidationError):
             WorkLifecycle(
                 timestamp=now,
-                work_type="feature",
+                work_type="story",
                 work_id="F9.4",
                 event="invalid",  # type: ignore[arg-type]
                 phase="design",
@@ -384,7 +383,7 @@ class TestWorkLifecycle:
         with pytest.raises(ValidationError):
             WorkLifecycle(
                 timestamp=now,
-                work_type="feature",
+                work_type="story",
                 work_id="F9.4",
                 event="start",
                 phase="active",  # type: ignore[arg-type] - not valid with normalized phases
@@ -394,7 +393,7 @@ class TestWorkLifecycle:
         """Event serializes to JSON correctly."""
         event = WorkLifecycle(
             timestamp=now,
-            work_type="feature",
+            work_type="story",
             work_id="F9.4",
             event="blocked",
             phase="plan",
@@ -403,7 +402,7 @@ class TestWorkLifecycle:
         data = json.loads(event.model_dump_json())
 
         assert data["type"] == "work_lifecycle"
-        assert data["work_type"] == "feature"
+        assert data["work_type"] == "story"
         assert data["work_id"] == "F9.4"
         assert data["blocker"] == "waiting for ADR"
 
@@ -443,7 +442,7 @@ class TestSignalUnion:
         data = {
             "type": "skill_event",
             "timestamp": now.isoformat(),
-            "skill": "feature-design",
+            "skill": "story-design",
             "event": "complete",
             "duration_sec": 1800,
         }
@@ -451,14 +450,14 @@ class TestSignalUnion:
         signal = adapter.validate_python(data)
 
         assert isinstance(signal, SkillEvent)
-        assert signal.skill == "feature-design"
+        assert signal.skill == "story-design"
 
     def test_parse_session_event(self, now: datetime) -> None:
         """Parse SessionEvent from JSON via discriminated union."""
         data = {
             "type": "session_event",
             "timestamp": now.isoformat(),
-            "session_type": "feature",
+            "session_type": "story",
             "outcome": "success",
             "duration_min": 90,
         }
@@ -473,8 +472,8 @@ class TestSignalUnion:
         data = {
             "type": "calibration",
             "timestamp": now.isoformat(),
-            "feature_id": "F9.1",
-            "feature_size": "XS",
+            "story_id": "F9.1",
+            "story_size": "XS",
             "estimated_min": 25,
             "actual_min": 20,
             "velocity": 1.25,
@@ -515,12 +514,12 @@ class TestSignalUnion:
         assert isinstance(signal, CommandUsage)
         assert signal.command == "memory"
 
-    def test_parse_work_lifecycle_feature(self, now: datetime) -> None:
-        """Parse WorkLifecycle for feature from JSON via discriminated union."""
+    def test_parse_work_lifecycle_story(self, now: datetime) -> None:
+        """Parse WorkLifecycle for story from JSON via discriminated union."""
         data = {
             "type": "work_lifecycle",
             "timestamp": now.isoformat(),
-            "work_type": "feature",
+            "work_type": "story",
             "work_id": "F9.4",
             "event": "blocked",
             "phase": "plan",
@@ -530,7 +529,7 @@ class TestSignalUnion:
         signal = adapter.validate_python(data)
 
         assert isinstance(signal, WorkLifecycle)
-        assert signal.work_type == "feature"
+        assert signal.work_type == "story"
         assert signal.work_id == "F9.4"
         assert signal.blocker == "waiting for ADR"
 

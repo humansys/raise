@@ -239,7 +239,7 @@ User authenticates → OAuth 2.1 → User's permissions apply
 - [ ] Demo: Rai understands Jira context
 
 ### Phase 2: MCP Write (V3.1 - Apr)
-- [ ] Skill: Create Jira issue from feature spec
+- [ ] Skill: Create Jira issue from story spec
 - [ ] Skill: Update Confluence page from spec
 - [ ] Skill: Comment on Jira issue (governance notes)
 

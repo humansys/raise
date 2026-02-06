@@ -225,7 +225,7 @@ Investigate the BMAD Method (Breakthrough Method of Agile AI Driven Development)
 - **PRD workflow** (12 create steps, 13 validation steps, 5 edit steps):
   - Is this proportionate? 30 steps for a PRD seems heavy
   - Compare with RaiSE's specification approach
-  - What happens for small features vs. large products?
+  - What happens for small stories vs. large products?
 - **Architecture workflow** (8-step collaborative facilitation):
   - How does this compare to RaiSE's tech design command?
   - Quality of the architecture outputs?
@@ -1062,7 +1062,7 @@ This research will be successful if it produces:
 
 1. **Accurate Competitive Map**:
    - [ ] BMAD architecture fully documented and understood
-   - [ ] At least 15 distinct BMAD features/patterns analyzed
+   - [ ] At least 15 distinct BMAD stories/patterns analyzed
    - [ ] Strengths and weaknesses evidence-based (not opinion-based)
    - [ ] At least 5 head-to-head comparisons with clear verdicts
 

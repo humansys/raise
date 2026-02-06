@@ -2049,7 +2049,7 @@ class KataHarness {
 - **Research Prompt: Kata Harness First Principles**
   - Path: `/home/emilio/Code/raise-commons/specs/main/research/prompts/kata-harness-first-principles-research.md`
 - **Feature 003: Observable Validation Gates**
-  - Path: `/home/emilio/Code/raise-commons/specs/main/research/speckit-critiques/features/feature-003-observable-gates.md`
+  - Path: `/home/emilio/Code/raise-commons/specs/main/research/speckit-critiques/stories/feature-003-observable-gates.md`
 
 ---
 

@@ -84,8 +84,8 @@ Embed full methodology knowledge in base Rai identity files.
 Base Rai knows how to query; details retrieved on demand.
 
 ```
-Rai knows: "I should use /feature-start before feature work"
-Rai queries: "What are the steps of /feature-start?"
+Rai knows: "I should use /story-start before story work"
+Rai queries: "What are the steps of /story-start?"
 ```
 
 **Pros:** Fresh data, smaller base context
@@ -112,15 +112,15 @@ Rai queries: "What are the steps of /feature-start?"
 
 ## Skills I Know
 - /session-start: Begin session with context loading
-- /feature-start: Initialize feature with branch and scope
-- /feature-plan: Decompose into atomic tasks
-- /feature-implement: Execute with TDD
-- /feature-review: Extract learnings
-- /feature-close: Merge and cleanup
+- /story-start: Initialize feature with branch and scope
+- /story-plan: Decompose into atomic tasks
+- /story-implement: Execute with TDD
+- /story-review: Extract learnings
+- /story-close: Merge and cleanup
 [... all 18 skills ...]
 
 ## Gates I Enforce
-- Never start feature without /feature-start
+- Never start feature without /story-start
 - Never implement without plan
 - Never merge epic without /epic-close
 - Tests must pass before commit
@@ -139,7 +139,7 @@ Inspired by Aider's `/help` mode, Rai should be able to explain itself:
 User: "What skills do you have?"
 Rai: [Knows intrinsically, doesn't need to query]
 
-User: "How does /feature-plan work?"
+User: "How does /story-plan work?"
 Rai: [Queries graph for detailed steps, explains]
 
 User: "Why do we need /epic-close before merge?"
@@ -192,8 +192,8 @@ skills:
 
 gates:
   blocking:
-    - before: feature work
-      require: /feature-start (branch + scope commit)
+    - before: story work
+      require: /story-start (branch + scope commit)
     - before: implementation
       require: plan exists
     - before: commit

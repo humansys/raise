@@ -8,39 +8,13 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from raise_cli.core.text import sanitize_id
 from raise_cli.governance.models import Concept, ConceptType
 
 
-def _sanitize_id(name: str) -> str:
-    """Sanitize outcome name for use as ID.
-
-    Args:
-        name: Outcome name to sanitize.
-
-    Returns:
-        Sanitized ID string (lowercase, hyphens, no special chars).
-
-    Examples:
-        >>> _sanitize_id("Context Generation (MVC)")
-        'context-generation-mvc'
-    """
-    # Convert to lowercase
-    sanitized = name.lower()
-    # Remove parentheses
-    sanitized = sanitized.replace("(", "").replace(")", "")
-    # Replace spaces with hyphens
-    sanitized = sanitized.replace(" ", "-")
-    # Remove other special characters
-    sanitized = re.sub(r"[^a-z0-9-]", "", sanitized)
-    # Remove duplicate hyphens
-    sanitized = re.sub(r"-+", "-", sanitized)
-    # Remove leading/trailing hyphens
-    sanitized = sanitized.strip("-")
-
-    return sanitized
-
-
-def extract_outcomes(file_path: Path, project_root: Path | None = None) -> list[Concept]:
+def extract_outcomes(
+    file_path: Path, project_root: Path | None = None
+) -> list[Concept]:
     """Extract outcomes from Vision markdown tables.
 
     Parses Vision markdown files looking for tables with bold outcome names
@@ -94,7 +68,7 @@ def extract_outcomes(file_path: Path, project_root: Path | None = None) -> list[
                 description = match.group(2).strip()
 
                 # Generate ID from name
-                outcome_id = _sanitize_id(outcome_name)
+                outcome_id = sanitize_id(outcome_name)
 
                 # Calculate relative file path
                 try:

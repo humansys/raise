@@ -276,5 +276,5 @@
 ---
 
 *Catalog created: 2026-01-31*
-*Research question: Lean feature spec format for human understanding + AI alignment*
+*Research question: Lean story spec format for human understanding + AI alignment*
 *Tool: WebSearch (10 queries, 25 sources)*

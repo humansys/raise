@@ -76,7 +76,7 @@ El Niwashi transmite sabiduría cultural adaptable a cada jardín. Las Katas son
 │    • design.md       - Technical Design                          │
 │    • backlog.md      - Creación de backlog                       │
 │                                                                  │
-│  katas/feature/    (Work Cycle: Feature - Nx por feature)        │
+│  katas/story/    (Work Cycle: Feature - Nx por feature)        │
 │    • stories.md      - Generación de historias                   │
 │    • plan.md         - Planificación de implementación           │
 │    • implement.md    - Flujo de codificación                     │
@@ -239,8 +239,8 @@ kata_harness:
 | `katas/flujo/solution-vision.md` | Kata L1 | `katas/project/vision.md` | Kata |
 | `katas/flujo/tech-design.md` | Kata L1 | `katas/project/design.md` | Kata |
 | `katas/flujo/backlog-creation.md` | Kata L1 | `katas/project/backlog.md` | Kata |
-| `katas/flujo/implementation-plan.md` | Kata L1 | `katas/feature/plan.md` | Kata |
-| `katas/flujo/development.md` | Kata L1 | `katas/feature/implement.md` | Kata |
+| `katas/flujo/implementation-plan.md` | Kata L1 | `katas/story/plan.md` | Kata |
+| `katas/flujo/development.md` | Kata L1 | `katas/story/implement.md` | Kata |
 | `katas/patron/code-analysis.md` | Kata L2 | `katas/setup/analyze.md` | Kata |
 | `katas/patron/ecosystem-discovery.md` | Kata L2 | `katas/setup/ecosystem.md` | Kata |
 | `katas/patron/tech-design-stack.md` | Kata L2 | `context/patterns/tech-design-stack.md` | Context |
@@ -256,10 +256,10 @@ kata_harness:
 | `commands/project/create-backlog.md` | Command | `katas/project/backlog.md` | Kata |
 | `commands/project/map-ecosystem.md` | Command | `katas/setup/ecosystem.md` | Kata |
 | `commands/project/estimate-effort.md` | Command | `katas/project/estimate.md` | Kata |
-| `commands/feature/generate-stories.md` | Command | `katas/feature/stories.md` | Kata |
-| `commands/feature/plan-implementation.md` | Command | `katas/feature/plan.md` | Kata |
-| `commands/feature/implement.md` | Command | `katas/feature/implement.md` | Kata |
-| `commands/feature/design-feature.md` | Command | `katas/feature/design.md` | Kata |
+| `commands/feature/generate-stories.md` | Command | `katas/story/stories.md` | Kata |
+| `commands/feature/plan-implementation.md` | Command | `katas/story/plan.md` | Kata |
+| `commands/feature/implement.md` | Command | `katas/story/implement.md` | Kata |
+| `commands/feature/design-feature.md` | Command | `katas/story/design.md` | Kata |
 | `commands/setup/analyze-codebase.md` | Command | `katas/setup/analyze.md` | Kata |
 | `commands/setup/generate-rules.md` | Command | `skills/generate-rules.yaml` | Skill |
 | `commands/setup/edit-rule.md` | Command | `skills/edit-rule.yaml` | Skill |
@@ -281,7 +281,7 @@ titulo: "Discovery: Creación del PRD"
 work_cycle: project              # project | feature | setup | improve
 
 # CONTEXTO DE TRABAJO
-frequency: once-per-epic         # once-per-epic | per-feature | once-brownfield | continuous
+frequency: once-per-epic         # once-per-epic | per-story | once-brownfield | continuous
 fase_metodologia: 1              # Fase SDLC (1-7, opcional)
 
 # RELACIONES
@@ -334,7 +334,7 @@ version: 1.0.0
 | Campo | Propósito | Valores |
 |-------|-----------|---------|
 | `work_cycle` | Directorio padre, indica contexto de trabajo | `project`, `feature`, `setup`, `improve` |
-| `frequency` | Cuántas veces se ejecuta típicamente | `once-per-epic`, `per-feature`, `once-brownfield`, `continuous` |
+| `frequency` | Cuántas veces se ejecuta típicamente | `once-per-epic`, `per-story`, `once-brownfield`, `continuous` |
 | `next_kata` | Sugiere siguiente paso en el flujo | `work_cycle/kata_id` (ej: `project/vision`) |
 | `shuhari` | Guía de adaptación por nivel de maestría | Objeto con claves `shu`, `ha`, `ri` |
 
@@ -453,7 +453,7 @@ implementation:
 - [ ] Crear directorio `.raise/skills/`
 - [ ] Crear directorios `.raise/{harness,context}/`
 - [ ] Migrar `commands/project/*.md` → `katas/project/*.md`
-- [ ] Migrar `commands/feature/*.md` → `katas/feature/*.md`
+- [ ] Migrar `commands/feature/*.md` → `katas/story/*.md`
 - [ ] Migrar `commands/setup/*.md` → `katas/setup/*.md` + `skills/*.yaml`
 - [ ] Migrar `commands/context/*.md` → `skills/*.yaml`
 - [ ] Migrar `commands/validate/*.md` → `skills/run-gate.yaml`

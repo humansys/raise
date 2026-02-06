@@ -1,7 +1,7 @@
 # Velocity Calibration
 
 > Track actual durations to calibrate T-shirt sizing over time.
-> Updated after each feature via `/session-close` or `/feature-review`.
+> Updated after each story via `/session-close` or `/story-review`.
 
 ---
 

@@ -78,7 +78,7 @@ Choose a low-risk feature for your first fully-governed work:
 
 ### Step 7: Run the Feature Cycle
 
-Execute the feature katas:
+Execute the story katas:
 
 1. `feature/design` — Technical design
 2. `feature/stories` — User stories with acceptance criteria

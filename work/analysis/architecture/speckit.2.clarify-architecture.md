@@ -13,7 +13,7 @@ El comando `speckit.2.clarify` es un workflow interactivo de reducción de ambig
 ### 2.1 Frontmatter Analysis
 
 ```yaml
-description: Identify underspecified areas in the current feature spec by asking up to 5 highly targeted clarification questions and encoding answers back into the spec.
+description: Identify underspecified areas in the current story spec by asking up to 5 highly targeted clarification questions and encoding answers back into the spec.
 handoffs:
   - label: Build Technical Plan
     agent: speckit.3.plan

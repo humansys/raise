@@ -3,7 +3,7 @@ name: epic-plan
 description: >
   Sequence features from epic-design into an executable plan with milestones,
   dependencies, and progress tracking. Use after /epic-design to create a
-  realistic implementation roadmap before starting feature work.
+  realistic implementation roadmap before starting story work.
 
 license: MIT
 
@@ -12,7 +12,7 @@ metadata:
   raise.frequency: per-epic
   raise.fase: "4"
   raise.prerequisites: epic-design
-  raise.next: feature-design
+  raise.next: story-design
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
@@ -22,11 +22,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-plan \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=epic-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-plan \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=epic-plan \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Plan: Epic Implementation Roadmap
@@ -62,9 +62,9 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 - Epics already in progress (use for new epics only)
 
 **Inputs required:**
-- Epic scope document (`dev/epic-{id}-scope.md`) from `/epic-design`
+- Epic scope document: `work/epics/e{N}-{name}/scope.md`
 - Feature list with sizes and dependencies
-- Calibration data (`.claude/rai/calibration.md` if available)
+- Calibration data (`.raise/rai/memory/calibration.jsonl` if available)
 - External constraints (deadlines, dependencies, resource availability)
 
 **Outputs:**
@@ -81,24 +81,24 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 Record the start of the plan phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event start --phase plan
+uv run raise memory emit-work epic {epic_id} --event start --phase plan
 ```
 
-**Example:** `raise telemetry emit epic E9 -e start -p plan`
+**Example:** `raise memory emit-work epic E9 -e start -p plan`
 
 ### Step 0.5: Query Context
 
 Load relevant sequencing patterns and calibration from unified context:
 
 ```bash
-raise context query "sequencing calibration planning" --unified --types pattern,calibration --limit 5
+uv run raise memory query "sequencing calibration planning" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Calibration data informs realistic estimates.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
 ### Step 1: Review Epic Design Output
 
@@ -203,6 +203,8 @@ Include early features that:
 **Verification:** Each feature has sequencing rationale documented.
 
 > **If you can't continue:** Multiple valid orderings → Choose risk-first as default; document alternatives.
+
+> **Deep dive:** See `_references/sequencing-strategies.md` for detailed philosophy and anti-patterns.
 
 ---
 
@@ -353,11 +355,11 @@ Define how progress will be measured and communicated.
 - [ ] M3: Feature Complete (Day 7)
 - [ ] M4: Epic Complete (Day 9)
 
-**Velocity:** {X.Y}x average (updated per feature)
+**Velocity:** {X.Y}x average (updated per story)
 ```
 
 **Tracking cadence:**
-- Update after each feature completion
+- Update after each story completion
 - Milestone check at end of each day/session
 - Velocity recalculation after 3+ features
 
@@ -371,7 +373,7 @@ Define how progress will be measured and communicated.
 
 Capture why features are ordered this way for future reference.
 
-**For each feature, note:**
+**For each story, note:**
 - Position rationale (why this order?)
 - Dependencies (what does it need? what does it enable?)
 - Risk factors (what could go wrong?)
@@ -398,7 +400,7 @@ Capture why features are ordered this way for future reference.
 - **Parallel:** No (on critical path)
 ```
 
-**Verification:** Sequencing rationale documented for each feature.
+**Verification:** Sequencing rationale documented for each story.
 
 > **If you can't continue:** Rationale obvious → Brief notes sufficient; don't over-document.
 
@@ -507,18 +509,18 @@ Self-review checklist before starting implementation.
 Record the completion of the plan phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event complete --phase plan
+uv run raise memory emit-work epic {epic_id} --event complete --phase plan
 ```
 
-**Example:** `raise telemetry emit epic E9 -e complete -p plan`
+**Example:** `raise memory emit-work epic E9 -e complete -p plan`
 
 ---
 
 ## Output
 
-- **Primary:** Updated `dev/epic-{id}-scope.md` with implementation plan
+- **Primary:** `work/epics/e{N}-{name}/scope.md` — updated with implementation plan
 - **Sections added:** Feature sequence, milestones, parallel opportunities, progress tracking
-- **Next:** `/feature-design` for first feature in sequence
+- **Next:** `/story-design` for first feature in sequence
 
 ## Implementation Plan Template
 
@@ -595,7 +597,7 @@ Stream 3 (Parallel):        F{N}.4 ───┘
 ---
 
 *Plan created: YYYY-MM-DD*
-*Next: `/feature-design` for F{N}.1*
+*Next: `/story-design` for F{N}.1*
 ```
 
 ## Quality Standards
@@ -605,7 +607,7 @@ Stream 3 (Parallel):        F{N}.4 ───┘
 | Planning time | <1 hour for typical epic |
 | Plan reviewable | <5 minutes to understand sequence |
 | Milestones per epic | 2-4 (Walking Skeleton + MVP minimum) |
-| Sequencing rationale | 1-2 sentences per feature |
+| Sequencing rationale | 1-2 sentences per story |
 | Risk coverage | Top 3 sequencing risks addressed |
 
 ## Common Pitfalls
@@ -618,61 +620,6 @@ Stream 3 (Parallel):        F{N}.4 ───┘
 6. **Timeline without buffer** — Every hour accounted for; no room for learning
 7. **Planning without calibration** — Estimates based on intuition instead of measured velocity
 8. **Sunk cost sequencing** — "We already started X, so finish it" instead of re-evaluating
-
-## Sequencing Strategies Deep Dive
-
-### Risk-First (Primary)
-
-**Philosophy:** Uncertainty decreases as you learn. Early features teach you about the codebase, the problem, and your velocity. Tackling risky features early means:
-- More time to recover from surprises
-- Learning informs later features
-- Confidence grows throughout epic
-
-**Identify risky features by:**
-- New technology or unfamiliar patterns
-- Integration with external systems
-- Unclear requirements (even after design)
-- Performance or scalability unknowns
-- Team has never done something similar
-
-**Anti-pattern:** "Let's do the easy features first to build momentum" — This feels good but front-loads certainty and back-loads risk. By the time you hit the hard features, deadline pressure is highest.
-
-### Walking Skeleton
-
-**Philosophy:** Prove the architecture works before investing heavily. A walking skeleton is the smallest end-to-end path through the system that demonstrates:
-- Key architectural decisions are valid
-- Integration points work
-- Development environment is productive
-- Deployment pipeline functions
-
-**Walking skeleton features:**
-- Minimal but complete path from input to output
-- Touches all layers (UI, API, data, infrastructure)
-- Can be demonstrated (not just "it compiles")
-- Provides foundation for rest of features
-
-**Example:** For a governance toolkit epic, walking skeleton might be:
-- F1: Extract one concept from one file
-- F2: Build minimal graph with one relationship
-- F3: Query graph and return result
-
-**Anti-pattern:** Building all of layer 1 before touching layer 2. This delays integration risk discovery.
-
-### Quick Wins
-
-**Philosophy:** Early success builds momentum and validates process. Quick wins are features that:
-- Can be completed in one session
-- Provide visible, demonstrable value
-- Don't block other features
-- Build confidence in approach
-
-**Use quick wins when:**
-- Starting a new codebase or technology
-- Team morale needs boost
-- Stakeholders need early visibility
-- Validating development process
-
-**Anti-pattern:** Only quick wins — avoiding hard features indefinitely. Quick wins support risk-first; they don't replace it.
 
 ## Integration with Memory Model
 
@@ -697,10 +644,10 @@ This skill supports the three-layer memory model:
 ## References
 
 - **Epic Design:** `/epic-design` (produces input for this skill)
-- **Epic Scope Examples:** `dev/epic-e1-scope.md`, `dev/epic-e2-scope.md`, `dev/epic-e3-scope.md`
-- **Feature Planning:** `/feature-plan` (similar concept at feature level)
+- **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
+- **Feature Planning:** `/story-plan` (similar concept at story level)
 - **Epic Close:** `/epic-close` (retrospective after completion)
-- **Calibration Data:** `.claude/rai/calibration.md` (velocity patterns)
+- **Calibration Data:** `.raise/rai/memory/calibration.jsonl` (velocity patterns)
 - **Constitution:** `framework/reference/constitution.md` (Lean principles)
 - **Guardrails:** `governance/solution/guardrails.md` (quality standards)
 
@@ -720,13 +667,13 @@ Project Level
     ↓
 /epic-plan     ← YOU ARE HERE (sequence, milestones, tracking)
     ↓
-/feature-design → /feature-plan → /feature-implement → /feature-review
+/story-design → /story-plan → /story-implement → /story-review
     ↓
 /epic-close    ← Retrospective, learnings
 ```
 
 **From `/epic-design`:** Receives feature list with sizes, dependencies, risks
-**To `/feature-design`:** Provides sequenced list, identifies first feature to start
+**To `/story-design`:** Provides sequenced list, identifies first feature to start
 
 ---
 
