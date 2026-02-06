@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 from raise_cli.skills.schema import Skill
+from raise_cli.skills.validator import ValidationResult
 
 
 def format_skill_list_human(
@@ -89,3 +90,70 @@ def format_skill_list_json(
     }
 
     return json.dumps(output, indent=2)
+
+
+def format_validation_human(
+    results: list[ValidationResult],
+    console: Console,
+) -> None:
+    """Format validation results for human output.
+
+    Args:
+        results: List of validation results.
+        console: Rich console for output.
+    """
+    total_errors = sum(r.error_count for r in results)
+    total_warnings = sum(r.warning_count for r in results)
+
+    for result in results:
+        console.print(f"\n[bold]Validating:[/bold] {result.path}")
+
+        if result.is_valid and result.warning_count == 0:
+            console.print("[green]✓ All checks passed[/green]")
+            continue
+
+        # Show errors
+        for error in result.errors:
+            console.print(f"[red]✗ {error}[/red]")
+
+        # Show warnings
+        for warning in result.warnings:
+            console.print(f"[yellow]⚠ {warning}[/yellow]")
+
+    # Summary
+    console.print()
+    if total_errors == 0 and total_warnings == 0:
+        console.print(f"[green]All {len(results)} skill(s) valid[/green]")
+    else:
+        parts: list[str] = []
+        if total_errors > 0:
+            parts.append(f"[red]{total_errors} error(s)[/red]")
+        if total_warnings > 0:
+            parts.append(f"[yellow]{total_warnings} warning(s)[/yellow]")
+        console.print(f"{len(results)} skill(s) checked: {', '.join(parts)}")
+
+
+def format_validation_json(results: list[ValidationResult]) -> str:
+    """Format validation results as JSON.
+
+    Args:
+        results: List of validation results.
+
+    Returns:
+        JSON string.
+    """
+    output: list[dict[str, Any]] = []
+    for result in results:
+        output.append({
+            "path": result.path,
+            "valid": result.is_valid,
+            "errors": result.errors,
+            "warnings": result.warnings,
+        })
+
+    return json.dumps({
+        "results": output,
+        "total_errors": sum(r.error_count for r in results),
+        "total_warnings": sum(r.warning_count for r in results),
+        "all_valid": all(r.is_valid for r in results),
+    }, indent=2)

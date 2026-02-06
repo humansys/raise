@@ -6,6 +6,7 @@ RaiSE skills, following the inference economy principle.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated
 
 import typer
@@ -14,8 +15,11 @@ from rich.console import Console
 from raise_cli.output.formatters.skill import (
     format_skill_list_human,
     format_skill_list_json,
+    format_validation_human,
+    format_validation_json,
 )
 from raise_cli.skills.locator import SkillLocator, get_default_skill_dir
+from raise_cli.skills.validator import ValidationResult, validate_skill, validate_skill_file
 
 skill_app = typer.Typer(
     name="skill",
@@ -51,3 +55,66 @@ def list_command(
         print(output)  # Plain print for valid JSON
     else:
         format_skill_list_human(skills, grouped, console)
+
+
+@skill_app.command("validate")
+def validate_command(
+    path: Annotated[
+        str | None,
+        typer.Argument(
+            help="Path to skill file or directory. Validates all skills if not specified.",
+        ),
+    ] = None,
+    format: Annotated[
+        str,
+        typer.Option(
+            "--format",
+            "-f",
+            help="Output format: human or json",
+        ),
+    ] = "human",
+) -> None:
+    """Validate skill structure against RaiSE schema.
+
+    Checks frontmatter, required fields, sections, and naming conventions.
+    """
+    results: list[ValidationResult] = []
+
+    if path:
+        # Validate specific file or directory
+        target = Path(path)
+        if target.is_file():
+            results.append(validate_skill_file(target))
+        elif target.is_dir():
+            # Look for SKILL.md in directory
+            skill_file = target / "SKILL.md"
+            if skill_file.exists():
+                results.append(validate_skill_file(skill_file))
+            else:
+                results.append(ValidationResult(
+                    path=str(target),
+                    errors=[f"No SKILL.md found in {target}"],
+                ))
+        else:
+            results.append(ValidationResult(
+                path=str(target),
+                errors=[f"Path not found: {target}"],
+            ))
+    else:
+        # Validate all skills
+        skill_dir = get_default_skill_dir()
+        locator = SkillLocator(skill_dir)
+        skills = locator.load_all_skills()
+
+        for skill in skills:
+            results.append(validate_skill(skill))
+
+    # Output results
+    if format == "json":
+        print(format_validation_json(results))
+    else:
+        format_validation_human(results, console)
+
+    # Exit with error code if any validation failed
+    if not all(r.is_valid for r in results):
+        raise typer.Exit(code=1)
