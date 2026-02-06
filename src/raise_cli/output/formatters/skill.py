@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.table import Table
 
 from raise_cli.skills.name_checker import NameCheckResult
+from raise_cli.skills.scaffold import ScaffoldResult
 from raise_cli.skills.schema import Skill
 from raise_cli.skills.validator import ValidationResult
 
@@ -230,4 +231,38 @@ def format_name_check_json(result: NameCheckResult) -> str:
             "command": result.conflicting_command,
         },
         "suggestions": result.suggestions,
+    }, indent=2)
+
+
+def format_scaffold_human(result: ScaffoldResult, console: Console) -> None:
+    """Format scaffold result for human output.
+
+    Args:
+        result: Scaffold result.
+        console: Rich console for output.
+    """
+    if result.created:
+        console.print(f"\n[green]✓ Created skill at:[/green] {result.path}")
+        console.print("\n[dim]Next steps:[/dim]")
+        console.print("  1. Edit the SKILL.md to add description and steps")
+        console.print("  2. Run [cyan]raise skill validate[/cyan] to check structure")
+        console.print("  3. Test the skill with Claude Code")
+    else:
+        console.print(f"\n[red]✗ Failed to create skill[/red]")
+        console.print(f"[red]  {result.error}[/red]")
+
+
+def format_scaffold_json(result: ScaffoldResult) -> str:
+    """Format scaffold result as JSON.
+
+    Args:
+        result: Scaffold result.
+
+    Returns:
+        JSON string.
+    """
+    return json.dumps({
+        "created": result.created,
+        "path": result.path,
+        "error": result.error,
     }, indent=2)
