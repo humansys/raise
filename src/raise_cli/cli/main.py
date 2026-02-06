@@ -9,6 +9,7 @@ import typer
 from rich.console import Console
 
 from raise_cli import __version__
+from raise_cli.cli.commands.base import base_app
 from raise_cli.cli.commands.discover import discover_app
 from raise_cli.cli.commands.init import init_command
 from raise_cli.cli.commands.memory import memory_app
@@ -38,6 +39,7 @@ app = typer.Typer(
 )
 
 # Register command groups
+app.add_typer(base_app, name="base")
 app.add_typer(discover_app, name="discover")
 app.add_typer(memory_app, name="memory")
 app.add_typer(profile_app, name="profile")
