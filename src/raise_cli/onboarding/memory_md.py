@@ -184,9 +184,7 @@ class MemoryMdGenerator:
         lines.append("---")
         lines.append("")
 
-    def _add_gates_section(
-        self, lines: list[str], methodology: dict[str, Any]
-    ) -> None:
+    def _add_gates_section(self, lines: list[str], methodology: dict[str, Any]) -> None:
         """Add gate requirements as table."""
         gates = methodology.get("gates", {})
         blocking = gates.get("blocking", [])
