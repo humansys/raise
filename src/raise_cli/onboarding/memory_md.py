@@ -353,3 +353,37 @@ class MemoryMdGenerator:
             logger.warning("Failed to read patterns.jsonl: %s", e)
 
         return patterns
+
+
+def generate_memory_md(
+    methodology_path: Path | None = None,
+    patterns_path: Path | None = None,
+    project_name: str = "project",
+    max_patterns: int = 10,
+) -> str:
+    """Convenience function to generate MEMORY.md content.
+
+    Args:
+        methodology_path: Path to methodology.yaml.
+        patterns_path: Path to patterns.jsonl.
+        project_name: Project name for header.
+        max_patterns: Maximum patterns to include.
+
+    Returns:
+        Markdown content for MEMORY.md.
+
+    Example:
+        >>> content = generate_memory_md(
+        ...     methodology_path=Path(".raise/rai/framework/methodology.yaml"),
+        ...     patterns_path=Path(".raise/rai/memory/patterns.jsonl"),
+        ...     project_name="my-api",
+        ... )
+        >>> Path("MEMORY.md").write_text(content)
+    """
+    generator = MemoryMdGenerator()
+    return generator.generate(
+        methodology_path=methodology_path,
+        patterns_path=patterns_path,
+        project_name=project_name,
+        max_patterns=max_patterns,
+    )

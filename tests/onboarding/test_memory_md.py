@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.onboarding.memory_md import MemoryMdGenerator
+from raise_cli.onboarding.memory_md import MemoryMdGenerator, generate_memory_md
 
 
 # =============================================================================
@@ -218,3 +218,231 @@ class TestMemoryMdGeneratorPart1:
 
         assert "*Last updated:" in result
         assert "raise memory generate" in result
+
+
+# =============================================================================
+# Fixtures for Part 2
+# =============================================================================
+
+
+@pytest.fixture()
+def sample_patterns_jsonl(tmp_path: Path) -> Path:
+    """Create a sample patterns.jsonl for testing."""
+    import json
+
+    patterns = [
+        {
+            "id": "PAT-001",
+            "type": "process",
+            "content": "TDD cycle yields higher quality",
+            "context": ["testing", "quality"],
+            "created": "2026-01-31",
+        },
+        {
+            "id": "PAT-002",
+            "type": "codebase",
+            "content": "Singleton pattern for module state",
+            "context": ["architecture"],
+            "created": "2026-02-01",
+        },
+        {
+            "id": "PAT-003",
+            "type": "process",
+            "content": "Commit after each task enables recovery",
+            "context": ["git", "workflow"],
+            "created": "2026-02-02",
+        },
+    ]
+    path = tmp_path / "patterns.jsonl"
+    path.write_text("\n".join(json.dumps(p) for p in patterns) + "\n")
+    return path
+
+
+# =============================================================================
+# Part 2 Tests — Patterns → Markdown
+# =============================================================================
+
+
+class TestMemoryMdGeneratorPart2:
+    """Tests for Part 2: patterns.jsonl → markdown."""
+
+    def test_renders_patterns(
+        self, sample_methodology_yaml: Path, sample_patterns_jsonl: Path
+    ) -> None:
+        """Should render patterns with ID and content."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=sample_methodology_yaml,
+            patterns_path=sample_patterns_jsonl,
+        )
+
+        assert "## Key Patterns" in result
+        assert "**PAT-001:**" in result
+        assert "TDD cycle yields higher quality" in result
+        assert "**PAT-003:**" in result
+
+    def test_limits_patterns_to_max(
+        self, sample_methodology_yaml: Path, tmp_path: Path
+    ) -> None:
+        """Should only include max_patterns most recent."""
+        import json
+
+        patterns = [
+            {"id": f"PAT-{i:03d}", "content": f"Pattern {i}", "created": "2026-01-01"}
+            for i in range(1, 21)
+        ]
+        path = tmp_path / "patterns.jsonl"
+        path.write_text("\n".join(json.dumps(p) for p in patterns) + "\n")
+
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=sample_methodology_yaml,
+            patterns_path=path,
+            max_patterns=5,
+        )
+
+        # Should have the last 5 (PAT-016 through PAT-020)
+        assert "PAT-020" in result
+        assert "PAT-016" in result
+        assert "PAT-001" not in result
+
+    def test_empty_patterns_shows_placeholder(
+        self, sample_methodology_yaml: Path, tmp_path: Path
+    ) -> None:
+        """Should show placeholder when patterns.jsonl is empty."""
+        path = tmp_path / "patterns.jsonl"
+        path.write_text("")
+
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=sample_methodology_yaml,
+            patterns_path=path,
+        )
+
+        assert "No patterns yet" in result
+
+    def test_missing_patterns_file_shows_placeholder(
+        self, sample_methodology_yaml: Path, tmp_path: Path
+    ) -> None:
+        """Should show placeholder when patterns.jsonl doesn't exist."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=sample_methodology_yaml,
+            patterns_path=tmp_path / "nonexistent.jsonl",
+        )
+
+        assert "No patterns yet" in result
+
+    def test_no_patterns_path_shows_placeholder(
+        self, sample_methodology_yaml: Path
+    ) -> None:
+        """Should show placeholder when no patterns_path provided."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=sample_methodology_yaml,
+            patterns_path=None,
+        )
+
+        assert "No patterns yet" in result
+
+
+# =============================================================================
+# Edge Cases / Graceful Degradation
+# =============================================================================
+
+
+class TestMemoryMdGeneratorEdgeCases:
+    """Tests for graceful degradation."""
+
+    def test_missing_methodology_still_generates(self, tmp_path: Path) -> None:
+        """Should generate MEMORY.md even without methodology.yaml."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=tmp_path / "nonexistent.yaml",
+            project_name="fallback-project",
+        )
+
+        assert "# Rai Memory — fallback-project" in result
+        assert "Key Patterns" in result
+        assert "Last updated" in result
+
+    def test_no_methodology_path_still_generates(self) -> None:
+        """Should generate MEMORY.md when methodology_path is None."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(methodology_path=None, project_name="test")
+
+        assert "# Rai Memory — test" in result
+        assert isinstance(result, str)
+
+    def test_malformed_yaml_degrades_gracefully(self, tmp_path: Path) -> None:
+        """Should handle invalid YAML without crashing."""
+        bad_yaml = tmp_path / "bad.yaml"
+        bad_yaml.write_text(": : : invalid yaml [[[")
+
+        gen = MemoryMdGenerator()
+        result = gen.generate(methodology_path=bad_yaml)
+
+        # Should still produce output (header + footer at minimum)
+        assert "# Rai Memory" in result
+
+    def test_malformed_jsonl_skips_bad_lines(
+        self, sample_methodology_yaml: Path, tmp_path: Path
+    ) -> None:
+        """Should skip invalid JSON lines without crashing."""
+        path = tmp_path / "patterns.jsonl"
+        path.write_text(
+            '{"id": "PAT-001", "content": "Good pattern"}\n'
+            "this is not json\n"
+            '{"id": "PAT-002", "content": "Another good one"}\n'
+        )
+
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=sample_methodology_yaml,
+            patterns_path=path,
+        )
+
+        assert "PAT-001" in result
+        assert "PAT-002" in result
+
+    def test_default_project_name(self, sample_methodology_yaml: Path) -> None:
+        """Should use 'project' as default project name."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(methodology_path=sample_methodology_yaml)
+
+        assert "# Rai Memory — project" in result
+
+
+# =============================================================================
+# Convenience Function
+# =============================================================================
+
+
+class TestGenerateMemoryMd:
+    """Tests for the generate_memory_md() convenience function."""
+
+    def test_returns_string(self, sample_methodology_yaml: Path) -> None:
+        """Should return markdown string."""
+        result = generate_memory_md(
+            methodology_path=sample_methodology_yaml,
+            project_name="convenience-test",
+        )
+
+        assert isinstance(result, str)
+        assert "# Rai Memory — convenience-test" in result
+
+    def test_passes_all_args_through(
+        self, sample_methodology_yaml: Path, sample_patterns_jsonl: Path
+    ) -> None:
+        """Should pass all arguments to the generator."""
+        result = generate_memory_md(
+            methodology_path=sample_methodology_yaml,
+            patterns_path=sample_patterns_jsonl,
+            project_name="full-test",
+            max_patterns=2,
+        )
+
+        assert "# Rai Memory — full-test" in result
+        assert "PAT-003" in result  # Most recent
+        assert "PAT-002" in result  # Second most recent
+        assert "PAT-001" not in result  # Excluded by max_patterns=2
