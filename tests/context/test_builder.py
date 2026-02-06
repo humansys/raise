@@ -12,6 +12,7 @@ import pytest
 
 from raise_cli.context.builder import UnifiedGraphBuilder
 from raise_cli.context.models import ConceptNode
+from raise_cli.memory.models import MemoryScope
 
 
 class TestUnifiedGraphBuilderInit:
@@ -130,8 +131,9 @@ class TestLoadMemory:
         assert "F1.1" in node.content
 
     def test_loads_sessions_from_jsonl(self, tmp_path: Path) -> None:
-        """Should load sessions from sessions/index.jsonl."""
-        sessions_dir = tmp_path / ".raise/rai" / "memory" / "sessions"
+        """Should load sessions from personal/sessions/index.jsonl."""
+        # Sessions now only load from personal directory (multi-dev architecture)
+        sessions_dir = tmp_path / ".raise/rai" / "personal" / "sessions"
         sessions_dir.mkdir(parents=True)
 
         sessions_file = sessions_dir / "index.jsonl"
@@ -164,8 +166,13 @@ class TestLoadMemory:
 
     def test_loads_all_memory_types(self, tmp_path: Path) -> None:
         """Should load patterns, calibration, and sessions together."""
+        # Project directory for patterns and calibration
         memory_dir = tmp_path / ".raise/rai" / "memory"
-        sessions_dir = memory_dir / "sessions"
+        memory_dir.mkdir(parents=True)
+
+        # Personal directory for sessions (multi-dev architecture)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        sessions_dir = personal_dir / "sessions"
         sessions_dir.mkdir(parents=True)
 
         (memory_dir / "patterns.jsonl").write_text(
@@ -184,6 +191,163 @@ class TestLoadMemory:
         assert len(nodes) == 3
         types = {n.type for n in nodes}
         assert types == {"pattern", "calibration", "session"}
+
+
+class TestLoadMemoryMultiSource:
+    """Tests for multi-source memory loading (global, project, personal)."""
+
+    def test_loads_from_global_directory(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should load patterns from ~/.rai/ with global scope."""
+        # Setup global directory
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        (global_rai / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-GLOBAL",
+                "type": "universal",
+                "content": "Universal pattern",
+                "created": "2026-01-31",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "PAT-GLOBAL"
+        assert node.metadata.get("scope") == "global"
+
+    def test_loads_from_project_directory(self, tmp_path: Path) -> None:
+        """Should load patterns from .raise/rai/memory/ with project scope."""
+        memory_dir = tmp_path / ".raise/rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        (memory_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-PROJECT",
+                "type": "codebase",
+                "content": "Project pattern",
+                "created": "2026-01-31",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "PAT-PROJECT"
+        assert node.metadata.get("scope") == "project"
+
+    def test_loads_from_personal_directory(self, tmp_path: Path) -> None:
+        """Should load patterns from .raise/rai/personal/ with personal scope."""
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-PERSONAL",
+                "type": "process",
+                "content": "Personal pattern",
+                "created": "2026-01-31",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "PAT-PERSONAL"
+        assert node.metadata.get("scope") == "personal"
+
+    def test_loads_from_all_three_tiers(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should load from global, project, and personal directories."""
+        # Setup global
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+        (global_rai / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-G1", "type": "universal", "content": "Global", "created": "2026-01-31"}) + "\n"
+        )
+
+        # Setup project
+        project_memory = tmp_path / ".raise/rai" / "memory"
+        project_memory.mkdir(parents=True)
+        (project_memory / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-P1", "type": "codebase", "content": "Project", "created": "2026-01-31"}) + "\n"
+        )
+
+        # Setup personal
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-L1", "type": "process", "content": "Personal", "created": "2026-01-31"}) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 3
+        scopes = {n.metadata.get("scope") for n in nodes}
+        assert scopes == {"global", "project", "personal"}
+
+    def test_loads_calibration_from_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should load calibration from ~/.rai/ with global scope."""
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        (global_rai / "calibration.jsonl").write_text(
+            json.dumps({
+                "id": "CAL-GLOBAL",
+                "feature": "F1.1",
+                "name": "Global Cal",
+                "size": "S",
+                "created": "2026-01-31",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        assert len(nodes) == 1
+        assert nodes[0].id == "CAL-GLOBAL"
+        assert nodes[0].metadata.get("scope") == "global"
+
+    def test_loads_sessions_from_personal_only(self, tmp_path: Path) -> None:
+        """Sessions should only load from personal directory (developer-specific)."""
+        # Project sessions (should NOT be loaded in multi-dev mode)
+        project_sessions = tmp_path / ".raise/rai" / "memory" / "sessions"
+        project_sessions.mkdir(parents=True)
+        (project_sessions / "index.jsonl").write_text(
+            json.dumps({"id": "SES-PROJECT", "date": "2026-02-01", "type": "feature", "topic": "Project session"}) + "\n"
+        )
+
+        # Personal sessions (SHOULD be loaded)
+        personal_sessions = tmp_path / ".raise/rai" / "personal" / "sessions"
+        personal_sessions.mkdir(parents=True)
+        (personal_sessions / "index.jsonl").write_text(
+            json.dumps({"id": "SES-PERSONAL", "date": "2026-02-01", "type": "feature", "topic": "Personal session"}) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have personal session
+        session_nodes = [n for n in nodes if n.type == "session"]
+        assert len(session_nodes) == 1
+        assert session_nodes[0].id == "SES-PERSONAL"
+        assert session_nodes[0].metadata.get("scope") == "personal"
 
 
 class TestLoadWork:
@@ -604,8 +768,13 @@ class TestInferRelationships:
 
     def test_build_includes_inferred_edges(self, tmp_path: Path) -> None:
         """Build should include edges from infer_relationships."""
+        # Project directory for patterns
         memory_dir = tmp_path / ".raise/rai" / "memory"
-        sessions_dir = memory_dir / "sessions"
+        memory_dir.mkdir(parents=True)
+
+        # Personal directory for sessions (multi-dev architecture)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        sessions_dir = personal_dir / "sessions"
         sessions_dir.mkdir(parents=True)
 
         # Pattern with learned_from
@@ -619,11 +788,12 @@ class TestInferRelationships:
             }) + "\n"
         )
 
-        # Session that matches
+        # Session that matches (in personal directory)
         (sessions_dir / "index.jsonl").write_text(
             json.dumps({
                 "id": "SES-010",
                 "date": "2026-01-31",
+                "type": "feature",
                 "topic": "F1.5 Output Module",
             }) + "\n"
         )
