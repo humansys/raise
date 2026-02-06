@@ -282,7 +282,9 @@ def _format_json(result: UnifiedQueryResult) -> str:
 def generate_memory(
     path: Annotated[
         Path | None,
-        typer.Option("--path", "-p", help="Project root (defaults to current directory)"),
+        typer.Option(
+            "--path", "-p", help="Project root (defaults to current directory)"
+        ),
     ] = None,
 ) -> None:
     """Generate MEMORY.md for AI editors (Claude Code, etc.).

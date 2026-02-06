@@ -271,7 +271,11 @@ def init_command(
     bootstrap_result = bootstrap_rai_base(project_path)
 
     # Generate MEMORY.md (canonical + Claude Code)
-    from raise_cli.config.paths import get_claude_memory_path, get_framework_dir, get_memory_dir
+    from raise_cli.config.paths import (
+        get_claude_memory_path,
+        get_framework_dir,
+        get_memory_dir,
+    )
     from raise_cli.onboarding.memory_md import generate_memory_md
 
     methodology_path = get_framework_dir(project_path) / "methodology.yaml"
