@@ -54,7 +54,7 @@ V3:
 | F14.3 | Methodology Core | S | 2 | ✅ Done | methodology.yaml with skills, gates, rules |
 | F14.4 | Bootstrap on Init | M | 3 | ✅ Done | Copy bundled base to .raise/rai/ during raise init |
 | F14.5 | Two-Part MEMORY.md | M | 3 | ✅ Done | Generate MEMORY.md with static process + dynamic context |
-| F14.6 | Pattern Versioning | S | 2 | Pending | Add base/version fields to pattern schema |
+| F14.6 | Pattern Versioning | S | 2 | ✅ Done | Add base/version fields to pattern schema |
 | F14.7 | Base Show Command | XS | 1 | Pending | `raise base show` displays current base info |
 | F14.15 | Multi-Developer Architecture | L | 5 | ✅ Done | Separate personal data from shared project data |
 
@@ -366,8 +366,8 @@ Buffer for fixes
 | F14.2 Base Patterns | M | ✅ Done | 1 session | — | 20 universal patterns |
 | F14.3 Methodology | S | ✅ Done | 1 session | — | 20 skills, gates, principles |
 | F14.4 Bootstrap | M | ✅ Done | 30 min | 2.0x | PAT-154, PAT-155 |
-| F14.5 MEMORY.md | M | Pending | — | — | |
-| F14.6 Versioning | S | Pending | — | — | |
+| F14.5 MEMORY.md | M | ✅ Done | 1 session | 1.0x | PAT-156, PAT-157 |
+| F14.6 Versioning | S | ✅ Done | 15 min | 3.0x | 8 new tests, clean TDD |
 | F14.7 Base Show | XS | Pending | — | — | |
 | F14.12 Memory Ontology | XS | ✅ Done | 1 session | — | graph→memory, simpler CLI |
 | F14.13 Ontology Cleanup | M | ✅ Done | 90 min | 1.33x | CLI restructure, /skill-create, 9 patterns |
