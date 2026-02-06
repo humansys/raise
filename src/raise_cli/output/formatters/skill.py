@@ -8,6 +8,7 @@ from typing import Any
 from rich.console import Console
 from rich.table import Table
 
+from raise_cli.skills.name_checker import NameCheckResult
 from raise_cli.skills.schema import Skill
 from raise_cli.skills.validator import ValidationResult
 
@@ -156,4 +157,77 @@ def format_validation_json(results: list[ValidationResult]) -> str:
         "total_errors": sum(r.error_count for r in results),
         "total_warnings": sum(r.warning_count for r in results),
         "all_valid": all(r.is_valid for r in results),
+    }, indent=2)
+
+
+def format_name_check_human(result: NameCheckResult, console: Console) -> None:
+    """Format name check result for human output.
+
+    Args:
+        result: Name check result.
+        console: Rich console for output.
+    """
+    console.print(f"\n[bold]Checking name:[/bold] {result.name}\n")
+
+    # Pattern check
+    if result.valid_pattern:
+        console.print("[green]✓ Follows {domain}-{action} pattern[/green]")
+    else:
+        console.print("[red]✗ Does not follow {domain}-{action} pattern[/red]")
+
+    # Skill conflict
+    if result.no_skill_conflict:
+        console.print("[green]✓ No conflict with existing skills[/green]")
+    else:
+        console.print(f"[red]✗ Conflicts with existing skill: {result.conflicting_skill}[/red]")
+
+    # CLI conflict
+    if result.no_cli_conflict:
+        console.print("[green]✓ No CLI command conflict[/green]")
+    else:
+        console.print(f"[red]✗ Conflicts with CLI command: {result.conflicting_command}[/red]")
+
+    # Lifecycle check
+    if result.known_lifecycle:
+        console.print("[green]✓ Domain is a known lifecycle[/green]")
+    else:
+        console.print("[yellow]⚠ Domain is not a standard lifecycle[/yellow]")
+
+    # Final verdict
+    console.print()
+    if result.is_valid:
+        console.print(f"[bold green]Name '{result.name}' is valid.[/bold green]")
+    else:
+        console.print(f"[bold red]Name '{result.name}' is not valid.[/bold red]")
+
+    # Suggestions
+    if result.suggestions:
+        console.print()
+        for suggestion in result.suggestions:
+            console.print(f"[dim]→ {suggestion}[/dim]")
+
+
+def format_name_check_json(result: NameCheckResult) -> str:
+    """Format name check result as JSON.
+
+    Args:
+        result: Name check result.
+
+    Returns:
+        JSON string.
+    """
+    return json.dumps({
+        "name": result.name,
+        "valid": result.is_valid,
+        "checks": {
+            "valid_pattern": result.valid_pattern,
+            "no_skill_conflict": result.no_skill_conflict,
+            "no_cli_conflict": result.no_cli_conflict,
+            "known_lifecycle": result.known_lifecycle,
+        },
+        "conflicts": {
+            "skill": result.conflicting_skill,
+            "command": result.conflicting_command,
+        },
+        "suggestions": result.suggestions,
     }, indent=2)
