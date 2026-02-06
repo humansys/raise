@@ -56,7 +56,7 @@ V3:
 | F14.5 | Auto MEMORY.md Generation | M | 3 | Pending | Generate Claude auto memory from methodology.yaml |
 | F14.6 | Pattern Versioning | S | 2 | Pending | Add base/version fields to pattern schema |
 | F14.7 | Base Show Command | XS | 1 | Pending | `raise base show` displays current base info |
-| F14.15 | Multi-Developer Architecture | M | 3 | Pending | Separate personal data from shared project data |
+| F14.15 | Multi-Developer Architecture | L | 5 | ✅ Done | Separate personal data from shared project data |
 
 **Total F&F:** 8 features, 19 SP
 
