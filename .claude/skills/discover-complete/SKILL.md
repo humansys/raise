@@ -20,7 +20,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=discover-complete \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=discover-complete \"$CLAUDE_PROJECT_DIR\"/dev/scripts/log-skill-complete.sh"
 ---
 
 # Discovery Complete: Export Validated Components
