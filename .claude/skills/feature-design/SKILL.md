@@ -115,7 +115,7 @@ Review returned patterns and prior ADRs before proceeding. Key patterns and arch
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Assess Complexity
 

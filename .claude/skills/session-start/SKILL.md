@@ -75,7 +75,7 @@ uv run raise context query "session epic patterns" --limit 10
 # Read: CLAUDE.local.md
 ```
 
-**If graph unavailable:** Run `uv run raise graph build --unified` first.
+**If graph unavailable:** Run `uv run raise graph build` first.
 
 **Extract from results:**
 - Experience level (for output style)
