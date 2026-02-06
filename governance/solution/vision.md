@@ -390,10 +390,10 @@ raise-toolkit/
 │       Skills         │    │      Toolkit         │
 │  (Process Guides)    │    │  (Deterministic)     │
 │                      │    │                      │
-│  - /feature-design   │    │  - raise context     │
-│  - /feature-plan     │    │  - raise graph       │
-│  - /session-start    │    │  - raise validate    │
-│  - /research         │    │  - raise parse       │
+│  - /feature-design   │    │  - raise memory      │
+│  - /feature-plan     │    │  - raise discover    │
+│  - /session-start    │    │  - raise status      │
+│  - /research         │    │  - raise telemetry   │
 │  - ...               │    │  - ...               │
 └──────────────────────┘    └──────────────────────┘
                                       │
