@@ -2,7 +2,7 @@
 id: review
 titulo: "Review: Retrospective & Learning"
 work_cycle: feature
-frequency: per-feature
+frequency: per-story
 fase_metodologia: 7
 
 prerequisites:
@@ -103,7 +103,7 @@ Crear documento de retrospectiva:
 ## Output
 
 - **Artefacto:** Retrospectiva
-- **Ubicación:** `work/features/{feature}/retrospective.md`
+- **Ubicación:** `work/stories/{feature}/retrospective.md`
 - **Gate:** N/A
 - **Siguiente kata:** Próximo feature o mejora continua
 

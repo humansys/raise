@@ -45,9 +45,9 @@ raise context query "ADR architecture" --unified --types decision
 
 | Skill | Queries For | Can't Find |
 |-------|-------------|------------|
-| /feature-design | "architecture ADR" | ADRs (type doesn't exist) |
-| /feature-implement | "testing guardrails" | Guardrails (not extracted) |
-| /feature-review | calibration for comparison | Works, but not queried |
+| /story-design | "architecture ADR" | ADRs (type doesn't exist) |
+| /story-implement | "testing guardrails" | Guardrails (not extracted) |
+| /story-review | calibration for comparison | Works, but not queried |
 
 ## Decision
 
@@ -99,7 +99,7 @@ NodeType = Literal[
 
 **New (bidirectional):**
 ```
-/feature-review → raise memory add-pattern → patterns.jsonl → graph
+/story-review → raise memory add-pattern → patterns.jsonl → graph
 /session-close  → raise memory add-pattern → patterns.jsonl → graph
                   (multiple entry points, immediate persistence)
 ```
@@ -127,8 +127,8 @@ def extract_terms(file_path: Path, project_root: Path) -> list[Concept]:
 
 ### Positive
 
-1. **Complete MVC for feature cycle** — Every skill gets relevant context
-2. **ADRs queryable** — `/feature-design` sees prior architecture decisions
+1. **Complete MVC for story cycle** — Every skill gets relevant context
+2. **ADRs queryable** — `/story-design` sees prior architecture decisions
 3. **Immediate learning** — Patterns persist during work, not just at session end
 4. **Phase-appropriate context** — Design gets ADRs, implement gets guardrails
 5. **Reuses existing infrastructure** — Same extractors, same graph, same query
@@ -187,7 +187,7 @@ Keep patterns.jsonl write-only via /session-close.
 **Rejected because:**
 - Learnings during features are lost if session crashes
 - Delay between learning and persistence
-- /feature-review should capture patterns immediately
+- /story-review should capture patterns immediately
 - Contradicts "continuous improvement" principle
 
 ## Validation

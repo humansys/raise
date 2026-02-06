@@ -11,7 +11,9 @@ from pathlib import Path
 from raise_cli.governance.models import Concept, ConceptType
 
 
-def extract_requirements(file_path: Path, project_root: Path | None = None) -> list[Concept]:
+def extract_requirements(
+    file_path: Path, project_root: Path | None = None
+) -> list[Concept]:
     """Extract RF-XX requirements from PRD markdown file.
 
     Parses PRD markdown files looking for requirement sections with the

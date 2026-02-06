@@ -114,21 +114,27 @@ class UnifiedGraphBuilder:
         global_dir = get_global_rai_dir()
         if global_dir.exists():
             nodes.extend(
-                self._load_memory_from_dir(global_dir, MemoryScope.GLOBAL, sessions=False)
+                self._load_memory_from_dir(
+                    global_dir, MemoryScope.GLOBAL, sessions=False
+                )
             )
 
         # 2. Load from project directory (.raise/rai/memory/)
         project_dir = get_memory_dir(self.project_root)
         if project_dir.exists():
             nodes.extend(
-                self._load_memory_from_dir(project_dir, MemoryScope.PROJECT, sessions=False)
+                self._load_memory_from_dir(
+                    project_dir, MemoryScope.PROJECT, sessions=False
+                )
             )
 
         # 3. Load from personal directory (.raise/rai/personal/)
         personal_dir = get_personal_dir(self.project_root)
         if personal_dir.exists():
             nodes.extend(
-                self._load_memory_from_dir(personal_dir, MemoryScope.PERSONAL, sessions=True)
+                self._load_memory_from_dir(
+                    personal_dir, MemoryScope.PERSONAL, sessions=True
+                )
             )
 
         # Apply precedence: personal > project > global
@@ -170,9 +176,7 @@ class UnifiedGraphBuilder:
 
         return nodes
 
-    def _deduplicate_by_precedence(
-        self, nodes: list[ConceptNode]
-    ) -> list[ConceptNode]:
+    def _deduplicate_by_precedence(self, nodes: list[ConceptNode]) -> list[ConceptNode]:
         """Deduplicate nodes by ID using scope precedence.
 
         When the same ID appears in multiple tiers, keep only the
@@ -226,7 +230,7 @@ class UnifiedGraphBuilder:
         nodes.extend(self._concept_to_node(e) for e in epics)
 
         # Load features from epic scopes
-        features = self._extract_features()
+        features = self._extract_stories()
         nodes.extend(self._concept_to_node(f) for f in features)
 
         return nodes
@@ -250,12 +254,16 @@ class UnifiedGraphBuilder:
         Returns:
             List of ConceptNode for component concepts.
         """
-        validated_file = self.project_root / "work" / "discovery" / "components-validated.json"
+        validated_file = (
+            self.project_root / "work" / "discovery" / "components-validated.json"
+        )
         if not validated_file.exists():
             return []
 
         try:
-            data: dict[str, Any] = json.loads(validated_file.read_text(encoding="utf-8"))
+            data: dict[str, Any] = json.loads(
+                validated_file.read_text(encoding="utf-8")
+            )
             components_list: list[dict[str, Any]] = data.get("components", [])
 
             nodes: list[ConceptNode] = []
@@ -367,10 +375,10 @@ class UnifiedGraphBuilder:
         if node_type == "pattern":
             content = record.get("content", "")
         elif node_type == "calibration":
-            # Calibration uses feature + name
-            feature = record.get("feature", "")
+            # Calibration uses story + name (backward compat: old "feature" key)
+            story = record.get("story") or record.get("feature", "")
             name = record.get("name", "")
-            content = f"{feature}: {name}" if feature else name
+            content = f"{story}: {name}" if story else name
         elif node_type == "session":
             content = record.get("topic", record.get("summary", ""))
         else:
@@ -421,20 +429,20 @@ class UnifiedGraphBuilder:
 
         return epics
 
-    def _extract_features(self) -> list[Concept]:
+    def _extract_stories(self) -> list[Concept]:
         """Extract features from epic scope files.
 
         Returns:
-            List of feature Concept objects.
+            List of story Concept objects.
         """
-        from raise_cli.governance.parsers.epic import extract_features
+        from raise_cli.governance.parsers.epic import extract_stories
 
         features: list[Concept] = []
 
         # Find epic scope files
         for epic_path in self._find_epic_scopes():
             try:
-                extracted = extract_features(epic_path, self.project_root)
+                extracted = extract_stories(epic_path, self.project_root)
                 features.extend(extracted)
             except Exception:
                 continue
@@ -525,12 +533,12 @@ class UnifiedGraphBuilder:
             if not learned_from:
                 continue
 
-            # Find matching session by topic/feature reference
+            # Find matching session by topic/story reference
             for candidate in nodes:
                 if candidate.type != "session":
                     continue
 
-                # Check if session topic mentions the feature
+                # Check if session topic mentions the story
                 if str(learned_from) in candidate.content:
                     edges.append(
                         ConceptEdge(
@@ -549,7 +557,7 @@ class UnifiedGraphBuilder:
         nodes: list[ConceptNode],
         node_by_id: dict[str, ConceptNode],
     ) -> list[ConceptEdge]:
-        """Infer part_of edges from feature to epic.
+        """Infer part_of edges from story to epic.
 
         Args:
             nodes: All concept nodes.
@@ -561,14 +569,14 @@ class UnifiedGraphBuilder:
         edges: list[ConceptEdge] = []
 
         for node in nodes:
-            if node.type != "feature":
+            if node.type != "story":
                 continue
 
-            # Extract epic ID from feature ID (e.g., F11.2 -> E11)
-            feature_id = node.id
-            if feature_id.startswith("F"):
-                # Parse epic number from feature ID
-                parts = feature_id[1:].split(".")
+            # Extract epic ID from story ID (e.g., F11.2 -> E11)
+            story_id = node.id
+            if story_id.startswith("F"):
+                # Parse epic number from story ID
+                parts = story_id[1:].split(".")
                 if parts:
                     epic_id = f"E{parts[0]}"
                     if epic_id in node_by_id:

@@ -51,7 +51,7 @@ def sample_graph() -> UnifiedGraph:
             created="2026-01-01",
         ),
         ConceptNode(
-            id="/feature-plan",
+            id="/story-plan",
             type="skill",
             content="Decompose user stories into tasks",
             created="2026-02-01",
@@ -64,8 +64,8 @@ def sample_graph() -> UnifiedGraph:
     edges = [
         ConceptEdge(source="PAT-001", target="SES-015", type="learned_from"),
         ConceptEdge(source="PAT-002", target="SES-015", type="learned_from"),
-        ConceptEdge(source="PAT-002", target="/feature-plan", type="applies_to"),
-        ConceptEdge(source="/feature-plan", target="§2", type="governed_by"),
+        ConceptEdge(source="PAT-002", target="/story-plan", type="applies_to"),
+        ConceptEdge(source="/story-plan", target="§2", type="governed_by"),
     ]
     for edge in edges:
         graph.add_relationship(edge)
@@ -147,11 +147,11 @@ class TestUnifiedGraphQueries:
     def test_get_neighbors_depth_2(self, sample_graph: UnifiedGraph) -> None:
         """Test getting neighbors at depth 2."""
         neighbors = sample_graph.get_neighbors("SES-015", depth=2)
-        # Depth 2 should also include /feature-plan (via PAT-002)
+        # Depth 2 should also include /story-plan (via PAT-002)
         neighbor_ids = {n.id for n in neighbors}
         assert "PAT-001" in neighbor_ids
         assert "PAT-002" in neighbor_ids
-        assert "/feature-plan" in neighbor_ids
+        assert "/story-plan" in neighbor_ids
 
     def test_get_neighbors_with_edge_filter(self, sample_graph: UnifiedGraph) -> None:
         """Test getting neighbors with edge type filter."""
@@ -159,7 +159,7 @@ class TestUnifiedGraphQueries:
             "PAT-002", depth=1, edge_types=["applies_to"]
         )
         neighbor_ids = {n.id for n in neighbors}
-        assert "/feature-plan" in neighbor_ids
+        assert "/story-plan" in neighbor_ids
         # Should not include SES-015 (learned_from edge)
         assert "SES-015" not in neighbor_ids
 

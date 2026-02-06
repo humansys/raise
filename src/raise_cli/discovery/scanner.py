@@ -603,7 +603,9 @@ def scan_directory(
         if _should_exclude(file_path, exclude_patterns):
             continue
 
-        rel_path = file_path.relative_to(root) if file_path.is_relative_to(root) else file_path
+        rel_path = (
+            file_path.relative_to(root) if file_path.is_relative_to(root) else file_path
+        )
         rel_str = str(rel_path)
 
         file_language = language or detect_language(file_path)

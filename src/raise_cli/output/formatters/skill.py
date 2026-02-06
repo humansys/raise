@@ -33,7 +33,15 @@ def format_skill_list_human(
     console.print(f"[bold]Skills[/bold] ({len(skills)} found)\n")
 
     # Define lifecycle order for consistent output
-    lifecycle_order = ["session", "epic", "feature", "discovery", "utility", "meta", "unknown"]
+    lifecycle_order = [
+        "session",
+        "epic",
+        "story",
+        "discovery",
+        "utility",
+        "meta",
+        "unknown",
+    ]
 
     for lifecycle in lifecycle_order:
         if lifecycle not in grouped:
@@ -77,13 +85,15 @@ def format_skill_list_json(
     """
     skill_data: list[dict[str, Any]] = []
     for skill in sorted(skills, key=lambda s: s.name):
-        skill_data.append({
-            "name": skill.name,
-            "version": skill.version,
-            "lifecycle": skill.lifecycle,
-            "description": skill.description,
-            "path": skill.path,
-        })
+        skill_data.append(
+            {
+                "name": skill.name,
+                "version": skill.version,
+                "lifecycle": skill.lifecycle,
+                "description": skill.description,
+                "path": skill.path,
+            }
+        )
 
     output = {
         "skills": skill_data,
@@ -146,19 +156,24 @@ def format_validation_json(results: list[ValidationResult]) -> str:
     """
     output: list[dict[str, Any]] = []
     for result in results:
-        output.append({
-            "path": result.path,
-            "valid": result.is_valid,
-            "errors": result.errors,
-            "warnings": result.warnings,
-        })
+        output.append(
+            {
+                "path": result.path,
+                "valid": result.is_valid,
+                "errors": result.errors,
+                "warnings": result.warnings,
+            }
+        )
 
-    return json.dumps({
-        "results": output,
-        "total_errors": sum(r.error_count for r in results),
-        "total_warnings": sum(r.warning_count for r in results),
-        "all_valid": all(r.is_valid for r in results),
-    }, indent=2)
+    return json.dumps(
+        {
+            "results": output,
+            "total_errors": sum(r.error_count for r in results),
+            "total_warnings": sum(r.warning_count for r in results),
+            "all_valid": all(r.is_valid for r in results),
+        },
+        indent=2,
+    )
 
 
 def format_name_check_human(result: NameCheckResult, console: Console) -> None:
@@ -180,13 +195,17 @@ def format_name_check_human(result: NameCheckResult, console: Console) -> None:
     if result.no_skill_conflict:
         console.print("[green]✓ No conflict with existing skills[/green]")
     else:
-        console.print(f"[red]✗ Conflicts with existing skill: {result.conflicting_skill}[/red]")
+        console.print(
+            f"[red]✗ Conflicts with existing skill: {result.conflicting_skill}[/red]"
+        )
 
     # CLI conflict
     if result.no_cli_conflict:
         console.print("[green]✓ No CLI command conflict[/green]")
     else:
-        console.print(f"[red]✗ Conflicts with CLI command: {result.conflicting_command}[/red]")
+        console.print(
+            f"[red]✗ Conflicts with CLI command: {result.conflicting_command}[/red]"
+        )
 
     # Lifecycle check
     if result.known_lifecycle:
@@ -217,21 +236,24 @@ def format_name_check_json(result: NameCheckResult) -> str:
     Returns:
         JSON string.
     """
-    return json.dumps({
-        "name": result.name,
-        "valid": result.is_valid,
-        "checks": {
-            "valid_pattern": result.valid_pattern,
-            "no_skill_conflict": result.no_skill_conflict,
-            "no_cli_conflict": result.no_cli_conflict,
-            "known_lifecycle": result.known_lifecycle,
+    return json.dumps(
+        {
+            "name": result.name,
+            "valid": result.is_valid,
+            "checks": {
+                "valid_pattern": result.valid_pattern,
+                "no_skill_conflict": result.no_skill_conflict,
+                "no_cli_conflict": result.no_cli_conflict,
+                "known_lifecycle": result.known_lifecycle,
+            },
+            "conflicts": {
+                "skill": result.conflicting_skill,
+                "command": result.conflicting_command,
+            },
+            "suggestions": result.suggestions,
         },
-        "conflicts": {
-            "skill": result.conflicting_skill,
-            "command": result.conflicting_command,
-        },
-        "suggestions": result.suggestions,
-    }, indent=2)
+        indent=2,
+    )
 
 
 def format_scaffold_human(result: ScaffoldResult, console: Console) -> None:
@@ -248,7 +270,7 @@ def format_scaffold_human(result: ScaffoldResult, console: Console) -> None:
         console.print("  2. Run [cyan]raise skill validate[/cyan] to check structure")
         console.print("  3. Test the skill with Claude Code")
     else:
-        console.print(f"\n[red]✗ Failed to create skill[/red]")
+        console.print("\n[red]✗ Failed to create skill[/red]")
         console.print(f"[red]  {result.error}[/red]")
 
 
@@ -261,8 +283,11 @@ def format_scaffold_json(result: ScaffoldResult) -> str:
     Returns:
         JSON string.
     """
-    return json.dumps({
-        "created": result.created,
-        "path": result.path,
-        "error": result.error,
-    }, indent=2)
+    return json.dumps(
+        {
+            "created": result.created,
+            "path": result.path,
+            "error": result.error,
+        },
+        indent=2,
+    )

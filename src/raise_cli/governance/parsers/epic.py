@@ -1,6 +1,6 @@
 """Parser for epic scope documents.
 
-Extracts detailed Epic and Feature concepts from work/epics/*/scope.md files.
+Extracts detailed Epic and Story concepts from work/epics/*/scope.md files.
 """
 
 from __future__ import annotations
@@ -68,7 +68,7 @@ def extract_epic_details(
     """Extract detailed Epic concept from epic scope document.
 
     Parses the epic scope document to extract full epic metadata including
-    objective, status, target date, and feature count.
+    objective, status, target date, and story count.
 
     Args:
         file_path: Path to epic scope document (work/epics/*/scope.md).
@@ -171,12 +171,10 @@ def extract_epic_details(
     )
 
 
-def extract_features(
-    file_path: Path, project_root: Path | None = None
-) -> list[Concept]:
-    """Extract Feature concepts from epic scope document.
+def extract_stories(file_path: Path, project_root: Path | None = None) -> list[Concept]:
+    """Extract Story concepts from epic scope document.
 
-    Parses the "Features" table to extract feature metadata. Supports
+    Parses the "Stories" table to extract story metadata. Supports
     various table formats found in epic scope documents.
 
     Args:
@@ -185,16 +183,16 @@ def extract_features(
             If None, uses file_path.parent.parent.parent.parent.
 
     Returns:
-        List of Feature Concepts extracted from the table. Returns empty list
-        if file doesn't exist or no features found.
+        List of Story Concepts extracted from the table. Returns empty list
+        if file doesn't exist or no stories found.
 
     Examples:
         >>> from pathlib import Path
         >>> scope_doc = Path("work/epics/e08-backlog/scope.md")
-        >>> features = extract_features(scope_doc)
+        >>> features = extract_stories(scope_doc)
         >>> len(features)
         4
-        >>> features[0].metadata["feature_id"]
+        >>> features[0].metadata["story_id"]
         'F8.1'
     """
     if not file_path.exists():
@@ -219,23 +217,23 @@ def extract_features(
 
     concepts: list[Concept] = []
 
-    # Parse feature table rows
+    # Parse story table rows
     # Pattern variants:
     # | F8.1 | Backlog Parser | S | Pending | Description |
     # | F8.1 | Backlog Parser | S | 2 | Pending | Description |
     # | F2.1 | Concept Extraction | 3 | ✅ Complete | 52 min | 3.5x |
-    feature_pattern = re.compile(
-        r"^\|\s*(F\d+\.\d+)\s*\|"  # Feature ID
-        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"  # Feature name (with optional bold)
+    story_pattern = re.compile(
+        r"^\|\s*(F\d+\.\d+)\s*\|"  # Story ID
+        r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"  # Story name (with optional bold)
         r"\s*([^|]+?)\s*\|"  # Size or SP
         r"\s*([^|]+?)\s*\|"  # Status or SP (depends on format)
         r"(?:\s*([^|]*?)\s*\|)?"  # Optional: Description or Status or Time
     )
 
     for i, line in enumerate(lines, 1):
-        match = feature_pattern.match(line)
+        match = story_pattern.match(line)
         if match:
-            feature_id = match.group(1).strip()
+            story_id = match.group(1).strip()
             name = match.group(2).strip()
             col3 = match.group(3).strip()
             col4 = match.group(4).strip()
@@ -273,21 +271,21 @@ def extract_features(
                 description = col5
 
             # Build content
-            content = f"{feature_id}: {name}"
+            content = f"{story_id}: {name}"
             if status:
                 content += f" ({status})"
             if description:
                 content += f" - {description}"
 
             concept = Concept(
-                id=f"feature-{feature_id.lower().replace('.', '-')}",
-                type=ConceptType.FEATURE,
+                id=f"story-{story_id.lower().replace('.', '-')}",
+                type=ConceptType.STORY,
                 file=relative_path,
-                section=f"{feature_id}: {name}",
+                section=f"{story_id}: {name}",
                 lines=(i, i),
                 content=content[:500],
                 metadata={
-                    "feature_id": feature_id,
+                    "story_id": story_id,
                     "name": name,
                     "status": status or "pending",
                     "size": size,

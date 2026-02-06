@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.skills.parser import parse_skill, parse_frontmatter, ParseError
+from raise_cli.skills.parser import ParseError, parse_frontmatter, parse_skill
 
 
 class TestParseFrontmatter:
@@ -48,16 +48,16 @@ class TestParseFrontmatter:
         """Parse frontmatter with nested metadata."""
         content = dedent("""\
             ---
-            name: feature-plan
+            name: story-plan
             description: Plan a feature
             metadata:
-              raise.work_cycle: feature
+              raise.work_cycle: story
               raise.version: "1.0.0"
             ---
-            # Feature Plan
+            # Story Plan
         """)
         frontmatter, body = parse_frontmatter(content)
-        assert frontmatter["metadata"]["raise.work_cycle"] == "feature"
+        assert frontmatter["metadata"]["raise.work_cycle"] == "story"
         assert frontmatter["metadata"]["raise.version"] == "1.0.0"
 
     def test_parse_with_hooks(self) -> None:

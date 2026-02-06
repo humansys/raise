@@ -171,9 +171,9 @@ class TestDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "feature-plan"],
+            skills_mastered=["session-start", "story-plan"],
             universal_patterns=["Commit after each task"],
-            
+
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
             projects=["/home/emilio/Code/raise-commons"],
@@ -343,9 +343,9 @@ class TestSaveDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "feature-plan"],
+            skills_mastered=["session-start", "story-plan"],
             universal_patterns=["Commit after each task"],
-            
+
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
             projects=["/home/emilio/Code/raise-commons"],
@@ -436,7 +436,7 @@ class TestIncrementSession:
             skills_mastered=["skill1", "skill2"],
             universal_patterns=["pattern1"],
             first_session=date(2026, 1, 1),
-            
+
         )
         updated = increment_session(profile, project_path="/new/project")
         assert updated.name == "Emilio"

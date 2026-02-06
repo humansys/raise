@@ -49,9 +49,7 @@ class TomlConfigSource(PydanticBaseSettingsSource):
         self.toml_file = toml_file
         self.toml_table = toml_table
 
-    def get_field_value(
-        self, field: Any, field_name: str
-    ) -> tuple[Any, str, bool]:
+    def get_field_value(self, field: Any, field_name: str) -> tuple[Any, str, bool]:
         """Get field value from TOML file."""
         # Not used in newer pydantic-settings
         return None, "", False

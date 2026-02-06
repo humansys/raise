@@ -3,7 +3,7 @@
 > Best practices for raise-cli stack: Python 3.12+, Pydantic v2, Typer, pytest.
 > Synthesized from 150 sources across 6 research catalogs.
 
-**Purpose:** Reference during implementation and review. Jidoka checkpoint in `/feature-review`.
+**Purpose:** Reference during implementation and review. Jidoka checkpoint in `/story-review`.
 
 ---
 
@@ -639,7 +639,7 @@ def process_session(node): ...
 
 ## Jidoka Checklist
 
-Quick validation during `/feature-review`:
+Quick validation during `/story-review`:
 
 ### Pydantic
 - [ ] BaseModel only at system boundaries?

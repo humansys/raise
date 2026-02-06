@@ -23,7 +23,7 @@ NodeType = Literal[
     "outcome",  # OUT-* — vision outcomes
     "project",  # PRJ-* — project definitions
     "epic",  # E* — epic scopes
-    "feature",  # F*.* — feature work items
+    "story",  # F*.* — story work items
     "skill",  # /name — skill metadata
     "decision",  # ADR-* — architecture decisions (E12)
     "guardrail",  # GR-* — code standards (E12)
@@ -37,8 +37,8 @@ EdgeType = Literal[
     "governed_by",  # requirement → principle (governance link)
     "applies_to",  # pattern → skill (usage context)
     "needs_context",  # skill → concept types (context requirements)
-    "implements",  # feature → requirement (traceability)
-    "part_of",  # feature → epic (hierarchy)
+    "implements",  # story → requirement (traceability)
+    "part_of",  # story → epic (hierarchy)
     "related_to",  # generic semantic relationship
 ]
 
@@ -50,7 +50,7 @@ class ConceptNode(BaseModel):
     its content and metadata. All concept types share this schema.
 
     Attributes:
-        id: Unique identifier (e.g., 'PAT-001', '§2', 'F11.1', '/feature-plan').
+        id: Unique identifier (e.g., 'PAT-001', '§2', 'F11.1', '/story-plan').
         type: Node type from NodeType literal.
         content: Main text content or description.
         source_file: Path to source file (if applicable).

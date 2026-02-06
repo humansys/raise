@@ -16,7 +16,7 @@ from raise_cli.skills.locator import get_default_skill_dir
 DOMAIN_TO_LIFECYCLE = {
     "session": "session",
     "epic": "epic",
-    "feature": "feature",
+    "story": "story",
     "discover": "discovery",
     "skill": "meta",
     "research": "utility",
@@ -49,7 +49,7 @@ def _generate_skill_content(
     next_skill: str | None,
 ) -> str:
     """Generate SKILL.md content from template."""
-    # Extract title from name (e.g., feature-validate -> Feature Validate)
+    # Extract title from name (e.g., story-validate -> Story Validate)
     title = " ".join(word.capitalize() for word in name.split("-"))
 
     # Build prerequisites and next strings
@@ -60,7 +60,7 @@ def _generate_skill_content(
     frequency_map = {
         "session": "per-session",
         "epic": "per-epic",
-        "feature": "per-feature",
+        "story": "per-story",
         "discovery": "per-project",
         "utility": "on-demand",
         "meta": "on-demand",
@@ -152,7 +152,7 @@ def scaffold_skill(
     """Scaffold a new skill with proper structure.
 
     Args:
-        name: Skill name (e.g., 'feature-validate').
+        name: Skill name (e.g., 'story-validate').
         lifecycle: Lifecycle category. If not specified, inferred from name.
         after: Skill that should come before this one (prerequisites).
         before: Skill that should come after this one (next).

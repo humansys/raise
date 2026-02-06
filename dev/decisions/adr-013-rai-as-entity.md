@@ -120,7 +120,7 @@ This differentiates Rai from generic "agents" that merely execute tasks. Rai **p
 
 ```
 raise-cli v2.3
-├── features/
+├── stories/
 │   ├── memory (optional)
 │   ├── skills
 │   └── toolkit
@@ -129,7 +129,7 @@ raise-cli v2.3
 ↓ update
 
 raise-cli v2.4
-├── features/
+├── stories/
 │   ├── memory (improved)
 │   └── ...
 ```

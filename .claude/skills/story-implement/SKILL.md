@@ -1,5 +1,5 @@
 ---
-name: feature-implement
+name: story-implement
 description: >
   Execute the implementation plan task by task, verifying each step, and
   producing quality code that passes validation gates. Use after planning
@@ -9,10 +9,10 @@ license: MIT
 
 metadata:
   raise.work_cycle: feature
-  raise.frequency: per-feature
+  raise.frequency: per-story
   raise.fase: "6"
-  raise.prerequisites: feature-plan
-  raise.next: feature-review
+  raise.prerequisites: story-plan
+  raise.next: story-review
   raise.gate: gate-code
   raise.adaptable: "true"
   raise.version: "1.0.0"
@@ -22,11 +22,11 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=story-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=story-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Implement: Development Workflow
@@ -47,16 +47,16 @@ Execute the implementation plan task by task, verifying each step, and producing
 
 **When to use:**
 - After having an implementation plan
-- For each feature being developed
+- For each story being developed
 - Repeated for each task in the plan
 
 **Inputs required:**
-- Implementation plan: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
+- Implementation plan: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
 - Project rules and guardrails context
 
 **Output:**
 - Implemented and verified code
-- Progress log: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/progress.md`
+- Progress log: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/progress.md`
 
 ## Steps
 
@@ -65,7 +65,7 @@ Execute the implementation plan task by task, verifying each step, and producing
 Record the start of the implement phase:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event start --phase implement
+uv run raise memory emit-work feature {story_id} --event start --phase implement
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e start -p implement`
@@ -75,10 +75,10 @@ uv run raise memory emit-work feature {feature_id} --event start --phase impleme
 Implementation plan is mandatory:
 
 ```bash
-PLAN="work/epics/e{N}-{name}/features/{feature_id}/plan.md"
+PLAN="work/epics/e{N}-{name}/stories/{story_id}/plan.md"
 if [ ! -f "$PLAN" ]; then
     echo "ERROR: Plan not found: $PLAN"
-    echo "Run /feature-plan first"
+    echo "Run /story-plan first"
     exit 4  # ArtifactNotFoundError
 fi
 ```
@@ -87,7 +87,7 @@ fi
 
 **Verification:** Plan exists and is readable.
 
-> **If you can't continue:** Run `/feature-plan`. No exceptions.
+> **If you can't continue:** Run `/story-plan`. No exceptions.
 
 ### Step 0.5: Query Context
 
@@ -149,7 +149,7 @@ Execute verification defined in the plan:
 
 ### Step 5: Log Progress
 
-Update progress log (`work/epics/e{N}-{name}/features/{feature}/progress.md`):
+Update progress log (`work/epics/e{N}-{name}/stories/{feature}/progress.md`):
 - Task completed
 - Actual time vs estimated
 - Notes or discoveries
@@ -186,7 +186,7 @@ If all tasks completed → execute code gate.
 Record the completion of the implement phase:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event complete --phase implement
+uv run raise memory emit-work feature {story_id} --event complete --phase implement
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e complete -p implement`
@@ -197,7 +197,7 @@ uv run raise memory emit-work feature {feature_id} --event complete --phase impl
 - **Location:** Per project architecture
 - **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
 - **Gate:** `gates/gate-code.md`
-- **Next:** `/feature-review`
+- **Next:** `/story-review`
 
 ## Progress Template
 
@@ -249,4 +249,4 @@ Cycle: **Detect → Stop → Correct → Continue**
 ## References
 
 - Gate: `gates/gate-code.md`
-- Next skill: `/feature-review`
+- Next skill: `/story-review`

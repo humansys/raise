@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import pytest
-
 from raise_cli.skills.schema import (
+    Skill,
+    SkillFrontmatter,
     SkillHook,
     SkillHookCommand,
     SkillMetadata,
-    SkillFrontmatter,
-    Skill,
 )
 
 
@@ -19,10 +17,10 @@ class TestSkillMetadata:
     def test_minimal_metadata(self) -> None:
         """Metadata with only required fields."""
         metadata = SkillMetadata(
-            work_cycle="feature",
+            work_cycle="story",
             version="1.0.0",
         )
-        assert metadata.work_cycle == "feature"
+        assert metadata.work_cycle == "story"
         assert metadata.version == "1.0.0"
         assert metadata.frequency is None
 
@@ -155,13 +153,13 @@ class TestSkill:
         """Skill name shortcut property."""
         skill = Skill(
             frontmatter=SkillFrontmatter(
-                name="feature-plan",
+                name="story-plan",
                 description="Plan a feature",
             ),
             body="",
             path="/path/to/skill/SKILL.md",
         )
-        assert skill.name == "feature-plan"
+        assert skill.name == "story-plan"
 
     def test_skill_version_property(self) -> None:
         """Skill version from metadata."""

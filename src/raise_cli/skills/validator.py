@@ -30,7 +30,9 @@ class ValidationResult(BaseModel):
     """Result of validating a skill file."""
 
     path: str = Field(description="Path to the validated file")
-    errors: list[str] = Field(default_factory=lambda: [], description="Validation errors")
+    errors: list[str] = Field(
+        default_factory=lambda: [], description="Validation errors"
+    )
     warnings: list[str] = Field(
         default_factory=lambda: [], description="Validation warnings"
     )

@@ -56,7 +56,9 @@ class BaselineComponentMetadata(BaseModel):
     """Metadata for a baseline component."""
 
     name: str = Field(default="", description="Symbol name")
-    kind: str = Field(default="unknown", description="Symbol kind (class, function, etc.)")
+    kind: str = Field(
+        default="unknown", description="Symbol kind (class, function, etc.)"
+    )
 
 
 class BaselineComponent(BaseModel):
@@ -79,7 +81,9 @@ class BaselineComponent(BaseModel):
     )
 
 
-def _extract_directory_patterns(baseline: list[BaselineComponent]) -> dict[str, set[str]]:
+def _extract_directory_patterns(
+    baseline: list[BaselineComponent],
+) -> dict[str, set[str]]:
     """Extract directory patterns from baseline by category/kind.
 
     Groups baseline components by their kind and extracts the directories
@@ -104,7 +108,9 @@ def _extract_directory_patterns(baseline: list[BaselineComponent]) -> dict[str, 
     return patterns
 
 
-def _extract_naming_patterns(baseline: list[BaselineComponent]) -> dict[str, dict[str, int]]:
+def _extract_naming_patterns(
+    baseline: list[BaselineComponent],
+) -> dict[str, dict[str, int]]:
     """Extract naming patterns from baseline by kind.
 
     Looks for common prefixes/suffixes in symbol names and counts occurrences.
@@ -247,7 +253,9 @@ def _check_naming_drift(
             matches_pattern = any(name.startswith(p) for p in prefix_counts)
             if not matches_pattern:
                 # Find prefixes that appear 2+ times (established pattern)
-                common_prefixes = [p for p, count in prefix_counts.items() if count >= 2]
+                common_prefixes = [
+                    p for p, count in prefix_counts.items() if count >= 2
+                ]
                 if common_prefixes:
                     return DriftWarning(
                         file=symbol.file,

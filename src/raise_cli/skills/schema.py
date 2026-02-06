@@ -19,14 +19,24 @@ class SkillMetadata(BaseModel):
     Maps from YAML frontmatter with 'raise.' prefix to clean attributes.
     """
 
-    work_cycle: str = Field(description="Lifecycle: session, epic, feature, discovery, utility, meta")
+    work_cycle: str = Field(
+        description="Lifecycle: session, epic, story, discovery, utility, meta"
+    )
     version: str = Field(description="Semantic version of the skill")
-    frequency: str | None = Field(default=None, description="How often invoked: per-session, per-epic, etc.")
+    frequency: str | None = Field(
+        default=None, description="How often invoked: per-session, per-epic, etc."
+    )
     fase: str | None = Field(default=None, description="Phase number or 'meta'")
-    prerequisites: str | None = Field(default=None, description="Skills that must run before this one")
-    next: str | None = Field(default=None, description="Skill that typically follows this one")
+    prerequisites: str | None = Field(
+        default=None, description="Skills that must run before this one"
+    )
+    next: str | None = Field(
+        default=None, description="Skill that typically follows this one"
+    )
     gate: str | None = Field(default=None, description="Validation gate for this skill")
-    adaptable: bool = Field(default=True, description="Whether skill can be adapted by mastery level")
+    adaptable: bool = Field(
+        default=True, description="Whether skill can be adapted by mastery level"
+    )
 
     @classmethod
     def from_raw(cls, raw: dict[str, Any]) -> SkillMetadata:
@@ -77,7 +87,9 @@ class SkillFrontmatter(BaseModel):
     name: str = Field(description="Skill name in {domain}-{action} format")
     description: str = Field(description="Brief description of the skill")
     license: str | None = Field(default=None, description="License (typically MIT)")
-    metadata: SkillMetadata | None = Field(default=None, description="RaiSE-specific metadata")
+    metadata: SkillMetadata | None = Field(
+        default=None, description="RaiSE-specific metadata"
+    )
     hooks: dict[str, list[SkillHook]] | None = Field(
         default=None, description="Claude Code hooks (e.g., Stop)"
     )

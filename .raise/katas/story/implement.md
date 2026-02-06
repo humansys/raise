@@ -2,7 +2,7 @@
 id: implement
 titulo: "Implement: Development Workflow"
 work_cycle: feature
-frequency: per-feature
+frequency: per-story
 fase_metodologia: 6
 
 prerequisites:
@@ -34,12 +34,12 @@ Ejecutar el plan de implementación task por task, verificando cada paso, y prod
 - Repetido para cada task del plan
 
 **Inputs requeridos:**
-- Plan de implementación (`work/features/{feature}/plan.md`)
+- Plan de implementación (`work/stories/{feature}/plan.md`)
 - Contexto de reglas del proyecto
 
 **Output:**
 - Código implementado y verificado
-- `work/features/{feature}/progress.md` - Registro de progreso
+- `work/stories/{feature}/progress.md` - Registro de progreso
 
 ## Pasos
 
@@ -90,7 +90,7 @@ Ejecutar verificación definida en el plan:
 
 ### Paso 5: Registrar Progreso
 
-Actualizar `work/features/{feature}/progress.md`:
+Actualizar `work/stories/{feature}/progress.md`:
 - Task completado
 - Tiempo real vs estimado (calculado de timestamp)
 - Notas o descubrimientos

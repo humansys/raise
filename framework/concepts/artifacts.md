@@ -59,7 +59,7 @@ RaiSE organizes artifacts in a three-level hierarchy:
 
 **Scope:** Individual features, user stories, work items
 
-**Location:** `work/features/{name}/`
+**Location:** `work/stories/{name}/`
 
 **Artifacts:**
 | Artifact | Purpose |

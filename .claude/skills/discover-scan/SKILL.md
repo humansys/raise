@@ -310,4 +310,4 @@ This overrides context.yaml root_dirs for this scan.
 - Previous skill: `/discover-start`
 - Next skill: `/discover-validate`
 - CLI docs: `raise discover scan --help`
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`

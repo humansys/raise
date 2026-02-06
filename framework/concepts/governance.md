@@ -70,7 +70,7 @@ governance/projects/{name}/
 Governance for individual features (in `work/`).
 
 ```
-work/features/{name}/
+work/stories/{name}/
 ├── spec.md            # What to build
 ├── plan.md            # How to build it
 └── tasks.md           # Step by step
