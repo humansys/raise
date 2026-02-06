@@ -12,6 +12,7 @@ This module provides:
 
 from __future__ import annotations
 
+from raise_cli.skills.parser import ParseError, parse_frontmatter, parse_skill
 from raise_cli.skills.schema import (
     Skill,
     SkillFrontmatter,
@@ -21,9 +22,14 @@ from raise_cli.skills.schema import (
 )
 
 __all__ = [
+    # Schema
     "Skill",
     "SkillFrontmatter",
     "SkillHook",
     "SkillHookCommand",
     "SkillMetadata",
+    # Parser
+    "ParseError",
+    "parse_frontmatter",
+    "parse_skill",
 ]
