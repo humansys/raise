@@ -49,7 +49,7 @@ V3:
 
 | ID | Feature | Size | SP | Status | Description |
 |----|---------|:----:|:--:|:------:|-------------|
-| F14.1 | Base Identity Package | S | 2 | Pending | Bundle core.md + perspective.md in package |
+| F14.1 | Base Identity Package | S | 2 | ✅ Done | Bundle core.md + perspective.md in package |
 | F14.2 | Base Patterns Catalog | M | 3 | Pending | Define ~20 universal methodology patterns |
 | F14.3 | Methodology Core | S | 2 | Pending | methodology.yaml with skills, gates, rules |
 | F14.4 | Bootstrap on Init | M | 3 | Pending | Copy bundled base to .raise/rai/ during raise init |
@@ -362,7 +362,7 @@ Buffer for fixes
 | Feature | Size | Status | Actual | Velocity | Notes |
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F14.0 DX Quality Gate | M | ✅ Done | ~6 sessions | — | -5200 lines, graph consolidated |
-| F14.1 Base Identity | S | Pending | — | — | |
+| F14.1 Base Identity | S | ✅ Done | 1 session | — | Generic base identity |
 | F14.2 Base Patterns | M | Pending | — | — | |
 | F14.3 Methodology | S | Pending | — | — | |
 | F14.4 Bootstrap | M | Pending | — | — | |
