@@ -50,7 +50,7 @@ V3:
 | ID | Feature | Size | SP | Status | Description |
 |----|---------|:----:|:--:|:------:|-------------|
 | F14.1 | Base Identity Package | S | 2 | ✅ Done | Bundle core.md + perspective.md in package |
-| F14.2 | Base Patterns Catalog | M | 3 | Pending | Define ~20 universal methodology patterns |
+| F14.2 | Base Patterns Catalog | M | 3 | ✅ Done | Define ~20 universal methodology patterns |
 | F14.3 | Methodology Core | S | 2 | Pending | methodology.yaml with skills, gates, rules |
 | F14.4 | Bootstrap on Init | M | 3 | Pending | Copy bundled base to .raise/rai/ during raise init |
 | F14.5 | Two-Part MEMORY.md | M | 3 | Pending | Generate MEMORY.md with static process + dynamic context |
@@ -363,7 +363,7 @@ Buffer for fixes
 |---------|:----:|:------:|:------:|:--------:|-------|
 | F14.0 DX Quality Gate | M | ✅ Done | ~6 sessions | — | -5200 lines, graph consolidated |
 | F14.1 Base Identity | S | ✅ Done | 1 session | — | Generic base identity |
-| F14.2 Base Patterns | M | Pending | — | — | |
+| F14.2 Base Patterns | M | ✅ Done | 1 session | — | 20 universal patterns |
 | F14.3 Methodology | S | Pending | — | — | |
 | F14.4 Bootstrap | M | Pending | — | — | |
 | F14.5 MEMORY.md | M | Pending | — | — | |
