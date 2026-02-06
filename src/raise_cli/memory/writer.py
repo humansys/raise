@@ -203,6 +203,10 @@ class PatternInput(BaseModel):
     learned_from: str | None = Field(
         default=None, description="Story/session where learned"
     )
+    base: bool = Field(default=False, description="Whether this is a base pattern")
+    version: int | None = Field(
+        default=None, description="Base pattern version (for update tracking)"
+    )
 
 
 class CalibrationInput(BaseModel):
@@ -355,7 +359,7 @@ def append_pattern(
     pattern_id = _get_next_id(file_path, "PAT")
     created_date = created or date.today()
 
-    entry = {
+    entry: dict[str, Any] = {
         "id": pattern_id,
         "type": input_data.sub_type.value,
         "content": input_data.content,
@@ -363,6 +367,11 @@ def append_pattern(
         "learned_from": input_data.learned_from,
         "created": created_date.isoformat(),
     }
+
+    # Include base/version only for base patterns (clean output for personal patterns)
+    if input_data.base:
+        entry["base"] = True
+        entry["version"] = input_data.version or 1
 
     _append_jsonl(file_path, entry)
 

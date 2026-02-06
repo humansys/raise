@@ -68,6 +68,57 @@ class TestLoadPattern:
         assert concept.metadata["learned_from"] is None
 
 
+class TestLoadPatternBaseVersion:
+    """Tests for load_pattern with base/version fields (F14.6)."""
+
+    def test_base_pattern_has_base_in_metadata(self) -> None:
+        """Base patterns should surface base=True in metadata."""
+        data = {
+            "id": "BASE-001",
+            "type": "process",
+            "content": "TDD cycle discipline",
+            "context": ["tdd", "testing"],
+            "base": True,
+            "version": 1,
+            "created": "2026-02-05",
+        }
+        concept = load_pattern(data)
+
+        assert concept.metadata["base"] is True
+        assert concept.metadata["version"] == 1
+
+    def test_personal_pattern_has_no_base_in_metadata(self) -> None:
+        """Personal patterns (without base field) should not have base in metadata."""
+        data = {
+            "id": "PAT-001",
+            "type": "codebase",
+            "content": "My custom pattern",
+            "created": "2026-01-31",
+        }
+        concept = load_pattern(data)
+
+        assert concept.metadata.get("base") is None
+        assert concept.metadata.get("version") is None
+
+    def test_base_pattern_round_trip(self) -> None:
+        """Base pattern fields should survive load cycle."""
+        data = {
+            "id": "BASE-015",
+            "type": "technical",
+            "content": "Type annotations everywhere",
+            "context": ["typing", "pyright"],
+            "base": True,
+            "version": 2,
+            "created": "2026-02-05",
+        }
+        concept = load_pattern(data)
+
+        assert concept.id == "BASE-015"
+        assert concept.metadata["base"] is True
+        assert concept.metadata["version"] == 2
+        assert concept.metadata["sub_type"] == "technical"
+
+
 class TestLoadCalibration:
     """Tests for load_calibration function."""
 
