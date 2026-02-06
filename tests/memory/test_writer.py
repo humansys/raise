@@ -348,7 +348,9 @@ class TestValidateSessionIndex:
         sessions_dir.mkdir(parents=True)
 
         index_file = sessions_dir / "index.jsonl"
-        index_file.write_text('{"id": "SES-042", "date": "2026-02-01", "topic": "Test"}\n')
+        index_file.write_text(
+            '{"id": "SES-042", "date": "2026-02-01", "topic": "Test"}\n'
+        )
 
         result = validate_session_index(memory_dir)
 
@@ -403,6 +405,63 @@ class TestGetMemoryDirForScope:
 
         expected = tmp_path / ".raise" / "rai" / "personal"
         assert result == expected
+
+
+class TestAppendPatternBaseVersion:
+    """Tests for base/version fields in pattern versioning (F14.6)."""
+
+    def test_base_pattern_includes_base_and_version(self, tmp_path: Path) -> None:
+        """Base patterns should include base=True and version in output."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(
+            content="TDD cycle discipline",
+            sub_type=PatternSubType.PROCESS,
+            context=["tdd", "testing"],
+            base=True,
+            version=1,
+        )
+
+        result = append_pattern(memory_dir, input_data)
+
+        assert result.success is True
+        patterns_file = memory_dir / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert data["base"] is True
+        assert data["version"] == 1
+
+    def test_personal_pattern_omits_base_and_version(self, tmp_path: Path) -> None:
+        """Personal patterns (default) should not have base/version fields."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(
+            content="My custom pattern",
+            sub_type=PatternSubType.CODEBASE,
+            context=["custom"],
+        )
+
+        append_pattern(memory_dir, input_data)
+
+        patterns_file = memory_dir / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert "base" not in data
+        assert "version" not in data
+
+    def test_base_false_omits_fields(self, tmp_path: Path) -> None:
+        """Explicit base=False should not include base/version in output."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(content="Not a base pattern", base=False)
+
+        append_pattern(memory_dir, input_data)
+
+        patterns_file = memory_dir / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert "base" not in data
+        assert "version" not in data
 
 
 class TestAppendPatternWithScope:

@@ -51,17 +51,25 @@ def load_pattern(
     # Handle date field variations: 'created' or 'date'
     date_str = data.get("created") or data.get("date", "")
 
+    metadata: dict[str, Any] = {
+        "sub_type": data.get("type", "unknown"),
+        "learned_from": data.get("learned_from"),
+        "scope": scope.value,
+    }
+
+    # Surface base/version for pattern versioning (F14.6)
+    if data.get("base") is not None:
+        metadata["base"] = data["base"]
+    if data.get("version") is not None:
+        metadata["version"] = data["version"]
+
     return MemoryConcept(
         id=data["id"],
         type=MemoryConceptType.PATTERN,
         content=content,
         context=data.get("context", []),
         created=parse_date(date_str),
-        metadata={
-            "sub_type": data.get("type", "unknown"),
-            "learned_from": data.get("learned_from"),
-            "scope": scope.value,
-        },
+        metadata=metadata,
     )
 
 
