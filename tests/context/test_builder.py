@@ -350,6 +350,155 @@ class TestLoadMemoryMultiSource:
         assert session_nodes[0].metadata.get("scope") == "personal"
 
 
+class TestPrecedenceLogic:
+    """Tests for memory scope precedence (personal > project > global)."""
+
+    def test_personal_overrides_project(self, tmp_path: Path) -> None:
+        """Personal scope should override project scope for same ID."""
+        # Project pattern
+        project_dir = tmp_path / ".raise/rai" / "memory"
+        project_dir.mkdir(parents=True)
+        (project_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-001",
+                "type": "codebase",
+                "content": "Project version",
+                "created": "2026-01-31",
+            }) + "\n"
+        )
+
+        # Personal pattern with same ID
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-001",
+                "type": "codebase",
+                "content": "Personal override",
+                "created": "2026-02-01",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have one PAT-001, from personal
+        pat_nodes = [n for n in nodes if n.id == "PAT-001"]
+        assert len(pat_nodes) == 1
+        assert pat_nodes[0].content == "Personal override"
+        assert pat_nodes[0].metadata.get("scope") == "personal"
+
+    def test_project_overrides_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Project scope should override global scope for same ID."""
+        # Global pattern
+        global_dir = tmp_path / "global_rai"
+        global_dir.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_dir))
+        (global_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-002",
+                "type": "universal",
+                "content": "Global version",
+                "created": "2026-01-30",
+            }) + "\n"
+        )
+
+        # Project pattern with same ID
+        project_dir = tmp_path / ".raise/rai" / "memory"
+        project_dir.mkdir(parents=True)
+        (project_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-002",
+                "type": "codebase",
+                "content": "Project override",
+                "created": "2026-01-31",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have one PAT-002, from project
+        pat_nodes = [n for n in nodes if n.id == "PAT-002"]
+        assert len(pat_nodes) == 1
+        assert pat_nodes[0].content == "Project override"
+        assert pat_nodes[0].metadata.get("scope") == "project"
+
+    def test_personal_overrides_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Personal scope should override global scope for same ID."""
+        # Global pattern
+        global_dir = tmp_path / "global_rai"
+        global_dir.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_dir))
+        (global_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-003",
+                "type": "universal",
+                "content": "Global version",
+                "created": "2026-01-30",
+            }) + "\n"
+        )
+
+        # Personal pattern with same ID (skipping project)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps({
+                "id": "PAT-003",
+                "type": "process",
+                "content": "Personal override",
+                "created": "2026-02-01",
+            }) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # Should only have one PAT-003, from personal
+        pat_nodes = [n for n in nodes if n.id == "PAT-003"]
+        assert len(pat_nodes) == 1
+        assert pat_nodes[0].content == "Personal override"
+        assert pat_nodes[0].metadata.get("scope") == "personal"
+
+    def test_unique_ids_all_preserved(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Unique IDs from all tiers should be preserved."""
+        # Global pattern
+        global_dir = tmp_path / "global_rai"
+        global_dir.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_dir))
+        (global_dir / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-G1", "type": "universal", "content": "Global", "created": "2026-01-30"}) + "\n"
+        )
+
+        # Project pattern (different ID)
+        project_dir = tmp_path / ".raise/rai" / "memory"
+        project_dir.mkdir(parents=True)
+        (project_dir / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-P1", "type": "codebase", "content": "Project", "created": "2026-01-31"}) + "\n"
+        )
+
+        # Personal pattern (different ID)
+        personal_dir = tmp_path / ".raise/rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        (personal_dir / "patterns.jsonl").write_text(
+            json.dumps({"id": "PAT-L1", "type": "process", "content": "Personal", "created": "2026-02-01"}) + "\n"
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_memory()
+
+        # All three should be preserved
+        assert len(nodes) == 3
+        ids = {n.id for n in nodes}
+        assert ids == {"PAT-G1", "PAT-P1", "PAT-L1"}
+
+
 class TestLoadWork:
     """Tests for load_work method."""
 
