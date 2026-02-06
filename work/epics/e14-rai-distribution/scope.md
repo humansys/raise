@@ -51,7 +51,7 @@ V3:
 |----|---------|:----:|:--:|:------:|-------------|
 | F14.1 | Base Identity Package | S | 2 | ✅ Done | Bundle core.md + perspective.md in package |
 | F14.2 | Base Patterns Catalog | M | 3 | ✅ Done | Define ~20 universal methodology patterns |
-| F14.3 | Methodology Core | S | 2 | Pending | methodology.yaml with skills, gates, rules |
+| F14.3 | Methodology Core | S | 2 | ✅ Done | methodology.yaml with skills, gates, rules |
 | F14.4 | Bootstrap on Init | M | 3 | Pending | Copy bundled base to .raise/rai/ during raise init |
 | F14.5 | Two-Part MEMORY.md | M | 3 | Pending | Generate MEMORY.md with static process + dynamic context |
 | F14.6 | Pattern Versioning | S | 2 | Pending | Add base/version fields to pattern schema |
@@ -364,7 +364,7 @@ Buffer for fixes
 | F14.0 DX Quality Gate | M | ✅ Done | ~6 sessions | — | -5200 lines, graph consolidated |
 | F14.1 Base Identity | S | ✅ Done | 1 session | — | Generic base identity |
 | F14.2 Base Patterns | M | ✅ Done | 1 session | — | 20 universal patterns |
-| F14.3 Methodology | S | Pending | — | — | |
+| F14.3 Methodology | S | ✅ Done | 1 session | — | 20 skills, gates, principles |
 | F14.4 Bootstrap | M | Pending | — | — | |
 | F14.5 MEMORY.md | M | Pending | — | — | |
 | F14.6 Versioning | S | Pending | — | — | |
@@ -376,7 +376,7 @@ Buffer for fixes
 
 **Milestone Progress:**
 - [x] M0: Multi-Dev Architecture (Day 1)
-- [ ] M1: Base Assets (Day 1-2)
+- [x] M1: Base Assets (Day 1-2)
 - [ ] M2: Bootstrap (Day 2-3)
 - [ ] M3: MEMORY.md (Day 3)
 - [ ] M4: Epic Complete (Day 4)
