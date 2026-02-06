@@ -1,15 +1,15 @@
 ---
 id: implement
 titulo: "Implement: Development Workflow"
-work_cycle: feature
+work_cycle: story
 frequency: per-story
 fase_metodologia: 6
 
 prerequisites:
-  - feature/plan
+  - story/plan
 template: null
 gate: gates/gate-code.md
-next_kata: feature/review
+next_kata: story/review
 
 adaptable: true
 shuhari:

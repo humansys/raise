@@ -3,12 +3,12 @@ name: story-plan
 description: >
   Decompose user stories into atomic executable tasks, identify dependencies,
   and create a deterministic implementation plan. Use after design spec is ready
-  or for simple features that skip design.
+  or for simple stories that skip design.
 
 license: MIT
 
 metadata:
-  raise.work_cycle: feature
+  raise.work_cycle: story
   raise.frequency: per-story
   raise.fase: "5"
   raise.prerequisites: project-backlog

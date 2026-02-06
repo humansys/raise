@@ -6,7 +6,7 @@ Memory is the unified knowledge base containing:
 - Calibration (estimation data)
 - Sessions (work history)
 - Skills (workflow metadata)
-- Work (epics, features, decisions)
+- Work (epics, stories, decisions)
 
 The "graph" is an implementation detail — users interact with "memory".
 """
@@ -125,7 +125,7 @@ def query(
     - Governance (principles, requirements, terms)
     - Memory (patterns, calibration, sessions)
     - Skills (workflow metadata)
-    - Work (epics, features, decisions)
+    - Work (epics, stories, decisions)
 
     Examples:
         # Search by keywords
@@ -342,7 +342,7 @@ def generate_memory(
     console.print(f"  Claude Code: [cyan]{claude_path}[/cyan]")
 
     # Count sections for summary
-    skills_count = content.count("`/")
+    skills_count = content.count("` — ")  # Each skill line: `name` — purpose
     patterns_count = content.count("**PAT-") + content.count("**BASE-")
     console.print(f"  Skills: {skills_count}, Patterns: {patterns_count}")
     console.print("")
@@ -365,7 +365,7 @@ def build(
     Merges all context sources into a single queryable index:
     - Governance documents (constitution, PRD, vision)
     - Memory (patterns, calibration, sessions)
-    - Work tracking (epics, features)
+    - Work tracking (epics, stories)
     - Skills (SKILL.md metadata)
     - Components (from discovery)
 
@@ -1273,7 +1273,7 @@ def emit_session_event(
         int,
         typer.Option("--duration", "-d", help="Session duration in minutes"),
     ] = 0,
-    features: Annotated[
+    stories: Annotated[
         str,
         typer.Option("--stories", "-f", help="Stories worked on (comma-separated)"),
     ] = "",
@@ -1307,7 +1307,7 @@ def emit_session_event(
         )
 
     # Parse stories
-    stories_list = [f.strip() for f in features.split(",") if f.strip()]
+    stories_list = [f.strip() for f in stories.split(",") if f.strip()]
 
     # Create event
     event = SessionEvent(

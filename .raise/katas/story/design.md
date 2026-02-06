@@ -1,7 +1,7 @@
 ---
 id: story-design
-titulo: "Design: Feature Specification"
-work_cycle: feature
+titulo: "Design: Story Specification"
+work_cycle: story
 frequency: per-story-as-needed
 fase_metodologia: 4
 
@@ -9,7 +9,7 @@ prerequisites:
   - project/backlog
 template: templates/tech/tech-design-story-v2.md
 gate: null
-next_kata: feature/plan
+next_kata: story/plan
 
 adaptable: true
 shuhari:

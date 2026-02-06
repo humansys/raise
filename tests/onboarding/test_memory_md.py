@@ -9,7 +9,6 @@ import pytest
 
 from raise_cli.onboarding.memory_md import MemoryMdGenerator, generate_memory_md
 
-
 # =============================================================================
 # Fixtures
 # =============================================================================
@@ -130,9 +129,7 @@ class TestMemoryMdGeneratorPart1:
 
         assert "# Rai Memory — my-project" in result
 
-    def test_generates_lifecycle_section(
-        self, sample_methodology_yaml: Path
-    ) -> None:
+    def test_generates_lifecycle_section(self, sample_methodology_yaml: Path) -> None:
         """Should include lifecycle flows from methodology."""
         gen = MemoryMdGenerator()
         result = gen.generate(methodology_path=sample_methodology_yaml)
@@ -143,9 +140,7 @@ class TestMemoryMdGeneratorPart1:
         assert "/story-start" in result
         assert "/session-start" in result
 
-    def test_generates_skills_section(
-        self, sample_methodology_yaml: Path
-    ) -> None:
+    def test_generates_skills_section(self, sample_methodology_yaml: Path) -> None:
         """Should list all skills by category."""
         gen = MemoryMdGenerator()
         result = gen.generate(methodology_path=sample_methodology_yaml)
@@ -158,9 +153,7 @@ class TestMemoryMdGeneratorPart1:
         assert "`/session-start`" in result
         assert "Load memory and propose focus" in result
 
-    def test_generates_gates_section(
-        self, sample_methodology_yaml: Path
-    ) -> None:
+    def test_generates_gates_section(self, sample_methodology_yaml: Path) -> None:
         """Should render blocking gates as table."""
         gen = MemoryMdGenerator()
         result = gen.generate(methodology_path=sample_methodology_yaml)
@@ -169,9 +162,7 @@ class TestMemoryMdGeneratorPart1:
         assert "Epic branch exists" in result
         assert "Story branch and scope commit" in result
 
-    def test_generates_principles_section(
-        self, sample_methodology_yaml: Path
-    ) -> None:
+    def test_generates_principles_section(self, sample_methodology_yaml: Path) -> None:
         """Should list principles as numbered rules."""
         gen = MemoryMdGenerator()
         result = gen.generate(methodology_path=sample_methodology_yaml)
@@ -180,9 +171,7 @@ class TestMemoryMdGeneratorPart1:
         assert "TDD Always" in result
         assert "Commit After Task" in result
 
-    def test_generates_branches_section(
-        self, sample_methodology_yaml: Path
-    ) -> None:
+    def test_generates_branches_section(self, sample_methodology_yaml: Path) -> None:
         """Should include branch model."""
         gen = MemoryMdGenerator()
         result = gen.generate(methodology_path=sample_methodology_yaml)
@@ -191,9 +180,7 @@ class TestMemoryMdGeneratorPart1:
         assert "main (stable)" in result
         assert "Stories merge to epic branch" in result
 
-    def test_skills_count_in_header(
-        self, sample_methodology_yaml: Path
-    ) -> None:
+    def test_skills_count_in_header(self, sample_methodology_yaml: Path) -> None:
         """Should include total skills count."""
         gen = MemoryMdGenerator()
         result = gen.generate(methodology_path=sample_methodology_yaml)

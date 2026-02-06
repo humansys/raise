@@ -1,14 +1,14 @@
 ---
 name: story-close
 description: >
-  Complete a feature with retrospective verification, merge, cleanup,
-  and tracking update. Use after review to formally close the feature
+  Complete a story with retrospective verification, merge, cleanup,
+  and tracking update. Use after review to formally close the story
   lifecycle.
 
 license: MIT
 
 metadata:
-  raise.work_cycle: feature
+  raise.work_cycle: story
   raise.frequency: per-story
   raise.fase: "8"
   raise.prerequisites: story-review

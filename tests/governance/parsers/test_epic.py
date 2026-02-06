@@ -111,12 +111,12 @@ class TestExtractEpicDetails:
         assert epic is not None
         assert epic.metadata["branch"] == "`feature/e8/work-tracking-graph`"
 
-    def test_extract_feature_count(self, tmp_epic_file: Path) -> None:
-        """Should count features in table."""
+    def test_extract_story_count(self, tmp_epic_file: Path) -> None:
+        """Should count stories in table."""
         epic = extract_epic_details(tmp_epic_file)
 
         assert epic is not None
-        assert epic.metadata["feature_count"] == 4
+        assert epic.metadata["story_count"] == 4
 
     def test_extract_scope_doc(self, tmp_epic_file: Path) -> None:
         """Should include scope doc path in metadata."""

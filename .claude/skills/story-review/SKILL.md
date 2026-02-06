@@ -1,14 +1,14 @@
 ---
 name: story-review
 description: >
-  Reflect on completed features to extract learnings, identify process
+  Reflect on completed stories to extract learnings, identify process
   improvements, and update the framework with insights gained. Use after
   implementation is complete to close the development cycle.
 
 license: MIT
 
 metadata:
-  raise.work_cycle: feature
+  raise.work_cycle: story
   raise.frequency: per-story
   raise.fase: "7"
   raise.prerequisites: story-implement

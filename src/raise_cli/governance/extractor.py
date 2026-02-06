@@ -97,7 +97,7 @@ class GovernanceExtractor:
         - governance/solution/vision.md (outcomes)
         - framework/reference/constitution.md (principles)
         - governance/projects/*/backlog.md (epics)
-        - work/epics/*/scope.md (features)
+        - work/epics/*/scope.md (stories)
         - dev/decisions/adr-*.md (decisions)
         - governance/solution/guardrails.md (guardrails)
         - framework/reference/glossary.md (terms)
@@ -271,9 +271,7 @@ class GovernanceExtractor:
                 # Extract Story concepts
                 stories = extract_stories(scope_file, self.project_root)
                 concepts.extend(stories)
-                logger.info(
-                    f"Extracted {len(stories)} stories from {scope_file.name}"
-                )
+                logger.info(f"Extracted {len(stories)} stories from {scope_file.name}")
             except Exception as e:
                 logger.error(f"Error extracting from {scope_file}: {e}")
 
