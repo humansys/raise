@@ -173,7 +173,7 @@ def migrate_emilio_profile(
     # Universal patterns that apply across all projects
     universal_patterns = [
         "Commit after each completed task",
-        "TDD for complex features",
+        "TDD for complex stories",
         "Ask before spawning subagents",
         "Inference economy: gather with tools, think with inference",
         "Permission granted to redirect when dispersing",

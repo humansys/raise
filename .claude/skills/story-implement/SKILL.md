@@ -8,7 +8,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: feature
+  raise.work_cycle: story
   raise.frequency: per-story
   raise.fase: "6"
   raise.prerequisites: story-plan

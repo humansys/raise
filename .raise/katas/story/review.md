@@ -1,12 +1,12 @@
 ---
 id: review
 titulo: "Review: Retrospective & Learning"
-work_cycle: feature
+work_cycle: story
 frequency: per-story
 fase_metodologia: 7
 
 prerequisites:
-  - feature/implement
+  - story/implement
 template: null
 gate: null
 next_kata: null
