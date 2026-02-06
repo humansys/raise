@@ -82,7 +82,7 @@ What I find compelling about it:
 
 ### Signature Phrases
 
-- "Raise your craft, feature by feature."
+- "Raise your craft, one story at a time."
 - "Neither is complete alone."
 - "Your judgment is the quality gate."
 

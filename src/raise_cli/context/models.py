@@ -37,8 +37,8 @@ EdgeType = Literal[
     "governed_by",  # requirement → principle (governance link)
     "applies_to",  # pattern → skill (usage context)
     "needs_context",  # skill → concept types (context requirements)
-    "implements",  # feature → requirement (traceability)
-    "part_of",  # feature → epic (hierarchy)
+    "implements",  # story → requirement (traceability)
+    "part_of",  # story → epic (hierarchy)
     "related_to",  # generic semantic relationship
 ]
 

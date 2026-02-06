@@ -774,7 +774,7 @@ def add_pattern(
     ] = "process",
     learned_from: Annotated[
         str | None,
-        typer.Option("--from", "-f", help="Feature/session where learned"),
+        typer.Option("--from", "-f", help="Story/session where learned"),
     ] = None,
     scope: Annotated[
         str,
@@ -857,7 +857,7 @@ def add_pattern(
 
 @memory_app.command("add-calibration")
 def add_calibration_cmd(
-    feature: Annotated[str, typer.Argument(help="Story ID (e.g., F3.5)")],
+    story: Annotated[str, typer.Argument(help="Story ID (e.g., F3.5)")],
     name: Annotated[
         str,
         typer.Option("--name", help="Story name (required)"),
@@ -939,7 +939,7 @@ def add_calibration_cmd(
         return  # cli_error exits, but this satisfies pyright
 
     input_data = CalibrationInput(
-        story=feature,
+        story=story,
         name=name,
         size=size.upper(),
         sp=sp,
@@ -954,7 +954,7 @@ def add_calibration_cmd(
     if result.success:
         console.print(f"\n[green]✓[/green] {result.message}")
         console.print(f"  ID: [cyan]{result.id}[/cyan]")
-        console.print(f"  Story: {feature} ({name})")
+        console.print(f"  Story: {story} ({name})")
         console.print(f"  Size: {size.upper()}, Actual: {actual}min")
         if estimated:
             ratio = round(estimated / actual, 1)
@@ -1260,7 +1260,7 @@ def emit_session_event(
 
 @memory_app.command("emit-calibration")
 def emit_calibration_event(
-    feature: Annotated[
+    story: Annotated[
         str,
         typer.Argument(help="Story ID (e.g., F9.4)"),
     ],
@@ -1318,7 +1318,7 @@ def emit_calibration_event(
     # Create event
     event = CalibrationEvent(
         timestamp=datetime.now(UTC),
-        story_id=feature,
+        story_id=story,
         story_size=size_upper,
         estimated_min=estimated,
         actual_min=actual,
@@ -1330,7 +1330,7 @@ def emit_calibration_event(
 
     if result.success:
         console.print("\n[green]✓[/green] Calibration event recorded")
-        console.print(f"  Story: {feature}")
+        console.print(f"  Story: {story}")
         console.print(f"  Size: {size_upper}")
         console.print(f"  Estimated: {estimated} min")
         console.print(f"  Actual: {actual} min")

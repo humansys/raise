@@ -192,7 +192,7 @@ class PatternInput(BaseModel):
         content: Pattern description.
         sub_type: Pattern sub-type (codebase, process, architecture, technical).
         context: Context keywords for retrieval.
-        learned_from: Feature/session where pattern was learned.
+        learned_from: Story/session where pattern was learned.
     """
 
     content: str = Field(..., description="Pattern description")
@@ -201,7 +201,7 @@ class PatternInput(BaseModel):
     )
     context: list[str] = Field(default_factory=list, description="Context keywords")
     learned_from: str | None = Field(
-        default=None, description="Feature/session where learned"
+        default=None, description="Story/session where learned"
     )
 
 
