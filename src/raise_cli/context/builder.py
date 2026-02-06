@@ -131,7 +131,8 @@ class UnifiedGraphBuilder:
                 self._load_memory_from_dir(personal_dir, MemoryScope.PERSONAL, sessions=True)
             )
 
-        return nodes
+        # Apply precedence: personal > project > global
+        return self._deduplicate_by_precedence(nodes)
 
     def _load_memory_from_dir(
         self,
@@ -168,6 +169,47 @@ class UnifiedGraphBuilder:
                 nodes.extend(self._load_jsonl(sessions_file, "session", scope))
 
         return nodes
+
+    def _deduplicate_by_precedence(
+        self, nodes: list[ConceptNode]
+    ) -> list[ConceptNode]:
+        """Deduplicate nodes by ID using scope precedence.
+
+        When the same ID appears in multiple tiers, keep only the
+        highest-precedence version: personal > project > global.
+
+        Args:
+            nodes: List of nodes potentially with duplicate IDs.
+
+        Returns:
+            Deduplicated list with highest-precedence version of each ID.
+        """
+        # Precedence order: higher number = higher priority
+        scope_priority = {
+            MemoryScope.GLOBAL.value: 1,
+            MemoryScope.PROJECT.value: 2,
+            MemoryScope.PERSONAL.value: 3,
+        }
+
+        # Track best node for each ID
+        best_by_id: dict[str, ConceptNode] = {}
+
+        for node in nodes:
+            node_scope = node.metadata.get("scope", MemoryScope.PROJECT.value)
+            node_priority = scope_priority.get(node_scope, 0)
+
+            if node.id not in best_by_id:
+                best_by_id[node.id] = node
+            else:
+                existing_scope = best_by_id[node.id].metadata.get(
+                    "scope", MemoryScope.PROJECT.value
+                )
+                existing_priority = scope_priority.get(existing_scope, 0)
+
+                if node_priority > existing_priority:
+                    best_by_id[node.id] = node
+
+        return list(best_by_id.values())
 
     def load_work(self) -> list[ConceptNode]:
         """Load concepts from work tracking (backlog, epics).
