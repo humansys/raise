@@ -271,3 +271,67 @@ class TestSkillValidate:
         # Valid but with warnings
         assert result.exit_code == 0
         assert "warning" in result.stdout.lower() or "⚠" in result.stdout
+
+
+class TestSkillCheckName:
+    """Tests for raise skill check-name command."""
+
+    def test_check_name_valid(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Valid name returns exit code 0."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "check-name", "feature-validate"])
+        assert result.exit_code == 0
+        assert "valid" in result.stdout.lower()
+
+    def test_check_name_invalid_pattern(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Invalid pattern returns exit code 1."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "check-name", "badname"])
+        assert result.exit_code == 1
+        assert "pattern" in result.stdout.lower()
+
+    def test_check_name_json_output(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """JSON output format works."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "check-name", "session-test", "--format", "json"])
+        assert result.exit_code == 0
+        data = json.loads(result.stdout)
+        assert data["name"] == "session-test"
+        assert data["valid"] is True
+        assert "checks" in data
+
+    def test_check_name_skill_conflict(self, valid_skill_project: Path) -> None:
+        """Conflicts with existing skill."""
+        result = runner.invoke(app, ["skill", "check-name", "session-start"])
+        assert result.exit_code == 1
+        assert "conflict" in result.stdout.lower()
+
+    def test_check_name_cli_conflict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Conflicts with CLI command."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "check-name", "memory-build"])
+        assert result.exit_code == 1
+        assert "cli" in result.stdout.lower() or "command" in result.stdout.lower()
+
+    def test_check_name_shows_suggestions(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Shows suggestions for valid names."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "check-name", "custom-action"])
+        # Should show suggestion about unknown lifecycle
+        assert result.exit_code == 0
+        assert "lifecycle" in result.stdout.lower()

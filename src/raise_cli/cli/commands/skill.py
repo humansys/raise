@@ -13,12 +13,15 @@ import typer
 from rich.console import Console
 
 from raise_cli.output.formatters.skill import (
+    format_name_check_human,
+    format_name_check_json,
     format_skill_list_human,
     format_skill_list_json,
     format_validation_human,
     format_validation_json,
 )
 from raise_cli.skills.locator import SkillLocator, get_default_skill_dir
+from raise_cli.skills.name_checker import check_name
 from raise_cli.skills.validator import ValidationResult, validate_skill, validate_skill_file
 
 skill_app = typer.Typer(
@@ -117,4 +120,40 @@ def validate_command(
 
     # Exit with error code if any validation failed
     if not all(r.is_valid for r in results):
+        raise typer.Exit(code=1)
+
+
+@skill_app.command("check-name")
+def check_name_command(
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="Proposed skill name to check (e.g., 'feature-validate').",
+        ),
+    ],
+    format: Annotated[
+        str,
+        typer.Option(
+            "--format",
+            "-f",
+            help="Output format: human or json",
+        ),
+    ] = "human",
+) -> None:
+    """Check a proposed skill name against naming conventions.
+
+    Validates that the name follows {domain}-{action} pattern,
+    doesn't conflict with existing skills or CLI commands,
+    and uses a known lifecycle domain.
+    """
+    result = check_name(name)
+
+    # Output results
+    if format == "json":
+        print(format_name_check_json(result))
+    else:
+        format_name_check_human(result, console)
+
+    # Exit with error code if name is invalid
+    if not result.is_valid:
         raise typer.Exit(code=1)
