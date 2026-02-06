@@ -15,6 +15,8 @@ from rich.console import Console
 from raise_cli.output.formatters.skill import (
     format_name_check_human,
     format_name_check_json,
+    format_scaffold_human,
+    format_scaffold_json,
     format_skill_list_human,
     format_skill_list_json,
     format_validation_human,
@@ -22,6 +24,7 @@ from raise_cli.output.formatters.skill import (
 )
 from raise_cli.skills.locator import SkillLocator, get_default_skill_dir
 from raise_cli.skills.name_checker import check_name
+from raise_cli.skills.scaffold import scaffold_skill
 from raise_cli.skills.validator import ValidationResult, validate_skill, validate_skill_file
 
 skill_app = typer.Typer(
@@ -156,4 +159,60 @@ def check_name_command(
 
     # Exit with error code if name is invalid
     if not result.is_valid:
+        raise typer.Exit(code=1)
+
+
+@skill_app.command("scaffold")
+def scaffold_command(
+    name: Annotated[
+        str,
+        typer.Argument(
+            help="Skill name to create (e.g., 'feature-validate').",
+        ),
+    ],
+    lifecycle: Annotated[
+        str | None,
+        typer.Option(
+            "--lifecycle",
+            "-l",
+            help="Lifecycle: session, epic, feature, discovery, utility, meta. Inferred from name if not specified.",
+        ),
+    ] = None,
+    after: Annotated[
+        str | None,
+        typer.Option(
+            "--after",
+            help="Skill that should come before this one (prerequisites).",
+        ),
+    ] = None,
+    before: Annotated[
+        str | None,
+        typer.Option(
+            "--before",
+            help="Skill that should come after this one (next).",
+        ),
+    ] = None,
+    format: Annotated[
+        str,
+        typer.Option(
+            "--format",
+            "-f",
+            help="Output format: human or json",
+        ),
+    ] = "human",
+) -> None:
+    """Create a new skill from template.
+
+    Generates a SKILL.md file with proper structure in .claude/skills/<name>/.
+    """
+    result = scaffold_skill(name, lifecycle=lifecycle, after=after, before=before)
+
+    # Output results
+    if format == "json":
+        print(format_scaffold_json(result))
+    else:
+        format_scaffold_human(result, console)
+
+    # Exit with error code if creation failed
+    if not result.created:
         raise typer.Exit(code=1)

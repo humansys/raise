@@ -335,3 +335,76 @@ class TestSkillCheckName:
         # Should show suggestion about unknown lifecycle
         assert result.exit_code == 0
         assert "lifecycle" in result.stdout.lower()
+
+
+class TestSkillScaffold:
+    """Tests for raise skill scaffold command."""
+
+    def test_scaffold_creates_skill(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Scaffold creates a new skill."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "scaffold", "test-action"])
+        assert result.exit_code == 0
+        assert "created" in result.stdout.lower()
+        assert (skills / "test-action" / "SKILL.md").exists()
+
+    def test_scaffold_with_lifecycle(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Scaffold with explicit lifecycle."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "scaffold", "my-test", "--lifecycle", "epic"])
+        assert result.exit_code == 0
+        content = (skills / "my-test" / "SKILL.md").read_text()
+        assert "raise.work_cycle: epic" in content
+
+    def test_scaffold_with_after(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Scaffold with prerequisite skill."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--after", "feature-start"])
+        assert result.exit_code == 0
+        content = (skills / "test-action" / "SKILL.md").read_text()
+        assert "feature-start" in content
+
+    def test_scaffold_with_before(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Scaffold with next skill."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--before", "feature-close"])
+        assert result.exit_code == 0
+        content = (skills / "test-action" / "SKILL.md").read_text()
+        assert "feature-close" in content
+
+    def test_scaffold_json_output(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """JSON output format works."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "scaffold", "test-skill", "--format", "json"])
+        assert result.exit_code == 0
+        data = json.loads(result.stdout)
+        assert data["created"] is True
+        assert "test-skill" in data["path"]
+
+    def test_scaffold_fails_if_exists(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Scaffold fails for existing skill."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        existing = skills / "existing-skill"
+        existing.mkdir()
+        (existing / "SKILL.md").write_text("existing")
+        monkeypatch.chdir(tmp_path)
+
+        result = runner.invoke(app, ["skill", "scaffold", "existing-skill"])
+        assert result.exit_code == 1
+        assert "exists" in result.stdout.lower()
