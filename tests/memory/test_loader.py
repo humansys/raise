@@ -14,7 +14,7 @@ from raise_cli.memory.loader import (
     load_session,
     parse_date,
 )
-from raise_cli.memory.models import MemoryConceptType
+from raise_cli.memory.models import MemoryConceptType, MemoryScope
 
 
 class TestParseDate:
@@ -283,3 +283,110 @@ class TestLoadMemoryFromDirectory:
         assert result.files_processed > 0
         # Real data should parse without errors
         assert len(result.errors) == 0
+
+
+class TestMemoryScope:
+    """Tests for MemoryScope enum."""
+
+    def test_scope_values(self) -> None:
+        """MemoryScope has correct values."""
+        assert MemoryScope.GLOBAL.value == "global"
+        assert MemoryScope.PROJECT.value == "project"
+        assert MemoryScope.PERSONAL.value == "personal"
+
+    def test_scope_is_string_enum(self) -> None:
+        """MemoryScope values can be used as strings."""
+        assert str(MemoryScope.GLOBAL) == "global"
+        assert f"scope:{MemoryScope.PROJECT}" == "scope:project"
+
+
+class TestLoadPatternWithScope:
+    """Tests for load_pattern with scope tracking."""
+
+    def test_load_pattern_includes_scope_in_metadata(self) -> None:
+        """Pattern loaded with scope should have scope in metadata."""
+        data = {
+            "id": "PAT-001",
+            "type": "codebase",
+            "content": "Test pattern",
+            "created": "2026-01-31",
+        }
+        concept = load_pattern(data, scope=MemoryScope.PROJECT)
+
+        assert concept.metadata.get("scope") == MemoryScope.PROJECT.value
+
+    def test_load_pattern_default_scope_is_project(self) -> None:
+        """Pattern loaded without explicit scope defaults to project."""
+        data = {
+            "id": "PAT-002",
+            "type": "process",
+            "content": "Another pattern",
+            "created": "2026-01-31",
+        }
+        concept = load_pattern(data)
+
+        assert concept.metadata.get("scope") == MemoryScope.PROJECT.value
+
+    def test_load_pattern_global_scope(self) -> None:
+        """Pattern can be loaded with global scope."""
+        data = {
+            "id": "PAT-003",
+            "type": "universal",
+            "content": "Universal pattern",
+            "created": "2026-01-31",
+        }
+        concept = load_pattern(data, scope=MemoryScope.GLOBAL)
+
+        assert concept.metadata.get("scope") == MemoryScope.GLOBAL.value
+
+
+class TestLoadCalibrationWithScope:
+    """Tests for load_calibration with scope tracking."""
+
+    def test_load_calibration_includes_scope(self) -> None:
+        """Calibration loaded with scope should have scope in metadata."""
+        data = {
+            "id": "CAL-001",
+            "feature": "F1.1",
+            "name": "Test",
+            "size": "S",
+            "created": "2026-01-31",
+        }
+        concept = load_calibration(data, scope=MemoryScope.PERSONAL)
+
+        assert concept.metadata.get("scope") == MemoryScope.PERSONAL.value
+
+
+class TestLoadSessionWithScope:
+    """Tests for load_session with scope tracking."""
+
+    def test_load_session_includes_scope(self) -> None:
+        """Session loaded with scope should have scope in metadata."""
+        data = {
+            "id": "SES-001",
+            "date": "2026-02-01",
+            "type": "feature",
+            "topic": "Test session",
+        }
+        concept = load_session(data, scope=MemoryScope.PERSONAL)
+
+        assert concept.metadata.get("scope") == MemoryScope.PERSONAL.value
+
+
+class TestLoadJsonlFileWithScope:
+    """Tests for load_jsonl_file with scope parameter."""
+
+    def test_load_jsonl_file_passes_scope_to_concepts(self, tmp_path: Path) -> None:
+        """Scope should be passed to all loaded concepts."""
+        jsonl_file = tmp_path / "patterns.jsonl"
+        jsonl_file.write_text(
+            '{"id": "PAT-001", "type": "codebase", "content": "Test", "created": "2026-01-31"}\n'
+            '{"id": "PAT-002", "type": "process", "content": "Test2", "created": "2026-01-31"}\n'
+        )
+
+        concepts, _ = load_jsonl_file(
+            jsonl_file, MemoryConceptType.PATTERN, scope=MemoryScope.GLOBAL
+        )
+
+        assert len(concepts) == 2
+        assert all(c.metadata.get("scope") == "global" for c in concepts)

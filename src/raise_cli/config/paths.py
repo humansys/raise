@@ -116,6 +116,86 @@ def get_graph_dir(project_root: Path | None = None) -> Path:
 # Global Rai directory in user home (for developer profile)
 GLOBAL_RAI_DIR = ".rai"
 
+# Personal subdirectory (gitignored, per-developer within project)
+PERSONAL_SUBDIR = "personal"
+
+
+def get_global_rai_dir() -> Path:
+    """Get the global ~/.rai directory for cross-repo Rai state.
+
+    This directory stores:
+    - developer.yaml (identity, already exists)
+    - patterns.jsonl (universal patterns, NEW)
+    - calibration.jsonl (global calibration, NEW)
+
+    Can be overridden with RAI_HOME environment variable.
+
+    Returns:
+        Path to global Rai directory (e.g., ~/.rai or $RAI_HOME)
+
+    Example:
+        >>> global_dir = get_global_rai_dir()
+        >>> patterns_file = global_dir / "patterns.jsonl"
+    """
+    rai_home = os.environ.get("RAI_HOME")
+    if rai_home:
+        return Path(rai_home)
+    return Path.home() / GLOBAL_RAI_DIR
+
+
+def ensure_global_rai_dir() -> Path:
+    """Ensure the global ~/.rai directory exists with required files.
+
+    Creates:
+    - ~/.rai/ directory (if not exists)
+    - ~/.rai/patterns.jsonl (empty, if not exists)
+    - ~/.rai/calibration.jsonl (empty, if not exists)
+
+    Does NOT overwrite existing files.
+
+    Returns:
+        Path to global Rai directory.
+
+    Example:
+        >>> global_dir = ensure_global_rai_dir()
+        >>> # Now safe to write patterns to global_dir / "patterns.jsonl"
+    """
+    global_dir = get_global_rai_dir()
+    global_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create empty JSONL files if they don't exist
+    patterns_file = global_dir / PATTERNS_FILE
+    if not patterns_file.exists():
+        patterns_file.touch()
+
+    calibration_file = global_dir / CALIBRATION_FILE
+    if not calibration_file.exists():
+        calibration_file.touch()
+
+    return global_dir
+
+
+def get_personal_dir(project_root: Path | None = None) -> Path:
+    """Get the personal directory for developer-specific project data.
+
+    This directory is gitignored and stores:
+    - sessions/index.jsonl (my sessions)
+    - telemetry/signals.jsonl (my telemetry)
+    - calibration.jsonl (project-specific calibration)
+    - patterns.jsonl (project-specific learnings)
+
+    Args:
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to personal directory (e.g., .raise/rai/personal/)
+
+    Example:
+        >>> personal_dir = get_personal_dir()
+        >>> my_sessions = personal_dir / "sessions" / "index.jsonl"
+    """
+    return get_rai_dir(project_root) / PERSONAL_SUBDIR
+
 
 def _get_xdg_dir(env_var: str, fallback: str) -> Path:
     """Get an XDG directory for raise-cli.

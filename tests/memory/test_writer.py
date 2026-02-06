@@ -17,9 +17,10 @@ from raise_cli.memory.writer import (
     append_calibration,
     append_pattern,
     append_session,
+    get_memory_dir_for_scope,
     validate_session_index,
 )
-from raise_cli.memory.models import PatternSubType
+from raise_cli.memory.models import MemoryScope, PatternSubType
 
 
 class TestGetNextId:
@@ -373,3 +374,131 @@ class TestValidateSessionIndex:
         assert "issues" in summary
         assert "missing ID" in summary
         assert "non-standard" in summary
+
+
+class TestGetMemoryDirForScope:
+    """Tests for get_memory_dir_for_scope helper."""
+
+    def test_global_scope_returns_global_dir(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Global scope should return ~/.rai directory."""
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        result = get_memory_dir_for_scope(MemoryScope.GLOBAL, tmp_path)
+
+        assert result == global_rai
+
+    def test_project_scope_returns_memory_dir(self, tmp_path: Path) -> None:
+        """Project scope should return .raise/rai/memory directory."""
+        result = get_memory_dir_for_scope(MemoryScope.PROJECT, tmp_path)
+
+        expected = tmp_path / ".raise" / "rai" / "memory"
+        assert result == expected
+
+    def test_personal_scope_returns_personal_dir(self, tmp_path: Path) -> None:
+        """Personal scope should return .raise/rai/personal directory."""
+        result = get_memory_dir_for_scope(MemoryScope.PERSONAL, tmp_path)
+
+        expected = tmp_path / ".raise" / "rai" / "personal"
+        assert result == expected
+
+
+class TestAppendPatternWithScope:
+    """Tests for append_pattern with scope parameter."""
+
+    def test_writes_to_project_by_default(self, tmp_path: Path) -> None:
+        """Default scope should write to project memory directory."""
+        project_dir = tmp_path / ".raise" / "rai" / "memory"
+        project_dir.mkdir(parents=True)
+
+        input_data = PatternInput(content="Project pattern")
+
+        result = append_pattern(project_dir, input_data)
+
+        assert result.success is True
+        assert (project_dir / "patterns.jsonl").exists()
+
+    def test_writes_to_global_with_scope(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Global scope should write to ~/.rai directory."""
+        global_rai = tmp_path / "global_rai"
+        global_rai.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(global_rai))
+
+        input_data = PatternInput(content="Global pattern")
+
+        result = append_pattern(
+            get_memory_dir_for_scope(MemoryScope.GLOBAL, tmp_path),
+            input_data,
+            scope=MemoryScope.GLOBAL,
+        )
+
+        assert result.success is True
+        patterns_file = global_rai / "patterns.jsonl"
+        assert patterns_file.exists()
+        data = json.loads(patterns_file.read_text().strip())
+        assert data["content"] == "Global pattern"
+
+    def test_writes_to_personal_with_scope(self, tmp_path: Path) -> None:
+        """Personal scope should write to .raise/rai/personal directory."""
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        input_data = PatternInput(content="Personal pattern")
+
+        result = append_pattern(
+            personal_dir,
+            input_data,
+            scope=MemoryScope.PERSONAL,
+        )
+
+        assert result.success is True
+        patterns_file = personal_dir / "patterns.jsonl"
+        assert patterns_file.exists()
+
+
+class TestAppendCalibrationWithScope:
+    """Tests for append_calibration with scope parameter."""
+
+    def test_writes_to_personal_with_scope(self, tmp_path: Path) -> None:
+        """Personal scope should write to .raise/rai/personal directory."""
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        input_data = CalibrationInput(
+            feature="F1.1",
+            name="Test Feature",
+            size="S",
+            actual_min=30,
+        )
+
+        result = append_calibration(
+            personal_dir,
+            input_data,
+            scope=MemoryScope.PERSONAL,
+        )
+
+        assert result.success is True
+        cal_file = personal_dir / "calibration.jsonl"
+        assert cal_file.exists()
+
+
+class TestAppendSessionAlwaysPersonal:
+    """Tests for append_session always writing to personal directory."""
+
+    def test_session_writes_to_personal_dir(self, tmp_path: Path) -> None:
+        """Sessions should always write to personal directory."""
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+
+        input_data = SessionInput(topic="Test session")
+
+        result = append_session(personal_dir, input_data)
+
+        assert result.success is True
+        sessions_file = personal_dir / "sessions" / "index.jsonl"
+        assert sessions_file.exists()

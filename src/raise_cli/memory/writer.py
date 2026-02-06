@@ -16,7 +16,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from raise_cli.memory.models import PatternSubType
+from raise_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
+from raise_cli.memory.models import MemoryScope, PatternSubType
 
 
 @dataclass
@@ -260,6 +261,30 @@ class WriteResult(BaseModel):
     message: str = Field(default="", description="Status message")
 
 
+def get_memory_dir_for_scope(scope: MemoryScope, project_root: Path | None = None) -> Path:
+    """Get the appropriate memory directory for a given scope.
+
+    Args:
+        scope: Memory scope (GLOBAL, PROJECT, or PERSONAL).
+        project_root: Project root path. Defaults to cwd.
+
+    Returns:
+        Path to the memory directory for that scope.
+
+    Example:
+        >>> dir_path = get_memory_dir_for_scope(MemoryScope.GLOBAL)
+        >>> # Returns ~/.rai/
+        >>> dir_path = get_memory_dir_for_scope(MemoryScope.PROJECT, Path("."))
+        >>> # Returns .raise/rai/memory/
+    """
+    if scope == MemoryScope.GLOBAL:
+        return get_global_rai_dir()
+    elif scope == MemoryScope.PERSONAL:
+        return get_personal_dir(project_root)
+    else:  # PROJECT
+        return get_memory_dir(project_root)
+
+
 def _get_next_id(file_path: Path, prefix: str) -> str:
     """Get next available ID for a JSONL file.
 
@@ -309,13 +334,15 @@ def append_pattern(
     memory_dir: Path,
     input_data: PatternInput,
     created: date | None = None,
+    scope: MemoryScope = MemoryScope.PROJECT,
 ) -> WriteResult:
     """Append a new pattern to patterns.jsonl.
 
     Args:
-        memory_dir: Path to .raise/rai/memory/ directory.
+        memory_dir: Path to memory directory (global, project, or personal).
         input_data: Pattern input data.
         created: Date created (defaults to today).
+        scope: Memory scope for this pattern (affects ID generation context).
 
     Returns:
         WriteResult with generated ID and status.
@@ -339,7 +366,7 @@ def append_pattern(
         success=True,
         id=pattern_id,
         file_path=str(file_path),
-        message=f"Pattern {pattern_id} appended to {file_path.name}",
+        message=f"Pattern {pattern_id} appended to {file_path.name} (scope: {scope.value})",
     )
 
 
@@ -347,13 +374,15 @@ def append_calibration(
     memory_dir: Path,
     input_data: CalibrationInput,
     created: date | None = None,
+    scope: MemoryScope = MemoryScope.PROJECT,
 ) -> WriteResult:
     """Append a new calibration to calibration.jsonl.
 
     Args:
-        memory_dir: Path to .raise/rai/memory/ directory.
+        memory_dir: Path to memory directory (global, project, or personal).
         input_data: Calibration input data.
         created: Date created (defaults to today).
+        scope: Memory scope for this calibration (affects ID generation context).
 
     Returns:
         WriteResult with generated ID and status.
@@ -387,7 +416,7 @@ def append_calibration(
         success=True,
         id=cal_id,
         file_path=str(file_path),
-        message=f"Calibration {cal_id} appended to {file_path.name}",
+        message=f"Calibration {cal_id} appended to {file_path.name} (scope: {scope.value})",
     )
 
 
