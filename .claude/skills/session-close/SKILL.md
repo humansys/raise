@@ -86,7 +86,7 @@ uv run raise memory add-pattern "Description" -c "context,tags" -t process
 uv run raise memory add-session "Topic" -o "outcome1,outcome2" -t {type}
 
 # Telemetry (always)
-uv run raise telemetry emit-session -t {type} -o {outcome} -d {minutes}
+uv run raise memory emit-session -t {type} -o {outcome} -d {minutes}
 ```
 
 **Types:** feature, research, maintenance, infrastructure, ideation
@@ -118,7 +118,7 @@ Check conversation for ideas mentioned but not pursued.
 ### Step 5: Clear Session State
 
 ```bash
-uv run raise profile session-end
+uv run raise session close
 ```
 
 This clears `current_session` in `~/.rai/developer.yaml`, marking the session as properly closed. Without this step, the next `/session-start` will warn about an unclosed session.

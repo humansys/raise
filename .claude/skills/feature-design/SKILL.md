@@ -75,10 +75,10 @@ Create a lean feature specification that optimizes for both human understanding 
 Record the start of the design phase:
 
 ```bash
-uv run raise telemetry emit-work feature {feature_id} --event start --phase design
+uv run raise memory emit-work feature {feature_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit-work feature F9.4 -e start -p design`
+**Example:** `raise memory emit-work feature F9.4 -e start -p design`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -267,10 +267,10 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-uv run raise telemetry emit-work feature {feature_id} --event complete --phase design
+uv run raise memory emit-work feature {feature_id} --event complete --phase design
 ```
 
-**Example:** `raise telemetry emit-work feature F9.4 -e complete -p design`
+**Example:** `raise memory emit-work feature F9.4 -e complete -p design`
 
 ## Output
 
