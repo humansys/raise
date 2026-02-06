@@ -124,7 +124,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 ### Step 5: Emit Telemetry
 
 ```bash
-uv run raise telemetry emit-work epic E{N} --event start --phase init
+uv run raise memory emit-work epic E{N} --event start --phase init
 ```
 
 **Verification:** Telemetry emitted.

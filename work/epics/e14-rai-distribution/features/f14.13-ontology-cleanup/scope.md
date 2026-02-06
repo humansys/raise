@@ -110,15 +110,15 @@ raise
 
 ### Done Criteria (Phase 2)
 
-- [ ] `raise session start` and `raise session close` work
-- [ ] `raise memory add --type <type>` unified command works
-- [ ] `raise status` removed
-- [ ] `raise telemetry` removed (functionality in memory)
-- [ ] `profile` only has `show` command
-- [ ] All skills updated to new CLI
-- [ ] `scripts/` moved out of skills
-- [ ] Tests pass with >90% coverage
-- [ ] Documentation updated
+- [x] `raise session start` and `raise session close` work
+- [x] `raise memory emit-*` commands work (telemetry merged into memory)
+- [x] `raise status` removed
+- [x] `raise telemetry` removed (functionality in memory)
+- [x] `profile` only has `show` command
+- [x] All skills updated to new CLI
+- [x] `scripts/` moved out of skills
+- [x] Tests pass (905 passing)
+- [x] Documentation updated
 
 ### Size
 

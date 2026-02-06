@@ -150,7 +150,7 @@ Ha is between these — balanced detail.
 ### Step 4: Record Session
 
 ```bash
-uv run raise profile session-start --project "$(pwd)"
+uv run raise session start --project "$(pwd)"
 ```
 
 This command:
@@ -160,7 +160,7 @@ This command:
 
 **First-time user:** Ask name, then:
 ```bash
-uv run raise profile session-start --name "Name" --project "$(pwd)"
+uv run raise session start --name "Name" --project "$(pwd)"
 ```
 
 **If warned about unclosed session:** Inform the user that learnings from the previous session may have been lost. Suggest using `/session-close` before ending work.
