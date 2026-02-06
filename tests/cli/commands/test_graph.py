@@ -171,124 +171,6 @@ class TestGraphExtractCommand:
 class TestGraphBuildCommand:
     """Tests for `raise graph build` command."""
 
-    def test_graph_build_help(self) -> None:
-        """Should display help for graph build command."""
-        result = runner.invoke(app, ["graph", "build", "--help"])
-
-        assert result.exit_code == 0
-        assert "Build concept graph" in result.stdout
-        assert "--concepts" in result.stdout
-        assert "--output" in result.stdout
-
-    def test_graph_build_from_extraction(
-        self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Should build graph from extracted concepts."""
-        monkeypatch.chdir(tmp_governance_for_cli)
-
-        # Build graph
-        result = runner.invoke(app, ["graph", "build"])
-
-        assert result.exit_code == 0
-        assert "Building concept graph" in result.stdout
-        assert "Inferred" in result.stdout
-        assert "Graph:" in result.stdout
-        assert "nodes" in result.stdout
-        assert "edges" in result.stdout
-
-    def test_graph_build_with_custom_output(
-        self, tmp_governance_for_cli: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Should save graph to custom location."""
-        monkeypatch.chdir(tmp_governance_for_cli)
-
-        output_file = tmp_path / "custom_graph.json"
-        result = runner.invoke(app, ["graph", "build", "--output", str(output_file)])
-
-        assert result.exit_code == 0
-        assert output_file.exists()
-
-        # Verify it's valid JSON
-        data = json.loads(output_file.read_text())
-        assert "nodes" in data
-        assert "edges" in data
-        assert "metadata" in data
-
-    def test_graph_build_creates_cache_directory(
-        self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Should create .raise/cache directory if it doesn't exist."""
-        monkeypatch.chdir(tmp_governance_for_cli)
-
-        result = runner.invoke(app, ["graph", "build"])
-
-        assert result.exit_code == 0
-
-        cache_dir = tmp_governance_for_cli / ".raise" / "cache"
-        assert cache_dir.exists()
-        assert (cache_dir / "graph.json").exists()
-
-
-class TestGraphValidateCommand:
-    """Tests for `raise graph validate` command."""
-
-    def test_graph_validate_help(self) -> None:
-        """Should display help for graph validate command."""
-        result = runner.invoke(app, ["graph", "validate", "--help"])
-
-        assert result.exit_code == 0
-        assert "Validate graph structure" in result.stdout
-        assert "--graph" in result.stdout
-
-    def test_graph_validate_missing_file(self) -> None:
-        """Should error when graph file doesn't exist."""
-        result = runner.invoke(app, ["graph", "validate", "--graph", "/nonexistent/graph.json"])
-
-        assert result.exit_code == 4  # ArtifactNotFoundError
-        # cli_error outputs to stderr, check output (combined stdout+stderr)
-        assert "Error" in result.output or "not found" in result.output.lower()
-        assert "raise graph build" in result.output
-
-    def test_graph_validate_valid_graph(
-        self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Should validate a valid graph."""
-        monkeypatch.chdir(tmp_governance_for_cli)
-
-        # Build graph first
-        build_result = runner.invoke(app, ["graph", "build"])
-        assert build_result.exit_code == 0
-
-        # Validate it
-        result = runner.invoke(app, ["graph", "validate"])
-
-        assert result.exit_code == 0
-        assert "Validating graph" in result.stdout
-        assert "valid" in result.stdout.lower()
-        assert "relationships valid" in result.stdout.lower()
-
-    def test_graph_validate_custom_graph_file(
-        self, tmp_governance_for_cli: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Should validate custom graph file."""
-        monkeypatch.chdir(tmp_governance_for_cli)
-
-        custom_graph = tmp_path / "my_graph.json"
-
-        # Build to custom location
-        build_result = runner.invoke(app, ["graph", "build", "--output", str(custom_graph)])
-        assert build_result.exit_code == 0
-
-        # Validate custom file
-        result = runner.invoke(app, ["graph", "validate", "--graph", str(custom_graph)])
-
-        assert result.exit_code == 0
-        assert "valid" in result.stdout.lower()
-
-
-class TestGraphBuildUnifiedCommand:
-    """Tests for `raise graph build --unified` command."""
-
     @pytest.fixture
     def tmp_unified_project(self, tmp_path: Path) -> Path:
         """Create temporary project with all unified graph sources.
@@ -351,73 +233,70 @@ class TestGraphBuildUnifiedCommand:
 
         return project_root
 
-    def test_graph_build_unified_flag_in_help(self) -> None:
-        """Should show --unified flag in help."""
+    def test_graph_build_help(self) -> None:
+        """Should display help for graph build command."""
         result = runner.invoke(app, ["graph", "build", "--help"])
 
         assert result.exit_code == 0
-        assert "--unified" in result.stdout
+        assert "Build unified context graph" in result.stdout
+        assert "--output" in result.stdout
 
-    def test_graph_build_unified_creates_file(
+    def test_graph_build_creates_unified_graph(
         self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """Should create unified graph file at .raise/graph/unified.json."""
+        """Should build unified graph from all sources."""
         monkeypatch.chdir(tmp_unified_project)
 
-        result = runner.invoke(app, ["graph", "build", "--unified"])
+        result = runner.invoke(app, ["graph", "build"])
 
         assert result.exit_code == 0
+        assert "Building unified context graph" in result.stdout
+        assert "nodes" in result.stdout.lower()
+        assert "edges" in result.stdout.lower()
 
+        # Should create file at .raise/graph/unified.json
         unified_graph_file = tmp_unified_project / ".raise" / "graph" / "unified.json"
         assert unified_graph_file.exists()
 
-    def test_graph_build_unified_shows_node_counts_by_type(
+    def test_graph_build_with_custom_output(
+        self, tmp_unified_project: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should save graph to custom location."""
+        monkeypatch.chdir(tmp_unified_project)
+
+        output_file = tmp_path / "custom_graph.json"
+        result = runner.invoke(app, ["graph", "build", "--output", str(output_file)])
+
+        assert result.exit_code == 0
+        assert output_file.exists()
+
+        # Verify it's valid JSON with NetworkX node_link format
+        data = json.loads(output_file.read_text())
+        assert "nodes" in data
+        # NetworkX uses "links" not "edges"
+        assert "links" in data or "edges" in data
+        assert "directed" in data
+
+    def test_graph_build_shows_node_counts_by_type(
         self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Should show node counts by type in output."""
         monkeypatch.chdir(tmp_unified_project)
 
-        result = runner.invoke(app, ["graph", "build", "--unified"])
+        result = runner.invoke(app, ["graph", "build"])
 
         assert result.exit_code == 0
         # Should show counts by type
         assert "pattern" in result.stdout.lower()
         assert "skill" in result.stdout.lower()
 
-    def test_graph_build_unified_shows_edge_counts(
-        self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Should show edge counts in output."""
-        monkeypatch.chdir(tmp_unified_project)
-
-        result = runner.invoke(app, ["graph", "build", "--unified"])
-
-        assert result.exit_code == 0
-        assert "edges" in result.stdout.lower()
-
-    def test_graph_build_unified_produces_valid_json(
-        self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """Should produce valid JSON with nodes and edges."""
-        monkeypatch.chdir(tmp_unified_project)
-
-        result = runner.invoke(app, ["graph", "build", "--unified"])
-        assert result.exit_code == 0
-
-        unified_graph_file = tmp_unified_project / ".raise" / "graph" / "unified.json"
-        data = json.loads(unified_graph_file.read_text())
-
-        # Should have node_link format from NetworkX
-        assert "nodes" in data or "directed" in data
-        assert "links" in data or "edges" in data
-
-    def test_graph_build_unified_merges_all_sources(
+    def test_graph_build_merges_all_sources(
         self, tmp_unified_project: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Should merge governance, memory, and skills into unified graph."""
         monkeypatch.chdir(tmp_unified_project)
 
-        result = runner.invoke(app, ["graph", "build", "--unified"])
+        result = runner.invoke(app, ["graph", "build"])
         assert result.exit_code == 0
 
         unified_graph_file = tmp_unified_project / ".raise" / "graph" / "unified.json"
@@ -429,3 +308,62 @@ class TestGraphBuildUnifiedCommand:
 
         assert "pattern" in node_types
         assert "skill" in node_types
+
+
+class TestGraphValidateCommand:
+    """Tests for `raise graph validate` command."""
+
+    def test_graph_validate_help(self) -> None:
+        """Should display help for graph validate command."""
+        result = runner.invoke(app, ["graph", "validate", "--help"])
+
+        assert result.exit_code == 0
+        assert "Validate graph structure" in result.stdout
+        assert "--graph" in result.stdout
+
+    def test_graph_validate_missing_file(self) -> None:
+        """Should error when graph file doesn't exist."""
+        result = runner.invoke(app, ["graph", "validate", "--graph", "/nonexistent/graph.json"])
+
+        assert result.exit_code == 4  # ArtifactNotFoundError
+        # cli_error outputs to stderr, check output (combined stdout+stderr)
+        assert "Error" in result.output or "not found" in result.output.lower()
+        assert "raise graph build" in result.output
+
+    def test_graph_validate_valid_graph(
+        self, tmp_governance_for_cli: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should validate a valid graph."""
+        monkeypatch.chdir(tmp_governance_for_cli)
+
+        # Build graph first
+        build_result = runner.invoke(app, ["graph", "build"])
+        assert build_result.exit_code == 0
+
+        # Validate it
+        result = runner.invoke(app, ["graph", "validate"])
+
+        assert result.exit_code == 0
+        assert "Validating graph" in result.stdout
+        assert "valid" in result.stdout.lower()
+        assert "relationships valid" in result.stdout.lower()
+
+    def test_graph_validate_custom_graph_file(
+        self, tmp_governance_for_cli: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should validate custom graph file."""
+        monkeypatch.chdir(tmp_governance_for_cli)
+
+        custom_graph = tmp_path / "my_graph.json"
+
+        # Build to custom location
+        build_result = runner.invoke(app, ["graph", "build", "--output", str(custom_graph)])
+        assert build_result.exit_code == 0
+
+        # Validate custom file
+        result = runner.invoke(app, ["graph", "validate", "--graph", str(custom_graph)])
+
+        assert result.exit_code == 0
+        assert "valid" in result.stdout.lower()
+
+

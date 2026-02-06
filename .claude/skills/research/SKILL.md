@@ -97,7 +97,7 @@ Review returned patterns to avoid duplicating prior research.
 
 **Verification:** Context loaded or graph not available (proceed without).
 
-> **If context unavailable:** Run `raise graph build --unified` first, or skip to Step 1.
+> **If context unavailable:** Run `raise graph build` first, or skip to Step 1.
 
 ### Step 1: Frame the Question
 

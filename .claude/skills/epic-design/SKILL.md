@@ -104,7 +104,7 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Frame the Epic Objective
 
