@@ -436,18 +436,93 @@ class TestMemoryAddPatternCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_add_pattern_no_memory_dir(self, tmp_path: Path) -> None:
-        """Test add-pattern fails if memory dir not found."""
+    def test_add_pattern_creates_missing_dir(self, tmp_path: Path) -> None:
+        """Test add-pattern auto-creates memory directory if missing."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
+            # Don't create memory directory - it should be auto-created
             result = runner.invoke(
                 app,
                 ["memory", "add-pattern", "Test pattern"],
             )
 
-            assert result.exit_code == 4
-            assert "Memory directory not found" in result.output
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            # Verify directory was created
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            assert memory_dir.exists()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_with_scope_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test add-pattern with --scope global writes to global dir."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            # Setup global directory
+            global_rai = tmp_path / "global_rai"
+            global_rai.mkdir()
+            monkeypatch.setenv("RAI_HOME", str(global_rai))
+            (global_rai / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["memory", "add-pattern", "Global pattern", "--scope", "global"],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            # Verify written to global
+            patterns_file = global_rai / "patterns.jsonl"
+            assert patterns_file.exists()
+            content = patterns_file.read_text()
+            assert "Global pattern" in content
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_with_scope_personal(self, tmp_path: Path) -> None:
+        """Test add-pattern with --scope personal writes to personal dir."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            # Setup personal directory
+            personal_dir = tmp_path / ".raise" / "rai" / "personal"
+            personal_dir.mkdir(parents=True)
+            (personal_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["memory", "add-pattern", "Personal pattern", "--scope", "personal"],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            # Verify written to personal
+            patterns_file = personal_dir / "patterns.jsonl"
+            content = patterns_file.read_text()
+            assert "Personal pattern" in content
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_invalid_scope(self, tmp_path: Path) -> None:
+        """Test add-pattern with invalid scope fails."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            (memory_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["memory", "add-pattern", "Test", "--scope", "invalid"],
+            )
+
+            assert result.exit_code == 7
+            assert "Invalid scope" in result.output
         finally:
             os.chdir(original_cwd)
 
