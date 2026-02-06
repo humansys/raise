@@ -1389,3 +1389,17 @@
 {"type":"work_lifecycle","timestamp":"2026-02-06T00:29:10.292590Z","work_type":"feature","work_id":"F14.0","event":"complete","phase":"review","blocker":null}
 {"type":"work_lifecycle","timestamp":"2026-02-06T00:29:52.216316Z","work_type":"feature","work_id":"F14.12","event":"start","phase":"design","blocker":null}
 {"type":"work_lifecycle","timestamp":"2026-02-06T00:39:52.837998Z","work_type":"feature","work_id":"F14.12","event":"complete","phase":"review","blocker":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:40:17Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:40:17Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:40:17Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-06T00:41:14.138846Z","session_type":"feature","outcome":"success","duration_min":45,"features":[]}
+{"type":"skill_event","timestamp":"2026-02-06T00:41:43Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:41:43Z","skill":"feature-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:41:43Z","skill":"feature-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:41:43Z","skill":"session-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:42:53Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:43:32Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:45:22Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:47:06Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:49:01Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:50:35Z","skill":"session-start","event":"complete","duration_sec":null}
