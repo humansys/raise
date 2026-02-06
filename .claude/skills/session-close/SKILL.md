@@ -20,7 +20,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=session-close \"$CLAUDE_PROJECT_DIR\"/dev/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=session-close \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Session Close

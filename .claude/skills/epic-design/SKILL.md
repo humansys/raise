@@ -23,11 +23,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/dev/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/dev/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Design: Epic Specification
