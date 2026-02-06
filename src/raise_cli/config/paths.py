@@ -143,6 +143,38 @@ def get_global_rai_dir() -> Path:
     return Path.home() / GLOBAL_RAI_DIR
 
 
+def ensure_global_rai_dir() -> Path:
+    """Ensure the global ~/.rai directory exists with required files.
+
+    Creates:
+    - ~/.rai/ directory (if not exists)
+    - ~/.rai/patterns.jsonl (empty, if not exists)
+    - ~/.rai/calibration.jsonl (empty, if not exists)
+
+    Does NOT overwrite existing files.
+
+    Returns:
+        Path to global Rai directory.
+
+    Example:
+        >>> global_dir = ensure_global_rai_dir()
+        >>> # Now safe to write patterns to global_dir / "patterns.jsonl"
+    """
+    global_dir = get_global_rai_dir()
+    global_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create empty JSONL files if they don't exist
+    patterns_file = global_dir / PATTERNS_FILE
+    if not patterns_file.exists():
+        patterns_file.touch()
+
+    calibration_file = global_dir / CALIBRATION_FILE
+    if not calibration_file.exists():
+        calibration_file.touch()
+
+    return global_dir
+
+
 def get_personal_dir(project_root: Path | None = None) -> Path:
     """Get the personal directory for developer-specific project data.
 
