@@ -23,11 +23,11 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=epic-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Design: Epic Specification
@@ -83,10 +83,10 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-uv run raise telemetry emit-work epic {epic_id} --event start --phase design
+uv run raise memory emit-work epic {epic_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit-work epic E9 -e start -p design`
+**Example:** `raise memory emit-work epic E9 -e start -p design`
 
 ### Step 0.5: Query Context
 
@@ -404,10 +404,10 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-uv run raise telemetry emit-work epic {epic_id} --event complete --phase design
+uv run raise memory emit-work epic {epic_id} --event complete --phase design
 ```
 
-**Example:** `raise telemetry emit-work epic E9 -e complete -p design`
+**Example:** `raise memory emit-work epic E9 -e complete -p design`
 
 ---
 

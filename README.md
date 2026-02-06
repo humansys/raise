@@ -85,8 +85,8 @@ Skills are structured processes that guide AI-assisted development:
 The `raise` CLI provides deterministic operations:
 
 ```bash
-# Build concept graph from governance artifacts
-uv run raise graph build
+# Build Rai's memory from project artifacts
+uv run raise memory build
 
 # Query governance concepts (MVC - Minimum Viable Context)
 uv run raise context query "validation"

@@ -21,7 +21,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-start \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=feature-start \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Start: Feature Initialization
@@ -223,10 +223,10 @@ Show the feature lifecycle for orientation:
 Record the start of the feature lifecycle:
 
 ```bash
-uv run raise telemetry emit-work feature {feature_id} --event start --phase design
+uv run raise memory emit-work feature {feature_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit-work feature F12.2 -e start -p design`
+**Example:** `raise memory emit-work feature F12.2 -e start -p design`
 
 **Verification:** Telemetry emitted.
 

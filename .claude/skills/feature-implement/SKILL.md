@@ -22,11 +22,11 @@ hooks:
     - matcher: "Write|Edit"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.claude/skills/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=feature-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Implement: Development Workflow
@@ -65,10 +65,10 @@ Execute the implementation plan task by task, verifying each step, and producing
 Record the start of the implement phase:
 
 ```bash
-uv run raise telemetry emit-work feature {feature_id} --event start --phase implement
+uv run raise memory emit-work feature {feature_id} --event start --phase implement
 ```
 
-**Example:** `raise telemetry emit-work feature F9.4 -e start -p implement`
+**Example:** `raise memory emit-work feature F9.4 -e start -p implement`
 
 ### Step 0.1: Verify Prerequisites (REQUIRED - No Skip)
 
@@ -186,10 +186,10 @@ If all tasks completed → execute code gate.
 Record the completion of the implement phase:
 
 ```bash
-uv run raise telemetry emit-work feature {feature_id} --event complete --phase implement
+uv run raise memory emit-work feature {feature_id} --event complete --phase implement
 ```
 
-**Example:** `raise telemetry emit-work feature F9.4 -e complete -p implement`
+**Example:** `raise memory emit-work feature F9.4 -e complete -p implement`
 
 ## Output
 

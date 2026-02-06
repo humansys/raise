@@ -63,3 +63,5 @@
 {"id": "SES-063", "date": "2026-02-05", "type": "feature", "topic": "ISSUE-004 completion + ISSUE-005 triage", "outcomes": ["extractor_fix", "parser_fix", "tests_updated", "issue_triage"], "log_path": null}
 {"id": "SES-064", "date": "2026-02-05", "type": "feature", "topic": "ISSUE-005 DX fixes", "outcomes": ["init-output-fixed", "post-init-guidance", "context-command-simplified"], "log_path": null}
 {"id": "SES-065", "date": "2026-02-05", "type": "feature", "topic": "ISSUE-005 DX cleanup", "outcomes": ["removed 2689 lines dead code", "standardized CLI naming", "standardized skill sections"], "log_path": null}
+{"id": "SES-066", "date": "2026-02-05", "type": "feature", "topic": "ISSUE-005 cleanup: graph consolidation and skill extraction", "outcomes": ["ConceptGraph removed (-2510 lines)", "Skill boilerplate skipped (was customization)", "Sequencing strategies extracted (-54 lines)", "ISSUE-005 complete"], "log_path": null}
+{"id": "SES-067", "date": "2026-02-05", "type": "feature", "topic": "F14.0 close + F14.12 memory ontology", "outcomes": ["F14.0 merged", "F14.12 complete", "graph->memory rename", "10 skills updated"], "log_path": null}
