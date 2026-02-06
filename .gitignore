@@ -67,3 +67,6 @@ dmypy.json
 .pyright/
 .rai/memory/graph.json
 .envrc
+
+# Legacy telemetry (should be in personal/, will migrate)
+.raise/rai/telemetry/
