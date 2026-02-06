@@ -1,12 +1,14 @@
 # ISSUE-005: DX Audit Findings — Pre-F&F Quality Review
 
-> **Status:** RESOLVED
+> **Status:** COMPLETE
 > **Priority:** HIGH (F&F quality gate)
 > **Created:** 2026-02-05
 > **Updated:** 2026-02-05
 > **Scope:** Skills, CLI, Schemas, New User Experience, Code Quality
 >
-> **Resolved:** #1, #2, #4, #5, #6, #8, #10 — All F&F and Feb 15 items complete
+> **Resolved:** All items complete including post-launch cleanup
+> - F&F + Feb 15: #1, #2, #4, #5, #6, #8, #10 ✅
+> - Post-launch: #3, #7, #9 ✅ (graph consolidated -2510 lines, skill extracted -54 lines)
 
 ---
 
@@ -223,9 +225,9 @@ All 19 skills now follow: Purpose → Mastery Levels → Context → Steps → O
 
 | Issue | Effort | Impact | Status |
 |-------|--------|--------|--------|
-| #3 Skill bloat refactor | 4h | Medium | Pending |
-| #7 Skill boilerplate extraction | 2h | Medium | Pending |
-| #9 Graph base class | 2h | Medium | Pending |
+| #3 Skill bloat refactor | 4h | Medium | ✅ Partial — extracted 54 lines from epic-plan |
+| #7 Skill boilerplate extraction | 2h | Medium | ✅ Skipped — boilerplate is actually customization |
+| #9 Graph base class | 2h | Medium | ✅ Done — consolidated to UnifiedGraph (-2510 lines)
 | #11 Convention schema | - | - | ✅ Not an issue (models are distinct) |
 | #12 XDG path helpers | - | - | ✅ Already extracted |
 | #13 Skill section names | 1h | Low | ✅ Done |
