@@ -274,6 +274,79 @@ def _format_json(result: UnifiedQueryResult) -> str:
 
 
 # =============================================================================
+# Generate MEMORY.md
+# =============================================================================
+
+
+@memory_app.command("generate")
+def generate_memory(
+    path: Annotated[
+        Path | None,
+        typer.Option("--path", "-p", help="Project root (defaults to current directory)"),
+    ] = None,
+) -> None:
+    """Generate MEMORY.md for AI editors (Claude Code, etc.).
+
+    Generates a two-part MEMORY.md from methodology.yaml (process knowledge)
+    and patterns.jsonl (learned patterns). Writes to:
+
+    1. Canonical: .raise/rai/memory/MEMORY.md (source of truth)
+    2. Claude Code: ~/.claude/projects/{path}/memory/MEMORY.md
+
+    The generator is agent-agnostic — future IDE support adds placement
+    functions, not new generators.
+
+    Examples:
+        # Generate for current project
+        $ raise memory generate
+
+        # Generate for specific project
+        $ raise memory generate --path /home/user/my-project
+    """
+    from raise_cli.config.paths import (
+        get_claude_memory_path,
+        get_framework_dir,
+        get_memory_dir,
+    )
+    from raise_cli.onboarding.memory_md import generate_memory_md
+
+    project_root = (path or Path.cwd()).resolve()
+    project_name = project_root.name
+
+    # Resolve source paths
+    methodology_path = get_framework_dir(project_root) / "methodology.yaml"
+    patterns_path = get_memory_dir(project_root) / "patterns.jsonl"
+
+    # Generate content (agent-agnostic)
+    content = generate_memory_md(
+        methodology_path=methodology_path,
+        patterns_path=patterns_path,
+        project_name=project_name,
+    )
+
+    # Write canonical copy (.raise/rai/memory/MEMORY.md)
+    canonical_path = get_memory_dir(project_root) / "MEMORY.md"
+    canonical_path.parent.mkdir(parents=True, exist_ok=True)
+    canonical_path.write_text(content)
+
+    # Write Claude Code copy (~/.claude/projects/{path}/memory/MEMORY.md)
+    claude_path = get_claude_memory_path(project_root)
+    claude_path.parent.mkdir(parents=True, exist_ok=True)
+    claude_path.write_text(content)
+
+    # Output
+    console.print("\n[green]✓[/green] Generated MEMORY.md")
+    console.print(f"  Canonical: [cyan]{canonical_path}[/cyan]")
+    console.print(f"  Claude Code: [cyan]{claude_path}[/cyan]")
+
+    # Count sections for summary
+    skills_count = content.count("`/")
+    patterns_count = content.count("**PAT-") + content.count("**BASE-")
+    console.print(f"  Skills: {skills_count}, Patterns: {patterns_count}")
+    console.print("")
+
+
+# =============================================================================
 # Build/Index Commands
 # =============================================================================
 

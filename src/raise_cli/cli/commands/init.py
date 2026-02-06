@@ -270,6 +270,29 @@ def init_command(
 
     bootstrap_result = bootstrap_rai_base(project_path)
 
+    # Generate MEMORY.md (canonical + Claude Code)
+    from raise_cli.config.paths import get_claude_memory_path, get_framework_dir, get_memory_dir
+    from raise_cli.onboarding.memory_md import generate_memory_md
+
+    methodology_path = get_framework_dir(project_path) / "methodology.yaml"
+    patterns_path = get_memory_dir(project_path) / "patterns.jsonl"
+
+    memory_content = generate_memory_md(
+        methodology_path=methodology_path,
+        patterns_path=patterns_path,
+        project_name=project_name,
+    )
+
+    # Write canonical copy
+    canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
+    canonical_memory.parent.mkdir(parents=True, exist_ok=True)
+    canonical_memory.write_text(memory_content)
+
+    # Write Claude Code copy
+    claude_memory = get_claude_memory_path(project_path)
+    claude_memory.parent.mkdir(parents=True, exist_ok=True)
+    claude_memory.write_text(memory_content)
+
     # Output messages based on experience level
     welcome = _get_welcome_message(profile if not created_profile else None)
     project_msg = _get_project_message(
