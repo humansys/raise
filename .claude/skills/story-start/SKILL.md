@@ -1,18 +1,18 @@
 ---
-name: feature-start
+name: story-start
 description: >
   Initialize a feature with verified context, branch, and scope commit.
-  Use at the beginning of feature work to ensure proper setup and
+  Use at the beginning of story work to ensure proper setup and
   traceability from the start.
 
 license: MIT
 
 metadata:
   raise.work_cycle: feature
-  raise.frequency: per-feature
+  raise.frequency: per-story
   raise.fase: "3"
   raise.prerequisites: ""
-  raise.next: feature-design
+  raise.next: story-design
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.2.0"
@@ -21,7 +21,7 @@ hooks:
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-start \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=story-start \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Start: Feature Initialization
@@ -43,7 +43,7 @@ Initialize a feature with verified context, dedicated branch, and scope commit. 
 **When to use:**
 - Starting a new feature from the backlog
 - Beginning work on an epic feature
-- When you want traceable feature lifecycle from the start
+- When you want traceable story lifecycle from the start
 
 **When to skip:**
 - Quick bug fixes (use direct branch)
@@ -53,7 +53,7 @@ Initialize a feature with verified context, dedicated branch, and scope commit. 
 **Inputs required:**
 - Feature ID from backlog or epic scope
 - Epic scope document (for epic features)
-- Clear understanding of feature scope
+- Clear understanding of story scope
 
 **Output:**
 - Feature branch created and checked out
@@ -74,7 +74,7 @@ git branch --list "epic/e{N}/*" | head -1
 - Epic branch exists → Continue (will create feature sub-branch)
 - Epic branch missing → **STOP.** Run `/epic-start` first.
 
-> **Poka-yoke:** Feature branches MUST nest under epic branches. Creating a feature branch without its epic branch breaks the merge flow.
+> **Poka-yoke:** Feature branches MUST nest under epic branches. Creating a story branch without its epic branch breaks the merge flow.
 
 **Verification:** Epic branch `epic/e{N}/*` exists.
 
@@ -90,7 +90,7 @@ ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic scope"
 
 **Paths:**
 - Epic scope: `work/epics/e{N}-{name}/scope.md`
-- Features: `work/epics/e{N}-{name}/features/`
+- Features: `work/epics/e{N}-{name}/stories/`
 
 **Decision:**
 - Scope exists → Load and verify feature is listed
@@ -106,7 +106,7 @@ Confirm the feature is listed in the epic scope:
 
 ```bash
 SCOPE="work/epics/e{N}-{name}/scope.md"
-grep -q "{feature_id}" "$SCOPE" && echo "Feature found in epic" || echo "WARN: Feature not in epic scope"
+grep -q "{story_id}" "$SCOPE" && echo "Feature found in epic" || echo "WARN: Feature not in epic scope"
 ```
 
 **Decision:**
@@ -122,7 +122,7 @@ grep -q "{feature_id}" "$SCOPE" && echo "Feature found in epic" || echo "WARN: F
 Create a dedicated branch for the feature:
 
 ```bash
-git checkout -b feature/{epic_id}/{feature_id}
+git checkout -b feature/{epic_id}/{story_id}
 ```
 
 **Examples:**
@@ -131,11 +131,11 @@ git checkout -b feature/{epic_id}/{feature_id}
 
 **Skip condition:** For S/XS features already on an epic branch (`epic/{id}/...`), skip branch creation and work directly on the epic branch. State the skip explicitly:
 
-> "F12.5 is S-sized and we're on epic branch. Skipping feature branch per skip condition."
+> "F12.5 is S-sized and we're on epic branch. Skipping story branch per skip condition."
 
-**Rationale:** Small features within an epic don't need per-feature branch isolation — the epic branch already isolates from main. Avoids branch proliferation for trivial changes.
+**Rationale:** Small stories within an epic don't need per-story branch isolation — the epic branch already isolates from main. Avoids branch proliferation for trivial changes.
 
-**Verification:** On new feature branch OR on epic branch with skip stated.
+**Verification:** On new story branch OR on epic branch with skip stated.
 
 > **If you can't continue:** Branch exists → Check out existing branch or rename.
 
@@ -145,7 +145,7 @@ Document what's in and out of scope, plus done criteria.
 
 **Scope template:**
 ```markdown
-## Feature Scope: {feature_id}
+## Feature Scope: {story_id}
 
 **In Scope:**
 - [Specific deliverable 1]
@@ -172,7 +172,7 @@ Create the initial commit with scope documentation:
 
 ```bash
 git add -A
-git commit -m "feat({feature_id}): initialize feature scope
+git commit -m "feat({story_id}): initialize story scope
 
 In scope:
 - [item 1]
@@ -188,42 +188,42 @@ Done when:
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
-**Verification:** Scope commit created on feature branch.
+**Verification:** Scope commit created on story branch.
 
 > **If you can't continue:** Nothing to commit → Create scope as plan.md or design.md first.
 
 ### Step 7: Display Lifecycle Stages
 
-Show the feature lifecycle for orientation:
+Show the story lifecycle for orientation:
 
 ```markdown
 ## Feature Lifecycle
 
 ```
-/feature-start ← YOU ARE HERE
+/story-start ← YOU ARE HERE
       ↓
-/feature-design (fase 4) — Optional for simple features
+/story-design (fase 4) — Optional for simple features
       ↓
-/feature-plan (fase 5) — Decompose into tasks
+/story-plan (fase 5) — Decompose into tasks
       ↓
-/feature-implement (fase 6) — Execute tasks
+/story-implement (fase 6) — Execute tasks
       ↓
-/feature-review (fase 7) — Retrospective & learnings
+/story-review (fase 7) — Retrospective & learnings
       ↓
-/feature-close (fase 8) — Merge & cleanup
+/story-close (fase 8) — Merge & cleanup
 ```
 
-**Next step:** `/feature-design` for complex features, `/feature-plan` for simple ones.
+**Next step:** `/story-design` for complex features, `/story-plan` for simple ones.
 ```
 
 **Verification:** Lifecycle displayed; next step clear.
 
 ### Step 8: Emit Feature Start (Telemetry)
 
-Record the start of the feature lifecycle:
+Record the start of the story lifecycle:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event start --phase design
+uv run raise memory emit-work feature {story_id} --event start --phase design
 ```
 
 **Example:** `raise memory emit-work feature F12.2 -e start -p design`
@@ -234,18 +234,18 @@ uv run raise memory emit-work feature {feature_id} --event start --phase design
 
 ## Output
 
-- **Branch:** `feature/{epic_id}/{feature_id}` created and active (or epic branch for S/XS)
+- **Branch:** `feature/{epic_id}/{story_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
 - **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: start)
-- **Next:** `/feature-design` or `/feature-plan`
+- **Next:** `/story-design` or `/story-plan`
 
 ## Feature Start Summary Template
 
 ```markdown
-## Feature Started: {feature_id}
+## Feature Started: {story_id}
 
 **Epic:** {epic_id} (or standalone)
-**Branch:** `feature/{epic_id}/{feature_id}`
+**Branch:** `feature/{epic_id}/{story_id}`
 **Scope commit:** {commit_hash}
 
 ### Scope Summary
@@ -254,8 +254,8 @@ uv run raise memory emit-work feature {feature_id} --event start --phase design
 **Done:** [key criteria]
 
 ### Next Steps
-1. `/feature-design` — If complex (>3 components, architectural decisions)
-2. `/feature-plan` — If simple or design complete
+1. `/story-design` — If complex (>3 components, architectural decisions)
+2. `/story-plan` — If simple or design complete
 
 Ready to proceed.
 ```
@@ -286,10 +286,10 @@ For urgency, minimum viable start:
 2. Commit with one-line scope
 3. Emit telemetry
 
-Full scope documentation can follow in `/feature-design` or `/feature-plan`.
+Full scope documentation can follow in `/story-design` or `/story-plan`.
 
 ## References
 
-- Next skill: `/feature-design` or `/feature-plan`
-- Complement: `/feature-close`
+- Next skill: `/story-design` or `/story-plan`
+- Complement: `/story-close`
 - Epic context: `work/epics/e{N}-{name}/scope.md`

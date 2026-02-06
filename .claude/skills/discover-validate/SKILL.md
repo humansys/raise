@@ -296,4 +296,4 @@ Progress is saved to YAML after each batch. If interrupted:
 
 - Previous skill: `/discover-scan`
 - Next skill: `/discover-complete`
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`

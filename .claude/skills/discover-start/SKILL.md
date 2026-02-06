@@ -215,5 +215,5 @@ Running `/discover-start` again will overwrite `context.yaml`. This is intention
 ## References
 
 - Next skill: `/discover-scan`
-- Design: `work/features/f13.3/design.md`
+- Design: `work/stories/f13.3/design.md`
 - Epic: E13 Discovery

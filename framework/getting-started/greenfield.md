@@ -124,7 +124,7 @@ Run `project/backlog`:
 
 ### Step 10: Implement Features
 
-For each feature in your backlog:
+For each story in your backlog:
 
 1. `feature/design` — Technical approach
 2. `feature/stories` — Acceptance criteria
@@ -155,7 +155,7 @@ my-project/
 │           ├── design.md
 │           └── backlog.md
 ├── work/
-│   ├── features/        # Feature work
+│   ├── stories/        # Feature work
 │   └── research/        # Spikes, exploration
 └── src/                 # Your source code
 ```

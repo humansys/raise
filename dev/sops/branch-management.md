@@ -282,7 +282,7 @@ ORIGINAL SCOPE:
 ACTUAL SCOPE:
 - Project katas ✓
 - Research infrastructure (prompt template, evidence catalog)
-- Lean feature spec v2 template
+- Lean story spec v2 template
 - Feature/design kata
 
 JUSTIFICATION:
@@ -475,7 +475,7 @@ Commits:
   - feat: Add raise-cli Vision
   - docs: Scope evolution (added framework research)
   - feat: Add research prompt template
-  - feat: Add feature spec v2 template
+  - feat: Add story spec v2 template
 Final action: Renamed to foundation-jan2026 (cohesive sprint)
 ```
 

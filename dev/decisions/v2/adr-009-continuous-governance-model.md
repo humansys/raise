@@ -261,7 +261,7 @@ next_kata: setup/ecosystem
 
 .cursor/rules/                     # CODEBASE-ESPECÍFICO (este repo)
 ├── 010-react-components.mdc       # Funcional, solo hooks
-├── 020-file-structure.mdc         # src/features/{name}/
+├── 020-file-structure.mdc         # src/stories/{name}/
 ├── 030-error-handling.mdc         # Clase ApiError
 └── 040-database.mdc               # Patrones Prisma
 ```

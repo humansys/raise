@@ -380,7 +380,7 @@
     "PAT-026": {
       "id": "PAT-026",
       "type": "pattern",
-      "content": "Use skills on own work - /feature-implement creates progress.md, enables resumability, demonstrates the methodology works",
+      "content": "Use skills on own work - /story-implement creates progress.md, enables resumability, demonstrates the methodology works",
       "context": [
         "skills",
         "dogfooding",
@@ -882,7 +882,7 @@
     "PAT-058": {
       "id": "PAT-058",
       "type": "pattern",
-      "content": "Momentum trap: quick wins (XS features) create flow that bypasses process for subsequent work. Pause after each feature completion and consciously invoke skills for the next.",
+      "content": "Momentum trap: quick wins (XS features) create flow that bypasses process for subsequent work. Pause after each story completion and consciously invoke skills for the next.",
       "context": [
         "discipline",
         "process",
@@ -892,7 +892,7 @@
       "created": "2026-02-03",
       "metadata": {
         "sub_type": "process",
-        "learned_from": "F12.1 retrospective - skipped /feature-plan after F12.4"
+        "learned_from": "F12.1 retrospective - skipped /story-plan after F12.4"
       }
     },
     "PAT-059": {
@@ -914,7 +914,7 @@
     "PAT-060": {
       "id": "PAT-060",
       "type": "pattern",
-      "content": "Feature lifecycle bookends (/feature-start, /feature-close) with prerequisite gates create enforceable workflow without excessive friction. Soft gates warn, hard gates block.",
+      "content": "Feature lifecycle bookends (/story-start, /story-close) with prerequisite gates create enforceable workflow without excessive friction. Soft gates warn, hard gates block.",
       "context": [
         "lifecycle",
         "skills",
@@ -1252,7 +1252,7 @@
     "PAT-082": {
       "id": "PAT-082",
       "type": "pattern",
-      "content": "Full kata cycle on S-sized features yields ~3x velocity - dont skip phases for small features, the overhead is minimal and the structure helps",
+      "content": "Full kata cycle on S-sized features yields ~3x velocity - dont skip phases for small stories, the overhead is minimal and the structure helps",
       "context": [
         "process",
         "velocity",
@@ -1617,7 +1617,7 @@
     "PAT-106": {
       "id": "PAT-106",
       "type": "pattern",
-      "content": "Poka-yoke chain: epic-start creates branch that feature-start verifies — prevents orphan feature branches",
+      "content": "Poka-yoke chain: epic-start creates branch that story-start verifies — prevents orphan story branches",
       "context": [
         "process",
         "lifecycle",
@@ -2771,7 +2771,7 @@
           "ConceptEdge model",
           "UnifiedGraph class",
           "33 tests",
-          "feature-plan TDD update"
+          "story-plan TDD update"
         ],
         "log_path": null
       }
@@ -2985,7 +2985,7 @@
     "SES-026": {
       "id": "SES-026",
       "type": "session",
-      "content": "Feature Lifecycle Skills + F12.2 Guardrails: feature-start skill, feature-close skill, prerequisite gates",
+      "content": "Feature Lifecycle Skills + F12.2 Guardrails: story-start skill, story-close skill, prerequisite gates",
       "context": [
         "feature",
         "feature",
@@ -2997,8 +2997,8 @@
         "session_type": "feature",
         "topic": "Feature Lifecycle Skills + F12.2 Guardrails",
         "outcomes": [
-          "feature-start skill",
-          "feature-close skill",
+          "story-start skill",
+          "story-close skill",
           "prerequisite gates",
           "F12.2 complete",
           "20 guardrails",
@@ -3033,7 +3033,7 @@
     "SES-028": {
       "id": "SES-028",
       "type": "session",
-      "content": "F12.5 Skill Query Alignment: 4 skills updated, feature-start v1.1.0, PAT-061 added",
+      "content": "F12.5 Skill Query Alignment: 4 skills updated, story-start v1.1.0, PAT-061 added",
       "context": [
         "feature",
         "f12.5",
@@ -3046,7 +3046,7 @@
         "topic": "F12.5 Skill Query Alignment",
         "outcomes": [
           "4 skills updated",
-          "feature-start v1.1.0",
+          "story-start v1.1.0",
           "PAT-061 added",
           "2x velocity"
         ],
@@ -3309,7 +3309,7 @@
     "SES-040": {
       "id": "SES-040",
       "type": "session",
-      "content": "F7.2 Convention Detection Complete: 40 tests, 3.75x velocity, /feature-design v1.1.0",
+      "content": "F7.2 Convention Detection Complete: 40 tests, 3.75x velocity, /story-design v1.1.0",
       "context": [
         "feature",
         "f7.2",
@@ -3323,7 +3323,7 @@
         "outcomes": [
           "40 tests",
           "3.75x velocity",
-          "/feature-design v1.1.0",
+          "/story-design v1.1.0",
           "PAT-087/088/089"
         ],
         "log_path": null

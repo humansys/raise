@@ -1,5 +1,5 @@
 ---
-feature_id: "[F#.#]"
+story_id: "[F#.#]"
 title: "[Feature Name]"
 epic_ref: "[E# Epic Name]"
 story_points: [number]

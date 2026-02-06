@@ -3,7 +3,7 @@ name: epic-plan
 description: >
   Sequence features from epic-design into an executable plan with milestones,
   dependencies, and progress tracking. Use after /epic-design to create a
-  realistic implementation roadmap before starting feature work.
+  realistic implementation roadmap before starting story work.
 
 license: MIT
 
@@ -12,7 +12,7 @@ metadata:
   raise.frequency: per-epic
   raise.fase: "4"
   raise.prerequisites: epic-design
-  raise.next: feature-design
+  raise.next: story-design
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
@@ -355,11 +355,11 @@ Define how progress will be measured and communicated.
 - [ ] M3: Feature Complete (Day 7)
 - [ ] M4: Epic Complete (Day 9)
 
-**Velocity:** {X.Y}x average (updated per feature)
+**Velocity:** {X.Y}x average (updated per story)
 ```
 
 **Tracking cadence:**
-- Update after each feature completion
+- Update after each story completion
 - Milestone check at end of each day/session
 - Velocity recalculation after 3+ features
 
@@ -373,7 +373,7 @@ Define how progress will be measured and communicated.
 
 Capture why features are ordered this way for future reference.
 
-**For each feature, note:**
+**For each story, note:**
 - Position rationale (why this order?)
 - Dependencies (what does it need? what does it enable?)
 - Risk factors (what could go wrong?)
@@ -400,7 +400,7 @@ Capture why features are ordered this way for future reference.
 - **Parallel:** No (on critical path)
 ```
 
-**Verification:** Sequencing rationale documented for each feature.
+**Verification:** Sequencing rationale documented for each story.
 
 > **If you can't continue:** Rationale obvious → Brief notes sufficient; don't over-document.
 
@@ -520,7 +520,7 @@ uv run raise memory emit-work epic {epic_id} --event complete --phase plan
 
 - **Primary:** `work/epics/e{N}-{name}/scope.md` — updated with implementation plan
 - **Sections added:** Feature sequence, milestones, parallel opportunities, progress tracking
-- **Next:** `/feature-design` for first feature in sequence
+- **Next:** `/story-design` for first feature in sequence
 
 ## Implementation Plan Template
 
@@ -597,7 +597,7 @@ Stream 3 (Parallel):        F{N}.4 ───┘
 ---
 
 *Plan created: YYYY-MM-DD*
-*Next: `/feature-design` for F{N}.1*
+*Next: `/story-design` for F{N}.1*
 ```
 
 ## Quality Standards
@@ -607,7 +607,7 @@ Stream 3 (Parallel):        F{N}.4 ───┘
 | Planning time | <1 hour for typical epic |
 | Plan reviewable | <5 minutes to understand sequence |
 | Milestones per epic | 2-4 (Walking Skeleton + MVP minimum) |
-| Sequencing rationale | 1-2 sentences per feature |
+| Sequencing rationale | 1-2 sentences per story |
 | Risk coverage | Top 3 sequencing risks addressed |
 
 ## Common Pitfalls
@@ -645,7 +645,7 @@ This skill supports the three-layer memory model:
 
 - **Epic Design:** `/epic-design` (produces input for this skill)
 - **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
-- **Feature Planning:** `/feature-plan` (similar concept at feature level)
+- **Feature Planning:** `/story-plan` (similar concept at story level)
 - **Epic Close:** `/epic-close` (retrospective after completion)
 - **Calibration Data:** `.raise/rai/memory/calibration.jsonl` (velocity patterns)
 - **Constitution:** `framework/reference/constitution.md` (Lean principles)
@@ -667,13 +667,13 @@ Project Level
     ↓
 /epic-plan     ← YOU ARE HERE (sequence, milestones, tracking)
     ↓
-/feature-design → /feature-plan → /feature-implement → /feature-review
+/story-design → /story-plan → /story-implement → /story-review
     ↓
 /epic-close    ← Retrospective, learnings
 ```
 
 **From `/epic-design`:** Receives feature list with sizes, dependencies, risks
-**To `/feature-design`:** Provides sequenced list, identifies first feature to start
+**To `/story-design`:** Provides sequenced list, identifies first feature to start
 
 ---
 

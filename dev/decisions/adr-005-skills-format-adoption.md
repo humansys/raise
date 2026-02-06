@@ -110,9 +110,9 @@ The Agent Skills specification (agentskills.io) has emerged as the industry stan
 ```yaml
 ---
 # === Required by Agent Skills Spec ===
-name: feature-design
+name: story-design
 description: >
-  Create lean feature specifications optimized for human understanding
+  Create lean story specifications optimized for human understanding
   and AI alignment. Use when designing features before implementation.
 
 # === Optional Agent Skills Fields ===
@@ -121,10 +121,10 @@ license: MIT
 # === RaiSE Governance Extensions ===
 metadata:
   raise.work_cycle: feature
-  raise.frequency: per-feature-as-needed
+  raise.frequency: per-story-as-needed
   raise.fase: "4"
   raise.prerequisites: project-backlog
-  raise.next: feature-plan
+  raise.next: story-plan
   raise.gate: gate-design
   raise.adaptable: "true"
   raise.version: "1.0.0"

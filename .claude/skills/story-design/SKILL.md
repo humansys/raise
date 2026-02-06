@@ -1,7 +1,7 @@
 ---
-name: feature-design
+name: story-design
 description: >
-  Create lean feature specifications optimized for both human understanding
+  Create lean story specifications optimized for both human understanding
   and AI alignment. Use before planning complex features (>3 components, >5 SP),
   when architectural decisions are needed, or when AI will generate significant code.
 
@@ -9,10 +9,10 @@ license: MIT
 
 metadata:
   raise.work_cycle: feature
-  raise.frequency: per-feature-as-needed
+  raise.frequency: per-story-as-needed
   raise.fase: "4"
   raise.prerequisites: project-backlog
-  raise.next: feature-plan
+  raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.1.0"
@@ -22,18 +22,18 @@ hooks:
     - matcher: "Write"
       hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
+          command: "RAISE_SKILL_NAME=story-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
   Stop:
     - hooks:
         - type: command
-          command: "RAISE_SKILL_NAME=feature-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
+          command: "RAISE_SKILL_NAME=story-design \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Design: Feature Specification
 
 ## Purpose
 
-Create a lean feature specification that optimizes for both human understanding (quick review, clear intent) and AI alignment (accurate code generation).
+Create a lean story specification that optimizes for both human understanding (quick review, clear intent) and AI alignment (accurate code generation).
 
 **Core principle**: Specs are consumed by both humans AND AI - optimize for both.
 
@@ -54,7 +54,7 @@ Create a lean feature specification that optimizes for both human understanding 
 - When AI will generate significant code from the specification
 
 **When to skip:**
-- Simple features (<3 components, <5 SP, obvious implementation) → Go directly to `/feature-plan`
+- Simple features (<3 components, <5 SP, obvious implementation) → Go directly to `/story-plan`
 - Infrastructure/scaffolding work where implementation is self-evident
 - Bug fixes (use issue tracker instead)
 - Refactoring (unless substantial architectural change)
@@ -65,7 +65,7 @@ Create a lean feature specification that optimizes for both human understanding 
 - Clarity on problem and value proposition
 
 **Output:**
-- Feature specification: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/design.md`
+- Feature specification: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
 - Uses lean template v2 (YAML + Markdown + Examples + Acceptance Criteria)
 
 ## Steps
@@ -75,7 +75,7 @@ Create a lean feature specification that optimizes for both human understanding 
 Record the start of the design phase:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event start --phase design
+uv run raise memory emit-work feature {story_id} --event start --phase design
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e start -p design`
@@ -95,7 +95,7 @@ uv run raise memory query "architecture patterns ADR" --types pattern,decision -
 **From epic check:**
 - Epic exists → Continue, reference in design
 - Epic missing + simple feature → Continue with note
-- Epic missing + complex feature → Suggest `/feature-start` first
+- Epic missing + complex feature → Suggest `/story-start` first
 
 **Skip condition:** Standalone bugfixes or experiments without epic.
 
@@ -105,7 +105,7 @@ uv run raise memory query "architecture patterns ADR" --types pattern,decision -
 
 **Verification:** Epic context loaded OR explicitly standalone; patterns noted.
 
-> **If you can't continue:** Complex feature without epic → Run `/feature-start` first.
+> **If you can't continue:** Complex feature without epic → Run `/story-start` first.
 
 ### Step 1: Assess Complexity
 
@@ -122,7 +122,7 @@ Determine if feature needs a specification document.
 | State management | Stateless | Multiple states | Complex state machine |
 
 **Decision**:
-- **Simple** → Skip design, go to `/feature-plan`
+- **Simple** → Skip design, go to `/story-plan`
 - **Moderate** → Create spec, use core sections only
 - **Complex** → Create spec, include optional sections as needed
 
@@ -136,7 +136,7 @@ Determine if feature needs a specification document.
 
 **Check for risk markers:**
 ```bash
-grep -i "high risk\|HIGH RISK" work/epics/e*-*/scope.md 2>/dev/null | grep -i "{feature_id}" || echo "No explicit risk marker"
+grep -i "high risk\|HIGH RISK" work/epics/e*-*/scope.md 2>/dev/null | grep -i "{story_id}" || echo "No explicit risk marker"
 ```
 
 **If HIGH RISK detected, discuss:**
@@ -257,17 +257,17 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-uv run raise memory emit-work feature {feature_id} --event complete --phase design
+uv run raise memory emit-work feature {story_id} --event complete --phase design
 ```
 
 **Example:** `raise memory emit-work feature F9.4 -e complete -p design`
 
 ## Output
 
-- **Artifact**: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/design.md`
+- **Artifact**: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
 - **Telemetry**: `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
-- **Template**: `references/tech-design-feature-v2.md`
-- **Next**: `/feature-plan`
+- **Template**: `references/tech-design-story-v2.md`
+- **Next**: `/story-plan`
 
 ## Quality Standards
 
@@ -295,5 +295,5 @@ uv run raise memory emit-work feature {feature_id} --event complete --phase desi
 
 ## References
 
-- Template: `references/tech-design-feature-v2.md`
-- Next skill: `/feature-plan`
+- Template: `references/tech-design-story-v2.md`
+- Next skill: `/story-plan`

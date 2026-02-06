@@ -224,8 +224,8 @@ gates:
   blocking:
     - before: epic design
       require: Epic branch exists (/epic-start)
-    - before: feature work
-      require: Feature branch and scope commit (/feature-start)
+    - before: story work
+      require: Feature branch and scope commit (/story-start)
     - before: implementation
       require: Plan exists
     - before: commit
