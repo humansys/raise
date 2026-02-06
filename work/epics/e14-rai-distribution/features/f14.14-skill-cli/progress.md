@@ -2,8 +2,8 @@
 
 ## Status
 - **Started:** 2026-02-05 21:30
-- **Current Task:** 5 of 9
-- **Status:** In Progress (paused)
+- **Completed:** 2026-02-05
+- **Status:** Complete
 
 ## Completed Tasks
 
@@ -31,17 +31,40 @@
 - **Tests:** 6 passing
 - **Notes:** Human and JSON output, grouped by lifecycle
 
-## Remaining Tasks
+### Task 5: `raise skill validate` Command
+- **Completed:** 2026-02-05
+- **Files:** `src/raise_cli/skills/validator.py`
+- **Tests:** 20 passing (13 validator + 7 CLI)
+- **Notes:** Validates frontmatter, fields, sections, naming, hooks
 
-- Task 5: `raise skill validate` command
-- Task 6: `raise skill check-name` command
-- Task 7: `raise skill scaffold` command
-- Task 8: Update `/skill-create` skill
-- Task 9: Manual integration test
+### Task 6: `raise skill check-name` Command
+- **Completed:** 2026-02-05
+- **Files:** `src/raise_cli/skills/name_checker.py`
+- **Tests:** 18 passing (12 checker + 6 CLI)
+- **Notes:** Pattern, skill conflict, CLI conflict, lifecycle checks
 
-## Blockers
-- None
+### Task 7: `raise skill scaffold` Command
+- **Completed:** 2026-02-05
+- **Files:** `src/raise_cli/skills/scaffold.py`
+- **Tests:** 16 passing (10 scaffold + 6 CLI)
+- **Notes:** Creates SKILL.md from template, infers lifecycle
+
+### Task 8: Update `/skill-create` Skill
+- **Completed:** 2026-02-05
+- **Files:** `.claude/skills/skill-create/SKILL.md`
+- **Notes:** Integrated CLI commands into steps, version 2.0.0
+
+### Task 9: Manual Integration Test
+- **Completed:** 2026-02-05
+- **Notes:** End-to-end verification of all commands
+
+## Test Summary
+- **Total new tests:** 79
+- **Full suite:** 1028 passing
+- **Coverage:** Maintained >90%
 
 ## Discoveries
 - Rich console.print() corrupts JSON output — use plain print() for JSON
 - Pydantic default_factory needs lambda for pyright strict mode
+- `epic-start` skill missing Context section (pre-existing issue)
+- `debug` and `research` naming warnings expected (utility skills)
