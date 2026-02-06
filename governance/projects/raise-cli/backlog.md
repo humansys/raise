@@ -24,19 +24,18 @@
 | E11 | **Unified Context Architecture** | ✅ Complete | `dev/epic-e11-scope.md` | — |
 | E12 | **Complete Knowledge Graph** | ✅ Complete | `dev/epic-e12-scope.md` | — |
 | E13 | **Discovery** | ✅ Complete | `dev/epic-e13-scope.md` | — |
-| E14 | **Rai Distribution** | 📋 Research Needed | — | P0 (post-F&F) |
+| E14 | **Rai Distribution** | ✅ Complete | `work/epics/e14-rai-distribution/scope.md` | — |
 
-**F&F Scope (Feb 9):** E7 ✅ Complete
+**F&F Scope (Feb 9):** E7 ✅ Complete, E14 ✅ Complete
 **Post-F&F Priority:**
-1. E14 Rai Distribution — How new users "meet" Rai (P0 for public launch)
-2. E9 Phase 2 — Local insights and calibration updates
-3. E10 Collective Intelligence — V3 scope
+1. E9 Phase 2 — Local insights and calibration updates
+2. E10 Collective Intelligence — V3 scope
 
 **Sequence:**
 ```
 E7 Onboarding ✅ ← pip install → /session-start works
     ↓
-E14 Rai Distribution ← What IS "base Rai"? First-contact experience (RESEARCH)
+E14 Rai Distribution ✅ ← Base Rai bundled, bootstrap on init, MEMORY.md
     ↓
 E9 Phase 2           ← Local insights from telemetry
     ↓
