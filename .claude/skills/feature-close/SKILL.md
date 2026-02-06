@@ -50,7 +50,7 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 - Feature continuing in next session (not complete yet)
 
 **Inputs required:**
-- Completed retrospective (`work/features/{feature_id}/retrospective.md`)
+- Completed retrospective: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
 - Passing tests
 - Feature branch ready for merge
 
@@ -67,8 +67,7 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 Retrospective and tests are required before closing:
 
 ```bash
-# Check retrospective exists
-RETRO="work/features/{feature_id}/retrospective.md"
+RETRO="work/epics/e{N}-{name}/features/{feature_id}/retrospective.md"
 if [ ! -f "$RETRO" ]; then
     echo "ERROR: Retrospective not found: $RETRO"
     echo "Run /feature-review first"
@@ -93,12 +92,14 @@ uv run pytest --tb=no -q || {
 Confirm feature is complete:
 
 ```bash
+FEATURE_DIR="work/epics/e{N}-{name}/features/{feature_id}"
+
 # Show feature artifacts
-ls -la work/features/{feature_id}/
+ls -la "$FEATURE_DIR/"
 
 # Check for required artifacts
-[ -f "work/features/{feature_id}/plan.md" ] && echo "✓ Plan exists"
-[ -f "work/features/{feature_id}/retrospective.md" ] && echo "✓ Retrospective exists"
+[ -f "$FEATURE_DIR/plan.md" ] && echo "✓ Plan exists"
+[ -f "$FEATURE_DIR/retrospective.md" ] && echo "✓ Retrospective exists"
 ```
 
 **Required artifacts:**
@@ -163,8 +164,8 @@ Completed:
 - [summary of what was delivered]
 
 Artifacts:
-- work/features/{feature_id}/plan.md
-- work/features/{feature_id}/retrospective.md
+- {FEATURE_DIR}/plan.md
+- {FEATURE_DIR}/retrospective.md
 
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
@@ -180,7 +181,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 Mark the feature complete in the epic scope:
 
 ```bash
-# In dev/epic-{epic_id}-scope.md, update feature status
+# In epic scope (work/epics/e{N}-{name}/scope.md), update feature status
 # Change: - [ ] F12.2 Guardrails Extractor
 # To:     - [x] F12.2 Guardrails Extractor ✓
 ```
@@ -232,10 +233,10 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 Record the completion of the entire feature lifecycle:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase review
+uv run raise telemetry emit-work feature {feature_id} --event complete --phase review
 ```
 
-**Example:** `raise telemetry emit feature F12.2 -e complete -p review`
+**Example:** `raise telemetry emit-work feature F12.2 -e complete -p review`
 
 **Verification:** Telemetry emitted.
 
@@ -261,7 +262,7 @@ Update `CLAUDE.local.md` to reflect completion:
 - **Merge:** Feature merged to parent branch with `--no-ff`
 - **Cleanup:** Feature branch deleted locally
 - **Epic:** Feature marked complete in epic scope
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature complete)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Feature Close Summary Template
@@ -277,8 +278,9 @@ Update `CLAUDE.local.md` to reflect completion:
 - [Key deliverable 2]
 
 ### Artifacts
-- `work/features/{feature_id}/plan.md`
-- `work/features/{feature_id}/retrospective.md`
+- `{FEATURE_DIR}/plan.md`
+- `{FEATURE_DIR}/retrospective.md`
+
 
 ### Epic Progress
 - **{epic_id}:** N/M features complete (X%)
@@ -337,4 +339,4 @@ If feature is abandoned (not completed):
 
 - Previous skill: `/feature-review`
 - Complement: `/feature-start`
-- Epic scope: `dev/epic-{id}-scope.md`
+- Epic scope: `work/epics/e{N}-{name}/scope.md`

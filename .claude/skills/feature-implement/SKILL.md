@@ -51,12 +51,12 @@ Execute the implementation plan task by task, verifying each step, and producing
 - Repeated for each task in the plan
 
 **Inputs required:**
-- Implementation plan (`work/features/{feature}/plan.md`)
+- Implementation plan: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/plan.md`
 - Project rules and guardrails context
 
 **Output:**
 - Implemented and verified code
-- `work/features/{feature}/progress.md` - Progress log
+- Progress log: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/progress.md`
 
 ## Steps
 
@@ -65,17 +65,17 @@ Execute the implementation plan task by task, verifying each step, and producing
 Record the start of the implement phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase implement
+uv run raise telemetry emit-work feature {feature_id} --event start --phase implement
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e start -p implement`
+**Example:** `raise telemetry emit-work feature F9.4 -e start -p implement`
 
 ### Step 0.1: Verify Prerequisites (REQUIRED - No Skip)
 
 Implementation plan is mandatory:
 
 ```bash
-PLAN="work/features/{feature_id}/plan.md"
+PLAN="work/epics/e{N}-{name}/features/{feature_id}/plan.md"
 if [ ! -f "$PLAN" ]; then
     echo "ERROR: Plan not found: $PLAN"
     echo "Run /feature-plan first"
@@ -94,7 +94,7 @@ fi
 Load relevant codebase patterns from unified context:
 
 ```bash
-raise context query "testing coverage type annotations security" --unified --types pattern,guardrail --limit 5
+uv run raise context query "testing coverage type annotations security" --types pattern,guardrail --limit 5
 ```
 
 Review returned patterns and guardrails before proceeding. Key patterns inform implementation approach; guardrails ensure code standards compliance.
@@ -105,7 +105,7 @@ Review returned patterns and guardrails before proceeding. Key patterns inform i
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Load Plan and Context
 
@@ -149,7 +149,7 @@ Execute verification defined in the plan:
 
 ### Step 5: Log Progress
 
-Update `work/features/{feature}/progress.md`:
+Update progress log (`work/epics/e{N}-{name}/features/{feature}/progress.md`):
 - Task completed
 - Actual time vs estimated
 - Notes or discoveries
@@ -186,16 +186,16 @@ If all tasks completed → execute code gate.
 Record the completion of the implement phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase implement
+uv run raise telemetry emit-work feature {feature_id} --event complete --phase implement
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e complete -p implement`
+**Example:** `raise telemetry emit-work feature F9.4 -e complete -p implement`
 
 ## Output
 
 - **Artifact:** Implemented code
 - **Location:** Per project architecture
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
 - **Gate:** `gates/gate-code.md`
 - **Next:** `/feature-review`
 

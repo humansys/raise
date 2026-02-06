@@ -82,7 +82,7 @@ Execute the `raise discover scan` command:
 
 ```bash
 # For each root_dir in context
-raise discover scan {root_dir} --language {language} --output json
+uv run raise discover scan {root_dir} --language {language} --output json
 ```
 
 **Example:**

@@ -19,9 +19,14 @@ from typing import Annotated, Any
 
 import typer
 from rich.console import Console
-from rich.table import Table
 
+from raise_cli.cli.error_handler import cli_error
 from raise_cli.discovery.scanner import Language, scan_directory
+from raise_cli.output.formatters.discover import (
+    format_build_result,
+    format_drift_result,
+    format_scan_result,
+)
 
 discover_app = typer.Typer(
     name="discover",
@@ -101,11 +106,11 @@ def scan_command(
     lang: Language | None = None
     if language:
         if language not in ("python", "typescript", "javascript"):
-            console.print(
-                f"[red]Error: Unsupported language '{language}'. "
-                "Supported: python, typescript, javascript[/red]"
+            cli_error(
+                f"Unsupported language: {language}",
+                hint="Supported: python, typescript, javascript",
+                exit_code=7,
             )
-            raise typer.Exit(1)
         lang = language  # type: ignore[assignment]
 
     # Set default excludes if none provided
@@ -130,73 +135,7 @@ def scan_command(
         exclude_patterns=exclude_patterns,
     )
 
-    if output == "json":
-        # JSON output for programmatic use
-        output_data = {
-            "files_scanned": result.files_scanned,
-            "symbols": [s.model_dump() for s in result.symbols],
-            "errors": result.errors,
-        }
-        console.print_json(json.dumps(output_data))
-
-    elif output == "summary":
-        # Summary statistics only
-        classes = sum(1 for s in result.symbols if s.kind == "class")
-        functions = sum(1 for s in result.symbols if s.kind == "function")
-        methods = sum(1 for s in result.symbols if s.kind == "method")
-        modules = sum(1 for s in result.symbols if s.kind == "module")
-        interfaces = sum(1 for s in result.symbols if s.kind == "interface")
-
-        lang_str = f" ({lang})" if lang else " (auto-detect)"
-        console.print(f"[bold]Scan Summary:[/bold] {path}{lang_str}")
-        console.print(f"  Files scanned: {result.files_scanned}")
-        console.print(f"  Symbols found: {len(result.symbols)}")
-        console.print(f"    - Classes: {classes}")
-        console.print(f"    - Functions: {functions}")
-        console.print(f"    - Methods: {methods}")
-        if interfaces > 0:
-            console.print(f"    - Interfaces: {interfaces}")
-        if modules > 0:
-            console.print(f"    - Modules with docstrings: {modules}")
-        if result.errors:
-            console.print(f"  [yellow]Errors: {len(result.errors)}[/yellow]")
-
-    else:
-        # Human-readable table output
-        if not result.symbols:
-            console.print(f"[yellow]No symbols found in {path}[/yellow]")
-            return
-
-        table = Table(title=f"Symbols in {path}")
-        table.add_column("Kind", style="cyan", width=10)
-        table.add_column("Name", style="green")
-        table.add_column("File", style="dim")
-        table.add_column("Line", justify="right", style="dim")
-
-        # Group by file for readability
-        symbols_by_file: dict[str, list[tuple[str, str, int]]] = {}
-        for s in result.symbols:
-            if s.file not in symbols_by_file:
-                symbols_by_file[s.file] = []
-            display_name = f"  {s.name}" if s.parent else s.name
-            symbols_by_file[s.file].append((s.kind, display_name, s.line))
-
-        for file_path, symbols in sorted(symbols_by_file.items()):
-            for kind, name, line in sorted(symbols, key=lambda x: x[2]):
-                table.add_row(kind, name, file_path, str(line))
-
-        console.print(table)
-        console.print(
-            f"\n[dim]{result.files_scanned} files scanned, "
-            f"{len(result.symbols)} symbols found[/dim]"
-        )
-
-        if result.errors:
-            console.print(f"\n[yellow]Warnings ({len(result.errors)}):[/yellow]")
-            for error in result.errors[:5]:  # Show first 5 errors
-                console.print(f"  [dim]{error}[/dim]")
-            if len(result.errors) > 5:
-                console.print(f"  [dim]... and {len(result.errors) - 5} more[/dim]")
+    format_scan_result(result, path, output, language=lang)
 
 
 @discover_app.command("build")
@@ -254,27 +193,26 @@ def build_command(
 
     # Check input file exists
     if not input_path.exists():
-        console.print(
-            f"[red]Error: Components file not found: {input_path}[/red]\n"
-            "[dim]Run /discover-complete to generate validated components.[/dim]"
+        cli_error(
+            f"Components file not found: {input_path}",
+            hint="Run /discover-complete to generate validated components",
+            exit_code=4,
         )
-        raise typer.Exit(1)
 
     # Load components to validate and count
+    component_count = 0
     try:
         data: dict[str, Any] = json.loads(input_path.read_text(encoding="utf-8"))
         components: list[dict[str, Any]] = data.get("components", [])
         component_count = len(components)
     except (json.JSONDecodeError, KeyError) as e:
-        console.print(f"[red]Error: Invalid JSON in {input_path}: {e}[/red]")
-        raise typer.Exit(1) from None
+        cli_error(f"Invalid JSON in {input_path}: {e}")
 
     if component_count == 0:
-        console.print(
-            "[yellow]Warning: No components found in input file.[/yellow]\n"
-            "[dim]Run /discover-validate to validate components first.[/dim]"
+        cli_error(
+            "No components found in input file",
+            hint="Run /discover-validate to validate components first",
         )
-        raise typer.Exit(1)
 
     # Build unified graph (includes components automatically)
     from raise_cli.context.builder import UnifiedGraphBuilder
@@ -292,61 +230,33 @@ def build_command(
     component_nodes = [n for n in graph.iter_concepts() if n.type == "component"]
     components_in_graph = len(component_nodes)
 
-    if output == "json":
-        output_data = {
-            "status": "success",
-            "input_file": str(input_path),
-            "graph_file": str(graph_path),
-            "components_loaded": component_count,
-            "components_in_graph": components_in_graph,
-            "total_nodes": graph.node_count,
-            "total_edges": graph.edge_count,
-        }
-        console.print_json(json.dumps(output_data))
+    # Build categories dict
+    categories: dict[str, int] = {}
+    for comp in component_nodes:
+        category = comp.metadata.get("category", "unknown")
+        categories[category] = categories.get(category, 0) + 1
 
-    elif output == "summary":
-        console.print("[bold]Graph Build Summary[/bold]")
-        console.print(f"  Components loaded: {components_in_graph}")
-        console.print(f"  Total nodes: {graph.node_count}")
-        console.print(f"  Total edges: {graph.edge_count}")
+    # Build sample components list
+    sample_components = [
+        (
+            comp.metadata.get("name", comp.id),
+            comp.metadata.get("kind", ""),
+            comp.content[:60],
+        )
+        for comp in component_nodes[:3]
+    ]
 
-    else:
-        # Human-readable output
-        console.print("[bold green]Graph built successfully[/bold green]\n")
-        console.print(f"[bold]Input:[/bold] {input_path}")
-        console.print(f"[bold]Output:[/bold] {graph_path}\n")
-
-        # Component summary
-        console.print(f"[bold]Components:[/bold] {components_in_graph} loaded")
-
-        # Show by category if available
-        categories: dict[str, int] = {}
-        for comp in component_nodes:
-            category = comp.metadata.get("category", "unknown")
-            categories[category] = categories.get(category, 0) + 1
-
-        if categories:
-            console.print("\n[bold]By Category:[/bold]")
-            for cat, count in sorted(categories.items()):
-                console.print(f"  {cat}: {count}")
-
-        # Graph totals
-        console.print("\n[bold]Graph Totals:[/bold]")
-        console.print(f"  Nodes: {graph.node_count}")
-        console.print(f"  Edges: {graph.edge_count}")
-
-        # Sample components
-        if component_nodes:
-            console.print("\n[bold]Sample Components:[/bold]")
-            for comp in component_nodes[:3]:
-                name = comp.metadata.get("name", comp.id)
-                kind = comp.metadata.get("kind", "")
-                console.print(f"  [cyan]{name}[/cyan] ({kind}) — {comp.content[:60]}...")
-
-        # Next steps
-        console.print("\n[dim]Query components:[/dim]")
-        console.print('  [dim]raise context query --type component "keyword"[/dim]')
-        console.print("  [dim]raise context query --unified --type component[/dim]")
+    format_build_result(
+        input_path=input_path,
+        graph_path=graph_path,
+        component_count=component_count,
+        components_in_graph=components_in_graph,
+        node_count=graph.node_count,
+        edge_count=graph.edge_count,
+        categories=categories,
+        sample_components=sample_components,
+        output_format=output,
+    )
 
 
 @discover_app.command("drift")
@@ -394,7 +304,7 @@ def drift_command(
         # Output as JSON
         raise discover drift --output json
     """
-    from raise_cli.discovery.drift import DriftWarning, detect_drift
+    from raise_cli.discovery.drift import BaselineComponent, DriftWarning, detect_drift
 
     root = project_root.resolve()
     scan_path = path.resolve() if path else root / "src"
@@ -420,14 +330,17 @@ def drift_command(
         raise typer.Exit(0)
 
     # Load baseline
+    baseline: list[BaselineComponent] = []
     try:
         baseline_data: dict[str, Any] = json.loads(
             baseline_file.read_text(encoding="utf-8")
         )
-        baseline: list[dict[str, Any]] = baseline_data.get("components", [])
+        baseline_dicts: list[dict[str, Any]] = baseline_data.get("components", [])
+        baseline = [
+            BaselineComponent.model_validate(comp) for comp in baseline_dicts
+        ]
     except (json.JSONDecodeError, KeyError) as e:
-        console.print(f"[red]Error reading baseline: {e}[/red]")
-        raise typer.Exit(1) from None
+        cli_error(f"Error reading baseline: {e}")
 
     if not baseline:
         if output == "json":
@@ -480,61 +393,12 @@ def drift_command(
     )
 
     # Output results
-    if output == "json":
-        console.print_json(
-            json.dumps({
-                "status": "drift" if warnings else "clean",
-                "warnings": [w.model_dump() for w in warnings],
-                "warning_count": len(warnings),
-                "files_scanned": scan_result.files_scanned,
-                "symbols_checked": len(scan_result.symbols),
-            })
-        )
-    elif output == "summary":
-        console.print("[bold]Drift Detection Summary[/bold]")
-        console.print(f"  Files scanned: {scan_result.files_scanned}")
-        console.print(f"  Symbols checked: {len(scan_result.symbols)}")
-        console.print(f"  Warnings: {len(warnings)}")
-        if warnings:
-            by_severity: dict[str, int] = {}
-            for w in warnings:
-                by_severity[w.severity] = by_severity.get(w.severity, 0) + 1
-            for sev, count in sorted(by_severity.items()):
-                console.print(f"    - {sev}: {count}")
-    else:
-        # Human-readable output
-        if not warnings:
-            console.print("[bold green]No drift detected[/bold green]")
-            console.print(
-                f"[dim]Scanned {scan_result.files_scanned} files, "
-                f"checked {len(scan_result.symbols)} symbols[/dim]"
-            )
-            raise typer.Exit(0)
-
-        console.print(
-            f"[bold yellow]Drift detected: {len(warnings)} warning(s)[/bold yellow]\n"
-        )
-
-        for warning in warnings:
-            severity_color = {
-                "error": "red",
-                "warning": "yellow",
-                "info": "blue",
-            }.get(warning.severity, "white")
-
-            console.print(
-                f"[{severity_color}]{warning.severity.upper()}[/{severity_color}] "
-                f"[bold]{warning.file}[/bold]"
-            )
-            console.print(f"  {warning.issue}")
-            if warning.suggestion:
-                console.print(f"  [dim]Suggestion: {warning.suggestion}[/dim]")
-            console.print()
-
-        console.print(
-            f"[dim]Scanned {scan_result.files_scanned} files, "
-            f"checked {len(scan_result.symbols)} symbols[/dim]"
-        )
+    format_drift_result(
+        warnings=warnings,
+        files_scanned=scan_result.files_scanned,
+        symbols_checked=len(scan_result.symbols),
+        output_format=output,
+    )
 
     # Exit with 1 if warnings found
     if warnings:

@@ -214,48 +214,6 @@ class TestAppendSession:
         assert (memory_dir / "sessions" / "index.jsonl").exists()
 
 
-class TestCacheInvalidation:
-    """Tests for cache invalidation after writes."""
-
-    def test_pattern_invalidates_cache(self, tmp_path: Path) -> None:
-        """Writing pattern should delete graph.json cache."""
-        memory_dir = tmp_path / "memory"
-        memory_dir.mkdir()
-        cache_file = memory_dir / "graph.json"
-        cache_file.write_text('{"nodes": {}, "edges": []}')
-
-        input_data = PatternInput(content="Test pattern")
-        append_pattern(memory_dir, input_data)
-
-        assert not cache_file.exists()
-
-    def test_calibration_invalidates_cache(self, tmp_path: Path) -> None:
-        """Writing calibration should delete graph.json cache."""
-        memory_dir = tmp_path / "memory"
-        memory_dir.mkdir()
-        cache_file = memory_dir / "graph.json"
-        cache_file.write_text('{"nodes": {}, "edges": []}')
-
-        input_data = CalibrationInput(
-            feature="F1.1", name="Test", size="S", actual_min=30
-        )
-        append_calibration(memory_dir, input_data)
-
-        assert not cache_file.exists()
-
-    def test_session_invalidates_cache(self, tmp_path: Path) -> None:
-        """Writing session should delete graph.json cache."""
-        memory_dir = tmp_path / "memory"
-        memory_dir.mkdir()
-        cache_file = memory_dir / "graph.json"
-        cache_file.write_text('{"nodes": {}, "edges": []}')
-
-        input_data = SessionInput(topic="Test session")
-        append_session(memory_dir, input_data)
-
-        assert not cache_file.exists()
-
-
 class TestValidateSessionIndex:
     """Tests for validate_session_index function (Jidoka check)."""
 

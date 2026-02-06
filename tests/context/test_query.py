@@ -31,7 +31,7 @@ def sample_graph() -> UnifiedGraph:
             id="PAT-001",
             type="pattern",
             content="Apply 0.5x multiplier to estimates when using full kata cycle",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-02-01",
             metadata={"sub_type": "process"},
         )
@@ -41,7 +41,7 @@ def sample_graph() -> UnifiedGraph:
             id="PAT-002",
             type="pattern",
             content="Use singleton pattern with get/set/configure methods",
-            source_file=".rai/memory/patterns.jsonl",
+            source_file=".raise/rai/memory/patterns.jsonl",
             created="2026-01-15",
             metadata={"sub_type": "codebase"},
         )
@@ -53,7 +53,7 @@ def sample_graph() -> UnifiedGraph:
             id="CAL-001",
             type="calibration",
             content="F2.1 Concept Extraction: Size S, Est 180m, Actual 52m, Velocity 3.5x",
-            source_file=".rai/memory/calibration.jsonl",
+            source_file=".raise/rai/memory/calibration.jsonl",
             created="2026-01-31",
             metadata={"feature": "F2.1", "velocity": 3.5},
         )
@@ -77,7 +77,7 @@ def sample_graph() -> UnifiedGraph:
             id="SES-001",
             type="session",
             content="E3 Implementation Plan session with epic-plan skill",
-            source_file=".rai/memory/sessions/index.jsonl",
+            source_file=".raise/rai/memory/sessions/index.jsonl",
             created="2026-02-01",
         )
     )

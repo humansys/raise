@@ -112,7 +112,7 @@ class TestProfileShowCommand:
 
 
 class TestProfileSessionCommand:
-    """Tests for raise profile session command."""
+    """Tests for raise profile session-start command."""
 
     def test_session_increments_existing_profile(self, mock_home: Path) -> None:
         """Session increments sessions_total for existing profile."""
@@ -127,7 +127,7 @@ class TestProfileSessionCommand:
             save_developer_profile(profile)
 
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
-            result = runner.invoke(app, ["profile", "session"], catch_exceptions=False)
+            result = runner.invoke(app, ["profile", "session-start"], catch_exceptions=False)
 
         assert result.exit_code == 0
         assert "session recorded" in result.output.lower()
@@ -141,7 +141,7 @@ class TestProfileSessionCommand:
             # Provide name via --name flag for non-interactive test
             result = runner.invoke(
                 app,
-                ["profile", "session", "--name", "New User"],
+                ["profile", "session-start", "--name", "New User"],
                 catch_exceptions=False,
             )
 
@@ -168,7 +168,7 @@ class TestProfileSessionCommand:
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["profile", "session", "--project", "/path/to/myproject"],
+                ["profile", "session-start", "--project", "/path/to/myproject"],
                 catch_exceptions=False,
             )
 
@@ -193,7 +193,7 @@ class TestProfileSessionCommand:
             save_developer_profile(profile)
 
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
-            result = runner.invoke(app, ["profile", "session"], catch_exceptions=False)
+            result = runner.invoke(app, ["profile", "session-start"], catch_exceptions=False)
 
         assert result.exit_code == 0
 
@@ -211,7 +211,7 @@ class TestProfileSessionCommand:
         mock_home.mkdir(parents=True, exist_ok=True)
 
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
-            result = runner.invoke(app, ["profile", "session"], catch_exceptions=False)
+            result = runner.invoke(app, ["profile", "session-start"], catch_exceptions=False)
 
         # Should fail gracefully with helpful message
         assert result.exit_code != 0 or "name" in result.output.lower()
@@ -235,7 +235,7 @@ class TestProfileSessionCommand:
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["profile", "session", "--project", "/new/project"],
+                ["profile", "session-start", "--project", "/new/project"],
                 catch_exceptions=False,
             )
 
@@ -265,7 +265,7 @@ class TestProfileSessionCommand:
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["profile", "session", "--project", "/new/project"],
+                ["profile", "session-start", "--project", "/new/project"],
                 catch_exceptions=False,
             )
 
@@ -284,7 +284,7 @@ class TestProfileSessionCommand:
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["profile", "session", "--project", "/my/project"],
+                ["profile", "session-start", "--project", "/my/project"],
                 catch_exceptions=False,
             )
 

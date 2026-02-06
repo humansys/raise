@@ -52,7 +52,7 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 - Epic continuing (not all features done yet)
 
 **Inputs required:**
-- Epic scope document (`dev/epic-{id}-scope.md`)
+- Epic scope document: `work/epics/e{N}-{name}/scope.md`
 - All features complete with retrospectives
 - Epic branch with all work merged
 - Passing tests
@@ -71,11 +71,13 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 Check that all features are done:
 
 ```bash
+SCOPE="work/epics/e{N}-{name}/scope.md"
+
 # Review epic scope for feature checklist
-cat dev/epic-{epic_id}-scope.md | grep -E "^\s*-\s*\[.\]"
+cat "$SCOPE" | grep -E "^\s*-\s*\[.\]"
 
 # Verify no incomplete features
-if grep -E "^\s*-\s*\[ \]" dev/epic-{epic_id}-scope.md | grep -i "F{epic_id}"; then
+if grep -E "^\s*-\s*\[ \]" "$SCOPE" | grep -i "F{epic_id}"; then
     echo "ERROR: Incomplete features found"
     exit 4
 fi
@@ -101,7 +103,9 @@ uv run pytest --tb=short
 
 ### Step 3: Create Epic Retrospective (REQUIRED)
 
-Create `dev/epic-{epic_id}-retrospective.md` with:
+Create retrospective: `work/epics/e{N}-{name}/retrospective.md`
+
+Template:
 
 ```markdown
 # Epic Retrospective: E{N} {Epic Name}
@@ -162,8 +166,8 @@ Create `dev/epic-{epic_id}-retrospective.md` with:
 
 ## Artifacts
 
-- **Scope:** `dev/epic-{id}-scope.md`
-- **Features:** `work/features/` (N feature directories)
+- **Scope:** `work/epics/e{N}-{name}/scope.md`
+- **Features:** `work/epics/e{N}-{name}/features/`
 - **ADRs:** [list any ADRs created]
 - **Tests:** N new tests
 
@@ -261,7 +265,7 @@ Mark the epic complete in `governance/projects/raise-cli/backlog.md`:
 Record the epic completion:
 
 ```bash
-raise telemetry emit epic {epic_id} --event complete
+uv run raise telemetry emit-work epic {epic_id} --event complete
 ```
 
 **Verification:** Telemetry emitted.
@@ -285,11 +289,11 @@ Update `CLAUDE.local.md`:
 
 ## Output
 
-- **Retrospective:** `dev/epic-{epic_id}-retrospective.md`
+- **Retrospective:** `work/epics/e{N}-{name}/retrospective.md`
 - **Merge:** Epic merged to v2 with `--no-ff`
 - **Cleanup:** All epic and feature branches deleted (local and remote)
 - **Backlog:** Epic marked complete
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (epic complete)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (epic complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Epic Close Summary Template
@@ -366,6 +370,6 @@ If epic is abandoned (not completed):
 ## References
 
 - Previous: All feature `/feature-close` completions
-- Epic scope: `dev/epic-{id}-scope.md`
+- Epic scope: `work/epics/e{N}-{name}/scope.md`
 - Backlog: `governance/projects/raise-cli/backlog.md`
 - Next: `/epic-design` for next epic

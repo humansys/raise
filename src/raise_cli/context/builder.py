@@ -13,9 +13,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from raise_cli.config.paths import get_memory_dir
 from raise_cli.context.extractors.skills import extract_all_skills
 from raise_cli.context.graph import UnifiedGraph
 from raise_cli.context.models import ConceptEdge, ConceptNode
+from raise_cli.core.text import STOPWORDS
 
 if TYPE_CHECKING:
     from raise_cli.governance.extractor import GovernanceExtractor
@@ -100,7 +102,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of ConceptNode for memory concepts.
         """
-        memory_dir = self.project_root / ".rai" / "memory"
+        memory_dir = get_memory_dir(self.project_root)
         if not memory_dir.exists():
             return []
 
@@ -586,107 +588,10 @@ class UnifiedGraphBuilder:
         # From content
         if node.content:
             words = node.content.lower().split()
-            # Filter short words and common stopwords
-            stopwords = {
-                "the",
-                "a",
-                "an",
-                "is",
-                "are",
-                "was",
-                "were",
-                "be",
-                "been",
-                "being",
-                "have",
-                "has",
-                "had",
-                "do",
-                "does",
-                "did",
-                "will",
-                "would",
-                "could",
-                "should",
-                "may",
-                "might",
-                "must",
-                "shall",
-                "can",
-                "need",
-                "dare",
-                "ought",
-                "used",
-                "to",
-                "of",
-                "in",
-                "for",
-                "on",
-                "with",
-                "at",
-                "by",
-                "from",
-                "as",
-                "into",
-                "through",
-                "during",
-                "before",
-                "after",
-                "above",
-                "below",
-                "between",
-                "under",
-                "again",
-                "further",
-                "then",
-                "once",
-                "and",
-                "but",
-                "or",
-                "nor",
-                "so",
-                "yet",
-                "both",
-                "either",
-                "neither",
-                "not",
-                "only",
-                "own",
-                "same",
-                "than",
-                "too",
-                "very",
-                "just",
-                "also",
-                "now",
-                "here",
-                "there",
-                "when",
-                "where",
-                "why",
-                "how",
-                "all",
-                "each",
-                "every",
-                "few",
-                "more",
-                "most",
-                "other",
-                "some",
-                "such",
-                "no",
-                "any",
-                "this",
-                "that",
-                "these",
-                "those",
-                "it",
-                "its",
-            }
             for word in words:
-                # Clean word
+                # Clean word (keep only alphanumeric)
                 clean = "".join(c for c in word if c.isalnum())
-                if len(clean) >= 4 and clean not in stopwords:
+                if len(clean) >= 4 and clean not in STOPWORDS:
                     keywords.add(clean)
 
         # From context metadata (for patterns)

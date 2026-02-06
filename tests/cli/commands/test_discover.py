@@ -70,7 +70,7 @@ class TestDiscoverScan:
         """Should error on invalid language."""
         result = runner.invoke(app, ["discover", "scan", str(tmp_path), "--language", "rust"])
 
-        assert result.exit_code == 1
+        assert result.exit_code == 7  # ValidationError
         assert "Unsupported language" in result.output
 
 
@@ -156,7 +156,7 @@ class TestDiscoverBuild:
             ["discover", "build", "--project-root", str(tmp_path)],
         )
 
-        assert result.exit_code == 1
+        assert result.exit_code == 4  # ArtifactNotFoundError
         assert "Components file not found" in result.output
 
     def test_build_errors_on_empty_components(self, tmp_path: Path) -> None:

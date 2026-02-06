@@ -65,7 +65,7 @@ Create a lean feature specification that optimizes for both human understanding 
 - Clarity on problem and value proposition
 
 **Output:**
-- Feature specification in `work/features/{feature-id}/design.md`
+- Feature specification: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/design.md`
 - Uses lean template v2 (YAML + Markdown + Examples + Acceptance Criteria)
 
 ## Steps
@@ -75,17 +75,17 @@ Create a lean feature specification that optimizes for both human understanding 
 Record the start of the design phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase design
+uv run raise telemetry emit-work feature {feature_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e start -p design`
+**Example:** `raise telemetry emit-work feature F9.4 -e start -p design`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
 Check epic context for complex features:
 
 ```bash
-ls dev/epic-{epic_id}-scope.md 2>/dev/null || echo "WARN: No epic context"
+ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic context"
 ```
 
 **Decision:**
@@ -104,7 +104,7 @@ ls dev/epic-{epic_id}-scope.md 2>/dev/null || echo "WARN: No epic context"
 Load relevant architecture patterns and ADRs from unified context:
 
 ```bash
-raise context query "architecture patterns ADR" --unified --types pattern,decision --limit 5
+uv run raise context query "architecture patterns ADR" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Key patterns and architectural decisions inform design.
@@ -115,7 +115,7 @@ Review returned patterns and prior ADRs before proceeding. Key patterns and arch
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Assess Complexity
 
@@ -267,15 +267,15 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase design
+uv run raise telemetry emit-work feature {feature_id} --event complete --phase design
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e complete -p design`
+**Example:** `raise telemetry emit-work feature F9.4 -e complete -p design`
 
 ## Output
 
-- **Artifact**: `work/features/{feature-id}/design.md`
-- **Telemetry**: `.rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
+- **Artifact**: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/design.md`
+- **Telemetry**: `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-feature-v2.md`
 - **Next**: `/feature-plan`
 

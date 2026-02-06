@@ -1,7 +1,7 @@
 """Writer module for appending telemetry signals to JSONL.
 
 This module provides the `emit()` function to append signals to
-`.rai/telemetry/signals.jsonl` as specified in ADR-018.
+`.raise/rai/telemetry/signals.jsonl` as specified in ADR-018.
 
 Signals are written as JSON lines (one JSON object per line),
 which is append-friendly and git-friendly.
@@ -13,21 +13,15 @@ import fcntl
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
+
+from raise_cli.config.paths import SIGNALS_FILE, get_telemetry_dir
 
 if TYPE_CHECKING:
-    from raise_cli.telemetry.schemas import (
-        CalibrationEvent,
-        CommandUsage,
-        ErrorEvent,
-        SessionEvent,
-        SkillEvent,
-        WorkLifecycle,
-    )
+    from raise_cli.telemetry.schemas import Signal
 
-# Default telemetry directory relative to project root
-DEFAULT_TELEMETRY_DIR = ".rai/telemetry"
-DEFAULT_SIGNALS_FILE = "signals.jsonl"
+# Type alias for skill event types (matches SkillEvent.event)
+SkillEventType = Literal["start", "complete", "abandon"]
 
 
 @dataclass
@@ -54,9 +48,7 @@ def _get_telemetry_path(base_path: Path | None = None) -> Path:
     Returns:
         Path to signals.jsonl file.
     """
-    if base_path is None:
-        base_path = Path.cwd()
-    return base_path / DEFAULT_TELEMETRY_DIR / DEFAULT_SIGNALS_FILE
+    return get_telemetry_dir(base_path) / SIGNALS_FILE
 
 
 def _ensure_directory(path: Path) -> None:
@@ -69,20 +61,13 @@ def _ensure_directory(path: Path) -> None:
 
 
 def emit(
-    signal: (
-        SkillEvent
-        | SessionEvent
-        | CalibrationEvent
-        | ErrorEvent
-        | CommandUsage
-        | WorkLifecycle
-    ),
+    signal: Signal,
     *,
     base_path: Path | None = None,
 ) -> EmitResult:
     """Emit a telemetry signal to the signals.jsonl file.
 
-    Appends the signal as a JSON line to `.rai/telemetry/signals.jsonl`.
+    Appends the signal as a JSON line to `.raise/rai/telemetry/signals.jsonl`.
     Creates the directory if it doesn't exist. Uses file locking for
     thread-safe writes.
 
@@ -135,7 +120,7 @@ def emit(
 
 def emit_skill_event(
     skill: str,
-    event: str,
+    event: SkillEventType,
     duration_sec: int | None = None,
     *,
     base_path: Path | None = None,
@@ -156,7 +141,7 @@ def emit_skill_event(
     signal = SkillEvent(
         timestamp=datetime.now(UTC),
         skill=skill,
-        event=event,  # type: ignore[arg-type]
+        event=event,
         duration_sec=duration_sec,
     )
     return emit(signal, base_path=base_path)

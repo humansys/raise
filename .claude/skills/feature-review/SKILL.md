@@ -52,11 +52,11 @@ Reflect on the completed feature to extract learnings, identify process improvem
 
 **Inputs required:**
 - Completed feature
-- Progress log (`work/features/{feature}/progress.md`)
+- Progress log: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/progress.md`
 - Team feedback (if available)
 
 **Output:**
-- `work/features/{feature}/retrospective.md` - Documented retrospective
+- Retrospective: `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
 
 ## Steps
 
@@ -65,10 +65,10 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-raise telemetry emit feature {feature_id} --event start --phase review
+uv run raise telemetry emit-work feature {feature_id} --event start --phase review
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e start -p review`
+**Example:** `raise telemetry emit-work feature F9.4 -e start -p review`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -94,7 +94,7 @@ uv run pytest --tb=no -q || {
 Load relevant process patterns and prior retrospectives from unified context:
 
 ```bash
-raise context query "retrospective learnings velocity" --unified --types pattern,calibration --limit 5
+uv run raise context query "retrospective learnings velocity" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns and calibration data before proceeding. Prior learnings and velocity data inform retrospective focus.
@@ -105,7 +105,7 @@ Review returned patterns and calibration data before proceeding. Prior learnings
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Gather Data
 
@@ -157,7 +157,7 @@ If improvements identified:
 For learnings worth preserving across sessions, add to memory via CLI:
 
 ```bash
-raise memory add-pattern "Pattern description" \
+uv run raise memory add-pattern "Pattern description" \
   -c "context,keywords" \
   -t process \
   --from {feature_id}
@@ -172,10 +172,10 @@ raise memory add-pattern "Pattern description" \
 **Examples:**
 ```bash
 # Process pattern
-raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
+uv run raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
 
 # Technical pattern
-raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
+uv run raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
 ```
 
 **Decision:**
@@ -184,7 +184,7 @@ raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testi
 
 **Verification:** Patterns persisted via CLI (or explicitly skipped).
 
-> **If you can't continue:** CLI not available → Add patterns manually to `.rai/memory/patterns.jsonl`.
+> **If you can't continue:** CLI not available → Add patterns manually to `.raise/rai/memory/patterns.jsonl`.
 
 ### Step 5: Document Retrospective
 
@@ -200,7 +200,7 @@ Create retrospective document:
 Record the calibration signal for velocity tracking:
 
 ```bash
-raise telemetry emit-calibration {feature_id} \
+uv run raise telemetry emit-calibration {feature_id} \
   --size {XS|S|M|L} \
   --estimated {minutes} \
   --actual {minutes}
@@ -214,7 +214,7 @@ raise telemetry emit-calibration {feature_id} \
 
 **Example:**
 ```bash
-raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
+uv run raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
 ```
 
 **Verification:** Command shows velocity and "Calibration event recorded".
@@ -226,18 +226,18 @@ raise telemetry emit-calibration F9.4 -s S -e 30 -a 15
 Record the completion of the entire feature lifecycle:
 
 ```bash
-raise telemetry emit feature {feature_id} --event complete --phase review
+uv run raise telemetry emit-work feature {feature_id} --event complete --phase review
 ```
 
-**Example:** `raise telemetry emit feature F9.4 -e complete -p review`
+**Example:** `raise telemetry emit-work feature F9.4 -e complete -p review`
 
 **Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
 
 ## Output
 
-- **Artifact:** `work/features/{feature}/retrospective.md`
-- **Memory:** `.rai/memory/patterns.jsonl` (patterns persisted via CLI)
-- **Telemetry:** `.rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
+- **Artifact:** `work/epics/e{N}-{name}/features/f{N}.{M}-{name}/retrospective.md`
+- **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
+- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement
 

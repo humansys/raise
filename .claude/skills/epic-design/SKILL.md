@@ -71,7 +71,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - Constraints (timeline, resources, dependencies)
 
 **Outputs:**
-- Epic scope document (`dev/epic-{id}-scope.md`)
+- Epic scope document: `work/epics/e{N}-{name}/scope.md`
 - ADRs for significant architectural decisions (`dev/decisions/adr-*.md`)
 - Feature list with sizes, dependencies, and sequencing
 - Updated parking lot with deferred items
@@ -83,17 +83,17 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event start --phase design
+uv run raise telemetry emit-work epic {epic_id} --event start --phase design
 ```
 
-**Example:** `raise telemetry emit epic E9 -e start -p design`
+**Example:** `raise telemetry emit-work epic E9 -e start -p design`
 
 ### Step 0.5: Query Context
 
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-raise context query "architecture ADR epic" --unified --types pattern,decision --limit 5
+uv run raise context query "architecture ADR epic" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
@@ -104,7 +104,7 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise graph build --unified` first, or proceed without patterns.
+> **If context unavailable:** Run `raise graph build` first, or proceed without patterns.
 
 ### Step 1: Frame the Epic Objective
 
@@ -342,7 +342,7 @@ Identify what could go wrong and how to address it.
 
 Consolidate all design work into the epic scope document.
 
-**Location:** `dev/epic-{id}-scope.md`
+**Location:** `work/epics/e{N}-{name}/scope.md`
 
 **Required sections:**
 1. Objective (from Step 1)
@@ -404,16 +404,16 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-raise telemetry emit epic {epic_id} --event complete --phase design
+uv run raise telemetry emit-work epic {epic_id} --event complete --phase design
 ```
 
-**Example:** `raise telemetry emit epic E9 -e complete -p design`
+**Example:** `raise telemetry emit-work epic E9 -e complete -p design`
 
 ---
 
 ## Output
 
-- **Primary:** `dev/epic-{id}-scope.md` - Epic scope document
+- **Primary:** `work/epics/e{N}-{name}/scope.md`
 - **Secondary:** `dev/decisions/adr-*.md` - ADRs for architectural decisions (0-3 typical)
 - **Updated:** `dev/parking-lot.md` - Deferred items captured
 - **Next:** `/epic-plan` (sequence features, plan milestones)
@@ -571,7 +571,7 @@ This skill supports the three-layer memory model:
 
 ## References
 
-- **Epic Scope Examples:** `dev/epic-e1-scope.md`, `dev/epic-e2-scope.md`, `dev/epic-e3-scope.md`
+- **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
 - **ADR Template:** `.raise/templates/architecture/adr.md`
 - **Feature Design:** `/feature-design` (next level down)
 - **Epic Plan:** `/epic-plan` (sequence features after design)
