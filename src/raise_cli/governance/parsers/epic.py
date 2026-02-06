@@ -171,9 +171,7 @@ def extract_epic_details(
     )
 
 
-def extract_stories(
-    file_path: Path, project_root: Path | None = None
-) -> list[Concept]:
+def extract_stories(file_path: Path, project_root: Path | None = None) -> list[Concept]:
     """Extract Feature concepts from epic scope document.
 
     Parses the "Features" table to extract feature metadata. Supports

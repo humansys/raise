@@ -115,7 +115,9 @@ def _parse_session_entries(file_path: Path) -> _ParsedSessionEntries:
     )
 
 
-def _find_sequence_gaps(ses_numbers: list[int], gap_threshold: int = 5) -> tuple[int, list[tuple[int, int]]]:
+def _find_sequence_gaps(
+    ses_numbers: list[int], gap_threshold: int = 5
+) -> tuple[int, list[tuple[int, int]]]:
     """Find gaps in session number sequence.
 
     Returns:
@@ -261,7 +263,9 @@ class WriteResult(BaseModel):
     message: str = Field(default="", description="Status message")
 
 
-def get_memory_dir_for_scope(scope: MemoryScope, project_root: Path | None = None) -> Path:
+def get_memory_dir_for_scope(
+    scope: MemoryScope, project_root: Path | None = None
+) -> Path:
     """Get the appropriate memory directory for a given scope.
 
     Args:

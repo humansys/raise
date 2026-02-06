@@ -91,9 +91,7 @@ class SessionEvent(BaseModel):
         ..., description="How the session ended"
     )
     duration_min: int = Field(..., description="Duration in minutes")
-    stories: list[str] = Field(
-        default_factory=list, description="Story IDs worked on"
-    )
+    stories: list[str] = Field(default_factory=list, description="Story IDs worked on")
 
 
 class CalibrationEvent(BaseModel):

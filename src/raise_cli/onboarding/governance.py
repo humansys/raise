@@ -99,7 +99,9 @@ class GuardrailGenerator:
                 level=indent_level,
                 category="Code Style",
                 description=indent_desc,
-                verification="ruff check ." if indent_level == GuardrailLevel.MUST else None,
+                verification="ruff check ."
+                if indent_level == GuardrailLevel.MUST
+                else None,
             )
         )
 
@@ -112,7 +114,9 @@ class GuardrailGenerator:
                 level=quote_level,
                 category="Code Style",
                 description=f"Use {quotes.style} quotes for strings",
-                verification="ruff check ." if quote_level == GuardrailLevel.MUST else None,
+                verification="ruff check ."
+                if quote_level == GuardrailLevel.MUST
+                else None,
             )
         )
 
@@ -125,7 +129,9 @@ class GuardrailGenerator:
                 level=line_level,
                 category="Code Style",
                 description=f"Maximum line length: {line_length.max_length} characters",
-                verification="ruff check ." if line_level == GuardrailLevel.MUST else None,
+                verification="ruff check ."
+                if line_level == GuardrailLevel.MUST
+                else None,
             )
         )
 
@@ -278,7 +284,9 @@ class GuardrailGenerator:
         lines.append("## Context")
         lines.append("")
         lines.append(f"- **Files analyzed:** {conventions.files_analyzed}")
-        lines.append(f"- **Overall confidence:** {conventions.overall_confidence.value}")
+        lines.append(
+            f"- **Overall confidence:** {conventions.overall_confidence.value}"
+        )
         lines.append(f"- **Generated:** {date.today().isoformat()}")
         lines.append("")
 

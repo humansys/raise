@@ -12,7 +12,9 @@ from raise_cli.core.text import sanitize_id
 from raise_cli.governance.models import Concept, ConceptType
 
 
-def extract_principles(file_path: Path, project_root: Path | None = None) -> list[Concept]:
+def extract_principles(
+    file_path: Path, project_root: Path | None = None
+) -> list[Concept]:
     """Extract §N principles from Constitution markdown file.
 
     Parses Constitution markdown files looking for principle sections with the
