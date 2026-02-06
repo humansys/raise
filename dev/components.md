@@ -19,7 +19,7 @@
 
 > Pure business logic - no I/O awareness
 
-### [No engines yet - E2 will add KataEngine, E3 will add GateEngine]
+*Deprecated per ADR-012. Skills + Toolkit architecture replaced engine approach.*
 
 ---
 
@@ -27,7 +27,7 @@
 
 > Orchestration and use case coordination
 
-### [No handlers yet - E2 will add KataHandler, E3 will add GateHandler]
+*Deprecated per ADR-012. Skills + Toolkit architecture replaced handler approach.*
 
 ---
 
