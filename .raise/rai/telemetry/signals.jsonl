@@ -1379,3 +1379,11 @@
 {"type":"skill_event","timestamp":"2026-02-05T23:52:53Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-05T23:55:49Z","skill":"session-start","event":"complete","duration_sec":null}
 {"type":"skill_event","timestamp":"2026-02-06T00:03:06Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:15:40Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"session_event","timestamp":"2026-02-06T00:16:27.059453Z","session_type":"feature","outcome":"success","duration_min":45,"features":[]}
+{"type":"skill_event","timestamp":"2026-02-06T00:16:56Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:16:56Z","skill":"session-close","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:17:32Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:19:05Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"skill_event","timestamp":"2026-02-06T00:26:43Z","skill":"session-start","event":"complete","duration_sec":null}
+{"type":"work_lifecycle","timestamp":"2026-02-06T00:29:10.292590Z","work_type":"feature","work_id":"F14.0","event":"complete","phase":"review","blocker":null}
