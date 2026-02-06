@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from raise_cli.config.paths import (
+    ensure_global_rai_dir,
     get_cache_dir,
     get_config_dir,
     get_data_dir,
@@ -134,4 +135,74 @@ class TestGetPersonalDir:
     def test_returns_path_object(self, tmp_path: Path) -> None:
         """Should return a Path object, not a string."""
         result = get_personal_dir(tmp_path)
+        assert isinstance(result, Path)
+
+
+class TestEnsureGlobalRaiDir:
+    """Tests for ensure_global_rai_dir() function."""
+
+    def test_creates_directory_if_not_exists(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should create ~/.rai directory if it doesn't exist."""
+        fake_home = tmp_path / "home"
+        fake_home.mkdir()
+        monkeypatch.setenv("RAI_HOME", str(fake_home / ".rai"))
+
+        result = ensure_global_rai_dir()
+
+        assert result.exists()
+        assert result.is_dir()
+
+    def test_creates_empty_patterns_jsonl(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should create empty patterns.jsonl file."""
+        fake_rai = tmp_path / ".rai"
+        monkeypatch.setenv("RAI_HOME", str(fake_rai))
+
+        ensure_global_rai_dir()
+
+        patterns_file = fake_rai / "patterns.jsonl"
+        assert patterns_file.exists()
+        assert patterns_file.read_text() == ""
+
+    def test_creates_empty_calibration_jsonl(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should create empty calibration.jsonl file."""
+        fake_rai = tmp_path / ".rai"
+        monkeypatch.setenv("RAI_HOME", str(fake_rai))
+
+        ensure_global_rai_dir()
+
+        calibration_file = fake_rai / "calibration.jsonl"
+        assert calibration_file.exists()
+        assert calibration_file.read_text() == ""
+
+    def test_does_not_overwrite_existing_files(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should not overwrite existing patterns/calibration files."""
+        fake_rai = tmp_path / ".rai"
+        fake_rai.mkdir(parents=True)
+        patterns_file = fake_rai / "patterns.jsonl"
+        patterns_file.write_text('{"id": "PAT-001"}\n')
+        monkeypatch.setenv("RAI_HOME", str(fake_rai))
+
+        ensure_global_rai_dir()
+
+        # File should still have original content
+        assert patterns_file.read_text() == '{"id": "PAT-001"}\n'
+
+    def test_returns_path_to_directory(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Should return Path to the global rai directory."""
+        fake_rai = tmp_path / ".rai"
+        monkeypatch.setenv("RAI_HOME", str(fake_rai))
+
+        result = ensure_global_rai_dir()
+
+        assert result == fake_rai
         assert isinstance(result, Path)
