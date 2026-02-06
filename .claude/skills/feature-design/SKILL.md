@@ -80,42 +80,32 @@ uv run raise memory emit-work feature {feature_id} --event start --phase design
 
 **Example:** `raise memory emit-work feature F9.4 -e start -p design`
 
-### Step 0.1: Verify Prerequisites (Deterministic)
+### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
-Check epic context for complex features:
+Run these in parallel (all independent):
 
 ```bash
+# Check epic context
 ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic context"
+
+# Query architecture patterns and ADRs
+uv run raise memory query "architecture patterns ADR" --types pattern,decision --limit 5
 ```
 
-**Decision:**
+**From epic check:**
 - Epic exists → Continue, reference in design
 - Epic missing + simple feature → Continue with note
 - Epic missing + complex feature → Suggest `/feature-start` first
 
 **Skip condition:** Standalone bugfixes or experiments without epic.
 
-**Verification:** Epic context loaded OR explicitly standalone.
-
-> **If you can't continue:** Complex feature without epic → Run `/feature-start` first.
-
-### Step 0.5: Query Context
-
-Load relevant architecture patterns and ADRs from unified context:
-
-```bash
-uv run raise memory query "architecture patterns ADR" --types pattern,decision --limit 5
-```
-
-Review returned patterns and prior ADRs before proceeding. Key patterns and architectural decisions inform design.
-
-**What this returns:**
+**From memory query:**
 - Learned patterns from prior features
 - Prior architectural decisions (ADRs) relevant to this feature
 
-**Verification:** Context loaded; relevant patterns noted.
+**Verification:** Epic context loaded OR explicitly standalone; patterns noted.
 
-> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
+> **If you can't continue:** Complex feature without epic → Run `/feature-start` first.
 
 ### Step 1: Assess Complexity
 
@@ -146,7 +136,7 @@ Determine if feature needs a specification document.
 
 **Check for risk markers:**
 ```bash
-grep -i "high risk\|HIGH RISK" dev/epic-*-scope*.md 2>/dev/null | grep -i "{feature_id}" || echo "No explicit risk marker"
+grep -i "high risk\|HIGH RISK" work/epics/e*-*/scope.md 2>/dev/null | grep -i "{feature_id}" || echo "No explicit risk marker"
 ```
 
 **If HIGH RISK detected, discuss:**

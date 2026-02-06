@@ -60,10 +60,12 @@ Initialize codebase discovery by detecting project type, identifying key directo
 
 ### Step 1: Detect Languages Present
 
-Scan the project for source files and identify languages:
+Scan the project for source files and identify languages.
+
+Run these counts in parallel (all independent):
 
 ```bash
-# Count files by extension
+# Count files by extension (run in parallel)
 find . -type f -name "*.py" | wc -l    # Python
 find . -type f -name "*.ts" | wc -l    # TypeScript
 find . -type f -name "*.js" | wc -l    # JavaScript
