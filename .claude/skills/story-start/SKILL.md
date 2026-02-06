@@ -1,14 +1,14 @@
 ---
 name: story-start
 description: >
-  Initialize a feature with verified context, branch, and scope commit.
+  Initialize a story with verified context, branch, and scope commit.
   Use at the beginning of story work to ensure proper setup and
   traceability from the start.
 
 license: MIT
 
 metadata:
-  raise.work_cycle: feature
+  raise.work_cycle: story
   raise.frequency: per-story
   raise.fase: "3"
   raise.prerequisites: ""

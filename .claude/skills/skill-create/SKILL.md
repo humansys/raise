@@ -233,7 +233,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: {session|epic|feature|discovery|utility|meta}
+  raise.work_cycle: {session|epic|story|discovery|utility|meta}
   raise.frequency: {per-session|per-epic|per-story|as-needed}
   raise.fase: "{number or 'meta'}"
   raise.prerequisites: "{previous-skill or empty}"
