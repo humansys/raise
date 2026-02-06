@@ -93,11 +93,11 @@ Keep both "Orchestrator" and "RaiSE Engineer" — both are valid per glossary.
 
 ## Done Criteria
 
-- [ ] CLAUDE.md terminology section matches glossary
-- [ ] CLAUDE.md architecture paths match actual code structure
-- [ ] No `graph build/query` references in active docs
-- [ ] Archive directory created with historical artifacts
-- [ ] Active docs use consistent terminology
+- [x] CLAUDE.md terminology section matches glossary
+- [x] CLAUDE.md architecture paths match actual code structure
+- [x] No `graph build/query` references in active docs (README, vision.md, guardrails-stack.md)
+- [x] Archive directory created with historical artifacts (88 files)
+- [x] Active docs use consistent terminology
 
 ## Size
 
