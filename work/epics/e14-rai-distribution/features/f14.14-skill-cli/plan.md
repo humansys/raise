@@ -85,12 +85,13 @@
 
 ### Task 7: Implement `raise skill scaffold` Command
 
-- **Description:** Generate new SKILL.md from template with proper frontmatter, hooks, and sections.
+- **Description:** Generate new SKILL.md from template file (`.raise/templates/skill.md`). Template uses `{{placeholder}}` syntax for substitution. Scaffold validates name before generating.
 - **Files:**
   - `src/raise_cli/skills/scaffold.py` (new)
   - `src/raise_cli/cli/commands/skill.py` (add scaffold command)
   - `tests/skills/test_scaffold.py` (new)
   - `tests/cli/commands/test_skill.py` (add scaffold tests)
+- **Template:** `.raise/templates/skill.md` (already created)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/skills/test_scaffold.py -v && pytest tests/cli/commands/test_skill.py::test_skill_scaffold -v`
 - **Size:** M
