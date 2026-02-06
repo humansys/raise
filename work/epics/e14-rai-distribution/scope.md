@@ -356,6 +356,7 @@ Buffer for fixes
 | F14.5 MEMORY.md | M | Pending | — | — | |
 | F14.6 Versioning | S | Pending | — | — | |
 | F14.7 Base Show | XS | Pending | — | — | |
+| F14.12 Memory Ontology | XS | ✅ Done | 1 session | — | graph→memory, simpler CLI |
 
 **Milestone Progress:**
 - [ ] M1: Base Assets (Day 1)
