@@ -158,8 +158,8 @@ class TestDiscoverAnalyze:
             assert comp["confidence"]["score"] >= 0
             assert comp["confidence"]["tier"] in ("high", "medium", "low")
 
-    def test_analyze_empty_scan(self, tmp_path: Path) -> None:
-        """Should handle empty scan result."""
+    def test_analyze_empty_scan_json(self, tmp_path: Path) -> None:
+        """Should handle empty scan result in JSON format."""
         empty = tmp_path / "empty.json"
         empty.write_text(
             json.dumps({"files_scanned": 0, "symbols": [], "errors": []}),
@@ -172,3 +172,27 @@ class TestDiscoverAnalyze:
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert data["components"] == []
+
+    def test_analyze_empty_scan_human(self, tmp_path: Path) -> None:
+        """Should show 'no components' message for empty scan in human format."""
+        empty = tmp_path / "empty.json"
+        empty.write_text(
+            json.dumps({"files_scanned": 0, "symbols": [], "errors": []}),
+            encoding="utf-8",
+        )
+        result = runner.invoke(
+            app,
+            ["discover", "analyze", "--input", str(empty), "--output", "human"],
+        )
+        assert result.exit_code == 0
+        assert "No components to analyze" in result.output
+
+    def test_analyze_category_breakdown(self, tmp_path: Path) -> None:
+        """Human output should show category breakdown."""
+        scan_file = _scan_result_json(tmp_path)
+        result = runner.invoke(
+            app,
+            ["discover", "analyze", "--input", str(scan_file), "--output", "human"],
+        )
+        assert result.exit_code == 0
+        assert "Category Breakdown" in result.output

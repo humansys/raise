@@ -328,7 +328,7 @@ def compute_confidence(symbol: Symbol, path_category: str | None) -> ConfidenceR
 - [ ] `/discover-scan` skill updated to call `raise discover analyze` after scanning
 - [ ] `/discover-validate` skill rewritten with module-level parallel batches and confidence tiers
 - [ ] All new code has >90% test coverage
-- [ ] Validated on raise-cli's own codebase (516 symbols → reduced to <20 human decisions)
+- [ ] Validated on raise-cli's own codebase (human decisions reduced by >70% vs total components)
 
 ### Should Have
 
