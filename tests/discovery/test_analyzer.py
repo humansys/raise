@@ -18,7 +18,6 @@ from raise_cli.discovery.analyzer import (
     AnalysisResult,
     ConfidenceResult,
     ConfidenceSignals,
-    SemanticChunk,
     compute_confidence,
     match_path_category,
 )
@@ -112,24 +111,6 @@ class TestAnalyzedComponent:
         assert comp.methods == ["bar", "baz"]
 
 
-class TestSemanticChunk:
-    """Tests for SemanticChunk model."""
-
-    def test_create(self) -> None:
-        chunk = SemanticChunk(
-            chunk_id="chunk-scanner",
-            module="src/scanner.py",
-            module_docstring="Scanner module.",
-            package="raise_cli.discovery",
-            unit_count=3,
-            estimated_tokens=450,
-            confidence_tier="high",
-            units=["comp-a", "comp-b", "comp-c"],
-        )
-        assert chunk.unit_count == 3
-        assert len(chunk.units) == 3
-
-
 class TestAnalysisResult:
     """Tests for AnalysisResult model."""
 
@@ -139,9 +120,24 @@ class TestAnalysisResult:
             confidence_distribution={"high": 0, "medium": 0, "low": 0},
             categories={},
             components=[],
-            chunks=[],
+            module_groups={},
         )
         assert result.components == []
+        assert result.module_groups == {}
+
+    def test_module_groups(self) -> None:
+        result = AnalysisResult(
+            scan_summary={"files_scanned": 1, "total_symbols": 2},
+            confidence_distribution={"high": 2, "medium": 0, "low": 0},
+            categories={"service": 2},
+            components=[],
+            module_groups={
+                "src/scanner.py": ["comp-a", "comp-b"],
+                "src/drift.py": ["comp-c"],
+            },
+        )
+        assert len(result.module_groups) == 2
+        assert result.module_groups["src/scanner.py"] == ["comp-a", "comp-b"]
 
 
 # ── match_path_category Tests ─────────────────────────────────────────────

@@ -1,8 +1,8 @@
 """Deterministic analyzer for discovery scan results.
 
 Enriches raw scan output with confidence scores, path-based categories,
-hierarchical folding (methods into classes), and semantic chunking.
-No AI inference required — all signals are deterministic.
+hierarchical folding (methods into classes), and module grouping for
+parallel AI synthesis. No AI inference required — all signals are deterministic.
 
 Architecture: E13 Discovery improvement (discover-validate-scaling story)
 
@@ -133,30 +133,6 @@ class AnalyzedComponent(BaseModel):
     docstring: str | None = None
 
 
-class SemanticChunk(BaseModel):
-    """A group of related components for batch AI processing.
-
-    Attributes:
-        chunk_id: Unique chunk ID (e.g., "chunk-scanner").
-        module: File path of the source module.
-        module_docstring: Module-level docstring for context.
-        package: Python package path (dotted).
-        unit_count: Number of component units in this chunk.
-        estimated_tokens: Estimated token count for LLM context.
-        confidence_tier: Dominant confidence tier in this chunk.
-        units: Component IDs belonging to this chunk.
-    """
-
-    chunk_id: str
-    module: str
-    module_docstring: str
-    package: str
-    unit_count: int
-    estimated_tokens: int
-    confidence_tier: ConfidenceTier
-    units: list[str] = Field(default_factory=list)
-
-
 class AnalysisResult(BaseModel):
     """Complete analysis output — deterministic, no AI needed.
 
@@ -165,14 +141,14 @@ class AnalysisResult(BaseModel):
         confidence_distribution: Count of components per confidence tier.
         categories: Count of components per category.
         components: All analyzed components.
-        chunks: Semantic chunks for batch processing.
+        module_groups: Components grouped by source file (for parallel AI synthesis batches).
     """
 
     scan_summary: dict[str, int | list[str]]
     confidence_distribution: dict[str, int]
     categories: dict[str, int]
     components: list[AnalyzedComponent]
-    chunks: list[SemanticChunk]
+    module_groups: dict[str, list[str]] = Field(default_factory=dict)
 
 
 # ── Functions ─────────────────────────────────────────────────────────────
