@@ -101,7 +101,7 @@ With data from Step 1, analyze:
 | Deadline pressure | <3 days | Focus critical path |
 | Stale branches | >5 branches | Cleanup |
 
-**Check parking lot** (`dev/parking-lot.md`) for stale items or blockers.
+**Check parking lot:** If the project has a parking lot file (e.g., `dev/parking-lot.md`), check it for stale items or blockers.
 
 ### Step 3: Propose & Present
 
@@ -203,5 +203,5 @@ Only include these explanations for Shu-level developers.
 - Profile: `~/.rai/developer.yaml`
 - Graph: `.raise/graph/unified.json`
 - Human context: `CLAUDE.local.md`
-- Parking lot: `dev/parking-lot.md`
+- Parking lot: project-specific (e.g., `dev/parking-lot.md`)
 - Complement: `/session-close`
