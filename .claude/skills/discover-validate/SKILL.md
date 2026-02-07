@@ -1,8 +1,9 @@
 ---
 name: discover-validate
 description: >
-  Present synthesized component descriptions to human for validation.
-  Supports approve, edit, and skip actions in batches for efficient review.
+  Validate component descriptions using confidence-tier workflow.
+  Auto-validates high-confidence, batch-reviews medium by module,
+  flags low for individual human review.
 
 license: MIT
 
@@ -14,7 +15,7 @@ metadata:
   raise.next: discover-complete
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "2.0.0"
 
 hooks:
   Stop:
@@ -23,192 +24,183 @@ hooks:
           command: "RAISE_SKILL_NAME=discover-validate \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
-# Discovery Validate: Human Review Loop
+# Discovery Validate: Confidence-Based Review
 
 ## Purpose
 
-Present synthesized component descriptions to the human for validation. The human reviews each component and can approve, edit, or skip. This ensures the component catalog has accurate, human-verified descriptions.
+Validate component descriptions using a confidence-tier workflow that reduces human decisions from O(components) to O(modules + exceptions). High-confidence components are auto-validated. Medium-confidence components are reviewed as module batches with AI synthesis. Low-confidence components get individual human review.
 
-**Key insight:** Humans review, they don't write. Rai synthesizes, humans validate accuracy.
+**Key insight:** The deterministic analyzer (`raise discover analyze`) already did the heavy lifting. This skill only involves the human where it matters.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Present all components, process each approve/edit/skip decision.
+**Shu (守)**: Follow all steps, review each tier in order.
 
-**Ha (破)**: Auto-skip internal symbols (`_prefix`); focus on public APIs.
+**Ha (破)**: Trust high-confidence auto-validation; focus time on medium/low.
 
-**Ri (離)**: Batch approval patterns for consistent codebases; custom filters.
+**Ri (離)**: Tune confidence thresholds for domain-specific projects.
 
 ## Context
 
 **When to use:**
-- After `/discover-scan` has created draft components
-- When re-validating after synthesis updates
-- To validate specific categories only
+- After `/discover-scan` has created `work/discovery/analysis.json`
+- When re-validating after code changes (re-run scan + analyze first)
 
 **When to skip:**
 - All components already validated
-- Draft doesn't exist (run `/discover-scan` first)
+- No `analysis.json` (run `/discover-scan` first)
 
 **Inputs required:**
+- `work/discovery/analysis.json` from `/discover-scan` (via `raise discover analyze`)
 - `work/discovery/components-draft.yaml` from `/discover-scan`
 
 **Output:**
-- Updated `work/discovery/components-draft.yaml` with `validated: true` on approved items
+- Updated `work/discovery/components-draft.yaml` with `validated: true`
 - Ready for `/discover-complete`
 
 ## Steps
 
-### Step 1: Load Draft Components
+### Step 1: Load Analysis Results
 
-Read the draft file:
+Read the analysis file:
 
+```bash
+uv run raise discover analyze --input work/discovery/analysis.json --output summary
 ```
-Read: work/discovery/components-draft.yaml
+
+Or read directly:
+```
+Read: work/discovery/analysis.json
 ```
 
 **Extract:**
-- Total component count
-- Already validated count
-- Pending validation count
+- Confidence distribution (high/medium/low counts)
+- Module groups (for batch processing)
+- Components list with confidence tiers
 
-**Verification:** Draft file exists with components.
-
-> **If you can't continue:** No draft file → Run `/discover-scan` first.
-
-### Step 2: Filter for Validation
-
-Identify components needing review:
-
-**Include:**
-- `validated: false`
-- `internal: false` (public APIs)
-
-**Exclude (auto-skip):**
-- `internal: true` (private helpers) — unless user requests
-- Already `validated: true`
-
-**Calculate:**
-- Total pending: N components
-- Batches needed: ceil(N / 10)
-
-**Verification:** Pending list created.
-
-> **If you can't continue:** All components already validated → Show summary and exit.
-
-### Step 3: Present Batch for Review
-
-Present components in batches of 10 (default).
-
-**For each component, display:**
+**Present overview to user:**
 
 ```markdown
-### Component {N}/{total}: {name}
+## Validation Overview
+
+**Components:** {total}
+- High confidence (auto-validate): {N} ({percent}%)
+- Medium confidence (module batch review): {N} ({percent}%)
+- Low confidence (individual review): {N} ({percent}%)
+
+**Module groups:** {N} modules
+**Estimated human decisions:** ~{medium_modules + low_count}
+```
+
+**Verification:** Analysis loaded with confidence tiers.
+
+> **If you can't continue:** No analysis.json → Run `/discover-scan` first.
+
+### Step 2: Auto-Validate High Confidence
+
+Components with confidence score >= 70 have strong signals (docstring, type annotations, path convention, known base class). Auto-validate them:
+
+For each high-confidence component:
+- Use `auto_purpose` (first sentence of docstring) as `purpose`
+- Use `auto_category` as `category`
+- Set `validated: true`, `validated_by: auto`, `validated_at: {timestamp}`
+
+**Present summary to user:**
+
+```markdown
+### Auto-Validated: {N} components
+
+Categories: {breakdown}
+
+These components had strong documentation signals. Review any exceptions below.
+```
+
+**Ask user:** "Auto-validate {N} high-confidence components? [Approve all / Review individually]"
+
+**Verification:** High-confidence components marked validated.
+
+### Step 3: Batch Review Medium Confidence (by Module)
+
+Medium-confidence components (40-69) have partial signals — they need AI synthesis for purpose/category but can be reviewed efficiently in module batches.
+
+**For each module group** (from `module_groups` in analysis.json):
+
+1. Read all medium-confidence components in this module
+2. If the module has components that already have good `auto_purpose`, present those
+3. For components without good purpose, synthesize descriptions using module context
+
+**Present the module batch:**
+
+```markdown
+### Module: {file_path} ({N} components)
+
+| # | Name | Kind | Auto-Category | Purpose | Confidence |
+|---|------|------|---------------|---------|------------|
+| 1 | {name} | {kind} | {auto_category} | {auto_purpose or "needs synthesis"} | {score} |
+| 2 | ... | ... | ... | ... | ... |
+```
+
+**Ask user per module:** "Approve this module batch? [Approve all / Edit specific / Skip module]"
+
+- **Approve all**: Mark all components in module as validated
+- **Edit specific**: User specifies which components to correct
+- **Skip module**: Leave for later
+
+**Verification:** Module batch processed.
+
+### Step 4: Individual Review Low Confidence
+
+Low-confidence components (< 40) lack documentation signals — they need individual human attention.
+
+**For each low-confidence component:**
+
+```markdown
+### Component: {name}
 
 **File:** {file}:{line}
 **Kind:** {kind}
 **Signature:** `{signature}`
+**Docstring:** {docstring or "None"}
+**Auto-Category:** {auto_category}
+**Confidence:** {score} (low)
 
-**Purpose (Rai):** {purpose}
-
-**Category:** {category}
-**Dependencies:** {depends_on list}
-
----
+**Signals missing:** {list of false signals}
 ```
 
-**Then ask using AskUserQuestion:**
+**Ask user:**
+- Approve with synthesized purpose
+- Edit: provide corrected purpose/category
+- Skip: exclude from catalog
 
-```
-Review this component description:
+**Verification:** Each low-confidence component individually reviewed.
 
-Options:
-- Approve: Description is accurate
-- Edit: I'll provide a correction
-- Skip: Exclude from catalog (internal/trivial)
-```
+### Step 5: Save Validated Components
 
-### Step 4: Process User Decision
+Update `work/discovery/components-draft.yaml` with all validation decisions:
 
-Based on user choice:
+1. High-confidence: `validated: true`, `validated_by: auto`
+2. Medium-confidence: `validated: true`, `validated_by: human` (batch)
+3. Low-confidence: `validated: true`, `validated_by: human` (individual)
+4. Skipped: `skipped: true`, `skip_reason: "human_skip"`
 
-**Approve:**
-- Set `validated: true`
-- Set `validated_at: {timestamp}`
-- Set `validated_by: human`
-- Move to next component
+**Write updated file.**
 
-**Edit:**
-- Ask: "Enter corrected purpose:"
-- Update `purpose` field with user's text
-- Optionally ask for category correction
-- Set `validated: true` (edited = validated)
-- Set `validated_at: {timestamp}`
-- Set `validated_by: human`
-- Move to next component
+**Verification:** Draft file updated with validation states.
 
-**Skip:**
-- Set `skipped: true`
-- Set `skip_reason: "human_skip"`
-- Move to next component
-
-**Verification:** Decision recorded; draft updated.
-
-### Step 5: Save Progress After Each Batch
-
-After every 10 components (or batch completion):
-
-1. Update `work/discovery/components-draft.yaml` with changes
-2. Show batch summary:
-
-```markdown
-## Batch {M} Complete
-
-- Approved: {N}
-- Edited: {N}
-- Skipped: {N}
-
-**Progress:** {validated}/{total} components ({percent}%)
-
-Continue to next batch? [Y/n/done]
-```
-
-**User options:**
-- `Y` or Enter → Continue to next batch
-- `n` or `done` → Save and exit (resume later)
-
-**Verification:** Progress saved; user can resume.
-
-### Step 6: Handle Resume
-
-If user exits early or resumes:
-
-1. Load `components-draft.yaml`
-2. Count already-validated components
-3. Continue from first unvalidated public component
-
-**Verification:** Resume starts from correct position.
-
-### Step 7: Final Summary
-
-When all components reviewed (or user exits):
+### Step 6: Final Summary
 
 ```markdown
 ## Validation Complete
 
 **Total components:** {N}
-**Validated:** {N} ({percent}%)
+**Auto-validated (high):** {N}
+**Batch-reviewed (medium):** {N}
+**Individually reviewed (low):** {N}
 **Skipped:** {N}
-**Remaining:** {N}
 
-### Breakdown by Category
-- Models: {N} validated
-- Services: {N} validated
-- Utilities: {N} validated
-- ...
+**Human decisions made:** {actual_decisions} (vs {total} components — {reduction}% reduction)
 
 ### Next Step
-
 Run `/discover-complete` to export validated components for graph integration.
 ```
 
@@ -220,80 +212,50 @@ Run `/discover-complete` to export validated components for graph integration.
 - **Telemetry:** `skill_event` via Stop hook
 - **Next:** `/discover-complete`
 
+## Confidence Tiers
+
+| Tier | Score | Action | Human Effort |
+|------|-------|--------|-------------|
+| High | >= 70 | Auto-validate with auto_purpose/auto_category | Approve batch (1 decision) |
+| Medium | 40-69 | AI synthesis + module batch review | Per-module decision |
+| Low | < 40 | Individual human review | Per-component decision |
+
 ## Validation States
 
 | State | Meaning |
 |-------|---------|
 | `validated: false` | Pending review |
-| `validated: true` | Human approved (possibly edited) |
+| `validated: true, validated_by: auto` | Auto-validated (high confidence) |
+| `validated: true, validated_by: human` | Human approved (possibly edited) |
 | `skipped: true` | Human excluded from catalog |
-
-## Edit Flow Detail
-
-When user chooses "Edit":
-
-1. **Ask for purpose correction:**
-   ```
-   Current purpose: "{current_purpose}"
-
-   Enter corrected purpose (or press Enter to keep):
-   ```
-
-2. **Ask for category correction (optional):**
-   ```
-   Current category: {category}
-
-   Change category? [model/service/utility/handler/parser/builder/schema/command/test/keep]
-   ```
-
-3. Apply changes and mark validated.
-
-## Batch Control
-
-**Default batch size:** 10 components
-
-**Rationale:**
-- Small enough to complete in one sitting
-- Large enough to make progress
-- Saves after each batch for safety
-
-**Early exit:** User can type "done" at any batch prompt to save and exit.
 
 ## Notes
 
-### Validation Philosophy
+### Why Module Batches?
 
-The human doesn't need to write descriptions from scratch — that's Rai's job. The human validates:
-- Is the purpose accurate?
-- Is the category correct?
-- Should this be in the catalog at all?
-
-Most components should be quick "Approve" — edits are for corrections, not rewrites.
-
-### Internal Symbols
-
-Symbols starting with `_` are marked `internal: true` by `/discover-scan`. By default, `/discover-validate` skips these.
-
-To validate internal symbols too:
-```
-/discover-validate --include-internal
-```
-
-### Bulk Actions
-
-For codebases with consistent quality:
-- "Approve all in this module" (future enhancement)
-- "Skip all internal" (default behavior)
+Components in the same module are semantically related. Reviewing them together:
+- Provides context (what else is in this file?)
+- Enables pattern-based approval ("all models in this file look correct")
+- Reduces context switching
+- Enables parallel AI synthesis (each module = one batch)
 
 ### Resume Safety
 
-Progress is saved to YAML after each batch. If interrupted:
-- No data loss
-- Resume from last unvalidated component
-- Can re-run `/discover-validate` anytime
+Progress is saved to YAML after each tier. If interrupted:
+- High-confidence auto-validation is atomic
+- Medium/low progress saved per module/component
+- Can re-run `/discover-validate` anytime to continue
+
+### Tuning Thresholds
+
+If too many components are medium/low on a well-documented codebase:
+- Consider adjusting thresholds in `analyzer.py` (constants at top)
+- Default: high >= 70, medium >= 40, low < 40
 
 ## References
 
 - Previous skill: `/discover-scan`
 - Next skill: `/discover-complete`
-- Design: `work/stories/f13.3/design.md`
+- CLI: `raise discover analyze --help`
+- Analyzer: `src/raise_cli/discovery/analyzer.py`
+- Design: `work/stories/discover-validate-scaling/design.md`

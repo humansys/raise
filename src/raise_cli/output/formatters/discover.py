@@ -13,6 +13,7 @@ from rich.console import Console
 from rich.table import Table
 
 if TYPE_CHECKING:
+    from raise_cli.discovery.analyzer import AnalysisResult
     from raise_cli.discovery.drift import DriftWarning
     from raise_cli.discovery.scanner import ScanResult
 
@@ -332,3 +333,95 @@ def _format_build_human(
     # Next steps
     _console.print("\n[dim]Query components:[/dim]")
     _console.print('  [dim]raise context query "keyword" --types component[/dim]')
+
+
+def format_analyze_result(
+    result: AnalysisResult,
+    output_format: str,
+) -> None:
+    """Format and print analysis results.
+
+    Args:
+        result: Analysis result from the analyze pipeline.
+        output_format: Output format ("json", "summary", or "human").
+    """
+    if output_format == "json":
+        _format_analyze_json(result)
+    elif output_format == "summary":
+        _format_analyze_summary(result)
+    else:
+        _format_analyze_human(result)
+
+
+def _format_analyze_json(result: AnalysisResult) -> None:
+    """Format analysis result as JSON."""
+    _console.print_json(json.dumps(result.model_dump(), default=str))
+
+
+def _format_analyze_summary(result: AnalysisResult) -> None:
+    """Format analysis result as summary statistics."""
+    summary = result.scan_summary
+    dist = result.confidence_distribution
+    total = sum(dist.values())
+
+    _console.print("[bold]Discovery Analysis Summary[/bold]")
+    _console.print(f"  Files scanned: {summary.get('files_scanned', 0)}")
+    _console.print(
+        f"  Symbols: {summary.get('total_symbols', 0)} "
+        f"({summary.get('public_symbols', 0)} public, "
+        f"{summary.get('internal_symbols', 0)} internal)"
+    )
+    _console.print(f"  Components: {total}")
+    _console.print(f"    High confidence:   {dist.get('high', 0)}")
+    _console.print(f"    Medium confidence:  {dist.get('medium', 0)}")
+    _console.print(f"    Low confidence:     {dist.get('low', 0)}")
+    _console.print(f"  Module groups: {len(result.module_groups)}")
+
+
+def _format_analyze_human(result: AnalysisResult) -> None:
+    """Format analysis result as human-readable output."""
+    summary = result.scan_summary
+    dist = result.confidence_distribution
+    total = sum(dist.values())
+
+    _console.print("[bold]Discovery Analysis[/bold]")
+    _console.print("=" * 40)
+    _console.print(
+        f"\nScanned: {summary.get('files_scanned', 0)} files, "
+        f"{summary.get('total_symbols', 0)} symbols "
+        f"({summary.get('public_symbols', 0)} public, "
+        f"{summary.get('internal_symbols', 0)} internal)"
+    )
+
+    # Confidence distribution
+    _console.print("\n[bold]Confidence Distribution:[/bold]")
+    if total > 0:
+        high = dist.get("high", 0)
+        med = dist.get("medium", 0)
+        low = dist.get("low", 0)
+        _console.print(
+            f"  [green]High   (auto-validate):[/green] {high} "
+            f"({high * 100 // total}%)"
+        )
+        _console.print(
+            f"  [yellow]Medium (batch review):[/yellow]  {med} "
+            f"({med * 100 // total}%)"
+        )
+        _console.print(
+            f"  [red]Low    (needs review):[/red]  {low} "
+            f"({low * 100 // total}%)"
+        )
+    else:
+        _console.print("  No components to analyze")
+
+    # Category breakdown
+    if result.categories:
+        _console.print("\n[bold]Category Breakdown:[/bold]")
+        for cat, count in sorted(result.categories.items(), key=lambda x: -x[1]):
+            _console.print(f"  {cat}: {count}")
+
+    # Module groups
+    if result.module_groups:
+        _console.print(f"\n[bold]Module Groups:[/bold] {len(result.module_groups)}")
+        for module_path, comp_ids in sorted(result.module_groups.items()):
+            _console.print(f"  {module_path}  [{len(comp_ids)} components]")

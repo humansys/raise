@@ -5,6 +5,9 @@ from textwrap import dedent
 
 import pytest
 
+# Resolve project root at import time (immune to chdir in other tests)
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
 from raise_cli.governance.models import ConceptType
 from raise_cli.governance.parsers.adr import (
     _extract_decision_summary,
@@ -300,12 +303,12 @@ class TestIntegrationWithRealData:
     """Integration tests with real ADR data."""
 
     @pytest.mark.skipif(
-        not Path("dev/decisions/adr-019-unified-context-graph.md").exists(),
+        not (_PROJECT_ROOT / "dev/decisions/adr-019-unified-context-graph.md").exists(),
         reason="Real ADR data not available",
     )
     def test_extracts_real_adrs(self) -> None:
         """Should extract real ADRs from project."""
-        concepts = extract_all_decisions(Path.cwd())
+        concepts = extract_all_decisions(_PROJECT_ROOT)
 
         # Should have extracted some decisions
         assert len(concepts) > 0
