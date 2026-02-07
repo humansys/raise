@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Annotated
 
 if TYPE_CHECKING:
     from raise_cli.onboarding.bootstrap import BootstrapResult
+    from raise_cli.onboarding.skills import SkillScaffoldResult
 
 import typer
 from rich.console import Console
@@ -98,6 +99,7 @@ def _get_project_message(
     profile: DeveloperProfile | None,
     created_profile: bool,
     bootstrap_result: BootstrapResult | None = None,
+    skills_result: SkillScaffoldResult | None = None,
 ) -> str:
     """Get project detection message based on experience level.
 
@@ -107,6 +109,7 @@ def _get_project_message(
         profile: Developer profile (None for new users).
         created_profile: Whether profile was just created.
         bootstrap_result: Result of base Rai bootstrap (None if not run).
+        skills_result: Result of skill scaffolding (None if not run).
 
     Returns:
         Formatted message string for console output.
@@ -150,6 +153,19 @@ def _get_project_message(
                         "[dim]— methodology definition[/dim]"
                     )
 
+        # Skills info
+        if skills_result is not None:
+            if skills_result.already_existed:
+                lines.append(
+                    "[bold]Loaded:[/bold]  .claude/skills/  "
+                    "[dim]— skills already present[/dim]"
+                )
+            elif skills_result.skills_copied > 0:
+                lines.append(
+                    f"[bold]Created:[/bold] .claude/skills/  "
+                    f"[dim]— {skills_result.skills_copied} onboarding skills[/dim]"
+                )
+
         files_section = "\n".join(lines)
 
         return PROJECT_DETECTED_SHU.format(
@@ -163,12 +179,19 @@ def _get_project_message(
             bootstrap_msg = (
                 f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
             )
+        skills_msg = ""
+        if skills_result is not None and not skills_result.already_existed:
+            skills_msg = (
+                f"  Installed {skills_result.skills_copied} skills"
+                f" to .claude/skills/\n"
+            )
         return (
             PROJECT_DETECTED_RI.format(
                 project_type=project_type.capitalize(),
                 file_count=file_count,
             )
             + bootstrap_msg
+            + skills_msg
         )
 
 
@@ -270,6 +293,11 @@ def init_command(
 
     bootstrap_result = bootstrap_rai_base(project_path)
 
+    # Scaffold onboarding skills
+    from raise_cli.onboarding.skills import scaffold_skills
+
+    skills_result = scaffold_skills(project_path)
+
     # Generate MEMORY.md (canonical + Claude Code)
     from raise_cli.config.paths import (
         get_claude_memory_path,
@@ -305,6 +333,7 @@ def init_command(
         profile=profile,
         created_profile=created_profile,
         bootstrap_result=bootstrap_result,
+        skills_result=skills_result,
     )
 
     if profile.experience_level == ExperienceLevel.RI and not created_profile:
