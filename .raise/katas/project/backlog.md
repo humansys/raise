@@ -34,11 +34,11 @@ Transformar el Technical Design en un backlog de user stories priorizadas y esti
 - Cuando se necesita planificar sprints
 
 **Inputs requeridos:**
-- Technical Design aprobado (`governance/projects/{project}/design.md`)
+- Technical Design aprobado (`governance/design.md`)
 - PRD para trazabilidad de requisitos
 
 **Output:**
-- `governance/projects/{project}/backlog.md` - Backlog estructurado
+- `governance/backlog.md` - Backlog estructurado
 
 ## Pasos
 
@@ -117,7 +117,7 @@ Revisar backlog completo:
 ## Output
 
 - **Artefacto:** Product Backlog
-- **Ubicación:** `governance/projects/{project}/backlog.md`
+- **Ubicación:** `governance/backlog.md`
 - **Gate:** `gates/gate-backlog.md`
 - **Siguiente kata:** `feature/stories`
 

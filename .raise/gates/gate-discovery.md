@@ -18,7 +18,7 @@ Este gate implementa el principio **Jidoka**: si los criterios no se cumplen, el
 
 - Después de completar `katas/project/discovery.md`
 - Antes de iniciar `katas/project/vision.md`
-- El PRD debe existir en `governance/projects/{project}/prd.md`
+- El PRD debe existir en `governance/prd.md`
 
 ---
 

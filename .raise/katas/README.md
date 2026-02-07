@@ -57,8 +57,8 @@ katas/
 
 | Kata | Purpose | Output |
 |------|---------|--------|
-| `discovery.md` | Business Case creation | `governance/solution/business_case.md` |
-| `vision.md` | Solution Vision | `governance/solution/vision.md` |
+| `discovery.md` | Business Case creation | `governance/business_case.md` |
+| `vision.md` | Solution Vision | `governance/vision.md` |
 
 > **Flow**: `discovery` → `vision` → `setup/governance`
 
@@ -66,9 +66,9 @@ katas/
 
 | Kata | Purpose | Output |
 |------|---------|--------|
-| `governance.md` | System-wide Guardrails | `governance/solution/guardrails.md` |
+| `governance.md` | System-wide Guardrails | `governance/guardrails.md` |
 | `rules.md` | Codebase Patterns | `.cursor/rules/*.mdc` |
-| `ecosystem.md` | Dependency Mapping | `governance/solution/ecosystem.md` |
+| `ecosystem.md` | Dependency Mapping | `governance/ecosystem.md` |
 
 > **Greenfield flow**: `governance` → `rules` → `project/discovery`
 > **Brownfield flow**: `analyze` → `ecosystem` → `project/discovery`
@@ -78,13 +78,13 @@ katas/
 
 | Kata | Purpose | Output (approved) |
 |------|---------|-------------------|
-| `discovery.md` | PRD creation | `governance/projects/{name}/prd.md` |
-| `vision.md` | Project Vision | `governance/projects/{name}/vision.md` |
-| `design.md` | Technical Architecture | `governance/projects/{name}/design.md` |
-| `backlog.md` | Product Backlog | `governance/projects/{name}/backlog.md` |
+| `discovery.md` | PRD creation | `governance/prd.md` |
+| `vision.md` | Project Vision | `governance/vision.md` |
+| `design.md` | Technical Architecture | `governance/design.md` |
+| `backlog.md` | Product Backlog | `governance/backlog.md` |
 
 > **Note**: Project Vision was renamed from "Solution Vision" in v2.4 (ADR-010)
-> **Note**: Drafts are created in `work/projects/{name}/`, promoted to `governance/` after gate passes
+> **Note**: Drafts are created in `work/`, promoted to `governance/` after gate passes
 
 ### feature/ (Per-Feature)
 
