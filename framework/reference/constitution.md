@@ -2,9 +2,9 @@
 
 ## Principios Inmutables para Reliable AI Software Engineering
 
-**Versión:** 2.1.0
+**Versión:** 2.2.0
 **Estado:** Ratificada
-**Fecha:** 2 de Febrero, 2026
+**Fecha:** 7 de Febrero, 2026
 
 > **Nota de versión 2.0:** Esta enmienda incorpora el principio §8 (Observable Workflow) y alinea terminología con ontología v2.0. Ver changelog al final.
 
@@ -105,6 +105,7 @@ RaiSE aplica los principios del Toyota Production System al desarrollo asistido 
 | Empoderar al equipo    | Modelo Orquestador                |
 | Construir integridad   | Jidoka (parar en defectos)        |
 | Ver el todo            | Golden Data coherente             |
+| Genchi Genbutsu        | Antes de diseñar, ir al Gemba (código) |
 
 > Para desarrollo completo de la filosofía de aprendizaje, ver [05-learning-philosophy-v2.md](./05-learning-philosophy-v2.md).
 
@@ -164,6 +165,7 @@ Cada decisión del agente debe ser **trazable y auditable**. No hay cajas negras
 - **Registrar trace de cada interacción MCP** [NUEVO v2.0]
 - **Escalar al Orquestador ante ambigüedad** [NUEVO v2.0]
 - **Dogfooding: cuando construyas RaiSE, sigue RaiSE** [NUEVO v2.1] — Saltarse el proceso = saltarse la validación = entregar metodología no probada
+- **Genchi Genbutsu: antes de diseñar, ir al Gemba** [NUEVO v2.2] — Leer el código que se va a modificar. La documentación deriva; el código es la verdad. Diseñar desde observación, no desde memoria
 
 ---
 
@@ -222,6 +224,8 @@ Esta Constitution puede ser modificada bajo las siguientes condiciones:
 | 2.0.0    | 2025-12-28 | Restricciones Observable Workflow       | —       |
 | 2.0.0    | 2025-12-28 | Compromisos con Reguladores             | —       |
 | 2.1.0    | 2026-02-02 | Restricción añadida: Dogfooding        | —       |
+| 2.2.0    | 2026-02-07 | §7 Lean: Genchi Genbutsu añadido       | —       |
+| 2.2.0    | 2026-02-07 | Restricción: Ir al Gemba antes de diseñar | —   |
 
 ---
 
@@ -236,6 +240,7 @@ Esta Constitution puede ser modificada bajo las siguientes condiciones:
 | **Observable Workflow** | Sistema de trazabilidad de decisiones        |
 | **Golden Data**         | Información verificada y canónica          |
 | **Context Engineering** | Diseño del ambiente informacional del LLM   |
+| **Genchi Genbutsu**     | "Ve y observa tú mismo" — leer el código antes de diseñar cambios |
 
 > Para definiciones completas, ver [20-glossary-v2.md](./20-glossary-v2.md).
 

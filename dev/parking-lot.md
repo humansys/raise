@@ -42,6 +42,23 @@
 
 ## Ideas
 
+### Discovery & Code Understanding
+
+- [ ] **`/discover-document` skill** — (SES-085, 2026-02-07)
+  - **Problem:** Rai has 787 concepts + 309 components in memory, but no human-readable architecture documentation
+  - **What it generates:**
+    - Module-level architecture overview (what each package does, how they relate)
+    - Component catalog grouped by concern (by *purpose*, not alphabetical)
+    - Dependency flow between modules
+    - Entry points and API surface
+    - Mermaid diagrams for visual structure
+  - **Inputs already available:** `components-validated.json` (309 components), `analysis.json` (module groups, hierarchy)
+  - **Output:** `dev/architecture-overview.md` — readable, navigable, onboarding-ready
+  - **Sizing:** M-sized story (not epic). 1-2 stories max. Promote to epic only if auto-refresh cycle grows.
+  - **Positioning value:** "RaiSE doesn't just generate code — it *understands* your codebase, remembers it across sessions, and keeps that understanding fresh."
+  - **Priority:** Post story-close, pre-F&F if possible (manual generation as fallback)
+  - **Related:** Consider `raise discover refresh` single-command wrapper (S-sized story) for full pipeline re-run
+
 ### Framework Improvements
 
 - [ ] **Stale terminology grep as rename gate** — (Ishikawa analysis, 2026-02-06)
