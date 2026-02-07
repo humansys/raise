@@ -41,12 +41,12 @@ This skill automates the promotion of work artifacts to governance status after 
 
 ```
 Solution level:
-  work/proposals/vision.md → governance/solution/vision.md
+  work/proposals/vision.md → governance/vision.md
   work/proposals/adr-*.md → governance/decisions/adr-*.md
 
 Project level:
-  work/projects/{name}/vision.md → governance/projects/{name}/vision.md
-  work/projects/{name}/design.md → governance/projects/{name}/design.md
+  work/projects/{name}/vision.md → governance/vision.md
+  work/projects/{name}/design.md → governance/design.md
 ```
 
 **Verification**: Target path is determined and parent directory exists

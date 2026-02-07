@@ -50,7 +50,7 @@ RaiSE governance operates at three levels:
 Governance for the entire system/product.
 
 ```
-governance/solution/
+governance/
 ├── vision.md          # What we're building
 ├── guardrails.md      # Rules for all work
 └── business_case.md   # Why we're building it
@@ -60,7 +60,7 @@ governance/solution/
 Governance for specific initiatives.
 
 ```
-governance/projects/{name}/
+governance/
 ├── prd.md             # Requirements
 ├── design.md          # Technical approach
 └── backlog.md         # Planned work

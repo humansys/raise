@@ -71,22 +71,22 @@ behavior:
 available_gates:
   - id: gate-discovery
     path: gates/gate-discovery.md
-    validates: governance/projects/{project}/prd.md
+    validates: governance/prd.md
   - id: gate-vision
     path: gates/gate-vision.md
-    validates: governance/projects/{project}/vision.md
+    validates: governance/vision.md
   - id: gate-architecture
     path: gates/gate-architecture.md
-    validates: governance/projects/{project}/design.md
+    validates: governance/design.md
   - id: gate-design
     path: gates/gate-design.md
-    validates: governance/projects/{project}/design.md
+    validates: governance/design.md
   - id: gate-backlog
     path: gates/gate-backlog.md
-    validates: governance/projects/{project}/backlog.md
+    validates: governance/backlog.md
   - id: gate-estimation
     path: gates/gate-estimation.md
-    validates: governance/projects/{project}/estimation.md
+    validates: governance/estimation.md
 
 # Implementación
 implementation:

@@ -59,9 +59,12 @@ raise-commons/
 │   ├── reference/       # Constitution, glossary
 │   └── concepts/        # Core concepts
 │
-├── governance/          # Project governance
-│   ├── solution/        # Vision, guardrails, business case
-│   └── projects/        # Project-level artifacts (PRD, backlog)
+├── governance/          # Project governance (flat)
+│   ├── vision.md        # Solution-level
+│   ├── guardrails.md    # Solution-level
+│   ├── business_case.md # Solution-level
+│   ├── prd.md           # Project-level
+│   └── ...              # All artifacts at root level
 │
 ├── src/raise_cli/       # CLI implementation
 │

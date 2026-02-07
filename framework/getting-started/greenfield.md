@@ -19,7 +19,6 @@ git init
 
 # Create three-directory structure
 mkdir -p .raise governance work
-mkdir -p governance/solution governance/projects
 mkdir -p work/features work/research
 ```
 
@@ -59,7 +58,7 @@ Run the `solution/discovery` kata:
 /raise.solution.discovery
 ```
 
-This produces `governance/solution/business_case.md`:
+This produces `governance/business_case.md`:
 - Problem statement
 - Stakeholders
 - Success metrics
@@ -72,7 +71,7 @@ Run the `solution/vision` kata:
 /raise.solution.vision
 ```
 
-This produces `governance/solution/vision.md`:
+This produces `governance/vision.md`:
 - Technical approach
 - Architecture direction
 - Key decisions
@@ -85,7 +84,7 @@ Run the `setup/governance` kata:
 /raise.governance
 ```
 
-This produces `governance/solution/guardrails.md`:
+This produces `governance/guardrails.md`:
 - Coding standards
 - Review requirements
 - Quality gates
@@ -145,15 +144,12 @@ my-project/
 │   └── agents/          # AI agent configs
 ├── governance/
 │   ├── index.yaml       # Artifact manifest
-│   ├── solution/
-│   │   ├── business_case.md
-│   │   ├── vision.md
-│   │   └── guardrails.md
-│   └── projects/
-│       └── {project}/
-│           ├── prd.md
-│           ├── design.md
-│           └── backlog.md
+│   ├── business_case.md # Solution-level
+│   ├── vision.md        # Solution-level
+│   ├── guardrails.md    # Solution-level
+│   ├── prd.md           # Project-level
+│   ├── design.md        # Project-level
+│   └── backlog.md       # Project-level
 ├── work/
 │   ├── stories/        # Feature work
 │   └── research/        # Spikes, exploration

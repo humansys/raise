@@ -35,7 +35,7 @@ This produces:
 
 ### Step 3: Document Current State
 
-Create `governance/solution/current-state.md`:
+Create `governance/current-state.md`:
 - What exists today
 - Known issues
 - Key stakeholders
@@ -52,7 +52,7 @@ Use the `setup/governance` kata to define initial guardrails:
 /raise.governance
 ```
 
-This creates `governance/solution/guardrails.md` with:
+This creates `governance/guardrails.md` with:
 - Coding standards to enforce
 - Review requirements
 - Quality thresholds

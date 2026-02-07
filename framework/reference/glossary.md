@@ -213,7 +213,7 @@ Unidad semántica extraída de documentos de governance (requirement, principle,
 ```yaml
 id: req-rf-05
 type: requirement
-file: governance/projects/raise-cli/prd.md
+file: governance/prd.md
 section: "RF-05: Golden Context Generation"
 lines: [206, 214]
 content: "The system MUST generate..."
@@ -486,7 +486,7 @@ task: "validate-prd"
 concepts:
   - id: req-rf-05
     type: requirement
-    file: governance/projects/raise-cli/prd.md
+    file: governance/prd.md
     section: "RF-05"
     content: "The system MUST generate..."
   - id: principle-governance-as-code
@@ -649,7 +649,7 @@ Artefacto de nivel **solución** que documenta la justificación de negocio para
 - Riesgos y mitigaciones
 - Recomendación (Go/No-Go)
 
-**Ubicación:** `governance/solution/business_case.md`
+**Ubicación:** `governance/business_case.md`
 **Kata:** `solution/discovery`
 
 ### Solution Vision [ACTUALIZADO v2.4]
@@ -665,7 +665,7 @@ Artefacto de nivel **solución** que define QUÉ ES el sistema. Responde: "¿Qu�
 - Quality attributes y security level
 - Integraciones
 
-**Ubicación:** `governance/solution/vision.md`
+**Ubicación:** `governance/vision.md`
 **Kata:** `solution/vision`
 **Deriva:** Governance (guardrails del sistema)
 

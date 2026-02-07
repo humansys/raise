@@ -59,8 +59,8 @@ SOLUTION LEVEL:
 
 **Inputs requeridos:**
 - `framework/reference/constitution.md` (RaiSE principles)
-- `governance/solution/vision.md` (system identity, stack, architecture)
-- `governance/solution/guardrails.md` (MUST/SHOULD rules)
+- `governance/vision.md` (system identity, stack, architecture)
+- `governance/guardrails.md` (MUST/SHOULD rules)
 
 **Outputs:**
 - `CLAUDE.md` — Project context for Claude Code

@@ -115,9 +115,9 @@ class TestExtractAllGuardrails:
     """Tests for extracting all guardrails from standard location."""
 
     def test_extract_from_standard_location(self, tmp_path: Path) -> None:
-        """Extract from governance/solution/guardrails.md."""
+        """Extract from governance/guardrails.md."""
         # Create directory structure
-        gov_dir = tmp_path / "governance" / "solution"
+        gov_dir = tmp_path / "governance"
         gov_dir.mkdir(parents=True)
 
         guardrails_content = dedent("""
@@ -153,8 +153,8 @@ class TestIntegrationWithRealGuardrails:
         return Path(__file__).parent.parent.parent.parent
 
     def test_extract_real_guardrails(self, project_root: Path) -> None:
-        """Extract from actual governance/solution/guardrails.md."""
-        guardrails_file = project_root / "governance" / "solution" / "guardrails.md"
+        """Extract from actual governance/guardrails.md."""
+        guardrails_file = project_root / "governance" / "guardrails.md"
         if not guardrails_file.exists():
             pytest.skip("Guardrails file not found")
 

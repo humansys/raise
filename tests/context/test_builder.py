@@ -683,7 +683,7 @@ class TestLoadWork:
         mock_epic = Concept(
             id="E11",
             type=ConceptType.EPIC,
-            file="governance/projects/raise-cli/backlog.md",
+            file="governance/backlog.md",
             section="E11: Unified Context",
             lines=(50, 60),
             content="Unified context architecture epic",
@@ -1008,7 +1008,7 @@ class TestInferRelationships:
             id="E11",
             type="epic",
             content="Unified Context",
-            source_file="governance/projects/raise-cli/backlog.md",
+            source_file="governance/backlog.md",
             created="2026-02-03",
             metadata={},
         )

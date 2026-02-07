@@ -30,7 +30,7 @@ def extract_outcomes(
 
     Examples:
         >>> from pathlib import Path
-        >>> vision = Path("governance/solution/vision.md")
+        >>> vision = Path("governance/vision.md")
         >>> outcomes = extract_outcomes(vision)
         >>> len(outcomes)
         7

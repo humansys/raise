@@ -4,7 +4,7 @@
 > **Fecha**: [YYYY-MM-DD]
 > **Autor**: [Nombre]
 > **Versión**: 1.0.0
-> **PRD Referencia**: `governance/projects/{project}/prd.md`
+> **PRD Referencia**: `governance/prd.md`
 
 ---
 
@@ -189,9 +189,9 @@
 
 | Fuente | Artefacto | Relación |
 |--------|-----------|----------|
-| PRD | `governance/projects/{project}/prd.md` | Input principal |
-| Solution Vision | `governance/solution/vision.md` | Contexto de sistema |
-| Tech Design | `governance/projects/{project}/design.md` | Output (siguiente) |
+| PRD | `governance/prd.md` | Input principal |
+| Solution Vision | `governance/vision.md` | Contexto de sistema |
+| Tech Design | `governance/design.md` | Output (siguiente) |
 
 ---
 

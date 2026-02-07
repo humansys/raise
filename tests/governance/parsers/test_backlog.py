@@ -85,9 +85,7 @@ def tmp_backlog_file(tmp_path: Path) -> Path:
         """
     )
 
-    backlog_file = (
-        tmp_path / "governance" / "projects" / "test-project" / "backlog.md"
-    )
+    backlog_file = tmp_path / "governance" / "backlog.md"
     backlog_file.parent.mkdir(parents=True, exist_ok=True)
     backlog_file.write_text(backlog_content)
 
@@ -100,7 +98,7 @@ class TestExtractProject:
     def test_extract_project_id(self, tmp_backlog_file: Path) -> None:
         """Should extract project with correct ID."""
         project = extract_project(
-            tmp_backlog_file, tmp_backlog_file.parent.parent.parent.parent
+            tmp_backlog_file, tmp_backlog_file.parent.parent
         )
 
         assert project is not None
@@ -167,14 +165,15 @@ class TestExtractProject:
             | E1 | Test | ✅ Complete | — | — |
             """
         )
-        backlog_file = tmp_path / "governance" / "projects" / "fallback-proj" / "backlog.md"
+        backlog_file = tmp_path / "governance" / "backlog.md"
         backlog_file.parent.mkdir(parents=True, exist_ok=True)
         backlog_file.write_text(backlog_content)
 
         project = extract_project(backlog_file)
 
         assert project is not None
-        assert project.metadata["name"] == "fallback-proj"
+        # Fallback extracts from parent dir name when no H1 header
+        assert project.metadata["name"] == "governance"
 
     def test_content_includes_current_epic(self, tmp_backlog_file: Path) -> None:
         """Should include current epic in content summary."""
@@ -185,11 +184,11 @@ class TestExtractProject:
 
     def test_relative_file_path(self, tmp_backlog_file: Path) -> None:
         """Should calculate correct relative file path."""
-        project_root = tmp_backlog_file.parent.parent.parent.parent
+        project_root = tmp_backlog_file.parent.parent
         project = extract_project(tmp_backlog_file, project_root)
 
         assert project is not None
-        assert project.file == "governance/projects/test-project/backlog.md"
+        assert project.file == "governance/backlog.md"
 
 
 class TestExtractEpics:
@@ -290,11 +289,11 @@ class TestExtractEpics:
 
     def test_relative_file_path(self, tmp_backlog_file: Path) -> None:
         """Should calculate correct relative file path."""
-        project_root = tmp_backlog_file.parent.parent.parent.parent
+        project_root = tmp_backlog_file.parent.parent
         epics = extract_epics(tmp_backlog_file, project_root)
 
         for epic in epics:
-            assert epic.file == "governance/projects/test-project/backlog.md"
+            assert epic.file == "governance/backlog.md"
 
 
 class TestIntegrationWithRealBacklog:
@@ -302,7 +301,7 @@ class TestIntegrationWithRealBacklog:
 
     def test_extract_project_from_real_backlog(self) -> None:
         """Should extract project from real raise-cli backlog."""
-        backlog_path = Path("governance/projects/raise-cli/backlog.md")
+        backlog_path = Path("governance/backlog.md")
 
         if not backlog_path.exists():
             pytest.skip("Real backlog file not found")
@@ -317,7 +316,7 @@ class TestIntegrationWithRealBacklog:
 
     def test_extract_epics_from_real_backlog(self) -> None:
         """Should extract all epics from real raise-cli backlog."""
-        backlog_path = Path("governance/projects/raise-cli/backlog.md")
+        backlog_path = Path("governance/backlog.md")
 
         if not backlog_path.exists():
             pytest.skip("Real backlog file not found")
