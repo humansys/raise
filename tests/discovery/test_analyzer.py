@@ -19,8 +19,8 @@ from raise_cli.discovery.analyzer import (
     BASE_CLASS_CATEGORIES,
     DEFAULT_CATEGORY_MAP,
     NAME_CATEGORY_OVERRIDES,
-    AnalyzedComponent,
     AnalysisResult,
+    AnalyzedComponent,
     ConfidenceResult,
     ConfidenceSignals,
     analyze,
@@ -32,7 +32,6 @@ from raise_cli.discovery.analyzer import (
     match_path_category,
 )
 from raise_cli.discovery.scanner import ScanResult, Symbol
-
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
@@ -89,9 +88,9 @@ class TestConfidenceResult:
 
     def test_score_bounds(self) -> None:
         """Score must be 0-100."""
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             ConfidenceResult(score=-1, tier="low", signals=ConfidenceSignals())
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             ConfidenceResult(score=101, tier="low", signals=ConfidenceSignals())
 
 
@@ -385,7 +384,7 @@ class TestComputeConfidence:
             name="get_x",
             signature="def get_x() -> int",
         )
-        result = compute_confidence(sym, "service")
+        compute_confidence(sym, "service")
         # 30 + 10 (long doc) + 10 (type) + 20 (path) + 5 (name) = 75 → actually high
         # Need to find combo that gives exactly medium
         # Without type: 30 + 10 + 20 + 5 = 65 → medium
