@@ -572,3 +572,67 @@ class TestInitBootstrap:
         content = canonical.read_text()
         assert "# Rai Memory" in content
         assert "RaiSE Framework Process" in content
+
+
+class TestInitSkillScaffolding:
+    """Tests for skill scaffolding integration in raise init."""
+
+    def test_init_creates_skill_files(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should scaffold onboarding skills to .claude/skills/."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        skills_dir = greenfield_project / ".claude" / "skills"
+        assert (skills_dir / "session-start" / "SKILL.md").exists()
+        assert (skills_dir / "discover-start" / "SKILL.md").exists()
+        assert (skills_dir / "discover-scan" / "SKILL.md").exists()
+        assert (skills_dir / "discover-validate" / "SKILL.md").exists()
+        assert (skills_dir / "discover-complete" / "SKILL.md").exists()
+
+    def test_init_does_not_overwrite_existing_skills(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Re-running init should not overwrite existing skill files."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        # First init
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        # Modify a skill
+        skill_path = (
+            greenfield_project / ".claude" / "skills" / "session-start" / "SKILL.md"
+        )
+        skill_path.write_text("# Custom skill")
+
+        # Second init
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        assert skill_path.read_text() == "# Custom skill"
+
+    def test_shu_output_includes_skills_info(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Shu users should see skills scaffolding in output."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        assert "skills" in result.output.lower()
