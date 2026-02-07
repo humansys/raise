@@ -242,8 +242,13 @@ def get_claude_memory_path(project_root: Path) -> Path:
         >>> get_claude_memory_path(Path("/home/user/Code/my-project"))
         PosixPath('/home/user/.claude/projects/-home-user-Code-my-project/memory/MEMORY.md')
     """
-    # Claude Code convention: replace / with - , prepend -
+    # Claude Code convention: replace path separators with -, prepend -
+    # Must handle both Unix (/) and Windows (\) separators
     path_str = str(project_root)
+    # Normalize Windows backslashes to forward slashes
+    path_str = path_str.replace("\\", "/")
+    # Remove drive letter colon on Windows (C:/Users -> C/Users)
+    path_str = path_str.replace(":", "")
     encoded = path_str.replace("/", "-")
     return Path.home() / ".claude" / "projects" / encoded / "memory" / "MEMORY.md"
 
