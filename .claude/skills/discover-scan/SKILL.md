@@ -96,52 +96,68 @@ uv run raise discover scan src/raise_cli --language python --output json
 
 > **If you can't continue:** Scan fails → Check path exists and language is supported.
 
-### Step 3: Group Symbols by Module
+### Step 3: Run Analysis
 
-Organize extracted symbols by their source file for better synthesis context:
+Run the deterministic analyzer on the scan output to compute confidence scores, auto-categorize components, fold methods into parent classes, and group by module:
 
-```
-Module: src/raise_cli/discovery/scanner.py
-  - Symbol (class, line 44)
-  - ScanResult (class, line 77)
-  - extract_python_symbols (function, line 121)
-  - scan_directory (function, line 450)
+```bash
+uv run raise discover analyze --input {scan_output_json} --output human
 ```
 
-**Rationale:** Rai can synthesize better descriptions when seeing related symbols together.
+Or pipe directly:
+```bash
+uv run raise discover scan {root_dir} --language {language} --output json | uv run raise discover analyze --output human
+```
 
-**Verification:** Symbols grouped by file.
+**This produces:**
+- Confidence scores for each component (high/medium/low tiers)
+- Auto-categorization from path conventions and naming patterns
+- Hierarchical folding (methods grouped under parent classes)
+- Module grouping (for parallel AI synthesis batches)
+- `work/discovery/analysis.json` — the primary artifact for `/discover-validate`
 
-### Step 4: Synthesize Descriptions
+**Review the summary output:**
+- High-confidence components can be auto-validated (no AI synthesis needed)
+- Medium-confidence components need AI synthesis in module batches
+- Low-confidence components need individual human review
 
-For each symbol, synthesize:
-- **purpose**: 1-2 sentence description of what it does
-- **category**: Classification for organization
-- **depends_on**: Key dependencies from signature/docstring
+**Verification:** `work/discovery/analysis.json` exists with components and module_groups.
 
-**Synthesis approach per symbol:**
+> **If you can't continue:** Analysis fails → Check scan output is valid JSON.
+
+### Step 4: Synthesize Descriptions (Medium/Low Confidence Only)
+
+**High-confidence components** (score >= 70): Use `auto_purpose` and `auto_category` from the analyzer — no AI synthesis needed.
+
+**Medium and low-confidence components**: Synthesize descriptions using the module groups from the analysis. Process each module group as a batch:
+
+For each module group in `analysis.json`:
+1. Read all components in that module
+2. Synthesize purpose and category for components that lack good auto_purpose
+
+**Synthesis approach per component:**
 
 Given:
 ```
 name: {name}
-kind: {kind} (class/function/method)
+kind: {kind} (class/function)
 signature: {signature}
-docstring: {docstring}
+docstring: {docstring}  # may be None for low-confidence
 file: {file}
+auto_category: {category}  # from analyzer
+auto_purpose: {purpose}  # from docstring first sentence, may be empty
 ```
 
 Synthesize:
 1. **Purpose** — What does it do? Why does it exist? (1-2 sentences, focus on reuse value)
-2. **Category** — One of: `service`, `model`, `utility`, `handler`, `parser`, `builder`, `schema`, `command`, `test`
-3. **Dependencies** — Key types/classes it depends on (from signature, imports visible in docstring)
+2. **Category** — Verify or correct the auto_category
+3. **Dependencies** — Key types/classes it depends on (from signature)
 
 **Quality criteria:**
 - Purpose is actionable (describes what, not how)
 - Purpose highlights reuse value
 - Category matches the symbol's role
 - Dependencies are specific, not generic (`BaseModel`, not `pydantic`)
-
-**Skip internal symbols:** Symbols starting with `_` (single underscore) should be marked with `internal: true` and minimal description.
 
 ### Step 5: Generate Component IDs
 
@@ -241,7 +257,9 @@ Run `/discover-validate` to review and approve component descriptions.
 
 ## Output
 
-- **Artifact:** `work/discovery/components-draft.yaml`
+- **Artifacts:**
+  - `work/discovery/analysis.json` — Deterministic analysis with confidence scores and module groups
+  - `work/discovery/components-draft.yaml` — Draft components with synthesized descriptions
 - **Telemetry:** `skill_event` via Stop hook
 - **Next:** `/discover-validate`
 
