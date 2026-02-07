@@ -21,8 +21,9 @@ import typer
 from rich.console import Console
 
 from raise_cli.cli.error_handler import cli_error
-from raise_cli.discovery.scanner import Language, scan_directory
+from raise_cli.discovery.scanner import Language, ScanResult, scan_directory
 from raise_cli.output.formatters.discover import (
+    format_analyze_result,
     format_build_result,
     format_drift_result,
     format_scan_result,
@@ -136,6 +137,142 @@ def scan_command(
     )
 
     format_scan_result(result, path, output, language=lang)
+
+
+@discover_app.command("analyze")
+def analyze_command(
+    input_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--input",
+            "-i",
+            help="Path to scan result JSON (reads stdin if not provided)",
+        ),
+    ] = None,
+    output: Annotated[
+        str,
+        typer.Option(
+            "--output",
+            "-o",
+            help="Output format: human, json, or summary",
+        ),
+    ] = "human",
+    category_map_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--category-map",
+            "-c",
+            help="YAML file with custom path-to-category mappings",
+        ),
+    ] = None,
+) -> None:
+    """Analyze scan results with confidence scoring and module grouping.
+
+    Takes raw scan output (from `raise discover scan --output json`) and
+    produces an analysis with confidence scores, auto-categorization,
+    hierarchical folding, and module grouping for parallel AI synthesis.
+
+    All analysis is deterministic — no AI inference required.
+
+    Examples:
+        # Analyze from file
+        raise discover analyze --input scan-result.json
+
+        # Pipe from scan
+        raise discover scan src/ -l python -o json | raise discover analyze
+
+        # JSON output
+        raise discover analyze --input scan-result.json --output json
+
+        # Summary only
+        raise discover analyze --input scan-result.json --output summary
+    """
+    import sys
+
+    from raise_cli.discovery.analyzer import analyze
+
+    # Load scan result JSON
+    scan_json: str = ""
+    if input_file:
+        if not input_file.exists():
+            cli_error(
+                f"Input file not found: {input_file}",
+                hint="Run 'raise discover scan --output json' first",
+                exit_code=4,
+            )
+        scan_json = input_file.read_text(encoding="utf-8")
+    else:
+        # Read from stdin
+        if sys.stdin.isatty():
+            cli_error(
+                "No input provided",
+                hint="Pipe from scan: raise discover scan -o json | raise discover analyze\n"
+                "Or use --input: raise discover analyze --input scan-result.json",
+                exit_code=7,
+            )
+        scan_json = sys.stdin.read()
+
+    # Parse scan result
+    scan_result = ScanResult(symbols=[], files_scanned=0, errors=[])
+    try:
+        scan_data: dict[str, Any] = json.loads(scan_json)
+        scan_result = ScanResult(
+            symbols=[],
+            files_scanned=scan_data.get("files_scanned", 0),
+            errors=scan_data.get("errors", []),
+        )
+        # Parse symbols from JSON
+        from raise_cli.discovery.scanner import Symbol
+
+        for sym_data in scan_data.get("symbols", []):
+            scan_result.symbols.append(Symbol.model_validate(sym_data))
+    except (json.JSONDecodeError, KeyError, ValueError) as e:
+        cli_error(
+            f"Invalid scan result JSON: {e}",
+            hint="Input must be JSON from 'raise discover scan --output json'",
+            exit_code=7,
+        )
+
+    # Load custom category map if provided
+    category_map: dict[str, str] | None = None
+    if category_map_file:
+        if not category_map_file.exists():
+            cli_error(
+                f"Category map file not found: {category_map_file}",
+                exit_code=4,
+            )
+        try:
+            import yaml
+
+            category_map = yaml.safe_load(
+                category_map_file.read_text(encoding="utf-8")
+            )
+        except ImportError:
+            cli_error(
+                "PyYAML required for --category-map",
+                hint="Install with: pip install pyyaml",
+                exit_code=6,
+            )
+        except Exception as e:
+            cli_error(f"Error reading category map: {e}", exit_code=7)
+
+    # Run analysis
+    result = analyze(scan_result, category_map=category_map)
+
+    # Save analysis.json
+    output_dir = Path("work/discovery")
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / "analysis.json"
+    output_path.write_text(
+        json.dumps(result.model_dump(), indent=2, default=str),
+        encoding="utf-8",
+    )
+
+    # Format and print
+    format_analyze_result(result, output)
+
+    if output != "json":
+        console.print(f"\n[dim]Saved: {output_path}[/dim]")
 
 
 @discover_app.command("build")
