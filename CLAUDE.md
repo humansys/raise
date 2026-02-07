@@ -249,9 +249,12 @@ raise-commons/
 │   ├── reference/    # Constitution, glossary
 │   └── concepts/     # Core concepts
 │
-├── governance/       # Project governance
-│   ├── solution/     # Solution-level (business case, vision, guardrails)
-│   └── projects/     # Project-level artifacts
+├── governance/       # Project governance (flat)
+│   ├── vision.md     # Solution-level
+│   ├── guardrails.md # Solution-level
+│   ├── business_case.md # Solution-level
+│   ├── prd.md        # Project-level
+│   └── ...           # All artifacts at root level
 │
 ├── work/             # Active work
 │   ├── epics/        # Epic and story specs
@@ -278,8 +281,8 @@ raise-commons/
 | Priority | Document | Purpose |
 |----------|----------|---------|
 | 1 | `framework/reference/constitution.md` | Immutable principles |
-| 2 | `governance/solution/vision.md` | System identity and direction |
-| 3 | `governance/solution/guardrails.md` | Code standards |
+| 2 | `governance/vision.md` | System identity and direction |
+| 3 | `governance/guardrails.md` | Code standards |
 | 4 | `framework/reference/glossary.md` | Canonical terminology |
 | 5 | `dev/decisions/framework/*.md` | Architecture decisions (ADRs) |
 
@@ -408,9 +411,9 @@ Cycle: **Detect → Stop → Correct → Continue**
 | Artifact | Location |
 |----------|----------|
 | Constitution | `framework/reference/constitution.md` |
-| Solution Vision | `governance/solution/vision.md` |
-| Guardrails | `governance/solution/guardrails.md` |
-| Business Case | `governance/solution/business_case.md` |
+| Solution Vision | `governance/vision.md` |
+| Guardrails | `governance/guardrails.md` |
+| Business Case | `governance/business_case.md` |
 | Glossary | `framework/reference/glossary.md` |
 | Rai's Identity | `.raise/rai/identity/core.md` |
 | Rai's Perspective | `.raise/rai/identity/perspective.md` |

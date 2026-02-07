@@ -14,8 +14,8 @@ RaiSE is a reliability framework for AI-assisted software engineering. These gua
 
 | Fuente | Artefacto |
 |--------|-----------|
-| Business Case | `governance/solution/business_case.md` |
-| Solution Vision | `governance/solution/vision.md` |
+| Business Case | `governance/business_case.md` |
+| Solution Vision | `governance/vision.md` |
 
 ---
 

@@ -31,7 +31,7 @@ RaiSE organizes artifacts in a three-level hierarchy:
 
 **Scope:** The entire system or product
 
-**Location:** `governance/solution/`
+**Location:** `governance/`
 
 **Artifacts:**
 | Artifact | Purpose |
@@ -45,7 +45,7 @@ RaiSE organizes artifacts in a three-level hierarchy:
 
 **Scope:** A specific initiative, epic, or milestone
 
-**Location:** `governance/projects/{name}/`
+**Location:** `governance/`
 
 **Artifacts:**
 | Artifact | Purpose |
@@ -82,7 +82,7 @@ Promoted via gates       Not yet validated
 
 **Promotion flow:**
 ```
-work/projects/{name}/    governance/projects/{name}/
+work/stories/{name}/     governance/
        draft.md      ──[gate]──→      approved.md
 ```
 
@@ -132,13 +132,13 @@ The `governance/index.yaml` manifest tracks all approved artifacts:
 
 ```yaml
 artifacts:
-  - path: solution/vision.md
+  - path: vision.md
     type: vision
     level: solution
     status: approved
     approved_date: 2026-01-15
 
-  - path: projects/auth/design.md
+  - path: design.md
     type: design
     level: project
     status: approved

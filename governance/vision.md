@@ -497,7 +497,7 @@ Our first team: junior developers learning RaiSE with Rai.
 
 | Source | Artifact |
 |--------|----------|
-| Business Case | `governance/solution/business_case.md` |
+| Business Case | `governance/business_case.md` |
 | Rai as Entity | `dev/decisions/adr-013-rai-as-entity.md` |
 | Identity Core | `dev/decisions/adr-014-identity-core-structure.md` |
 | Memory Infrastructure | `dev/decisions/adr-015-memory-infrastructure.md` |

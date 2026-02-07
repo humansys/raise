@@ -122,8 +122,8 @@
   - `.extract_all() -> list[Concept]` - Extract from all standard locations
   - `.extract_with_result() -> ExtractionResult` - Extract with metadata
 - **Standard Locations:**
-  - `governance/projects/*/prd.md` (requirements)
-  - `governance/solution/vision.md` (outcomes)
+  - `governance/prd.md` (requirements)
+  - `governance/vision.md` (outcomes)
   - `framework/reference/constitution.md` (principles)
 - **Features:**
   - Automatic concept type inference from file path

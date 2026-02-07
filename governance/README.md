@@ -1,6 +1,6 @@
 # Governance Directory
 
-> Authoritative artifacts that govern this solution
+> Authoritative artifacts that govern this project
 
 ---
 
@@ -8,30 +8,31 @@
 
 This directory contains **curated, approved artifacts** that have passed validation gates. It is the single source of truth for:
 
-- Solution-level decisions and vision
-- Project-level approved designs
+- Product vision and strategy
+- Code standards and guardrails
+- Requirements and technical design
 - Accepted ADRs (Architecture Decision Records)
-- Shared context (glossary, constitution)
 
 ## Structure
 
 ```
 governance/
 ├── index.yaml          # Manifest of all artifacts (for agents)
-├── solution/           # Solution-level (endures across projects)
-│   ├── vision.md       # What this solution IS
-│   ├── business_case.md # Why it exists
-│   └── guardrails.md   # Constraints and rules
-├── projects/           # Project-level (time-bound initiatives)
-│   └── {project-name}/
-│       ├── vision.md   # Project approach
-│       └── design.md   # Technical design
+├── vision.md           # What this product IS
+├── business_case.md    # Why it exists
+├── guardrails.md       # Code quality standards
+├── guardrails-stack.md # Stack best practices
+├── prd.md              # Product requirements
+├── design.md           # Technical architecture
+├── backlog.md          # Epics and roadmap
 ├── context/            # Shared wisdom
-│   ├── glossary.md     # Canonical terminology
-│   └── constitution.md # Core principles
 └── decisions/          # Accepted ADRs
     └── adr-*.md
 ```
+
+All governance artifacts live at the root level. When multiple projects
+are needed (enterprise), add a `projects/` subdirectory — root-level
+artifacts automatically become shared across projects.
 
 ## The Index
 
@@ -52,9 +53,6 @@ work/                              governance/
 ─────                              ───────────
 work/proposals/adr-011.md    →     governance/decisions/adr-011.md
      (draft)                            (accepted)
-
-work/projects/foo/vision.md  →     governance/projects/foo/vision.md
-     (draft)                            (approved)
 ```
 
 The gate determines promotion. When a gate passes, use the governance-sync skill to promote.

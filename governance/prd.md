@@ -364,9 +364,9 @@ raise/
 
 | Source | Artifact |
 |--------|----------|
-| Solution Vision | `governance/solution/vision.md` |
-| Business Case | `governance/solution/business_case.md` |
-| Guardrails | `governance/solution/guardrails.md` |
+| Solution Vision | `governance/vision.md` |
+| Business Case | `governance/business_case.md` |
+| Guardrails | `governance/guardrails.md` |
 | CLAUDE.md | `CLAUDE.md` |
 | Skills Ecosystem Research | `work/research/outputs/skills-ecosystem-analysis.md` |
 
