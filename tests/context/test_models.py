@@ -66,6 +66,26 @@ class TestConceptNode:
         assert node.type == "story"
         assert node.metadata["epic"] == "E11"
 
+    def test_create_module_node(self) -> None:
+        """Test creating a module node for architecture knowledge."""
+        node = ConceptNode(
+            id="mod-discovery",
+            type="module",
+            content="Codebase analysis — scanning, confidence scoring, validation",
+            source_file="governance/architecture/modules/discovery.md",
+            created="2026-02-08",
+            metadata={
+                "purpose": "Code scanning and analysis",
+                "depends_on": ["core", "schemas"],
+                "depended_by": ["cli", "context"],
+                "components": 42,
+            },
+        )
+        assert node.id == "mod-discovery"
+        assert node.type == "module"
+        assert node.metadata["depends_on"] == ["core", "schemas"]
+        assert node.metadata["components"] == 42
+
     def test_all_node_types_valid(self) -> None:
         """Test that all node types can be created."""
         node_types = [
@@ -78,6 +98,7 @@ class TestConceptNode:
             ("E11", "epic"),
             ("F11.1", "story"),
             ("/test", "skill"),
+            ("mod-core", "module"),
         ]
         for node_id, node_type in node_types:
             node = ConceptNode(
@@ -140,6 +161,18 @@ class TestConceptEdge:
         assert edge.weight == 1.0  # default
         assert edge.metadata == {}  # default
 
+    def test_create_depends_on_edge(self) -> None:
+        """Test creating a depends_on edge between modules."""
+        edge = ConceptEdge(
+            source="mod-discovery",
+            target="mod-core",
+            type="depends_on",
+            weight=1.0,
+        )
+        assert edge.source == "mod-discovery"
+        assert edge.target == "mod-core"
+        assert edge.type == "depends_on"
+
     def test_all_edge_types_valid(self) -> None:
         """Test that all edge types can be created."""
         edge_types = [
@@ -150,6 +183,7 @@ class TestConceptEdge:
             "implements",
             "part_of",
             "related_to",
+            "depends_on",
         ]
         for edge_type in edge_types:
             edge = ConceptEdge(
