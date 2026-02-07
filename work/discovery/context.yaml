@@ -13,4 +13,6 @@ project:
     - src/raise_cli/__init__.py
   detected_at: "2026-02-04T18:30:00Z"
 
-status: initialized
+status: complete
+completed_at: "2026-02-07T21:59:00Z"
+component_count: 309
