@@ -21,9 +21,11 @@ from __future__ import annotations
 
 from typing import Literal
 
+from pathlib import PurePosixPath
+
 from pydantic import BaseModel, Field
 
-from raise_cli.discovery.scanner import Symbol
+from raise_cli.discovery.scanner import ScanResult, Symbol
 
 # ── Type aliases ──────────────────────────────────────────────────────────
 
@@ -283,3 +285,283 @@ def compute_confidence(
         tier = "low"
 
     return ConfidenceResult(score=score, tier=tier, signals=signals)
+
+
+def extract_first_sentence(docstring: str | None) -> str:
+    """Extract the first sentence from a docstring.
+
+    Args:
+        docstring: Raw docstring text, or None.
+
+    Returns:
+        First sentence (up to first period), or first line if no period.
+        Empty string if docstring is None or empty.
+    """
+    if not docstring:
+        return ""
+    text = docstring.strip()
+    if not text:
+        return ""
+    # Take first line
+    first_line = text.split("\n")[0].strip()
+    # If it contains a period, take up to and including the first period
+    dot_idx = first_line.find(".")
+    if dot_idx >= 0:
+        return first_line[: dot_idx + 1]
+    return first_line
+
+
+def determine_category(
+    name: str,
+    kind: str,
+    path_category: str | None,
+    base_class: str | None = None,
+) -> str:
+    """Determine component category using priority chain.
+
+    Priority: name override → base class → path convention → "other".
+
+    Args:
+        name: Symbol name.
+        kind: Symbol kind (class, function, etc.).
+        path_category: Category from match_path_category(), or None.
+        base_class: Known base class from confidence signals, or None.
+
+    Returns:
+        Category string.
+    """
+    # Priority 1: Name-based overrides
+    for suffix, category in NAME_CATEGORY_OVERRIDES.items():
+        if suffix == "test_" and name.startswith("test_"):
+            return category
+        if suffix == "Test" and kind == "class" and name.startswith("Test"):
+            return category
+        if suffix not in ("test_", "Test") and name.endswith(suffix):
+            return category
+
+    # Priority 2: Base class
+    if base_class and base_class in BASE_CLASS_CATEGORIES:
+        return BASE_CLASS_CATEGORIES[base_class]
+
+    # Priority 3: Path convention
+    if path_category:
+        return path_category
+
+    return "other"
+
+
+def _file_to_module(file_path: str) -> str:
+    """Convert a file path to a Python module path.
+
+    Strips 'src/' prefix and '.py' suffix, converts '/' to '.'.
+
+    Args:
+        file_path: Relative file path (e.g., "src/raise_cli/discovery/scanner.py").
+
+    Returns:
+        Dotted module path (e.g., "raise_cli.discovery.scanner").
+    """
+    p = PurePosixPath(file_path)
+    # Strip src/ prefix if present
+    parts = list(p.parts)
+    if parts and parts[0] == "src":
+        parts = parts[1:]
+    # Remove .py extension from last part
+    if parts:
+        stem = PurePosixPath(parts[-1]).stem
+        parts[-1] = stem
+    return ".".join(parts)
+
+
+def _file_stem(file_path: str) -> str:
+    """Extract the file stem from a path.
+
+    Args:
+        file_path: Relative file path.
+
+    Returns:
+        File stem (e.g., "scanner" from "src/discovery/scanner.py").
+    """
+    return PurePosixPath(file_path).stem
+
+
+def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
+    """Fold methods into their parent classes.
+
+    Classes become single units with a methods list.
+    Standalone functions and modules remain individual units.
+    Methods with missing parent classes are dropped.
+
+    Args:
+        symbols: List of Symbol objects to organize.
+
+    Returns:
+        List of AnalyzedComponent units with methods folded into classes.
+    """
+    class_symbols: dict[str, Symbol] = {}
+    class_methods: dict[str, list[Symbol]] = {}
+
+    for s in symbols:
+        if s.kind == "class":
+            class_symbols[s.name] = s
+            class_methods.setdefault(s.name, [])
+        elif s.kind == "method" and s.parent:
+            class_methods.setdefault(s.parent, []).append(s)
+
+    units: list[AnalyzedComponent] = []
+
+    # Create class units (with methods folded in)
+    for class_name, class_sym in class_symbols.items():
+        methods = class_methods.get(class_name, [])
+        comp_id = f"comp-{_file_stem(class_sym.file)}-{class_name}"
+        units.append(
+            AnalyzedComponent(
+                id=comp_id,
+                name=class_name,
+                kind="class",
+                file=class_sym.file,
+                line=class_sym.line,
+                signature=class_sym.signature,
+                module=_file_to_module(class_sym.file),
+                confidence=ConfidenceResult(
+                    score=0, tier="low", signals=ConfidenceSignals()
+                ),
+                auto_category="other",
+                auto_purpose="",
+                internal=class_name.startswith("_"),
+                methods=[m.name for m in methods],
+                docstring=class_sym.docstring,
+            )
+        )
+
+    # Add standalone functions and modules (skip methods — they're folded)
+    for s in symbols:
+        if s.kind in ("function", "module"):
+            comp_id = f"comp-{_file_stem(s.file)}-{s.name}"
+            units.append(
+                AnalyzedComponent(
+                    id=comp_id,
+                    name=s.name,
+                    kind=s.kind,
+                    file=s.file,
+                    line=s.line,
+                    signature=s.signature,
+                    module=_file_to_module(s.file),
+                    confidence=ConfidenceResult(
+                        score=0, tier="low", signals=ConfidenceSignals()
+                    ),
+                    auto_category="other",
+                    auto_purpose="",
+                    internal=s.name.startswith("_"),
+                    methods=[],
+                    docstring=s.docstring,
+                )
+            )
+
+    return units
+
+
+def _build_hierarchy_with_symbols(
+    symbols: list[Symbol],
+) -> tuple[list[AnalyzedComponent], dict[str, Symbol]]:
+    """Build hierarchy and return a map of component ID → original Symbol.
+
+    Used internally by analyze() to preserve original Symbol objects
+    for type-safe confidence scoring.
+    """
+    units = build_hierarchy(symbols)
+    # Build a lookup from symbol name+file to original Symbol
+    sym_lookup: dict[tuple[str, str], Symbol] = {}
+    for s in symbols:
+        sym_lookup[(s.name, s.file)] = s
+
+    symbol_map: dict[str, Symbol] = {}
+    for unit in units:
+        original = sym_lookup.get((unit.name, unit.file))
+        if original:
+            symbol_map[unit.id] = original
+        else:
+            # Fallback: create a minimal Symbol (shouldn't happen normally)
+            symbol_map[unit.id] = Symbol(
+                name=unit.name,
+                kind="class",
+                file=unit.file,
+                line=unit.line,
+                signature=unit.signature,
+                docstring=unit.docstring,
+            )
+    return units, symbol_map
+
+
+def group_by_module(components: list[AnalyzedComponent]) -> dict[str, list[str]]:
+    """Group component IDs by their source module file.
+
+    Each module group becomes a batch for parallel AI synthesis.
+
+    Args:
+        components: List of analyzed components.
+
+    Returns:
+        Dict mapping file path to list of component IDs.
+    """
+    groups: dict[str, list[str]] = {}
+    for comp in components:
+        groups.setdefault(comp.file, []).append(comp.id)
+    return groups
+
+
+def analyze(
+    scan_result: ScanResult,
+    category_map: dict[str, str] | None = None,
+) -> AnalysisResult:
+    """Run the full deterministic analysis pipeline.
+
+    Pipeline: filter internal → build hierarchy → score confidence →
+    categorize → group by module.
+
+    Args:
+        scan_result: Raw scan output from raise discover scan.
+        category_map: Optional custom path-to-category mapping.
+
+    Returns:
+        AnalysisResult with scored, categorized, module-grouped components.
+    """
+    all_symbols = scan_result.symbols
+    public = [s for s in all_symbols if not s.name.startswith("_")]
+    internal = [s for s in all_symbols if s.name.startswith("_")]
+
+    # Build hierarchy (fold methods into classes)
+    # Returns (units, symbol_map) so we can reuse original Symbols for scoring
+    units, symbol_map = _build_hierarchy_with_symbols(public)
+
+    # Score confidence + categorize + extract purpose
+    for unit in units:
+        path_category = match_path_category(unit.file, category_map)
+        original_sym = symbol_map[unit.id]
+        conf = compute_confidence(original_sym, path_category)
+        unit.confidence = conf
+        unit.auto_category = determine_category(
+            unit.name, unit.kind, path_category, conf.signals.known_base_class
+        )
+        unit.auto_purpose = extract_first_sentence(unit.docstring)
+
+    # Aggregate statistics
+    tier_counts: dict[str, int] = {"high": 0, "medium": 0, "low": 0}
+    cat_counts: dict[str, int] = {}
+    for unit in units:
+        tier_counts[unit.confidence.tier] += 1
+        cat_counts[unit.auto_category] = cat_counts.get(unit.auto_category, 0) + 1
+
+    return AnalysisResult(
+        scan_summary={
+            "files_scanned": scan_result.files_scanned,
+            "total_symbols": len(all_symbols),
+            "public_symbols": len(public),
+            "internal_symbols": len(internal),
+            "errors": scan_result.errors,
+        },
+        confidence_distribution=tier_counts,
+        categories=cat_counts,
+        components=units,
+        module_groups=group_by_module(units),
+    )

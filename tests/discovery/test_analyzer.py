@@ -4,6 +4,11 @@ Tests cover:
 - Confidence scoring (all 6 signals, boundary scores, tier assignment)
 - Path-to-category matching (default paths, custom map, no match)
 - Pydantic model validation
+- Hierarchy building (method folding, orphan methods, standalone functions)
+- Category determination (path → name override → base class → default)
+- First sentence extraction from docstrings
+- Module grouping for parallel AI batches
+- Full analyze() pipeline integration
 """
 
 from __future__ import annotations
@@ -18,10 +23,15 @@ from raise_cli.discovery.analyzer import (
     AnalysisResult,
     ConfidenceResult,
     ConfidenceSignals,
+    analyze,
+    build_hierarchy,
     compute_confidence,
+    determine_category,
+    extract_first_sentence,
+    group_by_module,
     match_path_category,
 )
-from raise_cli.discovery.scanner import Symbol
+from raise_cli.discovery.scanner import ScanResult, Symbol
 
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
@@ -450,3 +460,344 @@ class TestConstants:
         expected = ["BaseModel", "Exception", "BaseSettings", "TypedDict"]
         for key in expected:
             assert key in BASE_CLASS_CATEGORIES, f"Missing key: {key}"
+
+
+# ── build_hierarchy Tests ─────────────────────────────────────────────────
+
+
+class TestBuildHierarchy:
+    """Tests for method folding into parent classes."""
+
+    def test_class_with_methods_folds_to_one_unit(self) -> None:
+        """A class + 5 methods → 1 unit with methods list."""
+        symbols = [
+            _symbol(name="MyClass", kind="class", file="src/svc.py", signature="class MyClass"),
+            _symbol(name="method_a", kind="method", file="src/svc.py", parent="MyClass"),
+            _symbol(name="method_b", kind="method", file="src/svc.py", parent="MyClass"),
+            _symbol(name="method_c", kind="method", file="src/svc.py", parent="MyClass"),
+            _symbol(name="method_d", kind="method", file="src/svc.py", parent="MyClass"),
+            _symbol(name="method_e", kind="method", file="src/svc.py", parent="MyClass"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].name == "MyClass"
+        assert units[0].kind == "class"
+        assert sorted(units[0].methods) == [
+            "method_a", "method_b", "method_c", "method_d", "method_e",
+        ]
+
+    def test_standalone_function_stays_individual(self) -> None:
+        """Standalone functions are individual units."""
+        symbols = [
+            _symbol(name="helper", kind="function", file="src/utils.py"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].name == "helper"
+        assert units[0].kind == "function"
+        assert units[0].methods == []
+
+    def test_module_stays_individual(self) -> None:
+        """Module symbols are individual units."""
+        symbols = [
+            _symbol(name="utils", kind="module", file="src/utils.py", signature="module utils"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].kind == "module"
+
+    def test_orphan_method_without_parent_class(self) -> None:
+        """Method whose parent class is not in symbols gets dropped."""
+        symbols = [
+            _symbol(name="orphan_method", kind="method", file="src/svc.py", parent="MissingClass"),
+        ]
+        units = build_hierarchy(symbols)
+        # Orphan methods are not included as standalone units
+        assert len(units) == 0
+
+    def test_mixed_scenario(self) -> None:
+        """Class with methods + standalone function + module."""
+        symbols = [
+            _symbol(name="Config", kind="class", file="src/config.py", signature="class Config(BaseModel)"),
+            _symbol(name="validate", kind="method", file="src/config.py", parent="Config"),
+            _symbol(name="load_config", kind="function", file="src/config.py", signature="def load_config() -> Config"),
+            _symbol(name="config", kind="module", file="src/config.py", signature="module config"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 3  # class, function, module
+        names = {u.name for u in units}
+        assert names == {"Config", "load_config", "config"}
+        # Config should have validate folded in
+        config_unit = next(u for u in units if u.name == "Config")
+        assert config_unit.methods == ["validate"]
+
+    def test_class_without_methods(self) -> None:
+        """Class with no methods is still a unit."""
+        symbols = [
+            _symbol(name="Empty", kind="class", file="src/empty.py"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].methods == []
+
+    def test_component_id_format(self) -> None:
+        """Component IDs use file stem and name."""
+        symbols = [
+            _symbol(name="Scanner", kind="class", file="src/discovery/scanner.py"),
+        ]
+        units = build_hierarchy(symbols)
+        assert units[0].id == "comp-scanner-Scanner"
+
+    def test_module_path_computed(self) -> None:
+        """Module path is derived from file path."""
+        symbols = [
+            _symbol(name="Scanner", kind="class", file="src/raise_cli/discovery/scanner.py"),
+        ]
+        units = build_hierarchy(symbols)
+        assert units[0].module == "raise_cli.discovery.scanner"
+
+    def test_internal_flag_set(self) -> None:
+        """Components with underscore-prefixed names are internal."""
+        symbols = [
+            _symbol(name="_helper", kind="function", file="src/utils.py"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].internal is True
+
+    def test_public_flag_set(self) -> None:
+        """Components without underscore prefix are not internal."""
+        symbols = [
+            _symbol(name="helper", kind="function", file="src/utils.py"),
+        ]
+        units = build_hierarchy(symbols)
+        assert units[0].internal is False
+
+
+# ── determine_category Tests ─────────────────────────────────────────────
+
+
+class TestDetermineCategory:
+    """Tests for category determination priority chain."""
+
+    def test_name_override_error(self) -> None:
+        """Class ending with 'Error' → exception (name override wins)."""
+        assert determine_category("MyError", "class", "service") == "exception"
+
+    def test_name_override_warning(self) -> None:
+        assert determine_category("DeprecationWarning", "class", "service") == "exception"
+
+    def test_name_override_settings(self) -> None:
+        assert determine_category("AppSettings", "class", "model") == "config"
+
+    def test_name_override_config(self) -> None:
+        assert determine_category("DatabaseConfig", "class", "service") == "config"
+
+    def test_name_override_test_class(self) -> None:
+        assert determine_category("TestScanner", "class", "service") == "test"
+
+    def test_name_override_test_function(self) -> None:
+        assert determine_category("test_scan_directory", "function", "service") == "test"
+
+    def test_base_class_override(self) -> None:
+        """Base class category wins over path when no name override."""
+        assert determine_category("Symbol", "class", "service", "BaseModel") == "model"
+
+    def test_path_category_fallback(self) -> None:
+        """Path category used when no name or base class override."""
+        assert determine_category("Scanner", "class", "service") == "service"
+
+    def test_no_match_returns_other(self) -> None:
+        """No match returns 'other'."""
+        assert determine_category("Something", "class", None) == "other"
+
+    def test_name_override_has_highest_priority(self) -> None:
+        """Name override > base class > path."""
+        # "Error" name override should win even with BaseModel base class
+        assert determine_category("ValidationError", "class", "model", "Exception") == "exception"
+
+
+# ── extract_first_sentence Tests ─────────────────────────────────────────
+
+
+class TestExtractFirstSentence:
+    """Tests for first sentence extraction from docstrings."""
+
+    def test_none_returns_empty(self) -> None:
+        assert extract_first_sentence(None) == ""
+
+    def test_empty_returns_empty(self) -> None:
+        assert extract_first_sentence("") == ""
+
+    def test_single_sentence(self) -> None:
+        assert extract_first_sentence("A simple docstring.") == "A simple docstring."
+
+    def test_multi_sentence(self) -> None:
+        assert extract_first_sentence("First sentence. Second sentence.") == "First sentence."
+
+    def test_multiline(self) -> None:
+        doc = "First line.\n\nSecond paragraph with details."
+        assert extract_first_sentence(doc) == "First line."
+
+    def test_no_period(self) -> None:
+        """Docstring without period returns the whole first line."""
+        assert extract_first_sentence("No period here") == "No period here"
+
+    def test_multiline_no_period_first_line(self) -> None:
+        doc = "First line\n\nSecond paragraph."
+        assert extract_first_sentence(doc) == "First line"
+
+    def test_whitespace_stripped(self) -> None:
+        assert extract_first_sentence("  Padded sentence.  ") == "Padded sentence."
+
+
+# ── group_by_module Tests ─────────────────────────────────────────────────
+
+
+class TestGroupByModule:
+    """Tests for module grouping."""
+
+    def test_single_module(self) -> None:
+        components = [
+            _analyzed_component("comp-a", file="src/scanner.py"),
+            _analyzed_component("comp-b", file="src/scanner.py"),
+        ]
+        groups = group_by_module(components)
+        assert groups == {"src/scanner.py": ["comp-a", "comp-b"]}
+
+    def test_multiple_modules(self) -> None:
+        components = [
+            _analyzed_component("comp-a", file="src/scanner.py"),
+            _analyzed_component("comp-b", file="src/drift.py"),
+            _analyzed_component("comp-c", file="src/scanner.py"),
+        ]
+        groups = group_by_module(components)
+        assert groups == {
+            "src/scanner.py": ["comp-a", "comp-c"],
+            "src/drift.py": ["comp-b"],
+        }
+
+    def test_empty_list(self) -> None:
+        assert group_by_module([]) == {}
+
+
+# ── analyze() Integration Tests ──────────────────────────────────────────
+
+
+class TestAnalyze:
+    """Integration tests for the full analyze pipeline."""
+
+    def test_basic_pipeline(self) -> None:
+        """ScanResult → AnalysisResult with correct structure."""
+        scan = ScanResult(
+            symbols=[
+                _symbol(
+                    name="Scanner",
+                    kind="class",
+                    file="src/discovery/scanner.py",
+                    signature="class Scanner(BaseModel)",
+                    docstring="Scans codebases for symbols and extracts them.",
+                ),
+                _symbol(
+                    name="scan",
+                    kind="method",
+                    file="src/discovery/scanner.py",
+                    signature="def scan(self, path: str) -> list",
+                    docstring="Scan a directory.",
+                    parent="Scanner",
+                ),
+                _symbol(
+                    name="detect_language",
+                    kind="function",
+                    file="src/discovery/scanner.py",
+                    signature="def detect_language(path: str) -> str",
+                    docstring="Detect the programming language.",
+                ),
+                _symbol(
+                    name="_internal_helper",
+                    kind="function",
+                    file="src/discovery/scanner.py",
+                ),
+            ],
+            files_scanned=1,
+            errors=[],
+        )
+        result = analyze(scan)
+
+        # Internal symbols filtered out
+        assert all(not c.internal for c in result.components)
+        # Method folded into class
+        assert len(result.components) == 2  # Scanner (with scan folded), detect_language
+        scanner = next(c for c in result.components if c.name == "Scanner")
+        assert scanner.methods == ["scan"]
+        # Confidence tiers populated
+        assert sum(result.confidence_distribution.values()) == 2
+        # Module groups
+        assert "src/discovery/scanner.py" in result.module_groups
+        # Scan summary
+        assert result.scan_summary["total_symbols"] == 4
+        assert result.scan_summary["public_symbols"] == 3
+        assert result.scan_summary["internal_symbols"] == 1
+
+    def test_empty_scan(self) -> None:
+        scan = ScanResult(symbols=[], files_scanned=0, errors=[])
+        result = analyze(scan)
+        assert result.components == []
+        assert result.module_groups == {}
+        assert result.confidence_distribution == {"high": 0, "medium": 0, "low": 0}
+
+    def test_custom_category_map(self) -> None:
+        scan = ScanResult(
+            symbols=[
+                _symbol(
+                    name="Widget",
+                    kind="class",
+                    file="src/widgets/button.py",
+                    signature="class Widget",
+                    docstring="A UI widget.",
+                ),
+            ],
+            files_scanned=1,
+            errors=[],
+        )
+        result = analyze(scan, category_map={"widgets/": "widget"})
+        widget = result.components[0]
+        assert widget.auto_category == "widget"
+
+    def test_deterministic(self) -> None:
+        """Same scan input → same analysis output."""
+        scan = ScanResult(
+            symbols=[
+                _symbol(name="Foo", kind="class", file="src/foo.py", docstring="Foo class."),
+                _symbol(name="bar", kind="function", file="src/foo.py", docstring="Bar func."),
+            ],
+            files_scanned=1,
+            errors=[],
+        )
+        r1 = analyze(scan)
+        r2 = analyze(scan)
+        assert r1.confidence_distribution == r2.confidence_distribution
+        assert r1.module_groups == r2.module_groups
+        assert len(r1.components) == len(r2.components)
+
+
+# ── Test Helpers ──────────────────────────────────────────────────────────
+
+
+def _analyzed_component(
+    id: str = "comp-test",
+    file: str = "src/test.py",
+) -> AnalyzedComponent:
+    """Create a minimal AnalyzedComponent for testing."""
+    return AnalyzedComponent(
+        id=id,
+        name="test",
+        kind="class",
+        file=file,
+        line=1,
+        signature="class test",
+        module="test",
+        confidence=ConfidenceResult(score=50, tier="medium", signals=ConfidenceSignals()),
+        auto_category="service",
+        auto_purpose="Test.",
+    )
