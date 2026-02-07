@@ -67,6 +67,7 @@ class UnifiedGraphBuilder:
         all_nodes.extend(self.load_work())
         all_nodes.extend(self.load_skills())
         all_nodes.extend(self.load_components())
+        all_nodes.extend(self.load_architecture())
 
         # Add nodes to graph
         for node in all_nodes:
@@ -281,6 +282,94 @@ class UnifiedGraphBuilder:
             return nodes
         except (json.JSONDecodeError, KeyError):
             return []
+
+    def load_architecture(self) -> list[ConceptNode]:
+        """Load module nodes from architecture documentation.
+
+        Parses YAML frontmatter from governance/architecture/modules/*.md
+        and creates module ConceptNodes for the unified graph.
+
+        Returns:
+            List of ConceptNode for architecture modules.
+        """
+        modules_dir = (
+            self.project_root / "governance" / "architecture" / "modules"
+        )
+        if not modules_dir.exists():
+            return []
+
+        nodes: list[ConceptNode] = []
+
+        for md_file in sorted(modules_dir.glob("*.md")):
+            node = self._parse_architecture_doc(md_file)
+            if node:
+                nodes.append(node)
+
+        return nodes
+
+    def _parse_architecture_doc(self, file_path: Path) -> ConceptNode | None:
+        """Parse a single architecture module doc's YAML frontmatter.
+
+        Args:
+            file_path: Path to the module markdown file.
+
+        Returns:
+            ConceptNode if valid module frontmatter found, None otherwise.
+        """
+        try:
+            text = file_path.read_text(encoding="utf-8")
+        except OSError:
+            return None
+
+        # Extract YAML frontmatter between --- delimiters
+        if not text.startswith("---"):
+            return None
+
+        end = text.find("---", 3)
+        if end == -1:
+            return None
+
+        frontmatter_text = text[3:end].strip()
+
+        try:
+            import yaml
+
+            frontmatter: dict[str, Any] = yaml.safe_load(frontmatter_text)
+        except Exception:
+            return None
+
+        if not isinstance(frontmatter, dict):
+            return None
+
+        # Only process module-type docs
+        if frontmatter.get("type") != "module":
+            return None
+
+        name = frontmatter.get("name", "")
+        if not name:
+            return None
+
+        # Build relative source path
+        try:
+            source_file = str(file_path.relative_to(self.project_root))
+        except ValueError:
+            source_file = str(file_path)
+
+        # Build metadata from frontmatter fields
+        metadata: dict[str, Any] = {}
+        for key in ("depends_on", "depended_by", "entry_points", "public_api",
+                     "components", "constraints", "status"):
+            if key in frontmatter:
+                metadata[key] = frontmatter[key]
+
+        return ConceptNode(
+            id=f"mod-{name}",
+            type="module",
+            content=frontmatter.get("purpose", ""),
+            source_file=source_file,
+            created=frontmatter.get("last_validated", datetime.now(tz=UTC).isoformat()),
+            metadata=metadata,
+        )
 
     def _get_governance_extractor(self) -> GovernanceExtractor:
         """Get governance extractor instance.
@@ -503,6 +592,7 @@ class UnifiedGraphBuilder:
         edges.extend(self._infer_learned_from(nodes, node_by_id))
         edges.extend(self._infer_part_of(nodes, node_by_id))
         edges.extend(self._infer_skill_edges(nodes, node_by_id))
+        edges.extend(self._infer_depends_on(nodes, node_by_id))
 
         # Infer heuristic edges
         edges.extend(self._infer_keyword_relationships(nodes))
@@ -639,6 +729,45 @@ class UnifiedGraphBuilder:
                             source=node.id,
                             target=next_id,
                             type="related_to",
+                            weight=1.0,
+                        )
+                    )
+
+        return edges
+
+    def _infer_depends_on(
+        self,
+        nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> list[ConceptEdge]:
+        """Infer depends_on edges from module metadata.
+
+        Args:
+            nodes: All concept nodes.
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            List of depends_on edges between modules.
+        """
+        edges: list[ConceptEdge] = []
+
+        for node in nodes:
+            if node.type != "module":
+                continue
+
+            raw_deps: Any = node.metadata.get("depends_on", [])
+            if not isinstance(raw_deps, list):
+                continue
+            deps = cast(list[str], raw_deps)
+
+            for dep_name in deps:
+                target_id = f"mod-{dep_name}"
+                if target_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=node.id,
+                            target=target_id,
+                            type="depends_on",
                             weight=1.0,
                         )
                     )

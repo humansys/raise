@@ -862,6 +862,204 @@ class TestLoadComponents:
         assert nodes == []
 
 
+class TestLoadArchitecture:
+    """Tests for load_architecture method."""
+
+    def test_loads_module_from_yaml_frontmatter(self, tmp_path: Path) -> None:
+        """Should parse YAML frontmatter from architecture module docs."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "discovery.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: discovery
+            purpose: "Codebase analysis and scanning"
+            status: current
+            depends_on: [core, schemas]
+            depended_by: [cli, context]
+            components: 42
+            ---
+
+            ## Purpose
+
+            The discovery module extracts structural knowledge from source code.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "mod-discovery"
+        assert node.type == "module"
+        assert node.content == "Codebase analysis and scanning"
+        assert node.source_file == "governance/architecture/modules/discovery.md"
+        assert node.metadata["depends_on"] == ["core", "schemas"]
+        assert node.metadata["depended_by"] == ["cli", "context"]
+        assert node.metadata["components"] == 42
+
+    def test_loads_multiple_modules(self, tmp_path: Path) -> None:
+        """Should load all module docs from architecture/modules/."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        for name in ["core", "schemas", "discovery"]:
+            (modules_dir / f"{name}.md").write_text(
+                dedent(f"""\
+                ---
+                type: module
+                name: {name}
+                purpose: "{name} module"
+                status: current
+                depends_on: []
+                ---
+
+                ## Purpose
+
+                The {name} module.
+                """)
+            )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert len(nodes) == 3
+        ids = {n.id for n in nodes}
+        assert ids == {"mod-core", "mod-schemas", "mod-discovery"}
+
+    def test_handles_missing_architecture_directory(self, tmp_path: Path) -> None:
+        """Should return empty list if governance/architecture/ doesn't exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert nodes == []
+
+    def test_skips_files_without_module_type(self, tmp_path: Path) -> None:
+        """Should skip files where frontmatter type is not 'module'."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "index.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_index
+            project: raise-cli
+            ---
+
+            # Architecture Index
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert nodes == []
+
+    def test_skips_files_with_invalid_yaml(self, tmp_path: Path) -> None:
+        """Should skip files with unparseable YAML frontmatter."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "broken.md").write_text("No frontmatter here, just text.")
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert nodes == []
+
+    def test_creates_depends_on_edges(self, tmp_path: Path) -> None:
+        """Should create depends_on edges between module nodes."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "discovery.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: discovery
+            purpose: "Code scanning"
+            depends_on: [core, schemas]
+            ---
+
+            ## Purpose
+            Discovery module.
+            """)
+        )
+        (modules_dir / "core.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: core
+            purpose: "Shared utilities"
+            depends_on: []
+            ---
+
+            ## Purpose
+            Core module.
+            """)
+        )
+        (modules_dir / "schemas.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: schemas
+            purpose: "Pydantic models"
+            depends_on: []
+            ---
+
+            ## Purpose
+            Schemas module.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+        edges = builder.infer_relationships(nodes)
+
+        depends_on_edges = [e for e in edges if e.type == "depends_on"]
+        assert len(depends_on_edges) == 2
+
+        # discovery → core and discovery → schemas
+        targets = {e.target for e in depends_on_edges if e.source == "mod-discovery"}
+        assert targets == {"mod-core", "mod-schemas"}
+
+    def test_build_includes_architecture_modules(self, tmp_path: Path) -> None:
+        """Build should include architecture module nodes in graph."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "core.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: core
+            purpose: "Shared utilities"
+            depends_on: []
+            ---
+
+            ## Purpose
+            Core module.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with patch.object(builder, "load_governance", return_value=[]):
+            with patch.object(builder, "load_memory", return_value=[]):
+                with patch.object(builder, "load_work", return_value=[]):
+                    with patch.object(builder, "load_skills", return_value=[]):
+                        with patch.object(builder, "load_components", return_value=[]):
+                            graph = builder.build()
+
+        assert graph.node_count == 1
+        node = graph.get_concept("mod-core")
+        assert node is not None
+        assert node.type == "module"
+
+
 class TestBuild:
     """Tests for build method."""
 
