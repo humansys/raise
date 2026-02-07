@@ -3,7 +3,7 @@ name = "raise-cli"
 version = "2.0.0-alpha.1"
 description = "RaiSE CLI - Reliable AI Software Engineering governance framework"
 authors = [
-    {name = "Emilio Osorio", email = "emilio@humansys.co"}
+    {name = "Emilio Osorio", email = "emilio@humansys.ai"}
 ]
 readme = "README.md"
 license = {text = "MIT"}
@@ -41,11 +41,6 @@ dev = [
     "bandit>=1.7.8",
 ]
 
-[project.urls]
-Homepage = "https://github.com/humansys/raise-commons"
-Documentation = "https://github.com/humansys/raise-commons/framework"
-Repository = "https://github.com/humansys/raise-commons"
-Issues = "https://github.com/humansys/raise-commons/issues"
 
 [project.scripts]
 raise = "raise_cli.cli.main:app"
@@ -56,6 +51,14 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/raise_cli"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src/raise_cli/",
+    "/LICENSE",
+    "/README.md",
+    "/pyproject.toml",
+]
 
 [tool.ruff]
 line-length = 88

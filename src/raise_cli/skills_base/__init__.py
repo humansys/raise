@@ -1,15 +1,17 @@
 """Base skills package for distribution.
 
-This package contains the onboarding skills that ship with raise-cli.
-On `raise init`, these SKILL.md files are copied to the project's
+This package contains the RaiSE skills that ship with raise-cli.
+On `raise init`, skill files are copied to the project's
 `.claude/skills/` directory (Claude Code) or equivalent IDE location.
 
 Contents:
-    session-start/      Session lifecycle skill
-    discover-start/     Codebase discovery initialization
-    discover-scan/      Symbol extraction and synthesis
-    discover-validate/  Human validation of components
-    discover-complete/  Export to graph format
+    Session lifecycle:  session-start, session-close
+    Story lifecycle:    story-start, story-plan, story-design,
+                        story-implement, story-review, story-close
+    Epic lifecycle:     epic-start, epic-plan, epic-design, epic-close
+    Discovery:          discover-start, discover-scan,
+                        discover-validate, discover-complete
+    Tools:              research, debug
 
 Usage:
     from importlib.resources import files
@@ -21,12 +23,30 @@ Usage:
 
 from __future__ import annotations
 
-__version__ = "1.0.0"
+__version__ = "2.0.0"
 
 DISTRIBUTABLE_SKILLS: list[str] = [
+    # Session lifecycle
     "session-start",
+    "session-close",
+    # Story lifecycle
+    "story-start",
+    "story-plan",
+    "story-design",
+    "story-implement",
+    "story-review",
+    "story-close",
+    # Epic lifecycle
+    "epic-start",
+    "epic-plan",
+    "epic-design",
+    "epic-close",
+    # Discovery
     "discover-start",
     "discover-scan",
     "discover-validate",
     "discover-complete",
+    # Tools
+    "research",
+    "debug",
 ]
