@@ -4,7 +4,7 @@
 > **Fecha**: 2026-01-30
 > **Autor**: Claude Opus 4.5 + Emilio Osorio
 > **Versión**: 1.0.0
-> **PRD Referencia**: `governance/projects/raise-cli/prd.md`
+> **PRD Referencia**: `governance/prd.md`
 
 ---
 
@@ -244,11 +244,11 @@ The CLI is **the engine** that makes RaiSE governance deterministic and observab
 
 | Fuente | Artefacto | Relación |
 |--------|-----------|----------|
-| PRD | `governance/projects/raise-cli/prd.md` | Input principal |
-| Solution Vision | `governance/solution/vision.md` | Contexto de sistema |
-| Business Case | `governance/solution/business_case.md` | Justificación de negocio |
+| PRD | `governance/prd.md` | Input principal |
+| Solution Vision | `governance/vision.md` | Contexto de sistema |
+| Business Case | `governance/business_case.md` | Justificación de negocio |
 | Skills Research | `work/research/outputs/skills-ecosystem-analysis.md` | Agent Skills strategy |
-| Tech Design | `governance/projects/raise-cli/design.md` | Output (siguiente) |
+| Tech Design | `governance/design.md` | Output (siguiente) |
 
 ---
 

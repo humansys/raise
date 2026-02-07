@@ -3,7 +3,7 @@
 > **Status**: Draft
 > **Date**: 2026-01-30
 > **Version**: 1.1.0
-> **Related**: `governance/projects/raise-cli/prd.md`, `governance/projects/raise-cli/vision.md`
+> **Related**: `governance/prd.md`, `governance/vision.md`
 > **Research**: `work/research/outputs/python-cli-architecture-analysis.md`
 
 ---
@@ -1008,11 +1008,11 @@ pip install raise-cli
 
 | Source | Artifact | Relationship |
 |--------|----------|--------------|
-| PRD | `governance/projects/raise-cli/prd.md` | Requirements |
-| Vision | `governance/projects/raise-cli/vision.md` | Architecture direction |
-| Solution Vision | `governance/solution/vision.md` | System constraints |
+| PRD | `governance/prd.md` | Requirements |
+| Vision | `governance/vision.md` | Architecture direction |
+| Solution Vision | `governance/vision.md` | System constraints |
 | CLI Research | `work/research/outputs/python-cli-architecture-analysis.md` | Best practices |
-| Backlog | `governance/projects/raise-cli/backlog.md` | Implementation tasks (next) |
+| Backlog | `governance/backlog.md` | Implementation tasks (next) |
 
 ---
 

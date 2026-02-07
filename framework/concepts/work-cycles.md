@@ -47,8 +47,8 @@ RaiSE organizes all work into **five cycles**. Each cycle has a specific purpose
 - `solution/vision` — Technical vision and approach
 
 **Artifacts Produced:**
-- `governance/solution/business_case.md`
-- `governance/solution/vision.md`
+- `governance/business_case.md`
+- `governance/vision.md`
 
 ---
 
@@ -65,9 +65,9 @@ RaiSE organizes all work into **five cycles**. Each cycle has a specific purpose
 - `project/backlog` — Prioritized work items
 
 **Artifacts Produced:**
-- `governance/projects/{name}/prd.md`
-- `governance/projects/{name}/design.md`
-- `governance/projects/{name}/backlog.md`
+- `governance/prd.md`
+- `governance/design.md`
+- `governance/backlog.md`
 
 ---
 
