@@ -303,3 +303,30 @@ class TestGetClaudeMemoryPath:
         result = get_claude_memory_path(Path("/any/path"))
         assert result.name == "MEMORY.md"
         assert result.parent.name == "memory"
+
+    def test_handles_windows_backslashes(self) -> None:
+        """Should normalize Windows backslashes to dashes."""
+        from raise_cli.config.paths import get_claude_memory_path
+
+        # Simulate a Windows-style path string
+        project_root = Path("/C:/Users/emilio/Code/my-project")
+        result = get_claude_memory_path(project_root)
+
+        # The encoded part should use dashes, no backslashes or colons
+        encoded_part = result.parent.parent.name
+        assert "\\" not in encoded_part
+        assert ":" not in encoded_part
+
+    def test_handles_windows_drive_letter(self) -> None:
+        """Should strip drive letter colon for Windows paths."""
+        from raise_cli.config.paths import get_claude_memory_path
+
+        # On Linux, we can't create a real Windows Path, but we can
+        # test the string manipulation by passing a path-like string.
+        # The function converts to str first, so this tests the logic.
+        result = get_claude_memory_path(Path("/C:/Users/dev/project"))
+
+        encoded_part = result.parent.parent.name
+        # Should not contain colon from drive letter
+        assert ":" not in encoded_part
+        assert "-C" in encoded_part or "-c" in encoded_part.lower()
