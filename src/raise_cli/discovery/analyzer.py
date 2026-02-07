@@ -19,9 +19,8 @@ Example:
 
 from __future__ import annotations
 
-from typing import Literal
-
 from pathlib import PurePosixPath
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -260,10 +259,13 @@ def compute_confidence(
             break
 
     # Signal 5: Name follows convention (+5)
-    if symbol.kind == "class" and symbol.name and symbol.name[0].isupper():
-        signals.name_follows_convention = True
-        score += 5
-    elif symbol.kind in ("function", "method") and symbol.name.islower():
+    if (
+        symbol.kind == "class"
+        and symbol.name
+        and symbol.name[0].isupper()
+        or symbol.kind in ("function", "method")
+        and symbol.name.islower()
+    ):
         signals.name_follows_convention = True
         score += 5
 
