@@ -115,6 +115,21 @@ Load the implementation plan and obtain applicable rules context.
 
 > **If you can't continue:** Plan not found → Prerequisite check (Step 0.1) should have caught this.
 
+### Step 1.5: Design Comprehension Check (If Design Exists)
+
+If a design document exists for this story, restate the design intent to the user in 2-3 plain-language sentences before implementing. This catches misinterpretation before it cascades through tasks.
+
+**Present to user:**
+> "Based on the design, I understand we're building [X] that does [Y] by [Z]. Correct?"
+
+**Focus on:** Key concepts, data flow, what's explicitly NOT in scope.
+
+**Why:** One unvalidated assumption can waste an entire task cycle (PAT-167). A 30-second check saves hundreds of tokens.
+
+**Verification:** User confirms understanding or corrects it.
+
+> **If you can't continue:** Misalignment detected → Clarify before proceeding.
+
 ### Step 2: Identify Next Task
 
 Select the next uncompleted task according to plan order.
