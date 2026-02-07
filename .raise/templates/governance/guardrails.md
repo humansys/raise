@@ -3,7 +3,7 @@
 > **Solution**: {nombre de la solución}
 > **Versión**: 1.0.0
 > **Última actualización**: {fecha}
-> **Derivado de**: `governance/solution/vision.md`
+> **Derivado de**: `governance/vision.md`
 
 ---
 
@@ -93,7 +93,7 @@ Cuando un guardrail no puede cumplirse, el proceso es:
 1. Crear propuesta en `work/proposals/`
 2. Incluir rationale del cambio
 3. Obtener aprobación de {rol}
-4. Promover a `governance/solution/guardrails.md`
+4. Promover a `governance/guardrails.md`
 5. Actualizar `governance/index.yaml`
 
 ### Revisión Periódica
@@ -118,10 +118,10 @@ Cuando un guardrail no puede cumplirse, el proceso es:
 - **ADR-009**: Modelo de Gobernanza Continua
 - **ADR-010**: Jerarquía de Tres Niveles
 - **ADR-011**: Modelo de Tres Directorios
-- **Solution Vision**: `governance/solution/vision.md`
+- **Solution Vision**: `governance/vision.md`
 - **RaiSE Constitution**: `framework/reference/constitution.md`
 
 ---
 
 *Generado por: `setup/governance` kata*
-*Output: `governance/solution/guardrails.md`*
+*Output: `governance/guardrails.md`*

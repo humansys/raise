@@ -649,7 +649,7 @@ This skill supports the three-layer memory model:
 - **Epic Close:** `/epic-close` (retrospective after completion)
 - **Calibration Data:** `.raise/rai/memory/calibration.jsonl` (velocity patterns)
 - **Constitution:** `framework/reference/constitution.md` (Lean principles)
-- **Guardrails:** `governance/solution/guardrails.md` (quality standards)
+- **Guardrails:** `governance/guardrails.md` (quality standards)
 
 ## External References
 

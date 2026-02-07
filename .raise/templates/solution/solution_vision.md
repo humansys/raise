@@ -224,8 +224,8 @@
 
 | Fuente | Artefacto | Relación |
 |--------|-----------|----------|
-| Business Case | `governance/solution/business_case.md` | Justifica este sistema |
-| Governance | `governance/solution/` | Deriva de esta vision |
+| Business Case | `governance/business_case.md` | Justifica este sistema |
+| Governance | `governance/` | Deriva de esta vision |
 | ADRs | `dev/decisions/framework/` | Decisiones técnicas |
 
 ---

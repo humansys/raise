@@ -248,7 +248,7 @@ done
 
 ### Step 6: Update Backlog (REQUIRED)
 
-Mark the epic complete in `governance/projects/raise-cli/backlog.md`:
+Mark the epic complete in `governance/backlog.md`:
 
 ```markdown
 ## Epics
@@ -371,5 +371,5 @@ If epic is abandoned (not completed):
 
 - Previous: All feature `/story-close` completions
 - Epic scope: `work/epics/e{N}-{name}/scope.md`
-- Backlog: `governance/projects/raise-cli/backlog.md`
+- Backlog: `governance/backlog.md`
 - Next: `/epic-design` for next epic

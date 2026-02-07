@@ -38,11 +38,11 @@ La Project Vision asegura que el equipo técnico entienda el valor de negocio y 
 - Cuando se necesita alinear negocio y tecnología
 
 **Inputs requeridos:**
-- PRD aprobado (`governance/projects/{project}/prd.md` or `work/projects/{project}/prd.md` if draft)
+- PRD aprobado (`governance/prd.md` or `work/projects/{project}/prd.md` if draft)
 - Contexto técnico (stack actual, restricciones, integraciones)
 
 **Output:**
-- `governance/projects/{project}/vision.md` - Project Vision estructurada (after gate passes)
+- `governance/vision.md` - Project Vision estructurada (after gate passes)
 
 ## Pasos
 
@@ -56,7 +56,7 @@ Cargar el PRD aprobado y recopilar información del contexto técnico: stack act
 
 ### Paso 2: Instanciar Template Project Vision
 
-Crear el archivo `work/projects/{project}/vision.md` basado en el template de Project Vision. After gate passes, promote to `governance/projects/{project}/vision.md`.
+Crear el archivo `work/vision.md` basado en el template de Project Vision. After gate passes, promote to `governance/vision.md`.
 
 **Verificación:** Existe el archivo con todas las secciones del template presentes.
 
@@ -160,8 +160,8 @@ Presentar la Project Vision para validación:
 ## Output
 
 - **Artefacto:** Project Vision
-- **Ubicación (draft):** `work/projects/{project}/vision.md`
-- **Ubicación (approved):** `governance/projects/{project}/vision.md`
+- **Ubicación (draft):** `work/vision.md`
+- **Ubicación (approved):** `governance/vision.md`
 - **Gate:** `gates/gate-vision.md`
 - **Siguiente kata:** `project/design`
 
