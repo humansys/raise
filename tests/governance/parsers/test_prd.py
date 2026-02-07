@@ -43,7 +43,7 @@ def tmp_prd_file(tmp_path: Path) -> Path:
         """
     )
 
-    prd_file = tmp_path / "governance" / "projects" / "test" / "prd.md"
+    prd_file = tmp_path / "governance" / "prd.md"
     prd_file.parent.mkdir(parents=True, exist_ok=True)
     prd_file.write_text(prd_content)
 
@@ -104,11 +104,11 @@ class TestExtractRequirements:
 
     def test_relative_file_path(self, tmp_prd_file: Path) -> None:
         """Should calculate correct relative file path."""
-        project_root = tmp_prd_file.parent.parent.parent.parent
+        project_root = tmp_prd_file.parent.parent
         requirements = extract_requirements(tmp_prd_file, project_root)
 
         req = requirements[0]
-        assert req.file == "governance/projects/test/prd.md"
+        assert req.file == "governance/prd.md"
 
     def test_empty_file(self, tmp_path: Path) -> None:
         """Should return empty list for empty file."""
@@ -205,7 +205,7 @@ class TestExtractRequirements:
     def test_integration_with_real_prd(self) -> None:
         """Should extract requirements from real raise-cli PRD."""
         # This test verifies integration with actual project files
-        prd_path = Path("governance/projects/raise-cli/prd.md")
+        prd_path = Path("governance/prd.md")
 
         if not prd_path.exists():
             pytest.skip("Real PRD file not found")

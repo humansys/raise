@@ -302,7 +302,7 @@ class Handler{i}:
     def test_detect_generates_guardrails_file(
         self, python_project: Path, mock_home: Path
     ) -> None:
-        """--detect generates governance/solution/guardrails.md."""
+        """--detect generates governance/guardrails.md."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
@@ -313,7 +313,7 @@ class Handler{i}:
             )
 
         assert result.exit_code == 0
-        guardrails_path = python_project / "governance" / "solution" / "guardrails.md"
+        guardrails_path = python_project / "governance" / "guardrails.md"
         assert guardrails_path.exists(), f"Expected {guardrails_path} to exist"
 
     def test_detect_guardrails_contain_conventions(
@@ -330,7 +330,7 @@ class Handler{i}:
             )
 
         assert result.exit_code == 0
-        guardrails_path = python_project / "governance" / "solution" / "guardrails.md"
+        guardrails_path = python_project / "governance" / "guardrails.md"
         content = guardrails_path.read_text()
 
         # Should contain style guardrails
@@ -395,7 +395,7 @@ class Handler{i}:
             )
 
         assert result.exit_code == 0
-        guardrails_path = python_project / "governance" / "solution" / "guardrails.md"
+        guardrails_path = python_project / "governance" / "guardrails.md"
         content = guardrails_path.read_text()
         assert "my-api" in content
 

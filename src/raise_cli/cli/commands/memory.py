@@ -567,8 +567,8 @@ def extract(
     """Extract concepts from governance markdown files.
 
     If no file path is provided, extracts from all standard governance locations:
-    - governance/projects/*/prd.md (requirements)
-    - governance/solution/vision.md (outcomes)
+    - governance/prd.md (requirements)
+    - governance/vision.md (outcomes)
     - framework/reference/constitution.md (principles)
 
     Examples:
@@ -576,7 +576,7 @@ def extract(
         $ raise memory extract
 
         # Extract from specific file
-        $ raise memory extract governance/projects/raise-cli/prd.md
+        $ raise memory extract governance/prd.md
 
         # Output as JSON
         $ raise memory extract --format json

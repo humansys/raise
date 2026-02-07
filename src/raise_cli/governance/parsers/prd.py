@@ -23,14 +23,14 @@ def extract_requirements(
     Args:
         file_path: Path to PRD markdown file.
         project_root: Project root for relative path calculation.
-            If None, uses file_path.parent.parent.parent.
+            If None, uses file_path.parent.parent.
 
     Returns:
         List of Concept objects representing requirements.
 
     Examples:
         >>> from pathlib import Path
-        >>> prd = Path("governance/projects/raise-cli/prd.md")
+        >>> prd = Path("governance/prd.md")
         >>> requirements = extract_requirements(prd)
         >>> len(requirements)
         8
@@ -43,7 +43,7 @@ def extract_requirements(
         return []
 
     if project_root is None:
-        project_root = file_path.parent.parent.parent
+        project_root = file_path.parent.parent
 
     text = file_path.read_text(encoding="utf-8")
     lines = text.split("\n")
