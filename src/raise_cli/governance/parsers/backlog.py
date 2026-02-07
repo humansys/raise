@@ -1,6 +1,6 @@
 """Parser for project backlog files.
 
-Extracts Project and Epic concepts from governance/projects/*/backlog.md files.
+Extracts Project and Epic concepts from governance/backlog.md.
 """
 
 from __future__ import annotations
@@ -115,7 +115,7 @@ def extract_project(
     Args:
         file_path: Path to backlog.md file.
         project_root: Project root for relative path calculation.
-            If None, uses file_path.parent.parent.parent.parent.
+            If None, uses file_path.parent.parent.
 
     Returns:
         Project Concept if successfully parsed, None if file doesn't exist
@@ -123,7 +123,7 @@ def extract_project(
 
     Examples:
         >>> from pathlib import Path
-        >>> backlog = Path("governance/projects/raise-cli/backlog.md")
+        >>> backlog = Path("governance/backlog.md")
         >>> project = extract_project(backlog)
         >>> project.id
         'project-raise-cli'
@@ -134,8 +134,8 @@ def extract_project(
         return None
 
     if project_root is None:
-        # governance/projects/{name}/backlog.md -> project root is 4 levels up
-        project_root = file_path.parent.parent.parent.parent
+        # governance/backlog.md -> project root is 2 levels up
+        project_root = file_path.parent.parent
 
     text = file_path.read_text(encoding="utf-8")
     lines = text.split("\n")
@@ -214,7 +214,7 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
 
     Examples:
         >>> from pathlib import Path
-        >>> backlog = Path("governance/projects/raise-cli/backlog.md")
+        >>> backlog = Path("governance/backlog.md")
         >>> epics = extract_epics(backlog)
         >>> len(epics)
         9
@@ -225,13 +225,18 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
         return []
 
     if project_root is None:
-        project_root = file_path.parent.parent.parent.parent
+        project_root = file_path.parent.parent
 
     text = file_path.read_text(encoding="utf-8")
     lines = text.split("\n")
 
-    # Extract project name for relationship
-    project_name = file_path.parent.name
+    # Extract project name from H1: # Backlog: {name}
+    project_name = file_path.parent.name  # Fallback
+    for line in lines:
+        h1_match = re.match(r"^# Backlog:\s*(.+)$", line)
+        if h1_match:
+            project_name = h1_match.group(1).strip()
+            break
 
     # Calculate relative file path
     try:

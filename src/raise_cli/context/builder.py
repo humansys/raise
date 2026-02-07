@@ -457,10 +457,10 @@ class UnifiedGraphBuilder:
         """
         backlogs: list[Path] = []
 
-        # Check governance/projects/*/backlog.md
-        projects_dir = self.project_root / "governance" / "projects"
-        if projects_dir.exists():
-            backlogs.extend(projects_dir.glob("*/backlog.md"))
+        # Check governance/backlog.md
+        backlog_file = self.project_root / "governance" / "backlog.md"
+        if backlog_file.exists():
+            backlogs.append(backlog_file)
 
         return backlogs
 

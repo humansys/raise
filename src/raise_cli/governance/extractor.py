@@ -37,7 +37,7 @@ class GovernanceExtractor:
         >>> len(concepts) >= 20
         True
         >>> prd_concepts = extractor.extract_from_file(
-        ...     Path("governance/projects/raise-cli/prd.md"),
+        ...     Path("governance/prd.md"),
         ...     ConceptType.REQUIREMENT
         ... )
     """
@@ -67,7 +67,7 @@ class GovernanceExtractor:
 
         Examples:
             >>> extractor = GovernanceExtractor()
-            >>> prd_path = Path("governance/projects/raise-cli/prd.md")
+            >>> prd_path = Path("governance/prd.md")
             >>> concepts = extractor.extract_from_file(prd_path, ConceptType.REQUIREMENT)
         """
         if not file_path.exists():
@@ -93,13 +93,13 @@ class GovernanceExtractor:
         """Extract all concepts from standard governance file locations.
 
         Extracts from:
-        - governance/projects/*/prd.md (requirements)
-        - governance/solution/vision.md (outcomes)
+        - governance/prd.md (requirements)
+        - governance/vision.md (outcomes)
         - framework/reference/constitution.md (principles)
-        - governance/projects/*/backlog.md (epics)
+        - governance/backlog.md (epics)
         - work/epics/*/scope.md (stories)
         - dev/decisions/adr-*.md (decisions)
-        - governance/solution/guardrails.md (guardrails)
+        - governance/guardrails.md (guardrails)
         - framework/reference/glossary.md (terms)
 
         Returns:
@@ -134,8 +134,9 @@ class GovernanceExtractor:
         errors: list[str] = []
         files_processed = 0
 
-        # Extract from PRD files
-        for prd_file in self.project_root.glob("governance/projects/*/prd.md"):
+        # Extract from PRD
+        prd_file = self.project_root / "governance" / "prd.md"
+        if prd_file.exists():
             try:
                 prd_concepts = extract_requirements(prd_file, self.project_root)
                 concepts.extend(prd_concepts)
@@ -144,7 +145,7 @@ class GovernanceExtractor:
                 errors.append(f"Error extracting from {prd_file}: {e}")
 
         # Extract from Vision
-        vision_file = self.project_root / "governance" / "solution" / "vision.md"
+        vision_file = self.project_root / "governance" / "vision.md"
         if vision_file.exists():
             try:
                 vision_concepts = extract_outcomes(vision_file, self.project_root)
@@ -171,9 +172,8 @@ class GovernanceExtractor:
         work_concepts = self._extract_work_concepts()
         concepts.extend(work_concepts)
         # Count backlog and epic scope files as processed
-        backlog_count = len(
-            list(self.project_root.glob("governance/projects/*/backlog.md"))
-        )
+        backlog_file = self.project_root / "governance" / "backlog.md"
+        backlog_count = 1 if backlog_file.exists() else 0
         epic_count = len(list(self.project_root.glob("work/epics/*/scope.md")))
         files_processed += backlog_count + epic_count
 
@@ -191,9 +191,7 @@ class GovernanceExtractor:
             errors.append(f"Error extracting ADRs: {e}")
 
         # Extract Guardrails (E12 F12.2)
-        guardrails_file = (
-            self.project_root / "governance" / "solution" / "guardrails.md"
-        )
+        guardrails_file = self.project_root / "governance" / "guardrails.md"
         if guardrails_file.exists():
             try:
                 guardrail_concepts = extract_all_guardrails(self.project_root)
@@ -223,7 +221,7 @@ class GovernanceExtractor:
         """Extract work tracking concepts (Project, Epic, Story).
 
         Extracts from:
-        - governance/projects/*/backlog.md (Project + Epic index)
+        - governance/backlog.md (Project + Epic index)
         - work/epics/*/scope.md (Epic details + Stories)
 
         Returns:
@@ -231,8 +229,9 @@ class GovernanceExtractor:
         """
         concepts: list[Concept] = []
 
-        # Extract from backlog files
-        for backlog_file in self.project_root.glob("governance/projects/*/backlog.md"):
+        # Extract from backlog
+        backlog_file = self.project_root / "governance" / "backlog.md"
+        if backlog_file.exists():
             try:
                 # Extract Project concept
                 project = extract_project(backlog_file, self.project_root)
