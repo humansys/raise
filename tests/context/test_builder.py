@@ -1047,12 +1047,14 @@ class TestLoadArchitecture:
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
-        with patch.object(builder, "load_governance", return_value=[]):
-            with patch.object(builder, "load_memory", return_value=[]):
-                with patch.object(builder, "load_work", return_value=[]):
-                    with patch.object(builder, "load_skills", return_value=[]):
-                        with patch.object(builder, "load_components", return_value=[]):
-                            graph = builder.build()
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
 
         assert graph.node_count == 1
         node = graph.get_concept("mod-core")
