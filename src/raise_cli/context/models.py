@@ -29,6 +29,7 @@ NodeType = Literal[
     "guardrail",  # GR-* — code standards (E12)
     "term",  # TERM-* — glossary definitions (E12)
     "component",  # comp-* — discovered code components (E13)
+    "module",  # mod-* — architecture module knowledge (discover-describe)
 ]
 
 # Edge types for relationships between concepts
@@ -40,6 +41,7 @@ EdgeType = Literal[
     "implements",  # story → requirement (traceability)
     "part_of",  # story → epic (hierarchy)
     "related_to",  # generic semantic relationship
+    "depends_on",  # module → module (architecture dependency)
 ]
 
 

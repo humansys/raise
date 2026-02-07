@@ -2,17 +2,29 @@
 
 ## Overview
 - **Story:** discover-describe
-- **Story Points:** 8 SP
-- **Size:** L (complex, 6 components)
+- **Story Points:** 5 SP (revised down from 8 — CLI command removed)
+- **Size:** M (4 tasks, skill-driven approach)
 - **Created:** 2026-02-07
+- **Revised:** 2026-02-08 — Removed CLI command + describer module. Architecture docs are AI-synthesized via skill, not templated by CLI. Rationale: deterministic templates produce shallow docs; a new contributor needs real explanations. The CLI stays deterministic where it matters (graph building, querying). Documentation generation is a skill — an AI-assisted activity.
 - **Design:** `work/stories/discover-document/design.md`
 - **Research:** `work/research/architecture-knowledge-layer/`
+
+## Design Deviation
+
+The original design specified a `raise discover describe` CLI command with a `describer.py` module. After review, we determined:
+
+1. **The CLI command adds no meaningful value** — architecture docs are generated infrequently and benefit from AI prose synthesis, not template assembly
+2. **Useful onboarding docs need genuine explanations** — a new developer needs to understand *why* modules exist and *how* they fit, not just see dependency tables
+3. **Inference economy is served better** — the skill reads JSON files directly and synthesizes rich docs, avoiding a CLI intermediary that would produce shallow output
+
+**What stays:** Schema extension (Task 1), graph builder integration (Task 2) — both deterministic, both CLI-useful.
+**What changes:** The `/discover-describe` skill generates docs directly (Task 3), no `describer.py` or CLI command.
 
 ## Tasks
 
 ### Task 1: Extend Graph Schema (module + depends_on)
 
-- **Description:** Add `module` to NodeType and `depends_on` to EdgeType in context/models.py. This is the foundation — everything else builds on the graph being able to represent module-level knowledge.
+- **Description:** Add `module` to NodeType and `depends_on` to EdgeType in context/models.py. This is the foundation — the graph must represent module-level knowledge and inter-module dependencies.
 - **Files:**
   - `src/raise_cli/context/models.py` — Add to Literal types
   - `tests/context/test_models.py` — Test new types are valid
@@ -21,116 +33,78 @@
 - **Size:** XS
 - **Dependencies:** None
 
-### Task 2: Describer Module — Core Generation Logic
+### Task 2: Graph Builder — Architecture Doc Extraction
 
-- **Description:** Create `src/raise_cli/discovery/describer.py` with:
-  - `ModuleDescription` and `DescribeResult` Pydantic models
-  - `detect_modules()` — walk source tree, extract deps from imports, map components
-  - `render_module_doc()` — generate Markdown + YAML frontmatter per module
-  - `render_index()` — generate compact index (<2K tokens)
-  - `merge_with_existing()` — preserve human-authored sections on re-generation
+- **Description:** Extend UnifiedGraphBuilder with `load_architecture()` method that parses `governance/architecture/modules/*.md` YAML frontmatter and creates `module` nodes with `depends_on` edges in the unified graph. Wire into `build()` pipeline.
 - **Files:**
-  - `src/raise_cli/discovery/describer.py` — Create
-  - `tests/discovery/test_describer.py` — Create (>90% coverage)
+  - `src/raise_cli/context/builder.py` — Add `load_architecture()` method
+  - `tests/context/test_builder.py` — Test module nodes and depends_on edges appear in graph
 - **TDD Cycle:**
-  - RED: Test detect_modules returns correct module list from fixture
-  - GREEN: Implement detection from source tree
-  - RED: Test render_module_doc produces valid YAML frontmatter
-  - GREEN: Implement rendering with f-strings
-  - RED: Test merge preserves human sections
-  - GREEN: Implement section-aware merge
-- **Verification:** `pytest tests/discovery/test_describer.py -x -q --cov=src/raise_cli/discovery/describer --cov-fail-under=90`
-- **Size:** L
-- **Dependencies:** Task 1 (needs NodeType for model validation)
-
-### Task 3: CLI Command — `raise discover describe`
-
-- **Description:** Add `describe` subcommand to discover_app in discover.py. Options: `--module`, `--index-only`, `--output-dir`, `--output`. Calls describer module and writes output files.
-- **Files:**
-  - `src/raise_cli/cli/commands/discover.py` — Add describe command
-  - `src/raise_cli/output/formatters/discover.py` — Add format_describe_result
-  - `tests/cli/commands/test_discover.py` — Add describe command tests
-- **TDD Cycle:** RED (test CLI invocation) → GREEN (wire command) → REFACTOR
-- **Verification:** `pytest tests/cli/commands/test_discover.py -x -q -k describe`
-- **Size:** M
-- **Dependencies:** Task 2 (needs describer module)
-
-### Task 4: Graph Builder Integration
-
-- **Description:** Extend UnifiedGraphBuilder to parse `governance/architecture/modules/*.md` YAML frontmatter and create `module` nodes with `depends_on` edges in the unified graph.
-- **Files:**
-  - `src/raise_cli/context/builder.py` — Add architecture doc extraction
-  - `tests/context/test_builder.py` — Test module nodes appear in graph
-- **TDD Cycle:** RED (test graph contains module nodes after build) → GREEN (implement extraction) → REFACTOR
+  - RED: Test graph contains module nodes after build with fixture arch docs
+  - GREEN: Implement YAML frontmatter parsing + node/edge creation
+  - RED: Test depends_on edges are created between modules
+  - GREEN: Wire edge creation from frontmatter `depends_on` field
 - **Verification:** `pytest tests/context/test_builder.py -x -q -k module`
 - **Size:** M
-- **Dependencies:** Task 1 (needs NodeType), Task 2 (needs generated docs to parse)
+- **Dependencies:** Task 1 (needs NodeType/EdgeType)
 
-### Task 5: Dogfood — Generate raise-commons Architecture Docs
+### Task 3: Create `/discover-describe` Skill + Generate Docs
 
-- **Description:** Run `raise discover describe` on our own repo. Validate output: correct modules detected, accurate dependencies, useful content, compact index under 2K tokens. Fix any issues found.
+- **Description:** Create the skill file at `.claude/skills/discover-describe/SKILL.md` that orchestrates architecture doc generation. Then immediately dogfood: run the skill on raise-commons to generate `governance/architecture/` docs. The skill reads `work/discovery/components-validated.json`, analyzes source tree structure and imports, and produces:
+  - `governance/architecture/index.md` — compact index (<2K tokens)
+  - `governance/architecture/modules/*.md` — per-module docs with YAML frontmatter + rich prose
 - **Files:**
+  - `.claude/skills/discover-describe/SKILL.md` — Create
   - `governance/architecture/index.md` — Generated
-  - `governance/architecture/modules/*.md` — Generated (11 files)
+  - `governance/architecture/modules/*.md` — Generated (~11 files)
 - **Verification:**
-  - All 11 modules documented
-  - `wc -w governance/architecture/index.md` approximates <2K tokens
-  - YAML frontmatter parses cleanly: `python -c "import yaml; [yaml.safe_load(open(f)) for f in glob('governance/architecture/modules/*.md')]"` (conceptual)
+  - All modules documented with genuine explanatory prose
+  - YAML frontmatter is valid (type, name, purpose, depends_on, depended_by, components)
+  - Compact index under 2K tokens
+  - A new developer reading the docs would understand module purpose and relationships
+- **Size:** L
+- **Dependencies:** Task 1 (frontmatter uses module type vocabulary)
+
+### Task 4: Integration Verification
+
+- **Description:** End-to-end validation: rebuild graph with architecture docs, verify module nodes and depends_on edges appear, verify queries return module relationships.
+- **Verification:**
   - `raise memory build` succeeds with module nodes in graph
   - `raise memory query "discovery dependencies"` returns module relationships
-- **Size:** M
-- **Dependencies:** Tasks 2, 3, 4
-
-### Task 6: Manual Integration Test
-
-- **Description:** End-to-end validation: run full pipeline, verify docs are accurate and useful, check graph queries work, verify re-generation preserves human edits.
-- **Verification:**
-  - `raise discover describe` completes without error
-  - Generated docs are human-readable and accurate
-  - `raise memory build && raise memory query "module depends_on"` returns edges
-  - Add a custom section to one module doc, re-run describe, verify section preserved
   - All tests pass: `pytest --cov=src --cov-fail-under=90`
   - Linting clean: `ruff check . && ruff format --check .`
+  - Type check clean: `pyright --strict src/`
 - **Size:** S
-- **Dependencies:** Task 5
+- **Dependencies:** Tasks 2, 3
 
 ## Execution Order
 
 ```
 Task 1 (XS) — Schema extension
     ↓
-Task 2 (L) — Describer module (core work)
-    ↓
-Task 3 (M) ──┬── Task 4 (M)   ← parallel after Task 2
+Task 2 (M) ──┬── Task 3 (L)   ← parallel after Task 1
               ↓
-         Task 5 (M) — Dogfood
-              ↓
-         Task 6 (S) — Integration test
+         Task 4 (S) — Integration verification
 ```
 
 1. **Task 1** — Foundation (schema)
-2. **Task 2** — Core logic (biggest task, highest risk)
-3. **Tasks 3 + 4** — Can run in parallel (CLI + graph builder are independent)
-4. **Task 5** — Dogfood validates everything together
-5. **Task 6** — Final integration verification
+2. **Tasks 2 + 3** — Can start in parallel (graph builder + skill/docs are independent)
+3. **Task 4** — Integration validates everything together
 
 ## Risks
 
 | Risk | Mitigation |
 |------|------------|
-| Import dependency extraction is fragile | Use AST or simple regex on `from raise_cli.X import` — our codebase follows conventions |
-| Module detection misses packages | Walk `src/raise_cli/*/` with `__init__.py` — deterministic |
-| Re-generation merge logic is complex | Start simple: replace known sections, append unknown. Iterate if needed. |
-| Schema change breaks existing graphs | PAT-152: rebuild graph after schema change. Include in dogfood step. |
-| Compact index exceeds 2K tokens | Use terse descriptions. Module map table is the core — prose is optional. |
+| Schema change breaks existing graphs | PAT-152: rebuild graph after schema change. Include in Task 4. |
+| AI-generated docs are inaccurate | Dogfood immediately (Task 3); human reviews output before commit |
+| YAML frontmatter format inconsistency | Define schema in skill; validate in graph builder |
+| Compact index exceeds 2K tokens | Module map table is the core — terse purpose descriptions |
 
 ## Duration Tracking
 
 | Task | Size | Actual | Notes |
 |------|------|--------|-------|
 | 1 | XS | -- | |
-| 2 | L | -- | Core logic — biggest risk |
-| 3 | M | -- | |
-| 4 | M | -- | Parallel with 3 |
-| 5 | M | -- | Dogfood — may surface fixes |
-| 6 | S | -- | Final validation |
+| 2 | M | -- | Graph builder integration |
+| 3 | L | -- | Skill + dogfood (core work) |
+| 4 | S | -- | Integration verification |
