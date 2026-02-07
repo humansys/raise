@@ -18,7 +18,7 @@ Verificar que la Project Vision está completa, alinea negocio con técnica, y t
 
 - Después de completar `katas/project/vision.md`
 - Antes de iniciar `katas/project/design.md`
-- El documento debe existir en `work/projects/{project}/vision.md` (draft) or `governance/projects/{project}/vision.md` (approved)
+- El documento debe existir en `work/vision.md` (draft) or `governance/vision.md` (approved)
 
 ---
 
@@ -144,6 +144,6 @@ Verificar aprobaciones:
 
 When this gate passes, promote the artifact:
 ```
-work/projects/{project}/vision.md → governance/projects/{project}/vision.md
+work/vision.md → governance/vision.md
 ```
 Update `governance/index.yaml` with the new approved artifact.

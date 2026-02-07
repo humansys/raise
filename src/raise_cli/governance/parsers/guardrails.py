@@ -141,7 +141,7 @@ def extract_guardrails(
 
     Examples:
         >>> from pathlib import Path
-        >>> guardrails = extract_guardrails(Path("governance/solution/guardrails.md"))
+        >>> guardrails = extract_guardrails(Path("governance/guardrails.md"))
         >>> len(guardrails) > 0
         True
         >>> guardrails[0].type
@@ -151,7 +151,7 @@ def extract_guardrails(
         return []
 
     if project_root is None:
-        project_root = file_path.parent.parent.parent  # governance/solution/ -> root
+        project_root = file_path.parent.parent  # governance/ -> root
 
     content = file_path.read_text(encoding="utf-8")
     concepts: list[Concept] = []
@@ -217,7 +217,7 @@ def extract_guardrails(
 def extract_all_guardrails(project_root: Path | None = None) -> list[Concept]:
     """Extract all guardrails from standard location.
 
-    Looks for governance/solution/guardrails.md.
+    Looks for governance/guardrails.md.
 
     Args:
         project_root: Project root directory.
@@ -234,7 +234,7 @@ def extract_all_guardrails(project_root: Path | None = None) -> list[Concept]:
     if project_root is None:
         project_root = Path.cwd()
 
-    guardrails_file = project_root / "governance" / "solution" / "guardrails.md"
+    guardrails_file = project_root / "governance" / "guardrails.md"
 
     if guardrails_file.exists():
         return extract_guardrails(guardrails_file, project_root)

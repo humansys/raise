@@ -23,7 +23,7 @@ def tmp_governance_structure(tmp_path: Path) -> Path:
     project_root.mkdir()
 
     # Create PRD
-    prd_file = project_root / "governance" / "projects" / "test-project" / "prd.md"
+    prd_file = project_root / "governance" / "prd.md"
     prd_file.parent.mkdir(parents=True)
     prd_file.write_text(
         dedent(
@@ -38,8 +38,7 @@ def tmp_governance_structure(tmp_path: Path) -> Path:
     )
 
     # Create Vision
-    vision_file = project_root / "governance" / "solution" / "vision.md"
-    vision_file.parent.mkdir(parents=True)
+    vision_file = project_root / "governance" / "vision.md"
     vision_file.write_text(
         dedent(
             """
@@ -81,7 +80,7 @@ class TestGovernanceExtractor:
     def test_extract_from_file_with_explicit_type(self, tmp_governance_structure: Path) -> None:
         """Should extract from file with explicitly provided concept type."""
         extractor = GovernanceExtractor(tmp_governance_structure)
-        prd_file = tmp_governance_structure / "governance" / "projects" / "test-project" / "prd.md"
+        prd_file = tmp_governance_structure / "governance" / "prd.md"
 
         concepts = extractor.extract_from_file(prd_file, ConceptType.REQUIREMENT)
 
@@ -91,7 +90,7 @@ class TestGovernanceExtractor:
     def test_extract_from_file_with_inferred_type(self, tmp_governance_structure: Path) -> None:
         """Should infer concept type from file path."""
         extractor = GovernanceExtractor(tmp_governance_structure)
-        prd_file = tmp_governance_structure / "governance" / "projects" / "test-project" / "prd.md"
+        prd_file = tmp_governance_structure / "governance" / "prd.md"
 
         concepts = extractor.extract_from_file(prd_file)
 
@@ -110,7 +109,7 @@ class TestGovernanceExtractor:
     def test_extract_unsupported_concept_type(self, tmp_governance_structure: Path) -> None:
         """Should return empty list for unsupported concept type."""
         extractor = GovernanceExtractor(tmp_governance_structure)
-        prd_file = tmp_governance_structure / "governance" / "projects" / "test-project" / "prd.md"
+        prd_file = tmp_governance_structure / "governance" / "prd.md"
 
         # PATTERN and PRACTICE are not yet supported
         concepts = extractor.extract_from_file(prd_file, ConceptType.PATTERN)
@@ -195,8 +194,8 @@ class TestGovernanceExtractor:
         extractor = GovernanceExtractor()
 
         # Check if real files exist
-        prd_exists = any(Path.cwd().glob("governance/projects/*/prd.md"))
-        vision_exists = (Path.cwd() / "governance" / "solution" / "vision.md").exists()
+        prd_exists = (Path.cwd() / "governance" / "prd.md").exists()
+        vision_exists = (Path.cwd() / "governance" / "vision.md").exists()
         constitution_exists = (
             Path.cwd() / "framework" / "reference" / "constitution.md"
         ).exists()

@@ -60,12 +60,12 @@ PROJECT LEVEL:
 | **Brownfield** | Codebase existente + Deuda técnica | Extraer patrones, identificar brechas, formalizar |
 
 **Inputs requeridos:**
-- Greenfield: `governance/solution/vision.md` (nivel solución)
+- Greenfield: `governance/vision.md` (nivel solución)
 - Brownfield: Acceso al repositorio
 - Ambos: Decisiones del equipo sobre estándares
 
 **Output:**
-- `governance/solution/guardrails.md` — Documento de política y guardrails
+- `governance/guardrails.md` — Documento de política y guardrails
 - `governance/guardrails/*.mdc` — Guardrails individuales (si se separan)
 
 ## Pasos
@@ -84,8 +84,8 @@ Identificar si es greenfield o brownfield:
 ### Paso 2: Cargar Contexto Base
 
 **Greenfield:**
-- Cargar `governance/solution/vision.md` (Solution Vision - nivel sistema)
-- Cargar `governance/solution/business_case.md` si existe (Business Case)
+- Cargar `governance/vision.md` (Solution Vision - nivel sistema)
+- Cargar `governance/business_case.md` si existe (Business Case)
 - Cargar principios RaiSE desde constitution
 - Identificar restricciones técnicas declaradas en Solution Vision:
   - Stack tecnológico
@@ -101,7 +101,7 @@ Identificar si es greenfield o brownfield:
 
 **Verificación:** Contexto cargado y documentado.
 
-> **Si no puedes continuar:** Solution Vision no encontrada → Ejecutar `solution/vision` primero. Documentos no encontrados → Verificar `governance/solution/` directory.
+> **Si no puedes continuar:** Solution Vision no encontrada → Ejecutar `solution/vision` primero. Documentos no encontrados → Verificar `governance/` directory.
 
 ### Paso 3: Derivar Guardrails de Solution Vision
 
@@ -200,7 +200,7 @@ on_failure:
 
 ### Paso 6: Crear Documento de Política
 
-Crear `governance/solution/guardrails.md`:
+Crear `governance/guardrails.md`:
 
 ```markdown
 # Guardrails: [Nombre del Sistema]
@@ -211,8 +211,8 @@ Crear `governance/solution/guardrails.md`:
 ## Trazabilidad
 | Fuente | Artefacto |
 |--------|-----------|
-| Business Case | `governance/solution/business_case.md` |
-| Solution Vision | `governance/solution/vision.md` |
+| Business Case | `governance/business_case.md` |
+| Solution Vision | `governance/vision.md` |
 
 ## Principios Rectores
 [Principios derivados de Solution Vision que guían estas decisiones]
@@ -267,9 +267,9 @@ El kata puede resumirse desde cualquier punto.
 ## Output
 
 - **Artefactos:**
-  - `governance/solution/guardrails.md` — Documento de política y guardrails
+  - `governance/guardrails.md` — Documento de política y guardrails
   - `governance/guardrails/*.mdc` — Guardrails individuales (optional, for complex systems)
-- **Ubicación:** `governance/solution/` y `governance/guardrails/`
+- **Ubicación:** `governance/` y `governance/guardrails/`
 - **Gate:** N/A (validación integrada en Paso 7)
 - **Siguiente kata:** `setup/rules`
 

@@ -64,12 +64,12 @@ Read dev/decisions/adr-XXX-<name>.md
 
 | Impact Type | Affected Document | Update Type |
 |-------------|------------------|-------------|
-| **Scope changed** | `governance/projects/*/backlog.md` | Epic/story scope, SP estimates |
+| **Scope changed** | `governance/backlog.md` | Epic/story scope, SP estimates |
 | **Terminology changed** | `framework/reference/glossary.md` | Add/deprecate/update terms |
 | **Ontology validated** | `work/tracking/ontology-backlog.md` | Close items, update status |
-| **Outcomes changed** | `governance/solution/vision.md` | Update key outcomes |
+| **Outcomes changed** | `governance/vision.md` | Update key outcomes |
 | **Principles affected** | `framework/reference/constitution.md` | Rarely - escalate if needed |
-| **Roadmap shifted** | `governance/solution/roadmap.md` | Timeline, milestones |
+| **Roadmap shifted** | `governance/roadmap.md` | Timeline, milestones |
 
 **Create checklist:**
 ```
@@ -88,11 +88,11 @@ Documents to update:
 
 ### Step 3: Update Backlog
 
-**File:** `governance/projects/raise-cli/backlog.md`
+**File:** `governance/backlog.md`
 
 **Read current state:**
 ```
-Read governance/projects/raise-cli/backlog.md
+Read governance/backlog.md
 ```
 
 **For each scope change:**
@@ -207,7 +207,7 @@ Read work/tracking/ontology-backlog.md
 
 ### Step 6: Update Vision (if needed)
 
-**File:** `governance/solution/vision.md`
+**File:** `governance/vision.md`
 
 **Only update if:**
 - Key outcomes changed
@@ -216,7 +216,7 @@ Read work/tracking/ontology-backlog.md
 
 **Read current vision:**
 ```
-Read governance/solution/vision.md
+Read governance/vision.md
 ```
 
 **For outcome changes:**
@@ -299,10 +299,10 @@ ONTOLOGY:
 - In progress: ONT-022 (transpiración MD→LinkML)
 
 FILES:
-- governance/projects/raise-cli/backlog.md
+- governance/backlog.md
 - framework/reference/glossary.md
 - work/tracking/ontology-backlog.md
-- governance/solution/vision.md
+- governance/vision.md
 
 References: ADR-011, ADR-012
 

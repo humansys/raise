@@ -16,7 +16,7 @@ Verificar que el Technical Design está completo, es técnicamente sólido, y pr
 
 - Después de completar `flujo-03-tech-design`
 - Antes de iniciar `flujo-05-backlog-creation`
-- El documento debe existir en `governance/projects/{project}/design.md`
+- El documento debe existir en `governance/design.md`
 
 ---
 

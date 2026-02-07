@@ -35,7 +35,7 @@ def tmp_vision_file(tmp_path: Path) -> Path:
         """
     )
 
-    vision_file = tmp_path / "governance" / "solution" / "vision.md"
+    vision_file = tmp_path / "governance" / "vision.md"
     vision_file.parent.mkdir(parents=True, exist_ok=True)
     vision_file.write_text(vision_content)
 
@@ -47,7 +47,7 @@ class TestExtractOutcomes:
 
     def test_extract_from_valid_vision(self, tmp_vision_file: Path) -> None:
         """Should extract all outcomes from valid Vision file."""
-        outcomes = extract_outcomes(tmp_vision_file, tmp_vision_file.parent.parent.parent)
+        outcomes = extract_outcomes(tmp_vision_file, tmp_vision_file.parent.parent)
 
         assert len(outcomes) == 3
         assert all(o.type == ConceptType.OUTCOME for o in outcomes)
@@ -84,11 +84,11 @@ class TestExtractOutcomes:
 
     def test_relative_file_path(self, tmp_vision_file: Path) -> None:
         """Should calculate correct relative file path."""
-        project_root = tmp_vision_file.parent.parent.parent
+        project_root = tmp_vision_file.parent.parent
         outcomes = extract_outcomes(tmp_vision_file, project_root)
 
         outcome = outcomes[0]
-        assert outcome.file == "governance/solution/vision.md"
+        assert outcome.file == "governance/vision.md"
 
     def test_empty_file(self, tmp_path: Path) -> None:
         """Should return empty list for empty file."""
@@ -176,7 +176,7 @@ class TestExtractOutcomes:
 
     def test_integration_with_real_vision(self) -> None:
         """Should extract outcomes from real raise-cli Vision."""
-        vision_path = Path("governance/solution/vision.md")
+        vision_path = Path("governance/vision.md")
 
         if not vision_path.exists():
             pytest.skip("Real Vision file not found")

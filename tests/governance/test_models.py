@@ -26,7 +26,7 @@ class TestConcept:
         concept = Concept(
             id="req-rf-05",
             type=ConceptType.REQUIREMENT,
-            file="governance/projects/raise-cli/prd.md",
+            file="governance/prd.md",
             section="RF-05: Golden Context Generation",
             lines=(206, 214),
             content="The system MUST generate CLAUDE.md...",
@@ -35,7 +35,7 @@ class TestConcept:
 
         assert concept.id == "req-rf-05"
         assert concept.type == ConceptType.REQUIREMENT
-        assert concept.file == "governance/projects/raise-cli/prd.md"
+        assert concept.file == "governance/prd.md"
         assert concept.section == "RF-05: Golden Context Generation"
         assert concept.lines == (206, 214)
         assert "CLAUDE.md" in concept.content

@@ -326,8 +326,8 @@ def init_command(
                 conventions, project_name=project_name
             )
 
-            # Write to governance/solution/guardrails.md
-            guardrails_dir = project_path / "governance" / "solution"
+            # Write to governance/guardrails.md
+            guardrails_dir = project_path / "governance"
             guardrails_dir.mkdir(parents=True, exist_ok=True)
             guardrails_path = guardrails_dir / "guardrails.md"
             guardrails_path.write_text(guardrails_content)

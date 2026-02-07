@@ -21,7 +21,7 @@ class ConceptType(str, Enum):
         PRINCIPLE: Core principles from Constitution (§N format).
         PATTERN: Design patterns from technical design (future).
         PRACTICE: Process practices from katas (future).
-        PROJECT: Project from backlog (governance/projects/*/backlog.md).
+        PROJECT: Project from backlog (governance/backlog.md).
         EPIC: Epic from backlog or epic scope documents.
         STORY: Story from epic scope documents.
         DECISION: Architecture decision records (ADR-XXX format).
@@ -64,7 +64,7 @@ class Concept(BaseModel):
         >>> concept = Concept(
         ...     id="req-rf-05",
         ...     type=ConceptType.REQUIREMENT,
-        ...     file="governance/projects/raise-cli/prd.md",
+        ...     file="governance/prd.md",
         ...     section="RF-05: Golden Context Generation",
         ...     lines=(206, 214),
         ...     content="The system MUST generate CLAUDE.md...",
