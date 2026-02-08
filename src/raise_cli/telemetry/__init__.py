@@ -3,7 +3,7 @@
 This module provides infrastructure for collecting telemetry signals
 as specified in ADR-018 (Local Telemetry Architecture).
 
-Signals are stored locally in `.raise/rai/telemetry/signals.jsonl` and follow
+Signals are stored locally in `.raise/rai/personal/telemetry/signals.jsonl` and follow
 OpenTelemetry semantic conventions for future OTLP export.
 """
 

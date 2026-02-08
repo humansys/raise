@@ -226,7 +226,7 @@ uv run raise memory emit-work story {story_id} --event complete --phase plan
 ## Output
 
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
 - **Next:** `/story-implement`
 

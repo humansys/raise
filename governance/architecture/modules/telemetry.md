@@ -25,7 +25,7 @@ constraints:
 
 ## Purpose
 
-The telemetry module records what happens during RaiSE usage as structured signals — command invocations, skill executions, story lifecycle events, errors. All signals are stored locally in `.raise/rai/telemetry/signals.jsonl` as append-only JSONL. There is no network transmission; this is purely local observability.
+The telemetry module records what happens during RaiSE usage as structured signals — command invocations, skill executions, story lifecycle events, errors. All signals are stored locally in `.raise/rai/personal/telemetry/signals.jsonl` as append-only JSONL (personal scope — developer-specific, gitignored). There is no network transmission; this is purely local observability.
 
 The signals follow OpenTelemetry semantic conventions so they could be exported to OTLP-compatible backends in the future, but for now they serve two purposes: **velocity tracking** (how long do stories take?) and **usage patterns** (which commands are used most?).
 

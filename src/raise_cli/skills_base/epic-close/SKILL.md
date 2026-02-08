@@ -293,7 +293,7 @@ Update `CLAUDE.local.md`:
 - **Merge:** Epic merged to v2 with `--no-ff`
 - **Cleanup:** All epic and story branches deleted (local and remote)
 - **Backlog:** Epic marked complete
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (epic complete)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (epic complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Epic Close Summary Template
