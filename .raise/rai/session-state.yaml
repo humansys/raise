@@ -1,26 +1,26 @@
 current_work:
   epic: E15
   story: S15.8
-  phase: implement
+  phase: closed
   branch: epic/e15/ontology-refinement
 last_session:
-  id: SES-103
+  id: SES-106
   date: '2026-02-08'
   developer: Emilio
-  summary: S15.8 Task 4b + integration test — coaching evolution wiring + lifecycle
-    validation
+  summary: Maintenance — fixed structural drift in architecture docs and telemetry
+    path migration long tail (PAT-151)
   patterns_captured:
-  - PAT-SES-006
+  - PAT-SES-106
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - Close S15.8 story
-notes: Coaching evolution gap caught during integration prep — good Jidoka moment
-progress:
-  epic: E15
-  stories_done: 6
-  stories_total: 8
-  sp_done: 18
-  sp_total: 24
+  - S15.5 Query Helpers (3 SP)
+  - S15.6 Skills Integration (3 SP)
+  - Close E15 after S15.5 + S15.6
+notes: Session started as investigation into recurring path bugs, evolved into systematic
+  fix. Emilio's intuition about stale architecture docs was correct — the root cause
+  was incomplete F14.15 migration plus no enforcement mechanism. The drift check in
+  story-close is the prevention gate.
+progress: null
 completed_epics: []
