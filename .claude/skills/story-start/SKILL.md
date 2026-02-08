@@ -236,7 +236,7 @@ uv run raise memory emit-work story {story_id} --event start --phase design
 
 - **Branch:** `feature/{epic_id}/{story_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: start)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: start)
 - **Next:** `/story-design` or `/story-plan`
 
 ## Feature Start Summary Template

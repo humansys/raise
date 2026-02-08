@@ -141,7 +141,7 @@ Output brief suggestion:
 |------|--------|
 | `.raise/rai/memory/patterns.jsonl` | New patterns (CLI) |
 | `.raise/rai/personal/sessions/index.jsonl` | Session record (CLI) |
-| `.raise/rai/telemetry/signals.jsonl` | Session event (CLI) |
+| `.raise/rai/personal/telemetry/signals.jsonl` | Session event (CLI) |
 | `~/.rai/developer.yaml` | Session state cleared (CLI) |
 | `CLAUDE.local.md` | Single Write |
 | `dev/parking-lot.md` | Tangents (if any) |

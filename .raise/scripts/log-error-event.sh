@@ -13,7 +13,7 @@ ERROR_CONTEXT="${RAISE_ERROR_CONTEXT:-null}"
 ERROR_RECOVERABLE="${RAISE_ERROR_RECOVERABLE:-true}"
 
 # Ensure telemetry directory exists
-mkdir -p "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry"
+mkdir -p "$CLAUDE_PROJECT_DIR/.raise/rai/personal/telemetry"
 
 # Format context as JSON string or null
 if [ "$ERROR_CONTEXT" != "null" ] && [ -n "$ERROR_CONTEXT" ]; then
@@ -24,6 +24,6 @@ fi
 
 # Emit ErrorEvent (ADR-018 format)
 echo "{\"type\":\"error_event\",\"timestamp\":\"$TIMESTAMP\",\"tool\":\"$ERROR_TOOL\",\"error_type\":\"$ERROR_TYPE\",\"context\":$CONTEXT_JSON,\"recoverable\":$ERROR_RECOVERABLE}" \
-  >> "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry/signals.jsonl"
+  >> "$CLAUDE_PROJECT_DIR/.raise/rai/personal/telemetry/signals.jsonl"
 
 exit 0

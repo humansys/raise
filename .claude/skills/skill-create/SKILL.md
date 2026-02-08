@@ -385,7 +385,7 @@ uv run raise memory add-pattern "{Brief description of the pattern}" -c "{contex
 | SKILL.md | `.claude/skills/{skill-name}/SKILL.md` |
 | Hook config | Embedded in SKILL.md frontmatter |
 | Catalog update | MEMORY.md and/or CLAUDE.md |
-| Telemetry | `.raise/rai/telemetry/signals.jsonl` |
+| Telemetry | `.raise/rai/personal/telemetry/signals.jsonl` |
 
 ## Skill Naming Conventions
 
