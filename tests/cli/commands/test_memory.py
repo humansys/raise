@@ -971,6 +971,56 @@ class TestMemoryListEdgeCases:
             os.chdir(original_cwd)
 
 
+class TestMemoryGenerateCommand:
+    """Tests for `raise memory generate` command."""
+
+    def test_generate_shows_deprecation(self, tmp_path: Path) -> None:
+        """Generate command shows deprecation notice."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            # Create minimal structure
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+
+            result = runner.invoke(app, ["memory", "generate"])
+
+            assert result.exit_code == 0
+            assert "deprecated" in result.output.lower() or "skipped" in result.output.lower()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_generate_does_not_write_canonical_memory_md(self, tmp_path: Path) -> None:
+        """Generate command does not write canonical MEMORY.md."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+
+            runner.invoke(app, ["memory", "generate"])
+
+            canonical_path = memory_dir / "MEMORY.md"
+            assert not canonical_path.exists()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_generate_suggests_memory_build(self, tmp_path: Path) -> None:
+        """Generate command suggests using memory build instead."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+
+            result = runner.invoke(app, ["memory", "generate"])
+
+            assert result.exit_code == 0
+            assert "raise memory build" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+
 class TestMemoryQueryEdgeTypeFilter:
     """Tests for --edge-types CLI option."""
 

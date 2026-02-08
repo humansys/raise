@@ -201,7 +201,7 @@
 > Items explicitly deferred from E7 scope (ADR-021).
 
 - [ ] **Team memory** — V3 scope, see E10 Collective Intelligence
-- [ ] **`raise doctor` command** — Project health diagnostics (nice-to-have)
+- [ ] **`raise doctor` command** — Cognitive architecture coherence audit. Detect: graph primes duplicated in CLAUDE.md, MEMORY.md grown beyond boot pointer, session state referencing nonexistent stories, identity node drift from canonical source, always_on patterns missing from bundle, orphaned sessions, stale parking lot items. Not just "are files right" but "is the whole system coherent." (SES-005, 2026-02-08)
 - [ ] **Full ~/.rai/ expansion** — YAGNI for F&F, start with developer.yaml only
 - [ ] **Multi-language convention detection** — Python first, TypeScript/JS later
 - [ ] **Auto-progress Shu→Ha→Ri** — Experience level progression (manual for now)

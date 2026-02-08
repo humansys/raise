@@ -221,3 +221,145 @@ class TestProcessSessionClose:
         assert loaded is not None
         assert loaded.current_session is None
         mp.undo()
+
+
+class TestLoadStateFileProgress:
+    """Tests for load_state_file with progress and completed_epics."""
+
+    def test_loads_state_file_with_progress(self, tmp_path: Path) -> None:
+        """State file with progress populates CloseInput.progress."""
+        data = {
+            "summary": "E15 progress session",
+            "progress": {
+                "epic": "E15",
+                "stories_done": 5,
+                "stories_total": 8,
+                "sp_done": 15,
+                "sp_total": 24,
+            },
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+
+        result = load_state_file(state_file)
+        assert result.progress is not None
+        assert result.progress["epic"] == "E15"
+        assert result.progress["stories_done"] == 5
+        assert result.progress["sp_total"] == 24
+
+    def test_loads_state_file_with_completed_epics(self, tmp_path: Path) -> None:
+        """State file with completed_epics populates CloseInput."""
+        data = {
+            "summary": "Final epic session",
+            "completed_epics": ["E12", "E13", "E14"],
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+
+        result = load_state_file(state_file)
+        assert result.completed_epics == ["E12", "E13", "E14"]
+
+    def test_loads_state_file_without_progress_defaults(self, tmp_path: Path) -> None:
+        """State file without progress defaults to None/empty."""
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text("summary: no progress\n")
+
+        result = load_state_file(state_file)
+        assert result.progress is None
+        assert result.completed_epics == []
+
+
+class TestProcessSessionCloseProgress:
+    """Tests for process_session_close writing progress to session state."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        """Create a project with memory directory."""
+        project = tmp_path / "project"
+        memory_dir = project / ".raise" / "rai" / "memory" / "sessions"
+        memory_dir.mkdir(parents=True)
+        return project
+
+    def test_close_writes_progress_to_session_state(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close writes progress to session-state.yaml."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="progress test",
+            progress={
+                "epic": "E15",
+                "stories_done": 3,
+                "stories_total": 8,
+                "sp_done": 10,
+                "sp_total": 24,
+            },
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from raise_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.progress is not None
+        assert state.progress.epic == "E15"
+        assert state.progress.stories_done == 3
+        assert state.progress.sp_total == 24
+        mp.undo()
+
+    def test_close_writes_completed_epics_to_session_state(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close writes completed_epics to session-state.yaml."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="epics done",
+            completed_epics=["E12", "E14"],
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from raise_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.completed_epics == ["E12", "E14"]
+        mp.undo()
+
+    def test_close_without_progress_leaves_none(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close without progress leaves state.progress as None."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="no progress")
+
+        process_session_close(close_input, profile, project)
+
+        from raise_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.progress is None
+        assert state.completed_epics == []
+        mp.undo()
