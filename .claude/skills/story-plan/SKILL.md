@@ -2,8 +2,8 @@
 name: story-plan
 description: >
   Decompose user stories into atomic executable tasks, identify dependencies,
-  and create a deterministic implementation plan. Use after design spec is ready
-  or for simple stories that skip design.
+  and create a deterministic implementation plan. Use after /story-design
+  has grounded the story's integration decisions.
 
 license: MIT
 

@@ -202,7 +202,7 @@ Show the story lifecycle for orientation:
 ```
 /story-start ← YOU ARE HERE
       ↓
-/story-design (fase 4) — Optional for simple features
+/story-design (fase 4) — Grounds integration decisions
       ↓
 /story-plan (fase 5) — Decompose into tasks
       ↓
@@ -213,7 +213,7 @@ Show the story lifecycle for orientation:
 /story-close (fase 8) — Merge & cleanup
 ```
 
-**Next step:** `/story-design` for complex features, `/story-plan` for simple ones.
+**Next step:** `/story-design` — design is not optional (PAT-186). Proceed to `/story-plan` only after design.
 ```
 
 **Verification:** Lifecycle displayed; next step clear.
@@ -237,7 +237,7 @@ uv run raise memory emit-work story {story_id} --event start --phase design
 - **Branch:** `feature/{epic_id}/{story_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
 - **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: start)
-- **Next:** `/story-design` or `/story-plan`
+- **Next:** `/story-design`
 
 ## Feature Start Summary Template
 
@@ -253,9 +253,8 @@ uv run raise memory emit-work story {story_id} --event start --phase design
 **Out:** [brief list]
 **Done:** [key criteria]
 
-### Next Steps
-1. `/story-design` — If complex (>3 components, architectural decisions)
-2. `/story-plan` — If simple or design complete
+### Next Step
+`/story-design` — Design is not optional (PAT-186). Then `/story-plan`.
 
 Ready to proceed.
 ```
@@ -290,6 +289,6 @@ Full scope documentation can follow in `/story-design` or `/story-plan`.
 
 ## References
 
-- Next skill: `/story-design` or `/story-plan`
+- Next skill: `/story-design` (always — PAT-186)
 - Complement: `/story-close`
 - Epic context: `work/epics/e{N}-{name}/scope.md`
