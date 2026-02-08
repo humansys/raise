@@ -1,62 +1,70 @@
 ---
 story_id: "S15.8"
-title: "Minimal Agent Config — Graph as Agent Configuration"
+title: "Minimal Agent Config — Graph as Single Source of Truth"
 epic_ref: "E15 Ontology Graph Refinement"
-story_points: 3
+story_points: 5
 complexity: "moderate"
 status: "draft"
-version: "2.0"
+version: "3.0"
 created: "2026-02-08"
 updated: "2026-02-08"
 template: "lean-feature-spec-v2"
 ---
 
-# Feature: Minimal Agent Config — Graph as Agent Configuration
+# Feature: Minimal Agent Config — Graph as Single Source of Truth
 
 > **Epic**: E15 - Ontology Graph Refinement
-> **Complexity**: moderate | **SP**: 3
+> **Complexity**: moderate | **SP**: 5
 
 ---
 
 ## 1. What & Why
 
-**Problem**: CLAUDE.md (~300 lines) and CLAUDE.local.md (~77 lines) are manually-maintained copies of governance content that already lives in the memory graph (guardrails, principles, architecture, terms). CLAUDE.local.md requires manual edits after every session — the #1 source of maintenance friction. The context bundle works but is too thin (~150 tokens) — deadlines, recent sessions, progress, and governance primes are missing.
+**Problem**: Four overlapping sources load before a session starts — CLAUDE.md (~300 lines), CLAUDE.local.md (~77 lines), MEMORY.md (~200 lines), and Rai identity (~200 lines via hook). All are manually-maintained copies of content that already lives in the memory graph. They contradict, drift, and create maintenance tax. The context bundle exists but is too thin to replace them.
 
-**Value**: The memory graph becomes Rai's agent configuration. No duplicate files. CLAUDE.md and CLAUDE.local.md shrink to bootstrap pointers. The context bundle carries everything a session needs — session state AND governance primes — all from the graph. Zero manual file edits between sessions. Platform-agnostic by construction.
+**Value**: One channel, one truth. Everything Rai needs flows through the context bundle, sourced from the memory graph. Four files shrink to bootstrap pointers. The quality improvement isn't more information — it's **coherence**. No contradictions, no drift, no staleness. Zero manual file edits between sessions. Platform-agnostic by construction.
 
 ---
 
 ## 2. Approach
 
-**The graph IS the agent config.** No new files — extend what exists.
+**The graph IS Rai's configuration.** Everything that shapes behavior — governance, patterns, identity — lives as tagged nodes, surfaced as primes through the context bundle.
 
-The graph already has 22 guardrail nodes, principle nodes, architecture nodes, and term nodes. Tag critical ones with `always_on: true` metadata. The bundle queries them alongside foundational patterns and surfaces them as **governance primes**.
+| Source | Before | After | Mechanism |
+|--------|--------|-------|-----------|
+| CLAUDE.md | ~300 lines governance | 3 lines bootstrap | Graph → governance primes |
+| CLAUDE.local.md | ~77 lines session state | 2 lines bootstrap | CLI → session state in bundle |
+| MEMORY.md | ~200 lines pattern copy | 2 lines bootstrap | Graph → behavioral primes (already works) |
+| Identity hook | ~200 lines loaded by hook | Identity primes in bundle | Graph → identity primes |
 
-For operational detail (pre-commit config, toolchain commands), the AI queries on demand — just-in-time context, not upfront dump.
+**Three prime types in the bundle, one mechanism:**
+- **Governance primes** — critical guardrails + principles (`always_on: true`)
+- **Behavioral primes** — foundational patterns (`foundational: true`, already works)
+- **Identity primes** — Rai's values + boundaries (`always_on: true`)
 
-**CLAUDE.md** and **CLAUDE.local.md** shrink to bootstrap pointers.
+For operational detail (toolchain, directory structure, full identity), the AI queries on demand — just-in-time context, not upfront dump.
 
 ### Components Affected
 
 | Component | Change |
 |-----------|--------|
-| `CLAUDE.md` | **Rewrite** — ~300 lines → 3 lines (bootstrap pointer) |
-| `CLAUDE.local.md` | **Rewrite** — ~77 lines → 2 lines (bootstrap pointer) |
-| `src/raise_cli/session/bundle.py` | **Modify** — add governance primes, recent sessions, progress |
-| `src/raise_cli/schemas/session_state.py` | **Modify** — add progress model |
+| `CLAUDE.md` | **Rewrite** — ~300 lines → 3 lines bootstrap |
+| `CLAUDE.local.md` | **Rewrite** — ~77 lines → 2 lines bootstrap |
+| `MEMORY.md` | **Rewrite** — ~200 lines → 2 lines bootstrap (update `raise memory generate`) |
+| `src/raise_cli/session/bundle.py` | **Modify** — add governance primes, identity primes, recent sessions, progress |
+| `src/raise_cli/schemas/session_state.py` | **Modify** — add EpicProgress model |
 | `src/raise_cli/session/close.py` | **Modify** — write progress to state |
 | `src/raise_cli/cli/commands/session.py` | **Modify** — accept progress flags |
-| `src/raise_cli/context/builder.py` | **Modify** — tag critical nodes with `always_on: true` |
-| `.claude/skills/session-start/SKILL.md` | **Modify** — remove agent.md step, document governance primes |
+| `src/raise_cli/context/builder.py` | **Modify** — tag `always_on` on guardrails, principles; add identity node extraction |
+| `src/raise_cli/memory/generate.py` | **Modify** — generate minimal MEMORY.md |
+| `.claude/skills/session-start/SKILL.md` | **Modify** — document unified bundle |
 | `.claude/skills/session-close/SKILL.md` | **Modify** — output progress data |
 
 ---
 
 ## 3. Design Decisions
 
-### D1: What stays in CLAUDE.md?
-
-Pure platform adapter — bootstrap pointer only:
+### D1: CLAUDE.md — pure bootstrap
 
 ```markdown
 # RaiSE Project
@@ -64,68 +72,109 @@ Pure platform adapter — bootstrap pointer only:
 Run `/session-start` to load context and governance.
 ```
 
-3 lines. ALL governance lives in the memory graph, surfaced through the context bundle. Nothing should happen before `/session-start` runs.
+3 lines. All governance lives in the graph, surfaced through the bundle.
 
-**Rationale**: CLAUDE.md is a platform adapter, not a governance carrier. RaiSE owns all governance in its own artifacts, accessible through the graph.
+### D2: CLAUDE.local.md — pure bootstrap
 
-### D2: Graph as agent configuration — governance primes
+```markdown
+# RaiSE Project — raise-cli
+Run `/session-start` for context.
+```
 
-Same mechanism as behavioral primes (foundational patterns), extended to governance:
+2 lines. Session state comes from the bundle.
+
+### D3: MEMORY.md — pure bootstrap
+
+Update `raise memory generate` to output:
+
+```markdown
+# Rai Memory
+
+Run `/session-start` for context. Patterns and calibrations live in the memory graph.
+```
+
+2 lines. Patterns already surface as behavioral primes through the graph.
+
+### D4: Identity as graph primes
+
+Extract Rai's core values and boundaries from `.raise/rai/identity/core.md` during graph build. Create nodes tagged `always_on: true`:
+
+**Values** (from identity/core.md § Values):
+- `RAI-VAL-1`: Honesty over agreement — push back on bad ideas
+- `RAI-VAL-2`: Simplicity over cleverness — simple solution that works > elegant complex
+- `RAI-VAL-3`: Observability over trust — show work, explain reasoning
+- `RAI-VAL-4`: Learning over perfection — every session teaches something
+- `RAI-VAL-5`: Partnership over service — collaborator, not tool
+
+**Boundaries** (from identity/core.md § Boundaries):
+- `RAI-BND-1`: Stop on incoherence, ambiguity, or drift
+- `RAI-BND-2`: Ask before expensive operations
+- `RAI-BND-3`: Admit uncertainty rather than pretend confidence
+- `RAI-BND-4`: Redirect gently when dispersing
+
+Node type: `principle` (identity values are principles for Rai's behavior).
+
+**Implementation**: New `_load_identity()` method in builder. Reads identity/core.md, extracts structured sections (Values, Boundaries), creates nodes with `always_on: true` metadata.
+
+**Bundle output:**
+```
+# Identity Primes
+- RAI-VAL-1: Honesty over agreement
+- RAI-VAL-2: Simplicity over cleverness
+- RAI-BND-1: Stop on incoherence, ambiguity, or drift
+- RAI-BND-2: Ask before expensive operations
+```
+
+### D5: Governance primes from graph
+
+Same mechanism as D4. Tag critical guardrails and principles with `always_on: true`:
+
+- All `MUST-*` guardrails (mandatory rules)
+- Core principles: §1 (Humans Define), §3 (Platform Agnosticism), §7 (Lean + Jidoka)
+- Git practices: tag relevant governance content
 
 ```python
-def get_governance_primes(project_path: Path) -> list[ConceptNode]:
-    """Query graph for nodes with always_on=true metadata."""
+def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
+    """Query graph for all always_on nodes (governance + identity)."""
     return [
         node for node in graph.iter_concepts()
         if node.metadata.get("always_on") is True
     ]
 ```
 
-**What gets tagged `always_on: true`:**
-- Critical guardrails: MUST-SEC-* (security), MUST-CODE-* (type safety), MUST-DEV-* (workflow)
-- Core principles: §1 (Humans Define), §3 (Platform Agnosticism), §7 (Jidoka)
-- Git practices: from governance nodes or ADR references
-
 **Bundle output:**
 ```
 # Governance Primes
 - MUST-SEC-001: No secrets in code
 - MUST-CODE-001: Type annotations on all functions
-- §3: Platform Agnosticism — works where Git works
+- §3: Platform Agnosticism
 - §7: Lean + Jidoka — stop on defects
+- Git: GitLab (glab), v2 branch, conventional commits, Co-Authored-By: Rai
 ```
 
-**On-demand**: For full code standards, toolchain details, directory structure — AI queries `raise memory query "code standards" --types guardrail` or reads files directly when needed.
+**On-demand**: Full code standards, toolchain config, directory structure — query `raise memory query` or read files when needed.
 
-**Rationale**: Single source of truth (PAT-149). The graph already has the governance. Tagging critical nodes extends an existing mechanism (foundational patterns). No new files.
+### D6: Unified bundle — one CLI call, everything needed
 
-### D3: How does session-start load governance?
-
-Single-step context loading — the bundle carries everything:
+After S15.8, the bundle has these sections:
 
 ```
-Step 1: Load Context Bundle (session state + governance primes)
-  uv run raise session start --project "$(pwd)" --context
-
-Step 2: Interpret & Present
+# Session Context          ← session state (existing)
+# Progress                 ← NEW: epic SP, completed epics
+# Recent Sessions          ← NEW: last 3 from index.jsonl
+# Deadlines                ← existing (needs data in developer.yaml)
+# Governance Primes        ← NEW: always_on guardrails + principles
+# Identity Primes          ← NEW: always_on values + boundaries
+# Behavioral Primes        ← existing (foundational patterns)
+# Coaching                 ← existing (when populated)
+# Pending                  ← existing
 ```
 
-No Step 1.5. No file reads. The bundle is self-contained.
+One CLI call: `raise session start --project "$(pwd)" --context`
+One output: everything the AI needs to start working.
 
-**Rationale**: Simpler than the previous agent.md approach. One CLI call, one output, one source of truth.
+### D7: Session state expansion
 
-### D4: What expands in the context bundle?
-
-Add to `bundle.py`:
-
-| New section | Source | Tokens |
-|-------------|--------|--------|
-| Governance primes | Graph (`always_on=true`) | ~80 |
-| Recent sessions (last 3) | `sessions/index.jsonl` | ~100 |
-| Epic progress (SP, %) | `session-state.yaml` | ~20 |
-| Completed epics | `session-state.yaml` | ~20 |
-
-New `SessionState` fields:
 ```python
 class EpicProgress(BaseModel):
     epic: str           # "E15"
@@ -141,18 +190,14 @@ class SessionState(BaseModel):
     notes: str = ""
     # NEW
     progress: EpicProgress | None = None
-    completed_epics: list[str] = []  # ["E1", "E2", ...]
+    completed_epics: list[str] = []
 ```
 
-### D5: How does session-close capture progress?
+### D8: Session-close captures progress
 
 The session-close skill outputs progress in its state file:
 
 ```yaml
-# Existing fields...
-summary: "..."
-current_work: {epic: E15, story: S15.8, ...}
-# NEW fields
 progress:
   epic: E15
   stories_done: 6
@@ -162,35 +207,20 @@ progress:
 completed_epics: [E1, E2, E3, E4, E7, E8, E9, E11, E12, E13, E14]
 ```
 
-The skill computes this from epic scope during retrospective. CLI writes it to session-state.yaml.
+Skill computes from epic scope. CLI writes to session-state.yaml.
 
-### D6: Recent sessions — where to read from?
-
-`sessions/index.jsonl` — already exists, append-only. Read last 3-5 entries in `bundle.py`.
+### D9: Recent sessions from index.jsonl
 
 ```python
 def _format_recent_sessions(project_path: Path, limit: int = 3) -> str:
-    """Read last N sessions from index.jsonl."""
+    """Read last N sessions from sessions/index.jsonl."""
 ```
 
-### D7: CLAUDE.local.md — what stays?
+Read last 3 entries, format as one-liners.
 
-```markdown
-# RaiSE Project — raise-cli
-Run `/session-start` for context.
-```
+### D10: Clear hook — becomes redundant, no changes needed
 
-Two lines. Platform adapter tells Claude Code this is a RaiSE project.
-
-### D8: How to tag graph nodes as `always_on`?
-
-In `builder.py`, when building guardrail and principle nodes, set `metadata["always_on"] = True` for critical nodes:
-
-- Guardrails: all `MUST-*` prefixed (mandatory rules)
-- Principles: §1, §3, §7 (core safety/quality principles)
-- Git: create a `governance` node type entry or tag relevant ADR
-
-**IMPORTANT:** This requires a graph rebuild (`raise memory build`) — same pattern as S15.3 constraint edges.
+The hook currently loads Rai identity. After S15.8, identity primes come through the bundle. The hook becomes redundant but stays as-is — removing it is a separate cleanup, not blocking.
 
 ---
 
@@ -213,7 +243,7 @@ Completed: E1, E2, E3, E4, E7, E8, E9, E11, E12, E13, E14
 Last: SES-099 (2026-02-08, Emilio) — S15.8 design complete
 Recent:
 - SES-098: S15.7 implement → review → close (4.1x, PAT-189)
-- SES-097: S15.7 design — deterministic session protocol (PAT-187, PAT-188)
+- SES-097: S15.7 design — deterministic session protocol
 
 # Deadlines
 F&F: Feb 09 (1 day) — Friends & Family Pre-launch (FLEXIBLE)
@@ -229,6 +259,12 @@ Open Core: Feb 15 (7 days) — Public launch
 - §7: Lean + Jidoka — stop on defects
 - Git: GitLab (glab), v2 branch, conventional commits, Co-Authored-By: Rai
 
+# Identity Primes
+- RAI-VAL-1: Honesty over agreement
+- RAI-VAL-2: Simplicity over cleverness
+- RAI-BND-1: Stop on incoherence, ambiguity, or drift
+- RAI-BND-2: Ask before expensive operations
+
 # Behavioral Primes
 - PAT-149: Single source of truth
 - PAT-186: Design is not optional
@@ -238,8 +274,6 @@ Open Core: Feb 15 (7 days) — Public launch
 # Coaching
 Strengths: rapid prototyping, architectural vision
 Growth edge: delegation
-Recent corrections:
-- SES-096: Over-scoping → explicit design gate
 
 # Pending
 Next:
@@ -263,6 +297,13 @@ Run `/session-start` to load context and governance.
 Run `/session-start` for context.
 ```
 
+### Minimal MEMORY.md (2 lines)
+
+```markdown
+# Rai Memory
+Run `/session-start` for context. Patterns live in the memory graph.
+```
+
 ---
 
 ## 5. Acceptance Criteria
@@ -270,10 +311,12 @@ Run `/session-start` for context.
 ### MUST
 
 - [ ] Context bundle includes governance primes (from graph, `always_on=true`)
-- [ ] Context bundle includes recent sessions (last 3), epic progress, completed epics
-- [ ] Critical guardrails and principles tagged `always_on: true` in graph builder
-- [ ] CLAUDE.md is ≤ 5 lines (bootstrap pointer only)
-- [ ] CLAUDE.local.md is ≤ 3 lines (bootstrap pointer)
+- [ ] Context bundle includes identity primes (values + boundaries from graph)
+- [ ] Context bundle includes recent sessions (last 3) and epic progress
+- [ ] Critical guardrails, principles, and identity values tagged `always_on: true` in builder
+- [ ] CLAUDE.md ≤ 5 lines (bootstrap pointer)
+- [ ] CLAUDE.local.md ≤ 3 lines (bootstrap pointer)
+- [ ] MEMORY.md ≤ 3 lines (bootstrap pointer, via updated `raise memory generate`)
 - [ ] `SessionState` model has `progress` and `completed_epics` fields
 - [ ] Session-close writes progress to session-state.yaml
 - [ ] Full lifecycle (start → work → close → start) with zero manual file edits
@@ -282,11 +325,12 @@ Run `/session-start` for context.
 
 ### SHOULD
 
-- [ ] Bundle stays under ~500 tokens total
-- [ ] Deadlines populated in developer.yaml (via session-close or manual seed)
+- [ ] Bundle stays under ~600 tokens total
+- [ ] Deadlines populated in developer.yaml
+- [ ] Clear hook noted as redundant (cleanup in follow-up)
 
 ### MUST NOT
 
-- Create duplicate governance files (no agent.md — graph is the source)
+- Create duplicate governance or identity files
 - Break existing session-start/close CLI interface
-- Require hook changes
+- Modify the clear hook (redundancy is noted, not acted on)
