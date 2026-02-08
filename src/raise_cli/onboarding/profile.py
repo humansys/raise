@@ -97,6 +97,82 @@ class CurrentSession(BaseModel):
         return age.total_seconds() > hours * 3600
 
 
+class Correction(BaseModel):
+    """A coaching correction episode.
+
+    Records when Rai observed a behavioral pattern that needed adjustment
+    and the lesson learned from it.
+
+    Attributes:
+        session: Session ID where correction occurred (e.g., "SES-097").
+        what: Description of the behavior observed.
+        lesson: The lesson or principle derived from the correction.
+    """
+
+    session: str
+    what: str
+    lesson: str
+
+
+class Deadline(BaseModel):
+    """An operational deadline Rai tracks.
+
+    Deadlines modulate Rai's behavior — urgency, focus, pushback.
+    Not governance artifacts; these are Rai's operational context.
+
+    Attributes:
+        name: Short name for the deadline (e.g., "F&F").
+        date: Target date.
+        notes: Additional context about the deadline.
+    """
+
+    name: str
+    date: date
+    notes: str = ""
+
+
+class RelationshipState(BaseModel):
+    """State of the Rai-developer relationship.
+
+    Attributes:
+        quality: Relationship quality level.
+        since: Date when the relationship started.
+        trajectory: Direction of relationship development.
+    """
+
+    quality: str = "new"
+    since: date | None = None
+    trajectory: str = "starting"
+
+
+class CoachingContext(BaseModel):
+    """Rai's coaching observations about a developer.
+
+    Accumulates over time in ~/.rai/developer.yaml. Corrections
+    are capped at 10 (FIFO — oldest drops when new ones are added).
+
+    Attributes:
+        strengths: Observed developer strengths.
+        growth_edge: Current primary growth area.
+        trust_level: Trust level in the relationship.
+        autonomy: Autonomy observation notes.
+        corrections: Recent corrections (max 10, FIFO).
+        communication_notes: Notes about communication patterns.
+        relationship: State of the Rai-developer relationship.
+    """
+
+    strengths: list[str] = Field(default_factory=list)
+    growth_edge: str = ""
+    trust_level: str = "new"
+    autonomy: str = ""
+    corrections: list[Correction] = Field(default_factory=list)
+    communication_notes: list[str] = Field(default_factory=list)
+    relationship: RelationshipState = Field(default_factory=RelationshipState)
+
+
+CORRECTIONS_MAX = 10
+
+
 class DeveloperProfile(BaseModel):
     """Personal profile for a developer using RaiSE.
 
@@ -113,6 +189,8 @@ class DeveloperProfile(BaseModel):
         last_session: Date of most recent session.
         projects: List of project paths worked on.
         current_session: Active session state, or None if no session active.
+        coaching: Coaching context with corrections and relationship state.
+        deadlines: Operational deadlines Rai tracks.
     """
 
     name: str
@@ -126,6 +204,8 @@ class DeveloperProfile(BaseModel):
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
     current_session: CurrentSession | None = None
+    coaching: CoachingContext = Field(default_factory=CoachingContext)
+    deadlines: list[Deadline] = Field(default_factory=list)
 
 
 # Constants
@@ -254,3 +334,89 @@ def end_session(profile: DeveloperProfile) -> DeveloperProfile:
         Updated profile with current_session cleared.
     """
     return profile.model_copy(update={"current_session": None})
+
+
+def add_correction(
+    profile: DeveloperProfile, session_id: str, what: str, lesson: str
+) -> DeveloperProfile:
+    """Add a coaching correction to the profile.
+
+    Maintains FIFO cap of CORRECTIONS_MAX — oldest correction is dropped
+    when a new one is added and the list is at capacity.
+
+    Args:
+        profile: The developer profile to update.
+        session_id: Session ID where correction occurred.
+        what: Description of the behavior observed.
+        lesson: The lesson derived from the correction.
+
+    Returns:
+        Updated profile with new correction added.
+    """
+    correction = Correction(session=session_id, what=what, lesson=lesson)
+    corrections = [*profile.coaching.corrections, correction]
+    if len(corrections) > CORRECTIONS_MAX:
+        corrections = corrections[-CORRECTIONS_MAX:]
+    coaching = profile.coaching.model_copy(update={"corrections": corrections})
+    return profile.model_copy(update={"coaching": coaching})
+
+
+def add_deadline(
+    profile: DeveloperProfile, name: str, deadline_date: date, notes: str = ""
+) -> DeveloperProfile:
+    """Add an operational deadline to the profile.
+
+    If a deadline with the same name exists, it is replaced.
+
+    Args:
+        profile: The developer profile to update.
+        name: Short name for the deadline.
+        deadline_date: Target date.
+        notes: Additional context.
+
+    Returns:
+        Updated profile with deadline added or updated.
+    """
+    deadline = Deadline(name=name, date=deadline_date, notes=notes)
+    # Replace existing deadline with same name, or append
+    deadlines = [d for d in profile.deadlines if d.name != name]
+    deadlines.append(deadline)
+    return profile.model_copy(update={"deadlines": deadlines})
+
+
+def update_coaching(
+    profile: DeveloperProfile,
+    strengths: list[str] | None = None,
+    growth_edge: str | None = None,
+    trust_level: str | None = None,
+    autonomy: str | None = None,
+) -> DeveloperProfile:
+    """Update coaching context fields.
+
+    Only updates fields that are explicitly provided (not None).
+
+    Args:
+        profile: The developer profile to update.
+        strengths: New strengths list (replaces existing).
+        growth_edge: New growth edge description.
+        trust_level: New trust level.
+        autonomy: New autonomy observation.
+
+    Returns:
+        Updated profile with coaching changes.
+    """
+    updates: dict[str, object] = {}
+    if strengths is not None:
+        updates["strengths"] = strengths
+    if growth_edge is not None:
+        updates["growth_edge"] = growth_edge
+    if trust_level is not None:
+        updates["trust_level"] = trust_level
+    if autonomy is not None:
+        updates["autonomy"] = autonomy
+
+    if not updates:
+        return profile
+
+    coaching = profile.coaching.model_copy(update=updates)
+    return profile.model_copy(update={"coaching": coaching})
