@@ -636,3 +636,117 @@ class TestInitSkillScaffolding:
 
         assert result.exit_code == 0
         assert "skills" in result.output.lower()
+
+
+class TestInitGovernanceScaffolding:
+    """Tests for governance scaffolding integration in raise init."""
+
+    def test_init_creates_governance_directory(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should scaffold governance/ with template files."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        gov_dir = greenfield_project / "governance"
+        assert gov_dir.is_dir()
+        assert (gov_dir / "prd.md").exists()
+        assert (gov_dir / "vision.md").exists()
+        assert (gov_dir / "guardrails.md").exists()
+        assert (gov_dir / "backlog.md").exists()
+        assert (gov_dir / "architecture" / "system-context.md").exists()
+        assert (gov_dir / "architecture" / "system-design.md").exists()
+
+    def test_init_renders_project_name_in_templates(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should render project name in governance templates."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--name", "my-api"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        prd = (greenfield_project / "governance" / "prd.md").read_text()
+        assert "# PRD: my-api" in prd
+        assert "{project_name}" not in prd
+
+    def test_init_does_not_overwrite_existing_governance(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Re-running init should not overwrite existing governance files."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        # First init
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        # Modify a governance file
+        prd_path = greenfield_project / "governance" / "prd.md"
+        prd_path.write_text("# My Custom PRD\n")
+
+        # Second init
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        assert prd_path.read_text() == "# My Custom PRD\n"
+
+    def test_shu_output_includes_governance_info(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Shu users should see governance scaffolding in output."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        assert "governance" in result.output.lower()
+
+
+class TestInitSkillRecommendation:
+    """Tests for skill recommendation in init output."""
+
+    def test_greenfield_recommends_project_create(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Greenfield project should recommend /project-create."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        assert "/project-create" in result.output
+
+    def test_brownfield_recommends_project_onboard(
+        self, brownfield_project: Path, mock_home: Path
+    ) -> None:
+        """Brownfield project should recommend /project-onboard."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(brownfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        assert "/project-onboard" in result.output
