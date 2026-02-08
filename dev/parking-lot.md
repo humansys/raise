@@ -44,22 +44,37 @@
 
 ### Discovery & Code Understanding
 
-- [ ] **`/discover-document` skill** — (SES-085, 2026-02-07)
-  - **Problem:** Rai has 787 concepts + 309 components in memory, but no human-readable architecture documentation
-  - **What it generates:**
-    - Module-level architecture overview (what each package does, how they relate)
-    - Component catalog grouped by concern (by *purpose*, not alphabetical)
-    - Dependency flow between modules
-    - Entry points and API surface
-    - Mermaid diagrams for visual structure
-  - **Inputs already available:** `components-validated.json` (309 components), `analysis.json` (module groups, hierarchy)
-  - **Output:** `dev/architecture-overview.md` — readable, navigable, onboarding-ready
-  - **Sizing:** M-sized story (not epic). 1-2 stories max. Promote to epic only if auto-refresh cycle grows.
-  - **Positioning value:** "RaiSE doesn't just generate code — it *understands* your codebase, remembers it across sessions, and keeps that understanding fresh."
-  - **Priority:** Post story-close, pre-F&F if possible (manual generation as fallback)
-  - **Related:** Consider `raise discover refresh` single-command wrapper (S-sized story) for full pipeline re-run
+- [x] ~~**`/discover-describe` skill**~~ **PROMOTED TO ACTIVE STORY** (2026-02-07)
+  - **Story:** `work/stories/discover-document/`
+  - **Research:** `work/research/architecture-knowledge-layer/` (RES-ARCH-KNOWLEDGE-001)
+  - **Design:** `work/stories/discover-document/design.md`
+  - **Branch:** `story/discover-document`
+- [ ] **Publishable docs via MkDocs Material** — (SES-087, 2026-02-07)
+  - **Context:** Architecture docs in `governance/architecture/` use Markdown + YAML frontmatter — already compatible with MkDocs, Docusaurus, Starlight, GitBook
+  - **What:** Add `mkdocs.yml`, publish `framework/` + `governance/` as doc site
+  - **Sizing:** S-sized story (config + CI only, no code changes)
+  - **Priority:** Post-F&F, pre-public launch (Feb 15)
+  - **Related:** `raise discover describe` generates the content; MkDocs publishes it
 
 ### Framework Improvements
+
+- [ ] **Ontology-guided design step for design skills** — (SES-089, 2026-02-08, PAT-175)
+  - **Problem:** Design skills read governance files directly. The graph already has extracted, structured, related this information.
+  - **What:** Create reusable "load architectural context" skill step. Design skills query `raise memory query` for relevant modules, guardrails, principles, domain boundaries before designing.
+  - **Value:** Progressive disclosure of high-density context. Ontology-guided design by default, not by discipline. Works on any RaiSE project.
+  - **Priority:** Post-F&F, high impact
+  - **Pattern:** PAT-175
+
+- [ ] **Scope-refresh step after design deviations** — (SES-089, 2026-02-08, PAT-176)
+  - **Problem:** Scope commits go stale when design deviates (discover-describe: scope said CLI+Jinja2, actual was skill-only)
+  - **What:** Add scope-refresh to story-design skill. When design deviates, update scope.md automatically.
+  - **Priority:** Post-F&F
+  - **Pattern:** PAT-176
+
+- [ ] **Move convention detection from onboarding to discovery** — (SES-089, 2026-02-08, domain model decision #4)
+  - **Problem:** Convention detection is codebase analysis but lives in onboarding (Experience context). Domain model says it belongs in Discovery.
+  - **What:** Move `detect_conventions()` to discovery module. Onboarding calls discovery for this.
+  - **Priority:** Post-F&F refactoring
 
 - [ ] **Stale terminology grep as rename gate** — (Ishikawa analysis, 2026-02-06)
   - S14.16 declared complete with 21 files still containing "feature" remnants (PAT-151)
