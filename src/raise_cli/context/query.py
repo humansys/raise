@@ -16,7 +16,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 from raise_cli.context.graph import UnifiedGraph
-from raise_cli.context.models import ConceptNode, NodeType
+from raise_cli.context.models import ConceptNode, EdgeType, NodeType
 
 
 class UnifiedQueryStrategy(str, Enum):
@@ -64,6 +64,10 @@ class UnifiedQuery(BaseModel):
     types: list[NodeType] | None = Field(
         default=None,
         description="Filter by node types",
+    )
+    edge_types: list[EdgeType] | None = Field(
+        default=None,
+        description="Filter by edge types (concept_lookup only)",
     )
     limit: int = Field(
         default=10,
@@ -326,7 +330,9 @@ class UnifiedQueryEngine:
 
         # Get neighbors if depth > 0
         if query.max_depth > 0:
-            neighbors = self.graph.get_neighbors(concept_id, depth=query.max_depth)
+            neighbors = self.graph.get_neighbors(
+                concept_id, depth=query.max_depth, edge_types=query.edge_types
+            )
             for neighbor in neighbors:
                 # Apply type filter
                 if query.types and neighbor.type not in query.types:
