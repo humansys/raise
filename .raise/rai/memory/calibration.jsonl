@@ -22,3 +22,5 @@
 {"id": "CAL-014", "feature": "F7.1", "name": "raise init command", "size": "M", "sp": null, "estimated_min": 90, "actual_min": 40, "ratio": 2.2, "kata_cycle": true, "notes": null, "created": "2026-02-05"}
 {"feature": "F7.7", "name": "Guided First Session", "size": "M", "sp": 3, "estimated_min": 85, "actual_min": 26, "velocity": 3.3, "date": "2026-02-05", "notes": "Parallel subagents for Tasks 1+2"}
 {"feature": "F7.5", "name": "raise status", "size": "XS", "sp": 1, "estimated_min": 30, "actual_min": 8, "velocity": 3.75, "date": "2026-02-05", "notes": "Simple command"}
+{"id": "CAL-015", "story": "S15.4", "name": "Edge-Type Filtering", "size": "XS", "sp": null, "estimated_min": 30, "actual_min": 12, "ratio": 2.5, "kata_cycle": true, "notes": null, "created": "2026-02-08"}
+{"id": "CAL-016", "story": "S15.7", "name": "Deterministic Session Protocol", "size": "M", "sp": null, "estimated_min": null, "actual_min": 55, "ratio": null, "kata_cycle": true, "notes": null, "created": "2026-02-08"}
