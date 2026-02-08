@@ -1,0 +1,291 @@
+"""Tests for architectural context query helpers on UnifiedQueryEngine."""
+
+from __future__ import annotations
+
+import pytest
+
+from raise_cli.context.graph import UnifiedGraph
+from raise_cli.context.models import ConceptEdge, ConceptNode
+from raise_cli.context.query import ArchitecturalContext, UnifiedQueryEngine
+
+# --- Fixtures ---
+
+
+@pytest.fixture
+def arch_graph() -> UnifiedGraph:
+    """Create a graph with architectural structure for testing helpers.
+
+    Graph structure:
+        mod-memory --belongs_to--> bc-ontology --constrained_by--> guardrail-must-code-001
+        mod-memory --belongs_to--> bc-ontology --constrained_by--> guardrail-must-test-001
+        mod-memory --in_layer--> lyr-domain
+        mod-memory --depends_on--> mod-context
+        mod-orphan (no edges)
+    """
+    graph = UnifiedGraph()
+
+    # Module nodes
+    graph.add_concept(
+        ConceptNode(
+            id="mod-memory",
+            type="module",
+            content="Manage Rai's persistent memory",
+            source_file="governance/architecture/modules/memory.md",
+            created="2026-02-08",
+        )
+    )
+    graph.add_concept(
+        ConceptNode(
+            id="mod-context",
+            type="module",
+            content="Unified context graph and query engine",
+            source_file="governance/architecture/modules/context.md",
+            created="2026-02-08",
+        )
+    )
+    graph.add_concept(
+        ConceptNode(
+            id="mod-orphan",
+            type="module",
+            content="Module with no edges",
+            source_file="governance/architecture/modules/orphan.md",
+            created="2026-02-08",
+        )
+    )
+
+    # Bounded context node
+    graph.add_concept(
+        ConceptNode(
+            id="bc-ontology",
+            type="bounded_context",
+            content="Persist, integrate, and query accumulated knowledge",
+            source_file="governance/architecture/domain-model.md",
+            created="2026-02-08",
+        )
+    )
+
+    # Layer node
+    graph.add_concept(
+        ConceptNode(
+            id="lyr-domain",
+            type="layer",
+            content="Domain layer — core business logic",
+            source_file="governance/architecture/system-design.md",
+            created="2026-02-08",
+        )
+    )
+
+    # Guardrail nodes
+    graph.add_concept(
+        ConceptNode(
+            id="guardrail-must-code-001",
+            type="guardrail",
+            content="[MUST] Type hints on all code",
+            source_file="governance/guardrails.md",
+            created="2026-02-08",
+        )
+    )
+    graph.add_concept(
+        ConceptNode(
+            id="guardrail-must-test-001",
+            type="guardrail",
+            content="[MUST] >90% test coverage",
+            source_file="governance/guardrails.md",
+            created="2026-02-08",
+        )
+    )
+
+    # Edges: mod-memory belongs_to bc-ontology
+    graph.add_relationship(
+        ConceptEdge(source="mod-memory", target="bc-ontology", type="belongs_to")
+    )
+    # Edges: mod-memory in_layer lyr-domain
+    graph.add_relationship(
+        ConceptEdge(source="mod-memory", target="lyr-domain", type="in_layer")
+    )
+    # Edges: bc-ontology constrained_by guardrails
+    graph.add_relationship(
+        ConceptEdge(
+            source="bc-ontology",
+            target="guardrail-must-code-001",
+            type="constrained_by",
+        )
+    )
+    graph.add_relationship(
+        ConceptEdge(
+            source="bc-ontology",
+            target="guardrail-must-test-001",
+            type="constrained_by",
+        )
+    )
+    # Edges: mod-memory depends_on mod-context
+    graph.add_relationship(
+        ConceptEdge(source="mod-memory", target="mod-context", type="depends_on")
+    )
+
+    return graph
+
+
+@pytest.fixture
+def engine(arch_graph: UnifiedGraph) -> UnifiedQueryEngine:
+    """Create query engine with architectural graph."""
+    return UnifiedQueryEngine(arch_graph)
+
+
+# --- ArchitecturalContext Model Tests ---
+
+
+class TestArchitecturalContext:
+    """Tests for ArchitecturalContext Pydantic model."""
+
+    def test_minimal_context(self) -> None:
+        """ArchitecturalContext with only module is valid."""
+        module = ConceptNode(
+            id="mod-test", type="module", content="Test", created="2026-02-08"
+        )
+        ctx = ArchitecturalContext(module=module)
+        assert ctx.module.id == "mod-test"
+        assert ctx.domain is None
+        assert ctx.layer is None
+        assert ctx.constraints == []
+        assert ctx.dependencies == []
+
+    def test_full_context(self) -> None:
+        """ArchitecturalContext with all fields populated."""
+        module = ConceptNode(
+            id="mod-test", type="module", content="Test", created="2026-02-08"
+        )
+        domain = ConceptNode(
+            id="bc-test", type="bounded_context", content="Test BC", created="2026-02-08"
+        )
+        ctx = ArchitecturalContext(module=module, domain=domain)
+        assert ctx.domain is not None
+        assert ctx.domain.id == "bc-test"
+
+
+# --- find_domain_for Tests ---
+
+
+class TestFindDomainFor:
+    """Tests for find_domain_for helper."""
+
+    def test_finds_domain_via_belongs_to(self, engine: UnifiedQueryEngine) -> None:
+        """Finds bounded context via belongs_to edge."""
+        domain = engine.find_domain_for("mod-memory")
+        assert domain is not None
+        assert domain.id == "bc-ontology"
+        assert domain.type == "bounded_context"
+
+    def test_returns_none_for_orphan_module(self, engine: UnifiedQueryEngine) -> None:
+        """Returns None when module has no belongs_to edge."""
+        domain = engine.find_domain_for("mod-orphan")
+        assert domain is None
+
+    def test_returns_none_for_nonexistent_module(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns None for non-existent module ID."""
+        domain = engine.find_domain_for("mod-nonexistent")
+        assert domain is None
+
+
+# --- find_layer_for Tests ---
+
+
+class TestFindLayerFor:
+    """Tests for find_layer_for helper."""
+
+    def test_finds_layer_via_in_layer(self, engine: UnifiedQueryEngine) -> None:
+        """Finds layer via in_layer edge."""
+        layer = engine.find_layer_for("mod-memory")
+        assert layer is not None
+        assert layer.id == "lyr-domain"
+        assert layer.type == "layer"
+
+    def test_returns_none_for_orphan_module(self, engine: UnifiedQueryEngine) -> None:
+        """Returns None when module has no in_layer edge."""
+        layer = engine.find_layer_for("mod-orphan")
+        assert layer is None
+
+    def test_returns_none_for_nonexistent_module(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns None for non-existent module ID."""
+        layer = engine.find_layer_for("mod-nonexistent")
+        assert layer is None
+
+
+# --- find_constraints_for Tests ---
+
+
+class TestFindConstraintsFor:
+    """Tests for find_constraints_for helper."""
+
+    def test_finds_constraints_via_two_hop(self, engine: UnifiedQueryEngine) -> None:
+        """Finds guardrails via module -> BC -> constrained_by (two-hop)."""
+        constraints = engine.find_constraints_for("mod-memory")
+        assert len(constraints) == 2
+        constraint_ids = {c.id for c in constraints}
+        assert "guardrail-must-code-001" in constraint_ids
+        assert "guardrail-must-test-001" in constraint_ids
+
+    def test_all_constraints_are_guardrails(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """All returned constraints have guardrail type."""
+        constraints = engine.find_constraints_for("mod-memory")
+        for c in constraints:
+            assert c.type == "guardrail"
+
+    def test_returns_empty_for_orphan_module(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns empty list when module has no domain (no two-hop path)."""
+        constraints = engine.find_constraints_for("mod-orphan")
+        assert constraints == []
+
+    def test_returns_empty_for_nonexistent_module(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns empty list for non-existent module ID."""
+        constraints = engine.find_constraints_for("mod-nonexistent")
+        assert constraints == []
+
+
+# --- get_architectural_context Tests ---
+
+
+class TestGetArchitecturalContext:
+    """Tests for get_architectural_context composite helper."""
+
+    def test_returns_full_context(self, engine: UnifiedQueryEngine) -> None:
+        """Returns populated ArchitecturalContext for a well-connected module."""
+        ctx = engine.get_architectural_context("mod-memory")
+        assert ctx is not None
+        assert ctx.module.id == "mod-memory"
+        assert ctx.domain is not None
+        assert ctx.domain.id == "bc-ontology"
+        assert ctx.layer is not None
+        assert ctx.layer.id == "lyr-domain"
+        assert len(ctx.constraints) == 2
+        assert len(ctx.dependencies) == 1
+        assert ctx.dependencies[0].id == "mod-context"
+
+    def test_returns_partial_context_for_orphan(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns ArchitecturalContext with None/empty for unconnected module."""
+        ctx = engine.get_architectural_context("mod-orphan")
+        assert ctx is not None
+        assert ctx.module.id == "mod-orphan"
+        assert ctx.domain is None
+        assert ctx.layer is None
+        assert ctx.constraints == []
+        assert ctx.dependencies == []
+
+    def test_returns_none_for_nonexistent_module(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns None when module doesn't exist in graph."""
+        ctx = engine.get_architectural_context("mod-nonexistent")
+        assert ctx is None

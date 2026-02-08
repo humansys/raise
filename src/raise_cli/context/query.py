@@ -77,6 +77,34 @@ class UnifiedQuery(BaseModel):
     )
 
 
+class ArchitecturalContext(BaseModel):
+    """Full architectural context for a module.
+
+    Combines domain (bounded context), layer, constraints (guardrails),
+    and dependencies into a single structured result.
+
+    Attributes:
+        module: The module node.
+        domain: Bounded context the module belongs to (via belongs_to edge).
+        layer: Architectural layer (via in_layer edge).
+        constraints: Guardrails applicable via the module's bounded context.
+        dependencies: Modules this module depends on (via depends_on edge).
+
+    Examples:
+        >>> ctx = engine.get_architectural_context("mod-memory")
+        >>> ctx.module.id
+        'mod-memory'
+        >>> ctx.domain.id if ctx.domain else None
+        'bc-ontology'
+    """
+
+    module: ConceptNode
+    domain: ConceptNode | None = None
+    layer: ConceptNode | None = None
+    constraints: list[ConceptNode] = Field(default_factory=lambda: [])
+    dependencies: list[ConceptNode] = Field(default_factory=lambda: [])
+
+
 class UnifiedQueryMetadata(BaseModel):
     """Metadata about unified query result.
 
@@ -376,4 +404,104 @@ class UnifiedQueryEngine:
             token_estimate=token_estimate,
             execution_time_ms=execution_time_ms,
             types_found=types_found,
+        )
+
+    # =========================================================================
+    # Architectural Context Helpers (S15.5)
+    # =========================================================================
+
+    def find_domain_for(self, module_id: str) -> ConceptNode | None:
+        """Find the bounded context a module belongs to.
+
+        Follows outgoing ``belongs_to`` edge from the module node.
+
+        Args:
+            module_id: Module node ID (e.g., ``"mod-memory"``).
+
+        Returns:
+            The bounded context node, or None if not found.
+        """
+        neighbors = self.graph.get_neighbors(
+            module_id, depth=1, edge_types=["belongs_to"]
+        )
+        for node in neighbors:
+            if node.type == "bounded_context":
+                return node
+        return None
+
+    def find_layer_for(self, module_id: str) -> ConceptNode | None:
+        """Find the architectural layer a module belongs to.
+
+        Follows outgoing ``in_layer`` edge from the module node.
+
+        Args:
+            module_id: Module node ID (e.g., ``"mod-memory"``).
+
+        Returns:
+            The layer node, or None if not found.
+        """
+        neighbors = self.graph.get_neighbors(
+            module_id, depth=1, edge_types=["in_layer"]
+        )
+        for node in neighbors:
+            if node.type == "layer":
+                return node
+        return None
+
+    def find_constraints_for(self, module_id: str) -> list[ConceptNode]:
+        """Find all guardrails that constrain a module.
+
+        Two-hop traversal: module → ``belongs_to`` → bounded context →
+        ``constrained_by`` → guardrails.
+
+        Args:
+            module_id: Module node ID (e.g., ``"mod-memory"``).
+
+        Returns:
+            List of guardrail nodes. Empty if module has no domain.
+        """
+        domain = self.find_domain_for(module_id)
+        if domain is None:
+            return []
+
+        neighbors = self.graph.get_neighbors(
+            domain.id, depth=1, edge_types=["constrained_by"]
+        )
+        return [n for n in neighbors if n.type == "guardrail"]
+
+    def get_architectural_context(
+        self, module_id: str
+    ) -> ArchitecturalContext | None:
+        """Get full architectural context for a module.
+
+        Combines domain, layer, constraints, and dependencies into a
+        single structured result.
+
+        Args:
+            module_id: Module node ID (e.g., ``"mod-memory"``).
+
+        Returns:
+            ArchitecturalContext with all available information,
+            or None if module doesn't exist.
+        """
+        module = self.graph.get_concept(module_id)
+        if module is None:
+            return None
+
+        domain = self.find_domain_for(module_id)
+        layer = self.find_layer_for(module_id)
+        constraints = self.find_constraints_for(module_id)
+
+        # Dependencies: modules connected via depends_on
+        dep_neighbors = self.graph.get_neighbors(
+            module_id, depth=1, edge_types=["depends_on"]
+        )
+        dependencies = [n for n in dep_neighbors if n.type == "module"]
+
+        return ArchitecturalContext(
+            module=module,
+            domain=domain,
+            layer=layer,
+            constraints=constraints,
+            dependencies=dependencies,
         )
