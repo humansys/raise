@@ -57,47 +57,32 @@ template: "lean-feature-spec-v2"
 
 ### D1: What stays in CLAUDE.md?
 
-Only safety-critical rules that must ALWAYS be in system prompt:
+Pure platform adapter — bootstrap pointer only:
 
 ```markdown
 # RaiSE Project
 
-> Run `/session-start` to load full context.
-
-## Critical Rules
-
-**NEVER:**
-- Process code without structured context
-- Store secrets, tokens, or PII in config files
-- Sacrifice traceability for speed
-- Generate code without documented implementation plan
-- Spawn subagents without explicit permission
-
-**ALWAYS:**
-- Stop on defects (Jidoka): Detect → Stop → Correct → Continue
-- Ask before expensive operations
-
-## Git
-
-- **Platform:** GitLab (`glab` CLI, not `gh`)
-- **Development Branch:** `v2`
-- **Commits:** Conventional commits
-- **Co-authorship:** `Co-Authored-By: Rai <rai@humansys.ai>`
+Run `/session-start` to load context and governance.
 ```
 
-**Rationale**: These are safety guardrails — can't risk the AI acting without them before `/session-start` runs. Everything else loads on demand.
+3 lines. ALL governance (safety rules, git practices, code standards, architecture) lives in `.raise/agent.md`. Nothing should happen before `/session-start` runs — the pointer makes this explicit.
+
+**Rationale**: CLAUDE.md is a platform adapter, not a governance carrier. RaiSE owns all governance in its own config. Platform agnosticism means we can't rely on CLAUDE.md for anything beyond bootstrapping.
 
 ### D2: What goes in `.raise/agent.md`?
 
-Everything else from current CLAUDE.md:
+Everything from current CLAUDE.md — ALL governance:
 - Project identity + philosophy
 - Development principles (constitution summary)
 - Values table
+- **Critical rules (NEVER/ALWAYS lists)**
 - Full code standards (type safety, linting, testing, security, docs)
 - Architecture (stack, pattern, directory structure)
 - Toolchain (pre-commit, quality checks)
+- **Git practices (platform, branching, co-authorship)**
 - Terminology (deprecated → canonical)
 - Golden data (sources of truth)
+- Jidoka (stop on defects)
 - References table
 - Inference economy guidelines
 
@@ -232,32 +217,12 @@ Next:
 - PyPI publish
 ```
 
-### Minimal CLAUDE.md (~20 lines)
+### Minimal CLAUDE.md (3 lines)
 
 ```markdown
 # RaiSE Project
 
-> Run `/session-start` to load full context.
-
-## Critical Rules
-
-**NEVER:**
-- Process code without structured context
-- Store secrets, tokens, or PII in config files
-- Sacrifice traceability for speed
-- Generate code without documented implementation plan
-- Spawn subagents without explicit permission
-
-**ALWAYS:**
-- Stop on defects (Jidoka): Detect → Stop → Correct → Continue
-- Ask before expensive operations
-
-## Git
-
-- **Platform:** GitLab (`glab` CLI, not `gh`)
-- **Development Branch:** `v2`
-- **Commits:** Conventional commits (`feat:`, `fix:`, `docs:`, etc.)
-- **Co-authorship:** `Co-Authored-By: Rai <rai@humansys.ai>`
+Run `/session-start` to load context and governance.
 ```
 
 ### Session-Start Skill (Updated)
@@ -283,7 +248,7 @@ Step 2: Interpret & Present
 
 - [ ] Context bundle includes recent sessions (last 3), epic progress, completed epics
 - [ ] `.raise/agent.md` exists with full governance config (code standards, architecture, toolchain)
-- [ ] CLAUDE.md is ≤ 25 lines (safety rules + git + pointer)
+- [ ] CLAUDE.md is ≤ 5 lines (bootstrap pointer only)
 - [ ] CLAUDE.local.md is ≤ 3 lines (bootstrap pointer)
 - [ ] `SessionState` model has `progress` and `completed_epics` fields
 - [ ] Session-close writes progress to session-state.yaml
@@ -298,6 +263,6 @@ Step 2: Interpret & Present
 
 ### MUST NOT
 
-- Remove safety rules from CLAUDE.md (NEVER list must stay in system prompt)
 - Break existing session-start/close CLI interface
 - Require hook changes
+- Leave governance split between CLAUDE.md and agent.md (all governance in agent.md)
