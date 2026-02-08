@@ -345,12 +345,13 @@ class UnifiedGraphBuilder:
         try:
             import yaml
 
-            frontmatter: dict[str, Any] = yaml.safe_load(frontmatter_text)
+            frontmatter_raw: Any = yaml.safe_load(frontmatter_text)
         except Exception:
             return None
 
-        if not isinstance(frontmatter, dict):
+        if not isinstance(frontmatter_raw, dict):
             return None
+        frontmatter = cast(dict[str, Any], frontmatter_raw)
 
         # Build relative source path
         try:
@@ -389,8 +390,15 @@ class UnifiedGraphBuilder:
             return None
 
         metadata: dict[str, Any] = {}
-        for key in ("depends_on", "depended_by", "entry_points", "public_api",
-                     "components", "constraints", "status"):
+        for key in (
+            "depends_on",
+            "depended_by",
+            "entry_points",
+            "public_api",
+            "components",
+            "constraints",
+            "status",
+        ):
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
@@ -425,12 +433,21 @@ class UnifiedGraphBuilder:
         ext_deps: list[str] = frontmatter.get("external_dependencies", [])
         deps_summary = ", ".join(ext_deps) if ext_deps else "none"
 
-        content = f"System context: {tech_summary}. External dependencies: {deps_summary}."
+        content = (
+            f"System context: {tech_summary}. External dependencies: {deps_summary}."
+        )
 
         # Store all structured data in metadata
         metadata: dict[str, Any] = {"arch_type": "architecture_context"}
-        for key in ("tech_stack", "external_dependencies", "users", "governed_by",
-                     "project", "version", "status"):
+        for key in (
+            "tech_stack",
+            "external_dependencies",
+            "users",
+            "governed_by",
+            "project",
+            "version",
+            "status",
+        ):
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
@@ -466,13 +483,22 @@ class UnifiedGraphBuilder:
             layer_parts.append(f"{name}: {', '.join(modules)}")
 
         layers_summary = ". ".join(layer_parts) if layer_parts else "No layers defined"
-        content = f"System design: {len(layers)} layers ({', '.join(l.get('name', '') for l in layers)}). {layers_summary}."
+        layer_names = ", ".join(layer.get("name", "") for layer in layers)
+        content = (
+            f"System design: {len(layers)} layers ({layer_names}). {layers_summary}."
+        )
 
         # Store all structured data in metadata
         metadata: dict[str, Any] = {"arch_type": "architecture_design"}
-        for key in ("layers", "architectural_decisions", "distribution",
-                     "guardrails_reference", "constitution_reference",
-                     "project", "status"):
+        for key in (
+            "layers",
+            "architectural_decisions",
+            "distribution",
+            "guardrails_reference",
+            "constitution_reference",
+            "project",
+            "status",
+        ):
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
@@ -515,8 +541,14 @@ class UnifiedGraphBuilder:
 
         # Store all structured data in metadata
         metadata: dict[str, Any] = {"arch_type": "architecture_domain_model"}
-        for key in ("bounded_contexts", "shared_kernel", "application_layer",
-                     "distribution", "project", "status"):
+        for key in (
+            "bounded_contexts",
+            "shared_kernel",
+            "application_layer",
+            "distribution",
+            "project",
+            "status",
+        ):
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
