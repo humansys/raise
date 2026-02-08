@@ -153,12 +153,12 @@ Sequential — single developer + AI, and S7.2 patterns directly inform S7.3.
 
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
-| S7.1: Governance scaffolding CLI | S | Pending | - | |
+| S7.1: Governance scaffolding CLI | S | ✅ Done | 30 min | 1.5x velocity, PAT-202 |
 | S7.2: `/project-create` skill | M | Pending | - | |
 | S7.3: `/project-onboard` skill | M | Pending | - | |
 
 **Milestones:**
-- [ ] M1: Governance Templates
+- [x] M1: Governance Templates
 - [ ] M2: Greenfield Ready
 - [ ] M3: Brownfield Ready (Epic Complete)
 
@@ -174,4 +174,4 @@ Sequential — single developer + AI, and S7.2 patterns directly inform S7.3.
 
 *Created: 2026-02-08*
 *Plan added: 2026-02-08*
-*Next: `/story-start` for S7.1*
+*Next: `/story-start` for S7.2*
