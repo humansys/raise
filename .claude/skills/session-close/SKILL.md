@@ -1,8 +1,8 @@
 ---
 name: session-close
 description: >
-  Close a working session by updating memory and preparing context for the next session.
-  Preserves learnings and maintains continuity.
+  Close a working session by reflecting on outcomes and feeding structured data to CLI.
+  CLI does all writes atomically; skill does inference reflection.
 
 license: MIT
 
@@ -14,7 +14,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "3.0.0"
 
 hooks:
   Stop:
@@ -27,138 +27,121 @@ hooks:
 
 ## Purpose
 
-Close a session by preserving learnings and preparing handoff. Updates memory, captures tangents, and creates continuity for the next session.
+Close a session by reflecting on outcomes and feeding structured data to the CLI. The CLI performs all writes atomically (session index, patterns, coaching, session state, profile). The skill only does inference: reflect and produce structured output.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Explain each step and why. All steps executed.
+Experience level affects verbosity of the handoff message, not the operations.
 
-**Ha (破)**: Brief explanations. All steps executed.
+## Steps (2)
 
-**Ri (離)**: Minimal output. All steps executed.
+### Step 1: Reflect & Produce Structured Output
 
-Experience level affects **communication style**, not **operations**. All levels perform the same memory operations.
+Use inference to reflect on the session:
 
-## Context
+1. **Summary:** What was accomplished? (1-2 sentences)
+2. **Session type:** feature, research, maintenance, infrastructure, ideation
+3. **Outcomes:** List of concrete deliverables
+4. **Patterns:** Any new learnings? (check against existing — query if needed)
+5. **Corrections:** Any behavioral corrections observed? (what + lesson)
+6. **Current work:** Epic, story, phase, branch for continuity
+7. **Pending:** Decisions, blockers, next actions
+8. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
+9. **Update `CLAUDE.local.md`:** Recent Sessions table, Current Focus, Last updated
 
-**When to use:**
-- End of working session
-- After completing feature or significant work
-- Before break or context switch
+Write the structured output as a YAML state file:
 
-**When to skip:**
-- Trivial session with no learnings
-
-**Inputs required:**
-- Conversation context (learnings, tangents)
-- Existing patterns (for deduplication)
-
-**Output:**
-- Memory updates (patterns, sessions, telemetry)
-- Context file update (`CLAUDE.local.md`)
-- Session state cleared
-
-## Steps (6)
-
-### Step 1: Reflect & Query (Parallel)
-
-**Mental work** (while query runs):
-- What was the goal? What was accomplished?
-- What patterns/learnings emerged?
-- Any tangents worth capturing?
-
-**Query** (parallel):
-```bash
-uv run raise memory query "patterns" --types pattern --limit 5
+```yaml
+# /tmp/session-output.yaml
+summary: "Session protocol implementation"
+type: feature
+outcomes:
+  - "Tasks 1-6 complete"
+  - "136 tests passing"
+patterns:
+  - description: "Pattern description here"
+    context: "tag1,tag2"
+    type: process
+corrections:
+  - what: "Behavioral observation"
+    lesson: "Lesson learned"
+current_work:
+  epic: E15
+  story: S15.7
+  phase: implement
+  branch: story/s15.7/session-protocol
+pending:
+  decisions: []
+  blockers: []
+  next_actions:
+    - "Continue with Task 7"
+notes: "Any free-form notes"
 ```
 
-This helps avoid duplicate patterns. Query is fast (<3ms) — always run it.
-
-### Step 2: Update Memory (Parallel CLI Calls)
-
-Run these in parallel (all independent):
+### Step 2: Feed CLI
 
 ```bash
-# Patterns (if any new ones)
-uv run raise memory add-pattern "Description" -c "context,tags" -t process
-
-# Session record (always)
-uv run raise memory add-session "Topic" -o "outcome1,outcome2" -t {type}
-
-# Telemetry (always)
-uv run raise memory emit-session -t {type} -o {outcome} -d {minutes}
+uv run raise session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 ```
 
-**Types:** feature, research, maintenance, infrastructure, ideation
-**Outcomes:** success, partial, abandoned
+This single command atomically:
+- Records session in `sessions/index.jsonl`
+- Appends patterns to `patterns.jsonl`
+- Updates coaching corrections in `~/.rai/developer.yaml`
+- Writes `.raise/rai/session-state.yaml`
+- Clears `current_session` in profile
 
-### Step 3: Update Context (Single Write)
-
-Update `CLAUDE.local.md` with a **single Write operation**:
-
-1. Read the file once
-2. Plan all changes:
-   - Current Focus (if changed)
-   - Recent Sessions table (add row)
-   - Quick References (if new artifacts)
-   - Last updated line
-3. Write entire file once
-
-**Do NOT:** Make multiple Edit calls to the same file.
-
-### Step 4: Capture Tangents
-
-Check conversation for ideas mentioned but not pursued.
-
-- Add to `dev/parking-lot.md` if worth revisiting
-- Skip if none
-
-**Don't skip this step** — tangents exist only in conversation context.
-
-### Step 5: Clear Session State
-
+**Alternative (simple close):** For quick sessions without state file:
 ```bash
-uv run raise session close
+uv run raise session close --summary "Quick fix session" --type maintenance --project "$(pwd)"
 ```
 
-This clears `current_session` in `~/.rai/developer.yaml`, marking the session as properly closed. Without this step, the next `/session-start` will warn about an unclosed session.
+**With inline pattern/correction:**
+```bash
+uv run raise session close \
+  --summary "Session description" \
+  --type feature \
+  --pattern "New pattern learned" \
+  --correction "What happened" \
+  --correction-lesson "What to do instead" \
+  --project "$(pwd)"
+```
 
-### Step 6: Handoff
-
-Output brief suggestion:
+After the CLI call, output a brief handoff:
 
 ```
 ## Next Session
 **Continue:** [next step]
-**Alternative:** [if blocked]
-**Open:** [unresolved questions]
+**Open:** [unresolved questions, if any]
 ```
 
 ## Output
 
-| File | Update |
-|------|--------|
-| `.raise/rai/memory/patterns.jsonl` | New patterns (CLI) |
-| `.raise/rai/memory/sessions/index.jsonl` | Session record (CLI) |
-| `.raise/rai/telemetry/signals.jsonl` | Session event (CLI) |
-| `~/.rai/developer.yaml` | Session state cleared (CLI) |
-| `CLAUDE.local.md` | Single Write |
-| `dev/parking-lot.md` | Tangents (if any) |
+All writes are done by the CLI in Step 2 — the skill does NOT call separate memory/telemetry commands.
+
+| File | Update | Writer |
+|------|--------|--------|
+| `.raise/rai/memory/sessions/index.jsonl` | Session record | CLI |
+| `.raise/rai/memory/patterns.jsonl` | New patterns | CLI |
+| `~/.rai/developer.yaml` | Coaching + clear session | CLI |
+| `.raise/rai/session-state.yaml` | Working state | CLI |
+| `CLAUDE.local.md` | Recent Sessions, Focus | Skill (Write) |
+| `dev/parking-lot.md` | Tangents | Skill (Edit) |
 
 ## Notes
 
-**Token economy:** This skill reduces future token waste by persisting learnings in structured files.
-
-**Minimum close:** If rushed, at minimum: `add-session` + update CLAUDE.local.md "Recent Sessions".
-
-**Calibration:** If features completed, also run:
-```bash
-uv run raise memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins} -e {estimated_mins}
-```
+- **One CLI call** does all data plumbing — no separate add-session/add-pattern/emit-session
+- Idempotent: can close multiple times (second close overwrites with more current data)
+- State file is the richest path; CLI flags are for simple/quick closes
+- Calibration (if stories completed): still run separately:
+  ```bash
+  uv run raise memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
+  ```
 
 ## References
 
 - Complement: `/session-start`
+- Session state: `.raise/rai/session-state.yaml`
 - Memory: `.raise/rai/memory/`
 - Context: `CLAUDE.local.md`
 - Tangents: `dev/parking-lot.md`

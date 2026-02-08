@@ -3,7 +3,7 @@
 **ID:** E15
 **Branch:** `epic/e15/ontology-refinement`
 **Priority:** Pre-F&F (blocking — maximum Rai reliability for HumanSys team)
-**Sizing:** M (17 SP estimated)
+**Sizing:** M (22 SP estimated — 17 original + 5 S15.7)
 **Depends on:** E11 (Unified Graph), E13 (Discovery), discover-describe story (all complete)
 
 ---
@@ -281,6 +281,8 @@ Story 3 (S, 3 SP) ──┬── Story 4 (XS, 2 SP)    ← parallel after Story
 | 3‖ | S15.4 Edge-Type Filtering | XS | 2 | None (graph layer ready) | M2 | Parallel with S3. Exposes existing `get_neighbors()` edge_types in query engine |
 | 4 | S15.5 Query Helpers | S | 3 | S15.3, S15.4 | M3 | `find_constraints_for()`, `get_architectural_context()`, CLI commands |
 | 5 | S15.6 Skills Integration | S | 3 | S15.5 | M4 | Updates `/story-design`, `/epic-design`, `/story-plan` with architectural context step |
+| — | ~~S15.4b Foundational Pattern Surfacing~~ | XS | — | — | — | **Superseded by S15.7** |
+| 6 | S15.7 Deterministic Session Protocol | M | 5 | S15.4 | M5 | Session-state, CLI context bundle, coaching persistence, foundational patterns, platform agnosticism |
 
 ### Milestones
 
@@ -289,7 +291,8 @@ Story 3 (S, 3 SP) ──┬── Story 4 (XS, 2 SP)    ← parallel after Story
 | **M1: Architecture in Graph** | S15.1, S15.2 | Day 1 | `raise memory query "ontology" --types bounded_context` returns nodes. 8 BC + 4 layer nodes + belongs_to/in_layer edges | Query bounded contexts and layers |
 | **M2: Constraint-Aware Graph** | +S15.3, S15.4 | Day 1 | `raise memory query mod-memory --strategy concept_lookup --edge-types constrained_by` returns guardrails. ~200 constraint edges | Query constraints for any module |
 | **M3: One-Call Context** | +S15.5 | Day 2 | `raise memory context memory` returns full architectural context (domain, layer, constraints, dependencies) in <100ms | CLI command returns structured context |
-| **M4: Epic Complete** | +S15.6 | Day 2 | `/story-design` queries architectural context before designing. Dogfood with real story design. Retro complete. | Design a story using ontology-guided context |
+| **M4: Skills Integration** | +S15.6 | Day 2 | `/story-design` queries architectural context before designing. Dogfood with real story design. | Design a story using ontology-guided context |
+| **M5: Session Protocol** | +S15.7 | Day 3+ | `raise session start` outputs context bundle. Session-state.yaml written/read. Coaching persists. No CLAUDE.local.md dependency. Retro complete. | Full session lifecycle with new protocol |
 
 ### Parallel Work Streams
 
@@ -326,12 +329,15 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 | S15.4 Edge-Type Filter | XS | 2 | ✅ Done | 12 min | 2.5x | edge_types in query engine + CLI, PAT-186 |
 | S15.5 Query Helpers | S | 3 | Pending | — | — | |
 | S15.6 Skills Integration | S | 3 | Pending | — | — | |
+| ~~S15.4b Foundational Patterns~~ | XS | — | Superseded | — | — | Absorbed into S15.7 |
+| S15.7 Session Protocol | M | 5 | In Progress | — | — | Branch: `story/s15.7/session-protocol` |
 
 **Milestone Progress:**
 - [x] M1: Architecture in Graph (Day 1)
 - [x] M2: Constraint-Aware Graph (Day 1-2) — S15.3 + S15.4 done
 - [ ] M3: One-Call Context (Day 2)
-- [ ] M4: Epic Complete (Day 2)
+- [ ] M4: Skills Integration (Day 2)
+- [ ] M5: Session Protocol (Day 3+) — S15.7
 
 ### Velocity Assumptions
 
