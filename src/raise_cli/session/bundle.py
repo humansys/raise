@@ -264,14 +264,29 @@ def _format_primes(patterns: list[ConceptNode]) -> str:
 def _format_coaching(profile: DeveloperProfile) -> str:
     """Format coaching context."""
     coaching = profile.coaching
-    if not coaching.strengths and not coaching.corrections and not coaching.growth_edge:
+    has_content = (
+        coaching.strengths
+        or coaching.corrections
+        or coaching.growth_edge
+        or coaching.trust_level != "new"
+        or coaching.autonomy
+        or coaching.relationship.quality != "new"
+    )
+    if not has_content:
         return ""
 
     lines = ["# Coaching"]
+    if coaching.trust_level != "new":
+        lines.append(f"Trust: {coaching.trust_level}")
     if coaching.strengths:
         lines.append(f"Strengths: {', '.join(coaching.strengths)}")
     if coaching.growth_edge:
         lines.append(f"Growth edge: {coaching.growth_edge}")
+    if coaching.autonomy:
+        lines.append(f"Autonomy: {coaching.autonomy}")
+    if coaching.relationship.quality != "new":
+        rel = coaching.relationship
+        lines.append(f"Relationship: {rel.quality} ({rel.trajectory})")
     if coaching.corrections:
         lines.append("Recent corrections:")
         for c in coaching.corrections[-3:]:  # Last 3 for brevity

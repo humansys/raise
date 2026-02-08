@@ -390,6 +390,8 @@ def update_coaching(
     growth_edge: str | None = None,
     trust_level: str | None = None,
     autonomy: str | None = None,
+    relationship: dict[str, str] | None = None,
+    communication_notes: list[str] | None = None,
 ) -> DeveloperProfile:
     """Update coaching context fields.
 
@@ -401,6 +403,9 @@ def update_coaching(
         growth_edge: New growth edge description.
         trust_level: New trust level.
         autonomy: New autonomy observation.
+        relationship: Dict with optional keys (quality, trajectory).
+            Updates RelationshipState fields individually.
+        communication_notes: Notes about communication patterns (replaces existing).
 
     Returns:
         Updated profile with coaching changes.
@@ -414,6 +419,19 @@ def update_coaching(
         updates["trust_level"] = trust_level
     if autonomy is not None:
         updates["autonomy"] = autonomy
+    if communication_notes is not None:
+        updates["communication_notes"] = communication_notes
+    if relationship is not None:
+        rel_updates: dict[str, object] = {}
+        if "quality" in relationship:
+            rel_updates["quality"] = relationship["quality"]
+        if "trajectory" in relationship:
+            rel_updates["trajectory"] = relationship["trajectory"]
+        if rel_updates:
+            updated_rel = profile.coaching.relationship.model_copy(
+                update=rel_updates
+            )
+            updates["relationship"] = updated_rel
 
     if not updates:
         return profile

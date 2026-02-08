@@ -1,12 +1,12 @@
 """Session close orchestrator.
 
 Processes structured session output and performs all writes atomically:
-1. Write session-state.yaml (project-level working state)
+1. Record session in sessions/index.jsonl
 2. Append patterns to patterns.jsonl
 3. Update coaching corrections in developer.yaml
-4. Record session in sessions/index.jsonl
-5. Emit telemetry (session_close signal)
-6. Clear current_session in developer.yaml
+4. Update coaching observations in developer.yaml
+5. Clear current_session in developer.yaml
+6. Write session-state.yaml (project-level working state)
 """
 
 from __future__ import annotations
@@ -31,6 +31,7 @@ from raise_cli.onboarding.profile import (
     add_correction,
     end_session,
     save_developer_profile,
+    update_coaching,
 )
 from raise_cli.schemas.session_state import (
     CurrentWork,
@@ -60,6 +61,7 @@ class CloseInput:
     pending: dict[str, list[str]] | None = None
     progress: dict[str, int | str] | None = None
     completed_epics: list[str] = field(default_factory=list)
+    coaching: dict[str, object] | None = None
     notes: str = ""
 
 
@@ -103,6 +105,7 @@ def load_state_file(path: Path) -> CloseInput:
         pending=data.get("pending"),
         progress=data.get("progress"),
         completed_epics=data.get("completed_epics", []),
+        coaching=data.get("coaching"),
         notes=data.get("notes", ""),
     )
 
@@ -173,7 +176,21 @@ def process_session_close(
             )
             result.corrections_added += 1
 
-    # 4. Clear current_session and save profile
+    # 4. Update coaching observations
+    if close_input.coaching:
+        c = close_input.coaching
+        updated_profile = update_coaching(
+            updated_profile,
+            strengths=c.get("strengths"),  # type: ignore[arg-type]
+            growth_edge=c.get("growth_edge"),  # type: ignore[arg-type]
+            trust_level=c.get("trust_level"),  # type: ignore[arg-type]
+            autonomy=c.get("autonomy"),  # type: ignore[arg-type]
+            relationship=c.get("relationship"),  # type: ignore[arg-type]
+            communication_notes=c.get("communication_notes"),  # type: ignore[arg-type]
+        )
+        result.messages.append("Coaching updated")
+
+    # 5. Clear current_session and save profile
     updated_profile = end_session(updated_profile)
     save_developer_profile(updated_profile)
     result.messages.append("Profile updated")
