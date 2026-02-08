@@ -321,14 +321,14 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 | Story | Size | SP | Status | Actual | Velocity | Notes |
 |-------|:----:|:--:|:------:|:------:|:--------:|-------|
 | S15.1 Ingest Arch Docs | S | 3 | ✅ Done | 42 min | 2.14x | 3 arch nodes, type-dispatch pattern |
-| S15.2 BC + Layer Nodes | S | 3 | Pending | — | — | |
+| S15.2 BC + Layer Nodes | S | 3 | ✅ Done | 25 min | 2.4x | 10 BC + 4 layer nodes, 26 edges, PAT-182 |
 | S15.3 Constraint Edges | S | 3 | Pending | — | — | |
 | S15.4 Edge-Type Filter | XS | 2 | Pending | — | — | Parallel with S15.3 |
 | S15.5 Query Helpers | S | 3 | Pending | — | — | |
 | S15.6 Skills Integration | S | 3 | Pending | — | — | |
 
 **Milestone Progress:**
-- [ ] M1: Architecture in Graph (Day 1)
+- [x] M1: Architecture in Graph (Day 1)
 - [ ] M2: Constraint-Aware Graph (Day 1-2)
 - [ ] M3: One-Call Context (Day 2)
 - [ ] M4: Epic Complete (Day 2)
