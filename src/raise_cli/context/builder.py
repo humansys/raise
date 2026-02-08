@@ -53,7 +53,8 @@ class UnifiedGraphBuilder:
         """Build unified graph from all sources.
 
         Loads concepts from governance, memory, work, skills, and components,
-        then builds a UnifiedGraph with all nodes.
+        then builds a UnifiedGraph with all nodes. After all nodes are loaded,
+        extracts structural nodes (bounded contexts, layers) and their edges.
 
         Returns:
             UnifiedGraph containing all concepts.
@@ -73,9 +74,31 @@ class UnifiedGraphBuilder:
         for node in all_nodes:
             graph.add_concept(node)
 
+        # Extract structural nodes and edges (E15 — bounded contexts, layers)
+        # Runs after all nodes loaded so module nodes exist for edge safety
+        node_by_id: dict[str, ConceptNode] = {n.id: n for n in all_nodes}
+        structural_nodes: list[ConceptNode] = []
+        structural_edges: list[ConceptEdge] = []
+
+        bc_nodes, bc_edges = self._extract_bounded_contexts(all_nodes, node_by_id)
+        structural_nodes.extend(bc_nodes)
+        structural_edges.extend(bc_edges)
+
+        lyr_nodes, lyr_edges = self._extract_layers(all_nodes, node_by_id)
+        structural_nodes.extend(lyr_nodes)
+        structural_edges.extend(lyr_edges)
+
+        for node in structural_nodes:
+            graph.add_concept(node)
+        all_nodes.extend(structural_nodes)
+
         # Infer and add relationships
         edges = self.infer_relationships(all_nodes)
         for edge in edges:
+            graph.add_relationship(edge)
+
+        # Add structural edges (explicit, not inferred)
+        for edge in structural_edges:
             graph.add_relationship(edge)
 
         return graph
@@ -560,6 +583,207 @@ class UnifiedGraphBuilder:
             created=datetime.now(tz=UTC).isoformat(),
             metadata=metadata,
         )
+
+    def _extract_bounded_contexts(
+        self,
+        all_nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> tuple[list[ConceptNode], list[ConceptEdge]]:
+        """Extract bounded context nodes and belongs_to edges from domain model.
+
+        Reads the arch-domain-model node's metadata to create bounded_context
+        nodes for each DDD context, shared kernel, application layer, and
+        distribution grouping.
+
+        Args:
+            all_nodes: All nodes loaded so far.
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            Tuple of (bounded_context nodes, belongs_to edges).
+        """
+        nodes: list[ConceptNode] = []
+        edges: list[ConceptEdge] = []
+
+        # Find the arch-domain-model node
+        dm_node = node_by_id.get("arch-domain-model")
+        if dm_node is None:
+            return nodes, edges
+
+        now = datetime.now(tz=UTC).isoformat()
+
+        # Extract bounded contexts
+        bcs: list[dict[str, Any]] = dm_node.metadata.get("bounded_contexts", [])
+        for bc in bcs:
+            bc_name: str = bc.get("name", "")
+            if not bc_name:
+                continue
+            bc_id = f"bc-{bc_name}"
+            nodes.append(
+                ConceptNode(
+                    id=bc_id,
+                    type="bounded_context",
+                    content=bc.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "bounded_context",
+                        "modules": bc.get("modules", []),
+                    },
+                )
+            )
+            # Create belongs_to edges for modules in this BC
+            modules: list[str] = bc.get("modules", [])
+            for mod_name in modules:
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id, target=bc_id, type="belongs_to", weight=1.0
+                        )
+                    )
+
+        # Extract shared kernel as a BC node
+        shared: dict[str, Any] = dm_node.metadata.get("shared_kernel", {})
+        if shared:
+            nodes.append(
+                ConceptNode(
+                    id="bc-shared-kernel",
+                    type="bounded_context",
+                    content=shared.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "shared_kernel",
+                        "modules": shared.get("modules", []),
+                    },
+                )
+            )
+            for mod_name in shared.get("modules", []):
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id,
+                            target="bc-shared-kernel",
+                            type="belongs_to",
+                            weight=1.0,
+                        )
+                    )
+
+        # Extract application layer as a BC node
+        app_layer: dict[str, Any] = dm_node.metadata.get("application_layer", {})
+        if app_layer:
+            nodes.append(
+                ConceptNode(
+                    id="bc-application-layer",
+                    type="bounded_context",
+                    content=app_layer.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "application_layer",
+                        "modules": app_layer.get("modules", []),
+                    },
+                )
+            )
+            for mod_name in app_layer.get("modules", []):
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id,
+                            target="bc-application-layer",
+                            type="belongs_to",
+                            weight=1.0,
+                        )
+                    )
+
+        # Extract distribution as a BC node
+        dist: dict[str, Any] = dm_node.metadata.get("distribution", {})
+        if dist:
+            nodes.append(
+                ConceptNode(
+                    id="bc-distribution",
+                    type="bounded_context",
+                    content=dist.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "distribution",
+                        "modules": dist.get("modules", []),
+                    },
+                )
+            )
+            for mod_name in dist.get("modules", []):
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id,
+                            target="bc-distribution",
+                            type="belongs_to",
+                            weight=1.0,
+                        )
+                    )
+
+        return nodes, edges
+
+    def _extract_layers(
+        self,
+        all_nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> tuple[list[ConceptNode], list[ConceptEdge]]:
+        """Extract layer nodes and in_layer edges from system design.
+
+        Reads the arch-design node's metadata to create layer nodes and
+        in_layer edges linking modules to their architectural layer.
+
+        Args:
+            all_nodes: All nodes loaded so far.
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            Tuple of (layer nodes, in_layer edges).
+        """
+        nodes: list[ConceptNode] = []
+        edges: list[ConceptEdge] = []
+
+        # Find the arch-design node
+        design_node = node_by_id.get("arch-design")
+        if design_node is None:
+            return nodes, edges
+
+        now = datetime.now(tz=UTC).isoformat()
+
+        layers: list[dict[str, Any]] = design_node.metadata.get("layers", [])
+        for layer in layers:
+            layer_name: str = layer.get("name", "")
+            if not layer_name:
+                continue
+            layer_id = f"lyr-{layer_name}"
+            nodes.append(
+                ConceptNode(
+                    id=layer_id,
+                    type="layer",
+                    content=layer.get("description", ""),
+                    source_file=design_node.source_file,
+                    created=now,
+                    metadata={"modules": layer.get("modules", [])},
+                )
+            )
+            # Create in_layer edges for modules in this layer
+            modules: list[str] = layer.get("modules", [])
+            for mod_name in modules:
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id, target=layer_id, type="in_layer", weight=1.0
+                        )
+                    )
+
+        return nodes, edges
 
     def _get_governance_extractor(self) -> GovernanceExtractor:
         """Get governance extractor instance.

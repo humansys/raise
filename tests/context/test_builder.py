@@ -1619,3 +1619,322 @@ class TestInferRelationships:
 
         # Should have edges
         assert graph.edge_count >= 1
+
+
+class TestExtractBoundedContexts:
+    """Tests for bounded context extraction from arch-domain-model metadata (S15.2)."""
+
+    def _build_arch_fixtures(self, tmp_path: Path) -> None:
+        """Create architecture doc fixtures with domain model and design."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+        modules_dir = arch_dir / "modules"
+        modules_dir.mkdir()
+
+        # Domain model with bounded contexts
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: test
+            status: current
+            bounded_contexts:
+              - name: governance
+                modules: [governance]
+                description: "Extract structured knowledge"
+              - name: ontology
+                modules: [context, memory]
+                description: "Persist and query knowledge"
+            shared_kernel:
+              modules: [config, core]
+              description: "Foundation utilities"
+            application_layer:
+              modules: [cli]
+              description: "Thin orchestration shell"
+            distribution:
+              modules: [rai_base]
+              description: "Packaged content"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        # System design with layers
+        (arch_dir / "system-design.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_design
+            project: test
+            status: current
+            layers:
+              - name: leaf
+                modules: [config, core]
+                description: "Zero internal dependencies"
+              - name: domain
+                modules: [governance]
+                description: "Independent domain logic"
+              - name: integration
+                modules: [context, memory]
+                description: "Combines domains"
+              - name: orchestration
+                modules: [cli]
+                description: "User-facing entry points"
+            ---
+
+            # System Design
+            """)
+        )
+
+        # Module docs (so module nodes exist for edge safety)
+        for name in ["governance", "context", "memory", "config", "core", "cli", "rai_base"]:
+            (modules_dir / f"{name}.md").write_text(
+                dedent(f"""\
+                ---
+                type: module
+                name: {name}
+                purpose: "{name} module"
+                depends_on: []
+                ---
+
+                ## Purpose
+                The {name} module.
+                """)
+            )
+
+    def test_creates_bounded_context_nodes(self, tmp_path: Path) -> None:
+        """Should create bounded_context nodes from domain model metadata."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        bc_nodes = graph.get_concepts_by_type("bounded_context")
+        bc_ids = {n.id for n in bc_nodes}
+
+        # 2 BCs + shared_kernel + application_layer + distribution = 5
+        assert len(bc_nodes) == 5
+        assert "bc-governance" in bc_ids
+        assert "bc-ontology" in bc_ids
+        assert "bc-shared-kernel" in bc_ids
+        assert "bc-application-layer" in bc_ids
+        assert "bc-distribution" in bc_ids
+
+    def test_bc_nodes_have_correct_content(self, tmp_path: Path) -> None:
+        """BC node content should come from the description field."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("bc-ontology")
+        assert node is not None
+        assert node.content == "Persist and query knowledge"
+        assert node.metadata.get("bc_type") == "bounded_context"
+
+    def test_shared_kernel_has_bc_type_metadata(self, tmp_path: Path) -> None:
+        """Shared kernel should have bc_type='shared_kernel' in metadata."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("bc-shared-kernel")
+        assert node is not None
+        assert node.metadata.get("bc_type") == "shared_kernel"
+
+    def test_creates_belongs_to_edges(self, tmp_path: Path) -> None:
+        """Should create belongs_to edges from modules to their BC."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # mod-context and mod-memory should belong to bc-ontology
+        neighbors = graph.get_neighbors("bc-ontology", edge_types=["belongs_to"])
+        neighbor_ids = {n.id for n in neighbors}
+        assert "mod-context" in neighbor_ids
+        assert "mod-memory" in neighbor_ids
+
+    def test_no_belongs_to_for_missing_modules(self, tmp_path: Path) -> None:
+        """Should not create belongs_to edges when module node doesn't exist."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        # Domain model references a module that has no module doc
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: test
+            status: current
+            bounded_contexts:
+              - name: phantom
+                modules: [nonexistent]
+                description: "References missing module"
+            shared_kernel:
+              modules: []
+              description: "Empty"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # BC node should exist but have no belongs_to neighbors
+        node = graph.get_concept("bc-phantom")
+        assert node is not None
+        neighbors = graph.get_neighbors("bc-phantom", edge_types=["belongs_to"])
+        assert len(neighbors) == 0
+
+    def test_graceful_when_no_domain_model(self, tmp_path: Path) -> None:
+        """Should produce no BC nodes when arch-domain-model is absent."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        bc_nodes = graph.get_concepts_by_type("bounded_context")
+        assert len(bc_nodes) == 0
+
+
+class TestExtractLayers:
+    """Tests for layer extraction from arch-design metadata (S15.2)."""
+
+    def test_creates_layer_nodes(self, tmp_path: Path) -> None:
+        """Should create layer nodes from system design metadata."""
+        # Reuse the fixture builder from TestExtractBoundedContexts
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        layer_nodes = graph.get_concepts_by_type("layer")
+        layer_ids = {n.id for n in layer_nodes}
+
+        assert len(layer_nodes) == 4
+        assert layer_ids == {"lyr-leaf", "lyr-domain", "lyr-integration", "lyr-orchestration"}
+
+    def test_layer_nodes_have_correct_content(self, tmp_path: Path) -> None:
+        """Layer node content should come from the description field."""
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("lyr-leaf")
+        assert node is not None
+        assert node.content == "Zero internal dependencies"
+
+    def test_creates_in_layer_edges(self, tmp_path: Path) -> None:
+        """Should create in_layer edges from modules to their layer."""
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # mod-context and mod-memory should be in lyr-integration
+        neighbors = graph.get_neighbors("lyr-integration", edge_types=["in_layer"])
+        neighbor_ids = {n.id for n in neighbors}
+        assert "mod-context" in neighbor_ids
+        assert "mod-memory" in neighbor_ids
+
+    def test_no_in_layer_for_distribution_modules(self, tmp_path: Path) -> None:
+        """Distribution modules (rai_base) should NOT get in_layer edges."""
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # rai_base is in distribution, NOT in any layer
+        neighbors = graph.get_neighbors("mod-rai_base", edge_types=["in_layer"])
+        assert len(neighbors) == 0
+
+    def test_graceful_when_no_design_doc(self, tmp_path: Path) -> None:
+        """Should produce no layer nodes when arch-design is absent."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        layer_nodes = graph.get_concepts_by_type("layer")
+        assert len(layer_nodes) == 0

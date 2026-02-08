@@ -31,6 +31,8 @@ NodeType = Literal[
     "component",  # comp-* — discovered code components (E13)
     "module",  # mod-* — architecture module knowledge (discover-describe)
     "architecture",  # arch-* — architecture docs: context, design, domain model (E15)
+    "bounded_context",  # bc-* — DDD bounded context or structural grouping (E15)
+    "layer",  # lyr-* — architectural layer (E15)
 ]
 
 # Edge types for relationships between concepts
@@ -43,6 +45,8 @@ EdgeType = Literal[
     "part_of",  # story → epic (hierarchy)
     "related_to",  # generic semantic relationship
     "depends_on",  # module → module (architecture dependency)
+    "belongs_to",  # module → bounded_context (domain ownership, E15)
+    "in_layer",  # module → layer (architectural layer assignment, E15)
 ]
 
 
