@@ -331,7 +331,7 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 | S15.6 Skills Integration | S | 3 | Pending | — | — | |
 | ~~S15.4b Foundational Patterns~~ | XS | — | Superseded | — | — | Absorbed into S15.7 |
 | S15.7 Session Protocol | M | 5 | ✅ Done | 55 min | 4.1x | 136 tests, ADR-024, PAT-189 |
-| S15.8 Minimal Agent Config | S | 3 | Pending | — | — | Rich context bundle, shrink CLAUDE.md + CLAUDE.local.md |
+| S15.8 Minimal Agent Config | M | 5 | ✅ Done | — | — | Rich context bundle, shrink CLAUDE.md + CLAUDE.local.md |
 
 **Milestone Progress:**
 - [x] M1: Architecture in Graph (Day 1)
@@ -339,7 +339,7 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 - [ ] M3: One-Call Context (Day 2)
 - [ ] M4: Skills Integration (Day 2)
 - [x] M5: Session Protocol (Day 3+) — S15.7 ✓
-- [ ] M6: Self-Sustaining Sessions — S15.8 (CLAUDE.md + CLAUDE.local.md minimal, context bundle complete)
+- [x] M6: Self-Sustaining Sessions — S15.8 ✓ (CLAUDE.md + CLAUDE.local.md minimal, context bundle complete)
 
 ### Velocity Assumptions
 
