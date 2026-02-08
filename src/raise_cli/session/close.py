@@ -1,8 +1,8 @@
 """Session close orchestrator.
 
 Processes structured session output and performs all writes atomically:
-1. Record session in sessions/index.jsonl
-2. Append patterns to patterns.jsonl
+1. Record session in personal/sessions/index.jsonl (developer-specific)
+2. Append patterns to memory/patterns.jsonl (project knowledge)
 3. Update coaching corrections in developer.yaml
 4. Update coaching observations in developer.yaml
 5. Clear current_session in developer.yaml
@@ -127,14 +127,15 @@ def process_session_close(
     """
     result = CloseResult(success=True)
     memory_dir = project_path / ".raise" / "rai" / "memory"
+    personal_dir = project_path / ".raise" / "rai" / "personal"
 
-    # 1. Record session in index.jsonl
+    # 1. Record session in personal/sessions/index.jsonl
     session_input = SessionInput(
         topic=close_input.summary,
         session_type=close_input.session_type,
         outcomes=close_input.outcomes,
     )
-    session_result = append_session(memory_dir, session_input)
+    session_result = append_session(personal_dir, session_input)
     result.session_id = session_result.id
     result.messages.append(f"Session {session_result.id} recorded")
 

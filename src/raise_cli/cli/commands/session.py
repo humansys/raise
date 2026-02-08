@@ -115,9 +115,9 @@ def start(
 
     # Jidoka: Validate session index if project specified
     if project is not None:
-        memory_dir = Path(project) / ".raise" / "rai" / "memory"
-        if memory_dir.exists():
-            validation = validate_session_index(memory_dir)
+        personal_dir = Path(project) / ".raise" / "rai" / "personal"
+        if personal_dir.exists():
+            validation = validate_session_index(personal_dir)
             if not validation.is_valid:
                 typer.echo(f"Warning: {validation.summary()}")
                 typer.echo("Run `raise memory validate` to fix data quality issues.\n")

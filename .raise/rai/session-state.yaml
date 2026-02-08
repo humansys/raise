@@ -4,24 +4,23 @@ current_work:
   phase: implement
   branch: epic/e15/ontology-refinement
 last_session:
-  id: SES-004
+  id: SES-103
   date: '2026-02-08'
   developer: Emilio
-  summary: S15.8 Task 2 complete — session state expansion + bundle. EpicProgress
-    model, get_always_on_primes, governance/identity prime formatters, recent sessions,
-    progress formatting. 35 new tests, 1459 total, 92.38% coverage. Also fixed stale
-    CLAUDE.local.md.
-  patterns_captured: []
+  summary: S15.8 Task 4b + integration test — coaching evolution wiring + lifecycle
+    validation
+  patterns_captured:
+  - PAT-SES-006
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - 'Task 3: Session close + CLI + memory generate (write progress to state, accept
-    progress flags, skip MEMORY.md)'
-  - 'Task 4: File shrinking (CLAUDE.md → 3 lines, CLAUDE.local.md → 2 lines, delete
-    MEMORY.md)'
-  - 'Task 5: Integration test (full lifecycle validation)'
-notes: Clean single-pass TDD. Progress section works but won't show in live bundle
-  until Task 3 writes progress to session-state.yaml.
-progress: null
+  - Close S15.8 story
+notes: Coaching evolution gap caught during integration prep — good Jidoka moment
+progress:
+  epic: E15
+  stories_done: 6
+  stories_total: 8
+  sp_done: 18
+  sp_total: 24
 completed_epics: []

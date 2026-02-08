@@ -133,7 +133,7 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 
 | File | Update | Writer |
 |------|--------|--------|
-| `.raise/rai/memory/sessions/index.jsonl` | Session record | CLI |
+| `.raise/rai/personal/sessions/index.jsonl` | Session record | CLI |
 | `.raise/rai/memory/patterns.jsonl` | New patterns | CLI |
 | `~/.rai/developer.yaml` | Coaching + clear session | CLI |
 | `.raise/rai/session-state.yaml` | Working state | CLI |

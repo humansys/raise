@@ -4,7 +4,7 @@ Assembles a token-optimized context bundle (~600 tokens) from multiple sources:
 1. ~/.rai/developer.yaml → developer model + coaching + deadlines
 2. .raise/rai/session-state.yaml → current work state
 3. Memory graph → foundational patterns, governance primes, identity primes
-4. .raise/rai/memory/sessions/index.jsonl → recent sessions
+4. .raise/rai/personal/sessions/index.jsonl → recent sessions
 """
 
 from __future__ import annotations
@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 
 # Graph path relative to project root
 GRAPH_REL_PATH = Path(".raise") / "rai" / "memory" / "index.json"
-# Sessions index path relative to project root
+# Sessions index path relative to project root (personal = developer-specific)
 SESSIONS_INDEX_REL_PATH = (
-    Path(".raise") / "rai" / "memory" / "sessions" / "index.jsonl"
+    Path(".raise") / "rai" / "personal" / "sessions" / "index.jsonl"
 )
 
 

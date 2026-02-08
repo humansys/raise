@@ -72,10 +72,10 @@ class TestProcessSessionClose:
     """Tests for process_session_close."""
 
     def _setup_project(self, tmp_path: Path) -> Path:
-        """Create a project with memory directory."""
+        """Create a project with memory and personal directories."""
         project = tmp_path / "project"
-        memory_dir = project / ".raise" / "rai" / "memory" / "sessions"
-        memory_dir.mkdir(parents=True)
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
         return project
 
     def test_records_session(
@@ -260,10 +260,10 @@ class TestProcessSessionCloseCoaching:
     """Tests for process_session_close updating coaching in profile."""
 
     def _setup_project(self, tmp_path: Path) -> Path:
-        """Create a project with memory directory."""
+        """Create a project with memory and personal directories."""
         project = tmp_path / "project"
-        memory_dir = project / ".raise" / "rai" / "memory" / "sessions"
-        memory_dir.mkdir(parents=True)
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
         return project
 
     def test_close_updates_coaching_in_profile(
@@ -438,10 +438,10 @@ class TestProcessSessionCloseProgress:
     """Tests for process_session_close writing progress to session state."""
 
     def _setup_project(self, tmp_path: Path) -> Path:
-        """Create a project with memory directory."""
+        """Create a project with memory and personal directories."""
         project = tmp_path / "project"
-        memory_dir = project / ".raise" / "rai" / "memory" / "sessions"
-        memory_dir.mkdir(parents=True)
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
         return project
 
     def test_close_writes_progress_to_session_state(
