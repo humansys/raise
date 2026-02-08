@@ -545,7 +545,7 @@ class TestFormatRecentSessions:
         """Reads last 3 sessions from index.jsonl."""
         import json
 
-        index_dir = tmp_path / ".raise" / "rai" / "memory" / "sessions"
+        index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         index_dir.mkdir(parents=True)
         index_file = index_dir / "index.jsonl"
 
@@ -569,7 +569,7 @@ class TestFormatRecentSessions:
 
     def test_returns_empty_when_empty_index(self, tmp_path: Path) -> None:
         """Returns empty string when index is empty."""
-        index_dir = tmp_path / ".raise" / "rai" / "memory" / "sessions"
+        index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         index_dir.mkdir(parents=True)
         (index_dir / "index.jsonl").write_text("")
         result = _format_recent_sessions(tmp_path)
@@ -579,7 +579,7 @@ class TestFormatRecentSessions:
         """Works when fewer sessions than limit."""
         import json
 
-        index_dir = tmp_path / ".raise" / "rai" / "memory" / "sessions"
+        index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         index_dir.mkdir(parents=True)
         sessions = [
             {"id": "SES-001", "date": "2026-02-08", "type": "feature", "topic": "Only session"},
@@ -593,7 +593,7 @@ class TestFormatRecentSessions:
         """Long topics are truncated."""
         import json
 
-        index_dir = tmp_path / ".raise" / "rai" / "memory" / "sessions"
+        index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         index_dir.mkdir(parents=True)
         session = {"id": "SES-001", "date": "2026-02-08", "type": "feature", "topic": "A" * 120}
         (index_dir / "index.jsonl").write_text(json.dumps(session))
