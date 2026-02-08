@@ -50,6 +50,7 @@ template: "lean-feature-spec-v2"
 | 4 | Deadline source | `~/.rai/developer.yaml` deadlines section | Deadlines are Rai's operational context — they modulate behavior (urgency, focus, pushback). Not governance artifacts. |
 | 5 | Migration path | Build alongside, switch when validated | New protocol works in parallel. Session bridges stop being written. CLAUDE.local.md loses data role gradually. |
 | 6 | Telemetry ownership | CLI commands emit telemetry internally | Skills stop calling emit-session/emit-work/add-session separately. `raise session close` handles all writes atomically — one command, all data. |
+| 7 | Idempotent close | `raise session close` works with or without active session | Real workflow: close, keep working, close again. Second close overwrites state with more current data. `current_session` check is for orphan detection, not a precondition for writing state. |
 
 ---
 
@@ -344,7 +345,21 @@ And telemetry signal emitted (session_close with duration, outcomes)
 And the skill did NOT call any separate telemetry/memory commands
 ```
 
-### Scenario 4: Backward Compatibility
+### Scenario 4: Idempotent Close (Double Close)
+
+```gherkin
+Given a session was already closed (current_session is None)
+  And the developer continued working after close
+When `raise session close --state-file output2.yaml` is executed
+Then session-state.yaml is overwritten with the updated state
+And new patterns (if any) are appended to patterns.jsonl
+And coaching corrections (if any) are added to developer.yaml
+And a new session record is added to sessions/index.jsonl
+And the command succeeds without error
+And current_session remains None (already cleared)
+```
+
+### Scenario 5: Backward Compatibility
 
 ```gherkin
 Given the current CLI behavior (no --context flag)
@@ -353,7 +368,7 @@ Then behavior is identical to current: "Session recorded. (last: ...)"
 And no context bundle is output
 ```
 
-### Scenario 5: Profile Without Coaching (Migration)
+### Scenario 6: Profile Without Coaching (Migration)
 
 ```gherkin
 Given an existing developer.yaml without coaching or deadlines sections
