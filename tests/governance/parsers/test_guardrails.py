@@ -9,7 +9,10 @@ import pytest
 
 from raise_cli.governance.models import ConceptType
 from raise_cli.governance.parsers.guardrails import (
+    _extract_prefix,
+    _parse_frontmatter,
     _parse_guardrail_table,
+    _strip_frontmatter,
     extract_all_guardrails,
     extract_guardrails,
 )
@@ -142,6 +145,182 @@ class TestExtractAllGuardrails:
         """Return empty when guardrails.md doesn't exist."""
         concepts = extract_all_guardrails(tmp_path)
         assert concepts == []
+
+
+class TestParseFrontmatter:
+    """Tests for YAML frontmatter parsing."""
+
+    def test_parses_constraint_scopes(self) -> None:
+        """Parse constraint_scopes from YAML frontmatter."""
+        content = dedent("""\
+            ---
+            type: guardrails
+            version: "2.0.0"
+            constraint_scopes:
+              default: all_bounded_contexts
+              overrides:
+                must-arch: [bc-ontology, bc-skills]
+                should-cli: [lyr-orchestration]
+            ---
+
+            # Guardrails
+        """)
+
+        fm = _parse_frontmatter(content)
+
+        assert fm["type"] == "guardrails"
+        scopes = fm["constraint_scopes"]
+        assert scopes["default"] == "all_bounded_contexts"
+        assert scopes["overrides"]["must-arch"] == ["bc-ontology", "bc-skills"]
+        assert scopes["overrides"]["should-cli"] == ["lyr-orchestration"]
+
+    def test_returns_empty_dict_when_no_frontmatter(self) -> None:
+        """Return empty dict when content has no frontmatter."""
+        content = "# Just a heading\n\nSome text.\n"
+
+        fm = _parse_frontmatter(content)
+
+        assert fm == {}
+
+    def test_returns_empty_dict_for_invalid_yaml(self) -> None:
+        """Return empty dict for unparseable frontmatter."""
+        content = "---\n: invalid: yaml: [[\n---\n\n# Content\n"
+
+        fm = _parse_frontmatter(content)
+
+        assert fm == {}
+
+
+class TestStripFrontmatter:
+    """Tests for frontmatter stripping."""
+
+    def test_strips_frontmatter(self) -> None:
+        """Strip frontmatter and return body only."""
+        content = dedent("""\
+            ---
+            type: guardrails
+            version: "2.0.0"
+            ---
+
+            # Guardrails
+
+            Body text here.
+        """)
+
+        body = _strip_frontmatter(content)
+
+        assert not body.startswith("---")
+        assert "# Guardrails" in body
+        assert "Body text here." in body
+
+    def test_returns_content_unchanged_when_no_frontmatter(self) -> None:
+        """Return content as-is when no frontmatter present."""
+        content = "# Guardrails\n\nBody text.\n"
+
+        body = _strip_frontmatter(content)
+
+        assert body == content
+
+
+class TestExtractPrefix:
+    """Tests for guardrail ID prefix extraction."""
+
+    def test_extracts_must_code_prefix(self) -> None:
+        """Extract prefix from MUST-CODE-001."""
+        assert _extract_prefix("MUST-CODE-001") == "must-code"
+
+    def test_extracts_should_cli_prefix(self) -> None:
+        """Extract prefix from SHOULD-CLI-001."""
+        assert _extract_prefix("SHOULD-CLI-001") == "should-cli"
+
+    def test_extracts_must_arch_prefix(self) -> None:
+        """Extract prefix from MUST-ARCH-002."""
+        assert _extract_prefix("MUST-ARCH-002") == "must-arch"
+
+    def test_extracts_should_inf_prefix(self) -> None:
+        """Extract prefix from SHOULD-INF-003."""
+        assert _extract_prefix("SHOULD-INF-003") == "should-inf"
+
+
+class TestExtractGuardrailsWithFrontmatter:
+    """Tests for scope propagation from frontmatter to guardrail metadata."""
+
+    def test_propagates_default_scope(self, tmp_path: Path) -> None:
+        """Guardrails with default scope get all_bounded_contexts."""
+        content = dedent("""\
+            ---
+            type: guardrails
+            constraint_scopes:
+              default: all_bounded_contexts
+              overrides:
+                must-arch: [bc-ontology, bc-skills]
+            ---
+
+            ## Guardrails
+
+            ### Code Quality
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-CODE-001` | MUST | Type hints | pyright | Vision |
+        """)
+
+        file_path = tmp_path / "guardrails.md"
+        file_path.write_text(content)
+
+        concepts = extract_guardrails(file_path, tmp_path)
+
+        assert len(concepts) == 1
+        assert concepts[0].metadata["constraint_scope"] == "all_bounded_contexts"
+
+    def test_propagates_override_scope(self, tmp_path: Path) -> None:
+        """Guardrails matching an override get the specific scope list."""
+        content = dedent("""\
+            ---
+            type: guardrails
+            constraint_scopes:
+              default: all_bounded_contexts
+              overrides:
+                must-arch: [bc-ontology, bc-skills]
+            ---
+
+            ## Guardrails
+
+            ### Architecture
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-ARCH-001` | MUST | Engine separation | import analysis | Vision |
+        """)
+
+        file_path = tmp_path / "guardrails.md"
+        file_path.write_text(content)
+
+        concepts = extract_guardrails(file_path, tmp_path)
+
+        assert len(concepts) == 1
+        assert concepts[0].metadata["constraint_scope"] == ["bc-ontology", "bc-skills"]
+
+    def test_backward_compat_no_frontmatter(self, tmp_path: Path) -> None:
+        """Guardrails without frontmatter still parse correctly, no constraint_scope."""
+        content = dedent("""\
+            # Guardrails
+
+            ### Code Quality
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-CODE-001` | MUST | Type hints | pyright | Vision |
+        """)
+
+        file_path = tmp_path / "guardrails.md"
+        file_path.write_text(content)
+
+        concepts = extract_guardrails(file_path, tmp_path)
+
+        assert len(concepts) == 1
+        # No constraint_scope when no frontmatter
+        assert "constraint_scope" not in concepts[0].metadata
 
 
 class TestIntegrationWithRealGuardrails:
