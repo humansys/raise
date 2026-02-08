@@ -327,7 +327,7 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 | S15.2 BC + Layer Nodes | S | 3 | ✅ Done | 25 min | 2.4x | 10 BC + 4 layer nodes, 26 edges, PAT-182 |
 | S15.3 Constraint Edges | S | 3 | ✅ Done | 18 min | 3.3x | 195 constrained_by edges, PAT-185 |
 | S15.4 Edge-Type Filter | XS | 2 | ✅ Done | 12 min | 2.5x | edge_types in query engine + CLI, PAT-186 |
-| S15.5 Query Helpers | S | 3 | ✅ Done | ~25 min | 3.6x | ArchitecturalContext + 4 helpers + CLI, 19 tests |
+| S15.5 Query Helpers | S | 3 | ✅ Done | ~25 min | 3.6x | ArchitecturalContext + 4 helpers + CLI, 19 tests, closed |
 | S15.6 Skills Integration | S | 3 | Pending | — | — | |
 | ~~S15.4b Foundational Patterns~~ | XS | — | Superseded | — | — | Absorbed into S15.7 |
 | S15.7 Session Protocol | M | 5 | ✅ Done | 55 min | 4.1x | 136 tests, ADR-024, PAT-189 |
