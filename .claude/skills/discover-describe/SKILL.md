@@ -32,6 +32,7 @@ Generate architecture documentation from discovery data. Produces a complete doc
 **Output:**
 - `governance/architecture/system-context.md` — C4 Context level (what, who, why)
 - `governance/architecture/system-design.md` — C4 Container level (how, constraints, drift)
+- `governance/architecture/domain-model.md` — DDD bounded contexts, context map, decision guidance
 - `governance/architecture/index.md` — compact index (<2K tokens)
 - `governance/architecture/modules/*.md` — per-module docs with YAML frontmatter
 
@@ -147,6 +148,35 @@ constitution_reference: "framework/reference/constitution.md"
 
 **Why this matters:** These docs are the **intentional architecture**. Deviating from them is drift. Guardrails are not just code quality rules — they are architectural constraints that shape how every module is written. The constitution principles are not aspirational — they constrain every design decision.
 
+#### 5c: Domain Model (`domain-model.md`)
+
+Using module docs (dependency data, purposes, public APIs), component catalog, and import analysis, write `governance/architecture/domain-model.md` with:
+
+**YAML frontmatter:**
+```yaml
+---
+type: architecture_domain_model
+project: <project_name>
+status: current
+bounded_contexts: [...]
+shared_kernel: { modules: [...] }
+application_layer: { modules: [...] }
+---
+```
+
+**Markdown body:**
+- **Bounded Contexts** — Diagram showing all contexts and their modules. For each context:
+  - What it owns (and what it does NOT own)
+  - Aggregate roots (main entry point classes/functions)
+  - Domain vocabulary table (terms with context-specific meanings)
+  - Invariants (rules that must always hold)
+- **Context Map** — How contexts communicate: diagram + pattern table (supplier-consumer, file-based integration, anti-corruption layer, fire-and-forget)
+- **Design Decision Guidance** — "If you're adding X, it belongs in Y because Z" table. Include guidance for: when to create a new module, when to add a new NodeType/EdgeType
+- **Domain Boundaries to Protect** — Table of intentional boundaries and what crossing them prevents
+- **Open Questions** — Areas where intent can't be inferred from code — flag for human validation
+
+**How to derive this:** The module docs provide dependency data and public APIs. The component catalog provides internal structure. Import analysis reveals actual communication patterns. The domain model synthesizes this structural data into DDD concepts. **Humans validate the intent** — especially bounded context naming, boundary rationale, and decision guidance.
+
 ### Step 6: Validate
 
 - All modules documented
@@ -209,6 +239,17 @@ uv run raise memory query "module dependencies"
 | architectural_decisions | list[str] | No | ADR references |
 | guardrails_reference | string | Yes | Path to guardrails doc |
 | constitution_reference | string | Yes | Path to constitution doc |
+
+### Domain Model
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| type | string | Yes | Always "architecture_domain_model" |
+| project | string | Yes | Project name |
+| status | string | Yes | "current" or "deprecated" |
+| bounded_contexts | list[object] | Yes | Context definitions (name, modules, description) |
+| shared_kernel | object | Yes | Shared kernel modules |
+| application_layer | object | Yes | Application layer modules |
 
 ## Notes
 
