@@ -2,14 +2,14 @@
 name: story-design
 description: >
   Create lean story specifications optimized for both human understanding
-  and AI alignment. Use before planning complex stories (>3 components, >5 SP),
-  when architectural decisions are needed, or when AI will generate significant code.
+  and AI alignment. Design is not optional (PAT-186) — use before /story-plan
+  for every story to ground integration decisions.
 
 license: MIT
 
 metadata:
   raise.work_cycle: story
-  raise.frequency: per-story-as-needed
+  raise.frequency: per-story
   raise.fase: "4"
   raise.prerequisites: project-backlog
   raise.next: story-plan
@@ -75,10 +75,10 @@ Create a lean story specification that optimizes for both human understanding (q
 Record the start of the design phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event start --phase design
+uv run raise memory emit-work story {story_id} --event start --phase design
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e start -p design`
+**Example:** `raise memory emit-work story S15.1 -e start -p design`
 
 ### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
@@ -106,6 +106,38 @@ uv run raise memory query "architecture patterns ADR" --types pattern,decision -
 **Verification:** Epic context loaded OR explicitly standalone; patterns noted.
 
 > **If you can't continue:** Complex feature without epic → Run `/story-start` first.
+
+### Step 0.2: Load Architectural Context
+
+Identify the primary module(s) this story affects, then load their architectural context:
+
+```bash
+uv run raise memory context mod-<name>
+# Example: uv run raise memory context mod-memory
+```
+
+**How to identify the relevant module(s):**
+- From the story scope: which source module(s) will be modified?
+- Module names use `mod-` prefix (e.g., `mod-memory`, `mod-graph`, `mod-session`)
+- If unclear, check the epic scope for module references
+- For cross-cutting work, query multiple modules
+
+**What this returns:**
+- **Bounded context:** Which domain this module belongs to
+- **Layer:** Architecture layer (leaf, domain, integration, orchestration)
+- **Constraints:** Applicable guardrails (MUST and SHOULD)
+- **Dependencies:** What this module depends on and what depends on it
+
+**How to use the context in design:**
+- Respect bounded context boundaries — don't cross domains without explicit justification
+- Follow layer dependency rules — dependencies flow downward (orchestration → integration → domain → leaf)
+- Address all MUST constraints in the design
+- Note SHOULD constraints as recommendations
+- Present an "Architectural Context" section in the design output summarizing module, domain, layer, and key constraints
+
+**If module not found:** The module may not be in the graph yet. Continue without architectural context but note the gap.
+
+**Verification:** Architectural context loaded OR gap noted.
 
 ### Step 1: Assess Complexity
 
@@ -257,15 +289,15 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase design
+uv run raise memory emit-work story {story_id} --event complete --phase design
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e complete -p design`
+**Example:** `raise memory emit-work story S15.1 -e complete -p design`
 
 ## Output
 
 - **Artifact**: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
-- **Telemetry**: `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
+- **Telemetry**: `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-story-v2.md`
 - **Next**: `/story-plan`
 

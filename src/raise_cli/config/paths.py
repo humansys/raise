@@ -11,8 +11,8 @@ Directory Structure (per-project):
     ├── graph/                 # Context graph cache
     └── rai/                   # AI partner state
         ├── identity/          # Rai's identity
-        ├── memory/            # Patterns, calibration, sessions
-        └── telemetry/         # Signals
+        ├── memory/            # Patterns, calibration, graph (shared, committed)
+        └── personal/          # Sessions, telemetry (per-developer, gitignored)
 """
 
 from __future__ import annotations
@@ -84,7 +84,9 @@ def get_memory_dir(project_root: Path | None = None) -> Path:
 
 
 def get_telemetry_dir(project_root: Path | None = None) -> Path:
-    """Get the .raise/rai/telemetry/ directory.
+    """Get the .raise/rai/personal/telemetry/ directory.
+
+    Telemetry is personal data (developer-specific, gitignored).
 
     Args:
         project_root: Project root path. Defaults to current directory.
@@ -92,7 +94,7 @@ def get_telemetry_dir(project_root: Path | None = None) -> Path:
     Returns:
         Path to telemetry directory.
     """
-    return get_rai_dir(project_root) / TELEMETRY_SUBDIR
+    return get_personal_dir(project_root) / TELEMETRY_SUBDIR
 
 
 def get_identity_dir(project_root: Path | None = None) -> Path:

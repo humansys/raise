@@ -53,7 +53,8 @@ class UnifiedGraphBuilder:
         """Build unified graph from all sources.
 
         Loads concepts from governance, memory, work, skills, and components,
-        then builds a UnifiedGraph with all nodes.
+        then builds a UnifiedGraph with all nodes. After all nodes are loaded,
+        extracts structural nodes (bounded contexts, layers) and their edges.
 
         Returns:
             UnifiedGraph containing all concepts.
@@ -68,14 +69,44 @@ class UnifiedGraphBuilder:
         all_nodes.extend(self.load_skills())
         all_nodes.extend(self.load_components())
         all_nodes.extend(self.load_architecture())
+        all_nodes.extend(self.load_identity())
 
         # Add nodes to graph
         for node in all_nodes:
             graph.add_concept(node)
 
+        # Extract structural nodes and edges (E15 — bounded contexts, layers)
+        # Runs after all nodes loaded so module nodes exist for edge safety
+        node_by_id: dict[str, ConceptNode] = {n.id: n for n in all_nodes}
+        structural_nodes: list[ConceptNode] = []
+        structural_edges: list[ConceptEdge] = []
+
+        bc_nodes, bc_edges = self._extract_bounded_contexts(all_nodes, node_by_id)
+        structural_nodes.extend(bc_nodes)
+        structural_edges.extend(bc_edges)
+
+        lyr_nodes, lyr_edges = self._extract_layers(all_nodes, node_by_id)
+        structural_nodes.extend(lyr_nodes)
+        structural_edges.extend(lyr_edges)
+
+        for node in structural_nodes:
+            graph.add_concept(node)
+        all_nodes.extend(structural_nodes)
+
+        # Update node_by_id with structural nodes for constraint edge safety
+        node_by_id.update({n.id: n for n in structural_nodes})
+
+        # Extract constraint edges (S15.3 — guardrail → BC/layer)
+        constraint_edges = self._extract_constraints(all_nodes, node_by_id)
+        structural_edges.extend(constraint_edges)
+
         # Infer and add relationships
         edges = self.infer_relationships(all_nodes)
         for edge in edges:
+            graph.add_relationship(edge)
+
+        # Add structural edges (explicit, not inferred)
+        for edge in structural_edges:
             graph.add_relationship(edge)
 
         return graph
@@ -284,37 +315,239 @@ class UnifiedGraphBuilder:
             return []
 
     def load_architecture(self) -> list[ConceptNode]:
-        """Load module nodes from architecture documentation.
+        """Load architecture nodes from documentation.
 
-        Parses YAML frontmatter from governance/architecture/modules/*.md
-        and creates module ConceptNodes for the unified graph.
+        Scans both governance/architecture/*.md (architecture docs) and
+        governance/architecture/modules/*.md (module docs). Type-dispatches
+        by frontmatter ``type`` field.
 
         Returns:
-            List of ConceptNode for architecture modules.
+            List of ConceptNode for architecture and module concepts.
         """
-        modules_dir = (
-            self.project_root / "governance" / "architecture" / "modules"
-        )
-        if not modules_dir.exists():
+        arch_dir = self.project_root / "governance" / "architecture"
+        if not arch_dir.exists():
             return []
 
         nodes: list[ConceptNode] = []
 
-        for md_file in sorted(modules_dir.glob("*.md")):
+        # Scan parent directory for architecture docs
+        for md_file in sorted(arch_dir.glob("*.md")):
             node = self._parse_architecture_doc(md_file)
             if node:
                 nodes.append(node)
 
+        # Scan modules subdirectory for module docs
+        modules_dir = arch_dir / "modules"
+        if modules_dir.exists():
+            for md_file in sorted(modules_dir.glob("*.md")):
+                node = self._parse_architecture_doc(md_file)
+                if node:
+                    nodes.append(node)
+
+        return nodes
+
+    def load_identity(self) -> list[ConceptNode]:
+        """Load Rai identity values and boundaries from core.md.
+
+        Extracts values (### N. Title) and boundaries (### I Will / ### I Won't)
+        as principle nodes tagged with always_on=True.
+
+        Returns:
+            List of ConceptNode for identity concepts.
+        """
+        identity_file = self.project_root / ".raise" / "rai" / "identity" / "core.md"
+        if not identity_file.exists():
+            return []
+
+        try:
+            text = identity_file.read_text(encoding="utf-8")
+        except OSError:
+            return []
+
+        try:
+            source_file = str(identity_file.relative_to(self.project_root))
+        except ValueError:
+            source_file = str(identity_file)
+
+        now = datetime.now(tz=UTC).isoformat()
+        nodes: list[ConceptNode] = []
+
+        nodes.extend(self._extract_identity_values(text, source_file, now))
+        nodes.extend(self._extract_identity_boundaries(text, source_file, now))
+
+        return nodes
+
+    def _extract_identity_values(
+        self, text: str, source_file: str, now: str
+    ) -> list[ConceptNode]:
+        """Extract values from identity core.md.
+
+        Matches ### N. Title patterns under ## Values section.
+
+        Args:
+            text: Full file content.
+            source_file: Relative source path.
+            now: ISO timestamp.
+
+        Returns:
+            List of value ConceptNodes.
+        """
+        import re
+
+        nodes: list[ConceptNode] = []
+
+        # Find values section
+        values_match = re.search(r"^## Values\b", text, re.MULTILINE)
+        if not values_match:
+            return nodes
+
+        # Find end of values section (next ## heading or EOF)
+        next_section = re.search(r"^## ", text[values_match.end() :], re.MULTILINE)
+        values_end = (
+            values_match.end() + next_section.start()
+            if next_section
+            else len(text)
+        )
+        values_text = text[values_match.end() : values_end]
+
+        # Match ### N. Title patterns
+        value_pattern = re.compile(r"^### (\d+)\.\s+(.+)$", re.MULTILINE)
+        matches = list(value_pattern.finditer(values_text))
+
+        for i, match in enumerate(matches):
+            num = match.group(1)
+            title = match.group(2).strip()
+
+            # Extract first bullet point as description
+            start = match.end()
+            end = matches[i + 1].start() if i + 1 < len(matches) else len(values_text)
+            section_text = values_text[start:end]
+
+            bullet_match = re.search(r"^- (.+)$", section_text, re.MULTILINE)
+            description = bullet_match.group(1).strip() if bullet_match else ""
+
+            content = f"{title} — {description}" if description else title
+
+            nodes.append(
+                ConceptNode(
+                    id=f"RAI-VAL-{num}",
+                    type="principle",
+                    content=content,
+                    source_file=source_file,
+                    created=now,
+                    metadata={
+                        "always_on": True,
+                        "identity_type": "value",
+                        "value_number": num,
+                        "value_name": title,
+                    },
+                )
+            )
+
+        return nodes
+
+    def _extract_identity_boundaries(
+        self, text: str, source_file: str, now: str
+    ) -> list[ConceptNode]:
+        """Extract boundaries from identity core.md.
+
+        Matches ### I Will and ### I Won't sections, extracts bullet items.
+
+        Args:
+            text: Full file content.
+            source_file: Relative source path.
+            now: ISO timestamp.
+
+        Returns:
+            List of boundary ConceptNodes.
+        """
+        import re
+
+        nodes: list[ConceptNode] = []
+
+        # Find boundaries section
+        boundaries_match = re.search(r"^## Boundaries\b", text, re.MULTILINE)
+        if not boundaries_match:
+            return nodes
+
+        # Find end of boundaries section (next ## heading or EOF)
+        next_section = re.search(
+            r"^## ", text[boundaries_match.end() :], re.MULTILINE
+        )
+        boundaries_end = (
+            boundaries_match.end() + next_section.start()
+            if next_section
+            else len(text)
+        )
+        boundaries_text = text[boundaries_match.end() : boundaries_end]
+
+        # Extract "I Will" bullets
+        will_match = re.search(r"^### I Will\b", boundaries_text, re.MULTILINE)
+        wont_match = re.search(r"^### I Won't\b", boundaries_text, re.MULTILINE)
+
+        counter = 1
+
+        if will_match:
+            start = will_match.end()
+            end = wont_match.start() if wont_match else len(boundaries_text)
+            will_text = boundaries_text[start:end]
+
+            for bullet in re.finditer(r"^- (.+)$", will_text, re.MULTILINE):
+                nodes.append(
+                    ConceptNode(
+                        id=f"RAI-BND-{counter}",
+                        type="principle",
+                        content=bullet.group(1).strip(),
+                        source_file=source_file,
+                        created=now,
+                        metadata={
+                            "always_on": True,
+                            "identity_type": "boundary",
+                            "boundary_kind": "will",
+                        },
+                    )
+                )
+                counter += 1
+
+        if wont_match:
+            start = wont_match.end()
+            # Find next ### or end
+            next_heading = re.search(
+                r"^### ", boundaries_text[start:], re.MULTILINE
+            )
+            end = start + next_heading.start() if next_heading else len(boundaries_text)
+            wont_text = boundaries_text[start:end]
+
+            for bullet in re.finditer(r"^- (.+)$", wont_text, re.MULTILINE):
+                nodes.append(
+                    ConceptNode(
+                        id=f"RAI-BND-{counter}",
+                        type="principle",
+                        content=bullet.group(1).strip(),
+                        source_file=source_file,
+                        created=now,
+                        metadata={
+                            "always_on": True,
+                            "identity_type": "boundary",
+                            "boundary_kind": "wont",
+                        },
+                    )
+                )
+                counter += 1
+
         return nodes
 
     def _parse_architecture_doc(self, file_path: Path) -> ConceptNode | None:
-        """Parse a single architecture module doc's YAML frontmatter.
+        """Parse an architecture doc's YAML frontmatter into a ConceptNode.
+
+        Dispatches by frontmatter ``type`` field to produce the appropriate
+        node type (module or architecture).
 
         Args:
-            file_path: Path to the module markdown file.
+            file_path: Path to the markdown file.
 
         Returns:
-            ConceptNode if valid module frontmatter found, None otherwise.
+            ConceptNode if valid frontmatter found, None otherwise.
         """
         try:
             text = file_path.read_text(encoding="utf-8")
@@ -334,20 +567,13 @@ class UnifiedGraphBuilder:
         try:
             import yaml
 
-            frontmatter: dict[str, Any] = yaml.safe_load(frontmatter_text)
+            frontmatter_raw: Any = yaml.safe_load(frontmatter_text)
         except Exception:
             return None
 
-        if not isinstance(frontmatter, dict):
+        if not isinstance(frontmatter_raw, dict):
             return None
-
-        # Only process module-type docs
-        if frontmatter.get("type") != "module":
-            return None
-
-        name = frontmatter.get("name", "")
-        if not name:
-            return None
+        frontmatter = cast(dict[str, Any], frontmatter_raw)
 
         # Build relative source path
         try:
@@ -355,10 +581,46 @@ class UnifiedGraphBuilder:
         except ValueError:
             source_file = str(file_path)
 
-        # Build metadata from frontmatter fields
+        doc_type = frontmatter.get("type", "")
+
+        # Type-dispatch by frontmatter type
+        if doc_type == "module":
+            return self._parse_module_doc(frontmatter, source_file)
+        if doc_type == "architecture_context":
+            return self._parse_architecture_context(frontmatter, source_file)
+        if doc_type == "architecture_design":
+            return self._parse_architecture_design(frontmatter, source_file)
+        if doc_type == "architecture_domain_model":
+            return self._parse_architecture_domain_model(frontmatter, source_file)
+        # Skip architecture_index and unknown types
+        return None
+
+    def _parse_module_doc(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode | None:
+        """Parse a module-type architecture doc.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "module", or None if invalid.
+        """
+        name = frontmatter.get("name", "")
+        if not name:
+            return None
+
         metadata: dict[str, Any] = {}
-        for key in ("depends_on", "depended_by", "entry_points", "public_api",
-                     "components", "constraints", "status"):
+        for key in (
+            "depends_on",
+            "depended_by",
+            "entry_points",
+            "public_api",
+            "components",
+            "constraints",
+            "status",
+        ):
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
@@ -370,6 +632,408 @@ class UnifiedGraphBuilder:
             created=frontmatter.get("last_validated", datetime.now(tz=UTC).isoformat()),
             metadata=metadata,
         )
+
+    def _parse_architecture_context(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode:
+        """Parse an architecture_context doc (system-context.md).
+
+        Synthesizes content from tech stack and external dependencies.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "architecture".
+        """
+        # Synthesize content from tech stack
+        tech_stack: dict[str, str] = frontmatter.get("tech_stack", {})
+        tech_parts = [f"{k}: {v}" for k, v in tech_stack.items()]
+        tech_summary = ", ".join(tech_parts) if tech_parts else "No tech stack defined"
+
+        ext_deps: list[str] = frontmatter.get("external_dependencies", [])
+        deps_summary = ", ".join(ext_deps) if ext_deps else "none"
+
+        content = (
+            f"System context: {tech_summary}. External dependencies: {deps_summary}."
+        )
+
+        # Store all structured data in metadata
+        metadata: dict[str, Any] = {"arch_type": "architecture_context"}
+        for key in (
+            "tech_stack",
+            "external_dependencies",
+            "users",
+            "governed_by",
+            "project",
+            "version",
+            "status",
+        ):
+            if key in frontmatter:
+                metadata[key] = frontmatter[key]
+
+        return ConceptNode(
+            id="arch-context",
+            type="architecture",
+            content=content,
+            source_file=source_file,
+            created=datetime.now(tz=UTC).isoformat(),
+            metadata=metadata,
+        )
+
+    def _parse_architecture_design(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode:
+        """Parse an architecture_design doc (system-design.md).
+
+        Synthesizes content from layers and their module assignments.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "architecture".
+        """
+        # Synthesize content from layers
+        layers: list[dict[str, Any]] = frontmatter.get("layers", [])
+        layer_parts: list[str] = []
+        for layer in layers:
+            name = layer.get("name", "unknown")
+            modules: list[str] = layer.get("modules", [])
+            layer_parts.append(f"{name}: {', '.join(modules)}")
+
+        layers_summary = ". ".join(layer_parts) if layer_parts else "No layers defined"
+        layer_names = ", ".join(layer.get("name", "") for layer in layers)
+        content = (
+            f"System design: {len(layers)} layers ({layer_names}). {layers_summary}."
+        )
+
+        # Store all structured data in metadata
+        metadata: dict[str, Any] = {"arch_type": "architecture_design"}
+        for key in (
+            "layers",
+            "architectural_decisions",
+            "distribution",
+            "guardrails_reference",
+            "constitution_reference",
+            "project",
+            "status",
+        ):
+            if key in frontmatter:
+                metadata[key] = frontmatter[key]
+
+        return ConceptNode(
+            id="arch-design",
+            type="architecture",
+            content=content,
+            source_file=source_file,
+            created=datetime.now(tz=UTC).isoformat(),
+            metadata=metadata,
+        )
+
+    def _parse_architecture_domain_model(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode:
+        """Parse an architecture_domain_model doc (domain-model.md).
+
+        Synthesizes content from bounded contexts and shared kernel.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "architecture".
+        """
+        # Synthesize content from bounded contexts
+        bcs: list[dict[str, Any]] = frontmatter.get("bounded_contexts", [])
+        bc_names = [bc.get("name", "unknown") for bc in bcs]
+        bc_summary = ", ".join(bc_names) if bc_names else "none defined"
+
+        shared: dict[str, Any] = frontmatter.get("shared_kernel", {})
+        shared_modules: list[str] = shared.get("modules", [])
+        shared_summary = ", ".join(shared_modules) if shared_modules else "none"
+
+        content = (
+            f"Domain model: {len(bcs)} bounded contexts — {bc_summary}. "
+            f"Shared kernel: {shared_summary}."
+        )
+
+        # Store all structured data in metadata
+        metadata: dict[str, Any] = {"arch_type": "architecture_domain_model"}
+        for key in (
+            "bounded_contexts",
+            "shared_kernel",
+            "application_layer",
+            "distribution",
+            "project",
+            "status",
+        ):
+            if key in frontmatter:
+                metadata[key] = frontmatter[key]
+
+        return ConceptNode(
+            id="arch-domain-model",
+            type="architecture",
+            content=content,
+            source_file=source_file,
+            created=datetime.now(tz=UTC).isoformat(),
+            metadata=metadata,
+        )
+
+    def _extract_bounded_contexts(
+        self,
+        all_nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> tuple[list[ConceptNode], list[ConceptEdge]]:
+        """Extract bounded context nodes and belongs_to edges from domain model.
+
+        Reads the arch-domain-model node's metadata to create bounded_context
+        nodes for each DDD context, shared kernel, application layer, and
+        distribution grouping.
+
+        Args:
+            all_nodes: All nodes loaded so far.
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            Tuple of (bounded_context nodes, belongs_to edges).
+        """
+        nodes: list[ConceptNode] = []
+        edges: list[ConceptEdge] = []
+
+        # Find the arch-domain-model node
+        dm_node = node_by_id.get("arch-domain-model")
+        if dm_node is None:
+            return nodes, edges
+
+        now = datetime.now(tz=UTC).isoformat()
+
+        # Extract bounded contexts
+        bcs: list[dict[str, Any]] = dm_node.metadata.get("bounded_contexts", [])
+        for bc in bcs:
+            bc_name: str = bc.get("name", "")
+            if not bc_name:
+                continue
+            bc_id = f"bc-{bc_name}"
+            nodes.append(
+                ConceptNode(
+                    id=bc_id,
+                    type="bounded_context",
+                    content=bc.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "bounded_context",
+                        "modules": bc.get("modules", []),
+                    },
+                )
+            )
+            # Create belongs_to edges for modules in this BC
+            modules: list[str] = bc.get("modules", [])
+            for mod_name in modules:
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id, target=bc_id, type="belongs_to", weight=1.0
+                        )
+                    )
+
+        # Extract shared kernel as a BC node
+        shared: dict[str, Any] = dm_node.metadata.get("shared_kernel", {})
+        if shared:
+            nodes.append(
+                ConceptNode(
+                    id="bc-shared-kernel",
+                    type="bounded_context",
+                    content=shared.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "shared_kernel",
+                        "modules": shared.get("modules", []),
+                    },
+                )
+            )
+            for mod_name in shared.get("modules", []):
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id,
+                            target="bc-shared-kernel",
+                            type="belongs_to",
+                            weight=1.0,
+                        )
+                    )
+
+        # Extract application layer as a BC node
+        app_layer: dict[str, Any] = dm_node.metadata.get("application_layer", {})
+        if app_layer:
+            nodes.append(
+                ConceptNode(
+                    id="bc-application-layer",
+                    type="bounded_context",
+                    content=app_layer.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "application_layer",
+                        "modules": app_layer.get("modules", []),
+                    },
+                )
+            )
+            for mod_name in app_layer.get("modules", []):
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id,
+                            target="bc-application-layer",
+                            type="belongs_to",
+                            weight=1.0,
+                        )
+                    )
+
+        # Extract distribution as a BC node
+        dist: dict[str, Any] = dm_node.metadata.get("distribution", {})
+        if dist:
+            nodes.append(
+                ConceptNode(
+                    id="bc-distribution",
+                    type="bounded_context",
+                    content=dist.get("description", ""),
+                    source_file=dm_node.source_file,
+                    created=now,
+                    metadata={
+                        "bc_type": "distribution",
+                        "modules": dist.get("modules", []),
+                    },
+                )
+            )
+            for mod_name in dist.get("modules", []):
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id,
+                            target="bc-distribution",
+                            type="belongs_to",
+                            weight=1.0,
+                        )
+                    )
+
+        return nodes, edges
+
+    def _extract_layers(
+        self,
+        all_nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> tuple[list[ConceptNode], list[ConceptEdge]]:
+        """Extract layer nodes and in_layer edges from system design.
+
+        Reads the arch-design node's metadata to create layer nodes and
+        in_layer edges linking modules to their architectural layer.
+
+        Args:
+            all_nodes: All nodes loaded so far.
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            Tuple of (layer nodes, in_layer edges).
+        """
+        nodes: list[ConceptNode] = []
+        edges: list[ConceptEdge] = []
+
+        # Find the arch-design node
+        design_node = node_by_id.get("arch-design")
+        if design_node is None:
+            return nodes, edges
+
+        now = datetime.now(tz=UTC).isoformat()
+
+        layers: list[dict[str, Any]] = design_node.metadata.get("layers", [])
+        for layer in layers:
+            layer_name: str = layer.get("name", "")
+            if not layer_name:
+                continue
+            layer_id = f"lyr-{layer_name}"
+            nodes.append(
+                ConceptNode(
+                    id=layer_id,
+                    type="layer",
+                    content=layer.get("description", ""),
+                    source_file=design_node.source_file,
+                    created=now,
+                    metadata={"modules": layer.get("modules", [])},
+                )
+            )
+            # Create in_layer edges for modules in this layer
+            modules: list[str] = layer.get("modules", [])
+            for mod_name in modules:
+                mod_id = f"mod-{mod_name}"
+                if mod_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=mod_id, target=layer_id, type="in_layer", weight=1.0
+                        )
+                    )
+
+        return nodes, edges
+
+    def _extract_constraints(
+        self,
+        all_nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> list[ConceptEdge]:
+        """Extract constrained_by edges from guardrail scope metadata.
+
+        Reads ``constraint_scope`` from each guardrail node's metadata
+        (set by the guardrails parser from YAML frontmatter). Creates
+        ``constrained_by`` edges from target nodes (BCs or layers) to
+        guardrail nodes.
+
+        Args:
+            all_nodes: All nodes loaded so far (including structural).
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            List of constrained_by edges.
+        """
+        edges: list[ConceptEdge] = []
+        bc_ids = [
+            n.id for n in node_by_id.values() if n.type == "bounded_context"
+        ]
+
+        for node in all_nodes:
+            if node.type != "guardrail":
+                continue
+
+            scope: Any = node.metadata.get("constraint_scope")
+            if scope is None:
+                continue
+
+            if scope == "all_bounded_contexts":
+                targets = bc_ids
+            elif isinstance(scope, list):
+                targets = [t for t in cast(list[str], scope) if t in node_by_id]
+            else:
+                continue
+
+            for target_id in targets:
+                edges.append(
+                    ConceptEdge(
+                        source=target_id,
+                        target=node.id,
+                        type="constrained_by",
+                        weight=1.0,
+                    )
+                )
+
+        return edges
 
     def _get_governance_extractor(self) -> GovernanceExtractor:
         """Get governance extractor instance.

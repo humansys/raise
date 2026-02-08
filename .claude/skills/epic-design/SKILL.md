@@ -106,6 +106,38 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 > **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
+### Step 0.6: Load Architectural Context
+
+For each candidate module the epic might touch, load its architectural context:
+
+```bash
+uv run raise memory context mod-<name>
+# Example: uv run raise memory context mod-memory
+```
+
+**How to identify the relevant module(s):**
+- From the epic objective: which source modules will this epic affect?
+- Module names use `mod-` prefix (e.g., `mod-memory`, `mod-graph`, `mod-session`)
+- Epics typically span multiple modules — query each one
+- Focus on modules in the critical path first
+
+**What this returns (per module):**
+- **Bounded context:** Which domain this module belongs to
+- **Layer:** Architecture layer (leaf, domain, integration, orchestration)
+- **Constraints:** Applicable guardrails (MUST and SHOULD)
+- **Dependencies:** What this module depends on and what depends on it
+
+**How to use the context in epic design:**
+- Map which bounded contexts the epic spans — cross-domain work needs explicit justification
+- Identify layer boundaries the epic crosses — inform feature decomposition
+- Collect MUST constraints across all affected modules — include in epic done criteria
+- Use dependency information to inform feature sequencing
+- Present an "Architectural Context" section in the epic scope summarizing affected domains, layers, and key constraints
+
+**If module not found:** The module may not be in the graph yet. Continue without architectural context but note the gap.
+
+**Verification:** Architectural context loaded for key modules OR gaps noted.
+
 ### Step 1: Frame the Epic Objective
 
 Define what this epic accomplishes at a strategic level.

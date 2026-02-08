@@ -1,3 +1,13 @@
+---
+type: guardrails
+version: "2.0.0"
+constraint_scopes:
+  default: all_bounded_contexts
+  overrides:
+    must-arch: [bc-ontology, bc-skills]
+    should-cli: [lyr-orchestration]
+---
+
 # Guardrails: RaiSE
 
 > Governance rules for reliable production Python code

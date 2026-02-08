@@ -66,6 +66,7 @@ Experience level affects **communication style**, not **operations**. All levels
 - What was the goal? What was accomplished?
 - What patterns/learnings emerged?
 - Any tangents worth capturing?
+- How is the working relationship evolving? (trust, strengths, growth edges)
 
 **Query** (parallel):
 ```bash
@@ -139,8 +140,8 @@ Output brief suggestion:
 | File | Update |
 |------|--------|
 | `.raise/rai/memory/patterns.jsonl` | New patterns (CLI) |
-| `.raise/rai/memory/sessions/index.jsonl` | Session record (CLI) |
-| `.raise/rai/telemetry/signals.jsonl` | Session event (CLI) |
+| `.raise/rai/personal/sessions/index.jsonl` | Session record (CLI) |
+| `.raise/rai/personal/telemetry/signals.jsonl` | Session event (CLI) |
 | `~/.rai/developer.yaml` | Session state cleared (CLI) |
 | `CLAUDE.local.md` | Single Write |
 | `dev/parking-lot.md` | Tangents (if any) |

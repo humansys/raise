@@ -27,6 +27,7 @@ from raise_cli.config.paths import get_memory_dir, get_personal_dir
 from raise_cli.context import UnifiedGraph, UnifiedGraphBuilder
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
+    ArchitecturalContext,
     UnifiedQuery,
     UnifiedQueryEngine,
     UnifiedQueryResult,
@@ -110,6 +111,13 @@ def query(
             help="Filter by types (comma-separated: pattern,calibration,principle,etc.)",
         ),
     ] = None,
+    edge_types: Annotated[
+        str | None,
+        typer.Option(
+            "--edge-types",
+            help="Filter by edge types (comma-separated: constrained_by,depends_on,etc.)",
+        ),
+    ] = None,
     limit: Annotated[
         int,
         typer.Option("--limit", "-l", help="Maximum number of results"),
@@ -168,12 +176,18 @@ def query(
                 exit_code=7,
             )
 
+    # Parse edge_types filter
+    edge_types_list: list[str] | None = None
+    if edge_types:
+        edge_types_list = [t.strip() for t in edge_types.split(",")]
+
     # Build and execute query
     unified_query = UnifiedQuery(
         query=query_str,
         strategy=query_strategy,
         max_depth=1,
         types=types_list,  # type: ignore[arg-type]
+        edge_types=edge_types_list,  # type: ignore[arg-type]
         limit=limit,
     )
 
@@ -274,6 +288,110 @@ def _format_json(result: UnifiedQueryResult) -> str:
 
 
 # =============================================================================
+# Architectural Context Command
+# =============================================================================
+
+
+@memory_app.command("context")
+def context_cmd(
+    module_id: Annotated[
+        str, typer.Argument(help="Module ID (e.g., mod-memory)")
+    ],
+    format: Annotated[
+        str,
+        typer.Option("--format", "-f", help="Output format (human or json)"),
+    ] = "human",
+    index_path: Annotated[
+        Path | None,
+        typer.Option("--index", "-i", help="Memory index path"),
+    ] = None,
+) -> None:
+    """Show full architectural context for a module.
+
+    Returns the module's bounded context (domain), architectural layer,
+    applicable guardrails (constraints), and module dependencies in a
+    single structured view.
+
+    Examples:
+        # Show context for memory module
+        $ raise memory context mod-memory
+
+        # JSON output for programmatic use
+        $ raise memory context mod-memory --format json
+    """
+    unified_path = index_path or _get_default_index_path()
+    try:
+        engine = UnifiedQueryEngine.from_file(unified_path)
+    except FileNotFoundError as e:
+        cli_error(
+            str(e),
+            hint="Run 'raise memory build' first to create the index",
+            exit_code=4,
+        )
+        return  # cli_error exits, but this satisfies pyright
+
+    ctx = engine.get_architectural_context(module_id)
+    if ctx is None:
+        cli_error(
+            f"Module not found: {module_id}",
+            hint="Check available modules with: raise memory query '' --types module",
+            exit_code=4,
+        )
+        return  # cli_error exits, but this satisfies pyright
+
+    if format == "json":
+        console.print(_format_context_json(ctx))
+    else:
+        _print_context_human(ctx)
+
+
+def _format_context_json(ctx: ArchitecturalContext) -> str:
+    """Format architectural context as JSON."""
+    return ctx.model_dump_json(indent=2)
+
+
+def _print_context_human(ctx: ArchitecturalContext) -> None:
+    """Print architectural context in human-readable format."""
+    console.print(f"\n[bold]Module:[/bold] [cyan]{ctx.module.id}[/cyan]")
+    console.print(f"  {ctx.module.content}")
+
+    if ctx.domain:
+        console.print(f"\n[bold]Domain:[/bold] [green]{ctx.domain.id}[/green]")
+        console.print(f"  {ctx.domain.content}")
+    else:
+        console.print("\n[bold]Domain:[/bold] [dim]None[/dim]")
+
+    if ctx.layer:
+        console.print(f"\n[bold]Layer:[/bold] [green]{ctx.layer.id}[/green]")
+        console.print(f"  {ctx.layer.content}")
+    else:
+        console.print("\n[bold]Layer:[/bold] [dim]None[/dim]")
+
+    if ctx.constraints:
+        must = [c for c in ctx.constraints if "MUST" in c.content]
+        should = [c for c in ctx.constraints if "SHOULD" in c.content]
+        console.print(
+            f"\n[bold]Constraints:[/bold] {len(ctx.constraints)} guardrails"
+        )
+        if must:
+            must_ids = ", ".join(c.id for c in must)
+            console.print(f"  [red]MUST:[/red] {must_ids}")
+        if should:
+            should_ids = ", ".join(c.id for c in should)
+            console.print(f"  [yellow]SHOULD:[/yellow] {should_ids}")
+    else:
+        console.print("\n[bold]Constraints:[/bold] [dim]None[/dim]")
+
+    if ctx.dependencies:
+        dep_ids = ", ".join(d.id for d in ctx.dependencies)
+        console.print(f"\n[bold]Dependencies:[/bold] {dep_ids}")
+    else:
+        console.print("\n[bold]Dependencies:[/bold] [dim]None[/dim]")
+
+    console.print()
+
+
+# =============================================================================
 # Generate MEMORY.md
 # =============================================================================
 
@@ -287,65 +405,30 @@ def generate_memory(
         ),
     ] = None,
 ) -> None:
-    """Generate MEMORY.md for AI editors (Claude Code, etc.).
+    """Generate MEMORY.md for AI editors (deprecated).
 
-    Generates a two-part MEMORY.md from methodology.yaml (process knowledge)
-    and patterns.jsonl (learned patterns). Writes to:
+    MEMORY.md generation is no longer needed — the memory graph is the
+    single source of truth. Context is delivered via `raise session start
+    --context` which assembles a token-optimized bundle from the graph.
 
-    1. Canonical: .raise/rai/memory/MEMORY.md (source of truth)
-    2. Claude Code: ~/.claude/projects/{path}/memory/MEMORY.md
-
-    The generator is agent-agnostic — future IDE support adds placement
-    functions, not new generators.
+    Use `raise memory build` to rebuild the graph instead.
 
     Examples:
-        # Generate for current project
-        $ raise memory generate
-
-        # Generate for specific project
-        $ raise memory generate --path /home/user/my-project
+        # Build the memory graph (recommended)
+        $ raise memory build
     """
-    from raise_cli.config.paths import (
-        get_claude_memory_path,
-        get_framework_dir,
-        get_memory_dir,
+    console.print(
+        "\n[yellow]Skipped:[/yellow] MEMORY.md generation is deprecated."
     )
-    from raise_cli.onboarding.memory_md import generate_memory_md
-
-    project_root = (path or Path.cwd()).resolve()
-    project_name = project_root.name
-
-    # Resolve source paths
-    methodology_path = get_framework_dir(project_root) / "methodology.yaml"
-    patterns_path = get_memory_dir(project_root) / "patterns.jsonl"
-
-    # Generate content (agent-agnostic)
-    content = generate_memory_md(
-        methodology_path=methodology_path,
-        patterns_path=patterns_path,
-        project_name=project_name,
+    console.print(
+        "  The memory graph is the single source of truth."
     )
-
-    # Write canonical copy (.raise/rai/memory/MEMORY.md)
-    canonical_path = get_memory_dir(project_root) / "MEMORY.md"
-    canonical_path.parent.mkdir(parents=True, exist_ok=True)
-    canonical_path.write_text(content)
-
-    # Write Claude Code copy (~/.claude/projects/{path}/memory/MEMORY.md)
-    claude_path = get_claude_memory_path(project_root)
-    claude_path.parent.mkdir(parents=True, exist_ok=True)
-    claude_path.write_text(content)
-
-    # Output
-    console.print("\n[green]✓[/green] Generated MEMORY.md")
-    console.print(f"  Canonical: [cyan]{canonical_path}[/cyan]")
-    console.print(f"  Claude Code: [cyan]{claude_path}[/cyan]")
-
-    # Count sections for summary
-    skills_count = content.count("` — ")  # Each skill line: `name` — purpose
-    patterns_count = content.count("**PAT-") + content.count("**BASE-")
-    console.print(f"  Skills: {skills_count}, Patterns: {patterns_count}")
-    console.print("")
+    console.print(
+        "  Context is delivered via [cyan]raise session start --context[/cyan]."
+    )
+    console.print(
+        "  Use [cyan]raise memory build[/cyan] to rebuild the graph.\n"
+    )
 
 
 # =============================================================================

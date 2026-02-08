@@ -58,6 +58,26 @@
 
 ### Framework Improvements
 
+- [ ] **Remove "Unified" prefix from graph classes** — (SES-096, 2026-02-08)
+  - **Problem:** `UnifiedGraph`, `UnifiedQueryEngine`, `UnifiedQuery`, etc. — 7 classes carry "Unified" prefix that distinguishes nothing. Vestige from when separate graphs existed.
+  - **What:** Rename to `ContextGraph`, `QueryEngine`, `Query`, etc. Find-and-replace across `context/`, CLI, tests.
+  - **Risk:** PAT-151 (renames have long tail) — do as dedicated story with proper verification
+  - **Priority:** Post-F&F, low risk but real cognitive tax reduction
+
+- [x] ~~**Foundational pattern surfacing in session-start**~~ **RESOLVED by S15.7** (2026-02-08)
+  - 10 patterns tagged `foundational: true` in patterns.jsonl
+  - Context bundle assembler surfaces them as behavioral primes
+  - `raise session start --context` outputs primes automatically
+
+- [ ] **Governance doc frontmatter standardization** — (SES-094, 2026-02-08, PAT-184)
+  - **Problem:** 5 of 8 governance docs use fragile regex parsing (guardrails, constitution, PRD, vision, glossary). 3 modern docs (architecture, modules, ADRs) use YAML frontmatter with deterministic extraction.
+  - **Evidence:** SES-094 audit — regex parsers lose metadata, truncate content at 500 chars, use approximate line numbers, have 3+ version patterns for glossary alone.
+  - **What:** Migrate remaining 5 docs to YAML frontmatter. S15.3 does guardrails.md first; remaining 4 follow same pattern.
+  - **Docs to migrate:** constitution.md, prd.md, vision.md, glossary.md, backlog.md
+  - **Pattern:** Each doc gets frontmatter template + parser reads frontmatter + body parsed as before for backward compat
+  - **Priority:** Post-F&F, high compound value (every future graph rebuild benefits)
+  - **Related:** PAT-184, S15.3 (guardrails.md is the first)
+
 - [ ] **Ontology-guided design step for design skills** — (SES-089, 2026-02-08, PAT-175)
   - **Problem:** Design skills read governance files directly. The graph already has extracted, structured, related this information.
   - **What:** Create reusable "load architectural context" skill step. Design skills query `raise memory query` for relevant modules, guardrails, principles, domain boundaries before designing.
@@ -88,13 +108,10 @@
   - Stale `unified.json` breaks `raise memory query` with ValidationError
   - Consider: auto-detect model changes via git diff, or add optional flag to /story-close
 
-- [ ] **Session-start continuity improvement** — (2026-02-05)
-  - **Problem:** Output focuses on backlog-oriented memory query results, lacks continuity from last session
-  - **Observed:** Memory query "session epic patterns" returns deferred features (E9, E10) not previous session outcomes
-  - **Expected:** Surface last session's outcomes (SES-069: `session command`, `memory emit`, etc.) and clear next action
-  - **Current workaround:** CLAUDE.local.md "Next" field provides focus, but session index (SES-069) not surfaced
-  - **Fix:** Query session index for last session outcomes, present as "Last session" → "Continue with" flow
-  - **Priority:** Post-F&F polish
+- [x] ~~**Session-start continuity improvement**~~ **RESOLVED by S15.7** (2026-02-08)
+  - Context bundle includes last session summary, current work, and pending next actions
+  - `session-state.yaml` carries state between sessions (overwritten each close)
+  - No dependency on CLAUDE.local.md for continuity
 
 - [ ] **System Open Ends Audit** — (Post-E14, 2026-02-05)
   - **Trigger:** Found 22 stale branches because no cleanup in lifecycle skills
@@ -108,6 +125,12 @@
   - **Output:** List of gaps → prioritize → fix or add to backlog
   - **Priority:** Post-E14, before V3 complexity increase
   - **Pattern:** PAT-096 — Periodic system hygiene audits catch drift before accumulation
+
+- [ ] **CLI integration test isolation (`--test-dir`)** — (SES-098, 2026-02-08)
+  - **Problem:** Manual integration tests (Task 8 in S15.7) write to real memory paths (patterns.jsonl, sessions/index.jsonl). Requires manual cleanup after testing.
+  - **What:** Add `--test-dir` or `--dry-run` flag to session CLI commands for safe integration testing
+  - **Priority:** Post-F&F, low — pytest tests already use tmp_path correctly
+  - **Related:** S15.7 retrospective action item
 
 - [ ] **Parallel task execution in /story-implement** — (F7.7 discussion, 2026-02-05)
   - When tasks have no dependencies, allow spawning subagents in parallel
@@ -178,7 +201,7 @@
 > Items explicitly deferred from E7 scope (ADR-021).
 
 - [ ] **Team memory** — V3 scope, see E10 Collective Intelligence
-- [ ] **`raise doctor` command** — Project health diagnostics (nice-to-have)
+- [ ] **`raise doctor` command** — Cognitive architecture coherence audit. Detect: graph primes duplicated in CLAUDE.md, MEMORY.md grown beyond boot pointer, session state referencing nonexistent stories, identity node drift from canonical source, always_on patterns missing from bundle, orphaned sessions, stale parking lot items. Not just "are files right" but "is the whole system coherent." (SES-005, 2026-02-08)
 - [ ] **Full ~/.rai/ expansion** — YAGNI for F&F, start with developer.yaml only
 - [ ] **Multi-language convention detection** — Python first, TypeScript/JS later
 - [ ] **Auto-progress Shu→Ha→Ri** — Experience level progression (manual for now)

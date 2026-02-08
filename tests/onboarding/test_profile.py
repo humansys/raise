@@ -10,17 +10,25 @@ import yaml
 from pydantic import ValidationError
 
 from raise_cli.onboarding.profile import (
+    CORRECTIONS_MAX,
+    CoachingContext,
     CommunicationPreferences,
     CommunicationStyle,
+    Correction,
     CurrentSession,
+    Deadline,
     DeveloperProfile,
     ExperienceLevel,
+    RelationshipState,
+    add_correction,
+    add_deadline,
     end_session,
     get_rai_home,
     increment_session,
     load_developer_profile,
     save_developer_profile,
     start_session,
+    update_coaching,
 )
 
 
@@ -590,3 +598,300 @@ class TestDeveloperProfileCurrentSession:
         assert loaded is not None
         assert loaded.current_session is not None
         assert loaded.current_session.project == "/test/project"
+
+
+class TestCoachingModels:
+    """Tests for coaching-related models."""
+
+    def test_correction_requires_all_fields(self) -> None:
+        """Correction requires session, what, lesson."""
+        with pytest.raises(ValidationError):
+            Correction()  # type: ignore[call-arg]
+
+    def test_correction_valid(self) -> None:
+        """Correction accepts all required fields."""
+        c = Correction(session="SES-097", what="Skipped design", lesson="Always design")
+        assert c.session == "SES-097"
+        assert c.what == "Skipped design"
+        assert c.lesson == "Always design"
+
+    def test_deadline_requires_name_and_date(self) -> None:
+        """Deadline requires name and date."""
+        with pytest.raises(ValidationError):
+            Deadline()  # type: ignore[call-arg]
+
+    def test_deadline_notes_default_empty(self) -> None:
+        """Deadline notes defaults to empty string."""
+        d = Deadline(name="F&F", date=date(2026, 2, 9))
+        assert d.notes == ""
+
+    def test_relationship_state_defaults(self) -> None:
+        """RelationshipState has sensible defaults."""
+        r = RelationshipState()
+        assert r.quality == "new"
+        assert r.since is None
+        assert r.trajectory == "starting"
+
+    def test_coaching_context_defaults(self) -> None:
+        """CoachingContext defaults to empty/new state."""
+        c = CoachingContext()
+        assert c.strengths == []
+        assert c.growth_edge == ""
+        assert c.trust_level == "new"
+        assert c.autonomy == ""
+        assert c.corrections == []
+        assert c.communication_notes == []
+        assert c.relationship.quality == "new"
+
+
+class TestProfileBackwardCompat:
+    """Tests for backward compatibility of DeveloperProfile extensions."""
+
+    def test_profile_without_coaching_loads(self) -> None:
+        """Profile created without coaching field loads with defaults."""
+        profile = DeveloperProfile(name="OldUser")
+        assert profile.coaching.strengths == []
+        assert profile.coaching.corrections == []
+        assert profile.deadlines == []
+
+    def test_load_yaml_without_coaching(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Existing developer.yaml without coaching loads correctly."""
+        rai_home = tmp_path / ".rai"
+        rai_home.mkdir(parents=True)
+        profile_file = rai_home / "developer.yaml"
+        # Simulate a pre-S15.7 YAML (no coaching, no deadlines)
+        profile_file.write_text(
+            "name: LegacyUser\nexperience_level: ha\n"
+            "skills_mastered:\n- session-start\n"
+        )
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
+        result = load_developer_profile()
+        assert result is not None
+        assert result.name == "LegacyUser"
+        assert result.coaching.strengths == []
+        assert result.deadlines == []
+
+    def test_roundtrip_with_coaching(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Profile with coaching survives save/load roundtrip."""
+        rai_home = tmp_path / ".rai"
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
+        coaching = CoachingContext(
+            strengths=["architecture", "naming"],
+            growth_edge="speed over process",
+            trust_level="high",
+            corrections=[
+                Correction(
+                    session="SES-096",
+                    what="Offered to skip design",
+                    lesson="Knowledge != behavior",
+                )
+            ],
+        )
+        deadlines = [
+            Deadline(name="F&F", date=date(2026, 2, 9), notes="Pre-launch"),
+        ]
+        original = DeveloperProfile(
+            name="Emilio",
+            experience_level=ExperienceLevel.RI,
+            coaching=coaching,
+            deadlines=deadlines,
+        )
+        save_developer_profile(original)
+        loaded = load_developer_profile()
+
+        assert loaded is not None
+        assert loaded.coaching.strengths == ["architecture", "naming"]
+        assert loaded.coaching.growth_edge == "speed over process"
+        assert loaded.coaching.trust_level == "high"
+        assert len(loaded.coaching.corrections) == 1
+        assert loaded.coaching.corrections[0].session == "SES-096"
+        assert len(loaded.deadlines) == 1
+        assert loaded.deadlines[0].name == "F&F"
+        assert loaded.deadlines[0].date == date(2026, 2, 9)
+
+
+class TestAddCorrection:
+    """Tests for add_correction helper."""
+
+    def test_adds_correction(self) -> None:
+        """add_correction adds a correction to coaching."""
+        profile = DeveloperProfile(name="Test")
+        updated = add_correction(profile, "SES-001", "rushed", "slow down")
+        assert len(updated.coaching.corrections) == 1
+        assert updated.coaching.corrections[0].what == "rushed"
+
+    def test_fifo_cap(self) -> None:
+        """add_correction drops oldest when at CORRECTIONS_MAX."""
+        profile = DeveloperProfile(name="Test")
+        # Fill to capacity
+        for i in range(CORRECTIONS_MAX):
+            profile = add_correction(profile, f"SES-{i:03d}", f"what-{i}", f"lesson-{i}")
+        assert len(profile.coaching.corrections) == CORRECTIONS_MAX
+        assert profile.coaching.corrections[0].session == "SES-000"
+
+        # Add one more — oldest drops
+        profile = add_correction(profile, "SES-NEW", "new-what", "new-lesson")
+        assert len(profile.coaching.corrections) == CORRECTIONS_MAX
+        assert profile.coaching.corrections[0].session == "SES-001"
+        assert profile.coaching.corrections[-1].session == "SES-NEW"
+
+    def test_preserves_other_coaching_fields(self) -> None:
+        """add_correction doesn't touch other coaching fields."""
+        coaching = CoachingContext(strengths=["arch"], growth_edge="speed")
+        profile = DeveloperProfile(name="Test", coaching=coaching)
+        updated = add_correction(profile, "SES-001", "what", "lesson")
+        assert updated.coaching.strengths == ["arch"]
+        assert updated.coaching.growth_edge == "speed"
+
+    def test_returns_new_instance(self) -> None:
+        """add_correction returns a new profile (immutable)."""
+        profile = DeveloperProfile(name="Test")
+        updated = add_correction(profile, "SES-001", "what", "lesson")
+        assert profile is not updated
+        assert len(profile.coaching.corrections) == 0
+
+
+class TestAddDeadline:
+    """Tests for add_deadline helper."""
+
+    def test_adds_deadline(self) -> None:
+        """add_deadline adds a new deadline."""
+        profile = DeveloperProfile(name="Test")
+        updated = add_deadline(profile, "F&F", date(2026, 2, 9))
+        assert len(updated.deadlines) == 1
+        assert updated.deadlines[0].name == "F&F"
+
+    def test_replaces_existing_by_name(self) -> None:
+        """add_deadline replaces deadline with same name."""
+        profile = DeveloperProfile(name="Test")
+        profile = add_deadline(profile, "F&F", date(2026, 2, 9), "old")
+        profile = add_deadline(profile, "F&F", date(2026, 2, 10), "updated")
+        assert len(profile.deadlines) == 1
+        assert profile.deadlines[0].date == date(2026, 2, 10)
+        assert profile.deadlines[0].notes == "updated"
+
+    def test_multiple_deadlines(self) -> None:
+        """add_deadline supports multiple different deadlines."""
+        profile = DeveloperProfile(name="Test")
+        profile = add_deadline(profile, "F&F", date(2026, 2, 9))
+        profile = add_deadline(profile, "Launch", date(2026, 2, 15))
+        assert len(profile.deadlines) == 2
+
+    def test_returns_new_instance(self) -> None:
+        """add_deadline returns a new profile (immutable)."""
+        profile = DeveloperProfile(name="Test")
+        updated = add_deadline(profile, "F&F", date(2026, 2, 9))
+        assert profile is not updated
+        assert len(profile.deadlines) == 0
+
+
+class TestUpdateCoaching:
+    """Tests for update_coaching helper."""
+
+    def test_updates_strengths(self) -> None:
+        """update_coaching updates strengths."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(profile, strengths=["arch", "naming"])
+        assert updated.coaching.strengths == ["arch", "naming"]
+
+    def test_updates_growth_edge(self) -> None:
+        """update_coaching updates growth_edge."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(profile, growth_edge="speed over process")
+        assert updated.coaching.growth_edge == "speed over process"
+
+    def test_updates_trust_level(self) -> None:
+        """update_coaching updates trust_level."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(profile, trust_level="high")
+        assert updated.coaching.trust_level == "high"
+
+    def test_partial_update_preserves_others(self) -> None:
+        """update_coaching only changes specified fields."""
+        coaching = CoachingContext(
+            strengths=["arch"], growth_edge="speed", trust_level="growing"
+        )
+        profile = DeveloperProfile(name="Test", coaching=coaching)
+        updated = update_coaching(profile, trust_level="high")
+        assert updated.coaching.strengths == ["arch"]
+        assert updated.coaching.growth_edge == "speed"
+        assert updated.coaching.trust_level == "high"
+
+    def test_no_updates_returns_same_profile(self) -> None:
+        """update_coaching with no args returns same profile."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(profile)
+        assert profile is updated
+
+    def test_returns_new_instance(self) -> None:
+        """update_coaching returns a new profile (immutable) when updating."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(profile, strengths=["test"])
+        assert profile is not updated
+
+    def test_updates_relationship_quality(self) -> None:
+        """update_coaching updates relationship quality."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile, relationship={"quality": "productive"}
+        )
+        assert updated.coaching.relationship.quality == "productive"
+        assert updated.coaching.relationship.trajectory == "starting"
+
+    def test_updates_relationship_trajectory(self) -> None:
+        """update_coaching updates relationship trajectory."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile, relationship={"trajectory": "growing"}
+        )
+        assert updated.coaching.relationship.trajectory == "growing"
+        assert updated.coaching.relationship.quality == "new"
+
+    def test_updates_relationship_both_fields(self) -> None:
+        """update_coaching updates both relationship fields."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile,
+            relationship={"quality": "productive", "trajectory": "growing"},
+        )
+        assert updated.coaching.relationship.quality == "productive"
+        assert updated.coaching.relationship.trajectory == "growing"
+
+    def test_relationship_preserves_existing_fields(self) -> None:
+        """update_coaching relationship update preserves unspecified fields."""
+        rel = RelationshipState(quality="established", trajectory="stable")
+        coaching = CoachingContext(relationship=rel)
+        profile = DeveloperProfile(name="Test", coaching=coaching)
+        updated = update_coaching(
+            profile, relationship={"trajectory": "growing"}
+        )
+        assert updated.coaching.relationship.quality == "established"
+        assert updated.coaching.relationship.trajectory == "growing"
+
+    def test_updates_communication_notes(self) -> None:
+        """update_coaching updates communication_notes."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile, communication_notes=["prefers direct", "skip praise"]
+        )
+        assert updated.coaching.communication_notes == [
+            "prefers direct",
+            "skip praise",
+        ]
+
+    def test_communication_notes_replaces_existing(self) -> None:
+        """update_coaching replaces existing communication_notes."""
+        coaching = CoachingContext(communication_notes=["old note"])
+        profile = DeveloperProfile(name="Test", coaching=coaching)
+        updated = update_coaching(
+            profile, communication_notes=["new note"]
+        )
+        assert updated.coaching.communication_notes == ["new note"]

@@ -969,3 +969,167 @@ class TestMemoryListEdgeCases:
             assert "Memory Concepts" in result.stdout
         finally:
             os.chdir(original_cwd)
+
+
+class TestMemoryGenerateCommand:
+    """Tests for `raise memory generate` command."""
+
+    def test_generate_shows_deprecation(self, tmp_path: Path) -> None:
+        """Generate command shows deprecation notice."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            # Create minimal structure
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+
+            result = runner.invoke(app, ["memory", "generate"])
+
+            assert result.exit_code == 0
+            assert "deprecated" in result.output.lower() or "skipped" in result.output.lower()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_generate_does_not_write_canonical_memory_md(self, tmp_path: Path) -> None:
+        """Generate command does not write canonical MEMORY.md."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+
+            runner.invoke(app, ["memory", "generate"])
+
+            canonical_path = memory_dir / "MEMORY.md"
+            assert not canonical_path.exists()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_generate_suggests_memory_build(self, tmp_path: Path) -> None:
+        """Generate command suggests using memory build instead."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+
+            result = runner.invoke(app, ["memory", "generate"])
+
+            assert result.exit_code == 0
+            assert "raise memory build" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+
+class TestMemoryQueryEdgeTypeFilter:
+    """Tests for --edge-types CLI option."""
+
+    @pytest.fixture
+    def graph_with_edges(self, tmp_path: Path) -> Path:
+        """Create graph with edges for edge-type filtering tests."""
+        memory_dir = tmp_path / ".raise" / "rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        graph_data = {
+            "directed": True,
+            "multigraph": True,
+            "graph": {},
+            "nodes": [
+                {
+                    "id": "mod-memory",
+                    "type": "module",
+                    "content": "Memory module manages patterns and calibration",
+                    "source_file": "governance/architecture/modules/memory.md",
+                    "created": "2026-02-08",
+                    "metadata": {},
+                },
+                {
+                    "id": "GR-testing",
+                    "type": "guardrail",
+                    "content": "Testing guardrail: >90% coverage required",
+                    "source_file": "governance/guardrails.md",
+                    "created": "2026-02-08",
+                    "metadata": {},
+                },
+                {
+                    "id": "mod-context",
+                    "type": "module",
+                    "content": "Context module provides graph and query",
+                    "source_file": "governance/architecture/modules/context.md",
+                    "created": "2026-02-08",
+                    "metadata": {},
+                },
+            ],
+            "edges": [
+                {
+                    "source": "mod-memory",
+                    "target": "GR-testing",
+                    "type": "constrained_by",
+                    "weight": 1.0,
+                    "key": 0,
+                },
+                {
+                    "source": "mod-memory",
+                    "target": "mod-context",
+                    "type": "depends_on",
+                    "weight": 1.0,
+                    "key": 0,
+                },
+            ],
+        }
+
+        index_path = memory_dir / "index.json"
+        index_path.write_text(json.dumps(graph_data, indent=2))
+        return index_path
+
+    def test_edge_types_flag_filters_neighbors(
+        self, graph_with_edges: Path, tmp_path: Path
+    ) -> None:
+        """--edge-types filters to only matching edge types."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "query",
+                    "mod-memory",
+                    "--strategy",
+                    "concept_lookup",
+                    "--edge-types",
+                    "constrained_by",
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "GR-testing" in result.stdout
+            assert "mod-context" not in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_edge_types_flag_multiple(
+        self, graph_with_edges: Path, tmp_path: Path
+    ) -> None:
+        """--edge-types accepts comma-separated values."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "query",
+                    "mod-memory",
+                    "--strategy",
+                    "concept_lookup",
+                    "--edge-types",
+                    "constrained_by,depends_on",
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "GR-testing" in result.stdout
+            assert "mod-context" in result.stdout
+        finally:
+            os.chdir(original_cwd)

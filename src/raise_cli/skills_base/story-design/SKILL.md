@@ -265,7 +265,7 @@ uv run raise memory emit-work feature {story_id} --event complete --phase design
 ## Output
 
 - **Artifact**: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
-- **Telemetry**: `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
+- **Telemetry**: `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-story-v2.md`
 - **Next**: `/story-plan`
 

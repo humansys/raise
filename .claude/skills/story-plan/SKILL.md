@@ -2,8 +2,8 @@
 name: story-plan
 description: >
   Decompose user stories into atomic executable tasks, identify dependencies,
-  and create a deterministic implementation plan. Use after design spec is ready
-  or for simple stories that skip design.
+  and create a deterministic implementation plan. Use after /story-design
+  has grounded the story's integration decisions.
 
 license: MIT
 
@@ -64,10 +64,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event start --phase plan
+uv run raise memory emit-work story {story_id} --event start --phase plan
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e start -p plan`
+**Example:** `raise memory emit-work story S15.1 -e start -p plan`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -101,6 +101,36 @@ Review returned patterns before proceeding. Key patterns inform task structure a
 **Verification:** Context loaded; relevant patterns noted.
 
 > **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
+
+### Step 0.6: Load Architectural Context
+
+Identify the primary module(s) this story affects, then load their architectural context:
+
+```bash
+uv run raise memory context mod-<name>
+# Example: uv run raise memory context mod-memory
+```
+
+**How to identify the relevant module(s):**
+- From the story scope or design: which source module(s) will be modified?
+- Module names use `mod-` prefix (e.g., `mod-memory`, `mod-graph`, `mod-session`)
+- If unclear, check the epic scope for module references
+
+**What this returns:**
+- **Bounded context:** Which domain this module belongs to
+- **Layer:** Architecture layer (leaf, domain, integration, orchestration)
+- **Constraints:** Applicable guardrails (MUST and SHOULD)
+- **Dependencies:** What this module depends on and what depends on it
+
+**How to use the context in planning:**
+- Tasks that cross bounded context boundaries should be separate tasks
+- Layer dependency rules inform task ordering — lower layers first
+- MUST constraints should be addressed in task verification criteria
+- Dependencies inform which modules need testing together
+
+**If module not found:** The module may not be in the graph yet. Continue without architectural context but note the gap.
+
+**Verification:** Architectural context loaded OR gap noted.
 
 ### Step 1: Select Story
 
@@ -218,15 +248,15 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase plan
+uv run raise memory emit-work story {story_id} --event complete --phase plan
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e complete -p plan`
+**Example:** `raise memory emit-work story S15.1 -e complete -p plan`
 
 ## Output
 
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
 - **Next:** `/story-implement`
 

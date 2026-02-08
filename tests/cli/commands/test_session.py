@@ -9,6 +9,7 @@ from typer.testing import CliRunner
 
 from raise_cli.cli.main import app
 from raise_cli.onboarding.profile import CurrentSession, DeveloperProfile
+from raise_cli.session.close import CloseResult
 
 runner = CliRunner()
 
@@ -142,6 +143,75 @@ class TestSessionStart:
         assert result.exit_code == 0
         assert "Session already active" in result.output
 
+    def test_start_context_outputs_bundle(self, tmp_path: Path) -> None:
+        """Session start --context outputs context bundle."""
+        profile = DeveloperProfile(name="Hank")
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch(
+                "raise_cli.cli.commands.session.assemble_context_bundle",
+                return_value="# Session Context\nDeveloper: Hank (shu)",
+            ),
+            patch(
+                "raise_cli.cli.commands.session.load_session_state",
+                return_value=None,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "start", "--project", str(tmp_path), "--context"],
+            )
+
+        assert result.exit_code == 0
+        assert "# Session Context" in result.output
+        assert "Developer: Hank (shu)" in result.output
+        # Should NOT show "Session recorded" when --context is used
+        assert "Session recorded" not in result.output
+
+    def test_start_context_without_project_falls_back(self) -> None:
+        """Session start --context without --project falls back to default."""
+        profile = DeveloperProfile(name="Ivy")
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(app, ["session", "start", "--context"])
+
+        assert result.exit_code == 0
+        # Without --project, falls back to "Session recorded"
+        assert "Session recorded" in result.output
+
+    def test_start_without_context_preserves_behavior(self) -> None:
+        """Session start without --context preserves existing behavior."""
+        profile = DeveloperProfile(name="Jack")
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(app, ["session", "start"])
+
+        assert result.exit_code == 0
+        assert "Session recorded" in result.output
+
+    def test_start_help_shows_context_option(self) -> None:
+        """Session start --help shows --context option."""
+        result = runner.invoke(app, ["session", "start", "--help"])
+        assert result.exit_code == 0
+        assert "--context" in result.output
+
 
 class TestSessionClose:
     """Tests for raise session close command."""
@@ -195,6 +265,184 @@ class TestSessionClose:
         mock_save.assert_called_once()
         saved_profile = mock_save.call_args[0][0]
         assert saved_profile.current_session is None
+
+    def test_close_structured_with_summary(self) -> None:
+        """Close with --summary triggers structured close."""
+        profile = DeveloperProfile(name="Henry")
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-098",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "close", "--summary", "test session", "--type", "feature"],
+            )
+
+        assert result.exit_code == 0
+        assert "SES-098 closed" in result.output
+
+    def test_close_structured_with_state_file(self, tmp_path: Path) -> None:
+        """Close with --state-file reads from file."""
+        profile = DeveloperProfile(name="Iris")
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text("summary: from file\ntype: research\n")
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-099",
+            patterns_added=1,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ) as mock_close,
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--state-file",
+                    str(state_file),
+                    "--project",
+                    str(tmp_path),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert "SES-099 closed" in result.output
+        assert "Patterns added: 1" in result.output
+        # Verify the close input was populated from file
+        call_args = mock_close.call_args
+        close_input = call_args[0][0]
+        assert close_input.summary == "from file"
+
+    def test_close_structured_with_pattern_and_correction(self) -> None:
+        """Close with --pattern and --correction flags."""
+        profile = DeveloperProfile(name="Jane")
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-100",
+            patterns_added=1,
+            corrections_added=1,
+        )
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ) as mock_close,
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test",
+                    "--pattern",
+                    "New pattern discovered",
+                    "--correction",
+                    "Skipped design",
+                    "--correction-lesson",
+                    "Always design",
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert "Patterns added: 1" in result.output
+        assert "Corrections recorded: 1" in result.output
+        call_args = mock_close.call_args
+        close_input = call_args[0][0]
+        assert len(close_input.patterns) == 1
+        assert len(close_input.corrections) == 1
+
+    def test_close_state_file_passes_progress(self, tmp_path: Path) -> None:
+        """Close with --state-file passes progress to process_session_close."""
+        import yaml
+
+        profile = DeveloperProfile(name="Kay")
+        data = {
+            "summary": "progress session",
+            "progress": {
+                "epic": "E15",
+                "stories_done": 5,
+                "stories_total": 8,
+                "sp_done": 15,
+                "sp_total": 24,
+            },
+            "completed_epics": ["E12", "E14"],
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-101",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ) as mock_close,
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--state-file",
+                    str(state_file),
+                    "--project",
+                    str(tmp_path),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert "SES-101 closed" in result.output
+        call_args = mock_close.call_args
+        close_input = call_args[0][0]
+        assert close_input.progress is not None
+        assert close_input.progress["epic"] == "E15"
+        assert close_input.completed_epics == ["E12", "E14"]
+
+    def test_close_help_shows_new_options(self) -> None:
+        """Close --help shows new structured close options."""
+        result = runner.invoke(app, ["session", "close", "--help"])
+        assert result.exit_code == 0
+        assert "--summary" in result.output
+        assert "--state-file" in result.output
+        assert "--pattern" in result.output
+        assert "--correction" in result.output
 
 
 class TestSessionHelp:

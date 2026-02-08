@@ -65,10 +65,10 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event start --phase review
+uv run raise memory emit-work story {story_id} --event start --phase review
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e start -p review`
+**Example:** `raise memory emit-work story S15.1 -e start -p review`
 
 ### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
@@ -216,10 +216,10 @@ uv run raise memory emit-calibration F9.4 -s S -e 30 -a 15
 Record the completion of the entire story lifecycle:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase review
+uv run raise memory emit-work story {story_id} --event complete --phase review
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e complete -p review`
+**Example:** `raise memory emit-work story S15.1 -e complete -p review`
 
 **Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
 
@@ -227,7 +227,7 @@ uv run raise memory emit-work feature {story_id} --event complete --phase review
 
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
 - **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement
 

@@ -195,7 +195,7 @@ uv run raise memory emit-work feature {story_id} --event complete --phase implem
 
 - **Artifact:** Implemented code
 - **Location:** Per project architecture
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
 - **Gate:** `gates/gate-code.md`
 - **Next:** `/story-review`
 
