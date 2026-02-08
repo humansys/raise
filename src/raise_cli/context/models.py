@@ -30,6 +30,7 @@ NodeType = Literal[
     "term",  # TERM-* — glossary definitions (E12)
     "component",  # comp-* — discovered code components (E13)
     "module",  # mod-* — architecture module knowledge (discover-describe)
+    "architecture",  # arch-* — architecture docs: context, design, domain model (E15)
 ]
 
 # Edge types for relationships between concepts

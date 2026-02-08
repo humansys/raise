@@ -1062,6 +1062,260 @@ class TestLoadArchitecture:
         assert node.type == "module"
 
 
+class TestLoadArchitectureDocTypes:
+    """Tests for architecture doc type ingestion (S15.1)."""
+
+    def test_loads_architecture_context_doc(self, tmp_path: Path) -> None:
+        """Should parse architecture_context doc into architecture node."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "system-context.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_context
+            project: raise-cli
+            version: 2.0.0-alpha
+            status: current
+            tech_stack:
+              language: "Python 3.12+"
+              framework: "Pydantic AI"
+              cli: "Typer"
+            external_dependencies:
+              - "Git (version control)"
+              - "ripgrep (fast content search)"
+            users:
+              - "RaiSE Engineers"
+              - "Rai (AI partner)"
+            governed_by:
+              - "framework/reference/constitution.md"
+              - "governance/guardrails.md"
+            ---
+
+            # System Context
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.type == "architecture"]
+        assert len(arch_nodes) == 1
+        node = arch_nodes[0]
+        assert node.id == "arch-context"
+        assert node.type == "architecture"
+        assert "Python 3.12+" in node.content
+        assert node.source_file == "governance/architecture/system-context.md"
+        assert node.metadata["arch_type"] == "architecture_context"
+        assert node.metadata["tech_stack"]["language"] == "Python 3.12+"
+        assert len(node.metadata["external_dependencies"]) == 2
+        assert len(node.metadata["governed_by"]) == 2
+
+    def test_loads_architecture_design_doc(self, tmp_path: Path) -> None:
+        """Should parse architecture_design doc into architecture node."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "system-design.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_design
+            project: raise-cli
+            status: current
+            layers:
+              - name: leaf
+                modules: [core, config, schemas]
+                description: "Zero internal dependencies"
+              - name: domain
+                modules: [governance, discovery, skills, telemetry]
+                description: "Independent domain logic"
+              - name: integration
+                modules: [context, memory, onboarding, output]
+                description: "Combines domains"
+              - name: orchestration
+                modules: [cli]
+                description: "User-facing entry points"
+            architectural_decisions:
+              - "ADR-012: Skills + Toolkit"
+              - "ADR-019: Unified graph"
+            guardrails_reference: "governance/guardrails.md"
+            ---
+
+            # System Design
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.type == "architecture"]
+        assert len(arch_nodes) == 1
+        node = arch_nodes[0]
+        assert node.id == "arch-design"
+        assert node.type == "architecture"
+        assert "leaf" in node.content
+        assert "orchestration" in node.content
+        assert node.metadata["arch_type"] == "architecture_design"
+        assert len(node.metadata["layers"]) == 4
+        assert node.metadata["layers"][0]["name"] == "leaf"
+        assert node.metadata["layers"][0]["modules"] == ["core", "config", "schemas"]
+
+    def test_loads_architecture_domain_model_doc(self, tmp_path: Path) -> None:
+        """Should parse architecture_domain_model doc into architecture node."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: raise-cli
+            status: current
+            bounded_contexts:
+              - name: governance
+                modules: [governance]
+                description: "Extract structured knowledge"
+              - name: ontology
+                modules: [context, memory]
+                description: "Persist and query knowledge"
+              - name: discovery
+                modules: [discovery]
+                description: "Scan codebases"
+            shared_kernel:
+              modules: [config, core, schemas]
+              description: "Foundation utilities"
+            application_layer:
+              modules: [cli]
+              description: "Thin orchestration shell"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.type == "architecture"]
+        assert len(arch_nodes) == 1
+        node = arch_nodes[0]
+        assert node.id == "arch-domain-model"
+        assert node.type == "architecture"
+        assert "governance" in node.content
+        assert "ontology" in node.content
+        assert node.metadata["arch_type"] == "architecture_domain_model"
+        assert len(node.metadata["bounded_contexts"]) == 3
+        assert node.metadata["shared_kernel"]["modules"] == ["config", "core", "schemas"]
+
+    def test_skips_architecture_index_doc(self, tmp_path: Path) -> None:
+        """Should skip architecture_index docs (generated summary)."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "index.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_index
+            project: raise-cli
+            generated: "2026-02-08"
+            modules: 13
+            ---
+
+            # Architecture Index
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert nodes == []
+
+    def test_scans_parent_and_modules_directories(self, tmp_path: Path) -> None:
+        """Should load from both governance/architecture/ and modules/."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        modules_dir = arch_dir / "modules"
+        modules_dir.mkdir(parents=True)
+
+        # Parent-level architecture doc
+        (arch_dir / "system-context.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_context
+            project: raise-cli
+            status: current
+            tech_stack:
+              language: "Python 3.12+"
+            external_dependencies: []
+            users: []
+            governed_by: []
+            ---
+
+            # System Context
+            """)
+        )
+
+        # Module-level doc
+        (modules_dir / "core.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: core
+            purpose: "Shared utilities"
+            depends_on: []
+            ---
+
+            ## Purpose
+            Core module.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert len(nodes) == 2
+        types = {n.type for n in nodes}
+        assert types == {"architecture", "module"}
+        ids = {n.id for n in nodes}
+        assert ids == {"arch-context", "mod-core"}
+
+    def test_existing_module_parsing_unchanged(self, tmp_path: Path) -> None:
+        """Module doc parsing should remain backward compatible."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "memory.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: memory
+            purpose: "Pattern and calibration JSONL management"
+            status: current
+            depends_on: [config, context]
+            depended_by: [cli]
+            components: 30
+            constraints:
+              - "JSONL is append-only"
+            ---
+
+            ## Purpose
+            Memory module.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "mod-memory"
+        assert node.type == "module"
+        assert node.content == "Pattern and calibration JSONL management"
+        assert node.metadata["depends_on"] == ["config", "context"]
+        assert node.metadata["depended_by"] == ["cli"]
+        assert node.metadata["components"] == 30
+        assert node.metadata["constraints"] == ["JSONL is append-only"]
+
+
 class TestBuild:
     """Tests for build method."""
 
