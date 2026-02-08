@@ -8,16 +8,23 @@ bounded_contexts:
     description: "Extract structured knowledge from markdown governance documents"
   - name: discovery
     modules: [discovery]
-    description: "Scan codebases to extract structural knowledge from source code"
-  - name: knowledge
+    description: "Scan codebases to extract structural knowledge from source code, including convention detection"
+  - name: ontology
     modules: [context, memory]
-    description: "Persist, integrate, and query accumulated knowledge"
+    description: "Persist, integrate, and query accumulated knowledge — the ontological backbone of RaiSE"
+  - name: skills
+    modules: [skills]
+    description: "Skill parsing, location, validation, and scaffolding — process knowledge infrastructure"
   - name: experience
     modules: [onboarding, output]
     description: "First-run setup, developer profiles, and presentation"
   - name: observability
     modules: [telemetry]
     description: "Local signal collection for process improvement"
+  - name: integrations
+    modules: []
+    description: "External platform adapters (Jira, Confluence, Rovo) — V3 scope, not yet implemented"
+    status: planned
 shared_kernel:
   modules: [config, core, schemas]
   description: "Foundation utilities shared across all contexts"
@@ -37,7 +44,7 @@ This document captures the **intentional domain structure** of raise-cli. It ans
 
 ## Bounded Contexts
 
-raise-cli has five bounded contexts, a shared kernel, and an application layer. Each context has its own vocabulary, its own aggregate roots, and evolves independently.
+raise-cli has seven bounded contexts (one planned), a shared kernel, and an application layer. Each context has its own vocabulary, its own aggregate roots, and evolves independently.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -49,22 +56,27 @@ raise-cli has five bounded contexts, a shared kernel, and an application layer. 
 │  BOUNDED CONTEXTS                                                        │
 │                                                                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────────────────────┐  │
-│  │  GOVERNANCE   │  │  DISCOVERY   │  │  KNOWLEDGE                   │  │
+│  │  GOVERNANCE   │  │  DISCOVERY   │  │  ONTOLOGY                    │  │
 │  │              │  │              │  │  ┌─────────┐ ┌────────────┐  │  │
 │  │  governance/  │  │  discovery/  │  │  │ context │ │  memory    │  │  │
-│  │              │  │              │  │  │ (graph  │ │  (JSONL    │  │  │
-│  │  Markdown →  │  │  Python →   │  │  │  hub)   │ │  storage)  │  │  │
-│  │  concepts    │  │  components  │  │  └─────────┘ └────────────┘  │  │
+│  │              │  │  (+ future   │  │  │ (graph  │ │  (JSONL    │  │  │
+│  │  Markdown →  │  │  convention  │  │  │  hub)   │ │  storage)  │  │  │
+│  │  concepts    │  │  detection)  │  │  └─────────┘ └────────────┘  │  │
 │  └──────────────┘  └──────────────┘  └──────────────────────────────┘  │
 │                                                                          │
-│  ┌──────────────────────────┐  ┌───────────────────────────────────┐   │
-│  │  EXPERIENCE              │  │  OBSERVABILITY                     │   │
-│  │  ┌───────────┐ ┌───────┐│  │                                    │   │
-│  │  │onboarding │ │output ││  │  telemetry/                        │   │
-│  │  │(init,     │ │(format││  │  Append-only JSONL signals         │   │
-│  │  │ profile)  │ │ ters) ││  │                                    │   │
-│  │  └───────────┘ └───────┘│  └───────────────────────────────────┘   │
-│  └──────────────────────────┘                                           │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
+│  │  SKILLS      │  │  EXPERIENCE  │  │ OBSERVABILITY│                  │
+│  │              │  │  ┌─────────┐ │  │              │                  │
+│  │  skills/     │  │  │onboard- │ │  │  telemetry/  │                  │
+│  │  (parse,     │  │  │ing      │ │  │  JSONL       │                  │
+│  │   locate,    │  │  ├─────────┤ │  │  signals     │                  │
+│  │   validate)  │  │  │ output  │ │  │              │                  │
+│  └──────────────┘  │  └─────────┘ │  └──────────────┘                  │
+│                     └──────────────┘                                     │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │  INTEGRATIONS (V3 — planned)                                     │   │
+│  │  Jira, Confluence, Rovo adapters — own vocabulary, own auth      │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  SHARED KERNEL                                                           │
 │  ┌────────┐ ┌────────┐ ┌─────────┐                                     │
@@ -97,7 +109,7 @@ raise-cli has five bounded contexts, a shared kernel, and an application layer. 
 - Concepts carry source references (file, section, line range)
 - No AI inference — pure pattern matching
 
-**Does NOT own:** Storing concepts (that's Knowledge), displaying concepts (that's Experience/output).
+**Does NOT own:** Storing concepts (that's Ontology), displaying concepts (that's Experience/output).
 
 ---
 
@@ -126,13 +138,15 @@ raise-cli has five bounded contexts, a shared kernel, and an application layer. 
 - Components require human validation before entering the graph
 - Independent of Governance context — no cross-imports
 
-**Does NOT own:** Persisting components in the graph (that's Knowledge), generating architecture docs (that's a skill, not CLI logic).
+**Does NOT own:** Persisting components in the graph (that's Ontology), generating architecture docs (that's a skill, not CLI logic).
+
+**Future:** Convention detection (currently in onboarding) belongs here — it's codebase analysis. Move when refactoring.
 
 ---
 
-### 3. Knowledge Context
+### 3. Ontology Context
 
-**What it owns:** Persisting, integrating, and querying all accumulated knowledge. This is the **integration hub** — it pulls from Governance, Discovery, and Memory to build a unified queryable graph.
+**What it owns:** Persisting, integrating, and querying all accumulated knowledge. This is the **ontological backbone** of RaiSE — it pulls from Governance, Discovery, Skills, and Memory to build a unified queryable graph. RaiSE is fundamentally ontology-guided software development; this context is where that manifests.
 
 **Two modules, one context:**
 - **context** — Graph construction and querying (the "read" + "merge" side)
@@ -165,13 +179,43 @@ raise-cli has five bounded contexts, a shared kernel, and an application layer. 
 
 ---
 
-### 4. Experience Context
+### 4. Skills Context
+
+**What it owns:** Skill file infrastructure — parsing SKILL.md files, locating skills on disk, validating frontmatter, and scaffolding new skills. Has its own vocabulary and will grow (marketplace, versioning, composition).
+
+**Aggregate roots:**
+- `list_skills() → list[Skill]` — find all skills on disk
+- `parse_skill() → Skill` — parse SKILL.md frontmatter and body
+- `SkillLocator` — resolve skill names to file paths
+
+**Domain vocabulary:**
+
+| Term | Meaning in this context |
+|------|------------------------|
+| Skill | A process guide (SKILL.md) that Rai reads and executes |
+| Frontmatter | YAML metadata: name, description, inputs, outputs, hooks |
+| Skill location | Resolution order: project `.claude/skills/` → base package |
+| Scaffolding | Creating a new SKILL.md from template via `/skill-create` |
+
+**Invariants:**
+- Skills are markdown, not executable code
+- YAML frontmatter required for graph integration
+- Ontology naming convention (verb-noun, kebab-case)
+- Skills are parsed deterministically — no AI inference in parsing
+
+**Does NOT own:** Executing skills (that's Rai, the AI partner), storing skill nodes in graph (that's Ontology).
+
+---
+
+### 5. Experience Context
 
 **What it owns:** First-run developer experience and output formatting.
 
 **Two modules, one context:**
-- **onboarding** — Project initialization, developer profiles, convention detection, skill installation
+- **onboarding** — Project initialization, developer profiles, skill installation
 - **output** — Format-agnostic presentation (human, JSON, table)
+
+**Note:** Convention detection currently lives in onboarding but belongs in Discovery. It will move in a future refactoring.
 
 **Aggregate roots:**
 - `bootstrap() → ProjectManifest` — creates .raise/ structure
@@ -183,7 +227,6 @@ raise-cli has five bounded contexts, a shared kernel, and an application layer. 
 | Term | Meaning in this context |
 |------|------------------------|
 | DeveloperProfile | Persistent developer state (ShuHaRi level, preferences, sessions) |
-| Convention | Detected coding pattern (naming, structure, testing) with confidence |
 | Bootstrap | Creating the .raise/ directory structure from templates |
 | OutputFormat | Presentation mode: human (rich), JSON (machine), table (tabular) |
 
@@ -192,13 +235,12 @@ raise-cli has five bounded contexts, a shared kernel, and an application layer. 
 - Profile is global (`~/.rai/developer.yaml`), not per-project
 - All CLI output through `OutputConsole` — never raw `print()`
 - Formatters are pure functions (model → string)
-- Convention detection is heuristic with explicit confidence levels
 
-**Does NOT own:** Domain logic for any other context — onboarding orchestrates domain modules but doesn't contain domain logic.
+**Does NOT own:** Domain logic for any other context — onboarding orchestrates domain modules but doesn't contain domain logic. Convention detection belongs in Discovery (pending move).
 
 ---
 
-### 5. Observability Context
+### 6. Observability Context
 
 **What it owns:** Local signal collection for process improvement and observable workflow.
 
@@ -247,11 +289,14 @@ How bounded contexts communicate with each other.
   (extracts concepts)              │
                                    │ produces concepts
   DISCOVERY ──────────────────────┤
-  (extracts components)            │  produces components
+  (extracts components)            │ produces components
+                                   │
+  SKILLS ─────────────────────────┤
+  (parses skill metadata)          │ produces skill nodes
                                    │
                                    ▼
                             ┌─────────────┐
-                            │  KNOWLEDGE  │  ← Integration Hub
+                            │  ONTOLOGY   │  ← Integration Hub
                             │  (context   │     (Anti-Corruption Layer)
                             │   + memory) │
                             └──────┬──────┘
@@ -274,9 +319,10 @@ How bounded contexts communicate with each other.
 
 | From → To | Pattern | Mechanism |
 |-----------|---------|-----------|
-| Governance → Knowledge | **Supplier-Consumer** | Context calls `GovernanceExtractor`, transforms `Concept` into `ConceptNode` |
-| Discovery → Knowledge | **File-based integration** | Discovery writes `components-validated.json`, Context reads it |
-| Memory → Knowledge | **Shared data** | Memory writes JSONL, Context reads JSONL — same files, different access patterns |
+| Governance → Ontology | **Supplier-Consumer** | Context calls `GovernanceExtractor`, transforms `Concept` into `ConceptNode` |
+| Discovery → Ontology | **File-based integration** | Discovery writes `components-validated.json`, Context reads it |
+| Skills → Ontology | **Supplier-Consumer** | Context calls skill extractor, transforms `Skill` into `ConceptNode` |
+| Memory → Ontology | **Shared data** | Memory writes JSONL, Context reads JSONL — same files, different access patterns |
 | CLI → all contexts | **Application Layer** | Thin wrappers call domain functions directly |
 | CLI → Experience | **Delegation** | Commands call `OutputConsole` for all display |
 | CLI → Observability | **Fire-and-forget** | Commands emit signals after completing |
@@ -284,13 +330,14 @@ How bounded contexts communicate with each other.
 
 ### Anti-Corruption Layer: Context Module
 
-The `context` module acts as the **anti-corruption layer** between domains. Each domain has its own vocabulary (Governance speaks "Concept", Discovery speaks "Symbol/Component", Memory speaks "Pattern/Calibration"), but the graph normalizes everything into `ConceptNode` with a `NodeType` discriminator.
+The `context` module acts as the **anti-corruption layer** between domains. Each domain has its own vocabulary (Governance speaks "Concept", Discovery speaks "Symbol/Component", Skills speaks "Skill/Frontmatter", Memory speaks "Pattern/Calibration"), but the graph normalizes everything into `ConceptNode` with a `NodeType` discriminator.
 
 ```
-Governance.Concept ──→ context.load_governance() ──→ ConceptNode(type="requirement")
-Discovery.Component ──→ context.load_components() ──→ ConceptNode(type="component")
-Memory.Pattern     ──→ context.load_memory()     ──→ ConceptNode(type="pattern")
-Architecture.Module──→ context.load_architecture()──→ ConceptNode(type="module")
+Governance.Concept  ──→ context.load_governance()  ──→ ConceptNode(type="requirement")
+Discovery.Component ──→ context.load_components()  ──→ ConceptNode(type="component")
+Skills.Skill        ──→ context.load_skills()      ──→ ConceptNode(type="skill")
+Memory.Pattern      ──→ context.load_memory()      ──→ ConceptNode(type="pattern")
+Architecture.Module ──→ context.load_architecture()──→ ConceptNode(type="module")
 ```
 
 This translation happens in the `UnifiedGraphBuilder` loaders. Each loader knows the source domain's vocabulary and translates it to the graph's universal vocabulary.
@@ -307,12 +354,15 @@ When adding new functionality, use this table to determine where it belongs.
 |---------------------|-----------------|------------|
 | A new governance file parser | `governance/` | Governance owns all markdown extraction |
 | A new code analysis capability | `discovery/` | Discovery owns all source code analysis |
-| A new node type for the graph | `context/models.py` (NodeType) + new loader in `builder.py` | Knowledge owns the graph schema |
-| A new memory storage format | `memory/` | Memory owns JSONL persistence |
+| A new node type for the graph | `context/models.py` (NodeType) + new loader in `builder.py` | Ontology owns the graph schema |
+| A new memory storage format | `memory/` | Ontology/Memory owns JSONL persistence |
 | A new CLI command | `cli/commands/` + the relevant domain module | CLI is thin — logic stays in domain |
 | A new output format | `output/` | Experience owns presentation |
 | A new signal type | `telemetry/` | Observability owns signal definitions |
 | A new onboarding step | `onboarding/` | Experience owns first-run flow |
+| A new skill capability | `skills/` | Skills context owns skill infrastructure |
+| A new convention detector | `discovery/` | Discovery owns all codebase analysis |
+| A new external platform adapter | `integrations/` (V3) | Integrations context owns external platform vocabulary |
 | A new shared type (3+ modules need it) | `schemas/` | Shared kernel for cross-context types |
 | A new external tool wrapper | `core/` | Shared kernel owns subprocess integration |
 
@@ -372,16 +422,14 @@ These boundaries are **intentional**. Crossing them is domain drift.
 
 ---
 
-## Open Questions for Human Validation
+## Resolved Domain Decisions
 
-These are areas where the domain model may need refinement based on intent that can't be inferred from code:
+These questions were raised during domain model creation and resolved through human validation (2026-02-08):
 
-1. **Should `skills` be its own bounded context?** Currently it's part of no context — it parses SKILL.md files but doesn't execute them. Is skill management a domain or just infrastructure?
-
-2. **Is the Knowledge context too broad?** `context` (graph) and `memory` (JSONL) serve different purposes but are tightly coupled. Should they be two contexts with a published language between them?
-
-3. **Where does architecture documentation generation belong?** Currently it's a skill (AI-driven), not CLI logic. Is that the right boundary, or should `raise discover describe` be a CLI command?
-
-4. **Should onboarding own convention detection?** Convention detection (naming patterns, testing structure) feels closer to Discovery than Experience. Should it move?
-
-5. **What's the governance boundary for external integrations?** When Jira/Confluence integration comes (V3), does it get its own bounded context or extend Governance?
+| # | Question | Decision | Rationale |
+|---|----------|----------|-----------|
+| 1 | Should `skills` be its own bounded context? | **Yes — own context** | Has its own vocabulary (frontmatter, hooks, scaffolding), will grow (marketplace, versioning, composition). Not just infrastructure. |
+| 2 | Is the Knowledge context too broad? | **Rename to Ontology, keep unified** | RaiSE is ontology-guided software development. The graph IS the ontological backbone. context + memory serve the same purpose. Splitting adds complexity without benefit at this scale. |
+| 3 | Where does architecture doc generation belong? | **Skill only** | Architecture docs require AI synthesis (prose, rationale, domain model). Skills are the right vehicle. No CLI command — the skill calls CLI tools as needed. |
+| 4 | Should onboarding own convention detection? | **Move to Discovery** | Convention detection IS codebase analysis — same domain as scanning and analyzing. Cleaner domain boundaries. Pending refactoring. |
+| 5 | What's the governance boundary for external integrations? | **New Integrations bounded context (V3)** | External platforms (Jira, Confluence, Rovo) have their own vocabularies, auth models, and evolution rates. Dedicated context with adapters per platform keeps domains clean. |
