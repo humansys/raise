@@ -58,6 +58,24 @@
 
 ### Framework Improvements
 
+- [ ] **Ontology-guided design step for design skills** — (SES-089, 2026-02-08, PAT-175)
+  - **Problem:** Design skills read governance files directly. The graph already has extracted, structured, related this information.
+  - **What:** Create reusable "load architectural context" skill step. Design skills query `raise memory query` for relevant modules, guardrails, principles, domain boundaries before designing.
+  - **Value:** Progressive disclosure of high-density context. Ontology-guided design by default, not by discipline. Works on any RaiSE project.
+  - **Priority:** Post-F&F, high impact
+  - **Pattern:** PAT-175
+
+- [ ] **Scope-refresh step after design deviations** — (SES-089, 2026-02-08, PAT-176)
+  - **Problem:** Scope commits go stale when design deviates (discover-describe: scope said CLI+Jinja2, actual was skill-only)
+  - **What:** Add scope-refresh to story-design skill. When design deviates, update scope.md automatically.
+  - **Priority:** Post-F&F
+  - **Pattern:** PAT-176
+
+- [ ] **Move convention detection from onboarding to discovery** — (SES-089, 2026-02-08, domain model decision #4)
+  - **Problem:** Convention detection is codebase analysis but lives in onboarding (Experience context). Domain model says it belongs in Discovery.
+  - **What:** Move `detect_conventions()` to discovery module. Onboarding calls discovery for this.
+  - **Priority:** Post-F&F refactoring
+
 - [ ] **Stale terminology grep as rename gate** — (Ishikawa analysis, 2026-02-06)
   - S14.16 declared complete with 21 files still containing "feature" remnants (PAT-151)
   - Root cause: verification was behavioral (tests pass) not lexical (no stale terms)
