@@ -380,6 +380,61 @@ class TestSessionClose:
         assert len(close_input.patterns) == 1
         assert len(close_input.corrections) == 1
 
+    def test_close_state_file_passes_progress(self, tmp_path: Path) -> None:
+        """Close with --state-file passes progress to process_session_close."""
+        import yaml
+
+        profile = DeveloperProfile(name="Kay")
+        data = {
+            "summary": "progress session",
+            "progress": {
+                "epic": "E15",
+                "stories_done": 5,
+                "stories_total": 8,
+                "sp_done": 15,
+                "sp_total": 24,
+            },
+            "completed_epics": ["E12", "E14"],
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-101",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "raise_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ) as mock_close,
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--state-file",
+                    str(state_file),
+                    "--project",
+                    str(tmp_path),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert "SES-101 closed" in result.output
+        call_args = mock_close.call_args
+        close_input = call_args[0][0]
+        assert close_input.progress is not None
+        assert close_input.progress["epic"] == "E15"
+        assert close_input.completed_epics == ["E12", "E14"]
+
     def test_close_help_shows_new_options(self) -> None:
         """Close --help shows new structured close options."""
         result = runner.invoke(app, ["session", "close", "--help"])

@@ -34,6 +34,7 @@ from raise_cli.onboarding.profile import (
 )
 from raise_cli.schemas.session_state import (
     CurrentWork,
+    EpicProgress,
     LastSession,
     PendingItems,
     SessionState,
@@ -57,6 +58,8 @@ class CloseInput:
     corrections: list[dict[str, str]] = field(default_factory=list)
     current_work: dict[str, str] | None = None
     pending: dict[str, list[str]] | None = None
+    progress: dict[str, int | str] | None = None
+    completed_epics: list[str] = field(default_factory=list)
     notes: str = ""
 
 
@@ -98,6 +101,8 @@ def load_state_file(path: Path) -> CloseInput:
         corrections=data.get("corrections", []),
         current_work=data.get("current_work"),
         pending=data.get("pending"),
+        progress=data.get("progress"),
+        completed_epics=data.get("completed_epics", []),
         notes=data.get("notes", ""),
     )
 
@@ -195,6 +200,18 @@ def process_session_close(
             next_actions=close_input.pending.get("next_actions", []),
         )
 
+    # Build progress if provided
+    progress: EpicProgress | None = None
+    if close_input.progress:
+        p = close_input.progress
+        progress = EpicProgress(
+            epic=str(p.get("epic", "")),
+            stories_done=int(p.get("stories_done", 0)),
+            stories_total=int(p.get("stories_total", 0)),
+            sp_done=int(p.get("sp_done", 0)),
+            sp_total=int(p.get("sp_total", 0)),
+        )
+
     session_state = SessionState(
         current_work=current_work,
         last_session=LastSession(
@@ -209,6 +226,8 @@ def process_session_close(
         ),
         pending=pending,
         notes=close_input.notes,
+        progress=progress,
+        completed_epics=close_input.completed_epics,
     )
     save_session_state(project_path, session_state)
     result.messages.append("Session state saved")
