@@ -2,14 +2,14 @@
 name: story-design
 description: >
   Create lean story specifications optimized for both human understanding
-  and AI alignment. Use before planning complex stories (>3 components, >5 SP),
-  when architectural decisions are needed, or when AI will generate significant code.
+  and AI alignment. Design is not optional (PAT-186) — use before /story-plan
+  for every story to ground integration decisions.
 
 license: MIT
 
 metadata:
   raise.work_cycle: story
-  raise.frequency: per-story-as-needed
+  raise.frequency: per-story
   raise.fase: "4"
   raise.prerequisites: project-backlog
   raise.next: story-plan
