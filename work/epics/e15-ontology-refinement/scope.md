@@ -330,14 +330,14 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 | S15.5 Query Helpers | S | 3 | Pending | — | — | |
 | S15.6 Skills Integration | S | 3 | Pending | — | — | |
 | ~~S15.4b Foundational Patterns~~ | XS | — | Superseded | — | — | Absorbed into S15.7 |
-| S15.7 Session Protocol | M | 5 | In Progress | — | — | Branch: `story/s15.7/session-protocol` |
+| S15.7 Session Protocol | M | 5 | ✅ Done | 55 min | 4.1x | 136 tests, ADR-024, PAT-189 |
 
 **Milestone Progress:**
 - [x] M1: Architecture in Graph (Day 1)
 - [x] M2: Constraint-Aware Graph (Day 1-2) — S15.3 + S15.4 done
 - [ ] M3: One-Call Context (Day 2)
 - [ ] M4: Skills Integration (Day 2)
-- [ ] M5: Session Protocol (Day 3+) — S15.7
+- [x] M5: Session Protocol (Day 3+) — S15.7 ✓
 
 ### Velocity Assumptions
 
