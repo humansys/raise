@@ -49,6 +49,7 @@ template: "lean-feature-spec-v2"
 | 3 | Corrections buffer size | Last 10 corrections | Older corrections should have become patterns. If not generalized after 10, that's a signal. |
 | 4 | Deadline source | `~/.rai/developer.yaml` deadlines section | Deadlines are Rai's operational context — they modulate behavior (urgency, focus, pushback). Not governance artifacts. |
 | 5 | Migration path | Build alongside, switch when validated | New protocol works in parallel. Session bridges stop being written. CLAUDE.local.md loses data role gradually. |
+| 6 | Telemetry ownership | CLI commands emit telemetry internally | Skills stop calling emit-session/emit-work/add-session separately. `raise session close` handles all writes atomically — one command, all data. |
 
 ---
 
@@ -125,6 +126,15 @@ $ raise session close --summary "Session protocol design" \
 
 # Full close with state file (AI writes YAML, CLI reads)
 $ raise session close --state-file /tmp/session-output.yaml
+
+# All of the above atomically:
+# 1. Writes session-state.yaml
+# 2. Adds patterns to patterns.jsonl
+# 3. Updates coaching in developer.yaml
+# 4. Records session in sessions/index.jsonl
+# 5. Emits telemetry (session_close signal)
+# 6. Clears current_session
+# One command. All writes. No skill telemetry calls needed.
 ```
 
 ### State File Format (for --state-file)
@@ -330,6 +340,8 @@ And new patterns are appended to patterns.jsonl
 And corrections are appended to developer.yaml coaching (FIFO cap 10)
 And session record is added to sessions/index.jsonl
 And current_session is cleared
+And telemetry signal emitted (session_close with duration, outcomes)
+And the skill did NOT call any separate telemetry/memory commands
 ```
 
 ### Scenario 4: Backward Compatibility
