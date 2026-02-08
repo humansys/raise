@@ -102,6 +102,36 @@ Review returned patterns before proceeding. Key patterns inform task structure a
 
 > **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
 
+### Step 0.6: Load Architectural Context
+
+Identify the primary module(s) this story affects, then load their architectural context:
+
+```bash
+uv run raise memory context mod-<name>
+# Example: uv run raise memory context mod-memory
+```
+
+**How to identify the relevant module(s):**
+- From the story scope or design: which source module(s) will be modified?
+- Module names use `mod-` prefix (e.g., `mod-memory`, `mod-graph`, `mod-session`)
+- If unclear, check the epic scope for module references
+
+**What this returns:**
+- **Bounded context:** Which domain this module belongs to
+- **Layer:** Architecture layer (leaf, domain, integration, orchestration)
+- **Constraints:** Applicable guardrails (MUST and SHOULD)
+- **Dependencies:** What this module depends on and what depends on it
+
+**How to use the context in planning:**
+- Tasks that cross bounded context boundaries should be separate tasks
+- Layer dependency rules inform task ordering — lower layers first
+- MUST constraints should be addressed in task verification criteria
+- Dependencies inform which modules need testing together
+
+**If module not found:** The module may not be in the graph yet. Continue without architectural context but note the gap.
+
+**Verification:** Architectural context loaded OR gap noted.
+
 ### Step 1: Select Story
 
 Identify the next story to implement by priority.

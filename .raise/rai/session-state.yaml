@@ -1,26 +1,21 @@
 current_work:
   epic: E15
-  story: S15.8
-  phase: closed
+  story: S15.5
+  phase: complete
   branch: epic/e15/ontology-refinement
 last_session:
-  id: SES-106
+  id: SES-108
   date: '2026-02-08'
   developer: Emilio
-  summary: Maintenance — fixed structural drift in architecture docs and telemetry
-    path migration long tail (PAT-151)
-  patterns_captured:
-  - PAT-SES-106
+  summary: S15.5 story review complete — retrospective, calibration (3.6x), scope
+    updated, M3 milestone done.
+  patterns_captured: []
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - S15.5 Query Helpers (3 SP)
-  - S15.6 Skills Integration (3 SP)
-  - Close E15 after S15.5 + S15.6
-notes: Session started as investigation into recurring path bugs, evolved into systematic
-  fix. Emilio's intuition about stale architecture docs was correct — the root cause
-  was incomplete F14.15 migration plus no enforcement mechanism. The drift check in
-  story-close is the prevention gate.
+  - Start S15.6 Skills Integration (last story before E15 close)
+  - Close E15 after S15.6
+notes: Short session — just the review phase. S15.5 fully closed.
 progress: null
 completed_epics: []
