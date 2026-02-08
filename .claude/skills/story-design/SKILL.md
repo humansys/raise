@@ -107,6 +107,38 @@ uv run raise memory query "architecture patterns ADR" --types pattern,decision -
 
 > **If you can't continue:** Complex feature without epic → Run `/story-start` first.
 
+### Step 0.2: Load Architectural Context
+
+Identify the primary module(s) this story affects, then load their architectural context:
+
+```bash
+uv run raise memory context mod-<name>
+# Example: uv run raise memory context mod-memory
+```
+
+**How to identify the relevant module(s):**
+- From the story scope: which source module(s) will be modified?
+- Module names use `mod-` prefix (e.g., `mod-memory`, `mod-graph`, `mod-session`)
+- If unclear, check the epic scope for module references
+- For cross-cutting work, query multiple modules
+
+**What this returns:**
+- **Bounded context:** Which domain this module belongs to
+- **Layer:** Architecture layer (leaf, domain, integration, orchestration)
+- **Constraints:** Applicable guardrails (MUST and SHOULD)
+- **Dependencies:** What this module depends on and what depends on it
+
+**How to use the context in design:**
+- Respect bounded context boundaries — don't cross domains without explicit justification
+- Follow layer dependency rules — dependencies flow downward (orchestration → integration → domain → leaf)
+- Address all MUST constraints in the design
+- Note SHOULD constraints as recommendations
+- Present an "Architectural Context" section in the design output summarizing module, domain, layer, and key constraints
+
+**If module not found:** The module may not be in the graph yet. Continue without architectural context but note the gap.
+
+**Verification:** Architectural context loaded OR gap noted.
+
 ### Step 1: Assess Complexity
 
 Determine if feature needs a specification document.

@@ -328,7 +328,7 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 | S15.3 Constraint Edges | S | 3 | ✅ Done | 18 min | 3.3x | 195 constrained_by edges, PAT-185 |
 | S15.4 Edge-Type Filter | XS | 2 | ✅ Done | 12 min | 2.5x | edge_types in query engine + CLI, PAT-186 |
 | S15.5 Query Helpers | S | 3 | ✅ Done | ~25 min | 3.6x | ArchitecturalContext + 4 helpers + CLI, 19 tests, closed |
-| S15.6 Skills Integration | S | 3 | Pending | — | — | |
+| S15.6 Skills Integration | S | 3 | ✅ Done | ~10 min | 3.0x | 3 skills updated with arch context step |
 | ~~S15.4b Foundational Patterns~~ | XS | — | Superseded | — | — | Absorbed into S15.7 |
 | S15.7 Session Protocol | M | 5 | ✅ Done | 55 min | 4.1x | 136 tests, ADR-024, PAT-189 |
 | S15.8 Minimal Agent Config | M | 5 | ✅ Done | — | — | Rich context bundle, shrink CLAUDE.md + CLAUDE.local.md |
@@ -337,7 +337,7 @@ Stream 1: S15.5 (query helpers + CLI) ──► M3
 - [x] M1: Architecture in Graph (Day 1)
 - [x] M2: Constraint-Aware Graph (Day 1-2) — S15.3 + S15.4 done
 - [x] M3: One-Call Context (Day 2) — S15.5 ✓
-- [ ] M4: Skills Integration (Day 2)
+- [x] M4: Skills Integration (Day 2) — S15.6 ✓
 - [x] M5: Session Protocol (Day 3+) — S15.7 ✓
 - [x] M6: Self-Sustaining Sessions — S15.8 ✓ (CLAUDE.md + CLAUDE.local.md minimal, context bundle complete)
 
