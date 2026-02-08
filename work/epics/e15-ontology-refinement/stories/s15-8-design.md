@@ -34,7 +34,7 @@ template: "lean-feature-spec-v2"
 |--------|--------|-------|-----------|
 | CLAUDE.md | ~300 lines governance | 3 lines bootstrap | Graph → governance primes |
 | CLAUDE.local.md | ~77 lines session state | 2 lines bootstrap | CLI → session state in bundle |
-| MEMORY.md | ~200 lines pattern copy | 2 lines bootstrap | Graph → behavioral primes (already works) |
+| MEMORY.md | ~200 lines pattern copy | **Deleted** | Graph → behavioral primes (already works) |
 | Identity hook | ~200 lines loaded by hook | Identity primes in bundle | Graph → identity primes |
 
 **Three prime types in the bundle, one mechanism:**
@@ -50,7 +50,7 @@ For operational detail (toolchain, directory structure, full identity), the AI q
 |-----------|--------|
 | `CLAUDE.md` | **Rewrite** — ~300 lines → 3 lines bootstrap |
 | `CLAUDE.local.md` | **Rewrite** — ~77 lines → 2 lines bootstrap |
-| `MEMORY.md` | **Rewrite** — ~200 lines → 2 lines bootstrap (update `raise memory generate`) |
+| `MEMORY.md` | **Delete** — `raise memory generate` updated to skip creation |
 | `src/raise_cli/session/bundle.py` | **Modify** — add governance primes, identity primes, recent sessions, progress |
 | `src/raise_cli/schemas/session_state.py` | **Modify** — add EpicProgress model |
 | `src/raise_cli/session/close.py` | **Modify** — write progress to state |
@@ -83,17 +83,13 @@ Run `/session-start` for context.
 
 2 lines. Session state comes from the bundle.
 
-### D3: MEMORY.md — pure bootstrap
+### D3: MEMORY.md — eliminated
 
-Update `raise memory generate` to output:
+Delete MEMORY.md entirely. Claude Code works fine without it — no error, just loads nothing from auto-memory. The graph already surfaces patterns as behavioral primes through the bundle.
 
-```markdown
-# Rai Memory
+Update `raise memory generate` to skip MEMORY.md creation. The command can still exist for other purposes but no longer writes to Claude Code's auto-memory path.
 
-Run `/session-start` for context. Patterns and calibrations live in the memory graph.
-```
-
-2 lines. Patterns already surface as behavioral primes through the graph.
+**Rationale**: A bootstrap pointer to say "run /session-start" is still muda — the user already knows to run it. No file > empty file.
 
 ### D4: Identity as graph primes
 
@@ -297,12 +293,9 @@ Run `/session-start` to load context and governance.
 Run `/session-start` for context.
 ```
 
-### Minimal MEMORY.md (2 lines)
+### MEMORY.md — Deleted
 
-```markdown
-# Rai Memory
-Run `/session-start` for context. Patterns live in the memory graph.
-```
+No file. Claude Code loads nothing from auto-memory. Bundle carries everything.
 
 ---
 
@@ -316,7 +309,7 @@ Run `/session-start` for context. Patterns live in the memory graph.
 - [ ] Critical guardrails, principles, and identity values tagged `always_on: true` in builder
 - [ ] CLAUDE.md ≤ 5 lines (bootstrap pointer)
 - [ ] CLAUDE.local.md ≤ 3 lines (bootstrap pointer)
-- [ ] MEMORY.md ≤ 3 lines (bootstrap pointer, via updated `raise memory generate`)
+- [ ] MEMORY.md deleted (no auto-memory file; `raise memory generate` updated)
 - [ ] `SessionState` model has `progress` and `completed_epics` fields
 - [ ] Session-close writes progress to session-state.yaml
 - [ ] Full lifecycle (start → work → close → start) with zero manual file edits
