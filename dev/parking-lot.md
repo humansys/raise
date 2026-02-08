@@ -58,6 +58,26 @@
 
 ### Framework Improvements
 
+- [ ] **Foundational pattern surfacing in session-start** — (SES-094, 2026-02-08)
+  - **Problem:** Patterns are already in the graph (181 nodes) but session-start doesn't query for behavior-changing ones. Foundational patterns like PAT-183 (grounding over speed) get forgotten between sessions.
+  - **Data is there, surfacing is the gap.** Graph already has pattern nodes — the fix is query-side, not storage-side.
+  - **Approaches:**
+    1. Add `foundational: true` metadata to pattern nodes → session-start queries `raise memory query "foundational patterns"`
+    2. Tag patterns at creation time (new field in JSONL schema: `tier: foundational|tactical|situational`)
+    3. Session-start queries recent patterns (last N sessions) + high-impact patterns (process/architecture type)
+  - **MEMORY.md role:** Remains as manual override / curated essentials, not primary mechanism
+  - **Priority:** Post-F&F, high impact on session quality
+  - **Related:** PAT-183, PAT-150, PAT-154
+
+- [ ] **Governance doc frontmatter standardization** — (SES-094, 2026-02-08, PAT-184)
+  - **Problem:** 5 of 8 governance docs use fragile regex parsing (guardrails, constitution, PRD, vision, glossary). 3 modern docs (architecture, modules, ADRs) use YAML frontmatter with deterministic extraction.
+  - **Evidence:** SES-094 audit — regex parsers lose metadata, truncate content at 500 chars, use approximate line numbers, have 3+ version patterns for glossary alone.
+  - **What:** Migrate remaining 5 docs to YAML frontmatter. S15.3 does guardrails.md first; remaining 4 follow same pattern.
+  - **Docs to migrate:** constitution.md, prd.md, vision.md, glossary.md, backlog.md
+  - **Pattern:** Each doc gets frontmatter template + parser reads frontmatter + body parsed as before for backward compat
+  - **Priority:** Post-F&F, high compound value (every future graph rebuild benefits)
+  - **Related:** PAT-184, S15.3 (guardrails.md is the first)
+
 - [ ] **Ontology-guided design step for design skills** — (SES-089, 2026-02-08, PAT-175)
   - **Problem:** Design skills read governance files directly. The graph already has extracted, structured, related this information.
   - **What:** Create reusable "load architectural context" skill step. Design skills query `raise memory query` for relevant modules, guardrails, principles, domain boundaries before designing.
