@@ -64,16 +64,10 @@
   - **Risk:** PAT-151 (renames have long tail) — do as dedicated story with proper verification
   - **Priority:** Post-F&F, low risk but real cognitive tax reduction
 
-- [ ] **Foundational pattern surfacing in session-start** — (SES-094, 2026-02-08)
-  - **Problem:** Patterns are already in the graph (181 nodes) but session-start doesn't query for behavior-changing ones. Foundational patterns like PAT-183 (grounding over speed) get forgotten between sessions.
-  - **Data is there, surfacing is the gap.** Graph already has pattern nodes — the fix is query-side, not storage-side.
-  - **Approaches:**
-    1. Add `foundational: true` metadata to pattern nodes → session-start queries `raise memory query "foundational patterns"`
-    2. Tag patterns at creation time (new field in JSONL schema: `tier: foundational|tactical|situational`)
-    3. Session-start queries recent patterns (last N sessions) + high-impact patterns (process/architecture type)
-  - **MEMORY.md role:** Remains as manual override / curated essentials, not primary mechanism
-  - **Priority:** Post-F&F, high impact on session quality
-  - **Related:** PAT-183, PAT-150, PAT-154
+- [x] ~~**Foundational pattern surfacing in session-start**~~ **RESOLVED by S15.7** (2026-02-08)
+  - 10 patterns tagged `foundational: true` in patterns.jsonl
+  - Context bundle assembler surfaces them as behavioral primes
+  - `raise session start --context` outputs primes automatically
 
 - [ ] **Governance doc frontmatter standardization** — (SES-094, 2026-02-08, PAT-184)
   - **Problem:** 5 of 8 governance docs use fragile regex parsing (guardrails, constitution, PRD, vision, glossary). 3 modern docs (architecture, modules, ADRs) use YAML frontmatter with deterministic extraction.
@@ -114,13 +108,10 @@
   - Stale `unified.json` breaks `raise memory query` with ValidationError
   - Consider: auto-detect model changes via git diff, or add optional flag to /story-close
 
-- [ ] **Session-start continuity improvement** — (2026-02-05)
-  - **Problem:** Output focuses on backlog-oriented memory query results, lacks continuity from last session
-  - **Observed:** Memory query "session epic patterns" returns deferred features (E9, E10) not previous session outcomes
-  - **Expected:** Surface last session's outcomes (SES-069: `session command`, `memory emit`, etc.) and clear next action
-  - **Current workaround:** CLAUDE.local.md "Next" field provides focus, but session index (SES-069) not surfaced
-  - **Fix:** Query session index for last session outcomes, present as "Last session" → "Continue with" flow
-  - **Priority:** Post-F&F polish
+- [x] ~~**Session-start continuity improvement**~~ **RESOLVED by S15.7** (2026-02-08)
+  - Context bundle includes last session summary, current work, and pending next actions
+  - `session-state.yaml` carries state between sessions (overwritten each close)
+  - No dependency on CLAUDE.local.md for continuity
 
 - [ ] **System Open Ends Audit** — (Post-E14, 2026-02-05)
   - **Trigger:** Found 22 stale branches because no cleanup in lifecycle skills
@@ -134,6 +125,12 @@
   - **Output:** List of gaps → prioritize → fix or add to backlog
   - **Priority:** Post-E14, before V3 complexity increase
   - **Pattern:** PAT-096 — Periodic system hygiene audits catch drift before accumulation
+
+- [ ] **CLI integration test isolation (`--test-dir`)** — (SES-098, 2026-02-08)
+  - **Problem:** Manual integration tests (Task 8 in S15.7) write to real memory paths (patterns.jsonl, sessions/index.jsonl). Requires manual cleanup after testing.
+  - **What:** Add `--test-dir` or `--dry-run` flag to session CLI commands for safe integration testing
+  - **Priority:** Post-F&F, low — pytest tests already use tmp_path correctly
+  - **Related:** S15.7 retrospective action item
 
 - [ ] **Parallel task execution in /story-implement** — (F7.7 discussion, 2026-02-05)
   - When tasks have no dependencies, allow spawning subagents in parallel

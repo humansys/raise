@@ -47,7 +47,6 @@ Use inference to reflect on the session:
 6. **Current work:** Epic, story, phase, branch for continuity
 7. **Pending:** Decisions, blockers, next actions
 8. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
-9. **Update `CLAUDE.local.md`:** Recent Sessions table, Current Focus, Last updated
 
 Write the structured output as a YAML state file:
 
@@ -125,7 +124,6 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 | `.raise/rai/memory/patterns.jsonl` | New patterns | CLI |
 | `~/.rai/developer.yaml` | Coaching + clear session | CLI |
 | `.raise/rai/session-state.yaml` | Working state | CLI |
-| `CLAUDE.local.md` | Recent Sessions, Focus | Skill (Write) |
 | `dev/parking-lot.md` | Tangents | Skill (Edit) |
 
 ## Notes
@@ -143,5 +141,4 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 - Complement: `/session-start`
 - Session state: `.raise/rai/session-state.yaml`
 - Memory: `.raise/rai/memory/`
-- Context: `CLAUDE.local.md`
 - Tangents: `dev/parking-lot.md`
