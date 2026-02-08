@@ -1621,6 +1621,123 @@ class TestInferRelationships:
         assert graph.edge_count >= 1
 
 
+class TestLoadIdentity:
+    """Tests for identity extraction from core.md (S15.8)."""
+
+    def _write_identity(self, tmp_path: Path) -> None:
+        """Create a test identity/core.md file."""
+        identity_dir = tmp_path / ".raise" / "rai" / "identity"
+        identity_dir.mkdir(parents=True)
+
+        (identity_dir / "core.md").write_text(
+            dedent("""\
+            # Rai — Core Identity
+
+            ## Values
+
+            ### 1. Honesty over Agreement
+            - Push back on bad ideas
+
+            ### 2. Simplicity over Cleverness
+            - Simple solution that works
+
+            ### 3. Observability IS Trust
+            - Show work, explain reasoning
+
+            ### 4. Learning over Perfection
+            - Every session teaches something
+
+            ### 5. Partnership over Service
+            - Collaborator, not tool
+
+            ## Boundaries
+
+            ### I Will
+            - Push back on bad ideas
+            - Stop when I detect incoherence, ambiguity, or drift
+            - Ask before expensive operations
+            - Admit uncertainty rather than pretend confidence
+
+            ### I Won't
+            - Pretend certainty I don't have
+            - Validate ideas just because they were proposed
+            - Generate without understanding
+            """)
+        )
+
+    def test_extracts_values_as_principle_nodes(self, tmp_path: Path) -> None:
+        """Should extract 5 values as principle nodes with always_on=True."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        value_nodes = [n for n in nodes if n.id.startswith("RAI-VAL-")]
+        assert len(value_nodes) == 5
+        for node in value_nodes:
+            assert node.type == "principle"
+            assert node.metadata.get("always_on") is True
+            assert node.metadata.get("identity_type") == "value"
+
+    def test_extracts_boundaries_as_principle_nodes(self, tmp_path: Path) -> None:
+        """Should extract boundaries (I Will + I Won't) as principle nodes."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        boundary_nodes = [n for n in nodes if n.id.startswith("RAI-BND-")]
+        assert len(boundary_nodes) >= 4  # At least 4 from I Will
+        for node in boundary_nodes:
+            assert node.type == "principle"
+            assert node.metadata.get("always_on") is True
+            assert node.metadata.get("identity_type") == "boundary"
+
+    def test_value_node_content(self, tmp_path: Path) -> None:
+        """Value nodes should have 'Title — first bullet' content."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        val1 = next(n for n in nodes if n.id == "RAI-VAL-1")
+        assert "Honesty over Agreement" in val1.content
+
+    def test_boundary_node_content(self, tmp_path: Path) -> None:
+        """Boundary nodes should have the boundary text as content."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        bnd_nodes = [n for n in nodes if n.id.startswith("RAI-BND-")]
+        contents = [n.content for n in bnd_nodes]
+        assert any("Stop when I detect incoherence" in c for c in contents)
+
+    def test_returns_empty_when_no_identity_file(self, tmp_path: Path) -> None:
+        """Should return empty list when identity/core.md doesn't exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+        assert nodes == []
+
+    def test_build_includes_identity_nodes(self, tmp_path: Path) -> None:
+        """Build should include identity nodes in the graph."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # Should have value + boundary nodes
+        identity_nodes = [
+            n for n in graph.get_concepts_by_type("principle")
+            if n.id.startswith("RAI-")
+        ]
+        assert len(identity_nodes) >= 5  # At least the 5 values
+
+
 class TestExtractBoundedContexts:
     """Tests for bounded context extraction from arch-domain-model metadata (S15.2)."""
 

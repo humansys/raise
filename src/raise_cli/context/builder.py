@@ -69,6 +69,7 @@ class UnifiedGraphBuilder:
         all_nodes.extend(self.load_skills())
         all_nodes.extend(self.load_components())
         all_nodes.extend(self.load_architecture())
+        all_nodes.extend(self.load_identity())
 
         # Add nodes to graph
         for node in all_nodes:
@@ -342,6 +343,197 @@ class UnifiedGraphBuilder:
                 node = self._parse_architecture_doc(md_file)
                 if node:
                     nodes.append(node)
+
+        return nodes
+
+    def load_identity(self) -> list[ConceptNode]:
+        """Load Rai identity values and boundaries from core.md.
+
+        Extracts values (### N. Title) and boundaries (### I Will / ### I Won't)
+        as principle nodes tagged with always_on=True.
+
+        Returns:
+            List of ConceptNode for identity concepts.
+        """
+        identity_file = self.project_root / ".raise" / "rai" / "identity" / "core.md"
+        if not identity_file.exists():
+            return []
+
+        try:
+            text = identity_file.read_text(encoding="utf-8")
+        except OSError:
+            return []
+
+        try:
+            source_file = str(identity_file.relative_to(self.project_root))
+        except ValueError:
+            source_file = str(identity_file)
+
+        now = datetime.now(tz=UTC).isoformat()
+        nodes: list[ConceptNode] = []
+
+        nodes.extend(self._extract_identity_values(text, source_file, now))
+        nodes.extend(self._extract_identity_boundaries(text, source_file, now))
+
+        return nodes
+
+    def _extract_identity_values(
+        self, text: str, source_file: str, now: str
+    ) -> list[ConceptNode]:
+        """Extract values from identity core.md.
+
+        Matches ### N. Title patterns under ## Values section.
+
+        Args:
+            text: Full file content.
+            source_file: Relative source path.
+            now: ISO timestamp.
+
+        Returns:
+            List of value ConceptNodes.
+        """
+        import re
+
+        nodes: list[ConceptNode] = []
+
+        # Find values section
+        values_match = re.search(r"^## Values\b", text, re.MULTILINE)
+        if not values_match:
+            return nodes
+
+        # Find end of values section (next ## heading or EOF)
+        next_section = re.search(r"^## ", text[values_match.end() :], re.MULTILINE)
+        values_end = (
+            values_match.end() + next_section.start()
+            if next_section
+            else len(text)
+        )
+        values_text = text[values_match.end() : values_end]
+
+        # Match ### N. Title patterns
+        value_pattern = re.compile(r"^### (\d+)\.\s+(.+)$", re.MULTILINE)
+        matches = list(value_pattern.finditer(values_text))
+
+        for i, match in enumerate(matches):
+            num = match.group(1)
+            title = match.group(2).strip()
+
+            # Extract first bullet point as description
+            start = match.end()
+            end = matches[i + 1].start() if i + 1 < len(matches) else len(values_text)
+            section_text = values_text[start:end]
+
+            bullet_match = re.search(r"^- (.+)$", section_text, re.MULTILINE)
+            description = bullet_match.group(1).strip() if bullet_match else ""
+
+            content = f"{title} — {description}" if description else title
+
+            nodes.append(
+                ConceptNode(
+                    id=f"RAI-VAL-{num}",
+                    type="principle",
+                    content=content,
+                    source_file=source_file,
+                    created=now,
+                    metadata={
+                        "always_on": True,
+                        "identity_type": "value",
+                        "value_number": num,
+                        "value_name": title,
+                    },
+                )
+            )
+
+        return nodes
+
+    def _extract_identity_boundaries(
+        self, text: str, source_file: str, now: str
+    ) -> list[ConceptNode]:
+        """Extract boundaries from identity core.md.
+
+        Matches ### I Will and ### I Won't sections, extracts bullet items.
+
+        Args:
+            text: Full file content.
+            source_file: Relative source path.
+            now: ISO timestamp.
+
+        Returns:
+            List of boundary ConceptNodes.
+        """
+        import re
+
+        nodes: list[ConceptNode] = []
+
+        # Find boundaries section
+        boundaries_match = re.search(r"^## Boundaries\b", text, re.MULTILINE)
+        if not boundaries_match:
+            return nodes
+
+        # Find end of boundaries section (next ## heading or EOF)
+        next_section = re.search(
+            r"^## ", text[boundaries_match.end() :], re.MULTILINE
+        )
+        boundaries_end = (
+            boundaries_match.end() + next_section.start()
+            if next_section
+            else len(text)
+        )
+        boundaries_text = text[boundaries_match.end() : boundaries_end]
+
+        # Extract "I Will" bullets
+        will_match = re.search(r"^### I Will\b", boundaries_text, re.MULTILINE)
+        wont_match = re.search(r"^### I Won't\b", boundaries_text, re.MULTILINE)
+
+        counter = 1
+
+        if will_match:
+            start = will_match.end()
+            end = wont_match.start() if wont_match else len(boundaries_text)
+            will_text = boundaries_text[start:end]
+
+            for bullet in re.finditer(r"^- (.+)$", will_text, re.MULTILINE):
+                nodes.append(
+                    ConceptNode(
+                        id=f"RAI-BND-{counter}",
+                        type="principle",
+                        content=bullet.group(1).strip(),
+                        source_file=source_file,
+                        created=now,
+                        metadata={
+                            "always_on": True,
+                            "identity_type": "boundary",
+                            "boundary_kind": "will",
+                        },
+                    )
+                )
+                counter += 1
+
+        if wont_match:
+            start = wont_match.end()
+            # Find next ### or end
+            next_heading = re.search(
+                r"^### ", boundaries_text[start:], re.MULTILINE
+            )
+            end = start + next_heading.start() if next_heading else len(boundaries_text)
+            wont_text = boundaries_text[start:end]
+
+            for bullet in re.finditer(r"^- (.+)$", wont_text, re.MULTILINE):
+                nodes.append(
+                    ConceptNode(
+                        id=f"RAI-BND-{counter}",
+                        type="principle",
+                        content=bullet.group(1).strip(),
+                        source_file=source_file,
+                        created=now,
+                        metadata={
+                            "always_on": True,
+                            "identity_type": "boundary",
+                            "boundary_kind": "wont",
+                        },
+                    )
+                )
+                counter += 1
 
         return nodes
 

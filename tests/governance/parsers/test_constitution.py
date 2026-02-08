@@ -159,6 +159,40 @@ class TestExtractPrinciples:
         assert len(principle.content) <= 504  # 500 + "..."
         assert principle.content.endswith("...")
 
+    def test_always_on_for_core_principles(self, tmp_path: Path) -> None:
+        """§1, §3, §7 should have always_on=True in metadata (S15.8)."""
+        content = dedent("""\
+            # Constitution
+
+            ### §1. Humans Define, Machines Execute
+            Specs are source of truth.
+
+            ### §2. Governance as Code
+            Standards versioned in Git.
+
+            ### §3. Platform Agnosticism
+            Works where Git works.
+
+            ### §7. Lean Software Development
+            Eliminate waste, Jidoka.
+
+            ### §8. Observable Workflow
+            Every decision traceable.
+        """)
+
+        file_path = tmp_path / "constitution.md"
+        file_path.write_text(content)
+
+        principles = extract_principles(file_path, tmp_path)
+
+        always_on_nums = {"1", "3", "7"}
+        for p in principles:
+            num = p.metadata["principle_number"]
+            if num in always_on_nums:
+                assert p.metadata.get("always_on") is True, f"§{num} should be always_on"
+            else:
+                assert "always_on" not in p.metadata, f"§{num} should NOT be always_on"
+
     def test_integration_with_real_constitution(self) -> None:
         """Should extract principles from real raise-cli Constitution."""
         constitution_path = Path("framework/reference/constitution.md")
