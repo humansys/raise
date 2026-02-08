@@ -110,6 +110,13 @@ def query(
             help="Filter by types (comma-separated: pattern,calibration,principle,etc.)",
         ),
     ] = None,
+    edge_types: Annotated[
+        str | None,
+        typer.Option(
+            "--edge-types",
+            help="Filter by edge types (comma-separated: constrained_by,depends_on,etc.)",
+        ),
+    ] = None,
     limit: Annotated[
         int,
         typer.Option("--limit", "-l", help="Maximum number of results"),
@@ -168,12 +175,18 @@ def query(
                 exit_code=7,
             )
 
+    # Parse edge_types filter
+    edge_types_list: list[str] | None = None
+    if edge_types:
+        edge_types_list = [t.strip() for t in edge_types.split(",")]
+
     # Build and execute query
     unified_query = UnifiedQuery(
         query=query_str,
         strategy=query_strategy,
         max_depth=1,
         types=types_list,  # type: ignore[arg-type]
+        edge_types=edge_types_list,  # type: ignore[arg-type]
         limit=limit,
     )
 

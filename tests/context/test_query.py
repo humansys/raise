@@ -266,6 +266,107 @@ class TestUnifiedQueryEngineConceptLookup:
         assert "SES-001" in ids
 
 
+class TestUnifiedQueryEngineEdgeTypeFilter:
+    """Tests for edge-type filtering in concept lookup."""
+
+    def test_edge_types_field_default_none(self) -> None:
+        """edge_types defaults to None."""
+        query = UnifiedQuery(query="test")
+        assert query.edge_types is None
+
+    def test_edge_types_field_accepts_list(self) -> None:
+        """edge_types accepts a list of EdgeType values."""
+        query = UnifiedQuery(
+            query="test",
+            edge_types=["constrained_by", "depends_on"],
+        )
+        assert query.edge_types == ["constrained_by", "depends_on"]
+
+    def test_concept_lookup_with_edge_type_filter(
+        self, sample_graph: UnifiedGraph
+    ) -> None:
+        """Concept lookup with edge_types only returns neighbors via matching edges."""
+        from raise_cli.context.models import ConceptEdge
+
+        # Add two different edge types from PAT-001
+        sample_graph.add_relationship(
+            ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")
+        )
+        sample_graph.add_relationship(
+            ConceptEdge(source="PAT-001", target="/story-plan", type="applies_to")
+        )
+
+        engine = UnifiedQueryEngine(sample_graph)
+
+        # Filter to learned_from only
+        result = engine.query(
+            UnifiedQuery(
+                query="PAT-001",
+                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                max_depth=1,
+                edge_types=["learned_from"],
+            )
+        )
+        ids = {c.id for c in result.concepts}
+        assert "PAT-001" in ids  # root node always included
+        assert "SES-001" in ids  # connected via learned_from
+        assert "/story-plan" not in ids  # connected via applies_to, filtered out
+
+    def test_concept_lookup_with_multiple_edge_types(
+        self, sample_graph: UnifiedGraph
+    ) -> None:
+        """Multiple edge types returns neighbors matching any of them."""
+        from raise_cli.context.models import ConceptEdge
+
+        sample_graph.add_relationship(
+            ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")
+        )
+        sample_graph.add_relationship(
+            ConceptEdge(source="PAT-001", target="/story-plan", type="applies_to")
+        )
+
+        engine = UnifiedQueryEngine(sample_graph)
+
+        result = engine.query(
+            UnifiedQuery(
+                query="PAT-001",
+                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                max_depth=1,
+                edge_types=["learned_from", "applies_to"],
+            )
+        )
+        ids = {c.id for c in result.concepts}
+        assert "SES-001" in ids
+        assert "/story-plan" in ids
+
+    def test_concept_lookup_without_edge_types_returns_all(
+        self, sample_graph: UnifiedGraph
+    ) -> None:
+        """No edge_types filter returns all neighbors (backward compat)."""
+        from raise_cli.context.models import ConceptEdge
+
+        sample_graph.add_relationship(
+            ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")
+        )
+        sample_graph.add_relationship(
+            ConceptEdge(source="PAT-001", target="/story-plan", type="applies_to")
+        )
+
+        engine = UnifiedQueryEngine(sample_graph)
+
+        result = engine.query(
+            UnifiedQuery(
+                query="PAT-001",
+                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                max_depth=1,
+                edge_types=None,
+            )
+        )
+        ids = {c.id for c in result.concepts}
+        assert "SES-001" in ids
+        assert "/story-plan" in ids
+
+
 class TestUnifiedQueryEngineMetadata:
     """Tests for query metadata."""
 

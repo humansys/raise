@@ -58,6 +58,12 @@
 
 ### Framework Improvements
 
+- [ ] **Remove "Unified" prefix from graph classes** — (SES-096, 2026-02-08)
+  - **Problem:** `UnifiedGraph`, `UnifiedQueryEngine`, `UnifiedQuery`, etc. — 7 classes carry "Unified" prefix that distinguishes nothing. Vestige from when separate graphs existed.
+  - **What:** Rename to `ContextGraph`, `QueryEngine`, `Query`, etc. Find-and-replace across `context/`, CLI, tests.
+  - **Risk:** PAT-151 (renames have long tail) — do as dedicated story with proper verification
+  - **Priority:** Post-F&F, low risk but real cognitive tax reduction
+
 - [ ] **Foundational pattern surfacing in session-start** — (SES-094, 2026-02-08)
   - **Problem:** Patterns are already in the graph (181 nodes) but session-start doesn't query for behavior-changing ones. Foundational patterns like PAT-183 (grounding over speed) get forgotten between sessions.
   - **Data is there, surfacing is the gap.** Graph already has pattern nodes — the fix is query-side, not storage-side.
