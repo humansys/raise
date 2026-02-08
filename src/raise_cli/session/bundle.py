@@ -1,13 +1,15 @@
 """Context bundle assembly for session start.
 
-Assembles a token-optimized context bundle (~150 tokens) from multiple sources:
+Assembles a token-optimized context bundle (~600 tokens) from multiple sources:
 1. ~/.rai/developer.yaml → developer model + coaching + deadlines
 2. .raise/rai/session-state.yaml → current work state
-3. Memory graph → foundational patterns (metadata query)
+3. Memory graph → foundational patterns, governance primes, identity primes
+4. .raise/rai/memory/sessions/index.jsonl → recent sessions
 """
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import date
 from pathlib import Path
@@ -21,6 +23,10 @@ logger = logging.getLogger(__name__)
 
 # Graph path relative to project root
 GRAPH_REL_PATH = Path(".raise") / "rai" / "memory" / "index.json"
+# Sessions index path relative to project root
+SESSIONS_INDEX_REL_PATH = (
+    Path(".raise") / "rai" / "memory" / "sessions" / "index.jsonl"
+)
 
 
 def get_foundational_patterns(project_path: Path) -> list[ConceptNode]:
@@ -47,6 +53,33 @@ def get_foundational_patterns(project_path: Path) -> list[ConceptNode]:
         node
         for node in graph.iter_concepts()
         if node.type == "pattern" and node.metadata.get("foundational") is True
+    ]
+
+
+def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
+    """Query memory graph for all always_on nodes (governance + identity).
+
+    Args:
+        project_path: Absolute path to the project root.
+
+    Returns:
+        List of ConceptNodes with always_on=true metadata.
+    """
+    graph_path = project_path / GRAPH_REL_PATH
+    if not graph_path.exists():
+        logger.debug("Graph not found: %s", graph_path)
+        return []
+
+    try:
+        graph = UnifiedGraph.load(graph_path)
+    except Exception:
+        logger.warning("Failed to load graph: %s", graph_path)
+        return []
+
+    return [
+        node
+        for node in graph.iter_concepts()
+        if node.metadata.get("always_on") is True
     ]
 
 
@@ -97,6 +130,118 @@ def _format_deadlines(profile: DeveloperProfile) -> str:
         if d.notes:
             line += f" — {d.notes}"
         lines.append(line)
+    return "\n".join(lines)
+
+
+def _format_governance_primes(always_on_nodes: list[ConceptNode]) -> str:
+    """Format governance primes (guardrails + non-identity principles).
+
+    Args:
+        always_on_nodes: All always_on nodes from the graph.
+
+    Returns:
+        Formatted governance primes section, or empty string if none.
+    """
+    governance = [
+        n
+        for n in always_on_nodes
+        if not n.id.startswith("RAI-VAL-") and not n.id.startswith("RAI-BND-")
+    ]
+    if not governance:
+        return ""
+
+    lines = ["# Governance Primes"]
+    for n in governance:
+        content = n.content
+        if len(content) > 80:
+            content = content[:77] + "..."
+        lines.append(f"- {n.id}: {content}")
+    return "\n".join(lines)
+
+
+def _format_identity_primes(always_on_nodes: list[ConceptNode]) -> str:
+    """Format identity primes (RAI-VAL-* values + RAI-BND-* boundaries).
+
+    Args:
+        always_on_nodes: All always_on nodes from the graph.
+
+    Returns:
+        Formatted identity primes section, or empty string if none.
+    """
+    identity = [
+        n
+        for n in always_on_nodes
+        if n.id.startswith("RAI-VAL-") or n.id.startswith("RAI-BND-")
+    ]
+    if not identity:
+        return ""
+
+    lines = ["# Identity Primes"]
+    for n in identity:
+        content = n.content
+        if len(content) > 80:
+            content = content[:77] + "..."
+        lines.append(f"- {n.id}: {content}")
+    return "\n".join(lines)
+
+
+def _format_progress(state: SessionState | None) -> str:
+    """Format epic progress section.
+
+    Args:
+        state: Session state (may be None).
+
+    Returns:
+        Formatted progress section, or empty string if no progress.
+    """
+    if state is None or state.progress is None:
+        return ""
+
+    p = state.progress
+    pct = round(p.sp_done / p.sp_total * 100) if p.sp_total > 0 else 0
+    lines = [f"Progress: {p.epic} — {p.stories_done}/{p.stories_total} stories, {p.sp_done}/{p.sp_total} SP ({pct}%)"]
+
+    if state.completed_epics:
+        lines.append(f"Completed: {', '.join(state.completed_epics)}")
+
+    return "\n".join(lines)
+
+
+def _format_recent_sessions(project_path: Path, limit: int = 3) -> str:
+    """Format recent sessions from sessions/index.jsonl.
+
+    Args:
+        project_path: Absolute path to the project root.
+        limit: Number of recent sessions to include.
+
+    Returns:
+        Formatted recent sessions section, or empty string if none.
+    """
+    index_path = project_path / SESSIONS_INDEX_REL_PATH
+    if not index_path.exists():
+        return ""
+
+    try:
+        text = index_path.read_text().strip()
+        if not text:
+            return ""
+        sessions = [json.loads(line) for line in text.splitlines() if line.strip()]
+    except Exception:
+        logger.warning("Failed to read sessions index: %s", index_path)
+        return ""
+
+    if not sessions:
+        return ""
+
+    recent = sessions[-limit:]
+    recent.reverse()  # Most recent first
+
+    lines = ["Recent:"]
+    for s in recent:
+        topic = s.get("topic", "")
+        if len(topic) > 80:
+            topic = topic[:77] + "..."
+        lines.append(f"- {s['id']}: {topic}")
     return "\n".join(lines)
 
 
@@ -172,29 +317,55 @@ def assemble_context_bundle(
         project_path: Absolute path to the project root.
 
     Returns:
-        Plain text context bundle, ~150 tokens.
+        Plain text context bundle, ~600 tokens.
     """
     patterns = get_foundational_patterns(project_path)
+    always_on = get_always_on_primes(project_path)
 
+    # Session Context header
     sections = [
         "# Session Context",
         _format_developer_section(profile),
         _format_work_section(state),
-        _format_last_session(state),
     ]
 
+    # Progress (epic SP, completed epics)
+    progress = _format_progress(state)
+    if progress:
+        sections.append(progress)
+
+    # Last session + recent sessions
+    sections.append(_format_last_session(state))
+    recent = _format_recent_sessions(project_path)
+    if recent:
+        sections.append(recent)
+
+    # Deadlines
     deadlines = _format_deadlines(profile)
     if deadlines:
         sections.append(deadlines)
 
+    # Governance primes (guardrails + principles, not identity)
+    gov_primes = _format_governance_primes(always_on)
+    if gov_primes:
+        sections.append(gov_primes)
+
+    # Identity primes (RAI-VAL-*, RAI-BND-*)
+    id_primes = _format_identity_primes(always_on)
+    if id_primes:
+        sections.append(id_primes)
+
+    # Behavioral primes (foundational patterns)
     primes = _format_primes(patterns)
     if primes:
         sections.append(primes)
 
+    # Coaching
     coaching = _format_coaching(profile)
     if coaching:
         sections.append(coaching)
 
+    # Pending
     pending = _format_pending(state)
     if pending:
         sections.append(pending)

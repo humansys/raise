@@ -59,6 +59,24 @@ class PendingItems(BaseModel):
     next_actions: list[str] = Field(default_factory=list)
 
 
+class EpicProgress(BaseModel):
+    """Progress tracking for the current epic.
+
+    Attributes:
+        epic: Epic identifier (e.g., "E15").
+        stories_done: Number of completed stories.
+        stories_total: Total number of stories.
+        sp_done: Story points completed.
+        sp_total: Total story points.
+    """
+
+    epic: str
+    stories_done: int
+    stories_total: int
+    sp_done: int
+    sp_total: int
+
+
 class SessionState(BaseModel):
     """Project-level working state. Overwritten each session-close.
 
@@ -67,9 +85,13 @@ class SessionState(BaseModel):
         last_session: Summary of the most recent session.
         pending: Open items carried between sessions.
         notes: Free-form notes.
+        progress: Epic progress tracking.
+        completed_epics: List of completed epic identifiers.
     """
 
     current_work: CurrentWork
     last_session: LastSession
     pending: PendingItems = Field(default_factory=PendingItems)
     notes: str = ""
+    progress: EpicProgress | None = None
+    completed_epics: list[str] = Field(default_factory=list)
