@@ -47,6 +47,7 @@ EdgeType = Literal[
     "depends_on",  # module → module (architecture dependency)
     "belongs_to",  # module → bounded_context (domain ownership, E15)
     "in_layer",  # module → layer (architectural layer assignment, E15)
+    "constrained_by",  # BC/layer → guardrail (constraint relationship, E15)
 ]
 
 
