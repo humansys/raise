@@ -323,6 +323,60 @@ class TestExtractGuardrailsWithFrontmatter:
         assert "constraint_scope" not in concepts[0].metadata
 
 
+class TestAlwaysOnMetadata:
+    """Tests for always_on metadata on MUST-level guardrails (S15.8)."""
+
+    def test_must_guardrails_have_always_on_true(self, tmp_path: Path) -> None:
+        """MUST-level guardrails should have always_on=True in metadata."""
+        content = dedent("""\
+            # Guardrails
+
+            ### Code Quality
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-CODE-001` | MUST | Type hints | pyright | Vision |
+            | `SHOULD-CODE-001` | SHOULD | Docstrings | review | Retro |
+        """)
+
+        file_path = tmp_path / "guardrails.md"
+        file_path.write_text(content)
+
+        concepts = extract_guardrails(file_path, tmp_path)
+
+        must = next(c for c in concepts if c.metadata["guardrail_id"] == "MUST-CODE-001")
+        should = next(c for c in concepts if c.metadata["guardrail_id"] == "SHOULD-CODE-001")
+
+        assert must.metadata.get("always_on") is True
+        assert "always_on" not in should.metadata
+
+    def test_all_must_levels_get_always_on(self, tmp_path: Path) -> None:
+        """All MUST-level guardrails (SEC, TEST, ARCH) should get always_on."""
+        content = dedent("""\
+            # Guardrails
+
+            ### Security
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-SEC-001` | MUST | No secrets | detect-secrets | Vision |
+
+            ### Testing
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-TEST-001` | MUST | >90% coverage | pytest | Vision |
+        """)
+
+        file_path = tmp_path / "guardrails.md"
+        file_path.write_text(content)
+
+        concepts = extract_guardrails(file_path, tmp_path)
+
+        for concept in concepts:
+            assert concept.metadata.get("always_on") is True
+
+
 class TestIntegrationWithRealGuardrails:
     """Integration tests with the actual guardrails file."""
 

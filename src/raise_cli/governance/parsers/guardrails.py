@@ -272,6 +272,10 @@ def extract_guardrails(
                 "derived_from": guardrail["derived_from"],
             }
 
+            # Tag MUST-level guardrails as always_on (S15.8)
+            if level == "MUST":
+                metadata["always_on"] = True
+
             # Resolve constraint scope from frontmatter (S15.3)
             if scopes:
                 prefix = _extract_prefix(guardrail_id)
