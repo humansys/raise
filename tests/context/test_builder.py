@@ -1062,6 +1062,260 @@ class TestLoadArchitecture:
         assert node.type == "module"
 
 
+class TestLoadArchitectureDocTypes:
+    """Tests for architecture doc type ingestion (S15.1)."""
+
+    def test_loads_architecture_context_doc(self, tmp_path: Path) -> None:
+        """Should parse architecture_context doc into architecture node."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "system-context.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_context
+            project: raise-cli
+            version: 2.0.0-alpha
+            status: current
+            tech_stack:
+              language: "Python 3.12+"
+              framework: "Pydantic AI"
+              cli: "Typer"
+            external_dependencies:
+              - "Git (version control)"
+              - "ripgrep (fast content search)"
+            users:
+              - "RaiSE Engineers"
+              - "Rai (AI partner)"
+            governed_by:
+              - "framework/reference/constitution.md"
+              - "governance/guardrails.md"
+            ---
+
+            # System Context
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.type == "architecture"]
+        assert len(arch_nodes) == 1
+        node = arch_nodes[0]
+        assert node.id == "arch-context"
+        assert node.type == "architecture"
+        assert "Python 3.12+" in node.content
+        assert node.source_file == "governance/architecture/system-context.md"
+        assert node.metadata["arch_type"] == "architecture_context"
+        assert node.metadata["tech_stack"]["language"] == "Python 3.12+"
+        assert len(node.metadata["external_dependencies"]) == 2
+        assert len(node.metadata["governed_by"]) == 2
+
+    def test_loads_architecture_design_doc(self, tmp_path: Path) -> None:
+        """Should parse architecture_design doc into architecture node."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "system-design.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_design
+            project: raise-cli
+            status: current
+            layers:
+              - name: leaf
+                modules: [core, config, schemas]
+                description: "Zero internal dependencies"
+              - name: domain
+                modules: [governance, discovery, skills, telemetry]
+                description: "Independent domain logic"
+              - name: integration
+                modules: [context, memory, onboarding, output]
+                description: "Combines domains"
+              - name: orchestration
+                modules: [cli]
+                description: "User-facing entry points"
+            architectural_decisions:
+              - "ADR-012: Skills + Toolkit"
+              - "ADR-019: Unified graph"
+            guardrails_reference: "governance/guardrails.md"
+            ---
+
+            # System Design
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.type == "architecture"]
+        assert len(arch_nodes) == 1
+        node = arch_nodes[0]
+        assert node.id == "arch-design"
+        assert node.type == "architecture"
+        assert "leaf" in node.content
+        assert "orchestration" in node.content
+        assert node.metadata["arch_type"] == "architecture_design"
+        assert len(node.metadata["layers"]) == 4
+        assert node.metadata["layers"][0]["name"] == "leaf"
+        assert node.metadata["layers"][0]["modules"] == ["core", "config", "schemas"]
+
+    def test_loads_architecture_domain_model_doc(self, tmp_path: Path) -> None:
+        """Should parse architecture_domain_model doc into architecture node."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: raise-cli
+            status: current
+            bounded_contexts:
+              - name: governance
+                modules: [governance]
+                description: "Extract structured knowledge"
+              - name: ontology
+                modules: [context, memory]
+                description: "Persist and query knowledge"
+              - name: discovery
+                modules: [discovery]
+                description: "Scan codebases"
+            shared_kernel:
+              modules: [config, core, schemas]
+              description: "Foundation utilities"
+            application_layer:
+              modules: [cli]
+              description: "Thin orchestration shell"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.type == "architecture"]
+        assert len(arch_nodes) == 1
+        node = arch_nodes[0]
+        assert node.id == "arch-domain-model"
+        assert node.type == "architecture"
+        assert "governance" in node.content
+        assert "ontology" in node.content
+        assert node.metadata["arch_type"] == "architecture_domain_model"
+        assert len(node.metadata["bounded_contexts"]) == 3
+        assert node.metadata["shared_kernel"]["modules"] == ["config", "core", "schemas"]
+
+    def test_skips_architecture_index_doc(self, tmp_path: Path) -> None:
+        """Should skip architecture_index docs (generated summary)."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        (arch_dir / "index.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_index
+            project: raise-cli
+            generated: "2026-02-08"
+            modules: 13
+            ---
+
+            # Architecture Index
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert nodes == []
+
+    def test_scans_parent_and_modules_directories(self, tmp_path: Path) -> None:
+        """Should load from both governance/architecture/ and modules/."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        modules_dir = arch_dir / "modules"
+        modules_dir.mkdir(parents=True)
+
+        # Parent-level architecture doc
+        (arch_dir / "system-context.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_context
+            project: raise-cli
+            status: current
+            tech_stack:
+              language: "Python 3.12+"
+            external_dependencies: []
+            users: []
+            governed_by: []
+            ---
+
+            # System Context
+            """)
+        )
+
+        # Module-level doc
+        (modules_dir / "core.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: core
+            purpose: "Shared utilities"
+            depends_on: []
+            ---
+
+            ## Purpose
+            Core module.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert len(nodes) == 2
+        types = {n.type for n in nodes}
+        assert types == {"architecture", "module"}
+        ids = {n.id for n in nodes}
+        assert ids == {"arch-context", "mod-core"}
+
+    def test_existing_module_parsing_unchanged(self, tmp_path: Path) -> None:
+        """Module doc parsing should remain backward compatible."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "memory.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: memory
+            purpose: "Pattern and calibration JSONL management"
+            status: current
+            depends_on: [config, context]
+            depended_by: [cli]
+            components: 30
+            constraints:
+              - "JSONL is append-only"
+            ---
+
+            ## Purpose
+            Memory module.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        assert len(nodes) == 1
+        node = nodes[0]
+        assert node.id == "mod-memory"
+        assert node.type == "module"
+        assert node.content == "Pattern and calibration JSONL management"
+        assert node.metadata["depends_on"] == ["config", "context"]
+        assert node.metadata["depended_by"] == ["cli"]
+        assert node.metadata["components"] == 30
+        assert node.metadata["constraints"] == ["JSONL is append-only"]
+
+
 class TestBuild:
     """Tests for build method."""
 
@@ -1365,3 +1619,682 @@ class TestInferRelationships:
 
         # Should have edges
         assert graph.edge_count >= 1
+
+
+class TestLoadIdentity:
+    """Tests for identity extraction from core.md (S15.8)."""
+
+    def _write_identity(self, tmp_path: Path) -> None:
+        """Create a test identity/core.md file."""
+        identity_dir = tmp_path / ".raise" / "rai" / "identity"
+        identity_dir.mkdir(parents=True)
+
+        (identity_dir / "core.md").write_text(
+            dedent("""\
+            # Rai — Core Identity
+
+            ## Values
+
+            ### 1. Honesty over Agreement
+            - Push back on bad ideas
+
+            ### 2. Simplicity over Cleverness
+            - Simple solution that works
+
+            ### 3. Observability IS Trust
+            - Show work, explain reasoning
+
+            ### 4. Learning over Perfection
+            - Every session teaches something
+
+            ### 5. Partnership over Service
+            - Collaborator, not tool
+
+            ## Boundaries
+
+            ### I Will
+            - Push back on bad ideas
+            - Stop when I detect incoherence, ambiguity, or drift
+            - Ask before expensive operations
+            - Admit uncertainty rather than pretend confidence
+
+            ### I Won't
+            - Pretend certainty I don't have
+            - Validate ideas just because they were proposed
+            - Generate without understanding
+            """)
+        )
+
+    def test_extracts_values_as_principle_nodes(self, tmp_path: Path) -> None:
+        """Should extract 5 values as principle nodes with always_on=True."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        value_nodes = [n for n in nodes if n.id.startswith("RAI-VAL-")]
+        assert len(value_nodes) == 5
+        for node in value_nodes:
+            assert node.type == "principle"
+            assert node.metadata.get("always_on") is True
+            assert node.metadata.get("identity_type") == "value"
+
+    def test_extracts_boundaries_as_principle_nodes(self, tmp_path: Path) -> None:
+        """Should extract boundaries (I Will + I Won't) as principle nodes."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        boundary_nodes = [n for n in nodes if n.id.startswith("RAI-BND-")]
+        assert len(boundary_nodes) >= 4  # At least 4 from I Will
+        for node in boundary_nodes:
+            assert node.type == "principle"
+            assert node.metadata.get("always_on") is True
+            assert node.metadata.get("identity_type") == "boundary"
+
+    def test_value_node_content(self, tmp_path: Path) -> None:
+        """Value nodes should have 'Title — first bullet' content."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        val1 = next(n for n in nodes if n.id == "RAI-VAL-1")
+        assert "Honesty over Agreement" in val1.content
+
+    def test_boundary_node_content(self, tmp_path: Path) -> None:
+        """Boundary nodes should have the boundary text as content."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+
+        bnd_nodes = [n for n in nodes if n.id.startswith("RAI-BND-")]
+        contents = [n.content for n in bnd_nodes]
+        assert any("Stop when I detect incoherence" in c for c in contents)
+
+    def test_returns_empty_when_no_identity_file(self, tmp_path: Path) -> None:
+        """Should return empty list when identity/core.md doesn't exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_identity()
+        assert nodes == []
+
+    def test_build_includes_identity_nodes(self, tmp_path: Path) -> None:
+        """Build should include identity nodes in the graph."""
+        self._write_identity(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # Should have value + boundary nodes
+        identity_nodes = [
+            n for n in graph.get_concepts_by_type("principle")
+            if n.id.startswith("RAI-")
+        ]
+        assert len(identity_nodes) >= 5  # At least the 5 values
+
+
+class TestExtractBoundedContexts:
+    """Tests for bounded context extraction from arch-domain-model metadata (S15.2)."""
+
+    def _build_arch_fixtures(self, tmp_path: Path) -> None:
+        """Create architecture doc fixtures with domain model and design."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+        modules_dir = arch_dir / "modules"
+        modules_dir.mkdir()
+
+        # Domain model with bounded contexts
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: test
+            status: current
+            bounded_contexts:
+              - name: governance
+                modules: [governance]
+                description: "Extract structured knowledge"
+              - name: ontology
+                modules: [context, memory]
+                description: "Persist and query knowledge"
+            shared_kernel:
+              modules: [config, core]
+              description: "Foundation utilities"
+            application_layer:
+              modules: [cli]
+              description: "Thin orchestration shell"
+            distribution:
+              modules: [rai_base]
+              description: "Packaged content"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        # System design with layers
+        (arch_dir / "system-design.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_design
+            project: test
+            status: current
+            layers:
+              - name: leaf
+                modules: [config, core]
+                description: "Zero internal dependencies"
+              - name: domain
+                modules: [governance]
+                description: "Independent domain logic"
+              - name: integration
+                modules: [context, memory]
+                description: "Combines domains"
+              - name: orchestration
+                modules: [cli]
+                description: "User-facing entry points"
+            ---
+
+            # System Design
+            """)
+        )
+
+        # Module docs (so module nodes exist for edge safety)
+        for name in ["governance", "context", "memory", "config", "core", "cli", "rai_base"]:
+            (modules_dir / f"{name}.md").write_text(
+                dedent(f"""\
+                ---
+                type: module
+                name: {name}
+                purpose: "{name} module"
+                depends_on: []
+                ---
+
+                ## Purpose
+                The {name} module.
+                """)
+            )
+
+    def test_creates_bounded_context_nodes(self, tmp_path: Path) -> None:
+        """Should create bounded_context nodes from domain model metadata."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        bc_nodes = graph.get_concepts_by_type("bounded_context")
+        bc_ids = {n.id for n in bc_nodes}
+
+        # 2 BCs + shared_kernel + application_layer + distribution = 5
+        assert len(bc_nodes) == 5
+        assert "bc-governance" in bc_ids
+        assert "bc-ontology" in bc_ids
+        assert "bc-shared-kernel" in bc_ids
+        assert "bc-application-layer" in bc_ids
+        assert "bc-distribution" in bc_ids
+
+    def test_bc_nodes_have_correct_content(self, tmp_path: Path) -> None:
+        """BC node content should come from the description field."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("bc-ontology")
+        assert node is not None
+        assert node.content == "Persist and query knowledge"
+        assert node.metadata.get("bc_type") == "bounded_context"
+
+    def test_shared_kernel_has_bc_type_metadata(self, tmp_path: Path) -> None:
+        """Shared kernel should have bc_type='shared_kernel' in metadata."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("bc-shared-kernel")
+        assert node is not None
+        assert node.metadata.get("bc_type") == "shared_kernel"
+
+    def test_creates_belongs_to_edges(self, tmp_path: Path) -> None:
+        """Should create belongs_to edges from modules to their BC."""
+        self._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # mod-context and mod-memory should belong to bc-ontology
+        neighbors = graph.get_neighbors("bc-ontology", edge_types=["belongs_to"])
+        neighbor_ids = {n.id for n in neighbors}
+        assert "mod-context" in neighbor_ids
+        assert "mod-memory" in neighbor_ids
+
+    def test_no_belongs_to_for_missing_modules(self, tmp_path: Path) -> None:
+        """Should not create belongs_to edges when module node doesn't exist."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        # Domain model references a module that has no module doc
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: test
+            status: current
+            bounded_contexts:
+              - name: phantom
+                modules: [nonexistent]
+                description: "References missing module"
+            shared_kernel:
+              modules: []
+              description: "Empty"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # BC node should exist but have no belongs_to neighbors
+        node = graph.get_concept("bc-phantom")
+        assert node is not None
+        neighbors = graph.get_neighbors("bc-phantom", edge_types=["belongs_to"])
+        assert len(neighbors) == 0
+
+    def test_graceful_when_no_domain_model(self, tmp_path: Path) -> None:
+        """Should produce no BC nodes when arch-domain-model is absent."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        bc_nodes = graph.get_concepts_by_type("bounded_context")
+        assert len(bc_nodes) == 0
+
+
+class TestExtractLayers:
+    """Tests for layer extraction from arch-design metadata (S15.2)."""
+
+    def test_creates_layer_nodes(self, tmp_path: Path) -> None:
+        """Should create layer nodes from system design metadata."""
+        # Reuse the fixture builder from TestExtractBoundedContexts
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        layer_nodes = graph.get_concepts_by_type("layer")
+        layer_ids = {n.id for n in layer_nodes}
+
+        assert len(layer_nodes) == 4
+        assert layer_ids == {"lyr-leaf", "lyr-domain", "lyr-integration", "lyr-orchestration"}
+
+    def test_layer_nodes_have_correct_content(self, tmp_path: Path) -> None:
+        """Layer node content should come from the description field."""
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("lyr-leaf")
+        assert node is not None
+        assert node.content == "Zero internal dependencies"
+
+    def test_creates_in_layer_edges(self, tmp_path: Path) -> None:
+        """Should create in_layer edges from modules to their layer."""
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # mod-context and mod-memory should be in lyr-integration
+        neighbors = graph.get_neighbors("lyr-integration", edge_types=["in_layer"])
+        neighbor_ids = {n.id for n in neighbors}
+        assert "mod-context" in neighbor_ids
+        assert "mod-memory" in neighbor_ids
+
+    def test_no_in_layer_for_distribution_modules(self, tmp_path: Path) -> None:
+        """Distribution modules (rai_base) should NOT get in_layer edges."""
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # rai_base is in distribution, NOT in any layer
+        neighbors = graph.get_neighbors("mod-rai_base", edge_types=["in_layer"])
+        assert len(neighbors) == 0
+
+    def test_graceful_when_no_design_doc(self, tmp_path: Path) -> None:
+        """Should produce no layer nodes when arch-design is absent."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        layer_nodes = graph.get_concepts_by_type("layer")
+        assert len(layer_nodes) == 0
+
+
+class TestExtractConstraints:
+    """Tests for constraint edge extraction from guardrail metadata (S15.3)."""
+
+    def _build_constraint_fixtures(self, tmp_path: Path) -> None:
+        """Create fixtures with guardrails that have constraint_scope metadata."""
+        # Reuse arch fixtures for BCs and layers
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+
+        # Create guardrails.md with frontmatter
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir(exist_ok=True)
+
+        (gov_dir / "guardrails.md").write_text(
+            dedent("""\
+            ---
+            type: guardrails
+            constraint_scopes:
+              default: all_bounded_contexts
+              overrides:
+                must-arch: [bc-ontology, bc-skills]
+                should-cli: [lyr-orchestration]
+            ---
+
+            ## Guardrails
+
+            ### Code Quality
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-CODE-001` | MUST | Type hints | pyright | Vision |
+
+            ### Architecture
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-ARCH-001` | MUST | Engine separation | import analysis | Vision |
+
+            ### CLI Development
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `SHOULD-CLI-001` | SHOULD | Path params | review | Retro |
+            """)
+        )
+
+    def test_creates_constrained_by_edges_for_universal_scope(
+        self, tmp_path: Path
+    ) -> None:
+        """Universal guardrails (default) create edges to all BCs."""
+        self._build_constraint_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # MUST-CODE-001 applies to all BCs (default scope)
+        neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        neighbor_ids = {n.id for n in neighbors}
+        assert "guardrail-must-code-001" in neighbor_ids
+
+    def test_creates_constrained_by_edges_for_override_scope(
+        self, tmp_path: Path
+    ) -> None:
+        """Override guardrails create edges only to specified targets."""
+        self._build_constraint_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # MUST-ARCH-001 applies only to bc-ontology and bc-skills (override)
+        onto_neighbors = graph.get_neighbors(
+            "bc-ontology", edge_types=["constrained_by"]
+        )
+        onto_ids = {n.id for n in onto_neighbors}
+        assert "guardrail-must-arch-001" in onto_ids
+
+        # bc-governance should NOT have the arch guardrail
+        gov_neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        gov_ids = {n.id for n in gov_neighbors}
+        assert "guardrail-must-arch-001" not in gov_ids
+
+    def test_creates_constrained_by_edges_for_layer_target(
+        self, tmp_path: Path
+    ) -> None:
+        """Layer-targeted guardrails create edges to layer nodes."""
+        self._build_constraint_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # SHOULD-CLI-001 targets lyr-orchestration
+        orch_neighbors = graph.get_neighbors(
+            "lyr-orchestration", edge_types=["constrained_by"]
+        )
+        orch_ids = {n.id for n in orch_neighbors}
+        assert "guardrail-should-cli-001" in orch_ids
+
+    def test_no_constraint_edges_without_guardrails(self, tmp_path: Path) -> None:
+        """No constraint edges when no guardrail nodes exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        assert graph.edge_count == 0
+
+    def test_no_constraint_edges_without_scope_metadata(
+        self, tmp_path: Path
+    ) -> None:
+        """Guardrails without constraint_scope metadata produce no constraint edges."""
+        # Create arch fixtures (BCs exist)
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+
+        # Guardrails WITHOUT frontmatter (no constraint_scope in metadata)
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir(exist_ok=True)
+        (gov_dir / "guardrails.md").write_text(
+            dedent("""\
+            ## Guardrails
+
+            ### Code Quality
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-CODE-001` | MUST | Type hints | pyright | Vision |
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # Guardrail node exists but no constrained_by edges
+        node = graph.get_concept("guardrail-must-code-001")
+        assert node is not None
+
+        # BCs should have no constrained_by neighbors
+        bc_node = graph.get_concept("bc-governance")
+        assert bc_node is not None
+        neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        assert len(neighbors) == 0
+
+    def test_skips_nonexistent_target_nodes(self, tmp_path: Path) -> None:
+        """Should not create edges to nodes that don't exist in graph."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        # Domain model with a BC that won't have its target in override
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: test
+            status: current
+            bounded_contexts:
+              - name: governance
+                modules: []
+                description: "Test BC"
+            shared_kernel:
+              modules: []
+              description: "Empty"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir(exist_ok=True)
+        (gov_dir / "guardrails.md").write_text(
+            dedent("""\
+            ---
+            type: guardrails
+            constraint_scopes:
+              default: all_bounded_contexts
+              overrides:
+                must-arch: [bc-nonexistent]
+            ---
+
+            ## Guardrails
+
+            ### Architecture
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-ARCH-001` | MUST | Engine separation | import | Vision |
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # bc-nonexistent doesn't exist, so no constrained_by edges for must-arch
+        # bc-governance exists and should NOT have must-arch (it's overridden)
+        neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        arch_neighbors = [n for n in neighbors if "arch" in n.id]
+        assert len(arch_neighbors) == 0

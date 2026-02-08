@@ -9,9 +9,74 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
+
+import yaml
 
 from raise_cli.governance.models import Concept, ConceptType
+
+
+def _parse_frontmatter(content: str) -> dict[str, Any]:
+    """Parse YAML frontmatter from guardrails document.
+
+    Args:
+        content: Full file content.
+
+    Returns:
+        Parsed frontmatter dict, or empty dict if absent/invalid.
+    """
+    if not content.startswith("---"):
+        return {}
+
+    end = content.find("---", 3)
+    if end == -1:
+        return {}
+
+    try:
+        result: Any = yaml.safe_load(content[3:end])
+    except Exception:
+        return {}
+
+    if not isinstance(result, dict):
+        return {}
+    return cast(dict[str, Any], result)
+
+
+def _strip_frontmatter(content: str) -> str:
+    """Strip YAML frontmatter from content, returning body only.
+
+    Args:
+        content: Full file content potentially with frontmatter.
+
+    Returns:
+        Content without the frontmatter block.
+    """
+    if not content.startswith("---"):
+        return content
+
+    end = content.find("---", 3)
+    if end == -1:
+        return content
+
+    return content[end + 3:]
+
+
+def _extract_prefix(guardrail_id: str) -> str:
+    """Extract category prefix from a guardrail ID.
+
+    Converts ``MUST-ARCH-001`` to ``must-arch`` by lowercasing
+    and stripping the trailing ``-NNN`` numeric segment.
+
+    Args:
+        guardrail_id: Raw guardrail ID (e.g., ``MUST-CODE-001``).
+
+    Returns:
+        Lowercase category prefix (e.g., ``must-code``).
+    """
+    lowered = guardrail_id.lower()
+    # Strip last segment (the numeric part)
+    parts = lowered.rsplit("-", 1)
+    return parts[0]
 
 
 def _parse_guardrail_table(table_text: str, section: str) -> list[dict[str, Any]]:
@@ -156,8 +221,13 @@ def extract_guardrails(
     content = file_path.read_text(encoding="utf-8")
     concepts: list[Concept] = []
 
-    # Find all section tables
-    section_tables = _find_section_tables(content)
+    # Parse frontmatter if present (S15.3 — constraint scopes)
+    frontmatter = _parse_frontmatter(content)
+    body = _strip_frontmatter(content)
+    scopes: dict[str, Any] = frontmatter.get("constraint_scopes", {})
+
+    # Find all section tables from body (frontmatter stripped)
+    section_tables = _find_section_tables(body)
 
     # Calculate relative path
     try:
@@ -166,12 +236,12 @@ def extract_guardrails(
         relative_path = file_path.name
 
     # Track line numbers for each section
-    lines = content.split("\n")
+    body_lines = body.split("\n")
 
     for section_name, table_text in section_tables:
         # Find line number of section header
         section_line = 1
-        for i, line in enumerate(lines, 1):
+        for i, line in enumerate(body_lines, 1):
             if f"### {section_name}" in line:
                 section_line = i
                 break
@@ -193,6 +263,27 @@ def extract_guardrails(
             if len(content_str) > 500:
                 content_str = content_str[:500] + "..."
 
+            metadata: dict[str, Any] = {
+                "guardrail_id": guardrail_id,
+                "level": level,
+                "section": section_name,
+                "description": description,
+                "verification": guardrail["verification"],
+                "derived_from": guardrail["derived_from"],
+            }
+
+            # Tag MUST-level guardrails as always_on (S15.8)
+            if level == "MUST":
+                metadata["always_on"] = True
+
+            # Resolve constraint scope from frontmatter (S15.3)
+            if scopes:
+                prefix = _extract_prefix(guardrail_id)
+                overrides: dict[str, Any] = scopes.get("overrides", {})
+                scope = overrides.get(prefix, scopes.get("default"))
+                if scope is not None:
+                    metadata["constraint_scope"] = scope
+
             concept = Concept(
                 id=f"guardrail-{guardrail_id.lower()}",
                 type=ConceptType.GUARDRAIL,
@@ -200,14 +291,7 @@ def extract_guardrails(
                 section=f"{section_name}: {guardrail_id}",
                 lines=(section_line, section_line + 10),  # Approximate
                 content=content_str,
-                metadata={
-                    "guardrail_id": guardrail_id,
-                    "level": level,
-                    "section": section_name,
-                    "description": description,
-                    "verification": guardrail["verification"],
-                    "derived_from": guardrail["derived_from"],
-                },
+                metadata=metadata,
             )
             concepts.append(concept)
 

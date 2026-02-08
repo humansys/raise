@@ -112,6 +112,37 @@ ls -la "$FEATURE_DIR/"
 
 > **If you can't continue:** Missing artifacts → Complete the missing phase first.
 
+### Step 1.5: Check for Structural Drift
+
+If this story added new modules, changed directory structure, or altered data flow paths, the architecture docs must be updated before closing.
+
+```bash
+# Compare source modules vs documented modules
+SOURCE_MODULES=$(ls -d src/raise_cli/*/ 2>/dev/null | sed 's|src/raise_cli/||;s|/$||' | grep -v __pycache__ | sort)
+DOC_MODULES=$(ls governance/architecture/modules/*.md 2>/dev/null | sed 's|governance/architecture/modules/||;s|\.md$||' | sort)
+
+# Show any undocumented modules
+MISSING=$(comm -23 <(echo "$SOURCE_MODULES") <(echo "$DOC_MODULES"))
+if [ -n "$MISSING" ]; then
+    echo "WARNING: Undocumented modules detected:"
+    echo "$MISSING"
+    echo "Create module docs in governance/architecture/modules/ before closing."
+fi
+```
+
+**Also check manually:**
+- Did this story change where data is written (paths, directories)?
+- Did this story move data between scopes (project → personal, memory → personal)?
+- Did this story add new inter-module dependencies?
+
+If any of the above: update the relevant module doc in `governance/architecture/modules/` so the graph carries the correct structure to future sessions.
+
+**Why this matters:** New code in future sessions uses the graph as its map. Stale architecture docs cause path bugs and rework (PAT-151).
+
+**Verification:** No undocumented modules. Module docs reflect current paths and data flow.
+
+> **If drift detected:** Update the module doc now. This is a 5-minute task that prevents hours of rework.
+
 ### Step 2: Identify Parent Branch
 
 Determine the merge target:
@@ -233,10 +264,10 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 Record the completion of the entire story lifecycle:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase review
+uv run raise memory emit-work story {story_id} --event complete --phase review
 ```
 
-**Example:** `raise memory emit-work feature F12.2 -e complete -p review`
+**Example:** `raise memory emit-work story S15.1 -e complete -p review`
 
 **Verification:** Telemetry emitted.
 
@@ -262,7 +293,7 @@ Update `CLAUDE.local.md` to reflect completion:
 - **Merge:** Feature merged to parent branch with `--no-ff`
 - **Cleanup:** Feature branch deleted locally
 - **Epic:** Feature marked complete in epic scope
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (story complete)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (story complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Feature Close Summary Template

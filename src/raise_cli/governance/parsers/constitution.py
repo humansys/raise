@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import re
 from pathlib import Path
+from typing import Any
 
 from raise_cli.core.text import sanitize_id
 from raise_cli.governance.models import Concept, ConceptType
@@ -76,6 +77,15 @@ def extract_principles(
             except ValueError:
                 relative_path = file_path.name
 
+            metadata: dict[str, Any] = {
+                "principle_number": principle_num,
+                "principle_name": principle_name,
+            }
+
+            # Tag core principles as always_on (S15.8)
+            if principle_num in {"1", "3", "7"}:
+                metadata["always_on"] = True
+
             concept = Concept(
                 id=f"principle-{principle_id}",
                 type=ConceptType.PRINCIPLE,
@@ -83,10 +93,7 @@ def extract_principles(
                 section=f"§{principle_num}. {principle_name}",
                 lines=(i, min(i + len(content_lines[:30]), len(lines))),
                 content=content.strip(),
-                metadata={
-                    "principle_number": principle_num,
-                    "principle_name": principle_name,
-                },
+                metadata=metadata,
             )
             concepts.append(concept)
 

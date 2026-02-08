@@ -227,7 +227,7 @@ uv run raise memory emit-work feature {story_id} --event complete --phase review
 
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
 - **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
-- **Telemetry:** `.raise/rai/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
+- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement
 

@@ -8,10 +8,10 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 SKILL_NAME="${RAISE_SKILL_NAME:-unknown}"
 
 # Ensure telemetry directory exists
-mkdir -p "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry"
+mkdir -p "$CLAUDE_PROJECT_DIR/.raise/rai/personal/telemetry"
 
 # Calculate duration from start timestamp
-TIMESTAMP_FILE="$CLAUDE_PROJECT_DIR/.raise/rai/telemetry/.skill_start_${SKILL_NAME}"
+TIMESTAMP_FILE="$CLAUDE_PROJECT_DIR/.raise/rai/personal/telemetry/.skill_start_${SKILL_NAME}"
 DURATION_SEC="null"
 
 if [ -f "$TIMESTAMP_FILE" ]; then
@@ -31,6 +31,6 @@ fi
 
 # Emit SkillEvent (ADR-018 format)
 echo "{\"type\":\"skill_event\",\"timestamp\":\"$TIMESTAMP\",\"skill\":\"$SKILL_NAME\",\"event\":\"complete\",\"duration_sec\":$DURATION_SEC}" \
-  >> "$CLAUDE_PROJECT_DIR/.raise/rai/telemetry/signals.jsonl"
+  >> "$CLAUDE_PROJECT_DIR/.raise/rai/personal/telemetry/signals.jsonl"
 
 exit 0
