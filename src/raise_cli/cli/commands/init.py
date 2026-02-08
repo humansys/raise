@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Annotated
 
 if TYPE_CHECKING:
     from raise_cli.onboarding.bootstrap import BootstrapResult
+    from raise_cli.onboarding.governance import GovernanceScaffoldResult
     from raise_cli.onboarding.skills import SkillScaffoldResult
 
 import typer
@@ -62,11 +63,15 @@ PROJECT_DETECTED_SHU = """
 
 [bold cyan]What's next?[/bold cyan]
 
-  [bold]1. Start a session[/bold] (in Claude Code / AI editor):
+  [bold]1. Fill governance[/bold] (in Claude Code / AI editor):
+     Type [bold cyan]{skill_recommendation}[/bold cyan]
+     [dim]→ {skill_description}[/dim]
+
+  [bold]2. Start a session[/bold] (after governance is set up):
      Type [bold cyan]/session-start[/bold cyan]
      [dim]→ Loads your context, remembers patterns, proposes focused work[/dim]
 
-  [bold]2. Explore the CLI[/bold] (in terminal):
+  [bold]3. Explore the CLI[/bold] (in terminal):
      [dim]raise --help[/dim]      — see all commands
      [dim]raise context[/dim]     — query project context
      [dim]raise memory[/dim]      — query Rai's memory
@@ -76,7 +81,7 @@ PROJECT_DETECTED_SHU = """
 
 PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
-[dim]Editor:[/dim] /session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
+[dim]Next:[/dim] {skill_recommendation}   [dim]Then:[/dim] /session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
 """
 
 
@@ -93,6 +98,26 @@ def _get_welcome_message(profile: DeveloperProfile | None) -> str:
         return WELCOME_SHU
 
 
+def _get_skill_recommendation(project_type: str) -> tuple[str, str]:
+    """Get recommended skill based on project type.
+
+    Args:
+        project_type: Detected project type (greenfield/brownfield).
+
+    Returns:
+        Tuple of (skill_command, description).
+    """
+    if project_type == "brownfield":
+        return (
+            "/project-onboard",
+            "Analyze codebase and fill governance from conversation",
+        )
+    return (
+        "/project-create",
+        "Fill governance from conversation (new project)",
+    )
+
+
 def _get_project_message(
     project_type: str,
     file_count: int,
@@ -100,6 +125,7 @@ def _get_project_message(
     created_profile: bool,
     bootstrap_result: BootstrapResult | None = None,
     skills_result: SkillScaffoldResult | None = None,
+    governance_result: GovernanceScaffoldResult | None = None,
 ) -> str:
     """Get project detection message based on experience level.
 
@@ -110,10 +136,13 @@ def _get_project_message(
         created_profile: Whether profile was just created.
         bootstrap_result: Result of base Rai bootstrap (None if not run).
         skills_result: Result of skill scaffolding (None if not run).
+        governance_result: Result of governance scaffolding (None if not run).
 
     Returns:
         Formatted message string for console output.
     """
+    skill_cmd, skill_desc = _get_skill_recommendation(project_type)
+
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
         # Build files section with descriptions
         lines = [
@@ -166,12 +195,27 @@ def _get_project_message(
                     f"[dim]— {skills_result.skills_copied} onboarding skills[/dim]"
                 )
 
+        # Governance info
+        if governance_result is not None:
+            if governance_result.already_existed:
+                lines.append(
+                    "[bold]Loaded:[/bold]  governance/  "
+                    "[dim]— governance templates already present[/dim]"
+                )
+            elif governance_result.files_created > 0:
+                lines.append(
+                    f"[bold]Created:[/bold] governance/  "
+                    f"[dim]— {governance_result.files_created} governance templates[/dim]"
+                )
+
         files_section = "\n".join(lines)
 
         return PROJECT_DETECTED_SHU.format(
             project_type=project_type.capitalize(),
             file_count=file_count,
             files_section=files_section,
+            skill_recommendation=skill_cmd,
+            skill_description=skill_desc,
         )
     else:
         bootstrap_msg = ""
@@ -185,13 +229,20 @@ def _get_project_message(
                 f"  Installed {skills_result.skills_copied} skills"
                 f" to .claude/skills/\n"
             )
+        governance_msg = ""
+        if governance_result is not None and not governance_result.already_existed:
+            governance_msg = (
+                f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
+            )
         return (
             PROJECT_DETECTED_RI.format(
                 project_type=project_type.capitalize(),
                 file_count=file_count,
+                skill_recommendation=skill_cmd,
             )
             + bootstrap_msg
             + skills_msg
+            + governance_msg
         )
 
 
@@ -298,6 +349,11 @@ def init_command(
 
     skills_result = scaffold_skills(project_path)
 
+    # Scaffold governance templates
+    from raise_cli.onboarding.governance import scaffold_governance
+
+    governance_result = scaffold_governance(project_path, project_name)
+
     # Generate MEMORY.md (canonical + Claude Code)
     from raise_cli.config.paths import (
         get_claude_memory_path,
@@ -334,6 +390,7 @@ def init_command(
         created_profile=created_profile,
         bootstrap_result=bootstrap_result,
         skills_result=skills_result,
+        governance_result=governance_result,
     )
 
     if profile.experience_level == ExperienceLevel.RI and not created_profile:
