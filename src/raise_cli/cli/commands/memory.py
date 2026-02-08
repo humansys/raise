@@ -27,6 +27,7 @@ from raise_cli.config.paths import get_memory_dir, get_personal_dir
 from raise_cli.context import UnifiedGraph, UnifiedGraphBuilder
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
+    ArchitecturalContext,
     UnifiedQuery,
     UnifiedQueryEngine,
     UnifiedQueryResult,
@@ -284,6 +285,110 @@ def _format_markdown(result: UnifiedQueryResult) -> str:
 def _format_json(result: UnifiedQueryResult) -> str:
     """Format query result as JSON."""
     return result.to_json()
+
+
+# =============================================================================
+# Architectural Context Command
+# =============================================================================
+
+
+@memory_app.command("context")
+def context_cmd(
+    module_id: Annotated[
+        str, typer.Argument(help="Module ID (e.g., mod-memory)")
+    ],
+    format: Annotated[
+        str,
+        typer.Option("--format", "-f", help="Output format (human or json)"),
+    ] = "human",
+    index_path: Annotated[
+        Path | None,
+        typer.Option("--index", "-i", help="Memory index path"),
+    ] = None,
+) -> None:
+    """Show full architectural context for a module.
+
+    Returns the module's bounded context (domain), architectural layer,
+    applicable guardrails (constraints), and module dependencies in a
+    single structured view.
+
+    Examples:
+        # Show context for memory module
+        $ raise memory context mod-memory
+
+        # JSON output for programmatic use
+        $ raise memory context mod-memory --format json
+    """
+    unified_path = index_path or _get_default_index_path()
+    try:
+        engine = UnifiedQueryEngine.from_file(unified_path)
+    except FileNotFoundError as e:
+        cli_error(
+            str(e),
+            hint="Run 'raise memory build' first to create the index",
+            exit_code=4,
+        )
+        return  # cli_error exits, but this satisfies pyright
+
+    ctx = engine.get_architectural_context(module_id)
+    if ctx is None:
+        cli_error(
+            f"Module not found: {module_id}",
+            hint="Check available modules with: raise memory query '' --types module",
+            exit_code=4,
+        )
+        return  # cli_error exits, but this satisfies pyright
+
+    if format == "json":
+        console.print(_format_context_json(ctx))
+    else:
+        _print_context_human(ctx)
+
+
+def _format_context_json(ctx: ArchitecturalContext) -> str:
+    """Format architectural context as JSON."""
+    return ctx.model_dump_json(indent=2)
+
+
+def _print_context_human(ctx: ArchitecturalContext) -> None:
+    """Print architectural context in human-readable format."""
+    console.print(f"\n[bold]Module:[/bold] [cyan]{ctx.module.id}[/cyan]")
+    console.print(f"  {ctx.module.content}")
+
+    if ctx.domain:
+        console.print(f"\n[bold]Domain:[/bold] [green]{ctx.domain.id}[/green]")
+        console.print(f"  {ctx.domain.content}")
+    else:
+        console.print("\n[bold]Domain:[/bold] [dim]None[/dim]")
+
+    if ctx.layer:
+        console.print(f"\n[bold]Layer:[/bold] [green]{ctx.layer.id}[/green]")
+        console.print(f"  {ctx.layer.content}")
+    else:
+        console.print("\n[bold]Layer:[/bold] [dim]None[/dim]")
+
+    if ctx.constraints:
+        must = [c for c in ctx.constraints if "MUST" in c.content]
+        should = [c for c in ctx.constraints if "SHOULD" in c.content]
+        console.print(
+            f"\n[bold]Constraints:[/bold] {len(ctx.constraints)} guardrails"
+        )
+        if must:
+            must_ids = ", ".join(c.id for c in must)
+            console.print(f"  [red]MUST:[/red] {must_ids}")
+        if should:
+            should_ids = ", ".join(c.id for c in should)
+            console.print(f"  [yellow]SHOULD:[/yellow] {should_ids}")
+    else:
+        console.print("\n[bold]Constraints:[/bold] [dim]None[/dim]")
+
+    if ctx.dependencies:
+        dep_ids = ", ".join(d.id for d in ctx.dependencies)
+        console.print(f"\n[bold]Dependencies:[/bold] {dep_ids}")
+    else:
+        console.print("\n[bold]Dependencies:[/bold] [dim]None[/dim]")
+
+    console.print()
 
 
 # =============================================================================
