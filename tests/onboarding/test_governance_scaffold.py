@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from raise_cli.onboarding.governance import (
     GovernanceScaffoldResult,
     scaffold_governance,
@@ -167,3 +169,82 @@ class TestGovernanceScaffoldResult:
         assert not result.already_existed
         assert result.files_created == 0
         assert result.files_skipped == 0
+
+
+# =============================================================================
+# Integration Test: M1 Gate (scaffold → build → verify nodes)
+# =============================================================================
+
+
+class TestScaffoldToBuildIntegration:
+    """Integration test: scaffolded templates must produce governance nodes."""
+
+    @pytest.fixture
+    def scaffolded_project(self, tmp_path: Path) -> Path:
+        """Create a project with scaffolded governance templates."""
+        scaffold_governance(tmp_path, "test-project")
+        return tmp_path
+
+    def test_scaffold_then_build_produces_requirement_nodes(
+        self, scaffolded_project: Path
+    ) -> None:
+        """Scaffolded prd.md should produce requirement nodes in graph."""
+        from raise_cli.context.builder import UnifiedGraphBuilder
+
+        builder = UnifiedGraphBuilder(scaffolded_project)
+        graph = builder.build()
+
+        requirements = graph.get_concepts_by_type("requirement")
+        assert len(requirements) >= 1, (
+            "Expected at least 1 requirement node from prd.md template"
+        )
+        # Verify RF-01 was extracted
+        req_ids = {r.id for r in requirements}
+        assert "req-rf-01" in req_ids
+
+    def test_scaffold_then_build_produces_outcome_nodes(
+        self, scaffolded_project: Path
+    ) -> None:
+        """Scaffolded vision.md should produce outcome nodes in graph."""
+        from raise_cli.context.builder import UnifiedGraphBuilder
+
+        builder = UnifiedGraphBuilder(scaffolded_project)
+        graph = builder.build()
+
+        outcomes = graph.get_concepts_by_type("outcome")
+        assert len(outcomes) >= 1, (
+            "Expected at least 1 outcome node from vision.md template"
+        )
+
+    def test_scaffold_then_build_produces_guardrail_nodes(
+        self, scaffolded_project: Path
+    ) -> None:
+        """Scaffolded guardrails.md should produce guardrail nodes in graph."""
+        from raise_cli.context.builder import UnifiedGraphBuilder
+
+        builder = UnifiedGraphBuilder(scaffolded_project)
+        graph = builder.build()
+
+        guardrails = graph.get_concepts_by_type("guardrail")
+        assert len(guardrails) >= 1, (
+            "Expected at least 1 guardrail node from guardrails.md template"
+        )
+
+    def test_scaffold_then_build_m1_gate(
+        self, scaffolded_project: Path
+    ) -> None:
+        """M1 milestone gate: scaffold → build → all 3 governance types present."""
+        from raise_cli.context.builder import UnifiedGraphBuilder
+
+        builder = UnifiedGraphBuilder(scaffolded_project)
+        graph = builder.build()
+
+        gov_types: set[str] = set()
+        for node_type in ("requirement", "outcome", "guardrail"):
+            nodes = graph.get_concepts_by_type(node_type)
+            if nodes:
+                gov_types.add(node_type)
+
+        assert gov_types == {"requirement", "outcome", "guardrail"}, (
+            f"M1 gate failed: expected all 3 governance types, got {gov_types}"
+        )
