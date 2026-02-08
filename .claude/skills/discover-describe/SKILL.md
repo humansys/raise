@@ -2,11 +2,11 @@
 
 ## Purpose
 
-Generate architecture documentation from discovery data. Produces human-readable module docs with machine-parseable YAML frontmatter for graph integration.
+Generate architecture documentation from discovery data. Produces a complete documentation set: high-level system docs (C4 Context + Container), per-module docs with YAML frontmatter, and a compact index for AI context loading.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu**: Generate all modules, explain each section.
+**Shu**: Generate all levels, explain each section.
 **Ha**: Generate with targeted updates for changed modules.
 **Ri**: Incremental regeneration, preserve human sections.
 
@@ -25,8 +25,13 @@ Generate architecture documentation from discovery data. Produces human-readable
 - `work/discovery/components-validated.json` — validated component catalog
 - Source tree at `src/raise_cli/` — module structure and imports
 - Module `__init__.py` docstrings — self-described purpose
+- `governance/guardrails.md` — quality constraints (for system-design doc)
+- `framework/reference/constitution.md` — design principles (for system-design doc)
+- `governance/vision.md` — system identity (for system-context doc)
 
 **Output:**
+- `governance/architecture/system-context.md` — C4 Context level (what, who, why)
+- `governance/architecture/system-design.md` — C4 Container level (how, constraints, drift)
 - `governance/architecture/index.md` — compact index (<2K tokens)
 - `governance/architecture/modules/*.md` — per-module docs with YAML frontmatter
 
@@ -81,14 +86,78 @@ Write `governance/architecture/index.md` with:
 
 Target: under 2K tokens for session-loadable context.
 
-### Step 5: Validate
+### Step 5: Generate High-Level Architecture Docs
+
+After module docs are complete, generate the C4 Context and Container docs. These ground both humans and AI on the system's identity, boundaries, and constraints.
+
+#### 5a: System Context (`system-context.md`)
+
+Read `governance/vision.md` and `framework/reference/constitution.md`. Write `governance/architecture/system-context.md` with:
+
+**YAML frontmatter:**
+```yaml
+---
+type: architecture_context
+project: <project_name>
+version: <current_version>
+status: current
+tech_stack: { ... }
+external_dependencies: [...]
+users: [...]
+governed_by: [...]
+---
+```
+
+**Markdown body:**
+- **What Is <project>** — 2-3 sentences: identity, what it does, what it is NOT
+- **The RaiSE Triad** — How this system fits in the human-AI-methodology collaboration
+- **Who Uses It** — Table of actors and how they interact
+- **External Systems** — Diagram showing system boundary and integrations
+- **What It Does** — Command domains with brief descriptions
+- **What It Does NOT Do** — Explicit non-goals (prevents scope creep and drift)
+- **Design Philosophy** — Constitution principles that shape this system
+- **Quality Attributes** — Measurable targets from guardrails
+- **Governance Traceability** — Links to source governance docs
+
+#### 5b: System Design (`system-design.md`)
+
+Read `governance/guardrails.md`, module docs (for dependency data), and relevant ADRs. Write `governance/architecture/system-design.md` with:
+
+**YAML frontmatter:**
+```yaml
+---
+type: architecture_design
+project: <project_name>
+status: current
+layers: [...]
+architectural_decisions: [...]
+guardrails_reference: "governance/guardrails.md"
+constitution_reference: "framework/reference/constitution.md"
+---
+```
+
+**Markdown body:**
+- **Layered Architecture** — Diagram of all layers with modules in each
+- **Data Flows** — The 3 core flows: Knowledge Graph Construction, Codebase Discovery, Session Lifecycle
+- **Architectural Constraints** — Tables of structural, design, quality, and constitution constraints
+- **Key Patterns** — Recurring patterns: Extract→Structure→Query, YAML frontmatter as schema, three-tier memory, skills+toolkit
+- **What Constitutes Drift** — Explicit table of drift types, examples, and detection methods
+- **Directory Layout** — Annotated tree with layer assignments
+- **Governance Traceability** — Links to ADRs, guardrails, constitution
+
+**Why this matters:** These docs are the **intentional architecture**. Deviating from them is drift. Guardrails are not just code quality rules — they are architectural constraints that shape how every module is written. The constitution principles are not aspirational — they constrain every design decision.
+
+### Step 6: Validate
 
 - All modules documented
+- System-context and system-design docs exist and are current
 - YAML frontmatter parses cleanly
 - Index under 2K tokens
 - Dependency map is accurate (cross-check with imports)
+- Guardrails referenced in system-design match current `guardrails.md`
+- Constitution principles referenced match current `constitution.md`
 
-### Step 6: Rebuild Graph
+### Step 7: Rebuild Graph
 
 ```bash
 uv run raise memory build
@@ -100,6 +169,8 @@ uv run raise memory query "module dependencies"
 ```
 
 ## YAML Frontmatter Schema
+
+### Module Docs
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
@@ -114,12 +185,40 @@ uv run raise memory query "module dependencies"
 | components | int | No | Component count from discovery |
 | constraints | list[str] | No | Architectural constraints |
 
+### System Context
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| type | string | Yes | Always "architecture_context" |
+| project | string | Yes | Project name |
+| version | string | No | Current version |
+| status | string | Yes | "current" or "deprecated" |
+| tech_stack | object | Yes | Technology stack map |
+| external_dependencies | list[str] | Yes | External systems |
+| users | list[str] | Yes | Who uses this system |
+| governed_by | list[str] | Yes | Paths to governance docs |
+
+### System Design
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| type | string | Yes | Always "architecture_design" |
+| project | string | Yes | Project name |
+| status | string | Yes | "current" or "deprecated" |
+| layers | list[object] | Yes | Layer definitions with modules |
+| architectural_decisions | list[str] | No | ADR references |
+| guardrails_reference | string | Yes | Path to guardrails doc |
+| constitution_reference | string | Yes | Path to constitution doc |
+
 ## Notes
 
 - **No AI inference in CLI** — the CLI graph builder parses frontmatter deterministically
 - **AI synthesizes prose** — this skill generates the human-readable sections
 - **Preserve human edits** — on re-run, check for sections not in template and append them
 - **Skip placeholders** — modules with no real code (engines, handlers) can be omitted
+- **High-level docs are intentional architecture** — deviating from them is drift
+- **Guardrails are architectural** — they shape code structure, not just code style
+- **Dual-purpose docs** — serve human onboarding AND AI grounding; both must understand the system from these docs alone
 
 ## References
 
@@ -127,3 +226,6 @@ uv run raise memory query "module dependencies"
 - Components: `work/discovery/components-validated.json`
 - Design: `work/stories/discover-document/design.md`
 - Research: `work/research/architecture-knowledge-layer/`
+- Constitution: `framework/reference/constitution.md`
+- Guardrails: `governance/guardrails.md`
+- Vision: `governance/vision.md`
