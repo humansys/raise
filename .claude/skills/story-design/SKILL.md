@@ -75,10 +75,10 @@ Create a lean story specification that optimizes for both human understanding (q
 Record the start of the design phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event start --phase design
+uv run raise memory emit-work story {story_id} --event start --phase design
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e start -p design`
+**Example:** `raise memory emit-work story S15.1 -e start -p design`
 
 ### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
@@ -257,10 +257,10 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase design
+uv run raise memory emit-work story {story_id} --event complete --phase design
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e complete -p design`
+**Example:** `raise memory emit-work story S15.1 -e complete -p design`
 
 ## Output
 

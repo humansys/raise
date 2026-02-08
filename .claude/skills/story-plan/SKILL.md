@@ -64,10 +64,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event start --phase plan
+uv run raise memory emit-work story {story_id} --event start --phase plan
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e start -p plan`
+**Example:** `raise memory emit-work story S15.1 -e start -p plan`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -218,10 +218,10 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase plan
+uv run raise memory emit-work story {story_id} --event complete --phase plan
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e complete -p plan`
+**Example:** `raise memory emit-work story S15.1 -e complete -p plan`
 
 ## Output
 
