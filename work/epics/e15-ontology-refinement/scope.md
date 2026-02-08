@@ -267,6 +267,93 @@ Story 3 (S, 3 SP) ──┬── Story 4 (XS, 2 SP)    ← parallel after Story
 
 ---
 
+## Implementation Plan
+
+> Added by `/epic-plan` — 2026-02-08
+
+### Story Sequence
+
+| Order | Story | Size | SP | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|:--:|--------------|-----------|-----------|
+| 1 | S15.1 Ingest All Arch Docs | S | 3 | None | M1 | Foundation — removes `type != "module"` filter, enables all downstream |
+| 2 | S15.2 Bounded Context + Layer Nodes | S | 3 | S15.1 | M1 | Adds structural nodes S3 and S5 depend on |
+| 3 | S15.3 Constraint Edges | S | 3 | S15.2 | M2 | Creates `constrained_by` edges linking guardrails to bounded contexts |
+| 3‖ | S15.4 Edge-Type Filtering | XS | 2 | None (graph layer ready) | M2 | Parallel with S3. Exposes existing `get_neighbors()` edge_types in query engine |
+| 4 | S15.5 Query Helpers | S | 3 | S15.3, S15.4 | M3 | `find_constraints_for()`, `get_architectural_context()`, CLI commands |
+| 5 | S15.6 Skills Integration | S | 3 | S15.5 | M4 | Updates `/story-design`, `/epic-design`, `/story-plan` with architectural context step |
+
+### Milestones
+
+| Milestone | Stories | Target | Success Criteria | Demo |
+|-----------|---------|--------|------------------|------|
+| **M1: Architecture in Graph** | S15.1, S15.2 | Day 1 | `raise memory query "ontology" --types bounded_context` returns nodes. 8 BC + 4 layer nodes + belongs_to/in_layer edges | Query bounded contexts and layers |
+| **M2: Constraint-Aware Graph** | +S15.3, S15.4 | Day 1 | `raise memory query mod-memory --strategy concept_lookup --edge-types constrained_by` returns guardrails. ~200 constraint edges | Query constraints for any module |
+| **M3: One-Call Context** | +S15.5 | Day 2 | `raise memory context memory` returns full architectural context (domain, layer, constraints, dependencies) in <100ms | CLI command returns structured context |
+| **M4: Epic Complete** | +S15.6 | Day 2 | `/story-design` queries architectural context before designing. Dogfood with real story design. Retro complete. | Design a story using ontology-guided context |
+
+### Parallel Work Streams
+
+```
+Day 1 (Graph Structure):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stream 1: S15.1 (arch docs) ──► S15.2 (BCs + layers) ──► M1
+                                        │
+Day 1-2 (Constraint Layer):             ↓
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stream 1:                        S15.3 (constraint edges) ─┐
+                                                           ├──► M2
+Stream 2:                        S15.4 (edge-type filter)──┘
+
+Day 2 (Query + Skills):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stream 1: S15.5 (query helpers + CLI) ──► M3
+                    ↓
+          S15.6 (skills integration) ──► M4
+```
+
+**Merge points:**
+- After S15.2: Graph has structural nodes → split into S15.3 (builder) + S15.4 (query engine)
+- Before S15.5: Both constraint edges AND edge-type filtering must be ready
+- S15.6 is sequential — updates skills that call S15.5 helpers
+
+### Progress Tracking
+
+| Story | Size | SP | Status | Actual | Velocity | Notes |
+|-------|:----:|:--:|:------:|:------:|:--------:|-------|
+| S15.1 Ingest Arch Docs | S | 3 | Pending | — | — | |
+| S15.2 BC + Layer Nodes | S | 3 | Pending | — | — | |
+| S15.3 Constraint Edges | S | 3 | Pending | — | — | |
+| S15.4 Edge-Type Filter | XS | 2 | Pending | — | — | Parallel with S15.3 |
+| S15.5 Query Helpers | S | 3 | Pending | — | — | |
+| S15.6 Skills Integration | S | 3 | Pending | — | — | |
+
+**Milestone Progress:**
+- [ ] M1: Architecture in Graph (Day 1)
+- [ ] M2: Constraint-Aware Graph (Day 1-2)
+- [ ] M3: One-Call Context (Day 2)
+- [ ] M4: Epic Complete (Day 2)
+
+### Velocity Assumptions
+
+- **Baseline:** 3x multiplier with full kata cycle (PAT-082, PAT-094)
+- **All stories S/XS:** Full kata cycle yields ~3x (PAT-082). 17 SP at 3x ≈ ~6 SP effective effort
+- **Day 1:** S15.1 + S15.2 are builder changes in same module (context/builder.py) — momentum carries
+- **Day 2:** S15.3 + S15.4 parallel, then S15.5 + S15.6 are consumer code (query + skills)
+- **Buffer:** S15.4 already partially implemented → extra time for dogfood validation
+
+### Sequencing Risks
+
+| Risk | L | I | Mitigation |
+|------|:-:|:-:|------------|
+| S15.1 arch doc parsing more complex than expected | M | M | Frontmatter is already structured YAML — same parsing as module docs |
+| S15.3 guardrail category mapping creates too many edges | L | L | Start with bounded contexts only, add module-level later if needed |
+| S15.5 ArchitecturalContext model design requires iteration | M | M | Start with flat model (domain, layer, constraints list), don't over-abstract |
+| Rebuild graph breaks existing queries | M | H | Run full test suite after schema change. Keep existing node types untouched |
+
+---
+
+*Plan created: 2026-02-08*
 *Created: 2026-02-08*
 *Designed: 2026-02-08 (unknowns resolved, stories revised, ADR-023 created)*
-*Status: Designed — ready for /epic-plan*
+*Planned: 2026-02-08 (sequenced, milestones defined, 2-day timeline)*
+*Status: Planned — ready for /story-start S15.1*
