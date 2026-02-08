@@ -44,9 +44,10 @@ Use inference to reflect on the session:
 3. **Outcomes:** List of concrete deliverables
 4. **Patterns:** Any new learnings? (check against existing — query if needed)
 5. **Corrections:** Any behavioral corrections observed? (what + lesson)
-6. **Current work:** Epic, story, phase, branch for continuity
-7. **Pending:** Decisions, blockers, next actions
-8. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
+6. **Coaching:** Reflect on the working relationship (see below)
+7. **Current work:** Epic, story, phase, branch for continuity
+8. **Pending:** Decisions, blockers, next actions
+9. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
 
 Write the structured output as a YAML state file:
 
@@ -64,6 +65,18 @@ patterns:
 corrections:
   - what: "Behavioral observation"
     lesson: "Lesson learned"
+coaching:                                # Only include fields that changed
+  trust_level: "developing"              # new → developing → established → deep
+  strengths:
+    - "structured thinking"
+    - "design discipline"
+  growth_edge: "async patterns"
+  autonomy: "high within defined scope"
+  relationship:
+    quality: "productive"                # new → productive → established → deep
+    trajectory: "growing"                # starting → growing → stable → deepening
+  communication_notes:
+    - "prefers direct, concise"
 current_work:
   epic: E15
   story: S15.7
@@ -86,7 +99,7 @@ uv run raise session close --state-file /tmp/session-output.yaml --project "$(pw
 This single command atomically:
 - Records session in `sessions/index.jsonl`
 - Appends patterns to `patterns.jsonl`
-- Updates coaching corrections in `~/.rai/developer.yaml`
+- Updates coaching (corrections + observations) in `~/.rai/developer.yaml`
 - Writes `.raise/rai/session-state.yaml`
 - Clears `current_session` in profile
 

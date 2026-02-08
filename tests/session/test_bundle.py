@@ -13,6 +13,7 @@ from raise_cli.onboarding.profile import (
     Deadline,
     DeveloperProfile,
     ExperienceLevel,
+    RelationshipState,
 )
 from raise_cli.schemas.session_state import (
     CurrentWork,
@@ -262,6 +263,57 @@ class TestAssembleContextBundle:
         assert "SES-004" in bundle
         assert "SES-000" not in bundle
         assert "SES-001" not in bundle
+
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    def test_coaching_shows_trust_and_relationship(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Coaching section shows trust level, autonomy, and relationship."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(
+            name="Test",
+            coaching=CoachingContext(
+                trust_level="developing",
+                strengths=["design"],
+                autonomy="high within scope",
+                relationship=RelationshipState(
+                    quality="productive", trajectory="growing"
+                ),
+            ),
+        )
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
+
+        assert "Trust: developing" in bundle
+        assert "Autonomy: high within scope" in bundle
+        assert "Relationship: productive (growing)" in bundle
+
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    def test_coaching_omits_default_trust_and_relationship(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Coaching section omits trust and relationship at default values."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(
+            name="Test",
+            coaching=CoachingContext(strengths=["design"]),
+        )
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
+
+        assert "# Coaching" in bundle
+        assert "Strengths: design" in bundle
+        assert "Trust:" not in bundle
+        assert "Autonomy:" not in bundle
+        assert "Relationship:" not in bundle
 
 
 def _make_always_on_node(

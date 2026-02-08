@@ -223,6 +223,171 @@ class TestProcessSessionClose:
         mp.undo()
 
 
+class TestLoadStateFileCoaching:
+    """Tests for load_state_file with coaching observations."""
+
+    def test_loads_state_file_with_coaching(self, tmp_path: Path) -> None:
+        """State file with coaching populates CloseInput.coaching."""
+        data = {
+            "summary": "coaching session",
+            "coaching": {
+                "trust_level": "developing",
+                "strengths": ["design discipline", "structured thinking"],
+                "growth_edge": "async patterns",
+                "autonomy": "high within defined scope",
+                "relationship": {"quality": "productive", "trajectory": "growing"},
+                "communication_notes": ["prefers direct"],
+            },
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+
+        result = load_state_file(state_file)
+        assert result.coaching is not None
+        assert result.coaching["trust_level"] == "developing"
+        assert result.coaching["strengths"] == ["design discipline", "structured thinking"]
+
+    def test_loads_state_file_without_coaching_defaults_none(self, tmp_path: Path) -> None:
+        """State file without coaching defaults to None."""
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text("summary: no coaching\n")
+
+        result = load_state_file(state_file)
+        assert result.coaching is None
+
+
+class TestProcessSessionCloseCoaching:
+    """Tests for process_session_close updating coaching in profile."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        """Create a project with memory directory."""
+        project = tmp_path / "project"
+        memory_dir = project / ".raise" / "rai" / "memory" / "sessions"
+        memory_dir.mkdir(parents=True)
+        return project
+
+    def test_close_updates_coaching_in_profile(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close updates coaching fields in developer profile."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="coaching test",
+            coaching={
+                "trust_level": "developing",
+                "strengths": ["design", "testing"],
+                "growth_edge": "async patterns",
+            },
+        )
+
+        result = process_session_close(close_input, profile, project)
+
+        assert "Coaching updated" in result.messages
+        from raise_cli.onboarding.profile import load_developer_profile
+
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert loaded.coaching.trust_level == "developing"
+        assert loaded.coaching.strengths == ["design", "testing"]
+        assert loaded.coaching.growth_edge == "async patterns"
+        mp.undo()
+
+    def test_close_updates_relationship_in_profile(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close updates relationship state in profile."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="relationship test",
+            coaching={
+                "relationship": {"quality": "productive", "trajectory": "growing"},
+            },
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from raise_cli.onboarding.profile import load_developer_profile
+
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert loaded.coaching.relationship.quality == "productive"
+        assert loaded.coaching.relationship.trajectory == "growing"
+        mp.undo()
+
+    def test_close_without_coaching_leaves_defaults(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close without coaching leaves profile defaults."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="no coaching")
+
+        result = process_session_close(close_input, profile, project)
+
+        assert "Coaching updated" not in result.messages
+        from raise_cli.onboarding.profile import load_developer_profile
+
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert loaded.coaching.trust_level == "new"
+        assert loaded.coaching.strengths == []
+        mp.undo()
+
+    def test_close_partial_coaching_preserves_existing(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close with partial coaching preserves other fields."""
+        import pytest
+
+        from raise_cli.onboarding.profile import CoachingContext
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        coaching = CoachingContext(
+            strengths=["existing"], trust_level="developing"
+        )
+        profile = DeveloperProfile(name="Test", coaching=coaching)
+
+        close_input = CloseInput(
+            summary="partial coaching",
+            coaching={"growth_edge": "new edge"},
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from raise_cli.onboarding.profile import load_developer_profile
+
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert loaded.coaching.strengths == ["existing"]
+        assert loaded.coaching.trust_level == "developing"
+        assert loaded.coaching.growth_edge == "new edge"
+        mp.undo()
+
+
 class TestLoadStateFileProgress:
     """Tests for load_state_file with progress and completed_epics."""
 

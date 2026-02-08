@@ -836,3 +836,62 @@ class TestUpdateCoaching:
         profile = DeveloperProfile(name="Test")
         updated = update_coaching(profile, strengths=["test"])
         assert profile is not updated
+
+    def test_updates_relationship_quality(self) -> None:
+        """update_coaching updates relationship quality."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile, relationship={"quality": "productive"}
+        )
+        assert updated.coaching.relationship.quality == "productive"
+        assert updated.coaching.relationship.trajectory == "starting"
+
+    def test_updates_relationship_trajectory(self) -> None:
+        """update_coaching updates relationship trajectory."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile, relationship={"trajectory": "growing"}
+        )
+        assert updated.coaching.relationship.trajectory == "growing"
+        assert updated.coaching.relationship.quality == "new"
+
+    def test_updates_relationship_both_fields(self) -> None:
+        """update_coaching updates both relationship fields."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile,
+            relationship={"quality": "productive", "trajectory": "growing"},
+        )
+        assert updated.coaching.relationship.quality == "productive"
+        assert updated.coaching.relationship.trajectory == "growing"
+
+    def test_relationship_preserves_existing_fields(self) -> None:
+        """update_coaching relationship update preserves unspecified fields."""
+        rel = RelationshipState(quality="established", trajectory="stable")
+        coaching = CoachingContext(relationship=rel)
+        profile = DeveloperProfile(name="Test", coaching=coaching)
+        updated = update_coaching(
+            profile, relationship={"trajectory": "growing"}
+        )
+        assert updated.coaching.relationship.quality == "established"
+        assert updated.coaching.relationship.trajectory == "growing"
+
+    def test_updates_communication_notes(self) -> None:
+        """update_coaching updates communication_notes."""
+        profile = DeveloperProfile(name="Test")
+        updated = update_coaching(
+            profile, communication_notes=["prefers direct", "skip praise"]
+        )
+        assert updated.coaching.communication_notes == [
+            "prefers direct",
+            "skip praise",
+        ]
+
+    def test_communication_notes_replaces_existing(self) -> None:
+        """update_coaching replaces existing communication_notes."""
+        coaching = CoachingContext(communication_notes=["old note"])
+        profile = DeveloperProfile(name="Test", coaching=coaching)
+        updated = update_coaching(
+            profile, communication_notes=["new note"]
+        )
+        assert updated.coaching.communication_notes == ["new note"]

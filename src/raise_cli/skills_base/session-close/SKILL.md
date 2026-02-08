@@ -66,6 +66,7 @@ Experience level affects **communication style**, not **operations**. All levels
 - What was the goal? What was accomplished?
 - What patterns/learnings emerged?
 - Any tangents worth capturing?
+- How is the working relationship evolving? (trust, strengths, growth edges)
 
 **Query** (parallel):
 ```bash
