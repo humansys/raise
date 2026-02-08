@@ -284,37 +284,48 @@ class UnifiedGraphBuilder:
             return []
 
     def load_architecture(self) -> list[ConceptNode]:
-        """Load module nodes from architecture documentation.
+        """Load architecture nodes from documentation.
 
-        Parses YAML frontmatter from governance/architecture/modules/*.md
-        and creates module ConceptNodes for the unified graph.
+        Scans both governance/architecture/*.md (architecture docs) and
+        governance/architecture/modules/*.md (module docs). Type-dispatches
+        by frontmatter ``type`` field.
 
         Returns:
-            List of ConceptNode for architecture modules.
+            List of ConceptNode for architecture and module concepts.
         """
-        modules_dir = (
-            self.project_root / "governance" / "architecture" / "modules"
-        )
-        if not modules_dir.exists():
+        arch_dir = self.project_root / "governance" / "architecture"
+        if not arch_dir.exists():
             return []
 
         nodes: list[ConceptNode] = []
 
-        for md_file in sorted(modules_dir.glob("*.md")):
+        # Scan parent directory for architecture docs
+        for md_file in sorted(arch_dir.glob("*.md")):
             node = self._parse_architecture_doc(md_file)
             if node:
                 nodes.append(node)
 
+        # Scan modules subdirectory for module docs
+        modules_dir = arch_dir / "modules"
+        if modules_dir.exists():
+            for md_file in sorted(modules_dir.glob("*.md")):
+                node = self._parse_architecture_doc(md_file)
+                if node:
+                    nodes.append(node)
+
         return nodes
 
     def _parse_architecture_doc(self, file_path: Path) -> ConceptNode | None:
-        """Parse a single architecture module doc's YAML frontmatter.
+        """Parse an architecture doc's YAML frontmatter into a ConceptNode.
+
+        Dispatches by frontmatter ``type`` field to produce the appropriate
+        node type (module or architecture).
 
         Args:
-            file_path: Path to the module markdown file.
+            file_path: Path to the markdown file.
 
         Returns:
-            ConceptNode if valid module frontmatter found, None otherwise.
+            ConceptNode if valid frontmatter found, None otherwise.
         """
         try:
             text = file_path.read_text(encoding="utf-8")
@@ -341,21 +352,42 @@ class UnifiedGraphBuilder:
         if not isinstance(frontmatter, dict):
             return None
 
-        # Only process module-type docs
-        if frontmatter.get("type") != "module":
-            return None
-
-        name = frontmatter.get("name", "")
-        if not name:
-            return None
-
         # Build relative source path
         try:
             source_file = str(file_path.relative_to(self.project_root))
         except ValueError:
             source_file = str(file_path)
 
-        # Build metadata from frontmatter fields
+        doc_type = frontmatter.get("type", "")
+
+        # Type-dispatch by frontmatter type
+        if doc_type == "module":
+            return self._parse_module_doc(frontmatter, source_file)
+        if doc_type == "architecture_context":
+            return self._parse_architecture_context(frontmatter, source_file)
+        if doc_type == "architecture_design":
+            return self._parse_architecture_design(frontmatter, source_file)
+        if doc_type == "architecture_domain_model":
+            return self._parse_architecture_domain_model(frontmatter, source_file)
+        # Skip architecture_index and unknown types
+        return None
+
+    def _parse_module_doc(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode | None:
+        """Parse a module-type architecture doc.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "module", or None if invalid.
+        """
+        name = frontmatter.get("name", "")
+        if not name:
+            return None
+
         metadata: dict[str, Any] = {}
         for key in ("depends_on", "depended_by", "entry_points", "public_api",
                      "components", "constraints", "status"):
@@ -368,6 +400,132 @@ class UnifiedGraphBuilder:
             content=frontmatter.get("purpose", ""),
             source_file=source_file,
             created=frontmatter.get("last_validated", datetime.now(tz=UTC).isoformat()),
+            metadata=metadata,
+        )
+
+    def _parse_architecture_context(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode:
+        """Parse an architecture_context doc (system-context.md).
+
+        Synthesizes content from tech stack and external dependencies.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "architecture".
+        """
+        # Synthesize content from tech stack
+        tech_stack: dict[str, str] = frontmatter.get("tech_stack", {})
+        tech_parts = [f"{k}: {v}" for k, v in tech_stack.items()]
+        tech_summary = ", ".join(tech_parts) if tech_parts else "No tech stack defined"
+
+        ext_deps: list[str] = frontmatter.get("external_dependencies", [])
+        deps_summary = ", ".join(ext_deps) if ext_deps else "none"
+
+        content = f"System context: {tech_summary}. External dependencies: {deps_summary}."
+
+        # Store all structured data in metadata
+        metadata: dict[str, Any] = {"arch_type": "architecture_context"}
+        for key in ("tech_stack", "external_dependencies", "users", "governed_by",
+                     "project", "version", "status"):
+            if key in frontmatter:
+                metadata[key] = frontmatter[key]
+
+        return ConceptNode(
+            id="arch-context",
+            type="architecture",
+            content=content,
+            source_file=source_file,
+            created=datetime.now(tz=UTC).isoformat(),
+            metadata=metadata,
+        )
+
+    def _parse_architecture_design(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode:
+        """Parse an architecture_design doc (system-design.md).
+
+        Synthesizes content from layers and their module assignments.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "architecture".
+        """
+        # Synthesize content from layers
+        layers: list[dict[str, Any]] = frontmatter.get("layers", [])
+        layer_parts: list[str] = []
+        for layer in layers:
+            name = layer.get("name", "unknown")
+            modules: list[str] = layer.get("modules", [])
+            layer_parts.append(f"{name}: {', '.join(modules)}")
+
+        layers_summary = ". ".join(layer_parts) if layer_parts else "No layers defined"
+        content = f"System design: {len(layers)} layers ({', '.join(l.get('name', '') for l in layers)}). {layers_summary}."
+
+        # Store all structured data in metadata
+        metadata: dict[str, Any] = {"arch_type": "architecture_design"}
+        for key in ("layers", "architectural_decisions", "distribution",
+                     "guardrails_reference", "constitution_reference",
+                     "project", "status"):
+            if key in frontmatter:
+                metadata[key] = frontmatter[key]
+
+        return ConceptNode(
+            id="arch-design",
+            type="architecture",
+            content=content,
+            source_file=source_file,
+            created=datetime.now(tz=UTC).isoformat(),
+            metadata=metadata,
+        )
+
+    def _parse_architecture_domain_model(
+        self, frontmatter: dict[str, Any], source_file: str
+    ) -> ConceptNode:
+        """Parse an architecture_domain_model doc (domain-model.md).
+
+        Synthesizes content from bounded contexts and shared kernel.
+
+        Args:
+            frontmatter: Parsed YAML frontmatter dict.
+            source_file: Relative path to the source file.
+
+        Returns:
+            ConceptNode with type "architecture".
+        """
+        # Synthesize content from bounded contexts
+        bcs: list[dict[str, Any]] = frontmatter.get("bounded_contexts", [])
+        bc_names = [bc.get("name", "unknown") for bc in bcs]
+        bc_summary = ", ".join(bc_names) if bc_names else "none defined"
+
+        shared: dict[str, Any] = frontmatter.get("shared_kernel", {})
+        shared_modules: list[str] = shared.get("modules", [])
+        shared_summary = ", ".join(shared_modules) if shared_modules else "none"
+
+        content = (
+            f"Domain model: {len(bcs)} bounded contexts — {bc_summary}. "
+            f"Shared kernel: {shared_summary}."
+        )
+
+        # Store all structured data in metadata
+        metadata: dict[str, Any] = {"arch_type": "architecture_domain_model"}
+        for key in ("bounded_contexts", "shared_kernel", "application_layer",
+                     "distribution", "project", "status"):
+            if key in frontmatter:
+                metadata[key] = frontmatter[key]
+
+        return ConceptNode(
+            id="arch-domain-model",
+            type="architecture",
+            content=content,
+            source_file=source_file,
+            created=datetime.now(tz=UTC).isoformat(),
             metadata=metadata,
         )
 
