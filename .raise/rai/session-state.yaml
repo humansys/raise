@@ -1,21 +1,27 @@
 current_work:
   epic: E15
-  story: S15.5
-  phase: design
+  story: S15.8
+  phase: implement
   branch: epic/e15/ontology-refinement
 last_session:
-  id: SES-001
+  id: SES-004
   date: '2026-02-08'
   developer: Emilio
-  summary: 'S15.7 full lifecycle: implement (8 tasks, 136 tests) → review (4.1x, PAT-189)
-    → close (merged to epic). Dogfooded new session close protocol.'
+  summary: S15.8 Task 2 complete — session state expansion + bundle. EpicProgress
+    model, get_always_on_primes, governance/identity prime formatters, recent sessions,
+    progress formatting. 35 new tests, 1459 total, 92.38% coverage. Also fixed stale
+    CLAUDE.local.md.
   patterns_captured: []
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - S15.5 Architectural Context Query Helpers
-  - S15.6 Skills Integration
-  - PyPI publish → Windows dogfood → F&F invite
-notes: E15 at 73% (16/22 SP). M1, M2, M5 milestones complete. M3, M4 pending (S15.5,
-  S15.6).
+  - 'Task 3: Session close + CLI + memory generate (write progress to state, accept
+    progress flags, skip MEMORY.md)'
+  - 'Task 4: File shrinking (CLAUDE.md → 3 lines, CLAUDE.local.md → 2 lines, delete
+    MEMORY.md)'
+  - 'Task 5: Integration test (full lifecycle validation)'
+notes: Clean single-pass TDD. Progress section works but won't show in live bundle
+  until Task 3 writes progress to session-state.yaml.
+progress: null
+completed_epics: []
