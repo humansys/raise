@@ -1938,3 +1938,246 @@ class TestExtractLayers:
 
         layer_nodes = graph.get_concepts_by_type("layer")
         assert len(layer_nodes) == 0
+
+
+class TestExtractConstraints:
+    """Tests for constraint edge extraction from guardrail metadata (S15.3)."""
+
+    def _build_constraint_fixtures(self, tmp_path: Path) -> None:
+        """Create fixtures with guardrails that have constraint_scope metadata."""
+        # Reuse arch fixtures for BCs and layers
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+
+        # Create guardrails.md with frontmatter
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir(exist_ok=True)
+
+        (gov_dir / "guardrails.md").write_text(
+            dedent("""\
+            ---
+            type: guardrails
+            constraint_scopes:
+              default: all_bounded_contexts
+              overrides:
+                must-arch: [bc-ontology, bc-skills]
+                should-cli: [lyr-orchestration]
+            ---
+
+            ## Guardrails
+
+            ### Code Quality
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-CODE-001` | MUST | Type hints | pyright | Vision |
+
+            ### Architecture
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-ARCH-001` | MUST | Engine separation | import analysis | Vision |
+
+            ### CLI Development
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `SHOULD-CLI-001` | SHOULD | Path params | review | Retro |
+            """)
+        )
+
+    def test_creates_constrained_by_edges_for_universal_scope(
+        self, tmp_path: Path
+    ) -> None:
+        """Universal guardrails (default) create edges to all BCs."""
+        self._build_constraint_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # MUST-CODE-001 applies to all BCs (default scope)
+        neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        neighbor_ids = {n.id for n in neighbors}
+        assert "guardrail-must-code-001" in neighbor_ids
+
+    def test_creates_constrained_by_edges_for_override_scope(
+        self, tmp_path: Path
+    ) -> None:
+        """Override guardrails create edges only to specified targets."""
+        self._build_constraint_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # MUST-ARCH-001 applies only to bc-ontology and bc-skills (override)
+        onto_neighbors = graph.get_neighbors(
+            "bc-ontology", edge_types=["constrained_by"]
+        )
+        onto_ids = {n.id for n in onto_neighbors}
+        assert "guardrail-must-arch-001" in onto_ids
+
+        # bc-governance should NOT have the arch guardrail
+        gov_neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        gov_ids = {n.id for n in gov_neighbors}
+        assert "guardrail-must-arch-001" not in gov_ids
+
+    def test_creates_constrained_by_edges_for_layer_target(
+        self, tmp_path: Path
+    ) -> None:
+        """Layer-targeted guardrails create edges to layer nodes."""
+        self._build_constraint_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # SHOULD-CLI-001 targets lyr-orchestration
+        orch_neighbors = graph.get_neighbors(
+            "lyr-orchestration", edge_types=["constrained_by"]
+        )
+        orch_ids = {n.id for n in orch_neighbors}
+        assert "guardrail-should-cli-001" in orch_ids
+
+    def test_no_constraint_edges_without_guardrails(self, tmp_path: Path) -> None:
+        """No constraint edges when no guardrail nodes exist."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        assert graph.edge_count == 0
+
+    def test_no_constraint_edges_without_scope_metadata(
+        self, tmp_path: Path
+    ) -> None:
+        """Guardrails without constraint_scope metadata produce no constraint edges."""
+        # Create arch fixtures (BCs exist)
+        TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
+
+        # Guardrails WITHOUT frontmatter (no constraint_scope in metadata)
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir(exist_ok=True)
+        (gov_dir / "guardrails.md").write_text(
+            dedent("""\
+            ## Guardrails
+
+            ### Code Quality
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-CODE-001` | MUST | Type hints | pyright | Vision |
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # Guardrail node exists but no constrained_by edges
+        node = graph.get_concept("guardrail-must-code-001")
+        assert node is not None
+
+        # BCs should have no constrained_by neighbors
+        bc_node = graph.get_concept("bc-governance")
+        assert bc_node is not None
+        neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        assert len(neighbors) == 0
+
+    def test_skips_nonexistent_target_nodes(self, tmp_path: Path) -> None:
+        """Should not create edges to nodes that don't exist in graph."""
+        arch_dir = tmp_path / "governance" / "architecture"
+        arch_dir.mkdir(parents=True)
+
+        # Domain model with a BC that won't have its target in override
+        (arch_dir / "domain-model.md").write_text(
+            dedent("""\
+            ---
+            type: architecture_domain_model
+            project: test
+            status: current
+            bounded_contexts:
+              - name: governance
+                modules: []
+                description: "Test BC"
+            shared_kernel:
+              modules: []
+              description: "Empty"
+            ---
+
+            # Domain Model
+            """)
+        )
+
+        gov_dir = tmp_path / "governance"
+        gov_dir.mkdir(exist_ok=True)
+        (gov_dir / "guardrails.md").write_text(
+            dedent("""\
+            ---
+            type: guardrails
+            constraint_scopes:
+              default: all_bounded_contexts
+              overrides:
+                must-arch: [bc-nonexistent]
+            ---
+
+            ## Guardrails
+
+            ### Architecture
+
+            | ID | Level | Guardrail | Verificación | Derivado de |
+            |----|-------|-----------|--------------|-------------|
+            | `MUST-ARCH-001` | MUST | Engine separation | import | Vision |
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # bc-nonexistent doesn't exist, so no constrained_by edges for must-arch
+        # bc-governance exists and should NOT have must-arch (it's overridden)
+        neighbors = graph.get_neighbors(
+            "bc-governance", edge_types=["constrained_by"]
+        )
+        arch_neighbors = [n for n in neighbors if "arch" in n.id]
+        assert len(arch_neighbors) == 0

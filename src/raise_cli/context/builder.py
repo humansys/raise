@@ -92,6 +92,13 @@ class UnifiedGraphBuilder:
             graph.add_concept(node)
         all_nodes.extend(structural_nodes)
 
+        # Update node_by_id with structural nodes for constraint edge safety
+        node_by_id.update({n.id: n for n in structural_nodes})
+
+        # Extract constraint edges (S15.3 — guardrail → BC/layer)
+        constraint_edges = self._extract_constraints(all_nodes, node_by_id)
+        structural_edges.extend(constraint_edges)
+
         # Infer and add relationships
         edges = self.infer_relationships(all_nodes)
         for edge in edges:
@@ -784,6 +791,57 @@ class UnifiedGraphBuilder:
                     )
 
         return nodes, edges
+
+    def _extract_constraints(
+        self,
+        all_nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> list[ConceptEdge]:
+        """Extract constrained_by edges from guardrail scope metadata.
+
+        Reads ``constraint_scope`` from each guardrail node's metadata
+        (set by the guardrails parser from YAML frontmatter). Creates
+        ``constrained_by`` edges from target nodes (BCs or layers) to
+        guardrail nodes.
+
+        Args:
+            all_nodes: All nodes loaded so far (including structural).
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            List of constrained_by edges.
+        """
+        edges: list[ConceptEdge] = []
+        bc_ids = [
+            n.id for n in node_by_id.values() if n.type == "bounded_context"
+        ]
+
+        for node in all_nodes:
+            if node.type != "guardrail":
+                continue
+
+            scope: Any = node.metadata.get("constraint_scope")
+            if scope is None:
+                continue
+
+            if scope == "all_bounded_contexts":
+                targets = bc_ids
+            elif isinstance(scope, list):
+                targets = [t for t in cast(list[str], scope) if t in node_by_id]
+            else:
+                continue
+
+            for target_id in targets:
+                edges.append(
+                    ConceptEdge(
+                        source=target_id,
+                        target=node.id,
+                        type="constrained_by",
+                        weight=1.0,
+                    )
+                )
+
+        return edges
 
     def _get_governance_extractor(self) -> GovernanceExtractor:
         """Get governance extractor instance.
