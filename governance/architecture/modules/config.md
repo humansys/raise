@@ -8,13 +8,10 @@ depended_by: [cli, context, memory, onboarding, telemetry]
 entry_points: []
 public_api:
   - "RaiseSettings"
-  - "get_config_dir"
   - "get_cache_dir"
+  - "get_config_dir"
   - "get_data_dir"
-  - "get_memory_dir"
-  - "get_personal_dir"
-  - "get_global_rai_dir"
-components: 18
+components: 17
 constraints:
   - "No internal dependencies — leaf module"
   - "Settings follow cascade: CLI args > env vars > config file > defaults"

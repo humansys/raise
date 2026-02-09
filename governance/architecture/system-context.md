@@ -9,10 +9,11 @@ tech_stack:
   validation: "Pydantic v2"
   cli: "Typer"
   distribution: "uv + pipx"
-  ast_analysis: "ast-grep (shell)"
+  ast_analysis: "Python AST (stdlib) + ast-grep (shell)"
   search: "ripgrep (shell)"
   testing: "pytest"
   graph: "NetworkX"
+  code_analysis: "Python AST (context/analyzers subpackage)"
 external_dependencies:
   - "Git (version control, governance-as-code transport)"
   - "Python AST (code structure extraction)"
@@ -96,7 +97,7 @@ raise-cli exists within a three-part collaboration model:
 | Domain | Commands | What It Provides |
 |--------|----------|-----------------|
 | **Governance** | `raise context` | Extracts concepts from Markdown governance docs into a queryable graph |
-| **Memory** | `raise memory build/query` | Builds unified knowledge graph, answers questions from it |
+| **Memory** | `raise memory build/query` | Builds unified knowledge graph with code-aware nodes, answers questions from it |
 | **Discovery** | `raise discover scan/analyze/drift` | Scans codebase for components, detects architectural drift |
 | **Onboarding** | `raise init`, `raise profile` | Bootstraps projects, manages developer profiles |
 | **Telemetry** | `raise telemetry emit` | Records local JSONL signals for process improvement |

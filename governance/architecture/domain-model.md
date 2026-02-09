@@ -149,11 +149,12 @@ raise-cli has seven bounded contexts (one planned), a shared kernel, and an appl
 **What it owns:** Persisting, integrating, and querying all accumulated knowledge. This is the **ontological backbone** of RaiSE — it pulls from Governance, Discovery, Skills, and Memory to build a unified queryable graph. RaiSE is fundamentally ontology-guided software development; this context is where that manifests.
 
 **Two modules, one context:**
-- **context** — Graph construction and querying (the "read" + "merge" side)
+- **context** — Graph construction and querying (the "read" + "merge" side), including code-aware analysis (context/analyzers subpackage: PythonAnalyzer, CodeAnalyzer Protocol, ModuleInfo)
 - **memory** — JSONL storage for patterns, calibration, sessions (the "write" side)
 
 **Aggregate roots:**
-- `UnifiedGraphBuilder.build() → UnifiedGraph` — orchestrates all loaders
+- `UnifiedGraphBuilder.build() → UnifiedGraph` — orchestrates all loaders, including code structure enrichment
+- `UnifiedGraphBuilder.load_code_structure()` — enriches module nodes with imports, exports, component counts via PythonAnalyzer
 - `UnifiedQueryEngine.query() → QueryResult` — BFS keyword search
 - `append_pattern() / append_calibration() / append_session()` — write to JSONL
 
@@ -353,7 +354,8 @@ When adding new functionality, use this table to determine where it belongs.
 | If you're adding... | It belongs in... | Because... |
 |---------------------|-----------------|------------|
 | A new governance file parser | `governance/` | Governance owns all markdown extraction |
-| A new code analysis capability | `discovery/` | Discovery owns all source code analysis |
+| A new code analysis capability (for discovery) | `discovery/` | Discovery owns all source code scanning and component analysis |
+| A new code analysis capability (for graph enrichment) | `context/analyzers/` | Ontology owns code-aware graph node enrichment |
 | A new node type for the graph | `context/models.py` (NodeType) + new loader in `builder.py` | Ontology owns the graph schema |
 | A new memory storage format | `memory/` | Ontology/Memory owns JSONL persistence |
 | A new CLI command | `cli/commands/` + the relevant domain module | CLI is thin — logic stays in domain |
