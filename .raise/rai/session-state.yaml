@@ -1,23 +1,28 @@
 current_work:
-  epic: ''
-  story: ''
-  phase: ''
-  branch: v2
+  epic: E16
+  story: S16.2
+  phase: closed
+  branch: epic/e16/incremental-coherence
 last_session:
-  id: SES-115
-  date: '2026-02-08'
+  id: SES-123
+  date: '2026-02-09'
   developer: Emilio
-  summary: S7.3 /project-onboard skill — full story lifecycle from start through close.
-    Brownfield onboarding skill with discovery pipeline integration. Also fixed guardrails
-    format harmonization (raise init --detect output now parser-compatible). Closed
-    E7 epic — all 3 milestones achieved, merged to v2.
+  summary: S16.2 Graph Diff Engine — full lifecycle from start through close. Deliberate
+    design with 8 HITL decision points, zero rework. diff_graphs() pure function,
+    CLI integration, 39 tests, 1.71x velocity.
   patterns_captured:
-  - PAT-SES-115
+  - PAT-SES-123
+  - PAT-SES-123
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - Pick next epic from backlog
-notes: E7 complete. Full onboarding pipeline delivered in single day.
+  - 'S16.3: Docs Update Skill — /docs-update skill as subagent, compares graph vs
+    docs, updates frontmatter + narrative'
+  - 'S16.4: Lifecycle Integration — wire /docs-update into story-close'
+  - Re-run discovery pipeline after S16.3
+notes: 'User requested deliberate, slow design — resulted in best velocity yet for
+  M-sized story. The 8 decision points took ~15 min conversation but eliminated all
+  rework. Key simplification: dropping edge tracking removed ~40% of planned complexity.'
 progress: null
 completed_epics: []
