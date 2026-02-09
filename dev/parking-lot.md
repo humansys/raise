@@ -246,6 +246,13 @@
 - [ ] **PageRank ranking** — Simpler heuristics (public/exported) sufficient for MVP
 - [ ] **Multi-language support** — Start with Python, expand based on need
 
+### E16 Incremental Coherence — Parking Lot (2026-02-09)
+
+- [ ] **Multi-platform code analyzers** — Extend `CodeAnalyzer` Protocol beyond Python: TypeScript (Vite monorepos), PHP (Composer). Architecture is pluggable from S16.1 (Protocol + ModuleInfo). Need: TS import/export parser, PHP use/namespace parser. Priority: immediately after E16, needed for F&F devs doing discovery on mixed-stack monorepos.
+- [ ] **Rename "discovery" namespace to "discover"** — Harmonize verb form across skills. Low risk, cosmetic.
+- [ ] **Absorb `/discover-complete` into `/discover-validate`** — Export is a mechanical final step of validation, not a separate concern. Reduces unnecessary skill separation.
+- [ ] **`/docs-update` skill** — Standalone skill for updating module docs from graph state. Runs as subagent from story-close OR manually. Compares graph vs docs directly (robust, no diff dependency). Replaces S16.2+S16.3 merged approach from original epic design.
+
 ### Research Needed
 
 - [ ] What are the Lean Spec Principles? How do they apply to governance artifacts? **← In progress (subagent researching for /epic-design skill)**
