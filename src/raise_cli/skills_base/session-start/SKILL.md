@@ -15,12 +15,6 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "4.0.0"
-
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=session-start \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Session Start

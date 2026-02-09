@@ -18,18 +18,7 @@ metadata:
   raise.adaptable: "true"
   raise.version: "1.2.0"
 
-# RaiSE Observable Workflow hooks
-hooks:
-  PostToolUse:
-    - matcher: "Write"
-      hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=research \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=research \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
----
+# RaiSE Observable Workflow hooks---
 
 # Research: Evidence-Based Investigation
 
