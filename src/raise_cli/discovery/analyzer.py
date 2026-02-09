@@ -428,7 +428,11 @@ def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     # Add standalone functions and modules (skip methods — they're folded)
     for s in symbols:
         if s.kind in ("function", "module"):
-            comp_id = f"comp-{_file_to_module(s.file)}-{s.name}"
+            # Use "module" as suffix for module-level entries to avoid
+            # collisions with same-named functions (e.g., test_version.py
+            # has both module "test_version" and function "test_version")
+            id_name = "module" if s.kind == "module" else s.name
+            comp_id = f"comp-{_file_to_module(s.file)}-{id_name}"
             units.append(
                 AnalyzedComponent(
                     id=comp_id,
