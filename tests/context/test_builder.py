@@ -1416,6 +1416,44 @@ class TestBuild:
         assert node.type == "component"
         assert node.content == "Test component"
 
+    def test_build_warns_on_duplicate_node_ids(
+        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Should warn when duplicate node IDs are detected during build."""
+        import logging
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        duplicate_nodes = [
+            ConceptNode(
+                id="comp-test-Foo",
+                type="component",
+                content="First Foo",
+                created="2026-02-09",
+            ),
+            ConceptNode(
+                id="comp-test-Foo",
+                type="component",
+                content="Second Foo (collision)",
+                created="2026-02-09",
+            ),
+        ]
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=duplicate_nodes),
+            caplog.at_level(logging.WARNING),
+        ):
+            graph = builder.build()
+
+        # Graph has only 1 node (second overwrites first)
+        assert graph.node_count == 1
+        # Warning was emitted
+        assert any("comp-test-Foo" in msg for msg in caplog.messages)
+
 
 class TestInferRelationships:
     """Tests for infer_relationships method."""
