@@ -10,9 +10,11 @@ project:
     - src/raise_cli
   entry_points:
     - src/raise_cli/cli/main.py
+    - src/raise_cli/__main__.py
     - src/raise_cli/__init__.py
-  detected_at: "2026-02-04T18:30:00Z"
+  detected_at: "2026-02-09T12:00:00Z"
 
 status: complete
-completed_at: "2026-02-07T21:59:00Z"
-component_count: 309
+scanned_at: "2026-02-09T12:15:00Z"
+completed_at: "2026-02-09T12:30:00Z"
+component_count: 345

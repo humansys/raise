@@ -3,8 +3,8 @@ type: module
 name: memory
 purpose: "Manage Rai's persistent memory — patterns, calibration, and sessions stored as JSONL"
 status: current
-depends_on: [config, context]
-depended_by: [cli, context]
+depends_on: [config]
+depended_by: [cli, context, session]
 entry_points:
   - "raise memory add"
   - "raise memory emit"
@@ -55,7 +55,6 @@ The three-tier architecture (global `~/.rai/`, project `.raise/rai/memory/`, per
 | Depends On | Why |
 |-----------|-----|
 | `config` | Directory resolution for three-tier paths |
-| `context` | (circular at import level — uses TYPE_CHECKING guard) |
 
 ## Conventions
 
