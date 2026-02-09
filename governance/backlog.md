@@ -26,6 +26,7 @@
 | E13 | **Discovery** | ✅ Complete | `dev/epic-e13-scope.md` | — |
 | E14 | **Rai Distribution** | ✅ Complete | `work/epics/e14-rai-distribution/scope.md` | — |
 | E15 | **Ontology Graph Refinement** | ✅ Complete | `work/epics/e15-ontology-refinement/scope.md` | — |
+| E16 | **Incremental Coherence** | ✅ Complete | `work/epics/e16-incremental-coherence/scope.md` | — |
 
 **F&F Scope (Feb 9):** E7 ✅ Complete, E14 ✅ Complete
 **Post-F&F Priority:**
