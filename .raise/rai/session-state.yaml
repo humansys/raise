@@ -1,28 +1,24 @@
 current_work:
   epic: E16
-  story: S16.2
-  phase: closed
-  branch: epic/e16/incremental-coherence
+  story: S16.3
+  phase: implement
+  branch: story/s16.3/docs-update-skill
 last_session:
-  id: SES-123
+  id: SES-125
   date: '2026-02-09'
   developer: Emilio
-  summary: S16.2 Graph Diff Engine — full lifecycle from start through close. Deliberate
-    design with 8 HITL decision points, zero rework. diff_graphs() pure function,
-    CLI integration, 39 tests, 1.71x velocity.
-  patterns_captured:
-  - PAT-SES-123
-  - PAT-SES-123
+  summary: Ran /docs-update skill against all 15 modules — synced frontmatter (depends_on,
+    depended_by, public_api, components) with graph truth, fixed output narrative
+    stale dependency
+  patterns_captured: []
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - 'S16.3: Docs Update Skill — /docs-update skill as subagent, compares graph vs
-    docs, updates frontmatter + narrative'
-  - 'S16.4: Lifecycle Integration — wire /docs-update into story-close'
-  - Re-run discovery pipeline after S16.3
-notes: 'User requested deliberate, slow design — resulted in best velocity yet for
-  M-sized story. The 8 decision points took ~15 min conversation but eliminated all
-  rework. Key simplification: dropping edge tracking removed ~40% of planned complexity.'
+  - /story-review for S16.3
+  - /story-close for S16.3
+  - 'S16.4: Lifecycle Integration (wire /docs-update into story-close)'
+notes: Short focused session — skill execution only, no code changes. Story ready
+  for review + close next session.
 progress: null
 completed_epics: []

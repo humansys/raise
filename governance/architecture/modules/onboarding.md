@@ -54,7 +54,7 @@ constraints:
 
 The onboarding module handles everything needed to get a developer or project started with RaiSE. It has three main responsibilities: **project initialization** (`raise init` — detect project type, generate guardrails, install skills, create CLAUDE.md), **developer profile** (manage `~/.rai/developer.yaml` with experience level, preferences, and session tracking), and **convention detection** (analyze existing code to infer naming, formatting, and structure conventions).
 
-This is the largest module by component count (60) because it covers the entire first-use experience — from detecting "is this a Python project?" to generating a complete `CLAUDE.md` with project-specific rules.
+This is the largest module by component count (69) because it covers the entire first-use experience — from detecting "is this a Python project?" to generating a complete `CLAUDE.md` with project-specific rules.
 
 ## Architecture
 

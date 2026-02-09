@@ -36,7 +36,7 @@ None — leaf module by design.
 
 ## Conventions
 
-- Only types needed by 2+ modules should live here to avoid circular dependencies
+- Only types needed by 3+ modules should live here to avoid circular dependencies
 - Module-specific types stay in their owning module (don't prematurely extract)
 - All models use Pydantic BaseModel for validation and serialization
 - Follow progressive directory structure (PAT-158): start minimal, grow when needed
