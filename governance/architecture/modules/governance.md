@@ -4,15 +4,15 @@ name: governance
 purpose: "Extract semantic concepts from governance markdown files into structured data for the context graph"
 status: current
 depends_on: [core]
-depended_by: [context, cli]
+depended_by: [cli, context]
 entry_points:
   - "raise context build (via builder)"
 public_api:
-  - "GovernanceExtractor"
   - "Concept"
   - "ConceptType"
   - "ExtractionResult"
-components: 29
+  - "GovernanceExtractor"
+components: 32
 constraints:
   - "Independent of discovery module — no cross-imports"
   - "All extraction is deterministic — pattern matching on markdown structure"
