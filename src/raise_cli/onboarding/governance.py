@@ -1,14 +1,18 @@
-"""Governance generation from detected conventions.
+"""Governance generation and scaffolding.
 
-Transforms ConventionResult into guardrails.md content with appropriate
-confidence-based levels (MUST/SHOULD/COULD).
+Two capabilities:
+1. Generate guardrails.md from detected conventions (brownfield, --detect).
+2. Scaffold governance/ from bundled rai_base templates (all projects).
 """
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from datetime import date
 from enum import Enum
+from importlib.resources import files
+from pathlib import Path
 
 from pydantic import BaseModel
 
@@ -16,6 +20,8 @@ from raise_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class GuardrailLevel(str, Enum):
@@ -272,7 +278,15 @@ class GuardrailGenerator:
         return by_category
 
     def _add_md_header(self, lines: list[str], project_name: str | None) -> None:
-        """Add markdown document header."""
+        """Add markdown document header with YAML frontmatter.
+
+        Frontmatter is required by the guardrails parser for type identification.
+        """
+        lines.append("---")
+        lines.append("type: guardrails")
+        lines.append('version: "1.0.0"')
+        lines.append("---")
+        lines.append("")
         title = f"Guardrails: {project_name}" if project_name else "Guardrails"
         lines.append(f"# {title}")
         lines.append("")
@@ -300,17 +314,24 @@ class GuardrailGenerator:
     def _add_md_guardrail_tables(
         self, lines: list[str], by_category: dict[str, list[GeneratedGuardrail]]
     ) -> None:
-        """Add guardrail tables grouped by category."""
+        """Add guardrail tables grouped by category.
+
+        Uses ### headings and 5-column tables to match the guardrails
+        parser contract (parser looks for ``^###`` sections and extracts
+        the ``Derived from`` column).
+        """
         for category, cat_guardrails in by_category.items():
-            lines.append(f"## {category}")
+            lines.append(f"### {category}")
             lines.append("")
-            lines.append("| ID | Level | Guardrail | Verification |")
-            lines.append("|----|-------|-----------|--------------|")
+            lines.append("| ID | Level | Guardrail | Verification | Derived from |")
+            lines.append("|----|-------|-----------|--------------|--------------|")
 
             for g in cat_guardrails:
                 verification = g.verification or "Manual review"
+                guardrail_id = g.id.lower()
                 lines.append(
-                    f"| `{g.id}` | {g.level.value} | {g.description} | {verification} |"
+                    f"| {guardrail_id} | {g.level.value} | "
+                    f"{g.description} | {verification} | Convention |"
                 )
             lines.append("")
 
@@ -344,3 +365,78 @@ def generate_guardrails(
     """
     generator = GuardrailGenerator()
     return generator.to_markdown(conventions, project_name=project_name)
+
+
+# =============================================================================
+# Governance Scaffolding (from bundled templates)
+# =============================================================================
+
+# Template files in rai_base/governance/, relative to package root.
+# Tuples of (source_path_in_package, dest_path_in_governance).
+_GOVERNANCE_TEMPLATES: list[tuple[str, str]] = [
+    ("prd.md", "prd.md"),
+    ("vision.md", "vision.md"),
+    ("guardrails.md", "guardrails.md"),
+    ("backlog.md", "backlog.md"),
+    ("architecture/system-context.md", "architecture/system-context.md"),
+    ("architecture/system-design.md", "architecture/system-design.md"),
+]
+
+
+class GovernanceScaffoldResult(BaseModel):
+    """Result of governance scaffolding.
+
+    Attributes:
+        already_existed: True if all files already existed (nothing created).
+        files_created: Number of template files created.
+        files_skipped: Number of files skipped (already existed).
+        path: Path to the governance/ directory.
+    """
+
+    already_existed: bool = False
+    files_created: int = 0
+    files_skipped: int = 0
+    path: Path
+
+
+def scaffold_governance(
+    project_path: Path,
+    project_name: str,
+) -> GovernanceScaffoldResult:
+    """Scaffold governance/ from bundled rai_base templates.
+
+    Copies template files via importlib.resources, rendering
+    ``{project_name}`` placeholders. Per-file idempotency: existing
+    files are never overwritten.
+
+    Follows bootstrap.py pattern for asset distribution.
+
+    Args:
+        project_path: Project root directory.
+        project_name: Project name for template rendering.
+
+    Returns:
+        GovernanceScaffoldResult with details of what was created.
+    """
+    gov_dir = project_path / "governance"
+    base = files("raise_cli.rai_base") / "governance"
+    result = GovernanceScaffoldResult(path=gov_dir)
+
+    for src_rel, dest_rel in _GOVERNANCE_TEMPLATES:
+        dest = gov_dir / dest_rel
+        if dest.exists():
+            result.files_skipped += 1
+            logger.debug("Skipped (exists): %s", dest)
+            continue
+
+        # Read bundled template and render placeholders
+        content = (base / src_rel).read_text()
+        content = content.replace("{project_name}", project_name)
+
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(content)
+        result.files_created += 1
+        logger.debug("Created: %s", dest)
+
+    result.already_existed = result.files_created == 0
+    return result
