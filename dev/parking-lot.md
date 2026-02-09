@@ -58,6 +58,13 @@
 
 ### Framework Improvements
 
+- [ ] **Drift detector calibration — reduce false positives** — (SES-118, 2026-02-08)
+  - **Problem:** `raise discover drift` produces 383 warnings on raise-commons, nearly all false positives. Location drift flags correctly-placed files (`cli/commands/`, root-level `__main__.py`, `exceptions.py`). Naming drift suggests `emit_` prefix for standard functions (`main`, `start`, `close`).
+  - **Evidence:** 367 warnings, 16 info — near-zero actionable. Signal-to-noise ratio makes the tool unusable for real drift detection.
+  - **What:** Calibrate directory expectations to include standard Python patterns (root files, `cli/commands/`). Add allowlists or severity filtering. Consider making baseline patterns richer during `discover-validate`.
+  - **Priority:** Post-F&F, medium — the concept is sound but needs tuning to be useful
+  - **Related:** `raise doctor` (coherence audit), PAT-196 (architecture docs as map)
+
 - [ ] **Remove "Unified" prefix from graph classes** — (SES-096, 2026-02-08)
   - **Problem:** `UnifiedGraph`, `UnifiedQueryEngine`, `UnifiedQuery`, etc. — 7 classes carry "Unified" prefix that distinguishes nothing. Vestige from when separate graphs existed.
   - **What:** Rename to `ContextGraph`, `QueryEngine`, `Query`, etc. Find-and-replace across `context/`, CLI, tests.
