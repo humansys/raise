@@ -1,8 +1,8 @@
 ---
 name: session-start
 description: >
-  Begin a session by loading memory, analyzing progress, and proposing focused work.
-  Creates continuity across sessions. Adapts communication to experience level.
+  Begin a session by loading context bundle, interpreting it, and proposing work.
+  CLI does all data plumbing; skill does inference interpretation.
 
 license: MIT
 
@@ -14,7 +14,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "3.0.0"
+  raise.version: "4.0.0"
 
 hooks:
   Stop:
@@ -27,143 +27,69 @@ hooks:
 
 ## Purpose
 
-Load context, analyze progress, propose focused work. Creates continuity across sessions by loading memory and adapting to experience level.
+Load deterministic context bundle from CLI, interpret it, propose focused work. The CLI assembles all data (profile, session state, memory graph, deadlines, coaching). The skill only does inference: interpret and present.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Detailed explanations, teach concepts. All steps executed.
+Experience level is in the context bundle — adapt output verbosity accordingly.
 
-**Ha (破)**: Balanced output, explain new concepts only. All steps executed.
+- **Shu**: Detailed explanations, teach concepts
+- **Ha**: Balanced output, explain new concepts only
+- **Ri**: Minimal output, essentials only
 
-**Ri (離)**: Minimal output, essentials only. All steps executed.
+## Steps (2)
 
-Experience level affects **communication style**, not **operations**. All levels load the same data.
-
-## Context
-
-**When to use:**
-- Beginning of working session
-- After break or context switch
-- Resuming interrupted work
-
-**When to skip:**
-- Immediate continuation in same conversation
-
-**Inputs required:**
-- Developer profile (`~/.rai/developer.yaml`)
-- Unified graph (`.raise/graph/unified.json`)
-- Human context (`CLAUDE.local.md`)
-
-**Output:**
-- Session summary (displayed)
-- Session count update (`~/.rai/developer.yaml`)
-
-## Steps (4)
-
-### Step 1: Load Context (Parallel)
-
-Run these in parallel (all independent):
+### Step 1: Load Context Bundle
 
 ```bash
-# Developer profile
-uv run raise profile show
-
-# Unified graph context
-uv run raise memory query "session epic patterns" --limit 10
-
-# Human context (deadlines, notes)
-# Read: CLAUDE.local.md
+uv run raise session start --project "$(pwd)" --context
 ```
 
-**If graph unavailable:** Run `uv run raise memory build` first.
+This single command:
+- Loads developer profile from `~/.rai/developer.yaml`
+- Loads session state from `.raise/rai/session-state.yaml`
+- Queries memory graph for foundational patterns
+- Assembles a ~150 token context bundle
+- Records the session start (increments count, sets active session)
+- Warns about orphaned sessions if detected
 
-**Extract from results:**
-- Experience level (for output style)
-- Current epic/feature focus
-- Recent patterns and calibration
-- Deadlines and human notes
-
-### Step 2: Analyze
-
-With data from Step 1, analyze:
-
-**Progress:**
-- Epic completion %
-- Days to deadline
-- Recent velocity
-
-**Improvement signals:**
-
-| Signal | Detection | Action |
-|--------|-----------|--------|
-| Stale parking lot | Item >2 weeks | Promote or delete |
-| Feature drag | Same feature >3 sessions | Split or timebox |
-| Deadline pressure | <3 days | Focus critical path |
-| Stale branches | >5 branches | Cleanup |
-
-**Check parking lot:** If the project has a parking lot file (e.g., `dev/parking-lot.md`), check it for stale items or blockers.
-
-### Step 3: Propose & Present
-
-Propose session focus and present summary. Adapt verbosity to level:
-
-**Shu output:**
+**First-time user:** If no profile exists, ask for name:
+```bash
+uv run raise session start --name "Name" --project "$(pwd)" --context
 ```
-## Session Start: YYYY-MM-DD
 
-### Context
-- Memory: X patterns loaded
-- Level: Shu (I'll explain concepts as we go)
-- Last session: [outcome]
-- Focus: [Epic] → [Feature]
+**If graph unavailable:** Run `uv run raise memory build` first, then retry.
 
-### Progress
-| Metric | Status |
-|--------|--------|
-| Epic | X% complete |
-| Deadline | N days |
+### Step 2: Interpret & Present
 
-### Suggested Focus
-**What:** [goal]
-**Why:** [rationale]
-**Done when:** [criteria]
+With the context bundle from Step 1, use inference to:
 
-### Signals
-[any issues, or "Healthy"]
+1. **Check signals:**
+   - Deadline pressure (<3 days → focus critical path)
+   - Coaching corrections → reinforce behavioral primes
+   - Pending decisions or blockers → address first
 
-Ready when you are.
-```
+2. **Check parking lot:** If `dev/parking-lot.md` exists, scan for stale items (>2 weeks).
+
+3. **Propose session focus** based on:
+   - Pending items from previous session (highest priority)
+   - Current story/phase (continue where left off)
+   - Deadlines (urgency modulation)
+
+4. **Present** (adapt to experience level from bundle):
 
 **Ri output:**
 ```
 ## Session: YYYY-MM-DD
 
-**Context:** [Epic] → [Feature], X% complete, N days to deadline
+**Context:** [Epic] → [Story], [phase], N days to deadline
 **Focus:** [goal]
 **Signals:** [any, or "None"]
 
 Go.
 ```
 
-Ha is between these — balanced detail.
-
-### Step 4: Record Session
-
-```bash
-uv run raise session start --project "$(pwd)"
-```
-
-This command:
-- Increments session count and updates last_session date
-- Sets `current_session` state (for orphan detection)
-- **Warns** if a previous session wasn't closed (stale >24h = warning, recent = note)
-
-**First-time user:** Ask name, then:
-```bash
-uv run raise session start --name "Name" --project "$(pwd)"
-```
-
-**If warned about unclosed session:** Inform the user that learnings from the previous session may have been lost. Suggest using `/session-close` before ending work.
+**Shu output** adds: explanation of context, progress metrics, concepts.
 
 ## Output
 
@@ -171,37 +97,20 @@ uv run raise session start --name "Name" --project "$(pwd)"
 |------|-------------|
 | Session summary | Displayed (not saved) |
 | Signals | Displayed |
-| Session count | `~/.rai/developer.yaml` (CLI) |
-
-## Shu-Level Concepts
-
-For new developers (0-5 sessions), explain these concepts when relevant:
-
-**The RaiSE Triad:**
-```
-YOU (judgment, decisions) + RAI (patterns, execution) + RAISE (methodology, gates)
-```
-
-**Why Memory Matters:**
-```
-Without memory, every session starts cold. With memory, I remember patterns,
-velocity, and where we left off. This is continuity.
-```
-
-Only include these explanations for Shu-level developers.
+| Session state | `~/.rai/developer.yaml` (via CLI in Step 1) |
 
 ## Notes
 
-**Token economy:** Loading memory avoids re-discovering patterns through conversation.
-
-**Prioritization:** Deadlines → Dependencies → Momentum → Energy.
-
-**Continuity loop:** session-start loads → work → session-close saves.
+- **One CLI call** does all data plumbing — no separate profile/memory/graph queries
+- Context bundle is deterministic — same inputs produce same output
+- Skill is a thin inference layer — interpret, don't gather
+- Foundational patterns in bundle serve as behavioral primes
 
 ## References
 
+- Context bundle: `raise session start --context`
 - Profile: `~/.rai/developer.yaml`
-- Graph: `.raise/graph/unified.json`
-- Human context: `CLAUDE.local.md`
-- Parking lot: project-specific (e.g., `dev/parking-lot.md`)
+- Session state: `.raise/rai/session-state.yaml`
+- Memory graph: `.raise/rai/memory/index.json`
+- Parking lot: `dev/parking-lot.md`
 - Complement: `/session-close`

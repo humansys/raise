@@ -65,10 +65,10 @@ Execute the implementation plan task by task, verifying each step, and producing
 Record the start of the implement phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event start --phase implement
+uv run raise memory emit-work story {story_id} --event start --phase implement
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e start -p implement`
+**Example:** `raise memory emit-work story S15.1 -e start -p implement`
 
 ### Step 0.1: Verify Prerequisites (REQUIRED - No Skip)
 
@@ -114,6 +114,21 @@ Load the implementation plan and obtain applicable rules context.
 **Verification:** Plan loaded and context available.
 
 > **If you can't continue:** Plan not found → Prerequisite check (Step 0.1) should have caught this.
+
+### Step 1.5: Design Comprehension Check (If Design Exists)
+
+If a design document exists for this story, restate the design intent to the user in 2-3 plain-language sentences before implementing. This catches misinterpretation before it cascades through tasks.
+
+**Present to user:**
+> "Based on the design, I understand we're building [X] that does [Y] by [Z]. Correct?"
+
+**Focus on:** Key concepts, data flow, what's explicitly NOT in scope.
+
+**Why:** One unvalidated assumption can waste an entire task cycle (PAT-167). A 30-second check saves hundreds of tokens.
+
+**Verification:** User confirms understanding or corrects it.
+
+> **If you can't continue:** Misalignment detected → Clarify before proceeding.
 
 ### Step 2: Identify Next Task
 
@@ -186,10 +201,10 @@ If all tasks completed → execute code gate.
 Record the completion of the implement phase:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase implement
+uv run raise memory emit-work story {story_id} --event complete --phase implement
 ```
 
-**Example:** `raise memory emit-work feature F9.4 -e complete -p implement`
+**Example:** `raise memory emit-work story S15.1 -e complete -p implement`
 
 ## Output
 
