@@ -8,7 +8,7 @@ depended_by: [onboarding]
 entry_points: []
 public_api:
   - "__version__"
-components: 0
+components: 16
 constraints:
   - "No internal dependencies — distribution package"
   - "Content is copied, not imported at runtime"

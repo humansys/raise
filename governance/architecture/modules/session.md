@@ -18,7 +18,7 @@ public_api:
   - "CloseResult"
   - "load_session_state"
   - "save_session_state"
-components: 12
+components: 13
 constraints:
   - "Session records are always personal-scoped (developer-specific, gitignored)"
   - "Session state is project-scoped (committed, shared across developers)"

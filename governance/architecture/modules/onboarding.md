@@ -4,7 +4,7 @@ name: onboarding
 purpose: "Project initialization, developer profile management, convention detection, and CLAUDE.md generation"
 status: current
 depends_on: [config, core, rai_base, skills_base]
-depended_by: [cli]
+depended_by: [cli, session]
 entry_points:
   - "raise init"
   - "raise profile show"
@@ -17,7 +17,7 @@ public_api:
   - "save_developer_profile"
   - "DeveloperProfile"
   - "ProjectManifest"
-components: 60
+components: 69
 constraints:
   - "Must work on fresh repos with zero RaiSE artifacts"
   - "Convention detection is heuristic — confidence levels, not certainty"
