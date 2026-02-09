@@ -276,7 +276,40 @@ class TestMarkdownGeneration:
 
         assert "# Guardrails" in markdown
         assert "MUST" in markdown
-        assert "## Code Style" in markdown
+        assert "### Code Style" in markdown
+
+    def test_generates_parser_compatible_format(
+        self, high_confidence_conventions: ConventionResult
+    ) -> None:
+        """Output must be parseable by the guardrails parser.
+
+        Parser requires:
+        - YAML frontmatter with type: guardrails
+        - ### section headings (not ##)
+        - 5-column table with Derived from column
+        - No backticks around IDs
+        """
+        generator = GuardrailGenerator()
+        markdown = generator.to_markdown(
+            high_confidence_conventions, project_name="test-proj"
+        )
+
+        # YAML frontmatter
+        assert markdown.startswith("---\n")
+        assert "type: guardrails" in markdown
+
+        # ### section headings (parser regex: ^###\s+(.+?)$)
+        assert "### Code Style" in markdown
+        assert "### Naming" in markdown
+
+        # 5-column table with Derived from
+        assert "| Derived from |" in markdown
+
+        # No backticks around IDs in table rows
+        assert "| `" not in markdown
+
+        # IDs are lowercase
+        assert "| must-style-001 |" in markdown or "| should-" in markdown
 
     def test_includes_project_context(
         self, high_confidence_conventions: ConventionResult

@@ -278,7 +278,15 @@ class GuardrailGenerator:
         return by_category
 
     def _add_md_header(self, lines: list[str], project_name: str | None) -> None:
-        """Add markdown document header."""
+        """Add markdown document header with YAML frontmatter.
+
+        Frontmatter is required by the guardrails parser for type identification.
+        """
+        lines.append("---")
+        lines.append("type: guardrails")
+        lines.append('version: "1.0.0"')
+        lines.append("---")
+        lines.append("")
         title = f"Guardrails: {project_name}" if project_name else "Guardrails"
         lines.append(f"# {title}")
         lines.append("")
@@ -306,17 +314,24 @@ class GuardrailGenerator:
     def _add_md_guardrail_tables(
         self, lines: list[str], by_category: dict[str, list[GeneratedGuardrail]]
     ) -> None:
-        """Add guardrail tables grouped by category."""
+        """Add guardrail tables grouped by category.
+
+        Uses ### headings and 5-column tables to match the guardrails
+        parser contract (parser looks for ``^###`` sections and extracts
+        the ``Derived from`` column).
+        """
         for category, cat_guardrails in by_category.items():
-            lines.append(f"## {category}")
+            lines.append(f"### {category}")
             lines.append("")
-            lines.append("| ID | Level | Guardrail | Verification |")
-            lines.append("|----|-------|-----------|--------------|")
+            lines.append("| ID | Level | Guardrail | Verification | Derived from |")
+            lines.append("|----|-------|-----------|--------------|--------------|")
 
             for g in cat_guardrails:
                 verification = g.verification or "Manual review"
+                guardrail_id = g.id.lower()
                 lines.append(
-                    f"| `{g.id}` | {g.level.value} | {g.description} | {verification} |"
+                    f"| {guardrail_id} | {g.level.value} | "
+                    f"{g.description} | {verification} | Convention |"
                 )
             lines.append("")
 
