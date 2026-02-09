@@ -556,8 +556,21 @@ class TestBuildHierarchy:
         units = build_hierarchy(symbols)
         ids = [u.id for u in units]
         assert len(ids) == len(set(ids)), f"Duplicate IDs: {ids}"
-        assert "comp-raise_cli.memory.models-models" in ids
-        assert "comp-raise_cli.governance.models-models" in ids
+        # Module-level entries use "module" as suffix, not the file stem
+        assert "comp-raise_cli.memory.models-module" in ids
+        assert "comp-raise_cli.governance.models-module" in ids
+
+    def test_module_and_function_same_name_unique_ids(self) -> None:
+        """Module and function with same name in same file produce unique IDs."""
+        symbols = [
+            _symbol(name="test_version", kind="module", file="tests/test_version.py", signature="module test_version"),
+            _symbol(name="test_version", kind="function", file="tests/test_version.py", signature="def test_version()"),
+        ]
+        units = build_hierarchy(symbols)
+        ids = [u.id for u in units]
+        assert len(ids) == len(set(ids)), f"Duplicate IDs: {ids}"
+        assert "comp-tests.test_version-module" in ids
+        assert "comp-tests.test_version-test_version" in ids
 
     def test_module_path_computed(self) -> None:
         """Module path is derived from file path."""
@@ -793,11 +806,15 @@ class TestAnalyze:
 
     def test_duplicate_ids_raises_value_error(self) -> None:
         """Duplicate component IDs in analysis output raise ValueError (Jidoka)."""
-        # A function and module with same name in same file produce duplicate IDs
+        # Two classes with the same name in the same file (pathological but possible)
+        # build_hierarchy uses a dict keyed by class name, so second overwrites first.
+        # Instead, test with two functions of the same name in the same file.
+        # Actually, build_hierarchy iterates symbols list — two functions with same
+        # name+file produce duplicate IDs.
         scan = ScanResult(
             symbols=[
-                _symbol(name="utils", kind="function", file="src/utils.py", signature="def utils()"),
-                _symbol(name="utils", kind="module", file="src/utils.py", signature="module utils"),
+                _symbol(name="helper", kind="function", file="src/utils.py", signature="def helper()"),
+                _symbol(name="helper", kind="function", file="src/utils.py", signature="def helper(x: int)"),
             ],
             files_scanned=1,
             errors=[],
