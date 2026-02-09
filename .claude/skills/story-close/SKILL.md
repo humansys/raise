@@ -137,6 +137,38 @@ If any of the above: update the relevant module doc in `governance/architecture/
 
 > **If drift detected:** Update the module doc now. This is a 5-minute task that prevents hours of rework.
 
+### Step 1.75: Coherence Check — Update Architecture Docs
+
+If this story changed source code (not just tests, docs, or config), run the `/docs-update` skill to sync architecture docs with code truth before merging.
+
+```bash
+# Quick check: did this story touch source code?
+git diff --name-only $(git merge-base HEAD {parent_branch})..HEAD | grep -q "^src/" && echo "CODE_CHANGED" || echo "DOCS_ONLY"
+```
+
+**Decision:**
+- **CODE_CHANGED** → Run `/docs-update` now. It will build the graph, compare frontmatter, present diffs, and handle HITL approval internally.
+- **DOCS_ONLY** → Skip with message: "No source code changes — skipping coherence check."
+
+**After `/docs-update` completes:** If any module docs were updated, commit them before proceeding to merge:
+
+```bash
+git add governance/architecture/modules/*.md
+git commit -m "docs({story_id}): sync module docs with code truth
+
+Updated by /docs-update coherence check during story-close.
+
+Co-Authored-By: Rai <rai@humansys.ai>"
+```
+
+**If no docs changed:** Continue to Step 2.
+
+**Why here (not after merge):** Docs must be coherent *before* they land on the parent branch. Merging stale docs propagates drift to future sessions (PAT-196).
+
+**Verification:** `/docs-update` ran (or skip stated) and any doc changes are committed.
+
+> **If you can't continue:** `/docs-update` fails → Check that `raise memory build` works. If graph is broken, fix it or skip coherence check with a note and address in next session.
+
 ### Step 2: Identify Parent Branch
 
 Determine the merge target:

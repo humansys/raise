@@ -92,7 +92,7 @@ architecture/ ───→  ArchitectureLoader ──→ module nodes ───�
                     (YAML frontmatter → depends_on edges)                  query
 ```
 
-**Graph stats (current):** ~808 concepts, ~5077 relationships, 24 dependency edges.
+**Graph stats (current):** ~900+ concepts, ~5500+ relationships, 24 dependency edges, 345 components across 94 Python files.
 
 ### Flow 2: Codebase Discovery
 
@@ -106,9 +106,18 @@ Source tree ──→ Scanner (Python AST) ──→ symbols (class, function, c
                                               │
                                               ▼
                                      components-validated.json ──→ graph (via complete)
+                                              │
+                                              ▼
+                                     UnifiedGraphBuilder.load_code_structure()
+                                          (context/analyzers/PythonAnalyzer)
+                                              │
+                                              ▼
+                                     Enriched module nodes with imports, exports, counts
 ```
 
 **Pipeline:** `raise discover start` → `scan` → `analyze` → `validate` (human) → `complete` → `describe`
+
+**Code-aware graph:** Since S16.1, `load_code_structure()` enriches module nodes with AST-extracted data: imports, exports, component counts. The `context/analyzers/` subpackage provides `PythonAnalyzer` (concrete implementation) and `CodeAnalyzer` Protocol for extensibility.
 
 ### Flow 3: Session Lifecycle
 
@@ -257,6 +266,7 @@ src/raise_cli/
 ├── skills/                # Layer 2: Domain
 ├── telemetry/             # Layer 2: Domain
 ├── context/               # Layer 3: Integration (graph builder, query engine)
+│   └── analyzers/         #   Code analysis subpackage (PythonAnalyzer, Protocol)
 ├── memory/                # Layer 3: Integration (JSONL management)
 ├── onboarding/            # Layer 3: Integration (init, profile, bootstrap)
 ├── output/                # Layer 3: Integration (formatters)

@@ -35,7 +35,7 @@
     - [x] ~~Pre-compaction memory flush~~ **→ E3** (F3.5 /session-close flush)
     - [ ] Gateway abstraction — single control plane for multi-interface (Jira, Rovo, CLI, MCP)
     - [ ] Typed kata execution — Lobster-inspired pipelines with approval gates + resume tokens
-    - [ ] Token monitoring — track session context usage, trigger flush at soft threshold
+    - [ ] Token monitoring + self-managed context lifecycle — Rai detects context pressure (80% threshold), proactively runs /session-close to capture state, instructs user to open fresh conversation with /session-start. Infrastructure already exists (session-start/close, session-state.yaml). Missing piece: visibility into context usage (Claude Code feature request or heuristic). Makes context breaks a managed transition, not a loss. (SES-119, 2026-02-09)
     - [ ] Hybrid skills — markdown process + JSON schema + validation code
 
 ---
@@ -57,6 +57,13 @@
   - **Related:** `raise discover describe` generates the content; MkDocs publishes it
 
 ### Framework Improvements
+
+- [ ] **Drift detector calibration — reduce false positives** — (SES-118, 2026-02-08)
+  - **Problem:** `raise discover drift` produces 383 warnings on raise-commons, nearly all false positives. Location drift flags correctly-placed files (`cli/commands/`, root-level `__main__.py`, `exceptions.py`). Naming drift suggests `emit_` prefix for standard functions (`main`, `start`, `close`).
+  - **Evidence:** 367 warnings, 16 info — near-zero actionable. Signal-to-noise ratio makes the tool unusable for real drift detection.
+  - **What:** Calibrate directory expectations to include standard Python patterns (root files, `cli/commands/`). Add allowlists or severity filtering. Consider making baseline patterns richer during `discover-validate`.
+  - **Priority:** Post-F&F, medium — the concept is sound but needs tuning to be useful
+  - **Related:** `raise doctor` (coherence audit), PAT-196 (architecture docs as map)
 
 - [ ] **Remove "Unified" prefix from graph classes** — (SES-096, 2026-02-08)
   - **Problem:** `UnifiedGraph`, `UnifiedQueryEngine`, `UnifiedQuery`, etc. — 7 classes carry "Unified" prefix that distinguishes nothing. Vestige from when separate graphs existed.
@@ -238,6 +245,16 @@
 - [ ] **CI/CD drift blocking** — Start with warnings, add blocking after validation
 - [ ] **PageRank ranking** — Simpler heuristics (public/exported) sufficient for MVP
 - [ ] **Multi-language support** — Start with Python, expand based on need
+
+### E16 Incremental Coherence — Parking Lot (2026-02-09)
+
+- [ ] **Multi-platform code analyzers** — Extend `CodeAnalyzer` Protocol beyond Python: TypeScript (Vite monorepos), PHP (Composer). Architecture is pluggable from S16.1 (Protocol + ModuleInfo). Need: TS import/export parser, PHP use/namespace parser. Priority: immediately after E16, needed for F&F devs doing discovery on mixed-stack monorepos.
+- [ ] **Fix pre-existing pyright error in test_analyzer.py** — (S16.5 retro, 2026-02-09) `_symbol` helper uses `kind: str` instead of `SymbolKind` literal type. Single-line fix.
+- [ ] **Fix 3x SIM117 lint warnings in test_builder.py** — (S16.5 retro, 2026-02-09) Nested `with` statements → combined context managers at lines 1371, 1407, 1652. Mechanical.
+- [ ] **Add dataset enumeration step to /story-design for ID format changes** — (S16.5 retro, PAT-220) When a story involves changing ID/key formats, enumerate all real `(kind, name, file)` triples during design to catch collisions before integration.
+- [ ] **Rename "discovery" namespace to "discover"** — Harmonize verb form across skills. Low risk, cosmetic.
+- [ ] **Absorb `/discover-complete` into `/discover-validate`** — Export is a mechanical final step of validation, not a separate concern. Reduces unnecessary skill separation.
+- [ ] **`/docs-update` skill** — Standalone skill for updating module docs from graph state. Runs as subagent from story-close OR manually. Compares graph vs docs directly (robust, no diff dependency). Replaces S16.2+S16.3 merged approach from original epic design.
 
 ### Research Needed
 

@@ -3,22 +3,31 @@ type: module
 name: memory
 purpose: "Manage Rai's persistent memory — patterns, calibration, and sessions stored as JSONL"
 status: current
-depends_on: [config, context]
-depended_by: [cli, context]
+depends_on: [config]
+depended_by: [cli, context, session]
 entry_points:
   - "raise memory add"
   - "raise memory emit"
   - "raise memory emit-work"
 public_api:
-  - "append_pattern"
-  - "append_calibration"
-  - "append_session"
-  - "PatternInput"
   - "CalibrationInput"
-  - "SessionInput"
-  - "MemoryScope"
   - "MemoryConcept"
-components: 30
+  - "MemoryConceptType"
+  - "MemoryRelationship"
+  - "MemoryRelationshipType"
+  - "MemoryScope"
+  - "MigrationResult"
+  - "PatternInput"
+  - "PatternSubType"
+  - "SessionInput"
+  - "WriteResult"
+  - "append_calibration"
+  - "append_pattern"
+  - "append_session"
+  - "get_memory_dir_for_scope"
+  - "migrate_to_personal"
+  - "needs_migration"
+components: 34
 constraints:
   - "JSONL files are append-only — no in-place edits"
   - "Three-tier architecture: global > project > personal"
@@ -55,7 +64,6 @@ The three-tier architecture (global `~/.rai/`, project `.raise/rai/memory/`, per
 | Depends On | Why |
 |-----------|-----|
 | `config` | Directory resolution for three-tier paths |
-| `context` | (circular at import level — uses TYPE_CHECKING guard) |
 
 ## Conventions
 
