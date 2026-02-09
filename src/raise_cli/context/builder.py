@@ -71,6 +71,10 @@ class UnifiedGraphBuilder:
         all_nodes.extend(self.load_architecture())
         all_nodes.extend(self.load_identity())
 
+        # Enrich module nodes with real code analysis (S16.1)
+        # Must run before add_concept() so graph gets enriched copies
+        self.load_code_structure(all_nodes)
+
         # Add nodes to graph
         for node in all_nodes:
             graph.add_concept(node)
@@ -376,6 +380,47 @@ class UnifiedGraphBuilder:
         nodes.extend(self._extract_identity_boundaries(text, source_file, now))
 
         return nodes
+
+    def load_code_structure(self, all_nodes: list[ConceptNode]) -> None:
+        """Enrich module nodes with real code analysis data.
+
+        Runs detected analyzers against the project source and merges
+        results into existing mod-* node metadata under code_* keys.
+        Does not create new nodes — only enriches existing ones.
+
+        Args:
+            all_nodes: All nodes loaded so far (mutated in place).
+        """
+        from raise_cli.context.analyzers.models import ModuleInfo
+        from raise_cli.context.analyzers.python import PythonAnalyzer
+
+        analyzers = [PythonAnalyzer(src_dir="src/raise_cli")]
+
+        code_modules: list[ModuleInfo] = []
+        for analyzer in analyzers:
+            if analyzer.detect(self.project_root):
+                code_modules.extend(analyzer.analyze_modules(self.project_root))
+
+        if not code_modules:
+            return
+
+        # Build lookup: module name → ModuleInfo
+        code_by_name: dict[str, ModuleInfo] = {m.name: m for m in code_modules}
+
+        # Enrich existing mod-* nodes
+        for node in all_nodes:
+            if node.type != "module":
+                continue
+
+            # Extract module name from node ID (mod-<name> → <name>)
+            mod_name = node.id.removeprefix("mod-")
+            info = code_by_name.get(mod_name)
+            if info is None:
+                continue
+
+            node.metadata["code_imports"] = info.imports
+            node.metadata["code_exports"] = info.exports
+            node.metadata["code_components"] = info.component_count
 
     def _extract_identity_values(
         self, text: str, source_file: str, now: str
