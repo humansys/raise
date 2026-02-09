@@ -17,7 +17,7 @@
 | E4 | **Context Generation** | ✅ Via Skills | — | — |
 | E5 | **SAR Engine** | Deferred | — | P2 |
 | E6 | **Observability** | → Replaced by E9 | — | — |
-| E7 | **Distribution & Onboarding** | 📋 Ready | `dev/epic-e7-scope.md` | P1 (after E9) |
+| E7 | **Onboarding** | 🔧 In Progress | `work/epics/e7-onboarding/scope.md` | P1 (F&F) |
 | E8 | **Work Tracking Graph** | ✅ Complete | `dev/epic-e8-scope.md` | — |
 | E9 | **Local Learning & Self-Awareness** | ✅ Phase 1 Complete | `dev/epic-e9-scope.md` | — |
 | E10 | **Collective Intelligence** | 📋 Explored | `dev/epic-e10-scope.md` | P2 (V3) |
