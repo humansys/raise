@@ -375,17 +375,6 @@ def _file_to_module(file_path: str) -> str:
     return ".".join(parts)
 
 
-def _file_stem(file_path: str) -> str:
-    """Extract the file stem from a path.
-
-    Args:
-        file_path: Relative file path.
-
-    Returns:
-        File stem (e.g., "scanner" from "src/discovery/scanner.py").
-    """
-    return PurePosixPath(file_path).stem
-
 
 def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     """Fold methods into their parent classes.
@@ -415,7 +404,7 @@ def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     # Create class units (with methods folded in)
     for class_name, class_sym in class_symbols.items():
         methods = class_methods.get(class_name, [])
-        comp_id = f"comp-{_file_stem(class_sym.file)}-{class_name}"
+        comp_id = f"comp-{_file_to_module(class_sym.file)}-{class_name}"
         units.append(
             AnalyzedComponent(
                 id=comp_id,
@@ -439,7 +428,7 @@ def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     # Add standalone functions and modules (skip methods — they're folded)
     for s in symbols:
         if s.kind in ("function", "module"):
-            comp_id = f"comp-{_file_stem(s.file)}-{s.name}"
+            comp_id = f"comp-{_file_to_module(s.file)}-{s.name}"
             units.append(
                 AnalyzedComponent(
                     id=comp_id,
