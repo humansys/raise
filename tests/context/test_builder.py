@@ -2298,3 +2298,258 @@ class TestExtractConstraints:
         )
         arch_neighbors = [n for n in neighbors if "arch" in n.id]
         assert len(arch_neighbors) == 0
+
+
+class TestLoadCodeStructure:
+    """Tests for code structure integration (S16.1)."""
+
+    def _build_code_fixtures(self, tmp_path: Path) -> None:
+        """Create module docs + matching source code."""
+        # Module docs (frontmatter)
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+
+        (modules_dir / "alpha.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: alpha
+            purpose: "Alpha module"
+            depends_on: [beta]
+            components: 10
+            ---
+
+            ## Purpose
+            Alpha module.
+            """)
+        )
+        (modules_dir / "beta.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: beta
+            purpose: "Beta module"
+            depends_on: []
+            components: 5
+            ---
+
+            ## Purpose
+            Beta module.
+            """)
+        )
+
+        # Source code
+        src_dir = tmp_path / "src" / "raise_cli"
+        alpha = src_dir / "alpha"
+        alpha.mkdir(parents=True)
+        (alpha / "__init__.py").write_text(
+            dedent("""\
+            from raise_cli.alpha.core import Foo
+
+            __all__ = ["Foo"]
+            """)
+        )
+        (alpha / "core.py").write_text(
+            dedent("""\
+            from raise_cli.beta import helper
+
+            class Foo:
+                pass
+
+            def do_stuff():
+                pass
+            """)
+        )
+
+        beta = src_dir / "beta"
+        beta.mkdir(parents=True)
+        (beta / "__init__.py").write_text(
+            dedent("""\
+            from raise_cli.beta.utils import helper
+
+            __all__ = ["helper"]
+            """)
+        )
+        (beta / "utils.py").write_text(
+            dedent("""\
+            def helper():
+                pass
+            """)
+        )
+
+        # pyproject.toml so PythonAnalyzer.detect() works
+        (tmp_path / "pyproject.toml").write_text("[project]\nname = 'test'\n")
+
+    def test_enriches_module_nodes_with_code_imports(self, tmp_path: Path) -> None:
+        """Module nodes should gain code_imports metadata from ast analysis."""
+        self._build_code_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("mod-alpha")
+        assert node is not None
+        assert "code_imports" in node.metadata
+        assert "beta" in node.metadata["code_imports"]
+
+    def test_enriches_module_nodes_with_code_exports(self, tmp_path: Path) -> None:
+        """Module nodes should gain code_exports metadata from __init__.py."""
+        self._build_code_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("mod-alpha")
+        assert node is not None
+        assert "code_exports" in node.metadata
+        assert "Foo" in node.metadata["code_exports"]
+
+    def test_enriches_module_nodes_with_code_components(self, tmp_path: Path) -> None:
+        """Module nodes should gain code_components count from ast."""
+        self._build_code_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("mod-alpha")
+        assert node is not None
+        assert "code_components" in node.metadata
+        # Foo class + do_stuff function = 2
+        assert node.metadata["code_components"] == 2
+
+    def test_preserves_frontmatter_data(self, tmp_path: Path) -> None:
+        """Existing frontmatter fields (depends_on, components) should be preserved."""
+        self._build_code_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("mod-alpha")
+        assert node is not None
+        # Frontmatter data still there
+        assert node.metadata["depends_on"] == ["beta"]
+        assert node.metadata["components"] == 10
+        # Code data added alongside
+        assert "code_imports" in node.metadata
+
+    def test_modules_without_source_retain_existing_data(
+        self, tmp_path: Path
+    ) -> None:
+        """Module nodes without matching source should keep their data unchanged."""
+        # Module doc exists but no source code for it
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+        (modules_dir / "orphan.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: orphan
+            purpose: "No source code"
+            depends_on: []
+            ---
+
+            ## Purpose
+            Orphan module.
+            """)
+        )
+
+        (tmp_path / "pyproject.toml").write_text("[project]\nname = 'test'\n")
+        # Create empty src dir so analyzer runs but finds no modules
+        (tmp_path / "src" / "raise_cli").mkdir(parents=True)
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        node = graph.get_concept("mod-orphan")
+        assert node is not None
+        # No code_ keys added
+        assert "code_imports" not in node.metadata
+
+    def test_graceful_when_no_python_project(self, tmp_path: Path) -> None:
+        """Should not crash when project has no pyproject.toml."""
+        modules_dir = tmp_path / "governance" / "architecture" / "modules"
+        modules_dir.mkdir(parents=True)
+        (modules_dir / "core.md").write_text(
+            dedent("""\
+            ---
+            type: module
+            name: core
+            purpose: "Core module"
+            depends_on: []
+            ---
+
+            ## Purpose
+            Core module.
+            """)
+        )
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
+
+        # mod-core should exist from frontmatter, no code data
+        node = graph.get_concept("mod-core")
+        assert node is not None
+        assert "code_imports" not in node.metadata
+
+    def test_build_calls_load_code_structure(self, tmp_path: Path) -> None:
+        """build() should call load_code_structure() in its pipeline."""
+        self._build_code_fixtures(tmp_path)
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+            patch.object(
+                builder, "load_code_structure", wraps=builder.load_code_structure
+            ) as mock_code,
+        ):
+            builder.build()
+
+        mock_code.assert_called_once()
