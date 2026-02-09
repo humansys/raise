@@ -15,12 +15,6 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
-
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=discover-complete \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Discovery Complete: Export Validated Components

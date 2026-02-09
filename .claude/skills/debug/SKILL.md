@@ -16,17 +16,6 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
-
-hooks:
-  PostToolUse:
-    - matcher: "Write"
-      hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=debug \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=debug \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Debug: Root Cause Analysis

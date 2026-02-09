@@ -16,12 +16,6 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "2.0.0"
-
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=skill-create \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Create: RaiSE Skill
@@ -241,12 +235,6 @@ metadata:
   raise.gate: "{validation-gate or empty}"
   raise.adaptable: "true"
   raise.version: "1.0.0"
-
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME={skill-name} \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # {Action}: {Domain}
