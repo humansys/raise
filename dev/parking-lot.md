@@ -196,12 +196,16 @@
 - [ ] **Add `get_all_*` aliases to UnifiedGraph** - `iter_concepts()` is efficient but `get_all_concepts()` is more discoverable for CLI integration (F11.2 retro, low priority)
 - [ ] **Pre-design research phase in lifecycle** - Before `/epic-design`, sometimes need targeted research (e.g., reverse engineering prior art like Aider's repo map). Consider formalizing as optional phase in epic lifecycle. (E13 discussion, 2026-02-04)
 
-- [ ] **CurrentWork model: allow empty state** — (SES-115, 2026-02-08)
-  - **Problem:** `CurrentWork` Pydantic model requires `str` for epic/story/phase fields. When session closes with no active work (between epics), `None`/empty causes `ValidationError`.
-  - **What:** Change `CurrentWork` fields to `str = ""` or `str | None = None`. Check all consumers handle empty state.
-  - **File:** `src/raise_cli/session/` (find `CurrentWork` model)
-  - **Size:** XS — single model change + test
-  - **Priority:** Next maintenance session
+- [x] ~~**CurrentWork model: allow empty state**~~ **FIXED** (SES-116) — Fields default to `""`, `None` coerced via `field_validator`
+
+- [x] ~~**Skill stop hooks: missing `log-skill-complete.sh` in target projects**~~ **FIXED** (SES-116) — Scripts now scaffolded by `raise init`
+
+- [x] ~~**Remove duplicate bash hook telemetry — use CLI telemetry only**~~ **DONE** (SES-117) — Story `hooks-cleanup`, merged to v2
+  - **Problem:** Two parallel systems write to `signals.jsonl`: bash Stop hooks (`.raise/scripts/log-*.sh`) and CLI telemetry (`raise memory emit-work` / `telemetry/writer.py`). CLI version is strictly better (Pydantic schemas, file locking, proper error handling). Bash hooks are a vestige from E9 Phase 1.
+  - **What:** Strip `hooks:` sections from all 21 distributable skills. Remove bash scripts from `rai_base/scripts/` and bootstrap. Keep CLI `emit-work` calls in skill steps (they already cover the same events).
+  - **Files:** `src/raise_cli/skills_base/*/SKILL.md` (remove hooks), `src/raise_cli/rai_base/scripts/` (delete), `src/raise_cli/onboarding/bootstrap.py` (remove `_copy_scripts`)
+  - **Size:** S — mechanical removal across skills + bootstrap cleanup
+  - **Priority:** Medium — working but redundant, slight noise reduction
 
 ### E7 Onboarding — Deferred (Post-F&F)
 
