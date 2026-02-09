@@ -540,12 +540,24 @@ class TestBuildHierarchy:
         assert units[0].methods == []
 
     def test_component_id_format(self) -> None:
-        """Component IDs use file stem and name."""
+        """Component IDs use dotted module path and name."""
         symbols = [
             _symbol(name="Scanner", kind="class", file="src/discovery/scanner.py"),
         ]
         units = build_hierarchy(symbols)
-        assert units[0].id == "comp-scanner-Scanner"
+        assert units[0].id == "comp-discovery.scanner-Scanner"
+
+    def test_component_id_uniqueness_across_modules(self) -> None:
+        """Same-named files in different modules produce unique IDs."""
+        symbols = [
+            _symbol(name="models", kind="module", file="src/raise_cli/memory/models.py", signature="module models"),
+            _symbol(name="models", kind="module", file="src/raise_cli/governance/models.py", signature="module models"),
+        ]
+        units = build_hierarchy(symbols)
+        ids = [u.id for u in units]
+        assert len(ids) == len(set(ids)), f"Duplicate IDs: {ids}"
+        assert "comp-raise_cli.memory.models-models" in ids
+        assert "comp-raise_cli.governance.models-models" in ids
 
     def test_module_path_computed(self) -> None:
         """Module path is derived from file path."""
