@@ -525,6 +525,17 @@ def analyze(
     # Returns (units, symbol_map) so we can reuse original Symbols for scoring
     units, symbol_map = _build_hierarchy_with_symbols(public)
 
+    # Jidoka: stop on duplicate IDs — silent data loss is unacceptable
+    seen_ids: dict[str, str] = {}
+    for unit in units:
+        if unit.id in seen_ids:
+            msg = (
+                f"Duplicate component IDs detected: '{unit.id}' "
+                f"in {unit.file} collides with {seen_ids[unit.id]}"
+            )
+            raise ValueError(msg)
+        seen_ids[unit.id] = unit.file
+
     # Score confidence + categorize + extract purpose
     for unit in units:
         path_category = match_path_category(unit.file, category_map)

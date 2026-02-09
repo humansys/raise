@@ -791,6 +791,36 @@ class TestAnalyze:
         assert r1.module_groups == r2.module_groups
         assert len(r1.components) == len(r2.components)
 
+    def test_duplicate_ids_raises_value_error(self) -> None:
+        """Duplicate component IDs in analysis output raise ValueError (Jidoka)."""
+        # A function and module with same name in same file produce duplicate IDs
+        scan = ScanResult(
+            symbols=[
+                _symbol(name="utils", kind="function", file="src/utils.py", signature="def utils()"),
+                _symbol(name="utils", kind="module", file="src/utils.py", signature="module utils"),
+            ],
+            files_scanned=1,
+            errors=[],
+        )
+        with pytest.raises(ValueError, match="Duplicate component IDs"):
+            analyze(scan)
+
+    def test_no_duplicates_across_modules(self) -> None:
+        """Same-named symbols in different modules produce unique IDs."""
+        scan = ScanResult(
+            symbols=[
+                _symbol(name="Writer", kind="class", file="src/raise_cli/memory/writer.py",
+                        signature="class Writer", docstring="Memory writer."),
+                _symbol(name="Writer", kind="class", file="src/raise_cli/telemetry/writer.py",
+                        signature="class Writer", docstring="Telemetry writer."),
+            ],
+            files_scanned=2,
+            errors=[],
+        )
+        result = analyze(scan)
+        ids = [c.id for c in result.components]
+        assert len(ids) == len(set(ids)), f"Duplicate IDs: {ids}"
+
 
 # ── Test Helpers ──────────────────────────────────────────────────────────
 
