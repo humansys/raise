@@ -44,11 +44,12 @@ Prevent architecture documentation and graph drift through small-batch updates i
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
 | S16.1 | Code-Aware Graph | S | ✅ Done | Pluggable `CodeAnalyzer` Protocol + `PythonAnalyzer` (ast-based) to enrich graph with real imports/exports/components |
+| S16.5 | Component ID Uniqueness | S | Done | Fix silent 10-component data loss from duplicate IDs in analyzer (comp-{stem} → comp-{module.path}) |
 | S16.2 | Graph Diff Engine | M | Pending | Compare old vs new unified graph via `diff_graphs()`, expose as `raise memory build --diff` |
 | S16.3 | Docs Update Skill | M | Pending | `/docs-update` skill — subagent compares graph vs module docs, updates frontmatter + narrative |
 | S16.4 | Lifecycle Integration | S | Pending | Wire `/docs-update` into story-close as subagent, HITL gate |
 
-**Total:** 4 stories, ~2S + 2M
+**Total:** 5 stories, ~3S + 2M
 
 **Design decisions (2026-02-09 session):**
 - S16.2+S16.3 from original plan merged into single `/docs-update` skill (AI updates both frontmatter and narrative)
@@ -298,7 +299,8 @@ Discovery refresh between S16.1 and S16.2 is an activity, not a story.
 |:-----:|-------|:----:|:-------------|-----------|-----------|
 | 1 | S16.1: Code-Aware Graph | S | None | Prereq | Graph must have real code data (imports, exports) before diff is useful |
 | — | Discovery refresh | — | S16.1 | Prereq | Re-run discover + update module docs with enriched graph data |
-| 2 | S16.2: Graph Diff Engine | M | S16.1 | M1 | Pure `diff_graphs()` + `raise memory build --diff` CLI. Foundation for downstream. |
+| 1.5 | S16.5: Component ID Uniqueness | S | S16.1 | Prereq | Fix duplicate IDs causing 10 silent component drops in graph |
+| 2 | S16.2: Graph Diff Engine | M | S16.5 | M1 | Pure `diff_graphs()` + `raise memory build --diff` CLI. Foundation for downstream. |
 | 3 | S16.3: Docs Update Skill | M | S16.2 | M2 | `/docs-update` — subagent compares graph vs docs, updates both frontmatter + narrative |
 | 4 | S16.4: Lifecycle Integration | S | S16.3 | M3 | Wire `/docs-update` into story-close as subagent with HITL gate |
 
@@ -337,6 +339,7 @@ Discovery refresh between S16.1 and S16.2 is an activity, not a story.
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
 | S16.1: Code-Aware Graph | S | ✅ Done | 30 min | 1.5x velocity |
+| S16.5: Component ID Uniqueness | S | Done | - | ✅ 345/345 unique, 1.5x velocity |
 | S16.2: Graph Diff Engine | M | Pending | - | |
 | S16.3: Docs Update Skill | M | Pending | - | |
 | S16.4: Lifecycle Integration | S | Pending | - | |
