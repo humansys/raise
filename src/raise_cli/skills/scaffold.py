@@ -84,12 +84,6 @@ def _generate_skill_content(
           raise.gate: ""
           raise.adaptable: "true"
           raise.version: "1.0.0"
-
-        hooks:
-          Stop:
-            - hooks:
-                - type: command
-                  command: "RAISE_SKILL_NAME={name} \\"$CLAUDE_PROJECT_DIR\\"/.raise/scripts/log-skill-complete.sh"
         ---
 
         # {title}

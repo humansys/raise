@@ -15,12 +15,6 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
-
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=epic-start \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Start: Epic Initialization
