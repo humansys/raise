@@ -3,7 +3,7 @@ type: module
 name: session
 purpose: "Session lifecycle — state persistence, context bundle assembly, and close orchestration for deterministic session continuity"
 status: current
-depends_on: [memory, onboarding, schemas, context]
+depends_on: [context, memory, onboarding, schemas]
 depended_by: [cli]
 entry_points:
   - "raise session start"
@@ -18,7 +18,7 @@ public_api:
   - "CloseResult"
   - "load_session_state"
   - "save_session_state"
-components: 13
+components: 21
 constraints:
   - "Session records are always personal-scoped (developer-specific, gitignored)"
   - "Session state is project-scoped (committed, shared across developers)"

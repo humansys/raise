@@ -9,7 +9,7 @@ entry_points: []
 public_api:
   - "DISTRIBUTABLE_SKILLS"
   - "__version__"
-components: 24
+components: 0
 constraints:
   - "No internal dependencies — distribution package"
   - "Skills are copied to .claude/skills/ on raise init, not imported at runtime"

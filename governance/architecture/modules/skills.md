@@ -11,12 +11,18 @@ entry_points:
   - "raise skill validate"
   - "raise skill create"
 public_api:
+  - "ParseError"
   - "Skill"
   - "SkillFrontmatter"
+  - "SkillHook"
+  - "SkillHookCommand"
   - "SkillLocator"
-  - "parse_skill"
+  - "SkillMetadata"
+  - "get_default_skill_dir"
   - "list_skills"
-components: 25
+  - "parse_frontmatter"
+  - "parse_skill"
+components: 32
 constraints:
   - "Skills are markdown files, not Python code — this module manages them, doesn't execute them"
   - "Skill names must follow the ontology naming convention"

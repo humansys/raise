@@ -4,19 +4,22 @@ name: core
 purpose: "Subprocess wrappers for git, ast-grep, and ripgrep — the foundation tools everything else builds on"
 status: current
 depends_on: []
-depended_by: [governance, context, onboarding, telemetry]
+depended_by: [context, governance, onboarding]
 entry_points: []
 public_api:
-  - "run_tool"
+  - "GitStatus"
+  - "SearchMatch"
+  - "ToolResult"
   - "check_tool"
-  - "require_tool"
-  - "git_root"
   - "git_branch"
-  - "git_status"
   - "git_diff"
+  - "git_root"
+  - "git_status"
+  - "require_tool"
   - "rg_search"
+  - "run_tool"
   - "sg_search"
-components: 18
+components: 15
 constraints:
   - "No internal dependencies — leaf module"
   - "All external tool calls go through run_tool()"

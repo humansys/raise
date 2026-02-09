@@ -9,13 +9,18 @@ entry_points:
   - "raise memory emit"
   - "raise memory emit-work"
 public_api:
+  - "CalibrationEvent"
+  - "CommandUsage"
+  - "EmitResult"
+  - "ErrorEvent"
+  - "SessionEvent"
+  - "Signal"
+  - "SkillEvent"
+  - "WorkLifecycle"
   - "emit"
   - "emit_command_usage"
-  - "emit_skill_event"
   - "emit_error_event"
-  - "Signal"
-  - "WorkLifecycle"
-  - "CommandUsage"
+  - "emit_skill_event"
 components: 13
 constraints:
   - "Signals are local-only — no network transmission"
