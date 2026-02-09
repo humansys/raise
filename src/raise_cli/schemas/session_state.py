@@ -8,23 +8,32 @@ from __future__ import annotations
 
 from datetime import date
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class CurrentWork(BaseModel):
     """What Rai is currently working on.
 
+    All fields default to empty string so the model is valid even when
+    there is no active epic/story (e.g., between epics after session close).
+
     Attributes:
-        epic: Epic identifier (e.g., "E15").
-        story: Story identifier (e.g., "S15.7").
-        phase: Current phase (e.g., "design", "implement").
-        branch: Git branch name.
+        epic: Epic identifier (e.g., "E15"), or empty string.
+        story: Story identifier (e.g., "S15.7"), or empty string.
+        phase: Current phase (e.g., "design", "implement"), or empty string.
+        branch: Git branch name, or empty string.
     """
 
-    epic: str
-    story: str
-    phase: str
-    branch: str
+    epic: str = ""
+    story: str = ""
+    phase: str = ""
+    branch: str = ""
+
+    @field_validator("epic", "story", "phase", "branch", mode="before")
+    @classmethod
+    def coerce_none_to_empty(cls, v: object) -> object:
+        """Accept None from YAML and coerce to empty string."""
+        return "" if v is None else v
 
 
 class LastSession(BaseModel):

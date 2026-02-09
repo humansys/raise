@@ -13,6 +13,34 @@ from raise_cli.schemas.session_state import (
 )
 
 
+class TestCurrentWork:
+    """Tests for CurrentWork model."""
+
+    def test_defaults_to_empty_strings(self) -> None:
+        """CurrentWork accepts no arguments (all default to empty)."""
+        work = CurrentWork()
+        assert work.epic == ""
+        assert work.story == ""
+        assert work.phase == ""
+        assert work.branch == ""
+
+    def test_none_coerced_to_empty(self) -> None:
+        """CurrentWork coerces None values to empty string (YAML null fix)."""
+        work = CurrentWork(epic=None, story=None, phase="design", branch="main")  # type: ignore[arg-type]
+        assert work.epic == ""
+        assert work.story == ""
+        assert work.phase == "design"
+        assert work.branch == "main"
+
+    def test_from_yaml_dict_with_nulls(self) -> None:
+        """CurrentWork validates from dict with null values (as YAML produces)."""
+        data = {"epic": None, "story": None, "phase": "onboarding-complete", "branch": "test/raise-v2"}
+        work = CurrentWork.model_validate(data)
+        assert work.epic == ""
+        assert work.story == ""
+        assert work.phase == "onboarding-complete"
+
+
 class TestEpicProgress:
     """Tests for EpicProgress model."""
 

@@ -50,10 +50,13 @@ def _make_session_state() -> SessionState:
 class TestSessionStateSchema:
     """Tests for SessionState Pydantic models."""
 
-    def test_current_work_requires_all_fields(self) -> None:
-        """CurrentWork requires epic, story, phase, branch."""
-        with pytest.raises(ValidationError):
-            CurrentWork()  # type: ignore[call-arg]
+    def test_current_work_defaults_to_empty(self) -> None:
+        """CurrentWork defaults all fields to empty string."""
+        work = CurrentWork()
+        assert work.epic == ""
+        assert work.story == ""
+        assert work.phase == ""
+        assert work.branch == ""
 
     def test_current_work_valid(self) -> None:
         """CurrentWork accepts all required fields."""
