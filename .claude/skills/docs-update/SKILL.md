@@ -171,22 +171,35 @@ Present the drift report and ask:
 
 **Applying changes:** Use the Edit tool to modify only the YAML frontmatter section (between the `---` delimiters) of each module doc. Preserve all other content unchanged. Preserve field ordering as much as possible — only change values, don't reorder keys.
 
-### Step 6: Check for Structural Changes (Narrative Review)
+### Step 6: Check for Narrative Review Triggers
 
-Structural changes that warrant narrative review:
+**Trigger A — Structural changes (full narrative review):**
 
 - New modules appeared in the graph (not yet documented)
 - Modules removed from the graph (docs exist but code doesn't)
 - Major dependency changes (>2 new dependencies or >2 removed)
 - Significant public API changes (>5 new exports or >5 removed)
 
-**If no structural changes:** Skip to Step 8.
+**Trigger B — Stale value references (targeted scan):**
 
-**If structural changes detected:** Proceed to Step 7.
+For **every** module with any frontmatter change (even a single field), scan the narrative body for hardcoded references to old values:
 
-### Step 7: Narrative Review (Inference)
+- `components` changed → search prose for the old count (e.g., "component count (60)" when frontmatter now says 69)
+- `depends_on` removed a dependency → search prose for mentions of the removed module name outside the Dependencies table
+- `depended_by` changed → check if any prose references the old dependent list
+- `public_api` removed entries → search for mentions of removed function/class names in Key Files or Architecture sections
 
-For each module with structural changes, read the full module doc and propose updates to narrative sections:
+This is a mechanical text search, not inference. It catches stale hardcoded numbers and names that contradict updated frontmatter.
+
+**If no triggers:** Skip to Step 8.
+
+**If Trigger A:** Proceed to Step 7 (full narrative review).
+
+**If Trigger B only:** Proceed to Step 7 but scope to targeted fixes for the stale references found.
+
+### Step 7: Narrative Review
+
+**For Trigger A modules (structural changes):** Read the full module doc and propose updates to narrative sections using inference:
 
 - **Architecture** section — if dependencies changed significantly
 - **Key Files** section — if new files were added to the module
@@ -195,9 +208,29 @@ For each module with structural changes, read the full module doc and propose up
 
 Present proposed changes as a diff and ask for HITL approval before applying.
 
-**IMPORTANT:** This step uses inference. Changes are suggestions, not facts. Always present them for review.
+**IMPORTANT:** Trigger A changes use inference. Changes are suggestions, not facts. Always present them for review.
 
-### Step 8: Summary
+**For Trigger B modules (stale value references):** Apply targeted mechanical fixes:
+
+- Replace old component counts with new values from frontmatter
+- Remove references to dropped dependencies in prose paragraphs
+- Update any mentions of old API names that were removed
+
+These are factual corrections (the frontmatter is already approved as truth), but still present them for HITL confirmation before writing.
+
+### Step 8: Rebuild Graph (if docs changed)
+
+If any frontmatter or narrative changes were applied in Steps 5-7, rebuild the graph so it reflects the updated docs:
+
+```bash
+uv run raise memory build
+```
+
+This closes the coherence loop — the graph now contains both the code truth AND the corrected doc-declared values. Without this step, the graph would still hold pre-update frontmatter until the next manual build.
+
+**If no changes were applied:** Skip this step.
+
+### Step 9: Summary
 
 Present a summary of what was done:
 
@@ -207,6 +240,7 @@ Present a summary of what was done:
 Modules checked: 12
 Frontmatter updated: 3 (mod-memory, mod-context, mod-session)
 Narrative updated: 1 (mod-context)
+Graph rebuilt: yes
 No changes needed: 8
 Skipped: 0
 ```
