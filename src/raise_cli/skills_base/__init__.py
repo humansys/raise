@@ -10,8 +10,9 @@ Contents:
                         story-implement, story-review, story-close
     Epic lifecycle:     epic-start, epic-plan, epic-design, epic-close
     Discovery:          discover-start, discover-scan,
-                        discover-validate, discover-complete
-    Onboarding:         project-create
+                        discover-validate, discover-complete,
+                        discover-describe
+    Onboarding:         project-create, project-onboard
     Tools:              research, debug
 
 Usage:
@@ -24,7 +25,7 @@ Usage:
 
 from __future__ import annotations
 
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 DISTRIBUTABLE_SKILLS: list[str] = [
     # Session lifecycle
@@ -47,8 +48,10 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "discover-scan",
     "discover-validate",
     "discover-complete",
+    "discover-describe",
     # Onboarding
     "project-create",
+    "project-onboard",
     # Tools
     "research",
     "debug",

@@ -264,10 +264,10 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 Record the completion of the entire story lifecycle:
 
 ```bash
-uv run raise memory emit-work feature {story_id} --event complete --phase review
+uv run raise memory emit-work story {story_id} --event complete --phase review
 ```
 
-**Example:** `raise memory emit-work feature F12.2 -e complete -p review`
+**Example:** `raise memory emit-work story S15.1 -e complete -p review`
 
 **Verification:** Telemetry emitted.
 
