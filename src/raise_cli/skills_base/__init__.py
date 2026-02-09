@@ -11,6 +11,7 @@ Contents:
     Epic lifecycle:     epic-start, epic-plan, epic-design, epic-close
     Discovery:          discover-start, discover-scan,
                         discover-validate, discover-complete
+    Onboarding:         project-create
     Tools:              research, debug
 
 Usage:
@@ -46,6 +47,8 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "discover-scan",
     "discover-validate",
     "discover-complete",
+    # Onboarding
+    "project-create",
     # Tools
     "research",
     "debug",
