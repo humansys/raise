@@ -3,16 +3,16 @@ type: module
 name: output
 purpose: "Format-aware output system — human-readable, JSON, and table formats through a single console interface"
 status: current
-depends_on: [discovery, skills]
+depends_on: [skills]
 depended_by: [cli]
 entry_points: []
 public_api:
   - "OutputConsole"
   - "OutputFormat"
+  - "configure_console"
   - "get_console"
   - "set_console"
-  - "configure_console"
-components: 19
+components: 28
 constraints:
   - "All CLI output must go through OutputConsole, never raw print()"
   - "Formatters are domain-specific — each command group has its own formatter"
@@ -34,7 +34,6 @@ The `OutputConsole` singleton manages output format, color support, and verbosit
 
 | Depends On | Why |
 |-----------|-----|
-| `discovery` | Type imports for discovery result formatters |
 | `skills` | Type imports for skill result formatters |
 
 ## Conventions

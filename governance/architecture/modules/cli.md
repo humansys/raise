@@ -3,7 +3,7 @@ type: module
 name: cli
 purpose: "Typer-based CLI commands — the user-facing entry point that orchestrates all other modules"
 status: current
-depends_on: [config, context, discovery, governance, memory, onboarding, output, rai_base, skills, telemetry]
+depends_on: [config, context, discovery, governance, memory, onboarding, output, rai_base, session, skills, telemetry]
 depended_by: []
 entry_points:
   - "raise init"
@@ -14,7 +14,7 @@ entry_points:
   - "raise skill list|show|validate|create"
 public_api:
   - "app (Typer main app)"
-components: 42
+components: 54
 constraints:
   - "Nothing depends on cli — it's the outermost layer"
   - "CLI commands are thin wrappers — logic lives in domain modules"
@@ -66,6 +66,8 @@ Commands are organized by domain as Typer sub-apps:
 | `onboarding` | Project initialization, profile management |
 | `output` | Format-aware output (human/JSON/table) |
 | `rai_base` | Base identity and patterns for init |
+| `schemas` | Pydantic models for session state |
+| `session` | Session bundle assembly and close logic |
 | `skills` | Skill listing, validation, scaffolding |
 | `telemetry` | Signal emission on command usage |
 
