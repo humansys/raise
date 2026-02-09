@@ -238,5 +238,78 @@ S16.4 requires S16.1 + S16.2 at minimum. S16.3 can be wired in later.
 
 ---
 
+## Implementation Plan
+
+> Added by `/epic-plan` — 2026-02-08
+
+### Sequencing Strategy
+
+**Risk-first + Walking Skeleton.** S16.1 (graph diff) is the foundation — highest uncertainty (new capability), highest value (enables everything else). S16.2 follows immediately to prove the architecture end-to-end (diff → doc update). S16.3 is the riskiest inference work but isolated — can be deferred or simplified without blocking integration. S16.4 wires it all together.
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|:-------------|-----------|-----------|
+| 1 | S16.1: Graph Diff Engine | M | None | M1 | Foundation — everything depends on this. Highest uncertainty (new data model, comparison logic). |
+| 2 | S16.2: Deterministic Doc Updater | S | S16.1 | M1 | Walking skeleton — proves diff → doc update end-to-end. Deterministic, testable, low risk. |
+| 3 | S16.3: AI Doc Regeneration | M | S16.1 | M2 | Inference layer — riskiest but isolated. Can be simplified to prompt template if subagent approach is too complex. |
+| 4 | S16.4: Lifecycle Integration | S | S16.1, S16.2 | M3 | Wiring — integrates into story-close. Low risk once components exist. Optionally wires S16.3 if ready. |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria | Demo |
+|-----------|---------|------------------|------|
+| **M1: Walking Skeleton** | S16.1 + S16.2 | `raise memory build --diff` produces change set; module doc frontmatter auto-updates from diff | Run build --diff, show changed nodes, show updated module doc |
+| **M2: AI Layer** | + S16.3 | Subagent regenerates narrative sections for affected docs; HITL review works | Trigger structural change, show regenerated doc section, review diff |
+| **M3: Epic Complete** | + S16.4 | Coherence check runs in story-close Step 1.75; discovery-as-validation verifies state | Full story-close flow with coherence step; `raise discover validate` confirms no regression |
+
+### Parallel Opportunities
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Stream 1: S16.1 ──► S16.2 ──► S16.4
+                      ↓ enables    ↑ optionally wires
+Stream 2:           S16.3 ────────┘
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+S16.2 and S16.3 could run in parallel after S16.1, but given single-developer flow, sequential is more practical. S16.3 can be deferred past S16.4 if needed — lifecycle integration works with deterministic-only (Layer 1).
+
+### Sequencing Rationale
+
+**S16.1 first:** Only story with real uncertainty — new Pydantic models, comparison algorithm, impact categorization. If this takes longer than expected, the rest adjusts. Proves the core hypothesis: "can we diff two graphs meaningfully?"
+
+**S16.2 second:** Completes the walking skeleton. Takes the diff output from S16.1 and writes to actual files. Low risk — reading frontmatter, updating fields, preserving body. But proves the full loop works.
+
+**S16.3 third:** Isolated inference work. Depends only on S16.1's GraphDiff model as input. The subagent contract is the main design decision — what context does it receive, what does it produce? Can be simplified to a prompt template over `raise memory query` if full subagent is overkill.
+
+**S16.4 last:** Pure wiring. Takes working components and integrates into story-close skill + CLI command. Low risk, high visibility — this is where the user sees the value.
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| S16.1 diff is too noisy (false changes) | Medium | High | Conservative matching: ignore metadata-only changes, weight thresholds, HITL gate |
+| S16.3 subagent produces low-quality docs | Medium | Medium | Start with frontmatter-only path (S16.2). S16.3 is SHOULD scope — can be simplified or deferred |
+| Graph format changes break diff | Low | Medium | Pin GraphDiff model with tests against real unified.json snapshots |
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Notes |
+|-------|:----:|:------:|:------:|-------|
+| S16.1: Graph Diff Engine | M | Pending | - | |
+| S16.2: Deterministic Doc Updater | S | Pending | - | |
+| S16.3: AI Doc Regeneration | M | Pending | - | |
+| S16.4: Lifecycle Integration | S | Pending | - | |
+
+**Milestone Progress:**
+- [ ] M1: Walking Skeleton (S16.1 + S16.2)
+- [ ] M2: AI Layer (+ S16.3)
+- [ ] M3: Epic Complete (+ S16.4, retrospective, merge)
+
+---
+
 *Epic tracking — update per story completion*
 *Created: 2026-02-08*
+*Plan added: 2026-02-08*
