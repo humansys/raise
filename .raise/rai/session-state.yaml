@@ -1,21 +1,23 @@
 current_work:
-  epic: E15
-  story: S15.5
-  phase: complete
-  branch: epic/e15/ontology-refinement
+  epic: ''
+  story: ''
+  phase: ''
+  branch: v2
 last_session:
-  id: SES-108
+  id: SES-115
   date: '2026-02-08'
   developer: Emilio
-  summary: S15.5 story review complete — retrospective, calibration (3.6x), scope
-    updated, M3 milestone done.
-  patterns_captured: []
+  summary: S7.3 /project-onboard skill — full story lifecycle from start through close.
+    Brownfield onboarding skill with discovery pipeline integration. Also fixed guardrails
+    format harmonization (raise init --detect output now parser-compatible). Closed
+    E7 epic — all 3 milestones achieved, merged to v2.
+  patterns_captured:
+  - PAT-SES-115
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - Start S15.6 Skills Integration (last story before E15 close)
-  - Close E15 after S15.6
-notes: Short session — just the review phase. S15.5 fully closed.
+  - Pick next epic from backlog
+notes: E7 complete. Full onboarding pipeline delivered in single day.
 progress: null
 completed_epics: []

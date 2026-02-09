@@ -196,6 +196,13 @@
 - [ ] **Add `get_all_*` aliases to UnifiedGraph** - `iter_concepts()` is efficient but `get_all_concepts()` is more discoverable for CLI integration (F11.2 retro, low priority)
 - [ ] **Pre-design research phase in lifecycle** - Before `/epic-design`, sometimes need targeted research (e.g., reverse engineering prior art like Aider's repo map). Consider formalizing as optional phase in epic lifecycle. (E13 discussion, 2026-02-04)
 
+- [ ] **CurrentWork model: allow empty state** — (SES-115, 2026-02-08)
+  - **Problem:** `CurrentWork` Pydantic model requires `str` for epic/story/phase fields. When session closes with no active work (between epics), `None`/empty causes `ValidationError`.
+  - **What:** Change `CurrentWork` fields to `str = ""` or `str | None = None`. Check all consumers handle empty state.
+  - **File:** `src/raise_cli/session/` (find `CurrentWork` model)
+  - **Size:** XS — single model change + test
+  - **Priority:** Next maintenance session
+
 ### E7 Onboarding — Deferred (Post-F&F)
 
 > Items explicitly deferred from E7 scope (ADR-021).
