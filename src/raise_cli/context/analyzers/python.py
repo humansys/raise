@@ -246,11 +246,10 @@ class _ImportVisitor(ast.NodeVisitor):
         elif node.level > 0 and node.module:
             # Relative import: from ..sibling import bar
             self._resolve_relative(node.module, node.level)
-        elif node.level > 0:
+        elif node.level > 0 and node.names:
             # Relative import without module: from .. import sibling
-            if node.names:
-                for alias in node.names:
-                    if node.level >= 2:
+            for alias in node.names:
+                if node.level >= 2:
                         # from ..sibling means the name IS the sibling module
                         imported = alias.name
                         if imported != self.module_name:
@@ -287,8 +286,6 @@ class _ImportVisitor(ast.NodeVisitor):
 
     def _is_type_checking(self, test: ast.expr) -> bool:
         """Check if an if-test is TYPE_CHECKING."""
-        if isinstance(test, ast.Name) and test.id == "TYPE_CHECKING":
-            return True
-        if isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING":
-            return True
-        return False
+        return (
+            isinstance(test, ast.Name) and test.id == "TYPE_CHECKING"
+        ) or (isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING")
