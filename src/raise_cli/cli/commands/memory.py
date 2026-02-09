@@ -25,6 +25,7 @@ from rich.table import Table
 from raise_cli.cli.error_handler import cli_error
 from raise_cli.config.paths import get_memory_dir, get_personal_dir
 from raise_cli.context import UnifiedGraph, UnifiedGraphBuilder
+from raise_cli.context.diff import GraphDiff, diff_graphs
 from raise_cli.context.models import ConceptNode
 from raise_cli.context.query import (
     ArchitecturalContext,
@@ -442,6 +443,10 @@ def build(
         Path | None,
         typer.Option("--output", "-o", help="Path to save index JSON"),
     ] = None,
+    no_diff: Annotated[
+        bool,
+        typer.Option("--no-diff", help="Skip diff computation"),
+    ] = False,
 ) -> None:
     """Build memory index from all sources.
 
@@ -452,15 +457,26 @@ def build(
     - Skills (SKILL.md metadata)
     - Components (from discovery)
 
+    By default, diffs against the previous build and saves the diff
+    to .raise/rai/personal/last-diff.json for downstream consumers.
+
     Examples:
         # Build index to default location
         $ raise memory build
+
+        # Build without diff
+        $ raise memory build --no-diff
 
         # Save to custom location
         $ raise memory build --output custom_index.json
     """
     default_output = _get_default_index_path()
     output_path = output or default_output
+
+    # Load old graph for diff (before building new one)
+    old_graph: UnifiedGraph | None = None
+    if not no_diff and output_path.exists():
+        old_graph = UnifiedGraph.load(output_path)
 
     # Build unified graph
     builder = UnifiedGraphBuilder()
@@ -480,6 +496,14 @@ def build(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     graph.save(output_path)
 
+    # Compute and persist diff
+    diff: GraphDiff | None = None
+    if old_graph is not None:
+        diff = diff_graphs(old_graph, graph)
+        diff_path = get_personal_dir() / "last-diff.json"
+        diff_path.parent.mkdir(parents=True, exist_ok=True)
+        diff_path.write_text(diff.model_dump_json(indent=2))
+
     # Format output
     _format_build_result(
         output_path=output_path,
@@ -487,6 +511,7 @@ def build(
         edge_counts=edge_counts,
         total_nodes=graph.node_count,
         total_edges=graph.edge_count,
+        diff=diff,
     )
 
 
@@ -496,6 +521,7 @@ def _format_build_result(
     edge_counts: dict[str, int],
     total_nodes: int,
     total_edges: int,
+    diff: GraphDiff | None = None,
 ) -> None:
     """Format and print memory build results."""
     console.print("\n[cyan]Building memory index...[/cyan]")
@@ -514,6 +540,12 @@ def _format_build_result(
             console.print(f"  {edge_type}: [green]{count}[/green]")
 
     console.print(f"\n[bold]Total relationships:[/bold] [green]{total_edges}[/green]")
+
+    # Display diff summary
+    if diff is not None:
+        console.print(f"\n[bold]Diff:[/bold] {diff.summary}")
+        if diff.impact != "none":
+            console.print(f"[bold]Impact:[/bold] {diff.impact}")
 
     console.print(f"\n✓ Saved to [cyan]{output_path}[/cyan]\n")
 
