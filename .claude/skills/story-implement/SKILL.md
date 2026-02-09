@@ -16,17 +16,6 @@ metadata:
   raise.gate: gate-code
   raise.adaptable: "true"
   raise.version: "1.0.0"
-
-hooks:
-  PostToolUse:
-    - matcher: "Write|Edit"
-      hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=story-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-artifact-created.sh"
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=story-implement \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Implement: Development Workflow

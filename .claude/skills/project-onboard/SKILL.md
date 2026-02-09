@@ -17,12 +17,6 @@ metadata:
   raise.gate: "raise memory build produces 30+ governance nodes"
   raise.adaptable: "true"
   raise.version: "1.0.0"
-
-hooks:
-  Stop:
-    - hooks:
-        - type: command
-          command: "RAISE_SKILL_NAME=project-onboard \"$CLAUDE_PROJECT_DIR\"/.raise/scripts/log-skill-complete.sh"
 ---
 
 # Project Onboard: Brownfield Onboarding
