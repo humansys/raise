@@ -46,7 +46,7 @@ Prevent architecture documentation and graph drift through small-batch updates i
 | S16.1 | Code-Aware Graph | S | ✅ Done | Pluggable `CodeAnalyzer` Protocol + `PythonAnalyzer` (ast-based) to enrich graph with real imports/exports/components |
 | S16.5 | Component ID Uniqueness | S | Done | Fix silent 10-component data loss from duplicate IDs in analyzer (comp-{stem} → comp-{module.path}) |
 | S16.2 | Graph Diff Engine | M | Done | Compare old vs new unified graph via `diff_graphs()`, expose as `raise memory build --diff` |
-| S16.3 | Docs Update Skill | M | Pending | `/docs-update` skill — subagent compares graph vs module docs, updates frontmatter + narrative |
+| S16.3 | Docs Update Skill | M | Done | `/docs-update` skill — subagent compares graph vs module docs, updates frontmatter + narrative |
 | S16.4 | Lifecycle Integration | S | Pending | Wire `/docs-update` into story-close as subagent, HITL gate |
 
 **Total:** 5 stories, ~3S + 2M
@@ -341,13 +341,13 @@ Discovery refresh between S16.1 and S16.2 is an activity, not a story.
 | S16.1: Code-Aware Graph | S | ✅ Done | 30 min | 1.5x velocity |
 | S16.5: Component ID Uniqueness | S | Done | - | ✅ 345/345 unique, 1.5x velocity |
 | S16.2: Graph Diff Engine | M | ✅ Done | 35 min | 1.71x velocity, 8 design decisions, 39 tests |
-| S16.3: Docs Update Skill | M | Pending | - | |
+| S16.3: Docs Update Skill | M | ✅ Done | 120 min | 0.75x velocity, trigger A/B improvement, 15 modules synced |
 | S16.4: Lifecycle Integration | S | Pending | - | |
 
 **Milestone Progress:**
 - [ ] Prereq: Code-Aware Graph (S16.1 + discovery refresh)
 - [ ] M1: Graph Diff (+ S16.2)
-- [ ] M2: Docs Update (+ S16.3)
+- [x] M2: Docs Update (+ S16.3)
 - [ ] M3: Epic Complete (+ S16.4, retrospective, merge)
 
 ---
