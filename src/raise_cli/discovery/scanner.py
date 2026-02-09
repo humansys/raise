@@ -540,9 +540,66 @@ DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, str] = {
 }
 
 
+def _read_gitignore(root: Path) -> list[str]:
+    """Read .gitignore from *root* and convert entries to glob patterns.
+
+    Only handles simple .gitignore entries (directory names, file globs).
+    Negation patterns (``!``) and anchored paths are ignored — they cover
+    edge cases that don't affect typical exclude behaviour.
+    """
+    gitignore = root / ".gitignore"
+    if not gitignore.is_file():
+        return []
+
+    patterns: list[str] = []
+    try:
+        for raw_line in gitignore.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            # Skip blanks, comments, negation
+            if not line or line.startswith("#") or line.startswith("!"):
+                continue
+            # Strip trailing slash (directory marker)
+            entry = line.rstrip("/")
+            # Convert to glob: wrap bare names with **/ so they match anywhere
+            if "/" not in entry:
+                patterns.append(f"**/{entry}/**")
+            else:
+                patterns.append(f"**/{entry}/**")
+    except OSError:
+        return []
+    return patterns
+
+
+def _is_directory_pattern(pattern: str) -> str | None:
+    """Extract directory name from patterns like ``**/node_modules/**``.
+
+    Returns the bare directory name if the pattern represents a directory
+    exclusion, or None if it's a file-level pattern.
+    """
+    stripped = pattern.strip("*").strip("/")
+    if "/" not in stripped and pattern.endswith("/**"):
+        return stripped
+    return None
+
+
 def _should_exclude(file_path: Path, exclude_patterns: list[str]) -> bool:
-    """Check if a file should be excluded based on patterns."""
-    return any(file_path.match(pattern) for pattern in exclude_patterns)
+    """Check if a file should be excluded based on patterns.
+
+    Directory patterns (``**/name/**``) are matched by checking whether
+    the directory name appears anywhere in the path parts.  File patterns
+    (``**/test_*``) use ``PurePath.match`` which handles ``**`` correctly
+    for filename globbing.
+    """
+    parts = file_path.parts
+    for pattern in exclude_patterns:
+        dir_name = _is_directory_pattern(pattern)
+        if dir_name is not None:
+            if dir_name in parts:
+                return True
+        else:
+            if file_path.match(pattern):
+                return True
+    return False
 
 
 def _process_source_file(
@@ -588,7 +645,12 @@ def scan_directory(
         >>> result = scan_directory(Path("src/"), language="typescript")
     """
     if exclude_patterns is None:
-        exclude_patterns = DEFAULT_EXCLUDE_PATTERNS
+        exclude_patterns = list(DEFAULT_EXCLUDE_PATTERNS)
+
+    # Merge .gitignore patterns when present
+    gitignore_patterns = _read_gitignore(path)
+    if gitignore_patterns:
+        exclude_patterns = list(exclude_patterns) + gitignore_patterns
 
     if pattern is None:
         pattern = DEFAULT_LANGUAGE_PATTERNS.get(language, "**/*")

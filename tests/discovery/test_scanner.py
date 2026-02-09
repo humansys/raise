@@ -273,6 +273,45 @@ class TestScanDirectory:
         assert result.files_scanned == 1
         assert all(s.name != "TestFoo" for s in result.symbols)
 
+    def test_scan_excludes_nested_directories(self, tmp_path: Path) -> None:
+        """Test that node_modules and similar nested dirs are excluded."""
+        # Source file — should be scanned
+        (tmp_path / "main.py").write_text("class Main: pass")
+
+        # Nested node_modules — should be excluded
+        nm = tmp_path / "node_modules" / "react"
+        nm.mkdir(parents=True)
+        (nm / "index.js").write_text("function render() {}")
+
+        # Nested .venv — should be excluded
+        venv = tmp_path / ".venv" / "lib"
+        venv.mkdir(parents=True)
+        (venv / "site.py").write_text("class Site: pass")
+
+        result = scan_directory(tmp_path)
+        assert result.files_scanned == 1
+        assert any(s.name == "Main" for s in result.symbols)
+        assert not any(s.name == "render" for s in result.symbols)
+        assert not any(s.name == "Site" for s in result.symbols)
+
+    def test_scan_reads_gitignore(self, tmp_path: Path) -> None:
+        """Test that .gitignore patterns are merged into exclusions."""
+        # .gitignore excludes "vendor"
+        (tmp_path / ".gitignore").write_text("vendor\n")
+
+        # Source file
+        (tmp_path / "main.py").write_text("class Main: pass")
+
+        # Vendor dir — should be excluded via .gitignore
+        vendor = tmp_path / "vendor" / "lib"
+        vendor.mkdir(parents=True)
+        (vendor / "dep.py").write_text("class Dep: pass")
+
+        result = scan_directory(tmp_path)
+        assert result.files_scanned == 1
+        assert any(s.name == "Main" for s in result.symbols)
+        assert not any(s.name == "Dep" for s in result.symbols)
+
     def test_scan_empty_directory(self, tmp_path: Path) -> None:
         """Test scanning an empty directory."""
         result = scan_directory(tmp_path)
