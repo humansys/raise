@@ -490,6 +490,99 @@ class TestExtractTypescriptSymbols:
         symbols = extract_typescript_symbols(source, "test.ts")
         assert any(s.name == "ExportedClass" for s in symbols)
 
+    def test_extract_enum(self) -> None:
+        """Test extracting TypeScript enums."""
+        source = dedent("""\
+            export enum UserRole {
+                Admin = 'admin',
+                User = 'user',
+            }
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "UserRole"
+        assert symbols[0].kind == "enum"
+        assert symbols[0].signature == "enum UserRole"
+
+    def test_extract_type_alias(self) -> None:
+        """Test extracting TypeScript type aliases."""
+        source = dedent("""\
+            export type ReportAction = 'view' | 'edit' | 'delete';
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "ReportAction"
+        assert symbols[0].kind == "type_alias"
+        assert symbols[0].signature == "type ReportAction"
+
+    def test_extract_exported_const(self) -> None:
+        """Test extracting exported const declarations."""
+        source = dedent("""\
+            export const SESSION_CONFIG = {
+                timeout: 30000,
+                maxRetries: 3,
+            } as const;
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "SESSION_CONFIG"
+        assert symbols[0].kind == "constant"
+        assert symbols[0].signature == "const SESSION_CONFIG"
+
+    def test_extract_tsx_with_jsx(self) -> None:
+        """Test extracting from TSX file with JSX content."""
+        source = dedent("""\
+            interface UserProps {
+                name: string;
+            }
+
+            export default function UserCard(props: UserProps) {
+                return <div>{props.name}</div>;
+            }
+        """)
+        symbols = extract_typescript_symbols(source, "UserCard.tsx")
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        funcs = [s for s in symbols if s.kind == "function"]
+        assert len(ifaces) == 1
+        assert ifaces[0].name == "UserProps"
+        assert len(funcs) == 1
+        assert funcs[0].name == "UserCard"
+
+    def test_extract_complex_ts_file_with_new_kinds(self) -> None:
+        """Test extracting from a file with enums, types, consts, and classes."""
+        source = dedent("""\
+            export enum Status {
+                Active = 'active',
+                Inactive = 'inactive',
+            }
+
+            export type Config = {
+                debug: boolean;
+            };
+
+            export const DEFAULT_CONFIG = {
+                debug: false,
+            };
+
+            export class Service {
+                process(): void {}
+            }
+
+            export function helper(): void {}
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        enums = [s for s in symbols if s.kind == "enum"]
+        types = [s for s in symbols if s.kind == "type_alias"]
+        consts = [s for s in symbols if s.kind == "constant"]
+        classes = [s for s in symbols if s.kind == "class"]
+        functions = [s for s in symbols if s.kind == "function"]
+
+        assert len(enums) == 1
+        assert len(types) == 1
+        assert len(consts) == 1
+        assert len(classes) == 1
+        assert len(functions) == 1
+
 
 class TestExtractJavascriptSymbols:
     """Tests for extract_javascript_symbols function."""
