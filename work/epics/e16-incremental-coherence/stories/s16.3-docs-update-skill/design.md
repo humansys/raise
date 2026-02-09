@@ -1,7 +1,7 @@
 ---
 story_id: S16.3
 title: Docs Update Skill
-size: M
+size: S
 epic: E16
 type: story_design
 ---
@@ -16,42 +16,36 @@ type: story_design
 
 ## Architectural Context
 
-**Primary modules:** `mod-skills_base` (new skill file), `mod-cli` (new command for deterministic frontmatter), `mod-context` (consumes graph + diff data)
+**Primary module:** `mod-skills_base` (new skill file)
 
-**Layer:** The skill itself is a distributable asset (bc-distribution). The CLI command that supports it lives in the orchestration layer (cli module).
+**Layer:** Distributable asset (bc-distribution). No new CLI commands or source modules — the skill orchestrates existing CLI tools (`raise memory build`, `raise memory context`) and uses Claude's file editing capabilities directly.
 
-**ADR-025 two-layer principle:**
-1. **Deterministic layer** — CLI command reads graph, computes correct frontmatter fields, writes them. No inference needed.
-2. **Inference layer** — Skill reads diff + current doc, uses AI judgment to update narrative sections (Purpose, Architecture, Key Files, Conventions).
+**Key insight (PAT-172):** Skill-over-CLI for infrequent AI tasks. Frontmatter comparison is mechanical but runs rarely (per-story). A skill reading graph JSON directly beats building a CLI command that would add code surface for minimal benefit.
 
 ## Approach
 
 ### What We're Building
 
-Two things:
+One thing: **`/docs-update` skill** (SKILL.md in `.claude/skills/docs-update/`)
 
-1. **`raise docs update` CLI command** — deterministic frontmatter updater
-   - Reads graph (index.json) and code analysis data
-   - For each affected module: computes correct `depends_on`, `depended_by`, `components`, `public_api`, `entry_points` from graph
-   - Writes updated frontmatter to module doc files
-   - Pure deterministic — no inference, no HITL needed
+The skill orchestrates the full coherence flow using existing infrastructure:
 
-2. **`/docs-update` skill** (SKILL.md in `.claude/skills/docs-update/`)
-   - Step 1: Run `raise memory build` to get fresh graph + diff
-   - Step 2: Run `raise docs update --dry-run` to see what frontmatter changes
-   - Step 3: Run `raise docs update` to apply deterministic frontmatter
-   - Step 4: If diff shows structural changes (new modules, moved components), use inference to update narrative sections of affected module docs
-   - Step 5: HITL review before any narrative changes are saved
+1. Run `raise memory build` → fresh graph + diff
+2. For each affected module (from diff, or all modules if no diff):
+   - Run `raise memory context mod-X --format json` → graph truth
+   - Read `governance/architecture/modules/X.md` → current frontmatter
+   - Compare machine-owned fields (`depends_on`, `depended_by`, `components`, `public_api`) against graph data
+   - Update frontmatter fields directly via file editing
+3. If diff shows structural changes (new modules, moved components), propose narrative section updates
+4. HITL review before any changes are written
+
+No new Python code. No new CLI command. The skill uses existing `raise memory` commands for data and Claude's editing tools for updates.
 
 ### Components Affected
 
 | Component | Change | What |
 |-----------|--------|------|
-| `src/raise_cli/cli/commands/docs.py` | Create | New `raise docs update` command |
-| `src/raise_cli/docs/updater.py` | Create | Deterministic frontmatter updater logic |
-| `src/raise_cli/docs/__init__.py` | Create | Module init |
 | `.claude/skills/docs-update/SKILL.md` | Create | Skill definition |
-| `src/raise_cli/cli/main.py` | Modify | Register `docs_app` sub-app |
 
 ### Data Flow
 
@@ -60,51 +54,34 @@ raise memory build
         ↓
    index.json (graph) + last-diff.json
         ↓
-raise docs update [--modules mod-X mod-Y] [--dry-run]
+raise memory context mod-X --format json  (per module)
         ↓
-   Reads graph → extracts module nodes with metadata
-   Reads code analysis → imports, exports, component counts
-   Reads current frontmatter → parses existing YAML
+   Graph truth: code_imports, code_exports, code_components,
+                depends_on edges, depended_by (reverse)
         ↓
-   Computes diff per field (old frontmatter vs graph truth)
+Read governance/architecture/modules/X.md
         ↓
-   --dry-run: prints what would change
-   default: writes updated frontmatter to module .md files
+   Current frontmatter: depends_on, depended_by, components, public_api
+        ↓
+Compare → show diffs → HITL → apply via Edit tool
+```
+
+### Frontmatter Field Sources
+
+```python
+# Machine-owned fields (skill compares and updates):
+{
+    "depends_on": [...],    # from code_imports in graph metadata
+    "depended_by": [...],   # from reverse depends_on edges in graph
+    "components": N,        # from code_components in graph metadata
+    "public_api": [...],    # from code_exports in graph metadata
+}
+
+# Human-owned fields (skill never touches):
+# - purpose, constraints, status
 ```
 
 ## Examples
-
-### CLI Command — Dry Run
-
-```bash
-$ raise docs update --dry-run
-Module: mod-memory
-  depends_on: [config] → [config, schemas]  (added: schemas)
-  components: 25 → 30  (changed)
-
-Module: mod-context
-  public_api: added GraphDiff, diff_graphs
-  components: 20 → 25  (changed)
-
-2 modules would be updated
-```
-
-### CLI Command — Apply
-
-```bash
-$ raise docs update
-✓ mod-memory: updated depends_on, components
-✓ mod-context: updated public_api, components
-2 modules updated
-```
-
-### CLI Command — Specific Modules
-
-```bash
-$ raise docs update --modules mod-memory mod-context
-✓ mod-memory: updated depends_on, components
-✓ mod-context: updated public_api, components
-```
 
 ### Skill Invocation
 
@@ -113,49 +90,40 @@ User: /docs-update
 
 Rai:
 1. Building fresh graph... done (345 nodes)
-2. Diff: 12 nodes changed (5 added, 2 removed, 5 modified), 3 modules affected
-3. Frontmatter updates (deterministic):
-   - mod-memory: depends_on, components
-   - mod-context: public_api, components
-   Applied.
-4. Structural changes detected — reviewing narrative for mod-context...
+2. Diff: 12 nodes changed, 3 modules affected (mod-memory, mod-context, mod-cli)
+3. Comparing graph vs docs...
+
+   mod-memory:
+     depends_on: [config] → [config, schemas]
+     components: 25 → 30
+
+   mod-context:
+     public_api: +GraphDiff, +diff_graphs
+     components: 20 → 25
+
+   mod-cli: no frontmatter changes
+
+4. Apply frontmatter updates? [y/n]
+   → Applied.
+5. Structural changes detected — reviewing narrative for mod-context...
    [shows proposed narrative changes]
-5. HITL: Apply narrative changes? [y/n]
-```
-
-### Frontmatter Field Sources
-
-```python
-# What the updater computes from graph data:
-{
-    "depends_on": ["config", "schemas"],        # from code_imports in graph metadata
-    "depended_by": ["cli", "session"],          # from reverse dependency edges
-    "components": 30,                           # from discovery component count
-    "public_api": ["UnifiedGraph", "..."],      # from code_exports in graph metadata
-    "entry_points": ["raise memory build"],     # from CLI command registration
-}
-
-# What it does NOT touch (human-owned):
-# - purpose (hybrid — skill can suggest updates)
-# - constraints (human domain knowledge)
-# - status (human decision)
+6. Apply narrative changes? [y/n]
 ```
 
 ## Acceptance Criteria
 
 **MUST:**
-- `raise docs update` reads graph and updates module doc frontmatter deterministically
-- `raise docs update --dry-run` shows changes without writing
+- `/docs-update` skill builds graph, compares against module doc frontmatter
 - Updates `depends_on`, `depended_by`, `components`, `public_api` from graph data
-- `/docs-update` skill orchestrates build → frontmatter update → narrative review
-- HITL gate before any inference-based narrative changes
+- HITL gate before writing any changes (frontmatter or narrative)
+- Works standalone and as subagent from lifecycle skills
 
 **SHOULD:**
-- `--modules` flag to scope updates to specific modules
-- Preserve YAML field ordering in frontmatter when rewriting
-- Show clear diff output for both dry-run and apply modes
+- Use diff (last-diff.json) to scope to affected modules when available
+- Fall back to all modules when no diff exists
+- Show clear before/after for each field change
 
 **MUST NOT:**
-- Overwrite human-owned fields (`constraints`, `status`) deterministically
-- Apply narrative changes without HITL review
-- Require a diff to exist — should work from graph alone (diff enhances, doesn't gate)
+- Overwrite human-owned fields (`constraints`, `status`, `purpose`)
+- Apply changes without HITL review
+- Require new Python source code or CLI commands
