@@ -4,7 +4,7 @@ name: rai_base
 purpose: "Base identity, patterns, and framework content that ships with raise-cli and gets copied on 'raise init'"
 status: current
 depends_on: []
-depended_by: [onboarding]
+depended_by: [cli, onboarding]
 entry_points: []
 public_api:
   - "__version__"

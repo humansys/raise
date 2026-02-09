@@ -4,21 +4,28 @@ name: discovery
 purpose: "Scan codebases to extract structural knowledge — symbols, components, modules, and drift detection"
 status: current
 depends_on: []
-depended_by: [cli, output]
+depended_by: [cli]
 entry_points:
   - "raise discover scan"
   - "raise discover analyze"
   - "raise discover drift"
   - "raise discover build"
 public_api:
-  - "scan_directory"
-  - "extract_symbols"
-  - "detect_drift"
-  - "Analyzer.analyze"
-  - "Symbol"
-  - "ScanResult"
+  - "DriftSeverity"
   - "DriftWarning"
-components: 26
+  - "EXTENSION_TO_LANGUAGE"
+  - "Language"
+  - "ScanResult"
+  - "Symbol"
+  - "SymbolKind"
+  - "detect_drift"
+  - "detect_language"
+  - "extract_javascript_symbols"
+  - "extract_python_symbols"
+  - "extract_symbols"
+  - "extract_typescript_symbols"
+  - "scan_directory"
+components: 45
 constraints:
   - "Independent of governance module — no cross-imports"
   - "All analysis is deterministic — no AI inference in CLI"

@@ -1,23 +1,24 @@
 current_work:
-  epic: ''
-  story: ''
-  phase: ''
-  branch: v2
+  epic: E16
+  story: S16.3
+  phase: implement
+  branch: story/s16.3/docs-update-skill
 last_session:
-  id: SES-115
-  date: '2026-02-08'
+  id: SES-125
+  date: '2026-02-09'
   developer: Emilio
-  summary: S7.3 /project-onboard skill — full story lifecycle from start through close.
-    Brownfield onboarding skill with discovery pipeline integration. Also fixed guardrails
-    format harmonization (raise init --detect output now parser-compatible). Closed
-    E7 epic — all 3 milestones achieved, merged to v2.
-  patterns_captured:
-  - PAT-SES-115
+  summary: Ran /docs-update skill against all 15 modules — synced frontmatter (depends_on,
+    depended_by, public_api, components) with graph truth, fixed output narrative
+    stale dependency
+  patterns_captured: []
 pending:
   decisions: []
   blockers: []
   next_actions:
-  - Pick next epic from backlog
-notes: E7 complete. Full onboarding pipeline delivered in single day.
+  - /story-review for S16.3
+  - /story-close for S16.3
+  - 'S16.4: Lifecycle Integration (wire /docs-update into story-close)'
+notes: Short focused session — skill execution only, no code changes. Story ready
+  for review + close next session.
 progress: null
 completed_epics: []

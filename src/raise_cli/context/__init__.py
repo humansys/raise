@@ -7,11 +7,13 @@ Components:
     - models: ConceptNode, ConceptEdge, NodeType, EdgeType
     - graph: UnifiedGraph class wrapping NetworkX
     - query: UnifiedQueryEngine for context retrieval
+    - diff: Graph diffing for change detection
 """
 
 from __future__ import annotations
 
 from raise_cli.context.builder import UnifiedGraphBuilder
+from raise_cli.context.diff import GraphDiff, NodeChange, diff_graphs
 from raise_cli.context.graph import UnifiedGraph
 from raise_cli.context.models import ConceptEdge, ConceptNode, EdgeType, NodeType
 from raise_cli.context.query import (
@@ -26,9 +28,12 @@ __all__ = [
     "ConceptEdge",
     "ConceptNode",
     "EdgeType",
+    "GraphDiff",
+    "NodeChange",
     "NodeType",
     "UnifiedGraph",
     "UnifiedGraphBuilder",
+    "diff_graphs",
     "UnifiedQuery",
     "UnifiedQueryEngine",
     "UnifiedQueryMetadata",
