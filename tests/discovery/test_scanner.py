@@ -63,6 +63,39 @@ class TestSymbol:
         assert symbol.kind == "function"
         assert symbol.parent is None
 
+    def test_create_enum_symbol(self) -> None:
+        """Test creating an enum symbol."""
+        symbol = Symbol(
+            name="UserRole",
+            kind="enum",
+            file="roles.ts",
+            line=1,
+            signature="enum UserRole",
+        )
+        assert symbol.kind == "enum"
+
+    def test_create_type_alias_symbol(self) -> None:
+        """Test creating a type alias symbol."""
+        symbol = Symbol(
+            name="UserId",
+            kind="type_alias",
+            file="types.ts",
+            line=1,
+            signature="type UserId",
+        )
+        assert symbol.kind == "type_alias"
+
+    def test_create_constant_symbol(self) -> None:
+        """Test creating a constant symbol."""
+        symbol = Symbol(
+            name="MAX_RETRIES",
+            kind="constant",
+            file="config.ts",
+            line=1,
+            signature="const MAX_RETRIES",
+        )
+        assert symbol.kind == "constant"
+
 
 class TestScanResult:
     """Tests for ScanResult model."""
@@ -340,6 +373,16 @@ class TestScanDirectory:
         assert any(s.name == "PyClass" for s in result.symbols)
         assert any(s.name == "TsClass" for s in result.symbols)
 
+    def test_scan_tsx_files_with_language_filter(self, tmp_path: Path) -> None:
+        """Test that .tsx files are found when language=typescript."""
+        (tmp_path / "App.tsx").write_text("function App() { return null; }")
+        (tmp_path / "utils.ts").write_text("function helper() {}")
+
+        result = scan_directory(tmp_path, language="typescript")
+        assert result.files_scanned == 2
+        assert any(s.name == "App" for s in result.symbols)
+        assert any(s.name == "helper" for s in result.symbols)
+
 
 class TestExtractTypescriptSymbols:
     """Tests for extract_typescript_symbols function."""
@@ -499,6 +542,14 @@ class TestDetectLanguage:
         assert detect_language("foo.jsx") == "javascript"
         assert detect_language("foo.mjs") == "javascript"
         assert detect_language("foo.cjs") == "javascript"
+
+    def test_php_extensions(self) -> None:
+        """Test PHP file extensions."""
+        assert detect_language("foo.php") == "php"
+
+    def test_svelte_extensions(self) -> None:
+        """Test Svelte file extensions."""
+        assert detect_language("foo.svelte") == "svelte"
 
     def test_unsupported_extension(self) -> None:
         """Test unsupported file extensions return None."""

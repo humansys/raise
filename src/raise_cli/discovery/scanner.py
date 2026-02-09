@@ -24,10 +24,21 @@ if TYPE_CHECKING:
     from tree_sitter import Node, Parser
 
 # Symbol kinds that can be extracted
-SymbolKind = Literal["class", "function", "method", "module", "interface"]
+SymbolKind = Literal[
+    "class",
+    "function",
+    "method",
+    "module",
+    "interface",
+    "enum",
+    "type_alias",
+    "constant",
+    "trait",
+    "component",
+]
 
 # Supported languages for scanning
-Language = Literal["python", "typescript", "javascript"]
+Language = Literal["python", "typescript", "javascript", "php", "svelte"]
 
 # File extension to language mapping
 EXTENSION_TO_LANGUAGE: dict[str, Language] = {
@@ -38,6 +49,8 @@ EXTENSION_TO_LANGUAGE: dict[str, Language] = {
     ".jsx": "javascript",
     ".mjs": "javascript",
     ".cjs": "javascript",
+    ".php": "php",
+    ".svelte": "svelte",
 }
 
 
@@ -531,12 +544,14 @@ DEFAULT_EXCLUDE_PATTERNS: list[str] = [
     "**/.git/**",
 ]
 
-# Language-specific default glob patterns
-DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, str] = {
-    "python": "**/*.py",
-    "typescript": "**/*.ts",
-    "javascript": "**/*.js",
-    None: "**/*",  # Auto-detect: scan all files
+# Language-specific default glob patterns (list to support multiple extensions)
+DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, list[str]] = {
+    "python": ["**/*.py"],
+    "typescript": ["**/*.ts", "**/*.tsx"],
+    "javascript": ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
+    "php": ["**/*.php"],
+    "svelte": ["**/*.svelte"],
+    None: ["**/*"],  # Auto-detect: scan all files
 }
 
 
@@ -652,28 +667,41 @@ def scan_directory(
     if gitignore_patterns:
         exclude_patterns = list(exclude_patterns) + gitignore_patterns
 
-    if pattern is None:
-        pattern = DEFAULT_LANGUAGE_PATTERNS.get(language, "**/*")
+    # Resolve glob patterns: single pattern string or language-specific defaults
+    if pattern is not None:
+        patterns = [pattern]
+    else:
+        patterns = DEFAULT_LANGUAGE_PATTERNS.get(language, ["**/*"])
 
     result = ScanResult()
     root = path.resolve()
 
-    for file_path in path.glob(pattern):
-        if file_path.is_dir():
-            continue
+    # Collect files from all patterns, dedup by resolved path
+    seen: set[Path] = set()
+    for glob_pattern in patterns:
+        for file_path in path.glob(glob_pattern):
+            if file_path.is_dir():
+                continue
 
-        if _should_exclude(file_path, exclude_patterns):
-            continue
+            resolved = file_path.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
 
-        rel_path = (
-            file_path.relative_to(root) if file_path.is_relative_to(root) else file_path
-        )
-        rel_str = str(rel_path)
+            if _should_exclude(file_path, exclude_patterns):
+                continue
 
-        file_language = language or detect_language(file_path)
-        if file_language is None:
-            continue
+            rel_path = (
+                file_path.relative_to(root)
+                if file_path.is_relative_to(root)
+                else file_path
+            )
+            rel_str = str(rel_path)
 
-        _process_source_file(file_path, rel_str, file_language, result)
+            file_language = language or detect_language(file_path)
+            if file_language is None:
+                continue
+
+            _process_source_file(file_path, rel_str, file_language, result)
 
     return result
