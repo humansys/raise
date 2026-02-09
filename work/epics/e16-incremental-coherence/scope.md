@@ -21,96 +21,118 @@ Prevent architecture documentation and graph drift through small-batch updates i
 
 | Module | Domain | Layer | Role in Epic |
 |--------|--------|-------|--------------|
-| `mod-context` | bc-ontology | Integration | Graph diffing, change set generation |
-| `mod-discovery` | bc-discovery | Domain | Validation via full discovery rerun |
-| `mod-memory` | bc-ontology | Integration | Build command enhancement |
-| `mod-cli` | bc-tooling | Orchestration | New commands, story-close integration |
+| `mod-context` | bc-ontology | Integration | Code analyzers, graph diffing, builder enrichment |
+| `mod-memory` | bc-ontology | Integration | Build command `--diff` flag |
+| `mod-cli` | bc-tooling | Orchestration | CLI integration, story-close wiring |
 
-**Cross-domain:** Epic spans bc-ontology and bc-discovery — justified because coherence requires comparing graph (ontology) against code reality (discovery).
+**Cross-domain:** Contained within bc-ontology + bc-tooling. Code analysis lives in context (ontology domain) because it feeds the knowledge graph directly.
 
 **Key constraints from graph:**
 - MUST: Type hints, Pydantic models, >90% coverage (all standard guardrails)
 - Architecture: Engine/content separation, deterministic CLI + inference skill (PAT-200)
+- Protocol pattern for code analyzers enables platform agnosticism (principle-platform-agnosticism)
+
+**Key patterns informing revised design:**
+- PAT-066: tree-sitter for multi-language AST (future analyzers, not S16.1)
+- PAT-200: Deterministic (CLI) for structure, inference (skill) for content
+- PAT-053: Unified graph query as Step 1, raw file reads as fallback
 
 ---
 
-## Stories (4 planned)
+## Stories (4 planned — resequenced 2026-02-09)
 
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
-| S16.1 | Graph Diff Engine | M | Pending | Compare old vs new unified graph, emit structured change set (added/removed/modified nodes and edges) |
-| S16.2 | Deterministic Doc Updater | S | Pending | Auto-update factual frontmatter in module docs from code analysis (imports, public API, components) |
-| S16.3 | AI Doc Regeneration | M | Pending | Subagent regenerates narrative sections in affected docs when structural changes detected |
-| S16.4 | Lifecycle Integration | S | Pending | Wire coherence check into story-close (Step 1.75), add discovery-as-validation command |
+| S16.1 | Code-Aware Graph | S | ✅ Done | Pluggable `CodeAnalyzer` Protocol + `PythonAnalyzer` (ast-based) to enrich graph with real imports/exports/components |
+| S16.2 | Graph Diff Engine | M | Pending | Compare old vs new unified graph via `diff_graphs()`, expose as `raise memory build --diff` |
+| S16.3 | Docs Update Skill | M | Pending | `/docs-update` skill — subagent compares graph vs module docs, updates frontmatter + narrative |
+| S16.4 | Lifecycle Integration | S | Pending | Wire `/docs-update` into story-close as subagent, HITL gate |
 
 **Total:** 4 stories, ~2S + 2M
+
+**Design decisions (2026-02-09 session):**
+- S16.2+S16.3 from original plan merged into single `/docs-update` skill (AI updates both frontmatter and narrative)
+- New S16.1 added as prerequisite: graph must have real code data before diff is useful
+- `/docs-update` compares graph vs docs directly (robust) — doesn't depend on transient diff file
+- `/docs-update` runs as subagent with own context window, uses `raise memory` CLI for context
+- CodeAnalyzer is a Protocol — pluggable for future TS/PHP support (parkinglotted)
 
 ---
 
 ## In Scope
 
 **MUST:**
-- Graph diffing: compare two graph snapshots, produce structured change set
-- Deterministic frontmatter update for module docs (depends_on, depended_by, entry_points, public_api, components)
-- Story-close integration point (Step 1.75, after existing structural drift check)
+- Code-aware graph: `CodeAnalyzer` Protocol + `PythonAnalyzer` enriching module nodes with real imports/exports/components
+- Graph diffing: compare two graph snapshots via `diff_graphs()`, produce structured change set
+- `raise memory build --diff` CLI: single build, diff as side effect, persists diff
+- `/docs-update` skill: AI subagent updates both frontmatter AND narrative for affected module docs
+- `/docs-update` compares graph vs docs directly (robust, works without diff file)
+- Story-close integration: spawns `/docs-update` as subagent with HITL gate
 - HITL gate: human reviews all doc changes before commit
-- Full discovery as validation audit (verify incremental state)
 
 **SHOULD:**
-- AI subagent for narrative section regeneration (high-level docs, module purpose updates)
 - Change set includes categorized impact (frontmatter-only vs structural vs architectural)
-- `raise coherence check` CLI command for ad-hoc use outside lifecycle
+- `/docs-update` invocable manually outside lifecycle for ad-hoc use
+- `ModuleInfo` model captures entry_points for CLI commands
 
 ---
 
 ## Out of Scope (defer to parking lot)
 
+- **Multi-language code analyzers** (TS, PHP) → Post-E16, needed for F&F devs on mixed-stack monorepos. Protocol is ready.
 - **Drift detector calibration** (SES-118) → Separate item, complements but doesn't block
 - **Real-time/watch-mode detection** → Post-V3, no current need
 - **Cross-project coherence** → V3 scope (multi-project Rai)
 - **Auto-commit without human review** → Violates HITL principle
 - **High-level doc restructuring** (bounded context boundaries, layer redesign) → Human-only decisions
+- **Rename discovery namespace to discover** → Cosmetic, low priority
+- **Merge /discover-complete into /discover-validate** → Simplification, post-F&F
 
 ---
 
-## Architecture
+## Architecture (revised 2026-02-09)
 
-### Two-Layer Design (ADR-025)
+### Three-Layer Design (ADR-025 evolved)
 
 ```
-Story work changes code
+Code changes (gemba moves)
          │
          ▼
 ┌─────────────────────────┐
-│   Layer 1: CLI          │  Deterministic
-│   (raise memory build   │
-│    --diff)              │
-│                         │
-│   Input: old graph +    │
-│          new sources    │
-│   Output: GraphDiff     │
-│     - added nodes/edges │
-│     - removed           │
-│     - modified          │
-│     - impact category   │
-└────────┬────────────────┘
+│ Layer 0: Code Analysis   │  Deterministic (S16.1)
+│ (CodeAnalyzer Protocol)  │
+│                          │
+│ PythonAnalyzer (ast)     │
+│ → ModuleInfo per module  │
+│ → real imports, exports  │
+│ → component counts       │
+└────────┬─────────────────┘
+         │ enriches
+         ▼
+┌─────────────────────────┐
+│ Layer 1: Graph + Diff    │  Deterministic (S16.2)
+│ (raise memory build      │
+│  --diff)                 │
+│                          │
+│ Input: old graph +       │
+│        new sources +     │
+│        code analysis     │
+│ Output: GraphDiff        │
+│   - added/removed/mod    │
+│   - affected modules     │
+└────────┬─────────────────┘
          │
          ▼
 ┌─────────────────────────┐
-│   Frontmatter-only?     │──yes──▶ Auto-update module docs
-│                         │         (deterministic, no review)
-└────────┬────────────────┘
-         │ no (structural changes)
-         ▼
-┌─────────────────────────┐
-│   Layer 2: Skill        │  Inference
-│   (subagent)            │
-│                         │
-│   Input: GraphDiff +    │
-│          affected docs  │
-│   Output: Updated docs  │
-│          (human reviews) │
-└────────┬────────────────┘
+│ Layer 2: /docs-update    │  Inference (S16.3)
+│ (AI subagent)            │
+│                          │
+│ Compares graph vs docs   │
+│ Updates frontmatter +    │
+│   narrative together     │
+│ Uses raise memory CLI    │
+│   for context            │
+└────────┬─────────────────┘
          │
          ▼
     HITL review
@@ -119,7 +141,26 @@ Story work changes code
     Commit with story
 ```
 
-### Graph Diff Data Model
+### Code Analysis Models (S16.1)
+
+```python
+class ModuleInfo(BaseModel):
+    """Language-agnostic module analysis result."""
+    name: str
+    language: str
+    source_path: str
+    imports: list[str]
+    exports: list[str]
+    component_count: int
+    entry_points: list[str]
+
+class CodeAnalyzer(Protocol):
+    """Pluggable per-language analyzer."""
+    def detect(self, project_root: Path) -> bool: ...
+    def analyze_modules(self, project_root: Path) -> list[ModuleInfo]: ...
+```
+
+### Graph Diff Data Model (S16.2)
 
 ```python
 class NodeChange(BaseModel):
@@ -127,7 +168,7 @@ class NodeChange(BaseModel):
     change_type: Literal["added", "removed", "modified"]
     old_value: ConceptNode | None
     new_value: ConceptNode | None
-    changed_fields: list[str]  # For modified: which fields changed
+    changed_fields: list[str]
 
 class EdgeChange(BaseModel):
     source: str
@@ -140,10 +181,10 @@ class GraphDiff(BaseModel):
     edge_changes: list[EdgeChange]
     impact: Literal["none", "frontmatter", "structural", "architectural"]
     affected_modules: list[str]
-    summary: str  # Human-readable one-liner
+    summary: str
 ```
 
-### Lifecycle Integration
+### Lifecycle Integration (S16.4)
 
 ```
 story-close (existing):
@@ -151,11 +192,13 @@ story-close (existing):
   Step 1.5: Check structural drift (existing)
   Step 1.75: COHERENCE CHECK (NEW)           ◄━━━━
              │
-             ├─ rebuild graph
-             ├─ diff against previous
-             ├─ if frontmatter changes: auto-update docs
-             ├─ if structural changes: flag for subagent
-             ├─ human reviews changes
+             ├─ spawn /docs-update subagent
+             │    ├─ runs raise memory build --diff
+             │    ├─ compares graph vs module docs
+             │    ├─ updates affected docs (frontmatter + narrative)
+             │    └─ returns summary of changes
+             │
+             ├─ HITL: human reviews doc changes
              └─ commit doc updates with story
   Step 2:   Identify parent branch
   ...
@@ -172,10 +215,11 @@ story-close (existing):
 - [ ] All quality checks pass (ruff, pyright, bandit)
 
 ### Epic Complete
-- [ ] Graph diff produces accurate change sets on real raise-commons data
-- [ ] Module doc frontmatter auto-updates correctly from code changes
-- [ ] Story-close coherence step triggers on structural changes
-- [ ] Full discovery validates incremental state (no regression)
+- [ ] `raise memory build` produces graph with real code data (imports, exports, component counts)
+- [ ] `raise memory build --diff` produces accurate change sets on real raise-commons data
+- [ ] `/docs-update` skill updates module docs (frontmatter + narrative) from graph state
+- [ ] `/docs-update` works both manually and as subagent from story-close
+- [ ] Story-close spawns `/docs-update` subagent with HITL gate
 - [ ] Architecture docs updated for new modules/capabilities
 - [ ] Epic retrospective done
 - [ ] Merged to v2
@@ -185,18 +229,19 @@ story-close (existing):
 ## Dependencies
 
 ```
-S16.1 Graph Diff Engine (foundation)
+S16.1 Code-Aware Graph (prerequisite)
   │
-  ├──▶ S16.2 Deterministic Doc Updater
+  ├──▶ [Discovery refresh — re-run discover + update docs with real data]
   │
-  └──▶ S16.3 AI Doc Regeneration
+  └──▶ S16.2 Graph Diff Engine (foundation)
               │
-              ▼
-        S16.4 Lifecycle Integration (needs S16.1 + S16.2, optionally S16.3)
+              └──▶ S16.3 Docs Update Skill (/docs-update)
+                          │
+                          └──▶ S16.4 Lifecycle Integration
 ```
 
-S16.2 and S16.3 can be parallel after S16.1 completes.
-S16.4 requires S16.1 + S16.2 at minimum. S16.3 can be wired in later.
+Sequential chain: each story depends on the previous.
+Discovery refresh between S16.1 and S16.2 is an activity, not a story.
 
 **External blockers:** None.
 
@@ -224,17 +269,18 @@ S16.4 requires S16.1 + S16.2 at minimum. S16.3 can be wired in later.
 
 ### Key Risks
 
-- **Graph diff accuracy** (Medium likelihood, High impact): False positives in diff could trigger unnecessary doc rewrites. Mitigation: conservative change detection, HITL gate.
-- **Subagent quality** (Medium likelihood, Medium impact): AI-generated doc sections may need significant editing. Mitigation: start with frontmatter-only (S16.2), add AI layer (S16.3) incrementally.
-- **Story-close latency** (Low likelihood, Low impact): Extra step adds time. Mitigation: skip when no structural changes detected.
+- **PythonAnalyzer import patterns** (Medium likelihood, Medium impact): Real codebases have conditional imports, TYPE_CHECKING blocks, relative imports. Mitigation: test against actual raise-commons modules.
+- **Graph diff noise** (Medium likelihood, High impact): False positives in diff trigger unnecessary doc rewrites. Mitigation: conservative change detection, HITL gate.
+- **`/docs-update` subagent quality** (Medium likelihood, Medium impact): AI-generated doc sections may need editing. Mitigation: compares graph vs docs directly (grounded in data), HITL review.
+- **Story-close latency** (Low likelihood, Low impact): Subagent adds time. Mitigation: skip when no changes detected.
 
 ### Key Patterns Informing Design
 
+- **PAT-066:** tree-sitter for multi-language AST (future analyzers)
 - **PAT-196:** Architecture docs are the map — stale docs cause wrong paths
 - **PAT-200:** Deterministic (CLI) for structure, inference (skill) for content
 - **PAT-202/203:** Templates-as-contract — doc structure IS the contract
 - **PAT-174:** Architecture docs are intentional governance — deviating is drift
-- **PAT-191:** Simplest architecture is discovered, not designed upfront
 
 ---
 
@@ -242,70 +288,63 @@ S16.4 requires S16.1 + S16.2 at minimum. S16.3 can be wired in later.
 
 > Added by `/epic-plan` — 2026-02-08
 
-### Sequencing Strategy
+### Sequencing Strategy (revised 2026-02-09)
 
-**Risk-first + Walking Skeleton.** S16.1 (graph diff) is the foundation — highest uncertainty (new capability), highest value (enables everything else). S16.2 follows immediately to prove the architecture end-to-end (diff → doc update). S16.3 is the riskiest inference work but isolated — can be deferred or simplified without blocking integration. S16.4 wires it all together.
+**Prerequisite-first.** S16.1 (code-aware graph) must come first — without real code data in the graph, the diff engine would be blind to code changes. After S16.1, a discovery refresh grounds the docs in real data. Then S16.2 (diff engine) becomes meaningful, S16.3 (docs-update skill) consumes the diff, and S16.4 wires it into the lifecycle.
 
 ### Story Sequence
 
 | Order | Story | Size | Dependencies | Milestone | Rationale |
 |:-----:|-------|:----:|:-------------|-----------|-----------|
-| 1 | S16.1: Graph Diff Engine | M | None | M1 | Foundation — everything depends on this. Highest uncertainty (new data model, comparison logic). |
-| 2 | S16.2: Deterministic Doc Updater | S | S16.1 | M1 | Walking skeleton — proves diff → doc update end-to-end. Deterministic, testable, low risk. |
-| 3 | S16.3: AI Doc Regeneration | M | S16.1 | M2 | Inference layer — riskiest but isolated. Can be simplified to prompt template if subagent approach is too complex. |
-| 4 | S16.4: Lifecycle Integration | S | S16.1, S16.2 | M3 | Wiring — integrates into story-close. Low risk once components exist. Optionally wires S16.3 if ready. |
+| 1 | S16.1: Code-Aware Graph | S | None | Prereq | Graph must have real code data (imports, exports) before diff is useful |
+| — | Discovery refresh | — | S16.1 | Prereq | Re-run discover + update module docs with enriched graph data |
+| 2 | S16.2: Graph Diff Engine | M | S16.1 | M1 | Pure `diff_graphs()` + `raise memory build --diff` CLI. Foundation for downstream. |
+| 3 | S16.3: Docs Update Skill | M | S16.2 | M2 | `/docs-update` — subagent compares graph vs docs, updates both frontmatter + narrative |
+| 4 | S16.4: Lifecycle Integration | S | S16.3 | M3 | Wire `/docs-update` into story-close as subagent with HITL gate |
 
 ### Milestones
 
 | Milestone | Stories | Success Criteria | Demo |
 |-----------|---------|------------------|------|
-| **M1: Walking Skeleton** | S16.1 + S16.2 | `raise memory build --diff` produces change set; module doc frontmatter auto-updates from diff | Run build --diff, show changed nodes, show updated module doc |
-| **M2: AI Layer** | + S16.3 | Subagent regenerates narrative sections for affected docs; HITL review works | Trigger structural change, show regenerated doc section, review diff |
-| **M3: Epic Complete** | + S16.4 | Coherence check runs in story-close Step 1.75; discovery-as-validation verifies state | Full story-close flow with coherence step; `raise discover validate` confirms no regression |
-
-### Parallel Opportunities
-
-```
-Time →
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Stream 1: S16.1 ──► S16.2 ──► S16.4
-                      ↓ enables    ↑ optionally wires
-Stream 2:           S16.3 ────────┘
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-```
-
-S16.2 and S16.3 could run in parallel after S16.1, but given single-developer flow, sequential is more practical. S16.3 can be deferred past S16.4 if needed — lifecycle integration works with deterministic-only (Layer 1).
+| **Prereq: Code-Aware Graph** | S16.1 + discovery refresh | `raise memory build` produces graph with real imports/exports; module docs refreshed | Run build, query mod-context, show real depends_on from code |
+| **M1: Graph Diff** | + S16.2 | `raise memory build --diff` produces accurate change set | Make a code change, run build --diff, show detected changes |
+| **M2: Docs Update** | + S16.3 | `/docs-update` skill updates affected module docs (frontmatter + narrative) | Run /docs-update, show updated module doc |
+| **M3: Epic Complete** | + S16.4 | story-close spawns /docs-update subagent, HITL review, commit | Full story-close flow with coherence step |
 
 ### Sequencing Rationale
 
-**S16.1 first:** Only story with real uncertainty — new Pydantic models, comparison algorithm, impact categorization. If this takes longer than expected, the rest adjusts. Proves the core hypothesis: "can we diff two graphs meaningfully?"
+**S16.1 first:** Without real code data in the graph, the diff is blind. This is S-sized (Python ast + Protocol + builder integration) but enables everything else.
 
-**S16.2 second:** Completes the walking skeleton. Takes the diff output from S16.1 and writes to actual files. Low risk — reading frontmatter, updating fields, preserving body. But proves the full loop works.
+**Discovery refresh after S16.1:** Not a story — an activity. Re-run discover with the enriched graph to ground all module docs in real data before we start diffing.
 
-**S16.3 third:** Isolated inference work. Depends only on S16.1's GraphDiff model as input. The subagent contract is the main design decision — what context does it receive, what does it produce? Can be simplified to a prompt template over `raise memory query` if full subagent is overkill.
+**S16.2 second:** Now that the graph has real data, diff becomes meaningful. Pure function `diff_graphs(old, new)` + CLI integration. Highest uncertainty (comparison algorithm, noise filtering).
 
-**S16.4 last:** Pure wiring. Takes working components and integrates into story-close skill + CLI command. Low risk, high visibility — this is where the user sees the value.
+**S16.3 third:** `/docs-update` skill. Compares graph vs docs directly (robust, no diff dependency). Runs as subagent with own context. Can also be invoked manually outside lifecycle.
+
+**S16.4 last:** Wiring. story-close spawns `/docs-update` subagent. HITL gate for review. Low risk once components exist.
 
 ### Sequencing Risks
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|:----------:|:------:|------------|
-| S16.1 diff is too noisy (false changes) | Medium | High | Conservative matching: ignore metadata-only changes, weight thresholds, HITL gate |
-| S16.3 subagent produces low-quality docs | Medium | Medium | Start with frontmatter-only path (S16.2). S16.3 is SHOULD scope — can be simplified or deferred |
+| PythonAnalyzer misses import patterns | Medium | Medium | Test against real raise-commons modules; handle relative/absolute/conditional imports |
+| Diff is too noisy (false changes) | Medium | High | Conservative matching: ignore metadata-only changes, HITL gate |
+| `/docs-update` subagent quality | Medium | Medium | Compares graph vs docs directly — grounded in data, not guessing |
 | Graph format changes break diff | Low | Medium | Pin GraphDiff model with tests against real unified.json snapshots |
 
 ### Progress Tracking
 
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
-| S16.1: Graph Diff Engine | M | Pending | - | |
-| S16.2: Deterministic Doc Updater | S | Pending | - | |
-| S16.3: AI Doc Regeneration | M | Pending | - | |
+| S16.1: Code-Aware Graph | S | ✅ Done | 30 min | 1.5x velocity |
+| S16.2: Graph Diff Engine | M | Pending | - | |
+| S16.3: Docs Update Skill | M | Pending | - | |
 | S16.4: Lifecycle Integration | S | Pending | - | |
 
 **Milestone Progress:**
-- [ ] M1: Walking Skeleton (S16.1 + S16.2)
-- [ ] M2: AI Layer (+ S16.3)
+- [ ] Prereq: Code-Aware Graph (S16.1 + discovery refresh)
+- [ ] M1: Graph Diff (+ S16.2)
+- [ ] M2: Docs Update (+ S16.3)
 - [ ] M3: Epic Complete (+ S16.4, retrospective, merge)
 
 ---
@@ -313,3 +352,4 @@ S16.2 and S16.3 could run in parallel after S16.1, but given single-developer fl
 *Epic tracking — update per story completion*
 *Created: 2026-02-08*
 *Plan added: 2026-02-08*
+*Design revised: 2026-02-09 (resequenced stories, code-aware graph prerequisite, merged S16.2+S16.3 into /docs-update)*
