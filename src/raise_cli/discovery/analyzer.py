@@ -375,17 +375,6 @@ def _file_to_module(file_path: str) -> str:
     return ".".join(parts)
 
 
-def _file_stem(file_path: str) -> str:
-    """Extract the file stem from a path.
-
-    Args:
-        file_path: Relative file path.
-
-    Returns:
-        File stem (e.g., "scanner" from "src/discovery/scanner.py").
-    """
-    return PurePosixPath(file_path).stem
-
 
 def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     """Fold methods into their parent classes.
@@ -415,7 +404,7 @@ def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     # Create class units (with methods folded in)
     for class_name, class_sym in class_symbols.items():
         methods = class_methods.get(class_name, [])
-        comp_id = f"comp-{_file_stem(class_sym.file)}-{class_name}"
+        comp_id = f"comp-{_file_to_module(class_sym.file)}-{class_name}"
         units.append(
             AnalyzedComponent(
                 id=comp_id,
@@ -439,7 +428,11 @@ def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     # Add standalone functions and modules (skip methods — they're folded)
     for s in symbols:
         if s.kind in ("function", "module"):
-            comp_id = f"comp-{_file_stem(s.file)}-{s.name}"
+            # Use "module" as suffix for module-level entries to avoid
+            # collisions with same-named functions (e.g., test_version.py
+            # has both module "test_version" and function "test_version")
+            id_name = "module" if s.kind == "module" else s.name
+            comp_id = f"comp-{_file_to_module(s.file)}-{id_name}"
             units.append(
                 AnalyzedComponent(
                     id=comp_id,
@@ -535,6 +528,17 @@ def analyze(
     # Build hierarchy (fold methods into classes)
     # Returns (units, symbol_map) so we can reuse original Symbols for scoring
     units, symbol_map = _build_hierarchy_with_symbols(public)
+
+    # Jidoka: stop on duplicate IDs — silent data loss is unacceptable
+    seen_ids: dict[str, str] = {}
+    for unit in units:
+        if unit.id in seen_ids:
+            msg = (
+                f"Duplicate component IDs detected: '{unit.id}' "
+                f"in {unit.file} collides with {seen_ids[unit.id]}"
+            )
+            raise ValueError(msg)
+        seen_ids[unit.id] = unit.file
 
     # Score confidence + categorize + extract purpose
     for unit in units:
