@@ -184,6 +184,40 @@ class TestBootstrapPartialState:
         assert result.methodology_copied
 
 
+class TestBootstrapScripts:
+    """Tests for hook script scaffolding."""
+
+    def test_copies_hook_scripts(self, tmp_path: Path) -> None:
+        """Should copy hook scripts to .raise/scripts/."""
+        result = bootstrap_rai_base(tmp_path)
+
+        scripts_dir = tmp_path / ".raise" / "scripts"
+        assert (scripts_dir / "log-skill-complete.sh").exists()
+        assert (scripts_dir / "log-skill-start.sh").exists()
+        assert (scripts_dir / "log-session-event.sh").exists()
+        assert result.scripts_copied
+
+    def test_scripts_are_executable(self, tmp_path: Path) -> None:
+        """Hook scripts should have executable permission."""
+        bootstrap_rai_base(tmp_path)
+
+        script = tmp_path / ".raise" / "scripts" / "log-skill-complete.sh"
+        import os
+        assert os.access(script, os.X_OK)
+
+    def test_does_not_overwrite_existing_scripts(self, tmp_path: Path) -> None:
+        """Should not overwrite existing hook scripts."""
+        bootstrap_rai_base(tmp_path)
+
+        script = tmp_path / ".raise" / "scripts" / "log-skill-complete.sh"
+        script.write_text("#!/bin/bash\n# Custom script")
+
+        result = bootstrap_rai_base(tmp_path)
+
+        assert script.read_text() == "#!/bin/bash\n# Custom script"
+        assert not result.scripts_copied
+
+
 class TestBootstrapResult:
     """Tests for BootstrapResult model."""
 
@@ -194,6 +228,7 @@ class TestBootstrapResult:
         assert not result.identity_copied
         assert not result.patterns_copied
         assert not result.methodology_copied
+        assert not result.scripts_copied
         assert result.base_version == ""
         assert not result.already_existed
         assert result.files_copied == []

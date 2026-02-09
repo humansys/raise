@@ -34,6 +34,7 @@ class BootstrapResult(BaseModel):
     identity_copied: bool = False
     patterns_copied: bool = False
     methodology_copied: bool = False
+    scripts_copied: bool = False
     base_version: str = ""
     already_existed: bool = False
     files_copied: list[str] = Field(default_factory=list)
@@ -66,6 +67,9 @@ def bootstrap_rai_base(project_root: Path) -> BootstrapResult:
 
     # Copy methodology
     _copy_methodology(base, project_root, result)
+
+    # Copy hook scripts
+    _copy_scripts(base, project_root, result)
 
     # Determine if everything already existed
     result.already_existed = len(result.files_copied) == 0
@@ -160,3 +164,46 @@ def _copy_methodology(
     result.files_copied.append(str(dest))
     result.methodology_copied = True
     logger.debug("Copied: %s", dest)
+
+
+def _copy_scripts(
+    base: Traversable, project_root: Path, result: BootstrapResult
+) -> None:
+    """Copy hook scripts to .raise/scripts/.
+
+    Skills reference these scripts in their Stop hooks for telemetry.
+    Per-file idempotency — existing scripts are never overwritten.
+
+    Args:
+        base: importlib.resources Traversable for rai_base package.
+        project_root: Project root directory.
+        result: BootstrapResult to update.
+    """
+    scripts_dir = project_root / ".raise" / "scripts"
+    scripts_base = base / "scripts"
+
+    script_files = [
+        "log-skill-complete.sh",
+        "log-skill-start.sh",
+        "log-session-event.sh",
+        "log-artifact-created.sh",
+        "log-error-event.sh",
+    ]
+    copied_any = False
+
+    for filename in script_files:
+        dest = scripts_dir / filename
+        if dest.exists():
+            result.files_skipped.append(str(dest))
+            logger.debug("Skipped (exists): %s", dest)
+            continue
+
+        content = (scripts_base / filename).read_text()
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(content)
+        dest.chmod(0o755)
+        result.files_copied.append(str(dest))
+        copied_any = True
+        logger.debug("Copied: %s", dest)
+
+    result.scripts_copied = copied_any
