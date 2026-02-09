@@ -238,11 +238,12 @@ def extract_python_symbols(source: str, file_path: str) -> list[Symbol]:
 # -----------------------------------------------------------------------------
 
 
-def _get_ts_parser(language: Language) -> Parser:
+def _get_ts_parser(language: Language, *, file_path: str = "") -> Parser:
     """Get a tree-sitter parser for TypeScript or JavaScript.
 
     Args:
         language: Either "typescript" or "javascript".
+        file_path: File path (used to dispatch .tsx to TSX parser).
 
     Returns:
         Configured tree-sitter Parser.
@@ -262,7 +263,11 @@ def _get_ts_parser(language: Language) -> Parser:
     if language == "typescript":
         import tree_sitter_typescript as ts_typescript
 
-        lang = TSLanguage(ts_typescript.language_typescript())
+        is_tsx = file_path.endswith(".tsx")
+        if is_tsx:
+            lang = TSLanguage(ts_typescript.language_tsx())
+        else:
+            lang = TSLanguage(ts_typescript.language_typescript())
     else:
         import tree_sitter_javascript as ts_javascript
 
@@ -320,6 +325,16 @@ def _extract_ts_signature(node: Node, source: bytes) -> str:
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"interface {name}"
 
+    elif node_type == "enum_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"enum {name}"
+
+    elif node_type == "type_alias_declaration":
+        name_node = _find_child_by_type(node, "type_identifier", "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"type {name}"
+
     return ""
 
 
@@ -346,7 +361,7 @@ def extract_typescript_symbols(source: str, file_path: str) -> list[Symbol]:
         >>> symbols[0].kind
         'class'
     """
-    parser = _get_ts_parser("typescript")
+    parser = _get_ts_parser("typescript", file_path=file_path)
     source_bytes = source.encode("utf-8")
     tree = parser.parse(source_bytes)
 
@@ -407,6 +422,41 @@ def _extract_ts_js_symbols(
     function_types = {"function_declaration", "generator_function_declaration"}
     method_types = {"method_definition", "method_signature"}
     interface_types = {"interface_declaration"}
+    enum_types = {"enum_declaration"}
+    type_alias_types = {"type_alias_declaration"}
+
+    def _extract_exported_const(node: Node) -> None:
+        """Extract exported const variable declarations as constants."""
+        # export_statement → declaration → lexical_declaration → variable_declarator
+        # Also handle top-level lexical_declaration directly
+        decl = node
+        if node.type == "export_statement":
+            decl = _find_child_by_type(node, "lexical_declaration")
+            if decl is None:
+                return
+
+        if decl.type != "lexical_declaration":
+            return
+
+        # Only extract 'const' (not 'let' or 'var')
+        first_child = decl.children[0] if decl.children else None
+        if first_child is None or _get_node_text(first_child, source) != "const":
+            return
+
+        for child in decl.children:
+            if child.type == "variable_declarator":
+                name_node = _find_child_by_type(child, "identifier")
+                if name_node:
+                    name = _get_node_text(name_node, source)
+                    symbols.append(
+                        Symbol(
+                            name=name,
+                            kind="constant",
+                            file=file_path,
+                            line=child.start_point[0] + 1,
+                            signature=f"const {name}",
+                        )
+                    )
 
     def walk(node: Node, parent_class: str | None = None) -> None:
         node_type = node.type
@@ -474,6 +524,38 @@ def _extract_ts_js_symbols(
                     signature=_extract_ts_signature(node, source),
                 )
             )
+
+        elif node_type in enum_types:
+            name_node = _find_child_by_type(node, "identifier")
+            name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=name,
+                    kind="enum",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_ts_signature(node, source),
+                )
+            )
+
+        elif node_type in type_alias_types:
+            name_node = _find_child_by_type(node, "type_identifier", "identifier")
+            name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=name,
+                    kind="type_alias",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_ts_signature(node, source),
+                )
+            )
+
+        elif node_type == "export_statement":
+            # Handle exported const declarations
+            _extract_exported_const(node)
 
         # Recurse into children
         for child in node.children:
