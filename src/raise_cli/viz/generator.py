@@ -18,21 +18,22 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
 <meta charset="utf-8">
 <title>RaiSE Memory Graph</title>
 <style>
+  :root { --s: min(1vw, 1vh); }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0d1117; color: #c9d1d9; overflow: hidden; }
-  #controls { position: fixed; top: 12px; left: 12px; z-index: 10; display: flex; flex-wrap: wrap; gap: 6px; max-width: 80vw; }
-  .chip { padding: 4px 10px; border-radius: 12px; font-size: 12px; cursor: pointer; border: 1px solid #30363d; background: #161b22; transition: all 0.15s; user-select: none; }
+  #controls { position: fixed; top: 1.5vh; left: 1.5vw; z-index: 10; display: flex; flex-wrap: wrap; gap: calc(var(--s) * 0.8); max-width: 80vw; }
+  .chip { padding: 0.6vh 1.2vw; border-radius: 1.2vh; font-size: clamp(14px, 1.4vw, 28px); cursor: pointer; border: 1px solid #30363d; background: #161b22; transition: all 0.15s; user-select: none; }
   .chip:hover { border-color: #58a6ff; }
   .chip.active { border-color: #58a6ff; background: #1f2937; color: #58a6ff; }
-  .chip .count { opacity: 0.5; margin-left: 4px; }
-  #info { position: fixed; bottom: 12px; left: 12px; z-index: 10; font-size: 11px; color: #484f58; }
-  #tooltip { position: fixed; pointer-events: none; z-index: 20; background: #1c2128; border: 1px solid #30363d; border-radius: 8px; padding: 10px 14px; font-size: 12px; max-width: 400px; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-  #tooltip .tt-id { font-weight: 600; color: #58a6ff; margin-bottom: 4px; }
-  #tooltip .tt-type { font-size: 11px; color: #8b949e; margin-bottom: 6px; }
-  #tooltip .tt-tags { font-size: 10px; color: #7c3aed; margin-bottom: 6px; }
-  #tooltip .tt-from { font-size: 10px; color: #d29922; margin-bottom: 6px; }
-  #tooltip .tt-content { color: #c9d1d9; line-height: 1.4; max-height: 200px; overflow: hidden; white-space: pre-wrap; }
-  #search { position: fixed; top: 12px; right: 12px; z-index: 10; padding: 6px 12px; border-radius: 8px; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: 13px; width: 220px; outline: none; }
+  .chip .count { opacity: 0.5; margin-left: 0.4vw; }
+  #info { position: fixed; bottom: 1.5vh; left: 1.5vw; z-index: 10; font-size: clamp(12px, 1.2vw, 24px); color: #484f58; }
+  #tooltip { position: fixed; pointer-events: none; z-index: 20; background: #1c2128; border: 1px solid #30363d; border-radius: 1vh; padding: 1.2vh 1.5vw; font-size: clamp(14px, 1.3vw, 26px); max-width: 35vw; display: none; box-shadow: 0 0.4vh 1.2vh rgba(0,0,0,0.4); }
+  #tooltip .tt-id { font-weight: 600; color: #58a6ff; margin-bottom: 0.5vh; }
+  #tooltip .tt-type { font-size: clamp(12px, 1.1vw, 22px); color: #8b949e; margin-bottom: 0.6vh; }
+  #tooltip .tt-tags { font-size: clamp(11px, 1vw, 20px); color: #7c3aed; margin-bottom: 0.6vh; }
+  #tooltip .tt-from { font-size: clamp(11px, 1vw, 20px); color: #d29922; margin-bottom: 0.6vh; }
+  #tooltip .tt-content { color: #c9d1d9; line-height: 1.4; max-height: 25vh; overflow: hidden; white-space: pre-wrap; }
+  #search { position: fixed; top: 1.5vh; right: 1.5vw; z-index: 10; padding: 0.6vh 1.2vw; border-radius: 0.8vh; border: 1px solid #30363d; background: #161b22; color: #c9d1d9; font-size: clamp(14px, 1.4vw, 28px); width: clamp(200px, 18vw, 400px); outline: none; }
   #search:focus { border-color: #58a6ff; }
   #search::placeholder { color: #484f58; }
   svg { width: 100vw; height: 100vh; }
@@ -152,12 +153,16 @@ const g = svg.append('g');
 const zoom = d3.zoom().scaleExtent([0.1, 8]).on('zoom', e => g.attr('transform', e.transform));
 svg.call(zoom);
 
+// --- SCALE FACTOR (viewport-aware) ---
+const vMin = Math.min(width, height);
+const S = vMin / 100; // 1% of smallest viewport dimension
+
 // --- NODE RADIUS ---
 function nodeRadius(d) {
-  if (d.type === 'module' || d.type === 'bounded_context' || d.type === 'layer') return 18;
-  if (d.type === 'epic' || d.type === 'architecture') return 15;
-  if (d.type === 'story' || d.type === 'skill' || d.type === 'principle') return 12;
-  return 9;
+  if (d.type === 'module' || d.type === 'bounded_context' || d.type === 'layer') return S * 1.8;
+  if (d.type === 'epic' || d.type === 'architecture') return S * 1.5;
+  if (d.type === 'story' || d.type === 'skill' || d.type === 'principle') return S * 1.2;
+  return S * 0.9;
 }
 
 // --- CLUSTER LAYOUT ---
@@ -193,9 +198,9 @@ function targetY(d) {
 
 // --- SIMULATION ---
 const simulation = d3.forceSimulation(nodes)
-  .force('link', d3.forceLink(resolvedLinks).id(d => d.id).distance(60).strength(0.05))
-  .force('charge', d3.forceManyBody().strength(-40).distanceMax(400))
-  .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + 3))
+  .force('link', d3.forceLink(resolvedLinks).id(d => d.id).distance(S * 6).strength(0.05))
+  .force('charge', d3.forceManyBody().strength(-S * 4).distanceMax(S * 40))
+  .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + S * 0.3))
   .force('x', d3.forceX(d => targetX(d)).strength(0.15))
   .force('y', d3.forceY(d => targetY(d)).strength(0.15))
   .alphaDecay(0.02);
@@ -207,7 +212,7 @@ domainList.forEach(d => {
   const c = domainCenters[d];
   domainLabels.append('text')
     .attr('x', c.x).attr('y', c.y - clusterRadius * 0.35)
-    .attr('text-anchor', 'middle').attr('font-size', '18px').attr('font-weight', '600')
+    .attr('text-anchor', 'middle').attr('font-size', (S * 2) + 'px').attr('font-weight', '600')
     .attr('fill', domainColors[d] || '#484f58').attr('opacity', 0.25)
     .text(d.toUpperCase());
 });
@@ -218,7 +223,7 @@ patternCategories.forEach(cat => {
   if (c) {
     domainLabels.append('text')
       .attr('x', c.x).attr('y', c.y - subRadius * 0.25)
-      .attr('text-anchor', 'middle').attr('font-size', '11px').attr('font-weight', '500')
+      .attr('text-anchor', 'middle').attr('font-size', (S * 1.2) + 'px').attr('font-weight', '500')
       .attr('fill', patternColor(cat)).attr('opacity', 0.35)
       .text(cat);
   }
@@ -227,14 +232,14 @@ patternCategories.forEach(cat => {
 // Edge lines
 const link = g.append('g').attr('class', 'links')
   .selectAll('line').data(resolvedLinks).enter().append('line')
-  .attr('stroke', '#21262d').attr('stroke-width', 0.5).attr('stroke-opacity', 0.35);
+  .attr('stroke', '#21262d').attr('stroke-width', S * 0.06).attr('stroke-opacity', 0.35);
 
 // Edge labels (shown on hover via CSS)
 const linkLabel = g.append('g').attr('class', 'link-labels')
   .selectAll('text').data(resolvedLinks).enter().append('text')
   .text(d => d.type.replace(/_/g, ' '))
-  .attr('font-size', '7px').attr('fill', '#484f58').attr('text-anchor', 'middle')
-  .attr('dy', -3).style('pointer-events', 'none').attr('opacity', 0);
+  .attr('font-size', (S * 0.8) + 'px').attr('fill', '#484f58').attr('text-anchor', 'middle')
+  .attr('dy', -S * 0.3).style('pointer-events', 'none').attr('opacity', 0);
 
 // Node groups (circle + label)
 const nodeG = g.append('g').attr('class', 'nodes')
@@ -249,10 +254,10 @@ nodeG.append('circle')
 // Node labels
 nodeG.append('text')
   .text(d => d.id.length > 20 ? d.id.substring(0, 18) + '..' : d.id)
-  .attr('font-size', d => nodeRadius(d) > 12 ? '8px' : '6px')
+  .attr('font-size', d => (nodeRadius(d) > S ? S * 0.9 : S * 0.7) + 'px')
   .attr('fill', '#c9d1d9')
   .attr('text-anchor', 'middle')
-  .attr('dy', d => nodeRadius(d) + 10)
+  .attr('dy', d => nodeRadius(d) + S * 0.8)
   .style('pointer-events', 'none');
 
 // Tooltip
@@ -284,14 +289,14 @@ nodeG.on('mouseover', (e, d) => {
   }).attr('stroke-width', l => {
     const sId = l.source.id !== undefined ? l.source.id : l.source;
     const tId = l.target.id !== undefined ? l.target.id : l.target;
-    return (sId === d.id || tId === d.id) ? 1.5 : 0.5;
+    return (sId === d.id || tId === d.id) ? S * 0.15 : S * 0.06;
   });
 }).on('mousemove', e => {
   tooltip.style('left', (e.clientX + 14) + 'px').style('top', (e.clientY - 10) + 'px');
 }).on('mouseout', () => {
   tooltip.style('display', 'none');
   linkLabel.attr('opacity', 0);
-  link.attr('stroke', '#21262d').attr('stroke-width', 0.5);
+  link.attr('stroke', '#21262d').attr('stroke-width', S * 0.06);
 });
 
 // Info
