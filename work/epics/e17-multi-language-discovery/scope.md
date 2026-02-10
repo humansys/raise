@@ -172,6 +172,7 @@ S17.2/S17.3 are independent but sequential in single-session work.
 | S17.1 | M | ✅ Done | 45 min | 1.33x velocity |
 | S17.2 | M | ✅ Done | 25 min | 2.4x velocity |
 | S17.3 | S | ✅ Done | 20 min | 2.25x velocity |
+| BF-2 | L | ✅ Done | 45 min | 2.67x velocity, templates + completeness check |
 | S17.4 | S | Pending | - | |
 
 **Milestones:**
