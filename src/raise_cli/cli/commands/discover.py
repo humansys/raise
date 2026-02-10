@@ -55,7 +55,7 @@ def scan_command(
         typer.Option(
             "--language",
             "-l",
-            help="Language to scan: python, typescript, javascript (auto-detect if not set)",
+            help="Language to scan: python, typescript, javascript, php, svelte (auto-detect if not set)",
         ),
     ] = None,
     output: Annotated[
@@ -106,10 +106,10 @@ def scan_command(
     # Validate language if provided
     lang: Language | None = None
     if language:
-        if language not in ("python", "typescript", "javascript"):
+        if language not in ("python", "typescript", "javascript", "php", "svelte"):
             cli_error(
                 f"Unsupported language: {language}",
-                hint="Supported: python, typescript, javascript",
+                hint="Supported: python, typescript, javascript, php, svelte",
                 exit_code=7,
             )
         lang = language  # type: ignore[assignment]
