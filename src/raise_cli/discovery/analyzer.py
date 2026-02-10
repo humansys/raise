@@ -425,9 +425,10 @@ def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
             )
         )
 
-    # Add standalone functions and modules (skip methods — they're folded)
+    # Add standalone symbols: everything that's not class or method
+    # (exclude-based routing — future kinds automatically become standalone)
     for s in symbols:
-        if s.kind in ("function", "module"):
+        if s.kind not in ("class", "method"):
             # Use "module" as suffix for module-level entries to avoid
             # collisions with same-named functions (e.g., test_version.py
             # has both module "test_version" and function "test_version")
