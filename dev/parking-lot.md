@@ -15,6 +15,14 @@
   - **Workaround:** Use `--phase design` instead
   - **Priority:** Urgent — breaks every `/epic-start` telemetry emit
 
+- [ ] **Domain stance layer — behavioral priming per project type** — (SES-134, 2026-02-10)
+  - **Insight:** Identity (CLAUDE.md) shapes behavior deeply. Governance docs inform but don't prime as strongly. There's a missing middle layer: domain-specific thinking patterns that make Rai fluent, not just informed.
+  - **Mechanism:** `domain-stance.md` loaded in system prompt (CLAUDE.md or CLAUDE.local.md). Same identity, different domain lens.
+  - **Examples:** Lean Software Development stance (raise-commons), Lean Marketing stance (raise-gtm), Research stance
+  - **Not:** A different Rai, a new feature, or the governance docs. It's the domain vocabulary and quality intuitions between identity (universal) and governance (project-specific).
+  - **Next:** Prototype in raise-gtm CLAUDE.local.md, validate if alignment improves, then formalize pattern
+  - **Priority:** Urgent — affects GTM work starting now, and Jumpstart client onboarding
+
 - [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
 - [ ] **Rovo AI integration implementation** - Required for Mar 14 webinar (V3 scope)
 - [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
