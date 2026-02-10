@@ -54,7 +54,7 @@ Execute the implementation plan task by task, verifying each step, and producing
 Record the start of the implement phase:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event start --phase implement
+raise memory emit-work story {story_id} --event start --phase implement
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e start -p implement`
@@ -83,7 +83,7 @@ fi
 Load relevant codebase patterns from unified context:
 
 ```bash
-uv run raise memory query "testing coverage type annotations security" --types pattern,guardrail --limit 5
+raise memory query "testing coverage type annotations security" --types pattern,guardrail --limit 5
 ```
 
 Review returned patterns and guardrails before proceeding. Key patterns inform implementation approach; guardrails ensure code standards compliance.
@@ -190,7 +190,7 @@ If all tasks completed → execute code gate.
 Record the completion of the implement phase:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event complete --phase implement
+raise memory emit-work story {story_id} --event complete --phase implement
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e complete -p implement`

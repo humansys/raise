@@ -160,7 +160,7 @@ Answer these questions:
 
 ```bash
 # Check name follows pattern, no conflicts, known lifecycle
-uv run raise skill check-name {skill-name}
+raise skill check-name {skill-name}
 ```
 
 This validates:
@@ -177,7 +177,7 @@ Before creating, verify against patterns:
 
 ```bash
 # Query ontology patterns
-uv run raise memory query "ontology naming" --types pattern --limit 5
+raise memory query "ontology naming" --types pattern --limit 5
 ```
 
 **Checklist (PAT-136):**
@@ -196,10 +196,10 @@ Use the CLI to create the skill with proper structure:
 
 ```bash
 # Create skill with inferred lifecycle
-uv run raise skill scaffold {skill-name}
+raise skill scaffold {skill-name}
 
 # Or specify lifecycle and positioning explicitly
-uv run raise skill scaffold {skill-name} --lifecycle {lifecycle} --after {previous-skill} --before {next-skill}
+raise skill scaffold {skill-name} --lifecycle {lifecycle} --after {previous-skill} --before {next-skill}
 ```
 
 This creates:
@@ -277,7 +277,7 @@ metadata:
 
 ```bash
 # CLI command if applicable
-uv run raise {command}
+raise {command}
 ```
 
 **Verification:** {How to know this step succeeded.}
@@ -313,7 +313,7 @@ uv run raise {command}
 Use the CLI to validate the skill:
 
 ```bash
-uv run raise skill validate .claude/skills/{skill-name}/
+raise skill validate .claude/skills/{skill-name}/
 ```
 
 This checks:
@@ -361,7 +361,7 @@ Invoke the skill to verify it works:
 Record this skill creation as a pattern if it introduces new workflow:
 
 ```bash
-uv run raise memory add-pattern "{Brief description of the pattern}" -c "{context tags}" -t process --from "{feature-id}"
+raise memory add-pattern "{Brief description of the pattern}" -c "{context tags}" -t process --from "{feature-id}"
 ```
 
 **Verification:** Pattern recorded (optional — only for novel patterns).

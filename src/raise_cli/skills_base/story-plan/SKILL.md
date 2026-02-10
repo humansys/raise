@@ -53,7 +53,7 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event start --phase plan
+raise memory emit-work story {story_id} --event start --phase plan
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e start -p plan`
@@ -82,7 +82,7 @@ ls work/epics/e*/stories/{story_id}/design.md 2>/dev/null || echo "INFO: No desi
 Load relevant patterns and calibration from unified context:
 
 ```bash
-uv run raise memory query "planning estimation calibration" --types pattern,calibration --limit 5
+raise memory query "planning estimation calibration" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Key patterns inform task structure and sizing.
@@ -96,8 +96,8 @@ Review returned patterns before proceeding. Key patterns inform task structure a
 Identify the primary module(s) this story affects, then load their architectural context:
 
 ```bash
-uv run raise memory context mod-<name>
-# Example: uv run raise memory context mod-memory
+raise memory context mod-<name>
+# Example: raise memory context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -237,7 +237,7 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event complete --phase plan
+raise memory emit-work story {story_id} --event complete --phase plan
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e complete -p plan`

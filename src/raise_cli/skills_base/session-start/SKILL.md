@@ -36,7 +36,7 @@ Experience level is in the context bundle — adapt output verbosity accordingly
 ### Step 1: Load Context Bundle
 
 ```bash
-uv run raise session start --project "$(pwd)" --context
+raise session start --project "$(pwd)" --context
 ```
 
 This single command:
@@ -49,10 +49,10 @@ This single command:
 
 **First-time user:** If no profile exists, ask for name:
 ```bash
-uv run raise session start --name "Name" --project "$(pwd)" --context
+raise session start --name "Name" --project "$(pwd)" --context
 ```
 
-**If graph unavailable:** Run `uv run raise memory build` first, then retry.
+**If graph unavailable:** Run `raise memory build` first, then retry.
 
 ### Step 2: Interpret & Present
 

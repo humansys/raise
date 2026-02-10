@@ -76,12 +76,12 @@ Execute the `raise discover scan` command:
 
 ```bash
 # For each root_dir in context
-uv run raise discover scan {root_dir} --language {language} --output json
+raise discover scan {root_dir} --language {language} --output json
 ```
 
 **Example:**
 ```bash
-uv run raise discover scan src/raise_cli --language python --output json
+raise discover scan src/raise_cli --language python --output json
 ```
 
 **Capture the JSON output** — it contains all extracted symbols.
@@ -95,12 +95,12 @@ uv run raise discover scan src/raise_cli --language python --output json
 Run the deterministic analyzer on the scan output to compute confidence scores, auto-categorize components, fold methods into parent classes, and group by module:
 
 ```bash
-uv run raise discover analyze --input {scan_output_json} --output human
+raise discover analyze --input {scan_output_json} --output human
 ```
 
 Or pipe directly:
 ```bash
-uv run raise discover scan {root_dir} --language {language} --output json | uv run raise discover analyze --output human
+raise discover scan {root_dir} --language {language} --output json | raise discover analyze --output human
 ```
 
 **This produces:**

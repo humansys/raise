@@ -415,13 +415,13 @@ If governance documents conflict with ADR:
 
 **Phase 2 (E2.5):**
 ```bash
-uv run raise framework analyze-adrs ADR-011,ADR-012
+raise framework analyze-adrs ADR-011,ADR-012
 # Returns structured analysis of impacts
 ```
 
 **Phase 3 (E3):**
 ```bash
-uv run raise framework sync --from-adrs ADR-011,ADR-012 --auto
+raise framework sync --from-adrs ADR-011,ADR-012 --auto
 # Fully automated with human review
 ```
 
