@@ -33,6 +33,20 @@
 
 ## Ideas
 
+### Systemic Poka-Yoke — Design Principle (2026-02-10, PAT-242)
+
+- [ ] **"As above, so below" — poka-yoke at every producer-consumer boundary** — (SES-134, BF-2)
+  - **Insight:** BF-2 exposed the same failure shape at 5 layers (template, parser, graph, skill, process). Each layer silently trusted the previous. We add poka-yokes reactively after bugs, not systematically at design time.
+  - **Action:** Audit existing boundaries for missing poka-yokes. Candidates:
+    - Parser: log warning when `_parse_architecture_doc` returns None for a `.md` file
+    - Scaffold: validate frontmatter exists after writing template
+    - Graph build: completeness check (done in BF-2, but could be stronger)
+    - Skill consumption: lint skills for factual claims about code behavior
+    - Template distribution: contract test for all templates (done in BF-2)
+  - **Principle candidate:** "Every boundary between producer and consumer must validate. Consumers check what they receive. Producers check what they emit." Consider adding to constitution or guardrails.
+  - **Priority:** High strategic value — prevents a class of bugs, not just one instance
+  - **Related:** PAT-242, Jidoka (constitution), BF-2 retrospective
+
 ### Discovery & Code Understanding
 
 - [ ] **Publishable docs via MkDocs Material** — (SES-087, 2026-02-07)
