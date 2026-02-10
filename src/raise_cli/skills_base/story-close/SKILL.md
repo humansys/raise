@@ -258,7 +258,7 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 Record the completion of the entire story lifecycle:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event complete --phase review
+raise memory emit-work story {story_id} --event complete --phase review
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e complete -p review`

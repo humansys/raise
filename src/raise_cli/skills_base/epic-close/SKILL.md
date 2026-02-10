@@ -259,7 +259,7 @@ Mark the epic complete in `governance/backlog.md`:
 Record the epic completion:
 
 ```bash
-uv run raise memory emit-work epic {epic_id} --event complete
+raise memory emit-work epic {epic_id} --event complete
 ```
 
 **Verification:** Telemetry emitted.

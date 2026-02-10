@@ -64,7 +64,7 @@ Create a lean story specification that optimizes for both human understanding (q
 Record the start of the design phase:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event start --phase design
+raise memory emit-work story {story_id} --event start --phase design
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e start -p design`
@@ -78,7 +78,7 @@ Run these in parallel (all independent):
 ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic context"
 
 # Query architecture patterns and ADRs
-uv run raise memory query "architecture patterns ADR" --types pattern,decision --limit 5
+raise memory query "architecture patterns ADR" --types pattern,decision --limit 5
 ```
 
 **From epic check:**
@@ -101,8 +101,8 @@ uv run raise memory query "architecture patterns ADR" --types pattern,decision -
 Identify the primary module(s) this story affects, then load their architectural context:
 
 ```bash
-uv run raise memory context mod-<name>
-# Example: uv run raise memory context mod-memory
+raise memory context mod-<name>
+# Example: raise memory context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -278,7 +278,7 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event complete --phase design
+raise memory emit-work story {story_id} --event complete --phase design
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e complete -p design`

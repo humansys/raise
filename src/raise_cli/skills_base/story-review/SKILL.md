@@ -54,7 +54,7 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event start --phase review
+raise memory emit-work story {story_id} --event start --phase review
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e start -p review`
@@ -71,7 +71,7 @@ uv run pytest --tb=no -q || {
 }
 
 # Query retrospective patterns and calibration data
-uv run raise memory query "retrospective learnings velocity" --types pattern,calibration --limit 5
+raise memory query "retrospective learnings velocity" --types pattern,calibration --limit 5
 ```
 
 **From tests:**
@@ -136,7 +136,7 @@ If improvements identified:
 For learnings worth preserving across sessions, add to memory via CLI:
 
 ```bash
-uv run raise memory add-pattern "Pattern description" \
+raise memory add-pattern "Pattern description" \
   -c "context,keywords" \
   -t process \
   --from {story_id}
@@ -151,10 +151,10 @@ uv run raise memory add-pattern "Pattern description" \
 **Examples:**
 ```bash
 # Process pattern
-uv run raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
+raise memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
 
 # Technical pattern
-uv run raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
+raise memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
 ```
 
 **Decision:**
@@ -179,7 +179,7 @@ Create retrospective document:
 Record the calibration signal for velocity tracking:
 
 ```bash
-uv run raise memory emit-calibration {story_id} \
+raise memory emit-calibration {story_id} \
   --size {XS|S|M|L} \
   --estimated {minutes} \
   --actual {minutes}
@@ -193,7 +193,7 @@ uv run raise memory emit-calibration {story_id} \
 
 **Example:**
 ```bash
-uv run raise memory emit-calibration F9.4 -s S -e 30 -a 15
+raise memory emit-calibration F9.4 -s S -e 30 -a 15
 ```
 
 **Verification:** Command shows velocity and "Calibration event recorded".
@@ -205,7 +205,7 @@ uv run raise memory emit-calibration F9.4 -s S -e 30 -a 15
 Record the completion of the entire story lifecycle:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event complete --phase review
+raise memory emit-work story {story_id} --event complete --phase review
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e complete -p review`

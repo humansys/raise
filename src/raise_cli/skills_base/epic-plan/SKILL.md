@@ -70,7 +70,7 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 Record the start of the plan phase:
 
 ```bash
-uv run raise memory emit-work epic {epic_id} --event start --phase plan
+raise memory emit-work epic {epic_id} --event start --phase plan
 ```
 
 **Example:** `raise memory emit-work epic E9 -e start -p plan`
@@ -80,7 +80,7 @@ uv run raise memory emit-work epic {epic_id} --event start --phase plan
 Load relevant sequencing patterns and calibration from unified context:
 
 ```bash
-uv run raise memory query "sequencing calibration planning" --types pattern,calibration --limit 5
+raise memory query "sequencing calibration planning" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Calibration data informs realistic estimates.
@@ -498,7 +498,7 @@ Self-review checklist before starting implementation.
 Record the completion of the plan phase:
 
 ```bash
-uv run raise memory emit-work epic {epic_id} --event complete --phase plan
+raise memory emit-work epic {epic_id} --event complete --phase plan
 ```
 
 **Example:** `raise memory emit-work epic E9 -e complete -p plan`
