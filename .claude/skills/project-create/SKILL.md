@@ -312,7 +312,27 @@ version: "1.0.0"
 
 #### 6e: Write `governance/architecture/system-context.md`
 
+**IMPORTANT — Graph contract:** This doc MUST have YAML frontmatter with `type: architecture_context` to produce an `arch-context` node in the knowledge graph. Without it, the parser silently skips the file.
+
 ```markdown
+---
+type: architecture_context
+project: "{project_name}"
+status: current
+tech_stack:
+  language: "{primary language}"
+  framework: "{primary framework, if any}"
+  testing: "{test framework}"
+external_dependencies:
+  - "{External system 1}"
+  - "{External system 2}"
+users:
+  - "{User type 1}"
+  - "{User type 2}"
+governed_by:
+  - "governance/guardrails.md"
+---
+
 # System Context: {project_name}
 
 > C4 Level 1 — System Context diagram and description
@@ -340,7 +360,22 @@ version: "1.0.0"
 
 #### 6f: Write `governance/architecture/system-design.md`
 
+**IMPORTANT — Graph contract:** This doc MUST have YAML frontmatter with `type: architecture_design` to produce an `arch-design` node. The `layers:` field produces layer nodes and module-to-layer edges.
+
 ```markdown
+---
+type: architecture_design
+project: "{project_name}"
+status: current
+layers:
+  - name: "{layer_1_name}"
+    modules: [{module_1}, {module_2}]
+    description: "{What this layer does}"
+  - name: "{layer_2_name}"
+    modules: [{module_3}]
+    description: "{What this layer does}"
+---
+
 # System Design: {project_name}
 
 > C4 Level 2 — Container/component decomposition
@@ -361,7 +396,43 @@ version: "1.0.0"
 - {Any architectural decisions mentioned in conversation}
 ```
 
-**Verification:** All 6 governance docs written with project-specific content. No HTML comment placeholders remain.
+#### 6g: Write `governance/architecture/domain-model.md`
+
+**IMPORTANT — Graph contract:** This doc MUST have YAML frontmatter with `type: architecture_domain_model` to produce an `arch-domain-model` node. The `bounded_contexts:` field produces bounded context nodes.
+
+```markdown
+---
+type: architecture_domain_model
+project: "{project_name}"
+status: current
+bounded_contexts:
+  - name: "{context_1_name}"
+    modules: [{module_1}, {module_2}]
+    description: "{Domain boundary description}"
+  - name: "{context_2_name}"
+    modules: [{module_3}]
+    description: "{Domain boundary description}"
+shared_kernel:
+  modules: [{shared_module_1}]
+  description: "{Shared utilities across contexts}"
+---
+
+# Domain Model: {project_name}
+
+> Bounded contexts and shared kernel
+
+## Bounded Contexts
+
+{Describe each bounded context and its modules, inferred from conversation about the system's domain.}
+
+## Shared Kernel
+
+{Modules shared across bounded contexts — utilities, config, common types.}
+```
+
+**Note:** For greenfield projects, bounded contexts come from conversation (Step 5), not discovery. Module docs are NOT generated here — they'll be created when modules actually exist (after first implementation or after running discovery on the built codebase).
+
+**Verification:** All 7 governance docs written with project-specific content. No HTML comment placeholders remain. Architecture docs have YAML frontmatter.
 
 > **If you can't continue:** Write fails → Check file permissions. Governance dir should be writable.
 
@@ -386,15 +457,24 @@ Count the governance nodes. You need **30+ total** across these types:
 - Guardrails (from guardrails.md): ~10-13 nodes (table rows across sections)
 - Project (from backlog.md): 1 node
 - Epics (from backlog.md): ~3-5 nodes (table rows)
-- Architecture docs don't produce individual nodes but enrich the graph context
+- Architecture docs produce graph nodes: `arch-context`, `arch-design`, `arch-domain-model` (from system-context.md, system-design.md, domain-model.md)
+- Layers and bounded contexts are extracted automatically from architecture design and domain model frontmatter
+
+**Also run completeness validation:**
+```bash
+raise memory validate
+```
+
+Check that the completeness check passes (no "Completeness gaps" warnings). For greenfield, module nodes may not exist yet (no code to discover) — that's expected. But architecture nodes should be present.
 
 **Decision:**
-- 30+ nodes → **Gate passed.** Continue to summary.
+- 30+ governance nodes AND no architecture completeness gaps → **Gate passed.** Continue to summary.
 - <30 nodes → Investigate which docs didn't parse. Check format against parser contract in Step 6. Fix and rebuild.
+- Completeness gaps for architecture → Architecture docs are missing frontmatter. Check Steps 6e-6g.
 
-**Verification:** `raise memory build` succeeds and produces 30+ governance nodes.
+**Verification:** `raise memory build` succeeds, produces 30+ governance nodes, and `raise memory validate` shows no architecture gaps.
 
-> **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header. Fix the specific doc and rebuild.
+> **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header, **and YAML frontmatter on architecture docs**. Fix the specific doc and rebuild.
 
 ### Step 8: Summary and Next Steps
 

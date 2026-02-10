@@ -1,3 +1,23 @@
+---
+name: discover-describe
+description: >
+  Generate architecture documentation from discovery data. Produces
+  system-level docs (C4 Context + Container), per-module docs with
+  YAML frontmatter, and a compact index for AI context loading.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: discovery
+  raise.frequency: per-project
+  raise.fase: "5"
+  raise.prerequisites: discover-validate
+  raise.next: ""
+  raise.gate: ""
+  raise.adaptable: "true"
+  raise.version: "1.0.0"
+---
+
 # Discover Describe
 
 ## Purpose

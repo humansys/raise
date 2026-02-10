@@ -24,10 +24,21 @@ if TYPE_CHECKING:
     from tree_sitter import Node, Parser
 
 # Symbol kinds that can be extracted
-SymbolKind = Literal["class", "function", "method", "module", "interface"]
+SymbolKind = Literal[
+    "class",
+    "function",
+    "method",
+    "module",
+    "interface",
+    "enum",
+    "type_alias",
+    "constant",
+    "trait",
+    "component",
+]
 
 # Supported languages for scanning
-Language = Literal["python", "typescript", "javascript"]
+Language = Literal["python", "typescript", "javascript", "php", "svelte"]
 
 # File extension to language mapping
 EXTENSION_TO_LANGUAGE: dict[str, Language] = {
@@ -38,6 +49,8 @@ EXTENSION_TO_LANGUAGE: dict[str, Language] = {
     ".jsx": "javascript",
     ".mjs": "javascript",
     ".cjs": "javascript",
+    ".php": "php",
+    ".svelte": "svelte",
 }
 
 
@@ -225,11 +238,12 @@ def extract_python_symbols(source: str, file_path: str) -> list[Symbol]:
 # -----------------------------------------------------------------------------
 
 
-def _get_ts_parser(language: Language) -> Parser:
+def _get_ts_parser(language: Language, *, file_path: str = "") -> Parser:
     """Get a tree-sitter parser for TypeScript or JavaScript.
 
     Args:
         language: Either "typescript" or "javascript".
+        file_path: File path (used to dispatch .tsx to TSX parser).
 
     Returns:
         Configured tree-sitter Parser.
@@ -249,7 +263,11 @@ def _get_ts_parser(language: Language) -> Parser:
     if language == "typescript":
         import tree_sitter_typescript as ts_typescript
 
-        lang = TSLanguage(ts_typescript.language_typescript())
+        is_tsx = file_path.endswith(".tsx")
+        if is_tsx:
+            lang = TSLanguage(ts_typescript.language_tsx())
+        else:
+            lang = TSLanguage(ts_typescript.language_typescript())
     else:
         import tree_sitter_javascript as ts_javascript
 
@@ -307,6 +325,16 @@ def _extract_ts_signature(node: Node, source: bytes) -> str:
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"interface {name}"
 
+    elif node_type == "enum_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"enum {name}"
+
+    elif node_type == "type_alias_declaration":
+        name_node = _find_child_by_type(node, "type_identifier", "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"type {name}"
+
     return ""
 
 
@@ -333,7 +361,7 @@ def extract_typescript_symbols(source: str, file_path: str) -> list[Symbol]:
         >>> symbols[0].kind
         'class'
     """
-    parser = _get_ts_parser("typescript")
+    parser = _get_ts_parser("typescript", file_path=file_path)
     source_bytes = source.encode("utf-8")
     tree = parser.parse(source_bytes)
 
@@ -394,6 +422,41 @@ def _extract_ts_js_symbols(
     function_types = {"function_declaration", "generator_function_declaration"}
     method_types = {"method_definition", "method_signature"}
     interface_types = {"interface_declaration"}
+    enum_types = {"enum_declaration"}
+    type_alias_types = {"type_alias_declaration"}
+
+    def _extract_exported_const(node: Node) -> None:
+        """Extract exported const variable declarations as constants."""
+        # export_statement → declaration → lexical_declaration → variable_declarator
+        # Also handle top-level lexical_declaration directly
+        decl = node
+        if node.type == "export_statement":
+            decl = _find_child_by_type(node, "lexical_declaration")
+            if decl is None:
+                return
+
+        if decl.type != "lexical_declaration":
+            return
+
+        # Only extract 'const' (not 'let' or 'var')
+        first_child = decl.children[0] if decl.children else None
+        if first_child is None or _get_node_text(first_child, source) != "const":
+            return
+
+        for child in decl.children:
+            if child.type == "variable_declarator":
+                name_node = _find_child_by_type(child, "identifier")
+                if name_node:
+                    name = _get_node_text(name_node, source)
+                    symbols.append(
+                        Symbol(
+                            name=name,
+                            kind="constant",
+                            file=file_path,
+                            line=child.start_point[0] + 1,
+                            signature=f"const {name}",
+                        )
+                    )
 
     def walk(node: Node, parent_class: str | None = None) -> None:
         node_type = node.type
@@ -462,11 +525,448 @@ def _extract_ts_js_symbols(
                 )
             )
 
+        elif node_type in enum_types:
+            name_node = _find_child_by_type(node, "identifier")
+            name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=name,
+                    kind="enum",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_ts_signature(node, source),
+                )
+            )
+
+        elif node_type in type_alias_types:
+            name_node = _find_child_by_type(node, "type_identifier", "identifier")
+            name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=name,
+                    kind="type_alias",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_ts_signature(node, source),
+                )
+            )
+
+        elif node_type == "export_statement":
+            # Handle exported const declarations
+            _extract_exported_const(node)
+
         # Recurse into children
         for child in node.children:
             walk(child, parent_class)
 
     walk(root)
+    return symbols
+
+
+def _get_php_parser() -> Parser:
+    """Get a tree-sitter parser for PHP.
+
+    Returns:
+        Configured tree-sitter Parser.
+
+    Raises:
+        ImportError: If tree-sitter-php is not installed.
+    """
+    try:
+        from tree_sitter import Language as TSLanguage
+        from tree_sitter import Parser
+    except ImportError as e:
+        raise ImportError(
+            "tree-sitter is required for PHP scanning. "
+            "Install with: uv add tree-sitter tree-sitter-php"
+        ) from e
+
+    import tree_sitter_php as ts_php
+
+    lang = TSLanguage(ts_php.language_php())
+    return Parser(lang)
+
+
+def _extract_php_signature(node: Node, source: bytes) -> str:
+    """Extract a signature from a PHP AST node."""
+    node_type = node.type
+
+    if node_type == "class_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        parts = [f"class {name}"]
+        base = _find_child_by_type(node, "base_clause")
+        if base:
+            parts.append(_get_node_text(base, source))
+        iface = _find_child_by_type(node, "class_interface_clause")
+        if iface:
+            parts.append(_get_node_text(iface, source))
+        return " ".join(parts)
+
+    elif node_type == "interface_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"interface {name}"
+
+    elif node_type == "trait_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"trait {name}"
+
+    elif node_type == "function_definition":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        params_node = _find_child_by_type(node, "formal_parameters")
+        params = _get_node_text(params_node, source) if params_node else "()"
+        # Return type
+        ret_type = _find_child_by_type(node, "primitive_type", "named_type")
+        if ret_type:
+            return f"function {name}{params}: {_get_node_text(ret_type, source)}"
+        return f"function {name}{params}"
+
+    elif node_type == "method_declaration":
+        parts: list[str] = []
+        vis = _find_child_by_type(node, "visibility_modifier")
+        if vis:
+            parts.append(_get_node_text(vis, source))
+        static = _find_child_by_type(node, "static_modifier")
+        if static:
+            parts.append("static")
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        parts.append(f"function {name}")
+        params_node = _find_child_by_type(node, "formal_parameters")
+        params = _get_node_text(params_node, source) if params_node else "()"
+        sig = " ".join(parts) + params
+        ret_type = _find_child_by_type(node, "primitive_type", "named_type")
+        if ret_type:
+            sig += f": {_get_node_text(ret_type, source)}"
+        return sig
+
+    elif node_type == "enum_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        # Backed enum type (e.g., ": string")
+        ret_type = _find_child_by_type(node, "primitive_type")
+        if ret_type:
+            return f"enum {name}: {_get_node_text(ret_type, source)}"
+        return f"enum {name}"
+
+    return ""
+
+
+def _extract_php_symbols(
+    root: Node,
+    source: bytes,
+    file_path: str,
+) -> list[Symbol]:
+    """Extract symbols from a PHP tree-sitter parse tree.
+
+    Walks the AST and extracts classes, interfaces, traits, functions,
+    methods, and enums. Tracks namespace for qualified names.
+
+    Args:
+        root: Root node of the tree-sitter parse tree.
+        source: Source code as bytes.
+        file_path: Path to the source file.
+
+    Returns:
+        List of Symbol objects.
+    """
+    symbols: list[Symbol] = []
+    namespace = ""
+
+    # Container types whose children include methods
+    container_types = {"class_declaration", "interface_declaration", "trait_declaration"}
+
+    def _qualify(name: str) -> str:
+        return f"{namespace}\\{name}" if namespace else name
+
+    def walk(node: Node, parent_name: str | None = None) -> None:
+        nonlocal namespace
+        node_type = node.type
+
+        if node_type == "namespace_definition":
+            ns_node = _find_child_by_type(node, "namespace_name")
+            if ns_node:
+                namespace = _get_node_text(ns_node, source)
+            # Continue walking children (declarations inside namespace)
+            for child in node.children:
+                walk(child, parent_name)
+            return
+
+        if node_type in container_types:
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+            qualified = _qualify(local_name)
+
+            kind: SymbolKind = "class"
+            if node_type == "interface_declaration":
+                kind = "interface"
+            elif node_type == "trait_declaration":
+                kind = "trait"
+
+            symbols.append(
+                Symbol(
+                    name=qualified,
+                    kind=kind,
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                )
+            )
+
+            # Walk declaration_list for methods
+            body = _find_child_by_type(node, "declaration_list")
+            if body:
+                for child in body.children:
+                    walk(child, parent_name=qualified)
+            return
+
+        if node_type == "method_declaration" and parent_name is not None:
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=local_name,
+                    kind="method",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                    parent=parent_name,
+                )
+            )
+            return
+
+        if node_type == "function_definition" and parent_name is None:
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=_qualify(local_name),
+                    kind="function",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                )
+            )
+            return
+
+        if node_type == "enum_declaration":
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=_qualify(local_name),
+                    kind="enum",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                )
+            )
+            return
+
+        # Recurse into children
+        for child in node.children:
+            walk(child, parent_name)
+
+    walk(root)
+    return symbols
+
+
+def extract_php_symbols(source: str, file_path: str) -> list[Symbol]:
+    """Extract symbols from PHP source code.
+
+    Uses tree-sitter to parse PHP and extract classes, interfaces,
+    traits, functions, methods, and enums.
+
+    Args:
+        source: PHP source code as string.
+        file_path: Path to the source file (for metadata).
+
+    Returns:
+        List of Symbol objects.
+
+    Examples:
+        >>> source = '''
+        ... <?php
+        ... class User {
+        ...     public function getName(): string {}
+        ... }
+        ... '''
+        >>> symbols = extract_php_symbols(source, "User.php")
+        >>> symbols[0].kind
+        'class'
+    """
+    parser = _get_php_parser()
+    source_bytes = source.encode("utf-8")
+    tree = parser.parse(source_bytes)
+
+    return _extract_php_symbols(tree.root_node, source_bytes, file_path)
+
+
+# -----------------------------------------------------------------------------
+# Svelte Extraction (tree-sitter-svelte + JS/TS re-parse)
+# -----------------------------------------------------------------------------
+
+
+def _get_svelte_parser() -> Parser:
+    """Get a tree-sitter parser for Svelte.
+
+    Returns:
+        Configured tree-sitter Parser.
+
+    Raises:
+        ImportError: If tree-sitter-svelte is not installed.
+    """
+    try:
+        from tree_sitter import Language as TSLanguage
+        from tree_sitter import Parser
+    except ImportError as e:
+        raise ImportError(
+            "tree-sitter is required for Svelte scanning. "
+            "Install with: uv add tree-sitter tree-sitter-svelte"
+        ) from e
+
+    import tree_sitter_svelte
+
+    lang = TSLanguage(tree_sitter_svelte.language())
+    return Parser(lang)
+
+
+def _detect_svelte_script_lang(
+    script_element: Node, source: bytes
+) -> Language:
+    """Detect whether a Svelte script block uses TypeScript or JavaScript.
+
+    Checks for ``lang="ts"`` or ``lang="typescript"`` attribute on the
+    ``<script>`` tag.
+
+    Args:
+        script_element: The ``script_element`` node from tree-sitter-svelte.
+        source: Source code as bytes.
+
+    Returns:
+        ``"typescript"`` if lang attribute indicates TS, else ``"javascript"``.
+    """
+    for child in script_element.children:
+        if child.type != "start_tag":
+            continue
+        for attr in child.children:
+            if attr.type != "attribute":
+                continue
+            attr_name: Node | None = None
+            attr_value: Node | None = None
+            for part in attr.children:
+                if part.type == "attribute_name":
+                    attr_name = part
+                elif part.type == "quoted_attribute_value":
+                    attr_value = part
+            if attr_name is None or attr_value is None:
+                continue
+            name_text = source[attr_name.start_byte : attr_name.end_byte].decode("utf-8")
+            if name_text != "lang":
+                continue
+            # Extract value from quoted_attribute_value → attribute_value
+            for val_child in attr_value.children:
+                if val_child.type == "attribute_value":
+                    val_text = source[val_child.start_byte : val_child.end_byte].decode(
+                        "utf-8"
+                    )
+                    if val_text in ("ts", "typescript"):
+                        return "typescript"
+    return "javascript"
+
+
+def extract_svelte_symbols(source: str, file_path: str) -> list[Symbol]:
+    """Extract symbols from Svelte source code.
+
+    Uses a two-pass approach:
+    1. Parse with tree-sitter-svelte to find ``<script>`` blocks
+    2. Re-parse script content with JS or TS tree-sitter parser
+
+    Each ``.svelte`` file is also registered as a ``"component"`` symbol.
+
+    Args:
+        source: Svelte source code as string.
+        file_path: Path to the source file (for metadata).
+
+    Returns:
+        List of Symbol objects.
+
+    Examples:
+        >>> source = '''
+        ... <script>
+        ...   function hello() {}
+        ... </script>
+        ... '''
+        >>> symbols = extract_svelte_symbols(source, "App.svelte")
+        >>> symbols[0].kind
+        'component'
+    """
+    source_bytes = source.encode("utf-8")
+    component_name = Path(file_path).stem
+
+    symbols: list[Symbol] = [
+        Symbol(
+            name=component_name,
+            kind="component",
+            file=file_path,
+            line=1,
+            signature=f"component {component_name}",
+        )
+    ]
+
+    svelte_parser = _get_svelte_parser()
+    svelte_tree = svelte_parser.parse(source_bytes)
+    root = svelte_tree.root_node
+
+    for script_el in root.children:
+        if script_el.type != "script_element":
+            continue
+
+        # Detect lang="ts" on this specific script element
+        script_lang = _detect_svelte_script_lang(script_el, source_bytes)
+
+        # Find raw_text content
+        raw_text_node: Node | None = None
+        for sub in script_el.children:
+            if sub.type == "raw_text":
+                raw_text_node = sub
+                break
+        if raw_text_node is None:
+            continue
+
+        content = source_bytes[raw_text_node.start_byte : raw_text_node.end_byte]
+        if not content.strip():
+            continue
+
+        # Line offset: raw_text starts on the line after <script>
+        line_offset = raw_text_node.start_point[0]
+
+        # Parse script content with JS or TS parser
+        js_parser = _get_ts_parser(script_lang, file_path=file_path)
+        js_tree = js_parser.parse(content)
+        script_symbols = _extract_ts_js_symbols(js_tree.root_node, content, file_path)
+
+        # Adjust line numbers by offset
+        for sym in script_symbols:
+            sym_with_offset = Symbol(
+                name=sym.name,
+                kind=sym.kind,
+                file=sym.file,
+                line=sym.line + line_offset,
+                signature=sym.signature,
+                docstring=sym.docstring,
+                parent=sym.parent,
+            )
+            symbols.append(sym_with_offset)
+
     return symbols
 
 
@@ -516,6 +1016,10 @@ def extract_symbols(source: str, file_path: str, language: Language) -> list[Sym
         return extract_typescript_symbols(source, file_path)
     elif language == "javascript":
         return extract_javascript_symbols(source, file_path)
+    elif language == "php":
+        return extract_php_symbols(source, file_path)
+    elif language == "svelte":
+        return extract_svelte_symbols(source, file_path)
     else:
         raise ValueError(f"Unsupported language: {language}")
 
@@ -529,14 +1033,17 @@ DEFAULT_EXCLUDE_PATTERNS: list[str] = [
     "**/dist/**",
     "**/build/**",
     "**/.git/**",
+    "**/*.blade.php",
 ]
 
-# Language-specific default glob patterns
-DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, str] = {
-    "python": "**/*.py",
-    "typescript": "**/*.ts",
-    "javascript": "**/*.js",
-    None: "**/*",  # Auto-detect: scan all files
+# Language-specific default glob patterns (list to support multiple extensions)
+DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, list[str]] = {
+    "python": ["**/*.py"],
+    "typescript": ["**/*.ts", "**/*.tsx"],
+    "javascript": ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
+    "php": ["**/*.php"],
+    "svelte": ["**/*.svelte"],
+    None: ["**/*"],  # Auto-detect: scan all files
 }
 
 
@@ -652,28 +1159,41 @@ def scan_directory(
     if gitignore_patterns:
         exclude_patterns = list(exclude_patterns) + gitignore_patterns
 
-    if pattern is None:
-        pattern = DEFAULT_LANGUAGE_PATTERNS.get(language, "**/*")
+    # Resolve glob patterns: single pattern string or language-specific defaults
+    if pattern is not None:
+        patterns = [pattern]
+    else:
+        patterns = DEFAULT_LANGUAGE_PATTERNS.get(language, ["**/*"])
 
     result = ScanResult()
     root = path.resolve()
 
-    for file_path in path.glob(pattern):
-        if file_path.is_dir():
-            continue
+    # Collect files from all patterns, dedup by resolved path
+    seen: set[Path] = set()
+    for glob_pattern in patterns:
+        for file_path in path.glob(glob_pattern):
+            if file_path.is_dir():
+                continue
 
-        if _should_exclude(file_path, exclude_patterns):
-            continue
+            resolved = file_path.resolve()
+            if resolved in seen:
+                continue
+            seen.add(resolved)
 
-        rel_path = (
-            file_path.relative_to(root) if file_path.is_relative_to(root) else file_path
-        )
-        rel_str = str(rel_path)
+            if _should_exclude(file_path, exclude_patterns):
+                continue
 
-        file_language = language or detect_language(file_path)
-        if file_language is None:
-            continue
+            rel_path = (
+                file_path.relative_to(root)
+                if file_path.is_relative_to(root)
+                else file_path
+            )
+            rel_str = str(rel_path)
 
-        _process_source_file(file_path, rel_str, file_language, result)
+            file_language = language or detect_language(file_path)
+            if file_language is None:
+                continue
+
+            _process_source_file(file_path, rel_str, file_language, result)
 
     return result
