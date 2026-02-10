@@ -52,13 +52,13 @@ Source code → Scanner → raw symbols (551 for raise-commons)
 
 ## Key Files
 
-- **`scanner.py`** — Symbol extraction using Python's `ast` module (Python) and tree-sitter (TypeScript, TSX, JavaScript). Language detection via file extension. Returns `ScanResult` with typed `Symbol` objects including kind (class/function/method/enum/type_alias/constant/interface), line numbers, and parent relationships.
+- **`scanner.py`** — Symbol extraction using Python's `ast` module (Python) and tree-sitter (TypeScript, TSX, JavaScript, PHP). Language detection via file extension. Returns `ScanResult` with typed `Symbol` objects including kind (class/function/method/enum/type_alias/constant/interface/trait), line numbers, and parent relationships. PHP extraction includes namespace-qualified names.
 - **`analyzer.py`** — Groups symbols into components, assigns confidence tiers (high/medium/low), categorizes by module path. Produces `AnalysisResult` with module-level grouping. 99% test coverage, 79 tests.
 - **`drift.py`** — Compares current scan against a saved baseline. Detects added, removed, and moved components. Returns `DriftWarning` objects with severity levels.
 
 ## Dependencies
 
-Leaf module. Uses Python stdlib (`ast`, `pathlib`) and `tree-sitter-typescript` for TS/TSX parsing.
+Leaf module. Uses Python stdlib (`ast`, `pathlib`), `tree-sitter-typescript` for TS/TSX, and `tree-sitter-php` for PHP parsing.
 
 ## Conventions
 

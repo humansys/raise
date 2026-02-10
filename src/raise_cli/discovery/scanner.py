@@ -565,6 +565,251 @@ def _extract_ts_js_symbols(
     return symbols
 
 
+def _get_php_parser() -> Parser:
+    """Get a tree-sitter parser for PHP.
+
+    Returns:
+        Configured tree-sitter Parser.
+
+    Raises:
+        ImportError: If tree-sitter-php is not installed.
+    """
+    try:
+        from tree_sitter import Language as TSLanguage
+        from tree_sitter import Parser
+    except ImportError as e:
+        raise ImportError(
+            "tree-sitter is required for PHP scanning. "
+            "Install with: uv add tree-sitter tree-sitter-php"
+        ) from e
+
+    import tree_sitter_php as ts_php
+
+    lang = TSLanguage(ts_php.language_php())
+    return Parser(lang)
+
+
+def _extract_php_signature(node: Node, source: bytes) -> str:
+    """Extract a signature from a PHP AST node."""
+    node_type = node.type
+
+    if node_type == "class_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        parts = [f"class {name}"]
+        base = _find_child_by_type(node, "base_clause")
+        if base:
+            parts.append(_get_node_text(base, source))
+        iface = _find_child_by_type(node, "class_interface_clause")
+        if iface:
+            parts.append(_get_node_text(iface, source))
+        return " ".join(parts)
+
+    elif node_type == "interface_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"interface {name}"
+
+    elif node_type == "trait_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"trait {name}"
+
+    elif node_type == "function_definition":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        params_node = _find_child_by_type(node, "formal_parameters")
+        params = _get_node_text(params_node, source) if params_node else "()"
+        # Return type
+        ret_type = _find_child_by_type(node, "primitive_type", "named_type")
+        if ret_type:
+            return f"function {name}{params}: {_get_node_text(ret_type, source)}"
+        return f"function {name}{params}"
+
+    elif node_type == "method_declaration":
+        parts: list[str] = []
+        vis = _find_child_by_type(node, "visibility_modifier")
+        if vis:
+            parts.append(_get_node_text(vis, source))
+        static = _find_child_by_type(node, "static_modifier")
+        if static:
+            parts.append("static")
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        parts.append(f"function {name}")
+        params_node = _find_child_by_type(node, "formal_parameters")
+        params = _get_node_text(params_node, source) if params_node else "()"
+        sig = " ".join(parts) + params
+        ret_type = _find_child_by_type(node, "primitive_type", "named_type")
+        if ret_type:
+            sig += f": {_get_node_text(ret_type, source)}"
+        return sig
+
+    elif node_type == "enum_declaration":
+        name_node = _find_child_by_type(node, "name")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        # Backed enum type (e.g., ": string")
+        ret_type = _find_child_by_type(node, "primitive_type")
+        if ret_type:
+            return f"enum {name}: {_get_node_text(ret_type, source)}"
+        return f"enum {name}"
+
+    return ""
+
+
+def _extract_php_symbols(
+    root: Node,
+    source: bytes,
+    file_path: str,
+) -> list[Symbol]:
+    """Extract symbols from a PHP tree-sitter parse tree.
+
+    Walks the AST and extracts classes, interfaces, traits, functions,
+    methods, and enums. Tracks namespace for qualified names.
+
+    Args:
+        root: Root node of the tree-sitter parse tree.
+        source: Source code as bytes.
+        file_path: Path to the source file.
+
+    Returns:
+        List of Symbol objects.
+    """
+    symbols: list[Symbol] = []
+    namespace = ""
+
+    # Container types whose children include methods
+    container_types = {"class_declaration", "interface_declaration", "trait_declaration"}
+
+    def _qualify(name: str) -> str:
+        return f"{namespace}\\{name}" if namespace else name
+
+    def walk(node: Node, parent_name: str | None = None) -> None:
+        nonlocal namespace
+        node_type = node.type
+
+        if node_type == "namespace_definition":
+            ns_node = _find_child_by_type(node, "namespace_name")
+            if ns_node:
+                namespace = _get_node_text(ns_node, source)
+            # Continue walking children (declarations inside namespace)
+            for child in node.children:
+                walk(child, parent_name)
+            return
+
+        if node_type in container_types:
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+            qualified = _qualify(local_name)
+
+            kind: SymbolKind = "class"
+            if node_type == "interface_declaration":
+                kind = "interface"
+            elif node_type == "trait_declaration":
+                kind = "trait"
+
+            symbols.append(
+                Symbol(
+                    name=qualified,
+                    kind=kind,
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                )
+            )
+
+            # Walk declaration_list for methods
+            body = _find_child_by_type(node, "declaration_list")
+            if body:
+                for child in body.children:
+                    walk(child, parent_name=qualified)
+            return
+
+        if node_type == "method_declaration" and parent_name is not None:
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=local_name,
+                    kind="method",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                    parent=parent_name,
+                )
+            )
+            return
+
+        if node_type == "function_definition" and parent_name is None:
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=_qualify(local_name),
+                    kind="function",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                )
+            )
+            return
+
+        if node_type == "enum_declaration":
+            name_node = _find_child_by_type(node, "name")
+            local_name = _get_node_text(name_node, source) if name_node else "unknown"
+
+            symbols.append(
+                Symbol(
+                    name=_qualify(local_name),
+                    kind="enum",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_php_signature(node, source),
+                )
+            )
+            return
+
+        # Recurse into children
+        for child in node.children:
+            walk(child, parent_name)
+
+    walk(root)
+    return symbols
+
+
+def extract_php_symbols(source: str, file_path: str) -> list[Symbol]:
+    """Extract symbols from PHP source code.
+
+    Uses tree-sitter to parse PHP and extract classes, interfaces,
+    traits, functions, methods, and enums.
+
+    Args:
+        source: PHP source code as string.
+        file_path: Path to the source file (for metadata).
+
+    Returns:
+        List of Symbol objects.
+
+    Examples:
+        >>> source = '''
+        ... <?php
+        ... class User {
+        ...     public function getName(): string {}
+        ... }
+        ... '''
+        >>> symbols = extract_php_symbols(source, "User.php")
+        >>> symbols[0].kind
+        'class'
+    """
+    parser = _get_php_parser()
+    source_bytes = source.encode("utf-8")
+    tree = parser.parse(source_bytes)
+
+    return _extract_php_symbols(tree.root_node, source_bytes, file_path)
+
+
 def detect_language(file_path: str | Path) -> Language | None:
     """Detect language from file extension.
 
@@ -611,6 +856,8 @@ def extract_symbols(source: str, file_path: str, language: Language) -> list[Sym
         return extract_typescript_symbols(source, file_path)
     elif language == "javascript":
         return extract_javascript_symbols(source, file_path)
+    elif language == "php":
+        return extract_php_symbols(source, file_path)
     else:
         raise ValueError(f"Unsupported language: {language}")
 
@@ -624,6 +871,7 @@ DEFAULT_EXCLUDE_PATTERNS: list[str] = [
     "**/dist/**",
     "**/build/**",
     "**/.git/**",
+    "**/*.blade.php",
 ]
 
 # Language-specific default glob patterns (list to support multiple extensions)

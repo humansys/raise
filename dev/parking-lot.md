@@ -8,6 +8,13 @@
 
 ## Urgent
 
+- [ ] **WorkLifecycle model rejects `init` phase despite CLI accepting it** — (SES-131, 2026-02-09)
+  - **Problem:** `raise memory emit-work epic E17 --event start --phase init` passes CLI `valid_phases` check (includes `'init'`) but `WorkLifecycle` Pydantic model's `phase` field is `Literal['design', 'plan', 'implement', 'review']` — no `'init'`. CLI validates one thing, model validates another.
+  - **Location:** `memory.py:1336` (emit_work command), `WorkLifecycle` model definition
+  - **Fix:** Either add `'init'` to the Pydantic Literal, or remove `'init'` from `valid_phases` in the CLI command. The skill `/epic-start` uses `--phase init`, so the model should accept it.
+  - **Workaround:** Use `--phase design` instead
+  - **Priority:** Urgent — breaks every `/epic-start` telemetry emit
+
 - [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
 - [ ] **Rovo AI integration implementation** - Required for Mar 14 webinar (V3 scope)
 - [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
@@ -146,7 +153,14 @@
 - [ ] **Git history integration** — Nice-to-have for evolution tracking
 - [ ] **CI/CD drift blocking** — Start with warnings, add blocking after validation
 - [ ] **PageRank ranking** — Simpler heuristics (public/exported) sufficient for MVP
-- [ ] **Multi-language support** — Start with Python, expand based on need
+- [x] **Multi-language support** — ~~Start with Python, expand based on need~~ → E17 Multi-Language Discovery
+
+### E17 Multi-Language Discovery — Deferred (2026-02-09)
+
+- [ ] **Blade template extraction** (`.blade.php`) — Template markup, not structured code. Revisit if customers need template-level discovery.
+- [ ] **Vue SFC support** — No current customer need. Add when a Vue project needs discovery.
+- [ ] **Cross-language dependency analysis** — Import/require tracking across languages. Future scope.
+- [ ] **Svelte template/markup extraction** — Currently only script block symbols. Template bindings could be useful for component relationship mapping.
 
 ### E16 Incremental Coherence — Parking Lot (2026-02-09)
 
@@ -156,6 +170,12 @@
 - [ ] **Absorb `/discover-complete` into `/discover-validate`** — Export is a mechanical final step, not a separate concern.
 
 ### Research Needed
+
+- [ ] **Graph memory effectiveness in design sessions** — (SES-131, 2026-02-09)
+  - **Observation:** E17 epic-design loaded 3 graph queries (memory query, module context). None materially influenced design decisions. Design was driven by reading actual code (gemba).
+  - **Questions:** Is this a query relevance problem? A graph content depth problem? Or expected for new-territory work? Need data across multiple design sessions before deciding what to measure.
+  - **Possible outcomes:** Better query strategies in skills, graph content enrichment, effectiveness telemetry signal, or "working as intended for novel domains."
+  - **Priority:** Medium — significant infrastructure investment deserves ROI analysis
 
 - [ ] **Lean Spec Principles** — How do they apply to governance artifacts? (Previous research attempt stale — needs fresh start if still wanted)
 
