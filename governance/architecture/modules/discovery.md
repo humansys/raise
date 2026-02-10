@@ -29,7 +29,7 @@ components: 45
 constraints:
   - "Independent of governance module — no cross-imports"
   - "All analysis is deterministic — no AI inference in CLI"
-  - "Scanner uses Python AST (not tree-sitter) for Python files"
+  - "Scanner uses Python AST for Python files, tree-sitter for TS/TSX/JS"
 ---
 
 ## Purpose
@@ -52,13 +52,13 @@ Source code → Scanner → raw symbols (551 for raise-commons)
 
 ## Key Files
 
-- **`scanner.py`** — Symbol extraction using Python's `ast` module. Supports Python, TypeScript, and JavaScript. Returns `ScanResult` with typed `Symbol` objects including kind (class/function/method), line numbers, and parent relationships.
+- **`scanner.py`** — Symbol extraction using Python's `ast` module (Python) and tree-sitter (TypeScript, TSX, JavaScript). Language detection via file extension. Returns `ScanResult` with typed `Symbol` objects including kind (class/function/method/enum/type_alias/constant/interface), line numbers, and parent relationships.
 - **`analyzer.py`** — Groups symbols into components, assigns confidence tiers (high/medium/low), categorizes by module path. Produces `AnalysisResult` with module-level grouping. 99% test coverage, 79 tests.
 - **`drift.py`** — Compares current scan against a saved baseline. Detects added, removed, and moved components. Returns `DriftWarning` objects with severity levels.
 
 ## Dependencies
 
-None — leaf module. Uses only Python stdlib (`ast`, `pathlib`).
+Leaf module. Uses Python stdlib (`ast`, `pathlib`) and `tree-sitter-typescript` for TS/TSX parsing.
 
 ## Conventions
 
