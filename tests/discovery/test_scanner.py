@@ -14,6 +14,7 @@ from raise_cli.discovery.scanner import (
     extract_javascript_symbols,
     extract_php_symbols,
     extract_python_symbols,
+    extract_svelte_symbols,
     extract_symbols,
     extract_typescript_symbols,
     scan_directory,
@@ -911,3 +912,150 @@ class TestExtractPhpSymbols:
         # Blade file should be explicitly skipped — only 1 file scanned
         assert result.files_scanned == 1
         assert len(result.errors) == 0
+
+
+class TestExtractSvelteSymbols:
+    """Tests for extract_svelte_symbols function."""
+
+    def test_extract_js_script_block(self) -> None:
+        """Test extracting symbols from a JS script block."""
+        source = dedent("""\
+            <script>
+              function greet(msg) {
+                return 'Hello ' + msg;
+              }
+
+              class UserService {
+                getName() {
+                  return this.name;
+                }
+              }
+            </script>
+
+            <h1>Hello</h1>
+        """)
+        symbols = extract_svelte_symbols(source, "Greeting.svelte")
+        component = [s for s in symbols if s.kind == "component"]
+        functions = [s for s in symbols if s.kind == "function"]
+        classes = [s for s in symbols if s.kind == "class"]
+        methods = [s for s in symbols if s.kind == "method"]
+
+        assert len(component) == 1
+        assert component[0].name == "Greeting"
+        assert component[0].signature == "component Greeting"
+        assert component[0].line == 1
+
+        assert len(functions) == 1
+        assert functions[0].name == "greet"
+
+        assert len(classes) == 1
+        assert classes[0].name == "UserService"
+
+        assert len(methods) == 1
+        assert methods[0].name == "getName"
+        assert methods[0].parent == "UserService"
+
+    def test_extract_ts_script_block(self) -> None:
+        """Test extracting symbols from a TypeScript script block."""
+        source = dedent("""\
+            <script lang="ts">
+              interface User {
+                name: string;
+              }
+
+              export function getUser(): User {
+                return { name: 'test' };
+              }
+            </script>
+
+            <div>Hello</div>
+        """)
+        symbols = extract_svelte_symbols(source, "UserCard.svelte")
+        component = [s for s in symbols if s.kind == "component"]
+        interfaces = [s for s in symbols if s.kind == "interface"]
+        functions = [s for s in symbols if s.kind == "function"]
+
+        assert len(component) == 1
+        assert component[0].name == "UserCard"
+
+        assert len(interfaces) == 1
+        assert interfaces[0].name == "User"
+
+        assert len(functions) == 1
+        assert functions[0].name == "getUser"
+
+    def test_no_script_block(self) -> None:
+        """Test that a file with no script block returns component only."""
+        source = "<div>Static content only</div>\n"
+        symbols = extract_svelte_symbols(source, "Static.svelte")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "component"
+        assert symbols[0].name == "Static"
+
+    def test_empty_script_block(self) -> None:
+        """Test that an empty script block returns component only."""
+        source = "<script></script>\n<div>Hello</div>\n"
+        symbols = extract_svelte_symbols(source, "Empty.svelte")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "component"
+        assert symbols[0].name == "Empty"
+
+    def test_line_numbers_offset(self) -> None:
+        """Test that line numbers are correct relative to the .svelte file."""
+        source = dedent("""\
+            <script>
+              function first() {}
+
+              function second() {}
+            </script>
+        """)
+        symbols = extract_svelte_symbols(source, "Lines.svelte")
+        functions = [s for s in symbols if s.kind == "function"]
+        assert len(functions) == 2
+        # first() is on line 2 of the .svelte file
+        assert functions[0].name == "first"
+        assert functions[0].line == 2
+        # second() is on line 4 of the .svelte file
+        assert functions[1].name == "second"
+        assert functions[1].line == 4
+
+    def test_component_name_from_filename(self) -> None:
+        """Test that component name is derived from filename stem."""
+        source = "<div>Hello</div>\n"
+        symbols = extract_svelte_symbols(source, "src/lib/MyComponent.svelte")
+        assert symbols[0].name == "MyComponent"
+        assert symbols[0].file == "src/lib/MyComponent.svelte"
+
+    def test_extract_svelte_via_unified(self) -> None:
+        """Test extracting Svelte via unified extract_symbols function."""
+        source = dedent("""\
+            <script>
+              function hello() {}
+            </script>
+        """)
+        symbols = extract_symbols(source, "App.svelte", "svelte")
+        component = [s for s in symbols if s.kind == "component"]
+        functions = [s for s in symbols if s.kind == "function"]
+        assert len(component) == 1
+        assert component[0].name == "App"
+        assert len(functions) == 1
+        assert functions[0].name == "hello"
+
+    def test_script_context_module(self) -> None:
+        """Test extracting from both instance and module script blocks."""
+        source = dedent("""\
+            <script context="module">
+              export function shared() {}
+            </script>
+
+            <script>
+              function instance() {}
+            </script>
+
+            <div>Hello</div>
+        """)
+        symbols = extract_svelte_symbols(source, "Dual.svelte")
+        functions = [s for s in symbols if s.kind == "function"]
+        names = {f.name for f in functions}
+        assert "shared" in names
+        assert "instance" in names
