@@ -810,6 +810,166 @@ def extract_php_symbols(source: str, file_path: str) -> list[Symbol]:
     return _extract_php_symbols(tree.root_node, source_bytes, file_path)
 
 
+# -----------------------------------------------------------------------------
+# Svelte Extraction (tree-sitter-svelte + JS/TS re-parse)
+# -----------------------------------------------------------------------------
+
+
+def _get_svelte_parser() -> Parser:
+    """Get a tree-sitter parser for Svelte.
+
+    Returns:
+        Configured tree-sitter Parser.
+
+    Raises:
+        ImportError: If tree-sitter-svelte is not installed.
+    """
+    try:
+        from tree_sitter import Language as TSLanguage
+        from tree_sitter import Parser
+    except ImportError as e:
+        raise ImportError(
+            "tree-sitter is required for Svelte scanning. "
+            "Install with: uv add tree-sitter tree-sitter-svelte"
+        ) from e
+
+    import tree_sitter_svelte
+
+    lang = TSLanguage(tree_sitter_svelte.language())
+    return Parser(lang)
+
+
+def _detect_svelte_script_lang(
+    script_element: Node, source: bytes
+) -> Language:
+    """Detect whether a Svelte script block uses TypeScript or JavaScript.
+
+    Checks for ``lang="ts"`` or ``lang="typescript"`` attribute on the
+    ``<script>`` tag.
+
+    Args:
+        script_element: The ``script_element`` node from tree-sitter-svelte.
+        source: Source code as bytes.
+
+    Returns:
+        ``"typescript"`` if lang attribute indicates TS, else ``"javascript"``.
+    """
+    for child in script_element.children:
+        if child.type != "start_tag":
+            continue
+        for attr in child.children:
+            if attr.type != "attribute":
+                continue
+            attr_name: Node | None = None
+            attr_value: Node | None = None
+            for part in attr.children:
+                if part.type == "attribute_name":
+                    attr_name = part
+                elif part.type == "quoted_attribute_value":
+                    attr_value = part
+            if attr_name is None or attr_value is None:
+                continue
+            name_text = source[attr_name.start_byte : attr_name.end_byte].decode("utf-8")
+            if name_text != "lang":
+                continue
+            # Extract value from quoted_attribute_value → attribute_value
+            for val_child in attr_value.children:
+                if val_child.type == "attribute_value":
+                    val_text = source[val_child.start_byte : val_child.end_byte].decode(
+                        "utf-8"
+                    )
+                    if val_text in ("ts", "typescript"):
+                        return "typescript"
+    return "javascript"
+
+
+def extract_svelte_symbols(source: str, file_path: str) -> list[Symbol]:
+    """Extract symbols from Svelte source code.
+
+    Uses a two-pass approach:
+    1. Parse with tree-sitter-svelte to find ``<script>`` blocks
+    2. Re-parse script content with JS or TS tree-sitter parser
+
+    Each ``.svelte`` file is also registered as a ``"component"`` symbol.
+
+    Args:
+        source: Svelte source code as string.
+        file_path: Path to the source file (for metadata).
+
+    Returns:
+        List of Symbol objects.
+
+    Examples:
+        >>> source = '''
+        ... <script>
+        ...   function hello() {}
+        ... </script>
+        ... '''
+        >>> symbols = extract_svelte_symbols(source, "App.svelte")
+        >>> symbols[0].kind
+        'component'
+    """
+    source_bytes = source.encode("utf-8")
+    component_name = Path(file_path).stem
+
+    symbols: list[Symbol] = [
+        Symbol(
+            name=component_name,
+            kind="component",
+            file=file_path,
+            line=1,
+            signature=f"component {component_name}",
+        )
+    ]
+
+    svelte_parser = _get_svelte_parser()
+    svelte_tree = svelte_parser.parse(source_bytes)
+    root = svelte_tree.root_node
+
+    for script_el in root.children:
+        if script_el.type != "script_element":
+            continue
+
+        # Detect lang="ts" on this specific script element
+        script_lang = _detect_svelte_script_lang(script_el, source_bytes)
+
+        # Find raw_text content
+        raw_text_node: Node | None = None
+        for sub in script_el.children:
+            if sub.type == "raw_text":
+                raw_text_node = sub
+                break
+        if raw_text_node is None:
+            continue
+
+        content = source_bytes[raw_text_node.start_byte : raw_text_node.end_byte]
+        if not content.strip():
+            continue
+
+        # Line offset: raw_text starts on the line after <script>
+        line_offset = raw_text_node.start_point[0]
+
+        # Parse script content with JS or TS parser
+        js_parser = _get_ts_parser(script_lang, file_path=file_path)
+        js_tree = js_parser.parse(content)
+        script_symbols = _extract_ts_js_symbols(js_tree.root_node, content, file_path)
+
+        # Adjust line numbers by offset
+        for sym in script_symbols:
+            sym_with_offset = Symbol(
+                name=sym.name,
+                kind=sym.kind,
+                file=sym.file,
+                line=sym.line + line_offset,
+                signature=sym.signature,
+                docstring=sym.docstring,
+                parent=sym.parent,
+            )
+            symbols.append(sym_with_offset)
+
+    return symbols
+
+
 def detect_language(file_path: str | Path) -> Language | None:
     """Detect language from file extension.
 
@@ -858,6 +1018,8 @@ def extract_symbols(source: str, file_path: str, language: Language) -> list[Sym
         return extract_javascript_symbols(source, file_path)
     elif language == "php":
         return extract_php_symbols(source, file_path)
+    elif language == "svelte":
+        return extract_svelte_symbols(source, file_path)
     else:
         raise ValueError(f"Unsupported language: {language}")
 
