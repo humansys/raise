@@ -162,6 +162,19 @@
 - [ ] **Cross-language dependency analysis** — Import/require tracking across languages. Future scope.
 - [ ] **Svelte template/markup extraction** — Currently only script block symbols. Template bindings could be useful for component relationship mapping.
 
+### Graph Health & Context Caring — Parking Lot (2026-02-10)
+
+- [ ] **Lifecycle-aware graph health contract** — (SES-134, 2026-02-10)
+  - **Context:** BF-2 exposed that graph completeness is invisible. `raise memory validate` checks structural integrity but not semantic completeness. Neither user nor Rai can detect absent node types.
+  - **Vision:** Declarative invariants per lifecycle phase (post-init, post-onboard, post-discovery). Dedicated `raise memory health` command. Session-start integration so Rai sees gaps.
+  - **Scope:** Full lifecycle-phase schema, not just the minimal check in BF-2's F5
+  - **Related:** BF-2 (F5 is the seed), `raise doctor` (E7 deferred)
+
+- [ ] **Tools for human to understand and care for Rai's memory state** — (SES-134, 2026-02-10)
+  - **Context:** Emilio's insight — the graph is invisible to both Rai and the user. The user needs tools to understand what Rai knows and doesn't know, and to be more intentional about maintaining context quality.
+  - **Questions:** What would a "memory dashboard" look like? Is it CLI? Is it a doc? Is it part of session-start? What metrics matter?
+  - **Priority:** Post-BF-2, high value for Jumpstart client experience
+
 ### E16 Incremental Coherence — Parking Lot (2026-02-09)
 
 - [ ] **Multi-platform code analyzers** — Extend `CodeAnalyzer` Protocol beyond Python: TypeScript, PHP. Architecture is pluggable from S16.1.
