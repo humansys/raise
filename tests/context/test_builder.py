@@ -2591,3 +2591,100 @@ class TestLoadCodeStructure:
             builder.build()
 
         mock_code.assert_called_once()
+
+
+class TestRaiBaseTemplateContract:
+    """Contract tests: rai_base architecture templates produce valid graph nodes.
+
+    These tests verify PAT-202/203 (templates-as-contract): the bundled
+    templates in rai_base MUST parse through _parse_architecture_doc and
+    produce non-None nodes.
+    """
+
+    def _get_rai_base_arch_dir(self) -> Path:
+        """Get the path to bundled rai_base architecture templates."""
+        from importlib.resources import files as pkg_files
+
+        base = pkg_files("raise_cli.rai_base") / "governance" / "architecture"
+        # importlib Traversable → Path
+        return Path(str(base))
+
+    def test_system_context_template_has_valid_frontmatter(
+        self, tmp_path: Path
+    ) -> None:
+        """system-context.md template must parse into arch-context node."""
+        src = self._get_rai_base_arch_dir() / "system-context.md"
+        content = src.read_text().replace("{project_name}", "test-project")
+
+        dest_dir = tmp_path / "governance" / "architecture"
+        dest_dir.mkdir(parents=True)
+        (dest_dir / "system-context.md").write_text(content)
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.id == "arch-context"]
+        assert len(arch_nodes) == 1, "system-context.md must produce arch-context node"
+        assert arch_nodes[0].type == "architecture"
+        assert arch_nodes[0].metadata["arch_type"] == "architecture_context"
+
+    def test_system_design_template_has_valid_frontmatter(
+        self, tmp_path: Path
+    ) -> None:
+        """system-design.md template must parse into arch-design node."""
+        src = self._get_rai_base_arch_dir() / "system-design.md"
+        content = src.read_text().replace("{project_name}", "test-project")
+
+        dest_dir = tmp_path / "governance" / "architecture"
+        dest_dir.mkdir(parents=True)
+        (dest_dir / "system-design.md").write_text(content)
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.id == "arch-design"]
+        assert len(arch_nodes) == 1, "system-design.md must produce arch-design node"
+        assert arch_nodes[0].type == "architecture"
+        assert arch_nodes[0].metadata["arch_type"] == "architecture_design"
+
+    def test_domain_model_template_has_valid_frontmatter(
+        self, tmp_path: Path
+    ) -> None:
+        """domain-model.md template must parse into arch-domain-model node."""
+        src = self._get_rai_base_arch_dir() / "domain-model.md"
+        content = src.read_text().replace("{project_name}", "test-project")
+
+        dest_dir = tmp_path / "governance" / "architecture"
+        dest_dir.mkdir(parents=True)
+        (dest_dir / "domain-model.md").write_text(content)
+
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        nodes = builder.load_architecture()
+
+        arch_nodes = [n for n in nodes if n.id == "arch-domain-model"]
+        assert len(arch_nodes) == 1, "domain-model.md must produce arch-domain-model node"
+        assert arch_nodes[0].type == "architecture"
+        assert arch_nodes[0].metadata["arch_type"] == "architecture_domain_model"
+
+    def test_all_architecture_templates_have_type_frontmatter(self) -> None:
+        """Every .md file in rai_base architecture dir must have type: frontmatter."""
+        arch_dir = self._get_rai_base_arch_dir()
+        md_files = list(arch_dir.glob("*.md"))
+
+        assert len(md_files) >= 3, (
+            f"Expected ≥3 architecture templates, found {len(md_files)}: {md_files}"
+        )
+
+        for md_file in md_files:
+            content = md_file.read_text()
+            assert content.startswith("---"), (
+                f"{md_file.name} must start with YAML frontmatter delimiter '---'"
+            )
+            end = content.find("---", 3)
+            assert end != -1, (
+                f"{md_file.name} must have closing YAML frontmatter delimiter"
+            )
+            frontmatter_text = content[3:end].strip()
+            assert "type:" in frontmatter_text, (
+                f"{md_file.name} frontmatter must contain 'type:' field"
+            )
