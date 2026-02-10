@@ -64,6 +64,11 @@ def _format_scan_summary(
     methods = sum(1 for s in result.symbols if s.kind == "method")
     modules = sum(1 for s in result.symbols if s.kind == "module")
     interfaces = sum(1 for s in result.symbols if s.kind == "interface")
+    enums = sum(1 for s in result.symbols if s.kind == "enum")
+    type_aliases = sum(1 for s in result.symbols if s.kind == "type_alias")
+    constants = sum(1 for s in result.symbols if s.kind == "constant")
+    traits = sum(1 for s in result.symbols if s.kind == "trait")
+    components = sum(1 for s in result.symbols if s.kind == "component")
 
     lang_str = f" ({language})" if language else " (auto-detect)"
     _console.print(f"[bold]Scan Summary:[/bold] {path}{lang_str}")
@@ -74,6 +79,16 @@ def _format_scan_summary(
     _console.print(f"    - Methods: {methods}")
     if interfaces > 0:
         _console.print(f"    - Interfaces: {interfaces}")
+    if enums > 0:
+        _console.print(f"    - Enums: {enums}")
+    if type_aliases > 0:
+        _console.print(f"    - Type aliases: {type_aliases}")
+    if constants > 0:
+        _console.print(f"    - Constants: {constants}")
+    if traits > 0:
+        _console.print(f"    - Traits: {traits}")
+    if components > 0:
+        _console.print(f"    - Components: {components}")
     if modules > 0:
         _console.print(f"    - Modules with docstrings: {modules}")
     if result.errors:
