@@ -33,6 +33,7 @@ ConfidenceTier = Literal["high", "medium", "low"]
 # ── Category mapping constants ────────────────────────────────────────────
 
 DEFAULT_CATEGORY_MAP: dict[str, str] = {
+    # Python (raise-cli conventions)
     "cli/commands/": "command",
     "cli/": "utility",
     "schemas/": "schema",
@@ -46,6 +47,24 @@ DEFAULT_CATEGORY_MAP: dict[str, str] = {
     "config/": "utility",
     "core/": "utility",
     "telemetry/": "service",
+    # Laravel/PHP
+    "Controllers/": "controller",
+    "Models/": "model",
+    "Middleware/": "middleware",
+    "Providers/": "provider",
+    "Services/": "service",
+    "Requests/": "schema",
+    "Resources/": "formatter",
+    "routes/": "route",
+    "Migrations/": "migration",
+    # Svelte/TS/JS
+    "components/": "component",
+    "stores/": "store",
+    "lib/": "utility",
+    "utils/": "utility",
+    "types/": "schema",
+    "hooks/": "utility",
+    "api/": "service",
 }
 
 NAME_CATEGORY_OVERRIDES: dict[str, str] = {
@@ -352,26 +371,34 @@ def determine_category(
     return "other"
 
 
-def _file_to_module(file_path: str) -> str:
-    """Convert a file path to a Python module path.
+_SOURCE_PREFIXES = ("src", "app", "lib")
+_CODE_EXTENSIONS = {".py", ".php", ".ts", ".tsx", ".js", ".jsx", ".svelte"}
 
-    Strips 'src/' prefix and '.py' suffix, converts '/' to '.'.
+
+def _file_to_module(file_path: str) -> str:
+    """Convert a file path to a dotted module path.
+
+    Strips common source prefixes (src/, app/, lib/) and known code
+    extensions (.py, .php, .ts, .tsx, .js, .jsx, .svelte).
 
     Args:
-        file_path: Relative file path (e.g., "src/raise_cli/discovery/scanner.py").
+        file_path: Relative file path (e.g., "src/raise_cli/discovery/scanner.py"
+            or "app/Http/Controllers/UserController.php").
 
     Returns:
-        Dotted module path (e.g., "raise_cli.discovery.scanner").
+        Dotted module path (e.g., "raise_cli.discovery.scanner"
+            or "Http.Controllers.UserController").
     """
     p = PurePosixPath(file_path)
-    # Strip src/ prefix if present
     parts = list(p.parts)
-    if parts and parts[0] == "src":
+    # Strip common source prefixes
+    if parts and parts[0] in _SOURCE_PREFIXES:
         parts = parts[1:]
-    # Remove .py extension from last part
+    # Remove known code extension from last part
     if parts:
-        stem = PurePosixPath(parts[-1]).stem
-        parts[-1] = stem
+        last = PurePosixPath(parts[-1])
+        if last.suffix in _CODE_EXTENSIONS:
+            parts[-1] = last.stem
     return ".".join(parts)
 
 

@@ -23,6 +23,7 @@ from raise_cli.discovery.analyzer import (
     AnalyzedComponent,
     ConfidenceResult,
     ConfidenceSignals,
+    _file_to_module,
     analyze,
     build_hierarchy,
     compute_confidence,
@@ -221,6 +222,64 @@ class TestMatchPathCategory:
         """cli/commands/ should match before cli/."""
         result = match_path_category("src/raise_cli/cli/commands/scan.py")
         assert result == "command"
+
+    # ── Multi-language category patterns (S17.4) ─────────────────────────
+
+    def test_laravel_controllers_path(self) -> None:
+        result = match_path_category("app/Http/Controllers/UserController.php")
+        assert result == "controller"
+
+    def test_laravel_models_path(self) -> None:
+        result = match_path_category("app/Models/User.php")
+        assert result == "model"
+
+    def test_laravel_middleware_path(self) -> None:
+        result = match_path_category("app/Http/Middleware/Auth.php")
+        assert result == "middleware"
+
+    def test_laravel_providers_path(self) -> None:
+        result = match_path_category("app/Providers/AppServiceProvider.php")
+        assert result == "provider"
+
+    def test_laravel_services_path(self) -> None:
+        result = match_path_category("app/Services/PaymentService.php")
+        assert result == "service"
+
+    def test_laravel_requests_path(self) -> None:
+        result = match_path_category("app/Http/Requests/StoreUserRequest.php")
+        assert result == "schema"
+
+    def test_laravel_routes_path(self) -> None:
+        result = match_path_category("routes/web.php")
+        assert result == "route"
+
+    def test_laravel_migrations_path(self) -> None:
+        result = match_path_category("database/Migrations/create_users.php")
+        assert result == "migration"
+
+    def test_svelte_components_path(self) -> None:
+        result = match_path_category("src/lib/components/Header.svelte")
+        assert result == "component"
+
+    def test_svelte_stores_path(self) -> None:
+        result = match_path_category("src/stores/auth.ts")
+        assert result == "store"
+
+    def test_ts_lib_path(self) -> None:
+        result = match_path_category("src/lib/utils/format.ts")
+        assert result == "utility"
+
+    def test_ts_types_path(self) -> None:
+        result = match_path_category("src/types/user.ts")
+        assert result == "schema"
+
+    def test_ts_api_path(self) -> None:
+        result = match_path_category("src/api/client.ts")
+        assert result == "service"
+
+    def test_ts_hooks_path(self) -> None:
+        result = match_path_category("src/hooks/useAuth.ts")
+        assert result == "utility"
 
 
 # ── compute_confidence Tests ──────────────────────────────────────────────
@@ -433,6 +492,7 @@ class TestConstants:
 
     def test_default_category_map_has_expected_keys(self) -> None:
         expected = [
+            # Python
             "cli/commands/",
             "cli/",
             "schemas/",
@@ -446,6 +506,24 @@ class TestConstants:
             "config/",
             "core/",
             "telemetry/",
+            # Laravel/PHP
+            "Controllers/",
+            "Models/",
+            "Middleware/",
+            "Providers/",
+            "Services/",
+            "Requests/",
+            "Resources/",
+            "routes/",
+            "Migrations/",
+            # Svelte/TS/JS
+            "components/",
+            "stores/",
+            "lib/",
+            "utils/",
+            "types/",
+            "hooks/",
+            "api/",
         ]
         for key in expected:
             assert key in DEFAULT_CATEGORY_MAP, f"Missing key: {key}"
@@ -729,6 +807,63 @@ class TestExtractFirstSentence:
 
     def test_whitespace_stripped(self) -> None:
         assert extract_first_sentence("  Padded sentence.  ") == "Padded sentence."
+
+
+# ── _file_to_module Tests (S17.4) ────────────────────────────────────────
+
+
+class TestFileToModule:
+    """Tests for file path to module path conversion."""
+
+    # Existing Python behavior (regression)
+    def test_python_with_src_prefix(self) -> None:
+        result = _file_to_module("src/raise_cli/discovery/scanner.py")
+        assert result == "raise_cli.discovery.scanner"
+
+    def test_python_without_src_prefix(self) -> None:
+        result = _file_to_module("raise_cli/discovery/scanner.py")
+        assert result == "raise_cli.discovery.scanner"
+
+    # PHP paths (Laravel uses app/ prefix)
+    def test_php_with_app_prefix(self) -> None:
+        result = _file_to_module("app/Http/Controllers/UserController.php")
+        assert result == "Http.Controllers.UserController"
+
+    def test_php_without_prefix(self) -> None:
+        result = _file_to_module("Http/Controllers/UserController.php")
+        assert result == "Http.Controllers.UserController"
+
+    # TypeScript/JavaScript paths
+    def test_ts_with_src_prefix(self) -> None:
+        result = _file_to_module("src/lib/stores/auth.ts")
+        assert result == "lib.stores.auth"
+
+    def test_tsx_file(self) -> None:
+        result = _file_to_module("src/components/Header.tsx")
+        assert result == "components.Header"
+
+    def test_js_file(self) -> None:
+        result = _file_to_module("src/utils/format.js")
+        assert result == "utils.format"
+
+    def test_jsx_file(self) -> None:
+        result = _file_to_module("src/components/App.jsx")
+        assert result == "components.App"
+
+    # Svelte paths
+    def test_svelte_file(self) -> None:
+        result = _file_to_module("src/lib/components/Header.svelte")
+        assert result == "lib.components.Header"
+
+    # lib/ prefix stripping
+    def test_lib_prefix(self) -> None:
+        result = _file_to_module("lib/utils/helper.ts")
+        assert result == "utils.helper"
+
+    # Unknown extension preserved as-is (no stripping)
+    def test_unknown_extension_not_stripped(self) -> None:
+        result = _file_to_module("src/data/config.yaml")
+        assert result == "data.config.yaml"
 
 
 # ── group_by_module Tests ─────────────────────────────────────────────────
