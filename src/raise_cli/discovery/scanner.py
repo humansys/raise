@@ -871,6 +871,7 @@ DEFAULT_EXCLUDE_PATTERNS: list[str] = [
     "**/dist/**",
     "**/build/**",
     "**/.git/**",
+    "**/*.blade.php",
 ]
 
 # Language-specific default glob patterns (list to support multiple extensions)
