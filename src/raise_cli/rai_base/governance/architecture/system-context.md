@@ -1,3 +1,13 @@
+---
+type: architecture_context
+project: "{project_name}"
+status: draft
+tech_stack: {}
+external_dependencies: []
+users: []
+governed_by: []
+---
+
 # System Context: {project_name}
 
 > C4 Level 1 — System Context diagram and description

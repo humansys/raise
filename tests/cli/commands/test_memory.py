@@ -373,6 +373,84 @@ class TestMemoryValidateCommand:
             os.chdir(original_cwd)
 
 
+    def test_validate_completeness_warns_missing_architecture(
+        self, tmp_path: Path
+    ) -> None:
+        """Validate should warn when graph has no architecture nodes."""
+        memory_dir = tmp_path / ".raise" / "rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        # Graph with only pattern nodes — no architecture, no modules
+        graph_data = {
+            "nodes": [
+                {
+                    "id": "PAT-001",
+                    "type": "pattern",
+                    "content": "Test pattern",
+                    "source_file": "test.jsonl",
+                    "created": "2026-01-31",
+                    "metadata": {},
+                },
+            ],
+            "edges": [],
+            "metadata": {"version": "1.0", "created": "2026-01-31"},
+        }
+        (memory_dir / "index.json").write_text(json.dumps(graph_data))
+
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(app, ["memory", "validate"])
+
+            assert result.exit_code == 0
+            assert "Completeness" in result.output
+            assert "architecture" in result.output
+            assert "module" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_validate_completeness_passes_with_architecture_and_modules(
+        self, tmp_path: Path
+    ) -> None:
+        """Validate should pass completeness when architecture and module nodes exist."""
+        memory_dir = tmp_path / ".raise" / "rai" / "memory"
+        memory_dir.mkdir(parents=True)
+
+        graph_data = {
+            "nodes": [
+                {
+                    "id": "arch-context",
+                    "type": "architecture",
+                    "content": "System context",
+                    "source_file": "governance/architecture/system-context.md",
+                    "created": "2026-01-31",
+                    "metadata": {"arch_type": "architecture_context"},
+                },
+                {
+                    "id": "mod-core",
+                    "type": "module",
+                    "content": "Core module",
+                    "source_file": "governance/architecture/modules/core.md",
+                    "created": "2026-01-31",
+                    "metadata": {},
+                },
+            ],
+            "edges": [],
+            "metadata": {"version": "1.0", "created": "2026-01-31"},
+        }
+        (memory_dir / "index.json").write_text(json.dumps(graph_data))
+
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(app, ["memory", "validate"])
+
+            assert result.exit_code == 0
+            assert "Completeness check passed" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+
 class TestMemoryAddPatternCommand:
     """Tests for `raise memory add-pattern` command."""
 

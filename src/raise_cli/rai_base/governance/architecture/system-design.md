@@ -1,3 +1,10 @@
+---
+type: architecture_design
+project: "{project_name}"
+status: draft
+layers: []
+---
+
 # System Design: {project_name}
 
 > C4 Level 2 — Container/component decomposition
