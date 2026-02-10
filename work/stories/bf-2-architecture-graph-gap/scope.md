@@ -3,7 +3,7 @@
 > **Type:** Bugfix (systemic)
 > **Priority:** P1 — blocks demo-ready onboarding for external projects
 > **Found:** 2026-02-09, dry-run of discovery on zambezi-concierge
-> **Size:** M (templates + 2 skills + tests)
+> **Size:** L (templates + 2 skills + health check + tests)
 
 ---
 
@@ -84,6 +84,30 @@ Option C: Create a dedicated `/discover-describe` skill
 
 Check if `/project-create` has the same frontmatter gap in its architecture templates. Likely yes — fix in parallel.
 
+### F5: Graph completeness postcondition (G4: silent failure mode)
+
+The graph has structural validation (`raise memory validate`) but no **completeness** validation. A graph with 144 components and 0 architecture nodes passes validation — structurally consistent but semantically incomplete. Neither user nor Rai can detect the absence.
+
+**Minimum viable health check:**
+
+Define expected node types per lifecycle phase:
+```python
+ONBOARDING_COMPLETE = {
+    "architecture_context": 1,   # ≥1
+    "architecture_design": 1,    # ≥1
+    "module": 1,                 # ≥1
+}
+```
+
+Wire into:
+- **`raise memory validate --completeness`** (or extend default validation) — check graph against phase expectations
+- **End of `/project-onboard`** — postcondition gate warns if graph is incomplete after onboarding
+
+**Out of scope for F5:**
+- Full lifecycle-phase schema system (different invariants per phase)
+- Dedicated `raise memory health` command
+- session-start integration (future story)
+
 ## Acceptance Criteria
 
 1. After `raise init --detect` + `/project-onboard` on a brownfield project:
@@ -102,12 +126,18 @@ Check if `/project-create` has the same frontmatter gap in its architecture temp
 
 4. Graph gate in `/project-onboard` Step 7 verifies architecture + module nodes exist
 
+5. `raise memory validate` checks graph completeness (expected node types present)
+   - Warns when architecture nodes missing after onboarding
+   - Returns structured result (pass/fail + missing types)
+
 ## Test Plan
 
 - Integration test: scaffold → onboard → build graph → assert architecture nodes > 0
 - Integration test: assert module nodes match discovered modules
 - Unit test: `_parse_architecture_doc()` with new templates produces correct node types
 - Template contract test: all `rai_base/governance/architecture/*.md` files have valid YAML frontmatter with `type:` field
+- Unit test: completeness check detects missing architecture nodes
+- Unit test: completeness check passes when all expected types present
 
 ## Related
 
