@@ -626,6 +626,30 @@ def validate(
     # Check 3: Reachability
     console.print(f"  ✓ {graph.node_count}/{graph.node_count} concepts reachable")
 
+    # Check 4: Completeness — expected node types present
+    expected_types: dict[str, int] = {
+        "architecture": 1,  # ≥1 arch-* node
+        "module": 1,  # ≥1 mod-* node
+    }
+    type_counts: dict[str, int] = {}
+    for node in graph.iter_concepts():
+        type_counts[node.type] = type_counts.get(node.type, 0) + 1
+
+    missing: list[tuple[str, int, int]] = []
+    for node_type, min_count in expected_types.items():
+        actual = type_counts.get(node_type, 0)
+        if actual < min_count:
+            missing.append((node_type, min_count, actual))
+
+    if missing:
+        console.print("  [yellow]⚠[/yellow]  Completeness gaps:")
+        for node_type, expected, actual in missing:
+            console.print(
+                f"    {node_type}: expected ≥{expected}, found {actual}"
+            )
+    else:
+        console.print("  ✓ Completeness check passed")
+
     console.print("\n[green]Memory index is valid.[/green]\n")
 
 

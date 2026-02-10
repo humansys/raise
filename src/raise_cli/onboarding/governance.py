@@ -380,6 +380,7 @@ _GOVERNANCE_TEMPLATES: list[tuple[str, str]] = [
     ("backlog.md", "backlog.md"),
     ("architecture/system-context.md", "architecture/system-context.md"),
     ("architecture/system-design.md", "architecture/system-design.md"),
+    ("architecture/domain-model.md", "architecture/domain-model.md"),
 ]
 
 
