@@ -62,7 +62,7 @@ Two layers (ADR-025):
 Build the unified knowledge graph to get current code truth and a diff against the previous build:
 
 ```bash
-uv run raise memory build
+raise memory build
 ```
 
 This produces:
@@ -96,7 +96,7 @@ ls governance/architecture/modules/*.md
 For each module to check, gather graph truth and current doc state:
 
 ```bash
-uv run raise memory context mod-{name} --format json
+raise memory context mod-{name} --format json
 ```
 
 This returns a JSON object with:
@@ -223,7 +223,7 @@ These are factual corrections (the frontmatter is already approved as truth), bu
 If any frontmatter or narrative changes were applied in Steps 5-7, rebuild the graph so it reflects the updated docs:
 
 ```bash
-uv run raise memory build
+raise memory build
 ```
 
 This closes the coherence loop — the graph now contains both the code truth AND the corrected doc-declared values. Without this step, the graph would still hold pre-update frontmatter until the next manual build.

@@ -62,7 +62,7 @@ hooks:
 
 ```bash
 # Example command
-uv run raise {{example_command}}
+raise {{example_command}}
 ```
 
 **Verification:** {{step_1_verification}}

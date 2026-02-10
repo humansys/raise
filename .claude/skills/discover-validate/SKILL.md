@@ -59,7 +59,7 @@ Validate component descriptions using a confidence-tier workflow that reduces hu
 Read the analysis file:
 
 ```bash
-uv run raise discover analyze --input work/discovery/analysis.json --output summary
+raise discover analyze --input work/discovery/analysis.json --output summary
 ```
 
 Or read directly:

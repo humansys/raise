@@ -217,7 +217,7 @@ Show the story lifecycle for orientation:
 Record the start of the story lifecycle:
 
 ```bash
-uv run raise memory emit-work story {story_id} --event start --phase design
+raise memory emit-work story {story_id} --event start --phase design
 ```
 
 **Example:** `raise memory emit-work story S15.1 -e start -p design`
