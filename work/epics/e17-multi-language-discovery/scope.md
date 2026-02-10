@@ -178,7 +178,7 @@ S17.2/S17.3 are independent but sequential in single-session work.
 **Milestones:**
 - [x] M1: TS/TSX Fixed (2026-02-09)
 - [x] M2: Demo Ready (2026-02-09)
-- [ ] M3: Epic Complete
+- [x] M3: Epic Complete (2026-02-10)
 
 ---
 
