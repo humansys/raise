@@ -24,7 +24,7 @@ Extend `raise discover scan` to extract symbols from TypeScript/TSX, PHP, and Sv
 | S17.1 | Fix TS/TSX scanner | M | ✅ Done | Fix .tsx glob, TSX parser, add enum/const/type_alias extraction, new SymbolKinds, exclude-based hierarchy |
 | S17.2 | PHP extractor | M | ✅ Done | tree-sitter-php: classes, functions, interfaces, traits, methods |
 | S17.3 | Svelte extractor | S | ✅ Done | tree-sitter-svelte: script block symbols + component registration |
-| S17.4 | Analyzer adjustments | S | Pending | Category maps for non-Python, module path logic, formatter counts |
+| S17.4 | Analyzer adjustments | S | ✅ Done | Category maps for non-Python, module path logic, formatter counts |
 
 **Total:** 4 stories
 
@@ -173,7 +173,7 @@ S17.2/S17.3 are independent but sequential in single-session work.
 | S17.2 | M | ✅ Done | 25 min | 2.4x velocity |
 | S17.3 | S | ✅ Done | 20 min | 2.25x velocity |
 | BF-2 | L | ✅ Done | 45 min | 2.67x velocity, templates + completeness check |
-| S17.4 | S | Pending | - | |
+| S17.4 | S | ✅ Done | 15 min | 2.0x velocity |
 
 **Milestones:**
 - [x] M1: TS/TSX Fixed (2026-02-09)
