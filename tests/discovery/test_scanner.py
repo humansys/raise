@@ -1059,3 +1059,33 @@ class TestExtractSvelteSymbols:
         names = {f.name for f in functions}
         assert "shared" in names
         assert "instance" in names
+
+    def test_scan_directory_svelte(self, tmp_path: Path) -> None:
+        """Test scan_directory finds and parses .svelte files."""
+        svelte_file = tmp_path / "Counter.svelte"
+        svelte_file.write_text(dedent("""\
+            <script>
+              let count = 0;
+
+              function increment() {
+                count += 1;
+              }
+            </script>
+
+            <button on:click={increment}>{count}</button>
+        """))
+
+        # Also add a non-svelte file to ensure it's not picked up
+        other_file = tmp_path / "utils.js"
+        other_file.write_text("function helper() {}\n")
+
+        result = scan_directory(tmp_path, language="svelte")
+        assert result.files_scanned == 1
+        assert len(result.errors) == 0
+
+        components = [s for s in result.symbols if s.kind == "component"]
+        functions = [s for s in result.symbols if s.kind == "function"]
+        assert len(components) == 1
+        assert components[0].name == "Counter"
+        assert len(functions) == 1
+        assert functions[0].name == "increment"
