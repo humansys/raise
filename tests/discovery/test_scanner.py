@@ -877,3 +877,37 @@ class TestExtractPhpSymbols:
         assert enums[0].name == "App\\Services\\Priority"
         # 1 interface method + 1 trait method + 2 class methods
         assert len(methods) == 4
+
+    def test_empty_php_file(self) -> None:
+        """Test that an empty PHP file doesn't crash."""
+        source = "<?php\n"
+        symbols = extract_php_symbols(source, "empty.php")
+        assert symbols == []
+
+    def test_php_only_namespace_and_use(self) -> None:
+        """Test PHP file with only namespace and use statements."""
+        source = dedent("""\
+            <?php
+            namespace App\\Models;
+
+            use Illuminate\\Database\\Eloquent\\Model;
+        """)
+        symbols = extract_php_symbols(source, "imports.php")
+        assert symbols == []
+
+    def test_blade_php_excluded_from_scan(self, tmp_path: Path) -> None:
+        """Test that .blade.php files are excluded from PHP scan."""
+        # Create a regular PHP file
+        php_file = tmp_path / "User.php"
+        php_file.write_text("<?php\nclass User {}\n")
+
+        # Create a blade template
+        blade_file = tmp_path / "welcome.blade.php"
+        blade_file.write_text("<html><body>{{ $name }}</body></html>\n")
+
+        result = scan_directory(tmp_path, language="php")
+        names = [s.name for s in result.symbols]
+        assert "User" in names
+        # Blade file should be explicitly skipped — only 1 file scanned
+        assert result.files_scanned == 1
+        assert len(result.errors) == 0
