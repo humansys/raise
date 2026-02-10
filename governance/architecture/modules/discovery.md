@@ -23,13 +23,15 @@ public_api:
   - "extract_javascript_symbols"
   - "extract_python_symbols"
   - "extract_symbols"
+  - "extract_php_symbols"
+  - "extract_svelte_symbols"
   - "extract_typescript_symbols"
   - "scan_directory"
-components: 45
+components: 52
 constraints:
   - "Independent of governance module — no cross-imports"
   - "All analysis is deterministic — no AI inference in CLI"
-  - "Scanner uses Python AST (not tree-sitter) for Python files"
+  - "Scanner uses Python AST for Python files, tree-sitter for TS/TSX/JS/PHP/Svelte"
 ---
 
 ## Purpose
@@ -52,13 +54,13 @@ Source code → Scanner → raw symbols (551 for raise-commons)
 
 ## Key Files
 
-- **`scanner.py`** — Symbol extraction using Python's `ast` module. Supports Python, TypeScript, and JavaScript. Returns `ScanResult` with typed `Symbol` objects including kind (class/function/method), line numbers, and parent relationships.
+- **`scanner.py`** — Symbol extraction using Python's `ast` module (Python) and tree-sitter (TypeScript, TSX, JavaScript, PHP, Svelte). Language detection via file extension. Returns `ScanResult` with typed `Symbol` objects including kind (class/function/method/enum/type_alias/constant/interface/trait/component), line numbers, and parent relationships. PHP extraction includes namespace-qualified names. Svelte uses two-pass extraction (tree-sitter-svelte for structure, JS/TS parser for script content).
 - **`analyzer.py`** — Groups symbols into components, assigns confidence tiers (high/medium/low), categorizes by module path. Produces `AnalysisResult` with module-level grouping. 99% test coverage, 79 tests.
 - **`drift.py`** — Compares current scan against a saved baseline. Detects added, removed, and moved components. Returns `DriftWarning` objects with severity levels.
 
 ## Dependencies
 
-None — leaf module. Uses only Python stdlib (`ast`, `pathlib`).
+Leaf module. Uses Python stdlib (`ast`, `pathlib`), `tree-sitter-typescript` for TS/TSX, `tree-sitter-php` for PHP, and `tree-sitter-svelte` for Svelte parsing.
 
 ## Conventions
 

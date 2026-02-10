@@ -12,7 +12,9 @@ from raise_cli.discovery.scanner import (
     Symbol,
     detect_language,
     extract_javascript_symbols,
+    extract_php_symbols,
     extract_python_symbols,
+    extract_svelte_symbols,
     extract_symbols,
     extract_typescript_symbols,
     scan_directory,
@@ -62,6 +64,39 @@ class TestSymbol:
         )
         assert symbol.kind == "function"
         assert symbol.parent is None
+
+    def test_create_enum_symbol(self) -> None:
+        """Test creating an enum symbol."""
+        symbol = Symbol(
+            name="UserRole",
+            kind="enum",
+            file="roles.ts",
+            line=1,
+            signature="enum UserRole",
+        )
+        assert symbol.kind == "enum"
+
+    def test_create_type_alias_symbol(self) -> None:
+        """Test creating a type alias symbol."""
+        symbol = Symbol(
+            name="UserId",
+            kind="type_alias",
+            file="types.ts",
+            line=1,
+            signature="type UserId",
+        )
+        assert symbol.kind == "type_alias"
+
+    def test_create_constant_symbol(self) -> None:
+        """Test creating a constant symbol."""
+        symbol = Symbol(
+            name="MAX_RETRIES",
+            kind="constant",
+            file="config.ts",
+            line=1,
+            signature="const MAX_RETRIES",
+        )
+        assert symbol.kind == "constant"
 
 
 class TestScanResult:
@@ -340,6 +375,16 @@ class TestScanDirectory:
         assert any(s.name == "PyClass" for s in result.symbols)
         assert any(s.name == "TsClass" for s in result.symbols)
 
+    def test_scan_tsx_files_with_language_filter(self, tmp_path: Path) -> None:
+        """Test that .tsx files are found when language=typescript."""
+        (tmp_path / "App.tsx").write_text("function App() { return null; }")
+        (tmp_path / "utils.ts").write_text("function helper() {}")
+
+        result = scan_directory(tmp_path, language="typescript")
+        assert result.files_scanned == 2
+        assert any(s.name == "App" for s in result.symbols)
+        assert any(s.name == "helper" for s in result.symbols)
+
 
 class TestExtractTypescriptSymbols:
     """Tests for extract_typescript_symbols function."""
@@ -447,6 +492,99 @@ class TestExtractTypescriptSymbols:
         symbols = extract_typescript_symbols(source, "test.ts")
         assert any(s.name == "ExportedClass" for s in symbols)
 
+    def test_extract_enum(self) -> None:
+        """Test extracting TypeScript enums."""
+        source = dedent("""\
+            export enum UserRole {
+                Admin = 'admin',
+                User = 'user',
+            }
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "UserRole"
+        assert symbols[0].kind == "enum"
+        assert symbols[0].signature == "enum UserRole"
+
+    def test_extract_type_alias(self) -> None:
+        """Test extracting TypeScript type aliases."""
+        source = dedent("""\
+            export type ReportAction = 'view' | 'edit' | 'delete';
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "ReportAction"
+        assert symbols[0].kind == "type_alias"
+        assert symbols[0].signature == "type ReportAction"
+
+    def test_extract_exported_const(self) -> None:
+        """Test extracting exported const declarations."""
+        source = dedent("""\
+            export const SESSION_CONFIG = {
+                timeout: 30000,
+                maxRetries: 3,
+            } as const;
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "SESSION_CONFIG"
+        assert symbols[0].kind == "constant"
+        assert symbols[0].signature == "const SESSION_CONFIG"
+
+    def test_extract_tsx_with_jsx(self) -> None:
+        """Test extracting from TSX file with JSX content."""
+        source = dedent("""\
+            interface UserProps {
+                name: string;
+            }
+
+            export default function UserCard(props: UserProps) {
+                return <div>{props.name}</div>;
+            }
+        """)
+        symbols = extract_typescript_symbols(source, "UserCard.tsx")
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        funcs = [s for s in symbols if s.kind == "function"]
+        assert len(ifaces) == 1
+        assert ifaces[0].name == "UserProps"
+        assert len(funcs) == 1
+        assert funcs[0].name == "UserCard"
+
+    def test_extract_complex_ts_file_with_new_kinds(self) -> None:
+        """Test extracting from a file with enums, types, consts, and classes."""
+        source = dedent("""\
+            export enum Status {
+                Active = 'active',
+                Inactive = 'inactive',
+            }
+
+            export type Config = {
+                debug: boolean;
+            };
+
+            export const DEFAULT_CONFIG = {
+                debug: false,
+            };
+
+            export class Service {
+                process(): void {}
+            }
+
+            export function helper(): void {}
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        enums = [s for s in symbols if s.kind == "enum"]
+        types = [s for s in symbols if s.kind == "type_alias"]
+        consts = [s for s in symbols if s.kind == "constant"]
+        classes = [s for s in symbols if s.kind == "class"]
+        functions = [s for s in symbols if s.kind == "function"]
+
+        assert len(enums) == 1
+        assert len(types) == 1
+        assert len(consts) == 1
+        assert len(classes) == 1
+        assert len(functions) == 1
+
 
 class TestExtractJavascriptSymbols:
     """Tests for extract_javascript_symbols function."""
@@ -500,6 +638,14 @@ class TestDetectLanguage:
         assert detect_language("foo.mjs") == "javascript"
         assert detect_language("foo.cjs") == "javascript"
 
+    def test_php_extensions(self) -> None:
+        """Test PHP file extensions."""
+        assert detect_language("foo.php") == "php"
+
+    def test_svelte_extensions(self) -> None:
+        """Test Svelte file extensions."""
+        assert detect_language("foo.svelte") == "svelte"
+
     def test_unsupported_extension(self) -> None:
         """Test unsupported file extensions return None."""
         assert detect_language("foo.rs") is None
@@ -525,7 +671,421 @@ class TestExtractSymbols:
         symbols = extract_symbols("class Foo {}", "test.js", "javascript")
         assert symbols[0].name == "Foo"
 
+    def test_extract_php(self) -> None:
+        """Test extracting PHP via unified function."""
+        source = "<?php\nclass Foo {}"
+        symbols = extract_symbols(source, "test.php", "php")
+        assert symbols[0].name == "Foo"
+        assert symbols[0].kind == "class"
+
     def test_unsupported_language_raises(self) -> None:
         """Test that unsupported language raises ValueError."""
         with pytest.raises(ValueError, match="Unsupported language"):
             extract_symbols("fn main() {}", "test.rs", "rust")  # type: ignore[arg-type]
+
+
+class TestExtractPhpSymbols:
+    """Tests for extract_php_symbols function."""
+
+    def test_extract_class(self) -> None:
+        """Test extracting a PHP class."""
+        source = dedent("""\
+            <?php
+            class User {
+                public function getName(): string {
+                    return $this->name;
+                }
+            }
+        """)
+        symbols = extract_php_symbols(source, "User.php")
+        classes = [s for s in symbols if s.kind == "class"]
+        methods = [s for s in symbols if s.kind == "method"]
+        assert len(classes) == 1
+        assert classes[0].name == "User"
+        assert classes[0].signature == "class User"
+        assert len(methods) == 1
+        assert methods[0].name == "getName"
+        assert methods[0].parent == "User"
+
+    def test_extract_class_with_extends_implements(self) -> None:
+        """Test extracting class with inheritance."""
+        source = dedent("""\
+            <?php
+            class User extends Model implements Configurable {
+            }
+        """)
+        symbols = extract_php_symbols(source, "User.php")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "class"
+        assert "extends Model" in symbols[0].signature
+        assert "implements Configurable" in symbols[0].signature
+
+    def test_extract_interface(self) -> None:
+        """Test extracting a PHP interface."""
+        source = dedent("""\
+            <?php
+            interface Configurable {
+                public function getConfig(): array;
+            }
+        """)
+        symbols = extract_php_symbols(source, "Configurable.php")
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        methods = [s for s in symbols if s.kind == "method"]
+        assert len(ifaces) == 1
+        assert ifaces[0].name == "Configurable"
+        assert ifaces[0].signature == "interface Configurable"
+        assert len(methods) == 1
+        assert methods[0].parent == "Configurable"
+
+    def test_extract_trait(self) -> None:
+        """Test extracting a PHP trait."""
+        source = dedent("""\
+            <?php
+            trait HasSlug {
+                public function getSlug(): string {
+                    return 'slug';
+                }
+            }
+        """)
+        symbols = extract_php_symbols(source, "HasSlug.php")
+        traits = [s for s in symbols if s.kind == "trait"]
+        methods = [s for s in symbols if s.kind == "method"]
+        assert len(traits) == 1
+        assert traits[0].name == "HasSlug"
+        assert traits[0].signature == "trait HasSlug"
+        assert len(methods) == 1
+        assert methods[0].parent == "HasSlug"
+
+    def test_extract_function(self) -> None:
+        """Test extracting a top-level PHP function."""
+        source = dedent("""\
+            <?php
+            function helper(int $x): int {
+                return $x * 2;
+            }
+        """)
+        symbols = extract_php_symbols(source, "helpers.php")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "function"
+        assert symbols[0].name == "helper"
+        assert "function helper" in symbols[0].signature
+
+    def test_extract_enum(self) -> None:
+        """Test extracting a PHP 8.1 enum."""
+        source = dedent("""\
+            <?php
+            enum Status: string {
+                case Active = 'active';
+                case Inactive = 'inactive';
+            }
+        """)
+        symbols = extract_php_symbols(source, "Status.php")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "enum"
+        assert symbols[0].name == "Status"
+        assert "enum Status" in symbols[0].signature
+
+    def test_extract_with_namespace(self) -> None:
+        """Test that namespace qualifies symbol names."""
+        source = dedent("""\
+            <?php
+            namespace App\\Models;
+
+            class User {
+                public function getName(): string {
+                    return $this->name;
+                }
+            }
+
+            function helper(): void {}
+        """)
+        symbols = extract_php_symbols(source, "User.php")
+        classes = [s for s in symbols if s.kind == "class"]
+        functions = [s for s in symbols if s.kind == "function"]
+        methods = [s for s in symbols if s.kind == "method"]
+        assert classes[0].name == "App\\Models\\User"
+        assert functions[0].name == "App\\Models\\helper"
+        # Methods keep local name with parent reference
+        assert methods[0].name == "getName"
+        assert methods[0].parent == "App\\Models\\User"
+
+    def test_method_visibility_in_signature(self) -> None:
+        """Test that method signature includes visibility modifier."""
+        source = dedent("""\
+            <?php
+            class Foo {
+                public function bar(): void {}
+                private function baz(): void {}
+                protected static function qux(): void {}
+            }
+        """)
+        symbols = extract_php_symbols(source, "Foo.php")
+        methods = [s for s in symbols if s.kind == "method"]
+        assert len(methods) == 3
+        sigs = {m.name: m.signature for m in methods}
+        assert "public" in sigs["bar"]
+        assert "private" in sigs["baz"]
+        assert "protected" in sigs["qux"]
+        assert "static" in sigs["qux"]
+
+    def test_complex_php_file(self) -> None:
+        """Test extracting from a file with multiple construct types."""
+        source = dedent("""\
+            <?php
+            namespace App\\Services;
+
+            interface ServiceContract {
+                public function execute(): void;
+            }
+
+            trait Loggable {
+                public function log(string $msg): void {}
+            }
+
+            class UserService implements ServiceContract {
+                use Loggable;
+
+                public function execute(): void {}
+                private function validate(): bool { return true; }
+            }
+
+            function createService(): ServiceContract {
+                return new UserService();
+            }
+
+            enum Priority: int {
+                case Low = 1;
+                case High = 2;
+            }
+        """)
+        symbols = extract_php_symbols(source, "UserService.php")
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        traits = [s for s in symbols if s.kind == "trait"]
+        classes = [s for s in symbols if s.kind == "class"]
+        functions = [s for s in symbols if s.kind == "function"]
+        methods = [s for s in symbols if s.kind == "method"]
+        enums = [s for s in symbols if s.kind == "enum"]
+
+        assert len(ifaces) == 1
+        assert ifaces[0].name == "App\\Services\\ServiceContract"
+        assert len(traits) == 1
+        assert traits[0].name == "App\\Services\\Loggable"
+        assert len(classes) == 1
+        assert classes[0].name == "App\\Services\\UserService"
+        assert len(functions) == 1
+        assert functions[0].name == "App\\Services\\createService"
+        assert len(enums) == 1
+        assert enums[0].name == "App\\Services\\Priority"
+        # 1 interface method + 1 trait method + 2 class methods
+        assert len(methods) == 4
+
+    def test_empty_php_file(self) -> None:
+        """Test that an empty PHP file doesn't crash."""
+        source = "<?php\n"
+        symbols = extract_php_symbols(source, "empty.php")
+        assert symbols == []
+
+    def test_php_only_namespace_and_use(self) -> None:
+        """Test PHP file with only namespace and use statements."""
+        source = dedent("""\
+            <?php
+            namespace App\\Models;
+
+            use Illuminate\\Database\\Eloquent\\Model;
+        """)
+        symbols = extract_php_symbols(source, "imports.php")
+        assert symbols == []
+
+    def test_blade_php_excluded_from_scan(self, tmp_path: Path) -> None:
+        """Test that .blade.php files are excluded from PHP scan."""
+        # Create a regular PHP file
+        php_file = tmp_path / "User.php"
+        php_file.write_text("<?php\nclass User {}\n")
+
+        # Create a blade template
+        blade_file = tmp_path / "welcome.blade.php"
+        blade_file.write_text("<html><body>{{ $name }}</body></html>\n")
+
+        result = scan_directory(tmp_path, language="php")
+        names = [s.name for s in result.symbols]
+        assert "User" in names
+        # Blade file should be explicitly skipped — only 1 file scanned
+        assert result.files_scanned == 1
+        assert len(result.errors) == 0
+
+
+class TestExtractSvelteSymbols:
+    """Tests for extract_svelte_symbols function."""
+
+    def test_extract_js_script_block(self) -> None:
+        """Test extracting symbols from a JS script block."""
+        source = dedent("""\
+            <script>
+              function greet(msg) {
+                return 'Hello ' + msg;
+              }
+
+              class UserService {
+                getName() {
+                  return this.name;
+                }
+              }
+            </script>
+
+            <h1>Hello</h1>
+        """)
+        symbols = extract_svelte_symbols(source, "Greeting.svelte")
+        component = [s for s in symbols if s.kind == "component"]
+        functions = [s for s in symbols if s.kind == "function"]
+        classes = [s for s in symbols if s.kind == "class"]
+        methods = [s for s in symbols if s.kind == "method"]
+
+        assert len(component) == 1
+        assert component[0].name == "Greeting"
+        assert component[0].signature == "component Greeting"
+        assert component[0].line == 1
+
+        assert len(functions) == 1
+        assert functions[0].name == "greet"
+
+        assert len(classes) == 1
+        assert classes[0].name == "UserService"
+
+        assert len(methods) == 1
+        assert methods[0].name == "getName"
+        assert methods[0].parent == "UserService"
+
+    def test_extract_ts_script_block(self) -> None:
+        """Test extracting symbols from a TypeScript script block."""
+        source = dedent("""\
+            <script lang="ts">
+              interface User {
+                name: string;
+              }
+
+              export function getUser(): User {
+                return { name: 'test' };
+              }
+            </script>
+
+            <div>Hello</div>
+        """)
+        symbols = extract_svelte_symbols(source, "UserCard.svelte")
+        component = [s for s in symbols if s.kind == "component"]
+        interfaces = [s for s in symbols if s.kind == "interface"]
+        functions = [s for s in symbols if s.kind == "function"]
+
+        assert len(component) == 1
+        assert component[0].name == "UserCard"
+
+        assert len(interfaces) == 1
+        assert interfaces[0].name == "User"
+
+        assert len(functions) == 1
+        assert functions[0].name == "getUser"
+
+    def test_no_script_block(self) -> None:
+        """Test that a file with no script block returns component only."""
+        source = "<div>Static content only</div>\n"
+        symbols = extract_svelte_symbols(source, "Static.svelte")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "component"
+        assert symbols[0].name == "Static"
+
+    def test_empty_script_block(self) -> None:
+        """Test that an empty script block returns component only."""
+        source = "<script></script>\n<div>Hello</div>\n"
+        symbols = extract_svelte_symbols(source, "Empty.svelte")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "component"
+        assert symbols[0].name == "Empty"
+
+    def test_line_numbers_offset(self) -> None:
+        """Test that line numbers are correct relative to the .svelte file."""
+        source = dedent("""\
+            <script>
+              function first() {}
+
+              function second() {}
+            </script>
+        """)
+        symbols = extract_svelte_symbols(source, "Lines.svelte")
+        functions = [s for s in symbols if s.kind == "function"]
+        assert len(functions) == 2
+        # first() is on line 2 of the .svelte file
+        assert functions[0].name == "first"
+        assert functions[0].line == 2
+        # second() is on line 4 of the .svelte file
+        assert functions[1].name == "second"
+        assert functions[1].line == 4
+
+    def test_component_name_from_filename(self) -> None:
+        """Test that component name is derived from filename stem."""
+        source = "<div>Hello</div>\n"
+        symbols = extract_svelte_symbols(source, "src/lib/MyComponent.svelte")
+        assert symbols[0].name == "MyComponent"
+        assert symbols[0].file == "src/lib/MyComponent.svelte"
+
+    def test_extract_svelte_via_unified(self) -> None:
+        """Test extracting Svelte via unified extract_symbols function."""
+        source = dedent("""\
+            <script>
+              function hello() {}
+            </script>
+        """)
+        symbols = extract_symbols(source, "App.svelte", "svelte")
+        component = [s for s in symbols if s.kind == "component"]
+        functions = [s for s in symbols if s.kind == "function"]
+        assert len(component) == 1
+        assert component[0].name == "App"
+        assert len(functions) == 1
+        assert functions[0].name == "hello"
+
+    def test_script_context_module(self) -> None:
+        """Test extracting from both instance and module script blocks."""
+        source = dedent("""\
+            <script context="module">
+              export function shared() {}
+            </script>
+
+            <script>
+              function instance() {}
+            </script>
+
+            <div>Hello</div>
+        """)
+        symbols = extract_svelte_symbols(source, "Dual.svelte")
+        functions = [s for s in symbols if s.kind == "function"]
+        names = {f.name for f in functions}
+        assert "shared" in names
+        assert "instance" in names
+
+    def test_scan_directory_svelte(self, tmp_path: Path) -> None:
+        """Test scan_directory finds and parses .svelte files."""
+        svelte_file = tmp_path / "Counter.svelte"
+        svelte_file.write_text(dedent("""\
+            <script>
+              let count = 0;
+
+              function increment() {
+                count += 1;
+              }
+            </script>
+
+            <button on:click={increment}>{count}</button>
+        """))
+
+        # Also add a non-svelte file to ensure it's not picked up
+        other_file = tmp_path / "utils.js"
+        other_file.write_text("function helper() {}\n")
+
+        result = scan_directory(tmp_path, language="svelte")
+        assert result.files_scanned == 1
+        assert len(result.errors) == 0
+
+        components = [s for s in result.symbols if s.kind == "component"]
+        functions = [s for s in result.symbols if s.kind == "function"]
+        assert len(components) == 1
+        assert components[0].name == "Counter"
+        assert len(functions) == 1
+        assert functions[0].name == "increment"

@@ -8,6 +8,21 @@
 
 ## Urgent
 
+- [ ] **WorkLifecycle model rejects `init` phase despite CLI accepting it** — (SES-131, 2026-02-09)
+  - **Problem:** `raise memory emit-work epic E17 --event start --phase init` passes CLI `valid_phases` check (includes `'init'`) but `WorkLifecycle` Pydantic model's `phase` field is `Literal['design', 'plan', 'implement', 'review']` — no `'init'`. CLI validates one thing, model validates another.
+  - **Location:** `memory.py:1336` (emit_work command), `WorkLifecycle` model definition
+  - **Fix:** Either add `'init'` to the Pydantic Literal, or remove `'init'` from `valid_phases` in the CLI command. The skill `/epic-start` uses `--phase init`, so the model should accept it.
+  - **Workaround:** Use `--phase design` instead
+  - **Priority:** Urgent — breaks every `/epic-start` telemetry emit
+
+- [ ] **Domain stance layer — behavioral priming per project type** — (SES-134, 2026-02-10)
+  - **Insight:** Identity (CLAUDE.md) shapes behavior deeply. Governance docs inform but don't prime as strongly. There's a missing middle layer: domain-specific thinking patterns that make Rai fluent, not just informed.
+  - **Mechanism:** `domain-stance.md` loaded in system prompt (CLAUDE.md or CLAUDE.local.md). Same identity, different domain lens.
+  - **Examples:** Lean Software Development stance (raise-commons), Lean Marketing stance (raise-gtm), Research stance
+  - **Not:** A different Rai, a new feature, or the governance docs. It's the domain vocabulary and quality intuitions between identity (universal) and governance (project-specific).
+  - **Next:** Prototype in raise-gtm CLAUDE.local.md, validate if alignment improves, then formalize pattern
+  - **Priority:** Urgent — affects GTM work starting now, and Jumpstart client onboarding
+
 - [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
 - [ ] **Rovo AI integration implementation** - Required for Mar 14 webinar (V3 scope)
 - [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
@@ -25,6 +40,20 @@
 ---
 
 ## Ideas
+
+### Systemic Poka-Yoke — Design Principle (2026-02-10, PAT-242)
+
+- [ ] **"As above, so below" — poka-yoke at every producer-consumer boundary** — (SES-134, BF-2)
+  - **Insight:** BF-2 exposed the same failure shape at 5 layers (template, parser, graph, skill, process). Each layer silently trusted the previous. We add poka-yokes reactively after bugs, not systematically at design time.
+  - **Action:** Audit existing boundaries for missing poka-yokes. Candidates:
+    - Parser: log warning when `_parse_architecture_doc` returns None for a `.md` file
+    - Scaffold: validate frontmatter exists after writing template
+    - Graph build: completeness check (done in BF-2, but could be stronger)
+    - Skill consumption: lint skills for factual claims about code behavior
+    - Template distribution: contract test for all templates (done in BF-2)
+  - **Principle candidate:** "Every boundary between producer and consumer must validate. Consumers check what they receive. Producers check what they emit." Consider adding to constitution or guardrails.
+  - **Priority:** High strategic value — prevents a class of bugs, not just one instance
+  - **Related:** PAT-242, Jidoka (constitution), BF-2 retrospective
 
 ### Discovery & Code Understanding
 
@@ -146,7 +175,27 @@
 - [ ] **Git history integration** — Nice-to-have for evolution tracking
 - [ ] **CI/CD drift blocking** — Start with warnings, add blocking after validation
 - [ ] **PageRank ranking** — Simpler heuristics (public/exported) sufficient for MVP
-- [ ] **Multi-language support** — Start with Python, expand based on need
+- [x] **Multi-language support** — ~~Start with Python, expand based on need~~ → E17 Multi-Language Discovery
+
+### E17 Multi-Language Discovery — Deferred (2026-02-09)
+
+- [ ] **Blade template extraction** (`.blade.php`) — Template markup, not structured code. Revisit if customers need template-level discovery.
+- [ ] **Vue SFC support** — No current customer need. Add when a Vue project needs discovery.
+- [ ] **Cross-language dependency analysis** — Import/require tracking across languages. Future scope.
+- [ ] **Svelte template/markup extraction** — Currently only script block symbols. Template bindings could be useful for component relationship mapping.
+
+### Graph Health & Context Caring — Parking Lot (2026-02-10)
+
+- [ ] **Lifecycle-aware graph health contract** — (SES-134, 2026-02-10)
+  - **Context:** BF-2 exposed that graph completeness is invisible. `raise memory validate` checks structural integrity but not semantic completeness. Neither user nor Rai can detect absent node types.
+  - **Vision:** Declarative invariants per lifecycle phase (post-init, post-onboard, post-discovery). Dedicated `raise memory health` command. Session-start integration so Rai sees gaps.
+  - **Scope:** Full lifecycle-phase schema, not just the minimal check in BF-2's F5
+  - **Related:** BF-2 (F5 is the seed), `raise doctor` (E7 deferred)
+
+- [ ] **Tools for human to understand and care for Rai's memory state** — (SES-134, 2026-02-10)
+  - **Context:** Emilio's insight — the graph is invisible to both Rai and the user. The user needs tools to understand what Rai knows and doesn't know, and to be more intentional about maintaining context quality.
+  - **Questions:** What would a "memory dashboard" look like? Is it CLI? Is it a doc? Is it part of session-start? What metrics matter?
+  - **Priority:** Post-BF-2, high value for Jumpstart client experience
 
 ### E16 Incremental Coherence — Parking Lot (2026-02-09)
 
@@ -156,6 +205,12 @@
 - [ ] **Absorb `/discover-complete` into `/discover-validate`** — Export is a mechanical final step, not a separate concern.
 
 ### Research Needed
+
+- [ ] **Graph memory effectiveness in design sessions** — (SES-131, 2026-02-09)
+  - **Observation:** E17 epic-design loaded 3 graph queries (memory query, module context). None materially influenced design decisions. Design was driven by reading actual code (gemba).
+  - **Questions:** Is this a query relevance problem? A graph content depth problem? Or expected for new-territory work? Need data across multiple design sessions before deciding what to measure.
+  - **Possible outcomes:** Better query strategies in skills, graph content enrichment, effectiveness telemetry signal, or "working as intended for novel domains."
+  - **Priority:** Medium — significant infrastructure investment deserves ROI analysis
 
 - [ ] **Lean Spec Principles** — How do they apply to governance artifacts? (Previous research attempt stale — needs fresh start if still wanted)
 

@@ -74,6 +74,7 @@ class TestScaffoldGovernance:
         assert arch_dir.is_dir()
         assert (arch_dir / "system-context.md").exists()
         assert (arch_dir / "system-design.md").exists()
+        assert (arch_dir / "domain-model.md").exists()
 
     def test_renders_project_name(self, tmp_path: Path) -> None:
         """Should substitute {project_name} in all templates."""
@@ -91,17 +92,17 @@ class TestScaffoldGovernance:
         result = scaffold_governance(tmp_path, "test-project")
 
         assert isinstance(result, GovernanceScaffoldResult)
-        assert result.files_created == 6
+        assert result.files_created == 7
         assert result.files_skipped == 0
         assert not result.already_existed
         assert result.path == tmp_path / "governance"
 
     def test_total_files_created(self, tmp_path: Path) -> None:
-        """Should create exactly 6 template files."""
+        """Should create exactly 7 template files."""
         scaffold_governance(tmp_path, "test-project")
 
         md_files = list((tmp_path / "governance").rglob("*.md"))
-        assert len(md_files) == 6
+        assert len(md_files) == 7
 
 
 # =============================================================================
@@ -134,7 +135,7 @@ class TestScaffoldIdempotency:
 
         assert result.already_existed
         assert result.files_created == 0
-        assert result.files_skipped == 6
+        assert result.files_skipped == 7
 
     def test_creates_missing_files_on_partial_state(self, tmp_path: Path) -> None:
         """Should create missing files when governance/ is partial."""
@@ -150,7 +151,7 @@ class TestScaffoldIdempotency:
         # Other files should be created
         assert (gov_dir / "vision.md").exists()
         assert (gov_dir / "guardrails.md").exists()
-        assert result.files_created == 5
+        assert result.files_created == 6
         assert result.files_skipped == 1
 
 
