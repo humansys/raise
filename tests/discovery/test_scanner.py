@@ -63,6 +63,39 @@ class TestSymbol:
         assert symbol.kind == "function"
         assert symbol.parent is None
 
+    def test_create_enum_symbol(self) -> None:
+        """Test creating an enum symbol."""
+        symbol = Symbol(
+            name="UserRole",
+            kind="enum",
+            file="roles.ts",
+            line=1,
+            signature="enum UserRole",
+        )
+        assert symbol.kind == "enum"
+
+    def test_create_type_alias_symbol(self) -> None:
+        """Test creating a type alias symbol."""
+        symbol = Symbol(
+            name="UserId",
+            kind="type_alias",
+            file="types.ts",
+            line=1,
+            signature="type UserId",
+        )
+        assert symbol.kind == "type_alias"
+
+    def test_create_constant_symbol(self) -> None:
+        """Test creating a constant symbol."""
+        symbol = Symbol(
+            name="MAX_RETRIES",
+            kind="constant",
+            file="config.ts",
+            line=1,
+            signature="const MAX_RETRIES",
+        )
+        assert symbol.kind == "constant"
+
 
 class TestScanResult:
     """Tests for ScanResult model."""
@@ -340,6 +373,16 @@ class TestScanDirectory:
         assert any(s.name == "PyClass" for s in result.symbols)
         assert any(s.name == "TsClass" for s in result.symbols)
 
+    def test_scan_tsx_files_with_language_filter(self, tmp_path: Path) -> None:
+        """Test that .tsx files are found when language=typescript."""
+        (tmp_path / "App.tsx").write_text("function App() { return null; }")
+        (tmp_path / "utils.ts").write_text("function helper() {}")
+
+        result = scan_directory(tmp_path, language="typescript")
+        assert result.files_scanned == 2
+        assert any(s.name == "App" for s in result.symbols)
+        assert any(s.name == "helper" for s in result.symbols)
+
 
 class TestExtractTypescriptSymbols:
     """Tests for extract_typescript_symbols function."""
@@ -447,6 +490,99 @@ class TestExtractTypescriptSymbols:
         symbols = extract_typescript_symbols(source, "test.ts")
         assert any(s.name == "ExportedClass" for s in symbols)
 
+    def test_extract_enum(self) -> None:
+        """Test extracting TypeScript enums."""
+        source = dedent("""\
+            export enum UserRole {
+                Admin = 'admin',
+                User = 'user',
+            }
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "UserRole"
+        assert symbols[0].kind == "enum"
+        assert symbols[0].signature == "enum UserRole"
+
+    def test_extract_type_alias(self) -> None:
+        """Test extracting TypeScript type aliases."""
+        source = dedent("""\
+            export type ReportAction = 'view' | 'edit' | 'delete';
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "ReportAction"
+        assert symbols[0].kind == "type_alias"
+        assert symbols[0].signature == "type ReportAction"
+
+    def test_extract_exported_const(self) -> None:
+        """Test extracting exported const declarations."""
+        source = dedent("""\
+            export const SESSION_CONFIG = {
+                timeout: 30000,
+                maxRetries: 3,
+            } as const;
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        assert len(symbols) == 1
+        assert symbols[0].name == "SESSION_CONFIG"
+        assert symbols[0].kind == "constant"
+        assert symbols[0].signature == "const SESSION_CONFIG"
+
+    def test_extract_tsx_with_jsx(self) -> None:
+        """Test extracting from TSX file with JSX content."""
+        source = dedent("""\
+            interface UserProps {
+                name: string;
+            }
+
+            export default function UserCard(props: UserProps) {
+                return <div>{props.name}</div>;
+            }
+        """)
+        symbols = extract_typescript_symbols(source, "UserCard.tsx")
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        funcs = [s for s in symbols if s.kind == "function"]
+        assert len(ifaces) == 1
+        assert ifaces[0].name == "UserProps"
+        assert len(funcs) == 1
+        assert funcs[0].name == "UserCard"
+
+    def test_extract_complex_ts_file_with_new_kinds(self) -> None:
+        """Test extracting from a file with enums, types, consts, and classes."""
+        source = dedent("""\
+            export enum Status {
+                Active = 'active',
+                Inactive = 'inactive',
+            }
+
+            export type Config = {
+                debug: boolean;
+            };
+
+            export const DEFAULT_CONFIG = {
+                debug: false,
+            };
+
+            export class Service {
+                process(): void {}
+            }
+
+            export function helper(): void {}
+        """)
+        symbols = extract_typescript_symbols(source, "test.ts")
+        enums = [s for s in symbols if s.kind == "enum"]
+        types = [s for s in symbols if s.kind == "type_alias"]
+        consts = [s for s in symbols if s.kind == "constant"]
+        classes = [s for s in symbols if s.kind == "class"]
+        functions = [s for s in symbols if s.kind == "function"]
+
+        assert len(enums) == 1
+        assert len(types) == 1
+        assert len(consts) == 1
+        assert len(classes) == 1
+        assert len(functions) == 1
+
 
 class TestExtractJavascriptSymbols:
     """Tests for extract_javascript_symbols function."""
@@ -499,6 +635,14 @@ class TestDetectLanguage:
         assert detect_language("foo.jsx") == "javascript"
         assert detect_language("foo.mjs") == "javascript"
         assert detect_language("foo.cjs") == "javascript"
+
+    def test_php_extensions(self) -> None:
+        """Test PHP file extensions."""
+        assert detect_language("foo.php") == "php"
+
+    def test_svelte_extensions(self) -> None:
+        """Test Svelte file extensions."""
+        assert detect_language("foo.svelte") == "svelte"
 
     def test_unsupported_extension(self) -> None:
         """Test unsupported file extensions return None."""

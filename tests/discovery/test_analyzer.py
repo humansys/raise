@@ -572,6 +572,62 @@ class TestBuildHierarchy:
         assert "comp-tests.test_version-module" in ids
         assert "comp-tests.test_version-test_version" in ids
 
+    def test_enum_as_standalone_unit(self) -> None:
+        """Enum symbols become standalone units (not dropped)."""
+        symbols = [
+            _symbol(name="UserRole", kind="enum", file="src/roles.ts", signature="enum UserRole"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].name == "UserRole"
+        assert units[0].kind == "enum"
+
+    def test_type_alias_as_standalone_unit(self) -> None:
+        """Type alias symbols become standalone units (not dropped)."""
+        symbols = [
+            _symbol(name="Config", kind="type_alias", file="src/types.ts", signature="type Config"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].name == "Config"
+        assert units[0].kind == "type_alias"
+
+    def test_constant_as_standalone_unit(self) -> None:
+        """Constant symbols become standalone units (not dropped)."""
+        symbols = [
+            _symbol(name="MAX_RETRIES", kind="constant", file="src/config.ts", signature="const MAX_RETRIES"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].name == "MAX_RETRIES"
+        assert units[0].kind == "constant"
+
+    def test_interface_as_standalone_unit(self) -> None:
+        """Interface symbols become standalone units (not dropped)."""
+        symbols = [
+            _symbol(name="UserProps", kind="interface", file="src/types.ts", signature="interface UserProps"),
+        ]
+        units = build_hierarchy(symbols)
+        assert len(units) == 1
+        assert units[0].name == "UserProps"
+        assert units[0].kind == "interface"
+
+    def test_mixed_new_kinds(self) -> None:
+        """Mix of class, enum, type_alias, constant all appear in hierarchy."""
+        symbols = [
+            _symbol(name="Service", kind="class", file="src/svc.ts", signature="class Service"),
+            _symbol(name="process", kind="method", file="src/svc.ts", parent="Service"),
+            _symbol(name="Status", kind="enum", file="src/svc.ts", signature="enum Status"),
+            _symbol(name="Config", kind="type_alias", file="src/svc.ts", signature="type Config"),
+            _symbol(name="DEFAULT", kind="constant", file="src/svc.ts", signature="const DEFAULT"),
+            _symbol(name="helper", kind="function", file="src/svc.ts"),
+        ]
+        units = build_hierarchy(symbols)
+        names = {u.name for u in units}
+        # class (with method folded), enum, type_alias, constant, function = 5
+        assert names == {"Service", "Status", "Config", "DEFAULT", "helper"}
+        assert len(units) == 5
+
     def test_module_path_computed(self) -> None:
         """Module path is derived from file path."""
         symbols = [
