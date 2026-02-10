@@ -27,8 +27,9 @@
 | E14 | **Rai Distribution** | ✅ Complete | `work/epics/e14-rai-distribution/scope.md` | — |
 | E15 | **Ontology Graph Refinement** | ✅ Complete | `work/epics/e15-ontology-refinement/scope.md` | — |
 | E16 | **Incremental Coherence** | ✅ Complete | `work/epics/e16-incremental-coherence/scope.md` | — |
+| E17 | **Multi-Language Discovery** | ✅ Complete | `work/epics/e17-multi-language-discovery/scope.md` | — |
 
-**Summary:** 15 of 16 epics complete. E10 (Collective Intelligence) is V3 scope. E9 Phase 2 is next candidate.
+**Summary:** 16 of 17 epics complete. E10 (Collective Intelligence) is V3 scope. E9 Phase 2 is next candidate.
 
 ---
 
@@ -58,6 +59,7 @@
 | Epic | Key Deliverables |
 |------|-----------------|
 | E13 Discovery | `raise discover scan/validate/complete`, component catalog, Python code analyzer |
+| E17 Multi-Language Discovery | TS/TSX, PHP, Svelte extractors, multi-language analyzer categories and module paths |
 
 E5 (SAR Engine) was the original plan for brownfield analysis. E13 Discovery delivered this capability with a different approach: protocol-based code analyzers, component discovery, and drift detection. E5 is fully superseded.
 
