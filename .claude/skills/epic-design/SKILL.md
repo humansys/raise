@@ -72,7 +72,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-uv run raise memory emit-work epic {epic_id} --event start --phase design
+raise memory emit-work epic {epic_id} --event start --phase design
 ```
 
 **Example:** `raise memory emit-work epic E9 -e start -p design`
@@ -82,7 +82,7 @@ uv run raise memory emit-work epic {epic_id} --event start --phase design
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-uv run raise memory query "architecture ADR epic" --types pattern,decision --limit 5
+raise memory query "architecture ADR epic" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
@@ -100,8 +100,8 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 For each candidate module the epic might touch, load its architectural context:
 
 ```bash
-uv run raise memory context mod-<name>
-# Example: uv run raise memory context mod-memory
+raise memory context mod-<name>
+# Example: raise memory context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -425,7 +425,7 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-uv run raise memory emit-work epic {epic_id} --event complete --phase design
+raise memory emit-work epic {epic_id} --event complete --phase design
 ```
 
 **Example:** `raise memory emit-work epic E9 -e complete -p design`

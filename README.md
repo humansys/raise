@@ -86,16 +86,16 @@ The `raise` CLI provides deterministic operations:
 
 ```bash
 # Build Rai's memory from project artifacts
-uv run raise memory build
+raise memory build
 
 # Query governance concepts (MVC - Minimum Viable Context)
-uv run raise context query "validation"
+raise context query "validation"
 
 # Query Rai's memory
-uv run raise memory query "velocity patterns"
+raise memory query "velocity patterns"
 
 # Dump memory for inspection
-uv run raise memory dump --format md
+raise memory dump --format md
 ```
 
 ---

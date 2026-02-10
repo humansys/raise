@@ -217,12 +217,12 @@ Present completion summary:
 
 **Graph Integration (F13.4):**
 ```bash
-uv run raise discover build --input work/discovery/components-validated.json
+raise discover build --input work/discovery/components-validated.json
 ```
 
 This will add components to the unified context graph, enabling queries like:
 ```bash
-uv run raise memory query --type component "scanner"
+raise memory query --type component "scanner"
 ```
 
 ### Re-discovery
@@ -292,11 +292,11 @@ The JSON output is designed to be consumed by F13.4's `raise discover build` com
 
 ```bash
 # Add components to unified graph
-uv run raise discover build --input work/discovery/components-validated.json
+raise discover build --input work/discovery/components-validated.json
 
 # Then query components
-uv run raise memory query --type component "service"
-uv run raise memory query "authentication" --types component
+raise memory query --type component "service"
+raise memory query "authentication" --types component
 ```
 
 ### Component Type in Graph
