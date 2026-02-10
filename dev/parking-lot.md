@@ -197,9 +197,16 @@
   - **Questions:** What would a "memory dashboard" look like? Is it CLI? Is it a doc? Is it part of session-start? What metrics matter?
   - **Priority:** Post-BF-2, high value for Jumpstart client experience
 
+### E17 / SES-135 — Parking Lot (2026-02-10)
+
+- [ ] **`raise story` CLI subcommands** — Reduce inference overhead by tooling ceremony: `raise story context`, `raise story transition`, `raise story scaffold`, `raise story close --actual`, `raise gate check`. Estimated 30-40% token savings per story cycle. (Rai proposal, SES-135)
+- [ ] **Skill compression for Ri level** — Current skills are Shu-verbose even at Ri. Ri-mode skills should be 20-30 lines of "what to decide" + CLI commands, not 200 lines of step-by-step. (SES-135)
+- [ ] **Rename `discover-describe` to `discover-document`** — Better reflects output (documents, not descriptions). Avoids confusion with `docs-update`. (SES-135)
+- [ ] **Scanner `--exclude` flag** — PAT-247: vendor/node_modules exclusion for PHP/JS projects. Full-repo scans hit noise and duplicate IDs.
+
 ### E16 Incremental Coherence — Parking Lot (2026-02-09)
 
-- [ ] **Multi-platform code analyzers** — Extend `CodeAnalyzer` Protocol beyond Python: TypeScript, PHP. Architecture is pluggable from S16.1.
+- [x] **Multi-platform code analyzers** — ✅ E17 delivered TS/TSX, PHP, Svelte extractors (2026-02-10)
 - [ ] **Add dataset enumeration step to /story-design for ID format changes** — (PAT-220)
 - [ ] **Rename "discovery" namespace to "discover"** — Harmonize verb form across skills. Cosmetic.
 - [ ] **Absorb `/discover-complete` into `/discover-validate`** — Export is a mechanical final step, not a separate concern.
