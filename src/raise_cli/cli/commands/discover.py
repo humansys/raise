@@ -123,6 +123,7 @@ def scan_command(
             "**/.venv/**",
             "**/venv/**",
             "**/node_modules/**",
+            "**/vendor/**",
             "**/dist/**",
             "**/build/**",
             "**/.git/**",
