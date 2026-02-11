@@ -1,6 +1,6 @@
 # PRD: {project_name}
 
-> Product Requirements Document — fill with /project-create or /project-onboard
+> Product Requirements Document — fill with /rai-project-create or /rai-project-onboard
 
 ---
 

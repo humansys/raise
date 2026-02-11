@@ -76,7 +76,7 @@ class TestEmit:
     ) -> None:
         """Emit a skill event to signals.jsonl."""
         event = SkillEvent(
-            timestamp=now, skill="story-design", event="start"
+            timestamp=now, skill="rai-story-design", event="start"
         )
 
         result = emit(event, base_path=temp_telemetry_dir)
@@ -90,7 +90,7 @@ class TestEmit:
         content = result.path.read_text()
         data = json.loads(content.strip())
         assert data["type"] == "skill_event"
-        assert data["skill"] == "story-design"
+        assert data["skill"] == "rai-story-design"
         assert data["event"] == "start"
 
     def test_emit_session_event(
@@ -246,7 +246,7 @@ class TestEmitSkillEvent:
     def test_emit_start_event(self, temp_telemetry_dir: Path) -> None:
         """Emit a skill start event."""
         result = emit_skill_event(
-            skill="story-design",
+            skill="rai-story-design",
             event="start",
             base_path=temp_telemetry_dir,
         )
@@ -256,7 +256,7 @@ class TestEmitSkillEvent:
         content = result.path.read_text()
         data = json.loads(content.strip())
         assert data["type"] == "skill_event"
-        assert data["skill"] == "story-design"
+        assert data["skill"] == "rai-story-design"
         assert data["event"] == "start"
         assert data["duration_sec"] is None
 
@@ -265,7 +265,7 @@ class TestEmitSkillEvent:
     ) -> None:
         """Emit a skill complete event with duration."""
         result = emit_skill_event(
-            skill="story-implement",
+            skill="rai-story-implement",
             event="complete",
             duration_sec=1800,
             base_path=temp_telemetry_dir,

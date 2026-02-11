@@ -305,7 +305,7 @@ def start_session(profile: DeveloperProfile, project_path: str) -> DeveloperProf
     """Mark a session as active.
 
     Sets current_session with timestamp and project. Use this at the
-    beginning of /session-start to track active sessions.
+    beginning of /rai-session-start to track active sessions.
 
     Args:
         profile: The developer profile to update.
@@ -324,7 +324,7 @@ def start_session(profile: DeveloperProfile, project_path: str) -> DeveloperProf
 def end_session(profile: DeveloperProfile) -> DeveloperProfile:
     """Clear the active session state.
 
-    Clears current_session. Use this at the end of /session-close
+    Clears current_session. Use this at the end of /rai-session-close
     to mark the session as properly closed.
 
     Args:

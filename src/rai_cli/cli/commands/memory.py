@@ -1479,7 +1479,7 @@ def emit_session_event(
     """Emit a session event to telemetry.
 
     Records a session completion signal for local learning and insights.
-    Called at the end of /session-close to capture session metadata.
+    Called at the end of /rai-session-close to capture session metadata.
 
     Examples:
         # Basic session complete
@@ -1553,7 +1553,7 @@ def emit_calibration_event(
     """Emit a calibration event to telemetry.
 
     Records estimate vs actual for velocity tracking and pattern detection.
-    Called at the end of /story-review to capture calibration data.
+    Called at the end of /rai-story-review to capture calibration data.
 
     Velocity is calculated automatically: estimated / actual.
     - velocity > 1.0 means faster than estimated

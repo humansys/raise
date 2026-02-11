@@ -8,7 +8,7 @@ layers: []
 # System Design: {project_name}
 
 > C4 Level 2 — Container/component decomposition
-> Fill with /project-create or /project-onboard
+> Fill with /rai-project-create or /rai-project-onboard
 
 ## Architecture Overview
 

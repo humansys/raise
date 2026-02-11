@@ -163,7 +163,7 @@ class TestInitOutputAdaptation:
         # Shu output should include welcome and next steps
         output_lower = result.output.lower()
         assert "welcome" in output_lower or "rai" in output_lower
-        assert "next" in output_lower or "/session-start" in result.output
+        assert "next" in output_lower or "/rai-session-start" in result.output
 
     def test_ri_output_is_concise(
         self, greenfield_project: Path, mock_home: Path
@@ -590,11 +590,11 @@ class TestInitSkillScaffolding:
 
         assert result.exit_code == 0
         skills_dir = greenfield_project / ".claude" / "skills"
-        assert (skills_dir / "session-start" / "SKILL.md").exists()
-        assert (skills_dir / "discover-start" / "SKILL.md").exists()
-        assert (skills_dir / "discover-scan" / "SKILL.md").exists()
-        assert (skills_dir / "discover-validate" / "SKILL.md").exists()
-        assert (skills_dir / "discover-document" / "SKILL.md").exists()
+        assert (skills_dir / "rai-session-start" / "SKILL.md").exists()
+        assert (skills_dir / "rai-discover-start" / "SKILL.md").exists()
+        assert (skills_dir / "rai-discover-scan" / "SKILL.md").exists()
+        assert (skills_dir / "rai-discover-validate" / "SKILL.md").exists()
+        assert (skills_dir / "rai-discover-document" / "SKILL.md").exists()
 
     def test_init_does_not_overwrite_existing_skills(
         self, greenfield_project: Path, mock_home: Path
@@ -610,7 +610,7 @@ class TestInitSkillScaffolding:
 
         # Modify a skill
         skill_path = (
-            greenfield_project / ".claude" / "skills" / "session-start" / "SKILL.md"
+            greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
         )
         skill_path.write_text("# Custom skill")
 
@@ -735,7 +735,7 @@ class TestInitSkillRecommendation:
             )
 
         assert result.exit_code == 0
-        assert "/project-create" in result.output
+        assert "/rai-project-create" in result.output
 
     def test_brownfield_recommends_project_onboard(
         self, brownfield_project: Path, mock_home: Path
@@ -749,4 +749,4 @@ class TestInitSkillRecommendation:
             )
 
         assert result.exit_code == 0
-        assert "/project-onboard" in result.output
+        assert "/rai-project-onboard" in result.output

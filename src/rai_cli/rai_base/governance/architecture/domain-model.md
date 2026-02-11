@@ -9,7 +9,7 @@ shared_kernel: {}
 # Domain Model: {project_name}
 
 > Bounded contexts and shared kernel
-> Fill with /project-create or /project-onboard
+> Fill with /rai-project-create or /rai-project-onboard
 
 ## Bounded Contexts
 

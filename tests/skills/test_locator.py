@@ -20,12 +20,12 @@ def skill_dir(tmp_path: Path) -> Path:
     skills = tmp_path / ".claude" / "skills"
     skills.mkdir(parents=True)
 
-    # Create session-start skill
-    session_start = skills / "session-start"
+    # Create rai-session-start skill
+    session_start = skills / "rai-session-start"
     session_start.mkdir()
     (session_start / "SKILL.md").write_text(dedent("""\
         ---
-        name: session-start
+        name: rai-session-start
         description: Begin a session
         metadata:
           raise.work_cycle: session
@@ -34,12 +34,12 @@ def skill_dir(tmp_path: Path) -> Path:
         # Session Start
     """))
 
-    # Create story-plan skill
-    feature_plan = skills / "story-plan"
+    # Create rai-story-plan skill
+    feature_plan = skills / "rai-story-plan"
     feature_plan.mkdir()
     (feature_plan / "SKILL.md").write_text(dedent("""\
         ---
-        name: story-plan
+        name: rai-story-plan
         description: Plan a feature
         metadata:
           raise.work_cycle: story
@@ -48,12 +48,12 @@ def skill_dir(tmp_path: Path) -> Path:
         # Story Plan
     """))
 
-    # Create debug skill (utility)
-    debug = skills / "debug"
+    # Create rai-debug skill (utility)
+    debug = skills / "rai-debug"
     debug.mkdir()
     (debug / "SKILL.md").write_text(dedent("""\
         ---
-        name: debug
+        name: rai-debug
         description: Debug issues
         metadata:
           raise.work_cycle: utility
@@ -94,7 +94,7 @@ class TestSkillLocator:
         dirs = locator.find_skill_dirs()
         assert len(dirs) == 3
         names = {d.name for d in dirs}
-        assert names == {"session-start", "story-plan", "debug"}
+        assert names == {"rai-session-start", "rai-story-plan", "rai-debug"}
 
     def test_find_skill_dirs_empty(self, tmp_path: Path) -> None:
         """Handle empty skill directory."""
@@ -113,9 +113,9 @@ class TestSkillLocator:
     def test_load_skill(self, skill_dir: Path) -> None:
         """Load a single skill."""
         locator = SkillLocator(skill_dir / ".claude" / "skills")
-        skill = locator.load_skill("session-start")
+        skill = locator.load_skill("rai-session-start")
         assert skill is not None
-        assert skill.name == "session-start"
+        assert skill.name == "rai-session-start"
         assert skill.version == "3.0.0"
 
     def test_load_skill_not_found(self, skill_dir: Path) -> None:
@@ -130,7 +130,7 @@ class TestSkillLocator:
         skills = locator.load_all_skills()
         assert len(skills) == 3
         names = {s.name for s in skills}
-        assert names == {"session-start", "story-plan", "debug"}
+        assert names == {"rai-session-start", "rai-story-plan", "rai-debug"}
 
     def test_load_all_skills_sorted(self, skill_dir: Path) -> None:
         """Skills are sorted by name."""
@@ -151,7 +151,7 @@ class TestSkillLocator:
         assert len(grouped["session"]) == 1
         assert len(grouped["story"]) == 1
         assert len(grouped["utility"]) == 1
-        assert grouped["session"][0].name == "session-start"
+        assert grouped["session"][0].name == "rai-session-start"
 
 
 class TestListSkills:
