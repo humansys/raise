@@ -1030,6 +1030,7 @@ DEFAULT_EXCLUDE_PATTERNS: list[str] = [
     "**/.venv/**",
     "**/venv/**",
     "**/node_modules/**",
+    "**/vendor/**",
     "**/dist/**",
     "**/build/**",
     "**/.git/**",

@@ -329,6 +329,19 @@ class TestScanDirectory:
         assert not any(s.name == "render" for s in result.symbols)
         assert not any(s.name == "Site" for s in result.symbols)
 
+    def test_scan_excludes_vendor_by_default(self, tmp_path: Path) -> None:
+        """Test that vendor directories are excluded by default (PAT-247)."""
+        (tmp_path / "main.py").write_text("class Main: pass")
+
+        vendor = tmp_path / "vendor" / "lib"
+        vendor.mkdir(parents=True)
+        (vendor / "dep.py").write_text("class Dep: pass")
+
+        result = scan_directory(tmp_path)
+        assert result.files_scanned == 1
+        assert any(s.name == "Main" for s in result.symbols)
+        assert not any(s.name == "Dep" for s in result.symbols)
+
     def test_scan_reads_gitignore(self, tmp_path: Path) -> None:
         """Test that .gitignore patterns are merged into exclusions."""
         # .gitignore excludes "vendor"
