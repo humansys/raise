@@ -1,6 +1,6 @@
 ---
 type: architecture_domain_model
-project: raise-cli
+project: rai-cli
 status: current
 bounded_contexts:
   - name: governance
@@ -40,11 +40,11 @@ distribution:
 
 > DDD-informed domain boundaries, communication patterns, and design decision guidance.
 
-This document captures the **intentional domain structure** of raise-cli. It answers: where does new functionality belong, how do domains communicate, and what constitutes a domain boundary violation.
+This document captures the **intentional domain structure** of rai-cli. It answers: where does new functionality belong, how do domains communicate, and what constitutes a domain boundary violation.
 
 ## Bounded Contexts
 
-raise-cli has seven bounded contexts (one planned), a shared kernel, and an application layer. Each context has its own vocabulary, its own aggregate roots, and evolves independently.
+rai-cli has seven bounded contexts (one planned), a shared kernel, and an application layer. Each context has its own vocabulary, its own aggregate roots, and evolves independently.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
