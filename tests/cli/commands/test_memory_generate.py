@@ -6,7 +6,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from raise_cli.cli.main import app
+from rai_cli.cli.main import app
 
 runner = CliRunner()
 

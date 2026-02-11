@@ -1,6 +1,6 @@
 ---
 type: architecture_index
-project: raise-cli
+project: rai-cli
 generated: "2026-02-09"
 modules: 15
 components: 345
@@ -8,13 +8,13 @@ files: 94
 symbols: 648
 ---
 
-# raise-cli Architecture
+# rai-cli Architecture
 
 > Compact index for AI context loading. Full module docs: `governance/architecture/modules/`
 
 ## System Overview
 
-raise-cli is a Python CLI toolkit for the RaiSE framework. It provides deterministic governance operations, codebase discovery, and memory management for AI-assisted software engineering. The architecture follows a **layered hub-and-spoke** pattern: leaf modules (core, config, schemas) at the base, domain modules (governance, discovery, memory) in the middle, integration (context) pulling everything together, and the CLI as the sole orchestrator.
+rai-cli is a Python CLI toolkit for the RaiSE framework. It provides deterministic governance operations, codebase discovery, and memory management for AI-assisted software engineering. The architecture follows a **layered hub-and-spoke** pattern: leaf modules (core, config, schemas) at the base, domain modules (governance, discovery, memory) in the middle, integration (context) pulling everything together, and the CLI as the sole orchestrator.
 
 **Code-aware graph (S16.1):** The unified graph now includes module-level code analysis. `load_code_structure()` in the builder enriches mod-* nodes with imports, exports, and component counts extracted via Python AST (context/analyzers subpackage).
 
@@ -42,7 +42,7 @@ raise-cli is a Python CLI toolkit for the RaiSE framework. It provides determini
 
 ```
 Governance markdown → extractor → concept nodes ─────┐
-Source code         → scanner   → analyzer → comps   ├→ UnifiedGraph → raise memory query
+Source code         → scanner   → analyzer → comps   ├→ UnifiedGraph → rai memory query
 JSONL memory        → loader    → pattern/cal nodes  │
 Architecture docs   → frontmatter parser → mod nodes │
 Module source files → PythonAnalyzer → code metadata ┘

@@ -126,7 +126,7 @@ framework/                  # Public framework docs
 
 ### Ontology Patterns (Apply These)
 
-Query memory for details: `raise memory query "ontology cli design"`
+Query memory for details: `rai memory query "ontology cli design"`
 
 | Pattern | Principle |
 |---------|-----------|
@@ -160,7 +160,7 @@ Answer these questions:
 
 ```bash
 # Check name follows pattern, no conflicts, known lifecycle
-raise skill check-name {skill-name}
+rai skill check-name {skill-name}
 ```
 
 This validates:
@@ -169,7 +169,7 @@ This validates:
 - ✓ No CLI command conflict (PAT-132)
 - ✓ Domain is a known lifecycle
 
-**Verification:** `raise skill check-name` returns valid.
+**Verification:** `rai skill check-name` returns valid.
 
 ### Step 2: Check Ontology Compliance
 
@@ -177,7 +177,7 @@ Before creating, verify against patterns:
 
 ```bash
 # Query ontology patterns
-raise memory query "ontology naming" --types pattern --limit 5
+rai memory query "ontology naming" --types pattern --limit 5
 ```
 
 **Checklist (PAT-136):**
@@ -196,10 +196,10 @@ Use the CLI to create the skill with proper structure:
 
 ```bash
 # Create skill with inferred lifecycle
-raise skill scaffold {skill-name}
+rai skill scaffold {skill-name}
 
 # Or specify lifecycle and positioning explicitly
-raise skill scaffold {skill-name} --lifecycle {lifecycle} --after {previous-skill} --before {next-skill}
+rai skill scaffold {skill-name} --lifecycle {lifecycle} --after {previous-skill} --before {next-skill}
 ```
 
 This creates:
@@ -277,7 +277,7 @@ metadata:
 
 ```bash
 # CLI command if applicable
-raise {command}
+rai {command}
 ```
 
 **Verification:** {How to know this step succeeded.}
@@ -313,7 +313,7 @@ raise {command}
 Use the CLI to validate the skill:
 
 ```bash
-raise skill validate .claude/skills/{skill-name}/
+rai skill validate .claude/skills/{skill-name}/
 ```
 
 This checks:
@@ -323,7 +323,7 @@ This checks:
 - ✓ Name follows `{domain}-{action}` pattern
 - ⚠ Hook script paths (warns if not found)
 
-**Verification:** `raise skill validate` returns no errors.
+**Verification:** `rai skill validate` returns no errors.
 
 ### Step 6: Update Skill Catalog
 
@@ -361,7 +361,7 @@ Invoke the skill to verify it works:
 Record this skill creation as a pattern if it introduces new workflow:
 
 ```bash
-raise memory add-pattern "{Brief description of the pattern}" -c "{context tags}" -t process --from "{feature-id}"
+rai memory add-pattern "{Brief description of the pattern}" -c "{context tags}" -t process --from "{feature-id}"
 ```
 
 **Verification:** Pattern recorded (optional — only for novel patterns).
@@ -421,5 +421,5 @@ New skill is warranted when the workflow is distinct enough to warrant separate 
 
 - Skill structure: `.claude/skills/story-start/SKILL.md` (template example)
 - Hook scripts: `.raise/scripts/`
-- Ontology patterns: `raise memory query "ontology"`
-- CLI toolkit: `raise --help`
+- Ontology patterns: `rai memory query "ontology"`
+- CLI toolkit: `rai --help`

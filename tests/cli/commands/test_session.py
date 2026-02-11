@@ -7,9 +7,9 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from raise_cli.cli.main import app
-from raise_cli.onboarding.profile import CurrentSession, DeveloperProfile
-from raise_cli.session.close import CloseResult
+from rai_cli.cli.main import app
+from rai_cli.onboarding.profile import CurrentSession, DeveloperProfile
+from rai_cli.session.close import CloseResult
 
 runner = CliRunner()
 
@@ -20,7 +20,7 @@ class TestSessionStart:
     def test_start_first_time_requires_name(self) -> None:
         """First-time user without --name should get helpful error."""
         with patch(
-            "raise_cli.cli.commands.session.load_developer_profile", return_value=None
+            "rai_cli.cli.commands.session.load_developer_profile", return_value=None
         ):
             result = runner.invoke(app, ["session", "start"])
 
@@ -37,11 +37,11 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=None,
             ),
             patch(
-                "raise_cli.cli.commands.session.save_developer_profile"
+                "rai_cli.cli.commands.session.save_developer_profile"
             ) as mock_save,
         ):
             result = runner.invoke(
@@ -59,11 +59,11 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
             patch(
-                "raise_cli.cli.commands.session.save_developer_profile"
+                "rai_cli.cli.commands.session.save_developer_profile"
             ) as mock_save,
         ):
             result = runner.invoke(app, ["session", "start"])
@@ -80,11 +80,11 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
             patch(
-                "raise_cli.cli.commands.session.save_developer_profile"
+                "rai_cli.cli.commands.session.save_developer_profile"
             ) as mock_save,
         ):
             result = runner.invoke(
@@ -110,10 +110,10 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
             result = runner.invoke(app, ["session", "start"])
 
@@ -133,10 +133,10 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
             result = runner.invoke(app, ["session", "start"])
 
@@ -149,16 +149,16 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
             patch(
-                "raise_cli.cli.commands.session.assemble_context_bundle",
+                "rai_cli.cli.commands.session.assemble_context_bundle",
                 return_value="# Session Context\nDeveloper: Hank (shu)",
             ),
             patch(
-                "raise_cli.cli.commands.session.load_session_state",
+                "rai_cli.cli.commands.session.load_session_state",
                 return_value=None,
             ),
         ):
@@ -179,10 +179,10 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
             result = runner.invoke(app, ["session", "start", "--context"])
 
@@ -196,10 +196,10 @@ class TestSessionStart:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
             result = runner.invoke(app, ["session", "start"])
 
@@ -219,7 +219,7 @@ class TestSessionClose:
     def test_close_no_profile_errors(self) -> None:
         """Close without profile gives error."""
         with patch(
-            "raise_cli.cli.commands.session.load_developer_profile", return_value=None
+            "rai_cli.cli.commands.session.load_developer_profile", return_value=None
         ):
             result = runner.invoke(app, ["session", "close"])
 
@@ -231,7 +231,7 @@ class TestSessionClose:
         profile = DeveloperProfile(name="Frank", current_session=None)
 
         with patch(
-            "raise_cli.cli.commands.session.load_developer_profile",
+            "rai_cli.cli.commands.session.load_developer_profile",
             return_value=profile,
         ):
             result = runner.invoke(app, ["session", "close"])
@@ -251,11 +251,11 @@ class TestSessionClose:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
             patch(
-                "raise_cli.cli.commands.session.save_developer_profile"
+                "rai_cli.cli.commands.session.save_developer_profile"
             ) as mock_save,
         ):
             result = runner.invoke(app, ["session", "close"])
@@ -278,11 +278,11 @@ class TestSessionClose:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
             patch(
-                "raise_cli.cli.commands.session.process_session_close",
+                "rai_cli.cli.commands.session.process_session_close",
                 return_value=close_result,
             ),
         ):
@@ -308,11 +308,11 @@ class TestSessionClose:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
             patch(
-                "raise_cli.cli.commands.session.process_session_close",
+                "rai_cli.cli.commands.session.process_session_close",
                 return_value=close_result,
             ) as mock_close,
         ):
@@ -348,11 +348,11 @@ class TestSessionClose:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
             patch(
-                "raise_cli.cli.commands.session.process_session_close",
+                "rai_cli.cli.commands.session.process_session_close",
                 return_value=close_result,
             ) as mock_close,
         ):
@@ -407,11 +407,11 @@ class TestSessionClose:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.load_developer_profile",
+                "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
             patch(
-                "raise_cli.cli.commands.session.process_session_close",
+                "rai_cli.cli.commands.session.process_session_close",
                 return_value=close_result,
             ) as mock_close,
         ):

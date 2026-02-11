@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typer.testing import CliRunner
 
-from raise_cli.cli.main import app
+from rai_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -23,14 +23,14 @@ def test_version_flag() -> None:
     """Test --version flag shows version."""
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "raise-cli version" in result.stdout
+    assert "rai-cli version" in result.stdout
 
 
 def test_version_short_flag() -> None:
     """Test -V short flag shows version."""
     result = runner.invoke(app, ["-V"])
     assert result.exit_code == 0
-    assert "raise-cli version" in result.stdout
+    assert "rai-cli version" in result.stdout
 
 
 def test_invalid_format_rejected() -> None:

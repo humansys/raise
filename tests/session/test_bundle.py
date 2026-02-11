@@ -6,8 +6,8 @@ from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
-from raise_cli.context.models import ConceptNode
-from raise_cli.onboarding.profile import (
+from rai_cli.context.models import ConceptNode
+from rai_cli.onboarding.profile import (
     CoachingContext,
     Correction,
     Deadline,
@@ -15,14 +15,14 @@ from raise_cli.onboarding.profile import (
     ExperienceLevel,
     RelationshipState,
 )
-from raise_cli.schemas.session_state import (
+from rai_cli.schemas.session_state import (
     CurrentWork,
     LastSession,
     PendingItems,
     SessionState,
 )
-from raise_cli.schemas.session_state import EpicProgress
-from raise_cli.session.bundle import (
+from rai_cli.schemas.session_state import EpicProgress
+from rai_cli.session.bundle import (
     _format_governance_primes,
     _format_identity_primes,
     _format_progress,
@@ -99,8 +99,8 @@ def _make_pattern(pat_id: str, content: str) -> ConceptNode:
 class TestAssembleContextBundle:
     """Tests for assemble_context_bundle."""
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_full_bundle_contains_all_sections(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -149,8 +149,8 @@ class TestAssembleContextBundle:
         assert "16/25" in bundle
         assert "E1, E2" in bundle
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_bundle_without_state(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -170,8 +170,8 @@ class TestAssembleContextBundle:
         assert "# Coaching" not in bundle
         assert "# Pending" not in bundle
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_bundle_no_coaching(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -187,8 +187,8 @@ class TestAssembleContextBundle:
 
         assert "# Coaching" not in bundle
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_bundle_no_pending(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -214,8 +214,8 @@ class TestAssembleContextBundle:
 
         assert "# Pending" not in bundle
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_deadline_days_remaining(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -233,8 +233,8 @@ class TestAssembleContextBundle:
 
         assert "(today)" in bundle
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_coaching_shows_last_3_corrections(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -264,8 +264,8 @@ class TestAssembleContextBundle:
         assert "SES-000" not in bundle
         assert "SES-001" not in bundle
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_coaching_shows_trust_and_relationship(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -292,8 +292,8 @@ class TestAssembleContextBundle:
         assert "Autonomy: high within scope" in bundle
         assert "Relationship: productive (growing)" in bundle
 
-    @patch("raise_cli.session.bundle.get_always_on_primes")
-    @patch("raise_cli.session.bundle.get_foundational_patterns")
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
     def test_coaching_omits_default_trust_and_relationship(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -340,7 +340,7 @@ class TestGetAlwaysOnPrimes:
 
     def test_returns_always_on_nodes(self, tmp_path: Path) -> None:
         """Returns all nodes with always_on=true metadata."""
-        from raise_cli.context.graph import UnifiedGraph
+        from rai_cli.context.graph import UnifiedGraph
 
         graph = UnifiedGraph()
         graph.add_concept(
@@ -370,7 +370,7 @@ class TestGetAlwaysOnPrimes:
 
     def test_excludes_non_always_on(self, tmp_path: Path) -> None:
         """Nodes without always_on=true are excluded."""
-        from raise_cli.context.graph import UnifiedGraph
+        from rai_cli.context.graph import UnifiedGraph
 
         graph = UnifiedGraph()
         graph.add_concept(
@@ -612,7 +612,7 @@ class TestGetFoundationalPatterns:
 
     def test_returns_foundational_patterns_from_graph(self, tmp_path: Path) -> None:
         """Returns patterns with foundational=true from graph."""
-        from raise_cli.context.graph import UnifiedGraph
+        from rai_cli.context.graph import UnifiedGraph
 
         graph = UnifiedGraph()
         graph.add_concept(

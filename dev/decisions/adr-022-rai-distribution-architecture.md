@@ -39,8 +39,8 @@ This rules out tightly coupling base Rai content to the CLI package.
 
 ```
 PUBLIC (raise-commons repo):
-├── src/raise_cli/           # CLI code
-└── src/raise_cli/rai_base/  # Default public base Rai (bundled)
+├── src/rai_cli/           # CLI code
+└── src/rai_cli/rai_base/  # Default public base Rai (bundled)
     ├── identity/
     │   ├── core.md
     │   └── perspective.md
@@ -85,12 +85,12 @@ raise init
 raise config set base_source https://gitlab.acme.com/rai/rai-base-acme.git
 
 # Update base from configured source
-raise base update
+rai base update
 # If git URL: clone or pull latest
 # If bundled: check for CLI update, prompt if available
 
 # Check current base
-raise base show
+rai base show
 # Source: bundled (raise-cli 2.1.0)
 # -- or --
 # Source: https://gitlab.acme.com/rai/rai-base-acme.git (v1.3.0)
@@ -116,7 +116,7 @@ raise init
 ### Update Flow
 
 ```
-raise base update
+rai base update
     │
     ├── Resolve base source
     │
@@ -162,17 +162,17 @@ raise base update
 
 ### F&F (E14)
 
-1. Bundle base Rai in `src/raise_cli/rai_base/`
-2. `raise init` copies from bundled source
-3. `raise base show` displays current base info
+1. Bundle base Rai in `src/rai_cli/rai_base/`
+2. `rai init` copies from bundled source
+3. `rai base show` displays current base info
 4. No git source support yet (config ignored)
 
 ### Post-F&F
 
 1. Add `~/.rai/config.yaml` support
 2. Implement git source resolution
-3. Add `raise base update` command
-4. Add `raise config set base_source` command
+3. Add `rai base update` command
+4. Add `rai config set base_source` command
 
 ### V3
 

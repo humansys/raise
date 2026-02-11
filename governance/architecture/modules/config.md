@@ -1,7 +1,7 @@
 ---
 type: module
 name: config
-purpose: "Settings cascade and XDG-compliant directory resolution for all raise-cli configuration"
+purpose: "Settings cascade and XDG-compliant directory resolution for all rai-cli configuration"
 status: current
 depends_on: []
 depended_by: [cli, context, memory, onboarding, telemetry]
@@ -22,7 +22,7 @@ constraints:
 
 The config module resolves where things live and what settings are active. It provides two things: **directory resolution** (where is `.raise/`? where is `~/.rai/`? where do personal files go?) and **settings management** (output format, verbosity, project root).
 
-The directory helpers are critical because raise-cli uses a **three-tier data architecture** — global (`~/.rai/`), project (`.raise/rai/memory/`), and personal (`.raise/rai/personal/`) — and every module that reads or writes data needs to know which directory to target.
+The directory helpers are critical because rai-cli uses a **three-tier data architecture** — global (`~/.rai/`), project (`.raise/rai/memory/`), and personal (`.raise/rai/personal/`) — and every module that reads or writes data needs to know which directory to target.
 
 ## Key Files
 

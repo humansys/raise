@@ -121,7 +121,7 @@ Build a CLI tool that parses kata/gate definitions, tracks execution state, vali
 ### 2.3 Component Diagram (C4 Level 3)
 
 ```
-src/raise_cli/
+src/rai_cli/
 ├── __init__.py             # Package metadata, version
 ├── __main__.py             # Entry point: python -m raise_cli
 ├── exceptions.py           # Centralized error hierarchy
@@ -701,7 +701,7 @@ class Technology(BaseModel):
 └───────────┘     └───────────┘
 ```
 
-1. **CLI Layer**: Parses `raise kata run project/discovery`, validates args
+1. **CLI Layer**: Parses `rai kata run project/discovery`, validates args
 2. **Handler Layer**: Creates `KataHandler`, orchestrates execution
 3. **Engine Layer**: `KataEngine` loads definition, processes steps
 4. **State**: Persisted to `.raise/state/katas.json`
@@ -953,16 +953,16 @@ metadata:
 
 # RaiSE Governance
 
-Use `raise-cli` for deterministic governance of AI-assisted development.
+Use `rai-cli` for deterministic governance of AI-assisted development.
 
 ## Installation
 pip install raise-cli
 
 ## Core Commands
-- `raise kata run <kata-id>` — Execute governance katas
-- `raise gate check <gate-id>` — Validate artifacts against gates
-- `raise analyze` — Brownfield codebase analysis (SAR)
-- `raise context generate` — Generate CLAUDE.md from governance
+- `rai kata run <kata-id>` — Execute governance katas
+- `rai gate check <gate-id>` — Validate artifacts against gates
+- `rai analyze` — Brownfield codebase analysis (SAR)
+- `rai context generate` — Generate CLAUDE.md from governance
 
 ## Global Options
 - `--format json|human|table` — Output format

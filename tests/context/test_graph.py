@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.context.graph import UnifiedGraph
-from raise_cli.context.models import ConceptEdge, ConceptNode
+from rai_cli.context.graph import UnifiedGraph
+from rai_cli.context.models import ConceptEdge, ConceptNode
 
 
 @pytest.fixture

@@ -95,7 +95,7 @@ def get_data_dir() -> Path:
 - **Documentation burden:** Need to document where files are stored
 
 ### Mitigations
-- **Discoverability:** `raise config show-paths` command to show locations
+- **Discoverability:** `rai config show-paths` command to show locations
 - **Documentation:** README clearly documents XDG paths with examples
 - **Defaults:** Works out of box, most users don't need to know about XDG
 

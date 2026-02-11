@@ -188,9 +188,9 @@ Graceful degradation ensures the system works even for documents not yet parsed 
 - Fallback to file-level (graceful degradation)
 
 ### F2.4: CLI Commands (2 SP)
-- `raise graph build` - Parse governance into concepts
-- `raise context query --task <task>` - Get MVC for task
-- `raise graph validate` - Check graph consistency
+- `rai graph build` - Parse governance into concepts
+- `rai context query --task <task>` - Get MVC for task
+- `rai graph validate` - Check graph consistency
 
 **Total: ~9 SP** (reduced from original 31 SP for kata/gate engines)
 

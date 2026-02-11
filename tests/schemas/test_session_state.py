@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from raise_cli.schemas.session_state import (
+from rai_cli.schemas.session_state import (
     CurrentWork,
     EpicProgress,
     LastSession,

@@ -8,8 +8,8 @@ import pytest
 # Resolve project root at import time (immune to chdir in other tests)
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
-from raise_cli.governance.models import ConceptType
-from raise_cli.governance.parsers.adr import (
+from rai_cli.governance.models import ConceptType
+from rai_cli.governance.parsers.adr import (
     _extract_decision_summary,
     _parse_frontmatter,
     extract_all_decisions,

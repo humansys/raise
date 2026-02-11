@@ -6,9 +6,9 @@ impact classification, and affected_modules derivation.
 
 from __future__ import annotations
 
-from raise_cli.context.diff import GraphDiff, NodeChange, diff_graphs
-from raise_cli.context.graph import UnifiedGraph
-from raise_cli.context.models import ConceptNode
+from rai_cli.context.diff import GraphDiff, NodeChange, diff_graphs
+from rai_cli.context.graph import UnifiedGraph
+from rai_cli.context.models import ConceptNode
 
 
 def _make_node(

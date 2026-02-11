@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from raise_cli.memory.models import (
+from rai_cli.memory.models import (
     MemoryConcept,
     MemoryConceptType,
     MemoryLoadResult,

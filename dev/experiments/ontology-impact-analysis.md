@@ -135,7 +135,7 @@ Future: LinkML schemas (high semantic density)
 
 **Alignment:**
 - Skills execute validation (e.g., `/validate-prd`)
-- CLI provides deterministic checks (`raise validate structure`)
+- CLI provides deterministic checks (`rai validate structure`)
 - No longer "gate engine" but gates still exist
 
 **Shift**: Gates are skills calling toolkit, not separate engine.
@@ -199,7 +199,7 @@ Future: LinkML schemas (high semantic density)
 | **Concept** | Semantic unit extracted from governance (requirement, principle, outcome) | `req-rf-05` |
 | **MVC (Minimum Viable Context)** | Smallest set of concepts needed for a task | Query result with 2-5 concepts |
 | **Concept Graph** | Directed graph of governance concepts and relationships | `graph.yaml` |
-| **Toolkit** | CLI commands providing deterministic operations for skills | `raise parse`, `raise validate` |
+| **Toolkit** | CLI commands providing deterministic operations for skills | `rai parse`, `rai validate` |
 | **Transpiration** | Automated extraction of structured data from markdown | Markdown → JSON concepts |
 
 ### Updated Definitions
@@ -314,7 +314,7 @@ MVC Query:
 
 **Adoption path:**
 1. Install raise-cli (heavy - engines included)
-2. Run `raise kata run` (engine-driven)
+2. Run `rai kata run` (engine-driven)
 3. Customize via config files
 
 **Barriers:**
@@ -357,7 +357,7 @@ MVC Query:
 |----|------|----------|---------|
 | ONT-013 | Grafo + AST para SAR | "Parser → AST → Grafo → Recorrido → LLM" | AST for SAR (E5), Graph for governance (E2) |
 | ONT-031 | Phase-to-Category Mapping | Map 8 phases to 7 categories | Map skills to features (simpler) |
-| ONT-033 | Command Naming | `raise.N.name` vs `verb-noun` | Toolkit commands: `raise <verb> <noun>` |
+| ONT-033 | Command Naming | `raise.N.name` vs `verb-noun` | Toolkit commands: `rai <verb> <noun>` |
 
 ### Items to ADD (New Concepts)
 

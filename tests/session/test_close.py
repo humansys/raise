@@ -6,8 +6,8 @@ from pathlib import Path
 
 import yaml
 
-from raise_cli.onboarding.profile import DeveloperProfile, ExperienceLevel
-from raise_cli.session.close import CloseInput, load_state_file, process_session_close
+from rai_cli.onboarding.profile import DeveloperProfile, ExperienceLevel
+from rai_cli.session.close import CloseInput, load_state_file, process_session_close
 
 
 class TestLoadStateFile:
@@ -86,7 +86,7 @@ class TestProcessSessionClose:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -107,7 +107,7 @@ class TestProcessSessionClose:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -134,7 +134,7 @@ class TestProcessSessionClose:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -149,7 +149,7 @@ class TestProcessSessionClose:
 
         assert result.corrections_added == 1
         # Verify profile was saved with correction
-        from raise_cli.onboarding.profile import load_developer_profile
+        from rai_cli.onboarding.profile import load_developer_profile
 
         loaded = load_developer_profile()
         assert loaded is not None
@@ -165,7 +165,7 @@ class TestProcessSessionClose:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -185,7 +185,7 @@ class TestProcessSessionClose:
         process_session_close(close_input, profile, project)
 
         # Verify session state was written
-        from raise_cli.session.state import load_session_state
+        from rai_cli.session.state import load_session_state
 
         state = load_session_state(project)
         assert state is not None
@@ -202,12 +202,12 @@ class TestProcessSessionClose:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
 
-        from raise_cli.onboarding.profile import save_developer_profile, start_session
+        from rai_cli.onboarding.profile import save_developer_profile, start_session
 
         active = start_session(profile, str(project))
         save_developer_profile(active)
@@ -215,7 +215,7 @@ class TestProcessSessionClose:
         close_input = CloseInput(summary="done")
         process_session_close(close_input, active, project)
 
-        from raise_cli.onboarding.profile import load_developer_profile
+        from rai_cli.onboarding.profile import load_developer_profile
 
         loaded = load_developer_profile()
         assert loaded is not None
@@ -274,7 +274,7 @@ class TestProcessSessionCloseCoaching:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -290,7 +290,7 @@ class TestProcessSessionCloseCoaching:
         result = process_session_close(close_input, profile, project)
 
         assert "Coaching updated" in result.messages
-        from raise_cli.onboarding.profile import load_developer_profile
+        from rai_cli.onboarding.profile import load_developer_profile
 
         loaded = load_developer_profile()
         assert loaded is not None
@@ -307,7 +307,7 @@ class TestProcessSessionCloseCoaching:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -320,7 +320,7 @@ class TestProcessSessionCloseCoaching:
 
         process_session_close(close_input, profile, project)
 
-        from raise_cli.onboarding.profile import load_developer_profile
+        from rai_cli.onboarding.profile import load_developer_profile
 
         loaded = load_developer_profile()
         assert loaded is not None
@@ -336,7 +336,7 @@ class TestProcessSessionCloseCoaching:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -345,7 +345,7 @@ class TestProcessSessionCloseCoaching:
         result = process_session_close(close_input, profile, project)
 
         assert "Coaching updated" not in result.messages
-        from raise_cli.onboarding.profile import load_developer_profile
+        from rai_cli.onboarding.profile import load_developer_profile
 
         loaded = load_developer_profile()
         assert loaded is not None
@@ -359,11 +359,11 @@ class TestProcessSessionCloseCoaching:
         """process_session_close with partial coaching preserves other fields."""
         import pytest
 
-        from raise_cli.onboarding.profile import CoachingContext
+        from rai_cli.onboarding.profile import CoachingContext
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         coaching = CoachingContext(
@@ -378,7 +378,7 @@ class TestProcessSessionCloseCoaching:
 
         process_session_close(close_input, profile, project)
 
-        from raise_cli.onboarding.profile import load_developer_profile
+        from rai_cli.onboarding.profile import load_developer_profile
 
         loaded = load_developer_profile()
         assert loaded is not None
@@ -452,7 +452,7 @@ class TestProcessSessionCloseProgress:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -469,7 +469,7 @@ class TestProcessSessionCloseProgress:
 
         process_session_close(close_input, profile, project)
 
-        from raise_cli.session.state import load_session_state
+        from rai_cli.session.state import load_session_state
 
         state = load_session_state(project)
         assert state is not None
@@ -487,7 +487,7 @@ class TestProcessSessionCloseProgress:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -498,7 +498,7 @@ class TestProcessSessionCloseProgress:
 
         process_session_close(close_input, profile, project)
 
-        from raise_cli.session.state import load_session_state
+        from rai_cli.session.state import load_session_state
 
         state = load_session_state(project)
         assert state is not None
@@ -513,7 +513,7 @@ class TestProcessSessionCloseProgress:
 
         mp = pytest.MonkeyPatch()
         rai_home = tmp_path / ".rai"
-        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
         profile = DeveloperProfile(name="Test")
@@ -521,7 +521,7 @@ class TestProcessSessionCloseProgress:
 
         process_session_close(close_input, profile, project)
 
-        from raise_cli.session.state import load_session_state
+        from rai_cli.session.state import load_session_state
 
         state = load_session_state(project)
         assert state is not None

@@ -8,10 +8,10 @@ from unittest.mock import patch
 import pytest
 from typer.testing import CliRunner
 
-from raise_cli.cli.main import app
-from raise_cli.onboarding.detection import ProjectType
-from raise_cli.onboarding.manifest import load_manifest
-from raise_cli.onboarding.profile import (
+from rai_cli.cli.main import app
+from rai_cli.onboarding.detection import ProjectType
+from rai_cli.onboarding.manifest import load_manifest
+from rai_cli.onboarding.profile import (
     DeveloperProfile,
     ExperienceLevel,
     save_developer_profile,
@@ -56,7 +56,7 @@ class TestInitCommand:
         """Init creates .raise/manifest.yaml."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -71,7 +71,7 @@ class TestInitCommand:
         """Init detects greenfield project correctly."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -89,7 +89,7 @@ class TestInitCommand:
         """Init detects brownfield project correctly."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(brownfield_project)], catch_exceptions=False
             )
@@ -108,7 +108,7 @@ class TestInitCommand:
         """Init creates new developer profile if none exists."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -129,10 +129,10 @@ class TestInitCommand:
             name="Test User",
             experience_level=ExperienceLevel.RI,
         )
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             save_developer_profile(existing_profile)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -154,7 +154,7 @@ class TestInitOutputAdaptation:
         """Shu users get verbose, educational output."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -176,10 +176,10 @@ class TestInitOutputAdaptation:
             name="Expert",
             experience_level=ExperienceLevel.RI,
         )
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             save_developer_profile(ri_profile)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -201,7 +201,7 @@ class TestInitIdempotency:
         """Running init again updates the manifest."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             # First init
             result1 = runner.invoke(
                 app, ["init", "--path", str(brownfield_project)], catch_exceptions=False
@@ -231,7 +231,7 @@ class TestInitWithCustomName:
         """Init uses custom name when provided."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(greenfield_project), "--name", "my-custom-api"],
@@ -249,7 +249,7 @@ class TestInitWithCustomName:
         """Init uses directory name when --name not provided."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -305,7 +305,7 @@ class Handler{i}:
         """--detect generates governance/guardrails.md."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(python_project), "--detect"],
@@ -322,7 +322,7 @@ class Handler{i}:
         """Generated guardrails reflect detected conventions."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(python_project), "--detect"],
@@ -346,7 +346,7 @@ class Handler{i}:
         """--detect outputs detection summary to console."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(python_project), "--detect"],
@@ -364,7 +364,7 @@ class Handler{i}:
         """--detect on greenfield doesn't create guardrails (nothing to detect)."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(greenfield_project), "--detect"],
@@ -387,7 +387,7 @@ class Handler{i}:
         """Generated guardrails include project name."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(python_project), "--detect", "--name", "my-api"],
@@ -405,7 +405,7 @@ class Handler{i}:
         """--detect generates CLAUDE.md for brownfield projects."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(python_project), "--detect"],
@@ -422,7 +422,7 @@ class Handler{i}:
         """Generated CLAUDE.md contains convention summary."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(python_project), "--detect", "--name", "my-api"],
@@ -446,7 +446,7 @@ class Handler{i}:
         """--detect on greenfield generates minimal CLAUDE.md."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(greenfield_project), "--detect"],
@@ -469,7 +469,7 @@ class TestInitBootstrap:
         """Init should copy base identity files to .raise/rai/identity/."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -485,7 +485,7 @@ class TestInitBootstrap:
         """Init should copy base patterns to .raise/rai/memory/patterns.jsonl."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -501,7 +501,7 @@ class TestInitBootstrap:
         """Init should copy methodology.yaml to .raise/rai/framework/."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -520,7 +520,7 @@ class TestInitBootstrap:
         mock_home.mkdir(parents=True, exist_ok=True)
 
         # First init
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -530,7 +530,7 @@ class TestInitBootstrap:
         core_path.write_text("# Custom identity")
 
         # Second init
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -544,7 +544,7 @@ class TestInitBootstrap:
         """Shu users should see bootstrap details in output."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -559,7 +559,7 @@ class TestInitBootstrap:
         """Init should generate MEMORY.md to canonical location."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -583,7 +583,7 @@ class TestInitSkillScaffolding:
         """Init should scaffold onboarding skills to .claude/skills/."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -603,7 +603,7 @@ class TestInitSkillScaffolding:
         mock_home.mkdir(parents=True, exist_ok=True)
 
         # First init
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -615,7 +615,7 @@ class TestInitSkillScaffolding:
         skill_path.write_text("# Custom skill")
 
         # Second init
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -629,7 +629,7 @@ class TestInitSkillScaffolding:
         """Shu users should see skills scaffolding in output."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -647,7 +647,7 @@ class TestInitGovernanceScaffolding:
         """Init should scaffold governance/ with template files."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -668,7 +668,7 @@ class TestInitGovernanceScaffolding:
         """Init should render project name in governance templates."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
                 ["init", "--path", str(greenfield_project), "--name", "my-api"],
@@ -687,7 +687,7 @@ class TestInitGovernanceScaffolding:
         mock_home.mkdir(parents=True, exist_ok=True)
 
         # First init
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -697,7 +697,7 @@ class TestInitGovernanceScaffolding:
         prd_path.write_text("# My Custom PRD\n")
 
         # Second init
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -711,7 +711,7 @@ class TestInitGovernanceScaffolding:
         """Shu users should see governance scaffolding in output."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -729,7 +729,7 @@ class TestInitSkillRecommendation:
         """Greenfield project should recommend /project-create."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
             )
@@ -743,7 +743,7 @@ class TestInitSkillRecommendation:
         """Brownfield project should recommend /project-onboard."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app, ["init", "--path", str(brownfield_project)], catch_exceptions=False
             )

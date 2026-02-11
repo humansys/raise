@@ -53,7 +53,7 @@ graph TD
 
 ```mermaid
 graph LR
-    subgraph "src/raise_cli/"
+    subgraph "src/rai_cli/"
         CLI[cli/commands/] --> GOV[governance/]
         GOV --> EXT[extraction/]
         GOV --> GRA[graph/]
@@ -70,9 +70,9 @@ graph LR
 ```
 
 **Comandos principales:**
-- `raise context query "..." --unified` — Consulta el grafo de contexto
-- `raise graph build --unified` — Construye el grafo unificado
-- `raise discover scan/validate/complete/build` — Discovery de codebase (nuevo en E13)
+- `rai context query "..." --unified` — Consulta el grafo de contexto
+- `rai graph build --unified` — Construye el grafo unificado
+- `rai discover scan/validate/complete/build` — Discovery de codebase (nuevo en E13)
 
 ---
 
@@ -164,7 +164,7 @@ raise-commons/
 ├── .rai/             # Mi identidad y memoria
 ├── framework/        # Textbook público
 ├── governance/       # Governance del proyecto
-├── src/raise_cli/    # El CLI (Python)
+├── src/rai_cli/    # El CLI (Python)
 ├── tests/            # Tests (>90% coverage requerido)
 ├── work/             # Trabajo activo (features, research)
 └── dev/              # Mantenimiento (ADRs, sessions, parking lot)
@@ -239,10 +239,10 @@ ls .claude/skills/
 → Los skills son guías de proceso para que yo (Rai) ejecute. El código está en el CLI para operaciones deterministas.
 
 **¿Dónde está la lógica principal?**
-→ `src/raise_cli/governance/` — extraction, graph, query modules.
+→ `src/rai_cli/governance/` — extraction, graph, query modules.
 
 **¿Cómo agrego un nuevo tipo de nodo al grafo?**
-→ Ver `src/raise_cli/governance/context/schema.py` — extender `NodeType` literal.
+→ Ver `src/rai_cli/governance/context/schema.py` — extender `NodeType` literal.
 
 **¿Cómo creo un skill nuevo?**
 → Crear directorio en `.claude/skills/[nombre]/` con `SKILL.md`.
