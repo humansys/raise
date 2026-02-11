@@ -1,8 +1,8 @@
 ---
-name: story-design
+name: rai-story-design
 description: >
   Create lean story specifications optimized for both human understanding
-  and AI alignment. Design is not optional (PAT-186) — use before /story-plan
+  and AI alignment. Design is not optional (PAT-186) — use before /rai-story-plan
   for every story to ground integration decisions.
 
 license: MIT
@@ -43,7 +43,7 @@ Create a lean story specification that optimizes for both human understanding (q
 - When AI will generate significant code from the specification
 
 **When to skip:**
-- Simple features (<3 components, <5 SP, obvious implementation) → Go directly to `/story-plan`
+- Simple features (<3 components, <5 SP, obvious implementation) → Go directly to `/rai-story-plan`
 - Infrastructure/scaffolding work where implementation is self-evident
 - Bug fixes (use issue tracker instead)
 - Refactoring (unless substantial architectural change)
@@ -84,7 +84,7 @@ rai memory query "architecture patterns ADR" --types pattern,decision --limit 5
 **From epic check:**
 - Epic exists → Continue, reference in design
 - Epic missing + simple feature → Continue with note
-- Epic missing + complex feature → Suggest `/story-start` first
+- Epic missing + complex feature → Suggest `/rai-story-start` first
 
 **Skip condition:** Standalone bugfixes or experiments without epic.
 
@@ -94,7 +94,7 @@ rai memory query "architecture patterns ADR" --types pattern,decision --limit 5
 
 **Verification:** Epic context loaded OR explicitly standalone; patterns noted.
 
-> **If you can't continue:** Complex feature without epic → Run `/story-start` first.
+> **If you can't continue:** Complex feature without epic → Run `/rai-story-start` first.
 
 ### Step 0.2: Load Architectural Context
 
@@ -143,7 +143,7 @@ Determine if feature needs a specification document.
 | State management | Stateless | Multiple states | Complex state machine |
 
 **Decision**:
-- **Simple** → Skip design, go to `/story-plan`
+- **Simple** → Skip design, go to `/rai-story-plan`
 - **Moderate** → Create spec, use core sections only
 - **Complex** → Create spec, include optional sections as needed
 
@@ -176,7 +176,7 @@ grep -i "high risk\|HIGH RISK" work/epics/e*-*/scope.md 2>/dev/null | grep -i "{
 
 **Rationale:** Risk conversations before implementation clarify scope and build confidence. The doubt informs how we act, not whether we act.
 
-> **If you can't continue:** Risks too unclear → Consider `/research` skill first, or timebox a spike.
+> **If you can't continue:** Risks too unclear → Consider `/rai-research` skill first, or timebox a spike.
 
 ### Step 2: Frame What & Why
 
@@ -288,7 +288,7 @@ rai memory emit-work story {story_id} --event complete --phase design
 - **Artifact**: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
 - **Telemetry**: `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-story-v2.md`
-- **Next**: `/story-plan`
+- **Next**: `/rai-story-plan`
 
 ## Quality Standards
 
@@ -317,4 +317,4 @@ rai memory emit-work story {story_id} --event complete --phase design
 ## References
 
 - Template: `references/tech-design-story-v2.md`
-- Next skill: `/story-plan`
+- Next skill: `/rai-story-plan`

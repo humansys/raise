@@ -1,5 +1,5 @@
 ---
-name: epic-design
+name: rai-epic-design
 description: >
   Design an epic from strategic objective to feature breakdown. Use when
   starting a new body of work spanning multiple features (3-10), requiring
@@ -47,10 +47,10 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - When multiple features need coordination or share dependencies
 
 **When to skip:**
-- Single-story work (go directly to `/story-design`)
+- Single-story work (go directly to `/rai-story-design`)
 - Bug fixes or maintenance (use issue tracker)
 - Infrastructure tasks with obvious implementation
-- Exploratory spikes (use `/research` skill first)
+- Exploratory spikes (use `/rai-research` skill first)
 
 **Inputs required:**
 - Project backlog with candidate features
@@ -178,7 +178,7 @@ Determine if architectural decisions are needed before feature breakdown.
 4. Is there significant technical uncertainty?
 
 **If "yes" to any:**
-- Conduct spike/research if needed (2-4 hours max, not days)
+- Conduct spike/rai-research if needed (2-4 hours max, not days)
 - Document findings for ADR creation in Step 5
 - Note: "Gut-check before full spike" — validate hypothesis quickly
 
@@ -294,7 +294,7 @@ Establish clear completion criteria at both feature and epic levels.
 - [ ] All planned features complete
 - [ ] Architecture documentation updated
 - [ ] Success metrics validated
-- [ ] Epic retrospective completed (`/epic-close`)
+- [ ] Epic retrospective completed (`/rai-epic-close`)
 
 **Customize based on epic nature:**
 - User-facing epic: Add UX validation criteria
@@ -437,7 +437,7 @@ rai memory emit-work epic {epic_id} --event complete --phase design
 - **Primary:** `work/epics/e{N}-{name}/scope.md`
 - **Secondary:** `dev/decisions/adr-*.md` - ADRs for architectural decisions (0-3 typical)
 - **Updated:** `dev/parking-lot.md` - Deferred items captured
-- **Next:** `/epic-plan` (sequence features, plan milestones)
+- **Next:** `/rai-epic-plan` (sequence features, plan milestones)
 
 ## Epic Scope Template
 
@@ -573,7 +573,7 @@ F{N}.4
 4. **Too few features** — If <3 features, consider if this is really an epic
 5. **ADRs for everything** — Only document significant decisions; implementation details don't need ADRs
 6. **No ADRs at all** — Architectural decisions without documentation are lost knowledge
-7. **Over-specifying features** — Save details for `/story-design`; epic level is high-level
+7. **Over-specifying features** — Save details for `/rai-story-design`; epic level is high-level
 8. **Ignoring dependencies** — Unmapped dependencies cause blocked work during implementation
 9. **Unclear done criteria** — "We'll know it when we see it" is not a done criterion
 
@@ -594,9 +594,9 @@ This skill supports the three-layer memory model:
 
 - **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
 - **ADR Template:** `.raise/templates/architecture/adr.md`
-- **Feature Design:** `/story-design` (next level down)
-- **Epic Plan:** `/epic-plan` (sequence features after design)
-- **Epic Close:** `/epic-close` (retrospective after completion)
+- **Feature Design:** `/rai-story-design` (next level down)
+- **Epic Plan:** `/rai-epic-plan` (sequence features after design)
+- **Epic Close:** `/rai-epic-close` (retrospective after completion)
 - **Constitution:** `framework/reference/constitution.md` (principles governing design)
 - **Parking Lot:** `dev/parking-lot.md` (capture deferred items)
 
@@ -605,13 +605,13 @@ This skill supports the three-layer memory model:
 ```
 Project Level
     ↓
-/epic-design  ← YOU ARE HERE
+/rai-epic-design  ← YOU ARE HERE
     ↓
-/epic-plan    ← Sequence features, milestones
+/rai-epic-plan    ← Sequence features, milestones
     ↓
-/story-design → /story-plan → /story-implement → /story-review
+/rai-story-design → /rai-story-plan → /rai-story-implement → /rai-story-review
     ↓
-/epic-close   ← Retrospective, learnings
+/rai-epic-close   ← Retrospective, learnings
 ```
 
 ---

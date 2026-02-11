@@ -1,5 +1,5 @@
 ---
-name: skill-create
+name: rai-skill-create
 description: >
   Create new RaiSE skills with proper framework integration, ontological
   consistency, and awareness of the toolkit. Use when adding new workflow

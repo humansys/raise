@@ -1,5 +1,5 @@
 ---
-name: discover-validate
+name: rai-discover-validate
 description: >
   Validate component descriptions using confidence-tier workflow.
   Auto-validates high-confidence, batch-reviews medium by module,
@@ -37,16 +37,16 @@ Validate component descriptions using a confidence-tier workflow that reduces hu
 ## Context
 
 **When to use:**
-- After `/discover-scan` has created `work/discovery/analysis.json`
+- After `/rai-discover-scan` has created `work/discovery/analysis.json`
 - When re-validating after code changes (re-run scan + analyze first)
 
 **When to skip:**
 - All components already validated
-- No `analysis.json` (run `/discover-scan` first)
+- No `analysis.json` (run `/rai-discover-scan` first)
 
 **Inputs required:**
-- `work/discovery/analysis.json` from `/discover-scan` (via `rai discover analyze`)
-- `work/discovery/components-draft.yaml` from `/discover-scan`
+- `work/discovery/analysis.json` from `/rai-discover-scan` (via `rai discover analyze`)
+- `work/discovery/components-draft.yaml` from `/rai-discover-scan`
 
 **Output:**
 - Updated `work/discovery/components-draft.yaml` with `validated: true`
@@ -88,7 +88,7 @@ Read: work/discovery/analysis.json
 
 **Verification:** Analysis loaded with confidence tiers.
 
-> **If you can't continue:** No analysis.json → Run `/discover-scan` first.
+> **If you can't continue:** No analysis.json → Run `/rai-discover-scan` first.
 
 ### Step 2: Auto-Validate High Confidence
 
@@ -249,7 +249,7 @@ rai discover build --input work/discovery/components-validated.json
 ```
 
 **Architecture Documentation:**
-Run `/discover-document` to generate module docs from discovery data.
+Run `/rai-discover-document` to generate module docs from discovery data.
 ```
 
 **Verification:** Summary displayed; user knows status.
@@ -260,7 +260,7 @@ Run `/discover-document` to generate module docs from discovery data.
   - Updated `work/discovery/components-draft.yaml`
   - `work/discovery/components-validated.json` — Final component catalog
 - **Telemetry:** `skill_event` via Stop hook
-- **Next:** `rai discover build` (graph integration) or `/discover-document` (architecture docs)
+- **Next:** `rai discover build` (graph integration) or `/rai-discover-document` (architecture docs)
 
 ## Confidence Tiers
 
@@ -294,7 +294,7 @@ Components in the same module are semantically related. Reviewing them together:
 Progress is saved to YAML after each tier. If interrupted:
 - High-confidence auto-validation is atomic
 - Medium/low progress saved per module/component
-- Can re-run `/discover-validate` anytime to continue
+- Can re-run `/rai-discover-validate` anytime to continue
 
 ### Tuning Thresholds
 
@@ -304,7 +304,7 @@ If too many components are medium/low on a well-documented codebase:
 
 ## References
 
-- Previous skill: `/discover-scan`
-- Next: `rai discover build` (graph integration) or `/discover-document` (architecture docs)
+- Previous skill: `/rai-discover-scan`
+- Next: `rai discover build` (graph integration) or `/rai-discover-document` (architecture docs)
 - CLI: `rai discover analyze --help`
 - Analyzer: `src/rai_cli/discovery/analyzer.py`

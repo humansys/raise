@@ -1,5 +1,5 @@
 ---
-name: debug
+name: rai-debug
 description: >
   Systematic root cause analysis using lean methods (5 Whys, Ishikawa, Gemba).
   Use when encountering unexpected behavior, errors, or defects to find and
@@ -44,7 +44,7 @@ Systematically identify and fix the root cause of defects, errors, or unexpected
 **When NOT to use:**
 - Obvious typos or simple syntax errors
 - Well-documented known issues
-- Feature requests (use `/story-plan` instead)
+- Feature requests (use `/rai-story-plan` instead)
 
 **Inputs required:**
 - Clear problem statement
@@ -273,7 +273,7 @@ This skill implements Jidoka principle: **Stop and fix quality issues immediatel
 
 When you detect a defect during any skill:
 1. Stop the current work
-2. Invoke `/debug` to find root cause
+2. Invoke `/rai-debug` to find root cause
 3. Fix the root cause
 4. Resume original work
 

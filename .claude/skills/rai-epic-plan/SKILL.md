@@ -1,8 +1,8 @@
 ---
-name: epic-plan
+name: rai-epic-plan
 description: >
   Sequence features from epic-design into an executable plan with milestones,
-  dependencies, and progress tracking. Use after /epic-design to create a
+  dependencies, and progress tracking. Use after /rai-epic-design to create a
   realistic implementation roadmap before starting story work.
 
 license: MIT
@@ -22,7 +22,7 @@ metadata:
 
 ## Purpose
 
-Transform the feature list from `/epic-design` into a sequenced implementation plan with intermediate milestones, parallel work streams, and progress tracking mechanisms. Create a roadmap that maximizes learning, minimizes risk, and enables visible progress.
+Transform the feature list from `/rai-epic-design` into a sequenced implementation plan with intermediate milestones, parallel work streams, and progress tracking mechanisms. Create a roadmap that maximizes learning, minimizes risk, and enables visible progress.
 
 **Core principle:** Risk early, reward early. Tackle uncertain features first while momentum is high; deliver quick wins to validate approach and build confidence.
 
@@ -39,7 +39,7 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 ## Context
 
 **When to use:**
-- After `/epic-design` has produced a scope document with features
+- After `/rai-epic-design` has produced a scope document with features
 - Before starting first feature implementation
 - When features have complex dependencies requiring coordination
 - When stakeholders need visibility into progress checkpoints
@@ -96,7 +96,7 @@ Load and understand the epic scope before planning.
 **Review:**
 - Epic objective and value proposition
 - Feature list with sizes (T-shirt or SP)
-- Dependencies identified in `/epic-design`
+- Dependencies identified in `/rai-epic-design`
 - Done criteria (feature and epic level)
 - Risks identified
 
@@ -107,7 +107,7 @@ Load and understand the epic scope before planning.
 
 **Verification:** Can explain the epic scope in 60 seconds.
 
-> **If you can't continue:** Epic design incomplete → Run `/epic-design` first.
+> **If you can't continue:** Epic design incomplete → Run `/rai-epic-design` first.
 
 ---
 
@@ -141,7 +141,7 @@ F{N}.5 (integration) ← CRITICAL PATH END
 
 **Verification:** Critical path identified with duration estimate.
 
-> **If you can't continue:** Dependencies unclear → Return to `/epic-design` Step 6 (Map Dependencies).
+> **If you can't continue:** Dependencies unclear → Return to `/rai-epic-design` Step 6 (Map Dependencies).
 
 ---
 
@@ -241,7 +241,7 @@ Create intermediate checkpoints for progress visibility.
 | **M1: Walking Skeleton** | Minimal E2E path through system | Prove architecture, enable integration |
 | **M2: Core MVP** | Essential features complete | Demonstrate value, gather feedback |
 | **M3: Feature Complete** | All planned features done | Ready for polish/release |
-| **M4: Epic Complete** | Done criteria met, retro done | Ready for `/epic-close` |
+| **M4: Epic Complete** | Done criteria met, retro done | Ready for `/rai-epic-close` |
 
 **For each milestone, define:**
 - **Name:** Clear, meaningful label
@@ -415,7 +415,7 @@ Review risks with sequencing lens.
 
 **Verification:** Top 3 sequencing risks identified with mitigations.
 
-> **If you can't continue:** Risks identified in `/epic-design` → Reference those; add sequencing-specific risks.
+> **If you can't continue:** Risks identified in `/rai-epic-design` → Reference those; add sequencing-specific risks.
 
 ---
 
@@ -485,7 +485,7 @@ Self-review checklist before starting implementation.
 1. Could someone else start implementation from this plan?
 2. Is the first feature clear and unblocked?
 3. Are milestones meaningful (not just arbitrary splits)?
-4. Does the plan reflect what we learned in `/epic-design`?
+4. Does the plan reflect what we learned in `/rai-epic-design`?
 
 **Verification:** All validation checkboxes checked.
 
@@ -509,7 +509,7 @@ rai memory emit-work epic {epic_id} --event complete --phase plan
 
 - **Primary:** `work/epics/e{N}-{name}/scope.md` — updated with implementation plan
 - **Sections added:** Feature sequence, milestones, parallel opportunities, progress tracking
-- **Next:** `/story-design` for first feature in sequence
+- **Next:** `/rai-story-design` for first feature in sequence
 
 ## Implementation Plan Template
 
@@ -520,7 +520,7 @@ Add to epic scope document:
 
 ## Implementation Plan
 
-> Added by `/epic-plan` - YYYY-MM-DD
+> Added by `/rai-epic-plan` - YYYY-MM-DD
 
 ### Feature Sequence
 
@@ -538,7 +538,7 @@ Add to epic scope document:
 | **M1: Walking Skeleton** | F{N}.1, F{N}.2 | {Date/Day} | {What proves it works?} | {What can be shown?} |
 | **M2: Core MVP** | +F{N}.3, F{N}.4 | {Date/Day} | {What proves value?} | {What feedback to gather?} |
 | **M3: Feature Complete** | +F{N}.5... | {Date/Day} | All planned features done | Full capability demo |
-| **M4: Epic Complete** | - | {Date/Day} | Done criteria met | `/epic-close` ready |
+| **M4: Epic Complete** | - | {Date/Day} | Done criteria met | `/rai-epic-close` ready |
 
 ### Parallel Work Streams
 
@@ -586,7 +586,7 @@ Stream 3 (Parallel):        F{N}.4 ───┘
 ---
 
 *Plan created: YYYY-MM-DD*
-*Next: `/story-design` for F{N}.1*
+*Next: `/rai-story-design` for F{N}.1*
 ```
 
 ## Quality Standards
@@ -632,10 +632,10 @@ This skill supports the three-layer memory model:
 
 ## References
 
-- **Epic Design:** `/epic-design` (produces input for this skill)
+- **Epic Design:** `/rai-epic-design` (produces input for this skill)
 - **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
-- **Feature Planning:** `/story-plan` (similar concept at story level)
-- **Epic Close:** `/epic-close` (retrospective after completion)
+- **Feature Planning:** `/rai-story-plan` (similar concept at story level)
+- **Epic Close:** `/rai-epic-close` (retrospective after completion)
 - **Calibration Data:** `.raise/rai/memory/calibration.jsonl` (velocity patterns)
 - **Constitution:** `framework/reference/constitution.md` (Lean principles)
 - **Guardrails:** `governance/guardrails.md` (quality standards)
@@ -652,17 +652,17 @@ This skill supports the three-layer memory model:
 ```
 Project Level
     ↓
-/epic-design   ← Scope, features, ADRs
+/rai-epic-design   ← Scope, features, ADRs
     ↓
-/epic-plan     ← YOU ARE HERE (sequence, milestones, tracking)
+/rai-epic-plan     ← YOU ARE HERE (sequence, milestones, tracking)
     ↓
-/story-design → /story-plan → /story-implement → /story-review
+/rai-story-design → /rai-story-plan → /rai-story-implement → /rai-story-review
     ↓
-/epic-close    ← Retrospective, learnings
+/rai-epic-close    ← Retrospective, learnings
 ```
 
-**From `/epic-design`:** Receives feature list with sizes, dependencies, risks
-**To `/story-design`:** Provides sequenced list, identifies first feature to start
+**From `/rai-epic-design`:** Receives feature list with sizes, dependencies, risks
+**To `/rai-story-design`:** Provides sequenced list, identifies first feature to start
 
 ---
 

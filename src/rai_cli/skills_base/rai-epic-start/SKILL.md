@@ -1,5 +1,5 @@
 ---
-name: epic-start
+name: rai-epic-start
 description: >
   Initialize an epic with branch and scope commit.
   Creates the epic branch from v2 that story branches will nest under.
@@ -49,7 +49,7 @@ Initialize an epic with a dedicated branch from v2 and a scope commit. Feature b
 main (stable)
   └── v2 (development)
         └── epic/e{N}/{name}        ← THIS SKILL CREATES
-              └── feature/f{N}.{M}/{name}  ← /story-start creates
+              └── feature/f{N}.{M}/{name}  ← /rai-story-start creates
 ```
 
 ## Steps
@@ -150,18 +150,18 @@ rai memory emit-work epic E{N} --event start --phase init
 ## Epic Lifecycle
 
 ```
-/epic-start  ← YOU ARE HERE
+/rai-epic-start  ← YOU ARE HERE
      ↓
-/epic-design (scope, features, ADRs)
+/rai-epic-design (scope, features, ADRs)
      ↓
-/epic-plan (sequence, milestones)
+/rai-epic-plan (sequence, milestones)
      ↓
-[features via /story-start → ... → /story-close]
+[features via /rai-story-start → ... → /rai-story-close]
      ↓
-/epic-close (retrospective, merge to v2)
+/rai-epic-close (retrospective, merge to v2)
 ```
 
-**Next:** `/epic-design` to formalize scope and features.
+**Next:** `/rai-epic-design` to formalize scope and features.
 ```
 
 ## Output
@@ -169,7 +169,7 @@ rai memory emit-work epic E{N} --event start --phase init
 - **Branch:** `epic/e{N}/{slug}` created from v2
 - **Commit:** Scope commit with objective and boundaries
 - **Telemetry:** Epic start recorded
-- **Next:** `/epic-design`
+- **Next:** `/rai-epic-design`
 
 ## Summary Template
 
@@ -186,7 +186,7 @@ rai memory emit-work epic E{N} --event start --phase init
 **Done when:** All features + retrospective + merge
 
 ### Next
-→ `/epic-design` to formalize scope and features
+→ `/rai-epic-design` to formalize scope and features
 ```
 
 ## Notes
@@ -206,12 +206,12 @@ v2 ──┬── epic/e14/rai-distribution
      │         ├── feature/f14.2/base-patterns
      │         └── (features merge back to epic)
      │
-     └── (epic merges to v2 at /epic-close)
+     └── (epic merges to v2 at /rai-epic-close)
 ```
 
 ## References
 
-- Next: `/epic-design`
-- Features: `/story-start` (verifies epic branch exists)
-- Close: `/epic-close`
+- Next: `/rai-epic-design`
+- Features: `/rai-story-start` (verifies epic branch exists)
+- Close: `/rai-epic-close`
 - Branch model: `CLAUDE.md` § Git Practices

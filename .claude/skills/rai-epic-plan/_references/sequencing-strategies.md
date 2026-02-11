@@ -1,6 +1,6 @@
 # Sequencing Strategies Deep Dive
 
-> Reference material for `/epic-plan` Step 3.
+> Reference material for `/rai-epic-plan` Step 3.
 > For quick reference, see the decision matrix in the main skill.
 
 ---
@@ -64,4 +64,4 @@
 
 ---
 
-*Reference document for /epic-plan*
+*Reference document for /rai-epic-plan*

@@ -1,5 +1,5 @@
 ---
-name: epic-close
+name: rai-epic-close
 description: >
   Complete an epic with retrospective, metrics capture, branch cleanup,
   and merge to development branch. Use after all stories are done
@@ -337,13 +337,13 @@ Skipping retrospectives loses compound learning.
 ### Epic Lifecycle Summary
 
 ```
-/epic-design (scope, features, architecture)
+/rai-epic-design (scope, features, architecture)
       ↓
-/epic-plan (sequence, milestones, dependencies)
+/rai-epic-plan (sequence, milestones, dependencies)
       ↓
 [Feature cycles: start → design → plan → implement → review → close]
       ↓
-/epic-close (retrospective, merge, cleanup) ← YOU ARE HERE
+/rai-epic-close (retrospective, merge, cleanup) ← YOU ARE HERE
 ```
 
 ### Branch Hygiene
@@ -363,7 +363,7 @@ If epic is abandoned (not completed):
 
 ## References
 
-- Previous: All feature `/story-close` completions
+- Previous: All feature `/rai-story-close` completions
 - Epic scope: `work/epics/e{N}-{name}/scope.md`
 - Backlog: `governance/backlog.md`
-- Next: `/epic-design` for next epic
+- Next: `/rai-epic-design` for next epic

@@ -1,5 +1,5 @@
 ---
-name: story-start
+name: rai-story-start
 description: >
   Initialize a story with verified context, branch, and scope commit.
   Use at the beginning of story work to ensure proper setup and
@@ -66,13 +66,13 @@ git branch --list "epic/e{N}/*" | head -1
 
 **Decision:**
 - Epic branch exists → Continue (will create feature sub-branch)
-- Epic branch missing → **STOP.** Run `/epic-start` first.
+- Epic branch missing → **STOP.** Run `/rai-epic-start` first.
 
 > **Poka-yoke:** Feature branches MUST nest under epic branches. Creating a story branch without its epic branch breaks the merge flow.
 
 **Verification:** Epic branch `epic/e{N}/*` exists.
 
-> **If you can't continue:** Run `/epic-start` first to create the epic branch.
+> **If you can't continue:** Run `/rai-epic-start` first to create the epic branch.
 
 ### Step 2: Verify Epic Scope Document
 
@@ -88,11 +88,11 @@ ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic scope"
 
 **Decision:**
 - Scope exists → Load and verify feature is listed
-- Scope missing → Consider running `/epic-design` after `/epic-start`
+- Scope missing → Consider running `/rai-epic-design` after `/rai-epic-start`
 
 **Verification:** Epic scope loaded OR noted for creation.
 
-> **If you can't continue:** Complex feature without epic scope → Run `/epic-design` first.
+> **If you can't continue:** Complex feature without epic scope → Run `/rai-epic-design` first.
 
 ### Step 3: Verify Feature in Epic (If Epic Exists)
 
@@ -194,20 +194,20 @@ Show the story lifecycle for orientation:
 ## Feature Lifecycle
 
 ```
-/story-start ← YOU ARE HERE
+/rai-story-start ← YOU ARE HERE
       ↓
-/story-design (fase 4) — Grounds integration decisions
+/rai-story-design (fase 4) — Grounds integration decisions
       ↓
-/story-plan (fase 5) — Decompose into tasks
+/rai-story-plan (fase 5) — Decompose into tasks
       ↓
-/story-implement (fase 6) — Execute tasks
+/rai-story-implement (fase 6) — Execute tasks
       ↓
-/story-review (fase 7) — Retrospective & learnings
+/rai-story-review (fase 7) — Retrospective & learnings
       ↓
-/story-close (fase 8) — Merge & cleanup
+/rai-story-close (fase 8) — Merge & cleanup
 ```
 
-**Next step:** `/story-design` — design is not optional (PAT-186). Proceed to `/story-plan` only after design.
+**Next step:** `/rai-story-design` — design is not optional (PAT-186). Proceed to `/rai-story-plan` only after design.
 ```
 
 **Verification:** Lifecycle displayed; next step clear.
@@ -231,7 +231,7 @@ rai memory emit-work story {story_id} --event start --phase design
 - **Branch:** `feature/{epic_id}/{story_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
 - **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: start)
-- **Next:** `/story-design`
+- **Next:** `/rai-story-design`
 
 ## Feature Start Summary Template
 
@@ -248,7 +248,7 @@ rai memory emit-work story {story_id} --event start --phase design
 **Done:** [key criteria]
 
 ### Next Step
-`/story-design` — Design is not optional (PAT-186). Then `/story-plan`.
+`/rai-story-design` — Design is not optional (PAT-186). Then `/rai-story-plan`.
 
 Ready to proceed.
 ```
@@ -279,10 +279,10 @@ For urgency, minimum viable start:
 2. Commit with one-line scope
 3. Emit telemetry
 
-Full scope documentation can follow in `/story-design` or `/story-plan`.
+Full scope documentation can follow in `/rai-story-design` or `/rai-story-plan`.
 
 ## References
 
-- Next skill: `/story-design` (always — PAT-186)
-- Complement: `/story-close`
+- Next skill: `/rai-story-design` (always — PAT-186)
+- Complement: `/rai-story-close`
 - Epic context: `work/epics/e{N}-{name}/scope.md`

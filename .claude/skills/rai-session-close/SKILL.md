@@ -1,5 +1,5 @@
 ---
-name: session-close
+name: rai-session-close
 description: >
   Close a working session by reflecting on outcomes and feeding structured data to CLI.
   CLI does all writes atomically; skill does inference reflection.
@@ -145,7 +145,7 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 
 ## References
 
-- Complement: `/session-start`
+- Complement: `/rai-session-start`
 - Session state: `.raise/rai/session-state.yaml`
 - Memory: `.raise/rai/memory/`
 - Tangents: `dev/parking-lot.md`

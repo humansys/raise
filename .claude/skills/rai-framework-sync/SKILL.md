@@ -1,3 +1,8 @@
+---
+name: rai-framework-sync
+description: Sync framework files across locations after architectural decisions. Use when framework governance documents need updating for consistency and traceability.
+---
+
 # Framework Sync: Update Governance After Architectural Decisions
 
 ## Purpose
@@ -354,7 +359,7 @@ Co-Authored-By: [Your Name]
 
 ```markdown
 - [ ] ADRs written and committed
-- [ ] Framework sync executed (/framework-sync)
+- [ ] Framework sync executed (/rai-framework-sync)
   - [ ] Backlog updated (if scope changed)
   - [ ] Glossary updated (if terminology changed)
   - [ ] Ontology backlog updated (if items affected)
@@ -401,13 +406,13 @@ If governance documents conflict with ADR:
 ## Integration with Other Skills
 
 **Before framework-sync:**
-- `/research` → Evidence gathering
-- `/story-design` → Create design spec
+- `/rai-research` → Evidence gathering
+- `/rai-story-design` → Create design spec
 - Create ADR documenting decision
 
 **After framework-sync:**
-- `/story-plan` → Plan implementation
-- `/session-close` → Log session with sync
+- `/rai-story-plan` → Plan implementation
+- `/rai-session-close` → Log session with sync
 
 **Framework sync bridges decision → implementation.**
 
@@ -435,5 +440,5 @@ For now, skill provides human judgment. Automation comes after we learn patterns
 
 **Usage:**
 ```
-/framework-sync --adrs ADR-011,ADR-012
+/rai-framework-sync --adrs ADR-011,ADR-012
 ```

@@ -1,8 +1,8 @@
 ---
-name: story-plan
+name: rai-story-plan
 description: >
   Decompose user stories into atomic executable tasks, identify dependencies,
-  and create a deterministic implementation plan. Use after /story-design
+  and create a deterministic implementation plan. Use after /rai-story-design
   has grounded the story's integration decisions.
 
 license: MIT
@@ -69,13 +69,13 @@ ls work/epics/e*/stories/{story_id}/design.md 2>/dev/null || echo "INFO: No desi
 **Decision:**
 - design.md exists → Load and reference
 - design.md missing + Simple feature → Continue (design optional)
-- design.md missing + Moderate/Complex → Suggest `/story-design` first
+- design.md missing + Moderate/Complex → Suggest `/rai-story-design` first
 
-**Skip condition:** Simple features (per complexity matrix in /story-design).
+**Skip condition:** Simple features (per complexity matrix in /rai-story-design).
 
 **Verification:** Design loaded OR simple feature confirmed.
 
-> **If you can't continue:** Complex feature without design → Run `/story-design` first.
+> **If you can't continue:** Complex feature without design → Run `/rai-story-design` first.
 
 ### Step 0.5: Query Context
 
@@ -247,7 +247,7 @@ rai memory emit-work story {story_id} --event complete --phase plan
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
 - **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
-- **Next:** `/story-implement`
+- **Next:** `/rai-story-implement`
 
 ## Plan Template
 
@@ -304,4 +304,4 @@ rai memory emit-work story {story_id} --event complete --phase plan
 ## References
 
 - Gate: `gates/gate-plan.md`
-- Next skill: `/story-implement`
+- Next skill: `/rai-story-implement`

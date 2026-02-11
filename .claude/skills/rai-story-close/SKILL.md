@@ -1,5 +1,5 @@
 ---
-name: story-close
+name: rai-story-close
 description: >
   Complete a story with retrospective verification, merge, cleanup,
   and tracking update. Use after review to formally close the story
@@ -35,7 +35,7 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 ## Context
 
 **When to use:**
-- After `/story-review` retrospective is complete
+- After `/rai-story-review` retrospective is complete
 - Feature implementation is verified and tests pass
 - Ready to merge work into parent branch
 
@@ -64,7 +64,7 @@ Retrospective and tests are required before closing:
 RETRO="work/epics/e{N}-{name}/stories/{story_id}/retrospective.md"
 if [ ! -f "$RETRO" ]; then
     echo "ERROR: Retrospective not found: $RETRO"
-    echo "Run /story-review first"
+    echo "Run /rai-story-review first"
     exit 4  # ArtifactNotFoundError
 fi
 
@@ -79,7 +79,7 @@ uv run pytest --tb=no -q || {
 
 **Verification:** Retrospective exists and tests pass.
 
-> **If you can't continue:** Run `/story-review` first. No exceptions.
+> **If you can't continue:** Run `/rai-story-review` first. No exceptions.
 
 ### Step 1: Verify Feature Ready
 
@@ -139,7 +139,7 @@ If any of the above: update the relevant module doc in `governance/architecture/
 
 ### Step 1.75: Coherence Check — Update Architecture Docs
 
-If this story changed source code (not just tests, docs, or config), run the `/docs-update` skill to sync architecture docs with code truth before merging.
+If this story changed source code (not just tests, docs, or config), run the `/rai-docs-update` skill to sync architecture docs with code truth before merging.
 
 ```bash
 # Quick check: did this story touch source code?
@@ -147,16 +147,16 @@ git diff --name-only $(git merge-base HEAD {parent_branch})..HEAD | grep -q "^sr
 ```
 
 **Decision:**
-- **CODE_CHANGED** → Run `/docs-update` now. It will build the graph, compare frontmatter, present diffs, and handle HITL approval internally.
+- **CODE_CHANGED** → Run `/rai-docs-update` now. It will build the graph, compare frontmatter, present diffs, and handle HITL approval internally.
 - **DOCS_ONLY** → Skip with message: "No source code changes — skipping coherence check."
 
-**After `/docs-update` completes:** If any module docs were updated, commit them before proceeding to merge:
+**After `/rai-docs-update` completes:** If any module docs were updated, commit them before proceeding to merge:
 
 ```bash
 git add governance/architecture/modules/*.md
 git commit -m "docs({story_id}): sync module docs with code truth
 
-Updated by /docs-update coherence check during story-close.
+Updated by /rai-docs-update coherence check during story-close.
 
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
@@ -165,9 +165,9 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 
 **Why here (not after merge):** Docs must be coherent *before* they land on the parent branch. Merging stale docs propagates drift to future sessions (PAT-196).
 
-**Verification:** `/docs-update` ran (or skip stated) and any doc changes are committed.
+**Verification:** `/rai-docs-update` ran (or skip stated) and any doc changes are committed.
 
-> **If you can't continue:** `/docs-update` fails → Check that `rai memory build` works. If graph is broken, fix it or skip coherence check with a note and address in next session.
+> **If you can't continue:** `/rai-docs-update` fails → Check that `rai memory build` works. If graph is broken, fix it or skip coherence check with a note and address in next session.
 
 ### Step 2: Identify Parent Branch
 
@@ -353,17 +353,17 @@ Feature lifecycle complete.
 ### Feature Lifecycle Summary
 
 ```
-/story-start (fase 3)
+/rai-story-start (fase 3)
       ↓
-/story-design (fase 4)
+/rai-story-design (fase 4)
       ↓
-/story-plan (fase 5)
+/rai-story-plan (fase 5)
       ↓
-/story-implement (fase 6)
+/rai-story-implement (fase 6)
       ↓
-/story-review (fase 7)
+/rai-story-review (fase 7)
       ↓
-/story-close (fase 8) ← YOU ARE HERE
+/rai-story-close (fase 8) ← YOU ARE HERE
 ```
 
 ### Branch Hygiene Philosophy
@@ -394,6 +394,6 @@ If feature is abandoned (not completed):
 
 ## References
 
-- Previous skill: `/story-review`
-- Complement: `/story-start`
+- Previous skill: `/rai-story-review`
+- Complement: `/rai-story-start`
 - Epic scope: `work/epics/e{N}-{name}/scope.md`

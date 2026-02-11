@@ -1,5 +1,5 @@
 ---
-name: session-start
+name: rai-session-start
 description: >
   Begin a session by loading context bundle, interpreting it, and proposing work.
   CLI does all data plumbing; skill does inference interpretation.
@@ -107,4 +107,4 @@ Go.
 - Session state: `.raise/rai/session-state.yaml`
 - Memory graph: `.raise/rai/memory/index.json`
 - Parking lot: `dev/parking-lot.md`
-- Complement: `/session-close`
+- Complement: `/rai-session-close`

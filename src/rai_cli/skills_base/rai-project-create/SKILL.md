@@ -1,5 +1,5 @@
 ---
-name: project-create
+name: rai-project-create
 description: >
   Guide greenfield project setup through conversation. Fills governance templates
   with project-specific content and builds the knowledge graph. Use after rai init
@@ -22,7 +22,7 @@ metadata:
 
 ## Purpose
 
-Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `rai memory build` produces 30+ governance nodes, making `/session-start` immediately useful.
+Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `rai memory build` produces 30+ governance nodes, making `/rai-session-start` immediately useful.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -41,7 +41,7 @@ Guide a developer through greenfield project setup via conversation. Collect pro
 
 **When to skip:**
 - Project already has filled governance docs (non-placeholder content)
-- Brownfield project with existing code → use `/project-onboard` instead
+- Brownfield project with existing code → use `/rai-project-onboard` instead
 - Project not yet initialized → run `rai init` first
 
 **Inputs required:**
@@ -51,7 +51,7 @@ Guide a developer through greenfield project setup via conversation. Collect pro
 **Output:**
 - 6 governance docs filled with project-specific content
 - Knowledge graph with 30+ governance nodes
-- Project ready for `/session-start`
+- Project ready for `/rai-session-start`
 
 ## Steps
 
@@ -83,7 +83,7 @@ Files without HTML comment placeholders likely have real content already.
 ls src/ lib/ app/ *.py *.ts *.js 2>/dev/null | head -5
 ```
 
-If source code exists, suggest: "This looks like an existing project. Consider `/project-onboard` instead for brownfield analysis."
+If source code exists, suggest: "This looks like an existing project. Consider `/rai-project-onboard` instead for brownfield analysis."
 
 **Verification:** Governance templates exist and are ready to fill.
 
@@ -415,9 +415,9 @@ Present what was created and what to do next.
 **Graph:** {total} governance nodes extracted
 
 **Next steps:**
-1. Run `/session-start` to begin your first working session
+1. Run `/rai-session-start` to begin your first working session
 2. Review the generated governance docs and refine as needed
-3. Start your first epic with `/epic-design`
+3. Start your first epic with `/rai-epic-design`
 ```
 
 **Verification:** Summary displayed with node counts.
@@ -444,12 +444,12 @@ The skill checks for existing non-placeholder content before writing. Docs that 
 
 ### Greenfield vs Brownfield
 
-This skill is for **greenfield** projects only. It asks "what do you want to build?" — a creative conversation. For brownfield projects that need "what do you already have?", use `/project-onboard` (S7.3).
+This skill is for **greenfield** projects only. It asks "what do you want to build?" — a creative conversation. For brownfield projects that need "what do you already have?", use `/rai-project-onboard` (S7.3).
 
 ## References
 
 - Prerequisite: `rai init` (governance scaffolding from S7.1)
-- Next: `/session-start`
-- Sibling: `/project-onboard` (brownfield)
+- Next: `/rai-session-start`
+- Sibling: `/rai-project-onboard` (brownfield)
 - Parser sources: `src/rai_cli/governance/parsers/*.py`
 - Template sources: `src/rai_cli/rai_base/governance/*.md`
