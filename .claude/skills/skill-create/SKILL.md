@@ -97,7 +97,7 @@ Existing skills that new skills can reference or complement:
 | Session | `session-start` → `session-close` |
 | Epic | `epic-start` → `epic-design` → `epic-plan` → `epic-close` |
 | Feature | `story-start` → `story-design` → `story-plan` → `story-implement` → `story-review` → `story-close` |
-| Discovery | `discover-start` → `discover-scan` → `discover-validate` → `discover-complete` |
+| Discovery | `discover-start` → `discover-scan` → `discover-validate` → `discover-document` |
 | Utility | `research`, `debug`, `framework-sync` |
 | Meta | `skill-create` (this skill) |
 

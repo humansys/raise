@@ -10,8 +10,7 @@ Contents:
                         story-implement, story-review, story-close
     Epic lifecycle:     epic-start, epic-plan, epic-design, epic-close
     Discovery:          discover-start, discover-scan,
-                        discover-validate, discover-complete,
-                        discover-describe
+                        discover-validate, discover-document
     Onboarding:         project-create, project-onboard
     Tools:              research, debug
 
@@ -47,8 +46,7 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "discover-start",
     "discover-scan",
     "discover-validate",
-    "discover-complete",
-    "discover-describe",
+    "discover-document",
     # Onboarding
     "project-create",
     "project-onboard",

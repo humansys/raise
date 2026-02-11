@@ -123,6 +123,7 @@ def scan_command(
             "**/.venv/**",
             "**/venv/**",
             "**/node_modules/**",
+            "**/vendor/**",
             "**/dist/**",
             "**/build/**",
             "**/.git/**",
@@ -332,7 +333,7 @@ def build_command(
     if not input_path.exists():
         cli_error(
             f"Components file not found: {input_path}",
-            hint="Run /discover-complete to generate validated components",
+            hint="Run /discover-validate to generate validated components",
             exit_code=4,
         )
 
@@ -464,7 +465,7 @@ def drift_command(
         else:
             console.print(
                 "[yellow]No baseline components found.[/yellow]\n"
-                "[dim]Run /discover-complete to create a baseline first.[/dim]"
+                "[dim]Run /discover-validate to create a baseline first.[/dim]"
             )
         raise typer.Exit(0)
 
