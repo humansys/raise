@@ -167,7 +167,7 @@ function nodeRadius(d) {
 
 // --- CLUSTER LAYOUT ---
 // Position domains in a circle around center
-const clusterRadius = Math.min(width, height) * 0.3;
+const clusterRadius = Math.min(width, height) * 0.45;
 const domainCenters = {};
 domainList.forEach((d, i) => {
   const angle = (i / domainList.length) * 2 * Math.PI - Math.PI / 2;
@@ -201,8 +201,8 @@ const simulation = d3.forceSimulation(nodes)
   .force('link', d3.forceLink(resolvedLinks).id(d => d.id).distance(S * 6).strength(0.05))
   .force('charge', d3.forceManyBody().strength(-S * 4).distanceMax(S * 40))
   .force('collision', d3.forceCollide().radius(d => nodeRadius(d) + S * 0.3))
-  .force('x', d3.forceX(d => targetX(d)).strength(0.15))
-  .force('y', d3.forceY(d => targetY(d)).strength(0.15))
+  .force('x', d3.forceX(d => targetX(d)).strength(0.25))
+  .force('y', d3.forceY(d => targetY(d)).strength(0.25))
   .alphaDecay(0.02);
 
 // --- DRAW ---
@@ -211,9 +211,10 @@ const domainLabels = g.append('g').attr('class', 'domain-labels');
 domainList.forEach(d => {
   const c = domainCenters[d];
   domainLabels.append('text')
-    .attr('x', c.x).attr('y', c.y - clusterRadius * 0.35)
-    .attr('text-anchor', 'middle').attr('font-size', (S * 2) + 'px').attr('font-weight', '600')
-    .attr('fill', domainColors[d] || '#484f58').attr('opacity', 0.25)
+    .attr('x', c.x).attr('y', c.y)
+    .attr('text-anchor', 'middle').attr('dominant-baseline', 'central')
+    .attr('font-size', (S * 4) + 'px').attr('font-weight', '800')
+    .attr('fill', domainColors[d] || '#484f58').attr('opacity', 0.15)
     .text(d.toUpperCase());
 });
 
@@ -253,11 +254,12 @@ nodeG.append('circle')
 
 // Node labels
 nodeG.append('text')
-  .text(d => d.id.length > 20 ? d.id.substring(0, 18) + '..' : d.id)
-  .attr('font-size', d => (nodeRadius(d) > S ? S * 0.9 : S * 0.7) + 'px')
+  .text(d => d.id.length > 24 ? d.id.substring(0, 22) + '..' : d.id)
+  .attr('font-size', d => (nodeRadius(d) > S ? S * 1.1 : S * 0.9) + 'px')
   .attr('fill', '#c9d1d9')
   .attr('text-anchor', 'middle')
-  .attr('dy', d => nodeRadius(d) + S * 0.8)
+  .attr('dy', d => nodeRadius(d) + S * 1.2)
+  .attr('font-weight', '500')
   .style('pointer-events', 'none');
 
 // Tooltip
