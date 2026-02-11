@@ -23,7 +23,7 @@ class TestNameCheckResult:
             no_skill_conflict=True,
             no_cli_conflict=True,
             known_lifecycle=True,
-            suggestions=["Consider adding after session-start"],
+            suggestions=["Consider adding after rai-session-start"],
         )
         assert result.is_valid is True
 
@@ -41,12 +41,12 @@ class TestNameCheckResult:
     def test_is_valid_when_skill_conflict(self) -> None:
         """Skill conflict makes result invalid."""
         result = NameCheckResult(
-            name="session-start",
+            name="rai-session-start",
             valid_pattern=True,
             no_skill_conflict=False,
             no_cli_conflict=True,
             known_lifecycle=True,
-            conflicting_skill="session-start",
+            conflicting_skill="rai-session-start",
         )
         assert result.is_valid is False
 
@@ -109,11 +109,11 @@ class TestCheckName:
         skills.mkdir(parents=True)
 
         # Create existing skill
-        existing = skills / "session-start"
+        existing = skills / "rai-session-start"
         existing.mkdir()
         (existing / "SKILL.md").write_text("""\
 ---
-name: session-start
+name: rai-session-start
 description: Test
 metadata:
   raise.work_cycle: session
@@ -123,11 +123,11 @@ metadata:
 """)
 
         monkeypatch.chdir(tmp_path)
-        result = check_name("session-start")
+        result = check_name("rai-session-start")
 
         assert not result.is_valid
         assert not result.no_skill_conflict
-        assert result.conflicting_skill == "session-start"
+        assert result.conflicting_skill == "rai-session-start"
 
     def test_conflict_with_cli_command(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Name that conflicts with CLI command is invalid."""
@@ -171,7 +171,7 @@ metadata:
         skills.mkdir(parents=True)
 
         # Create related skills
-        for name in ["session-start", "session-close"]:
+        for name in ["rai-session-start", "rai-session-close"]:
             skill_dir = skills / name
             skill_dir.mkdir()
             (skill_dir / "SKILL.md").write_text(f"""\

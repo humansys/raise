@@ -333,7 +333,7 @@ def build_command(
     if not input_path.exists():
         cli_error(
             f"Components file not found: {input_path}",
-            hint="Run /discover-validate to generate validated components",
+            hint="Run /rai-discover-validate to generate validated components",
             exit_code=4,
         )
 
@@ -349,7 +349,7 @@ def build_command(
     if component_count == 0:
         cli_error(
             "No components found in input file",
-            hint="Run /discover-validate to validate components first",
+            hint="Run /rai-discover-validate to validate components first",
         )
 
     # Build unified graph (includes components automatically)
@@ -465,7 +465,7 @@ def drift_command(
         else:
             console.print(
                 "[yellow]No baseline components found.[/yellow]\n"
-                "[dim]Run /discover-validate to create a baseline first.[/dim]"
+                "[dim]Run /rai-discover-validate to create a baseline first.[/dim]"
             )
         raise typer.Exit(0)
 
@@ -495,7 +495,7 @@ def drift_command(
         else:
             console.print(
                 "[yellow]Baseline has no components.[/yellow]\n"
-                "[dim]Run /discover-validate to add components.[/dim]"
+                "[dim]Run /rai-discover-validate to add components.[/dim]"
             )
         raise typer.Exit(0)
 
@@ -506,7 +506,7 @@ def drift_command(
             f"[yellow]Note: Baseline has only {len(baseline)} component(s).[/yellow]\n"
             f"[dim]Drift detection works best with {min_baseline_size}+ components "
             "for meaningful patterns.[/dim]\n"
-            "[dim]Run /discover-scan and /discover-validate to expand the baseline.[/dim]\n"
+            "[dim]Run /rai-discover-scan and /rai-discover-validate to expand the baseline.[/dim]\n"
         )
 
     # Scan for new symbols

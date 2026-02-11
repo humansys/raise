@@ -18,6 +18,9 @@ from rai_cli.skills.locator import SkillLocator, get_default_skill_dir
 # Pattern for {domain}-{action} naming convention
 NAMING_PATTERN = re.compile(r"^[a-z]+-[a-z]+(-[a-z]+)*$")
 
+# RaiSE namespace prefix for distributed skills
+RAI_PREFIX = "rai-"
+
 # Known lifecycle domains
 KNOWN_LIFECYCLES = {
     "session",
@@ -28,6 +31,8 @@ KNOWN_LIFECYCLES = {
     "research",
     "debug",
     "framework",
+    "project",
+    "docs",
 }
 
 # CLI commands that conflict with skill names (PAT-132)
@@ -103,9 +108,17 @@ def _check_cli_conflict(name: str) -> tuple[bool, str | None]:
     return True, None
 
 
+def _strip_rai_prefix(name: str) -> str:
+    """Strip rai- namespace prefix if present."""
+    if name.startswith(RAI_PREFIX):
+        return name[len(RAI_PREFIX) :]
+    return name
+
+
 def _check_lifecycle(name: str) -> bool:
     """Check if domain is a known lifecycle."""
-    parts = name.split("-")
+    unprefixed = _strip_rai_prefix(name)
+    parts = unprefixed.split("-")
     if parts:
         domain = parts[0]
         return domain in KNOWN_LIFECYCLES
@@ -118,14 +131,21 @@ def _get_suggestions(
     """Generate positioning suggestions."""
     suggestions: list[str] = []
 
-    parts = name.split("-")
+    unprefixed = _strip_rai_prefix(name)
+    parts = unprefixed.split("-")
     if len(parts) < 2:
         return suggestions
 
     domain = parts[0]
 
-    # Find related skills in same domain
-    related = sorted([s for s in existing_skills if s.startswith(f"{domain}-")])
+    # Find related skills in same domain (check both prefixed and unprefixed)
+    related = sorted(
+        [
+            s
+            for s in existing_skills
+            if _strip_rai_prefix(s).startswith(f"{domain}-")
+        ]
+    )
 
     if related:
         # Suggest positioning relative to existing skills

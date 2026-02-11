@@ -11,7 +11,7 @@ governed_by: []
 # System Context: {project_name}
 
 > C4 Level 1 — System Context diagram and description
-> Fill with /project-create or /project-onboard
+> Fill with /rai-project-create or /rai-project-onboard
 
 ## Overview
 

@@ -1545,18 +1545,18 @@ class TestInferRelationships:
     def test_infers_skill_next_edges(self, tmp_path: Path) -> None:
         """Should create related_to edges from skill.raise/raise.next."""
         skill = ConceptNode(
-            id="/story-plan",
+            id="/rai-story-plan",
             type="skill",
             content="Plan tasks",
-            source_file=".claude/skills/story-plan/SKILL.md",
+            source_file=".claude/skills/rai-story-plan/SKILL.md",
             created="2026-02-03",
-            metadata={"raise.next": "story-implement"},
+            metadata={"raise.next": "rai-story-implement"},
         )
         next_skill = ConceptNode(
-            id="/story-implement",
+            id="/rai-story-implement",
             type="skill",
             content="Implement feature",
-            source_file=".claude/skills/story-implement/SKILL.md",
+            source_file=".claude/skills/rai-story-implement/SKILL.md",
             created="2026-02-03",
             metadata={},
         )
@@ -1567,7 +1567,7 @@ class TestInferRelationships:
         next_edges = [
             e
             for e in edges
-            if e.source == "/story-plan" and e.target == "/story-implement"
+            if e.source == "/rai-story-plan" and e.target == "/rai-story-implement"
         ]
         assert len(next_edges) == 1
         assert next_edges[0].type == "related_to"

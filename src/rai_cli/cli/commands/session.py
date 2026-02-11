@@ -105,7 +105,7 @@ def start(
                 f"Warning: Stale session detected (started {prev.started_at.date()}, "
                 f"project: {prev.project})\n"
                 "Previous session was not closed. Learnings may have been lost.\n"
-                "Tip: Use /session-close before ending work."
+                "Tip: Use /rai-session-close before ending work."
             )
         else:
             typer.echo(

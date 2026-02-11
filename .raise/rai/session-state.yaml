@@ -1,28 +1,19 @@
 current_work:
   epic: ''
-  story: S-RENAME
-  phase: pending
-  branch: v2
+  story: ''
+  phase: ''
+  branch: ''
 last_session:
-  id: SES-137
+  id: SES-139
   date: '2026-02-11'
   developer: Emilio
-  summary: S-RELEASE story complete — pre-release hardening (vendor excludes, skill
-    consolidation, skill rename). Decided on rai-cli package name and rai command.
-    Publish deferred to after S-RENAME.
-  patterns_captured:
-  - PAT-SES-137
-  - PAT-SES-137
+  summary: S-RENAME full story cycle — renamed raise→rai CLI, raise-cli→rai-cli package
+    across 554 files. Pushed to origin.
+  patterns_captured: []
 pending:
-  decisions:
-  - 'S-NAMESPACE: whether to prefix skills with rai. and when (before or after first
-    publish)'
+  decisions: []
   blockers: []
-  next_actions:
-  - 'S-RENAME: command raise→rai, package raise-cli→rai-cli (~430 refs, mechanical)'
-  - Build and publish rai-cli to PyPI after S-RENAME
-notes: First F&F demo was today. Client kick-off also today. Good energy. The rai
-  command name emerged from a sharp insight about deterministic vs inference layers
-  of the AI partner.
+  next_actions: []
+notes: ''
 progress: null
 completed_epics: []

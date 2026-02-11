@@ -42,17 +42,17 @@ class TestSkillEvent:
 
     def test_create_start_event(self, now: datetime) -> None:
         """Create a skill start event."""
-        event = SkillEvent(timestamp=now, skill="story-design", event="start")
+        event = SkillEvent(timestamp=now, skill="rai-story-design", event="start")
 
         assert event.type == "skill_event"
-        assert event.skill == "story-design"
+        assert event.skill == "rai-story-design"
         assert event.event == "start"
         assert event.duration_sec is None
 
     def test_create_complete_event_with_duration(self, now: datetime) -> None:
         """Create a skill complete event with duration."""
         event = SkillEvent(
-            timestamp=now, skill="story-implement", event="complete", duration_sec=1800
+            timestamp=now, skill="rai-story-implement", event="complete", duration_sec=1800
         )
 
         assert event.event == "complete"
@@ -61,7 +61,7 @@ class TestSkillEvent:
     def test_create_abandon_event(self, now: datetime) -> None:
         """Create a skill abandon event."""
         event = SkillEvent(
-            timestamp=now, skill="research", event="abandon", duration_sec=600
+            timestamp=now, skill="rai-research", event="abandon", duration_sec=600
         )
 
         assert event.event == "abandon"
@@ -75,12 +75,12 @@ class TestSkillEvent:
     def test_serialization(self, now: datetime) -> None:
         """Event serializes to JSON correctly."""
         event = SkillEvent(
-            timestamp=now, skill="story-design", event="complete", duration_sec=1200
+            timestamp=now, skill="rai-story-design", event="complete", duration_sec=1200
         )
         data = json.loads(event.model_dump_json())
 
         assert data["type"] == "skill_event"
-        assert data["skill"] == "story-design"
+        assert data["skill"] == "rai-story-design"
         assert data["event"] == "complete"
         assert data["duration_sec"] == 1200
 
@@ -442,7 +442,7 @@ class TestSignalUnion:
         data = {
             "type": "skill_event",
             "timestamp": now.isoformat(),
-            "skill": "story-design",
+            "skill": "rai-story-design",
             "event": "complete",
             "duration_sec": 1800,
         }
@@ -450,7 +450,7 @@ class TestSignalUnion:
         signal = adapter.validate_python(data)
 
         assert isinstance(signal, SkillEvent)
-        assert signal.skill == "story-design"
+        assert signal.skill == "rai-story-design"
 
     def test_parse_session_event(self, now: datetime) -> None:
         """Parse SessionEvent from JSON via discriminated union."""
