@@ -88,7 +88,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 ```
 
 **Strategy**: Model F (Skill as Bootstrap)
-- The `raise` Agent Skill is a lightweight bootstrap that teaches AI agents how to use raise-cli
+- The `rai` Agent Skill is a lightweight bootstrap that teaches AI agents how to use raise-cli
 - CLI is the product; skill is the discovery/distribution mechanism
 - Skill rarely changes; CLI can evolve freely
 
@@ -99,7 +99,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | **Commands** | — | CLI atomic operations (internal) |
 | **Katas** | — | Process patterns (RaiSE content) |
 | **Gates** | — | Validation criteria (RaiSE content) |
-| `raise` skill | Agent Skill | Bootstrap for ecosystem distribution |
+| `rai` skill | Agent Skill | Bootstrap for ecosystem distribution |
 
 **Note**: RaiSE uses "commands" for atomic CLI operations to avoid confusion with Agent Skills ecosystem.
 
@@ -107,9 +107,9 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 
 | Version | Distribution Model | What's Added |
 |---------|-------------------|--------------|
-| **v2.0** | CLI + `raise` skill | Skill points to CLI (bootstrap) |
+| **v2.0** | CLI + `rai` skill | Skill points to CLI (bootstrap) |
 | **v2.x** | + MCP server | Structured tool access for agents |
-| **v3.0** | + Governance layer | `raise skill audit` for ecosystem governance |
+| **v3.0** | + Governance layer | `rai skill audit` for ecosystem governance |
 
 ---
 
@@ -126,7 +126,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | **Golden context generation** | Generate CLAUDE.md, .cursorrules from governance |
 | **Brownfield analysis (SAR)** | Codebase structure analysis for existing projects |
 | **Observable metrics (local)** | Track gate pass rates, kata execution |
-| **`raise` Agent Skill** | Bootstrap skill for ecosystem distribution |
+| **`rai` Agent Skill** | Bootstrap skill for ecosystem distribution |
 
 ### Out-of-Scope
 
@@ -167,7 +167,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | RF-01.5 | The system SHOULD support `--interactive` mode for guided execution | Should |
 | RF-01.6 | The system SHOULD display Jidoka inline prompts during execution | Should |
 
-**Command:** `raise kata run <kata-id> [--project <name>] [--interactive]`
+**Command:** `rai kata run <kata-id> [--project <name>] [--interactive]`
 
 ### RF-02: Gate Validation Engine
 
@@ -179,7 +179,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | RF-02.4 | The system SHOULD provide `--fix` suggestions for failed validations | Should |
 | RF-02.5 | The system COULD integrate with CI/CD via exit codes | Could |
 
-**Command:** `raise gate check <gate-id> [--artifact <path>]`
+**Command:** `rai gate check <gate-id> [--artifact <path>]`
 
 ### RF-03: Commands Library
 
@@ -191,7 +191,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | RF-03.4 | The system SHOULD provide file manipulation commands (read, write, template) | Should |
 | RF-03.5 | The system SHOULD provide structured output (JSON) for AI consumption | Should |
 
-**Command:** `raise <command> [args...] [--json]`
+**Command:** `rai <command> [args...] [--json]`
 
 ### RF-04: Template Scaffolding
 
@@ -201,7 +201,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | RF-04.2 | The system MUST support variable substitution in templates | Must |
 | RF-04.3 | The system SHOULD validate scaffolded artifacts against schemas | Should |
 
-**Command:** `raise template scaffold <template-id> [--output <path>]`
+**Command:** `rai template scaffold <template-id> [--output <path>]`
 
 ### RF-05: Golden Context Generation
 
@@ -211,7 +211,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | RF-05.2 | The system SHOULD generate .cursorrules from guardrails | Should |
 | RF-05.3 | The system SHOULD support custom output formats | Could |
 
-**Command:** `raise context generate [--format claude|cursor|both]`
+**Command:** `rai context generate [--format claude|cursor|both]`
 
 ### RF-06: Brownfield Analysis (SAR)
 
@@ -223,7 +223,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | RF-06.4 | The system SHOULD detect technology stack automatically | Should |
 | RF-06.5 | The system SHOULD identify architectural patterns | Should |
 
-**Command:** `raise analyze [--path <dir>] [--output <path>]`
+**Command:** `rai analyze [--path <dir>] [--output <path>]`
 
 ### RF-07: Observability
 
@@ -234,13 +234,13 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 | RF-07.3 | The system SHOULD generate summary reports | Should |
 | RF-07.4 | The system SHOULD export metrics in JSON format | Should |
 
-**Command:** `raise metrics [show|export] [--format json]`
+**Command:** `rai metrics [show|export] [--format json]`
 
 ### RF-08: Agent Skill Distribution
 
 | ID | Requirement | Priority |
 |----|-------------|----------|
-| RF-08.1 | The system MUST include a `raise` Agent Skill for ecosystem distribution | Must |
+| RF-08.1 | The system MUST include a `rai` Agent Skill for ecosystem distribution | Must |
 | RF-08.2 | The skill MUST follow Anthropic Agent Skills specification (SKILL.md format) | Must |
 | RF-08.3 | The skill SHOULD document core CLI commands and workflows | Should |
 | RF-08.4 | The skill SHOULD be publishable to Claude Code plugins marketplace | Should |
@@ -337,7 +337,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 
 | Consumer | Type | Impact |
 |----------|------|--------|
-| `raise` Agent Skill | Distribution | Bootstrap for AI assistants |
+| `rai` Agent Skill | Distribution | Bootstrap for AI assistants |
 | MCP server (future) | Code | Share engines |
 | SaaS (future) | API | Expose via REST |
 | CI/CD pipelines | CLI | Gate validation |

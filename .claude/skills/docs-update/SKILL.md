@@ -3,7 +3,7 @@ name: docs-update
 description: >
   Compare knowledge graph against module architecture docs and update
   drifted fields. Deterministic frontmatter comparison using existing
-  raise memory commands, with inference for narrative sections. HITL
+  rai memory commands, with inference for narrative sections. HITL
   before any writes.
 
 license: MIT
@@ -41,14 +41,14 @@ Two layers (ADR-025):
 - After completing a story that changed code structure (new modules, changed dependencies, new exports)
 - During `/story-close` as a coherence check (S16.4 integration)
 - Manually when architecture docs feel stale
-- After running `raise discover scan` or a full discovery refresh
+- After running `rai discover scan` or a full discovery refresh
 
 **When to skip:**
 - Stories that only changed tests, docs, or non-code files
-- No graph available (`raise memory build` hasn't been run)
+- No graph available (`rai memory build` hasn't been run)
 
 **Inputs required:**
-- Knowledge graph: `.raise/rai/memory/index.json` (from `raise memory build`)
+- Knowledge graph: `.raise/rai/memory/index.json` (from `rai memory build`)
 - Module docs: `governance/architecture/modules/*.md`
 
 **Output:**
@@ -62,14 +62,14 @@ Two layers (ADR-025):
 Build the unified knowledge graph to get current code truth and a diff against the previous build:
 
 ```bash
-raise memory build
+rai memory build
 ```
 
 This produces:
 - `.raise/rai/memory/index.json` — the full graph
 - `.raise/rai/personal/last-diff.json` — what changed since last build
 
-**If build fails:** Check that the project has discoverable source code and governance files. Run `raise memory build -v` for diagnostics.
+**If build fails:** Check that the project has discoverable source code and governance files. Run `rai memory build -v` for diagnostics.
 
 ### Step 2: Identify Affected Modules
 
@@ -96,7 +96,7 @@ ls governance/architecture/modules/*.md
 For each module to check, gather graph truth and current doc state:
 
 ```bash
-raise memory context mod-{name} --format json
+rai memory context mod-{name} --format json
 ```
 
 This returns a JSON object with:
@@ -223,7 +223,7 @@ These are factual corrections (the frontmatter is already approved as truth), bu
 If any frontmatter or narrative changes were applied in Steps 5-7, rebuild the graph so it reflects the updated docs:
 
 ```bash
-raise memory build
+rai memory build
 ```
 
 This closes the coherence loop — the graph now contains both the code truth AND the corrected doc-declared values. Without this step, the graph would still hold pre-update frontmatter until the next manual build.
@@ -255,7 +255,7 @@ Skipped: 0
 
 ## Notes
 
-- **No new Python code.** This skill uses existing `raise memory` commands and Claude's file editing tools.
+- **No new Python code.** This skill uses existing `rai memory` commands and Claude's file editing tools.
 - **PAT-172:** Skill-over-CLI for infrequent tasks. Frontmatter comparison is mechanical but runs per-story at most.
 - **PAT-196:** Architecture docs are the map — keeping them current prevents future sessions from using wrong paths.
 - **`entry_points` excluded from auto-update** because CLI command names aren't captured in `code_exports`. These are human-maintained.

@@ -33,7 +33,7 @@ constraints:
 
 ## Purpose
 
-The context module is the **integration hub** of raise-cli. It takes knowledge from five domains — governance documents, developer memory (patterns/calibration/sessions), work tracking (epics/stories), discovered components, and code structure — and merges them into a single `UnifiedGraph` backed by NetworkX. This graph is what makes `raise memory query` work: any concept can find related concepts across domains.
+The context module is the **integration hub** of raise-cli. It takes knowledge from five domains — governance documents, developer memory (patterns/calibration/sessions), work tracking (epics/stories), discovered components, and code structure — and merges them into a single `UnifiedGraph` backed by NetworkX. This graph is what makes `rai memory query` work: any concept can find related concepts across domains.
 
 For example, querying "testing patterns" can return a pattern from memory, a guardrail from governance, a component from discovery, and actual code imports/exports from module analysis — all connected by shared keywords or explicit relationships. As of S16.1 (Code-Aware Graph), the builder now enriches module nodes with real code analysis data (imports, exports, component counts) via language-specific analyzers.
 
@@ -45,7 +45,7 @@ JSONL memory     → MemoryLoader        → pattern nodes  ├→ UnifiedGraphB
 Epic/story files → WorkParser          → work nodes     │       ↓
 Components JSON  → ComponentLoader     → comp nodes     │  UnifiedQueryEngine
 Architecture docs→ ArchitectureLoader  → module nodes   │       ↓
-Source code      → CodeAnalyzer        → enriched mods ─┘  raise memory query
+Source code      → CodeAnalyzer        → enriched mods ─┘  rai memory query
                                            (S16.1)
 ```
 

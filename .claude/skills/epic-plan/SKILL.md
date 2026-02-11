@@ -70,24 +70,24 @@ Transform the feature list from `/epic-design` into a sequenced implementation p
 Record the start of the plan phase:
 
 ```bash
-raise memory emit-work epic {epic_id} --event start --phase plan
+rai memory emit-work epic {epic_id} --event start --phase plan
 ```
 
-**Example:** `raise memory emit-work epic E9 -e start -p plan`
+**Example:** `rai memory emit-work epic E9 -e start -p plan`
 
 ### Step 0.5: Query Context
 
 Load relevant sequencing patterns and calibration from unified context:
 
 ```bash
-raise memory query "sequencing calibration planning" --types pattern,calibration --limit 5
+rai memory query "sequencing calibration planning" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Calibration data informs realistic estimates.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
 
 ### Step 1: Review Epic Design Output
 
@@ -498,10 +498,10 @@ Self-review checklist before starting implementation.
 Record the completion of the plan phase:
 
 ```bash
-raise memory emit-work epic {epic_id} --event complete --phase plan
+rai memory emit-work epic {epic_id} --event complete --phase plan
 ```
 
-**Example:** `raise memory emit-work epic E9 -e complete -p plan`
+**Example:** `rai memory emit-work epic E9 -e complete -p plan`
 
 ---
 

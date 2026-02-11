@@ -156,7 +156,7 @@ This structure is **portable across agents** (Claude Code, Cursor, etc.) and **s
 |-----------|----------------|------------------|
 | **Identity Core** | `.rai/` directory (markdown files) | Persistent identity, portable |
 | **Memory** | Workspace-as-memory (files) | Continuity, patterns, calibration |
-| **Toolkit** | `raise` CLI | Deterministic operations |
+| **Toolkit** | `rai` CLI | Deterministic operations |
 | **Skills** | `.claude/skills/` (markdown) | Process guides |
 
 **Anyone can run Rai locally.** Bring your own inference (Claude Code, Cursor, any capable LLM). The Identity Core persists; the inference provider varies.
@@ -351,7 +351,7 @@ raise-toolkit/
 | **Governance Toolkit** | Concept extraction, graph, MVC queries | Done (E2) |
 | **Identity Core** | `.rai/` structure for Rai's existence | Planned (E3) |
 | **Memory Infrastructure** | Workspace-as-memory, pre-compaction flush | Planned (E3) |
-| **CLI Interface** | `raise` command including `raise memory` | In progress |
+| **CLI Interface** | `rai` command including `rai memory` | In progress |
 | **Rai Identity** | Entity model, not product | Done (ADR-013) |
 | **Calibration** | Estimate tracking, velocity | In progress |
 
@@ -390,8 +390,8 @@ raise-toolkit/
 │       Skills         │    │      Toolkit         │
 │  (Process Guides)    │    │  (Deterministic)     │
 │                      │    │                      │
-│  - /story-design   │    │  - raise memory      │
-│  - /story-plan     │    │  - raise discover    │
+│  - /story-design   │    │  - rai memory      │
+│  - /story-plan     │    │  - rai discover    │
 │  - /session-start    │    │  - raise status      │
 │  - /research         │    │  - raise telemetry   │
 │  - ...               │    │  - ...               │
@@ -413,8 +413,8 @@ raise-toolkit/
 
 ### Package
 
-- **PyPI:** `raise-cli`
-- **Command:** `raise`
+- **PyPI:** `rai-cli`
+- **Command:** `rai`
 - **Install:** `pip install raise-cli` or `uv install raise-cli`
 
 ---

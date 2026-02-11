@@ -38,7 +38,7 @@ The `OutputConsole` singleton manages output format, color support, and verbosit
 
 ## Conventions
 
-- One formatter file per command group (e.g., `formatters/discover.py` for all `raise discover *` commands)
+- One formatter file per command group (e.g., `formatters/discover.py` for all `rai discover *` commands)
 - Formatters are pure functions: take a result model, return formatted output
 - Human format uses Unicode box drawing and color; JSON format is raw Pydantic `.model_dump()`
 - New commands need a corresponding formatter added to `formatters/`

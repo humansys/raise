@@ -7,7 +7,7 @@ Thank you for your interest in contributing to RaiSE Commons.
 RaiSE Commons includes both **methodology** and **tooling**:
 
 - **Framework** — Methodology, katas, templates, governance artifacts
-- **raise-cli** — CLI tool for governance operations (`src/raise_cli/`)
+- **rai-cli** — CLI tool for governance operations (`src/rai_cli/`)
 
 Contributions can focus on either area.
 
@@ -35,7 +35,7 @@ uv run raise --version
 
 ### Recommended: direnv for Seamless CLI Access
 
-To use `raise` directly (without `uv run` prefix):
+To use `rai` directly (without `uv run` prefix):
 
 ```bash
 # Install direnv (Ubuntu/Debian)

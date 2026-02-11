@@ -18,9 +18,9 @@ epic: "E16"
 Architecture documentation drifts from code silently. The current system has no incremental update path — only full discovery (overwrite) or manual vigilance.
 
 Evidence from SES-118:
-- `raise discover drift` produces 383 warnings on raise-commons, near-zero actionable
+- `rai discover drift` produces 383 warnings on raise-commons, near-zero actionable
 - Full discovery overwrites human-validated baselines — no merge capability
-- `raise memory build` overwrites `unified.json` with no change report
+- `rai memory build` overwrites `unified.json` with no change report
 - Story-close Step 1.5 checks for structural drift but cannot fix it
 - PAT-196: stale architecture docs cause new sessions to use wrong paths
 
@@ -90,4 +90,4 @@ High-level docs (`system-design.md`, `domain-model.md`) contain both factual str
 
 3. **Manual discipline only** — Current state. Doesn't scale, produces PAT-196 repeatedly.
 
-4. **Post-hoc audit only** (`raise doctor`) — Detects but doesn't prevent. Drift accumulates between audits.
+4. **Post-hoc audit only** (`rai doctor`) — Detects but doesn't prevent. Drift accumulates between audits.

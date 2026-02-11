@@ -30,7 +30,7 @@ The methodology is **static documentation** when it should be **executable infra
 
 ### 2.1 Value Proposition
 
-raise-cli transforms RaiSE methodology from documentation into executable governance infrastructure. Engineers interact with governance through familiar CLI patterns (`raise kata run`, `raise gate check`) while AI assistants discover capabilities through the Agent Skills ecosystem. The CLI becomes the single interface for governance execution, validation, and observability.
+raise-cli transforms RaiSE methodology from documentation into executable governance infrastructure. Engineers interact with governance through familiar CLI patterns (`rai kata run`, `rai gate check`) while AI assistants discover capabilities through the Agent Skills ecosystem. The CLI becomes the single interface for governance execution, validation, and observability.
 
 The CLI is **the engine** that makes RaiSE governance deterministic and observable. It's not another AI coding tool — it's the governance layer that makes AI coding reliable.
 
@@ -46,7 +46,7 @@ The CLI is **the engine** that makes RaiSE governance deterministic and observab
 - Kata execution time reduced from ~30 min to <10 min (3x improvement)
 - Gate pass rate measurable (target >80% first-attempt)
 - AI assistants can discover and use RaiSE via Agent Skills ecosystem
-- Brownfield projects can onboard with `raise analyze` in <30 seconds
+- Brownfield projects can onboard with `rai analyze` in <30 seconds
 
 ---
 
@@ -59,8 +59,8 @@ The CLI is **the engine** that makes RaiSE governance deterministic and observab
 | Executable governance | Kata engine parses/executes `.raise/katas/*.md` | Kata completion tracked |
 | Deterministic validation | Gate engine runs validation code against artifacts | Pass/fail with structured output |
 | Observable workflows | Metrics store (JSON) tracks all executions | Metrics exportable, >80% pass rate |
-| AI-ready context | `raise context generate` produces CLAUDE.md | AI can invoke `raise` commands |
-| Brownfield support | `raise analyze` runs ast-grep + ripgrep analysis | SAR generated in <30s |
+| AI-ready context | `rai context generate` produces CLAUDE.md | AI can invoke `rai` commands |
+| Brownfield support | `rai analyze` runs ast-grep + ripgrep analysis | SAR generated in <30s |
 | Ecosystem distribution | `raise/SKILL.md` follows Agent Skills spec | Publishable to Claude Code plugins |
 
 ### 3.2 Impacto por Stakeholder
@@ -85,7 +85,7 @@ The CLI is **the engine** that makes RaiSE governance deterministic and observab
 - [x] **Gate validation engine** — Deterministic artifact validation with structured output
 - [x] **Context generation** — Produce CLAUDE.md from governance artifacts
 - [x] **Brownfield analysis** — SAR generation via ast-grep + ripgrep
-- [x] **`raise` Agent Skill** — Bootstrap skill for ecosystem distribution
+- [x] **`rai` Agent Skill** — Bootstrap skill for ecosystem distribution
 
 ### 4.2 Should Have
 
@@ -94,7 +94,7 @@ The CLI is **the engine** that makes RaiSE governance deterministic and observab
 - [ ] Interactive mode (`--interactive`) for guided kata execution
 - [ ] Shell completion (Bash/Zsh/Fish)
 - [ ] `--fix` suggestions for failed gate validations
-- [ ] Metrics dashboard (`raise metrics show`)
+- [ ] Metrics dashboard (`rai metrics show`)
 
 ### 4.3 Could Have (Nice-to-Have)
 
@@ -112,7 +112,7 @@ The CLI is **the engine** that makes RaiSE governance deterministic and observab
 - ❌ SaaS dashboard (deferred to v3.0)
 - ❌ IDE extensions (separate project)
 - ❌ Multi-repo coordination (enterprise feature)
-- ❌ Skill governance/audit (`raise skill audit` deferred to v3.0)
+- ❌ Skill governance/audit (`rai skill audit` deferred to v3.0)
 - ❌ Code generation (delegated to AI assistants)
 
 ---

@@ -72,17 +72,17 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-raise memory emit-work epic {epic_id} --event start --phase design
+rai memory emit-work epic {epic_id} --event start --phase design
 ```
 
-**Example:** `raise memory emit-work epic E9 -e start -p design`
+**Example:** `rai memory emit-work epic E9 -e start -p design`
 
 ### Step 0.5: Query Context
 
 Load relevant architecture decisions and prior epic patterns from unified context:
 
 ```bash
-raise memory query "architecture ADR epic" --types pattern,decision --limit 5
+rai memory query "architecture ADR epic" --types pattern,decision --limit 5
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
@@ -93,15 +93,15 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
 
 ### Step 0.6: Load Architectural Context
 
 For each candidate module the epic might touch, load its architectural context:
 
 ```bash
-raise memory context mod-<name>
-# Example: raise memory context mod-memory
+rai memory context mod-<name>
+# Example: rai memory context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -425,10 +425,10 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-raise memory emit-work epic {epic_id} --event complete --phase design
+rai memory emit-work epic {epic_id} --event complete --phase design
 ```
 
-**Example:** `raise memory emit-work epic E9 -e complete -p design`
+**Example:** `rai memory emit-work epic E9 -e complete -p design`
 
 ---
 

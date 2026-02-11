@@ -65,9 +65,9 @@ raise-cli exists within a three-part collaboration model:
 
 | Actor | How They Use raise-cli | Example |
 |-------|----------------------|---------|
-| **RaiSE Engineer** | Directly via terminal or indirectly through Rai | `raise init`, `raise memory query` |
-| **Rai (AI Partner)** | Called from skills during collaborative sessions | Rai reads `/session-start` skill, calls `raise session start` |
-| **CI/CD pipelines** | Drift detection, governance validation (future) | `raise discover drift` in pre-merge hook |
+| **RaiSE Engineer** | Directly via terminal or indirectly through Rai | `rai init`, `rai memory query` |
+| **Rai (AI Partner)** | Called from skills during collaborative sessions | Rai reads `/session-start` skill, calls `rai session start` |
+| **CI/CD pipelines** | Drift detection, governance validation (future) | `rai discover drift` in pre-merge hook |
 
 ## External Systems
 
@@ -96,13 +96,13 @@ raise-cli exists within a three-part collaboration model:
 
 | Domain | Commands | What It Provides |
 |--------|----------|-----------------|
-| **Governance** | `raise context` | Extracts concepts from Markdown governance docs into a queryable graph |
-| **Memory** | `raise memory build/query` | Builds unified knowledge graph with code-aware nodes, answers questions from it |
-| **Discovery** | `raise discover scan/analyze/drift` | Scans codebase for components, detects architectural drift |
-| **Onboarding** | `raise init`, `raise profile` | Bootstraps projects, manages developer profiles |
-| **Telemetry** | `raise telemetry emit` | Records local JSONL signals for process improvement |
-| **Session** | `raise session start` | Tracks session lifecycle for continuity |
-| **Skills** | `raise skill list/show` | Locates and displays process guide skills |
+| **Governance** | `rai context` | Extracts concepts from Markdown governance docs into a queryable graph |
+| **Memory** | `rai memory build/query` | Builds unified knowledge graph with code-aware nodes, answers questions from it |
+| **Discovery** | `rai discover scan/analyze/drift` | Scans codebase for components, detects architectural drift |
+| **Onboarding** | `rai init`, `rai profile` | Bootstraps projects, manages developer profiles |
+| **Telemetry** | `rai telemetry emit` | Records local JSONL signals for process improvement |
+| **Session** | `rai session start` | Tracks session lifecycle for continuity |
+| **Skills** | `rai skill list/show` | Locates and displays process guide skills |
 
 ## What raise-cli Does NOT Do
 

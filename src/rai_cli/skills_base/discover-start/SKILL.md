@@ -130,9 +130,9 @@ project:
   languages:
     - python           # List detected languages
   root_dirs:
-    - src/raise_cli    # Directories to scan
+    - src/rai_cli    # Directories to scan
   entry_points:
-    - src/raise_cli/cli/main.py  # Main entry points
+    - src/rai_cli/cli/main.py  # Main entry points
   detected_at: {ISO_TIMESTAMP}
 
 status: initialized

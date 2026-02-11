@@ -33,7 +33,7 @@ Generate architecture documentation from discovery data. Produces a complete doc
 ## Context
 
 **When to use:**
-- After `raise discover scan` + `raise discover analyze` pipeline
+- After `rai discover scan` + `rai discover analyze` pipeline
 - When architecture has changed significantly
 - When onboarding new contributors
 
@@ -43,7 +43,7 @@ Generate architecture documentation from discovery data. Produces a complete doc
 
 **Inputs required:**
 - `work/discovery/components-validated.json` — validated component catalog
-- Source tree at `src/raise_cli/` — module structure and imports
+- Source tree at `src/rai_cli/` — module structure and imports
 - Module `__init__.py` docstrings — self-described purpose
 - `governance/guardrails.md` — quality constraints (for system-design doc)
 - `framework/reference/constitution.md` — design principles (for system-design doc)
@@ -210,12 +210,12 @@ application_layer: { modules: [...] }
 ### Step 7: Rebuild Graph
 
 ```bash
-raise memory build
+rai memory build
 ```
 
 Verify module nodes appear in graph:
 ```bash
-raise memory query "module dependencies"
+rai memory query "module dependencies"
 ```
 
 ## YAML Frontmatter Schema
@@ -283,7 +283,7 @@ raise memory query "module dependencies"
 
 ## References
 
-- Graph builder: `src/raise_cli/context/builder.py` (`load_architecture()`)
+- Graph builder: `src/rai_cli/context/builder.py` (`load_architecture()`)
 - Components: `work/discovery/components-validated.json`
 - Design: `work/stories/discover-document/design.md`
 - Research: `work/research/architecture-knowledge-layer/`

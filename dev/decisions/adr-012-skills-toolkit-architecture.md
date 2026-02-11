@@ -18,12 +18,12 @@ The initial RaiSE design proposed programmatic execution engines:
 **E2: Kata Engine (31 SP)**
 - Kata Parser, Discovery, State Manager
 - Interactive execution with prompts
-- `raise kata run project/prd` command
+- `rai kata run project/prd` command
 
 **E3: Gate Engine (29 SP)**
 - Gate Parser, Criterion Validators
 - Deterministic validation execution
-- `raise gate validate prd` command
+- `rai gate validate prd` command
 
 **Total: 60 SP of programmatic orchestration**
 
@@ -40,7 +40,7 @@ Through dogfooding RaiSE development using Claude Code, we discovered:
 ```markdown
 # Skill: Session Start
 ## Step 1: Load Context
-Bash: raise session analyze
+Bash: rai session analyze
 # Returns: {memory: {...}, progress: {...}, signals: [...]}
 
 ## Step 2: Synthesize
@@ -137,7 +137,7 @@ raise graph build --from <dir>
 raise context query --task <task>
 
 # Session Management
-raise session analyze
+rai session analyze
 raise progress show <epic-id>
 
 # Analysis (Brownfield - E5)
@@ -259,10 +259,10 @@ raise analyze patterns <dir>
   - Fallback to file-level
 
 - F2.4: CLI Commands (2 SP)
-  - `raise graph build`
-  - `raise context query`
-  - `raise validate structure`
-  - `raise parse <file>`
+  - `rai graph build`
+  - `rai context query`
+  - `rai validate structure`
+  - `rai parse <file>`
 
 **Skills (content, not SP):**
 - `/validate-prd` - Validate PRD quality
@@ -301,10 +301,10 @@ raise analyze patterns <dir>
 - Fallback to file-level
 
 **Day 7: CLI Commands**
-- `raise graph build`
-- `raise context query`
-- `raise validate structure`
-- `raise parse`
+- `rai graph build`
+- `rai context query`
+- `rai validate structure`
+- `rai parse`
 
 ### Phase 2: Skills Library (ongoing)
 

@@ -185,13 +185,13 @@ Use AI to infer which guardrails apply to which modules based on semantic simila
 | Module → BC edges | 14 (one per module) |
 | Module → Layer edges | 14 (one per module) |
 | Constraint edges | ~150-200 (22 guardrails × avg 7 scopes) |
-| `raise memory context <module>` latency | <100ms |
+| `rai memory context <module>` latency | <100ms |
 | Design skill improvement | Dogfood with real story design |
 
 ### Test Query
 
 ```bash
-raise memory context memory
+rai memory context memory
 # Should return:
 # Domain: ontology (persists, integrates, queries knowledge)
 # Layer: integration (combines domains)

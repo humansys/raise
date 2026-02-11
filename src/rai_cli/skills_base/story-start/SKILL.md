@@ -217,10 +217,10 @@ Show the story lifecycle for orientation:
 Record the start of the story lifecycle:
 
 ```bash
-raise memory emit-work story {story_id} --event start --phase design
+rai memory emit-work story {story_id} --event start --phase design
 ```
 
-**Example:** `raise memory emit-work story S15.1 -e start -p design`
+**Example:** `rai memory emit-work story S15.1 -e start -p design`
 
 **Verification:** Telemetry emitted.
 
