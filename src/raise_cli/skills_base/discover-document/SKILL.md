@@ -1,5 +1,5 @@
 ---
-name: discover-describe
+name: discover-document
 description: >
   Generate architecture documentation from discovery data. Produces
   system-level docs (C4 Context + Container), per-module docs with
@@ -18,7 +18,7 @@ metadata:
   raise.version: "1.0.0"
 ---
 
-# Discover Describe
+# Discover Document
 
 ## Purpose
 

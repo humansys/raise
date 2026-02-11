@@ -96,7 +96,6 @@ def _extract_skills_from_sessions(sessions_path: Path) -> list[str]:
         "discover-start",
         "discover-scan",
         "discover-validate",
-        "discover-complete",
     }
 
     found_skills: set[str] = set()
