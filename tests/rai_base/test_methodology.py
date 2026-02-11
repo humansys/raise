@@ -78,27 +78,27 @@ class TestMethodologySkills:
         """Session skills are defined."""
         session_skills = skills["session"]
         names = [s["name"] for s in session_skills]
-        assert "/session-start" in names
-        assert "/session-close" in names
+        assert "/rai-session-start" in names
+        assert "/rai-session-close" in names
 
     def test_epic_skills_present(self, skills: dict) -> None:
         """Epic skills are defined."""
         epic_skills = skills["epic"]
         names = [s["name"] for s in epic_skills]
-        assert "/epic-start" in names
-        assert "/epic-design" in names
-        assert "/epic-plan" in names
-        assert "/epic-close" in names
+        assert "/rai-epic-start" in names
+        assert "/rai-epic-design" in names
+        assert "/rai-epic-plan" in names
+        assert "/rai-epic-close" in names
 
     def test_story_skills_present(self, skills: dict) -> None:
         """Story skills are defined."""
         feature_skills = skills["story"]
         names = [s["name"] for s in feature_skills]
-        assert "/story-start" in names
-        assert "/story-plan" in names
-        assert "/story-implement" in names
-        assert "/story-review" in names
-        assert "/story-close" in names
+        assert "/rai-story-start" in names
+        assert "/rai-story-plan" in names
+        assert "/rai-story-implement" in names
+        assert "/rai-story-review" in names
+        assert "/rai-story-close" in names
 
     def test_skills_have_required_fields(self, skills: dict) -> None:
         """All skills have name, purpose, when fields."""

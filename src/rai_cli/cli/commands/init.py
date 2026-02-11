@@ -68,7 +68,7 @@ PROJECT_DETECTED_SHU = """
      [dim]→ {skill_description}[/dim]
 
   [bold]2. Start a session[/bold] (after governance is set up):
-     Type [bold cyan]/session-start[/bold cyan]
+     Type [bold cyan]/rai-session-start[/bold cyan]
      [dim]→ Loads your context, remembers patterns, proposes focused work[/dim]
 
   [bold]3. Explore the CLI[/bold] (in terminal):
@@ -81,7 +81,7 @@ PROJECT_DETECTED_SHU = """
 
 PROJECT_DETECTED_RI = """{project_type} project ({file_count} files). Created .raise/manifest.yaml
 
-[dim]Next:[/dim] {skill_recommendation}   [dim]Then:[/dim] /session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
+[dim]Next:[/dim] {skill_recommendation}   [dim]Then:[/dim] /rai-session-start   [dim]CLI:[/dim] raise --help   [dim](claude.ai/download)[/dim]
 """
 
 
@@ -109,11 +109,11 @@ def _get_skill_recommendation(project_type: str) -> tuple[str, str]:
     """
     if project_type == "brownfield":
         return (
-            "/project-onboard",
+            "/rai-project-onboard",
             "Analyze codebase and fill governance from conversation",
         )
     return (
-        "/project-create",
+        "/rai-project-create",
         "Fill governance from conversation (new project)",
     )
 

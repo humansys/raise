@@ -89,37 +89,37 @@ class TestExtractSkillsFromSessions:
         """Extracts skill names mentioned in outcomes."""
         sessions_path = tmp_path / "index.jsonl"
         sessions_path.write_text(
-            '{"id": "SES-001", "outcomes": ["/session-start skill created", "tests passing"]}\n'
-            '{"id": "SES-002", "outcomes": ["story-plan complete"]}\n'
+            '{"id": "SES-001", "outcomes": ["/rai-session-start skill created", "tests passing"]}\n'
+            '{"id": "SES-002", "outcomes": ["rai-story-plan complete"]}\n'
         )
         skills = _extract_skills_from_sessions(sessions_path)
-        assert "session-start" in skills
-        assert "story-plan" in skills
+        assert "rai-session-start" in skills
+        assert "rai-story-plan" in skills
 
     def test_extracts_skills_from_topic(self, tmp_path: Path) -> None:
         """Extracts skill names mentioned in topic."""
         sessions_path = tmp_path / "index.jsonl"
         sessions_path.write_text(
-            '{"id": "SES-001", "topic": "Epic Design Session"}\n'
+            '{"id": "SES-001", "topic": "Rai Epic Design Session"}\n'
         )
         skills = _extract_skills_from_sessions(sessions_path)
-        assert "epic-design" in skills
+        assert "rai-epic-design" in skills
 
     def test_deduplicates_skills(self, tmp_path: Path) -> None:
         """Returns unique skills only."""
         sessions_path = tmp_path / "index.jsonl"
         sessions_path.write_text(
-            '{"id": "SES-001", "outcomes": ["session-start done"]}\n'
-            '{"id": "SES-002", "outcomes": ["/session-start again"]}\n'
+            '{"id": "SES-001", "outcomes": ["rai-session-start done"]}\n'
+            '{"id": "SES-002", "outcomes": ["/rai-session-start again"]}\n'
         )
         skills = _extract_skills_from_sessions(sessions_path)
-        assert skills.count("session-start") == 1
+        assert skills.count("rai-session-start") == 1
 
     def test_returns_sorted_skills(self, tmp_path: Path) -> None:
         """Returns skills in sorted order."""
         sessions_path = tmp_path / "index.jsonl"
         sessions_path.write_text(
-            '{"id": "SES-001", "outcomes": ["research done", "debug used"]}\n'
+            '{"id": "SES-001", "outcomes": ["rai-research done", "rai-debug used"]}\n'
         )
         skills = _extract_skills_from_sessions(sessions_path)
         assert skills == sorted(skills)
@@ -176,18 +176,18 @@ class TestMigrateEmilioProfile:
         memory_path.mkdir(parents=True)
         index_path = memory_path / "index.jsonl"
         index_path.write_text(
-            '{"id": "SES-001", "date": "2026-02-01", "outcomes": ["session-start created"]}\n'
-            '{"id": "SES-002", "date": "2026-02-02", "outcomes": ["story-plan done"]}\n'
-            '{"id": "SES-003", "date": "2026-02-03", "outcomes": ["epic-design complete"]}\n'
+            '{"id": "SES-001", "date": "2026-02-01", "outcomes": ["rai-session-start created"]}\n'
+            '{"id": "SES-002", "date": "2026-02-02", "outcomes": ["rai-story-plan done"]}\n'
+            '{"id": "SES-003", "date": "2026-02-03", "outcomes": ["rai-epic-design complete"]}\n'
         )
 
         profile = migrate_emilio_profile(tmp_path)
 
         assert profile.first_session == date(2026, 2, 1)
         assert profile.last_session == date(2026, 2, 3)
-        assert "session-start" in profile.skills_mastered
-        assert "story-plan" in profile.skills_mastered
-        assert "epic-design" in profile.skills_mastered
+        assert "rai-session-start" in profile.skills_mastered
+        assert "rai-story-plan" in profile.skills_mastered
+        assert "rai-epic-design" in profile.skills_mastered
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
         """Handles missing .raise/rai/memory directory gracefully."""
@@ -209,12 +209,12 @@ class TestMigrateEmilioProfile:
         memory_path = tmp_path / ".raise/rai" / "memory" / "sessions"
         memory_path.mkdir(parents=True)
         index_path = memory_path / "index.jsonl"
-        index_path.write_text('{"id": "SES-001", "outcomes": ["debug used"]}\n')
+        index_path.write_text('{"id": "SES-001", "outcomes": ["rai-debug used"]}\n')
 
         profile = migrate_emilio_profile(
             tmp_path,
             additional_skills=["custom-skill"],
         )
 
-        assert "debug" in profile.skills_mastered
+        assert "rai-debug" in profile.skills_mastered
         assert "custom-skill" in profile.skills_mastered

@@ -179,7 +179,7 @@ class TestDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "story-plan"],
+            skills_mastered=["rai-session-start", "rai-story-plan"],
             universal_patterns=["Commit after each task"],
 
             first_session=date(2026, 2, 1),
@@ -351,7 +351,7 @@ class TestSaveDeveloperProfile:
             name="Emilio",
             experience_level=ExperienceLevel.RI,
             communication=communication,
-            skills_mastered=["session-start", "story-plan"],
+            skills_mastered=["rai-session-start", "rai-story-plan"],
             universal_patterns=["Commit after each task"],
 
             first_session=date(2026, 2, 1),
@@ -664,7 +664,7 @@ class TestProfileBackwardCompat:
         # Simulate a pre-S15.7 YAML (no coaching, no deadlines)
         profile_file.write_text(
             "name: LegacyUser\nexperience_level: ha\n"
-            "skills_mastered:\n- session-start\n"
+            "skills_mastered:\n- rai-session-start\n"
         )
         monkeypatch.setattr(
             "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home

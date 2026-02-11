@@ -32,7 +32,7 @@ class TestParseFrontmatter:
         """Parse frontmatter with multiline description."""
         content = dedent("""\
             ---
-            name: session-start
+            name: rai-session-start
             description: >
               Begin a session by loading memory, analyzing progress,
               and proposing focused work.
@@ -41,14 +41,14 @@ class TestParseFrontmatter:
             # Session Start
         """)
         frontmatter, body = parse_frontmatter(content)
-        assert frontmatter["name"] == "session-start"
+        assert frontmatter["name"] == "rai-session-start"
         assert "loading memory" in frontmatter["description"]
 
     def test_parse_with_metadata(self) -> None:
         """Parse frontmatter with nested metadata."""
         content = dedent("""\
             ---
-            name: story-plan
+            name: rai-story-plan
             description: Plan a feature
             metadata:
               raise.work_cycle: story
@@ -148,7 +148,7 @@ class TestParseSkill:
         skill_file = tmp_path / "SKILL.md"
         skill_file.write_text(dedent("""\
             ---
-            name: session-start
+            name: rai-session-start
             description: >
               Begin a session by loading memory.
             license: MIT
@@ -157,7 +157,7 @@ class TestParseSkill:
               raise.frequency: per-session
               raise.fase: "start"
               raise.prerequisites: ""
-              raise.next: session-close
+              raise.next: rai-session-close
               raise.gate: ""
               raise.adaptable: "true"
               raise.version: "3.0.0"
@@ -165,7 +165,7 @@ class TestParseSkill:
               Stop:
                 - hooks:
                     - type: command
-                      command: "RAISE_SKILL_NAME=session-start script.sh"
+                      command: "RAISE_SKILL_NAME=rai-session-start script.sh"
             ---
             # Session Start
 
@@ -175,11 +175,11 @@ class TestParseSkill:
         """))
 
         skill = parse_skill(skill_file)
-        assert skill.name == "session-start"
+        assert skill.name == "rai-session-start"
         assert skill.version == "3.0.0"
         assert skill.lifecycle == "session"
         assert skill.frontmatter.metadata is not None
-        assert skill.frontmatter.metadata.next == "session-close"
+        assert skill.frontmatter.metadata.next == "rai-session-close"
         assert skill.frontmatter.hooks is not None
         assert "Stop" in skill.frontmatter.hooks
 

@@ -31,7 +31,7 @@ class TestSkillMetadata:
             frequency="per-session",
             fase="start",
             prerequisites="",
-            next="session-close",
+            next="rai-session-close",
             gate="",
             adaptable=True,
             version="3.0.0",
@@ -39,7 +39,7 @@ class TestSkillMetadata:
         assert metadata.work_cycle == "session"
         assert metadata.frequency == "per-session"
         assert metadata.fase == "start"
-        assert metadata.next == "session-close"
+        assert metadata.next == "rai-session-close"
         assert metadata.adaptable is True
 
     def test_metadata_from_raw_dict(self) -> None:
@@ -48,8 +48,8 @@ class TestSkillMetadata:
             "raise.work_cycle": "epic",
             "raise.frequency": "per-epic",
             "raise.fase": "1",
-            "raise.prerequisites": "epic-start",
-            "raise.next": "epic-plan",
+            "raise.prerequisites": "rai-epic-start",
+            "raise.next": "rai-epic-plan",
             "raise.gate": "",
             "raise.adaptable": "true",
             "raise.version": "2.0.0",
@@ -58,8 +58,8 @@ class TestSkillMetadata:
         assert metadata.work_cycle == "epic"
         assert metadata.frequency == "per-epic"
         assert metadata.fase == "1"
-        assert metadata.prerequisites == "epic-start"
-        assert metadata.next == "epic-plan"
+        assert metadata.prerequisites == "rai-epic-start"
+        assert metadata.next == "rai-epic-plan"
         assert metadata.adaptable is True
         assert metadata.version == "2.0.0"
 
@@ -108,7 +108,7 @@ class TestSkillFrontmatter:
     def test_full_frontmatter(self) -> None:
         """Frontmatter with all fields."""
         frontmatter = SkillFrontmatter(
-            name="session-start",
+            name="rai-session-start",
             description="Begin a session",
             license="MIT",
             metadata=SkillMetadata(
@@ -125,7 +125,7 @@ class TestSkillFrontmatter:
                 ]
             },
         )
-        assert frontmatter.name == "session-start"
+        assert frontmatter.name == "rai-session-start"
         assert frontmatter.license == "MIT"
         assert frontmatter.metadata is not None
         assert frontmatter.metadata.work_cycle == "session"
@@ -153,13 +153,13 @@ class TestSkill:
         """Skill name shortcut property."""
         skill = Skill(
             frontmatter=SkillFrontmatter(
-                name="story-plan",
+                name="rai-story-plan",
                 description="Plan a feature",
             ),
             body="",
             path="/path/to/skill/SKILL.md",
         )
-        assert skill.name == "story-plan"
+        assert skill.name == "rai-story-plan"
 
     def test_skill_version_property(self) -> None:
         """Skill version from metadata."""
@@ -193,7 +193,7 @@ class TestSkill:
         """Skill lifecycle from metadata work_cycle."""
         skill = Skill(
             frontmatter=SkillFrontmatter(
-                name="epic-design",
+                name="rai-epic-design",
                 description="Design an epic",
                 metadata=SkillMetadata(
                     work_cycle="epic",
