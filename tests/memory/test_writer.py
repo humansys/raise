@@ -407,6 +407,95 @@ class TestGetMemoryDirForScope:
         assert result == expected
 
 
+class TestGetNextIdWithPrefix:
+    """Tests for _get_next_id with developer prefix."""
+
+    def test_with_prefix_returns_prefixed_id(self, tmp_path: Path) -> None:
+        """Should generate PAT-E-001 with prefix 'E'."""
+        file_path = tmp_path / "test.jsonl"
+        file_path.touch()
+
+        result = _get_next_id(file_path, "PAT", developer_prefix="E")
+
+        assert result == "PAT-E-001"
+
+    def test_increments_from_existing_prefixed(self, tmp_path: Path) -> None:
+        """Should increment from highest existing prefixed ID."""
+        file_path = tmp_path / "test.jsonl"
+        file_path.write_text(
+            '{"id": "PAT-E-001", "content": "first"}\n'
+            '{"id": "PAT-E-005", "content": "fifth"}\n'
+        )
+
+        result = _get_next_id(file_path, "PAT", developer_prefix="E")
+
+        assert result == "PAT-E-006"
+
+    def test_ignores_other_developer_prefixes(self, tmp_path: Path) -> None:
+        """Should only count IDs matching own prefix."""
+        file_path = tmp_path / "test.jsonl"
+        file_path.write_text(
+            '{"id": "PAT-E-010", "content": "emilio"}\n'
+            '{"id": "PAT-F-003", "content": "fer"}\n'
+        )
+
+        result = _get_next_id(file_path, "PAT", developer_prefix="F")
+
+        assert result == "PAT-F-004"
+
+    def test_handles_mixed_old_and_new_format(self, tmp_path: Path) -> None:
+        """Should handle files with both PAT-NNN and PAT-X-NNN formats."""
+        file_path = tmp_path / "test.jsonl"
+        file_path.write_text(
+            '{"id": "PAT-100", "content": "old format"}\n'
+            '{"id": "PAT-E-005", "content": "new format"}\n'
+        )
+
+        result = _get_next_id(file_path, "PAT", developer_prefix="E")
+
+        assert result == "PAT-E-006"
+
+    def test_no_prefix_preserves_old_behavior(self, tmp_path: Path) -> None:
+        """Without prefix, should produce old format PAT-NNN."""
+        file_path = tmp_path / "test.jsonl"
+        file_path.write_text('{"id": "PAT-010", "content": "existing"}\n')
+
+        result = _get_next_id(file_path, "PAT")
+
+        assert result == "PAT-011"
+
+
+class TestAppendPatternWithPrefix:
+    """Tests for append_pattern with developer_prefix."""
+
+    def test_appends_with_developer_prefix(self, tmp_path: Path) -> None:
+        """Should generate prefixed ID when developer_prefix provided."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(content="Test pattern")
+
+        result = append_pattern(memory_dir, input_data, developer_prefix="E")
+
+        assert result.success is True
+        assert result.id == "PAT-E-001"
+
+        patterns_file = memory_dir / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert data["id"] == "PAT-E-001"
+
+    def test_appends_without_prefix_backward_compat(self, tmp_path: Path) -> None:
+        """Without prefix, should still produce PAT-NNN (backward compat)."""
+        memory_dir = tmp_path / "memory"
+        memory_dir.mkdir()
+
+        input_data = PatternInput(content="Test pattern")
+
+        result = append_pattern(memory_dir, input_data)
+
+        assert result.id == "PAT-001"
+
+
 class TestAppendPatternBaseVersion:
     """Tests for base/version fields in pattern versioning (F14.6)."""
 

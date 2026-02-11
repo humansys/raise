@@ -46,6 +46,7 @@ from rai_cli.memory import (
     append_session,
     get_memory_dir_for_scope,
 )
+from rai_cli.onboarding.profile import load_developer_profile
 from rai_cli.telemetry.schemas import (
     CalibrationEvent,
     SessionEvent,
@@ -1114,7 +1115,13 @@ def add_pattern(
         learned_from=learned_from,
     )
 
-    result = append_pattern(mem_dir, input_data, scope=memory_scope)
+    # Load developer prefix for multi-dev safety
+    profile = load_developer_profile()
+    dev_prefix = profile.get_pattern_prefix() if profile else None
+
+    result = append_pattern(
+        mem_dir, input_data, scope=memory_scope, developer_prefix=dev_prefix
+    )
 
     if result.success:
         console.print(f"\n[green]✓[/green] {result.message}")
@@ -1161,7 +1168,7 @@ def add_calibration_cmd(
     scope: Annotated[
         str,
         typer.Option("--scope", help="Memory scope (global, project, personal)"),
-    ] = "project",
+    ] = "personal",
     memory_dir: Annotated[
         Path | None,
         typer.Option(
@@ -1172,17 +1179,17 @@ def add_calibration_cmd(
     """Add calibration data for a completed story.
 
     Examples:
-        # Basic calibration (default: project scope)
-        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
+        # Basic calibration (default: personal scope)
+        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
 
         # With estimate for velocity calculation
-        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60
+        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60
 
         # Full details
-        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
+        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
 
-        # Add to personal scope
-        $ raise memory add-calibration F3.5 --name "Skills" -s XS -a 20 --scope personal
+        # Add to project scope (shared)
+        $ rai memory add-calibration F3.5 --name "Skills" -s XS -a 20 --scope project
     """
     # Parse scope
     try:
