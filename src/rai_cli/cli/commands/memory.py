@@ -46,6 +46,7 @@ from rai_cli.memory import (
     append_session,
     get_memory_dir_for_scope,
 )
+from rai_cli.onboarding.profile import load_developer_profile
 from rai_cli.telemetry.schemas import (
     CalibrationEvent,
     SessionEvent,
@@ -1114,7 +1115,13 @@ def add_pattern(
         learned_from=learned_from,
     )
 
-    result = append_pattern(mem_dir, input_data, scope=memory_scope)
+    # Load developer prefix for multi-dev safety
+    profile = load_developer_profile()
+    dev_prefix = profile.get_pattern_prefix() if profile else None
+
+    result = append_pattern(
+        mem_dir, input_data, scope=memory_scope, developer_prefix=dev_prefix
+    )
 
     if result.success:
         console.print(f"\n[green]✓[/green] {result.message}")
