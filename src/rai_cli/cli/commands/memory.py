@@ -1161,7 +1161,7 @@ def add_calibration_cmd(
     scope: Annotated[
         str,
         typer.Option("--scope", help="Memory scope (global, project, personal)"),
-    ] = "project",
+    ] = "personal",
     memory_dir: Annotated[
         Path | None,
         typer.Option(
@@ -1172,17 +1172,17 @@ def add_calibration_cmd(
     """Add calibration data for a completed story.
 
     Examples:
-        # Basic calibration (default: project scope)
-        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
+        # Basic calibration (default: personal scope)
+        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
 
         # With estimate for velocity calculation
-        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60
+        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60
 
         # Full details
-        $ raise memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
+        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
 
-        # Add to personal scope
-        $ raise memory add-calibration F3.5 --name "Skills" -s XS -a 20 --scope personal
+        # Add to project scope (shared)
+        $ rai memory add-calibration F3.5 --name "Skills" -s XS -a 20 --scope project
     """
     # Parse scope
     try:
