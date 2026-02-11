@@ -6,6 +6,28 @@
 
 ---
 
+## Pre-Release (before first PyPI publish)
+
+- [ ] **S-RENAME: Command entry point `raise` → `rai`, package `raise-cli` → `rai-cli`**
+  - **Why now:** Zero installed users. After publish, this becomes a breaking change.
+  - **Blast radius:** ~430 references across skills (123 in skills_base, 148 in .claude/skills), Python source (119), tests (42), README, CLAUDE.md, governance docs
+  - **Nature:** Mechanical find-replace. No logic changes. Test suite catches breakage.
+  - **Changes:** pyproject.toml (name + entry point), all `raise discover` → `rai discover`, `raise memory` → `rai memory`, `raise session` → `rai session`, `raise init` → `rai init`, etc.
+  - **Rationale:** `rai` = the partner's name, 3 chars vs 5, no Python keyword collision, "I asked Rai to scan" is natural speech
+  - **Size:** S (mechanical, ~30 min)
+  - **Blocks:** PyPI publish
+
+- [ ] **S-NAMESPACE: Skill namespace prefix `rai.` for all distributed skills**
+  - **Why:** Without namespace, RaiSE skills mix with user-created skills in `.claude/skills/`
+  - **Research needed:** Claude Code skill naming best practices, whether native namespacing is coming, dot vs dash separator, impact on `/skill-name` invocation
+  - **Changes:** 17 skill directories renamed (both skills_base/ and .claude/skills/), DISTRIBUTABLE_SKILLS list, all cross-references between skills, methodology.yaml
+  - **DX trade-off:** `/story-implement` → `/rai.story-implement` (longer to type)
+  - **Alternative:** Wait for Claude Code to add native namespacing
+  - **Size:** M (research + mechanical rename)
+  - **Blocks:** PyPI publish (or not — could be done post-publish as non-breaking since skills are project-local)
+
+---
+
 ## Urgent
 
 - [x] **WorkLifecycle phase mismatch: CLI accepts phases the Pydantic model rejects** — (SES-131, SES-136) ✓ Fixed SES-136 — added `init` + `close` to Pydantic Literal
