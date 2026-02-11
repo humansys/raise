@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import yaml
@@ -220,6 +221,69 @@ class TestProcessSessionClose:
         loaded = load_developer_profile()
         assert loaded is not None
         assert loaded.current_session is None
+        mp.undo()
+
+
+class TestProcessSessionClosePatternPrefix:
+    """Tests for pattern prefix wiring in session close."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        """Create a project with memory and personal directories."""
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_patterns_use_developer_prefix(self, tmp_path: Path) -> None:
+        """Patterns added during close use developer's prefix."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Emilio", pattern_prefix="E")
+        close_input = CloseInput(
+            summary="test",
+            patterns=[
+                {"description": "Test pattern", "type": "process", "context": "test"},
+            ],
+        )
+
+        result = process_session_close(close_input, profile, project)
+
+        assert result.patterns_added == 1
+        patterns_file = project / ".raise" / "rai" / "memory" / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert data["id"].startswith("PAT-E-")
+        mp.undo()
+
+    def test_patterns_use_name_initial_without_explicit_prefix(
+        self, tmp_path: Path
+    ) -> None:
+        """Without explicit prefix, uses first letter of name."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Fernando")
+        close_input = CloseInput(
+            summary="test",
+            patterns=[
+                {"description": "Fer pattern", "type": "process", "context": "test"},
+            ],
+        )
+
+        result = process_session_close(close_input, profile, project)
+
+        assert result.patterns_added == 1
+        patterns_file = project / ".raise" / "rai" / "memory" / "patterns.jsonl"
+        data = json.loads(patterns_file.read_text().strip())
+        assert data["id"].startswith("PAT-F-")
         mp.undo()
 
 
