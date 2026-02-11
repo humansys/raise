@@ -264,7 +264,7 @@ class WorkLifecycle(BaseModel):
     event: Literal["start", "complete", "blocked", "unblocked", "abandoned"] = Field(
         ..., description="Lifecycle event type"
     )
-    phase: Literal["design", "plan", "implement", "review"] = Field(
+    phase: Literal["init", "design", "plan", "implement", "review", "close"] = Field(
         ..., description="Current phase in the workflow"
     )
     blocker: str | None = Field(

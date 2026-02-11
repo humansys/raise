@@ -1393,12 +1393,13 @@ def emit_work(
         )
 
     # Validate phase
-    valid_phases: list[Literal["design", "plan", "implement", "review", "init"]] = [
+    valid_phases: list[Literal["init", "design", "plan", "implement", "review", "close"]] = [
+        "init",
         "design",
         "plan",
         "implement",
         "review",
-        "init",
+        "close",
     ]
     if phase not in valid_phases:
         cli_error(
