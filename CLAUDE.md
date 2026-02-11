@@ -1,3 +1,3 @@
 # RaiSE Project
 
-Run `/session-start` to load context and governance.
+Run `/rai-session-start` to load context and governance.
