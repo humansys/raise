@@ -100,14 +100,9 @@ skills:
       creates: Draft component catalog (YAML)
 
     - name: /discover-validate
-      purpose: Human review of synthesized descriptions
+      purpose: Human review of synthesized descriptions, then export to graph format
       when: After scan complete
-      creates: Validated component catalog
-
-    - name: /discover-complete
-      purpose: Export to graph format
-      when: Validation complete
-      creates: JSON for graph integration
+      creates: Validated component catalog + JSON for graph integration
 
   meta:
     - name: /skill-create
