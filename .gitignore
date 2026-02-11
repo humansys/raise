@@ -8,6 +8,9 @@ CLAUDE.local.md
 # RaiSE generated/cache files
 .raise/cache/
 
+# RaiSE derived artifacts (rebuild with `rai memory build`)
+.raise/rai/memory/index.json
+
 # RaiSE personal directory (per-developer, not shared)
 .raise/rai/personal/
 
