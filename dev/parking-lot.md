@@ -162,7 +162,7 @@
   - Pattern pruning/archival when noise overwhelms signal
 - [ ] **HITL approval before completion signals** - Telemetry "complete" events should only emit AFTER user approval
 - [ ] **Pre-design research phase in lifecycle** - Formalize optional research phase before `/epic-design`
-- [ ] **Research gate for UX-facing stories** — (SES-142, S-WELCOME retro, PAT-E-263) Add `/rai-research` as recommended step in `/rai-story-design` when story touches human interaction. Cost: ~10 min. Value: prevented building wrong thing in S-WELCOME.
+- [x] **Research gate for UX-facing stories** — (SES-142, S-WELCOME retro, PAT-E-263) Add `/rai-research` as recommended step in `/rai-story-design` when story touches human interaction. Cost: ~10 min. Value: prevented building wrong thing in S-WELCOME. ✓ S-RESEARCH-GATE
 
 - [ ] **Documentation debt from early retros** — Minor additions deferred since early February:
   - Document Pyright + Pydantic `Field(default_factory=list)` exception in guardrails

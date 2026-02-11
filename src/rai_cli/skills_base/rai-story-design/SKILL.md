@@ -178,6 +178,25 @@ grep -i "high risk\|HIGH RISK" work/epics/e*-*/scope.md 2>/dev/null | grep -i "{
 
 > **If you can't continue:** Risks too unclear → Consider `/rai-research` skill first, or timebox a spike.
 
+### Step 1.7: Research Gate for UX-Facing Stories (Conditional)
+
+**If the story touches human interaction**, consider running `/rai-research` before designing.
+
+**A story is "UX-facing" when it:**
+- Introduces or changes user-facing workflows (onboarding, wizards, prompts)
+- Designs information presentation for human consumption (dashboards, reports, summaries)
+- Makes assumptions about user behavior, preferences, or mental models
+- Touches developer experience (DX) — CLI ergonomics, error messages, skill output format
+
+**Why:** In S-WELCOME (SES-142), 10 minutes of research prevented building the wrong thing entirely. Industry evidence on Dunning-Kruger, imposter syndrome, and zero-config convergence overturned the initial design instinct (mandatory wizard → sensible defaults). Cost is low (~10 min); value is high when it redirects.
+
+**If UX-facing:**
+> "This story touches human interaction. I recommend running `/rai-research` to ground the design in evidence before proceeding. ~10 min investment. Want to do that first?"
+
+**Skip condition:** Story is purely technical (internal APIs, data processing, infrastructure, refactoring).
+
+**Reference:** PAT-E-263
+
 ### Step 2: Frame What & Why
 
 Define the feature's purpose and value clearly.
