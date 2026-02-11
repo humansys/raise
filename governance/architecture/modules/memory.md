@@ -6,9 +6,9 @@ status: current
 depends_on: [config]
 depended_by: [cli, context, session]
 entry_points:
-  - "raise memory add"
-  - "raise memory emit"
-  - "raise memory emit-work"
+  - "rai memory add"
+  - "rai memory emit"
+  - "rai memory emit-work"
 public_api:
   - "CalibrationInput"
   - "MemoryConcept"
@@ -44,8 +44,8 @@ The three-tier architecture (global `~/.rai/`, project `.raise/rai/memory/`, per
 
 ```
 /session-close → append_session() → .raise/rai/personal/sessions/index.jsonl
-/story-review  → append_pattern() → .raise/rai/memory/patterns.jsonl
-                → append_calibration() → .raise/rai/memory/calibration.jsonl
+/story-review  → append_pattern() → .raise/rai/memory/patterns.jsonl (PAT-{X}-NNN)
+                → append_calibration() → .raise/rai/personal/calibration.jsonl
                                                     ↓
                               rai memory build → UnifiedGraphBuilder
                                                     ↓
@@ -55,7 +55,7 @@ The three-tier architecture (global `~/.rai/`, project `.raise/rai/memory/`, per
 ## Key Files
 
 - **`models.py`** — Pydantic models for memory concepts: `MemoryConcept`, `MemoryScope` (global/project/personal), `PatternSubType` (process/codebase/universal), relationship types.
-- **`writer.py`** — Append-only JSONL writers: `append_pattern()`, `append_calibration()`, `append_session()`. Each takes a typed input model and returns a `WriteResult`. Handles ID generation and timestamp creation.
+- **`writer.py`** — Append-only JSONL writers: `append_pattern()`, `append_calibration()`, `append_session()`. Each takes a typed input model and returns a `WriteResult`. Handles ID generation (with optional developer prefix for multi-dev safety) and timestamp creation.
 - **`loader.py`** — Read and parse JSONL files. Used by the graph builder to load memory into the unified graph.
 - **`migration.py`** — Migration utilities for the v1→v2 data model change (sessions moved from project to personal directory).
 
@@ -69,6 +69,7 @@ The three-tier architecture (global `~/.rai/`, project `.raise/rai/memory/`, per
 
 - JSONL is append-only — never edit or delete lines in place
 - New fields use backward-compatible pattern: read new key first, fall back to old key (PAT-153)
-- IDs are auto-generated with sequential numbering (PAT-001, CAL-001, SES-001)
-- Session data is always personal-scoped (developer-specific)
-- Pattern and calibration data defaults to project-scoped (shared)
+- Pattern IDs use developer prefix: PAT-{X}-NNN (e.g., PAT-E-001 for Emilio, PAT-F-001 for Fer)
+- Calibration and session IDs remain sequential: CAL-001, SES-001
+- Session and calibration data is personal-scoped (developer-specific, gitignored)
+- Pattern data is project-scoped (shared, committed) with developer-prefixed IDs to prevent collisions
