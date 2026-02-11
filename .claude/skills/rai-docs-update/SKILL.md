@@ -1,5 +1,5 @@
 ---
-name: docs-update
+name: rai-docs-update
 description: >
   Compare knowledge graph against module architecture docs and update
   drifted fields. Deterministic frontmatter comparison using existing
@@ -39,7 +39,7 @@ Two layers (ADR-025):
 
 **When to use:**
 - After completing a story that changed code structure (new modules, changed dependencies, new exports)
-- During `/story-close` as a coherence check (S16.4 integration)
+- During `/rai-story-close` as a coherence check (S16.4 integration)
 - Manually when architecture docs feel stale
 - After running `rai discover scan` or a full discovery refresh
 

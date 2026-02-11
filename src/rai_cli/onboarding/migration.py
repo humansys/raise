@@ -81,6 +81,22 @@ def _extract_skills_from_sessions(sessions_path: Path) -> list[str]:
 
     # Skills to look for in outcomes
     known_skills = {
+        "rai-session-start",
+        "rai-session-close",
+        "rai-story-design",
+        "rai-story-plan",
+        "rai-story-implement",
+        "rai-story-review",
+        "rai-story-start",
+        "rai-story-close",
+        "rai-epic-design",
+        "rai-epic-plan",
+        "rai-research",
+        "rai-debug",
+        "rai-discover-start",
+        "rai-discover-scan",
+        "rai-discover-validate",
+        # Legacy names (pre-namespace, for backward compat with old sessions)
         "session-start",
         "session-close",
         "story-design",

@@ -1,5 +1,5 @@
 ---
-name: research
+name: rai-research
 description: >
   Conduct epistemologically rigorous research to inform decisions.
   Use before ADRs, when evaluating competing approaches, entering

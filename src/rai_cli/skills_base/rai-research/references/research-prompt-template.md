@@ -304,7 +304,7 @@ See `examples/tech-stack-evaluation-prompt.md` for a complete example of this te
 
 ## References
 
-- Research kata: `.raise/katas/tools/research.md`
+- Research kata: `.raise/katas/tools/rai-research.md`
 - Evidence catalog template: `.raise/templates/tools/evidence-catalog.md`
 - Meta-research on this template: `work/research/ai-research-prompts/`
 

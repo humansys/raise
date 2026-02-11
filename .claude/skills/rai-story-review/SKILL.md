@@ -1,5 +1,5 @@
 ---
-name: story-review
+name: rai-story-review
 description: >
   Reflect on completed stories to extract learnings, identify process
   improvements, and update the framework with insights gained. Use after
@@ -273,4 +273,4 @@ The retrospective completes the story cycle and feeds learnings back into the fr
 
 - Heutagogical Checkpoint: `framework/reference/glossary.md`
 - Kaizen: Toyota Production System
-- Previous skill: `/story-implement`
+- Previous skill: `/rai-story-implement`

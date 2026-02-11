@@ -1,5 +1,5 @@
 ---
-name: story-implement
+name: rai-story-implement
 description: >
   Execute the implementation plan task by task, verifying each step, and
   producing quality code that passes validation gates. Use after planning
@@ -67,7 +67,7 @@ Implementation plan is mandatory:
 PLAN="work/epics/e{N}-{name}/stories/{story_id}/plan.md"
 if [ ! -f "$PLAN" ]; then
     echo "ERROR: Plan not found: $PLAN"
-    echo "Run /story-plan first"
+    echo "Run /rai-story-plan first"
     exit 4  # ArtifactNotFoundError
 fi
 ```
@@ -76,7 +76,7 @@ fi
 
 **Verification:** Plan exists and is readable.
 
-> **If you can't continue:** Run `/story-plan`. No exceptions.
+> **If you can't continue:** Run `/rai-story-plan`. No exceptions.
 
 ### Step 0.5: Query Context
 
@@ -201,7 +201,7 @@ rai memory emit-work story {story_id} --event complete --phase implement
 - **Location:** Per project architecture
 - **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
 - **Gate:** `gates/gate-code.md`
-- **Next:** `/story-review`
+- **Next:** `/rai-story-review`
 
 ## Progress Template
 
@@ -253,4 +253,4 @@ Cycle: **Detect → Stop → Correct → Continue**
 ## References
 
 - Gate: `gates/gate-code.md`
-- Next skill: `/story-review`
+- Next skill: `/rai-story-review`
