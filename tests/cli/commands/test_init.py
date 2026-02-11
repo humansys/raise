@@ -594,7 +594,7 @@ class TestInitSkillScaffolding:
         assert (skills_dir / "discover-start" / "SKILL.md").exists()
         assert (skills_dir / "discover-scan" / "SKILL.md").exists()
         assert (skills_dir / "discover-validate" / "SKILL.md").exists()
-        assert (skills_dir / "discover-complete" / "SKILL.md").exists()
+        assert (skills_dir / "discover-document" / "SKILL.md").exists()
 
     def test_init_does_not_overwrite_existing_skills(
         self, greenfield_project: Path, mock_home: Path

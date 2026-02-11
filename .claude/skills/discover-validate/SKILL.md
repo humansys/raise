@@ -12,7 +12,7 @@ metadata:
   raise.frequency: per-project
   raise.fase: "3"
   raise.prerequisites: discover-scan
-  raise.next: discover-complete
+  raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "2.0.0"
@@ -50,7 +50,7 @@ Validate component descriptions using a confidence-tier workflow that reduces hu
 
 **Output:**
 - Updated `work/discovery/components-draft.yaml` with `validated: true`
-- Ready for `/discover-complete`
+- `work/discovery/components-validated.json` — Final component catalog for graph integration
 
 ## Steps
 
@@ -181,10 +181,55 @@ Update `work/discovery/components-draft.yaml` with all validation decisions:
 
 **Verification:** Draft file updated with validation states.
 
-### Step 6: Final Summary
+### Step 6: Export Validated Components
+
+After validation, export the validated components to JSON for graph integration.
+
+**Load** `work/discovery/components-draft.yaml` and filter to `validated: true` components.
+
+**Transform** each validated component to graph node format:
+
+```json
+{
+  "id": "comp-scanner-symbol",
+  "type": "component",
+  "content": "purpose description",
+  "source_file": "path/to/file.py",
+  "created": "ISO timestamp",
+  "metadata": {
+    "name": "Symbol",
+    "kind": "class",
+    "line": 44,
+    "signature": "class Symbol(BaseModel)",
+    "category": "model",
+    "depends_on": ["pydantic.BaseModel"],
+    "validated_by": "human",
+    "validated_at": "ISO timestamp"
+  }
+}
+```
+
+**Field mapping:** `id` → `id`, `purpose` → `content`, `file` → `source_file`, everything else → `metadata.*`
+
+**Write** `work/discovery/components-validated.json`:
+
+```json
+{
+  "generated_at": "ISO timestamp",
+  "source_file": "work/discovery/components-draft.yaml",
+  "component_count": 32,
+  "components": [ ... ]
+}
+```
+
+**Update** `work/discovery/context.yaml` status to `complete`.
+
+**Verification:** `work/discovery/components-validated.json` created with validated components.
+
+### Step 7: Final Summary
 
 ```markdown
-## Validation Complete
+## Validation & Export Complete
 
 **Total components:** {N}
 **Auto-validated (high):** {N}
@@ -194,17 +239,28 @@ Update `work/discovery/components-draft.yaml` with all validation decisions:
 
 **Human decisions made:** {actual_decisions} (vs {total} components — {reduction}% reduction)
 
-### Next Step
-Run `/discover-complete` to export validated components for graph integration.
+**Exported:** {N} components to `work/discovery/components-validated.json`
+
+### Next Steps
+
+**Graph Integration:**
+```bash
+raise discover build --input work/discovery/components-validated.json
+```
+
+**Architecture Documentation:**
+Run `/discover-document` to generate module docs from discovery data.
 ```
 
 **Verification:** Summary displayed; user knows status.
 
 ## Output
 
-- **Artifact:** Updated `work/discovery/components-draft.yaml`
+- **Artifacts:**
+  - Updated `work/discovery/components-draft.yaml`
+  - `work/discovery/components-validated.json` — Final component catalog
 - **Telemetry:** `skill_event` via Stop hook
-- **Next:** `/discover-complete`
+- **Next:** `raise discover build` (graph integration) or `/discover-document` (architecture docs)
 
 ## Confidence Tiers
 
@@ -249,7 +305,6 @@ If too many components are medium/low on a well-documented codebase:
 ## References
 
 - Previous skill: `/discover-scan`
-- Next skill: `/discover-complete`
+- Next: `raise discover build` (graph integration) or `/discover-document` (architecture docs)
 - CLI: `raise discover analyze --help`
 - Analyzer: `src/raise_cli/discovery/analyzer.py`
-- Design: `work/stories/discover-validate-scaling/design.md`

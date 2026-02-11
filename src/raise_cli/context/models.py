@@ -29,7 +29,7 @@ NodeType = Literal[
     "guardrail",  # GR-* — code standards (E12)
     "term",  # TERM-* — glossary definitions (E12)
     "component",  # comp-* — discovered code components (E13)
-    "module",  # mod-* — architecture module knowledge (discover-describe)
+    "module",  # mod-* — architecture module knowledge (discover-document)
     "architecture",  # arch-* — architecture docs: context, design, domain model (E15)
     "bounded_context",  # bc-* — DDD bounded context or structural grouping (E15)
     "layer",  # lyr-* — architectural layer (E15)

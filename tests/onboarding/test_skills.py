@@ -71,7 +71,7 @@ class TestScaffoldSkills:
         result = scaffold_skills(tmp_path)
 
         assert "session-start" in result.skills_installed
-        assert "discover-complete" in result.skills_installed
+        assert "discover-document" in result.skills_installed
         assert "story-implement" in result.skills_installed
         assert "epic-design" in result.skills_installed
         assert "debug" in result.skills_installed
@@ -81,7 +81,7 @@ class TestScaffoldSkills:
         """Should list all copied files in result."""
         result = scaffold_skills(tmp_path)
 
-        # 18 skills × 1 SKILL.md + 3 reference files = 21 files
+        # 17 skills × 1 SKILL.md + 3 reference files = 20 files
         expected_files = TOTAL_SKILLS + len(SKILLS_WITH_REFERENCES)
         assert len(result.files_copied) == expected_files
         assert len(result.files_skipped) == 0
