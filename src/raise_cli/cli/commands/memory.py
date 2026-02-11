@@ -967,6 +967,64 @@ def _print_concepts_table(concepts: list[ConceptNode]) -> None:
 
 
 # =============================================================================
+# Visualization Command
+# =============================================================================
+
+
+@memory_app.command("viz")
+def viz(
+    output: Annotated[
+        Path | None,
+        typer.Option("--output", "-o", help="Output HTML file path"),
+    ] = None,
+    index_path: Annotated[
+        Path | None,
+        typer.Option("--index", "-i", help="Memory index path"),
+    ] = None,
+    open_browser: Annotated[
+        bool,
+        typer.Option("--open/--no-open", help="Open in browser after generating"),
+    ] = True,
+) -> None:
+    """Generate interactive HTML visualization of the memory graph.
+
+    Creates a self-contained HTML file with a D3.js force-directed graph.
+    Nodes are color-coded by type, filterable, zoomable, and searchable.
+
+    Examples:
+        # Generate and open in browser
+        $ raise memory viz
+
+        # Generate to specific path
+        $ raise memory viz --output graph.html
+
+        # Generate without opening
+        $ raise memory viz --no-open
+    """
+    import webbrowser
+
+    from raise_cli.viz import generate_viz_html
+
+    unified_path = index_path or _get_default_index_path()
+    if not unified_path.exists():
+        cli_error(
+            f"Memory index not found: {unified_path}",
+            hint="Run 'raise memory build' first to create the index",
+            exit_code=4,
+        )
+
+    output_path = output or Path(".raise/rai/memory/graph.html")
+
+    console.print(f"\nGenerating visualization from [cyan]{unified_path}[/cyan]...")
+    result_path = generate_viz_html(unified_path, output_path)
+    console.print(f"✓ Written to [cyan]{result_path}[/cyan]\n")
+
+    if open_browser:
+        webbrowser.open(f"file://{result_path.resolve()}")
+        console.print("  Opened in browser.\n")
+
+
+# =============================================================================
 # Append Commands (Add to memory)
 # =============================================================================
 
