@@ -11,8 +11,8 @@
 - **Completed:** 2026-02-03
 - **Duration:** ~8 min
 - **Files:**
-  - `src/raise_cli/telemetry/__init__.py`
-  - `src/raise_cli/telemetry/schemas.py`
+  - `src/rai_cli/telemetry/__init__.py`
+  - `src/rai_cli/telemetry/schemas.py`
 - **Notes:** Fixed ruff lint (Union → | syntax)
 
 ### Task 2: Add tests for schemas

@@ -7,8 +7,8 @@ from pathlib import Path
 
 import yaml
 
-from raise_cli.onboarding.detection import ProjectType
-from raise_cli.onboarding.manifest import (
+from rai_cli.onboarding.detection import ProjectType
+from rai_cli.onboarding.manifest import (
     ProjectInfo,
     ProjectManifest,
     load_manifest,

@@ -165,7 +165,7 @@ Ready when you are, or redirect me if priorities changed.
 ### 3. Current Focus (update regularly)
 | Field | Value |
 |-------|-------|
-| Project | raise-cli v2.0 |
+| Project | rai-cli v2.0 |
 | Epic | E1 Core Foundation (100% COMPLETE) |
 | Next Epic | E2 Kata Engine |
 | Branch | `v2` |

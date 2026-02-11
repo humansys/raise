@@ -1,4 +1,4 @@
-# Feature F7.1: `raise init` Command
+# Feature F7.1: `rai init` Command
 
 > **Status:** In Progress
 > **Epic:** E7 Onboarding
@@ -11,7 +11,7 @@
 
 ### In Scope
 
-- `raise init` CLI command
+- `rai init` CLI command
 - Greenfield vs brownfield project detection (file count heuristic)
 - Create `.rai/` project structure (minimal: manifest.yaml)
 - Load existing `~/.rai/developer.yaml` or create new one (via F7.8 module)
@@ -29,8 +29,8 @@
 
 ### Done Criteria
 
-- [ ] `raise init` runs successfully on greenfield project
-- [ ] `raise init` runs successfully on brownfield project
+- [ ] `rai init` runs successfully on greenfield project
+- [ ] `rai init` runs successfully on brownfield project
 - [ ] Detects and reports greenfield/brownfield status
 - [ ] Creates `.rai/manifest.yaml` with project metadata
 - [ ] Loads existing developer profile if present
@@ -115,7 +115,7 @@ Run /session-start when ready.
 ## References
 
 - Epic scope: `dev/epic-e7-scope-v2.md`
-- Personal memory module: `src/raise_cli/personal/` (F7.8)
+- Personal memory module: `src/rai_cli/personal/` (F7.8)
 - ADR-021: Brownfield-First Onboarding
 
 ---

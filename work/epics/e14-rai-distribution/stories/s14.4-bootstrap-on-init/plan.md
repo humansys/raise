@@ -12,7 +12,7 @@
 ### Task 1: Create BootstrapResult model and bootstrap module
 - **Description:** Create `onboarding/bootstrap.py` with `BootstrapResult` Pydantic model and the core `bootstrap_rai_base()` function. Uses `importlib.resources.files()` to read bundled files from `raise_cli.rai_base` and copies them to `.raise/rai/` with per-file idempotency.
 - **Files:**
-  - CREATE: `src/raise_cli/onboarding/bootstrap.py`
+  - CREATE: `src/rai_cli/onboarding/bootstrap.py`
   - CREATE: `tests/onboarding/test_bootstrap.py`
 - **TDD Cycle:**
   - RED: Test `bootstrap_rai_base()` on empty project dir → expects identity, patterns, methodology copied
@@ -27,7 +27,7 @@
 ### Task 2: Add `get_identity_dir()` to paths.py
 - **Description:** Add a `get_identity_dir()` helper to `config/paths.py` and a `get_framework_dir()` helper. Follows existing pattern of `get_memory_dir()`, `get_telemetry_dir()`.
 - **Files:**
-  - MODIFY: `src/raise_cli/config/paths.py`
+  - MODIFY: `src/rai_cli/config/paths.py`
   - MODIFY: `tests/config/test_paths.py`
 - **TDD Cycle:**
   - RED: Test `get_identity_dir()` returns `.raise/rai/identity/`
@@ -40,7 +40,7 @@
 ### Task 3: Integrate bootstrap into init command
 - **Description:** Call `bootstrap_rai_base()` in `init_command()` after `save_manifest()`. Add bootstrap info to output messages (Shu: detailed, Ri: concise). Lazy import for startup speed.
 - **Files:**
-  - MODIFY: `src/raise_cli/cli/commands/init.py`
+  - MODIFY: `src/rai_cli/cli/commands/init.py`
   - MODIFY: `tests/cli/commands/test_init.py`
 - **TDD Cycle:**
   - RED: Test `init_command()` creates `.raise/rai/identity/core.md`
@@ -53,7 +53,7 @@
 - **Dependencies:** Task 1, Task 2
 
 ### Task 4: Manual Integration Test
-- **Description:** Run `raise init` on a fresh temp directory. Verify all base files are copied correctly. Run again to verify idempotency. Check file contents match bundled originals.
+- **Description:** Run `rai init` on a fresh temp directory. Verify all base files are copied correctly. Run again to verify idempotency. Check file contents match bundled originals.
 - **Verification:** Demo working end-to-end in terminal
 - **Size:** XS
 - **Dependencies:** All previous tasks

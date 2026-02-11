@@ -14,7 +14,7 @@
 - `NodeChange` and `EdgeChange` Pydantic models for structured diff output
 - `GraphDiff` model with impact classification (none/frontmatter/structural/architectural)
 - `affected_modules` derivation from change set
-- `raise memory build --diff` CLI flag: build new graph, diff against previous, persist diff
+- `rai memory build --diff` CLI flag: build new graph, diff against previous, persist diff
 - Diff persistence as JSON artifact alongside unified graph
 - Conservative change detection to minimize false positives
 
@@ -32,7 +32,7 @@
 - [ ] `diff_graphs()` correctly detects added, removed, and modified edges
 - [ ] Impact classification works (none → frontmatter → structural → architectural)
 - [ ] `affected_modules` correctly derived from changes
-- [ ] `raise memory build --diff` CLI integration works end-to-end
+- [ ] `rai memory build --diff` CLI integration works end-to-end
 - [ ] Diff persisted as JSON artifact
 - [ ] Tests pass with >90% coverage on new code
 - [ ] Tested against real raise-commons graph snapshots

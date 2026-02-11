@@ -11,7 +11,7 @@
 - **Started:** ~14:35
 - **Completed:** ~14:40
 - **Duration:** ~5 min (estimated: 15 min) — parallelized with Task 2
-- **Notes:** Subagent completed. `raise profile show` outputs YAML.
+- **Notes:** Subagent completed. `rai profile show` outputs YAML.
 
 ### Task 2: Add Session Increment Function
 - **Started:** ~14:35
@@ -23,7 +23,7 @@
 - **Started:** ~14:42
 - **Completed:** ~14:48
 - **Duration:** ~6 min (estimated: 15 min)
-- **Notes:** `raise profile session` with --name for first-time users. 5 tests.
+- **Notes:** `rai profile session` with --name for first-time users. 5 tests.
 
 ### Task 4: Update Session-Start Skill
 - **Started:** ~14:50

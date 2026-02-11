@@ -39,11 +39,11 @@ raise onboard                   # Interactive wizard
 
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
-| F7.1 | **Onboard Command** | S | Pending | `raise onboard` wizard with templates |
+| F7.1 | **Onboard Command** | S | Pending | `rai onboard` wizard with templates |
 | F7.2 | **Package Metadata** | XS | ✅ Complete | pyproject.toml for PyPI |
-| F7.3 | **Status Command** | XS | Pending | `raise status` health check |
+| F7.3 | **Status Command** | XS | Pending | `rai status` health check |
 | F7.4 | **README & Docs** | S | ✅ Complete | Updated 2026-02-02 |
-| F7.5 | **Doctor Command** | S | Deferred | `raise doctor` diagnostics (P1) |
+| F7.5 | **Doctor Command** | S | Deferred | `rai doctor` diagnostics (P1) |
 
 **F&F Scope:** F7.1, F7.3 (onboard + status)
 
@@ -63,7 +63,7 @@ Learned from OpenClaw: templates scale complexity to user needs.
 
 **F&F Default:** `minimal` — fastest path to value
 
-### `raise onboard` Flow
+### `rai onboard` Flow
 
 ```
 Step 1: Detect Project State
@@ -91,7 +91,7 @@ Step 5: Verify & Show Next Steps
     2. Run /session-start
 ```
 
-### `raise status` Output
+### `rai status` Output
 
 ```
 $ raise status
@@ -116,7 +116,7 @@ Skills must be bundled with the package for `onboard` to copy them:
 
 ```
 raise-cli/
-├── src/raise_cli/
+├── src/rai_cli/
 │   ├── cli/commands/
 │   │   ├── onboard.py      # NEW
 │   │   └── status.py       # NEW (or extend existing)
@@ -133,11 +133,11 @@ raise-cli/
 ## In Scope (F&F - Feb 9)
 
 **MUST:**
-- [ ] `raise onboard` command with minimal template
+- [ ] `rai onboard` command with minimal template
 - [ ] Copy skills from package to `.claude/skills/`
 - [ ] Generate minimal CLAUDE.md
-- [ ] `raise status` health check
-- [ ] Skills bundled in package (`src/raise_cli/data/skills/`)
+- [ ] `rai status` health check
+- [ ] Skills bundled in package (`src/rai_cli/data/skills/`)
 - [ ] Update pyproject.toml to include package data
 
 **SHOULD:**
@@ -151,9 +151,9 @@ raise-cli/
 
 **Deferred:**
 - Standard/full templates
-- `raise doctor` diagnostics
-- `raise sync` (regenerate CLAUDE.md)
-- `raise upgrade` (update skills)
+- `rai doctor` diagnostics
+- `rai sync` (regenerate CLAUDE.md)
+- `rai upgrade` (update skills)
 - Shell completions (F7.3 from original backlog)
 
 ---
@@ -169,8 +169,8 @@ raise-cli/
 
 ### Epic Complete
 - [ ] `pip install raise-cli` works
-- [ ] `raise onboard` creates working setup
-- [ ] `raise status` shows project health
+- [ ] `rai onboard` creates working setup
+- [ ] `rai status` shows project health
 - [ ] F&F user can go from install to /session-start in <5 minutes
 - [ ] Tested in fresh repo (dogfooding invertido)
 
@@ -198,9 +198,9 @@ F7.3 (Status)
 
 | Pattern | Application to RaiSE |
 |---------|---------------------|
-| Single `onboard` command | `raise onboard` wizard |
+| Single `onboard` command | `rai onboard` wizard |
 | Interactive wizard | Guide through template choice |
-| `doctor` command | `raise doctor` for diagnostics (P1) |
+| `doctor` command | `rai doctor` for diagnostics (P1) |
 | Workspace isolation | Per-project `.claude/skills/` |
 | Daemon mode | NOT needed — Claude Code is the runtime |
 
@@ -233,7 +233,7 @@ To include skills in the Python package:
 ```toml
 # pyproject.toml
 [tool.hatch.build.targets.wheel]
-packages = ["src/raise_cli"]
+packages = ["src/rai_cli"]
 
 [tool.hatch.build.targets.wheel.force-include]
 ".claude/skills" = "raise_cli/data/skills"

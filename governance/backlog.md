@@ -58,7 +58,7 @@
 
 | Epic | Key Deliverables |
 |------|-----------------|
-| E13 Discovery | `raise discover scan/validate/complete`, component catalog, Python code analyzer |
+| E13 Discovery | `rai discover scan/validate/complete`, component catalog, Python code analyzer |
 | E17 Multi-Language Discovery | TS/TSX, PHP, Svelte extractors, multi-language analyzer categories and module paths |
 
 E5 (SAR Engine) was the original plan for brownfield analysis. E13 Discovery delivered this capability with a different approach: protocol-based code analyzers, component discovery, and drift detection. E5 is fully superseded.
@@ -75,8 +75,8 @@ E6 (Observability) was replaced by E9's local-first telemetry approach. Phase 2 
 
 | Epic | Key Deliverables |
 |------|-----------------|
-| E14 Rai Distribution | Base Rai bundled in package, bootstrap on `raise init`, MEMORY.md generation, skills scaffolding |
-| E7 Onboarding | `raise init` governance scaffolding, `/project-create` (greenfield), `/project-onboard` (brownfield) |
+| E14 Rai Distribution | Base Rai bundled in package, bootstrap on `rai init`, MEMORY.md generation, skills scaffolding |
+| E7 Onboarding | `rai init` governance scaffolding, `/project-create` (greenfield), `/project-onboard` (brownfield) |
 
 ---
 
@@ -85,13 +85,13 @@ E6 (Observability) was replaced by E9's local-first telemetry approach. Phase 2 
 ### CLI Commands
 
 ```
-raise init          — Initialize project (greenfield/brownfield detection)
-raise discover      — Codebase discovery (scan, validate, complete, drift)
-raise memory        — Query and manage memory (query, context, build, add-pattern, emit-work)
-raise session       — Session lifecycle (start, close)
-raise skill         — Skill management (list, validate)
-raise profile       — Developer profile
-raise base          — Base Rai package info
+rai init          — Initialize project (greenfield/brownfield detection)
+rai discover      — Codebase discovery (scan, validate, complete, drift)
+rai memory        — Query and manage memory (query, context, build, add-pattern, emit-work)
+rai session       — Session lifecycle (start, close)
+rai skill         — Skill management (list, validate)
+rai profile       — Developer profile
+rai base          — Base Rai package info
 ```
 
 ### Skills (20 total)

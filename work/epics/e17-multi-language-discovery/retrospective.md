@@ -8,7 +8,7 @@
 
 ## Summary
 
-Extended `raise discover scan` from Python-only to polyglot support (TypeScript/TSX, PHP, Svelte). The epic was driven by a zambezi-concierge demo need — a real customer repo with Python + Laravel PHP + Svelte. All three extractors use tree-sitter for consistent, deterministic parsing. The analyzer now categorizes and paths non-Python files correctly.
+Extended `rai discover scan` from Python-only to polyglot support (TypeScript/TSX, PHP, Svelte). The epic was driven by a zambezi-concierge demo need — a real customer repo with Python + Laravel PHP + Svelte. All three extractors use tree-sitter for consistent, deterministic parsing. The analyzer now categorizes and paths non-Python files correctly.
 
 ---
 
@@ -45,7 +45,7 @@ Extended `raise discover scan` from Python-only to polyglot support (TypeScript/
 
 - **Scanner lacks --exclude for vendor/node_modules** (PAT-247) — Full-repo PHP scans hit vendor directories, causing duplicate IDs and noise
 - **discover-describe was invisible** — Missing YAML frontmatter meant Claude Code never registered it. Fixed during epic close session.
-- **uv run prefix in skills** — All 39 skill files hardcoded `uv run raise` instead of `raise`. Fixed as standalone bugfix during this epic's session.
+- **uv run prefix in skills** — All 39 skill files hardcoded `uv run raise` instead of `rai`. Fixed as standalone bugfix during this epic's session.
 
 ## Patterns Discovered
 
@@ -53,7 +53,7 @@ Extended `raise discover scan` from Python-only to polyglot support (TypeScript/
 |----|---------|---------|
 | PAT-247 | Scanner needs exclude patterns for vendor/node_modules | PHP/JS projects with dependency dirs |
 | (fix) | Skills without YAML frontmatter are invisible to Claude Code | Skill registration requires frontmatter |
-| (fix) | `uv run` prefix is dev-env coupling leak | End users install via pip, get `raise` on PATH |
+| (fix) | `uv run` prefix is dev-env coupling leak | End users install via pip, get `rai` on PATH |
 
 ## Process Insights
 
@@ -78,7 +78,7 @@ Extended `raise discover scan` from Python-only to polyglot support (TypeScript/
 - First RaiSE client kick-off (today)
 - Future: `--exclude` flag for scanner (PAT-247)
 - Future: Absorb discover-complete into discover-validate (parking lot)
-- Future: `raise story` CLI subcommands to reduce inference overhead
+- Future: `rai story` CLI subcommands to reduce inference overhead
 
 ---
 

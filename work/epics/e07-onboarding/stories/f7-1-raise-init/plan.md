@@ -1,4 +1,4 @@
-# Implementation Plan: F7.1 `raise init` Command
+# Implementation Plan: F7.1 `rai init` Command
 
 ## Overview
 
@@ -11,9 +11,9 @@
 
 ### Task 1: Project Detection Module
 
-- **Description:** Create `src/raise_cli/onboarding/detection.py` with project type detection logic (greenfield/brownfield based on code file count)
+- **Description:** Create `src/rai_cli/onboarding/detection.py` with project type detection logic (greenfield/brownfield based on code file count)
 - **Files:**
-  - `src/raise_cli/onboarding/detection.py` (new)
+  - `src/rai_cli/onboarding/detection.py` (new)
   - `tests/onboarding/test_detection.py` (new)
 - **TDD Cycle:**
   - RED: Test `detect_project_type()` returns greenfield for empty dir
@@ -28,7 +28,7 @@
 
 - **Description:** Create Pydantic model for `.rai/manifest.yaml` and save/load functions
 - **Files:**
-  - `src/raise_cli/onboarding/manifest.py` (new)
+  - `src/rai_cli/onboarding/manifest.py` (new)
   - `tests/onboarding/test_manifest.py` (new)
 - **TDD Cycle:**
   - RED: Test `ProjectManifest` schema validates correctly
@@ -42,11 +42,11 @@
 
 ### Task 3: Init CLI Command
 
-- **Description:** Create `raise init` command that ties detection, manifest, and profile together
+- **Description:** Create `rai init` command that ties detection, manifest, and profile together
 - **Files:**
-  - `src/raise_cli/cli/commands/init.py` (new)
-  - `src/raise_cli/cli/main.py` (modify to register)
-  - `src/raise_cli/onboarding/__init__.py` (update exports)
+  - `src/rai_cli/cli/commands/init.py` (new)
+  - `src/rai_cli/cli/main.py` (modify to register)
+  - `src/rai_cli/onboarding/__init__.py` (update exports)
   - `tests/cli/commands/test_init.py` (new)
 - **TDD Cycle:**
   - RED: Test init creates `.rai/manifest.yaml`
@@ -65,19 +65,19 @@
 - **Files:** None new
 - **TDD Cycle:** N/A (validation only)
 - **Verification:**
-  - `ruff check src/raise_cli/onboarding/ src/raise_cli/cli/commands/init.py`
-  - `ruff format --check src/raise_cli/onboarding/ src/raise_cli/cli/commands/init.py`
-  - `pyright src/raise_cli/onboarding/ src/raise_cli/cli/commands/init.py`
-  - `pytest tests/onboarding/ tests/cli/commands/test_init.py --cov=src/raise_cli/onboarding --cov=src/raise_cli/cli/commands/init --cov-report=term-missing`
+  - `ruff check src/rai_cli/onboarding/ src/rai_cli/cli/commands/init.py`
+  - `ruff format --check src/rai_cli/onboarding/ src/rai_cli/cli/commands/init.py`
+  - `pyright src/rai_cli/onboarding/ src/rai_cli/cli/commands/init.py`
+  - `pytest tests/onboarding/ tests/cli/commands/test_init.py --cov=src/rai_cli/onboarding --cov=src/rai_cli/cli/commands/init --cov-report=term-missing`
 - **Size:** XS
 - **Dependencies:** Tasks 1-3
 
 ### Task 5 (Final): Manual Integration Test
 
-- **Description:** Test `raise init` on real directories (greenfield + brownfield)
+- **Description:** Test `rai init` on real directories (greenfield + brownfield)
 - **Verification:**
-  1. Create temp greenfield dir → `raise init` → verify output/files
-  2. Run `raise init` on existing project → verify brownfield detection
+  1. Create temp greenfield dir → `rai init` → verify output/files
+  2. Run `rai init` on existing project → verify brownfield detection
   3. Delete `~/.rai/developer.yaml` → run init → verify new profile created
   4. Run init again → verify existing profile loaded
 - **Size:** XS

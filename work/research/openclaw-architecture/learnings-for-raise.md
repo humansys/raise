@@ -189,7 +189,7 @@ steps:
 **Verification:** Design covers all acceptance criteria.
 ```
 
-**For V3:** Consider `raise workflow run kata.md` that:
+**For V3:** Consider `rai workflow run kata.md` that:
 1. Parses kata markdown
 2. Extracts steps and gates
 3. Executes with approval checkpoints
@@ -221,7 +221,7 @@ Agent intelligence stays constant; gateway adapts to interface.
 
 ### Current RaiSE Approach
 
-- CLI only (`raise` command)
+- CLI only (`rai` command)
 - Claude Code integration via skills
 - No multi-interface support
 

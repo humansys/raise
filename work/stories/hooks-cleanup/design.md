@@ -10,13 +10,13 @@ modules: [mod-telemetry, mod-skills]
 
 ## What & Why
 
-**Problem:** Two parallel systems write to `signals.jsonl` — bash Stop hooks (`.raise/scripts/log-*.sh`) and CLI telemetry (`raise memory emit-work`). The CLI version is strictly better: Pydantic schemas, file locking, proper error handling. Bash hooks are a vestige from E9 Phase 1.
+**Problem:** Two parallel systems write to `signals.jsonl` — bash Stop hooks (`.raise/scripts/log-*.sh`) and CLI telemetry (`rai memory emit-work`). The CLI version is strictly better: Pydantic schemas, file locking, proper error handling. Bash hooks are a vestige from E9 Phase 1.
 
 **Value:** Remove dead code that creates confusion and noise. One telemetry path = simpler mental model, fewer files to maintain, cleaner onboarding.
 
 ## Architectural Context
 
-- **mod-telemetry** (bc-observability, lyr-domain): CLI-based telemetry via `raise memory emit-work` — this stays, it's the authoritative path
+- **mod-telemetry** (bc-observability, lyr-domain): CLI-based telemetry via `rai memory emit-work` — this stays, it's the authoritative path
 - **mod-skills** (skill parser/schema/validator/scaffold): Hooks are parsed from SKILL.md frontmatter — these models stay but become unused by distributable skills
 
 ## Approach
@@ -36,9 +36,9 @@ Remove bash hook infrastructure from three layers:
 
 | Component | Change | Files |
 |-----------|--------|-------|
-| Distributable skills | Delete `hooks:` block | 20 SKILL.md in `src/raise_cli/skills_base/` |
+| Distributable skills | Delete `hooks:` block | 20 SKILL.md in `src/rai_cli/skills_base/` |
 | Source skills | Delete `hooks:` block | 21 SKILL.md in `.claude/skills/` |
-| Bash scripts | Delete | 5 files in `src/raise_cli/rai_base/scripts/` |
+| Bash scripts | Delete | 5 files in `src/rai_cli/rai_base/scripts/` |
 | Bootstrap | Delete `_copy_scripts()` + `scripts_copied` field | `onboarding/bootstrap.py` |
 | Scaffold | Remove hooks from template | `skills/scaffold.py` |
 | Bootstrap tests | Remove `TestBootstrapScripts` class | `tests/onboarding/test_bootstrap.py` |
@@ -97,7 +97,7 @@ content = dedent(f"""\
 **MUST:**
 - No `hooks:` sections in any of the 20 distributable SKILL.md files
 - No `hooks:` sections in any of the 21 source SKILL.md files
-- No bash scripts in `src/raise_cli/rai_base/scripts/`
+- No bash scripts in `src/rai_cli/rai_base/scripts/`
 - `_copy_scripts` removed from bootstrap
 - Scaffold template generates skills without hooks
 - All tests pass
@@ -110,4 +110,4 @@ content = dedent(f"""\
 - Remove `SkillHook`/`SkillHookCommand` models from schema
 - Remove hook parsing from parser
 - Remove hook validation from validator
-- Break existing CLI telemetry (`raise memory emit-work`)
+- Break existing CLI telemetry (`rai memory emit-work`)

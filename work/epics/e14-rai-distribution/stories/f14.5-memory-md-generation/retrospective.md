@@ -17,7 +17,7 @@
 ## What Could Improve
 
 - **Telemetry work type confusion**: `emit-work feature` fails — CLI expects `story`. Minor friction, documented.
-- **Skills count in CLI output**: `raise memory generate` reports "Skills: 0" — cosmetic bug in output counting, not in actual generation.
+- **Skills count in CLI output**: `rai memory generate` reports "Skills: 0" — cosmetic bug in output counting, not in actual generation.
 
 ## Heutagogical Checkpoint
 
@@ -44,5 +44,5 @@
 - **PAT-157:** Don't skip /story-design for distribution features — architectural decisions surface in design
 
 ## Action Items
-- [ ] Fix "Skills: 0" display in `raise memory generate` summary (low priority, cosmetic)
+- [ ] Fix "Skills: 0" display in `rai memory generate` summary (low priority, cosmetic)
 - [ ] Consider accepting both "story" and "feature" in `emit-work` CLI

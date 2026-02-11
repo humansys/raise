@@ -55,13 +55,13 @@ EXTRACT (deterministic)  →  SYNTHESIZE (LLM)  →  VALIDATE (human)  →  POPU
 
 **MUST:**
 - [x] New node types in unified graph schema (system, module, component, convention)
-- [x] `raise discover scan` — Extract symbols from codebase using ast-grep
-- [ ] `raise discover build` — Build component nodes from scan output
+- [x] `rai discover scan` — Extract symbols from codebase using ast-grep
+- [ ] `rai discover build` — Build component nodes from scan output
 - [ ] `/discover-start` skill — Initialize discovery, detect project type
 - [ ] `/discover-scan` skill — Run extraction, LLM synthesizes descriptions
 - [ ] `/discover-validate` skill — Human reviews AI descriptions, approves/edits
 - [ ] `/discover-complete` skill — Populate validated nodes to graph
-- [ ] `raise context query --type component` — Query component catalog
+- [ ] `rai context query --type component` — Query component catalog
 
 **SHOULD:**
 - [ ] Convention/pattern extraction (naming patterns, architectural patterns)
@@ -139,7 +139,7 @@ class ComponentNode(ConceptNode):
 
 /discover-scan
     │
-    ├── Run: raise discover scan ./src
+    ├── Run: rai discover scan ./src
     ├── Rai receives JSON of extracted symbols
     ├── Rai synthesizes descriptions for each component
     │   "UserService: Handles user CRUD operations and authentication.
@@ -155,7 +155,7 @@ class ComponentNode(ConceptNode):
 
 /discover-complete
     │
-    ├── Run: raise discover build --validated
+    ├── Run: rai discover build --validated
     ├── Validated nodes added to unified graph
     ├── Relationships inferred (depends_on, used_by)
     └── Graph persisted
@@ -165,13 +165,13 @@ class ComponentNode(ConceptNode):
 
 ```bash
 # Scan codebase, output JSON of symbols
-raise discover scan [path] [--language python|typescript|...] [--output json|yaml]
+rai discover scan [path] [--language python|typescript|...] [--output json|yaml]
 
 # Build graph from scan output (after validation)
-raise discover build [--input scan.json] [--validated-only]
+rai discover build [--input scan.json] [--validated-only]
 
 # Check new files against baseline (drift detection)
-raise discover check [--diff HEAD~1] [--baseline graph.json]
+rai discover check [--diff HEAD~1] [--baseline graph.json]
 ```
 
 ---
@@ -188,7 +188,7 @@ raise discover check [--diff HEAD~1] [--baseline graph.json]
 ### Epic Complete
 - [ ] All 5 features complete (F13.1-F13.5)
 - [ ] Can run full discovery flow on raise-commons itself (dogfooding)
-- [ ] Component query works: `raise context query --type component "service"`
+- [ ] Component query works: `rai context query --type component "service"`
 - [ ] At least 10 components discovered and validated from raise-commons
 - [ ] Basic drift detection flags when new file doesn't match conventions
 - [ ] Architecture guide updated (`dev/architecture-overview.md`)
@@ -298,7 +298,7 @@ This epic builds on completed research:
 
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
-| **M1: Walking Skeleton** | F13.1, F13.2 | Feb 5 | `raise discover scan src/` outputs JSON with symbols | Show extracted components from raise-commons |
+| **M1: Walking Skeleton** | F13.1, F13.2 | Feb 5 | `rai discover scan src/` outputs JSON with symbols | Show extracted components from raise-commons |
 | **M2: Discovery Flow** | F13.3, F13.4 | Feb 7 | Full `/discover-*` skill flow works, components in graph | Run discovery on raise-commons, query results |
 | **M3: F&F Ready** | F13.5 + polish | Feb 8 | Drift detection warns on non-conforming code | Demo drift warning on test file |
 

@@ -28,7 +28,7 @@
 - Passwords no longer accepted — API tokens or Trusted Publishers only
 - Version numbers are permanent (can't re-upload same version)
 - Pre-release versions (`2.0.0a1`) invisible to `pip install` by default — users need `--pre`
-- Name `raise-cli` is **available** (verified 2026-02-07)
+- Name `rai-cli` is **available** (verified 2026-02-07)
 - TestPyPI exists for dry runs (separate account/system)
 
 **Publishing with uv:**
@@ -40,7 +40,7 @@ uv publish --token pypi-YOUR_TOKEN
 **sdist security:** Default hatch config leaks entire repo. Fixed with explicit include:
 ```toml
 [tool.hatch.build.targets.sdist]
-include = ["/src/raise_cli/", "/LICENSE", "/README.md", "/pyproject.toml"]
+include = ["/src/rai_cli/", "/LICENSE", "/README.md", "/pyproject.toml"]
 ```
 
 **Sources:**
@@ -142,7 +142,7 @@ include = ["/src/raise_cli/", "/LICENSE", "/README.md", "/pyproject.toml"]
 | Decision | Rationale |
 |----------|-----------|
 | Publish to PyPI as pre-release (`2.0.0a1`) | F&F users install via `pip install raise-cli --pre` |
-| sdist restricted to `src/raise_cli/` only | Prevent private repo data leaking |
+| sdist restricted to `src/rai_cli/` only | Prevent private repo data leaking |
 | Ship 18 skills (not 5) | F&F users need full lifecycle, not just discovery |
 | Exclude skill-create and framework-sync | Internal/meta skills, not needed by F&F users |
 | Fix Windows path encoding now | Emilio testing on Windows laptop |

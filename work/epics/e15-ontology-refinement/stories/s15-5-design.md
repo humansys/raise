@@ -28,7 +28,7 @@ template: "lean-feature-spec-v2"
 
 ## 2. Approach
 
-**How we'll solve it**: Add convenience methods to `UnifiedQueryEngine` that compose typed BFS traversals (using `edge_types` from S15.4) into single-call helpers. Expose via new CLI subcommands under `raise memory`.
+**How we'll solve it**: Add convenience methods to `UnifiedQueryEngine` that compose typed BFS traversals (using `edge_types` from S15.4) into single-call helpers. Expose via new CLI subcommands under `rai memory`.
 
 **Components affected**:
 - **`context/query.py`**: Add 4 helper methods + `ArchitecturalContext` model (modify)
@@ -63,7 +63,7 @@ constraints = engine.find_constraints_for("mod-memory")  # → list[ConceptNode]
 
 ```bash
 # Full architectural context (primary command)
-$ raise memory context mod-memory
+$ rai memory context mod-memory
 
 # Output:
 # Module: mod-memory — Manage Rai's persistent memory...
@@ -100,13 +100,13 @@ class ArchitecturalContext(BaseModel):
 - [ ] `find_domain_for(module_id)` follows `belongs_to` edge to bounded context
 - [ ] `find_layer_for(module_id)` follows `in_layer` edge to layer node
 - [ ] `find_constraints_for(module_id)` follows `belongs_to` → BC → `constrained_by` → guardrails
-- [ ] `raise memory context <module_id>` formats output via Rich console
+- [ ] `rai memory context <module_id>` formats output via Rich console
 - [ ] Returns empty/None gracefully when module has no domain, layer, or constraints
 - [ ] Unit tests >90% coverage on new code
 
 ### Should Have
 
-- [ ] `raise memory context` with `--format json` for machine consumption
+- [ ] `rai memory context` with `--format json` for machine consumption
 - [ ] Helper methods handle non-existent module IDs gracefully (return None/empty)
 
 ### Must NOT

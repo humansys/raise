@@ -12,8 +12,8 @@
 ### Task 1: Skill Extractor
 - **Description:** Create new module to parse SKILL.md YAML frontmatter and return ConceptNode
 - **Files:**
-  - `src/raise_cli/context/extractors/__init__.py` (new)
-  - `src/raise_cli/context/extractors/skills.py` (new)
+  - `src/rai_cli/context/extractors/__init__.py` (new)
+  - `src/rai_cli/context/extractors/skills.py` (new)
   - `tests/context/extractors/__init__.py` (new)
   - `tests/context/extractors/test_skills.py` (new)
 - **TDD Cycle:**
@@ -28,7 +28,7 @@
 ### Task 2: UnifiedGraphBuilder with Loaders
 - **Description:** Create UnifiedGraphBuilder class with `load_governance()`, `load_memory()`, `load_work()`, `load_skills()` methods. Each returns `list[ConceptNode]`.
 - **Files:**
-  - `src/raise_cli/context/builder.py` (new)
+  - `src/rai_cli/context/builder.py` (new)
   - `tests/context/test_builder.py` (new)
 - **TDD Cycle:**
   - RED: Test `load_governance()` converts Concept → ConceptNode
@@ -44,7 +44,7 @@
 ### Task 3: Relationship Inference
 - **Description:** Add `infer_relationships()` method with explicit edges (weight=1.0) and heuristic edges (weight<1.0)
 - **Files:**
-  - `src/raise_cli/context/builder.py` (extend)
+  - `src/rai_cli/context/builder.py` (extend)
   - `tests/context/test_builder.py` (extend)
 - **TDD Cycle:**
   - RED: Test explicit `learned_from` edges (pattern → session)
@@ -58,13 +58,13 @@
 - **Dependencies:** Task 2
 
 ### Task 4: CLI Command
-- **Description:** Add `--unified` flag to `raise graph build` command. When set, use UnifiedGraphBuilder and save to `.raise/graph/unified.json`
+- **Description:** Add `--unified` flag to `rai graph build` command. When set, use UnifiedGraphBuilder and save to `.raise/graph/unified.json`
 - **Files:**
-  - `src/raise_cli/cli/commands/graph.py` (extend)
-  - `src/raise_cli/context/__init__.py` (export builder)
+  - `src/rai_cli/cli/commands/graph.py` (extend)
+  - `src/rai_cli/context/__init__.py` (export builder)
   - `tests/cli/commands/test_graph.py` (extend)
 - **TDD Cycle:**
-  - RED: Test `raise graph build --unified` creates unified graph file
+  - RED: Test `rai graph build --unified` creates unified graph file
   - RED: Test output shows node/edge counts by type
   - GREEN: Implement CLI flag and integration
   - REFACTOR: Clean up output formatting

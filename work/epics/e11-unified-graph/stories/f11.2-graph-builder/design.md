@@ -125,7 +125,7 @@ Reuse existing `extract_keywords()` from E2:
 
 ## CLI Command
 
-Extend `raise graph build` with `--unified` flag:
+Extend `rai graph build` with `--unified` flag:
 
 ```bash
 # Existing behavior (governance only)
@@ -161,7 +161,7 @@ Graph: 99 nodes, 68 edges
 ## File Structure
 
 ```
-src/raise_cli/context/
+src/rai_cli/context/
 ├── __init__.py       # Existing (F11.1)
 ├── models.py         # Existing (F11.1)
 ├── graph.py          # Existing (F11.1)
@@ -286,7 +286,7 @@ def extract_all_skills(skills_dir: Path) -> list[ConceptNode]:
 - [ ] All 4 sources loading correctly
 - [ ] Explicit relationships created (weight=1.0)
 - [ ] Inferred relationships created (weight<1.0)
-- [ ] `raise graph build --unified` command works
+- [ ] `rai graph build --unified` command works
 - [ ] Tests passing (>90% coverage)
 - [ ] Quality checks pass (ruff, pyright, bandit)
 

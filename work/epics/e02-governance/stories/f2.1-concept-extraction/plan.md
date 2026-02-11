@@ -9,13 +9,13 @@
 ## Tasks
 
 ### Task 1: Create Pydantic Models
-- **Description:** Implement `Concept`, `ConceptType`, and `ExtractionResult` models in `src/raise_cli/governance/models.py`
+- **Description:** Implement `Concept`, `ConceptType`, and `ExtractionResult` models in `src/rai_cli/governance/models.py`
 - **Files:**
-  - CREATE `src/raise_cli/governance/__init__.py`
-  - CREATE `src/raise_cli/governance/models.py`
+  - CREATE `src/rai_cli/governance/__init__.py`
+  - CREATE `src/rai_cli/governance/models.py`
 - **Verification:**
   - Models instantiate correctly with valid data
-  - `pyright --strict src/raise_cli/governance/models.py` passes
+  - `pyright --strict src/rai_cli/governance/models.py` passes
   - `pytest tests/governance/test_models.py -v` passes
 - **Size:** S
 - **Dependencies:** None
@@ -23,63 +23,63 @@
 ### Task 2: Implement PRD Requirements Parser
 - **Description:** Create `parsers/prd.py` with `extract_requirements()` function using regex `### RF-\d+: (.+)` to extract requirements with metadata
 - **Files:**
-  - CREATE `src/raise_cli/governance/parsers/__init__.py`
-  - CREATE `src/raise_cli/governance/parsers/prd.py`
+  - CREATE `src/rai_cli/governance/parsers/__init__.py`
+  - CREATE `src/rai_cli/governance/parsers/prd.py`
   - CREATE `tests/governance/parsers/test_prd.py`
 - **Verification:**
   - Extract 8 requirements from real `governance/projects/raise-cli/prd.md`
   - Handle edge cases (empty file, malformed sections, special chars)
-  - `pytest tests/governance/parsers/test_prd.py -v --cov=src/raise_cli/governance/parsers/prd.py --cov-fail-under=90` passes
+  - `pytest tests/governance/parsers/test_prd.py -v --cov=src/rai_cli/governance/parsers/prd.py --cov-fail-under=90` passes
 - **Size:** S
 - **Dependencies:** Task 1
 
 ### Task 3: Implement Vision Outcomes Parser
 - **Description:** Create `parsers/vision.py` with `extract_outcomes()` function to parse markdown tables and extract outcome rows
 - **Files:**
-  - CREATE `src/raise_cli/governance/parsers/vision.py`
+  - CREATE `src/rai_cli/governance/parsers/vision.py`
   - CREATE `tests/governance/parsers/test_vision.py`
 - **Verification:**
   - Extract 7+ outcomes from real `governance/solution/vision.md`
   - Table parsing handles variations (spacing, formatting)
-  - `pytest tests/governance/parsers/test_vision.py -v --cov=src/raise_cli/governance/parsers/vision.py --cov-fail-under=90` passes
+  - `pytest tests/governance/parsers/test_vision.py -v --cov=src/rai_cli/governance/parsers/vision.py --cov-fail-under=90` passes
 - **Size:** S
 - **Dependencies:** Task 1
 
 ### Task 4: Implement Constitution Principles Parser
 - **Description:** Create `parsers/constitution.py` with `extract_principles()` function using regex `### §\d+\. (.+)` to extract principles
 - **Files:**
-  - CREATE `src/raise_cli/governance/parsers/constitution.py`
+  - CREATE `src/rai_cli/governance/parsers/constitution.py`
   - CREATE `tests/governance/parsers/test_constitution.py`
 - **Verification:**
   - Extract 8+ principles from real `framework/reference/constitution.md`
   - Section content extraction works correctly
-  - `pytest tests/governance/parsers/test_constitution.py -v --cov=src/raise_cli/governance/parsers/constitution.py --cov-fail-under=90` passes
+  - `pytest tests/governance/parsers/test_constitution.py -v --cov=src/rai_cli/governance/parsers/constitution.py --cov-fail-under=90` passes
 - **Size:** S
 - **Dependencies:** Task 1
 
 ### Task 5: Implement GovernanceExtractor Orchestrator
 - **Description:** Create `extractor.py` with `GovernanceExtractor` class that orchestrates all parsers, provides `extract_from_file()` and `extract_all()` methods
 - **Files:**
-  - CREATE `src/raise_cli/governance/extractor.py`
+  - CREATE `src/rai_cli/governance/extractor.py`
   - CREATE `tests/governance/test_extractor.py`
 - **Verification:**
   - `extract_all()` returns 23+ concepts from raise-commons governance
   - `extract_from_file()` works for individual files
   - Error handling for missing files works (skip with warning)
-  - `pytest tests/governance/test_extractor.py -v --cov=src/raise_cli/governance/extractor.py --cov-fail-under=90` passes
+  - `pytest tests/governance/test_extractor.py -v --cov=src/rai_cli/governance/extractor.py --cov-fail-under=90` passes
 - **Size:** M
 - **Dependencies:** Task 2, Task 3, Task 4
 
-### Task 6: Add CLI Command `raise graph extract`
-- **Description:** Create `src/raise_cli/cli/commands/graph.py` with `extract` command supporting `--format json` option
+### Task 6: Add CLI Command `rai graph extract`
+- **Description:** Create `src/rai_cli/cli/commands/graph.py` with `extract` command supporting `--format json` option
 - **Files:**
-  - CREATE `src/raise_cli/cli/commands/graph.py`
-  - MODIFY `src/raise_cli/cli/app.py` (register graph commands)
+  - CREATE `src/rai_cli/cli/commands/graph.py`
+  - MODIFY `src/rai_cli/cli/app.py` (register graph commands)
   - CREATE `tests/cli/commands/test_graph.py`
 - **Verification:**
-  - `raise graph extract` works and displays human-readable output
-  - `raise graph extract --format json` returns valid JSON
-  - `raise graph extract governance/projects/raise-cli/prd.md` works for single file
+  - `rai graph extract` works and displays human-readable output
+  - `rai graph extract --format json` returns valid JSON
+  - `rai graph extract governance/projects/raise-cli/prd.md` works for single file
   - CLI integration test passes
   - `pytest tests/cli/commands/test_graph.py -v` passes
 - **Size:** M
@@ -93,9 +93,9 @@
 - **Verification:**
   - All public APIs have Google-style docstrings
   - `dev/components.md` documents governance module
-  - `ruff check src/raise_cli/governance/` passes
-  - `pyright --strict src/raise_cli/governance/` passes
-  - `pytest tests/governance/ --cov=src/raise_cli/governance --cov-fail-under=90` passes
+  - `ruff check src/rai_cli/governance/` passes
+  - `pyright --strict src/rai_cli/governance/` passes
+  - `pytest tests/governance/ --cov=src/rai_cli/governance --cov-fail-under=90` passes
 - **Size:** XS
 - **Dependencies:** Task 6
 
@@ -145,12 +145,12 @@ Task 1
 
 - [ ] All tasks complete (1-7)
 - [ ] Extract 23+ concepts from raise-commons governance files
-- [ ] CLI command `raise graph extract` functional
+- [ ] CLI command `rai graph extract` functional
 - [ ] >90% test coverage on governance module
 - [ ] All type checks pass (`pyright --strict`)
 - [ ] All linting passes (`ruff check`)
 - [ ] Component catalog updated
-- [ ] No security issues (`bandit -r src/raise_cli/governance/`)
+- [ ] No security issues (`bandit -r src/rai_cli/governance/`)
 
 ---
 

@@ -744,7 +744,7 @@ RaiSE's distribution model (from CLAUDE.md):
 
 **Verdict**: BMAD's npm model is **vastly superior for user experience**. RaiSE's git-based model is **principled but clunky**.
 
-**Recommendation**: RaiSE should **Adapt BMAD's UX philosophy** (one-command install) while maintaining git-native distribution. Solution: Create `raise-cli` installer that:
+**Recommendation**: RaiSE should **Adapt BMAD's UX philosophy** (one-command install) while maintaining git-native distribution. Solution: Create `rai-cli` installer that:
 - Clones repo (git-native)
 - Runs injection script automatically
 - Detects IDE/environment (like BMAD installer)
@@ -1256,7 +1256,7 @@ RaiSE's sustainability (from CLAUDE.md):
 
 **Threat Level**: **Moderate**. UX polish matters for growth.
 
-**Mitigation**: Build `raise-cli` installer with BMAD-level UX (P1 priority).
+**Mitigation**: Build `rai-cli` installer with BMAD-level UX (P1 priority).
 
 ---
 
@@ -1493,7 +1493,7 @@ RaiSE's sustainability (from CLAUDE.md):
 - **npm Wins**: First-time user experience, rapid onboarding
 - **Git Wins**: Platform independence, principle alignment (§3)
 
-**Verdict**: Trade-off between UX (BMAD) and principles (RaiSE). RaiSE can improve UX without abandoning git-native model (via `raise-cli`).
+**Verdict**: Trade-off between UX (BMAD) and principles (RaiSE). RaiSE can improve UX without abandoning git-native model (via `rai-cli`).
 
 ---
 
@@ -1506,7 +1506,7 @@ RaiSE's sustainability (from CLAUDE.md):
 **What to Adopt**: One-command installation experience with environment detection.
 
 **Implementation**:
-- Create `raise-cli` installer: `npx @raise/install` or `curl -sSL install.raise.dev | sh`
+- Create `rai-cli` installer: `npx @raise/install` or `curl -sSL install.raise.dev | sh`
 - Detects IDE/platform (like BMAD)
 - Clones git repo → runs injection script → configures `.specify/`
 - Interactive setup wizard (asks about project type, brownfield/greenfield)
@@ -1723,7 +1723,7 @@ RaiSE's sustainability (from CLAUDE.md):
 
 #### Medium-Term Response (3-6 Months)
 
-**Action 4**: **Build `raise-cli` Installer** (P1)
+**Action 4**: **Build `rai-cli` Installer** (P1)
 - Match BMAD's one-command UX
 - Maintain git-native distribution
 - Launch with: Environment detection, setup wizard
@@ -1766,7 +1766,7 @@ RaiSE's sustainability (from CLAUDE.md):
 | **P0** | Brownfield Reverse Spec Gen | Greenfield bias | High | Critical |
 | **P0** | Observable Validation Gates | LLM-dependent governance | Medium | High |
 | **P0** | MCP-Native Integration | 18+ platform breadth | Medium | High |
-| **P1** | `raise-cli` Installer UX | npm installer advantage | Medium | High |
+| **P1** | `rai-cli` Installer UX | npm installer advantage | Medium | High |
 | **P1** | Lean Specification Templates | Documentation overhead | Low | High |
 | **P1** | Multi-Repo Coordination | Single-repo limitation | High | Critical (Enterprise) |
 | **P1** | Context Window Optimization (RAG) | Document sharding limitations | High | High |

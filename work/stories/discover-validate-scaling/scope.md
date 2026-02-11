@@ -30,7 +30,7 @@ Redesign `/discover-validate` to work at module-level with confidence tiers, red
 
 ## Out of Scope
 
-- CLI code changes to `raise discover scan`
+- CLI code changes to `rai discover scan`
 - New CLI commands
 - Diff-mode for re-scans (future enhancement)
 - Changes to `/discover-start` or `/discover-complete`

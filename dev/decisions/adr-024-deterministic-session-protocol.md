@@ -46,7 +46,7 @@ This resolves the design question of where coaching observations belong: they ex
 ```
 SESSION START:
 ┌─────────────────────────────────────────────────────────────┐
-│  raise session start --project . --context                  │
+│  rai session start --project . --context                  │
 │                                                             │
 │  Reads:                                                     │
 │  ├── ~/.rai/developer.yaml        → identity + coaching     │
@@ -78,7 +78,7 @@ SESSION CLOSE:
          │
          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  raise session close --state-file output.yaml               │
+│  rai session close --state-file output.yaml               │
 │                                                             │
 │  Writes (atomically):                                       │
 │  ├── .raise/rai/session-state.yaml  → working state         │
@@ -140,12 +140,12 @@ Growth edge: speed over process under pressure
 
 ### Telemetry Ownership
 
-CLI commands emit their own telemetry. Skills do not call `emit-session`, `emit-work`, or `add-session` separately. `raise session close` performs all writes atomically — session record, telemetry, patterns, coaching, state.
+CLI commands emit their own telemetry. Skills do not call `emit-session`, `emit-work`, or `add-session` separately. `rai session close` performs all writes atomically — session record, telemetry, patterns, coaching, state.
 
 ### Backward Compatibility
 
-- `raise session start` without `--context` preserves current behavior
-- `raise session close` without flags preserves current behavior
+- `rai session start` without `--context` preserves current behavior
+- `rai session close` without flags preserves current behavior
 - `developer.yaml` without `coaching`/`deadlines` loads cleanly (defaults to empty)
 - CLAUDE.local.md continues to work as optional vendor bridge
 
@@ -165,7 +165,7 @@ CLI commands emit their own telemetry. Skills do not call `emit-session`, `emit-
 
 1. **Migration effort** — Existing session bridges become obsolete. CLAUDE.local.md loses its data role. Transition period where both old and new coexist.
 2. **Schema change in developer.yaml** — Existing profiles need backward-compatible extension.
-3. **CLI complexity** — `raise session start/close` commands grow significantly. More code, more tests.
+3. **CLI complexity** — `rai session start/close` commands grow significantly. More code, more tests.
 
 ### Neutral
 
@@ -226,16 +226,16 @@ Parse deadlines from governance docs at session-start time.
 | CLAUDE.local.md reads in session-start | 0 |
 | Coaching fields persisted | strengths, growth_edge, corrections, communication_notes |
 | Foundational patterns surfaced | ~10 curated patterns in bundle |
-| Backward compat | Existing `raise session start/close` without flags unchanged |
+| Backward compat | Existing `rai session start/close` without flags unchanged |
 
 ### Test Scenario
 
 ```bash
 # Close a session with full state
-raise session close --state-file output.yaml
+rai session close --state-file output.yaml
 
 # Start next session — verify continuity
-raise session start --project . --context
+rai session start --project . --context
 # Should output: developer model, current work from session-state.yaml,
 # foundational patterns from graph, coaching context, deadlines
 # All in ~150 tokens, no CLAUDE.local.md read needed

@@ -60,8 +60,8 @@
 
 | Artifact | Location |
 |----------|----------|
-| Memory module | `src/raise_cli/memory/` (6 files) |
-| CLI commands | `src/raise_cli/cli/commands/memory.py` |
+| Memory module | `src/rai_cli/memory/` (6 files) |
+| CLI commands | `src/rai_cli/cli/commands/memory.py` |
 | Tests | `tests/memory/` (5 files), `tests/cli/commands/test_memory.py` |
 | Design | `work/stories/f3.3-memory-graph/design.md` |
 | Plan | `work/stories/f3.3-memory-graph/plan.md` |

@@ -63,7 +63,7 @@ Este directorio contiene la documentacion de los componentes de gobernanza de Ra
 
 - **Que hace**: Analiza codebase brownfield, extrae patrones, genera reglas
 - **Output**: `.raise/rules/*.yaml`, `.raise/graph.yaml`
-- **CLI**: `raise sar analyze [path]`
+- **CLI**: `rai sar analyze [path]`
 - **Tiers**: Open Core (LLM) / Licensed (determinista)
 
 ### raise.ctx (RaiSE Context)
@@ -71,7 +71,7 @@ Este directorio contiene la documentacion de los componentes de gobernanza de Ra
 - **Que hace**: Entrega Minimum-Viable Context a agentes
 - **Input**: Query (task + scope) + datos de SAR
 - **Output**: MVC (reglas + contexto + warnings)
-- **CLI**: `raise ctx get --task "..." --scope "..."`
+- **CLI**: `rai ctx get --task "..." --scope "..."`
 - **Caracteristica**: Siempre determinista
 
 ### Minimum-Viable Context (MVC)
@@ -102,7 +102,7 @@ Output de SAR, input de raise.ctx:
 |------|-----|-----------|
 | A1 | Schemas y templates | - |
 | A2 | Comando `raise.sar.analyze` | - |
-| A3 | - | CLI `raise ctx get` basico |
+| A3 | - | CLI `rai ctx get` basico |
 | A4 | Documentacion | Integracion con agentes |
 
 ### Track B: Licensed

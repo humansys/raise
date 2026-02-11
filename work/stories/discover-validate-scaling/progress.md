@@ -9,13 +9,13 @@
 
 ### Task 1: Models + confidence scoring
 - **Status:** Complete
-- **Files created:** `src/raise_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
+- **Files created:** `src/rai_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
 - **Tests:** 44 passed
 - **Notes:** Fixed path matching to use directory boundaries (prevents "cli/" matching "raise_cli/"). Fixed test for zero-signal case (Python `str.islower()` returns True for mixed digit+lower strings).
 
 ### Task 2: Hierarchy builder, module grouping, and analyze pipeline
 - **Status:** Complete
-- **Files modified:** `src/raise_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
+- **Files modified:** `src/rai_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
 - **Tests:** 79 passed (35 new)
 - **Notes:** Added build_hierarchy(), determine_category(), extract_first_sentence(), group_by_module(), analyze(). Used _build_hierarchy_with_symbols() to preserve original Symbol objects for type-safe compute_confidence() calls.
 

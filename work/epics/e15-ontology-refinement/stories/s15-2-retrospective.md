@@ -17,7 +17,7 @@
 
 ## What Could Improve
 
-- **Design spec overcount on edges.** Design said 13 belongs_to edges but actual is 14 (counted 14 module docs = 14 modules, each mapping to exactly one BC). Off-by-one in mental arithmetic, not in code. Minor but shows the value of `raise memory build` as the source of truth.
+- **Design spec overcount on edges.** Design said 13 belongs_to edges but actual is 14 (counted 14 module docs = 14 modules, each mapping to exactly one BC). Off-by-one in mental arithmetic, not in code. Minor but shows the value of `rai memory build` as the source of truth.
 - **Pre-existing ruff SIM117 warnings** in older test code created noise during quality gate verification. Not S15.2's problem but noticed.
 
 ## Heutagogical Checkpoint

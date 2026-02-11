@@ -23,7 +23,7 @@ constraints:
 
 ## Purpose
 
-The CLI module is the **application shell** — it parses user input, calls the appropriate domain module, and formats the output. It uses [Typer](https://typer.tiangolo.com/) with subcommand groups (`raise discover ...`, `raise memory ...`, `raise skill ...`). Each command is intentionally thin: validate arguments, call a domain function, format the result.
+The CLI module is the **application shell** — it parses user input, calls the appropriate domain module, and formats the output. It uses [Typer](https://typer.tiangolo.com/) with subcommand groups (`rai discover ...`, `rai memory ...`, `rai skill ...`). Each command is intentionally thin: validate arguments, call a domain function, format the result.
 
 This is the only module that depends on everything else, and nothing depends on it. If you're adding a new CLI command, this is where it goes. If you're adding logic, it belongs in a domain module instead.
 
@@ -48,10 +48,10 @@ Commands are organized by domain as Typer sub-apps:
 - **`main.py`** — Typer app definition and sub-app registration. Global options (`--output`, `--verbose`).
 - **`commands/discover.py`** — `scan`, `analyze`, `drift`, `build` commands for the discovery pipeline.
 - **`commands/memory.py`** — `build`, `query`, `add`, `emit`, `emit-work` commands for memory and graph operations.
-- **`commands/init.py`** — `raise init` command for project bootstrapping (onboarding flow).
+- **`commands/init.py`** — `rai init` command for project bootstrapping (onboarding flow).
 - **`commands/skill.py`** — `list`, `show`, `validate`, `create` commands for skill management.
-- **`commands/profile.py`** — `raise profile show` for developer profile display.
-- **`commands/session.py`** — `raise session start` for session tracking.
+- **`commands/profile.py`** — `rai profile show` for developer profile display.
+- **`commands/session.py`** — `rai session start` for session tracking.
 - **`error_handler.py`** — Maps exceptions to exit codes and user-friendly error messages.
 
 ## Dependencies

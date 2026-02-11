@@ -126,10 +126,10 @@ Priority order for skill discovery:
 ### What This Means for F14.14 Scope
 
 **Keep:**
-- `raise skill list` — List `.claude/skills/`
-- `raise skill scaffold` — Generate in `.claude/skills/`
-- `raise skill validate` — Validate SKILL.md structure
-- `raise skill check-name` — Ontology compliance
+- `rai skill list` — List `.claude/skills/`
+- `rai skill scaffold` — Generate in `.claude/skills/`
+- `rai skill validate` — Validate SKILL.md structure
+- `rai skill check-name` — Ontology compliance
 
 **Simplify:**
 - Platform detection → Just check for `.claude/skills/` existence

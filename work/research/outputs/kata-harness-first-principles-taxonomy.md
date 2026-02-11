@@ -1977,7 +1977,7 @@ class ExecutionObserver {
    - Diff expected vs actual execution
 
 4. **Analysis Tools**
-   - CLI: `raise trace analyze <trace-id>`
+   - CLI: `rai trace analyze <trace-id>`
    - Identify bottlenecks (slow steps)
    - Identify quality issues (frequent gate failures)
 

@@ -187,7 +187,7 @@ At 10,000 users: ~$100-200/month
 **Cost:** $0/month
 **Goal:** Prove users will share
 
-- Export command in CLI (`raise memory export --shareable`)
+- Export command in CLI (`rai memory export --shareable`)
 - Public repo for patterns
 - Manual curation
 - Measure: Do people actually contribute?
@@ -244,8 +244,8 @@ What to build NOW to enable this LATER:
 
 ```python
 # In CLI
-raise memory export --shareable    # Export patterns marked shareable
-raise memory pull --community      # Pull from community (future)
+rai memory export --shareable    # Export patterns marked shareable
+rai memory pull --community      # Pull from community (future)
 ```
 
 **Effort:** ~1 day to add schema fields, ~2 days for export command

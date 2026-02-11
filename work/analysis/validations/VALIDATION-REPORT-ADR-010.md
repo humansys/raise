@@ -48,12 +48,12 @@ flowchart LR
 **Contexto:** Consecuencias de ADR-002 (Git Distribution)
 
 ```markdown
-- No hay auto-update (requiere `raise hydrate` manual)  ← DEFECTO
+- No hay auto-update (requiere `rai hydrate` manual)  ← DEFECTO
 ```
 
 **Corrección requerida:**
 ```markdown
-- No hay auto-update (requiere `raise pull` manual)  ← CORRECTO
+- No hay auto-update (requiere `rai pull` manual)  ← CORRECTO
 ```
 
 **Severidad:** Baja — Documento de referencia arquitectónica
@@ -99,8 +99,8 @@ flowchart LR
 
 | Término | Archivos Presentes | Cobertura |
 |---------|:------------------:|:---------:|
-| `raise pull` | 9 | ✅ |
-| `raise kata` | 9 | ✅ |
+| `rai pull` | 9 | ✅ |
+| `rai kata` | 9 | ✅ |
 | `--skip-pull` | 3 | ✅ |
 | ADR-010 referenciado | 7 | ✅ |
 

@@ -12,17 +12,17 @@
 ### Ontology Simplification
 
 **Before:**
-- `raise context query` — query unified graph
-- `raise graph build` — build graph
-- `raise graph validate` — validate graph
-- `raise graph extract` — extract concepts
+- `rai context query` — query unified graph
+- `rai graph build` — build graph
+- `rai graph validate` — validate graph
+- `rai graph extract` — extract concepts
 - `.raise/graph/unified.json` — graph file
 
 **After:**
-- `raise memory query` — query memory
-- `raise memory build` — build memory index
-- `raise memory validate` — validate index
-- `raise memory extract` — extract concepts
+- `rai memory query` — query memory
+- `rai memory build` — build memory index
+- `rai memory validate` — validate index
+- `rai memory extract` — extract concepts
 - `.raise/rai/memory/index.json` — index file
 
 ### Impact

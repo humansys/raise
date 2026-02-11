@@ -19,7 +19,7 @@
 ### 1. Feature F1.1: Project Scaffolding (3 SP) ✓
 
 **Implemented:**
-- Package structure: `src/raise_cli/` with three-layer architecture
+- Package structure: `src/rai_cli/` with three-layer architecture
 - `pyproject.toml`: Dependencies (typer, rich, pydantic, pydantic-settings, pyyaml)
 - Entry points: `raise` command via `[project.scripts]`
 - Tests directory with basic package tests
@@ -242,8 +242,8 @@ Focused on:
 ## Artifacts Created
 
 **Code:**
-- `src/raise_cli/` - Package structure (F1.1)
-- `src/raise_cli/cli/main.py` - Global options (F1.2)
+- `src/rai_cli/` - Package structure (F1.1)
+- `src/rai_cli/cli/main.py` - Global options (F1.2)
 - `tests/` - Test structure (F1.1, F1.2)
 - `pyproject.toml` - Package config (F1.1)
 

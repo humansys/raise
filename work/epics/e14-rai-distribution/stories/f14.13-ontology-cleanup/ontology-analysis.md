@@ -241,7 +241,7 @@ Minimal changes:
 
 ### High Priority (Do Now)
 
-1. **Remove `raise status`** — Empty command, no value
+1. **Remove `rai status`** — Empty command, no value
 2. **Rename `profile session-end` → `profile session-close`** — Match skill naming
 3. **Document session architecture** — Intentional three-system split
 
@@ -252,8 +252,8 @@ Minimal changes:
 
 ### Low Priority (Post-F&F)
 
-6. **Create `raise session` command group** — First-class session management
-7. **Unify `add-*` commands** — `raise memory add --type pattern "..."` vs separate commands
+6. **Create `rai session` command group** — First-class session management
+7. **Unify `add-*` commands** — `rai memory add --type pattern "..."` vs separate commands
 
 ---
 

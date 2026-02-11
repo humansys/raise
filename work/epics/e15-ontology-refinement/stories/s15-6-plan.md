@@ -9,7 +9,7 @@
 ## Tasks
 
 ### Task 1: Add Architectural Context Step to /story-design
-- **Description:** Insert Step 0.2 "Load Architectural Context" after Step 0.1 (prerequisites) and before Step 1 (complexity assessment). The step instructs Rai to identify the primary module(s) the story affects, run `raise memory context <module>`, and use the returned bounded context, layer, constraints, and dependencies to inform design decisions. Include guidance on how to present an "Architectural Context" section in design output.
+- **Description:** Insert Step 0.2 "Load Architectural Context" after Step 0.1 (prerequisites) and before Step 1 (complexity assessment). The step instructs Rai to identify the primary module(s) the story affects, run `rai memory context <module>`, and use the returned bounded context, layer, constraints, and dependencies to inform design decisions. Include guidance on how to present an "Architectural Context" section in design output.
 - **Files:** `.claude/skills/story-design/SKILL.md`
 - **Verification:** Read the modified file, confirm step is present with correct numbering and content
 - **Size:** S
@@ -30,8 +30,8 @@
 - **Dependencies:** None (parallel with Tasks 1-2)
 
 ### Task 4 (Final): Manual Integration Test
-- **Description:** Dogfood the new step by running `raise memory context` for a real module and verifying the output would be useful in a design context. Verify all 3 skills have consistent step structure.
-- **Verification:** Run `raise memory context memory` and confirm it returns useful architectural context. Verify all 3 SKILL.md files have the new step in the correct position.
+- **Description:** Dogfood the new step by running `rai memory context` for a real module and verifying the output would be useful in a design context. Verify all 3 skills have consistent step structure.
+- **Verification:** Run `rai memory context memory` and confirm it returns useful architectural context. Verify all 3 SKILL.md files have the new step in the correct position.
 - **Size:** XS
 - **Dependencies:** Tasks 1, 2, 3
 

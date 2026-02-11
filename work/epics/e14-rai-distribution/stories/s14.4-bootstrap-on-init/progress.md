@@ -27,7 +27,7 @@
 
 ### Task 4: Manual integration test
 - **Size:** XS
-- **Verification:** `raise init` on fresh tmp dir creates all files; re-init skips
+- **Verification:** `rai init` on fresh tmp dir creates all files; re-init skips
 
 ## Summary
 - **Total tests added:** 25

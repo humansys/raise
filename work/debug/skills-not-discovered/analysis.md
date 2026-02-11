@@ -78,7 +78,7 @@ DISCOVERED ◄────────┤    ✓ SKILL.md format is correct
 ## Prevention
 
 1. **Documentation:** Add skill naming convention to CLAUDE.md
-2. **Validation:** Could add a `raise skill validate` command to check structure
+2. **Validation:** Could add a `rai skill validate` command to check structure
 
 ## Status
 

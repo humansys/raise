@@ -11,7 +11,7 @@
 
 | Criterion | Status | Notes |
 |-----------|--------|-------|
-| `raise discover analyze` accepts JSON (stdin + `--input`) | Done | |
+| `rai discover analyze` accepts JSON (stdin + `--input`) | Done | |
 | Confidence scoring is deterministic | Done | Pure functions, no AI |
 | Three tiers: high (>=70), medium (40-69), low (<40) | Done | |
 | Path-based auto-categorization | Done | DEFAULT_CATEGORY_MAP + custom --category-map |
@@ -102,11 +102,11 @@ An 8 SP L-sized story in a single session blew the context window, forcing compa
 
 | Artifact | Location | Coverage |
 |----------|----------|----------|
-| Analyzer module | `src/raise_cli/discovery/analyzer.py` | 99% (181 stmts) |
+| Analyzer module | `src/rai_cli/discovery/analyzer.py` | 99% (181 stmts) |
 | Analyzer tests | `tests/discovery/test_analyzer.py` | — (79 tests) |
-| CLI command | `src/raise_cli/cli/commands/discover.py` | 35% (modified) |
+| CLI command | `src/rai_cli/cli/commands/discover.py` | 35% (modified) |
 | CLI tests | `tests/cli/commands/test_discover_analyze.py` | — (9 tests) |
-| Formatter | `src/raise_cli/output/formatters/discover.py` | 36% (modified) |
+| Formatter | `src/rai_cli/output/formatters/discover.py` | 36% (modified) |
 | Scan skill | `.claude/skills/discover-scan/SKILL.md` | untested |
 | Validate skill | `.claude/skills/discover-validate/SKILL.md` | untested |
 
@@ -116,7 +116,7 @@ An 8 SP L-sized story in a single session blew the context window, forcing compa
 e054a62 feat(discovery): add analyzer models and confidence scoring
 23d1551 refactor(discovery): replace semantic chunking with simple module grouping  ← wasted work
 387e12a feat(discovery): add hierarchy builder, module grouping, and analyze pipeline
-6736ff2 feat(discovery): add raise discover analyze CLI command and formatter
+6736ff2 feat(discovery): add rai discover analyze CLI command and formatter
 c8cdda1 docs(skills): rewrite discover skills for confidence-tier workflow
 5fbe31c fix(tests): resolve ruff lint warnings in test_analyzer
 ```

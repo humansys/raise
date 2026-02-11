@@ -485,7 +485,7 @@ Async functions must use try-catch with custom errors.
 
 ### Fase 1: MVP (junto con SAR A3)
 
-- [ ] CLI basico: `raise ctx get --task --scope`
+- [ ] CLI basico: `rai ctx get --task --scope`
 - [ ] Scope matching por file patterns
 - [ ] Confidence filtering
 - [ ] Output YAML/JSON

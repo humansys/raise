@@ -25,7 +25,7 @@
 
 ### What would you change about the process?
 - For mechanical bulk operations across many files, a Python script run via Bash is the right tool. Edit tool for 41 files would be impractical.
-- Integration test for `raise init` should use absolute paths exclusively (PAT-204 reinforcement).
+- Integration test for `rai init` should use absolute paths exclusively (PAT-204 reinforcement).
 
 ### Are there improvements for the framework?
 - No framework changes needed. This was a clean removal story.

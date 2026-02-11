@@ -163,7 +163,7 @@ What local Rai does with signals (no network required):
 | session_event | "Research sessions: 90% success. Feature sessions: 60%. What's different?" |
 | calibration | "Your S estimates are consistently 2x off — consider adjusting mental model" |
 | error_event | "You've hit 'pytest not found' 5 times — add to your shell profile?" |
-| command_usage | "You never use `raise context query` — it could help with understanding relationships" |
+| command_usage | "You never use `rai context query` — it could help with understanding relationships" |
 
 **Rai becomes a coach.** Observing patterns, suggesting improvements. Personalized to each user.
 

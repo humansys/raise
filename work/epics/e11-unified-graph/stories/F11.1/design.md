@@ -104,7 +104,7 @@ class UnifiedGraph:
 ## File Structure
 
 ```
-src/raise_cli/context/
+src/rai_cli/context/
 ├── __init__.py          # Module exports
 ├── models.py            # ConceptNode, ConceptEdge, NodeType, EdgeType
 └── graph.py             # UnifiedGraph class
@@ -135,7 +135,7 @@ src/raise_cli/context/
 
 - ADR-019: `dev/decisions/adr-019-unified-context-graph.md`
 - E11 Scope: `dev/epic-e11-scope.md`
-- Existing patterns: `src/raise_cli/governance/graph/models.py`, `src/raise_cli/memory/models.py`
+- Existing patterns: `src/rai_cli/governance/graph/models.py`, `src/rai_cli/memory/models.py`
 
 ---
 

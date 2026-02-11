@@ -27,7 +27,7 @@
 
 ### Are there improvements for the framework?
 - Fixed: 3 skills updated to remove "optional design" language (story-start, story-design, story-plan)
-- Future: Consider a `raise doctor` style check that compares skill descriptions against pattern memory for drift
+- Future: Consider a `rai doctor` style check that compares skill descriptions against pattern memory for drift
 
 ### What are you more capable of now?
 - Composing typed BFS traversals into higher-level helper methods

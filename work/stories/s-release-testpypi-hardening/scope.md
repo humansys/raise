@@ -21,7 +21,7 @@
 
 ## Deferred to Pre-Release Stories
 
-- **S-RENAME:** Command entry point `raise` → `rai`, package `raise-cli` → `rai-cli`
+- **S-RENAME:** Command entry point `rai` → `rai`, package `rai-cli` → `rai-cli`
 - **S-NAMESPACE:** Skill namespace prefix (research needed)
 - **Publish to PyPI** — blocked on S-RENAME
 

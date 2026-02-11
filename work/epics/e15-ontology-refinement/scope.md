@@ -117,7 +117,7 @@ Additionally: parse module doc `constraints` field and create module-specific co
 Expose `edge_types` parameter in `UnifiedQueryEngine.query()`:
 - Add `edge_types: list[EdgeType] | None = None` to `UnifiedQuery` model
 - Pass through to `_concept_lookup()` → `graph.get_neighbors()`
-- Add `--edge-types` CLI option to `raise memory query`
+- Add `--edge-types` CLI option to `rai memory query`
 
 **Implementation:** ~20 lines of code change. The graph-level capability already exists in `UnifiedGraph.get_neighbors()`. This story bridges the gap to the query engine and CLI.
 
@@ -133,9 +133,9 @@ Add convenience methods to `UnifiedQueryEngine`:
 - `get_architectural_context(module_name: str) → ArchitecturalContext` — single-call combining all three
 
 Expose via CLI:
-- `raise memory constraints <module>` — all applicable guardrails and constraints
-- `raise memory domain <module>` — bounded context info
-- `raise memory context <module>` — full architectural context (domain + layer + constraints + dependencies)
+- `rai memory constraints <module>` — all applicable guardrails and constraints
+- `rai memory domain <module>` — bounded context info
+- `rai memory context <module>` — full architectural context (domain + layer + constraints + dependencies)
 
 **Implementation:** New `ArchitecturalContext` Pydantic model. Helper methods use typed BFS (edge_types parameter from Story 4). CLI commands format output via OutputConsole.
 
@@ -148,7 +148,7 @@ Create a reusable "Load Architectural Context" step for design skills. Update `/
 
 ```bash
 # Step 0: Load Architectural Context
-raise memory context <relevant-module>
+rai memory context <relevant-module>
 # Returns: bounded context, layer, constraints, dependencies, guardrails
 ```
 
@@ -207,7 +207,7 @@ See `dev/decisions/adr-023-ontology-graph-extension.md` for full decision record
 - [ ] Bounded context and layer nodes with belongs_to/in_layer edges
 - [ ] Guardrails linked to bounded contexts/layers via constrained_by edges
 - [ ] Query engine exposes edge_types filtering
-- [ ] `raise memory context <module>` returns full architectural context
+- [ ] `rai memory context <module>` returns full architectural context
 - [ ] `/story-design` queries architectural context before designing
 - [ ] Tests pass (>90% coverage)
 - [ ] **Dogfood: design a real story using ontology-guided design step**
@@ -288,11 +288,11 @@ Story 3 (S, 3 SP) ──┬── Story 4 (XS, 2 SP)    ← parallel after Story
 
 | Milestone | Stories | Target | Success Criteria | Demo |
 |-----------|---------|--------|------------------|------|
-| **M1: Architecture in Graph** | S15.1, S15.2 | Day 1 | `raise memory query "ontology" --types bounded_context` returns nodes. 8 BC + 4 layer nodes + belongs_to/in_layer edges | Query bounded contexts and layers |
-| **M2: Constraint-Aware Graph** | +S15.3, S15.4 | Day 1 | `raise memory query mod-memory --strategy concept_lookup --edge-types constrained_by` returns guardrails. ~200 constraint edges | Query constraints for any module |
-| **M3: One-Call Context** | +S15.5 | Day 2 | `raise memory context memory` returns full architectural context (domain, layer, constraints, dependencies) in <100ms | CLI command returns structured context |
+| **M1: Architecture in Graph** | S15.1, S15.2 | Day 1 | `rai memory query "ontology" --types bounded_context` returns nodes. 8 BC + 4 layer nodes + belongs_to/in_layer edges | Query bounded contexts and layers |
+| **M2: Constraint-Aware Graph** | +S15.3, S15.4 | Day 1 | `rai memory query mod-memory --strategy concept_lookup --edge-types constrained_by` returns guardrails. ~200 constraint edges | Query constraints for any module |
+| **M3: One-Call Context** | +S15.5 | Day 2 | `rai memory context memory` returns full architectural context (domain, layer, constraints, dependencies) in <100ms | CLI command returns structured context |
 | **M4: Skills Integration** | +S15.6 | Day 2 | `/story-design` queries architectural context before designing. Dogfood with real story design. | Design a story using ontology-guided context |
-| **M5: Session Protocol** | +S15.7 | Day 3+ | `raise session start` outputs context bundle. Session-state.yaml written/read. Coaching persists. No CLAUDE.local.md dependency. Retro complete. | Full session lifecycle with new protocol |
+| **M5: Session Protocol** | +S15.7 | Day 3+ | `rai session start` outputs context bundle. Session-state.yaml written/read. Coaching persists. No CLAUDE.local.md dependency. Retro complete. | Full session lifecycle with new protocol |
 
 ### Parallel Work Streams
 

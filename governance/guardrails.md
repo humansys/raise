@@ -318,7 +318,7 @@ on_failure:
 ```
 RaiSE architecture separates concerns:
 
-src/raise_cli/
+src/rai_cli/
 ├── engines/       # Stable core logic (kata, gate, skill engines)
 │   ├── kata.py    # Kata execution engine
 │   ├── gate.py    # Gate validation engine
@@ -356,7 +356,7 @@ on_failure:
 When defining data structures in RaiSE:
 - Use Pydantic BaseModel for all schemas
 - Use Pydantic Settings for configuration
-- Define models in src/raise_cli/schemas/
+- Define models in src/rai_cli/schemas/
 - Use Field() for validation and documentation
 - Export models from schemas/__init__.py
 ```
@@ -470,7 +470,7 @@ When designing CLI commands with directory operations:
 - Add `--path PATH` option defaulting to current directory
 - Avoid mocking `Path.cwd()` in tests
 - Tests can pass explicit paths without complex patching
-- Also simplifies scripting: `raise init --path /some/dir`
+- Also simplifies scripting: `rai init --path /some/dir`
 ```
 
 **Verificación:**

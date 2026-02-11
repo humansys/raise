@@ -273,11 +273,11 @@ Instead of LLM auto-generating descriptions:
 
 For F&F, we need:
 
-1. **`raise discover scan`** — Extract symbols using ast-grep
+1. **`rai discover scan`** — Extract symbols using ast-grep
    - Input: Directory path
    - Output: JSON of symbols (file, line, name, kind)
 
-2. **`raise discover build`** — Build component nodes
+2. **`rai discover build`** — Build component nodes
    - Input: Scan output
    - Output: Component nodes in unified graph
 
@@ -286,7 +286,7 @@ For F&F, we need:
    - Human validates and adds descriptions
    - Data saved to graph
 
-4. **`raise context query --type component`** — Query components
+4. **`rai context query --type component`** — Query components
    - Already have query infrastructure from E11
 
 ---

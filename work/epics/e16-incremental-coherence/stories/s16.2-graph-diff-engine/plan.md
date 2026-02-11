@@ -11,7 +11,7 @@
 ### Task 1: Models + Pure diff function
 - **Description:** Create `context/diff.py` with `NodeChange`, `GraphDiff` Pydantic models and `diff_graphs(old, new)` pure function. Compare nodes by `content`, `type`, `metadata` only. Derive `affected_modules` from module-type changes. Classify impact as `none`/`module`/`architectural`. Generate deterministic summary string.
 - **Files:**
-  - Create: `src/raise_cli/context/diff.py`
+  - Create: `src/rai_cli/context/diff.py`
   - Create: `tests/context/test_diff.py`
 - **TDD Cycle:**
   - RED: Tests for added/removed/modified nodes, impact classification, affected_modules derivation, empty graphs, identical graphs
@@ -22,9 +22,9 @@
 - **Dependencies:** None
 
 ### Task 2: CLI integration (`--no-diff` flag + build wiring)
-- **Description:** Modify `raise memory build` to: (1) load old graph before building, (2) diff after build, (3) save diff to `.raise/rai/personal/last-diff.json`, (4) print summary. Add `--no-diff` flag to skip. Update `_format_build_result` or add new output for diff summary.
+- **Description:** Modify `rai memory build` to: (1) load old graph before building, (2) diff after build, (3) save diff to `.raise/rai/personal/last-diff.json`, (4) print summary. Add `--no-diff` flag to skip. Update `_format_build_result` or add new output for diff summary.
 - **Files:**
-  - Modify: `src/raise_cli/cli/commands/memory.py`
+  - Modify: `src/rai_cli/cli/commands/memory.py`
   - Create: `tests/cli/commands/test_memory_build_diff.py`
 - **TDD Cycle:**
   - RED: Test build with diff (mocked builder), test `--no-diff` skips, test first build (no old graph), test diff persisted to correct path
@@ -37,7 +37,7 @@
 ### Task 3: Export from context module
 - **Description:** Add `diff_graphs`, `GraphDiff`, `NodeChange` to `context/__init__.py` `__all__` exports.
 - **Files:**
-  - Modify: `src/raise_cli/context/__init__.py`
+  - Modify: `src/rai_cli/context/__init__.py`
 - **TDD Cycle:** N/A — wiring only
 - **Verification:** `python -c "from raise_cli.context import diff_graphs, GraphDiff, NodeChange"`
 - **Size:** XS
@@ -56,12 +56,12 @@
 - **Dependencies:** Task 1
 
 ### Task 5: Quality gates + manual integration test
-- **Description:** Run full quality suite. Then manually run `raise memory build` twice — once to establish baseline, once after a trivial change — verify diff output and persisted file.
+- **Description:** Run full quality suite. Then manually run `rai memory build` twice — once to establish baseline, once after a trivial change — verify diff output and persisted file.
 - **Verification:**
-  - `uv run ruff check src/raise_cli/context/diff.py`
-  - `uv run pyright src/raise_cli/context/diff.py`
+  - `uv run ruff check src/rai_cli/context/diff.py`
+  - `uv run pyright src/rai_cli/context/diff.py`
   - `uv run pytest tests/context/test_diff.py tests/context/test_diff_integration.py tests/cli/commands/test_memory_build_diff.py --cov=raise_cli.context.diff -v`
-  - Manual: `uv run raise memory build` end-to-end
+  - Manual: `uv run rai memory build` end-to-end
 - **Size:** S
 - **Dependencies:** Tasks 1-4
 

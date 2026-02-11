@@ -20,6 +20,6 @@
 **Done Criteria:**
 - [ ] `constrained_by` edges created between guardrail nodes and bounded context nodes
 - [ ] Graph rebuilt with ~200 constraint edges (per M2 success criteria)
-- [ ] `raise memory query` can traverse constraint edges
+- [ ] `rai memory query` can traverse constraint edges
 - [ ] All tests GREEN (pyright strict + ruff + pytest)
 - [ ] Retrospective complete

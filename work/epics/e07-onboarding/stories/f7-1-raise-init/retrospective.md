@@ -1,4 +1,4 @@
-# Retrospective: F7.1 `raise init` Command
+# Retrospective: F7.1 `rai init` Command
 
 ## Summary
 

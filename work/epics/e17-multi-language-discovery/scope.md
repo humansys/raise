@@ -9,11 +9,11 @@
 
 ## Objective
 
-Extend `raise discover scan` to extract symbols from TypeScript/TSX, PHP, and Svelte codebases, enabling discovery on polyglot repositories.
+Extend `rai discover scan` to extract symbols from TypeScript/TSX, PHP, and Svelte codebases, enabling discovery on polyglot repositories.
 
 **Value proposition:** Unlocks discovery for real customer projects (zambezi-concierge: Python + Laravel PHP + Svelte) that aren't Python-only. Without this, discovery covers ~30% of codebases we need to support. The TypeScript scanner currently misses 84% of files in real Next.js projects (bug report 2026-02-08).
 
-**Success criteria:** `raise discover scan` produces a complete component catalog when run on zambezi-concierge (Python backend + PHP admin + Svelte frontend).
+**Success criteria:** `rai discover scan` produces a complete component catalog when run on zambezi-concierge (Python backend + PHP admin + Svelte frontend).
 
 ---
 
@@ -69,7 +69,7 @@ Extend `raise discover scan` to extract symbols from TypeScript/TSX, PHP, and Sv
 
 ### Epic Complete
 - [ ] All 4 stories complete (S17.1-S17.4)
-- [ ] `raise discover scan` works on zambezi-concierge repo
+- [ ] `rai discover scan` works on zambezi-concierge repo
 - [ ] Existing Python discovery unchanged (regression tests pass)
 - [ ] Epic retrospective completed
 - [ ] Merged to v2
@@ -141,7 +141,7 @@ Bug report from portal-pmo-v2 discovery (2026-02-08) + zambezi-concierge demo ne
 | Milestone | Stories | Target | Success Criteria |
 |-----------|---------|--------|------------------|
 | **M1: TS/TSX Fixed** | S17.1 | Tonight | .tsx scanned, enum/const/type extracted, Python regression pass |
-| **M2: Demo Ready** | S17.1-3 | Tonight/tomorrow AM | `raise discover scan` on zambezi-concierge produces symbols from all 3 stacks |
+| **M2: Demo Ready** | S17.1-3 | Tonight/tomorrow AM | `rai discover scan` on zambezi-concierge produces symbols from all 3 stacks |
 | **M3: Epic Complete** | All 4 | Post-demo | Analyzer polished, retro done, merged to v2 |
 
 ### Parallel Opportunities

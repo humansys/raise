@@ -1,6 +1,6 @@
 ---
 type: architecture_context
-project: raise-cli
+project: rai-cli
 version: 2.0.0-alpha
 status: current
 tech_stack:
@@ -30,17 +30,17 @@ governed_by:
 
 # System Context
 
-> C4 Level 1 — What is raise-cli, who uses it, how does it fit in the world?
+> C4 Level 1 — What is rai-cli, who uses it, how does it fit in the world?
 
-## What Is raise-cli
+## What Is rai-cli
 
-raise-cli is the **deterministic toolkit** of the RaiSE framework. It provides CLI commands that extract, structure, query, and validate project knowledge — governance documents, codebase structure, developer memory, and architectural decisions.
+rai-cli is the **deterministic toolkit** of the RaiSE framework. It provides CLI commands that extract, structure, query, and validate project knowledge — governance documents, codebase structure, developer memory, and architectural decisions.
 
 It is **not** a code generator, not an AI agent, and not an IDE plugin. It is the tooling layer that makes AI-assisted software engineering **reliable and observable**.
 
 ## The RaiSE Triad
 
-raise-cli exists within a three-part collaboration model:
+rai-cli exists within a three-part collaboration model:
 
 ```
         RaiSE Engineer
@@ -50,30 +50,30 @@ raise-cli exists within a three-part collaboration model:
               ▼
            Rai
    (AI Partner — Execution, Memory, Patterns)
-   Reads skills, calls raise-cli, synthesizes
+   Reads skills, calls rai-cli, synthesizes
               │
               │ governed by
               ▼
         RaiSE Toolkit
-   raise-cli + Skills + Governance artifacts
+   rai-cli + Skills + Governance artifacts
    Deterministic, Observable, Git-native
 ```
 
-**The human** defines what to build and makes judgment calls. **Rai** (AI partner) executes skills, calls CLI tools, and maintains continuity across sessions. **raise-cli** provides the deterministic operations that Rai calls — no AI inference happens inside the CLI itself.
+**The human** defines what to build and makes judgment calls. **Rai** (AI partner) executes skills, calls CLI tools, and maintains continuity across sessions. **rai-cli** provides the deterministic operations that Rai calls — no AI inference happens inside the CLI itself.
 
 ## Who Uses It
 
-| Actor | How They Use raise-cli | Example |
+| Actor | How They Use rai-cli | Example |
 |-------|----------------------|---------|
-| **RaiSE Engineer** | Directly via terminal or indirectly through Rai | `raise init`, `raise memory query` |
-| **Rai (AI Partner)** | Called from skills during collaborative sessions | Rai reads `/session-start` skill, calls `raise session start` |
-| **CI/CD pipelines** | Drift detection, governance validation (future) | `raise discover drift` in pre-merge hook |
+| **RaiSE Engineer** | Directly via terminal or indirectly through Rai | `rai init`, `rai memory query` |
+| **Rai (AI Partner)** | Called from skills during collaborative sessions | Rai reads `/session-start` skill, calls `rai session start` |
+| **CI/CD pipelines** | Drift detection, governance validation (future) | `rai discover drift` in pre-merge hook |
 
 ## External Systems
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                     raise-cli boundary                        │
+│                     rai-cli boundary                        │
 │                                                               │
 │  Governance ←→ Concept Graph ←→ Memory ←→ Discovery          │
 │                                                               │
@@ -90,21 +90,21 @@ raise-cli exists within a three-part collaboration model:
 - **Git** — All governance artifacts, memory files, and architecture docs live in Git. Git is the transport and the source of truth. Platform-agnostic (GitHub, GitLab, Bitbucket — any Git host).
 - **Python AST** — Used by the discovery module to extract symbols (classes, functions, constants) from Python source files. No external dependency — stdlib `ast` module.
 - **ripgrep / ast-grep** — Called as shell subprocesses for fast content search and AST pattern matching. Optional — graceful degradation if not installed.
-- **AI inference provider** — raise-cli does NOT call any AI API. Rai (the AI partner) runs on Claude Code, Cursor, or any capable LLM. The CLI is inference-free by design.
+- **AI inference provider** — rai-cli does NOT call any AI API. Rai (the AI partner) runs on Claude Code, Cursor, or any capable LLM. The CLI is inference-free by design.
 
-## What raise-cli Does
+## What rai-cli Does
 
 | Domain | Commands | What It Provides |
 |--------|----------|-----------------|
-| **Governance** | `raise context` | Extracts concepts from Markdown governance docs into a queryable graph |
-| **Memory** | `raise memory build/query` | Builds unified knowledge graph with code-aware nodes, answers questions from it |
-| **Discovery** | `raise discover scan/analyze/drift` | Scans codebase for components, detects architectural drift |
-| **Onboarding** | `raise init`, `raise profile` | Bootstraps projects, manages developer profiles |
-| **Telemetry** | `raise telemetry emit` | Records local JSONL signals for process improvement |
-| **Session** | `raise session start` | Tracks session lifecycle for continuity |
-| **Skills** | `raise skill list/show` | Locates and displays process guide skills |
+| **Governance** | `rai context` | Extracts concepts from Markdown governance docs into a queryable graph |
+| **Memory** | `rai memory build/query` | Builds unified knowledge graph with code-aware nodes, answers questions from it |
+| **Discovery** | `rai discover scan/analyze/drift` | Scans codebase for components, detects architectural drift |
+| **Onboarding** | `rai init`, `rai profile` | Bootstraps projects, manages developer profiles |
+| **Telemetry** | `rai telemetry emit` | Records local JSONL signals for process improvement |
+| **Session** | `rai session start` | Tracks session lifecycle for continuity |
+| **Skills** | `rai skill list/show` | Locates and displays process guide skills |
 
-## What raise-cli Does NOT Do
+## What rai-cli Does NOT Do
 
 - **Generate code** — That is Rai's job (the AI partner)
 - **Run AI inference** — All CLI operations are deterministic

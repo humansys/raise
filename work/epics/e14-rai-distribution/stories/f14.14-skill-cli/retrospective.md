@@ -27,7 +27,7 @@
 
 1. **Rich console corrupts JSON output** — `console.print()` adds ANSI codes that break JSON parsing. Use `print()` for machine-readable output.
 2. **Pydantic + pyright strict mode** — `default_factory=list` fails pyright; needs `default_factory=lambda: []` for strict type checking.
-3. **Validation as discovery tool** — Running `raise skill validate` across all skills found pre-existing issues (epic-start missing Context).
+3. **Validation as discovery tool** — Running `rai skill validate` across all skills found pre-existing issues (epic-start missing Context).
 
 ### What would you change about the process?
 
@@ -47,7 +47,7 @@
 ## Improvements Applied
 
 - `/skill-create` skill updated to v2.0.0 with CLI integration
-- CLI Toolkit section in skill-create now includes `raise skill` commands
+- CLI Toolkit section in skill-create now includes `rai skill` commands
 
 ## Action Items
 

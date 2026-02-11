@@ -817,7 +817,7 @@ raise rules validate-graph --expect-hash=sha256:abc123
 
 **Invalidation Logic**:
 1. On CLI startup, check local graph hash against remote (optional, controlled by `--offline` flag)
-2. If stale and not offline, warn user: "Local graph is 3 commits behind. Run `raise rules pull` to update."
+2. If stale and not offline, warn user: "Local graph is 3 commits behind. Run `rai rules pull` to update."
 3. Continue with local graph unless `--require-current` flag is set
 
 ### 4.5 Command Reference
@@ -981,14 +981,14 @@ Each Spec-Kit command triggers a deterministic rule query.
 
 | Command | Phase Activated | Rule Query |
 |---------|-----------------|------------|
-| `/speckit.specify` | discover | `raise rules get --phase=discover --command=specify` |
-| `/speckit.clarify` | discover | `raise rules get --phase=discover --command=clarify` |
-| `/raise.2.vision` | vision | `raise rules get --phase=vision --command=vision` |
-| `/raise.3.ecosystem` | vision | `raise rules get --phase=vision --command=ecosystem` |
-| `/raise.tech-design` | design | `raise rules get --phase=design --command=tech-design` |
-| `/speckit.plan` | plan | `raise rules get --phase=plan --command=plan` |
-| `/speckit.tasks` | plan | `raise rules get --phase=plan --command=tasks` |
-| `/speckit.implement` | implement | `raise rules get --phase=implement --command=implement` |
+| `/speckit.specify` | discover | `rai rules get --phase=discover --command=specify` |
+| `/speckit.clarify` | discover | `rai rules get --phase=discover --command=clarify` |
+| `/raise.2.vision` | vision | `rai rules get --phase=vision --command=vision` |
+| `/raise.3.ecosystem` | vision | `rai rules get --phase=vision --command=ecosystem` |
+| `/raise.tech-design` | design | `rai rules get --phase=design --command=tech-design` |
+| `/speckit.plan` | plan | `rai rules get --phase=plan --command=plan` |
+| `/speckit.tasks` | plan | `rai rules get --phase=plan --command=tasks` |
+| `/speckit.implement` | implement | `rai rules get --phase=implement --command=implement` |
 
 **Injection Point in Command Prompt**:
 
@@ -999,7 +999,7 @@ Commands should load rules at the "Initialize Environment" step:
 
 1. **Initialize Environment**:
    - Run `.specify/scripts/bash/check-prerequisites.sh --json --paths-only`
-   - Load rules: `raise rules get --phase=design --command=tech-design --format=yaml-md`
+   - Load rules: `rai rules get --phase=design --command=tech-design --format=yaml-md`
    - Inject rules into agent context
 ```
 
@@ -1223,7 +1223,7 @@ Developer Query: "What rules apply to security?"
 
 3. **Rule Analytics**: How do we measure which rules are most effective? Usage tracking, violation rates, etc.
 
-4. **Natural Language Interface**: Could we support `raise rules get "security rules for API design"` with NL → query translation? Would this compromise determinism?
+4. **Natural Language Interface**: Could we support `rai rules get "security rules for API design"` with NL → query translation? Would this compromise determinism?
 
 5. **Graph Visualization**: What tooling is needed for understanding large rule graphs? Interactive explorers, dependency diagrams, conflict highlighters.
 
@@ -1440,7 +1440,7 @@ rules:
 
 ## Appendix B: CLI Command Reference
 
-### `raise rules get`
+### `rai rules get`
 
 Retrieve rules for a given context.
 
@@ -1478,7 +1478,7 @@ EXIT CODES:
     6    Circular dependency detected
 ```
 
-### `raise rules deps`
+### `rai rules deps`
 
 Show dependency tree for a rule.
 
@@ -1500,7 +1500,7 @@ EXAMPLES:
     raise rules deps --rule=sec-001 --depth=3 --format=dot | dot -Tpng > deps.png
 ```
 
-### `raise rules conflicts`
+### `rai rules conflicts`
 
 Check for conflicts in a scope.
 
@@ -1523,7 +1523,7 @@ EXAMPLES:
     raise rules conflicts --phase=implement --command=implement --technology=react
 ```
 
-### `raise rules validate`
+### `rai rules validate`
 
 Validate rule integrity.
 
@@ -1545,7 +1545,7 @@ EXAMPLES:
     raise rules validate --rule=sec-001 --check-deps
 ```
 
-### `raise rules graph`
+### `rai rules graph`
 
 Export or inspect the full graph.
 
@@ -1564,7 +1564,7 @@ EXAMPLES:
     raise rules graph --format=dot --filter="phase=design" | dot -Tpng > design-rules.png
 ```
 
-### `raise rules pull`
+### `rai rules pull`
 
 Update local graph from remote.
 
@@ -1584,7 +1584,7 @@ EXAMPLES:
     raise rules pull --dry-run
 ```
 
-### `raise rules info`
+### `rai rules info`
 
 Show graph metadata.
 

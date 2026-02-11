@@ -10,7 +10,7 @@
 
 ## Problem
 
-The `raise discover analyze` command generates component IDs using the pattern `comp-{file_stem}-{name}`, where `file_stem` is the filename without extension. This creates **ID collisions** when different modules have files with the same name.
+The `rai discover analyze` command generates component IDs using the pattern `comp-{file_stem}-{name}`, where `file_stem` is the filename without extension. This creates **ID collisions** when different modules have files with the same name.
 
 **Evidence (SES-121, 2026-02-09):**
 
@@ -35,7 +35,7 @@ Discovery validated 345 components, but only 335 appear in the graph. The 10 mis
 
 ## Root Cause
 
-In `src/raise_cli/discovery/analyzer.py`, the `_generate_id()` function uses only the file stem:
+In `src/rai_cli/discovery/analyzer.py`, the `_generate_id()` function uses only the file stem:
 
 ```python
 # Current: comp-{file_stem}-{symbol_name}
@@ -78,7 +78,7 @@ Change ID generation to include the **parent module path** relative to the packa
 
 - [ ] All 345 validated components appear in the graph (0 silent drops)
 - [ ] Component IDs are unique across the entire discovery catalog
-- [ ] `raise discover analyze` fails if duplicate IDs would be generated
+- [ ] `rai discover analyze` fails if duplicate IDs would be generated
 - [ ] Graph builder warns on component ID collision
 - [ ] All existing tests pass with updated IDs
 - [ ] Quality gates pass (ruff, pyright, pytest >90%)

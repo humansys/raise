@@ -28,14 +28,14 @@ research: "work/research/architecture-knowledge-layer/"
 
 ## 2. Approach
 
-**How we'll solve it**: Add `raise discover describe` command that generates per-module architecture docs in `governance/architecture/`. Each doc uses Markdown + YAML frontmatter — human-readable body with machine-parseable metadata. The frontmatter integrates into the unified graph as new `module` node type with `depends_on` edges.
+**How we'll solve it**: Add `rai discover describe` command that generates per-module architecture docs in `governance/architecture/`. Each doc uses Markdown + YAML frontmatter — human-readable body with machine-parseable metadata. The frontmatter integrates into the unified graph as new `module` node type with `depends_on` edges.
 
 **Components affected**:
-- **`src/raise_cli/discovery/describer.py`**: Create — core generation logic
-- **`src/raise_cli/cli/commands/discover.py`**: Modify — add `describe` subcommand
-- **`src/raise_cli/context/models.py`**: Modify — add `module` to NodeType, `depends_on` to EdgeType
-- **`src/raise_cli/context/builder.py`**: Modify — extract architecture docs into graph
-- **`src/raise_cli/output/formatters/discover.py`**: Modify — add describe formatter
+- **`src/rai_cli/discovery/describer.py`**: Create — core generation logic
+- **`src/rai_cli/cli/commands/discover.py`**: Modify — add `describe` subcommand
+- **`src/rai_cli/context/models.py`**: Modify — add `module` to NodeType, `depends_on` to EdgeType
+- **`src/rai_cli/context/builder.py`**: Modify — extract architecture docs into graph
+- **`src/rai_cli/output/formatters/discover.py`**: Modify — add describe formatter
 - **`governance/architecture/`**: Create — output directory for generated docs
 - **`.claude/skills/discover-describe/`**: Create — skill orchestration
 - **Jinja2 template**: Create — module doc template
@@ -48,19 +48,19 @@ research: "work/research/architecture-knowledge-layer/"
 
 ```bash
 # Generate architecture docs for all modules
-raise discover describe
+rai discover describe
 
 # Generate for specific module(s)
-raise discover describe --module discovery --module context
+rai discover describe --module discovery --module context
 
 # Generate compact index only (for quick context loading)
-raise discover describe --index-only
+rai discover describe --index-only
 
 # Specify output directory (default: governance/architecture/)
-raise discover describe --output-dir governance/architecture/
+rai discover describe --output-dir governance/architecture/
 
 # JSON output for programmatic consumption
-raise discover describe --output json
+rai discover describe --output json
 ```
 
 ### Expected Output (Human)
@@ -220,7 +220,7 @@ Patterns/sessions → JSONL → memory loader → graph
                                               ↓
                                         unified graph
                                               ↓
-                                     raise memory query
+                                     rai memory query
 ```
 
 ## Constraints
@@ -264,8 +264,8 @@ class DescribeResult(BaseModel):
 
 ### Must Have
 
-- [ ] `raise discover describe` generates `governance/architecture/index.md`
-- [ ] `raise discover describe` generates per-module docs in `governance/architecture/modules/`
+- [ ] `rai discover describe` generates `governance/architecture/index.md`
+- [ ] `rai discover describe` generates per-module docs in `governance/architecture/modules/`
 - [ ] YAML frontmatter is valid and parseable (type, name, purpose, depends_on, depended_by, entry_points, public_api, constraints)
 - [ ] `module` added to NodeType in context/models.py; `depends_on` added to EdgeType
 - [ ] Graph builder extracts architecture docs into graph as `module` nodes with `depends_on` edges
@@ -295,7 +295,7 @@ class DescribeResult(BaseModel):
 ```gherkin
 Given a project with components-validated.json (309 components)
 And no existing governance/architecture/ directory
-When I run `raise discover describe`
+When I run `rai discover describe`
 Then governance/architecture/index.md is created
 And governance/architecture/modules/*.md are created (one per module)
 And each module doc has valid YAML frontmatter
@@ -307,7 +307,7 @@ And the compact index is under 2K tokens
 ```gherkin
 Given existing governance/architecture/modules/discovery.md
 And the human has added a "## Design Rationale" section
-When I run `raise discover describe`
+When I run `rai discover describe`
 Then the YAML frontmatter is updated with current data
 And the auto-generated sections are refreshed
 And the human-authored "## Design Rationale" section is preserved
@@ -317,10 +317,10 @@ And the human-authored "## Design Rationale" section is preserved
 
 ```gherkin
 Given governance/architecture/ docs exist with YAML frontmatter
-When I run `raise memory build`
+When I run `rai memory build`
 Then the unified graph contains `module` nodes for each documented module
 And `depends_on` edges connect modules per their frontmatter
-And `raise memory query "discovery dependencies"` returns module relationships
+And `rai memory query "discovery dependencies"` returns module relationships
 ```
 
 </details>
@@ -337,7 +337,7 @@ def detect_modules(project_root: Path) -> list[ModuleDescription]:
     """Detect modules from source tree and extract dependencies.
 
     Strategy:
-    1. Walk src/raise_cli/ — each subdirectory with __init__.py = module
+    1. Walk src/rai_cli/ — each subdirectory with __init__.py = module
     2. For each module, collect components from components-validated.json
     3. Extract imports between modules (deterministic AST or grep)
     4. Derive entry_points from CLI commands that import the module

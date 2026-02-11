@@ -12,7 +12,7 @@
 ### Task 1: Create Convention Schemas
 - **Description:** Define Pydantic models for all convention types (Confidence, IndentationConvention, NamingConvention, etc.) and the ConventionResult container.
 - **Files:**
-  - Create `src/raise_cli/onboarding/conventions.py` (schemas section)
+  - Create `src/rai_cli/onboarding/conventions.py` (schemas section)
 - **TDD Cycle:**
   - RED: Write test that imports and instantiates ConventionResult with sample data
   - GREEN: Implement all Pydantic models from design spec
@@ -24,7 +24,7 @@
 ### Task 2: Implement Confidence Calculation
 - **Description:** Implement `calculate_confidence()` function with the sample-size aware logic (<5 = LOW, 5-10 = cap MEDIUM, >10 = ratio-based).
 - **Files:**
-  - `src/raise_cli/onboarding/conventions.py`
+  - `src/rai_cli/onboarding/conventions.py`
 - **TDD Cycle:**
   - RED: Write tests for edge cases (<5 samples, exactly 5, 10, 11, various ratios)
   - GREEN: Implement confidence calculation per design algorithm
@@ -36,7 +36,7 @@
 ### Task 3: Implement Style Detection
 - **Description:** Implement detection for indentation (spaces/tabs, width), quote style (single/double), and line length (80th percentile).
 - **Files:**
-  - `src/raise_cli/onboarding/conventions.py`
+  - `src/rai_cli/onboarding/conventions.py`
 - **TDD Cycle:**
   - RED: Write tests with fixture files (consistent 4-space, mixed indent, etc.)
   - GREEN: Implement `detect_indentation()`, `detect_quotes()`, `detect_line_length()`
@@ -48,7 +48,7 @@
 ### Task 4: Implement Naming Detection
 - **Description:** Implement detection for function, class, and constant naming patterns using regex extraction.
 - **Files:**
-  - `src/raise_cli/onboarding/conventions.py`
+  - `src/rai_cli/onboarding/conventions.py`
 - **TDD Cycle:**
   - RED: Write tests for snake_case functions, PascalCase classes, UPPER_SNAKE constants
   - GREEN: Implement `classify_name()`, `detect_naming_conventions()`
@@ -60,7 +60,7 @@
 ### Task 5: Implement Structure Detection
 - **Description:** Detect project structure conventions (source_dir, test_dir, has_src_layout, common_patterns).
 - **Files:**
-  - `src/raise_cli/onboarding/conventions.py`
+  - `src/rai_cli/onboarding/conventions.py`
 - **TDD Cycle:**
   - RED: Write tests for src-layout project, flat project, various test directories
   - GREEN: Implement `detect_structure()`
@@ -72,8 +72,8 @@
 ### Task 6: Integrate into detect_conventions()
 - **Description:** Create main `detect_conventions()` function that orchestrates all detectors and calculates overall confidence.
 - **Files:**
-  - `src/raise_cli/onboarding/conventions.py`
-  - Update `src/raise_cli/onboarding/__init__.py` exports
+  - `src/rai_cli/onboarding/conventions.py`
+  - Update `src/rai_cli/onboarding/__init__.py` exports
 - **TDD Cycle:**
   - RED: Write integration test calling detect_conventions() on fixture project
   - GREEN: Wire up all detectors, implement overall_confidence calculation

@@ -25,9 +25,9 @@
 - **Completed:** 2026-02-03
 - **Duration:** ~10 min
 - **Files:**
-  - `src/raise_cli/cli/commands/telemetry.py` (new)
-  - `src/raise_cli/cli/main.py` (modified)
-- **Notes:** `raise telemetry emit-session` — portable solution
+  - `src/rai_cli/cli/commands/telemetry.py` (new)
+  - `src/rai_cli/cli/main.py` (modified)
+- **Notes:** `rai telemetry emit-session` — portable solution
 
 ### Task 4: Skill integration
 - **Completed:** 2026-02-03
@@ -40,9 +40,9 @@
 - **Completed:** 2026-02-03
 - **Duration:** ~5 min
 - **Files:**
-  - `src/raise_cli/cli/commands/telemetry.py` (extended)
+  - `src/rai_cli/cli/commands/telemetry.py` (extended)
   - `.claude/skills/story-review/SKILL.md` (modified)
-- **Notes:** Added `raise telemetry emit-calibration` + Step 6 in story-review
+- **Notes:** Added `rai telemetry emit-calibration` + Step 6 in story-review
 
 ## Blockers
 - None

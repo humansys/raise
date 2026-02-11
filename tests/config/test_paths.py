@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.config.paths import (
+from rai_cli.config.paths import (
     ensure_global_rai_dir,
     get_cache_dir,
     get_config_dir,
@@ -25,7 +25,7 @@ class TestGetConfigDir:
         """Should return ~/.config/raise when XDG_CONFIG_HOME not set."""
         monkeypatch.delenv("XDG_CONFIG_HOME", raising=False)
         result = get_config_dir()
-        expected = Path.home() / ".config" / "raise"
+        expected = Path.home() / ".config" / "rai"
         assert result == expected
 
     def test_xdg_config_home_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -33,7 +33,7 @@ class TestGetConfigDir:
         custom_config = "/custom/config"
         monkeypatch.setenv("XDG_CONFIG_HOME", custom_config)
         result = get_config_dir()
-        expected = Path(custom_config) / "raise"
+        expected = Path(custom_config) / "rai"
         assert result == expected
 
     def test_returns_path_object(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -50,7 +50,7 @@ class TestGetCacheDir:
         """Should return ~/.cache/raise when XDG_CACHE_HOME not set."""
         monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
         result = get_cache_dir()
-        expected = Path.home() / ".cache" / "raise"
+        expected = Path.home() / ".cache" / "rai"
         assert result == expected
 
     def test_xdg_cache_home_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -58,7 +58,7 @@ class TestGetCacheDir:
         custom_cache = "/custom/cache"
         monkeypatch.setenv("XDG_CACHE_HOME", custom_cache)
         result = get_cache_dir()
-        expected = Path(custom_cache) / "raise"
+        expected = Path(custom_cache) / "rai"
         assert result == expected
 
     def test_returns_path_object(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -75,7 +75,7 @@ class TestGetDataDir:
         """Should return ~/.local/share/raise when XDG_DATA_HOME not set."""
         monkeypatch.delenv("XDG_DATA_HOME", raising=False)
         result = get_data_dir()
-        expected = Path.home() / ".local" / "share" / "raise"
+        expected = Path.home() / ".local" / "share" / "rai"
         assert result == expected
 
     def test_xdg_data_home_override(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -83,7 +83,7 @@ class TestGetDataDir:
         custom_data = "/custom/data"
         monkeypatch.setenv("XDG_DATA_HOME", custom_data)
         result = get_data_dir()
-        expected = Path(custom_data) / "raise"
+        expected = Path(custom_data) / "rai"
         assert result == expected
 
     def test_returns_path_object(self, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -257,7 +257,7 @@ class TestGetClaudeMemoryPath:
 
     def test_transforms_path_correctly(self) -> None:
         """Should replace / with - and prepend - for Claude Code convention."""
-        from raise_cli.config.paths import get_claude_memory_path
+        from rai_cli.config.paths import get_claude_memory_path
 
         project_root = Path("/home/user/Code/my-project")
         result = get_claude_memory_path(project_root)
@@ -274,7 +274,7 @@ class TestGetClaudeMemoryPath:
 
     def test_handles_root_path(self) -> None:
         """Should handle simple root-level paths."""
-        from raise_cli.config.paths import get_claude_memory_path
+        from rai_cli.config.paths import get_claude_memory_path
 
         project_root = Path("/myproject")
         result = get_claude_memory_path(project_root)
@@ -291,14 +291,14 @@ class TestGetClaudeMemoryPath:
 
     def test_returns_path_object(self) -> None:
         """Should return a Path object."""
-        from raise_cli.config.paths import get_claude_memory_path
+        from rai_cli.config.paths import get_claude_memory_path
 
         result = get_claude_memory_path(Path("/some/project"))
         assert isinstance(result, Path)
 
     def test_ends_with_memory_md(self) -> None:
         """Should always end with memory/MEMORY.md."""
-        from raise_cli.config.paths import get_claude_memory_path
+        from rai_cli.config.paths import get_claude_memory_path
 
         result = get_claude_memory_path(Path("/any/path"))
         assert result.name == "MEMORY.md"
@@ -306,7 +306,7 @@ class TestGetClaudeMemoryPath:
 
     def test_handles_windows_backslashes(self) -> None:
         """Should normalize Windows backslashes to dashes."""
-        from raise_cli.config.paths import get_claude_memory_path
+        from rai_cli.config.paths import get_claude_memory_path
 
         # Simulate a Windows-style path string
         project_root = Path("/C:/Users/emilio/Code/my-project")
@@ -319,7 +319,7 @@ class TestGetClaudeMemoryPath:
 
     def test_handles_windows_drive_letter(self) -> None:
         """Should strip drive letter colon for Windows paths."""
-        from raise_cli.config.paths import get_claude_memory_path
+        from rai_cli.config.paths import get_claude_memory_path
 
         # On Linux, we can't create a real Windows Path, but we can
         # test the string manipulation by passing a path-like string.

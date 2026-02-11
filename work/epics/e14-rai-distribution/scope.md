@@ -22,7 +22,7 @@ Enable new users to experience Rai as a knowledgeable partner from day one, with
 ```
 F&F (this epic):
   raise-cli package bundles base Rai
-  raise init → copies bundled base to .raise/rai/
+  rai init → copies bundled base to .raise/rai/
 
 Post-F&F:
   ~/.rai/config.yaml can specify base_source: <git-url>
@@ -52,10 +52,10 @@ V3:
 | F14.1 | Base Identity Package | S | 2 | ✅ Done | Bundle core.md + perspective.md in package |
 | F14.2 | Base Patterns Catalog | M | 3 | ✅ Done | Define ~20 universal methodology patterns |
 | F14.3 | Methodology Core | S | 2 | ✅ Done | methodology.yaml with skills, gates, rules |
-| F14.4 | Bootstrap on Init | M | 3 | ✅ Done | Copy bundled base to .raise/rai/ during raise init |
+| F14.4 | Bootstrap on Init | M | 3 | ✅ Done | Copy bundled base to .raise/rai/ during rai init |
 | F14.5 | Two-Part MEMORY.md | M | 3 | ✅ Done | Generate MEMORY.md with static process + dynamic context |
 | F14.6 | Pattern Versioning | S | 2 | ✅ Done | Add base/version fields to pattern schema |
-| F14.7 | Base Show Command | XS | 1 | ✅ Done | `raise base show` displays current base info |
+| F14.7 | Base Show Command | XS | 1 | ✅ Done | `rai base show` displays current base info |
 | F14.15 | Multi-Developer Architecture | L | 5 | ✅ Done | Separate personal data from shared project data |
 
 **Total F&F:** 8 features, 19 SP
@@ -66,7 +66,7 @@ V3:
 |----|---------|:----:|-------------|
 | F14.8 | Config Support | S | `~/.rai/config.yaml` with base_source setting |
 | F14.9 | Git Source Resolution | M | Clone/pull from git URL when configured |
-| F14.10 | Base Update Command | S | `raise base update` pulls latest + applies |
+| F14.10 | Base Update Command | S | `rai base update` pulls latest + applies |
 | F14.11 | Update Detection | S | Detect version mismatch on session-start |
 
 ---
@@ -74,13 +74,13 @@ V3:
 ## In Scope (F&F)
 
 **MUST:**
-- Base identity files (core.md, perspective.md) bundled in `src/raise_cli/rai_base/`
+- Base identity files (core.md, perspective.md) bundled in `src/rai_cli/rai_base/`
 - Universal methodology patterns (~20 base patterns) in JSONL
 - methodology.yaml with skills list, gates, process rules
-- Bootstrap flow in `raise init` copies bundled base to `.raise/rai/`
+- Bootstrap flow in `rai init` copies bundled base to `.raise/rai/`
 - Two-part MEMORY.md generation (static process + dynamic context)
 - Pattern versioning schema (base: true, version: N)
-- `raise base show` command
+- `rai base show` command
 - Legacy file cleanup (graph.json, migration artifacts)
 
 **SHOULD:**
@@ -95,7 +95,7 @@ V3:
 | Item | Rationale |
 |------|-----------|
 | Git-based corporate base source | Adds complexity, not needed for F&F users |
-| `raise base update` command | Requires git source support |
+| `rai base update` command | Requires git source support |
 | `~/.rai/config.yaml` | Only needed for base_source override |
 | Update detection on session-start | Nice-to-have, not blocking |
 
@@ -114,7 +114,7 @@ V3:
 ## Package Structure
 
 ```
-src/raise_cli/rai_base/
+src/rai_cli/rai_base/
 ├── identity/
 │   ├── core.md           # Rai's values, boundaries, essence
 │   └── perspective.md    # How Rai approaches collaboration
@@ -196,10 +196,10 @@ raise init
 
 ### Epic Complete (F&F)
 - [ ] All 8 F&F features complete
-- [ ] `raise init` creates `.raise/rai/` with base identity + patterns
+- [ ] `rai init` creates `.raise/rai/` with base identity + patterns
 - [ ] Two-part MEMORY.md generated (process + context)
 - [ ] Pattern versioning schema working (base: true)
-- [ ] `raise base show` displays base info
+- [ ] `rai base show` displays base info
 - [ ] Legacy files cleaned up (graph.json, migration artifacts)
 - [ ] New user simulation test passes
 - [ ] Epic retrospective completed (`/epic-close`)
@@ -232,8 +232,8 @@ F14.3 (Methodology)┘         │
 | Milestone | Features | Target | Success Criteria |
 |-----------|----------|--------|------------------|
 | **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1-2 | Identity + patterns + methodology created |
-| **M2: Bootstrap** | F14.4, F14.5 | Day 2-3 | `raise init` creates full .raise/rai/ + MEMORY.md |
-| **M3: CLI** | F14.6, F14.7 | Day 3-4 | Versioning schema + `raise base show` |
+| **M2: Bootstrap** | F14.4, F14.5 | Day 2-3 | `rai init` creates full .raise/rai/ + MEMORY.md |
+| **M3: CLI** | F14.6, F14.7 | Day 3-4 | Versioning schema + `rai base show` |
 | **M4: Validation** | — | Day 4 | New user simulation passes |
 
 ---
@@ -325,8 +325,8 @@ V3: Corporate documentation + team overrides
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
 | **M0: Multi-Dev** | F14.15 | Day 1 | Personal data separated from shared | No merge conflicts on sessions |
-| **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1-2 | All content in `src/raise_cli/rai_base/` | Files exist, valid format |
-| **M2: Bootstrap** | F14.4 | Day 2-3 | `raise init` copies base to `.raise/rai/` | Init creates identity + patterns |
+| **M1: Base Assets** | F14.1, F14.2, F14.3 | Day 1-2 | All content in `src/rai_cli/rai_base/` | Files exist, valid format |
+| **M2: Bootstrap** | F14.4 | Day 2-3 | `rai init` copies base to `.raise/rai/` | Init creates identity + patterns |
 | **M3: MEMORY.md** | F14.5, F14.6 | Day 3 | Auto-generated with skills/gates | MEMORY.md has full process |
 | **M4: Complete** | F14.7 + validation | Day 4 | New user simulation passes | Full flow demo |
 
@@ -419,7 +419,7 @@ Buffer for fixes
 
 ```bash
 # Confirm index.json is working
-uv run raise memory query "test" --limit 1
+uv run rai memory query "test" --limit 1
 
 # Then remove legacy files
 rm .raise/rai/memory/graph.json
@@ -507,8 +507,8 @@ Returns: [{content: "...", source: "global"}, {content: "...", source: "project"
 - [ ] Add `.raise/rai/memory/sessions/` to `.gitignore`
 - [ ] Add `.raise/rai/telemetry/` to `.gitignore`
 - [ ] Migration: move existing personal data on first access
-- [ ] Update `raise session` commands to use personal paths
-- [ ] Update `raise memory emit-*` to use personal paths
+- [ ] Update `rai session` commands to use personal paths
+- [ ] Update `rai memory emit-*` to use personal paths
 - [ ] Update context builder to load from personal paths
 
 **SHOULD:**
@@ -550,8 +550,8 @@ On first access to personal data:
 - [ ] Personal data written to `~/.rai/projects/{hash}/`
 - [ ] Personal paths gitignored
 - [ ] Existing data migrated on first access
-- [ ] `raise session start` works with new paths
-- [ ] `raise memory emit-*` works with new paths
+- [ ] `rai session start` works with new paths
+- [ ] `rai memory emit-*` works with new paths
 - [ ] Tests for migration and new paths
 - [ ] No merge conflicts on sessions/telemetry in multi-dev scenario
 
@@ -617,11 +617,11 @@ MEMORY.md has two distinct sections:
 
 ### Generation Logic
 
-**Part 1 (Static):** Generated once during `raise init`, updated on `raise base update` (post-F&F)
+**Part 1 (Static):** Generated once during `rai init`, updated on `rai base update` (post-F&F)
 
 **Part 2 (Dynamic):** Regenerated on:
-- `raise memory build` (explicit)
-- `raise session start` (optional flag: `--refresh-memory`)
+- `rai memory build` (explicit)
+- `rai session start` (optional flag: `--refresh-memory`)
 - When stale (>24h since last update)
 
 ### In Scope
@@ -631,10 +631,10 @@ MEMORY.md has two distinct sections:
 - [ ] Query project state for Part 2 (epic, patterns, deadlines from CLAUDE.local.md)
 - [ ] Generate to `~/.claude/projects/{hash}/memory/MEMORY.md`
 - [ ] Preserve user edits in designated "custom" section (if present)
-- [ ] Add `raise memory generate` command (explicit generation)
+- [ ] Add `rai memory generate` command (explicit generation)
 
 **SHOULD:**
-- [ ] Auto-refresh on `raise session start`
+- [ ] Auto-refresh on `rai session start`
 
 ### Out of Scope
 
@@ -651,8 +651,8 @@ MEMORY.md has two distinct sections:
 
 ### Done Criteria
 
-- [ ] `raise init` generates two-part MEMORY.md
-- [ ] `raise memory generate` regenerates from current state
+- [ ] `rai init` generates two-part MEMORY.md
+- [ ] `rai memory generate` regenerates from current state
 - [ ] Part 1 matches methodology.yaml content
 - [ ] Part 2 reflects current epic/patterns
 - [ ] Tests for generation logic

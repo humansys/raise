@@ -8,11 +8,11 @@
 
 ## Pre-Release (before first PyPI publish)
 
-- [ ] **S-RENAME: Command entry point `raise` → `rai`, package `raise-cli` → `rai-cli`**
+- [ ] **S-RENAME: Command entry point `rai` → `rai`, package `rai-cli` → `rai-cli`**
   - **Why now:** Zero installed users. After publish, this becomes a breaking change.
   - **Blast radius:** ~430 references across skills (123 in skills_base, 148 in .claude/skills), Python source (119), tests (42), README, CLAUDE.md, governance docs
   - **Nature:** Mechanical find-replace. No logic changes. Test suite catches breakage.
-  - **Changes:** pyproject.toml (name + entry point), all `raise discover` → `rai discover`, `raise memory` → `rai memory`, `raise session` → `rai session`, `raise init` → `rai init`, etc.
+  - **Changes:** pyproject.toml (name + entry point), all `rai discover` → `rai discover`, `rai memory` → `rai memory`, `rai session` → `rai session`, `rai init` → `rai init`, etc.
   - **Rationale:** `rai` = the partner's name, 3 chars vs 5, no Python keyword collision, "I asked Rai to scan" is natural speech
   - **Size:** S (mechanical, ~30 min)
   - **Blocks:** PyPI publish
@@ -34,8 +34,8 @@
   - **Root cause:** Two validation layers disagree. CLI `valid_phases` list (memory.py:1396) includes `'init'` but `WorkLifecycle.phase` Pydantic Literal (schemas.py:267) only allows `['design', 'plan', 'implement', 'review']`. CLI pre-validation passes, Pydantic construction crashes.
   - **Missing phases:** `init` (needed by `/epic-start`, `/story-start`), `close` (needed by `/story-close`, `/epic-close`)
   - **Locations:**
-    - Schema: `src/raise_cli/telemetry/schemas.py:267` — `phase: Literal["design", "plan", "implement", "review"]`
-    - CLI validator: `src/raise_cli/cli/commands/memory.py:1396` — `valid_phases` list
+    - Schema: `src/rai_cli/telemetry/schemas.py:267` — `phase: Literal["design", "plan", "implement", "review"]`
+    - CLI validator: `src/rai_cli/cli/commands/memory.py:1396` — `valid_phases` list
   - **Fix:** Add `'init'` and `'close'` to the Pydantic Literal in `WorkLifecycle.phase`, and ensure CLI `valid_phases` matches exactly. Single source of truth: the Pydantic model should define valid phases, CLI should read from it.
   - **Workaround:** Use `--phase design` for init events, `--phase review` for close events
   - **Frequency:** Hits on every `/epic-start`, `/story-start`, `/story-close`, `/epic-close` — 4x per story cycle
@@ -88,7 +88,7 @@
   - **What:** Add `mkdocs.yml`, publish `framework/` + `governance/` as doc site
   - **Sizing:** S-sized story (config + CI only, no code changes)
   - **Priority:** Post-F&F, pre-public launch (Feb 15)
-  - **Related:** `raise discover describe` generates the content; MkDocs publishes it
+  - **Related:** `rai discover describe` generates the content; MkDocs publishes it
 
 - [ ] **Formalize branchless epic pattern in branch model docs** — (SES-128, 2026-02-09)
   - **Context:** BF-1 validated that bugfix stories can branch directly off v2 without an epic branch. Epic serves as tracking label only.
@@ -98,11 +98,11 @@
 ### Framework Improvements
 
 - [ ] **Drift detector calibration — reduce false positives** — (SES-118, 2026-02-08)
-  - **Problem:** `raise discover drift` produces 383 warnings on raise-commons, nearly all false positives. Location drift flags correctly-placed files (`cli/commands/`, root-level `__main__.py`, `exceptions.py`). Naming drift suggests `emit_` prefix for standard functions (`main`, `start`, `close`).
+  - **Problem:** `rai discover drift` produces 383 warnings on raise-commons, nearly all false positives. Location drift flags correctly-placed files (`cli/commands/`, root-level `__main__.py`, `exceptions.py`). Naming drift suggests `emit_` prefix for standard functions (`main`, `start`, `close`).
   - **Evidence:** 367 warnings, 16 info — near-zero actionable. Signal-to-noise ratio makes the tool unusable for real drift detection.
   - **What:** Calibrate directory expectations to include standard Python patterns (root files, `cli/commands/`). Add allowlists or severity filtering. Consider making baseline patterns richer during `discover-validate`.
   - **Priority:** Post-F&F, medium — the concept is sound but needs tuning to be useful
-  - **Related:** `raise doctor` (coherence audit), PAT-196 (architecture docs as map)
+  - **Related:** `rai doctor` (coherence audit), PAT-196 (architecture docs as map)
 
 - [ ] **Remove "Unified" prefix from graph classes** — (SES-096, 2026-02-08)
   - **Problem:** `UnifiedGraph`, `UnifiedQueryEngine`, `UnifiedQuery`, etc. — 7 classes carry "Unified" prefix that distinguishes nothing. Vestige from when separate graphs existed.
@@ -130,7 +130,7 @@
 - [ ] **Stale terminology grep as rename gate** — (Ishikawa analysis, 2026-02-06)
   - S14.16 declared complete with 21 files still containing "feature" remnants (PAT-151)
   - **Countermeasure:** Add `grep -ri "<old_term>"` as mandatory final gate for rename stories
-  - Consider: automated `raise lint terms` command that checks against glossary
+  - Consider: automated `rai lint terms` command that checks against glossary
 
 - [ ] **Add graph-rebuild to /story-close when Pydantic models change** — (S14.16 retro, 2026-02-06)
   - Schema Literal changes invalidate cached unified graph (PAT-152)
@@ -176,7 +176,7 @@
 > Items explicitly deferred from E7 scope (ADR-021).
 
 - [ ] **Team memory** — V3 scope, see E10 Collective Intelligence
-- [ ] **`raise doctor` command** — Cognitive architecture coherence audit
+- [ ] **`rai doctor` command** — Cognitive architecture coherence audit
 - [ ] **Full ~/.rai/ expansion** — YAGNI for F&F, start with developer.yaml only
 - [ ] **Multi-language convention detection** — Python first, TypeScript/JS later
 - [ ] **Auto-progress Shu→Ha→Ri** — Experience level progression (manual for now)
@@ -213,10 +213,10 @@
 ### Graph Health & Context Caring — Parking Lot (2026-02-10)
 
 - [ ] **Lifecycle-aware graph health contract** — (SES-134, 2026-02-10)
-  - **Context:** BF-2 exposed that graph completeness is invisible. `raise memory validate` checks structural integrity but not semantic completeness. Neither user nor Rai can detect absent node types.
-  - **Vision:** Declarative invariants per lifecycle phase (post-init, post-onboard, post-discovery). Dedicated `raise memory health` command. Session-start integration so Rai sees gaps.
+  - **Context:** BF-2 exposed that graph completeness is invisible. `rai memory validate` checks structural integrity but not semantic completeness. Neither user nor Rai can detect absent node types.
+  - **Vision:** Declarative invariants per lifecycle phase (post-init, post-onboard, post-discovery). Dedicated `rai memory health` command. Session-start integration so Rai sees gaps.
   - **Scope:** Full lifecycle-phase schema, not just the minimal check in BF-2's F5
-  - **Related:** BF-2 (F5 is the seed), `raise doctor` (E7 deferred)
+  - **Related:** BF-2 (F5 is the seed), `rai doctor` (E7 deferred)
 
 - [ ] **Tools for human to understand and care for Rai's memory state** — (SES-134, 2026-02-10)
   - **Context:** Emilio's insight — the graph is invisible to both Rai and the user. The user needs tools to understand what Rai knows and doesn't know, and to be more intentional about maintaining context quality.
@@ -225,7 +225,7 @@
 
 ### E17 / SES-135 — Parking Lot (2026-02-10)
 
-- [ ] **`raise story` CLI subcommands** — Reduce inference overhead by tooling ceremony: `raise story context`, `raise story transition`, `raise story scaffold`, `raise story close --actual`, `raise gate check`. Estimated 30-40% token savings per story cycle. (Rai proposal, SES-135)
+- [ ] **`rai story` CLI subcommands** — Reduce inference overhead by tooling ceremony: `rai story context`, `rai story transition`, `rai story scaffold`, `rai story close --actual`, `rai gate check`. Estimated 30-40% token savings per story cycle. (Rai proposal, SES-135)
 - [ ] **Skill compression for Ri level** — Current skills are Shu-verbose even at Ri. Ri-mode skills should be 20-30 lines of "what to decide" + CLI commands, not 200 lines of step-by-step. (SES-135)
 - [ ] **Rename `discover-describe` to `discover-document`** — Better reflects output (documents, not descriptions). Avoids confusion with `docs-update`. (SES-135)
 - [ ] **Scanner `--exclude` flag** — PAT-247: vendor/node_modules exclusion for PHP/JS projects. Full-repo scans hit noise and duplicate IDs.
@@ -265,7 +265,7 @@
 - [ ] F9.9 Calibration Updater — Auto-update calibration from actuals
 
 **Phase 3 (Telemetry CLI):**
-- [ ] F9.10 Telemetry Commands — `raise telemetry velocity`, `drift`, `insights`
+- [ ] F9.10 Telemetry Commands — `rai telemetry velocity`, `drift`, `insights`
 - [ ] F9.11 Retro Integration — /story-review queries telemetry
 
 **Also deferred:**

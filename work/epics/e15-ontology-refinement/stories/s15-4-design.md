@@ -22,7 +22,7 @@ template: "lean-feature-spec-v2"
 
 **Problem**: The graph layer (`get_neighbors()`) already supports `edge_types` filtering, but neither the query engine nor the CLI expose it. Users cannot filter by relationship type when querying — e.g., "show me only `constrained_by` edges for this module."
 
-**Value**: Enables M2 milestone (constraint-aware graph) — `raise memory query mod-memory --strategy concept_lookup --edge-types constrained_by` returns guardrails that constrain a module. Foundation for S15.5 query helpers.
+**Value**: Enables M2 milestone (constraint-aware graph) — `rai memory query mod-memory --strategy concept_lookup --edge-types constrained_by` returns guardrails that constrain a module. Foundation for S15.5 query helpers.
 
 ---
 
@@ -47,13 +47,13 @@ Thread the existing `edge_types` parameter from graph layer through query engine
 
 ```bash
 # Lookup module with constrained_by edges only
-$ raise memory query mod-memory --strategy concept_lookup --edge-types constrained_by
+$ rai memory query mod-memory --strategy concept_lookup --edge-types constrained_by
 
 # Multiple edge types (comma-separated, same pattern as --types)
-$ raise memory query mod-memory --strategy concept_lookup --edge-types constrained_by,depends_on
+$ rai memory query mod-memory --strategy concept_lookup --edge-types constrained_by,depends_on
 
 # Combined with node type filter
-$ raise memory query mod-memory --strategy concept_lookup --edge-types constrained_by --types guardrail
+$ rai memory query mod-memory --strategy concept_lookup --edge-types constrained_by --types guardrail
 ```
 
 ### Expected Output

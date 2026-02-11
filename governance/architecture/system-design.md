@@ -1,6 +1,6 @@
 ---
 type: architecture_design
-project: raise-cli
+project: rai-cli
 status: current
 layers:
   - name: leaf
@@ -31,11 +31,11 @@ constitution_reference: "framework/reference/constitution.md"
 
 # System Design
 
-> C4 Level 2 — How raise-cli is structured internally, its constraints, and what constitutes drift.
+> C4 Level 2 — How rai-cli is structured internally, its constraints, and what constitutes drift.
 
 ## Layered Hub-and-Spoke Architecture
 
-raise-cli follows a **strictly layered, acyclic** dependency structure. Every module lives in exactly one layer, and dependencies only flow downward.
+rai-cli follows a **strictly layered, acyclic** dependency structure. Every module lives in exactly one layer, and dependencies only flow downward.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -115,7 +115,7 @@ Source tree ──→ Scanner (Python AST) ──→ symbols (class, function, c
                                      Enriched module nodes with imports, exports, counts
 ```
 
-**Pipeline:** `raise discover start` → `scan` → `analyze` → `validate` (human) → `complete` → `describe`
+**Pipeline:** `rai discover start` → `scan` → `analyze` → `validate` (human) → `complete` → `describe`
 
 **Code-aware graph:** Since S16.1, `load_code_structure()` enriches module nodes with AST-extracted data: imports, exports, component counts. The `context/analyzers/` subpackage provides `PythonAnalyzer` (concrete implementation) and `CodeAnalyzer` Protocol for extensibility.
 
@@ -125,14 +125,14 @@ How Rai maintains continuity across sessions.
 
 ```
 /session-start ──→ raise profile show ──→ developer context
-                   raise memory query  ──→ relevant patterns
+                   rai memory query  ──→ relevant patterns
                    CLAUDE.local.md     ──→ human notes, deadlines
                         │
                         ▼
                    Session work (skills, tools, commits)
                         │
                         ▼
-/session-close ──→ raise session close ──→ pattern extraction
+/session-close ──→ rai session close ──→ pattern extraction
                    memory update        ──→ JSONL append
                    CLAUDE.local.md      ──→ updated notes
 ```
@@ -184,7 +184,7 @@ From `framework/reference/constitution.md`, these principles constrain all archi
 | §1 Humans Define, Machines Execute | CLI extracts and structures — never decides |
 | §2 Governance as Code | All rules versioned in Git; no external config stores |
 | §3 Platform Agnosticism | No GitHub/GitLab-specific APIs; Git-native only |
-| §4 Validation Gates | Quality checked at each phase — `raise discover drift` enables this |
+| §4 Validation Gates | Quality checked at each phase — `rai discover drift` enables this |
 | §7 Lean / Jidoka | Stop on defects — CLI validates and reports, never silently skips |
 | §8 Observable Workflow | Local JSONL telemetry; every skill emits signals |
 
@@ -200,7 +200,7 @@ Every domain follows the same three-step pattern:
 Raw source (Markdown, Python, JSONL)
     → Extractor/Loader (deterministic parsing)
         → Concept nodes in UnifiedGraph
-            → BFS traversal via raise memory query
+            → BFS traversal via rai memory query
 ```
 
 This is the fundamental data pattern. New knowledge sources follow this same path.
@@ -238,21 +238,21 @@ Rai reads the skill, decides what to do, calls CLI tools for data, synthesizes r
 | Drift Type | Example | Detection |
 |-----------|---------|-----------|
 | **Layer violation** | Domain module importing from integration module | Import analysis, pyright |
-| **Circular dependency** | Module A imports B, B imports A | pyright, `raise discover drift` |
+| **Circular dependency** | Module A imports B, B imports A | pyright, `rai discover drift` |
 | **Missing types** | Function without type annotations | `pyright --strict` |
 | **Raw dicts for data** | Using `dict` instead of Pydantic model | Code review, grep |
 | **AI inference in CLI** | CLI command calling an LLM API | Code review |
 | **Secrets in code** | Hardcoded API keys or credentials | `detect-secrets`, `bandit` |
 | **Untested code** | New module without corresponding test file | Coverage report |
-| **Undocumented module** | New `src/raise_cli/X/` without `governance/architecture/modules/X.md` | `raise discover drift` |
+| **Undocumented module** | New `src/rai_cli/X/` without `governance/architecture/modules/X.md` | `rai discover drift` |
 | **Guardrail violation** | Any MUST-level guardrail broken | Pre-commit hooks |
 
-**Drift prevention:** Pre-commit hooks catch most violations automatically. `raise discover drift` catches structural changes. Architecture docs catch intent drift through human review.
+**Drift prevention:** Pre-commit hooks catch most violations automatically. `rai discover drift` catches structural changes. Architecture docs catch intent drift through human review.
 
 ## Directory Layout
 
 ```
-src/raise_cli/
+src/rai_cli/
 ├── __init__.py            # Package root, version
 ├── exceptions.py          # Exception hierarchy with exit codes
 ├── cli/                   # Layer 4: Orchestration

@@ -73,7 +73,7 @@
 
 - **Memory persistence:** Patterns, calibrations, sessions survive across Claude Code sessions
 - **Hook-assisted workflow:** Auto-context on startup, reminders on compaction
-- **CLI memory management:** `raise memory add-*` for quick saves
+- **CLI memory management:** `rai memory add-*` for quick saves
 
 ### Modules Added
 
@@ -82,7 +82,7 @@
 ├── identity/                   # Markdown (human-authored)
 └── memory/                     # JSONL + Graph (machine-managed)
 
-src/raise_cli/memory/           # Memory Toolkit
+src/rai_cli/memory/           # Memory Toolkit
 ├── models.py, loader.py        # Read path
 ├── builder.py, query.py        # Graph + search
 ├── cache.py                    # LRU with staleness

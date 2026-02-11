@@ -5,7 +5,7 @@
 **Problem:**
 - Architecture docs drift from code silently (PAT-196)
 - Graph cache invalidates on schema changes (PAT-152)
-- `raise discover drift` produces 383 warnings, near-zero actionable (SES-118)
+- `rai discover drift` produces 383 warnings, near-zero actionable (SES-118)
 - Full discovery workflow overwrites human validation — no incremental path
 - No mechanism to detect *what changed* in the graph between builds
 

@@ -13,14 +13,14 @@
 
 **Existing infrastructure:**
 - `/session-close` skill has hooks (PostToolUse, Stop)
-- Python telemetry module: `src/raise_cli/telemetry/` (F9.1, F9.2)
-- Memory CLI commands: `raise memory add-session`
+- Python telemetry module: `src/rai_cli/telemetry/` (F9.1, F9.2)
+- Memory CLI commands: `rai memory add-session`
 
 **Discovery:**
 Shell script hooks can't receive session metadata (type, outcome, features) because Claude can't set environment variables for hooks. We need a CLI command that Claude calls explicitly.
 
 **Solution:**
-CLI command `raise telemetry emit-session` that Claude calls at end of /session-close with session context.
+CLI command `rai telemetry emit-session` that Claude calls at end of /session-close with session context.
 
 ## Story
 
@@ -31,7 +31,7 @@ CLI command `raise telemetry emit-session` that Claude calls at end of /session-
 ## Acceptance Criteria
 
 - [x] Shell script exists for future hook use
-- [ ] CLI command `raise telemetry emit-session` works
+- [ ] CLI command `rai telemetry emit-session` works
 - [ ] Captures session_type, outcome, duration_min, features
 - [ ] Signals written to `.rai/telemetry/signals.jsonl`
 - [ ] Schema matches ADR-018 SessionEvent format
@@ -55,11 +55,11 @@ CLI command `raise telemetry emit-session` that Claude calls at end of /session-
 - **Notes:** Hook added, but emits "unknown" without env vars
 
 ### Task 3: Create CLI telemetry command
-- **Description:** Add `raise telemetry emit-session` command that Claude can call
+- **Description:** Add `rai telemetry emit-session` command that Claude can call
 - **Files:**
-  - `src/raise_cli/cli/commands/telemetry.py` (new)
-  - `src/raise_cli/cli/main.py` (modify - register command)
-- **Verification:** `raise telemetry emit-session --type feature --outcome success` works
+  - `src/rai_cli/cli/commands/telemetry.py` (new)
+  - `src/rai_cli/cli/main.py` (modify - register command)
+- **Verification:** `rai telemetry emit-session --type feature --outcome success` works
 - **Size:** S
 - **Dependencies:** F9.2 Signal Writer
 

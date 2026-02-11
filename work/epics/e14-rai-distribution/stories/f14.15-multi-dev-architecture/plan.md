@@ -33,7 +33,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 1: Add Path Helpers
 - **Description:** Add `get_global_rai_dir()` and `get_personal_dir()` to paths.py
-- **Files:** `src/raise_cli/config/paths.py`, `tests/config/test_paths.py`
+- **Files:** `src/rai_cli/config/paths.py`, `tests/config/test_paths.py`
 - **TDD Cycle:** RED (test new functions) → GREEN (implement) → REFACTOR
 - **Verification:** `pytest tests/config/test_paths.py -v`
 - **Size:** S
@@ -41,7 +41,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 2: Add Scope to Memory Models
 - **Description:** Add `MemoryScope` enum and update loader to track scope in metadata
-- **Files:** `src/raise_cli/memory/models.py`, `src/raise_cli/memory/loader.py`, `tests/memory/test_loader.py`
+- **Files:** `src/rai_cli/memory/models.py`, `src/rai_cli/memory/loader.py`, `tests/memory/test_loader.py`
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/memory/test_loader.py -v`
 - **Size:** S
@@ -49,7 +49,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 3: Multi-Source Graph Builder
 - **Description:** Modify `UnifiedGraphBuilder.load_memory()` to load from global, project, and personal directories with scope tracking
-- **Files:** `src/raise_cli/context/builder.py`, `tests/context/test_builder.py`
+- **Files:** `src/rai_cli/context/builder.py`, `tests/context/test_builder.py`
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/context/test_builder.py -v`
 - **Size:** M
@@ -57,7 +57,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 4: Precedence Logic
 - **Description:** Add `_deduplicate_by_precedence()` for handling same ID in multiple tiers (personal > project > global)
-- **Files:** `src/raise_cli/context/builder.py`, `tests/context/test_builder.py`
+- **Files:** `src/rai_cli/context/builder.py`, `tests/context/test_builder.py`
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/context/test_builder.py::test_precedence -v`
 - **Size:** S
@@ -65,7 +65,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 5: Scope-Aware Memory Writer
 - **Description:** Update `append_pattern`, `append_calibration`, `append_session` to write to correct location based on scope
-- **Files:** `src/raise_cli/memory/writer.py`, `tests/memory/test_writer.py`
+- **Files:** `src/rai_cli/memory/writer.py`, `tests/memory/test_writer.py`
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/memory/test_writer.py -v`
 - **Size:** M
@@ -73,7 +73,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 6: Update Memory CLI Commands
 - **Description:** Add `--scope` option to `emit-pattern`, `emit-calibration` commands; update `add-session` to write to personal
-- **Files:** `src/raise_cli/cli/commands/memory.py`, `tests/cli/commands/test_memory.py`
+- **Files:** `src/rai_cli/cli/commands/memory.py`, `tests/cli/commands/test_memory.py`
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/cli/commands/test_memory.py -v`
 - **Size:** M
@@ -81,7 +81,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 7: Migration Logic
 - **Description:** Add migration function to move existing sessions/telemetry/calibration to personal dir on first access
-- **Files:** `src/raise_cli/memory/migration.py` (new), `tests/memory/test_migration.py` (new)
+- **Files:** `src/rai_cli/memory/migration.py` (new), `tests/memory/test_migration.py` (new)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/memory/test_migration.py -v`
 - **Size:** M
@@ -89,7 +89,7 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 8: Update Gitignore
 - **Description:** Add `.raise/rai/personal/` to project .gitignore template and update existing .gitignore
-- **Files:** `.gitignore`, `src/raise_cli/onboarding/templates/gitignore.txt` (if exists)
+- **Files:** `.gitignore`, `src/rai_cli/onboarding/templates/gitignore.txt` (if exists)
 - **TDD Cycle:** N/A (config change)
 - **Verification:** `git check-ignore .raise/rai/personal/test.txt` returns path
 - **Size:** XS
@@ -97,17 +97,17 @@ Three-tier data separation with graph as abstraction layer:
 
 ### Task 9: Global Directory Bootstrap
 - **Description:** Add `ensure_global_rai_dir()` to create `~/.rai/` with empty patterns.jsonl and calibration.jsonl on first use
-- **Files:** `src/raise_cli/config/paths.py`, `tests/config/test_paths.py`
+- **Files:** `src/rai_cli/config/paths.py`, `tests/config/test_paths.py`
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/config/test_paths.py::test_ensure_global -v`
 - **Size:** S
 - **Dependencies:** Task 1
 
 ### Task 10: Integration - Memory Build Command
-- **Description:** Ensure `raise memory build` loads from all three tiers correctly
-- **Files:** `src/raise_cli/cli/commands/memory.py` (verify), integration test
+- **Description:** Ensure `rai memory build` loads from all three tiers correctly
+- **Files:** `src/rai_cli/cli/commands/memory.py` (verify), integration test
 - **TDD Cycle:** RED → GREEN → REFACTOR
-- **Verification:** `uv run raise memory build && uv run raise memory query "test" --format json | grep scope`
+- **Verification:** `uv run rai memory build && uv run rai memory query "test" --format json | grep scope`
 - **Size:** S
 - **Dependencies:** Task 3, Task 4, Task 7
 
@@ -115,8 +115,8 @@ Three-tier data separation with graph as abstraction layer:
 - **Description:** Validate full flow: create global pattern, create project pattern, query returns both with correct scope
 - **Verification:**
   1. `echo '{"id":"PAT-GLOBAL","type":"process","content":"Global test","context":[],"created":"2026-02-05"}' >> ~/.rai/patterns.jsonl`
-  2. `uv run raise memory build`
-  3. `uv run raise memory query "Global test"` shows scope: global
+  2. `uv run rai memory build`
+  3. `uv run rai memory query "Global test"` shows scope: global
   4. Clean up test data
 - **Size:** XS
 - **Dependencies:** All previous tasks

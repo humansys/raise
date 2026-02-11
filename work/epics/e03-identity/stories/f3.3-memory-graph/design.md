@@ -26,7 +26,7 @@ research: work/research/memory-systems/RES-MEMORY-001.md
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Reuse strategy | Wrap (not extend/fork) | E2 stays untouched, memory evolves independently |
-| Module location | `src/raise_cli/memory/` | Top-level, parallel to governance/ |
+| Module location | `src/rai_cli/memory/` | Top-level, parallel to governance/ |
 | Graph rebuild | Cache + staleness check | Balance of simplicity and performance |
 | Retrieval | Keyword + BFS + recency | Proven pattern + time awareness |
 | Concept types | `pattern`, `calibration`, `session` | YAGNI — what we have now |
@@ -37,12 +37,12 @@ research: work/research/memory-systems/RES-MEMORY-001.md
 
 | Component | Action | Description |
 |-----------|--------|-------------|
-| `src/raise_cli/memory/models.py` | Create | MemoryConcept, MemoryRelationship, MemoryConceptType |
-| `src/raise_cli/memory/loader.py` | Create | Load JSONL files → list of MemoryConcept |
-| `src/raise_cli/memory/builder.py` | Create | Build ConceptGraph from concepts, infer relationships |
-| `src/raise_cli/memory/query.py` | Create | MemoryQuery with keyword + BFS + recency |
-| `src/raise_cli/memory/cache.py` | Create | Graph caching with staleness check |
-| `src/raise_cli/cli/commands/memory.py` | Create | CLI commands: query, dump |
+| `src/rai_cli/memory/models.py` | Create | MemoryConcept, MemoryRelationship, MemoryConceptType |
+| `src/rai_cli/memory/loader.py` | Create | Load JSONL files → list of MemoryConcept |
+| `src/rai_cli/memory/builder.py` | Create | Build ConceptGraph from concepts, infer relationships |
+| `src/rai_cli/memory/query.py` | Create | MemoryQuery with keyword + BFS + recency |
+| `src/rai_cli/memory/cache.py` | Create | Graph caching with staleness check |
+| `src/rai_cli/cli/commands/memory.py` | Create | CLI commands: query, dump |
 
 ---
 
@@ -60,7 +60,7 @@ research: work/research/memory-systems/RES-MEMORY-001.md
 ### CLI Usage: Query
 
 ```bash
-$ raise memory query "graph traversal"
+$ rai memory query "graph traversal"
 
 Relevant memories (3 found, 847 tokens):
 
@@ -80,7 +80,7 @@ CAL-001: F2.1 velocity 3.5x
 ### CLI Usage: Dump
 
 ```bash
-$ raise memory dump --format json
+$ rai memory dump --format json
 
 {
   "concepts": 48,
@@ -91,7 +91,7 @@ $ raise memory dump --format json
   "token_estimate": 4200
 }
 
-$ raise memory dump --format md > memory-snapshot.md
+$ rai memory dump --format md > memory-snapshot.md
 # Exports human-readable markdown
 ```
 
@@ -154,14 +154,14 @@ class MemoryQueryResult(BaseModel):
 
 ```python
 # First query: rebuilds graph, caches
-$ raise memory query "patterns"  # ~50ms (cold)
+$ rai memory query "patterns"  # ~50ms (cold)
 
 # Second query: loads from cache
-$ raise memory query "velocity"  # ~5ms (warm)
+$ rai memory query "velocity"  # ~5ms (warm)
 
 # After JSONL edit: detects staleness, rebuilds
 $ echo '{"type":"pattern"...}' >> .rai/memory/patterns.jsonl
-$ raise memory query "new"       # ~50ms (rebuild)
+$ rai memory query "new"       # ~50ms (rebuild)
 ```
 
 ---
@@ -173,8 +173,8 @@ $ raise memory query "new"       # ~50ms (rebuild)
 - [ ] Load all JSONL files from `.rai/memory/` directory
 - [ ] Build ConceptGraph with pattern, calibration, session nodes
 - [ ] Infer relationships (learned_from, related_to, validates, applies_to)
-- [ ] `raise memory query "topic"` returns relevant concepts
-- [ ] `raise memory dump` outputs concept/relationship counts
+- [ ] `rai memory query "topic"` returns relevant concepts
+- [ ] `rai memory dump` outputs concept/relationship counts
 - [ ] Cache graph.json with staleness detection
 - [ ] Token estimate in query results
 - [ ] >90% test coverage on new code
@@ -225,6 +225,6 @@ tests/memory/
 ## References
 
 - Research: `work/research/memory-systems/RES-MEMORY-001.md`
-- E2 Graph: `src/raise_cli/governance/graph/`
+- E2 Graph: `src/rai_cli/governance/graph/`
 - ADR-016: Memory format decision (JSONL + Graph)
 - Epic scope: `dev/epic-e3-scope.md`

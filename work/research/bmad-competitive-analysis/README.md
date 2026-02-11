@@ -78,7 +78,7 @@ Investigate BMAD Method (Breakthrough Method of Agile AI-Driven Development) as 
 3. **Enterprise Compliance Brief** — 2-page PDF positioning RaiSE for regulated industries (Week 3-4)
 
 **Medium-Term (3-6 Months)**:
-4. **Build `raise-cli` Installer** — One-command UX (match BMAD) while maintaining git-native distribution
+4. **Build `rai-cli` Installer** — One-command UX (match BMAD) while maintaining git-native distribution
 5. **First Enterprise Case Study** — Validate production readiness, generate social proof
 6. **Community Building** — Discord, docs site, weekly office hours, content engine
 
@@ -260,7 +260,7 @@ Investigate BMAD Method (Breakthrough Method of Agile AI-Driven Development) as 
 7. Initiate community building (Discord, docs, office hours)
 
 **Medium-Term (Month 3-6)**:
-8. Build `raise-cli` installer
+8. Build `rai-cli` installer
 9. Run first enterprise pilot (case study generation)
 10. Expand community (content engine, champions)
 

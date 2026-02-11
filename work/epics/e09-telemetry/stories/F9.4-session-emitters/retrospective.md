@@ -40,8 +40,8 @@
 - Agent-portable telemetry architecture
 
 ## Improvements Applied
-- Added `raise telemetry emit-session` command
-- Added `raise telemetry emit-calibration` command
+- Added `rai telemetry emit-session` command
+- Added `rai telemetry emit-calibration` command
 - Updated `/session-close` with Step 8
 - Updated `/story-review` with Step 6
 

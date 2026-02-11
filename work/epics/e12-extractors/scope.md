@@ -55,7 +55,7 @@
 | F12.3 | **Glossary Extractor** | S | ✅ Done | Extract glossary terms for terminology |
 | F12.4 | **Schema Extension** | XS | ✅ Done | Add `decision`, `guardrail`, `term` to NodeType |
 | F12.5 | **Skill Query Alignment** | S | ✅ Done | Fix query/type mismatches in story cycle skills |
-| F12.6 | **Memory Write CLI** | M | ✅ Done | `raise memory add-pattern` command |
+| F12.6 | **Memory Write CLI** | M | ✅ Done | `rai memory add-pattern` command |
 
 **Total:** 6 features, ~10 SP estimated
 
@@ -68,7 +68,7 @@
 **Problem:** 40+ ADRs exist but /story-design can't query them.
 
 **Scope:**
-- New parser: `src/raise_cli/governance/parsers/adr.py`
+- New parser: `src/rai_cli/governance/parsers/adr.py`
 - Extract: ID, title, status, decision summary, related ADRs
 - Node type: `decision`
 - Handle three formats:
@@ -77,8 +77,8 @@
   - v2: `dev/decisions/v2/adr-*.md` (sub-directory)
 
 **Files:**
-- `src/raise_cli/governance/parsers/adr.py` (new)
-- `src/raise_cli/governance/extractor.py` (integrate)
+- `src/rai_cli/governance/parsers/adr.py` (new)
+- `src/rai_cli/governance/extractor.py` (integrate)
 - `tests/governance/parsers/test_adr.py` (new)
 
 **Example output:**
@@ -103,13 +103,13 @@
 **Problem:** Guardrails are in CLAUDE.md but not queryable by topic.
 
 **Scope:**
-- New parser: `src/raise_cli/governance/parsers/guardrails.py`
+- New parser: `src/rai_cli/governance/parsers/guardrails.py`
 - Extract sections: Type Safety, Linting, Testing, Security, Documentation
 - Node type: `guardrail`
 
 **Files:**
-- `src/raise_cli/governance/parsers/guardrails.py` (new)
-- `src/raise_cli/governance/extractor.py` (integrate)
+- `src/rai_cli/governance/parsers/guardrails.py` (new)
+- `src/rai_cli/governance/extractor.py` (integrate)
 - `tests/governance/parsers/test_guardrails.py` (new)
 
 **Source:** `governance/solution/guardrails.md`
@@ -121,13 +121,13 @@
 **Problem:** Terminology in glossary but not surfaced in queries.
 
 **Scope:**
-- New parser: `src/raise_cli/governance/parsers/glossary.py`
+- New parser: `src/rai_cli/governance/parsers/glossary.py`
 - Extract: Term, definition, deprecated alternatives
 - Node type: `term`
 
 **Files:**
-- `src/raise_cli/governance/parsers/glossary.py` (new)
-- `src/raise_cli/governance/extractor.py` (integrate)
+- `src/rai_cli/governance/parsers/glossary.py` (new)
+- `src/rai_cli/governance/extractor.py` (integrate)
 - `tests/governance/parsers/test_glossary.py` (new)
 
 **Source:** `framework/reference/glossary.md`
@@ -144,8 +144,8 @@
 - Update `governance/models.py` ConceptType enum
 
 **Files:**
-- `src/raise_cli/context/models.py`
-- `src/raise_cli/governance/models.py`
+- `src/rai_cli/context/models.py`
+- `src/rai_cli/governance/models.py`
 
 ---
 
@@ -181,19 +181,19 @@
 **Problem:** Patterns only persist via /session-close.
 
 **Scope:**
-- New command: `raise memory add-pattern`
+- New command: `rai memory add-pattern`
 - Add to patterns.jsonl immediately
 - Deduplicate by content similarity
 - Integrate into /story-review
 
 **Files:**
-- `src/raise_cli/cli/commands/memory.py` (extend)
-- `src/raise_cli/memory/patterns.py` (new or extend)
+- `src/rai_cli/cli/commands/memory.py` (extend)
+- `src/rai_cli/memory/patterns.py` (new or extend)
 - `.claude/skills/story-review/SKILL.md` (integrate)
 
 **CLI signature:**
 ```bash
-raise memory add-pattern "Pattern content" \
+rai memory add-pattern "Pattern content" \
   --context testing,workflow \
   --learned-from F12.1
 ```
@@ -210,8 +210,8 @@ raise memory add-pattern "Pattern content" \
 
 ### Epic Complete
 - [x] All 6 features complete (F12.1-F12.6)
-- [x] `raise context query "ADR" --unified --types decision` works
-- [x] `raise context query "type hints" --unified --types guardrail` works
+- [x] `rai context query "ADR" --unified --types decision` works
+- [x] `rai context query "type hints" --unified --types guardrail` works
 - [x] `/story-design` queries return ADR nodes (via `--types decision`)
 - [x] `/story-review` can persist patterns via CLI (Step 4.5 added in v1.1.0)
 - [x] ADR-020 status updated to "Accepted"
@@ -299,7 +299,7 @@ Still well under 1K — no performance concerns.
 
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
-| **M1: Walking Skeleton** | F12.4, F12.1 | Day 1-2 | `raise context query "ADR" --types decision` works | Query returns ADR-019, ADR-020 |
+| **M1: Walking Skeleton** | F12.4, F12.1 | Day 1-2 | `rai context query "ADR" --types decision` works | Query returns ADR-019, ADR-020 |
 | **M2: Full Extraction** | +F12.2, F12.3, F12.6 | Day 3-4 | All governance types extractable, memory write works | Query guardrails, glossary; add pattern via CLI |
 | **M3: Skills Aligned** | +F12.5 | Day 5 | All story cycle skills use correct types | /story-design finds ADRs |
 | **M4: Epic Complete** | Integration | Day 6 | Done criteria met, ADR-020 accepted | Full demo, retrospective |

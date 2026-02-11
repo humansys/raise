@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.onboarding.memory_md import MemoryMdGenerator, generate_memory_md
+from rai_cli.onboarding.memory_md import MemoryMdGenerator, generate_memory_md
 
 # =============================================================================
 # Fixtures

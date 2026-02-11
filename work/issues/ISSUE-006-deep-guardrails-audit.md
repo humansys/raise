@@ -1,6 +1,6 @@
 # ISSUE-006: Deep Guardrails Audit
 
-> Comprehensive file-by-file review of `src/raise_cli/` against `guardrails-stack.md`
+> Comprehensive file-by-file review of `src/rai_cli/` against `guardrails-stack.md`
 > Date: 2026-02-05
 > Methodology: 8 parallel agents reviewing each module
 
@@ -79,11 +79,11 @@
 - `format_unified_build_result()`, `format_governance_build_result()` in `graph.py` formatter
 
 **Files changed:**
-- `src/raise_cli/output/formatters/__init__.py` (new)
-- `src/raise_cli/output/formatters/discover.py` (325 lines)
-- `src/raise_cli/output/formatters/graph.py` (new, 90 lines)
-- `src/raise_cli/cli/commands/discover.py` (543 → 405 lines)
-- `src/raise_cli/cli/commands/graph.py` (451 → 441 lines)
+- `src/rai_cli/output/formatters/__init__.py` (new)
+- `src/rai_cli/output/formatters/discover.py` (325 lines)
+- `src/rai_cli/output/formatters/graph.py` (new, 90 lines)
+- `src/rai_cli/cli/commands/discover.py` (543 → 405 lines)
+- `src/rai_cli/cli/commands/graph.py` (451 → 441 lines)
 
 ---
 
@@ -99,7 +99,7 @@
 - `emit`: Deferred — 12 skills depend on current syntax, ergonomic as-is
 
 **Files updated:**
-- `src/raise_cli/cli/commands/memory.py`
+- `src/rai_cli/cli/commands/memory.py`
 - `.claude/skills/session-close/SKILL.md` (fixed parameter order bug)
 - `.claude/scripts/pre-compact-reminder.sh`
 

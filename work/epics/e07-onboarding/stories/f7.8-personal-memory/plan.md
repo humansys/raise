@@ -27,8 +27,8 @@
 
 - **Description:** Create Pydantic model for `~/.rai/developer.yaml` with core fields
 - **Files:**
-  - `src/raise_cli/onboarding/__init__.py` (new module)
-  - `src/raise_cli/onboarding/profile.py` (new)
+  - `src/rai_cli/onboarding/__init__.py` (new module)
+  - `src/rai_cli/onboarding/profile.py` (new)
   - `tests/onboarding/test_profile.py` (new)
 - **TDD Cycle:**
   - RED: Test DeveloperProfile validates required fields
@@ -59,7 +59,7 @@ class DeveloperProfile(BaseModel):
 
 - **Description:** Implement load_developer_profile() and save_developer_profile() with ~/.rai/ directory handling
 - **Files:**
-  - `src/raise_cli/onboarding/profile.py` (extend)
+  - `src/rai_cli/onboarding/profile.py` (extend)
   - `tests/onboarding/test_profile.py` (extend)
 - **TDD Cycle:**
   - RED: Test load_developer_profile returns None if file missing

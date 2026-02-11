@@ -19,9 +19,9 @@
 - F2.4 CLI Commands (2 SP)
 
 **Delivered:**
-- F2.1 Concept Extraction (3 SP) - includes CLI `raise governance extract`
-- F2.2 Graph Builder (2 SP) - includes CLI `raise graph build`, `raise graph validate`
-- F2.3 MVC Query Engine (2 SP) - includes CLI `raise context query`
+- F2.1 Concept Extraction (3 SP) - includes CLI `rai governance extract`
+- F2.2 Graph Builder (2 SP) - includes CLI `rai graph build`, `rai graph validate`
+- F2.3 MVC Query Engine (2 SP) - includes CLI `rai context query`
 
 **Scope Evolution:**
 - F2.4 merged into F2.1-F2.3: Each feature delivered its own CLI commands
@@ -172,7 +172,7 @@ query/ (F2.3)
 ### Modules Added
 
 ```
-src/raise_cli/governance/
+src/rai_cli/governance/
 ├── extraction/          # F2.1 - Parse governance files
 │   ├── parsers.py       # Constitution, Vision, Guardrails parsers
 │   └── models.py        # Concept, Component, Guardrail models

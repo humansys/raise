@@ -27,7 +27,7 @@ The session protocol violates RaiSE's own principle: **deterministic data with i
 
 Redesign the session protocol around three principles:
 
-1. **CLI gathers, AI interprets** — `raise session start` outputs a complete context bundle; `raise session close` accepts structured input
+1. **CLI gathers, AI interprets** — `rai session start` outputs a complete context bundle; `rai session close` accepts structured input
 2. **Platform agnosticism** — all session state lives in `.raise/rai/` (project) and `~/.rai/` (global), not in vendor-specific files
 3. **Relationship persistence** — Rai's coaching observations accumulate in `~/.rai/developer.yaml`
 
@@ -42,7 +42,7 @@ Redesign the session protocol around three principles:
 
 ### Context Bundle Format
 
-Token-optimized output from `raise session start`:
+Token-optimized output from `rai session start`:
 
 ```
 # Session Context
@@ -146,13 +146,13 @@ coaching:
 ### Skill Boundary After Redesign
 
 **Session-start skill becomes:**
-1. Call `raise session start --project .` → receive context bundle
+1. Call `rai session start --project .` → receive context bundle
 2. Interpret bundle → propose focus (inference)
 3. Done. Two steps.
 
 **Session-close skill becomes:**
 1. Reflect on session → extract structured data (inference)
-2. Feed structured data to `raise session close` → CLI writes everything
+2. Feed structured data to `rai session close` → CLI writes everything
 3. Done. Two steps.
 
 ---
@@ -162,8 +162,8 @@ coaching:
 1. **Session state schema** — Pydantic model + YAML persistence in `.raise/rai/session-state.yaml`
 2. **Developer model coaching extension** — extend `DeveloperProfile` with coaching fields
 3. **Foundational pattern tagging** — `foundational: true` metadata on key patterns, graph query support
-4. **CLI `raise session start` redesign** — assemble and output context bundle from multiple sources
-5. **CLI `raise session close` redesign** — accept structured input, write session-state + coaching updates
+4. **CLI `rai session start` redesign** — assemble and output context bundle from multiple sources
+5. **CLI `rai session close` redesign** — accept structured input, write session-state + coaching updates
 6. **Context bundle format** — token-optimized output designed for LLM consumption
 7. **Skill updates** — session-start and session-close become thin inference layers
 8. **ADR-024** — architectural decision record for session protocol
@@ -180,7 +180,7 @@ coaching:
 
 ## Design Decisions Needed
 
-1. **How does `raise session close` receive structured input?** — stdin JSON, CLI flags, or interactive prompts?
+1. **How does `rai session close` receive structured input?** — stdin JSON, CLI flags, or interactive prompts?
 2. **Foundational pattern curation** — which patterns get `foundational: true`? (HITL with Emilio)
 3. **Corrections buffer size** — keep last N corrections in developer model? (proposed: 10)
 4. **Deadline source** — parse from governance artifacts or explicit field in session-state?
@@ -188,7 +188,7 @@ coaching:
 
 ## Done Criteria
 
-- [ ] `raise session start --project .` outputs complete context bundle (<200 tokens)
+- [ ] `rai session start --project .` outputs complete context bundle (<200 tokens)
 - [ ] `.raise/rai/session-state.yaml` written by session-close, read by session-start
 - [ ] `~/.rai/developer.yaml` has coaching section with corrections, strengths, communication notes
 - [ ] Foundational patterns tagged and surfaced in context bundle

@@ -6,13 +6,13 @@ En la sesión del 2025-12-29 se completó la migración de ontología de comando
 
 | Cambio | Antes | Después |
 |--------|-------|---------|
-| Comando de sincronización | `raise hydrate` | `raise pull` |
-| Comando de ejecución de katas | `raise validate` | `raise kata` |
+| Comando de sincronización | `rai hydrate` | `rai pull` |
+| Comando de ejecución de katas | `rai validate` | `rai kata` |
 | Flag | `--skip-hydrate` | `--skip-pull` |
 
 **ADR-010** documenta la decisión y clasifica comandos en dos contextos:
-- **Desarrollo (interactivo):** `raise init`, `raise kata`
-- **CI/CD (automatizable):** `raise pull`, `raise check`, `raise gate`, `raise audit`
+- **Desarrollo (interactivo):** `rai init`, `rai kata`
+- **CI/CD (automatizable):** `rai pull`, `rai check`, `rai gate`, `rai audit`
 
 ---
 
@@ -58,20 +58,20 @@ sed -i 's/2\.0\.0/2.1.0/g' <archivo>
 ```markdown
 ### pull (comando)
 **Definición:** Comando CLI que sincroniza Golden Data desde el repositorio central (raise-config).
-**Uso:** `raise pull [--branch <nombre>] [--guardrails-only]`
+**Uso:** `rai pull [--branch <nombre>] [--guardrails-only]`
 **Contexto:** Desarrollo + CI/CD
 **Nota:** Reemplaza `hydrate` desde v2.1 (ADR-010).
 
 ### kata (comando)
 **Definición:** Comando CLI que ejecuta una Kata (proceso estructurado con Jidoka).
-**Uso:** `raise kata <alias|id> [target]`
+**Uso:** `rai kata <alias|id> [target]`
 **Contexto:** Solo desarrollo (interactivo)
 **Aliases:** spec, plan, design, review, story
 **Nota:** Reemplaza `validate` desde v2.1 (ADR-010). Las Katas se ejecutan, no se validan.
 ```
 
 **10-system-architecture-v2.md** — Diagramas Mermaid a actualizar:
-- Flujo 2: "Sincronización de Guardrails" menciona `raise hydrate`
+- Flujo 2: "Sincronización de Guardrails" menciona `rai hydrate`
 - Tabla de comandos raise-kit
 - Secuencia de inicialización
 

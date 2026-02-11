@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from raise_cli.context.graph import UnifiedGraph
-from raise_cli.context.models import ConceptEdge, ConceptNode
-from raise_cli.context.query import ArchitecturalContext, UnifiedQueryEngine
+from rai_cli.context.graph import UnifiedGraph
+from rai_cli.context.models import ConceptEdge, ConceptNode
+from rai_cli.context.query import ArchitecturalContext, UnifiedQueryEngine
 
 # --- Fixtures ---
 

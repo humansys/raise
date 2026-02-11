@@ -46,12 +46,12 @@ Raise-commons got its module docs through manual creation during story developme
 ## Reproduction
 
 ```bash
-raise init --detect          # scaffolds templates WITHOUT frontmatter
+rai init --detect          # scaffolds templates WITHOUT frontmatter
 /project-onboard             # fills templates WITHOUT frontmatter
 /discover-start → scan → validate → complete  # produces components only
-raise discover build         # loads components into graph
-raise memory build           # builds full index
-raise memory query "architecture"  # → 0 results
+rai discover build         # loads components into graph
+rai memory build           # builds full index
+rai memory query "architecture"  # → 0 results
 ```
 
 ## Fix Scope
@@ -86,7 +86,7 @@ Check if `/project-create` has the same frontmatter gap in its architecture temp
 
 ### F5: Graph completeness postcondition (G4: silent failure mode)
 
-The graph has structural validation (`raise memory validate`) but no **completeness** validation. A graph with 144 components and 0 architecture nodes passes validation — structurally consistent but semantically incomplete. Neither user nor Rai can detect the absence.
+The graph has structural validation (`rai memory validate`) but no **completeness** validation. A graph with 144 components and 0 architecture nodes passes validation — structurally consistent but semantically incomplete. Neither user nor Rai can detect the absence.
 
 **Minimum viable health check:**
 
@@ -100,19 +100,19 @@ ONBOARDING_COMPLETE = {
 ```
 
 Wire into:
-- **`raise memory validate --completeness`** (or extend default validation) — check graph against phase expectations
+- **`rai memory validate --completeness`** (or extend default validation) — check graph against phase expectations
 - **End of `/project-onboard`** — postcondition gate warns if graph is incomplete after onboarding
 
 **Out of scope for F5:**
 - Full lifecycle-phase schema system (different invariants per phase)
-- Dedicated `raise memory health` command
+- Dedicated `rai memory health` command
 - session-start integration (future story)
 
 ## Acceptance Criteria
 
-1. After `raise init --detect` + `/project-onboard` on a brownfield project:
-   - `raise memory query "architecture"` returns architecture nodes (context, design, domain model)
-   - `raise memory query --types module` returns module nodes
+1. After `rai init --detect` + `/project-onboard` on a brownfield project:
+   - `rai memory query "architecture"` returns architecture nodes (context, design, domain model)
+   - `rai memory query --types module` returns module nodes
    - Module nodes have `depends_on` edges
    - Component nodes are reachable from module nodes
 
@@ -126,7 +126,7 @@ Wire into:
 
 4. Graph gate in `/project-onboard` Step 7 verifies architecture + module nodes exist
 
-5. `raise memory validate` checks graph completeness (expected node types present)
+5. `rai memory validate` checks graph completeness (expected node types present)
    - Warns when architecture nodes missing after onboarding
    - Returns structured result (pass/fail + missing types)
 

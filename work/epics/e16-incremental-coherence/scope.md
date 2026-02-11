@@ -45,7 +45,7 @@ Prevent architecture documentation and graph drift through small-batch updates i
 |----|-------|:----:|:------:|-------------|
 | S16.1 | Code-Aware Graph | S | ✅ Done | Pluggable `CodeAnalyzer` Protocol + `PythonAnalyzer` (ast-based) to enrich graph with real imports/exports/components |
 | S16.5 | Component ID Uniqueness | S | Done | Fix silent 10-component data loss from duplicate IDs in analyzer (comp-{stem} → comp-{module.path}) |
-| S16.2 | Graph Diff Engine | M | Done | Compare old vs new unified graph via `diff_graphs()`, expose as `raise memory build --diff` |
+| S16.2 | Graph Diff Engine | M | Done | Compare old vs new unified graph via `diff_graphs()`, expose as `rai memory build --diff` |
 | S16.3 | Docs Update Skill | M | Done | `/docs-update` skill — subagent compares graph vs module docs, updates frontmatter + narrative |
 | S16.4 | Lifecycle Integration | S | ✅ Done | Wire `/docs-update` into story-close Step 1.75, skip for non-code stories |
 
@@ -55,7 +55,7 @@ Prevent architecture documentation and graph drift through small-batch updates i
 - S16.2+S16.3 from original plan merged into single `/docs-update` skill (AI updates both frontmatter and narrative)
 - New S16.1 added as prerequisite: graph must have real code data before diff is useful
 - `/docs-update` compares graph vs docs directly (robust) — doesn't depend on transient diff file
-- `/docs-update` runs as subagent with own context window, uses `raise memory` CLI for context
+- `/docs-update` runs as subagent with own context window, uses `rai memory` CLI for context
 - CodeAnalyzer is a Protocol — pluggable for future TS/PHP support (parkinglotted)
 
 ---
@@ -65,7 +65,7 @@ Prevent architecture documentation and graph drift through small-batch updates i
 **MUST:**
 - Code-aware graph: `CodeAnalyzer` Protocol + `PythonAnalyzer` enriching module nodes with real imports/exports/components
 - Graph diffing: compare two graph snapshots via `diff_graphs()`, produce structured change set
-- `raise memory build --diff` CLI: single build, diff as side effect, persists diff
+- `rai memory build --diff` CLI: single build, diff as side effect, persists diff
 - `/docs-update` skill: AI subagent updates both frontmatter AND narrative for affected module docs
 - `/docs-update` compares graph vs docs directly (robust, works without diff file)
 - Story-close integration: spawns `/docs-update` as subagent with HITL gate
@@ -131,7 +131,7 @@ Code changes (gemba moves)
 │ Compares graph vs docs   │
 │ Updates frontmatter +    │
 │   narrative together     │
-│ Uses raise memory CLI    │
+│ Uses rai memory CLI    │
 │   for context            │
 └────────┬─────────────────┘
          │
@@ -194,7 +194,7 @@ story-close (existing):
   Step 1.75: COHERENCE CHECK (NEW)           ◄━━━━
              │
              ├─ spawn /docs-update subagent
-             │    ├─ runs raise memory build --diff
+             │    ├─ runs rai memory build --diff
              │    ├─ compares graph vs module docs
              │    ├─ updates affected docs (frontmatter + narrative)
              │    └─ returns summary of changes
@@ -216,8 +216,8 @@ story-close (existing):
 - [ ] All quality checks pass (ruff, pyright, bandit)
 
 ### Epic Complete
-- [ ] `raise memory build` produces graph with real code data (imports, exports, component counts)
-- [ ] `raise memory build --diff` produces accurate change sets on real raise-commons data
+- [ ] `rai memory build` produces graph with real code data (imports, exports, component counts)
+- [ ] `rai memory build --diff` produces accurate change sets on real raise-commons data
 - [ ] `/docs-update` skill updates module docs (frontmatter + narrative) from graph state
 - [ ] `/docs-update` works both manually and as subagent from story-close
 - [ ] Story-close spawns `/docs-update` subagent with HITL gate
@@ -300,7 +300,7 @@ Discovery refresh between S16.1 and S16.2 is an activity, not a story.
 | 1 | S16.1: Code-Aware Graph | S | None | Prereq | Graph must have real code data (imports, exports) before diff is useful |
 | — | Discovery refresh | — | S16.1 | Prereq | Re-run discover + update module docs with enriched graph data |
 | 1.5 | S16.5: Component ID Uniqueness | S | S16.1 | Prereq | Fix duplicate IDs causing 10 silent component drops in graph |
-| 2 | S16.2: Graph Diff Engine | M | S16.5 | M1 | Pure `diff_graphs()` + `raise memory build --diff` CLI. Foundation for downstream. |
+| 2 | S16.2: Graph Diff Engine | M | S16.5 | M1 | Pure `diff_graphs()` + `rai memory build --diff` CLI. Foundation for downstream. |
 | 3 | S16.3: Docs Update Skill | M | S16.2 | M2 | `/docs-update` — subagent compares graph vs docs, updates both frontmatter + narrative |
 | 4 | S16.4: Lifecycle Integration | S | S16.3 | M3 | Wire `/docs-update` into story-close as subagent with HITL gate |
 
@@ -308,8 +308,8 @@ Discovery refresh between S16.1 and S16.2 is an activity, not a story.
 
 | Milestone | Stories | Success Criteria | Demo |
 |-----------|---------|------------------|------|
-| **Prereq: Code-Aware Graph** | S16.1 + discovery refresh | `raise memory build` produces graph with real imports/exports; module docs refreshed | Run build, query mod-context, show real depends_on from code |
-| **M1: Graph Diff** | + S16.2 | `raise memory build --diff` produces accurate change set | Make a code change, run build --diff, show detected changes |
+| **Prereq: Code-Aware Graph** | S16.1 + discovery refresh | `rai memory build` produces graph with real imports/exports; module docs refreshed | Run build, query mod-context, show real depends_on from code |
+| **M1: Graph Diff** | + S16.2 | `rai memory build --diff` produces accurate change set | Make a code change, run build --diff, show detected changes |
 | **M2: Docs Update** | + S16.3 | `/docs-update` skill updates affected module docs (frontmatter + narrative) | Run /docs-update, show updated module doc |
 | **M3: Epic Complete** | + S16.4 | story-close spawns /docs-update subagent, HITL review, commit | Full story-close flow with coherence step |
 

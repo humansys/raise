@@ -353,7 +353,7 @@ LangGraph, CrewAI, AutoGen focus on developer productivity. RaiSE focuses on **r
    - ✅ PII protection (anonymize user IDs, never log code content)
 
 6. **OpenTelemetry Compatibility**:
-   - Export command: `raise export otlp --input .raise/traces/2026-01-29.jsonl`
+   - Export command: `rai export otlp --input .raise/traces/2026-01-29.jsonl`
    - Custom OTLP attributes for RaiSE-specific events:
      ```json
      {
@@ -1486,8 +1486,8 @@ class ContextManager {
    - Capture: trace started, step started/completed/failed, gate checked, jidoka triggered, trace completed
 
 6. **CLI** (Minimal):
-   - `raise kata run flujo-01-discovery`
-   - `raise trace show <trace-id>`
+   - `rai kata run flujo-01-discovery`
+   - `rai trace show <trace-id>`
 
 **Out of Scope (Phase 2+)**:
 - Branching, loops, parallel execution
@@ -1535,7 +1535,7 @@ class ContextManager {
 
 **Week 4: Integration + Testing**
 - [ ] Implement Observer (JSONL logging)
-- [ ] Implement CLI (`raise kata run`, `raise trace show`)
+- [ ] Implement CLI (`rai kata run`, `rai trace show`)
 - [ ] End-to-end test: Run flujo-01-discovery
 - [ ] Verify all 5 success criteria
 - [ ] Documentation (architecture, usage)
@@ -1602,20 +1602,20 @@ class ContextManager {
 - [ ] Store metrics in time-series format
 
 **Week 10: CLI Dashboard**
-- [ ] `raise metrics --kata flujo-01-discovery`
-- [ ] `raise audit query --event-type gate_check --status failed`
-- [ ] `raise dashboard` (CLI-based, live updates)
+- [ ] `rai metrics --kata flujo-01-discovery`
+- [ ] `rai audit query --event-type gate_check --status failed`
+- [ ] `rai dashboard` (CLI-based, live updates)
 - [ ] Weekly/monthly reports (Markdown format)
 
 **Week 11: Trace Replay**
 - [ ] Store LLM responses in traces
 - [ ] Implement replay logic (use cached responses)
-- [ ] `raise trace replay <trace-id>`
+- [ ] `rai trace replay <trace-id>`
 - [ ] Diff expected vs actual execution
 
 **Week 12: OpenTelemetry Export**
 - [ ] Implement OTLP exporter
-- [ ] `raise export otlp --input traces/*.jsonl --output /tmp/traces.otlp`
+- [ ] `rai export otlp --input traces/*.jsonl --output /tmp/traces.otlp`
 - [ ] Test with Jaeger/Zipkin
 - [ ] Document enterprise integration
 
@@ -1646,8 +1646,8 @@ class ContextManager {
 **Week 15: Developer Experience**
 - [ ] VSCode extension (Kata syntax highlighting)
 - [ ] CLI autocomplete
-- [ ] Policy testing CLI (`raise policy test`)
-- [ ] Gate testing CLI (`raise gate test`)
+- [ ] Policy testing CLI (`rai policy test`)
+- [ ] Gate testing CLI (`rai gate test`)
 
 **Week 16: Production Readiness**
 - [ ] Unit tests (all components)
@@ -1895,7 +1895,7 @@ const backend = config.llm_backend === 'anthropic'
 **Mitigation**:
 1. **Compiler Validation**: Detect broken references at compile time
 2. **Policy Versioning**: SemVer for policies, deprecation warnings
-3. **CI/CD Integration**: Run `raise policy test` in CI, fail PR on errors
+3. **CI/CD Integration**: Run `rai policy test` in CI, fail PR on errors
 4. **Linting**: Policy linter checks for common issues
 
 ---

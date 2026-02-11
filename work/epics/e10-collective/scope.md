@@ -78,9 +78,9 @@ No infrastructure. Patterns shared via Git repo.
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
 | F10.1 | **Lineage Schema** | XS | Pending | Add lineage fields to pattern model |
-| F10.2 | **Export Command** | S | Pending | `raise memory export --shareable` |
+| F10.2 | **Export Command** | S | Pending | `rai memory export --shareable` |
 | F10.3 | **Community Repo** | XS | Future | Public repo for shared patterns |
-| F10.4 | **Pull Command** | S | Future | `raise memory pull --community` |
+| F10.4 | **Pull Command** | S | Future | `rai memory pull --community` |
 
 **Effort:** 2-3 days | **Cost:** $0
 

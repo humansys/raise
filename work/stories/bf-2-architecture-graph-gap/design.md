@@ -39,9 +39,9 @@ Five fixes, ordered by dependency:
 Add YAML frontmatter to scaffolded architecture templates so the parser can find them.
 
 **Files:**
-- `src/raise_cli/rai_base/governance/architecture/system-context.md` — add `type: architecture_context` frontmatter
-- `src/raise_cli/rai_base/governance/architecture/system-design.md` — add `type: architecture_design` frontmatter
-- Create `src/raise_cli/rai_base/governance/architecture/domain-model.md` — add `type: architecture_domain_model` frontmatter
+- `src/rai_cli/rai_base/governance/architecture/system-context.md` — add `type: architecture_context` frontmatter
+- `src/rai_cli/rai_base/governance/architecture/system-design.md` — add `type: architecture_design` frontmatter
+- Create `src/rai_cli/rai_base/governance/architecture/domain-model.md` — add `type: architecture_domain_model` frontmatter
 
 **Frontmatter contract** (matches what `_parse_architecture_doc` expects):
 
@@ -79,7 +79,7 @@ shared_kernel: {}
 ---
 ```
 
-**IMPORTANT:** Templates use `{project_name}` placeholder — the existing `raise init` scaffold replaces this. Verify the placeholder substitution still works after adding frontmatter.
+**IMPORTANT:** Templates use `{project_name}` placeholder — the existing `rai init` scaffold replaces this. Verify the placeholder substitution still works after adding frontmatter.
 
 ### F2: Fix /project-onboard skill
 
@@ -120,7 +120,7 @@ components: {component_count}
 {List of components discovered in this module}
 ```
 
-6. Update Step 7 verification: After `raise memory build`, check for architecture node types — not just governance node count
+6. Update Step 7 verification: After `rai memory build`, check for architecture node types — not just governance node count
 
 ### F3: Fix /project-create skill
 
@@ -128,9 +128,9 @@ Same frontmatter gap. Apply identical changes to Steps 6e, 6f, add 6g (domain-mo
 
 ### F4: Graph completeness postcondition
 
-Extend `raise memory validate` with a completeness check.
+Extend `rai memory validate` with a completeness check.
 
-**Implementation in `src/raise_cli/cli/commands/memory.py`:**
+**Implementation in `src/rai_cli/cli/commands/memory.py`:**
 
 Add a new check after existing structural validation:
 
@@ -167,13 +167,13 @@ else:
 
 ### F5: Update /project-onboard graph gate
 
-In Step 7, after `raise memory build`, run `raise memory validate`. If completeness warnings appear, the skill should report them to the user rather than silently continuing.
+In Step 7, after `rai memory build`, run `rai memory validate`. If completeness warnings appear, the skill should report them to the user rather than silently continuing.
 
 ---
 
 ## Examples
 
-### After fix: `raise init --detect` scaffold
+### After fix: `rai init --detect` scaffold
 
 ```
 governance/
@@ -190,7 +190,7 @@ governance/
 ### After fix: `/project-onboard` on zambezi-concierge
 
 ```bash
-$ raise memory validate
+$ rai memory validate
 Memory Index Validation
   ✓ 168 concepts loaded
   ✓ All relationships valid
@@ -198,12 +198,12 @@ Memory Index Validation
   ✓ Graph completeness check passed    ← NEW
   ✓ 168/168 concepts reachable
 
-$ raise memory query --types architecture
+$ rai memory query --types architecture
 arch-context    System Context: zambezi-concierge
 arch-design     System Design: zambezi-concierge
 arch-domain-model  Domain Model: zambezi-concierge
 
-$ raise memory query --types module
+$ rai memory query --types module
 mod-api         Express API server
 mod-frontend    Svelte SPA frontend
 mod-shared      Shared utilities and types
@@ -212,7 +212,7 @@ mod-shared      Shared utilities and types
 ### Completeness warning (when gap exists)
 
 ```bash
-$ raise memory validate
+$ rai memory validate
 Memory Index Validation
   ✓ 144 concepts loaded
   ✓ All relationships valid
@@ -231,7 +231,7 @@ Memory Index Validation
 1. All `rai_base/governance/architecture/*.md` templates have valid YAML frontmatter with `type:` field
 2. `_parse_architecture_doc()` produces nodes from scaffolded templates (template contract test)
 3. `/project-onboard` skill generates architecture docs with frontmatter + module docs
-4. `raise memory validate` warns when architecture/module nodes are missing
+4. `rai memory validate` warns when architecture/module nodes are missing
 5. Tests pass, types pass, lint passes
 
 **SHOULD:**

@@ -9,13 +9,13 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from raise_cli.schemas.session_state import (
+from rai_cli.schemas.session_state import (
     CurrentWork,
     LastSession,
     PendingItems,
     SessionState,
 )
-from raise_cli.session.state import (
+from rai_cli.session.state import (
     get_session_state_path,
     load_session_state,
     save_session_state,

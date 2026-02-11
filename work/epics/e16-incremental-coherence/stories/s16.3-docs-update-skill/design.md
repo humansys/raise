@@ -18,7 +18,7 @@ type: story_design
 
 **Primary module:** `mod-skills_base` (new skill file)
 
-**Layer:** Distributable asset (bc-distribution). No new CLI commands or source modules — the skill orchestrates existing CLI tools (`raise memory build`, `raise memory context`) and uses Claude's file editing capabilities directly.
+**Layer:** Distributable asset (bc-distribution). No new CLI commands or source modules — the skill orchestrates existing CLI tools (`rai memory build`, `rai memory context`) and uses Claude's file editing capabilities directly.
 
 **Key insight (PAT-172):** Skill-over-CLI for infrequent AI tasks. Frontmatter comparison is mechanical but runs rarely (per-story). A skill reading graph JSON directly beats building a CLI command that would add code surface for minimal benefit.
 
@@ -30,16 +30,16 @@ One thing: **`/docs-update` skill** (SKILL.md in `.claude/skills/docs-update/`)
 
 The skill orchestrates the full coherence flow using existing infrastructure:
 
-1. Run `raise memory build` → fresh graph + diff
+1. Run `rai memory build` → fresh graph + diff
 2. For each affected module (from diff, or all modules if no diff):
-   - Run `raise memory context mod-X --format json` → graph truth
+   - Run `rai memory context mod-X --format json` → graph truth
    - Read `governance/architecture/modules/X.md` → current frontmatter
    - Compare machine-owned fields (`depends_on`, `depended_by`, `components`, `public_api`) against graph data
    - Update frontmatter fields directly via file editing
 3. If diff shows structural changes (new modules, moved components), propose narrative section updates
 4. HITL review before any changes are written
 
-No new Python code. No new CLI command. The skill uses existing `raise memory` commands for data and Claude's editing tools for updates.
+No new Python code. No new CLI command. The skill uses existing `rai memory` commands for data and Claude's editing tools for updates.
 
 ### Components Affected
 
@@ -50,11 +50,11 @@ No new Python code. No new CLI command. The skill uses existing `raise memory` c
 ### Data Flow
 
 ```
-raise memory build
+rai memory build
         ↓
    index.json (graph) + last-diff.json
         ↓
-raise memory context mod-X --format json  (per module)
+rai memory context mod-X --format json  (per module)
         ↓
    Graph truth: code_imports, code_exports, code_components,
                 depends_on edges, depended_by (reverse)

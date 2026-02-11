@@ -8,7 +8,7 @@
 
 ## Summary
 
-Delivered the complete onboarding pipeline: CLI scaffolding (`raise init`), greenfield skill (`/project-create`), and brownfield skill (`/project-onboard`). A developer can now go from zero to a working `/session-start` in under 10 minutes on either new or existing projects. The guardrails format harmonization fix ensures `raise init --detect` output is directly parseable by `raise memory build`.
+Delivered the complete onboarding pipeline: CLI scaffolding (`rai init`), greenfield skill (`/project-create`), and brownfield skill (`/project-onboard`). A developer can now go from zero to a working `/session-start` in under 10 minutes on either new or existing projects. The guardrails format harmonization fix ensures `rai init --detect` output is directly parseable by `rai memory build`.
 
 ---
 
@@ -41,7 +41,7 @@ Delivered the complete onboarding pipeline: CLI scaffolding (`raise init`), gree
 
 ## What Could Be Improved
 
-- **Guardrails format drift:** `raise init --detect` generated guardrails in a different format than the parser expected. Fixed in S7.3, but this should have been caught earlier (integration test in S7.1 would have flagged it).
+- **Guardrails format drift:** `rai init --detect` generated guardrails in a different format than the parser expected. Fixed in S7.3, but this should have been caught earlier (integration test in S7.1 would have flagged it).
 - **Shell cwd management:** Deleting a temp directory while cwd was inside it killed the shell for the rest of the session. Simple mistake, but cost time.
 
 ## Patterns Discovered
@@ -65,7 +65,7 @@ Delivered the complete onboarding pipeline: CLI scaffolding (`raise init`), gree
 - **Scope:** `work/epics/e7-onboarding/scope.md`
 - **Stories:** `work/epics/e7-onboarding/stories/s7.{1,2,3}-*/`
 - **Skills:** `.claude/skills/project-create/`, `.claude/skills/project-onboard/`
-- **CLI:** `src/raise_cli/onboarding/governance.py` (guardrails format fix)
+- **CLI:** `src/rai_cli/onboarding/governance.py` (guardrails format fix)
 - **Tests:** 19 governance tests (1 new parser-compatibility test)
 
 ---
@@ -73,7 +73,7 @@ Delivered the complete onboarding pipeline: CLI scaffolding (`raise init`), gree
 ## Next Steps
 
 - This epic completes the onboarding pipeline
-- New projects: `raise init` → `/project-create` or `/project-onboard` → `/session-start`
+- New projects: `rai init` → `/project-create` or `/project-onboard` → `/session-start`
 - Next epic TBD
 
 ---

@@ -27,8 +27,8 @@
 ### Task 1: Create telemetry module with schemas
 - **Description:** Create new telemetry module with Pydantic signal schemas following ADR-018 specification
 - **Files:**
-  - `src/raise_cli/telemetry/__init__.py` (new)
-  - `src/raise_cli/telemetry/schemas.py` (new)
+  - `src/rai_cli/telemetry/__init__.py` (new)
+  - `src/rai_cli/telemetry/schemas.py` (new)
 - **Verification:** `python -c "from raise_cli.telemetry import SkillEvent"`
 - **Size:** XS
 - **Dependencies:** None
@@ -38,7 +38,7 @@
 - **Files:**
   - `tests/telemetry/__init__.py` (new)
   - `tests/telemetry/test_schemas.py` (new)
-- **Verification:** `pytest tests/telemetry/ -v --cov=src/raise_cli/telemetry`
+- **Verification:** `pytest tests/telemetry/ -v --cov=src/rai_cli/telemetry`
 - **Size:** XS
 - **Dependencies:** Task 1
 

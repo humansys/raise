@@ -9,9 +9,9 @@
 ## Tasks
 
 ### Task 1: Create Exception Module
-- **Description:** Implement `src/raise_cli/exceptions.py` with complete exception hierarchy per design §4.1
-- **Files:** `src/raise_cli/exceptions.py` (create)
-- **Verification:** `pyright --strict src/raise_cli/exceptions.py && ruff check src/raise_cli/exceptions.py`
+- **Description:** Implement `src/rai_cli/exceptions.py` with complete exception hierarchy per design §4.1
+- **Files:** `src/rai_cli/exceptions.py` (create)
+- **Verification:** `pyright --strict src/rai_cli/exceptions.py && ruff check src/rai_cli/exceptions.py`
 - **Estimate:** 30m
 - **Dependencies:** None
 
@@ -27,9 +27,9 @@
 - `GateFailedError` (exit_code=10, E010)
 
 ### Task 2: Create Error Handler
-- **Description:** Implement `src/raise_cli/cli/error_handler.py` with Rich formatting per design §4.3
-- **Files:** `src/raise_cli/cli/error_handler.py` (create)
-- **Verification:** `pyright --strict src/raise_cli/cli/error_handler.py && ruff check src/raise_cli/cli/error_handler.py`
+- **Description:** Implement `src/rai_cli/cli/error_handler.py` with Rich formatting per design §4.3
+- **Files:** `src/rai_cli/cli/error_handler.py` (create)
+- **Verification:** `pyright --strict src/rai_cli/cli/error_handler.py && ruff check src/rai_cli/cli/error_handler.py`
 - **Estimate:** 30m
 - **Dependencies:** Task 1
 
@@ -41,8 +41,8 @@
 
 ### Task 3: Integrate with CLI Main
 - **Description:** Wire error handler into CLI app with try/except around command execution
-- **Files:** `src/raise_cli/cli/main.py` (modify)
-- **Verification:** `raise --help` still works, manual error test
+- **Files:** `src/rai_cli/cli/main.py` (modify)
+- **Verification:** `rai --help` still works, manual error test
 - **Estimate:** 20m
 - **Dependencies:** Task 2
 
@@ -69,7 +69,7 @@
 
 ### Task 7: Export from Package
 - **Description:** Update `__init__.py` files to export exceptions publicly
-- **Files:** `src/raise_cli/__init__.py` (modify)
+- **Files:** `src/rai_cli/__init__.py` (modify)
 - **Verification:** `python -c "from raise_cli import RaiseError"`
 - **Estimate:** 10m
 - **Dependencies:** Task 1

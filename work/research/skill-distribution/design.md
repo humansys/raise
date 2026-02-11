@@ -7,22 +7,22 @@ complexity: moderate
 research: work/research/skill-distribution/
 ---
 
-# Design: Skill Scaffolding in `raise init`
+# Design: Skill Scaffolding in `rai init`
 
 ## What & Why
 
-**Problem:** New users who install `raise-cli` and run `raise init` get base Rai assets (identity, patterns, methodology) but no Claude Code skills. The core DX — `/session-start`, `/discover-*` — is invisible to them.
+**Problem:** New users who install `rai-cli` and run `rai init` get base Rai assets (identity, patterns, methodology) but no Claude Code skills. The core DX — `/session-start`, `/discover-*` — is invisible to them.
 
-**Value:** Users can immediately use `/session-start` and the discovery workflow after `raise init`. The onboarding path works end-to-end.
+**Value:** Users can immediately use `/session-start` and the discovery workflow after `rai init`. The onboarding path works end-to-end.
 
 ## Approach
 
 ### Architecture: Canonical Source with IDE Adapters (PAT-128)
 
-Store distributable skills as canonical markdown in `raise_cli.skills_base` package (alongside `rai_base`). During `raise init`, copy skills to IDE-specific locations via adapter functions.
+Store distributable skills as canonical markdown in `raise_cli.skills_base` package (alongside `rai_base`). During `rai init`, copy skills to IDE-specific locations via adapter functions.
 
 ```
-src/raise_cli/
+src/rai_cli/
 ├── rai_base/           # Existing: identity, patterns, methodology
 │   ├── identity/
 │   ├── memory/
@@ -64,10 +64,10 @@ raise init
 
 | Component | Change | Purpose |
 |-----------|--------|---------|
-| `src/raise_cli/skills_base/` | CREATE | Package with distributable skills |
-| `src/raise_cli/onboarding/skills.py` | CREATE | Skill scaffolding logic |
-| `src/raise_cli/cli/commands/init.py` | MODIFY | Call skill scaffolding |
-| `src/raise_cli/onboarding/bootstrap.py` | MODIFY | Add `skills_copied` to result |
+| `src/rai_cli/skills_base/` | CREATE | Package with distributable skills |
+| `src/rai_cli/onboarding/skills.py` | CREATE | Skill scaffolding logic |
+| `src/rai_cli/cli/commands/init.py` | MODIFY | Call skill scaffolding |
+| `src/rai_cli/onboarding/bootstrap.py` | MODIFY | Add `skills_copied` to result |
 
 **Flow:**
 
@@ -79,13 +79,13 @@ skills_result = scaffold_skills(project_path, ide="claude")
 
 ### Phase 2 (Post-F&F): Multi-IDE Rules
 
-**New option:** `raise init --ide <name>` or auto-detect from project files.
+**New option:** `rai init --ide <name>` or auto-detect from project files.
 
 ```bash
-raise init                     # Claude Code skills (default)
-raise init --ide cursor        # + .cursor/rules/raise.mdc
-raise init --ide copilot       # + .github/copilot-instructions.md
-raise init --ide all           # All detected IDEs
+rai init                     # Claude Code skills (default)
+rai init --ide cursor        # + .cursor/rules/raise.mdc
+rai init --ide copilot       # + .github/copilot-instructions.md
+rai init --ide all           # All detected IDEs
 ```
 
 **IDE Detection heuristic:**
@@ -118,7 +118,7 @@ $ raise init
 ✓ Created .claude/skills/ (5 skills)
 
 # Phase 2: Multi-IDE
-$ raise init --ide cursor
+$ rai init --ide cursor
 ✓ Created .raise/manifest.yaml
 ✓ Created .raise/rai/ (base Rai)
 ✓ Created .claude/skills/ (5 skills)
@@ -174,7 +174,7 @@ class BootstrapResult(BaseModel):
 
 ### MUST
 
-1. `raise init` copies 5 onboarding skills to `.claude/skills/`
+1. `rai init` copies 5 onboarding skills to `.claude/skills/`
 2. Copied skills are identical to source (no transformation needed for Phase 1)
 3. Existing files are never overwritten (same idempotency as bootstrap)
 4. Skills work when invoked as `/session-start`, `/discover-start`, etc. in Claude Code
@@ -189,7 +189,7 @@ class BootstrapResult(BaseModel):
 ### MUST NOT
 
 1. Copy lifecycle skills (story-*, epic-*, research) — those are for raise-commons developers
-2. Break existing `raise init` behavior for users who don't use Claude Code
+2. Break existing `rai init` behavior for users who don't use Claude Code
 3. Hardcode paths — use `importlib.resources` for package assets (same pattern as `rai_base`)
 
 ## Design Decisions
@@ -229,6 +229,6 @@ Per research (portability analysis):
 ## Testing Approach
 
 - Unit tests for `scaffold_skills()` — verify files copied, idempotency, skip existing
-- Integration test: `raise init` in temp dir → verify `.claude/skills/` created
+- Integration test: `rai init` in temp dir → verify `.claude/skills/` created
 - Verify `SKILL.md` content matches source (no corruption)
 - Test with `RAI_HOME` override (isolated environment)

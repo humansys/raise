@@ -47,9 +47,9 @@ The three-tier architecture (global `~/.rai/`, project `.raise/rai/memory/`, per
 /story-review  → append_pattern() → .raise/rai/memory/patterns.jsonl
                 → append_calibration() → .raise/rai/memory/calibration.jsonl
                                                     ↓
-                              raise memory build → UnifiedGraphBuilder
+                              rai memory build → UnifiedGraphBuilder
                                                     ↓
-                              raise memory query → results
+                              rai memory query → results
 ```
 
 ## Key Files

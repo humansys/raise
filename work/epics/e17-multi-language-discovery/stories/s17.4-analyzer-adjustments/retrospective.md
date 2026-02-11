@@ -34,4 +34,4 @@
 - PAT-247: Scanner needs exclude patterns for vendor/node_modules
 
 ## Action Items
-- [ ] Future story: add --exclude to raise discover scan
+- [ ] Future story: add --exclude to rai discover scan

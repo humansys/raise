@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from raise_cli.skills.schema import (
+from rai_cli.skills.schema import (
     Skill,
     SkillFrontmatter,
     SkillHook,

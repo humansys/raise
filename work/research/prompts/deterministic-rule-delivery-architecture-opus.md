@@ -49,7 +49,7 @@ Current AI coding assistants (Cursor, Copilot, Claude Code) suffer from **model-
 ┌─────────────────────────────────────────────────────────────────┐
 │                      WARM RULES                                  │
 │  CLI call mandated by workflow step                              │
-│  Example: `raise rules get --phase=design`                       │
+│  Example: `rai rules get --phase=design`                       │
 │  Retrieval: Deterministic | Discretion: Timing only | Rel: High  │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -57,7 +57,7 @@ Current AI coding assistants (Cursor, Copilot, Claude Code) suffer from **model-
 ┌─────────────────────────────────────────────────────────────────┐
 │                      COLD RULES                                  │
 │  CLI call for specific contexts                                  │
-│  Example: `raise rules get --for=security-review`                │
+│  Example: `rai rules get --for=security-review`                │
 │  Retrieval: Deterministic | Discretion: Context-triggered | Med  │
 └─────────────────────────────────────────────────────────────────┘
 ```

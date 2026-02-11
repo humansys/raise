@@ -28,13 +28,13 @@ template: "lean-feature-spec-v2"
 
 ## 2. Approach
 
-**How we'll solve it**: Redesign `raise session start` to assemble a complete, token-optimized context bundle from multiple sources (session-state, developer model, graph). Redesign `raise session close` to accept structured session outcomes and write all state deterministically. Extend the developer model with coaching and deadline fields. Add foundational pattern metadata for behavioral priming.
+**How we'll solve it**: Redesign `rai session start` to assemble a complete, token-optimized context bundle from multiple sources (session-state, developer model, graph). Redesign `rai session close` to accept structured session outcomes and write all state deterministically. Extend the developer model with coaching and deadline fields. Add foundational pattern metadata for behavioral priming.
 
 **Components affected**:
-- **`src/raise_cli/onboarding/profile.py`**: Modify — extend `DeveloperProfile` with `CoachingContext` and `deadlines`
-- **`src/raise_cli/cli/commands/session.py`**: Modify — redesign `start` (context bundle output) and `close` (structured input)
-- **`src/raise_cli/schemas/session_state.py`**: Create — `SessionState` Pydantic model
-- **`src/raise_cli/session/`**: Create — session protocol module (state reader/writer, bundle assembler)
+- **`src/rai_cli/onboarding/profile.py`**: Modify — extend `DeveloperProfile` with `CoachingContext` and `deadlines`
+- **`src/rai_cli/cli/commands/session.py`**: Modify — redesign `start` (context bundle output) and `close` (structured input)
+- **`src/rai_cli/schemas/session_state.py`**: Create — `SessionState` Pydantic model
+- **`src/rai_cli/session/`**: Create — session protocol module (state reader/writer, bundle assembler)
 - **`.raise/rai/session-state.yaml`**: Create — project-level working state (written by close, read by start)
 - **`.raise/rai/memory/patterns.jsonl`**: Modify — add `foundational: true` metadata to ~10 patterns
 - **`.claude/skills/session-start/SKILL.md`**: Modify — thin to 2 steps (call CLI, interpret)
@@ -44,13 +44,13 @@ template: "lean-feature-spec-v2"
 
 | # | Decision | Resolution | Rationale |
 |---|----------|------------|-----------|
-| 1 | How does `raise session close` receive structured input? | CLI flags for simple fields + `--state-file` for full state | Flags for common ops (`--summary`, `--patterns`), file for full session-state overwrite. AI writes YAML, CLI reads it. |
+| 1 | How does `rai session close` receive structured input? | CLI flags for simple fields + `--state-file` for full state | Flags for common ops (`--summary`, `--patterns`), file for full session-state overwrite. AI writes YAML, CLI reads it. |
 | 2 | Which patterns are foundational? | 10 patterns curated with Emilio (HITL) | PAT-187, 183, 186, 150, 154, 159, 149, 152, 153, 151. Human judgment, not automation. |
 | 3 | Corrections buffer size | Last 10 corrections | Older corrections should have become patterns. If not generalized after 10, that's a signal. |
 | 4 | Deadline source | `~/.rai/developer.yaml` deadlines section | Deadlines are Rai's operational context — they modulate behavior (urgency, focus, pushback). Not governance artifacts. |
 | 5 | Migration path | Build alongside, switch when validated | New protocol works in parallel. Session bridges stop being written. CLAUDE.local.md loses data role gradually. |
-| 6 | Telemetry ownership | CLI commands emit telemetry internally | Skills stop calling emit-session/emit-work/add-session separately. `raise session close` handles all writes atomically — one command, all data. |
-| 7 | Idempotent close | `raise session close` works with or without active session | Real workflow: close, keep working, close again. Second close overwrites state with more current data. `current_session` check is for orphan detection, not a precondition for writing state. |
+| 6 | Telemetry ownership | CLI commands emit telemetry internally | Skills stop calling emit-session/emit-work/add-session separately. `rai session close` handles all writes atomically — one command, all data. |
+| 7 | Idempotent close | `rai session close` works with or without active session | Real workflow: close, keep working, close again. Second close overwrites state with more current data. `current_session` check is for orphan detection, not a precondition for writing state. |
 
 ---
 
@@ -60,12 +60,12 @@ template: "lean-feature-spec-v2"
 
 ```bash
 # Full context bundle for AI consumption
-$ raise session start --project /home/emilio/Code/raise-commons --context
+$ rai session start --project /home/emilio/Code/raise-commons --context
 
 # Output: token-optimized context bundle (see Expected Output below)
 
 # Legacy mode (current behavior, backward compat)
-$ raise session start --project /home/emilio/Code/raise-commons
+$ rai session start --project /home/emilio/Code/raise-commons
 # Output: "Session recorded. (last: 2026-02-08)"
 ```
 
@@ -112,21 +112,21 @@ Next:
 
 ```bash
 # Simple close with summary
-$ raise session close --summary "Session protocol design" --type feature
+$ rai session close --summary "Session protocol design" --type feature
 
 # Close with new patterns
-$ raise session close --summary "Session protocol design" \
+$ rai session close --summary "Session protocol design" \
   --type feature \
   --pattern "PAT-187: Code as Gemba — observe before designing"
 
 # Close with coaching correction
-$ raise session close --summary "Session protocol design" \
+$ rai session close --summary "Session protocol design" \
   --type feature \
   --correction "Defaulted to speed under deadline" \
   --correction-lesson "Reliability > velocity"
 
 # Full close with state file (AI writes YAML, CLI reads)
-$ raise session close --state-file /tmp/session-output.yaml
+$ rai session close --state-file /tmp/session-output.yaml
 
 # All of the above atomically:
 # 1. Writes session-state.yaml
@@ -170,7 +170,7 @@ notes: "ADR-024 needed before implementation."
 ### Data Structures
 
 ```python
-# src/raise_cli/schemas/session_state.py
+# src/rai_cli/schemas/session_state.py
 
 class SessionState(BaseModel):
     """Project-level working state. Overwritten each session-close."""
@@ -209,7 +209,7 @@ class PendingItems(BaseModel):
 ```
 
 ```python
-# Extension to src/raise_cli/onboarding/profile.py
+# Extension to src/rai_cli/onboarding/profile.py
 
 class Correction(BaseModel):
     """A coaching correction episode."""
@@ -270,10 +270,10 @@ class DeveloperProfile(BaseModel):
 
 ### Must Have
 
-- [ ] `raise session start --project . --context` outputs a complete context bundle to stdout
+- [ ] `rai session start --project . --context` outputs a complete context bundle to stdout
 - [ ] Context bundle is <200 tokens for a typical session
 - [ ] Context bundle includes: developer model, current work, behavioral primes, coaching, deadlines, pending items
-- [ ] `raise session close` accepts `--summary`, `--type`, `--pattern`, `--correction`, `--correction-lesson`, and `--state-file`
+- [ ] `rai session close` accepts `--summary`, `--type`, `--pattern`, `--correction`, `--correction-lesson`, and `--state-file`
 - [ ] `.raise/rai/session-state.yaml` is written by close, read by start
 - [ ] `~/.rai/developer.yaml` has `coaching` and `deadlines` sections (backward compatible — defaults to empty)
 - [ ] Foundational patterns tagged with `foundational: true` in patterns.jsonl metadata
@@ -290,7 +290,7 @@ class DeveloperProfile(BaseModel):
 
 - [ ] **MUST NOT** depend on CLAUDE.local.md for session continuity
 - [ ] **MUST NOT** write session bridges (prose files) — learnings go to graph, state to session-state.yaml
-- [ ] **MUST NOT** break existing `raise session start/close` behavior (backward compat via `--context` flag)
+- [ ] **MUST NOT** break existing `rai session start/close` behavior (backward compat via `--context` flag)
 
 ---
 
@@ -303,7 +303,7 @@ class DeveloperProfile(BaseModel):
 Given a developer with an existing profile in ~/.rai/developer.yaml
   And a session-state.yaml exists from a previous session close
   And the memory graph has been built with foundational patterns tagged
-When `raise session start --project . --context` is executed
+When `rai session start --project . --context` is executed
 Then the CLI outputs a context bundle containing:
   - Developer name and level from profile
   - Current work state from session-state.yaml
@@ -321,7 +321,7 @@ And current_session is set in the profile
 Given a developer with an existing profile in ~/.rai/developer.yaml
   And no session-state.yaml exists
   And the memory graph has been built
-When `raise session start --project . --context` is executed
+When `rai session start --project . --context` is executed
 Then the CLI outputs a context bundle with:
   - Developer name and level
   - "(no previous session state)" for current work
@@ -334,7 +334,7 @@ And the bundle gracefully handles missing state
 
 ```gherkin
 Given an active session with current_session set
-When `raise session close --state-file output.yaml` is executed
+When `rai session close --state-file output.yaml` is executed
   And output.yaml contains summary, patterns, corrections, and current_work
 Then session-state.yaml is overwritten with current_work, last_session, pending
 And new patterns are appended to patterns.jsonl
@@ -350,7 +350,7 @@ And the skill did NOT call any separate telemetry/memory commands
 ```gherkin
 Given a session was already closed (current_session is None)
   And the developer continued working after close
-When `raise session close --state-file output2.yaml` is executed
+When `rai session close --state-file output2.yaml` is executed
 Then session-state.yaml is overwritten with the updated state
 And new patterns (if any) are appended to patterns.jsonl
 And coaching corrections (if any) are added to developer.yaml
@@ -363,7 +363,7 @@ And current_session remains None (already cleared)
 
 ```gherkin
 Given the current CLI behavior (no --context flag)
-When `raise session start --project .` is executed without --context
+When `rai session start --project .` is executed without --context
 Then behavior is identical to current: "Session recorded. (last: ...)"
 And no context bundle is output
 ```

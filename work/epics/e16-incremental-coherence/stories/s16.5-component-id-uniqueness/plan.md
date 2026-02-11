@@ -9,7 +9,7 @@
 
 ### Task 1: Fix ID generation in `build_hierarchy()` + update tests
 - **Description:** Change `_file_stem()` to `_file_to_module()` in the two ID-generation lines (`analyzer.py:418,442`). The new format: `comp-{dotted.module}-{name}`. Update `test_component_id_format` assertion and any analyze() integration test assertions that check IDs.
-- **Files:** `src/raise_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
+- **Files:** `src/rai_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
 - **TDD Cycle:** RED (update test assertion to expect new ID format → fails with old code) → GREEN (change ID generation) → REFACTOR
 - **Verification:** `pytest tests/discovery/test_analyzer.py -v`
 - **Size:** S
@@ -17,7 +17,7 @@
 
 ### Task 2: Add post-analysis uniqueness assertion
 - **Description:** After `build_hierarchy()` returns in `analyze()`, assert all component IDs are unique. If duplicates found, raise `ValueError` with the duplicate IDs (Jidoka — stop on defect). Add test with conflicting files that would produce duplicate IDs under the old scheme but unique IDs under the new scheme, and a test that verifies the assertion fires on actual duplicates.
-- **Files:** `src/raise_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
+- **Files:** `src/rai_cli/discovery/analyzer.py`, `tests/discovery/test_analyzer.py`
 - **TDD Cycle:** RED (test duplicate ID raises ValueError) → GREEN (add assertion in `analyze()`) → REFACTOR
 - **Verification:** `pytest tests/discovery/test_analyzer.py -v`
 - **Size:** S
@@ -25,14 +25,14 @@
 
 ### Task 3: Add collision warning in graph builder `load_components()`
 - **Description:** In `UnifiedGraphBuilder.load_components()`, after loading all component nodes, check for ID collisions against existing node IDs. Log a warning via `logging.warning()` when a component ID already exists. Add test.
-- **Files:** `src/raise_cli/context/builder.py`, `tests/context/test_builder.py`
+- **Files:** `src/rai_cli/context/builder.py`, `tests/context/test_builder.py`
 - **TDD Cycle:** RED (test warning emitted on collision) → GREEN (add warning check) → REFACTOR
 - **Verification:** `pytest tests/context/test_builder.py -v`
 - **Size:** S
 - **Dependencies:** None (parallel with Task 1-2)
 
 ### Task 4: Manual integration test — re-run discovery pipeline
-- **Description:** Run full discovery pipeline: `raise discover scan` → `raise discover analyze` → verify 345 unique IDs → `raise memory build` → verify 345 components in graph. This validates the fix end-to-end with real data.
+- **Description:** Run full discovery pipeline: `rai discover scan` → `rai discover analyze` → verify 345 unique IDs → `rai memory build` → verify 345 components in graph. This validates the fix end-to-end with real data.
 - **Verification:** Component count in graph equals validated component count (0 silent drops)
 - **Size:** XS
 - **Dependencies:** Tasks 1, 2, 3

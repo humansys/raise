@@ -49,7 +49,7 @@ Made the ontology graph the active backbone for design decisions. The graph now 
 ## What Could Be Improved
 
 - **Epic scope grew significantly** — 17 SP estimated → 27 SP delivered. S15.7 and S15.8 were added mid-epic. While valuable, the scope expansion should have been documented as a deliberate decision point.
-- **Module naming convention** — `mod-` prefix requirement in `raise memory context` wasn't obvious. Caught during S15.6 dogfood but could have been caught earlier with a UX review.
+- **Module naming convention** — `mod-` prefix requirement in `rai memory context` wasn't obvious. Caught during S15.6 dogfood but could have been caught earlier with a UX review.
 - **Graph rebuild frequency** — Schema changes (PAT-152) require graph rebuilds. Should be automated as a post-schema-change hook.
 
 ## Patterns Discovered
@@ -85,7 +85,7 @@ Made the ontology graph the active backbone for design decisions. The graph now 
 - [x] Bounded context and layer nodes with belongs_to/in_layer edges (S15.2)
 - [x] Guardrails linked to bounded contexts/layers via constrained_by edges (S15.3)
 - [x] Query engine exposes edge_types filtering (S15.4)
-- [x] `raise memory context <module>` returns full architectural context (S15.5)
+- [x] `rai memory context <module>` returns full architectural context (S15.5)
 - [x] `/story-design` queries architectural context before designing (S15.6)
 - [x] Tests pass (>90% coverage) — 92.36%
 - [x] Graph rebuilt and verified (S15.3 integration test)
@@ -98,7 +98,7 @@ Made the ontology graph the active backbone for design decisions. The graph now 
 
 - Merge E15 to main
 - E15 unblocks ontology-guided design for all future epics
-- Consider: short-name resolution for `raise memory context` (parking lot)
+- Consider: short-name resolution for `rai memory context` (parking lot)
 - Consider: automated graph rebuild on schema change (parking lot)
 
 ---

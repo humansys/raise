@@ -67,8 +67,8 @@
 
 | Artifact | Location | Lines/Tests |
 |----------|----------|-------------|
-| ConceptType extension | `src/raise_cli/governance/models.py` | +3 enum values |
-| Backlog parser | `src/raise_cli/governance/parsers/backlog.py` | 298 lines |
+| ConceptType extension | `src/rai_cli/governance/models.py` | +3 enum values |
+| Backlog parser | `src/rai_cli/governance/parsers/backlog.py` | 298 lines |
 | Parser tests | `tests/governance/parsers/test_backlog.py` | 34 tests |
 | Design spec | `work/stories/f8.1-backlog-parser/design.md` | 204 lines |
 | Implementation plan | `work/stories/f8.1-backlog-parser/plan.md` | 88 lines |

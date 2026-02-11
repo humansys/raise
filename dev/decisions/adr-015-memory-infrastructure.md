@@ -52,7 +52,7 @@ From RES-OPENCLAW-001, key patterns that work:
 - Analytics/observability
 
 **Both**:
-- Same interface (`raise memory` CLI)
+- Same interface (`rai memory` CLI)
 - Same Identity Core structure
 - Graceful degradation
 
@@ -65,7 +65,7 @@ From RES-OPENCLAW-001, key patterns that work:
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     Memory Interface                             │
-│  raise memory status | flush | search | load | prune            │
+│  rai memory status | flush | search | load | prune            │
 └─────────────────────────────────────────────────────────────────┘
                               │
             ┌─────────────────┴─────────────────┐
@@ -92,7 +92,7 @@ From RES-OPENCLAW-001, key patterns that work:
 
 ```bash
 # Status - check memory state
-raise memory status
+rai memory status
 # Output:
 #   Backend: file
 #   Workspace: .rai/
@@ -101,20 +101,20 @@ raise memory status
 #   Last flush: 2 hours ago
 
 # Flush - save current session state (pre-compaction)
-raise memory flush [--session-id ID]
+rai memory flush [--session-id ID]
 # Writes current session learnings to daily log
 
 # Search - find in memory
-raise memory search "velocity patterns"
+rai memory search "velocity patterns"
 # File: keyword search (grep)
 # DB: vector similarity search
 
 # Load - load context for session
-raise memory load [--minimal | --extended | --full]
+rai memory load [--minimal | --extended | --full]
 # Returns: JSON with requested context
 
 # Prune - clean old sessions
-raise memory prune --keep-days 30
+rai memory prune --keep-days 30
 # Removes session logs older than threshold
 ```
 
@@ -172,7 +172,7 @@ def search(query: str, limit: int = 5) -> list[Memory]:
 ```
 Session tokens approach soft threshold (80% of window)
     ↓
-Skill or user triggers: raise memory flush
+Skill or user triggers: rai memory flush
     ↓
 Current session state written to daily log
     ↓
@@ -186,7 +186,7 @@ Session continues safely (or compacts without loss)
 - Progress state
 
 **Trigger options**:
-1. **Manual**: User runs `raise memory flush`
+1. **Manual**: User runs `rai memory flush`
 2. **Skill-triggered**: `/session-close` includes flush
 3. **Checkpoint**: After feature completion, commit, etc.
 4. **Future**: Auto-detect token threshold (requires agent support)
@@ -372,7 +372,7 @@ agent = Agent(
 | Feature | Description | Priority |
 |---------|-------------|----------|
 | **F3.1** | MemoryBackend interface + FileMemoryBackend | HIGH |
-| **F3.2** | `raise memory` CLI commands | HIGH |
+| **F3.2** | `rai memory` CLI commands | HIGH |
 | **F3.3** | Pre-compaction flush in /session-close | HIGH |
 | **F3.4** | Update /session-start to use new structure | HIGH |
 | **F3.5** | DatabaseMemoryBackend (commercial) | MEDIUM |
@@ -382,7 +382,7 @@ agent = Agent(
 
 ```
 F3.1: MemoryBackend + FileMemoryBackend
-F3.2: raise memory status|flush|search|load|prune
+F3.2: rai memory status|flush|search|load|prune
 F3.3: /session-close includes flush
 F3.4: /session-start uses .rai/ structure
 ```
@@ -424,14 +424,14 @@ F3.6: Mem0 integration for semantic extraction
 
 ```bash
 # Create memory
-raise memory flush --content "Kata cycles deliver 2-3x velocity"
+rai memory flush --content "Kata cycles deliver 2-3x velocity"
 
 # Search memory
-raise memory search "velocity"
+rai memory search "velocity"
 # Expected: Returns the pattern with source
 
 # Status check
-raise memory status
+rai memory status
 # Expected: Shows file counts, last flush time
 ```
 
@@ -442,7 +442,7 @@ raise memory status
 export RAISE_MEMORY_BACKEND=database
 export RAISE_DB_URL=postgresql://...
 
-raise memory search "velocity patterns"
+rai memory search "velocity patterns"
 # Expected: Vector similarity results with relevance scores
 ```
 
@@ -473,11 +473,11 @@ raise memory search "velocity patterns"
 - E3 scope defined around memory infrastructure
 - File backend for V2 (Feb 9)
 - Database backend for V3 (Mar 14)
-- CLI commands: `raise memory status|flush|search|load|prune`
+- CLI commands: `rai memory status|flush|search|load|prune`
 
 **Next steps**:
 1. Implement MemoryBackend interface
 2. Implement FileMemoryBackend
-3. Add `raise memory` CLI commands
+3. Add `rai memory` CLI commands
 4. Update /session-close with flush
 5. Update /session-start for new structure

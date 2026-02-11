@@ -15,7 +15,7 @@ The raise-cli discovery pipeline is a four-phase process that transforms raw sou
 | Phase | Skill | CLI Command | Output Artifact |
 |-------|-------|-------------|-----------------|
 | 1. Start | `/discover-start` | *(manual file detection)* | `work/discovery/context.yaml` |
-| 2. Scan | `/discover-scan` | `raise discover scan` | `work/discovery/components-draft.yaml` |
+| 2. Scan | `/discover-scan` | `rai discover scan` | `work/discovery/components-draft.yaml` |
 | 3. Validate | `/discover-validate` | *(AI-human interaction loop)* | Updated `components-draft.yaml` |
 | 4. Complete | `/discover-complete` | *(AI file transformation)* | `work/discovery/components-validated.json` |
 
@@ -23,9 +23,9 @@ Post-pipeline, a fifth step integrates validated components into the unified gra
 
 | Step | CLI Command | Output |
 |------|-------------|--------|
-| Build | `raise discover build` | `.raise/graph/unified.json` |
+| Build | `rai discover build` | `.raise/graph/unified.json` |
 
-Additionally, `raise discover drift` provides ongoing architectural compliance checks against the validated baseline.
+Additionally, `rai discover drift` provides ongoing architectural compliance checks against the validated baseline.
 
 **Key architectural decision:** Skills are process guides (markdown), not executable code. The AI assistant (Claude/Rai) reads the skill and executes it step-by-step, calling CLI tools and file operations as needed. This means phases 1, 3, and 4 have **no deterministic CLI implementation** -- they are entirely AI-orchestrated workflows.
 
@@ -140,7 +140,7 @@ sequenceDiagram
     Human->>Rai: /discover-scan
     Rai->>FS: Read work/discovery/context.yaml
     FS-->>Rai: project config (languages, root_dirs)
-    Rai->>CLI: raise discover scan src/raise_cli --language python --output json
+    Rai->>CLI: rai discover scan src/rai_cli --language python --output json
     CLI->>CLI: scan_directory() -> ScanResult
     CLI-->>Rai: JSON: {symbols: [...], files_scanned: N}
     Rai->>Rai: Group symbols by module
@@ -171,7 +171,7 @@ sequenceDiagram
     Rai-->>Human: Summary: N exported, categories, next steps
 
     Note over Human,FS: Graph Integration (post-pipeline)
-    Human->>CLI: raise discover build
+    Human->>CLI: rai discover build
     CLI->>FS: Read components-validated.json
     CLI->>CLI: UnifiedGraphBuilder.build()
     CLI->>FS: Save .raise/graph/unified.json
@@ -383,8 +383,8 @@ class BaselineComponent(BaseModel):
 project:
   name: string           # From pyproject.toml, package.json, or dirname
   languages: string[]    # ["python", "typescript", "javascript"]
-  root_dirs: string[]    # ["src/raise_cli"]
-  entry_points: string[] # ["src/raise_cli/cli/main.py"]
+  root_dirs: string[]    # ["src/rai_cli"]
+  entry_points: string[] # ["src/rai_cli/cli/main.py"]
   detected_at: string    # ISO timestamp
 status: string           # "initialized" | "scanning" | "validated" | "complete"
 ```
@@ -446,9 +446,9 @@ components:
 
 ## 5. CLI Commands Detail
 
-### 5.1 `raise discover scan`
+### 5.1 `rai discover scan`
 
-**Function:** `scan_command()` in `src/raise_cli/cli/commands/discover.py`
+**Function:** `scan_command()` in `src/rai_cli/cli/commands/discover.py`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -485,9 +485,9 @@ components:
 }
 ```
 
-### 5.2 `raise discover build`
+### 5.2 `rai discover build`
 
-**Function:** `build_command()` in `src/raise_cli/cli/commands/discover.py`
+**Function:** `build_command()` in `src/rai_cli/cli/commands/discover.py`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -506,9 +506,9 @@ components:
 
 **Important implementation detail:** `build_command()` first reads and validates the input JSON independently, then calls `UnifiedGraphBuilder.build()` which loads components *again* from the same default path. The builder method `load_components()` hardcodes the path `work/discovery/components-validated.json` relative to `project_root`. If `--input` points to a non-default path, the builder will still look at the default path. This is a potential discrepancy between the CLI's input validation and the builder's actual loading logic.
 
-### 5.3 `raise discover drift`
+### 5.3 `rai discover drift`
 
-**Function:** `drift_command()` in `src/raise_cli/cli/commands/discover.py`
+**Function:** `drift_command()` in `src/rai_cli/cli/commands/discover.py`
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
@@ -582,7 +582,7 @@ Phases 1, 3, and 4 are entirely AI-orchestrated with no deterministic CLI backin
 - **No automation**: Cannot run validation in CI/CD.
 - **No testing**: The validation logic lives in markdown, not in testable code.
 
-Phase 2 has a solid `raise discover scan` command, and the post-pipeline has `raise discover build`. The middle phases (validate and complete) are manual.
+Phase 2 has a solid `rai discover scan` command, and the post-pipeline has `rai discover build`. The middle phases (validate and complete) are manual.
 
 ### 6.5 Build Command Path Discrepancy
 
@@ -658,12 +658,12 @@ Drift Check (CLI):
 | Skill Says | Implementation Does | Gap |
 |------------|-------------------|-----|
 | `/discover-start` creates context.yaml | No CLI command exists -- entirely AI writes to file | No deterministic implementation |
-| `/discover-scan` calls `raise discover scan ... --output json` | CLI command exists and works correctly | Aligned |
+| `/discover-scan` calls `rai discover scan ... --output json` | CLI command exists and works correctly | Aligned |
 | `/discover-scan` says AI synthesizes descriptions | No CLI support for synthesis -- AI does it inline | Synthesis is non-deterministic |
 | `/discover-validate` presents batches of 10 | No CLI backing -- entirely AI interaction | No testable validation logic |
 | `/discover-validate` saves progress per batch | AI must manually rewrite YAML | No atomic save mechanism |
 | `/discover-complete` transforms YAML to JSON | No CLI command -- AI transforms and writes file | No deterministic implementation |
-| `/discover-complete` says `raise discover build` integrates | `build_command()` exists and works | Aligned |
+| `/discover-complete` says `rai discover build` integrates | `build_command()` exists and works | Aligned |
 | Skills reference `components-validated.json` schema | Builder `load_components()` implements exact schema | Aligned |
 
 ---

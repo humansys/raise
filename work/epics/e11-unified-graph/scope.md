@@ -55,7 +55,7 @@ Complete Rai's self-improvement infrastructure by unifying memory, governance, a
 |----|---------|:----:|:------:|-------------|
 | F11.1 | **Unified Graph Schema** | S | **Done** | Pydantic models, NetworkX wrapper, serialization |
 | F11.2 | **Graph Builder** | M | **Done** | Merge governance + memory + work + skills into unified graph |
-| F11.3 | **Unified Query** | S | **Done** | `raise context query --unified` with keyword search + concept lookup |
+| F11.3 | **Unified Query** | S | **Done** | `rai context query --unified` with keyword search + concept lookup |
 | F11.4 | **Skill Integration** | S | **Done** | Added "Step 0.5: Query Context" to 9 workflow skills |
 
 **Total:** 4 features, ~7 SP, ~4-5 hours
@@ -73,9 +73,9 @@ Complete Rai's self-improvement infrastructure by unifying memory, governance, a
 - JSON serialization via `node_link_data`/`node_link_graph`
 
 **Files:**
-- `src/raise_cli/context/models.py` (new)
-- `src/raise_cli/context/graph.py` (new)
-- `src/raise_cli/context/__init__.py` (new)
+- `src/rai_cli/context/models.py` (new)
+- `src/rai_cli/context/graph.py` (new)
+- `src/rai_cli/context/__init__.py` (new)
 
 ### F11.2: Graph Builder
 
@@ -84,7 +84,7 @@ Complete Rai's self-improvement infrastructure by unifying memory, governance, a
 - Parse skill metadata from `.claude/skills/*/SKILL.md`
 - Merge all concepts into unified graph
 - Infer relationships (learned_from, governed_by, applies_to, etc.)
-- `raise graph build --unified` command
+- `rai graph build --unified` command
 
 **Sources to merge:**
 1. Governance: constitution principles, PRD requirements, vision outcomes
@@ -93,14 +93,14 @@ Complete Rai's self-improvement infrastructure by unifying memory, governance, a
 4. Skills: metadata from SKILL.md frontmatter
 
 **Files:**
-- `src/raise_cli/context/builder.py` (new)
-- `src/raise_cli/context/extractors/` (new - skill parser)
-- `src/raise_cli/cli/commands/graph.py` (extend)
+- `src/rai_cli/context/builder.py` (new)
+- `src/rai_cli/context/extractors/` (new - skill parser)
+- `src/rai_cli/cli/commands/graph.py` (extend)
 
 ### F11.3: Unified Query
 
 **Scope:**
-- `raise context query "<query>"` searches unified graph
+- `rai context query "<query>"` searches unified graph
 - Keyword matching on node content
 - BFS traversal from matched nodes (configurable depth)
 - Filter by node type if specified
@@ -113,8 +113,8 @@ raise context query "planning estimation" --max-depth 2 --types pattern,calibrat
 ```
 
 **Files:**
-- `src/raise_cli/context/query.py` (new)
-- `src/raise_cli/cli/commands/context.py` (extend)
+- `src/rai_cli/context/query.py` (new)
+- `src/rai_cli/cli/commands/context.py` (extend)
 
 ### F11.4: Skill Integration
 
@@ -156,7 +156,7 @@ raise context query "planning estimation" --max-depth 2 --types pattern,calibrat
 ## Out of Scope
 
 - Vector embeddings / semantic search (add later if keyword insufficient)
-- Auto-rebuild on file changes (manual `raise graph build` for now)
+- Auto-rebuild on file changes (manual `rai graph build` for now)
 - GraphRAG-style community detection (overkill for our scale)
 - External database backend (NetworkX in-memory is sufficient)
 
@@ -203,7 +203,7 @@ F11.2 (Builder) ─────► F11.3 (Query)
 
 | Metric | Target | Validation |
 |--------|--------|------------|
-| Concepts in graph | >50 | `raise graph build --unified && jq '.nodes | length'` |
+| Concepts in graph | >50 | `rai graph build --unified && jq '.nodes | length'` |
 | Query latency | <100ms | Benchmark |
 | Relevant results per skill | >2 | Manual check |
 | Skills integrated | 9 | Count SKILL.md files with query step |
@@ -282,8 +282,8 @@ From RES-CONTEXT-001:
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
 | **M1: Schema Ready** | F11.1 | Hour 1 | Models pass pyright, tests pass | `UnifiedGraph` can add/serialize nodes |
-| **M2: Graph Builds** | F11.2 | Hour 2.5 | All 4 sources merged into graph | `raise graph build --unified` produces JSON |
-| **M3: Queryable** | F11.3 | Hour 3.5 | Query returns relevant context | `raise context query "planning"` works |
+| **M2: Graph Builds** | F11.2 | Hour 2.5 | All 4 sources merged into graph | `rai graph build --unified` produces JSON |
+| **M3: Queryable** | F11.3 | Hour 3.5 | Query returns relevant context | `rai context query "planning"` works |
 | **M4: Complete** | F11.4 | Hour 4.5 | Skills use unified context | `/story-plan` shows queried patterns |
 
 ### Parallel Work Streams

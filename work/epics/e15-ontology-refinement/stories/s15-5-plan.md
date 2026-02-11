@@ -12,7 +12,7 @@
 ### Task 1: ArchitecturalContext model + helper methods on UnifiedQueryEngine
 - **Description:** Add `ArchitecturalContext` Pydantic model to `context/query.py`. Add 4 helper methods to `UnifiedQueryEngine`: `find_domain_for()`, `find_layer_for()`, `find_constraints_for()`, `get_architectural_context()`. All use typed BFS via existing `get_neighbors(edge_types=...)`.
 - **Files:**
-  - `src/raise_cli/context/query.py` (modify — add model + methods)
+  - `src/rai_cli/context/query.py` (modify — add model + methods)
   - `tests/context/test_query_helpers.py` (create — unit tests)
 - **TDD Cycle:**
   - RED: Test `get_architectural_context("mod-memory")` returns populated `ArchitecturalContext`
@@ -25,10 +25,10 @@
 - **Size:** S
 - **Dependencies:** None
 
-### Task 2: CLI `raise memory context` subcommand
+### Task 2: CLI `rai memory context` subcommand
 - **Description:** Add `context` subcommand to `memory_app` in `cli/commands/memory.py`. Accepts module ID argument. Formats output via Rich console (human default, `--format json` option). Calls `engine.get_architectural_context()` from Task 1.
 - **Files:**
-  - `src/raise_cli/cli/commands/memory.py` (modify — add `context` command)
+  - `src/rai_cli/cli/commands/memory.py` (modify — add `context` command)
   - `tests/cli/commands/test_memory_context.py` (create — CLI tests)
 - **TDD Cycle:**
   - RED: Test CLI command exits 0 and outputs module/domain/layer/constraints
@@ -41,7 +41,7 @@
 - **Dependencies:** Task 1
 
 ### Task 3: Manual Integration Test
-- **Description:** Rebuild graph, run `raise memory context mod-memory` against real data. Verify output shows domain (bc-ontology), layer, and constraint guardrails. Test with a module that has no domain to verify graceful handling.
+- **Description:** Rebuild graph, run `rai memory context mod-memory` against real data. Verify output shows domain (bc-ontology), layer, and constraint guardrails. Test with a module that has no domain to verify graceful handling.
 - **Verification:** Demo working command with real graph data
 - **Size:** XS
 - **Dependencies:** Task 1, Task 2

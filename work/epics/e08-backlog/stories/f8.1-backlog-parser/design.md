@@ -16,7 +16,7 @@ created: 2026-02-02
 
 **Problem:** Work tracking (projects, epics) is not part of the queryable governance graph. Rai can't answer "what's the current epic?" because backlog data isn't extracted as concepts.
 
-**Value:** Extract Project and Epic concepts from `backlog.md` files, enabling graph queries like `raise context query "current work"`.
+**Value:** Extract Project and Epic concepts from `backlog.md` files, enabling graph queries like `rai context query "current work"`.
 
 ---
 
@@ -30,9 +30,9 @@ Parse `governance/projects/*/backlog.md` files to extract:
 **Pattern:** Follow `prd.py` parser pattern — regex for tables, line-by-line parsing.
 
 **Components affected:**
-- `src/raise_cli/governance/parsers/backlog.py` — **CREATE**
-- `src/raise_cli/governance/models.py` — **MODIFY** (add ConceptType.PROJECT, ConceptType.EPIC)
-- `src/raise_cli/governance/parsers/__init__.py` — **MODIFY** (export new parser)
+- `src/rai_cli/governance/parsers/backlog.py` — **CREATE**
+- `src/rai_cli/governance/models.py` — **MODIFY** (add ConceptType.PROJECT, ConceptType.EPIC)
+- `src/rai_cli/governance/parsers/__init__.py` — **MODIFY** (export new parser)
 
 ---
 

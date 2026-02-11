@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from raise_cli.core.text import sanitize_id
+from rai_cli.core.text import sanitize_id
 
 
 class TestSanitizeId:

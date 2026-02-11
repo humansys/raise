@@ -13,15 +13,15 @@ The `/session-start` skill is **markdown** — it guides Rai's behavior, not cod
 1. **New Step 0** in skill: Load personal profile via CLI
 2. **Conditional content** based on experience level
 3. **Session increment** at end of skill
-4. **CLI command** to support the skill: `raise profile show` (read profile)
+4. **CLI command** to support the skill: `rai profile show` (read profile)
 
 ## Tasks
 
 ### Task 1: Add Profile CLI Command
-- **Description:** Create `raise profile show` command that outputs developer profile in YAML format. This lets the skill read the profile.
+- **Description:** Create `rai profile show` command that outputs developer profile in YAML format. This lets the skill read the profile.
 - **Files:**
-  - `src/raise_cli/cli/commands/profile.py` (new)
-  - `src/raise_cli/cli/main.py` (register command)
+  - `src/rai_cli/cli/commands/profile.py` (new)
+  - `src/rai_cli/cli/main.py` (register command)
   - `tests/cli/commands/test_profile.py` (new)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `uv run pytest tests/cli/commands/test_profile.py -v`
@@ -31,7 +31,7 @@ The `/session-start` skill is **markdown** — it guides Rai's behavior, not cod
 ### Task 2: Add Session Increment Function
 - **Description:** Add `increment_session()` function to profile module that increments `sessions_total`, updates `last_session`, and adds project if new.
 - **Files:**
-  - `src/raise_cli/onboarding/profile.py`
+  - `src/rai_cli/onboarding/profile.py`
   - `tests/onboarding/test_profile.py`
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `uv run pytest tests/onboarding/test_profile.py -v`
@@ -39,9 +39,9 @@ The `/session-start` skill is **markdown** — it guides Rai's behavior, not cod
 - **Dependencies:** None (parallel with Task 1)
 
 ### Task 3: Add Profile Session CLI Command
-- **Description:** Create `raise profile session` command that increments session and optionally creates profile for first-time users.
+- **Description:** Create `rai profile session` command that increments session and optionally creates profile for first-time users.
 - **Files:**
-  - `src/raise_cli/cli/commands/profile.py` (extend)
+  - `src/rai_cli/cli/commands/profile.py` (extend)
   - `tests/cli/commands/test_profile.py` (extend)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `uv run pytest tests/cli/commands/test_profile.py -v`
@@ -50,11 +50,11 @@ The `/session-start` skill is **markdown** — it guides Rai's behavior, not cod
 
 ### Task 4: Update Session-Start Skill with Adaptive Sections
 - **Description:** Modify `/session-start` skill to:
-  1. Load profile at start (`raise profile show`)
+  1. Load profile at start (`rai profile show`)
   2. Branch behavior based on experience level
   3. Add educational content for Shu users
   4. Add efficient content for Ri users
-  5. Increment session at end (`raise profile session`)
+  5. Increment session at end (`rai profile session`)
 - **Files:**
   - `.claude/skills/session-start/SKILL.md`
 - **TDD Cycle:** N/A (skill markdown, not code)
@@ -91,7 +91,7 @@ Task 2 ──┘
 | Risk | Mitigation |
 |------|------------|
 | Skill markdown complexity | Keep Shu/Ri sections clearly separated |
-| First-time user flow | `raise profile session` creates profile if missing |
+| First-time user flow | `rai profile session` creates profile if missing |
 
 ## Duration Tracking
 

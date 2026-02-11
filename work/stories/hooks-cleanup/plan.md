@@ -9,10 +9,10 @@
 ## Tasks
 
 ### Task 1: Strip hooks from distributable skills
-- **Description:** Remove the `hooks:` YAML frontmatter block from all 20 distributable SKILL.md files in `src/raise_cli/skills_base/*/SKILL.md`. The block is always the last section before the closing `---`, with a consistent format (4 lines: `hooks:`, `  Stop:`, `    - hooks:`, `        - type: command`, `          command: ...`).
-- **Files:** 20 files in `src/raise_cli/skills_base/*/SKILL.md`
+- **Description:** Remove the `hooks:` YAML frontmatter block from all 20 distributable SKILL.md files in `src/rai_cli/skills_base/*/SKILL.md`. The block is always the last section before the closing `---`, with a consistent format (4 lines: `hooks:`, `  Stop:`, `    - hooks:`, `        - type: command`, `          command: ...`).
+- **Files:** 20 files in `src/rai_cli/skills_base/*/SKILL.md`
 - **TDD Cycle:** GREEN only — mechanical removal, verified by grep
-- **Verification:** `grep -r "^hooks:" src/raise_cli/skills_base/ | wc -l` → 0
+- **Verification:** `grep -r "^hooks:" src/rai_cli/skills_base/ | wc -l` → 0
 - **Size:** S
 - **Dependencies:** None
 
@@ -25,10 +25,10 @@
 - **Dependencies:** None (parallel with Task 1)
 
 ### Task 3: Remove bash scripts and bootstrap wiring
-- **Description:** Delete the 5 bash scripts from `src/raise_cli/rai_base/scripts/` and remove the `_copy_scripts()` function + `scripts_copied` field from `bootstrap.py`. Remove the call to `_copy_scripts` in `bootstrap_rai_base()`.
+- **Description:** Delete the 5 bash scripts from `src/rai_cli/rai_base/scripts/` and remove the `_copy_scripts()` function + `scripts_copied` field from `bootstrap.py`. Remove the call to `_copy_scripts` in `bootstrap_rai_base()`.
 - **Files:**
-  - Delete: `src/raise_cli/rai_base/scripts/log-skill-complete.sh`, `log-skill-start.sh`, `log-session-event.sh`, `log-artifact-created.sh`, `log-error-event.sh`
-  - Modify: `src/raise_cli/onboarding/bootstrap.py`
+  - Delete: `src/rai_cli/rai_base/scripts/log-skill-complete.sh`, `log-skill-start.sh`, `log-session-event.sh`, `log-artifact-created.sh`, `log-error-event.sh`
+  - Modify: `src/rai_cli/onboarding/bootstrap.py`
 - **TDD Cycle:** RED (update tests first) → GREEN (remove code)
 - **Verification:** `pytest tests/onboarding/test_bootstrap.py -v`
 - **Size:** S
@@ -36,7 +36,7 @@
 
 ### Task 4: Remove hooks from scaffold template
 - **Description:** Remove the `hooks:` block from the skill template in `scaffold.py` so newly created skills don't include hooks.
-- **Files:** `src/raise_cli/skills/scaffold.py`
+- **Files:** `src/rai_cli/skills/scaffold.py`
 - **TDD Cycle:** RED → GREEN — verify scaffold output has no hooks
 - **Verification:** `pytest tests/skills/ -v`
 - **Size:** XS
@@ -52,7 +52,7 @@
 - **Dependencies:** Tasks 1-4
 
 ### Task 6: Manual integration test
-- **Description:** Run `raise init` on a temp directory to verify bootstrap no longer copies scripts. Run `raise skill validate` on a distributable skill to verify it parses without hooks.
+- **Description:** Run `rai init` on a temp directory to verify bootstrap no longer copies scripts. Run `rai skill validate` on a distributable skill to verify it parses without hooks.
 - **Verification:** Demo both commands working correctly
 - **Size:** XS
 - **Dependencies:** Task 5

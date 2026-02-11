@@ -38,7 +38,7 @@
 
 ## Improvements Applied
 - Templates now have YAML frontmatter (contract matches parser)
-- `raise memory validate` includes completeness check
+- `rai memory validate` includes completeness check
 - Skills corrected and expanded with module doc generation
 - Parking lot entries for systemic follow-up
 

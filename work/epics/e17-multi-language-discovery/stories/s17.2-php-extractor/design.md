@@ -2,7 +2,7 @@
 
 ## What & Why
 
-**Problem:** `raise discover scan` cannot extract symbols from PHP files. zambezi-concierge has 37 PHP files in admin/app/ (Laravel + Filament) that are invisible to discovery.
+**Problem:** `rai discover scan` cannot extract symbols from PHP files. zambezi-concierge has 37 PHP files in admin/app/ (Laravel + Filament) that are invisible to discovery.
 
 **Value:** Enables discovery on PHP codebases and the PHP portion of polyglot repos like zambezi-concierge.
 

@@ -1,9 +1,9 @@
 # CLI Anti-Patterns Scan Report
 
-> Scan of `src/raise_cli/cli/` against `governance/solution/guardrails-stack.md` Section 2 (CLI)
+> Scan of `src/rai_cli/cli/` against `governance/solution/guardrails-stack.md` Section 2 (CLI)
 
 **Date:** 2026-02-05
-**Scanned:** 12 files in `src/raise_cli/cli/`
+**Scanned:** 12 files in `src/rai_cli/cli/`
 
 ---
 
@@ -26,7 +26,7 @@
 
 #### Finding 1.1 (Low)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/error_handler.py:109`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/error_handler.py:109`
 
 ```python
 print(output, file=sys.stderr)
@@ -40,11 +40,11 @@ print(output, file=sys.stderr)
 
 #### Finding 1.2 (Medium)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/profile.py:50-60`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/profile.py:50-60`
 
 ```python
 typer.echo(
-    "No developer profile found. Run `raise init` in a project to create one."
+    "No developer profile found. Run `rai init` in a project to create one."
 )
 ...
 typer.echo(output.rstrip())
@@ -65,7 +65,7 @@ console.print("No developer profile found. Run [cyan]raise init[/cyan] to create
 
 #### Finding 1.3 (Medium)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/status.py:74-128`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/status.py:74-128`
 
 ```python
 typer.echo("RaiSE Project Status")
@@ -90,9 +90,9 @@ console.print(f"Project: [cyan]{project_info['name']}[/cyan] ({project_info['typ
 
 ### 2. sys.exit() Instead of raise typer.Exit()
 
-**Guideline:** Use `raise typer.Exit(code)` for proper Typer exception handling.
+**Guideline:** Use `rai typer.Exit(code)` for proper Typer exception handling.
 
-**Finding:** No violations found. All exit points correctly use `raise typer.Exit()`.
+**Finding:** No violations found. All exit points correctly use `rai typer.Exit()`.
 
 **Evidence:** 42 occurrences of `typer.Exit` found, 0 occurrences of `sys.exit()` in command code.
 
@@ -104,7 +104,7 @@ console.print(f"Project: [cyan]{project_info['name']}[/cyan] ({project_info['typ
 
 #### Finding 3.1 (High)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/memory.py:409-414`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/memory.py:409-414`
 
 ```python
 @memory_app.command("add-calibration")
@@ -131,7 +131,7 @@ def add_calibration_cmd(
 
 #### Finding 3.2 (Medium)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/telemetry.py:200-209`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/telemetry.py:200-209`
 
 ```python
 @telemetry_app.command("emit")
@@ -167,7 +167,7 @@ def emit_work(
 
 #### Finding 5.1 (High)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/profile.py`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/profile.py`
 
 **Analysis:** No `--format` option. Only outputs YAML format for `show` command.
 
@@ -192,7 +192,7 @@ def show(
 
 #### Finding 5.2 (Medium)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/status.py`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/status.py`
 
 **Analysis:** No `--format` option. Only outputs human-readable text.
 
@@ -212,7 +212,7 @@ def status(
 
 #### Finding 5.3 (Low)
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/init.py`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/init.py`
 
 **Analysis:** No `--format` option. Acceptable since init is an interactive command that should always output human-readable text.
 
@@ -258,7 +258,7 @@ def status(
 ## Files Reviewed
 
 ```
-src/raise_cli/cli/
+src/rai_cli/cli/
 ├── __init__.py
 ├── main.py
 ├── error_handler.py

@@ -25,13 +25,13 @@ Build an in-memory directed graph from extracted concepts with relationship infe
 - **Traversal**: BFS utilities for MVC queries (F2.3)
 
 **Components affected**:
-- CREATE: `src/raise_cli/governance/graph/` (new submodule)
+- CREATE: `src/rai_cli/governance/graph/` (new submodule)
   - `models.py` - Graph data structures (`ConceptGraph`, `Relationship`)
   - `builder.py` - Graph construction from concepts
   - `relationships.py` - Relationship inference logic
   - `serializer.py` - JSON persistence
   - `traversal.py` - BFS and path utilities
-- MODIFY: `src/raise_cli/cli/commands/graph.py` - Add `build` subcommand
+- MODIFY: `src/rai_cli/cli/commands/graph.py` - Add `build` subcommand
 - CREATE: `tests/governance/graph/` (test suite)
 
 ## Examples
@@ -211,7 +211,7 @@ class ConceptGraph(BaseModel):
 - Store graph as `ConceptGraph` with nodes (dict) and edges (list)
 - Serialize to JSON (`graph.to_json()`) and deserialize (`ConceptGraph.from_json()`)
 - Provide BFS traversal utility with depth limit and edge type filtering
-- CLI command `raise graph build` functional
+- CLI command `rai graph build` functional
 - >90% test coverage on graph module
 - All code passes type checking (`pyright --strict`)
 
@@ -478,7 +478,7 @@ def test_graph_serialization_roundtrip():
 
 ## References
 
-- **F2.1 output**: `Concept` objects from `src/raise_cli/governance/models.py`
+- **F2.1 output**: `Concept` objects from `src/rai_cli/governance/models.py`
 - **Spike validation**: `dev/experiments/test_mvc.py` (BFS traversal proven)
 - **Architecture**: `dev/decisions/adr-011-concept-level-graph-architecture.md`
 - **Epic scope**: `dev/epic-e2-scope.md`

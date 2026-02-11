@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.onboarding.governance import (
+from rai_cli.onboarding.governance import (
     GovernanceScaffoldResult,
     scaffold_governance,
 )
@@ -190,7 +190,7 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """Scaffolded prd.md should produce requirement nodes in graph."""
-        from raise_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import UnifiedGraphBuilder
 
         builder = UnifiedGraphBuilder(scaffolded_project)
         graph = builder.build()
@@ -207,7 +207,7 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """Scaffolded vision.md should produce outcome nodes in graph."""
-        from raise_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import UnifiedGraphBuilder
 
         builder = UnifiedGraphBuilder(scaffolded_project)
         graph = builder.build()
@@ -221,7 +221,7 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """Scaffolded guardrails.md should produce guardrail nodes in graph."""
-        from raise_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import UnifiedGraphBuilder
 
         builder = UnifiedGraphBuilder(scaffolded_project)
         graph = builder.build()
@@ -235,7 +235,7 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """M1 milestone gate: scaffold → build → all 3 governance types present."""
-        from raise_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import UnifiedGraphBuilder
 
         builder = UnifiedGraphBuilder(scaffolded_project)
         graph = builder.build()

@@ -17,10 +17,10 @@
 - **Dependencies:** None
 
 ### Task 2: Integration test — brownfield walkthrough on temp project
-- **Description:** End-to-end validation: create a temp Python project with source files, run `raise init --detect`, then manually walk through the skill steps (discover scan + analyze, verify governance docs generated match parser contracts, run `raise memory build`, verify 30+ nodes). This validates the skill produces real, parseable governance output.
+- **Description:** End-to-end validation: create a temp Python project with source files, run `rai init --detect`, then manually walk through the skill steps (discover scan + analyze, verify governance docs generated match parser contracts, run `rai memory build`, verify 30+ nodes). This validates the skill produces real, parseable governance output.
 - **Files:** None (manual test in /tmp)
 - **TDD Cycle:** N/A — integration test, not unit test
-- **Verification:** `raise memory build` on temp project produces 30+ governance nodes after following skill steps
+- **Verification:** `rai memory build` on temp project produces 30+ governance nodes after following skill steps
 - **Size:** S
 - **Dependencies:** Task 1
 

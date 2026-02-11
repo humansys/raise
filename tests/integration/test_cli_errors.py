@@ -9,13 +9,13 @@ from unittest.mock import patch
 
 import pytest
 
-from raise_cli.__main__ import main
-from raise_cli.cli.error_handler import set_error_console
-from raise_cli.exceptions import (
+from rai_cli.__main__ import main
+from rai_cli.cli.error_handler import set_error_console
+from rai_cli.exceptions import (
     ConfigurationError,
     GateFailedError,
     KataNotFoundError,
-    RaiseError,
+    RaiError,
 )
 
 
@@ -27,13 +27,13 @@ class TestCLIErrorHandling:
         set_error_console(None)
 
     def test_raise_error_exits_with_correct_code(self) -> None:
-        """RaiseError causes exit with exit_code=1."""
+        """RaiError causes exit with exit_code=1."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             patch.object(sys, "stderr", new_callable=io.StringIO),
             pytest.raises(SystemExit) as exc_info,
         ):
-            mock_app.side_effect = RaiseError("General error")
+            mock_app.side_effect = RaiError("General error")
             main()
 
         assert exc_info.value.code == 1
@@ -41,7 +41,7 @@ class TestCLIErrorHandling:
     def test_configuration_error_exits_with_code_2(self) -> None:
         """ConfigurationError causes exit with exit_code=2."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             patch.object(sys, "stderr", new_callable=io.StringIO),
             pytest.raises(SystemExit) as exc_info,
         ):
@@ -53,7 +53,7 @@ class TestCLIErrorHandling:
     def test_kata_not_found_error_exits_with_code_3(self) -> None:
         """KataNotFoundError causes exit with exit_code=3."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             patch.object(sys, "stderr", new_callable=io.StringIO),
             pytest.raises(SystemExit) as exc_info,
         ):
@@ -65,7 +65,7 @@ class TestCLIErrorHandling:
     def test_gate_failed_error_exits_with_code_10(self) -> None:
         """GateFailedError causes exit with exit_code=10."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             patch.object(sys, "stderr", new_callable=io.StringIO),
             pytest.raises(SystemExit) as exc_info,
         ):
@@ -83,10 +83,10 @@ class TestCLIErrorHandling:
         set_error_console(console)
 
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             pytest.raises(SystemExit),
         ):
-            mock_app.side_effect = RaiseError("Test error message")
+            mock_app.side_effect = RaiError("Test error message")
             main()
 
         result = output.getvalue()
@@ -101,7 +101,7 @@ class TestCLIErrorHandling:
         set_error_console(console)
 
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             pytest.raises(SystemExit),
         ):
             mock_app.side_effect = ConfigurationError("Config error")
@@ -119,10 +119,10 @@ class TestCLIErrorHandling:
         set_error_console(console)
 
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             pytest.raises(SystemExit),
         ):
-            mock_app.side_effect = RaiseError(
+            mock_app.side_effect = RaiError(
                 "Error occurred",
                 hint="Try running with --verbose",
             )
@@ -143,12 +143,12 @@ class TestCLIErrorHandlingJsonFormat:
         """JSON format outputs valid JSON to stderr."""
         # Set format to json before triggering error
         with (
-            patch("raise_cli.__main__.app") as mock_app,
-            patch("raise_cli.cli.main.get_output_format", return_value="json"),
+            patch("rai_cli.__main__.app") as mock_app,
+            patch("rai_cli.cli.main.get_output_format", return_value="json"),
             patch.object(sys, "stderr", new_callable=io.StringIO) as mock_stderr,
             pytest.raises(SystemExit),
         ):
-            mock_app.side_effect = RaiseError("Test error")
+            mock_app.side_effect = RaiError("Test error")
             main()
 
         output = mock_stderr.getvalue()
@@ -161,12 +161,12 @@ class TestCLIErrorHandlingJsonFormat:
     def test_json_format_includes_hint(self) -> None:
         """JSON output includes hint when provided."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
-            patch("raise_cli.cli.main.get_output_format", return_value="json"),
+            patch("rai_cli.__main__.app") as mock_app,
+            patch("rai_cli.cli.main.get_output_format", return_value="json"),
             patch.object(sys, "stderr", new_callable=io.StringIO) as mock_stderr,
             pytest.raises(SystemExit),
         ):
-            mock_app.side_effect = RaiseError("Error", hint="Do this")
+            mock_app.side_effect = RaiError("Error", hint="Do this")
             main()
 
         output = mock_stderr.getvalue()
@@ -176,12 +176,12 @@ class TestCLIErrorHandlingJsonFormat:
     def test_json_format_includes_details(self) -> None:
         """JSON output includes details when provided."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
-            patch("raise_cli.cli.main.get_output_format", return_value="json"),
+            patch("rai_cli.__main__.app") as mock_app,
+            patch("rai_cli.cli.main.get_output_format", return_value="json"),
             patch.object(sys, "stderr", new_callable=io.StringIO) as mock_stderr,
             pytest.raises(SystemExit),
         ):
-            mock_app.side_effect = RaiseError("Error", details={"file": "test.py"})
+            mock_app.side_effect = RaiError("Error", details={"file": "test.py"})
             main()
 
         output = mock_stderr.getvalue()
@@ -189,22 +189,22 @@ class TestCLIErrorHandlingJsonFormat:
         assert parsed["details"] == {"file": "test.py"}
 
 
-class TestNonRaiseErrorPassthrough:
-    """Tests that non-RaiseError exceptions are not caught."""
+class TestNonRaiErrorPassthrough:
+    """Tests that non-RaiError exceptions are not caught."""
 
     def test_value_error_not_caught(self) -> None:
         """ValueError is not caught by error handler."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
-            pytest.raises(ValueError, match="not a RaiseError"),
+            patch("rai_cli.__main__.app") as mock_app,
+            pytest.raises(ValueError, match="not a RaiError"),
         ):
-            mock_app.side_effect = ValueError("not a RaiseError")
+            mock_app.side_effect = ValueError("not a RaiError")
             main()
 
     def test_runtime_error_not_caught(self) -> None:
         """RuntimeError is not caught by error handler."""
         with (
-            patch("raise_cli.__main__.app") as mock_app,
+            patch("rai_cli.__main__.app") as mock_app,
             pytest.raises(RuntimeError, match="unexpected"),
         ):
             mock_app.side_effect = RuntimeError("unexpected")

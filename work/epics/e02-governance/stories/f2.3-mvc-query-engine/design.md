@@ -30,13 +30,13 @@ Build a query engine that takes queries (concept IDs or keywords), maps them to 
 **Key insight from spike**: Simple keyword matching + BFS traversal is sufficient for 97% token savings. No need for complex NLP or semantic search in MVP.
 
 **Components affected**:
-- CREATE: `src/raise_cli/governance/query/` (new submodule)
+- CREATE: `src/rai_cli/governance/query/` (new submodule)
   - `models.py` - MVCQuery, MVCResult, QueryStrategy
   - `engine.py` - Query orchestration and execution
   - `strategies.py` - Query strategy implementations (concept, requirement, principle, related)
   - `formatters.py` - Output formatters (markdown, json, context)
-- CREATE: `src/raise_cli/cli/commands/context.py` - New CLI command group
-- MODIFY: `src/raise_cli/cli/app.py` - Register context commands
+- CREATE: `src/rai_cli/cli/commands/context.py` - New CLI command group
+- MODIFY: `src/rai_cli/cli/app.py` - Register context commands
 - CREATE: `tests/governance/query/` (test suite)
 
 ## Examples
@@ -289,7 +289,7 @@ class MVCMetadata(BaseModel):
 - Return MVCResult with concepts, metadata (token estimate, paths)
 - Format as markdown (section headers, relationship annotations)
 - Format as JSON (structured output for tool integration)
-- CLI command `raise context query <query>` with `--format` and `--output` options
+- CLI command `rai context query <query>` with `--format` and `--output` options
 - Token estimation: count words in result content * 1.3 (spike-validated heuristic)
 - Include relationship paths in metadata (for "why this concept?" explanations)
 - >90% test coverage on query module

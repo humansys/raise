@@ -24,8 +24,8 @@ Extend `load_architecture()` to scan both `governance/architecture/modules/*.md`
 
 | File | Change |
 |------|--------|
-| `src/raise_cli/context/models.py` | Add `"architecture"` to NodeType Literal |
-| `src/raise_cli/context/builder.py` | Extend `load_architecture()` + refactor `_parse_architecture_doc()` |
+| `src/rai_cli/context/models.py` | Add `"architecture"` to NodeType Literal |
+| `src/rai_cli/context/builder.py` | Extend `load_architecture()` + refactor `_parse_architecture_doc()` |
 | `tests/context/test_builder.py` | Add tests for each new doc type handler |
 
 ## Design Decisions
@@ -101,10 +101,10 @@ ConceptNode(
 
 ```bash
 # After graph rebuild:
-raise memory query "architecture" --types architecture
+rai memory query "architecture" --types architecture
 # Should return: arch-context, arch-design, arch-domain-model
 
-raise memory query "bounded context ontology" --types architecture
+rai memory query "bounded context ontology" --types architecture
 # Should return: arch-domain-model (content mentions bounded contexts)
 ```
 

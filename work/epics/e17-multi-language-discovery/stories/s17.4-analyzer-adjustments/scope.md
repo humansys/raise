@@ -15,7 +15,7 @@
 - Cross-language dependency analysis
 
 **Done Criteria:**
-- [ ] `raise discover analyze` categorizes PHP/Svelte/TS symbols correctly
+- [ ] `rai discover analyze` categorizes PHP/Svelte/TS symbols correctly
 - [ ] Module paths work for non-Python files
 - [ ] Formatter shows counts for all SymbolKinds
 - [ ] Tests pass (>90% coverage on new code)

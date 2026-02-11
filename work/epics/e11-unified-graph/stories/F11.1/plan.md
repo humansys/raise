@@ -14,8 +14,8 @@
 
 ### Task 1: Create context module structure
 
-- **Description:** Create `src/raise_cli/context/` module with `__init__.py`
-- **Files:** `src/raise_cli/context/__init__.py`
+- **Description:** Create `src/rai_cli/context/` module with `__init__.py`
+- **Files:** `src/rai_cli/context/__init__.py`
 - **Verification:** Module imports successfully
 - **Size:** XS
 - **Dependencies:** None
@@ -23,16 +23,16 @@
 ### Task 2: Create type definitions and models
 
 - **Description:** Create `models.py` with `NodeType`, `EdgeType`, `ConceptNode`, `ConceptEdge`
-- **Files:** `src/raise_cli/context/models.py`
-- **Verification:** `pyright src/raise_cli/context/models.py` passes
+- **Files:** `src/rai_cli/context/models.py`
+- **Verification:** `pyright src/rai_cli/context/models.py` passes
 - **Size:** S
 - **Dependencies:** Task 1
 
 ### Task 3: Create UnifiedGraph class
 
 - **Description:** Create `graph.py` with `UnifiedGraph` class wrapping NetworkX MultiDiGraph
-- **Files:** `src/raise_cli/context/graph.py`
-- **Verification:** `pyright src/raise_cli/context/graph.py` passes
+- **Files:** `src/rai_cli/context/graph.py`
+- **Verification:** `pyright src/rai_cli/context/graph.py` passes
 - **Size:** S
 - **Dependencies:** Task 2
 
@@ -47,7 +47,7 @@
 ### Task 5: Update module exports and verify quality
 
 - **Description:** Update `__init__.py` exports, run full quality checks
-- **Files:** `src/raise_cli/context/__init__.py`
+- **Files:** `src/rai_cli/context/__init__.py`
 - **Verification:** `ruff check . && pyright src/ && pytest tests/context/`
 - **Size:** XS
 - **Dependencies:** Task 4

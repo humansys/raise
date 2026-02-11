@@ -34,8 +34,8 @@
 - **Tests:** 109 passing (93 memory + 16 CLI)
 - **Coverage:** 96-100% on memory module
 - **Files created:**
-  - `src/raise_cli/memory/query.py` - Query engine
-  - `src/raise_cli/cli/commands/memory.py` - CLI commands
+  - `src/rai_cli/memory/query.py` - Query engine
+  - `src/rai_cli/cli/commands/memory.py` - CLI commands
   - `tests/memory/test_query.py` - 36 tests
   - `tests/cli/commands/test_memory.py` - 16 tests
 

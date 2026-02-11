@@ -56,7 +56,7 @@
 
 ## Action Items
 
-- [ ] Wire migration to auto-run on `raise session start` (future feature)
+- [ ] Wire migration to auto-run on `rai session start` (future feature)
 - [ ] Add scope badges to human-readable query output
 - [ ] Consider adding `--personal` shortcut flag for common use case
 

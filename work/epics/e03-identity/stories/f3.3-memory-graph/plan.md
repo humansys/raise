@@ -14,9 +14,9 @@
 
 - **Description:** Create memory data models and JSONL loader
 - **Files:**
-  - `src/raise_cli/memory/__init__.py` (create)
-  - `src/raise_cli/memory/models.py` (create)
-  - `src/raise_cli/memory/loader.py` (create)
+  - `src/rai_cli/memory/__init__.py` (create)
+  - `src/rai_cli/memory/models.py` (create)
+  - `src/rai_cli/memory/loader.py` (create)
   - `tests/memory/__init__.py` (create)
   - `tests/memory/test_models.py` (create)
   - `tests/memory/test_loader.py` (create)
@@ -38,8 +38,8 @@
 
 - **Description:** Build ConceptGraph from concepts, infer relationships, add caching
 - **Files:**
-  - `src/raise_cli/memory/builder.py` (create)
-  - `src/raise_cli/memory/cache.py` (create)
+  - `src/rai_cli/memory/builder.py` (create)
+  - `src/rai_cli/memory/cache.py` (create)
   - `tests/memory/test_builder.py` (create)
   - `tests/memory/test_cache.py` (create)
 - **Verification:** `pytest tests/memory/test_builder.py tests/memory/test_cache.py -v`
@@ -62,8 +62,8 @@
 
 - **Description:** Implement memory search and CLI commands
 - **Files:**
-  - `src/raise_cli/memory/query.py` (create)
-  - `src/raise_cli/cli/commands/memory.py` (create)
+  - `src/rai_cli/memory/query.py` (create)
+  - `src/rai_cli/cli/commands/memory.py` (create)
   - `tests/memory/test_query.py` (create)
   - `tests/memory/test_integration.py` (create)
   - `tests/cli/test_memory_commands.py` (create)
@@ -78,8 +78,8 @@
   - Recency weighting (newer = higher score)
   - Token estimation
 - CLI commands:
-  - `raise memory query "topic"` — search and display results
-  - `raise memory dump --format json|md` — export memory stats/content
+  - `rai memory query "topic"` — search and display results
+  - `rai memory dump --format json|md` — export memory stats/content
 - Integration tests: full flow load → build → cache → query
 
 ---
@@ -117,10 +117,10 @@ Sequential — each task builds on previous.
 
 Before marking complete:
 - [ ] All tests passing: `pytest tests/memory/ -v`
-- [ ] Type checking: `pyright src/raise_cli/memory/`
-- [ ] Linting: `ruff check src/raise_cli/memory/`
-- [ ] Coverage >90%: `pytest --cov=src/raise_cli/memory`
-- [ ] CLI works: `raise memory query "test"` returns results
+- [ ] Type checking: `pyright src/rai_cli/memory/`
+- [ ] Linting: `ruff check src/rai_cli/memory/`
+- [ ] Coverage >90%: `pytest --cov=src/rai_cli/memory`
+- [ ] CLI works: `rai memory query "test"` returns results
 
 ## Notes
 

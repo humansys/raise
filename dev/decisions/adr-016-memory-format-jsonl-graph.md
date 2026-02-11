@@ -74,7 +74,7 @@ Done. No markdown sync.
 
 Human inspection?
     ↓
-raise memory dump --format md
+rai memory dump --format md
 ```
 
 ### File Structure
@@ -151,16 +151,16 @@ Same as E2 governance:
 
 ```bash
 # Session close appends to JSONL
-raise memory add pattern "New pattern" --context testing
+rai memory add pattern "New pattern" --context testing
 
 # Verify append
 tail -1 .rai/memory/patterns.jsonl
 
 # Rebuild graph
-raise memory rebuild
+rai memory rebuild
 
 # Query works
-raise memory query "testing patterns"
+rai memory query "testing patterns"
 ```
 
 ## Implementation
@@ -210,5 +210,5 @@ Part of E3 (Identity Core + Memory Graph):
 **Impact**:
 - Memory files use JSONL format
 - Graph built from JSONL (same as E2)
-- `raise memory dump` for human inspection
+- `rai memory dump` for human inspection
 - Migration converts existing markdown

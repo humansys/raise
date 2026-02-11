@@ -119,7 +119,7 @@ v2 ←── solution-foundation
 
 - **Pattern:** Modular monolith → Plugin-ready when needed
 - **Principle:** Engines are stable, interfaces come and go, content grows organically
-- **Package:** `raise-cli` (PyPI) → `raise` (CLI command)
+- **Package:** `rai-cli` (PyPI) → `raise` (CLI command)
 
 #### Core Capabilities (7 MUST)
 
@@ -254,7 +254,7 @@ Merged to v2:
 With solution foundation complete, the project is ready for:
 
 1. **Project-level work** — kata-harness can now proceed with governance constraints
-2. **CLI development** — `raise-cli` package can be scaffolded following guardrails
+2. **CLI development** — `rai-cli` package can be scaffolded following guardrails
 3. **Community sharing** — Artifacts ready for investor/community review
 
 ---

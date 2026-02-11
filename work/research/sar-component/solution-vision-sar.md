@@ -39,7 +39,7 @@ Los agentes LLM que asisten en desarrollo de software operan sin contexto sufici
 **Diferenciadores clave**:
 - Extraccion determinista (no AI-inferred) para gobernanza confiable
 - Grafo de relaciones entre reglas para contexto estructurado
-- Interfaz CLI para integracion en flujos de agentes (`raise get rules`)
+- Interfaz CLI para integracion en flujos de agentes (`rai get rules`)
 - Formato optimizado para RAG y context window de LLMs
 
 **Resultados objetivo**:
@@ -644,7 +644,7 @@ Caracteristicas:
 - Relaciones: requires, conflicts_with, supersedes, related_to
 - Validacion de integridad (no cycles, refs exist)
 
-**4. CLI Skill: `raise get rules`**
+**4. CLI Skill: `rai get rules`**
 - Query por tarea (--task)
 - Query por scope (--scope, --file)
 - Filter por confidence (--min-confidence)
@@ -712,7 +712,7 @@ El producto Licensed agrega capacidades enterprise sobre Open Core.
 |---------|--------|----------|
 | Precision de reglas extraidas | >70% | Reglas son validas y aplicables (human validation) |
 | Cobertura de convenciones | >60% | Convenciones principales capturadas |
-| Latencia de `raise get rules` | <500ms | Benchmark en codebase mediano |
+| Latencia de `rai get rules` | <500ms | Benchmark en codebase mediano |
 | Pipeline total | <20 min | En codebase de 500 files |
 | Human edit rate | <30% | Reglas usables con minor edits |
 
@@ -844,7 +844,7 @@ Este documento se construye sobre el siguiente research:
 - [ ] Context management (chunking, purging patterns)
 - [ ] Testear con stacks: TypeScript, Python, PHP
 
-**Fase A3: CLI `raise get rules` (Semana 4)**
+**Fase A3: CLI `rai get rules` (Semana 4)**
 
 - [ ] Implementar query por tarea (--task)
 - [ ] Implementar query por scope (--scope, --file)

@@ -29,7 +29,7 @@ template: "lean-feature-spec-v2"
 
 ## 1. What & Why
 
-**Problem**: After `raise init`, governance docs exist but contain only placeholder comments. The project has structure but no meaning — the graph has no useful nodes, `/session-start` has no context, and RaiSE provides no value until someone fills those docs.
+**Problem**: After `rai init`, governance docs exist but contain only placeholder comments. The project has structure but no meaning — the graph has no useful nodes, `/session-start` has no context, and RaiSE provides no value until someone fills those docs.
 
 **Value**: A guided conversation turns an empty project into a RaiSE-ready one. The developer describes their project once; Rai fills all governance docs with parser-compatible content. The graph comes alive with 30+ nodes, and `/session-start` becomes useful immediately.
 
@@ -37,13 +37,13 @@ template: "lean-feature-spec-v2"
 
 ## 2. Approach
 
-**How we'll solve it**: A SKILL.md file that guides a multi-step conversation — collecting project identity, goals, requirements, constraints, and architecture — then writes filled governance docs back to `governance/`. Each doc is filled with content that matches the parser regex patterns (RF-XX headings, bold-pipe outcome tables, guardrail ID tables). Final gate: `raise memory build` produces 30+ governance nodes.
+**How we'll solve it**: A SKILL.md file that guides a multi-step conversation — collecting project identity, goals, requirements, constraints, and architecture — then writes filled governance docs back to `governance/`. Each doc is filled with content that matches the parser regex patterns (RF-XX headings, bold-pipe outcome tables, guardrail ID tables). Final gate: `rai memory build` produces 30+ governance nodes.
 
 **Components affected**:
-- **`src/raise_cli/skills_base/project-create/SKILL.md`**: Create — the skill file
-- **`src/raise_cli/skills_base/__init__.py`**: Modify — add `"project-create"` to `DISTRIBUTABLE_SKILLS`
+- **`src/rai_cli/skills_base/project-create/SKILL.md`**: Create — the skill file
+- **`src/rai_cli/skills_base/__init__.py`**: Modify — add `"project-create"` to `DISTRIBUTABLE_SKILLS`
 
-**IMPORTANT**: This is a **skill-only** story. No new CLI commands. No new Python modules. The skill reads existing templates, conducts conversation, writes filled docs, and calls existing CLI commands (`raise memory build`).
+**IMPORTANT**: This is a **skill-only** story. No new CLI commands. No new Python modules. The skill reads existing templates, conducts conversation, writes filled docs, and calls existing CLI commands (`rai memory build`).
 
 ---
 
@@ -55,7 +55,7 @@ template: "lean-feature-spec-v2"
 User: /project-create
 ```
 
-The skill triggers when invoked on a project that has `raise init` already run (governance/ directory exists with templates).
+The skill triggers when invoked on a project that has `rai init` already run (governance/ directory exists with templates).
 
 ### Conversation Flow
 
@@ -90,7 +90,7 @@ Step 6: Generate and write all governance docs
   - Write to governance/
 
 Step 7: Build graph and verify
-  $ raise memory build
+  $ rai memory build
   → Verify 30+ governance nodes extracted
 
 Step 8: Summary and next steps
@@ -214,7 +214,7 @@ Each generated doc **MUST** match its parser's regex patterns:
 - [ ] Skill file `project-create/SKILL.md` follows standard skill structure (frontmatter, steps, verification)
 - [ ] Skill collects project info through conversation (not all-at-once prompt)
 - [ ] Generated governance docs match parser regex patterns (RF-XX, bold-pipe, guardrail IDs)
-- [ ] `raise memory build` produces 30+ governance nodes after skill completes
+- [ ] `rai memory build` produces 30+ governance nodes after skill completes
 - [ ] Skill added to `DISTRIBUTABLE_SKILLS` in `skills_base/__init__.py`
 - [ ] Poka-yoke: verifies `governance/` exists before starting; recommends `/project-onboard` if existing code detected
 
@@ -239,11 +239,11 @@ Each generated doc **MUST** match its parser's regex patterns:
 ### Scenario 1: Happy Path — Fresh Greenfield
 
 ```gherkin
-Given a project with `raise init` completed (governance/ has templates)
+Given a project with `rai init` completed (governance/ has templates)
 When user invokes /project-create
 Then Rai asks about project identity, requirements, constraints, architecture
 And fills all 6 governance docs with parser-compatible content
-And runs `raise memory build` producing 30+ nodes
+And runs `rai memory build` producing 30+ nodes
 And displays summary with node count and recommends /session-start
 ```
 
@@ -259,9 +259,9 @@ And skips docs the user wants to preserve
 ### Scenario 3: No governance/ — Missing Prerequisites
 
 ```gherkin
-Given `raise init` has not been run (no governance/ directory)
+Given `rai init` has not been run (no governance/ directory)
 When user invokes /project-create
-Then Rai stops with clear message: "Run `raise init` first"
+Then Rai stops with clear message: "Run `rai init` first"
 And does not proceed with conversation
 ```
 
@@ -280,13 +280,13 @@ And does not proceed with conversation
 - S7.3: `/project-onboard` skill (parallel — brownfield)
 
 **Parser sources** (for content format validation):
-- `src/raise_cli/governance/parsers/prd.py` — RF-XX heading regex
-- `src/raise_cli/governance/parsers/vision.py` — bold-pipe outcome regex
-- `src/raise_cli/governance/parsers/guardrails.py` — YAML frontmatter + ID table
-- `src/raise_cli/governance/parsers/backlog.py` — Backlog heading + epic table
+- `src/rai_cli/governance/parsers/prd.py` — RF-XX heading regex
+- `src/rai_cli/governance/parsers/vision.py` — bold-pipe outcome regex
+- `src/rai_cli/governance/parsers/guardrails.py` — YAML frontmatter + ID table
+- `src/rai_cli/governance/parsers/backlog.py` — Backlog heading + epic table
 
 **Template sources** (what we're filling):
-- `src/raise_cli/rai_base/governance/*.md` — S7.1 templates
+- `src/rai_cli/rai_base/governance/*.md` — S7.1 templates
 
 ---
 

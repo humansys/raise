@@ -179,10 +179,10 @@ raise-cli is **developer tooling**, not an agentic executor:
 
 | Command | Purpose | Inference |
 |---------|---------|-----------|
-| `raise init` | Scaffold RaiSE structure | No |
-| `raise skill new` | Create skill from template | No |
-| `raise gate check` | Validate gate criteria | No |
-| `raise telemetry` | Aggregate/report metrics | No |
+| `rai init` | Scaffold RaiSE structure | No |
+| `rai skill new` | Create skill from template | No |
+| `rai gate check` | Validate gate criteria | No |
+| `rai telemetry` | Aggregate/report metrics | No |
 
 **Pydantic AI** stays in stack for schema validation, not inference.
 

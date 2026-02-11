@@ -7,7 +7,7 @@
 
 ## Decision
 
-Adopt the following Typer CLI design patterns for the RaiSE CLI (`raise` command) based on triangulated evidence from 22 sources.
+Adopt the following Typer CLI design patterns for the RaiSE CLI (`rai` command) based on triangulated evidence from 22 sources.
 
 **Confidence:** HIGH
 
@@ -32,13 +32,13 @@ The recommendations below are derived from convergent evidence across authoritat
 ```
 raise context query      # topic: context, command: query
 raise graph build        # topic: graph, command: build
-raise discover scan      # topic: discover, command: scan
+rai discover scan      # topic: discover, command: scan
 ```
 
 **Implementation:**
 
 ```python
-# src/raise_cli/cli/commands/context.py
+# src/rai_cli/cli/commands/context.py
 import typer
 
 app = typer.Typer(help="Context operations for governance artifacts")
@@ -51,7 +51,7 @@ def query(
     """Query the context graph for relevant artifacts."""
     ...
 
-# src/raise_cli/cli/main.py
+# src/rai_cli/cli/main.py
 from .commands import context, graph, discover
 
 app = typer.Typer()
@@ -136,7 +136,7 @@ def format_output(data: dict, format: OutputFormat) -> None:
 **Pattern:** Exception hierarchy mapped to exit codes. Catch at boundary.
 
 ```python
-# src/raise_cli/exceptions.py
+# src/rai_cli/exceptions.py
 from enum import IntEnum
 
 class ExitCode(IntEnum):

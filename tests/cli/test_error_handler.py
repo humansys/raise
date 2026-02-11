@@ -10,16 +10,16 @@ from unittest.mock import patch
 import pytest
 from rich.console import Console
 
-from raise_cli.cli.error_handler import (
+from rai_cli.cli.error_handler import (
     get_error_console,
     handle_error,
     set_error_console,
 )
-from raise_cli.exceptions import (
+from rai_cli.exceptions import (
     ConfigurationError,
     GateFailedError,
     KataNotFoundError,
-    RaiseError,
+    RaiError,
 )
 
 
@@ -36,7 +36,7 @@ class TestHandleErrorHuman:
         console = Console(file=output, force_terminal=True, width=80)
         set_error_console(console)
 
-        error = RaiseError("Test error message")
+        error = RaiError("Test error message")
         handle_error(error, output_format="human")
 
         result = output.getvalue()
@@ -60,7 +60,7 @@ class TestHandleErrorHuman:
         console = Console(file=output, force_terminal=True, width=80)
         set_error_console(console)
 
-        error = RaiseError("Error", hint="Try this instead")
+        error = RaiError("Error", hint="Try this instead")
         handle_error(error, output_format="human")
 
         result = output.getvalue()
@@ -73,7 +73,7 @@ class TestHandleErrorHuman:
         console = Console(file=output, force_terminal=True, width=80)
         set_error_console(console)
 
-        error = RaiseError("Error", details={"file": "test.py", "line": 42})
+        error = RaiError("Error", details={"file": "test.py", "line": 42})
         handle_error(error, output_format="human")
 
         result = output.getvalue()
@@ -87,7 +87,7 @@ class TestHandleErrorHuman:
         console = Console(file=output, force_terminal=True, width=80)
         set_error_console(console)
 
-        error = RaiseError("Error")
+        error = RaiError("Error")
         handle_error(error, output_format="human")
 
         result = output.getvalue()
@@ -99,7 +99,7 @@ class TestHandleErrorHuman:
         console = Console(file=output, force_terminal=True, width=80)
         set_error_console(console)
 
-        error = RaiseError("Error")
+        error = RaiError("Error")
         handle_error(error, output_format="human")
 
         result = output.getvalue()
@@ -115,7 +115,7 @@ class TestHandleErrorJson:
 
     def test_outputs_valid_json(self) -> None:
         """JSON output is valid JSON."""
-        error = RaiseError("Test error")
+        error = RaiError("Test error")
 
         with patch.object(sys, "stderr", new_callable=io.StringIO) as mock_stderr:
             handle_error(error, output_format="json")
@@ -149,7 +149,7 @@ class TestHandleErrorJson:
 
     def test_json_contains_message(self) -> None:
         """JSON output contains message."""
-        error = RaiseError("Test message")
+        error = RaiError("Test message")
 
         with patch.object(sys, "stderr", new_callable=io.StringIO) as mock_stderr:
             handle_error(error, output_format="json")
@@ -160,7 +160,7 @@ class TestHandleErrorJson:
 
     def test_json_contains_hint(self) -> None:
         """JSON output contains hint when provided."""
-        error = RaiseError("Error", hint="Do this")
+        error = RaiError("Error", hint="Do this")
 
         with patch.object(sys, "stderr", new_callable=io.StringIO) as mock_stderr:
             handle_error(error, output_format="json")
@@ -171,7 +171,7 @@ class TestHandleErrorJson:
 
     def test_json_contains_details(self) -> None:
         """JSON output contains details when provided."""
-        error = RaiseError("Error", details={"key": "value"})
+        error = RaiError("Error", details={"key": "value"})
 
         with patch.object(sys, "stderr", new_callable=io.StringIO) as mock_stderr:
             handle_error(error, output_format="json")
@@ -193,7 +193,7 @@ class TestHandleErrorReturnValue:
     @pytest.mark.parametrize(
         ("exception_class", "expected_exit_code"),
         [
-            (RaiseError, 1),
+            (RaiError, 1),
             (ConfigurationError, 2),
             (KataNotFoundError, 3),
             (GateFailedError, 10),
@@ -201,7 +201,7 @@ class TestHandleErrorReturnValue:
     )
     def test_returns_exit_code(
         self,
-        exception_class: type[RaiseError],
+        exception_class: type[RaiError],
         expected_exit_code: int,
     ) -> None:
         """handle_error returns the exception's exit_code."""
@@ -264,7 +264,7 @@ class TestTableFormat:
         console = Console(file=output, force_terminal=True, width=80)
         set_error_console(console)
 
-        error = RaiseError("Test error")
+        error = RaiError("Test error")
         handle_error(error, output_format="table")
 
         result = output.getvalue()

@@ -30,7 +30,7 @@ Every mature approach separates **structure** (extractable from code) from **int
 
 | Layer | Auto-generable? | Half-life | Consumer | Sources |
 |-------|----------------|-----------|----------|---------|
-| **Structural** (symbols, deps, APIs) | Yes | Days-weeks | AI primarily | Aider, Cursor, Continue, `raise discover` |
+| **Structural** (symbols, deps, APIs) | Yes | Days-weeks | AI primarily | Aider, Cursor, Continue, `rai discover` |
 | **Intentional** (rationale, goals, non-goals) | No | Months-indefinite | Human + AI | ADRs, Google Design Docs, RFCs, C4 |
 
 > "Models infer structure, not intent." — InfoQ 2025
@@ -288,7 +288,7 @@ This adds **module-level dependency edges** — the critical gap identified in i
 
 ### Naming Decision
 
-**Recommendation: `raise discover describe`** (verb: describe)
+**Recommendation: `rai discover describe`** (verb: describe)
 
 | Candidate | Pros | Cons |
 |-----------|------|------|
@@ -304,9 +304,9 @@ The discover pipeline becomes: `start` → `scan` → `analyze` → `validate` �
 
 | Content | Strategy | Trigger |
 |---------|----------|---------|
-| YAML frontmatter (deps, API, entry points) | Auto-generated from code | `raise discover describe` |
+| YAML frontmatter (deps, API, entry points) | Auto-generated from code | `rai discover describe` |
 | Purpose, Architecture, Non-Goals | Human-authored, validated | Milestone / story-close |
-| Mermaid diagrams | Auto-generated | `raise discover describe` |
+| Mermaid diagrams | Auto-generated | `rai discover describe` |
 | Constraints | Human-authored | ADR creation |
 
 ### Trade-offs
@@ -327,7 +327,7 @@ The discover pipeline becomes: `start` → `scan` → `analyze` → `validate` �
 | Risk | Mitigation |
 |------|------------|
 | Frontmatter schema changes break graph | Version frontmatter schema, backward compat in reader |
-| Human sections go stale | Validate at story-close; drift detection in `raise discover` |
+| Human sections go stale | Validate at story-close; drift detection in `rai discover` |
 | Over-engineering for F&F | Start with index.md + 3 key modules, grow incrementally |
 | Token budget exceeded | Compact index.md stays under 2K; modules loaded on demand |
 

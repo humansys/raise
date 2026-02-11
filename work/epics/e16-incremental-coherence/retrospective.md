@@ -71,7 +71,7 @@ E16 closed the coherence loop between code and architecture documentation. Start
 - **Stories:** `work/epics/e16-incremental-coherence/stories/`
 - **ADRs:** ADR-025 (Incremental Coherence)
 - **Skills:** `/docs-update` (new), `/story-close` Step 1.75 (modified)
-- **Code:** `src/raise_cli/context/analyzers/`, `src/raise_cli/context/diff.py`
+- **Code:** `src/rai_cli/context/analyzers/`, `src/rai_cli/context/diff.py`
 - **Tests:** 83 new tests across 8 files
 
 ---

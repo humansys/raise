@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from raise_cli.governance.models import Concept, ConceptType, ExtractionResult
+from rai_cli.governance.models import Concept, ConceptType, ExtractionResult
 
 
 class TestConceptType:

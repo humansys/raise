@@ -38,43 +38,43 @@ Affects:
 
 ### Task 1: Add `vendor` to scanner default excludes
 - **Description:** Add `**/vendor/**` to `DEFAULT_EXCLUDE_PATTERNS` in scanner.py
-- **Files:** `src/raise_cli/discovery/scanner.py`
+- **Files:** `src/rai_cli/discovery/scanner.py`
 - **TDD Cycle:** RED (test that vendor/ is excluded by default) → GREEN (add pattern) → REFACTOR
 - **Verification:** `uv run pytest tests/ -k "exclude" -x -q`
 - **Size:** XS
 - **Dependencies:** None
 
 ### Task 2: Absorb discover-complete into discover-validate skill
-- **Description:** Merge the export step (Steps 1-7 from discover-complete) as a final step in discover-validate. Remove discover-complete skill from both `.claude/skills/` and `src/raise_cli/skills_base/`. Update all references.
+- **Description:** Merge the export step (Steps 1-7 from discover-complete) as a final step in discover-validate. Remove discover-complete skill from both `.claude/skills/` and `src/rai_cli/skills_base/`. Update all references.
 - **Files:**
-  - `src/raise_cli/skills_base/discover-validate/SKILL.md` (add export step)
-  - `src/raise_cli/skills_base/discover-complete/` (delete directory)
-  - `src/raise_cli/skills_base/__init__.py` (remove from list + docstring)
-  - `src/raise_cli/rai_base/framework/methodology.yaml` (remove reference)
-  - `src/raise_cli/onboarding/migration.py` (remove reference)
-  - `src/raise_cli/cli/commands/discover.py` (update hint messages)
+  - `src/rai_cli/skills_base/discover-validate/SKILL.md` (add export step)
+  - `src/rai_cli/skills_base/discover-complete/` (delete directory)
+  - `src/rai_cli/skills_base/__init__.py` (remove from list + docstring)
+  - `src/rai_cli/rai_base/framework/methodology.yaml` (remove reference)
+  - `src/rai_cli/onboarding/migration.py` (remove reference)
+  - `src/rai_cli/cli/commands/discover.py` (update hint messages)
   - `.claude/skills/discover-complete/` (delete directory)
   - `.claude/skills/discover-validate/SKILL.md` (add export step)
-- **TDD Cycle:** No code logic change — skill content only. Verify with `uv run raise skill list` and grep for stale references.
-- **Verification:** `grep -r "discover-complete" src/raise_cli/` returns zero hits. `uv run pytest -x -q`
+- **TDD Cycle:** No code logic change — skill content only. Verify with `uv run rai skill list` and grep for stale references.
+- **Verification:** `grep -r "discover-complete" src/rai_cli/` returns zero hits. `uv run pytest -x -q`
 - **Size:** M
 - **Dependencies:** None
 
 ### Task 3: Rename discover-describe → discover-document
-- **Description:** Rename skill in both `.claude/skills/` and `src/raise_cli/skills_base/`. Update all internal references.
+- **Description:** Rename skill in both `.claude/skills/` and `src/rai_cli/skills_base/`. Update all internal references.
 - **Files:**
-  - `src/raise_cli/skills_base/discover-describe/` → `discover-document/` (rename dir + update `name:` field)
-  - `src/raise_cli/skills_base/__init__.py` (update list + docstring)
+  - `src/rai_cli/skills_base/discover-describe/` → `discover-document/` (rename dir + update `name:` field)
+  - `src/rai_cli/skills_base/__init__.py` (update list + docstring)
   - `.claude/skills/discover-describe/` → `.claude/skills/discover-document/` (rename dir + update `name:` field)
   - Any cross-references in other skills
-- **TDD Cycle:** Verify with `uv run raise skill list` — should show `discover-document`, not `discover-describe`.
-- **Verification:** `grep -r "discover-describe" src/raise_cli/` returns zero hits. `uv run pytest -x -q`
+- **TDD Cycle:** Verify with `uv run rai skill list` — should show `discover-document`, not `discover-describe`.
+- **Verification:** `grep -r "discover-describe" src/rai_cli/` returns zero hits. `uv run pytest -x -q`
 - **Size:** S
 - **Dependencies:** None
 
 ### Task 4: Full validation gate
 - **Description:** Run full test suite, type check, lint to confirm nothing broke.
-- **Verification:** `uv run pytest -x -q && uv run ruff check src/ && uv run pyright src/raise_cli/`
+- **Verification:** `uv run pytest -x -q && uv run ruff check src/ && uv run pyright src/rai_cli/`
 - **Size:** XS
 - **Dependencies:** Tasks 1-3
 
@@ -85,12 +85,12 @@ Affects:
   2. `uv build` (creates dist/)
   3. `uv publish --publish-url https://test.pypi.org/legacy/` (or twine)
   4. Verify: `pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ raise-cli`
-  5. `raise --version` works
+  5. `rai --version` works
 - **Size:** S
 - **Dependencies:** Task 4
 
 ### Task 6 (Final): Manual Integration Test
-- **Description:** Install from TestPyPI in clean venv, run `raise init --detect` on a test project, verify skills list shows correct names (no discover-complete, discover-document present).
+- **Description:** Install from TestPyPI in clean venv, run `rai init --detect` on a test project, verify skills list shows correct names (no discover-complete, discover-document present).
 - **Verification:** End-to-end install → init → skill list works
 - **Size:** XS
 - **Dependencies:** Task 5
@@ -102,7 +102,7 @@ Affects:
 4. Task 6 (integration test — depends on 5)
 
 ## Risks
-- **TestPyPI name collision:** `raise-cli` may already be taken on TestPyPI. Mitigation: check availability first, rename package if needed.
+- **TestPyPI name collision:** `rai-cli` may already be taken on TestPyPI. Mitigation: check availability first, rename package if needed.
 - **Stale references:** Renaming/removing skills may leave references in unexpected places. Mitigation: grep broadly after each change.
 
 ## Duration Tracking

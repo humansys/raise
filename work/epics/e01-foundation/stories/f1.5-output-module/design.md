@@ -31,9 +31,9 @@ template: "lean-feature-spec-v2"
 **How we'll solve it**: Create a thin output abstraction over Rich Console that respects the `--format` flag, providing `print_*` functions for common output types (messages, data, lists, success/warning).
 
 **Components affected**:
-- **`src/raise_cli/output/`**: Create - new output module with formatters
-- **`src/raise_cli/cli/main.py`**: Modify - wire up output console to settings
-- **`src/raise_cli/__init__.py`**: Modify - export public API
+- **`src/rai_cli/output/`**: Create - new output module with formatters
+- **`src/rai_cli/cli/main.py`**: Modify - wire up output console to settings
+- **`src/rai_cli/__init__.py`**: Modify - export public API
 
 ---
 

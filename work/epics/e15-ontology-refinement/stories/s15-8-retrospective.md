@@ -13,7 +13,7 @@
 - `EpicProgress` model + `completed_epics` in `SessionState`
 - Context bundle expanded: governance primes, identity primes, recent sessions, epic progress, coaching
 - Session close writes progress to `session-state.yaml`
-- `raise memory generate` skips MEMORY.md creation
+- `rai memory generate` skips MEMORY.md creation
 - CLAUDE.md shrunk from ~300 lines to 3-line bootstrap
 - CLAUDE.local.md shrunk to 2-line bootstrap
 - Session-close skill updated with progress output
@@ -28,7 +28,7 @@
 
 - **Design-first approach paid off** — v3 design (graph as single source) was the right abstraction. No rework during implementation.
 - **Task decomposition was accurate** — 5 tasks, sequential dependencies, each built cleanly on the previous.
-- **Context bundle is now comprehensive** — one CLI call (`raise session start --context`) delivers everything Rai needs. Zero manual file edits.
+- **Context bundle is now comprehensive** — one CLI call (`rai session start --context`) delivers everything Rai needs. Zero manual file edits.
 - **Ishikawa debug (PAT-187)** — session path bug found via root cause analysis, not guessing.
 
 ## What Could Improve
@@ -54,7 +54,7 @@
 - [x] Critical guardrails, principles, and identity values tagged `always_on: true` in builder
 - [x] CLAUDE.md <= 5 lines (bootstrap pointer)
 - [x] CLAUDE.local.md <= 3 lines (bootstrap pointer)
-- [x] MEMORY.md: `raise memory generate` updated to skip creation
+- [x] MEMORY.md: `rai memory generate` updated to skip creation
 - [x] `SessionState` model has `progress` and `completed_epics` fields
 - [x] Session-close writes progress to session-state.yaml
 - [x] Full lifecycle (start -> work -> close -> start) with zero manual file edits

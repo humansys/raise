@@ -3,7 +3,7 @@ name: project-onboard
 description: >
   Guide brownfield project onboarding through discovery and conversation. Analyzes
   existing codebase, detects conventions, fills governance templates with discovered
-  and conversational content, and builds the knowledge graph. Use after raise init --detect
+  and conversational content, and builds the knowledge graph. Use after rai init --detect
   on an existing project.
 
 license: MIT
@@ -23,7 +23,7 @@ metadata:
 
 ## Purpose
 
-Guide a developer through brownfield project onboarding by combining codebase discovery with conversation. Analyze what exists (structure, conventions, components), ask what code can't tell us (vision, goals, intent), then fill governance templates with parser-compatible content. Final gate: `raise memory build` produces 30+ governance nodes, making `/session-start` immediately useful.
+Guide a developer through brownfield project onboarding by combining codebase discovery with conversation. Analyze what exists (structure, conventions, components), ask what code can't tell us (vision, goals, intent), then fill governance templates with parser-compatible content. Final gate: `rai memory build` produces 30+ governance nodes, making `/session-start` immediately useful.
 
 **Key difference from `/project-create`:** This skill starts from WHAT EXISTS (discovery), then asks WHY. `/project-create` starts from WHAT YOU WANT (pure conversation).
 
@@ -38,17 +38,17 @@ Guide a developer through brownfield project onboarding by combining codebase di
 ## Context
 
 **When to use:**
-- After `raise init --detect` on an existing (brownfield) project
+- After `rai init --detect` on an existing (brownfield) project
 - When `governance/` exists and `guardrails.md` has detected conventions
 - When onboarding a project that already has source code
 
 **When to skip:**
 - Greenfield project with no source code → use `/project-create` instead
-- Project not yet initialized → run `raise init --detect` first
+- Project not yet initialized → run `rai init --detect` first
 - Project already has filled governance docs (non-placeholder content)
 
 **Inputs required:**
-- A project with `raise init --detect` already completed
+- A project with `rai init --detect` already completed
 - The existing codebase to analyze
 
 **Output:**
@@ -76,13 +76,13 @@ grep -c "must-\|should-" governance/guardrails.md 2>/dev/null || echo "0"
 
 **Decision:**
 - Manifest + 6 governance files + guardrails with conventions → Continue
-- No manifest → **STOP.** Tell the user: "Run `raise init --detect` first."
-- Manifest but guardrails are placeholders → Suggest: "Run `raise init --detect` (with `--detect` flag) to analyze your conventions first."
+- No manifest → **STOP.** Tell the user: "Run `rai init --detect` first."
+- Manifest but guardrails are placeholders → Suggest: "Run `rai init --detect` (with `--detect` flag) to analyze your conventions first."
 - No source code found → Suggest: "This looks like a greenfield project. Consider `/project-create` instead."
 
 **Verification:** Manifest exists, governance templates exist, conventions detected.
 
-> **If you can't continue:** No manifest → Run `raise init --detect` first. Always.
+> **If you can't continue:** No manifest → Run `rai init --detect` first. Always.
 
 ### Step 2: Run Discovery Pipeline
 
@@ -90,13 +90,13 @@ Analyze the codebase structure using the discovery CLI.
 
 ```bash
 # Scan for code symbols
-raise discover scan . -o json > /tmp/scan-result.json
+rai discover scan . -o json > /tmp/scan-result.json
 
 # Analyze with confidence scoring and module grouping
-raise discover analyze -i /tmp/scan-result.json -o json > /tmp/analysis-result.json
+rai discover analyze -i /tmp/scan-result.json -o json > /tmp/analysis-result.json
 
 # Also get summary for presentation
-raise discover analyze -i /tmp/scan-result.json -o summary
+rai discover analyze -i /tmp/scan-result.json -o summary
 ```
 
 **What you get:**
@@ -112,7 +112,7 @@ cat governance/guardrails.md
 
 **Verification:** Discovery scan and analysis completed successfully.
 
-> **If you can't continue:** Scan fails → Check if source files exist. Try `raise discover scan . -o summary` to diagnose.
+> **If you can't continue:** Scan fails → Check if source files exist. Try `rai discover scan . -o summary` to diagnose.
 
 ### Step 3: Present Discovery Summary
 
@@ -129,7 +129,7 @@ Present what was discovered to the user for confirmation and correction.
 |--------|-------|---------|-----------|
 | {module} | {N} | {N} | {N} |
 
-**Detected Conventions** (from `raise init --detect`):
+**Detected Conventions** (from `rai init --detect`):
 - {convention 1 — e.g., "Type hints: 78% coverage"}
 - {convention 2 — e.g., "Testing: pytest, 65% coverage"}
 - {convention 3 — e.g., "Linting: ruff configured"}
@@ -195,7 +195,7 @@ Discovery found the components. Ask the user to confirm the bigger picture.
 
 Write all 6 governance docs using combined discovery + conversation data. **CRITICAL:** Follow the exact format for each doc — the graph parsers use regex patterns to extract nodes.
 
-**IMPORTANT:** For brownfield, `guardrails.md` was already generated by `raise init --detect`. In Step 6c, MERGE detected conventions with any additional guardrails from the conversation rather than overwriting.
+**IMPORTANT:** For brownfield, `guardrails.md` was already generated by `rai init --detect`. In Step 6c, MERGE detected conventions with any additional guardrails from the conversation rather than overwriting.
 
 #### 6a: Write `governance/vision.md`
 
@@ -267,7 +267,7 @@ Write all 6 governance docs using combined discovery + conversation data. **CRIT
 
 #### 6c: Write `governance/guardrails.md`
 
-**For brownfield:** `guardrails.md` was already generated by `raise init --detect` with detected conventions. Read the existing content and MERGE:
+**For brownfield:** `guardrails.md` was already generated by `rai init --detect` with detected conventions. Read the existing content and MERGE:
 - Keep all guardrails detected from conventions (they reflect actual codebase standards)
 - Add any additional guardrails from the conversation (Step 4 of `/project-create` equivalent, if user mentioned quality concerns)
 - Ensure the file has proper YAML frontmatter and parser-compatible format
@@ -505,14 +505,14 @@ Create `governance/architecture/modules/` directory, then write one `.md` file p
 Run the graph builder and verify the 30+ node gate.
 
 ```bash
-raise memory build
+rai memory build
 ```
 
 **Expected output:** The build should show governance nodes extracted from each doc.
 
 **Verification gate:**
 ```bash
-raise memory query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
+rai memory query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
 ```
 
 Count the governance nodes. You need **30+ total** across these types:
@@ -527,7 +527,7 @@ Count the governance nodes. You need **30+ total** across these types:
 
 **Also run completeness validation:**
 ```bash
-raise memory validate
+rai memory validate
 ```
 
 Check that the completeness check passes (no "Completeness gaps" warnings). If warnings appear, fix the missing doc types — most likely a frontmatter issue.
@@ -537,7 +537,7 @@ Check that the completeness check passes (no "Completeness gaps" warnings). If w
 - <30 nodes → Investigate which docs didn't parse. Check format against parser contract in Step 6. Fix and rebuild.
 - Completeness gaps → Architecture or module docs are missing frontmatter. Check Steps 6e-6h.
 
-**Verification:** `raise memory build` succeeds, produces 30+ governance nodes, and `raise memory validate` shows no completeness gaps.
+**Verification:** `rai memory build` succeeds, produces 30+ governance nodes, and `rai memory validate` shows no completeness gaps.
 
 > **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header, **and YAML frontmatter on architecture/module docs**. Fix the specific doc and rebuild.
 
@@ -578,7 +578,7 @@ Present what was created and what to do next.
 | Item | Destination |
 |------|-------------|
 | Filled governance docs | `governance/` (prd.md, vision.md, guardrails.md, backlog.md, architecture/) |
-| Knowledge graph | `.raise/rai/memory/index.json` (via `raise memory build`) |
+| Knowledge graph | `.raise/rai/memory/index.json` (via `rai memory build`) |
 | Summary | Displayed to user |
 
 ## Notes
@@ -598,12 +598,12 @@ This skill is for **brownfield** projects — existing codebases with source fil
 ### Discovery Data Flow
 
 ```
-raise init --detect
+rai init --detect
   → .raise/manifest.yaml (project type, file count)
   → governance/guardrails.md (detected conventions)
   → CLAUDE.md (project context)
 
-raise discover scan + analyze
+rai discover scan + analyze
   → Modules, classes, functions, components
   → Architecture signals (frameworks, patterns)
 
@@ -611,14 +611,14 @@ Conversation
   → Vision, goals, requirements, success criteria
   → Architecture confirmation/refinement
 
-Combined → 6 governance docs → raise memory build → 30+ nodes
+Combined → 6 governance docs → rai memory build → 30+ nodes
 ```
 
 ## References
 
-- Prerequisite: `raise init --detect` (convention detection from S7.1)
-- Discovery: `raise discover scan`, `raise discover analyze`
+- Prerequisite: `rai init --detect` (convention detection from S7.1)
+- Discovery: `rai discover scan`, `rai discover analyze`
 - Next: `/session-start`
 - Sibling: `/project-create` (greenfield)
-- Parser sources: `src/raise_cli/governance/parsers/*.py`
-- Template sources: `src/raise_cli/rai_base/governance/*.md`
+- Parser sources: `src/rai_cli/governance/parsers/*.py`
+- Template sources: `src/rai_cli/rai_base/governance/*.md`

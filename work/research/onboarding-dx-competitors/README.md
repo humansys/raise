@@ -229,7 +229,7 @@ BMAD recommends explicit project discovery:
 
 **Phase 1: Quick Start (like Claude Code /init)**
 ```bash
-raise init    # or `raise setup`
+rai init    # or `rai setup`
 ```
 - Scans project structure
 - Detects languages, frameworks
@@ -275,7 +275,7 @@ Everything else can be inferred or defaulted.
 
 **For F&F:**
 
-1. **`raise init`** (CLI command)
+1. **`rai init`** (CLI command)
    - Scan project
    - Generate minimal CLAUDE.md
    - Copy skills to .claude/skills/
@@ -289,7 +289,7 @@ Everything else can be inferred or defaulted.
    - Ask "What do you want to build?"
 
 **Effort:**
-- `raise init`: ~2h
+- `rai init`: ~2h
 - Enhanced session-start: ~1h
 - Total: ~3h
 
@@ -315,7 +315,7 @@ Everything else can be inferred or defaulted.
 
 1. **Should we do component discovery automatically?**
    - Current: `/discover-*` skills are manual
-   - Consider: Auto-run on `raise init`?
+   - Consider: Auto-run on `rai init`?
    - Risk: Slow for large codebases
 
 2. **Global ~/.rai/ for user patterns?**

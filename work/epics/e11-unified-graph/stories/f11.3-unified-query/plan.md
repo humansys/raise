@@ -10,7 +10,7 @@
 ## Tasks
 
 ### Task 1: Query Module (Models + Engine)
-- **Description:** Create `src/raise_cli/context/query.py` with:
+- **Description:** Create `src/rai_cli/context/query.py` with:
   - `UnifiedQuery` model (query, strategy, max_depth, types)
   - `UnifiedQueryResult` model (concepts, metadata)
   - `UnifiedQueryMetadata` model (query, total, tokens, time, types_found)
@@ -18,8 +18,8 @@
   - `keyword_search` strategy: case-insensitive content matching, relevance scoring
   - `concept_lookup` strategy: direct ID lookup + BFS via `get_neighbors()`
 - **Files:**
-  - `src/raise_cli/context/query.py` (create)
-  - `src/raise_cli/context/__init__.py` (export new classes)
+  - `src/rai_cli/context/query.py` (create)
+  - `src/rai_cli/context/__init__.py` (export new classes)
   - `tests/context/test_query.py` (create)
 - **TDD Cycle:**
   - RED: Test `UnifiedQuery` model validation
@@ -36,13 +36,13 @@
 - **Dependencies:** None
 
 ### Task 2: CLI Integration
-- **Description:** Add `--unified` flag to `raise context query` command:
+- **Description:** Add `--unified` flag to `rai context query` command:
   - When `--unified` is set, use `UnifiedQueryEngine` instead of `ContextQueryEngine`
   - Load graph from `.raise/graph/unified.json`
   - Reuse existing `--format`, `--max-depth` options
   - Add human-readable formatter for unified results
 - **Files:**
-  - `src/raise_cli/cli/commands/context.py` (modify)
+  - `src/rai_cli/cli/commands/context.py` (modify)
   - `tests/cli/commands/test_context.py` (extend or create)
 - **TDD Cycle:**
   - RED: Test `--unified` flag routes to unified engine

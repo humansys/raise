@@ -57,7 +57,7 @@
 
 **Implication**:
 ```python
-# In src/raise_cli/commands/context.py
+# In src/rai_cli/commands/context.py
 from raise_cli.core import git_utils      # Absolute from root
 from .base import CommandBase              # Relative within subpackage
 ```

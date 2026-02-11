@@ -82,7 +82,7 @@ class SkillLocator:
 
 ## Features
 
-### `raise skill list`
+### `rai skill list`
 
 List all discovered skills across platform directories.
 
@@ -117,12 +117,12 @@ Platform: .claude/skills/ (Claude Code)
 }
 ```
 
-### `raise skill scaffold <name>`
+### `rai skill scaffold <name>`
 
 Generate a new skill with proper structure.
 
 ```bash
-raise skill scaffold feature-validate
+rai skill scaffold feature-validate
 ```
 
 Creates:
@@ -136,16 +136,16 @@ Creates:
 - `--after <skill-name>` — Set prerequisites
 - `--before <skill-name>` — Set next
 
-### `raise skill validate [path]`
+### `rai skill validate [path]`
 
 Validate skill structure against RaiSE schema.
 
 ```bash
 # Validate specific skill
-raise skill validate .claude/skills/my-skill/SKILL.md
+rai skill validate .claude/skills/my-skill/SKILL.md
 
 # Validate all skills
-raise skill validate
+rai skill validate
 ```
 
 **Checks:**
@@ -168,12 +168,12 @@ Validating: .claude/skills/my-skill/SKILL.md
 1 error, 1 warning
 ```
 
-### `raise skill check-name <name>`
+### `rai skill check-name <name>`
 
 Check proposed skill name against ontology patterns.
 
 ```bash
-raise skill check-name session-validate
+rai skill check-name session-validate
 ```
 
 **Checks:**
@@ -201,10 +201,10 @@ Suggestion: Position after 'session-start', before 'session-close'
 ## In Scope
 
 **MUST:**
-- [ ] `raise skill list` with human/json output
-- [ ] `raise skill scaffold <name>` with template generation
-- [ ] `raise skill validate` for structure checking
-- [ ] `raise skill check-name` for ontology compliance
+- [ ] `rai skill list` with human/json output
+- [ ] `rai skill scaffold <name>` with template generation
+- [ ] `rai skill validate` for structure checking
+- [ ] `rai skill check-name` for ontology compliance
 - [ ] Skill schema (Pydantic model for SKILL.md parsing)
 - [ ] Tests for all commands
 

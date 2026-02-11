@@ -11,9 +11,9 @@
 ### Task 1: Tag `always_on` in graph + identity extraction
 - **Description:** Add `always_on: true` metadata to critical guardrails (all MUST-*) and core principles (§1, §3, §7) in their parsers. Add `_load_identity()` to builder that extracts 5 values + 10 boundaries from `.raise/rai/identity/core.md` as `principle` nodes with `always_on: true`. Rebuild graph.
 - **Files:**
-  - `src/raise_cli/governance/parsers/guardrails.py` — add `always_on: True` to metadata for `MUST-*` level guardrails
-  - `src/raise_cli/governance/parsers/constitution.py` — add `always_on: True` to metadata for §1, §3, §7
-  - `src/raise_cli/context/builder.py` — new `_load_identity()` method, call it in `build()`
+  - `src/rai_cli/governance/parsers/guardrails.py` — add `always_on: True` to metadata for `MUST-*` level guardrails
+  - `src/rai_cli/governance/parsers/constitution.py` — add `always_on: True` to metadata for §1, §3, §7
+  - `src/rai_cli/context/builder.py` — new `_load_identity()` method, call it in `build()`
 - **TDD Cycle:** RED (test always_on nodes exist after build) → GREEN → REFACTOR
 - **Verification:** `pytest tests/governance/parsers/ tests/context/test_builder.py -v` + rebuild graph + verify `always_on` nodes
 - **Size:** M
@@ -22,20 +22,20 @@
 ### Task 2: Session state expansion + bundle
 - **Description:** Add `EpicProgress` model and `completed_epics` to `SessionState`. Expand bundle with: `get_always_on_primes()` for governance + identity primes, `_format_recent_sessions()` reading last 3 from `sessions/index.jsonl`, `_format_progress()` for epic progress. Update `assemble_context_bundle()` to include all new sections.
 - **Files:**
-  - `src/raise_cli/schemas/session_state.py` — add `EpicProgress`, `completed_epics`
-  - `src/raise_cli/session/bundle.py` — add `get_always_on_primes()`, `_format_governance_primes()`, `_format_identity_primes()`, `_format_recent_sessions()`, `_format_progress()`
+  - `src/rai_cli/schemas/session_state.py` — add `EpicProgress`, `completed_epics`
+  - `src/rai_cli/session/bundle.py` — add `get_always_on_primes()`, `_format_governance_primes()`, `_format_identity_primes()`, `_format_recent_sessions()`, `_format_progress()`
 - **TDD Cycle:** RED (test bundle output has new sections) → GREEN → REFACTOR
 - **Verification:** `pytest tests/schemas/test_session_state.py tests/session/test_bundle.py -v`
 - **Size:** M
 - **Dependencies:** Task 1 (needs always_on nodes in graph)
 
 ### Task 3: Session close + CLI + memory generate
-- **Description:** Update `process_session_close()` to write progress and completed_epics to session-state.yaml. Update session CLI to accept `--progress` and `--completed-epics` flags (or via state file). Update `raise memory generate` to skip MEMORY.md creation (both canonical and Claude Code paths).
+- **Description:** Update `process_session_close()` to write progress and completed_epics to session-state.yaml. Update session CLI to accept `--progress` and `--completed-epics` flags (or via state file). Update `rai memory generate` to skip MEMORY.md creation (both canonical and Claude Code paths).
 - **Files:**
-  - `src/raise_cli/session/close.py` — write progress fields to state
-  - `src/raise_cli/cli/commands/session.py` — accept progress in close command
-  - `src/raise_cli/cli/commands/memory.py` — skip MEMORY.md writes in generate
-  - `src/raise_cli/onboarding/memory_md.py` — conditional skip or deprecate
+  - `src/rai_cli/session/close.py` — write progress fields to state
+  - `src/rai_cli/cli/commands/session.py` — accept progress in close command
+  - `src/rai_cli/cli/commands/memory.py` — skip MEMORY.md writes in generate
+  - `src/rai_cli/onboarding/memory_md.py` — conditional skip or deprecate
 - **TDD Cycle:** RED (test close writes progress, test generate skips MEMORY.md) → GREEN → REFACTOR
 - **Verification:** `pytest tests/session/test_close.py tests/cli/commands/test_session.py tests/cli/commands/test_memory.py -v`
 - **Size:** M
@@ -54,7 +54,7 @@
 - **Dependencies:** Tasks 1-3 (bundle must work before we cut over)
 
 ### Task 5 (Final): Manual Integration Test
-- **Description:** Full lifecycle validation: `raise memory build` → verify always_on nodes → `raise session start --context` → verify bundle has governance primes, identity primes, recent sessions, progress → work → `raise session close` with progress → verify session-state.yaml → `raise session start --context` again → verify continuity. Confirm zero manual file edits needed.
+- **Description:** Full lifecycle validation: `rai memory build` → verify always_on nodes → `rai session start --context` → verify bundle has governance primes, identity primes, recent sessions, progress → work → `rai session close` with progress → verify session-state.yaml → `rai session start --context` again → verify continuity. Confirm zero manual file edits needed.
 - **Verification:** Demo full lifecycle working end-to-end.
 - **Size:** S
 - **Dependencies:** All previous tasks

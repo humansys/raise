@@ -22,8 +22,8 @@ Current AI coding assistants (Cursor, Copilot, Claude Code) suffer from **model-
 | Tier | Mechanism | Retrieval | Example |
 |------|-----------|-----------|---------|
 | **HOT** | IDE-native static files | None (always in context) | CLAUDE.md, .cursorrules |
-| **WARM** | CLI call mandated by workflow | Deterministic, phase-scoped | `raise rules get --phase=design` |
-| **COLD** | CLI call for specific contexts | Deterministic, context-triggered | `raise rules get --for=security-review` |
+| **WARM** | CLI call mandated by workflow | Deterministic, phase-scoped | `rai rules get --phase=design` |
+| **COLD** | CLI call for specific contexts | Deterministic, context-triggered | `rai rules get --for=security-review` |
 
 ### The Graph's Role
 

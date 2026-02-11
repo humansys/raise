@@ -10,9 +10,9 @@ status: design
 
 ## What & Why
 
-**Problem:** `raise init` creates infrastructure (`.raise/`, profile, skills) but leaves `governance/` empty. Without governance docs, the knowledge graph has zero governance nodes, and onboarding skills (S7.2/S7.3) have no templates to fill.
+**Problem:** `rai init` creates infrastructure (`.raise/`, profile, skills) but leaves `governance/` empty. Without governance docs, the knowledge graph has zero governance nodes, and onboarding skills (S7.2/S7.3) have no templates to fill.
 
-**Value:** After this story, `raise init` produces a `governance/` directory with parser-compatible templates. `raise memory build` can immediately produce governance nodes from them — unblocking both onboarding skills.
+**Value:** After this story, `rai init` produces a `governance/` directory with parser-compatible templates. `rai memory build` can immediately produce governance nodes from them — unblocking both onboarding skills.
 
 ## Architectural Context
 
@@ -25,12 +25,12 @@ status: design
 
 **Templates as bundled assets** — following the established `rai_base` pattern (bootstrap.py).
 
-Governance templates live as **markdown files** in `src/raise_cli/rai_base/governance/`, the exact files that parsers need. `scaffold_governance()` copies them to `governance/` via `importlib.resources`, rendering `{project_name}` placeholders. This makes templates the **contract** between scaffolding and parsing — if a parser changes, the template changes with it, and the integration test catches drift.
+Governance templates live as **markdown files** in `src/rai_cli/rai_base/governance/`, the exact files that parsers need. `scaffold_governance()` copies them to `governance/` via `importlib.resources`, rendering `{project_name}` placeholders. This makes templates the **contract** between scaffolding and parsing — if a parser changes, the template changes with it, and the integration test catches drift.
 
 **Components:**
-- `src/raise_cli/rai_base/governance/` — **create**: template markdown files (the contract)
-- `src/raise_cli/onboarding/governance.py` — **modify**: add `scaffold_governance()` that copies from rai_base
-- `src/raise_cli/cli/commands/init.py` — **modify**: call `scaffold_governance()`, add skill recommendation to output
+- `src/rai_cli/rai_base/governance/` — **create**: template markdown files (the contract)
+- `src/rai_cli/onboarding/governance.py` — **modify**: add `scaffold_governance()` that copies from rai_base
+- `src/rai_cli/cli/commands/init.py` — **modify**: call `scaffold_governance()`, add skill recommendation to output
 - Tests — **create**: unit + integration tests
 
 **Why not Python strings?** Templates are inspectable markdown. They serve as single source of truth. They can be validated independently against parsers. Follows the existing `rai_base` asset distribution pattern.
@@ -60,7 +60,7 @@ $ raise init
 ### Asset Package Structure
 
 ```
-src/raise_cli/rai_base/
+src/rai_cli/rai_base/
 ├── governance/              # NEW — governance templates
 │   ├── __init__.py
 │   ├── prd.md
@@ -235,12 +235,12 @@ def test_scaffold_then_build_produces_nodes(tmp_path):
 ## Acceptance Criteria
 
 **MUST:**
-- Governance templates live as files in `src/raise_cli/rai_base/governance/` (not Python strings)
-- `raise init` scaffolds `governance/` with 6 template files (prd, vision, guardrails, backlog, system-context, system-design)
+- Governance templates live as files in `src/rai_cli/rai_base/governance/` (not Python strings)
+- `rai init` scaffolds `governance/` with 6 template files (prd, vision, guardrails, backlog, system-context, system-design)
 - Templates have exact patterns for existing parsers (RF-XX headings, bold table cells, YAML frontmatter)
-- `raise memory build` produces governance nodes from scaffolded templates
+- `rai memory build` produces governance nodes from scaffolded templates
 - Per-file idempotency: existing files never overwritten (follows bootstrap.py pattern)
-- `raise init` output recommends `/project-create` (greenfield) or `/project-onboard` (brownfield)
+- `rai init` output recommends `/project-create` (greenfield) or `/project-onboard` (brownfield)
 
 **SHOULD:**
 - Templates include HTML comments as placeholders for skill content

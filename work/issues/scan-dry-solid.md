@@ -1,6 +1,6 @@
 # DRY/SOLID Scan Results
 
-> Scan of `src/raise_cli/` against guardrails-stack.md section 5 (DRY/SOLID)
+> Scan of `src/rai_cli/` against guardrails-stack.md section 5 (DRY/SOLID)
 > Date: 2026-02-05
 
 ---
@@ -56,7 +56,7 @@
 
 #### Error Handling Pattern (24 occurrences)
 
-The pattern `console.print(f"[red]Error:[/red] ...")` followed by `raise typer.Exit(1)` appears in:
+The pattern `console.print(f"[red]Error:[/red] ...")` followed by `rai typer.Exit(1)` appears in:
 
 | File | Occurrences |
 |------|-------------|
@@ -66,10 +66,10 @@ The pattern `console.print(f"[red]Error:[/red] ...")` followed by `raise typer.E
 | `cli/commands/graph.py` | 2 |
 
 **Affected Files:**
-- `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/telemetry.py:79,107,153,160,163,196,261,274,286,328`
-- `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/memory.py:126,216,374,384,405,450,456,483,521,545`
-- `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/context.py:249,268,320,339`
-- `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/graph.py:60,307`
+- `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/telemetry.py:79,107,153,160,163,196,261,274,286,328`
+- `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/memory.py:126,216,374,384,405,450,456,483,521,545`
+- `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/context.py:249,268,320,339`
+- `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/graph.py:60,307`
 
 **Suggested Fix:**
 Create a helper function in `cli/error_handler.py` or use the existing error handling pattern:
@@ -236,5 +236,5 @@ The codebase follows good practices using:
 
 ---
 
-*Scanned: 77 Python files in src/raise_cli/*
+*Scanned: 77 Python files in src/rai_cli/*
 *Tool: Manual analysis with Grep/Read*

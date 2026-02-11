@@ -7,9 +7,9 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.context.analyzers.models import ModuleInfo
-from raise_cli.context.analyzers.protocol import CodeAnalyzer
-from raise_cli.context.analyzers.python import PythonAnalyzer
+from rai_cli.context.analyzers.models import ModuleInfo
+from rai_cli.context.analyzers.protocol import CodeAnalyzer
+from rai_cli.context.analyzers.python import PythonAnalyzer
 
 
 class TestPythonAnalyzerDetect:

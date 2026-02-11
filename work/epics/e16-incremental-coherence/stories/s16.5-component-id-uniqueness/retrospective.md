@@ -51,7 +51,7 @@ Before committing to an ID format, enumerate all real triples `(kind, name, file
 ## Acceptance Criteria Status
 - [x] All 345 validated components appear in the graph (0 silent drops)
 - [x] Component IDs are unique across the entire discovery catalog
-- [x] `raise discover analyze` fails if duplicate IDs would be generated
+- [x] `rai discover analyze` fails if duplicate IDs would be generated
 - [x] Graph builder warns on component ID collision
 - [x] All existing tests pass with updated IDs
 - [x] Quality gates pass (ruff, pyright — no new errors)
