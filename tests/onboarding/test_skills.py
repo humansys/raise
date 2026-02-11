@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from raise_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
-from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
+from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
+from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
 TOTAL_SKILLS = len(DISTRIBUTABLE_SKILLS)
 
@@ -59,7 +59,7 @@ class TestScaffoldSkills:
 
         scaffold_skills(tmp_path)
 
-        base = files("raise_cli.skills_base")
+        base = files("rai_cli.skills_base")
         original = (base / "session-start" / "SKILL.md").read_text()
         copied = (
             tmp_path / ".claude" / "skills" / "session-start" / "SKILL.md"

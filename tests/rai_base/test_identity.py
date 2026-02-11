@@ -18,26 +18,26 @@ class TestBaseIdentityPackage:
 
     def test_rai_base_package_exists(self) -> None:
         """rai_base package is importable."""
-        from raise_cli import rai_base
+        from rai_cli import rai_base
 
         assert rai_base.__version__ == "1.0.0"
 
     def test_identity_directory_accessible(self) -> None:
         """Identity directory is accessible via importlib.resources."""
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         identity = base / "identity"
         assert identity.is_dir()
 
     def test_core_md_exists(self) -> None:
         """core.md file exists and is readable."""
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         core_file = base / "identity" / "core.md"
         content = core_file.read_text()
         assert len(content) > 0
 
     def test_perspective_md_exists(self) -> None:
         """perspective.md file exists and is readable."""
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         perspective_file = base / "identity" / "perspective.md"
         content = perspective_file.read_text()
         assert len(content) > 0
@@ -49,7 +49,7 @@ class TestCoreIdentityContent:
     @pytest.fixture
     def core_content(self) -> str:
         """Load core.md content."""
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         return (base / "identity" / "core.md").read_text()
 
     def test_has_title(self, core_content: str) -> None:
@@ -92,7 +92,7 @@ class TestPerspectiveContent:
     @pytest.fixture
     def perspective_content(self) -> str:
         """Load perspective.md content."""
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         return (base / "identity" / "perspective.md").read_text()
 
     def test_has_title(self, perspective_content: str) -> None:
@@ -134,13 +134,13 @@ class TestIdentityMarkdownValidity:
     @pytest.fixture
     def core_content(self) -> str:
         """Load core.md content."""
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         return (base / "identity" / "core.md").read_text()
 
     @pytest.fixture
     def perspective_content(self) -> str:
         """Load perspective.md content."""
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         return (base / "identity" / "perspective.md").read_text()
 
     def test_core_has_h1_header(self, core_content: str) -> None:

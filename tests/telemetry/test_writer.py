@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.telemetry import (
+from rai_cli.telemetry import (
     CalibrationEvent,
     CommandUsage,
     ErrorEvent,
@@ -27,7 +27,7 @@ from raise_cli.telemetry import (
     emit_error_event,
     emit_skill_event,
 )
-from raise_cli.telemetry.writer import EmitResult, _get_telemetry_path
+from rai_cli.telemetry.writer import EmitResult, _get_telemetry_path
 
 # --- Fixtures ---
 

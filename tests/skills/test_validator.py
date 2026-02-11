@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from raise_cli.skills.validator import (
+from rai_cli.skills.validator import (
     ValidationResult,
     validate_skill,
     validate_skill_file,
@@ -343,7 +343,7 @@ class TestValidateSkill:
 
     def test_validate_parsed_skill(self, tmp_path: Path) -> None:
         """Can validate an already-parsed Skill object."""
-        from raise_cli.skills.parser import parse_skill
+        from rai_cli.skills.parser import parse_skill
 
         skill_content = """\
 ---

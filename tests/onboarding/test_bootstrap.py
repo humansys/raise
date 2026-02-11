@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from raise_cli.onboarding.bootstrap import BootstrapResult, bootstrap_rai_base
+from rai_cli.onboarding.bootstrap import BootstrapResult, bootstrap_rai_base
 
 
 class TestBootstrapRaiBase:
@@ -65,7 +65,7 @@ class TestBootstrapRaiBase:
 
         bootstrap_rai_base(tmp_path)
 
-        base = files("raise_cli.rai_base")
+        base = files("rai_cli.rai_base")
         original = (base / "identity" / "core.md").read_text()
         copied = (tmp_path / ".raise" / "rai" / "identity" / "core.md").read_text()
         assert copied == original

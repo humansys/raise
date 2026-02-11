@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.skills.locator import (
+from rai_cli.skills.locator import (
     SkillLocator,
     get_default_skill_dir,
     list_skills,

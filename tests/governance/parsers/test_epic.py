@@ -5,8 +5,8 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.governance.models import ConceptType
-from raise_cli.governance.parsers.epic import (
+from rai_cli.governance.models import ConceptType
+from rai_cli.governance.parsers.epic import (
     extract_epic_details,
     extract_stories,
 )

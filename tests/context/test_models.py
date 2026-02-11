@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from raise_cli.context.models import ConceptEdge, ConceptNode
+from rai_cli.context.models import ConceptEdge, ConceptNode
 
 
 class TestConceptNode:
