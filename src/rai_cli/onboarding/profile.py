@@ -181,6 +181,9 @@ class DeveloperProfile(BaseModel):
 
     Attributes:
         name: Developer's name for personalized interaction.
+        pattern_prefix: Single-letter prefix for pattern IDs (e.g., 'E' for Emilio).
+            Used to prevent pattern ID collisions in multi-developer repos.
+            Defaults to first letter of name if not set.
         experience_level: Current Shu-Ha-Ri level (affects verbosity).
         communication: Communication style preferences.
         skills_mastered: List of skill names the developer has mastered.
@@ -194,6 +197,11 @@ class DeveloperProfile(BaseModel):
     """
 
     name: str
+    pattern_prefix: str | None = Field(
+        default=None,
+        description="Single-letter prefix for pattern IDs (e.g., 'E'). "
+        "Defaults to first letter of name.",
+    )
     experience_level: ExperienceLevel = ExperienceLevel.SHU
     communication: CommunicationPreferences = Field(
         default_factory=CommunicationPreferences
@@ -206,6 +214,15 @@ class DeveloperProfile(BaseModel):
     current_session: CurrentSession | None = None
     coaching: CoachingContext = Field(default_factory=CoachingContext)
     deadlines: list[Deadline] = Field(default_factory=list)
+
+    def get_pattern_prefix(self) -> str:
+        """Get the developer's pattern prefix.
+
+        Returns explicit pattern_prefix if set, otherwise first letter of name (uppercased).
+        """
+        if self.pattern_prefix:
+            return self.pattern_prefix.upper()
+        return self.name[0].upper() if self.name else "X"
 
 
 # Constants

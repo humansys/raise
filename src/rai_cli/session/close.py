@@ -162,7 +162,9 @@ def process_session_close(
             context=context_list,
             learned_from=result.session_id,
         )
-        pat_result: WriteResult = append_pattern(memory_dir, pat_input)
+        pat_result: WriteResult = append_pattern(
+            memory_dir, pat_input, developer_prefix=profile.get_pattern_prefix()
+        )
         result.patterns_added += 1
         result.messages.append(f"Pattern {pat_result.id} added")
 

@@ -293,7 +293,9 @@ def get_memory_dir_for_scope(
         return get_memory_dir(project_root)
 
 
-def _get_next_id(file_path: Path, prefix: str) -> str:
+def _get_next_id(
+    file_path: Path, prefix: str, developer_prefix: str | None = None
+) -> str:
     """Get next available ID for a JSONL file.
 
     Scans existing entries to find max ID and increments.
@@ -301,11 +303,18 @@ def _get_next_id(file_path: Path, prefix: str) -> str:
     Args:
         file_path: Path to JSONL file.
         prefix: ID prefix (e.g., 'PAT', 'CAL', 'SES').
+        developer_prefix: Optional developer prefix for multi-dev safety.
+            When provided, generates e.g. 'PAT-E-001' and only counts
+            IDs matching that developer's prefix.
 
     Returns:
-        Next ID (e.g., 'PAT-031' if max is 'PAT-030').
+        Next ID. With developer_prefix='E': 'PAT-E-001'.
+        Without: 'PAT-001' (backward compatible).
     """
     max_num = 0
+
+    # Build the full prefix to match against
+    full_prefix = f"{prefix}-{developer_prefix}-" if developer_prefix else f"{prefix}-"
 
     if file_path.exists():
         with file_path.open("r", encoding="utf-8") as f:
@@ -316,13 +325,15 @@ def _get_next_id(file_path: Path, prefix: str) -> str:
                 try:
                     data = json.loads(line)
                     entry_id = data.get("id", "")
-                    if entry_id.startswith(prefix + "-"):
-                        num_str = entry_id[len(prefix) + 1 :]
+                    if entry_id.startswith(full_prefix):
+                        num_str = entry_id[len(full_prefix) :]
                         num = int(num_str)
                         max_num = max(max_num, num)
                 except (json.JSONDecodeError, ValueError):
                     continue
 
+    if developer_prefix:
+        return f"{prefix}-{developer_prefix}-{max_num + 1:03d}"
     return f"{prefix}-{max_num + 1:03d}"
 
 
@@ -343,6 +354,7 @@ def append_pattern(
     input_data: PatternInput,
     created: date | None = None,
     scope: MemoryScope = MemoryScope.PROJECT,
+    developer_prefix: str | None = None,
 ) -> WriteResult:
     """Append a new pattern to patterns.jsonl.
 
@@ -351,12 +363,14 @@ def append_pattern(
         input_data: Pattern input data.
         created: Date created (defaults to today).
         scope: Memory scope for this pattern (affects ID generation context).
+        developer_prefix: Optional developer prefix for multi-dev safety.
+            When provided, generates IDs like 'PAT-E-001' instead of 'PAT-001'.
 
     Returns:
         WriteResult with generated ID and status.
     """
     file_path = memory_dir / "patterns.jsonl"
-    pattern_id = _get_next_id(file_path, "PAT")
+    pattern_id = _get_next_id(file_path, "PAT", developer_prefix=developer_prefix)
     created_date = created or date.today()
 
     entry: dict[str, Any] = {
