@@ -8,8 +8,8 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.memory.models import MemoryScope, PatternSubType
-from raise_cli.memory.writer import (
+from rai_cli.memory.models import MemoryScope, PatternSubType
+from rai_cli.memory.writer import (
     CalibrationInput,
     PatternInput,
     SessionInput,

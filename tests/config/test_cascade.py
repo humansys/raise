@@ -4,7 +4,7 @@ Tests the 5-level configuration cascade:
 1. CLI arguments (constructor)
 2. Environment variables
 3. Project pyproject.toml
-4. User config (~/.config/raise/config.toml)
+4. User config (~/.config/rai/config.toml)
 5. Defaults
 """
 
@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.config.settings import RaiseSettings
+from rai_cli.config.settings import RaiSettings
 
 
 class TestConfigurationCascade:
@@ -25,11 +25,11 @@ class TestConfigurationCascade:
     ) -> None:
         """Level 5: Defaults should be used when nothing else is set."""
         # Clear all possible override sources
-        monkeypatch.delenv("RAISE_OUTPUT_FORMAT", raising=False)
+        monkeypatch.delenv("RAI_OUTPUT_FORMAT", raising=False)
         monkeypatch.chdir(tmp_path)  # No pyproject.toml
         monkeypatch.setenv("HOME", str(tmp_path))  # No user config
 
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "human"
         assert settings.verbosity == 0
         assert settings.color is True
@@ -39,11 +39,11 @@ class TestConfigurationCascade:
     ) -> None:
         """Level 4: User config should override defaults."""
         # Set up user config
-        config_dir = tmp_path / ".config" / "raise"
+        config_dir = tmp_path / ".config" / "rai"
         config_dir.mkdir(parents=True)
         config_file = config_dir / "config.toml"
         config_file.write_text("""
-[raise]
+[rai]
 output_format = "json"
 verbosity = 2
 color = false
@@ -51,10 +51,10 @@ color = false
 
         # Point to our test user config
         monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / ".config"))
-        monkeypatch.delenv("RAISE_OUTPUT_FORMAT", raising=False)
+        monkeypatch.delenv("RAI_OUTPUT_FORMAT", raising=False)
         monkeypatch.chdir(tmp_path)  # No pyproject.toml
 
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "json"
         assert settings.verbosity == 2
         assert settings.color is False
@@ -64,11 +64,11 @@ color = false
     ) -> None:
         """Level 3: Project pyproject.toml should override user config."""
         # Set up user config
-        config_dir = tmp_path / ".config" / "raise"
+        config_dir = tmp_path / ".config" / "rai"
         config_dir.mkdir(parents=True)
         config_file = config_dir / "config.toml"
         config_file.write_text("""
-[raise]
+[rai]
 output_format = "json"
 verbosity = 1
 """)
@@ -79,15 +79,15 @@ verbosity = 1
         project_dir.mkdir()
         pyproject = project_dir / "pyproject.toml"
         pyproject.write_text("""
-[tool.raise]
+[tool.rai]
 output_format = "table"
 verbosity = 3
 """)
 
         monkeypatch.chdir(project_dir)
-        monkeypatch.delenv("RAISE_OUTPUT_FORMAT", raising=False)
+        monkeypatch.delenv("RAI_OUTPUT_FORMAT", raising=False)
 
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "table"
         assert settings.verbosity == 3
 
@@ -98,7 +98,7 @@ verbosity = 3
         # Set up project config
         pyproject = tmp_path / "pyproject.toml"
         pyproject.write_text("""
-[tool.raise]
+[tool.rai]
 output_format = "table"
 verbosity = 2
 color = true
@@ -107,11 +107,11 @@ color = true
         monkeypatch.chdir(tmp_path)
 
         # Set env vars (should win)
-        monkeypatch.setenv("RAISE_OUTPUT_FORMAT", "json")
-        monkeypatch.setenv("RAISE_VERBOSITY", "1")
-        monkeypatch.setenv("RAISE_COLOR", "false")
+        monkeypatch.setenv("RAI_OUTPUT_FORMAT", "json")
+        monkeypatch.setenv("RAI_VERBOSITY", "1")
+        monkeypatch.setenv("RAI_COLOR", "false")
 
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "json"
         assert settings.verbosity == 1
         assert settings.color is False
@@ -121,11 +121,11 @@ color = true
     ) -> None:
         """Level 1: CLI arguments should override environment variables."""
         # Set up env vars
-        monkeypatch.setenv("RAISE_OUTPUT_FORMAT", "json")
-        monkeypatch.setenv("RAISE_VERBOSITY", "2")
+        monkeypatch.setenv("RAI_OUTPUT_FORMAT", "json")
+        monkeypatch.setenv("RAI_VERBOSITY", "2")
 
         # Constructor args should win
-        settings = RaiseSettings(output_format="table", verbosity=3)
+        settings = RaiSettings(output_format="table", verbosity=3)
         assert settings.output_format == "table"
         assert settings.verbosity == 3
 
@@ -136,10 +136,10 @@ color = true
         # Level 5: Defaults (color=True, interactive=False)
 
         # Level 4: User config
-        config_dir = tmp_path / ".config" / "raise"
+        config_dir = tmp_path / ".config" / "rai"
         config_dir.mkdir(parents=True)
         (config_dir / "config.toml").write_text("""
-[raise]
+[rai]
 output_format = "json"
 verbosity = 1
 color = false
@@ -151,16 +151,16 @@ interactive = true
         project_dir = tmp_path / "project"
         project_dir.mkdir()
         (project_dir / "pyproject.toml").write_text("""
-[tool.raise]
+[tool.rai]
 output_format = "table"
 """)
         monkeypatch.chdir(project_dir)
 
         # Level 2: Env var (should override project for verbosity)
-        monkeypatch.setenv("RAISE_VERBOSITY", "2")
+        monkeypatch.setenv("RAI_VERBOSITY", "2")
 
         # Level 1: CLI arg (should override everything for color)
-        settings = RaiseSettings(color=True)
+        settings = RaiSettings(color=True)
 
         # Verify cascade:
         assert settings.color is True  # From CLI (level 1)
@@ -182,25 +182,25 @@ class TestConfigurationEdgeCases:
         pyproject.write_text("this is not valid toml [[[")
 
         monkeypatch.chdir(tmp_path)
-        monkeypatch.delenv("RAISE_OUTPUT_FORMAT", raising=False)
+        monkeypatch.delenv("RAI_OUTPUT_FORMAT", raising=False)
 
         # Should fall back to defaults without crashing
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "human"
 
     def test_malformed_user_config_graceful_degradation(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Should gracefully handle malformed user config."""
-        config_dir = tmp_path / ".config" / "raise"
+        config_dir = tmp_path / ".config" / "rai"
         config_dir.mkdir(parents=True)
         (config_dir / "config.toml").write_text("invalid toml content {{{")
 
         monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / ".config"))
-        monkeypatch.delenv("RAISE_OUTPUT_FORMAT", raising=False)
+        monkeypatch.delenv("RAI_OUTPUT_FORMAT", raising=False)
 
         # Should fall back to defaults without crashing
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "human"
 
     def test_missing_config_files_no_error(
@@ -209,9 +209,9 @@ class TestConfigurationEdgeCases:
         """Should not error when config files don't exist."""
         monkeypatch.chdir(tmp_path)  # No pyproject.toml
         monkeypatch.setenv("HOME", str(tmp_path))  # No user config
-        monkeypatch.delenv("RAISE_OUTPUT_FORMAT", raising=False)
+        monkeypatch.delenv("RAI_OUTPUT_FORMAT", raising=False)
 
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "human"
 
     def test_partial_config_files(
@@ -220,15 +220,15 @@ class TestConfigurationEdgeCases:
         """Should handle config files with only some fields set."""
         pyproject = tmp_path / "pyproject.toml"
         pyproject.write_text("""
-[tool.raise]
+[tool.rai]
 output_format = "json"
 # verbosity intentionally not set
 """)
 
         monkeypatch.chdir(tmp_path)
-        monkeypatch.delenv("RAISE_VERBOSITY", raising=False)
+        monkeypatch.delenv("RAI_VERBOSITY", raising=False)
 
-        settings = RaiseSettings()
+        settings = RaiSettings()
         assert settings.output_format == "json"  # From config
         assert settings.verbosity == 0  # From default
 
@@ -242,14 +242,14 @@ class TestPathConfiguration:
         """Path fields should be loaded correctly from TOML."""
         pyproject = tmp_path / "pyproject.toml"
         pyproject.write_text("""
-[tool.raise]
+[tool.rai]
 raise_dir = ".custom-raise"
 governance_dir = "gov"
 work_dir = "work-dir"
 """)
 
         monkeypatch.chdir(tmp_path)
-        settings = RaiseSettings()
+        settings = RaiSettings()
 
         assert settings.raise_dir == Path(".custom-raise")
         assert settings.governance_dir == Path("gov")

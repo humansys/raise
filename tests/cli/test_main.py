@@ -4,17 +4,17 @@ from __future__ import annotations
 
 from typer.testing import CliRunner
 
-from raise_cli.cli.main import app
-from raise_cli.config import RaiseSettings
+from rai_cli.cli.main import app
+from rai_cli.config import RaiSettings
 
 runner = CliRunner()
 
 
 class TestCLISettings:
-    """Tests for RaiseSettings integration with CLI."""
+    """Tests for RaiSettings integration with CLI."""
 
     def test_default_settings_created(self) -> None:
-        """CLI should create RaiseSettings with defaults when no flags provided."""
+        """CLI should create RaiSettings with defaults when no flags provided."""
         # We can't directly access ctx.obj in tests, but we can verify
         # the CLI runs without error (integration test)
         result = runner.invoke(app, ["--help"])
@@ -49,7 +49,7 @@ class TestCLISettings:
         """CLI should show version with --version."""
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
-        assert "raise-cli version" in result.stdout
+        assert "rai-cli version" in result.stdout
 
 
 class TestSettingsIntegration:
@@ -57,8 +57,8 @@ class TestSettingsIntegration:
 
     def test_settings_uses_cli_overrides(self) -> None:
         """Settings should respect CLI argument overrides."""
-        # Test that RaiseSettings respects constructor args
-        settings = RaiseSettings(output_format="json", verbosity=2)
+        # Test that RaiSettings respects constructor args
+        settings = RaiSettings(output_format="json", verbosity=2)
         assert settings.output_format == "json"
         assert settings.verbosity == 2
 
@@ -68,17 +68,17 @@ class TestSettingsIntegration:
         monkeypatch.setenv("RAISE_OUTPUT_FORMAT", "table")
 
         # CLI arg should win
-        settings = RaiseSettings(output_format="json")
+        settings = RaiSettings(output_format="json")
         assert settings.output_format == "json"
 
     def test_quiet_sets_verbosity_negative(self) -> None:
         """Quiet flag should result in verbosity -1."""
-        settings = RaiseSettings(verbosity=-1)
+        settings = RaiSettings(verbosity=-1)
         assert settings.verbosity == -1
 
     def test_verbose_caps_at_three(self) -> None:
         """Verbosity should cap at 3."""
-        settings = RaiseSettings(verbosity=3)
+        settings = RaiSettings(verbosity=3)
         assert settings.verbosity == 3
 
 
@@ -87,9 +87,9 @@ class TestBackwardCompatibility:
 
     def test_output_format_values(self) -> None:
         """Output format should support all three values."""
-        settings_human = RaiseSettings(output_format="human")
-        settings_json = RaiseSettings(output_format="json")
-        settings_table = RaiseSettings(output_format="table")
+        settings_human = RaiSettings(output_format="human")
+        settings_json = RaiSettings(output_format="json")
+        settings_table = RaiSettings(output_format="table")
 
         assert settings_human.output_format == "human"
         assert settings_json.output_format == "json"

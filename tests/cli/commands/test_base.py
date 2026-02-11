@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from raise_cli.cli.main import app
+from rai_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -38,7 +38,7 @@ class TestBaseShow:
         (identity_dir / "core.md").write_text("# Rai")
 
         with patch(
-            "raise_cli.cli.commands.base._get_project_root", return_value=tmp_path
+            "rai_cli.cli.commands.base._get_project_root", return_value=tmp_path
         ):
             result = runner.invoke(app, ["base", "show"])
 
@@ -48,7 +48,7 @@ class TestBaseShow:
     def test_shows_not_installed_when_missing(self, tmp_path: Path) -> None:
         """Should show not installed when .raise/rai/ doesn't exist."""
         with patch(
-            "raise_cli.cli.commands.base._get_project_root", return_value=tmp_path
+            "rai_cli.cli.commands.base._get_project_root", return_value=tmp_path
         ):
             result = runner.invoke(app, ["base", "show"])
 

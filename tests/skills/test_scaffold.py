@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.skills.scaffold import scaffold_skill
+from rai_cli.skills.scaffold import scaffold_skill
 
 
 class TestScaffoldSkill:
@@ -112,7 +112,7 @@ class TestScaffoldSkill:
 
     def test_scaffold_creates_valid_skill(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Scaffolded skill passes validation."""
-        from raise_cli.skills.validator import validate_skill_file
+        from rai_cli.skills.validator import validate_skill_file
 
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)

@@ -5,8 +5,8 @@ from textwrap import dedent
 
 import pytest
 
-from raise_cli.governance.extractor import GovernanceExtractor
-from raise_cli.governance.models import ConceptType
+from rai_cli.governance.extractor import GovernanceExtractor
+from rai_cli.governance.models import ConceptType
 
 
 @pytest.fixture

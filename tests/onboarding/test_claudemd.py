@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from raise_cli.onboarding.claudemd import ClaudeMdGenerator, generate_claude_md
-from raise_cli.onboarding.conventions import (
+from rai_cli.onboarding.claudemd import ClaudeMdGenerator, generate_claude_md
+from rai_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
     IndentationConvention,
@@ -16,7 +16,7 @@ from raise_cli.onboarding.conventions import (
     StructureConventions,
     StyleConventions,
 )
-from raise_cli.onboarding.detection import DetectionResult, ProjectType
+from rai_cli.onboarding.detection import DetectionResult, ProjectType
 
 # =============================================================================
 # Fixtures

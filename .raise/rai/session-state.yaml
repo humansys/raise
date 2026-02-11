@@ -1,26 +1,28 @@
 current_work:
   epic: ''
-  story: ''
-  phase: ''
+  story: S-RENAME
+  phase: pending
   branch: v2
 last_session:
-  id: SES-135
-  date: '2026-02-10'
+  id: SES-137
+  date: '2026-02-11'
   developer: Emilio
-  summary: E17 close + S17.4 full cycle + bugfixes (uv run prefix, discover-describe
-    frontmatter) + zambezi discovery support
+  summary: S-RELEASE story complete — pre-release hardening (vendor excludes, skill
+    consolidation, skill rename). Decided on rai-cli package name and rai command.
+    Publish deferred to after S-RENAME.
   patterns_captured:
-  - PAT-SES-135
-  - PAT-SES-135
+  - PAT-SES-137
+  - PAT-SES-137
 pending:
-  decisions: []
+  decisions:
+  - 'S-NAMESPACE: whether to prefix skills with rai. and when (before or after first
+    publish)'
   blockers: []
   next_actions:
-  - Zambezi-concierge discovery re-run (in progress on other instance)
-  - Demo zambezi-concierge discovery
-  - First RaiSE client kick-off (today)
-notes: First session where Rai proposed inference economy improvements unprompted.
-  Productive meta-conversation about where tokens go to waste vs where they create
-  value.
+  - 'S-RENAME: command raise→rai, package raise-cli→rai-cli (~430 refs, mechanical)'
+  - Build and publish rai-cli to PyPI after S-RENAME
+notes: First F&F demo was today. Client kick-off also today. Good energy. The rai
+  command name emerged from a sharp insight about deterministic vs inference layers
+  of the AI partner.
 progress: null
 completed_epics: []

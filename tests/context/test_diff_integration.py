@@ -6,9 +6,9 @@ diff_graphs detects them accurately. Decoupled from live codebase state.
 
 from __future__ import annotations
 
-from raise_cli.context.diff import diff_graphs
-from raise_cli.context.graph import UnifiedGraph
-from raise_cli.context.models import ConceptNode
+from rai_cli.context.diff import diff_graphs
+from rai_cli.context.graph import UnifiedGraph
+from rai_cli.context.models import ConceptNode
 
 
 class TestDiffWithFixtureGraph:

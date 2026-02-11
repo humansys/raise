@@ -6,9 +6,9 @@ from pathlib import Path
 
 import pytest
 
-from raise_cli.context.graph import UnifiedGraph
-from raise_cli.context.models import ConceptNode
-from raise_cli.context.query import (
+from rai_cli.context.graph import UnifiedGraph
+from rai_cli.context.models import ConceptNode
+from rai_cli.context.query import (
     UnifiedQuery,
     UnifiedQueryEngine,
     UnifiedQueryMetadata,
@@ -241,7 +241,7 @@ class TestUnifiedQueryEngineConceptLookup:
         self, sample_graph: UnifiedGraph
     ) -> None:
         """Lookup with depth > 0 includes neighbors."""
-        from raise_cli.context.models import ConceptEdge
+        from rai_cli.context.models import ConceptEdge
 
         # Add relationship
         sample_graph.add_relationship(
@@ -286,7 +286,7 @@ class TestUnifiedQueryEngineEdgeTypeFilter:
         self, sample_graph: UnifiedGraph
     ) -> None:
         """Concept lookup with edge_types only returns neighbors via matching edges."""
-        from raise_cli.context.models import ConceptEdge
+        from rai_cli.context.models import ConceptEdge
 
         # Add two different edge types from PAT-001
         sample_graph.add_relationship(
@@ -316,7 +316,7 @@ class TestUnifiedQueryEngineEdgeTypeFilter:
         self, sample_graph: UnifiedGraph
     ) -> None:
         """Multiple edge types returns neighbors matching any of them."""
-        from raise_cli.context.models import ConceptEdge
+        from rai_cli.context.models import ConceptEdge
 
         sample_graph.add_relationship(
             ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")
@@ -343,7 +343,7 @@ class TestUnifiedQueryEngineEdgeTypeFilter:
         self, sample_graph: UnifiedGraph
     ) -> None:
         """No edge_types filter returns all neighbors (backward compat)."""
-        from raise_cli.context.models import ConceptEdge
+        from rai_cli.context.models import ConceptEdge
 
         sample_graph.add_relationship(
             ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")

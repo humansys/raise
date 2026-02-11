@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 import pytest
 
-from raise_cli.context.builder import UnifiedGraphBuilder
-from raise_cli.context.models import ConceptNode
+from rai_cli.context.builder import UnifiedGraphBuilder
+from rai_cli.context.models import ConceptNode
 
 
 class TestUnifiedGraphBuilderInit:
@@ -33,7 +33,7 @@ class TestLoadGovernance:
     def test_converts_concepts_to_nodes(self, tmp_path: Path) -> None:
         """Should convert governance Concept to ConceptNode."""
         # Create mock concept
-        from raise_cli.governance.models import Concept, ConceptType
+        from rai_cli.governance.models import Concept, ConceptType
 
         mock_concept = Concept(
             id="principle-1",
@@ -678,7 +678,7 @@ class TestLoadWork:
 
     def test_converts_epics_to_nodes(self, tmp_path: Path) -> None:
         """Should convert epic Concept to ConceptNode."""
-        from raise_cli.governance.models import Concept, ConceptType
+        from rai_cli.governance.models import Concept, ConceptType
 
         mock_epic = Concept(
             id="E11",
@@ -705,7 +705,7 @@ class TestLoadWork:
 
     def test_converts_features_to_nodes(self, tmp_path: Path) -> None:
         """Should convert feature Concept to ConceptNode."""
-        from raise_cli.governance.models import Concept, ConceptType
+        from rai_cli.governance.models import Concept, ConceptType
 
         mock_feature = Concept(
             id="F11.2",
@@ -1364,7 +1364,7 @@ class TestBuild:
 
     def test_build_returns_unified_graph(self, tmp_path: Path) -> None:
         """Should return UnifiedGraph instance."""
-        from raise_cli.context.graph import UnifiedGraph
+        from rai_cli.context.graph import UnifiedGraph
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
@@ -2377,19 +2377,19 @@ class TestLoadCodeStructure:
         )
 
         # Source code
-        src_dir = tmp_path / "src" / "raise_cli"
+        src_dir = tmp_path / "src" / "rai_cli"
         alpha = src_dir / "alpha"
         alpha.mkdir(parents=True)
         (alpha / "__init__.py").write_text(
             dedent("""\
-            from raise_cli.alpha.core import Foo
+            from rai_cli.alpha.core import Foo
 
             __all__ = ["Foo"]
             """)
         )
         (alpha / "core.py").write_text(
             dedent("""\
-            from raise_cli.beta import helper
+            from rai_cli.beta import helper
 
             class Foo:
                 pass
@@ -2403,7 +2403,7 @@ class TestLoadCodeStructure:
         beta.mkdir(parents=True)
         (beta / "__init__.py").write_text(
             dedent("""\
-            from raise_cli.beta.utils import helper
+            from rai_cli.beta.utils import helper
 
             __all__ = ["helper"]
             """)
@@ -2521,7 +2521,7 @@ class TestLoadCodeStructure:
 
         (tmp_path / "pyproject.toml").write_text("[project]\nname = 'test'\n")
         # Create empty src dir so analyzer runs but finds no modules
-        (tmp_path / "src" / "raise_cli").mkdir(parents=True)
+        (tmp_path / "src" / "rai_cli").mkdir(parents=True)
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
@@ -2605,7 +2605,7 @@ class TestRaiBaseTemplateContract:
         """Get the path to bundled rai_base architecture templates."""
         from importlib.resources import files as pkg_files
 
-        base = pkg_files("raise_cli.rai_base") / "governance" / "architecture"
+        base = pkg_files("rai_cli.rai_base") / "governance" / "architecture"
         # importlib Traversable → Path
         return Path(str(base))
 
