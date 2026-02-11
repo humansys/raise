@@ -50,7 +50,7 @@ cd raise-commons
 uv pip install -e .
 
 # Verify installation
-uv run raise --help
+raise --help
 ```
 
 ### First Steps
