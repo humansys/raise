@@ -10,7 +10,7 @@ from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 TOTAL_SKILLS = len(DISTRIBUTABLE_SKILLS)
 
 # Skills that include reference subdirectories (more than just SKILL.md)
-SKILLS_WITH_REFERENCES = {"epic-plan", "research", "story-design"}
+SKILLS_WITH_REFERENCES = {"rai-epic-plan", "rai-research", "rai-story-design"}
 
 
 class TestScaffoldSkills:
@@ -33,14 +33,14 @@ class TestScaffoldSkills:
 
         skills_dir = tmp_path / ".claude" / "skills"
         assert (
-            skills_dir / "epic-plan" / "_references" / "sequencing-strategies.md"
+            skills_dir / "rai-epic-plan" / "_references" / "sequencing-strategies.md"
         ).exists()
         assert (
-            skills_dir / "research" / "references" / "research-prompt-template.md"
+            skills_dir / "rai-research" / "references" / "research-prompt-template.md"
         ).exists()
         assert (
             skills_dir
-            / "story-design"
+            / "rai-story-design"
             / "references"
             / "tech-design-story-v2.md"
         ).exists()
@@ -49,7 +49,7 @@ class TestScaffoldSkills:
         """Copied skills should have YAML frontmatter."""
         scaffold_skills(tmp_path)
 
-        skill_path = tmp_path / ".claude" / "skills" / "session-start" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
         content = skill_path.read_text()
         assert content.startswith("---\n") or content.startswith("#")
 
@@ -60,9 +60,9 @@ class TestScaffoldSkills:
         scaffold_skills(tmp_path)
 
         base = files("rai_cli.skills_base")
-        original = (base / "session-start" / "SKILL.md").read_text()
+        original = (base / "rai-session-start" / "SKILL.md").read_text()
         copied = (
-            tmp_path / ".claude" / "skills" / "session-start" / "SKILL.md"
+            tmp_path / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
         ).read_text()
         assert copied == original
 
@@ -70,11 +70,11 @@ class TestScaffoldSkills:
         """Should return names of copied skills."""
         result = scaffold_skills(tmp_path)
 
-        assert "session-start" in result.skills_installed
-        assert "discover-document" in result.skills_installed
-        assert "story-implement" in result.skills_installed
-        assert "epic-design" in result.skills_installed
-        assert "debug" in result.skills_installed
+        assert "rai-session-start" in result.skills_installed
+        assert "rai-discover-document" in result.skills_installed
+        assert "rai-story-implement" in result.skills_installed
+        assert "rai-epic-design" in result.skills_installed
+        assert "rai-debug" in result.skills_installed
         assert len(result.skills_installed) == TOTAL_SKILLS
 
     def test_reports_files_copied(self, tmp_path: Path) -> None:
@@ -97,14 +97,14 @@ class TestScaffoldSkillsIdempotency:
         scaffold_skills(tmp_path)
 
         # Modify a skill
-        skill_path = tmp_path / ".claude" / "skills" / "session-start" / "SKILL.md"
+        skill_path = tmp_path / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
         skill_path.write_text("# Custom skill")
 
         # Second scaffold
         result = scaffold_skills(tmp_path)
 
         assert skill_path.read_text() == "# Custom skill"
-        assert "session-start" in result.skills_skipped_names
+        assert "rai-session-start" in result.skills_skipped_names
 
     def test_second_run_reports_already_existed(self, tmp_path: Path) -> None:
         """Second scaffold should report already_existed=True."""
@@ -119,21 +119,21 @@ class TestScaffoldSkillsIdempotency:
     def test_copies_only_missing_skills(self, tmp_path: Path) -> None:
         """Should copy missing skills when some already exist."""
         # Create one skill manually
-        skill_dir = tmp_path / ".claude" / "skills" / "session-start"
+        skill_dir = tmp_path / ".claude" / "skills" / "rai-session-start"
         skill_dir.mkdir(parents=True)
         (skill_dir / "SKILL.md").write_text("# Existing")
 
         result = scaffold_skills(tmp_path)
 
         # session-start should be skipped
-        assert "session-start" in result.skills_skipped_names
+        assert "rai-session-start" in result.skills_skipped_names
         # Others should be copied
         assert result.skills_copied == TOTAL_SKILLS - 1
         assert (
-            tmp_path / ".claude" / "skills" / "discover-start" / "SKILL.md"
+            tmp_path / ".claude" / "skills" / "rai-discover-start" / "SKILL.md"
         ).exists()
         assert (
-            tmp_path / ".claude" / "skills" / "story-implement" / "SKILL.md"
+            tmp_path / ".claude" / "skills" / "rai-story-implement" / "SKILL.md"
         ).exists()
 
 

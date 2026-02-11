@@ -1,6 +1,6 @@
 # Solution Vision: {project_name}
 
-> Solution vision — fill with /project-create or /project-onboard
+> Solution vision — fill with /rai-project-create or /rai-project-onboard
 
 ## Identity
 

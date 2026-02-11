@@ -29,9 +29,9 @@ def extract_skill_metadata(skill_path: Path) -> ConceptNode | None:
         ConceptNode for the skill, or None if parsing fails or file doesn't exist.
 
     Examples:
-        >>> node = extract_skill_metadata(Path(".claude/skills/story-plan/SKILL.md"))
+        >>> node = extract_skill_metadata(Path(".claude/skills/rai-story-plan/SKILL.md"))
         >>> node.id if node else None
-        '/story-plan'
+        '/rai-story-plan'
     """
     if not skill_path.exists():
         return None

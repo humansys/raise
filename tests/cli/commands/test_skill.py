@@ -18,12 +18,12 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     skills = tmp_path / ".claude" / "skills"
     skills.mkdir(parents=True)
 
-    # Create session-start skill
-    session_start = skills / "session-start"
+    # Create rai-session-start skill
+    session_start = skills / "rai-session-start"
     session_start.mkdir()
     (session_start / "SKILL.md").write_text(dedent("""\
         ---
-        name: session-start
+        name: rai-session-start
         description: Begin a session by loading memory
         metadata:
           raise.work_cycle: session
@@ -32,12 +32,12 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         # Session Start
     """))
 
-    # Create story-plan skill
-    feature_plan = skills / "story-plan"
+    # Create rai-story-plan skill
+    feature_plan = skills / "rai-story-plan"
     feature_plan.mkdir()
     (feature_plan / "SKILL.md").write_text(dedent("""\
         ---
-        name: story-plan
+        name: rai-story-plan
         description: Plan a feature implementation
         metadata:
           raise.work_cycle: story
@@ -46,12 +46,12 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
         # Story Plan
     """))
 
-    # Create debug skill
-    debug = skills / "debug"
+    # Create rai-debug skill
+    debug = skills / "rai-debug"
     debug.mkdir()
     (debug / "SKILL.md").write_text(dedent("""\
         ---
-        name: debug
+        name: rai-debug
         description: Debug issues systematically
         metadata:
           raise.work_cycle: utility
@@ -74,9 +74,9 @@ class TestSkillList:
         """List skills in human-readable format."""
         result = runner.invoke(app, ["skill", "list"])
         assert result.exit_code == 0
-        assert "session-start" in result.stdout
-        assert "story-plan" in result.stdout
-        assert "debug" in result.stdout
+        assert "rai-session-start" in result.stdout
+        assert "rai-story-plan" in result.stdout
+        assert "rai-debug" in result.stdout
 
     def test_list_skills_json(self, skill_project: Path) -> None:
         """List skills in JSON format."""
@@ -86,7 +86,7 @@ class TestSkillList:
         assert "skills" in data
         assert len(data["skills"]) == 3
         names = {s["name"] for s in data["skills"]}
-        assert names == {"session-start", "story-plan", "debug"}
+        assert names == {"rai-session-start", "rai-story-plan", "rai-debug"}
 
     def test_list_skills_json_structure(self, skill_project: Path) -> None:
         """Verify JSON output structure."""
@@ -95,7 +95,7 @@ class TestSkillList:
         data = json.loads(result.stdout)
 
         # Check skill structure
-        skill = next(s for s in data["skills"] if s["name"] == "session-start")
+        skill = next(s for s in data["skills"] if s["name"] == "rai-session-start")
         assert skill["version"] == "3.0.0"
         assert skill["lifecycle"] == "session"
         assert "description" in skill
@@ -135,12 +135,12 @@ def valid_skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path
     skills = tmp_path / ".claude" / "skills"
     skills.mkdir(parents=True)
 
-    # Create valid session-start skill
-    session_start = skills / "session-start"
+    # Create valid rai-session-start skill
+    session_start = skills / "rai-session-start"
     session_start.mkdir()
     (session_start / "SKILL.md").write_text(dedent("""\
         ---
-        name: session-start
+        name: rai-session-start
         description: Begin a session by loading memory
         metadata:
           raise.work_cycle: session
@@ -180,7 +180,7 @@ class TestSkillValidate:
 
     def test_validate_specific_file(self, valid_skill_project: Path) -> None:
         """Validate a specific skill file."""
-        skill_path = valid_skill_project / ".claude" / "skills" / "session-start" / "SKILL.md"
+        skill_path = valid_skill_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
         result = runner.invoke(app, ["skill", "validate", str(skill_path)])
         assert result.exit_code == 0
         # Check for success indicators (path may be wrapped by Rich)
@@ -188,7 +188,7 @@ class TestSkillValidate:
 
     def test_validate_specific_dir(self, valid_skill_project: Path) -> None:
         """Validate a skill directory (looks for SKILL.md)."""
-        skill_dir = valid_skill_project / ".claude" / "skills" / "session-start"
+        skill_dir = valid_skill_project / ".claude" / "skills" / "rai-session-start"
         result = runner.invoke(app, ["skill", "validate", str(skill_dir)])
         assert result.exit_code == 0
 
@@ -311,7 +311,7 @@ class TestSkillCheckName:
 
     def test_check_name_skill_conflict(self, valid_skill_project: Path) -> None:
         """Conflicts with existing skill."""
-        result = runner.invoke(app, ["skill", "check-name", "session-start"])
+        result = runner.invoke(app, ["skill", "check-name", "rai-session-start"])
         assert result.exit_code == 1
         assert "conflict" in result.stdout.lower()
 
@@ -368,10 +368,10 @@ class TestSkillScaffold:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--after", "story-start"])
+        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--after", "rai-story-start"])
         assert result.exit_code == 0
         content = (skills / "test-action" / "SKILL.md").read_text()
-        assert "story-start" in content
+        assert "rai-story-start" in content
 
     def test_scaffold_with_before(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """Scaffold with next skill."""
@@ -379,10 +379,10 @@ class TestSkillScaffold:
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--before", "story-close"])
+        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--before", "rai-story-close"])
         assert result.exit_code == 0
         content = (skills / "test-action" / "SKILL.md").read_text()
-        assert "story-close" in content
+        assert "rai-story-close" in content
 
     def test_scaffold_json_output(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
         """JSON output format works."""
