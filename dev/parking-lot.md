@@ -8,7 +8,7 @@
 
 ## Urgent
 
-- [ ] **WorkLifecycle phase mismatch: CLI accepts phases the Pydantic model rejects** — (SES-131, SES-136)
+- [x] **WorkLifecycle phase mismatch: CLI accepts phases the Pydantic model rejects** — (SES-131, SES-136) ✓ Fixed SES-136 — added `init` + `close` to Pydantic Literal
   - **Root cause:** Two validation layers disagree. CLI `valid_phases` list (memory.py:1396) includes `'init'` but `WorkLifecycle.phase` Pydantic Literal (schemas.py:267) only allows `['design', 'plan', 'implement', 'review']`. CLI pre-validation passes, Pydantic construction crashes.
   - **Missing phases:** `init` (needed by `/epic-start`, `/story-start`), `close` (needed by `/story-close`, `/epic-close`)
   - **Locations:**
