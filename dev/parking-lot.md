@@ -8,12 +8,16 @@
 
 ## Urgent
 
-- [ ] **WorkLifecycle model rejects `init` phase despite CLI accepting it** — (SES-131, 2026-02-09)
-  - **Problem:** `raise memory emit-work epic E17 --event start --phase init` passes CLI `valid_phases` check (includes `'init'`) but `WorkLifecycle` Pydantic model's `phase` field is `Literal['design', 'plan', 'implement', 'review']` — no `'init'`. CLI validates one thing, model validates another.
-  - **Location:** `memory.py:1336` (emit_work command), `WorkLifecycle` model definition
-  - **Fix:** Either add `'init'` to the Pydantic Literal, or remove `'init'` from `valid_phases` in the CLI command. The skill `/epic-start` uses `--phase init`, so the model should accept it.
-  - **Workaround:** Use `--phase design` instead
-  - **Priority:** Urgent — breaks every `/epic-start` telemetry emit
+- [ ] **WorkLifecycle phase mismatch: CLI accepts phases the Pydantic model rejects** — (SES-131, SES-136)
+  - **Root cause:** Two validation layers disagree. CLI `valid_phases` list (memory.py:1396) includes `'init'` but `WorkLifecycle.phase` Pydantic Literal (schemas.py:267) only allows `['design', 'plan', 'implement', 'review']`. CLI pre-validation passes, Pydantic construction crashes.
+  - **Missing phases:** `init` (needed by `/epic-start`, `/story-start`), `close` (needed by `/story-close`, `/epic-close`)
+  - **Locations:**
+    - Schema: `src/raise_cli/telemetry/schemas.py:267` — `phase: Literal["design", "plan", "implement", "review"]`
+    - CLI validator: `src/raise_cli/cli/commands/memory.py:1396` — `valid_phases` list
+  - **Fix:** Add `'init'` and `'close'` to the Pydantic Literal in `WorkLifecycle.phase`, and ensure CLI `valid_phases` matches exactly. Single source of truth: the Pydantic model should define valid phases, CLI should read from it.
+  - **Workaround:** Use `--phase design` for init events, `--phase review` for close events
+  - **Frequency:** Hits on every `/epic-start`, `/story-start`, `/story-close`, `/epic-close` — 4x per story cycle
+  - **Priority:** Urgent — XS fix, high frequency
 
 - [ ] **Domain stance layer — behavioral priming per project type** — (SES-134, 2026-02-10)
   - **Insight:** Identity (CLAUDE.md) shapes behavior deeply. Governance docs inform but don't prime as strongly. There's a missing middle layer: domain-specific thinking patterns that make Rai fluent, not just informed.
