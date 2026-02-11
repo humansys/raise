@@ -29,7 +29,7 @@ constraints:
 
 The core module wraps external CLI tools (git, ripgrep, ast-grep) into typed Python functions. Instead of scattering `subprocess.run()` calls throughout the codebase, every module calls `run_tool()` or its specialized variants (`git_status()`, `rg_search()`, etc.), which return typed `ToolResult` objects with stdout, stderr, and return codes.
 
-This matters because raise-cli is a **toolkit that orchestrates other tools** — it doesn't reimplement git or AST parsing. Core provides the bridge between Python and those external tools with consistent error handling.
+This matters because rai-cli is a **toolkit that orchestrates other tools** — it doesn't reimplement git or AST parsing. Core provides the bridge between Python and those external tools with consistent error handling.
 
 ## Key Files
 

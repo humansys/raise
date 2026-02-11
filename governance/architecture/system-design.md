@@ -1,6 +1,6 @@
 ---
 type: architecture_design
-project: raise-cli
+project: rai-cli
 status: current
 layers:
   - name: leaf
@@ -31,11 +31,11 @@ constitution_reference: "framework/reference/constitution.md"
 
 # System Design
 
-> C4 Level 2 — How raise-cli is structured internally, its constraints, and what constitutes drift.
+> C4 Level 2 — How rai-cli is structured internally, its constraints, and what constitutes drift.
 
 ## Layered Hub-and-Spoke Architecture
 
-raise-cli follows a **strictly layered, acyclic** dependency structure. Every module lives in exactly one layer, and dependencies only flow downward.
+rai-cli follows a **strictly layered, acyclic** dependency structure. Every module lives in exactly one layer, and dependencies only flow downward.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
