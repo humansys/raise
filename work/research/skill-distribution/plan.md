@@ -18,33 +18,33 @@
 - **Dependencies:** None
 
 ### Task 2: Create `skills_base` package
-- **Description:** Create `src/raise_cli/skills_base/` package following `rai_base` pattern. Contains `__init__.py` with version and `DISTRIBUTABLE_SKILLS` manifest, plus one subdirectory per skill with `SKILL.md`. Copy the 5 onboarding skills from `.claude/skills/`: `session-start`, `discover-start`, `discover-scan`, `discover-validate`, `discover-complete`. Use the fixed `session-start` from Task 1.
+- **Description:** Create `src/rai_cli/skills_base/` package following `rai_base` pattern. Contains `__init__.py` with version and `DISTRIBUTABLE_SKILLS` manifest, plus one subdirectory per skill with `SKILL.md`. Copy the 5 onboarding skills from `.claude/skills/`: `session-start`, `discover-start`, `discover-scan`, `discover-validate`, `discover-complete`. Use the fixed `session-start` from Task 1.
 - **Files:**
-  - `src/raise_cli/skills_base/__init__.py` (CREATE)
-  - `src/raise_cli/skills_base/session-start/SKILL.md` (CREATE)
-  - `src/raise_cli/skills_base/discover-start/SKILL.md` (CREATE)
-  - `src/raise_cli/skills_base/discover-scan/SKILL.md` (CREATE)
-  - `src/raise_cli/skills_base/discover-validate/SKILL.md` (CREATE)
-  - `src/raise_cli/skills_base/discover-complete/SKILL.md` (CREATE)
+  - `src/rai_cli/skills_base/__init__.py` (CREATE)
+  - `src/rai_cli/skills_base/session-start/SKILL.md` (CREATE)
+  - `src/rai_cli/skills_base/discover-start/SKILL.md` (CREATE)
+  - `src/rai_cli/skills_base/discover-scan/SKILL.md` (CREATE)
+  - `src/rai_cli/skills_base/discover-validate/SKILL.md` (CREATE)
+  - `src/rai_cli/skills_base/discover-complete/SKILL.md` (CREATE)
 - **TDD Cycle:** RED: test that `importlib.resources.files("raise_cli.skills_base")` resolves and skills are readable → GREEN: create package → REFACTOR
 - **Verification:** `pytest tests/onboarding/test_skills.py -v`
 - **Size:** S
 - **Dependencies:** Task 1
 
 ### Task 3: Implement `scaffold_skills()` module
-- **Description:** Create `src/raise_cli/onboarding/skills.py` with `scaffold_skills(project_root, ide="claude")` function. Follows the same pattern as `bootstrap.py`: use `importlib.resources` to read from `skills_base`, copy to `.claude/skills/{name}/SKILL.md`, per-file idempotency (never overwrite), return `SkillScaffoldResult` Pydantic model. Add `SkillScaffoldResult` to schemas or keep inline (same as `BootstrapResult`).
+- **Description:** Create `src/rai_cli/onboarding/skills.py` with `scaffold_skills(project_root, ide="claude")` function. Follows the same pattern as `bootstrap.py`: use `importlib.resources` to read from `skills_base`, copy to `.claude/skills/{name}/SKILL.md`, per-file idempotency (never overwrite), return `SkillScaffoldResult` Pydantic model. Add `SkillScaffoldResult` to schemas or keep inline (same as `BootstrapResult`).
 - **Files:**
-  - `src/raise_cli/onboarding/skills.py` (CREATE)
+  - `src/rai_cli/onboarding/skills.py` (CREATE)
   - `tests/onboarding/test_skills.py` (CREATE)
 - **TDD Cycle:** RED: test scaffold_skills copies to `.claude/skills/`, test idempotency, test result model → GREEN: implement → REFACTOR
 - **Verification:** `pytest tests/onboarding/test_skills.py -v`
 - **Size:** M
 - **Dependencies:** Task 2
 
-### Task 4: Integrate into `raise init`
+### Task 4: Integrate into `rai init`
 - **Description:** Call `scaffold_skills()` in `init_command()` after `bootstrap_rai_base()`. Add skill count to output messages for both Shu and Ri levels. Update `_get_project_message()` to include skills info.
 - **Files:**
-  - `src/raise_cli/cli/commands/init.py` (MODIFY)
+  - `src/rai_cli/cli/commands/init.py` (MODIFY)
   - `tests/cli/commands/test_init.py` (MODIFY)
 - **TDD Cycle:** RED: test init command creates `.claude/skills/` → GREEN: integrate → REFACTOR
 - **Verification:** `pytest tests/cli/commands/test_init.py -v && pytest tests/ -x`
@@ -62,10 +62,10 @@
 ### Task 6 (Final): Manual Integration Test
 - **Description:** Test the full flow in an isolated environment:
   1. Set `RAI_HOME=/tmp/test-ff-user/.rai` and `HOME=/tmp/test-ff-user`
-  2. Run `raise init` in a test directory
+  2. Run `rai init` in a test directory
   3. Verify `.claude/skills/` contains all 5 skills
   4. Verify skills are valid SKILL.md with frontmatter
-  5. Verify idempotency: run `raise init` again, skills not overwritten
+  5. Verify idempotency: run `rai init` again, skills not overwritten
 - **Verification:** Manual demo of end-to-end flow
 - **Size:** XS
 - **Dependencies:** Task 5

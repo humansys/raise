@@ -31,7 +31,7 @@
 ### Phase 2: Scan and Fix Codebase
 
 **2.1 Critical Fixes (ISSUE-005)**
-- [ ] Fix `raise init` output — clarify CLI vs Claude Code skills gap
+- [ ] Fix `rai init` output — clarify CLI vs Claude Code skills gap
 - [ ] Add post-init guidance — what to do next
 - [ ] Resolve MemoryGraph deprecation — complete migration or remove
 
@@ -44,7 +44,7 @@
 **2.3 Code Hygiene**
 - [ ] Delete duplicate `/epic-close/skill.md` (old version)
 - [ ] Standardize skill headers ("When to Use" → "Purpose")
-- [ ] Rename `raise memory dump` → `raise memory list`
+- [ ] Rename `rai memory dump` → `rai memory list`
 - [ ] Fix any security issues found by new pre-commit hooks
 
 **2.4 Validate Against New Guardrails**
@@ -56,7 +56,7 @@
 
 - [ ] All tests pass (>90% coverage)
 - [ ] All pre-commit hooks pass (including new ones)
-- [ ] Manual review of `raise init` flow
+- [ ] Manual review of `rai init` flow
 - [ ] Retrospective and learnings captured
 
 ---
@@ -65,7 +65,7 @@
 
 ### Deferred to Post-F&F
 - Skill bloat refactoring (epic-plan 736 lines → <400)
-- Split `raise context query` into two commands
+- Split `rai context query` into two commands
 - Schema consolidation (governance/query vs context/query)
 - Telemetry boilerplate extraction from skills
 - Convention schema flattening (8 models → 3)
@@ -83,7 +83,7 @@
 - [ ] `guardrails-stack.md` created with synthesized best practices
 - [ ] `/story-review` has Jidoka checkpoint for stack patterns
 - [ ] Pre-commit hooks updated (pip-audit, detect-secrets)
-- [ ] `raise init` output clearly distinguishes CLI/Skills
+- [ ] `rai init` output clearly distinguishes CLI/Skills
 - [ ] No deprecated code warnings in normal usage paths
 - [ ] Zero duplicated utility functions (sanitizers, paths, graph methods)
 - [ ] Codebase passes scan against new guardrails

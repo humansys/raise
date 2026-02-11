@@ -184,7 +184,7 @@ openclaw onboard --install-daemon
    - Governance constraints active in project
    - Its own calibration data (velocity, patterns)
 
-4. **Onboarding command** — `raise init` should:
+4. **Onboarding command** — `rai init` should:
    - Detect brownfield/greenfield (already designed in E7)
    - Copy Rai identity files with clear explanation
    - Offer personality customization as second step (not first)

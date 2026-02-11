@@ -565,7 +565,7 @@ Once MVP passes all tests:
 2. **Phase 3**: Full observability
    - OpenTelemetry export
    - Replay capability
-   - Analysis CLI (`raise trace analyze`)
+   - Analysis CLI (`rai trace analyze`)
 
 3. **Phase 4**: Production hardening
    - Performance optimization

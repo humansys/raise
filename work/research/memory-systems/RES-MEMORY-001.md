@@ -259,7 +259,7 @@ CELL = [INSTRUCTIONS] + [EXAMPLES] + [MEMORY/STATE] + [CURRENT INPUT]
 - Temporal queries ("what did I learn this week?")
 - Memory-specific concept and relationship types
 
-**Location:** `src/raise_cli/governance/graph/`
+**Location:** `src/rai_cli/governance/graph/`
 
 ---
 

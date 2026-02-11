@@ -11,8 +11,8 @@
 - **Completed:** 2026-02-03
 - **Duration:** ~12 min
 - **Files:**
-  - `src/raise_cli/telemetry/writer.py` (new)
-  - `src/raise_cli/telemetry/__init__.py` (updated)
+  - `src/rai_cli/telemetry/writer.py` (new)
+  - `src/rai_cli/telemetry/__init__.py` (updated)
 - **Notes:** Added file locking (fcntl), convenience functions for common signal types
 
 ### Task 2: Add tests for writer

@@ -59,8 +59,8 @@
 | 1 | SessionState schema + YAML persistence | 18 |
 | 2 | DeveloperProfile coaching extension | 34 |
 | 3 | Context bundle assembler | 8 |
-| 4 | `raise session start --context` | 4 |
-| 5 | `raise session close` structured redesign | 12 |
+| 4 | `rai session start --context` | 4 |
+| 5 | `rai session close` structured redesign | 12 |
 | 6 | 10 foundational patterns tagged | verified |
 | 7 | Skills rewritten to 2-step protocols | — |
 | 8 | Full lifecycle integration test | all paths |

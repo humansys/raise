@@ -36,7 +36,7 @@
 > User-facing commands
 
 ### Global Options (F1.2, updated F1.3)
-- **Location:** `src/raise_cli/cli/main.py`
+- **Location:** `src/rai_cli/cli/main.py`
 - **Purpose:** Global options for all commands (format, verbosity, quiet)
 - **Added:** F1.2 (Epic E1), integrated with RaiseSettings in F1.3
 - **API:**
@@ -49,7 +49,7 @@
 - **Dependencies:** `RaiseSettings` (F1.3)
 
 ### Error Handler (F1.4)
-- **Location:** `src/raise_cli/cli/error_handler.py`
+- **Location:** `src/rai_cli/cli/error_handler.py`
 - **Purpose:** Format and display errors with Rich output or JSON
 - **Added:** F1.4 (Epic E1)
 - **Public API:**
@@ -71,7 +71,7 @@
 > Pydantic models for type-safe data structures
 
 ### Governance Models (F2.1)
-- **Location:** `src/raise_cli/governance/models.py`
+- **Location:** `src/rai_cli/governance/models.py`
 - **Purpose:** Pydantic models for concept extraction from governance files
 - **Added:** F2.1 (Epic E2)
 - **Public API:**
@@ -92,7 +92,7 @@
 > Concept extraction from governance markdown files
 
 ### Governance Parsers (F2.1)
-- **Location:** `src/raise_cli/governance/parsers/`
+- **Location:** `src/rai_cli/governance/parsers/`
 - **Purpose:** Extract semantic concepts from governance markdown files
 - **Added:** F2.1 (Epic E2)
 - **Sub-modules:**
@@ -113,7 +113,7 @@
 - **Related:** ADR-011 (concept-level graph architecture)
 
 ### Governance Extractor (F2.1)
-- **Location:** `src/raise_cli/governance/extractor.py`
+- **Location:** `src/rai_cli/governance/extractor.py`
 - **Purpose:** Orchestrate concept extraction from all governance files
 - **Added:** F2.1 (Epic E2)
 - **Public API:**
@@ -135,7 +135,7 @@
 - **Related:** ADR-011
 
 ### Graph Module (F2.2)
-- **Location:** `src/raise_cli/governance/graph/`
+- **Location:** `src/rai_cli/governance/graph/`
 - **Purpose:** Build and query concept-level directed graphs from extracted concepts
 - **Added:** F2.2 (Epic E2)
 - **Sub-modules:**
@@ -169,13 +169,13 @@
 - **Related:** ADR-011 (concept-level graph architecture)
 
 ### Graph CLI Commands (F2.1, F2.2)
-- **Location:** `src/raise_cli/cli/commands/graph.py`
+- **Location:** `src/rai_cli/cli/commands/graph.py`
 - **Purpose:** CLI interface for concept graph operations (extract, build, validate)
 - **Added:** F2.1 (extract), F2.2 (build, validate) - Epic E2
 - **Commands:**
-  - `raise graph extract [FILE_PATH]` - Extract concepts from governance files
-  - `raise graph build` - Build concept graph with relationship inference
-  - `raise graph validate` - Validate graph structure and relationships
+  - `rai graph extract [FILE_PATH]` - Extract concepts from governance files
+  - `rai graph build` - Build concept graph with relationship inference
+  - `rai graph validate` - Validate graph structure and relationships
 - **Options (extract):**
   - `--format/-f` (human|json) - Output format
 - **Options (build):**
@@ -213,7 +213,7 @@
 - **Related:** ADR-011
 
 ### MVC Query Engine (F2.3)
-- **Location:** `src/raise_cli/governance/query/`
+- **Location:** `src/rai_cli/governance/query/`
 - **Purpose:** Extract Minimum Viable Context (MVC) from concept graph, achieving >90% token savings vs loading full files
 - **Added:** F2.3 (Epic E2)
 - **Type:** Query orchestrator with 4 strategies, multiple output formats
@@ -254,11 +254,11 @@
 - **Related:** ADR-011 (97% token savings validated)
 
 ### Context CLI Commands (F2.3)
-- **Location:** `src/raise_cli/cli/commands/context.py`
+- **Location:** `src/rai_cli/cli/commands/context.py`
 - **Purpose:** CLI interface for querying concept graph and retrieving MVC
 - **Added:** F2.3 (Epic E2)
 - **Commands:**
-  - `raise context query <QUERY>` - Query concept graph for Minimum Viable Context
+  - `rai context query <QUERY>` - Query concept graph for Minimum Viable Context
 - **Options:**
   - `--format/-f (markdown|json)` - Output format (default: markdown)
   - `--output/-o PATH` - Save to file instead of stdout
@@ -283,7 +283,7 @@
 - **Features:**
   - Human-readable markdown output (default) optimized for AI consumption
   - JSON output for tool integration
-  - Error handling with helpful messages (graph not found → suggests `raise graph build`)
+  - Error handling with helpful messages (graph not found → suggests `rai graph build`)
   - Token estimate and savings displayed in output
   - Execution time tracking
 - **Dependencies:** ContextQueryEngine, ConceptGraph, Rich
@@ -295,7 +295,7 @@
 ## Configuration (Core Layer)
 
 ### RaiseSettings (F1.3)
-- **Location:** `src/raise_cli/config/settings.py`
+- **Location:** `src/rai_cli/config/settings.py`
 - **Purpose:** Centralized configuration with 5-level cascade precedence
 - **Added:** F1.3 (Epic E1)
 - **Type:** Pydantic BaseSettings with custom TOML sources
@@ -320,7 +320,7 @@
 - **Tests:** 24 unit tests + 11 integration tests (cascade)
 
 ### XDG Directory Helpers (F1.3)
-- **Location:** `src/raise_cli/config/paths.py`
+- **Location:** `src/rai_cli/config/paths.py`
 - **Purpose:** XDG Base Directory compliant path resolution
 - **Added:** F1.3 (Epic E1)
 - **Specification:** [XDG Base Directory Spec](https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html)
@@ -337,7 +337,7 @@
 - **Tests:** 9 unit tests (defaults + env var overrides)
 
 ### TomlConfigSource (F1.3 - Internal)
-- **Location:** `src/raise_cli/config/settings.py` (private class)
+- **Location:** `src/rai_cli/config/settings.py` (private class)
 - **Purpose:** Custom Pydantic settings source for TOML file loading
 - **Added:** F1.3 (Epic E1)
 - **Type:** `PydanticBaseSettingsSource` subclass
@@ -355,10 +355,10 @@
 > Centralized error hierarchy with exit codes
 
 ### RaiseError Hierarchy (F1.4)
-- **Location:** `src/raise_cli/exceptions.py`
+- **Location:** `src/rai_cli/exceptions.py`
 - **Purpose:** Centralized exceptions with exit codes, error codes, hints
 - **Added:** F1.4 (Epic E1)
-- **Export:** All exceptions exported from `raise_cli` package root
+- **Export:** All exceptions exported from `rai_cli` package root
 - **Base Class:** `RaiseError`
   - `exit_code: int` - Process exit code
   - `error_code: str` - Unique identifier (E000-E010)
@@ -390,7 +390,7 @@
 > Format-aware output for CLI commands
 
 ### OutputConsole (F1.5)
-- **Location:** `src/raise_cli/output/console.py`
+- **Location:** `src/rai_cli/output/console.py`
 - **Purpose:** Unified output interface respecting `--format` flag
 - **Added:** F1.5 (Epic E1)
 - **Export:** `raise_cli.output`
@@ -421,7 +421,7 @@
 ## Utilities (Core Layer)
 
 ### Tool Wrappers (F1.6)
-- **Location:** `src/raise_cli/core/tools.py`
+- **Location:** `src/rai_cli/core/tools.py`
 - **Purpose:** Typed subprocess wrappers for external tools
 - **Added:** F1.6 (Epic E1)
 - **Export:** `raise_cli.core`
@@ -581,7 +581,7 @@
 > Codebase understanding for consistent reuse and drift detection
 
 ### Scanner (F13.2)
-- **Location:** `src/raise_cli/discovery/scanner.py`
+- **Location:** `src/rai_cli/discovery/scanner.py`
 - **Purpose:** Extract code symbols (classes, functions, methods) from source files
 - **Added:** F13.2 (Epic E13)
 - **Languages:** Python (ast), TypeScript/JavaScript (tree-sitter)
@@ -596,7 +596,7 @@
 - **Dependencies:** ast (stdlib), tree-sitter (optional for TS/JS)
 
 ### Drift Detection (F13.5)
-- **Location:** `src/raise_cli/discovery/drift.py`
+- **Location:** `src/rai_cli/discovery/drift.py`
 - **Purpose:** Detect architectural drift between new code and established patterns
 - **Added:** F13.5 (Epic E13)
 - **Public API:**
@@ -618,13 +618,13 @@
 - **Dependencies:** Scanner module (Symbol)
 
 ### Discovery CLI Commands (F13.2, F13.5)
-- **Location:** `src/raise_cli/cli/commands/discover.py`
+- **Location:** `src/rai_cli/cli/commands/discover.py`
 - **Purpose:** CLI interface for codebase discovery and drift detection
 - **Added:** F13.2 (scan, build), F13.5 (drift) - Epic E13
 - **Commands:**
-  - `raise discover scan [PATH]` - Scan directory for code symbols
-  - `raise discover build` - Build unified graph with discovered components
-  - `raise discover drift [PATH]` - Check for architectural drift
+  - `rai discover scan [PATH]` - Scan directory for code symbols
+  - `rai discover build` - Build unified graph with discovered components
+  - `rai discover drift [PATH]` - Check for architectural drift
 - **Options (scan):**
   - `--language/-l` - Language filter (python, typescript, javascript)
   - `--output/-o` - Output format (human, json, summary)

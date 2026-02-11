@@ -9,12 +9,12 @@
 
 ## What Went Well
 - Clean, parallel implementation — all 3 skill files modified independently with consistent pattern
-- Dogfood caught that `raise memory context` requires `mod-` prefix, not bare module names — fixed immediately in all 3 skills
+- Dogfood caught that `rai memory context` requires `mod-` prefix, not bare module names — fixed immediately in all 3 skills
 - The architectural context step is lightweight (one CLI call + interpretation guidelines) — no over-engineering
 - Step placement is logical: after context loading, before main design work begins
 
 ## What Could Improve
-- The `raise memory context` command doesn't accept bare module names (e.g., `memory` vs `mod-memory`) — this is a UX gap in the CLI that could confuse users. Consider adding fuzzy/short-name resolution in a future story.
+- The `rai memory context` command doesn't accept bare module names (e.g., `memory` vs `mod-memory`) — this is a UX gap in the CLI that could confuse users. Consider adding fuzzy/short-name resolution in a future story.
 
 ## Heutagogical Checkpoint
 
@@ -26,7 +26,7 @@
 - Nothing significant. The S-sized story with Markdown-only changes flowed naturally through the full kata cycle. The design step (PAT-186) was valuable even for this — it grounded the placement decisions before implementation.
 
 ### Are there improvements for the framework?
-- Future: `raise memory context` could accept short names (`memory` → `mod-memory`) for better ergonomics
+- Future: `rai memory context` could accept short names (`memory` → `mod-memory`) for better ergonomics
 - The `mod-` prefix convention should be documented in the CLI help text
 
 ### What are you more capable of now?
@@ -37,4 +37,4 @@
 - All 3 design skills now document `mod-` prefix convention with examples
 
 ## Action Items
-- [ ] Consider short-name resolution for `raise memory context` (parking lot candidate)
+- [ ] Consider short-name resolution for `rai memory context` (parking lot candidate)

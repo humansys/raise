@@ -20,14 +20,14 @@ Enable any developer to go from `pip install raise-cli` to a fully RaiSE-ready p
 
 ## Context
 
-E7 was originally scoped as "Distribution & Onboarding." E14 delivered the distribution half: base Rai bundling, bootstrap on `raise init`, MEMORY.md generation, skills scaffolding. What remains is the **onboarding experience**.
+E7 was originally scoped as "Distribution & Onboarding." E14 delivered the distribution half: base Rai bundling, bootstrap on `rai init`, MEMORY.md generation, skills scaffolding. What remains is the **onboarding experience**.
 
-`raise init` creates infrastructure (manifest, profile, Rai base, skills) but leaves the governance content layer empty. The onboarding skills bridge that gap with two scenario-specific experiences:
+`rai init` creates infrastructure (manifest, profile, Rai base, skills) but leaves the governance content layer empty. The onboarding skills bridge that gap with two scenario-specific experiences:
 
 - **Greenfield** is creative — "what do you want to build?" Rai as co-creator.
 - **Brownfield** is analytical — "let me understand what you have." Rai as analyst.
 
-These are fundamentally different experiences. Separate skills provide better DX than one skill trying to serve both (YAGNI on a router — `raise init` output recommends the right skill).
+These are fundamentally different experiences. Separate skills provide better DX than one skill trying to serve both (YAGNI on a router — `rai init` output recommends the right skill).
 
 ## Architectural Context
 
@@ -40,7 +40,7 @@ These are fundamentally different experiences. Separate skills provide better DX
 
 | ID | Story | Size | Description |
 |----|-------|:----:|-------------|
-| S7.1 | Governance scaffolding CLI | S | Extend `raise init` to scaffold `governance/` with parser-compatible templates; output skill recommendation based on detected project type |
+| S7.1 | Governance scaffolding CLI | S | Extend `rai init` to scaffold `governance/` with parser-compatible templates; output skill recommendation based on detected project type |
 | S7.2 | `/project-create` skill | M | Greenfield: ask about project, fill governance content from conversation, build graph |
 | S7.3 | `/project-onboard` skill | M | Brownfield: discovery pipeline + convention detection + ask about intent, fill governance content, build graph |
 
@@ -55,7 +55,7 @@ These are fundamentally different experiences. Separate skills provide better DX
 - Generated docs: PRD, vision, guardrails, architecture (system-context, system-design, domain-model)
 - Graph build + verification as final gate in both skills
 - Both skills distributed via `DISTRIBUTABLE_SKILLS`
-- `raise init` recommends the right skill in its output
+- `rai init` recommends the right skill in its output
 
 **SHOULD:**
 - Greenfield guardrails defaults per language/framework (without code to analyze)
@@ -64,9 +64,9 @@ These are fundamentally different experiences. Separate skills provide better DX
 
 ## Out of Scope
 
-- `raise status` health check → post-F&F
-- `raise doctor` coherence audit → post-F&F
-- Router skill (`/onboard`) → YAGNI, `raise init` recommends
+- `rai status` health check → post-F&F
+- `rai doctor` coherence audit → post-F&F
+- Router skill (`/onboard`) → YAGNI, `rai init` recommends
 - Multi-language convention detection → Python first
 - Auto Shu→Ha→Ri progression → manual for now
 
@@ -83,7 +83,7 @@ S7.3 (skill: project-onboard) ─┘
 S7.1 must complete first — both skills depend on CLI-generated governance templates.
 S7.2 and S7.3 are independent and can be worked in parallel.
 
-**External:** All CLI commands exist (`raise init`, `raise discover scan`, `raise discover analyze`, `raise memory build`).
+**External:** All CLI commands exist (`rai init`, `rai discover scan`, `rai discover analyze`, `rai memory build`).
 
 ## Architecture Decisions
 
@@ -104,7 +104,7 @@ No new ADRs needed. Existing decisions apply:
 - [ ] All 3 stories complete
 - [ ] Fresh greenfield project: `/project-create` → graph with 30+ governance nodes
 - [ ] Fresh brownfield project: `/project-onboard` → graph with governance + architecture nodes
-- [ ] `raise init` output recommends correct skill
+- [ ] `rai init` output recommends correct skill
 - [ ] Epic retrospective completed (`/epic-close`)
 - [ ] Merged to v2
 
@@ -112,7 +112,7 @@ No new ADRs needed. Existing decisions apply:
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|------------|
-| Governance doc format drift from parsers | Medium | High | S7.1 generates templates deterministically; integration test verifies `raise memory build` parses them |
+| Governance doc format drift from parsers | Medium | High | S7.1 generates templates deterministically; integration test verifies `rai memory build` parses them |
 | Greenfield guardrails too generic | Low | Medium | Start with Python defaults; expand per-language post-F&F |
 | Discovery pipeline too slow for onboarding | Low | Low | Existing CLI is fast; skill can show progress |
 
@@ -134,7 +134,7 @@ No new ADRs needed. Existing decisions apply:
 
 | Milestone | Stories | Success Criteria | Demo |
 |-----------|---------|------------------|------|
-| **M1: Governance Templates** | S7.1 | `raise init` scaffolds `governance/` with correct frontmatter; `raise memory build` produces governance nodes from templates | Run `raise init` on empty dir → `governance/` exists → `raise memory build` → nodes in graph |
+| **M1: Governance Templates** | S7.1 | `rai init` scaffolds `governance/` with correct frontmatter; `rai memory build` produces governance nodes from templates | Run `rai init` on empty dir → `governance/` exists → `rai memory build` → nodes in graph |
 | **M2: Greenfield Ready** | +S7.2 | `/project-create` on empty project → governance docs filled from conversation → graph with 30+ nodes → `/session-start` works | Full greenfield walkthrough: name → project description → governance generated → graph built → session starts |
 | **M3: Brownfield Ready (Epic Complete)** | +S7.3 | `/project-onboard` on existing codebase → discovery + conventions + governance → graph with architecture nodes → `/session-start` works | Full brownfield walkthrough on a real Python project |
 

@@ -21,7 +21,7 @@ Today's session revealed a critical gap: Rai didn't know where the backlog was, 
 
 Extend the governance graph to include work tracking concepts (projects, epics, features, status). This enables:
 
-1. **Unambiguous queries:** `raise context query "current work"` → clear answer
+1. **Unambiguous queries:** `rai context query "current work"` → clear answer
 2. **Single source of truth:** Each level has one owner
 3. **Foundation for V3:** Internal representation for Jira/Confluence integration
 
@@ -157,7 +157,7 @@ RelationshipType = Literal[
 | F8.1 | **Backlog Parser** | S | 2 | Parse `governance/projects/*/backlog.md` → Project + Epic index |
 | F8.2 | **Epic Parser** | S | 2 | Parse `dev/epic-*-scope.md` → Epic + Features |
 | F8.3 | **Graph Extension** | S | 2 | Add work concepts to ConceptGraph, relationships |
-| F8.4 | **Work Queries** | S | 2 | `raise context query "current epic"`, `"E8 features"` |
+| F8.4 | **Work Queries** | S | 2 | `rai context query "current epic"`, `"E8 features"` |
 
 **Total:** 4 features, 8 SP, ~4-6 hours with kata cycle
 
@@ -347,7 +347,7 @@ Implemented by:
 ### New Files
 
 ```
-src/raise_cli/governance/parsers/
+src/rai_cli/governance/parsers/
 ├── base.py             # NEW: WorkItemParser interface
 ├── backlog.py          # NEW: BacklogParser
 └── epic.py             # NEW: EpicScopeParser
@@ -356,16 +356,16 @@ src/raise_cli/governance/parsers/
 ### Modified Files
 
 ```
-src/raise_cli/governance/
+src/rai_cli/governance/
 ├── models.py           # EXTEND: ConceptType (PROJECT, EPIC, FEATURE)
 ├── extractor.py        # EXTEND: extract_work_concepts()
 
-src/raise_cli/governance/graph/
+src/rai_cli/governance/graph/
 ├── models.py           # EXTEND: RelationshipType (contains, blocks, current_focus)
 ├── builder.py          # EXTEND: build_work_layer()
 └── relationships.py    # EXTEND: infer_work_relationships()
 
-src/raise_cli/governance/query/
+src/rai_cli/governance/query/
 └── strategies.py       # EXTEND: work-aware query strategies
 ```
 
@@ -433,8 +433,8 @@ Epic scope docs should have parseable feature table:
 - [ ] `BacklogParser` extracts projects and epic index
 - [ ] `EpicScopeParser` extracts epic details and features
 - [ ] Graph includes work concepts with `contains` relationships
-- [ ] `raise context query "E8"` returns epic with features
-- [ ] `raise context query "current work"` returns project focus
+- [ ] `rai context query "E8"` returns epic with features
+- [ ] `rai context query "current work"` returns project focus
 
 **SHOULD:**
 - [ ] `--type epic` filter for queries
@@ -468,9 +468,9 @@ Epic scope docs should have parseable feature table:
 
 ### Epic Complete
 
-- [ ] `raise graph build` includes work concepts
-- [ ] `raise context query "current epic"` returns correct answer
-- [ ] `raise context query "E8 features"` returns feature list
+- [ ] `rai graph build` includes work concepts
+- [ ] `rai context query "current epic"` returns correct answer
+- [ ] `rai context query "E8 features"` returns feature list
 - [ ] No more "where is the backlog?" confusion
 - [ ] Existing governance queries still work (no regression)
 - [ ] Tests: >90% coverage on new parsers
@@ -623,8 +623,8 @@ This epic creates the **internal canonical representation** that V3 will use:
 
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
-| **M1: Graph with Work** | F8.1, F8.2, F8.3 | Day 1-2 | `raise graph build` includes work concepts | Graph shows Project → Epic → Feature hierarchy |
-| **M2: Epic Complete** | F8.4 | Day 2-3 | `raise context query "current work"` returns E8 | Query returns current epic with features |
+| **M1: Graph with Work** | F8.1, F8.2, F8.3 | Day 1-2 | `rai graph build` includes work concepts | Graph shows Project → Epic → Feature hierarchy |
+| **M2: Epic Complete** | F8.4 | Day 2-3 | `rai context query "current work"` returns E8 | Query returns current epic with features |
 
 ### Parallel Work Streams
 
@@ -725,7 +725,7 @@ Stream 2: F8.2 (Epic Parser) ─────┘
 **F8.4 Work Queries:**
 - Test existing strategies with work concepts
 - May need work-specific query formatting
-- Key test: `raise context query "current work"` → returns E8
+- Key test: `rai context query "current work"` → returns E8
 
 ---
 

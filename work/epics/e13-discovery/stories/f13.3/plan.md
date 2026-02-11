@@ -33,14 +33,14 @@
 
 ### Task 2: Create `/discover-scan` Skill
 
-- **Description:** Create the extraction and synthesis skill that runs `raise discover scan` and has Rai synthesize descriptions
+- **Description:** Create the extraction and synthesis skill that runs `rai discover scan` and has Rai synthesize descriptions
 - **Files:**
   - Create: `.claude/skills/discover-scan/SKILL.md`
 - **TDD Cycle:** N/A (skill is markdown)
 - **Verification:**
   - Skill loads when invoked with `/discover-scan`
   - Reads `work/discovery/context.yaml`
-  - Runs `raise discover scan` command
+  - Runs `rai discover scan` command
   - Outputs `work/discovery/components-draft.yaml`
 - **Size:** M
 - **Dependencies:** Task 1
@@ -109,7 +109,7 @@
 - **Dependencies:** Tasks 1-4
 
 **Test scope:**
-- Run on `src/raise_cli/discovery/` (small module, known symbols)
+- Run on `src/rai_cli/discovery/` (small module, known symbols)
 - Verify context detection (Python)
 - Verify synthesis produces reasonable descriptions
 - Validate at least 3-5 components

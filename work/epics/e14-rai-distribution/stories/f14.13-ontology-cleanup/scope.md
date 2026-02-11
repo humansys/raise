@@ -65,11 +65,11 @@ raise
 
 | Change | Type | Files |
 |--------|------|-------|
-| Create `raise session` command group | New | `cli/commands/session.py` |
+| Create `rai session` command group | New | `cli/commands/session.py` |
 | Move session-start/end from profile | Refactor | `cli/commands/profile.py` |
 | Rename session-end → session-close | Rename | - |
-| Remove `raise status` | Delete | `cli/commands/status.py` |
-| Remove `raise telemetry` | Delete | `cli/commands/telemetry.py` |
+| Remove `rai status` | Delete | `cli/commands/status.py` |
+| Remove `rai telemetry` | Delete | `cli/commands/telemetry.py` |
 | Merge telemetry emit into memory add | Refactor | `cli/commands/memory.py` |
 | Unify memory add-* into single command | Refactor | `cli/commands/memory.py` |
 
@@ -110,10 +110,10 @@ raise
 
 ### Done Criteria (Phase 2)
 
-- [x] `raise session start` and `raise session close` work
-- [x] `raise memory emit-*` commands work (telemetry merged into memory)
-- [x] `raise status` removed
-- [x] `raise telemetry` removed (functionality in memory)
+- [x] `rai session start` and `rai session close` work
+- [x] `rai memory emit-*` commands work (telemetry merged into memory)
+- [x] `rai status` removed
+- [x] `rai telemetry` removed (functionality in memory)
 - [x] `profile` only has `show` command
 - [x] All skills updated to new CLI
 - [x] `scripts/` moved out of skills

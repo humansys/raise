@@ -488,7 +488,7 @@ This document provides visual diagrams for the recommended Kata Harness architec
 │  Manual Resume Flow                                         │
 └────────────────────────────────────────────────────────────┘
 
-    User runs: `raise kata project/discovery --resume paso-2`
+    User runs: `rai kata project/discovery --resume paso-2`
                            ↓
                   Load checkpoint (paso-2)
                            ↓

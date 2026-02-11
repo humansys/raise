@@ -15,7 +15,7 @@
 - **Simplification cascade.** Dropping edge tracking (Decision 5.5) eliminated ~40% of planned complexity with no loss of consumer value. The diff model went from 4 classes to 2.
 - **Impact classification simplified.** Three levels (none/module/architectural) instead of four. The consumer (`/docs-update`) doesn't need the diff to pre-classify granularity — it reads `changed_fields` directly.
 - **TDD was smooth.** Tests first, implementation straightforward. 29 unit tests covered every code path before integration tests even ran.
-- **Real-world validation.** Integration tests against actual 345-node graph caught nothing — the unit tests already covered it. But the manual `raise memory build` run showed the diff working on real changes (3 added nodes + 1 modified module from our own work).
+- **Real-world validation.** Integration tests against actual 345-node graph caught nothing — the unit tests already covered it. But the manual `rai memory build` run showed the diff working on real changes (3 added nodes + 1 modified module from our own work).
 
 ## What Could Improve
 

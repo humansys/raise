@@ -1,6 +1,6 @@
 # Pydantic Anti-Pattern Scan Report
 
-> Scanned: `src/raise_cli/` against `governance/solution/guardrails-stack.md` Section 1 (Pydantic v2)
+> Scanned: `src/rai_cli/` against `governance/solution/guardrails-stack.md` Section 1 (Pydantic v2)
 > Date: 2026-02-05
 > Files scanned: 72 Python files
 
@@ -26,7 +26,7 @@
 
 #### Finding 1.1
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/discover.py`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/discover.py`
 **Line:** 137
 
 ```python
@@ -44,7 +44,7 @@
 
 #### Finding 1.2
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/discover.py`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/discover.py`
 **Line:** 487
 
 ```python
@@ -62,7 +62,7 @@
 
 #### Finding 1.3
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/context/graph.py`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/context/graph.py`
 **Line:** 65
 
 ```python
@@ -130,7 +130,7 @@ Using BaseModel is justified. The deprecated `MemoryGraph` in `memory/builder.py
 
 The telemetry module correctly implements discriminated unions:
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/telemetry/schemas.py`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/telemetry/schemas.py`
 **Lines:** 278-286
 
 ```python

@@ -203,7 +203,7 @@ clig.dev introduces the idea that CLI interaction is a "conversation" - users it
 
 ### Gap 1: Typer-Specific Exception Handling Patterns
 
-While general Python exception handling is well-documented, Typer-specific patterns for mapping exceptions to exit codes and user-friendly messages are less formalized. Most examples show basic `typer.Exit()` or `raise typer.BadParameter()`.
+While general Python exception handling is well-documented, Typer-specific patterns for mapping exceptions to exit codes and user-friendly messages are less formalized. Most examples show basic `typer.Exit()` or `rai typer.BadParameter()`.
 
 **Recommendation:** Create RaiSE-specific exception hierarchy with exit code mapping.
 

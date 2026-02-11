@@ -31,7 +31,7 @@
 - **Duration:** 15 min (estimated: 40 min)
 - **Notes:** MVCQueryEngine orchestrates all strategies. 22 tests (80 cumulative), 98% coverage on engine.py. from_cache() loader, metadata calculation, path tracing all working. 2.7x faster than estimate!
 
-### Task 5: Add CLI Command `raise context query`
+### Task 5: Add CLI Command `rai context query`
 - **Started:** +60 min
 - **Completed:** +75 min
 - **Duration:** 15 min (estimated: 40 min)
@@ -81,7 +81,7 @@ None
 - **Components Delivered:**
   - 4 query strategies (concept lookup, keyword search, relationship traversal, related concepts)
   - 2 output formats (markdown, JSON)
-  - CLI command `raise context query` with 6 options
+  - CLI command `rai context query` with 6 options
   - Token estimation (words * 1.3)
   - Relationship path tracing
   - from_cache() graph loader

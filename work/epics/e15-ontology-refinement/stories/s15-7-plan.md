@@ -13,9 +13,9 @@
 ### Task 1: Session State Schema + Persistence
 - **Description:** Create `SessionState` Pydantic model and YAML reader/writer. This is the new `.raise/rai/session-state.yaml` artifact — project-level working state overwritten each session-close.
 - **Files:**
-  - Create `src/raise_cli/schemas/session_state.py` — `SessionState`, `CurrentWork`, `LastSession`, `PendingItems` models
-  - Create `src/raise_cli/session/__init__.py` — module init
-  - Create `src/raise_cli/session/state.py` — `load_session_state()`, `save_session_state()`, path constants
+  - Create `src/rai_cli/schemas/session_state.py` — `SessionState`, `CurrentWork`, `LastSession`, `PendingItems` models
+  - Create `src/rai_cli/session/__init__.py` — module init
+  - Create `src/rai_cli/session/state.py` — `load_session_state()`, `save_session_state()`, path constants
   - Create `tests/session/test_state.py` — round-trip serialization, missing file handling, schema validation
 - **TDD Cycle:** RED (test load/save round-trip) → GREEN (implement models + persistence) → REFACTOR
 - **Verification:** `pytest tests/session/test_state.py -v`
@@ -25,7 +25,7 @@
 ### Task 2: Developer Profile Extension (Coaching + Deadlines)
 - **Description:** Extend `DeveloperProfile` with `CoachingContext` and `Deadline` models. Backward compatible — new fields default to empty. Add helper functions: `add_correction()` (FIFO cap 10), `add_deadline()`, `update_coaching()`.
 - **Files:**
-  - Modify `src/raise_cli/onboarding/profile.py` — add `CoachingContext`, `Correction`, `Deadline`, `RelationshipState` models; extend `DeveloperProfile`
+  - Modify `src/rai_cli/onboarding/profile.py` — add `CoachingContext`, `Correction`, `Deadline`, `RelationshipState` models; extend `DeveloperProfile`
   - Modify `tests/onboarding/test_profile.py` — backward compat (load without coaching), correction FIFO, deadline CRUD
 - **TDD Cycle:** RED (test backward compat load) → GREEN (add models with defaults) → RED (test FIFO) → GREEN (implement helpers) → REFACTOR
 - **Verification:** `pytest tests/onboarding/test_profile.py -v`
@@ -33,30 +33,30 @@
 - **Dependencies:** None
 
 ### Task 3: Context Bundle Assembler
-- **Description:** Create the context bundle assembly logic. Reads from developer profile, session state, and memory graph. Outputs token-optimized plain text (~150 tokens). This is the core of `raise session start --context`.
+- **Description:** Create the context bundle assembly logic. Reads from developer profile, session state, and memory graph. Outputs token-optimized plain text (~150 tokens). This is the core of `rai session start --context`.
 - **Files:**
-  - Create `src/raise_cli/session/bundle.py` — `assemble_context_bundle()`, `format_context_bundle()`, section formatters
+  - Create `src/rai_cli/session/bundle.py` — `assemble_context_bundle()`, `format_context_bundle()`, section formatters
   - Create `tests/session/test_bundle.py` — output format validation, missing sources handling, token count check
 - **TDD Cycle:** RED (test bundle format with mock data) → GREEN (implement assembler) → RED (test missing state graceful) → GREEN (handle edge cases) → REFACTOR
 - **Verification:** `pytest tests/session/test_bundle.py -v`
 - **Size:** M
 - **Dependencies:** Task 1, Task 2
 
-### Task 4: Redesign `raise session start`
-- **Description:** Add `--context` flag to `raise session start`. When present, assemble and output the context bundle. Without flag, preserve current behavior (backward compat). Emit telemetry internally.
+### Task 4: Redesign `rai session start`
+- **Description:** Add `--context` flag to `rai session start`. When present, assemble and output the context bundle. Without flag, preserve current behavior (backward compat). Emit telemetry internally.
 - **Files:**
-  - Modify `src/raise_cli/cli/commands/session.py` — add `--context` flag, call `assemble_context_bundle()`, emit telemetry
+  - Modify `src/rai_cli/cli/commands/session.py` — add `--context` flag, call `assemble_context_bundle()`, emit telemetry
   - Modify `tests/cli/commands/test_session.py` — test `--context` output, test backward compat, test telemetry emission
 - **TDD Cycle:** RED (test --context outputs bundle) → GREEN (wire flag to assembler) → RED (test backward compat) → GREEN (preserve existing behavior) → REFACTOR
 - **Verification:** `pytest tests/cli/commands/test_session.py -v`
 - **Size:** S
 - **Dependencies:** Task 3
 
-### Task 5: Redesign `raise session close`
-- **Description:** Extend `raise session close` to accept structured input and perform all writes atomically. Flags: `--summary`, `--type`, `--pattern`, `--correction`, `--correction-lesson`, `--state-file`. Internally: write session-state.yaml, update coaching in developer.yaml, add patterns to patterns.jsonl, record session in index.jsonl, emit telemetry, clear current_session.
+### Task 5: Redesign `rai session close`
+- **Description:** Extend `rai session close` to accept structured input and perform all writes atomically. Flags: `--summary`, `--type`, `--pattern`, `--correction`, `--correction-lesson`, `--state-file`. Internally: write session-state.yaml, update coaching in developer.yaml, add patterns to patterns.jsonl, record session in index.jsonl, emit telemetry, clear current_session.
 - **Files:**
-  - Modify `src/raise_cli/cli/commands/session.py` — extend `close()` with new flags, atomic write orchestration
-  - Create `src/raise_cli/session/close.py` — `process_session_close()` orchestrator (reads state-file or flags, performs all writes)
+  - Modify `src/rai_cli/cli/commands/session.py` — extend `close()` with new flags, atomic write orchestration
+  - Create `src/rai_cli/session/close.py` — `process_session_close()` orchestrator (reads state-file or flags, performs all writes)
   - Modify `tests/cli/commands/test_session.py` — test each flag, test state-file input, test atomic writes, test telemetry
 - **TDD Cycle:** RED (test close with --summary writes state) → GREEN (implement orchestrator) → RED (test --state-file) → GREEN (implement file parsing) → RED (test --pattern writes to JSONL) → GREEN (wire to memory writer) → REFACTOR
 - **Verification:** `pytest tests/cli/commands/test_session.py -v`
@@ -69,12 +69,12 @@
   - Modify `.raise/rai/memory/patterns.jsonl` — add metadata to PAT-187, 183, 186, 150, 154, 159, 149, 152, 153, 151
   - Add PAT-187 (Code as Gemba) if not yet recorded
 - **TDD Cycle:** N/A (data curation, not code)
-- **Verification:** `uv run raise memory build && uv run raise memory query "foundational" --types pattern`
+- **Verification:** `uv run rai memory build && uv run rai memory query "foundational" --types pattern`
 - **Size:** S
 - **Dependencies:** None (parallel with Tasks 1-2)
 
 ### Task 7: Update Skills (Session-Start + Session-Close)
-- **Description:** Thin both skills to 2-step protocols. Session-start: call `raise session start --context`, interpret bundle, propose focus. Session-close: reflect on session (inference), write state-file, call `raise session close --state-file`. Remove all separate CLI calls from skills.
+- **Description:** Thin both skills to 2-step protocols. Session-start: call `rai session start --context`, interpret bundle, propose focus. Session-close: reflect on session (inference), write state-file, call `rai session close --state-file`. Remove all separate CLI calls from skills.
 - **Files:**
   - Modify `.claude/skills/session-start/SKILL.md` — rewrite to 2 steps
   - Modify `.claude/skills/session-close/SKILL.md` — rewrite to 2 steps
@@ -86,9 +86,9 @@
 ### Task 8 (Final): Manual Integration Test
 - **Description:** Full session lifecycle with new protocol. Start a session, verify context bundle output, do some work, close session with structured input, start next session and verify continuity (state carried, coaching updated, foundational patterns surfaced).
 - **Verification:**
-  1. `raise session start --project . --context` → verify bundle format
-  2. `raise session close --summary "test" --type feature --state-file output.yaml` → verify all writes
-  3. `raise session start --project . --context` → verify state carries over
+  1. `rai session start --project . --context` → verify bundle format
+  2. `rai session close --summary "test" --type feature --state-file output.yaml` → verify all writes
+  3. `rai session start --project . --context` → verify state carries over
   4. Check `~/.rai/developer.yaml` has coaching section
   5. Check `.raise/rai/session-state.yaml` exists and is correct
 - **Size:** XS

@@ -16,7 +16,7 @@
 - Aligned all active docs with glossary
 
 **Phase 2: CLI/Skill Ontology Restructure**
-- Created `raise session` command group (first-class workflow state)
+- Created `rai session` command group (first-class workflow state)
 - Merged `telemetry emit-*` into `memory emit-*`
 - Removed empty `status` command
 - Removed redundant `telemetry` command group
@@ -70,7 +70,7 @@
 
 1. **Session-start continuity** — Query session index for previous session outcomes, present as "Last session → Continue with" flow. (Parking lotted)
 
-2. **Skill CLI commands** — `raise skill list/scaffold/validate/check-name` for inference economy. (Scoped as F14.14)
+2. **Skill CLI commands** — `rai skill list/scaffold/validate/check-name` for inference economy. (Scoped as F14.14)
 
 3. **Coverage in pre-commit** — Add `pytest --cov-fail-under=90` to pre-commit hooks.
 

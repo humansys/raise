@@ -42,8 +42,8 @@ Build the governance toolkit that enables concept-level graph representation of 
 - Build concept graph with relationships (requires, implements, validates, etc.)
 - Serialize graph to JSON/YAML for persistence
 - Graph traversal for MVC queries (breadth-first search)
-- CLI commands: `raise graph extract`, `raise graph build`, `raise context query`
-- Validation: `raise validate structure` checks governance structure
+- CLI commands: `rai graph extract`, `rai graph build`, `rai context query`
+- Validation: `rai validate structure` checks governance structure
 - Type safety: all code type-annotated
 - Tests: >90% coverage on new code
 - Quality: passes ruff, pyright, bandit
@@ -86,7 +86,7 @@ Build the governance toolkit that enables concept-level graph representation of 
 - [ ] All 4 features complete (F2.1-F2.4)
 - [ ] Graph can extract 20+ concepts from raise-commons governance
 - [ ] MVC query returns relevant concepts with <3% token usage vs full files
-- [ ] CLI commands functional: `raise graph build`, `raise context query`
+- [ ] CLI commands functional: `rai graph build`, `rai context query`
 - [ ] **Skills created** for governance validation (e.g., `/validate-prd`)
 - [ ] **Architecture guide updated** (`dev/architecture-overview.md`)
 - [ ] Integration tests prove E2E workflow works
@@ -173,7 +173,7 @@ F2.4 (CLI Commands)
 - Concept extraction: 23 concepts from raise-commons governance
 - Graph builder: BFS traversal with cycle detection
 - MVC queries: 97% token savings validated
-- CLI commands: `raise governance extract`, `raise graph build`, `raise graph validate`, `raise context query`
+- CLI commands: `rai governance extract`, `rai graph build`, `rai graph validate`, `rai context query`
 
 **Process Innovations:**
 - Post-Retrospective Action Protocol SOP created

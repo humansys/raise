@@ -17,7 +17,7 @@
 3. How should exceptions map to exit codes?
 4. What are common anti-patterns to avoid?
 
-**Decision Context:** This research informs the ongoing development of the RaiSE CLI (`raise` command) to ensure it follows industry best practices and provides excellent developer experience.
+**Decision Context:** This research informs the ongoing development of the RaiSE CLI (`rai` command) to ensure it follows industry best practices and provides excellent developer experience.
 
 ---
 
@@ -65,7 +65,7 @@ Research across 22 sources (5 Very High, 9 High, 7 Medium, 1 Low evidence) revea
 
 Adopt the patterns documented in [recommendation.md](./recommendation.md):
 
-1. **Structure:** Topic + Command (`raise context query`)
+1. **Structure:** Topic + Command (`rai context query`)
 2. **Options:** `-f, --format` for output, standard flag names
 3. **Output:** OutputFormat enum, Rich for human, stable JSON schema
 4. **Errors:** Exception hierarchy with exit codes, catch at boundary

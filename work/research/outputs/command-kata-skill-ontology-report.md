@@ -481,9 +481,9 @@ Proposed:
    - Reference docs: Full hierarchy
 
 4. **CLI Integration**
-   - `raise skill <name>` - Execute atomic skill
-   - `raise kata <name>` - Execute learning process
-   - `raise gate <name>` - Run validation
+   - `rai skill <name>` - Execute atomic skill
+   - `rai kata <name>` - Execute learning process
+   - `rai gate <name>` - Run validation
 
 ### Fallback Recommendation
 

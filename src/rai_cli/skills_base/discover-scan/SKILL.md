@@ -1,7 +1,7 @@
 ---
 name: discover-scan
 description: >
-  Extract symbols from codebase using raise discover scan, then synthesize
+  Extract symbols from codebase using rai discover scan, then synthesize
   meaningful descriptions for each component. Creates draft for human validation.
 
 license: MIT
@@ -21,7 +21,7 @@ metadata:
 
 ## Purpose
 
-Extract symbols from the codebase using the `raise discover scan` CLI command, then synthesize meaningful descriptions for each component. The output is a draft component catalog ready for human validation.
+Extract symbols from the codebase using the `rai discover scan` CLI command, then synthesize meaningful descriptions for each component. The output is a draft component catalog ready for human validation.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -72,16 +72,16 @@ Read: work/discovery/context.yaml
 
 ### Step 2: Run Extraction
 
-Execute the `raise discover scan` command:
+Execute the `rai discover scan` command:
 
 ```bash
 # For each root_dir in context
-raise discover scan {root_dir} --language {language} --output json
+rai discover scan {root_dir} --language {language} --output json
 ```
 
 **Example:**
 ```bash
-raise discover scan src/raise_cli --language python --output json
+rai discover scan src/rai_cli --language python --output json
 ```
 
 **Capture the JSON output** — it contains all extracted symbols.
@@ -95,12 +95,12 @@ raise discover scan src/raise_cli --language python --output json
 Run the deterministic analyzer on the scan output to compute confidence scores, auto-categorize components, fold methods into parent classes, and group by module:
 
 ```bash
-raise discover analyze --input {scan_output_json} --output human
+rai discover analyze --input {scan_output_json} --output human
 ```
 
 Or pipe directly:
 ```bash
-raise discover scan {root_dir} --language {language} --output json | raise discover analyze --output human
+rai discover scan {root_dir} --language {language} --output json | rai discover analyze --output human
 ```
 
 **This produces:**
@@ -180,11 +180,11 @@ source_command: "raise discover scan {path} --language {lang}"
 symbol_count: {N}
 
 components:
-  # Module: src/raise_cli/discovery/scanner.py
+  # Module: src/rai_cli/discovery/scanner.py
   - id: comp-scanner-symbol
     name: Symbol
     kind: class
-    file: src/raise_cli/discovery/scanner.py
+    file: src/rai_cli/discovery/scanner.py
     line: 44
     signature: "class Symbol(BaseModel)"
     docstring: |
@@ -201,7 +201,7 @@ components:
   - id: comp-scanner-get-signature
     name: _get_signature
     kind: function
-    file: src/raise_cli/discovery/scanner.py
+    file: src/rai_cli/discovery/scanner.py
     line: 96
     signature: "def _get_signature(node: ast.ClassDef | ast.FunctionDef | ast.AsyncFunctionDef) -> str"
     docstring: "Extract signature from an AST node."
@@ -321,5 +321,5 @@ This overrides context.yaml root_dirs for this scan.
 
 - Previous skill: `/discover-start`
 - Next skill: `/discover-validate`
-- CLI docs: `raise discover scan --help`
+- CLI docs: `rai discover scan --help`
 - Design: `work/stories/f13.3/design.md`

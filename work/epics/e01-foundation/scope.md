@@ -32,7 +32,7 @@ Build the foundational CLI infrastructure: package structure, command framework,
 ## In Scope
 
 **MUST:**
-- Working `raise` CLI command with help/version
+- Working `rai` CLI command with help/version
 - Configuration cascade (CLI → env → file → defaults)
 - Exception hierarchy with proper exit codes
 - Output formatters (human, json, table)
@@ -74,7 +74,7 @@ Build the foundational CLI infrastructure: package structure, command framework,
 
 ### Epic Complete
 - [x] All 6 features complete (F1.1-F1.6)
-- [x] `raise --version` and `raise --help` work
+- [x] `rai --version` and `rai --help` work
 - [x] All tests pass (214 tests, 95% coverage)
 - [x] **Architecture guide updated** (`dev/architecture-overview.md`)
 - [ ] README updated with installation instructions (deferred: pre-release, no PyPI yet)

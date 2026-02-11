@@ -87,7 +87,7 @@ checks:
 - Built-in validators library (10 validators)
 - Validator API for custom extensions
 - Policy examples (precondition, validation gate, handoff, Jidoka trigger)
-- CLI interface (`raise policy`, `raise gate` commands)
+- CLI interface (`rai policy`, `rai gate` commands)
 - JSON Schema for validation
 
 **Example Policy**:

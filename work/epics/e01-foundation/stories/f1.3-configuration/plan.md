@@ -20,7 +20,7 @@ total_estimate: "6-8 hours"
 **Description**: Create XDG-compliant directory helper functions
 
 **Deliverables**:
-- `src/raise_cli/config/paths.py` with:
+- `src/rai_cli/config/paths.py` with:
   - `get_config_dir() -> Path`
   - `get_cache_dir() -> Path`
   - `get_data_dir() -> Path`
@@ -53,7 +53,7 @@ total_estimate: "6-8 hours"
 **Description**: Create configuration settings class using Pydantic BaseSettings
 
 **Deliverables**:
-- `src/raise_cli/config/settings.py` with:
+- `src/rai_cli/config/settings.py` with:
   - `RaiseSettings` class
   - All fields from design spec
 - Tests in `tests/config/test_settings.py`
@@ -122,7 +122,7 @@ total_estimate: "6-8 hours"
 **Description**: Integrate RaiseSettings with CLI context
 
 **Deliverables**:
-- Modified `src/raise_cli/cli/main.py`:
+- Modified `src/rai_cli/cli/main.py`:
   - Create `RaiseSettings` instance in main CLI callback
   - Override with CLI arg values (--format, -v/-q)
   - Store in `ctx.obj["settings"]`
@@ -163,8 +163,8 @@ total_estimate: "6-8 hours"
 **Implementation**:
 ```markdown
 # Add entries for:
-# - src/raise_cli/config/settings.py (RaiseSettings)
-# - src/raise_cli/config/paths.py (XDG helpers)
+# - src/rai_cli/config/settings.py (RaiseSettings)
+# - src/rai_cli/config/paths.py (XDG helpers)
 # Include: location, purpose, public API, dependencies, added date
 ```
 

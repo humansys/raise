@@ -331,7 +331,7 @@ This feature creates the directory structure and empty/minimal files. Content mi
 
 ### Why Not CLI Module?
 
-F3.1 is structure + content migration. No Python code needed yet. The CLI module (`raise memory`) comes in F3.4.
+F3.1 is structure + content migration. No Python code needed yet. The CLI module (`rai memory`) comes in F3.4.
 
 ### Backward Compatibility
 

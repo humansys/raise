@@ -10,7 +10,7 @@
 ### Task 1: Svelte extractor core + tests
 - **Description:** Implement `_get_svelte_parser()`, `_extract_svelte_script_info()`, and `extract_svelte_symbols()` in `scanner.py`. Two-pass approach: parse with tree-sitter-svelte to find `<script>` blocks, detect `lang="ts"` attribute, re-parse script content with JS/TS parser. Register component symbol. Add line offset correction. Wire into `extract_symbols()` dispatcher.
 - **Files:**
-  - Modify: `src/raise_cli/discovery/scanner.py`
+  - Modify: `src/rai_cli/discovery/scanner.py`
   - Modify: `tests/discovery/test_scanner.py`
 - **TDD Cycle:**
   - RED: Tests for `extract_svelte_symbols()` — JS script block, TS script block, no script block, empty script, component registration, line number correctness
@@ -34,7 +34,7 @@
 - **Dependencies:** Task 1
 
 ### Task 3 (Final): Manual Integration Test
-- **Description:** Run `raise discover scan` on a real `.svelte` file or small Svelte project to validate end-to-end. Verify component symbol and script symbols appear in output.
+- **Description:** Run `rai discover scan` on a real `.svelte` file or small Svelte project to validate end-to-end. Verify component symbol and script symbols appear in output.
 - **Verification:** Demo working with CLI
 - **Size:** XS
 - **Dependencies:** Tasks 1-2

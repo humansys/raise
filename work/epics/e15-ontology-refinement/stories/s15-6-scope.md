@@ -16,12 +16,12 @@ Create a reusable "Load Architectural Context" step for design skills. Update `/
 
 - Automated validation of designs against constraints (future epic)
 - Changes to other skills beyond the 3 design skills
-- New CLI commands (S15.5 already provides `raise memory context`)
+- New CLI commands (S15.5 already provides `rai memory context`)
 - Conflict detection or violation warnings
 
 ## Done Criteria
 
-- [ ] `/story-design` queries `raise memory context <module>` before designing
+- [ ] `/story-design` queries `rai memory context <module>` before designing
 - [ ] `/epic-design` queries architectural context for relevant modules
 - [ ] `/story-plan` references architectural context in task decomposition
 - [ ] Skills output "Architectural Context" section in their artifacts

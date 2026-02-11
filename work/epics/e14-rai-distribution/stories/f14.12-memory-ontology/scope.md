@@ -10,8 +10,8 @@
 
 ## In Scope
 
-- CLI: `raise context query` → `raise memory query`
-- CLI: `raise graph build` → `raise memory build`
+- CLI: `rai context query` → `rai memory query`
+- CLI: `rai graph build` → `rai memory build`
 - File: `.raise/graph/unified.json` → `.raise/rai/memory/index.json`
 - Update all skill references to new commands
 - Update tests
@@ -24,8 +24,8 @@
 
 ## Done Criteria
 
-- [ ] `raise memory query "..."` works
-- [ ] `raise memory build` works
+- [ ] `rai memory query "..."` works
+- [ ] `rai memory build` works
 - [ ] Old commands removed or aliased
 - [ ] Skills reference new command names
 - [ ] Tests pass

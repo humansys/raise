@@ -201,7 +201,7 @@ enforcement:
 **Implementation Path**:
 1. **Phase 1**: Define 5 core policy types (validation_gate, precondition_check, artifact_schema, handoff_gate, jidoka_trigger)
 2. **Phase 2**: Build policy evaluator in Kata Executor Harness (Python/TypeScript)
-3. **Phase 3**: CLI for policy testing (`raise policy test gate-discovery-policy.yaml`)
+3. **Phase 3**: CLI for policy testing (`rai policy test gate-discovery-policy.yaml`)
 4. **Phase 4**: Visual policy editor (low-code UI for non-technical users)
 
 **Use Case in RaiSE**:
@@ -415,7 +415,7 @@ validations:
 
 **Migration Path**:
 1. Convert existing Markdown gates to YAML (dual format during transition)
-2. Build gate executor CLI: `raise gate run gate-discovery`
+2. Build gate executor CLI: `rai gate run gate-discovery`
 3. Integrate with Kata Executor Harness (auto-run gates after kata)
 4. Deprecate Markdown gates when YAML coverage complete
 
@@ -1892,7 +1892,7 @@ Retry Step 2? [y/N]
 
 **Deliverables**:
 1. **Policy DSL Specification** (YAML schema, 5 core policy types)
-2. **Policy Engine** (Python CLI: `raise policy validate <policy.yaml>`)
+2. **Policy Engine** (Python CLI: `rai policy validate <policy.yaml>`)
 3. **Pre-execution Gates** (3 policies: discovery, vision, tech-design)
 4. **Gate Migration** (convert 3 Markdown gates to YAML)
 5. **Basic Kata Executor** (load kata + policy, run preconditions, execute, run gate)
@@ -1912,7 +1912,7 @@ Retry Step 2? [y/N]
 
 **Deliverables**:
 1. **Audit Logging** (log all kata executions, gate results to PostgreSQL)
-2. **Gate Dashboard** (CLI: `raise gate report` shows pass/fail trends)
+2. **Gate Dashboard** (CLI: `rai gate report` shows pass/fail trends)
 3. **Policy Versioning** (support SemVer for policies, migration warnings)
 4. **Custom Validators** (plugin system for project-specific checks)
 
@@ -1947,7 +1947,7 @@ Retry Step 2? [y/N]
 
 **Deliverables**:
 1. **Approval Workflows** (multi-stage approval for policy changes)
-2. **Policy Testing Framework** (`raise policy test <policy.yaml> --scenario <test.json>`)
+2. **Policy Testing Framework** (`rai policy test <policy.yaml> --scenario <test.json>`)
 3. **Visual Policy Editor** (low-code UI for non-technical users)
 4. **Integration with External Tools** (Semgrep, ESLint for code validation)
 

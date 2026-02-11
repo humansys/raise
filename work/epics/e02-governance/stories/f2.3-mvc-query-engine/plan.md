@@ -19,10 +19,10 @@ Build a query engine for extracting Minimum Viable Context (MVC) from the concep
 ## Tasks
 
 ### Task 1: Create Query Models
-- **Description:** Implement `QueryStrategy`, `MVCQuery`, `MVCResult`, and `MVCMetadata` models in `src/raise_cli/governance/query/models.py` with Pydantic validation and serialization support
+- **Description:** Implement `QueryStrategy`, `MVCQuery`, `MVCResult`, and `MVCMetadata` models in `src/rai_cli/governance/query/models.py` with Pydantic validation and serialization support
 - **Files:**
-  - CREATE `src/raise_cli/governance/query/__init__.py`
-  - CREATE `src/raise_cli/governance/query/models.py`
+  - CREATE `src/rai_cli/governance/query/__init__.py`
+  - CREATE `src/rai_cli/governance/query/models.py`
   - CREATE `tests/governance/query/__init__.py`
   - CREATE `tests/governance/query/test_models.py`
 - **Verification:**
@@ -30,15 +30,15 @@ Build a query engine for extracting Minimum Viable Context (MVC) from the concep
   - `MVCResult` includes concepts and metadata
   - `MVCMetadata` includes token_estimate, paths, execution_time_ms
   - JSON serialization/deserialization works (`to_json()`, `from_json()`)
-  - `pyright --strict src/raise_cli/governance/query/models.py` passes
-  - `pytest tests/governance/query/test_models.py -v --cov=src/raise_cli/governance/query/models.py --cov-fail-under=90` passes
+  - `pyright --strict src/rai_cli/governance/query/models.py` passes
+  - `pytest tests/governance/query/test_models.py -v --cov=src/rai_cli/governance/query/models.py --cov-fail-under=90` passes
 - **Size:** S
 - **Dependencies:** None (uses F2.1's Concept model, F2.2's ConceptGraph)
 
 ### Task 2: Implement Query Strategies
 - **Description:** Create `strategies.py` with 4 strategy implementations: `query_concept_lookup()`, `query_keyword_search()`, `query_relationship_traversal()`, `query_related_concepts()`. Each returns list of concepts matching the strategy criteria.
 - **Files:**
-  - CREATE `src/raise_cli/governance/query/strategies.py`
+  - CREATE `src/rai_cli/governance/query/strategies.py`
   - CREATE `tests/governance/query/test_strategies.py`
 - **Verification:**
   - **CONCEPT_LOOKUP**: Returns concept by ID + 1-hop dependencies (governed_by, implements)
@@ -46,14 +46,14 @@ Build a query engine for extracting Minimum Viable Context (MVC) from the concep
   - **RELATIONSHIP_TRAVERSAL**: Uses F2.2's `traverse_bfs()` with edge type filtering
   - **RELATED_CONCEPTS**: Returns concepts with >2 shared keywords, sorted by relevance
   - All strategies handle edge cases (empty graph, no matches, invalid IDs)
-  - `pytest tests/governance/query/test_strategies.py -v --cov=src/raise_cli/governance/query/strategies.py --cov-fail-under=90` passes
+  - `pytest tests/governance/query/test_strategies.py -v --cov=src/rai_cli/governance/query/strategies.py --cov-fail-under=90` passes
 - **Size:** M
 - **Dependencies:** Task 1
 
 ### Task 3: Implement Query Engine
 - **Description:** Create `engine.py` with `MVCQueryEngine` class that orchestrates: load graph → auto-detect strategy → execute strategy → calculate metadata (token estimate, paths, execution time) → return MVCResult
 - **Files:**
-  - CREATE `src/raise_cli/governance/query/engine.py`
+  - CREATE `src/rai_cli/governance/query/engine.py`
   - CREATE `tests/governance/query/test_engine.py`
 - **Verification:**
   - `from_cache()` loads graph from `.raise/cache/graph.json`
@@ -62,37 +62,37 @@ Build a query engine for extracting Minimum Viable Context (MVC) from the concep
   - Relationship paths traced from query concept to results
   - Execution time tracked in metadata
   - Integration test: Query real raise-commons graph achieves >90% token savings
-  - `pytest tests/governance/query/test_engine.py -v --cov=src/raise_cli/governance/query/engine.py --cov-fail-under=90` passes
+  - `pytest tests/governance/query/test_engine.py -v --cov=src/rai_cli/governance/query/engine.py --cov-fail-under=90` passes
 - **Size:** M
 - **Dependencies:** Task 2
 
 ### Task 4: Implement Output Formatters
 - **Description:** Create `formatters.py` with formatters for markdown and JSON. Markdown formatter includes concept sections with relationship annotations. Include `to_file()` utility.
 - **Files:**
-  - CREATE `src/raise_cli/governance/query/formatters.py`
+  - CREATE `src/rai_cli/governance/query/formatters.py`
   - CREATE `tests/governance/query/test_formatters.py`
 - **Verification:**
   - `to_markdown()` formats MVCResult as markdown with headers, relationship paths, token estimate
   - `to_json()` formats as structured JSON (concepts array + metadata object)
   - `to_file(path, format)` writes result to file in specified format
   - Markdown output includes: query, strategy, concepts with type/file annotations, relationship paths, savings estimate
-  - `pytest tests/governance/query/test_formatters.py -v --cov=src/raise_cli/governance/query/formatters.py --cov-fail-under=90` passes
+  - `pytest tests/governance/query/test_formatters.py -v --cov=src/rai_cli/governance/query/formatters.py --cov-fail-under=90` passes
 - **Size:** S
 - **Dependencies:** Task 1
 
-### Task 5: Add CLI Command `raise context query`
+### Task 5: Add CLI Command `rai context query`
 - **Description:** Create new CLI command group `context` with `query` subcommand. Support options: `--format (markdown|json)`, `--output <path>`, `--strategy <strategy>`, `--max-depth <int>`
 - **Files:**
-  - CREATE `src/raise_cli/cli/commands/context.py`
-  - MODIFY `src/raise_cli/cli/app.py` (register context_app)
+  - CREATE `src/rai_cli/cli/commands/context.py`
+  - MODIFY `src/rai_cli/cli/app.py` (register context_app)
   - CREATE `tests/cli/commands/test_context.py`
 - **Verification:**
-  - `raise context query "req-rf-05"` displays MVC in markdown format
-  - `raise context query "validation" --format json` outputs JSON
-  - `raise context query "req-rf-05" --output context.md` writes to file
-  - `raise context query "req-rf-05" --strategy relationship_traversal --max-depth 2` works with explicit params
+  - `rai context query "req-rf-05"` displays MVC in markdown format
+  - `rai context query "validation" --format json` outputs JSON
+  - `rai context query "req-rf-05" --output context.md` writes to file
+  - `rai context query "req-rf-05" --strategy relationship_traversal --max-depth 2` works with explicit params
   - CLI displays token estimate and savings percentage
-  - Error handling: graph not found → suggests `raise graph build`
+  - Error handling: graph not found → suggests `rai graph build`
   - `pytest tests/cli/commands/test_context.py -v` passes
 - **Size:** M
 - **Dependencies:** Task 3, Task 4
@@ -102,7 +102,7 @@ Build a query engine for extracting Minimum Viable Context (MVC) from the concep
 - **Files:**
   - CREATE `tests/governance/query/test_integration.py`
   - MODIFY `dev/components.md` (add query module entry)
-  - MODIFY all `src/raise_cli/governance/query/*.py` (add/verify docstrings)
+  - MODIFY all `src/rai_cli/governance/query/*.py` (add/verify docstrings)
 - **Verification:**
   - Integration test: Query RF-05 from real graph returns <500 tokens vs ~6,796 manual
   - Integration test: Keyword search returns relevant concepts only
@@ -110,7 +110,7 @@ Build a query engine for extracting Minimum Viable Context (MVC) from the concep
   - All public APIs have Google-style docstrings
   - Component catalog includes: query module location, purpose, public API, dependencies
   - `pytest tests/governance/query/test_integration.py -v` passes
-  - `pytest --cov=src/raise_cli/governance/query --cov-fail-under=90` passes (full module coverage)
+  - `pytest --cov=src/rai_cli/governance/query --cov-fail-under=90` passes (full module coverage)
 - **Size:** S
 - **Dependencies:** Task 5
 
@@ -169,7 +169,7 @@ Build a query engine for extracting Minimum Viable Context (MVC) from the concep
 - [x] Return MVCResult with concepts + metadata (token estimate, paths)
 - [x] Format as markdown (sections, relationship annotations)
 - [x] Format as JSON (structured output)
-- [x] CLI command `raise context query <query>` with `--format` and `--output` options
+- [x] CLI command `rai context query <query>` with `--format` and `--output` options
 - [x] Token estimation using words * 1.3 heuristic
 - [x] Include relationship paths in metadata
 - [x] >90% test coverage on query module

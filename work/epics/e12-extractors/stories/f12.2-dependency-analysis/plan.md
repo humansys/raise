@@ -21,10 +21,10 @@
 ## Tasks
 
 ### Task 1: Guardrails Parser Module
-- **Description:** Create `src/raise_cli/governance/parsers/guardrails.py` with section-based extraction
+- **Description:** Create `src/rai_cli/governance/parsers/guardrails.py` with section-based extraction
 - **Files:**
-  - `src/raise_cli/governance/parsers/guardrails.py` (new)
-  - `src/raise_cli/governance/parsers/__init__.py` (update export)
+  - `src/rai_cli/governance/parsers/guardrails.py` (new)
+  - `src/rai_cli/governance/parsers/__init__.py` (update export)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `uv run pytest tests/governance/parsers/test_guardrails.py -v`
 - **Size:** S
@@ -39,7 +39,7 @@
 ### Task 2: Extractor Integration
 - **Description:** Integrate guardrails parser into `GovernanceExtractor.extract_all()`
 - **Files:**
-  - `src/raise_cli/governance/extractor.py` (modify)
+  - `src/rai_cli/governance/extractor.py` (modify)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `uv run pytest tests/governance/test_extractor.py -v -k guardrail`
 - **Size:** XS

@@ -60,7 +60,7 @@ RaiSE is **not** a competing agentic runtime:
 │                                                              │
 │   Developer tooling (NOT an executor):                       │
 │                                                              │
-│   - Scaffolding: raise init, raise skill new                │
+│   - Scaffolding: raise init, rai skill new                │
 │   - Validation: raise gate check (deterministic)            │
 │   - Telemetry: Aggregation and reporting                    │
 │   - Utilities: raise context, raise deps                    │
@@ -104,12 +104,12 @@ raise-cli becomes developer tooling, not an AI application:
 
 | Command | Purpose | Inference Required |
 |---------|---------|-------------------|
-| `raise init` | Scaffold RaiSE structure | No |
-| `raise skill new` | Create skill from template | No |
-| `raise gate check` | Validate gate criteria | No |
-| `raise validate` | Check governance artifacts | No |
-| `raise telemetry` | Aggregate/report metrics | No |
-| `raise context` | Preview what Claude sees | No |
+| `rai init` | Scaffold RaiSE structure | No |
+| `rai skill new` | Create skill from template | No |
+| `rai gate check` | Validate gate criteria | No |
+| `rai validate` | Check governance artifacts | No |
+| `rai telemetry` | Aggregate/report metrics | No |
+| `rai context` | Preview what Claude sees | No |
 
 **Pydantic stays in stack** for schema validation and structured parsing, not for inference.
 

@@ -11,9 +11,9 @@
 ### Task 1: Fix rai_base architecture templates (F1)
 - **Description:** Add YAML frontmatter to system-context.md and system-design.md. Create new domain-model.md template. All must match `_parse_architecture_doc` dispatch types.
 - **Files:**
-  - Modify: `src/raise_cli/rai_base/governance/architecture/system-context.md`
-  - Modify: `src/raise_cli/rai_base/governance/architecture/system-design.md`
-  - Create: `src/raise_cli/rai_base/governance/architecture/domain-model.md`
+  - Modify: `src/rai_cli/rai_base/governance/architecture/system-context.md`
+  - Modify: `src/rai_cli/rai_base/governance/architecture/system-design.md`
+  - Create: `src/rai_cli/rai_base/governance/architecture/domain-model.md`
 - **TDD Cycle:**
   - RED: Template contract test — parse each template through `_parse_architecture_doc`, assert non-None return
   - GREEN: Add frontmatter to templates
@@ -22,10 +22,10 @@
 - **Size:** S
 - **Dependencies:** None
 
-### Task 2: Add completeness check to `raise memory validate` (F4)
+### Task 2: Add completeness check to `rai memory validate` (F4)
 - **Description:** Extend the existing validate command with a check that expected node types are present (architecture ≥1, module ≥1). Warning only, not hard failure.
 - **Files:**
-  - Modify: `src/raise_cli/cli/commands/memory.py` (validate function, ~line 554)
+  - Modify: `src/rai_cli/cli/commands/memory.py` (validate function, ~line 554)
 - **TDD Cycle:**
   - RED: Test that validate warns when graph has 0 architecture nodes; test it passes when ≥1 present
   - GREEN: Add completeness check after existing structural checks
@@ -44,7 +44,7 @@
 - **Dependencies:** Task 1 (need to know exact frontmatter format)
 
 ### Task 4: Fix /project-onboard skill — module doc generation (F2 + F5)
-- **Description:** Add Step 6h: generate `governance/architecture/modules/*.md` for each discovered module. Add graph gate in Step 7: run `raise memory validate` after build, check for completeness warnings.
+- **Description:** Add Step 6h: generate `governance/architecture/modules/*.md` for each discovered module. Add graph gate in Step 7: run `rai memory validate` after build, check for completeness warnings.
 - **Files:**
   - Modify: `.claude/skills/project-onboard/SKILL.md`
 - **TDD Cycle:** N/A (skill Markdown). Manual verification: template matches `_parse_module_doc` expected fields.
@@ -75,7 +75,7 @@
 - **Verification:**
   ```bash
   # In raise-commons:
-  raise memory build && raise memory validate
+  rai memory build && rai memory validate
   # Check: architecture nodes present, completeness check passes
   ```
 - **Size:** XS
@@ -92,7 +92,7 @@
 
 ## Risks
 
-- **Placeholder substitution:** Adding frontmatter to templates may break `{project_name}` replacement in `raise init`. Mitigation: verify in Task 1.
+- **Placeholder substitution:** Adding frontmatter to templates may break `{project_name}` replacement in `rai init`. Mitigation: verify in Task 1.
 - **Skill drift:** Skills are Markdown instructions for Rai, not executable code. We can't test them automatically. Mitigation: manual review, template contract test covers the data contract.
 
 ## Duration Tracking

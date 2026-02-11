@@ -42,7 +42,7 @@ raise-cli is a Python CLI toolkit for the RaiSE framework. It provides determini
 
 ```
 Governance markdown → extractor → concept nodes ─────┐
-Source code         → scanner   → analyzer → comps   ├→ UnifiedGraph → raise memory query
+Source code         → scanner   → analyzer → comps   ├→ UnifiedGraph → rai memory query
 JSONL memory        → loader    → pattern/cal nodes  │
 Architecture docs   → frontmatter parser → mod nodes │
 Module source files → PythonAnalyzer → code metadata ┘

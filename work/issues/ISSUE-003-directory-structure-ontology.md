@@ -37,7 +37,7 @@ The current directory structure conflates three concerns:
 2. **RaiSE framework distribution** (what gets bundled in raise-cli)
 3. **User project governance** (what a user project should have)
 
-New users running `raise init` on their project will be confused about what directories they need and what each one means.
+New users running `rai init` on their project will be confused about what directories they need and what each one means.
 
 ---
 
@@ -140,7 +140,7 @@ raise-commons/
 ├── .rai/                      # Emilio's Rai (dogfooding)
 ├── .claude/                   # Claude Code settings
 │
-├── src/raise_cli/             # CLI source code
+├── src/rai_cli/             # CLI source code
 │   └── rai_base/              # Bundled base Rai (E14)
 │
 ├── framework/                 # PUBLIC textbook (what we publish)
@@ -185,7 +185,7 @@ raise-commons/
 - Decision: Do we migrate raise-commons or just define user structure?
 
 ### Phase 2: E14 Implementation
-- `raise init` creates the clean user structure
+- `rai init` creates the clean user structure
 - Base Rai goes to `.rai/` (not `.raise/`)
 - No `.raise/` created for user projects
 

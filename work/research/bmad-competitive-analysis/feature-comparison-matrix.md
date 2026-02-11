@@ -722,7 +722,7 @@ personas:
 **Strategic Impact**: **Moderate Threat**. UX polish matters for adoption.
 
 **RaiSE Response**:
-1. **Build `raise-cli` installer** (P1): Match BMAD's one-command UX
+1. **Build `rai-cli` installer** (P1): Match BMAD's one-command UX
 2. **Adopt module organization** (P2): Restructure `.raise-kit/` with `module.yaml` (git-native, not npm)
 3. **Community marketplace** (P2): Discovery platform for community commands
 
@@ -786,7 +786,7 @@ personas:
 **Strategic Impact**: **Moderate Threat**. Installation UX determines trial → adoption conversion.
 
 **RaiSE Response** (Recommendation 1: P1):
-- Build `raise-cli` installer: `npx @raise/install` or `curl install.raise.dev | sh`
+- Build `rai-cli` installer: `npx @raise/install` or `curl install.raise.dev | sh`
 - Detects IDE/platform (like BMAD)
 - Clones git repo (maintain git-native distribution)
 - Runs injection script automatically
@@ -1563,7 +1563,7 @@ personas:
 
 1. **18+ Platform Support** — Market coverage advantage (RaiSE: MCP evangelism + focused depth)
 2. **Named Persona Agents** — Accessibility advantage (RaiSE: Optional personas, P3)
-3. **npm Installer UX** — First-time experience advantage (RaiSE: Build `raise-cli`, P1)
+3. **npm Installer UX** — First-time experience advantage (RaiSE: Build `rai-cli`, P1)
 4. **Community Momentum** (32k stars) — Network effects (RaiSE: Rapid open-source launch, P0)
 5. **Quick Flow Path** — Small task friction (RaiSE: Build `/specify.quick`, P2)
 

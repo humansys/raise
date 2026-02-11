@@ -99,8 +99,8 @@ NodeType = Literal[
 
 **New (bidirectional):**
 ```
-/story-review → raise memory add-pattern → patterns.jsonl → graph
-/session-close  → raise memory add-pattern → patterns.jsonl → graph
+/story-review → rai memory add-pattern → patterns.jsonl → graph
+/session-close  → rai memory add-pattern → patterns.jsonl → graph
                   (multiple entry points, immediate persistence)
 ```
 
@@ -214,7 +214,7 @@ raise context query "testing coverage" --unified --types guardrail
 # Returns: guardrail-testing section
 
 # Memory write works
-raise memory add-pattern "Parser modules are reusable" --context testing
+rai memory add-pattern "Parser modules are reusable" --context testing
 # Adds to patterns.jsonl immediately
 ```
 

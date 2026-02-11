@@ -87,7 +87,7 @@ notes: "Any free-form notes"
 ### Step 2: Feed CLI
 
 ```bash
-raise session close --state-file /tmp/session-output.yaml --project "$(pwd)"
+rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 ```
 
 This single command atomically:
@@ -99,12 +99,12 @@ This single command atomically:
 
 **Alternative (simple close):** For quick sessions without state file:
 ```bash
-raise session close --summary "Quick fix session" --type maintenance --project "$(pwd)"
+rai session close --summary "Quick fix session" --type maintenance --project "$(pwd)"
 ```
 
 **With inline pattern/correction:**
 ```bash
-raise session close \
+rai session close \
   --summary "Session description" \
   --type feature \
   --pattern "New pattern learned" \
@@ -140,7 +140,7 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 - State file is the richest path; CLI flags are for simple/quick closes
 - Calibration (if stories completed): still run separately:
   ```bash
-  raise memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
+  rai memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
   ```
 
 ## References

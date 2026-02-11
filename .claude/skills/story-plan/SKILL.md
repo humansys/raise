@@ -53,10 +53,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-raise memory emit-work story {story_id} --event start --phase plan
+rai memory emit-work story {story_id} --event start --phase plan
 ```
 
-**Example:** `raise memory emit-work story S15.1 -e start -p plan`
+**Example:** `rai memory emit-work story S15.1 -e start -p plan`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -82,22 +82,22 @@ ls work/epics/e*/stories/{story_id}/design.md 2>/dev/null || echo "INFO: No desi
 Load relevant patterns and calibration from unified context:
 
 ```bash
-raise memory query "planning estimation calibration" --types pattern,calibration --limit 5
+rai memory query "planning estimation calibration" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Key patterns inform task structure and sizing.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `raise memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
 
 ### Step 0.6: Load Architectural Context
 
 Identify the primary module(s) this story affects, then load their architectural context:
 
 ```bash
-raise memory context mod-<name>
-# Example: raise memory context mod-memory
+rai memory context mod-<name>
+# Example: rai memory context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -237,10 +237,10 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-raise memory emit-work story {story_id} --event complete --phase plan
+rai memory emit-work story {story_id} --event complete --phase plan
 ```
 
-**Example:** `raise memory emit-work story S15.1 -e complete -p plan`
+**Example:** `rai memory emit-work story S15.1 -e complete -p plan`
 
 ## Output
 

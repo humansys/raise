@@ -10,7 +10,7 @@
 
 ### Task 1: PHP parser, walker, signatures, and dispatcher wiring
 - **Description:** Implement `_get_php_parser()`, `_extract_php_signature()`, `_extract_php_symbols()`, and `extract_php_symbols()`. Wire into `extract_symbols()` dispatcher. Handle class, interface, trait, function, method, and enum node types. Track namespace as state for qualified names. Include visibility and static modifiers in method signatures.
-- **Files:** `src/raise_cli/discovery/scanner.py`, `tests/discovery/test_scanner.py`
+- **Files:** `src/rai_cli/discovery/scanner.py`, `tests/discovery/test_scanner.py`
 - **TDD Cycle:**
   - RED: Tests for each PHP symbol kind (class, interface, trait, function, method, enum), namespace-qualified names, class with extends/implements, method visibility/static
   - GREEN: Implement all PHP extraction functions
@@ -21,7 +21,7 @@
 
 ### Task 2: Blade template exclusion and edge cases
 - **Description:** Ensure `.blade.php` files are skipped during scan (they match `**/*.php` glob but aren't parseable PHP classes). Add exclude pattern or filter. Test edge cases: empty files, PHP files without `<?php` tag, files with only namespace/use statements.
-- **Files:** `src/raise_cli/discovery/scanner.py` (scan_directory or extract_php_symbols), `tests/discovery/test_scanner.py`
+- **Files:** `src/rai_cli/discovery/scanner.py` (scan_directory or extract_php_symbols), `tests/discovery/test_scanner.py`
 - **TDD Cycle:**
   - RED: Test that `.blade.php` files are excluded from scan results. Test empty/minimal PHP files don't crash.
   - GREEN: Add blade exclusion logic and defensive handling.
@@ -31,8 +31,8 @@
 - **Dependencies:** Task 1
 
 ### Task 3 (Final): Manual Integration Test
-- **Description:** Run `raise discover scan` against zambezi-concierge admin/app/ with `--language php`. Verify symbols from real Laravel files appear correctly. Run full test suite + quality gates.
-- **Verification:** `uv run raise discover scan /home/emilio/Code/zambezi-concierge/admin --language php --format summary` shows classes, methods, interfaces. Full gates: `uv run pytest -x -q && uv run ruff check src/ && uv run pyright src/raise_cli/discovery/`
+- **Description:** Run `rai discover scan` against zambezi-concierge admin/app/ with `--language php`. Verify symbols from real Laravel files appear correctly. Run full test suite + quality gates.
+- **Verification:** `uv run rai discover scan /home/emilio/Code/zambezi-concierge/admin --language php --format summary` shows classes, methods, interfaces. Full gates: `uv run pytest -x -q && uv run ruff check src/ && uv run pyright src/rai_cli/discovery/`
 - **Size:** XS
 - **Dependencies:** Tasks 1-2
 

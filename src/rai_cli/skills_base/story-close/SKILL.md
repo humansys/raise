@@ -112,7 +112,7 @@ If this story added new modules, changed directory structure, or altered data fl
 
 ```bash
 # Compare source modules vs documented modules
-SOURCE_MODULES=$(ls -d src/raise_cli/*/ 2>/dev/null | sed 's|src/raise_cli/||;s|/$||' | grep -v __pycache__ | sort)
+SOURCE_MODULES=$(ls -d src/rai_cli/*/ 2>/dev/null | sed 's|src/rai_cli/||;s|/$||' | grep -v __pycache__ | sort)
 DOC_MODULES=$(ls governance/architecture/modules/*.md 2>/dev/null | sed 's|governance/architecture/modules/||;s|\.md$||' | sort)
 
 # Show any undocumented modules
@@ -258,10 +258,10 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 Record the completion of the entire story lifecycle:
 
 ```bash
-raise memory emit-work story {story_id} --event complete --phase review
+rai memory emit-work story {story_id} --event complete --phase review
 ```
 
-**Example:** `raise memory emit-work story S15.1 -e complete -p review`
+**Example:** `rai memory emit-work story S15.1 -e complete -p review`
 
 **Verification:** Telemetry emitted.
 

@@ -10,15 +10,15 @@
 ### Task 1: Create governance template assets + scaffold function
 - **Description:** Create `rai_base/governance/` with parser-compatible markdown templates (prd.md, vision.md, guardrails.md, backlog.md, architecture/system-context.md, architecture/system-design.md). Add `__init__.py` files for importlib.resources. Then add `GovernanceScaffoldResult` model and `scaffold_governance()` function to `onboarding/governance.py` — copies templates via `importlib.resources`, renders `{project_name}`, per-file idempotency (follows bootstrap.py pattern). Unit tests for scaffold function.
 - **Files:**
-  - `src/raise_cli/rai_base/governance/__init__.py` (create)
-  - `src/raise_cli/rai_base/governance/prd.md` (create)
-  - `src/raise_cli/rai_base/governance/vision.md` (create)
-  - `src/raise_cli/rai_base/governance/guardrails.md` (create)
-  - `src/raise_cli/rai_base/governance/backlog.md` (create)
-  - `src/raise_cli/rai_base/governance/architecture/__init__.py` (create)
-  - `src/raise_cli/rai_base/governance/architecture/system-context.md` (create)
-  - `src/raise_cli/rai_base/governance/architecture/system-design.md` (create)
-  - `src/raise_cli/onboarding/governance.py` (modify)
+  - `src/rai_cli/rai_base/governance/__init__.py` (create)
+  - `src/rai_cli/rai_base/governance/prd.md` (create)
+  - `src/rai_cli/rai_base/governance/vision.md` (create)
+  - `src/rai_cli/rai_base/governance/guardrails.md` (create)
+  - `src/rai_cli/rai_base/governance/backlog.md` (create)
+  - `src/rai_cli/rai_base/governance/architecture/__init__.py` (create)
+  - `src/rai_cli/rai_base/governance/architecture/system-context.md` (create)
+  - `src/rai_cli/rai_base/governance/architecture/system-design.md` (create)
+  - `src/rai_cli/onboarding/governance.py` (modify)
   - `tests/test_governance_scaffold.py` (create)
 - **TDD Cycle:** RED (test scaffold creates files, renders project_name, skips existing) → GREEN (implement) → REFACTOR
 - **Verification:** `pytest tests/test_governance_scaffold.py -v`
@@ -28,7 +28,7 @@
 ### Task 2: Integrate into init_command + skill recommendation
 - **Description:** Call `scaffold_governance()` from `init_command()` after bootstrap/skills, before message output. Add governance result to output messages (Shu: detailed, Ri: concise). Add skill recommendation line based on detected project type: `/project-create` for greenfield, `/project-onboard` for brownfield. Update `_get_project_message()` to include both.
 - **Files:**
-  - `src/raise_cli/cli/commands/init.py` (modify)
+  - `src/rai_cli/cli/commands/init.py` (modify)
   - `tests/test_init.py` (modify — add assertions for governance scaffolding and skill recommendation)
 - **TDD Cycle:** RED (test init produces governance/ and recommends skill) → GREEN (implement) → REFACTOR
 - **Verification:** `pytest tests/test_init.py -v`
@@ -36,11 +36,11 @@
 - **Dependencies:** Task 1
 
 ### Task 3: Integration test (M1 gate) + manual validation
-- **Description:** Integration test: `scaffold_governance()` → `raise memory build` → verify governance nodes (requirement, outcome, guardrail) exist in graph. This is the M1 milestone gate from the epic scope. Then manual validation: run `raise init` on a temp directory and verify the full flow.
+- **Description:** Integration test: `scaffold_governance()` → `rai memory build` → verify governance nodes (requirement, outcome, guardrail) exist in graph. This is the M1 milestone gate from the epic scope. Then manual validation: run `rai init` on a temp directory and verify the full flow.
 - **Files:**
   - `tests/test_governance_scaffold.py` (modify — add integration test)
 - **TDD Cycle:** RED (test scaffold → build → nodes) → GREEN (fix any template/parser mismatches) → REFACTOR
-- **Verification:** `pytest tests/test_governance_scaffold.py::test_scaffold_then_build_produces_nodes -v` + manual `raise init` on temp dir
+- **Verification:** `pytest tests/test_governance_scaffold.py::test_scaffold_then_build_produces_nodes -v` + manual `rai init` on temp dir
 - **Size:** S
 - **Dependencies:** Task 1, Task 2
 

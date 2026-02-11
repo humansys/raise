@@ -182,7 +182,7 @@ def emit_pattern(
 ### Current State
 
 ```
-Agent → raise memory query "TDD" → Graph → Results
+Agent → rai memory query "TDD" → Graph → Results
         (already abstracts file location)
 ```
 
@@ -191,7 +191,7 @@ The graph IS already the abstraction layer. Agents don't read JSONL files direct
 ### Enhanced State (Option B)
 
 ```
-Agent → raise memory query "TDD" → Graph → Results with scope metadata
+Agent → rai memory query "TDD" → Graph → Results with scope metadata
                                             ↓
                                    [{content: "...", scope: "global"},
                                     {content: "...", scope: "project"}]
@@ -323,6 +323,6 @@ def ensure_global_dir() -> Path:
 
 ## References
 
-- Current architecture: `src/raise_cli/context/builder.py`
-- Graph implementation: `src/raise_cli/context/graph.py`
+- Current architecture: `src/rai_cli/context/builder.py`
+- Graph implementation: `src/rai_cli/context/graph.py`
 - ADR-019: Unified Context Graph Architecture

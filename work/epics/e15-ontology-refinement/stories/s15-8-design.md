@@ -50,13 +50,13 @@ For operational detail (toolchain, directory structure, full identity), the AI q
 |-----------|--------|
 | `CLAUDE.md` | **Rewrite** — ~300 lines → 3 lines bootstrap |
 | `CLAUDE.local.md` | **Rewrite** — ~77 lines → 2 lines bootstrap |
-| `MEMORY.md` | **Delete** — `raise memory generate` updated to skip creation |
-| `src/raise_cli/session/bundle.py` | **Modify** — add governance primes, identity primes, recent sessions, progress |
-| `src/raise_cli/schemas/session_state.py` | **Modify** — add EpicProgress model |
-| `src/raise_cli/session/close.py` | **Modify** — write progress to state |
-| `src/raise_cli/cli/commands/session.py` | **Modify** — accept progress flags |
-| `src/raise_cli/context/builder.py` | **Modify** — tag `always_on` on guardrails, principles; add identity node extraction |
-| `src/raise_cli/memory/generate.py` | **Modify** — generate minimal MEMORY.md |
+| `MEMORY.md` | **Delete** — `rai memory generate` updated to skip creation |
+| `src/rai_cli/session/bundle.py` | **Modify** — add governance primes, identity primes, recent sessions, progress |
+| `src/rai_cli/schemas/session_state.py` | **Modify** — add EpicProgress model |
+| `src/rai_cli/session/close.py` | **Modify** — write progress to state |
+| `src/rai_cli/cli/commands/session.py` | **Modify** — accept progress flags |
+| `src/rai_cli/context/builder.py` | **Modify** — tag `always_on` on guardrails, principles; add identity node extraction |
+| `src/rai_cli/memory/generate.py` | **Modify** — generate minimal MEMORY.md |
 | `.claude/skills/session-start/SKILL.md` | **Modify** — document unified bundle |
 | `.claude/skills/session-close/SKILL.md` | **Modify** — output progress data |
 
@@ -87,7 +87,7 @@ Run `/session-start` for context.
 
 Delete MEMORY.md entirely. Claude Code works fine without it — no error, just loads nothing from auto-memory. The graph already surfaces patterns as behavioral primes through the bundle.
 
-Update `raise memory generate` to skip MEMORY.md creation. The command can still exist for other purposes but no longer writes to Claude Code's auto-memory path.
+Update `rai memory generate` to skip MEMORY.md creation. The command can still exist for other purposes but no longer writes to Claude Code's auto-memory path.
 
 **Rationale**: A bootstrap pointer to say "run /session-start" is still muda — the user already knows to run it. No file > empty file.
 
@@ -148,7 +148,7 @@ def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
 - Git: GitLab (glab), v2 branch, conventional commits, Co-Authored-By: Rai
 ```
 
-**On-demand**: Full code standards, toolchain config, directory structure — query `raise memory query` or read files when needed.
+**On-demand**: Full code standards, toolchain config, directory structure — query `rai memory query` or read files when needed.
 
 ### D6: Unified bundle — one CLI call, everything needed
 
@@ -166,7 +166,7 @@ After S15.8, the bundle has these sections:
 # Pending                  ← existing
 ```
 
-One CLI call: `raise session start --project "$(pwd)" --context`
+One CLI call: `rai session start --project "$(pwd)" --context`
 One output: everything the AI needs to start working.
 
 ### D7: Session state expansion
@@ -309,7 +309,7 @@ No file. Claude Code loads nothing from auto-memory. Bundle carries everything.
 - [ ] Critical guardrails, principles, and identity values tagged `always_on: true` in builder
 - [ ] CLAUDE.md ≤ 5 lines (bootstrap pointer)
 - [ ] CLAUDE.local.md ≤ 3 lines (bootstrap pointer)
-- [ ] MEMORY.md deleted (no auto-memory file; `raise memory generate` updated)
+- [ ] MEMORY.md deleted (no auto-memory file; `rai memory generate` updated)
 - [ ] `SessionState` model has `progress` and `completed_epics` fields
 - [ ] Session-close writes progress to session-state.yaml
 - [ ] Full lifecycle (start → work → close → start) with zero manual file edits

@@ -18,7 +18,7 @@ phase: design
 
 **Module:** New skill file in `.claude/skills/project-onboard/SKILL.md`
 **Domain:** Onboarding (same as `/project-create`)
-**Reuses:** Same governance doc format and parser contracts from S7.2. Same `raise memory build` gate.
+**Reuses:** Same governance doc format and parser contracts from S7.2. Same `rai memory build` gate.
 
 **Key difference from `/project-create`:**
 
@@ -27,16 +27,16 @@ phase: design
 | Input | Conversation only | Discovery + conversation |
 | Architecture docs | User describes | Discovered from code |
 | Guardrails | User specifies | Detected conventions + user refinement |
-| Prerequisite | `raise init` | `raise init --detect` |
-| Discovery commands | None | `raise discover scan`, `raise discover analyze` |
+| Prerequisite | `rai init` | `rai init --detect` |
+| Discovery commands | None | `rai discover scan`, `rai discover analyze` |
 
 ## Approach
 
 The skill orchestrates a **3-phase pipeline**: discover → converse → generate.
 
 ### Phase 1: Discover (deterministic CLI)
-1. Verify `raise init --detect` was run (manifest exists, conventions detected)
-2. Run `raise discover scan . -o json | raise discover analyze -o json` to get codebase structure
+1. Verify `rai init --detect` was run (manifest exists, conventions detected)
+2. Run `rai discover scan . -o json | rai discover analyze -o json` to get codebase structure
 3. Present discovery summary to user — modules, components, architecture patterns
 
 ### Phase 2: Converse (inference)
@@ -46,7 +46,7 @@ The skill orchestrates a **3-phase pipeline**: discover → converse → generat
 
 ### Phase 3: Generate (write + validate)
 7. Write 6 governance docs using combined discovery + conversation data
-8. `raise memory build` — 30+ node gate (same as project-create)
+8. `rai memory build` — 30+ node gate (same as project-create)
 9. Summary and next steps
 
 **IMPORTANT:** The governance doc format is identical to `/project-create` — same parser contracts, same YAML frontmatter, same regex patterns. The difference is WHERE the content comes from (discovery vs pure conversation).
@@ -66,13 +66,13 @@ User: /project-onboard
 ls .raise/manifest.yaml
 
 # Verify conventions were detected (--detect flag was used)
-# guardrails.md should already exist from raise init --detect
+# guardrails.md should already exist from rai init --detect
 ls governance/guardrails.md
 ```
 
 If `governance/guardrails.md` doesn't exist or has only placeholders:
 ```
-"Run `raise init --detect` first — I need convention detection data to analyze your project."
+"Run `rai init --detect` first — I need convention detection data to analyze your project."
 ```
 
 ### Discovery Output (presented to user)
@@ -139,13 +139,13 @@ FastAPI-based REST API with SQLAlchemy ORM, Celery task queue, and JWT authentic
 
 ### MUST
 1. Skill file exists at `.claude/skills/project-onboard/SKILL.md` with valid YAML frontmatter
-2. Skill runs discovery pipeline (`raise discover scan` + `raise discover analyze`) and presents results
+2. Skill runs discovery pipeline (`rai discover scan` + `rai discover analyze`) and presents results
 3. Governance docs follow identical parser contracts as `/project-create` (same regex patterns)
-4. `raise memory build` produces 30+ nodes after onboarding
+4. `rai memory build` produces 30+ nodes after onboarding
 5. Architecture docs are enriched with discovery data (components from actual code, not just conversation)
 
 ### SHOULD
-1. Detected conventions from `raise init --detect` flow into guardrails refinement
+1. Detected conventions from `rai init --detect` flow into guardrails refinement
 2. Skill detects if prerequisites are missing and gives clear instructions
 3. Discovery results presented concisely — summary, not raw dump
 
@@ -159,4 +159,4 @@ FastAPI-based REST API with SQLAlchemy ORM, Celery task queue, and JWT authentic
 - **PAT-201** applies: separate skills for greenfield vs brownfield produce better DX
 - **PAT-202/203** apply: governance templates are the contract, same as S7.2
 - Reuse S7.2 skill structure as template — same YAML frontmatter pattern, same step numbering convention
-- Convention detection from `raise init --detect` already generates `guardrails.md` and `CLAUDE.md` — the skill enriches these, doesn't replace them
+- Convention detection from `rai init --detect` already generates `guardrails.md` and `CLAUDE.md` — the skill enriches these, doesn't replace them

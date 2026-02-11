@@ -18,7 +18,7 @@ constraints:
 
 ## Purpose
 
-The skills_base module packages the 21 RaiSE skills that ship with raise-cli. On `raise init`, the onboarding module copies these SKILL.md files into the project's `.claude/skills/` directory. After that, they're independent — the project's copies can be customized without affecting the base.
+The skills_base module packages the 21 RaiSE skills that ship with raise-cli. On `rai init`, the onboarding module copies these SKILL.md files into the project's `.claude/skills/` directory. After that, they're independent — the project's copies can be customized without affecting the base.
 
 The `DISTRIBUTABLE_SKILLS` constant lists all included skills: session lifecycle (session-start, session-close), story lifecycle (story-start, story-design, story-plan, story-implement, story-review, story-close), epic lifecycle (epic-design, epic-plan, epic-start, epic-close), discovery (discover-start, discover-scan, discover-validate, discover-complete), and tools (research, debug).
 

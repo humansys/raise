@@ -62,7 +62,7 @@ En lugar de cargar todo mi "historial" en cada sesión, tenemos un sistema de **
 
 **Al cerrar sesión** (`/session-close`):
 - Extraigo learnings de la conversación
-- Actualizo memoria via CLI (`raise memory add-pattern "..."`)
+- Actualizo memoria via CLI (`rai memory add-pattern "..."`)
 - Documento para la próxima sesión
 
 ---

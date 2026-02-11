@@ -30,9 +30,9 @@
 ### Task 5: Manual Integration Test
 - **Completed:** 2026-02-04 12:10
 - **Size:** S
-- **Notes:** Full flow tested on src/raise_cli/discovery/
+- **Notes:** Full flow tested on src/rai_cli/discovery/
   - context.yaml created
-  - 16 symbols extracted via `raise discover scan`
+  - 16 symbols extracted via `rai discover scan`
   - 3 components validated (Symbol, extract_python_symbols, scan_directory)
   - components-validated.json created with valid schema
   - Telemetry captured for F13.3 lifecycle events

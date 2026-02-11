@@ -54,7 +54,7 @@
 
 **Disagreement**: None found.
 
-**Implication for raise-cli**: Define TypeAdapters in dedicated modules (e.g., `src/raise_cli/schemas/adapters.py`) and import them where needed.
+**Implication for raise-cli**: Define TypeAdapters in dedicated modules (e.g., `src/rai_cli/schemas/adapters.py`) and import them where needed.
 
 ---
 

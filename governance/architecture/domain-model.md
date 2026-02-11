@@ -170,7 +170,7 @@ raise-cli has seven bounded contexts (one planned), a shared kernel, and an appl
 | Memory scope | Which tier a piece of knowledge belongs to |
 
 **Invariants:**
-- Graph is rebuilt from scratch on every `raise memory build` — no incremental updates
+- Graph is rebuilt from scratch on every `rai memory build` — no incremental updates
 - NodeType is a Literal type — adding new types is a **schema change** (PAT-152)
 - JSONL is append-only — never edit historical entries
 - Backward compatibility: readers handle both old and new JSONL schemas (PAT-153)

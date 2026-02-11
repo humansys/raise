@@ -210,7 +210,7 @@ Federated makes sense for enterprise with 100K+ nodes and separate teams. We hav
 
 1. **Existing code reusable** — Extractors, parsers still work
 2. **Storage format changes** — From multiple files to one unified.json
-3. **Query interface changes** — `raise context query` becomes unified
+3. **Query interface changes** — `rai context query` becomes unified
 
 ## Implementation (E11)
 

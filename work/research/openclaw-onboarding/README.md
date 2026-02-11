@@ -87,7 +87,7 @@ Project ready with governance + skills + CLAUDE.md
 /session-start in Claude Code
 ```
 
-### `raise onboard` Wizard Steps
+### `rai onboard` Wizard Steps
 
 **Step 1: Detect Project State**
 - New project (greenfield) vs existing repo (brownfield)
@@ -178,17 +178,17 @@ project/
 
 | Command | Purpose |
 |---------|---------|
-| `raise onboard` | Interactive setup wizard |
-| `raise status` | Check project health |
-| `raise doctor` | Diagnose configuration issues |
-| `raise sync` | Regenerate CLAUDE.md from governance |
-| `raise upgrade` | Update skills to latest version |
+| `rai onboard` | Interactive setup wizard |
+| `rai status` | Check project health |
+| `rai doctor` | Diagnose configuration issues |
+| `rai sync` | Regenerate CLAUDE.md from governance |
+| `rai upgrade` | Update skills to latest version |
 
 ---
 
 ## Recommendation
 
-**Decision:** Implement `raise onboard` command with 3 templates
+**Decision:** Implement `rai onboard` command with 3 templates
 
 **Confidence:** HIGH
 
@@ -216,11 +216,11 @@ project/
 
 | Feature | Size | Priority |
 |---------|------|----------|
-| `raise onboard --template minimal` | S | P0 (F&F) |
-| `raise status` | XS | P0 (F&F) |
-| `raise doctor` | S | P1 |
+| `rai onboard --template minimal` | S | P0 (F&F) |
+| `rai status` | XS | P0 (F&F) |
+| `rai doctor` | S | P1 |
 | Standard/full templates | M | P2 |
-| `raise upgrade` | S | P2 |
+| `rai upgrade` | S | P2 |
 
 **F&F scope:** `onboard` + `status` = ~2-3 hours with kata cycle
 

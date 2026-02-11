@@ -12,7 +12,7 @@ created: 2026-02-03
 
 ## Problem
 
-Skills need to query accumulated context (patterns, calibration, governance, work) at invocation time. Currently `raise context query` only queries the governance graph. There's no way to query the unified graph that F11.2 builds.
+Skills need to query accumulated context (patterns, calibration, governance, work) at invocation time. Currently `rai context query` only queries the governance graph. There's no way to query the unified graph that F11.2 builds.
 
 ## Value
 
@@ -22,11 +22,11 @@ Skills need to query accumulated context (patterns, calibration, governance, wor
 
 ## Approach
 
-Extend the existing `raise context query` command to support `--unified` flag, querying the unified graph instead of governance-only graph.
+Extend the existing `rai context query` command to support `--unified` flag, querying the unified graph instead of governance-only graph.
 
 **Components affected:**
-- `src/raise_cli/context/query.py` — **CREATE** — UnifiedContextQuery engine
-- `src/raise_cli/cli/commands/context.py` — **MODIFY** — Add `--unified` flag
+- `src/rai_cli/context/query.py` — **CREATE** — UnifiedContextQuery engine
+- `src/rai_cli/cli/commands/context.py` — **MODIFY** — Add `--unified` flag
 
 **Pattern reuse:**
 - Copy engine pattern from `governance/query/engine.py`
@@ -151,7 +151,7 @@ print(f"Tokens: ~{result.metadata.token_estimate}")
 
 ### MUST
 
-- [ ] `raise context query "<query>" --unified` queries unified graph
+- [ ] `rai context query "<query>" --unified` queries unified graph
 - [ ] Keyword search matches against node content (case-insensitive)
 - [ ] `--types` flag filters by node type (comma-separated)
 - [ ] `--max-depth` controls BFS traversal depth (default 1)
@@ -166,7 +166,7 @@ print(f"Tokens: ~{result.metadata.token_estimate}")
 
 ### MUST NOT
 
-- [ ] Break existing `raise context query` (governance) behavior
+- [ ] Break existing `rai context query` (governance) behavior
 - [ ] Require graph rebuild on every query (load from file)
 - [ ] Include concepts with no keyword matches in keyword_search
 
@@ -191,11 +191,11 @@ recency_bonus = 5 if created within 7 days else 0
 
 - Vector embeddings / semantic search (add later if keyword insufficient)
 - New query strategies beyond keyword_search and concept_lookup
-- Auto-rebuild graph if stale (manual `raise graph build --unified`)
+- Auto-rebuild graph if stale (manual `rai graph build --unified`)
 
 ## References
 
 - Epic: `dev/epic-e11-scope.md`
 - ADR: `dev/decisions/adr-019-unified-context-graph.md`
-- Pattern reuse: `src/raise_cli/governance/query/`
-- Graph class: `src/raise_cli/context/graph.py`
+- Pattern reuse: `src/rai_cli/governance/query/`
+- Graph class: `src/rai_cli/context/graph.py`

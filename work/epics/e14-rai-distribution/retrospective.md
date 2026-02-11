@@ -8,7 +8,7 @@
 
 ## Summary
 
-E14 enables new users to experience Rai as a knowledgeable partner from day one. The epic delivers bundled base identity, 20 universal methodology patterns, a methodology definition, automatic bootstrap on `raise init`, two-part MEMORY.md generation, pattern versioning, and a `raise base show` command. Multi-developer architecture separates personal data from shared project data, preventing merge conflicts.
+E14 enables new users to experience Rai as a knowledgeable partner from day one. The epic delivers bundled base identity, 20 universal methodology patterns, a methodology definition, automatic bootstrap on `rai init`, two-part MEMORY.md generation, pattern versioning, and a `rai base show` command. Multi-developer architecture separates personal data from shared project data, preventing merge conflicts.
 
 ---
 
@@ -87,10 +87,10 @@ E14 enables new users to experience Rai as a knowledgeable partner from day one.
 - **Scope:** `work/epics/e14-rai-distribution/scope.md`
 - **ADRs:** ADR-022 (distribution architecture)
 - **Research:** `work/research/rai-distribution/` (3 unknowns resolved)
-- **New module:** `src/raise_cli/rai_base/` (base package)
-- **New module:** `src/raise_cli/onboarding/bootstrap.py`
-- **New module:** `src/raise_cli/onboarding/memory_md.py`
-- **New command:** `raise base show`
+- **New module:** `src/rai_cli/rai_base/` (base package)
+- **New module:** `src/rai_cli/onboarding/bootstrap.py`
+- **New module:** `src/rai_cli/onboarding/memory_md.py`
+- **New command:** `rai base show`
 - **Tests:** 1210 total at close (92.71% coverage)
 
 ---

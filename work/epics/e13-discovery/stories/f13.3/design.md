@@ -9,7 +9,7 @@
 
 ## What & Why
 
-**Problem:** When Rai scans a codebase with `raise discover scan`, the output is raw symbol data (names, signatures, locations). To build a useful component catalog, someone must describe what each component does and how it relates to others. Manually writing descriptions is tedious and requires deep codebase knowledge humans often lack.
+**Problem:** When Rai scans a codebase with `rai discover scan`, the output is raw symbol data (names, signatures, locations). To build a useful component catalog, someone must describe what each component does and how it relates to others. Manually writing descriptions is tedious and requires deep codebase knowledge humans often lack.
 
 **Value:** Discovery skills enable Rai to synthesize meaningful descriptions from extracted symbols, then present them to humans for validation. Human effort shifts from *writing* to *reviewing*. The result: accurate component documentation at AI speed.
 
@@ -28,7 +28,7 @@ Create 4 skills that form a discovery workflow:
 
 **Key design decisions:**
 
-1. **Skills call CLI toolkit** — Skills orchestrate, `raise discover scan` does extraction
+1. **Skills call CLI toolkit** — Skills orchestrate, `rai discover scan` does extraction
 2. **Intermediate state as YAML** — Draft components stored in `work/discovery/` for human review
 3. **Batch validation** — Present components in batches (5-10), not one by one
 4. **Telemetry at each step** — Track discovery lifecycle for learning
@@ -67,9 +67,9 @@ project:
   name: raise-cli
   languages: [python]
   root_dirs:
-    - src/raise_cli
+    - src/rai_cli
   entry_points:
-    - src/raise_cli/cli/main.py
+    - src/rai_cli/cli/main.py
   detected_at: 2026-02-04T10:00:00Z
 
 status: initialized
@@ -86,7 +86,7 @@ raise telemetry emit discovery {project} --event start
 
 **Flow:**
 1. Read `work/discovery/context.yaml` for scope
-2. Run `raise discover scan {path} --output json`
+2. Run `rai discover scan {path} --output json`
 3. For each extracted symbol, Rai synthesizes:
    - `purpose`: 1-2 sentence description of what it does
    - `depends_on`: List of dependencies (from imports/signatures)
@@ -117,14 +117,14 @@ Be concise. Focus on reuse value.
 ```yaml
 # work/discovery/components-draft.yaml
 generated_at: 2026-02-04T10:05:00Z
-source_scan: raise discover scan src/raise_cli --language python
+source_scan: rai discover scan src/rai_cli --language python
 symbol_count: 45
 
 components:
   - id: comp-scanner-symbol
     name: Symbol
     kind: class
-    file: src/raise_cli/discovery/scanner.py
+    file: src/rai_cli/discovery/scanner.py
     line: 44
     signature: "class Symbol(BaseModel)"
     # Synthesized by Rai:
@@ -136,7 +136,7 @@ components:
   - id: comp-scanner-scan-directory
     name: scan_directory
     kind: function
-    file: src/raise_cli/discovery/scanner.py
+    file: src/rai_cli/discovery/scanner.py
     line: 450
     signature: "def scan_directory(path: Path, ...) -> ScanResult"
     purpose: "Scans a directory tree for source files and extracts all symbols. Main entry point for discovery."
@@ -167,7 +167,7 @@ components:
 ```markdown
 ## Component 1/10: Symbol
 
-**File:** src/raise_cli/discovery/scanner.py:44
+**File:** src/rai_cli/discovery/scanner.py:44
 **Kind:** class
 **Signature:** `class Symbol(BaseModel)`
 
@@ -213,7 +213,7 @@ components:
       "id": "comp-scanner-symbol",
       "type": "component",
       "content": "Represents a code symbol extracted from source files. Core data structure for discovery output.",
-      "source_file": "src/raise_cli/discovery/scanner.py",
+      "source_file": "src/rai_cli/discovery/scanner.py",
       "created": "2026-02-04T10:30:00Z",
       "metadata": {
         "name": "Symbol",
@@ -318,7 +318,7 @@ echo '{"type":"discovery_event",...}' >> .rai/telemetry/signals.jsonl
 ### MUST
 
 - [ ] `/discover-start` detects Python/TS/JS projects and creates `work/discovery/context.yaml`
-- [ ] `/discover-scan` runs `raise discover scan` and synthesizes descriptions for each symbol
+- [ ] `/discover-scan` runs `rai discover scan` and synthesizes descriptions for each symbol
 - [ ] `/discover-validate` presents components for human review with approve/edit/skip
 - [ ] `/discover-complete` outputs validated components in JSON format ready for F13.4
 - [ ] All skills emit telemetry via Stop hook
@@ -431,7 +431,7 @@ This allows re-running validation without touching graph, and makes testing easi
 
 Group symbols by module before synthesis to give Rai better context:
 ```
-Module: src/raise_cli/discovery/scanner.py
+Module: src/rai_cli/discovery/scanner.py
   - Symbol (class)
   - ScanResult (class)
   - extract_python_symbols (function)

@@ -13,8 +13,8 @@
 
 - **Description:** Create Pydantic models to parse SKILL.md frontmatter. Schema should capture name, description, metadata, hooks structure.
 - **Files:**
-  - `src/raise_cli/skills/__init__.py` (new module)
-  - `src/raise_cli/skills/schema.py` (new)
+  - `src/rai_cli/skills/__init__.py` (new module)
+  - `src/rai_cli/skills/schema.py` (new)
   - `tests/skills/test_schema.py` (new)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/skills/test_schema.py -v`
@@ -25,7 +25,7 @@
 
 - **Description:** Parse SKILL.md files extracting YAML frontmatter and markdown body. Handle edge cases (missing frontmatter, invalid YAML).
 - **Files:**
-  - `src/raise_cli/skills/parser.py` (new)
+  - `src/rai_cli/skills/parser.py` (new)
   - `tests/skills/test_parser.py` (new)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/skills/test_parser.py -v`
@@ -36,33 +36,33 @@
 
 - **Description:** Find skill directories in `.claude/skills/`. List all skills with metadata. No platform detection complexity — just Claude Code for now.
 - **Files:**
-  - `src/raise_cli/skills/locator.py` (new)
+  - `src/rai_cli/skills/locator.py` (new)
   - `tests/skills/test_locator.py` (new)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/skills/test_locator.py -v`
 - **Size:** S
 - **Dependencies:** Task 2
 
-### Task 4: Implement `raise skill list` Command
+### Task 4: Implement `rai skill list` Command
 
 - **Description:** CLI command to list all skills with human/json output. Group by lifecycle, show version and description.
 - **Files:**
-  - `src/raise_cli/cli/commands/skill.py` (new)
-  - `src/raise_cli/cli/commands/__init__.py` (update exports)
-  - `src/raise_cli/cli/main.py` (register command)
-  - `src/raise_cli/output/formatters/skill.py` (new)
+  - `src/rai_cli/cli/commands/skill.py` (new)
+  - `src/rai_cli/cli/commands/__init__.py` (update exports)
+  - `src/rai_cli/cli/main.py` (register command)
+  - `src/rai_cli/output/formatters/skill.py` (new)
   - `tests/cli/commands/test_skill.py` (new)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/cli/commands/test_skill.py::test_skill_list -v`
 - **Size:** M
 - **Dependencies:** Task 3
 
-### Task 5: Implement `raise skill validate` Command
+### Task 5: Implement `rai skill validate` Command
 
 - **Description:** Validate skill structure against schema. Check frontmatter, required fields, hook paths, required sections.
 - **Files:**
-  - `src/raise_cli/skills/validator.py` (new)
-  - `src/raise_cli/cli/commands/skill.py` (add validate command)
+  - `src/rai_cli/skills/validator.py` (new)
+  - `src/rai_cli/cli/commands/skill.py` (add validate command)
   - `tests/skills/test_validator.py` (new)
   - `tests/cli/commands/test_skill.py` (add validate tests)
 - **TDD Cycle:** RED → GREEN → REFACTOR
@@ -70,12 +70,12 @@
 - **Size:** M
 - **Dependencies:** Task 4
 
-### Task 6: Implement `raise skill check-name` Command
+### Task 6: Implement `rai skill check-name` Command
 
 - **Description:** Check proposed skill name against ontology patterns (PAT-130-136). Verify {domain}-{action} pattern, no conflicts with existing skills or CLI commands.
 - **Files:**
-  - `src/raise_cli/skills/naming.py` (new)
-  - `src/raise_cli/cli/commands/skill.py` (add check-name command)
+  - `src/rai_cli/skills/naming.py` (new)
+  - `src/rai_cli/cli/commands/skill.py` (add check-name command)
   - `tests/skills/test_naming.py` (new)
   - `tests/cli/commands/test_skill.py` (add check-name tests)
 - **TDD Cycle:** RED → GREEN → REFACTOR
@@ -83,12 +83,12 @@
 - **Size:** S
 - **Dependencies:** Task 4
 
-### Task 7: Implement `raise skill scaffold` Command
+### Task 7: Implement `rai skill scaffold` Command
 
 - **Description:** Generate new SKILL.md from template file (`.raise/templates/skill.md`). Template uses `{{placeholder}}` syntax for substitution. Scaffold validates name before generating.
 - **Files:**
-  - `src/raise_cli/skills/scaffold.py` (new)
-  - `src/raise_cli/cli/commands/skill.py` (add scaffold command)
+  - `src/rai_cli/skills/scaffold.py` (new)
+  - `src/rai_cli/cli/commands/skill.py` (add scaffold command)
   - `tests/skills/test_scaffold.py` (new)
   - `tests/cli/commands/test_skill.py` (add scaffold tests)
 - **Template:** `.raise/templates/skill.md` (already created)
@@ -111,10 +111,10 @@
 
 - **Description:** Validate all four commands work end-to-end with actual skills directory.
 - **Verification:**
-  - `uv run raise skill list` shows all 20 skills grouped by lifecycle
-  - `uv run raise skill validate` validates all skills
-  - `uv run raise skill check-name test-skill` gives correct feedback
-  - `uv run raise skill scaffold test-skill --lifecycle utility` creates valid SKILL.md
+  - `uv run rai skill list` shows all 20 skills grouped by lifecycle
+  - `uv run rai skill validate` validates all skills
+  - `uv run rai skill check-name test-skill` gives correct feedback
+  - `uv run rai skill scaffold test-skill --lifecycle utility` creates valid SKILL.md
 - **Size:** XS
 - **Dependencies:** All previous tasks
 

@@ -34,7 +34,7 @@ Create the reference document from research. Not yet integrated into framework.
 
 | Task | Description | Depends On | Est |
 |------|-------------|------------|-----|
-| T2.1 | Fix `raise init` output — add CLI vs Skills explanation | — | 30m |
+| T2.1 | Fix `rai init` output — add CLI vs Skills explanation | — | 30m |
 | T2.2 | Add post-init guidance — show manifest, next steps | T2.1 | 20m |
 | T2.3 | Resolve MemoryGraph deprecation — assess and fix | — | 45m |
 | **T2.X** | **Commit: "fix(init): clarify CLI vs Skills, resolve deprecations"** | T2.1-T2.3 | — |
@@ -80,7 +80,7 @@ Create the reference document from research. Not yet integrated into framework.
 |------|-------------|------------|-----|
 | T3.1 | Run full test suite, ensure >90% coverage | Phase 2 | 10m |
 | T3.2 | Run existing pre-commit hooks on full codebase | Phase 2 | 5m |
-| T3.3 | Manual test: fresh `raise init` flow | T2.1-T2.2 | 10m |
+| T3.3 | Manual test: fresh `rai init` flow | T2.1-T2.2 | 10m |
 | T3.4 | Review guardrails-stack.md against what we learned fixing code | Phase 2 | 15m |
 | **T3.X** | **Commit: "test(f14.0): verify fixes, refine guardrails"** | T3.1-T3.4 | — |
 

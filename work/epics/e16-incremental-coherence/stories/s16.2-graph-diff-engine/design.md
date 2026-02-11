@@ -10,22 +10,22 @@ modules: [context, memory, cli]
 
 ## What & Why
 
-**Problem:** The unified graph is rebuilt from scratch each `raise memory build`, but there's no way to know what changed. Without a diff, `/docs-update` (S16.3) can't know which modules need doc updates, forcing full re-examination every time.
+**Problem:** The unified graph is rebuilt from scratch each `rai memory build`, but there's no way to know what changed. Without a diff, `/docs-update` (S16.3) can't know which modules need doc updates, forcing full re-examination every time.
 
 **Value:** A structured diff between graph builds tells downstream consumers exactly what changed, enabling targeted doc updates at story-close. This is the foundation for incremental coherence — small-batch updates instead of periodic big-bang audits.
 
 ## Approach
 
-Pure function `diff_graphs(old, new)` in `context/diff.py` compares two `UnifiedGraph` instances by node presence and semantic fields. No edge comparison — edges are derived from nodes and rebuilt each build. The diff is computed by default on every `raise memory build` and persisted for downstream consumption.
+Pure function `diff_graphs(old, new)` in `context/diff.py` compares two `UnifiedGraph` instances by node presence and semantic fields. No edge comparison — edges are derived from nodes and rebuilt each build. The diff is computed by default on every `rai memory build` and persisted for downstream consumption.
 
 **Components:**
 
 | Component | Change | Location |
 |-----------|--------|----------|
-| `GraphDiff`, `NodeChange` models | Create | `src/raise_cli/context/diff.py` |
-| `diff_graphs()` function | Create | `src/raise_cli/context/diff.py` |
-| `raise memory build` command | Modify | `src/raise_cli/cli/commands/memory.py` |
-| context module `__init__.py` | Modify | `src/raise_cli/context/__init__.py` |
+| `GraphDiff`, `NodeChange` models | Create | `src/rai_cli/context/diff.py` |
+| `diff_graphs()` function | Create | `src/rai_cli/context/diff.py` |
+| `rai memory build` command | Modify | `src/rai_cli/cli/commands/memory.py` |
+| context module `__init__.py` | Modify | `src/rai_cli/context/__init__.py` |
 
 ## Data Models
 
@@ -73,7 +73,7 @@ def diff_graphs(old: UnifiedGraph, new: UnifiedGraph) -> GraphDiff
 
 ## CLI Integration
 
-**`raise memory build` updated flow:**
+**`rai memory build` updated flow:**
 
 ```
 1. Load old graph from index.json (if exists)
@@ -88,7 +88,7 @@ def diff_graphs(old: UnifiedGraph, new: UnifiedGraph) -> GraphDiff
 
 **CLI output example:**
 ```
-$ raise memory build
+$ rai memory build
 Built graph: 347 nodes, 412 edges
 Diff: 3 nodes changed (2 modified, 1 added), 2 modules affected (mod-context, mod-memory)
 Impact: module
@@ -97,7 +97,7 @@ Saved diff to .raise/rai/personal/last-diff.json
 
 **No changes example:**
 ```
-$ raise memory build
+$ rai memory build
 Built graph: 345 nodes, 410 edges
 Diff: no changes
 ```
@@ -127,7 +127,7 @@ Diff: no changes
 - `diff_graphs()` detects added, removed, and modified nodes correctly
 - Impact classification distinguishes none/module/architectural
 - `affected_modules` derived accurately from node changes
-- `raise memory build` diffs by default and persists result
+- `rai memory build` diffs by default and persists result
 - `--no-diff` flag skips diff computation
 - First build (no previous graph) handled gracefully
 - Tested against real raise-commons graph snapshots

@@ -10,13 +10,13 @@
 ## In Scope
 
 1. **`/discover-document` skill** — Orchestrates documentation generation from discovery data
-2. **`raise discover document` CLI command** — Deterministic generation of architecture docs
+2. **`rai discover document` CLI command** — Deterministic generation of architecture docs
 3. **Jinja2 template** for architecture overview (Mermaid diagrams, module catalog, dependency flow)
 4. **Output:** `dev/architecture-overview.md` — human-readable, onboarding-ready
 
 ## Out of Scope
 
-- Auto-refresh cycle (future: `raise discover refresh` wrapper)
+- Auto-refresh cycle (future: `rai discover refresh` wrapper)
 - Non-Python language support
 - Integration with external doc systems (Confluence, etc.)
 - Interactive/web-based documentation viewer
@@ -30,7 +30,7 @@
 
 ## Done Criteria
 
-- [ ] `raise discover document` generates `dev/architecture-overview.md`
+- [ ] `rai discover document` generates `dev/architecture-overview.md`
 - [ ] Output includes: module overview, component catalog by concern, dependency flow, entry points, Mermaid diagrams
 - [ ] Skill `/discover-document` works end-to-end
 - [ ] Tests pass (>90% coverage on new code)

@@ -13,13 +13,13 @@ dependencies: [F14.1, F14.2, F14.3]
 
 ## What & Why
 
-**Problem:** After `raise init`, `.raise/rai/` is empty — no identity, no patterns, no methodology. Users get a CLI but not Rai. The "reliable" promise depends entirely on user discipline until they manually set up Rai.
+**Problem:** After `rai init`, `.raise/rai/` is empty — no identity, no patterns, no methodology. Users get a CLI but not Rai. The "reliable" promise depends entirely on user discipline until they manually set up Rai.
 
-**Value:** New users get a capable AI partner from the first `raise init`. Base identity and universal patterns are available immediately, enabling skills and memory to function from day one.
+**Value:** New users get a capable AI partner from the first `rai init`. Base identity and universal patterns are available immediately, enabling skills and memory to function from day one.
 
 ## Approach
 
-Add a bootstrap step to `raise init` that copies bundled base assets from the `raise_cli.rai_base` package to the project's `.raise/rai/` directory.
+Add a bootstrap step to `rai init` that copies bundled base assets from the `raise_cli.rai_base` package to the project's `.raise/rai/` directory.
 
 **Components affected:**
 
@@ -119,9 +119,9 @@ class BootstrapResult(BaseModel):
 ## Acceptance Criteria
 
 **MUST:**
-- `raise init` copies base identity (core.md, perspective.md) to `.raise/rai/identity/`
-- `raise init` copies base patterns to `.raise/rai/memory/patterns.jsonl`
-- `raise init` copies methodology.yaml to `.raise/rai/framework/`
+- `rai init` copies base identity (core.md, perspective.md) to `.raise/rai/identity/`
+- `rai init` copies base patterns to `.raise/rai/memory/patterns.jsonl`
+- `rai init` copies methodology.yaml to `.raise/rai/framework/`
 - Existing files are never overwritten (idempotent)
 - Bootstrap reports what was copied vs skipped
 - Works on fresh project (no `.raise/` exists yet)

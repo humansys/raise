@@ -274,7 +274,7 @@ raise/
 **Week 4**: Post-Execution Gates
 - Convert 3 Markdown gates to YAML
 - Implement gate runner
-- CLI commands (`raise gate run`)
+- CLI commands (`rai gate run`)
 
 **Deliverable**: User runs `/raise.1.discovery`, pre-gate checks, kata executes, post-gate validates. Deterministic enforcement.
 

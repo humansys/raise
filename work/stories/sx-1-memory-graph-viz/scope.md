@@ -9,7 +9,7 @@
 - Color-coded nodes by type (component, pattern, session, etc.)
 - Filterable by node type
 - Zoomable/pannable force-directed layout
-- CLI command to generate the HTML (`raise memory viz` or similar)
+- CLI command to generate the HTML (`rai memory viz` or similar)
 - Self-contained single HTML file (no external dependencies at runtime)
 
 **Out of Scope:**
@@ -20,7 +20,7 @@
 - Styling beyond functional demo-readiness
 
 **Done Criteria:**
-- [ ] `raise memory viz` (or equivalent) generates an interactive HTML file
+- [ ] `rai memory viz` (or equivalent) generates an interactive HTML file
 - [ ] HTML opens in browser showing graph with colored nodes and labeled edges
 - [ ] User can filter by node type
 - [ ] User can zoom/pan and hover for details

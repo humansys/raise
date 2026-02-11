@@ -2,7 +2,7 @@
 name: project-create
 description: >
   Guide greenfield project setup through conversation. Fills governance templates
-  with project-specific content and builds the knowledge graph. Use after raise init
+  with project-specific content and builds the knowledge graph. Use after rai init
   on a new project.
 
 license: MIT
@@ -22,7 +22,7 @@ metadata:
 
 ## Purpose
 
-Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `raise memory build` produces 30+ governance nodes, making `/session-start` immediately useful.
+Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `rai memory build` produces 30+ governance nodes, making `/session-start` immediately useful.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -35,17 +35,17 @@ Guide a developer through greenfield project setup via conversation. Collect pro
 ## Context
 
 **When to use:**
-- After `raise init` on a new (greenfield) project
+- After `rai init` on a new (greenfield) project
 - When `governance/` exists but contains only placeholder templates
 - When starting a project from scratch
 
 **When to skip:**
 - Project already has filled governance docs (non-placeholder content)
 - Brownfield project with existing code → use `/project-onboard` instead
-- Project not yet initialized → run `raise init` first
+- Project not yet initialized → run `rai init` first
 
 **Inputs required:**
-- A project with `raise init` already completed (`governance/` directory exists)
+- A project with `rai init` already completed (`governance/` directory exists)
 - Developer's knowledge of what they're building
 
 **Output:**
@@ -64,8 +64,8 @@ ls governance/prd.md governance/vision.md governance/guardrails.md governance/ba
 ```
 
 **Decision:**
-- 6 files found → Continue (templates exist from `raise init`)
-- 0 files → **STOP.** Tell the user: "Run `raise init` first to scaffold governance templates."
+- 6 files found → Continue (templates exist from `rai init`)
+- 0 files → **STOP.** Tell the user: "Run `rai init` first to scaffold governance templates."
 - Some but not all → Warn and continue with available templates
 
 **Also check for existing content:**
@@ -87,7 +87,7 @@ If source code exists, suggest: "This looks like an existing project. Consider `
 
 **Verification:** Governance templates exist and are ready to fill.
 
-> **If you can't continue:** No governance/ → Run `raise init` first. Always.
+> **If you can't continue:** No governance/ → Run `rai init` first. Always.
 
 ### Step 2: Collect Project Identity
 
@@ -370,14 +370,14 @@ version: "1.0.0"
 Run the graph builder and verify the 30+ node gate.
 
 ```bash
-raise memory build
+rai memory build
 ```
 
 **Expected output:** The build should show governance nodes extracted from each doc.
 
 **Verification gate:**
 ```bash
-raise memory query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
+rai memory query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
 ```
 
 Count the governance nodes. You need **30+ total** across these types:
@@ -392,7 +392,7 @@ Count the governance nodes. You need **30+ total** across these types:
 - 30+ nodes → **Gate passed.** Continue to summary.
 - <30 nodes → Investigate which docs didn't parse. Check format against parser contract in Step 6. Fix and rebuild.
 
-**Verification:** `raise memory build` succeeds and produces 30+ governance nodes.
+**Verification:** `rai memory build` succeeds and produces 30+ governance nodes.
 
 > **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header. Fix the specific doc and rebuild.
 
@@ -429,7 +429,7 @@ Present what was created and what to do next.
 | Item | Destination |
 |------|-------------|
 | Filled governance docs | `governance/` (prd.md, vision.md, guardrails.md, backlog.md, architecture/) |
-| Knowledge graph | `.raise/rai/memory/index.json` (via `raise memory build`) |
+| Knowledge graph | `.raise/rai/memory/index.json` (via `rai memory build`) |
 | Summary | Displayed to user |
 
 ## Notes
@@ -448,8 +448,8 @@ This skill is for **greenfield** projects only. It asks "what do you want to bui
 
 ## References
 
-- Prerequisite: `raise init` (governance scaffolding from S7.1)
+- Prerequisite: `rai init` (governance scaffolding from S7.1)
 - Next: `/session-start`
 - Sibling: `/project-onboard` (brownfield)
-- Parser sources: `src/raise_cli/governance/parsers/*.py`
-- Template sources: `src/raise_cli/rai_base/governance/*.md`
+- Parser sources: `src/rai_cli/governance/parsers/*.py`
+- Template sources: `src/rai_cli/rai_base/governance/*.md`

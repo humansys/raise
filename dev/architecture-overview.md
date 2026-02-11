@@ -66,7 +66,7 @@ raise-commons/
 │   ├── prd.md           # Project-level
 │   └── ...              # All artifacts at root level
 │
-├── src/raise_cli/       # CLI implementation
+├── src/rai_cli/       # CLI implementation
 │
 ├── work/                # Active work
 │   ├── stories/        # Feature specs
@@ -93,9 +93,9 @@ Based on **ADR-012: Skills + CLI Toolkit Architecture**:
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                    Governance Toolkit                        │
-│   raise memory query    → MVC retrieval (97% token savings) │
-│   raise memory build      → Build concept graphs              │
-│   raise discover scan    → Extract code components           │
+│   rai memory query    → MVC retrieval (97% token savings) │
+│   rai memory build      → Build concept graphs              │
+│   rai discover scan    → Extract code components           │
 │   raise telemetry emit   → Capture learning signals          │
 └─────────────────────────────────────────────────────────────┘
                             │
@@ -114,7 +114,7 @@ Based on **ADR-012: Skills + CLI Toolkit Architecture**:
 ## 4. CLI Module Structure
 
 ```
-src/raise_cli/
+src/rai_cli/
 ├── cli/                    # Typer CLI layer
 │   ├── commands/           # Command modules
 │   │   ├── context.py      # MVC queries
@@ -205,7 +205,7 @@ Based on **ADR-019: Unified Context Graph** and **ADR-020: Knowledge Graph Compl
 
 ```bash
 # Query with MVC (Minimum Viable Context)
-raise memory query "error handling" --unified --type component
+rai memory query "error handling" --unified --type component
 
 # Result: 7 concepts, 118 tokens, 2.8ms
 # vs reading files directly: ~5000 tokens (97% savings)
@@ -363,7 +363,7 @@ Session Work  →  Telemetry Writer  →  signals.jsonl
 ## 12. Extension Points
 
 ### Adding a New Parser
-1. Create `src/raise_cli/governance/parsers/new_type.py`
+1. Create `src/rai_cli/governance/parsers/new_type.py`
 2. Implement `extract_*` functions returning `Concept` objects
 3. Register in `UnifiedGraphBuilder._extract_*` method
 4. Add tests in `tests/governance/parsers/`
@@ -376,7 +376,7 @@ Session Work  →  Telemetry Writer  →  signals.jsonl
 ### Adding a New Node Type
 1. Extend `NodeType` literal in `context/models.py`
 2. Add extraction logic in `context/builder.py`
-3. Update `raise memory build --unified` if needed
+3. Update `rai memory build --unified` if needed
 
 ---
 

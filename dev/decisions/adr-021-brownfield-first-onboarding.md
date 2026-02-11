@@ -46,7 +46,7 @@ This works for greenfield but fails brownfield because:
 
 **Default to full discovery + convention detection for brownfield projects.**
 
-### `raise init` Behavior
+### `rai init` Behavior
 
 ```
 raise init
@@ -157,8 +157,8 @@ raise init
 ### Alternative C: Discovery as Separate Step
 
 ```
-raise init              # Minimal setup
-raise discover          # Explicit discovery step
+rai init              # Minimal setup
+rai discover          # Explicit discovery step
 raise generate-rules    # Generate governance
 ```
 

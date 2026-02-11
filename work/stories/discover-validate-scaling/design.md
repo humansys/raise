@@ -22,23 +22,23 @@ template: "lean-feature-spec-v2"
 
 **Problem**: The current `/discover-validate` skill presents 500+ symbols one-by-one for human review. On raise-cli (374 public components), this needed ~37 batches. On brownfield (50-200K lines), it'd need 200-500 batches. The process doesn't scale — and fatigue causes rubber-stamping after ~50 items, making it less reliable than upstream signal quality.
 
-**Value**: A new deterministic CLI tool (`raise discover analyze`) computes confidence scores, auto-categorizes by path conventions, and groups components by module for parallel AI synthesis — reducing AI work by 60-70% and human decisions from O(components) to O(modules). The AI only synthesizes what's genuinely ambiguous. The human only reviews exceptions.
+**Value**: A new deterministic CLI tool (`rai discover analyze`) computes confidence scores, auto-categorizes by path conventions, and groups components by module for parallel AI synthesis — reducing AI work by 60-70% and human decisions from O(components) to O(modules). The AI only synthesizes what's genuinely ambiguous. The human only reviews exceptions.
 
 ---
 
 ## 2. Approach
 
-**How we'll solve it**: Build a deterministic `raise discover analyze` CLI command that takes raw scan output (`ScanResult`) and produces an `AnalysisResult` with confidence-scored, hierarchically-grouped, module-grouped components. Then rewrite the `/discover-scan` and `/discover-validate` skills to use this tool — the scan skill calls `analyze` after scanning, the validate skill processes module groups as parallel batches for AI synthesis with drill-down only on exceptions.
+**How we'll solve it**: Build a deterministic `rai discover analyze` CLI command that takes raw scan output (`ScanResult`) and produces an `AnalysisResult` with confidence-scored, hierarchically-grouped, module-grouped components. Then rewrite the `/discover-scan` and `/discover-validate` skills to use this tool — the scan skill calls `analyze` after scanning, the validate skill processes module groups as parallel batches for AI synthesis with drill-down only on exceptions.
 
 **Components affected**:
 
 | Component | Change | Purpose |
 |-----------|--------|---------|
-| `src/raise_cli/discovery/analyzer.py` | **Create** | Confidence scoring, hierarchy build, path-based categorization, module grouping |
-| `src/raise_cli/cli/commands/discover.py` | **Modify** | Add `raise discover analyze` subcommand |
-| `src/raise_cli/output/formatters/discover.py` | **Modify** | Add `format_analyze_result()` formatter |
-| `src/raise_cli/discovery/scanner.py` | No change | Existing `ScanResult` is the input |
-| `.claude/skills/discover-scan/SKILL.md` | **Modify** | Call `raise discover analyze` after scan |
+| `src/rai_cli/discovery/analyzer.py` | **Create** | Confidence scoring, hierarchy build, path-based categorization, module grouping |
+| `src/rai_cli/cli/commands/discover.py` | **Modify** | Add `rai discover analyze` subcommand |
+| `src/rai_cli/output/formatters/discover.py` | **Modify** | Add `format_analyze_result()` formatter |
+| `src/rai_cli/discovery/scanner.py` | No change | Existing `ScanResult` is the input |
+| `.claude/skills/discover-scan/SKILL.md` | **Modify** | Call `rai discover analyze` after scan |
 | `.claude/skills/discover-validate/SKILL.md` | **Rewrite** | Module-level parallel batches with confidence tiers |
 | `tests/discovery/test_analyzer.py` | **Create** | Unit tests for analyzer logic |
 
@@ -50,16 +50,16 @@ template: "lean-feature-spec-v2"
 
 ```bash
 # Analyze scan output (pipe from scan)
-raise discover scan src/raise_cli --language python --output json | raise discover analyze --output json
+rai discover scan src/rai_cli --language python --output json | rai discover analyze --output json
 
 # Analyze from file (saved scan output)
-raise discover analyze --input scan-result.json --output human
+rai discover analyze --input scan-result.json --output human
 
 # Analyze with custom path-category mappings
-raise discover analyze --input scan-result.json --category-map project-categories.yaml
+rai discover analyze --input scan-result.json --category-map project-categories.yaml
 
 # Just the summary statistics
-raise discover analyze --input scan-result.json --output summary
+rai discover analyze --input scan-result.json --output summary
 ```
 
 ### 3.2 Expected Output (human format)
@@ -123,7 +123,7 @@ Saved: work/discovery/analysis.json
       "id": "comp-scanner-symbol",
       "name": "Symbol",
       "kind": "class",
-      "file": "src/raise_cli/discovery/scanner.py",
+      "file": "src/rai_cli/discovery/scanner.py",
       "line": 44,
       "signature": "class Symbol(BaseModel)",
       "module": "raise_cli.discovery.scanner",
@@ -147,14 +147,14 @@ Saved: work/discovery/analysis.json
     }
   ],
   "module_groups": {
-    "src/raise_cli/discovery/scanner.py": [
+    "src/rai_cli/discovery/scanner.py": [
       "comp-scanner-symbol",
       "comp-scanner-scanresult",
       "comp-scanner-extract_python_symbols",
       "comp-scanner-scan_directory",
       "comp-scanner-detect_language"
     ],
-    "src/raise_cli/discovery/drift.py": [
+    "src/rai_cli/discovery/drift.py": [
       "comp-drift-driftwarning",
       "comp-drift-detect_drift"
     ]
@@ -165,7 +165,7 @@ Saved: work/discovery/analysis.json
 ### 3.4 Data Structures
 
 ```python
-# --- New models in src/raise_cli/discovery/analyzer.py ---
+# --- New models in src/rai_cli/discovery/analyzer.py ---
 
 from pydantic import BaseModel, Field
 from typing import Literal
@@ -318,14 +318,14 @@ def compute_confidence(symbol: Symbol, path_category: str | None) -> ConfidenceR
 
 ### Must Have
 
-- [ ] `raise discover analyze` command accepts JSON scan output (stdin or `--input`)
+- [ ] `rai discover analyze` command accepts JSON scan output (stdin or `--input`)
 - [ ] Confidence scoring produces deterministic results (same input = same output)
 - [ ] Components scored into three tiers: high (>=70), medium (40-69), low (<40)
 - [ ] Path-based auto-categorization maps file paths to categories
 - [ ] Hierarchical folding: methods grouped under parent class as single unit
 - [ ] Module grouping: components grouped by source file for parallel AI synthesis batches
 - [ ] Output formats: `human`, `json`, `summary` (consistent with other discover commands)
-- [ ] `/discover-scan` skill updated to call `raise discover analyze` after scanning
+- [ ] `/discover-scan` skill updated to call `rai discover analyze` after scanning
 - [ ] `/discover-validate` skill rewritten with module-level parallel batches and confidence tiers
 - [ ] All new code has >90% test coverage
 - [ ] Validated on raise-cli's own codebase (human decisions reduced by >70% vs total components)
@@ -339,7 +339,7 @@ def compute_confidence(symbol: Symbol, path_category: str | None) -> ConfidenceR
 
 - [ ] **MUST NOT** require AI inference for confidence scoring — all signals are deterministic
 - [ ] **MUST NOT** change `ScanResult` or `Symbol` models — analyzer consumes existing output
-- [ ] **MUST NOT** break existing `raise discover scan`, `build`, or `drift` commands
+- [ ] **MUST NOT** break existing `rai discover scan`, `build`, or `drift` commands
 
 ---
 
@@ -391,7 +391,7 @@ And the skill can process each module group as a parallel AI batch
 ### Scenario 5: Pipe from scan command
 
 ```gherkin
-Given the user runs "raise discover scan src/ -l python -o json | raise discover analyze"
+Given the user runs "raise discover scan src/ -l python -o json | rai discover analyze"
 When the analyzer receives JSON on stdin
 Then it parses the ScanResult JSON correctly
 And produces the full AnalysisResult
@@ -411,7 +411,7 @@ And writes to work/discovery/analysis.json by default
 def analyze(scan_result: ScanResult, category_map: dict[str, str] | None = None) -> AnalysisResult:
     """
     Deterministic analysis pipeline. No AI, no network calls.
-    Input: ScanResult from raise discover scan
+    Input: ScanResult from rai discover scan
     Output: AnalysisResult with confidence, categories, hierarchy, module groups
     """
     categories = category_map or DEFAULT_CATEGORY_MAP
@@ -559,7 +559,7 @@ def group_by_module(units: list[AnalyzedComponent]) -> dict[str, list[str]]:
 - E13 Discovery scope: `work/epics/e13-discovery/scope.md`
 
 **Dependencies**:
-- Existing `raise discover scan` command (no changes needed)
+- Existing `rai discover scan` command (no changes needed)
 - `ScanResult` and `Symbol` Pydantic models (unchanged)
 
 ---

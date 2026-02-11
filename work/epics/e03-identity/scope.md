@@ -65,7 +65,7 @@ Done. No markdown sync needed.
 
 Human wants to inspect?
     ↓
-raise memory dump --format md
+rai memory dump --format md
 ```
 
 ### File Structure
@@ -130,15 +130,15 @@ Extracted from sessions, queryable via graph:
 - Extract Emilio relationship data to humans.jsonl
 - Memory graph using E2's ConceptGraph infrastructure
 - Memory extractors (pattern, insight, calibration, decision)
-- CLI: `raise memory query "topic"` — returns relevant memories via graph
-- CLI: `raise memory dump [--format md|json]` — export for human inspection
+- CLI: `rai memory query "topic"` — returns relevant memories via graph
+- CLI: `rai memory dump [--format md|json]` — export for human inspection
 - Update /session-start to query memory graph
 - Update /session-close to append JSONL + rebuild graph
 - Type safety: all code type-annotated
 - Tests: >90% coverage on new code
 
 **SHOULD:**
-- CLI: `raise memory add` — manual memory entry
+- CLI: `rai memory add` — manual memory entry
 - Graceful fallback if `.rai/` missing (create from template)
 - Graph validation (detect orphan concepts)
 
@@ -170,8 +170,8 @@ Extracted from sessions, queryable via graph:
 - [x] `.rai/` structure created (identity/ as md, memory/ as jsonl)
 - [x] Content migrated from `.claude/rai/` to JSONL format
 - [x] Memory graph builds successfully from JSONL (47 nodes, 49 edges)
-- [x] `raise memory query` returns relevant results (0.24ms query time)
-- [x] `raise memory dump --format md` produces readable output
+- [x] `rai memory query` returns relevant results (0.24ms query time)
+- [x] `rai memory dump --format md` produces readable output
 - [ ] /session-start queries memory graph for context
 - [ ] /session-close appends to JSONL and rebuilds graph
 - [ ] Token savings measured (target: >80% vs loading all memory files)
@@ -235,7 +235,7 @@ F3.5 (Skills Integration)
 |--------|--------|------------|
 | Structure complete | identity/ (md) + memory/ (jsonl) | Directory check |
 | Migration complete | All content converted | Diff review |
-| Graph builds | Concepts extracted from JSONL | `raise memory query` works |
+| Graph builds | Concepts extracted from JSONL | `rai memory query` works |
 | Token savings | >80% vs raw files | Measure query output vs full load |
 | Query relevance | Returns useful context | Manual validation |
 | Dump readable | Human-friendly markdown | Visual check |

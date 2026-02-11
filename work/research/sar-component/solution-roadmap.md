@@ -43,9 +43,9 @@ El Open Core es el primer entregable, usando el patron "Deterministic Rails, Non
 
 | # | Componente | Entregable | Descripcion |
 |---|------------|------------|-------------|
-| 1 | SAR | Comando `raise sar analyze` | Pipeline de extraccion via LLM |
+| 1 | SAR | Comando `rai sar analyze` | Pipeline de extraccion via LLM |
 | 2 | SAR | JSON Schemas | Schemas para rule.yaml, graph.yaml |
-| 3 | raise.ctx | CLI `raise ctx get` | Retrieval determinista de MVC |
+| 3 | raise.ctx | CLI `rai ctx get` | Retrieval determinista de MVC |
 | 4 | Ambos | Documentacion | Guia de uso, ejemplos |
 
 **SAR - Caracteristicas:**
@@ -181,7 +181,7 @@ El producto Licensed agrega capacidades enterprise sobre Open Core.
 
 ---
 
-### Fase A3: CLI `raise ctx` (raise.ctx component)
+### Fase A3: CLI `rai ctx` (raise.ctx component)
 
 **Duracion estimada**: 1 semana
 **Objetivo**: Implementar el componente de entrega de MVC (raise.ctx)
@@ -189,7 +189,7 @@ El producto Licensed agrega capacidades enterprise sobre Open Core.
 
 **Tareas:**
 
-- [ ] **A3.1** Implementar comando base `raise ctx get`
+- [ ] **A3.1** Implementar comando base `rai ctx get`
   - Lee `.raise/rules/*.yaml` y `.raise/graph.yaml`
   - Parsea y valida datos de SAR
 

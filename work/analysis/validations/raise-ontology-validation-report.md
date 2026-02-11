@@ -189,7 +189,7 @@
 | 15-tech-stack-v2.md | ✅ | MELT framework, traces.py |
 | 20-glossary-v2.md | ✅ | Definición completa |
 | 21-methodology-v2.md | ✅ | Métricas section |
-| 23-commands-reference-v2.md | ✅ | `raise audit` command |
+| 23-commands-reference-v2.md | ✅ | `rai audit` command |
 
 **Cobertura Observable Workflow: 8/8 (100%)**
 
@@ -200,7 +200,7 @@
 | 10-system-architecture-v2.md | ✅ | Componente CORE designation |
 | 15-tech-stack-v2.md | ✅ | MCP stack section |
 | 30-roadmap-v2.md | ✅ | v0.2 (promovido de v0.3) |
-| 23-commands-reference-v2.md | ✅ | `raise mcp` commands |
+| 23-commands-reference-v2.md | ✅ | `rai mcp` commands |
 | 01-product-vision-v2.md | ✅ | MCP-native differentiator |
 | 02-business-model-v2.md | ✅ | raise-mcp product |
 | 12-integration-patterns-v2.md | ✅ | MCP-native pattern |

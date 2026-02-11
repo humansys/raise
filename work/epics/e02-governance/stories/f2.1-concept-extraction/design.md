@@ -26,7 +26,7 @@ Build regex-based parsers that extract semantic concepts from structured markdow
 Each parser produces `Concept` objects with metadata (type, file location, content, line numbers) that feed the graph builder (F2.2).
 
 **Components affected**:
-- CREATE: `src/raise_cli/governance/` (new module)
+- CREATE: `src/rai_cli/governance/` (new module)
   - `parsers/prd.py` - Extract requirements
   - `parsers/vision.py` - Extract outcomes
   - `parsers/constitution.py` - Extract principles
@@ -153,7 +153,7 @@ class ExtractionResult(BaseModel):
 - Return `Concept` objects with complete metadata (id, type, file, section, lines, content)
 - Handle missing files gracefully (skip with warning, not crash)
 - Truncate long content (>500 chars) to avoid graph bloat
-- CLI command `raise graph extract` functional
+- CLI command `rai graph extract` functional
 - >90% test coverage on parsers
 - All parsers pass type checking (`pyright --strict`)
 

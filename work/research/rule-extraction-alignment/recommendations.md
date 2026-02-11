@@ -1754,7 +1754,7 @@ raise-cli skills publish @myorg/custom-rules
 
 #### Phase 2: CLI Tool (6 weeks)
 
-**Script**: `raise-cli` (Python or Bash)
+**Script**: `rai-cli` (Python or Bash)
 
 ```python
 # raise-cli skills install @raise/react-best-practices

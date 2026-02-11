@@ -37,7 +37,7 @@
 - **Duration:** ~9 min (estimated: 30-60 min)
 - **Notes:** Orchestrator coordinates all parsers. 14 tests passing, 78% coverage. All 73 governance tests pass!
 
-### Task 6: Add CLI Command `raise graph extract`
+### Task 6: Add CLI Command `rai graph extract`
 - **Started:** 19:52
 - **Completed:** 20:02
 - **Duration:** ~10 min (estimated: 30-60 min)

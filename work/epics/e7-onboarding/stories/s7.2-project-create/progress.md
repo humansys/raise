@@ -17,11 +17,11 @@
 
 ### Task 3: Register in DISTRIBUTABLE_SKILLS and scaffold locally
 - **Duration:** ~5 min
-- **Notes:** Added to list, updated docstring, ran `raise init` to scaffold. Skill immediately visible in available skills list.
+- **Notes:** Added to list, updated docstring, ran `rai init` to scaffold. Skill immediately visible in available skills list.
 
 ### Task 4: Integration test — parser contract validation
 - **Duration:** ~15 min
-- **Notes:** Created temp project, ran `raise init` (greenfield detected), filled governance docs with skill-format content, tested with actual parsers. First run: 19 nodes (FAIL). Calibrated content density: 8 reqs + 7 outcomes + 13 guardrails + 1 project + 5 epics = 34 nodes (PASS). Updated skill guidance to reflect calibrated minimums.
+- **Notes:** Created temp project, ran `rai init` (greenfield detected), filled governance docs with skill-format content, tested with actual parsers. First run: 19 nodes (FAIL). Calibrated content density: 8 reqs + 7 outcomes + 13 guardrails + 1 project + 5 epics = 34 nodes (PASS). Updated skill guidance to reflect calibrated minimums.
 
 ## Blockers
 - None

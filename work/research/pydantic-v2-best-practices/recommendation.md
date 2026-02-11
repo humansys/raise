@@ -137,7 +137,7 @@ def output_result(result: BaseModel, format: str) -> None:
 
 **Code Pattern - TypeAdapter Reuse:**
 ```python
-# In src/raise_cli/schemas/adapters.py
+# In src/rai_cli/schemas/adapters.py
 from pydantic import TypeAdapter
 from .graph import NodeData, EdgeData
 

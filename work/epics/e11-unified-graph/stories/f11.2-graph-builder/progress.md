@@ -25,7 +25,7 @@
 ### Task 4: CLI Command
 - **Duration:** ~20 min
 - **Tests:** 6 passing (28 total for context module + CLI)
-- **Notes:** `raise graph build --unified` flag, node/edge counts by type
+- **Notes:** `rai graph build --unified` flag, node/edge counts by type
 
 ### Task 5: Manual Integration Test
 - **Duration:** ~5 min

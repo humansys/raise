@@ -114,5 +114,5 @@ trait, component) as of S17.1. No changes needed.
 
 | File | Change |
 |------|--------|
-| `src/raise_cli/discovery/analyzer.py` | Extend category map, generalize `_file_to_module` |
+| `src/rai_cli/discovery/analyzer.py` | Extend category map, generalize `_file_to_module` |
 | `tests/test_analyzer.py` | Add tests for new categories and module paths |

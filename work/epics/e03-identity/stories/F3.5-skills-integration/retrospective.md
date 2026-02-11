@@ -14,7 +14,7 @@
 - **Research-first approach:** Used claude-code-guide agent to understand hooks before implementing
 - **CLI commands work smoothly:** The writer API + CLI integration tested well end-to-end
 - **Hook scripts are simple:** Bash scripts with jq parsing - easy to debug and maintain
-- **Dogfooding the new tools:** Used `raise memory add-*` commands to record this retrospective
+- **Dogfooding the new tools:** Used `rai memory add-*` commands to record this retrospective
 
 ## What Could Improve
 

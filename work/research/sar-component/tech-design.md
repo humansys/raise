@@ -145,7 +145,7 @@ edges:
 ### 3.3 MVC Output Schema (raise.ctx)
 
 ```yaml
-# Output de `raise ctx get`
+# Output de `rai ctx get`
 # Schema: mvc-schema.json
 
 query:

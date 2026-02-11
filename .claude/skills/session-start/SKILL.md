@@ -36,7 +36,7 @@ Experience level is in the context bundle — adapt output verbosity accordingly
 ### Step 1: Load Context Bundle
 
 ```bash
-raise session start --project "$(pwd)" --context
+rai session start --project "$(pwd)" --context
 ```
 
 This single command:
@@ -49,10 +49,10 @@ This single command:
 
 **First-time user:** If no profile exists, ask for name:
 ```bash
-raise session start --name "Name" --project "$(pwd)" --context
+rai session start --name "Name" --project "$(pwd)" --context
 ```
 
-**If graph unavailable:** Run `raise memory build` first, then retry.
+**If graph unavailable:** Run `rai memory build` first, then retry.
 
 ### Step 2: Interpret & Present
 
@@ -102,7 +102,7 @@ Go.
 
 ## References
 
-- Context bundle: `raise session start --context`
+- Context bundle: `rai session start --context`
 - Profile: `~/.rai/developer.yaml`
 - Session state: `.raise/rai/session-state.yaml`
 - Memory graph: `.raise/rai/memory/index.json`

@@ -35,7 +35,7 @@
 ### Task 7: Export from Package
 - **Started:** 15:00
 - **Completed:** 15:02
-- **Notes:** All exceptions exported from `raise_cli` root
+- **Notes:** All exceptions exported from `rai_cli` root
 
 ### Task 6: Integration Test
 - **Started:** 15:02
@@ -52,5 +52,5 @@
 
 ## Verification
 - `pytest tests/` - 140 passed, 91% coverage
-- `pyright src/raise_cli/` - 0 errors
-- `ruff check src/raise_cli/` - All checks passed
+- `pyright src/rai_cli/` - 0 errors
+- `ruff check src/rai_cli/` - All checks passed

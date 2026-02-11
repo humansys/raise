@@ -126,7 +126,7 @@ Rai queries: "What are the steps of /story-start?"
 - Tests must pass before commit
 
 ## When I Need Details
-Query: `raise context query "[topic]" --unified`
+Query: `rai context query "[topic]" --unified`
 ```
 
 ---

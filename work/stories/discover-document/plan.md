@@ -11,7 +11,7 @@
 
 ## Design Deviation
 
-The original design specified a `raise discover describe` CLI command with a `describer.py` module. After review, we determined:
+The original design specified a `rai discover describe` CLI command with a `describer.py` module. After review, we determined:
 
 1. **The CLI command adds no meaningful value** — architecture docs are generated infrequently and benefit from AI prose synthesis, not template assembly
 2. **Useful onboarding docs need genuine explanations** — a new developer needs to understand *why* modules exist and *how* they fit, not just see dependency tables
@@ -26,7 +26,7 @@ The original design specified a `raise discover describe` CLI command with a `de
 
 - **Description:** Add `module` to NodeType and `depends_on` to EdgeType in context/models.py. This is the foundation — the graph must represent module-level knowledge and inter-module dependencies.
 - **Files:**
-  - `src/raise_cli/context/models.py` — Add to Literal types
+  - `src/rai_cli/context/models.py` — Add to Literal types
   - `tests/context/test_models.py` — Test new types are valid
 - **TDD Cycle:** RED (test module node creation) → GREEN (add to Literal) → REFACTOR
 - **Verification:** `pytest tests/context/ -x -q`
@@ -37,7 +37,7 @@ The original design specified a `raise discover describe` CLI command with a `de
 
 - **Description:** Extend UnifiedGraphBuilder with `load_architecture()` method that parses `governance/architecture/modules/*.md` YAML frontmatter and creates `module` nodes with `depends_on` edges in the unified graph. Wire into `build()` pipeline.
 - **Files:**
-  - `src/raise_cli/context/builder.py` — Add `load_architecture()` method
+  - `src/rai_cli/context/builder.py` — Add `load_architecture()` method
   - `tests/context/test_builder.py` — Test module nodes and depends_on edges appear in graph
 - **TDD Cycle:**
   - RED: Test graph contains module nodes after build with fixture arch docs
@@ -69,8 +69,8 @@ The original design specified a `raise discover describe` CLI command with a `de
 
 - **Description:** End-to-end validation: rebuild graph with architecture docs, verify module nodes and depends_on edges appear, verify queries return module relationships.
 - **Verification:**
-  - `raise memory build` succeeds with module nodes in graph
-  - `raise memory query "discovery dependencies"` returns module relationships
+  - `rai memory build` succeeds with module nodes in graph
+  - `rai memory query "discovery dependencies"` returns module relationships
   - All tests pass: `pytest --cov=src --cov-fail-under=90`
   - Linting clean: `ruff check . && ruff format --check .`
   - Type check clean: `pyright --strict src/`

@@ -17,7 +17,7 @@
 - **Dependencies:** None
 
 ### Task 2: Manual Integration Test
-- **Description:** Walk through the story-close skill mentally with a scenario: a story that changed `src/raise_cli/memory/...` files. Verify the step ordering makes sense and the skip condition triggers correctly for a docs-only story.
+- **Description:** Walk through the story-close skill mentally with a scenario: a story that changed `src/rai_cli/memory/...` files. Verify the step ordering makes sense and the skip condition triggers correctly for a docs-only story.
 - **Verification:** Confirm the step flow is coherent end-to-end
 - **Size:** XS
 - **Dependencies:** Task 1

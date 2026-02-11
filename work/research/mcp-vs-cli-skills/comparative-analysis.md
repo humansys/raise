@@ -1244,7 +1244,7 @@ Tier 3 (Cold): RAG Retrieval
 - **Deliverable**: Observability dashboard, auto-optimization
 
 **Phase 5: Tooling (Months 10-12)** - UX
-- CLI tools for managing rules (`raise rules add/list/test`)
+- CLI tools for managing rules (`rai rules add/list/test`)
 - IDE extensions (VS Code, Cursor)
 - Rule effectiveness analytics (which rules help most?)
 - Migration tools from other frameworks

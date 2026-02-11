@@ -12,7 +12,7 @@
 - Skill-only story kept scope tight — no Python modules, no CLI commands, just one well-crafted SKILL.md
 - S7.1's template-as-contract pattern (PAT-202) carried forward perfectly — templates provided the structure, skill fills the content
 - Reading all 4 parser source files before writing the skill ensured format correctness from the start
-- Integration test on temp project validated the full flow: `raise init` → fill docs → `raise memory build` → node extraction
+- Integration test on temp project validated the full flow: `rai init` → fill docs → `rai memory build` → node extraction
 
 ## What Could Improve
 - First integration test only produced 19 nodes (target: 30+). The design suggested "3-5 requirements" but didn't calculate whether that volume could hit the gate.

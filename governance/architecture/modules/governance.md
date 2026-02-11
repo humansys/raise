@@ -21,7 +21,7 @@ constraints:
 
 ## Purpose
 
-The governance module reads markdown governance files (Constitution, PRD, Vision, Guardrails, Backlog, Glossary, ADRs) and extracts structured `Concept` objects from them. These concepts become nodes in the unified context graph, making governance artifacts queryable via `raise memory query`.
+The governance module reads markdown governance files (Constitution, PRD, Vision, Guardrails, Backlog, Glossary, ADRs) and extracts structured `Concept` objects from them. These concepts become nodes in the unified context graph, making governance artifacts queryable via `rai memory query`.
 
 This is what makes RaiSE's "Governance as Code" principle concrete — the governance files aren't just documentation, they're **machine-readable data** that constrains and informs AI behavior.
 

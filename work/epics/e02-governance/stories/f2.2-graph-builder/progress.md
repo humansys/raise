@@ -35,7 +35,7 @@
 - **Started:** 21:50
 - **Completed:** 22:05
 - **Duration:** 15 min (estimated: 30-60 min)
-- **Notes:** Added `raise graph build` and `raise graph validate` commands. Build extracts concepts if not cached, infers relationships, saves to JSON. Validate checks for invalid edges and cycles. All 16 CLI tests pass (7 new tests for build/validate).
+- **Notes:** Added `rai graph build` and `rai graph validate` commands. Build extracts concepts if not cached, infers relationships, saves to JSON. Validate checks for invalid edges and cycles. All 16 CLI tests pass (7 new tests for build/validate).
 
 ### Task 6: Integration Tests & Performance Validation
 - **Started:** 22:05

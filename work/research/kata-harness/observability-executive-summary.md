@@ -226,14 +226,14 @@ raise dashboard
 ### Phase 1: Minimal Viable Observability (2 weeks)
 - Trace start/end events
 - Jidoka events
-- Basic CLI (`raise audit list/show`)
+- Basic CLI (`rai audit list/show`)
 
 **Deliverable**: Basic audit trail
 
 ### Phase 2: Step-Level Tracing (2 weeks)
 - Step start/end events
 - Token usage and latency
-- `raise metrics` command
+- `rai metrics` command
 
 **Deliverable**: Performance insights
 

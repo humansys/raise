@@ -36,11 +36,11 @@
 
 | Sección | Cambio Requerido |
 |---------|------------------|
-| Tabla de comandos core | `raise hydrate` → `raise pull` |
-| Sección `raise hydrate` | Renombrar a `raise pull`, actualizar descripción |
+| Tabla de comandos core | `rai hydrate` → `rai pull` |
+| Sección `rai hydrate` | Renombrar a `rai pull`, actualizar descripción |
 | Flag `--skip-hydrate` | Renombrar a `--skip-pull` |
 | Flag `--guardrails-only` | Mantener (aplica a `pull`) |
-| Sección `raise validate` | Renombrar a `raise kata`, reescribir como proceso |
+| Sección `rai validate` | Renombrar a `rai kata`, reescribir como proceso |
 | Ejemplos CI/CD | Actualizar comandos |
 | Pre-commit hooks | Actualizar comandos |
 
@@ -53,7 +53,7 @@
 
 | Sección | Cambio Requerido |
 |---------|------------------|
-| Diagrama "Flujo 2: Sincronización" | `raise hydrate` → `raise pull` |
+| Diagrama "Flujo 2: Sincronización" | `rai hydrate` → `rai pull` |
 | Tabla de comandos raise-kit | Actualizar lista |
 | Descripción de flujos | Actualizar menciones |
 
@@ -66,7 +66,7 @@
 #### 30-roadmap-v2.md
 | Línea | Cambio |
 |-------|--------|
-| Backlog P0 | `raise hydrate` → `raise pull` |
+| Backlog P0 | `rai hydrate` → `rai pull` |
 | v0.1.0 checklist | Actualizar comando |
 
 ---
@@ -74,7 +74,7 @@
 #### 11-data-architecture-v2.md
 | Línea | Cambio |
 |-------|--------|
-| Flujo de transformación | `raise hydrate` → `raise pull` |
+| Flujo de transformación | `rai hydrate` → `rai pull` |
 | Migración scripts | Actualizar referencias |
 
 ---
@@ -82,7 +82,7 @@
 #### 24-examples-library-v2.md
 | Línea | Cambio |
 |-------|--------|
-| Ejemplos de uso | `raise hydrate` → `raise pull` |
+| Ejemplos de uso | `rai hydrate` → `rai pull` |
 
 ---
 
@@ -105,8 +105,8 @@
 - 1 mención de `hydrate` en flujo de seguridad
 
 #### 20-glossary-v2.md
-- Añadir entrada para `raise pull`
-- Añadir entrada para `raise kata`
+- Añadir entrada para `rai pull`
+- Añadir entrada para `rai kata`
 - Marcar `hydrate` como deprecated
 
 ---
@@ -117,8 +117,8 @@
 
 | Buscar | Reemplazar por |
 |--------|----------------|
-| `raise hydrate` | `raise pull` |
-| `raise validate` | `raise kata` |
+| `rai hydrate` | `rai pull` |
+| `rai validate` | `rai kata` |
 | `--skip-hydrate` | `--skip-pull` |
 | `hydrate command` | `pull command` |
 | `hydrate guardrails` | `pull Golden Data` |
@@ -128,7 +128,7 @@
 En **23-commands-reference-v2.md**:
 - Añadir sección "Contextos de Uso: Desarrollo vs CI/CD"
 - Añadir tabla de clasificación de comandos
-- Añadir sección `raise kata` completa con aliases
+- Añadir sección `rai kata` completa con aliases
 
 En **20-glossary-v2.md**:
 - Entrada: `pull` (comando)

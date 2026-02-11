@@ -24,7 +24,7 @@ metadata:
 
 Validate component descriptions using a confidence-tier workflow that reduces human decisions from O(components) to O(modules + exceptions). High-confidence components are auto-validated. Medium-confidence components are reviewed as module batches with AI synthesis. Low-confidence components get individual human review.
 
-**Key insight:** The deterministic analyzer (`raise discover analyze`) already did the heavy lifting. This skill only involves the human where it matters.
+**Key insight:** The deterministic analyzer (`rai discover analyze`) already did the heavy lifting. This skill only involves the human where it matters.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -45,7 +45,7 @@ Validate component descriptions using a confidence-tier workflow that reduces hu
 - No `analysis.json` (run `/discover-scan` first)
 
 **Inputs required:**
-- `work/discovery/analysis.json` from `/discover-scan` (via `raise discover analyze`)
+- `work/discovery/analysis.json` from `/discover-scan` (via `rai discover analyze`)
 - `work/discovery/components-draft.yaml` from `/discover-scan`
 
 **Output:**
@@ -59,7 +59,7 @@ Validate component descriptions using a confidence-tier workflow that reduces hu
 Read the analysis file:
 
 ```bash
-raise discover analyze --input work/discovery/analysis.json --output summary
+rai discover analyze --input work/discovery/analysis.json --output summary
 ```
 
 Or read directly:
@@ -245,7 +245,7 @@ After validation, export the validated components to JSON for graph integration.
 
 **Graph Integration:**
 ```bash
-raise discover build --input work/discovery/components-validated.json
+rai discover build --input work/discovery/components-validated.json
 ```
 
 **Architecture Documentation:**
@@ -260,7 +260,7 @@ Run `/discover-document` to generate module docs from discovery data.
   - Updated `work/discovery/components-draft.yaml`
   - `work/discovery/components-validated.json` — Final component catalog
 - **Telemetry:** `skill_event` via Stop hook
-- **Next:** `raise discover build` (graph integration) or `/discover-document` (architecture docs)
+- **Next:** `rai discover build` (graph integration) or `/discover-document` (architecture docs)
 
 ## Confidence Tiers
 
@@ -305,6 +305,6 @@ If too many components are medium/low on a well-documented codebase:
 ## References
 
 - Previous skill: `/discover-scan`
-- Next: `raise discover build` (graph integration) or `/discover-document` (architecture docs)
-- CLI: `raise discover analyze --help`
-- Analyzer: `src/raise_cli/discovery/analyzer.py`
+- Next: `rai discover build` (graph integration) or `/discover-document` (architecture docs)
+- CLI: `rai discover analyze --help`
+- Analyzer: `src/rai_cli/discovery/analyzer.py`

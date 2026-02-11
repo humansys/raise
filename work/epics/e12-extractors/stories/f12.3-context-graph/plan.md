@@ -37,7 +37,7 @@
 ### Task 1: Create Glossary Parser Module
 - **Description:** Create `glossary.py` parser following established pattern from guardrails.py
 - **Files:**
-  - `src/raise_cli/governance/parsers/glossary.py` (new)
+  - `src/rai_cli/governance/parsers/glossary.py` (new)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/governance/parsers/test_glossary.py -v`
 - **Size:** S
@@ -52,7 +52,7 @@
 ### Task 2: Integrate into Extractor
 - **Description:** Add glossary extraction to unified graph builder
 - **Files:**
-  - `src/raise_cli/governance/extractor.py` (modify)
+  - `src/rai_cli/governance/extractor.py` (modify)
 - **TDD Cycle:** RED → GREEN → REFACTOR
 - **Verification:** `pytest tests/governance/test_extractor.py -v`
 - **Size:** XS

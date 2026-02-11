@@ -196,14 +196,14 @@ neighbors = graph.get_neighbors("mod-memory", edge_types=["in_layer"])
 
 ```bash
 # After graph rebuild:
-raise memory build
+rai memory build
 
 # Query bounded contexts
-raise memory query "ontology" --types bounded_context
+rai memory query "ontology" --types bounded_context
 # → bc-ontology: Persist, integrate, and query accumulated knowledge...
 
 # Query layers
-raise memory query "leaf" --types layer
+rai memory query "leaf" --types layer
 # → lyr-leaf: Zero internal dependencies — foundation utilities
 ```
 

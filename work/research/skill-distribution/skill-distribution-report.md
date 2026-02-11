@@ -8,7 +8,7 @@
 
 ## Research Question
 
-How should `raise init` distribute AI assistant skills/prompts to user projects, supporting Claude Code, Cursor, Windsurf, GitHub Copilot, and other AI IDEs?
+How should `rai init` distribute AI assistant skills/prompts to user projects, supporting Claude Code, Cursor, Windsurf, GitHub Copilot, and other AI IDEs?
 
 ---
 
@@ -73,7 +73,7 @@ Two distinct types of content:
 **A. Project Rules (passive context):**
 - Coding conventions, architecture patterns, project instructions
 - Maps to: `CLAUDE.md`, `.cursor/rules/`, `.windsurfrules`, `.github/copilot-instructions.md`
-- `raise init --detect` already generates `CLAUDE.md` and `governance/guardrails.md`
+- `rai init --detect` already generates `CLAUDE.md` and `governance/guardrails.md`
 
 **B. Process Skills (active invocable):**
 - `/session-start`, `/discover-*`, `/story-*`
@@ -126,7 +126,7 @@ For F&F (Feb 9), simplest viable approach:
 
 1. **Skill portability:** Claude Code skills don't map to Cursor/Copilot. Would need to be adapted as rules/instructions with different invocation patterns.
 2. **Version management:** When RaiSE updates skills, how do user projects get updates? (skill update/sync — out of scope for now)
-3. **Skill selection:** Should `raise init` copy all skills or ask which ones? User might not need discovery skills for greenfield.
+3. **Skill selection:** Should `rai init` copy all skills or ask which ones? User might not need discovery skills for greenfield.
 
 ---
 
@@ -137,10 +137,10 @@ For F&F (Feb 9), simplest viable approach:
 ### Phase 1: F&F (Feb 9) — Claude Code Skills
 
 ```bash
-raise init  # copies essential skills to .claude/skills/
+rai init  # copies essential skills to .claude/skills/
 ```
 
-- Package onboarding skills as distributable assets in `raise_cli`
+- Package onboarding skills as distributable assets in `rai_cli`
 - Copy to `.claude/skills/` during init
 - Skills: `session-start`, `discover-start`, `discover-scan`, `discover-validate`, `discover-complete`
 - `CLAUDE.md` generation already exists
@@ -149,9 +149,9 @@ raise init  # copies essential skills to .claude/skills/
 ### Phase 2: Post-F&F — Multi-IDE Rules
 
 ```bash
-raise init --ide cursor     # generates .cursor/rules/raise.mdc
-raise init --ide copilot    # generates .github/copilot-instructions.md
-raise init --ide all        # generates for all detected IDEs
+rai init --ide cursor     # generates .cursor/rules/raise.mdc
+rai init --ide copilot    # generates .github/copilot-instructions.md
+rai init --ide all        # generates for all detected IDEs
 ```
 
 - Canonical rules stored in `.raise/rules/`

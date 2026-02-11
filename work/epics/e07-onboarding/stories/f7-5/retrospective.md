@@ -1,7 +1,7 @@
-# Retrospective: F7.5 `raise status` Command
+# Retrospective: F7.5 `rai status` Command
 
 ## Summary
-- **Feature:** F7.5 `raise status`
+- **Feature:** F7.5 `rai status`
 - **Delivered:** Project health check command
 - **Duration:** ~8 min
 - **Velocity:** 3.75x

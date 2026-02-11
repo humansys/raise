@@ -28,8 +28,8 @@
 ### Task 1: Create writer module with emit function
 - **Description:** Create `writer.py` with `emit()` function that appends signals to JSONL
 - **Files:**
-  - `src/raise_cli/telemetry/writer.py` (new)
-  - `src/raise_cli/telemetry/__init__.py` (update exports)
+  - `src/rai_cli/telemetry/writer.py` (new)
+  - `src/rai_cli/telemetry/__init__.py` (update exports)
 - **Verification:** `uv run python -c "from raise_cli.telemetry import emit"`
 - **Size:** S
 - **Dependencies:** None
@@ -38,7 +38,7 @@
 - **Description:** Unit tests for emit function — success, directory creation, error handling
 - **Files:**
   - `tests/telemetry/test_writer.py` (new)
-- **Verification:** `uv run pytest tests/telemetry/test_writer.py -v --cov=src/raise_cli/telemetry`
+- **Verification:** `uv run pytest tests/telemetry/test_writer.py -v --cov=src/rai_cli/telemetry`
 - **Size:** S
 - **Dependencies:** Task 1
 

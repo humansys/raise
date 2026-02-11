@@ -56,7 +56,7 @@ This means:
 ┌─────────────────────────────────────────────────┐
 │              raise-cli (Tooling)                │
 │                                                 │
-│   - Scaffolding (raise init, raise skill new)  │
+│   - Scaffolding (raise init, rai skill new)  │
 │   - Validation (raise gate check)              │
 │   - Telemetry (aggregation, not collection)    │
 └─────────────────────────────────────────────────┘

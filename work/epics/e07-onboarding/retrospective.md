@@ -23,12 +23,12 @@
 |---------|:--:|-----------|--------|:--------:|:-----:|
 | F7.8 Personal Memory | 2 | 50 min | 17 min | 2.94x | 24 |
 | F7.9 Emilio Migration | 1 | 30 min | 15 min | 2.0x | 60 |
-| F7.1 `raise init` | 3 | 90 min | 40 min | 2.25x | 41 |
+| F7.1 `rai init` | 3 | 90 min | 40 min | 2.25x | 41 |
 | F7.2 Convention Detection | 3 | 150 min | 40 min | 3.75x | 40 |
 | F7.3 Governance Generation | 2 | 80 min | 20 min | 4.0x | ~15 |
 | F7.4 Enhanced CLAUDE.md | 2 | 80 min | 16 min | 5.0x | ~9 |
 | F7.7 Guided First Session | 3 | 85 min | 26 min | 3.3x | 13 |
-| F7.5 `raise status` | 1 | 30 min | 8 min | 3.75x | 4 |
+| F7.5 `rai status` | 1 | 30 min | 8 min | 3.75x | 4 |
 | F7.6 Skills Bundling | 1 | — | — | — | pre-E7 |
 | **Total** | **18** | **~595 min** | **182 min** | **3.3x avg** | **193** |
 
@@ -113,7 +113,7 @@
 ### New Capabilities Unlocked
 
 **Future work can now:**
-- Initialize any project with `raise init` (greenfield/brownfield detection)
+- Initialize any project with `rai init` (greenfield/brownfield detection)
 - Auto-detect Python conventions with confidence scoring
 - Generate governance artifacts from detected patterns
 - Adapt interaction based on developer experience level
@@ -122,7 +122,7 @@
 ### Modules Added
 
 ```
-src/raise_cli/onboarding/
+src/rai_cli/onboarding/
 ├── __init__.py
 ├── conventions.py      # Convention detection with confidence
 ├── detection.py        # Project type detection

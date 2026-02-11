@@ -116,7 +116,7 @@ The insight generator SHOULD:
 
 | ID | Feature | Size | Status | Description |
 |----|---------|:----:|:------:|-------------|
-| F9.10 | **Telemetry Commands** | M | Future | `raise telemetry velocity`, `drift`, `insights` |
+| F9.10 | **Telemetry Commands** | M | Future | `rai telemetry velocity`, `drift`, `insights` |
 | F9.11 | **Retro Integration** | S | Future | /story-review queries telemetry |
 
 **Effort:** 1 day | **Cost:** $0
@@ -299,7 +299,7 @@ What Rai surfaces based on signal patterns:
 | session_event: Research 90% success, Feature 60% | "What's different about feature sessions?" |
 | calibration: S estimates consistently 2x off | "Your S estimates are optimistic — adjust?" |
 | error_event: pytest not found 5x this week | "Add pytest to your shell profile?" |
-| command_usage: Never uses `raise context query` | "This command could help with X" |
+| command_usage: Never uses `rai context query` | "This command could help with X" |
 
 ---
 
@@ -427,7 +427,7 @@ F9.2 (Signal Writer) ← depends on schemas
 - [x] All tests pass
 - [x] ADR-018 created
 - [x] **BONUS:** WorkLifecycle unified schema (epic + feature)
-- [x] **BONUS:** Unified `raise telemetry emit` CLI command
+- [x] **BONUS:** Unified `rai telemetry emit` CLI command
 - [x] **BONUS:** Normalized phases (design/plan/implement/review)
 
 ### Phase 2 (Epic)
@@ -493,7 +493,7 @@ From exploration session (2026-02-02):
 
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
-| **M1: Walking Skeleton** | F9.1, F9.2 | Hour 1 | Can write a signal to signals.jsonl | `raise telemetry emit --test` works |
+| **M1: Walking Skeleton** | F9.1, F9.2 | Hour 1 | Can write a signal to signals.jsonl | `rai telemetry emit --test` works |
 | **M2: Signal Collection** | F9.3, F9.4, F9.5 | Hour 3 | Skills and sessions emit signals | Run /session-close, check signals.jsonl |
 
 ### Parallel Work Streams

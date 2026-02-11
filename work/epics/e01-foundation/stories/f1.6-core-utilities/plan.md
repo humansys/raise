@@ -23,14 +23,14 @@ Each wrapper:
 
 ### Task 1: Tool Runner Base + Git Wrapper
 - **Description:** Create `core/tools.py` with base runner and git wrapper
-- **Files:** `src/raise_cli/core/tools.py`
+- **Files:** `src/rai_cli/core/tools.py`
 - **Verification:** `pytest tests/core/test_tools.py -k git`
 - **Size:** S
 - **Dependencies:** None
 
 ### Task 2: ast-grep and ripgrep Wrappers
 - **Description:** Add sg and rg wrappers following git pattern
-- **Files:** `src/raise_cli/core/tools.py`
+- **Files:** `src/rai_cli/core/tools.py`
 - **Verification:** `pytest tests/core/test_tools.py`
 - **Size:** S
 - **Dependencies:** Task 1
@@ -38,7 +38,7 @@ Each wrapper:
 ### Task 3: Tests + Quality Checks
 - **Description:** Complete test coverage, run all quality checks
 - **Files:** `tests/core/test_tools.py`
-- **Verification:** `pytest --cov=src/raise_cli/core --cov-fail-under=90 && ruff check . && pyright src/`
+- **Verification:** `pytest --cov=src/rai_cli/core --cov-fail-under=90 && ruff check . && pyright src/`
 - **Size:** XS
 - **Dependencies:** Task 2
 

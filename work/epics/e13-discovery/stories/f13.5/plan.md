@@ -37,9 +37,9 @@ Baseline (validated components)     New/Modified Files
 
 ### Task 1: Create Drift Detection Module
 
-- **Description:** Create `src/raise_cli/discovery/drift.py` with core detection logic
+- **Description:** Create `src/rai_cli/discovery/drift.py` with core detection logic
 - **Files:**
-  - `src/raise_cli/discovery/drift.py` (new)
+  - `src/rai_cli/discovery/drift.py` (new)
   - `tests/discovery/test_drift.py` (new)
 - **TDD Cycle:**
   - RED: Test `detect_drift()` returns drift warnings for non-conforming files
@@ -70,9 +70,9 @@ def detect_drift(
 
 ### Task 2: Add CLI Command
 
-- **Description:** Add `raise discover drift` command that runs detection
+- **Description:** Add `rai discover drift` command that runs detection
 - **Files:**
-  - `src/raise_cli/cli/commands/discover.py` (modify)
+  - `src/rai_cli/cli/commands/discover.py` (modify)
   - `tests/cli/commands/test_discover.py` (modify)
 - **TDD Cycle:**
   - RED: Test CLI command exits 0 with no drift, exits 1 with drift warnings
@@ -85,14 +85,14 @@ def detect_drift(
 **CLI interface:**
 ```bash
 # Check for drift against baseline
-raise discover drift
+rai discover drift
 
 # Check specific directory
-raise discover drift src/new_module/
+rai discover drift src/new_module/
 
 # Output formats
-raise discover drift --output json
-raise discover drift --output summary
+rai discover drift --output json
+rai discover drift --output summary
 ```
 
 ### Task 3: Manual Integration Test
@@ -100,7 +100,7 @@ raise discover drift --output summary
 - **Description:** Validate drift detection works end-to-end
 - **Verification:**
   1. Create a test file that violates naming conventions
-  2. Run `raise discover drift`
+  2. Run `rai discover drift`
   3. Verify warning is shown
   4. Delete test file
 - **Size:** XS

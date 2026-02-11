@@ -33,9 +33,9 @@ template: "lean-feature-spec-v2"
 Implement Pydantic Settings-based configuration system with standard cascade precedence (CLI > env > project config > user config > defaults). Use XDG directory standard for user config location to be a good Unix citizen.
 
 **Components affected**:
-- **src/raise_cli/config/settings.py**: Create `RaiseSettings` class (Pydantic BaseSettings)
-- **src/raise_cli/config/paths.py**: Create XDG directory helpers (`get_config_dir()`, `get_cache_dir()`, `get_data_dir()`)
-- **src/raise_cli/cli/main.py**: Integrate settings with CLI context
+- **src/rai_cli/config/settings.py**: Create `RaiseSettings` class (Pydantic BaseSettings)
+- **src/rai_cli/config/paths.py**: Create XDG directory helpers (`get_config_dir()`, `get_cache_dir()`, `get_data_dir()`)
+- **src/rai_cli/cli/main.py**: Integrate settings with CLI context
 - **tests/config/**: Create test suite for cascade precedence and XDG paths
 
 ---

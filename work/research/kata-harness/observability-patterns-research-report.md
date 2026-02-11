@@ -1620,7 +1620,7 @@ Metrics:
   Gates checked: 1
   Jidoka stops: 1
 
-Use `raise audit show --verbose {trace_id}` for full details
+Use `rai audit show --verbose {trace_id}` for full details
 ```
 
 **Query governance events**:
@@ -1744,7 +1744,7 @@ raise export csv --last 90d --output metrics.csv
 **Scope**:
 - Trace `trace_started`, `trace_completed`, `jidoka_triggered` events only
 - Write to `.raise/traces/{date}.jsonl`
-- Implement `raise audit list` and `raise audit show` commands
+- Implement `rai audit list` and `rai audit show` commands
 
 **Deliverable**: Basic Jidoka audit trail
 
@@ -1753,7 +1753,7 @@ raise export csv --last 90d --output metrics.csv
 **Scope**:
 - Add `step_started`, `step_completed` events
 - Capture token usage and latency per step
-- Implement `raise metrics --week` command
+- Implement `rai metrics --week` command
 
 **Deliverable**: Performance bottleneck identification
 
@@ -1769,7 +1769,7 @@ raise export csv --last 90d --output metrics.csv
 #### Phase 4: Dashboard (Week 7-8)
 
 **Scope**:
-- Build CLI-based dashboard (`raise dashboard`)
+- Build CLI-based dashboard (`rai dashboard`)
 - Visualize Jidoka trends, gate pass rates, cost trends
 - Export to CSV for external analysis
 
@@ -1778,7 +1778,7 @@ raise export csv --last 90d --output metrics.csv
 #### Phase 5: OTLP Export (Future)
 
 **Scope**:
-- Implement `raise export otlp` command
+- Implement `rai export otlp` command
 - Map RaiSE events to OpenTelemetry spans
 - Enable integration with enterprise observability platforms
 

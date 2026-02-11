@@ -19,7 +19,7 @@
 
 | Practice | Standard (2024-2025) | RaiSE Status | Action |
 |----------|---------------------|--------------|--------|
-| src layout | Recommended for packages | Using `src/raise_cli/` | Aligned |
+| src layout | Recommended for packages | Using `src/rai_cli/` | Aligned |
 | pyproject.toml | Standard (PEP 621) | Using pyproject.toml | Aligned |
 | pydantic-settings | Recommended | Using for config | Aligned |
 | uv for deps | Emerging standard | Using uv | Aligned |
@@ -38,7 +38,7 @@
 **Current state**: Unknown complexity
 **Standard**: Keep minimal (exports, version only)
 
-**Action**: Review all __init__.py files in `src/raise_cli/`:
+**Action**: Review all __init__.py files in `src/rai_cli/`:
 - Remove any initialization logic
 - Keep only `__all__` exports and version constants
 - Move any code to dedicated modules

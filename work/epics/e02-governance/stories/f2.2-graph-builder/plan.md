@@ -9,72 +9,72 @@
 ## Tasks
 
 ### Task 1: Create Graph Models
-- **Description:** Implement `Relationship`, `RelationshipType`, and `ConceptGraph` models in `src/raise_cli/governance/graph/models.py` with graph query methods (get_node, get_outgoing_edges, get_incoming_edges)
+- **Description:** Implement `Relationship`, `RelationshipType`, and `ConceptGraph` models in `src/rai_cli/governance/graph/models.py` with graph query methods (get_node, get_outgoing_edges, get_incoming_edges)
 - **Files:**
-  - CREATE `src/raise_cli/governance/graph/__init__.py`
-  - CREATE `src/raise_cli/governance/graph/models.py`
+  - CREATE `src/rai_cli/governance/graph/__init__.py`
+  - CREATE `src/rai_cli/governance/graph/models.py`
   - CREATE `tests/governance/graph/__init__.py`
   - CREATE `tests/governance/graph/test_models.py`
 - **Verification:**
   - Models instantiate correctly with valid data
   - Graph query methods work (get_node, get_outgoing_edges, get_incoming_edges)
   - JSON serialization/deserialization roundtrip preserves data
-  - `pyright --strict src/raise_cli/governance/graph/models.py` passes
-  - `pytest tests/governance/graph/test_models.py -v --cov=src/raise_cli/governance/graph/models.py --cov-fail-under=90` passes
+  - `pyright --strict src/rai_cli/governance/graph/models.py` passes
+  - `pytest tests/governance/graph/test_models.py -v --cov=src/rai_cli/governance/graph/models.py --cov-fail-under=90` passes
 - **Size:** M
 - **Dependencies:** None (uses F2.1's Concept model)
 
 ### Task 2: Implement Relationship Inference Logic
 - **Description:** Create `relationships.py` with `infer_relationships()` function implementing 4 rules: implements (keyword matching), governed_by (§N refs), depends_on (explicit refs), related_to (shared keywords)
 - **Files:**
-  - CREATE `src/raise_cli/governance/graph/relationships.py`
+  - CREATE `src/rai_cli/governance/graph/relationships.py`
   - CREATE `tests/governance/graph/test_relationships.py`
 - **Verification:**
   - All 4 relationship rules work correctly
   - `extract_keywords()` helper filters stopwords correctly
   - Relationship metadata includes confidence and method
   - No duplicate edges created (same source, target, type)
-  - `pytest tests/governance/graph/test_relationships.py -v --cov=src/raise_cli/governance/graph/relationships.py --cov-fail-under=90` passes
+  - `pytest tests/governance/graph/test_relationships.py -v --cov=src/rai_cli/governance/graph/relationships.py --cov-fail-under=90` passes
 - **Size:** M
 - **Dependencies:** Task 1
 
 ### Task 3: Implement BFS Traversal Utilities
 - **Description:** Create `traversal.py` with `traverse_bfs()` function supporting depth limit, edge type filtering, and cycle detection
 - **Files:**
-  - CREATE `src/raise_cli/governance/graph/traversal.py`
+  - CREATE `src/rai_cli/governance/graph/traversal.py`
   - CREATE `tests/governance/graph/test_traversal.py`
 - **Verification:**
   - BFS traversal respects max_depth parameter
   - Edge type filtering works correctly
   - Handles disconnected graphs gracefully
   - Performance <100ms for 50-node graph
-  - `pytest tests/governance/graph/test_traversal.py -v --cov=src/raise_cli/governance/graph/traversal.py --cov-fail-under=90` passes
+  - `pytest tests/governance/graph/test_traversal.py -v --cov=src/rai_cli/governance/graph/traversal.py --cov-fail-under=90` passes
 - **Size:** S
 - **Dependencies:** Task 1
 
 ### Task 4: Implement GraphBuilder Orchestrator
 - **Description:** Create `builder.py` with `GraphBuilder` class that builds graph from concepts by creating nodes dict, inferring relationships, and populating metadata (build time, stats)
 - **Files:**
-  - CREATE `src/raise_cli/governance/graph/builder.py`
+  - CREATE `src/rai_cli/governance/graph/builder.py`
   - CREATE `tests/governance/graph/test_builder.py`
 - **Verification:**
   - `build()` creates graph from concept list
   - Graph metadata includes build time and statistics
   - Handles empty concept list gracefully
   - Integration test: build from real raise-commons governance (20+ nodes, 30+ edges)
-  - `pytest tests/governance/graph/test_builder.py -v --cov=src/raise_cli/governance/graph/builder.py --cov-fail-under=90` passes
+  - `pytest tests/governance/graph/test_builder.py -v --cov=src/rai_cli/governance/graph/builder.py --cov-fail-under=90` passes
 - **Size:** M
 - **Dependencies:** Task 2, Task 3
 
-### Task 5: Add CLI Commands `raise graph build` and `raise graph validate`
-- **Description:** Extend `src/raise_cli/cli/commands/graph.py` with `build` and `validate` subcommands, with options for custom input/output paths
+### Task 5: Add CLI Commands `rai graph build` and `rai graph validate`
+- **Description:** Extend `src/rai_cli/cli/commands/graph.py` with `build` and `validate` subcommands, with options for custom input/output paths
 - **Files:**
-  - MODIFY `src/raise_cli/cli/commands/graph.py`
+  - MODIFY `src/rai_cli/cli/commands/graph.py`
   - MODIFY `tests/cli/commands/test_graph.py`
 - **Verification:**
-  - `raise graph build` loads concepts from `.raise/cache/concepts.json` and saves graph to `.raise/cache/graph.json`
-  - `raise graph build --concepts <path> --output <path>` works with custom paths
-  - `raise graph validate` checks for cycles, validates relationships
+  - `rai graph build` loads concepts from `.raise/cache/concepts.json` and saves graph to `.raise/cache/graph.json`
+  - `rai graph build --concepts <path> --output <path>` works with custom paths
+  - `rai graph validate` checks for cycles, validates relationships
   - CLI displays graph statistics (nodes, edges per type)
   - `pytest tests/cli/commands/test_graph.py -v` passes
 - **Size:** M
@@ -101,10 +101,10 @@
 - **Verification:**
   - All public APIs have Google-style docstrings
   - `dev/components.md` documents graph module with dependencies, public API
-  - `ruff check src/raise_cli/governance/graph/` passes
-  - `pyright --strict src/raise_cli/governance/graph/` passes
-  - `pytest tests/governance/graph/ --cov=src/raise_cli/governance/graph --cov-fail-under=90` passes
-  - `bandit -r src/raise_cli/governance/graph/` passes
+  - `ruff check src/rai_cli/governance/graph/` passes
+  - `pyright --strict src/rai_cli/governance/graph/` passes
+  - `pytest tests/governance/graph/ --cov=src/rai_cli/governance/graph --cov-fail-under=90` passes
+  - `bandit -r src/rai_cli/governance/graph/` passes
 - **Size:** XS
 - **Dependencies:** Task 6
 
@@ -155,7 +155,7 @@ Task 1
 
 - [ ] All tasks complete (1-7)
 - [ ] Build graph from 20+ concepts with 30+ relationships
-- [ ] CLI commands `raise graph build` and `raise graph validate` functional
+- [ ] CLI commands `rai graph build` and `rai graph validate` functional
 - [ ] JSON serialization/deserialization preserves graph structure
 - [ ] BFS traversal supports depth limit and edge type filtering
 - [ ] >90% test coverage on graph module
@@ -163,7 +163,7 @@ Task 1
 - [ ] All linting passes (`ruff check`)
 - [ ] Performance: <2s for 50 concepts, <100ms for BFS
 - [ ] Component catalog updated
-- [ ] No security issues (`bandit -r src/raise_cli/governance/graph/`)
+- [ ] No security issues (`bandit -r src/rai_cli/governance/graph/`)
 
 ---
 

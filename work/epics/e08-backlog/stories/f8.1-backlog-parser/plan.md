@@ -14,7 +14,7 @@
 ### Task 1: Extend ConceptType enum
 
 - **Description:** Add PROJECT and EPIC to ConceptType enum in models.py
-- **Files:** `src/raise_cli/governance/models.py`
+- **Files:** `src/rai_cli/governance/models.py`
 - **Verification:** `python -c "from raise_cli.governance.models import ConceptType; print(ConceptType.PROJECT, ConceptType.EPIC)"`
 - **Size:** XS
 - **Dependencies:** None
@@ -23,8 +23,8 @@
 
 - **Description:** Create `backlog.py` with `extract_project()` and `extract_epics()` functions following prd.py pattern. Include `normalize_status()` helper.
 - **Files:**
-  - `src/raise_cli/governance/parsers/backlog.py` (CREATE)
-  - `src/raise_cli/governance/parsers/__init__.py` (MODIFY - add export)
+  - `src/rai_cli/governance/parsers/backlog.py` (CREATE)
+  - `src/rai_cli/governance/parsers/__init__.py` (MODIFY - add export)
 - **Verification:** `python -c "from raise_cli.governance.parsers.backlog import extract_project, extract_epics; print('OK')"`
 - **Size:** M
 - **Dependencies:** Task 1
@@ -38,7 +38,7 @@
   - Current focus extraction
   - Edge cases (missing file, malformed content)
 - **Files:** `tests/governance/parsers/test_backlog.py` (CREATE)
-- **Verification:** `pytest tests/governance/parsers/test_backlog.py -v --cov=src/raise_cli/governance/parsers/backlog --cov-fail-under=90`
+- **Verification:** `pytest tests/governance/parsers/test_backlog.py -v --cov=src/rai_cli/governance/parsers/backlog --cov-fail-under=90`
 - **Size:** S
 - **Dependencies:** Task 2
 

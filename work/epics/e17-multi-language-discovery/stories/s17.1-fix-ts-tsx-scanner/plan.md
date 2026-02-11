@@ -10,7 +10,7 @@
 
 ### Task 1: Expand SymbolKind and fix TS glob pattern
 - **Description:** Add new symbol kinds to the `SymbolKind` Literal type and fix the TypeScript glob pattern to include `.tsx` files. Also add `"svelte"` and `"php"` to the `Language` Literal and `EXTENSION_TO_LANGUAGE` map (foundation for S17.2/S17.3).
-- **Files:** `src/raise_cli/discovery/scanner.py` (SymbolKind, Language, EXTENSION_TO_LANGUAGE, DEFAULT_LANGUAGE_PATTERNS)
+- **Files:** `src/rai_cli/discovery/scanner.py` (SymbolKind, Language, EXTENSION_TO_LANGUAGE, DEFAULT_LANGUAGE_PATTERNS)
 - **TDD Cycle:**
   - RED: Test that `detect_language("foo.tsx")` returns `"typescript"`, `DEFAULT_LANGUAGE_PATTERNS["typescript"]` matches `.tsx` files, and `SymbolKind` accepts `"enum"`, `"type_alias"`, `"constant"`.
   - GREEN: Update Literal types, extension map, glob pattern.
@@ -21,7 +21,7 @@
 
 ### Task 2: TSX parser dispatch and new symbol extraction
 - **Description:** Modify `_get_ts_parser()` to accept a file path/extension and dispatch `.tsx` to `language_tsx()`. Add extraction of `enum_declaration`, `type_alias_declaration`, and exported `const` variable declarations in `_extract_ts_js_symbols()`. Add signature extraction for new node types in `_extract_ts_signature()`.
-- **Files:** `src/raise_cli/discovery/scanner.py` (_get_ts_parser, extract_typescript_symbols, _extract_ts_js_symbols, _extract_ts_signature)
+- **Files:** `src/rai_cli/discovery/scanner.py` (_get_ts_parser, extract_typescript_symbols, _extract_ts_js_symbols, _extract_ts_signature)
 - **TDD Cycle:**
   - RED: Test that `.tsx` source with JSX parses correctly. Test that enum, type alias, and const export produce correct Symbol objects with correct kinds.
   - GREEN: Implement parser dispatch and new node type handling.
@@ -32,7 +32,7 @@
 
 ### Task 3: Exclude-based hierarchy routing
 - **Description:** Refactor `build_hierarchy()` in analyzer.py to use exclude-based routing: class and method get special treatment, everything else becomes a standalone component. Update the interface kind handling too (currently it's extracted in scanner but not routed in hierarchy).
-- **Files:** `src/raise_cli/discovery/analyzer.py` (build_hierarchy)
+- **Files:** `src/rai_cli/discovery/analyzer.py` (build_hierarchy)
 - **TDD Cycle:**
   - RED: Test that symbols with kind="enum", "type_alias", "constant" appear in hierarchy output as standalone components. Test that existing class/method folding still works.
   - GREEN: Flip the routing logic from include-based to exclude-based.
@@ -43,7 +43,7 @@
 
 ### Task 4: Formatter counts for new symbol kinds
 - **Description:** Update `_format_scan_summary()` to show counts for enums, type aliases, and constants when present (same conditional pattern as interfaces/modules).
-- **Files:** `src/raise_cli/output/formatters/discover.py` (_format_scan_summary)
+- **Files:** `src/rai_cli/output/formatters/discover.py` (_format_scan_summary)
 - **TDD Cycle:**
   - RED: Test that summary output includes enum/type_alias/constant counts when symbols of those kinds exist.
   - GREEN: Add conditional print lines.
@@ -53,8 +53,8 @@
 - **Dependencies:** Task 1
 
 ### Task 5: Manual integration test
-- **Description:** Run `raise discover scan` against real TypeScript source with `.tsx` files, enums, const exports, and type aliases. Verify symbols appear in output. Run full test suite + quality gates.
-- **Verification:** `uv run pytest tests/ -x -q && uv run ruff check src/ && uv run pyright src/raise_cli/discovery/`
+- **Description:** Run `rai discover scan` against real TypeScript source with `.tsx` files, enums, const exports, and type aliases. Verify symbols appear in output. Run full test suite + quality gates.
+- **Verification:** `uv run pytest tests/ -x -q && uv run ruff check src/ && uv run pyright src/rai_cli/discovery/`
 - **Size:** XS
 - **Dependencies:** Tasks 1-4
 

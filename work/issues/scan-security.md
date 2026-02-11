@@ -1,6 +1,6 @@
 # Security Scan Report
 
-> Scanned `src/raise_cli/` against `governance/solution/guardrails-stack.md` Section 3 (Security)
+> Scanned `src/rai_cli/` against `governance/solution/guardrails-stack.md` Section 3 (Security)
 > Date: 2026-02-05
 
 ---
@@ -39,7 +39,7 @@ No usage of `eval()`, `exec()`, or `compile()` with user input found.
 
 The subprocess wrapper in `tools.py` correctly uses argument lists without shell=True.
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/core/tools.py:152`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/core/tools.py:152`
 
 ```python
 result = subprocess.run(
@@ -104,7 +104,7 @@ No `pickle.load()` or `yaml.load()` (unsafe) found.
 
 #### 6.1 context query --output
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/context.py:297`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/context.py:297`
 
 ```python
 # Write to file or stdout
@@ -114,7 +114,7 @@ if output:
 
 #### 6.2 memory query --output
 
-**File:** `/home/emilio/Code/raise-commons/src/raise_cli/cli/commands/memory.py:158`
+**File:** `/home/emilio/Code/raise-commons/src/rai_cli/cli/commands/memory.py:158`
 
 ```python
 # Write to file or stdout
@@ -129,7 +129,7 @@ if output:
 Add a `safe_path()` utility as recommended in `guardrails-stack.md` Section 3.4:
 
 ```python
-# Add to src/raise_cli/core/paths.py (new file) or core/__init__.py
+# Add to src/rai_cli/core/paths.py (new file) or core/__init__.py
 
 from pathlib import Path
 
@@ -207,27 +207,27 @@ No database connections (sqlite, mysql, postgres) or SQL queries found in the co
 
 ```bash
 # eval/exec
-rg '\beval\s*\(' src/raise_cli/
-rg '\bexec\s*\(' src/raise_cli/
+rg '\beval\s*\(' src/rai_cli/
+rg '\bexec\s*\(' src/rai_cli/
 
 # subprocess
-rg 'shell\s*=\s*True' src/raise_cli/
-rg 'subprocess\.(run|call|Popen)' src/raise_cli/
+rg 'shell\s*=\s*True' src/rai_cli/
+rg 'subprocess\.(run|call|Popen)' src/rai_cli/
 
 # os.system
-rg 'os\.system\s*\(' src/raise_cli/
+rg 'os\.system\s*\(' src/rai_cli/
 
 # Secrets
-rg -i '(password|secret|api_key|token|credential)\s*=\s*["'\''][^"'\'']+["'\'']' src/raise_cli/
+rg -i '(password|secret|api_key|token|credential)\s*=\s*["'\''][^"'\'']+["'\'']' src/rai_cli/
 
 # YAML
-rg 'yaml\.' src/raise_cli/
+rg 'yaml\.' src/rai_cli/
 
 # pickle
-rg 'pickle\.' src/raise_cli/
+rg 'pickle\.' src/rai_cli/
 
 # Path traversal patterns
-rg 'is_relative_to|safe_path' src/raise_cli/
+rg 'is_relative_to|safe_path' src/rai_cli/
 ```
 
 ---

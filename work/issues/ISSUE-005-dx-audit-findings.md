@@ -14,7 +14,7 @@
 
 ## Executive Summary
 
-Comprehensive DX audit of raise-cli revealed **5 critical issues** and **10+ high-priority improvements** needed before F&F release. The most impactful finding: **new users hit a wall after `raise init`** — they're told to run `/session-start` but don't know that's a Claude Code skill, not a CLI command.
+Comprehensive DX audit of raise-cli revealed **5 critical issues** and **10+ high-priority improvements** needed before F&F release. The most impactful finding: **new users hit a wall after `rai init`** — they're told to run `/session-start` but don't know that's a Claude Code skill, not a CLI command.
 
 ---
 
@@ -27,9 +27,9 @@ Comprehensive DX audit of raise-cli revealed **5 critical issues** and **10+ hig
 **Resolution:** Updated Ri output to use "Editor:" vs "CLI:" labels with download link (commit 9daac97)
 
 **Problem:**
-- User runs `raise init`
+- User runs `rai init`
 - Output says "Run /session-start when ready"
-- User tries `raise session-start` → command not found
+- User tries `rai session-start` → command not found
 - User doesn't know `/session-start` is a Claude Code skill
 
 **Evidence:**
@@ -44,7 +44,7 @@ But nothing explains:
 - What Claude Code is
 - How to access skills
 
-**Fix:** Update `raise init` output to clearly distinguish CLI vs Claude Code:
+**Fix:** Update `rai init` output to clearly distinguish CLI vs Claude Code:
 ```
 Next steps:
   CLI commands:     raise --help (in terminal)
@@ -55,12 +55,12 @@ Don't have Claude Code? Visit: https://claude.ai/claude-code
 
 ---
 
-### 2. `raise context query` Is Two Commands ✅ RESOLVED
+### 2. `rai context query` Is Two Commands ✅ RESOLVED
 
 **Severity:** CRITICAL
 **Impact:** Usability, discoverability
 **Resolution:** Simplified to ONE command querying ONE graph:
-- `raise context query` — queries unified graph (all context in one place)
+- `rai context query` — queries unified graph (all context in one place)
 - Removed governance-only query (unified includes everything)
 - Options: `--types`, `--limit`, `--strategy`, `--format`, `--output`
 
@@ -111,7 +111,7 @@ Epic-plan includes 50+ lines of "Sequencing Strategies Deep Dive" — reference 
 
 ### 6. No Post-Init Guidance ✅ RESOLVED
 
-**Problem:** After `raise init`, user sees brief "Next steps" but:
+**Problem:** After `rai init`, user sees brief "Next steps" but:
 - No explanation of what `/session-start` does
 - No explanation of what was created
 - No "first 5 minutes" guide
@@ -120,7 +120,7 @@ Epic-plan includes 50+ lines of "Sequencing Strategies Deep Dive" — reference 
 - Files now show purpose: "manifest.yaml — project metadata", "developer.yaml — your preferences"
 - /session-start explains: "Loads your context, remembers patterns, proposes focused work"
 - Numbered steps with clear action items
-- "First 5 minutes guide" and `raise help` command deferred (YAGNI for F&F)
+- "First 5 minutes guide" and `rai help` command deferred (YAGNI for F&F)
 
 ---
 
@@ -158,9 +158,9 @@ Epic-plan includes 50+ lines of "Sequencing Strategies Deep Dive" — reference 
 ### 10. Inconsistent Command Naming ✅ RESOLVED
 
 **Resolution:** Standardized command naming (commit 6cb2eb8):
-- `raise profile session` → `raise profile session-start` (matches session-end)
-- `raise telemetry emit` → `raise telemetry emit-work` (matches emit-session, emit-calibration)
-- `raise memory dump` was already `raise memory list` (stale info)
+- `rai profile session` → `rai profile session-start` (matches session-end)
+- `rai telemetry emit` → `rai telemetry emit-work` (matches emit-session, emit-calibration)
+- `rai memory dump` was already `rai memory list` (stale info)
 
 Updated 10 skills to use new command names.
 
@@ -241,8 +241,8 @@ All 19 skills now follow: Purpose → Mastery Levels → Context → Steps → O
 1. **Delete duplicate `/epic-close/skill.md`** — Old version, confusing
 2. **Fix session skill headers** — "When to Use" → "Purpose"
 3. **Add JSON output to telemetry commands** — Scriptability
-4. **Update `raise init` output** — Explain CLI vs Skills
-5. **Rename `raise memory dump`** → `raise memory list`
+4. **Update `rai init` output** — Explain CLI vs Skills
+5. **Rename `rai memory dump`** → `rai memory list`
 
 ---
 

@@ -44,8 +44,8 @@ Scan Python source files and infer conventions through majority voting. For each
 4. **Python first** — TypeScript/JS deferred to post-F&F
 
 **Components affected**:
-- **`src/raise_cli/onboarding/conventions.py`**: Create — detection logic
-- **`src/raise_cli/schemas/conventions.py`**: Create — Pydantic models
+- **`src/rai_cli/onboarding/conventions.py`**: Create — detection logic
+- **`src/rai_cli/schemas/conventions.py`**: Create — Pydantic models
 - **`tests/onboarding/test_conventions.py`**: Create — unit tests
 
 ---
@@ -113,7 +113,7 @@ ConventionResult(
         ),
     ),
     structure=StructureConventions(
-        source_dir="src/raise_cli",
+        source_dir="src/rai_cli",
         test_dir="tests",
         has_src_layout=True,
         common_patterns=["schemas/", "cli/commands/"],
@@ -354,7 +354,7 @@ tests/fixtures/conventions/
 - ADR-021: Brownfield-First Onboarding
 
 **Related Features**:
-- F7.1: `raise init` (creates manifest, calls detection in future)
+- F7.1: `rai init` (creates manifest, calls detection in future)
 - F7.3: Governance Generation (consumes conventions to generate guardrails.md)
 
 **Dependencies**:

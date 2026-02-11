@@ -139,7 +139,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 ### Step 5: Emit Telemetry
 
 ```bash
-raise memory emit-work epic E{N} --event start --phase init
+rai memory emit-work epic E{N} --event start --phase init
 ```
 
 **Verification:** Telemetry emitted.

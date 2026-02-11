@@ -43,6 +43,6 @@ Generates interactive HTML visualization of the memory graph (`index.json`).
 
 ## Integration
 
-- CLI command `raise memory viz` in `cli/commands/memory.py`
+- CLI command `rai memory viz` in `cli/commands/memory.py`
 - No runtime dependencies beyond stdlib (`json`, `pathlib`)
 - D3.js v7 loaded from CDN in generated HTML

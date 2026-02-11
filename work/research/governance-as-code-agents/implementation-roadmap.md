@@ -38,7 +38,7 @@ This roadmap translates governance-as-code research into actionable implementati
 **Task List**:
 - [ ] Define JSON Schema for policy YAML (based on `policy-dsl-specification.md` Section 2.4)
 - [ ] Add schema validation to policy loader
-- [ ] Create CLI: `raise policy validate <policy.yaml>`
+- [ ] Create CLI: `rai policy validate <policy.yaml>`
 - [ ] Write unit tests for schema validation (10 test cases: valid, invalid field, missing required, etc.)
 
 **Acceptance Criteria**:
@@ -153,7 +153,7 @@ This roadmap translates governance-as-code research into actionable implementati
 - [ ] Define preconditions (file existence, directory writable, etc.)
 - [ ] Set appropriate severity levels (error vs warning)
 - [ ] Write clear recovery guidance
-- [ ] Validate policy: `raise policy validate <policy.yaml>`
+- [ ] Validate policy: `rai policy validate <policy.yaml>`
 
 **Example** (pre-tech-design-policy.yaml):
 ```yaml
@@ -244,7 +244,7 @@ Execution halted.
 - [ ] Extract validation criteria (checklist items)
 - [ ] Map criteria to validator checks
 - [ ] Write YAML gate policy (based on `policy-dsl-specification.md` Section 4.2)
-- [ ] Test gate: `raise gate run gate-discovery --artifact specs/main/project_requirements.md`
+- [ ] Test gate: `rai gate run gate-discovery --artifact specs/main/project_requirements.md`
 
 **Migration Example**:
 
@@ -270,7 +270,7 @@ checks:
 
 **Acceptance Criteria**:
 - 3 YAML gates created
-- Gates validate successfully: `raise policy validate gate-discovery.yaml`
+- Gates validate successfully: `rai policy validate gate-discovery.yaml`
 - All criteria from Markdown gates mapped to YAML checks
 
 **Dependencies**: 2.1 (validators)
@@ -325,19 +325,19 @@ Execution halted.
 
 #### 4.3 CLI for Gate Management (Day 5)
 
-**Deliverable**: `raise gate` CLI commands
+**Deliverable**: `rai gate` CLI commands
 
 **Task List**:
-- [ ] Implement `raise gate run <gate-id>` (run gate manually)
-- [ ] Implement `raise gate run-all --kata <kata-id>` (run all gates for kata)
-- [ ] Implement `raise gate list` (list all gates)
-- [ ] Implement `raise gate show <gate-id>` (display gate details)
+- [ ] Implement `rai gate run <gate-id>` (run gate manually)
+- [ ] Implement `rai gate run-all --kata <kata-id>` (run all gates for kata)
+- [ ] Implement `rai gate list` (list all gates)
+- [ ] Implement `rai gate show <gate-id>` (display gate details)
 - [ ] Add help text and examples
 - [ ] Write CLI integration tests
 
 **Acceptance Criteria**:
 - CLI commands work as documented
-- Help text is clear: `raise gate --help`
+- Help text is clear: `rai gate --help`
 - Can run gates manually for testing
 
 **Dependencies**: 4.2 (gate runner)
@@ -459,7 +459,7 @@ CREATE TABLE gate_results (
 
 #### 6.1 CLI Dashboard (Day 1-3)
 
-**Deliverable**: `raise gate report` command
+**Deliverable**: `rai gate report` command
 
 **Task List**:
 - [ ] Query database for gate execution stats
@@ -525,7 +525,7 @@ Recommendation: Review gate-design checks for common failure patterns.
 - [ ] Add `compatible_kata_versions` field to policy schema
 - [ ] Implement version compatibility check in policy loader
 - [ ] Warn user if policy version outdated
-- [ ] Implement `raise policy upgrade` command
+- [ ] Implement `rai policy upgrade` command
 - [ ] Write unit tests
 
 **Example**:
@@ -547,7 +547,7 @@ Continuing with v1.5.0...
 
 **Task List**:
 - [ ] Add `changelog` field to policy YAML
-- [ ] Display changelog in `raise policy show <policy-id>`
+- [ ] Display changelog in `rai policy show <policy-id>`
 - [ ] Generate changelog diff for upgrades
 - [ ] Write tests
 
@@ -595,7 +595,7 @@ Changelog:
 #### 8.2 Validator Testing Framework (Day 4-5)
 
 **Task List**:
-- [ ] Implement `raise validator test <validator-name>` command
+- [ ] Implement `rai validator test <validator-name>` command
 - [ ] Allow validators to define test cases in YAML
 - [ ] Run test cases, report pass/fail
 - [ ] Write tests
@@ -715,7 +715,7 @@ test_cases:
 
 **Mitigation**:
 - Start with simplest possible DSL (5 validators, basic YAML)
-- Provide migration tool: `raise policy convert gate-discovery.md` (Markdown → YAML)
+- Provide migration tool: `rai policy convert gate-discovery.md` (Markdown → YAML)
 - Document with examples, not just reference docs
 - Get feedback from 3 teams before finalizing DSL
 
@@ -743,7 +743,7 @@ test_cases:
 - Start with warning-only mode (log failures, don't block)
 - Collect data for 2 weeks, tune thresholds
 - Implement override mechanism (`--override VAL-003 "Reason: legacy code"`)
-- User feedback loop: `raise gate report-false-positive VAL-003`
+- User feedback loop: `rai gate report-false-positive VAL-003`
 
 ---
 

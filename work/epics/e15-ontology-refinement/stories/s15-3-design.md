@@ -187,8 +187,8 @@ constraints = graph.get_neighbors("bc-ontology", edge_types=["constrained_by"])
 ### CLI Usage
 
 ```bash
-raise memory build
-raise memory query "bc-ontology" --strategy concept_lookup
+rai memory build
+rai memory query "bc-ontology" --strategy concept_lookup
 # → bc-ontology + constrained_by neighbors
 ```
 

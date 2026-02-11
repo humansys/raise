@@ -191,11 +191,11 @@ What are we working on?"
 
 | ID | Feature | Size | SP | Status | Description |
 |----|---------|:----:|:--:|:------:|-------------|
-| F7.1 | **`raise init` Command** | M | 3 | Pending | Core initialization with project detection |
+| F7.1 | **`rai init` Command** | M | 3 | Pending | Core initialization with project detection |
 | F7.2 | **Convention Detection** | M | 3 | Pending | Auto-detect code style, naming, structure |
 | F7.3 | **Governance Generation** | S | 2 | ✅ Done | Generate guardrails.md from conventions |
 | F7.4 | **Enhanced CLAUDE.md** | S | 2 | ✅ Done | Context-rich with architecture, components |
-| F7.5 | **`raise status` Command** | XS | 1 | ✅ Done | Project health check |
+| F7.5 | **`rai status` Command** | XS | 1 | ✅ Done | Project health check |
 | F7.6 | **Skills Bundling** | XS | 1 | ✅ Done | Skills in package, copy on init |
 | F7.7 | **Guided First Session** | M | 3 | ✅ Done | Educational onboarding in /session-start |
 | F7.8 | **Personal Memory** | S | 2 | ✅ Done | ~/.rai/developer.yaml + adaptive interaction |
@@ -398,11 +398,11 @@ Rai: "This is complex. /story-design first?"
 ### MUST
 
 - [x] Skills bundled in package (F7.6 ✅)
-- [x] `raise init` with greenfield/brownfield detection (F7.1 ✅)
+- [x] `rai init` with greenfield/brownfield detection (F7.1 ✅)
 - [x] Convention detection for Python projects (F7.2 ✅)
 - [x] Generate guardrails.md from detected conventions (F7.3 ✅)
 - [x] Enhanced CLAUDE.md with architecture context (F7.4 ✅)
-- [x] `raise status` health check (F7.5 ✅)
+- [x] `rai status` health check (F7.5 ✅)
 - [x] Personal memory: `~/.rai/developer.yaml` (F7.8 ✅)
 - [x] Adaptive interaction based on experience_level (F7.7 ✅)
 - [x] Emilio profile migration (F7.9 ✅)
@@ -427,7 +427,7 @@ Rai: "This is complex. /story-design first?"
 | Item | Rationale | Destination |
 |------|-----------|-------------|
 | Team memory | V3 scope | E10 Collective Intelligence |
-| `raise doctor` | Nice-to-have | Parking lot |
+| `rai doctor` | Nice-to-have | Parking lot |
 | Full ~/.rai/ expansion | YAGNI | Post-F&F |
 | Multi-language detection | Python first | Parking lot |
 
@@ -466,12 +466,12 @@ Rai: "This is complex. /story-design first?"
 |:-----:|---------|:----:|:--:|--------------|-----------|-----------|
 | 1 | F7.8 Personal Memory | S | 2 | F7.6 ✅ | M1 | Foundation for adaptive behavior |
 | 2 | F7.9 Emilio Migration | XS | 1 | F7.8 | M1 | Validates schema, provides Ri template |
-| 3 | F7.1 `raise init` | M | 3 | F7.8 | M1 | Core command, walking skeleton |
+| 3 | F7.1 `rai init` | M | 3 | F7.8 | M1 | Core command, walking skeleton |
 | 4 | F7.2 Convention Detection | M | 3 | F7.1 | M2 | HIGH RISK: new capability |
 | 5 | F7.3 Governance Generation | S | 2 | F7.2 | M2 | Templates from detected conventions |
 | 6 | F7.4 Enhanced CLAUDE.md | S | 2 | F7.1 | M2 | Can parallel with F7.3 |
 | 7 | F7.7 Guided First Session | M | 3 | F7.3, F7.4, F7.8 | M3 | Depends on all adaptive components |
-| 8 | F7.5 `raise status` | XS | 1 | F7.1 | M3 | Polish, after core complete |
+| 8 | F7.5 `rai status` | XS | 1 | F7.1 | M3 | Polish, after core complete |
 
 **Done:** F7.6 Skills Bundling ✅ (1 SP)
 
@@ -479,7 +479,7 @@ Rai: "This is complex. /story-design first?"
 
 | Milestone | Features | Target | Success Criteria | Demo |
 |-----------|----------|--------|------------------|------|
-| **M1: Walking Skeleton** | F7.8, F7.9, F7.1 | Day 1 | `raise init` works on greenfield with personal memory | New project init, Emilio profile loaded |
+| **M1: Walking Skeleton** | F7.8, F7.9, F7.1 | Day 1 | `rai init` works on greenfield with personal memory | New project init, Emilio profile loaded |
 | **M2: Brownfield MVP** | +F7.2, F7.3, F7.4 | Day 2-3 | Full brownfield onboarding with governance | Fer's project: conventions detected, guardrails generated |
 | **M3: Adaptive Experience** | +F7.7, F7.5 | Day 4 | Shu/Ri interaction adapts, status works | Shu user gets education, Ri user gets efficiency |
 | **M4: Epic Complete** | — | Day 5 | Done criteria met, retrospective | `/epic-close` ready |
@@ -512,12 +512,12 @@ Day 5:                                        └► Retro, polish (M4: Complete
 | F7.6 Skills Bundling | XS | 1 | ✅ Done | — | — | Pre-E7 |
 | F7.8 Personal Memory | S | 2 | ✅ Done | 17 min | 2.94x | |
 | F7.9 Emilio Migration | XS | 1 | ✅ Done | 15 min | 2.0x | Extended model |
-| F7.1 `raise init` | M | 3 | ✅ Done | 40 min | 2.25x | M1 complete |
+| F7.1 `rai init` | M | 3 | ✅ Done | 40 min | 2.25x | M1 complete |
 | F7.2 Convention Detection | M | 3 | ✅ Done | 40 min | 3.75x | Risk mitigated |
 | F7.3 Governance Generation | S | 2 | ✅ Done | 20 min | 4.0x | |
 | F7.4 Enhanced CLAUDE.md | S | 2 | ✅ Done | 16 min | 5.0x | |
 | F7.7 Guided First Session | M | 3 | ✅ Done | 26 min | 3.3x | Parallel subagents |
-| F7.5 `raise status` | XS | 1 | ✅ Done | 8 min | 3.75x | |
+| F7.5 `rai status` | XS | 1 | ✅ Done | 8 min | 3.75x | |
 
 **Milestone Progress:**
 - [x] M1: Walking Skeleton (Day 1 - Feb 4) ✅ Complete (F7.8, F7.9, F7.1)

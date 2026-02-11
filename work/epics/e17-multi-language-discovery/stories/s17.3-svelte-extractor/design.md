@@ -2,7 +2,7 @@
 
 ## What & Why
 
-**Problem:** `raise discover scan` cannot extract symbols from `.svelte` files. zambezi-concierge uses Svelte for its frontend — these components are invisible to discovery.
+**Problem:** `rai discover scan` cannot extract symbols from `.svelte` files. zambezi-concierge uses Svelte for its frontend — these components are invisible to discovery.
 
 **Value:** Completes M2 (Demo Ready) — discovery works across Python, TS/JS, PHP, and Svelte in polyglot repos.
 

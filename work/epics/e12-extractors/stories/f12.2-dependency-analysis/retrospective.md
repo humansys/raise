@@ -42,7 +42,7 @@
 - None required — process worked as designed
 
 ## Artifacts Created
-- `src/raise_cli/governance/parsers/guardrails.py` (193 lines)
+- `src/rai_cli/governance/parsers/guardrails.py` (193 lines)
 - `tests/governance/parsers/test_guardrails.py` (8 tests, 22 total with extractor)
 
 ## Results

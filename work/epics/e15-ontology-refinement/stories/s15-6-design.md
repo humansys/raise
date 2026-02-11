@@ -19,7 +19,7 @@ Every design decision starts grounded in the current architecture. Skills automa
 
 ## Approach
 
-Add a **"Load Architectural Context"** step to each of the 3 design skills. The step uses the `raise memory context <module>` CLI command (delivered in S15.5) to load structured architectural context before design begins.
+Add a **"Load Architectural Context"** step to each of the 3 design skills. The step uses the `rai memory context <module>` CLI command (delivered in S15.5) to load structured architectural context before design begins.
 
 **Components affected:**
 - `.claude/skills/story-design/SKILL.md` — modify (add step)
@@ -40,7 +40,7 @@ Insert as a new step after prerequisites/context loading, before the main design
 Identify the primary module(s) this story/epic affects, then load their architectural context:
 
 ```bash
-uv run raise memory context <module-name>
+uv run rai memory context <module-name>
 ```
 
 **How to identify the relevant module(s):**
@@ -95,7 +95,7 @@ Skills should present an "Architectural Context" section in their output artifac
 ### Example 1: Story Design for memory module
 
 ```bash
-$ uv run raise memory context memory
+$ uv run rai memory context memory
 # Returns: bounded context (ontology), layer (domain),
 # 21 constraints, 4 dependencies
 ```
@@ -108,9 +108,9 @@ The `/story-design` skill would include this in the design spec:
 ### Example 2: Epic Design spanning multiple modules
 
 ```bash
-$ uv run raise memory context memory
-$ uv run raise memory context session
-$ uv run raise memory context graph
+$ uv run rai memory context memory
+$ uv run rai memory context session
+$ uv run rai memory context graph
 ```
 
 The `/epic-design` skill would note cross-module dependencies and domain boundaries.
@@ -127,7 +127,7 @@ If a story touches both `memory` (ontology BC) and `session` (experience BC), th
 - `/story-design` SKILL.md includes architectural context step after prerequisites
 - `/epic-design` SKILL.md includes architectural context step with multi-module guidance
 - `/story-plan` SKILL.md includes architectural context step informing task decomposition
-- Each step references `raise memory context <module>` CLI command
+- Each step references `rai memory context <module>` CLI command
 - Graceful fallback when module not found in graph
 
 **SHOULD:**

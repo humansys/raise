@@ -244,7 +244,7 @@ Based on analysis of OpenClaw (formerly Moltbot) registry with 700+ skills acros
 
 ### Option A: RaiSE as Agent Skill
 
-**Description**: Publish `raise` as a skill in the Agent Skills ecosystem, making RaiSE governance accessible to any skills-compatible agent.
+**Description**: Publish `rai` as a skill in the Agent Skills ecosystem, making RaiSE governance accessible to any skills-compatible agent.
 
 | Aspect | Analysis |
 |--------|----------|
@@ -279,9 +279,9 @@ Based on analysis of OpenClaw (formerly Moltbot) registry with 700+ skills acros
 | **Technical approach** | CLI/MCP tool that validates skills against policies |
 
 **Features**:
-- `raise skill audit <path>` - Security/quality audit
-- `raise skill validate <path>` - Schema validation
-- `raise skill policy-check <path>` - Organizational policy compliance
+- `rai skill audit <path>` - Security/quality audit
+- `rai skill validate <path>` - Schema validation
+- `rai skill policy-check <path>` - Organizational policy compliance
 - Skill registry with governance metadata
 
 **Pros**:
@@ -421,7 +421,7 @@ This is semantically DIFFERENT from Agent Skills:
 
 **Implication**: There's a clear market gap for skill auditing, validation, and policy enforcement. 26%+ unknown credential handling and 43% command injection flaws indicate need.
 
-**Action**: Consider building `raise skill audit` as differentiating feature.
+**Action**: Consider building `rai skill audit` as differentiating feature.
 
 ### 3. MCP and Skills are complementary, not competing
 

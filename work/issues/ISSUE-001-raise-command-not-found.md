@@ -1,4 +1,4 @@
-# ISSUE-001: `raise` command not found in non-interactive shells
+# ISSUE-001: `rai` command not found in non-interactive shells
 
 > Parked: 2026-02-05
 > Priority: P2 (workaround exists)
@@ -8,17 +8,17 @@
 
 ## Problem
 
-The `raise` command is not available in Claude Code's bash environment, requiring `uv run raise` instead.
+The `rai` command is not available in Claude Code's bash environment, requiring `uv run raise` instead.
 
-**Expected:** `raise profile show` works
+**Expected:** `rai profile show` works
 **Actual:** `bash: raise: command not found`
 
 ## Evidence
 
 ### Environment Analysis (2026-02-05)
 
-1. **Interactive shell:** `raise` works (PATH includes `~/.local/bin`)
-2. **Non-interactive shell (Claude Code):** `raise` not found
+1. **Interactive shell:** `rai` works (PATH includes `~/.local/bin`)
+2. **Non-interactive shell (Claude Code):** `rai` not found
 3. **BASH_ENV not set** in Claude Code's environment
 
 ### Root Cause (Ishikawa, SES-048)
@@ -38,7 +38,7 @@ The `raise` command is not available in Claude Code's bash environment, requirin
               PATH not configured
                         │
                         ▼
-              `raise` not found
+              `rai` not found
 ```
 
 **Root cause:** Claude Code spawns non-interactive bash. Non-interactive bash only reads `BASH_ENV`, not `.bashrc`. Without `BASH_ENV` pointing to a file that sets PATH, the `~/.local/bin` directory isn't in PATH.
@@ -68,7 +68,7 @@ export PATH="$HOME/.local/bin:$PATH"
 
 ## Current Workaround
 
-Use `uv run raise` instead of `raise` in Claude Code sessions.
+Use `uv run raise` instead of `rai` in Claude Code sessions.
 
 ## What Needs Investigation
 

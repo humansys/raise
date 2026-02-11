@@ -252,7 +252,7 @@ Accessibility ←———————————+—————————�
 
 ## Medium-Term Response (3-6 Months)
 
-### Action 4: Build `raise-cli` Installer (P1)
+### Action 4: Build `rai-cli` Installer (P1)
 
 **Objective**: Match BMAD's one-command installation UX while maintaining git-native distribution
 
@@ -352,7 +352,7 @@ curl -sSL install.raise.dev | sh
 
 **Phase 1: Onboarding (Week 1)**
 - Kickoff meeting: Explain RaiSE philosophy (Constitution, Lean, Heutagogía)
-- Install RaiSE: `raise-cli` on 2-3 pilot features
+- Install RaiSE: `rai-cli` on 2-3 pilot features
 - Training: 2-hour workshop (Validation Gates, Kata structure, ADRs)
 
 **Phase 2: Feature 1 (Week 2-4)**
@@ -704,7 +704,7 @@ curl -sSL install.raise.dev | sh
 | **P0** | MCP-Native Integration | 18+ platform breadth advantage | Medium | High | Month 6-9 |
 | **P0** | Open-Source Launch | Community momentum (32k stars vs. 0) | High | Critical | Week 1 |
 | **P0** | Multi-Repo Coordination | Enterprise blocker (single-repo assumption) | High | Critical | Month 3-6 |
-| **P1** | `raise-cli` Installer UX | npm installer advantage (adoption friction) | Medium | High | Month 3-4 |
+| **P1** | `rai-cli` Installer UX | npm installer advantage (adoption friction) | Medium | High | Month 3-4 |
 | **P1** | Lean Specification Templates | Documentation overhead (top complaint) | Low | High | Month 1-2 |
 | **P1** | Context Window Optimization (RAG) | Manual sharding limitations | High | High | Month 6-9 |
 | **P1** | GitHub Issues Integration | Sprint tracking + PM tool gap | Medium | High | Month 6-8 |
@@ -934,7 +934,7 @@ curl -sSL install.raise.dev | sh
 - ✅ Enterprise compliance brief (2-page PDF)
 
 **Days 31-60** (Short-Term):
-- ✅ `raise-cli` installer (one-command UX)
+- ✅ `rai-cli` installer (one-command UX)
 - ✅ Lean specification templates (80/20 approach)
 - ✅ Community infrastructure (Discord, docs site, office hours)
 
