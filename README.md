@@ -31,71 +31,125 @@ RaiSE is a methodology + toolkit for professional developers who use AI assistan
 
 ---
 
-## Quick Start
+## Developer Onboarding
 
 ### Prerequisites
 
 - Python 3.12+
 - [uv](https://github.com/astral-sh/uv) (recommended) or pip
-- [Claude Code](https://claude.ai/claude-code) CLI
+- [Claude Code](https://claude.ai/claude-code) CLI installed and configured
 
-### Installation
+### Setup
 
 ```bash
-# Clone the repository
+# 1. Clone and checkout the development branch
 git clone https://gitlab.com/humansys-demos/product/raise1/raise-commons.git
 cd raise-commons
+git checkout v2
 
-# Install in development mode
-uv pip install -e .
+# 2. Install in development mode
+uv pip install -e ".[dev]"
 
-# Verify installation
-raise --help
+# 3. Verify installation
+rai --help
 ```
 
-### First Steps
+### Onboarding with Rai
 
-1. **Start a session** — Run `/session-start` in Claude Code to load context and memory
-2. **Explore skills** — Use `/help` to see available skills like `/feature-design`, `/research`
-3. **Read the constitution** — `framework/reference/constitution.md` defines the principles
+Once installed, open Claude Code in the project directory and run:
+
+```
+/rai-welcome
+```
+
+This single command will:
+- **Detect your situation** (new developer, returning developer, etc.)
+- **Create your profile** (`~/.rai/developer.yaml`) with your name and pattern prefix
+- **Build the knowledge graph** so Rai has project context
+- **Scaffold `CLAUDE.local.md`** for your personal Claude Code instructions
+- **Optionally customize** communication preferences (language, style)
+- **Verify everything works**
+
+After welcome completes, start working:
+
+```
+/rai-session-start
+```
+
+This loads your context, memory, and proposes focused work.
+
+### What You Get
+
+| Shared (committed) | Personal (gitignored) |
+|--------------------|-----------------------|
+| Patterns (`.raise/rai/memory/patterns.jsonl`) | Session history (`.raise/rai/personal/sessions/`) |
+| Governance docs | Session state (`.raise/rai/personal/session-state.yaml`) |
+| Skills, methodology | Calibration data (`.raise/rai/personal/calibration.jsonl`) |
+| Work artifacts | Knowledge graph (`.raise/rai/memory/index.json`) |
+
+Each developer builds their own personal context through working sessions. Pattern IDs are developer-prefixed (e.g., PAT-E-001 for Emilio, PAT-F-001 for Fer) to prevent collisions.
 
 ---
 
 ## Available Skills
 
-Skills are structured processes that guide AI-assisted development:
+Skills are structured processes that guide AI-assisted development. Run them as `/skill-name` in Claude Code.
 
+### Session Lifecycle
 | Skill | Purpose |
 |-------|---------|
-| `/session-start` | Begin a session with memory and context loaded |
-| `/session-close` | End a session, persist learnings to memory |
-| `/feature-design` | Create lean specs for complex features |
-| `/feature-plan` | Decompose features into atomic tasks |
-| `/feature-implement` | Execute implementation with validation gates |
-| `/feature-review` | Retrospective to extract learnings |
-| `/research` | Epistemologically rigorous research |
-| `/epic-design` | Design multi-feature epics |
-| `/epic-plan` | Sequence features into executable plans |
-| `/debug` | Root cause analysis (5 Whys, Ishikawa) |
+| `/rai-welcome` | One-time developer onboarding |
+| `/rai-session-start` | Begin a session with memory and context |
+| `/rai-session-close` | End a session, persist learnings |
+
+### Story Lifecycle
+| Skill | Purpose |
+|-------|---------|
+| `/rai-story-start` | Initialize a story with branch and scope |
+| `/rai-story-design` | Create lean specs for complex stories |
+| `/rai-story-plan` | Decompose into atomic tasks |
+| `/rai-story-implement` | Execute with TDD and validation gates |
+| `/rai-story-review` | Retrospective and learnings |
+| `/rai-story-close` | Merge, cleanup, tracking |
+
+### Epic Lifecycle
+| Skill | Purpose |
+|-------|---------|
+| `/rai-epic-start` | Initialize an epic with branch |
+| `/rai-epic-design` | Design multi-story epics |
+| `/rai-epic-plan` | Sequence stories into plans |
+| `/rai-epic-close` | Epic retrospective and merge |
+
+### Other Skills
+| Skill | Purpose |
+|-------|---------|
+| `/rai-research` | Epistemologically rigorous research |
+| `/rai-debug` | Root cause analysis (5 Whys, Ishikawa) |
+| `/rai-docs-update` | Sync architecture docs with code |
+| `/rai-discover-start` | Initialize codebase discovery |
+| `/rai-discover-scan` | Extract and describe components |
 
 ---
 
 ## CLI Commands
 
-The `raise` CLI provides deterministic operations:
+The `rai` CLI provides deterministic operations:
 
 ```bash
-# Build Rai's memory from project artifacts
-raise memory build
+# Build Rai's knowledge graph from project artifacts
+rai memory build
 
-# Query governance concepts (MVC - Minimum Viable Context)
-raise context query "validation"
+# Query governance concepts
+rai memory context mod-session
 
 # Query Rai's memory
-raise memory query "velocity patterns"
+rai memory query "velocity patterns"
 
-# Dump memory for inspection
-raise memory dump --format md
+# Start a session (creates profile on first run)
+rai session start --name "YourName" --project "$(pwd)" --context
+
+# Close a session
+rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 ```
 
 ---
@@ -104,33 +158,50 @@ raise memory dump --format md
 
 ```
 raise-commons/
+├── .claude/skills/      # Claude Code skills (24 skills)
+│
 ├── framework/           # Public textbook (concepts, reference)
 │   ├── reference/       #   Constitution, glossary, philosophy
 │   ├── concepts/        #   Core concepts (katas, gates, artifacts)
 │   └── getting-started/ #   Greenfield/brownfield guides
 │
 ├── .raise/              # Framework engine
-│   ├── katas/           #   Process definitions (the HOW)
-│   ├── gates/           #   Validation criteria (the QUALITY)
-│   ├── templates/       #   Artifact scaffolds (the WHAT)
-│   └── skills/          #   Atomic operations
-│
-├── .rai/                # Rai's identity and memory
-│   ├── identity/        #   Core values, perspective, boundaries
-│   └── memory/          #   Patterns, calibration, session history
-│
-├── .claude/skills/      # Claude Code skills (11 skills)
+│   ├── rai/             #   Rai's memory and personal data
+│   │   ├── memory/      #     Patterns, knowledge graph (shared)
+│   │   └── personal/    #     Sessions, calibration (per-developer, gitignored)
+│   ├── katas/           #   Process definitions
+│   ├── gates/           #   Validation criteria
+│   ├── templates/       #   Artifact scaffolds
+│   └── skills/          #   Legacy skill definitions
 │
 ├── governance/          # Project governance
-│   ├── solution/        #   Vision, guardrails, business case
-│   └── projects/        #   Project-level artifacts, backlog
+│   ├── architecture/    #   Module docs, system design
+│   └── solution/        #   Vision, guardrails, business case
 │
-├── src/raise_cli/       # CLI toolkit (Python)
+├── src/rai_cli/         # CLI toolkit (Python)
+│
+├── work/                # Work in progress
+│   └── stories/         #   Story artifacts (scope, design, plan, retro)
 │
 └── dev/                 # Framework maintenance
     ├── decisions/       #   ADRs (Architecture Decision Records)
-    └── sessions/        #   Session logs
+    └── parking-lot.md   #   Ideas and tangents for later
 ```
+
+---
+
+## Branch Model
+
+```
+main (stable releases)
+  └── v2 (development)
+        └── epic/e{N}/{name}
+              └── story/s{N}.{M}/{name}
+```
+
+- Work on `v2` (development branch)
+- Stories branch from and merge back to their epic or `v2`
+- `main` receives releases from `v2`
 
 ---
 
@@ -140,10 +211,10 @@ raise-commons/
 |---------|-------------|
 | **RaiSE Engineer** | You — the human who directs AI-assisted development |
 | **Rai** | AI partner with memory, calibration, and accumulated judgment |
-| **Kata** | Structured process definition for a methodology phase |
+| **Skill** | Structured Claude Code prompt for a methodology phase |
 | **Validation Gate** | Quality checkpoint with specific criteria |
 | **Guardrail** | Constraint that guides AI behavior |
-| **MVC** | Minimum Viable Context — query what's relevant, not everything |
+| **ShuHaRi** | Mastery levels (beginner → practitioner → master) that adapt Rai's verbosity |
 
 See the full [Glossary](framework/reference/glossary.md) for canonical terminology.
 
