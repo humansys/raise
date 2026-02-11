@@ -314,10 +314,7 @@ def _get_next_id(
     max_num = 0
 
     # Build the full prefix to match against
-    if developer_prefix:
-        full_prefix = f"{prefix}-{developer_prefix}-"
-    else:
-        full_prefix = f"{prefix}-"
+    full_prefix = f"{prefix}-{developer_prefix}-" if developer_prefix else f"{prefix}-"
 
     if file_path.exists():
         with file_path.open("r", encoding="utf-8") as f:
