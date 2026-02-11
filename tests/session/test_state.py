@@ -118,10 +118,10 @@ class TestSessionStateSchema:
 class TestGetSessionStatePath:
     """Tests for get_session_state_path."""
 
-    def test_returns_correct_path(self, tmp_path: Path) -> None:
-        """Path is project_root/.raise/rai/session-state.yaml."""
+    def test_returns_personal_path(self, tmp_path: Path) -> None:
+        """Path is project_root/.raise/rai/personal/session-state.yaml."""
         path = get_session_state_path(tmp_path)
-        assert path == tmp_path / ".raise" / "rai" / "session-state.yaml"
+        assert path == tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
 
 
 class TestLoadSessionState:
@@ -134,7 +134,7 @@ class TestLoadSessionState:
 
     def test_returns_none_for_empty_file(self, tmp_path: Path) -> None:
         """Returns None for empty YAML file."""
-        state_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
         state_path.parent.mkdir(parents=True)
         state_path.write_text("")
         result = load_session_state(tmp_path)
@@ -142,7 +142,7 @@ class TestLoadSessionState:
 
     def test_returns_none_for_invalid_yaml(self, tmp_path: Path) -> None:
         """Returns None for invalid YAML."""
-        state_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
         state_path.parent.mkdir(parents=True)
         state_path.write_text("invalid: yaml: [")
         result = load_session_state(tmp_path)
@@ -150,15 +150,54 @@ class TestLoadSessionState:
 
     def test_returns_none_for_invalid_schema(self, tmp_path: Path) -> None:
         """Returns None for YAML that doesn't match schema."""
-        state_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
         state_path.parent.mkdir(parents=True)
         state_path.write_text("not_a_field: true\n")
         result = load_session_state(tmp_path)
         assert result is None
 
+    def test_migrates_from_old_path(self, tmp_path: Path) -> None:
+        """Migrates session-state.yaml from old .raise/rai/ to personal/."""
+        old_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        old_path.parent.mkdir(parents=True)
+        old_path.write_text(
+            yaml.dump(
+                _make_session_state().model_dump(mode="json"),
+                default_flow_style=False,
+            )
+        )
+        new_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
+        assert not new_path.exists()
+
+        result = load_session_state(tmp_path)
+        assert result is not None
+        assert result.current_work.epic == "E15"
+        # Old file should be gone, new file should exist
+        assert not old_path.exists()
+        assert new_path.exists()
+
+    def test_no_migration_if_new_path_exists(self, tmp_path: Path) -> None:
+        """Does not migrate if personal/ already has session-state.yaml."""
+        old_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        old_path.parent.mkdir(parents=True)
+        old_path.write_text("stale: true\n")
+
+        new_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
+        new_path.parent.mkdir(parents=True)
+        new_path.write_text(
+            yaml.dump(
+                _make_session_state().model_dump(mode="json"),
+                default_flow_style=False,
+            )
+        )
+
+        result = load_session_state(tmp_path)
+        assert result is not None
+        assert result.current_work.epic == "E15"
+
     def test_loads_valid_state(self, tmp_path: Path) -> None:
         """Loads and validates a correct session state file."""
-        state_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
         state_path.parent.mkdir(parents=True)
         state_path.write_text(
             yaml.dump(
@@ -176,17 +215,17 @@ class TestSaveSessionState:
     """Tests for save_session_state."""
 
     def test_creates_parent_directories(self, tmp_path: Path) -> None:
-        """Creates .raise/rai/ if it doesn't exist."""
+        """Creates .raise/rai/personal/ if it doesn't exist."""
         state = _make_session_state()
         save_session_state(tmp_path, state)
-        state_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
         assert state_path.exists()
 
     def test_writes_valid_yaml(self, tmp_path: Path) -> None:
         """Written file is valid YAML."""
         state = _make_session_state()
         save_session_state(tmp_path, state)
-        state_path = tmp_path / ".raise" / "rai" / "session-state.yaml"
+        state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
         data = yaml.safe_load(state_path.read_text())
         assert data["current_work"]["epic"] == "E15"
         assert data["last_session"]["id"] == "SES-097"
