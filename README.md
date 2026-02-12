@@ -100,7 +100,52 @@ This loads your context, memory, and proposes focused work.
 | Skills, methodology | Calibration data (`.raise/rai/personal/calibration.jsonl`) |
 | Work artifacts | Knowledge graph (`.raise/rai/memory/index.json`) |
 
-Each developer builds their own personal context through working sessions. Pattern IDs are developer-prefixed (e.g., PAT-E-001 for Emilio, PAT-F-001 for Fer) to prevent collisions.
+Each developer builds their own personal context through working sessions. Pattern IDs are developer-prefixed (e.g., PAT-A-001 for Alice, PAT-B-001 for Bob) to prevent collisions in shared repositories.
+
+---
+
+## Usage
+
+### Initialize RaiSE on Your Project
+
+```bash
+# Navigate to your existing project
+cd your-project
+
+# Initialize RaiSE governance structure
+rai init --detect
+
+# Open Claude Code and run onboarding
+/rai-welcome
+```
+
+This scaffolds the `.raise/` directory, detects your project's conventions (language, testing framework, linting), and builds the knowledge graph.
+
+### Daily Workflow
+
+A typical session follows this pattern:
+
+```
+1. /rai-session-start          # Load context, see what's pending
+2. /rai-story-start             # Create branch, define scope
+3. /rai-story-design            # Design the approach (recommended)
+4. /rai-story-plan              # Break into atomic tasks
+5. /rai-story-implement         # TDD execution with validation gates
+6. /rai-story-review            # Retrospective, capture patterns
+7. /rai-story-close             # Merge, cleanup
+8. /rai-session-close           # Persist learnings for next session
+```
+
+You don't need to complete all steps in one session — Rai remembers where you left off.
+
+### What Rai Remembers
+
+- **Patterns** — Reusable insights learned from your work (e.g., "always validate config at boundaries")
+- **Calibration** — Your velocity, strengths, growth edges
+- **Session history** — What you worked on, decisions made, items deferred
+- **Coaching corrections** — Mistakes Rai made and learned from
+
+Each session builds on the last. Over time, Rai becomes a more effective collaborator for your specific codebase and working style.
 
 ---
 
@@ -245,9 +290,11 @@ From the [Constitution](framework/reference/constitution.md):
 
 ---
 
-## For F&F Users
+## Status
 
-This is a pre-release (v2.0.0-alpha). We value your feedback:
+This is a pre-release (`v2.0.0-alpha`). The framework is being used in production but the API may change.
+
+We value your feedback:
 
 - **Questions?** Open an [issue](https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/issues)
 - **Found a bug?** Open an [issue](https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/issues) with reproduction steps
