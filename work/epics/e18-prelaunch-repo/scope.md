@@ -168,7 +168,7 @@ Sequential execution — 3M stories in 2.5 days leaves buffer before Feb 15 soft
 | S18.4 Security & Quality Spike | S | Pending | - | Research — informs S18.3 |
 
 **Milestones:**
-- [ ] M1: Repo Clean (Feb 13)
+- [x] M1: Repo Clean (Feb 12) ✓
 - [ ] M2: Launch Ready (Feb 14)
 
 ### Sequencing Risks
