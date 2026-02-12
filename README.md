@@ -57,6 +57,22 @@ run `uv venv` to create an environment.
 rai --help
 ```
 
+Windows WSL (Ubuntu/Debian).
+```bash
+# 1 — Use pipx
+
+sudo apt update
+sudo apt install pipx -y
+pipx ensurepath
+
+
+# 2 Close and new terminal WSL.
+
+# 3 Install:
+
+pipx install rai-cli
+```
+
 ### Onboarding with Rai
 
 Once installed, open Claude Code in the project directory and run:
