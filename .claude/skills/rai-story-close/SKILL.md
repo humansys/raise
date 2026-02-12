@@ -137,38 +137,6 @@ If any of the above: update the relevant module doc in `governance/architecture/
 
 > **If drift detected:** Update the module doc now. This is a 5-minute task that prevents hours of rework.
 
-### Step 1.75: Coherence Check — Update Architecture Docs
-
-If this story changed source code (not just tests, docs, or config), run the `/rai-docs-update` skill to sync architecture docs with code truth before merging.
-
-```bash
-# Quick check: did this story touch source code?
-git diff --name-only $(git merge-base HEAD {parent_branch})..HEAD | grep -q "^src/" && echo "CODE_CHANGED" || echo "DOCS_ONLY"
-```
-
-**Decision:**
-- **CODE_CHANGED** → Run `/rai-docs-update` now. It will build the graph, compare frontmatter, present diffs, and handle HITL approval internally.
-- **DOCS_ONLY** → Skip with message: "No source code changes — skipping coherence check."
-
-**After `/rai-docs-update` completes:** If any module docs were updated, commit them before proceeding to merge:
-
-```bash
-git add governance/architecture/modules/*.md
-git commit -m "docs({story_id}): sync module docs with code truth
-
-Updated by /rai-docs-update coherence check during story-close.
-
-Co-Authored-By: Rai <rai@humansys.ai>"
-```
-
-**If no docs changed:** Continue to Step 2.
-
-**Why here (not after merge):** Docs must be coherent *before* they land on the parent branch. Merging stale docs propagates drift to future sessions (PAT-196).
-
-**Verification:** `/rai-docs-update` ran (or skip stated) and any doc changes are committed.
-
-> **If you can't continue:** `/rai-docs-update` fails → Check that `rai memory build` works. If graph is broken, fix it or skip coherence check with a note and address in next session.
-
 ### Step 2: Identify Parent Branch
 
 Determine the merge target:
@@ -180,13 +148,13 @@ echo "Current branch: $CURRENT"
 
 # Determine parent (epic or main development branch)
 # Pattern: feature/{epic}/{feature} → epic/{epic}/...
-# Pattern: feature/standalone/... → v2 (or main)
+# Pattern: feature/standalone/... → {dev_branch}
 ```
 
 **Branch hierarchy:**
 - `feature/e12/f12-2` → merges to `epic/e12/...`
-- `feature/standalone/fx` → merges to `v2`
-- `epic/e12/...` → eventually merges to `v2`
+- `feature/standalone/fx` → merges to `{dev_branch}` (read from `.raise/manifest.yaml` → `branches.development`)
+- `epic/e12/...` → eventually merges to `{dev_branch}`
 
 **Verification:** Parent branch identified.
 
