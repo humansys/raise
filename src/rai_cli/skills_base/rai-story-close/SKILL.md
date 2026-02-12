@@ -148,13 +148,13 @@ echo "Current branch: $CURRENT"
 
 # Determine parent (epic or main development branch)
 # Pattern: feature/{epic}/{feature} → epic/{epic}/...
-# Pattern: feature/standalone/... → v2 (or main)
+# Pattern: feature/standalone/... → {dev_branch}
 ```
 
 **Branch hierarchy:**
 - `feature/e12/f12-2` → merges to `epic/e12/...`
-- `feature/standalone/fx` → merges to `v2`
-- `epic/e12/...` → eventually merges to `v2`
+- `feature/standalone/fx` → merges to `{dev_branch}` (read from `.raise/manifest.yaml` → `branches.development`)
+- `epic/e12/...` → eventually merges to `{dev_branch}`
 
 **Verification:** Parent branch identified.
 
