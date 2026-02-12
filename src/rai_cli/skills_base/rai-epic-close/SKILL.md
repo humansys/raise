@@ -20,6 +20,10 @@ metadata:
 
 # Epic Close: Epic Completion & Retrospective
 
+## Branch Configuration
+
+**Read `branches.development` from `.raise/manifest.yaml`** to determine the project's development branch. All references to `{dev_branch}` below use this value. Default: `main`.
+
 ## Purpose
 
 Complete an epic by conducting a retrospective, capturing metrics, cleaning up all branches, and merging to the development branch. This formally closes the epic lifecycle with learnings captured for continuous improvement.
@@ -38,7 +42,7 @@ Complete an epic by conducting a retrospective, capturing metrics, cleaning up a
 
 **When to use:**
 - All features in the epic are complete (merged to epic branch)
-- Ready to merge epic work into development branch (v2)
+- Ready to merge epic work into development branch (`{dev_branch}`)
 - Want to capture learnings before moving to next epic
 
 **When to skip:**
@@ -183,7 +187,7 @@ Template:
 
 ### Step 4: Merge Epic to Development Branch (REQUIRED)
 
-Merge the epic branch to v2 (or main development branch):
+Merge the epic branch to `{dev_branch}`:
 
 ```bash
 # Ensure on epic branch with latest
@@ -191,8 +195,8 @@ git checkout epic/{epic_id}/{name}
 git pull origin epic/{epic_id}/{name} 2>/dev/null || true
 
 # Switch to development branch
-git checkout v2
-git pull origin v2
+git checkout {dev_branch}
+git pull origin {dev_branch}
 
 # Merge with descriptive commit
 git merge --no-ff epic/{epic_id}/{name} -m "Merge epic/{epic_id}/{name}: {Epic Name}
@@ -211,7 +215,7 @@ Retrospective: dev/epic-{epic_id}-retrospective.md
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
-**Verification:** Merge commit created on v2.
+**Verification:** Merge commit created on `{dev_branch}`.
 
 > **If you can't continue:** Merge conflicts → Resolve carefully, preserving all epic work.
 
@@ -238,7 +242,7 @@ done
 
 **Verification:** No branches remain for this epic (local or remote).
 
-> **If you can't continue:** Branch deletion fails → Ensure you're on v2, not a branch being deleted.
+> **If you can't continue:** Branch deletion fails → Ensure you're on `{dev_branch}`, not a branch being deleted.
 
 ### Step 6: Update Backlog (REQUIRED)
 
@@ -284,7 +288,7 @@ Update `CLAUDE.local.md`:
 ## Output
 
 - **Retrospective:** `work/epics/e{N}-{name}/retrospective.md`
-- **Merge:** Epic merged to v2 with `--no-ff`
+- **Merge:** Epic merged to `{dev_branch}` with `--no-ff`
 - **Cleanup:** All epic and story branches deleted (local and remote)
 - **Backlog:** Epic marked complete
 - **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (epic complete)
@@ -295,7 +299,7 @@ Update `CLAUDE.local.md`:
 ```markdown
 ## Epic Closed: E{N} {Epic Name}
 
-**Branch:** `epic/{epic_id}/{name}` → merged to `v2`
+**Branch:** `epic/{epic_id}/{name}` → merged to `{dev_branch}`
 **Merge commit:** {commit_hash}
 **Duration:** X days
 
@@ -351,7 +355,7 @@ Skipping retrospectives loses compound learning.
 **Clean as you go.** After this skill:
 - No `epic/{epic_id}/*` branches should exist
 - No `feature/{epic_id}/*` branches should exist
-- All work is in v2 via merge commit
+- All work is in `{dev_branch}` via merge commit
 
 ### Abandoned Epics
 

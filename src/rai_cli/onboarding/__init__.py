@@ -35,6 +35,7 @@ from rai_cli.onboarding.governance import (
     generate_guardrails,
 )
 from rai_cli.onboarding.manifest import (
+    BranchConfig,
     ProjectInfo,
     ProjectManifest,
     load_manifest,
@@ -79,6 +80,7 @@ __all__ = [
     "GuardrailLevel",
     "generate_guardrails",
     # Manifest
+    "BranchConfig",
     "ProjectInfo",
     "ProjectManifest",
     "load_manifest",

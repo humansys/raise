@@ -9,6 +9,7 @@ import yaml
 
 from rai_cli.onboarding.detection import ProjectType
 from rai_cli.onboarding.manifest import (
+    BranchConfig,
     ProjectInfo,
     ProjectManifest,
     load_manifest,
@@ -56,6 +57,71 @@ class TestProjectManifest:
         project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
         manifest = ProjectManifest(version="2.0", project=project)
         assert manifest.version == "2.0"
+
+
+class TestBranchConfig:
+    """Tests for BranchConfig model."""
+
+    def test_defaults_to_main(self) -> None:
+        """BranchConfig defaults both branches to main."""
+        config = BranchConfig()
+        assert config.development == "main"
+        assert config.main == "main"
+
+    def test_custom_branches(self) -> None:
+        """BranchConfig with custom branch names."""
+        config = BranchConfig(development="develop", main="master")
+        assert config.development == "develop"
+        assert config.main == "master"
+
+
+class TestManifestWithBranches:
+    """Tests for ProjectManifest with branch config."""
+
+    def test_manifest_has_default_branches(self) -> None:
+        """Manifest has default branch config when not specified."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        manifest = ProjectManifest(project=project)
+        assert manifest.branches.development == "main"
+        assert manifest.branches.main == "main"
+
+    def test_manifest_with_custom_branches(self) -> None:
+        """Manifest accepts custom branch config."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        branches = BranchConfig(development="develop", main="main")
+        manifest = ProjectManifest(project=project, branches=branches)
+        assert manifest.branches.development == "develop"
+
+    def test_roundtrip_with_branches(self, tmp_path: Path) -> None:
+        """Save and load preserves branch config."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        branches = BranchConfig(development="dev", main="master")
+        original = ProjectManifest(project=project, branches=branches)
+
+        save_manifest(original, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.branches.development == "dev"
+        assert loaded.branches.main == "master"
+
+    def test_loads_manifest_without_branches_field(self, tmp_path: Path) -> None:
+        """Loads legacy manifest without branches field (backward compat)."""
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 10\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.branches.development == "main"
+        assert loaded.branches.main == "main"
 
 
 class TestSaveManifest:
