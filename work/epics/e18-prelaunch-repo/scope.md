@@ -23,15 +23,16 @@ Prepare raise-commons for public release: security audit, community files, READM
 
 ---
 
-## Stories (3)
+## Stories (4)
 
 | ID | Story | Size | GTM Ref | Description |
 |----|-------|:----:|---------|-------------|
 | S18.1 | Repo Readiness | M | S7.1 | Security audit, license fix, NOTICE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, issue templates, dep check |
 | S18.2 | README | M | S7.2 | Open-core README — 30-second conversion, GIF/screenshot, quick start, badges |
 | S18.3 | Release Engineering | M | S7.4 | pyproject.toml cleanup, GitHub mirror setup, TestPyPI → PyPI, release tag v2.0.0-alpha |
+| S18.4 | Security & Quality Tooling Spike | S | — | Research modern Python CLI security/quality toolchain (GitLab Premium, SonarCloud, Sigstore, SBOM) |
 
-**Total:** 3 stories (all M), all in raise-commons
+**Total:** 3M + 1S stories, all in raise-commons
 
 ---
 
@@ -136,6 +137,7 @@ Handoff signal: Dev Rai updates raise-gtm E7 progress tracking when S18.x storie
 | 1 | S18.1 Repo Readiness | M | None | M1 | Foundation — repo must be clean before anything public. Security audit + community files. |
 | 2 | S18.2 README | M | S18.1 (soft) | M2 | Conversion asset — needs repo shape to be final. FastAPI/Ruff pattern per D4. |
 | 3 | S18.3 Release Engineering | M | S18.1 (hard), S18.2 (soft) | M2 | Final step — publish only after repo is clean and README is ready. |
+| — | S18.4 Security & Quality Spike | S | S18.1 | — | Research spike — findings inform S18.3 toolchain decisions. |
 
 ### Milestones
 
@@ -160,9 +162,10 @@ Sequential execution — 3M stories in 2.5 days leaves buffer before Feb 15 soft
 
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
-| S18.1 Repo Readiness | M | Pending | - | |
+| S18.1 Repo Readiness | M | ✓ Done | - | 15d4bc4 |
 | S18.2 README | M | Pending | - | |
 | S18.3 Release Engineering | M | Pending | - | |
+| S18.4 Security & Quality Spike | S | Pending | - | Research — informs S18.3 |
 
 **Milestones:**
 - [ ] M1: Repo Clean (Feb 13)
