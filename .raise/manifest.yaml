@@ -4,3 +4,6 @@ project:
   project_type: brownfield
   code_file_count: 182
   detected_at: '2026-02-09T00:27:11.229956Z'
+branches:
+  development: v2
+  main: main
