@@ -165,7 +165,7 @@ Sequential execution — 3M stories in 2.5 days leaves buffer before Feb 15 soft
 | S18.1 Repo Readiness | M | ✓ Done | - | 15d4bc4 |
 | S18.2 README | M | Pending | - | |
 | S18.3 Release Engineering | M | Pending | - | |
-| S18.4 Security & Quality Spike | S | Pending | - | Research — informs S18.3 |
+| S18.4 Security & Quality Spike | S | ✓ Done | - | 886bf4d — 3-layer DevSecOps toolchain |
 
 **Milestones:**
 - [x] M1: Repo Clean (Feb 12) ✓
