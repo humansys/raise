@@ -3,7 +3,7 @@
 **Size:** M
 **Epic:** E18 (Pre-Launch Repo Readiness)
 **GTM Ref:** S7.1
-**Branch:** TBD (via `/rai-story-start`)
+**Branch:** story/s18.1/repo-readiness
 
 **In Scope:**
 - Security audit of git history (secrets, API keys, tokens)
