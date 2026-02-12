@@ -52,7 +52,7 @@ Guide a developer through brownfield project onboarding by combining codebase di
 - The existing codebase to analyze
 
 **Output:**
-- 7+ governance docs filled with discovery + conversational content (6 base + module docs)
+- 6 governance docs filled with discovery + conversational content
 - Knowledge graph with 30+ governance nodes
 - Project ready for `/rai-session-start`
 
@@ -190,6 +190,36 @@ Discovery found the components. Ask the user to confirm the bigger picture.
 **Verification:** You have external actors, interfaces, and confirmed component list.
 
 > **If you can't continue:** User hasn't thought about external boundaries → Help: "If someone drew a box around {project_name}, what arrows go in and out?"
+
+### Step 5.5: Collect Branch Configuration
+
+Ask about the project's branch model. This is stored in `.raise/manifest.yaml` and used by all workflow skills.
+
+**Ask:**
+> "What's your branch model?
+> 1. **Main/stable branch name** — e.g., `main`, `master`
+> 2. **Development/integration branch name** — e.g., `main`, `develop`, `dev`
+>
+> If you work directly on `main` with no separate development branch, both are `main`."
+
+**Defaults:** If the user is unsure, default both to `main` (simplest model).
+
+**What you need:**
+- `branches.main` — the stable branch (default: `main`)
+- `branches.development` — the integration branch (default: `main`)
+
+**Update manifest:**
+```bash
+# The manifest was created by rai init. Update it with branch config.
+# Add to .raise/manifest.yaml:
+# branches:
+#   development: {dev_branch}
+#   main: {main_branch}
+```
+
+**Verification:** Branch names captured. Manifest updated.
+
+> **If you can't continue:** User unsure → Default both to `main`. Can change later.
 
 ### Step 6: Generate and Write Governance Docs
 
@@ -334,27 +364,7 @@ version: "1.0.0"
 
 #### 6e: Write `governance/architecture/system-context.md`
 
-**IMPORTANT — Graph contract:** This doc MUST have YAML frontmatter with `type: architecture_context` to produce an `arch-context` node in the knowledge graph. Without it, the parser silently skips the file.
-
 ```markdown
----
-type: architecture_context
-project: "{project_name}"
-status: current
-tech_stack:
-  language: "{primary language}"
-  framework: "{primary framework, if any}"
-  testing: "{test framework}"
-external_dependencies:
-  - "{External system 1}"
-  - "{External system 2}"
-users:
-  - "{User type 1}"
-  - "{User type 2}"
-governed_by:
-  - "governance/guardrails.md"
----
-
 # System Context: {project_name}
 
 > C4 Level 1 — System Context diagram and description
@@ -384,22 +394,7 @@ governed_by:
 
 **For brownfield:** This doc is ENRICHED by discovery data. Components come from actual modules found in the code, not just user description.
 
-**IMPORTANT — Graph contract:** This doc MUST have YAML frontmatter with `type: architecture_design` to produce an `arch-design` node. The `layers:` field is critical — it produces layer nodes and module-to-layer edges.
-
 ```markdown
----
-type: architecture_design
-project: "{project_name}"
-status: current
-layers:
-  - name: "{layer_1_name}"
-    modules: [{module_1}, {module_2}]
-    description: "{What this layer does}"
-  - name: "{layer_2_name}"
-    modules: [{module_3}]
-    description: "{What this layer does}"
----
-
 # System Design: {project_name}
 
 > C4 Level 2 — Container/component decomposition
@@ -420,83 +415,7 @@ layers:
 - {Any architectural decisions from conversation or visible in code structure}
 ```
 
-#### 6g: Write `governance/architecture/domain-model.md`
-
-**IMPORTANT — Graph contract:** This doc MUST have YAML frontmatter with `type: architecture_domain_model` to produce an `arch-domain-model` node. The `bounded_contexts:` field produces bounded context nodes and module-to-context edges.
-
-```markdown
----
-type: architecture_domain_model
-project: "{project_name}"
-status: current
-bounded_contexts:
-  - name: "{context_1_name}"
-    modules: [{module_1}, {module_2}]
-    description: "{Domain boundary description}"
-  - name: "{context_2_name}"
-    modules: [{module_3}]
-    description: "{Domain boundary description}"
-shared_kernel:
-  modules: [{shared_module_1}]
-  description: "{Shared utilities across contexts}"
----
-
-# Domain Model: {project_name}
-
-> Bounded contexts and shared kernel — inferred from discovery module groupings
-
-## Bounded Contexts
-
-{Describe each bounded context and its modules. Group discovered modules by domain responsibility.}
-
-## Shared Kernel
-
-{Modules shared across bounded contexts — utilities, config, common types.}
-```
-
-**How to infer bounded contexts from discovery:** Group discovered modules by domain. Modules that share imports or data types likely belong to the same bounded context. Ask the user to confirm groupings if unclear.
-
-#### 6h: Generate `governance/architecture/modules/*.md`
-
-**IMPORTANT — Graph contract:** Each module doc MUST have YAML frontmatter with `type: module` to produce a `mod-{name}` node. These are the structural backbone — they link components to modules, modules to layers, and modules to bounded contexts.
-
-For each module discovered in Step 2, generate a module doc:
-
-```markdown
----
-type: module
-name: "{module_name}"
-purpose: "{One-line purpose — from discovery analysis + user confirmation}"
-status: current
-depends_on: [{detected_dependencies}]
-depended_by: []
-entry_points: []
-public_api: []
-components: {component_count_from_discovery}
----
-
-# Module: {module_name}
-
-> {Purpose}
-
-## Responsibility
-
-{What this module does — synthesized from discovery scan + user conversation}
-
-## Components
-
-{List key components discovered in this module}
-```
-
-**How to populate:**
-- `name`: Module directory name from discovery (e.g., `api`, `models`, `frontend`)
-- `purpose`: Synthesize from discovery analysis (what the module contains) + user context (what it's for)
-- `depends_on`: Infer from import analysis in discovery, or ask user
-- `components`: Count from discovery scan results
-
-Create `governance/architecture/modules/` directory, then write one `.md` file per discovered module.
-
-**Verification:** All governance docs written with project-specific content. No HTML comment placeholders remain. Architecture docs have YAML frontmatter. Module docs exist for each discovered module.
+**Verification:** All 6 governance docs written with project-specific content. No HTML comment placeholders remain.
 
 > **If you can't continue:** Write fails → Check file permissions. Governance dir should be writable.
 
@@ -521,25 +440,15 @@ Count the governance nodes. You need **30+ total** across these types:
 - Guardrails (from guardrails.md): ~5-13 nodes (table rows across sections)
 - Project (from backlog.md): 1 node
 - Epics (from backlog.md): ~2-4 nodes (table rows)
-- Architecture docs produce graph nodes: `arch-context`, `arch-design`, `arch-domain-model` (from system-context.md, system-design.md, domain-model.md)
-- Module docs produce graph nodes: `mod-{name}` (one per modules/*.md file)
-- Layers and bounded contexts are extracted automatically from architecture design and domain model frontmatter
-
-**Also run completeness validation:**
-```bash
-rai memory validate
-```
-
-Check that the completeness check passes (no "Completeness gaps" warnings). If warnings appear, fix the missing doc types — most likely a frontmatter issue.
+- Architecture docs don't produce individual nodes but enrich the graph context
 
 **Decision:**
-- 30+ governance nodes AND completeness check passes → **Gate passed.** Continue to summary.
+- 30+ nodes → **Gate passed.** Continue to summary.
 - <30 nodes → Investigate which docs didn't parse. Check format against parser contract in Step 6. Fix and rebuild.
-- Completeness gaps → Architecture or module docs are missing frontmatter. Check Steps 6e-6h.
 
-**Verification:** `rai memory build` succeeds, produces 30+ governance nodes, and `rai memory validate` shows no completeness gaps.
+**Verification:** `rai memory build` succeeds and produces 30+ governance nodes.
 
-> **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header, **and YAML frontmatter on architecture/module docs**. Fix the specific doc and rebuild.
+> **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header. Fix the specific doc and rebuild.
 
 ### Step 8: Summary and Next Steps
 
