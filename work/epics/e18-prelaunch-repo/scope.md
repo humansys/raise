@@ -1,7 +1,7 @@
 # Epic E18: Pre-Launch Repo Readiness — Scope
 
-> **Status:** PENDING
-> **Branch:** TBD (via `/rai-epic-start`)
+> **Status:** PLANNED
+> **Branch:** epic/e18/prelaunch-repo
 > **Created:** 2026-02-12
 > **Soft launch:** 2026-02-15 (Saturday)
 > **Parent:** E7 Pre-Launch Open Core (raise-gtm) — Dev Rai track
@@ -23,15 +23,16 @@ Prepare raise-commons for public release: security audit, community files, READM
 
 ---
 
-## Stories (3)
+## Stories (4)
 
 | ID | Story | Size | GTM Ref | Description |
 |----|-------|:----:|---------|-------------|
 | S18.1 | Repo Readiness | M | S7.1 | Security audit, license fix, NOTICE, CONTRIBUTING, CODE_OF_CONDUCT, CHANGELOG, issue templates, dep check |
 | S18.2 | README | M | S7.2 | Open-core README — 30-second conversion, GIF/screenshot, quick start, badges |
 | S18.3 | Release Engineering | M | S7.4 | pyproject.toml cleanup, GitHub mirror setup, TestPyPI → PyPI, release tag v2.0.0-alpha |
+| S18.4 | Security & Quality Tooling Spike | S | — | Research modern Python CLI security/quality toolchain (GitLab Premium, SonarCloud, Sigstore, SBOM) |
 
-**Total:** 3 stories (all M), all in raise-commons
+**Total:** 3M + 1S stories, all in raise-commons
 
 ---
 
@@ -103,11 +104,15 @@ S18.1 (Repo Readiness)
 
 ## Key Decisions
 
-| # | Decision | Rationale |
-|---|----------|-----------|
-| 1 | Separate epic in raise-commons (E18) vs inline in GTM E7 | Each repo owns its own work artifacts. GTM E7 references via GTM Ref column. |
-| 2 | Story IDs S18.x (not S7.x) | raise-commons numbering, cross-referenced to GTM S7.x |
-| 3 | Plan from raise-gtm S7.1 reused | S7.1 plan already detailed and reviewed — adopt, don't redo |
+| # | Decision | Resolution | Rationale |
+|---|----------|------------|-----------|
+| 1 | Separate epic in raise-commons (E18) vs inline in GTM E7 | Separate epic | Each repo owns its own work artifacts. GTM E7 references via GTM Ref column. |
+| 2 | Story IDs S18.x (not S7.x) | S18.x | raise-commons numbering, cross-referenced to GTM S7.x |
+| 3 | Plan from raise-gtm S7.1 reused | Reuse | S7.1 plan already detailed and reviewed — adopt, don't redo |
+| D2 | Fresh start vs full history for GitHub mirror | **Fresh start** | Asymmetric risk — missed secret >> lost history. No external contributors to attribute. Private history stays in GitLab. |
+| D3 | Mirror mechanism | **Manual push** | Simpler for launch. GitLab CI automation deferred to post-launch. |
+| D4 | README structure | **FastAPI/Ruff pattern** | Convergent evidence from 7 exemplars: one-liner → code example → features. |
+| D8 | Visual for README | **Session transcript** | Claude Code is text-based. GIF as nice-to-have post-launch. |
 
 ---
 
@@ -118,6 +123,66 @@ S18.1 (Repo Readiness)
 **Emilio** coordinates: S7.6 (soft launch), S7.7 (community launch)
 
 Handoff signal: Dev Rai updates raise-gtm E7 progress tracking when S18.x stories complete.
+
+---
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-12
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S18.1 Repo Readiness | M | None | M1 | Foundation — repo must be clean before anything public. Security audit + community files. |
+| 2 | S18.2 README | M | S18.1 (soft) | M2 | Conversion asset — needs repo shape to be final. FastAPI/Ruff pattern per D4. |
+| 3 | S18.3 Release Engineering | M | S18.1 (hard), S18.2 (soft) | M2 | Final step — publish only after repo is clean and README is ready. |
+| — | S18.4 Security & Quality Spike | S | S18.1 | — | Research spike — findings inform S18.3 toolchain decisions. |
+
+### Milestones
+
+| Milestone | Stories | Target | Success Criteria |
+|-----------|---------|--------|------------------|
+| **M1: Repo Clean** | S18.1 | Feb 13 | No secrets, license consistent, all community files present, tests pass |
+| **M2: Launch Ready** | S18.2, S18.3 | Feb 14 | README passes 30-sec test, `pip install rai-cli` works from PyPI, GitHub mirror live |
+
+### Work Streams
+
+```
+Time →  Feb 12-13              Feb 13-14              Feb 14
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        S18.1 (Repo) ────────► S18.2 (README) ──────► S18.3 (Release)
+                                                         │
+                                                    Launch Ready ──► raise-gtm S7.6
+```
+
+Sequential execution — 3M stories in 2.5 days leaves buffer before Feb 15 soft launch.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Notes |
+|-------|:----:|:------:|:------:|-------|
+| S18.1 Repo Readiness | M | ✓ Done | - | 15d4bc4 |
+| S18.2 README | M | Pending | - | |
+| S18.3 Release Engineering | M | Pending | - | |
+| S18.4 Security & Quality Spike | S | Pending | - | Research — informs S18.3 |
+
+**Milestones:**
+- [ ] M1: Repo Clean (Feb 13)
+- [ ] M2: Launch Ready (Feb 14)
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| Security audit finds secrets in history | Low | Low | D2 resolved: fresh start eliminates history risk |
+| PyPI publish fails on clean env | Low | Medium | TestPyPI verification before production publish; already published alpha.6 successfully |
+| README 30-sec test fails with F&F | Medium | Medium | Early F&F review during S18.2; iterate before S18.3 |
+
+---
+
+*Plan created: 2026-02-12*
+*Next: `/rai-story-start` for S18.1*
 
 ---
 

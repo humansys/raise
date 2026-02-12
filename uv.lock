@@ -396,7 +396,7 @@ wheels = [
 
 [[package]]
 name = "rai-cli"
-version = "2.0.0a2"
+version = "2.0.0a6"
 source = { editable = "." }
 dependencies = [
     { name = "networkx" },
