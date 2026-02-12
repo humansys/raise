@@ -84,8 +84,25 @@ def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
 
 
 def _format_developer_section(profile: DeveloperProfile) -> str:
-    """Format the developer identity line."""
-    return f"Developer: {profile.name} ({profile.experience_level.value})"
+    """Format developer identity line with non-default communication prefs."""
+    line = f"Developer: {profile.name} ({profile.experience_level.value})"
+
+    # Surface communication preferences that deviate from defaults
+    comm = profile.communication
+    prefs: list[str] = []
+    if comm.language != "en":
+        prefs.append(f"language: {comm.language}")
+    if comm.style.value != "balanced":
+        prefs.append(f"style: {comm.style.value}")
+    if comm.skip_praise:
+        prefs.append("skip_praise")
+    if comm.redirect_when_dispersing:
+        prefs.append("redirect_when_dispersing")
+
+    if prefs:
+        line += f"\nCommunication: {', '.join(prefs)}"
+
+    return line
 
 
 def _format_work_section(state: SessionState | None) -> str:

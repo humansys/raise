@@ -9,6 +9,8 @@ from unittest.mock import patch
 from rai_cli.context.models import ConceptNode
 from rai_cli.onboarding.profile import (
     CoachingContext,
+    CommunicationPreferences,
+    CommunicationStyle,
     Correction,
     Deadline,
     DeveloperProfile,
@@ -17,11 +19,11 @@ from rai_cli.onboarding.profile import (
 )
 from rai_cli.schemas.session_state import (
     CurrentWork,
+    EpicProgress,
     LastSession,
     PendingItems,
     SessionState,
 )
-from rai_cli.schemas.session_state import EpicProgress
 from rai_cli.session.bundle import (
     _format_governance_primes,
     _format_identity_primes,
@@ -328,6 +330,100 @@ def _make_always_on_node(
         created="2026-02-08",
         metadata={"always_on": True},
     )
+
+
+class TestFormatDeveloperSection:
+    """Tests for _format_developer_section communication preferences."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_includes_non_default_language(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Developer section includes language when not default 'en'."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(
+            name="Emilio",
+            experience_level=ExperienceLevel.RI,
+            communication=CommunicationPreferences(language="mixed"),
+        )
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
+        assert "Developer: Emilio (ri)" in bundle
+        assert "language: mixed" in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_omits_default_language(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Developer section omits language when default 'en'."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="Test")
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
+        assert "language:" not in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_includes_non_default_style(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Developer section includes style when not default 'balanced'."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(
+            name="Test",
+            communication=CommunicationPreferences(
+                style=CommunicationStyle.DIRECT,
+            ),
+        )
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
+        assert "style: direct" in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_includes_skip_praise(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Developer section includes skip_praise when true."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(
+            name="Test",
+            communication=CommunicationPreferences(skip_praise=True),
+        )
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
+        assert "skip_praise" in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_omits_all_defaults(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Developer section omits communication when all defaults."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="Test")
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
+        assert "Communication:" not in bundle
+        assert "language:" not in bundle
+        assert "style:" not in bundle
 
 
 class TestGetAlwaysOnPrimes:
