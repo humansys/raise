@@ -39,7 +39,20 @@ RaiSE is a methodology + toolkit for professional developers who use AI assistan
 - [uv](https://github.com/astral-sh/uv) (recommended) or pip
 - [Claude Code](https://claude.ai/claude-code) CLI installed and configured
 
-### Setup
+### Quick Install (from PyPI)
+
+```bash
+# Current release is alpha — requires --pre flag
+pip install --pre rai-cli
+
+# Or with uv:
+uv pip install --prerelease=allow rai-cli
+
+# Verify
+rai --help
+```
+
+### Development Setup
 
 ```bash
 # 1. Clone and checkout the development branch
