@@ -35,16 +35,30 @@ class ProjectInfo(BaseModel):
     detected_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
+class BranchConfig(BaseModel):
+    """Branch naming configuration for the project.
+
+    Attributes:
+        development: The development/integration branch name.
+        main: The stable/production branch name.
+    """
+
+    development: str = "main"
+    main: str = "main"
+
+
 class ProjectManifest(BaseModel):
     """Project manifest stored in .raise/manifest.yaml.
 
     Attributes:
         version: Manifest schema version.
         project: Project information.
+        branches: Branch naming configuration.
     """
 
     version: str = "1.0"
     project: ProjectInfo
+    branches: BranchConfig = Field(default_factory=BranchConfig)
 
 
 def save_manifest(manifest: ProjectManifest, project_root: Path) -> None:

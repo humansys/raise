@@ -2,7 +2,7 @@
 name: rai-epic-start
 description: >
   Initialize an epic with branch and scope commit.
-  Creates the epic branch from v2 that story branches will nest under.
+  Creates the epic branch from the development branch that story branches will nest under.
 
 license: MIT
 
@@ -19,9 +19,13 @@ metadata:
 
 # Start: Epic Initialization
 
+## Branch Configuration
+
+**Read `branches.development` from `.raise/manifest.yaml`** to determine the project's development branch. All references to `{dev_branch}` below use this value. Default: `main`.
+
 ## Purpose
 
-Initialize an epic with a dedicated branch from v2 and a scope commit. Feature branches will be created as sub-branches of this epic branch.
+Initialize an epic with a dedicated branch from `{dev_branch}` and a scope commit. Feature branches will be created as sub-branches of this epic branch.
 
 ## Context
 
@@ -31,7 +35,7 @@ Initialize an epic with a dedicated branch from v2 and a scope commit. Feature b
 - Creating isolation for a significant capability
 
 **When to skip:**
-- Small fixes or single features (use story branch from v2)
+- Small fixes or single features (use story branch from `{dev_branch}`)
 - Continuation of existing epic (branch already exists)
 
 **Inputs required:**
@@ -40,35 +44,35 @@ Initialize an epic with a dedicated branch from v2 and a scope commit. Feature b
 - High-level objective
 
 **Output:**
-- Epic branch created from v2
+- Epic branch created from `{dev_branch}`
 - Scope commit documenting boundaries
 - Telemetry recorded
 
 **Branch model:**
 ```
 main (stable)
-  └── v2 (development)
+  └── {dev_branch} (development)
         └── epic/e{N}/{name}        ← THIS SKILL CREATES
               └── feature/f{N}.{M}/{name}  ← /rai-story-start creates
 ```
 
 ## Steps
 
-### Step 1: Verify on v2 Branch
+### Step 1: Verify on Development Branch
 
-Ensure we're starting from the development branch:
+Ensure we're starting from the development branch (`{dev_branch}`):
 
 ```bash
 git branch --show-current
 ```
 
 **Decision:**
-- On `v2` → Continue
-- On other branch → `git checkout v2 && git pull`
+- On `{dev_branch}` → Continue
+- On other branch → `git checkout {dev_branch} && git pull`
 
-**Verification:** On v2 branch, up to date.
+**Verification:** On `{dev_branch}` branch, up to date.
 
-> **Poka-yoke:** Epic branches MUST branch from v2. Starting from wrong branch causes merge pain.
+> **Poka-yoke:** Epic branches MUST branch from `{dev_branch}`. Starting from wrong branch causes merge pain.
 
 ### Step 2: Create Epic Branch
 
@@ -109,7 +113,7 @@ Document what's in and out of scope:
 **Done when:**
 - [ ] All features complete
 - [ ] Epic retrospective done
-- [ ] Merged to v2
+- [ ] Merged to `{dev_branch}`
 ```
 
 **Verification:** Scope documented.
@@ -158,7 +162,7 @@ rai memory emit-work epic E{N} --event start --phase init
      ↓
 [features via /rai-story-start → ... → /rai-story-close]
      ↓
-/rai-epic-close (retrospective, merge to v2)
+/rai-epic-close (retrospective, merge to {dev_branch})
 ```
 
 **Next:** `/rai-epic-design` to formalize scope and features.
@@ -166,7 +170,7 @@ rai memory emit-work epic E{N} --event start --phase init
 
 ## Output
 
-- **Branch:** `epic/e{N}/{slug}` created from v2
+- **Branch:** `epic/e{N}/{slug}` created from `{dev_branch}`
 - **Commit:** Scope commit with objective and boundaries
 - **Telemetry:** Epic start recorded
 - **Next:** `/rai-epic-design`
@@ -178,7 +182,7 @@ rai memory emit-work epic E{N} --event start --phase init
 
 **Branch:** `epic/e{N}/{slug}`
 **Commit:** {hash}
-**Base:** v2
+**Base:** `{dev_branch}`
 
 ### Quick Scope
 **Objective:** {1-line}
@@ -195,18 +199,18 @@ rai memory emit-work epic E{N} --event start --phase init
 
 1. **Isolation** — Epic work isolated from other epics
 2. **Feature nesting** — Features branch from epic, merge to epic
-3. **Clean merge** — Epic merges as unit to v2
+3. **Clean merge** — Epic merges as unit to `{dev_branch}`
 4. **Rollback** — Can abandon entire epic if needed
 
 ### Branch Lifecycle
 
 ```
-v2 ──┬── epic/e14/rai-distribution
+{dev_branch} ──┬── epic/e14/rai-distribution
      │         ├── feature/f14.1/base-identity
      │         ├── feature/f14.2/base-patterns
      │         └── (features merge back to epic)
      │
-     └── (epic merges to v2 at /rai-epic-close)
+     └── (epic merges to {dev_branch} at /rai-epic-close)
 ```
 
 ## References

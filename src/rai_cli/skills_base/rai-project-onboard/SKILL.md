@@ -191,6 +191,36 @@ Discovery found the components. Ask the user to confirm the bigger picture.
 
 > **If you can't continue:** User hasn't thought about external boundaries → Help: "If someone drew a box around {project_name}, what arrows go in and out?"
 
+### Step 5.5: Collect Branch Configuration
+
+Ask about the project's branch model. This is stored in `.raise/manifest.yaml` and used by all workflow skills.
+
+**Ask:**
+> "What's your branch model?
+> 1. **Main/stable branch name** — e.g., `main`, `master`
+> 2. **Development/integration branch name** — e.g., `main`, `develop`, `dev`
+>
+> If you work directly on `main` with no separate development branch, both are `main`."
+
+**Defaults:** If the user is unsure, default both to `main` (simplest model).
+
+**What you need:**
+- `branches.main` — the stable branch (default: `main`)
+- `branches.development` — the integration branch (default: `main`)
+
+**Update manifest:**
+```bash
+# The manifest was created by rai init. Update it with branch config.
+# Add to .raise/manifest.yaml:
+# branches:
+#   development: {dev_branch}
+#   main: {main_branch}
+```
+
+**Verification:** Branch names captured. Manifest updated.
+
+> **If you can't continue:** User unsure → Default both to `main`. Can change later.
+
 ### Step 6: Generate and Write Governance Docs
 
 Write all 6 governance docs using combined discovery + conversation data. **CRITICAL:** Follow the exact format for each doc — the graph parsers use regex patterns to extract nodes.
