@@ -6,40 +6,17 @@
 
 ---
 
-## Pre-Release (before first PyPI publish)
+## Pre-Release (before first PyPI publish) — DONE
 
-- [ ] **S-RENAME: Command entry point `rai` → `rai`, package `rai-cli` → `rai-cli`**
-  - **Why now:** Zero installed users. After publish, this becomes a breaking change.
-  - **Blast radius:** ~430 references across skills (123 in skills_base, 148 in .claude/skills), Python source (119), tests (42), README, CLAUDE.md, governance docs
-  - **Nature:** Mechanical find-replace. No logic changes. Test suite catches breakage.
-  - **Changes:** pyproject.toml (name + entry point), all `rai discover` → `rai discover`, `rai memory` → `rai memory`, `rai session` → `rai session`, `rai init` → `rai init`, etc.
-  - **Rationale:** `rai` = the partner's name, 3 chars vs 5, no Python keyword collision, "I asked Rai to scan" is natural speech
-  - **Size:** S (mechanical, ~30 min)
-  - **Blocks:** PyPI publish
-
-- [ ] **S-NAMESPACE: Skill namespace prefix `rai.` for all distributed skills**
-  - **Why:** Without namespace, RaiSE skills mix with user-created skills in `.claude/skills/`
-  - **Research needed:** Claude Code skill naming best practices, whether native namespacing is coming, dot vs dash separator, impact on `/skill-name` invocation
-  - **Changes:** 17 skill directories renamed (both skills_base/ and .claude/skills/), DISTRIBUTABLE_SKILLS list, all cross-references between skills, methodology.yaml
-  - **DX trade-off:** `/story-implement` → `/rai.story-implement` (longer to type)
-  - **Alternative:** Wait for Claude Code to add native namespacing
-  - **Size:** M (research + mechanical rename)
-  - **Blocks:** PyPI publish (or not — could be done post-publish as non-breaking since skills are project-local)
+- [x] **S-RENAME:** ✓ Already published as `rai-cli` with `rai` entry point
+- [x] **S-NAMESPACE:** ✓ Completed SES-140 — `rai-` prefix for all 23 skills
+- [x] **First PyPI publish:** ✓ 2.0.0a1 published 2026-02-11, now at 2.0.0a5
 
 ---
 
 ## Urgent
 
-- [x] **WorkLifecycle phase mismatch: CLI accepts phases the Pydantic model rejects** — (SES-131, SES-136) ✓ Fixed SES-136 — added `init` + `close` to Pydantic Literal
-  - **Root cause:** Two validation layers disagree. CLI `valid_phases` list (memory.py:1396) includes `'init'` but `WorkLifecycle.phase` Pydantic Literal (schemas.py:267) only allows `['design', 'plan', 'implement', 'review']`. CLI pre-validation passes, Pydantic construction crashes.
-  - **Missing phases:** `init` (needed by `/epic-start`, `/story-start`), `close` (needed by `/story-close`, `/epic-close`)
-  - **Locations:**
-    - Schema: `src/rai_cli/telemetry/schemas.py:267` — `phase: Literal["design", "plan", "implement", "review"]`
-    - CLI validator: `src/rai_cli/cli/commands/memory.py:1396` — `valid_phases` list
-  - **Fix:** Add `'init'` and `'close'` to the Pydantic Literal in `WorkLifecycle.phase`, and ensure CLI `valid_phases` matches exactly. Single source of truth: the Pydantic model should define valid phases, CLI should read from it.
-  - **Workaround:** Use `--phase design` for init events, `--phase review` for close events
-  - **Frequency:** Hits on every `/epic-start`, `/story-start`, `/story-close`, `/epic-close` — 4x per story cycle
-  - **Priority:** Urgent — XS fix, high frequency
+- [x] **WorkLifecycle phase mismatch** — ✓ Fixed SES-136
 
 - [ ] **Domain stance layer — behavioral priming per project type** — (SES-134, 2026-02-10)
   - **Insight:** Identity (CLAUDE.md) shapes behavior deeply. Governance docs inform but don't prime as strongly. There's a missing middle layer: domain-specific thinking patterns that make Rai fluent, not just informed.
@@ -162,7 +139,7 @@
   - Pattern pruning/archival when noise overwhelms signal
 - [ ] **HITL approval before completion signals** - Telemetry "complete" events should only emit AFTER user approval
 - [ ] **Pre-design research phase in lifecycle** - Formalize optional research phase before `/epic-design`
-- [x] **Research gate for UX-facing stories** — (SES-142, S-WELCOME retro, PAT-E-263) Add `/rai-research` as recommended step in `/rai-story-design` when story touches human interaction. Cost: ~10 min. Value: prevented building wrong thing in S-WELCOME. ✓ S-RESEARCH-GATE
+- [x] **Research gate for UX-facing stories** — ✓ S-RESEARCH-GATE (SES-142)
 
 - [ ] **Documentation debt from early retros** — Minor additions deferred since early February:
   - Document Pyright + Pydantic `Field(default_factory=list)` exception in guardrails
@@ -202,7 +179,7 @@
 - [ ] **Git history integration** — Nice-to-have for evolution tracking
 - [ ] **CI/CD drift blocking** — Start with warnings, add blocking after validation
 - [ ] **PageRank ranking** — Simpler heuristics (public/exported) sufficient for MVP
-- [x] **Multi-language support** — ~~Start with Python, expand based on need~~ → E17 Multi-Language Discovery
+- [x] **Multi-language support** — ✓ E17 Multi-Language Discovery
 
 ### E17 Multi-Language Discovery — Deferred (2026-02-09)
 
@@ -233,7 +210,7 @@
 
 ### E16 Incremental Coherence — Parking Lot (2026-02-09)
 
-- [x] **Multi-platform code analyzers** — ✅ E17 delivered TS/TSX, PHP, Svelte extractors (2026-02-10)
+- [x] **Multi-platform code analyzers** — ✓ E17 (2026-02-10)
 - [ ] **Add dataset enumeration step to /story-design for ID format changes** — (PAT-220)
 - [ ] **Rename "discovery" namespace to "discover"** — Harmonize verb form across skills. Cosmetic.
 - [ ] **Absorb `/discover-complete` into `/discover-validate`** — Export is a mechanical final step, not a separate concern.
@@ -298,5 +275,5 @@
 ---
 
 *Created: 2026-01-31*
-*Last reviewed: 2026-02-09*
-*Last updated: 2026-02-09 (pruned 31 resolved/stale items, consolidated documentation debt)*
+*Last reviewed: 2026-02-12*
+*Last updated: 2026-02-12 (pruned completed items: pre-release blockers done, phase mismatch fixed, research gate done, multi-lang done)*

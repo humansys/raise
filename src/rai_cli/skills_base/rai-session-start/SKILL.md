@@ -62,6 +62,7 @@ With the context bundle from Step 1, use inference to:
    - Deadline pressure (<3 days → focus critical path)
    - Coaching corrections → reinforce behavioral primes
    - Pending decisions or blockers → address first
+   - Communication preferences (language, style, skip_praise, redirect) → adapt tone accordingly
 
 2. **Check parking lot:** If `dev/parking-lot.md` exists, scan for stale items (>2 weeks).
 
