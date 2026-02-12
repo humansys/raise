@@ -28,8 +28,9 @@
 | E15 | **Ontology Graph Refinement** | ✅ Complete | `work/epics/e15-ontology-refinement/scope.md` | — |
 | E16 | **Incremental Coherence** | ✅ Complete | `work/epics/e16-incremental-coherence/scope.md` | — |
 | E17 | **Multi-Language Discovery** | ✅ Complete | `work/epics/e17-multi-language-discovery/scope.md` | — |
+| E18 | **Pre-Launch Repo Readiness** | 📋 Pending | `work/epics/e18-prelaunch-repo/scope.md` | P0 (Feb 15) |
 
-**Summary:** 16 of 17 epics complete. E10 (Collective Intelligence) is V3 scope. E9 Phase 2 is next candidate.
+**Summary:** 16 of 17 epics complete. E18 (Pre-Launch Repo) is active priority for Feb 15 soft launch. E10 (Collective Intelligence) is V3 scope.
 
 ---
 
@@ -106,7 +107,23 @@ Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (3)
 
 ---
 
-## 4. Next Candidates
+## 4. Current Work
+
+### E18: Pre-Launch Repo Readiness (P0 — Feb 15 soft launch)
+
+Dev Rai track of GTM E7 (raise-gtm). Repo must be public-ready before soft launch.
+
+| Story | Size | Status | GTM Ref | Description |
+|-------|:----:|:------:|---------|-------------|
+| S18.1 Repo Readiness | M | Pending | S7.1 | Security audit, license, community files, issue templates |
+| S18.2 README | M | Pending | S7.2 | Open-core README for 30-second conversion |
+| S18.3 Release Engineering | M | Pending | S7.4 | GitHub mirror, TestPyPI → PyPI, release tag |
+
+**Sequence:** S18.1 → S18.2 → S18.3 (S18.2/S18.3 can overlap)
+
+---
+
+## 5. Next Candidates
 
 | Candidate | What | Priority | Effort |
 |-----------|------|----------|--------|
@@ -119,7 +136,7 @@ See `dev/parking-lot.md` for full idea backlog.
 
 ---
 
-## 5. Definition of Done
+## 6. Definition of Done
 
 Each feature is complete when:
 
