@@ -50,6 +50,9 @@ git checkout v2
 # 2. Install in development mode
 uv pip install -e ".[dev]"
 
+If error "No virtual environment found."
+run `uv venv` to create an environment.
+
 # 3. Verify installation
 rai --help
 ```
