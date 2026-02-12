@@ -244,7 +244,7 @@ This is a pre-release (v2.0.0-alpha). We value your feedback:
 
 ## License
 
-[MIT](LICENSE)
+[Apache-2.0](LICENSE)
 
 ---
 
