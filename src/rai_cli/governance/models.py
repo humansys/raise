@@ -42,6 +42,8 @@ class ConceptType(str, Enum):
     DECISION = "decision"
     GUARDRAIL = "guardrail"
     TERM = "term"
+    # Release ontology
+    RELEASE = "release"
 
 
 class Concept(BaseModel):
