@@ -64,6 +64,8 @@ Set up the humansys GitHub org with a filtered mirror of raise-commons. The repo
 - `dev/` — internal dev docs, parking lot, happy path guides
 - `.raise/` — memory graph, telemetry, session state
 - `archive/` — historical artifacts
+- `blog/` — article drafts (published via raise-gtm)
+- `docs/` — internal research notes
 
 **Included (everything else):**
 - `src/` — source code
@@ -89,5 +91,5 @@ Set up the humansys GitHub org with a filtered mirror of raise-commons. The repo
 - PR template added
 
 **MUST NOT:**
-- Push `work/`, `dev/`, `.raise/`, `archive/` to GitHub
+- Push `work/`, `dev/`, `.raise/`, `archive/`, `blog/`, `docs/` to GitHub
 - Make repo public before explicit go-ahead
