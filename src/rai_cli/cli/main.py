@@ -14,6 +14,7 @@ from rai_cli.cli.commands.discover import discover_app
 from rai_cli.cli.commands.init import init_command
 from rai_cli.cli.commands.memory import memory_app
 from rai_cli.cli.commands.profile import profile_app
+from rai_cli.cli.commands.release import release_app
 from rai_cli.cli.commands.session import session_app
 from rai_cli.cli.commands.skill import skill_app
 from rai_cli.config import RaiSettings
@@ -43,6 +44,7 @@ app.add_typer(base_app, name="base")
 app.add_typer(discover_app, name="discover")
 app.add_typer(memory_app, name="memory")
 app.add_typer(profile_app, name="profile")
+app.add_typer(release_app, name="release")
 app.add_typer(session_app, name="session")
 app.add_typer(skill_app, name="skill")
 
