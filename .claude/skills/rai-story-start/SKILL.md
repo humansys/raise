@@ -238,6 +238,7 @@ rai memory emit-work story {story_id} --event start --phase design
 ```markdown
 ## Feature Started: {story_id}
 
+**Release:** REL-{id} ({name}, target {date})
 **Epic:** {epic_id} (or standalone)
 **Branch:** `feature/{epic_id}/{story_id}`
 **Scope commit:** {commit_hash}
