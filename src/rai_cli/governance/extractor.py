@@ -16,6 +16,7 @@ from rai_cli.governance.parsers.epic import extract_epic_details, extract_storie
 from rai_cli.governance.parsers.glossary import extract_all_terms
 from rai_cli.governance.parsers.guardrails import extract_all_guardrails
 from rai_cli.governance.parsers.prd import extract_requirements
+from rai_cli.governance.parsers.roadmap import extract_releases
 from rai_cli.governance.parsers.vision import extract_outcomes
 
 logger = logging.getLogger(__name__)
@@ -210,6 +211,16 @@ class GovernanceExtractor:
             except Exception as e:
                 errors.append(f"Error extracting glossary terms: {e}")
 
+        # Extract Releases from roadmap
+        roadmap_file = self.project_root / "governance" / "roadmap.md"
+        if roadmap_file.exists():
+            try:
+                release_concepts = extract_releases(roadmap_file, self.project_root)
+                concepts.extend(release_concepts)
+                files_processed += 1
+            except Exception as e:
+                errors.append(f"Error extracting from {roadmap_file}: {e}")
+
         return ExtractionResult(
             concepts=concepts,
             total=len(concepts),
@@ -304,6 +315,8 @@ class GovernanceExtractor:
             return ConceptType.GUARDRAIL
         elif "glossary" in file_name:
             return ConceptType.TERM
+        elif "roadmap" in file_name:
+            return ConceptType.RELEASE
         else:
             raise ValueError(
                 f"Cannot infer concept type from file path: {file_path}. "
