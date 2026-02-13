@@ -3,25 +3,45 @@
 **Size:** M
 **Epic:** E18 (Pre-Launch Repo Readiness)
 **GTM Ref:** S7.4
-**Branch:** TBD (via `/rai-story-start`)
+**Branch:** `story/s18.3/release-engineering`
+**Research:** S18.4 security-quality-tooling synthesis (150+ sources)
 
 **In Scope:**
-- pyproject.toml review and cleanup for public release
-- GitHub public repo creation and mirror setup (GitLab → GitHub)
-- TestPyPI publish and install verification on clean environment
-- PyPI publish (production)
+
+L1 — Pre-commit (local dev):
+- `.pre-commit-config.yaml` with ruff, detect-secrets, bandit, pyright (pre-push)
+- `.secrets.baseline` for detect-secrets
+- bandit config in pyproject.toml
+
+L2 — CI Pipeline:
+- GitHub Actions: test + lint + type check workflow
+- GitHub Actions: CodeQL (security-extended queries)
+- GitLab CI: SAST + dependency scanning + secret detection (3 template includes)
+- Dependabot config (deps + GH Actions)
+
+L3 — Release Pipeline:
+- GitHub Actions: release workflow with Trusted Publishers (no token)
+- PEP 740 attestations (automatic via pypa/gh-action-pypi-publish)
+- GitHub public repo setup and mirror (GitLab → GitHub)
+- TestPyPI → PyPI publish verification
 - GitHub release tag (v2.0.0-alpha)
-- Verify `pip install rai-cli` works end-to-end on fresh env
 
 **Out of Scope:**
-- CI/CD pipeline (post-launch)
+- zizmor (GH Actions audit) — post-launch
+- CycloneDX SBOM generation — post-launch
+- `actions/attest-build-provenance` — post-launch
+- SonarCloud — revisit when team grows
+- SLSA Level 3 — aspirational
 - Automated mirror sync (manual push for alpha)
 - PRO/Enterprise packaging
 
 **Done Criteria:**
-- [ ] `pip install rai-cli` works from PyPI on 3 clean environments
+- [ ] Pre-commit hooks run <4s, pre-push <15s
+- [ ] `pip install rai-cli` works from PyPI on clean environment
 - [ ] GitHub public repo live with correct content
 - [ ] GitHub release tag created
+- [ ] CodeQL enabled on GitHub mirror
+- [ ] GitLab CI security scanning active
 - [ ] TestPyPI verification passed before production publish
 - [ ] Retrospective complete
 
