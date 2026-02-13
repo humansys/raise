@@ -1315,6 +1315,7 @@ class UnifiedGraphBuilder:
         edges.extend(self._infer_part_of(nodes, node_by_id))
         edges.extend(self._infer_skill_edges(nodes, node_by_id))
         edges.extend(self._infer_depends_on(nodes, node_by_id))
+        edges.extend(self._infer_release_part_of(nodes, node_by_id))
 
         # Infer heuristic edges
         edges.extend(self._infer_keyword_relationships(nodes))
@@ -1490,6 +1491,47 @@ class UnifiedGraphBuilder:
                             source=node.id,
                             target=target_id,
                             type="depends_on",
+                            weight=1.0,
+                        )
+                    )
+
+        return edges
+
+    def _infer_release_part_of(
+        self,
+        nodes: list[ConceptNode],
+        node_by_id: dict[str, ConceptNode],
+    ) -> list[ConceptEdge]:
+        """Infer part_of edges from epics to releases.
+
+        Uses the ``epics`` list in release node metadata to create
+        part_of edges. Skips edges where the epic node doesn't exist.
+
+        Args:
+            nodes: All concept nodes.
+            node_by_id: Lookup dict by node ID.
+
+        Returns:
+            List of part_of edges from epic to release.
+        """
+        edges: list[ConceptEdge] = []
+
+        for node in nodes:
+            if node.type != "release":
+                continue
+
+            epic_refs: Any = node.metadata.get("epics", [])
+            if not isinstance(epic_refs, list):
+                continue
+
+            for epic_ref in cast(list[str], epic_refs):
+                epic_id = f"epic-{epic_ref.lower()}"
+                if epic_id in node_by_id:
+                    edges.append(
+                        ConceptEdge(
+                            source=epic_id,
+                            target=node.id,
+                            type="part_of",
                             weight=1.0,
                         )
                     )
