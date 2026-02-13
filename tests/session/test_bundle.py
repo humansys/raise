@@ -698,6 +698,140 @@ class TestFormatRecentSessions:
         assert "..." in result
 
 
+class TestBundleReleaseContext:
+    """Tests for release context in session bundle."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_bundle_includes_release_when_graph_has_release_edge(
+        self, mock_patterns: object, mock_always_on: object, tmp_path: Path
+    ) -> None:
+        """Bundle includes release line when graph has epic→release edge."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        # Build a graph with epic→release edge
+        from rai_cli.context.graph import UnifiedGraph
+        from rai_cli.context.models import ConceptEdge
+
+        graph = UnifiedGraph()
+        graph.add_concept(
+            ConceptNode(
+                id="rel-v3.0",
+                type="release",
+                content="V3.0 Commercial Launch",
+                source_file="governance/roadmap.md",
+                created="2026-02-11",
+                metadata={
+                    "release_id": "REL-V3.0",
+                    "name": "V3.0 Commercial Launch",
+                    "target": "2026-03-14",
+                },
+            )
+        )
+        graph.add_concept(
+            ConceptNode(
+                id="epic-e19",
+                type="epic",
+                content="V3 Product Design",
+                source_file="governance/backlog.md",
+                created="2026-02-11",
+            )
+        )
+        graph.add_relationship(
+            ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
+        )
+        graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
+        graph.save(graph_path)
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E19", story="S19.3", phase="implement",
+                branch="epic/e19/v3",
+            ),
+            last_session=LastSession(
+                id="SES-100", date=date(2026, 2, 13),
+                developer="Test", summary="test",
+            ),
+        )
+
+        bundle = assemble_context_bundle(profile, state, tmp_path)
+        assert "Release: REL-V3.0" in bundle
+        assert "V3.0 Commercial Launch" in bundle
+        assert "2026-03-14" in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_bundle_omits_release_when_no_graph(
+        self, mock_patterns: object, mock_always_on: object, tmp_path: Path
+    ) -> None:
+        """Bundle omits release line when no graph exists."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E19", story="S19.3", phase="implement",
+                branch="epic/e19/v3",
+            ),
+            last_session=LastSession(
+                id="SES-100", date=date(2026, 2, 13),
+                developer="Test", summary="test",
+            ),
+        )
+
+        bundle = assemble_context_bundle(profile, state, tmp_path)
+        assert "Release:" not in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_bundle_omits_release_when_epic_has_no_release(
+        self, mock_patterns: object, mock_always_on: object, tmp_path: Path
+    ) -> None:
+        """Bundle omits release line when epic has no release in graph."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        # Graph exists but epic has no release edge
+        from rai_cli.context.graph import UnifiedGraph
+
+        graph = UnifiedGraph()
+        graph.add_concept(
+            ConceptNode(
+                id="epic-e18",
+                type="epic",
+                content="V2 Open Core",
+                source_file="governance/backlog.md",
+                created="2026-02-11",
+            )
+        )
+        graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
+        graph.save(graph_path)
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E18", story="S18.1", phase="implement",
+                branch="epic/e18/v2",
+            ),
+            last_session=LastSession(
+                id="SES-100", date=date(2026, 2, 13),
+                developer="Test", summary="test",
+            ),
+        )
+
+        bundle = assemble_context_bundle(profile, state, tmp_path)
+        assert "Release:" not in bundle
+
+
 class TestGetFoundationalPatterns:
     """Tests for get_foundational_patterns."""
 

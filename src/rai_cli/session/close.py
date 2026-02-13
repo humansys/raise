@@ -202,6 +202,7 @@ def process_session_close(
     if close_input.current_work:
         cw = close_input.current_work
         current_work = CurrentWork(
+            release=cw.get("release", ""),
             epic=cw.get("epic", ""),
             story=cw.get("story", ""),
             phase=cw.get("phase", ""),
@@ -209,7 +210,7 @@ def process_session_close(
         )
     else:
         current_work = CurrentWork(
-            epic="", story="", phase="", branch=""
+            release="", epic="", story="", phase="", branch=""
         )
 
     pending = PendingItems()

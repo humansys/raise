@@ -79,19 +79,21 @@ rai memory emit-work epic {epic_id} --event start --phase design
 
 ### Step 0.5: Query Context
 
-Load relevant architecture decisions and prior epic patterns from unified context:
+Load relevant architecture decisions, prior epic patterns, and release context from unified context:
 
 ```bash
 rai memory query "architecture ADR epic" --types pattern,decision --limit 5
+rai memory query "release" --types release --limit 3
 ```
 
-Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions.
+Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions. The release query identifies which release this epic belongs to — use this to frame the objective and timeline in Step 1.
 
 **What this returns:**
 - Learned patterns from prior epics
 - Prior architectural decisions (ADRs) relevant to this epic
+- Release context (target dates, scope, related epics)
 
-**Verification:** Context loaded; relevant patterns noted.
+**Verification:** Context loaded; relevant patterns noted; release association identified (if any).
 
 > **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
 
@@ -132,6 +134,7 @@ rai memory context mod-<name>
 Define what this epic accomplishes at a strategic level.
 
 **Capture:**
+- **Release context**: Which release does this epic serve? (e.g., REL-V3.0). Frame the objective within the release's goals and timeline.
 - **Objective**: What business/user outcome does this epic deliver? (1-2 sentences)
 - **Value proposition**: Why does this matter? What's unlocked after completion?
 - **Success criteria**: How will we know the epic succeeded? (measurable outcomes)
@@ -445,6 +448,7 @@ rai memory emit-work epic {epic_id} --event complete --phase design
 # Epic E{N}: {Epic Name} - Scope
 
 > **Status:** IN PROGRESS
+> **Release:** REL-{id} ({release name}, target {release date})
 > Branch: `feature/e{n}/{epic-slug}`
 > Created: YYYY-MM-DD
 > Target: YYYY-MM-DD (deadline or milestone)

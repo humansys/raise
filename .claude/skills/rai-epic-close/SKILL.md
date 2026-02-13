@@ -171,6 +171,14 @@ Template:
 
 ---
 
+## Release Impact
+
+**Release:** REL-{id} ({release name})
+**Epic progress:** {N}/{total} epics complete for this release
+**Remaining epics:** [list remaining epic IDs]
+
+> Include this section when the epic belongs to a release. Shows how epic completion advances the release.
+
 ## Next Steps
 
 - [What follows this epic]
@@ -257,6 +265,8 @@ Mark the epic complete in `governance/backlog.md`:
 ```
 
 **Verification:** Backlog reflects epic completion.
+
+> **Release tracking:** If the epic belongs to a release, note the release progress (e.g., "REL-V3.0: 1/4 epics complete"). This helps future sessions understand release velocity.
 
 ### Step 7: Emit Epic Complete Telemetry
 
