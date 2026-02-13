@@ -3,7 +3,7 @@
 #
 # This script creates a filtered copy of a source branch and force-pushes
 # it to the GitHub remote. Internal directories (work/, dev/, .raise/,
-# archive/) are excluded so the public repo shows only the product.
+# archive/, blog/, docs/) are excluded so the public repo shows only the product.
 #
 # Usage:
 #   ./scripts/sync-github.sh [source-branch] [target-branch]
@@ -24,7 +24,7 @@ set -euo pipefail
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
 TEMP_BRANCH="__sync-github-temp"
-EXCLUDED_DIRS=("work" "dev" ".raise" "archive")
+EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs")
 
 # Colors for output
 RED='\033[0;31m'
