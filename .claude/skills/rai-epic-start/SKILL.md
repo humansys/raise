@@ -97,6 +97,7 @@ Document what's in and out of scope:
 ```markdown
 ## Epic Scope: E{N} {Name}
 
+**Release:** REL-{id} ({name}, target {date})
 **Objective:** {1-2 sentences}
 
 **In Scope:**
@@ -197,6 +198,7 @@ rai memory emit-work epic E{N} --event start --phase init
 ```markdown
 ## Epic Started: E{N} {Name}
 
+**Release:** REL-{id} ({name}, target {date})
 **Branch:** `epic/e{N}/{slug}`
 **Commit:** {hash}
 **Base:** `{dev_branch}`
