@@ -39,7 +39,7 @@ Use inference to reflect on the session:
 4. **Patterns:** Any new learnings? (check against existing — query if needed)
 5. **Corrections:** Any behavioral corrections observed? (what + lesson)
 6. **Coaching:** Reflect on the working relationship (see below)
-7. **Current work:** Epic, story, phase, branch for continuity
+7. **Current work:** Release, epic, story, phase, branch for continuity
 8. **Pending:** Decisions, blockers, next actions
 9. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
 
@@ -72,6 +72,7 @@ coaching:                                # Only include fields that changed
   communication_notes:
     - "prefers direct, concise"
 current_work:
+  release: V3.0
   epic: E15
   story: S15.7
   phase: implement

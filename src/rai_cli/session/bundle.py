@@ -105,16 +105,61 @@ def _format_developer_section(profile: DeveloperProfile) -> str:
     return line
 
 
-def _format_work_section(state: SessionState | None) -> str:
+def _find_release_for_current_epic(
+    project_path: Path, epic_id: str
+) -> ConceptNode | None:
+    """Find release node for the current epic from the memory graph.
+
+    Args:
+        project_path: Absolute path to the project root.
+        epic_id: Epic identifier (e.g., "E19").
+
+    Returns:
+        The release ConceptNode, or None if not found or graph unavailable.
+    """
+    if not epic_id:
+        return None
+
+    graph_path = project_path / GRAPH_REL_PATH
+    if not graph_path.exists():
+        return None
+
+    try:
+        from rai_cli.context.query import UnifiedQueryEngine
+
+        engine = UnifiedQueryEngine.from_file(graph_path)
+        return engine.find_release_for(f"epic-{epic_id.lower()}")
+    except Exception:
+        logger.debug("Failed to query release for epic %s", epic_id)
+        return None
+
+
+def _format_work_section(
+    state: SessionState | None,
+    release_node: ConceptNode | None = None,
+) -> str:
     """Format current work state."""
     if state is None:
         return "Work: (no previous session state)"
 
-    lines = [
+    lines: list[str] = []
+
+    if release_node:
+        release_id = release_node.metadata.get("release_id", release_node.id)
+        name = release_node.metadata.get("name", "")
+        target = release_node.metadata.get("target", "")
+        release_parts = [f"Release: {release_id}"]
+        if name:
+            release_parts.append(f"({name})")
+        if target:
+            release_parts.append(f"— Target: {target}")
+        lines.append(" ".join(release_parts))
+
+    lines.extend([
         f"Story: {state.current_work.story} [{state.current_work.phase}]",
         f"Epic: {state.current_work.epic}",
         f"Branch: {state.current_work.branch}",
-    ]
+    ])
     return "\n".join(lines)
 
 
@@ -354,11 +399,18 @@ def assemble_context_bundle(
     patterns = get_foundational_patterns(project_path)
     always_on = get_always_on_primes(project_path)
 
+    # Resolve release context for current epic
+    release_node: ConceptNode | None = None
+    if state and state.current_work.epic:
+        release_node = _find_release_for_current_epic(
+            project_path, state.current_work.epic
+        )
+
     # Session Context header
     sections = [
         "# Session Context",
         _format_developer_section(profile),
-        _format_work_section(state),
+        _format_work_section(state, release_node=release_node),
     ]
 
     # Progress (epic SP, completed epics)
