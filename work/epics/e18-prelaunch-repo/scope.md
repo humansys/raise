@@ -163,7 +163,7 @@ Sequential execution — 3M stories in 2.5 days leaves buffer before Feb 15 soft
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
 | S18.1 Repo Readiness | M | ✓ Done | - | 15d4bc4 |
-| S18.2 README | M | Pending | - | |
+| S18.2 README | M | ✓ Done | - | da9bb52 — FastAPI/Ruff pattern, 312→152 lines |
 | S18.3 Release Engineering | M | Pending | - | |
 | S18.4 Security & Quality Spike | S | ✓ Done | - | 886bf4d — 3-layer DevSecOps toolchain |
 
