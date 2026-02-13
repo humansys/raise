@@ -130,8 +130,17 @@ exclude_lines = [
     "if TYPE_CHECKING:",
 ]
 
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B101"]  # assert is fine in non-production code
+
 [tool.rai]
 # RaiSE CLI configuration for this project
 output_format = "human"
 color = true
 verbosity = 0
+
+[dependency-groups]
+dev = [
+    "detect-secrets>=1.5.0",
+]
