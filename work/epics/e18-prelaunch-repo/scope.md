@@ -23,7 +23,7 @@ Prepare raise-commons for public release: security audit, community files, READM
 
 ---
 
-## Stories (4)
+## Stories (5)
 
 | ID | Story | Size | GTM Ref | Description |
 |----|-------|:----:|---------|-------------|
@@ -31,8 +31,9 @@ Prepare raise-commons for public release: security audit, community files, READM
 | S18.2 | README | M | S7.2 | Open-core README — 30-second conversion, GIF/screenshot, quick start, badges |
 | S18.3 | Release Engineering | M | S7.4 | pyproject.toml cleanup, GitHub mirror setup, TestPyPI → PyPI, release tag v2.0.0-alpha |
 | S18.4 | Security & Quality Tooling Spike | S | — | Research modern Python CLI security/quality toolchain (GitLab Premium, SonarCloud, Sigstore, SBOM) |
+| S18.5 | GitHub Org Setup | M | S7.4 | humansys org, raise repo, engineering team, sync script, labels |
 
-**Total:** 3M + 1S stories, all in raise-commons
+**Total:** 4M + 1S stories, all in raise-commons
 
 ---
 
@@ -166,6 +167,7 @@ Sequential execution — 3M stories in 2.5 days leaves buffer before Feb 15 soft
 | S18.2 README | M | ✓ Done | - | da9bb52 — FastAPI/Ruff pattern, 312→152 lines |
 | S18.3 Release Engineering | M | Pending | - | |
 | S18.4 Security & Quality Spike | S | ✓ Done | - | 886bf4d — 3-layer DevSecOps toolchain |
+| S18.5 GitHub Org Setup | M | ✓ Done | 38 min | 1.58x velocity — repo, team, sync script |
 
 **Milestones:**
 - [x] M1: Repo Clean (Feb 12) ✓
