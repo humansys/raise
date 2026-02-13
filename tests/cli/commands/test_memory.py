@@ -406,13 +406,14 @@ class TestMemoryValidateCommand:
             assert "Completeness" in result.output
             assert "architecture" in result.output
             assert "module" in result.output
+            assert "release" in result.output
         finally:
             os.chdir(original_cwd)
 
-    def test_validate_completeness_passes_with_architecture_and_modules(
+    def test_validate_completeness_passes_with_all_expected_types(
         self, tmp_path: Path
     ) -> None:
-        """Validate should pass completeness when architecture and module nodes exist."""
+        """Validate should pass completeness when architecture, module, and release nodes exist."""
         memory_dir = tmp_path / ".raise" / "rai" / "memory"
         memory_dir.mkdir(parents=True)
 
@@ -433,6 +434,14 @@ class TestMemoryValidateCommand:
                     "source_file": "governance/architecture/modules/core.md",
                     "created": "2026-01-31",
                     "metadata": {},
+                },
+                {
+                    "id": "rel-v2.0",
+                    "type": "release",
+                    "content": "V2.0 Open Core",
+                    "source_file": "governance/roadmap.md",
+                    "created": "2026-02-11",
+                    "metadata": {"release_id": "REL-V2.0"},
                 },
             ],
             "edges": [],

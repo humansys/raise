@@ -631,6 +631,7 @@ def validate(
     expected_types: dict[str, int] = {
         "architecture": 1,  # ≥1 arch-* node
         "module": 1,  # ≥1 mod-* node
+        "release": 1,  # ≥1 rel-* node
     }
     type_counts: dict[str, int] = {}
     for node in graph.iter_concepts():
