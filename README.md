@@ -1,304 +1,147 @@
 # RaiSE
 
-**Reliable AI Software Engineering** — Ship quality software at AI speed.
+**Reliable AI Software Engineering** — Governance that makes AI-assisted development actually reliable.
 
-> *Raise your craft, feature by feature.*
-
----
-
-## What is RaiSE?
-
-RaiSE is a methodology + toolkit for professional developers who use AI assistants. It solves the problem of AI-generated code that's fast but inconsistent: governance that works naturally, validation at every step, and memory that persists across sessions.
-
-**The RaiSE Triad:**
-
-```
-        RaiSE Engineer
-        (You - Strategy, Judgment, Ownership)
-              │
-              │ collaborates with
-              ▼
-           Rai
-   (AI Partner - Execution + Memory)
-              │
-              │ governed by
-              ▼
-           RaiSE
-    (Methodology + Toolkit)
-```
-
-**Rai** is your AI collaborator — not a generic assistant, but a partner trained in the discipline of reliable AI software engineering. Rai remembers your patterns, calibrates to your velocity, and maintains coherence across sessions.
+[![PyPI version](https://img.shields.io/pypi/v/rai-cli.svg)](https://pypi.org/project/rai-cli/)
+[![Python versions](https://img.shields.io/pypi/pyversions/rai-cli.svg)](https://pypi.org/project/rai-cli/)
+[![License](https://img.shields.io/pypi/l/rai-cli.svg)](https://github.com/humansys-ai/raise-commons/blob/main/LICENSE)
 
 ---
 
-## Developer Onboarding
-
-### Prerequisites
-
-- Python 3.12+
-- [uv](https://github.com/astral-sh/uv) (recommended) or pip
-- [Claude Code](https://claude.ai/claude-code) CLI installed and configured
-
-### Quick Install (from PyPI)
-
-```bash
-# Current release is alpha — requires --pre flag
-pip install --pre rai-cli
-
-# Or with uv:
-uv pip install --prerelease=allow rai-cli
-
-# Verify
-rai --help
-```
-
-### Development Setup
-
-```bash
-# 1. Clone and checkout the development branch
-git clone https://gitlab.com/humansys-demos/product/raise1/raise-commons.git
-cd raise-commons
-git checkout v2
-
-# 2. Install in development mode
-uv pip install -e ".[dev]"
-
-# 3. Verify installation
-rai --help
-```
-
-### Onboarding with Rai
-
-Once installed, open Claude Code in the project directory and run:
+## What does it look like?
 
 ```
-/rai-welcome
+$ pip install rai-cli
+$ cd your-project
+$ rai init --detect
+
+✓ Detected: Python 3.12, pytest, ruff, pyright
+✓ Scaffolded .raise/ governance structure
+✓ Built knowledge graph (47 components, 12 modules)
+
+# Open Claude Code and start working:
+
+> /rai-session-start
+
+Session: 2026-02-12
+Context: your-project → 47 components mapped
+Focus: Ready for first story
+Signals: None
+
+Go.
+
+> /rai-story-start S1
+
+Branch: story/s1/add-auth-middleware
+Scope commit: a1b2c3d
+
+> /rai-story-implement
+
+Task 1/3: Write failing test for auth middleware... ✓
+Task 2/3: Implement middleware to pass test... ✓
+Task 3/3: Integration test... ✓
+All gates passed. Ready for review.
 ```
 
-This single command will:
-- **Detect your situation** (new developer, returning developer, etc.)
-- **Create your profile** (`~/.rai/developer.yaml`) with your name and pattern prefix
-- **Build the knowledge graph** so Rai has project context
-- **Scaffold `CLAUDE.local.md`** for your personal Claude Code instructions
-- **Optionally customize** communication preferences (language, style)
-- **Verify everything works**
-
-After welcome completes, start working:
-
-```
-/rai-session-start
-```
-
-This loads your context, memory, and proposes focused work.
-
-### What You Get
-
-| Shared (committed) | Personal (gitignored) |
-|--------------------|-----------------------|
-| Patterns (`.raise/rai/memory/patterns.jsonl`) | Session history (`.raise/rai/personal/sessions/`) |
-| Governance docs | Session state (`.raise/rai/personal/session-state.yaml`) |
-| Skills, methodology | Calibration data (`.raise/rai/personal/calibration.jsonl`) |
-| Work artifacts | Knowledge graph (`.raise/rai/memory/index.json`) |
-
-Each developer builds their own personal context through working sessions. Pattern IDs are developer-prefixed (e.g., PAT-A-001 for Alice, PAT-B-001 for Bob) to prevent collisions in shared repositories.
+Rai remembers your patterns, calibrates to your velocity, and maintains coherence across sessions. Every session builds on the last.
 
 ---
 
-## Usage
+## Why RaiSE?
 
-### Initialize RaiSE on Your Project
+AI coding assistants are fast but unreliable. They generate code without memory, context, or quality discipline. The result: inconsistent output that needs constant human correction.
+
+RaiSE fixes this with three things:
+
+- **Governance as code** — Quality standards, guardrails, and validation gates versioned in your repo. The AI follows them automatically.
+- **Persistent memory** — Patterns learned, mistakes corrected, calibration accumulated. Session 50 is better than session 1.
+- **Structured workflow** — Story lifecycle from scope to retrospective. TDD enforcement, atomic commits, human-in-the-loop gates.
+
+---
+
+## Features
+
+**24 skills** that guide AI-assisted development through structured workflows:
+
+| Category | Skills | What they do |
+|----------|--------|-------------|
+| **Session** | `session-start`, `session-close` | Load context, persist learnings between sessions |
+| **Story** | `story-start` through `story-close` | Full development lifecycle with TDD and validation gates |
+| **Epic** | `epic-start` through `epic-close` | Multi-story planning with milestones and dependencies |
+| **Discovery** | `discover-start`, `discover-scan` | Map existing codebases — Python, TypeScript, JavaScript, PHP, Svelte |
+| **Research** | `research`, `debug` | Epistemologically rigorous research and root cause analysis |
+
+**Knowledge graph** that gives the AI real context about your codebase — modules, dependencies, architecture decisions, not just file contents.
+
+**Memory system** that accumulates patterns, calibration data, and coaching corrections across sessions. Rai gets better at working with *your* codebase over time.
+
+---
+
+## Quick Start
 
 ```bash
-# Navigate to your existing project
+# Install
+pip install rai-cli
+
+# Initialize on your project
 cd your-project
-
-# Initialize RaiSE governance structure
 rai init --detect
 
-# Open Claude Code and run onboarding
-/rai-welcome
+# Open Claude Code and onboard
+claude
+> /rai-welcome
 ```
 
-This scaffolds the `.raise/` directory, detects your project's conventions (language, testing framework, linting), and builds the knowledge graph.
+**Requirements:** Python 3.12+, [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI
 
-### Daily Workflow
+After onboarding, start each session with `/rai-session-start` and Rai proposes focused work based on where you left off.
 
-A typical session follows this pattern:
+---
+
+## How It Works
 
 ```
-1. /rai-session-start          # Load context, see what's pending
-2. /rai-story-start             # Create branch, define scope
-3. /rai-story-design            # Design the approach (recommended)
-4. /rai-story-plan              # Break into atomic tasks
-5. /rai-story-implement         # TDD execution with validation gates
-6. /rai-story-review            # Retrospective, capture patterns
-7. /rai-story-close             # Merge, cleanup
-8. /rai-session-close           # Persist learnings for next session
+/rai-session-start          Load context, see what's pending
+    ↓
+/rai-story-start            Create branch, define scope
+    ↓
+/rai-story-plan             Break into atomic tasks
+    ↓
+/rai-story-implement        TDD execution with validation gates
+    ↓
+/rai-story-review           Retrospective, capture patterns
+    ↓
+/rai-story-close            Merge, cleanup
+    ↓
+/rai-session-close          Persist learnings for next session
 ```
 
 You don't need to complete all steps in one session — Rai remembers where you left off.
 
-### What Rai Remembers
+---
 
-- **Patterns** — Reusable insights learned from your work (e.g., "always validate config at boundaries")
-- **Calibration** — Your velocity, strengths, growth edges
-- **Session history** — What you worked on, decisions made, items deferred
-- **Coaching corrections** — Mistakes Rai made and learned from
+## Documentation
 
-Each session builds on the last. Over time, Rai becomes a more effective collaborator for your specific codebase and working style.
+- [Getting Started Guide](framework/getting-started/)
+- [Constitution & Principles](framework/reference/constitution.md)
+- [Glossary](framework/reference/glossary.md)
+- [Contributing](CONTRIBUTING.md)
+- [Changelog](CHANGELOG.md)
 
 ---
 
-## Available Skills
+## Community
 
-Skills are structured processes that guide AI-assisted development. Run them as `/skill-name` in Claude Code.
-
-### Session Lifecycle
-| Skill | Purpose |
-|-------|---------|
-| `/rai-welcome` | One-time developer onboarding |
-| `/rai-session-start` | Begin a session with memory and context |
-| `/rai-session-close` | End a session, persist learnings |
-
-### Story Lifecycle
-| Skill | Purpose |
-|-------|---------|
-| `/rai-story-start` | Initialize a story with branch and scope |
-| `/rai-story-design` | Create lean specs for complex stories |
-| `/rai-story-plan` | Decompose into atomic tasks |
-| `/rai-story-implement` | Execute with TDD and validation gates |
-| `/rai-story-review` | Retrospective and learnings |
-| `/rai-story-close` | Merge, cleanup, tracking |
-
-### Epic Lifecycle
-| Skill | Purpose |
-|-------|---------|
-| `/rai-epic-start` | Initialize an epic with branch |
-| `/rai-epic-design` | Design multi-story epics |
-| `/rai-epic-plan` | Sequence stories into plans |
-| `/rai-epic-close` | Epic retrospective and merge |
-
-### Other Skills
-| Skill | Purpose |
-|-------|---------|
-| `/rai-research` | Epistemologically rigorous research |
-| `/rai-debug` | Root cause analysis (5 Whys, Ishikawa) |
-| `/rai-docs-update` | Sync architecture docs with code |
-| `/rai-discover-start` | Initialize codebase discovery |
-| `/rai-discover-scan` | Extract and describe components |
-
----
-
-## CLI Commands
-
-The `rai` CLI provides deterministic operations:
-
-```bash
-# Build Rai's knowledge graph from project artifacts
-rai memory build
-
-# Query governance concepts
-rai memory context mod-session
-
-# Query Rai's memory
-rai memory query "velocity patterns"
-
-# Start a session (creates profile on first run)
-rai session start --name "YourName" --project "$(pwd)" --context
-
-# Close a session
-rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
-```
-
----
-
-## Repository Structure
-
-```
-raise-commons/
-├── .claude/skills/      # Claude Code skills (24 skills)
-│
-├── framework/           # Public textbook (concepts, reference)
-│   ├── reference/       #   Constitution, glossary, philosophy
-│   ├── concepts/        #   Core concepts (katas, gates, artifacts)
-│   └── getting-started/ #   Greenfield/brownfield guides
-│
-├── .raise/              # Framework engine
-│   ├── rai/             #   Rai's memory and personal data
-│   │   ├── memory/      #     Patterns, knowledge graph (shared)
-│   │   └── personal/    #     Sessions, calibration (per-developer, gitignored)
-│   ├── katas/           #   Process definitions
-│   ├── gates/           #   Validation criteria
-│   ├── templates/       #   Artifact scaffolds
-│   └── skills/          #   Legacy skill definitions
-│
-├── governance/          # Project governance
-│   ├── architecture/    #   Module docs, system design
-│   └── solution/        #   Vision, guardrails, business case
-│
-├── src/rai_cli/         # CLI toolkit (Python)
-│
-├── work/                # Work in progress
-│   └── stories/         #   Story artifacts (scope, design, plan, retro)
-│
-└── dev/                 # Framework maintenance
-    ├── decisions/       #   ADRs (Architecture Decision Records)
-    └── parking-lot.md   #   Ideas and tangents for later
-```
-
----
-
-## Branch Model
-
-```
-main (stable releases)
-  └── v2 (development)
-        └── epic/e{N}/{name}
-              └── story/s{N}.{M}/{name}
-```
-
-- Work on `v2` (development branch)
-- Stories branch from and merge back to their epic or `v2`
-- `main` receives releases from `v2`
-
----
-
-## Core Concepts
-
-| Concept | Description |
-|---------|-------------|
-| **RaiSE Engineer** | You — the human who directs AI-assisted development |
-| **Rai** | AI partner with memory, calibration, and accumulated judgment |
-| **Skill** | Structured Claude Code prompt for a methodology phase |
-| **Validation Gate** | Quality checkpoint with specific criteria |
-| **Guardrail** | Constraint that guides AI behavior |
-| **ShuHaRi** | Mastery levels (beginner → practitioner → master) that adapt Rai's verbosity |
-
-See the full [Glossary](framework/reference/glossary.md) for canonical terminology.
-
----
-
-## Key Principles
-
-From the [Constitution](framework/reference/constitution.md):
-
-1. **Humans Define, Machines Execute** — Specs are source of truth
-2. **Governance as Code** — Standards versioned in Git
-3. **Validation Gates** — Quality checked at each phase
-4. **Observable Workflow** — Every decision traceable
-5. **Jidoka** — Stop on defects, don't accumulate errors
+- [Report a bug](https://github.com/humansys-ai/raise-commons/issues/new?template=bug-report.yml)
+- [Request a feature](https://github.com/humansys-ai/raise-commons/issues/new?template=feature-request.yml)
+- [Security policy](SECURITY.md)
+- [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ---
 
 ## Status
 
-This is a pre-release (`v2.0.0-alpha`). The framework is being used in production but the API may change.
-
-We value your feedback:
-
-- **Questions?** Open an [issue](https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/issues)
-- **Found a bug?** Open an [issue](https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/issues) with reproduction steps
-- **Ideas?** We want to hear them — open an issue or reach out directly
+Pre-release (`v2.0.0-alpha`). Used in production but the API may change. We value your feedback — [open an issue](https://github.com/humansys-ai/raise-commons/issues) or reach out directly.
 
 ---
 
@@ -306,7 +149,4 @@ We value your feedback:
 
 [Apache-2.0](LICENSE)
 
----
-
-*RaiSE — Reliable AI Software Engineering*
-*Neither is complete alone.*
+*RaiSE — Reliable AI Software Engineering. Raise your craft, one story at a time.*
