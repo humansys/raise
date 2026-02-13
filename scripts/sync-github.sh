@@ -2,8 +2,16 @@
 # sync-github.sh — Push filtered raise-commons content to GitHub mirror
 #
 # This script creates a clean orphan commit from a source branch, excluding
-# internal directories, and force-pushes it to the GitHub remote. No git
-# history is carried — the public repo shows only the current state.
+# internal directories and files, and force-pushes it to the GitHub remote.
+# No git history is carried — the public repo shows only the current state.
+#
+# Excluded (internal):
+#   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/, governance/, .claude/, scripts/
+#   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md
+#
+# Included (public):
+#   src/, tests/, framework/, .github/, pyproject.toml, uv.lock,
+#   README.md, LICENSE, CONTRIBUTING.md, CODE_OF_CONDUCT.md, NOTICE, CHANGELOG.md, .gitignore
 #
 # Usage:
 #   ./scripts/sync-github.sh [source-branch] [target-branch]
@@ -24,7 +32,8 @@ set -euo pipefail
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
 TEMP_BRANCH="__sync-github-temp"
-EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs")
+EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs" "governance" ".claude" "scripts")
+EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md")
 
 # Colors for output
 RED='\033[0;31m'
@@ -69,7 +78,8 @@ SOURCE_SHA=$(git rev-parse "$SOURCE_BRANCH")
 SOURCE_SHORT=$(git rev-parse --short "$SOURCE_BRANCH")
 
 info "Syncing $SOURCE_BRANCH ($SOURCE_SHORT) → github/$TARGET_BRANCH"
-info "Excluded: ${EXCLUDED_DIRS[*]}"
+info "Excluded dirs: ${EXCLUDED_DIRS[*]}"
+info "Excluded files: ${EXCLUDED_FILES[*]}"
 
 # Check out source branch content
 git checkout "$SOURCE_BRANCH" --quiet
@@ -82,6 +92,14 @@ for dir in "${EXCLUDED_DIRS[@]}"; do
     if [ -d "$dir" ]; then
         git rm -rf --quiet "$dir"
         info "Removed $dir/"
+    fi
+done
+
+# Remove excluded files
+for file in "${EXCLUDED_FILES[@]}"; do
+    if [ -f "$file" ]; then
+        git rm -f --quiet "$file"
+        info "Removed $file"
     fi
 done
 
