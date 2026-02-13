@@ -113,6 +113,9 @@ class TestReleaseList:
 
     def test_shows_error_when_no_graph(self, tmp_path: Path) -> None:
         """rai release list shows error when graph doesn't exist."""
+        from rai_cli.cli.error_handler import set_error_console
+
+        set_error_console(None)  # Reset singleton to avoid test ordering leaks
         result = runner.invoke(app, ["release", "list", "--project", str(tmp_path)])
         assert result.exit_code != 0
         assert "build" in result.output.lower() or "build" in (result.stderr or "").lower()
