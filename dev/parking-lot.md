@@ -42,6 +42,18 @@
 
 ---
 
+## Process Debt
+
+- [ ] **Deterministic backlog sync via CLI** — (SES-150, 2026-02-13, S-RELEASE-ONTOLOGY)
+  - **Problem:** Epic lifecycle skills (start/close) rely on inference to update `governance/backlog.md`. E18-E22 existed but weren't in the backlog — zero release→epic edges in graph. Strategy sessions that define future epics also bypass the backlog.
+  - **Skill fix (done):** Added Step 5 to `/rai-epic-start` requiring backlog row registration. `/rai-epic-close` already had Step 6.
+  - **CLI fix (needed):** `rai epic register E{N} --name "..." --status "In Progress"` — deterministic command that adds/updates the backlog row. Removes inference from the loop. Same pattern as `rai memory emit-work`.
+  - **Also needed:** `rai epic update-status E{N} --status complete` for close, and backlog sync during planning sessions when future epics are defined.
+  - **Priority:** High — backlog is the authoritative epic index; if it drifts, the ontology graph is incomplete.
+  - **Related:** PAT-194 (infrastructure without wiring), PAT-196 (stale docs → wrong paths)
+
+---
+
 ## Ideas
 
 ### Systemic Poka-Yoke — Design Principle (2026-02-10, PAT-242)

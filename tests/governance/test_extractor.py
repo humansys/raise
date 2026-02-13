@@ -188,6 +188,13 @@ class TestGovernanceExtractor:
         assert result.total == 0
         assert result.files_processed == 0
 
+    def test_infer_type_from_roadmap_file(self, tmp_governance_structure: Path) -> None:
+        """Should infer RELEASE type from roadmap file."""
+        extractor = GovernanceExtractor(tmp_governance_structure)
+
+        concept_type = extractor._infer_concept_type(Path("roadmap.md"))
+        assert concept_type == ConceptType.RELEASE
+
     def test_integration_with_real_governance(self) -> None:
         """Should extract concepts from real raise-cli governance files."""
         # This test runs against actual project files
@@ -222,3 +229,62 @@ class TestGovernanceExtractor:
             assert len(concept.content) > 0
             assert concept.lines[0] > 0
             assert concept.lines[1] >= concept.lines[0]
+
+
+class TestRoadmapExtraction:
+    """Tests for roadmap extraction wiring in GovernanceExtractor."""
+
+    @pytest.fixture
+    def project_with_roadmap(self, tmp_path: Path) -> Path:
+        """Create project with roadmap file."""
+        project_root = tmp_path / "project"
+        governance = project_root / "governance"
+        governance.mkdir(parents=True)
+
+        roadmap = governance / "roadmap.md"
+        roadmap.write_text(
+            dedent(
+                """\
+                # Roadmap: test-project
+
+                ## Releases
+
+                | ID | Release | Target | Status | Epics |
+                |----|---------|--------|--------|-------|
+                | REL-V1.0 | V1.0 MVP | 2026-01-01 | Complete | E1, E2 |
+                | REL-V2.0 | V2.0 Core | 2026-02-15 | In Progress | E3 |
+                """
+            )
+        )
+        return project_root
+
+    def test_extract_with_result_includes_releases(
+        self, project_with_roadmap: Path
+    ) -> None:
+        """Should extract release concepts from roadmap."""
+        extractor = GovernanceExtractor(project_with_roadmap)
+
+        result = extractor.extract_with_result()
+
+        release_concepts = [
+            c for c in result.concepts if c.type == ConceptType.RELEASE
+        ]
+        assert len(release_concepts) == 2
+
+    def test_release_ids_in_extraction(self, project_with_roadmap: Path) -> None:
+        """Should produce correct release IDs."""
+        extractor = GovernanceExtractor(project_with_roadmap)
+
+        result = extractor.extract_with_result()
+
+        ids = {c.id for c in result.concepts if c.type == ConceptType.RELEASE}
+        assert "rel-v1.0" in ids
+        assert "rel-v2.0" in ids
+
+    def test_files_processed_counts_roadmap(self, project_with_roadmap: Path) -> None:
+        """Should count roadmap file as processed."""
+        extractor = GovernanceExtractor(project_with_roadmap)
+
+        result = extractor.extract_with_result()
+
+        assert result.files_processed >= 1

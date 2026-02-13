@@ -42,6 +42,8 @@ def normalize_status(raw: str) -> str:
         return "deferred"
     if "progress" in raw_lower:
         return "in_progress"
+    if "planning" in raw_lower:
+        return "planning"
     return "pending"
 
 
