@@ -452,6 +452,81 @@ class TestProcessSessionCloseCoaching:
         mp.undo()
 
 
+class TestProcessSessionCloseRelease:
+    """Tests for session close persisting release field."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        """Create a project with memory and personal directories."""
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_close_persists_release_in_session_state(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close persists release field in session-state.yaml."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="release wiring test",
+            current_work={
+                "release": "V3.0",
+                "epic": "E19",
+                "story": "S19.3",
+                "phase": "implement",
+                "branch": "epic/e19/v3",
+            },
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from rai_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.current_work.release == "V3.0"
+        assert state.current_work.epic == "E19"
+        mp.undo()
+
+    def test_close_without_release_defaults_empty(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close without release defaults to empty string."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="no release test",
+            current_work={
+                "epic": "E15",
+                "story": "S15.7",
+                "phase": "implement",
+                "branch": "story/s15.7/x",
+            },
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from rai_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.current_work.release == ""
+        mp.undo()
+
+
 class TestLoadStateFileProgress:
     """Tests for load_state_file with progress and completed_epics."""
 

@@ -469,6 +469,26 @@ class UnifiedQueryEngine:
         )
         return [n for n in neighbors if n.type == "guardrail"]
 
+    def find_release_for(self, epic_id: str) -> ConceptNode | None:
+        """Find the release an epic belongs to.
+
+        Follows outgoing ``part_of`` edge from the epic node to find
+        a release node.
+
+        Args:
+            epic_id: Epic node ID (e.g., ``"epic-e19"``).
+
+        Returns:
+            The release node, or None if not found.
+        """
+        neighbors = self.graph.get_neighbors(
+            epic_id, depth=1, edge_types=["part_of"]
+        )
+        for node in neighbors:
+            if node.type == "release":
+                return node
+        return None
+
     def get_architectural_context(
         self, module_id: str
     ) -> ArchitecturalContext | None:

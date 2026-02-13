@@ -289,3 +289,96 @@ class TestGetArchitecturalContext:
         """Returns None when module doesn't exist in graph."""
         ctx = engine.get_architectural_context("mod-nonexistent")
         assert ctx is None
+
+
+# --- find_release_for Tests ---
+
+
+@pytest.fixture
+def release_graph() -> UnifiedGraph:
+    """Create a graph with epic→release part_of edges for testing.
+
+    Graph structure:
+        epic-e19 --part_of--> rel-v3.0
+        epic-e20 --part_of--> rel-v3.0
+        epic-e18 (no release edge)
+    """
+    graph = UnifiedGraph()
+
+    graph.add_concept(
+        ConceptNode(
+            id="rel-v3.0",
+            type="release",
+            content="V3.0 Commercial Launch",
+            source_file="governance/roadmap.md",
+            created="2026-02-11",
+            metadata={"release_id": "REL-V3.0", "name": "V3.0 Commercial Launch", "target": "2026-03-14"},
+        )
+    )
+    graph.add_concept(
+        ConceptNode(
+            id="epic-e19",
+            type="epic",
+            content="V3 Product Design",
+            source_file="governance/backlog.md",
+            created="2026-02-11",
+        )
+    )
+    graph.add_concept(
+        ConceptNode(
+            id="epic-e20",
+            type="epic",
+            content="V3 Hosted Rai",
+            source_file="governance/backlog.md",
+            created="2026-02-11",
+        )
+    )
+    graph.add_concept(
+        ConceptNode(
+            id="epic-e18",
+            type="epic",
+            content="V2 Open Core",
+            source_file="governance/backlog.md",
+            created="2026-02-11",
+        )
+    )
+
+    graph.add_relationship(
+        ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
+    )
+    graph.add_relationship(
+        ConceptEdge(source="epic-e20", target="rel-v3.0", type="part_of")
+    )
+
+    return graph
+
+
+@pytest.fixture
+def release_engine(release_graph: UnifiedGraph) -> UnifiedQueryEngine:
+    """Create query engine with release graph."""
+    return UnifiedQueryEngine(release_graph)
+
+
+class TestFindReleaseFor:
+    """Tests for find_release_for helper."""
+
+    def test_finds_release_via_part_of(self, release_engine: UnifiedQueryEngine) -> None:
+        """Finds release node via part_of edge from epic."""
+        release = release_engine.find_release_for("epic-e19")
+        assert release is not None
+        assert release.id == "rel-v3.0"
+        assert release.type == "release"
+
+    def test_returns_none_for_epic_without_release(
+        self, release_engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns None when epic has no part_of edge to a release."""
+        release = release_engine.find_release_for("epic-e18")
+        assert release is None
+
+    def test_returns_none_for_nonexistent_epic(
+        self, release_engine: UnifiedQueryEngine
+    ) -> None:
+        """Returns None for non-existent epic ID."""
+        release = release_engine.find_release_for("epic-e999")
+        assert release is None
