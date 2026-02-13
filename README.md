@@ -63,8 +63,27 @@ git checkout v2
 # 2. Install in development mode
 uv pip install -e ".[dev]"
 
+If error "No virtual environment found."
+run `uv venv` to create an environment.
+
 # 3. Verify installation
 rai --help
+```
+
+Windows WSL (Ubuntu/Debian).
+```bash
+# 1 — Use pipx
+
+sudo apt update
+sudo apt install pipx -y
+pipx ensurepath
+
+
+# 2 Close and new terminal WSL.
+
+# 3 Install:
+
+pipx install rai-cli
 ```
 
 ### Onboarding with Rai
