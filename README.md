@@ -203,6 +203,16 @@ rai memory context mod-session
 # Query Rai's memory
 rai memory query "velocity patterns"
 
+# Validate the memory graph (structural + completeness)
+rai memory validate
+
+# Visualize the memory graph as interactive HTML
+rai memory viz                    # Opens in browser
+rai memory viz --output graph.html  # Custom output path
+
+# List releases and their associated epics
+rai release list
+
 # Start a session (creates profile on first run)
 rai session start --name "YourName" --project "$(pwd)" --context
 
