@@ -24,12 +24,13 @@ class CurrentWork(BaseModel):
         branch: Git branch name, or empty string.
     """
 
+    release: str = ""
     epic: str = ""
     story: str = ""
     phase: str = ""
     branch: str = ""
 
-    @field_validator("epic", "story", "phase", "branch", mode="before")
+    @field_validator("release", "epic", "story", "phase", "branch", mode="before")
     @classmethod
     def coerce_none_to_empty(cls, v: object) -> object:
         """Accept None from YAML and coerce to empty string."""

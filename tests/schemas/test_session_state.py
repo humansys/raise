@@ -24,6 +24,21 @@ class TestCurrentWork:
         assert work.phase == ""
         assert work.branch == ""
 
+    def test_release_field_accepts_value(self) -> None:
+        """CurrentWork accepts release field."""
+        work = CurrentWork(release="V3.0")
+        assert work.release == "V3.0"
+
+    def test_release_defaults_to_empty(self) -> None:
+        """CurrentWork release defaults to empty string."""
+        work = CurrentWork()
+        assert work.release == ""
+
+    def test_release_none_coerced_to_empty(self) -> None:
+        """CurrentWork coerces release=None to empty string."""
+        work = CurrentWork(release=None)  # type: ignore[arg-type]
+        assert work.release == ""
+
     def test_none_coerced_to_empty(self) -> None:
         """CurrentWork coerces None values to empty string (YAML null fix)."""
         work = CurrentWork(epic=None, story=None, phase="design", branch="main")  # type: ignore[arg-type]
@@ -174,3 +189,22 @@ class TestSessionState:
         state = SessionState.model_validate(data)
         assert state.progress is None
         assert state.completed_epics == []
+
+    def test_backward_compat_no_release_in_yaml(self) -> None:
+        """SessionState loads from dict without release field (backward compat)."""
+        data = {
+            "current_work": {
+                "epic": "E19",
+                "story": "S19.3",
+                "phase": "implement",
+                "branch": "epic/e19/v3",
+            },
+            "last_session": {
+                "id": "SES-100",
+                "date": "2026-02-13",
+                "developer": "Test",
+                "summary": "test",
+            },
+        }
+        state = SessionState.model_validate(data)
+        assert state.current_work.release == ""
