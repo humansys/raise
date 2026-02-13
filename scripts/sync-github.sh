@@ -89,18 +89,15 @@ git checkout --orphan "$TEMP_BRANCH" --quiet
 
 # Remove excluded directories
 for dir in "${EXCLUDED_DIRS[@]}"; do
-    if [ -d "$dir" ]; then
+    if git ls-files --error-unmatch "$dir" &>/dev/null 2>&1; then
         git rm -rf --quiet "$dir"
         info "Removed $dir/"
     fi
 done
 
-# Remove excluded files
+# Remove excluded files (--ignore-unmatch handles gitignored/missing files)
 for file in "${EXCLUDED_FILES[@]}"; do
-    if [ -f "$file" ]; then
-        git rm -f --quiet "$file"
-        info "Removed $file"
-    fi
+    git rm -f --quiet --ignore-unmatch "$file"
 done
 
 # Create single clean commit
