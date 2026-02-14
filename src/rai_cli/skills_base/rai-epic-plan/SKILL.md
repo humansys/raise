@@ -16,6 +16,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
+  raise.visibility: public
 ---
 
 # Plan: Epic Implementation Roadmap
@@ -95,6 +96,7 @@ Load and understand the epic scope before planning.
 
 **Review:**
 - Epic objective and value proposition
+- Release context (which release, target date, related epics)
 - Feature list with sizes (T-shirt or SP)
 - Dependencies identified in `/rai-epic-design`
 - Done criteria (feature and epic level)
@@ -102,6 +104,7 @@ Load and understand the epic scope before planning.
 
 **Capture:**
 - Total features and estimated effort
+- Release timeline and how this epic fits within it
 - Key constraints (deadline, external dependencies)
 - Architectural decisions that affect sequencing
 
@@ -249,6 +252,7 @@ Create intermediate checkpoints for progress visibility.
 - **Success criteria:** How to verify milestone reached
 - **Demo capability:** What can be shown/tested
 - **Feedback opportunity:** What questions can be answered
+- **Release alignment:** How this milestone relates to the release timeline (if epic belongs to a release)
 
 **Milestone heuristics:**
 - Walking Skeleton: 1-3 features (smallest demonstrable value)
@@ -288,7 +292,7 @@ Map features to time periods if deadline exists.
 1. **Reference calibration data:** Use `.claude/rai/calibration.md` for velocity
 2. **Apply velocity multiplier:** Kata cycle = 2-3x faster than traditional estimates
 3. **Add buffer:** 20-30% buffer for unknowns, integration, polish
-4. **Back-calculate from deadline:** Work backward from external dates
+4. **Map to release deadline:** If this epic belongs to a release, back-calculate from the release target date. Ensure epic completion leaves buffer before release.
 
 **Timeline mapping:**
 

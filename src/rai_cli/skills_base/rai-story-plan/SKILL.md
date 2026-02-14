@@ -16,6 +16,7 @@ metadata:
   raise.gate: gate-plan
   raise.adaptable: "true"
   raise.version: "1.0.0"
+  raise.visibility: public
 ---
 
 # Plan: Implementation Planning

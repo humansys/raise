@@ -17,6 +17,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.2.0"
+  raise.visibility: public
 
 # RaiSE Observable Workflow hooks---
 

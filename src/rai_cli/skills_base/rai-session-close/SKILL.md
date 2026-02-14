@@ -15,6 +15,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "3.0.0"
+  raise.visibility: public
 ---
 
 # Session Close
@@ -39,9 +40,10 @@ Use inference to reflect on the session:
 4. **Patterns:** Any new learnings? (check against existing — query if needed)
 5. **Corrections:** Any behavioral corrections observed? (what + lesson)
 6. **Coaching:** Reflect on the working relationship (see below)
-7. **Current work:** Epic, story, phase, branch for continuity
+7. **Current work:** Release, epic, story, phase, branch for continuity
 8. **Pending:** Decisions, blockers, next actions
-9. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
+9. **Narrative:** Session context for cross-session continuity — decisions (with WHY), research conclusions, artifacts created, branch state. Goal: make next session "immediately resumable." (~300-500 tokens, 2-3 sentences per section)
+10. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
 
 Write the structured output as a YAML state file:
 
@@ -72,6 +74,7 @@ coaching:                                # Only include fields that changed
   communication_notes:
     - "prefers direct, concise"
 current_work:
+  release: V3.0
   epic: E15
   story: S15.7
   phase: implement
@@ -81,6 +84,22 @@ pending:
   blockers: []
   next_actions:
     - "Continue with Task 7"
+narrative: |                               # Cross-session continuity (2-3 sentences per section, ~300-500 tokens total)
+  ## Decisions
+  - Key decisions made and WHY (rationale, not just the choice)
+  - Trade-offs accepted and alternatives rejected
+
+  ## Research
+  - Research completed + conclusions (reference file paths)
+  - Key insights that inform next session's work
+
+  ## Artifacts
+  - Files created/modified with their purpose
+  - New tests, docs, or config added
+
+  ## Branch State
+  - Current branch and commits ahead of base
+  - Story branch status (created/not yet/merged)
 notes: "Any free-form notes"
 ```
 
