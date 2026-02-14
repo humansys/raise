@@ -9,6 +9,7 @@ import typer
 from rich.console import Console
 
 from rai_cli import __version__
+from rai_cli.cli.commands.backlog import backlog_app
 from rai_cli.cli.commands.base import base_app
 from rai_cli.cli.commands.discover import discover_app
 from rai_cli.cli.commands.init import init_command
@@ -41,6 +42,7 @@ app = typer.Typer(
 )
 
 # Register command groups
+app.add_typer(backlog_app, name="backlog")
 app.add_typer(base_app, name="base")
 app.add_typer(discover_app, name="discover")
 app.add_typer(memory_app, name="memory")
