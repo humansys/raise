@@ -202,6 +202,24 @@ def ensure_global_rai_dir() -> Path:
     return global_dir
 
 
+def get_credentials_path() -> Path:
+    """Get path to encrypted credentials file for external providers.
+
+    Returns path to ~/.rai/credentials.json which stores OAuth tokens
+    for external providers (JIRA, GitLab, etc.) with Fernet encryption.
+
+    The file is created with user-only permissions (0600) when first written.
+
+    Returns:
+        Path to credentials file (e.g., ~/.rai/credentials.json).
+
+    Example:
+        >>> creds_path = get_credentials_path()
+        >>> # Use with rai_providers.auth.credentials.store_token()
+    """
+    return get_global_rai_dir() / "credentials.json"
+
+
 def get_personal_dir(project_root: Path | None = None) -> Path:
     """Get the personal directory for developer-specific project data.
 
