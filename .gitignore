@@ -1,0 +1,86 @@
+.specstory/
+.cursor/
+
+# Claude Code local settings (user-specific)
+.claude/settings.local.json
+CLAUDE.local.md
+
+# RaiSE generated/cache files
+.raise/cache/
+
+# RaiSE derived artifacts (rebuild with `rai memory build`)
+.raise/rai/memory/index.json
+
+# RaiSE personal directory (per-developer, not shared)
+.raise/rai/personal/
+
+# Temporary files
+*.tmp
+*.bak-*
+*.log
+.DS_Store
+Thumbs.db
+
+# Script generated folders (if testing locally)
+.specify-raise/commands/
+
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Testing
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Type checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyright/
+.rai/memory/graph.json
+.envrc
+
+# Legacy telemetry (should be in personal/, will migrate)
+.raise/rai/telemetry/
+
+# Secrets & credentials
+.env
+.env.*
+*.pem
+*.key
+.pypirc
+credentials.json
+*.sqlite
+.netrc

@@ -1,0 +1,235 @@
+# RaiSE Methodology Definition
+# Used to generate MEMORY.md Part 1 (static process knowledge)
+version: 1
+
+# =============================================================================
+# Work Lifecycle
+# =============================================================================
+lifecycle:
+  epic:
+    phases: [start, design, plan, implement, close]
+    flow: "/rai-epic-start → /rai-epic-design → /rai-epic-plan → [stories] → /rai-epic-close"
+
+  story:
+    phases: [start, design, plan, implement, review, close]
+    flow: "/rai-story-start → /rai-story-design* → /rai-story-plan → /rai-story-implement → /rai-story-review → /rai-story-close"
+    note: "*design optional for S/XS stories"
+
+  session:
+    phases: [start, work, close]
+    flow: "/rai-session-start → [work] → /rai-session-close"
+
+# =============================================================================
+# Skills by Category
+# =============================================================================
+skills:
+  session:
+    - name: /rai-session-start
+      purpose: Load memory, analyze progress, propose focused work
+      when: Beginning of any working session
+      adapts_to: Shu/Ha/Ri experience level
+
+    - name: /rai-session-close
+      purpose: Capture learnings, update memory, log session
+      when: End of working session
+      creates: Session record, pattern updates
+
+  epic:
+    - name: /rai-epic-start
+      purpose: Create epic branch from development branch
+      when: Starting a new epic
+      creates: Epic branch (poka-yoke gate for stories)
+
+    - name: /rai-epic-design
+      purpose: Design epic scope, stories, architecture
+      when: After epic branch exists
+      creates: Epic scope document with story breakdown
+
+    - name: /rai-epic-plan
+      purpose: Sequence stories with milestones and dependencies
+      when: After epic design approved
+      creates: Implementation roadmap
+
+    - name: /rai-epic-close
+      purpose: Epic retrospective, metrics capture, merge to dev
+      when: All stories complete
+      creates: Retrospective, branch cleanup
+
+  story:
+    - name: /rai-story-start
+      purpose: Create story branch and scope commit
+      when: Starting a new story
+      creates: Story branch, scope documentation
+      verifies: Epic branch exists
+
+    - name: /rai-story-design
+      purpose: Create lean specification for complex stories
+      when: Story has >3 components or needs architectural decisions
+      creates: Design spec optimized for AI alignment
+      optional_for: S/XS sized stories
+
+    - name: /rai-story-plan
+      purpose: Decompose into atomic executable tasks
+      when: After design (or directly for simple stories)
+      creates: Task list with dependencies
+
+    - name: /rai-story-implement
+      purpose: Execute tasks with TDD and validation gates
+      when: Plan exists
+      creates: Working code, tests, documentation
+
+    - name: /rai-story-review
+      purpose: Extract learnings, identify improvements
+      when: Implementation complete
+      creates: Retrospective, pattern updates
+
+    - name: /rai-story-close
+      purpose: Verify, merge, cleanup
+      when: Review complete
+      creates: Merged code, deleted branch
+
+  discovery:
+    - name: /rai-discover-start
+      purpose: Initialize codebase discovery
+      when: Setting up discovery for a codebase
+      creates: Discovery context file
+
+    - name: /rai-discover-scan
+      purpose: Extract symbols and synthesize descriptions
+      when: After discovery initialized
+      creates: Draft component catalog (YAML)
+
+    - name: /rai-discover-validate
+      purpose: Human review of synthesized descriptions, then export to graph format
+      when: After scan complete
+      creates: Validated component catalog + JSON for graph integration
+
+  meta:
+    - name: /rai-skill-create
+      purpose: Create new skills with framework integration
+      when: Adding workflow automation
+      creates: Skill directory with prompt.md
+
+  other:
+    - name: /rai-research
+      purpose: Epistemologically rigorous research
+      when: Before ADRs, evaluating approaches, unfamiliar domains
+      creates: Evidence catalog with triangulated claims
+
+    - name: /rai-debug
+      purpose: Root cause analysis using lean methods
+      when: Encountering unexpected behavior or defects
+      method: 5 Whys, Ishikawa diagram, Gemba
+
+    - name: /rai-framework-sync
+      purpose: Sync framework files across locations
+      when: Framework updates need propagation
+
+# =============================================================================
+# Gates (Poka-Yoke)
+# =============================================================================
+gates:
+  blocking:
+    - before: Epic design
+      require: Epic branch exists
+      enforced_by: /rai-epic-start
+      rationale: Stories nest under epic branches
+
+    - before: Story work
+      require: Story branch and scope commit
+      enforced_by: /rai-story-start
+      rationale: Traceability from first commit
+
+    - before: Implementation
+      require: Plan exists
+      enforced_by: /rai-story-plan
+      rationale: No coding without decomposed tasks
+
+    - before: Story close
+      require: Retrospective complete
+      enforced_by: /rai-story-review
+      rationale: Learning is part of done
+
+    - before: Epic merge
+      require: Epic retrospective complete
+      enforced_by: /rai-epic-close
+      rationale: Meso-layer learning captured
+
+  quality:
+    - gate: Tests pass
+      when: Before any commit
+      rationale: TDD is non-negotiable
+
+    - gate: Type checks pass
+      when: Before any commit
+      tool: pyright --strict
+
+    - gate: Linting passes
+      when: Before any commit
+      tool: ruff check && ruff format
+
+# =============================================================================
+# Principles (Critical Rules)
+# =============================================================================
+principles:
+  process:
+    - name: TDD Always
+      rule: RED-GREEN-REFACTOR, no exceptions
+      rationale: Tests are specification, not afterthought
+
+    - name: Commit After Task
+      rule: Commit after each completed task, not just story end
+      rationale: Enables recovery, shows progress
+
+    - name: Full Skill Cycle
+      rule: Use skills even for small stories
+      rationale: Structure helps; overhead is minimal
+
+    - name: Ask Before Subagents
+      rule: Get permission before spawning subagents
+      rationale: Inference economy - AI computation is precious
+
+    - name: Delete Branches After Merge
+      rule: Clean up merged branches immediately
+      rationale: Prevent accumulation, reduce confusion
+
+  collaboration:
+    - name: HITL Default
+      rule: Pause after significant work for human review
+      rationale: Slow is smooth, smooth is fast
+
+    - name: Direct Communication
+      rule: No praise-padding, say what needs saying
+      rationale: Efficiency and respect for time
+
+    - name: Redirect When Dispersing
+      rule: Gently redirect tangents to parking lot
+      rationale: Maintain focus on stated goal
+
+  technical:
+    - name: Type Everything
+      rule: Type annotations on all code
+      rationale: Pyright strict is the standard
+
+    - name: Pydantic Models
+      rule: Use Pydantic for all data structures
+      rationale: Validation at boundaries, serialization free
+
+    - name: Simple First
+      rule: Simple heuristics over complex solutions
+      rationale: Complexity must earn its place
+
+# =============================================================================
+# Branch Model
+# =============================================================================
+branches:
+  structure: |
+    main (stable)
+      └── v2 (development)
+            └── epic/e{N}/{name}
+                  └── story/s{N}.{M}/{name}
+
+  flow:
+    - Stories merge to epic branch
+    - Epics merge to development branch (v2)
+    - Development merges to main at release
