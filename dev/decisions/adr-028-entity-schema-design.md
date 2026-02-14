@@ -29,16 +29,26 @@ Tensiones:
 
 **Use JIRA Entity Properties for sync metadata. Store RaiSE-specific data as JSON in entity properties, invisible to JIRA users but queryable via JQL.**
 
-**Schema:**
+**Schema (Full Granularity):**
 ```json
 {
   "rai_sync": {
     "epic_id": "E-DEMO",
     "story_id": "S-DEMO.1",
+    "task_id": "T-DEMO.1.1",        // Only for JIRA subtasks
     "last_sync_at": "2026-02-14T10:30:00Z",
     "sync_version": "1",
     "rai_branch": "demo/atlassian-webinar",
-    "local_path": "/home/emilio/Code/raise-commons"
+    "local_path": "/home/emilio/Code/raise-commons",
+
+    // Task-specific metadata (for subtasks)
+    "task_status": "in_progress",   // pending, in_progress, done
+    "task_blocked": false,
+    "estimated_sp": 0.5,
+
+    // Forge-ready metadata
+    "sync_direction": "push",       // push, pull, bidirectional (V3)
+    "last_modified_by": "rai"       // rai, jira (for conflict detection)
   }
 }
 ```
@@ -57,6 +67,26 @@ if props and props["rai_sync"]["epic_id"] == local_epic_id:
     # Already synced, skip creation
     return
 ```
+
+**Forge Intelligence Support:**
+
+Entity properties enable cross-project intelligence in Rai in Forge (V3):
+
+1. **Stable cross-project IDs:** `epic_id`, `story_id`, `task_id` are RaiSE-internal (E-DEMO works across all projects)
+2. **Metadata aggregation:** Forge queries JIRA entity properties across all org projects
+3. **Pattern recognition:** `estimated_sp` vs `actual_sp` → velocity patterns
+4. **Blocker detection:** `task_blocked` + `blocker_reason` → systemic blockers
+5. **Sync direction tracking:** `last_modified_by` → who changed what (conflict detection)
+
+**Example Forge query:**
+```jql
+// Find all OAuth tasks blocked across organization
+project in (PROJ1, PROJ2, PROJ3)
+AND issue.property[com.humansys.raise.sync].rai_sync.task_id ~ "oauth"
+AND issue.property[com.humansys.raise.sync].rai_sync.task_blocked = true
+```
+
+This returns all blocked OAuth tasks across projects → Forge analyzes patterns → recommends solutions.
 
 ## Consecuencias
 

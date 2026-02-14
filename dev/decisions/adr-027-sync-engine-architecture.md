@@ -42,10 +42,21 @@ governance/backlog.md + memory graph (SQLite)
 ```
 
 **MVP Scope (E-DEMO):**
+- **Full granularity sync:** Epic + Story + Task levels
 - Local writes immediately to backlog.md + memory graph
 - Manual sync command: `rai backlog sync --provider jira --direction push`
 - Idempotent operations (safe to re-run sync)
-- Entity properties track sync state (last_sync_at, rai_epic_id)
+- Entity properties track sync state (last_sync_at, rai_epic_id, rai_story_id, rai_task_id)
+- Task extraction from `plan.md` → JIRA subtasks
+
+**JIRA Hierarchy:**
+```
+JIRA Epic (E-DEMO)
+  └── JIRA Story (S-DEMO.1)
+        └── JIRA Subtask (T-DEMO.1.1)
+        └── JIRA Subtask (T-DEMO.1.2)
+        └── JIRA Subtask (T-DEMO.1.3)
+```
 
 **Deferred to V3:**
 - Bidirectional sync (JIRA → Local pull)
@@ -64,6 +75,41 @@ When implementing bidirectional sync in V3:
 | `current_story`, `progress`, `workflow_state` | Rai | LWW (Rai wins) | Rai owns internal workflow |
 | `tasks`, `learnings`, `session_context` | Rai | No sync (local only) | Internal to Rai |
 | `comments`, `attachments` | Both | Append-only | Never conflict |
+
+## Forge Vision (V3 Intelligence Infrastructure)
+
+**Strategic Context:** This MVP is designed as the foundation for **Rai in Forge** — hosted intelligence that aggregates data across projects/teams.
+
+**Architecture Evolution:**
+```
+MVP (E-DEMO):
+  Local Dev (RaiSE CLI) → JIRA (one-way)
+
+V3 (Forge):
+  Local Devs (RaiSE CLI) ↔ JIRA ↔ Remote Devs (JIRA only)
+                          ↕️
+                    Rai in Forge
+              (Cross-project intelligence)
+```
+
+**Forge Capabilities (Future):**
+1. **Cross-project pattern recognition:** "OAuth tasks slip 2x across 3 projects"
+2. **Systemic insights:** "Teams syncing tasks to JIRA have 25% better estimation"
+3. **Reuse recommendations:** "E-DEMO architecture similar to E-AUTH (raise-gtm)"
+4. **Blocker detection:** "5 teams blocked on same dependency"
+5. **Team health metrics:** "Project X has WIP too high (5 epics in implement)"
+
+**Why Design for Forge Now:**
+- Internal IDs (E-DEMO) are stable across projects → pattern recognition works
+- Full granularity (epic/story/task) → Forge has execution-level visibility
+- Bidirectional schema ready → remote devs can update JIRA, Rai stays in sync
+- Entity properties → metadata travels with JIRA items across tools
+
+**Design Decisions Informed by Forge:**
+- Stable internal IDs (not JIRA-dependent)
+- Full task granularity (execution patterns need this)
+- Normalized schema (cross-project aggregation requires it)
+- JSON output mode (Forge consumes structured data)
 
 ## Consecuencias
 

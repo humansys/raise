@@ -62,18 +62,18 @@ Build a JIRA bidirectional sync prototype using the full RaiSE process to:
 
 ---
 
-## Features (14 SP estimated, 28 days, ~2 SP/week velocity)
+## Features (15 SP estimated, 1.5 days, ~10 SP/day aggressive velocity)
 
 | ID | Feature | Size | Dependencies | Description |
 |----|---------|:----:|:------------:|-------------|
 | **S-DEMO.1** | Research synthesis & architecture design | M (3 SP) | — | Consolidate 6 research outputs into unified architecture. Create 3 ADRs (OAuth, sync engine, entity schema). Define BacklogProvider interface. |
 | **S-DEMO.2** | OAuth 2.0 authentication | M (3 SP) | S-DEMO.1 | Implement JIRA Cloud OAuth flow (authorization code + PKCE). Token storage, refresh logic. CLI-friendly device flow. |
-| **S-DEMO.3** | JIRA client & API wrapper | S (2 SP) | S-DEMO.2 | Thin wrapper over `atlassian-python-api`. Rate limit handling (March 2 deadline). Field filtering for token economy. |
-| **S-DEMO.4** | Entity properties & sync metadata | S (2 SP) | S-DEMO.3 | JIRA entity properties for sync state (last_sync_at, rai_epic_id, rai_story_id). Schema design, storage/retrieval. |
-| **S-DEMO.5** | Sync engine (one-way: Local → JIRA) | M (3 SP) | S-DEMO.4 | Detect active epic, map to JIRA format, create epics/issues. Idempotent operations. Dry-run mode. Error handling. |
+| **S-DEMO.3** | JIRA client & API wrapper | S (2 SP) | S-DEMO.2 | Thin wrapper over `atlassian-python-api`. Rate limit handling. Field filtering for token economy. |
+| **S-DEMO.4** | Entity properties & sync metadata | S (2 SP) | S-DEMO.3 | JIRA entity properties for sync state (epic/story/task IDs, timestamps, Forge metadata). Schema design, storage/retrieval. |
+| **S-DEMO.5** | Sync engine (full granularity) | L (4 SP) | S-DEMO.4 | **Full granularity:** Epic + Story + Task sync. Parse plan.md for tasks. Create JIRA epics/stories/subtasks. Idempotent operations. Dry-run mode. Error handling. |
 | **S-DEMO.6** | Demo validation & retrospective | XS (1 SP) | S-DEMO.5 | Rehearse demo scenario 3+ times. Capture learnings. Epic retrospective. Architecture decision (raise-pro vs monorepo vs fork). |
 
-**Total:** 6 features, 14 SP estimated, 28 days (2 SP/week aggressive velocity)
+**Total:** 6 features, 15 SP estimated, 1.5 days (10 SP/day aggressive velocity)
 
 **Critical path:** S-DEMO.1 → S-DEMO.2 → S-DEMO.3 → S-DEMO.4 → S-DEMO.5 → S-DEMO.6 (sequential, no parallelism)
 
@@ -84,20 +84,62 @@ Build a JIRA bidirectional sync prototype using the full RaiSE process to:
 ### MUST (Demo Blockers)
 
 **Core Functionality:**
-- One-way sync: Local backlog (governance/backlog.md) → JIRA
+- **Full granularity sync:** Epic + Story + Task levels (not just epic/story)
+- One-way sync: Local backlog (governance/backlog.md + plan.md) → JIRA
 - OAuth 2.0 authentication with JIRA Cloud (authorization code + PKCE)
-- Entity properties for sync metadata tracking
+- Entity properties for sync metadata tracking (epic/story/task IDs + Forge metadata)
 - CLI command: `rai backlog sync --provider jira --direction push`
 - Active epic detection (sync current epic from git branch context)
+- Task extraction from `plan.md` → JIRA subtasks
 - Dry-run mode: `--dry-run` flag (preview changes without execution)
 - Basic error handling with user-friendly messages
+
+**JIRA Hierarchy Created:**
+```
+JIRA Epic (E-DEMO: JIRA Sync Enabler)
+  └── JIRA Story (S-DEMO.1: Research synthesis)
+        └── JIRA Subtask (T-DEMO.1.1: Synthesize bidirectional sync research)
+        └── JIRA Subtask (T-DEMO.1.2: Create ADR-026)
+        └── JIRA Subtask (T-DEMO.1.3: Create ADR-027)
+  └── JIRA Story (S-DEMO.2: OAuth authentication)
+        └── JIRA Subtask (T-DEMO.2.1: ...)
+        └── ...
+```
 
 **Research-Backed Architecture:**
 - Local-first sync (local is source of truth for Rai)
 - Hub-and-spoke topology (memory graph as central hub)
 - Field-level ownership (Rai owns workflow state, team owns collaboration fields)
 - Exponential backoff retry (3-7 retries over 1-3 days)
-- Rate limit compliance (March 2 JIRA API change deadline)
+- Internal IDs + JIRA IDs (stable cross-project identifiers for Forge)
+
+**Forge Vision (Designed for V3, Foundation Now):**
+
+This MVP is the foundation for **Rai in Forge** — hosted intelligence aggregating data across projects/teams.
+
+**Architecture Evolution:**
+```
+MVP (Demo):
+  Local Dev (RaiSE CLI) → JIRA (one-way push)
+
+V3 (Forge):
+  Local Devs ↔ JIRA ↔ Remote Devs (JIRA only)
+              ↕️
+        Rai in Forge
+    (Cross-project intelligence)
+```
+
+**Why Design for Forge Now:**
+1. **Full granularity** (epic/story/task) → Execution-level visibility for pattern recognition
+2. **Internal IDs** (E-DEMO, S-DEMO.1, T-DEMO.1.1) → Stable across projects, enables aggregation
+3. **Entity properties** → Metadata travels with JIRA items, queryable cross-project
+4. **Bidirectional schema ready** → Remote devs update JIRA, Rai stays in sync (V3)
+
+**Example Forge Capabilities (V3):**
+- "OAuth tasks slip 2x estimate across 3 projects" (pattern recognition)
+- "E-DEMO architecture similar to E-AUTH in raise-gtm" (reuse recommendations)
+- "5 teams blocked on same dependency" (systemic blocker detection)
+- "Teams syncing tasks have 25% better estimation accuracy" (process insights)
 
 **Process Validation (Dogfooding):**
 - Full RaiSE epic lifecycle (design → plan → stories → close)
@@ -254,22 +296,25 @@ S-DEMO.6 (Demo validation + retro)
 
 ## Timeline
 
-### Weekly Breakdown (28 Days, 4 Weeks)
+### Sprint Breakdown (1.5 Days = 36 Hours)
 
-| Week | Dates | Stories | Focus | Gate |
-|------|-------|---------|-------|------|
-| **1** | Feb 14-20 | S-DEMO.1, S-DEMO.2 | Architecture + OAuth | Auth working, 3 ADRs created |
-| **2** | Feb 21-27 | S-DEMO.3, S-DEMO.4 | JIRA client + Metadata | One epic data ready to sync |
-| **3** | Feb 28-Mar 6 | S-DEMO.5 | Sync engine + Error handling | One epic syncs reliably |
-| **4** | Mar 7-13 | S-DEMO.6 | Demo validation + Polish | Demo-ready, 3+ rehearsals |
-| **Demo** | Mar 14 | — | Atlassian webinar | ✅ Success |
-| **Decision** | Mar 15-31 | — | Architecture choice | Migrate/archive |
+| Phase | Time | Stories | Focus | Gate |
+|-------|------|---------|-------|------|
+| **Sat PM** | 4pm-midnight (8h) | S-DEMO.1, S-DEMO.2 | ✅ ADRs done, OAuth impl | Auth working |
+| **Sun AM** | 8am-2pm (6h) | S-DEMO.3 | JIRA client + API wrapper | API calls working |
+| **Sun PM** | 2pm-10pm (8h) | S-DEMO.4, S-DEMO.5 start | Entity properties + Sync start | Metadata schema working |
+| **Sun Night** | 10pm-2am (4h) | S-DEMO.5 complete | Full sync engine (epic/story/task) | One epic syncs end-to-end |
+| **Mon AM** | 8am-11am (3h) | S-DEMO.6 | Demo rehearsal + polish | Demo-ready |
+| **Mon 11am** | — | — | **DEMO** | ✅ Success |
+
+**Total:** 29 hours, 15 SP = ~0.5 SP/hour = **~10-12 SP/day** (hyper-aggressive, dogfooding under pressure)
 
 ### Velocity Assumptions
 
-- **Estimated:** 14 SP / 28 days = 0.5 SP/day = 2 SP/week (aggressive)
-- **Baseline (no kata cycle):** 1.5 SP/week (from calibration data)
-- **Multiplier:** 1.33x (aggressive velocity needed for 28-day deadline)
+- **Estimated:** 15 SP / 1.5 days = 10 SP/day (hyper-aggressive)
+- **Historical:** User reports "days where we do 20 SP" with RaiSE
+- **This sprint:** 15 SP feasible with full focus + no blockers
+- **Risk:** Timeline is TIGHT — any blocker (OAuth complexity, API issues) could slip demo
 
 **Velocity Factors:**
 - ✅ **Positive:** Research complete (6 outputs = no unknowns), clear architecture
