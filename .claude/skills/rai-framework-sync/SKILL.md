@@ -1,6 +1,19 @@
 ---
 name: rai-framework-sync
 description: Sync framework files across locations after architectural decisions. Use when framework governance documents need updating for consistency and traceability.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: meta
+  raise.frequency: as-needed
+  raise.fase: "sync"
+  raise.prerequisites: ""
+  raise.next: ""
+  raise.gate: ""
+  raise.adaptable: "true"
+  raise.version: "1.0.0"
+  raise.visibility: internal
 ---
 
 # Framework Sync: Update Governance After Architectural Decisions

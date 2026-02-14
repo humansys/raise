@@ -15,6 +15,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "3.0.0"
+  raise.visibility: public
 ---
 
 # Session Close

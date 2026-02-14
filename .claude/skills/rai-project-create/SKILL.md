@@ -16,6 +16,7 @@ metadata:
   raise.gate: "raise memory build produces 30+ governance nodes"
   raise.adaptable: "true"
   raise.version: "1.0.0"
+  raise.visibility: public
 ---
 
 # Project Create: Greenfield Onboarding
