@@ -15,6 +15,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
+  raise.visibility: public
 ---
 
 # Start: Epic Initialization
@@ -97,6 +98,7 @@ Document what's in and out of scope:
 ```markdown
 ## Epic Scope: E{N} {Name}
 
+**Release:** REL-{id} ({name}, target {date})
 **Objective:** {1-2 sentences}
 
 **In Scope:**
@@ -140,7 +142,24 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 
 **Verification:** Scope commit created on epic branch.
 
-### Step 5: Emit Telemetry
+### Step 5: Register Epic in Backlog (REQUIRED)
+
+Add or update the epic row in `governance/backlog.md`:
+
+```markdown
+| E{N} | **{Epic Name}** | In Progress | — | {Priority} |
+```
+
+**If the row already exists:** Update its status to `In Progress`.
+**If the row doesn't exist:** Add it to the Epics Overview table.
+
+Also update the summary line below the table to reflect the new count.
+
+**Verification:** Epic appears in `governance/backlog.md` with correct status.
+
+> **Why this matters:** The backlog is the authoritative epic index. Epics created without a backlog entry become invisible to the ontology graph — release edges, queries, and planning all depend on epic nodes existing.
+
+### Step 6: Emit Telemetry
 
 ```bash
 rai memory emit-work epic E{N} --event start --phase init
@@ -148,7 +167,7 @@ rai memory emit-work epic E{N} --event start --phase init
 
 **Verification:** Telemetry emitted.
 
-### Step 6: Display Lifecycle
+### Step 7: Display Lifecycle
 
 ```markdown
 ## Epic Lifecycle
@@ -180,6 +199,7 @@ rai memory emit-work epic E{N} --event start --phase init
 ```markdown
 ## Epic Started: E{N} {Name}
 
+**Release:** REL-{id} ({name}, target {date})
 **Branch:** `epic/e{N}/{slug}`
 **Commit:** {hash}
 **Base:** `{dev_branch}`

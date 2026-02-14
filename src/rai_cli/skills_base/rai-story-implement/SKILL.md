@@ -16,6 +16,7 @@ metadata:
   raise.gate: gate-code
   raise.adaptable: "true"
   raise.version: "1.0.0"
+  raise.visibility: public
 ---
 
 # Implement: Development Workflow

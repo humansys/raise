@@ -15,9 +15,10 @@ Contents:
     Discovery:          rai-discover-start, rai-discover-scan,
                         rai-discover-validate, rai-discover-document
     Onboarding:         rai-project-create, rai-project-onboard, rai-welcome
-    Governance:         rai-docs-update, rai-framework-sync
-    Meta:               rai-skill-create
+    Governance:         rai-docs-update
     Tools:              rai-research, rai-debug
+
+Note: Internal skills (rai-framework-sync, rai-publish) are excluded from distribution.
 
 Usage:
     from importlib.resources import files
@@ -33,35 +34,32 @@ __version__ = "2.2.0"
 
 DISTRIBUTABLE_SKILLS: list[str] = [
     # Session lifecycle
-    "rai-session-start",
     "rai-session-close",
+    "rai-session-start",
     # Story lifecycle
-    "rai-story-start",
-    "rai-story-plan",
+    "rai-story-close",
     "rai-story-design",
     "rai-story-implement",
+    "rai-story-plan",
     "rai-story-review",
-    "rai-story-close",
+    "rai-story-start",
     # Epic lifecycle
-    "rai-epic-start",
-    "rai-epic-plan",
-    "rai-epic-design",
     "rai-epic-close",
+    "rai-epic-design",
+    "rai-epic-plan",
+    "rai-epic-start",
     # Discovery
-    "rai-discover-start",
-    "rai-discover-scan",
-    "rai-discover-validate",
     "rai-discover-document",
+    "rai-discover-scan",
+    "rai-discover-start",
+    "rai-discover-validate",
     # Onboarding
     "rai-project-create",
     "rai-project-onboard",
     "rai-welcome",
     # Governance
     "rai-docs-update",
-    "rai-framework-sync",
-    # Meta
-    "rai-skill-create",
     # Tools
-    "rai-research",
     "rai-debug",
+    "rai-research",
 ]

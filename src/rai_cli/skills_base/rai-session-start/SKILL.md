@@ -15,6 +15,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "4.0.0"
+  raise.visibility: public
 ---
 
 # Session Start
@@ -59,7 +60,9 @@ rai session start --name "Name" --project "$(pwd)" --context
 With the context bundle from Step 1, use inference to:
 
 1. **Check signals:**
+   - Release deadline pressure (<30 days → flag urgency, include days remaining)
    - Deadline pressure (<3 days → focus critical path)
+   - Session narrative → review decisions, research, artifacts from last session for continuity
    - Coaching corrections → reinforce behavioral primes
    - Pending decisions or blockers → address first
    - Communication preferences (language, style, skip_praise, redirect) → adapt tone accordingly
@@ -77,12 +80,14 @@ With the context bundle from Step 1, use inference to:
 ```
 ## Session: YYYY-MM-DD
 
-**Context:** [Epic] → [Story], [phase], N days to deadline
+**Context:** REL-{id} → [Epic] → [Story], [phase], N days to release
 **Focus:** [goal]
 **Signals:** [any, or "None"]
 
 Go.
 ```
+
+> Release appears in context line only when the current epic belongs to a release (from bundle output). Omit if no release.
 
 **Shu output** adds: explanation of context, progress metrics, concepts.
 
