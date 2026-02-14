@@ -13,12 +13,12 @@
 |:-----:|---------|:----:|--------------|-----------|-------|-----------------|-----------|
 | **1** | S-DEMO.1 | M (3 SP) | ✅ Done | M1 | Sat 16:00 | **✅ Sat 17:00** | ADRs complete, foundation set |
 | **2** | S-DEMO.2 | M (3 SP) | S-DEMO.1 | M1 | Sat 17:00 | Sat 23:00 | OAuth critical path, highest risk |
-| **3** | S-DEMO.3 | S (2 SP) | S-DEMO.2 | M2 | Sun 08:00 | Sun 12:00 | JIRA client needed before sync |
+| **3** | S-DEMO.3 | M (3 SP) | S-DEMO.2 | M2 | Sun 08:00 | Sun 12:00 | Bidirectional JIRA client (read + write) |
 | **4** | S-DEMO.4 | S (2 SP) | S-DEMO.3 | M2 | Sun 12:00 | Sun 16:00 | Entity properties schema |
-| **5** | S-DEMO.5 | L (4 SP) | S-DEMO.4 | M3 | Sun 16:00 | Mon 06:00 | Sync engine (epic/story/task) |
-| **6** | S-DEMO.6 | XS (1 SP) | S-DEMO.5 | M4 | Mon 06:00 | Mon 10:00 | Demo rehearsal + polish |
+| **5** | S-DEMO.5 | L (4 SP) | S-DEMO.4 | M3 | Sun 16:00 | Mon 06:00 | Sync engine (pull + push, epic/story) |
+| **6** | S-DEMO.6 | XS (1 SP) | S-DEMO.5 | M4 | Mon 06:00 | Mon 10:00 | Coppel demo rehearsal + script |
 
-**Total:** 15 SP, 6 stories, 29 hours
+**Total:** 16 SP, 6 stories, 29 hours
 
 **Critical Path:** S-DEMO.1 → S-DEMO.2 → S-DEMO.3 → S-DEMO.4 → S-DEMO.5 → S-DEMO.6
 
@@ -51,11 +51,13 @@
 ### M2: JIRA API Working (Sunday 16:00)
 
 **Features Complete:**
-- S-DEMO.3: JIRA client & API wrapper
+- S-DEMO.3: JIRA client (bidirectional)
 - S-DEMO.4: Entity properties & sync metadata
 
 **Success Criteria:**
-- [ ] JIRA client creates test issue via API
+- [ ] **Read:** JIRA client reads epic from JIRA (by key or JQL)
+- [ ] **Write:** JIRA client creates story linked to epic
+- [ ] **Read:** JIRA client reads status updates from JIRA
 - [ ] Entity properties read/write working
 - [ ] Rate limiting handled (field filtering implemented)
 - [ ] Idempotency check works (query entity properties before create)
@@ -63,68 +65,110 @@
 **Demo Capability:**
 ```bash
 rai backlog test-jira --provider jira
-# Creates test epic in JIRA
+# Reads test epic from JIRA
+# Creates test story in JIRA
+# Reads story status back
 # Shows entity properties in JIRA UI
 ```
 
-**Demo Validation:** Check JIRA UI, see test epic with `com.humansys.raise.sync` property visible in developer tools.
+**Demo Validation:** Check JIRA UI, see test epic + story with `com.humansys.raise.sync` property visible in developer tools.
 
-**Gate:** Cannot proceed to S-DEMO.5 without JIRA API calls working. If blocked past 18:00 Sunday, reduce sync scope (epic/story only, skip tasks).
+**Gate:** Cannot proceed to S-DEMO.5 without bidirectional JIRA operations working. If blocked past 18:00 Sunday, reduce to one-way push only (defer pull to post-demo).
 
 ---
 
-### M3: Full Sync Working (Monday 06:00 AM)
+### M3: Bidirectional Sync Working (Monday 06:00 AM)
 
 **Features Complete:**
-- S-DEMO.5: Sync engine (epic/story/task granularity)
+- S-DEMO.5: Sync engine (pull + push, epic/story granularity)
 
-**Success Criteria:**
-- [ ] Parse E-DEMO epic from `governance/backlog.md`
-- [ ] Parse 6 stories from epic branch
-- [ ] Parse tasks from each story's `plan.md`
-- [ ] Create JIRA Epic → Stories → Subtasks hierarchy
-- [ ] Entity properties set on all items (epic/story/task IDs)
+**Success Criteria (Coppel Workflow):**
+- [ ] **Pull:** Read JIRA epic → Write to `governance/backlog.md` + memory graph
+- [ ] **Push:** Read local stories → Create JIRA issues → Link to epic
+- [ ] **Pull:** Read JIRA status updates → Update local backlog
+- [ ] Entity properties set on all items (epic/story IDs)
 - [ ] Idempotent (re-running sync doesn't duplicate)
 - [ ] Dry-run mode works (`--dry-run` shows what would sync)
 
-**Demo Capability:**
+**Demo Capability (Full Workflow):**
 ```bash
-rai backlog sync --provider jira --dry-run
-# Shows: Will create 1 epic, 6 stories, ~30 tasks
+# 1. PM creates epic in JIRA (manual step)
 
-rai backlog sync --provider jira
-# Actually creates hierarchy in JIRA
+# 2. Rai pulls epic
+rai backlog pull --source jira --dry-run
+# Shows: Will import "Product Governance Initiative" epic
+
+rai backlog pull --source jira
+# Epic appears in governance/backlog.md
+
+# 3. Rai designs epic locally (manual: /rai-epic-design)
+
+# 4. Rai pushes stories to JIRA
+rai backlog push --source jira --dry-run
+# Shows: Will create 5 stories linked to epic
+
+rai backlog push --source jira
+# 5 stories appear in JIRA
+
+# 5. Team updates story status in JIRA (manual)
+
+# 6. Rai syncs status back
+rai backlog pull --source jira
+# Status updated in local backlog
 ```
 
-**Demo Validation:** Open JIRA, see full E-DEMO epic with 6 stories, each with subtasks. Click into entity properties (dev tools), see RaiSE metadata.
+**Demo Validation:** End-to-end workflow works. JIRA epic → local backlog → local design → JIRA stories → status sync back.
 
-**Gate:** This is the CRITICAL milestone. If not reached by 06:00 Monday, we have 5 hours to debug before demo. Fallback: Demo with partial sync (epic/story only).
+**Gate:** This is the CRITICAL milestone. If not reached by 06:00 Monday, we have 5 hours to debug before demo. Fallback: Demo with push only (skip pull workflow).
 
 ---
 
 ### M4: Demo Ready (Monday 10:00 AM)
 
 **Features Complete:**
-- S-DEMO.6: Demo validation & retrospective
+- S-DEMO.6: Demo rehearsal & Coppel script
 
 **Success Criteria:**
-- [ ] Demo rehearsed 3+ times successfully
-- [ ] Demo script written (what to say, what to show)
+- [ ] Coppel workflow rehearsed 3+ times successfully
+- [ ] Demo script written (tailored to Zaira's governance scalability needs)
 - [ ] JIRA project cleaned up (delete test data)
 - [ ] Fresh sync for demo (clean JIRA state)
 - [ ] Backup plan documented (if live demo fails, show screenshots)
 
-**Demo Script:**
-1. Show RaiSE working locally (this epic, stories, tasks in plan.md)
-2. Run `rai backlog sync --provider jira --dry-run` (show what will sync)
-3. Run `rai backlog sync --provider jira` (create in JIRA)
-4. Open JIRA UI → show epic → stories → subtasks
-5. Click into story → dev tools → show entity properties (RaiSE metadata)
-6. Explain Forge vision (cross-project intelligence)
+**Demo Script (Coppel Context):**
 
-**Demo Duration:** 10-15 minutes
+**Intro (1 min):** "We're showing how RaiSE enables product governance at scale—addressing Coppel's challenge of migrating from Plan View to JIRA while maintaining governance without 1:1 coaching."
 
-**Gate:** Demo must rehearse successfully by 10:00 AM. If any issues, we have 1 hour buffer to fix before 11:00 AM demo.
+**Workflow (10 min):**
+1. **PM creates epic in JIRA** (pre-created: "Product Governance Initiative")
+   - "This is how your product managers start initiatives in JIRA today"
+
+2. **Rai pulls epic** (`rai backlog pull --source jira`)
+   - Show epic appears in local backlog
+   - "Rai is notified and brings the epic into the governance framework"
+
+3. **Rai designs epic** (show `/rai-epic-design` process)
+   - Show 5 stories created locally
+   - "Rai guides the design with governance principles built-in"
+
+4. **Rai pushes stories to JIRA** (`rai backlog push --source jira`)
+   - Show 5 stories appear in JIRA linked to epic
+   - "Team sees structured stories in their existing JIRA workflow"
+
+5. **Team approves story** (manually update status in JIRA)
+   - "Team collaboration happens in JIRA as normal"
+
+6. **Rai syncs status back** (`rai backlog pull --source jira`)
+   - Show status updated in RaiSE backlog
+   - "Governance and execution stay in sync automatically"
+
+**Forge Vision (2 min):** Cross-project intelligence, systemic insights, value measurement
+
+**Q&A (2 min)**
+
+**Demo Duration:** 15 minutes total
+
+**Gate:** Demo must rehearse successfully by 10:00 AM. If any issues, we have 1 hour buffer to fix before 11:00 AM demo with Zaira.
 
 ---
 
@@ -149,18 +193,21 @@ rai backlog sync --provider jira
 ### Why S-DEMO.5 (Sync Engine) is Largest?
 
 **Complexity:**
-- Parse multiple file formats (backlog.md, plan.md)
-- Handle hierarchy (epic → story → task)
-- Create 3 JIRA issue types (epic, story, subtask)
+- **Bidirectional operations:** Both pull (JIRA → local) and push (local → JIRA)
+- Parse multiple file formats (backlog.md for epics, epic scope for stories)
+- Handle hierarchy (epic → story)
+- Create JIRA issues (epic, story) and link them
 - Idempotency logic (don't duplicate on re-run)
-- Error handling (API failures, partial sync)
+- Entity properties integration (track sync state)
+- Dry-run mode (preview without execution)
+- Error handling (API failures, partial sync, network issues)
 
 **Why Late:**
 - Foundation built (auth, JIRA client, entity properties all working)
 - Learning accumulated (patterns from earlier stories)
-- Most time available (10+ hours Sunday night/Monday morning)
+- Most time available (14 hours Sunday evening/Monday morning)
 
-**Fallback:** If running behind → reduce granularity (epic + story only, skip tasks)
+**Fallback:** If running behind → reduce to one-way push only (defer pull to post-demo)
 
 ---
 
@@ -183,10 +230,10 @@ rai backlog sync --provider jira
 |---------|:----:|:------:|-------|----------|:-----------:|:--------:|-------|
 | **S-DEMO.1** | M (3 SP) | ✅ **DONE** | Sat 14:00 | Sat 17:00 | **3h** | **1.0 SP/h** | ADRs + scope complete |
 | **S-DEMO.2** | M (3 SP) | 🔄 NEXT | Sat 17:00 | Target: 23:00 | - | - | OAuth auth flow |
-| **S-DEMO.3** | S (2 SP) | Pending | Sun 08:00 | Target: 12:00 | - | - | JIRA API wrapper |
+| **S-DEMO.3** | M (3 SP) | Pending | Sun 08:00 | Target: 12:00 | - | - | Bidirectional JIRA client |
 | **S-DEMO.4** | S (2 SP) | Pending | Sun 12:00 | Target: 16:00 | - | - | Entity properties |
-| **S-DEMO.5** | L (4 SP) | Pending | Sun 16:00 | Target: Mon 06:00 | - | - | Full sync engine |
-| **S-DEMO.6** | XS (1 SP) | Pending | Mon 06:00 | Target: 10:00 | - | - | Demo rehearsal |
+| **S-DEMO.5** | L (4 SP) | Pending | Sun 16:00 | Target: Mon 06:00 | - | - | Sync engine (pull + push) |
+| **S-DEMO.6** | XS (1 SP) | Pending | Mon 06:00 | Target: 10:00 | - | - | Coppel demo rehearsal |
 
 ### Milestone Progress
 
@@ -206,10 +253,10 @@ rai backlog sync --provider jira
 
 ### Cumulative Progress
 
-- **SP Complete:** 3 / 15 (20%)
+- **SP Complete:** 3 / 16 (19%)
 - **Time Elapsed:** 3h / 29h (10%)
 - **Velocity:** 1.0 SP/hour (on track for 10 SP/day target)
-- **Burn Rate:** Ahead of schedule (20% complete vs 10% time elapsed)
+- **Burn Rate:** Ahead of schedule (19% complete vs 10% time elapsed)
 
 **Next Checkpoint:** Saturday 23:00 (M1: Auth working)
 
@@ -220,8 +267,8 @@ rai backlog sync --provider jira
 | Risk | Likelihood | Impact | Mitigation | Fallback |
 |------|:----------:|:------:|------------|----------|
 | **OAuth complexity delays M1** | Medium | High | Use `atlassian-python-api` library (proven). Timebox to 6h. | Pivot to API tokens (hardcoded) if blocked past midnight Sat |
-| **JIRA API rate limits hit** | Low | Medium | Implement field filtering (S-DEMO.3). Batch API calls. | Sync fewer items (epic only, not stories/tasks) |
-| **Task parsing complexity** | Medium | Medium | Parse plan.md early (Sunday). Test with real task data. | Skip task sync, do epic + story only (reduces scope by 30%) |
+| **Bidirectional sync complexity** | Medium | High | S-DEMO.3 sized as M (3 SP) for read + write operations. | Reduce to one-way push only (defer pull to post-demo) |
+| **JIRA API rate limits hit** | Low | Medium | Implement field filtering (S-DEMO.3). Batch API calls. | Sync fewer items (epic only, not stories) |
 | **Demo environment failure** | Low | Critical | Rehearse 3+ times. Backup: Screenshots + recorded demo. | Show recorded demo if live JIRA fails |
 | **Sleep deprivation errors** | High | Medium | Stop at 2am Sunday. 6h sleep minimum. Fresh start Monday. | Accept reduced scope if exhausted |
 
