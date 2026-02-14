@@ -111,7 +111,22 @@ Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (3)
 
 ---
 
-## 4. Next Candidates
+## 4. Hotfixes & Bugfixes
+
+> **Note**: Bugfix stories branch directly from `v2` (no epic wrapper). Format compatible with Jira import/sync.
+
+| ID | Title | Description | Status | Priority | Found In | Target |
+|----|-------|-------------|--------|----------|----------|--------|
+| **HF-3** | Type annotations incomplete in governance models | `governance/models.py:131` - ExtractionResult.concepts field has partial type `list[Unknown]`. Causes pyright errors in strict mode. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
+| **HF-4** | Type annotations incomplete in profile schema | `onboarding/profile.py:168,216` - CoachingState.corrections and deadlines fields have partial types `list[Unknown]`. Pyright strict mode failures. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
+
+**Completed:**
+- **HF-1**: Session narrative schema (completed in v2.0.0a6)
+- **HF-2**: Publish skill integration (completed in v2.0.0a7)
+
+---
+
+## 5. Next Candidates
 
 | Candidate | What | Priority | Effort |
 |-----------|------|----------|--------|
@@ -124,7 +139,7 @@ See `dev/parking-lot.md` for full idea backlog.
 
 ---
 
-## 5. Definition of Done
+## 6. Definition of Done
 
 Each feature is complete when:
 
@@ -141,6 +156,7 @@ Each feature is complete when:
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 2.1.0 | 2026-02-14 | Rai | Added Hotfixes section (§4) for quality gate tracking, renumbered subsequent sections |
 | 2.0.0 | 2026-02-09 | Rai | Full refresh: E5→E13, E6→E9, E7 complete, E12-E16 added, stale sections removed |
 | 1.3.0 | 2026-02-03 | Rai | E9 Phase 1 + E11 complete, only E7 remaining for F&F |
 | 1.2.0 | 2026-02-03 | Rai | E8 complete, E9 in progress (F9.1 done), sequence: E9→E7 |
@@ -150,4 +166,4 @@ Each feature is complete when:
 ---
 
 *Updated by: Rai + Emilio*
-*Last sync: 2026-02-09*
+*Last sync: 2026-02-14*
