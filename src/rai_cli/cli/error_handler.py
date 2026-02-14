@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import json
 import sys
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Literal, NoReturn
 
 from rich.console import Console
 from rich.panel import Panel
@@ -114,7 +114,7 @@ def cli_error(
     *,
     hint: str | None = None,
     exit_code: int = 1,
-) -> None:
+) -> NoReturn:
     """Print error message and exit with code.
 
     This is the standard pattern for CLI error handling. Use this instead of
