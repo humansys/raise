@@ -467,6 +467,98 @@ class TestProcessSessionCloseCoaching:
         mp.undo()
 
 
+class TestLoadStateFileNarrative:
+    """Tests for load_state_file with narrative field."""
+
+    def test_loads_state_file_with_narrative(self, tmp_path: Path) -> None:
+        """State file with narrative populates CloseInput.narrative."""
+        data = {
+            "summary": "narrative session",
+            "narrative": "## Decisions\n- Chose sync model over adapters\n\n## Artifacts\n- adr-026.md created",
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+
+        result = load_state_file(state_file)
+        assert "sync model" in result.narrative
+
+    def test_loads_state_file_without_narrative_defaults_empty(
+        self, tmp_path: Path,
+    ) -> None:
+        """State file without narrative defaults to empty string."""
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text("summary: no narrative\n")
+
+        result = load_state_file(state_file)
+        assert result.narrative == ""
+
+
+class TestProcessSessionCloseNarrative:
+    """Tests for process_session_close persisting narrative."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        """Create a project with memory and personal directories."""
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_close_persists_narrative_in_session_state(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close persists narrative in session-state.yaml."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="narrative test",
+            narrative="## Decisions\n- Chose sync model",
+            current_work={
+                "epic": "E21",
+                "story": "S21.1",
+                "phase": "implement",
+                "branch": "epic/e21/platform",
+            },
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from rai_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert "sync model" in state.narrative
+        mp.undo()
+
+    def test_close_without_narrative_defaults_empty(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close without narrative leaves empty string."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="no narrative")
+
+        process_session_close(close_input, profile, project)
+
+        from rai_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.narrative == ""
+        mp.undo()
+
+
 class TestProcessSessionCloseRelease:
     """Tests for session close persisting release field."""
 

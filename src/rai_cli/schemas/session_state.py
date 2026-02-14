@@ -103,5 +103,10 @@ class SessionState(BaseModel):
     last_session: LastSession
     pending: PendingItems = Field(default_factory=PendingItems)
     notes: str = ""
+    narrative: str = Field(
+        default="",
+        description="Structured session context for cross-session continuity. "
+        "Contains decisions, research, artifacts, and branch state from the last session.",
+    )
     progress: EpicProgress | None = None
     completed_epics: list[str] = Field(default_factory=list)

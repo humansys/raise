@@ -212,3 +212,64 @@ class TestSessionState:
         }
         state = SessionState.model_validate(data)
         assert state.current_work.release == ""
+
+
+class TestSessionNarrative:
+    """Tests for session narrative field."""
+
+    def _make_minimal(self) -> SessionState:
+        return SessionState(
+            current_work=CurrentWork(
+                epic="E15", story="S15.8", phase="implement", branch="epic/e15"
+            ),
+            last_session=LastSession(
+                id="SES-003",
+                date=date(2026, 2, 8),
+                developer="Emilio",
+                summary="Task 1 done",
+            ),
+        )
+
+    def test_narrative_defaults_to_empty(self) -> None:
+        """SessionState.narrative defaults to empty string."""
+        state = self._make_minimal()
+        assert state.narrative == ""
+
+    def test_narrative_accepts_value(self) -> None:
+        """SessionState accepts narrative field."""
+        state = self._make_minimal()
+        state.narrative = "## Decisions\n- Chose sync model"
+        assert "sync model" in state.narrative
+
+    def test_narrative_round_trip(self) -> None:
+        """SessionState with narrative round-trips through dict."""
+        state = SessionState(
+            current_work=CurrentWork(epic="E21", story="S21.1", phase="implement", branch="epic/e21"),
+            last_session=LastSession(
+                id="SES-159", date=date(2026, 2, 14),
+                developer="Emilio", summary="test",
+            ),
+            narrative="## Decisions\n- Architecture = sync model\n\n## Artifacts\n- scope.md created",
+        )
+        data = state.model_dump()
+        restored = SessionState.model_validate(data)
+        assert restored.narrative == state.narrative
+
+    def test_backward_compat_no_narrative_in_yaml(self) -> None:
+        """SessionState loads from dict without narrative field (backward compat)."""
+        data = {
+            "current_work": {
+                "epic": "E15",
+                "story": "S15.7",
+                "phase": "design",
+                "branch": "main",
+            },
+            "last_session": {
+                "id": "SES-001",
+                "date": "2026-02-08",
+                "developer": "Test",
+                "summary": "test",
+            },
+        }
+        state = SessionState.model_validate(data)
+        assert state.narrative == ""
