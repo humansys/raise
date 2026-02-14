@@ -5,6 +5,11 @@
 # internal directories and files, and force-pushes it to the GitHub remote.
 # No git history is carried — the public repo shows only the current state.
 #
+# IMPORTANT: Uses git plumbing (read-tree/write-tree) to build the filtered
+# commit entirely in the object store. The working tree is NEVER modified.
+# This prevents Claude Code from losing track of skills when .claude/ is
+# temporarily removed during sync.
+#
 # Excluded (internal):
 #   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/, governance/, .claude/, scripts/
 #   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md, .gitlab-ci.yml
@@ -22,7 +27,6 @@
 #
 # Prerequisites:
 #   - 'github' remote configured: git remote add github https://github.com/humansys/raise.git
-#   - Clean working tree (no uncommitted changes)
 #
 # WARNING: This force-pushes to the GitHub remote. The GitHub mirror is a
 # read-only target — all development happens in GitLab (origin).
@@ -31,7 +35,6 @@ set -euo pipefail
 
 SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
-TEMP_BRANCH="__sync-github-temp"
 EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs" "governance" ".claude" "scripts")
 EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml")
 
@@ -45,18 +48,6 @@ info()  { echo -e "${GREEN}[sync]${NC} $*"; }
 warn()  { echo -e "${YELLOW}[sync]${NC} $*"; }
 error() { echo -e "${RED}[sync]${NC} $*" >&2; }
 
-# Save current state
-ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-REPO_ROOT=$(git rev-parse --show-toplevel)
-
-cleanup() {
-    info "Cleaning up..."
-    cd "$REPO_ROOT"
-    git checkout "$ORIGINAL_BRANCH" --quiet 2>/dev/null || true
-    git branch -D "$TEMP_BRANCH" --quiet 2>/dev/null || true
-}
-trap cleanup EXIT
-
 # Preflight checks
 if ! git remote get-url github &>/dev/null; then
     error "'github' remote not configured."
@@ -69,11 +60,6 @@ if ! git rev-parse --verify "$SOURCE_BRANCH" &>/dev/null; then
     exit 1
 fi
 
-if [ -n "$(git status --porcelain)" ]; then
-    error "Working tree is not clean. Commit or stash changes first."
-    exit 1
-fi
-
 SOURCE_SHA=$(git rev-parse "$SOURCE_BRANCH")
 SOURCE_SHORT=$(git rev-parse --short "$SOURCE_BRANCH")
 
@@ -81,34 +67,36 @@ info "Syncing $SOURCE_BRANCH ($SOURCE_SHORT) → github/$TARGET_BRANCH"
 info "Excluded dirs: ${EXCLUDED_DIRS[*]}"
 info "Excluded files: ${EXCLUDED_FILES[*]}"
 
-# Check out source branch content
-git checkout "$SOURCE_BRANCH" --quiet
+# Build filtered tree using git plumbing (no working tree changes)
+# 1. Read source tree into a temporary index
+export GIT_INDEX_FILE=$(mktemp)
+trap "rm -f '$GIT_INDEX_FILE'" EXIT
 
-# Create orphan branch (no history)
-git checkout --orphan "$TEMP_BRANCH" --quiet
+git read-tree "$SOURCE_BRANCH"
 
-# Remove excluded directories
+# 2. Remove excluded directories from the temporary index
 for dir in "${EXCLUDED_DIRS[@]}"; do
-    if git ls-files --error-unmatch "$dir" &>/dev/null 2>&1; then
-        git rm -rf --quiet "$dir"
-        info "Removed $dir/"
-    fi
+    git rm -r --cached --quiet --ignore-unmatch "$dir"
+    info "Excluded $dir/"
 done
 
-# Remove excluded files (--ignore-unmatch handles gitignored/missing files)
+# 3. Remove excluded files from the temporary index
 for file in "${EXCLUDED_FILES[@]}"; do
-    git rm -f --quiet --ignore-unmatch "$file"
+    git rm --cached --quiet --ignore-unmatch "$file"
 done
 
-# Create single clean commit
-git commit --quiet -m "RaiSE Framework v2 — $(date +%Y-%m-%d)
+# 4. Write the filtered index as a tree object
+TREE=$(git write-tree)
+
+# 5. Create an orphan commit (no parent) from the filtered tree
+COMMIT=$(git commit-tree "$TREE" -m "RaiSE Framework v2 — $(date +%Y-%m-%d)
 
 Open core mirror of raise-commons.
-Source: $SOURCE_BRANCH ($SOURCE_SHA)"
+Source: $SOURCE_BRANCH ($SOURCE_SHA)")
 
-# Force-push to GitHub
+# 6. Force-push the commit to GitHub
 info "Pushing to github/$TARGET_BRANCH..."
-git push github "$TEMP_BRANCH:$TARGET_BRANCH" --force
+git push github "$COMMIT:refs/heads/$TARGET_BRANCH" --force
 
 info "Done. GitHub mirror updated."
 info "Source: $SOURCE_BRANCH ($SOURCE_SHORT)"
