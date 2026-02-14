@@ -26,7 +26,7 @@ from rai_cli.cli.error_handler import cli_error
 from rai_cli.config.paths import get_memory_dir, get_personal_dir
 from rai_cli.context import UnifiedGraph, UnifiedGraphBuilder
 from rai_cli.context.diff import GraphDiff, diff_graphs
-from rai_cli.context.models import ConceptNode
+from rai_cli.context.models import ConceptEdge, ConceptNode
 from rai_cli.context.query import (
     ArchitecturalContext,
     UnifiedQuery,
@@ -34,7 +34,7 @@ from rai_cli.context.query import (
     UnifiedQueryResult,
     UnifiedQueryStrategy,
 )
-from rai_cli.governance import ConceptType, GovernanceExtractor
+from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
 from rai_cli.memory import (
     CalibrationInput,
     MemoryScope,
@@ -67,11 +67,6 @@ memory_app = typer.Typer(
 )
 
 console = Console()
-
-
-def _get_default_memory_dir() -> Path:
-    """Get default memory directory (.raise/rai/memory)."""
-    return get_memory_dir()
 
 
 def _get_default_index_path() -> Path:
@@ -643,7 +638,7 @@ def validate(
     console.print("\n[green]Memory index is valid.[/green]\n")
 
 
-def _detect_cycles(graph: UnifiedGraph, edges: list) -> list[list[str]]:
+def _detect_cycles(graph: UnifiedGraph, edges: list[ConceptEdge]) -> list[list[str]]:
     """Detect cycles in a set of edges using DFS."""
     # Build adjacency list from edges
     adj: dict[str, list[str]] = {}
@@ -779,7 +774,7 @@ def extract(
             console.print("\nExtracting concepts from governance files...")
 
             # Group concepts by type
-            by_type: dict[ConceptType, list] = {}
+            by_type: dict[ConceptType, list[Concept]] = {}
             for concept in result.concepts:
                 by_type.setdefault(concept.type, []).append(concept)
 

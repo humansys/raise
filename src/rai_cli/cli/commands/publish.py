@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-import subprocess
+import subprocess  # nosec B404 - subprocess required for git operations in CLI tool
 from datetime import date
 from pathlib import Path
 from typing import Annotated
@@ -12,7 +12,12 @@ import typer
 from rich.console import Console
 
 from rai_cli.publish.check import CheckResult, run_checks
-from rai_cli.publish.version import BumpType, bump_version, is_pep440, sync_version_files
+from rai_cli.publish.version import (
+    BumpType,
+    bump_version,
+    is_pep440,
+    sync_version_files,
+)
 
 publish_app = typer.Typer(help="Publish and release management commands")
 console = Console()
@@ -180,13 +185,13 @@ def release_command(
             raise typer.Exit(1)
         new_version = version
     else:
-        assert bump is not None
+        assert bump is not None  # nosec B101 - validated at line 159-161
         new_version = bump_version(current, bump)
 
     today = date.today().isoformat()
 
     # Display plan
-    console.print(f"[bold]Release Plan[/bold]")
+    console.print("[bold]Release Plan[/bold]")
     console.print(f"  Current version: {current}")
     console.print(f"  New version:     {new_version}")
     console.print(f"  Date:            {today}")
@@ -197,7 +202,7 @@ def release_command(
     console.print(f"    3. Update CHANGELOG.md: [Unreleased] → [{new_version}] - {today}")
     console.print(f"    4. Commit: release: v{new_version}")
     console.print(f"    5. Tag: v{new_version}")
-    console.print(f"    6. Push commit + tag → triggers GitHub Actions release")
+    console.print("    6. Push commit + tag → triggers GitHub Actions release")
 
     if dry_run:
         console.print("\n[yellow]Dry run — no changes made[/yellow]")
@@ -227,12 +232,12 @@ def release_command(
             console.print("[yellow]⚠ No unreleased entries to promote[/yellow]")
 
     # 4: Commit
-    subprocess.run(
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
         ["git", "add", str(pyproject_path), str(init_path), str(changelog_path)],
         cwd=project,
         check=True,
     )
-    subprocess.run(
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
         ["git", "commit", "-m", f"release: v{new_version}"],
         cwd=project,
         check=True,
@@ -240,7 +245,7 @@ def release_command(
     console.print(f"[green]✓ Committed: release: v{new_version}[/green]")
 
     # 5: Tag
-    subprocess.run(
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
         ["git", "tag", f"v{new_version}"],
         cwd=project,
         check=True,
@@ -248,12 +253,12 @@ def release_command(
     console.print(f"[green]✓ Tagged: v{new_version}[/green]")
 
     # 6: Push (with confirmation already given)
-    subprocess.run(
+    subprocess.run(  # nosec B603,B607 - controlled git commands, no untrusted input
         ["git", "push", "--follow-tags"],
         cwd=project,
         check=True,
     )
-    console.print(f"[green]✓ Pushed to origin[/green]")
+    console.print("[green]✓ Pushed to origin[/green]")
 
     console.print(f"\n[bold green]Release v{new_version} published.[/bold green]")
     console.print("GitHub Actions will handle PyPI upload.")
