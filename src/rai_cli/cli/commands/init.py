@@ -226,14 +226,11 @@ def _get_project_message(
         skills_msg = ""
         if skills_result is not None and not skills_result.already_existed:
             skills_msg = (
-                f"  Installed {skills_result.skills_copied} skills"
-                f" to .claude/skills/\n"
+                f"  Installed {skills_result.skills_copied} skills to .claude/skills/\n"
             )
         governance_msg = ""
         if governance_result is not None and not governance_result.already_existed:
-            governance_msg = (
-                f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
-            )
+            governance_msg = f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
         return (
             PROJECT_DETECTED_RI.format(
                 project_type=project_type.capitalize(),

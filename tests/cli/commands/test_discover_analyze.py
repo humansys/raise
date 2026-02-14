@@ -111,7 +111,9 @@ class TestDiscoverAnalyze:
         )
         assert result.exit_code != 0
 
-    def test_analyze_saves_analysis_json(self, tmp_path: Path, monkeypatch: object) -> None:
+    def test_analyze_saves_analysis_json(
+        self, tmp_path: Path, monkeypatch: object
+    ) -> None:
         """Should save analysis.json to work/discovery/."""
         scan_file = _scan_result_json(tmp_path)
         # Change to tmp_path so analysis.json is saved there

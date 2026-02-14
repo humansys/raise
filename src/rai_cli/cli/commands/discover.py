@@ -245,9 +245,7 @@ def analyze_command(
         try:
             import yaml
 
-            category_map = yaml.safe_load(
-                category_map_file.read_text(encoding="utf-8")
-            )
+            category_map = yaml.safe_load(category_map_file.read_text(encoding="utf-8"))
         except ImportError:
             cli_error(
                 "PyYAML required for --category-map",

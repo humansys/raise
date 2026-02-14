@@ -7,7 +7,7 @@ from pathlib import Path
 
 import yaml
 
-from rai_cli.onboarding.profile import DeveloperProfile, ExperienceLevel
+from rai_cli.onboarding.profile import DeveloperProfile
 from rai_cli.session.close import CloseInput, load_state_file, process_session_close
 
 
@@ -30,11 +30,13 @@ class TestLoadStateFile:
             "type": "feature",
             "outcomes": ["S15.7 scope committed"],
             "patterns": [
-                {"description": "Code as Gemba", "context": "process,lean", "type": "process"}
+                {
+                    "description": "Code as Gemba",
+                    "context": "process,lean",
+                    "type": "process",
+                }
             ],
-            "corrections": [
-                {"what": "Skipped design", "lesson": "Always design"}
-            ],
+            "corrections": [{"what": "Skipped design", "lesson": "Always design"}],
             "current_work": {
                 "epic": "E15",
                 "story": "S15.7",
@@ -79,9 +81,7 @@ class TestProcessSessionClose:
         (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
         return project
 
-    def test_records_session(
-        self, tmp_path: Path, monkeypatch: "object"
-    ) -> None:
+    def test_records_session(self, tmp_path: Path, monkeypatch: object) -> None:
         """process_session_close records session in index.jsonl."""
         import pytest
 
@@ -101,7 +101,8 @@ class TestProcessSessionClose:
         mp.undo()
 
     def test_adds_patterns(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close appends patterns to patterns.jsonl."""
         import pytest
@@ -115,7 +116,11 @@ class TestProcessSessionClose:
         close_input = CloseInput(
             summary="test",
             patterns=[
-                {"description": "New pattern", "type": "process", "context": "test,dev"},
+                {
+                    "description": "New pattern",
+                    "type": "process",
+                    "context": "test,dev",
+                },
             ],
         )
 
@@ -128,7 +133,8 @@ class TestProcessSessionClose:
         mp.undo()
 
     def test_adds_corrections_to_profile(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close adds corrections to developer profile."""
         import pytest
@@ -159,7 +165,8 @@ class TestProcessSessionClose:
         mp.undo()
 
     def test_writes_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close writes session-state.yaml."""
         import pytest
@@ -196,7 +203,8 @@ class TestProcessSessionClose:
         mp.undo()
 
     def test_clears_current_session(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close clears current_session in profile."""
         import pytest
@@ -309,9 +317,14 @@ class TestLoadStateFileCoaching:
         result = load_state_file(state_file)
         assert result.coaching is not None
         assert result.coaching["trust_level"] == "developing"
-        assert result.coaching["strengths"] == ["design discipline", "structured thinking"]
+        assert result.coaching["strengths"] == [
+            "design discipline",
+            "structured thinking",
+        ]
 
-    def test_loads_state_file_without_coaching_defaults_none(self, tmp_path: Path) -> None:
+    def test_loads_state_file_without_coaching_defaults_none(
+        self, tmp_path: Path
+    ) -> None:
         """State file without coaching defaults to None."""
         state_file = tmp_path / "state.yaml"
         state_file.write_text("summary: no coaching\n")
@@ -331,7 +344,8 @@ class TestProcessSessionCloseCoaching:
         return project
 
     def test_close_updates_coaching_in_profile(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close updates coaching fields in developer profile."""
         import pytest
@@ -364,7 +378,8 @@ class TestProcessSessionCloseCoaching:
         mp.undo()
 
     def test_close_updates_relationship_in_profile(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close updates relationship state in profile."""
         import pytest
@@ -393,7 +408,8 @@ class TestProcessSessionCloseCoaching:
         mp.undo()
 
     def test_close_without_coaching_leaves_defaults(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without coaching leaves profile defaults."""
         import pytest
@@ -418,7 +434,8 @@ class TestProcessSessionCloseCoaching:
         mp.undo()
 
     def test_close_partial_coaching_preserves_existing(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close with partial coaching preserves other fields."""
         import pytest
@@ -430,9 +447,7 @@ class TestProcessSessionCloseCoaching:
         mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         project = self._setup_project(tmp_path)
-        coaching = CoachingContext(
-            strengths=["existing"], trust_level="developing"
-        )
+        coaching = CoachingContext(strengths=["existing"], trust_level="developing")
         profile = DeveloperProfile(name="Test", coaching=coaching)
 
         close_input = CloseInput(
@@ -584,7 +599,8 @@ class TestProcessSessionCloseProgress:
         return project
 
     def test_close_writes_progress_to_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close writes progress to session-state.yaml."""
         import pytest
@@ -619,7 +635,8 @@ class TestProcessSessionCloseProgress:
         mp.undo()
 
     def test_close_writes_completed_epics_to_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close writes completed_epics to session-state.yaml."""
         import pytest
@@ -645,7 +662,8 @@ class TestProcessSessionCloseProgress:
         mp.undo()
 
     def test_close_without_progress_leaves_none(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without progress leaves state.progress as None."""
         import pytest

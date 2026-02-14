@@ -14,7 +14,9 @@ Contents:
     Epic lifecycle:     rai-epic-start, rai-epic-plan, rai-epic-design, rai-epic-close
     Discovery:          rai-discover-start, rai-discover-scan,
                         rai-discover-validate, rai-discover-document
-    Onboarding:         rai-project-create, rai-project-onboard
+    Onboarding:         rai-project-create, rai-project-onboard, rai-welcome
+    Governance:         rai-docs-update, rai-framework-sync
+    Meta:               rai-skill-create
     Tools:              rai-research, rai-debug
 
 Usage:
@@ -27,7 +29,7 @@ Usage:
 
 from __future__ import annotations
 
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 
 DISTRIBUTABLE_SKILLS: list[str] = [
     # Session lifecycle
@@ -53,6 +55,12 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     # Onboarding
     "rai-project-create",
     "rai-project-onboard",
+    "rai-welcome",
+    # Governance
+    "rai-docs-update",
+    "rai-framework-sync",
+    # Meta
+    "rai-skill-create",
     # Tools
     "rai-research",
     "rai-debug",

@@ -17,38 +17,48 @@ class TestDiffWithFixtureGraph:
     def _build_fixture_graph(self) -> UnifiedGraph:
         """Build a deterministic graph for diff testing."""
         graph = UnifiedGraph()
-        graph.add_concept(ConceptNode(
-            id="mod-alpha",
-            type="module",
-            content="Alpha module for testing",
-            created="2026-01-01",
-            metadata={"code_imports": ["config"], "code_exports": ["alpha_func"]},
-        ))
-        graph.add_concept(ConceptNode(
-            id="mod-beta",
-            type="module",
-            content="Beta module for testing",
-            created="2026-01-01",
-            metadata={"code_imports": [], "code_exports": []},
-        ))
-        graph.add_concept(ConceptNode(
-            id="PAT-001",
-            type="pattern",
-            content="Test pattern one",
-            created="2026-01-01",
-        ))
-        graph.add_concept(ConceptNode(
-            id="PAT-002",
-            type="pattern",
-            content="Test pattern two",
-            created="2026-01-01",
-        ))
-        graph.add_concept(ConceptNode(
-            id="guard-001",
-            type="guardrail",
-            content="Test guardrail",
-            created="2026-01-01",
-        ))
+        graph.add_concept(
+            ConceptNode(
+                id="mod-alpha",
+                type="module",
+                content="Alpha module for testing",
+                created="2026-01-01",
+                metadata={"code_imports": ["config"], "code_exports": ["alpha_func"]},
+            )
+        )
+        graph.add_concept(
+            ConceptNode(
+                id="mod-beta",
+                type="module",
+                content="Beta module for testing",
+                created="2026-01-01",
+                metadata={"code_imports": [], "code_exports": []},
+            )
+        )
+        graph.add_concept(
+            ConceptNode(
+                id="PAT-001",
+                type="pattern",
+                content="Test pattern one",
+                created="2026-01-01",
+            )
+        )
+        graph.add_concept(
+            ConceptNode(
+                id="PAT-002",
+                type="pattern",
+                content="Test pattern two",
+                created="2026-01-01",
+            )
+        )
+        graph.add_concept(
+            ConceptNode(
+                id="guard-001",
+                type="guardrail",
+                content="Test guardrail",
+                created="2026-01-01",
+            )
+        )
         return graph
 
     def test_identical_graphs_no_changes(self) -> None:

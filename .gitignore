@@ -74,3 +74,13 @@ dmypy.json
 
 # Legacy telemetry (should be in personal/, will migrate)
 .raise/rai/telemetry/
+
+# Secrets & credentials
+.env
+.env.*
+*.pem
+*.key
+.pypirc
+credentials.json
+*.sqlite
+.netrc

@@ -8,7 +8,6 @@ from rai_cli.schemas.session_state import (
     CurrentWork,
     EpicProgress,
     LastSession,
-    PendingItems,
     SessionState,
 )
 
@@ -49,7 +48,12 @@ class TestCurrentWork:
 
     def test_from_yaml_dict_with_nulls(self) -> None:
         """CurrentWork validates from dict with null values (as YAML produces)."""
-        data = {"epic": None, "story": None, "phase": "onboarding-complete", "branch": "test/raise-v2"}
+        data = {
+            "epic": None,
+            "story": None,
+            "phase": "onboarding-complete",
+            "branch": "test/raise-v2",
+        }
         work = CurrentWork.model_validate(data)
         assert work.epic == ""
         assert work.story == ""

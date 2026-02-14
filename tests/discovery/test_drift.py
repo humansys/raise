@@ -126,11 +126,15 @@ class TestDetectDrift:
         baseline = [
             BaselineComponent(
                 source_file="src/rai_cli/discovery/scanner.py",
-                metadata=BaselineComponentMetadata(name="extract_python_symbols", kind="function"),
+                metadata=BaselineComponentMetadata(
+                    name="extract_python_symbols", kind="function"
+                ),
             ),
             BaselineComponent(
                 source_file="src/rai_cli/discovery/scanner.py",
-                metadata=BaselineComponentMetadata(name="extract_typescript_symbols", kind="function"),
+                metadata=BaselineComponentMetadata(
+                    name="extract_typescript_symbols", kind="function"
+                ),
             ),
         ]
         # Function that doesn't follow extract_* pattern

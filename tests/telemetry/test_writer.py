@@ -57,7 +57,9 @@ class TestGetTelemetryPath:
         # Telemetry is personal data per F14.15
         assert path == tmp_path / ".raise/rai/personal/telemetry/signals.jsonl"
 
-    def test_none_uses_cwd(self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    def test_none_uses_cwd(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
         """None base_path uses current working directory."""
         monkeypatch.chdir(tmp_path)
         path = _get_telemetry_path(None)
@@ -71,13 +73,9 @@ class TestGetTelemetryPath:
 class TestEmit:
     """Tests for emit() function."""
 
-    def test_emit_skill_event(
-        self, temp_telemetry_dir: Path, now: datetime
-    ) -> None:
+    def test_emit_skill_event(self, temp_telemetry_dir: Path, now: datetime) -> None:
         """Emit a skill event to signals.jsonl."""
-        event = SkillEvent(
-            timestamp=now, skill="rai-story-design", event="start"
-        )
+        event = SkillEvent(timestamp=now, skill="rai-story-design", event="start")
 
         result = emit(event, base_path=temp_telemetry_dir)
 
@@ -93,9 +91,7 @@ class TestEmit:
         assert data["skill"] == "rai-story-design"
         assert data["event"] == "start"
 
-    def test_emit_session_event(
-        self, temp_telemetry_dir: Path, now: datetime
-    ) -> None:
+    def test_emit_session_event(self, temp_telemetry_dir: Path, now: datetime) -> None:
         """Emit a session event."""
         event = SessionEvent(
             timestamp=now,
@@ -136,9 +132,7 @@ class TestEmit:
         assert data["type"] == "calibration"
         assert data["velocity"] == 1.4
 
-    def test_emit_error_event(
-        self, temp_telemetry_dir: Path, now: datetime
-    ) -> None:
+    def test_emit_error_event(self, temp_telemetry_dir: Path, now: datetime) -> None:
         """Emit an error event."""
         event = ErrorEvent(
             timestamp=now,
@@ -161,9 +155,7 @@ class TestEmit:
         self, temp_telemetry_dir: Path, now: datetime
     ) -> None:
         """Emit a command usage event."""
-        event = CommandUsage(
-            timestamp=now, command="memory", subcommand="query"
-        )
+        event = CommandUsage(timestamp=now, command="memory", subcommand="query")
 
         result = emit(event, base_path=temp_telemetry_dir)
 
@@ -178,9 +170,7 @@ class TestEmit:
         self, temp_telemetry_dir: Path, now: datetime
     ) -> None:
         """Creates .raise/rai/personal/telemetry/ directory if it doesn't exist."""
-        event = SkillEvent(
-            timestamp=now, skill="test", event="start"
-        )
+        event = SkillEvent(timestamp=now, skill="test", event="start")
 
         # Directory doesn't exist yet (personal telemetry path per F14.15)
         telemetry_dir = temp_telemetry_dir / ".raise/rai/personal/telemetry"
@@ -196,7 +186,9 @@ class TestEmit:
     ) -> None:
         """Multiple emits append to the same file."""
         event1 = SkillEvent(timestamp=now, skill="skill1", event="start")
-        event2 = SkillEvent(timestamp=now, skill="skill2", event="complete", duration_sec=60)
+        event2 = SkillEvent(
+            timestamp=now, skill="skill2", event="complete", duration_sec=60
+        )
         event3 = CommandUsage(timestamp=now, command="memory")
 
         emit(event1, base_path=temp_telemetry_dir)
@@ -260,9 +252,7 @@ class TestEmitSkillEvent:
         assert data["event"] == "start"
         assert data["duration_sec"] is None
 
-    def test_emit_complete_event_with_duration(
-        self, temp_telemetry_dir: Path
-    ) -> None:
+    def test_emit_complete_event_with_duration(self, temp_telemetry_dir: Path) -> None:
         """Emit a skill complete event with duration."""
         result = emit_skill_event(
             skill="rai-story-implement",

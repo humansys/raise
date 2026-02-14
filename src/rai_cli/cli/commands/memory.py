@@ -296,9 +296,7 @@ def _format_json(result: UnifiedQueryResult) -> str:
 
 @memory_app.command("context")
 def context_cmd(
-    module_id: Annotated[
-        str, typer.Argument(help="Module ID (e.g., mod-memory)")
-    ],
+    module_id: Annotated[str, typer.Argument(help="Module ID (e.g., mod-memory)")],
     format: Annotated[
         str,
         typer.Option("--format", "-f", help="Output format (human or json)"),
@@ -372,9 +370,7 @@ def _print_context_human(ctx: ArchitecturalContext) -> None:
     if ctx.constraints:
         must = [c for c in ctx.constraints if "MUST" in c.content]
         should = [c for c in ctx.constraints if "SHOULD" in c.content]
-        console.print(
-            f"\n[bold]Constraints:[/bold] {len(ctx.constraints)} guardrails"
-        )
+        console.print(f"\n[bold]Constraints:[/bold] {len(ctx.constraints)} guardrails")
         if must:
             must_ids = ", ".join(c.id for c in must)
             console.print(f"  [red]MUST:[/red] {must_ids}")
@@ -419,18 +415,12 @@ def generate_memory(
         # Build the memory graph (recommended)
         $ raise memory build
     """
-    console.print(
-        "\n[yellow]Skipped:[/yellow] MEMORY.md generation is deprecated."
-    )
-    console.print(
-        "  The memory graph is the single source of truth."
-    )
+    console.print("\n[yellow]Skipped:[/yellow] MEMORY.md generation is deprecated.")
+    console.print("  The memory graph is the single source of truth.")
     console.print(
         "  Context is delivered via [cyan]raise session start --context[/cyan]."
     )
-    console.print(
-        "  Use [cyan]raise memory build[/cyan] to rebuild the graph.\n"
-    )
+    console.print("  Use [cyan]raise memory build[/cyan] to rebuild the graph.\n")
 
 
 # =============================================================================
@@ -646,9 +636,7 @@ def validate(
     if missing:
         console.print("  [yellow]⚠[/yellow]  Completeness gaps:")
         for node_type, expected, actual in missing:
-            console.print(
-                f"    {node_type}: expected ≥{expected}, found {actual}"
-            )
+            console.print(f"    {node_type}: expected ≥{expected}, found {actual}")
     else:
         console.print("  ✓ Completeness check passed")
 
@@ -1401,7 +1389,9 @@ def emit_work(
         )
 
     # Validate phase
-    valid_phases: list[Literal["init", "design", "plan", "implement", "review", "close"]] = [
+    valid_phases: list[
+        Literal["init", "design", "plan", "implement", "review", "close"]
+    ] = [
         "init",
         "design",
         "plan",

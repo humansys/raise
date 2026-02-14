@@ -54,9 +54,8 @@ class SkillMetadata(BaseModel):
             if key.startswith("raise."):
                 clean_key = key[6:]  # Remove 'raise.' prefix
                 # Handle boolean conversion
-                if clean_key == "adaptable":
-                    if isinstance(value, str):
-                        value = value.lower() == "true"
+                if clean_key == "adaptable" and isinstance(value, str):
+                    value = value.lower() == "true"
                 cleaned[clean_key] = value
 
         return cls(**cleaned)
