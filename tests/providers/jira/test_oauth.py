@@ -2,6 +2,7 @@
 
 import hashlib
 import secrets
+import time
 from base64 import urlsafe_b64encode
 from pathlib import Path
 from typing import Any
@@ -284,3 +285,143 @@ class TestOAuthFlow:
 
         assert "state mismatch" in str(exc_info.value).lower()
         assert "CSRF" in str(exc_info.value) or "csrf" in str(exc_info.value).lower()
+
+
+class TestTokenRefresh:
+    """Test automatic token refresh logic."""
+
+    def test_is_token_expired_returns_true_when_expired(self) -> None:
+        """Token is considered expired when expires_at is in the past."""
+        from rai_providers.jira.oauth import is_token_expired
+
+        # Token expired 1 hour ago
+        expired_token = {
+            "access_token": "old_token",
+            "expires_at": int(time.time()) - 3600,
+        }
+
+        assert is_token_expired(expired_token) is True
+
+    def test_is_token_expired_returns_false_when_valid(self) -> None:
+        """Token is valid when expires_at is in the future."""
+        from rai_providers.jira.oauth import is_token_expired
+
+        # Token expires in 1 hour
+        valid_token = {
+            "access_token": "valid_token",
+            "expires_at": int(time.time()) + 3600,
+        }
+
+        assert is_token_expired(valid_token) is False
+
+    def test_is_token_expired_with_buffer(self) -> None:
+        """Token refresh considers safety buffer (refresh 5 min early)."""
+        from rai_providers.jira.oauth import is_token_expired
+
+        # Token expires in 4 minutes (within 5-minute buffer)
+        near_expiry_token = {
+            "access_token": "soon_to_expire",
+            "expires_at": int(time.time()) + 240,
+        }
+
+        assert is_token_expired(near_expiry_token, buffer_seconds=300) is True
+
+    def test_is_token_expired_handles_missing_expires_at(self) -> None:
+        """Token without expires_at is considered expired (safe default)."""
+        from rai_providers.jira.oauth import is_token_expired
+
+        token_without_expiry = {"access_token": "token_123"}
+
+        assert is_token_expired(token_without_expiry) is True
+
+    @patch("requests.post")
+    def test_refresh_access_token_success(
+        self, mock_post: Mock, oauth_config: dict[str, str]
+    ) -> None:
+        """Refresh token exchanges refresh_token for new access_token."""
+        from rai_providers.jira.oauth import refresh_access_token
+
+        # Mock successful refresh response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "access_token": "new_access_token_abc",
+            "refresh_token": "new_refresh_token_xyz",
+            "token_type": "Bearer",
+            "expires_in": 3600,
+        }
+        mock_post.return_value = mock_response
+
+        old_token = {
+            "access_token": "old_token",
+            "refresh_token": "refresh_token_123",
+            "expires_at": int(time.time()) - 100,
+        }
+
+        refreshed_token = refresh_access_token(
+            token=old_token,
+            client_id=oauth_config["client_id"],
+            client_secret=oauth_config["client_secret"],
+            token_url=oauth_config["token_url"],
+        )
+
+        # Verify refresh request
+        mock_post.assert_called_once()
+        call_args = mock_post.call_args
+        assert call_args[1]["data"]["grant_type"] == "refresh_token"
+        assert call_args[1]["data"]["refresh_token"] == "refresh_token_123"
+        assert call_args[1]["data"]["client_id"] == oauth_config["client_id"]
+
+        # Verify refreshed token
+        assert refreshed_token["access_token"] == "new_access_token_abc"
+        assert refreshed_token["refresh_token"] == "new_refresh_token_xyz"
+        assert "expires_at" in refreshed_token
+
+    @patch("requests.post")
+    def test_refresh_access_token_failure(
+        self, mock_post: Mock, oauth_config: dict[str, str]
+    ) -> None:
+        """Refresh token handles invalid refresh_token errors."""
+        from rai_providers.jira.oauth import OAuthError, refresh_access_token
+
+        # Mock error response (refresh token expired/revoked)
+        mock_response = MagicMock()
+        mock_response.status_code = 400
+        mock_response.json.return_value = {
+            "error": "invalid_grant",
+            "error_description": "Refresh token expired",
+        }
+        mock_post.return_value = mock_response
+
+        token = {
+            "access_token": "old_token",
+            "refresh_token": "expired_refresh_token",
+        }
+
+        with pytest.raises(OAuthError) as exc_info:
+            refresh_access_token(
+                token=token,
+                client_id=oauth_config["client_id"],
+                client_secret=oauth_config["client_secret"],
+                token_url=oauth_config["token_url"],
+            )
+
+        assert "invalid_grant" in str(exc_info.value)
+
+    def test_refresh_access_token_no_refresh_token(
+        self, oauth_config: dict[str, str]
+    ) -> None:
+        """Refresh fails gracefully when token has no refresh_token."""
+        from rai_providers.jira.oauth import OAuthError, refresh_access_token
+
+        token_without_refresh = {"access_token": "token_123"}
+
+        with pytest.raises(OAuthError) as exc_info:
+            refresh_access_token(
+                token=token_without_refresh,
+                client_id=oauth_config["client_id"],
+                client_secret=oauth_config["client_secret"],
+                token_url=oauth_config["token_url"],
+            )
+
+        assert "refresh_token" in str(exc_info.value).lower()

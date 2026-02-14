@@ -343,3 +343,76 @@ def authenticate(
         store_token("jira", token, credentials_path)
 
     return token
+
+
+def is_token_expired(token: dict[str, Any], buffer_seconds: int = 300) -> bool:
+    """Check if OAuth token is expired or near expiry.
+
+    Args:
+        token: Token dictionary with expires_at timestamp.
+        buffer_seconds: Safety buffer to refresh before actual expiry (default: 5 min).
+
+    Returns:
+        True if token is expired or within buffer window, False otherwise.
+    """
+    # If no expires_at field, consider expired (safe default)
+    if "expires_at" not in token:
+        return True
+
+    # Check if token is expired or within safety buffer
+    current_time = int(time.time())
+    expires_at = token["expires_at"]
+
+    return current_time >= (expires_at - buffer_seconds)
+
+
+def refresh_access_token(
+    token: dict[str, Any],
+    client_id: str,
+    client_secret: str,
+    token_url: str = ATLASSIAN_TOKEN_URL,
+) -> dict[str, Any]:
+    """Refresh OAuth access token using refresh token.
+
+    Args:
+        token: Current token dictionary with refresh_token.
+        client_id: OAuth client ID.
+        client_secret: OAuth client secret.
+        token_url: OAuth token endpoint URL.
+
+    Returns:
+        New token dictionary with refreshed access_token and expires_at.
+
+    Raises:
+        OAuthError: If refresh fails (no refresh_token, network error, invalid token).
+    """
+    # Verify refresh_token exists
+    if "refresh_token" not in token:
+        raise OAuthError(
+            "Cannot refresh token: no refresh_token found. "
+            "Re-authentication required."
+        )
+
+    # Exchange refresh token for new access token
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": token["refresh_token"],
+        "client_id": client_id,
+        "client_secret": client_secret,
+    }
+
+    response = requests.post(token_url, data=data, timeout=30)
+
+    if response.status_code != 200:
+        error_data = response.json()
+        error_code = error_data.get("error", "unknown_error")
+        error_desc = error_data.get("error_description", "Unknown error")
+        raise OAuthError(f"Token refresh failed: {error_code} - {error_desc}")
+
+    refreshed_token = response.json()
+
+    # Add expiry timestamp
+    if "expires_in" in refreshed_token:
+        refreshed_token["expires_at"] = int(time.time()) + refreshed_token["expires_in"]
+
+    return refreshed_token  # type: ignore[no-any-return]
