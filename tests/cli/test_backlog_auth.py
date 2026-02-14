@@ -1,7 +1,6 @@
 """Tests for `rai backlog auth` CLI command."""
 
 from pathlib import Path
-from typing import Any
 from unittest.mock import Mock, patch
 
 import pytest
@@ -42,7 +41,7 @@ class TestBacklogAuthCommand:
 
         # Mock getting user info (email)
         with patch("rai_providers.jira.oauth.get_current_user") as mock_get_user:
-            mock_get_user.return_value = {"emailAddress": "user@example.com"}
+            mock_get_user.return_value = {"email": "user@example.com"}
 
             result = runner.invoke(app, ["backlog", "auth", "--provider", "jira"])
 
@@ -68,7 +67,7 @@ class TestBacklogAuthCommand:
         }
 
         with patch("rai_providers.jira.oauth.get_current_user") as mock_get_user:
-            mock_get_user.return_value = {"emailAddress": "custom@example.com"}
+            mock_get_user.return_value = {"email": "custom@example.com"}
 
             # Set env vars for custom credentials
             import os

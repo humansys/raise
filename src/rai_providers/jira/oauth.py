@@ -43,6 +43,7 @@ DEFAULT_SCOPES = [
     "read:jira-work",
     "write:jira-work",
     "read:jira-user",
+    "read:me",  # Required for /me endpoint
     "offline_access",  # Required for refresh token
 ]
 
@@ -261,6 +262,9 @@ def _start_callback_server(port: int = 8080, timeout: int = 300) -> dict[str, st
     """
     _CallbackHandler.callback_data = None
 
+    # Allow address reuse to avoid "Address already in use" errors
+    socketserver.TCPServer.allow_reuse_address = True
+
     with socketserver.TCPServer(("localhost", port), _CallbackHandler) as httpd:
         # Set timeout and handle single request
         httpd.timeout = 1  # Check every second
@@ -442,6 +446,10 @@ def get_current_user(access_token: str) -> dict[str, Any]:
     )
 
     if response.status_code != 200:
-        raise OAuthError(f"Failed to get user info: HTTP {response.status_code}")
+        error_detail = response.text if response.text else "No error details"
+        raise OAuthError(
+            f"Failed to get user info: HTTP {response.status_code}. "
+            f"Details: {error_detail}"
+        )
 
     return response.json()  # type: ignore[no-any-return]
