@@ -104,7 +104,7 @@ def auth(
 
             # Get user info to display confirmation
             user_info = get_current_user(token["access_token"])
-            email = user_info.get("emailAddress", "Unknown")
+            email = user_info.get("email", "Unknown")
 
             console.print(
                 f"\n[green]✓ Authenticated as {email}[/green]",
