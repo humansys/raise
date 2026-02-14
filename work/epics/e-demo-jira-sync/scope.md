@@ -78,7 +78,7 @@ Demonstrate **bidirectional workflow orchestration** between RaiSE and JIRA for 
 | ID | Feature | Size | Dependencies | Description |
 |----|---------|:----:|:------------:|-------------|
 | **S-DEMO.1** | Research synthesis & architecture design | M (3 SP) | — | ✅ **COMPLETE** - 6 research outputs consolidated, 3 ADRs created (OAuth, sync architecture, entity schema) |
-| **S-DEMO.2** | OAuth 2.0 authentication | M (3 SP) | S-DEMO.1 | Implement JIRA Cloud OAuth flow (authorization code + PKCE). Token storage, refresh logic. |
+| **S-DEMO.2** | OAuth 2.0 authentication | M (3 SP) | S-DEMO.1 | ✅ **COMPLETE** - Full OAuth 2.0 + PKCE flow, Fernet encryption, automatic token refresh, CLI command (44 min, 6.8x velocity) |
 | **S-DEMO.3** | JIRA client (bidirectional) | M (3 SP) | S-DEMO.2 | Bidirectional wrapper: **Read** epics + status, **Write** stories. Rate limiting, field filtering. |
 | **S-DEMO.4** | Entity properties & sync metadata | S (2 SP) | S-DEMO.3 | JIRA entity properties for sync state (epic/story IDs, timestamps, Forge metadata). Schema design, storage/retrieval. |
 | **S-DEMO.5** | Sync engine (pull + push) | L (4 SP) | S-DEMO.4 | **Bidirectional sync:** `pull` (JIRA → local), `push` (local → JIRA). Epic + Story granularity. Manual triggers. Idempotent. Dry-run mode. |
