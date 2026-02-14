@@ -1,3 +1,23 @@
+---
+name: rai-publish
+description: >
+  Guide the human through a structured release workflow with quality gates,
+  version bumping, changelog management, and PyPI publishing via GitHub Actions.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: meta
+  raise.frequency: as-needed
+  raise.fase: "release"
+  raise.prerequisites: ""
+  raise.next: ""
+  raise.gate: ""
+  raise.adaptable: "true"
+  raise.version: "1.0.0"
+  raise.visibility: internal
+---
+
 # Publish: Guided Release Workflow
 
 ## Purpose

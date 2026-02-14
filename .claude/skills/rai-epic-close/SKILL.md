@@ -16,6 +16,7 @@ metadata:
   raise.gate: ""
   raise.adaptable: "true"
   raise.version: "1.0.0"
+  raise.visibility: public
 ---
 
 # Epic Close: Epic Completion & Retrospective
