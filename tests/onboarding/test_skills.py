@@ -39,10 +39,7 @@ class TestScaffoldSkills:
             skills_dir / "rai-research" / "references" / "research-prompt-template.md"
         ).exists()
         assert (
-            skills_dir
-            / "rai-story-design"
-            / "references"
-            / "tech-design-story-v2.md"
+            skills_dir / "rai-story-design" / "references" / "tech-design-story-v2.md"
         ).exists()
 
     def test_skill_content_has_frontmatter(self, tmp_path: Path) -> None:

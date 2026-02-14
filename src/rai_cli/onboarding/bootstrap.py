@@ -160,5 +160,3 @@ def _copy_methodology(
     result.files_copied.append(str(dest))
     result.methodology_copied = True
     logger.debug("Copied: %s", dest)
-
-

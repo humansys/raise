@@ -2,6 +2,11 @@
 # Install: pre-commit install && pre-commit install --hook-type pre-push
 # Run all: pre-commit run --all-files
 # Target: pre-commit <4s, pre-push <15s
+#
+# Scope: src/ and tests/ only — internal dirs (archive/, work/, dev/, .raise/)
+# are excluded because they aren't shipped in the public repo.
+
+exclude: '^(archive/|work/|dev/|\.raise/|blog/|docs/|governance/|\.claude/|scripts/|framework/)'
 
 repos:
   # Housekeeping hooks
@@ -18,7 +23,7 @@ repos:
 
   # Ruff — lint + format
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.9.7
+    rev: v0.14.14
     hooks:
       - id: ruff
         args: [--fix]

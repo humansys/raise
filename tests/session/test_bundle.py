@@ -116,15 +116,17 @@ class TestAssembleContextBundle:
             _make_always_on_node(
                 "guardrail-must-code-001", "guardrail", "[MUST] Type hints"
             ),
-            _make_always_on_node(
-                "RAI-VAL-1", "principle", "Honesty over agreement"
-            ),
+            _make_always_on_node("RAI-VAL-1", "principle", "Honesty over agreement"),
         ]
 
         profile = _make_profile()
         state = _make_state()
         state.progress = EpicProgress(
-            epic="E15", stories_done=5, stories_total=8, sp_done=16, sp_total=25,
+            epic="E15",
+            stories_done=5,
+            stories_total=8,
+            sp_done=16,
+            sp_total=25,
         )
         state.completed_epics = ["E1", "E2"]
         bundle = assemble_context_bundle(profile, state, Path("/project"))
@@ -318,9 +320,7 @@ class TestAssembleContextBundle:
         assert "Relationship:" not in bundle
 
 
-def _make_always_on_node(
-    node_id: str, node_type: str, content: str
-) -> ConceptNode:
+def _make_always_on_node(node_id: str, node_type: str, content: str) -> ConceptNode:
     """Create a mock always_on node."""
     return ConceptNode(
         id=node_id,
@@ -507,12 +507,8 @@ class TestFormatGovernancePrimes:
     def test_excludes_identity_nodes(self) -> None:
         """Identity nodes (RAI-VAL-*, RAI-BND-*) are excluded from governance."""
         nodes = [
-            _make_always_on_node(
-                "RAI-VAL-1", "principle", "Honesty over agreement"
-            ),
-            _make_always_on_node(
-                "RAI-BND-1", "principle", "Stop on incoherence"
-            ),
+            _make_always_on_node("RAI-VAL-1", "principle", "Honesty over agreement"),
+            _make_always_on_node("RAI-BND-1", "principle", "Stop on incoherence"),
             _make_always_on_node(
                 "guardrail-must-code-001", "guardrail", "[MUST] Type hints"
             ),
@@ -525,9 +521,7 @@ class TestFormatGovernancePrimes:
     def test_returns_empty_string_when_no_governance(self) -> None:
         """Returns empty string when no governance nodes."""
         nodes = [
-            _make_always_on_node(
-                "RAI-VAL-1", "principle", "Honesty"
-            ),
+            _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
         ]
         result = _format_governance_primes(nodes)
         assert result == ""
@@ -551,12 +545,8 @@ class TestFormatIdentityPrimes:
     def test_formats_identity_nodes(self) -> None:
         """Identity primes include RAI-VAL-* and RAI-BND-* nodes."""
         nodes = [
-            _make_always_on_node(
-                "RAI-VAL-1", "principle", "Honesty over agreement"
-            ),
-            _make_always_on_node(
-                "RAI-BND-1", "principle", "Stop on incoherence"
-            ),
+            _make_always_on_node("RAI-VAL-1", "principle", "Honesty over agreement"),
+            _make_always_on_node("RAI-BND-1", "principle", "Stop on incoherence"),
         ]
         result = _format_identity_primes(nodes)
         assert "# Identity Primes" in result
@@ -566,12 +556,8 @@ class TestFormatIdentityPrimes:
     def test_excludes_non_identity(self) -> None:
         """Non-identity nodes are excluded."""
         nodes = [
-            _make_always_on_node(
-                "guardrail-must-code-001", "guardrail", "Type hints"
-            ),
-            _make_always_on_node(
-                "RAI-VAL-1", "principle", "Honesty"
-            ),
+            _make_always_on_node("guardrail-must-code-001", "guardrail", "Type hints"),
+            _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
         ]
         result = _format_identity_primes(nodes)
         assert "guardrail-must-code-001" not in result
@@ -580,9 +566,7 @@ class TestFormatIdentityPrimes:
     def test_returns_empty_string_when_no_identity(self) -> None:
         """Returns empty string when no identity nodes."""
         nodes = [
-            _make_always_on_node(
-                "guardrail-must-code-001", "guardrail", "Type hints"
-            ),
+            _make_always_on_node("guardrail-must-code-001", "guardrail", "Type hints"),
         ]
         result = _format_identity_primes(nodes)
         assert result == ""
@@ -646,7 +630,12 @@ class TestFormatRecentSessions:
         index_file = index_dir / "index.jsonl"
 
         sessions = [
-            {"id": f"SES-{i:03d}", "date": "2026-02-08", "type": "feature", "topic": f"Topic {i}"}
+            {
+                "id": f"SES-{i:03d}",
+                "date": "2026-02-08",
+                "type": "feature",
+                "topic": f"Topic {i}",
+            }
             for i in range(5)
         ]
         index_file.write_text("\n".join(json.dumps(s) for s in sessions))
@@ -678,7 +667,12 @@ class TestFormatRecentSessions:
         index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         index_dir.mkdir(parents=True)
         sessions = [
-            {"id": "SES-001", "date": "2026-02-08", "type": "feature", "topic": "Only session"},
+            {
+                "id": "SES-001",
+                "date": "2026-02-08",
+                "type": "feature",
+                "topic": "Only session",
+            },
         ]
         (index_dir / "index.jsonl").write_text(json.dumps(sessions[0]))
 
@@ -691,7 +685,12 @@ class TestFormatRecentSessions:
 
         index_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         index_dir.mkdir(parents=True)
-        session = {"id": "SES-001", "date": "2026-02-08", "type": "feature", "topic": "A" * 120}
+        session = {
+            "id": "SES-001",
+            "date": "2026-02-08",
+            "type": "feature",
+            "topic": "A" * 120,
+        }
         (index_dir / "index.jsonl").write_text(json.dumps(session))
 
         result = _format_recent_sessions(tmp_path, limit=3)

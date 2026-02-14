@@ -5,9 +5,6 @@ from textwrap import dedent
 
 import pytest
 
-# Resolve project root at import time (immune to chdir in other tests)
-_PROJECT_ROOT = Path(__file__).resolve().parents[3]
-
 from rai_cli.governance.models import ConceptType
 from rai_cli.governance.parsers.adr import (
     _extract_decision_summary,
@@ -16,6 +13,9 @@ from rai_cli.governance.parsers.adr import (
     extract_decision_from_file,
     extract_decisions,
 )
+
+# Resolve project root at import time (immune to chdir in other tests)
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 
 class TestParseFrontmatter:
@@ -139,7 +139,8 @@ class TestExtractDecisionFromFile:
     def test_extracts_from_valid_adr(self, tmp_path: Path) -> None:
         """Should extract decision from valid ADR file."""
         adr_file = tmp_path / "adr-001-test.md"
-        adr_file.write_text(dedent("""\
+        adr_file.write_text(
+            dedent("""\
             ---
             id: "ADR-001"
             title: "Test Decision"
@@ -157,7 +158,8 @@ class TestExtractDecisionFromFile:
 
             ## Consequences
             It will be good.
-        """))
+        """)
+        )
 
         concept = extract_decision_from_file(adr_file, tmp_path)
 
@@ -182,13 +184,15 @@ class TestExtractDecisionFromFile:
     def test_returns_none_for_missing_id(self, tmp_path: Path) -> None:
         """Should return None if frontmatter has no id."""
         adr_file = tmp_path / "adr-001-no-id.md"
-        adr_file.write_text(dedent("""\
+        adr_file.write_text(
+            dedent("""\
             ---
             title: "No ID"
             status: "Draft"
             ---
             Content
-        """))
+        """)
+        )
 
         concept = extract_decision_from_file(adr_file, tmp_path)
 
@@ -207,7 +211,8 @@ class TestExtractDecisions:
     def test_extracts_from_directory(self, tmp_path: Path) -> None:
         """Should extract all ADRs from directory."""
         # Create test ADRs
-        (tmp_path / "adr-001-first.md").write_text(dedent("""\
+        (tmp_path / "adr-001-first.md").write_text(
+            dedent("""\
             ---
             id: "ADR-001"
             title: "First"
@@ -215,8 +220,10 @@ class TestExtractDecisions:
             ---
             ## Decision
             First decision.
-        """))
-        (tmp_path / "adr-002-second.md").write_text(dedent("""\
+        """)
+        )
+        (tmp_path / "adr-002-second.md").write_text(
+            dedent("""\
             ---
             id: "ADR-002"
             title: "Second"
@@ -224,7 +231,8 @@ class TestExtractDecisions:
             ---
             ## Decision
             Second decision.
-        """))
+        """)
+        )
         # Legacy file (no frontmatter) - should be skipped
         (tmp_path / "adr-003-legacy.md").write_text("# Legacy ADR\nNo frontmatter.")
 
@@ -254,7 +262,8 @@ class TestExtractAllDecisions:
         v2_dir.mkdir()
 
         # Root ADR
-        (root_dir / "adr-019-unified.md").write_text(dedent("""\
+        (root_dir / "adr-019-unified.md").write_text(
+            dedent("""\
             ---
             id: "ADR-019"
             title: "Unified Graph"
@@ -262,10 +271,12 @@ class TestExtractAllDecisions:
             ---
             ## Decision
             Use unified graph.
-        """))
+        """)
+        )
 
         # v2 ADR
-        (v2_dir / "adr-001-sar.md").write_text(dedent("""\
+        (v2_dir / "adr-001-sar.md").write_text(
+            dedent("""\
             ---
             id: "ADR-001"
             title: "SAR Pipeline"
@@ -273,7 +284,8 @@ class TestExtractAllDecisions:
             ---
             ## Decisión
             Usar pipeline de 4 fases.
-        """))
+        """)
+        )
 
         concepts = extract_all_decisions(tmp_path)
 

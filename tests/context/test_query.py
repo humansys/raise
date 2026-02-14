@@ -193,9 +193,7 @@ class TestUnifiedQueryEngineKeywordSearch:
 
     def test_type_filter(self, engine: UnifiedQueryEngine) -> None:
         """Type filter limits results."""
-        result = engine.query(
-            UnifiedQuery(query="pattern", types=["calibration"])
-        )
+        result = engine.query(UnifiedQuery(query="pattern", types=["calibration"]))
         # Should only return calibration nodes, not pattern nodes
         for concept in result.concepts:
             assert concept.type == "calibration"
@@ -237,9 +235,7 @@ class TestUnifiedQueryEngineConceptLookup:
         )
         assert len(result.concepts) == 0
 
-    def test_lookup_with_neighbors(
-        self, sample_graph: UnifiedGraph
-    ) -> None:
+    def test_lookup_with_neighbors(self, sample_graph: UnifiedGraph) -> None:
         """Lookup with depth > 0 includes neighbors."""
         from rai_cli.context.models import ConceptEdge
 

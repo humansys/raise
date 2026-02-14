@@ -77,9 +77,7 @@ def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
         return []
 
     return [
-        node
-        for node in graph.iter_concepts()
-        if node.metadata.get("always_on") is True
+        node for node in graph.iter_concepts() if node.metadata.get("always_on") is True
     ]
 
 
@@ -216,7 +214,9 @@ def _format_progress(state: SessionState | None) -> str:
 
     p = state.progress
     pct = round(p.sp_done / p.sp_total * 100) if p.sp_total > 0 else 0
-    lines = [f"Progress: {p.epic} — {p.stories_done}/{p.stories_total} stories, {p.sp_done}/{p.sp_total} SP ({pct}%)"]
+    lines = [
+        f"Progress: {p.epic} — {p.stories_done}/{p.stories_total} stories, {p.sp_done}/{p.sp_total} SP ({pct}%)"
+    ]
 
     if state.completed_epics:
         lines.append(f"Completed: {', '.join(state.completed_epics)}")

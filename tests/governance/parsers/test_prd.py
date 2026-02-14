@@ -55,7 +55,9 @@ class TestExtractRequirements:
 
     def test_extract_from_valid_prd(self, tmp_prd_file: Path) -> None:
         """Should extract all requirements from valid PRD."""
-        requirements = extract_requirements(tmp_prd_file, tmp_prd_file.parent.parent.parent.parent)
+        requirements = extract_requirements(
+            tmp_prd_file, tmp_prd_file.parent.parent.parent.parent
+        )
 
         assert len(requirements) == 3
         assert all(r.type == ConceptType.REQUIREMENT for r in requirements)
@@ -158,7 +160,10 @@ class TestExtractRequirements:
 
         requirements = extract_requirements(prd_file)
         assert len(requirements) == 1
-        assert requirements[0].metadata["title"] == "Requirement with (parentheses) & symbols!"
+        assert (
+            requirements[0].metadata["title"]
+            == "Requirement with (parentheses) & symbols!"
+        )
 
     def test_content_truncation_by_lines(self, tmp_path: Path) -> None:
         """Should truncate content to ~20 lines."""

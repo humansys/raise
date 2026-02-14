@@ -280,12 +280,7 @@ class TestGetClaudeMemoryPath:
         result = get_claude_memory_path(project_root)
 
         expected = (
-            Path.home()
-            / ".claude"
-            / "projects"
-            / "-myproject"
-            / "memory"
-            / "MEMORY.md"
+            Path.home() / ".claude" / "projects" / "-myproject" / "memory" / "MEMORY.md"
         )
         assert result == expected
 

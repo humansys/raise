@@ -181,7 +181,6 @@ class TestDeveloperProfile:
             communication=communication,
             skills_mastered=["rai-session-start", "rai-story-plan"],
             universal_patterns=["Commit after each task"],
-
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
             projects=["/home/emilio/Code/raise-commons"],
@@ -254,9 +253,7 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Fer\nexperience_level: shu\n")
 
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
 
         assert result is not None
@@ -272,9 +269,7 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("invalid: yaml: content: [")
 
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
         assert result is None
 
@@ -287,9 +282,7 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("not_a_name: Test\n")  # Missing required 'name' field
 
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
         assert result is None
 
@@ -302,9 +295,7 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """save_developer_profile creates ~/.rai/ if it doesn't exist."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         profile = DeveloperProfile(name="Test")
         save_developer_profile(profile)
@@ -317,13 +308,9 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """save_developer_profile writes valid YAML file."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
-        profile = DeveloperProfile(
-            name="Fer", experience_level=ExperienceLevel.HA
-        )
+        profile = DeveloperProfile(name="Fer", experience_level=ExperienceLevel.HA)
         save_developer_profile(profile)
 
         profile_file = rai_home / "developer.yaml"
@@ -338,9 +325,7 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """Saved profile can be loaded back correctly."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         communication = CommunicationPreferences(
             style=CommunicationStyle.DIRECT,
@@ -353,7 +338,6 @@ class TestSaveDeveloperProfile:
             communication=communication,
             skills_mastered=["rai-session-start", "rai-story-plan"],
             universal_patterns=["Commit after each task"],
-
             first_session=date(2026, 2, 1),
             last_session=date(2026, 2, 4),
             projects=["/home/emilio/Code/raise-commons"],
@@ -381,9 +365,7 @@ class TestSaveDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Old\n")
 
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         profile = DeveloperProfile(name="New")
         save_developer_profile(profile)
@@ -444,7 +426,6 @@ class TestIncrementSession:
             skills_mastered=["skill1", "skill2"],
             universal_patterns=["pattern1"],
             first_session=date(2026, 1, 1),
-
         )
         updated = increment_session(profile, project_path="/new/project")
         assert updated.name == "Emilio"
@@ -586,9 +567,7 @@ class TestDeveloperProfileCurrentSession:
     ) -> None:
         """current_session survives save/load roundtrip."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         profile = DeveloperProfile(name="Test")
         with_session = start_session(profile, "/test/project")
@@ -666,9 +645,7 @@ class TestProfileBackwardCompat:
             "name: LegacyUser\nexperience_level: ha\n"
             "skills_mastered:\n- rai-session-start\n"
         )
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
         assert result is not None
         assert result.name == "LegacyUser"
@@ -680,9 +657,7 @@ class TestProfileBackwardCompat:
     ) -> None:
         """Profile with coaching survives save/load roundtrip."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: rai_home
-        )
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         coaching = CoachingContext(
             strengths=["architecture", "naming"],
             growth_edge="speed over process",
@@ -733,7 +708,9 @@ class TestAddCorrection:
         profile = DeveloperProfile(name="Test")
         # Fill to capacity
         for i in range(CORRECTIONS_MAX):
-            profile = add_correction(profile, f"SES-{i:03d}", f"what-{i}", f"lesson-{i}")
+            profile = add_correction(
+                profile, f"SES-{i:03d}", f"what-{i}", f"lesson-{i}"
+            )
         assert len(profile.coaching.corrections) == CORRECTIONS_MAX
         assert profile.coaching.corrections[0].session == "SES-000"
 
@@ -840,18 +817,14 @@ class TestUpdateCoaching:
     def test_updates_relationship_quality(self) -> None:
         """update_coaching updates relationship quality."""
         profile = DeveloperProfile(name="Test")
-        updated = update_coaching(
-            profile, relationship={"quality": "productive"}
-        )
+        updated = update_coaching(profile, relationship={"quality": "productive"})
         assert updated.coaching.relationship.quality == "productive"
         assert updated.coaching.relationship.trajectory == "starting"
 
     def test_updates_relationship_trajectory(self) -> None:
         """update_coaching updates relationship trajectory."""
         profile = DeveloperProfile(name="Test")
-        updated = update_coaching(
-            profile, relationship={"trajectory": "growing"}
-        )
+        updated = update_coaching(profile, relationship={"trajectory": "growing"})
         assert updated.coaching.relationship.trajectory == "growing"
         assert updated.coaching.relationship.quality == "new"
 
@@ -870,9 +843,7 @@ class TestUpdateCoaching:
         rel = RelationshipState(quality="established", trajectory="stable")
         coaching = CoachingContext(relationship=rel)
         profile = DeveloperProfile(name="Test", coaching=coaching)
-        updated = update_coaching(
-            profile, relationship={"trajectory": "growing"}
-        )
+        updated = update_coaching(profile, relationship={"trajectory": "growing"})
         assert updated.coaching.relationship.quality == "established"
         assert updated.coaching.relationship.trajectory == "growing"
 
@@ -891,7 +862,5 @@ class TestUpdateCoaching:
         """update_coaching replaces existing communication_notes."""
         coaching = CoachingContext(communication_notes=["old note"])
         profile = DeveloperProfile(name="Test", coaching=coaching)
-        updated = update_coaching(
-            profile, communication_notes=["new note"]
-        )
+        updated = update_coaching(profile, communication_notes=["new note"])
         assert updated.coaching.communication_notes == ["new note"]
