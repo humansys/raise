@@ -165,7 +165,7 @@ Sequential execution — 3M stories in 2.5 days leaves buffer before Feb 15 soft
 |-------|:----:|:------:|:------:|-------|
 | S18.1 Repo Readiness | M | ✓ Done | - | 15d4bc4 |
 | S18.2 README | M | ✓ Done | - | da9bb52 — FastAPI/Ruff pattern, 312→152 lines |
-| S18.3 Release Engineering | M | Pending | - | |
+| S18.3 Release Engineering | M | ✓ Done | ~120 min | 1.25x — T1-T6 complete, T7 partial (sync only, public deferred) |
 | S18.4 Security & Quality Spike | S | ✓ Done | - | 886bf4d — 3-layer DevSecOps toolchain |
 | S18.5 GitHub Org Setup | M | ✓ Done | 38 min | 1.58x velocity — repo, team, sync script |
 
