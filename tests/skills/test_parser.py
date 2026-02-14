@@ -125,7 +125,8 @@ class TestParseSkill:
     def test_parse_minimal_skill(self, tmp_path: Path) -> None:
         """Parse a minimal valid skill file."""
         skill_file = tmp_path / "SKILL.md"
-        skill_file.write_text(dedent("""\
+        skill_file.write_text(
+            dedent("""\
             ---
             name: test-skill
             description: A minimal test skill
@@ -135,7 +136,8 @@ class TestParseSkill:
             ## Purpose
 
             This is a test.
-        """))
+        """)
+        )
 
         skill = parse_skill(skill_file)
         assert skill.name == "test-skill"
@@ -146,7 +148,8 @@ class TestParseSkill:
     def test_parse_full_skill(self, tmp_path: Path) -> None:
         """Parse a complete skill with all fields."""
         skill_file = tmp_path / "SKILL.md"
-        skill_file.write_text(dedent("""\
+        skill_file.write_text(
+            dedent("""\
             ---
             name: rai-session-start
             description: >
@@ -172,7 +175,8 @@ class TestParseSkill:
             ## Purpose
 
             Load context and propose work.
-        """))
+        """)
+        )
 
         skill = parse_skill(skill_file)
         assert skill.name == "rai-session-start"
@@ -192,13 +196,15 @@ class TestParseSkill:
     def test_parse_skill_with_path_string(self, tmp_path: Path) -> None:
         """Parse skill from string path."""
         skill_file = tmp_path / "SKILL.md"
-        skill_file.write_text(dedent("""\
+        skill_file.write_text(
+            dedent("""\
             ---
             name: test-skill
             description: Test
             ---
             # Body
-        """))
+        """)
+        )
 
         skill = parse_skill(str(skill_file))
         assert skill.name == "test-skill"

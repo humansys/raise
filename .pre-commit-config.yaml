@@ -1,0 +1,56 @@
+# Pre-commit hooks for raise-commons
+# Install: pre-commit install && pre-commit install --hook-type pre-push
+# Run all: pre-commit run --all-files
+# Target: pre-commit <4s, pre-push <15s
+#
+# Scope: src/ and tests/ only — internal dirs (archive/, work/, dev/, .raise/)
+# are excluded because they aren't shipped in the public repo.
+
+exclude: '^(archive/|work/|dev/|\.raise/|blog/|docs/|governance/|\.claude/|scripts/|framework/)'
+
+repos:
+  # Housekeeping hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
+  # Ruff — lint + format
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.14
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  # Secret detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+
+  # Security audit
+  - repo: https://github.com/PyCQA/bandit
+    rev: '1.8.3'
+    hooks:
+      - id: bandit
+        args: ['-c', 'pyproject.toml', '--severity-level', 'medium', '--confidence-level', 'high']
+        additional_dependencies: ['bandit[toml]']
+
+  # Type checking (pre-push only — too slow for pre-commit)
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: uv run pyright
+        language: system
+        types: [python]
+        stages: [pre-push]
+        pass_filenames: false

@@ -156,7 +156,10 @@ class TestArchitecturalContext:
             id="mod-test", type="module", content="Test", created="2026-02-08"
         )
         domain = ConceptNode(
-            id="bc-test", type="bounded_context", content="Test BC", created="2026-02-08"
+            id="bc-test",
+            type="bounded_context",
+            content="Test BC",
+            created="2026-02-08",
         )
         ctx = ArchitecturalContext(module=module, domain=domain)
         assert ctx.domain is not None
@@ -229,17 +232,13 @@ class TestFindConstraintsFor:
         assert "guardrail-must-code-001" in constraint_ids
         assert "guardrail-must-test-001" in constraint_ids
 
-    def test_all_constraints_are_guardrails(
-        self, engine: UnifiedQueryEngine
-    ) -> None:
+    def test_all_constraints_are_guardrails(self, engine: UnifiedQueryEngine) -> None:
         """All returned constraints have guardrail type."""
         constraints = engine.find_constraints_for("mod-memory")
         for c in constraints:
             assert c.type == "guardrail"
 
-    def test_returns_empty_for_orphan_module(
-        self, engine: UnifiedQueryEngine
-    ) -> None:
+    def test_returns_empty_for_orphan_module(self, engine: UnifiedQueryEngine) -> None:
         """Returns empty list when module has no domain (no two-hop path)."""
         constraints = engine.find_constraints_for("mod-orphan")
         assert constraints == []

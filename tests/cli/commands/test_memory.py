@@ -141,9 +141,7 @@ class TestMemoryQueryCommand:
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(
-                app, ["memory", "query", "python", "--limit", "1"]
-            )
+            result = runner.invoke(app, ["memory", "query", "python", "--limit", "1"])
 
             assert result.exit_code == 0
         finally:
@@ -203,9 +201,7 @@ class TestMemoryListCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_list_json_format(
-        self, sample_unified_graph: Path, tmp_path: Path
-    ) -> None:
+    def test_list_json_format(self, sample_unified_graph: Path, tmp_path: Path) -> None:
         """Test list with JSON format."""
         original_cwd = os.getcwd()
         try:
@@ -358,9 +354,7 @@ class TestMemoryValidateCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_validate_basic(
-        self, sample_unified_graph: Path, tmp_path: Path
-    ) -> None:
+    def test_validate_basic(self, sample_unified_graph: Path, tmp_path: Path) -> None:
         """Test basic validate command."""
         original_cwd = os.getcwd()
         try:
@@ -371,7 +365,6 @@ class TestMemoryValidateCommand:
             assert "Memory index is valid" in result.stdout
         finally:
             os.chdir(original_cwd)
-
 
     def test_validate_completeness_warns_missing_architecture(
         self, tmp_path: Path
@@ -467,7 +460,13 @@ class TestMemoryAddPatternCommand:
 
             result = runner.invoke(
                 app,
-                ["memory", "add-pattern", "Test pattern content", "-c", "testing,python"],
+                [
+                    "memory",
+                    "add-pattern",
+                    "Test pattern content",
+                    "-c",
+                    "testing,python",
+                ],
             )
 
             assert result.exit_code == 0
@@ -620,10 +619,15 @@ class TestMemoryAddCalibrationCommand:
             result = runner.invoke(
                 app,
                 [
-                    "memory", "add-calibration", "F1.1",
-                    "--name", "Test Feature",
-                    "--size", "S",
-                    "--actual", "30",
+                    "memory",
+                    "add-calibration",
+                    "F1.1",
+                    "--name",
+                    "Test Feature",
+                    "--size",
+                    "S",
+                    "--actual",
+                    "30",
                 ],
             )
 
@@ -645,11 +649,17 @@ class TestMemoryAddCalibrationCommand:
             result = runner.invoke(
                 app,
                 [
-                    "memory", "add-calibration", "F1.2",
-                    "--name", "Feature with estimate",
-                    "--size", "M",
-                    "--actual", "45",
-                    "--estimated", "60",
+                    "memory",
+                    "add-calibration",
+                    "F1.2",
+                    "--name",
+                    "Feature with estimate",
+                    "--size",
+                    "M",
+                    "--actual",
+                    "45",
+                    "--estimated",
+                    "60",
                 ],
             )
 
@@ -670,10 +680,15 @@ class TestMemoryAddCalibrationCommand:
             result = runner.invoke(
                 app,
                 [
-                    "memory", "add-calibration", "F1.1",
-                    "--name", "Test",
-                    "--size", "HUGE",
-                    "--actual", "30",
+                    "memory",
+                    "add-calibration",
+                    "F1.1",
+                    "--name",
+                    "Test",
+                    "--size",
+                    "HUGE",
+                    "--actual",
+                    "30",
                 ],
             )
 
@@ -718,9 +733,13 @@ class TestMemoryAddSessionCommand:
             result = runner.invoke(
                 app,
                 [
-                    "memory", "add-session", "Feature work",
-                    "-o", "Task 1 done,Task 2 done,Task 3 done",
-                    "-t", "story",
+                    "memory",
+                    "add-session",
+                    "Feature work",
+                    "-o",
+                    "Task 1 done,Task 2 done,Task 3 done",
+                    "-t",
+                    "story",
                 ],
             )
 
@@ -763,7 +782,16 @@ class TestMemoryEmitWorkCommand:
 
             result = runner.invoke(
                 app,
-                ["memory", "emit-work", "epic", "E1", "-e", "complete", "-p", "implement"],
+                [
+                    "memory",
+                    "emit-work",
+                    "epic",
+                    "E1",
+                    "-e",
+                    "complete",
+                    "-p",
+                    "implement",
+                ],
             )
 
             assert result.exit_code == 0
@@ -783,8 +811,16 @@ class TestMemoryEmitWorkCommand:
             result = runner.invoke(
                 app,
                 [
-                    "memory", "emit-work", "story", "F1.2",
-                    "-e", "blocked", "-p", "plan", "-b", "waiting for API"
+                    "memory",
+                    "emit-work",
+                    "story",
+                    "F1.2",
+                    "-e",
+                    "blocked",
+                    "-p",
+                    "plan",
+                    "-b",
+                    "waiting for API",
                 ],
             )
 
@@ -831,7 +867,16 @@ class TestMemoryEmitWorkCommand:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "emit-work", "story", "F1.1", "-e", "start", "-p", "invalid"],
+                [
+                    "memory",
+                    "emit-work",
+                    "story",
+                    "F1.1",
+                    "-e",
+                    "start",
+                    "-p",
+                    "invalid",
+                ],
             )
 
             assert result.exit_code == 7
@@ -872,11 +917,16 @@ class TestMemoryEmitSessionCommand:
             result = runner.invoke(
                 app,
                 [
-                    "memory", "emit-session",
-                    "-t", "research",
-                    "-o", "partial",
-                    "-d", "90",
-                    "-f", "F1.1,F1.2",
+                    "memory",
+                    "emit-session",
+                    "-t",
+                    "research",
+                    "-o",
+                    "partial",
+                    "-d",
+                    "90",
+                    "-f",
+                    "F1.1,F1.2",
                 ],
             )
 
@@ -915,7 +965,17 @@ class TestMemoryEmitCalibrationCommand:
 
             result = runner.invoke(
                 app,
-                ["memory", "emit-calibration", "F1.1", "-s", "S", "-e", "60", "-a", "30"],
+                [
+                    "memory",
+                    "emit-calibration",
+                    "F1.1",
+                    "-s",
+                    "S",
+                    "-e",
+                    "60",
+                    "-a",
+                    "30",
+                ],
             )
 
             assert result.exit_code == 0
@@ -935,7 +995,17 @@ class TestMemoryEmitCalibrationCommand:
 
             result = runner.invoke(
                 app,
-                ["memory", "emit-calibration", "F1.2", "-s", "M", "-e", "30", "-a", "60"],
+                [
+                    "memory",
+                    "emit-calibration",
+                    "F1.2",
+                    "-s",
+                    "M",
+                    "-e",
+                    "30",
+                    "-a",
+                    "60",
+                ],
             )
 
             assert result.exit_code == 0
@@ -954,7 +1024,17 @@ class TestMemoryEmitCalibrationCommand:
 
             result = runner.invoke(
                 app,
-                ["memory", "emit-calibration", "F1.3", "-s", "S", "-e", "30", "-a", "30"],
+                [
+                    "memory",
+                    "emit-calibration",
+                    "F1.3",
+                    "-s",
+                    "S",
+                    "-e",
+                    "30",
+                    "-a",
+                    "30",
+                ],
             )
 
             assert result.exit_code == 0
@@ -970,7 +1050,17 @@ class TestMemoryEmitCalibrationCommand:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "emit-calibration", "F1.1", "-s", "XXL", "-e", "30", "-a", "30"],
+                [
+                    "memory",
+                    "emit-calibration",
+                    "F1.1",
+                    "-s",
+                    "XXL",
+                    "-e",
+                    "30",
+                    "-a",
+                    "30",
+                ],
             )
 
             assert result.exit_code == 7
@@ -985,7 +1075,17 @@ class TestMemoryEmitCalibrationCommand:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "emit-calibration", "F1.1", "-s", "S", "-e", "0", "-a", "30"],
+                [
+                    "memory",
+                    "emit-calibration",
+                    "F1.1",
+                    "-s",
+                    "S",
+                    "-e",
+                    "0",
+                    "-a",
+                    "30",
+                ],
             )
 
             assert result.exit_code == 7
@@ -1000,7 +1100,17 @@ class TestMemoryEmitCalibrationCommand:
             os.chdir(tmp_path)
             result = runner.invoke(
                 app,
-                ["memory", "emit-calibration", "F1.1", "-s", "S", "-e", "30", "-a", "0"],
+                [
+                    "memory",
+                    "emit-calibration",
+                    "F1.1",
+                    "-s",
+                    "S",
+                    "-e",
+                    "30",
+                    "-a",
+                    "0",
+                ],
             )
 
             assert result.exit_code == 7
@@ -1033,9 +1143,7 @@ class TestMemoryQueryEdgeCases:
 class TestMemoryListEdgeCases:
     """Tests for edge cases in memory list command."""
 
-    def test_list_memory_only(
-        self, sample_unified_graph: Path, tmp_path: Path
-    ) -> None:
+    def test_list_memory_only(self, sample_unified_graph: Path, tmp_path: Path) -> None:
         """Test list with --memory-only flag."""
         original_cwd = os.getcwd()
         try:
@@ -1064,7 +1172,10 @@ class TestMemoryGenerateCommand:
             result = runner.invoke(app, ["memory", "generate"])
 
             assert result.exit_code == 0
-            assert "deprecated" in result.output.lower() or "skipped" in result.output.lower()
+            assert (
+                "deprecated" in result.output.lower()
+                or "skipped" in result.output.lower()
+            )
         finally:
             os.chdir(original_cwd)
 

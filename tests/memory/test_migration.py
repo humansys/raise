@@ -109,7 +109,9 @@ class TestMigrateToPersonal:
         assert result.success is True
         assert result.sessions_migrated == 2
         assert (personal_dir / "sessions" / "index.jsonl").exists()
-        assert (personal_dir / "sessions" / "index.jsonl").read_text() == session_content
+        assert (
+            personal_dir / "sessions" / "index.jsonl"
+        ).read_text() == session_content
 
     def test_migrate_creates_backup(self, tmp_path: Path) -> None:
         """Creates backup of original files before migration."""
@@ -147,7 +149,9 @@ class TestMigrateToPersonal:
         assert result.success is True
         assert result.telemetry_migrated == 1
         assert (personal_dir / "telemetry" / "signals.jsonl").exists()
-        assert (personal_dir / "telemetry" / "signals.jsonl").read_text() == telemetry_content
+        assert (
+            personal_dir / "telemetry" / "signals.jsonl"
+        ).read_text() == telemetry_content
 
     def test_migrate_calibration(self, tmp_path: Path) -> None:
         """Migrates calibration from project memory to personal directory."""

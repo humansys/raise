@@ -33,6 +33,7 @@ NodeType = Literal[
     "architecture",  # arch-* — architecture docs: context, design, domain model (E15)
     "bounded_context",  # bc-* — DDD bounded context or structural grouping (E15)
     "layer",  # lyr-* — architectural layer (E15)
+    "release",  # rel-* — release milestones from roadmap
 ]
 
 # Edge types for relationships between concepts

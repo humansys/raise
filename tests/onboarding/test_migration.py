@@ -54,8 +54,7 @@ class TestExtractSessionsData:
         """Handles sessions without date field."""
         sessions_path = tmp_path / "index.jsonl"
         sessions_path.write_text(
-            '{"id": "SES-001"}\n'
-            '{"id": "SES-002", "date": "2026-02-02"}\n'
+            '{"id": "SES-001"}\n{"id": "SES-002", "date": "2026-02-02"}\n'
         )
         total, first, last = _extract_sessions_data(sessions_path)
         assert total == 2

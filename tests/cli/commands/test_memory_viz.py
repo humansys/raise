@@ -108,7 +108,15 @@ class TestMemoryVizCommand:
             output = graph_project / "out.html"
             result = runner.invoke(
                 app,
-                ["memory", "viz", "--no-open", "--index", str(index), "--output", str(output)],
+                [
+                    "memory",
+                    "viz",
+                    "--no-open",
+                    "--index",
+                    str(index),
+                    "--output",
+                    str(output),
+                ],
             )
 
             assert result.exit_code == 0

@@ -385,11 +385,13 @@ def generate_viz_html(
     links = graph_data.get("links", graph_data.get("edges", []))
     slim_links = []
     for link in links:
-        slim_links.append({
-            "source": link.get("source", ""),
-            "target": link.get("target", ""),
-            "type": link.get("type", link.get("relation", "related_to")),
-        })
+        slim_links.append(
+            {
+                "source": link.get("source", ""),
+                "target": link.get("target", ""),
+                "type": link.get("type", link.get("relation", "related_to")),
+            }
+        )
 
     slim_graph: dict[str, list[dict[str, str]]] = {
         "nodes": slim_nodes,

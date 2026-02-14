@@ -266,7 +266,10 @@ class TestSaveSessionState:
         assert loaded.last_session.date == original.last_session.date
         assert loaded.last_session.developer == original.last_session.developer
         assert loaded.last_session.summary == original.last_session.summary
-        assert loaded.last_session.patterns_captured == original.last_session.patterns_captured
+        assert (
+            loaded.last_session.patterns_captured
+            == original.last_session.patterns_captured
+        )
         assert loaded.pending.decisions == original.pending.decisions
         assert loaded.pending.next_actions == original.pending.next_actions
         assert loaded.notes == original.notes

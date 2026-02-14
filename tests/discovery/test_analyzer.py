@@ -548,19 +548,38 @@ class TestBuildHierarchy:
     def test_class_with_methods_folds_to_one_unit(self) -> None:
         """A class + 5 methods → 1 unit with methods list."""
         symbols = [
-            _symbol(name="MyClass", kind="class", file="src/svc.py", signature="class MyClass"),
-            _symbol(name="method_a", kind="method", file="src/svc.py", parent="MyClass"),
-            _symbol(name="method_b", kind="method", file="src/svc.py", parent="MyClass"),
-            _symbol(name="method_c", kind="method", file="src/svc.py", parent="MyClass"),
-            _symbol(name="method_d", kind="method", file="src/svc.py", parent="MyClass"),
-            _symbol(name="method_e", kind="method", file="src/svc.py", parent="MyClass"),
+            _symbol(
+                name="MyClass",
+                kind="class",
+                file="src/svc.py",
+                signature="class MyClass",
+            ),
+            _symbol(
+                name="method_a", kind="method", file="src/svc.py", parent="MyClass"
+            ),
+            _symbol(
+                name="method_b", kind="method", file="src/svc.py", parent="MyClass"
+            ),
+            _symbol(
+                name="method_c", kind="method", file="src/svc.py", parent="MyClass"
+            ),
+            _symbol(
+                name="method_d", kind="method", file="src/svc.py", parent="MyClass"
+            ),
+            _symbol(
+                name="method_e", kind="method", file="src/svc.py", parent="MyClass"
+            ),
         ]
         units = build_hierarchy(symbols)
         assert len(units) == 1
         assert units[0].name == "MyClass"
         assert units[0].kind == "class"
         assert sorted(units[0].methods) == [
-            "method_a", "method_b", "method_c", "method_d", "method_e",
+            "method_a",
+            "method_b",
+            "method_c",
+            "method_d",
+            "method_e",
         ]
 
     def test_standalone_function_stays_individual(self) -> None:
@@ -577,7 +596,12 @@ class TestBuildHierarchy:
     def test_module_stays_individual(self) -> None:
         """Module symbols are individual units."""
         symbols = [
-            _symbol(name="utils", kind="module", file="src/utils.py", signature="module utils"),
+            _symbol(
+                name="utils",
+                kind="module",
+                file="src/utils.py",
+                signature="module utils",
+            ),
         ]
         units = build_hierarchy(symbols)
         assert len(units) == 1
@@ -586,7 +610,12 @@ class TestBuildHierarchy:
     def test_orphan_method_without_parent_class(self) -> None:
         """Method whose parent class is not in symbols gets dropped."""
         symbols = [
-            _symbol(name="orphan_method", kind="method", file="src/svc.py", parent="MissingClass"),
+            _symbol(
+                name="orphan_method",
+                kind="method",
+                file="src/svc.py",
+                parent="MissingClass",
+            ),
         ]
         units = build_hierarchy(symbols)
         # Orphan methods are not included as standalone units
@@ -595,10 +624,27 @@ class TestBuildHierarchy:
     def test_mixed_scenario(self) -> None:
         """Class with methods + standalone function + module."""
         symbols = [
-            _symbol(name="Config", kind="class", file="src/config.py", signature="class Config(BaseModel)"),
-            _symbol(name="validate", kind="method", file="src/config.py", parent="Config"),
-            _symbol(name="load_config", kind="function", file="src/config.py", signature="def load_config() -> Config"),
-            _symbol(name="config", kind="module", file="src/config.py", signature="module config"),
+            _symbol(
+                name="Config",
+                kind="class",
+                file="src/config.py",
+                signature="class Config(BaseModel)",
+            ),
+            _symbol(
+                name="validate", kind="method", file="src/config.py", parent="Config"
+            ),
+            _symbol(
+                name="load_config",
+                kind="function",
+                file="src/config.py",
+                signature="def load_config() -> Config",
+            ),
+            _symbol(
+                name="config",
+                kind="module",
+                file="src/config.py",
+                signature="module config",
+            ),
         ]
         units = build_hierarchy(symbols)
         assert len(units) == 3  # class, function, module
@@ -628,8 +674,18 @@ class TestBuildHierarchy:
     def test_component_id_uniqueness_across_modules(self) -> None:
         """Same-named files in different modules produce unique IDs."""
         symbols = [
-            _symbol(name="models", kind="module", file="src/rai_cli/memory/models.py", signature="module models"),
-            _symbol(name="models", kind="module", file="src/rai_cli/governance/models.py", signature="module models"),
+            _symbol(
+                name="models",
+                kind="module",
+                file="src/rai_cli/memory/models.py",
+                signature="module models",
+            ),
+            _symbol(
+                name="models",
+                kind="module",
+                file="src/rai_cli/governance/models.py",
+                signature="module models",
+            ),
         ]
         units = build_hierarchy(symbols)
         ids = [u.id for u in units]
@@ -641,8 +697,18 @@ class TestBuildHierarchy:
     def test_module_and_function_same_name_unique_ids(self) -> None:
         """Module and function with same name in same file produce unique IDs."""
         symbols = [
-            _symbol(name="test_version", kind="module", file="tests/test_version.py", signature="module test_version"),
-            _symbol(name="test_version", kind="function", file="tests/test_version.py", signature="def test_version()"),
+            _symbol(
+                name="test_version",
+                kind="module",
+                file="tests/test_version.py",
+                signature="module test_version",
+            ),
+            _symbol(
+                name="test_version",
+                kind="function",
+                file="tests/test_version.py",
+                signature="def test_version()",
+            ),
         ]
         units = build_hierarchy(symbols)
         ids = [u.id for u in units]
@@ -653,7 +719,12 @@ class TestBuildHierarchy:
     def test_enum_as_standalone_unit(self) -> None:
         """Enum symbols become standalone units (not dropped)."""
         symbols = [
-            _symbol(name="UserRole", kind="enum", file="src/roles.ts", signature="enum UserRole"),
+            _symbol(
+                name="UserRole",
+                kind="enum",
+                file="src/roles.ts",
+                signature="enum UserRole",
+            ),
         ]
         units = build_hierarchy(symbols)
         assert len(units) == 1
@@ -663,7 +734,12 @@ class TestBuildHierarchy:
     def test_type_alias_as_standalone_unit(self) -> None:
         """Type alias symbols become standalone units (not dropped)."""
         symbols = [
-            _symbol(name="Config", kind="type_alias", file="src/types.ts", signature="type Config"),
+            _symbol(
+                name="Config",
+                kind="type_alias",
+                file="src/types.ts",
+                signature="type Config",
+            ),
         ]
         units = build_hierarchy(symbols)
         assert len(units) == 1
@@ -673,7 +749,12 @@ class TestBuildHierarchy:
     def test_constant_as_standalone_unit(self) -> None:
         """Constant symbols become standalone units (not dropped)."""
         symbols = [
-            _symbol(name="MAX_RETRIES", kind="constant", file="src/config.ts", signature="const MAX_RETRIES"),
+            _symbol(
+                name="MAX_RETRIES",
+                kind="constant",
+                file="src/config.ts",
+                signature="const MAX_RETRIES",
+            ),
         ]
         units = build_hierarchy(symbols)
         assert len(units) == 1
@@ -683,7 +764,12 @@ class TestBuildHierarchy:
     def test_interface_as_standalone_unit(self) -> None:
         """Interface symbols become standalone units (not dropped)."""
         symbols = [
-            _symbol(name="UserProps", kind="interface", file="src/types.ts", signature="interface UserProps"),
+            _symbol(
+                name="UserProps",
+                kind="interface",
+                file="src/types.ts",
+                signature="interface UserProps",
+            ),
         ]
         units = build_hierarchy(symbols)
         assert len(units) == 1
@@ -693,11 +779,28 @@ class TestBuildHierarchy:
     def test_mixed_new_kinds(self) -> None:
         """Mix of class, enum, type_alias, constant all appear in hierarchy."""
         symbols = [
-            _symbol(name="Service", kind="class", file="src/svc.ts", signature="class Service"),
+            _symbol(
+                name="Service",
+                kind="class",
+                file="src/svc.ts",
+                signature="class Service",
+            ),
             _symbol(name="process", kind="method", file="src/svc.ts", parent="Service"),
-            _symbol(name="Status", kind="enum", file="src/svc.ts", signature="enum Status"),
-            _symbol(name="Config", kind="type_alias", file="src/svc.ts", signature="type Config"),
-            _symbol(name="DEFAULT", kind="constant", file="src/svc.ts", signature="const DEFAULT"),
+            _symbol(
+                name="Status", kind="enum", file="src/svc.ts", signature="enum Status"
+            ),
+            _symbol(
+                name="Config",
+                kind="type_alias",
+                file="src/svc.ts",
+                signature="type Config",
+            ),
+            _symbol(
+                name="DEFAULT",
+                kind="constant",
+                file="src/svc.ts",
+                signature="const DEFAULT",
+            ),
             _symbol(name="helper", kind="function", file="src/svc.ts"),
         ]
         units = build_hierarchy(symbols)
@@ -709,7 +812,9 @@ class TestBuildHierarchy:
     def test_module_path_computed(self) -> None:
         """Module path is derived from file path."""
         symbols = [
-            _symbol(name="Scanner", kind="class", file="src/rai_cli/discovery/scanner.py"),
+            _symbol(
+                name="Scanner", kind="class", file="src/rai_cli/discovery/scanner.py"
+            ),
         ]
         units = build_hierarchy(symbols)
         assert units[0].module == "rai_cli.discovery.scanner"
@@ -743,7 +848,9 @@ class TestDetermineCategory:
         assert determine_category("MyError", "class", "service") == "exception"
 
     def test_name_override_warning(self) -> None:
-        assert determine_category("DeprecationWarning", "class", "service") == "exception"
+        assert (
+            determine_category("DeprecationWarning", "class", "service") == "exception"
+        )
 
     def test_name_override_settings(self) -> None:
         assert determine_category("AppSettings", "class", "model") == "config"
@@ -755,7 +862,9 @@ class TestDetermineCategory:
         assert determine_category("TestScanner", "class", "service") == "test"
 
     def test_name_override_test_function(self) -> None:
-        assert determine_category("test_scan_directory", "function", "service") == "test"
+        assert (
+            determine_category("test_scan_directory", "function", "service") == "test"
+        )
 
     def test_base_class_override(self) -> None:
         """Base class category wins over path when no name override."""
@@ -772,7 +881,10 @@ class TestDetermineCategory:
     def test_name_override_has_highest_priority(self) -> None:
         """Name override > base class > path."""
         # "Error" name override should win even with BaseModel base class
-        assert determine_category("ValidationError", "class", "model", "Exception") == "exception"
+        assert (
+            determine_category("ValidationError", "class", "model", "Exception")
+            == "exception"
+        )
 
 
 # ── extract_first_sentence Tests ─────────────────────────────────────────
@@ -791,7 +903,10 @@ class TestExtractFirstSentence:
         assert extract_first_sentence("A simple docstring.") == "A simple docstring."
 
     def test_multi_sentence(self) -> None:
-        assert extract_first_sentence("First sentence. Second sentence.") == "First sentence."
+        assert (
+            extract_first_sentence("First sentence. Second sentence.")
+            == "First sentence."
+        )
 
     def test_multiline(self) -> None:
         doc = "First line.\n\nSecond paragraph with details."
@@ -942,7 +1057,9 @@ class TestAnalyze:
         # Internal symbols filtered out
         assert all(not c.internal for c in result.components)
         # Method folded into class
-        assert len(result.components) == 2  # Scanner (with scan folded), detect_language
+        assert (
+            len(result.components) == 2
+        )  # Scanner (with scan folded), detect_language
         scanner = next(c for c in result.components if c.name == "Scanner")
         assert scanner.methods == ["scan"]
         # Confidence tiers populated
@@ -983,8 +1100,15 @@ class TestAnalyze:
         """Same scan input → same analysis output."""
         scan = ScanResult(
             symbols=[
-                _symbol(name="Foo", kind="class", file="src/foo.py", docstring="Foo class."),
-                _symbol(name="bar", kind="function", file="src/foo.py", docstring="Bar func."),
+                _symbol(
+                    name="Foo", kind="class", file="src/foo.py", docstring="Foo class."
+                ),
+                _symbol(
+                    name="bar",
+                    kind="function",
+                    file="src/foo.py",
+                    docstring="Bar func.",
+                ),
             ],
             files_scanned=1,
             errors=[],
@@ -1004,8 +1128,18 @@ class TestAnalyze:
         # name+file produce duplicate IDs.
         scan = ScanResult(
             symbols=[
-                _symbol(name="helper", kind="function", file="src/utils.py", signature="def helper()"),
-                _symbol(name="helper", kind="function", file="src/utils.py", signature="def helper(x: int)"),
+                _symbol(
+                    name="helper",
+                    kind="function",
+                    file="src/utils.py",
+                    signature="def helper()",
+                ),
+                _symbol(
+                    name="helper",
+                    kind="function",
+                    file="src/utils.py",
+                    signature="def helper(x: int)",
+                ),
             ],
             files_scanned=1,
             errors=[],
@@ -1017,10 +1151,20 @@ class TestAnalyze:
         """Same-named symbols in different modules produce unique IDs."""
         scan = ScanResult(
             symbols=[
-                _symbol(name="Writer", kind="class", file="src/rai_cli/memory/writer.py",
-                        signature="class Writer", docstring="Memory writer."),
-                _symbol(name="Writer", kind="class", file="src/rai_cli/telemetry/writer.py",
-                        signature="class Writer", docstring="Telemetry writer."),
+                _symbol(
+                    name="Writer",
+                    kind="class",
+                    file="src/rai_cli/memory/writer.py",
+                    signature="class Writer",
+                    docstring="Memory writer.",
+                ),
+                _symbol(
+                    name="Writer",
+                    kind="class",
+                    file="src/rai_cli/telemetry/writer.py",
+                    signature="class Writer",
+                    docstring="Telemetry writer.",
+                ),
             ],
             files_scanned=2,
             errors=[],
@@ -1046,7 +1190,9 @@ def _analyzed_component(
         line=1,
         signature="class test",
         module="test",
-        confidence=ConfidenceResult(score=50, tier="medium", signals=ConfidenceSignals()),
+        confidence=ConfidenceResult(
+            score=50, tier="medium", signals=ConfidenceSignals()
+        ),
         auto_category="service",
         auto_purpose="Test.",
     )

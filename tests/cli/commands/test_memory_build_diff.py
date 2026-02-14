@@ -149,9 +149,7 @@ class TestBuildWithDiff:
         assert not diff_path.exists()
 
     @patch("rai_cli.cli.commands.memory.UnifiedGraphBuilder")
-    def test_no_changes_diff(
-        self, mock_builder_cls: MagicMock, tmp_path: Path
-    ) -> None:
+    def test_no_changes_diff(self, mock_builder_cls: MagicMock, tmp_path: Path) -> None:
         """Identical graphs produce 'no changes' diff."""
         graph = _make_graph(("PAT-001", "pattern", "same"))
 

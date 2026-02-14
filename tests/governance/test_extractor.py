@@ -77,7 +77,9 @@ class TestGovernanceExtractor:
         extractor = GovernanceExtractor(tmp_path)
         assert extractor.project_root == tmp_path
 
-    def test_extract_from_file_with_explicit_type(self, tmp_governance_structure: Path) -> None:
+    def test_extract_from_file_with_explicit_type(
+        self, tmp_governance_structure: Path
+    ) -> None:
         """Should extract from file with explicitly provided concept type."""
         extractor = GovernanceExtractor(tmp_governance_structure)
         prd_file = tmp_governance_structure / "governance" / "prd.md"
@@ -87,7 +89,9 @@ class TestGovernanceExtractor:
         assert len(concepts) == 2
         assert all(c.type == ConceptType.REQUIREMENT for c in concepts)
 
-    def test_extract_from_file_with_inferred_type(self, tmp_governance_structure: Path) -> None:
+    def test_extract_from_file_with_inferred_type(
+        self, tmp_governance_structure: Path
+    ) -> None:
         """Should infer concept type from file path."""
         extractor = GovernanceExtractor(tmp_governance_structure)
         prd_file = tmp_governance_structure / "governance" / "prd.md"
@@ -106,7 +110,9 @@ class TestGovernanceExtractor:
 
         assert concepts == []
 
-    def test_extract_unsupported_concept_type(self, tmp_governance_structure: Path) -> None:
+    def test_extract_unsupported_concept_type(
+        self, tmp_governance_structure: Path
+    ) -> None:
         """Should return empty list for unsupported concept type."""
         extractor = GovernanceExtractor(tmp_governance_structure)
         prd_file = tmp_governance_structure / "governance" / "prd.md"
@@ -132,14 +138,18 @@ class TestGovernanceExtractor:
         concept_type = extractor._infer_concept_type(Path("vision.md"))
         assert concept_type == ConceptType.OUTCOME
 
-    def test_infer_type_from_constitution_file(self, tmp_governance_structure: Path) -> None:
+    def test_infer_type_from_constitution_file(
+        self, tmp_governance_structure: Path
+    ) -> None:
         """Should infer PRINCIPLE type from Constitution file."""
         extractor = GovernanceExtractor(tmp_governance_structure)
 
         concept_type = extractor._infer_concept_type(Path("constitution.md"))
         assert concept_type == ConceptType.PRINCIPLE
 
-    def test_infer_type_fails_for_unknown_file(self, tmp_governance_structure: Path) -> None:
+    def test_infer_type_fails_for_unknown_file(
+        self, tmp_governance_structure: Path
+    ) -> None:
         """Should raise ValueError for unknown file type."""
         extractor = GovernanceExtractor(tmp_governance_structure)
 

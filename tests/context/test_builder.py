@@ -1205,7 +1205,11 @@ class TestLoadArchitectureDocTypes:
         assert "ontology" in node.content
         assert node.metadata["arch_type"] == "architecture_domain_model"
         assert len(node.metadata["bounded_contexts"]) == 3
-        assert node.metadata["shared_kernel"]["modules"] == ["config", "core", "schemas"]
+        assert node.metadata["shared_kernel"]["modules"] == [
+            "config",
+            "core",
+            "schemas",
+        ]
 
     def test_skips_architecture_index_doc(self, tmp_path: Path) -> None:
         """Should skip architecture_index docs (generated summary)."""
@@ -1368,12 +1372,14 @@ class TestBuild:
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
-        with patch.object(builder, "load_governance", return_value=[]):
-            with patch.object(builder, "load_memory", return_value=[]):
-                with patch.object(builder, "load_work", return_value=[]):
-                    with patch.object(builder, "load_skills", return_value=[]):
-                        with patch.object(builder, "load_components", return_value=[]):
-                            graph = builder.build()
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
 
         assert isinstance(graph, UnifiedGraph)
 
@@ -1404,11 +1410,13 @@ class TestBuild:
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
-        with patch.object(builder, "load_governance", return_value=[]):
-            with patch.object(builder, "load_memory", return_value=[]):
-                with patch.object(builder, "load_work", return_value=[]):
-                    with patch.object(builder, "load_skills", return_value=[]):
-                        graph = builder.build()
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_memory", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+        ):
+            graph = builder.build()
 
         assert graph.node_count == 1
         node = graph.get_concept("comp-test")
@@ -1649,11 +1657,13 @@ class TestInferRelationships:
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
-        with patch.object(builder, "load_governance", return_value=[]):
-            with patch.object(builder, "load_work", return_value=[]):
-                with patch.object(builder, "load_skills", return_value=[]):
-                    with patch.object(builder, "load_components", return_value=[]):
-                        graph = builder.build()
+        with (
+            patch.object(builder, "load_governance", return_value=[]),
+            patch.object(builder, "load_work", return_value=[]),
+            patch.object(builder, "load_skills", return_value=[]),
+            patch.object(builder, "load_components", return_value=[]),
+        ):
+            graph = builder.build()
 
         # Should have edges
         assert graph.edge_count >= 1
@@ -1770,7 +1780,8 @@ class TestLoadIdentity:
 
         # Should have value + boundary nodes
         identity_nodes = [
-            n for n in graph.get_concepts_by_type("principle")
+            n
+            for n in graph.get_concepts_by_type("principle")
             if n.id.startswith("RAI-")
         ]
         assert len(identity_nodes) >= 5  # At least the 5 values
@@ -1842,7 +1853,15 @@ class TestExtractBoundedContexts:
         )
 
         # Module docs (so module nodes exist for edge safety)
-        for name in ["governance", "context", "memory", "config", "core", "cli", "rai_base"]:
+        for name in [
+            "governance",
+            "context",
+            "memory",
+            "config",
+            "core",
+            "cli",
+            "rai_base",
+        ]:
             (modules_dir / f"{name}.md").write_text(
                 dedent(f"""\
                 ---
@@ -2020,7 +2039,12 @@ class TestExtractLayers:
         layer_ids = {n.id for n in layer_nodes}
 
         assert len(layer_nodes) == 4
-        assert layer_ids == {"lyr-leaf", "lyr-domain", "lyr-integration", "lyr-orchestration"}
+        assert layer_ids == {
+            "lyr-leaf",
+            "lyr-domain",
+            "lyr-integration",
+            "lyr-orchestration",
+        }
 
     def test_layer_nodes_have_correct_content(self, tmp_path: Path) -> None:
         """Layer node content should come from the description field."""
@@ -2156,9 +2180,7 @@ class TestExtractConstraints:
             graph = builder.build()
 
         # MUST-CODE-001 applies to all BCs (default scope)
-        neighbors = graph.get_neighbors(
-            "bc-governance", edge_types=["constrained_by"]
-        )
+        neighbors = graph.get_neighbors("bc-governance", edge_types=["constrained_by"])
         neighbor_ids = {n.id for n in neighbors}
         assert "guardrail-must-code-001" in neighbor_ids
 
@@ -2228,9 +2250,7 @@ class TestExtractConstraints:
 
         assert graph.edge_count == 0
 
-    def test_no_constraint_edges_without_scope_metadata(
-        self, tmp_path: Path
-    ) -> None:
+    def test_no_constraint_edges_without_scope_metadata(self, tmp_path: Path) -> None:
         """Guardrails without constraint_scope metadata produce no constraint edges."""
         # Create arch fixtures (BCs exist)
         TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
@@ -2267,9 +2287,7 @@ class TestExtractConstraints:
         # BCs should have no constrained_by neighbors
         bc_node = graph.get_concept("bc-governance")
         assert bc_node is not None
-        neighbors = graph.get_neighbors(
-            "bc-governance", edge_types=["constrained_by"]
-        )
+        neighbors = graph.get_neighbors("bc-governance", edge_types=["constrained_by"])
         assert len(neighbors) == 0
 
     def test_skips_nonexistent_target_nodes(self, tmp_path: Path) -> None:
@@ -2331,9 +2349,7 @@ class TestExtractConstraints:
 
         # bc-nonexistent doesn't exist, so no constrained_by edges for must-arch
         # bc-governance exists and should NOT have must-arch (it's overridden)
-        neighbors = graph.get_neighbors(
-            "bc-governance", edge_types=["constrained_by"]
-        )
+        neighbors = graph.get_neighbors("bc-governance", edge_types=["constrained_by"])
         arch_neighbors = [n for n in neighbors if "arch" in n.id]
         assert len(arch_neighbors) == 0
 
@@ -2498,9 +2514,7 @@ class TestLoadCodeStructure:
         # Code data added alongside
         assert "code_imports" in node.metadata
 
-    def test_modules_without_source_retain_existing_data(
-        self, tmp_path: Path
-    ) -> None:
+    def test_modules_without_source_retain_existing_data(self, tmp_path: Path) -> None:
         """Module nodes without matching source should keep their data unchanged."""
         # Module doc exists but no source code for it
         modules_dir = tmp_path / "governance" / "architecture" / "modules"
@@ -2628,9 +2642,7 @@ class TestRaiBaseTemplateContract:
         assert arch_nodes[0].type == "architecture"
         assert arch_nodes[0].metadata["arch_type"] == "architecture_context"
 
-    def test_system_design_template_has_valid_frontmatter(
-        self, tmp_path: Path
-    ) -> None:
+    def test_system_design_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
         """system-design.md template must parse into arch-design node."""
         src = self._get_rai_base_arch_dir() / "system-design.md"
         content = src.read_text().replace("{project_name}", "test-project")
@@ -2647,9 +2659,7 @@ class TestRaiBaseTemplateContract:
         assert arch_nodes[0].type == "architecture"
         assert arch_nodes[0].metadata["arch_type"] == "architecture_design"
 
-    def test_domain_model_template_has_valid_frontmatter(
-        self, tmp_path: Path
-    ) -> None:
+    def test_domain_model_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
         """domain-model.md template must parse into arch-domain-model node."""
         src = self._get_rai_base_arch_dir() / "domain-model.md"
         content = src.read_text().replace("{project_name}", "test-project")
@@ -2662,7 +2672,9 @@ class TestRaiBaseTemplateContract:
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.id == "arch-domain-model"]
-        assert len(arch_nodes) == 1, "domain-model.md must produce arch-domain-model node"
+        assert len(arch_nodes) == 1, (
+            "domain-model.md must produce arch-domain-model node"
+        )
         assert arch_nodes[0].type == "architecture"
         assert arch_nodes[0].metadata["arch_type"] == "architecture_domain_model"
 

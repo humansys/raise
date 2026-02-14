@@ -231,9 +231,7 @@ class TestScaffoldToBuildIntegration:
             "Expected at least 1 guardrail node from guardrails.md template"
         )
 
-    def test_scaffold_then_build_m1_gate(
-        self, scaffolded_project: Path
-    ) -> None:
+    def test_scaffold_then_build_m1_gate(self, scaffolded_project: Path) -> None:
         """M1 milestone gate: scaffold → build → all 3 governance types present."""
         from rai_cli.context.builder import UnifiedGraphBuilder
 

@@ -208,9 +208,7 @@ def process_session_close(
             branch=cw.get("branch", ""),
         )
     else:
-        current_work = CurrentWork(
-            epic="", story="", phase="", branch=""
-        )
+        current_work = CurrentWork(epic="", story="", phase="", branch="")
 
     pending = PendingItems()
     if close_input.pending:
@@ -239,10 +237,9 @@ def process_session_close(
             date=date.today(),
             developer=profile.name,
             summary=close_input.summary,
-            patterns_captured=[
-                f"PAT-{result.session_id}"
-                for _ in close_input.patterns
-            ] if close_input.patterns else [],
+            patterns_captured=[f"PAT-{result.session_id}" for _ in close_input.patterns]
+            if close_input.patterns
+            else [],
         ),
         pending=pending,
         notes=close_input.notes,

@@ -266,7 +266,9 @@ Test output.
 
         # Invalid naming is a warning, not error
         assert result.is_valid
-        assert any("naming" in w.lower() or "pattern" in w.lower() for w in result.warnings)
+        assert any(
+            "naming" in w.lower() or "pattern" in w.lower() for w in result.warnings
+        )
 
     def test_hook_path_not_found(self, tmp_path: Path) -> None:
         """Hook referencing non-existent script is a warning."""
@@ -310,7 +312,9 @@ Test output.
         result = validate_skill_file(skill_file)
 
         # Hook path not found is a warning (script may exist elsewhere)
-        assert any("hook" in w.lower() or "script" in w.lower() for w in result.warnings)
+        assert any(
+            "hook" in w.lower() or "script" in w.lower() for w in result.warnings
+        )
 
     def test_file_not_found(self, tmp_path: Path) -> None:
         """Non-existent file returns error."""

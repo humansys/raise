@@ -679,7 +679,11 @@ def _extract_php_symbols(
     namespace = ""
 
     # Container types whose children include methods
-    container_types = {"class_declaration", "interface_declaration", "trait_declaration"}
+    container_types = {
+        "class_declaration",
+        "interface_declaration",
+        "trait_declaration",
+    }
 
     def _qualify(name: str) -> str:
         return f"{namespace}\\{name}" if namespace else name
@@ -839,9 +843,7 @@ def _get_svelte_parser() -> Parser:
     return Parser(lang)
 
 
-def _detect_svelte_script_lang(
-    script_element: Node, source: bytes
-) -> Language:
+def _detect_svelte_script_lang(script_element: Node, source: bytes) -> Language:
     """Detect whether a Svelte script block uses TypeScript or JavaScript.
 
     Checks for ``lang="ts"`` or ``lang="typescript"`` attribute on the
@@ -869,7 +871,9 @@ def _detect_svelte_script_lang(
                     attr_value = part
             if attr_name is None or attr_value is None:
                 continue
-            name_text = source[attr_name.start_byte : attr_name.end_byte].decode("utf-8")
+            name_text = source[attr_name.start_byte : attr_name.end_byte].decode(
+                "utf-8"
+            )
             if name_text != "lang":
                 continue
             # Extract value from quoted_attribute_value → attribute_value
