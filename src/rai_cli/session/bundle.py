@@ -307,6 +307,25 @@ def _format_recent_sessions(project_path: Path, limit: int = 3) -> str:
     return "\n".join(lines)
 
 
+def _format_narrative(state: SessionState | None) -> str:
+    """Format session narrative for cross-session continuity.
+
+    Narrative is loaded verbatim — no truncation. It contains structured
+    context (decisions, research, artifacts, branch state) that makes the
+    next session immediately resumable.
+
+    Args:
+        state: Session state (may be None).
+
+    Returns:
+        Formatted narrative section, or empty string if no narrative.
+    """
+    if state is None or not state.narrative:
+        return ""
+
+    return f"# Session Narrative\n{state.narrative}"
+
+
 def _format_primes(patterns: list[ConceptNode]) -> str:
     """Format foundational patterns as behavioral primes."""
     if not patterns:
@@ -423,6 +442,11 @@ def assemble_context_bundle(
     recent = _format_recent_sessions(project_path)
     if recent:
         sections.append(recent)
+
+    # Session narrative (cross-session continuity — not truncated)
+    narrative = _format_narrative(state)
+    if narrative:
+        sections.append(narrative)
 
     # Deadlines
     deadlines = _format_deadlines(profile)
