@@ -831,6 +831,125 @@ class TestBundleReleaseContext:
         assert "Release:" not in bundle
 
 
+class TestFormatNarrative:
+    """Tests for narrative section in context bundle."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_bundle_includes_narrative_when_present(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Bundle includes narrative section when state has narrative."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E21", story="S21.1", phase="implement", branch="epic/e21"
+            ),
+            last_session=LastSession(
+                id="SES-159", date=date(2026, 2, 14),
+                developer="Test", summary="test session",
+            ),
+            narrative="## Decisions\n- Architecture = sync model\n\n## Artifacts\n- scope.md created",
+        )
+        bundle = assemble_context_bundle(profile, state, Path("/project"))
+
+        assert "# Session Narrative" in bundle
+        assert "Architecture = sync model" in bundle
+        assert "scope.md created" in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_bundle_omits_narrative_when_empty(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Bundle omits narrative section when narrative is empty."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E15", story="S15.7", phase="design", branch="main"
+            ),
+            last_session=LastSession(
+                id="SES-001", date=date(2026, 2, 8),
+                developer="Test", summary="test",
+            ),
+        )
+        bundle = assemble_context_bundle(profile, state, Path("/project"))
+
+        assert "# Session Narrative" not in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_narrative_not_truncated(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Narrative content is NOT truncated regardless of length."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        long_narrative = "## Decisions\n" + "- Decision line that is quite long and detailed " * 20
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E21", story="S21.1", phase="implement", branch="epic/e21"
+            ),
+            last_session=LastSession(
+                id="SES-159", date=date(2026, 2, 14),
+                developer="Test", summary="test",
+            ),
+            narrative=long_narrative,
+        )
+        bundle = assemble_context_bundle(profile, state, Path("/project"))
+
+        # Full content should be present, no "..." truncation
+        assert long_narrative in bundle
+        assert "..." not in bundle.split("# Session Narrative")[1].split("#")[0]
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_narrative_appears_after_last_session(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Narrative section appears after Last: line in bundle."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-code-001", "guardrail", "[MUST] Type hints"),
+        ]
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E21", story="S21.1", phase="implement", branch="epic/e21"
+            ),
+            last_session=LastSession(
+                id="SES-159", date=date(2026, 2, 14),
+                developer="Test", summary="test session",
+            ),
+            narrative="## Decisions\n- Chose sync model",
+        )
+        bundle = assemble_context_bundle(profile, state, Path("/project"))
+
+        last_pos = bundle.find("Last:")
+        narrative_pos = bundle.find("# Session Narrative")
+        primes_pos = bundle.find("# Governance Primes")
+
+        assert last_pos < narrative_pos < primes_pos
+
+
 class TestGetFoundationalPatterns:
     """Tests for get_foundational_patterns."""
 

@@ -41,7 +41,8 @@ Use inference to reflect on the session:
 6. **Coaching:** Reflect on the working relationship (see below)
 7. **Current work:** Release, epic, story, phase, branch for continuity
 8. **Pending:** Decisions, blockers, next actions
-9. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
+9. **Narrative:** Session context for cross-session continuity — decisions (with WHY), research conclusions, artifacts created, branch state. Goal: make next session "immediately resumable." (~300-500 tokens, 2-3 sentences per section)
+10. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
 
 Write the structured output as a YAML state file:
 
@@ -82,6 +83,22 @@ pending:
   blockers: []
   next_actions:
     - "Continue with Task 7"
+narrative: |                               # Cross-session continuity (2-3 sentences per section, ~300-500 tokens total)
+  ## Decisions
+  - Key decisions made and WHY (rationale, not just the choice)
+  - Trade-offs accepted and alternatives rejected
+
+  ## Research
+  - Research completed + conclusions (reference file paths)
+  - Key insights that inform next session's work
+
+  ## Artifacts
+  - Files created/modified with their purpose
+  - New tests, docs, or config added
+
+  ## Branch State
+  - Current branch and commits ahead of base
+  - Story branch status (created/not yet/merged)
 notes: "Any free-form notes"
 ```
 

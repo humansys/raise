@@ -63,6 +63,7 @@ class CloseInput:
     completed_epics: list[str] = field(default_factory=list)
     coaching: dict[str, object] | None = None
     notes: str = ""
+    narrative: str = ""
 
 
 @dataclass
@@ -107,6 +108,7 @@ def load_state_file(path: Path) -> CloseInput:
         completed_epics=data.get("completed_epics", []),
         coaching=data.get("coaching"),
         notes=data.get("notes", ""),
+        narrative=data.get("narrative", ""),
     )
 
 
@@ -247,6 +249,7 @@ def process_session_close(
         ),
         pending=pending,
         notes=close_input.notes,
+        narrative=close_input.narrative,
         progress=progress,
         completed_epics=close_input.completed_epics,
     )
