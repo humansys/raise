@@ -119,6 +119,7 @@ Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (3)
 |----|-------|-------------|--------|----------|----------|--------|
 | **HF-3** | Type annotations incomplete in governance models | `governance/models.py:131` - ExtractionResult.concepts field has partial type `list[Unknown]`. Causes pyright errors in strict mode. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
 | **HF-4** | Type annotations incomplete in profile schema | `onboarding/profile.py:168,216` - CoachingState.corrections and deadlines fields have partial types `list[Unknown]`. Pyright strict mode failures. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
+| **HF-5** | Extend governance extractor to parse SOPs | Governance extractor currently parses principles, requirements, terms, glossary, ADRs, but not SOPs. Need to add SOP parsing support for `governance/sops/*.md` files. | 🔴 Open | P3 | v2.0.0a8 | v2.0.0a10 |
 
 **Completed:**
 - **HF-1**: Session narrative schema (completed in v2.0.0a6)
@@ -152,10 +153,97 @@ Each feature is complete when:
 
 ---
 
+## 7. Demo & Commercial Strategy
+
+### Atlassian Webinar Demo (March 14, 2026)
+
+**Branch:** `demo/atlassian-webinar` (created 2026-02-14)
+
+**Purpose:** JIRA sync prototype for Atlassian partnership webinar demo
+
+**Merge Policy:** ⚠️ **NEVER MERGES TO v2** — Commercial-only feature
+
+**Status:** Active spike (timeboxed prototype)
+
+---
+
+### Commercial Strategy
+
+**Decision (2026-02-14):** JIRA/backlog sync is **commercial-only**, not distributed in open-source raise-cli.
+
+**Rationale:**
+- Part of future RaiSE PRO offering (premium tier)
+- Atlassian partnership demo validates market demand
+- May retrofit to open version later (decision deferred)
+
+**Research Foundation:**
+- 6 parallel research streams completed (2026-02-14)
+- 184+ sources analyzed, ~6,500 lines of documentation
+- Location: `/work/research/{bidirectional-sync,jira-sync,gitlab-sync,offline-first,pm-sync-boundaries,sync-triggers}/`
+
+---
+
+### Demo Branch Lifecycle
+
+| Phase | Timeline | Action |
+|-------|----------|--------|
+| **Prototype** | Feb 14 - Mar 13 | Build demo MVP in `demo/atlassian-webinar` |
+| **Demo** | Mar 14 | Atlassian webinar presentation |
+| **Decision** | Mar 15 - 31 | Choose commercial architecture (raise-pro package vs monorepo vs fork) |
+| **Migrate or Archive** | Apr 1+ | Move to raise-pro or archive branch |
+
+---
+
+### Post-Demo Options
+
+**Option 1: Separate Package (Recommended)**
+```
+raise-cli (open, PyPI) → Core + extension points
+raise-pro (commercial) → JIRA/GitLab/Odoo adapters
+```
+
+**Option 2: Monorepo with Private Modules**
+```
+src/rai_cli/  (distributed)
+src/rai_pro/  (filtered out of build)
+```
+
+**Option 3: Private Fork**
+```
+raise-commons (open)
+raise-commercial (private fork)
+```
+
+Decision deferred until post-demo customer validation.
+
+---
+
+### Related V3 Epics (Potentially Commercial)
+
+| Epic | Description | Tier |
+|------|-------------|------|
+| E19 | V3 Product Design | TBD |
+| E20 | Shared Memory Architecture | TBD |
+| E21 | Platform Integration (JIRA/GitLab/Odoo) | Commercial |
+| E22 | Enterprise Readiness | Commercial |
+
+E21 absorbs demo branch learnings if raise-pro is built.
+
+---
+
+### Documentation
+
+- **Strategy Doc:** `DEMO-STRATEGY.md` in `demo/atlassian-webinar` branch
+- **Research:** `/work/research/` (6 comprehensive studies)
+- **Parking Lot:** "E-NEXT: Backlog Abstraction Layer (RaiSE PRO)"
+
+---
+
 ## Changelog
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 2.2.0 | 2026-02-14 | Rai | Added Demo & Commercial Strategy section (§7), documented demo/atlassian-webinar branch |
 | 2.1.0 | 2026-02-14 | Rai | Added Hotfixes section (§4) for quality gate tracking, renumbered subsequent sections |
 | 2.0.0 | 2026-02-09 | Rai | Full refresh: E5→E13, E6→E9, E7 complete, E12-E16 added, stale sections removed |
 | 1.3.0 | 2026-02-03 | Rai | E9 Phase 1 + E11 complete, only E7 remaining for F&F |
