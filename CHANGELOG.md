@@ -7,7 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0-alpha.6] — 2026-02-12
+### Added
+- Session narrative for cross-session memory continuity (HF-1)
+- Publish workflow: `rai publish check` and `rai publish release` commands (HF-2)
+- `/rai-publish` skill for guided release workflow
+
+### Fixed
+- PEP 440 version compliance (`2.0.0a7` format)
+- Version sync between pyproject.toml and __init__.py
+
+## [2.0.0a6] - 2026-02-12
 
 ### Added
 - Initial public release of rai-cli
@@ -20,5 +29,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys-ai/raise-commons/compare/v2.0.0-alpha.6...HEAD
-[2.0.0-alpha.6]: https://github.com/humansys-ai/raise-commons/releases/tag/v2.0.0-alpha.6
+[Unreleased]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a6...HEAD
+[2.0.0a6]: https://github.com/humansys-io/raise-commons/releases/tag/v2.0.0a6
