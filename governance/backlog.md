@@ -33,8 +33,9 @@
 | E20 | **Shared Memory Architecture** | Planning | — | P1 (V3) |
 | E21 | **Platform Integration** | Planning | — | P1 (V3) |
 | E22 | **Enterprise Readiness** | Planning | — | P2 (V3) |
+| **E-DEMO** | **JIRA Sync Enabler** | 🚀 In Progress | `demo/atlassian-webinar/scope.md` | P0 (Demo) |
 
-**Summary:** 17 of 22 epics complete. E19-E22 are V3 scope.
+**Summary:** 17 of 22 epics complete. E19-E22 are V3 scope. E-DEMO is enabler epic (demo branch, non-merging).
 
 ---
 
