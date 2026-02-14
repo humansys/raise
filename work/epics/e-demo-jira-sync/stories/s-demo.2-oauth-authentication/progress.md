@@ -2,7 +2,7 @@
 
 ## Status
 - **Started:** 2026-02-14 17:05
-- **Current Task:** 4 of 6
+- **Current Task:** 5 of 6
 - **Status:** In Progress
 
 ## Completed Tasks
@@ -30,6 +30,12 @@
 - **Completed:** 17:29
 - **Duration:** 4 min (estimated: 45 min)
 - **Notes:** TDD cycle complete (RED-GREEN-REFACTOR). Implemented automatic token refresh: expiry detection with 5-min safety buffer, refresh token exchange, error handling for missing/invalid refresh tokens. All 17 tests passing (10 OAuth + 7 refresh), all quality gates green.
+
+### Task 5: Add CLI command `rai backlog auth`
+- **Started:** 17:30
+- **Completed:** 17:38
+- **Duration:** 8 min (estimated: 45 min)
+- **Notes:** TDD cycle complete (RED-GREEN-REFACTOR). Created backlog command group with auth subcommand. Integrated OAuth flow with CLI: provider validation, custom credentials via env vars, user-friendly error messages, success confirmation with email. Added get_current_user() API call and get_credentials_path() helper. All 23 tests passing (6 CLI + 17 OAuth), all quality gates green.
 
 ## Blockers
 - None

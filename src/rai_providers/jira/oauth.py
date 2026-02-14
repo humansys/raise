@@ -416,3 +416,32 @@ def refresh_access_token(
         refreshed_token["expires_at"] = int(time.time()) + refreshed_token["expires_in"]
 
     return refreshed_token  # type: ignore[no-any-return]
+
+
+def get_current_user(access_token: str) -> dict[str, Any]:
+    """Get current authenticated user information from JIRA.
+
+    Args:
+        access_token: OAuth access token.
+
+    Returns:
+        User information dictionary with emailAddress, displayName, etc.
+
+    Raises:
+        OAuthError: If API request fails.
+    """
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json",
+    }
+
+    response = requests.get(
+        "https://api.atlassian.com/me",
+        headers=headers,
+        timeout=10,
+    )
+
+    if response.status_code != 200:
+        raise OAuthError(f"Failed to get user info: HTTP {response.status_code}")
+
+    return response.json()  # type: ignore[no-any-return]
