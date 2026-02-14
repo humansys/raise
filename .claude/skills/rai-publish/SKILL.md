@@ -82,7 +82,22 @@ rai publish check
 
 If any gates fail, stop and help fix them before proceeding.
 
-### Step 4: Execute Release (Dry Run First)
+### Step 4: Sync Public Skills to Distribution
+
+```bash
+# Filter skills for PyPI distribution (exclude internal skills)
+python scripts/sync-skills.py
+```
+
+This syncs only public skills from `.claude/skills/` to `src/rai_cli/skills_base/`, excluding internal tools (rai-framework-sync, rai-publish). Check the output confirms 22 public skills synced.
+
+If changes were made, commit them:
+```bash
+git add src/rai_cli/skills_base/
+git commit -m "chore: sync public skills for distribution"
+```
+
+### Step 5: Execute Release (Dry Run First)
 
 ```bash
 # Show what will happen
@@ -91,7 +106,7 @@ rai publish release --bump {type} --dry-run
 
 Present the plan. Ask for confirmation before executing.
 
-### Step 5: Execute Release
+### Step 6: Execute Release
 
 ```bash
 rai publish release --bump {type}
@@ -104,7 +119,7 @@ This will:
 4. Create version tag
 5. Push to origin (triggers GitHub Actions for PyPI upload)
 
-### Step 6: Verify
+### Step 7: Verify
 
 ```bash
 # Check GitHub Actions
