@@ -7,7 +7,7 @@
 #
 # Excluded (internal):
 #   Dirs:  work/, dev/, .raise/, archive/, blog/, docs/, governance/, .claude/, scripts/
-#   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md
+#   Files: .claude.json, .cursorindexingignore, CLAUDE.md, CLAUDE.local.md, .gitlab-ci.yml
 #
 # Included (public):
 #   src/, tests/, framework/, .github/, pyproject.toml, uv.lock,
@@ -33,7 +33,7 @@ SOURCE_BRANCH="${1:-main}"
 TARGET_BRANCH="${2:-main}"
 TEMP_BRANCH="__sync-github-temp"
 EXCLUDED_DIRS=("work" "dev" ".raise" "archive" "blog" "docs" "governance" ".claude" "scripts")
-EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md")
+EXCLUDED_FILES=(".claude.json" ".cursorindexingignore" "CLAUDE.md" "CLAUDE.local.md" ".gitlab-ci.yml")
 
 # Colors for output
 RED='\033[0;31m'
