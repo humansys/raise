@@ -167,9 +167,7 @@ class ClaudeMdGenerator:
         lines.append("")
         lines.append("This project uses RaiSE governance. Key files:")
         lines.append("")
-        lines.append(
-            "- `governance/guardrails.md` — Code standards and verification"
-        )
+        lines.append("- `governance/guardrails.md` — Code standards and verification")
         lines.append("- `.raise/manifest.yaml` — Project metadata")
         lines.append("")
 

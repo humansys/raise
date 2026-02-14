@@ -445,9 +445,7 @@ def update_coaching(
         if "trajectory" in relationship:
             rel_updates["trajectory"] = relationship["trajectory"]
         if rel_updates:
-            updated_rel = profile.coaching.relationship.model_copy(
-                update=rel_updates
-            )
+            updated_rel = profile.coaching.relationship.model_copy(update=rel_updates)
             updates["relationship"] = updated_rel
 
     if not updates:

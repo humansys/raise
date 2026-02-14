@@ -193,9 +193,7 @@ class TestUnifiedGraphIteration:
 class TestUnifiedGraphPersistence:
     """Persistence tests."""
 
-    def test_save_and_load(
-        self, sample_graph: UnifiedGraph, tmp_path: Path
-    ) -> None:
+    def test_save_and_load(self, sample_graph: UnifiedGraph, tmp_path: Path) -> None:
         """Test saving and loading a graph."""
         # Save
         save_path = tmp_path / "test_graph.json"

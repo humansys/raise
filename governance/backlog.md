@@ -28,13 +28,13 @@
 | E15 | **Ontology Graph Refinement** | ✅ Complete | `work/epics/e15-ontology-refinement/scope.md` | — |
 | E16 | **Incremental Coherence** | ✅ Complete | `work/epics/e16-incremental-coherence/scope.md` | — |
 | E17 | **Multi-Language Discovery** | ✅ Complete | `work/epics/e17-multi-language-discovery/scope.md` | — |
-| E18 | **V2 Release Readiness** | In Progress | — | **P0** |
+| E18 | **Pre-Launch Repo Readiness** | ✅ Complete | `work/epics/e18-prelaunch-repo/scope.md` | — |
 | E19 | **V3 Product Design** | Planning | — | P1 (V3) |
 | E20 | **Shared Memory Architecture** | Planning | — | P1 (V3) |
 | E21 | **Platform Integration** | Planning | — | P1 (V3) |
 | E22 | **Enterprise Readiness** | Planning | — | P2 (V3) |
 
-**Summary:** 16 of 22 epics complete. E18 in progress (V2 release). E19-E22 are V3 scope.
+**Summary:** 17 of 22 epics complete. E19-E22 are V3 scope.
 
 ---
 

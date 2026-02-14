@@ -344,8 +344,12 @@ class TestAlwaysOnMetadata:
 
         concepts = extract_guardrails(file_path, tmp_path)
 
-        must = next(c for c in concepts if c.metadata["guardrail_id"] == "MUST-CODE-001")
-        should = next(c for c in concepts if c.metadata["guardrail_id"] == "SHOULD-CODE-001")
+        must = next(
+            c for c in concepts if c.metadata["guardrail_id"] == "MUST-CODE-001"
+        )
+        should = next(
+            c for c in concepts if c.metadata["guardrail_id"] == "SHOULD-CODE-001"
+        )
 
         assert must.metadata.get("always_on") is True
         assert "always_on" not in should.metadata
@@ -408,7 +412,7 @@ class TestIntegrationWithRealGuardrails:
         ids = [c.metadata.get("guardrail_id") for c in concepts]
         assert "MUST-CODE-001" in ids  # Type hints
         assert "MUST-TEST-001" in ids  # Coverage
-        assert "MUST-SEC-001" in ids   # No secrets
+        assert "MUST-SEC-001" in ids  # No secrets
 
     def test_extract_all_real_guardrails(self, project_root: Path) -> None:
         """Extract all guardrails from standard location."""

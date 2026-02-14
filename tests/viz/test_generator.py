@@ -49,31 +49,135 @@ def rich_graph(tmp_path: Path) -> Path:
     """Create a graph with multiple domains and pattern categories."""
     nodes = [
         # Governance
-        {"id": "principle-01", "type": "principle", "content": "Simplicity", "source_file": "constitution.md", "created": "2026-01-01", "metadata": {}},
-        {"id": "guardrail-01", "type": "guardrail", "content": "Type hints", "source_file": "guardrails.md", "created": "2026-01-01", "metadata": {}},
+        {
+            "id": "principle-01",
+            "type": "principle",
+            "content": "Simplicity",
+            "source_file": "constitution.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
+        {
+            "id": "guardrail-01",
+            "type": "guardrail",
+            "content": "Type hints",
+            "source_file": "guardrails.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
         # Architecture
-        {"id": "mod-memory", "type": "module", "content": "Memory module", "source_file": "architecture.md", "created": "2026-01-01", "metadata": {}},
-        {"id": "comp-query", "type": "component", "content": "Query engine", "source_file": "architecture.md", "created": "2026-01-01", "metadata": {}},
-        {"id": "layer-core", "type": "layer", "content": "Core layer", "source_file": "architecture.md", "created": "2026-01-01", "metadata": {}},
+        {
+            "id": "mod-memory",
+            "type": "module",
+            "content": "Memory module",
+            "source_file": "architecture.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
+        {
+            "id": "comp-query",
+            "type": "component",
+            "content": "Query engine",
+            "source_file": "architecture.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
+        {
+            "id": "layer-core",
+            "type": "layer",
+            "content": "Core layer",
+            "source_file": "architecture.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
         # Memory — patterns with different categories
-        {"id": "PAT-001", "type": "pattern", "content": "Architecture pattern", "source_file": "patterns.jsonl", "created": "2026-01-01", "metadata": {"context": ["architecture", "design"]}},
-        {"id": "PAT-002", "type": "pattern", "content": "Process pattern", "source_file": "patterns.jsonl", "created": "2026-01-01", "metadata": {"context": ["process", "workflow"]}},
-        {"id": "PAT-003", "type": "pattern", "content": "Testing pattern", "source_file": "patterns.jsonl", "created": "2026-01-01", "metadata": {"context": ["testing"]}},
-        {"id": "PAT-004", "type": "pattern", "content": "No context pattern", "source_file": "patterns.jsonl", "created": "2026-01-01", "metadata": {}},
-        {"id": "CAL-001", "type": "calibration", "content": "Calibration data", "source_file": "calibration.jsonl", "created": "2026-01-01", "metadata": {}},
-        {"id": "SES-001", "type": "session", "content": "Session record", "source_file": "sessions.jsonl", "created": "2026-01-01", "metadata": {}},
+        {
+            "id": "PAT-001",
+            "type": "pattern",
+            "content": "Architecture pattern",
+            "source_file": "patterns.jsonl",
+            "created": "2026-01-01",
+            "metadata": {"context": ["architecture", "design"]},
+        },
+        {
+            "id": "PAT-002",
+            "type": "pattern",
+            "content": "Process pattern",
+            "source_file": "patterns.jsonl",
+            "created": "2026-01-01",
+            "metadata": {"context": ["process", "workflow"]},
+        },
+        {
+            "id": "PAT-003",
+            "type": "pattern",
+            "content": "Testing pattern",
+            "source_file": "patterns.jsonl",
+            "created": "2026-01-01",
+            "metadata": {"context": ["testing"]},
+        },
+        {
+            "id": "PAT-004",
+            "type": "pattern",
+            "content": "No context pattern",
+            "source_file": "patterns.jsonl",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
+        {
+            "id": "CAL-001",
+            "type": "calibration",
+            "content": "Calibration data",
+            "source_file": "calibration.jsonl",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
+        {
+            "id": "SES-001",
+            "type": "session",
+            "content": "Session record",
+            "source_file": "sessions.jsonl",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
         # Work
-        {"id": "epic-e01", "type": "epic", "content": "Foundation epic", "source_file": "scope.md", "created": "2026-01-01", "metadata": {}},
-        {"id": "story-f1.1", "type": "story", "content": "First story", "source_file": "scope.md", "created": "2026-01-01", "metadata": {}},
+        {
+            "id": "epic-e01",
+            "type": "epic",
+            "content": "Foundation epic",
+            "source_file": "scope.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
+        {
+            "id": "story-f1.1",
+            "type": "story",
+            "content": "First story",
+            "source_file": "scope.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
         # Skills
-        {"id": "skill-session-start", "type": "skill", "content": "Session start skill", "source_file": "SKILL.md", "created": "2026-01-01", "metadata": {}},
+        {
+            "id": "skill-session-start",
+            "type": "skill",
+            "content": "Session start skill",
+            "source_file": "SKILL.md",
+            "created": "2026-01-01",
+            "metadata": {},
+        },
     ]
     links = [
         {"source": "PAT-001", "target": "mod-memory", "type": "related_to"},
         {"source": "guardrail-01", "target": "mod-memory", "type": "constrained_by"},
         {"source": "story-f1.1", "target": "epic-e01", "type": "belongs_to"},
     ]
-    graph = {"directed": True, "multigraph": True, "graph": {}, "nodes": nodes, "links": links}
+    graph = {
+        "directed": True,
+        "multigraph": True,
+        "graph": {},
+        "nodes": nodes,
+        "links": links,
+    }
     index_path = tmp_path / "index.json"
     index_path.write_text(json.dumps(graph))
     return index_path
@@ -111,7 +215,9 @@ class TestGenerateVizHtml:
 
         assert "d3.v7.min.js" in content
 
-    def test_pattern_metadata_preserved(self, minimal_graph: Path, tmp_path: Path) -> None:
+    def test_pattern_metadata_preserved(
+        self, minimal_graph: Path, tmp_path: Path
+    ) -> None:
         """Pattern nodes include category, tags, and learned_from."""
         output = tmp_path / "graph.html"
         generate_viz_html(minimal_graph, output)
@@ -126,8 +232,19 @@ class TestGenerateVizHtml:
         """Pattern content is preserved in full (not truncated to 200 chars)."""
         long_content = "A" * 500
         graph = {
-            "directed": True, "multigraph": True, "graph": {},
-            "nodes": [{"id": "PAT-LONG", "type": "pattern", "content": long_content, "source_file": "", "created": "", "metadata": {"context": ["testing"]}}],
+            "directed": True,
+            "multigraph": True,
+            "graph": {},
+            "nodes": [
+                {
+                    "id": "PAT-LONG",
+                    "type": "pattern",
+                    "content": long_content,
+                    "source_file": "",
+                    "created": "",
+                    "metadata": {"context": ["testing"]},
+                }
+            ],
             "links": [],
         }
         index_path = tmp_path / "index.json"
@@ -143,8 +260,19 @@ class TestGenerateVizHtml:
         """Non-pattern nodes have content truncated to 200 chars."""
         long_content = "B" * 500
         graph = {
-            "directed": True, "multigraph": True, "graph": {},
-            "nodes": [{"id": "mod-big", "type": "module", "content": long_content, "source_file": "", "created": "", "metadata": {}}],
+            "directed": True,
+            "multigraph": True,
+            "graph": {},
+            "nodes": [
+                {
+                    "id": "mod-big",
+                    "type": "module",
+                    "content": long_content,
+                    "source_file": "",
+                    "created": "",
+                    "metadata": {},
+                }
+            ],
             "links": [],
         }
         index_path = tmp_path / "index.json"
@@ -157,7 +285,9 @@ class TestGenerateVizHtml:
         assert long_content not in content
         assert "B" * 200 in content
 
-    def test_pattern_without_context_gets_general_category(self, rich_graph: Path, tmp_path: Path) -> None:
+    def test_pattern_without_context_gets_general_category(
+        self, rich_graph: Path, tmp_path: Path
+    ) -> None:
         """Patterns with no context tags get category 'general'."""
         output = tmp_path / "graph.html"
         generate_viz_html(rich_graph, output)
@@ -197,7 +327,9 @@ class TestGenerateVizHtml:
         assert "constrained_by" in content
         assert "belongs_to" in content
 
-    def test_creates_parent_directories(self, minimal_graph: Path, tmp_path: Path) -> None:
+    def test_creates_parent_directories(
+        self, minimal_graph: Path, tmp_path: Path
+    ) -> None:
         """Output path parent directories are created if missing."""
         output = tmp_path / "deep" / "nested" / "dir" / "graph.html"
         generate_viz_html(minimal_graph, output)
@@ -206,7 +338,13 @@ class TestGenerateVizHtml:
 
     def test_empty_graph(self, tmp_path: Path) -> None:
         """Handles an empty graph without errors."""
-        graph = {"directed": True, "multigraph": True, "graph": {}, "nodes": [], "links": []}
+        graph = {
+            "directed": True,
+            "multigraph": True,
+            "graph": {},
+            "nodes": [],
+            "links": [],
+        }
         index_path = tmp_path / "index.json"
         index_path.write_text(json.dumps(graph))
 
@@ -220,8 +358,19 @@ class TestGenerateVizHtml:
     def test_edges_with_missing_nodes_excluded(self, tmp_path: Path) -> None:
         """Edges referencing non-existent nodes are handled gracefully."""
         graph = {
-            "directed": True, "multigraph": True, "graph": {},
-            "nodes": [{"id": "A", "type": "module", "content": "", "source_file": "", "created": "", "metadata": {}}],
+            "directed": True,
+            "multigraph": True,
+            "graph": {},
+            "nodes": [
+                {
+                    "id": "A",
+                    "type": "module",
+                    "content": "",
+                    "source_file": "",
+                    "created": "",
+                    "metadata": {},
+                }
+            ],
             "links": [{"source": "A", "target": "MISSING", "type": "related_to"}],
         }
         index_path = tmp_path / "index.json"

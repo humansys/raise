@@ -5,9 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-import pytest
-
-from rai_cli.context.analyzers.models import ModuleInfo
 from rai_cli.context.analyzers.protocol import CodeAnalyzer
 from rai_cli.context.analyzers.python import PythonAnalyzer
 
@@ -41,9 +38,7 @@ class TestPythonAnalyzerDetect:
 class TestPythonAnalyzerImports:
     """Tests for import extraction."""
 
-    def _make_module(
-        self, tmp_path: Path, module_name: str, code: str
-    ) -> Path:
+    def _make_module(self, tmp_path: Path, module_name: str, code: str) -> Path:
         """Helper to create a module with given code."""
         src_dir = tmp_path / "src" / "pkg"
         mod_dir = src_dir / module_name

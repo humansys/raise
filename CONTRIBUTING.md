@@ -11,6 +11,10 @@ RaiSE Commons includes both **methodology** and **tooling**:
 
 Contributions can focus on either area.
 
+## Code of Conduct
+
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code.
+
 ## Development Setup
 
 ### Prerequisites
@@ -23,39 +27,15 @@ Contributions can focus on either area.
 
 ```bash
 # Clone and enter the repository
-git clone https://gitlab.com/humansys/raise-commons.git
+git clone https://github.com/humansys-ai/raise-commons.git
 cd raise-commons
 
 # Install dependencies
 uv sync
 
 # Run CLI via uv
-uv run raise --version
+uv run rai --version
 ```
-
-### Recommended: direnv for Seamless CLI Access
-
-To use `rai` directly (without `uv run` prefix):
-
-```bash
-# Install direnv (Ubuntu/Debian)
-sudo apt install direnv
-
-# Add hook to your shell (~/.bashrc or ~/.zshrc)
-echo 'eval "$(direnv hook bash)"' >> ~/.bashrc  # or ~/.zshrc for zsh
-
-# Restart your shell or source the config
-source ~/.bashrc
-
-# In the project directory, create and allow .envrc
-echo 'source .venv/bin/activate' > .envrc
-direnv allow
-
-# Now 'raise' works directly
-raise --version
-```
-
-direnv auto-activates the virtual environment when you enter the project directory.
 
 ### Running Tests
 
@@ -77,13 +57,13 @@ uv run pyright --strict src/           # Type checking
 
 ### Questions and Discussion
 
-Open a [GitLab Issue](../../issues) with the `question` label.
+Open an [Issue](../../issues) with the `question` label.
 
 ### Bug Reports
 
 For documentation errors, broken links, or terminology inconsistencies:
 
-1. Open a [GitLab Issue](../../issues)
+1. Open an [Issue](../../issues)
 2. Describe what you found
 3. Include the file path and line number if applicable
 4. Suggest a correction if you have one
@@ -92,7 +72,7 @@ For documentation errors, broken links, or terminology inconsistencies:
 
 For methodology improvements or new content:
 
-1. Open a [GitLab Issue](../../issues) with the `enhancement` label
+1. Open an [Issue](../../issues) with the `enhancement` label
 2. Describe the proposed change
 3. Explain the rationale
 
@@ -103,7 +83,7 @@ For methodology improvements or new content:
 3. **Create a feature branch** from `v2` (development branch)
 4. **Make your changes** following the style guidelines
 5. **Run tests and quality checks** (see Development Setup)
-6. **Submit a Merge Request** referencing the issue
+6. **Submit a Pull Request** referencing the issue
 
 ## Style Guidelines
 
@@ -146,10 +126,6 @@ Before submitting:
 - [ ] Concise (no unnecessary words)
 - [ ] Links use descriptive text
 - [ ] American English spelling
-
-## Code of Conduct
-
-Be respectful and constructive. Focus on improving the framework for everyone.
 
 ---
 

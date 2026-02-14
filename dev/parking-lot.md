@@ -27,6 +27,21 @@
   - **Priority:** Urgent — affects GTM work starting now, and Jumpstart client onboarding
 
 - [ ] **Marketing strategy** - ASAP, identify dependencies before Feb 15 launch
+- [ ] **E-NEXT: Backlog Abstraction Layer (RaiSE PRO)** — (SES-148, 2026-02-13)
+  - **Epic candidate.** Platform-agnostic backlog interface: `rai backlog` commands that work against any backend.
+  - **Architecture:** Port/Adapter pattern. `BacklogProvider` interface → `JiraAdapter`, `GitLabAdapter`, `OdooAdapter`, `LocalAdapter` (current `work/epics/` = implicit LocalAdapter).
+  - **Source of truth is configurable per project:** Local→JIRA (indie/small team), JIRA→Local (enterprise/Coppel), bidirectional sync.
+  - **Token economy:** CLI wrapper over `atlassian-python-api` returns compact output (~200 tokens vs ~8,000 from MCP raw JSON per operation). MCP as fallback only.
+  - **Strategic context:**
+    - Humansys = Atlassian Gold Partner. All devs + Rai using JIRA/Confluence daily = organic demo refinement.
+    - Coppel (new client) uses JIRA — direct customer need.
+    - March 14 Atlassian webinar — 4 weeks of real usage produces polished demo.
+    - Extends to Confluence: `rai docs publish` → Confluence page from design.md, architecture docs.
+  - **Includes:** JIRA read/write, Confluence read/write, Compass catalog (when enabled), search (JQL/CQL abstracted).
+  - **Validated in PoC:** MCP integration works (SES-148). PRAISE-59 created, Confluence page created, full read/write confirmed.
+  - **Priority:** High — enables PRO tier, Atlassian partnership demo, customer delivery.
+  - **Depends on:** E18 complete (repo public, CI/CD live).
+
 - [ ] **Rovo AI integration implementation** - Required for Mar 14 webinar (V3 scope)
 - [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
   - Rai = trained RaiSE agent (not generic Claude)

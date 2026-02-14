@@ -110,9 +110,7 @@ class TestBootstrapIdempotency:
         bootstrap_rai_base(tmp_path)
 
         # Modify methodology
-        meth_path = (
-            tmp_path / ".raise" / "rai" / "framework" / "methodology.yaml"
-        )
+        meth_path = tmp_path / ".raise" / "rai" / "framework" / "methodology.yaml"
         meth_path.write_text("version: 99\n")
 
         # Second bootstrap
@@ -134,9 +132,7 @@ class TestBootstrapIdempotency:
 class TestBootstrapPartialState:
     """Tests for bootstrap when .raise/rai/ is partially populated."""
 
-    def test_copies_missing_patterns_when_identity_exists(
-        self, tmp_path: Path
-    ) -> None:
+    def test_copies_missing_patterns_when_identity_exists(self, tmp_path: Path) -> None:
         """Should copy patterns even if identity already exists."""
         # Create identity manually
         identity_dir = tmp_path / ".raise" / "rai" / "identity"
@@ -153,9 +149,7 @@ class TestBootstrapPartialState:
         # Methodology should be copied
         assert result.methodology_copied
 
-    def test_copies_missing_methodology_when_others_exist(
-        self, tmp_path: Path
-    ) -> None:
+    def test_copies_missing_methodology_when_others_exist(self, tmp_path: Path) -> None:
         """Should copy methodology even if identity and patterns exist."""
         # Create identity and patterns manually
         identity_dir = tmp_path / ".raise" / "rai" / "identity"

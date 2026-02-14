@@ -402,7 +402,6 @@ def _file_to_module(file_path: str) -> str:
     return ".".join(parts)
 
 
-
 def build_hierarchy(symbols: list[Symbol]) -> list[AnalyzedComponent]:
     """Fold methods into their parent classes.
 
