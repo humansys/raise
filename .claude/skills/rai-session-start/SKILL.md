@@ -61,6 +61,7 @@ With the context bundle from Step 1, use inference to:
 1. **Check signals:**
    - Release deadline pressure (<30 days → flag urgency, include days remaining)
    - Deadline pressure (<3 days → focus critical path)
+   - Session narrative → review decisions, research, artifacts from last session for continuity
    - Coaching corrections → reinforce behavioral primes
    - Pending decisions or blockers → address first
    - Communication preferences (language, style, skip_praise, redirect) → adapt tone accordingly
