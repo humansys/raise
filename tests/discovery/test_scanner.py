@@ -1076,7 +1076,8 @@ class TestExtractSvelteSymbols:
     def test_scan_directory_svelte(self, tmp_path: Path) -> None:
         """Test scan_directory finds and parses .svelte files."""
         svelte_file = tmp_path / "Counter.svelte"
-        svelte_file.write_text(dedent("""\
+        svelte_file.write_text(
+            dedent("""\
             <script>
               let count = 0;
 
@@ -1086,7 +1087,8 @@ class TestExtractSvelteSymbols:
             </script>
 
             <button on:click={increment}>{count}</button>
-        """))
+        """)
+        )
 
         # Also add a non-svelte file to ensure it's not picked up
         other_file = tmp_path / "utils.js"

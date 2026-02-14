@@ -21,7 +21,8 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     # Create rai-session-start skill
     session_start = skills / "rai-session-start"
     session_start.mkdir()
-    (session_start / "SKILL.md").write_text(dedent("""\
+    (session_start / "SKILL.md").write_text(
+        dedent("""\
         ---
         name: rai-session-start
         description: Begin a session by loading memory
@@ -30,12 +31,14 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
           raise.version: "3.0.0"
         ---
         # Session Start
-    """))
+    """)
+    )
 
     # Create rai-story-plan skill
     feature_plan = skills / "rai-story-plan"
     feature_plan.mkdir()
-    (feature_plan / "SKILL.md").write_text(dedent("""\
+    (feature_plan / "SKILL.md").write_text(
+        dedent("""\
         ---
         name: rai-story-plan
         description: Plan a feature implementation
@@ -44,12 +47,14 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
           raise.version: "1.0.0"
         ---
         # Story Plan
-    """))
+    """)
+    )
 
     # Create rai-debug skill
     debug = skills / "rai-debug"
     debug.mkdir()
-    (debug / "SKILL.md").write_text(dedent("""\
+    (debug / "SKILL.md").write_text(
+        dedent("""\
         ---
         name: rai-debug
         description: Debug issues systematically
@@ -58,7 +63,8 @@ def skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
           raise.version: "1.0.0"
         ---
         # Debug
-    """))
+    """)
+    )
 
     monkeypatch.chdir(tmp_path)
     return tmp_path
@@ -110,7 +116,9 @@ class TestSkillList:
         assert "story" in result.stdout.lower()
         assert "utility" in result.stdout.lower()
 
-    def test_list_skills_empty_dir(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_list_skills_empty_dir(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Handle empty skill directory gracefully."""
         empty_skills = tmp_path / ".claude" / "skills"
         empty_skills.mkdir(parents=True)
@@ -120,7 +128,9 @@ class TestSkillList:
         assert result.exit_code == 0
         assert "No skills found" in result.stdout or "0" in result.stdout
 
-    def test_list_skills_no_skill_dir(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_list_skills_no_skill_dir(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Handle missing skill directory gracefully."""
         monkeypatch.chdir(tmp_path)
 
@@ -138,7 +148,8 @@ def valid_skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path
     # Create valid rai-session-start skill
     session_start = skills / "rai-session-start"
     session_start.mkdir()
-    (session_start / "SKILL.md").write_text(dedent("""\
+    (session_start / "SKILL.md").write_text(
+        dedent("""\
         ---
         name: rai-session-start
         description: Begin a session by loading memory
@@ -163,7 +174,8 @@ def valid_skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path
         ## Output
 
         What this produces.
-    """))
+    """)
+    )
 
     monkeypatch.chdir(tmp_path)
     return tmp_path
@@ -180,7 +192,13 @@ class TestSkillValidate:
 
     def test_validate_specific_file(self, valid_skill_project: Path) -> None:
         """Validate a specific skill file."""
-        skill_path = valid_skill_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
+        skill_path = (
+            valid_skill_project
+            / ".claude"
+            / "skills"
+            / "rai-session-start"
+            / "SKILL.md"
+        )
         result = runner.invoke(app, ["skill", "validate", str(skill_path)])
         assert result.exit_code == 0
         # Check for success indicators (path may be wrapped by Rich)
@@ -192,7 +210,9 @@ class TestSkillValidate:
         result = runner.invoke(app, ["skill", "validate", str(skill_dir)])
         assert result.exit_code == 0
 
-    def test_validate_invalid_skill(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_validate_invalid_skill(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Invalid skill returns exit code 1."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
@@ -200,7 +220,8 @@ class TestSkillValidate:
         # Create invalid skill (missing metadata)
         bad_skill = skills / "bad-skill"
         bad_skill.mkdir()
-        (bad_skill / "SKILL.md").write_text(dedent("""\
+        (bad_skill / "SKILL.md").write_text(
+            dedent("""\
             ---
             name: bad-skill
             description: Missing metadata
@@ -208,7 +229,8 @@ class TestSkillValidate:
             # Bad Skill
 
             No sections.
-        """))
+        """)
+        )
 
         monkeypatch.chdir(tmp_path)
         result = runner.invoke(app, ["skill", "validate"])
@@ -224,14 +246,18 @@ class TestSkillValidate:
         assert "all_valid" in data
         assert data["all_valid"] is True
 
-    def test_validate_nonexistent_path(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_validate_nonexistent_path(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Handle nonexistent path."""
         monkeypatch.chdir(tmp_path)
         result = runner.invoke(app, ["skill", "validate", "/nonexistent/path"])
         assert result.exit_code == 1
         assert "not found" in result.stdout.lower()
 
-    def test_validate_shows_warnings(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_validate_shows_warnings(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Warnings are displayed (e.g., naming convention)."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
@@ -239,7 +265,8 @@ class TestSkillValidate:
         # Create skill with bad naming (missing hyphen)
         bad_name = skills / "badname"
         bad_name.mkdir()
-        (bad_name / "SKILL.md").write_text(dedent("""\
+        (bad_name / "SKILL.md").write_text(
+            dedent("""\
             ---
             name: badname
             description: Skill with bad name
@@ -264,7 +291,8 @@ class TestSkillValidate:
             ## Output
 
             Test.
-        """))
+        """)
+        )
 
         monkeypatch.chdir(tmp_path)
         result = runner.invoke(app, ["skill", "validate"])
@@ -276,7 +304,9 @@ class TestSkillValidate:
 class TestSkillCheckName:
     """Tests for raise skill check-name command."""
 
-    def test_check_name_valid(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_check_name_valid(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Valid name returns exit code 0."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
@@ -286,7 +316,9 @@ class TestSkillCheckName:
         assert result.exit_code == 0
         assert "valid" in result.stdout.lower()
 
-    def test_check_name_invalid_pattern(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_check_name_invalid_pattern(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Invalid pattern returns exit code 1."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
@@ -296,13 +328,17 @@ class TestSkillCheckName:
         assert result.exit_code == 1
         assert "pattern" in result.stdout.lower()
 
-    def test_check_name_json_output(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_check_name_json_output(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """JSON output format works."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "check-name", "session-test", "--format", "json"])
+        result = runner.invoke(
+            app, ["skill", "check-name", "session-test", "--format", "json"]
+        )
         assert result.exit_code == 0
         data = json.loads(result.stdout)
         assert data["name"] == "session-test"
@@ -315,7 +351,9 @@ class TestSkillCheckName:
         assert result.exit_code == 1
         assert "conflict" in result.stdout.lower()
 
-    def test_check_name_cli_conflict(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_check_name_cli_conflict(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Conflicts with CLI command."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
@@ -325,7 +363,9 @@ class TestSkillCheckName:
         assert result.exit_code == 1
         assert "cli" in result.stdout.lower() or "command" in result.stdout.lower()
 
-    def test_check_name_shows_suggestions(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_check_name_shows_suggestions(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Shows suggestions for valid names."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
@@ -340,7 +380,9 @@ class TestSkillCheckName:
 class TestSkillScaffold:
     """Tests for raise skill scaffold command."""
 
-    def test_scaffold_creates_skill(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_scaffold_creates_skill(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Scaffold creates a new skill."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
@@ -351,52 +393,70 @@ class TestSkillScaffold:
         assert "created" in result.stdout.lower()
         assert (skills / "test-action" / "SKILL.md").exists()
 
-    def test_scaffold_with_lifecycle(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_scaffold_with_lifecycle(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Scaffold with explicit lifecycle."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "my-test", "--lifecycle", "epic"])
+        result = runner.invoke(
+            app, ["skill", "scaffold", "my-test", "--lifecycle", "epic"]
+        )
         assert result.exit_code == 0
         content = (skills / "my-test" / "SKILL.md").read_text()
         assert "raise.work_cycle: epic" in content
 
-    def test_scaffold_with_after(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_scaffold_with_after(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Scaffold with prerequisite skill."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--after", "rai-story-start"])
+        result = runner.invoke(
+            app, ["skill", "scaffold", "test-action", "--after", "rai-story-start"]
+        )
         assert result.exit_code == 0
         content = (skills / "test-action" / "SKILL.md").read_text()
         assert "rai-story-start" in content
 
-    def test_scaffold_with_before(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_scaffold_with_before(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Scaffold with next skill."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "test-action", "--before", "rai-story-close"])
+        result = runner.invoke(
+            app, ["skill", "scaffold", "test-action", "--before", "rai-story-close"]
+        )
         assert result.exit_code == 0
         content = (skills / "test-action" / "SKILL.md").read_text()
         assert "rai-story-close" in content
 
-    def test_scaffold_json_output(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_scaffold_json_output(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """JSON output format works."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)
         monkeypatch.chdir(tmp_path)
 
-        result = runner.invoke(app, ["skill", "scaffold", "test-skill", "--format", "json"])
+        result = runner.invoke(
+            app, ["skill", "scaffold", "test-skill", "--format", "json"]
+        )
         assert result.exit_code == 0
         data = json.loads(result.stdout)
         assert data["created"] is True
         assert "test-skill" in data["path"]
 
-    def test_scaffold_fails_if_exists(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_scaffold_fails_if_exists(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Scaffold fails for existing skill."""
         skills = tmp_path / ".claude" / "skills"
         skills.mkdir(parents=True)

@@ -140,11 +140,7 @@ def _get_suggestions(
 
     # Find related skills in same domain (check both prefixed and unprefixed)
     related = sorted(
-        [
-            s
-            for s in existing_skills
-            if _strip_rai_prefix(s).startswith(f"{domain}-")
-        ]
+        [s for s in existing_skills if _strip_rai_prefix(s).startswith(f"{domain}-")]
     )
 
     if related:

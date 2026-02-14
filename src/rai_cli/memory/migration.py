@@ -35,10 +35,7 @@ class MigrationResult:
 
     def summary(self) -> str:
         """Generate human-readable summary of migration."""
-        if self.dry_run:
-            prefix = "Would migrate"
-        else:
-            prefix = "Migrated"
+        prefix = "Would migrate" if self.dry_run else "Migrated"
 
         parts: list[str] = []
         if self.sessions_migrated > 0:
@@ -123,10 +120,7 @@ def needs_migration(
     # Check for calibration
     project_calibration = memory_dir / "calibration.jsonl"
     personal_calibration = personal_dir / "calibration.jsonl"
-    if _has_content(project_calibration) and not _has_content(personal_calibration):
-        return True
-
-    return False
+    return _has_content(project_calibration) and not _has_content(personal_calibration)
 
 
 def _migrate_file(

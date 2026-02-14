@@ -17,14 +17,16 @@ class TestExtractSkillMetadata:
     def test_extracts_basic_frontmatter(self, tmp_path: Path) -> None:
         """Should extract name, description from YAML frontmatter."""
         skill_md = tmp_path / "SKILL.md"
-        skill_md.write_text(dedent("""\
+        skill_md.write_text(
+            dedent("""\
             ---
             name: story-plan
             description: Plan implementation tasks
             ---
             # Feature Plan
             Body content here.
-        """))
+        """)
+        )
 
         node = extract_skill_metadata(skill_md)
 
@@ -37,7 +39,8 @@ class TestExtractSkillMetadata:
     def test_extracts_metadata_fields(self, tmp_path: Path) -> None:
         """Should extract raise.* metadata fields."""
         skill_md = tmp_path / "SKILL.md"
-        skill_md.write_text(dedent("""\
+        skill_md.write_text(
+            dedent("""\
             ---
             name: test-skill
             description: Test skill description
@@ -47,7 +50,8 @@ class TestExtractSkillMetadata:
               raise.work_cycle: story
             ---
             # Test
-        """))
+        """)
+        )
 
         node = extract_skill_metadata(skill_md)
 
@@ -59,7 +63,8 @@ class TestExtractSkillMetadata:
     def test_handles_multiline_description(self, tmp_path: Path) -> None:
         """Should handle YAML multiline description."""
         skill_md = tmp_path / "SKILL.md"
-        skill_md.write_text(dedent("""\
+        skill_md.write_text(
+            dedent("""\
             ---
             name: multi-line
             description: >
@@ -68,7 +73,8 @@ class TestExtractSkillMetadata:
               multiple lines.
             ---
             # Multi
-        """))
+        """)
+        )
 
         node = extract_skill_metadata(skill_md)
 
@@ -88,12 +94,14 @@ class TestExtractSkillMetadata:
     def test_returns_none_for_missing_name(self, tmp_path: Path) -> None:
         """Should return None if name field is missing."""
         skill_md = tmp_path / "SKILL.md"
-        skill_md.write_text(dedent("""\
+        skill_md.write_text(
+            dedent("""\
             ---
             description: No name field
             ---
             # Test
-        """))
+        """)
+        )
 
         node = extract_skill_metadata(skill_md)
 
@@ -110,13 +118,15 @@ class TestExtractSkillMetadata:
     def test_handles_empty_metadata(self, tmp_path: Path) -> None:
         """Should handle skill with no metadata section."""
         skill_md = tmp_path / "SKILL.md"
-        skill_md.write_text(dedent("""\
+        skill_md.write_text(
+            dedent("""\
             ---
             name: simple-skill
             description: Simple skill
             ---
             # Simple
-        """))
+        """)
+        )
 
         node = extract_skill_metadata(skill_md)
 
@@ -126,13 +136,15 @@ class TestExtractSkillMetadata:
     def test_sets_created_timestamp(self, tmp_path: Path) -> None:
         """Should set created field from file or current time."""
         skill_md = tmp_path / "SKILL.md"
-        skill_md.write_text(dedent("""\
+        skill_md.write_text(
+            dedent("""\
             ---
             name: timestamped
             description: Has timestamp
             ---
             # Test
-        """))
+        """)
+        )
 
         node = extract_skill_metadata(skill_md)
 
@@ -148,22 +160,26 @@ class TestExtractAllSkills:
         """Should extract all SKILL.md files from skills directory."""
         # Create skill directories
         (tmp_path / "skill-a").mkdir()
-        (tmp_path / "skill-a" / "SKILL.md").write_text(dedent("""\
+        (tmp_path / "skill-a" / "SKILL.md").write_text(
+            dedent("""\
             ---
             name: skill-a
             description: Skill A
             ---
             # A
-        """))
+        """)
+        )
 
         (tmp_path / "skill-b").mkdir()
-        (tmp_path / "skill-b" / "SKILL.md").write_text(dedent("""\
+        (tmp_path / "skill-b" / "SKILL.md").write_text(
+            dedent("""\
             ---
             name: skill-b
             description: Skill B
             ---
             # B
-        """))
+        """)
+        )
 
         nodes = extract_all_skills(tmp_path)
 
@@ -175,13 +191,15 @@ class TestExtractAllSkills:
     def test_skips_invalid_skills(self, tmp_path: Path) -> None:
         """Should skip skills with invalid frontmatter."""
         (tmp_path / "valid").mkdir()
-        (tmp_path / "valid" / "SKILL.md").write_text(dedent("""\
+        (tmp_path / "valid" / "SKILL.md").write_text(
+            dedent("""\
             ---
             name: valid
             description: Valid skill
             ---
             # Valid
-        """))
+        """)
+        )
 
         (tmp_path / "invalid").mkdir()
         (tmp_path / "invalid" / "SKILL.md").write_text("No frontmatter")

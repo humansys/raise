@@ -21,7 +21,8 @@ class TestDiscoverScan:
         # Create a simple Python file
         src_dir = tmp_path / "src"
         src_dir.mkdir()
-        (src_dir / "example.py").write_text(dedent("""\
+        (src_dir / "example.py").write_text(
+            dedent("""\
             '''Module docstring.'''
 
             class MyClass:
@@ -31,9 +32,12 @@ class TestDiscoverScan:
 
             def my_function():
                 pass
-        """))
+        """)
+        )
 
-        result = runner.invoke(app, ["discover", "scan", str(src_dir), "--output", "summary"])
+        result = runner.invoke(
+            app, ["discover", "scan", str(src_dir), "--output", "summary"]
+        )
 
         assert result.exit_code == 0
         assert "Scan Summary" in result.output
@@ -47,7 +51,9 @@ class TestDiscoverScan:
         src_dir.mkdir()
         (src_dir / "example.py").write_text("class Foo: pass")
 
-        result = runner.invoke(app, ["discover", "scan", str(src_dir), "--output", "json"])
+        result = runner.invoke(
+            app, ["discover", "scan", str(src_dir), "--output", "json"]
+        )
 
         assert result.exit_code == 0
         output = json.loads(result.output)
@@ -60,14 +66,18 @@ class TestDiscoverScan:
         empty_dir = tmp_path / "empty"
         empty_dir.mkdir()
 
-        result = runner.invoke(app, ["discover", "scan", str(empty_dir), "--output", "summary"])
+        result = runner.invoke(
+            app, ["discover", "scan", str(empty_dir), "--output", "summary"]
+        )
 
         assert result.exit_code == 0
         assert "Symbols found: 0" in result.output
 
     def test_scan_invalid_language(self, tmp_path: Path) -> None:
         """Should error on invalid language."""
-        result = runner.invoke(app, ["discover", "scan", str(tmp_path), "--language", "rust"])
+        result = runner.invoke(
+            app, ["discover", "scan", str(tmp_path), "--language", "rust"]
+        )
 
         assert result.exit_code == 7  # ValidationError
         assert "Unsupported language" in result.output
@@ -83,30 +93,41 @@ class TestDiscoverBuild:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "source_file": "work/discovery/components-draft.yaml",
-            "component_count": 1,
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-test-class",
-                    "type": "component",
-                    "content": "A test class for validation",
-                    "source_file": "src/test.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {
-                        "name": "TestClass",
-                        "kind": "class",
-                        "line": 10,
-                        "category": "model",
-                    },
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "source_file": "work/discovery/components-draft.yaml",
+                    "component_count": 1,
+                    "components": [
+                        {
+                            "id": "comp-test-class",
+                            "type": "component",
+                            "content": "A test class for validation",
+                            "source_file": "src/test.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {
+                                "name": "TestClass",
+                                "kind": "class",
+                                "line": 10,
+                                "category": "model",
+                            },
+                        },
+                    ],
+                }
+            )
+        )
 
         result = runner.invoke(
             app,
-            ["discover", "build", "--project-root", str(tmp_path), "--output", "summary"],
+            [
+                "discover",
+                "build",
+                "--project-root",
+                str(tmp_path),
+                "--output",
+                "summary",
+            ],
         )
 
         assert result.exit_code == 0
@@ -123,19 +144,23 @@ class TestDiscoverBuild:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-test",
-                    "type": "component",
-                    "content": "Test",
-                    "source_file": "src/test.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {},
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": "comp-test",
+                            "type": "component",
+                            "content": "Test",
+                            "source_file": "src/test.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {},
+                        },
+                    ],
+                }
+            )
+        )
 
         result = runner.invoke(
             app,
@@ -164,10 +189,14 @@ class TestDiscoverBuild:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [],
-        }))
+        validated_file.write_text(
+            json.dumps(
+                {
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [],
+                }
+            )
+        )
 
         result = runner.invoke(
             app,
@@ -187,19 +216,21 @@ class TestDiscoverBuild:
         discovery_dir = tmp_path / "work" / "discovery"
         discovery_dir.mkdir(parents=True)
 
-        component_data = json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
-                {
-                    "id": "comp-custom",
-                    "type": "component",
-                    "content": "Custom component",
-                    "source_file": "src/custom.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {"name": "Custom"},
-                },
-            ],
-        })
+        component_data = json.dumps(
+            {
+                "generated_at": "2026-02-04T12:10:00Z",
+                "components": [
+                    {
+                        "id": "comp-custom",
+                        "type": "component",
+                        "content": "Custom component",
+                        "source_file": "src/custom.py",
+                        "created": "2026-02-04T12:10:00Z",
+                        "metadata": {"name": "Custom"},
+                    },
+                ],
+            }
+        )
 
         # Create custom file and standard file
         custom_file = tmp_path / "custom-components.json"
@@ -212,9 +243,12 @@ class TestDiscoverBuild:
             [
                 "discover",
                 "build",
-                "--input", str(custom_file),
-                "--project-root", str(tmp_path),
-                "--output", "summary",
+                "--input",
+                str(custom_file),
+                "--project-root",
+                str(tmp_path),
+                "--output",
+                "summary",
             ],
         )
 
@@ -227,27 +261,39 @@ class TestDiscoverBuild:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-model",
-                    "type": "component",
-                    "content": "A model class",
-                    "source_file": "src/model.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {"name": "Model", "kind": "class", "category": "model"},
-                },
-                {
-                    "id": "comp-service",
-                    "type": "component",
-                    "content": "A service class",
-                    "source_file": "src/service.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {"name": "Service", "kind": "class", "category": "service"},
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": "comp-model",
+                            "type": "component",
+                            "content": "A model class",
+                            "source_file": "src/model.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {
+                                "name": "Model",
+                                "kind": "class",
+                                "category": "model",
+                            },
+                        },
+                        {
+                            "id": "comp-service",
+                            "type": "component",
+                            "content": "A service class",
+                            "source_file": "src/service.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {
+                                "name": "Service",
+                                "kind": "class",
+                                "category": "service",
+                            },
+                        },
+                    ],
+                }
+            )
+        )
 
         result = runner.invoke(
             app,
@@ -272,7 +318,9 @@ class TestDiscoverDrift:
 
         # No baseline = exit 0 with info message
         assert result.exit_code == 0
-        assert "No baseline" in result.output or "no components" in result.output.lower()
+        assert (
+            "No baseline" in result.output or "no components" in result.output.lower()
+        )
 
     def test_drift_no_warnings(self, tmp_path: Path) -> None:
         """Should exit 0 when no drift detected."""
@@ -281,33 +329,39 @@ class TestDiscoverDrift:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-symbol",
-                    "type": "component",
-                    "content": "A symbol class.",
-                    "source_file": "src/discovery/scanner.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {
-                        "name": "Symbol",
-                        "kind": "class",
-                        "line": 10,
-                    },
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": "comp-symbol",
+                            "type": "component",
+                            "content": "A symbol class.",
+                            "source_file": "src/discovery/scanner.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {
+                                "name": "Symbol",
+                                "kind": "class",
+                                "line": 10,
+                            },
+                        },
+                    ],
+                }
+            )
+        )
 
         # Create source file that follows convention
         src_dir = tmp_path / "src" / "discovery"
         src_dir.mkdir(parents=True)
-        (src_dir / "scanner.py").write_text(dedent("""\
+        (src_dir / "scanner.py").write_text(
+            dedent("""\
             '''Scanner module.'''
             class Symbol:
                 '''A symbol.'''
                 pass
-        """))
+        """)
+        )
 
         result = runner.invoke(
             app,
@@ -324,32 +378,38 @@ class TestDiscoverDrift:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-symbol",
-                    "type": "component",
-                    "content": "A model in discovery.",
-                    "source_file": "src/discovery/scanner.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {
-                        "name": "Symbol",
-                        "kind": "class",
-                    },
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": "comp-symbol",
+                            "type": "component",
+                            "content": "A model in discovery.",
+                            "source_file": "src/discovery/scanner.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {
+                                "name": "Symbol",
+                                "kind": "class",
+                            },
+                        },
+                    ],
+                }
+            )
+        )
 
         # Create file in WRONG location (src/cli/ instead of src/discovery/)
         wrong_dir = tmp_path / "src" / "cli"
         wrong_dir.mkdir(parents=True)
-        (wrong_dir / "wrong_place.py").write_text(dedent("""\
+        (wrong_dir / "wrong_place.py").write_text(
+            dedent("""\
             '''Wrong module.'''
             class WrongClass:
                 '''This class is in the wrong place.'''
                 pass
-        """))
+        """)
+        )
 
         result = runner.invoke(
             app,
@@ -366,19 +426,23 @@ class TestDiscoverDrift:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-1",
-                    "type": "component",
-                    "content": "Test component.",
-                    "source_file": "src/module/test.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {"name": "Test", "kind": "class"},
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": "comp-1",
+                            "type": "component",
+                            "content": "Test component.",
+                            "source_file": "src/module/test.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {"name": "Test", "kind": "class"},
+                        },
+                    ],
+                }
+            )
+        )
 
         # Create matching source
         src_dir = tmp_path / "src" / "module"
@@ -401,19 +465,23 @@ class TestDiscoverDrift:
         discovery_dir.mkdir(parents=True)
 
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": "comp-1",
-                    "type": "component",
-                    "content": "Test component.",
-                    "source_file": "src/module/test.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {"name": "Test", "kind": "class"},
-                },
-            ],
-        }))
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": "comp-1",
+                            "type": "component",
+                            "content": "Test component.",
+                            "source_file": "src/module/test.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {"name": "Test", "kind": "class"},
+                        },
+                    ],
+                }
+            )
+        )
 
         # Create matching source
         src_dir = tmp_path / "src" / "module"
@@ -422,7 +490,14 @@ class TestDiscoverDrift:
 
         result = runner.invoke(
             app,
-            ["discover", "drift", "--project-root", str(tmp_path), "--output", "summary"],
+            [
+                "discover",
+                "drift",
+                "--project-root",
+                str(tmp_path),
+                "--output",
+                "summary",
+            ],
         )
 
         assert result.exit_code == 0
@@ -435,20 +510,24 @@ class TestDiscoverDrift:
 
         # Create baseline with only 3 components (below threshold of 10)
         validated_file = discovery_dir / "components-validated.json"
-        validated_file.write_text(json.dumps({
-            "generated_at": "2026-02-04T12:10:00Z",
-            "components": [
+        validated_file.write_text(
+            json.dumps(
                 {
-                    "id": f"comp-{i}",
-                    "type": "component",
-                    "content": f"Component {i}",
-                    "source_file": f"src/module/comp{i}.py",
-                    "created": "2026-02-04T12:10:00Z",
-                    "metadata": {"name": f"Comp{i}", "kind": "class"},
+                    "generated_at": "2026-02-04T12:10:00Z",
+                    "components": [
+                        {
+                            "id": f"comp-{i}",
+                            "type": "component",
+                            "content": f"Component {i}",
+                            "source_file": f"src/module/comp{i}.py",
+                            "created": "2026-02-04T12:10:00Z",
+                            "metadata": {"name": f"Comp{i}", "kind": "class"},
+                        }
+                        for i in range(3)  # Only 3 components
+                    ],
                 }
-                for i in range(3)  # Only 3 components
-            ],
-        }))
+            )
+        )
 
         # Create matching source
         src_dir = tmp_path / "src" / "module"

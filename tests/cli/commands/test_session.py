@@ -28,9 +28,7 @@ class TestSessionStart:
         assert "No developer profile found" in result.output
         assert "--name" in result.output
 
-    def test_start_first_time_with_name_creates_profile(
-        self, tmp_path: Path
-    ) -> None:
+    def test_start_first_time_with_name_creates_profile(self, tmp_path: Path) -> None:
         """First-time user with --name creates profile and starts session."""
         rai_home = tmp_path / ".rai"
         rai_home.mkdir(parents=True)
@@ -40,13 +38,9 @@ class TestSessionStart:
                 "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=None,
             ),
-            patch(
-                "rai_cli.cli.commands.session.save_developer_profile"
-            ) as mock_save,
+            patch("rai_cli.cli.commands.session.save_developer_profile") as mock_save,
         ):
-            result = runner.invoke(
-                app, ["session", "start", "--name", "Alice"]
-            )
+            result = runner.invoke(app, ["session", "start", "--name", "Alice"])
 
         assert result.exit_code == 0
         assert "Welcome to RaiSE, Alice" in result.output
@@ -62,9 +56,7 @@ class TestSessionStart:
                 "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch(
-                "rai_cli.cli.commands.session.save_developer_profile"
-            ) as mock_save,
+            patch("rai_cli.cli.commands.session.save_developer_profile") as mock_save,
         ):
             result = runner.invoke(app, ["session", "start"])
 
@@ -83,9 +75,7 @@ class TestSessionStart:
                 "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch(
-                "rai_cli.cli.commands.session.save_developer_profile"
-            ) as mock_save,
+            patch("rai_cli.cli.commands.session.save_developer_profile") as mock_save,
         ):
             result = runner.invoke(
                 app, ["session", "start", "--project", str(project_path)]
@@ -254,9 +244,7 @@ class TestSessionClose:
                 "rai_cli.cli.commands.session.load_developer_profile",
                 return_value=profile,
             ),
-            patch(
-                "rai_cli.cli.commands.session.save_developer_profile"
-            ) as mock_save,
+            patch("rai_cli.cli.commands.session.save_developer_profile") as mock_save,
         ):
             result = runner.invoke(app, ["session", "close"])
 

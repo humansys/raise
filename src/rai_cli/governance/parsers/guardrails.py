@@ -58,7 +58,7 @@ def _strip_frontmatter(content: str) -> str:
     if end == -1:
         return content
 
-    return content[end + 3:]
+    return content[end + 3 :]
 
 
 def _extract_prefix(guardrail_id: str) -> str:
