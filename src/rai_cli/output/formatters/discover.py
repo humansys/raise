@@ -415,16 +415,13 @@ def _format_analyze_human(result: AnalysisResult) -> None:
         med = dist.get("medium", 0)
         low = dist.get("low", 0)
         _console.print(
-            f"  [green]High   (auto-validate):[/green] {high} "
-            f"({high * 100 // total}%)"
+            f"  [green]High   (auto-validate):[/green] {high} ({high * 100 // total}%)"
         )
         _console.print(
-            f"  [yellow]Medium (batch review):[/yellow]  {med} "
-            f"({med * 100 // total}%)"
+            f"  [yellow]Medium (batch review):[/yellow]  {med} ({med * 100 // total}%)"
         )
         _console.print(
-            f"  [red]Low    (needs review):[/red]  {low} "
-            f"({low * 100 // total}%)"
+            f"  [red]Low    (needs review):[/red]  {low} ({low * 100 // total}%)"
         )
     else:
         _console.print("  No components to analyze")

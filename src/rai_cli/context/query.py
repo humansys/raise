@@ -469,9 +469,7 @@ class UnifiedQueryEngine:
         )
         return [n for n in neighbors if n.type == "guardrail"]
 
-    def get_architectural_context(
-        self, module_id: str
-    ) -> ArchitecturalContext | None:
+    def get_architectural_context(self, module_id: str) -> ArchitecturalContext | None:
         """Get full architectural context for a module.
 
         Combines domain, layer, constraints, and dependencies into a

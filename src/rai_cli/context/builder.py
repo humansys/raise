@@ -462,9 +462,7 @@ class UnifiedGraphBuilder:
         # Find end of values section (next ## heading or EOF)
         next_section = re.search(r"^## ", text[values_match.end() :], re.MULTILINE)
         values_end = (
-            values_match.end() + next_section.start()
-            if next_section
-            else len(text)
+            values_match.end() + next_section.start() if next_section else len(text)
         )
         values_text = text[values_match.end() : values_end]
 
@@ -529,13 +527,9 @@ class UnifiedGraphBuilder:
             return nodes
 
         # Find end of boundaries section (next ## heading or EOF)
-        next_section = re.search(
-            r"^## ", text[boundaries_match.end() :], re.MULTILINE
-        )
+        next_section = re.search(r"^## ", text[boundaries_match.end() :], re.MULTILINE)
         boundaries_end = (
-            boundaries_match.end() + next_section.start()
-            if next_section
-            else len(text)
+            boundaries_match.end() + next_section.start() if next_section else len(text)
         )
         boundaries_text = text[boundaries_match.end() : boundaries_end]
 
@@ -570,9 +564,7 @@ class UnifiedGraphBuilder:
         if wont_match:
             start = wont_match.end()
             # Find next ### or end
-            next_heading = re.search(
-                r"^### ", boundaries_text[start:], re.MULTILINE
-            )
+            next_heading = re.search(r"^### ", boundaries_text[start:], re.MULTILINE)
             end = start + next_heading.start() if next_heading else len(boundaries_text)
             wont_text = boundaries_text[start:end]
 
@@ -1062,9 +1054,7 @@ class UnifiedGraphBuilder:
             List of constrained_by edges.
         """
         edges: list[ConceptEdge] = []
-        bc_ids = [
-            n.id for n in node_by_id.values() if n.type == "bounded_context"
-        ]
+        bc_ids = [n.id for n in node_by_id.values() if n.type == "bounded_context"]
 
         for node in all_nodes:
             if node.type != "guardrail":

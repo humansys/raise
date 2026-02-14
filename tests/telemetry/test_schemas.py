@@ -52,7 +52,10 @@ class TestSkillEvent:
     def test_create_complete_event_with_duration(self, now: datetime) -> None:
         """Create a skill complete event with duration."""
         event = SkillEvent(
-            timestamp=now, skill="rai-story-implement", event="complete", duration_sec=1800
+            timestamp=now,
+            skill="rai-story-implement",
+            event="complete",
+            duration_sec=1800,
         )
 
         assert event.event == "complete"

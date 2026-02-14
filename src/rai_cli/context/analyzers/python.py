@@ -226,7 +226,7 @@ class _ImportVisitor(ast.NodeVisitor):
         self.imports: set[str] = set()
         self._in_type_checking = False
 
-    def visit_If(self, node: ast.If) -> None:
+    def visit_If(self, node: ast.If) -> None:  # noqa: N802
         """Skip imports inside TYPE_CHECKING blocks."""
         if self._is_type_checking(node.test):
             # Don't visit the body — skip TYPE_CHECKING imports
@@ -235,7 +235,7 @@ class _ImportVisitor(ast.NodeVisitor):
         else:
             self.generic_visit(node)
 
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:  # noqa: N802
         """Extract module name from 'from X import Y' statements."""
         if self._in_type_checking:
             return
@@ -250,12 +250,12 @@ class _ImportVisitor(ast.NodeVisitor):
             # Relative import without module: from .. import sibling
             for alias in node.names:
                 if node.level >= 2:
-                        # from ..sibling means the name IS the sibling module
-                        imported = alias.name
-                        if imported != self.module_name:
-                            self.imports.add(imported)
+                    # from ..sibling means the name IS the sibling module
+                    imported = alias.name
+                    if imported != self.module_name:
+                        self.imports.add(imported)
 
-    def visit_Import(self, node: ast.Import) -> None:
+    def visit_Import(self, node: ast.Import) -> None:  # noqa: N802
         """Extract module name from 'import X' statements."""
         if self._in_type_checking:
             return
@@ -286,6 +286,6 @@ class _ImportVisitor(ast.NodeVisitor):
 
     def _is_type_checking(self, test: ast.expr) -> bool:
         """Check if an if-test is TYPE_CHECKING."""
-        return (
-            isinstance(test, ast.Name) and test.id == "TYPE_CHECKING"
-        ) or (isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING")
+        return (isinstance(test, ast.Name) and test.id == "TYPE_CHECKING") or (
+            isinstance(test, ast.Attribute) and test.attr == "TYPE_CHECKING"
+        )

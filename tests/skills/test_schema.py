@@ -118,9 +118,7 @@ class TestSkillFrontmatter:
             hooks={
                 "Stop": [
                     SkillHook(
-                        hooks=[
-                            SkillHookCommand(type="command", command="echo done")
-                        ]
+                        hooks=[SkillHookCommand(type="command", command="echo done")]
                     )
                 ]
             },

@@ -565,9 +565,7 @@ class TestInitBootstrap:
             )
 
         assert result.exit_code == 0
-        canonical = (
-            greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
-        )
+        canonical = greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
         assert canonical.exists()
         content = canonical.read_text()
         assert "# Rai Memory" in content

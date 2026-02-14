@@ -97,9 +97,7 @@ class TestExtractProject:
 
     def test_extract_project_id(self, tmp_backlog_file: Path) -> None:
         """Should extract project with correct ID."""
-        project = extract_project(
-            tmp_backlog_file, tmp_backlog_file.parent.parent
-        )
+        project = extract_project(tmp_backlog_file, tmp_backlog_file.parent.parent)
 
         assert project is not None
         assert project.id == "project-test-project"

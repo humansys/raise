@@ -23,7 +23,8 @@ def skill_dir(tmp_path: Path) -> Path:
     # Create rai-session-start skill
     session_start = skills / "rai-session-start"
     session_start.mkdir()
-    (session_start / "SKILL.md").write_text(dedent("""\
+    (session_start / "SKILL.md").write_text(
+        dedent("""\
         ---
         name: rai-session-start
         description: Begin a session
@@ -32,12 +33,14 @@ def skill_dir(tmp_path: Path) -> Path:
           raise.version: "3.0.0"
         ---
         # Session Start
-    """))
+    """)
+    )
 
     # Create rai-story-plan skill
     feature_plan = skills / "rai-story-plan"
     feature_plan.mkdir()
-    (feature_plan / "SKILL.md").write_text(dedent("""\
+    (feature_plan / "SKILL.md").write_text(
+        dedent("""\
         ---
         name: rai-story-plan
         description: Plan a feature
@@ -46,12 +49,14 @@ def skill_dir(tmp_path: Path) -> Path:
           raise.version: "1.0.0"
         ---
         # Story Plan
-    """))
+    """)
+    )
 
     # Create rai-debug skill (utility)
     debug = skills / "rai-debug"
     debug.mkdir()
-    (debug / "SKILL.md").write_text(dedent("""\
+    (debug / "SKILL.md").write_text(
+        dedent("""\
         ---
         name: rai-debug
         description: Debug issues
@@ -60,7 +65,8 @@ def skill_dir(tmp_path: Path) -> Path:
           raise.version: "1.0.0"
         ---
         # Debug
-    """))
+    """)
+    )
 
     return tmp_path
 

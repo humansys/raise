@@ -52,7 +52,9 @@ class TestExtractPrinciples:
 
     def test_extract_from_valid_constitution(self, tmp_constitution_file: Path) -> None:
         """Should extract all principles from valid Constitution file."""
-        principles = extract_principles(tmp_constitution_file, tmp_constitution_file.parent.parent.parent)
+        principles = extract_principles(
+            tmp_constitution_file, tmp_constitution_file.parent.parent.parent
+        )
 
         assert len(principles) == 3
         assert all(p.type == ConceptType.PRINCIPLE for p in principles)
@@ -70,7 +72,9 @@ class TestExtractPrinciples:
         """Should extract principle number and name to metadata."""
         principles = extract_principles(tmp_constitution_file)
 
-        principle = next(p for p in principles if p.id == "principle-governance-as-code")
+        principle = next(
+            p for p in principles if p.id == "principle-governance-as-code"
+        )
         assert principle.metadata["principle_number"] == "2"
         assert principle.metadata["principle_name"] == "Governance as Code"
 
@@ -78,14 +82,18 @@ class TestExtractPrinciples:
         """Should extract correct section headers."""
         principles = extract_principles(tmp_constitution_file)
 
-        principle = next(p for p in principles if p.id == "principle-governance-as-code")
+        principle = next(
+            p for p in principles if p.id == "principle-governance-as-code"
+        )
         assert principle.section == "§2. Governance as Code"
 
     def test_principle_content(self, tmp_constitution_file: Path) -> None:
         """Should extract section content."""
         principles = extract_principles(tmp_constitution_file)
 
-        principle = next(p for p in principles if p.id == "principle-governance-as-code")
+        principle = next(
+            p for p in principles if p.id == "principle-governance-as-code"
+        )
         assert "versioned in Git" in principle.content
         assert "repository" in principle.content
 
@@ -189,7 +197,9 @@ class TestExtractPrinciples:
         for p in principles:
             num = p.metadata["principle_number"]
             if num in always_on_nums:
-                assert p.metadata.get("always_on") is True, f"§{num} should be always_on"
+                assert p.metadata.get("always_on") is True, (
+                    f"§{num} should be always_on"
+                )
             else:
                 assert "always_on" not in p.metadata, f"§{num} should NOT be always_on"
 

@@ -323,45 +323,35 @@ class TestModuleLevelFunctions:
 class TestQuietMode:
     """Tests for quiet mode (verbosity=-1)."""
 
-    def test_print_message_suppressed(
-        self, capsys: pytest.CaptureFixture[str]
-    ) -> None:
+    def test_print_message_suppressed(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test print_message suppressed in quiet mode."""
         console = OutputConsole(verbosity=-1)
         console.print_message("Should not appear")
         captured = capsys.readouterr()
         assert captured.out == ""
 
-    def test_print_success_suppressed(
-        self, capsys: pytest.CaptureFixture[str]
-    ) -> None:
+    def test_print_success_suppressed(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test print_success suppressed in quiet mode."""
         console = OutputConsole(verbosity=-1)
         console.print_success("Should not appear")
         captured = capsys.readouterr()
         assert captured.out == ""
 
-    def test_print_warning_suppressed(
-        self, capsys: pytest.CaptureFixture[str]
-    ) -> None:
+    def test_print_warning_suppressed(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test print_warning suppressed in quiet mode."""
         console = OutputConsole(verbosity=-1)
         console.print_warning("Should not appear")
         captured = capsys.readouterr()
         assert captured.out == ""
 
-    def test_print_data_suppressed(
-        self, capsys: pytest.CaptureFixture[str]
-    ) -> None:
+    def test_print_data_suppressed(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test print_data suppressed in quiet mode."""
         console = OutputConsole(verbosity=-1)
         console.print_data({"key": "value"})
         captured = capsys.readouterr()
         assert captured.out == ""
 
-    def test_print_list_suppressed(
-        self, capsys: pytest.CaptureFixture[str]
-    ) -> None:
+    def test_print_list_suppressed(self, capsys: pytest.CaptureFixture[str]) -> None:
         """Test print_list suppressed in quiet mode."""
         console = OutputConsole(verbosity=-1)
         console.print_list([{"id": "test"}])
