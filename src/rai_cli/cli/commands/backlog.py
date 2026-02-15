@@ -5,11 +5,15 @@ and integrating with external providers (JIRA, GitLab, etc.).
 
 Example:
     $ rai backlog auth --provider jira    # Authenticate with JIRA
+    $ rai backlog pull --source jira --epic DEMO-1  # Pull epic from JIRA
+    $ rai backlog push --source jira --epic E-DEMO  # Push stories to JIRA
+    $ rai backlog status --epic E-DEMO    # Check authorization status
 """
 
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import typer
 from rich.console import Console
@@ -21,6 +25,53 @@ backlog_app = typer.Typer(
 )
 
 console = Console()
+
+
+def _get_sync_dir(project: str) -> Path:
+    """Get sync directory path for project."""
+    return Path(project).resolve() / ".raise" / "rai" / "sync"
+
+
+def _init_jira_client() -> tuple[object, str]:
+    """Initialize JIRA client from stored credentials.
+
+    Returns:
+        Tuple of (JiraClient, cloud_id)
+
+    Raises:
+        typer.Exit: If credentials not found or expired
+    """
+    try:
+        from rai_cli.config.paths import get_credentials_path
+        from rai_providers.auth.credentials import load_token
+        from rai_providers.jira.client import JiraClient
+    except ImportError as e:
+        console.print(f"[red]Error:[/red] Failed to load provider modules: {e}")
+        raise typer.Exit(code=1) from e
+
+    credentials_path = get_credentials_path()
+    token = load_token("jira", credentials_path)
+
+    if not token:
+        console.print(
+            "[red]Error:[/red] No JIRA credentials found.\n"
+            "Run: rai backlog auth --provider jira"
+        )
+        raise typer.Exit(code=1)
+
+    cloud_id = os.getenv("JIRA_CLOUD_ID", "")
+    if not cloud_id:
+        console.print(
+            "[red]Error:[/red] JIRA_CLOUD_ID environment variable not set.\n"
+            "Get it from: https://api.atlassian.com/oauth/token/accessible-resources"
+        )
+        raise typer.Exit(code=1)
+
+    client = JiraClient(
+        cloud_id=cloud_id,
+        access_token=token["access_token"],
+    )
+    return client, cloud_id
 
 
 @backlog_app.command()
@@ -129,3 +180,276 @@ def auth(
                 style="red",
             )
             raise typer.Exit(code=1) from e
+
+
+@backlog_app.command()
+def pull(
+    source: str = typer.Option(
+        ..., "--source", "-s", help="Provider to pull from (jira)"
+    ),
+    epic: str = typer.Option(
+        ..., "--epic", "-e", help="JIRA epic key (e.g., DEMO-1)"
+    ),
+    epic_id: str = typer.Option(
+        "", "--epic-id", help="Local epic ID to assign (default: auto-generate)"
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Preview without executing"
+    ),
+    project: str = typer.Option(
+        ".", "--project", "-p", help="Project root path"
+    ),
+) -> None:
+    """Pull epic and stories from JIRA to local sync state.
+
+    Reads epic and its stories from JIRA, maps them to local IDs,
+    and stores sync state in .raise/rai/sync/state.json.
+
+    Examples:
+        $ rai backlog pull --source jira --epic DEMO-1
+        $ rai backlog pull --source jira --epic DEMO-1 --epic-id E-DEMO --dry-run
+    """
+    if source.lower() != "jira":
+        console.print(f"[red]Error:[/red] Source '{source}' not supported. Use 'jira'.")
+        raise typer.Exit(code=1)
+
+    from rai_providers.jira.sync import pull_epic as _pull_epic
+    from rai_providers.jira.sync_state import SyncState, load_state, save_state
+
+    client, cloud_id = _init_jira_client()
+    sync_dir = _get_sync_dir(project)
+
+    # Load or create state
+    state = load_state(sync_dir)
+    project_key = epic.split("-")[0]
+    if state is None:
+        state = SyncState(cloud_id=cloud_id, project_key=project_key)
+
+    # Auto-generate epic_id if not provided
+    local_epic_id = epic_id or f"E-{project_key}"
+
+    try:
+        result = _pull_epic(
+            client=client,  # type: ignore[arg-type]
+            epic_key=epic,
+            epic_id=local_epic_id,
+            state=state,
+            dry_run=dry_run,
+        )
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(code=1) from e
+
+    # Display results
+    prefix = "[yellow][DRY RUN][/yellow] " if dry_run else ""
+    action = "Would import" if dry_run else "Imported"
+
+    console.print(f"\n{prefix}[bold]Pulling from JIRA...[/bold]\n")
+    status_label = "new" if result.epic_imported else "updated"
+    console.print(
+        f"Epic: {result.epic_key} \"{result.epic_summary}\" "
+        f"[{result.epic_status}] → {local_epic_id} ({status_label})"
+    )
+
+    if result.story_details:
+        console.print("\nStories:")
+        for detail in result.story_details:
+            s_action = detail.get("action", "imported")
+            s_icon = "✓" if s_action == "imported" else "↻"
+            console.print(
+                f"  {s_icon} {detail.get('jira_key', '?')}: "
+                f"\"{detail.get('summary', '')}\" "
+                f"[{detail.get('status', '?')}] → {detail.get('local_id', '?')}"
+            )
+
+    console.print(
+        f"\nSummary: {result.stories_imported} imported, "
+        f"{result.stories_updated} updated."
+    )
+
+    if not dry_run:
+        save_state(state, sync_dir)
+        console.print(f"State saved to {sync_dir / 'state.json'}", style="dim")
+
+
+@backlog_app.command()
+def push(
+    source: str = typer.Option(
+        ..., "--source", "-s", help="Provider to push to (jira)"
+    ),
+    epic: str = typer.Option(
+        ..., "--epic", "-e", help="Local epic ID (e.g., E-DEMO)"
+    ),
+    stories_input: str = typer.Option(
+        "", "--stories", help="Comma-separated story definitions: id:title,id:title"
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Preview without executing"
+    ),
+    project: str = typer.Option(
+        ".", "--project", "-p", help="Project root path"
+    ),
+) -> None:
+    """Push local stories to JIRA under mapped epic.
+
+    Creates JIRA stories linked to the parent epic. Idempotent — re-running
+    won't create duplicates. Requires prior pull to map the epic.
+
+    Examples:
+        $ rai backlog push --source jira --epic E-DEMO \\
+            --stories "S-DEMO.1:Define governance,S-DEMO.2:Create checklist"
+        $ rai backlog push --source jira --epic E-DEMO --dry-run
+    """
+    if source.lower() != "jira":
+        console.print(f"[red]Error:[/red] Source '{source}' not supported. Use 'jira'.")
+        raise typer.Exit(code=1)
+
+    from rai_providers.jira.sync import LocalStory, push_stories as _push_stories
+    from rai_providers.jira.sync_state import load_state, save_state
+
+    client, _cloud_id = _init_jira_client()
+    sync_dir = _get_sync_dir(project)
+
+    state = load_state(sync_dir)
+    if state is None:
+        console.print(
+            "[red]Error:[/red] No sync state found. Run pull first:\n"
+            "  rai backlog pull --source jira --epic <JIRA_KEY>"
+        )
+        raise typer.Exit(code=1)
+
+    # Parse stories from input
+    local_stories: list[LocalStory] = []
+    if stories_input:
+        for part in stories_input.split(","):
+            parts = part.strip().split(":", 1)
+            if len(parts) == 2:
+                local_stories.append(
+                    LocalStory(story_id=parts[0].strip(), title=parts[1].strip())
+                )
+
+    if not local_stories:
+        console.print(
+            "[red]Error:[/red] No stories provided.\n"
+            "Use --stories 'S-DEMO.1:Title One,S-DEMO.2:Title Two'"
+        )
+        raise typer.Exit(code=1)
+
+    try:
+        result = _push_stories(
+            client=client,  # type: ignore[arg-type]
+            epic_id=epic,
+            stories=local_stories,
+            state=state,
+            dry_run=dry_run,
+        )
+    except ValueError as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(code=1) from e
+    except Exception as e:
+        console.print(f"[red]Error:[/red] {e}")
+        raise typer.Exit(code=1) from e
+
+    # Display results
+    prefix = "[yellow][DRY RUN][/yellow] " if dry_run else ""
+    console.print(f"\n{prefix}[bold]Pushing stories to JIRA...[/bold]\n")
+    console.print(f"Epic: {epic} → {result.jira_epic_key}\n")
+
+    if result.created_details:
+        label = "Would create" if dry_run else "Created"
+        console.print(f"{label}:")
+        for detail in result.created_details:
+            jira_key = detail.get("jira_key", "pending")
+            console.print(
+                f"  ✓ {detail['story_id']}: \"{detail['title']}\" → {jira_key}"
+            )
+
+    if result.skipped_details:
+        console.print("\nSkipped (already synced):")
+        for sid in result.skipped_details:
+            jira_key = state.stories.get(sid, None)
+            key_str = jira_key.jira_key if jira_key else "?"
+            console.print(f"  - {sid} ({key_str})")
+
+    console.print(
+        f"\nSummary: {result.created} created, {result.skipped} skipped."
+    )
+
+    if not dry_run:
+        save_state(state, sync_dir)
+        console.print(f"State saved to {sync_dir / 'state.json'}", style="dim")
+
+
+@backlog_app.command()
+def status(
+    epic: str = typer.Option(
+        ..., "--epic", "-e", help="Local epic ID (e.g., E-DEMO)"
+    ),
+    project: str = typer.Option(
+        ".", "--project", "-p", help="Project root path"
+    ),
+) -> None:
+    """Show sync and authorization status for epic stories.
+
+    Reads local sync state (no JIRA API calls). Shows which stories
+    are authorized to work on based on their JIRA status.
+
+    Examples:
+        $ rai backlog status --epic E-DEMO
+    """
+    from rai_providers.jira.sync import check_authorization
+    from rai_providers.jira.sync_state import load_state
+
+    sync_dir = _get_sync_dir(project)
+    state = load_state(sync_dir)
+
+    if state is None:
+        console.print(
+            "[red]Error:[/red] No sync state found. Run pull first:\n"
+            "  rai backlog pull --source jira --epic <JIRA_KEY>"
+        )
+        raise typer.Exit(code=1)
+
+    # Check epic exists
+    if epic not in state.epics:
+        console.print(f"[red]Error:[/red] Epic {epic} not found in sync state.")
+        raise typer.Exit(code=1)
+
+    epic_mapping = state.epics[epic]
+    console.print(
+        f"\n[bold]Authorization status for {epic}[/bold] "
+        f"(JIRA: {epic_mapping.jira_key})\n"
+    )
+
+    # Check each story
+    epic_prefix = epic.removeprefix("E-")
+    story_ids = sorted(
+        [sid for sid in state.stories if sid.startswith(f"S-{epic_prefix}.")]
+    )
+
+    if not story_ids:
+        console.print("  No stories synced for this epic.")
+        return
+
+    for story_id in story_ids:
+        result = check_authorization(state, story_id)
+        if result.authorized:
+            console.print(
+                f"  [green]✓[/green] {story_id}: {result.jira_status} "
+                f"({result.jira_key}) — Ready to work"
+            )
+        else:
+            console.print(
+                f"  [red]✗[/red] {story_id}: {result.jira_status} "
+                f"({result.jira_key}) — Awaiting authorization"
+            )
+
+    if state.last_sync_at:
+        console.print(
+            f"\nLast sync: {state.last_sync_at.strftime('%Y-%m-%d %H:%M UTC')}",
+            style="dim",
+        )
+    console.print(
+        "Run 'rai backlog pull --source jira --epic <KEY>' to refresh.",
+        style="dim",
+    )
