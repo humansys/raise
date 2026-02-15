@@ -253,12 +253,13 @@ class JiraClient(BacklogProvider):
             # Create story via API
             response = self._jira.create_issue(fields=fields)  # type: ignore[no-untyped-call]
 
-            # Return created story
+            # create_issue returns minimal response (just key and id)
+            # Default status for new issues is typically "To Do" or project default
             return JiraStory(
                 key=response["key"],  # type: ignore[index,call-overload]
                 summary=story.summary,
                 description=story.description,
-                status=response["fields"]["status"]["name"],  # type: ignore[index]
+                status="To Do",  # Default status for new stories
                 labels=story.labels,
                 epic_key=epic_key,
             )
