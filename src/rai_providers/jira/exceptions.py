@@ -17,6 +17,28 @@ class JiraError(Exception):
         super().__init__(self.message)
 
 
+class JiraApiError(JiraError):
+    """JIRA API error with HTTP status code.
+
+    Raised when JIRA REST API returns an error response.
+    Includes status code for specific error handling.
+
+    Attributes:
+        status_code: HTTP status code (e.g., 404, 403, 500)
+        message: Human-readable error description
+    """
+
+    def __init__(self, status_code: int, message: str) -> None:
+        """Initialize with status code and message.
+
+        Args:
+            status_code: HTTP status code
+            message: Human-readable error description
+        """
+        self.status_code = status_code
+        super().__init__(message)
+
+
 class JiraAuthError(JiraError):
     """Authentication or authorization failed.
 
