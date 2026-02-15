@@ -1,7 +1,7 @@
 # Backlog: raise-cli
 
 > **Status**: Active
-> **Date**: 2026-02-09
+> **Date**: 2026-02-15
 > **Version**: 2.0.0
 > **Related**: PRD v1.1.0, Vision v1.0.0, Design v1.1.0
 
@@ -20,7 +20,7 @@
 | E7 | **Onboarding** | ✅ Complete | `work/epics/e7-onboarding/scope.md` | — |
 | E8 | **Work Tracking Graph** | ✅ Complete | `dev/epic-e8-scope.md` | — |
 | E9 | **Telemetry & Self-Awareness** | ✅ Phase 1 Complete | `dev/epic-e9-scope.md` | — |
-| E10 | **Collective Intelligence** | 📋 Explored | `dev/epic-e10-scope.md` | P2 (V3) |
+| [RAISE-143](https://humansys.atlassian.net/browse/RAISE-143) | **Collective Intelligence** (was E10) | 📋 Backlog | `dev/epic-e10-scope.md` | P2 (V3) |
 | E11 | **Unified Context Architecture** | ✅ Complete | `dev/epic-e11-scope.md` | — |
 | E12 | **Complete Knowledge Graph** | ✅ Complete | `dev/epic-e12-scope.md` | — |
 | E13 | **Discovery** | ✅ Complete | `dev/epic-e13-scope.md` | — |
@@ -29,13 +29,17 @@
 | E16 | **Incremental Coherence** | ✅ Complete | `work/epics/e16-incremental-coherence/scope.md` | — |
 | E17 | **Multi-Language Discovery** | ✅ Complete | `work/epics/e17-multi-language-discovery/scope.md` | — |
 | E18 | **Pre-Launch Repo Readiness** | ✅ Complete | `work/epics/e18-prelaunch-repo/scope.md` | — |
-| E19 | **V3 Product Design** | Planning | — | P1 (V3) |
-| E20 | **Shared Memory Architecture** | Planning | — | P1 (V3) |
-| E21 | **Platform Integration** | Planning | — | P1 (V3) |
-| E22 | **Enterprise Readiness** | Planning | — | P2 (V3) |
 | **E-DEMO** | **JIRA Sync Enabler** | 🚀 In Progress | `demo/atlassian-webinar/scope.md` | P0 (Demo) |
+| [RAISE-127](https://humansys.atlassian.net/browse/RAISE-127) | **Multi-Agent Support** | 📋 Backlog | — | P0 (v2.1) |
+| [RAISE-128](https://humansys.atlassian.net/browse/RAISE-128) | **IDE Integration** | 📋 Backlog | — | P1 (v2.1) |
+| [RAISE-135](https://humansys.atlassian.net/browse/RAISE-135) | **Hierarchical Memory Architecture** (was E20) | 📋 Backlog | — | P1 (v2.1+) |
+| [RAISE-140](https://humansys.atlassian.net/browse/RAISE-140) | **V3 Product Design** (was E19) | 📋 Backlog | — | P1 (V3) |
+| [RAISE-141](https://humansys.atlassian.net/browse/RAISE-141) | **Platform Integration — Backlog Backends** (was E21) | 📋 Backlog | — | P1 (V3) |
+| [RAISE-142](https://humansys.atlassian.net/browse/RAISE-142) | **Enterprise Readiness** (was E22) | 📋 Backlog | — | P2 (V3) |
+| [RAISE-143](https://humansys.atlassian.net/browse/RAISE-143) | **Collective Intelligence** (was E10) | 📋 Backlog | `dev/epic-e10-scope.md` | P2 (V3) |
+| [RAISE-144](https://humansys.atlassian.net/browse/RAISE-144) | **Engineering Health** | 📋 Permanent | — | Rolling |
 
-**Summary:** 17 of 22 epics complete. E19-E22 are V3 scope. E-DEMO is enabler epic (demo branch, non-merging).
+**Summary:** 17 of 18 internal epics complete. E-DEMO in progress. 8 JIRA-tracked epics in backlog (v2.1/V3 + Engineering Health).
 
 ---
 
@@ -118,6 +122,8 @@ Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (3)
 
 | ID | Title | Description | Status | Priority | Found In | Target |
 |----|-------|-------------|--------|----------|----------|--------|
+| [RAISE-134](https://humansys.atlassian.net/browse/RAISE-134) | Context leak: session data cross-project | CLI resolves project from CWD; `session close` from wrong directory writes to wrong `.raise/`. Poka-yoke needed. | 🔴 Selected for Dev | P1 | v2.0.0a1 | v2.1 |
+| [RAISE-136](https://humansys.atlassian.net/browse/RAISE-136) | Graph schema crash on unknown NodeType | `NodeType` Literal rejects unknown types at deserialization. Need graceful degradation (skip + warn). | 🔴 Selected for Dev | P1 | v2.0.0a1 | v2.0.0a6 |
 | **HF-3** | Type annotations incomplete in governance models | `governance/models.py:131` - ExtractionResult.concepts field has partial type `list[Unknown]`. Causes pyright errors in strict mode. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
 | **HF-4** | Type annotations incomplete in profile schema | `onboarding/profile.py:168,216` - CoachingState.corrections and deadlines fields have partial types `list[Unknown]`. Pyright strict mode failures. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
 | **HF-5** | Extend governance extractor to parse SOPs | Governance extractor currently parses principles, requirements, terms, glossary, ADRs, but not SOPs. Need to add SOP parsing support for `governance/sops/*.md` files. | 🔴 Open | P3 | v2.0.0a8 | v2.0.0a10 |
@@ -128,14 +134,26 @@ Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (3)
 
 ---
 
-## 5. Next Candidates
+## 5. Next: RAISE-127 Urgent Subset (Bugfix Grande)
+
+> **Goal:** Devs and F&F can use multiple IDEs/agents without session corruption.
+> **Scope:** 3 stories from RAISE-127, branches directly from v2. Fixes RAISE-134.
+
+| # | JIRA | Story | Size | Depends On |
+|---|------|-------|------|------------|
+| 1 | [RAISE-137](https://humansys.atlassian.net/browse/RAISE-137) | Agent Identity — detect IDE/runtime, assign agent ID | S | — |
+| 2 | [RAISE-138](https://humansys.atlassian.net/browse/RAISE-138) | Namespaced Session State — per-agent isolated directories | M | RAISE-137 |
+| 3 | [RAISE-139](https://humansys.atlassian.net/browse/RAISE-139) | Project-scoped session writes — poka-yoke CWD (fixes RAISE-134) | S | RAISE-138 |
+
+### Other Candidates
 
 | Candidate | What | Priority | Effort |
 |-----------|------|----------|--------|
+| **RAISE-136: CM-1 Graceful Degradation** | Skip unknown node types with warning instead of crash | P1 (immediate) | XS (1 story) |
 | **E9 Phase 2** | Local insights from telemetry — signal analysis, insight generation, calibration updates | Post-F&F | M (3-4 stories) |
-| **E10 Collective Intelligence** | Pattern sharing, aggregate telemetry, team memory | V3 | L |
+| **RAISE-143: Collective Intelligence** | Pattern sharing, aggregate telemetry, team memory | V3 | L |
 | **Governance frontmatter standardization** | Migrate 5 remaining docs to YAML frontmatter (PAT-184) | Post-F&F | S (1 epic) |
-| **"Unified" rename** | Remove vestigial prefix from graph classes | Post-F&F | S (1 story) |
+| [RAISE-145](https://humansys.atlassian.net/browse/RAISE-145): "Unified" rename | Remove vestigial prefix from graph classes (under RAISE-144) | Post-F&F | S (1 story) |
 
 See `dev/parking-lot.md` for full idea backlog.
 
@@ -219,16 +237,22 @@ Decision deferred until post-demo customer validation.
 
 ---
 
-### Related V3 Epics (Potentially Commercial)
+### Related Epics (JIRA-tracked)
 
-| Epic | Description | Tier |
+| JIRA | Description | Tier |
 |------|-------------|------|
-| E19 | V3 Product Design | TBD |
-| E20 | Shared Memory Architecture | TBD |
-| E21 | Platform Integration (JIRA/GitLab/Odoo) | Commercial |
-| E22 | Enterprise Readiness | Commercial |
+| [RAISE-127](https://humansys.atlassian.net/browse/RAISE-127) | Multi-Agent Support — concurrent Rai instances | Core (v2.1) |
+| [RAISE-128](https://humansys.atlassian.net/browse/RAISE-128) | IDE Integration — Cursor, Antigravity, VSCode/Kilo | Core (v2.1) |
+| [RAISE-135](https://humansys.atlassian.net/browse/RAISE-135) | Hierarchical Memory — instance → repo → team → org | Pro/Enterprise |
+| [RAISE-140](https://humansys.atlassian.net/browse/RAISE-140) | V3 Product Design — commercial architecture | V3 |
+| [RAISE-141](https://humansys.atlassian.net/browse/RAISE-141) | Platform Integration — backlog backends (JIRA/GitLab/Odoo) | Commercial |
+| [RAISE-142](https://humansys.atlassian.net/browse/RAISE-142) | Enterprise Readiness — org governance, compliance | Enterprise |
 
-E21 absorbs demo branch learnings if raise-pro is built.
+| [RAISE-143](https://humansys.atlassian.net/browse/RAISE-143) | Collective Intelligence — pattern sharing, team memory | V3 |
+| [RAISE-144](https://humansys.atlassian.net/browse/RAISE-144) | Engineering Health — rolling tech debt epic | Permanent |
+
+**Dependency chain:** RAISE-127 → RAISE-128, RAISE-135 → RAISE-142/143.
+E-DEMO learnings feed into RAISE-141 (backlog backends).
 
 ---
 
@@ -244,6 +268,7 @@ E21 absorbs demo branch learnings if raise-pro is built.
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 2.3.0 | 2026-02-15 | Rai | Full JIRA sync: E10/E19-E22 → RAISE-140-143, Engineering Health epic (RAISE-144), RAISE-134/136 bugs, RAISE-137-139 urgent stories, Fix Version strategy |
 | 2.2.0 | 2026-02-14 | Rai | Added Demo & Commercial Strategy section (§7), documented demo/atlassian-webinar branch |
 | 2.1.0 | 2026-02-14 | Rai | Added Hotfixes section (§4) for quality gate tracking, renumbered subsequent sections |
 | 2.0.0 | 2026-02-09 | Rai | Full refresh: E5→E13, E6→E9, E7 complete, E12-E16 added, stale sections removed |
@@ -255,4 +280,4 @@ E21 absorbs demo branch learnings if raise-pro is built.
 ---
 
 *Updated by: Rai + Emilio*
-*Last sync: 2026-02-14*
+*Last sync: 2026-02-15*
