@@ -14,6 +14,9 @@ CLAUDE.local.md
 # RaiSE personal directory (per-developer, not shared)
 .raise/rai/personal/
 
+# RaiSE sync state (per-instance JIRA mappings, not shared)
+.raise/rai/sync/
+
 # Temporary files
 *.tmp
 *.bak-*

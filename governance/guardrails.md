@@ -61,6 +61,7 @@ Derived from Solution Vision:
 | `MUST-TEST-001` | MUST | >90% test coverage | `pytest --cov` ≥ 90% | Solution Vision §Quality |
 | `MUST-TEST-002` | MUST | All tests pass | `pytest` exits 0 | Best practices |
 | `SHOULD-TEST-001` | SHOULD | Property-based tests for parsers/validators | hypothesis tests exist for Pydantic models | Best practices |
+| `SHOULD-TEST-003` | SHOULD | Integration tests for external services | Mark with `@pytest.mark.integration`, skip by default, document prerequisites (env vars), include cleanup | Best practices |
 
 ### Security
 
