@@ -229,36 +229,36 @@ rai backlog pull --source jira
 | Feature | Size | Status | Start | Complete | Actual Time | Velocity | Notes |
 |---------|:----:|:------:|-------|----------|:-----------:|:--------:|-------|
 | **S-DEMO.1** | M (3 SP) | ✅ **DONE** | Sat 14:00 | Sat 17:00 | **3h** | **1.0 SP/h** | ADRs + scope complete |
-| **S-DEMO.2** | M (3 SP) | 🔄 NEXT | Sat 17:00 | Target: 23:00 | - | - | OAuth auth flow |
-| **S-DEMO.3** | M (3 SP) | Pending | Sun 08:00 | Target: 12:00 | - | - | Bidirectional JIRA client |
-| **S-DEMO.4** | S (2 SP) | Pending | Sun 12:00 | Target: 16:00 | - | - | Entity properties |
-| **S-DEMO.5** | L (4 SP) | Pending | Sun 16:00 | Target: Mon 06:00 | - | - | Sync engine (pull + push) |
-| **S-DEMO.6** | XS (1 SP) | Pending | Mon 06:00 | Target: 10:00 | - | - | Coppel demo rehearsal |
+| **S-DEMO.2** | M (3 SP) | ✅ **DONE** | Sat 17:00 | Sat 17:44 | **44m** | **6.8x** | OAuth + PKCE + token storage |
+| **S-DEMO.3** | M (3 SP) | ✅ **DONE** | Sat 19:00 | Sat 21:15 | **135m** | **1.33x** | Bidirectional JIRA client |
+| **S-DEMO.4** | S (2 SP) | ✅ **DONE** | Sun ~01:00 | Sun ~02:50 | **110m** | **1.22x** | Entity properties + integration tests |
+| **S-DEMO.5** | L (4 SP) | 🔄 **IN PROGRESS** | Sun 06:00 | - | - | - | Sync engine: Tasks 1-5 done, Task 6 (integration test) pending |
+| **S-DEMO.6** | XS (1 SP) | Pending | - | Target: Mon 10:00 | - | - | Coppel demo rehearsal |
 
 ### Milestone Progress
 
-- [x] **M1: Authentication Working** (Target: Sat 23:00) — **NEXT GATE**
+- [x] **M1: Authentication Working** (Target: Sat 23:00) ✅
   - [x] S-DEMO.1 complete ✅
-  - [ ] S-DEMO.2 in progress
+  - [x] S-DEMO.2 complete ✅
 
-- [ ] **M2: JIRA API Working** (Target: Sun 16:00)
-  - [ ] S-DEMO.3 pending
-  - [ ] S-DEMO.4 pending
+- [x] **M2: JIRA API Working** (Target: Sun 16:00) ✅
+  - [x] S-DEMO.3 complete ✅
+  - [x] S-DEMO.4 complete ✅
 
-- [ ] **M3: Full Sync Working** (Target: Mon 06:00)
-  - [ ] S-DEMO.5 pending
+- [ ] **M3: Full Sync Working** (Target: Mon 06:00) — **CURRENT**
+  - [ ] S-DEMO.5 in progress (Tasks 1-5 done, Task 6 pending)
 
 - [ ] **M4: Demo Ready** (Target: Mon 10:00)
   - [ ] S-DEMO.6 pending
 
 ### Cumulative Progress
 
-- **SP Complete:** 3 / 16 (19%)
-- **Time Elapsed:** 3h / 29h (10%)
-- **Velocity:** 1.0 SP/hour (on track for 10 SP/day target)
-- **Burn Rate:** Ahead of schedule (19% complete vs 10% time elapsed)
+- **SP Complete:** 12 / 16 (75%) — S-DEMO.5 partially complete
+- **Time Elapsed:** ~14h / 29h (48%)
+- **Velocity:** ~0.86 SP/hour (sustainable pace)
+- **Burn Rate:** Ahead of schedule (75% complete vs 48% time elapsed)
 
-**Next Checkpoint:** Saturday 23:00 (M1: Auth working)
+**Next:** Complete S-DEMO.5 Task 6 (integration test), then S-DEMO.6 (rehearsal)
 
 ---
 
