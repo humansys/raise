@@ -215,7 +215,7 @@ def get_credentials_path() -> Path:
 
     Example:
         >>> creds_path = get_credentials_path()
-        >>> # Use with rai_providers.auth.credentials.store_token()
+        >>> # Use with rai_pro.providers.auth.credentials.store_token()
     """
     return get_global_rai_dir() / "credentials.json"
 

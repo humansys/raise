@@ -5,14 +5,14 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from rai_providers.jira.client import JiraClient, RateLimiter
-from rai_providers.jira.exceptions import (
+from rai_pro.providers.jira.client import JiraClient, RateLimiter
+from rai_pro.providers.jira.exceptions import (
     JiraAuthError,
     JiraError,
     JiraNotFoundError,
     JiraRateLimitError,
 )
-from rai_providers.jira.models import JiraEpic, JiraStory
+from rai_pro.providers.jira.models import JiraEpic, JiraStory
 
 
 class TestRateLimiter:
@@ -81,14 +81,14 @@ class TestJiraClient:
     @pytest.fixture
     def client(self, mock_jira: Mock) -> JiraClient:
         """Create a JiraClient with mocked Jira instance."""
-        with patch("rai_providers.jira.client.Jira", return_value=mock_jira):
+        with patch("rai_pro.providers.jira.client.Jira", return_value=mock_jira):
             client = JiraClient(cloud_id="test-cloud-id", access_token="test-token")
             client._jira = mock_jira
         return client
 
     def test_client_initialization(self) -> None:
         """Test JiraClient initializes correctly."""
-        with patch("rai_providers.jira.client.Jira") as mock_jira_class:
+        with patch("rai_pro.providers.jira.client.Jira") as mock_jira_class:
             client = JiraClient(cloud_id="test-cloud", access_token="test-token")
 
             mock_jira_class.assert_called_once()
@@ -276,14 +276,14 @@ class TestJiraClientWriteOperations:
     @pytest.fixture
     def client(self, mock_jira: Mock) -> JiraClient:
         """Create a JiraClient with mocked Jira instance."""
-        with patch("rai_providers.jira.client.Jira", return_value=mock_jira):
+        with patch("rai_pro.providers.jira.client.Jira", return_value=mock_jira):
             client = JiraClient(cloud_id="test-cloud-id", access_token="test-token")
             client._jira = mock_jira
         return client
 
     def test_create_story_success(self, client: JiraClient, mock_jira: Mock) -> None:
         """Test creating a story under an epic successfully."""
-        from rai_providers.jira.models import StoryCreate
+        from rai_pro.providers.jira.models import StoryCreate
 
         # Mock response from JIRA
         mock_jira.create_issue.return_value = {
@@ -324,7 +324,7 @@ class TestJiraClientWriteOperations:
 
     def test_create_story_minimal(self, client: JiraClient, mock_jira: Mock) -> None:
         """Test creating a story with minimal fields (summary only)."""
-        from rai_providers.jira.models import StoryCreate
+        from rai_pro.providers.jira.models import StoryCreate
 
         mock_jira.create_issue.return_value = {
             "key": "DEMO-125",
@@ -348,7 +348,7 @@ class TestJiraClientWriteOperations:
         self, client: JiraClient, mock_jira: Mock
     ) -> None:
         """Test that project key is correctly extracted from epic key."""
-        from rai_providers.jira.models import StoryCreate
+        from rai_pro.providers.jira.models import StoryCreate
 
         mock_jira.create_issue.return_value = {
             "key": "PROJ-999",
@@ -371,7 +371,7 @@ class TestJiraClientWriteOperations:
         self, client: JiraClient, mock_jira: Mock
     ) -> None:
         """Test creating story with non-existent epic raises JiraNotFoundError."""
-        from rai_providers.jira.models import StoryCreate
+        from rai_pro.providers.jira.models import StoryCreate
 
         mock_jira.create_issue.side_effect = Exception("Parent does not exist")
 
@@ -382,7 +382,7 @@ class TestJiraClientWriteOperations:
 
     def test_create_story_auth_error(self, client: JiraClient, mock_jira: Mock) -> None:
         """Test creating story with auth error raises JiraAuthError."""
-        from rai_providers.jira.models import StoryCreate
+        from rai_pro.providers.jira.models import StoryCreate
 
         mock_jira.create_issue.side_effect = Exception("401 Unauthorized")
 
@@ -395,7 +395,7 @@ class TestJiraClientWriteOperations:
         self, client: JiraClient, mock_jira: Mock
     ) -> None:
         """Test that rate limiter is called for create operation."""
-        from rai_providers.jira.models import StoryCreate
+        from rai_pro.providers.jira.models import StoryCreate
 
         mock_jira.create_issue.return_value = {
             "key": "DEMO-124",

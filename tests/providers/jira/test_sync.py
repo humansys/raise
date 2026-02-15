@@ -9,8 +9,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from rai_providers.jira.models import JiraEpic, JiraStory
-from rai_providers.jira.sync import (
+from rai_pro.providers.jira.models import JiraEpic, JiraStory
+from rai_pro.providers.jira.sync import (
     AuthResult,
     LocalStory,
     PullResult,
@@ -19,7 +19,7 @@ from rai_providers.jira.sync import (
     pull_epic,
     push_stories,
 )
-from rai_providers.jira.sync_state import SyncMapping, SyncState
+from rai_pro.providers.jira.sync_state import SyncMapping, SyncState
 
 
 @pytest.fixture
@@ -303,7 +303,7 @@ class TestPushStories:
 
         stories = [LocalStory(story_id="S-DEMO.1", title="Story One")]
 
-        with patch("rai_providers.jira.sync.set_entity_property") as mock_set:
+        with patch("rai_pro.providers.jira.sync.set_entity_property") as mock_set:
             push_stories(
                 client=mock_client,
                 epic_id="E-DEMO",

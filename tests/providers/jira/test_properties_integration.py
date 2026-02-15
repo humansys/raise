@@ -17,9 +17,9 @@ import os
 from datetime import UTC, datetime
 
 import pytest
-from src.rai_providers.jira.client import JiraClient
-from src.rai_providers.jira.models import RaiSyncMetadata
-from src.rai_providers.jira.properties import (
+from rai_pro.providers.jira.client import JiraClient
+from rai_pro.providers.jira.models import RaiSyncMetadata
+from rai_pro.providers.jira.properties import (
     get_entity_property,
     has_rai_metadata,
     set_entity_property,

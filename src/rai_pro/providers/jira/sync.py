@@ -14,10 +14,10 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from rai_providers.jira.client import JiraClient
-from rai_providers.jira.models import RaiSyncMetadata, StoryCreate
-from rai_providers.jira.properties import set_entity_property
-from rai_providers.jira.sync_state import SyncMapping, SyncState
+from rai_pro.providers.jira.client import JiraClient
+from rai_pro.providers.jira.models import RaiSyncMetadata, StoryCreate
+from rai_pro.providers.jira.properties import set_entity_property
+from rai_pro.providers.jira.sync_state import SyncMapping, SyncState
 
 # Default JIRA statuses that indicate authorization to work
 DEFAULT_AUTHORIZED_STATUSES: list[str] = ["Approved", "Ready", "In Progress"]

@@ -27,7 +27,7 @@ from urllib.parse import parse_qs, urlencode, urlparse
 
 import requests
 
-from rai_providers.auth.credentials import store_token
+from rai_pro.providers.auth.credentials import store_token
 
 
 class OAuthError(Exception):

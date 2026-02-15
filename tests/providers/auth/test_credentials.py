@@ -31,7 +31,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path, sample_token: dict[str, Any]
     ) -> None:
         """Store token creates encrypted credentials file."""
-        from rai_providers.auth.credentials import store_token
+        from rai_pro.providers.auth.credentials import store_token
 
         store_token("jira", sample_token, credentials_path)
 
@@ -45,7 +45,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path, sample_token: dict[str, Any]
     ) -> None:
         """Load token decrypts stored credentials."""
-        from rai_providers.auth.credentials import load_token, store_token
+        from rai_pro.providers.auth.credentials import load_token, store_token
 
         store_token("jira", sample_token, credentials_path)
         loaded_token = load_token("jira", credentials_path)
@@ -58,7 +58,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path
     ) -> None:
         """Load token returns None when credentials file doesn't exist."""
-        from rai_providers.auth.credentials import load_token
+        from rai_pro.providers.auth.credentials import load_token
 
         result = load_token("jira", credentials_path)
 
@@ -68,7 +68,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path, sample_token: dict[str, Any]
     ) -> None:
         """Load token returns None when provider not in credentials."""
-        from rai_providers.auth.credentials import load_token, store_token
+        from rai_pro.providers.auth.credentials import load_token, store_token
 
         store_token("jira", sample_token, credentials_path)
         result = load_token("gitlab", credentials_path)  # Different provider
@@ -79,7 +79,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path, sample_token: dict[str, Any]
     ) -> None:
         """Store token updates existing provider credentials."""
-        from rai_providers.auth.credentials import load_token, store_token
+        from rai_pro.providers.auth.credentials import load_token, store_token
 
         # Store initial token
         store_token("jira", sample_token, credentials_path)
@@ -95,7 +95,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path, sample_token: dict[str, Any]
     ) -> None:
         """Multiple providers can be stored in same credentials file."""
-        from rai_providers.auth.credentials import load_token, store_token
+        from rai_pro.providers.auth.credentials import load_token, store_token
 
         jira_token = sample_token
         gitlab_token = {**sample_token, "access_token": "gitlab_token_xyz"}
@@ -110,7 +110,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path, sample_token: dict[str, Any]
     ) -> None:
         """Encryption key derivation produces same key for same input."""
-        from rai_providers.auth.credentials import load_token, store_token
+        from rai_pro.providers.auth.credentials import load_token, store_token
 
         # Store token twice in different sessions
         store_token("jira", sample_token, credentials_path)
@@ -125,7 +125,7 @@ class TestCredentialsStorage:
         self, credentials_path: Path, sample_token: dict[str, Any]
     ) -> None:
         """Credentials file is created with user-only permissions (0600)."""
-        from rai_providers.auth.credentials import store_token
+        from rai_pro.providers.auth.credentials import store_token
 
         store_token("jira", sample_token, credentials_path)
 

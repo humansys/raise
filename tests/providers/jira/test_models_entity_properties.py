@@ -10,7 +10,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from rai_providers.jira.models import EntityProperty, RaiSyncMetadata
+from rai_pro.providers.jira.models import EntityProperty, RaiSyncMetadata
 
 
 class TestRaiSyncMetadata:
