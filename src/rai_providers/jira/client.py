@@ -18,7 +18,7 @@ from rai_providers.jira.exceptions import (
     JiraNotFoundError,
     JiraRateLimitError,
 )
-from rai_providers.jira.models import JiraEpic, JiraStory
+from rai_providers.jira.models import JiraEpic, JiraStory, StoryCreate
 
 
 class RateLimiter:
@@ -200,6 +200,68 @@ class JiraClient:
             return response["fields"]["status"]["name"]  # type: ignore[index,return-value]
         except Exception as e:
             raise self._map_error(e, key) from e
+
+    def create_story(self, epic_key: str, story: StoryCreate) -> JiraStory:
+        """Create a JIRA story under a parent epic.
+
+        Args:
+            epic_key: Parent epic key (e.g., "DEMO-123")
+            story: Story data to create
+
+        Returns:
+            Created JiraStory with JIRA-assigned key
+
+        Raises:
+            JiraNotFoundError: Epic doesn't exist or no permission
+            JiraAuthError: Authentication failed
+            JiraError: Other errors
+        """
+        self._rate_limiter.wait_if_needed()
+
+        try:
+            # Extract project key from epic key (DEMO-123 → DEMO)
+            project_key = self._extract_project_key(epic_key)
+
+            # Build create payload with field filtering
+            fields = {
+                "project": {"key": project_key},
+                "summary": story.summary,
+                "issuetype": {"name": "Story"},
+                "parent": {"key": epic_key},
+            }
+
+            # Add optional fields only if provided
+            if story.description:
+                fields["description"] = story.description
+
+            if story.labels:
+                fields["labels"] = story.labels
+
+            # Create story via API
+            response = self._jira.create_issue(fields=fields)  # type: ignore[no-untyped-call]
+
+            # Return created story
+            return JiraStory(
+                key=response["key"],  # type: ignore[index,call-overload]
+                summary=story.summary,
+                description=story.description,
+                status=response["fields"]["status"]["name"],  # type: ignore[index]
+                labels=story.labels,
+                epic_key=epic_key,
+            )
+        except Exception as e:
+            raise self._map_error(e, epic_key) from e
+
+    def _extract_project_key(self, issue_key: str) -> str:
+        """Extract project key from issue key.
+
+        Args:
+            issue_key: Issue key (e.g., "DEMO-123")
+
+        Returns:
+            Project key (e.g., "DEMO")
+        """
+        return issue_key.split("-")[0]
 
     def _map_error(self, error: Exception, context: str = "") -> JiraError:
         """Map atlassian-python-api errors to custom exceptions.
