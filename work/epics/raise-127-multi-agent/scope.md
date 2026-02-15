@@ -1,4 +1,4 @@
-# Epic RAISE-127 pt1: Multi-Agent Isolation — Scope
+# Epic RAISE-127 pt1: Session Instance Isolation — Scope
 
 > **Status:** IN PROGRESS
 > **JIRA:** [RAISE-127](https://humansys.atlassian.net/browse/RAISE-127)
@@ -11,14 +11,15 @@
 
 ## Objective
 
-Developers can use multiple IDEs/agents concurrently on the same project without session corruption or data loss.
+Any number of AI agents or terminals can run concurrent sessions on the same project without state corruption or data loss.
 
-**Value proposition:** This is a launch blocker. Real developers use Claude Code + Cursor + terminal simultaneously. Without isolation, session state corrupts silently — the kind of bug that destroys trust on first use.
+**Value proposition:** This is a launch blocker. Real developers run 3 Claude Code terminals + 3 Gemini tasks simultaneously. Without session isolation, state corrupts silently — the kind of bug that destroys trust on first use.
 
 **Success criteria:**
-- Two agents running `rai session start/close` on the same project produce independent, correct session histories
+- 6 concurrent sessions on the same project produce independent, correct session histories
 - Running `rai session close` from wrong directory is rejected with clear error
-- Existing single-agent setups auto-migrate without data loss
+- Existing single-session setups auto-migrate without data loss
+- Platform agnostic — no IDE-specific detection required
 
 ---
 
@@ -26,9 +27,9 @@ Developers can use multiple IDEs/agents concurrently on the same project without
 
 | # | JIRA | Story | Size | SP | Depends On |
 |---|------|-------|:----:|:--:|------------|
-| 1 | [RAISE-137](https://humansys.atlassian.net/browse/RAISE-137) | Agent Identity — detect IDE/runtime, assign agent ID | S | 2 | — |
-| 2 | [RAISE-138](https://humansys.atlassian.net/browse/RAISE-138) | Namespaced Session State — per-agent isolated directories | M | 3 | RAISE-137 |
-| 3 | [RAISE-139](https://humansys.atlassian.net/browse/RAISE-139) | Project-scoped session writes — CWD poka-yoke (fixes RAISE-134) | S | 3 | RAISE-138 |
+| 1 | [RAISE-137](https://humansys.atlassian.net/browse/RAISE-137) | Session Token Protocol — start returns ID, `--session` on commands, env var fallback | S | 2 | — |
+| 2 | [RAISE-138](https://humansys.atlassian.net/browse/RAISE-138) | Per-Session State Isolation — session directories, migration, concurrent access | M | 3 | RAISE-137 |
+| 3 | [RAISE-139](https://humansys.atlassian.net/browse/RAISE-139) | Project-Scoped Session Writes — CWD poka-yoke (fixes RAISE-134) | S | 3 | RAISE-138 |
 
 **Total:** 3 stories, 8 SP estimated
 
@@ -37,81 +38,103 @@ Developers can use multiple IDEs/agents concurrently on the same project without
 ## In Scope
 
 **MUST:**
-- Agent identity detection via `RAI_AGENT_ID` env var + auto-detection fallback
-- Per-agent subdirectories under `.raise/rai/personal/{agent-id}/`
-- Migration of existing `personal/` layout to `personal/default/`
+- Session token protocol: `rai session start` returns `SES-NNN`, all commands accept `--session`
+- Resolution order: `--session` flag > `RAI_SESSION_ID` env var > error
+- Per-session directories under `.raise/rai/personal/sessions/{SES-NNN}/`
+- Per-session state.yaml and signals.jsonl (telemetry)
+- Shared session ledger (`index.jsonl`) with fcntl locking
+- `active_sessions` list in `developer.yaml` (replaces single `current_session`)
+- Migration from old flat layout to per-session directories
 - CWD validation before writing to `.raise/` (poka-yoke for RAISE-134)
-- `current_session` in developer.yaml becomes dict keyed by agent ID
+- Agent type as optional metadata (`--agent`) on session start, not isolation key
 
 **SHOULD:**
 - Clear error messages when CWD mismatch detected
-- `rai session status` shows all active agents
+- Session directory cleanup on `rai session close`
+- Stale session detection (>24h) across all active sessions
 
 ---
 
 ## Out of Scope (deferred)
 
-- Agent coordination / shared state → RAISE-127 pt2
+- Agent coordination / shared context between sessions → RAISE-127 pt2
 - Agent-to-agent communication → RAISE-127 pt2
 - IDE-specific plugins / deep integration → RAISE-128
 - Hierarchical memory (instance → repo → team → org) → RAISE-135
-- Aggregated cross-agent telemetry → parking lot
+- Aggregated cross-session telemetry → parking lot
+- Session directory garbage collection (beyond close cleanup) → parking lot
 
 ---
 
 ## Architecture
 
-**ADR:** [ADR-029: Agent Isolation Strategy](../../dev/decisions/adr-029-agent-isolation-strategy.md)
+**ADR:** [ADR-029: Session Instance Isolation](../../dev/decisions/adr-029-agent-isolation-strategy.md)
 
-### Key Design Decisions
+### Core Design: Token-Based Session Protocol
 
-**1. Agent identity = environment variable (not process detection)**
-- `RAI_AGENT_ID` env var, set by IDE integration (CLAUDE.md hooks, .cursorrules, etc.)
-- Fallback auto-detection from known IDE env vars
-- Default: `"default"` for direct terminal use
+The CLI follows a REST-like token model. The caller is responsible for identifying which session it belongs to. The CLI is stateless — no magic detection.
 
-**2. Isolation = per-agent directories (not file locking)**
-- Each agent gets its own subdirectory under `personal/`
-- Session state, session history, and telemetry are all per-agent
-- Shared project knowledge (patterns, graph) stays shared — fcntl already handles concurrency
-
-**3. Profile stays global, sessions become per-agent**
-- `~/.rai/developer.yaml` is about the developer, not the agent
-- `current_session` field changes from single value to `dict[str, CurrentSession]`
-- Coaching, trust, experience — developer attributes, not agent attributes
+```
+AI Agent                          CLI
+   │                               │
+   ├─ rai session start ──────────►│ generates SES-177
+   │◄── "Session SES-177 started" ─┤
+   │                               │
+   │  (agent remembers SES-177)    │
+   │                               │
+   ├─ rai emit-work --session 177 ─►│ writes to SES-177/
+   ├─ rai emit-work --session 177 ─►│ writes to SES-177/
+   │                               │
+   ├─ rai session close --session ─►│ finalizes SES-177/
+   │◄── "Session SES-177 closed" ──┤
+```
 
 ### Directory Layout (after)
 
 ```
 .raise/rai/personal/
-├── claude-code/
-│   ├── session-state.yaml
-│   ├── sessions/index.jsonl
-│   └── telemetry/signals.jsonl
-├── cursor/
-│   └── ...
-└── default/
-    └── ...
+├── sessions/
+│   ├── index.jsonl              # Shared ledger (fcntl-locked)
+│   ├── SES-177/                 # Claude Code terminal 1
+│   │   ├── state.yaml
+│   │   └── signals.jsonl
+│   ├── SES-178/                 # Claude Code terminal 2
+│   │   └── ...
+│   └── SES-179/                 # Gemini task 1
+│       └── ...
+
+.raise/rai/memory/               # Shared project knowledge (unchanged)
+├── patterns.jsonl               # fcntl-locked for concurrent appends
+├── calibration.jsonl
+└── index.json
+
+~/.rai/developer.yaml            # Global profile
+├── active_sessions: [           # Replaces current_session
+│     {session_id: SES-177, started_at: ..., project: ..., agent: claude-code},
+│     {session_id: SES-178, started_at: ..., project: ..., agent: claude-code},
+│     {session_id: SES-179, started_at: ..., project: ..., agent: gemini},
+│   ]
 ```
 
 ### Affected Modules
 
 | Module | Impact | What Changes |
 |--------|--------|--------------|
-| `mod-config` (paths.py) | **High** | All `get_personal_dir()` calls gain agent_id parameter |
-| `mod-session` (state, close, bundle) | **High** | Reads/writes use agent-namespaced paths |
-| `mod-onboarding` (profile.py) | **Medium** | `current_session` schema change, migration |
-| `mod-cli` (session commands) | **Medium** | Agent ID resolution, CWD validation |
-| `mod-telemetry` (writer.py) | **Low** | Path already uses `get_personal_dir()` — inherits change |
+| `mod-session` (state, close, bundle) | **High** | Token protocol, per-session paths, active_sessions |
+| `mod-config` (paths.py) | **High** | `get_session_dir(session_id)` replaces flat `get_personal_dir()` for session state |
+| `mod-onboarding` (profile.py) | **Medium** | `active_sessions` schema, migration from `current_session` |
+| `mod-cli` (session commands) | **Medium** | `--session` flag on all commands, `--agent` on start |
+| `mod-telemetry` (writer.py) | **Medium** | Write signals to per-session directory, not shared file |
+| `mod-memory` (writer.py) | **Low** | Session index append uses fcntl lock (already does for patterns) |
 
 ---
 
 ## Dependencies
 
 ```
-RAISE-137 (agent identity)
+RAISE-137 (session token protocol)
      ↓
-RAISE-138 (namespaced state)
+RAISE-138 (per-session state isolation)
      ↓
 RAISE-139 (CWD poka-yoke)
 ```
@@ -132,9 +155,9 @@ Strictly sequential — each story builds on the previous. No parallel tracks.
 
 ### Epic Complete
 - [ ] All 3 stories complete
-- [ ] Two agents can run concurrent sessions without corruption (manual verification)
+- [ ] 6 concurrent sessions produce independent, correct histories (manual verification)
 - [ ] CWD mismatch rejected with clear error
-- [ ] Existing `personal/` auto-migrates to `personal/default/` on first run
+- [ ] Existing `personal/` auto-migrates on first run
 - [ ] RAISE-134 resolved
 - [ ] Architecture docs updated
 - [ ] Epic retrospective completed
@@ -146,19 +169,23 @@ Strictly sequential — each story builds on the previous. No parallel tracks.
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|:----------:|:------:|------------|
-| Migration corrupts existing session data | Low | High | Backup before migrate, atomic move operation, integration test |
-| IDE env var detection is wrong/missing | Medium | Low | `RAI_AGENT_ID` explicit override always works, auto-detect is convenience only |
-| `current_session` schema change breaks session start | Low | Medium | Backward compat: if old format detected, migrate in place |
+| Migration corrupts existing session data | Low | High | Backup before migrate, atomic move, integration test |
+| AI agent forgets to pass `--session` | Medium | Medium | Clear error message when missing, `RAI_SESSION_ID` env var as fallback |
+| Session directories accumulate unbounded | Low | Low | Cleanup on close, gc strategy deferred to parking lot |
+| `active_sessions` schema change breaks session start | Low | Medium | Backward compat: detect old `current_session` format, migrate in place |
 
 ---
 
 ## Notes
 
+### Why Session Instance, Not Agent Type
+Original design namespaced by agent type (claude-code, cursor). Emilio's insight: 3 Claude Code terminals are the same agent but different sessions. The isolation unit is the session instance. Agent type is useful metadata but the wrong isolation key.
+
 ### Why Now
-Soft launch is Feb 18. The first external developers to try RaiSE will likely use multiple IDEs. A session corruption bug on first use is a trust-killer. This must land before Wednesday.
+Soft launch is Feb 18. External developers will use multiple terminals/agents. Session corruption on first use is a trust-killer.
 
 ### Pt1 vs Pt2
-Pt1 (this epic) is isolation — agents don't interfere with each other. Pt2 is coordination — agents can share context intentionally. Pt1 is a prerequisite for pt2, but pt2 is not on the critical path for launch.
+Pt1 (this epic) = isolation — sessions don't interfere. Pt2 = coordination — sessions can share context intentionally. Pt1 is prerequisite for pt2, but pt2 is not on the critical path for launch.
 
 ---
 
