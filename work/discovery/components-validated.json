@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-02-09T16:34:19.336899+00:00",
+  "generated_at": "2026-02-15T21:12:13.606791+00:00",
   "source_file": "work/discovery/components-draft.yaml",
-  "component_count": 345,
+  "component_count": 381,
   "components": [
     {
       "id": "comp-exceptions-RaiseError",
@@ -7581,6 +7581,804 @@
         "internal": false,
         "validated_by": "auto",
         "validated_at": "2026-02-09T16:32:06.678285+00:00"
+      }
+    },
+    {
+      "id": "comp-providers-base-BacklogProvider",
+      "type": "component",
+      "content": "Abstract interface for backlog providers (JIRA, GitLab, Odoo, Local). Defines the contract for bidirectional sync operations with provider-agnostic methods.",
+      "source_file": "rai_pro/providers/base.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "BacklogProvider",
+        "kind": "class",
+        "line": 11,
+        "signature": "class BacklogProvider(ABC)",
+        "module": "providers-base",
+        "category": "interface",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-client-JiraClient",
+      "type": "component",
+      "content": "JIRA implementation of BacklogProvider interface. Provides type-safe methods for reading epics and stories with rate limiting, field filtering, and OAuth token integration.",
+      "source_file": "rai_pro/providers/jira/client.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraClient",
+        "kind": "class",
+        "line": 73,
+        "signature": "class JiraClient(BacklogProvider)",
+        "module": "jira-client",
+        "category": "client",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "BacklogProvider",
+          "RateLimiter"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-client-RateLimiter",
+      "type": "component",
+      "content": "Token bucket rate limiter for API calls. Enforces maximum request rate to comply with JIRA Cloud limits (10 req/sec) using sliding window algorithm.",
+      "source_file": "rai_pro/providers/jira/client.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "RateLimiter",
+        "kind": "class",
+        "line": 27,
+        "signature": "class RateLimiter",
+        "module": "jira-client",
+        "category": "utility",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-models-JiraEpic",
+      "type": "component",
+      "content": "JIRA Epic with filtered fields only (key, summary, description, status, labels). Used for efficient API responses.",
+      "source_file": "rai_pro/providers/jira/models.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraEpic",
+        "kind": "class",
+        "line": 16,
+        "signature": "class JiraEpic(BaseModel)",
+        "module": "jira-models",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-models-JiraStory",
+      "type": "component",
+      "content": "JIRA Story/Issue with filtered fields only (key, summary, description, status, labels, epic_key). Used for efficient API responses.",
+      "source_file": "rai_pro/providers/jira/models.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraStory",
+        "kind": "class",
+        "line": 34,
+        "signature": "class JiraStory(BaseModel)",
+        "module": "jira-models",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-models-StoryCreate",
+      "type": "component",
+      "content": "Data required to create a JIRA story (summary, description, labels). Input model for story creation operations.",
+      "source_file": "rai_pro/providers/jira/models.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "StoryCreate",
+        "kind": "class",
+        "line": 54,
+        "signature": "class StoryCreate(BaseModel)",
+        "module": "jira-models",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-models-RaiSyncMetadata",
+      "type": "component",
+      "content": "RaiSE sync metadata for JIRA entity properties (ADR-028). Tracks what's been synced, when, and by whom. Includes epic_id, story_id, task_id, timestamps, branch info, and conflict detection fields.",
+      "source_file": "rai_pro/providers/jira/models.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "RaiSyncMetadata",
+        "kind": "class",
+        "line": 68,
+        "signature": "class RaiSyncMetadata(BaseModel)",
+        "module": "jira-models",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-models-EntityProperty",
+      "type": "component",
+      "content": "JIRA entity property wrapper for RaiSE sync metadata (ADR-028). Wraps RaiSyncMetadata in the structure expected by JIRA entity properties API.",
+      "source_file": "rai_pro/providers/jira/models.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "EntityProperty",
+        "kind": "class",
+        "line": 121,
+        "signature": "class EntityProperty(BaseModel)",
+        "module": "jira-models",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "RaiSyncMetadata"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync-LocalStory",
+      "type": "component",
+      "content": "Local story data for push to JIRA. Contains story metadata for sync operations.",
+      "source_file": "rai_pro/providers/jira/sync.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "LocalStory",
+        "kind": "class",
+        "line": 26,
+        "signature": "class LocalStory(BaseModel)",
+        "module": "jira-sync",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync-PullResult",
+      "type": "component",
+      "content": "Result of a pull operation from JIRA. Contains import summary with epic and story counts.",
+      "source_file": "rai_pro/providers/jira/sync.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "PullResult",
+        "kind": "class",
+        "line": 35,
+        "signature": "class PullResult(BaseModel)",
+        "module": "jira-sync",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync-PushResult",
+      "type": "component",
+      "content": "Result of a push operation to JIRA. Contains creation summary with created and skipped story counts.",
+      "source_file": "rai_pro/providers/jira/sync.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "PushResult",
+        "kind": "class",
+        "line": 52,
+        "signature": "class PushResult(BaseModel)",
+        "module": "jira-sync",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync-AuthResult",
+      "type": "component",
+      "content": "Result of an authorization check. Indicates whether a story is authorized to work on based on JIRA status.",
+      "source_file": "rai_pro/providers/jira/sync.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "AuthResult",
+        "kind": "class",
+        "line": 69,
+        "signature": "class AuthResult(BaseModel)",
+        "module": "jira-sync",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync_state-SyncMapping",
+      "type": "component",
+      "content": "Mapping between a local RaiSE ID and a JIRA issue key. Tracks sync relationship for a single epic or story with status and timestamps.",
+      "source_file": "rai_pro/providers/jira/sync_state.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "SyncMapping",
+        "kind": "class",
+        "line": 19,
+        "signature": "class SyncMapping(BaseModel)",
+        "module": "jira-sync_state",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync_state-SyncState",
+      "type": "component",
+      "content": "Persistent sync state between RaiSE and JIRA. Stored in .raise/rai/sync/state.json. Contains provider info, cloud_id, project_key, and epic/story mappings.",
+      "source_file": "rai_pro/providers/jira/sync_state.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "SyncState",
+        "kind": "class",
+        "line": 39,
+        "signature": "class SyncState(BaseModel)",
+        "module": "jira-sync_state",
+        "category": "model",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "SyncMapping"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-exceptions-JiraError",
+      "type": "component",
+      "content": "Base exception for JIRA operations. All JIRA-specific exceptions inherit from this class.",
+      "source_file": "rai_pro/providers/jira/exceptions.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraError",
+        "kind": "class",
+        "line": 4,
+        "signature": "class JiraError(Exception)",
+        "module": "jira-exceptions",
+        "category": "exception",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-exceptions-JiraApiError",
+      "type": "component",
+      "content": "JIRA API error with HTTP status code. Raised when JIRA REST API returns an error response.",
+      "source_file": "rai_pro/providers/jira/exceptions.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraApiError",
+        "kind": "class",
+        "line": 20,
+        "signature": "class JiraApiError(JiraError)",
+        "module": "jira-exceptions",
+        "category": "exception",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraError"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-exceptions-JiraAuthError",
+      "type": "component",
+      "content": "Authentication or authorization failed. Raised for invalid/expired OAuth tokens, permission issues, or HTTP 401/403 responses.",
+      "source_file": "rai_pro/providers/jira/exceptions.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraAuthError",
+        "kind": "class",
+        "line": 42,
+        "signature": "class JiraAuthError(JiraError)",
+        "module": "jira-exceptions",
+        "category": "exception",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraError"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-exceptions-JiraNotFoundError",
+      "type": "component",
+      "content": "Requested resource not found. Raised when epic or story key doesn't exist or user lacks permission (HTTP 404).",
+      "source_file": "rai_pro/providers/jira/exceptions.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraNotFoundError",
+        "kind": "class",
+        "line": 54,
+        "signature": "class JiraNotFoundError(JiraError)",
+        "module": "jira-exceptions",
+        "category": "exception",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraError"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-exceptions-JiraRateLimitError",
+      "type": "component",
+      "content": "Rate limit exceeded. Raised when server-side rate limit hit (HTTP 429). Client-side rate limiting should prevent this in normal operation.",
+      "source_file": "rai_pro/providers/jira/exceptions.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "JiraRateLimitError",
+        "kind": "class",
+        "line": 66,
+        "signature": "class JiraRateLimitError(JiraError)",
+        "module": "jira-exceptions",
+        "category": "exception",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraError"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-oauth-OAuthError",
+      "type": "component",
+      "content": "OAuth flow error. Raised when any step of the OAuth 2.0 Authorization Code + PKCE flow fails.",
+      "source_file": "rai_pro/providers/jira/oauth.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "OAuthError",
+        "kind": "class",
+        "line": 33,
+        "signature": "class OAuthError(Exception)",
+        "module": "jira-oauth",
+        "category": "exception",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-oauth-authenticate",
+      "type": "component",
+      "content": "Complete OAuth 2.0 Authorization Code + PKCE flow for JIRA. Orchestrates authorization URL, browser redirect, callback server, token exchange, and credential storage.",
+      "source_file": "rai_pro/providers/jira/oauth.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "authenticate",
+        "kind": "function",
+        "line": 287,
+        "signature": "def authenticate(client_id: str, client_secret: str, redirect_uri: str='http://localhost:8080/callback', credentials_path: Path | None=None, scopes: list[str] | None=None) -> dict[str, Any]",
+        "module": "jira-oauth",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "build_authorization_url",
+          "exchange_code_for_token"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-oauth-is_token_expired",
+      "type": "component",
+      "content": "Check if OAuth token is expired or near expiry. Uses safety buffer to refresh before actual expiry (default 5 min).",
+      "source_file": "rai_pro/providers/jira/oauth.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "is_token_expired",
+        "kind": "function",
+        "line": 352,
+        "signature": "def is_token_expired(token: dict[str, Any], buffer_seconds: int=300) -> bool",
+        "module": "jira-oauth",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-oauth-refresh_access_token",
+      "type": "component",
+      "content": "Refresh OAuth access token using refresh token. Returns new token with refreshed access_token and expires_at.",
+      "source_file": "rai_pro/providers/jira/oauth.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "refresh_access_token",
+        "kind": "function",
+        "line": 373,
+        "signature": "def refresh_access_token(token: dict[str, Any], client_id: str, client_secret: str, token_url: str=ATLASSIAN_TOKEN_URL) -> dict[str, Any]",
+        "module": "jira-oauth",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-oauth-get_current_user",
+      "type": "component",
+      "content": "Get current authenticated user information from JIRA. Returns user dictionary with emailAddress, displayName, etc.",
+      "source_file": "rai_pro/providers/jira/oauth.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "get_current_user",
+        "kind": "function",
+        "line": 425,
+        "signature": "def get_current_user(access_token: str) -> dict[str, Any]",
+        "module": "jira-oauth",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-oauth-build_authorization_url",
+      "type": "component",
+      "content": "Build OAuth authorization URL with PKCE parameters. Returns tuple of (authorization_url, state, code_verifier).",
+      "source_file": "rai_pro/providers/jira/oauth.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "build_authorization_url",
+        "kind": "function",
+        "line": 92,
+        "signature": "def build_authorization_url(client_id: str, redirect_uri: str, authorization_url: str=ATLASSIAN_AUTH_URL, scopes: list[str] | None=None) -> tuple[str, str, str]",
+        "module": "jira-oauth",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-oauth-exchange_code_for_token",
+      "type": "component",
+      "content": "Exchange authorization code for access token using PKCE. Returns token dictionary with access_token, refresh_token, expires_at, etc.",
+      "source_file": "rai_pro/providers/jira/oauth.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "exchange_code_for_token",
+        "kind": "function",
+        "line": 154,
+        "signature": "def exchange_code_for_token(authorization_code: str, code_verifier: str, client_id: str, client_secret: str, redirect_uri: str, token_url: str=ATLASSIAN_TOKEN_URL) -> dict[str, Any]",
+        "module": "jira-oauth",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync-pull_epic",
+      "type": "component",
+      "content": "Pull epic and stories from JIRA, update sync state. Supports dry-run mode and entity property tagging.",
+      "source_file": "rai_pro/providers/jira/sync.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "pull_epic",
+        "kind": "function",
+        "line": 79,
+        "signature": "def pull_epic(client: JiraClient, epic_key: str, epic_id: str, state: SyncState, dry_run: bool=False, branch: str='', local_path: str='') -> PullResult",
+        "module": "jira-sync",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraClient",
+          "SyncState",
+          "PullResult"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync-push_stories",
+      "type": "component",
+      "content": "Push local stories to JIRA under mapped epic. Supports dry-run mode and entity property tagging. Raises ValueError if epic_id is not mapped.",
+      "source_file": "rai_pro/providers/jira/sync.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "push_stories",
+        "kind": "function",
+        "line": 211,
+        "signature": "def push_stories(client: JiraClient, epic_id: str, stories: list[LocalStory], state: SyncState, dry_run: bool=False, branch: str='', local_path: str='') -> PushResult",
+        "module": "jira-sync",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraClient",
+          "LocalStory",
+          "SyncState",
+          "PushResult"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync-check_authorization",
+      "type": "component",
+      "content": "Check if story is authorized to work on (offline, reads state only). Default authorized statuses: ['Approved', 'Ready', 'In Progress'].",
+      "source_file": "rai_pro/providers/jira/sync.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "check_authorization",
+        "kind": "function",
+        "line": 325,
+        "signature": "def check_authorization(state: SyncState, story_id: str, authorized_statuses: list[str] | None=None) -> AuthResult",
+        "module": "jira-sync",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "SyncState",
+          "AuthResult"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-properties-set_entity_property",
+      "type": "component",
+      "content": "Store sync metadata on JIRA issue via entity properties. Property key: com.humansys.raise.sync. Invisible to JIRA users but queryable via JQL.",
+      "source_file": "rai_pro/providers/jira/properties.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "set_entity_property",
+        "kind": "function",
+        "line": 25,
+        "signature": "def set_entity_property(client: JiraClient, issue_key: str, metadata: RaiSyncMetadata) -> None",
+        "module": "jira-properties",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraClient",
+          "RaiSyncMetadata"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-properties-get_entity_property",
+      "type": "component",
+      "content": "Retrieve sync metadata from JIRA issue entity properties. Uses strict validation. Returns None if property not set.",
+      "source_file": "rai_pro/providers/jira/properties.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "get_entity_property",
+        "kind": "function",
+        "line": 71,
+        "signature": "def get_entity_property(client: JiraClient, issue_key: str) -> RaiSyncMetadata | None",
+        "module": "jira-properties",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraClient",
+          "RaiSyncMetadata"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-properties-has_rai_metadata",
+      "type": "component",
+      "content": "Check if JIRA issue has RaiSE sync metadata (idempotency helper). Used for duplicate detection in sync operations.",
+      "source_file": "rai_pro/providers/jira/properties.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "has_rai_metadata",
+        "kind": "function",
+        "line": 119,
+        "signature": "def has_rai_metadata(client: JiraClient, issue_key: str) -> bool",
+        "module": "jira-properties",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "JiraClient"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-auth-credentials-store_token",
+      "type": "component",
+      "content": "Store OAuth token with encryption for specified provider. Creates credentials file with user-only permissions (0600).",
+      "source_file": "rai_pro/providers/auth/credentials.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "store_token",
+        "kind": "function",
+        "line": 35,
+        "signature": "def store_token(provider: str, token: dict[str, Any], credentials_path: Path) -> None",
+        "module": "auth-credentials",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-auth-credentials-load_token",
+      "type": "component",
+      "content": "Load and decrypt OAuth token for specified provider. Returns None if file/provider doesn't exist.",
+      "source_file": "rai_pro/providers/auth/credentials.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "load_token",
+        "kind": "function",
+        "line": 64,
+        "signature": "def load_token(provider: str, credentials_path: Path) -> dict[str, Any] | None",
+        "module": "auth-credentials",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync_state-load_state",
+      "type": "component",
+      "content": "Load sync state from .raise/rai/sync/state.json. Returns None if file doesn't exist or is invalid.",
+      "source_file": "rai_pro/providers/jira/sync_state.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "load_state",
+        "kind": "function",
+        "line": 69,
+        "signature": "def load_state(sync_dir: Path) -> SyncState | None",
+        "module": "jira-sync_state",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "SyncState"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
+      }
+    },
+    {
+      "id": "comp-jira-sync_state-save_state",
+      "type": "component",
+      "content": "Save sync state to .raise/rai/sync/state.json. Creates sync directory if it doesn't exist.",
+      "source_file": "rai_pro/providers/jira/sync_state.py",
+      "created": "2026-02-15T21:12:13.606791+00:00",
+      "metadata": {
+        "name": "save_state",
+        "kind": "function",
+        "line": 86,
+        "signature": "def save_state(state: SyncState, sync_dir: Path) -> None",
+        "module": "jira-sync_state",
+        "category": "function",
+        "confidence_tier": "high",
+        "confidence_score": 85,
+        "depends_on": [
+          "SyncState"
+        ],
+        "internal": false,
+        "validated_by": "human",
+        "validated_at": "2026-02-15T21:12:13.606791+00:00"
       }
     }
   ]

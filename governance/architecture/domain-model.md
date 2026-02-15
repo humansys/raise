@@ -22,9 +22,8 @@ bounded_contexts:
     modules: [telemetry]
     description: "Local signal collection for process improvement"
   - name: integrations
-    modules: []
-    description: "External platform adapters (Jira, Confluence, Rovo) — V3 scope, not yet implemented"
-    status: planned
+    modules: [rai_pro]
+    description: "External platform adapters (JIRA backlog sync, OAuth, entity properties) — enterprise features in rai_pro package"
 shared_kernel:
   modules: [config, core, schemas]
   description: "Foundation utilities shared across all contexts"
@@ -74,8 +73,8 @@ rai-cli has seven bounded contexts (one planned), a shared kernel, and an applic
 │  └──────────────┘  │  └─────────┘ │  └──────────────┘                  │
 │                     └──────────────┘                                     │
 │  ┌──────────────────────────────────────────────────────────────────┐   │
-│  │  INTEGRATIONS (V3 — planned)                                     │   │
-│  │  Jira, Confluence, Rovo adapters — own vocabulary, own auth      │   │
+│  │  INTEGRATIONS                                                    │   │
+│  │  rai_pro/ — JIRA backlog sync, OAuth 2.0+PKCE, entity props     │   │
 │  └──────────────────────────────────────────────────────────────────┘   │
 ├─────────────────────────────────────────────────────────────────────────┤
 │  SHARED KERNEL                                                           │
@@ -364,7 +363,7 @@ When adding new functionality, use this table to determine where it belongs.
 | A new onboarding step | `onboarding/` | Experience owns first-run flow |
 | A new skill capability | `skills/` | Skills context owns skill infrastructure |
 | A new convention detector | `discovery/` | Discovery owns all codebase analysis |
-| A new external platform adapter | `integrations/` (V3) | Integrations context owns external platform vocabulary |
+| A new external platform adapter | `rai_pro/providers/` | Integrations context owns external platform vocabulary |
 | A new shared type (3+ modules need it) | `schemas/` | Shared kernel for cross-context types |
 | A new external tool wrapper | `core/` | Shared kernel owns subprocess integration |
 
@@ -434,4 +433,4 @@ These questions were raised during domain model creation and resolved through hu
 | 2 | Is the Knowledge context too broad? | **Rename to Ontology, keep unified** | RaiSE is ontology-guided software development. The graph IS the ontological backbone. context + memory serve the same purpose. Splitting adds complexity without benefit at this scale. |
 | 3 | Where does architecture doc generation belong? | **Skill only** | Architecture docs require AI synthesis (prose, rationale, domain model). Skills are the right vehicle. No CLI command — the skill calls CLI tools as needed. |
 | 4 | Should onboarding own convention detection? | **Move to Discovery** | Convention detection IS codebase analysis — same domain as scanning and analyzing. Cleaner domain boundaries. Pending refactoring. |
-| 5 | What's the governance boundary for external integrations? | **New Integrations bounded context (V3)** | External platforms (Jira, Confluence, Rovo) have their own vocabularies, auth models, and evolution rates. Dedicated context with adapters per platform keeps domains clean. |
+| 5 | What's the governance boundary for external integrations? | **Integrations bounded context in `rai_pro/`** | External platforms (JIRA, Confluence, Rovo) have their own vocabularies, auth models, and evolution rates. Dedicated context in `rai_pro/providers/` with adapters per platform keeps domains clean. Implemented in E-DEMO with JIRA provider. |

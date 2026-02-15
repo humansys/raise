@@ -3,7 +3,7 @@ type: module
 name: cli
 purpose: "Typer-based CLI commands — the user-facing entry point that orchestrates all other modules"
 status: current
-depends_on: [config, context, discovery, governance, memory, onboarding, output, rai_base, session, skills, telemetry]
+depends_on: [config, context, discovery, governance, memory, onboarding, output, rai_base, rai_pro, session, skills, telemetry]
 depended_by: []
 entry_points:
   - "raise init"
@@ -12,6 +12,8 @@ entry_points:
   - "raise profile show"
   - "raise session start"
   - "raise skill list|show|validate|create"
+  - "rai backlog auth|pull|push|status"
+  - "rai release list|show"
 public_api:
   - "app (Typer main app)"
 components: 54

@@ -8,6 +8,7 @@ project:
     - python
   root_dirs:
     - src/raise_cli
+    - src/rai_pro
   entry_points:
     - src/raise_cli/cli/main.py
     - src/raise_cli/__main__.py
