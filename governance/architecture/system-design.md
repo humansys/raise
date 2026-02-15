@@ -7,7 +7,7 @@ layers:
     modules: [core, config, schemas]
     description: "Zero internal dependencies — foundation utilities"
   - name: domain
-    modules: [governance, discovery, skills, telemetry]
+    modules: [governance, discovery, skills, telemetry, rai_pro]
     description: "Independent domain logic — no cross-domain imports"
   - name: integration
     modules: [context, memory, onboarding, output]
