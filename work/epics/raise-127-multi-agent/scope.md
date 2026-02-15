@@ -189,5 +189,66 @@ Pt1 (this epic) = isolation — sessions don't interfere. Pt2 = coordination —
 
 ---
 
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-15
+
+### Story Sequence
+
+| Order | Story | Size | SP | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|:--:|--------------|-----------|-----------|
+| 1 | RAISE-137: Session Token Protocol | S | 2 | None | M1 | Foundation — all other work depends on session ID resolution |
+| 2 | RAISE-138: Per-Session State Isolation | M | 3 | RAISE-137 | M2 | Core isolation — proves the architecture works |
+| 3 | RAISE-139: Project-Scoped Writes (CWD poka-yoke) | S | 3 | RAISE-138 | M3 | Safety net — requires session paths to exist |
+
+Strictly sequential. No parallel streams — each story builds on the previous.
+
+### Milestones
+
+| Milestone | After | Target | Success Criteria |
+|-----------|-------|--------|------------------|
+| **M1: Token Protocol** | RAISE-137 | Feb 16 | `rai session start` returns SES-NNN; `--session` and `RAI_SESSION_ID` accepted |
+| **M2: Isolation Works** | RAISE-138 | Feb 17 | Two concurrent sessions produce independent state dirs; migration from old layout works |
+| **M3: Launch Ready** | RAISE-139 | Feb 17 | CWD mismatch rejected with clear error; RAISE-134 closed; all tests green |
+| **M4: Epic Complete** | retro | Feb 18 | Retrospective done, merged to v2, soft launch ready |
+
+### Timeline
+
+| Day | Work | Milestone |
+|-----|------|-----------|
+| Sat Feb 15 | RAISE-137 (S/2SP) | M1 |
+| Sun Feb 16 | RAISE-138 (M/3SP) | M2 |
+| Mon Feb 17 | RAISE-139 (S/3SP) | M3 |
+| Tue Feb 18 | Buffer / retro / merge | M4 → soft launch |
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Notes |
+|-------|:----:|:------:|:------:|-------|
+| RAISE-137 | S | Pending | — | |
+| RAISE-138 | M | Pending | — | |
+| RAISE-139 | S | Pending | — | |
+
+**Milestones:**
+- [ ] M1: Token Protocol (Feb 16)
+- [ ] M2: Isolation Works (Feb 17)
+- [ ] M3: Launch Ready (Feb 17)
+- [ ] M4: Epic Complete (Feb 18)
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| RAISE-137 `--session` plumbing touches many commands | Medium | Medium | Start with session start/close only, extend to other commands incrementally |
+| RAISE-138 migration logic more complex than estimated | Low | High | Test with actual `~/.rai/developer.yaml` and `.raise/rai/personal/` before merging |
+| Buffer day consumed by demo prep (Feb 16 Coppel) | Low | Low | Demo is handled via live workflow, no prep needed |
+
+---
+
+*Plan created: 2026-02-15*
+*Next: `/rai-story-start` for RAISE-137*
+
+---
+
 *Created: 2026-02-15*
 *Updated: 2026-02-15*
