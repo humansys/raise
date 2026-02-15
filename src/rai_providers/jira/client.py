@@ -9,7 +9,9 @@ This module provides a clean wrapper over atlassian-python-api with:
 
 import time
 from collections import deque
+from typing import Any
 
+import requests
 from atlassian import Jira
 
 from rai_providers.base import BacklogProvider
@@ -90,10 +92,18 @@ class JiraClient(BacklogProvider):
         Args:
             cloud_id: Atlassian cloud ID (from OAuth)
             access_token: OAuth access token
+            workspace_url: Workspace URL (e.g., https://site.atlassian.net).
+                          If not provided, fetches from accessible-resources API.
         """
+        # Use /ex/jira proxy URL (workspace URL doesn't accept OAuth tokens directly)
         url = f"https://api.atlassian.com/ex/jira/{cloud_id}"
-        self._jira = Jira(url=url, token=access_token)
+
+        # CRITICAL: Set cloud=True to use API v3 endpoints (enhanced_jql with /search/jql)
+        self._jira = Jira(url=url, token=access_token, cloud=True)
         self._rate_limiter = RateLimiter(max_requests=10, window_seconds=1.0)
+        self._cloud_id = cloud_id
+        self._access_token = access_token
+        self._api_base = url
 
     def read_epic(self, key: str) -> JiraEpic:
         """Read an epic from JIRA with filtered fields.
