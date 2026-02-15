@@ -347,7 +347,6 @@ def _format_coaching(profile: DeveloperProfile) -> str:
     coaching = profile.coaching
     has_content = (
         coaching.strengths
-        or coaching.corrections
         or coaching.growth_edge
         or coaching.trust_level != "new"
         or coaching.autonomy
@@ -368,10 +367,8 @@ def _format_coaching(profile: DeveloperProfile) -> str:
     if coaching.relationship.quality != "new":
         rel = coaching.relationship
         lines.append(f"Relationship: {rel.quality} ({rel.trajectory})")
-    if coaching.corrections:
-        lines.append("Recent corrections:")
-        for c in coaching.corrections[-3:]:  # Last 3 for brevity
-            lines.append(f"- {c.session}: {c.what} → {c.lesson}")
+    # Corrections suppressed from session context — noise without specific
+    # consumption point. Revisit when /rai-story-review integrates them.
     return "\n".join(lines)
 
 
