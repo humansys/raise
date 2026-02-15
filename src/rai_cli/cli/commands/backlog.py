@@ -46,9 +46,9 @@ def _init_jira_client() -> tuple[object, str]:
     """
     try:
         from rai_cli.config.paths import get_credentials_path
-        from rai_providers.auth.credentials import load_token, store_token
-        from rai_providers.jira.client import JiraClient
-        from rai_providers.jira.oauth import (
+        from rai_pro.providers.auth.credentials import load_token, store_token
+        from rai_pro.providers.jira.client import JiraClient
+        from rai_pro.providers.jira.oauth import (
             OAuthError,
             is_token_expired,
             refresh_access_token,
@@ -142,7 +142,7 @@ def auth(
     # Import provider modules
     try:
         from rai_cli.config.paths import get_credentials_path
-        from rai_providers.jira.oauth import (
+        from rai_pro.providers.jira.oauth import (
             OAuthError,
             authenticate,
             get_current_user,
@@ -244,8 +244,8 @@ def pull(
         console.print(f"[red]Error:[/red] Source '{source}' not supported. Use 'jira'.")
         raise typer.Exit(code=1)
 
-    from rai_providers.jira.sync import pull_epic as _pull_epic
-    from rai_providers.jira.sync_state import SyncState, load_state, save_state
+    from rai_pro.providers.jira.sync import pull_epic as _pull_epic
+    from rai_pro.providers.jira.sync_state import SyncState, load_state, save_state
 
     client, cloud_id = _init_jira_client()
     sync_dir = _get_sync_dir(project)
@@ -335,8 +335,8 @@ def push(
         console.print(f"[red]Error:[/red] Source '{source}' not supported. Use 'jira'.")
         raise typer.Exit(code=1)
 
-    from rai_providers.jira.sync import LocalStory, push_stories as _push_stories
-    from rai_providers.jira.sync_state import load_state, save_state
+    from rai_pro.providers.jira.sync import LocalStory, push_stories as _push_stories
+    from rai_pro.providers.jira.sync_state import load_state, save_state
 
     client, _cloud_id = _init_jira_client()
     sync_dir = _get_sync_dir(project)
@@ -428,8 +428,8 @@ def status(
     Examples:
         $ rai backlog status --epic E-DEMO
     """
-    from rai_providers.jira.sync import check_authorization
-    from rai_providers.jira.sync_state import load_state
+    from rai_pro.providers.jira.sync import check_authorization
+    from rai_pro.providers.jira.sync_state import load_state
 
     sync_dir = _get_sync_dir(project)
     state = load_state(sync_dir)

@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from rai_providers.jira.models import JiraEpic, JiraStory, StoryCreate
+from rai_pro.providers.jira.models import JiraEpic, JiraStory, StoryCreate
 
 
 class TestJiraEpic:

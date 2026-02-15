@@ -20,7 +20,7 @@ def mock_credentials_path(tmp_path: Path) -> Path:
 class TestBacklogAuthCommand:
     """Test `rai backlog auth` command."""
 
-    @patch("rai_providers.jira.oauth.authenticate")
+    @patch("rai_pro.providers.jira.oauth.authenticate")
     @patch("rai_cli.config.paths.get_credentials_path")
     def test_auth_jira_success(
         self,
@@ -40,7 +40,7 @@ class TestBacklogAuthCommand:
         }
 
         # Mock getting user info (email)
-        with patch("rai_providers.jira.oauth.get_current_user") as mock_get_user:
+        with patch("rai_pro.providers.jira.oauth.get_current_user") as mock_get_user:
             mock_get_user.return_value = {"email": "user@example.com"}
 
             result = runner.invoke(app, ["backlog", "auth", "--provider", "jira"])
@@ -53,7 +53,7 @@ class TestBacklogAuthCommand:
         # Verify OAuth flow was called
         mock_authenticate.assert_called_once()
 
-    @patch("rai_providers.jira.oauth.authenticate")
+    @patch("rai_pro.providers.jira.oauth.authenticate")
     def test_auth_jira_with_custom_credentials(
         self,
         mock_authenticate: Mock,
@@ -66,7 +66,7 @@ class TestBacklogAuthCommand:
             "refresh_token": "rt_custom",
         }
 
-        with patch("rai_providers.jira.oauth.get_current_user") as mock_get_user:
+        with patch("rai_pro.providers.jira.oauth.get_current_user") as mock_get_user:
             mock_get_user.return_value = {"email": "custom@example.com"}
 
             # Set env vars for custom credentials
@@ -107,13 +107,13 @@ class TestBacklogAuthCommand:
         # Typer will show help or error about missing required option
         assert result.exit_code != 0
 
-    @patch("rai_providers.jira.oauth.authenticate")
+    @patch("rai_pro.providers.jira.oauth.authenticate")
     def test_auth_oauth_failure(
         self,
         mock_authenticate: Mock,
     ) -> None:
         """Handle OAuth failures gracefully with error message."""
-        from rai_providers.jira.oauth import OAuthError
+        from rai_pro.providers.jira.oauth import OAuthError
 
         # Mock OAuth failure
         mock_authenticate.side_effect = OAuthError("User denied authorization")
@@ -123,7 +123,7 @@ class TestBacklogAuthCommand:
         assert result.exit_code != 0
         assert "denied" in result.stdout.lower() or "error" in result.stdout.lower()
 
-    @patch("rai_providers.jira.oauth.authenticate")
+    @patch("rai_pro.providers.jira.oauth.authenticate")
     @patch("rai_cli.config.paths.get_credentials_path")
     def test_auth_network_error(
         self,

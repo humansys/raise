@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_providers.jira.sync_state import (
+from rai_pro.providers.jira.sync_state import (
     SyncMapping,
     SyncState,
     load_state,

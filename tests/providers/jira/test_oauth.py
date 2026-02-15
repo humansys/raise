@@ -36,7 +36,7 @@ class TestPKCEGeneration:
 
     def test_generate_code_verifier_length(self) -> None:
         """Code verifier should be 43-128 characters."""
-        from rai_providers.jira.oauth import _generate_code_verifier
+        from rai_pro.providers.jira.oauth import _generate_code_verifier
 
         verifier = _generate_code_verifier()
 
@@ -46,7 +46,7 @@ class TestPKCEGeneration:
 
     def test_generate_code_verifier_randomness(self) -> None:
         """Code verifier should be random (different each time)."""
-        from rai_providers.jira.oauth import _generate_code_verifier
+        from rai_pro.providers.jira.oauth import _generate_code_verifier
 
         verifier1 = _generate_code_verifier()
         verifier2 = _generate_code_verifier()
@@ -55,7 +55,7 @@ class TestPKCEGeneration:
 
     def test_generate_code_challenge_from_verifier(self) -> None:
         """Code challenge should be SHA256 hash of verifier, base64url encoded."""
-        from rai_providers.jira.oauth import _generate_code_challenge
+        from rai_pro.providers.jira.oauth import _generate_code_challenge
 
         verifier = "test-verifier-12345678901234567890123456"
 
@@ -69,7 +69,7 @@ class TestPKCEGeneration:
 
     def test_code_challenge_deterministic(self) -> None:
         """Same verifier produces same challenge."""
-        from rai_providers.jira.oauth import _generate_code_challenge
+        from rai_pro.providers.jira.oauth import _generate_code_challenge
 
         verifier = "consistent-verifier-value"
 
@@ -86,7 +86,7 @@ class TestAuthorizationURL:
         self, oauth_config: dict[str, str]
     ) -> None:
         """Authorization URL contains required OAuth parameters."""
-        from rai_providers.jira.oauth import build_authorization_url
+        from rai_pro.providers.jira.oauth import build_authorization_url
 
         url, state, verifier = build_authorization_url(
             client_id=oauth_config["client_id"],
@@ -119,7 +119,7 @@ class TestAuthorizationURL:
         self, oauth_config: dict[str, str]
     ) -> None:
         """Authorization URL returns state and verifier for later validation."""
-        from rai_providers.jira.oauth import build_authorization_url
+        from rai_pro.providers.jira.oauth import build_authorization_url
 
         url, state, verifier = build_authorization_url(
             client_id=oauth_config["client_id"],
@@ -147,7 +147,7 @@ class TestTokenExchange:
         mock_credentials_path: Path,
     ) -> None:
         """Exchange authorization code for access token using PKCE verifier."""
-        from rai_providers.jira.oauth import exchange_code_for_token
+        from rai_pro.providers.jira.oauth import exchange_code_for_token
 
         # Mock successful token response
         mock_response = MagicMock()
@@ -194,7 +194,7 @@ class TestTokenExchange:
         self, mock_post: Mock, oauth_config: dict[str, str]
     ) -> None:
         """Token exchange handles error responses."""
-        from rai_providers.jira.oauth import OAuthError, exchange_code_for_token
+        from rai_pro.providers.jira.oauth import OAuthError, exchange_code_for_token
 
         # Mock error response
         mock_response = MagicMock()
@@ -222,7 +222,7 @@ class TestOAuthFlow:
     """Test complete OAuth flow integration."""
 
     @patch("webbrowser.open")
-    @patch("rai_providers.jira.oauth._start_callback_server")
+    @patch("rai_pro.providers.jira.oauth._start_callback_server")
     @patch("requests.post")
     def test_complete_oauth_flow(
         self,
@@ -233,7 +233,7 @@ class TestOAuthFlow:
         mock_credentials_path: Path,
     ) -> None:
         """Complete OAuth flow: authorize → callback → token exchange → store."""
-        from rai_providers.jira.oauth import authenticate
+        from rai_pro.providers.jira.oauth import authenticate
 
         # Mock callback server returning authorization code and state
         mock_callback_server.return_value = {
@@ -253,7 +253,7 @@ class TestOAuthFlow:
         mock_post.return_value = mock_token_response
 
         # Run complete flow
-        with patch("rai_providers.jira.oauth._generate_state") as mock_state:
+        with patch("rai_pro.providers.jira.oauth._generate_state") as mock_state:
             mock_state.return_value = "mock_state_value"
 
             token = authenticate(
@@ -278,7 +278,7 @@ class TestOAuthFlow:
 
     def test_state_mismatch_raises_error(self) -> None:
         """OAuth flow validates state parameter to prevent CSRF."""
-        from rai_providers.jira.oauth import OAuthError, _validate_state
+        from rai_pro.providers.jira.oauth import OAuthError, _validate_state
 
         with pytest.raises(OAuthError) as exc_info:
             _validate_state(expected="state_123", actual="state_456")
@@ -292,7 +292,7 @@ class TestTokenRefresh:
 
     def test_is_token_expired_returns_true_when_expired(self) -> None:
         """Token is considered expired when expires_at is in the past."""
-        from rai_providers.jira.oauth import is_token_expired
+        from rai_pro.providers.jira.oauth import is_token_expired
 
         # Token expired 1 hour ago
         expired_token = {
@@ -304,7 +304,7 @@ class TestTokenRefresh:
 
     def test_is_token_expired_returns_false_when_valid(self) -> None:
         """Token is valid when expires_at is in the future."""
-        from rai_providers.jira.oauth import is_token_expired
+        from rai_pro.providers.jira.oauth import is_token_expired
 
         # Token expires in 1 hour
         valid_token = {
@@ -316,7 +316,7 @@ class TestTokenRefresh:
 
     def test_is_token_expired_with_buffer(self) -> None:
         """Token refresh considers safety buffer (refresh 5 min early)."""
-        from rai_providers.jira.oauth import is_token_expired
+        from rai_pro.providers.jira.oauth import is_token_expired
 
         # Token expires in 4 minutes (within 5-minute buffer)
         near_expiry_token = {
@@ -328,7 +328,7 @@ class TestTokenRefresh:
 
     def test_is_token_expired_handles_missing_expires_at(self) -> None:
         """Token without expires_at is considered expired (safe default)."""
-        from rai_providers.jira.oauth import is_token_expired
+        from rai_pro.providers.jira.oauth import is_token_expired
 
         token_without_expiry = {"access_token": "token_123"}
 
@@ -339,7 +339,7 @@ class TestTokenRefresh:
         self, mock_post: Mock, oauth_config: dict[str, str]
     ) -> None:
         """Refresh token exchanges refresh_token for new access_token."""
-        from rai_providers.jira.oauth import refresh_access_token
+        from rai_pro.providers.jira.oauth import refresh_access_token
 
         # Mock successful refresh response
         mock_response = MagicMock()
@@ -382,7 +382,7 @@ class TestTokenRefresh:
         self, mock_post: Mock, oauth_config: dict[str, str]
     ) -> None:
         """Refresh token handles invalid refresh_token errors."""
-        from rai_providers.jira.oauth import OAuthError, refresh_access_token
+        from rai_pro.providers.jira.oauth import OAuthError, refresh_access_token
 
         # Mock error response (refresh token expired/revoked)
         mock_response = MagicMock()
@@ -412,7 +412,7 @@ class TestTokenRefresh:
         self, oauth_config: dict[str, str]
     ) -> None:
         """Refresh fails gracefully when token has no refresh_token."""
-        from rai_providers.jira.oauth import OAuthError, refresh_access_token
+        from rai_pro.providers.jira.oauth import OAuthError, refresh_access_token
 
         token_without_refresh = {"access_token": "token_123"}
 

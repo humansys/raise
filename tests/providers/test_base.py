@@ -4,8 +4,8 @@ from abc import ABC
 
 import pytest
 
-from rai_providers.base import BacklogProvider
-from rai_providers.jira.client import JiraClient
+from rai_pro.providers.base import BacklogProvider
+from rai_pro.providers.jira.client import JiraClient
 
 
 def test_backlog_provider_is_abstract():

@@ -14,9 +14,9 @@ Property key: com.humansys.raise.sync (namespaced to avoid collisions)
 
 from typing import Any
 
-from rai_providers.jira.client import JiraClient
-from rai_providers.jira.exceptions import JiraApiError
-from rai_providers.jira.models import EntityProperty, RaiSyncMetadata
+from rai_pro.providers.jira.client import JiraClient
+from rai_pro.providers.jira.exceptions import JiraApiError
+from rai_pro.providers.jira.models import EntityProperty, RaiSyncMetadata
 
 # Namespaced property key from ADR-028
 PROPERTY_KEY = "com.humansys.raise.sync"

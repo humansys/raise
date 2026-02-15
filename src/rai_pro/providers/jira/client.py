@@ -14,14 +14,14 @@ from typing import Any
 import requests
 from atlassian import Jira
 
-from rai_providers.base import BacklogProvider
-from rai_providers.jira.exceptions import (
+from rai_pro.providers.base import BacklogProvider
+from rai_pro.providers.jira.exceptions import (
     JiraAuthError,
     JiraError,
     JiraNotFoundError,
     JiraRateLimitError,
 )
-from rai_providers.jira.models import JiraEpic, JiraStory, StoryCreate
+from rai_pro.providers.jira.models import JiraEpic, JiraStory, StoryCreate
 
 
 class RateLimiter:

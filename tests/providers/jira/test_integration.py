@@ -26,8 +26,8 @@ import time
 
 import pytest
 
-from rai_providers.jira.client import JiraClient
-from rai_providers.jira.models import StoryCreate
+from rai_pro.providers.jira.client import JiraClient
+from rai_pro.providers.jira.models import StoryCreate
 
 
 @pytest.mark.integration
@@ -178,7 +178,7 @@ def test_jira_client_error_handling():
 
     # Test 1: Not found error
     print("1. Testing 404 handling...")
-    from rai_providers.jira.exceptions import JiraNotFoundError
+    from rai_pro.providers.jira.exceptions import JiraNotFoundError
 
     with pytest.raises(JiraNotFoundError):
         client.read_epic("NONEXISTENT-99999")

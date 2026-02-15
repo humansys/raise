@@ -3,7 +3,7 @@
 This package provides adapters for external backlog/PM tools (JIRA, GitLab, Odoo).
 """
 
-from rai_providers.base import BacklogProvider
+from rai_pro.providers.base import BacklogProvider
 
 __version__ = "2.0.0"
 
