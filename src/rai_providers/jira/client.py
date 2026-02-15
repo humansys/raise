@@ -12,6 +12,7 @@ from collections import deque
 
 from atlassian import Jira
 
+from rai_providers.base import BacklogProvider
 from rai_providers.jira.exceptions import (
     JiraAuthError,
     JiraError,
@@ -67,14 +68,16 @@ class RateLimiter:
         self._requests.append(now)
 
 
-class JiraClient:
-    """JIRA client for bidirectional read/write operations.
+class JiraClient(BacklogProvider):
+    """JIRA implementation of BacklogProvider interface.
 
     Provides type-safe methods for reading epics and stories, with:
     - Rate limiting (10 req/sec)
     - Field filtering (only required fields)
     - OAuth token integration
     - Error handling with custom exceptions
+
+    Implements BacklogProvider contract for bidirectional epic-story sync.
 
     Attributes:
         _jira: Underlying atlassian-python-api client
