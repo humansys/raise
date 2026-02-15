@@ -262,3 +262,152 @@ class TestJiraClient:
         # Should be generic JiraError, not a subclass
         assert isinstance(exc_info.value, JiraError)
         assert not isinstance(exc_info.value, (JiraAuthError, JiraNotFoundError, JiraRateLimitError))
+
+
+class TestJiraClientWriteOperations:
+    """Tests for JiraClient write operations (create story)."""
+
+    @pytest.fixture
+    def mock_jira(self) -> Mock:
+        """Create a mock Jira instance."""
+        mock = Mock()
+        return mock
+
+    @pytest.fixture
+    def client(self, mock_jira: Mock) -> JiraClient:
+        """Create a JiraClient with mocked Jira instance."""
+        with patch("rai_providers.jira.client.Jira", return_value=mock_jira):
+            client = JiraClient(cloud_id="test-cloud-id", access_token="test-token")
+            client._jira = mock_jira
+        return client
+
+    def test_create_story_success(self, client: JiraClient, mock_jira: Mock) -> None:
+        """Test creating a story under an epic successfully."""
+        from rai_providers.jira.models import StoryCreate
+
+        # Mock response from JIRA
+        mock_jira.create_issue.return_value = {
+            "key": "DEMO-124",
+            "fields": {
+                "summary": "Implement value metrics",
+                "description": "Design and implement value measurement framework",
+                "status": {"name": "To Do"},
+                "labels": ["governance", "metrics"],
+            },
+        }
+
+        story_data = StoryCreate(
+            summary="Implement value metrics",
+            description="Design and implement value measurement framework",
+            labels=["governance", "metrics"],
+        )
+
+        created_story = client.create_story("DEMO-123", story_data)
+
+        assert isinstance(created_story, JiraStory)
+        assert created_story.key == "DEMO-124"
+        assert created_story.summary == "Implement value metrics"
+        assert created_story.description == "Design and implement value measurement framework"
+        assert created_story.status == "To Do"
+        assert created_story.labels == ["governance", "metrics"]
+        assert created_story.epic_key == "DEMO-123"
+
+        # Verify API call structure
+        mock_jira.create_issue.assert_called_once()
+        call_args = mock_jira.create_issue.call_args
+        fields = call_args[1]["fields"]
+
+        assert fields["summary"] == "Implement value metrics"
+        assert fields["issuetype"]["name"] == "Story"
+        assert fields["parent"]["key"] == "DEMO-123"
+        assert fields["labels"] == ["governance", "metrics"]
+
+    def test_create_story_minimal(self, client: JiraClient, mock_jira: Mock) -> None:
+        """Test creating a story with minimal fields (summary only)."""
+        from rai_providers.jira.models import StoryCreate
+
+        mock_jira.create_issue.return_value = {
+            "key": "DEMO-125",
+            "fields": {
+                "summary": "Minimal story",
+                "description": None,
+                "status": {"name": "To Do"},
+                "labels": [],
+            },
+        }
+
+        story_data = StoryCreate(summary="Minimal story")
+        created_story = client.create_story("DEMO-123", story_data)
+
+        assert created_story.key == "DEMO-125"
+        assert created_story.summary == "Minimal story"
+        assert created_story.description is None
+        assert created_story.labels == []
+
+    def test_create_story_extracts_project_key(
+        self, client: JiraClient, mock_jira: Mock
+    ) -> None:
+        """Test that project key is correctly extracted from epic key."""
+        from rai_providers.jira.models import StoryCreate
+
+        mock_jira.create_issue.return_value = {
+            "key": "PROJ-999",
+            "fields": {
+                "summary": "Test",
+                "status": {"name": "To Do"},
+                "labels": [],
+            },
+        }
+
+        story_data = StoryCreate(summary="Test story")
+        client.create_story("PROJ-456", story_data)
+
+        # Verify project key extracted correctly
+        call_args = mock_jira.create_issue.call_args
+        fields = call_args[1]["fields"]
+        assert fields["project"]["key"] == "PROJ"
+
+    def test_create_story_epic_not_found(
+        self, client: JiraClient, mock_jira: Mock
+    ) -> None:
+        """Test creating story with non-existent epic raises JiraNotFoundError."""
+        from rai_providers.jira.models import StoryCreate
+
+        mock_jira.create_issue.side_effect = Exception("Parent does not exist")
+
+        story_data = StoryCreate(summary="Test story")
+
+        with pytest.raises(JiraNotFoundError):
+            client.create_story("INVALID-999", story_data)
+
+    def test_create_story_auth_error(self, client: JiraClient, mock_jira: Mock) -> None:
+        """Test creating story with auth error raises JiraAuthError."""
+        from rai_providers.jira.models import StoryCreate
+
+        mock_jira.create_issue.side_effect = Exception("401 Unauthorized")
+
+        story_data = StoryCreate(summary="Test story")
+
+        with pytest.raises(JiraAuthError):
+            client.create_story("DEMO-123", story_data)
+
+    def test_create_story_rate_limiting_applied(
+        self, client: JiraClient, mock_jira: Mock
+    ) -> None:
+        """Test that rate limiter is called for create operation."""
+        from rai_providers.jira.models import StoryCreate
+
+        mock_jira.create_issue.return_value = {
+            "key": "DEMO-124",
+            "fields": {
+                "summary": "Test",
+                "status": {"name": "To Do"},
+                "labels": [],
+            },
+        }
+
+        story_data = StoryCreate(summary="Test story")
+
+        with patch.object(client._rate_limiter, "wait_if_needed") as mock_wait:
+            client.create_story("DEMO-123", story_data)
+            mock_wait.assert_called_once()
