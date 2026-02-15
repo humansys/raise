@@ -90,6 +90,27 @@ Create a bidirectional JIRA client wrapper over `atlassian-python-api` that prov
 - **CREATE:** `src/rai_providers/base.py` (BacklogProvider interface for future)
 - **MODIFY:** S-DEMO.2 OAuth module (if token refresh integration needed)
 
+## JIRA Issue Type Hierarchy
+
+**JIRA's standard hierarchy:**
+```
+Epic (issue type: Epic)
+  └── Story (issue type: Story)
+        └── Subtask (issue type: Sub-task)
+```
+
+**What this client handles (in scope for demo):**
+- **Epic:** Top-level container for related stories
+- **Story:** User story or feature under an epic
+
+**What this client does NOT handle (out of scope):**
+- **Subtask/Task:** Task-level items under stories (deferred post-demo per epic scope)
+
+**Rationale:**
+Epic + Story levels are sufficient to demonstrate bidirectional workflow orchestration for the Coppel demo. Task-level sync adds complexity without additional strategic value for the initial demo. Task support can be added post-demo if needed.
+
+**IMPORTANT:** When creating stories via `create_story()`, the JIRA issue type will be `"Story"` (not `"Task"` or `"Sub-task"`). Stories are attached to parent epics via the `parent` field.
+
 ## Examples
 
 ### 1. Read Epic
@@ -268,7 +289,7 @@ class BacklogProvider(ABC):
 - [ ] Must NOT store secrets in code (credentials, tokens)
 - [ ] Must NOT implement sync logic (that's S-DEMO.5 - this is a client only)
 - [ ] Must NOT add entity properties handling (that's S-DEMO.4)
-- [ ] Must NOT implement task-level operations (deferred post-demo)
+- [ ] Must NOT implement task/subtask-level operations (JIRA issue type "Sub-task" - deferred post-demo, only Epic + Story for demo scope)
 
 ## Constraints
 
