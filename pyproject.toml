@@ -115,6 +115,9 @@ addopts = [
     "--cov-report=html",
     "--cov-fail-under=90",
 ]
+markers = [
+    "integration: Manual integration tests requiring external services (run with -m integration)",
+]
 
 [tool.coverage.run]
 source = ["src/rai_cli"]
