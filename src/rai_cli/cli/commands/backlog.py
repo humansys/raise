@@ -33,18 +33,26 @@ def _get_sync_dir(project: str) -> Path:
 
 
 def _init_jira_client() -> tuple[object, str]:
-    """Initialize JIRA client from stored credentials.
+    """Initialize JIRA client from stored credentials with auto-refresh.
+
+    Checks token expiry and refreshes automatically if needed.
+    Stores refreshed token back to credentials file.
 
     Returns:
         Tuple of (JiraClient, cloud_id)
 
     Raises:
-        typer.Exit: If credentials not found or expired
+        typer.Exit: If credentials not found or refresh fails
     """
     try:
         from rai_cli.config.paths import get_credentials_path
-        from rai_providers.auth.credentials import load_token
+        from rai_providers.auth.credentials import load_token, store_token
         from rai_providers.jira.client import JiraClient
+        from rai_providers.jira.oauth import (
+            OAuthError,
+            is_token_expired,
+            refresh_access_token,
+        )
     except ImportError as e:
         console.print(f"[red]Error:[/red] Failed to load provider modules: {e}")
         raise typer.Exit(code=1) from e
@@ -58,6 +66,29 @@ def _init_jira_client() -> tuple[object, str]:
             "Run: rai backlog auth --provider jira"
         )
         raise typer.Exit(code=1)
+
+    # Auto-refresh expired tokens
+    if is_token_expired(token):
+        client_id = os.getenv("JIRA_CLIENT_ID", "")
+        client_secret = os.getenv("JIRA_CLIENT_SECRET", "")
+
+        if not client_id or not client_secret:
+            console.print(
+                "[red]Error:[/red] Token expired and JIRA_CLIENT_ID/JIRA_CLIENT_SECRET "
+                "not set for refresh.\nRun: rai backlog auth --provider jira"
+            )
+            raise typer.Exit(code=1)
+
+        try:
+            token = refresh_access_token(token, client_id, client_secret)
+            store_token("jira", token, credentials_path)
+            console.print("[dim]Token refreshed automatically.[/dim]")
+        except OAuthError as e:
+            console.print(
+                f"[red]Error:[/red] Token refresh failed: {e}\n"
+                "Run: rai backlog auth --provider jira"
+            )
+            raise typer.Exit(code=1) from e
 
     cloud_id = os.getenv("JIRA_CLOUD_ID", "")
     if not cloud_id:
