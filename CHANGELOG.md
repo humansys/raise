@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0a9] - 2026-02-16
+
 ### Added
 - Multi-agent session isolation: `--agent` and `--session` CLI flags for concurrent agent support (RAISE-127 pt1)
 - Session token protocol with priority resolution (`RAI_SESSION_ID` env → `--session` flag → auto-generate)
@@ -18,9 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bidirectional JIRA sync: `rai backlog pull/push/status/auth` commands (PRO)
 
 ### Fixed
-- PRO import guards: all `rai backlog` commands show clear "requires rai-pro" message instead of ImportError
-
-## [2.0.0a8] - 2026-02-14
+- PRO import guards: all `rai backlog` commands show clear "requires rai-pro" message instead of ImportError## [2.0.0a8] - 2026-02-14
 
 ### Added
 - Session narrative for cross-session memory continuity (HF-1)
@@ -42,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a8...HEAD
+[Unreleased]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a9...HEAD
+[2.0.0a9]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a8...v2.0.0a9
 [2.0.0a8]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a6...v2.0.0a8
 [2.0.0a6]: https://github.com/humansys-io/raise-commons/releases/tag/v2.0.0a6
