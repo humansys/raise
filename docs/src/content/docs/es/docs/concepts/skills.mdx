@@ -14,24 +14,24 @@ Un skill es un archivo markdown en `.claude/skills/<nombre>/SKILL.md` con:
 - **Niveles de maestría** — Shu (seguir exactamente), Ha (adaptar), Ri (crear el tuyo)
 - **Entradas y salidas** — qué necesita, qué produce
 
-Cuando invocas un skill (ej. `/story-plan`), tu IA carga el SKILL.md y sigue sus pasos — verificando prerequisitos, ejecutando cada paso, verificando resultados y produciendo salida documentada.
+Cuando invocas un skill (ej. `/rai-story-plan`), tu IA carga el SKILL.md y sigue sus pasos — verificando prerequisitos, ejecutando cada paso, verificando resultados y produciendo salida documentada.
 
 ## El Ciclo de Vida de una Story
 
 La cadena de skills más importante es el ciclo de vida de una story — la secuencia que lleva una feature desde la idea hasta código mergeado:
 
 ```
-/story-start    → Crear branch y scope commit
+/rai-story-start    → Crear branch y scope commit
       ↓
-/story-design   → Diseñar la especificación
+/rai-story-design   → Diseñar la especificación
       ↓
-/story-plan     → Descomponer en tareas atómicas
+/rai-story-plan     → Descomponer en tareas atómicas
       ↓
-/story-implement → Ejecutar tareas con TDD
+/rai-story-implement → Ejecutar tareas con TDD
       ↓
-/story-review   → Retrospectiva y aprendizajes
+/rai-story-review   → Retrospectiva y aprendizajes
       ↓
-/story-close    → Verificar, mergear, limpiar
+/rai-story-close    → Verificar, mergear, limpiar
 ```
 
 Cada paso produce un artefacto (scope.md, design.md, plan.md, progress.md, retrospective.md) y tiene gates de verificación que deben pasar antes de continuar. Esto no es burocracia — es cómo aseguras consistencia y trazabilidad entre sesiones.
@@ -42,10 +42,10 @@ Los skills se organizan por el ciclo de vida de trabajo al que pertenecen:
 
 | Ciclo de Vida | Skills | Cuándo |
 |---------------|--------|--------|
-| **Session** | `/session-start`, `/session-close` | Cada sesión de trabajo |
-| **Story** | `/story-start` hasta `/story-close` | Para cada feature |
-| **Epic** | `/epic-start` hasta `/epic-close` | Para cuerpos de trabajo multi-story |
-| **Discovery** | `/discover-start` hasta `/discover-complete` | Al analizar un codebase |
+| **Session** | `/rai-session-start`, `/rai-session-close` | Cada sesión de trabajo |
+| **Story** | `/rai-story-start` hasta `/rai-story-close` | Para cada feature |
+| **Epic** | `/rai-epic-start` hasta `/rai-epic-close` | Para cuerpos de trabajo multi-story |
+| **Discovery** | `/rai-discover-start` hasta `/rai-discover-document` | Al analizar un codebase |
 
 ## Skills vs. CLI
 
@@ -54,7 +54,7 @@ Esta distinción importa:
 - **Skills** guían el *proceso* — le dicen a ti y a tu IA qué hacer, en qué orden, con qué verificación
 - **CLI** maneja los *datos* — lee, escribe, construye y consulta determinísticamente
 
-Un skill como `/story-plan` le dice a la IA que descomponga una story en tareas. El comando CLI `rai memory emit-work` registra el evento. El skill orquesta; el CLI ejecuta.
+Un skill como `/rai-story-plan` le dice a la IA que descomponga una story en tareas. El comando CLI `rai memory emit-work` registra el evento. El skill orquesta; el CLI ejecuta.
 
 ## Niveles de Maestría (ShuHaRi)
 
