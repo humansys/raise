@@ -116,6 +116,7 @@ def process_session_close(
     close_input: CloseInput,
     profile: DeveloperProfile,
     project_path: Path,
+    session_id: str | None = None,
 ) -> CloseResult:
     """Process session close — perform all writes.
 
@@ -253,7 +254,7 @@ def process_session_close(
         progress=progress,
         completed_epics=close_input.completed_epics,
     )
-    save_session_state(project_path, session_state)
+    save_session_state(project_path, session_state, session_id=session_id)
     result.messages.append("Session state saved")
 
     return result

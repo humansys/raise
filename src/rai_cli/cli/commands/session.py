@@ -34,7 +34,7 @@ from rai_cli.onboarding.profile import (
 from rai_cli.session.bundle import assemble_context_bundle
 from rai_cli.session.close import CloseInput, load_state_file, process_session_close
 from rai_cli.session.resolver import resolve_session_id
-from rai_cli.session.state import load_session_state
+from rai_cli.session.state import cleanup_session_dir, load_session_state, migrate_flat_to_session
 
 session_app = typer.Typer(
     name="session",
@@ -140,6 +140,13 @@ def start(
         personal_dir = Path(project) / ".raise" / "rai" / "personal"
         sessions_index = personal_dir / "sessions" / "index.jsonl"
         session_id = get_next_id(sessions_index, "SES")
+
+        # Migrate flat files if they exist (before creating dir)
+        migrate_flat_to_session(Path(project), session_id)
+
+        # Ensure per-session directory exists (migration may have created it)
+        session_dir = Path(project) / ".raise" / "rai" / "personal" / "sessions" / session_id
+        session_dir.mkdir(parents=True, exist_ok=True)
 
         # Add to active_sessions (with stale warning)
         agent_name = agent if agent else "unknown"
@@ -306,8 +313,13 @@ def close(
     # Resolve project path
     project_path = Path(project) if project else Path.cwd()
 
-    # Process close
-    close_result = process_session_close(close_input, profile, project_path)
+    # Process close (pass session_id for per-session state writes)
+    close_result = process_session_close(close_input, profile, project_path, session_id=resolved_session_id)
+
+    # Cleanup per-session directory
+    cleanup_session_id = resolved_session_id or close_result.session_id
+    if cleanup_session_id:
+        cleanup_session_dir(project_path, cleanup_session_id)
 
     # Output summary
     typer.echo(f"Session {close_result.session_id} closed.")
