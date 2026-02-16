@@ -30,8 +30,9 @@ Any number of AI agents or terminals can run concurrent sessions on the same pro
 | 1 | [RAISE-137](https://humansys.atlassian.net/browse/RAISE-137) | Session Token Protocol — start returns ID, `--session` on commands, env var fallback | S | 2 | — |
 | 2 | [RAISE-138](https://humansys.atlassian.net/browse/RAISE-138) | Per-Session State Isolation — session directories, migration, concurrent access | M | 3 | RAISE-137 |
 | 3 | [RAISE-139](https://humansys.atlassian.net/browse/RAISE-139) | Project-Scoped Session Writes — CWD poka-yoke (fixes RAISE-134) | S | 3 | RAISE-138 |
+| 4 | [RAISE-146](https://humansys.atlassian.net/browse/RAISE-146) | Wire --session through telemetry CLI commands | XS | 1 | RAISE-138 |
 
-**Total:** 3 stories, 8 SP estimated
+**Total:** 4 stories, 9 SP estimated
 
 ---
 
@@ -226,12 +227,13 @@ Strictly sequential. No parallel streams — each story builds on the previous.
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
 | RAISE-137 | S | ✅ Done | 2h | 1.25x velocity |
-| RAISE-138 | M | Pending | — | |
-| RAISE-139 | S | Pending | — | |
+| RAISE-138 | M | ✅ Done | ~1h | 1.0x velocity |
+| RAISE-139 | S | ✅ Done | ~20min | 1.5x velocity |
+| RAISE-146 | XS | Pending | — | Telemetry CLI wiring |
 
 **Milestones:**
 - [x] M1: Token Protocol (Feb 15 — completed ahead of schedule)
-- [ ] M2: Isolation Works (Feb 17)
+- [x] M2: Isolation Works (Feb 15 — completed ahead of schedule)
 - [ ] M3: Launch Ready (Feb 17)
 - [ ] M4: Epic Complete (Feb 18)
 
