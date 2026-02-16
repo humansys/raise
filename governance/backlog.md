@@ -38,8 +38,9 @@
 | [RAISE-142](https://humansys.atlassian.net/browse/RAISE-142) | **Enterprise Readiness** (was E22) | 📋 Backlog | — | P2 (V3) |
 | [RAISE-143](https://humansys.atlassian.net/browse/RAISE-143) | **Collective Intelligence** (was E10) | 📋 Backlog | `dev/epic-e10-scope.md` | P2 (V3) |
 | [RAISE-144](https://humansys.atlassian.net/browse/RAISE-144) | **Engineering Health** | 📋 Permanent | — | Rolling |
+| [RAISE-153](https://humansys.atlassian.net/browse/RAISE-153) | **Developer Enablement** | 🚀 In Progress | `work/epics/raise-153-developer-enablement/scope.md` | P0 (v2.0) |
 
-**Summary:** 17 of 18 internal epics complete. E-DEMO in progress. 8 JIRA-tracked epics in backlog (v2.1/V3 + Engineering Health).
+**Summary:** 17 of 18 internal epics complete. E-DEMO and RAISE-153 in progress. 8 JIRA-tracked epics in backlog (v2.1/V3 + Engineering Health).
 
 ---
 
