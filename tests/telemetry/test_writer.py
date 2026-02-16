@@ -209,6 +209,66 @@ class TestEmit:
         assert data3["command"] == "memory"
 
 
+class TestEmitPerSession:
+    """Tests for per-session telemetry writes."""
+
+    def test_emit_to_per_session_dir(self, temp_telemetry_dir: Path, now: datetime) -> None:
+        """Emit to sessions/{session_id}/signals.jsonl when session_id provided."""
+        event = SkillEvent(timestamp=now, skill="test", event="start")
+
+        result = emit(event, base_path=temp_telemetry_dir, session_id="SES-177")
+
+        assert result.success is True
+        expected_path = (
+            temp_telemetry_dir / ".raise" / "rai" / "personal"
+            / "sessions" / "SES-177" / "signals.jsonl"
+        )
+        assert result.path == expected_path
+        assert expected_path.exists()
+
+        data = json.loads(expected_path.read_text().strip())
+        assert data["skill"] == "test"
+
+    def test_per_session_does_not_write_to_shared(
+        self, temp_telemetry_dir: Path, now: datetime
+    ) -> None:
+        """Per-session emit should NOT write to shared telemetry dir."""
+        event = SkillEvent(timestamp=now, skill="test", event="start")
+
+        emit(event, base_path=temp_telemetry_dir, session_id="SES-177")
+
+        shared_path = (
+            temp_telemetry_dir / ".raise" / "rai" / "personal"
+            / "telemetry" / "signals.jsonl"
+        )
+        assert not shared_path.exists()
+
+    def test_two_sessions_write_independently(
+        self, temp_telemetry_dir: Path, now: datetime
+    ) -> None:
+        """Two sessions write to separate files without interference."""
+        event1 = SkillEvent(timestamp=now, skill="session1", event="start")
+        event2 = SkillEvent(timestamp=now, skill="session2", event="start")
+
+        emit(event1, base_path=temp_telemetry_dir, session_id="SES-177")
+        emit(event2, base_path=temp_telemetry_dir, session_id="SES-178")
+
+        path1 = (
+            temp_telemetry_dir / ".raise" / "rai" / "personal"
+            / "sessions" / "SES-177" / "signals.jsonl"
+        )
+        path2 = (
+            temp_telemetry_dir / ".raise" / "rai" / "personal"
+            / "sessions" / "SES-178" / "signals.jsonl"
+        )
+
+        data1 = json.loads(path1.read_text().strip())
+        data2 = json.loads(path2.read_text().strip())
+
+        assert data1["skill"] == "session1"
+        assert data2["skill"] == "session2"
+
+
 class TestEmitResult:
     """Tests for EmitResult dataclass."""
 
