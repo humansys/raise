@@ -186,6 +186,20 @@ class GateFailedError(RaiError):
     error_code: str = "E010"
 
 
+class RaiSessionNotFoundError(RaiError):
+    """Session ID not provided or resolvable.
+
+    Raised when:
+    - Neither --session flag nor RAI_SESSION_ID env var is provided
+    - Session ID is required but cannot be determined
+
+    Exit code: 2 (configuration error - user must provide session context)
+    """
+
+    exit_code: int = 2
+    error_code: str = "E011"
+
+
 # All public exceptions
 __all__ = [
     "RaiError",
@@ -197,4 +211,5 @@ __all__ = [
     "StateError",
     "ValidationError",
     "GateFailedError",
+    "RaiSessionNotFoundError",
 ]
