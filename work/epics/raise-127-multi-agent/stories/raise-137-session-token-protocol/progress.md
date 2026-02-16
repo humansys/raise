@@ -2,7 +2,7 @@
 
 ## Status
 - **Started:** 2026-02-15 (implementation phase)
-- **Current Task:** 3 of 6
+- **Current Task:** 4 of 6
 - **Status:** In Progress
 
 ## Completed Tasks
@@ -24,6 +24,12 @@
 - **Completed:** 2026-02-15
 - **Duration:** ~20 min
 - **Notes:** Added `--agent` flag to `rai session start`, `--session` flag to `rai session close`. Imported `resolve_session_id` in session commands (wiring completed in Task 4). Updated output format to show "▶ Session SES-PLACEHOLDER started (agent)". All 3 tests passing. Pyright: 0 errors.
+
+### Task 4: Update Session Start/Close to Use active_sessions
+- **Started:** 2026-02-15
+- **Completed:** 2026-02-15
+- **Duration:** ~25 min
+- **Notes:** TDD cycle RED→GREEN→REFACTOR successful. Updated `start_session()` to add to `active_sessions` list (returns tuple with stale warnings). Updated `end_session()` to remove from list by session_id (no-op if not found). Stale detection working (>24h threshold). Removed deprecated tests for old `current_session` behavior. All 96 profile tests passing. CLI wiring deferred to Task 5/subsequent stories.
 
 ## Blockers
 
