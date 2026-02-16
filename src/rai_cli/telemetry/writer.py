@@ -17,7 +17,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-from rai_cli.config.paths import SIGNALS_FILE, TELEMETRY_SUBDIR, get_personal_dir
+from rai_cli.config.paths import SIGNALS_FILE, TELEMETRY_SUBDIR, get_personal_dir, get_session_dir
 
 if TYPE_CHECKING:
     from rai_cli.telemetry.schemas import Signal
@@ -69,33 +69,31 @@ def emit(
     signal: Signal,
     *,
     base_path: Path | None = None,
+    session_id: str | None = None,
 ) -> EmitResult:
     """Emit a telemetry signal to the signals.jsonl file.
 
-    Appends the signal as a JSON line to `.raise/rai/personal/telemetry/signals.jsonl`.
+    When session_id is provided, writes to per-session directory:
+        .raise/rai/personal/sessions/{session_id}/signals.jsonl
+
+    When session_id is None, writes to shared telemetry directory:
+        .raise/rai/personal/telemetry/signals.jsonl
+
     Creates the directory if it doesn't exist. Uses file locking for
     thread-safe writes. Telemetry is personal data (gitignored).
 
     Args:
         signal: The signal to emit (any of the 5 signal types).
         base_path: Base directory for telemetry. Defaults to current directory.
+        session_id: Optional session ID for per-session isolation.
 
     Returns:
         EmitResult with success status and path or error message.
-
-    Examples:
-        >>> from datetime import datetime, timezone
-        >>> from rai_cli.telemetry import SkillEvent, emit
-        >>> event = SkillEvent(
-        ...     timestamp=datetime.now(timezone.utc),
-        ...     skill="story-design",
-        ...     event="start"
-        ... )
-        >>> result = emit(event)
-        >>> result.success
-        True
     """
-    path = _get_telemetry_path(base_path)
+    if session_id is not None:
+        path = get_session_dir(session_id, base_path) / SIGNALS_FILE
+    else:
+        path = _get_telemetry_path(base_path)
 
     try:
         _ensure_directory(path)
@@ -129,6 +127,7 @@ def emit_skill_event(
     duration_sec: int | None = None,
     *,
     base_path: Path | None = None,
+    session_id: str | None = None,
 ) -> EmitResult:
     """Convenience function to emit a skill event.
 
@@ -137,6 +136,7 @@ def emit_skill_event(
         event: Event type ("start", "complete", "abandon").
         duration_sec: Duration in seconds (for complete/abandon).
         base_path: Base directory for telemetry.
+        session_id: Optional session ID for per-session isolation.
 
     Returns:
         EmitResult with success status.
@@ -149,7 +149,7 @@ def emit_skill_event(
         event=event,
         duration_sec=duration_sec,
     )
-    return emit(signal, base_path=base_path)
+    return emit(signal, base_path=base_path, session_id=session_id)
 
 
 def emit_command_usage(
@@ -157,6 +157,7 @@ def emit_command_usage(
     subcommand: str | None = None,
     *,
     base_path: Path | None = None,
+    session_id: str | None = None,
 ) -> EmitResult:
     """Convenience function to emit a command usage event.
 
@@ -164,6 +165,7 @@ def emit_command_usage(
         command: Main command name (e.g., "memory").
         subcommand: Subcommand name if any (e.g., "query").
         base_path: Base directory for telemetry.
+        session_id: Optional session ID for per-session isolation.
 
     Returns:
         EmitResult with success status.
@@ -175,7 +177,7 @@ def emit_command_usage(
         command=command,
         subcommand=subcommand,
     )
-    return emit(signal, base_path=base_path)
+    return emit(signal, base_path=base_path, session_id=session_id)
 
 
 def emit_error_event(
@@ -185,6 +187,7 @@ def emit_error_event(
     recoverable: bool,
     *,
     base_path: Path | None = None,
+    session_id: str | None = None,
 ) -> EmitResult:
     """Convenience function to emit an error event.
 
@@ -194,6 +197,7 @@ def emit_error_event(
         context: Brief context (no sensitive data).
         recoverable: Whether the error was recoverable.
         base_path: Base directory for telemetry.
+        session_id: Optional session ID for per-session isolation.
 
     Returns:
         EmitResult with success status.
@@ -207,4 +211,4 @@ def emit_error_event(
         context=context,
         recoverable=recoverable,
     )
-    return emit(signal, base_path=base_path)
+    return emit(signal, base_path=base_path, session_id=session_id)
