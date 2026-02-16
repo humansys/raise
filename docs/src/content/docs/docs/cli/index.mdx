@@ -58,6 +58,7 @@ With `--context`, outputs a token-optimized context bundle (~150 tokens) assembl
 |------|-------|-------------|
 | `--name` | `-n` | Your name (required for first-time setup) |
 | `--project` | `-p` | Project path to associate with this session |
+| `--agent` | | Agent type (e.g., `claude-code`, `cursor`). Default: `unknown` |
 | `--context` | | Output a context bundle for AI consumption |
 
 ```bash
@@ -83,6 +84,7 @@ End the current working session. With `--summary` or `--state-file`, performs a 
 | `--correction` | | Coaching correction observed |
 | `--correction-lesson` | | Lesson from the correction |
 | `--state-file` | | YAML file with full structured session output |
+| `--session` | | Session ID to close (e.g., `SES-177`). Falls back to `RAI_SESSION_ID` env var |
 | `--project` | `-p` | Project path |
 
 ```bash
@@ -354,6 +356,27 @@ rai memory emit-calibration S9.4 --size S --estimated 30 --actual 15
 rai memory emit-calibration S9.4 -s M -e 60 -a 90
 ```
 
+### `rai memory viz`
+
+Generate an interactive HTML visualization of the memory graph. Creates a self-contained HTML file with a D3.js force-directed graph. Nodes are color-coded by type, filterable, zoomable, and searchable.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--output` | `-o` | Output HTML file path |
+| `--index` | `-i` | Memory index path |
+| `--open` / `--no-open` | | Open in browser after generating (default: open) |
+
+```bash
+# Generate and open in browser
+rai memory viz
+
+# Generate to specific path
+rai memory viz --output graph.html
+
+# Generate without opening
+rai memory viz --no-open
+```
+
 ### `rai memory generate`
 
 :::caution[Deprecated]
@@ -537,4 +560,141 @@ Display base Rai package information. Shows the bundled base version, contents (
 
 ```bash
 rai base show
+```
+
+---
+
+## Backlog
+
+Commands for syncing with external backlog providers (JIRA).
+
+### `rai backlog auth`
+
+Authenticate with an external backlog provider. Initiates OAuth 2.0 flow and stores credentials securely in `~/.rai/credentials.json`.
+
+Supported providers: `jira` (Atlassian JIRA Cloud).
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--provider` | `-p` | Provider to authenticate with (e.g., `jira`) **(required)** |
+
+```bash
+# Authenticate with JIRA
+rai backlog auth --provider jira
+
+# With custom OAuth credentials
+JIRA_CLIENT_ID=xxx JIRA_CLIENT_SECRET=yyy rai backlog auth --provider jira
+```
+
+### `rai backlog pull`
+
+Pull epic and stories from JIRA to local sync state. Reads from JIRA, maps to local IDs, and stores sync state in `.raise/rai/sync/state.json`.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--source` | `-s` | Provider to pull from (`jira`) **(required)** |
+| `--epic` | `-e` | JIRA epic key (e.g., `DEMO-1`) **(required)** |
+| `--epic-id` | | Local epic ID to assign (default: auto-generate) |
+| `--dry-run` | | Preview without executing |
+| `--project` | `-p` | Project root path (default: `.`) |
+
+```bash
+# Pull epic from JIRA
+rai backlog pull --source jira --epic DEMO-1
+
+# With custom local ID and preview
+rai backlog pull --source jira --epic DEMO-1 --epic-id E-DEMO --dry-run
+```
+
+### `rai backlog push`
+
+Push local stories to JIRA under a mapped epic. Creates JIRA stories linked to the parent epic. Idempotent — re-running won't create duplicates. Requires prior `pull` to map the epic.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--source` | `-s` | Provider to push to (`jira`) **(required)** |
+| `--epic` | `-e` | Local epic ID (e.g., `E-DEMO`) **(required)** |
+| `--stories` | | Comma-separated story definitions: `id:title,id:title` |
+| `--dry-run` | | Preview without executing |
+| `--project` | `-p` | Project root path (default: `.`) |
+
+```bash
+# Push stories to JIRA
+rai backlog push --source jira --epic E-DEMO \
+  --stories "S-DEMO.1:Define governance,S-DEMO.2:Create checklist"
+
+# Preview only
+rai backlog push --source jira --epic E-DEMO --dry-run
+```
+
+### `rai backlog status`
+
+Show sync and authorization status for epic stories. Reads local sync state only (no JIRA API calls). Shows which stories are authorized to work on based on their JIRA status.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--epic` | `-e` | Local epic ID (e.g., `E-DEMO`) **(required)** |
+| `--project` | `-p` | Project root path (default: `.`) |
+
+```bash
+rai backlog status --epic E-DEMO
+```
+
+---
+
+## Publish
+
+Commands for quality gates and release orchestration.
+
+### `rai publish check`
+
+Run all quality gates before publishing. Runs 10 quality checks: tests, types, lint, security, coverage, build, package validation, changelog, PEP 440 version, and version sync.
+
+Exits with code `0` if all pass, `1` if any fail.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project root path (default: `.`) |
+
+```bash
+rai publish check
+```
+
+### `rai publish release`
+
+Orchestrate a full release: check, bump, changelog, commit, tag, push. Either `--bump` or `--version` is required.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--bump` | `-b` | Version bump type: `major`, `minor`, `patch`, `alpha`, `beta`, `rc`, `release` |
+| `--version` | `-v` | Explicit version (overrides `--bump`) |
+| `--dry-run` | | Show what would happen without executing |
+| `--skip-check` | | Skip quality gates (dangerous) |
+| `--project` | `-p` | Project root path (default: `.`) |
+
+```bash
+# Bump alpha version
+rai publish release --bump alpha
+
+# Preview a minor release
+rai publish release --bump minor --dry-run
+
+# Set explicit version
+rai publish release --version 2.1.0
+```
+
+---
+
+## Release
+
+### `rai release list`
+
+List releases from the memory graph. Shows all release nodes with their status, target date, and associated epics.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project root path (default: `.`) |
+
+```bash
+rai release list
 ```

@@ -58,6 +58,7 @@ Con `--context`, genera un bundle de contexto optimizado en tokens (~150 tokens)
 |------|-------|-------------|
 | `--name` | `-n` | Tu nombre (requerido en la primera configuración) |
 | `--project` | `-p` | Ruta del proyecto a asociar con esta sesión |
+| `--agent` | | Tipo de agente (ej., `claude-code`, `cursor`). Por defecto: `unknown` |
 | `--context` | | Generar bundle de contexto para consumo de IA |
 
 ```bash
@@ -83,6 +84,7 @@ Finaliza la sesión de trabajo actual. Con `--summary` o `--state-file`, realiza
 | `--correction` | | Corrección de coaching observada |
 | `--correction-lesson` | | Lección de la corrección |
 | `--state-file` | | Archivo YAML con salida estructurada completa |
+| `--session` | | ID de sesión a cerrar (ej., `SES-177`). Usa `RAI_SESSION_ID` como fallback |
 | `--project` | `-p` | Ruta del proyecto |
 
 ```bash
@@ -354,6 +356,27 @@ rai memory emit-calibration S9.4 --size S --estimated 30 --actual 15
 rai memory emit-calibration S9.4 -s M -e 60 -a 90
 ```
 
+### `rai memory viz`
+
+Genera una visualización HTML interactiva del grafo de memoria. Crea un archivo HTML autocontenido con un grafo de fuerza dirigida D3.js. Los nodos están coloreados por tipo, son filtrables, tienen zoom y búsqueda.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--output` | `-o` | Ruta del archivo HTML de salida |
+| `--index` | `-i` | Ruta del índice de memoria |
+| `--open` / `--no-open` | | Abrir en navegador después de generar (por defecto: open) |
+
+```bash
+# Generar y abrir en navegador
+rai memory viz
+
+# Generar en ruta específica
+rai memory viz --output graph.html
+
+# Generar sin abrir
+rai memory viz --no-open
+```
+
 ### `rai memory generate`
 
 :::caution[Deprecado]
@@ -537,4 +560,141 @@ Muestra información del paquete base de Rai. Muestra la versión del base inclu
 
 ```bash
 rai base show
+```
+
+---
+
+## Backlog
+
+Comandos para sincronización con proveedores de backlog externos (JIRA).
+
+### `rai backlog auth`
+
+Autenticarse con un proveedor de backlog externo. Inicia flujo OAuth 2.0 y almacena credenciales de forma segura en `~/.rai/credentials.json`.
+
+Proveedores soportados: `jira` (Atlassian JIRA Cloud).
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--provider` | `-p` | Proveedor con el cual autenticarse (ej., `jira`) **(requerido)** |
+
+```bash
+# Autenticarse con JIRA
+rai backlog auth --provider jira
+
+# Con credenciales OAuth personalizadas
+JIRA_CLIENT_ID=xxx JIRA_CLIENT_SECRET=yyy rai backlog auth --provider jira
+```
+
+### `rai backlog pull`
+
+Traer epic y stories desde JIRA al estado de sincronización local. Lee desde JIRA, mapea a IDs locales y almacena el estado en `.raise/rai/sync/state.json`.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--source` | `-s` | Proveedor desde donde traer (`jira`) **(requerido)** |
+| `--epic` | `-e` | Clave del epic en JIRA (ej., `DEMO-1`) **(requerido)** |
+| `--epic-id` | | ID local del epic a asignar (por defecto: auto-generar) |
+| `--dry-run` | | Vista previa sin ejecutar |
+| `--project` | `-p` | Ruta raíz del proyecto (por defecto: `.`) |
+
+```bash
+# Traer epic desde JIRA
+rai backlog pull --source jira --epic DEMO-1
+
+# Con ID local personalizado y vista previa
+rai backlog pull --source jira --epic DEMO-1 --epic-id E-DEMO --dry-run
+```
+
+### `rai backlog push`
+
+Enviar stories locales a JIRA bajo un epic mapeado. Crea stories en JIRA vinculadas al epic padre. Idempotente — re-ejecutar no crea duplicados. Requiere `pull` previo para mapear el epic.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--source` | `-s` | Proveedor al cual enviar (`jira`) **(requerido)** |
+| `--epic` | `-e` | ID local del epic (ej., `E-DEMO`) **(requerido)** |
+| `--stories` | | Definiciones de stories separadas por coma: `id:título,id:título` |
+| `--dry-run` | | Vista previa sin ejecutar |
+| `--project` | `-p` | Ruta raíz del proyecto (por defecto: `.`) |
+
+```bash
+# Enviar stories a JIRA
+rai backlog push --source jira --epic E-DEMO \
+  --stories "S-DEMO.1:Definir gobernanza,S-DEMO.2:Crear checklist"
+
+# Solo vista previa
+rai backlog push --source jira --epic E-DEMO --dry-run
+```
+
+### `rai backlog status`
+
+Mostrar estado de sincronización y autorización para stories del epic. Lee solo el estado local (sin llamadas API a JIRA). Muestra qué stories están autorizadas para trabajo según su estado en JIRA.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--epic` | `-e` | ID local del epic (ej., `E-DEMO`) **(requerido)** |
+| `--project` | `-p` | Ruta raíz del proyecto (por defecto: `.`) |
+
+```bash
+rai backlog status --epic E-DEMO
+```
+
+---
+
+## Publish
+
+Comandos para quality gates y orquestación de releases.
+
+### `rai publish check`
+
+Ejecutar todos los quality gates antes de publicar. Ejecuta 10 verificaciones: tests, tipos, lint, seguridad, cobertura, build, validación de paquete, changelog, versión PEP 440 y sincronización de versión.
+
+Sale con código `0` si todos pasan, `1` si alguno falla.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--project` | `-p` | Ruta raíz del proyecto (por defecto: `.`) |
+
+```bash
+rai publish check
+```
+
+### `rai publish release`
+
+Orquestar un release completo: check, bump, changelog, commit, tag, push. Se requiere `--bump` o `--version`.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--bump` | `-b` | Tipo de bump: `major`, `minor`, `patch`, `alpha`, `beta`, `rc`, `release` |
+| `--version` | `-v` | Versión explícita (sobreescribe `--bump`) |
+| `--dry-run` | | Mostrar qué pasaría sin ejecutar |
+| `--skip-check` | | Saltar quality gates (peligroso) |
+| `--project` | `-p` | Ruta raíz del proyecto (por defecto: `.`) |
+
+```bash
+# Bump versión alpha
+rai publish release --bump alpha
+
+# Vista previa de release minor
+rai publish release --bump minor --dry-run
+
+# Versión explícita
+rai publish release --version 2.1.0
+```
+
+---
+
+## Release
+
+### `rai release list`
+
+Listar releases del grafo de memoria. Muestra todos los nodos de release con su estado, fecha objetivo y epics asociados.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--project` | `-p` | Ruta raíz del proyecto (por defecto: `.`) |
+
+```bash
+rai release list
 ```
