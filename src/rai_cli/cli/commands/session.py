@@ -21,7 +21,8 @@ from typing import Annotated
 import typer
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.memory.writer import validate_session_index
+from rai_cli.exceptions import RaiSessionNotFoundError
+from rai_cli.memory.writer import get_next_id, validate_session_index
 from rai_cli.onboarding.profile import (
     DeveloperProfile,
     end_session,
@@ -133,9 +134,25 @@ def start(
     # Increment session count
     updated = increment_session(profile, project_path=project)
 
-    # Set active session state
+    # Generate session ID and add to active_sessions
+    session_id: str | None = None
     if project is not None:
-        updated = start_session(updated, project)
+        personal_dir = Path(project) / ".raise" / "rai" / "personal"
+        sessions_index = personal_dir / "sessions" / "index.jsonl"
+        session_id = get_next_id(sessions_index, "SES")
+
+        # Add to active_sessions (with stale warning)
+        agent_name = agent if agent else "unknown"
+        updated, stale_sessions = start_session(
+            updated, session_id=session_id, project_path=project, agent=agent_name
+        )
+
+        # Warn about stale sessions
+        if stale_sessions:
+            typer.echo("⚠ Warning: Stale sessions detected (started >24h ago):")
+            for stale in stale_sessions:
+                typer.echo(f"  - {stale.session_id} (started {stale.started_at.date()}, project: {stale.project})")
+            typer.echo("Consider closing these sessions with: rai session close --session <ID>\n")
 
     save_developer_profile(updated)
 
@@ -145,12 +162,13 @@ def start(
     if context and project is not None:
         project_path = Path(project)
         state = load_session_state(project_path)
-        bundle = assemble_context_bundle(updated, state, project_path)
+        bundle = assemble_context_bundle(updated, state, project_path, session_id=session_id)
         typer.echo(bundle)
     else:
-        # TODO(RAISE-137): Get actual session ID from active_sessions in Task 4
-        # For now, show placeholder format
-        typer.echo(f"▶ Session SES-PLACEHOLDER started ({agent_name})")
+        if session_id:
+            typer.echo(f"▶ Session {session_id} started ({agent_name})")
+        else:
+            typer.echo(f"▶ Session started ({agent_name})")
         typer.echo(f"Session recorded. (last: {updated.last_session})")
 
 
@@ -236,26 +254,32 @@ def close(
         cli_error("No developer profile found")
         return  # cli_error raises, but this helps pyright
 
-    # TODO(RAISE-137): Use resolve_session_id() in Task 4 when active_sessions is wired
-    # For now, --session flag is accepted but not yet used
+    # Resolve session ID (from --session flag or RAI_SESSION_ID env var)
+    resolved_session_id: str | None = None
     if session:
         import os
 
-        _ = resolve_session_id(session_flag=session, env_var=os.getenv("RAI_SESSION_ID"))
-        # Resolved ID will be used in Task 4 to identify which session to close
+        try:
+            resolved_session_id = resolve_session_id(session_flag=session, env_var=os.getenv("RAI_SESSION_ID"))
+        except RaiSessionNotFoundError as e:
+            cli_error(str(e))
+            return
 
     # Determine if this is a structured close
     is_structured = summary is not None or state_file is not None
 
     if not is_structured:
         # Legacy behavior: just clear active session
-        if profile.current_session is None:
-            typer.echo("No active session to close.")
-            return
+        if not resolved_session_id:
+            # No session specified, try to use first active session
+            if not profile.active_sessions:
+                typer.echo("No active session to close.")
+                return
+            resolved_session_id = profile.active_sessions[0].session_id
 
-        updated = end_session(profile)
+        updated = end_session(profile, session_id=resolved_session_id)
         save_developer_profile(updated)
-        typer.echo("Session closed.")
+        typer.echo(f"Session {resolved_session_id} closed.")
         return
 
     # Structured close: build CloseInput from flags or state file
