@@ -16,6 +16,7 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
+from rai_cli.config.paths import get_session_dir
 from rai_cli.schemas.session_state import SessionState
 
 logger = logging.getLogger(__name__)
@@ -27,15 +28,26 @@ SESSION_STATE_REL_PATH = Path(".raise") / "rai" / "personal" / "session-state.ya
 _LEGACY_SESSION_STATE_REL_PATH = Path(".raise") / "rai" / "session-state.yaml"
 
 
-def get_session_state_path(project_path: Path) -> Path:
-    """Get the absolute path to session-state.yaml for a project.
+def get_session_state_path(
+    project_path: Path, session_id: str | None = None
+) -> Path:
+    """Get the absolute path to session state file.
+
+    When session_id is provided, returns per-session path:
+        .raise/rai/personal/sessions/{session_id}/state.yaml
+
+    When session_id is None, returns legacy flat path:
+        .raise/rai/personal/session-state.yaml
 
     Args:
         project_path: Absolute path to the project root.
+        session_id: Optional session ID for per-session isolation.
 
     Returns:
-        Path to the session-state.yaml file in personal/ directory.
+        Path to the session state file.
     """
+    if session_id is not None:
+        return get_session_dir(session_id, project_path) / "state.yaml"
     return project_path / SESSION_STATE_REL_PATH
 
 
@@ -54,19 +66,24 @@ def _migrate_session_state(project_path: Path) -> None:
         logger.info("Migrated session state: %s → %s", old_path, new_path)
 
 
-def load_session_state(project_path: Path) -> SessionState | None:
-    """Load session state from .raise/rai/personal/session-state.yaml.
+def load_session_state(
+    project_path: Path, session_id: str | None = None
+) -> SessionState | None:
+    """Load session state from per-session directory or flat file.
 
-    Automatically migrates from legacy path if needed.
+    When session_id is provided, loads from per-session directory.
+    When session_id is None, loads from legacy flat file (with migration).
 
     Args:
         project_path: Absolute path to the project root.
+        session_id: Optional session ID for per-session isolation.
 
     Returns:
         SessionState if file exists and is valid, None otherwise.
     """
-    _migrate_session_state(project_path)
-    state_path = get_session_state_path(project_path)
+    if session_id is None:
+        _migrate_session_state(project_path)
+    state_path = get_session_state_path(project_path, session_id)
 
     if not state_path.exists():
         logger.debug("Session state not found: %s", state_path)
@@ -87,8 +104,13 @@ def load_session_state(project_path: Path) -> SessionState | None:
         return None
 
 
-def save_session_state(project_path: Path, state: SessionState) -> None:
-    """Save session state to .raise/rai/session-state.yaml.
+def save_session_state(
+    project_path: Path, state: SessionState, session_id: str | None = None
+) -> None:
+    """Save session state to per-session directory or flat file.
+
+    When session_id is provided, writes to per-session directory.
+    When session_id is None, writes to legacy flat file.
 
     Creates parent directories if they don't exist.
     Overwrites any existing file.
@@ -96,8 +118,9 @@ def save_session_state(project_path: Path, state: SessionState) -> None:
     Args:
         project_path: Absolute path to the project root.
         state: The session state to save.
+        session_id: Optional session ID for per-session isolation.
     """
-    state_path = get_session_state_path(project_path)
+    state_path = get_session_state_path(project_path, session_id)
     state_path.parent.mkdir(parents=True, exist_ok=True)
 
     data = state.model_dump(mode="json")

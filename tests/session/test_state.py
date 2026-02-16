@@ -118,10 +118,16 @@ class TestSessionStateSchema:
 class TestGetSessionStatePath:
     """Tests for get_session_state_path."""
 
-    def test_returns_personal_path(self, tmp_path: Path) -> None:
-        """Path is project_root/.raise/rai/personal/session-state.yaml."""
+    def test_returns_personal_path_without_session_id(self, tmp_path: Path) -> None:
+        """Path is project_root/.raise/rai/personal/session-state.yaml when no session_id."""
         path = get_session_state_path(tmp_path)
         assert path == tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
+
+    def test_returns_per_session_path_with_session_id(self, tmp_path: Path) -> None:
+        """Path is .raise/rai/personal/sessions/{session_id}/state.yaml when session_id provided."""
+        path = get_session_state_path(tmp_path, session_id="SES-177")
+        expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-177" / "state.yaml"
+        assert path == expected
 
 
 class TestLoadSessionState:
@@ -195,6 +201,21 @@ class TestLoadSessionState:
         assert result is not None
         assert result.current_work.epic == "E15"
 
+    def test_loads_from_per_session_dir(self, tmp_path: Path) -> None:
+        """Loads from sessions/{session_id}/state.yaml when session_id provided."""
+        session_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-177"
+        session_dir.mkdir(parents=True)
+        state_path = session_dir / "state.yaml"
+        state_path.write_text(
+            yaml.dump(
+                _make_session_state().model_dump(mode="json"),
+                default_flow_style=False,
+            )
+        )
+        result = load_session_state(tmp_path, session_id="SES-177")
+        assert result is not None
+        assert result.current_work.epic == "E15"
+
     def test_loads_valid_state(self, tmp_path: Path) -> None:
         """Loads and validates a correct session state file."""
         state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
@@ -252,6 +273,15 @@ class TestSaveSessionState:
         assert result is not None
         assert result.current_work.epic == "E16"
         assert result.last_session.id == "SES-100"
+
+    def test_saves_to_per_session_dir(self, tmp_path: Path) -> None:
+        """Writes to sessions/{session_id}/state.yaml when session_id provided."""
+        state = _make_session_state()
+        save_session_state(tmp_path, state, session_id="SES-177")
+        expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-177" / "state.yaml"
+        assert expected.exists()
+        data = yaml.safe_load(expected.read_text())
+        assert data["current_work"]["epic"] == "E15"
 
     def test_roundtrip(self, tmp_path: Path) -> None:
         """Save then load returns equivalent state."""
