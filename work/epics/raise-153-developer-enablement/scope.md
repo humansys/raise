@@ -19,7 +19,7 @@ Enable developers to adopt RaiSE by providing accurate, up-to-date documentation
 
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
-| S1 | Starlight site + content migration | M | Pending | Set up Starlight in raise-commons, migrate 9 docs from raise-gtm, update `raise` → `rai`, theme replication |
+| S1 | Starlight site + content migration | M | ✅ Done | Set up Starlight in raise-commons, migrate 18 docs (9 EN + 9 ES) from raise-gtm, update `raise` → `rai`, theme replication |
 | S2 | CLI Reference update | M | Pending | Document new a9 commands (session --agent/--session, backlog PRO, publish), verify all commands match actual CLI |
 | S3 | Getting Started Guide | M | Pending | Methodology-first tutorial: RaiSE principles → Triad → first story lifecycle, not just "how to install" |
 | S4 | Training Slide Deck | S | Pending | Distill from guide + reference for 1h Kurigage sessions |
@@ -44,7 +44,7 @@ Enable developers to adopt RaiSE by providing accurate, up-to-date documentation
 
 ## Out of Scope
 
-- Bilingual (i18n) → future story, after English content stabilizes
+- ~~Bilingual (i18n)~~ → Pulled into S1 (low incremental cost)
 - API/SDK documentation → no public API yet
 - Video tutorials → future enablement
 - raise-gtm redirect wiring → separate story in raise-gtm repo
@@ -60,7 +60,7 @@ Enable developers to adopt RaiSE by providing accurate, up-to-date documentation
 - Replicate raise-gtm theme (dark, copper/amber) for initial brand coherence
 - Deploy as separate Cloudflare Pages project to `docs.raiseframework.ai`
 - raise-gtm docs become stale after migration (redirects are raise-gtm scope)
-- English-only initially
+- Bilingual (EN/ES) from S1 — low incremental cost
 
 **Seed content from raise-gtm** (9 pages to migrate):
 - `index.mdx` — docs homepage
