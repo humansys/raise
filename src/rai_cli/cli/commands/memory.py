@@ -47,6 +47,7 @@ from rai_cli.memory import (
     get_memory_dir_for_scope,
 )
 from rai_cli.onboarding.profile import load_developer_profile
+from rai_cli.session.resolver import resolve_session_id_optional
 from rai_cli.telemetry.schemas import (
     CalibrationEvent,
     SessionEvent,
@@ -1323,6 +1324,13 @@ def emit_work(
             "--blocker", "-b", help="Blocker description (for blocked events)"
         ),
     ] = "",
+    session: Annotated[
+        str | None,
+        typer.Option(
+            "--session",
+            help="Session ID (e.g., SES-177). Falls back to RAI_SESSION_ID env var.",
+        ),
+    ] = None,
 ) -> None:
     """Emit a work lifecycle event for Lean flow analysis.
 
@@ -1418,8 +1426,13 @@ def emit_work(
         blocker=blocker_value,
     )
 
+    # Resolve optional session ID
+    import os
+
+    session_id = resolve_session_id_optional(session, os.environ.get("RAI_SESSION_ID"))
+
     # Emit signal
-    result = emit(lifecycle_event)
+    result = emit(lifecycle_event, session_id=session_id)
 
     if result.success:
         # Format label based on work type
@@ -1468,6 +1481,13 @@ def emit_session_event(
         str,
         typer.Option("--stories", "-f", help="Stories worked on (comma-separated)"),
     ] = "",
+    session: Annotated[
+        str | None,
+        typer.Option(
+            "--session",
+            help="Session ID (e.g., SES-177). Falls back to RAI_SESSION_ID env var.",
+        ),
+    ] = None,
 ) -> None:
     """Emit a session event to telemetry.
 
@@ -1509,8 +1529,13 @@ def emit_session_event(
         stories=stories_list,
     )
 
+    # Resolve optional session ID
+    import os
+
+    session_id = resolve_session_id_optional(session, os.environ.get("RAI_SESSION_ID"))
+
     # Emit signal
-    result = emit(event)
+    result = emit(event, session_id=session_id)
 
     if result.success:
         console.print("\n[green]✓[/green] Session event recorded")
@@ -1542,6 +1567,13 @@ def emit_calibration_event(
         int,
         typer.Option("--actual", "-a", help="Actual duration in minutes"),
     ] = 0,
+    session: Annotated[
+        str | None,
+        typer.Option(
+            "--session",
+            help="Session ID (e.g., SES-177). Falls back to RAI_SESSION_ID env var.",
+        ),
+    ] = None,
 ) -> None:
     """Emit a calibration event to telemetry.
 
@@ -1591,8 +1623,13 @@ def emit_calibration_event(
         velocity=velocity,
     )
 
+    # Resolve optional session ID
+    import os
+
+    session_id = resolve_session_id_optional(session, os.environ.get("RAI_SESSION_ID"))
+
     # Emit signal
-    result = emit(event)
+    result = emit(event, session_id=session_id)
 
     if result.success:
         console.print("\n[green]✓[/green] Calibration event recorded")

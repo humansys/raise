@@ -8,7 +8,7 @@ from unittest.mock import patch
 from typer.testing import CliRunner
 
 from rai_cli.cli.main import app
-from rai_cli.onboarding.profile import CurrentSession, DeveloperProfile
+from rai_cli.onboarding.profile import ActiveSession, DeveloperProfile
 from rai_cli.session.close import CloseResult
 
 runner = CliRunner()
@@ -85,18 +85,26 @@ class TestSessionStart:
         assert "Session recorded" in result.output
         mock_save.assert_called_once()
         saved_profile = mock_save.call_args[0][0]
-        assert saved_profile.current_session is not None
-        assert saved_profile.current_session.project == str(project_path)
+        assert len(saved_profile.active_sessions) == 1
+        assert saved_profile.active_sessions[0].project == str(project_path)
+        assert "SES-001" in result.output  # Session ID displayed
 
-    def test_start_warns_on_stale_session(self) -> None:
+    def test_start_warns_on_stale_session(self, tmp_path: Path) -> None:
         """Starting when stale session exists warns user."""
         from datetime import UTC, datetime, timedelta
 
-        stale_state = CurrentSession(
+        from rai_cli.onboarding.profile import ActiveSession
+
+        project_path = tmp_path / "test-project"
+        project_path.mkdir()
+
+        stale_session = ActiveSession(
+            session_id="SES-OLD",
             started_at=datetime.now(UTC) - timedelta(days=2),
             project="/old/project",
+            agent="old-agent",
         )
-        profile = DeveloperProfile(name="Dave", current_session=stale_state)
+        profile = DeveloperProfile(name="Dave", active_sessions=[stale_session])
 
         with (
             patch(
@@ -105,21 +113,23 @@ class TestSessionStart:
             ),
             patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
-            result = runner.invoke(app, ["session", "start"])
+            result = runner.invoke(app, ["session", "start", "--project", str(project_path)])
 
         assert result.exit_code == 0
-        assert "Stale session detected" in result.output
-        assert "Learnings may have been lost" in result.output
+        assert "Stale sessions detected" in result.output
+        assert "SES-OLD" in result.output
 
-    def test_start_notes_active_session(self) -> None:
-        """Starting when recent session exists notes it."""
+    def test_start_allows_multiple_sessions(self) -> None:
+        """Starting when recent session exists allows it (multi-session support)."""
         from datetime import UTC, datetime
 
-        recent_state = CurrentSession(
+        existing_session = ActiveSession(
+            session_id="SES-001",
             started_at=datetime.now(UTC),
             project="/current/project",
+            agent="existing-agent",
         )
-        profile = DeveloperProfile(name="Eve", current_session=recent_state)
+        profile = DeveloperProfile(name="Eve", active_sessions=[existing_session])
 
         with (
             patch(
@@ -131,7 +141,8 @@ class TestSessionStart:
             result = runner.invoke(app, ["session", "start"])
 
         assert result.exit_code == 0
-        assert "Session already active" in result.output
+        # No warning for fresh sessions - multi-session support allows concurrent sessions
+        assert "Warning" not in result.output
 
     def test_start_context_outputs_bundle(self, tmp_path: Path) -> None:
         """Session start --context outputs context bundle."""
@@ -218,7 +229,7 @@ class TestSessionClose:
 
     def test_close_no_active_session_is_noop(self) -> None:
         """Close when no active session is informational no-op."""
-        profile = DeveloperProfile(name="Frank", current_session=None)
+        profile = DeveloperProfile(name="Frank", active_sessions=[])
 
         with patch(
             "rai_cli.cli.commands.session.load_developer_profile",
@@ -229,15 +240,20 @@ class TestSessionClose:
         assert result.exit_code == 0
         assert "No active session to close" in result.output
 
-    def test_close_active_session_clears_state(self) -> None:
-        """Close with active session clears current_session."""
+    def test_close_active_session_removes_from_list(self, tmp_path: Path) -> None:
+        """Close with active session removes it from active_sessions."""
         from datetime import UTC, datetime
 
-        active_state = CurrentSession(
+        project = tmp_path / "project"
+        project.mkdir()
+
+        active_session = ActiveSession(
+            session_id="SES-100",
             started_at=datetime.now(UTC),
-            project="/my/project",
+            project=str(project),
+            agent="test-agent",
         )
-        profile = DeveloperProfile(name="Grace", current_session=active_state)
+        profile = DeveloperProfile(name="Grace", active_sessions=[active_session])
 
         with (
             patch(
@@ -246,13 +262,15 @@ class TestSessionClose:
             ),
             patch("rai_cli.cli.commands.session.save_developer_profile") as mock_save,
         ):
-            result = runner.invoke(app, ["session", "close"])
+            result = runner.invoke(
+                app, ["session", "close", "--project", str(project)]
+            )
 
         assert result.exit_code == 0
-        assert "Session closed" in result.output
+        assert "Session SES-100 closed" in result.output
         mock_save.assert_called_once()
         saved_profile = mock_save.call_args[0][0]
-        assert saved_profile.current_session is None
+        assert len(saved_profile.active_sessions) == 0
 
     def test_close_structured_with_summary(self) -> None:
         """Close with --summary triggers structured close."""
@@ -423,6 +441,66 @@ class TestSessionClose:
         assert close_input.progress["epic"] == "E15"
         assert close_input.completed_epics == ["E12", "E14"]
 
+    def test_close_cleanup_session_dir(self, tmp_path: Path) -> None:
+        """Session close removes per-session directory after close."""
+        from datetime import UTC, datetime
+
+        profile = DeveloperProfile(
+            name="Test",
+            active_sessions=[
+                ActiveSession(
+                    session_id="SES-050",
+                    started_at=datetime.now(UTC),
+                    project=str(tmp_path),
+                    agent="test",
+                ),
+            ],
+        )
+
+        # Create per-session directory (simulating what start would create)
+        session_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-050"
+        session_dir.mkdir(parents=True)
+        (session_dir / "state.yaml").write_text("current_work: {}")
+        (session_dir / "signals.jsonl").write_text("{}")
+
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-050",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.resolve_session_id",
+                return_value="SES-050",
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test",
+                    "--session",
+                    "SES-050",
+                    "--project",
+                    str(tmp_path),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert not session_dir.exists(), "Session dir should be cleaned up after close"
+
     def test_close_help_shows_new_options(self) -> None:
         """Close --help shows new structured close options."""
         result = runner.invoke(app, ["session", "close", "--help"])
@@ -460,3 +538,305 @@ class TestSessionHelp:
 
         assert result.exit_code == 0
         assert "End the current working session" in result.output
+
+
+class TestSessionStartCreatesDir:
+    """Tests for session start creating per-session directory (RAISE-138)."""
+
+    def test_start_creates_session_dir(self, tmp_path: Path) -> None:
+        """Session start with --project creates per-session directory."""
+        profile = DeveloperProfile(name="Test")
+        project_path = tmp_path / "project"
+        project_path.mkdir()
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "start", "--project", str(project_path)],
+            )
+
+        assert result.exit_code == 0
+        # Per-session directory should exist
+        session_dir = project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        assert session_dir.exists(), "Per-session directory should be created on start"
+        assert session_dir.is_dir()
+
+    def test_start_migrates_flat_files(self, tmp_path: Path) -> None:
+        """Session start migrates flat state/telemetry files to per-session dir."""
+        profile = DeveloperProfile(name="Test")
+        project_path = tmp_path / "project"
+        project_path.mkdir()
+
+        # Create flat files (legacy layout)
+        personal_dir = project_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text("current_work:\n  epic: E15\n")
+        flat_telemetry_dir = personal_dir / "telemetry"
+        flat_telemetry_dir.mkdir()
+        flat_signals = flat_telemetry_dir / "signals.jsonl"
+        flat_signals.write_text('{"signal_type": "test"}\n')
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "start", "--project", str(project_path)],
+            )
+
+        assert result.exit_code == 0
+        # Flat files should be moved to per-session dir
+        session_dir = project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        assert (session_dir / "state.yaml").exists()
+        assert (session_dir / "signals.jsonl").exists()
+        # Old flat files should be removed
+        assert not flat_state.exists(), "Flat state file should be removed after migration"
+        assert not flat_signals.exists(), "Flat signals file should be removed after migration"
+
+
+class TestSessionStartWithAgent:
+    """Tests for raise session start --agent flag (RAISE-137)."""
+
+    def test_start_with_agent_flag(self, tmp_path: Path) -> None:
+        """Session start --agent includes agent in output."""
+        profile = DeveloperProfile(name="Test")
+        project_path = tmp_path / "test-project"
+        project_path.mkdir()
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app, ["session", "start", "--project", str(project_path), "--agent", "claude-code"]
+            )
+
+        assert result.exit_code == 0
+        assert "SES-" in result.output  # Session ID present
+        assert "(claude-code)" in result.output
+
+    def test_start_without_agent_defaults(self, tmp_path: Path) -> None:
+        """Session start without --agent defaults to unknown."""
+        profile = DeveloperProfile(name="Test")
+        project_path = tmp_path / "test-project"
+        project_path.mkdir()
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(app, ["session", "start", "--project", str(project_path)])
+
+        assert result.exit_code == 0
+        assert "(unknown)" in result.output  # Default agent
+
+
+class TestSessionCloseCwdGuard:
+    """Tests for CWD poka-yoke guard on session close (RAISE-139)."""
+
+    def test_close_rejects_mismatched_project(self, tmp_path: Path) -> None:
+        """Session close rejects writes when CWD project != session project."""
+        from datetime import UTC, datetime
+
+        session_project = tmp_path / "project-a"
+        session_project.mkdir()
+        wrong_project = tmp_path / "project-b"
+        wrong_project.mkdir()
+
+        active = ActiveSession(
+            session_id="SES-050",
+            started_at=datetime.now(UTC),
+            project=str(session_project),
+            agent="test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[active])
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test",
+                    "--project",
+                    str(wrong_project),
+                ],
+            )
+
+        assert result.exit_code != 0
+        assert "project-a" in result.output
+        assert "project-b" in result.output
+
+    def test_close_allows_matching_project(self, tmp_path: Path) -> None:
+        """Session close allows writes when projects match."""
+        from datetime import UTC, datetime
+
+        project = tmp_path / "project"
+        project.mkdir()
+
+        active = ActiveSession(
+            session_id="SES-050",
+            started_at=datetime.now(UTC),
+            project=str(project),
+            agent="test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[active])
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-050",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ),
+            patch("rai_cli.cli.commands.session.resolve_session_id", return_value="SES-050"),
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test",
+                    "--session",
+                    "SES-050",
+                    "--project",
+                    str(project),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert "SES-050 closed" in result.output
+
+    def test_close_no_active_session_skips_guard(self) -> None:
+        """Guard is skipped when no active session has project info."""
+        profile = DeveloperProfile(name="Test", active_sessions=[])
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-099",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "close", "--summary", "test"],
+            )
+
+        assert result.exit_code == 0
+
+    def test_close_rejects_mismatch_on_legacy_close(self, tmp_path: Path) -> None:
+        """Legacy (non-structured) close also checks CWD guard."""
+        from datetime import UTC, datetime
+
+        session_project = tmp_path / "correct"
+        session_project.mkdir()
+        wrong_project = tmp_path / "wrong"
+        wrong_project.mkdir()
+
+        active = ActiveSession(
+            session_id="SES-050",
+            started_at=datetime.now(UTC),
+            project=str(session_project),
+            agent="test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[active])
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+            patch(
+                "rai_cli.cli.commands.session.Path"
+            ) as mock_path_cls,
+        ):
+            # Mock Path.cwd() to return wrong project
+            mock_path_cls.cwd.return_value = wrong_project
+            # But we need real Path for other uses, so let Path(x) work normally
+            mock_path_cls.side_effect = Path
+
+            result = runner.invoke(
+                app,
+                ["session", "close"],
+            )
+
+        assert result.exit_code != 0
+        assert "correct" in result.output
+
+
+class TestSessionCloseWithSessionFlag:
+    """Tests for raise session close --session flag (RAISE-137)."""
+
+    def test_close_with_session_flag(self, tmp_path: Path) -> None:
+        """Session close --session uses resolver to identify session."""
+        profile = DeveloperProfile(name="Test")
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.resolve_session_id") as mock_resolve,
+        ):
+            mock_resolve.return_value = "SES-177"
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--session",
+                    "SES-177",
+                ],
+            )
+
+        # Should succeed (legacy close behavior for now)
+        assert result.exit_code == 0
+        # Resolver was called during session ID resolution
+        mock_resolve.assert_called_once_with(
+            session_flag="SES-177", env_var=None
+        )

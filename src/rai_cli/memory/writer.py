@@ -293,7 +293,7 @@ def get_memory_dir_for_scope(
         return get_memory_dir(project_root)
 
 
-def _get_next_id(
+def get_next_id(
     file_path: Path, prefix: str, developer_prefix: str | None = None
 ) -> str:
     """Get next available ID for a JSONL file.
@@ -370,7 +370,7 @@ def append_pattern(
         WriteResult with generated ID and status.
     """
     file_path = memory_dir / "patterns.jsonl"
-    pattern_id = _get_next_id(file_path, "PAT", developer_prefix=developer_prefix)
+    pattern_id = get_next_id(file_path, "PAT", developer_prefix=developer_prefix)
     created_date = created or date.today()
 
     entry: dict[str, Any] = {
@@ -415,7 +415,7 @@ def append_calibration(
         WriteResult with generated ID and status.
     """
     file_path = memory_dir / "calibration.jsonl"
-    cal_id = _get_next_id(file_path, "CAL")
+    cal_id = get_next_id(file_path, "CAL")
     created_date = created or date.today()
 
     # Calculate ratio if both estimated and actual present
@@ -463,7 +463,7 @@ def append_session(
         WriteResult with generated ID and status.
     """
     file_path = memory_dir / "sessions" / "index.jsonl"
-    session_id = _get_next_id(file_path, "SES")
+    session_id = get_next_id(file_path, "SES")
     session_date_val = session_date or date.today()
 
     entry = {
