@@ -254,7 +254,10 @@ def process_session_close(
         progress=progress,
         completed_epics=close_input.completed_epics,
     )
-    save_session_state(project_path, session_state, session_id=session_id)
+    # Write to flat file (not per-session dir) — flat file serves as
+    # cross-session continuity buffer. Next session start will migrate
+    # it to the new per-session directory.
+    save_session_state(project_path, session_state)
     result.messages.append("Session state saved")
 
     return result
