@@ -11,6 +11,7 @@ from pydantic import ValidationError
 
 from rai_cli.onboarding.profile import (
     CORRECTIONS_MAX,
+    ActiveSession,
     CoachingContext,
     CommunicationPreferences,
     CommunicationStyle,
@@ -864,3 +865,143 @@ class TestUpdateCoaching:
         profile = DeveloperProfile(name="Test", coaching=coaching)
         updated = update_coaching(profile, communication_notes=["new note"])
         assert updated.coaching.communication_notes == ["new note"]
+
+
+class TestActiveSession:
+    """Tests for ActiveSession model."""
+
+    def test_creates_with_required_fields(self) -> None:
+        """ActiveSession can be created with required fields."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC),
+            project="/path/to/project",
+        )
+        assert session.session_id == "SES-177"
+        assert session.project == "/path/to/project"
+
+    def test_agent_defaults_to_unknown(self) -> None:
+        """ActiveSession agent field defaults to 'unknown'."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC),
+            project="/path/to/project",
+        )
+        assert session.agent == "unknown"
+
+    def test_agent_can_be_specified(self) -> None:
+        """ActiveSession agent field can be set explicitly."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC),
+            project="/path/to/project",
+            agent="claude-code",
+        )
+        assert session.agent == "claude-code"
+
+    def test_is_stale_fresh_session(self) -> None:
+        """ActiveSession.is_stale() returns False for recent sessions."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC) - timedelta(hours=1),
+            project="/path/to/project",
+        )
+        assert not session.is_stale(hours=24)
+
+    def test_is_stale_old_session(self) -> None:
+        """ActiveSession.is_stale() returns True for sessions >24h old."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC) - timedelta(hours=25),
+            project="/path/to/project",
+        )
+        assert session.is_stale(hours=24)
+
+    def test_is_stale_custom_threshold(self) -> None:
+        """ActiveSession.is_stale() accepts custom threshold."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC) - timedelta(hours=10),
+            project="/path/to/project",
+        )
+        assert not session.is_stale(hours=24)
+        assert session.is_stale(hours=8)
+
+
+class TestBackwardCompatMigration:
+    """Tests for backward compatibility migration."""
+
+    def test_migrates_current_session_to_active_sessions(
+        self, tmp_path: Path
+    ) -> None:
+        """load_developer_profile migrates old current_session format."""
+        # Create old format YAML with current_session (dict)
+        old_data = {
+            "name": "Test",
+            "experience_level": "ri",
+            "current_session": {
+                "started_at": datetime.now(UTC).isoformat(),
+                "project": "/path/to/project",
+            },
+        }
+        profile_path = tmp_path / "developer.yaml"
+        with open(profile_path, "w") as f:
+            yaml.dump(old_data, f)
+
+        # Mock get_rai_home to return tmp_path
+        import rai_cli.onboarding.profile as profile_module
+
+        original_get_rai_home = profile_module.get_rai_home
+        profile_module.get_rai_home = lambda: tmp_path
+
+        try:
+            # Load profile — should migrate
+            profile = load_developer_profile()
+
+            assert profile is not None
+            # active_sessions should have one entry
+            assert len(profile.active_sessions) == 1
+            assert profile.active_sessions[0].project == "/path/to/project"
+            # current_session should be None (removed)
+            assert profile.current_session is None
+
+            # Reload to verify migration was saved
+            reloaded = load_developer_profile()
+            assert reloaded is not None
+            assert len(reloaded.active_sessions) == 1
+            assert reloaded.current_session is None
+        finally:
+            profile_module.get_rai_home = original_get_rai_home
+
+    def test_no_migration_when_already_new_format(self, tmp_path: Path) -> None:
+        """load_developer_profile doesn't re-migrate new format."""
+        # Create new format YAML with active_sessions
+        new_data = {
+            "name": "Test",
+            "experience_level": "ri",
+            "active_sessions": [
+                {
+                    "session_id": "SES-100",
+                    "started_at": datetime.now(UTC).isoformat(),
+                    "project": "/path/to/project",
+                    "agent": "claude-code",
+                }
+            ],
+        }
+        profile_path = tmp_path / "developer.yaml"
+        with open(profile_path, "w") as f:
+            yaml.dump(new_data, f)
+
+        import rai_cli.onboarding.profile as profile_module
+
+        original_get_rai_home = profile_module.get_rai_home
+        profile_module.get_rai_home = lambda: tmp_path
+
+        try:
+            profile = load_developer_profile()
+
+            assert profile is not None
+            assert len(profile.active_sessions) == 1
+            assert profile.active_sessions[0].session_id == "SES-100"
+        finally:
+            profile_module.get_rai_home = original_get_rai_home

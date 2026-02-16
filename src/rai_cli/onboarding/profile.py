@@ -72,6 +72,9 @@ class CommunicationPreferences(BaseModel):
 class CurrentSession(BaseModel):
     """Active session state for detecting orphaned sessions.
 
+    **DEPRECATED:** Use ActiveSession instead. This model is kept for
+    backward compatibility during migration from single-session to multi-session.
+
     Tracks when a session started and in which project, enabling detection
     of sessions that were started but never closed (e.g., due to interruption).
 
@@ -82,6 +85,38 @@ class CurrentSession(BaseModel):
 
     started_at: datetime
     project: str
+
+    def is_stale(self, hours: int = 24) -> bool:
+        """Check if session is stale (started more than N hours ago).
+
+        Args:
+            hours: Number of hours after which a session is considered stale.
+
+        Returns:
+            True if session started more than `hours` ago.
+        """
+        now = datetime.now(UTC)
+        age = now - self.started_at
+        return age.total_seconds() > hours * 3600
+
+
+class ActiveSession(BaseModel):
+    """Active session instance for multi-session support.
+
+    Replaces CurrentSession to support concurrent sessions on the same project.
+    Multiple AI agents/terminals can run simultaneously without state corruption.
+
+    Attributes:
+        session_id: Unique session identifier (e.g., "SES-177").
+        started_at: UTC timestamp when session began.
+        project: Absolute path to the project directory.
+        agent: Agent type metadata (e.g., "claude-code", "cursor"). Default: "unknown".
+    """
+
+    session_id: str
+    started_at: datetime
+    project: str
+    agent: str = "unknown"
 
     def is_stale(self, hours: int = 24) -> bool:
         """Check if session is stale (started more than N hours ago).
@@ -211,7 +246,8 @@ class DeveloperProfile(BaseModel):
     first_session: date | None = None
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
-    current_session: CurrentSession | None = None
+    current_session: CurrentSession | None = None  # DEPRECATED: migrated to active_sessions
+    active_sessions: list[ActiveSession] = Field(default_factory=list)
     coaching: CoachingContext = Field(default_factory=CoachingContext)
     deadlines: list[Deadline] = Field(default_factory=list)
 
@@ -239,8 +275,51 @@ def get_rai_home() -> Path:
     return Path.home() / RAI_HOME_DIR
 
 
+def _migrate_current_session(profile: DeveloperProfile) -> DeveloperProfile:
+    """Migrate old current_session format to active_sessions list.
+
+    Backward compatibility migration for RAISE-137. Converts single
+    current_session (dict) to active_sessions (list) with generated session ID.
+
+    Args:
+        profile: Profile to migrate.
+
+    Returns:
+        Profile with migration applied (may be same instance if no migration needed).
+    """
+    if profile.current_session is None:
+        # No current session to migrate
+        return profile
+
+    if len(profile.active_sessions) > 0:
+        # Already migrated or has active sessions — don't re-migrate
+        logger.debug("Profile already has active_sessions, skipping migration")
+        return profile
+
+    # Migrate: convert current_session to ActiveSession
+    # Generate a session ID (we don't have the real ID from old format)
+    # Use "SES-MIGRATED" as placeholder
+    migrated_session = ActiveSession(
+        session_id="SES-MIGRATED",
+        started_at=profile.current_session.started_at,
+        project=profile.current_session.project,
+        agent="unknown",
+    )
+
+    # Create updated profile with migration
+    updated = profile.model_copy(deep=True)
+    updated.active_sessions = [migrated_session]
+    updated.current_session = None
+
+    logger.info("Migrated current_session to active_sessions")
+    return updated
+
+
 def load_developer_profile() -> DeveloperProfile | None:
     """Load developer profile from ~/.rai/developer.yaml.
+
+    Automatically migrates old current_session format to active_sessions
+    if needed (backward compatibility for RAISE-137).
 
     Returns:
         DeveloperProfile if file exists and is valid, None otherwise.
@@ -258,7 +337,17 @@ def load_developer_profile() -> DeveloperProfile | None:
         if data is None:
             logger.warning("Empty developer profile: %s", profile_path)
             return None
-        return DeveloperProfile.model_validate(data)
+
+        profile = DeveloperProfile.model_validate(data)
+
+        # Migrate if needed
+        migrated = _migrate_current_session(profile)
+        if migrated is not profile:
+            # Migration occurred — save immediately
+            save_developer_profile(migrated)
+            return migrated
+
+        return profile
     except yaml.YAMLError as e:
         logger.warning("Invalid YAML in developer profile: %s", e)
         return None
