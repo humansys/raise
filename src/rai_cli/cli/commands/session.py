@@ -47,6 +47,35 @@ session_app = typer.Typer(
 )
 
 
+def _check_cwd_guard(
+    profile: DeveloperProfile,
+    session_id: str,
+    close_project: Path,
+) -> None:
+    """Poka-yoke: reject session close if CWD project != session project.
+
+    Compares the resolved absolute path of the close project against the
+    project recorded in the ActiveSession. Raises cli_error on mismatch.
+
+    Args:
+        profile: Developer profile with active sessions.
+        session_id: The session being closed.
+        close_project: Project path from --project flag or CWD.
+    """
+    for active in profile.active_sessions:
+        if active.session_id == session_id and active.project:
+            session_path = Path(active.project).resolve()
+            close_path = close_project.resolve()
+            if session_path != close_path:
+                cli_error(
+                    f"CWD mismatch — session {session_id} started in "
+                    f"{session_path} but close is running from {close_path}. "
+                    f"Run from the correct project directory, or use "
+                    f"--project {session_path}.",
+                )
+            break
+
+
 @session_app.command()
 def start(
     name: Annotated[
@@ -290,6 +319,10 @@ def close(
                 return
             resolved_session_id = profile.active_sessions[0].session_id
 
+        # CWD poka-yoke (RAISE-139): reject if project mismatch
+        legacy_project = Path(project) if project else Path.cwd()
+        _check_cwd_guard(profile, resolved_session_id, legacy_project)
+
         updated = end_session(profile, session_id=resolved_session_id)
         save_developer_profile(updated)
         typer.echo(f"Session {resolved_session_id} closed.")
@@ -318,6 +351,13 @@ def close(
 
     # Resolve project path
     project_path = Path(project) if project else Path.cwd()
+
+    # CWD poka-yoke (RAISE-139): reject if project mismatch
+    guard_session_id = resolved_session_id
+    if not guard_session_id and profile.active_sessions:
+        guard_session_id = profile.active_sessions[0].session_id
+    if guard_session_id:
+        _check_cwd_guard(profile, guard_session_id, project_path)
 
     # Process close (pass session_id for per-session state writes)
     close_result = process_session_close(close_input, profile, project_path, session_id=resolved_session_id)
