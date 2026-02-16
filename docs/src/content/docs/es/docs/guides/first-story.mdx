@@ -22,10 +22,10 @@ Pasa el bundle de contexto a tu asistente de IA.
 
 ## Paso 1: Iniciar la Story
 
-Toda story comienza con `/story-start`. Esto crea un branch y documenta qué estás construyendo.
+Toda story comienza con `/rai-story-start`. Esto crea un branch y documenta qué estás construyendo.
 
 ```
-/story-start S1.1 Agregar saludo de usuario
+/rai-story-start S1.1 Agregar saludo de usuario
 ```
 
 Tu IA va a:
@@ -37,10 +37,10 @@ El documento de scope captura qué está **en scope**, qué está **fuera de sco
 
 ## Paso 2: Diseñar la Especificación
 
-Después, `/story-design` crea una especificación lean.
+Después, `/rai-story-design` crea una especificación lean.
 
 ```
-/story-design S1.1 Agregar saludo de usuario
+/rai-story-design S1.1 Agregar saludo de usuario
 ```
 
 Tu IA va a:
@@ -56,10 +56,10 @@ Para features simples, puedes saltar el diseño e ir directamente a la planifica
 
 ## Paso 3: Planificar la Implementación
 
-`/story-plan` descompone la story en tareas atómicas.
+`/rai-story-plan` descompone la story en tareas atómicas.
 
 ```
-/story-plan S1.1 Agregar saludo de usuario
+/rai-story-plan S1.1 Agregar saludo de usuario
 ```
 
 Tu IA va a:
@@ -72,10 +72,10 @@ Cada tarea debe ser individualmente committeable y verificable. El plan incluye 
 
 ## Paso 4: Implementar
 
-`/story-implement` ejecuta el plan tarea por tarea.
+`/rai-story-implement` ejecuta el plan tarea por tarea.
 
 ```
-/story-implement S1.1 Agregar saludo de usuario
+/rai-story-implement S1.1 Agregar saludo de usuario
 ```
 
 Tu IA va a:
@@ -91,10 +91,10 @@ El ritmo clave aquí: **implementar → verificar → commit → pausar**. Despu
 
 ## Paso 5: Revisar
 
-Después de la implementación, `/story-review` captura aprendizajes.
+Después de la implementación, `/rai-story-review` captura aprendizajes.
 
 ```
-/story-review S1.1 Agregar saludo de usuario
+/rai-story-review S1.1 Agregar saludo de usuario
 ```
 
 Tu IA va a:
@@ -111,10 +111,10 @@ Aquí es donde la memoria se acumula. Un patrón aprendido aquí aparece en sesi
 
 ## Paso 6: Cerrar
 
-Finalmente, `/story-close` mergea y limpia.
+Finalmente, `/rai-story-close` mergea y limpia.
 
 ```
-/story-close S1.1 Agregar saludo de usuario
+/rai-story-close S1.1 Agregar saludo de usuario
 ```
 
 Tu IA va a:

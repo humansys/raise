@@ -1,15 +1,29 @@
 ---
 title: Getting Started
-description: Install RaiSE and run your first AI-assisted engineering session in under 5 minutes.
+description: Understand what RaiSE is, install it, and run your first AI-assisted engineering session.
 ---
 
-Get up and running with RaiSE in under 5 minutes.
+RaiSE is a methodology and toolkit for **reliable AI software engineering**. It turns AI coding assistants from unpredictable generators into disciplined collaborators — through governance, memory, and structured workflows.
 
-## Prerequisites
+## The Triad
 
-- **Python 3.11+** — check with `python --version`
-- **pip** or **uv** — for package installation
-- **Claude Code** — RaiSE is designed to work with AI coding assistants. [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is recommended.
+RaiSE works through three collaborating parts:
+
+```
+    You (Strategy, Judgment, Ownership)
+         │
+         │ collaborates with
+         ▼
+      Rai (AI Partner — Execution + Memory)
+         │
+         │ governed by
+         ▼
+      RaiSE (Methodology + Toolkit)
+```
+
+**You** decide *what* to build and *why*. **Rai** executes with accumulated memory and calibrated judgment. **RaiSE** provides the discipline — skills, governance, and quality gates — that makes the collaboration reliable.
+
+The result: AI that learns from your project, follows your rules, and compounds knowledge across sessions instead of starting fresh every time.
 
 ## Install
 
@@ -17,67 +31,59 @@ Get up and running with RaiSE in under 5 minutes.
 pip install rai-cli
 ```
 
-Verify the installation:
+Verify:
 
 ```bash
 rai --version
 ```
 
-```
-rai-cli version 2.0.0
-```
-
 ## Initialize a project
-
-Navigate to your project directory and run:
 
 ```bash
 cd your-project
 rai init
 ```
 
-This creates the `.raise/` directory with:
-
-- **Governance templates** — principles, requirements, and guardrails
-- **Memory structure** — patterns, calibration, and session tracking
-- **Manifest** — project metadata in `.raise/manifest.yaml`
-
-For existing projects, use `--detect` to automatically analyze your codebase conventions:
+This creates the `.raise/` directory with governance templates, memory structure, and a project manifest. For existing codebases, add `--detect` to analyze your conventions automatically:
 
 ```bash
 rai init --detect
 ```
 
-## Set up your developer profile
+## Your first session
 
-The first time you start a session, RaiSE creates your developer profile:
+Set up your developer profile (first time only):
 
 ```bash
 rai session start --name "Your Name" --project .
 ```
 
-```
-▶ Session started (SES-001)
-Developer: Your Name
-```
-
-Your profile is stored at `~/.rai/developer.yaml` and persists across projects. It tracks your experience level, session history, and coaching data.
-
-## Your first session
-
-After the initial setup, start sessions with:
+After that, start sessions with a context bundle:
 
 ```bash
 rai session start --project . --context
 ```
 
-The `--context` flag outputs a token-optimized context bundle (~150 tokens) assembled from:
+The `--context` flag outputs a token-optimized bundle (~150 tokens) with your developer profile, session state, and memory patterns. Pass it to your AI assistant — it gives full awareness of where you are and what you're working on.
 
-- **Developer profile** — your name, experience level, session count
-- **Session state** — current epic/story, pending decisions, blockers
-- **Memory patterns** — learned patterns and governance primes
+## The story lifecycle
 
-Pass this context to your AI assistant at the start of each working session. It gives the assistant full awareness of where you are and what you're working on.
+This is the core rhythm of working with RaiSE. Every piece of work follows six steps:
+
+```
+/rai-story-start     → Scope: what are we building?
+/rai-story-design    → Spec: how will it work?
+/rai-story-plan      → Tasks: what are the steps?
+/rai-story-implement → Build: test, code, verify, commit
+/rai-story-review    → Reflect: what did we learn?
+/rai-story-close     → Merge: clean up and ship
+```
+
+Each step produces an artifact that feeds the next. The review feeds memory, which feeds future sessions. This is how learning compounds — not through magic, but through disciplined repetition.
+
+Start with a small feature (XS or S sized). Get the rhythm first, then scale up.
+
+→ **[Walk through the full lifecycle](/docs/guides/first-story/)** for a step-by-step guide.
 
 ## End a session
 
@@ -87,11 +93,9 @@ When you're done working, close the session to capture what happened:
 rai session close --summary "What I accomplished" --type feature --project .
 ```
 
-This records the session in your telemetry and updates the session state for next time.
-
 ## Build your memory
 
-As you work, RaiSE accumulates knowledge — patterns, calibration data, governance documents. Build the unified memory index to make it all queryable:
+As you work, RaiSE accumulates knowledge — patterns, calibration data, governance. Build the unified memory index to make it queryable:
 
 ```bash
 rai memory build
@@ -103,20 +107,9 @@ Then query it:
 rai memory query "testing patterns"
 ```
 
-```
-# Memory Query Results
-
-## Pattern (2)
-
-### BASE-018
-Tests alongside implementation, not after. Write the test, watch it fail,
-make it pass. Catches issues immediately.
-
-### PAT-042
-Use capsys for stdout tests in pytest. Cleaner than mocking print.
-```
-
 ## What's next
 
-- Browse the [CLI Reference](/docs/cli/) for all commands, flags, and examples
-- Learn about [Core Concepts](/docs/concepts/) — Memory, Skills, Governance, Knowledge Graph *(coming soon)*
+- **[Your First Story](/docs/guides/first-story/)** — Full story lifecycle walkthrough
+- **[Setting Up a Project](/docs/guides/setting-up/)** — Greenfield and brownfield setup in depth
+- **[CLI Reference](/docs/cli/)** — All commands, flags, and examples
+- **[Core Concepts](/docs/concepts/)** — Memory, Skills, Governance, Knowledge Graph
