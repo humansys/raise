@@ -218,7 +218,8 @@ class TestProcessSessionClose:
 
         from rai_cli.onboarding.profile import save_developer_profile, start_session
 
-        active = start_session(profile, str(project))
+        # Session ID must match what append_session will generate (SES-001 for first session)
+        active, _ = start_session(profile, session_id="SES-001", project_path=str(project), agent="test")
         save_developer_profile(active)
 
         close_input = CloseInput(summary="done")
@@ -228,7 +229,7 @@ class TestProcessSessionClose:
 
         loaded = load_developer_profile()
         assert loaded is not None
-        assert loaded.current_session is None
+        assert len(loaded.active_sessions) == 0  # Session removed
         mp.undo()
 
 
