@@ -58,6 +58,7 @@ Con `--context`, genera un bundle de contexto optimizado en tokens (~150 tokens)
 |------|-------|-------------|
 | `--name` | `-n` | Tu nombre (requerido en la primera configuración) |
 | `--project` | `-p` | Ruta del proyecto a asociar con esta sesión |
+| `--agent` | | Tipo de agente (ej., `claude-code`, `cursor`). Por defecto: `unknown` |
 | `--context` | | Generar bundle de contexto para consumo de IA |
 
 ```bash
@@ -83,6 +84,7 @@ Finaliza la sesión de trabajo actual. Con `--summary` o `--state-file`, realiza
 | `--correction` | | Corrección de coaching observada |
 | `--correction-lesson` | | Lección de la corrección |
 | `--state-file` | | Archivo YAML con salida estructurada completa |
+| `--session` | | ID de sesión a cerrar (ej., `SES-177`). Usa `RAI_SESSION_ID` como fallback |
 | `--project` | `-p` | Ruta del proyecto |
 
 ```bash
@@ -354,6 +356,27 @@ rai memory emit-calibration S9.4 --size S --estimated 30 --actual 15
 rai memory emit-calibration S9.4 -s M -e 60 -a 90
 ```
 
+### `rai memory viz`
+
+Genera una visualización HTML interactiva del grafo de memoria. Crea un archivo HTML autocontenido con un grafo de fuerza dirigida D3.js. Los nodos están coloreados por tipo, son filtrables, tienen zoom y búsqueda.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--output` | `-o` | Ruta del archivo HTML de salida |
+| `--index` | `-i` | Ruta del índice de memoria |
+| `--open` / `--no-open` | | Abrir en navegador después de generar (por defecto: open) |
+
+```bash
+# Generar y abrir en navegador
+rai memory viz
+
+# Generar en ruta específica
+rai memory viz --output graph.html
+
+# Generar sin abrir
+rai memory viz --no-open
+```
+
 ### `rai memory generate`
 
 :::caution[Deprecado]
@@ -537,4 +560,20 @@ Muestra información del paquete base de Rai. Muestra la versión del base inclu
 
 ```bash
 rai base show
+```
+
+---
+
+## Release
+
+### `rai release list`
+
+Listar releases del grafo de memoria. Muestra todos los nodos de release con su estado, fecha objetivo y epics asociados.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--project` | `-p` | Ruta raíz del proyecto (por defecto: `.`) |
+
+```bash
+rai release list
 ```
