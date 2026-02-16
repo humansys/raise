@@ -1,0 +1,122 @@
+---
+title: Comenzar
+description: Instala RaiSE y ejecuta tu primera sesión de ingeniería asistida por IA en menos de 5 minutos.
+---
+
+Empieza a usar RaiSE en menos de 5 minutos.
+
+## Requisitos previos
+
+- **Python 3.11+** — verifica con `python --version`
+- **pip** o **uv** — para instalar paquetes
+- **Claude Code** — RaiSE está diseñado para trabajar con asistentes de código con IA. Se recomienda [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
+
+## Instalar
+
+```bash
+pip install rai-cli
+```
+
+Verifica la instalación:
+
+```bash
+rai --version
+```
+
+```
+rai-cli version 2.0.0
+```
+
+## Inicializar un proyecto
+
+Navega al directorio de tu proyecto y ejecuta:
+
+```bash
+cd tu-proyecto
+rai init
+```
+
+Esto crea el directorio `.raise/` con:
+
+- **Plantillas de gobernanza** — principios, requisitos y guardrails
+- **Estructura de memoria** — patrones, calibración y seguimiento de sesiones
+- **Manifiesto** — metadatos del proyecto en `.raise/manifest.yaml`
+
+Para proyectos existentes, usa `--detect` para analizar automáticamente las convenciones de tu código:
+
+```bash
+rai init --detect
+```
+
+## Configura tu perfil de desarrollador
+
+La primera vez que inicias una sesión, RaiSE crea tu perfil de desarrollador:
+
+```bash
+rai session start --name "Tu Nombre" --project .
+```
+
+```
+▶ Session started (SES-001)
+Developer: Tu Nombre
+```
+
+Tu perfil se almacena en `~/.rai/developer.yaml` y persiste entre proyectos. Registra tu nivel de experiencia, historial de sesiones y datos de coaching.
+
+## Tu primera sesión
+
+Después de la configuración inicial, inicia sesiones con:
+
+```bash
+rai session start --project . --context
+```
+
+El flag `--context` genera un bundle de contexto optimizado en tokens (~150 tokens) ensamblado desde:
+
+- **Perfil de desarrollador** — tu nombre, nivel de experiencia, cantidad de sesiones
+- **Estado de sesión** — epic/story actual, decisiones pendientes, bloqueantes
+- **Patrones de memoria** — patrones aprendidos y primes de gobernanza
+
+Pasa este contexto a tu asistente de IA al inicio de cada sesión de trabajo. Le da al asistente conciencia completa de dónde estás y en qué estás trabajando.
+
+## Terminar una sesión
+
+Cuando termines de trabajar, cierra la sesión para capturar lo que ocurrió:
+
+```bash
+rai session close --summary "Lo que logré" --type feature --project .
+```
+
+Esto registra la sesión en tu telemetría y actualiza el estado de sesión para la próxima vez.
+
+## Construir tu memoria
+
+A medida que trabajas, RaiSE acumula conocimiento — patrones, datos de calibración, documentos de gobernanza. Construye el índice de memoria unificado para hacerlo consultable:
+
+```bash
+rai memory build
+```
+
+Luego consúltalo:
+
+```bash
+rai memory query "testing patterns"
+```
+
+```
+# Memory Query Results
+
+## Pattern (2)
+
+### BASE-018
+Tests alongside implementation, not after. Write the test, watch it fail,
+make it pass. Catches issues immediately.
+
+### PAT-042
+Use capsys for stdout tests in pytest. Cleaner than mocking print.
+```
+
+## Siguiente paso
+
+- Consulta la [Referencia CLI](/es/docs/cli/) para todos los comandos, flags y ejemplos
+- Aprende sobre los [Conceptos Core](/es/docs/concepts/) — Memoria, Skills, Gobernanza, Knowledge Graph *(próximamente)*
