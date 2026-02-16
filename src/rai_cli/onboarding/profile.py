@@ -407,39 +407,62 @@ def increment_session(
     return profile.model_copy(update=updates)
 
 
-def start_session(profile: DeveloperProfile, project_path: str) -> DeveloperProfile:
-    """Mark a session as active.
+def start_session(
+    profile: DeveloperProfile,
+    session_id: str,
+    project_path: str,
+    agent: str = "unknown",
+) -> tuple[DeveloperProfile, list[ActiveSession]]:
+    """Mark a session as active by adding to active_sessions list.
 
-    Sets current_session with timestamp and project. Use this at the
-    beginning of /rai-session-start to track active sessions.
+    Adds an ActiveSession to the profile's active_sessions list. Also detects
+    stale sessions (started >24h ago) and returns them for warning.
 
     Args:
         profile: The developer profile to update.
+        session_id: Unique session identifier (e.g., "SES-177").
         project_path: Absolute path to the project directory.
+        agent: Agent type (e.g., "claude-code", "cursor"). Default: "unknown".
 
     Returns:
-        Updated profile with current_session set.
+        Tuple of (updated profile, list of stale sessions for warning).
     """
-    session = CurrentSession(
+    # Detect stale sessions before adding new one
+    stale_sessions = [s for s in profile.active_sessions if s.is_stale(hours=24)]
+
+    # Create new active session
+    new_session = ActiveSession(
+        session_id=session_id,
         started_at=datetime.now(UTC),
         project=project_path,
+        agent=agent,
     )
-    return profile.model_copy(update={"current_session": session})
+
+    # Add to active_sessions list
+    updated_sessions = [*profile.active_sessions, new_session]
+    updated = profile.model_copy(update={"active_sessions": updated_sessions})
+
+    return updated, stale_sessions
 
 
-def end_session(profile: DeveloperProfile) -> DeveloperProfile:
-    """Clear the active session state.
+def end_session(profile: DeveloperProfile, session_id: str) -> DeveloperProfile:
+    """Remove a session from active_sessions list.
 
-    Clears current_session. Use this at the end of /rai-session-close
-    to mark the session as properly closed.
+    Removes the specified session from the profile's active_sessions list.
+    If session_id doesn't exist, returns profile unchanged (no-op).
 
     Args:
         profile: The developer profile to update.
+        session_id: Session identifier to remove (e.g., "SES-177").
 
     Returns:
-        Updated profile with current_session cleared.
+        Updated profile with session removed from active_sessions.
     """
-    return profile.model_copy(update={"current_session": None})
+    # Filter out the specified session
+    updated_sessions = [
+        s for s in profile.active_sessions if s.session_id != session_id
+    ]
+    return profile.model_copy(update={"active_sessions": updated_sessions})
 
 
 def add_correction(

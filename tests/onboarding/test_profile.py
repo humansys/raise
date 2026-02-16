@@ -478,106 +478,9 @@ class TestCurrentSession:
         assert session_old.is_stale() is True
 
 
-class TestStartSession:
-    """Tests for start_session function."""
-
-    def test_sets_current_session(self) -> None:
-        """start_session sets current_session field."""
-        profile = DeveloperProfile(name="Test")
-        updated = start_session(profile, "/home/user/project")
-        assert updated.current_session is not None
-        assert updated.current_session.project == "/home/user/project"
-
-    def test_sets_started_at_to_now(self) -> None:
-        """start_session sets started_at to current UTC time."""
-        profile = DeveloperProfile(name="Test")
-        before = datetime.now(UTC)
-        updated = start_session(profile, "/test")
-        after = datetime.now(UTC)
-
-        assert updated.current_session is not None
-        assert before <= updated.current_session.started_at <= after
-
-    def test_returns_new_instance(self) -> None:
-        """start_session returns new profile instance (immutable)."""
-        profile = DeveloperProfile(name="Test")
-        updated = start_session(profile, "/test")
-        assert profile is not updated
-        assert profile.current_session is None  # Original unchanged
-
-    def test_preserves_other_fields(self) -> None:
-        """start_session preserves all other profile fields."""
-        profile = DeveloperProfile(
-            name="Emilio",
-            experience_level=ExperienceLevel.RI,
-        )
-        updated = start_session(profile, "/test")
-        assert updated.name == "Emilio"
-        assert updated.experience_level == ExperienceLevel.RI
-
-
-class TestEndSession:
-    """Tests for end_session function."""
-
-    def test_clears_current_session(self) -> None:
-        """end_session clears current_session field."""
-        profile = DeveloperProfile(name="Test")
-        with_session = start_session(profile, "/test")
-        assert with_session.current_session is not None
-
-        ended = end_session(with_session)
-        assert ended.current_session is None
-
-    def test_works_when_no_session_active(self) -> None:
-        """end_session is a no-op when no session is active."""
-        profile = DeveloperProfile(name="Test")
-        assert profile.current_session is None
-        ended = end_session(profile)
-        assert ended.current_session is None
-
-    def test_returns_new_instance(self) -> None:
-        """end_session returns new profile instance (immutable)."""
-        profile = DeveloperProfile(name="Test")
-        with_session = start_session(profile, "/test")
-        ended = end_session(with_session)
-        assert with_session is not ended
-        assert with_session.current_session is not None  # Original unchanged
-
-    def test_preserves_other_fields(self) -> None:
-        """end_session preserves all other profile fields."""
-        profile = DeveloperProfile(
-            name="Emilio",
-            experience_level=ExperienceLevel.RI,
-        )
-        with_session = start_session(profile, "/test")
-        ended = end_session(with_session)
-        assert ended.name == "Emilio"
-        assert ended.experience_level == ExperienceLevel.RI
-
-
-class TestDeveloperProfileCurrentSession:
-    """Tests for current_session field in DeveloperProfile."""
-
-    def test_default_current_session_is_none(self) -> None:
-        """New profiles have no active session."""
-        profile = DeveloperProfile(name="Test")
-        assert profile.current_session is None
-
-    def test_current_session_roundtrip(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """current_session survives save/load roundtrip."""
-        rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
-
-        profile = DeveloperProfile(name="Test")
-        with_session = start_session(profile, "/test/project")
-        save_developer_profile(with_session)
-
-        loaded = load_developer_profile()
-        assert loaded is not None
-        assert loaded.current_session is not None
-        assert loaded.current_session.project == "/test/project"
+# Old tests for deprecated start_session/end_session with current_session removed.
+# These functions now use active_sessions list. See TestStartSessionWithActiveSessions
+# and TestEndSessionWithActiveSessions for current behavior.
 
 
 class TestCoachingModels:
@@ -1005,3 +908,143 @@ class TestBackwardCompatMigration:
             assert profile.active_sessions[0].session_id == "SES-100"
         finally:
             profile_module.get_rai_home = original_get_rai_home
+
+
+class TestStartSessionWithActiveSessions:
+    """Tests for start_session using active_sessions list (Task 4)."""
+
+    def test_adds_session_to_active_sessions_list(self) -> None:
+        """start_session adds ActiveSession to active_sessions list."""
+        profile = DeveloperProfile(name="Test")
+        updated, stale = start_session(
+            profile, session_id="SES-177", project_path="/test/project", agent="claude-code"
+        )
+        assert len(updated.active_sessions) == 1
+        assert updated.active_sessions[0].session_id == "SES-177"
+        assert updated.active_sessions[0].project == "/test/project"
+        assert updated.active_sessions[0].agent == "claude-code"
+        assert len(stale) == 0  # No stale sessions
+
+    def test_agent_defaults_to_unknown(self) -> None:
+        """start_session defaults agent to 'unknown' when not specified."""
+        profile = DeveloperProfile(name="Test")
+        updated, _ = start_session(profile, session_id="SES-177", project_path="/test")
+        assert updated.active_sessions[0].agent == "unknown"
+
+    def test_adds_multiple_sessions(self) -> None:
+        """start_session can add multiple sessions for concurrent work."""
+        profile = DeveloperProfile(name="Test")
+        profile, _ = start_session(profile, session_id="SES-100", project_path="/proj1")
+        profile, _ = start_session(profile, session_id="SES-101", project_path="/proj2", agent="cursor")
+        assert len(profile.active_sessions) == 2
+        assert profile.active_sessions[0].session_id == "SES-100"
+        assert profile.active_sessions[1].session_id == "SES-101"
+
+    def test_preserves_existing_sessions(self) -> None:
+        """start_session preserves existing active_sessions when adding new one."""
+        existing = ActiveSession(
+            session_id="SES-100",
+            started_at=datetime.now(UTC),
+            project="/existing",
+            agent="other",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[existing])
+        updated, _ = start_session(profile, session_id="SES-101", project_path="/new")
+        assert len(updated.active_sessions) == 2
+        assert updated.active_sessions[0].session_id == "SES-100"
+        assert updated.active_sessions[1].session_id == "SES-101"
+
+    def test_returns_stale_sessions_warning(self) -> None:
+        """start_session returns list of stale sessions when detected."""
+        # Create profile with stale session (>24h old)
+        stale = ActiveSession(
+            session_id="SES-OLD",
+            started_at=datetime.now(UTC) - timedelta(hours=25),
+            project="/old",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[stale])
+
+        updated, stale_list = start_session(
+            profile, session_id="SES-NEW", project_path="/new"
+        )
+
+        assert len(updated.active_sessions) == 2  # Both old and new
+        assert len(stale_list) == 1
+        assert stale_list[0].session_id == "SES-OLD"
+
+    def test_no_warning_for_fresh_sessions(self) -> None:
+        """start_session returns empty list when no stale sessions."""
+        fresh = ActiveSession(
+            session_id="SES-FRESH",
+            started_at=datetime.now(UTC) - timedelta(hours=1),
+            project="/fresh",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[fresh])
+
+        updated, stale_list = start_session(
+            profile, session_id="SES-NEW", project_path="/new"
+        )
+
+        assert len(stale_list) == 0
+
+
+class TestEndSessionWithActiveSessions:
+    """Tests for end_session using active_sessions list (Task 4)."""
+
+    def test_removes_session_from_active_sessions(self) -> None:
+        """end_session removes specified session from active_sessions list."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC),
+            project="/test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[session])
+        updated = end_session(profile, session_id="SES-177")
+        assert len(updated.active_sessions) == 0
+
+    def test_preserves_other_sessions(self) -> None:
+        """end_session only removes specified session, keeps others."""
+        sessions = [
+            ActiveSession(
+                session_id="SES-100",
+                started_at=datetime.now(UTC),
+                project="/proj1",
+            ),
+            ActiveSession(
+                session_id="SES-101",
+                started_at=datetime.now(UTC),
+                project="/proj2",
+            ),
+        ]
+        profile = DeveloperProfile(name="Test", active_sessions=sessions)
+        updated = end_session(profile, session_id="SES-100")
+
+        assert len(updated.active_sessions) == 1
+        assert updated.active_sessions[0].session_id == "SES-101"
+
+    def test_noop_when_session_not_found(self) -> None:
+        """end_session is no-op when session_id doesn't exist."""
+        session = ActiveSession(
+            session_id="SES-100",
+            started_at=datetime.now(UTC),
+            project="/test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[session])
+        updated = end_session(profile, session_id="SES-999")
+
+        # Session list unchanged
+        assert len(updated.active_sessions) == 1
+        assert updated.active_sessions[0].session_id == "SES-100"
+
+    def test_returns_new_instance(self) -> None:
+        """end_session returns new profile instance (immutable)."""
+        session = ActiveSession(
+            session_id="SES-177",
+            started_at=datetime.now(UTC),
+            project="/test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[session])
+        updated = end_session(profile, session_id="SES-177")
+
+        assert profile is not updated
+        assert len(profile.active_sessions) == 1  # Original unchanged
