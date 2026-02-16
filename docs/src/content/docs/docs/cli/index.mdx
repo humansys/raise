@@ -58,6 +58,7 @@ With `--context`, outputs a token-optimized context bundle (~150 tokens) assembl
 |------|-------|-------------|
 | `--name` | `-n` | Your name (required for first-time setup) |
 | `--project` | `-p` | Project path to associate with this session |
+| `--agent` | | Agent type (e.g., `claude-code`, `cursor`). Default: `unknown` |
 | `--context` | | Output a context bundle for AI consumption |
 
 ```bash
@@ -83,6 +84,7 @@ End the current working session. With `--summary` or `--state-file`, performs a 
 | `--correction` | | Coaching correction observed |
 | `--correction-lesson` | | Lesson from the correction |
 | `--state-file` | | YAML file with full structured session output |
+| `--session` | | Session ID to close (e.g., `SES-177`). Falls back to `RAI_SESSION_ID` env var |
 | `--project` | `-p` | Project path |
 
 ```bash
@@ -354,6 +356,27 @@ rai memory emit-calibration S9.4 --size S --estimated 30 --actual 15
 rai memory emit-calibration S9.4 -s M -e 60 -a 90
 ```
 
+### `rai memory viz`
+
+Generate an interactive HTML visualization of the memory graph. Creates a self-contained HTML file with a D3.js force-directed graph. Nodes are color-coded by type, filterable, zoomable, and searchable.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--output` | `-o` | Output HTML file path |
+| `--index` | `-i` | Memory index path |
+| `--open` / `--no-open` | | Open in browser after generating (default: open) |
+
+```bash
+# Generate and open in browser
+rai memory viz
+
+# Generate to specific path
+rai memory viz --output graph.html
+
+# Generate without opening
+rai memory viz --no-open
+```
+
 ### `rai memory generate`
 
 :::caution[Deprecated]
@@ -538,3 +561,20 @@ Display base Rai package information. Shows the bundled base version, contents (
 ```bash
 rai base show
 ```
+
+---
+
+## Release
+
+### `rai release list`
+
+List releases from the memory graph. Shows all release nodes with their status, target date, and associated epics.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project root path (default: `.`) |
+
+```bash
+rai release list
+```
+
