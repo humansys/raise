@@ -17,7 +17,7 @@ from rai_cli.exceptions import (
     ValidationError,
 )
 
-__version__ = "2.0.0a8"
+__version__ = "2.0.0a9"
 __author__ = "Emilio Osorio"
 __license__ = "MIT"
 
