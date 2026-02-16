@@ -240,14 +240,17 @@ class TestSessionClose:
         assert result.exit_code == 0
         assert "No active session to close" in result.output
 
-    def test_close_active_session_removes_from_list(self) -> None:
+    def test_close_active_session_removes_from_list(self, tmp_path: Path) -> None:
         """Close with active session removes it from active_sessions."""
         from datetime import UTC, datetime
+
+        project = tmp_path / "project"
+        project.mkdir()
 
         active_session = ActiveSession(
             session_id="SES-100",
             started_at=datetime.now(UTC),
-            project="/my/project",
+            project=str(project),
             agent="test-agent",
         )
         profile = DeveloperProfile(name="Grace", active_sessions=[active_session])
@@ -259,7 +262,9 @@ class TestSessionClose:
             ),
             patch("rai_cli.cli.commands.session.save_developer_profile") as mock_save,
         ):
-            result = runner.invoke(app, ["session", "close"])
+            result = runner.invoke(
+                app, ["session", "close", "--project", str(project)]
+            )
 
         assert result.exit_code == 0
         assert "Session SES-100 closed" in result.output
@@ -641,6 +646,166 @@ class TestSessionStartWithAgent:
 
         assert result.exit_code == 0
         assert "(unknown)" in result.output  # Default agent
+
+
+class TestSessionCloseCwdGuard:
+    """Tests for CWD poka-yoke guard on session close (RAISE-139)."""
+
+    def test_close_rejects_mismatched_project(self, tmp_path: Path) -> None:
+        """Session close rejects writes when CWD project != session project."""
+        from datetime import UTC, datetime
+
+        session_project = tmp_path / "project-a"
+        session_project.mkdir()
+        wrong_project = tmp_path / "project-b"
+        wrong_project.mkdir()
+
+        active = ActiveSession(
+            session_id="SES-050",
+            started_at=datetime.now(UTC),
+            project=str(session_project),
+            agent="test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[active])
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test",
+                    "--project",
+                    str(wrong_project),
+                ],
+            )
+
+        assert result.exit_code != 0
+        assert "project-a" in result.output
+        assert "project-b" in result.output
+
+    def test_close_allows_matching_project(self, tmp_path: Path) -> None:
+        """Session close allows writes when projects match."""
+        from datetime import UTC, datetime
+
+        project = tmp_path / "project"
+        project.mkdir()
+
+        active = ActiveSession(
+            session_id="SES-050",
+            started_at=datetime.now(UTC),
+            project=str(project),
+            agent="test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[active])
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-050",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ),
+            patch("rai_cli.cli.commands.session.resolve_session_id", return_value="SES-050"),
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test",
+                    "--session",
+                    "SES-050",
+                    "--project",
+                    str(project),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert "SES-050 closed" in result.output
+
+    def test_close_no_active_session_skips_guard(self) -> None:
+        """Guard is skipped when no active session has project info."""
+        profile = DeveloperProfile(name="Test", active_sessions=[])
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-099",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "close", "--summary", "test"],
+            )
+
+        assert result.exit_code == 0
+
+    def test_close_rejects_mismatch_on_legacy_close(self, tmp_path: Path) -> None:
+        """Legacy (non-structured) close also checks CWD guard."""
+        from datetime import UTC, datetime
+
+        session_project = tmp_path / "correct"
+        session_project.mkdir()
+        wrong_project = tmp_path / "wrong"
+        wrong_project.mkdir()
+
+        active = ActiveSession(
+            session_id="SES-050",
+            started_at=datetime.now(UTC),
+            project=str(session_project),
+            agent="test",
+        )
+        profile = DeveloperProfile(name="Test", active_sessions=[active])
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+            patch(
+                "rai_cli.cli.commands.session.Path"
+            ) as mock_path_cls,
+        ):
+            # Mock Path.cwd() to return wrong project
+            mock_path_cls.cwd.return_value = wrong_project
+            # But we need real Path for other uses, so let Path(x) work normally
+            mock_path_cls.side_effect = Path
+
+            result = runner.invoke(
+                app,
+                ["session", "close"],
+            )
+
+        assert result.exit_code != 0
+        assert "correct" in result.output
 
 
 class TestSessionCloseWithSessionFlag:
