@@ -317,6 +317,26 @@ class TestAssembleContextBundle:
         assert "Autonomy:" not in bundle
         assert "Relationship:" not in bundle
 
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_session_id_in_context(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Session ID appears in context bundle when provided."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = _make_profile()
+        state = _make_state()
+        bundle = assemble_context_bundle(
+            profile, state, Path("/project"), session_id="SES-177"
+        )
+
+        # Session ID should appear in a visible location
+        assert "Session: SES-177" in bundle
+
 
 def _make_always_on_node(node_id: str, node_type: str, content: str) -> ConceptNode:
     """Create a mock always_on node."""
