@@ -436,6 +436,66 @@ class TestSessionClose:
         assert close_input.progress["epic"] == "E15"
         assert close_input.completed_epics == ["E12", "E14"]
 
+    def test_close_cleanup_session_dir(self, tmp_path: Path) -> None:
+        """Session close removes per-session directory after close."""
+        from datetime import UTC, datetime
+
+        profile = DeveloperProfile(
+            name="Test",
+            active_sessions=[
+                ActiveSession(
+                    session_id="SES-050",
+                    started_at=datetime.now(UTC),
+                    project=str(tmp_path),
+                    agent="test",
+                ),
+            ],
+        )
+
+        # Create per-session directory (simulating what start would create)
+        session_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-050"
+        session_dir.mkdir(parents=True)
+        (session_dir / "state.yaml").write_text("current_work: {}")
+        (session_dir / "signals.jsonl").write_text("{}")
+
+        close_result = CloseResult(
+            success=True,
+            session_id="SES-050",
+            patterns_added=0,
+            corrections_added=0,
+        )
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.process_session_close",
+                return_value=close_result,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.resolve_session_id",
+                return_value="SES-050",
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--summary",
+                    "test",
+                    "--session",
+                    "SES-050",
+                    "--project",
+                    str(tmp_path),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert not session_dir.exists(), "Session dir should be cleaned up after close"
+
     def test_close_help_shows_new_options(self) -> None:
         """Close --help shows new structured close options."""
         result = runner.invoke(app, ["session", "close", "--help"])
@@ -473,6 +533,71 @@ class TestSessionHelp:
 
         assert result.exit_code == 0
         assert "End the current working session" in result.output
+
+
+class TestSessionStartCreatesDir:
+    """Tests for session start creating per-session directory (RAISE-138)."""
+
+    def test_start_creates_session_dir(self, tmp_path: Path) -> None:
+        """Session start with --project creates per-session directory."""
+        profile = DeveloperProfile(name="Test")
+        project_path = tmp_path / "project"
+        project_path.mkdir()
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "start", "--project", str(project_path)],
+            )
+
+        assert result.exit_code == 0
+        # Per-session directory should exist
+        session_dir = project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        assert session_dir.exists(), "Per-session directory should be created on start"
+        assert session_dir.is_dir()
+
+    def test_start_migrates_flat_files(self, tmp_path: Path) -> None:
+        """Session start migrates flat state/telemetry files to per-session dir."""
+        profile = DeveloperProfile(name="Test")
+        project_path = tmp_path / "project"
+        project_path.mkdir()
+
+        # Create flat files (legacy layout)
+        personal_dir = project_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text("current_work:\n  epic: E15\n")
+        flat_telemetry_dir = personal_dir / "telemetry"
+        flat_telemetry_dir.mkdir()
+        flat_signals = flat_telemetry_dir / "signals.jsonl"
+        flat_signals.write_text('{"signal_type": "test"}\n')
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "start", "--project", str(project_path)],
+            )
+
+        assert result.exit_code == 0
+        # Flat files should be moved to per-session dir
+        session_dir = project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        assert (session_dir / "state.yaml").exists()
+        assert (session_dir / "signals.jsonl").exists()
+        # Old flat files should be removed
+        assert not flat_state.exists(), "Flat state file should be removed after migration"
+        assert not flat_signals.exists(), "Flat signals file should be removed after migration"
 
 
 class TestSessionStartWithAgent:

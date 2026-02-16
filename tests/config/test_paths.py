@@ -15,6 +15,7 @@ from rai_cli.config.paths import (
     get_global_rai_dir,
     get_identity_dir,
     get_personal_dir,
+    get_session_dir,
 )
 
 
@@ -179,6 +180,27 @@ class TestGetPersonalDir:
     def test_returns_path_object(self, tmp_path: Path) -> None:
         """Should return a Path object, not a string."""
         result = get_personal_dir(tmp_path)
+        assert isinstance(result, Path)
+
+
+class TestGetSessionDir:
+    """Tests for get_session_dir() function."""
+
+    def test_returns_per_session_path(self, tmp_path: Path) -> None:
+        """Should return .raise/rai/personal/sessions/{session_id}/."""
+        result = get_session_dir("SES-177", tmp_path)
+        expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-177"
+        assert result == expected
+
+    def test_uses_cwd_when_no_project_root(self) -> None:
+        """Should use cwd when no project_root provided."""
+        result = get_session_dir("SES-42")
+        expected = Path.cwd() / ".raise" / "rai" / "personal" / "sessions" / "SES-42"
+        assert result == expected
+
+    def test_returns_path_object(self, tmp_path: Path) -> None:
+        """Should return a Path object."""
+        result = get_session_dir("SES-1", tmp_path)
         assert isinstance(result, Path)
 
 
