@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-02-16
+
+### Added
+- Developer Enablement: Starlight docs site (22 pages, EN+ES) at docs.raiseframework.ai
+- Methodology article: core concepts, Lean principles, the Triad
+- Jumpstart training materials for team onboarding
+- Complete CLI reference for all core commands
+
 ## [2.0.0a9] - 2026-02-16
 
 ### Added
