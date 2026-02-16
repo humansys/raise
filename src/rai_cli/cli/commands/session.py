@@ -21,7 +21,8 @@ from typing import Annotated
 import typer
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.memory.writer import validate_session_index
+from rai_cli.exceptions import RaiSessionNotFoundError
+from rai_cli.memory.writer import get_next_id, validate_session_index
 from rai_cli.onboarding.profile import (
     DeveloperProfile,
     end_session,
@@ -32,13 +33,47 @@ from rai_cli.onboarding.profile import (
 )
 from rai_cli.session.bundle import assemble_context_bundle
 from rai_cli.session.close import CloseInput, load_state_file, process_session_close
-from rai_cli.session.state import load_session_state
+from rai_cli.session.resolver import resolve_session_id
+from rai_cli.session.state import (
+    cleanup_session_dir,
+    load_session_state,
+    migrate_flat_to_session,
+)
 
 session_app = typer.Typer(
     name="session",
     help="Manage working sessions",
     no_args_is_help=True,
 )
+
+
+def _check_cwd_guard(
+    profile: DeveloperProfile,
+    session_id: str,
+    close_project: Path,
+) -> None:
+    """Poka-yoke: reject session close if CWD project != session project.
+
+    Compares the resolved absolute path of the close project against the
+    project recorded in the ActiveSession. Raises cli_error on mismatch.
+
+    Args:
+        profile: Developer profile with active sessions.
+        session_id: The session being closed.
+        close_project: Project path from --project flag or CWD.
+    """
+    for active in profile.active_sessions:
+        if active.session_id == session_id and active.project:
+            session_path = Path(active.project).resolve()
+            close_path = close_project.resolve()
+            if session_path != close_path:
+                cli_error(
+                    f"CWD mismatch — session {session_id} started in "
+                    f"{session_path} but close is running from {close_path}. "
+                    f"Run from the correct project directory, or use "
+                    f"--project {session_path}.",
+                )
+            break
 
 
 @session_app.command()
@@ -57,6 +92,13 @@ def start(
             "--project",
             "-p",
             help="Project path to associate with this session",
+        ),
+    ] = None,
+    agent: Annotated[
+        str | None,
+        typer.Option(
+            "--agent",
+            help="Agent type (e.g., claude-code, cursor). Default: unknown",
         ),
     ] = None,
     context: Annotated[
@@ -125,18 +167,50 @@ def start(
     # Increment session count
     updated = increment_session(profile, project_path=project)
 
-    # Set active session state
+    # Generate session ID and add to active_sessions
+    session_id: str | None = None
     if project is not None:
-        updated = start_session(updated, project)
+        personal_dir = Path(project) / ".raise" / "rai" / "personal"
+        sessions_index = personal_dir / "sessions" / "index.jsonl"
+        session_id = get_next_id(sessions_index, "SES")
+
+        # Migrate flat files if they exist (before creating dir)
+        migrate_flat_to_session(Path(project), session_id)
+
+        # Ensure per-session directory exists (migration may have created it)
+        session_dir = Path(project) / ".raise" / "rai" / "personal" / "sessions" / session_id
+        session_dir.mkdir(parents=True, exist_ok=True)
+
+        # Add to active_sessions (with stale warning)
+        agent_name = agent if agent else "unknown"
+        updated, stale_sessions = start_session(
+            updated, session_id=session_id, project_path=project, agent=agent_name
+        )
+
+        # Warn about stale sessions
+        if stale_sessions:
+            typer.echo("⚠ Warning: Stale sessions detected (started >24h ago):")
+            for stale in stale_sessions:
+                typer.echo(f"  - {stale.session_id} (started {stale.started_at.date()}, project: {stale.project})")
+            typer.echo("Consider closing these sessions with: rai session close --session <ID>\n")
 
     save_developer_profile(updated)
 
+    # Format agent for output
+    agent_name = agent if agent else "unknown"
+
     if context and project is not None:
         project_path = Path(project)
-        state = load_session_state(project_path)
-        bundle = assemble_context_bundle(updated, state, project_path)
+        # Load state from per-session dir (migration moved flat file there)
+        # Falls back to flat file if no session_id
+        state = load_session_state(project_path, session_id=session_id)
+        bundle = assemble_context_bundle(updated, state, project_path, session_id=session_id)
         typer.echo(bundle)
     else:
+        if session_id:
+            typer.echo(f"▶ Session {session_id} started ({agent_name})")
+        else:
+            typer.echo(f"▶ Session started ({agent_name})")
         typer.echo(f"Session recorded. (last: {updated.last_session})")
 
 
@@ -186,6 +260,13 @@ def close(
             help="YAML file with full structured session output",
         ),
     ] = None,
+    session: Annotated[
+        str | None,
+        typer.Option(
+            "--session",
+            help="Session ID to close (e.g., SES-177). Falls back to RAI_SESSION_ID env var.",
+        ),
+    ] = None,
     project: Annotated[
         str | None,
         typer.Option(
@@ -215,18 +296,36 @@ def close(
         cli_error("No developer profile found")
         return  # cli_error raises, but this helps pyright
 
+    # Resolve session ID (from --session flag or RAI_SESSION_ID env var)
+    resolved_session_id: str | None = None
+    if session:
+        import os
+
+        try:
+            resolved_session_id = resolve_session_id(session_flag=session, env_var=os.getenv("RAI_SESSION_ID"))
+        except RaiSessionNotFoundError as e:
+            cli_error(str(e))
+            return
+
     # Determine if this is a structured close
     is_structured = summary is not None or state_file is not None
 
     if not is_structured:
         # Legacy behavior: just clear active session
-        if profile.current_session is None:
-            typer.echo("No active session to close.")
-            return
+        if not resolved_session_id:
+            # No session specified, try to use first active session
+            if not profile.active_sessions:
+                typer.echo("No active session to close.")
+                return
+            resolved_session_id = profile.active_sessions[0].session_id
 
-        updated = end_session(profile)
+        # CWD poka-yoke (RAISE-139): reject if project mismatch
+        legacy_project = Path(project) if project else Path.cwd()
+        _check_cwd_guard(profile, resolved_session_id, legacy_project)
+
+        updated = end_session(profile, session_id=resolved_session_id)
         save_developer_profile(updated)
-        typer.echo("Session closed.")
+        typer.echo(f"Session {resolved_session_id} closed.")
         return
 
     # Structured close: build CloseInput from flags or state file
@@ -253,8 +352,20 @@ def close(
     # Resolve project path
     project_path = Path(project) if project else Path.cwd()
 
-    # Process close
-    close_result = process_session_close(close_input, profile, project_path)
+    # CWD poka-yoke (RAISE-139): reject if project mismatch
+    guard_session_id = resolved_session_id
+    if not guard_session_id and profile.active_sessions:
+        guard_session_id = profile.active_sessions[0].session_id
+    if guard_session_id:
+        _check_cwd_guard(profile, guard_session_id, project_path)
+
+    # Process close (pass session_id for per-session state writes)
+    close_result = process_session_close(close_input, profile, project_path, session_id=resolved_session_id)
+
+    # Cleanup per-session directory
+    cleanup_session_id = resolved_session_id or close_result.session_id
+    if cleanup_session_id:
+        cleanup_session_dir(project_path, cleanup_session_id)
 
     # Output summary
     typer.echo(f"Session {close_result.session_id} closed.")

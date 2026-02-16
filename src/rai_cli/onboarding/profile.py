@@ -72,6 +72,9 @@ class CommunicationPreferences(BaseModel):
 class CurrentSession(BaseModel):
     """Active session state for detecting orphaned sessions.
 
+    **DEPRECATED:** Use ActiveSession instead. This model is kept for
+    backward compatibility during migration from single-session to multi-session.
+
     Tracks when a session started and in which project, enabling detection
     of sessions that were started but never closed (e.g., due to interruption).
 
@@ -82,6 +85,38 @@ class CurrentSession(BaseModel):
 
     started_at: datetime
     project: str
+
+    def is_stale(self, hours: int = 24) -> bool:
+        """Check if session is stale (started more than N hours ago).
+
+        Args:
+            hours: Number of hours after which a session is considered stale.
+
+        Returns:
+            True if session started more than `hours` ago.
+        """
+        now = datetime.now(UTC)
+        age = now - self.started_at
+        return age.total_seconds() > hours * 3600
+
+
+class ActiveSession(BaseModel):
+    """Active session instance for multi-session support.
+
+    Replaces CurrentSession to support concurrent sessions on the same project.
+    Multiple AI agents/terminals can run simultaneously without state corruption.
+
+    Attributes:
+        session_id: Unique session identifier (e.g., "SES-177").
+        started_at: UTC timestamp when session began.
+        project: Absolute path to the project directory.
+        agent: Agent type metadata (e.g., "claude-code", "cursor"). Default: "unknown".
+    """
+
+    session_id: str
+    started_at: datetime
+    project: str
+    agent: str = "unknown"
 
     def is_stale(self, hours: int = 24) -> bool:
         """Check if session is stale (started more than N hours ago).
@@ -211,7 +246,8 @@ class DeveloperProfile(BaseModel):
     first_session: date | None = None
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
-    current_session: CurrentSession | None = None
+    current_session: CurrentSession | None = None  # DEPRECATED: migrated to active_sessions
+    active_sessions: list[ActiveSession] = Field(default_factory=list)
     coaching: CoachingContext = Field(default_factory=CoachingContext)
     deadlines: list[Deadline] = Field(default_factory=list)
 
@@ -239,8 +275,51 @@ def get_rai_home() -> Path:
     return Path.home() / RAI_HOME_DIR
 
 
+def _migrate_current_session(profile: DeveloperProfile) -> DeveloperProfile:
+    """Migrate old current_session format to active_sessions list.
+
+    Backward compatibility migration for RAISE-137. Converts single
+    current_session (dict) to active_sessions (list) with generated session ID.
+
+    Args:
+        profile: Profile to migrate.
+
+    Returns:
+        Profile with migration applied (may be same instance if no migration needed).
+    """
+    if profile.current_session is None:
+        # No current session to migrate
+        return profile
+
+    if len(profile.active_sessions) > 0:
+        # Already migrated or has active sessions — don't re-migrate
+        logger.debug("Profile already has active_sessions, skipping migration")
+        return profile
+
+    # Migrate: convert current_session to ActiveSession
+    # Generate a session ID (we don't have the real ID from old format)
+    # Use "SES-MIGRATED" as placeholder
+    migrated_session = ActiveSession(
+        session_id="SES-MIGRATED",
+        started_at=profile.current_session.started_at,
+        project=profile.current_session.project,
+        agent="unknown",
+    )
+
+    # Create updated profile with migration
+    updated = profile.model_copy(deep=True)
+    updated.active_sessions = [migrated_session]
+    updated.current_session = None
+
+    logger.info("Migrated current_session to active_sessions")
+    return updated
+
+
 def load_developer_profile() -> DeveloperProfile | None:
     """Load developer profile from ~/.rai/developer.yaml.
+
+    Automatically migrates old current_session format to active_sessions
+    if needed (backward compatibility for RAISE-137).
 
     Returns:
         DeveloperProfile if file exists and is valid, None otherwise.
@@ -258,7 +337,17 @@ def load_developer_profile() -> DeveloperProfile | None:
         if data is None:
             logger.warning("Empty developer profile: %s", profile_path)
             return None
-        return DeveloperProfile.model_validate(data)
+
+        profile = DeveloperProfile.model_validate(data)
+
+        # Migrate if needed
+        migrated = _migrate_current_session(profile)
+        if migrated is not profile:
+            # Migration occurred — save immediately
+            save_developer_profile(migrated)
+            return migrated
+
+        return profile
     except yaml.YAMLError as e:
         logger.warning("Invalid YAML in developer profile: %s", e)
         return None
@@ -318,39 +407,62 @@ def increment_session(
     return profile.model_copy(update=updates)
 
 
-def start_session(profile: DeveloperProfile, project_path: str) -> DeveloperProfile:
-    """Mark a session as active.
+def start_session(
+    profile: DeveloperProfile,
+    session_id: str,
+    project_path: str,
+    agent: str = "unknown",
+) -> tuple[DeveloperProfile, list[ActiveSession]]:
+    """Mark a session as active by adding to active_sessions list.
 
-    Sets current_session with timestamp and project. Use this at the
-    beginning of /rai-session-start to track active sessions.
+    Adds an ActiveSession to the profile's active_sessions list. Also detects
+    stale sessions (started >24h ago) and returns them for warning.
 
     Args:
         profile: The developer profile to update.
+        session_id: Unique session identifier (e.g., "SES-177").
         project_path: Absolute path to the project directory.
+        agent: Agent type (e.g., "claude-code", "cursor"). Default: "unknown".
 
     Returns:
-        Updated profile with current_session set.
+        Tuple of (updated profile, list of stale sessions for warning).
     """
-    session = CurrentSession(
+    # Detect stale sessions before adding new one
+    stale_sessions = [s for s in profile.active_sessions if s.is_stale(hours=24)]
+
+    # Create new active session
+    new_session = ActiveSession(
+        session_id=session_id,
         started_at=datetime.now(UTC),
         project=project_path,
+        agent=agent,
     )
-    return profile.model_copy(update={"current_session": session})
+
+    # Add to active_sessions list
+    updated_sessions = [*profile.active_sessions, new_session]
+    updated = profile.model_copy(update={"active_sessions": updated_sessions})
+
+    return updated, stale_sessions
 
 
-def end_session(profile: DeveloperProfile) -> DeveloperProfile:
-    """Clear the active session state.
+def end_session(profile: DeveloperProfile, session_id: str) -> DeveloperProfile:
+    """Remove a session from active_sessions list.
 
-    Clears current_session. Use this at the end of /rai-session-close
-    to mark the session as properly closed.
+    Removes the specified session from the profile's active_sessions list.
+    If session_id doesn't exist, returns profile unchanged (no-op).
 
     Args:
         profile: The developer profile to update.
+        session_id: Session identifier to remove (e.g., "SES-177").
 
     Returns:
-        Updated profile with current_session cleared.
+        Updated profile with session removed from active_sessions.
     """
-    return profile.model_copy(update={"current_session": None})
+    # Filter out the specified session
+    updated_sessions = [
+        s for s in profile.active_sessions if s.session_id != session_id
+    ]
+    return profile.model_copy(update={"active_sessions": updated_sessions})
 
 
 def add_correction(

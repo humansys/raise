@@ -116,6 +116,7 @@ def process_session_close(
     close_input: CloseInput,
     profile: DeveloperProfile,
     project_path: Path,
+    session_id: str | None = None,
 ) -> CloseResult:
     """Process session close — perform all writes.
 
@@ -195,8 +196,8 @@ def process_session_close(
         )
         result.messages.append("Coaching updated")
 
-    # 5. Clear current_session and save profile
-    updated_profile = end_session(updated_profile)
+    # 5. Remove session from active_sessions and save profile
+    updated_profile = end_session(updated_profile, session_id=result.session_id)
     save_developer_profile(updated_profile)
     result.messages.append("Profile updated")
 
@@ -253,6 +254,9 @@ def process_session_close(
         progress=progress,
         completed_epics=close_input.completed_epics,
     )
+    # Write to flat file (not per-session dir) — flat file serves as
+    # cross-session continuity buffer. Next session start will migrate
+    # it to the new per-session directory.
     save_session_state(project_path, session_state)
     result.messages.append("Session state saved")
 

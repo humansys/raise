@@ -239,10 +239,10 @@ class TestAssembleContextBundle:
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_coaching_shows_last_3_corrections(
+    def test_coaching_corrections_suppressed(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Coaching section shows only last 3 corrections for brevity."""
+        """Coaching corrections are suppressed from context bundle."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -261,12 +261,10 @@ class TestAssembleContextBundle:
         )
         bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-        # Only last 3 should appear
-        assert "SES-002" in bundle
-        assert "SES-003" in bundle
-        assert "SES-004" in bundle
-        assert "SES-000" not in bundle
-        assert "SES-001" not in bundle
+        # Corrections should not appear — suppressed until retro-skill integration
+        for i in range(5):
+            assert f"SES-{i:03d}" not in bundle
+        assert "corrections" not in bundle.lower()
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -318,6 +316,26 @@ class TestAssembleContextBundle:
         assert "Trust:" not in bundle
         assert "Autonomy:" not in bundle
         assert "Relationship:" not in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_session_id_in_context(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Session ID appears in context bundle when provided."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = _make_profile()
+        state = _make_state()
+        bundle = assemble_context_bundle(
+            profile, state, Path("/project"), session_id="SES-177"
+        )
+
+        # Session ID should appear in a visible location
+        assert "Session: SES-177" in bundle
 
 
 def _make_always_on_node(node_id: str, node_type: str, content: str) -> ConceptNode:

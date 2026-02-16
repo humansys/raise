@@ -228,6 +228,7 @@ class TestExceptionExports:
             "StateError",
             "ValidationError",
             "GateFailedError",
+            "RaiSessionNotFoundError",
         }
 
         assert set(exceptions.__all__) == expected
