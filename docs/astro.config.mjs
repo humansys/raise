@@ -33,6 +33,7 @@ export default defineConfig({
           label: 'Concepts',
           translations: { es: 'Conceptos' },
           items: [
+            { slug: 'docs/concepts' },
             { slug: 'docs/concepts/memory' },
             { slug: 'docs/concepts/skills' },
             { slug: 'docs/concepts/governance' },
