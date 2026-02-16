@@ -1,7 +1,7 @@
 """Session ID resolution logic.
 
 Resolves session ID from --session flag or RAI_SESSION_ID env var
-following priority order: flag > env var > error.
+following priority order: flag > env var > error (or None for optional).
 """
 
 from __future__ import annotations
@@ -82,3 +82,32 @@ def resolve_session_id(
         "No session ID provided",
         hint="Pass --session SES-NNN or set RAI_SESSION_ID environment variable",
     )
+
+
+def resolve_session_id_optional(
+    session_flag: str | None,
+    env_var: str | None,
+) -> str | None:
+    """Resolve session ID, returning None when neither source is provided.
+
+    Same resolution priority as resolve_session_id but returns None instead
+    of raising when no session context exists. Use for commands where
+    --session is optional (e.g., telemetry emit commands).
+
+    Args:
+        session_flag: Value from --session CLI flag.
+        env_var: Value from RAI_SESSION_ID environment variable.
+
+    Returns:
+        Normalized session ID, or None if neither source provided.
+    """
+    # Priority 1: --session flag
+    if session_flag and session_flag.strip():
+        return _normalize_session_id(session_flag)
+
+    # Priority 2: RAI_SESSION_ID env var
+    if env_var and env_var.strip():
+        return _normalize_session_id(env_var)
+
+    # Priority 3: None (no session context — that's OK)
+    return None
