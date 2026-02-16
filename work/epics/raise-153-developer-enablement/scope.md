@@ -21,7 +21,7 @@ Enable developers to adopt RaiSE by providing accurate, up-to-date documentation
 |----|-------|:----:|:------:|-------------|
 | S1 | Starlight site + content migration | M | ✅ Done | Set up Starlight in raise-commons, migrate 18 docs (9 EN + 9 ES) from raise-gtm, update `raise` → `rai`, theme replication |
 | S2 | CLI Reference update | M | ✅ Done | Updated EN + ES docs against v2.0.0a9 --help, added memory viz, release list, --agent, --session flags. PAT-T-005: core/PRO boundary |
-| S3 | Getting Started Guide | M | Pending | Methodology-first tutorial: RaiSE principles → Triad → first story lifecycle, not just "how to install" |
+| S3 | Getting Started Guide | M | ✅ Done | Svelte-like structure: Triad concept anchor → install → lifecycle → engagement paths. Fixed stale /story-* prefixes in first-story guides |
 | S4 | Training Slide Deck | S | Pending | Distill from guide + reference for 1h Kurigage sessions |
 | S5 | Publish skill | S | Pending | `/rai-docs-publish`: verify content currency + build + deploy to Cloudflare Pages |
 
