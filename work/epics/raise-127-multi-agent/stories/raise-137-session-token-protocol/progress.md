@@ -2,7 +2,7 @@
 
 ## Status
 - **Started:** 2026-02-15 (implementation phase)
-- **Current Task:** 4 of 6
+- **Current Task:** 5 of 6
 - **Status:** In Progress
 
 ## Completed Tasks
@@ -30,6 +30,12 @@
 - **Completed:** 2026-02-15
 - **Duration:** ~25 min
 - **Notes:** TDD cycle RED→GREEN→REFACTOR successful. Updated `start_session()` to add to `active_sessions` list (returns tuple with stale warnings). Updated `end_session()` to remove from list by session_id (no-op if not found). Stale detection working (>24h threshold). Removed deprecated tests for old `current_session` behavior. All 96 profile tests passing. CLI wiring deferred to Task 5/subsequent stories.
+
+### Task 5: Add Session ID to Context Bundle Output
+- **Started:** 2026-02-15
+- **Completed:** 2026-02-15
+- **Duration:** ~15 min
+- **Notes:** TDD cycle RED→GREEN successful. Added optional `session_id` parameter to `assemble_context_bundle()`. Session ID appears as "Session: SES-NNN" between developer and work sections. Backward compatible (parameter optional). All 42 bundle tests passing. Pyright: 0 errors.
 
 ## Blockers
 
