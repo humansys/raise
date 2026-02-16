@@ -32,6 +32,7 @@ from rai_cli.onboarding.profile import (
 )
 from rai_cli.session.bundle import assemble_context_bundle
 from rai_cli.session.close import CloseInput, load_state_file, process_session_close
+from rai_cli.session.resolver import resolve_session_id
 from rai_cli.session.state import load_session_state
 
 session_app = typer.Typer(
@@ -57,6 +58,13 @@ def start(
             "--project",
             "-p",
             help="Project path to associate with this session",
+        ),
+    ] = None,
+    agent: Annotated[
+        str | None,
+        typer.Option(
+            "--agent",
+            help="Agent type (e.g., claude-code, cursor). Default: unknown",
         ),
     ] = None,
     context: Annotated[
@@ -131,12 +139,18 @@ def start(
 
     save_developer_profile(updated)
 
+    # Format agent for output
+    agent_name = agent if agent else "unknown"
+
     if context and project is not None:
         project_path = Path(project)
         state = load_session_state(project_path)
         bundle = assemble_context_bundle(updated, state, project_path)
         typer.echo(bundle)
     else:
+        # TODO(RAISE-137): Get actual session ID from active_sessions in Task 4
+        # For now, show placeholder format
+        typer.echo(f"▶ Session SES-PLACEHOLDER started ({agent_name})")
         typer.echo(f"Session recorded. (last: {updated.last_session})")
 
 
@@ -186,6 +200,13 @@ def close(
             help="YAML file with full structured session output",
         ),
     ] = None,
+    session: Annotated[
+        str | None,
+        typer.Option(
+            "--session",
+            help="Session ID to close (e.g., SES-177). Falls back to RAI_SESSION_ID env var.",
+        ),
+    ] = None,
     project: Annotated[
         str | None,
         typer.Option(
@@ -214,6 +235,14 @@ def close(
     if profile is None:
         cli_error("No developer profile found")
         return  # cli_error raises, but this helps pyright
+
+    # TODO(RAISE-137): Use resolve_session_id() in Task 4 when active_sessions is wired
+    # For now, --session flag is accepted but not yet used
+    if session:
+        import os
+
+        _ = resolve_session_id(session_flag=session, env_var=os.getenv("RAI_SESSION_ID"))
+        # Resolved ID will be used in Task 4 to identify which session to close
 
     # Determine if this is a structured close
     is_structured = summary is not None or state_file is not None
