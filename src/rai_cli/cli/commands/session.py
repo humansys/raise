@@ -34,7 +34,11 @@ from rai_cli.onboarding.profile import (
 from rai_cli.session.bundle import assemble_context_bundle
 from rai_cli.session.close import CloseInput, load_state_file, process_session_close
 from rai_cli.session.resolver import resolve_session_id
-from rai_cli.session.state import cleanup_session_dir, load_session_state, migrate_flat_to_session
+from rai_cli.session.state import (
+    cleanup_session_dir,
+    load_session_state,
+    migrate_flat_to_session,
+)
 
 session_app = typer.Typer(
     name="session",
