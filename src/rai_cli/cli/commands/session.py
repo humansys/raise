@@ -168,7 +168,9 @@ def start(
 
     if context and project is not None:
         project_path = Path(project)
-        state = load_session_state(project_path)
+        # Load state from per-session dir (migration moved flat file there)
+        # Falls back to flat file if no session_id
+        state = load_session_state(project_path, session_id=session_id)
         bundle = assemble_context_bundle(updated, state, project_path, session_id=session_id)
         typer.echo(bundle)
     else:
