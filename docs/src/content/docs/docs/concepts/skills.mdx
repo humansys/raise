@@ -14,24 +14,24 @@ A skill is a markdown file in `.claude/skills/<name>/SKILL.md` with:
 - **Mastery levels** — Shu (follow exactly), Ha (adapt), Ri (create your own)
 - **Inputs and outputs** — what it needs, what it produces
 
-When you invoke a skill (e.g., `/story-plan`), your AI loads the SKILL.md and follows its steps — checking prerequisites, executing each step, verifying results, and producing documented output.
+When you invoke a skill (e.g., `/rai-story-plan`), your AI loads the SKILL.md and follows its steps — checking prerequisites, executing each step, verifying results, and producing documented output.
 
 ## The Story Lifecycle
 
 The most important skill chain is the story lifecycle — the sequence that takes a feature from idea to merged code:
 
 ```
-/story-start    → Create branch and scope commit
+/rai-story-start    → Create branch and scope commit
       ↓
-/story-design   → Design the specification
+/rai-story-design   → Design the specification
       ↓
 /story-plan     → Decompose into atomic tasks
       ↓
-/story-implement → Execute tasks with TDD
+/rai-story-implement → Execute tasks with TDD
       ↓
-/story-review   → Retrospective and learnings
+/rai-story-review   → Retrospective and learnings
       ↓
-/story-close    → Verify, merge, cleanup
+/rai-story-close    → Verify, merge, cleanup
 ```
 
 Each step produces an artifact (scope.md, design.md, plan.md, progress.md, retrospective.md) and has verification gates that must pass before proceeding. This isn't bureaucracy — it's how you ensure consistency and traceability across sessions.
@@ -42,10 +42,10 @@ Skills are organized by the work lifecycle they belong to:
 
 | Lifecycle | Skills | When |
 |-----------|--------|------|
-| **Session** | `/session-start`, `/session-close` | Every working session |
-| **Story** | `/story-start` through `/story-close` | For each feature |
-| **Epic** | `/epic-start` through `/epic-close` | For multi-story bodies of work |
-| **Discovery** | `/discover-start` through `/discover-complete` | When analyzing a codebase |
+| **Session** | `/rai-session-start`, `/rai-session-close` | Every working session |
+| **Story** | `/rai-story-start` through `/rai-story-close` | For each feature |
+| **Epic** | `/rai-epic-start` through `/rai-epic-close` | For multi-story bodies of work |
+| **Discovery** | `/rai-discover-start` through `/rai-discover-document` | When analyzing a codebase |
 
 ## Skills vs. CLI
 
@@ -54,7 +54,7 @@ This distinction matters:
 - **Skills** guide the *process* — they tell you and your AI what to do, in what order, with what verification
 - **CLI** handles the *data* — it reads, writes, builds, and queries deterministically
 
-A skill like `/story-plan` tells the AI to decompose a story into tasks. The CLI command `rai memory emit-work` records the event. The skill orchestrates; the CLI executes.
+A skill like `/rai-story-plan` tells the AI to decompose a story into tasks. The CLI command `rai memory emit-work` records the event. The skill orchestrates; the CLI executes.
 
 ## Mastery Levels (ShuHaRi)
 

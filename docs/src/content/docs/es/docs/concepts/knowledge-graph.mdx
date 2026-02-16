@@ -23,7 +23,7 @@ Cuando ejecutas `rai memory build`, el CLI recorre todas las fuentes del proyect
 | Principle | `§N` | Constitución | "Heurísticas simples sobre ML complejo" |
 | Requirement | `RF-*` | PRD | "Website de marketing con voz de artesano" |
 | Guardrail | `GR-*` | Guardrails | "MUST: No vanity metrics como goals" |
-| Skill | `/name` | Archivos SKILL.md | `/story-plan` — descomponer en tareas |
+| Skill | `/name` | Archivos SKILL.md | `/rai-story-plan` — descomponer en tareas |
 | Story | `S*.*` | Seguimiento de trabajo | S8.6: Docs Getting Started |
 | Epic | `E*` | Scope de epics | E8: Website v1 + Docs |
 | Component | `comp-*` | Discovery scan | Clase `SessionManager` |
@@ -43,7 +43,7 @@ Los edges expresan cómo se relacionan los conceptos:
 | `depends_on` | El módulo depende de otro | mod-session → mod-memory |
 | `belongs_to` | El módulo pertenece a un dominio | mod-memory → bc-core |
 | `constrained_by` | El dominio está restringido por un guardrail | bc-core → GR-015 |
-| `applies_to` | El patrón aplica a un skill | PAT-001 → /story-implement |
+| `applies_to` | El patrón aplica a un skill | PAT-001 → /rai-story-implement |
 
 ## Construir el Grafo
 
