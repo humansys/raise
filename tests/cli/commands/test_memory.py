@@ -894,6 +894,209 @@ class TestMemoryEmitWorkCommand:
             os.chdir(original_cwd)
 
 
+class TestEmitSessionRouting:
+    """Tests for --session flag routing signals to per-session directories."""
+
+    def test_emit_work_with_session_flag(self, tmp_path: Path) -> None:
+        """Test emit-work with --session writes to per-session directory."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "emit-work",
+                    "story",
+                    "F1.1",
+                    "-e",
+                    "start",
+                    "-p",
+                    "design",
+                    "--session",
+                    "SES-999",
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "started" in result.stdout
+            # Signal should land in per-session directory
+            session_signals = (
+                tmp_path
+                / ".raise"
+                / "rai"
+                / "personal"
+                / "sessions"
+                / "SES-999"
+                / "signals.jsonl"
+            )
+            assert session_signals.exists()
+            content = session_signals.read_text()
+            assert "F1.1" in content
+        finally:
+            os.chdir(original_cwd)
+
+    def test_emit_session_with_session_flag(self, tmp_path: Path) -> None:
+        """Test emit-session with --session writes to per-session directory."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "emit-session",
+                    "-t",
+                    "story",
+                    "-o",
+                    "success",
+                    "--session",
+                    "SES-999",
+                ],
+            )
+
+            assert result.exit_code == 0
+            session_signals = (
+                tmp_path
+                / ".raise"
+                / "rai"
+                / "personal"
+                / "sessions"
+                / "SES-999"
+                / "signals.jsonl"
+            )
+            assert session_signals.exists()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_emit_calibration_with_session_flag(self, tmp_path: Path) -> None:
+        """Test emit-calibration with --session writes to per-session directory."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "emit-calibration",
+                    "F1.1",
+                    "-s",
+                    "S",
+                    "-e",
+                    "30",
+                    "-a",
+                    "15",
+                    "--session",
+                    "SES-999",
+                ],
+            )
+
+            assert result.exit_code == 0
+            session_signals = (
+                tmp_path
+                / ".raise"
+                / "rai"
+                / "personal"
+                / "sessions"
+                / "SES-999"
+                / "signals.jsonl"
+            )
+            assert session_signals.exists()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_emit_work_with_session_env_var(self, tmp_path: Path) -> None:
+        """Test emit-work falls back to RAI_SESSION_ID env var."""
+        original_cwd = os.getcwd()
+        original_env = os.environ.get("RAI_SESSION_ID")
+        try:
+            os.chdir(tmp_path)
+            os.environ["RAI_SESSION_ID"] = "SES-888"
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "emit-work",
+                    "story",
+                    "F1.1",
+                    "-e",
+                    "start",
+                    "-p",
+                    "design",
+                ],
+            )
+
+            assert result.exit_code == 0
+            session_signals = (
+                tmp_path
+                / ".raise"
+                / "rai"
+                / "personal"
+                / "sessions"
+                / "SES-888"
+                / "signals.jsonl"
+            )
+            assert session_signals.exists()
+        finally:
+            os.chdir(original_cwd)
+            if original_env is None:
+                os.environ.pop("RAI_SESSION_ID", None)
+            else:
+                os.environ["RAI_SESSION_ID"] = original_env
+
+    def test_emit_work_session_flag_overrides_env(self, tmp_path: Path) -> None:
+        """Test --session flag takes priority over RAI_SESSION_ID."""
+        original_cwd = os.getcwd()
+        original_env = os.environ.get("RAI_SESSION_ID")
+        try:
+            os.chdir(tmp_path)
+            os.environ["RAI_SESSION_ID"] = "SES-888"
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "emit-work",
+                    "story",
+                    "F1.1",
+                    "-e",
+                    "start",
+                    "-p",
+                    "design",
+                    "--session",
+                    "SES-777",
+                ],
+            )
+
+            assert result.exit_code == 0
+            # Flag should win over env var
+            flag_signals = (
+                tmp_path
+                / ".raise"
+                / "rai"
+                / "personal"
+                / "sessions"
+                / "SES-777"
+                / "signals.jsonl"
+            )
+            env_signals = (
+                tmp_path
+                / ".raise"
+                / "rai"
+                / "personal"
+                / "sessions"
+                / "SES-888"
+                / "signals.jsonl"
+            )
+            assert flag_signals.exists()
+            assert not env_signals.exists()
+        finally:
+            os.chdir(original_cwd)
+            if original_env is None:
+                os.environ.pop("RAI_SESSION_ID", None)
+            else:
+                os.environ["RAI_SESSION_ID"] = original_env
+
+
 class TestMemoryEmitSessionCommand:
     """Tests for `raise memory emit-session` command."""
 
