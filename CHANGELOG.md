@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Multi-agent session isolation: `--agent` and `--session` CLI flags for concurrent agent support (RAISE-127 pt1)
+- Session token protocol with priority resolution (`RAI_SESSION_ID` env → `--session` flag → auto-generate)
+- Per-session state directories with automatic migration from flat files
+- CWD poka-yoke guard on session close to prevent shell death (PAT-204)
+- `resolve_session_id()` and `resolve_session_id_optional()` helpers
+- `--session` flag on telemetry emit commands (`emit-work`, `emit-calibration`, `emit-pattern`)
+- JIRA OAuth 2.0 integration with PKCE flow and auto-refresh (PRO)
+- Bidirectional JIRA sync: `rai backlog pull/push/status/auth` commands (PRO)
+
+### Fixed
+- PRO import guards: all `rai backlog` commands show clear "requires rai-pro" message instead of ImportError
+
 ## [2.0.0a8] - 2026-02-14
 
 ### Added
