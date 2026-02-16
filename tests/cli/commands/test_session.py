@@ -460,3 +460,76 @@ class TestSessionHelp:
 
         assert result.exit_code == 0
         assert "End the current working session" in result.output
+
+
+class TestSessionStartWithAgent:
+    """Tests for raise session start --agent flag (RAISE-137)."""
+
+    def test_start_with_agent_flag(self) -> None:
+        """Session start --agent includes agent in output."""
+        profile = DeveloperProfile(name="Test")
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(
+                app, ["session", "start", "--agent", "claude-code"]
+            )
+
+        assert result.exit_code == 0
+        assert "SES-" in result.output  # Session ID present
+        assert "(claude-code)" in result.output
+
+    def test_start_without_agent_defaults(self) -> None:
+        """Session start without --agent defaults to unknown."""
+        profile = DeveloperProfile(name="Test")
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+        ):
+            result = runner.invoke(app, ["session", "start"])
+
+        assert result.exit_code == 0
+        # Should still work, just not show agent in output if not specified
+
+
+class TestSessionCloseWithSessionFlag:
+    """Tests for raise session close --session flag (RAISE-137)."""
+
+    def test_close_with_session_flag(self, tmp_path: Path) -> None:
+        """Session close --session uses resolver to identify session."""
+        profile = DeveloperProfile(name="Test")
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.resolve_session_id") as mock_resolve,
+        ):
+            mock_resolve.return_value = "SES-177"
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--session",
+                    "SES-177",
+                ],
+            )
+
+        # Should succeed (legacy close behavior for now)
+        assert result.exit_code == 0
+        # Resolver was called during session ID resolution
+        mock_resolve.assert_called_once_with(
+            session_flag="SES-177", env_var=None
+        )

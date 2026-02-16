@@ -2,7 +2,7 @@
 
 ## Status
 - **Started:** 2026-02-15 (implementation phase)
-- **Current Task:** 2 of 6
+- **Current Task:** 3 of 6
 - **Status:** In Progress
 
 ## Completed Tasks
@@ -18,6 +18,12 @@
 - **Completed:** 2026-02-15
 - **Duration:** ~15 min
 - **Notes:** TDD cycle RED→GREEN successful. Created `session/resolver.py` with resolution logic (flag > env var > error). Added `_normalize_session_id()` helper for "177" → "SES-177" normalization. Added `RaiSessionNotFoundError` to exceptions. All 12 tests passing. Pyright: 0 errors.
+
+### Task 3: Add --session and --agent Flags to CLI Commands
+- **Started:** 2026-02-15
+- **Completed:** 2026-02-15
+- **Duration:** ~20 min
+- **Notes:** Added `--agent` flag to `rai session start`, `--session` flag to `rai session close`. Imported `resolve_session_id` in session commands (wiring completed in Task 4). Updated output format to show "▶ Session SES-PLACEHOLDER started (agent)". All 3 tests passing. Pyright: 0 errors.
 
 ## Blockers
 
