@@ -225,12 +225,12 @@ Strictly sequential. No parallel streams — each story builds on the previous.
 
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
-| RAISE-137 | S | Pending | — | |
+| RAISE-137 | S | ✅ Done | 2h | 1.25x velocity |
 | RAISE-138 | M | Pending | — | |
 | RAISE-139 | S | Pending | — | |
 
 **Milestones:**
-- [ ] M1: Token Protocol (Feb 16)
+- [x] M1: Token Protocol (Feb 15 — completed ahead of schedule)
 - [ ] M2: Isolation Works (Feb 17)
 - [ ] M3: Launch Ready (Feb 17)
 - [ ] M4: Epic Complete (Feb 18)
