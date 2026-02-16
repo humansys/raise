@@ -401,6 +401,7 @@ def assemble_context_bundle(
     profile: DeveloperProfile,
     state: SessionState | None,
     project_path: Path,
+    session_id: str | None = None,
 ) -> str:
     """Assemble token-optimized context bundle from multiple sources.
 
@@ -408,6 +409,7 @@ def assemble_context_bundle(
         profile: Developer profile from ~/.rai/developer.yaml.
         state: Session state from .raise/rai/session-state.yaml (may be None).
         project_path: Absolute path to the project root.
+        session_id: Optional session identifier (e.g., "SES-177").
 
     Returns:
         Plain text context bundle, ~600 tokens.
@@ -426,8 +428,13 @@ def assemble_context_bundle(
     sections = [
         "# Session Context",
         _format_developer_section(profile),
-        _format_work_section(state, release_node=release_node),
     ]
+
+    # Add session ID if provided
+    if session_id:
+        sections.append(f"Session: {session_id}")
+
+    sections.append(_format_work_section(state, release_node=release_node))
 
     # Progress (epic SP, completed epics)
     progress = _format_progress(state)
