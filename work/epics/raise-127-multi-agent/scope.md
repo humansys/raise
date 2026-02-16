@@ -229,12 +229,12 @@ Strictly sequential. No parallel streams — each story builds on the previous.
 | RAISE-137 | S | ✅ Done | 2h | 1.25x velocity |
 | RAISE-138 | M | ✅ Done | ~1h | 1.0x velocity |
 | RAISE-139 | S | ✅ Done | ~20min | 1.5x velocity |
-| RAISE-146 | XS | Pending | — | Telemetry CLI wiring |
+| RAISE-146 | XS | ✅ Done | ~15min | 1.0x velocity |
 
 **Milestones:**
 - [x] M1: Token Protocol (Feb 15 — completed ahead of schedule)
 - [x] M2: Isolation Works (Feb 15 — completed ahead of schedule)
-- [ ] M3: Launch Ready (Feb 17)
+- [x] M3: Launch Ready (Feb 16 — completed ahead of schedule)
 - [ ] M4: Epic Complete (Feb 18)
 
 ### Sequencing Risks
