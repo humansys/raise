@@ -13,7 +13,7 @@ from rai_cli.memory.writer import (
     CalibrationInput,
     PatternInput,
     SessionInput,
-    _get_next_id,
+    get_next_id,
     append_calibration,
     append_pattern,
     append_session,
@@ -23,14 +23,14 @@ from rai_cli.memory.writer import (
 
 
 class TestGetNextId:
-    """Tests for _get_next_id function."""
+    """Tests for get_next_id function."""
 
     def test_empty_file_returns_001(self, tmp_path: Path) -> None:
         """First ID should be 001 when file is empty."""
         file_path = tmp_path / "test.jsonl"
         file_path.touch()
 
-        result = _get_next_id(file_path, "PAT")
+        result = get_next_id(file_path, "PAT")
 
         assert result == "PAT-001"
 
@@ -38,7 +38,7 @@ class TestGetNextId:
         """First ID should be 001 when file doesn't exist."""
         file_path = tmp_path / "nonexistent.jsonl"
 
-        result = _get_next_id(file_path, "PAT")
+        result = get_next_id(file_path, "PAT")
 
         assert result == "PAT-001"
 
@@ -51,7 +51,7 @@ class TestGetNextId:
             '{"id": "PAT-003", "content": "third"}\n'
         )
 
-        result = _get_next_id(file_path, "PAT")
+        result = get_next_id(file_path, "PAT")
 
         assert result == "PAT-006"
 
@@ -63,7 +63,7 @@ class TestGetNextId:
             '{"id": "CAL-005", "content": "calibration"}\n'
         )
 
-        result = _get_next_id(file_path, "CAL")
+        result = get_next_id(file_path, "CAL")
 
         assert result == "CAL-006"
 
@@ -408,14 +408,14 @@ class TestGetMemoryDirForScope:
 
 
 class TestGetNextIdWithPrefix:
-    """Tests for _get_next_id with developer prefix."""
+    """Tests for get_next_id with developer prefix."""
 
     def test_with_prefix_returns_prefixed_id(self, tmp_path: Path) -> None:
         """Should generate PAT-E-001 with prefix 'E'."""
         file_path = tmp_path / "test.jsonl"
         file_path.touch()
 
-        result = _get_next_id(file_path, "PAT", developer_prefix="E")
+        result = get_next_id(file_path, "PAT", developer_prefix="E")
 
         assert result == "PAT-E-001"
 
@@ -427,7 +427,7 @@ class TestGetNextIdWithPrefix:
             '{"id": "PAT-E-005", "content": "fifth"}\n'
         )
 
-        result = _get_next_id(file_path, "PAT", developer_prefix="E")
+        result = get_next_id(file_path, "PAT", developer_prefix="E")
 
         assert result == "PAT-E-006"
 
@@ -439,7 +439,7 @@ class TestGetNextIdWithPrefix:
             '{"id": "PAT-F-003", "content": "fer"}\n'
         )
 
-        result = _get_next_id(file_path, "PAT", developer_prefix="F")
+        result = get_next_id(file_path, "PAT", developer_prefix="F")
 
         assert result == "PAT-F-004"
 
@@ -451,7 +451,7 @@ class TestGetNextIdWithPrefix:
             '{"id": "PAT-E-005", "content": "new format"}\n'
         )
 
-        result = _get_next_id(file_path, "PAT", developer_prefix="E")
+        result = get_next_id(file_path, "PAT", developer_prefix="E")
 
         assert result == "PAT-E-006"
 
@@ -460,7 +460,7 @@ class TestGetNextIdWithPrefix:
         file_path = tmp_path / "test.jsonl"
         file_path.write_text('{"id": "PAT-010", "content": "existing"}\n')
 
-        result = _get_next_id(file_path, "PAT")
+        result = get_next_id(file_path, "PAT")
 
         assert result == "PAT-011"
 
