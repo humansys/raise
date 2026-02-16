@@ -220,6 +220,23 @@ def get_credentials_path() -> Path:
     return get_global_rai_dir() / "credentials.json"
 
 
+def get_session_dir(session_id: str, project_root: Path | None = None) -> Path:
+    """Get the per-session directory for isolated session state.
+
+    Each session instance gets its own directory containing:
+    - state.yaml (session working state)
+    - signals.jsonl (session telemetry)
+
+    Args:
+        session_id: Session identifier (e.g., "SES-177").
+        project_root: Project root path. Defaults to current directory.
+
+    Returns:
+        Path to per-session directory (e.g., .raise/rai/personal/sessions/SES-177/)
+    """
+    return get_personal_dir(project_root) / SESSIONS_DIR / session_id
+
+
 def get_personal_dir(project_root: Path | None = None) -> Path:
     """Get the personal directory for developer-specific project data.
 
