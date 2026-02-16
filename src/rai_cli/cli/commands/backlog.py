@@ -53,9 +53,12 @@ def _init_jira_client() -> tuple[object, str]:
             is_token_expired,
             refresh_access_token,
         )
-    except ImportError as e:
-        console.print(f"[red]Error:[/red] Failed to load provider modules: {e}")
-        raise typer.Exit(code=1) from e
+    except ImportError:
+        console.print(
+            "[red]Error:[/red] rai-pro is required for JIRA integration.\n"
+            "Install with: pip install rai-cli[pro]"
+        )
+        raise typer.Exit(code=1) from None
 
     credentials_path = get_credentials_path()
     token = load_token("jira", credentials_path)
@@ -147,12 +150,12 @@ def auth(
             authenticate,
             get_current_user,
         )
-    except ImportError as e:
+    except ImportError:
         console.print(
-            f"[red]Error:[/red] Failed to load provider modules: {e}",
-            style="red",
+            "[red]Error:[/red] rai-pro is required for JIRA integration.\n"
+            "Install with: pip install rai-cli[pro]"
         )
-        raise typer.Exit(code=1) from e
+        raise typer.Exit(code=1) from None
 
     # Get credentials path
     credentials_path = get_credentials_path()
@@ -244,8 +247,15 @@ def pull(
         console.print(f"[red]Error:[/red] Source '{source}' not supported. Use 'jira'.")
         raise typer.Exit(code=1)
 
-    from rai_pro.providers.jira.sync import pull_epic as _pull_epic
-    from rai_pro.providers.jira.sync_state import SyncState, load_state, save_state
+    try:
+        from rai_pro.providers.jira.sync import pull_epic as _pull_epic
+        from rai_pro.providers.jira.sync_state import SyncState, load_state, save_state
+    except ImportError:
+        console.print(
+            "[red]Error:[/red] rai-pro is required for JIRA integration.\n"
+            "Install with: pip install rai-cli[pro]"
+        )
+        raise typer.Exit(code=1) from None
 
     client, cloud_id = _init_jira_client()
     sync_dir = _get_sync_dir(project)
@@ -273,7 +283,6 @@ def pull(
 
     # Display results
     prefix = "[yellow][DRY RUN][/yellow] " if dry_run else ""
-    action = "Would import" if dry_run else "Imported"
 
     console.print(f"\n{prefix}[bold]Pulling from JIRA...[/bold]\n")
     status_label = "new" if result.epic_imported else "updated"
@@ -335,8 +344,16 @@ def push(
         console.print(f"[red]Error:[/red] Source '{source}' not supported. Use 'jira'.")
         raise typer.Exit(code=1)
 
-    from rai_pro.providers.jira.sync import LocalStory, push_stories as _push_stories
-    from rai_pro.providers.jira.sync_state import load_state, save_state
+    try:
+        from rai_pro.providers.jira.sync import LocalStory  # noqa: I001
+        from rai_pro.providers.jira.sync import push_stories as _push_stories
+        from rai_pro.providers.jira.sync_state import load_state, save_state
+    except ImportError:
+        console.print(
+            "[red]Error:[/red] rai-pro is required for JIRA integration.\n"
+            "Install with: pip install rai-cli[pro]"
+        )
+        raise typer.Exit(code=1) from None
 
     client, _cloud_id = _init_jira_client()
     sync_dir = _get_sync_dir(project)
@@ -428,8 +445,15 @@ def status(
     Examples:
         $ rai backlog status --epic E-DEMO
     """
-    from rai_pro.providers.jira.sync import check_authorization
-    from rai_pro.providers.jira.sync_state import load_state
+    try:
+        from rai_pro.providers.jira.sync import check_authorization
+        from rai_pro.providers.jira.sync_state import load_state
+    except ImportError:
+        console.print(
+            "[red]Error:[/red] rai-pro is required for JIRA integration.\n"
+            "Install with: pip install rai-cli[pro]"
+        )
+        raise typer.Exit(code=1) from None
 
     sync_dir = _get_sync_dir(project)
     state = load_state(sync_dir)
