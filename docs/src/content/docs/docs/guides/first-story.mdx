@@ -22,10 +22,10 @@ Pass the context bundle to your AI assistant.
 
 ## Step 1: Start the Story
 
-Every story begins with `/story-start`. This creates a branch and documents what you're building.
+Every story begins with `/rai-story-start`. This creates a branch and documents what you're building.
 
 ```
-/story-start S1.1 Add user greeting
+/rai-story-start S1.1 Add user greeting
 ```
 
 Your AI will:
@@ -37,10 +37,10 @@ The scope document captures what's **in scope**, what's **out of scope**, and wh
 
 ## Step 2: Design the Specification
 
-Next, `/story-design` creates a lean specification.
+Next, `/rai-story-design` creates a lean specification.
 
 ```
-/story-design S1.1 Add user greeting
+/rai-story-design S1.1 Add user greeting
 ```
 
 Your AI will:
@@ -56,10 +56,10 @@ For simple features, you can skip design and go directly to planning.
 
 ## Step 3: Plan the Implementation
 
-`/story-plan` decomposes the story into atomic tasks.
+`/rai-story-plan` decomposes the story into atomic tasks.
 
 ```
-/story-plan S1.1 Add user greeting
+/rai-story-plan S1.1 Add user greeting
 ```
 
 Your AI will:
@@ -72,10 +72,10 @@ Each task should be individually committable and verifiable. The plan includes a
 
 ## Step 4: Implement
 
-`/story-implement` executes the plan task by task.
+`/rai-story-implement` executes the plan task by task.
 
 ```
-/story-implement S1.1 Add user greeting
+/rai-story-implement S1.1 Add user greeting
 ```
 
 Your AI will:
@@ -91,10 +91,10 @@ The key rhythm here: **implement → verify → commit → pause**. After each t
 
 ## Step 5: Review
 
-After implementation, `/story-review` captures learnings.
+After implementation, `/rai-story-review` captures learnings.
 
 ```
-/story-review S1.1 Add user greeting
+/rai-story-review S1.1 Add user greeting
 ```
 
 Your AI will:
@@ -111,10 +111,10 @@ This is where memory compounds. A pattern learned here shows up in future sessio
 
 ## Step 6: Close
 
-Finally, `/story-close` merges and cleans up.
+Finally, `/rai-story-close` merges and cleans up.
 
 ```
-/story-close S1.1 Add user greeting
+/rai-story-close S1.1 Add user greeting
 ```
 
 Your AI will:
