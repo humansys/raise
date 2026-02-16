@@ -66,6 +66,62 @@ def _migrate_session_state(project_path: Path) -> None:
         logger.info("Migrated session state: %s → %s", old_path, new_path)
 
 
+def migrate_flat_to_session(project_path: Path, session_id: str) -> bool:
+    """One-time migration from flat layout to per-session directory.
+
+    Moves:
+    - personal/session-state.yaml → personal/sessions/{session_id}/state.yaml
+    - personal/telemetry/signals.jsonl → personal/sessions/{session_id}/signals.jsonl
+
+    Args:
+        project_path: Absolute path to the project root.
+        session_id: Session ID for the target per-session directory.
+
+    Returns:
+        True if migration occurred, False if nothing to migrate.
+    """
+    personal_dir = project_path / ".raise" / "rai" / "personal"
+    flat_state = personal_dir / "session-state.yaml"
+    flat_signals = personal_dir / "telemetry" / "signals.jsonl"
+
+    # Nothing to migrate
+    if not flat_state.exists() and not flat_signals.exists():
+        return False
+
+    # Don't migrate if session dir already exists
+    session_dir = get_session_dir(session_id, project_path)
+    if session_dir.exists():
+        return False
+
+    session_dir.mkdir(parents=True, exist_ok=True)
+
+    if flat_state.exists():
+        shutil.move(str(flat_state), str(session_dir / "state.yaml"))
+        logger.info("Migrated state: %s → %s/state.yaml", flat_state, session_dir)
+
+    if flat_signals.exists():
+        shutil.move(str(flat_signals), str(session_dir / "signals.jsonl"))
+        logger.info("Migrated signals: %s → %s/signals.jsonl", flat_signals, session_dir)
+
+    return True
+
+
+def cleanup_session_dir(project_path: Path, session_id: str) -> None:
+    """Remove per-session directory after session close.
+
+    Only removes the specific session directory. Does NOT remove
+    shared files (index.jsonl, memory/).
+
+    Args:
+        project_path: Absolute path to the project root.
+        session_id: Session ID whose directory to remove.
+    """
+    session_dir = get_session_dir(session_id, project_path)
+    if session_dir.exists():
+        shutil.rmtree(session_dir)
+        logger.info("Cleaned up session dir: %s", session_dir)
+
+
 def load_session_state(
     project_path: Path, session_id: str | None = None
 ) -> SessionState | None:

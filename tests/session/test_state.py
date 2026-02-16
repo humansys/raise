@@ -283,6 +283,13 @@ class TestSaveSessionState:
         data = yaml.safe_load(expected.read_text())
         assert data["current_work"]["epic"] == "E15"
 
+    def test_saves_to_per_session_dir_without_flat(self, tmp_path: Path) -> None:
+        """Saves to per-session dir without creating flat file."""
+        state = _make_session_state()
+        save_session_state(tmp_path, state, session_id="SES-200")
+        flat_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
+        assert not flat_path.exists(), "Should not create flat file when session_id provided"
+
     def test_roundtrip(self, tmp_path: Path) -> None:
         """Save then load returns equivalent state."""
         original = _make_session_state()
@@ -303,3 +310,128 @@ class TestSaveSessionState:
         assert loaded.pending.decisions == original.pending.decisions
         assert loaded.pending.next_actions == original.pending.next_actions
         assert loaded.notes == original.notes
+
+
+class TestMigrateFlatToSession:
+    """Tests for migrate_flat_to_session (RAISE-138)."""
+
+    def test_migrates_state_and_signals(self, tmp_path: Path) -> None:
+        """Moves flat state and signals files into per-session directory."""
+        from rai_cli.session.state import migrate_flat_to_session
+
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        # Create flat files
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text("current_work:\n  epic: E15\n")
+        telemetry_dir = personal_dir / "telemetry"
+        telemetry_dir.mkdir()
+        flat_signals = telemetry_dir / "signals.jsonl"
+        flat_signals.write_text('{"signal_type": "test"}\n')
+
+        result = migrate_flat_to_session(tmp_path, "SES-100")
+
+        assert result is True
+        session_dir = personal_dir / "sessions" / "SES-100"
+        assert (session_dir / "state.yaml").exists()
+        assert (session_dir / "state.yaml").read_text() == "current_work:\n  epic: E15\n"
+        assert (session_dir / "signals.jsonl").exists()
+        assert (session_dir / "signals.jsonl").read_text() == '{"signal_type": "test"}\n'
+        # Flat files removed
+        assert not flat_state.exists()
+        assert not flat_signals.exists()
+
+    def test_migrates_state_only(self, tmp_path: Path) -> None:
+        """Migrates state file when no signals file exists."""
+        from rai_cli.session.state import migrate_flat_to_session
+
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text("current_work:\n  epic: E15\n")
+
+        result = migrate_flat_to_session(tmp_path, "SES-100")
+
+        assert result is True
+        session_dir = personal_dir / "sessions" / "SES-100"
+        assert (session_dir / "state.yaml").exists()
+        assert not flat_state.exists()
+
+    def test_no_migration_when_no_flat_files(self, tmp_path: Path) -> None:
+        """Returns False when no flat files exist."""
+        from rai_cli.session.state import migrate_flat_to_session
+
+        result = migrate_flat_to_session(tmp_path, "SES-100")
+        assert result is False
+
+    def test_no_migration_when_session_dir_exists(self, tmp_path: Path) -> None:
+        """Skips migration if per-session dir already exists."""
+        from rai_cli.session.state import migrate_flat_to_session
+
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text("current_work:\n  epic: E15\n")
+        # Session dir already exists
+        session_dir = personal_dir / "sessions" / "SES-100"
+        session_dir.mkdir(parents=True)
+
+        result = migrate_flat_to_session(tmp_path, "SES-100")
+
+        assert result is False
+        assert flat_state.exists(), "Should not touch flat files if session dir exists"
+
+    def test_handles_empty_flat_files_gracefully(self, tmp_path: Path) -> None:
+        """Handles empty flat files without error."""
+        from rai_cli.session.state import migrate_flat_to_session
+
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text("")
+
+        result = migrate_flat_to_session(tmp_path, "SES-100")
+
+        assert result is True
+        session_dir = personal_dir / "sessions" / "SES-100"
+        assert (session_dir / "state.yaml").exists()
+
+
+class TestCleanupSessionDir:
+    """Tests for cleanup_session_dir (RAISE-138)."""
+
+    def test_removes_session_directory(self, tmp_path: Path) -> None:
+        """Removes the per-session directory and all contents."""
+        from rai_cli.session.state import cleanup_session_dir
+
+        session_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-100"
+        session_dir.mkdir(parents=True)
+        (session_dir / "state.yaml").write_text("test")
+        (session_dir / "signals.jsonl").write_text("test")
+
+        cleanup_session_dir(tmp_path, "SES-100")
+
+        assert not session_dir.exists()
+
+    def test_noop_when_dir_missing(self, tmp_path: Path) -> None:
+        """No error when session directory doesn't exist."""
+        from rai_cli.session.state import cleanup_session_dir
+
+        # Should not raise
+        cleanup_session_dir(tmp_path, "SES-NONEXISTENT")
+
+    def test_does_not_remove_sibling_sessions(self, tmp_path: Path) -> None:
+        """Cleanup of one session does not affect other sessions."""
+        from rai_cli.session.state import cleanup_session_dir
+
+        sessions_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
+        (sessions_dir / "SES-100").mkdir(parents=True)
+        (sessions_dir / "SES-100" / "state.yaml").write_text("100")
+        (sessions_dir / "SES-101").mkdir(parents=True)
+        (sessions_dir / "SES-101" / "state.yaml").write_text("101")
+
+        cleanup_session_dir(tmp_path, "SES-100")
+
+        assert not (sessions_dir / "SES-100").exists()
+        assert (sessions_dir / "SES-101").exists()
+        assert (sessions_dir / "SES-101" / "state.yaml").read_text() == "101"
