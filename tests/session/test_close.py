@@ -635,6 +635,100 @@ class TestProcessSessionCloseRelease:
         mp.undo()
 
 
+class TestLoadStateFileNextSessionPrompt:
+    """Tests for load_state_file with next_session_prompt field."""
+
+    def test_loads_state_file_with_next_session_prompt(self, tmp_path: Path) -> None:
+        """State file with next_session_prompt populates CloseInput."""
+        data = {
+            "summary": "prompt session",
+            "next_session_prompt": "Verify encoding fix covers discovery tests. Emilio interested in backlog abstraction.",
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+
+        result = load_state_file(state_file)
+        assert "encoding fix" in result.next_session_prompt
+
+    def test_loads_state_file_without_next_session_prompt_defaults_empty(
+        self, tmp_path: Path,
+    ) -> None:
+        """State file without next_session_prompt defaults to empty string."""
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text("summary: no prompt\n")
+
+        result = load_state_file(state_file)
+        assert result.next_session_prompt == ""
+
+
+class TestProcessSessionCloseNextSessionPrompt:
+    """Tests for process_session_close persisting next_session_prompt."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        """Create a project with memory and personal directories."""
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_close_persists_next_session_prompt_in_session_state(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close persists next_session_prompt in session-state.yaml."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(
+            summary="prompt test",
+            next_session_prompt="Check encoding in discovery tests next session.",
+            current_work={
+                "epic": "RAISE-144",
+                "story": "",
+                "phase": "",
+                "branch": "v2",
+            },
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from rai_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert "encoding" in state.next_session_prompt
+
+        mp.undo()
+
+    def test_close_without_next_session_prompt_defaults_empty(
+        self, tmp_path: Path,
+    ) -> None:
+        """process_session_close without next_session_prompt leaves empty string."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+        close_input = CloseInput(summary="no prompt")
+
+        process_session_close(close_input, profile, project)
+
+        from rai_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        assert state.next_session_prompt == ""
+
+        mp.undo()
+
+
 class TestLoadStateFileProgress:
     """Tests for load_state_file with progress and completed_epics."""
 

@@ -108,5 +108,10 @@ class SessionState(BaseModel):
         description="Structured session context for cross-session continuity. "
         "Contains decisions, research, artifacts, and branch state from the last session.",
     )
+    next_session_prompt: str = Field(
+        default="",
+        description="Forward-looking guidance from Rai to her future self. "
+        "Written during session-close, read at session-start for better continuity.",
+    )
     progress: EpicProgress | None = None
     completed_epics: list[str] = Field(default_factory=list)
