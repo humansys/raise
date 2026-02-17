@@ -10,6 +10,7 @@ import yaml
 from rai_cli.onboarding.detection import ProjectType
 from rai_cli.onboarding.manifest import (
     BranchConfig,
+    IdeManifest,
     ProjectInfo,
     ProjectManifest,
     load_manifest,
@@ -122,6 +123,85 @@ class TestManifestWithBranches:
         assert loaded is not None
         assert loaded.branches.development == "main"
         assert loaded.branches.main == "main"
+
+
+class TestIdeManifest:
+    """Tests for IdeManifest model."""
+
+    def test_defaults_to_claude(self) -> None:
+        """IdeManifest defaults type to claude."""
+        ide = IdeManifest()
+        assert ide.type == "claude"
+
+    def test_accepts_antigravity(self) -> None:
+        """IdeManifest accepts antigravity type."""
+        ide = IdeManifest(type="antigravity")
+        assert ide.type == "antigravity"
+
+    def test_rejects_invalid_type(self) -> None:
+        """IdeManifest rejects invalid IDE type."""
+        import pytest
+
+        with pytest.raises(Exception):
+            IdeManifest(type="invalid")  # type: ignore[arg-type]
+
+
+class TestManifestWithIde:
+    """Tests for ProjectManifest with IDE config."""
+
+    def test_manifest_has_default_ide(self) -> None:
+        """Manifest defaults to claude IDE when not specified."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        manifest = ProjectManifest(project=project)
+        assert manifest.ide.type == "claude"
+
+    def test_manifest_with_antigravity_ide(self) -> None:
+        """Manifest accepts antigravity IDE config."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        ide = IdeManifest(type="antigravity")
+        manifest = ProjectManifest(project=project, ide=ide)
+        assert manifest.ide.type == "antigravity"
+
+    def test_roundtrip_with_ide(self, tmp_path: Path) -> None:
+        """Save and load preserves IDE config."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        ide = IdeManifest(type="antigravity")
+        original = ProjectManifest(project=project, ide=ide)
+
+        save_manifest(original, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.ide.type == "antigravity"
+
+    def test_loads_manifest_without_ide_field(self, tmp_path: Path) -> None:
+        """Loads legacy manifest without ide field (backward compat)."""
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 10\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.ide.type == "claude"
+
+    def test_saved_yaml_contains_ide_section(self, tmp_path: Path) -> None:
+        """Saved YAML includes ide section."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        ide = IdeManifest(type="antigravity")
+        manifest = ProjectManifest(project=project, ide=ide)
+
+        save_manifest(manifest, tmp_path)
+
+        content = (tmp_path / ".raise" / "manifest.yaml").read_text()
+        data = yaml.safe_load(content)
+        assert data["ide"]["type"] == "antigravity"
 
 
 class TestSaveManifest:
