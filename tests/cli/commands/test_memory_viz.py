@@ -78,7 +78,7 @@ class TestMemoryVizCommand:
 
             default_output = graph_project / ".raise" / "rai" / "memory" / "graph.html"
             assert default_output.exists()
-            content = default_output.read_text()
+            content = default_output.read_text(encoding="utf-8")
             assert "<!DOCTYPE html>" in content
             assert "PAT-001" in content
         finally:

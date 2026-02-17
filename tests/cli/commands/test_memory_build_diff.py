@@ -78,7 +78,7 @@ class TestBuildWithDiff:
         diff_path = personal_dir / "last-diff.json"
         assert diff_path.exists()
 
-        diff_data = json.loads(diff_path.read_text())
+        diff_data = json.loads(diff_path.read_text(encoding="utf-8"))
         diff = GraphDiff.model_validate(diff_data)
         assert len(diff.node_changes) == 2  # 1 modified + 1 added
         assert diff.impact == "module"

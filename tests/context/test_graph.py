@@ -201,7 +201,7 @@ class TestUnifiedGraphPersistence:
         assert save_path.exists()
 
         # Verify JSON structure
-        data = json.loads(save_path.read_text())
+        data = json.loads(save_path.read_text(encoding="utf-8"))
         assert "nodes" in data
         assert "edges" in data or "links" in data  # NetworkX 3.x uses "edges"
 

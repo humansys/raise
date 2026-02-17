@@ -28,7 +28,7 @@ class TestMethodologyPackage:
         """methodology.yaml file exists and is readable."""
         base = files("rai_cli.rai_base")
         methodology_file = base / "framework" / "methodology.yaml"
-        content = methodology_file.read_text()
+        content = methodology_file.read_text(encoding="utf-8")
         assert len(content) > 0
 
 
@@ -39,7 +39,7 @@ class TestMethodologyValidity:
     def methodology(self) -> dict:
         """Load and parse methodology.yaml."""
         base = files("rai_cli.rai_base")
-        content = (base / "framework" / "methodology.yaml").read_text()
+        content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         return yaml.safe_load(content)
 
     def test_valid_yaml(self, methodology: dict) -> None:
@@ -65,7 +65,7 @@ class TestMethodologySkills:
     def skills(self) -> dict:
         """Load skills section."""
         base = files("rai_cli.rai_base")
-        content = (base / "framework" / "methodology.yaml").read_text()
+        content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["skills"]
 
@@ -121,7 +121,7 @@ class TestMethodologyGates:
     def gates(self) -> dict:
         """Load gates section."""
         base = files("rai_cli.rai_base")
-        content = (base / "framework" / "methodology.yaml").read_text()
+        content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["gates"]
 
@@ -160,7 +160,7 @@ class TestMethodologyPrinciples:
     def principles(self) -> dict:
         """Load principles section."""
         base = files("rai_cli.rai_base")
-        content = (base / "framework" / "methodology.yaml").read_text()
+        content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["principles"]
 
@@ -194,7 +194,7 @@ class TestMethodologyLifecycle:
     def lifecycle(self) -> dict:
         """Load lifecycle section."""
         base = files("rai_cli.rai_base")
-        content = (base / "framework" / "methodology.yaml").read_text()
+        content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["lifecycle"]
 

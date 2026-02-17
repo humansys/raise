@@ -27,7 +27,7 @@ class TestBootstrapRaiBase:
         assert patterns_file.exists()
         assert result.patterns_copied
         # Should contain actual patterns (not empty)
-        content = patterns_file.read_text()
+        content = patterns_file.read_text(encoding="utf-8")
         assert "BASE-001" in content
 
     def test_copies_methodology_file(self, tmp_path: Path) -> None:
@@ -40,7 +40,7 @@ class TestBootstrapRaiBase:
         assert methodology_file.exists()
         assert result.methodology_copied
         # Should contain actual methodology content
-        content = methodology_file.read_text()
+        content = methodology_file.read_text(encoding="utf-8")
         assert "version:" in content
 
     def test_returns_base_version(self, tmp_path: Path) -> None:
@@ -66,8 +66,8 @@ class TestBootstrapRaiBase:
         bootstrap_rai_base(tmp_path)
 
         base = files("rai_cli.rai_base")
-        original = (base / "identity" / "core.md").read_text()
-        copied = (tmp_path / ".raise" / "rai" / "identity" / "core.md").read_text()
+        original = (base / "identity" / "core.md").read_text(encoding="utf-8")
+        copied = (tmp_path / ".raise" / "rai" / "identity" / "core.md").read_text(encoding="utf-8")
         assert copied == original
 
 
@@ -86,7 +86,7 @@ class TestBootstrapIdempotency:
         # Second bootstrap
         result = bootstrap_rai_base(tmp_path)
 
-        assert core_path.read_text() == "# Custom identity"
+        assert core_path.read_text(encoding="utf-8") == "# Custom identity"
         assert not result.identity_copied
 
     def test_does_not_overwrite_patterns(self, tmp_path: Path) -> None:
@@ -101,7 +101,7 @@ class TestBootstrapIdempotency:
         # Second bootstrap
         result = bootstrap_rai_base(tmp_path)
 
-        assert '{"id": "PAT-001", "custom": true}' in patterns_path.read_text()
+        assert '{"id": "PAT-001", "custom": true}' in patterns_path.read_text(encoding="utf-8")
         assert not result.patterns_copied
 
     def test_does_not_overwrite_methodology(self, tmp_path: Path) -> None:
@@ -116,7 +116,7 @@ class TestBootstrapIdempotency:
         # Second bootstrap
         result = bootstrap_rai_base(tmp_path)
 
-        assert meth_path.read_text() == "version: 99\n"
+        assert meth_path.read_text(encoding="utf-8") == "version: 99\n"
         assert not result.methodology_copied
 
     def test_second_run_reports_already_existed(self, tmp_path: Path) -> None:

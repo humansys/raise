@@ -85,7 +85,7 @@ class TestEmit:
         assert result.error is None
 
         # Verify file contents
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["type"] == "skill_event"
         assert data["skill"] == "rai-story-design"
@@ -105,7 +105,7 @@ class TestEmit:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["type"] == "session_event"
         assert data["outcome"] == "success"
@@ -127,7 +127,7 @@ class TestEmit:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["type"] == "calibration"
         assert data["velocity"] == 1.4
@@ -146,7 +146,7 @@ class TestEmit:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["type"] == "error_event"
         assert data["recoverable"] is True
@@ -161,7 +161,7 @@ class TestEmit:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["type"] == "command_usage"
         assert data["command"] == "memory"
@@ -196,7 +196,7 @@ class TestEmit:
         result = emit(event3, base_path=temp_telemetry_dir)
 
         # Read all lines
-        lines = result.path.read_text().strip().split("\n")
+        lines = result.path.read_text(encoding="utf-8").strip().split("\n")
         assert len(lines) == 3
 
         # Verify each line is valid JSON
@@ -226,7 +226,7 @@ class TestEmitPerSession:
         assert result.path == expected_path
         assert expected_path.exists()
 
-        data = json.loads(expected_path.read_text().strip())
+        data = json.loads(expected_path.read_text(encoding="utf-8").strip())
         assert data["skill"] == "test"
 
     def test_per_session_does_not_write_to_shared(
@@ -262,8 +262,8 @@ class TestEmitPerSession:
             / "sessions" / "SES-178" / "signals.jsonl"
         )
 
-        data1 = json.loads(path1.read_text().strip())
-        data2 = json.loads(path2.read_text().strip())
+        data1 = json.loads(path1.read_text(encoding="utf-8").strip())
+        data2 = json.loads(path2.read_text(encoding="utf-8").strip())
 
         assert data1["skill"] == "session1"
         assert data2["skill"] == "session2"
@@ -305,7 +305,7 @@ class TestEmitSkillEvent:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["type"] == "skill_event"
         assert data["skill"] == "rai-story-design"
@@ -323,7 +323,7 @@ class TestEmitSkillEvent:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["event"] == "complete"
         assert data["duration_sec"] == 1800
@@ -342,7 +342,7 @@ class TestEmitCommandUsage:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["command"] == "memory"
         assert data["subcommand"] == "query"
@@ -356,7 +356,7 @@ class TestEmitCommandUsage:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["command"] == "version"
         assert data["subcommand"] is None
@@ -377,7 +377,7 @@ class TestEmitErrorEvent:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["tool"] == "Bash"
         assert data["error_type"] == "command_not_found"
@@ -396,6 +396,6 @@ class TestEmitErrorEvent:
 
         assert result.success is True
 
-        content = result.path.read_text()
+        content = result.path.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["recoverable"] is False

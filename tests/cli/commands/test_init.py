@@ -331,7 +331,7 @@ class Handler{i}:
 
         assert result.exit_code == 0
         guardrails_path = python_project / "governance" / "guardrails.md"
-        content = guardrails_path.read_text()
+        content = guardrails_path.read_text(encoding="utf-8")
 
         # Should contain style guardrails
         assert "Code Style" in content
@@ -396,7 +396,7 @@ class Handler{i}:
 
         assert result.exit_code == 0
         guardrails_path = python_project / "governance" / "guardrails.md"
-        content = guardrails_path.read_text()
+        content = guardrails_path.read_text(encoding="utf-8")
         assert "my-api" in content
 
     def test_detect_generates_claude_md(
@@ -431,7 +431,7 @@ class Handler{i}:
 
         assert result.exit_code == 0
         claude_md_path = python_project / "CLAUDE.md"
-        content = claude_md_path.read_text()
+        content = claude_md_path.read_text(encoding="utf-8")
 
         # Should contain project name
         assert "my-api" in content
@@ -456,7 +456,7 @@ class Handler{i}:
         assert result.exit_code == 0
         claude_md_path = greenfield_project / "CLAUDE.md"
         assert claude_md_path.exists()
-        content = claude_md_path.read_text()
+        content = claude_md_path.read_text(encoding="utf-8")
         assert "greenfield" in content.lower()
 
 
@@ -493,7 +493,7 @@ class TestInitBootstrap:
         assert result.exit_code == 0
         patterns = greenfield_project / ".raise" / "rai" / "memory" / "patterns.jsonl"
         assert patterns.exists()
-        assert "BASE-001" in patterns.read_text()
+        assert "BASE-001" in patterns.read_text(encoding="utf-8")
 
     def test_init_creates_methodology_file(
         self, greenfield_project: Path, mock_home: Path
@@ -511,7 +511,7 @@ class TestInitBootstrap:
             greenfield_project / ".raise" / "rai" / "framework" / "methodology.yaml"
         )
         assert methodology.exists()
-        assert "version:" in methodology.read_text()
+        assert "version:" in methodology.read_text(encoding="utf-8")
 
     def test_init_does_not_overwrite_existing_identity(
         self, greenfield_project: Path, mock_home: Path
@@ -536,7 +536,7 @@ class TestInitBootstrap:
             )
 
         assert result.exit_code == 0
-        assert core_path.read_text() == "# Custom identity"
+        assert core_path.read_text(encoding="utf-8") == "# Custom identity"
 
     def test_shu_output_includes_bootstrap_info(
         self, greenfield_project: Path, mock_home: Path
@@ -567,7 +567,7 @@ class TestInitBootstrap:
         assert result.exit_code == 0
         canonical = greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
         assert canonical.exists()
-        content = canonical.read_text()
+        content = canonical.read_text(encoding="utf-8")
         assert "# Rai Memory" in content
         assert "RaiSE Framework Process" in content
 
@@ -619,7 +619,7 @@ class TestInitSkillScaffolding:
             )
 
         assert result.exit_code == 0
-        assert skill_path.read_text() == "# Custom skill"
+        assert skill_path.read_text(encoding="utf-8") == "# Custom skill"
 
     def test_shu_output_includes_skills_info(
         self, greenfield_project: Path, mock_home: Path
@@ -674,7 +674,7 @@ class TestInitGovernanceScaffolding:
             )
 
         assert result.exit_code == 0
-        prd = (greenfield_project / "governance" / "prd.md").read_text()
+        prd = (greenfield_project / "governance" / "prd.md").read_text(encoding="utf-8")
         assert "# PRD: my-api" in prd
         assert "{project_name}" not in prd
 
@@ -701,7 +701,7 @@ class TestInitGovernanceScaffolding:
             )
 
         assert result.exit_code == 0
-        assert prd_path.read_text() == "# My Custom PRD\n"
+        assert prd_path.read_text(encoding="utf-8") == "# My Custom PRD\n"
 
     def test_shu_output_includes_governance_info(
         self, greenfield_project: Path, mock_home: Path

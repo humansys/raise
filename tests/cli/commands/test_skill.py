@@ -405,7 +405,7 @@ class TestSkillScaffold:
             app, ["skill", "scaffold", "my-test", "--lifecycle", "epic"]
         )
         assert result.exit_code == 0
-        content = (skills / "my-test" / "SKILL.md").read_text()
+        content = (skills / "my-test" / "SKILL.md").read_text(encoding="utf-8")
         assert "raise.work_cycle: epic" in content
 
     def test_scaffold_with_after(
@@ -420,7 +420,7 @@ class TestSkillScaffold:
             app, ["skill", "scaffold", "test-action", "--after", "rai-story-start"]
         )
         assert result.exit_code == 0
-        content = (skills / "test-action" / "SKILL.md").read_text()
+        content = (skills / "test-action" / "SKILL.md").read_text(encoding="utf-8")
         assert "rai-story-start" in content
 
     def test_scaffold_with_before(
@@ -435,7 +435,7 @@ class TestSkillScaffold:
             app, ["skill", "scaffold", "test-action", "--before", "rai-story-close"]
         )
         assert result.exit_code == 0
-        content = (skills / "test-action" / "SKILL.md").read_text()
+        content = (skills / "test-action" / "SKILL.md").read_text(encoding="utf-8")
         assert "rai-story-close" in content
 
     def test_scaffold_json_output(

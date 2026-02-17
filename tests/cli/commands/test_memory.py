@@ -129,7 +129,7 @@ class TestMemoryQueryCommand:
 
             assert result.exit_code == 0
             assert output_file.exists()
-            content = output_file.read_text()
+            content = output_file.read_text(encoding="utf-8")
             assert "Memory Query Results" in content or "Concepts" in content
         finally:
             os.chdir(original_cwd)
@@ -244,7 +244,7 @@ class TestMemoryListCommand:
 
             assert result.exit_code == 0
             assert output_file.exists()
-            content = output_file.read_text()
+            content = output_file.read_text(encoding="utf-8")
             assert "PAT-001" in content
         finally:
             os.chdir(original_cwd)
@@ -564,7 +564,7 @@ class TestMemoryAddPatternCommand:
             # Verify written to global
             patterns_file = global_rai / "patterns.jsonl"
             assert patterns_file.exists()
-            content = patterns_file.read_text()
+            content = patterns_file.read_text(encoding="utf-8")
             assert "Global pattern" in content
         finally:
             os.chdir(original_cwd)
@@ -588,7 +588,7 @@ class TestMemoryAddPatternCommand:
             assert "PAT-" in result.stdout
             # Verify written to personal
             patterns_file = personal_dir / "patterns.jsonl"
-            content = patterns_file.read_text()
+            content = patterns_file.read_text(encoding="utf-8")
             assert "Personal pattern" in content
         finally:
             os.chdir(original_cwd)
@@ -931,7 +931,7 @@ class TestEmitSessionRouting:
                 / "signals.jsonl"
             )
             assert session_signals.exists()
-            content = session_signals.read_text()
+            content = session_signals.read_text(encoding="utf-8")
             assert "F1.1" in content
         finally:
             os.chdir(original_cwd)

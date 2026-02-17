@@ -92,7 +92,7 @@ class TestAppendPattern:
         # Verify file content
         patterns_file = memory_dir / "patterns.jsonl"
         assert patterns_file.exists()
-        content = patterns_file.read_text()
+        content = patterns_file.read_text(encoding="utf-8")
         data = json.loads(content.strip())
         assert data["id"] == "PAT-001"
         assert data["content"] == "Test pattern content"
@@ -122,7 +122,7 @@ class TestAppendPattern:
         append_pattern(memory_dir, input_data, created=custom_date)
 
         patterns_file = memory_dir / "patterns.jsonl"
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert data["created"] == "2026-01-15"
 
 
@@ -151,7 +151,7 @@ class TestAppendCalibration:
         assert result.id == "CAL-001"
 
         cal_file = memory_dir / "calibration.jsonl"
-        data = json.loads(cal_file.read_text().strip())
+        data = json.loads(cal_file.read_text(encoding="utf-8").strip())
         assert data["story"] == "F3.5"
         assert data["ratio"] == 3.0  # 60 / 20
 
@@ -170,7 +170,7 @@ class TestAppendCalibration:
         append_calibration(memory_dir, input_data)
 
         cal_file = memory_dir / "calibration.jsonl"
-        data = json.loads(cal_file.read_text().strip())
+        data = json.loads(cal_file.read_text(encoding="utf-8").strip())
         assert data["ratio"] is None
 
 
@@ -197,7 +197,7 @@ class TestAppendSession:
         # Verify creates sessions directory
         sessions_file = memory_dir / "sessions" / "index.jsonl"
         assert sessions_file.exists()
-        data = json.loads(sessions_file.read_text().strip())
+        data = json.loads(sessions_file.read_text(encoding="utf-8").strip())
         assert data["topic"] == "F3.5 Skills Integration"
         assert data["outcomes"] == ["Writer API", "Hooks setup", "CLI commands"]
 
@@ -481,7 +481,7 @@ class TestAppendPatternWithPrefix:
         assert result.id == "PAT-E-001"
 
         patterns_file = memory_dir / "patterns.jsonl"
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert data["id"] == "PAT-E-001"
 
     def test_appends_without_prefix_backward_compat(self, tmp_path: Path) -> None:
@@ -516,7 +516,7 @@ class TestAppendPatternBaseVersion:
 
         assert result.success is True
         patterns_file = memory_dir / "patterns.jsonl"
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert data["base"] is True
         assert data["version"] == 1
 
@@ -534,7 +534,7 @@ class TestAppendPatternBaseVersion:
         append_pattern(memory_dir, input_data)
 
         patterns_file = memory_dir / "patterns.jsonl"
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert "base" not in data
         assert "version" not in data
 
@@ -548,7 +548,7 @@ class TestAppendPatternBaseVersion:
         append_pattern(memory_dir, input_data)
 
         patterns_file = memory_dir / "patterns.jsonl"
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert "base" not in data
         assert "version" not in data
 
@@ -587,7 +587,7 @@ class TestAppendPatternWithScope:
         assert result.success is True
         patterns_file = global_rai / "patterns.jsonl"
         assert patterns_file.exists()
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert data["content"] == "Global pattern"
 
     def test_writes_to_personal_with_scope(self, tmp_path: Path) -> None:

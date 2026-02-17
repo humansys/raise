@@ -37,7 +37,7 @@ class TestCredentialsStorage:
 
         assert credentials_path.exists()
         # File should contain encrypted data, not plaintext token
-        raw_content = credentials_path.read_text()
+        raw_content = credentials_path.read_text(encoding="utf-8")
         assert "ya29.a0AfH6SMBx" not in raw_content  # Access token not in plaintext
         assert "1//0gHZ9K" not in raw_content  # Refresh token not in plaintext
 

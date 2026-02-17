@@ -47,7 +47,7 @@ class TestScaffoldSkills:
         scaffold_skills(tmp_path)
 
         skill_path = tmp_path / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
-        content = skill_path.read_text()
+        content = skill_path.read_text(encoding="utf-8")
         assert content.startswith("---\n") or content.startswith("#")
 
     def test_skill_content_matches_bundled(self, tmp_path: Path) -> None:
@@ -57,10 +57,10 @@ class TestScaffoldSkills:
         scaffold_skills(tmp_path)
 
         base = files("rai_cli.skills_base")
-        original = (base / "rai-session-start" / "SKILL.md").read_text()
+        original = (base / "rai-session-start" / "SKILL.md").read_text(encoding="utf-8")
         copied = (
             tmp_path / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
-        ).read_text()
+        ).read_text(encoding="utf-8")
         assert copied == original
 
     def test_returns_skill_names(self, tmp_path: Path) -> None:
@@ -100,7 +100,7 @@ class TestScaffoldSkillsIdempotency:
         # Second scaffold
         result = scaffold_skills(tmp_path)
 
-        assert skill_path.read_text() == "# Custom skill"
+        assert skill_path.read_text(encoding="utf-8") == "# Custom skill"
         assert "rai-session-start" in result.skills_skipped_names
 
     def test_second_run_reports_already_existed(self, tmp_path: Path) -> None:

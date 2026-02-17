@@ -2628,7 +2628,7 @@ class TestRaiBaseTemplateContract:
     ) -> None:
         """system-context.md template must parse into arch-context node."""
         src = self._get_rai_base_arch_dir() / "system-context.md"
-        content = src.read_text().replace("{project_name}", "test-project")
+        content = src.read_text(encoding="utf-8").replace("{project_name}", "test-project")
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
@@ -2645,7 +2645,7 @@ class TestRaiBaseTemplateContract:
     def test_system_design_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
         """system-design.md template must parse into arch-design node."""
         src = self._get_rai_base_arch_dir() / "system-design.md"
-        content = src.read_text().replace("{project_name}", "test-project")
+        content = src.read_text(encoding="utf-8").replace("{project_name}", "test-project")
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
@@ -2662,7 +2662,7 @@ class TestRaiBaseTemplateContract:
     def test_domain_model_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
         """domain-model.md template must parse into arch-domain-model node."""
         src = self._get_rai_base_arch_dir() / "domain-model.md"
-        content = src.read_text().replace("{project_name}", "test-project")
+        content = src.read_text(encoding="utf-8").replace("{project_name}", "test-project")
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
@@ -2688,7 +2688,7 @@ class TestRaiBaseTemplateContract:
         )
 
         for md_file in md_files:
-            content = md_file.read_text()
+            content = md_file.read_text(encoding="utf-8")
             assert content.startswith("---"), (
                 f"{md_file.name} must start with YAML frontmatter delimiter '---'"
             )
