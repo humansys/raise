@@ -11,12 +11,12 @@ Note: Telemetry is personal data (F14.15) and should not be committed.
 
 from __future__ import annotations
 
-import fcntl
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
+from rai_cli.compat import file_lock, file_unlock
 from rai_cli.config.paths import SIGNALS_FILE, TELEMETRY_SUBDIR, get_personal_dir, get_session_dir
 
 if TYPE_CHECKING:
@@ -103,13 +103,11 @@ def emit(
 
         # Append with file locking for thread safety
         with open(path, "a", encoding="utf-8") as f:
-            # Acquire exclusive lock (blocking)
-            fcntl.flock(f.fileno(), fcntl.LOCK_EX)
+            file_lock(f)
             try:
                 f.write(json_line)
             finally:
-                # Release lock
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+                file_unlock(f)
 
         return EmitResult(success=True, path=path)
 
