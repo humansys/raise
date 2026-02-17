@@ -1,4 +1,4 @@
-"""Tests for code scanner (Python, TypeScript, JavaScript)."""
+"""Tests for code scanner (Python, TypeScript, JavaScript, PHP, Svelte, C#)."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from rai_cli.discovery.scanner import (
     ScanResult,
     Symbol,
     detect_language,
+    extract_csharp_symbols,
     extract_javascript_symbols,
     extract_php_symbols,
     extract_python_symbols,
@@ -659,6 +660,10 @@ class TestDetectLanguage:
         """Test Svelte file extensions."""
         assert detect_language("foo.svelte") == "svelte"
 
+    def test_csharp_extensions(self) -> None:
+        """Test C# file extensions."""
+        assert detect_language("foo.cs") == "csharp"
+
     def test_unsupported_extension(self) -> None:
         """Test unsupported file extensions return None."""
         assert detect_language("foo.rs") is None
@@ -688,6 +693,13 @@ class TestExtractSymbols:
         """Test extracting PHP via unified function."""
         source = "<?php\nclass Foo {}"
         symbols = extract_symbols(source, "test.php", "php")
+        assert symbols[0].name == "Foo"
+        assert symbols[0].kind == "class"
+
+    def test_extract_csharp(self) -> None:
+        """Test extracting C# via unified function."""
+        source = "class Foo {}"
+        symbols = extract_symbols(source, "test.cs", "csharp")
         assert symbols[0].name == "Foo"
         assert symbols[0].kind == "class"
 
@@ -1104,3 +1116,240 @@ class TestExtractSvelteSymbols:
         assert components[0].name == "Counter"
         assert len(functions) == 1
         assert functions[0].name == "increment"
+
+
+class TestExtractCsharpSymbols:
+    """Tests for extract_csharp_symbols function."""
+
+    def test_extract_class(self) -> None:
+        """Test extracting a C# class."""
+        source = dedent("""\
+            public class UserService {
+                public void Process() { }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "UserService.cs")
+        classes = [s for s in symbols if s.kind == "class"]
+        methods = [s for s in symbols if s.kind == "method"]
+        assert len(classes) == 1
+        assert classes[0].name == "UserService"
+        assert classes[0].signature == "class UserService"
+        assert len(methods) == 1
+        assert methods[0].name == "Process"
+        assert methods[0].parent == "UserService"
+
+    def test_extract_class_with_inheritance(self) -> None:
+        """Test extracting a class with base class and interfaces."""
+        source = dedent("""\
+            public class UserService : BaseService, IUserService {
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "UserService.cs")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "class"
+        assert "UserService" in symbols[0].signature
+        assert ": BaseService, IUserService" in symbols[0].signature
+
+    def test_extract_interface(self) -> None:
+        """Test extracting a C# interface."""
+        source = dedent("""\
+            public interface IUserService {
+                Task<User> GetUserAsync(int id);
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "IUserService.cs")
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        methods = [s for s in symbols if s.kind == "method"]
+        assert len(ifaces) == 1
+        assert ifaces[0].name == "IUserService"
+        assert ifaces[0].signature == "interface IUserService"
+        assert len(methods) == 1
+        assert methods[0].name == "GetUserAsync"
+        assert methods[0].parent == "IUserService"
+
+    def test_extract_struct(self) -> None:
+        """Test extracting a C# struct (maps to class kind)."""
+        source = dedent("""\
+            public struct Point {
+                public int X { get; set; }
+                public int Y { get; set; }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "Point.cs")
+        structs = [s for s in symbols if s.kind == "class"]
+        props = [s for s in symbols if s.kind == "method"]
+        assert len(structs) == 1
+        assert structs[0].name == "Point"
+        assert "struct Point" in structs[0].signature
+        assert len(props) == 2
+
+    def test_extract_record(self) -> None:
+        """Test extracting a C# record (maps to class kind)."""
+        source = "public record UserDto(string Name, string Email);\n"
+        symbols = extract_csharp_symbols(source, "UserDto.cs")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "class"
+        assert symbols[0].name == "UserDto"
+        assert "record UserDto" in symbols[0].signature
+
+    def test_extract_enum(self) -> None:
+        """Test extracting a C# enum."""
+        source = dedent("""\
+            public enum UserRole {
+                Admin,
+                User,
+                Guest
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "UserRole.cs")
+        assert len(symbols) == 1
+        assert symbols[0].kind == "enum"
+        assert symbols[0].name == "UserRole"
+        assert "enum UserRole" in symbols[0].signature
+
+    def test_extract_property(self) -> None:
+        """Test extracting properties (maps to method kind)."""
+        source = dedent("""\
+            public class Config {
+                public string ConnectionString { get; set; }
+                private int MaxRetries { get; }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "Config.cs")
+        props = [s for s in symbols if s.kind == "method" and s.parent == "Config"]
+        assert len(props) == 2
+        assert props[0].name == "ConnectionString"
+        assert props[1].name == "MaxRetries"
+
+    def test_extract_with_namespace(self) -> None:
+        """Test that namespace qualifies symbol names."""
+        source = dedent("""\
+            namespace MyApp.Services
+            {
+                public class UserService {
+                    public void Process() { }
+                }
+
+                public interface IService { }
+
+                public enum Priority {
+                    Low,
+                    High
+                }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "UserService.cs")
+        classes = [s for s in symbols if s.kind == "class"]
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        enums = [s for s in symbols if s.kind == "enum"]
+        methods = [s for s in symbols if s.kind == "method"]
+        assert classes[0].name == "MyApp.Services.UserService"
+        assert ifaces[0].name == "MyApp.Services.IService"
+        assert enums[0].name == "MyApp.Services.Priority"
+        assert methods[0].name == "Process"
+        assert methods[0].parent == "MyApp.Services.UserService"
+
+    def test_method_visibility_in_signature(self) -> None:
+        """Test that method signature includes visibility modifiers."""
+        source = dedent("""\
+            public class Foo {
+                public void Bar() { }
+                private int Baz() { return 0; }
+                protected static void Qux() { }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "Foo.cs")
+        methods = [s for s in symbols if s.kind == "method"]
+        assert len(methods) == 3
+        sigs = {m.name: m.signature for m in methods}
+        assert "public" in sigs["Bar"]
+        assert "private" in sigs["Baz"]
+        assert "protected" in sigs["Qux"]
+        assert "static" in sigs["Qux"]
+
+    def test_complex_csharp_file(self) -> None:
+        """Test extracting from a file with multiple construct types."""
+        source = dedent("""\
+            namespace MyApp.Services
+            {
+                public interface IUserService {
+                    Task<User> GetUserAsync(int id);
+                }
+
+                public class UserService : IUserService {
+                    public string ConnectionString { get; set; }
+
+                    public async Task<User> GetUserAsync(int id) {
+                        return null;
+                    }
+
+                    private void ValidateId(int id) { }
+                }
+
+                public enum UserRole {
+                    Admin,
+                    User,
+                    Guest
+                }
+
+                public record UserDto(string Name, string Email);
+
+                public struct Point {
+                    public int X { get; set; }
+                    public int Y { get; set; }
+                }
+            }
+        """)
+        symbols = extract_csharp_symbols(source, "Service.cs")
+        ifaces = [s for s in symbols if s.kind == "interface"]
+        classes = [s for s in symbols if s.kind == "class"]
+        enums = [s for s in symbols if s.kind == "enum"]
+        methods = [s for s in symbols if s.kind == "method"]
+
+        assert len(ifaces) == 1
+        assert ifaces[0].name == "MyApp.Services.IUserService"
+        # UserService + UserDto (record) + Point (struct)
+        assert len(classes) == 3
+        assert len(enums) == 1
+        assert enums[0].name == "MyApp.Services.UserRole"
+        # IUserService.GetUserAsync + UserService.(ConnectionString, GetUserAsync, ValidateId) + Point.(X, Y)
+        assert len(methods) == 6
+
+    def test_empty_csharp_file(self) -> None:
+        """Test that an empty C# file doesn't crash."""
+        source = "using System;\n"
+        symbols = extract_csharp_symbols(source, "empty.cs")
+        assert symbols == []
+
+    def test_designer_cs_excluded_from_scan(self, tmp_path: Path) -> None:
+        """Test that .Designer.cs files are excluded from C# scan."""
+        cs_file = tmp_path / "Form1.cs"
+        cs_file.write_text("public class Form1 {}\n")
+
+        designer_file = tmp_path / "Form1.Designer.cs"
+        designer_file.write_text("public partial class Form1 { private void InitializeComponent() {} }\n")
+
+        result = scan_directory(tmp_path, language="csharp")
+        names = [s.name for s in result.symbols]
+        assert "Form1" in names
+        assert result.files_scanned == 1
+        assert len(result.errors) == 0
+
+    def test_scan_directory_csharp(self, tmp_path: Path) -> None:
+        """Test scan_directory finds and parses .cs files."""
+        cs_file = tmp_path / "UserService.cs"
+        cs_file.write_text(dedent("""\
+            namespace MyApp {
+                public class UserService {
+                    public void Process() { }
+                }
+            }
+        """))
+
+        other_file = tmp_path / "main.py"
+        other_file.write_text("class Main: pass\n")
+
+        result = scan_directory(tmp_path, language="csharp")
+        assert result.files_scanned == 1
+        assert any(s.name == "MyApp.UserService" for s in result.symbols)
+        assert not any(s.name == "Main" for s in result.symbols)
