@@ -3,7 +3,7 @@
 This module provides commands to scan codebases, extract structural
 information, and integrate discovered components into the unified context graph.
 
-Supports Python, TypeScript, and JavaScript.
+Supports Python, TypeScript, JavaScript, PHP, Svelte, and C#.
 
 Example:
     $ raise discover scan src/
@@ -55,7 +55,7 @@ def scan_command(
         typer.Option(
             "--language",
             "-l",
-            help="Language to scan: python, typescript, javascript, php, svelte (auto-detect if not set)",
+            help="Language to scan: python, typescript, javascript, php, svelte, csharp (auto-detect if not set)",
         ),
     ] = None,
     output: Annotated[
@@ -86,7 +86,7 @@ def scan_command(
     """Scan a directory and extract code symbols.
 
     Extracts classes, functions, methods, interfaces, and module docstrings
-    from source files. Supports Python, TypeScript, and JavaScript.
+    from source files. Supports Python, TypeScript, JavaScript, PHP, Svelte, and C#.
 
     Output can be human-readable table, JSON, or summary statistics.
 
@@ -106,10 +106,10 @@ def scan_command(
     # Validate language if provided
     lang: Language | None = None
     if language:
-        if language not in ("python", "typescript", "javascript", "php", "svelte"):
+        if language not in ("python", "typescript", "javascript", "php", "svelte", "csharp"):
             cli_error(
                 f"Unsupported language: {language}",
-                hint="Supported: python, typescript, javascript, php, svelte",
+                hint="Supported: python, typescript, javascript, php, svelte, csharp",
                 exit_code=7,
             )
         lang = language  # type: ignore[assignment]
