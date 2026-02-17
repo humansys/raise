@@ -326,6 +326,24 @@ def _format_narrative(state: SessionState | None) -> str:
     return f"# Session Narrative\n{state.narrative}"
 
 
+def _format_next_session_prompt(state: SessionState | None) -> str:
+    """Format next session prompt for cross-session continuity.
+
+    This is forward-looking guidance from Rai to her future self,
+    written during session-close and presented at session-start.
+
+    Args:
+        state: Session state (may be None).
+
+    Returns:
+        Formatted prompt section, or empty string if no prompt.
+    """
+    if state is None or not state.next_session_prompt:
+        return ""
+
+    return f"# Next Session Prompt\n{state.next_session_prompt}"
+
+
 def _format_primes(patterns: list[ConceptNode]) -> str:
     """Format foundational patterns as behavioral primes."""
     if not patterns:
@@ -451,6 +469,11 @@ def assemble_context_bundle(
     narrative = _format_narrative(state)
     if narrative:
         sections.append(narrative)
+
+    # Next session prompt (forward-looking guidance from Rai to future self)
+    next_prompt = _format_next_session_prompt(state)
+    if next_prompt:
+        sections.append(next_prompt)
 
     # Deadlines
     deadlines = _format_deadlines(profile)
