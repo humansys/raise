@@ -1466,7 +1466,7 @@ def scan_directory(
                 if file_path.is_relative_to(root)
                 else file_path
             )
-            rel_str = str(rel_path)
+            rel_str = rel_path.as_posix()
 
             file_language = language or detect_language(file_path)
             if file_language is None:

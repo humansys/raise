@@ -8,6 +8,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from rai_cli.compat import portable_path
+
 from rai_cli.governance.models import Concept, ConceptType
 
 
@@ -165,7 +167,7 @@ def extract_project(
 
     # Calculate relative file path
     try:
-        relative_path = str(file_path.relative_to(project_root))
+        relative_path = portable_path(file_path, project_root)
     except ValueError:
         relative_path = file_path.name
 
@@ -242,7 +244,7 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
 
     # Calculate relative file path
     try:
-        relative_path = str(file_path.relative_to(project_root))
+        relative_path = portable_path(file_path, project_root)
     except ValueError:
         relative_path = file_path.name
 

@@ -8,6 +8,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from rai_cli.compat import portable_path
+
 from rai_cli.governance.models import Concept, ConceptType
 
 
@@ -74,7 +76,7 @@ def extract_requirements(
 
             # Calculate relative file path
             try:
-                relative_path = str(file_path.relative_to(project_root))
+                relative_path = portable_path(file_path, project_root)
             except ValueError:
                 # If file_path not relative to project_root, use file name
                 relative_path = file_path.name

@@ -11,6 +11,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+from rai_cli.compat import portable_path
 from rai_cli.context.analyzers.models import ModuleInfo
 
 
@@ -100,7 +101,7 @@ class PythonAnalyzer:
         exports = self._extract_exports(module_dir)
 
         try:
-            source_path = str(module_dir.relative_to(project_root))
+            source_path = portable_path(module_dir, project_root)
         except ValueError:
             source_path = str(module_dir)
 
