@@ -968,6 +968,62 @@ class TestFormatNarrative:
         assert last_pos < narrative_pos < primes_pos
 
 
+class TestFormatNextSessionPrompt:
+    """Tests for next_session_prompt section in context bundle."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_bundle_includes_next_session_prompt_when_present(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Bundle includes next_session_prompt section when state has it."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="RAISE-144", story="", phase="", branch="v2"
+            ),
+            last_session=LastSession(
+                id="SES-200", date=date(2026, 2, 17),
+                developer="Test", summary="test session",
+            ),
+            next_session_prompt="Verify encoding fix covers discovery tests. Check backlog abstraction interest.",
+        )
+        bundle = assemble_context_bundle(profile, state, Path("/project"))
+
+        assert "# Next Session Prompt" in bundle
+        assert "encoding fix" in bundle
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_bundle_omits_next_session_prompt_when_empty(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Bundle omits next_session_prompt section when empty."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="Test")
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E15", story="S15.7", phase="design", branch="main"
+            ),
+            last_session=LastSession(
+                id="SES-001", date=date(2026, 2, 8),
+                developer="Test", summary="test",
+            ),
+        )
+        bundle = assemble_context_bundle(profile, state, Path("/project"))
+
+        assert "# Next Session Prompt" not in bundle
+
+
 class TestGetFoundationalPatterns:
     """Tests for get_foundational_patterns."""
 

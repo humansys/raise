@@ -64,6 +64,7 @@ class CloseInput:
     coaching: dict[str, object] | None = None
     notes: str = ""
     narrative: str = ""
+    next_session_prompt: str = ""
 
 
 @dataclass
@@ -109,6 +110,7 @@ def load_state_file(path: Path) -> CloseInput:
         coaching=data.get("coaching"),
         notes=data.get("notes", ""),
         narrative=data.get("narrative", ""),
+        next_session_prompt=data.get("next_session_prompt", ""),
     )
 
 
@@ -251,6 +253,7 @@ def process_session_close(
         pending=pending,
         notes=close_input.notes,
         narrative=close_input.narrative,
+        next_session_prompt=close_input.next_session_prompt,
         progress=progress,
         completed_epics=close_input.completed_epics,
     )
