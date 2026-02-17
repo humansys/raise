@@ -371,12 +371,12 @@ def init_command(
     # Write canonical copy
     canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
     canonical_memory.parent.mkdir(parents=True, exist_ok=True)
-    canonical_memory.write_text(memory_content)
+    canonical_memory.write_text(memory_content, encoding="utf-8")
 
     # Write Claude Code copy
     claude_memory = get_claude_memory_path(project_path)
     claude_memory.parent.mkdir(parents=True, exist_ok=True)
-    claude_memory.write_text(memory_content)
+    claude_memory.write_text(memory_content, encoding="utf-8")
 
     # Output messages based on experience level
     welcome = _get_welcome_message(profile if not created_profile else None)
@@ -413,7 +413,7 @@ def init_command(
             guardrails_dir = project_path / "governance"
             guardrails_dir.mkdir(parents=True, exist_ok=True)
             guardrails_path = guardrails_dir / "guardrails.md"
-            guardrails_path.write_text(guardrails_content)
+            guardrails_path.write_text(guardrails_content, encoding="utf-8")
 
             # Generate CLAUDE.md
             claude_md_content = generate_claude_md(
@@ -422,7 +422,7 @@ def init_command(
                 conventions=conventions,
             )
             claude_md_path = project_path / "CLAUDE.md"
-            claude_md_path.write_text(claude_md_content)
+            claude_md_path.write_text(claude_md_content, encoding="utf-8")
 
             # Output summary
             conf = conventions.overall_confidence.value.upper()
@@ -448,7 +448,7 @@ def init_command(
             conventions=None,
         )
         claude_md_path = project_path / "CLAUDE.md"
-        claude_md_path.write_text(claude_md_content)
+        claude_md_path.write_text(claude_md_content, encoding="utf-8")
 
         if profile.experience_level != ExperienceLevel.RI:
             console.print(

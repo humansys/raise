@@ -64,7 +64,7 @@ def _copy_skill_tree(
                 logger.debug("Skipped (exists): %s", dest)
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
-            dest.write_text(item.read_text())
+            dest.write_text(item.read_text(encoding="utf-8"), encoding="utf-8")
             result.files_copied.append(str(dest))
             copied += 1
             logger.debug("Copied: %s", dest)

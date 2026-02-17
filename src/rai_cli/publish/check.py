@@ -79,7 +79,7 @@ def _extract_version(path: Path, pattern: str) -> str | None:
     """
     if not path.exists():
         return None
-    content = path.read_text()
+    content = path.read_text(encoding="utf-8")
     match = re.search(pattern, content)
     if match:
         return match.group(1)
@@ -116,7 +116,7 @@ def run_checks(
 
     # 8: Changelog has unreleased entries
     if changelog_path.exists():
-        content = changelog_path.read_text()
+        content = changelog_path.read_text(encoding="utf-8")
         has_entries = has_unreleased_entries(content)
         results.append(
             CheckResult(

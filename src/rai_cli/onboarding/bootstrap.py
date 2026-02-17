@@ -96,9 +96,9 @@ def _copy_identity(
             logger.debug("Skipped (exists): %s", dest)
             continue
 
-        content = (identity_base / filename).read_text()
+        content = (identity_base / filename).read_text(encoding="utf-8")
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(content)
+        dest.write_text(content, encoding="utf-8")
         result.files_copied.append(str(dest))
         copied_any = True
         logger.debug("Copied: %s", dest)
@@ -125,10 +125,10 @@ def _copy_patterns(
         return
 
     source = base / "memory" / "patterns-base.jsonl"
-    content = source.read_text()
+    content = source.read_text(encoding="utf-8")
 
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(content)
+    dest.write_text(content, encoding="utf-8")
     result.files_copied.append(str(dest))
     result.patterns_copied = True
     logger.debug("Copied: %s", dest)
@@ -153,10 +153,10 @@ def _copy_methodology(
         return
 
     source = base / "framework" / "methodology.yaml"
-    content = source.read_text()
+    content = source.read_text(encoding="utf-8")
 
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(content)
+    dest.write_text(content, encoding="utf-8")
     result.files_copied.append(str(dest))
     result.methodology_copied = True
     logger.debug("Copied: %s", dest)

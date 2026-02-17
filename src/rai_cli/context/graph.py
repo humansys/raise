@@ -273,7 +273,7 @@ class UnifiedGraph:
         """
         data: dict[str, Any] = nx.node_link_data(self.graph)  # type: ignore[assignment]
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2, default=str))
+        path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
 
     @classmethod
     def load(cls, path: Path) -> UnifiedGraph:
@@ -294,7 +294,7 @@ class UnifiedGraph:
             >>> graph.node_count
             50
         """
-        loaded_data: dict[str, Any] = json.loads(path.read_text())
+        loaded_data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
         instance = cls()
         instance.graph = nx.node_link_graph(loaded_data, directed=True, multigraph=True)
         return instance

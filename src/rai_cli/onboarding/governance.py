@@ -431,11 +431,11 @@ def scaffold_governance(
             continue
 
         # Read bundled template and render placeholders
-        content = (base / src_rel).read_text()
+        content = (base / src_rel).read_text(encoding="utf-8")
         content = content.replace("{project_name}", project_name)
 
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(content)
+        dest.write_text(content, encoding="utf-8")
         result.files_created += 1
         logger.debug("Created: %s", dest)
 
