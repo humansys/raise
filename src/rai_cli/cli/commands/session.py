@@ -312,15 +312,22 @@ def close(
 
     if not is_structured:
         # Legacy behavior: just clear active session
+        legacy_project = Path(project) if project else Path.cwd()
         if not resolved_session_id:
-            # No session specified, try to use first active session
-            if not profile.active_sessions:
-                typer.echo("No active session to close.")
+            # No session specified — find active session for THIS project
+            resolved_project = legacy_project.resolve()
+            for active in profile.active_sessions:
+                if active.project and Path(active.project).resolve() == resolved_project:
+                    resolved_session_id = active.session_id
+                    break
+            if not resolved_session_id:
+                if not profile.active_sessions:
+                    typer.echo("No active session to close.")
+                else:
+                    typer.echo("No active session for this project.")
                 return
-            resolved_session_id = profile.active_sessions[0].session_id
 
         # CWD poka-yoke (RAISE-139): reject if project mismatch
-        legacy_project = Path(project) if project else Path.cwd()
         _check_cwd_guard(profile, resolved_session_id, legacy_project)
 
         updated = end_session(profile, session_id=resolved_session_id)
@@ -353,9 +360,16 @@ def close(
     project_path = Path(project) if project else Path.cwd()
 
     # CWD poka-yoke (RAISE-139): reject if project mismatch
+    # When no --session flag, find the active session for THIS project
+    # (not just the first one — that may belong to a different project)
     guard_session_id = resolved_session_id
     if not guard_session_id and profile.active_sessions:
-        guard_session_id = profile.active_sessions[0].session_id
+        resolved_project = project_path.resolve()
+        for active in profile.active_sessions:
+            if active.project and Path(active.project).resolve() == resolved_project:
+                guard_session_id = active.session_id
+                break
+        # If no session matches this project, skip guard (no session to protect)
     if guard_session_id:
         _check_cwd_guard(profile, guard_session_id, project_path)
 

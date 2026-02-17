@@ -834,10 +834,10 @@ class TestActiveSession:
 class TestBackwardCompatMigration:
     """Tests for backward compatibility migration."""
 
-    def test_migrates_current_session_to_active_sessions(
+    def test_migrates_current_session_clears_stale(
         self, tmp_path: Path
     ) -> None:
-        """load_developer_profile migrates old current_session format."""
+        """load_developer_profile clears stale current_session on migration."""
         # Create old format YAML with current_session (dict)
         old_data = {
             "name": "Test",
@@ -858,20 +858,19 @@ class TestBackwardCompatMigration:
         profile_module.get_rai_home = lambda: tmp_path
 
         try:
-            # Load profile — should migrate
+            # Load profile — should migrate by clearing stale session
             profile = load_developer_profile()
 
             assert profile is not None
-            # active_sessions should have one entry
-            assert len(profile.active_sessions) == 1
-            assert profile.active_sessions[0].project == "/path/to/project"
+            # active_sessions should be empty (stale session cleared)
+            assert len(profile.active_sessions) == 0
             # current_session should be None (removed)
             assert profile.current_session is None
 
             # Reload to verify migration was saved
             reloaded = load_developer_profile()
             assert reloaded is not None
-            assert len(reloaded.active_sessions) == 1
+            assert len(reloaded.active_sessions) == 0
             assert reloaded.current_session is None
         finally:
             profile_module.get_rai_home = original_get_rai_home
