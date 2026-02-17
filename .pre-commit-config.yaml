@@ -44,6 +44,15 @@ repos:
         args: ['-c', 'pyproject.toml', '--severity-level', 'medium', '--confidence-level', 'high']
         additional_dependencies: ['bandit[toml]']
 
+  # Encoding guard — bare read_text() defaults to OS encoding (cp1252 on Windows)
+  - repo: local
+    hooks:
+      - id: check-read-text-encoding
+        name: check read_text has encoding
+        entry: bash -c '! grep -rn "\.read_text()" tests/ --include="*.py"'
+        language: system
+        pass_filenames: false
+
   # Type checking (pre-push only — too slow for pre-commit)
   - repo: local
     hooks:
