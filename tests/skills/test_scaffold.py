@@ -37,7 +37,7 @@ class TestScaffoldSkill:
         result = scaffold_skill("session-test", lifecycle="session")
 
         assert result.created
-        content = (skills / "session-test" / "SKILL.md").read_text()
+        content = (skills / "session-test" / "SKILL.md").read_text(encoding="utf-8")
         assert "raise.work_cycle: session" in content
 
     def test_scaffold_with_prerequisites(
@@ -51,7 +51,7 @@ class TestScaffoldSkill:
         result = scaffold_skill("feature-test", after="rai-story-start")
 
         assert result.created
-        content = (skills / "feature-test" / "SKILL.md").read_text()
+        content = (skills / "feature-test" / "SKILL.md").read_text(encoding="utf-8")
         assert "rai-story-start" in content
 
     def test_scaffold_with_next(
@@ -65,7 +65,7 @@ class TestScaffoldSkill:
         result = scaffold_skill("feature-test", before="rai-story-close")
 
         assert result.created
-        content = (skills / "feature-test" / "SKILL.md").read_text()
+        content = (skills / "feature-test" / "SKILL.md").read_text(encoding="utf-8")
         assert "rai-story-close" in content
 
     def test_scaffold_infers_lifecycle_from_name(
@@ -79,7 +79,7 @@ class TestScaffoldSkill:
         result = scaffold_skill("session-validate")
 
         assert result.created
-        content = (skills / "session-validate" / "SKILL.md").read_text()
+        content = (skills / "session-validate" / "SKILL.md").read_text(encoding="utf-8")
         assert "raise.work_cycle: session" in content
 
     def test_scaffold_defaults_to_utility(
@@ -93,7 +93,7 @@ class TestScaffoldSkill:
         result = scaffold_skill("custom-action")
 
         assert result.created
-        content = (skills / "custom-action" / "SKILL.md").read_text()
+        content = (skills / "custom-action" / "SKILL.md").read_text(encoding="utf-8")
         assert "raise.work_cycle: utility" in content
 
     def test_scaffold_fails_if_exists(

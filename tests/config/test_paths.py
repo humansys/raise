@@ -231,7 +231,7 @@ class TestEnsureGlobalRaiDir:
 
         patterns_file = fake_rai / "patterns.jsonl"
         assert patterns_file.exists()
-        assert patterns_file.read_text() == ""
+        assert patterns_file.read_text(encoding="utf-8") == ""
 
     def test_creates_empty_calibration_jsonl(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -244,7 +244,7 @@ class TestEnsureGlobalRaiDir:
 
         calibration_file = fake_rai / "calibration.jsonl"
         assert calibration_file.exists()
-        assert calibration_file.read_text() == ""
+        assert calibration_file.read_text(encoding="utf-8") == ""
 
     def test_does_not_overwrite_existing_files(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -259,7 +259,7 @@ class TestEnsureGlobalRaiDir:
         ensure_global_rai_dir()
 
         # File should still have original content
-        assert patterns_file.read_text() == '{"id": "PAT-001"}\n'
+        assert patterns_file.read_text(encoding="utf-8") == '{"id": "PAT-001"}\n'
 
     def test_returns_path_to_directory(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch

@@ -247,7 +247,7 @@ class TestSaveSessionState:
         state = _make_session_state()
         save_session_state(tmp_path, state)
         state_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
-        data = yaml.safe_load(state_path.read_text())
+        data = yaml.safe_load(state_path.read_text(encoding="utf-8"))
         assert data["current_work"]["epic"] == "E15"
         assert data["last_session"]["id"] == "SES-097"
 
@@ -280,7 +280,7 @@ class TestSaveSessionState:
         save_session_state(tmp_path, state, session_id="SES-177")
         expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-177" / "state.yaml"
         assert expected.exists()
-        data = yaml.safe_load(expected.read_text())
+        data = yaml.safe_load(expected.read_text(encoding="utf-8"))
         assert data["current_work"]["epic"] == "E15"
 
     def test_saves_to_per_session_dir_without_flat(self, tmp_path: Path) -> None:
@@ -334,9 +334,9 @@ class TestMigrateFlatToSession:
         assert result is True
         session_dir = personal_dir / "sessions" / "SES-100"
         assert (session_dir / "state.yaml").exists()
-        assert (session_dir / "state.yaml").read_text() == "current_work:\n  epic: E15\n"
+        assert (session_dir / "state.yaml").read_text(encoding="utf-8") == "current_work:\n  epic: E15\n"
         assert (session_dir / "signals.jsonl").exists()
-        assert (session_dir / "signals.jsonl").read_text() == '{"signal_type": "test"}\n'
+        assert (session_dir / "signals.jsonl").read_text(encoding="utf-8") == '{"signal_type": "test"}\n'
         # Flat files removed
         assert not flat_state.exists()
         assert not flat_signals.exists()
@@ -434,4 +434,4 @@ class TestCleanupSessionDir:
 
         assert not (sessions_dir / "SES-100").exists()
         assert (sessions_dir / "SES-101").exists()
-        assert (sessions_dir / "SES-101" / "state.yaml").read_text() == "101"
+        assert (sessions_dir / "SES-101" / "state.yaml").read_text(encoding="utf-8") == "101"

@@ -158,7 +158,7 @@ class TestSaveManifest:
         save_manifest(manifest, tmp_path)
 
         manifest_path = tmp_path / ".raise" / "manifest.yaml"
-        content = manifest_path.read_text()
+        content = manifest_path.read_text(encoding="utf-8")
         data = yaml.safe_load(content)
 
         assert data["version"] == "1.0"
@@ -177,7 +177,7 @@ class TestSaveManifest:
 
         save_manifest(manifest, tmp_path)
 
-        content = (rai_dir / "manifest.yaml").read_text()
+        content = (rai_dir / "manifest.yaml").read_text(encoding="utf-8")
         assert "old: content" not in content
         assert "new" in content
 

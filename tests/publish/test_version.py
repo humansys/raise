@@ -148,8 +148,8 @@ class TestSyncVersionFiles:
             init_path=init_py,  # type: ignore[arg-type]
         )
 
-        assert 'version = "2.1.0"' in pyproject.read_text()
-        assert '__version__ = "2.1.0"' in init_py.read_text()
+        assert 'version = "2.1.0"' in pyproject.read_text(encoding="utf-8")
+        assert '__version__ = "2.1.0"' in init_py.read_text(encoding="utf-8")
 
     def test_sync_preserves_surrounding_content(
         self, tmp_path: pytest.TempPathFactory
@@ -168,11 +168,11 @@ class TestSyncVersionFiles:
             init_path=init_py,  # type: ignore[arg-type]
         )
 
-        pyproject_content = pyproject.read_text()
+        pyproject_content = pyproject.read_text(encoding="utf-8")
         assert 'name = "test"' in pyproject_content
         assert 'version = "1.1.0"' in pyproject_content
         assert 'description = "hi"' in pyproject_content
 
-        init_content = init_py.read_text()
+        init_content = init_py.read_text(encoding="utf-8")
         assert '__version__ = "1.1.0"' in init_content
         assert '__author__ = "me"' in init_content

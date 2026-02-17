@@ -32,14 +32,14 @@ class TestBaseIdentityPackage:
         """core.md file exists and is readable."""
         base = files("rai_cli.rai_base")
         core_file = base / "identity" / "core.md"
-        content = core_file.read_text()
+        content = core_file.read_text(encoding="utf-8")
         assert len(content) > 0
 
     def test_perspective_md_exists(self) -> None:
         """perspective.md file exists and is readable."""
         base = files("rai_cli.rai_base")
         perspective_file = base / "identity" / "perspective.md"
-        content = perspective_file.read_text()
+        content = perspective_file.read_text(encoding="utf-8")
         assert len(content) > 0
 
 
@@ -50,7 +50,7 @@ class TestCoreIdentityContent:
     def core_content(self) -> str:
         """Load core.md content."""
         base = files("rai_cli.rai_base")
-        return (base / "identity" / "core.md").read_text()
+        return (base / "identity" / "core.md").read_text(encoding="utf-8")
 
     def test_has_title(self, core_content: str) -> None:
         """Core identity has proper title."""
@@ -93,7 +93,7 @@ class TestPerspectiveContent:
     def perspective_content(self) -> str:
         """Load perspective.md content."""
         base = files("rai_cli.rai_base")
-        return (base / "identity" / "perspective.md").read_text()
+        return (base / "identity" / "perspective.md").read_text(encoding="utf-8")
 
     def test_has_title(self, perspective_content: str) -> None:
         """Perspective has proper title."""
@@ -135,13 +135,13 @@ class TestIdentityMarkdownValidity:
     def core_content(self) -> str:
         """Load core.md content."""
         base = files("rai_cli.rai_base")
-        return (base / "identity" / "core.md").read_text()
+        return (base / "identity" / "core.md").read_text(encoding="utf-8")
 
     @pytest.fixture
     def perspective_content(self) -> str:
         """Load perspective.md content."""
         base = files("rai_cli.rai_base")
-        return (base / "identity" / "perspective.md").read_text()
+        return (base / "identity" / "perspective.md").read_text(encoding="utf-8")
 
     def test_core_has_h1_header(self, core_content: str) -> None:
         """Core has exactly one H1 header at the start."""

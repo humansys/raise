@@ -317,7 +317,7 @@ class TestSaveDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         assert profile_file.exists()
 
-        content = yaml.safe_load(profile_file.read_text())
+        content = yaml.safe_load(profile_file.read_text(encoding="utf-8"))
         assert content["name"] == "Fer"
         assert content["experience_level"] == "ha"
 
@@ -371,7 +371,7 @@ class TestSaveDeveloperProfile:
         profile = DeveloperProfile(name="New")
         save_developer_profile(profile)
 
-        content = yaml.safe_load(profile_file.read_text())
+        content = yaml.safe_load(profile_file.read_text(encoding="utf-8"))
         assert content["name"] == "New"
 
 

@@ -111,7 +111,7 @@ class TestMigrateToPersonal:
         assert (personal_dir / "sessions" / "index.jsonl").exists()
         assert (
             personal_dir / "sessions" / "index.jsonl"
-        ).read_text() == session_content
+        ).read_text(encoding="utf-8") == session_content
 
     def test_migrate_creates_backup(self, tmp_path: Path) -> None:
         """Creates backup of original files before migration."""
@@ -151,7 +151,7 @@ class TestMigrateToPersonal:
         assert (personal_dir / "telemetry" / "signals.jsonl").exists()
         assert (
             personal_dir / "telemetry" / "signals.jsonl"
-        ).read_text() == telemetry_content
+        ).read_text(encoding="utf-8") == telemetry_content
 
     def test_migrate_calibration(self, tmp_path: Path) -> None:
         """Migrates calibration from project memory to personal directory."""
@@ -167,7 +167,7 @@ class TestMigrateToPersonal:
         assert result.success is True
         assert result.calibration_migrated == 1
         assert (personal_dir / "calibration.jsonl").exists()
-        assert (personal_dir / "calibration.jsonl").read_text() == calibration_content
+        assert (personal_dir / "calibration.jsonl").read_text(encoding="utf-8") == calibration_content
 
     def test_migrate_nothing_to_migrate(self, tmp_path: Path) -> None:
         """Returns success with zero counts when nothing to migrate."""
@@ -207,7 +207,7 @@ class TestMigrateToPersonal:
         assert result.sessions_migrated == 0
         assert "skipped" in result.message.lower() or result.sessions_migrated == 0
         # Personal data should be unchanged
-        assert "SES-002" in (personal_dir / "sessions" / "index.jsonl").read_text()
+        assert "SES-002" in (personal_dir / "sessions" / "index.jsonl").read_text(encoding="utf-8")
 
     def test_migrate_dry_run(self, tmp_path: Path) -> None:
         """Dry run reports what would be migrated without making changes."""

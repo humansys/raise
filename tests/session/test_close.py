@@ -264,7 +264,7 @@ class TestProcessSessionClosePatternPrefix:
 
         assert result.patterns_added == 1
         patterns_file = project / ".raise" / "rai" / "memory" / "patterns.jsonl"
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert data["id"].startswith("PAT-E-")
         mp.undo()
 
@@ -291,7 +291,7 @@ class TestProcessSessionClosePatternPrefix:
 
         assert result.patterns_added == 1
         patterns_file = project / ".raise" / "rai" / "memory" / "patterns.jsonl"
-        data = json.loads(patterns_file.read_text().strip())
+        data = json.loads(patterns_file.read_text(encoding="utf-8").strip())
         assert data["id"].startswith("PAT-F-")
         mp.undo()
 

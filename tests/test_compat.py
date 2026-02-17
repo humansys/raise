@@ -89,7 +89,7 @@ class TestFileLock:
             file_lock(fh)
             fh.write("data\n")
             file_unlock(fh)
-        assert f.read_text() == "data\n"
+        assert f.read_text(encoding="utf-8") == "data\n"
 
     def test_lock_is_reentrant_after_unlock(self, tmp_path: Path) -> None:
         f = tmp_path / "lockable.txt"

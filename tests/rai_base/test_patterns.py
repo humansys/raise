@@ -28,7 +28,7 @@ class TestBasePatternsPackage:
         """patterns-base.jsonl file exists and is readable."""
         base = files("rai_cli.rai_base")
         patterns_file = base / "memory" / "patterns-base.jsonl"
-        content = patterns_file.read_text()
+        content = patterns_file.read_text(encoding="utf-8")
         assert len(content) > 0
 
 
@@ -39,7 +39,7 @@ class TestBasePatternsValidity:
     def patterns(self) -> list[dict]:
         """Load and parse all base patterns."""
         base = files("rai_cli.rai_base")
-        content = (base / "memory" / "patterns-base.jsonl").read_text()
+        content = (base / "memory" / "patterns-base.jsonl").read_text(encoding="utf-8")
         patterns = []
         for line in content.strip().split("\n"):
             if line.strip():
@@ -118,7 +118,7 @@ class TestBasePatternsContent:
     def patterns(self) -> list[dict]:
         """Load and parse all base patterns."""
         base = files("rai_cli.rai_base")
-        content = (base / "memory" / "patterns-base.jsonl").read_text()
+        content = (base / "memory" / "patterns-base.jsonl").read_text(encoding="utf-8")
         return [
             json.loads(line) for line in content.strip().split("\n") if line.strip()
         ]

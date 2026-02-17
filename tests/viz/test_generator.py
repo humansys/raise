@@ -193,7 +193,7 @@ class TestGenerateVizHtml:
 
         assert result == output
         assert output.exists()
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
         assert content.startswith("<!DOCTYPE html>")
         assert "</html>" in content
 
@@ -201,7 +201,7 @@ class TestGenerateVizHtml:
         """Graph data is embedded as JSON in the HTML."""
         output = tmp_path / "graph.html"
         generate_viz_html(minimal_graph, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         assert "PAT-001" in content
         assert "mod-cli" in content
@@ -211,7 +211,7 @@ class TestGenerateVizHtml:
         """D3.js is loaded in the HTML."""
         output = tmp_path / "graph.html"
         generate_viz_html(minimal_graph, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         assert "d3.v7.min.js" in content
 
@@ -221,7 +221,7 @@ class TestGenerateVizHtml:
         """Pattern nodes include category, tags, and learned_from."""
         output = tmp_path / "graph.html"
         generate_viz_html(minimal_graph, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         # The embedded JSON should contain pattern metadata
         assert '"category"' in content
@@ -252,7 +252,7 @@ class TestGenerateVizHtml:
 
         output = tmp_path / "graph.html"
         generate_viz_html(index_path, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         assert long_content in content
 
@@ -280,7 +280,7 @@ class TestGenerateVizHtml:
 
         output = tmp_path / "graph.html"
         generate_viz_html(index_path, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         assert long_content not in content
         assert "B" * 200 in content
@@ -291,7 +291,7 @@ class TestGenerateVizHtml:
         """Patterns with no context tags get category 'general'."""
         output = tmp_path / "graph.html"
         generate_viz_html(rich_graph, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         assert '"general"' in content
 
@@ -299,7 +299,7 @@ class TestGenerateVizHtml:
         """HTML contains nodes from all domains."""
         output = tmp_path / "graph.html"
         generate_viz_html(rich_graph, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         # Governance
         assert "principle-01" in content
@@ -321,7 +321,7 @@ class TestGenerateVizHtml:
         """Edge relationship types are preserved in the output."""
         output = tmp_path / "graph.html"
         generate_viz_html(rich_graph, output)
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
 
         assert "related_to" in content
         assert "constrained_by" in content
@@ -352,7 +352,7 @@ class TestGenerateVizHtml:
         generate_viz_html(index_path, output)
 
         assert output.exists()
-        content = output.read_text()
+        content = output.read_text(encoding="utf-8")
         assert "<!DOCTYPE html>" in content
 
     def test_edges_with_missing_nodes_excluded(self, tmp_path: Path) -> None:

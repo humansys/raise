@@ -31,7 +31,7 @@ class TestScaffoldGovernance:
 
         prd = tmp_path / "governance" / "prd.md"
         assert prd.exists()
-        content = prd.read_text()
+        content = prd.read_text(encoding="utf-8")
         assert "# PRD: test-project" in content
         assert "### RF-01:" in content
 
@@ -41,7 +41,7 @@ class TestScaffoldGovernance:
 
         vision = tmp_path / "governance" / "vision.md"
         assert vision.exists()
-        content = vision.read_text()
+        content = vision.read_text(encoding="utf-8")
         assert "# Solution Vision: test-project" in content
         assert "| **Core Value**" in content
 
@@ -51,7 +51,7 @@ class TestScaffoldGovernance:
 
         guardrails = tmp_path / "governance" / "guardrails.md"
         assert guardrails.exists()
-        content = guardrails.read_text()
+        content = guardrails.read_text(encoding="utf-8")
         assert "type: guardrails" in content
         assert "# Guardrails: test-project" in content
         assert "| must-code-001 |" in content
@@ -62,7 +62,7 @@ class TestScaffoldGovernance:
 
         backlog = tmp_path / "governance" / "backlog.md"
         assert backlog.exists()
-        content = backlog.read_text()
+        content = backlog.read_text(encoding="utf-8")
         assert "# Backlog: test-project" in content
         assert "**Status**: Draft" in content
 
@@ -81,7 +81,7 @@ class TestScaffoldGovernance:
         scaffold_governance(tmp_path, "my-awesome-api")
 
         for md_file in (tmp_path / "governance").rglob("*.md"):
-            content = md_file.read_text()
+            content = md_file.read_text(encoding="utf-8")
             assert "{project_name}" not in content, (
                 f"{md_file.name} still contains unrendered placeholder"
             )
@@ -125,7 +125,7 @@ class TestScaffoldIdempotency:
         # Second scaffold
         result = scaffold_governance(tmp_path, "test-project")
 
-        assert prd.read_text() == "# My Custom PRD\n"
+        assert prd.read_text(encoding="utf-8") == "# My Custom PRD\n"
         assert result.files_skipped > 0
 
     def test_second_run_reports_already_existed(self, tmp_path: Path) -> None:
@@ -147,7 +147,7 @@ class TestScaffoldIdempotency:
         result = scaffold_governance(tmp_path, "test-project")
 
         # prd.md should be untouched
-        assert (gov_dir / "prd.md").read_text() == "# Existing PRD\n"
+        assert (gov_dir / "prd.md").read_text(encoding="utf-8") == "# Existing PRD\n"
         # Other files should be created
         assert (gov_dir / "vision.md").exists()
         assert (gov_dir / "guardrails.md").exists()
