@@ -10,6 +10,7 @@
 - Extract: classes, interfaces, structs, enums, methods, functions, records, properties
 - Namespace-qualified names (same pattern as PHP)
 - Wire into `extract_symbols` dispatcher, `Language` literal, extension map
+- Exclude `*.Designer.cs` from scan (WinForms auto-generated boilerplate)
 - Tests following existing patterns (unit + scan_directory integration)
 
 **Out of Scope:**

@@ -37,10 +37,10 @@
 | [RAISE-141](https://humansys.atlassian.net/browse/RAISE-141) | **Platform Integration — Backlog Backends** (was E21) | 📋 Backlog | — | P1 (V3) |
 | [RAISE-142](https://humansys.atlassian.net/browse/RAISE-142) | **Enterprise Readiness** (was E22) | 📋 Backlog | — | P2 (V3) |
 | [RAISE-143](https://humansys.atlassian.net/browse/RAISE-143) | **Collective Intelligence** (was E10) | 📋 Backlog | `dev/epic-e10-scope.md` | P2 (V3) |
-| [RAISE-144](https://humansys.atlassian.net/browse/RAISE-144) | **Engineering Health** | 📋 Permanent | — | Rolling |
-| [RAISE-153](https://humansys.atlassian.net/browse/RAISE-153) | **Developer Enablement** | 🚀 In Progress | `work/epics/raise-153-developer-enablement/scope.md` | P0 (v2.0) |
+| [RAISE-144](https://humansys.atlassian.net/browse/RAISE-144) | **Engineering Health** | 🚀 Active | §6 | Rolling |
+| [RAISE-153](https://humansys.atlassian.net/browse/RAISE-153) | **Developer Enablement** | ✅ Complete | `work/epics/raise-153-developer-enablement/scope.md` | — |
 
-**Summary:** 17 of 18 internal epics complete. E-DEMO and RAISE-153 in progress. 8 JIRA-tracked epics in backlog (v2.1/V3 + Engineering Health).
+**Summary:** 18 of 19 internal epics complete. RAISE-144 (Engineering Health) is a permanent rolling epic. 7 JIRA-tracked epics in backlog (v2.1/V3).
 
 ---
 
@@ -160,6 +160,24 @@ See `dev/parking-lot.md` for full idea backlog.
 
 ---
 
+## 6. RAISE-144: Engineering Health (Rolling)
+
+> **Goal:** Platform stability, language coverage, and tech debt reduction. Permanent epic — stories branch directly from `v2`.
+> **Driven by:** Kurigage Jumpstart (first client onboarding) requirements.
+
+| # | JIRA | Story | Size | Priority | Status |
+|---|------|-------|------|----------|--------|
+| 1 | [RAISE-158](https://humansys.atlassian.net/browse/RAISE-158) | C#/.NET discovery scanner | S | P0 | 🚀 In Progress |
+| 2 | [RAISE-161](https://humansys.atlassian.net/browse/RAISE-161) | Windows compatibility verification | XS | P0 (before Mon Feb 16) | 📋 Backlog |
+| 3 | [RAISE-160](https://humansys.atlassian.net/browse/RAISE-160) | Flutter/Dart discovery scanner | S | P2 (before Track 2) | 📋 Backlog |
+| 4 | [RAISE-145](https://humansys.atlassian.net/browse/RAISE-145) | "Unified" prefix rename | S | Post-F&F | 📋 Backlog |
+
+**Completed:**
+- **HF-SES-MIGRATED**: SES-MIGRATED zombie blocks session close — migration clears stale session + CWD guard filters by project (v2.0.1)
+- **HF-TEST-LEAKAGE**: Test leakage into ~/.rai/developer.yaml — autouse conftest.py fixture (v2.0.1)
+
+---
+
 ## 6. Definition of Done
 
 Each feature is complete when:
@@ -269,6 +287,7 @@ E-DEMO learnings feed into RAISE-141 (backlog backends).
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 2.4.0 | 2026-02-16 | Rai | RAISE-153 complete, RAISE-144 activated with Kurigage-driven stories (RAISE-158/160/161), SES-MIGRATED + test leakage fixes |
 | 2.3.0 | 2026-02-15 | Rai | Full JIRA sync: E10/E19-E22 → RAISE-140-143, Engineering Health epic (RAISE-144), RAISE-134/136 bugs, RAISE-137-139 urgent stories, Fix Version strategy |
 | 2.2.0 | 2026-02-14 | Rai | Added Demo & Commercial Strategy section (§7), documented demo/atlassian-webinar branch |
 | 2.1.0 | 2026-02-14 | Rai | Added Hotfixes section (§4) for quality gate tracking, renumbered subsequent sections |
