@@ -128,7 +128,7 @@ class ExtractionResult(BaseModel):
         2
     """
 
-    concepts: list[Concept] = Field(default_factory=list)
+    concepts: list[Concept] = Field(default_factory=lambda: list[Concept]())
     total: int = Field(..., description="Total concepts extracted")
     files_processed: int = Field(..., description="Number of files parsed")
     errors: list[str] = Field(default_factory=list)

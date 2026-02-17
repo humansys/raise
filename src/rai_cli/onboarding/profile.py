@@ -200,7 +200,7 @@ class CoachingContext(BaseModel):
     growth_edge: str = ""
     trust_level: str = "new"
     autonomy: str = ""
-    corrections: list[Correction] = Field(default_factory=list)
+    corrections: list[Correction] = Field(default_factory=lambda: list[Correction]())
     communication_notes: list[str] = Field(default_factory=list)
     relationship: RelationshipState = Field(default_factory=RelationshipState)
 
@@ -247,9 +247,9 @@ class DeveloperProfile(BaseModel):
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
     current_session: CurrentSession | None = None  # DEPRECATED: migrated to active_sessions
-    active_sessions: list[ActiveSession] = Field(default_factory=list)
+    active_sessions: list[ActiveSession] = Field(default_factory=lambda: list[ActiveSession]())
     coaching: CoachingContext = Field(default_factory=CoachingContext)
-    deadlines: list[Deadline] = Field(default_factory=list)
+    deadlines: list[Deadline] = Field(default_factory=lambda: list[Deadline]())
 
     def get_pattern_prefix(self) -> str:
         """Get the developer's pattern prefix.

@@ -17,7 +17,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
 from rai_cli.compat import file_lock, file_unlock
-from rai_cli.config.paths import SIGNALS_FILE, TELEMETRY_SUBDIR, get_personal_dir, get_session_dir
+from rai_cli.config.paths import (
+    SIGNALS_FILE,
+    TELEMETRY_SUBDIR,
+    get_personal_dir,
+    get_session_dir,
+)
 
 if TYPE_CHECKING:
     from rai_cli.telemetry.schemas import Signal

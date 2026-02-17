@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Any
 
 from rai_cli.compat import portable_path
-
 from rai_cli.core.text import sanitize_id
 from rai_cli.governance.models import Concept, ConceptType
 

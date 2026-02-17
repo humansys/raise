@@ -12,9 +12,9 @@ import os
 from pathlib import Path
 from typing import Any, cast
 
-from rai_cli.compat import secure_permissions
-
 from cryptography.fernet import Fernet  # type: ignore[import-untyped]
+
+from rai_cli.compat import secure_permissions
 
 
 def _get_encryption_key() -> bytes:

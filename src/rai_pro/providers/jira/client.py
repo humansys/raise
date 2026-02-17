@@ -9,9 +9,7 @@ This module provides a clean wrapper over atlassian-python-api with:
 
 import time
 from collections import deque
-from typing import Any
 
-import requests
 from atlassian import Jira
 
 from rai_pro.providers.base import BacklogProvider
@@ -236,7 +234,7 @@ class JiraClient(BacklogProvider):
             project_key = self._extract_project_key(epic_key)
 
             # Build create payload with field filtering
-            fields = {
+            fields: dict[str, object] = {
                 "project": {"key": project_key},
                 "summary": story.summary,
                 "issuetype": {"name": "Story"},
