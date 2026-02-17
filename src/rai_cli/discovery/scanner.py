@@ -38,7 +38,7 @@ SymbolKind = Literal[
 ]
 
 # Supported languages for scanning
-Language = Literal["python", "typescript", "javascript", "php", "svelte"]
+Language = Literal["python", "typescript", "javascript", "php", "svelte", "csharp"]
 
 # File extension to language mapping
 EXTENSION_TO_LANGUAGE: dict[str, Language] = {
@@ -51,6 +51,7 @@ EXTENSION_TO_LANGUAGE: dict[str, Language] = {
     ".cjs": "javascript",
     ".php": "php",
     ".svelte": "svelte",
+    ".cs": "csharp",
 }
 
 
@@ -974,6 +975,274 @@ def extract_svelte_symbols(source: str, file_path: str) -> list[Symbol]:
     return symbols
 
 
+# -----------------------------------------------------------------------------
+# C# Extraction (tree-sitter-c-sharp)
+# -----------------------------------------------------------------------------
+
+
+def _get_csharp_parser() -> Parser:
+    """Get a tree-sitter parser for C#.
+
+    Returns:
+        Configured tree-sitter Parser.
+
+    Raises:
+        ImportError: If tree-sitter-c-sharp is not installed.
+    """
+    try:
+        from tree_sitter import Language as TSLanguage
+        from tree_sitter import Parser
+    except ImportError as e:
+        raise ImportError(
+            "tree-sitter is required for C# scanning. "
+            "Install with: uv add tree-sitter tree-sitter-c-sharp"
+        ) from e
+
+    import tree_sitter_c_sharp
+
+    lang = TSLanguage(tree_sitter_c_sharp.language())
+    return Parser(lang)
+
+
+def _extract_csharp_signature(node: Node, source: bytes) -> str:
+    """Extract a signature from a C# AST node."""
+    node_type = node.type
+
+    if node_type == "class_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        base_list = _find_child_by_type(node, "base_list")
+        if base_list:
+            return f"class {name} {_get_node_text(base_list, source)}"
+        return f"class {name}"
+
+    elif node_type == "interface_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"interface {name}"
+
+    elif node_type == "struct_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        base_list = _find_child_by_type(node, "base_list")
+        if base_list:
+            return f"struct {name} {_get_node_text(base_list, source)}"
+        return f"struct {name}"
+
+    elif node_type == "record_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"record {name}"
+
+    elif node_type == "enum_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"enum {name}"
+
+    elif node_type == "method_declaration":
+        parts: list[str] = []
+        for child in node.children:
+            if child.type == "modifier":
+                parts.append(_get_node_text(child, source))
+        # Return type
+        ret_type = _find_child_by_type(
+            node, "predefined_type", "identifier", "generic_name", "void_keyword"
+        )
+        if ret_type:
+            parts.append(_get_node_text(ret_type, source))
+        name_node = _find_child_by_type(node, "identifier")
+        if name_node:
+            # Skip if this is the return type identifier we already added
+            name_text = _get_node_text(name_node, source)
+            # Find the method name (last identifier before parameter_list)
+            method_name = name_text
+            for child in node.children:
+                if child.type == "identifier":
+                    method_name = _get_node_text(child, source)
+                elif child.type == "parameter_list":
+                    break
+            parts.append(method_name)
+        params_node = _find_child_by_type(node, "parameter_list")
+        if params_node:
+            parts.append(_get_node_text(params_node, source))
+        return " ".join(parts)
+
+    elif node_type == "property_declaration":
+        parts_p: list[str] = []
+        for child in node.children:
+            if child.type == "modifier":
+                parts_p.append(_get_node_text(child, source))
+        ret_type = _find_child_by_type(
+            node, "predefined_type", "identifier", "generic_name"
+        )
+        if ret_type:
+            parts_p.append(_get_node_text(ret_type, source))
+        name_node = _find_child_by_type(node, "identifier")
+        if name_node:
+            parts_p.append(_get_node_text(name_node, source))
+        return " ".join(parts_p)
+
+    return ""
+
+
+def _extract_csharp_symbols_from_tree(
+    root: Node,
+    source: bytes,
+    file_path: str,
+) -> list[Symbol]:
+    """Extract symbols from a C# tree-sitter parse tree.
+
+    Walks the AST and extracts classes, interfaces, structs, records,
+    enums, methods, and properties. Tracks namespace for qualified names.
+
+    Args:
+        root: Root node of the tree-sitter parse tree.
+        source: Source code as bytes.
+        file_path: Path to the source file.
+
+    Returns:
+        List of Symbol objects.
+    """
+    symbols: list[Symbol] = []
+    namespace = ""
+
+    container_types = {
+        "class_declaration",
+        "interface_declaration",
+        "struct_declaration",
+        "record_declaration",
+    }
+
+    def _qualify(name: str) -> str:
+        return f"{namespace}.{name}" if namespace else name
+
+    def _get_name(node: Node) -> str:
+        name_node = _find_child_by_type(node, "identifier")
+        return _get_node_text(name_node, source) if name_node else "unknown"
+
+    def walk(node: Node, parent_name: str | None = None) -> None:
+        nonlocal namespace
+        node_type = node.type
+
+        if node_type == "namespace_declaration":
+            ns_node = _find_child_by_type(node, "qualified_name", "identifier")
+            if ns_node:
+                namespace = _get_node_text(ns_node, source)
+            body = _find_child_by_type(node, "declaration_list")
+            if body:
+                for child in body.children:
+                    walk(child, parent_name)
+            return
+
+        if node_type in container_types:
+            local_name = _get_name(node)
+            qualified = _qualify(local_name)
+
+            kind: SymbolKind = "class"
+            if node_type == "interface_declaration":
+                kind = "interface"
+
+            symbols.append(
+                Symbol(
+                    name=qualified,
+                    kind=kind,
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_csharp_signature(node, source),
+                )
+            )
+
+            body = _find_child_by_type(node, "declaration_list")
+            if body:
+                for child in body.children:
+                    walk(child, parent_name=qualified)
+            return
+
+        if node_type == "method_declaration" and parent_name is not None:
+            # Find the method name — last identifier before parameter_list
+            method_name = "unknown"
+            for child in node.children:
+                if child.type == "identifier":
+                    method_name = _get_node_text(child, source)
+                elif child.type == "parameter_list":
+                    break
+
+            symbols.append(
+                Symbol(
+                    name=method_name,
+                    kind="method",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_csharp_signature(node, source),
+                    parent=parent_name,
+                )
+            )
+            return
+
+        if node_type == "property_declaration" and parent_name is not None:
+            local_name = _get_name(node)
+            symbols.append(
+                Symbol(
+                    name=local_name,
+                    kind="method",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_csharp_signature(node, source),
+                    parent=parent_name,
+                )
+            )
+            return
+
+        if node_type == "enum_declaration":
+            local_name = _get_name(node)
+            symbols.append(
+                Symbol(
+                    name=_qualify(local_name),
+                    kind="enum",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_csharp_signature(node, source),
+                )
+            )
+            return
+
+        for child in node.children:
+            walk(child, parent_name)
+
+    walk(root)
+    return symbols
+
+
+def extract_csharp_symbols(source: str, file_path: str) -> list[Symbol]:
+    """Extract symbols from C# source code.
+
+    Uses tree-sitter to parse C# and extract classes, interfaces,
+    structs, records, enums, methods, and properties.
+
+    Args:
+        source: C# source code as string.
+        file_path: Path to the source file (for metadata).
+
+    Returns:
+        List of Symbol objects.
+
+    Examples:
+        >>> source = '''
+        ... public class UserService {
+        ...     public void Process() { }
+        ... }
+        ... '''
+        >>> symbols = extract_csharp_symbols(source, "UserService.cs")
+        >>> symbols[0].kind
+        'class'
+    """
+    parser = _get_csharp_parser()
+    source_bytes = source.encode("utf-8")
+    tree = parser.parse(source_bytes)
+
+    return _extract_csharp_symbols_from_tree(tree.root_node, source_bytes, file_path)
+
+
 def detect_language(file_path: str | Path) -> Language | None:
     """Detect language from file extension.
 
@@ -1024,6 +1293,8 @@ def extract_symbols(source: str, file_path: str, language: Language) -> list[Sym
         return extract_php_symbols(source, file_path)
     elif language == "svelte":
         return extract_svelte_symbols(source, file_path)
+    elif language == "csharp":
+        return extract_csharp_symbols(source, file_path)
     else:
         raise ValueError(f"Unsupported language: {language}")
 
@@ -1039,6 +1310,7 @@ DEFAULT_EXCLUDE_PATTERNS: list[str] = [
     "**/build/**",
     "**/.git/**",
     "**/*.blade.php",
+    "*.Designer.cs",
 ]
 
 # Language-specific default glob patterns (list to support multiple extensions)
@@ -1048,6 +1320,7 @@ DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, list[str]] = {
     "javascript": ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs"],
     "php": ["**/*.php"],
     "svelte": ["**/*.svelte"],
+    "csharp": ["**/*.cs"],
     None: ["**/*"],  # Auto-detect: scan all files
 }
 
