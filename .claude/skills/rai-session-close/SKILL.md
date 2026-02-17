@@ -43,7 +43,8 @@ Use inference to reflect on the session:
 7. **Current work:** Release, epic, story, phase, branch for continuity
 8. **Pending:** Decisions, blockers, next actions
 9. **Narrative:** Session context for cross-session continuity — decisions (with WHY), research conclusions, artifacts created, branch state. Goal: make next session "immediately resumable." (~300-500 tokens, 2-3 sentences per section)
-10. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
+10. **Next session prompt:** Forward-looking guidance from Rai to her future self. What should the next session prioritize? What should Rai watch for or remind the human about? What context will be critical? (~100-200 tokens, actionable and specific)
+11. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
 
 Write the structured output as a YAML state file:
 
@@ -100,6 +101,10 @@ narrative: |                               # Cross-session continuity (2-3 sente
   ## Branch State
   - Current branch and commits ahead of base
   - Story branch status (created/not yet/merged)
+next_session_prompt: |                    # Forward-looking guidance to future Rai (~100-200 tokens)
+  Verify that [specific thing] works after [change made this session].
+  Emilio mentioned interest in [topic] — if he brings it up, [context].
+  Watch for [potential issue] in [area].
 notes: "Any free-form notes"
 ```
 
