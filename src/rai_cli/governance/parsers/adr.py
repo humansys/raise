@@ -8,13 +8,12 @@ Legacy v1 ADRs without frontmatter are skipped.
 from __future__ import annotations
 
 import re
-
-from rai_cli.compat import portable_path
 from pathlib import Path
 from typing import Any, cast
 
 import yaml
 
+from rai_cli.compat import portable_path
 from rai_cli.governance.models import Concept, ConceptType
 
 

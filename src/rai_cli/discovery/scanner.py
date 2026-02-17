@@ -1306,10 +1306,7 @@ def _extract_dart_signature(node: Node, source: bytes) -> str:
         name = _get_node_text(name_node, source) if name_node else "unknown"
         return f"enum {name}"
 
-    elif node_type == "function_signature":
-        return _get_node_text(node, source).strip()
-
-    elif node_type == "method_signature":
+    elif node_type == "function_signature" or node_type == "method_signature":
         return _get_node_text(node, source).strip()
 
     return ""
@@ -1405,10 +1402,7 @@ def _extract_dart_symbols_from_tree(
             inner = _find_child_by_type(
                 node, "function_signature", "getter_signature"
             )
-            if inner:
-                method_name = _get_name(inner)
-            else:
-                method_name = _get_name(node)
+            method_name = _get_name(inner) if inner else _get_name(node)
 
             symbols.append(
                 Symbol(

@@ -9,7 +9,6 @@ import re
 from pathlib import Path
 
 from rai_cli.compat import portable_path
-
 from rai_cli.governance.models import Concept, ConceptType
 from rai_cli.governance.parsers.backlog import normalize_status
 

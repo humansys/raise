@@ -10,7 +10,6 @@ import re
 from pathlib import Path
 
 from rai_cli.compat import portable_path
-
 from rai_cli.governance.models import Concept, ConceptType
 
 # Sections that contain term definitions (extract from these)

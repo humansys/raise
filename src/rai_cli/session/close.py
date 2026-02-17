@@ -15,6 +15,7 @@ import logging
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
+from typing import cast
 
 import yaml
 
@@ -54,13 +55,13 @@ class CloseInput:
 
     summary: str = ""
     session_type: str = "feature"
-    outcomes: list[str] = field(default_factory=list)
-    patterns: list[dict[str, str]] = field(default_factory=list)
-    corrections: list[dict[str, str]] = field(default_factory=list)
+    outcomes: list[str] = field(default_factory=lambda: list[str]())
+    patterns: list[dict[str, str]] = field(default_factory=lambda: list[dict[str, str]]())
+    corrections: list[dict[str, str]] = field(default_factory=lambda: list[dict[str, str]]())
     current_work: dict[str, str] | None = None
     pending: dict[str, list[str]] | None = None
     progress: dict[str, int | str] | None = None
-    completed_epics: list[str] = field(default_factory=list)
+    completed_epics: list[str] = field(default_factory=lambda: list[str]())
     coaching: dict[str, object] | None = None
     notes: str = ""
     narrative: str = ""
@@ -75,7 +76,7 @@ class CloseResult:
     session_id: str = ""
     patterns_added: int = 0
     corrections_added: int = 0
-    messages: list[str] = field(default_factory=list)
+    messages: list[str] = field(default_factory=lambda: list[str]())
 
 
 def load_state_file(path: Path) -> CloseInput:
@@ -97,20 +98,22 @@ def load_state_file(path: Path) -> CloseInput:
         msg = f"State file must be a YAML mapping, got {type(data).__name__}"
         raise ValueError(msg)
 
+    d = cast(dict[str, object], data)
+
     return CloseInput(
-        summary=data.get("summary", ""),
-        session_type=data.get("type", "feature"),
-        outcomes=data.get("outcomes", []),
-        patterns=data.get("patterns", []),
-        corrections=data.get("corrections", []),
-        current_work=data.get("current_work"),
-        pending=data.get("pending"),
-        progress=data.get("progress"),
-        completed_epics=data.get("completed_epics", []),
-        coaching=data.get("coaching"),
-        notes=data.get("notes", ""),
-        narrative=data.get("narrative", ""),
-        next_session_prompt=data.get("next_session_prompt", ""),
+        summary=str(d.get("summary", "")),
+        session_type=str(d.get("type", "feature")),
+        outcomes=list(d.get("outcomes", []) or []),  # type: ignore[arg-type]
+        patterns=list(d.get("patterns", []) or []),  # type: ignore[arg-type]
+        corrections=list(d.get("corrections", []) or []),  # type: ignore[arg-type]
+        current_work=d.get("current_work"),  # type: ignore[arg-type]
+        pending=d.get("pending"),  # type: ignore[arg-type]
+        progress=d.get("progress"),  # type: ignore[arg-type]
+        completed_epics=list(d.get("completed_epics", []) or []),  # type: ignore[arg-type]
+        coaching=d.get("coaching"),  # type: ignore[arg-type]
+        notes=str(d.get("notes", "")),
+        narrative=str(d.get("narrative", "")),
+        next_session_prompt=str(d.get("next_session_prompt", "")),
     )
 
 
@@ -150,11 +153,7 @@ def process_session_close(
         if not description:
             continue
         context = pat_data.get("context", "")
-        context_list = (
-            [c.strip() for c in context.split(",")]
-            if isinstance(context, str)
-            else context
-        )
+        context_list = [c.strip() for c in context.split(",")]
         pat_type = pat_data.get("type", "process")
         try:
             sub_type = PatternSubType(pat_type)
