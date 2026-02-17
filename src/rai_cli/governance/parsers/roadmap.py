@@ -8,6 +8,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from rai_cli.compat import portable_path
+
 from rai_cli.governance.models import Concept, ConceptType
 from rai_cli.governance.parsers.backlog import normalize_status
 
@@ -43,7 +45,7 @@ def extract_releases(
 
     # Calculate relative file path
     try:
-        relative_path = str(file_path.relative_to(project_root))
+        relative_path = portable_path(file_path, project_root)
     except ValueError:
         relative_path = file_path.name
 

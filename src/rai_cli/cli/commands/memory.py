@@ -23,6 +23,7 @@ from rich.console import Console
 from rich.table import Table
 
 from rai_cli.cli.error_handler import cli_error
+from rai_cli.compat import to_file_uri
 from rai_cli.config.paths import get_memory_dir, get_personal_dir
 from rai_cli.context import UnifiedGraph, UnifiedGraphBuilder
 from rai_cli.context.diff import GraphDiff, diff_graphs
@@ -1006,7 +1007,7 @@ def viz(
     console.print(f"✓ Written to [cyan]{result_path}[/cyan]\n")
 
     if open_browser:
-        webbrowser.open(f"file://{result_path.resolve()}")
+        webbrowser.open(to_file_uri(result_path))
         console.print("  Opened in browser.\n")
 
 

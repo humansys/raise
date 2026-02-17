@@ -9,6 +9,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+from rai_cli.compat import portable_path
+
 from rai_cli.core.text import sanitize_id
 from rai_cli.governance.models import Concept, ConceptType
 
@@ -73,7 +75,7 @@ def extract_principles(
 
             # Calculate relative file path
             try:
-                relative_path = str(file_path.relative_to(project_root))
+                relative_path = portable_path(file_path, project_root)
             except ValueError:
                 relative_path = file_path.name
 

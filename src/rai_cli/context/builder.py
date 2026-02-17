@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from rai_cli.compat import portable_path
 from rai_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
 from rai_cli.context.extractors.skills import extract_all_skills
 from rai_cli.context.graph import UnifiedGraph
@@ -382,7 +383,7 @@ class UnifiedGraphBuilder:
             return []
 
         try:
-            source_file = str(identity_file.relative_to(self.project_root))
+            source_file = portable_path(identity_file, self.project_root)
         except ValueError:
             source_file = str(identity_file)
 
@@ -627,7 +628,7 @@ class UnifiedGraphBuilder:
 
         # Build relative source path
         try:
-            source_file = str(file_path.relative_to(self.project_root))
+            source_file = portable_path(file_path, self.project_root)
         except ValueError:
             source_file = str(file_path)
 
@@ -1131,7 +1132,7 @@ class UnifiedGraphBuilder:
 
         # Try to make path relative, fallback to absolute
         try:
-            source_file = str(file_path.relative_to(self.project_root))
+            source_file = portable_path(file_path, self.project_root)
         except ValueError:
             source_file = str(file_path)
 

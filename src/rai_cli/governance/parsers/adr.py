@@ -8,6 +8,8 @@ Legacy v1 ADRs without frontmatter are skipped.
 from __future__ import annotations
 
 import re
+
+from rai_cli.compat import portable_path
 from pathlib import Path
 from typing import Any, cast
 
@@ -193,7 +195,7 @@ def extract_decision_from_file(
 
     # Calculate relative path
     try:
-        relative_path = str(file_path.relative_to(project_root))
+        relative_path = portable_path(file_path, project_root)
     except ValueError:
         relative_path = file_path.name
 

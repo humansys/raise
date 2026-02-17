@@ -12,6 +12,8 @@ import os
 from pathlib import Path
 from typing import Any, cast
 
+from rai_cli.compat import secure_permissions
+
 from cryptography.fernet import Fernet  # type: ignore[import-untyped]
 
 
@@ -122,4 +124,4 @@ def _save_credentials_file(
 
     # Write with restricted permissions (user-only read/write)
     credentials_path.write_bytes(encrypted_data)
-    credentials_path.chmod(0o600)
+    secure_permissions(credentials_path)
