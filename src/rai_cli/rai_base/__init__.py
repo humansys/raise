@@ -14,7 +14,7 @@ Usage:
 
     base_files = files("rai_cli.rai_base")
     identity_dir = base_files / "identity"
-    core_md = (identity_dir / "core.md").read_text()
+    core_md = (identity_dir / "core.md").read_text(encoding="utf-8")
 """
 
 from __future__ import annotations

@@ -20,6 +20,8 @@ from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, Field
 
+from rai_cli.compat import portable_path
+
 if TYPE_CHECKING:
     from tree_sitter import Node, Parser
 
@@ -1461,12 +1463,10 @@ def scan_directory(
             if _should_exclude(file_path, exclude_patterns):
                 continue
 
-            rel_path = (
-                file_path.relative_to(root)
-                if file_path.is_relative_to(root)
-                else file_path
-            )
-            rel_str = rel_path.as_posix()
+            if file_path.is_relative_to(root):
+                rel_str = portable_path(file_path, root)
+            else:
+                rel_str = file_path.as_posix()
 
             file_language = language or detect_language(file_path)
             if file_language is None:

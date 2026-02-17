@@ -25,7 +25,7 @@ Usage:
 
     base_skills = files("rai_cli.skills_base")
     session_start = base_skills / "rai-session-start" / "SKILL.md"
-    content = session_start.read_text()
+    content = session_start.read_text(encoding="utf-8")
 """
 
 from __future__ import annotations
