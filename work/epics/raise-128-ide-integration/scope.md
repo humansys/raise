@@ -20,7 +20,7 @@ Make `rai init` work with Antigravity by introducing an IDE abstraction layer, d
 
 | # | ID | Feature | Size | Status | Description |
 |---|-----|---------|:----:|:------:|-------------|
-| 1 | F128.1 | IDE Configuration Model | S | Pending | `IdeType` literal, `IdeConfig` dataclass, factory, manifest schema extension |
+| 1 | F128.1 | IDE Configuration Model | S | Done | `IdeType` literal, `IdeConfig` Pydantic model (frozen), factory, manifest schema extension |
 | 2 | F128.2 | Decouple Init from Claude Paths | M | Pending | Refactor 6 hardcoded `.claude/` references to use `IdeConfig` |
 | 3 | F128.3 | Antigravity Scaffolding | S | Pending | Generate `.agent/skills/`, `.agent/rules/raise.md`, `.agent/workflows/` |
 | 4 | F128.4 | Init --ide Flag + E2E Tests | S | Pending | Wire CLI flag, end-to-end validation for both IDEs |
@@ -188,7 +188,7 @@ F128.4 (--ide flag + E2E tests)
 
 | Feature | Size | Status | Actual | Notes |
 |---------|:----:|:------:|:------:|-------|
-| F128.1: IDE Configuration Model | S | Pending | - | |
+| F128.1: IDE Configuration Model | S | Done | 20 min | 3.0x velocity |
 | F128.2: Decouple Init from Claude Paths | M | Pending | - | |
 | F128.3: Antigravity Scaffolding | S | Pending | - | |
 | F128.4: Init --ide Flag + E2E Tests | S | Pending | - | |
@@ -202,4 +202,5 @@ F128.4 (--ide flag + E2E tests)
 
 *Created: 2026-02-17*
 *Plan added: 2026-02-17*
-*Next: `/rai-story-start` for F128.1*
+*F128.1 closed: 2026-02-17*
+*Next: `/rai-story-start` for F128.2*
