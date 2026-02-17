@@ -200,7 +200,7 @@ def query(
 
     # Write to file or stdout
     if output:
-        output.write_text(output_text)
+        output.write_text(output_text, encoding="utf-8")
         console.print(f"✓ Results written to [cyan]{output}[/cyan]")
         console.print(f"  Concepts: {result.metadata.total_concepts}")
         console.print(f"  Tokens: ~{result.metadata.token_estimate}")
@@ -490,7 +490,7 @@ def build(
         diff = diff_graphs(old_graph, graph)
         diff_path = get_personal_dir() / "last-diff.json"
         diff_path.parent.mkdir(parents=True, exist_ok=True)
-        diff_path.write_text(diff.model_dump_json(indent=2))
+        diff_path.write_text(diff.model_dump_json(indent=2), encoding="utf-8")
 
     # Format output
     _format_build_result(
@@ -893,7 +893,7 @@ def list_memory(
 
     # Write to file or stdout
     if output:
-        output.write_text(output_text)
+        output.write_text(output_text, encoding="utf-8")
         console.print(f"✓ Memory written to [cyan]{output}[/cyan]\n")
     elif format != "table":
         console.print(output_text)

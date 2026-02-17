@@ -41,7 +41,7 @@ def _count_base_patterns() -> int:
     """
     base = files("rai_cli.rai_base")
     source = base / "memory" / "patterns-base.jsonl"
-    content = source.read_text()  # type: ignore[union-attr]
+    content = source.read_text(encoding="utf-8")  # type: ignore[union-attr]
     return sum(1 for line in content.splitlines() if line.strip())
 
 

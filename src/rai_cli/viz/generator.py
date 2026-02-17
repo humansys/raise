@@ -358,7 +358,7 @@ def generate_viz_html(
     Returns:
         The output path written to.
     """
-    graph_data = json.loads(index_path.read_text())
+    graph_data = json.loads(index_path.read_text(encoding="utf-8"))
 
     # Strip heavy content from nodes to keep the HTML small
     # For patterns: keep full content + context tags for sub-clustering
@@ -402,5 +402,5 @@ def generate_viz_html(
     html = _HTML_TEMPLATE.replace("%%GRAPH_DATA%%", graph_json)
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(html)
+    output_path.write_text(html, encoding="utf-8")
     return output_path

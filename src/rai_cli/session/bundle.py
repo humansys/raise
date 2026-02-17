@@ -284,7 +284,7 @@ def _format_recent_sessions(project_path: Path, limit: int = 3) -> str:
         return ""
 
     try:
-        text = index_path.read_text().strip()
+        text = index_path.read_text(encoding="utf-8").strip()
         if not text:
             return ""
         sessions = [json.loads(line) for line in text.splitlines() if line.strip()]

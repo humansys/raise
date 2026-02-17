@@ -148,21 +148,21 @@ def sync_version_files(
         raise ValueError(msg)
 
     # Update pyproject.toml
-    pyproject_content = pyproject_path.read_text()
+    pyproject_content = pyproject_path.read_text(encoding="utf-8")
     pyproject_content = re.sub(
         r'version\s*=\s*"[^"]*"',
         f'version = "{new_version}"',
         pyproject_content,
         count=1,
     )
-    pyproject_path.write_text(pyproject_content)
+    pyproject_path.write_text(pyproject_content, encoding="utf-8")
 
     # Update __init__.py
-    init_content = init_path.read_text()
+    init_content = init_path.read_text(encoding="utf-8")
     init_content = re.sub(
         r'__version__\s*=\s*"[^"]*"',
         f'__version__ = "{new_version}"',
         init_content,
         count=1,
     )
-    init_path.write_text(init_content)
+    init_path.write_text(init_content, encoding="utf-8")

@@ -55,7 +55,7 @@ def _read_current_version(pyproject_path: Path) -> str:
     if not pyproject_path.exists():
         console.print("[red]pyproject.toml not found[/red]")
         raise typer.Exit(1)
-    content = pyproject_path.read_text()
+    content = pyproject_path.read_text(encoding="utf-8")
     match = re.search(r'version\s*=\s*"([^"]*)"', content)
     if not match:
         console.print("[red]Could not find version in pyproject.toml[/red]")
@@ -223,10 +223,10 @@ def release_command(
     if changelog_path.exists():
         from rai_cli.publish.changelog import promote_unreleased
 
-        content = changelog_path.read_text()
+        content = changelog_path.read_text(encoding="utf-8")
         try:
             content = promote_unreleased(content, new_version, today)
-            changelog_path.write_text(content)
+            changelog_path.write_text(content, encoding="utf-8")
             console.print("[green]✓ Changelog updated[/green]")
         except ValueError:
             console.print("[yellow]⚠ No unreleased entries to promote[/yellow]")
