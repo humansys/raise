@@ -60,6 +60,7 @@ rai session start --name "Name" --project "$(pwd)" --context
 With the context bundle from Step 1, use inference to:
 
 1. **Check signals:**
+   - **Next session prompt** → if present, this is guidance from your past self. Read it first, use it to shape focus and proactively guide the human. This is your highest-priority continuity signal.
    - Release deadline pressure (<30 days → flag urgency, include days remaining)
    - Deadline pressure (<3 days → focus critical path)
    - Session narrative → review decisions, research, artifacts from last session for continuity
