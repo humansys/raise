@@ -114,21 +114,8 @@ def scan_command(
             )
         lang = language  # type: ignore[assignment]
 
-    # Set default excludes if none provided
-    exclude_patterns = (
-        exclude
-        if exclude
-        else [
-            "**/__pycache__/**",
-            "**/.venv/**",
-            "**/venv/**",
-            "**/node_modules/**",
-            "**/vendor/**",
-            "**/dist/**",
-            "**/build/**",
-            "**/.git/**",
-        ]
-    )
+    # Pass user excludes or None to use DEFAULT_EXCLUDE_PATTERNS from scanner
+    exclude_patterns = exclude if exclude else None
 
     result = scan_directory(
         path,

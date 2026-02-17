@@ -1310,7 +1310,7 @@ DEFAULT_EXCLUDE_PATTERNS: list[str] = [
     "**/build/**",
     "**/.git/**",
     "**/*.blade.php",
-    "**/*.Designer.cs",
+    "*.Designer.cs",
 ]
 
 # Language-specific default glob patterns (list to support multiple extensions)
