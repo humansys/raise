@@ -651,8 +651,8 @@ class TestSessionStartWithAgent:
 class TestSessionCloseCwdGuard:
     """Tests for CWD poka-yoke guard on session close (RAISE-139)."""
 
-    def test_close_rejects_mismatched_project(self, tmp_path: Path) -> None:
-        """Session close rejects writes when CWD project != session project."""
+    def test_close_skips_session_from_different_project(self, tmp_path: Path) -> None:
+        """Session close from project-b ignores active session from project-a."""
         from datetime import UTC, datetime
 
         session_project = tmp_path / "project-a"
@@ -687,9 +687,9 @@ class TestSessionCloseCwdGuard:
                 ],
             )
 
-        assert result.exit_code != 0
-        assert "project-a" in result.output
-        assert "project-b" in result.output
+        # Structured close proceeds — CWD guard skips because no session matches project-b
+        assert result.exit_code == 0
+        assert "closed" in result.output
 
     def test_close_allows_matching_project(self, tmp_path: Path) -> None:
         """Session close allows writes when projects match."""
@@ -768,7 +768,7 @@ class TestSessionCloseCwdGuard:
         assert result.exit_code == 0
 
     def test_close_rejects_mismatch_on_legacy_close(self, tmp_path: Path) -> None:
-        """Legacy (non-structured) close also checks CWD guard."""
+        """Legacy close from wrong CWD skips session from different project."""
         from datetime import UTC, datetime
 
         session_project = tmp_path / "correct"
@@ -804,8 +804,8 @@ class TestSessionCloseCwdGuard:
                 ["session", "close"],
             )
 
-        assert result.exit_code != 0
-        assert "correct" in result.output
+        assert result.exit_code == 0
+        assert "No active session for this project" in result.output
 
 
 class TestSessionCloseWithSessionFlag:

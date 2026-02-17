@@ -296,22 +296,14 @@ def _migrate_current_session(profile: DeveloperProfile) -> DeveloperProfile:
         logger.debug("Profile already has active_sessions, skipping migration")
         return profile
 
-    # Migrate: convert current_session to ActiveSession
-    # Generate a session ID (we don't have the real ID from old format)
-    # Use "SES-MIGRATED" as placeholder
-    migrated_session = ActiveSession(
-        session_id="SES-MIGRATED",
-        started_at=profile.current_session.started_at,
-        project=profile.current_session.project,
-        agent="unknown",
-    )
-
-    # Create updated profile with migration
+    # The old current_session is stale — it was never properly closed
+    # under the old format. Clear it instead of converting to a zombie
+    # SES-MIGRATED entry that blocks future session closes.
     updated = profile.model_copy(deep=True)
-    updated.active_sessions = [migrated_session]
+    updated.active_sessions = []
     updated.current_session = None
 
-    logger.info("Migrated current_session to active_sessions")
+    logger.info("Migrated current_session: cleared stale session (old format)")
     return updated
 
 
