@@ -167,8 +167,8 @@ See `dev/parking-lot.md` for full idea backlog.
 
 | # | JIRA | Story | Size | Priority | Status |
 |---|------|-------|------|----------|--------|
-| 1 | [RAISE-158](https://humansys.atlassian.net/browse/RAISE-158) | C#/.NET discovery scanner | S | P0 | 🚀 In Progress |
-| 2 | [RAISE-161](https://humansys.atlassian.net/browse/RAISE-161) | Windows compatibility verification | XS | P0 (before Mon Feb 16) | 📋 Backlog |
+| 1 | [RAISE-158](https://humansys.atlassian.net/browse/RAISE-158) | C#/.NET discovery scanner | S | P0 | ✅ Done |
+| 2 | [RAISE-161](https://humansys.atlassian.net/browse/RAISE-161) | Windows compatibility verification | XS | P0 | ✅ Done |
 | 3 | [RAISE-160](https://humansys.atlassian.net/browse/RAISE-160) | Flutter/Dart discovery scanner | S | P2 (before Track 2) | 📋 Backlog |
 | 4 | [RAISE-145](https://humansys.atlassian.net/browse/RAISE-145) | "Unified" prefix rename | S | Post-F&F | 📋 Backlog |
 
