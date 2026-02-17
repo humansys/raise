@@ -40,7 +40,7 @@ SymbolKind = Literal[
 ]
 
 # Supported languages for scanning
-Language = Literal["python", "typescript", "javascript", "php", "svelte", "csharp"]
+Language = Literal["python", "typescript", "javascript", "php", "svelte", "csharp", "dart"]
 
 # File extension to language mapping
 EXTENSION_TO_LANGUAGE: dict[str, Language] = {
@@ -54,6 +54,7 @@ EXTENSION_TO_LANGUAGE: dict[str, Language] = {
     ".php": "php",
     ".svelte": "svelte",
     ".cs": "csharp",
+    ".dart": "dart",
 }
 
 
@@ -1245,6 +1246,219 @@ def extract_csharp_symbols(source: str, file_path: str) -> list[Symbol]:
     return _extract_csharp_symbols_from_tree(tree.root_node, source_bytes, file_path)
 
 
+# ── Dart / Flutter ───────────────────────────────────────────────────────
+
+
+def _get_dart_parser() -> Parser:
+    """Create a tree-sitter parser for Dart.
+
+    Uses tree-sitter-language-pack since no standalone tree-sitter-dart
+    package exists on PyPI.
+
+    Returns:
+        Configured tree-sitter Parser for Dart.
+
+    Raises:
+        ImportError: If tree-sitter-language-pack is not installed.
+    """
+    try:
+        from tree_sitter_language_pack import get_parser
+    except ImportError as e:
+        raise ImportError(
+            "tree-sitter-language-pack is required for Dart scanning. "
+            "Install with: uv add tree-sitter-language-pack"
+        ) from e
+
+    return get_parser("dart")
+
+
+def _extract_dart_signature(node: Node, source: bytes) -> str:
+    """Extract a signature from a Dart AST node."""
+    node_type = node.type
+
+    if node_type == "class_definition":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        # Check for abstract modifier
+        abstract_node = _find_child_by_type(node, "abstract")
+        prefix = "abstract class" if abstract_node else "class"
+        superclass = _find_child_by_type(node, "superclass")
+        if superclass:
+            return f"{prefix} {name} {_get_node_text(superclass, source)}"
+        return f"{prefix} {name}"
+
+    elif node_type == "mixin_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"mixin {name}"
+
+    elif node_type == "extension_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        # Find the "on" type
+        type_node = _find_child_by_type(node, "type_identifier")
+        if type_node:
+            return f"extension {name} on {_get_node_text(type_node, source)}"
+        return f"extension {name}"
+
+    elif node_type == "enum_declaration":
+        name_node = _find_child_by_type(node, "identifier")
+        name = _get_node_text(name_node, source) if name_node else "unknown"
+        return f"enum {name}"
+
+    elif node_type == "function_signature":
+        return _get_node_text(node, source).strip()
+
+    elif node_type == "method_signature":
+        return _get_node_text(node, source).strip()
+
+    return ""
+
+
+def _extract_dart_symbols_from_tree(
+    root: Node,
+    source: bytes,
+    file_path: str,
+) -> list[Symbol]:
+    """Extract symbols from a Dart tree-sitter parse tree.
+
+    Walks the AST and extracts classes, mixins, extensions, enums,
+    top-level functions, and methods.
+
+    Args:
+        root: Root node of the tree-sitter parse tree.
+        source: Source code as bytes.
+        file_path: Path to the source file.
+
+    Returns:
+        List of Symbol objects.
+    """
+    symbols: list[Symbol] = []
+
+    container_types = {
+        "class_definition",
+        "mixin_declaration",
+        "extension_declaration",
+    }
+
+    def _get_name(node: Node) -> str:
+        name_node = _find_child_by_type(node, "identifier")
+        return _get_node_text(name_node, source) if name_node else "unknown"
+
+    def walk(node: Node, parent_name: str | None = None) -> None:
+        node_type = node.type
+
+        if node_type in container_types:
+            local_name = _get_name(node)
+
+            kind: SymbolKind = "class"
+            if node_type == "mixin_declaration":
+                kind = "trait"
+
+            symbols.append(
+                Symbol(
+                    name=local_name,
+                    kind=kind,
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_dart_signature(node, source),
+                )
+            )
+
+            # Walk into body for methods
+            body = _find_child_by_type(node, "class_body", "extension_body")
+            if body:
+                for child in body.children:
+                    walk(child, parent_name=local_name)
+            return
+
+        if node_type == "enum_declaration":
+            local_name = _get_name(node)
+            symbols.append(
+                Symbol(
+                    name=local_name,
+                    kind="enum",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_dart_signature(node, source),
+                )
+            )
+            return
+
+        # Top-level function: function_signature at program level
+        if node_type == "function_signature" and parent_name is None:
+            local_name = _get_name(node)
+            symbols.append(
+                Symbol(
+                    name=local_name,
+                    kind="function",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_dart_signature(node, source),
+                )
+            )
+            return
+
+        # Method inside a container
+        if node_type == "method_signature" and parent_name is not None:
+            # method_signature contains function_signature or getter_signature
+            inner = _find_child_by_type(
+                node, "function_signature", "getter_signature"
+            )
+            if inner:
+                method_name = _get_name(inner)
+            else:
+                method_name = _get_name(node)
+
+            symbols.append(
+                Symbol(
+                    name=method_name,
+                    kind="method",
+                    file=file_path,
+                    line=node.start_point[0] + 1,
+                    signature=_extract_dart_signature(node, source),
+                    parent=parent_name,
+                )
+            )
+            return
+
+        for child in node.children:
+            walk(child, parent_name)
+
+    walk(root)
+    return symbols
+
+
+def extract_dart_symbols(source: str, file_path: str) -> list[Symbol]:
+    """Extract symbols from Dart source code.
+
+    Uses tree-sitter to parse Dart and extract classes, mixins,
+    extensions, enums, top-level functions, and methods.
+
+    Args:
+        source: Dart source code as string.
+        file_path: Path to the source file (for metadata).
+
+    Returns:
+        List of Symbol objects.
+
+    Examples:
+        >>> source = '''
+        ... class UserService {
+        ...     void process() {}
+        ... }
+        ... '''
+        >>> symbols = extract_dart_symbols(source, "user_service.dart")
+        >>> symbols[0].kind
+        'class'
+    """
+    parser = _get_dart_parser()
+    source_bytes = source.encode("utf-8")
+    tree = parser.parse(source_bytes)
+
+    return _extract_dart_symbols_from_tree(tree.root_node, source_bytes, file_path)
+
+
 def detect_language(file_path: str | Path) -> Language | None:
     """Detect language from file extension.
 
@@ -1297,6 +1511,8 @@ def extract_symbols(source: str, file_path: str, language: Language) -> list[Sym
         return extract_svelte_symbols(source, file_path)
     elif language == "csharp":
         return extract_csharp_symbols(source, file_path)
+    elif language == "dart":
+        return extract_dart_symbols(source, file_path)
     else:
         raise ValueError(f"Unsupported language: {language}")
 
@@ -1323,6 +1539,7 @@ DEFAULT_LANGUAGE_PATTERNS: dict[Language | None, list[str]] = {
     "php": ["**/*.php"],
     "svelte": ["**/*.svelte"],
     "csharp": ["**/*.cs"],
+    "dart": ["**/*.dart"],
     None: ["**/*"],  # Auto-detect: scan all files
 }
 
