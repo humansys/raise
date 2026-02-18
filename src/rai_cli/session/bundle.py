@@ -507,6 +507,63 @@ SECTION_REGISTRY: dict[str, Callable[..., str]] = {
 }
 
 
+def assemble_sections(
+    sections: list[str],
+    project_path: Path,
+    profile: DeveloperProfile,
+    state: SessionState | None,
+) -> str:
+    """Assemble formatted output for selected priming sections.
+
+    Each section independently loads its data source (graph, profile, or state)
+    and formats the output. Section names are validated against SECTION_REGISTRY.
+
+    Args:
+        sections: List of section names to load (e.g., ["governance", "behavioral"]).
+        project_path: Absolute path to the project root.
+        profile: Developer profile.
+        state: Session state (may be None).
+
+    Returns:
+        Formatted sections joined by blank lines, or empty string if no content.
+
+    Raises:
+        ValueError: If any section name is not in SECTION_REGISTRY.
+    """
+    if not sections:
+        return ""
+
+    # Validate all section names first
+    for name in sections:
+        if name not in SECTION_REGISTRY:
+            raise ValueError(
+                f"Unknown section: '{name}'. "
+                f"Valid: {sorted(SECTION_REGISTRY.keys())}"
+            )
+
+    parts: list[str] = []
+    for name in sections:
+        if name == "governance":
+            always_on = get_always_on_primes(project_path)
+            part = _format_governance_primes(always_on)
+        elif name == "behavioral":
+            patterns = get_foundational_patterns(project_path)
+            part = _format_primes(patterns)
+        elif name == "coaching":
+            part = _format_coaching(profile)
+        elif name == "deadlines":
+            part = _format_deadlines(profile)
+        elif name == "progress":
+            part = _format_progress(state)
+        else:
+            continue  # unreachable due to validation above
+
+        if part:
+            parts.append(part)
+
+    return "\n\n".join(parts)
+
+
 def _format_manifest(manifests: list[SectionManifest]) -> str:
     """Format manifest of available context sections.
 
