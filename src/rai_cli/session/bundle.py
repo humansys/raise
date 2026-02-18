@@ -507,6 +507,92 @@ SECTION_REGISTRY: dict[str, Callable[..., str]] = {
 }
 
 
+def _format_manifest(manifests: list[SectionManifest]) -> str:
+    """Format manifest of available context sections.
+
+    Args:
+        manifests: List of section manifest entries.
+
+    Returns:
+        Formatted manifest section, or empty string if no manifests.
+    """
+    if not manifests:
+        return ""
+
+    lines = ["# Available Context"]
+    for m in manifests:
+        if m.count == 0:
+            lines.append(f"- {m.name}: 0 items")
+        else:
+            lines.append(f"- {m.name}: {m.count} items (~{m.token_estimate} tokens)")
+    return "\n".join(lines)
+
+
+def assemble_orientation(
+    profile: DeveloperProfile,
+    state: SessionState | None,
+    project_path: Path,
+    session_id: str | None = None,
+) -> str:
+    """Assemble orientation-only context (always-on sections).
+
+    Orientation = "where are we?" — work state, continuity, pending.
+    Does NOT include priming sections (governance, behavioral, coaching,
+    deadlines, progress). Those are loaded separately via assemble_sections().
+
+    Args:
+        profile: Developer profile from ~/.rai/developer.yaml.
+        state: Session state from .raise/rai/session-state.yaml (may be None).
+        project_path: Absolute path to the project root.
+        session_id: Optional session identifier (e.g., "SES-177").
+
+    Returns:
+        Plain text orientation context.
+    """
+    # Resolve release context for current epic
+    release_node: ConceptNode | None = None
+    if state and state.current_work.epic:
+        release_node = _find_release_for_current_epic(
+            project_path, state.current_work.epic
+        )
+
+    # Session Context header
+    sections: list[str] = [
+        "# Session Context",
+        _format_developer_section(profile),
+    ]
+
+    # Add session ID if provided
+    if session_id:
+        sections.append(f"Session: {session_id}")
+
+    sections.append(_format_work_section(state, release_node=release_node))
+
+    # Last session + recent sessions
+    sections.append(_format_last_session(state))
+    recent = _format_recent_sessions(project_path)
+    if recent:
+        sections.append(recent)
+
+    # Session narrative (cross-session continuity — not truncated)
+    narrative = _format_narrative(state)
+    if narrative:
+        sections.append(narrative)
+
+    # Next session prompt (forward-looking guidance from Rai to future self)
+    next_prompt = _format_next_session_prompt(state)
+    if next_prompt:
+        sections.append(next_prompt)
+
+    # Pending
+    pending = _format_pending(state)
+    if pending:
+        sections.append(pending)
+
+    # Filter empty sections, join with blank lines
+    return "\n\n".join(s for s in sections if s)
+
+
 def assemble_context_bundle(
     profile: DeveloperProfile,
     state: SessionState | None,
@@ -514,6 +600,9 @@ def assemble_context_bundle(
     session_id: str | None = None,
 ) -> str:
     """Assemble token-optimized context bundle from multiple sources.
+
+    Currently emits full bundle (orientation + all priming sections) for
+    backward compatibility. Will be made lean in a subsequent task.
 
     Args:
         profile: Developer profile from ~/.rai/developer.yaml.
@@ -535,7 +624,7 @@ def assemble_context_bundle(
         )
 
     # Session Context header
-    sections = [
+    sections: list[str] = [
         "# Session Context",
         _format_developer_section(profile),
     ]

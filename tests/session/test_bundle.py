@@ -28,9 +28,11 @@ from rai_cli.session.bundle import (
     SECTION_REGISTRY,
     SectionManifest,
     _format_governance_primes,
+    _format_manifest,
     _format_progress,
     _format_recent_sessions,
     assemble_context_bundle,
+    assemble_orientation,
     count_section_items,
     get_always_on_primes,
     get_foundational_patterns,
@@ -1173,3 +1175,119 @@ class TestCountSectionItems:
         import pytest
         with pytest.raises(ValueError, match="Unknown section"):
             count_section_items("unknown", Path("/project"), _make_profile(), _make_state())
+
+
+class TestAssembleOrientation:
+    """Tests for assemble_orientation (always-on sections only)."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_orientation_contains_always_on_sections(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Orientation includes developer, work, sessions, narrative, pending."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-187", "Code as Gemba"),
+        ]
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+        ]
+
+        profile = _make_profile()
+        state = _make_state()
+        state.narrative = "## Decisions\n- Chose sync model"
+        state.next_session_prompt = "Continue with RAISE-169"
+        result = assemble_orientation(profile, state, Path("/project"), session_id="SES-210")
+
+        # Always-on sections present
+        assert "# Session Context" in result
+        assert "Developer: Emilio" in result
+        assert "Session: SES-210" in result
+        assert "Story: S15.7 [implement]" in result
+        assert "Epic: E15" in result
+        assert "SES-097" in result  # last session
+        assert "# Session Narrative" in result
+        assert "Chose sync model" in result
+        assert "# Next Session Prompt" in result
+        assert "Continue with RAISE-169" in result
+        assert "# Pending" in result
+        assert "Pattern curation" in result
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_orientation_excludes_priming_sections(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Orientation does NOT include governance, behavioral, coaching, deadlines, progress."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-187", "Code as Gemba"),
+        ]
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+        ]
+
+        profile = _make_profile()  # has deadlines and coaching
+        state = _make_state()
+        state.progress = EpicProgress(
+            epic="E15", stories_done=5, stories_total=8, sp_done=16, sp_total=25
+        )
+        result = assemble_orientation(profile, state, Path("/project"))
+
+        assert "# Governance Primes" not in result
+        assert "# Behavioral Primes" not in result
+        assert "# Coaching" not in result
+        assert "# Deadlines" not in result
+        assert "Progress:" not in result
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_orientation_without_state(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Orientation works gracefully without session state."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="New")
+        result = assemble_orientation(profile, None, Path("/project"))
+
+        assert "Developer: New (shu)" in result
+        assert "(no previous session state)" in result
+
+
+class TestFormatManifest:
+    """Tests for _format_manifest."""
+
+    def test_manifest_format(self) -> None:
+        """Manifest formats section counts and token estimates."""
+        manifests = [
+            SectionManifest(name="governance", count=14, token_estimate=350),
+            SectionManifest(name="behavioral", count=12, token_estimate=240),
+            SectionManifest(name="coaching", count=1, token_estimate=80),
+            SectionManifest(name="deadlines", count=0, token_estimate=0),
+        ]
+        result = _format_manifest(manifests)
+
+        assert "# Available Context" in result
+        assert "governance: 14 items (~350 tokens)" in result
+        assert "behavioral: 12 items (~240 tokens)" in result
+        assert "coaching: 1 items (~80 tokens)" in result
+        assert "deadlines: 0 items" in result
+
+    def test_manifest_empty_list(self) -> None:
+        """Empty manifest list returns empty string."""
+        result = _format_manifest([])
+        assert result == ""
+
+    def test_manifest_zero_count_omits_tokens(self) -> None:
+        """Zero-count sections don't show token estimate."""
+        manifests = [SectionManifest(name="deadlines", count=0, token_estimate=0)]
+        result = _format_manifest(manifests)
+        assert "deadlines: 0 items" in result
+        assert "tokens" not in result.split("deadlines")[1]
