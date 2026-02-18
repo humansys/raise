@@ -169,6 +169,122 @@ class TestMemoryQueryCommand:
         finally:
             os.chdir(original_cwd)
 
+    def test_query_compact_format(
+        self, sample_unified_graph: Path, tmp_path: Path
+    ) -> None:
+        """Test compact format: Markdown-KV flat, one line per result."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                ["memory", "query", "singleton pattern", "--format", "compact"],
+            )
+
+            assert result.exit_code == 0
+            # Header: # Memory: query (N results, strategy)
+            assert "# Memory:" in result.stdout
+            assert "keyword_search" in result.stdout
+            # Markdown-KV format: **type** id: content
+            assert "**pattern**" in result.stdout
+            assert "PAT-001" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_query_compact_format_truncation_footer(
+        self, tmp_path: Path
+    ) -> None:
+        """Test compact format shows truncation footer when results clipped."""
+        # Create graph with multiple matching nodes
+        memory_dir = tmp_path / ".raise" / "rai" / "memory"
+        memory_dir.mkdir(parents=True)
+        graph_data = {
+            "nodes": [
+                {
+                    "id": f"PAT-{i:03d}",
+                    "type": "pattern",
+                    "content": f"velocity pattern number {i}",
+                    "source_file": "test",
+                    "created": "2026-02-01",
+                    "metadata": {},
+                }
+                for i in range(5)
+            ],
+            "edges": [],
+            "metadata": {"version": "1.0", "created": "2026-02-01"},
+        }
+        index_path = memory_dir / "index.json"
+        index_path.write_text(json.dumps(graph_data))
+
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                ["memory", "query", "velocity", "--format", "compact", "--limit", "2"],
+            )
+
+            assert result.exit_code == 0
+            assert "[+3 more" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_query_compact_format_no_footer_when_all_shown(
+        self, sample_unified_graph: Path, tmp_path: Path
+    ) -> None:
+        """Test compact format has no footer when all results are shown."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                ["memory", "query", "singleton", "--format", "compact", "--limit", "50"],
+            )
+
+            assert result.exit_code == 0
+            assert "[+" not in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_query_compact_content_truncation(
+        self, tmp_path: Path
+    ) -> None:
+        """Test compact format truncates content at 150 chars."""
+        memory_dir = tmp_path / ".raise" / "rai" / "memory"
+        memory_dir.mkdir(parents=True)
+        long_content = "A" * 200 + " with keyword velocity"
+        graph_data = {
+            "nodes": [
+                {
+                    "id": "PAT-LONG",
+                    "type": "pattern",
+                    "content": long_content,
+                    "source_file": "test",
+                    "created": "2026-02-01",
+                    "metadata": {},
+                }
+            ],
+            "edges": [],
+            "metadata": {"version": "1.0", "created": "2026-02-01"},
+        }
+        index_path = memory_dir / "index.json"
+        index_path.write_text(json.dumps(graph_data))
+
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                ["memory", "query", "velocity", "--format", "compact"],
+            )
+
+            assert result.exit_code == 0
+            # Content should be truncated — full 200+ chars should NOT appear
+            assert long_content not in result.stdout
+            assert "..." in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
 
 class TestMemoryListCommand:
     """Tests for `raise memory list` command."""
