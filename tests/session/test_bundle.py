@@ -33,6 +33,7 @@ from rai_cli.session.bundle import (
     _format_recent_sessions,
     assemble_context_bundle,
     assemble_orientation,
+    assemble_sections,
     count_section_items,
     get_always_on_primes,
     get_foundational_patterns,
@@ -1291,3 +1292,104 @@ class TestFormatManifest:
         result = _format_manifest(manifests)
         assert "deadlines: 0 items" in result
         assert "tokens" not in result.split("deadlines")[1]
+
+
+class TestAssembleSections:
+    """Tests for assemble_sections (queryable priming sections)."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_governance_and_behavioral(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Loading governance and behavioral returns both formatted sections."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-187", "Code as Gemba — observe before designing"),
+        ]
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+        ]
+
+        result = assemble_sections(
+            ["governance", "behavioral"],
+            Path("/project"),
+            _make_profile(),
+            _make_state(),
+        )
+
+        assert "# Governance Primes" in result
+        assert "guardrail-must-001" in result
+        assert "# Behavioral Primes" in result
+        assert "PAT-187" in result
+
+    def test_coaching_only(self) -> None:
+        """Loading coaching alone returns coaching section."""
+        result = assemble_sections(
+            ["coaching"],
+            Path("/project"),
+            _make_profile(),
+            _make_state(),
+        )
+
+        assert "# Coaching" in result
+        assert "architecture" in result
+
+    def test_empty_sections_returns_empty(self) -> None:
+        """Empty section list returns empty string."""
+        result = assemble_sections(
+            [],
+            Path("/project"),
+            _make_profile(),
+            _make_state(),
+        )
+        assert result == ""
+
+    def test_unknown_section_raises(self) -> None:
+        """Unknown section name raises ValueError with valid names."""
+        import pytest
+        with pytest.raises(ValueError, match="Unknown section"):
+            assemble_sections(
+                ["unknown"],
+                Path("/project"),
+                _make_profile(),
+                _make_state(),
+            )
+
+    def test_progress_with_data(self) -> None:
+        """Loading progress returns progress section when data exists."""
+        state = _make_state()
+        state.progress = EpicProgress(
+            epic="E15", stories_done=3, stories_total=8, sp_done=10, sp_total=25
+        )
+        result = assemble_sections(
+            ["progress"],
+            Path("/project"),
+            _make_profile(),
+            state,
+        )
+        assert "E15" in result
+        assert "3/8" in result
+
+    def test_deadlines_with_data(self) -> None:
+        """Loading deadlines returns deadline section."""
+        result = assemble_sections(
+            ["deadlines"],
+            Path("/project"),
+            _make_profile(),  # has 2 deadlines
+            _make_state(),
+        )
+        assert "# Deadlines" in result
+        assert "F&F" in result
+
+    def test_section_with_no_content_omitted(self) -> None:
+        """Sections with no content are omitted from output."""
+        profile = DeveloperProfile(name="New")  # no coaching, no deadlines
+        result = assemble_sections(
+            ["coaching", "deadlines"],
+            Path("/project"),
+            profile,
+            _make_state(),
+        )
+        assert result == ""
