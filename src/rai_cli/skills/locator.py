@@ -1,7 +1,8 @@
 """Skill locator for finding and loading skills.
 
-Discovers skills in the Claude Code skill directory (.claude/skills/)
-and provides methods for loading and organizing them.
+Discovers skills in the IDE skill directory (e.g. .claude/skills/
+for Claude Code, .agent/skills/ for Antigravity) and provides
+methods for loading and organizing them.
 """
 
 from __future__ import annotations
@@ -9,21 +10,28 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 
+from rai_cli.config.ide import IdeConfig, get_ide_config
 from rai_cli.skills.parser import parse_skill
 from rai_cli.skills.schema import Skill
 
 
-def get_default_skill_dir(project_root: Path | None = None) -> Path:
+def get_default_skill_dir(
+    project_root: Path | None = None,
+    *,
+    ide_config: IdeConfig | None = None,
+) -> Path:
     """Get the default skill directory path.
 
     Args:
         project_root: Project root directory. Defaults to current directory.
+        ide_config: IDE configuration. Defaults to Claude.
 
     Returns:
-        Path to .claude/skills/ directory.
+        Path to the IDE's skill directory.
     """
     root = project_root or Path.cwd()
-    return root / ".claude" / "skills"
+    config = ide_config or get_ide_config()
+    return root / config.skills_dir
 
 
 class SkillLocator:
@@ -112,18 +120,21 @@ class SkillLocator:
 def list_skills(
     skill_dir: Path | None = None,
     project_root: Path | None = None,
+    *,
+    ide_config: IdeConfig | None = None,
 ) -> list[Skill]:
     """Convenience function to list all skills.
 
     Args:
         skill_dir: Direct path to skill directory.
-        project_root: Project root (will use .claude/skills/ under it).
+        project_root: Project root (resolves via ide_config).
+        ide_config: IDE configuration. Defaults to Claude.
 
     Returns:
         List of parsed Skill objects.
     """
     if skill_dir is None and project_root is not None:
-        skill_dir = get_default_skill_dir(project_root)
+        skill_dir = get_default_skill_dir(project_root, ide_config=ide_config)
 
     locator = SkillLocator(skill_dir)
     return locator.load_all_skills()
