@@ -1,0 +1,101 @@
+# Jira Configuration for raise-commons
+# Used by rai-cli and AI agents to interact with Jira without token-expensive discovery.
+# Deterministic reference — agents read this instead of querying workflows each time.
+
+# ─── Projects ────────────────────────────────────────────────────────────────
+
+projects:
+  RAISE:
+    name: RAISE
+    category: Development
+    description: Framework development (CLI, skills, memory, discovery)
+    board_type: scrum
+
+  RGTM:
+    name: RaiSE GTM
+    category: Go-to-Market
+    description: Marketing strategy, content, campaigns, sales enablement
+    board_type: scrum
+
+# ─── Workflow (shared by both projects) ──────────────────────────────────────
+# All transitions are open from any state (no restrictions).
+
+workflow:
+  states:
+    - name: Backlog
+      id: 11
+      category: To Do
+      description: Not yet prioritized
+
+    - name: Selected for Development
+      id: 21
+      category: To Do
+      description: Prioritized, ready to start
+
+    - name: In Progress
+      id: 31
+      category: In Progress
+      description: Actively being worked on
+
+    - name: Done
+      id: 41
+      category: Done
+      description: Completed and verified
+
+  # Mapping from RaiSE lifecycle to Jira transitions
+  lifecycle_mapping:
+    story_start: 31        # → In Progress
+    story_close: 41        # → Done
+    epic_start: 31         # → In Progress
+    epic_close: 41         # → Done
+    selected: 21           # → Selected for Development
+    backlog: 11            # → Backlog
+
+# ─── Team ────────────────────────────────────────────────────────────────────
+# Identifiers that work with MCP jira_create_issue / jira_update_issue assignee field.
+
+team:
+  - name: Emilio Osorio
+    identifier: emilio@humansys.ai    # email works
+    role: lead-dev
+    focus: product, architecture
+
+  - name: Aquiles Lázaro
+    identifier: "557058:890eb66c-5965-47ea-9f36-f9dc8f3b4547"  # account_id (no email in Jira)
+    role: devops
+    focus: CI/CD, quality gates, Windows
+
+  - name: gerardo davila
+    identifier: "gerardo davila"         # display name works for assignment (account_id fails on Sub-task create)
+    account_id: "712020:8448ec75-857f-4fbc-8da8-8e0fc3bdfa37"  # keep for JQL queries
+    role: cs-mobile
+    focus: Flutter/Dart, customer success
+
+  - name: Fernando Rodriguez Zapata
+    identifier: fernando@humansys.ai   # email works
+    role: enablement
+    focus: training, onboarding, content
+
+# ─── Issue Types ─────────────────────────────────────────────────────────────
+
+issue_types:
+  - Epic       # Collection of related stories
+  - Story      # User-facing feature or deliverable
+  - Task       # Technical work item
+  - Bug        # Defect
+  - Sub-task   # Child of Story/Task (use 'Sub-task', NOT 'Subtask')
+
+# ─── Usage Notes for Agents ─────────────────────────────────────────────────
+#
+# To assign an issue:
+#   Use the 'identifier' field from the team section as the assignee value.
+#
+# To transition an issue:
+#   Use mcp__atlassian__jira_transition_issue with the state 'id' from workflow.states.
+#   All transitions are open — you can move from any state to any state.
+#
+# To link a story to an epic:
+#   Use additional_fields: {"parent": "RAISE-XXX"} when creating the issue.
+#
+# Project key in JQL:
+#   RAISE is a reserved word — always quote it: project = "RAISE"
