@@ -3,8 +3,11 @@
 Assembles a token-optimized context bundle (~600 tokens) from multiple sources:
 1. ~/.rai/developer.yaml → developer model + coaching + deadlines
 2. .raise/rai/session-state.yaml → current work state
-3. Memory graph → foundational patterns, governance primes, identity primes
+3. Memory graph → foundational patterns, governance primes
 4. .raise/rai/personal/sessions/index.jsonl → recent sessions
+
+Note: Identity primes (RAI-VAL-*, RAI-BND-*) are no longer emitted here.
+They live in CLAUDE.md as always-on content (ADR-012).
 """
 
 from __future__ import annotations
@@ -218,31 +221,6 @@ def _format_governance_primes(always_on_nodes: list[ConceptNode]) -> str:
         lines.append(f"- {n.id}: {content}")
     return "\n".join(lines)
 
-
-def _format_identity_primes(always_on_nodes: list[ConceptNode]) -> str:
-    """Format identity primes (RAI-VAL-* values + RAI-BND-* boundaries).
-
-    Args:
-        always_on_nodes: All always_on nodes from the graph.
-
-    Returns:
-        Formatted identity primes section, or empty string if none.
-    """
-    identity = [
-        n
-        for n in always_on_nodes
-        if n.id.startswith("RAI-VAL-") or n.id.startswith("RAI-BND-")
-    ]
-    if not identity:
-        return ""
-
-    lines = ["# Identity Primes"]
-    for n in identity:
-        content = n.content
-        if len(content) > 80:
-            content = content[:77] + "..."
-        lines.append(f"- {n.id}: {content}")
-    return "\n".join(lines)
 
 
 def _format_progress(state: SessionState | None) -> str:
@@ -485,10 +463,7 @@ def assemble_context_bundle(
     if gov_primes:
         sections.append(gov_primes)
 
-    # Identity primes (RAI-VAL-*, RAI-BND-*)
-    id_primes = _format_identity_primes(always_on)
-    if id_primes:
-        sections.append(id_primes)
+    # Identity primes (RAI-VAL-*, RAI-BND-*) removed — now in CLAUDE.md (ADR-012)
 
     # Behavioral primes (foundational patterns)
     primes = _format_primes(patterns)

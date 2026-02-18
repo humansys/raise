@@ -26,7 +26,6 @@ from rai_cli.schemas.session_state import (
 )
 from rai_cli.session.bundle import (
     _format_governance_primes,
-    _format_identity_primes,
     _format_progress,
     _format_recent_sessions,
     assemble_context_bundle,
@@ -144,11 +143,11 @@ class TestAssembleContextBundle:
         assert "architecture" in bundle
         assert "# Pending" in bundle
         assert "Pattern curation" in bundle
-        # New sections
+        # Governance primes present, identity primes removed (ADR-012: moved to CLAUDE.md)
         assert "# Governance Primes" in bundle
         assert "guardrail-must-code-001" in bundle
-        assert "# Identity Primes" in bundle
-        assert "RAI-VAL-1" in bundle
+        assert "# Identity Primes" not in bundle
+        assert "RAI-VAL-1" not in bundle
         assert "5/8" in bundle
         assert "16/25" in bundle
         assert "E1, E2" in bundle
@@ -557,37 +556,36 @@ class TestFormatGovernancePrimes:
         assert "..." in result
 
 
-class TestFormatIdentityPrimes:
-    """Tests for _format_identity_primes."""
+class TestIdentityPrimesRemoved:
+    """Verify identity primes are no longer emitted (ADR-012)."""
 
-    def test_formats_identity_nodes(self) -> None:
-        """Identity primes include RAI-VAL-* and RAI-BND-* nodes."""
-        nodes = [
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_identity_nodes_not_in_bundle(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Identity nodes (RAI-VAL-*, RAI-BND-*) are not emitted in bundle."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = [
             _make_always_on_node("RAI-VAL-1", "principle", "Honesty over agreement"),
             _make_always_on_node("RAI-BND-1", "principle", "Stop on incoherence"),
+            _make_always_on_node(
+                "guardrail-must-code-001", "guardrail", "[MUST] Type hints"
+            ),
         ]
-        result = _format_identity_primes(nodes)
-        assert "# Identity Primes" in result
-        assert "RAI-VAL-1" in result
-        assert "RAI-BND-1" in result
 
-    def test_excludes_non_identity(self) -> None:
-        """Non-identity nodes are excluded."""
-        nodes = [
-            _make_always_on_node("guardrail-must-code-001", "guardrail", "Type hints"),
-            _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
-        ]
-        result = _format_identity_primes(nodes)
-        assert "guardrail-must-code-001" not in result
-        assert "RAI-VAL-1" in result
+        profile = DeveloperProfile(name="Test")
+        bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-    def test_returns_empty_string_when_no_identity(self) -> None:
-        """Returns empty string when no identity nodes."""
-        nodes = [
-            _make_always_on_node("guardrail-must-code-001", "guardrail", "Type hints"),
-        ]
-        result = _format_identity_primes(nodes)
-        assert result == ""
+        # Governance primes still present
+        assert "# Governance Primes" in bundle
+        assert "guardrail-must-code-001" in bundle
+        # Identity primes removed — now in CLAUDE.md
+        assert "# Identity Primes" not in bundle
+        assert "RAI-VAL-1" not in bundle
+        assert "RAI-BND-1" not in bundle
 
 
 class TestFormatProgress:
