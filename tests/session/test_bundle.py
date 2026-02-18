@@ -108,10 +108,10 @@ class TestAssembleContextBundle:
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_full_bundle_contains_all_sections(
+    def test_lean_bundle_has_orientation_and_manifest(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Full bundle contains all sections including new ones."""
+        """Lean bundle contains orientation + manifest, NOT priming sections."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = [
@@ -126,37 +126,29 @@ class TestAssembleContextBundle:
 
         profile = _make_profile()
         state = _make_state()
-        state.progress = EpicProgress(
-            epic="E15",
-            stories_done=5,
-            stories_total=8,
-            sp_done=16,
-            sp_total=25,
-        )
-        state.completed_epics = ["E1", "E2"]
         bundle = assemble_context_bundle(profile, state, Path("/project"))
 
+        # Orientation sections present
         assert "# Session Context" in bundle
         assert "Developer: Emilio (ri)" in bundle
         assert "Story: S15.7 [implement]" in bundle
         assert "Epic: E15" in bundle
         assert "SES-097" in bundle
-        assert "# Deadlines" in bundle
-        assert "F&F" in bundle
-        assert "# Behavioral Primes" in bundle
-        assert "PAT-187" in bundle
-        assert "# Coaching" in bundle
-        assert "architecture" in bundle
         assert "# Pending" in bundle
         assert "Pattern curation" in bundle
-        # Governance primes present, identity primes removed (ADR-012: moved to CLAUDE.md)
-        assert "# Governance Primes" in bundle
-        assert "guardrail-must-code-001" in bundle
-        assert "# Identity Primes" not in bundle
-        assert "RAI-VAL-1" not in bundle
-        assert "5/8" in bundle
-        assert "16/25" in bundle
-        assert "E1, E2" in bundle
+
+        # Manifest present
+        assert "# Available Context" in bundle
+        assert "governance:" in bundle
+        assert "behavioral:" in bundle
+
+        # Priming sections NOT present (moved to rai session context)
+        assert "# Governance Primes" not in bundle
+        assert "guardrail-must-code-001" not in bundle
+        assert "# Behavioral Primes" not in bundle
+        assert "PAT-187" not in bundle
+        assert "# Coaching" not in bundle
+        assert "# Deadlines" not in bundle
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -225,10 +217,10 @@ class TestAssembleContextBundle:
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_deadline_days_remaining(
+    def test_deadline_in_manifest_not_inline(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Deadlines show days remaining."""
+        """Deadlines appear in manifest count, not inline."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -240,7 +232,11 @@ class TestAssembleContextBundle:
         )
         bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-        assert "(today)" in bundle
+        # Deadline count in manifest
+        assert "deadlines: 1 items" in bundle
+        # Deadline details NOT inline (moved to rai session context)
+        assert "Soon" not in bundle
+        assert "(today)" not in bundle
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -273,10 +269,10 @@ class TestAssembleContextBundle:
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_coaching_shows_trust_and_relationship(
+    def test_coaching_in_manifest_not_inline(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Coaching section shows trust level, autonomy, and relationship."""
+        """Coaching appears in manifest count, not inline."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -295,32 +291,11 @@ class TestAssembleContextBundle:
         )
         bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-        assert "Trust: developing" in bundle
-        assert "Autonomy: high within scope" in bundle
-        assert "Relationship: productive (growing)" in bundle
-
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_coaching_omits_default_trust_and_relationship(
-        self, mock_patterns: object, mock_always_on: object
-    ) -> None:
-        """Coaching section omits trust and relationship at default values."""
-        assert callable(mock_patterns)
-        assert callable(mock_always_on)
-        mock_patterns.return_value = []
-        mock_always_on.return_value = []
-
-        profile = DeveloperProfile(
-            name="Test",
-            coaching=CoachingContext(strengths=["design"]),
-        )
-        bundle = assemble_context_bundle(profile, None, Path("/project"))
-
-        assert "# Coaching" in bundle
-        assert "Strengths: design" in bundle
-        assert "Trust:" not in bundle
-        assert "Autonomy:" not in bundle
-        assert "Relationship:" not in bundle
+        # Coaching count in manifest
+        assert "coaching: 1 items" in bundle
+        # Coaching details NOT inline (moved to rai session context)
+        assert "Trust: developing" not in bundle
+        assert "# Coaching" not in bundle
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -570,7 +545,7 @@ class TestIdentityPrimesRemoved:
     def test_identity_nodes_not_in_bundle(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Identity nodes (RAI-VAL-*, RAI-BND-*) are not emitted in bundle."""
+        """Identity nodes (RAI-VAL-*, RAI-BND-*) are not emitted in lean bundle."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -585,13 +560,15 @@ class TestIdentityPrimesRemoved:
         profile = DeveloperProfile(name="Test")
         bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-        # Governance primes still present
-        assert "# Governance Primes" in bundle
-        assert "guardrail-must-code-001" in bundle
-        # Identity primes removed — now in CLAUDE.md
+        # Lean bundle has no governance inline — only in manifest
+        assert "# Governance Primes" not in bundle
+        assert "guardrail-must-code-001" not in bundle
+        # Identity primes also absent
         assert "# Identity Primes" not in bundle
         assert "RAI-VAL-1" not in bundle
         assert "RAI-BND-1" not in bundle
+        # Governance count in manifest (2 non-identity out of 3)
+        assert "governance: 1 items" in bundle
 
 
 class TestFormatProgress:
@@ -944,7 +921,7 @@ class TestFormatNarrative:
     def test_narrative_appears_after_last_session(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Narrative section appears after Last: line in bundle."""
+        """Narrative section appears after Last: line and before manifest."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -967,9 +944,9 @@ class TestFormatNarrative:
 
         last_pos = bundle.find("Last:")
         narrative_pos = bundle.find("# Session Narrative")
-        primes_pos = bundle.find("# Governance Primes")
+        manifest_pos = bundle.find("# Available Context")
 
-        assert last_pos < narrative_pos < primes_pos
+        assert last_pos < narrative_pos < manifest_pos
 
 
 class TestFormatNextSessionPrompt:
