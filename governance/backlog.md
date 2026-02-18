@@ -31,7 +31,7 @@
 | E18 | **Pre-Launch Repo Readiness** | ✅ Complete | `work/epics/e18-prelaunch-repo/scope.md` | — |
 | **E-DEMO** | **JIRA Sync Enabler** | 🚀 In Progress | `demo/atlassian-webinar/scope.md` | P0 (Demo) |
 | [RAISE-127](https://humansys.atlassian.net/browse/RAISE-127) | **Multi-Agent Support** | 🚀 In Progress (pt1 done, pt2 pending) | `work/epics/raise-127-multi-agent/scope.md` | P0 (v2.1) |
-| [RAISE-128](https://humansys.atlassian.net/browse/RAISE-128) | **IDE Integration** | 🚀 In Progress | `work/epics/raise-128-ide-integration/scope.md` | P1 (v2.1) |
+| [RAISE-128](https://humansys.atlassian.net/browse/RAISE-128) | **IDE Integration** | ✅ Complete | `work/epics/raise-128-ide-integration/scope.md` | P1 (v2.1) |
 | [RAISE-135](https://humansys.atlassian.net/browse/RAISE-135) | **Hierarchical Memory Architecture** (was E20) | 📋 Backlog | — | P1 (v2.1+) |
 | [RAISE-140](https://humansys.atlassian.net/browse/RAISE-140) | **V3 Product Design** (was E19) | 📋 Backlog | — | P1 (V3) |
 | [RAISE-141](https://humansys.atlassian.net/browse/RAISE-141) | **Platform Integration — Backlog Backends** (was E21) | 📋 Backlog | — | P1 (V3) |
