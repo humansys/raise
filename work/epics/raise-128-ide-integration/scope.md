@@ -21,7 +21,7 @@ Make `rai init` work with Antigravity by introducing an IDE abstraction layer, d
 | # | ID | Feature | Size | Status | Description |
 |---|-----|---------|:----:|:------:|-------------|
 | 1 | F128.1 | IDE Configuration Model | S | Done | `IdeType` literal, `IdeConfig` Pydantic model (frozen), factory, manifest schema extension |
-| 2 | F128.2 | Decouple Init from Claude Paths | M | Pending | Refactor 6 hardcoded `.claude/` references to use `IdeConfig` |
+| 2 | F128.2 | Decouple Init from Claude Paths | M | Done | Refactored 4 coupling points to use `IdeConfig` (scope corrected from 6→4 via gemba) |
 | 3 | F128.3 | Antigravity Scaffolding | S | Pending | Generate `.agent/skills/`, `.agent/rules/raise.md`, `.agent/workflows/` |
 | 4 | F128.4 | Init --ide Flag + E2E Tests | S | Pending | Wire CLI flag, end-to-end validation for both IDEs |
 
@@ -189,12 +189,12 @@ F128.4 (--ide flag + E2E tests)
 | Feature | Size | Status | Actual | Notes |
 |---------|:----:|:------:|:------:|-------|
 | F128.1: IDE Configuration Model | S | Done | 20 min | 3.0x velocity |
-| F128.2: Decouple Init from Claude Paths | M | Pending | - | |
+| F128.2: Decouple Init from Claude Paths | M | Done | 25 min | 2.6x velocity |
 | F128.3: Antigravity Scaffolding | S | Pending | - | |
 | F128.4: Init --ide Flag + E2E Tests | S | Pending | - | |
 
 **Milestone Progress:**
-- [ ] M1: Abstraction Ready (F128.1 + F128.2)
+- [x] M1: Abstraction Ready (F128.1 + F128.2) ✓
 - [ ] M2: Multi-IDE MVP (+F128.3)
 - [ ] M3: Epic Complete (+F128.4)
 
@@ -203,4 +203,5 @@ F128.4 (--ide flag + E2E tests)
 *Created: 2026-02-17*
 *Plan added: 2026-02-17*
 *F128.1 closed: 2026-02-17*
-*Next: `/rai-story-start` for F128.2*
+*F128.2 closed: 2026-02-18*
+*Next: `/rai-story-start` for F128.3*
