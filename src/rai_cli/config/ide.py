@@ -9,11 +9,19 @@ Architecture decision: ADR-031 (IdeConfig pattern).
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
 IdeType = Literal["claude", "antigravity"]
+
+
+class IdeChoice(str, Enum):
+    """Typer-compatible enum for --ide CLI option."""
+
+    claude = "claude"
+    antigravity = "antigravity"
 
 
 class IdeConfig(BaseModel):
