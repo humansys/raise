@@ -112,6 +112,7 @@ class UnifiedQueryMetadata(BaseModel):
         query: Original query string.
         strategy: Strategy used for execution.
         total_concepts: Number of concepts in result.
+        total_available: Total matching concepts before limit applied.
         token_estimate: Estimated token count for result.
         execution_time_ms: Query execution time in milliseconds.
         types_found: Count of concepts by type.
@@ -121,6 +122,7 @@ class UnifiedQueryMetadata(BaseModel):
         ...     query="planning",
         ...     strategy=UnifiedQueryStrategy.KEYWORD_SEARCH,
         ...     total_concepts=5,
+        ...     total_available=12,
         ...     token_estimate=320,
         ...     execution_time_ms=8.5,
         ...     types_found={"pattern": 2, "calibration": 2, "skill": 1},
@@ -130,6 +132,9 @@ class UnifiedQueryMetadata(BaseModel):
     query: str = Field(..., description="Original query string")
     strategy: UnifiedQueryStrategy = Field(..., description="Strategy used")
     total_concepts: int = Field(..., description="Number of concepts returned")
+    total_available: int = Field(
+        0, description="Total matching concepts before limit applied"
+    )
     token_estimate: int = Field(..., description="Estimated token count")
     execution_time_ms: float = Field(..., description="Execution time in ms")
     types_found: dict[str, int] = Field(
@@ -279,18 +284,22 @@ class UnifiedQueryEngine:
 
         # Execute strategy
         if query.strategy == UnifiedQueryStrategy.KEYWORD_SEARCH:
-            concepts = self._keyword_search(query)
+            concepts, total_available = self._keyword_search(query)
         else:  # CONCEPT_LOOKUP
-            concepts = self._concept_lookup(query)
+            concepts, total_available = self._concept_lookup(query)
 
         execution_time_ms = (time.time() - start_time) * 1000
 
         # Calculate metadata
-        metadata = self._calculate_metadata(query, concepts, execution_time_ms)
+        metadata = self._calculate_metadata(
+            query, concepts, execution_time_ms, total_available
+        )
 
         return UnifiedQueryResult(concepts=concepts, metadata=metadata)
 
-    def _keyword_search(self, query: UnifiedQuery) -> list[ConceptNode]:
+    def _keyword_search(
+        self, query: UnifiedQuery
+    ) -> tuple[list[ConceptNode], int]:
         """Execute keyword search strategy.
 
         Matches keywords against node content, returns top N by relevance.
@@ -299,11 +308,11 @@ class UnifiedQueryEngine:
             query: Query parameters.
 
         Returns:
-            List of matching concepts sorted by relevance.
+            Tuple of (matching concepts sorted by relevance, total matches before limit).
         """
         keywords = query.query.lower().split()
         if not keywords:
-            return []
+            return [], 0
 
         scored_concepts: list[tuple[float, ConceptNode]] = []
 
@@ -328,10 +337,15 @@ class UnifiedQueryEngine:
         # Sort by score descending
         scored_concepts.sort(key=lambda x: x[0], reverse=True)
 
-        # Apply limit
-        return [concept for _, concept in scored_concepts[: query.limit]]
+        total_available = len(scored_concepts)
 
-    def _concept_lookup(self, query: UnifiedQuery) -> list[ConceptNode]:
+        # Apply limit
+        limited = [concept for _, concept in scored_concepts[: query.limit]]
+        return limited, total_available
+
+    def _concept_lookup(
+        self, query: UnifiedQuery
+    ) -> tuple[list[ConceptNode], int]:
         """Execute concept lookup strategy.
 
         Direct ID lookup with optional BFS neighbor traversal.
@@ -340,14 +354,14 @@ class UnifiedQueryEngine:
             query: Query parameters.
 
         Returns:
-            List of concepts (target + neighbors if depth > 0).
+            Tuple of (concepts list, total matches before limit).
         """
         concept_id = query.query
 
         # Direct lookup
         concept = self.graph.get_concept(concept_id)
         if concept is None:
-            return []
+            return [], 0
 
         # Apply type filter to main concept
         if query.types and concept.type not in query.types:
@@ -368,14 +382,17 @@ class UnifiedQueryEngine:
                 if neighbor.id not in [c.id for c in concepts]:
                     concepts.append(neighbor)
 
+        total_available = len(concepts)
+
         # Apply limit
-        return concepts[: query.limit]
+        return concepts[: query.limit], total_available
 
     def _calculate_metadata(
         self,
         query: UnifiedQuery,
         concepts: list[ConceptNode],
         execution_time_ms: float,
+        total_available: int,
     ) -> UnifiedQueryMetadata:
         """Calculate metadata for query result.
 
@@ -383,6 +400,7 @@ class UnifiedQueryEngine:
             query: Original query.
             concepts: Concepts in result.
             execution_time_ms: Execution time in milliseconds.
+            total_available: Total matching concepts before limit applied.
 
         Returns:
             Query result metadata.
@@ -401,6 +419,7 @@ class UnifiedQueryEngine:
             query=query.query,
             strategy=query.strategy,
             total_concepts=len(concepts),
+            total_available=total_available,
             token_estimate=token_estimate,
             execution_time_ms=execution_time_ms,
             types_found=types_found,

@@ -262,6 +262,21 @@ class TestUnifiedQueryEngineConceptLookup:
         assert "SES-001" in ids
 
 
+    def test_concept_lookup_does_not_fallback_to_keyword(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """concept_lookup with non-existent ID returns empty, no fallback."""
+        result = engine.query(
+            UnifiedQuery(
+                query="singleton",  # exists as keyword but not as ID
+                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+            )
+        )
+        # Must return empty — no silent fallback to keyword_search
+        assert len(result.concepts) == 0
+        assert result.metadata.strategy == UnifiedQueryStrategy.CONCEPT_LOOKUP
+
+
 class TestUnifiedQueryEngineEdgeTypeFilter:
     """Tests for edge-type filtering in concept lookup."""
 
@@ -381,6 +396,41 @@ class TestUnifiedQueryEngineMetadata:
         result = engine.query(UnifiedQuery(query="pattern singleton"))
         if len(result.concepts) > 0:
             assert len(result.metadata.types_found) > 0
+
+    def test_total_available_equals_total_when_no_truncation(
+        self, engine: UnifiedQueryEngine
+    ) -> None:
+        """total_available equals total_concepts when results fit within limit."""
+        result = engine.query(UnifiedQuery(query="multiplier", limit=50))
+        assert result.metadata.total_available == result.metadata.total_concepts
+
+    def test_total_available_exceeds_total_when_truncated(
+        self, sample_graph: UnifiedGraph
+    ) -> None:
+        """total_available > total_concepts when limit truncates results."""
+        # Add extra nodes that share a keyword to guarantee truncation
+        sample_graph.add_concept(
+            ConceptNode(
+                id="PAT-EXTRA-1",
+                type="pattern",
+                content="velocity tracking for estimation",
+                source_file="test",
+                created="2026-02-01",
+            )
+        )
+        sample_graph.add_concept(
+            ConceptNode(
+                id="PAT-EXTRA-2",
+                type="pattern",
+                content="velocity calibration method",
+                source_file="test",
+                created="2026-02-01",
+            )
+        )
+        eng = UnifiedQueryEngine(sample_graph)
+        result = eng.query(UnifiedQuery(query="velocity", limit=1))
+        assert result.metadata.total_concepts == 1
+        assert result.metadata.total_available >= 2
 
 
 class TestUnifiedQueryEngineFromFile:
