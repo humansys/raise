@@ -656,10 +656,11 @@ def assemble_context_bundle(
     project_path: Path,
     session_id: str | None = None,
 ) -> str:
-    """Assemble token-optimized context bundle from multiple sources.
+    """Assemble lean context bundle: orientation + manifest.
 
-    Currently emits full bundle (orientation + all priming sections) for
-    backward compatibility. Will be made lean in a subsequent task.
+    Emits always-on orientation sections plus a manifest of available
+    priming sections (with counts and token estimates). Priming sections
+    are loaded separately via `rai session context --sections`.
 
     Args:
         profile: Developer profile from ~/.rai/developer.yaml.
@@ -668,77 +669,26 @@ def assemble_context_bundle(
         session_id: Optional session identifier (e.g., "SES-177").
 
     Returns:
-        Plain text context bundle, ~600 tokens.
+        Plain text context bundle: orientation + manifest.
     """
-    patterns = get_foundational_patterns(project_path)
-    always_on = get_always_on_primes(project_path)
+    # Orientation (always-on sections)
+    orientation = assemble_orientation(profile, state, project_path, session_id)
 
-    # Resolve release context for current epic
-    release_node: ConceptNode | None = None
-    if state and state.current_work.epic:
-        release_node = _find_release_for_current_epic(
-            project_path, state.current_work.epic
-        )
+    # Build manifest for available priming sections
+    manifests: list[SectionManifest] = []
+    for section_name in SECTION_REGISTRY:
+        count = count_section_items(section_name, project_path, profile, state)
+        tokens = count * _TOKENS_PER_ITEM.get(section_name, 20)
+        manifests.append(SectionManifest(
+            name=section_name,
+            count=count,
+            token_estimate=tokens,
+        ))
 
-    # Session Context header
-    sections: list[str] = [
-        "# Session Context",
-        _format_developer_section(profile),
-    ]
+    manifest = _format_manifest(manifests)
 
-    # Add session ID if provided
-    if session_id:
-        sections.append(f"Session: {session_id}")
+    parts = [orientation]
+    if manifest:
+        parts.append(manifest)
 
-    sections.append(_format_work_section(state, release_node=release_node))
-
-    # Progress (epic SP, completed epics)
-    progress = _format_progress(state)
-    if progress:
-        sections.append(progress)
-
-    # Last session + recent sessions
-    sections.append(_format_last_session(state))
-    recent = _format_recent_sessions(project_path)
-    if recent:
-        sections.append(recent)
-
-    # Session narrative (cross-session continuity — not truncated)
-    narrative = _format_narrative(state)
-    if narrative:
-        sections.append(narrative)
-
-    # Next session prompt (forward-looking guidance from Rai to future self)
-    next_prompt = _format_next_session_prompt(state)
-    if next_prompt:
-        sections.append(next_prompt)
-
-    # Deadlines
-    deadlines = _format_deadlines(profile)
-    if deadlines:
-        sections.append(deadlines)
-
-    # Governance primes (guardrails + principles, not identity)
-    gov_primes = _format_governance_primes(always_on)
-    if gov_primes:
-        sections.append(gov_primes)
-
-    # Identity primes (RAI-VAL-*, RAI-BND-*) removed — now in CLAUDE.md (ADR-012)
-
-    # Behavioral primes (foundational patterns)
-    primes = _format_primes(patterns)
-    if primes:
-        sections.append(primes)
-
-    # Coaching
-    coaching = _format_coaching(profile)
-    if coaching:
-        sections.append(coaching)
-
-    # Pending
-    pending = _format_pending(state)
-    if pending:
-        sections.append(pending)
-
-    # Filter empty sections, join with blank lines
-    return "\n\n".join(s for s in sections if s)
+    return "\n\n".join(parts)
