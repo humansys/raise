@@ -25,10 +25,13 @@ from rai_cli.schemas.session_state import (
     SessionState,
 )
 from rai_cli.session.bundle import (
+    SECTION_REGISTRY,
+    SectionManifest,
     _format_governance_primes,
     _format_progress,
     _format_recent_sessions,
     assemble_context_bundle,
+    count_section_items,
     get_always_on_primes,
     get_foundational_patterns,
 )
@@ -1069,3 +1072,104 @@ class TestGetFoundationalPatterns:
         result = get_foundational_patterns(tmp_path)
         assert len(result) == 1
         assert result[0].id == "PAT-187"
+
+
+class TestSectionRegistry:
+    """Tests for SECTION_REGISTRY and manifest model."""
+
+    def test_registry_has_all_five_sections(self) -> None:
+        """Registry contains all defined queryable sections."""
+        expected = {"governance", "behavioral", "coaching", "deadlines", "progress"}
+        assert set(SECTION_REGISTRY.keys()) == expected
+
+    def test_registry_values_are_callable(self) -> None:
+        """All registry values are callable format functions."""
+        for name, fn in SECTION_REGISTRY.items():
+            assert callable(fn), f"Section '{name}' is not callable"
+
+
+class TestSectionManifest:
+    """Tests for SectionManifest model."""
+
+    def test_manifest_creation(self) -> None:
+        """Manifest can be created with section name, count, and token estimate."""
+        m = SectionManifest(name="governance", count=14, token_estimate=350)
+        assert m.name == "governance"
+        assert m.count == 14
+        assert m.token_estimate == 350
+
+    def test_manifest_zero_count(self) -> None:
+        """Manifest with zero count is valid."""
+        m = SectionManifest(name="deadlines", count=0, token_estimate=0)
+        assert m.count == 0
+
+
+class TestCountSectionItems:
+    """Tests for count_section_items."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    def test_count_governance(self, mock_always_on: object) -> None:
+        """Counts governance items (always_on minus identity)."""
+        assert callable(mock_always_on)
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+            _make_always_on_node("guardrail-must-002", "guardrail", "Ruff"),
+            _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
+        ]
+        result = count_section_items("governance", Path("/project"), _make_profile(), _make_state())
+        assert result == 2  # 3 always_on minus 1 identity
+
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_count_behavioral(self, mock_patterns: object) -> None:
+        """Counts behavioral items (foundational patterns)."""
+        assert callable(mock_patterns)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-1", "Pattern one"),
+            _make_pattern("PAT-2", "Pattern two"),
+        ]
+        result = count_section_items("behavioral", Path("/project"), _make_profile(), _make_state())
+        assert result == 2
+
+    def test_count_coaching_with_content(self) -> None:
+        """Counts coaching as 1 when content exists."""
+        profile = _make_profile()
+        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        assert result == 1
+
+    def test_count_coaching_empty(self) -> None:
+        """Counts coaching as 0 when no content."""
+        profile = DeveloperProfile(name="New")
+        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        assert result == 0
+
+    def test_count_deadlines(self) -> None:
+        """Counts deadlines from profile."""
+        profile = _make_profile()  # has 2 deadlines
+        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        assert result == 2
+
+    def test_count_deadlines_empty(self) -> None:
+        """Counts deadlines as 0 when none."""
+        profile = DeveloperProfile(name="New")
+        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        assert result == 0
+
+    def test_count_progress_with_data(self) -> None:
+        """Counts progress as 1 when data exists."""
+        state = _make_state()
+        state.progress = EpicProgress(
+            epic="E15", stories_done=2, stories_total=5, sp_done=6, sp_total=15
+        )
+        result = count_section_items("progress", Path("/project"), _make_profile(), state)
+        assert result == 1
+
+    def test_count_progress_without_data(self) -> None:
+        """Counts progress as 0 when no progress data."""
+        result = count_section_items("progress", Path("/project"), _make_profile(), _make_state())
+        assert result == 0
+
+    def test_count_unknown_section_raises(self) -> None:
+        """Unknown section name raises ValueError."""
+        import pytest
+        with pytest.raises(ValueError, match="Unknown section"):
+            count_section_items("unknown", Path("/project"), _make_profile(), _make_state())

@@ -14,8 +14,11 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
+
+from pydantic import BaseModel
 
 from rai_cli.context.graph import UnifiedGraph
 from rai_cli.context.models import ConceptNode
@@ -391,6 +394,117 @@ def _format_pending(state: SessionState | None) -> str:
         for n in pending.next_actions:
             lines.append(f"- {n}")
     return "\n".join(lines)
+
+
+# ---------------------------------------------------------------------------
+# Section registry and manifest
+# ---------------------------------------------------------------------------
+
+
+class SectionManifest(BaseModel):
+    """Manifest entry for a queryable context section."""
+
+    name: str
+    count: int
+    token_estimate: int
+
+
+def _count_governance(project_path: Path) -> int:
+    """Count governance items (always_on nodes minus identity)."""
+    nodes = get_always_on_primes(project_path)
+    return len([
+        n for n in nodes
+        if not n.id.startswith("RAI-VAL-") and not n.id.startswith("RAI-BND-")
+    ])
+
+
+def _count_behavioral(project_path: Path) -> int:
+    """Count foundational pattern items."""
+    return len(get_foundational_patterns(project_path))
+
+
+def _count_coaching(profile: DeveloperProfile) -> int:
+    """Count coaching items (1 if content exists, 0 otherwise)."""
+    coaching = profile.coaching
+    has_content = (
+        coaching.strengths
+        or coaching.growth_edge
+        or coaching.trust_level != "new"
+        or coaching.autonomy
+        or coaching.relationship.quality != "new"
+    )
+    return 1 if has_content else 0
+
+
+def _count_deadlines(profile: DeveloperProfile) -> int:
+    """Count deadline items."""
+    return len(profile.deadlines)
+
+
+def _count_progress(state: SessionState | None) -> int:
+    """Count progress items (1 if exists, 0 otherwise)."""
+    if state is None or state.progress is None:
+        return 0
+    return 1
+
+
+# Average tokens per item, estimated from real data
+_TOKENS_PER_ITEM: dict[str, int] = {
+    "governance": 25,
+    "behavioral": 20,
+    "coaching": 80,
+    "deadlines": 30,
+    "progress": 40,
+}
+
+
+def count_section_items(
+    section: str,
+    project_path: Path,
+    profile: DeveloperProfile,
+    state: SessionState | None,
+) -> int:
+    """Count items in a named section.
+
+    Args:
+        section: Section name from SECTION_REGISTRY.
+        project_path: Absolute path to the project root.
+        profile: Developer profile.
+        state: Session state (may be None).
+
+    Returns:
+        Number of items in the section.
+
+    Raises:
+        ValueError: If section name is not in SECTION_REGISTRY.
+    """
+    if section not in SECTION_REGISTRY:
+        raise ValueError(f"Unknown section: '{section}'. Valid: {sorted(SECTION_REGISTRY.keys())}")
+
+    if section == "governance":
+        return _count_governance(project_path)
+    if section == "behavioral":
+        return _count_behavioral(project_path)
+    if section == "coaching":
+        return _count_coaching(profile)
+    if section == "deadlines":
+        return _count_deadlines(profile)
+    if section == "progress":
+        return _count_progress(state)
+
+    return 0  # unreachable but satisfies pyright
+
+
+# Registry: section name → format function
+# Format functions have heterogeneous signatures; the registry maps names
+# for validation and dispatch. Actual calling happens in assemble_sections().
+SECTION_REGISTRY: dict[str, Callable[..., str]] = {
+    "governance": _format_governance_primes,
+    "behavioral": _format_primes,
+    "coaching": _format_coaching,
+    "deadlines": _format_deadlines,
+    "progress": _format_progress,
+}
 
 
 def assemble_context_bundle(
