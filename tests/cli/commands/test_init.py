@@ -748,3 +748,130 @@ class TestInitSkillRecommendation:
 
         assert result.exit_code == 0
         assert "/rai-project-onboard" in result.output
+
+
+class TestInitIdeFlag:
+    """Tests for --ide flag (multi-IDE scaffolding)."""
+
+    def test_default_produces_claude_structure(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Default rai init (no --ide) produces .claude/ structure."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        # Claude structure
+        assert (greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert not (greenfield_project / ".agent").exists()
+
+    def test_explicit_claude_identical_to_default(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--ide claude produces same structure as default."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--ide", "claude"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert not (greenfield_project / ".agent").exists()
+
+    def test_antigravity_produces_agent_structure(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--ide antigravity produces .agent/ structure."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--ide", "antigravity"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        # Antigravity skills structure
+        assert (greenfield_project / ".agent" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        # Workflows directory created by scaffold_workflows
+        assert (greenfield_project / ".agent" / "workflows").is_dir()
+        # No Claude structure
+        assert not (greenfield_project / ".claude").exists()
+        assert not (greenfield_project / "CLAUDE.md").exists()
+
+    def test_antigravity_no_claude_memory_copy(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--ide antigravity does NOT write Claude Code MEMORY.md copy."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with (
+            patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home),
+            patch(
+                "rai_cli.config.paths.get_claude_memory_path"
+            ) as mock_claude_mem,
+        ):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--ide", "antigravity"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        # Canonical MEMORY.md still exists
+        canonical = greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
+        assert canonical.exists()
+        # get_claude_memory_path should NOT have been called for antigravity
+        mock_claude_mem.assert_not_called()
+
+    def test_antigravity_with_detect(
+        self, brownfield_project: Path, mock_home: Path
+    ) -> None:
+        """--ide antigravity --detect writes to .agent/rules/raise.md not CLAUDE.md."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                [
+                    "init",
+                    "--path", str(brownfield_project),
+                    "--ide", "antigravity",
+                    "--detect",
+                ],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        # Instructions file at Antigravity path
+        assert (brownfield_project / ".agent" / "rules" / "raise.md").exists()
+        # NOT at Claude path
+        assert not (brownfield_project / "CLAUDE.md").exists()
+
+    def test_canonical_memory_exists_for_both_ides(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Canonical MEMORY.md in .raise/rai/memory/ exists regardless of IDE."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        for ide in ("claude", "antigravity"):
+            project = greenfield_project / ide
+            project.mkdir()
+            with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+                result = runner.invoke(
+                    app,
+                    ["init", "--path", str(project), "--ide", ide],
+                    catch_exceptions=False,
+                )
+            assert result.exit_code == 0
+            canonical = project / ".raise" / "rai" / "memory" / "MEMORY.md"
+            assert canonical.exists(), f"Canonical MEMORY.md missing for --ide {ide}"

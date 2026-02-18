@@ -42,6 +42,11 @@
   - **Priority:** High — enables PRO tier, Atlassian partnership demo, customer delivery.
   - **Depends on:** E18 complete (repo public, CI/CD live).
 
+- [x] **E-NEXT: Multi-IDE Portability** — ✓ Promoted to RAISE-128 (epic/raise-128/ide-integration). Antigravity focus first, Gemini CLI deferred.
+  - **Deferred to future story:** Gemini CLI support (`--ide gemini`, `.gemini/skills/`, `GEMINI.md`, `.gemini/commands/*.toml`)
+  - **Deferred to future epic:** Other IDEs (Cursor, Windsurf, Continue, Amazon Q, Codex CLI)
+  - **Deferred to parking lot:** `rai migrate --ide` for existing projects (convert `.claude/` → `.agent/` in-place)
+
 - [ ] **Rovo AI integration implementation** - Required for Mar 14 webinar (V3 scope)
 - [ ] **V3: Rai as Commercial Offering** - Hosted Rai before Mar 14 webinar:
   - Rai = trained RaiSE agent (not generic Claude)
@@ -58,6 +63,11 @@
       - **Lost-in-the-middle:** calidad se degrada con contexto acumulado largo — argumento adicional para breaks frecuentes como práctica, no solo como emergencia.
     - [ ] Hybrid skills — markdown process + JSON schema + validation code
 
+- [ ] **Session duration tracking** — (SES-011 raise-gtm, 2026-02-16)
+  - **Problem:** `rai session start/close` only records date, not timestamps. No way to measure actual session duration. Calibration data (estimated vs actual minutes) is manually estimated from commit timestamps, not measured.
+  - **What:** Record ISO timestamps on session start and close in `sessions/index.jsonl`. Calculate and display duration on close. Enable velocity analysis across sessions.
+  - **Priority:** Medium — low effort, high compound value for calibration accuracy
+
 ---
 
 ## Process Debt
@@ -69,6 +79,13 @@
   - **Also needed:** `rai epic update-status E{N} --status complete` for close, and backlog sync during planning sessions when future epics are defined.
   - **Priority:** High — backlog is the authoritative epic index; if it drifts, the ontology graph is incomplete.
   - **Related:** PAT-194 (infrastructure without wiring), PAT-196 (stale docs → wrong paths)
+
+- [ ] **Skill sync on upgrade — `rai skill sync`** — (SES-007, 2026-02-17)
+  - **Problem:** `scaffold_skills()` is idempotent — skips existing `SKILL.md` files. When user upgrades rai-cli via pip, project skills stay at the version from first `rai init`. No mechanism to detect stale skills or pull updates.
+  - **What:** `rai skill sync` command that compares bundled skills (in `skills_base/`) against project skills (`.claude/skills/`), detects version drift, and updates with user confirmation.
+  - **Considerations:** Needs version tracking per skill (frontmatter `version` field already exists). Diff display before overwrite. Backup of customized skills.
+  - **Priority:** Medium — affects every project that upgrades rai-cli
+  - **Related:** RAISE-144 (Engineering Health)
 
 ---
 

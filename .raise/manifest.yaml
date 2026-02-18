@@ -1,9 +1,9 @@
 version: '1.0'
 project:
-  name: rai-cli
+  name: raise-commons
   project_type: brownfield
-  code_file_count: 182
-  detected_at: '2026-02-09T00:27:11.229956Z'
+  code_file_count: 247
+  detected_at: '2026-02-17T19:41:33.004480Z'
 branches:
-  development: v2
+  development: main
   main: main
