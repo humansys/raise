@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from rai_cli.config.ide import get_ide_config
 from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
 from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
@@ -132,6 +133,31 @@ class TestScaffoldSkillsIdempotency:
         assert (
             tmp_path / ".claude" / "skills" / "rai-story-implement" / "SKILL.md"
         ).exists()
+
+
+class TestScaffoldSkillsIdeConfig:
+    """Tests for scaffold_skills() with IDE configuration."""
+
+    def test_scaffold_to_antigravity_dir(self, tmp_path: Path) -> None:
+        """Should scaffold skills to .agent/skills/ with antigravity config."""
+        config = get_ide_config("antigravity")
+        result = scaffold_skills(tmp_path, ide_config=config)
+
+        agent_skills = tmp_path / ".agent" / "skills"
+        for skill_name in DISTRIBUTABLE_SKILLS:
+            assert (agent_skills / skill_name / "SKILL.md").exists(), (
+                f"Missing: {skill_name}"
+            )
+        assert result.skills_copied == TOTAL_SKILLS
+        # .claude/skills/ should NOT exist
+        assert not (tmp_path / ".claude" / "skills").exists()
+
+    def test_scaffold_default_is_claude(self, tmp_path: Path) -> None:
+        """Default scaffold (no ide_config) still goes to .claude/skills/."""
+        result = scaffold_skills(tmp_path)
+
+        assert (tmp_path / ".claude" / "skills").exists()
+        assert result.skills_copied == TOTAL_SKILLS
 
 
 class TestScaffoldSkillsPartialState:
