@@ -25,7 +25,7 @@
 **Stories:**
 - [x] RAISE-166: Compact query format + concept_lookup fix + truncation (S) ✓ (2026-02-18)
 - [x] RAISE-165: Session startup overhead reduction (S) ✓ (2026-02-18)
-- RAISE-169: Task-relevant context bundle (M)
+- [x] RAISE-169: Task-relevant context bundle (M) ✓ (2026-02-18)
 - RAISE-170: Temporal decay and pattern scoring (M)
 - RAISE-171: Meta-cognition indicators (L)
 
