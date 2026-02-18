@@ -196,7 +196,12 @@ def query(
     result = engine.query(unified_query)
 
     # Format output
-    output_text = _format_json(result) if format == "json" else _format_markdown(result)
+    if format == "json":
+        output_text = _format_json(result)
+    elif format == "compact":
+        output_text = _format_compact(result)
+    else:
+        output_text = _format_markdown(result)
 
     # Write to file or stdout
     if output:
@@ -277,6 +282,45 @@ def _format_markdown(result: UnifiedQueryResult) -> str:
     lines.append(f"- Execution time: {result.metadata.execution_time_ms:.2f}ms")
     lines.append(f"- Token estimate: ~{result.metadata.token_estimate}")
     lines.append("")
+
+    return "\n".join(lines)
+
+
+_COMPACT_CONTENT_MAX = 150
+
+
+def _format_compact(result: UnifiedQueryResult) -> str:
+    """Format query result as compact Markdown-KV for AI consumption.
+
+    One line per result: **type** id: content (truncated at 150 chars).
+    Header with query, count, and strategy. Truncation footer when clipped.
+    """
+    meta = result.metadata
+    lines: list[str] = []
+
+    # Header: # Memory: query (N results, strategy)
+    lines.append(
+        f"# Memory: {meta.query} ({meta.total_concepts} results, {meta.strategy.value})"
+    )
+
+    # No results
+    if not result.concepts:
+        lines.append("*No results.*")
+        return "\n".join(lines)
+
+    # One Markdown-KV line per concept
+    for concept in result.concepts:
+        content = concept.content
+        if len(content) > _COMPACT_CONTENT_MAX:
+            content = content[:_COMPACT_CONTENT_MAX] + "..."
+        lines.append(f"**{concept.type}** {concept.id}: {content}")
+
+    # Truncation footer (only when results were clipped)
+    remaining = meta.total_available - meta.total_concepts
+    if remaining > 0:
+        lines.append(
+            f"[+{remaining} more — use --limit {meta.total_available} to see all]"
+        )
 
     return "\n".join(lines)
 
