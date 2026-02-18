@@ -13,22 +13,15 @@ Example:
     $ raise init --detect  # Detect conventions and generate guardrails
 """
 
-from __future__ import annotations
-
 from datetime import date
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated
-
-if TYPE_CHECKING:
-    from rai_cli.onboarding.bootstrap import BootstrapResult
-    from rai_cli.onboarding.governance import GovernanceScaffoldResult
-    from rai_cli.onboarding.skills import SkillScaffoldResult
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.panel import Panel
 
-from rai_cli.config.ide import IdeConfig, IdeType, get_ide_config
+from rai_cli.config.ide import IdeChoice, IdeConfig, IdeType, get_ide_config
 from rai_cli.onboarding.claudemd import generate_claude_md
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type
@@ -124,9 +117,9 @@ def _get_project_message(
     file_count: int,
     profile: DeveloperProfile | None,
     created_profile: bool,
-    bootstrap_result: BootstrapResult | None = None,
-    skills_result: SkillScaffoldResult | None = None,
-    governance_result: GovernanceScaffoldResult | None = None,
+    bootstrap_result: "BootstrapResult | None" = None,
+    skills_result: "SkillScaffoldResult | None" = None,
+    governance_result: "GovernanceScaffoldResult | None" = None,
     ide_config: IdeConfig | None = None,
 ) -> str:
     """Get project detection message based on experience level.
@@ -296,12 +289,12 @@ def init_command(
         ),
     ] = False,
     ide: Annotated[
-        IdeType,
+        IdeChoice,
         typer.Option(
             "--ide",
             help="Target IDE (claude, antigravity)",
         ),
-    ] = "claude",
+    ] = IdeChoice.claude,
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
@@ -349,7 +342,7 @@ def init_command(
     save_manifest(manifest, project_path)
 
     # Resolve IDE configuration
-    ide_config = get_ide_config(ide)
+    ide_config = get_ide_config(ide.value)
 
     # Bootstrap Rai base assets
     from rai_cli.onboarding.bootstrap import bootstrap_rai_base
