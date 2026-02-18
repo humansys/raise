@@ -78,6 +78,9 @@ dmypy.json
 # Legacy telemetry (should be in personal/, will migrate)
 .raise/rai/telemetry/
 
+# MCP server config (contains API tokens)
+.mcp.json
+
 # Secrets & credentials
 .env
 .env.*

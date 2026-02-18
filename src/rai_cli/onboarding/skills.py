@@ -1,7 +1,7 @@
 """Scaffold bundled skills into a project.
 
 Copies RaiSE skills from the rai_cli.skills_base package
-to the project's .claude/skills/ directory during `raise init`.
+to the project's IDE skill directory during `rai init`.
 
 Uses importlib.resources to read bundled skill files (Python 3.9+).
 Per-file idempotency: existing files are never overwritten.
@@ -23,6 +23,8 @@ from importlib.resources.abc import Traversable
 from pathlib import Path
 
 from pydantic import BaseModel, Field
+
+from rai_cli.config.ide import IdeConfig, get_ide_config
 
 logger = logging.getLogger(__name__)
 
@@ -73,8 +75,12 @@ def _copy_skill_tree(
     return copied
 
 
-def scaffold_skills(project_root: Path) -> SkillScaffoldResult:
-    """Copy bundled skills to project .claude/skills/ directory.
+def scaffold_skills(
+    project_root: Path,
+    *,
+    ide_config: IdeConfig | None = None,
+) -> SkillScaffoldResult:
+    """Copy bundled skills to project skill directory.
 
     Copies skill files from the installed rai_cli.skills_base
     package, including reference subdirectories. Uses per-file
@@ -82,14 +88,16 @@ def scaffold_skills(project_root: Path) -> SkillScaffoldResult:
 
     Args:
         project_root: Project root directory.
+        ide_config: IDE configuration. Defaults to Claude.
 
     Returns:
         SkillScaffoldResult with details of what was copied or skipped.
     """
     from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
+    config = ide_config or get_ide_config()
     base = files("rai_cli.skills_base")
-    skills_dir = project_root / ".claude" / "skills"
+    skills_dir = project_root / config.skills_dir
     result = SkillScaffoldResult()
 
     for skill_name in DISTRIBUTABLE_SKILLS:

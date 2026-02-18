@@ -7,6 +7,7 @@ from textwrap import dedent
 
 import pytest
 
+from rai_cli.config.ide import IdeConfig, get_ide_config
 from rai_cli.skills.locator import (
     SkillLocator,
     get_default_skill_dir,
@@ -83,6 +84,18 @@ class TestGetDefaultSkillDir:
     def test_default_skill_dir_with_project_root(self, tmp_path: Path) -> None:
         """Get skill directory relative to project root."""
         skill_dir = get_default_skill_dir(tmp_path)
+        assert skill_dir == tmp_path / ".claude" / "skills"
+
+    def test_default_skill_dir_with_ide_config(self, tmp_path: Path) -> None:
+        """Get skill directory from IdeConfig."""
+        config = get_ide_config("antigravity")
+        skill_dir = get_default_skill_dir(tmp_path, ide_config=config)
+        assert skill_dir == tmp_path / ".agent" / "skills"
+
+    def test_default_skill_dir_with_claude_config(self, tmp_path: Path) -> None:
+        """Claude config produces same path as default."""
+        config = get_ide_config("claude")
+        skill_dir = get_default_skill_dir(tmp_path, ide_config=config)
         assert skill_dir == tmp_path / ".claude" / "skills"
 
 
@@ -172,3 +185,10 @@ class TestListSkills:
         """List skills using project root."""
         skills = list_skills(project_root=skill_dir)
         assert len(skills) == 3
+
+    def test_list_skills_with_ide_config(self, skill_dir: Path) -> None:
+        """List skills using project root + ide_config resolves correct dir."""
+        # Antigravity config points to .agent/skills which doesn't exist in fixture
+        config = get_ide_config("antigravity")
+        skills = list_skills(project_root=skill_dir, ide_config=config)
+        assert len(skills) == 0  # .agent/skills/ doesn't exist in fixture

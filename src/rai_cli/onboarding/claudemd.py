@@ -1,13 +1,14 @@
-"""CLAUDE.md generation for project onboarding.
+"""IDE instructions file generation for project onboarding.
 
-Generates a project-specific CLAUDE.md file with detected conventions,
-project structure, and references to governance artifacts.
+Generates project-specific instructions content (CLAUDE.md, .agent/rules/raise.md)
+with detected conventions, project structure, and references to governance artifacts.
 """
 
 from __future__ import annotations
 
 from datetime import date
 
+from rai_cli.config.ide import IdeConfig
 from rai_cli.onboarding.conventions import ConventionResult
 from rai_cli.onboarding.detection import DetectionResult, ProjectType
 
@@ -186,16 +187,19 @@ def generate_claude_md(
     project_name: str,
     detection: DetectionResult,
     conventions: ConventionResult | None = None,
+    *,
+    ide_config: IdeConfig | None = None,
 ) -> str:
-    """Convenience function to generate CLAUDE.md content.
+    """Convenience function to generate IDE instructions file content.
 
     Args:
         project_name: Name of the project.
         detection: Project detection result.
         conventions: Optional convention detection result.
+        ide_config: IDE configuration. Defaults to Claude.
 
     Returns:
-        Markdown content for CLAUDE.md.
+        Markdown content for the IDE's instructions file.
 
     Example:
         >>> detection = detect_project_type(Path("/my/project"))

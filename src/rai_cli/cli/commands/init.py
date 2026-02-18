@@ -13,21 +13,15 @@ Example:
     $ raise init --detect  # Detect conventions and generate guardrails
 """
 
-from __future__ import annotations
-
 from datetime import date
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated
-
-if TYPE_CHECKING:
-    from rai_cli.onboarding.bootstrap import BootstrapResult
-    from rai_cli.onboarding.governance import GovernanceScaffoldResult
-    from rai_cli.onboarding.skills import SkillScaffoldResult
+from typing import Annotated
 
 import typer
 from rich.console import Console
 from rich.panel import Panel
 
+from rai_cli.config.ide import IdeChoice, IdeConfig, IdeType, get_ide_config
 from rai_cli.onboarding.claudemd import generate_claude_md
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type
@@ -123,9 +117,10 @@ def _get_project_message(
     file_count: int,
     profile: DeveloperProfile | None,
     created_profile: bool,
-    bootstrap_result: BootstrapResult | None = None,
-    skills_result: SkillScaffoldResult | None = None,
-    governance_result: GovernanceScaffoldResult | None = None,
+    bootstrap_result: "BootstrapResult | None" = None,
+    skills_result: "SkillScaffoldResult | None" = None,
+    governance_result: "GovernanceScaffoldResult | None" = None,
+    ide_config: IdeConfig | None = None,
 ) -> str:
     """Get project detection message based on experience level.
 
@@ -137,10 +132,12 @@ def _get_project_message(
         bootstrap_result: Result of base Rai bootstrap (None if not run).
         skills_result: Result of skill scaffolding (None if not run).
         governance_result: Result of governance scaffolding (None if not run).
+        ide_config: IDE configuration. Defaults to Claude.
 
     Returns:
         Formatted message string for console output.
     """
+    skills_dir = ide_config.skills_dir if ide_config else ".claude/skills"
     skill_cmd, skill_desc = _get_skill_recommendation(project_type)
 
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
@@ -186,12 +183,12 @@ def _get_project_message(
         if skills_result is not None:
             if skills_result.already_existed:
                 lines.append(
-                    "[bold]Loaded:[/bold]  .claude/skills/  "
+                    f"[bold]Loaded:[/bold]  {skills_dir}/  "
                     "[dim]— skills already present[/dim]"
                 )
             elif skills_result.skills_copied > 0:
                 lines.append(
-                    f"[bold]Created:[/bold] .claude/skills/  "
+                    f"[bold]Created:[/bold] {skills_dir}/  "
                     f"[dim]— {skills_result.skills_copied} onboarding skills[/dim]"
                 )
 
@@ -226,7 +223,7 @@ def _get_project_message(
         skills_msg = ""
         if skills_result is not None and not skills_result.already_existed:
             skills_msg = (
-                f"  Installed {skills_result.skills_copied} skills to .claude/skills/\n"
+                f"  Installed {skills_result.skills_copied} skills to {skills_dir}/\n"
             )
         governance_msg = ""
         if governance_result is not None and not governance_result.already_existed:
@@ -291,6 +288,13 @@ def init_command(
             help="Detect conventions and generate guardrails.md",
         ),
     ] = False,
+    ide: Annotated[
+        IdeChoice,
+        typer.Option(
+            "--ide",
+            help="Target IDE (claude, antigravity)",
+        ),
+    ] = IdeChoice.claude,
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
@@ -304,6 +308,7 @@ def init_command(
         $ raise init --name my-api
         $ raise init --path /path/to/project
         $ raise init --detect  # Detect conventions and generate guardrails
+        $ raise init --ide antigravity  # Initialize for Antigravity IDE
     """
     # Determine project path
     project_path = path if path is not None else Path.cwd()
@@ -336,6 +341,9 @@ def init_command(
     manifest = ProjectManifest(project=project_info)
     save_manifest(manifest, project_path)
 
+    # Resolve IDE configuration
+    ide_config = get_ide_config(ide.value)
+
     # Bootstrap Rai base assets
     from rai_cli.onboarding.bootstrap import bootstrap_rai_base
 
@@ -344,14 +352,19 @@ def init_command(
     # Scaffold onboarding skills
     from rai_cli.onboarding.skills import scaffold_skills
 
-    skills_result = scaffold_skills(project_path)
+    skills_result = scaffold_skills(project_path, ide_config=ide_config)
+
+    # Scaffold workflows (no-op for IDEs without workflows_dir)
+    from rai_cli.onboarding.workflows import scaffold_workflows
+
+    scaffold_workflows(project_path, ide_config=ide_config)
 
     # Scaffold governance templates
     from rai_cli.onboarding.governance import scaffold_governance
 
     governance_result = scaffold_governance(project_path, project_name)
 
-    # Generate MEMORY.md (canonical + Claude Code)
+    # Generate MEMORY.md (canonical + IDE-specific copy)
     from rai_cli.config.paths import (
         get_claude_memory_path,
         get_framework_dir,
@@ -368,15 +381,16 @@ def init_command(
         project_name=project_name,
     )
 
-    # Write canonical copy
+    # Write canonical copy (always)
     canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
     canonical_memory.parent.mkdir(parents=True, exist_ok=True)
     canonical_memory.write_text(memory_content, encoding="utf-8")
 
-    # Write Claude Code copy
-    claude_memory = get_claude_memory_path(project_path)
-    claude_memory.parent.mkdir(parents=True, exist_ok=True)
-    claude_memory.write_text(memory_content, encoding="utf-8")
+    # Write Claude Code copy (only for Claude IDE)
+    if ide_config.ide_type == "claude":
+        claude_memory = get_claude_memory_path(project_path)
+        claude_memory.parent.mkdir(parents=True, exist_ok=True)
+        claude_memory.write_text(memory_content, encoding="utf-8")
 
     # Output messages based on experience level
     welcome = _get_welcome_message(profile if not created_profile else None)
@@ -388,6 +402,7 @@ def init_command(
         bootstrap_result=bootstrap_result,
         skills_result=skills_result,
         governance_result=governance_result,
+        ide_config=ide_config,
     )
 
     if profile.experience_level == ExperienceLevel.RI and not created_profile:
@@ -399,7 +414,8 @@ def init_command(
         console.print(Panel(welcome.strip(), border_style="cyan"))
         console.print(project_msg)
 
-    # Convention detection, guardrails, and CLAUDE.md generation
+    # Convention detection, guardrails, and instructions file generation
+    instructions_path = project_path / ide_config.instructions_file
     if detect and detection.project_type == ProjectType.BROWNFIELD:
         conventions = detect_conventions(project_path)
 
@@ -415,21 +431,22 @@ def init_command(
             guardrails_path = guardrails_dir / "guardrails.md"
             guardrails_path.write_text(guardrails_content, encoding="utf-8")
 
-            # Generate CLAUDE.md
-            claude_md_content = generate_claude_md(
+            # Generate instructions file
+            instructions_content = generate_claude_md(
                 project_name=project_name,
                 detection=detection,
                 conventions=conventions,
+                ide_config=ide_config,
             )
-            claude_md_path = project_path / "CLAUDE.md"
-            claude_md_path.write_text(claude_md_content, encoding="utf-8")
+            instructions_path.parent.mkdir(parents=True, exist_ok=True)
+            instructions_path.write_text(instructions_content, encoding="utf-8")
 
             # Output summary
             conf = conventions.overall_confidence.value.upper()
             if profile.experience_level == ExperienceLevel.RI:
                 console.print(
                     f"\n[dim]Conventions detected ({conventions.files_analyzed} files, "
-                    f"{conf} confidence). Generated guardrails.md and CLAUDE.md[/dim]"
+                    f"{conf} confidence). Generated guardrails.md and {ide_config.instructions_file}[/dim]"
                 )
             else:
                 console.print(
@@ -437,21 +454,22 @@ def init_command(
                     f"Analyzed {conventions.files_analyzed} files with {conf} confidence.\n"
                     f"Generated:\n"
                     f"  - [bold]{guardrails_path}[/bold] (code standards)\n"
-                    f"  - [bold]{claude_md_path}[/bold] (project context)\n\n"
+                    f"  - [bold]{instructions_path}[/bold] (project context)\n\n"
                     f"[dim]Review and adjust as needed.[/dim]"
                 )
     elif detect and detection.project_type == ProjectType.GREENFIELD:
-        # Generate minimal CLAUDE.md for greenfield
-        claude_md_content = generate_claude_md(
+        # Generate minimal instructions file for greenfield
+        instructions_content = generate_claude_md(
             project_name=project_name,
             detection=detection,
             conventions=None,
+            ide_config=ide_config,
         )
-        claude_md_path = project_path / "CLAUDE.md"
-        claude_md_path.write_text(claude_md_content, encoding="utf-8")
+        instructions_path.parent.mkdir(parents=True, exist_ok=True)
+        instructions_path.write_text(instructions_content, encoding="utf-8")
 
         if profile.experience_level != ExperienceLevel.RI:
             console.print(
-                f"\n[dim]Created {claude_md_path}. No code to analyze yet — "
+                f"\n[dim]Created {instructions_path}. No code to analyze yet — "
                 "guardrails will be generated when conventions are established.[/dim]"
             )
