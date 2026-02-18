@@ -14,6 +14,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
+from rai_cli.config.ide import IdeConfig, get_ide_config
 from rai_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
 from rai_cli.context.extractors.skills import extract_all_skills
 from rai_cli.context.graph import UnifiedGraph
@@ -42,13 +43,20 @@ class UnifiedGraphBuilder:
         50
     """
 
-    def __init__(self, project_root: Path | None = None) -> None:
+    def __init__(
+        self,
+        project_root: Path | None = None,
+        *,
+        ide_config: IdeConfig | None = None,
+    ) -> None:
         """Initialize builder with project root.
 
         Args:
             project_root: Root directory for the project. Defaults to cwd.
+            ide_config: IDE configuration. Defaults to Claude.
         """
         self.project_root = project_root or Path.cwd()
+        self.ide_config = ide_config or get_ide_config()
 
     def build(self) -> UnifiedGraph:
         """Build unified graph from all sources.
@@ -287,12 +295,12 @@ class UnifiedGraphBuilder:
     def load_skills(self) -> list[ConceptNode]:
         """Load concepts from skill YAML frontmatter.
 
-        Parses SKILL.md files in .claude/skills directory.
+        Parses SKILL.md files in the IDE's skill directory.
 
         Returns:
             List of ConceptNode for skill concepts.
         """
-        skills_dir = self.project_root / ".claude" / "skills"
+        skills_dir = self.project_root / self.ide_config.skills_dir
         return extract_all_skills(skills_dir)
 
     def load_components(self) -> list[ConceptNode]:

@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
+from rai_cli.config.ide import get_ide_config
 from rai_cli.context.builder import UnifiedGraphBuilder
 from rai_cli.context.models import ConceptNode
 
@@ -25,6 +26,19 @@ class TestUnifiedGraphBuilderInit:
         """Should use current directory when no root provided."""
         builder = UnifiedGraphBuilder()
         assert builder.project_root == Path.cwd()
+
+    def test_initializes_with_ide_config(self, tmp_path: Path) -> None:
+        """Should accept and store IDE configuration."""
+        config = get_ide_config("antigravity")
+        builder = UnifiedGraphBuilder(project_root=tmp_path, ide_config=config)
+        assert builder.ide_config.ide_type == "antigravity"
+        assert builder.ide_config.skills_dir == ".agent/skills"
+
+    def test_defaults_to_claude_ide_config(self, tmp_path: Path) -> None:
+        """Should default to Claude IDE config when none provided."""
+        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        assert builder.ide_config.ide_type == "claude"
+        assert builder.ide_config.skills_dir == ".claude/skills"
 
 
 class TestLoadGovernance:
@@ -762,6 +776,28 @@ class TestLoadSkills:
         nodes = builder.load_skills()
 
         assert nodes == []
+
+    def test_load_skills_with_antigravity_config(self, tmp_path: Path) -> None:
+        """Should load skills from .agent/skills with antigravity config."""
+        skills_dir = tmp_path / ".agent" / "skills" / "test-skill"
+        skills_dir.mkdir(parents=True)
+
+        (skills_dir / "SKILL.md").write_text(
+            dedent("""\
+            ---
+            name: test-skill
+            description: A test skill
+            ---
+            # Test
+        """)
+        )
+
+        config = get_ide_config("antigravity")
+        builder = UnifiedGraphBuilder(project_root=tmp_path, ide_config=config)
+        nodes = builder.load_skills()
+
+        assert len(nodes) == 1
+        assert nodes[0].id == "/test-skill"
 
 
 class TestLoadComponents:
