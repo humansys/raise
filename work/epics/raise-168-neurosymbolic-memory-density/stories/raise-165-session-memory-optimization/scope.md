@@ -2,32 +2,33 @@
 
 **Epic:** RAISE-168 (Neurosymbolic Memory Density)
 **Size:** S
-**Priority:** P2
-**Depends on:** RAISE-166 ✅ (compact format confirmed viable — Markdown-KV is top performer)
+**Depends on:** RAISE-166 ✅ (Markdown-KV compact confirmed as top performer)
 
 ### Problem
 
-Session start loads ~1,860 tokens of identity narrative (~80% human-readable prose, not behavioral primes), duplicates the skills list already in system-reminder, includes business milestones with zero coding utility, and omits the one thing that prevents CLI fumbling: `cli-reference.md`.
+Session context fragmented across 5 proprietary mechanisms (hook, memory dir, identity files via hook, CLI primes, MEMORY.md). Creates brittleness, duplication, and platform lock-in.
 
 ### In Scope
 
-- Add `cli-reference.md` load to session-init hook
-- Compress `identity/core.md` + `identity/perspective.md` to behavioral essentials (values, boundaries, principles)
-- Remove skills list from `MEMORY.md` (duplicate of system-reminder)
-- Remove business milestones from `MEMORY.md` (zero coding utility)
-- Deduplicate PAT-198/PAT-199 (identical entries)
-- Convert identity primes in context bundle to compact format (RAISE-166 confirmed Markdown-KV works)
+- Consolidate CLAUDE.md as single always-on file (identity + process + CLI ref in MK-KV compact)
+- Delete session-init.sh hook
+- Clean up ~/.claude/.../memory/ (vacate MEMORY.md, delete cli-reference.md)
+- Remove identity primes from CLI context bundle (Python code change)
+- Preserve .raise/rai/identity/ as canonical source (unchanged)
 
 ### Out of Scope
 
-- Memory query format changes (→ RAISE-166)
-- `rai cli reference --compact` auto-generation command (parking lot)
-- Token monitoring / programmatic context detection (parking lot)
+- `rai init --ide X` command (future — this design enables it)
+- `rai cli reference --compact` auto-generation (parking lot)
+- Modifying identity source files (core.md, perspective.md)
+- Changes to CLAUDE.local.md
 
 ### Done Criteria
 
-- [ ] `cli-reference.md` loads at session start via hook
-- [ ] Identity files compressed (behavioral essentials only)
-- [ ] MEMORY.md pruned (no skills list, no milestones, no duplicate PATs)
-- [ ] Context bundle identity primes converted to compact format
+- [ ] CLAUDE.md consolidated (~95 lines: identity, process, branch, CLI ref compact, file ops)
+- [ ] session-init.sh deleted
+- [ ] Memory dir cleaned (MEMORY.md redirected, cli-reference.md deleted)
+- [ ] CLI identity primes section removed (Python change)
+- [ ] Identity source files unchanged in .raise/rai/identity/
+- [ ] No behavioral regression
 - [ ] Retrospective complete
