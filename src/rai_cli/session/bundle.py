@@ -14,8 +14,11 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Callable
 from datetime import date
 from pathlib import Path
+
+from pydantic import BaseModel
 
 from rai_cli.context.graph import UnifiedGraph
 from rai_cli.context.models import ConceptNode
@@ -393,13 +396,206 @@ def _format_pending(state: SessionState | None) -> str:
     return "\n".join(lines)
 
 
-def assemble_context_bundle(
+# ---------------------------------------------------------------------------
+# Section registry and manifest
+# ---------------------------------------------------------------------------
+
+
+class SectionManifest(BaseModel):
+    """Manifest entry for a queryable context section."""
+
+    name: str
+    count: int
+    token_estimate: int
+
+
+def _count_governance(project_path: Path) -> int:
+    """Count governance items (always_on nodes minus identity)."""
+    nodes = get_always_on_primes(project_path)
+    return len([
+        n for n in nodes
+        if not n.id.startswith("RAI-VAL-") and not n.id.startswith("RAI-BND-")
+    ])
+
+
+def _count_behavioral(project_path: Path) -> int:
+    """Count foundational pattern items."""
+    return len(get_foundational_patterns(project_path))
+
+
+def _count_coaching(profile: DeveloperProfile) -> int:
+    """Count coaching items (1 if content exists, 0 otherwise)."""
+    coaching = profile.coaching
+    has_content = (
+        coaching.strengths
+        or coaching.growth_edge
+        or coaching.trust_level != "new"
+        or coaching.autonomy
+        or coaching.relationship.quality != "new"
+    )
+    return 1 if has_content else 0
+
+
+def _count_deadlines(profile: DeveloperProfile) -> int:
+    """Count deadline items."""
+    return len(profile.deadlines)
+
+
+def _count_progress(state: SessionState | None) -> int:
+    """Count progress items (1 if exists, 0 otherwise)."""
+    if state is None or state.progress is None:
+        return 0
+    return 1
+
+
+# Average tokens per item, estimated from real data
+_TOKENS_PER_ITEM: dict[str, int] = {
+    "governance": 25,
+    "behavioral": 20,
+    "coaching": 80,
+    "deadlines": 30,
+    "progress": 40,
+}
+
+
+def count_section_items(
+    section: str,
+    project_path: Path,
+    profile: DeveloperProfile,
+    state: SessionState | None,
+) -> int:
+    """Count items in a named section.
+
+    Args:
+        section: Section name from SECTION_REGISTRY.
+        project_path: Absolute path to the project root.
+        profile: Developer profile.
+        state: Session state (may be None).
+
+    Returns:
+        Number of items in the section.
+
+    Raises:
+        ValueError: If section name is not in SECTION_REGISTRY.
+    """
+    if section not in SECTION_REGISTRY:
+        raise ValueError(f"Unknown section: '{section}'. Valid: {sorted(SECTION_REGISTRY.keys())}")
+
+    if section == "governance":
+        return _count_governance(project_path)
+    if section == "behavioral":
+        return _count_behavioral(project_path)
+    if section == "coaching":
+        return _count_coaching(profile)
+    if section == "deadlines":
+        return _count_deadlines(profile)
+    if section == "progress":
+        return _count_progress(state)
+
+    return 0  # unreachable but satisfies pyright
+
+
+# Registry: section name → format function
+# Format functions have heterogeneous signatures; the registry maps names
+# for validation and dispatch. Actual calling happens in assemble_sections().
+SECTION_REGISTRY: dict[str, Callable[..., str]] = {
+    "governance": _format_governance_primes,
+    "behavioral": _format_primes,
+    "coaching": _format_coaching,
+    "deadlines": _format_deadlines,
+    "progress": _format_progress,
+}
+
+
+def assemble_sections(
+    sections: list[str],
+    project_path: Path,
+    profile: DeveloperProfile,
+    state: SessionState | None,
+) -> str:
+    """Assemble formatted output for selected priming sections.
+
+    Each section independently loads its data source (graph, profile, or state)
+    and formats the output. Section names are validated against SECTION_REGISTRY.
+
+    Args:
+        sections: List of section names to load (e.g., ["governance", "behavioral"]).
+        project_path: Absolute path to the project root.
+        profile: Developer profile.
+        state: Session state (may be None).
+
+    Returns:
+        Formatted sections joined by blank lines, or empty string if no content.
+
+    Raises:
+        ValueError: If any section name is not in SECTION_REGISTRY.
+    """
+    if not sections:
+        return ""
+
+    # Validate all section names first
+    for name in sections:
+        if name not in SECTION_REGISTRY:
+            raise ValueError(
+                f"Unknown section: '{name}'. "
+                f"Valid: {sorted(SECTION_REGISTRY.keys())}"
+            )
+
+    parts: list[str] = []
+    for name in sections:
+        if name == "governance":
+            always_on = get_always_on_primes(project_path)
+            part = _format_governance_primes(always_on)
+        elif name == "behavioral":
+            patterns = get_foundational_patterns(project_path)
+            part = _format_primes(patterns)
+        elif name == "coaching":
+            part = _format_coaching(profile)
+        elif name == "deadlines":
+            part = _format_deadlines(profile)
+        elif name == "progress":
+            part = _format_progress(state)
+        else:
+            continue  # unreachable due to validation above
+
+        if part:
+            parts.append(part)
+
+    return "\n\n".join(parts)
+
+
+def _format_manifest(manifests: list[SectionManifest]) -> str:
+    """Format manifest of available context sections.
+
+    Args:
+        manifests: List of section manifest entries.
+
+    Returns:
+        Formatted manifest section, or empty string if no manifests.
+    """
+    if not manifests:
+        return ""
+
+    lines = ["# Available Context"]
+    for m in manifests:
+        if m.count == 0:
+            lines.append(f"- {m.name}: 0 items")
+        else:
+            lines.append(f"- {m.name}: {m.count} items (~{m.token_estimate} tokens)")
+    return "\n".join(lines)
+
+
+def assemble_orientation(
     profile: DeveloperProfile,
     state: SessionState | None,
     project_path: Path,
     session_id: str | None = None,
 ) -> str:
-    """Assemble token-optimized context bundle from multiple sources.
+    """Assemble orientation-only context (always-on sections).
+
+    Orientation = "where are we?" — work state, continuity, pending.
+    Does NOT include priming sections (governance, behavioral, coaching,
+    deadlines, progress). Those are loaded separately via assemble_sections().
 
     Args:
         profile: Developer profile from ~/.rai/developer.yaml.
@@ -408,11 +604,8 @@ def assemble_context_bundle(
         session_id: Optional session identifier (e.g., "SES-177").
 
     Returns:
-        Plain text context bundle, ~600 tokens.
+        Plain text orientation context.
     """
-    patterns = get_foundational_patterns(project_path)
-    always_on = get_always_on_primes(project_path)
-
     # Resolve release context for current epic
     release_node: ConceptNode | None = None
     if state and state.current_work.epic:
@@ -421,7 +614,7 @@ def assemble_context_bundle(
         )
 
     # Session Context header
-    sections = [
+    sections: list[str] = [
         "# Session Context",
         _format_developer_section(profile),
     ]
@@ -431,11 +624,6 @@ def assemble_context_bundle(
         sections.append(f"Session: {session_id}")
 
     sections.append(_format_work_section(state, release_node=release_node))
-
-    # Progress (epic SP, completed epics)
-    progress = _format_progress(state)
-    if progress:
-        sections.append(progress)
 
     # Last session + recent sessions
     sections.append(_format_last_session(state))
@@ -453,28 +641,6 @@ def assemble_context_bundle(
     if next_prompt:
         sections.append(next_prompt)
 
-    # Deadlines
-    deadlines = _format_deadlines(profile)
-    if deadlines:
-        sections.append(deadlines)
-
-    # Governance primes (guardrails + principles, not identity)
-    gov_primes = _format_governance_primes(always_on)
-    if gov_primes:
-        sections.append(gov_primes)
-
-    # Identity primes (RAI-VAL-*, RAI-BND-*) removed — now in CLAUDE.md (ADR-012)
-
-    # Behavioral primes (foundational patterns)
-    primes = _format_primes(patterns)
-    if primes:
-        sections.append(primes)
-
-    # Coaching
-    coaching = _format_coaching(profile)
-    if coaching:
-        sections.append(coaching)
-
     # Pending
     pending = _format_pending(state)
     if pending:
@@ -482,3 +648,47 @@ def assemble_context_bundle(
 
     # Filter empty sections, join with blank lines
     return "\n\n".join(s for s in sections if s)
+
+
+def assemble_context_bundle(
+    profile: DeveloperProfile,
+    state: SessionState | None,
+    project_path: Path,
+    session_id: str | None = None,
+) -> str:
+    """Assemble lean context bundle: orientation + manifest.
+
+    Emits always-on orientation sections plus a manifest of available
+    priming sections (with counts and token estimates). Priming sections
+    are loaded separately via `rai session context --sections`.
+
+    Args:
+        profile: Developer profile from ~/.rai/developer.yaml.
+        state: Session state from .raise/rai/session-state.yaml (may be None).
+        project_path: Absolute path to the project root.
+        session_id: Optional session identifier (e.g., "SES-177").
+
+    Returns:
+        Plain text context bundle: orientation + manifest.
+    """
+    # Orientation (always-on sections)
+    orientation = assemble_orientation(profile, state, project_path, session_id)
+
+    # Build manifest for available priming sections
+    manifests: list[SectionManifest] = []
+    for section_name in SECTION_REGISTRY:
+        count = count_section_items(section_name, project_path, profile, state)
+        tokens = count * _TOKENS_PER_ITEM.get(section_name, 20)
+        manifests.append(SectionManifest(
+            name=section_name,
+            count=count,
+            token_estimate=tokens,
+        ))
+
+    manifest = _format_manifest(manifests)
+
+    parts = [orientation]
+    if manifest:
+        parts.append(manifest)
+
+    return "\n\n".join(parts)

@@ -32,9 +32,9 @@ Experience level is in the context bundle — adapt output verbosity accordingly
 - **Ha**: Balanced output, explain new concepts only
 - **Ri**: Minimal output, essentials only
 
-## Steps (2)
+## Steps (3)
 
-### Step 1: Load Context Bundle
+### Step 1: Load Orientation Bundle
 
 ```bash
 rai session start --project "$(pwd)" --context
@@ -43,8 +43,7 @@ rai session start --project "$(pwd)" --context
 This single command:
 - Loads developer profile from `~/.rai/developer.yaml`
 - Loads session state from `.raise/rai/session-state.yaml`
-- Queries memory graph for foundational patterns
-- Assembles a ~150 token context bundle
+- Assembles a lean bundle: **orientation** (work state, continuity, pending) + **manifest** (available priming sections with counts)
 - Records the session start (increments count, sets active session)
 - Warns about orphaned sessions if detected
 
@@ -55,9 +54,40 @@ rai session start --name "Name" --project "$(pwd)" --context
 
 **If graph unavailable:** Run `rai memory build` first, then retry.
 
-### Step 2: Interpret & Present
+The bundle output includes an `# Available Context` manifest listing sections by name, item count, and token estimate. Use this to decide what to load in Step 2.
 
-With the context bundle from Step 1, use inference to:
+### Step 2: Load Task-Relevant Context
+
+Based on the manifest from Step 1, load priming sections relevant to this session. The CLI serves sections by name — the skill decides what to load.
+
+```bash
+rai session context --sections governance,behavioral --project "$(pwd)"
+```
+
+**Available sections:** `governance`, `behavioral`, `coaching`, `deadlines`, `progress`
+
+**Decision heuristic (in-context learning):**
+
+| Session type | Recommended sections |
+|-------------|---------------------|
+| Feature work | `governance,behavioral` |
+| Research/ideation | `behavioral` |
+| Maintenance/bugs | `governance` |
+| First session / new project | `governance,behavioral,coaching` |
+| Near deadline (<7 days) | `deadlines,progress` (add to any above) |
+
+**IMPORTANT:** These are recommendations, not rules. Adapt based on:
+- What the manifest shows (if `governance: 0 items`, skip it)
+- What the human says they want to work on
+- What the next session prompt suggests
+
+**Grounding check:** If a section shows 0 items where content is expected (e.g., `governance: 0`), flag it to the human and ask where to find grounding.
+
+**Skip condition:** If no priming is needed (quick maintenance, clear continuity from narrative), skip Step 2 entirely.
+
+### Step 3: Interpret & Present
+
+With orientation from Step 1 and priming from Step 2, use inference to:
 
 1. **Check signals:**
    - **Next session prompt** → if present, this is guidance from your past self. Read it first, use it to shape focus and proactively guide the human. This is your highest-priority continuity signal.
@@ -102,10 +132,11 @@ Go.
 
 ## Notes
 
-- **One CLI call** does all data plumbing — no separate profile/memory/graph queries
+- **Two-phase context loading:** Step 1 = orientation (always-on, ~100 tokens), Step 2 = priming (task-relevant, loaded by name)
+- CLI is generic plumbing (serves sections by name), skill is composing intelligence (decides what to load)
+- Manifest is self-describing — skill reads counts to make informed decisions
 - Context bundle is deterministic — same inputs produce same output
 - Skill is a thin inference layer — interpret, don't gather
-- Foundational patterns in bundle serve as behavioral primes
 
 ## References
 

@@ -25,10 +25,16 @@ from rai_cli.schemas.session_state import (
     SessionState,
 )
 from rai_cli.session.bundle import (
+    SECTION_REGISTRY,
+    SectionManifest,
     _format_governance_primes,
+    _format_manifest,
     _format_progress,
     _format_recent_sessions,
     assemble_context_bundle,
+    assemble_orientation,
+    assemble_sections,
+    count_section_items,
     get_always_on_primes,
     get_foundational_patterns,
 )
@@ -102,10 +108,10 @@ class TestAssembleContextBundle:
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_full_bundle_contains_all_sections(
+    def test_lean_bundle_has_orientation_and_manifest(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Full bundle contains all sections including new ones."""
+        """Lean bundle contains orientation + manifest, NOT priming sections."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = [
@@ -120,37 +126,29 @@ class TestAssembleContextBundle:
 
         profile = _make_profile()
         state = _make_state()
-        state.progress = EpicProgress(
-            epic="E15",
-            stories_done=5,
-            stories_total=8,
-            sp_done=16,
-            sp_total=25,
-        )
-        state.completed_epics = ["E1", "E2"]
         bundle = assemble_context_bundle(profile, state, Path("/project"))
 
+        # Orientation sections present
         assert "# Session Context" in bundle
         assert "Developer: Emilio (ri)" in bundle
         assert "Story: S15.7 [implement]" in bundle
         assert "Epic: E15" in bundle
         assert "SES-097" in bundle
-        assert "# Deadlines" in bundle
-        assert "F&F" in bundle
-        assert "# Behavioral Primes" in bundle
-        assert "PAT-187" in bundle
-        assert "# Coaching" in bundle
-        assert "architecture" in bundle
         assert "# Pending" in bundle
         assert "Pattern curation" in bundle
-        # Governance primes present, identity primes removed (ADR-012: moved to CLAUDE.md)
-        assert "# Governance Primes" in bundle
-        assert "guardrail-must-code-001" in bundle
-        assert "# Identity Primes" not in bundle
-        assert "RAI-VAL-1" not in bundle
-        assert "5/8" in bundle
-        assert "16/25" in bundle
-        assert "E1, E2" in bundle
+
+        # Manifest present
+        assert "# Available Context" in bundle
+        assert "governance:" in bundle
+        assert "behavioral:" in bundle
+
+        # Priming sections NOT present (moved to rai session context)
+        assert "# Governance Primes" not in bundle
+        assert "guardrail-must-code-001" not in bundle
+        assert "# Behavioral Primes" not in bundle
+        assert "PAT-187" not in bundle
+        assert "# Coaching" not in bundle
+        assert "# Deadlines" not in bundle
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -219,10 +217,10 @@ class TestAssembleContextBundle:
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_deadline_days_remaining(
+    def test_deadline_in_manifest_not_inline(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Deadlines show days remaining."""
+        """Deadlines appear in manifest count, not inline."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -234,7 +232,11 @@ class TestAssembleContextBundle:
         )
         bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-        assert "(today)" in bundle
+        # Deadline count in manifest
+        assert "deadlines: 1 items" in bundle
+        # Deadline details NOT inline (moved to rai session context)
+        assert "Soon" not in bundle
+        assert "(today)" not in bundle
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -267,10 +269,10 @@ class TestAssembleContextBundle:
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_coaching_shows_trust_and_relationship(
+    def test_coaching_in_manifest_not_inline(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Coaching section shows trust level, autonomy, and relationship."""
+        """Coaching appears in manifest count, not inline."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -289,32 +291,11 @@ class TestAssembleContextBundle:
         )
         bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-        assert "Trust: developing" in bundle
-        assert "Autonomy: high within scope" in bundle
-        assert "Relationship: productive (growing)" in bundle
-
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
-    def test_coaching_omits_default_trust_and_relationship(
-        self, mock_patterns: object, mock_always_on: object
-    ) -> None:
-        """Coaching section omits trust and relationship at default values."""
-        assert callable(mock_patterns)
-        assert callable(mock_always_on)
-        mock_patterns.return_value = []
-        mock_always_on.return_value = []
-
-        profile = DeveloperProfile(
-            name="Test",
-            coaching=CoachingContext(strengths=["design"]),
-        )
-        bundle = assemble_context_bundle(profile, None, Path("/project"))
-
-        assert "# Coaching" in bundle
-        assert "Strengths: design" in bundle
-        assert "Trust:" not in bundle
-        assert "Autonomy:" not in bundle
-        assert "Relationship:" not in bundle
+        # Coaching count in manifest
+        assert "coaching: 1 items" in bundle
+        # Coaching details NOT inline (moved to rai session context)
+        assert "Trust: developing" not in bundle
+        assert "# Coaching" not in bundle
 
     @patch("rai_cli.session.bundle.get_always_on_primes")
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -564,7 +545,7 @@ class TestIdentityPrimesRemoved:
     def test_identity_nodes_not_in_bundle(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Identity nodes (RAI-VAL-*, RAI-BND-*) are not emitted in bundle."""
+        """Identity nodes (RAI-VAL-*, RAI-BND-*) are not emitted in lean bundle."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -579,13 +560,15 @@ class TestIdentityPrimesRemoved:
         profile = DeveloperProfile(name="Test")
         bundle = assemble_context_bundle(profile, None, Path("/project"))
 
-        # Governance primes still present
-        assert "# Governance Primes" in bundle
-        assert "guardrail-must-code-001" in bundle
-        # Identity primes removed — now in CLAUDE.md
+        # Lean bundle has no governance inline — only in manifest
+        assert "# Governance Primes" not in bundle
+        assert "guardrail-must-code-001" not in bundle
+        # Identity primes also absent
         assert "# Identity Primes" not in bundle
         assert "RAI-VAL-1" not in bundle
         assert "RAI-BND-1" not in bundle
+        # Governance count in manifest (2 non-identity out of 3)
+        assert "governance: 1 items" in bundle
 
 
 class TestFormatProgress:
@@ -938,7 +921,7 @@ class TestFormatNarrative:
     def test_narrative_appears_after_last_session(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
-        """Narrative section appears after Last: line in bundle."""
+        """Narrative section appears after Last: line and before manifest."""
         assert callable(mock_patterns)
         assert callable(mock_always_on)
         mock_patterns.return_value = []
@@ -961,9 +944,9 @@ class TestFormatNarrative:
 
         last_pos = bundle.find("Last:")
         narrative_pos = bundle.find("# Session Narrative")
-        primes_pos = bundle.find("# Governance Primes")
+        manifest_pos = bundle.find("# Available Context")
 
-        assert last_pos < narrative_pos < primes_pos
+        assert last_pos < narrative_pos < manifest_pos
 
 
 class TestFormatNextSessionPrompt:
@@ -1069,3 +1052,321 @@ class TestGetFoundationalPatterns:
         result = get_foundational_patterns(tmp_path)
         assert len(result) == 1
         assert result[0].id == "PAT-187"
+
+
+class TestSectionRegistry:
+    """Tests for SECTION_REGISTRY and manifest model."""
+
+    def test_registry_has_all_five_sections(self) -> None:
+        """Registry contains all defined queryable sections."""
+        expected = {"governance", "behavioral", "coaching", "deadlines", "progress"}
+        assert set(SECTION_REGISTRY.keys()) == expected
+
+    def test_registry_values_are_callable(self) -> None:
+        """All registry values are callable format functions."""
+        for name, fn in SECTION_REGISTRY.items():
+            assert callable(fn), f"Section '{name}' is not callable"
+
+
+class TestSectionManifest:
+    """Tests for SectionManifest model."""
+
+    def test_manifest_creation(self) -> None:
+        """Manifest can be created with section name, count, and token estimate."""
+        m = SectionManifest(name="governance", count=14, token_estimate=350)
+        assert m.name == "governance"
+        assert m.count == 14
+        assert m.token_estimate == 350
+
+    def test_manifest_zero_count(self) -> None:
+        """Manifest with zero count is valid."""
+        m = SectionManifest(name="deadlines", count=0, token_estimate=0)
+        assert m.count == 0
+
+
+class TestCountSectionItems:
+    """Tests for count_section_items."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    def test_count_governance(self, mock_always_on: object) -> None:
+        """Counts governance items (always_on minus identity)."""
+        assert callable(mock_always_on)
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+            _make_always_on_node("guardrail-must-002", "guardrail", "Ruff"),
+            _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
+        ]
+        result = count_section_items("governance", Path("/project"), _make_profile(), _make_state())
+        assert result == 2  # 3 always_on minus 1 identity
+
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_count_behavioral(self, mock_patterns: object) -> None:
+        """Counts behavioral items (foundational patterns)."""
+        assert callable(mock_patterns)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-1", "Pattern one"),
+            _make_pattern("PAT-2", "Pattern two"),
+        ]
+        result = count_section_items("behavioral", Path("/project"), _make_profile(), _make_state())
+        assert result == 2
+
+    def test_count_coaching_with_content(self) -> None:
+        """Counts coaching as 1 when content exists."""
+        profile = _make_profile()
+        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        assert result == 1
+
+    def test_count_coaching_empty(self) -> None:
+        """Counts coaching as 0 when no content."""
+        profile = DeveloperProfile(name="New")
+        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        assert result == 0
+
+    def test_count_deadlines(self) -> None:
+        """Counts deadlines from profile."""
+        profile = _make_profile()  # has 2 deadlines
+        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        assert result == 2
+
+    def test_count_deadlines_empty(self) -> None:
+        """Counts deadlines as 0 when none."""
+        profile = DeveloperProfile(name="New")
+        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        assert result == 0
+
+    def test_count_progress_with_data(self) -> None:
+        """Counts progress as 1 when data exists."""
+        state = _make_state()
+        state.progress = EpicProgress(
+            epic="E15", stories_done=2, stories_total=5, sp_done=6, sp_total=15
+        )
+        result = count_section_items("progress", Path("/project"), _make_profile(), state)
+        assert result == 1
+
+    def test_count_progress_without_data(self) -> None:
+        """Counts progress as 0 when no progress data."""
+        result = count_section_items("progress", Path("/project"), _make_profile(), _make_state())
+        assert result == 0
+
+    def test_count_unknown_section_raises(self) -> None:
+        """Unknown section name raises ValueError."""
+        import pytest
+        with pytest.raises(ValueError, match="Unknown section"):
+            count_section_items("unknown", Path("/project"), _make_profile(), _make_state())
+
+
+class TestAssembleOrientation:
+    """Tests for assemble_orientation (always-on sections only)."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_orientation_contains_always_on_sections(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Orientation includes developer, work, sessions, narrative, pending."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-187", "Code as Gemba"),
+        ]
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+        ]
+
+        profile = _make_profile()
+        state = _make_state()
+        state.narrative = "## Decisions\n- Chose sync model"
+        state.next_session_prompt = "Continue with RAISE-169"
+        result = assemble_orientation(profile, state, Path("/project"), session_id="SES-210")
+
+        # Always-on sections present
+        assert "# Session Context" in result
+        assert "Developer: Emilio" in result
+        assert "Session: SES-210" in result
+        assert "Story: S15.7 [implement]" in result
+        assert "Epic: E15" in result
+        assert "SES-097" in result  # last session
+        assert "# Session Narrative" in result
+        assert "Chose sync model" in result
+        assert "# Next Session Prompt" in result
+        assert "Continue with RAISE-169" in result
+        assert "# Pending" in result
+        assert "Pattern curation" in result
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_orientation_excludes_priming_sections(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Orientation does NOT include governance, behavioral, coaching, deadlines, progress."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-187", "Code as Gemba"),
+        ]
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+        ]
+
+        profile = _make_profile()  # has deadlines and coaching
+        state = _make_state()
+        state.progress = EpicProgress(
+            epic="E15", stories_done=5, stories_total=8, sp_done=16, sp_total=25
+        )
+        result = assemble_orientation(profile, state, Path("/project"))
+
+        assert "# Governance Primes" not in result
+        assert "# Behavioral Primes" not in result
+        assert "# Coaching" not in result
+        assert "# Deadlines" not in result
+        assert "Progress:" not in result
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_orientation_without_state(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Orientation works gracefully without session state."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = []
+        mock_always_on.return_value = []
+
+        profile = DeveloperProfile(name="New")
+        result = assemble_orientation(profile, None, Path("/project"))
+
+        assert "Developer: New (shu)" in result
+        assert "(no previous session state)" in result
+
+
+class TestFormatManifest:
+    """Tests for _format_manifest."""
+
+    def test_manifest_format(self) -> None:
+        """Manifest formats section counts and token estimates."""
+        manifests = [
+            SectionManifest(name="governance", count=14, token_estimate=350),
+            SectionManifest(name="behavioral", count=12, token_estimate=240),
+            SectionManifest(name="coaching", count=1, token_estimate=80),
+            SectionManifest(name="deadlines", count=0, token_estimate=0),
+        ]
+        result = _format_manifest(manifests)
+
+        assert "# Available Context" in result
+        assert "governance: 14 items (~350 tokens)" in result
+        assert "behavioral: 12 items (~240 tokens)" in result
+        assert "coaching: 1 items (~80 tokens)" in result
+        assert "deadlines: 0 items" in result
+
+    def test_manifest_empty_list(self) -> None:
+        """Empty manifest list returns empty string."""
+        result = _format_manifest([])
+        assert result == ""
+
+    def test_manifest_zero_count_omits_tokens(self) -> None:
+        """Zero-count sections don't show token estimate."""
+        manifests = [SectionManifest(name="deadlines", count=0, token_estimate=0)]
+        result = _format_manifest(manifests)
+        assert "deadlines: 0 items" in result
+        assert "tokens" not in result.split("deadlines")[1]
+
+
+class TestAssembleSections:
+    """Tests for assemble_sections (queryable priming sections)."""
+
+    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    def test_governance_and_behavioral(
+        self, mock_patterns: object, mock_always_on: object
+    ) -> None:
+        """Loading governance and behavioral returns both formatted sections."""
+        assert callable(mock_patterns)
+        assert callable(mock_always_on)
+        mock_patterns.return_value = [
+            _make_pattern("PAT-187", "Code as Gemba — observe before designing"),
+        ]
+        mock_always_on.return_value = [
+            _make_always_on_node("guardrail-must-001", "guardrail", "Type hints"),
+        ]
+
+        result = assemble_sections(
+            ["governance", "behavioral"],
+            Path("/project"),
+            _make_profile(),
+            _make_state(),
+        )
+
+        assert "# Governance Primes" in result
+        assert "guardrail-must-001" in result
+        assert "# Behavioral Primes" in result
+        assert "PAT-187" in result
+
+    def test_coaching_only(self) -> None:
+        """Loading coaching alone returns coaching section."""
+        result = assemble_sections(
+            ["coaching"],
+            Path("/project"),
+            _make_profile(),
+            _make_state(),
+        )
+
+        assert "# Coaching" in result
+        assert "architecture" in result
+
+    def test_empty_sections_returns_empty(self) -> None:
+        """Empty section list returns empty string."""
+        result = assemble_sections(
+            [],
+            Path("/project"),
+            _make_profile(),
+            _make_state(),
+        )
+        assert result == ""
+
+    def test_unknown_section_raises(self) -> None:
+        """Unknown section name raises ValueError with valid names."""
+        import pytest
+        with pytest.raises(ValueError, match="Unknown section"):
+            assemble_sections(
+                ["unknown"],
+                Path("/project"),
+                _make_profile(),
+                _make_state(),
+            )
+
+    def test_progress_with_data(self) -> None:
+        """Loading progress returns progress section when data exists."""
+        state = _make_state()
+        state.progress = EpicProgress(
+            epic="E15", stories_done=3, stories_total=8, sp_done=10, sp_total=25
+        )
+        result = assemble_sections(
+            ["progress"],
+            Path("/project"),
+            _make_profile(),
+            state,
+        )
+        assert "E15" in result
+        assert "3/8" in result
+
+    def test_deadlines_with_data(self) -> None:
+        """Loading deadlines returns deadline section."""
+        result = assemble_sections(
+            ["deadlines"],
+            Path("/project"),
+            _make_profile(),  # has 2 deadlines
+            _make_state(),
+        )
+        assert "# Deadlines" in result
+        assert "F&F" in result
+
+    def test_section_with_no_content_omitted(self) -> None:
+        """Sections with no content are omitted from output."""
+        profile = DeveloperProfile(name="New")  # no coaching, no deadlines
+        result = assemble_sections(
+            ["coaching", "deadlines"],
+            Path("/project"),
+            profile,
+            _make_state(),
+        )
+        assert result == ""

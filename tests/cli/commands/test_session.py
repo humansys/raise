@@ -511,6 +511,85 @@ class TestSessionClose:
         assert "--correction" in result.output
 
 
+class TestSessionContext:
+    """Tests for raise session context command."""
+
+    def test_context_returns_formatted_sections(self) -> None:
+        """Session context --sections returns formatted output."""
+        profile = DeveloperProfile(name="Test")
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.assemble_sections",
+                return_value="# Governance Primes\n- guardrail-must-001: Type hints",
+            ),
+            patch(
+                "rai_cli.cli.commands.session.load_session_state",
+                return_value=None,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "context", "--sections", "governance", "--project", "."],
+            )
+
+        assert result.exit_code == 0
+        assert "# Governance Primes" in result.output
+
+    def test_context_requires_sections(self) -> None:
+        """Session context without --sections shows error."""
+        result = runner.invoke(app, ["session", "context"])
+        assert result.exit_code != 0
+
+    def test_context_requires_project(self) -> None:
+        """Session context without --project shows error."""
+        result = runner.invoke(app, ["session", "context", "--sections", "governance"])
+        assert result.exit_code != 0
+
+    def test_context_unknown_section_shows_error(self) -> None:
+        """Session context with unknown section shows helpful error."""
+        profile = DeveloperProfile(name="Test")
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch(
+                "rai_cli.cli.commands.session.assemble_sections",
+                side_effect=ValueError("Unknown section: 'bogus'. Valid: ['behavioral', 'coaching', 'deadlines', 'governance', 'progress']"),
+            ),
+            patch(
+                "rai_cli.cli.commands.session.load_session_state",
+                return_value=None,
+            ),
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "context", "--sections", "bogus", "--project", "."],
+            )
+
+        assert result.exit_code != 0
+        assert "Unknown section" in result.output
+
+    def test_context_no_profile_errors(self) -> None:
+        """Session context without profile gives error."""
+        with patch(
+            "rai_cli.cli.commands.session.load_developer_profile", return_value=None
+        ):
+            result = runner.invoke(
+                app,
+                ["session", "context", "--sections", "governance", "--project", "."],
+            )
+
+        assert result.exit_code != 0
+        assert "No developer profile found" in result.output
+
+
 class TestSessionHelp:
     """Tests for session command help."""
 
@@ -522,6 +601,7 @@ class TestSessionHelp:
         assert result.exit_code in (0, 2)
         assert "start" in result.output
         assert "close" in result.output
+        assert "context" in result.output
         assert "Manage working sessions" in result.output
 
     def test_session_start_help(self) -> None:
