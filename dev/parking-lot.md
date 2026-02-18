@@ -52,7 +52,10 @@
   - **From OpenClaw research (RES-OPENCLAW-001):**
     - [ ] Gateway abstraction — single control plane for multi-interface (Jira, Rovo, CLI, MCP)
     - [ ] Typed kata execution — Lobster-inspired pipelines with approval gates + resume tokens
-    - [ ] Token monitoring + self-managed context lifecycle — Rai detects context pressure (80% threshold), proactively runs /session-close to capture state, instructs user to open fresh conversation with /session-start. Infrastructure already exists (session-start/close, session-state.yaml). Missing piece: visibility into context usage (Claude Code feature request or heuristic). Makes context breaks a managed transition, not a loss. (SES-119, 2026-02-09)
+    - [ ] Token monitoring + self-managed context lifecycle — Rai detects context pressure (80% threshold), proactively runs /session-close to capture state, instructs user to open fresh conversation with /session-start. Infrastructure already exists (session-start/close, session-state.yaml). Makes context breaks a managed transition, not a loss. (SES-119, 2026-02-09)
+      - **Research update (SES-204, 2026-02-18):** Claude Code hooks no exponen % de contexto a scripts externos — barra de contexto está hardwired al modelo, no hay API. Detección programática está descartada.
+      - **Heurístico viable:** 200K para trabajo iterativo diario. Activar `/model sonnet[1m]` para sesiones de onboarding brownfield o análisis masivo de codebase (Sonnet 4.6: mismo precio hasta 200K, triple sobre 200K). Señal manual: cuando la conversación se siente larga → `/rai-session-close` consciente + nuevo thread con `/rai-session-start`.
+      - **Lost-in-the-middle:** calidad se degrada con contexto acumulado largo — argumento adicional para breaks frecuentes como práctica, no solo como emergencia.
     - [ ] Hybrid skills — markdown process + JSON schema + validation code
 
 ---
@@ -101,6 +104,16 @@
 
 ### Framework Improvements
 
+- [ ] **`rai init` generates CLAUDE.md from .raise/ canonical source** — (SES-209, 2026-02-18, ADR-012)
+  - **Context:** RAISE-165 established CLAUDE.md as a projection from `.raise/` canonical source. Currently hand-written. `rai init --ide claude-code` should deterministically generate it.
+  - **Scope:** Read identity files + process rules + CLI introspection → generate CLAUDE.md. Also `rai init --ide cursor` for `.cursorrules`.
+  - **Priority:** Medium — closes the loop on ADR-012's deterministic update principle
+
+- [ ] **`rai cli reference --compact` auto-generation** — (SES-200, 2026-02-17)
+  - **Context:** RAISE-163 solved CLI fumbling by regenerating cli-reference.md manually from `--help` output. But it drifts when commands change.
+  - **What:** CLI command that generates compact reference from argparse/click introspection. Run during session-start or as pre-commit hook.
+  - **Priority:** Low — manual regeneration works, automation is polish
+
 - [ ] **Drift detector calibration — reduce false positives** — (SES-118, 2026-02-08)
   - **Problem:** `rai discover drift` produces 383 warnings on raise-commons, nearly all false positives. Location drift flags correctly-placed files (`cli/commands/`, root-level `__main__.py`, `exceptions.py`). Naming drift suggests `emit_` prefix for standard functions (`main`, `start`, `close`).
   - **Evidence:** 367 warnings, 16 info — near-zero actionable. Signal-to-noise ratio makes the tool unusable for real drift detection.
@@ -144,9 +157,9 @@
   - **Goal:** Systematic review to find "open ends" — things that accumulate without cleanup, fail silently, or assume state that may not exist.
   - **Priority:** Before V3 complexity increase
 
-- [ ] **CLI integration test isolation (`--test-dir`)** — (SES-098, 2026-02-08)
-  - **What:** Add `--test-dir` or `--dry-run` flag to session CLI commands for safe integration testing
-  - **Priority:** Post-F&F, low — pytest tests already use tmp_path correctly
+- [x] **CLI integration test isolation (`--test-dir`)** — (SES-098, 2026-02-08) ✓ Solved via `conftest.py` autouse fixture (2026-02-16)
+  - **What:** Prevented test leakage into `~/.rai/developer.yaml` via global `_isolate_rai_home` fixture
+  - **Resolution:** `tests/conftest.py` redirects `get_rai_home` to `tmp_path` for all tests. No `--test-dir` flag needed.
 
 - [ ] **Parallel task execution in /story-implement** — (F7.7 discussion, 2026-02-05)
   - When tasks have no dependencies, allow spawning subagents in parallel
@@ -301,6 +314,13 @@
 
 ---
 
+### RAISE-169 Session — Parking Lot (2026-02-18)
+
+- [ ] **`rai session context --all` shortcut** — Load all priming sections at once instead of listing each name. Observe over 3-5 sessions whether full loading is common enough to warrant a shortcut.
+- [ ] **Two-phase context loading friction monitoring** — RAISE-169 introduced lean bundle + `rai session context --sections`. Monitor if the extra step feels natural or adds friction. If friction: consider auto-loading a default set. If natural: leave as-is.
+
+---
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-12 (pruned completed items: pre-release blockers done, phase mismatch fixed, research gate done, multi-lang done)*
+*Last updated: 2026-02-18 (RAISE-169: two-phase context loading items)*

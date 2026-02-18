@@ -71,6 +71,9 @@ Stories merge to epic, epics merge to v2, v2 merges to main at release.
 - wrong: rai memory add-pattern --source F1 | right: --from F1 | why: flag is --from
 - wrong: rai discover scan --input dir | right: rai discover scan dir | why: PATH positional
 
+## External Integrations
+- Jira config: `.raise/jira.yaml` — team identifiers, workflows, transition IDs. Read just-in-time when using Jira MCP tools.
+
 ## File Operations
 - ALWAYS read files explicitly before editing them
 - Use read tool first, then edit/write tools
