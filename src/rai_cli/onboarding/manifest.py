@@ -13,6 +13,7 @@ from pathlib import Path
 import yaml
 from pydantic import BaseModel, Field, ValidationError
 
+from rai_cli.config.ide import IdeType
 from rai_cli.config.paths import MANIFEST_FILE, get_raise_dir
 from rai_cli.onboarding.detection import ProjectType
 
@@ -47,6 +48,16 @@ class BranchConfig(BaseModel):
     main: str = "main"
 
 
+class IdeManifest(BaseModel):
+    """IDE configuration persisted in manifest.
+
+    Attributes:
+        type: Which IDE this project uses.
+    """
+
+    type: IdeType = "claude"
+
+
 class ProjectManifest(BaseModel):
     """Project manifest stored in .raise/manifest.yaml.
 
@@ -54,11 +65,13 @@ class ProjectManifest(BaseModel):
         version: Manifest schema version.
         project: Project information.
         branches: Branch naming configuration.
+        ide: IDE configuration.
     """
 
     version: str = "1.0"
     project: ProjectInfo
     branches: BranchConfig = Field(default_factory=BranchConfig)
+    ide: IdeManifest = Field(default_factory=IdeManifest)
 
 
 def save_manifest(manifest: ProjectManifest, project_root: Path) -> None:
