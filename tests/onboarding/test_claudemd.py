@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import pytest
 
+from rai_cli.config.ide import get_ide_config
 from rai_cli.onboarding.claudemd import ClaudeMdGenerator, generate_claude_md
 from rai_cli.onboarding.conventions import (
     Confidence,
@@ -326,3 +327,20 @@ class TestConvenienceFunction:
             conventions=None,
         )
         assert "new-project" in result
+
+    def test_accepts_ide_config(
+        self,
+        brownfield_detection: DetectionResult,
+        conventions: ConventionResult,
+    ) -> None:
+        """generate_claude_md should accept ide_config parameter."""
+        config = get_ide_config("antigravity")
+        result = generate_claude_md(
+            project_name="my-api",
+            detection=brownfield_detection,
+            conventions=conventions,
+            ide_config=config,
+        )
+        # Content is IDE-agnostic — same output regardless of config
+        assert isinstance(result, str)
+        assert "my-api" in result
