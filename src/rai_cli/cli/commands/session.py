@@ -31,7 +31,7 @@ from rai_cli.onboarding.profile import (
     save_developer_profile,
     start_session,
 )
-from rai_cli.session.bundle import assemble_context_bundle
+from rai_cli.session.bundle import assemble_context_bundle, assemble_sections
 from rai_cli.session.close import CloseInput, load_state_file, process_session_close
 from rai_cli.session.resolver import resolve_session_id
 from rai_cli.session.state import (
@@ -212,6 +212,56 @@ def start(
         else:
             typer.echo(f"▶ Session started ({agent_name})")
         typer.echo(f"Session recorded. (last: {updated.last_session})")
+
+
+@session_app.command()
+def context(
+    sections: Annotated[
+        str,
+        typer.Option(
+            "--sections",
+            "-s",
+            help="Comma-separated section names to load (e.g., 'governance,behavioral')",
+        ),
+    ],
+    project: Annotated[
+        str,
+        typer.Option(
+            "--project",
+            "-p",
+            help="Project path",
+        ),
+    ],
+) -> None:
+    """Load specific context sections for AI consumption.
+
+    Returns formatted priming sections selected by name. Use after
+    `rai session start --context` to load task-relevant context.
+
+    Available sections: governance, behavioral, coaching, deadlines, progress.
+
+    Examples:
+        $ raise session context --sections governance,behavioral --project .
+        $ raise session context --sections coaching --project /my/proj
+    """
+    profile = load_developer_profile()
+    if profile is None:
+        cli_error("No developer profile found")
+        return
+
+    project_path = Path(project)
+    state = load_session_state(project_path)
+
+    section_list = [s.strip() for s in sections.split(",") if s.strip()]
+
+    try:
+        output = assemble_sections(section_list, project_path, profile, state)
+    except ValueError as e:
+        cli_error(str(e))
+        return
+
+    if output:
+        typer.echo(output)
 
 
 @session_app.command()
