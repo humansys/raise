@@ -231,6 +231,31 @@ Toolkit (CLI commands)   → Deterministic operations Rai calls from within skil
 
 Rai reads the skill, decides what to do, calls CLI tools for data, synthesizes results. The skill provides judgment; the tool provides determinism.
 
+### Pattern: Just-in-Time External Config
+
+```
+Always-on (CLAUDE.md)    → 1-line pointer: "jira.yaml exists at .raise/"
+Session-start            → Mentions availability, does NOT load content
+Skill (story-start, etc) → Reads full config just-in-time when needed
+```
+
+External integrations (Jira, CI/CD, notifications) require static configuration (team IDs, workflow states, transition IDs, project keys). This config is:
+
+- **Not memory** — static facts, not accumulated knowledge. Doesn't belong in the graph.
+- **Not always-on** — most sessions don't need it. Loading it wastes context tokens.
+- **Not discoverable at runtime** — querying APIs for workflows burns tokens and is non-deterministic.
+
+Solution: store as `.raise/*.yaml` config files. CLAUDE.md points to them (1 line). Skills read them just-in-time when they need to interact with external systems.
+
+**Current configs:**
+- `.raise/jira.yaml` — team identifiers, project keys, workflow states, transition IDs, lifecycle mapping
+
+**Design rules:**
+1. Config files are deterministic reference — never inference-generated
+2. CLAUDE.md carries only a pointer, never the content
+3. Skills read the full file only when they need it (e.g., story-start reads jira.yaml to transition the issue)
+4. Config files are per-repo — each project/client can have different team, workflows, projects
+
 ## What Constitutes Drift
 
 **Architectural drift** is any change that violates the constraints above. Specifically:
