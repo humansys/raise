@@ -875,3 +875,188 @@ class TestInitIdeFlag:
             assert result.exit_code == 0
             canonical = project / ".raise" / "rai" / "memory" / "MEMORY.md"
             assert canonical.exists(), f"Canonical MEMORY.md missing for --ide {ide}"
+
+
+class TestInitAgentFlag:
+    """Tests for new --agent flag (replaces --ide)."""
+
+    def test_agent_cursor_produces_cursor_structure(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent cursor scaffolds to .cursor/skills/."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "cursor"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (
+            greenfield_project / ".cursor" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
+        assert not (greenfield_project / ".claude").exists()
+
+    def test_agent_windsurf_produces_windsurf_structure(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent windsurf scaffolds to .windsurf/skills/ and .windsurf/workflows/."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "windsurf"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (greenfield_project / ".windsurf" / "skills").exists()
+        assert (greenfield_project / ".windsurf" / "workflows").exists()
+
+    def test_multi_agent_produces_both_structures(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent claude --agent cursor scaffolds to both locations."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                [
+                    "init",
+                    "--path", str(greenfield_project),
+                    "--agent", "claude",
+                    "--agent", "cursor",
+                ],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (
+            greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
+        assert (
+            greenfield_project / ".cursor" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
+
+    def test_multi_agent_manifest_stores_all_types(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Manifest agents.types contains all specified agents."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app,
+                [
+                    "init",
+                    "--path", str(greenfield_project),
+                    "--agent", "claude",
+                    "--agent", "cursor",
+                ],
+                catch_exceptions=False,
+            )
+
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert "claude" in manifest.agents.types
+        assert "cursor" in manifest.agents.types
+
+    def test_agent_takes_priority_over_ide(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent takes priority over --ide when both provided."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                [
+                    "init",
+                    "--path", str(greenfield_project),
+                    "--agent", "cursor",
+                    "--ide", "antigravity",
+                ],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (greenfield_project / ".cursor" / "skills").exists()
+        assert not (greenfield_project / ".agent").exists()
+
+    def test_unknown_agent_warns_and_falls_back(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Unknown agent type produces warning, falls back to claude."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "nonexistent"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert "Warning" in result.output or "warning" in result.output.lower()
+        # Falls back to claude
+        assert (greenfield_project / ".claude" / "skills").exists()
+
+
+class TestInitDetectAgents:
+    """Tests for --detect auto-detection of agents."""
+
+    def test_detect_finds_claude_marker(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--detect picks up CLAUDE.md as claude marker."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+        (greenfield_project / "CLAUDE.md").write_text("# Claude")
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert "claude" in manifest.agents.types
+
+    def test_detect_generates_agents_md(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--detect generates AGENTS.md at project root."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+        (greenfield_project / "CLAUDE.md").write_text("# Claude")
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (greenfield_project / "AGENTS.md").exists()
+
+    def test_detect_no_markers_defaults_to_claude(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--detect with no markers found defaults to claude."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (greenfield_project / ".claude" / "skills").exists()

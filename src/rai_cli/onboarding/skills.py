@@ -24,6 +24,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
+from rai_cli.config.agent_plugin import AgentPlugin
 from rai_cli.config.agents import AgentConfig, get_agent_config
 
 logger = logging.getLogger(__name__)
@@ -40,10 +41,31 @@ class SkillScaffoldResult(BaseModel):
     skills_skipped_names: list[str] = Field(default_factory=list)
 
 
+def _apply_plugin_transform(
+    content: str,
+    plugin: AgentPlugin,
+    agent_config: AgentConfig,
+) -> str:
+    """Apply plugin.transform_skill to a SKILL.md content string."""
+    from rai_cli.skills.parser import parse_frontmatter
+
+    import yaml
+
+    fm, body = parse_frontmatter(content)
+    fm_out, body_out = plugin.transform_skill(fm, body, agent_config)
+    # Re-serialize: frontmatter + body
+    if fm_out:
+        return f"---\n{yaml.dump(fm_out, default_flow_style=False, allow_unicode=True)}---\n{body_out}"
+    return body_out
+
+
 def _copy_skill_tree(
     source_dir: Traversable,
     dest_dir: Path,
     result: SkillScaffoldResult,
+    *,
+    plugin: AgentPlugin | None = None,
+    agent_config: AgentConfig | None = None,
 ) -> int:
     """Recursively copy skill files from source to destination.
 
@@ -51,6 +73,8 @@ def _copy_skill_tree(
         source_dir: Traversable resource directory.
         dest_dir: Target directory on filesystem.
         result: Result object to track copied/skipped files.
+        plugin: Optional plugin to transform SKILL.md files.
+        agent_config: Agent config passed to plugin.
 
     Returns:
         Number of files copied.
@@ -66,12 +90,17 @@ def _copy_skill_tree(
                 logger.debug("Skipped (exists): %s", dest)
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
-            dest.write_text(item.read_text(encoding="utf-8"), encoding="utf-8")
+            raw_content = item.read_text(encoding="utf-8")
+            if plugin is not None and agent_config is not None and item.name == "SKILL.md":
+                raw_content = _apply_plugin_transform(raw_content, plugin, agent_config)
+            dest.write_text(raw_content, encoding="utf-8")
             result.files_copied.append(str(dest))
             copied += 1
             logger.debug("Copied: %s", dest)
         elif item.is_dir():
-            copied += _copy_skill_tree(item, dest, result)
+            copied += _copy_skill_tree(
+                item, dest, result, plugin=plugin, agent_config=agent_config
+            )
     return copied
 
 
@@ -79,6 +108,7 @@ def scaffold_skills(
     project_root: Path,
     *,
     agent_config: AgentConfig | None = None,
+    plugin: AgentPlugin | None = None,
 ) -> SkillScaffoldResult:
     """Copy bundled skills to project skill directory.
 
@@ -88,7 +118,8 @@ def scaffold_skills(
 
     Args:
         project_root: Project root directory.
-        ide_config: IDE configuration. Defaults to Claude.
+        agent_config: Agent configuration. Defaults to Claude.
+        plugin: Optional plugin to transform SKILL.md files during copy.
 
     Returns:
         SkillScaffoldResult with details of what was copied or skipped.
@@ -96,6 +127,9 @@ def scaffold_skills(
     from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
     config = agent_config or get_agent_config()
+    if config.skills_dir is None:
+        return SkillScaffoldResult()
+
     base = files("rai_cli.skills_base")
     skills_dir = project_root / config.skills_dir
     result = SkillScaffoldResult()
@@ -111,7 +145,9 @@ def scaffold_skills(
             continue
 
         source = base / skill_name
-        copied = _copy_skill_tree(source, skill_dest, result)
+        copied = _copy_skill_tree(
+            source, skill_dest, result, plugin=plugin, agent_config=config
+        )
 
         if copied > 0:
             result.skills_installed.append(skill_name)
