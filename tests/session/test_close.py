@@ -729,6 +729,33 @@ class TestProcessSessionCloseNextSessionPrompt:
         mp.undo()
 
 
+class TestLoadStateFileSessionId:
+    """Tests for load_state_file with session_id field (RAISE-201)."""
+
+    def test_loads_state_file_with_session_id(self, tmp_path: Path) -> None:
+        """State file with session_id populates CloseInput.session_id."""
+        data = {
+            "session_id": "SES-219",
+            "summary": "session with id",
+            "type": "feature",
+        }
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text(yaml.dump(data))
+
+        result = load_state_file(state_file)
+        assert result.session_id == "SES-219"
+
+    def test_loads_state_file_without_session_id_defaults_empty(
+        self, tmp_path: Path,
+    ) -> None:
+        """State file without session_id defaults to empty string."""
+        state_file = tmp_path / "state.yaml"
+        state_file.write_text("summary: no session id\n")
+
+        result = load_state_file(state_file)
+        assert result.session_id == ""
+
+
 class TestLoadStateFileProgress:
     """Tests for load_state_file with progress and completed_epics."""
 
