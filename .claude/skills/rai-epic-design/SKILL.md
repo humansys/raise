@@ -130,6 +130,26 @@ rai memory context mod-<name>
 
 **Verification:** Architectural context loaded for key modules OR gaps noted.
 
+### Step 0.7: Load Problem Brief (Optional)
+
+Check if a Problem Brief exists from a prior `/problem-shape` session:
+
+```bash
+ls work/problem-briefs/*.md 2>/dev/null | sort | tail -1
+```
+
+**If a Brief exists:**
+- Read the most recent one
+- Use it as pre-populated input for Step 1 (Objective) — skip asking for the business objective verbally
+- Note in the epic scope: `> Problem Brief: work/problem-briefs/{filename}`
+
+**If no Brief exists:**
+- Continue normally — Step 1 will gather the objective conversationally
+
+**This step is non-blocking.** A missing Problem Brief is not an error; it just means Step 1 starts from scratch.
+
+**Verification:** Problem Brief loaded OR confirmed absent.
+
 ### Step 1: Frame the Epic Objective
 
 Define what this epic accomplishes at a strategic level.
