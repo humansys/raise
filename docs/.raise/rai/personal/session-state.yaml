@@ -1,0 +1,53 @@
+current_work:
+  release: ''
+  epic: RAISE-144
+  story: RAISE-199
+  phase: closed
+  branch: v2
+last_session:
+  id: SES-001
+  date: '2026-02-19'
+  developer: Emilio
+  summary: RAISE-168 epic closed + merged to v2. RAISE-199 docs update complete. v2
+    ready for 2.1.0 publish.
+  patterns_captured: []
+pending:
+  decisions: []
+  blockers: []
+  next_actions:
+  - Run /rai-publish to release v2.1.0 to PyPI
+  - Design RAISE-171 epic (meta-cognition indicators) when ready
+notes: Demo-ready. git advice.addIgnoredFile silenced.
+narrative: '## Decisions
+
+  RAISE-171 (meta-cognition indicators) promoted to its own epic — scope too large
+  for RAISE-168. RAISE-168 closed with 5 stories delivered. Release is v2.1.0 (not
+  2.0.2) — RAISE-168 content significant enough for minor bump.
+
+
+  ## Artifacts
+
+  work/epics/raise-168-neurosymbolic-memory-density/retrospective.md — epic close.
+
+  docs/src/content/docs/docs/cli/index.mdx + ES mirror — CLI reference for v2.1.0.
+
+  docs/src/content/docs/docs/concepts/memory.mdx + ES mirror — Pattern scoring + reinforcement
+  loop.
+
+  work/stories/raise-199-docs-v210-release-prep/scope.md — docs story scope.
+
+
+  ## Branch State
+
+  v2 — ready for publish. RAISE-128 + RAISE-168 (5 stories) + RAISE-199 docs. 2246
+  passing, 90.59% coverage, pyright + ruff clean. Docs build 22 pages, 0 errors.
+
+  '
+next_session_prompt: 'v2 is release-ready for 2.1.0. Next: /rai-publish. Before publish:
+  verify tests pass, bump pyproject.toml to 2.1.0, update CHANGELOG, tag + push. RAISE-171
+  (meta-cognition) is next epic — no branch yet, needs /rai-epic-start when ready.
+  Check Kurigage demo feedback.
+
+  '
+progress: null
+completed_epics: []
