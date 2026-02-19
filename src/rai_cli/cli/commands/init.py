@@ -22,7 +22,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from rai_cli.config.agents import AgentChoice, AgentConfig, get_agent_config
-from rai_cli.onboarding.claudemd import generate_claude_md
+from rai_cli.onboarding.instructions import generate_instructions as generate_claude_md
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type
 from rai_cli.onboarding.governance import generate_guardrails
