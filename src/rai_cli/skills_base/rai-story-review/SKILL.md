@@ -15,7 +15,7 @@ metadata:
   raise.next: story-close
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "1.2.0"
   raise.visibility: public
 ---
 
@@ -165,6 +165,50 @@ rai memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing
 **Verification:** Patterns persisted via CLI (or explicitly skipped).
 
 > **If you can't continue:** CLI not available → Add patterns manually to `.raise/rai/memory/patterns.jsonl`.
+
+### Step 4.6: Evaluate Behavioral Patterns (Reinforcement Signal)
+
+Evaluate the patterns that were loaded at story-start against what actually happened
+during implementation. This is the primary signal collection point for the temporal
+decay scoring system (RAISE-170).
+
+**When to run:** After implementation is complete and the code is working.
+**Source of patterns:** The behavioral section loaded at session start (`rai session context --sections behavioral`).
+
+**Votes:**
+- `1` = implementation **followed** the pattern (applied, reinforced)
+- `0` = pattern **not relevant** to this story (N/A — does NOT count toward evaluations)
+- `-1` = implementation **contradicted** the pattern (violated, worked against it)
+
+**Command per pattern:**
+```bash
+rai memory reinforce {pattern_id} --vote {1|0|-1} --from {story_id}
+```
+
+**Example batch (RAISE-170 patterns):**
+```bash
+rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170   # Grounding over speed — applied
+rai memory reinforce PAT-E-153 --vote 1 --from RAISE-170   # JSONL backward compat — applied
+rai memory reinforce PAT-E-186 --vote 1 --from RAISE-170   # Design not optional — applied
+rai memory reinforce PAT-E-150 --vote 0 --from RAISE-170   # Drift review — N/A this story
+rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170   # Large renames — N/A this story
+```
+
+**Decision heuristic per pattern:**
+- Did the implementation explicitly use, follow, or validate this pattern? → `1`
+- Was the pattern loaded but this story simply wasn't the relevant context? → `0`
+- Did the implementation go against what the pattern recommends? → `-1`
+
+**Output interpretation:**
+- `wilson≈0.XX` — current confidence score after update
+- `↓ consider reviewing` — Wilson score < 0.15, pattern may need revision
+
+**Note:** Only evaluate patterns you consciously considered during implementation.
+Do NOT force votes. `0` is the right choice for most patterns in any given story.
+
+**Verification:** All loaded behavioral patterns evaluated (or explicitly skipped with reason).
+
+> **If you can't continue:** CLI unavailable → Document evaluations in retrospective manually.
 
 ### Step 5: Document Retrospective
 

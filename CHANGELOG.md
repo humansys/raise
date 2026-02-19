@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-02-19
+
+### Added
+- Neurosymbolic Memory Density epic (RAISE-168): temporal decay scoring, Wilson confidence, pattern reinforcement via `rai memory reinforce`
+- Task-relevant context bundle: two-phase context loading with `rai session context --sections` (RAISE-169)
+- IDE Integration epic (RAISE-128): multi-IDE agent registry, `--ide` flag, Copilot/Cursor/Windsurf plugin support
+- Problem-shape skill: `/rai-problem-shape` for guided problem definition at portfolio level (RAISE-200)
+- Memory query `--format compact` for high-density Markdown-KV output (RAISE-166)
+- Multi-IDE instruction generation: AgentConfig model with 5 built-in agent targets (RAISE-197)
+
+### Fixed
+- Session close race condition: three-layer defense with session-specific paths, session_id in state file, and coherence validation (RAISE-201)
+- Pyright strict: explicit `last_sync_at=None` in SyncState constructor
+
+## [2.0.1] - 2026-02-17
+
+### Fixed
+- SES-MIGRATED test fixture leakage across session tests
+- Encoding fix for test `read_text()` calls on Windows
+
 ## [2.0.0] - 2026-02-16
 
 ### Added
