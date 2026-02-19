@@ -29,12 +29,14 @@ from rai_cli.memory.models import (
 from rai_cli.memory.writer import (
     CalibrationInput,
     PatternInput,
+    ReinforceResult,
     SessionInput,
     WriteResult,
     append_calibration,
     append_pattern,
     append_session,
     get_memory_dir_for_scope,
+    reinforce_pattern,
 )
 
 __all__ = [
@@ -47,6 +49,7 @@ __all__ = [
     "MigrationResult",
     "PatternInput",
     "PatternSubType",
+    "ReinforceResult",
     "SessionInput",
     "WriteResult",
     "append_calibration",
@@ -55,4 +58,5 @@ __all__ = [
     "get_memory_dir_for_scope",
     "migrate_to_personal",
     "needs_migration",
+    "reinforce_pattern",
 ]

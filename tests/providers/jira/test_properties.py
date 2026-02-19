@@ -4,7 +4,7 @@ Tests set_entity_property, get_entity_property, and has_rai_metadata with mocked
 TDD: RED phase - tests written before implementation.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import Mock
 
 import pytest
@@ -24,7 +24,7 @@ from rai_pro.providers.jira.properties import (
 class TestSetEntityProperty:
     """Test set_entity_property function."""
 
-    
+
     def test_set_entity_property_success(self) -> None:
         """Test successful entity property storage."""
         mock_client = Mock(spec=JiraClient)
@@ -34,7 +34,7 @@ class TestSetEntityProperty:
         metadata = RaiSyncMetadata(
             epic_id="E-DEMO",
             story_id="S-DEMO.4",
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
@@ -56,7 +56,7 @@ class TestSetEntityProperty:
         assert payload["rai_sync"]["epic_id"] == "E-DEMO"
         assert payload["rai_sync"]["story_id"] == "S-DEMO.4"
 
-    
+
     def test_set_entity_property_handles_api_error(self) -> None:
         """Test error handling when JIRA API call fails."""
         mock_client = Mock(spec=JiraClient)
@@ -68,7 +68,7 @@ class TestSetEntityProperty:
         mock_client._jira.put = Mock(side_effect=error)
 
         metadata = RaiSyncMetadata(
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
@@ -82,7 +82,7 @@ class TestSetEntityProperty:
 class TestGetEntityProperty:
     """Test get_entity_property function."""
 
-    
+
     def test_get_entity_property_success(self) -> None:
         """Test successful entity property retrieval."""
         mock_client = Mock(spec=JiraClient)
@@ -94,7 +94,7 @@ class TestGetEntityProperty:
                 "rai_sync": {
                     "epic_id": "E-DEMO",
                     "story_id": "S-DEMO.4",
-                    "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+                    "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
                     "sync_version": "1",
                     "rai_branch": "demo/atlassian-webinar",
                     "local_path": "/home/emilio/Code/raise-commons",
@@ -117,7 +117,7 @@ class TestGetEntityProperty:
         assert result.story_id == "S-DEMO.4"
         assert result.sync_version == "1"
 
-    
+
     def test_get_entity_property_not_found_returns_none(self) -> None:
         """Test that 404 (property not set) returns None."""
         mock_client = Mock(spec=JiraClient)
@@ -129,7 +129,7 @@ class TestGetEntityProperty:
 
         assert result is None
 
-    
+
     def test_get_entity_property_other_error_raises(self) -> None:
         """Test that non-404 errors are raised."""
         mock_client = Mock(spec=JiraClient)
@@ -142,7 +142,7 @@ class TestGetEntityProperty:
 
         assert exc_info.value.status_code == 500
 
-    
+
     def test_get_entity_property_strict_validation_rejects_malformed(self) -> None:
         """Test that strict validation rejects malformed data from JIRA."""
         mock_client = Mock(spec=JiraClient)
@@ -162,7 +162,7 @@ class TestGetEntityProperty:
         with pytest.raises(ValidationError):
             get_entity_property(mock_client, "DEMO-123")
 
-    
+
     def test_get_entity_property_rejects_unknown_fields(self) -> None:
         """Test that strict mode rejects unknown fields."""
         mock_client = Mock(spec=JiraClient)
@@ -172,7 +172,7 @@ class TestGetEntityProperty:
             "value": {
                 "rai_sync": {
                     "epic_id": "E-DEMO",
-                    "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+                    "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
                     "rai_branch": "demo/atlassian-webinar",
                     "local_path": "/home/emilio/Code/raise-commons",
                 },
@@ -188,7 +188,7 @@ class TestGetEntityProperty:
 class TestHasRaiMetadata:
     """Test has_rai_metadata helper function."""
 
-    
+
     def test_has_rai_metadata_true_when_property_exists(self) -> None:
         """Test returns True when entity property exists."""
         mock_client = Mock(spec=JiraClient)
@@ -199,7 +199,7 @@ class TestHasRaiMetadata:
             "value": {
                 "rai_sync": {
                     "epic_id": "E-DEMO",
-                    "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+                    "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
                     "rai_branch": "demo/atlassian-webinar",
                     "local_path": "/home/emilio/Code/raise-commons",
                 }
@@ -210,7 +210,7 @@ class TestHasRaiMetadata:
 
         assert result is True
 
-    
+
     def test_has_rai_metadata_false_when_property_not_set(self) -> None:
         """Test returns False when entity property not set (404)."""
         mock_client = Mock(spec=JiraClient)

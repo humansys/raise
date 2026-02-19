@@ -9,6 +9,7 @@ import yaml
 
 from rai_cli.onboarding.detection import ProjectType
 from rai_cli.onboarding.manifest import (
+    AgentsManifest,
     BranchConfig,
     IdeManifest,
     ProjectInfo,
@@ -142,7 +143,7 @@ class TestIdeManifest:
         """IdeManifest rejects invalid IDE type."""
         import pytest
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             IdeManifest(type="invalid")  # type: ignore[arg-type]
 
 
@@ -330,3 +331,132 @@ class TestLoadManifest:
         assert loaded.project.name == original.project.name
         assert loaded.project.project_type == original.project.project_type
         assert loaded.project.code_file_count == original.project.code_file_count
+
+
+# =============================================================================
+# AgentsManifest (new multi-agent schema)
+# =============================================================================
+
+
+class TestAgentsManifest:
+    """Tests for AgentsManifest model — new multi-agent schema."""
+
+    def test_defaults_to_claude(self) -> None:
+        """AgentsManifest defaults types to ['claude']."""
+        m = AgentsManifest()
+        assert m.types == ["claude"]
+
+    def test_accepts_multiple_types(self) -> None:
+        """AgentsManifest accepts list of agent types."""
+        m = AgentsManifest(types=["claude", "cursor", "windsurf"])
+        assert m.types == ["claude", "cursor", "windsurf"]
+
+    def test_empty_types_allowed(self) -> None:
+        """AgentsManifest accepts empty list."""
+        m = AgentsManifest(types=[])
+        assert m.types == []
+
+    def test_custom_agent_types_allowed(self) -> None:
+        """AgentsManifest accepts non-builtin agent types (extensibility)."""
+        m = AgentsManifest(types=["azure-devops"])
+        assert "azure-devops" in m.types
+
+
+class TestProjectManifestAgents:
+    """Tests for ProjectManifest.agents field."""
+
+    def test_manifest_has_default_agents(self) -> None:
+        """Manifest defaults agents to ['claude']."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        manifest = ProjectManifest(project=project)
+        assert manifest.agents.types == ["claude"]
+
+    def test_manifest_accepts_multi_agent(self) -> None:
+        """Manifest accepts explicit multi-agent config."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        agents = AgentsManifest(types=["claude", "cursor"])
+        manifest = ProjectManifest(project=project, agents=agents)
+        assert "cursor" in manifest.agents.types
+
+    def test_saved_yaml_contains_agents_section(self, tmp_path: Path) -> None:
+        """Saved YAML includes agents.types section."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        agents = AgentsManifest(types=["claude", "cursor"])
+        manifest = ProjectManifest(project=project, agents=agents)
+
+        save_manifest(manifest, tmp_path)
+
+        data = yaml.safe_load((tmp_path / ".raise" / "manifest.yaml").read_text())
+        assert data["agents"]["types"] == ["claude", "cursor"]
+
+    def test_roundtrip_agents(self, tmp_path: Path) -> None:
+        """Save + load preserves agents.types."""
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        manifest = ProjectManifest(
+            project=project, agents=AgentsManifest(types=["claude", "windsurf"])
+        )
+        save_manifest(manifest, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.agents.types == ["claude", "windsurf"]
+
+
+class TestManifestBackwardCompat:
+    """Tests for backward compat — old ide.type → agents.types migration."""
+
+    def test_old_ide_yaml_populates_agents(self, tmp_path: Path) -> None:
+        """Old manifest with ide.type migrates to agents.types on load."""
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 5\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+            "ide:\n"
+            "  type: antigravity\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert "antigravity" in loaded.agents.types
+
+    def test_manifest_without_ide_uses_claude_default(self, tmp_path: Path) -> None:
+        """Manifest without ide or agents section defaults agents to ['claude']."""
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 5\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.agents.types == ["claude"]
+
+    def test_new_agents_yaml_takes_precedence(self, tmp_path: Path) -> None:
+        """If both ide and agents present, agents.types is used."""
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: proj\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 1\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+            "ide:\n"
+            "  type: claude\n"
+            "agents:\n"
+            "  types:\n"
+            "    - claude\n"
+            "    - cursor\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.agents.types == ["claude", "cursor"]

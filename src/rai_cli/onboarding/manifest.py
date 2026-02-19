@@ -9,9 +9,10 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any, cast
 
 import yaml
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field, ValidationError, model_validator
 
 from rai_cli.config.ide import IdeType
 from rai_cli.config.paths import MANIFEST_FILE, get_raise_dir
@@ -49,13 +50,25 @@ class BranchConfig(BaseModel):
 
 
 class IdeManifest(BaseModel):
-    """IDE configuration persisted in manifest.
+    """IDE configuration persisted in manifest (legacy single-IDE format).
 
     Attributes:
         type: Which IDE this project uses.
     """
 
     type: IdeType = "claude"
+
+
+class AgentsManifest(BaseModel):
+    """Multi-agent configuration persisted in manifest.
+
+    Replaces IdeManifest with a list to support multiple simultaneous agents.
+
+    Attributes:
+        types: List of active agent types (e.g. ["claude", "cursor", "windsurf"]).
+    """
+
+    types: list[str] = Field(default_factory=lambda: ["claude"])
 
 
 class ProjectManifest(BaseModel):
@@ -65,13 +78,36 @@ class ProjectManifest(BaseModel):
         version: Manifest schema version.
         project: Project information.
         branches: Branch naming configuration.
-        ide: IDE configuration.
+        ide: Legacy single-IDE configuration (backward compat — read/write).
+        agents: Multi-agent configuration (new format).
     """
 
     version: str = "1.0"
     project: ProjectInfo
     branches: BranchConfig = Field(default_factory=BranchConfig)
     ide: IdeManifest = Field(default_factory=IdeManifest)
+    agents: AgentsManifest = Field(default_factory=AgentsManifest)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _migrate_ide_to_agents(cls, data: Any) -> dict[str, Any]:
+        """Migrate old ide.type format to agents.types on load.
+
+        If 'agents' key is absent but 'ide' key is present, derive
+        agents.types from ide.type for backward compat.
+        """
+        if not isinstance(data, dict):
+            return cast(dict[str, Any], data)
+        typed: dict[str, Any] = cast(dict[str, Any], data)
+        if "agents" not in typed and "ide" in typed:
+            raw_ide: object = typed["ide"]
+            if isinstance(raw_ide, dict):
+                raw_type: object = cast(dict[str, object], raw_ide).get("type", "claude")
+                ide_type: str = str(raw_type) if raw_type is not None else "claude"
+            else:
+                ide_type = "claude"
+            typed["agents"] = {"types": [ide_type]}
+        return typed
 
 
 def save_manifest(manifest: ProjectManifest, project_root: Path) -> None:

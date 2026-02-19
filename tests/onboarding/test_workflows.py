@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from rai_cli.config.ide import get_ide_config
+from rai_cli.config.agents import get_agent_config
 from rai_cli.onboarding.workflows import WorkflowScaffoldResult, scaffold_workflows
 from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
@@ -18,8 +18,8 @@ class TestScaffoldWorkflows:
 
     def test_generates_all_workflows_for_antigravity(self, tmp_path: Path) -> None:
         """Should generate one workflow file per distributable skill."""
-        config = get_ide_config("antigravity")
-        result = scaffold_workflows(tmp_path, ide_config=config)
+        config = get_agent_config("antigravity")
+        result = scaffold_workflows(tmp_path, agent_config=config)
 
         workflows_dir = tmp_path / ".agent" / "workflows"
         for skill_name in DISTRIBUTABLE_SKILLS:
@@ -30,8 +30,8 @@ class TestScaffoldWorkflows:
 
     def test_workflow_has_valid_yaml_frontmatter(self, tmp_path: Path) -> None:
         """Each workflow file should have parseable YAML frontmatter with name and description."""
-        config = get_ide_config("antigravity")
-        scaffold_workflows(tmp_path, ide_config=config)
+        config = get_agent_config("antigravity")
+        scaffold_workflows(tmp_path, agent_config=config)
 
         workflow_path = tmp_path / ".agent" / "workflows" / "rai-session-start.md"
         content = workflow_path.read_text()
@@ -48,8 +48,8 @@ class TestScaffoldWorkflows:
 
     def test_workflow_body_references_skill(self, tmp_path: Path) -> None:
         """Workflow body should reference the corresponding skill."""
-        config = get_ide_config("antigravity")
-        scaffold_workflows(tmp_path, ide_config=config)
+        config = get_agent_config("antigravity")
+        scaffold_workflows(tmp_path, agent_config=config)
 
         workflow_path = tmp_path / ".agent" / "workflows" / "rai-session-start.md"
         content = workflow_path.read_text()
@@ -62,8 +62,8 @@ class TestScaffoldWorkflows:
 
     def test_returns_files_created_list(self, tmp_path: Path) -> None:
         """Should return list of created file paths."""
-        config = get_ide_config("antigravity")
-        result = scaffold_workflows(tmp_path, ide_config=config)
+        config = get_agent_config("antigravity")
+        result = scaffold_workflows(tmp_path, agent_config=config)
 
         assert len(result.files_created) == TOTAL_SKILLS
         assert not result.already_existed
@@ -75,8 +75,8 @@ class TestScaffoldWorkflowsNoOp:
 
     def test_noop_for_claude(self, tmp_path: Path) -> None:
         """Claude has no workflows_dir — should skip entirely."""
-        config = get_ide_config("claude")
-        result = scaffold_workflows(tmp_path, ide_config=config)
+        config = get_agent_config("claude")
+        result = scaffold_workflows(tmp_path, agent_config=config)
 
         assert result.workflows_created == 0
         assert result.skipped_no_workflows_dir
@@ -95,24 +95,24 @@ class TestScaffoldWorkflowsIdempotency:
 
     def test_does_not_overwrite_existing_workflows(self, tmp_path: Path) -> None:
         """Should not overwrite existing workflow files."""
-        config = get_ide_config("antigravity")
-        scaffold_workflows(tmp_path, ide_config=config)
+        config = get_agent_config("antigravity")
+        scaffold_workflows(tmp_path, agent_config=config)
 
         # Modify a workflow
         workflow_path = tmp_path / ".agent" / "workflows" / "rai-session-start.md"
         workflow_path.write_text("# Custom workflow")
 
         # Second scaffold
-        result = scaffold_workflows(tmp_path, ide_config=config)
+        result = scaffold_workflows(tmp_path, agent_config=config)
 
         assert workflow_path.read_text() == "# Custom workflow"
         assert "rai-session-start" in result.files_skipped
 
     def test_second_run_reports_already_existed(self, tmp_path: Path) -> None:
         """Second scaffold should report already_existed=True."""
-        config = get_ide_config("antigravity")
-        scaffold_workflows(tmp_path, ide_config=config)
-        result = scaffold_workflows(tmp_path, ide_config=config)
+        config = get_agent_config("antigravity")
+        scaffold_workflows(tmp_path, agent_config=config)
+        result = scaffold_workflows(tmp_path, agent_config=config)
 
         assert result.already_existed
         assert len(result.files_skipped) == TOTAL_SKILLS
@@ -120,14 +120,14 @@ class TestScaffoldWorkflowsIdempotency:
 
     def test_creates_only_missing_workflows(self, tmp_path: Path) -> None:
         """Should create missing workflows when some already exist."""
-        config = get_ide_config("antigravity")
+        config = get_agent_config("antigravity")
 
         # Pre-create one workflow
         wf_dir = tmp_path / ".agent" / "workflows"
         wf_dir.mkdir(parents=True)
         (wf_dir / "rai-session-start.md").write_text("# Existing")
 
-        result = scaffold_workflows(tmp_path, ide_config=config)
+        result = scaffold_workflows(tmp_path, agent_config=config)
 
         assert "rai-session-start" in result.files_skipped
         assert result.workflows_created == TOTAL_SKILLS - 1
