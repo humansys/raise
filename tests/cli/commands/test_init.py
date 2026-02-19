@@ -1005,6 +1005,53 @@ class TestInitAgentFlag:
         # Falls back to claude
         assert (greenfield_project / ".claude" / "skills").exists()
 
+    def test_agent_roo_produces_roo_structure(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent roo scaffolds to .roo/skills/."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "roo"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (greenfield_project / ".roo" / "skills" / "rai-session-start" / "SKILL.md").exists()
+
+    def test_agent_roo_detect_generates_instructions(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent roo --detect generates .roo/rules/raise.md instructions."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "roo", "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        assert (greenfield_project / ".roo" / "rules" / "raise.md").exists()
+
+    def test_agent_roo_no_claude_structure(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--agent roo does NOT scaffold .claude/ structure."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--agent", "roo"],
+                catch_exceptions=False,
+            )
+
+        assert not (greenfield_project / ".claude").exists()
+
 
 class TestInitDetectAgents:
     """Tests for --detect auto-detection of agents."""
@@ -1060,3 +1107,22 @@ class TestInitDetectAgents:
 
         assert result.exit_code == 0
         assert (greenfield_project / ".claude" / "skills").exists()
+
+    def test_detect_finds_roo_marker(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """--detect picks up .roo/ directory as roo marker."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+        (greenfield_project / ".roo").mkdir()
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project), "--detect"],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert "roo" in manifest.agents.types

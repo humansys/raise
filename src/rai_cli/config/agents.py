@@ -15,7 +15,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-BuiltinAgentType = Literal["claude", "cursor", "windsurf", "copilot", "antigravity"]
+BuiltinAgentType = Literal["claude", "cursor", "windsurf", "copilot", "antigravity", "roo"]
 
 
 class AgentChoice(str, Enum):
@@ -26,6 +26,7 @@ class AgentChoice(str, Enum):
     windsurf = "windsurf"
     copilot = "copilot"
     antigravity = "antigravity"
+    roo = "roo"
 
 
 class AgentConfig(BaseModel):
@@ -91,6 +92,13 @@ BUILTIN_AGENTS: dict[BuiltinAgentType, AgentConfig] = {
         instructions_file=".agent/rules/raise.md",
         workflows_dir=".agent/workflows",
         detection_markers=[".agent/rules", ".agent"],
+    ),
+    "roo": AgentConfig(
+        name="Roo Code",
+        agent_type="roo",
+        skills_dir=".roo/skills",
+        instructions_file=".roo/rules/raise.md",
+        detection_markers=[".roo/rules", ".roo", ".rooignore"],
     ),
 }
 
