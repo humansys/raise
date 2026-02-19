@@ -27,7 +27,7 @@
 - [x] RAISE-165: Session startup overhead reduction (S) ✓ (2026-02-18)
 - [x] RAISE-169: Task-relevant context bundle (M) ✓ (2026-02-18)
 - [x] RAISE-197: Multi-agent skill distribution (L) ✓ (2026-02-18) — 1.74x velocity
-- RAISE-170: Temporal decay and pattern scoring (M)
+- [x] RAISE-170: Temporal decay and pattern scoring (M) ✓ (completed 2026-02-19, 1.5x velocity)
 - RAISE-171: Meta-cognition indicators (L)
 
 **Done when:**
