@@ -32,6 +32,7 @@ Con `--detect`, también analiza las convenciones de código y genera guardrails
 | `--name` | `-n` | Nombre del proyecto (por defecto: nombre del directorio) |
 | `--path` | `-p` | Ruta del proyecto (por defecto: directorio actual) |
 | `--detect` | `-d` | Detectar convenciones y generar `guardrails.md` |
+| `--ide` | | Tipo de IDE: `claude` (por defecto), `antigravity`, `cursor` |
 
 ```bash
 # Proyecto nuevo
@@ -42,6 +43,9 @@ rai init --name mi-api
 
 # Proyecto existente con detección de convenciones
 rai init --detect
+
+# Inicializar para Antigravity IDE
+rai init --ide antigravity
 ```
 
 ---
@@ -99,6 +103,26 @@ rai session close --summary "Refactoricé tests" --type maintenance \
   --pattern "Usar fixtures para setup de base de datos"
 ```
 
+### `rai session context`
+
+Carga secciones de contexto relevantes para la tarea. Se llama después de `rai session start --context` para cargar priming detallado para un tipo de trabajo específico. Secciones disponibles: `governance`, `behavioral`, `coaching`, `deadlines`, `progress`.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--sections` | | Nombres de secciones separados por coma |
+| `--project` | `-p` | Ruta del proyecto |
+
+```bash
+# Trabajo en feature: principios de gobernanza + patrones de comportamiento
+rai session context --sections governance,behavioral --project .
+
+# Cerca de una fecha límite: verificar urgencia
+rai session context --sections deadlines,progress --project .
+
+# Primera sesión: cargar todo
+rai session context --sections governance,behavioral,coaching --project .
+```
+
 ---
 
 ## Memoria
@@ -109,7 +133,7 @@ Busca en la memoria unificada conceptos relevantes. La memoria contiene todas la
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
-| `--format` | `-f` | Formato de salida: `human` o `json` |
+| `--format` | `-f` | Formato de salida: `human`, `json` o `compact` |
 | `--output` | `-o` | Archivo de salida (por defecto: stdout) |
 | `--strategy` | `-s` | Estrategia de búsqueda: `keyword_search` o `concept_lookup` |
 | `--types` | `-t` | Filtrar por tipos (separados por coma: `pattern`, `calibration`, `principle`, etc.) |
@@ -242,6 +266,28 @@ rai memory add-pattern "BFS reuse across modules" -t architecture --from S2.3
 
 # Agregar a scope personal
 rai memory add-pattern "My workflow preference" --scope personal
+```
+
+### `rai memory reinforce`
+
+Registra una señal de refuerzo para un patrón. Se llama al revisar una story para indicar si el patrón fue aplicado (`1`), no fue relevante (`0`), o fue contradicho (`-1`). El voto `0` (N/A) no cuenta hacia el total de evaluaciones — úsalo libremente para patrones irrelevantes.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--vote` | `-v` | Voto: `1` (aplicado), `0` (N/A — no contado), `-1` (contradicho) |
+| `--from` | `-f` | ID de story para trazabilidad (ej., `RAISE-170`) |
+| `--scope` | `-s` | Scope de memoria: `global`, `project`, `personal` (por defecto: `project`) |
+| `--memory-dir` | `-m` | Ruta del directorio de memoria (reemplaza scope) |
+
+```bash
+# El patrón fue seguido durante la implementación
+rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170
+
+# El patrón no fue relevante para esta story
+rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170
+
+# El patrón fue contradicho
+rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170
 ```
 
 ### `rai memory add-calibration`

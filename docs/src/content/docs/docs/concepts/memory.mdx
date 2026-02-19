@@ -52,6 +52,30 @@ Sessions are a chronological record of what happened. Each session captures: wha
 rai memory add-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
 ```
 
+## Pattern Scoring
+
+Not all patterns are equal. Patterns that have been validated through real implementation should surface before untested ones. RaiSE uses a **composite score** to rank patterns in every query:
+
+```
+score = (0.3 × recency + 0.7 × keyword_relevance) × wilson_modifier
+```
+
+**Recency** decays over time using a 30-day half-life — a pattern from yesterday scores higher than one from 3 months ago, all else equal. **Foundational patterns** (marked `foundational: true`) are exempt from decay and always score on keyword relevance alone.
+
+**Wilson modifier** adjusts the score based on reinforcement history. Patterns with many positive evaluations get a boost; patterns that have been contradicted in practice rank lower.
+
+### Reinforcement Loop
+
+At every story-review, evaluate the patterns that were loaded at session start:
+
+```bash
+rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170   # applied
+rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170   # N/A
+rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170  # contradicted
+```
+
+Vote `0` (N/A) does not count toward evaluations — use it freely. The system is deliberately conservative with small sample sizes: a pattern with 1 positive evaluation scores ~0.21, not 1.0. Confidence builds gradually through real usage.
+
 ## How Memory Compounds
 
 This is the key insight: memory creates a **compounding effect**.
@@ -86,6 +110,8 @@ The index is a JSON file (`.raise/rai/memory/index.json`) that combines patterns
 |---------|-------------|
 | `rai memory build` | Build unified index from all sources |
 | `rai memory query` | Search memory for relevant concepts |
+| `rai memory query --format compact` | High-density output for AI context windows |
+| `rai memory reinforce --vote 1\|0\|-1` | Record reinforcement signal for a pattern |
 | `rai memory list` | List all concepts in the index |
 | `rai memory add-pattern` | Record a learned pattern |
 | `rai memory add-calibration` | Record story timing data |

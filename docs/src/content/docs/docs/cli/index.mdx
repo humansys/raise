@@ -32,6 +32,7 @@ With `--detect`, also analyzes code conventions and generates guardrails.
 | `--name` | `-n` | Project name (defaults to directory name) |
 | `--path` | `-p` | Project path (defaults to current directory) |
 | `--detect` | `-d` | Detect conventions and generate `guardrails.md` |
+| `--ide` | | IDE type: `claude` (default), `antigravity`, `cursor` |
 
 ```bash
 # New project
@@ -42,6 +43,9 @@ rai init --name my-api
 
 # Existing project with convention detection
 rai init --detect
+
+# Initialize for Antigravity IDE
+rai init --ide antigravity
 ```
 
 ---
@@ -99,6 +103,26 @@ rai session close --summary "Refactored tests" --type maintenance \
   --pattern "Use fixtures for database setup"
 ```
 
+### `rai session context`
+
+Load task-relevant context priming sections. Call this after `rai session start --context` to load detailed priming for a specific work type. Available sections: `governance`, `behavioral`, `coaching`, `deadlines`, `progress`.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--sections` | | Comma-separated section names to load |
+| `--project` | `-p` | Project path |
+
+```bash
+# Feature work: governance principles + behavioral patterns
+rai session context --sections governance,behavioral --project .
+
+# Near a deadline: check urgency
+rai session context --sections deadlines,progress --project .
+
+# First session: load everything
+rai session context --sections governance,behavioral,coaching --project .
+```
+
 ---
 
 ## Memory
@@ -109,7 +133,7 @@ Search the unified memory for relevant concepts. The memory contains all context
 
 | Flag | Short | Description |
 |------|-------|-------------|
-| `--format` | `-f` | Output format: `human` or `json` |
+| `--format` | `-f` | Output format: `human`, `json`, or `compact` |
 | `--output` | `-o` | Output file path (default: stdout) |
 | `--strategy` | `-s` | Query strategy: `keyword_search` or `concept_lookup` |
 | `--types` | `-t` | Filter by types (comma-separated: `pattern`, `calibration`, `principle`, etc.) |
@@ -126,6 +150,9 @@ rai memory query "testing" --types pattern,calibration
 
 # Lookup specific concept by ID
 rai memory query "PAT-001" --strategy concept_lookup
+
+# Compact output — maximum density for AI context windows
+rai memory query "velocity" --format compact
 
 # Output as JSON
 rai memory query "velocity" --format json
@@ -242,6 +269,28 @@ rai memory add-pattern "BFS reuse across modules" -t architecture --from S2.3
 
 # Add to personal scope
 rai memory add-pattern "My workflow preference" --scope personal
+```
+
+### `rai memory reinforce`
+
+Record a reinforcement signal for a pattern. Called at story-review to indicate whether a pattern was applied (`1`), not relevant (`0`), or contradicted (`-1`). Vote `0` (N/A) does not count toward the evaluation total — use it freely for irrelevant patterns.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--vote` | `-v` | Vote: `1` (applied), `0` (N/A — not counted), `-1` (contradicted) |
+| `--from` | `-f` | Story ID for traceability (e.g., `RAISE-170`) |
+| `--scope` | `-s` | Memory scope: `global`, `project`, `personal` (default: `project`) |
+| `--memory-dir` | `-m` | Memory directory path (overrides scope) |
+
+```bash
+# Pattern was followed during implementation
+rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170
+
+# Pattern was not relevant to this story
+rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170
+
+# Pattern was contradicted
+rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170
 ```
 
 ### `rai memory add-calibration`
