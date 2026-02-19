@@ -12,12 +12,14 @@ from rai_cli.memory.models import MemoryScope, PatternSubType
 from rai_cli.memory.writer import (
     CalibrationInput,
     PatternInput,
+    ReinforceResult,
     SessionInput,
-    get_next_id,
     append_calibration,
     append_pattern,
     append_session,
     get_memory_dir_for_scope,
+    get_next_id,
+    reinforce_pattern,
     validate_session_index,
 )
 
@@ -649,3 +651,161 @@ class TestAppendSessionAlwaysPersonal:
         assert result.success is True
         sessions_file = personal_dir / "sessions" / "index.jsonl"
         assert sessions_file.exists()
+
+
+class TestReinforcePattern:
+    """Tests for reinforce_pattern function (RAISE-170)."""
+
+    def _make_patterns_file(self, tmp_path: Path, lines: list[dict]) -> Path:
+        """Create a patterns.jsonl file with given records."""
+        f = tmp_path / "patterns.jsonl"
+        f.write_text(
+            "\n".join(json.dumps(line) for line in lines) + "\n",
+            encoding="utf-8",
+        )
+        return f
+
+    def test_positive_vote_increments_positives_and_evaluations(
+        self, tmp_path: Path
+    ) -> None:
+        """Vote +1 increments positives and evaluations."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [{"id": "PAT-E-001", "content": "test pattern", "created": "2026-02-01"}],
+        )
+        result = reinforce_pattern(f, "PAT-E-001", vote=1)
+
+        assert result.pattern_id == "PAT-E-001"
+        assert result.positives == 1
+        assert result.negatives == 0
+        assert result.evaluations == 1
+        assert result.was_updated is True
+
+        data = json.loads(f.read_text(encoding="utf-8").strip())
+        assert data["positives"] == 1
+        assert data["evaluations"] == 1
+
+    def test_negative_vote_increments_negatives_and_evaluations(
+        self, tmp_path: Path
+    ) -> None:
+        """Vote -1 increments negatives and evaluations."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [{"id": "PAT-E-001", "content": "test", "created": "2026-02-01"}],
+        )
+        result = reinforce_pattern(f, "PAT-E-001", vote=-1)
+
+        assert result.negatives == 1
+        assert result.evaluations == 1
+        assert result.was_updated is True
+
+    def test_zero_vote_does_not_update(self, tmp_path: Path) -> None:
+        """Vote 0 (N/A) does not modify evaluations or counts."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [
+                {
+                    "id": "PAT-E-001",
+                    "content": "test",
+                    "created": "2026-02-01",
+                    "positives": 2,
+                    "negatives": 0,
+                    "evaluations": 2,
+                }
+            ],
+        )
+        original_text = f.read_text(encoding="utf-8")
+        result = reinforce_pattern(f, "PAT-E-001", vote=0)
+
+        assert result.was_updated is False
+        assert result.positives == 2
+        assert result.evaluations == 2
+        assert f.read_text(encoding="utf-8") == original_text  # file unchanged
+
+    def test_pattern_not_found_raises(self, tmp_path: Path) -> None:
+        """KeyError raised when pattern ID not found."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [{"id": "PAT-E-001", "content": "test", "created": "2026-02-01"}],
+        )
+        with pytest.raises(KeyError):
+            reinforce_pattern(f, "PAT-E-999", vote=1)
+
+    def test_increments_from_existing_counts(self, tmp_path: Path) -> None:
+        """Increments existing positives/negatives/evaluations (not reset)."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [
+                {
+                    "id": "PAT-E-001",
+                    "content": "test",
+                    "created": "2026-02-01",
+                    "positives": 3,
+                    "negatives": 1,
+                    "evaluations": 4,
+                }
+            ],
+        )
+        result = reinforce_pattern(f, "PAT-E-001", vote=1)
+
+        assert result.positives == 4
+        assert result.negatives == 1
+        assert result.evaluations == 5
+
+    def test_last_evaluated_set_on_nonzero_vote(self, tmp_path: Path) -> None:
+        """last_evaluated updated to today for +1 and -1 votes."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [{"id": "PAT-E-001", "content": "test", "created": "2026-02-01"}],
+        )
+        reinforce_pattern(f, "PAT-E-001", vote=1)
+
+        data = json.loads(f.read_text(encoding="utf-8").strip())
+        assert data["last_evaluated"] == date.today().isoformat()
+
+    def test_last_evaluated_not_set_on_zero_vote(self, tmp_path: Path) -> None:
+        """last_evaluated NOT updated for vote=0."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [{"id": "PAT-E-001", "content": "test", "created": "2026-02-01"}],
+        )
+        reinforce_pattern(f, "PAT-E-001", vote=0)
+
+        data = json.loads(f.read_text(encoding="utf-8").strip())
+        assert "last_evaluated" not in data
+
+    def test_multi_pattern_file_only_updates_target(self, tmp_path: Path) -> None:
+        """Only target pattern is modified; others remain unchanged."""
+        f = self._make_patterns_file(
+            tmp_path,
+            [
+                {"id": "PAT-E-001", "content": "first", "created": "2026-02-01"},
+                {"id": "PAT-E-002", "content": "second", "created": "2026-02-01"},
+                {"id": "PAT-E-003", "content": "third", "created": "2026-02-01"},
+            ],
+        )
+        reinforce_pattern(f, "PAT-E-002", vote=1)
+
+        lines = [
+            json.loads(line) for line in f.read_text(encoding="utf-8").splitlines() if line.strip()
+        ]
+        assert len(lines) == 3
+        assert lines[0]["id"] == "PAT-E-001"
+        assert "positives" not in lines[0]
+        assert lines[1]["positives"] == 1
+        assert lines[2]["id"] == "PAT-E-003"
+        assert "positives" not in lines[2]
+
+    def test_reinforce_result_model(self) -> None:
+        """ReinforceResult is a Pydantic model with expected fields."""
+        r = ReinforceResult(
+            pattern_id="PAT-E-001",
+            vote=1,
+            positives=2,
+            negatives=0,
+            evaluations=2,
+            last_evaluated="2026-02-19",
+            was_updated=True,
+        )
+        assert r.pattern_id == "PAT-E-001"
+        assert r.was_updated is True

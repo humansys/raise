@@ -4,13 +4,15 @@ This module provides the `raise init` command that:
 - Detects if the project is greenfield or brownfield
 - Creates .raise/manifest.yaml with project metadata
 - Loads or creates ~/.rai/developer.yaml for personal profile
-- Outputs adaptive messages based on experience level
-- Optionally detects conventions and generates guardrails (--detect)
+- Scaffolds skills, workflows, and governance for each target agent
+- Supports multiple agents via --agent (repeatable) or --detect
 
 Example:
-    $ raise init
-    $ raise init --name my-custom-name
-    $ raise init --detect  # Detect conventions and generate guardrails
+    $ raise init                           # defaults to claude
+    $ raise init --agent cursor            # single agent
+    $ raise init --agent claude --agent cursor  # multi-agent
+    $ raise init --detect                  # auto-detect installed agents
+    $ raise init --ide antigravity         # (deprecated) alias for --agent
 """
 
 from datetime import date
@@ -21,18 +23,26 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-from rai_cli.config.ide import IdeChoice, IdeConfig, IdeType, get_ide_config
-from rai_cli.onboarding.claudemd import generate_claude_md
+from rai_cli.config.agent_registry import AgentRegistry, load_registry
+from rai_cli.config.agents import AgentChoice, AgentConfig
+from rai_cli.onboarding.bootstrap import BootstrapResult
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type
-from rai_cli.onboarding.governance import generate_guardrails
-from rai_cli.onboarding.manifest import ProjectInfo, ProjectManifest, save_manifest
+from rai_cli.onboarding.governance import GovernanceScaffoldResult, generate_guardrails
+from rai_cli.onboarding.instructions import generate_instructions
+from rai_cli.onboarding.manifest import (
+    AgentsManifest,
+    ProjectInfo,
+    ProjectManifest,
+    save_manifest,
+)
 from rai_cli.onboarding.profile import (
     DeveloperProfile,
     ExperienceLevel,
     load_developer_profile,
     save_developer_profile,
 )
+from rai_cli.onboarding.skills import SkillScaffoldResult
 
 console = Console()
 
@@ -93,14 +103,7 @@ def _get_welcome_message(profile: DeveloperProfile | None) -> str:
 
 
 def _get_skill_recommendation(project_type: str) -> tuple[str, str]:
-    """Get recommended skill based on project type.
-
-    Args:
-        project_type: Detected project type (greenfield/brownfield).
-
-    Returns:
-        Tuple of (skill_command, description).
-    """
+    """Get recommended skill based on project type."""
     if project_type == "brownfield":
         return (
             "/rai-project-onboard",
@@ -117,31 +120,16 @@ def _get_project_message(
     file_count: int,
     profile: DeveloperProfile | None,
     created_profile: bool,
-    bootstrap_result: "BootstrapResult | None" = None,
-    skills_result: "SkillScaffoldResult | None" = None,
-    governance_result: "GovernanceScaffoldResult | None" = None,
-    ide_config: IdeConfig | None = None,
+    bootstrap_result: BootstrapResult | None = None,
+    skills_result: SkillScaffoldResult | None = None,
+    governance_result: GovernanceScaffoldResult | None = None,
+    agent_config: AgentConfig | None = None,
 ) -> str:
-    """Get project detection message based on experience level.
-
-    Args:
-        project_type: Detected project type (greenfield/brownfield).
-        file_count: Number of code files detected.
-        profile: Developer profile (None for new users).
-        created_profile: Whether profile was just created.
-        bootstrap_result: Result of base Rai bootstrap (None if not run).
-        skills_result: Result of skill scaffolding (None if not run).
-        governance_result: Result of governance scaffolding (None if not run).
-        ide_config: IDE configuration. Defaults to Claude.
-
-    Returns:
-        Formatted message string for console output.
-    """
-    skills_dir = ide_config.skills_dir if ide_config else ".claude/skills"
+    """Get project detection message based on experience level."""
+    skills_dir = agent_config.skills_dir if agent_config else ".claude/skills"
     skill_cmd, skill_desc = _get_skill_recommendation(project_type)
 
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
-        # Build files section with descriptions
         lines = [
             "[bold]Created:[/bold] .raise/manifest.yaml  [dim]— project metadata[/dim]"
         ]
@@ -155,7 +143,6 @@ def _get_project_message(
                 "[bold]Loaded:[/bold]  ~/.rai/developer.yaml  [dim]— your preferences[/dim]"
             )
 
-        # Bootstrap info
         if bootstrap_result is not None:
             if bootstrap_result.already_existed:
                 lines.append(
@@ -179,7 +166,6 @@ def _get_project_message(
                         "[dim]— methodology definition[/dim]"
                     )
 
-        # Skills info
         if skills_result is not None:
             if skills_result.already_existed:
                 lines.append(
@@ -192,7 +178,6 @@ def _get_project_message(
                     f"[dim]— {skills_result.skills_copied} onboarding skills[/dim]"
                 )
 
-        # Governance info
         if governance_result is not None:
             if governance_result.already_existed:
                 lines.append(
@@ -227,7 +212,9 @@ def _get_project_message(
             )
         governance_msg = ""
         if governance_result is not None and not governance_result.already_existed:
-            governance_msg = f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
+            governance_msg = (
+                f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
+            )
         return (
             PROJECT_DETECTED_RI.format(
                 project_type=project_type.capitalize(),
@@ -244,7 +231,7 @@ def _create_new_profile(project_path: Path) -> DeveloperProfile:
     """Create a new developer profile with defaults."""
     today = date.today()
     return DeveloperProfile(
-        name="Developer",  # Will be personalized later
+        name="Developer",
         experience_level=ExperienceLevel.SHU,
         first_session=today,
         last_session=today,
@@ -261,6 +248,52 @@ def _update_profile_with_project(
         profile.projects.append(project_str)
     profile.last_session = date.today()
     return profile
+
+
+def _resolve_agent_types(
+    agent: list[str] | None,
+    ide: AgentChoice | None,
+    detect: bool,
+    project_path: Path,
+    registry: AgentRegistry,
+) -> list[str]:
+    """Resolve the list of agent types to initialize for.
+
+    Priority: --agent > --ide (deprecated) > --detect > default ["claude"]
+    """
+    if agent:
+        return list(agent)
+    if ide is not None:
+        return [ide.value]
+    if detect:
+        detected = registry.detect_agents(project_path)
+        return detected if detected else ["claude"]
+    return ["claude"]
+
+
+def _generate_agents_md(
+    project_path: Path, agent_types: list[str], project_name: str
+) -> None:
+    """Generate AGENTS.md at project root — cross-tool instructions file.
+
+    AGENTS.md is supported by Cursor, Windsurf, Copilot, Codex CLI, Kilo Code,
+    OpenCode (60K+ repos use it as the universal agent instructions file).
+    """
+    agents_md_path = project_path / "AGENTS.md"
+    if agents_md_path.exists():
+        return
+
+    content = (
+        f"# {project_name}\n\n"
+        f"> RaiSE-governed project. Run `/rai-session-start` to load full context.\n\n"
+        f"## Active Agents\n\n"
+        + "\n".join(f"- {a}" for a in agent_types)
+        + "\n\n"
+        "## Process\n\n"
+        "This project follows the RaiSE methodology. "
+        "See `.raise/` for governance artifacts and `rai --help` for CLI.\n"
+    )
+    agents_md_path.write_text(content, encoding="utf-8")
 
 
 def init_command(
@@ -285,30 +318,36 @@ def init_command(
         typer.Option(
             "--detect",
             "-d",
-            help="Detect conventions and generate guardrails.md",
+            help="Auto-detect installed agents from project markers. Also generates AGENTS.md.",
         ),
     ] = False,
+    agent: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--agent",
+            help="Target agent(s): claude, cursor, windsurf, copilot, antigravity. Repeatable.",
+        ),
+    ] = None,
     ide: Annotated[
-        IdeChoice,
+        AgentChoice | None,
         typer.Option(
             "--ide",
-            help="Target IDE (claude, antigravity)",
+            help="[deprecated] Use --agent instead.",
+            hidden=False,
         ),
-    ] = IdeChoice.claude,
+    ] = None,
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
     Detects project type (greenfield/brownfield), creates .raise/manifest.yaml,
-    and sets up developer profile for personalized interaction.
-
-    With --detect, also analyzes code conventions and generates guardrails.
+    and scaffolds skills/workflows for each target agent.
 
     Examples:
-        $ raise init
-        $ raise init --name my-api
-        $ raise init --path /path/to/project
-        $ raise init --detect  # Detect conventions and generate guardrails
-        $ raise init --ide antigravity  # Initialize for Antigravity IDE
+        $ raise init                                 # defaults to claude
+        $ raise init --agent cursor                  # single agent
+        $ raise init --agent claude --agent cursor   # multi-agent
+        $ raise init --detect                        # auto-detect agents
+        $ raise init --ide antigravity               # (deprecated) alias
     """
     # Determine project path
     project_path = path if path is not None else Path.cwd()
@@ -332,39 +371,46 @@ def init_command(
     # Detect project type
     detection = detect_project_type(project_path)
 
-    # Create and save manifest
+    # Load agent registry (3-tier: built-in → .raise/agents/ → ~/.rai/agents/)
+    registry = load_registry(project_root=project_path)
+
+    # Resolve agent types from flags
+    agent_types = _resolve_agent_types(agent, ide, detect, project_path, registry)
+
+    # Validate agent types are in registry; skip unknown with warning
+    valid_agent_types: list[str] = []
+    for at in agent_types:
+        try:
+            registry.get_config(at)
+            valid_agent_types.append(at)
+        except KeyError:
+            console.print(f"[yellow]Warning:[/yellow] Unknown agent '{at}' — skipped.")
+    if not valid_agent_types:
+        valid_agent_types = ["claude"]
+
+    # Create and save manifest with agent types
     project_info = ProjectInfo(
         name=project_name,
         project_type=detection.project_type,
         code_file_count=detection.code_file_count,
     )
-    manifest = ProjectManifest(project=project_info)
+    manifest = ProjectManifest(
+        project=project_info,
+        agents=AgentsManifest(types=valid_agent_types),
+    )
     save_manifest(manifest, project_path)
 
-    # Resolve IDE configuration
-    ide_config = get_ide_config(ide.value)
-
-    # Bootstrap Rai base assets
+    # Bootstrap Rai base assets (once, agent-agnostic)
     from rai_cli.onboarding.bootstrap import bootstrap_rai_base
 
     bootstrap_result = bootstrap_rai_base(project_path)
 
-    # Scaffold onboarding skills
-    from rai_cli.onboarding.skills import scaffold_skills
-
-    skills_result = scaffold_skills(project_path, ide_config=ide_config)
-
-    # Scaffold workflows (no-op for IDEs without workflows_dir)
-    from rai_cli.onboarding.workflows import scaffold_workflows
-
-    scaffold_workflows(project_path, ide_config=ide_config)
-
-    # Scaffold governance templates
+    # Scaffold governance templates (once)
     from rai_cli.onboarding.governance import scaffold_governance
 
     governance_result = scaffold_governance(project_path, project_name)
 
-    # Generate MEMORY.md (canonical + IDE-specific copy)
+    # Generate MEMORY.md canonical copy
     from rai_cli.config.paths import (
         get_claude_memory_path,
         get_framework_dir,
@@ -374,25 +420,50 @@ def init_command(
 
     methodology_path = get_framework_dir(project_path) / "methodology.yaml"
     patterns_path = get_memory_dir(project_path) / "patterns.jsonl"
-
     memory_content = generate_memory_md(
         methodology_path=methodology_path,
         patterns_path=patterns_path,
         project_name=project_name,
     )
-
-    # Write canonical copy (always)
     canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
     canonical_memory.parent.mkdir(parents=True, exist_ok=True)
     canonical_memory.write_text(memory_content, encoding="utf-8")
 
-    # Write Claude Code copy (only for Claude IDE)
-    if ide_config.ide_type == "claude":
-        claude_memory = get_claude_memory_path(project_path)
-        claude_memory.parent.mkdir(parents=True, exist_ok=True)
-        claude_memory.write_text(memory_content, encoding="utf-8")
+    # Per-agent scaffolding
+    first_config = registry.get_config(valid_agent_types[0])
+    first_skills_result = None
 
-    # Output messages based on experience level
+    from rai_cli.onboarding.skills import scaffold_skills
+    from rai_cli.onboarding.workflows import scaffold_workflows
+
+    for agent_type in valid_agent_types:
+        config = registry.get_config(agent_type)
+        plugin = registry.get_plugin(agent_type)
+
+        # Skills
+        skills_result = scaffold_skills(
+            project_path, agent_config=config, plugin=plugin
+        )
+        if agent_type == valid_agent_types[0]:
+            first_skills_result = skills_result
+
+        # Workflows
+        scaffold_workflows(project_path, agent_config=config)
+
+        # Claude-specific: copy MEMORY.md to .claude/projects/
+        if config.agent_type == "claude":
+            claude_memory = get_claude_memory_path(project_path)
+            claude_memory.parent.mkdir(parents=True, exist_ok=True)
+            claude_memory.write_text(memory_content, encoding="utf-8")
+
+        # Plugin post_init hook
+        plugin.post_init(project_path, config)
+
+    # AGENTS.md on --detect
+    if detect:
+        _generate_agents_md(project_path, valid_agent_types, project_name)
+
+    # Output messages
     welcome = _get_welcome_message(profile if not created_profile else None)
     project_msg = _get_project_message(
         project_type=detection.project_type.value,
@@ -400,53 +471,46 @@ def init_command(
         profile=profile,
         created_profile=created_profile,
         bootstrap_result=bootstrap_result,
-        skills_result=skills_result,
+        skills_result=first_skills_result,
         governance_result=governance_result,
-        ide_config=ide_config,
+        agent_config=first_config,
     )
 
     if profile.experience_level == ExperienceLevel.RI and not created_profile:
-        # Concise output for experienced users
         console.print(welcome)
         console.print(project_msg)
     else:
-        # Rich output for new/learning users
         console.print(Panel(welcome.strip(), border_style="cyan"))
         console.print(project_msg)
 
     # Convention detection, guardrails, and instructions file generation
-    instructions_path = project_path / ide_config.instructions_file
+    instructions_path = project_path / first_config.instructions_file
     if detect and detection.project_type == ProjectType.BROWNFIELD:
         conventions = detect_conventions(project_path)
 
         if conventions.files_analyzed > 0:
-            # Generate guardrails markdown
             guardrails_content = generate_guardrails(
                 conventions, project_name=project_name
             )
-
-            # Write to governance/guardrails.md
             guardrails_dir = project_path / "governance"
             guardrails_dir.mkdir(parents=True, exist_ok=True)
             guardrails_path = guardrails_dir / "guardrails.md"
             guardrails_path.write_text(guardrails_content, encoding="utf-8")
 
-            # Generate instructions file
-            instructions_content = generate_claude_md(
+            instructions_content = generate_instructions(
                 project_name=project_name,
                 detection=detection,
                 conventions=conventions,
-                ide_config=ide_config,
+                agent_config=first_config,
             )
             instructions_path.parent.mkdir(parents=True, exist_ok=True)
             instructions_path.write_text(instructions_content, encoding="utf-8")
 
-            # Output summary
             conf = conventions.overall_confidence.value.upper()
             if profile.experience_level == ExperienceLevel.RI:
                 console.print(
                     f"\n[dim]Conventions detected ({conventions.files_analyzed} files, "
-                    f"{conf} confidence). Generated guardrails.md and {ide_config.instructions_file}[/dim]"
+                    f"{conf} confidence). Generated guardrails.md and {first_config.instructions_file}[/dim]"
                 )
             else:
                 console.print(
@@ -458,12 +522,11 @@ def init_command(
                     f"[dim]Review and adjust as needed.[/dim]"
                 )
     elif detect and detection.project_type == ProjectType.GREENFIELD:
-        # Generate minimal instructions file for greenfield
-        instructions_content = generate_claude_md(
+        instructions_content = generate_instructions(
             project_name=project_name,
             detection=detection,
             conventions=None,
-            ide_config=ide_config,
+            agent_config=first_config,
         )
         instructions_path.parent.mkdir(parents=True, exist_ok=True)
         instructions_path.write_text(instructions_content, encoding="utf-8")

@@ -8,7 +8,6 @@ from textwrap import dedent
 import pytest
 
 from rai_cli.context.builder import UnifiedGraphBuilder
-from rai_cli.context.models import ConceptNode
 
 
 @pytest.fixture

@@ -5,10 +5,6 @@ Handles developer profile management, project initialization, and convention det
 
 from __future__ import annotations
 
-from rai_cli.onboarding.claudemd import (
-    ClaudeMdGenerator,
-    generate_claude_md,
-)
 from rai_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
@@ -33,6 +29,12 @@ from rai_cli.onboarding.governance import (
     GuardrailGenerator,
     GuardrailLevel,
     generate_guardrails,
+)
+from rai_cli.onboarding.instructions import (
+    ClaudeMdGenerator,
+    InstructionsGenerator,
+    generate_claude_md,
+    generate_instructions,
 )
 from rai_cli.onboarding.manifest import (
     BranchConfig,
@@ -65,7 +67,10 @@ __all__ = [
     "StructureConventions",
     "StyleConventions",
     "detect_conventions",
-    # ClaudeMd
+    # Instructions
+    "InstructionsGenerator",
+    "generate_instructions",
+    # Backward-compat
     "ClaudeMdGenerator",
     "generate_claude_md",
     # Detection
