@@ -53,6 +53,7 @@ class CloseInput:
     Can be populated from CLI flags or from a state file.
     """
 
+    session_id: str = ""
     summary: str = ""
     session_type: str = "feature"
     outcomes: list[str] = field(default_factory=lambda: list[str]())
@@ -101,6 +102,7 @@ def load_state_file(path: Path) -> CloseInput:
     d = cast(dict[str, object], data)
 
     return CloseInput(
+        session_id=str(d.get("session_id", "")),
         summary=str(d.get("summary", "")),
         session_type=str(d.get("type", "feature")),
         outcomes=list(d.get("outcomes", []) or []),  # type: ignore[arg-type]

@@ -398,6 +398,23 @@ def close(
             session_type=session_type or "feature",
         )
 
+    # Coherence validation (RAISE-201): reject if state file session_id
+    # doesn't match the target session. Prevents race condition where
+    # parallel sessions overwrite each other's state files.
+    if (
+        state_file is not None
+        and close_input.session_id
+        and resolved_session_id
+        and close_input.session_id != resolved_session_id
+    ):
+        cli_error(
+            f"State file session_id ({close_input.session_id}) does not match "
+            f"target session ({resolved_session_id}).\n"
+            f"The file may have been overwritten by a parallel session.\n"
+            f"Re-run /rai-session-close to regenerate the state file.",
+        )
+        return  # cli_error raises
+
     # Override with CLI flags if provided alongside state file
     if pattern:
         close_input.patterns.append({"description": pattern, "type": "process"})
