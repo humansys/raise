@@ -434,41 +434,41 @@ class TestUnifiedQueryEngineMetadata:
 
 
 class TestWilsonLowerBound:
-    """Tests for _wilson_lower_bound helper."""
+    """Tests for wilson_lower_bound helper."""
 
     def test_all_positive_high_score(self) -> None:
         """All positive evaluations gives high Wilson score."""
-        from rai_cli.context.query import _wilson_lower_bound
+        from rai_cli.context.query import wilson_lower_bound
 
-        score = _wilson_lower_bound(10, 0)
+        score = wilson_lower_bound(10, 0)
         assert score > 0.7
 
     def test_all_negative_low_score(self) -> None:
         """All negative evaluations gives low Wilson score."""
-        from rai_cli.context.query import _wilson_lower_bound
+        from rai_cli.context.query import wilson_lower_bound
 
-        score = _wilson_lower_bound(0, 10)
+        score = wilson_lower_bound(0, 10)
         assert score < 0.1
 
     def test_majority_negative_approx(self) -> None:
         """3 pos / 7 neg (design example) gives ~0.10."""
-        from rai_cli.context.query import _wilson_lower_bound
+        from rai_cli.context.query import wilson_lower_bound
 
-        score = _wilson_lower_bound(3, 7)
+        score = wilson_lower_bound(3, 7)
         assert 0.05 < score < 0.20
 
     def test_zero_total_raises(self) -> None:
         """Zero total observations raises ValueError."""
-        from rai_cli.context.query import _wilson_lower_bound
+        from rai_cli.context.query import wilson_lower_bound
 
         with pytest.raises(ValueError):
-            _wilson_lower_bound(0, 0)
+            wilson_lower_bound(0, 0)
 
     def test_single_positive_is_conservative(self) -> None:
         """Single positive is conservative — Wilson lower bound < 0.9."""
-        from rai_cli.context.query import _wilson_lower_bound
+        from rai_cli.context.query import wilson_lower_bound
 
-        score = _wilson_lower_bound(1, 0)
+        score = wilson_lower_bound(1, 0)
         assert 0 < score < 0.9
 
 
