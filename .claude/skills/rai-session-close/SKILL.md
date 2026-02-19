@@ -49,7 +49,8 @@ Use inference to reflect on the session:
 Write the structured output as a YAML state file:
 
 ```yaml
-# /tmp/session-output.yaml
+# /tmp/session-output-{SES-ID}.yaml
+session_id: "{SES-ID}"                    # REQUIRED — prevents race condition (RAISE-201)
 summary: "Session protocol implementation"
 type: feature
 outcomes:
@@ -111,7 +112,7 @@ notes: "Any free-form notes"
 ### Step 2: Feed CLI
 
 ```bash
-rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
+rai session close --state-file /tmp/session-output-{SES-ID}.yaml --session {SES-ID} --project "$(pwd)"
 ```
 
 This single command atomically:
