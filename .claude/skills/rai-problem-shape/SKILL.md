@@ -1,5 +1,5 @@
 ---
-name: problem-shape
+name: rai-problem-shape
 description: >
   Guided problem definition at portfolio level. Takes a vague business idea
   and shapes it into a well-formed problem statement before it enters the
@@ -27,7 +27,7 @@ Guide a portfolio owner, product leader, or business stakeholder from a vague in
 
 **Position in the pipeline:**
 ```
-[vague business idea] → /problem-shape → /rai-epic-design → /rai-epic-plan → [stories]
+[vague business idea] → /rai-problem-shape → /rai-epic-design → /rai-epic-plan → [stories]
 ```
 
 **Core principle:** Teams fail when they receive *solutions* from stakeholders instead of problems. This skill enforces the problem-first discipline before any implementation commitment is made.
@@ -254,7 +254,7 @@ where `{slug-proyecto}` is the project name from Step 0, lowercased, spaces repl
 
 ```markdown
 # Problem Brief — {Nombre del Proyecto}
-> Generado: {YYYY-MM-DD} | Skill: /problem-shape v1.0
+> Generado: {YYYY-MM-DD} | Skill: /rai-problem-shape v1.0
 
 ## Dominio / Tipo de apuesta
 {Step 1 answer}
