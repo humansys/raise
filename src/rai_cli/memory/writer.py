@@ -267,6 +267,28 @@ class WriteResult(BaseModel):
     message: str = Field(default="", description="Status message")
 
 
+class ReinforceResult(BaseModel):
+    """Result of a pattern reinforcement operation.
+
+    Attributes:
+        pattern_id: ID of the reinforced pattern.
+        vote: Vote applied (+1, 0, -1).
+        positives: Updated positive evaluation count.
+        negatives: Updated negative evaluation count.
+        evaluations: Updated total evaluation count.
+        last_evaluated: ISO date of last evaluation (None if vote=0 and never evaluated).
+        was_updated: False when vote=0 (N/A — file not modified).
+    """
+
+    pattern_id: str = Field(..., description="ID of the reinforced pattern")
+    vote: int = Field(..., description="Vote applied (+1, 0, -1)")
+    positives: int = Field(..., description="Positive evaluation count")
+    negatives: int = Field(..., description="Negative evaluation count")
+    evaluations: int = Field(..., description="Total evaluation count")
+    last_evaluated: str | None = Field(default=None, description="ISO date of last evaluation")
+    was_updated: bool = Field(..., description="False when vote=0 (file not modified)")
+
+
 def get_memory_dir_for_scope(
     scope: MemoryScope, project_root: Path | None = None
 ) -> Path:
@@ -394,6 +416,91 @@ def append_pattern(
         id=pattern_id,
         file_path=str(file_path),
         message=f"Pattern {pattern_id} appended to {file_path.name} (scope: {scope.value})",
+    )
+
+
+def reinforce_pattern(
+    file_path: Path,
+    pattern_id: str,
+    vote: int,
+    story_id: str | None = None,  # noqa: ARG001  (traceability, not stored in v1)
+) -> ReinforceResult:
+    """Update reinforcement fields for a pattern in a JSONL file.
+
+    Vote semantics:
+        +1 = implementation followed the pattern (positives + evaluations++)
+        -1 = implementation contradicted the pattern (negatives + evaluations++)
+         0 = not relevant to this story (N/A — file not modified)
+
+    Rewrites the JSONL file atomically (temp file + rename) to prevent
+    corruption on crash.
+
+    Args:
+        file_path: Path to the patterns.jsonl file.
+        pattern_id: ID of the pattern to reinforce (e.g., 'PAT-E-183').
+        vote: +1, 0, or -1.
+        story_id: Optional story ID for traceability (not stored in JSONL v1).
+
+    Returns:
+        ReinforceResult with updated counts.
+
+    Raises:
+        KeyError: If pattern_id is not found in the file.
+    """
+    lines = file_path.read_text(encoding="utf-8").splitlines()
+    records: list[dict[str, Any]] = []
+    found = False
+
+    for line in lines:
+        line = line.strip()
+        if not line:
+            continue
+        record: dict[str, Any] = json.loads(line)
+        if record.get("id") == pattern_id:
+            found = True
+            if vote != 0:
+                record["positives"] = (record.get("positives") or 0) + (1 if vote == 1 else 0)
+                record["negatives"] = (record.get("negatives") or 0) + (1 if vote == -1 else 0)
+                record["evaluations"] = (record.get("evaluations") or 0) + 1
+                record["last_evaluated"] = date.today().isoformat()
+        records.append(record)
+
+    if not found:
+        raise KeyError(f"Pattern '{pattern_id}' not found in {file_path}")
+
+    target = next(r for r in records if r.get("id") == pattern_id)
+    positives = target.get("positives") or 0
+    negatives = target.get("negatives") or 0
+    evaluations = target.get("evaluations") or 0
+    last_evaluated: str | None = target.get("last_evaluated")
+
+    if vote == 0:
+        return ReinforceResult(
+            pattern_id=pattern_id,
+            vote=0,
+            positives=positives,
+            negatives=negatives,
+            evaluations=evaluations,
+            last_evaluated=last_evaluated,
+            was_updated=False,
+        )
+
+    # Atomic rewrite: write to temp, then rename
+    tmp_path = file_path.with_suffix(".jsonl.tmp")
+    tmp_path.write_text(
+        "\n".join(json.dumps(r) for r in records) + "\n",
+        encoding="utf-8",
+    )
+    tmp_path.replace(file_path)
+
+    return ReinforceResult(
+        pattern_id=pattern_id,
+        vote=vote,
+        positives=positives,
+        negatives=negatives,
+        evaluations=evaluations,
+        last_evaluated=last_evaluated,
+        was_updated=True,
     )
 
 
