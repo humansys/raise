@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 from rai_cli.compat import portable_path
-from rai_cli.config.ide import IdeConfig, get_ide_config
+from rai_cli.config.agents import AgentConfig, get_agent_config
 from rai_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
 from rai_cli.context.extractors.skills import extract_all_skills
 from rai_cli.context.graph import UnifiedGraph
@@ -48,16 +48,16 @@ class UnifiedGraphBuilder:
         self,
         project_root: Path | None = None,
         *,
-        ide_config: IdeConfig | None = None,
+        agent_config: AgentConfig | None = None,
     ) -> None:
         """Initialize builder with project root.
 
         Args:
             project_root: Root directory for the project. Defaults to cwd.
-            ide_config: IDE configuration. Defaults to Claude.
+            agent_config: Agent configuration. Defaults to Claude.
         """
         self.project_root = project_root or Path.cwd()
-        self.ide_config = ide_config or get_ide_config()
+        self.ide_config = agent_config or get_agent_config()
 
     def build(self) -> UnifiedGraph:
         """Build unified graph from all sources.

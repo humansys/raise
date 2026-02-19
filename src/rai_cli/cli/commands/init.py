@@ -21,7 +21,7 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-from rai_cli.config.ide import IdeChoice, IdeConfig, IdeType, get_ide_config
+from rai_cli.config.agents import AgentChoice, AgentConfig, get_agent_config
 from rai_cli.onboarding.claudemd import generate_claude_md
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type
@@ -120,7 +120,7 @@ def _get_project_message(
     bootstrap_result: "BootstrapResult | None" = None,
     skills_result: "SkillScaffoldResult | None" = None,
     governance_result: "GovernanceScaffoldResult | None" = None,
-    ide_config: IdeConfig | None = None,
+    agent_config: AgentConfig | None = None,
 ) -> str:
     """Get project detection message based on experience level.
 
@@ -137,7 +137,7 @@ def _get_project_message(
     Returns:
         Formatted message string for console output.
     """
-    skills_dir = ide_config.skills_dir if ide_config else ".claude/skills"
+    skills_dir = agent_config.skills_dir if agent_config else ".claude/skills"
     skill_cmd, skill_desc = _get_skill_recommendation(project_type)
 
     if profile is None or profile.experience_level == ExperienceLevel.SHU:
@@ -289,12 +289,12 @@ def init_command(
         ),
     ] = False,
     ide: Annotated[
-        IdeChoice,
+        AgentChoice,
         typer.Option(
             "--ide",
-            help="Target IDE (claude, antigravity)",
+            help="Target agent (claude, cursor, windsurf, copilot, antigravity)",
         ),
-    ] = IdeChoice.claude,
+    ] = AgentChoice.claude,
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
@@ -342,7 +342,7 @@ def init_command(
     save_manifest(manifest, project_path)
 
     # Resolve IDE configuration
-    ide_config = get_ide_config(ide.value)
+    ide_config = get_agent_config(ide.value)
 
     # Bootstrap Rai base assets
     from rai_cli.onboarding.bootstrap import bootstrap_rai_base
@@ -352,12 +352,12 @@ def init_command(
     # Scaffold onboarding skills
     from rai_cli.onboarding.skills import scaffold_skills
 
-    skills_result = scaffold_skills(project_path, ide_config=ide_config)
+    skills_result = scaffold_skills(project_path, agent_config=ide_config)
 
     # Scaffold workflows (no-op for IDEs without workflows_dir)
     from rai_cli.onboarding.workflows import scaffold_workflows
 
-    scaffold_workflows(project_path, ide_config=ide_config)
+    scaffold_workflows(project_path, agent_config=ide_config)
 
     # Scaffold governance templates
     from rai_cli.onboarding.governance import scaffold_governance
@@ -387,7 +387,7 @@ def init_command(
     canonical_memory.write_text(memory_content, encoding="utf-8")
 
     # Write Claude Code copy (only for Claude IDE)
-    if ide_config.ide_type == "claude":
+    if ide_config.agent_type == "claude":
         claude_memory = get_claude_memory_path(project_path)
         claude_memory.parent.mkdir(parents=True, exist_ok=True)
         claude_memory.write_text(memory_content, encoding="utf-8")
@@ -402,7 +402,7 @@ def init_command(
         bootstrap_result=bootstrap_result,
         skills_result=skills_result,
         governance_result=governance_result,
-        ide_config=ide_config,
+        agent_config=ide_config,
     )
 
     if profile.experience_level == ExperienceLevel.RI and not created_profile:
@@ -436,7 +436,7 @@ def init_command(
                 project_name=project_name,
                 detection=detection,
                 conventions=conventions,
-                ide_config=ide_config,
+                agent_config=ide_config,
             )
             instructions_path.parent.mkdir(parents=True, exist_ok=True)
             instructions_path.write_text(instructions_content, encoding="utf-8")
@@ -463,7 +463,7 @@ def init_command(
             project_name=project_name,
             detection=detection,
             conventions=None,
-            ide_config=ide_config,
+            agent_config=ide_config,
         )
         instructions_path.parent.mkdir(parents=True, exist_ok=True)
         instructions_path.write_text(instructions_content, encoding="utf-8")

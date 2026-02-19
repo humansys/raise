@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from rai_cli.config.ide import IdeConfig
+from rai_cli.config.agents import AgentConfig
 from rai_cli.onboarding.conventions import ConventionResult
 from rai_cli.onboarding.detection import DetectionResult, ProjectType
 
@@ -188,7 +188,7 @@ def generate_claude_md(
     detection: DetectionResult,
     conventions: ConventionResult | None = None,
     *,
-    ide_config: IdeConfig | None = None,
+    agent_config: AgentConfig | None = None,
 ) -> str:
     """Convenience function to generate IDE instructions file content.
 

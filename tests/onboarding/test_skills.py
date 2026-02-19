@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.config.ide import get_ide_config
+from rai_cli.config.agents import get_agent_config
 from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
 from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
@@ -140,8 +140,8 @@ class TestScaffoldSkillsIdeConfig:
 
     def test_scaffold_to_antigravity_dir(self, tmp_path: Path) -> None:
         """Should scaffold skills to .agent/skills/ with antigravity config."""
-        config = get_ide_config("antigravity")
-        result = scaffold_skills(tmp_path, ide_config=config)
+        config = get_agent_config("antigravity")
+        result = scaffold_skills(tmp_path, agent_config=config)
 
         agent_skills = tmp_path / ".agent" / "skills"
         for skill_name in DISTRIBUTABLE_SKILLS:
