@@ -39,9 +39,10 @@ class TestReinforceCommand:
     """Tests for `rai memory reinforce` command."""
 
     def test_positive_vote_succeeds(self, memory_dir: Path) -> None:
-        """Vote 1 updates pattern and prints summary."""
+        """--vote 1 updates pattern and prints summary."""
         result = runner.invoke(
-            app, ["memory", "reinforce", "PAT-E-001", "1", "--memory-dir", str(memory_dir)]
+            app,
+            ["memory", "reinforce", "PAT-E-001", "--vote", "1", "--memory-dir", str(memory_dir)],
         )
         assert result.exit_code == 0, result.output
         assert "PAT-E-001" in result.output
@@ -49,22 +50,23 @@ class TestReinforceCommand:
         assert "evaluations=1" in result.output
 
     def test_negative_vote_succeeds(self, memory_dir: Path) -> None:
-        """Vote -1 updates pattern and prints summary."""
+        """--vote -1 updates pattern and prints summary."""
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-001", "--memory-dir", str(memory_dir), "--", "-1"],
+            ["memory", "reinforce", "PAT-E-001", "--vote", "-1", "--memory-dir", str(memory_dir)],
         )
         assert result.exit_code == 0, result.output
         assert "negatives=1" in result.output
         assert "evaluations=1" in result.output
 
     def test_zero_vote_prints_na(self, memory_dir: Path) -> None:
-        """Vote 0 prints N/A and does not update file."""
+        """--vote 0 prints N/A and does not update file."""
         f = memory_dir / "patterns.jsonl"
         original = f.read_text(encoding="utf-8")
 
         result = runner.invoke(
-            app, ["memory", "reinforce", "PAT-E-001", "0", "--memory-dir", str(memory_dir)]
+            app,
+            ["memory", "reinforce", "PAT-E-001", "--vote", "0", "--memory-dir", str(memory_dir)],
         )
         assert result.exit_code == 0, result.output
         assert "N/A" in result.output
@@ -75,7 +77,8 @@ class TestReinforceCommand:
         result = runner.invoke(
             app,
             [
-                "memory", "reinforce", "PAT-E-001", "1",
+                "memory", "reinforce", "PAT-E-001",
+                "--vote", "1",
                 "--from", "RAISE-170",
                 "--memory-dir", str(memory_dir),
             ],
@@ -86,7 +89,7 @@ class TestReinforceCommand:
         """Unknown pattern ID exits with non-zero code."""
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-999", "1", "--memory-dir", str(memory_dir)],
+            ["memory", "reinforce", "PAT-E-999", "--vote", "1", "--memory-dir", str(memory_dir)],
         )
         assert result.exit_code != 0
 
@@ -94,7 +97,7 @@ class TestReinforceCommand:
         """Invalid vote value exits with non-zero code."""
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-001", "2", "--memory-dir", str(memory_dir)],
+            ["memory", "reinforce", "PAT-E-001", "--vote", "2", "--memory-dir", str(memory_dir)],
         )
         assert result.exit_code != 0
 
@@ -115,15 +118,17 @@ class TestReinforceCommand:
             ],
         )
         result = runner.invoke(
-            app, ["memory", "reinforce", "PAT-E-BAD", "--memory-dir", str(d), "--", "-1"]
+            app,
+            ["memory", "reinforce", "PAT-E-BAD", "--vote", "-1", "--memory-dir", str(d)],
         )
         assert result.exit_code == 0, result.output
         assert "consider" in result.output.lower()
 
     def test_file_updated_after_positive_vote(self, memory_dir: Path) -> None:
-        """File is rewritten with updated counts after vote 1."""
+        """File is rewritten with updated counts after --vote 1."""
         runner.invoke(
-            app, ["memory", "reinforce", "PAT-E-001", "1", "--memory-dir", str(memory_dir)]
+            app,
+            ["memory", "reinforce", "PAT-E-001", "--vote", "1", "--memory-dir", str(memory_dir)],
         )
         data = json.loads((memory_dir / "patterns.jsonl").read_text(encoding="utf-8").strip())
         assert data["positives"] == 1
