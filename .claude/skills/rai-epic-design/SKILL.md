@@ -132,7 +132,7 @@ rai memory context mod-<name>
 
 ### Step 0.7: Load Problem Brief (Optional)
 
-Check if a Problem Brief exists from a prior `/problem-shape` session:
+Check if a Problem Brief exists from a prior `/rai-problem-shape` session:
 
 ```bash
 ls work/problem-briefs/*.md 2>/dev/null | sort | tail -1
