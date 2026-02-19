@@ -31,8 +31,9 @@ Any number of AI agents or terminals can run concurrent sessions on the same pro
 | 2 | [RAISE-138](https://humansys.atlassian.net/browse/RAISE-138) | Per-Session State Isolation — session directories, migration, concurrent access | M | 3 | RAISE-137 |
 | 3 | [RAISE-139](https://humansys.atlassian.net/browse/RAISE-139) | Project-Scoped Session Writes — CWD poka-yoke (fixes RAISE-134) | S | 3 | RAISE-138 |
 | 4 | [RAISE-146](https://humansys.atlassian.net/browse/RAISE-146) | Wire --session through telemetry CLI commands | XS | 1 | RAISE-138 |
+| 5 | [RAISE-202](https://humansys.atlassian.net/browse/RAISE-202) | Roo Code agent support (LiteLLM-compatible) | S | 3 | — | ✅ Done (2026-02-19) |
 
-**Total:** 4 stories, 9 SP estimated
+**Total:** 5 stories, 12 SP estimated (pt1: 4 done, pt2: RAISE-202 done)
 
 ---
 
