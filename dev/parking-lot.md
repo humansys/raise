@@ -358,6 +358,17 @@
 
 ---
 
+### RAISE-170 Session — Parking Lot (2026-02-19)
+
+- [ ] **Curación de patrones: análisis AI-driven para identificar foundational + duplicados** — (SES-217, 2026-02-19)
+  - **Idea:** Con 378 patrones de peso uniforme, hay candidatos a `foundational: true` que no están marcados como tales, patrones redundantes, y posibles contradicciones.
+  - **Qué haría:** Leer todos los patrones del JSONL, analizar cada uno con inferencia: ¿debería ser foundational? ¿es redundante con otro? ¿contradice otro?
+  - **Output:** Reporte de candidatos a foundational, pares de duplicados potenciales, sugerencias de re-rank inicial.
+  - **Encaje natural:** Podría ser el núcleo de `rai memory health` (ya en parking lot como deferred de RAISE-171) o historia separada de curaduría.
+  - **Trigger para promover:** Cuando RAISE-170 esté completo y el scoring real revele patrones que suben/bajan significativamente — ahí el análisis de curación será más informado.
+
+---
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-18 (RAISE-169: two-phase context loading items)*
+*Last updated: 2026-02-19 (RAISE-170: curación de patrones AI-driven)*

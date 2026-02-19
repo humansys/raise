@@ -433,6 +433,245 @@ class TestUnifiedQueryEngineMetadata:
         assert result.metadata.total_available >= 2
 
 
+class TestWilsonLowerBound:
+    """Tests for wilson_lower_bound helper."""
+
+    def test_all_positive_high_score(self) -> None:
+        """All positive evaluations gives high Wilson score."""
+        from rai_cli.context.query import wilson_lower_bound
+
+        score = wilson_lower_bound(10, 0)
+        assert score > 0.7
+
+    def test_all_negative_low_score(self) -> None:
+        """All negative evaluations gives low Wilson score."""
+        from rai_cli.context.query import wilson_lower_bound
+
+        score = wilson_lower_bound(0, 10)
+        assert score < 0.1
+
+    def test_majority_negative_approx(self) -> None:
+        """3 pos / 7 neg (design example) gives ~0.10."""
+        from rai_cli.context.query import wilson_lower_bound
+
+        score = wilson_lower_bound(3, 7)
+        assert 0.05 < score < 0.20
+
+    def test_zero_total_raises(self) -> None:
+        """Zero total observations raises ValueError."""
+        from rai_cli.context.query import wilson_lower_bound
+
+        with pytest.raises(ValueError):
+            wilson_lower_bound(0, 0)
+
+    def test_single_positive_is_conservative(self) -> None:
+        """Single positive is conservative — Wilson lower bound < 0.9."""
+        from rai_cli.context.query import wilson_lower_bound
+
+        score = wilson_lower_bound(1, 0)
+        assert 0 < score < 0.9
+
+
+class TestCalculateRelevanceScore:
+    """Tests for composite relevance scoring (RAISE-170)."""
+
+    def test_foundational_true_exempt_from_decay(self) -> None:
+        """foundational=True patterns skip decay — score = keyword_relevance only."""
+        from rai_cli.context.query import calculate_relevance_score
+
+        score = calculate_relevance_score(
+            content="planning estimation calibration",
+            keywords=["planning", "estimation"],
+            created="2025-01-01",  # ~400 days old, would decay heavily
+            metadata={"foundational": True},
+        )
+        assert score == pytest.approx(1.0, abs=0.01)
+
+    def test_base_true_also_exempt(self) -> None:
+        """base=True (writer.py legacy key) also skips decay."""
+        from rai_cli.context.query import calculate_relevance_score
+
+        score = calculate_relevance_score(
+            content="planning estimation calibration",
+            keywords=["planning", "estimation"],
+            created="2025-01-01",
+            metadata={"base": True},
+        )
+        assert score == pytest.approx(1.0, abs=0.01)
+
+    def test_zero_evaluations_modifier_is_neutral(self) -> None:
+        """evaluations=0 → modifier=1.0, no penalty for un-evaluated patterns."""
+        from datetime import date
+
+        from rai_cli.context.query import calculate_relevance_score
+
+        score = calculate_relevance_score(
+            content="planning",
+            keywords=["planning"],
+            created=date.today().isoformat(),
+            metadata={"evaluations": 0},
+        )
+        # brand new pattern: recency=1.0, relevance=1.0, modifier=1.0
+        # base = 0.3*1.0 + 0.7*1.0 = 1.0
+        assert score == pytest.approx(1.0, abs=0.01)
+
+    def test_thirty_day_half_life_decay(self) -> None:
+        """Pattern at exactly 30d has recency=0.5 (half-life)."""
+        from datetime import date, timedelta
+
+        from rai_cli.context.query import calculate_relevance_score
+
+        created = (date.today() - timedelta(days=30)).isoformat()
+        score = calculate_relevance_score(
+            content="planning",
+            keywords=["planning"],
+            created=created,
+            metadata={},
+        )
+        # recency=0.5, relevance=1.0, modifier=1.0
+        # base = 0.3*0.5 + 0.7*1.0 = 0.85
+        assert score == pytest.approx(0.85, abs=0.02)
+
+    def test_high_negatives_reduces_score(self) -> None:
+        """Wilson modifier significantly reduces score for mostly-negative patterns."""
+        from datetime import date
+
+        from rai_cli.context.query import calculate_relevance_score
+
+        today = date.today().isoformat()
+        score_negative = calculate_relevance_score(
+            content="planning",
+            keywords=["planning"],
+            created=today,
+            metadata={"positives": 3, "negatives": 7, "evaluations": 10},
+        )
+        score_neutral = calculate_relevance_score(
+            content="planning",
+            keywords=["planning"],
+            created=today,
+            metadata={"evaluations": 0},
+        )
+        assert score_negative < score_neutral * 0.5
+
+    def test_no_keyword_hits_pure_recency(self) -> None:
+        """No keyword hits → score = w_recency * recency (today = 0.3)."""
+        from datetime import date
+
+        from rai_cli.context.query import calculate_relevance_score
+
+        score = calculate_relevance_score(
+            content="totally unrelated content here",
+            keywords=["planning", "estimation"],
+            created=date.today().isoformat(),
+            metadata={},
+        )
+        # relevance=0.0, recency=1.0 → base = 0.3*1.0 + 0.7*0.0 = 0.3
+        assert score == pytest.approx(0.3, abs=0.05)
+
+    def test_empty_keywords_no_crash(self) -> None:
+        """Empty keywords list returns a float without crashing."""
+        from datetime import date
+
+        from rai_cli.context.query import calculate_relevance_score
+
+        score = calculate_relevance_score(
+            content="anything",
+            keywords=[],
+            created=date.today().isoformat(),
+            metadata={},
+        )
+        assert isinstance(score, float)
+
+    def test_invalid_date_defaults_gracefully(self) -> None:
+        """Invalid date string does not crash — defaults to age=0."""
+        from rai_cli.context.query import calculate_relevance_score
+
+        score = calculate_relevance_score(
+            content="planning",
+            keywords=["planning"],
+            created="not-a-date",
+            metadata={},
+        )
+        assert isinstance(score, float)
+
+    def test_none_metadata_treated_as_empty(self) -> None:
+        """None metadata is handled safely."""
+        from datetime import date
+
+        from rai_cli.context.query import calculate_relevance_score
+
+        score = calculate_relevance_score(
+            content="planning",
+            keywords=["planning"],
+            created=date.today().isoformat(),
+            metadata=None,
+        )
+        assert isinstance(score, float)
+
+
+class TestKeywordSearchOrdering:
+    """Integration tests: query results ordered by composite score (RAISE-170)."""
+
+    def test_foundational_beats_heavily_decayed(self) -> None:
+        """Foundational pattern outscores a heavily decayed pattern with same keywords."""
+        graph = UnifiedGraph()
+        graph.add_concept(
+            ConceptNode(
+                id="PAT-DECAYED",
+                type="pattern",
+                content="planning estimation velocity",
+                source_file="test",
+                created="2025-01-01",
+                metadata={},
+            )
+        )
+        graph.add_concept(
+            ConceptNode(
+                id="PAT-FOUND",
+                type="pattern",
+                content="planning estimation velocity",
+                source_file="test",
+                created="2025-01-01",
+                metadata={"foundational": True},
+            )
+        )
+        engine = UnifiedQueryEngine(graph)
+        result = engine.query(UnifiedQuery(query="planning estimation velocity"))
+        ids = [c.id for c in result.concepts]
+        assert ids.index("PAT-FOUND") < ids.index("PAT-DECAYED")
+
+    def test_newer_beats_older_same_keywords(self) -> None:
+        """Newer pattern outscores older one on same keywords (decay effect)."""
+        from datetime import date, timedelta
+
+        today = date.today()
+        graph = UnifiedGraph()
+        graph.add_concept(
+            ConceptNode(
+                id="PAT-NEW",
+                type="pattern",
+                content="planning estimation",
+                source_file="test",
+                created=today.isoformat(),
+                metadata={},
+            )
+        )
+        graph.add_concept(
+            ConceptNode(
+                id="PAT-OLD",
+                type="pattern",
+                content="planning estimation",
+                source_file="test",
+                created=(today - timedelta(days=90)).isoformat(),
+                metadata={},
+            )
+        )
+        engine = UnifiedQueryEngine(graph)
+        result = engine.query(UnifiedQuery(query="planning estimation"))
+        ids = [c.id for c in result.concepts]
+        assert ids.index("PAT-NEW") < ids.index("PAT-OLD")
+
+
 class TestUnifiedQueryEngineFromFile:
     """Tests for loading engine from file."""
 
