@@ -88,7 +88,7 @@ class TestAgentConfig:
             skills_dir=".claude/skills",
             instructions_file="CLAUDE.md",
         )
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             config.skills_dir = ".other/skills"  # type: ignore[misc]
 
     def test_detection_markers_default_empty(self) -> None:

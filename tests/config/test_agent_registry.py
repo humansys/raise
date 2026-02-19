@@ -8,9 +8,8 @@ import pytest
 import yaml
 
 from rai_cli.config.agent_plugin import AgentPlugin, DefaultAgentPlugin
-from rai_cli.config.agent_registry import AgentRegistry, load_registry
+from rai_cli.config.agent_registry import load_registry
 from rai_cli.config.agents import AgentConfig
-
 
 # ---------------------------------------------------------------------------
 # Helpers

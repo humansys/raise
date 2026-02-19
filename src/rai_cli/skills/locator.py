@@ -31,7 +31,8 @@ def get_default_skill_dir(
     """
     root = project_root or Path.cwd()
     config = agent_config or get_agent_config()
-    return root / config.skills_dir
+    skills_dir = config.skills_dir or ".claude/skills"
+    return root / skills_dir
 
 
 class SkillLocator:

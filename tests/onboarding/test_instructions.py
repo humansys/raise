@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from rai_cli.config.agents import get_agent_config
-from rai_cli.onboarding.instructions import InstructionsGenerator, generate_instructions
 from rai_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
@@ -18,6 +17,7 @@ from rai_cli.onboarding.conventions import (
     StyleConventions,
 )
 from rai_cli.onboarding.detection import DetectionResult, ProjectType
+from rai_cli.onboarding.instructions import InstructionsGenerator, generate_instructions
 
 # =============================================================================
 # Fixtures

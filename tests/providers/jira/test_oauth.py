@@ -1,11 +1,9 @@
 """Tests for JIRA OAuth 2.0 Authorization Code + PKCE flow."""
 
 import hashlib
-import secrets
 import time
 from base64 import urlsafe_b64encode
 from pathlib import Path
-from typing import Any
 from unittest.mock import MagicMock, Mock, patch
 from urllib.parse import parse_qs, urlparse
 

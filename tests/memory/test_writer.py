@@ -13,11 +13,11 @@ from rai_cli.memory.writer import (
     CalibrationInput,
     PatternInput,
     SessionInput,
-    get_next_id,
     append_calibration,
     append_pattern,
     append_session,
     get_memory_dir_for_scope,
+    get_next_id,
     validate_session_index,
 )
 

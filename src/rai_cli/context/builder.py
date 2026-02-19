@@ -301,7 +301,8 @@ class UnifiedGraphBuilder:
         Returns:
             List of ConceptNode for skill concepts.
         """
-        skills_dir = self.project_root / self.ide_config.skills_dir
+        raw_skills_dir = self.ide_config.skills_dir or ".claude/skills"
+        skills_dir = self.project_root / raw_skills_dir
         return extract_all_skills(skills_dir)
 
     def load_components(self) -> list[ConceptNode]:

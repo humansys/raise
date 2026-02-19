@@ -143,7 +143,7 @@ class TestIdeManifest:
         """IdeManifest rejects invalid IDE type."""
         import pytest
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception):  # noqa: B017
             IdeManifest(type="invalid")  # type: ignore[arg-type]
 
 

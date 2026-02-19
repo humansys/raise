@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 from rai_cli.agents.copilot_plugin import CopilotPlugin
 from rai_cli.config.agents import BUILTIN_AGENTS
 
