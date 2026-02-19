@@ -39,7 +39,7 @@
 | [RAISE-143](https://humansys.atlassian.net/browse/RAISE-143) | **Collective Intelligence** (was E10) | 📋 Backlog | `dev/epic-e10-scope.md` | P2 (V3) |
 | [RAISE-144](https://humansys.atlassian.net/browse/RAISE-144) | **Engineering Health** | 🚀 Active | §6 | Rolling |
 | [RAISE-153](https://humansys.atlassian.net/browse/RAISE-153) | **Developer Enablement** | ✅ Complete | `work/epics/raise-153-developer-enablement/scope.md` | — |
-| [RAISE-168](https://humansys.atlassian.net/browse/RAISE-168) | **Neurosymbolic Memory Density** | 🚀 In Progress | `work/epics/raise-168-neurosymbolic-memory-density/scope.md` | P1 |
+| [RAISE-168](https://humansys.atlassian.net/browse/RAISE-168) | **Neurosymbolic Memory Density** | ✅ Complete | `work/epics/raise-168-neurosymbolic-memory-density/scope.md` | P1 |
 
 **Summary:** 18 of 19 internal epics complete. RAISE-144 (Engineering Health) is a permanent rolling epic. RAISE-168 (Neurosymbolic Memory Density) active. 7 JIRA-tracked epics in backlog (v2.1/V3).
 
