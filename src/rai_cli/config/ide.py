@@ -1,69 +1,32 @@
-"""IDE configuration model and factory.
+"""Backward-compatibility shim for IDE configuration.
 
-Defines IDE-specific conventions (paths, file names) as data.
-Each supported IDE has a pre-built IdeConfig in the registry.
-Factory function returns the config for a given IDE type.
+All types have been moved to rai_cli.config.agents.
+This module re-exports old names for external consumers.
 
-Architecture decision: ADR-031 (IdeConfig pattern).
+Migration: IdeConfig → AgentConfig, IdeType → BuiltinAgentType,
+IdeChoice → AgentChoice, IDE_CONFIGS → BUILTIN_AGENTS,
+get_ide_config → get_agent_config.
 """
 
-from __future__ import annotations
+from rai_cli.config.agents import (
+    BUILTIN_AGENTS as BUILTIN_AGENTS,
+)
+from rai_cli.config.agents import (
+    AgentChoice as AgentChoice,
+)
+from rai_cli.config.agents import (
+    AgentConfig as AgentConfig,
+)
+from rai_cli.config.agents import (
+    BuiltinAgentType as BuiltinAgentType,
+)
+from rai_cli.config.agents import (
+    get_agent_config as get_agent_config,
+)
 
-from enum import Enum
-from typing import Literal
-
-from pydantic import BaseModel, ConfigDict
-
-IdeType = Literal["claude", "antigravity"]
-
-
-class IdeChoice(str, Enum):
-    """Typer-compatible enum for --ide CLI option."""
-
-    claude = "claude"
-    antigravity = "antigravity"
-
-
-class IdeConfig(BaseModel):
-    """IDE-specific configuration holding convention paths.
-
-    Attributes:
-        ide_type: Which IDE this config represents.
-        skills_dir: Relative path to skills directory from project root.
-        instructions_file: Relative path to instructions/rules file from project root.
-        workflows_dir: Relative path to workflows directory (None if IDE has no equivalent).
-    """
-
-    model_config = ConfigDict(frozen=True)
-
-    ide_type: IdeType
-    skills_dir: str
-    instructions_file: str
-    workflows_dir: str | None = None
-
-
-IDE_CONFIGS: dict[IdeType, IdeConfig] = {
-    "claude": IdeConfig(
-        ide_type="claude",
-        skills_dir=".claude/skills",
-        instructions_file="CLAUDE.md",
-    ),
-    "antigravity": IdeConfig(
-        ide_type="antigravity",
-        skills_dir=".agent/skills",
-        instructions_file=".agent/rules/raise.md",
-        workflows_dir=".agent/workflows",
-    ),
-}
-
-
-def get_ide_config(ide_type: IdeType = "claude") -> IdeConfig:
-    """Get the IDE configuration for a given IDE type.
-
-    Args:
-        ide_type: The IDE to get config for. Defaults to "claude".
-
-    Returns:
-        IdeConfig with paths and conventions for the requested IDE.
-    """
-    return IDE_CONFIGS[ide_type]
+# Backward-compat aliases
+IdeConfig = AgentConfig
+IdeType = BuiltinAgentType
+IdeChoice = AgentChoice
+IDE_CONFIGS = BUILTIN_AGENTS
+get_ide_config = get_agent_config

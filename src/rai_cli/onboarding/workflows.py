@@ -16,7 +16,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from rai_cli.config.ide import IdeConfig, get_ide_config
+from rai_cli.config.agents import AgentConfig, get_agent_config
 from rai_cli.skills.parser import parse_frontmatter
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ class WorkflowScaffoldResult(BaseModel):
 def scaffold_workflows(
     project_root: Path,
     *,
-    ide_config: IdeConfig | None = None,
+    agent_config: AgentConfig | None = None,
 ) -> WorkflowScaffoldResult:
     """Generate workflow shim files for each distributable skill.
 
@@ -52,7 +52,7 @@ def scaffold_workflows(
     """
     from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
-    config = ide_config or get_ide_config()
+    config = agent_config or get_agent_config()
     result = WorkflowScaffoldResult()
 
     if config.workflows_dir is None:
