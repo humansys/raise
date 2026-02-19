@@ -105,14 +105,15 @@ class TestAgentConfig:
 class TestBuiltinAgents:
     """Tests for BUILTIN_AGENTS registry."""
 
-    def test_five_builtin_agents(self) -> None:
-        """Registry contains exactly 5 built-in agents."""
+    def test_six_builtin_agents(self) -> None:
+        """Registry contains exactly 6 built-in agents."""
         expected: set[BuiltinAgentType] = {
             "claude",
             "cursor",
             "windsurf",
             "copilot",
             "antigravity",
+            "roo",
         }
         assert set(BUILTIN_AGENTS.keys()) == expected
 
@@ -167,8 +168,21 @@ class TestBuiltinAgents:
         assert config.workflows_dir == ".agent/workflows"
         assert config.detection_markers == [".agent/rules", ".agent"]
 
+    def test_roo_registry_values(self) -> None:
+        """Roo Code registry entry has correct values."""
+        config = BUILTIN_AGENTS["roo"]
+        assert config.name == "Roo Code"
+        assert config.agent_type == "roo"
+        assert config.skills_dir == ".roo/skills"
+        assert config.instructions_file == ".roo/rules/raise.md"
+        assert config.workflows_dir is None
+        assert ".roo/rules" in config.detection_markers
+        assert ".roo" in config.detection_markers
+        assert ".rooignore" in config.detection_markers
+        assert config.plugin is None
+
     def test_all_agents_have_skills_dir(self) -> None:
-        """All 5 built-in agents have skills_dir set (Cursor confirmed 2.4+)."""
+        """All 6 built-in agents have skills_dir set."""
         for agent_type, config in BUILTIN_AGENTS.items():
             assert config.skills_dir is not None, f"{agent_type} missing skills_dir"
 
@@ -177,12 +191,13 @@ class TestAgentChoice:
     """Tests for AgentChoice enum."""
 
     def test_all_builtin_types_in_enum(self) -> None:
-        """AgentChoice has all 5 built-in types."""
+        """AgentChoice has all 6 built-in types."""
         assert AgentChoice.claude.value == "claude"
         assert AgentChoice.cursor.value == "cursor"
         assert AgentChoice.windsurf.value == "windsurf"
         assert AgentChoice.copilot.value == "copilot"
         assert AgentChoice.antigravity.value == "antigravity"
+        assert AgentChoice.roo.value == "roo"
 
 
 class TestGetAgentConfig:
