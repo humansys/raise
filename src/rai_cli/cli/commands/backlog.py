@@ -264,7 +264,7 @@ def pull(
     state = load_state(sync_dir)
     project_key = epic.split("-")[0]
     if state is None:
-        state = SyncState(cloud_id=cloud_id, project_key=project_key)
+        state = SyncState(cloud_id=cloud_id, project_key=project_key, last_sync_at=None)
 
     # Auto-generate epic_id if not provided
     local_epic_id = epic_id or f"E-{project_key}"
