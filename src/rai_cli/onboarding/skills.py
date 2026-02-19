@@ -47,9 +47,9 @@ def _apply_plugin_transform(
     agent_config: AgentConfig,
 ) -> str:
     """Apply plugin.transform_skill to a SKILL.md content string."""
-    from rai_cli.skills.parser import parse_frontmatter
-
     import yaml
+
+    from rai_cli.skills.parser import parse_frontmatter
 
     fm, body = parse_frontmatter(content)
     fm_out, body_out = plugin.transform_skill(fm, body, agent_config)

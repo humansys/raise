@@ -26,12 +26,10 @@ from rich.panel import Panel
 from rai_cli.config.agent_registry import AgentRegistry, load_registry
 from rai_cli.config.agents import AgentChoice, AgentConfig
 from rai_cli.onboarding.bootstrap import BootstrapResult
-from rai_cli.onboarding.governance import GovernanceScaffoldResult
-from rai_cli.onboarding.instructions import generate_instructions
-from rai_cli.onboarding.skills import SkillScaffoldResult
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type
-from rai_cli.onboarding.governance import generate_guardrails
+from rai_cli.onboarding.governance import GovernanceScaffoldResult, generate_guardrails
+from rai_cli.onboarding.instructions import generate_instructions
 from rai_cli.onboarding.manifest import (
     AgentsManifest,
     ProjectInfo,
@@ -44,6 +42,7 @@ from rai_cli.onboarding.profile import (
     load_developer_profile,
     save_developer_profile,
 )
+from rai_cli.onboarding.skills import SkillScaffoldResult
 
 console = Console()
 
@@ -290,9 +289,9 @@ def _generate_agents_md(
         f"## Active Agents\n\n"
         + "\n".join(f"- {a}" for a in agent_types)
         + "\n\n"
-        f"## Process\n\n"
-        f"This project follows the RaiSE methodology. "
-        f"See `.raise/` for governance artifacts and `rai --help` for CLI.\n"
+        "## Process\n\n"
+        "This project follows the RaiSE methodology. "
+        "See `.raise/` for governance artifacts and `rai --help` for CLI.\n"
     )
     agents_md_path.write_text(content, encoding="utf-8")
 

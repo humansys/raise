@@ -1,6 +1,5 @@
 """Tests for credentials storage with encryption."""
 
-import json
 from pathlib import Path
 from typing import Any
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from rai_cli.config.agent_plugin import DefaultAgentPlugin
-from rai_cli.config.agents import AgentConfig, BUILTIN_AGENTS
+from rai_cli.config.agents import BUILTIN_AGENTS, AgentConfig
 
 
 def _claude_config() -> AgentConfig:
@@ -53,8 +53,6 @@ class TestAgentPluginProtocol:
 
     def test_class_without_inheritance_satisfies_protocol(self) -> None:
         """A class implementing the 3 methods satisfies AgentPlugin without inheriting."""
-        from rai_cli.config.agent_plugin import AgentPlugin
-        from typing import runtime_checkable, Protocol
 
         class MyPlugin:
             def transform_instructions(self, content: str, config: AgentConfig) -> str:

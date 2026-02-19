@@ -4,17 +4,13 @@ Uses mocked JiraClient to test sync logic without JIRA API calls.
 """
 
 from datetime import UTC, datetime
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 from rai_pro.providers.jira.models import JiraEpic, JiraStory
 from rai_pro.providers.jira.sync import (
-    AuthResult,
     LocalStory,
-    PullResult,
-    PushResult,
     check_authorization,
     pull_epic,
     push_stories,

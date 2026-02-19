@@ -331,6 +331,26 @@
 
 ---
 
+### RAISE-197 Session — Parking Lot (2026-02-18)
+
+- [ ] **RaiSE Hub — curated skill marketplace** — (SES-213, 2026-02-18, OpenClaw research)
+  - **Context:** OpenClaw's ClawHub hit 5,000+ skills in weeks via network effects, but also attracted malicious skills (Cisco found exfiltration, prompt injection). VirusTotal scanning added reactively.
+  - **RaiSE differentiator:** Process-embedded skills (TDD, gates, retrospectives) vs generic "teach AI a tool" skills. Governance-aware curation = enterprise trust advantage.
+  - **What:** Curated marketplace where teams publish process skills with verification + governance metadata.
+  - **Priority:** Strategic — post-RAISE-197, depends on plugin architecture being validated
+  - **Related:** AgentSkills standard convergence, F&F user wanting "connectors"
+
+- [ ] **Skills as MCP servers — portable process execution** — (SES-213, 2026-02-18)
+  - **Context:** OpenClaw validates two-layer model: Skills (tight integration) + MCP (portable). RaiSE already uses MCP for external tools (Jira).
+  - **What:** Expose RaiSE skills as MCP servers consumable by OpenClaw, Claude Code, Cursor, any MCP-compatible agent. Our process becomes portable to any agent.
+  - **Priority:** Medium-term — after plugin architecture stabilizes
+
+- [ ] **`rai migrate --agent` for existing projects** — (SES-213, 2026-02-18)
+  - **What:** Convert existing IDE-specific files in-place (e.g., `.claude/` → `.cursor/` + `.windsurf/`). Inverse of `rai init --detect`.
+  - **Previously:** Listed as `rai migrate --ide` in E14 deferred items. Updated scope with agent terminology.
+
+---
+
 ### RAISE-169 Session — Parking Lot (2026-02-18)
 
 - [ ] **`rai session context --all` shortcut** — Load all priming sections at once instead of listing each name. Observe over 3-5 sessions whether full loading is common enough to warrant a shortcut.

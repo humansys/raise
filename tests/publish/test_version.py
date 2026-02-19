@@ -5,7 +5,6 @@ from __future__ import annotations
 import pytest
 
 from rai_cli.publish.version import (
-    VersionInfo,
     bump_version,
     is_pep440,
     parse_version,

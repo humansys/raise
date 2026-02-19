@@ -4,7 +4,7 @@ Tests RaiSyncMetadata and EntityProperty models with strict validation.
 TDD: RED phase - tests written before implementation.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 import pytest
@@ -19,12 +19,12 @@ class TestRaiSyncMetadata:
     def test_valid_metadata_minimal_fields(self) -> None:
         """Test valid metadata with only required fields."""
         metadata = RaiSyncMetadata(
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
 
-        assert metadata.last_sync_at == datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc)
+        assert metadata.last_sync_at == datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC)
         assert metadata.rai_branch == "demo/atlassian-webinar"
         assert metadata.local_path == "/home/emilio/Code/raise-commons"
         assert metadata.sync_version == "1"  # Default
@@ -36,7 +36,7 @@ class TestRaiSyncMetadata:
         metadata = RaiSyncMetadata(
             epic_id="E-DEMO",
             story_id="S-DEMO.4",
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
@@ -52,7 +52,7 @@ class TestRaiSyncMetadata:
             task_status="in_progress",
             task_blocked=False,
             estimated_sp=0.5,
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
@@ -81,7 +81,7 @@ class TestRaiSyncMetadata:
         with pytest.raises(ValidationError) as exc_info:
             RaiSyncMetadata(
                 task_status="invalid_status",  # type: ignore[arg-type]
-                last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+                last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
                 rai_branch="demo/atlassian-webinar",
                 local_path="/home/emilio/Code/raise-commons",
             )
@@ -97,7 +97,7 @@ class TestRaiSyncMetadata:
         with pytest.raises(ValidationError) as exc_info:
             RaiSyncMetadata(
                 sync_direction="invalid",  # type: ignore[arg-type]
-                last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+                last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
                 rai_branch="demo/atlassian-webinar",
                 local_path="/home/emilio/Code/raise-commons",
             )
@@ -110,7 +110,7 @@ class TestRaiSyncMetadata:
         """Test that strict mode rejects unknown fields (extra='forbid')."""
         with pytest.raises(ValidationError) as exc_info:
             RaiSyncMetadata(
-                last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+                last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
                 rai_branch="demo/atlassian-webinar",
                 local_path="/home/emilio/Code/raise-commons",
                 unknown_field="should_fail",  # type: ignore[call-arg]
@@ -125,7 +125,7 @@ class TestRaiSyncMetadata:
         metadata = RaiSyncMetadata(
             epic_id="E-DEMO",
             story_id="S-DEMO.4",
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
@@ -145,7 +145,7 @@ class TestEntityProperty:
         """Test valid EntityProperty wrapping RaiSyncMetadata."""
         metadata = RaiSyncMetadata(
             epic_id="E-DEMO",
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
@@ -160,7 +160,7 @@ class TestEntityProperty:
         metadata = RaiSyncMetadata(
             epic_id="E-DEMO",
             story_id="S-DEMO.4",
-            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+            last_sync_at=datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
             rai_branch="demo/atlassian-webinar",
             local_path="/home/emilio/Code/raise-commons",
         )
@@ -180,7 +180,7 @@ class TestEntityProperty:
             "rai_sync": {
                 "epic_id": "E-DEMO",
                 "story_id": "S-DEMO.4",
-                "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc),
+                "last_sync_at": datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC),
                 "sync_version": "1",
                 "rai_branch": "demo/atlassian-webinar",
                 "local_path": "/home/emilio/Code/raise-commons",
@@ -214,7 +214,7 @@ class TestEntityProperty:
 
         assert entity_prop.rai_sync.epic_id == "E-DEMO"
         assert entity_prop.rai_sync.story_id == "S-DEMO.4"
-        assert entity_prop.rai_sync.last_sync_at == datetime(2026, 2, 14, 10, 0, 0, tzinfo=timezone.utc)
+        assert entity_prop.rai_sync.last_sync_at == datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC)
 
     def test_entity_property_strict_validation_rejects_malformed_data(self) -> None:
         """Test strict validation rejects malformed JIRA response."""

@@ -8,7 +8,6 @@ from rai_cli.discovery.scanner import (
     extract_symbols,
 )
 
-
 # ── Language detection ───────────────────────────────────────────────────
 
 
