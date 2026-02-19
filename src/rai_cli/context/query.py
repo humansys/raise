@@ -207,7 +207,7 @@ def estimate_tokens(text: str) -> int:
     return len(text) // 4
 
 
-def _wilson_lower_bound(
+def wilson_lower_bound(
     positives: int,
     negatives: int,
     z: float = SCORING_WILSON_Z,
@@ -299,7 +299,7 @@ def calculate_relevance_score(
     if positives + negatives == 0:
         return round(base, 4)  # defensive guard for data inconsistency
 
-    modifier = _wilson_lower_bound(positives, negatives)
+    modifier = wilson_lower_bound(positives, negatives)
     return round(base * modifier, 4)
 
 

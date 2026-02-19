@@ -29,11 +29,13 @@ from rai_cli.context import UnifiedGraph, UnifiedGraphBuilder
 from rai_cli.context.diff import GraphDiff, diff_graphs
 from rai_cli.context.models import ConceptEdge, ConceptNode
 from rai_cli.context.query import (
+    SCORING_LOW_WILSON_THRESHOLD,
     ArchitecturalContext,
     UnifiedQuery,
     UnifiedQueryEngine,
     UnifiedQueryResult,
     UnifiedQueryStrategy,
+    wilson_lower_bound,
 )
 from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
 from rai_cli.memory import (
@@ -41,11 +43,13 @@ from rai_cli.memory import (
     MemoryScope,
     PatternInput,
     PatternSubType,
+    ReinforceResult,
     SessionInput,
     append_calibration,
     append_pattern,
     append_session,
     get_memory_dir_for_scope,
+    reinforce_pattern,
 )
 from rai_cli.onboarding.profile import load_developer_profile
 from rai_cli.session.resolver import resolve_session_id_optional
@@ -1058,6 +1062,104 @@ def viz(
 # =============================================================================
 # Append Commands (Add to memory)
 # =============================================================================
+
+
+@memory_app.command("reinforce")
+def reinforce_cmd(
+    pattern_id: Annotated[str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")],
+    vote: Annotated[
+        int,
+        typer.Argument(help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)"),
+    ],
+    story_id: Annotated[
+        str | None,
+        typer.Option("--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"),
+    ] = None,
+    scope: Annotated[
+        str,
+        typer.Option("--scope", "-s", help="Memory scope (global, project, personal)"),
+    ] = "project",
+    memory_dir: Annotated[
+        Path | None,
+        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
+    ] = None,
+) -> None:
+    """Reinforce a pattern with a vote signal.
+
+    Called at story-review to record whether a pattern was applied (1),
+    not relevant (0), or contradicted (-1) during implementation.
+    Vote 0 (N/A) does not modify evaluations count.
+
+    Examples:
+        $ rai memory reinforce PAT-E-183 1 --from RAISE-170
+        $ rai memory reinforce PAT-E-094 -1 --from RAISE-170
+        $ rai memory reinforce PAT-E-151 0 --from RAISE-170
+    """
+    # Validate vote value
+    if vote not in (1, 0, -1):
+        cli_error(
+            f"Invalid vote: {vote}",
+            hint="Valid values: 1 (applied), 0 (N/A), -1 (contradicted)",
+            exit_code=7,
+        )
+        return
+
+    vote_int = vote
+
+    # Resolve patterns file
+    try:
+        memory_scope = MemoryScope(scope)
+    except ValueError:
+        cli_error(
+            f"Invalid scope: {scope}",
+            hint="Valid scopes: global, project, personal",
+            exit_code=7,
+        )
+        return
+
+    mem_dir = memory_dir or get_memory_dir_for_scope(memory_scope)
+    patterns_file = mem_dir / "patterns.jsonl"
+
+    if not patterns_file.exists():
+        cli_error(
+            f"Patterns file not found: {patterns_file}",
+            hint="Run 'rai memory add-pattern' first or check --memory-dir",
+            exit_code=4,
+        )
+        return
+
+    try:
+        result: ReinforceResult = reinforce_pattern(
+            patterns_file, pattern_id, vote=vote_int, story_id=story_id
+        )
+    except KeyError:
+        cli_error(
+            f"Pattern '{pattern_id}' not found in {patterns_file}",
+            hint="Check the pattern ID with 'rai memory query'",
+            exit_code=4,
+        )
+        return
+
+    if not result.was_updated:
+        console.print(f"\n[green]✓[/green] {pattern_id}: N/A (not counted)\n")
+        return
+
+    # Build summary line
+    summary = (
+        f"positives={result.positives}, "
+        f"negatives={result.negatives}, "
+        f"evaluations={result.evaluations}"
+    )
+
+    # Compute Wilson score for display
+    if result.evaluations > 0 and (result.positives + result.negatives) > 0:
+        wilson = wilson_lower_bound(result.positives, result.negatives)
+        wilson_str = f"wilson≈{wilson:.2f}"
+        if wilson < SCORING_LOW_WILSON_THRESHOLD:
+            wilson_str += " [yellow]↓ consider reviewing[/yellow]"
+        summary += f", {wilson_str}"
+
+    console.print(f"\n[green]✓[/green] {pattern_id}: {summary}\n")
 
 
 @memory_app.command("add-pattern")
