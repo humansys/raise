@@ -369,6 +369,15 @@
 
 ---
 
+### SES-218 — Parking Lot (2026-02-19)
+
+- [ ] **Documentar que bugs siguen el story lifecycle** — (SES-218, 2026-02-19)
+  - **Gap:** CLAUDE.md (generado por `rai init`) documenta `STORY:` lifecycle pero no dice explícitamente que Bugs siguen el mismo ciclo (start → design → plan → implement → review → close).
+  - **Fix:** Agregar regla en el source canónico de `.raise/` que genera CLAUDE.md. 2-liner.
+  - **Priority:** Low — regla clara, no necesita research.
+
+---
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-19 (RAISE-170: curación de patrones AI-driven)*
+*Last updated: 2026-02-19 (SES-218: bug lifecycle documentation gap)*
