@@ -1069,7 +1069,7 @@ def reinforce_cmd(
     pattern_id: Annotated[str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")],
     vote: Annotated[
         int,
-        typer.Argument(help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)"),
+        typer.Option("--vote", "-v", help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)"),
     ],
     story_id: Annotated[
         str | None,
@@ -1091,9 +1091,9 @@ def reinforce_cmd(
     Vote 0 (N/A) does not modify evaluations count.
 
     Examples:
-        $ rai memory reinforce PAT-E-183 1 --from RAISE-170
-        $ rai memory reinforce PAT-E-094 -1 --from RAISE-170
-        $ rai memory reinforce PAT-E-151 0 --from RAISE-170
+        $ rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170
+        $ rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170
+        $ rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170
     """
     # Validate vote value
     if vote not in (1, 0, -1):
