@@ -920,3 +920,144 @@ class TestSessionCloseWithSessionFlag:
         mock_resolve.assert_called_once_with(
             session_flag="SES-177", env_var=None
         )
+
+
+class TestSessionCloseCoherenceValidation:
+    """Tests for session close state file coherence validation (RAISE-201)."""
+
+    def test_rejects_state_file_with_mismatched_session_id(
+        self, tmp_path: Path,
+    ) -> None:
+        """CLI rejects state file when session_id doesn't match --session."""
+        import yaml
+
+        profile = DeveloperProfile(name="Test")
+
+        # Write state file with SES-217 data
+        state_file = tmp_path / "session-output.yaml"
+        state_file.write_text(yaml.dump({
+            "session_id": "SES-217",
+            "summary": "wrong session data",
+            "type": "feature",
+        }))
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.resolve_session_id") as mock_resolve,
+        ):
+            mock_resolve.return_value = "SES-219"
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--state-file",
+                    str(state_file),
+                    "--session",
+                    "SES-219",
+                    "--project",
+                    str(tmp_path),
+                ],
+            )
+
+        assert result.exit_code != 0
+        assert "SES-217" in result.output
+        assert "SES-219" in result.output
+
+    def test_accepts_state_file_with_matching_session_id(
+        self, tmp_path: Path,
+    ) -> None:
+        """CLI accepts state file when session_id matches --session."""
+        import yaml
+
+        profile = DeveloperProfile(name="Test")
+
+        # Create project structure
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+
+        state_file = tmp_path / "session-output.yaml"
+        state_file.write_text(yaml.dump({
+            "session_id": "SES-219",
+            "summary": "correct session",
+            "type": "feature",
+        }))
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.resolve_session_id") as mock_resolve,
+            patch("rai_cli.cli.commands.session.process_session_close") as mock_close,
+            patch("rai_cli.cli.commands.session.cleanup_session_dir"),
+        ):
+            mock_resolve.return_value = "SES-219"
+            mock_close.return_value = CloseResult(success=True, session_id="SES-219")
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--state-file",
+                    str(state_file),
+                    "--session",
+                    "SES-219",
+                    "--project",
+                    str(project),
+                ],
+            )
+
+        assert result.exit_code == 0
+        assert "SES-219 closed" in result.output
+
+    def test_skips_validation_when_state_file_has_no_session_id(
+        self, tmp_path: Path,
+    ) -> None:
+        """CLI proceeds when state file has no session_id (backwards compat)."""
+        import yaml
+
+        profile = DeveloperProfile(name="Test")
+
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+
+        state_file = tmp_path / "session-output.yaml"
+        state_file.write_text(yaml.dump({
+            "summary": "old format without session_id",
+            "type": "feature",
+        }))
+
+        with (
+            patch(
+                "rai_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("rai_cli.cli.commands.session.save_developer_profile"),
+            patch("rai_cli.cli.commands.session.resolve_session_id") as mock_resolve,
+            patch("rai_cli.cli.commands.session.process_session_close") as mock_close,
+            patch("rai_cli.cli.commands.session.cleanup_session_dir"),
+        ):
+            mock_resolve.return_value = "SES-219"
+            mock_close.return_value = CloseResult(success=True, session_id="SES-219")
+            result = runner.invoke(
+                app,
+                [
+                    "session",
+                    "close",
+                    "--state-file",
+                    str(state_file),
+                    "--session",
+                    "SES-219",
+                    "--project",
+                    str(project),
+                ],
+            )
+
+        assert result.exit_code == 0
