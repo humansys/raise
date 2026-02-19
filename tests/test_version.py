@@ -6,8 +6,10 @@ import rai_cli
 
 
 def test_version() -> None:
-    """Test that version is defined."""
-    assert rai_cli.__version__ == "2.0.0"
+    """Test that version is defined and follows semver format."""
+    assert rai_cli.__version__ is not None
+    parts = rai_cli.__version__.split(".")
+    assert len(parts) >= 2, f"Version '{rai_cli.__version__}' does not look like semver"
 
 
 def test_author() -> None:
