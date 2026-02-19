@@ -28,9 +28,9 @@
 - [x] RAISE-169: Task-relevant context bundle (M) ✓ (2026-02-18)
 - [x] RAISE-197: Multi-agent skill distribution (L) ✓ (2026-02-18) — 1.74x velocity
 - [x] RAISE-170: Temporal decay and pattern scoring (M) ✓ (completed 2026-02-19, 1.5x velocity)
-- RAISE-171: Meta-cognition indicators (L)
+- ~~RAISE-171: Meta-cognition indicators (L)~~ → promoted to own epic (scope too large)
 
 **Done when:**
-- [ ] All stories complete
+- [x] All stories complete
 - [ ] Epic retrospective done
 - [ ] Merged to `v2`
