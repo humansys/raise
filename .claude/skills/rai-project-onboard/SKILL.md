@@ -16,7 +16,7 @@ metadata:
   raise.next: "session-start"
   raise.gate: "raise memory build produces 30+ governance nodes"
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
   raise.visibility: public
 ---
 
@@ -115,6 +115,70 @@ cat governance/guardrails.md
 
 > **If you can't continue:** Scan fails → Check if source files exist. Try `rai discover scan . -o summary` to diagnose.
 
+### Step 2.5: Discover Existing Documentation
+
+Before asking the user anything, check if the repo already has documentation that can answer governance questions.
+
+```bash
+# Look for documentation directories and markdown files
+find . -maxdepth 3 \
+  -not -path "./.git/*" \
+  -not -path "./.raise/*" \
+  -not -path "./governance/*" \
+  -not -path "./.claude/*" \
+  -not -path "./.agent/*" \
+  \( -name "*.md" -o -name "*.rst" -o -name "*.txt" \) \
+  | sort | head -40
+
+# Also check for known doc directories
+ls -d docs/ documentation/ doc/ .docs/ wiki/ pages/ 2>/dev/null
+```
+
+**Present findings to the user:**
+
+```
+## Documentation found in your repo:
+
+📁 docs/ — {N} files
+  - {filename}: {one-line description if inferable from name}
+  - ...
+
+📄 Root markdown files:
+  - README.md
+  - CONTRIBUTING.md
+  - ...
+
+Should I read these to pre-populate governance? This will save you from answering questions that are already documented.
+```
+
+**If no docs found:** Skip directly to Step 3. Proceed with conversational flow.
+
+**If docs found and user says yes:** Read the relevant files. For each file, extract and map to governance fields:
+
+| Governance field | Look for in docs |
+|-----------------|-----------------|
+| Vision / description | README intro, project overview, `docs/overview.*`, `docs/intro.*` |
+| Requirements / capabilities | User Stories, `docs/requirements.*`, `docs/features.*`, backlog files |
+| Success criteria / goals | OKRs, acceptance criteria, `docs/goals.*` |
+| Architecture / components | ADRs, `docs/architecture.*`, `docs/design.*`, system docs |
+| External interfaces | API docs, integration docs, `docs/integrations.*` |
+| Guardrails / conventions | CONTRIBUTING, coding standards, `docs/development.*` |
+
+**Track what's been answered:**
+
+After reading docs, build a coverage map:
+```
+✅ Vision: found in README.md (paragraph 1)
+✅ Core capabilities: found in docs/user-stories/ (5 stories)
+✅ Success criteria: found in docs/okrs.md
+❓ External interfaces: not found — will ask
+❓ Branch model: not found — will ask
+```
+
+**Verification:** User confirmed whether to use existing docs. Coverage map built.
+
+> **If you can't continue:** Docs exist but user says no → Proceed with normal conversational flow from Step 3.
+
 ### Step 3: Present Discovery Summary
 
 Present what was discovered to the user for confirmation and correction.
@@ -153,42 +217,52 @@ Does this look right? Anything to add or correct?
 
 > **If you can't continue:** User disagrees significantly → Re-run discovery with different options, or note corrections for manual inclusion.
 
-### Step 4: Collect Missing Context (What Code Can't Tell Us)
+### Step 4: Fill Gaps (What Code and Docs Can't Tell Us)
 
-Discovery reveals structure, but not intent. Ask for what's missing.
+Use the coverage map from Step 2.5. Only ask for fields that weren't found in existing documentation.
 
-**Ask:**
-> "I can see WHAT you built. Now tell me WHY:
-> 1. **One-paragraph description** — what is {project_name} for, who uses it, why it exists?
-> 2. **3-5 core capabilities** — what does it DO? (I'll cross-reference with what I found in the code)
-> 3. **What success looks like** — how do you know it's working well?"
+**If coverage map shows gaps**, ask only for those:
+
+> "I read your documentation and code. A few things I couldn't find:
+> {for each gap, one targeted question}
+>
+> Example gaps:
+> - **Description**: what is {project_name} for, who uses it, why it exists? (1 paragraph)
+> - **Success criteria**: how do you know it's working well?
+> - **Core capabilities**: what are the 3-5 main things it does?"
+
+**If coverage map shows no gaps**, skip this step entirely and go to Step 5.
 
 **What you need from this:**
-- Description paragraph (goes into `vision.md` Identity section)
-- Core capabilities → become RF-XX requirements in `prd.md` (cross-referenced with discovered modules)
+- Description paragraph → `vision.md` Identity section
+- Core capabilities → RF-XX requirements in `prd.md`
 - Success criteria → PRD Goals section
-- Key outcomes → vision.md Outcomes table
+- Key outcomes → `vision.md` Outcomes table
 
-**Verification:** You have a description, 3-5 capabilities, and success criteria.
+**Verification:** All governance fields covered (from docs + this conversation).
 
 > **If you can't continue:** User gives vague answer → Ask: "Who uses this? What problem does it solve for them?"
 
-### Step 5: Collect Architecture Refinements
+### Step 5: Fill Architecture Gaps
 
-Discovery found the components. Ask the user to confirm the bigger picture.
+Use coverage map from Step 2.5. Only ask for architecture fields not found in existing docs.
 
-**Ask:**
-> "Based on the code, I see these components: {list from discovery}. Let me confirm the full picture:
-> 1. **Who/what uses {project_name}?** (users, other systems, APIs)
-> 2. **What external systems does it talk to?** (databases, APIs, services)
-> 3. **Anything I missed?** Components or patterns not visible in the code?"
+**If architecture docs were found** (ADRs, system design docs, API docs): extract external interfaces, actors, and components from them. Only ask for what's genuinely missing.
+
+**If architecture gaps remain**, ask only those:
+
+> "Based on the code and your docs, I see: {list from discovery + docs}.
+> {only ask what's missing from the coverage map}:
+> - **Who/what uses {project_name}?** (if not found)
+> - **What external systems does it talk to?** (if not found)
+> - **Anything I missed?** (always ask this)"
 
 **What you need:**
-- External actors and systems (system-context.md)
-- External interfaces with direction and protocol (system-context.md table)
-- Confirmation/correction of internal components (system-design.md table — enriched with discovery data)
+- External actors and systems → `system-context.md`
+- External interfaces with direction and protocol → `system-context.md` table
+- Confirmation/correction of internal components → `system-design.md` (enriched with discovery data)
 
-**Verification:** You have external actors, interfaces, and confirmed component list.
+**Verification:** External actors, interfaces, and component list confirmed — from docs or conversation.
 
 > **If you can't continue:** User hasn't thought about external boundaries → Help: "If someone drew a box around {project_name}, what arrows go in and out?"
 
@@ -517,9 +591,12 @@ rai discover scan + analyze
   → Modules, classes, functions, components
   → Architecture signals (frameworks, patterns)
 
-Conversation
-  → Vision, goals, requirements, success criteria
-  → Architecture confirmation/refinement
+Documentation discovery (Step 2.5) ← NEW
+  → docs/, README.md, user stories, ADRs, specs
+  → Coverage map: what's answered vs. what's a gap
+
+Conversation (gap-filling only)
+  → Only what wasn't found in code or docs
 
 Combined → 6 governance docs → rai memory build → 30+ nodes
 ```
