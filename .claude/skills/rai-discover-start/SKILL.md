@@ -57,21 +57,33 @@ Initialize codebase discovery by detecting project type, identifying key directo
 
 Scan the project for source files and identify languages.
 
+**Important:** Exclude generated/build directories to avoid false positives: `.raise/`, `obj/`, `bin/`, `node_modules/`, `.git/`.
+
 Run these counts in parallel (all independent):
 
 ```bash
-# Count files by extension (run in parallel)
-find . -type f -name "*.py" | wc -l    # Python
-find . -type f -name "*.ts" | wc -l    # TypeScript
-find . -type f -name "*.js" | wc -l    # JavaScript
-find . -type f -name "*.tsx" | wc -l   # React TSX
-find . -type f -name "*.jsx" | wc -l   # React JSX
+# Count files by extension — exclude generated dirs (run in parallel)
+find . -type f -name "*.py" \
+  ! -path "./.raise/*" ! -path "./node_modules/*" ! -path "./.git/*" | wc -l    # Python
+find . -type f \( -name "*.ts" -o -name "*.tsx" \) \
+  ! -path "./.raise/*" ! -path "./node_modules/*" ! -path "./.git/*" | wc -l    # TypeScript
+find . -type f \( -name "*.js" -o -name "*.jsx" \) \
+  ! -path "./.raise/*" ! -path "./node_modules/*" ! -path "./.git/*" | wc -l    # JavaScript
+find . -type f \( -name "*.cs" -o -name "*.csproj" \) \
+  ! -path "./obj/*" ! -path "./bin/*" ! -path "./.raise/*" ! -path "./.git/*" | wc -l    # C#/.NET
+find . -type f -name "*.php" \
+  ! -path "./vendor/*" ! -path "./.raise/*" ! -path "./.git/*" | wc -l    # PHP
+find . -type f -name "*.dart" \
+  ! -path "./.dart_tool/*" ! -path "./.raise/*" ! -path "./.git/*" | wc -l    # Dart/Flutter
 ```
 
 **Supported languages:**
 - `python` — `.py` files
 - `typescript` — `.ts`, `.tsx` files
 - `javascript` — `.js`, `.jsx` files
+- `csharp` — `.cs`, `.csproj` files
+- `php` — `.php` files
+- `dart` — `.dart` files
 
 **Record:** List of detected languages with file counts.
 
@@ -112,6 +124,19 @@ Find main entry points for context:
 - `src/index.ts` — Library entry
 - `src/main.ts` — App entry
 - `package.json` main field
+
+**C#/.NET:**
+- `Program.cs` — .NET 6+ minimal API / console entry
+- `Startup.cs` — ASP.NET Core startup
+- `*.sln` — Solution file (multi-project)
+- `src/*/Program.cs` — Clean Architecture entry
+
+**PHP:**
+- `public/index.php` — Web entry
+- `bin/console` — Symfony CLI entry
+
+**Dart/Flutter:**
+- `lib/main.dart` — Flutter app entry
 
 **Record:** Entry point paths (informational, helps Rai understand structure).
 
