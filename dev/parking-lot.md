@@ -448,6 +448,18 @@
   - **What:** Muestra tier activo (COMMUNITY/PRO/Enterprise), URL del backend si configurado, health del backend, y capabilities disponibles. Útil para onboarding y debugging de configuración.
   - **Priority:** Baja — es polish, no bloquea funcionalidad core
 
+- [ ] **Rai en Slack/Google Chat — presencia conversacional del equipo** — (SES-224, 2026-02-20)
+  - **Visión:** Rai participa en los canales del equipo como un miembro más. El equipo puede preguntarle cosas (`@rai ¿cuál es el estado de RAISE-211?`), recibe notificaciones automáticas (story cerrada, pattern aprendido, post del diario de sesiones), y responde en mensajes privados como si fuera `rai memory query` desde el terminal.
+  - **Tres capas:**
+    1. **`SlackTrigger` / `GoogleChatTrigger`** (variante de `TriggerAdapter`, ADR-034) — recibe mensajes entrantes, normaliza a `WorkflowTrigger`, despacha al skill o query correcto. Backend PRO recibe el webhook y orquesta.
+    2. **`SlackNotificationAdapter` / `TeamsNotificationAdapter`** (variante de `NotificationAdapter`, ADR-034) — Rai publica proactivamente: post del diario al cerrar sesión, aviso cuando una story cierra, pattern nuevo aprendido. El canal recibe updates sin que nadie tenga que preguntar.
+    3. **`SlackParser`** (variante de `GovernanceParser`, ADR-034) — las conversaciones del equipo en Slack alimentan el knowledge graph. Decisiones tomadas en un hilo, acuerdos informales, contexto que hoy se pierde, se convierten en nodes del grafo. Los humanos construyen el knowledge graph sin saberlo, solo conversando.
+  - **Lo nuevo respecto a ADR-034:** La dirección inversa — conversaciones como fuente del grafo — no estaba contemplada. `SlackParser` es una implementación nueva de `GovernanceParser` que parsea mensajes de chat, no documentos. Requiere criterios de extracción (qué es decisión vs ruido).
+  - **Prerequisitos:** RAISE-211 (TierContext + entry points), RAISE-209 (team memory + backend), y el diseño de TriggerAdapter (open question de ADR-035/036 sobre si el backend necesita agent loop).
+  - **Por qué importa:** Cierra la brecha entre donde el equipo vive (Slack/Chat) y donde vive el knowledge graph (el repo). Hoy Rai solo aprende de lo que se documenta formalmente. Con esto aprende de cómo el equipo realmente piensa y trabaja.
+  - **Riesgo:** Privacidad y señal/ruido — no todo lo que se dice en Slack debe ir al grafo. Requiere política de extracción y opt-in explícito por canal.
+  - **Candidato a epic:** Post-RAISE-209, cuando team memory esté en producción y haya suficiente base para añadir canales de entrada conversacionales.
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-20 (SES-224: ADR-038 skill semantics, skill extensions, rai skill pull, rai tier status)*
+*Last updated: 2026-02-20 (SES-224: ADR-038 skill semantics, skill extensions, rai skill pull, rai tier status, Rai en Slack/Google Chat)*
