@@ -73,7 +73,7 @@ def scaffold_workflows(
 
         # Read skill frontmatter for name + description
         skill_md = base / skill_name / "SKILL.md"
-        content = skill_md.read_text()
+        content = skill_md.read_text(encoding="utf-8")
         frontmatter, _body = parse_frontmatter(content)
 
         name = frontmatter.get("name", skill_name)
