@@ -2,8 +2,13 @@ version: '1.0'
 project:
   name: raise-commons
   project_type: brownfield
-  code_file_count: 247
-  detected_at: '2026-02-17T19:41:33.004480Z'
+  code_file_count: 256
+  detected_at: '2026-02-19T18:59:25.510645Z'
 branches:
   development: main
   main: main
+ide:
+  type: claude
+agents:
+  types:
+  - claude
