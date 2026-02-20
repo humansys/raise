@@ -102,7 +102,7 @@ Find the main source directories:
 - `packages/` — Monorepo packages
 
 ```bash
-ls -d src/ lib/ app/ packages/ 2>/dev/null || echo "Check project structure"
+for d in src/ lib/ app/ packages/; do [ -d "$d" ] && echo "$d"; done
 ```
 
 **Record:** List of root directories to scan.
