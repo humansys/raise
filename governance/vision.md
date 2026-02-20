@@ -62,6 +62,10 @@ Neither is complete alone. Together: **collaborative intelligence**.
 - **Organic** — Grows with your workflow, not imposed
 - **Present where users are** — CLI, IDE, conversation — meet them there
 - **Invisible when working** — Only visible when it adds value
+- **Extensible by design** — Governance schemas, knowledge parsers, and documentation targets
+  are pluggable from day one. The RaiSE default (`.raise/` directory) is one implementation,
+  not the only one. Organizations bring their own structure; the core provides the contracts.
+  Community builds the adapters. (ADR-034)
 
 ---
 
@@ -390,10 +394,10 @@ raise-toolkit/
 │       Skills         │    │      Toolkit         │
 │  (Process Guides)    │    │  (Deterministic)     │
 │                      │    │                      │
-│  - /story-design   │    │  - rai memory      │
-│  - /story-plan     │    │  - rai discover    │
-│  - /session-start    │    │  - raise status      │
-│  - /research         │    │  - raise telemetry   │
+│  - /story-design     │    │  - rai memory        │
+│  - /story-plan       │    │  - rai discover      │
+│  - /session-start    │    │  - rai backlog       │
+│  - /research         │    │  - rai docs publish  │
 │  - ...               │    │  - ...               │
 └──────────────────────┘    └──────────────────────┘
                                       │
@@ -407,9 +411,26 @@ raise-toolkit/
                           │  - Outcomes          │
                           │  - Relationships     │
                           └──────────────────────┘
+                                      ▲
+                                      │ fed by
+                          ┌──────────────────────┐
+                          │   Adapter Layer      │
+                          │   (ADR-033, ADR-034) │
+                          │                      │
+                          │  GovernanceSchema    │ ← what artifacts exist
+                          │  GovernanceParser    │ ← extract graph nodes
+                          │  DocumentationTarget │ ← where to publish
+                          │  PM Adapter          │ ← backlog operations
+                          │                      │
+                          │  built-in (core/MIT) │
+                          │  + community plugins │
+                          │  + raise-pro adapters│
+                          └──────────────────────┘
 ```
 
 **Key Insight (E2):** We don't need execution engines. Rai reads skills and calls tools. 85% scope reduction, better flexibility, same outcomes.
+
+**Key Insight (ADR-033/034):** The knowledge graph is only as rich as what feeds it. The adapter layer makes that surface extensible — organizations bring their governance structures, the community builds the parsers.
 
 ### Package
 
@@ -502,6 +523,8 @@ Our first team: junior developers learning RaiSE with Rai.
 | Identity Core | `dev/decisions/adr-014-identity-core-structure.md` |
 | Memory Infrastructure | `dev/decisions/adr-015-memory-infrastructure.md` |
 | E2 Architecture | `dev/decisions/adr-011-*.md`, `dev/decisions/adr-012-*.md` |
+| PM Adapter Architecture | `dev/decisions/adr-033-open-core-adapter-architecture.md` |
+| Governance Extensibility | `dev/decisions/adr-034-governance-extensibility.md` |
 | Rai Identity Doc | `.claude/rai/identity.md` (will migrate to `.rai/`) |
 | OpenClaw Research | `work/research/openclaw-architecture/` |
 | Session Log | `dev/sessions/` |

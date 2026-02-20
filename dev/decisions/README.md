@@ -61,6 +61,9 @@ What are the trade-offs? What do we gain? What do we accept?
 | [002](adr-002-pydantic-everywhere.md) | Pydantic for All Data Models | Accepted | 2026-01-31 |
 | [003](adr-003-rich-for-output.md) | Rich for CLI Output | Accepted | 2026-01-31 |
 | [004](adr-004-xdg-directories.md) | XDG Directory Compliance | Accepted | 2026-01-31 |
+| [033](adr-033-open-core-adapter-architecture.md) | Open-Core Adapter Architecture | Accepted | 2026-02-19 |
+| [034](adr-034-governance-extensibility.md) | Governance Extensibility — Schema, Parsers, Targets | Accepted | 2026-02-19 |
+| [035](adr-035-backend-deployment-topology.md) | Backend Deployment Topology — COMMUNITY / PRO / ENTERPRISE | Accepted | 2026-02-19 |
 
 ---
 

@@ -59,6 +59,10 @@ RaiSE offers three tiers designed around a natural progression: individual devel
 - Knowledge graph (local JSON-based)
 - Local telemetry (velocity tracking, signal analysis)
 - BYOK inference — customer's own API key, always
+- **Adapter extension contracts (ADR-033, ADR-034)** — `GovernanceSchemaProvider`,
+  `GovernanceParser`, `DocumentationTarget`, and `ProjectManagementAdapter` Protocol
+  definitions are Apache 2.0–licensed. The community can build adapters (Notion, Obsidian,
+  Azure DevOps, GitHub Issues) against these contracts without any dependency on raise-pro.
 
 **Value proposition:** *"Ship reliable software at AI speed. Solo."*
 
@@ -84,13 +88,17 @@ RaiSE offers three tiers designed around a natural progression: individual devel
 - Conflict resolution — when two Rai instances learn contradicting patterns
 - Privacy gradient — calibration stays personal, architecture insights are shared
 
-**Platform Integration:**
+**Platform Integration (raise-pro adapters — ADR-033, ADR-034):**
 
-- `rai backlog` — Platform-agnostic backlog commands (Jira first, GitLab later)
+- `rai backlog` — Platform-agnostic backlog commands backed by `ProjectManagementAdapter`
   - Create/read/update/transition issues
   - JQL search abstracted behind CLI
   - Story lifecycle synced to Jira (story-start creates issue, story-close transitions)
-- `rai docs publish` — Design docs and architecture docs to Confluence pages
+  - First implementation: `raise-jira-adapter` (raise-pro). Community may build `raise-linear-adapter`, etc.
+- `rai docs publish` — Publishes governance docs to Confluence via `DocumentationTarget`
+  - Destination resolved from org config (`.raise/adapters/confluence-governance.yaml`)
+  - Org-specific space mapping, page hierarchy, and templates
+- `rai memory build` with `JiraBacklogParser` — Jira issues flow into the knowledge graph
 - `rai search` — Unified search across Jira + Confluence (via Rovo)
 - Compass catalog — Component registry sync (beta)
 - Token-efficient CLI wrappers (~200 tokens vs ~8,000 raw MCP per operation)
@@ -173,9 +181,15 @@ RaiSE offers three tiers designed around a natural progression: individual devel
 | Org-wide pattern aggregation        |    —    | — |     ✓     |
 | **Discovery**                 |          |    |            |
 | Multi-language discovery            |    ✓    | ✓ |     ✓     |
+| **Extensibility (ADR-033/034)**|          |    |            |
+| Adapter Protocol contracts (Apache 2.0)    |    ✓    | ✓ |     ✓     |
+| Community adapter support           |    ✓    | ✓ |     ✓     |
+| raise-pro adapters (Jira, Confluence)|   —    | ✓ |     ✓     |
+| Custom org governance schemas       |    —    | ✓ |     ✓     |
 | **Platform Integration**      |          |    |            |
-| Jira integration                    |    —    | ✓ |     ✓     |
-| Confluence publishing               |    —    | ✓ |     ✓     |
+| Jira integration (`rai backlog`)    |    —    | ✓ |     ✓     |
+| Confluence publishing (`rai docs`)  |    —    | ✓ |     ✓     |
+| Jira → knowledge graph parser       |    —    | ✓ |     ✓     |
 | Unified search (Rovo)               |    —    | ✓ |     ✓     |
 | Compass catalog sync                |    —    | ✓ |     ✓     |
 | **Security & Compliance**     |          |    |            |
