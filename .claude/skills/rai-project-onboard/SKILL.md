@@ -494,36 +494,122 @@ version: "1.0.0"
 
 > **If you can't continue:** Write fails → Check file permissions. Governance dir should be writable.
 
-### Step 7: Build Graph and Verify (Gate)
+### Step 7: Build Graph and Verify (Coverage Gate)
 
-Run the graph builder and verify the 30+ node gate.
+Run the graph builder, then check **coverage** across 4 dimensions — not a node count.
 
 ```bash
 rai memory build
 ```
 
-**Expected output:** The build should show governance nodes extracted from each doc.
+#### G1: Governance Structure
 
-**Verification gate:**
+For each of the 6 docs, verify parser-extractable content exists (not placeholders):
+
 ```bash
-rai memory query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
+# vision.md — outcomes table with bold-pipe rows
+grep -c "| \*\*" governance/vision.md
+
+# prd.md — RF-XX requirements
+grep -c "^### RF-" governance/prd.md
+
+# guardrails.md — guardrail table rows (must-/should- IDs)
+grep -c "| must-\|should-" governance/guardrails.md
+
+# backlog.md — epic table rows
+grep -c "| E[0-9]" governance/backlog.md
+
+# system-context.md — external interfaces table
+grep -c "| System\|Inbound\|Outbound\|Both" governance/architecture/system-context.md
+
+# system-design.md — components table
+grep -c "| Component\|[A-Z][a-z].*|" governance/architecture/system-design.md
 ```
 
-Count the governance nodes. You need **30+ total** across these types:
-- Requirements (from prd.md): ~5-8 nodes (RF-01 through RF-08)
-- Outcomes (from vision.md): ~3-5 nodes (bold-pipe table rows)
-- Guardrails (from guardrails.md): ~5-13 nodes (table rows across sections)
-- Project (from backlog.md): 1 node
-- Epics (from backlog.md): ~2-4 nodes (table rows)
-- Architecture docs don't produce individual nodes but enrich the graph context
+**Pass criteria:**
+- vision.md: ≥ 2 outcome rows
+- prd.md: ≥ 3 RF-XX requirements
+- guardrails.md: ≥ 3 guardrail rows
+- backlog.md: ≥ 1 epic row
+- system-context.md: interfaces table present
+- system-design.md: ≥ 2 component rows
+
+#### G2: Module Coverage (Code → Governance)
+
+Cross-reference discovered modules against governance:
+
+```bash
+# Get discovered modules
+rai discover scan . -o summary 2>/dev/null | grep "Module:" | awk '{print $2}'
+
+# Check how many appear in system-design.md or prd.md
+# For each module name: grep -i "{module}" governance/architecture/system-design.md governance/prd.md
+```
+
+Count: `covered_modules / total_modules`. **Pass: ≥ 80%.**
+
+If below 80%: list the uncovered modules explicitly — the user decides if they're intentionally excluded (e.g., test utilities) or genuinely missing from governance.
+
+#### G3: Documentation Coverage (Docs Read → Governance)
+
+For each file read in Step 2.5, verify at least one governance element traces back to it:
+
+- Check that content extracted from each doc made it into at least one governance doc
+- This is an inference check — use your reading of both the source docs and the written governance
+- Flag any doc that was read but appears to have contributed nothing
+
+**Pass: 100% of docs read → at least one governance element.**
+
+#### G4: Internal Traceability
+
+```bash
+# Guardrails have Derived from populated (not empty or placeholder)
+grep -A1 "| must-\|should-" governance/guardrails.md | grep -c "RF-"
+
+# Requirements have body content (not just heading)
+# Read prd.md and check each RF-XX heading has ≥1 sentence below it
+```
+
+**Pass criteria:**
+- ≥ 80% of guardrails have `Derived from` with a valid RF-XX
+- All RF-XX requirements have body text (not just heading)
+
+---
+
+**Present gate results:**
+
+```
+## Quality Gate
+
+G1 Governance structure:
+  ✅ vision.md — {N} outcomes
+  ✅ prd.md — {N} requirements (RF-01 to RF-{N})
+  ❌ guardrails.md — 0 rows (format issue)
+  ✅ backlog.md — {N} epics
+  ✅ system-context.md — interfaces table present
+  ✅ system-design.md — {N} components
+
+G2 Module coverage: {N}/{M} modules in governance ({%})
+  {✅ or ⚠️ list of uncovered modules if any}
+
+G3 Doc coverage: {N}/{M} docs read → mapped to governance
+  {✅ or ❌ list any docs that contributed nothing}
+
+G4 Traceability:
+  {N}/{M} guardrails have Derived from
+  {N}/{M} requirements have body content
+
+Gate: {PASS / PARTIAL / FAIL} — {specific fix instructions if not PASS}
+```
 
 **Decision:**
-- 30+ nodes → **Gate passed.** Continue to summary.
-- <30 nodes → Investigate which docs didn't parse. Check format against parser contract in Step 6. Fix and rebuild.
+- All green → **Gate passed.** Continue to Step 8.
+- PARTIAL (1-2 items failing) → Fix specific items, re-run affected checks. Do NOT rebuild full graph unless structure changed.
+- FAIL (G1 failures or G3 failures) → Fix docs, rebuild graph, re-run gate.
 
-**Verification:** `rai memory build` succeeds and produces 30+ governance nodes.
+**Verification:** Gate results presented. All 4 dimensions pass or user accepts documented exceptions.
 
-> **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header. Fix the specific doc and rebuild.
+> **If you can't continue:** G2 below 80% → Ask user: "These modules have no governance coverage — intentional or missing?" Proceed based on their answer.
 
 ### Step 8: Summary and Next Steps
 
