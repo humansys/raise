@@ -140,11 +140,11 @@ RAISE-244 (bugfix — validation client)
 
 | Story | Size | Status | Notes |
 |-------|:----:|:------:|-------|
-| RAISE-243 | M | Pending | |
+| RAISE-243 | M | ✅ Done | 1.33x velocity |
 | RAISE-244 | S | Pending | |
 
 **Milestones:**
-- [ ] M1: Creator works
+- [x] M1: Creator works (2026-02-20)
 - [ ] M2: Epic complete
 
 ---
