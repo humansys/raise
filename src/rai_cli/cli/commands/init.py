@@ -311,14 +311,26 @@ def _generate_agents_md(
 
     AGENTS.md is supported by Cursor, Windsurf, Copilot, Codex CLI, Kilo Code,
     OpenCode (60K+ repos use it as the universal agent instructions file).
+
+    Uses IDE-specific session start instructions when only one agent is
+    configured; uses generic instructions for multi-agent setups.
     """
     agents_md_path = project_path / "AGENTS.md"
     if agents_md_path.exists():
         return
 
+    # Claude Code uses /skill-name syntax; other IDEs do not.
+    # Use the slash-command form only for single-claude setups.
+    if agent_types == ["claude"]:
+        session_instruction = "Run `/rai-session-start` to load full context."
+    else:
+        session_instruction = (
+            "Invoke the `rai-session-start` skill from your IDE to load full context."
+        )
+
     content = (
         f"# {project_name}\n\n"
-        f"> RaiSE-governed project. Run `/rai-session-start` to load full context.\n\n"
+        f"> RaiSE-governed project. {session_instruction}\n\n"
         f"## Active Agents\n\n"
         + "\n".join(f"- {a}" for a in agent_types)
         + "\n\n"
