@@ -238,17 +238,29 @@ class TestAgentDetection:
         assert "copilot" in detected
 
     def test_no_markers_returns_empty(self, tmp_path: Path) -> None:
+        empty_home = tmp_path / "empty-home"
+        empty_home.mkdir()
         registry = load_registry()
-        detected = registry.detect_agents(tmp_path)
+        detected = registry.detect_agents(tmp_path, user_home=empty_home)
         assert detected == []
 
     def test_no_duplicate_detection(self, tmp_path: Path) -> None:
         """Same agent only detected once even if multiple markers match."""
+        empty_home = tmp_path / "empty-home"
+        empty_home.mkdir()
         (tmp_path / "CLAUDE.md").write_text("# Claude")
         (tmp_path / ".claude").mkdir()
         registry = load_registry()
-        detected = registry.detect_agents(tmp_path)
+        detected = registry.detect_agents(tmp_path, user_home=empty_home)
         assert detected.count("claude") == 1
+
+    def test_detects_claude_from_home_claude_dir(self, tmp_path: Path) -> None:
+        """~/.claude in home dir detected as claude marker (pre-init brownfield)."""
+        mock_home = tmp_path / "home"
+        (mock_home / ".claude").mkdir(parents=True)
+        registry = load_registry()
+        detected = registry.detect_agents(tmp_path, user_home=mock_home)
+        assert "claude" in detected
 
 
 # ---------------------------------------------------------------------------
