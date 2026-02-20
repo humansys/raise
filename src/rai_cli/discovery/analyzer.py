@@ -65,6 +65,14 @@ DEFAULT_CATEGORY_MAP: dict[str, str] = {
     "types/": "schema",
     "hooks/": "utility",
     "api/": "service",
+    # C#/.NET (Clean Architecture conventions — leaf directories only,
+    # avoid broad layer dirs like Infrastructure/ that shadow more specific ones)
+    "Controllers/": "controller",
+    "Repositories/": "repository",
+    "Handlers/": "service",
+    "Commands/": "command",
+    "Queries/": "query",
+    "Validators/": "validator",
 }
 
 NAME_CATEGORY_OVERRIDES: dict[str, str] = {
@@ -74,6 +82,17 @@ NAME_CATEGORY_OVERRIDES: dict[str, str] = {
     "Config": "config",
     "Test": "test",
     "test_": "test",
+    # C#/.NET name suffixes
+    "Handler": "service",
+    "Repository": "repository",
+    "RepositoryAsync": "repository",
+    "Command": "command",
+    "Query": "query",
+    "Validator": "validator",
+    "Controller": "controller",
+    "Middleware": "middleware",
+    "Extension": "utility",
+    "Factory": "utility",
 }
 
 BASE_CLASS_CATEGORIES: dict[str, str] = {
