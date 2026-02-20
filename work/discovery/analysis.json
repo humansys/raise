@@ -34,7 +34,8 @@
           "path_matches_convention": false,
           "known_base_class": "BaseModel",
           "name_follows_convention": true,
-          "parent_validated": false
+          "parent_validated": false,
+          "has_semantic_suffix": false
         }
       },
       "auto_category": "model",
@@ -64,7 +65,8 @@
           "path_matches_convention": false,
           "known_base_class": null,
           "name_follows_convention": true,
-          "parent_validated": false
+          "parent_validated": false,
+          "has_semantic_suffix": false
         }
       },
       "auto_category": "other",
