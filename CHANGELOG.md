@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.3] - 2026-02-20
+
 ### Added
 - Roo Code agent support: `.roo/skills` and `.roo/rules` generation, LiteLLM-compatible (RAISE-202)
 
@@ -24,9 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Guardrails template: remove hardcoded Python guardrail from base template
 - `rai skill list`: 4 skills with non-standard `work_cycle` values now visible; defensive formatter fallback (RAISE-216)
 - `AGENTS.md`: cross-IDE compatible session-start instruction (RAISE-217)
-- `rai init`: warn when brownfield governance docs are empty after init (RAISE-220)
-
-## [2.0.2] - 2026-02-19
+- `rai init`: warn when brownfield governance docs are empty after init (RAISE-220)## [2.0.2] - 2026-02-19
 
 ### Added
 - Neurosymbolic Memory Density epic (RAISE-168): temporal decay scoring, Wilson confidence, pattern reinforcement via `rai memory reinforce`
@@ -89,7 +89,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a9...HEAD
+[Unreleased]: https://github.com/humansys-io/raise-commons/compare/v2.0.3...HEAD
+[2.0.3]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a9...v2.0.3
 [2.0.0a9]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a8...v2.0.0a9
 [2.0.0a8]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a6...v2.0.0a8
 [2.0.0a6]: https://github.com/humansys-io/raise-commons/releases/tag/v2.0.0a6
