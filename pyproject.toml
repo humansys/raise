@@ -145,3 +145,4 @@ exclude_lines = [
 output_format = "human"
 color = true
 verbosity = 0
+
