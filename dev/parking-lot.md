@@ -91,6 +91,31 @@
 
 ## Ideas
 
+### Local Rai Runtime — Daemon con AOP para telemetría y tracking (SES-223, 2026-02-19)
+
+- [ ] **Local Rai Runtime — daemon de background para telemetría como aspecto** — (SES-223, 2026-02-19)
+  - **Insight:** La telemetría y el session tracking hoy viven *dentro* de las skills (emit-work calls, session start/close en el contenido). Esto es frágil (RAISE-201 fue un síntoma), limita la riqueza de datos, y añade complejidad a las skills. Un daemon local convierte estos cross-cutting concerns en aspectos de la infraestructura, no del contenido.
+  - **Mecanismo central:**
+    1. **CLI middleware** — un solo interceptor en `app.callback()` (no en cada comando). Cada `rai` invocation emite un `CliEvent` tipado al daemon. Graceful degradation: si el daemon no corre, timeout 50ms, CLI continúa sin error.
+    2. **Unix socket** — `~/.rai/daemon.sock`. IPC local, sin red, sin latencia perceptible. Inspirado en OpenClaw Gateway (`ws://127.0.0.1:18789`) pero más simple y tipado.
+    3. **Correlación por env var** — el agente (Claude Code) setea `RAI_SKILL_CONTEXT=<skill>:<story-id>` antes de ejecutar una skill. CLI lo lee e incluye en el evento. Skills no hacen ninguna llamada de tracking. Agente setea el var una vez.
+    4. **Filesystem watcher** — cubre cambios a `.raise/` fuera del CLI (edits manuales, agente escribiendo archivos directamente). También detecta sesiones huérfanas (RAISE-201 estructuralmente).
+  - **Lo que captura que hoy no tenemos:**
+    - Duración real por skill (no estimada)
+    - Pasos re-ejecutados dentro de una skill
+    - Correcciones: `add-pattern` inmediatamente post-error
+    - Tiempo entre skills (cadencia real de trabajo)
+    - CLI calls sin contexto de skill (work ad-hoc)
+    - Cache hits vs misses en memory query
+  - **Puerta de entrada a inference local (COMMUNITY):** daemon puramente determinista en v1. Si hay modelo local configurado (Ollama, LM Studio), el mismo daemon puede añadir inference opcional: "llevas 40 min en story-plan sin avanzar de fase de diseño — ¿quieres ayuda?". Sin backend requerido.
+  - **Relación con ADR-035:** el backend PRO/Enterprise tiene su propio agent loop (Hosted Rai). Este daemon es el equivalente COMMUNITY — mismo patrón, distinto alcance.
+  - **Impacto en skills:** skills existentes se simplifican. Sin llamadas `rai memory emit-work`. Sin `rai session start/close` explícitos en el contenido. El daemon maneja todo.
+  - **Riesgo:** proceso permanente en máquina del developer → consumo de recursos, crashes, conflictos con otros procesos. Diseño debe ser ultra-ligero. `rai daemon start|stop|status` como interfaz explícita.
+  - **Prioridad:** Media-Alta — resuelve problemas estructurales (RAISE-201 class), habilita telemetría rica, y es prerequisito para inference local. Candidato a epic post-V3.
+  - **Referencias:** OpenClaw Gateway pattern, AOP (Aspect-Oriented Programming), ADR-034 §TriggerAdapter, ADR-035 §Hosted Rai Agent Loop
+
+---
+
 ### Systemic Poka-Yoke — Design Principle (2026-02-10, PAT-242)
 
 - [ ] **"As above, so below" — poka-yoke at every producer-consumer boundary** — (SES-134, BF-2)
@@ -378,6 +403,22 @@
 
 ---
 
+---
+
+### SES-222 — Parking Lot (2026-02-19)
+
+- [ ] **Invitar a Gustavo a construir raise-azuredevops-adapter** — (SES-222, 2026-02-19)
+  - **Context:** Gustavo (desarrollador, conocido de Emilio) quiere construir un adaptador de RaiSE para Azure DevOps.
+  - **Timing:** Esperar a que RAISE-204 (contratos ADR-033) esté implementado y publicado. Sin contratos estables, el adaptador no tiene base.
+  - **Acción:** Una vez que `rai-cli` incluya `ProjectManagementAdapter` Protocol + `rai.adapters.pm` entry point, compartir el ADR-033 con Gustavo como punto de partida.
+
+- [ ] **PAT-E-354 desactualizado — "4 of 5 IDEs"** — (SES-222, 2026-02-19)
+  - **Context:** El patrón dice "4 of 5 IDEs" pero Roo Code ya es el 6to IDE soportado (RAISE-202). Texto desactualizado.
+  - **Fix:** Actualizar el texto del patrón para reflejar el estado actual.
+  - **Priority:** Low — cosmético, no bloquea nada.
+
+---
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-19 (SES-218: bug lifecycle documentation gap)*
+*Last updated: 2026-02-19 (SES-222: Gustavo/Azure DevOps adapter, PAT-E-354 stale)*
