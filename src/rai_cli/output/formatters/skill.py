@@ -43,7 +43,12 @@ def format_skill_list_human(
         "unknown",
     ]
 
-    for lifecycle in lifecycle_order:
+    # Show all lifecycles: ordered first, then any unknown ones alphabetically
+    ordered_set = set(lifecycle_order)
+    extra_lifecycles = sorted(lc for lc in grouped if lc not in ordered_set)
+    display_order = lifecycle_order + extra_lifecycles
+
+    for lifecycle in display_order:
         if lifecycle not in grouped:
             continue
 

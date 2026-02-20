@@ -9,7 +9,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: tools
+  raise.work_cycle: utility
   raise.frequency: as-needed
   raise.fase: "0"
   raise.prerequisites: ""

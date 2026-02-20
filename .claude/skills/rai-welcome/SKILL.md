@@ -7,7 +7,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: onboarding
+  raise.work_cycle: utility
   raise.frequency: once-per-developer
   raise.fase: "setup"
   raise.prerequisites: ""
