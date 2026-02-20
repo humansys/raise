@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- `rai init`: Windows encoding crash (`UnicodeDecodeError: charmap cp1252`) when reading SKILL.md during workflow scaffolding — add `encoding="utf-8"` to `read_text()` call
+
 ## [2.0.3] - 2026-02-20
 
 ### Added
