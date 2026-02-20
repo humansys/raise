@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.1.0"
   raise.visibility: public
 ---
 
@@ -87,6 +87,10 @@ Read: work/discovery/analysis.json
 **Estimated human decisions:** ~{medium_modules + low_count}
 ```
 
+> **⚠ All-low scenario:** If `high == 0 AND medium == 0 AND low > 50`, the
+> per-component path would require O(components) decisions. Skip to
+> **Step 4 Gate** for alternative modes before attempting individual review.
+
 **Verification:** Analysis loaded with confidence tiers.
 
 > **If you can't continue:** No analysis.json → Run `/rai-discover-scan` first.
@@ -124,10 +128,15 @@ Medium-confidence components (40-69) have partial signals — they need AI synth
 2. If the module has components that already have good `auto_purpose`, present those
 3. For components without good purpose, synthesize descriptions using module context
 
+> **C# / large projects:** If modules are single-file (1 component each), grouping by
+> file is not useful. Switch to grouping by **namespace prefix** instead:
+> extract the common namespace segment (e.g., `BetterNet.Services.Profile.Application`)
+> and batch all components sharing that prefix in one review.
+
 **Present the module batch:**
 
 ```markdown
-### Module: {file_path} ({N} components)
+### Module: {file_path or namespace} ({N} components)
 
 | # | Name | Kind | Auto-Category | Purpose | Confidence |
 |---|------|------|---------------|---------|------------|
@@ -143,9 +152,63 @@ Medium-confidence components (40-69) have partial signals — they need AI synth
 
 **Verification:** Module batch processed.
 
-### Step 4: Individual Review Low Confidence
+### Step 4: Gate — Check Scale Before Individual Review
 
-Low-confidence components (< 40) lack documentation signals — they need individual human attention.
+**Before starting individual review, check:**
+
+```
+all_low = (high_count == 0 AND medium_count == 0 AND low_count > 50)
+```
+
+**If `all_low` is true**, individual review would require O(components) decisions — defeating the purpose of the pipeline. Present the user with these alternatives:
+
+---
+
+#### Mode A: By Architectural Layer *(recommended for Clean Architecture / CQRS)*
+
+Group components by top-level namespace segment (e.g., `Application`, `Domain`, `Infrastructure`, `Api`). Review one layer at a time:
+
+1. Extract layer from each component's namespace (first segment after project root)
+2. Present components grouped by layer in a table (same format as Step 3)
+3. Ask user: "Approve entire `{Layer}` layer? [Approve all / Review individually / Skip layer]"
+4. **Approve all**: mark all components in layer `validated: true, validated_by: human`
+5. **Skip layer**: mark all as `skipped: true, skip_reason: "layer_skip"`
+
+---
+
+#### Mode B: Key Components *(recommended when codebase is large and mostly infra)*
+
+User nominates 10–20 key components; all others are bulk-skipped.
+
+1. Ask user: "Name the 10–20 most important components (entry points, core domain, key services)"
+2. Validate only those individually (use Step 4 normal flow)
+3. Bulk-skip the rest: `skipped: true, skip_reason: "bulk_skip — not nominated"`
+4. Note in summary how many were bulk-skipped
+
+---
+
+#### Mode C: Accept by Naming Pattern *(recommended for consistent suffix patterns)*
+
+Auto-accept all components whose name matches a consistent suffix pattern in a namespace.
+
+1. Show a breakdown: "Found 87 `*Handler`, 34 `*Repository`, 12 `*Validator`..."
+2. Ask user per pattern: "Auto-accept all `*Handler` components? [Yes / Review first / Skip]"
+3. **Yes**: mark all matching as `validated: true, validated_by: auto-pattern`
+4. Remaining unmatched components → fall back to Mode A or individual review
+
+---
+
+**If `all_low` is false**, proceed normally with individual review below.
+
+**Ask user which mode to use** if `all_low` is true.
+
+**Verification:** Mode selected or individual review confirmed.
+
+---
+
+### Step 4b: Individual Review Low Confidence
+
+Low-confidence components (< 40) that weren't handled by a bulk mode need individual human attention.
 
 **For each low-confidence component:**
 
@@ -246,7 +309,7 @@ After validation, export the validated components to JSON for graph integration.
 
 **Graph Integration:**
 ```bash
-rai discover build --input work/discovery/components-validated.json
+rai memory build --input work/discovery/components-validated.json
 ```
 
 **Architecture Documentation:**
@@ -261,7 +324,7 @@ Run `/rai-discover-document` to generate module docs from discovery data.
   - Updated `work/discovery/components-draft.yaml`
   - `work/discovery/components-validated.json` — Final component catalog
 - **Telemetry:** `skill_event` via Stop hook
-- **Next:** `rai discover build` (graph integration) or `/rai-discover-document` (architecture docs)
+- **Next:** `rai memory build` (graph integration) or `/rai-discover-document` (architecture docs)
 
 ## Confidence Tiers
 
@@ -306,6 +369,6 @@ If too many components are medium/low on a well-documented codebase:
 ## References
 
 - Previous skill: `/rai-discover-scan`
-- Next: `rai discover build` (graph integration) or `/rai-discover-document` (architecture docs)
+- Next: `rai memory build` (graph integration) or `/rai-discover-document` (architecture docs)
 - CLI: `rai discover analyze --help`
 - Analyzer: `src/rai_cli/discovery/analyzer.py`
