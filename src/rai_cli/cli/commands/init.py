@@ -15,6 +15,7 @@ Example:
     $ raise init --ide antigravity         # (deprecated) alias for --agent
 """
 
+import sys
 from datetime import date
 from pathlib import Path
 from typing import Annotated
@@ -271,6 +272,38 @@ def _resolve_agent_types(
     return ["claude"]
 
 
+def _prompt_agent_selection(
+    detected: list[str],
+    registry: AgentRegistry,
+) -> list[str]:
+    """Show detected agents and prompt user to confirm or extend selection.
+
+    In non-interactive contexts (no TTY), prints the detected agents and
+    returns them without prompting.
+
+    Args:
+        detected: Agent types found by auto-detection.
+        registry: Registry used to list all available agents.
+
+    Returns:
+        Final list of agent types selected by the user.
+    """
+    all_agents = registry.list_agents()
+    detected_label = ", ".join(detected) if detected else "none"
+    console.print(f"\n[bold]Detected agents:[/bold] {detected_label}")
+
+    if not sys.stdin.isatty():
+        return detected if detected else ["claude"]
+
+    console.print(f"[dim]Available:[/dim] {', '.join(all_agents)}")
+    default = ",".join(detected) if detected else "claude"
+    raw = typer.prompt(
+        "Configure agents (comma-separated)",
+        default=default,
+    )
+    return [a.strip() for a in raw.split(",") if a.strip()]
+
+
 def _generate_agents_md(
     project_path: Path, agent_types: list[str], project_name: str
 ) -> None:
@@ -376,6 +409,10 @@ def init_command(
 
     # Resolve agent types from flags
     agent_types = _resolve_agent_types(agent, ide, detect, project_path, registry)
+
+    # When --detect is used, confirm selection interactively
+    if detect and agent is None and ide is None:
+        agent_types = _prompt_agent_selection(agent_types, registry)
 
     # Validate agent types are in registry; skip unknown with warning
     valid_agent_types: list[str] = []

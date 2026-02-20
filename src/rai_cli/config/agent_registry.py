@@ -164,22 +164,31 @@ class AgentRegistry:
         """Return sorted list of all registered agent_type keys."""
         return sorted(self._configs.keys())
 
-    def detect_agents(self, project_root: Path) -> list[str]:
+    def detect_agents(
+        self, project_root: Path, user_home: Path | None = None
+    ) -> list[str]:
         """Detect which registered agents have marker files in project_root.
 
         Checks each agent's detection_markers list; stops at first match per
-        agent. Returns sorted list of detected agent_type keys.
+        agent. Markers starting with ``~/`` are resolved against user_home
+        (defaults to Path.home()) instead of project_root.
 
         Args:
-            project_root: Directory to check for agent marker paths.
+            project_root: Directory to check for project-relative marker paths.
+            user_home: Home directory for ``~/`` markers (defaults to Path.home()).
 
         Returns:
             Sorted list of detected agent_type strings.
         """
+        home = user_home if user_home is not None else Path.home()
         detected: list[str] = []
         for agent_type, config in self._configs.items():
             for marker in config.detection_markers:
-                if (project_root / marker).exists():
+                if marker.startswith("~/"):
+                    check_path = home / marker[2:]
+                else:
+                    check_path = project_root / marker
+                if check_path.exists():
                     detected.append(agent_type)
                     break
         return sorted(detected)

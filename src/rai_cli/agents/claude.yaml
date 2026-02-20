@@ -5,3 +5,4 @@ skills_dir: .claude/skills
 detection_markers:
   - CLAUDE.md
   - .claude
+  - ~/.claude
