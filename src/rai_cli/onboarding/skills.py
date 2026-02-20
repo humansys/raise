@@ -33,11 +33,19 @@ logger = logging.getLogger(__name__)
 class SkillScaffoldResult(BaseModel):
     """Result of skill scaffolding operation."""
 
+    # New sync-aware fields
+    skills_installed: list[str] = Field(default_factory=list)
+    skills_updated: list[str] = Field(default_factory=list)
+    skills_conflicted: list[str] = Field(default_factory=list)
+    skills_kept: list[str] = Field(default_factory=list)
+    skills_overwritten: list[str] = Field(default_factory=list)
+    skills_current: list[str] = Field(default_factory=list)
+
+    # Backward-compat fields
     skills_copied: int = 0
     already_existed: bool = False
     files_copied: list[str] = Field(default_factory=list)
     files_skipped: list[str] = Field(default_factory=list)
-    skills_installed: list[str] = Field(default_factory=list)
     skills_skipped_names: list[str] = Field(default_factory=list)
 
 
