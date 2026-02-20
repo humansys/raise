@@ -118,6 +118,37 @@ RAISE-244 (bugfix — validation client)
 
 ---
 
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-20
+
+### Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | RAISE-243 `rai-skill-create` | M | None | M1 | Foundation — the creator must exist before any client skill |
+| 2 | RAISE-244 `rai-bugfix` | S | RAISE-243 | M2 | Validation gate — proves the creator works E2E |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Creator works** | RAISE-243 | `rai-skill-create` generates a valid SKILL.md from conversation, passes `rai skill validate` |
+| **M2: Epic complete** | +RAISE-244 | `rai-bugfix` created via creator, works correctly, epic retro done |
+
+### Progress Tracking
+
+| Story | Size | Status | Notes |
+|-------|:----:|:------:|-------|
+| RAISE-243 | M | Pending | |
+| RAISE-244 | S | Pending | |
+
+**Milestones:**
+- [ ] M1: Creator works
+- [ ] M2: Epic complete
+
+---
+
 ## Notes
 
 ### Design Philosophy
@@ -132,5 +163,6 @@ Best patterns to study: `rai-debug` (utility, methodology-driven), `rai-research
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-02-20 | Rai | Implementation plan — linear sequence, 2 milestones |
 | 2026-02-20 | Rai | Epic design — architectural context, risk assessment, design philosophy |
 | 2026-02-20 | Rai | Initial scope |
