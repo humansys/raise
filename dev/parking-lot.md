@@ -419,6 +419,35 @@
 
 ---
 
+---
+
+### SES-224 — Parking Lot (2026-02-20)
+
+- [ ] **ADR-038: Skill update semantics — `rai: framework/custom` frontmatter** — (SES-224, 2026-02-20)
+  - **Context:** Fernando propuso en el daily (2026-02-19) usar un campo en el frontmatter del skill para indicar ownership: `rai: framework` (RaiSE puede sobreescribir en updates) vs `rai: custom` (la org lo posee, no se toca en updates).
+  - **Problema que resuelve:** `rai skill sync` / `rai init --upgrade` hoy no sabe qué skills son del framework y cuáles fueron customizados por la org. Una actualización sobreescribiría customizaciones.
+  - **Propuesta:** `rai skill update` solo sobreescribe skills con `rai: framework`. Skills con `rai: custom` se preservan siempre, salvo flag explícito `--force`.
+  - **También resuelve:** skills internos de humansys marcados como `rai: internal` — no se distribuyen en la instalación pública.
+  - **Acción:** Escribir ADR-038 antes de distribuir skills customizados a Coppel o cualquier cliente.
+  - **Priority:** Alta — bloquea la distribución de skills org-específicos
+
+- [ ] **Skill extensions pattern — hooks opcionales en skills base** — (SES-224, 2026-02-20)
+  - **Context:** Aquiles quiere que `rai-story-close` o `rai-epic-close` pregunten si correr Snyk scanner. Snyk requiere MCP configurado — si no está, el skill fallaría o advertiría a developers sin Snyk.
+  - **Patrón correcto:** Skill extension que se registra en un hook del skill base. El skill base declara puntos de extensión; las extensiones que requieren MCPs no disponibles se saltan silenciosamente.
+  - **Ejemplo:** `rai-story-close.snyk` con `extends: rai-story-close` y `requires.mcp: snyk`.
+  - **Relación con ADR-038:** la misma mecánica de frontmatter puede incluir `extends` y `requires`.
+  - **Priority:** Media — no bloquea RAISE-211, pero Aquiles lo necesita para su integración
+
+- [ ] **`rai skill pull --source` — distribución de skills org-específicos** — (SES-224, 2026-02-20)
+  - **Context:** Fernando necesita acceder a los skills internos de humansys que están en el repo pero no en la distribución pip. El equipo de Soluciones quiere distribuir sus propios skills (con prefijo `sol.`) a sus developers.
+  - **Propuesta:** `rai skill pull --source humansys` / `--source sol` + configuración de sources en `.raise/skills.yaml`.
+  - **Relación con SkillRegistryAdapter:** es la versión simple (COMMUNITY) del SkillRegistryAdapter identificado en SES-224. La versión Enterprise agrega org governance y allowlists.
+  - **Priority:** Media — Fernando lo necesita para onboarding del equipo de Soluciones
+
+- [ ] **`rai tier status` command** — (SES-224, 2026-02-20, ADR-037 §Open Questions)
+  - **What:** Muestra tier activo (COMMUNITY/PRO/Enterprise), URL del backend si configurado, health del backend, y capabilities disponibles. Útil para onboarding y debugging de configuración.
+  - **Priority:** Baja — es polish, no bloquea funcionalidad core
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-19 (SES-222: Gustavo/Azure DevOps adapter, PAT-E-354 stale)*
+*Last updated: 2026-02-20 (SES-224: ADR-038 skill semantics, skill extensions, rai skill pull, rai tier status)*
