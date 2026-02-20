@@ -513,8 +513,8 @@ grep -c "| \*\*" governance/vision.md
 # prd.md — RF-XX requirements
 grep -c "^### RF-" governance/prd.md
 
-# guardrails.md — guardrail table rows (must-/should- IDs)
-grep -c "| must-\|should-" governance/guardrails.md
+# guardrails.md — guardrail table rows (must-/should- IDs, case-insensitive)
+grep -ciE "\| (must|should)-" governance/guardrails.md
 
 # backlog.md — epic table rows
 grep -c "| E[0-9]" governance/backlog.md
