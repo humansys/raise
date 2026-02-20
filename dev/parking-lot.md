@@ -448,6 +448,86 @@
   - **What:** Muestra tier activo (COMMUNITY/PRO/Enterprise), URL del backend si configurado, health del backend, y capabilities disponibles. Útil para onboarding y debugging de configuración.
   - **Priority:** Baja — es polish, no bloquea funcionalidad core
 
+- [ ] **Group Sessions — sesiones de desarrollo grupal en Google Chat / Slack** — (SES-224, 2026-02-20)
+
+  **La visión en una frase:** El equipo invita a Rai a un canal, abre sesión, trabaja junto como lo haría en una videollamada — pero el canal ES la sesión, y Rai es participante activa, no solo un bot de consultas.
+
+  **Cómo funciona una Group Session:**
+
+  1. **Convocatoria:** Emilio agenda "Sesión de diseño: Adapters — viernes 4pm, @rai invited". Rai puede recibir la invitación vía webhook de Google Calendar / Slack. Al llegar la hora, Rai se anuncia en el canal con contexto de lo que se va a trabajar: story, epic, documentos relevantes precargados.
+
+  2. **Primary + participantes:** Hay un *primary* — la persona a cuyo nombre van los commits, cuyo perfil define el nivel base de la sesión, y quien toma las decisiones finales. Los demás son participantes — pueden preguntar, validar, cuestionar, pedir explicaciones. Rai sabe quién es el primary y quiénes son los participantes (por mención inicial o por configuración del canal).
+
+  3. **Hilo principal — las decisiones:** El thread principal es donde ocurre la sesión real. Rai guía el proceso (como lo haría con un skill: `/rai-story-design`, `/rai-epic-design`), hace preguntas al grupo, presenta opciones, y espera validación antes de avanzar. Las decisiones se toman aquí. El historial de este thread es el narrative de la sesión.
+
+  4. **Sub-threads — las profundizaciones:** Cuando alguien dice "no entiendo eso, @rai ELI5", Rai abre un thread sobre ese mensaje. La explicación detallada ocurre en el thread, no en el canal principal. Al terminar la explicación, Rai sube una línea al hilo principal: "Aquiles confirmó: entendido — [resumen de 10 palabras]". El hilo principal se mantiene limpio: solo decisiones, no tutoriales.
+
+  5. **Calibración per-participante:** Rai adapta el nivel según quién escribe. Si Emilio pregunta algo, la respuesta asume contexto de arquitectura. Si Gerardo pregunta lo mismo, empieza desde cero con analogías. Esto requiere que cada participante tenga un perfil básico en el knowledge graph del equipo (seniority, área de foco, qué cosas ya entiende).
+
+  6. **Async catch-up:** Si alguien llega tarde al canal, puede escribir "@rai resumen". Rai produce un párrafo con las decisiones tomadas hasta ese punto y el estado actual — sin interrumpir el hilo principal.
+
+  7. **Cierre grupal:** El primary (o cualquier participante con permiso) escribe "cierra sesión rai". Rai produce automáticamente:
+     - Resumen de decisiones tomadas, atribuidas a quién las propuso
+     - Jira items creados/actualizados (stories, bugs, decisiones pendientes)
+     - Patterns capturados de la conversación y agregados al knowledge graph del equipo
+     - Commits atribuidos al primary con todos los participantes en el `Co-Authored-By`
+     - Post del Diario de Sesiones publicado en Confluence
+
+  **Ejemplo concreto (la sesión de hoy en formato grupal):**
+  ```
+  [Emilio]: @rai abre sesión — diseño de extensibilidad para PRO/Enterprise
+  [Rai]: Sesión abierta. Primary: Emilio. Participantes detectados: Aquiles, Fernando.
+         Contexto cargado: ADR-033/034/035, RAISE-211 pendiente.
+         Pregunta de arranque: ¿cuál es el objetivo de esta sesión en una oración?
+
+  [Emilio]: entender qué falta en core antes de poder construir PRO
+
+  [Rai]: Perfecto. Voy a hacer un gap analysis de los ADRs actuales.
+         [análisis de extensibilidad...]
+         Identifiqué 7 gaps. Los dos más urgentes son KnowledgeGraphBackend y TierContext.
+         ¿Confirmamos que estos entran en el próximo epic?
+
+  [Aquiles]: qué es KnowledgeGraphBackend exactamente? [en thread]
+
+  [Rai → thread con Aquiles]: ELI5: hoy el CLI guarda todo en tu computadora...
+  [Rai → hilo principal]: Aquiles confirmado: entiende el gap.
+
+  [Fernando]: sí confirmo, entrambos entran
+  [Emilio]: confirmado
+
+  [Rai]: Decisión tomada: KnowledgeGraphBackend y TierContext en RAISE-211.
+         Avanzando a Stories...
+
+  [Emilio]: cierra sesión rai
+
+  [Rai]: Sesión cerrada. Resumen: 7 gaps identificados, 2 en scope RAISE-211...
+         RAISE-211 creado en Jira. ADR-036 y ADR-037 escritos. Post publicado en Confluence.
+         Commits: emilio@humansys.ai (Co-Authored-By: Aquiles, Fernando, Rai)
+  ```
+
+  **Lo que esto resuelve que nada más resuelve:**
+  - Sesiones de diseño sin videollamada — el canal es suficiente
+  - El equipo que no pudo estar en la sesión ve exactamente qué se decidió y por qué
+  - El knowledge graph se construye colectivamente, no solo cuando Emilio trabaja solo con Rai
+  - Los commits tienen autoría honesta — reflejan que fue trabajo de equipo
+
+  **Prerequisitos técnicos:**
+  - `TriggerAdapter` con `SlackTrigger` / `GoogleChatTrigger` — recibe mensajes del canal
+  - `NotificationAdapter` — Rai publica al canal y a threads
+  - **Hosted Rai agent loop** — el backend necesita mantener estado de sesión grupal entre mensajes (esta es la respuesta definitiva a la open question de ADR-035: "¿necesita el backend su propio agent loop?" — sí, para Group Sessions)
+  - `KnowledgeGraphBackend` (RAISE-211/RAISE-209) — la sesión actualiza el grafo del equipo
+  - **Group Session Protocol** — variante de ADR-024 para sesiones multi-participante
+  - **Participant Profile Registry** — cada miembro del equipo tiene un perfil básico para calibración
+
+  **Lo que es nuevo vs lo que ya está diseñado:**
+  - `NotificationAdapter`, `TriggerAdapter` — ya en ADR-034, se extienden
+  - Group Session Protocol — **nuevo**, variante de ADR-024
+  - Per-participant calibration — **nuevo**, no existe en el modelo actual
+  - Thread isolation (ELI5 sin contaminar el hilo principal) — **nuevo**, patrón de UX específico de chat
+  - Channel-as-session-log — **nuevo**, invierte el modelo: el chat es el narrative, no un artefacto producido al final
+
+  **Candidato a epic:** Post-RAISE-209 y post-TriggerAdapter. Requiere Hosted Rai con agent loop funcionando. Probablemente V3.1 o V4.
+
 - [ ] **Rai en Slack/Google Chat — presencia conversacional del equipo** — (SES-224, 2026-02-20)
   - **Visión:** Rai participa en los canales del equipo como un miembro más. El equipo puede preguntarle cosas (`@rai ¿cuál es el estado de RAISE-211?`), recibe notificaciones automáticas (story cerrada, pattern aprendido, post del diario de sesiones), y responde en mensajes privados como si fuera `rai memory query` desde el terminal.
   - **Tres capas:**
