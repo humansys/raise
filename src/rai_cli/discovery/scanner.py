@@ -1142,7 +1142,6 @@ def _extract_csharp_symbols_from_tree(
 
         if node_type in container_types:
             local_name = _get_name(node)
-            qualified = _qualify(local_name)
 
             kind: SymbolKind = "class"
             if node_type == "interface_declaration":
@@ -1150,7 +1149,7 @@ def _extract_csharp_symbols_from_tree(
 
             symbols.append(
                 Symbol(
-                    name=qualified,
+                    name=local_name,
                     kind=kind,
                     file=file_path,
                     line=node.start_point[0] + 1,
@@ -1161,7 +1160,7 @@ def _extract_csharp_symbols_from_tree(
             body = _find_child_by_type(node, "declaration_list")
             if body:
                 for child in body.children:
-                    walk(child, parent_name=qualified)
+                    walk(child, parent_name=local_name)
             return
 
         if node_type == "method_declaration" and parent_name is not None:
@@ -1203,7 +1202,7 @@ def _extract_csharp_symbols_from_tree(
             local_name = _get_name(node)
             symbols.append(
                 Symbol(
-                    name=_qualify(local_name),
+                    name=local_name,
                     kind="enum",
                     file=file_path,
                     line=node.start_point[0] + 1,

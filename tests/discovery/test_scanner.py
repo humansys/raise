@@ -1222,7 +1222,7 @@ class TestExtractCsharpSymbols:
         assert props[1].name == "MaxRetries"
 
     def test_extract_with_namespace(self) -> None:
-        """Test that namespace qualifies symbol names."""
+        """Test that namespace does NOT qualify symbol names — local name only (RAISE-226)."""
         source = dedent("""\
             namespace MyApp.Services
             {
@@ -1243,11 +1243,11 @@ class TestExtractCsharpSymbols:
         ifaces = [s for s in symbols if s.kind == "interface"]
         enums = [s for s in symbols if s.kind == "enum"]
         methods = [s for s in symbols if s.kind == "method"]
-        assert classes[0].name == "MyApp.Services.UserService"
-        assert ifaces[0].name == "MyApp.Services.IService"
-        assert enums[0].name == "MyApp.Services.Priority"
+        assert classes[0].name == "UserService"
+        assert ifaces[0].name == "IService"
+        assert enums[0].name == "Priority"
         assert methods[0].name == "Process"
-        assert methods[0].parent == "MyApp.Services.UserService"
+        assert methods[0].parent == "UserService"
 
     def test_method_visibility_in_signature(self) -> None:
         """Test that method signature includes visibility modifiers."""
@@ -1307,11 +1307,11 @@ class TestExtractCsharpSymbols:
         methods = [s for s in symbols if s.kind == "method"]
 
         assert len(ifaces) == 1
-        assert ifaces[0].name == "MyApp.Services.IUserService"
+        assert ifaces[0].name == "IUserService"
         # UserService + UserDto (record) + Point (struct)
         assert len(classes) == 3
         assert len(enums) == 1
-        assert enums[0].name == "MyApp.Services.UserRole"
+        assert enums[0].name == "UserRole"
         # IUserService.GetUserAsync + UserService.(ConnectionString, GetUserAsync, ValidateId) + Point.(X, Y)
         assert len(methods) == 6
 
@@ -1351,5 +1351,5 @@ class TestExtractCsharpSymbols:
 
         result = scan_directory(tmp_path, language="csharp")
         assert result.files_scanned == 1
-        assert any(s.name == "MyApp.UserService" for s in result.symbols)
+        assert any(s.name == "UserService" for s in result.symbols)
         assert not any(s.name == "Main" for s in result.symbols)
