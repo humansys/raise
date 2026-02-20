@@ -8,7 +8,7 @@ from pathlib import Path
 from rai_cli.onboarding.migration import (
     _extract_sessions_data,
     _extract_skills_from_sessions,
-    migrate_emilio_profile,
+    migrate_developer_profile,
 )
 from rai_cli.onboarding.profile import (
     CommunicationStyle,
@@ -124,48 +124,48 @@ class TestExtractSkillsFromSessions:
         assert skills == sorted(skills)
 
 
-class TestMigrateEmilioProfile:
-    """Tests for migrate_emilio_profile function."""
+class TestMigrateDeveloperProfile:
+    """Tests for migrate_developer_profile function."""
 
     def test_creates_profile_with_name(self, tmp_path: Path) -> None:
         """Creates profile with correct name."""
-        profile = migrate_emilio_profile(tmp_path)
-        assert profile.name == "Emilio"
+        profile = migrate_developer_profile(tmp_path)
+        assert profile.name == "Developer"
 
     def test_creates_profile_with_custom_name(self, tmp_path: Path) -> None:
         """Creates profile with custom name."""
-        profile = migrate_emilio_profile(tmp_path, name="Test")
+        profile = migrate_developer_profile(tmp_path, name="Test")
         assert profile.name == "Test"
 
     def test_sets_ri_experience_level(self, tmp_path: Path) -> None:
         """Sets experience level to Ri (expert)."""
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
         assert profile.experience_level == ExperienceLevel.RI
 
     def test_sets_direct_communication_style(self, tmp_path: Path) -> None:
         """Sets communication style to direct."""
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
         assert profile.communication.style == CommunicationStyle.DIRECT
 
     def test_sets_skip_praise_true(self, tmp_path: Path) -> None:
         """Sets skip_praise to True."""
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
         assert profile.communication.skip_praise is True
 
     def test_sets_redirect_permission_true(self, tmp_path: Path) -> None:
         """Sets redirect_when_dispersing to True."""
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
         assert profile.communication.redirect_when_dispersing is True
 
     def test_includes_universal_patterns(self, tmp_path: Path) -> None:
         """Includes known universal patterns."""
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
         assert len(profile.universal_patterns) > 0
         assert "Commit after each completed task" in profile.universal_patterns
 
     def test_includes_project_path(self, tmp_path: Path) -> None:
         """Includes project path in projects list."""
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
         assert str(tmp_path) in profile.projects
 
     def test_extracts_sessions_from_real_data(self, tmp_path: Path) -> None:
@@ -180,7 +180,7 @@ class TestMigrateEmilioProfile:
             '{"id": "SES-003", "date": "2026-02-03", "outcomes": ["rai-epic-design complete"]}\n'
         )
 
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
 
         assert profile.first_session == date(2026, 2, 1)
         assert profile.last_session == date(2026, 2, 3)
@@ -190,13 +190,13 @@ class TestMigrateEmilioProfile:
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
         """Handles missing .raise/rai/memory directory gracefully."""
-        profile = migrate_emilio_profile(tmp_path)
+        profile = migrate_developer_profile(tmp_path)
         assert profile.first_session is None
         assert profile.last_session is None
 
     def test_accepts_additional_skills(self, tmp_path: Path) -> None:
         """Accepts additional skills parameter."""
-        profile = migrate_emilio_profile(
+        profile = migrate_developer_profile(
             tmp_path,
             additional_skills=["custom-skill", "another-skill"],
         )
@@ -210,7 +210,7 @@ class TestMigrateEmilioProfile:
         index_path = memory_path / "index.jsonl"
         index_path.write_text('{"id": "SES-001", "outcomes": ["rai-debug used"]}\n')
 
-        profile = migrate_emilio_profile(
+        profile = migrate_developer_profile(
             tmp_path,
             additional_skills=["custom-skill"],
         )

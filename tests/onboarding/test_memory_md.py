@@ -96,12 +96,12 @@ def sample_methodology_yaml(tmp_path: Path) -> Path:
         branches:
           structure: |
             main (stable)
-              └── v2 (development)
+              └── {development_branch} (development)
                     └── epic/e{N}/{name}
                           └── story/s{N}.{M}/{name}
           flow:
             - Stories merge to epic branch
-            - Epics merge to development branch (v2)
+            - Epics merge to development branch ({development_branch})
             - Development merges to main at release
     """)
     methodology_path = tmp_path / "methodology.yaml"
@@ -179,6 +179,28 @@ class TestMemoryMdGeneratorPart1:
         assert "## Branch Model" in result
         assert "main (stable)" in result
         assert "Stories merge to epic branch" in result
+
+    def test_branches_substitutes_development_branch(
+        self, sample_methodology_yaml: Path
+    ) -> None:
+        """Should replace {development_branch} placeholder with given branch name."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(
+            methodology_path=sample_methodology_yaml,
+            development_branch="develop",
+        )
+
+        assert "develop (development)" in result
+        assert "development branch (develop)" in result
+        assert "{development_branch}" not in result
+
+    def test_branches_defaults_to_main(self, sample_methodology_yaml: Path) -> None:
+        """Should default development_branch to 'main' when not provided."""
+        gen = MemoryMdGenerator()
+        result = gen.generate(methodology_path=sample_methodology_yaml)
+
+        assert "main (development)" in result
+        assert "{development_branch}" not in result
 
     def test_skills_count_in_header(self, sample_methodology_yaml: Path) -> None:
         """Should include total skills count."""
@@ -433,3 +455,16 @@ class TestGenerateMemoryMd:
         assert "PAT-003" in result  # Most recent
         assert "PAT-002" in result  # Second most recent
         assert "PAT-001" not in result  # Excluded by max_patterns=2
+
+    def test_passes_development_branch_through(
+        self, sample_methodology_yaml: Path
+    ) -> None:
+        """Should pass development_branch to the generator."""
+        result = generate_memory_md(
+            methodology_path=sample_methodology_yaml,
+            project_name="branch-test",
+            development_branch="v2",
+        )
+
+        assert "v2 (development)" in result
+        assert "{development_branch}" not in result

@@ -144,20 +144,20 @@ def _extract_skills_from_sessions(sessions_path: Path) -> list[str]:
     return sorted(found_skills)
 
 
-def migrate_emilio_profile(
+def migrate_developer_profile(
     project_path: Path,
     *,
-    name: str = "Emilio",
+    name: str = "Developer",
     additional_skills: list[str] | None = None,
 ) -> DeveloperProfile:
-    """Create Emilio's profile from existing memory data.
+    """Create developer profile from existing memory data.
 
     Extracts session history, skills used, and communication preferences
     from the project's .raise/rai/memory/ directory.
 
     Args:
-        project_path: Path to the raise-commons project root.
-        name: Developer name (default: "Emilio").
+        project_path: Path to the project root.
+        name: Developer name (default: "Developer").
         additional_skills: Extra skills to add beyond those detected.
 
     Returns:
@@ -176,7 +176,7 @@ def migrate_emilio_profile(
     if additional_skills:
         skills_mastered = sorted(set(skills_mastered) | set(additional_skills))
 
-    # Emilio's known communication preferences (from CLAUDE.local.md)
+    # Default communication preferences
     communication = CommunicationPreferences(
         style=CommunicationStyle.DIRECT,
         language="en",  # es for casual

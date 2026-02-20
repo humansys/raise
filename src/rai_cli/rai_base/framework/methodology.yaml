@@ -225,11 +225,11 @@ principles:
 branches:
   structure: |
     main (stable)
-      └── v2 (development)
+      └── {development_branch} (development)
             └── epic/e{N}/{name}
                   └── story/s{N}.{M}/{name}
 
   flow:
     - Stories merge to epic branch
-    - Epics merge to development branch (v2)
+    - Epics merge to development branch ({development_branch})
     - Development merges to main at release

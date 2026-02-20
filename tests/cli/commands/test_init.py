@@ -572,6 +572,59 @@ class TestInitBootstrap:
         assert "RaiSE Framework Process" in content
 
 
+class TestInitMemoryMdBranches:
+    """Tests for MEMORY.md branch substitution during init."""
+
+    def test_init_memory_md_no_placeholder_leak(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Generated MEMORY.md must not contain raw {development_branch} placeholder."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        canonical = greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
+        content = canonical.read_text(encoding="utf-8")
+        assert "{development_branch}" not in content
+
+    def test_init_memory_md_uses_default_main_branch(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Default init produces MEMORY.md with 'main' as development branch."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        canonical = greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
+        content = canonical.read_text(encoding="utf-8")
+        assert "main (development)" in content
+
+    def test_init_memory_md_no_hardcoded_v2(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Generated MEMORY.md must not contain hardcoded 'v2' as branch name."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        canonical = greenfield_project / ".raise" / "rai" / "memory" / "MEMORY.md"
+        content = canonical.read_text(encoding="utf-8")
+        assert "v2 (development)" not in content
+        assert "branch (v2)" not in content
+
+
 class TestInitSkillScaffolding:
     """Tests for skill scaffolding integration in raise init."""
 
