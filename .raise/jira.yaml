@@ -77,13 +77,40 @@ team:
     focus: training, onboarding, content
 
 # ─── Issue Types ─────────────────────────────────────────────────────────────
+# Ontology decision: SES-226 / Tech Note TN-001
+# Rule: choose the type that changes HOW you work on the issue, not just how it's labeled.
 
 issue_types:
-  - Epic       # Collection of related stories
-  - Story      # User-facing feature or deliverable
-  - Task       # Technical work item
-  - Bug        # Defect
-  - Sub-task   # Child of Story/Task (use 'Sub-task', NOT 'Subtask')
+  - name: Epic
+    description: "Rolling or bounded body of work. Contains Stories, Improvements, Spikes."
+    when_to_use: "When work spans multiple deliverables or requires architectural direction."
+
+  - name: Story
+    description: "Delivers direct user or developer value — new capability, feature, UX."
+    when_to_use: "When the output is something a stakeholder can use or observe."
+
+  - name: Improvement
+    description: "Makes something existing better — process, tooling, DX, quality. Not a defect."
+    when_to_use: "When nothing is broken but something could work better. Includes refactors, process changes, config improvements."
+    example: "Multi-instance coordination file (RAISE-241), jira.yaml ontology update."
+
+  - name: Spike
+    description: "Time-boxed investigation. Produces knowledge, NOT a deliverable. No implementation commitment."
+    when_to_use: "When uncertainty must be reduced before committing to a Story or design."
+    contract: "Define: question to answer + timebox. Output: decision or recommendation, not code."
+
+  - name: Task
+    description: "Technical work with no direct user value. Infrastructure, CI, config, maintenance."
+    when_to_use: "When the work is necessary but doesn't fit Story, Improvement, or Spike."
+
+  - name: Bug
+    description: "Something that worked and broke, or never worked as specified."
+    when_to_use: "Defect. Use priority field for severity (Critical/Major/Minor)."
+    default_parent: "RAISE-144"   # → Engineering Health (see defaults section)
+
+  - name: Sub-task
+    description: "Child of any issue type. For breaking down complex work within a single issue."
+    note: "Use 'Sub-task' NOT 'Subtask' — Jira API is case-sensitive."
 
 # ─── Defaults ────────────────────────────────────────────────────────────────
 # Repo-level defaults for issue creation. Agents MUST apply these unless
