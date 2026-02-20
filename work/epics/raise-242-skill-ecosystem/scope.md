@@ -9,46 +9,90 @@
 
 ## Objective
 
-Build the meta-skill infrastructure: understand the existing skill ecosystem patterns, then create a skill that generates new skills following those patterns. Validate with a concrete client skill (rai-bugfix).
+Build the meta-skill infrastructure: a skill that generates new skills by composing existing CLI tools and following established patterns. Validate with a concrete client skill (rai-bugfix).
 
-## Rationale
+**Value proposition:** Standardized skill creation reduces errors, ensures consistency across the ecosystem, and lowers the barrier for expanding RaiSE's capability surface. Every future skill benefits from this investment.
 
-Skills are RaiSE's primary product capability expansion mechanism. Currently 25+ skills exist but creating new ones requires manual reading of patterns and copy-paste from existing skills. A skill creator standardizes this, reduces errors, and enables consistent quality across the ecosystem.
+---
 
-This epic is "skill of skills" — grounding in how existing skills work is prerequisite to building the creator.
+## Architectural Context
+
+**Affected module:** `mod-skills` (domain layer, `bc-skills` bounded context)
+
+**Existing infrastructure (no changes needed):**
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| `schema.py` | `src/rai_cli/skills/` | Pydantic models: `Skill`, `SkillFrontmatter`, `SkillMetadata` |
+| `scaffold.py` | `src/rai_cli/skills/` | Template generation with lifecycle inference |
+| `validator.py` | `src/rai_cli/skills/` | Structural validation (required fields + sections) |
+| `name_checker.py` | `src/rai_cli/skills/` | `{domain}-{action}` pattern, conflict detection |
+| `locator.py` | `src/rai_cli/skills/` | Directory-based auto-discovery |
+| `parser.py` | `src/rai_cli/skills/` | YAML frontmatter extraction |
+
+**Key architectural decision:** ADR-012 (Skills orchestrate, CLI provides data). The skill creator is a pure orchestration skill — no CLI code changes needed.
+
+**Discovery mechanism:** Convention-based. Any `{skill_dir}/{name}/SKILL.md` is auto-discovered. No manifest, no registration.
+
+**Required SKILL.md sections:** Purpose, Context, Steps, Output (validated by `validator.py`).
+
+**Naming pattern:** `{domain}-{action}(-{qualifier})*` with known lifecycle domains (session, epic, story, discover, skill, research, debug, framework, project, docs).
 
 ---
 
 ## In Scope
 
-- Analyze existing skill patterns (structure, SKILL.md conventions, lifecycle)
-- Understand CLI infrastructure (scaffold, validate, check-name, schema)
-- Build `rai-skill-create` — interactive skill that generates new skills
-- Build `rai-bugfix` — first client skill, validates the creator works
-- Skills live in `.claude/skills/` (project-specific, not publishable)
+**MUST:**
+- `rai-skill-create` skill — conversational skill generator that:
+  - Validates name via `rai skill check-name`
+  - Scaffolds structure via `rai skill scaffold`
+  - Fills template with conversational input (replacing TODOs)
+  - Reads reference skills for pattern matching
+  - Validates result via `rai skill validate`
+- `rai-bugfix` skill — systematic bug fixing skill created using the creator
+- Both skills live in `.claude/skills/` (project-specific)
+
+**SHOULD:**
+- Skill creator adapts to mastery level (ShuHaRi)
+- Reference skill selection is intelligent (picks relevant patterns by domain)
 
 ## Out of Scope
 
-- Skill marketplace or distribution → deferred to future epic
-- Modifications to `skills_base/` (distributable skills) → separate concern
-- CLI scaffold command changes → use existing infrastructure as-is
+- Skill marketplace or distribution → future epic
+- Modifications to `skills_base/` or CLI scaffold code → existing infra is sufficient
 - Skill versioning or dependency management → premature
+- Agent-specific adaptations (Cursor, Copilot plugins) → separate concern
 
 ---
 
 ## Stories
 
-| # | JIRA | Story | Size | Depends On |
-|---|------|-------|------|------------|
-| 1 | [RAISE-243](https://humansys.atlassian.net/browse/RAISE-243) | `rai-skill-create` — skill creator skill | M | — |
-| 2 | [RAISE-244](https://humansys.atlassian.net/browse/RAISE-244) | `rai-bugfix` — systematic bug fixing skill | S | RAISE-243 |
+| # | JIRA | Story | Size | Depends On | Description |
+|---|------|-------|------|------------|-------------|
+| 1 | [RAISE-243](https://humansys.atlassian.net/browse/RAISE-243) | `rai-skill-create` | M | — | Conversational skill that composes CLI tools to generate valid skills |
+| 2 | [RAISE-244](https://humansys.atlassian.net/browse/RAISE-244) | `rai-bugfix` | S | RAISE-243 | First client skill — validates the creator works end-to-end |
+
+```
+RAISE-243 (skill creator)
+    ↓
+RAISE-244 (bugfix — validation client)
+```
+
+**No parallel tracks** — RAISE-244 is both a deliverable and a validation gate for RAISE-243.
 
 ---
 
-## Done When
+## Done Criteria
 
-- [ ] Skill ecosystem patterns documented and understood
+### Per Story
+- [ ] Code implemented with type annotations
+- [ ] Unit tests passing (>90% coverage)
+- [ ] Quality checks pass (ruff, pyright, bandit)
+- [ ] Story retrospective complete
+
+### Epic Complete
 - [ ] `rai-skill-create` generates valid skills from conversation
+- [ ] Generated skills pass `rai skill validate` without errors
 - [ ] `rai-bugfix` created using `rai-skill-create` and works correctly
 - [ ] All tests pass, types clean, lint clean
 - [ ] Epic retrospective complete
@@ -56,8 +100,37 @@ This epic is "skill of skills" — grounding in how existing skills work is prer
 
 ---
 
+## Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|-----------|--------|------------|
+| Skill creator produces skills that pass validation but are low quality | Medium | Medium | Use rai-bugfix as E2E quality gate; read reference skills for pattern matching |
+| Over-engineering the creator with too many options | Medium | Low | Start minimal — name, purpose, steps. Iterate if needed |
+| Template drift — scaffold template vs real skills diverge | Low | Low | Creator reads actual skills as patterns, not just the template |
+
+---
+
+## Architecture References
+
+| Decision | Document | Key Insight |
+|----------|----------|-------------|
+| Skills orchestrate, CLI provides data | ADR-012 | Skill creator is pure orchestration — no CLI changes needed |
+
+---
+
+## Notes
+
+### Design Philosophy
+The skill creator is an **orchestration skill**, not a code generator. It composes existing CLI tools (`check-name` → `scaffold` → `validate`) and fills the template through conversation. The intelligence is in the conversation design, not in new infrastructure.
+
+### Reference Skills
+Best patterns to study: `rai-debug` (utility, methodology-driven), `rai-research` (utility, multi-step), `rai-story-design` (story lifecycle, structured output).
+
+---
+
 ## Changelog
 
 | Date | Author | Change |
 |------|--------|--------|
+| 2026-02-20 | Rai | Epic design — architectural context, risk assessment, design philosophy |
 | 2026-02-20 | Rai | Initial scope |
