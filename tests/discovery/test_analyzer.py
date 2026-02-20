@@ -513,6 +513,110 @@ class TestComputeConfidence:
         assert r1.score == r2.score
         assert r1.tier == r2.tier
 
+    # ── C#/.NET scoring (RAISE-225) ───────────────────────────────────────
+
+    def test_csharp_handler_in_handlers_dir_is_medium(self) -> None:
+        """Handler class in Handlers/ with interface base → medium (50)."""
+        sym = _symbol(
+            name="GetProfileHandler",
+            kind="class",
+            signature="class GetProfileHandler : IRequestHandler<GetProfileQuery, ProfileDto>",
+            file="src/Application/Handlers/GetProfileHandler.cs",
+        )
+        # path=20, type_annot=10 (': '), base_class=10 (IRequestHandler), name_conv=5, suffix=15 = 60
+        result = compute_confidence(sym, "service")
+        assert result.tier == "medium"
+        assert result.score == 60
+        assert result.signals.has_semantic_suffix is True
+        assert result.signals.name_follows_convention is True
+
+    def test_csharp_repository_is_medium(self) -> None:
+        """Repository class in Repositories/ → medium."""
+        sym = _symbol(
+            name="ProfileRepository",
+            kind="class",
+            signature="class ProfileRepository : IProfileRepository",
+            file="src/Infrastructure/Repositories/ProfileRepository.cs",
+        )
+        # path=20, type_annot=10 (': '), name_conv=5, semantic_suffix=15 = 50
+        result = compute_confidence(sym, "repository")
+        assert result.tier == "medium"
+        assert result.signals.has_semantic_suffix is True
+
+    def test_csharp_controller_with_base_class_is_medium(self) -> None:
+        """Controller with ControllerBase → base class signal fires."""
+        sym = _symbol(
+            name="ProfileController",
+            kind="class",
+            signature="class ProfileController : ControllerBase",
+            file="src/Api/Controllers/ProfileController.cs",
+        )
+        # path=20, type_annot=10 (': '), base_class=10, name_conv=5, suffix=15 = 60
+        result = compute_confidence(sym, "controller")
+        assert result.tier == "medium"
+        assert result.signals.known_base_class == "ControllerBase"
+        assert result.signals.has_semantic_suffix is True
+
+    def test_csharp_method_pascalcase_gets_name_convention(self) -> None:
+        """C# methods are PascalCase — name convention signal should fire."""
+        sym = _symbol(
+            name="GetProfile",
+            kind="method",
+            signature="public async Task<ProfileDto> GetProfile(GetProfileQuery query)",
+            file="src/Application/Handlers/GetProfileHandler.cs",
+            parent="GetProfileHandler",
+        )
+        result = compute_confidence(sym, None)
+        assert result.signals.name_follows_convention is True
+
+    def test_python_method_pascalcase_does_not_get_name_convention(self) -> None:
+        """Python methods are snake_case — PascalCase method should NOT fire."""
+        sym = _symbol(
+            name="GetProfile",
+            kind="method",
+            signature="def GetProfile(self) -> ProfileDto",
+            file="src/services/profile.py",
+            parent="ProfileService",
+        )
+        result = compute_confidence(sym, None)
+        assert result.signals.name_follows_convention is False
+
+    def test_csharp_generic_type_counts_as_type_annotation(self) -> None:
+        """C# generics like Task<T> count as type annotations."""
+        sym = _symbol(
+            name="Handle",
+            kind="method",
+            signature="public async Task<ProfileDto> Handle(GetProfileQuery request)",
+            file="src/Handlers/GetProfileHandler.cs",
+            parent="GetProfileHandler",
+        )
+        result = compute_confidence(sym, None)
+        assert result.signals.has_type_annotations is True
+
+    def test_csharp_no_suffix_no_path_stays_low(self) -> None:
+        """C# class with no suffix, no path match, no base class → low."""
+        sym = _symbol(
+            name="Startup",
+            kind="class",
+            signature="class Startup",
+            file="src/Startup.cs",
+        )
+        # name_conv=5 only → 5 → low
+        result = compute_confidence(sym, None)
+        assert result.tier == "low"
+        assert result.signals.has_semantic_suffix is False
+
+    def test_csharp_namespace_qualified_name_still_scores_suffix(self) -> None:
+        """Namespace-qualified names like 'MyApp.Handlers.GetProfileHandler' → suffix detected."""
+        sym = _symbol(
+            name="MyApp.Handlers.GetProfileHandler",
+            kind="class",
+            signature="class GetProfileHandler : IRequestHandler<GetProfileQuery, ProfileDto>",
+            file="src/Application/Handlers/GetProfileHandler.cs",
+        )
+        result = compute_confidence(sym, "service")
+        assert result.signals.has_semantic_suffix is True
+
 
 # ── Constants Tests ───────────────────────────────────────────────────────
 
