@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Roo Code agent support: `.roo/skills` and `.roo/rules` generation, LiteLLM-compatible (RAISE-202)
+
+### Fixed
+- Discovery pipeline: C#, PHP, Dart language detection in `rai-discover-start`; exclude generated dirs (RAISE-224)
+- Discovery pipeline: C#-aware confidence scorer with path and name suffix category mappings (RAISE-225)
+- Discovery pipeline: normalize C# component IDs — strip namespace prefix, add `.cs`/`.dart` extensions (RAISE-226)
+- Discovery pipeline: PHP namespace backslashes → dots, Windows path normalization, dedup warnings
+- Discovery pipeline: C# namespace grouping and path escaping in `rai-discover-validate` (RAISE-229, RAISE-230)
+- Discovery pipeline: C# and PHP branches in `rai-discover-document`; `constitution_reference` optional (RAISE-233, RAISE-234)
+- `rai-discover-validate`: replace deprecated `rai discover build` with `rai memory build` (RAISE-231)
+- `rai-discover-start`: avoid exit code 2 on missing optional directories
+- `rai init --detect`: prompt user to confirm/extend detected agent selection (RAISE-221)
+- `rai-project-onboard`: case-insensitive guardrails gate, 4-dimension coverage gate, doc discovery before conversational flow
+- Guardrails template: remove hardcoded Python guardrail from base template
+- `rai skill list`: 4 skills with non-standard `work_cycle` values now visible; defensive formatter fallback (RAISE-216)
+- `AGENTS.md`: cross-IDE compatible session-start instruction (RAISE-217)
+- `rai init`: warn when brownfield governance docs are empty after init (RAISE-220)
+
 ## [2.0.2] - 2026-02-19
 
 ### Added

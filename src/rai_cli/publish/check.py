@@ -31,7 +31,7 @@ _COMMAND_GATES: list[Gate] = [
     Gate(name="Tests pass", command="uv run pytest --tb=no -q"),
     Gate(name="Type checks clean", command="uv run pyright src/"),
     Gate(name="Lint clean", command="uv run ruff check src/"),
-    Gate(name="Security scan", command="uv run bandit -r src/ -q"),
+    Gate(name="Security scan", command="uv run bandit -r src/ -q -ll"),
     Gate(name="Coverage threshold", command="uv run pytest --cov --cov-fail-under=90 -q"),
     Gate(name="Build succeeds", command="uv build"),
     Gate(name="Package validates", command="uv run twine check dist/*"),

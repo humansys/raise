@@ -1119,9 +1119,6 @@ def _extract_csharp_symbols_from_tree(
         "record_declaration",
     }
 
-    def _qualify(name: str) -> str:
-        return f"{namespace}.{name}" if namespace else name
-
     def _get_name(node: Node) -> str:
         name_node = _find_child_by_type(node, "identifier")
         return _get_node_text(name_node, source) if name_node else "unknown"

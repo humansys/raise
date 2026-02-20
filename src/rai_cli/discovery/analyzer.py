@@ -67,7 +67,6 @@ DEFAULT_CATEGORY_MAP: dict[str, str] = {
     "api/": "service",
     # C#/.NET (Clean Architecture conventions — leaf directories only,
     # avoid broad layer dirs like Infrastructure/ that shadow more specific ones)
-    "Controllers/": "controller",
     "Repositories/": "repository",
     "Handlers/": "service",
     "Commands/": "command",
