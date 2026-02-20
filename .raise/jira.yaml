@@ -85,6 +85,16 @@ issue_types:
   - Bug        # Defect
   - Sub-task   # Child of Story/Task (use 'Sub-task', NOT 'Subtask')
 
+# ─── Defaults ────────────────────────────────────────────────────────────────
+# Repo-level defaults for issue creation. Agents MUST apply these unless
+# the human explicitly specifies otherwise.
+
+defaults:
+  RAISE:
+    bug_parent: "RAISE-144"       # All bugs → Engineering Health epic
+    task_parent: null             # Tasks go to their own epic explicitly
+    # Note: use additional_fields: {"parent": "RAISE-144"} when creating bugs
+
 # ─── Usage Notes for Agents ─────────────────────────────────────────────────
 #
 # To assign an issue:
