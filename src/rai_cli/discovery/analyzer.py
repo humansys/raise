@@ -100,7 +100,31 @@ BASE_CLASS_CATEGORIES: dict[str, str] = {
     "Exception": "exception",
     "BaseSettings": "config",
     "TypedDict": "schema",
+    # C#/.NET common base classes
+    "ControllerBase": "controller",
+    "Controller": "controller",
+    "DbContext": "service",
+    "IRequestHandler": "service",
 }
+
+# C# name suffixes that indicate clear semantic intent.
+# When present, confidence gets a +15 boost (same as parent context).
+CSHARP_SEMANTIC_SUFFIXES: frozenset[str] = frozenset(
+    {
+        "Handler",
+        "Repository",
+        "RepositoryAsync",
+        "Command",
+        "Query",
+        "Validator",
+        "Controller",
+        "Middleware",
+        "Factory",
+        "Extension",
+        "Service",
+        "Manager",
+    }
+)
 
 
 # ── Pydantic models ──────────────────────────────────────────────────────
@@ -120,6 +144,7 @@ class ConfidenceSignals(BaseModel):
     known_base_class: str | None = None
     name_follows_convention: bool = False
     parent_validated: bool = False
+    has_semantic_suffix: bool = False  # C#: name ends with known semantic suffix
 
 
 class ConfidenceResult(BaseModel):
@@ -254,11 +279,16 @@ def compute_confidence(
     - Known base class in signature: +10
     - Name follows convention: +5
     - Parent class context (methods): +15
+    - Semantic suffix in name [C# only]: +15
 
     Tier thresholds:
     - High: score >= 70
     - Medium: 40 <= score < 70
     - Low: score < 40
+
+    C# note: XML doc comments (///) are not yet extracted by the scanner
+    (tracked in RAISE-225). Until then, Signal 1 will always be 0 for C#
+    symbols. Signals 2, 5, and 7 compensate for this gap.
 
     Args:
         symbol: The Symbol to score.
@@ -269,6 +299,7 @@ def compute_confidence(
     """
     score = 0
     signals = ConfidenceSignals()
+    is_csharp = symbol.file.endswith(".cs")
 
     # Signal 1: Has docstring (+30)
     if symbol.docstring:
@@ -280,9 +311,16 @@ def compute_confidence(
             score += 10
 
     # Signal 2: Has type annotations in signature (+10)
-    if "->" in symbol.signature or ": " in symbol.signature:
-        signals.has_type_annotations = True
-        score += 10
+    # Python: looks for '->' (return type) or ': ' (param type hints)
+    # C#: also counts generic types '<' (e.g. Task<T>, IRequestHandler<Q,R>)
+    if is_csharp:
+        if ": " in symbol.signature or "<" in symbol.signature:
+            signals.has_type_annotations = True
+            score += 10
+    else:
+        if "->" in symbol.signature or ": " in symbol.signature:
+            signals.has_type_annotations = True
+            score += 10
 
     # Signal 3: Path matches a known convention (+20)
     if path_category:
@@ -297,7 +335,14 @@ def compute_confidence(
             break
 
     # Signal 5: Name follows convention (+5)
-    if (
+    # Python: classes PascalCase, functions/methods snake_case
+    # C#: all public symbols are PascalCase (classes AND methods)
+    if is_csharp:
+        short_name = symbol.name.split(".")[-1]  # strip namespace if present
+        if short_name and short_name[0].isupper():
+            signals.name_follows_convention = True
+            score += 5
+    elif (
         symbol.kind == "class"
         and symbol.name
         and symbol.name[0].isupper()
@@ -311,6 +356,15 @@ def compute_confidence(
     if symbol.parent:
         signals.parent_validated = True
         score += 15
+
+    # Signal 7: Semantic suffix in name [C# only] (+15)
+    # Handler, Repository, Command, Query, Validator, Controller, etc.
+    # These suffixes are intentional architectural markers in C#/.NET.
+    if is_csharp:
+        short_name = symbol.name.split(".")[-1]
+        if any(short_name.endswith(s) for s in CSHARP_SEMANTIC_SUFFIXES):
+            signals.has_semantic_suffix = True
+            score += 15
 
     # Cap at 100
     score = min(score, 100)
