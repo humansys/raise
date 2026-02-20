@@ -54,7 +54,8 @@ class TestScaffoldGovernance:
         content = guardrails.read_text(encoding="utf-8")
         assert "type: guardrails" in content
         assert "# Guardrails: test-project" in content
-        assert "| must-code-001 |" in content
+        # Table structure present — rows populated by rai-project-onboard per tech stack
+        assert "| ID | Level | Guardrail |" in content
 
     def test_creates_backlog_template(self, tmp_path: Path) -> None:
         """Should create governance/backlog.md from bundled template."""
@@ -220,20 +221,41 @@ class TestScaffoldToBuildIntegration:
     def test_scaffold_then_build_produces_guardrail_nodes(
         self, scaffolded_project: Path
     ) -> None:
-        """Scaffolded guardrails.md should produce guardrail nodes in graph."""
+        """Guardrail nodes require rows added by rai-project-onboard, not just scaffold.
+
+        The template provides table structure only — rows are tech-stack specific
+        and filled by /rai-project-onboard (RAISE-219). We add a row manually here
+        to test the graph builder pipeline independent of the template content.
+        """
         from rai_cli.context.builder import UnifiedGraphBuilder
+
+        # Add a guardrail row — in real usage this is done by rai-project-onboard
+        guardrails_path = scaffolded_project / "governance" / "guardrails.md"
+        content = guardrails_path.read_text(encoding="utf-8")
+        row = "| must-code-001 | MUST | Use consistent code style | linter | RF-01 |\n"
+        guardrails_path.write_text(content + row, encoding="utf-8")
 
         builder = UnifiedGraphBuilder(scaffolded_project)
         graph = builder.build()
 
         guardrails = graph.get_concepts_by_type("guardrail")
         assert len(guardrails) >= 1, (
-            "Expected at least 1 guardrail node from guardrails.md template"
+            "Expected at least 1 guardrail node after adding a row"
         )
 
     def test_scaffold_then_build_m1_gate(self, scaffolded_project: Path) -> None:
-        """M1 milestone gate: scaffold → build → all 3 governance types present."""
+        """M1 milestone gate: scaffold + onboard content → build → all 3 types present.
+
+        Scaffold alone produces requirements and outcomes from templates.
+        Guardrails require onboard to add tech-stack rows (RAISE-219).
+        """
         from rai_cli.context.builder import UnifiedGraphBuilder
+
+        # Simulate onboard adding a guardrail row
+        guardrails_path = scaffolded_project / "governance" / "guardrails.md"
+        content = guardrails_path.read_text(encoding="utf-8")
+        row = "| must-code-001 | MUST | Use consistent code style | linter | RF-01 |\n"
+        guardrails_path.write_text(content + row, encoding="utf-8")
 
         builder = UnifiedGraphBuilder(scaffolded_project)
         graph = builder.build()

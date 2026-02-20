@@ -15,4 +15,3 @@ version: "1.0.0"
 
 | ID | Level | Guardrail | Verification | Derived from |
 |----|-------|-----------|--------------|--------------|
-| must-code-001 | MUST | Type hints on all public APIs | pyright --strict | RF-01 |
