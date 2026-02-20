@@ -389,7 +389,9 @@ def _file_to_module(file_path: str) -> str:
         Dotted module path (e.g., "rai_cli.discovery.scanner"
             or "Http.Controllers.UserController").
     """
-    p = PurePosixPath(file_path)
+    # Normalize Windows backslashes before PurePosixPath — paths may arrive
+    # with backslashes on Windows or from PHP/C# namespace-derived paths.
+    p = PurePosixPath(file_path.replace("\\", "/"))
     parts = list(p.parts)
     # Strip common source prefixes
     if parts and parts[0] in _SOURCE_PREFIXES:
@@ -556,16 +558,23 @@ def analyze(
     # Returns (units, symbol_map) so we can reuse original Symbols for scoring
     units, symbol_map = _build_hierarchy_with_symbols(public)
 
-    # Jidoka: stop on duplicate IDs — silent data loss is unacceptable
+    # Deduplicate IDs — can occur with generated dirs (.astro/, __pycache__/)
+    # or Windows paths. Keep first occurrence, warn about duplicates.
+    import warnings
+
     seen_ids: dict[str, str] = {}
+    deduped: list[AnalyzedComponent] = []
     for unit in units:
         if unit.id in seen_ids:
-            msg = (
-                f"Duplicate component IDs detected: '{unit.id}' "
-                f"in {unit.file} collides with {seen_ids[unit.id]}"
+            warnings.warn(
+                f"Duplicate component ID '{unit.id}' in {unit.file} "
+                f"(already seen in {seen_ids[unit.id]}) — skipping duplicate.",
+                stacklevel=2,
             )
-            raise ValueError(msg)
-        seen_ids[unit.id] = unit.file
+        else:
+            seen_ids[unit.id] = unit.file
+            deduped.append(unit)
+    units = deduped
 
     # Score confidence + categorize + extract purpose
     for unit in units:

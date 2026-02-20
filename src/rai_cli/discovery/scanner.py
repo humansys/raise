@@ -690,7 +690,9 @@ def _extract_php_symbols(
     }
 
     def _qualify(name: str) -> str:
-        return f"{namespace}\\{name}" if namespace else name
+        # Use dot separator for internal IDs — PHP uses backslash for namespaces
+        # but backslashes in component IDs break JSON, graph queries, and ID dedup.
+        return f"{namespace}.{name}" if namespace else name
 
     def walk(node: Node, parent_name: str | None = None) -> None:
         nonlocal namespace
@@ -699,7 +701,8 @@ def _extract_php_symbols(
         if node_type == "namespace_definition":
             ns_node = _find_child_by_type(node, "namespace_name")
             if ns_node:
-                namespace = _get_node_text(ns_node, source)
+                # Normalize PHP backslash separators to dots for graph IDs
+                namespace = _get_node_text(ns_node, source).replace("\\", ".")
             # Continue walking children (declarations inside namespace)
             for child in node.children:
                 walk(child, parent_name)

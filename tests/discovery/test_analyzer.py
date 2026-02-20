@@ -1119,13 +1119,12 @@ class TestAnalyze:
         assert r1.module_groups == r2.module_groups
         assert len(r1.components) == len(r2.components)
 
-    def test_duplicate_ids_raises_value_error(self) -> None:
-        """Duplicate component IDs in analysis output raise ValueError (Jidoka)."""
-        # Two classes with the same name in the same file (pathological but possible)
-        # build_hierarchy uses a dict keyed by class name, so second overwrites first.
-        # Instead, test with two functions of the same name in the same file.
-        # Actually, build_hierarchy iterates symbols list — two functions with same
-        # name+file produce duplicate IDs.
+    def test_duplicate_ids_warns_and_deduplicates(self) -> None:
+        """Duplicate component IDs are warned about and deduplicated (keep first).
+
+        Changed from ValueError to warning+dedup to handle generated dirs
+        (.astro/, __pycache__/) and Windows paths gracefully (RAISE-215).
+        """
         scan = ScanResult(
             symbols=[
                 _symbol(
@@ -1144,8 +1143,17 @@ class TestAnalyze:
             files_scanned=1,
             errors=[],
         )
-        with pytest.raises(ValueError, match="Duplicate component IDs"):
-            analyze(scan)
+        import warnings
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            result = analyze(scan)
+
+        # Duplicate is warned about
+        assert any("Duplicate component ID" in str(w.message) for w in caught)
+        # Only one component survives (first occurrence kept)
+        ids = [c.id for c in result.components]
+        assert ids.count("comp-utils-helper") == 1
 
     def test_no_duplicates_across_modules(self) -> None:
         """Same-named symbols in different modules produce unique IDs."""
