@@ -50,6 +50,7 @@ class MemoryMdGenerator:
         patterns_path: Path | None = None,
         project_name: str = "project",
         max_patterns: int = 10,
+        development_branch: str = "main",
     ) -> str:
         """Generate MEMORY.md content.
 
@@ -58,6 +59,8 @@ class MemoryMdGenerator:
             patterns_path: Path to patterns.jsonl (Part 2 source).
             project_name: Project name for the header.
             max_patterns: Maximum patterns to include in Part 2.
+            development_branch: Development branch name for placeholder
+                substitution in branch model (default: "main").
 
         Returns:
             Markdown content for MEMORY.md.
@@ -73,7 +76,7 @@ class MemoryMdGenerator:
             self._add_skills_section(lines, methodology)
             self._add_gates_section(lines, methodology)
             self._add_principles_section(lines, methodology)
-            self._add_branches_section(lines, methodology)
+            self._add_branches_section(lines, methodology, development_branch)
 
         # Part 2: Dynamic patterns
         patterns = self._load_patterns(patterns_path)
@@ -238,7 +241,10 @@ class MemoryMdGenerator:
         lines.append("")
 
     def _add_branches_section(
-        self, lines: list[str], methodology: dict[str, Any]
+        self,
+        lines: list[str],
+        methodology: dict[str, Any],
+        development_branch: str = "main",
     ) -> None:
         """Add branch model section."""
         branches = methodology.get("branches", {})
@@ -250,6 +256,7 @@ class MemoryMdGenerator:
 
         structure = branches.get("structure", "")
         if structure:
+            structure = structure.replace("{development_branch}", development_branch)
             lines.append("```")
             # structure may have trailing newline from YAML block scalar
             for line in structure.rstrip().split("\n"):
@@ -259,6 +266,7 @@ class MemoryMdGenerator:
 
         flow = branches.get("flow", [])
         for item in flow:
+            item = item.replace("{development_branch}", development_branch)
             lines.append(f"- {item}")
 
         lines.append("")
@@ -358,6 +366,7 @@ def generate_memory_md(
     patterns_path: Path | None = None,
     project_name: str = "project",
     max_patterns: int = 10,
+    development_branch: str = "main",
 ) -> str:
     """Convenience function to generate MEMORY.md content.
 
@@ -366,6 +375,8 @@ def generate_memory_md(
         patterns_path: Path to patterns.jsonl.
         project_name: Project name for header.
         max_patterns: Maximum patterns to include.
+        development_branch: Development branch name for placeholder
+            substitution in branch model (default: "main").
 
     Returns:
         Markdown content for MEMORY.md.
@@ -384,4 +395,5 @@ def generate_memory_md(
         patterns_path=patterns_path,
         project_name=project_name,
         max_patterns=max_patterns,
+        development_branch=development_branch,
     )

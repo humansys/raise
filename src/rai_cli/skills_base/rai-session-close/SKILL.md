@@ -104,7 +104,7 @@ narrative: |                               # Cross-session continuity (2-3 sente
   - Story branch status (created/not yet/merged)
 next_session_prompt: |                    # Forward-looking guidance to future Rai (~100-200 tokens)
   Verify that [specific thing] works after [change made this session].
-  Emilio mentioned interest in [topic] — if he brings it up, [context].
+  The developer mentioned interest in [topic] — if they bring it up, [context].
   Watch for [potential issue] in [area].
 notes: "Any free-form notes"
 ```

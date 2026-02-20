@@ -43,7 +43,7 @@ from rai_cli.onboarding.manifest import (
     load_manifest,
     save_manifest,
 )
-from rai_cli.onboarding.migration import migrate_emilio_profile
+from rai_cli.onboarding.migration import migrate_developer_profile
 from rai_cli.onboarding.profile import (
     CommunicationPreferences,
     CommunicationStyle,
@@ -98,6 +98,6 @@ __all__ = [
     "get_rai_home",
     "increment_session",
     "load_developer_profile",
-    "migrate_emilio_profile",
+    "migrate_developer_profile",
     "save_developer_profile",
 ]

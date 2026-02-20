@@ -473,6 +473,7 @@ def init_command(
         methodology_path=methodology_path,
         patterns_path=patterns_path,
         project_name=project_name,
+        development_branch=manifest.branches.development,
     )
     canonical_memory = get_memory_dir(project_path) / "MEMORY.md"
     canonical_memory.parent.mkdir(parents=True, exist_ok=True)
