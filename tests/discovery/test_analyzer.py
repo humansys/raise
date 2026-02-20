@@ -1157,6 +1157,20 @@ class TestFileToModule:
         result = _file_to_module("src/data/config.yaml")
         assert result == "data.config.yaml"
 
+    # ── C# / Dart extensions (RAISE-226) ─────────────────────────────────
+
+    def test_csharp_extension_stripped(self) -> None:
+        result = _file_to_module("src/Api/Controllers/ProfileController.cs")
+        assert result == "Api.Controllers.ProfileController"
+
+    def test_csharp_extension_stripped_no_prefix(self) -> None:
+        result = _file_to_module("Startup.cs")
+        assert result == "Startup"
+
+    def test_dart_extension_stripped(self) -> None:
+        result = _file_to_module("lib/features/profile/profile_repository.dart")
+        assert result == "features.profile.profile_repository"
+
 
 # ── group_by_module Tests ─────────────────────────────────────────────────
 

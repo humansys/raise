@@ -445,7 +445,7 @@ def determine_category(
 
 
 _SOURCE_PREFIXES = ("src", "app", "lib")
-_CODE_EXTENSIONS = {".py", ".php", ".ts", ".tsx", ".js", ".jsx", ".svelte"}
+_CODE_EXTENSIONS = {".py", ".php", ".ts", ".tsx", ".js", ".jsx", ".svelte", ".cs", ".dart"}
 
 
 def _file_to_module(file_path: str) -> str:
