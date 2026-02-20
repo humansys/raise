@@ -532,6 +532,31 @@ def init_command(
         console.print(Panel(welcome.strip(), border_style="cyan"))
         console.print(project_msg)
 
+    # Warn when brownfield governance was just scaffolded (docs are empty templates)
+    if (
+        detection.project_type == ProjectType.BROWNFIELD
+        and not governance_result.already_existed
+        and governance_result.files_created > 0
+    ):
+        skill_cmd, _ = _get_skill_recommendation("brownfield")
+        if profile.experience_level == ExperienceLevel.RI:
+            console.print(
+                f"\n[yellow]⚠ Governance docs are empty templates.[/yellow] "
+                f"Run [bold cyan]{skill_cmd}[/bold cyan] to fill them."
+            )
+        else:
+            console.print(
+                Panel(
+                    f"[bold yellow]Governance docs need your input[/bold yellow]\n\n"
+                    f"[dim]vision.md, prd.md, backlog.md[/dim] were created as empty templates.\n"
+                    f"Any agent that reads them now will get [bold]no context[/bold].\n\n"
+                    f"Fill them before starting work:\n"
+                    f"  [bold cyan]{skill_cmd}[/bold cyan]",
+                    border_style="yellow",
+                    title="[yellow]⚠ Next step required[/yellow]",
+                )
+            )
+
     # Convention detection, guardrails, and instructions file generation
     instructions_path = project_path / first_config.instructions_file
     if detect and detection.project_type == ProjectType.BROWNFIELD:
