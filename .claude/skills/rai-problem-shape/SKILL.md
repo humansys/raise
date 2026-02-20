@@ -8,7 +8,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: portfolio
+  raise.work_cycle: utility
   raise.frequency: per-initiative
   raise.fase: "0"
   raise.prerequisites: ""
