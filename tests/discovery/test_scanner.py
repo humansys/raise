@@ -828,11 +828,11 @@ class TestExtractPhpSymbols:
         classes = [s for s in symbols if s.kind == "class"]
         functions = [s for s in symbols if s.kind == "function"]
         methods = [s for s in symbols if s.kind == "method"]
-        assert classes[0].name == "App\\Models\\User"
-        assert functions[0].name == "App\\Models\\helper"
+        assert classes[0].name == "App.Models.User"
+        assert functions[0].name == "App.Models.helper"
         # Methods keep local name with parent reference
         assert methods[0].name == "getName"
-        assert methods[0].parent == "App\\Models\\User"
+        assert methods[0].parent == "App.Models.User"
 
     def test_method_visibility_in_signature(self) -> None:
         """Test that method signature includes visibility modifier."""
@@ -892,15 +892,15 @@ class TestExtractPhpSymbols:
         enums = [s for s in symbols if s.kind == "enum"]
 
         assert len(ifaces) == 1
-        assert ifaces[0].name == "App\\Services\\ServiceContract"
+        assert ifaces[0].name == "App.Services.ServiceContract"
         assert len(traits) == 1
-        assert traits[0].name == "App\\Services\\Loggable"
+        assert traits[0].name == "App.Services.Loggable"
         assert len(classes) == 1
-        assert classes[0].name == "App\\Services\\UserService"
+        assert classes[0].name == "App.Services.UserService"
         assert len(functions) == 1
-        assert functions[0].name == "App\\Services\\createService"
+        assert functions[0].name == "App.Services.createService"
         assert len(enums) == 1
-        assert enums[0].name == "App\\Services\\Priority"
+        assert enums[0].name == "App.Services.Priority"
         # 1 interface method + 1 trait method + 2 class methods
         assert len(methods) == 4
 
