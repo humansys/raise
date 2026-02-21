@@ -48,6 +48,55 @@ from rai_cli.onboarding.skills import SkillScaffoldResult
 console = Console()
 
 
+def _print_skill_sync_summary(result: SkillScaffoldResult) -> None:
+    """Print a summary table of skill sync actions."""
+    from rai_cli.skills_base import __version__ as cli_version
+
+    console.print(f"\n[bold]Skill sync: rai-cli {cli_version}[/bold]\n")
+
+    rows: list[tuple[str, str, str]] = []
+    for name in result.skills_installed:
+        rows.append((name, "[green]new[/green]", "install"))
+    for name in result.skills_updated:
+        rows.append((name, "[cyan]updated[/cyan]", "auto-update"))
+    for name in result.skills_conflicted:
+        rows.append((name, "[yellow]conflict[/yellow]", "prompt"))
+    for name in result.skills_kept:
+        rows.append((name, "[yellow]kept[/yellow]", "user chose keep"))
+    for name in result.skills_overwritten:
+        rows.append((name, "[cyan]overwritten[/cyan]", "user chose overwrite"))
+    for name in result.skills_current:
+        rows.append((name, "current", "skip"))
+
+    rows.sort(key=lambda r: r[0])
+
+    from rich.table import Table
+
+    table = Table(show_header=True)
+    table.add_column("Skill", style="bold")
+    table.add_column("Status")
+    table.add_column("Action")
+    for name, status, action in rows:
+        table.add_row(name, status, action)
+
+    console.print(table)
+
+    n_install = len(result.skills_installed)
+    n_update = len(result.skills_updated)
+    n_conflict = len(result.skills_conflicted) + len(result.skills_kept)
+    n_current = len(result.skills_current) + len(result.skills_overwritten)
+    parts: list[str] = []
+    if n_install:
+        parts.append(f"{n_install} new")
+    if n_update:
+        parts.append(f"{n_update} auto-update")
+    if n_conflict:
+        parts.append(f"{n_conflict} conflict")
+    if n_current:
+        parts.append(f"{n_current} current")
+    console.print(f"\n  Summary: {', '.join(parts)}\n")
+
+
 # Message templates for different experience levels
 WELCOME_SHU = """[bold cyan]Welcome to RaiSE![/bold cyan]
 
@@ -381,6 +430,27 @@ def init_command(
             hidden=False,
         ),
     ] = None,
+    dry_run: Annotated[
+        bool,
+        typer.Option(
+            "--dry-run",
+            help="Preview skill updates without writing files.",
+        ),
+    ] = False,
+    force: Annotated[
+        bool,
+        typer.Option(
+            "--force",
+            help="Overwrite all skill files without prompting.",
+        ),
+    ] = False,
+    skip_updates: Annotated[
+        bool,
+        typer.Option(
+            "--skip-updates",
+            help="Keep all existing skills, only install new ones.",
+        ),
+    ] = False,
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
@@ -492,7 +562,8 @@ def init_command(
 
         # Skills
         skills_result = scaffold_skills(
-            project_path, agent_config=config, plugin=plugin
+            project_path, agent_config=config, plugin=plugin,
+            force=force, skip_updates=skip_updates, dry_run=dry_run,
         )
         if agent_type == valid_agent_types[0]:
             first_skills_result = skills_result
@@ -508,6 +579,16 @@ def init_command(
 
         # Plugin post_init hook
         plugin.post_init(project_path, config)
+
+    # Dry-run: show skill sync summary and exit
+    if dry_run and first_skills_result is not None:
+        _print_skill_sync_summary(first_skills_result)
+        has_updates = bool(
+            first_skills_result.skills_updated
+            or first_skills_result.skills_installed
+            or first_skills_result.skills_conflicted
+        )
+        raise typer.Exit(code=0 if not has_updates else 1)
 
     # AGENTS.md on --detect
     if detect:
