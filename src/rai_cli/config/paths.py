@@ -36,8 +36,10 @@ TELEMETRY_SUBDIR = "telemetry"
 IDENTITY_SUBDIR = "identity"
 GRAPH_SUBDIR = "graph"
 FRAMEWORK_SUBDIR = "framework"
+MANIFESTS_SUBDIR = "manifests"
 
 # File names
+SKILLS_MANIFEST_FILE = "skills.json"
 MANIFEST_FILE = "manifest.yaml"
 CONFIG_FILE = "config.yaml"
 PATTERNS_FILE = "patterns.jsonl"
