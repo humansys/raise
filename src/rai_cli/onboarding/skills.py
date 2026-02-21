@@ -197,6 +197,8 @@ def scaffold_skills(
     result = SkillScaffoldResult()
     manifest = load_skill_manifest(project_root) or SkillManifest()
     cli_version = _get_cli_version()
+    batch_keep = False
+    batch_overwrite = False
 
     for skill_name in DISTRIBUTABLE_SKILLS:
         skill_dest = skills_dir / skill_name
@@ -265,7 +267,7 @@ def scaffold_skills(
             result.skills_skipped_names.append(skill_name)
 
         elif action == SkillSyncAction.CONFLICT:
-            if force:
+            if force or batch_overwrite:
                 if not dry_run:
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
@@ -277,10 +279,58 @@ def scaffold_skills(
                         sha256=hash_new, version=cli_version,
                     )
                 result.skills_overwritten.append(skill_name)
-            else:
-                # Default: keep user's version (non-interactive for now)
+            elif skip_updates or batch_keep:
                 result.skills_conflicted.append(skill_name)
                 result.skills_skipped_names.append(skill_name)
+            elif dry_run:
+                result.skills_conflicted.append(skill_name)
+            else:
+                # Interactive conflict resolution
+                from rai_cli.onboarding.skill_conflict import (
+                    ConflictAction,
+                    prompt_skill_conflict,
+                )
+
+                on_disk_content = skill_md.read_text(encoding="utf-8")
+                user_action = prompt_skill_conflict(
+                    skill_name, on_disk_content, bundled_content,
+                )
+
+                if user_action == ConflictAction.KEEP:
+                    result.skills_kept.append(skill_name)
+                elif user_action == ConflictAction.KEEP_ALL:
+                    result.skills_kept.append(skill_name)
+                    batch_keep = True
+                elif user_action in (
+                    ConflictAction.OVERWRITE,
+                    ConflictAction.OVERWRITE_ALL,
+                ):
+                    skill_md.write_text(bundled_content, encoding="utf-8")
+                    result.files_copied.append(str(skill_md))
+                    _copy_skill_tree(
+                        source, skill_dest, result,
+                        plugin=plugin, agent_config=config, overwrite=True,
+                    )
+                    manifest.skills[skill_name] = SkillEntry(
+                        sha256=hash_new, version=cli_version,
+                    )
+                    result.skills_overwritten.append(skill_name)
+                    if user_action == ConflictAction.OVERWRITE_ALL:
+                        batch_overwrite = True
+                elif user_action == ConflictAction.BACKUP_OVERWRITE:
+                    # Save backup before overwriting
+                    backup_path = skill_md.with_suffix(".md.bak")
+                    backup_path.write_text(on_disk_content, encoding="utf-8")
+                    skill_md.write_text(bundled_content, encoding="utf-8")
+                    result.files_copied.append(str(skill_md))
+                    _copy_skill_tree(
+                        source, skill_dest, result,
+                        plugin=plugin, agent_config=config, overwrite=True,
+                    )
+                    manifest.skills[skill_name] = SkillEntry(
+                        sha256=hash_new, version=cli_version,
+                    )
+                    result.skills_overwritten.append(skill_name)
 
         elif action == SkillSyncAction.LEGACY:
             # No manifest entry — first encounter
