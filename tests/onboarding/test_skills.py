@@ -271,7 +271,8 @@ class TestSkillSyncUpgrade:
 
         result = scaffold_skills(tmp_path)
 
-        assert skill_name in result.skills_conflicted
+        # In non-TTY (test env), prompt returns KEEP → goes to skills_kept
+        assert skill_name in result.skills_kept
         assert skill_md.read_text(encoding="utf-8") == "# User customized version"
 
     def test_force_overwrites_conflicts(self, tmp_path: Path) -> None:
