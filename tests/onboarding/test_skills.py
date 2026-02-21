@@ -110,7 +110,7 @@ class TestScaffoldSkillsIdempotency:
         result = scaffold_skills(tmp_path)
 
         assert result.already_existed
-        assert len(result.files_skipped) == TOTAL_SKILLS
+        assert len(result.skills_current) == TOTAL_SKILLS
         assert len(result.files_copied) == 0
         assert result.skills_copied == 0
 
@@ -178,6 +178,200 @@ class TestScaffoldSkillsPartialState:
         result = scaffold_skills(tmp_path)
 
         assert result.skills_copied == TOTAL_SKILLS
+
+
+class TestSkillSyncUpgrade:
+    """Tests for version-aware skill sync (dpkg three-hash algorithm)."""
+
+    def test_first_run_writes_manifest(self, tmp_path: Path) -> None:
+        """First scaffold should create .raise/manifests/skills.json."""
+        scaffold_skills(tmp_path)
+
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        assert manifest_path.exists()
+
+    def test_first_run_records_all_skills_in_manifest(self, tmp_path: Path) -> None:
+        """Manifest should contain entries for all distributed skills."""
+        import json
+
+        scaffold_skills(tmp_path)
+
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        for skill_name in DISTRIBUTABLE_SKILLS:
+            assert skill_name in data["skills"], f"Missing manifest entry: {skill_name}"
+
+    def test_auto_updates_untouched_skill(self, tmp_path: Path) -> None:
+        """Skill not modified by user should be auto-updated when upstream changes."""
+        import json
+
+        scaffold_skills(tmp_path)
+
+        # Simulate upstream change: modify the manifest hash to differ from new
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        skill_name = "rai-debug"
+        skill_md = tmp_path / ".claude" / "skills" / skill_name / "SKILL.md"
+        current_content = skill_md.read_text(encoding="utf-8")
+
+        # Set distributed hash to a fake old hash (simulating old version was different)
+        # But on-disk still matches distributed (user didn't touch it)
+        fake_old_hash = "0" * 64
+        data["skills"][skill_name]["sha256"] = fake_old_hash
+        manifest_path.write_text(json.dumps(data), encoding="utf-8")
+
+        # Also write the fake old content to disk so on-disk == distributed
+        skill_md.write_text("old content from previous version", encoding="utf-8")
+        data["skills"][skill_name]["sha256"] = (
+            __import__("hashlib")
+            .sha256("old content from previous version".encode())
+            .hexdigest()
+        )
+        manifest_path.write_text(json.dumps(data), encoding="utf-8")
+
+        # Re-run scaffold — should auto-update since user didn't customize
+        result = scaffold_skills(tmp_path)
+
+        assert skill_name in result.skills_updated
+        # File should now match bundled content again
+        updated_content = skill_md.read_text(encoding="utf-8")
+        assert updated_content == current_content
+
+    def test_keeps_customized_skill(self, tmp_path: Path) -> None:
+        """Customized skill should not be overwritten when upstream hasn't changed."""
+        scaffold_skills(tmp_path)
+
+        # User customizes a skill
+        skill_md = tmp_path / ".claude" / "skills" / "rai-debug" / "SKILL.md"
+        skill_md.write_text("# My custom debug skill", encoding="utf-8")
+
+        result = scaffold_skills(tmp_path)
+
+        # Should be classified as current (upstream didn't change)
+        assert skill_md.read_text(encoding="utf-8") == "# My custom debug skill"
+
+    def test_conflict_defaults_to_keep(self, tmp_path: Path) -> None:
+        """When both sides changed, default is keep user's version."""
+        import json
+
+        scaffold_skills(tmp_path)
+
+        skill_name = "rai-debug"
+        skill_md = tmp_path / ".claude" / "skills" / skill_name / "SKILL.md"
+
+        # Simulate: user modified AND upstream changed
+        # Set distributed hash to something different from both on-disk and new
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        data["skills"][skill_name]["sha256"] = "a" * 64
+        manifest_path.write_text(json.dumps(data), encoding="utf-8")
+
+        # User's customized content
+        skill_md.write_text("# User customized version", encoding="utf-8")
+
+        result = scaffold_skills(tmp_path)
+
+        assert skill_name in result.skills_conflicted
+        assert skill_md.read_text(encoding="utf-8") == "# User customized version"
+
+    def test_force_overwrites_conflicts(self, tmp_path: Path) -> None:
+        """--force should overwrite even conflicted skills."""
+        import json
+
+        scaffold_skills(tmp_path)
+
+        skill_name = "rai-debug"
+        skill_md = tmp_path / ".claude" / "skills" / skill_name / "SKILL.md"
+
+        # Create conflict scenario
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        data["skills"][skill_name]["sha256"] = "a" * 64
+        manifest_path.write_text(json.dumps(data), encoding="utf-8")
+        skill_md.write_text("# User version", encoding="utf-8")
+
+        result = scaffold_skills(tmp_path, force=True)
+
+        assert skill_name in result.skills_overwritten
+        assert skill_md.read_text(encoding="utf-8") != "# User version"
+
+    def test_skip_updates_keeps_all(self, tmp_path: Path) -> None:
+        """--skip-updates should keep all existing files."""
+        import json
+
+        scaffold_skills(tmp_path)
+
+        skill_name = "rai-debug"
+        skill_md = tmp_path / ".claude" / "skills" / skill_name / "SKILL.md"
+
+        # Simulate upstream change with untouched file
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        old_hash = data["skills"][skill_name]["sha256"]
+        data["skills"][skill_name]["sha256"] = "b" * 64
+        manifest_path.write_text(json.dumps(data), encoding="utf-8")
+
+        # Write content matching the fake old hash
+        skill_md.write_text("old version content", encoding="utf-8")
+        data["skills"][skill_name]["sha256"] = (
+            __import__("hashlib")
+            .sha256("old version content".encode())
+            .hexdigest()
+        )
+        manifest_path.write_text(json.dumps(data), encoding="utf-8")
+
+        result = scaffold_skills(tmp_path, skip_updates=True)
+
+        # Should not update even though upstream changed
+        assert skill_name not in result.skills_updated
+
+    def test_dry_run_does_not_write(self, tmp_path: Path) -> None:
+        """--dry-run should not write any files."""
+        # Fresh project — dry run should report what it would do
+        result = scaffold_skills(tmp_path, dry_run=True)
+
+        assert len(result.skills_installed) == TOTAL_SKILLS
+        # But no manifest should exist
+        assert not (tmp_path / ".raise" / "manifests" / "skills.json").exists()
+        # And no skill files should exist
+        assert not (tmp_path / ".claude" / "skills").exists()
+
+    def test_legacy_project_no_manifest(self, tmp_path: Path) -> None:
+        """Project with existing skills but no manifest should be handled."""
+        # Create a skill without using scaffold (simulating legacy project)
+        skill_dir = tmp_path / ".claude" / "skills" / "rai-debug"
+        skill_dir.mkdir(parents=True)
+        (skill_dir / "SKILL.md").write_text("# Legacy skill", encoding="utf-8")
+
+        result = scaffold_skills(tmp_path)
+
+        # rai-debug should be treated as legacy (current, recorded in manifest)
+        assert "rai-debug" in result.skills_current
+        # Manifest should now exist
+        assert (tmp_path / ".raise" / "manifests" / "skills.json").exists()
+
+    def test_new_skill_added_in_upgrade(self, tmp_path: Path) -> None:
+        """Skills added in newer rai-cli should be installed on upgrade."""
+        scaffold_skills(tmp_path)
+
+        # Remove one skill to simulate it being new in next version
+        import json
+        import shutil
+
+        skill_name = "rai-debug"
+        skill_dir = tmp_path / ".claude" / "skills" / skill_name
+        shutil.rmtree(skill_dir)
+
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        del data["skills"][skill_name]
+        manifest_path.write_text(json.dumps(data), encoding="utf-8")
+
+        # Re-run — should install the "new" skill
+        result = scaffold_skills(tmp_path)
+
+        assert skill_name in result.skills_installed
+        assert (skill_dir / "SKILL.md").exists()
 
 
 class TestSkillScaffoldResult:
