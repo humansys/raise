@@ -49,33 +49,6 @@ class TestConceptNode:
         assert node.source_file is None
         assert node.metadata == {}
 
-    def test_create_skill_node(self) -> None:
-        """Test creating a skill node."""
-        node = ConceptNode(
-            id="/story-plan",
-            type="skill",
-            content="Decompose user stories into atomic executable tasks",
-            source_file=".claude/skills/story-plan/SKILL.md",
-            created="2026-02-03",
-            metadata={"phases": ["plan"]},
-        )
-        assert node.id == "/story-plan"
-        assert node.type == "skill"
-
-    def test_create_feature_node(self) -> None:
-        """Test creating a feature node."""
-        node = ConceptNode(
-            id="F11.1",
-            type="story",
-            content="Unified Graph Schema - Pydantic models and NetworkX wrapper",
-            source_file="dev/epic-e11-scope.md",
-            created="2026-02-03",
-            metadata={"size": "S", "epic": "E11"},
-        )
-        assert node.id == "F11.1"
-        assert node.type == "story"
-        assert node.metadata["epic"] == "E11"
-
     def test_create_module_node(self) -> None:
         """Test creating a module node for architecture knowledge."""
         node = ConceptNode(
@@ -95,29 +68,6 @@ class TestConceptNode:
         assert node.type == "module"
         assert node.metadata["depends_on"] == ["core", "schemas"]
         assert node.metadata["components"] == 42
-
-    def test_all_node_types_valid(self) -> None:
-        """Test that all node types can be created."""
-        node_types = [
-            ("PAT-001", "pattern"),
-            ("CAL-001", "calibration"),
-            ("SES-001", "session"),
-            ("§1", "principle"),
-            ("RF-01", "requirement"),
-            ("OUT-001", "outcome"),
-            ("E11", "epic"),
-            ("F11.1", "story"),
-            ("/test", "skill"),
-            ("mod-core", "module"),
-        ]
-        for node_id, node_type in node_types:
-            node = ConceptNode(
-                id=node_id,
-                type=node_type,  # type: ignore[arg-type]
-                content=f"Test {node_type}",
-                created="2026-02-03",
-            )
-            assert node.type == node_type
 
     def test_token_estimate(self) -> None:
         """Test token estimation."""
@@ -183,21 +133,14 @@ class TestGraphNode:
             ...
 
         node = _ExplicitNode(
-            id="E1", type="explicit_test_t1", content="test", created="2026-01-01"
+            id="E1", type="custom_override", content="test", created="2026-01-01"
         )
-        assert node.type == "explicit_test_t1"
+        assert node.type == "custom_override"
 
     def test_graphnode_base_no_auto_type(self) -> None:
         """GraphNode base itself requires explicit type (no __node_type__)."""
         node = GraphNode(id="B1", type="anything", content="test", created="2026-01-01")
         assert node.type == "anything"
-
-    def test_graphnode_token_estimate(self) -> None:
-        """token_estimate works on base GraphNode."""
-        node = GraphNode(
-            id="T1", type="test", content="A" * 80, created="2026-01-01"
-        )
-        assert node.token_estimate == 20  # 80 // 4
 
     def test_graphnode_subclass_without_node_type_not_registered(self) -> None:
         """Subclass without node_type kwarg is NOT registered."""

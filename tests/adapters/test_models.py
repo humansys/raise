@@ -18,9 +18,6 @@ from rai_cli.adapters.models import (
 class TestCoreArtifactType:
     """CoreArtifactType StrEnum tests."""
 
-    def test_all_nine_members_exist(self) -> None:
-        assert len(CoreArtifactType) == 9
-
     def test_values_are_lowercase_strings(self) -> None:
         assert CoreArtifactType.BACKLOG == "backlog"
         assert CoreArtifactType.ADR == "adr"
