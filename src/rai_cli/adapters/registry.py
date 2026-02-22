@@ -4,6 +4,11 @@ Discovers adapter implementations registered via Python entry points
 (``[project.entry-points]`` in pyproject.toml). Each group maps to a
 Protocol contract from ``rai_cli.adapters.protocols``.
 
+Trust model: entry point loading inherits the ``pip install`` trust boundary.
+If a package is installed in the environment, its entry points are trusted.
+There is no allowlist or sandboxing — this is consistent with how pytest,
+stevedore, and the broader Python ecosystem handle plugin discovery.
+
 Architecture: ADR-033 (PM), ADR-034 (Governance), ADR-036 (Graph Backend)
 """
 
@@ -24,6 +29,14 @@ EP_DOC_TARGETS: str = "rai.docs.targets"
 EP_GRAPH_BACKENDS: str = "rai.graph.backends"
 
 
+def _dist_name(ep: Any) -> str:
+    """Best-effort extraction of the distribution name that provides an entry point."""
+    try:
+        return ep.dist.name  # type: ignore[union-attr]
+    except AttributeError:
+        return "unknown"
+
+
 def _discover(group: str) -> dict[str, type]:
     """Load all entry points for a group. Skips broken or non-class ones with warning."""
     result: dict[str, type] = {}
@@ -32,13 +45,18 @@ def _discover(group: str) -> dict[str, type]:
             loaded: Any = ep.load()
         except Exception as exc:  # noqa: BLE001
             logger.warning(
-                "Skipping entry point '%s' in group '%s': %s", ep.name, group, exc
+                "Skipping entry point '%s' from '%s' in group '%s': %s",
+                ep.name,
+                _dist_name(ep),
+                group,
+                exc,
             )
             continue
         if not inspect.isclass(loaded):
             logger.warning(
-                "Skipping entry point '%s' in group '%s': expected a class, got %s",
+                "Skipping entry point '%s' from '%s' in group '%s': expected a class, got %s",
                 ep.name,
+                _dist_name(ep),
                 group,
                 type(loaded).__name__,
             )
