@@ -87,8 +87,8 @@ class TestPublicAPIExportsRegistryFunctions:
 
 
 class TestDunderAll:
-    def test_all_has_expected_entries(self) -> None:
+    def test_all_exports_are_importable(self) -> None:
         import rai_cli.adapters as adapters
 
-        # 5 Protocols + 6 models + 5 registry functions + 5 EP constants = 21
-        assert len(adapters.__all__) == 21
+        for name in adapters.__all__:
+            assert hasattr(adapters, name), f"{name} in __all__ but not importable"

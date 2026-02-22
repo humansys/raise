@@ -9,8 +9,10 @@ Architecture: ADR-033 (PM), ADR-034 (Governance), ADR-036 (Graph Backend)
 
 from __future__ import annotations
 
+import inspect
 import logging
 from importlib.metadata import entry_points
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -23,16 +25,25 @@ EP_GRAPH_BACKENDS: str = "rai.graph.backends"
 
 
 def _discover(group: str) -> dict[str, type]:
-    """Load all entry points for a group. Skips broken ones with warning."""
+    """Load all entry points for a group. Skips broken or non-class ones with warning."""
     result: dict[str, type] = {}
     for ep in entry_points(group=group):
         try:
-            loaded: type = ep.load()  # type: ignore[assignment]
-            result[ep.name] = loaded
+            loaded: Any = ep.load()
         except Exception as exc:  # noqa: BLE001
             logger.warning(
                 "Skipping entry point '%s' in group '%s': %s", ep.name, group, exc
             )
+            continue
+        if not inspect.isclass(loaded):
+            logger.warning(
+                "Skipping entry point '%s' in group '%s': expected a class, got %s",
+                ep.name,
+                group,
+                type(loaded).__name__,
+            )
+            continue
+        result[ep.name] = loaded
     return result
 
 
