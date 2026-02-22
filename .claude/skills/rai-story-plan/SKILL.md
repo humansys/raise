@@ -322,8 +322,6 @@ rai memory emit-work story {story_id} --event complete --phase plan
 
 ## Plan Template
 
-> **IMPORTANT:** This template MUST match the task structure defined in Step 2. If Step 2 changes, update this template.
-
 ```markdown
 # Implementation Plan: {Feature Name}
 
@@ -336,47 +334,7 @@ rai memory emit-work story {story_id} --event complete --phase plan
 
 ## Tasks
 
-### Task 1: {descriptive name}
-
-**Objective:** [one sentence — what this task delivers]
-
-**RED — Write Failing Test:**
-- **File:** `tests/path/to/test_file.ext`
-- **Test function:** `test_descriptive_name`
-- **Setup:** [Given — from Gherkin scenario]
-- **Action:** [When — from Gherkin scenario]
-- **Assertion:** [Then — from Gherkin scenario]
-// Test sketch (adapt to your stack):
-// TypeScript:  it('should do thing', () => { expect(result).toBe(expected) })
-// Python:     def test_thing(): assert result == expected
-// C#:         [Fact] public void Thing() { Assert.Equal(expected, result); }
-// PHP:        $this->assertEquals($expected, $result);
-// Dart:       expect(result, equals(expected));
-
-**GREEN — Implement:**
-- **File:** `src/path/to/module.ext`
-- **Function/Class:** [signature from design § Target Interfaces]
-// Signature (adapt to your stack):
-// TypeScript:  function newFeature(param: Type): ReturnType
-// Python:     def new_feature(param: Type) -> ReturnType
-// C#:         public ReturnType NewFeature(Type param)
-// PHP:        public function newFeature(Type $param): ReturnType
-// Dart:       ReturnType newFeature(Type param)
-- **Integration:** [from design § Integration Points]
-
-**Verification:**
-// Run with your project's test runner:
-// TypeScript:  npx jest tests/path/test_file.test.ts
-// Python:     pytest tests/path/test_file.py::test_name -v
-// C#:         dotnet test --filter DescriptiveName
-// PHP:        phpunit tests/path/TestFile.php --filter testName
-// Dart:       flutter test test/path/test_file_test.dart
-
-**Size:** S
-**Dependencies:** None
-**AC Reference:** Scenario "name" from story.md / design.md § AC
-
----
+[Use SDLD Blueprint task format from Step 2. Apply depth heuristic for story size.]
 
 ### Task N (Final): Integration Verification
 - **Objective:** Validate story works end-to-end
