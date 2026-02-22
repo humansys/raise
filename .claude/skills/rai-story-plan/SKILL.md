@@ -15,7 +15,7 @@ metadata:
   raise.next: story-implement
   raise.gate: gate-plan
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
   raise.visibility: public
 ---
 
@@ -42,10 +42,11 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 
 **Inputs required:**
 - User stories for the feature to implement
-- Technical Design for architectural context (if complex)
+- Story Design (Contract 4) — `design.md` with Gemba state, Target Interfaces, and Integration Points
+- Acceptance Criteria — from `story.md` (Gherkin) or `design.md` § AC
 
 **Output:**
-- Implementation plan: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
+- SDLD Task Blueprints: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
 
 ## Steps
 
@@ -157,24 +158,74 @@ Divide story into atomic tasks:
 
 *Duration tracked for calibration, not commitment. AI-assisted velocity varies.
 
-**Task structure:**
+**IMPORTANT:** Derive task deliverables from `design.md` § Target Interfaces. Each function signature becomes a task. Each Gherkin scenario becomes a test spec. File paths come from § Gemba. If no design exists (simple features), use the lightweight format.
+
+**Task structure — SDLD Blueprint (M+ stories):**
+
 ```markdown
-### Task N: [Name]
-- **Description:** What to do
-- **Files:** Files to create/modify
-- **TDD Cycle:** RED (write failing test) → GREEN (implement) → REFACTOR
-- **Verification:** How to verify completion (test command)
-- **Size:** XS/S/M/L
-- **Dependencies:** None / Task N
+### Task N: [descriptive name]
+
+**Objective:** [one sentence — what this task delivers]
+
+**RED — Write Failing Test:**
+- **File:** `tests/path/to/test_file.ext`
+- **Test function:** `test_descriptive_name`
+- **Setup:** [Given — from Gherkin scenario]
+- **Action:** [When — from Gherkin scenario]
+- **Assertion:** [Then — from Gherkin scenario]
+```
+// Test sketch in project language (adapt to your stack):
+// TypeScript:  describe('feature', () => { it('should ...', () => { ... }) })
+// Python:     def test_descriptive_name(): ...
+// C#:         [Fact] public void DescriptiveName() { ... }
+// PHP:        public function testDescriptiveName(): void { ... }
+// Dart:       test('descriptive name', () { ... });
 ```
 
-**TDD Guidance (RED/GREEN cycles):**
+**GREEN — Implement:**
+- **File:** `src/path/to/module.ext`
+- **Function/Class:** [signature from design § Target Interfaces]
+```
+// Implementation signature (adapt to your stack):
+// TypeScript:  function newFeature(param: Type): ReturnType
+// Python:     def new_feature(param: Type) -> ReturnType
+// C#:         public ReturnType NewFeature(Type param)
+// PHP:        public function newFeature(Type $param): ReturnType
+// Dart:       ReturnType newFeature(Type param)
+```
+- **Integration:** [how this connects — from design § Integration Points]
+
+**Verification:**
+```bash
+# Run with your project's test runner:
+# TypeScript:  npx jest tests/path/test_file.test.ts
+# Python:     pytest tests/path/test_file.py::test_name -v
+# C#:         dotnet test --filter DescriptiveName
+# PHP:        phpunit tests/path/TestFile.php --filter testName
+# Dart:       flutter test test/path/test_file_test.dart
+```
+
+**Size:** S
+**Dependencies:** None
+**AC Reference:** Scenario "name" from story.md / design.md § AC
+```
+
+**Blueprint depth heuristic — adapt detail to story size:**
+
+| Story Size | RED Section | GREEN Section |
+|------------|-------------|---------------|
+| XS (1-2 SP) | Test name + assertion only | Function name + file only |
+| S (3-5 SP) | Test sketch (Given/When/Then) | Signature + file + integration |
+| M (5-8 SP) | Full test code sketch | Full signature + imports + integration |
+| L (8+ SP) | Full test code sketch | Full signature + imports + integration (consider splitting story) |
+
+**TDD Guidance:**
 - **RED:** Write a failing test first that defines expected behavior
 - **GREEN:** Write minimal code to make the test pass
 - **REFACTOR:** Clean up while keeping tests green
-- For infrastructure/setup tasks, TDD cycle may be optional
+- For infrastructure/setup tasks (no testable behavior), TDD cycle may be optional — use a lightweight task format without RED/GREEN sections
 
-**Verification:** Each task is atomic and verifiable.
+**Verification:** Each task is atomic and verifiable. RED/GREEN sections trace to design § Target Interfaces.
 
 > **If you can't continue:** Tasks too large → Divide until atomic. But avoid over-decomposition for simple features.
 
@@ -230,8 +281,27 @@ Create plan document with:
 - Dependencies
 - Verifications
 - Duration tracking table (filled during implementation)
+- **Traceability table** (required for M+ stories)
 
-**Verification:** Plan documented and complete.
+**Traceability table format:**
+
+```markdown
+## Traceability
+
+| AC Scenario | Task(s) | Design § |
+|-------------|---------|----------|
+| "happy path: user exports session" | T1, T2 | Target Interfaces → exportSession |
+| "error: missing session" | T3 | Target Interfaces → exportSession (error path) |
+```
+
+**Rules:**
+- Every AC scenario from `story.md` or `design.md` § AC **MUST** map to at least one task
+- Every task **MUST** reference an AC scenario (via `AC Reference` field)
+- `Design §` column traces back to the design section that grounds this task
+
+**Skip condition:** XS/S stories without formal AC can omit the traceability table.
+
+**Verification:** Plan documented and complete. Traceability table covers all AC scenarios (M+ stories).
 
 ### Step 7: Emit Feature Complete (Telemetry)
 
@@ -256,32 +326,19 @@ rai memory emit-work story {story_id} --event complete --phase plan
 # Implementation Plan: {Feature Name}
 
 ## Overview
-- **Feature:** {feature-id}
-- **Story Points:** N SP
-- **Feature Size:** XS/S/M/L
+- **Story:** {story-id}
+- **Size:** XS/S/M/L
+- **Tasks:** N
+- **Derived from:** design.md § Target Interfaces
 - **Created:** YYYY-MM-DD
 
 ## Tasks
 
-### Task 1: {Name}
-- **Description:** ...
-- **Files:** ...
-- **TDD Cycle:** RED → GREEN → REFACTOR
-- **Verification:** `pytest tests/test_X.py`
-- **Size:** S
-- **Dependencies:** None
+[Use SDLD Blueprint task format from Step 2. Apply depth heuristic for story size.]
 
-### Task 2: {Name}
-- **Description:** ...
-- **Files:** ...
-- **TDD Cycle:** RED → GREEN → REFACTOR
-- **Verification:** `ruff check src/`
-- **Size:** XS
-- **Dependencies:** Task 1
-
-### Task N (Final): Manual Integration Test
-- **Description:** Validate story works end-to-end with running software
-- **Verification:** Demo the story working interactively
+### Task N (Final): Integration Verification
+- **Objective:** Validate story works end-to-end
+- **Verification:** Run all story tests + manual demo
 - **Size:** XS
 - **Dependencies:** All previous tasks
 
@@ -289,7 +346,14 @@ rai memory emit-work story {story_id} --event complete --phase plan
 1. Task 1 (foundation)
 2. Task 2 (depends on 1)
 3. Task 3, Task 4 (parallel)
-4. Task N - Manual Integration Test (final validation)
+4. Task N — Integration verification (final)
+
+## Traceability
+
+| AC Scenario | Task(s) | Design § |
+|-------------|---------|----------|
+| "happy path" | T1, T2 | Target Interfaces → function_x |
+| "edge case" | T3 | Target Interfaces → function_y |
 
 ## Risks
 - {Risk 1}: {Mitigation}
@@ -299,7 +363,7 @@ rai memory emit-work story {story_id} --event complete --phase plan
 |------|------|--------|-------|
 | 1 | S | -- | (filled during implementation) |
 | 2 | XS | -- | |
-| N | XS | -- | Integration test |
+| N | XS | -- | Integration verification |
 ```
 
 ## References
