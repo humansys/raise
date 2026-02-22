@@ -105,6 +105,14 @@ S6 depends on all others.
 
 ---
 
+## Architecture References
+
+| Document | Key Insight |
+|----------|-------------|
+| `design.md` (this epic) | Contract chain: 6 artifact formats, grounding cascade from hypothesis to code signatures |
+
+---
+
 ## Notes
 
 ### Why This Epic
