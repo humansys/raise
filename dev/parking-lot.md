@@ -540,6 +540,16 @@
   - **Riesgo:** Privacidad y señal/ruido — no todo lo que se dice en Slack debe ir al grafo. Requiere política de extracción y opt-in explícito por canal.
   - **Candidato a epic:** Post-RAISE-209, cuando team memory esté en producción y haya suficiente base para añadir canales de entrada conversacionales.
 
+---
+
+### S249.1 — Parking Lot (2026-02-21)
+
+- [ ] **Deprecar `rai skill scaffold` → reemplazar con skill creator skill** — (S249.1, 2026-02-21)
+  - **Context:** `scaffold.py` genera boilerplate SKILL.md con un template hardcoded. Es un generador estático que no aplica convenciones cross-cutting (e.g., platform agnosticism en ejemplos de código).
+  - **Propuesta:** Reemplazar con un skill creator skill (conversacional, guiado) que genere skills más ricos: con depth heuristics, multi-language examples, Contract 4 output format, etc.
+  - **Acción inmediata:** Marcar `rai skill scaffold` como deprecated en el CLI help text.
+  - **Priority:** Baja — scaffold se usa poco, PAT-E-400 cubre el gap de platform agnosticism en sesiones
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-20 (SES-224: ADR-038 skill semantics, skill extensions, rai skill pull, rai tier status, Rai en Slack/Google Chat)*
+*Last updated: 2026-02-21 (S249.1: scaffold deprecation candidate)*
