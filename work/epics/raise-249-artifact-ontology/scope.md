@@ -33,7 +33,7 @@ consumes as structured input. No skill needs to infer what the previous one mean
 | S3 | epic-start v1.1 | S | ✅ Done | Epic Brief artifact (SAFe hypothesis + Shape Up) |
 | S4 | epic-design v1.2 | S | ✅ Done | Separate scope.md / design.md artifacts |
 | S5 | story-start v1.1 | S | ✅ Done | User Story template (Connextra + Gherkin + SbE) |
-| S6 | Validation | S | Pending | Run a real story through the new pipeline end-to-end |
+| S6 | Validation | S | ⏭ Cancelled | Superseded — RAISE-211 serves as real-world validation of the full contract chain |
 
 **Total:** 6 stories, 2M + 4S
 
@@ -184,12 +184,12 @@ No parallel streams — single developer + shared format conventions across skil
 | S5: story-start v1.1 | S | ✅ Done | 15 min | 3.0x velocity |
 | S3: epic-start v1.1 | S | ✅ Done | 12 min | 3.75x velocity |
 | S4: epic-design v1.2 | S | ✅ Done | 10 min | 4.5x velocity |
-| S6: Validation | S | Pending | — | |
+| S6: Validation | S | ⏭ Cancelled | — | Superseded by RAISE-211 |
 
 **Milestone Progress:**
 - [x] M1: Grounded Pipeline (S1 + S2) ✅
 - [x] M2: Full Chain (+ S3 + S4 + S5) ✅
-- [ ] M3: Validated (+ S6)
+- [ ] ~~M3: Validated (+ S6)~~ — Cancelled: RAISE-211 is the real validation
 
 ### Sequencing Risks
 
