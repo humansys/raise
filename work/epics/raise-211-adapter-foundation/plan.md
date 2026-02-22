@@ -50,8 +50,8 @@ Stream 2 (Parallel):       S5 ◄──┘  S4 ────────┘
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S211.0 | M | Pending | — | — | |
-| S211.1 | S | Pending | — | — | |
+| S211.0 | M | Done ✓ | ~45 min | 2.5x | Pydantic + __init_subclass__ validated |
+| S211.1 | S | Done ✓ | ~18 min | 3.3x | Clean greenfield, full ceremony |
 | S211.2 | S | Pending | — | — | |
 | S211.5 | S | Pending | — | — | |
 | S211.3 | M | Pending | — | — | |
@@ -59,7 +59,7 @@ Stream 2 (Parallel):       S5 ◄──┘  S4 ────────┘
 | S211.6 | S | Pending | — | — | |
 
 **Milestone Progress:**
-- [ ] M1: Foundation
+- [x] M1: Foundation (S211.0 + S211.1 done)
 - [ ] M2: Registry
 - [ ] M3: Integration
 - [ ] M4: Complete

@@ -26,7 +26,7 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 | ID | Story | Size | Status | Dependencies | Description |
 |----|-------|:----:|:------:|--------------|-------------|
 | S211.0 | GraphNode class hierarchy | M | Done ✓ | None | GraphNode base with `__init_subclass__` auto-registration. 18 core subclasses as documented extension points. |
-| S211.1 | Protocol contracts | S | Pending | S211.0 | PM, Governance, DocTarget Protocols + Pydantic models (IssueSpec, ArtifactLocator, etc.) |
+| S211.1 | Protocol contracts | S | Done ✓ | S211.0 | PM, Governance, DocTarget Protocols + Pydantic models (IssueSpec, ArtifactLocator, etc.) |
 | S211.2 | Entry point registry | S | Pending | S211.1 | `importlib.metadata` discovery: `get_pm_adapters()`, `get_governance_schemas()`, etc. |
 | S211.3 | rai memory build → registry | M | Pending | S211.0, S211.2 | Refactor UnifiedGraphBuilder to use registry instead of hardcoded parsers |
 | S211.4 | KnowledgeGraphBackend | M | Pending | S211.0, S211.2 | Protocol + FilesystemGraphBackend (refactor current persistence) |
