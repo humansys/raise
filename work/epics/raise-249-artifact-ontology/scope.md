@@ -138,4 +138,79 @@ stories. S3-S5 complete the upstream chain.
 
 ---
 
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-21
+
+### Feature Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S1: story-design v1.2 | M | None | M1 | Upstream of S2; produces input story-plan will consume. Highest immediate impact. |
+| 2 | S2: story-plan v1.1 | M | Soft on S1 | M1 | Consumes story-design output. Together with S1 = usable pipeline for RAISE-247. |
+| 3 | S5: story-start v1.1 | S | None | M2 | User Story artifact feeds story-design. Logically upstream of S1 but lower priority. |
+| 4 | S3: epic-start v1.1 | S | None | M2 | Epic Brief artifact. Independent of story chain. |
+| 5 | S4: epic-design v1.2 | S | S3 (soft) | M2 | Scope/design split. Benefits from S3's brief format being defined. |
+| 6 | S6: Validation | S | S1-S5 | M3 | End-to-end proof with real RAISE-247 story. |
+
+**Sequential execution** — single developer, all skills share format conventions that benefit from sequential learning. Each story informs the next.
+
+### Milestones
+
+| Milestone | Stories | Success Criteria | Demo |
+|-----------|---------|------------------|------|
+| **M1: Grounded Pipeline** | S1 + S2 | story-design produces Gemba + interfaces; story-plan produces SDLD blueprints | Run RAISE-247 S1 through story-design → story-plan and inspect output quality |
+| **M2: Full Chain** | + S3 + S4 + S5 | All 5 skills updated; every skill produces typed artifact; every input contract documented | Walk through artifact chain from epic brief → plan showing progressive grounding |
+| **M3: Validated** | + S6 | Real story executed through full pipeline; implementation was mechanical | Zero architectural questions during story-implement of validation story |
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Sequential: S1 ─► S2 ─► S5 ─► S3 ─► S4 ─► S6
+            ╰─ M1 ──╯   ╰──── M2 ────╯    ╰M3╯
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+No parallel streams — single developer + shared format conventions across skills make sequential learning more valuable than parallelism. Each story refines understanding of the contract chain that the next story uses.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Notes |
+|-------|:----:|:------:|:------:|-------|
+| S1: story-design v1.2 | M | Pending | — | |
+| S2: story-plan v1.1 | M | Pending | — | |
+| S5: story-start v1.1 | S | Pending | — | |
+| S3: epic-start v1.1 | S | Pending | — | |
+| S4: epic-design v1.2 | S | Pending | — | |
+| S6: Validation | S | Pending | — | |
+
+**Milestone Progress:**
+- [ ] M1: Grounded Pipeline (S1 + S2)
+- [ ] M2: Full Chain (+ S3 + S4 + S5)
+- [ ] M3: Validated (+ S6)
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| S1 Gemba step makes story-design too long | Medium | Medium | Depth heuristic by story size (XS=skip, S=skim, M+=full) |
+| SDLD blueprint format is too rigid for novel work | Medium | Medium | Adapt detail level to story size; XS/S get lighter blueprints |
+| S6 validation reveals contract gap between skills | Low | High | Each story includes self-test: write a mini-example artifact and verify next skill could consume it |
+
+### Velocity Assumptions
+
+- **Baseline:** These are skill content changes (markdown), not code. Faster than typical stories.
+- **Estimated per story:** S = 30-60 min, M = 1-2 hours
+- **Total estimated:** ~5-7 hours across 6 stories
+- **Buffer:** 30% for iteration after S6 reveals improvements
+
+---
+
+*Plan created: 2026-02-21*
+*Next: S1 — `/rai-story-design` for story-design v1.2*
+
+---
+
 *Created: 2026-02-21*
