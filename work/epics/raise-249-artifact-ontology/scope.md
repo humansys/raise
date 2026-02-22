@@ -32,7 +32,7 @@ consumes as structured input. No skill needs to infer what the previous one mean
 | S2 | story-plan v1.1 | M | ✅ Done | SDLD Task Blueprints with signatures, tests, file paths |
 | S3 | epic-start v1.1 | S | Pending | Epic Brief artifact (SAFe hypothesis + Shape Up) |
 | S4 | epic-design v1.2 | S | Pending | Separate scope.md / design.md artifacts |
-| S5 | story-start v1.1 | S | Pending | User Story template (Connextra + Gherkin + SbE) |
+| S5 | story-start v1.1 | S | ✅ Done | User Story template (Connextra + Gherkin + SbE) |
 | S6 | Validation | S | Pending | Run a real story through the new pipeline end-to-end |
 
 **Total:** 6 stories, 2M + 4S
@@ -181,7 +181,7 @@ No parallel streams — single developer + shared format conventions across skil
 |-------|:----:|:------:|:------:|-------|
 | S1: story-design v1.2 | M | ✅ Done | 30 min | 3.0x velocity |
 | S2: story-plan v1.1 | M | ✅ Done | 20 min | 4.5x velocity |
-| S5: story-start v1.1 | S | Pending | — | |
+| S5: story-start v1.1 | S | ✅ Done | 15 min | 3.0x velocity |
 | S3: epic-start v1.1 | S | Pending | — | |
 | S4: epic-design v1.2 | S | Pending | — | |
 | S6: Validation | S | Pending | — | |
