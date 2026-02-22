@@ -12,7 +12,7 @@ strategy: "risk-first + walking skeleton"
 
 | Order | Story | Size | Dependencies | Milestone | Rationale |
 |:-----:|-------|:----:|--------------|-----------|-----------|
-| 1 | S211.0: Open NodeType/EdgeType | S | None | M1 | Foundation: opens the type system for all subsequent stories. Quick win — 2 lines + constants. |
+| 1 | S211.0: GraphNode class hierarchy | M | None | M1 | Risk-first: hierarchy + deserialization. Foundation for all subsequent stories. |
 | 2 | S211.1: Protocol contracts | S | S0 | M1 | Defines all contracts others consume. Pure types, fast. |
 | 3 | S211.2: Entry point registry | S | S1 | M2 | Enables registry dispatch for S3/S4/S6. |
 | 4 | S211.5: TierContext | S | S1 | M2 | Independent of S2. Can start once contracts exist. |
@@ -24,7 +24,7 @@ strategy: "risk-first + walking skeleton"
 
 | Milestone | Stories | Success Criteria | Demo |
 |-----------|---------|------------------|------|
-| **M1: Foundation** | S0, S1 | Open types work, all 1610 tests pass. Protocols importable, pyright strict clean. | `from rai_cli.adapters.protocols import GovernanceParser` works |
+| **M1: Foundation** | S0, S1 | GraphNode hierarchy works, all 1610 tests pass. Protocols importable, pyright strict clean. | `from rai_cli.adapters.protocols import GovernanceParser` works |
 | **M2: Registry** | +S2, S5 | Entry points discover built-in schema/parsers. `TierContext.community()` returns correct tier. | `get_governance_schemas()` returns `RaiSEDefaultSchema` |
 | **M3: Integration** | +S3, S4 | `rai memory build` via registry path produces functionally identical graph. `FilesystemGraphBackend.persist()`/`load()` roundtrips. | `rai memory build && rai memory query "epic"` returns same results |
 | **M4: Complete** | +S6 | `rai adapters list` shows installed adapters. Epic retro done. | Full CLI demo of adapter ecosystem |
@@ -50,7 +50,7 @@ Stream 2 (Parallel):       S5 ◄──┘  S4 ────────┘
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S211.0 | S | Pending | — | — | |
+| S211.0 | M | Pending | — | — | |
 | S211.1 | S | Pending | — | — | |
 | S211.2 | S | Pending | — | — | |
 | S211.5 | S | Pending | — | — | |
@@ -68,17 +68,19 @@ Stream 2 (Parallel):       S5 ◄──┘  S4 ────────┘
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|:----------:|:------:|------------|
+| S0 Pydantic + __init_subclass__ edge cases | Medium | Medium | Test auto-registration + model_validator early. Known friction area. |
 | S3 regression — builder refactor produces different graph | Medium | High | Snapshot test: serialize graph before/after, diff. Must be identical. |
-| S4 serialization — FilesystemGraphBackend roundtrip changes | Low | Medium | Test roundtrip before/after refactor. |
+| S4 serialization — class hierarchy JSON roundtrip | Low | Medium | Test roundtrip early in S4. Registry lookup handles deserialization. |
 
 ## Velocity Assumptions
 
 - **Baseline:** ~3x multiplier with full kata cycle (from PAT-E-094, PAT-E-285)
-- **S0-S1:** Pure types/constants. Expect 4-5x (PAT-E-288: TDD as spec).
+- **S0:** Hierarchy + deserialization. Expect 2-3x (Pydantic interaction needs care).
+- **S1-S2:** Pure contracts/plumbing. Expect 3-4x (PAT-E-288: TDD as spec).
 - **S3-S4:** Refactor stories. Expect 2-3x (more careful, snapshot validation).
 - **Buffer:** 20% for integration surprises.
 
 ---
 
 *Plan created: 2026-02-22*
-*Next: `/rai-story-start` for S211.0 (Open NodeType/EdgeType)*
+*Next: `/rai-story-start` for S211.0 (GraphNode class hierarchy)*
