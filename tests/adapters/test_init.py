@@ -45,8 +45,50 @@ class TestPublicAPIExportsAllModels:
         assert issubclass(CoreArtifactType, str)
 
 
+class TestPublicAPIExportsRegistryFunctions:
+    def test_import_all_registry_functions(self) -> None:
+        from rai_cli.adapters import (
+            get_doc_targets,
+            get_governance_parsers,
+            get_governance_schemas,
+            get_graph_backends,
+            get_pm_adapters,
+        )
+
+        fns = [
+            get_pm_adapters,
+            get_governance_schemas,
+            get_governance_parsers,
+            get_doc_targets,
+            get_graph_backends,
+        ]
+        for fn in fns:
+            assert callable(fn)
+
+    def test_import_all_registry_constants(self) -> None:
+        from rai_cli.adapters import (
+            EP_DOC_TARGETS,
+            EP_GOVERNANCE_PARSERS,
+            EP_GOVERNANCE_SCHEMAS,
+            EP_GRAPH_BACKENDS,
+            EP_PM_ADAPTERS,
+        )
+
+        constants = [
+            EP_PM_ADAPTERS,
+            EP_GOVERNANCE_SCHEMAS,
+            EP_GOVERNANCE_PARSERS,
+            EP_DOC_TARGETS,
+            EP_GRAPH_BACKENDS,
+        ]
+        for const in constants:
+            assert isinstance(const, str)
+            assert const.startswith("rai.")
+
+
 class TestDunderAll:
-    def test_all_has_eleven_entries(self) -> None:
+    def test_all_has_expected_entries(self) -> None:
         import rai_cli.adapters as adapters
 
-        assert len(adapters.__all__) == 11
+        # 5 Protocols + 6 models + 5 registry functions + 5 EP constants = 21
+        assert len(adapters.__all__) == 21
