@@ -5,7 +5,7 @@ status: scoped
 branch: v2
 adr: ADR-038
 date: 2026-02-21
-size: M
+size: L
 ---
 
 # RAISE-247: CLI Ontology Restructuring
@@ -135,7 +135,40 @@ as a standalone command.
 
 **Size:** S
 
-### S7: Update all skills and generated docs
+### S7: Local Skill Registry
+
+**What:** Create a persistent skill index at `.raise/rai/skills/registry.json` that tracks
+installed skills with metadata, ownership, and version — so the CLI manages skills as
+entities, not loose files.
+
+**The registry knows:**
+- **What's installed:** skill name, version, work_cycle, path
+- **Ownership:** `framework` (from `skills_base/`, updatable by `rai init`) vs `custom`
+  (created by user/org, never overwritten) vs `org` (installed via future `rai skill pull`)
+- **Version drift:** installed version vs available version from `skills_base/`
+- **Frontmatter cache:** work_cycle, prerequisites, fase — queryable without re-parsing
+
+**Why it's prerequisite for S8 (skill sync post-rename):**
+Without registry, `rai init --force` after the ontology rename would overwrite custom
+skills that clients have created. The registry's ownership field (`framework` vs `custom`)
+is what makes selective sync safe: update framework skills, preserve custom ones.
+
+**Includes:**
+- `RegistryEntry` Pydantic model (name, version, ownership, work_cycle, path, installed_at)
+- `SkillRegistry` class: load, save, register, unregister, diff_against_base
+- `rai skill list` reads from registry instead of filesystem scan
+- `rai init` populates registry when scaffolding skills
+- `rai skill scaffold` registers new skill as `custom`
+- Migration: first run builds registry from existing filesystem state
+
+**Does NOT include:**
+- `rai skill pull` / org sources (future, parking lot)
+- `rai skill prepare` (rejected — coupling)
+- Skill marketplace integration
+
+**Size:** M
+
+### S8: Update all skills and generated docs
 
 **What:** Mechanical find-replace across all 22 skills in `skills_base/`, plus CLAUDE.md
 CLI Quick Reference and README.
@@ -144,12 +177,13 @@ CLI Quick Reference and README.
 - Update all `rai memory` → `rai graph` / `rai pattern` / `rai signal` in skills_base/
 - Regenerate CLAUDE.md from `.raise/` canonical source
 - Update README.md CLI examples
-- Run `rai init --force` to propagate to `.claude/skills/` and `.agent/skills/`
+- Run `rai init` to propagate to `.claude/skills/` and `.agent/skills/` (registry-aware,
+  only updates `framework` ownership skills)
 - Verify no stale references remain (grep gate)
 
 **Size:** M
 
-### S8: Remove backward-compat aliases (deferred)
+### S9: Remove backward-compat aliases (deferred)
 
 **What:** After one release cycle with deprecation warnings, remove the `rai memory *`
 aliases. **Not in this epic** — tracked here for completeness. Execute when all known
@@ -160,11 +194,13 @@ client projects have updated.
 ## Dependency Order
 
 ```
-S1 (graph) → S2 (pattern) → S3 (signal) → S4 (kill) → S5 (merge/flatten) → S6 (absorb) → S7 (skills)
+S1 (graph) → S2 (pattern) → S3 (signal) → S4 (kill) → S5 (merge/flatten) → S6 (absorb)
+  → S7 (registry) → S8 (skills)
 ```
 
-S1-S6 are CLI changes. S7 is the propagation sweep — must go last.
-S8 is deferred to a future release cycle.
+S1-S6 are CLI changes. S7 is the registry (enables safe sync). S8 is the propagation
+sweep — must go last because it uses the registry to avoid overwriting custom skills.
+S9 is deferred to a future release cycle.
 
 ## Decisions (from ADR-038 open questions)
 
@@ -194,6 +230,10 @@ rai signal emit work S1 --event start --phase design
 rai release list
 rai info
 rai profile
+
+# Registry exists and tracks ownership
+test -f .raise/rai/skills/registry.json
+rai skill list --format json | python -c "import sys,json; d=json.load(sys.stdin); assert any(s.get('ownership')=='framework' for s in d)"
 ```
 
 ## References
