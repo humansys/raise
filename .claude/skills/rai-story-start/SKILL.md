@@ -15,7 +15,7 @@ metadata:
   raise.next: story-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.2.0"
+  raise.version: "1.3.0"
   raise.visibility: public
 ---
 
@@ -53,6 +53,7 @@ Initialize a feature with verified context, dedicated branch, and scope commit. 
 **Output:**
 - Feature branch created and checked out
 - Scope commit with in/out criteria
+- User Story artifact (`story.md`) with Connextra + Gherkin + SbE (S+ stories)
 - Telemetry emitted for feature start
 
 ## Steps
@@ -161,9 +162,81 @@ Document what's in and out of scope, plus done criteria.
 
 > **If you can't continue:** Scope unclear → Clarify with stakeholder or timebox discovery.
 
+### Step 5.5: Create User Story Artifact (Contract 3)
+
+Produce a structured User Story that `/rai-story-design` consumes as input. This defines WHO wants WHAT and WHY (Connextra), HOW it behaves (Gherkin), and concrete examples (SbE).
+
+**Depth heuristic by story size:**
+
+| Size | User Story Depth |
+|------|-----------------|
+| XS | **Skip** — scope commit is sufficient, no `story.md` needed |
+| S | Connextra + 1-2 Gherkin scenarios (happy path + 1 edge case) |
+| M | Connextra + 3-5 Gherkin scenarios + SbE table |
+| L+ | Full: Connextra + 5+ scenarios + SbE + Notes with epic design references |
+
+**Artifact location:** `work/epics/{epic-id}/stories/{story-id}/story.md`
+
+**Template:**
+
+```markdown
+---
+story_id: "{story_id}"
+title: "{title}"
+epic_ref: "{epic_id}"
+size: "{S|M|L}"
+status: "draft"
+created: "{YYYY-MM-DD}"
+---
+
+# Story: {title}
+
+## User Story
+As a [role/persona],
+I want [capability],
+so that [benefit/outcome].
+
+## Acceptance Criteria
+
+### Scenario: {happy path title}
+```gherkin
+Given [initial context]
+When [action]
+Then [expected outcome]
+```
+
+### Scenario: {edge case title}
+```gherkin
+Given [context]
+When [action]
+Then [outcome]
+```
+
+## Examples (Specification by Example)
+
+| Input | Action | Expected Output |
+|-------|--------|----------------|
+| [concrete value] | [concrete action] | [concrete result] |
+
+## Notes
+[context, constraints, references to epic design.md]
+```
+
+**How `/rai-story-design` consumes this artifact:**
+- **User Story** → frames the What & Why (Step 2)
+- **Gherkin scenarios** → become acceptance criteria (Step 5 references them, not duplicates)
+- **SbE examples** → become test cases in `/rai-story-plan`
+- **Notes** → link to epic `design.md` for component context
+
+**Skip condition:** XS stories — scope commit is sufficient, no `story.md` needed. State the skip explicitly.
+
+**Verification:** `story.md` created with YAML frontmatter + Connextra + Gherkin scenarios, OR skip stated for XS stories.
+
+> **If you can't continue:** Unclear acceptance criteria → Discuss with stakeholder before writing Gherkin.
+
 ### Step 6: Create Scope Commit
 
-Create the initial commit with scope documentation:
+Create the initial commit with scope documentation (and `story.md` if created in Step 5.5):
 
 ```bash
 git add -A
@@ -231,6 +304,7 @@ rai memory emit-work story {story_id} --event start --phase design
 
 - **Branch:** `feature/{epic_id}/{story_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
+- **User Story:** `work/epics/{epic-id}/stories/{story-id}/story.md` — Contract 3 artifact (S+ stories; XS skips)
 - **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: start)
 - **Next:** `/rai-story-design`
 
@@ -248,6 +322,7 @@ rai memory emit-work story {story_id} --event start --phase design
 **In:** [brief list]
 **Out:** [brief list]
 **Done:** [key criteria]
+**User Story:** `story.md` created (or skipped for XS)
 
 ### Next Step
 `/rai-story-design` — Design is not optional (PAT-186). Then `/rai-story-plan`.
