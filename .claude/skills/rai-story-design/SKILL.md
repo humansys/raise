@@ -15,7 +15,7 @@ metadata:
   raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "1.2.0"
   raise.visibility: public
 ---
 
@@ -53,10 +53,11 @@ Create a lean story specification that optimizes for both human understanding (q
 - Feature from backlog (ID, description, story points, acceptance criteria)
 - Technical Design (project-level) for architectural context
 - Clarity on problem and value proposition
+- User Story with Gherkin AC (`story.md` from `/rai-story-start`) — optional, used in Step 5 if available
 
 **Output:**
 - Feature specification: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
-- Uses lean template v2 (YAML + Markdown + Examples + Acceptance Criteria)
+- Uses Contract 4 format: What & Why → Approach → Gemba → Target Interfaces → AC → Constraints
 
 ## Steps
 
@@ -213,17 +214,109 @@ Define the feature's purpose and value clearly.
 
 > **If you can't continue:** Unclear value → Escalate to backlog refinement
 
+### Step 2.5: Gemba Walk — Read Current Code
+
+**Purpose:** Read the actual source files this story will modify. Map current interfaces before designing new ones. You cannot design a change to code you haven't read.
+
+> *"Go and see"* — Code is the Gemba (PAT-E-187). Documentation lies; code doesn't.
+
+**Depth heuristic by story size:**
+
+| Size | Gemba Depth | What to Capture |
+|------|-------------|-----------------|
+| XS | Skip | — (go directly to Step 3) |
+| S | Skim | File list + key function/class names |
+| M | Full | File, current interface, what changes, what stays |
+| L+ | Full + dependencies | Same as M + upstream/downstream consumers |
+
+**Output table (M+ stories):**
+
+```markdown
+## Gemba: Current State
+
+| File | Current Interface | What Changes | What Stays |
+|------|------------------|--------------|------------|
+| `src/path/to/module.ext` | `func(a: string): Result` | Add param `b: int` | Return type, error handling |
+```
+
+**Instructions:**
+- Use the Read tool on each file. Do not guess from memory or documentation.
+- For M+ stories, populate the full table. For S stories, a bullet list of files + key names suffices.
+- Note any surprises: unexpected dependencies, missing types, undocumented behavior.
+
+**Verification:** Gemba table (or file list for S) populated from actual source reads.
+
+> **If you can't continue:** Source files not found → Verify paths with user; the story scope may be wrong.
+
 ### Step 3: Describe Approach (High-Level)
 
-Describe WHAT you're building and WHY this approach, not detailed HOW.
+Describe WHAT you're building and WHY this approach at component level.
 
 **Document:**
 - Solution approach (1-2 sentences)
 - Components affected (list with change type: create/modify/delete)
 
-**Focus on WHAT, not HOW** — trust AI to determine implementation details.
+**Focus on WHAT at component level** — function-level detail comes in Step 3.5 (Target Interfaces).
 
 > **If you can't continue:** Too many unknowns → Spike needed; create research task
+
+### Step 3.5: Target Interfaces (Function Level)
+
+**Purpose:** Define the function-level contracts that story-plan will consume as task deliverables. These are the actual signatures the implementer will write — not pseudocode, not prose.
+
+**Depth heuristic (same as Gemba):**
+
+| Size | Interface Depth | What to Define |
+|------|----------------|----------------|
+| XS | Skip | — (implementation is obvious) |
+| S | Key signatures only | 1-2 main function signatures |
+| M | Full | All new/modified functions, models, integration points |
+| L+ | Full + contracts | Same as M + pre/post conditions, error contracts |
+
+**Output structure (M+ stories):**
+
+```markdown
+## Target Interfaces
+
+### New/Modified Functions
+\```
+// Use the project's language. Actual signatures, not pseudocode.
+// Examples in different languages:
+
+// TypeScript:  function newFunction(param: Type, other: OtherType): ReturnType
+// Python:      def new_function(param: Type, other: OtherType) -> ReturnType
+// C#:          public ReturnType NewFunction(Type param, OtherType other)
+// PHP:         public function newFunction(Type $param, OtherType $other): ReturnType
+// Dart:        ReturnType newFunction(Type param, OtherType other)
+\```
+
+### New/Modified Models
+\```
+// Data models / DTOs in the project's language and framework.
+// Examples:
+//   Python/Pydantic: class NewModel(BaseModel): ...
+//   TypeScript:      interface NewModel { fieldOne: string; fieldTwo: number }
+//   C#:              public record NewModel(string FieldOne, int FieldTwo)
+//   PHP:             class NewModel { public string $fieldOne; ... }
+//   Dart:            class NewModel { final String fieldOne; ... }
+\```
+
+### Integration Points
+- `newFunction()` is called by `existingModule.orchestrator()`
+- `NewModel` is consumed by `downstreamComponent.process()`
+- `modifiedFunction()` now also called from `newCaller()`
+```
+
+**Instructions:**
+- Use the project's actual language and conventions for all signatures.
+- Include type annotations appropriate to the language (type hints, generics, return types).
+- One-line docstrings/comments on every function and model.
+- Integration points show the call graph: who calls what, who consumes what.
+- For S stories, a flat list of key signatures without the full structure is sufficient.
+
+**Verification:** Target interfaces defined with actual types; story-plan could derive task deliverables from them.
+
+> **If you can't continue:** Can't define interfaces → Approach (Step 3) not concrete enough; return to Step 3 or run a spike.
 
 ### Step 4: Create Examples (CRITICAL)
 
@@ -242,16 +335,24 @@ Provide concrete, runnable examples:
 
 > **If you can't continue:** Can't envision examples → Approach not concrete enough; return to Step 3
 
-### Step 5: Define Acceptance Criteria
+### Step 5: Reference or Define Acceptance Criteria
 
-Specify clear "done" conditions.
+**Primary path (story.md exists):** Reference the Gherkin acceptance criteria from the User Story artifact produced by `/rai-story-start`. Do not duplicate them — link to the source.
 
-**Structure:**
+```markdown
+## 5. Acceptance Criteria
+[From User Story Gherkin — referenced, not duplicated]
+See: `story.md` § Acceptance Criteria
+```
+
+**Fallback path (no story.md):** Define acceptance criteria inline using the MUST/SHOULD/MUST NOT structure. This preserves backward compatibility for stories started without `/rai-story-start` or before the User Story artifact was introduced.
+
+**Structure (fallback only):**
 - **MUST**: Required for completion (3-5 items)
 - **SHOULD**: Nice-to-have (1-3 items)
 - **MUST NOT**: Explicit anti-requirements
 
-**Quality criteria:**
+**Quality criteria (both paths):**
 - Specific and testable (not "works well")
 - Observable outcomes (not internal states)
 - Traceable to user value from Step 2
@@ -286,9 +387,11 @@ Apply emphasis patterns for critical requirements:
 Self-review checklist:
 - [ ] YAML frontmatter complete
 - [ ] What & Why clear (explain in 2 minutes)
-- [ ] Approach describes WHAT at right level
+- [ ] Gemba table populated from actual source reads (M+ stories)
+- [ ] Target Interfaces use actual signatures with type hints (M+ stories)
+- [ ] Approach describes WHAT at component level
 - [ ] **Examples are concrete and runnable**
-- [ ] Acceptance criteria specific and testable
+- [ ] Acceptance criteria referenced from story.md OR defined inline
 - [ ] Optional sections justified by complexity
 - [ ] Spec reviewable in <5 minutes
 - [ ] Spec creation took <30 minutes
@@ -307,8 +410,26 @@ rai memory emit-work story {story_id} --event complete --phase design
 
 - **Artifact**: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
 - **Telemetry**: `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
-- **Template**: `references/tech-design-story-v2.md`
 - **Next**: `/rai-story-plan`
+
+### Design Output Structure (Contract 4)
+
+The design.md artifact follows this structure, consumed by `/rai-story-plan`:
+
+```
+1. What & Why          — problem + value (from Step 2)
+2. Approach            — component-level solution (from Step 3)
+3. Gemba: Current State — actual interfaces from source (from Step 2.5)
+4. Target Interfaces   — function signatures, models, integration points (from Step 3.5)
+5. Acceptance Criteria  — referenced from story.md or defined inline (from Step 5)
+6. Constraints         — if applicable (from Step 6)
+```
+
+**How `/rai-story-plan` consumes this:**
+- Gemba § Current State → knows which files to modify and current state
+- Target Interfaces → function signatures become task deliverables
+- Integration Points → inform task dependencies
+- AC (via story.md) → Gherkin scenarios become test specs
 
 ## Quality Standards
 
