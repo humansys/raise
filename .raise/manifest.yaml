@@ -5,7 +5,7 @@ project:
   code_file_count: 256
   detected_at: '2026-02-19T18:59:25.510645Z'
 branches:
-  development: main
+  development: v2
   main: main
 ide:
   type: claude
