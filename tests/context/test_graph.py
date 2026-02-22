@@ -8,7 +8,14 @@ from pathlib import Path
 import pytest
 
 from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptEdge, ConceptNode
+from rai_cli.context.models import (
+    ConceptEdge,
+    ConceptNode,
+    EpicNode,
+    GraphNode,
+    PatternNode,
+    SessionNode,
+)
 
 
 @pytest.fixture
@@ -283,3 +290,93 @@ class TestUnifiedGraphEdgeCases:
         empty_graph.add_relationship(edge1)
         empty_graph.add_relationship(edge2)
         assert empty_graph.edge_count == 2
+
+
+class TestGraphNodeDeserialization:
+    """Tests for typed GraphNode reconstruction from graph storage."""
+
+    def test_get_concept_returns_correct_subclass(self) -> None:
+        """Adding an EpicNode and retrieving it returns EpicNode instance."""
+        graph = UnifiedGraph()
+        node = EpicNode(id="E1", content="test epic", created="2026-01-01")
+        graph.add_concept(node)
+        retrieved = graph.get_concept("E1")
+        assert retrieved is not None
+        assert isinstance(retrieved, EpicNode)
+        assert retrieved.type == "epic"
+
+    def test_get_concepts_by_type_returns_subclasses(self) -> None:
+        """get_concepts_by_type returns correct subclass instances."""
+        graph = UnifiedGraph()
+        graph.add_concept(
+            PatternNode(id="P1", content="pat1", created="2026-01-01")
+        )
+        graph.add_concept(
+            PatternNode(id="P2", content="pat2", created="2026-01-01")
+        )
+        graph.add_concept(
+            EpicNode(id="E1", content="epic1", created="2026-01-01")
+        )
+        patterns = graph.get_concepts_by_type("pattern")
+        assert len(patterns) == 2
+        assert all(isinstance(p, PatternNode) for p in patterns)
+
+    def test_iter_concepts_yields_subclasses(self) -> None:
+        """iter_concepts yields correct subclass instances."""
+        graph = UnifiedGraph()
+        graph.add_concept(
+            EpicNode(id="E1", content="epic", created="2026-01-01")
+        )
+        graph.add_concept(
+            SessionNode(id="S1", content="session", created="2026-01-01")
+        )
+        concepts = list(graph.iter_concepts())
+        types_found = {type(c).__name__ for c in concepts}
+        assert "EpicNode" in types_found
+        assert "SessionNode" in types_found
+
+    def test_save_load_roundtrip_preserves_subclass(
+        self, tmp_path: Path
+    ) -> None:
+        """Save → load → get_concept returns correct subclass."""
+        graph = UnifiedGraph()
+        graph.add_concept(
+            EpicNode(
+                id="E1",
+                content="test epic",
+                created="2026-01-01",
+                metadata={"key": "RAISE-211"},
+            )
+        )
+        path = tmp_path / "graph.json"
+        graph.save(path)
+
+        loaded = UnifiedGraph.load(path)
+        retrieved = loaded.get_concept("E1")
+        assert retrieved is not None
+        assert isinstance(retrieved, EpicNode)
+        assert retrieved.type == "epic"
+        assert retrieved.metadata["key"] == "RAISE-211"
+
+    def test_unknown_type_falls_back_to_graphnode(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Node with unregistered type loads as GraphNode base with warning."""
+        import logging
+
+        graph = UnifiedGraph()
+        # Manually inject a node with unknown type via NetworkX
+        graph.graph.add_node(
+            "U1",
+            type="jira.sprint",
+            content="Sprint 42",
+            created="2026-01-01",
+            metadata={},
+        )
+        with caplog.at_level(logging.WARNING):
+            retrieved = graph.get_concept("U1")
+        assert retrieved is not None
+        assert isinstance(retrieved, GraphNode)
+        assert type(retrieved) is GraphNode  # exact type, not subclass
+        assert retrieved.type == "jira.sprint"
+        assert "not registered" in caplog.text
