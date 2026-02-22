@@ -28,7 +28,7 @@ consumes as structured input. No skill needs to infer what the previous one mean
 
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
-| S1 | story-design v1.2 | M | Pending | Gemba Walk + Integration Design at function level |
+| S1 | story-design v1.2 | M | ✅ Done | Gemba Walk + Integration Design at function level |
 | S2 | story-plan v1.1 | M | Pending | SDLD Task Blueprints with signatures, tests, file paths |
 | S3 | epic-start v1.1 | S | Pending | Epic Brief artifact (SAFe hypothesis + Shape Up) |
 | S4 | epic-design v1.2 | S | Pending | Separate scope.md / design.md artifacts |
@@ -179,7 +179,7 @@ No parallel streams — single developer + shared format conventions across skil
 
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
-| S1: story-design v1.2 | M | Pending | — | |
+| S1: story-design v1.2 | M | ✅ Done | 30 min | 3.0x velocity |
 | S2: story-plan v1.1 | M | Pending | — | |
 | S5: story-start v1.1 | S | Pending | — | |
 | S3: epic-start v1.1 | S | Pending | — | |
