@@ -23,27 +23,7 @@ from rai_cli.adapters.registry import (
 )
 
 
-# --- Constants ---
-
-
-class TestConstants:
-    def test_pm_adapters_group(self) -> None:
-        assert EP_PM_ADAPTERS == "rai.adapters.pm"
-
-    def test_governance_schemas_group(self) -> None:
-        assert EP_GOVERNANCE_SCHEMAS == "rai.governance.schemas"
-
-    def test_governance_parsers_group(self) -> None:
-        assert EP_GOVERNANCE_PARSERS == "rai.governance.parsers"
-
-    def test_doc_targets_group(self) -> None:
-        assert EP_DOC_TARGETS == "rai.docs.targets"
-
-    def test_graph_backends_group(self) -> None:
-        assert EP_GRAPH_BACKENDS == "rai.graph.backends"
-
-
-# --- _discover ---
+# --- Helpers ---
 
 
 def _make_entry_point(name: str, load_result: Any) -> MagicMock:
@@ -60,6 +40,9 @@ def _make_broken_entry_point(name: str, error: Exception) -> MagicMock:
     ep.name = name
     ep.load.side_effect = error
     return ep
+
+
+# --- _discover behavior ---
 
 
 class TestDiscover:
@@ -128,37 +111,83 @@ class TestDiscover:
         assert result == {"a": cls_a, "c": cls_c}
         assert "b" in caplog.text
 
+    def test_skips_non_class_entry_point_with_warning(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """Entry points must resolve to classes, not functions or instances."""
+        a_function = lambda: None  # noqa: E731
+        mock_ep = _make_entry_point("not_a_class", a_function)
 
-# --- Public functions delegate to _discover ---
+        with patch(
+            "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
+        ):
+            with caplog.at_level(logging.WARNING):
+                result = _discover("rai.adapters.pm")
+
+        assert result == {}
+        assert "not_a_class" in caplog.text
+        assert "expected a class" in caplog.text
+
+
+# --- Public functions: behavior-based tests ---
 
 
 class TestPublicFunctions:
-    @patch("rai_cli.adapters.registry._discover", return_value={})
-    def test_get_pm_adapters(self, mock_discover: MagicMock) -> None:
-        result = get_pm_adapters()
-        mock_discover.assert_called_once_with(EP_PM_ADAPTERS)
-        assert result == {}
+    """Each public function discovers from its designated group.
 
-    @patch("rai_cli.adapters.registry._discover", return_value={})
-    def test_get_governance_schemas(self, mock_discover: MagicMock) -> None:
-        result = get_governance_schemas()
-        mock_discover.assert_called_once_with(EP_GOVERNANCE_SCHEMAS)
-        assert result == {}
+    Tests use real _discover (not mocked) to verify end-to-end behavior.
+    """
 
-    @patch("rai_cli.adapters.registry._discover", return_value={})
-    def test_get_governance_parsers(self, mock_discover: MagicMock) -> None:
-        result = get_governance_parsers()
-        mock_discover.assert_called_once_with(EP_GOVERNANCE_PARSERS)
-        assert result == {}
+    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
+    def test_get_pm_adapters_returns_empty_when_none_registered(
+        self, _mock: MagicMock
+    ) -> None:
+        assert get_pm_adapters() == {}
 
-    @patch("rai_cli.adapters.registry._discover", return_value={})
-    def test_get_doc_targets(self, mock_discover: MagicMock) -> None:
-        result = get_doc_targets()
-        mock_discover.assert_called_once_with(EP_DOC_TARGETS)
-        assert result == {}
+    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
+    def test_get_governance_schemas_returns_empty_when_none_registered(
+        self, _mock: MagicMock
+    ) -> None:
+        assert get_governance_schemas() == {}
 
-    @patch("rai_cli.adapters.registry._discover", return_value={})
-    def test_get_graph_backends(self, mock_discover: MagicMock) -> None:
-        result = get_graph_backends()
-        mock_discover.assert_called_once_with(EP_GRAPH_BACKENDS)
-        assert result == {}
+    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
+    def test_get_governance_parsers_returns_empty_when_none_registered(
+        self, _mock: MagicMock
+    ) -> None:
+        assert get_governance_parsers() == {}
+
+    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
+    def test_get_doc_targets_returns_empty_when_none_registered(
+        self, _mock: MagicMock
+    ) -> None:
+        assert get_doc_targets() == {}
+
+    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
+    def test_get_graph_backends_returns_empty_when_none_registered(
+        self, _mock: MagicMock
+    ) -> None:
+        assert get_graph_backends() == {}
+
+    def test_get_pm_adapters_discovers_from_correct_group(self) -> None:
+        fake_cls = type("JiraAdapter", (), {})
+        mock_ep = _make_entry_point("jira", fake_cls)
+
+        with patch(
+            "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
+        ) as mock_eps:
+            result = get_pm_adapters()
+
+        mock_eps.assert_called_once_with(group=EP_PM_ADAPTERS)
+        assert result == {"jira": fake_cls}
+
+    def test_get_governance_parsers_discovers_from_correct_group(self) -> None:
+        fake_cls = type("BacklogParser", (), {})
+        mock_ep = _make_entry_point("backlog", fake_cls)
+
+        with patch(
+            "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
+        ) as mock_eps:
+            result = get_governance_parsers()
+
+        mock_eps.assert_called_once_with(group=EP_GOVERNANCE_PARSERS)
+        assert result == {"backlog": fake_cls}
