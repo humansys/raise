@@ -41,25 +41,35 @@
 | [RAISE-153](https://humansys.atlassian.net/browse/RAISE-153) | **Developer Enablement** | ✅ Complete | `work/epics/raise-153-developer-enablement/scope.md` | — |
 | [RAISE-168](https://humansys.atlassian.net/browse/RAISE-168) | **Neurosymbolic Memory Density** | ✅ Complete | `work/epics/raise-168-neurosymbolic-memory-density/scope.md` | — |
 | [RAISE-173](https://humansys.atlassian.net/browse/RAISE-173) | **Team Enablement & Operational Readiness** | 🚀 In Progress | — | P1 |
-| [RAISE-211](https://humansys.atlassian.net/browse/RAISE-211) | **Adapter Foundation** | 📋 Backlog | — | P1 (v2.1) |
-| [RAISE-242](https://humansys.atlassian.net/browse/RAISE-242) | **Skill Ecosystem** | 📋 Backlog | — | P1 (v2.1) |
+| [RAISE-211](https://humansys.atlassian.net/browse/RAISE-211) | **Adapter Foundation** | 📋 Backlog | — | P1 (v2.2) |
+| [RAISE-242](https://humansys.atlassian.net/browse/RAISE-242) | **Skill Ecosystem** | 📋 Backlog | — | P1 (v2.1 partial, v2.3 full) |
 | [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | 📋 Backlog | `work/epics/raise-247-cli-ontology/scope.md` | P0 (v2.1) |
-| [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | 📋 Backlog | `work/epics/raise-248-hooks-gates/scope.md` | P1 (v2.1) |
+| [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | 📋 Backlog | `work/epics/raise-248-hooks-gates/scope.md` | P1 (v2.2) |
 
-### Implementation Order (decided SES-234, 2026-02-21)
+### Release Roadmap (decided SES-234, 2026-02-21)
 
-```
-Phase 1:  RAISE-247 (CLI Ontology)       ← no dependencies, cleans the base
-Phase 2:  RAISE-211 (Adapter Foundation)  ← can parallelize with Phase 1
-Phase 3:  RAISE-248 (Hooks & Gates)       ← consumes 211 entry points + 247 names
-Phase 4:  RAISE-242 (Skill Builder)       ← generates skills on clean ontology + hooks
-```
+**v2.1 — CLI Professional** (~10 stories)
+- RAISE-247: CLI Ontology Restructuring (complete — 9 stories)
+- RAISE-242/S1: Semantic Validator (1 story from Skill Ecosystem)
+- Outcome: clean CLI, skill registry with ownership, semantic validation
 
-**Rationale:** 247 first because it delivers immediate value (clean CLI, skill registry
-for Kurigage) with no dependencies. 211 is foundation for PRO but has no consumer until
-248. 248 eliminates 68% skill ceremony. 242 generates correct skills on the final infra.
+**v2.2 — Extensibility** (~13 stories)
+- RAISE-211: Adapter Foundation (6 stories — Protocol contracts, entry points, TierContext)
+- RAISE-248: Hooks & Gates (7 stories — event system, telemetry hook, built-in gates)
+- Outcome: pluggable architecture, skills lose 68% ceremony overhead
 
-**Summary:** 18 of 19 internal epics complete. RAISE-144 (Engineering Health) is a permanent rolling epic. 4 new epics scoped (SES-234): CLI ontology, adapter foundation, hooks/gates, skill ecosystem.
+**v2.3 — Skill Ecosystem** (~2+ stories)
+- RAISE-242/S2-S3: Skill Builder + rai-debug (2 stories)
+- Providers (context, output, scaffold) if needed
+- Outcome: anyone can create correct skills, ecosystem ready
+
+**Rationale:** v2.1 delivers immediate value (clean CLI, skill registry for Kurigage)
+with no dependencies. v2.2 builds the extensibility infrastructure that PRO needs. v2.3
+completes the skill ecosystem on top of the final infrastructure. Each release is
+self-contained and delivers shippable value.
+
+**Summary:** 18 of 19 internal epics complete. RAISE-144 (Engineering Health) is a
+permanent rolling epic. 4 new epics scoped (SES-234), distributed across v2.1–v2.3.
 
 ---
 
