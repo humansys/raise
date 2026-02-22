@@ -267,7 +267,7 @@ rai memory emit-work story {story_id} --event complete --phase plan
 - **Description:** ...
 - **Files:** ...
 - **TDD Cycle:** RED → GREEN → REFACTOR
-- **Verification:** `pytest tests/test_X.py`
+- **Verification:** `{test runner} tests/test_X.{ext}` (e.g., pytest, dotnet test, flutter test, phpunit)
 - **Size:** S
 - **Dependencies:** None
 
@@ -275,7 +275,7 @@ rai memory emit-work story {story_id} --event complete --phase plan
 - **Description:** ...
 - **Files:** ...
 - **TDD Cycle:** RED → GREEN → REFACTOR
-- **Verification:** `ruff check src/`
+- **Verification:** `{linter} src/` (e.g., ruff, eslint, dart analyze, phpstan)
 - **Size:** XS
 - **Dependencies:** Task 1
 
