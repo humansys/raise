@@ -25,7 +25,7 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 
 | ID | Story | Size | Status | Dependencies | Description |
 |----|-------|:----:|:------:|--------------|-------------|
-| S211.0 | GraphNode class hierarchy | M | Pending | None | Migrate ConceptNode from flat Literal to class hierarchy with `__init_subclass__` auto-registration. 18 core types as subclasses. |
+| S211.0 | Open NodeType/EdgeType | S | Pending | None | NodeType Literal → str + CoreNodeTypes constants. EdgeType same. Aliases for backward compat. |
 | S211.1 | Protocol contracts | S | Pending | S211.0 | PM, Governance, DocTarget Protocols + Pydantic models (IssueSpec, ArtifactLocator, etc.) |
 | S211.2 | Entry point registry | S | Pending | S211.1 | `importlib.metadata` discovery: `get_pm_adapters()`, `get_governance_schemas()`, etc. |
 | S211.3 | rai memory build → registry | M | Pending | S211.0, S211.2 | Refactor UnifiedGraphBuilder to use registry instead of hardcoded parsers |
@@ -33,14 +33,14 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 | S211.5 | TierContext | S | Pending | S211.1 | Tier detection from manifest, Capability enum, progressive enrichment |
 | S211.6 | rai adapters list/check | S | Pending | S211.2, S211.5 | CLI surface for adapter discovery and validation |
 
-**Total:** 7 stories (M-L epic)
+**Total:** 7 stories (M epic)
 
 ---
 
 ## In Scope
 
 **MUST:**
-- GraphNode class hierarchy with auto-registration (`__init_subclass__`)
+- Open NodeType/EdgeType (str + constants, not Literal)
 - Protocol contracts for all adapter types (PM, Governance, Graph, Tier)
 - Entry point registry with `importlib.metadata` discovery
 - FilesystemGraphBackend as built-in (current behavior, refactored)
@@ -59,6 +59,7 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 - AuditAdapter → Enterprise compliance
 - SearchAdapter (semantic search, pgvector) → PRO
 - SkillRegistryAdapter → org governance
+- GraphNode class hierarchy (deferred — migrate when plugins need per-type fields)
 - NodeType/EdgeType migration layer for old serialized graphs → rebuild on upgrade
 
 ---
@@ -84,14 +85,14 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 ## Dependencies
 
 ```
-S211.0 (GraphNode hierarchy)
+S211.0 (Open NodeType/EdgeType)
   ├── S211.1 (Protocol contracts)
   │     ├── S211.2 (Entry point registry)
   │     │     ├── S211.3 (rai memory build → registry) ←── also needs S211.0
   │     │     ├── S211.4 (KnowledgeGraphBackend) ←── also needs S211.0
   │     │     └── S211.6 (rai adapters list/check) ←── also needs S211.5
   │     └── S211.5 (TierContext)
-  └── S211.3 (needs new node types)
+  └── S211.3 (needs open types)
 ```
 
 **Critical path:** S0 → S1 → S2 → S3
@@ -105,12 +106,12 @@ S211.0 (GraphNode hierarchy)
 ## Notes
 
 ### Key Design Decisions
-- **GraphNode hierarchy** (C+E+D pattern): Class hierarchy with `__init_subclass__` auto-registration + entry points for plugin discovery. Pattern used by pytest, Airflow, Kedro.
+- **NodeType pragmatic** (str + constants): Open type field, CoreNodeTypes as guidance constants. Researched pytest/Airflow/Kedro patterns — class hierarchy deferred until plugins need per-type fields. Evidence-based: all 18 core types have identical shape today.
 - **Backward compat:** Rebuild on upgrade. Graph is derived, not source. `rai memory build` regenerates.
 - **Module layout:** Protocols in `adapters/`, built-in implementations stay in-place (`governance/`, `graph/`).
+- **Unknown types:** Graceful fallback with warning + actionable message ("run rai memory build").
 
 ### Key Risks
-- **S211.0 scope:** GraphNode migration touches models used across 1610 tests. Mitigation: keep ConceptNode as alias during migration, batch-update tests.
 - **S211.3 regression:** Builder refactor must produce identical graph. Mitigation: snapshot test comparing before/after graph output.
 
 ### ADR Foundation
