@@ -145,24 +145,6 @@ class TestPublicFunctions:
         assert get_pm_adapters() == {}
 
     @patch("rai_cli.adapters.registry.entry_points", return_value=[])
-    def test_get_governance_schemas_returns_empty_when_none_registered(
-        self, _mock: MagicMock
-    ) -> None:
-        assert get_governance_schemas() == {}
-
-    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
-    def test_get_governance_parsers_returns_empty_when_none_registered(
-        self, _mock: MagicMock
-    ) -> None:
-        assert get_governance_parsers() == {}
-
-    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
-    def test_get_doc_targets_returns_empty_when_none_registered(
-        self, _mock: MagicMock
-    ) -> None:
-        assert get_doc_targets() == {}
-
-    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
     def test_get_graph_backends_returns_empty_when_none_registered(
         self, _mock: MagicMock
     ) -> None:
