@@ -9,13 +9,22 @@ Architecture: ADR-019 Unified Context Graph Architecture
 from __future__ import annotations
 
 import json
+import logging
 from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
 import networkx as nx  # type: ignore[import-untyped]
 
-from rai_cli.context.models import ConceptEdge, ConceptNode, EdgeType, NodeType
+from rai_cli.context.models import (
+    ConceptEdge,
+    ConceptNode,
+    EdgeType,
+    GraphNode,
+    NodeType,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class UnifiedGraph:
@@ -43,6 +52,21 @@ class UnifiedGraph:
     def __init__(self) -> None:
         """Initialize an empty unified graph."""
         self.graph: nx.MultiDiGraph[str] = nx.MultiDiGraph()
+
+    def _reconstruct_node(self, node_id: str, data: dict[str, Any]) -> GraphNode:
+        """Reconstruct a typed GraphNode from serialized dict."""
+        data["id"] = node_id
+        node_type = data.get("type", "")
+        cls = GraphNode.registered_types().get(node_type)
+        if cls:
+            return cls.model_validate(data)
+        if node_type:
+            logger.warning(
+                "Node type '%s' not registered (missing plugin?). "
+                "Run 'rai memory build' to regenerate graph.",
+                node_type,
+            )
+        return GraphNode.model_validate(data)
 
     def add_concept(self, node: ConceptNode) -> None:
         """Add a concept node to the graph.
@@ -106,9 +130,7 @@ class UnifiedGraph:
         if concept_id not in self.graph.nodes:
             return None
         data = dict(self.graph.nodes[concept_id])
-        # Ensure id is present (may be missing after load)
-        data["id"] = concept_id
-        return ConceptNode.model_validate(data)
+        return self._reconstruct_node(concept_id, data)
 
     def get_concepts_by_type(self, node_type: NodeType) -> list[ConceptNode]:
         """Get all concepts of a specific type.
@@ -129,8 +151,7 @@ class UnifiedGraph:
         for node_id in self.graph.nodes:
             data: dict[str, Any] = dict(self.graph.nodes[node_id])
             if data.get("type") == node_type:
-                data["id"] = node_id  # Ensure id is present
-                concepts.append(ConceptNode.model_validate(data))
+                concepts.append(self._reconstruct_node(node_id, data))
         return concepts
 
     def get_neighbors(
@@ -211,8 +232,7 @@ class UnifiedGraph:
         node_id: str
         for node_id in self.graph.nodes:
             data: dict[str, Any] = dict(self.graph.nodes[node_id])
-            data["id"] = node_id  # Ensure id is present
-            yield ConceptNode.model_validate(data)
+            yield self._reconstruct_node(node_id, data)
 
     def iter_relationships(self) -> Iterator[ConceptEdge]:
         """Iterate over all relationships in the graph.
@@ -237,7 +257,7 @@ class UnifiedGraph:
             yield ConceptEdge(
                 source=source,
                 target=target,
-                type=edge_type,  # type: ignore[arg-type]
+                type=edge_type,
                 weight=weight,
                 metadata=metadata,
             )
