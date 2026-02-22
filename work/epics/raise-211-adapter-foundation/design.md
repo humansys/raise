@@ -9,9 +9,9 @@ grounded_in: "Gemba of context/models.py, context/builder.py (1608 LOC), governa
 
 | Module/File | Current State | Changes | Stays |
 |-------------|--------------|---------|-------|
-| `context/models.py` (136 LOC) | `ConceptNode` flat model, `NodeType` Literal (18 types), `EdgeType` Literal (11 types) | NodeType → class hierarchy with auto-registration. ConceptNode becomes GraphNode base. EdgeType → str + constants. | Field names, serialization shape |
+| `context/models.py` (136 LOC) | `ConceptNode` flat model, `NodeType` Literal (18 types), `EdgeType` Literal (11 types) | GraphNode base with `__init_subclass__` auto-registration. 18 core subclasses. EdgeType → str + CoreEdgeTypes. ConceptNode = GraphNode alias. | Field names, serialization shape |
 | `context/builder.py` (1608 LOC) | 7 `load_*` methods, all hardcoded. `GovernanceExtractor` instantiated directly. `PythonAnalyzer` hardcoded. | `load_governance()` → registry dispatch. `load_code_structure()` → registry dispatch. Other load methods remain (memory, work, skills, etc.) | `build()` orchestration pattern, project_root injection |
-| `context/graph.py` (~300 LOC) | `UnifiedGraph` wraps NetworkX. `add_concept(ConceptNode)`, `save()`/`load()` via `node_link_data` | `add_concept()` accepts `GraphNode` (base class). Serialization handles discriminated hierarchy. | NetworkX core, query methods, BFS traversal |
+| `context/graph.py` (~300 LOC) | `UnifiedGraph` wraps NetworkX. `add_concept(ConceptNode)`, `save()`/`load()` via `node_link_data` | Deserialization with registry lookup + graceful fallback. Type annotations: GraphNode. | NetworkX core, query methods, BFS traversal, save format |
 | `governance/extractor.py` (324 LOC) | Orchestrates 9 parsers with hardcoded paths. Returns `list[Concept]` | Becomes `RaiSEDefaultSchema` implementing `GovernanceSchemaProvider` Protocol. Parsers called via registry. | Parser logic (refactored into Protocol implementations) |
 | `governance/parsers/*.py` (9 files, ~1900 LOC) | Standalone functions: `extract_X(file_path) → list[Concept]` | Each wrapped as `GovernanceParser` implementation class. Return `list[GraphNode]` instead of `list[Concept]` | Regex parsing logic, extraction heuristics |
 | `context/analyzers/protocol.py` (44 LOC) | `CodeAnalyzer` Protocol — existing pattern precedent | None — already follows target pattern | Everything |
@@ -21,7 +21,7 @@ grounded_in: "Gemba of context/models.py, context/builder.py (1608 LOC), governa
 
 | Component | Responsibility | Key Interface | Consumes | Produces |
 |-----------|---------------|---------------|----------|----------|
-| `GraphNode` (base) | Base class for all graph nodes with auto-registration | `__init_subclass__(node_type=...)` | — | Node registry |
+| `context/models.py` (updated) | GraphNode hierarchy with auto-registration | `GraphNode.__init_subclass__`, `GraphNode.resolve()`, 18 core subclasses | — | Extensible type system |
 | `adapters/protocols.py` | Protocol contracts for PM, Governance, DocTarget | `ProjectManagementAdapter`, `GovernanceSchemaProvider`, `GovernanceParser`, `DocumentationTarget` | — | Contracts |
 | `adapters/models.py` | Shared Pydantic models for adapter boundaries | `IssueSpec`, `IssueRef`, `ArtifactLocator`, `ArtifactType`, `PublishResult` | — | Models |
 | `adapters/registry.py` | Entry point discovery | `get_pm_adapters()`, `get_governance_schemas()`, `get_governance_parsers()`, `get_graph_backends()` | `importlib.metadata` | Adapter instances |
@@ -32,22 +32,21 @@ grounded_in: "Gemba of context/models.py, context/builder.py (1608 LOC), governa
 
 ## Key Contracts
 
-### GraphNode Base (S211.0)
+### GraphNode Hierarchy (S211.0)
 
 ```python
 from __future__ import annotations
 from typing import Any, ClassVar
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 class GraphNode(BaseModel):
-    """Base class for all knowledge graph nodes.
-
-    Subclasses auto-register via __init_subclass__.
+    """Base class for all knowledge graph nodes. Auto-registers subclasses.
     Pattern: pytest Node + Airflow BaseOperator + Kedro AbstractDataset.
     """
     _registry: ClassVar[dict[str, type[GraphNode]]] = {}
 
     id: str
+    type: str = ""  # auto-set by subclass via model_validator
     content: str
     source_file: str | None = None
     created: str
@@ -59,38 +58,42 @@ class GraphNode(BaseModel):
             cls.__node_type__ = node_type
             GraphNode._registry[node_type] = cls
 
+    @model_validator(mode="before")
+    @classmethod
+    def _set_default_type(cls, data: Any) -> Any:
+        if isinstance(data, dict) and hasattr(cls, "__node_type__"):
+            data.setdefault("type", cls.__node_type__)
+        return data
+
     @classmethod
     def resolve(cls, node_type: str) -> type[GraphNode]:
-        """Resolve a node_type string to its registered class."""
         return cls._registry[node_type]
 
     @classmethod
     def registered_types(cls) -> dict[str, type[GraphNode]]:
-        """All registered node type mappings."""
         return dict(cls._registry)
 
-# Core types (18 — one class per current Literal value)
-class PatternNode(GraphNode, node_type="pattern"): ...
-class EpicNode(GraphNode, node_type="epic"): ...
-class StoryNode(GraphNode, node_type="story"): ...
-class DecisionNode(GraphNode, node_type="decision"): ...
+    @property
+    def token_estimate(self) -> int:
+        return len(self.content) // 4
+
+# Core types — 18 documented extension points
+class PatternNode(GraphNode, node_type="pattern"):
+    """Extension: confidence scores, decay metadata.""" ...
+class EpicNode(GraphNode, node_type="epic"):
+    """Extension: Jira epic fields (key, board, sprint).""" ...
 # ... (all 18)
 
-# Backward compat alias — removed after full migration
+# Backward compat
 ConceptNode = GraphNode
-```
+NodeType = str
 
-### GraphEdge (S211.0)
-
-```python
-EdgeType = str  # open for plugins
+# Edges — flat (no per-type fields needed)
+EdgeType = str
 
 class CoreEdgeTypes:
     LEARNED_FROM = "learned_from"
-    GOVERNED_BY = "governed_by"
-    PART_OF = "part_of"
-    DEPENDS_ON = "depends_on"
-    # ... (all 11 current types)
+    # ... (all 11)
 
 class GraphEdge(BaseModel):
     source: str
@@ -99,7 +102,6 @@ class GraphEdge(BaseModel):
     weight: float = 1.0
     metadata: dict[str, Any] = Field(default_factory=dict)
 
-# Backward compat alias
 ConceptEdge = GraphEdge
 ```
 
@@ -126,7 +128,7 @@ class GovernanceSchemaProvider(Protocol):
 class GovernanceParser(Protocol):
     """ADR-034: Parses a governance artifact into graph nodes."""
     def can_parse(self, locator: ArtifactLocator) -> bool: ...
-    def parse(self, locator: ArtifactLocator) -> list[GraphNode]: ...
+    def parse(self, locator: ArtifactLocator) -> list[ConceptNode]: ...
 
 @runtime_checkable
 class DocumentationTarget(Protocol):
@@ -200,17 +202,18 @@ class TierContext:
 ## Migration Path
 
 ### Backward Compatibility Strategy
-- **ConceptNode** becomes alias for `GraphNode` during migration. Removed after all consumers updated.
-- **ConceptEdge** becomes alias for `GraphEdge`. Same lifecycle.
-- **NodeType Literal** removed. Code that does `node.type == "epic"` still works (string comparison). Code that type-checks against `Literal` breaks — must update to `isinstance(node, EpicNode)` or `node.__node_type__ == "epic"`.
+- **ConceptNode** becomes alias for `GraphNode`. All 83 test instantiations work unchanged.
+- **ConceptEdge** becomes alias for `GraphEdge`. All 32 test instantiations work unchanged.
+- **NodeType** changes from Literal to `str`. Code using `node.type == "epic"` unchanged. `ConceptNode(type="epic", ...)` still works.
 - **Serialized graph**: No migration layer. Users run `rai memory build` after upgrade. Graph is derived from sources, not authoritative.
+- **Deserialization**: Registry lookup reconstructs correct subclass. Unknown types degrade to GraphNode base with warning.
 
 ### Consumer Changes
-- `UnifiedGraphBuilder.build()`: Returns graph with `GraphNode` subclass instances instead of flat `ConceptNode`.
-- `UnifiedGraph.add_concept()`: Accepts `GraphNode` (base class).
+- `context/graph.py`: Deserialization uses `GraphNode.resolve()`. Type annotations widen to `GraphNode`.
+- `context/query.py`, `context/diff.py`: `NodeType` references become `str`, callers unchanged.
 - `GovernanceExtractor`: Becomes `RaiSEDefaultSchema`. Consumers that import it directly must update.
-- All governance parsers: Return `list[GraphNode]` subclass instances instead of `list[Concept]`.
-- Tests: ~1610 tests, many reference `ConceptNode` — alias covers initial migration, then batch update.
+- All governance parsers: Return `list[GraphNode]` (subclass instances via the hierarchy).
+- Tests: 83 `ConceptNode(` + 32 `ConceptEdge(` — all work via aliases.
 
 ## What Does NOT Change
 

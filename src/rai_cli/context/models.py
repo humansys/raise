@@ -9,86 +9,63 @@ Architecture: ADR-019 Unified Context Graph Architecture
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, ClassVar
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
-# Node types for unified context graph
-NodeType = Literal[
-    "pattern",  # PAT-* — learned patterns from memory
-    "calibration",  # CAL-* — velocity/estimation data
-    "session",  # SES-* — session history records
-    "principle",  # §N — constitution principles
-    "requirement",  # RF-* — PRD requirements
-    "outcome",  # OUT-* — vision outcomes
-    "project",  # PRJ-* — project definitions
-    "epic",  # E* — epic scopes
-    "story",  # F*.* — story work items
-    "skill",  # /name — skill metadata
-    "decision",  # ADR-* — architecture decisions (E12)
-    "guardrail",  # GR-* — code standards (E12)
-    "term",  # TERM-* — glossary definitions (E12)
-    "component",  # comp-* — discovered code components (E13)
-    "module",  # mod-* — architecture module knowledge (discover-document)
-    "architecture",  # arch-* — architecture docs: context, design, domain model (E15)
-    "bounded_context",  # bc-* — DDD bounded context or structural grouping (E15)
-    "layer",  # lyr-* — architectural layer (E15)
-    "release",  # rel-* — release milestones from roadmap
-]
-
-# Edge types for relationships between concepts
-EdgeType = Literal[
-    "learned_from",  # pattern → session (memory origin)
-    "governed_by",  # requirement → principle (governance link)
-    "applies_to",  # pattern → skill (usage context)
-    "needs_context",  # skill → concept types (context requirements)
-    "implements",  # story → requirement (traceability)
-    "part_of",  # story → epic (hierarchy)
-    "related_to",  # generic semantic relationship
-    "depends_on",  # module → module (architecture dependency)
-    "belongs_to",  # module → bounded_context (domain ownership, E15)
-    "in_layer",  # module → layer (architectural layer assignment, E15)
-    "constrained_by",  # BC/layer → guardrail (constraint relationship, E15)
-]
+# --- Node type system (open for plugins) ---
+NodeType = str
 
 
-class ConceptNode(BaseModel):
-    """A node in the unified context graph.
+class GraphNode(BaseModel):
+    """Base class for all knowledge graph nodes. Auto-registers subclasses.
 
-    Represents any concept type (pattern, principle, skill, etc.) with
-    its content and metadata. All concept types share this schema.
-
-    Attributes:
-        id: Unique identifier (e.g., 'PAT-001', '§2', 'F11.1', '/rai-story-plan').
-        type: Node type from NodeType literal.
-        content: Main text content or description.
-        source_file: Path to source file (if applicable).
-        created: ISO timestamp when concept was created.
-        metadata: Type-specific additional attributes.
+    Pattern: pytest Node + Airflow BaseOperator + Kedro AbstractDataset.
+    Subclasses define node_type and optionally add typed fields.
 
     Examples:
-        >>> node = ConceptNode(
-        ...     id="PAT-001",
-        ...     type="pattern",
-        ...     content="Singleton with get/set/configure pattern",
-        ...     source_file=".raise/rai/memory/patterns.jsonl",
-        ...     created="2026-01-31",
-        ...     metadata={"sub_type": "codebase", "context": ["testing"]}
-        ... )
-        >>> node.id
-        'PAT-001'
+        >>> class JiraSprintNode(GraphNode, node_type="jira.sprint"):
+        ...     sprint_id: str = ""
+        >>> node = JiraSprintNode(id="S1", content="Sprint 1", created="2026-01-01")
         >>> node.type
-        'pattern'
+        'jira.sprint'
     """
 
+    _registry: ClassVar[dict[str, type[GraphNode]]] = {}
+
     id: str = Field(..., description="Unique identifier (e.g., 'PAT-001', '§2')")
-    type: NodeType = Field(..., description="Node type")
+    type: str = Field(default="", description="Node type (auto-set by subclass)")
     content: str = Field(..., description="Main text content or description")
     source_file: str | None = Field(default=None, description="Path to source file")
     created: str = Field(..., description="ISO timestamp when created")
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Type-specific attributes"
     )
+
+    def __init_subclass__(cls, node_type: str | None = None, **kwargs: Any) -> None:
+        super().__init_subclass__(**kwargs)
+        if node_type is not None:
+            cls.__node_type__ = node_type  # type: ignore[attr-defined]
+            GraphNode._registry[node_type] = cls
+
+    @model_validator(mode="before")
+    @classmethod
+    def _set_default_type(cls, data: dict[str, Any]) -> dict[str, Any]:
+        """Auto-set type field from subclass registration."""
+        if hasattr(cls, "__node_type__"):
+            node_type: str = cls.__node_type__  # type: ignore[attr-defined]
+            data.setdefault("type", node_type)
+        return data
+
+    @classmethod
+    def resolve(cls, node_type: str) -> type[GraphNode]:
+        """Resolve a node_type string to its registered class."""
+        return cls._registry[node_type]
+
+    @classmethod
+    def registered_types(cls) -> dict[str, type[GraphNode]]:
+        """All registered node type mappings."""
+        return dict(cls._registry)
 
     @property
     def token_estimate(self) -> int:
@@ -100,20 +77,116 @@ class ConceptNode(BaseModel):
         return len(self.content) // 4
 
 
-class ConceptEdge(BaseModel):
-    """An edge in the unified context graph.
+# --- Core node types (18) — documented extension points ---
+
+
+class PatternNode(GraphNode, node_type="pattern"):
+    """Learned patterns from memory. Extension: confidence scores, decay metadata."""
+
+
+class CalibrationNode(GraphNode, node_type="calibration"):
+    """Velocity/estimation data. Extension: per-team calibration fields."""
+
+
+class SessionNode(GraphNode, node_type="session"):
+    """Session history records. Extension: agent-specific session data."""
+
+
+class PrincipleNode(GraphNode, node_type="principle"):
+    """Constitution principles. Extension: org-level principle overrides."""
+
+
+class RequirementNode(GraphNode, node_type="requirement"):
+    """PRD requirements. Extension: priority, stakeholder fields."""
+
+
+class OutcomeNode(GraphNode, node_type="outcome"):
+    """Vision outcomes. Extension: OKR linkage fields."""
+
+
+class ProjectNode(GraphNode, node_type="project"):
+    """Project definitions. Extension: multi-repo project metadata."""
+
+
+class EpicNode(GraphNode, node_type="epic"):
+    """Epic scopes. Extension: Jira epic fields (key, board, sprint)."""
+
+
+class StoryNode(GraphNode, node_type="story"):
+    """Story work items. Extension: PM tool fields (assignee, status)."""
+
+
+class SkillNode(GraphNode, node_type="skill"):
+    """Skill metadata. Extension: registry, versioning, ownership."""
+
+
+class DecisionNode(GraphNode, node_type="decision"):
+    """Architecture decisions. Extension: review status, superseded-by."""
+
+
+class GuardrailNode(GraphNode, node_type="guardrail"):
+    """Code standards. Extension: enforcement level, exceptions."""
+
+
+class TermNode(GraphNode, node_type="term"):
+    """Glossary definitions. Extension: translations, domain scope."""
+
+
+class ComponentNode(GraphNode, node_type="component"):
+    """Discovered code components. Extension: language-specific metadata."""
+
+
+class ModuleNode(GraphNode, node_type="module"):
+    """Architecture module knowledge. Extension: dependency metrics."""
+
+
+class ArchitectureNode(GraphNode, node_type="architecture"):
+    """Architecture docs. Extension: diagram links, review dates."""
+
+
+class BoundedContextNode(GraphNode, node_type="bounded_context"):
+    """DDD bounded contexts. Extension: team ownership, API surface."""
+
+
+class LayerNode(GraphNode, node_type="layer"):
+    """Architectural layers. Extension: deployment mapping."""
+
+
+class ReleaseNode(GraphNode, node_type="release"):
+    """Release milestones. Extension: changelog, artifact URLs."""
+
+
+# Backward compat alias — all existing code uses ConceptNode
+ConceptNode = GraphNode
+
+
+# --- Edge type system (open for plugins, flat — no hierarchy needed) ---
+EdgeType = str
+
+
+class CoreEdgeTypes:
+    """Constants for the 11 core edge types."""
+
+    LEARNED_FROM = "learned_from"
+    GOVERNED_BY = "governed_by"
+    APPLIES_TO = "applies_to"
+    NEEDS_CONTEXT = "needs_context"
+    IMPLEMENTS = "implements"
+    PART_OF = "part_of"
+    RELATED_TO = "related_to"
+    DEPENDS_ON = "depends_on"
+    BELONGS_TO = "belongs_to"
+    IN_LAYER = "in_layer"
+    CONSTRAINED_BY = "constrained_by"
+
+
+class GraphEdge(BaseModel):
+    """An edge in the unified context graph. Open type system.
 
     Represents a directed relationship between two concepts.
 
-    Attributes:
-        source: Source node ID.
-        target: Target node ID.
-        type: Relationship type from EdgeType literal.
-        weight: Edge weight for ranking (default 1.0).
-        metadata: Additional relationship attributes.
-
     Examples:
-        >>> edge = ConceptEdge(
+        >>> edge = GraphEdge(
         ...     source="PAT-001",
         ...     target="SES-015",
         ...     type="learned_from",
@@ -133,3 +206,7 @@ class ConceptEdge(BaseModel):
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Additional relationship attributes"
     )
+
+
+# Backward compat alias
+ConceptEdge = GraphEdge

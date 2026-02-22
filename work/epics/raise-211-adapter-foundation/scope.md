@@ -25,7 +25,7 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 
 | ID | Story | Size | Status | Dependencies | Description |
 |----|-------|:----:|:------:|--------------|-------------|
-| S211.0 | GraphNode class hierarchy | M | Pending | None | Migrate ConceptNode from flat Literal to class hierarchy with `__init_subclass__` auto-registration. 18 core types as subclasses. |
+| S211.0 | GraphNode class hierarchy | M | Pending | None | GraphNode base with `__init_subclass__` auto-registration. 18 core subclasses as documented extension points. |
 | S211.1 | Protocol contracts | S | Pending | S211.0 | PM, Governance, DocTarget Protocols + Pydantic models (IssueSpec, ArtifactLocator, etc.) |
 | S211.2 | Entry point registry | S | Pending | S211.1 | `importlib.metadata` discovery: `get_pm_adapters()`, `get_governance_schemas()`, etc. |
 | S211.3 | rai memory build → registry | M | Pending | S211.0, S211.2 | Refactor UnifiedGraphBuilder to use registry instead of hardcoded parsers |
@@ -33,7 +33,7 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 | S211.5 | TierContext | S | Pending | S211.1 | Tier detection from manifest, Capability enum, progressive enrichment |
 | S211.6 | rai adapters list/check | S | Pending | S211.2, S211.5 | CLI surface for adapter discovery and validation |
 
-**Total:** 7 stories (M-L epic)
+**Total:** 7 stories (M epic)
 
 ---
 
@@ -105,12 +105,13 @@ S211.0 (GraphNode hierarchy)
 ## Notes
 
 ### Key Design Decisions
-- **GraphNode hierarchy** (C+E+D pattern): Class hierarchy with `__init_subclass__` auto-registration + entry points for plugin discovery. Pattern used by pytest, Airflow, Kedro.
+- **GraphNode hierarchy** (C+E+D pattern): Class hierarchy with `__init_subclass__` auto-registration. Pattern from pytest/Airflow/Kedro. 18 core subclasses are documented extension points — the codebase is the portfolio. Edges stay flat (str + constants) — no per-type fields needed.
 - **Backward compat:** Rebuild on upgrade. Graph is derived, not source. `rai memory build` regenerates.
 - **Module layout:** Protocols in `adapters/`, built-in implementations stay in-place (`governance/`, `graph/`).
+- **Unknown types:** Graceful fallback with warning + actionable message ("run rai memory build").
 
 ### Key Risks
-- **S211.0 scope:** GraphNode migration touches models used across 1610 tests. Mitigation: keep ConceptNode as alias during migration, batch-update tests.
+- **S211.0 scope:** GraphNode hierarchy touches models used across 1610 tests. Mitigation: ConceptNode as alias, zero test changes required.
 - **S211.3 regression:** Builder refactor must produce identical graph. Mitigation: snapshot test comparing before/after graph output.
 
 ### ADR Foundation
