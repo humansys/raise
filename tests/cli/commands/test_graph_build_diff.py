@@ -39,7 +39,7 @@ def _make_graph(*nodes: tuple[str, str, str]) -> UnifiedGraph:
 class TestBuildWithDiff:
     """Build command diffs by default."""
 
-    @patch("rai_cli.cli.commands.memory.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
     def test_diff_computed_and_saved(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:
@@ -63,15 +63,15 @@ class TestBuildWithDiff:
 
         with (
             patch(
-                "rai_cli.cli.commands.memory._get_default_index_path",
+                "rai_cli.cli.commands.graph._get_default_index_path",
                 return_value=index_path,
             ),
             patch(
-                "rai_cli.cli.commands.memory.get_personal_dir",
+                "rai_cli.cli.commands.graph.get_personal_dir",
                 return_value=personal_dir,
             ),
         ):
-            result = runner.invoke(app, ["memory", "build"])
+            result = runner.invoke(app, ["graph", "build"])
 
         assert result.exit_code == 0, result.output
 
@@ -85,7 +85,7 @@ class TestBuildWithDiff:
         assert diff.impact == "module"
         assert "mod-x" in diff.affected_modules
 
-    @patch("rai_cli.cli.commands.memory.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
     def test_diff_summary_in_output(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:
@@ -104,20 +104,20 @@ class TestBuildWithDiff:
 
         with (
             patch(
-                "rai_cli.cli.commands.memory._get_default_index_path",
+                "rai_cli.cli.commands.graph._get_default_index_path",
                 return_value=index_path,
             ),
             patch(
-                "rai_cli.cli.commands.memory.get_personal_dir",
+                "rai_cli.cli.commands.graph.get_personal_dir",
                 return_value=personal_dir,
             ),
         ):
-            result = runner.invoke(app, ["memory", "build"])
+            result = runner.invoke(app, ["graph", "build"])
 
         assert result.exit_code == 0, result.output
         assert "1 nodes changed" in result.output
 
-    @patch("rai_cli.cli.commands.memory.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
     def test_first_build_no_old_graph(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:
@@ -134,22 +134,22 @@ class TestBuildWithDiff:
 
         with (
             patch(
-                "rai_cli.cli.commands.memory._get_default_index_path",
+                "rai_cli.cli.commands.graph._get_default_index_path",
                 return_value=index_path,
             ),
             patch(
-                "rai_cli.cli.commands.memory.get_personal_dir",
+                "rai_cli.cli.commands.graph.get_personal_dir",
                 return_value=personal_dir,
             ),
         ):
-            result = runner.invoke(app, ["memory", "build"])
+            result = runner.invoke(app, ["graph", "build"])
 
         assert result.exit_code == 0, result.output
         # No diff file on first build
         diff_path = personal_dir / "last-diff.json"
         assert not diff_path.exists()
 
-    @patch("rai_cli.cli.commands.memory.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
     def test_no_changes_diff(self, mock_builder_cls: MagicMock, tmp_path: Path) -> None:
         """Identical graphs produce 'no changes' diff."""
         graph = _make_graph(("PAT-001", "pattern", "same"))
@@ -165,15 +165,15 @@ class TestBuildWithDiff:
 
         with (
             patch(
-                "rai_cli.cli.commands.memory._get_default_index_path",
+                "rai_cli.cli.commands.graph._get_default_index_path",
                 return_value=index_path,
             ),
             patch(
-                "rai_cli.cli.commands.memory.get_personal_dir",
+                "rai_cli.cli.commands.graph.get_personal_dir",
                 return_value=personal_dir,
             ),
         ):
-            result = runner.invoke(app, ["memory", "build"])
+            result = runner.invoke(app, ["graph", "build"])
 
         assert result.exit_code == 0, result.output
         assert "no changes" in result.output
@@ -182,7 +182,7 @@ class TestBuildWithDiff:
 class TestNoDiffFlag:
     """--no-diff skips diff computation."""
 
-    @patch("rai_cli.cli.commands.memory.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
     def test_no_diff_flag_skips_diff(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:
@@ -201,15 +201,15 @@ class TestNoDiffFlag:
 
         with (
             patch(
-                "rai_cli.cli.commands.memory._get_default_index_path",
+                "rai_cli.cli.commands.graph._get_default_index_path",
                 return_value=index_path,
             ),
             patch(
-                "rai_cli.cli.commands.memory.get_personal_dir",
+                "rai_cli.cli.commands.graph.get_personal_dir",
                 return_value=personal_dir,
             ),
         ):
-            result = runner.invoke(app, ["memory", "build", "--no-diff"])
+            result = runner.invoke(app, ["graph", "build", "--no-diff"])
 
         assert result.exit_code == 0, result.output
         # No diff file created

@@ -95,14 +95,14 @@ def _create_arch_graph(tmp_path: Path) -> Path:
     return index_path
 
 
-class TestMemoryContextCommand:
+class TestGraphContextCommand:
     """Tests for `raise memory context` command."""
 
     def test_context_human_output(self, tmp_path: Path) -> None:
         """Human output shows module, domain, layer, constraints."""
         index_path = _create_arch_graph(tmp_path)
         result = runner.invoke(
-            app, ["memory", "context", "mod-memory", "--index", str(index_path)]
+            app, ["graph", "context", "mod-memory", "--index", str(index_path)]
         )
         assert result.exit_code == 0
         assert "mod-memory" in result.output
@@ -116,7 +116,7 @@ class TestMemoryContextCommand:
         result = runner.invoke(
             app,
             [
-                "memory",
+                "graph",
                 "context",
                 "mod-memory",
                 "--index",
@@ -138,7 +138,7 @@ class TestMemoryContextCommand:
         index_path = _create_arch_graph(tmp_path)
         result = runner.invoke(
             app,
-            ["memory", "context", "mod-nonexistent", "--index", str(index_path)],
+            ["graph", "context", "mod-nonexistent", "--index", str(index_path)],
         )
         assert result.exit_code != 0 or "not found" in result.output.lower()
 

@@ -46,7 +46,7 @@ class TestMemoryGenerate:
         )
 
         assert result.exit_code == 0
-        assert "raise memory build" in result.output
+        assert "graph build" in result.output
 
     def test_generate_suggests_session_start(self) -> None:
         """Should mention raise session start --context."""
