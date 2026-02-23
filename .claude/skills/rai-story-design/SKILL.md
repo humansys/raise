@@ -243,6 +243,7 @@ Define the feature's purpose and value clearly.
 - Use the Read tool on each file. Do not guess from memory or documentation.
 - For M+ stories, populate the full table. For S stories, a bullet list of files + key names suffices.
 - Note any surprises: unexpected dependencies, missing types, undocumented behavior.
+- **For refactoring stories (PAT-E-423):** grep for ALL call sites of the function/method being abstracted or replaced. Count them, list them in the gemba table. A half-migration (abstracting 1 of N call sites) is worse than none — it creates an inconsistent codebase with two ways to do the same thing.
 
 **Verification:** Gemba table (or file list for S) populated from actual source reads.
 

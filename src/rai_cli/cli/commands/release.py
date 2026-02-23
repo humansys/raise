@@ -13,7 +13,7 @@ from rich.console import Console
 from rich.table import Table
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.context.graph import UnifiedGraph
+from rai_cli.graph.filesystem_backend import get_active_backend
 
 release_app = typer.Typer(help="Release management commands")
 console = Console()
@@ -46,7 +46,7 @@ def list_releases(
         )
 
     try:
-        graph = UnifiedGraph.load(graph_path)
+        graph = get_active_backend(graph_path).load()
     except Exception as e:
         cli_error(f"Error loading memory index: {e}")
 

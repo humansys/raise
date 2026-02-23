@@ -41,7 +41,7 @@
 | [RAISE-153](https://humansys.atlassian.net/browse/RAISE-153) | **Developer Enablement** | ✅ Complete | `work/epics/raise-153-developer-enablement/scope.md` | — |
 | [RAISE-168](https://humansys.atlassian.net/browse/RAISE-168) | **Neurosymbolic Memory Density** | ✅ Complete | `work/epics/raise-168-neurosymbolic-memory-density/scope.md` | — |
 | [RAISE-173](https://humansys.atlassian.net/browse/RAISE-173) | **Team Enablement & Operational Readiness** | 🚀 In Progress | — | P1 |
-| [RAISE-211](https://humansys.atlassian.net/browse/RAISE-211) | **Adapter Foundation** | 📋 Backlog | — | P1 (v2.2) |
+| [RAISE-211](https://humansys.atlassian.net/browse/RAISE-211) | **Adapter Foundation** | 🚀 In Progress | `work/epics/raise-211-adapter-foundation/scope.md` | P1 (v2.2) |
 | [RAISE-242](https://humansys.atlassian.net/browse/RAISE-242) | **Skill Ecosystem** | 📋 Backlog | — | P1 (v2.1 partial, v2.3 full) |
 | [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | 📋 Backlog | `work/epics/raise-247-cli-ontology/scope.md` | P0 (v2.1) |
 | [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | 📋 Backlog | `work/epics/raise-248-hooks-gates/scope.md` | P1 (v2.2) |

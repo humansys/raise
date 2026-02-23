@@ -71,6 +71,20 @@ class AgentsManifest(BaseModel):
     types: list[str] = Field(default_factory=lambda: ["claude"])
 
 
+class TierConfig(BaseModel):
+    """Tier configuration from manifest (optional section).
+
+    Attributes:
+        level: Tier level string (community, pro, enterprise).
+        backend_url: Backend URL for PRO/Enterprise tiers.
+        capabilities: List of capability strings enabled for this tier.
+    """
+
+    level: str = "community"
+    backend_url: str | None = None
+    capabilities: list[str] = Field(default_factory=list)
+
+
 class ProjectManifest(BaseModel):
     """Project manifest stored in .raise/manifest.yaml.
 
@@ -80,6 +94,7 @@ class ProjectManifest(BaseModel):
         branches: Branch naming configuration.
         ide: Legacy single-IDE configuration (backward compat — read/write).
         agents: Multi-agent configuration (new format).
+        tier: Optional tier configuration (S211.5).
     """
 
     version: str = "1.0"
@@ -87,6 +102,7 @@ class ProjectManifest(BaseModel):
     branches: BranchConfig = Field(default_factory=BranchConfig)
     ide: IdeManifest = Field(default_factory=IdeManifest)
     agents: AgentsManifest = Field(default_factory=AgentsManifest)
+    tier: TierConfig | None = None
 
     @model_validator(mode="before")
     @classmethod

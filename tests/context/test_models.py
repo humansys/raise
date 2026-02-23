@@ -4,7 +4,16 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.context.models import ConceptEdge, ConceptNode
+from rai_cli.context.models import (
+    ConceptEdge,
+    ConceptNode,
+    CoreEdgeTypes,
+    EpicNode,
+    GraphEdge,
+    GraphNode,
+    NodeType,
+    PatternNode,
+)
 
 
 class TestConceptNode:
@@ -39,33 +48,6 @@ class TestConceptNode:
         assert node.source_file is None
         assert node.metadata == {}
 
-    def test_create_skill_node(self) -> None:
-        """Test creating a skill node."""
-        node = ConceptNode(
-            id="/story-plan",
-            type="skill",
-            content="Decompose user stories into atomic executable tasks",
-            source_file=".claude/skills/story-plan/SKILL.md",
-            created="2026-02-03",
-            metadata={"phases": ["plan"]},
-        )
-        assert node.id == "/story-plan"
-        assert node.type == "skill"
-
-    def test_create_feature_node(self) -> None:
-        """Test creating a feature node."""
-        node = ConceptNode(
-            id="F11.1",
-            type="story",
-            content="Unified Graph Schema - Pydantic models and NetworkX wrapper",
-            source_file="dev/epic-e11-scope.md",
-            created="2026-02-03",
-            metadata={"size": "S", "epic": "E11"},
-        )
-        assert node.id == "F11.1"
-        assert node.type == "story"
-        assert node.metadata["epic"] == "E11"
-
     def test_create_module_node(self) -> None:
         """Test creating a module node for architecture knowledge."""
         node = ConceptNode(
@@ -86,29 +68,6 @@ class TestConceptNode:
         assert node.metadata["depends_on"] == ["core", "schemas"]
         assert node.metadata["components"] == 42
 
-    def test_all_node_types_valid(self) -> None:
-        """Test that all node types can be created."""
-        node_types = [
-            ("PAT-001", "pattern"),
-            ("CAL-001", "calibration"),
-            ("SES-001", "session"),
-            ("§1", "principle"),
-            ("RF-01", "requirement"),
-            ("OUT-001", "outcome"),
-            ("E11", "epic"),
-            ("F11.1", "story"),
-            ("/test", "skill"),
-            ("mod-core", "module"),
-        ]
-        for node_id, node_type in node_types:
-            node = ConceptNode(
-                id=node_id,
-                type=node_type,  # type: ignore[arg-type]
-                content=f"Test {node_type}",
-                created="2026-02-03",
-            )
-            assert node.type == node_type
-
     def test_token_estimate(self) -> None:
         """Test token estimation."""
         node = ConceptNode(
@@ -120,14 +79,145 @@ class TestConceptNode:
         assert node.token_estimate == 25  # 100 // 4
 
     def test_invalid_node_type_rejected(self) -> None:
-        """Test that invalid node types are rejected."""
-        with pytest.raises(ValueError):
-            ConceptNode(
-                id="TEST-001",
-                type="invalid_type",  # type: ignore[arg-type]
-                content="Test",
-                created="2026-02-03",
-            )
+        """Test that any string type is accepted (open type system)."""
+        node = ConceptNode(
+            id="TEST-001",
+            type="custom.plugin_type",
+            content="Test",
+            created="2026-02-03",
+        )
+        assert node.type == "custom.plugin_type"
+
+
+class TestGraphNode:
+    """Tests for GraphNode base class with auto-registration."""
+
+    def test_graphnode_subclass_registers_type(self) -> None:
+        """Subclass with node_type registers in the global registry."""
+
+        class _TestRegNode(GraphNode, node_type="test_reg_t1"):
+            ...
+
+        assert "test_reg_t1" in GraphNode.registered_types()
+        assert GraphNode.resolve("test_reg_t1") is _TestRegNode
+
+    def test_graphnode_resolve_unknown_raises(self) -> None:
+        """resolve() raises KeyError for unregistered types."""
+        with pytest.raises(KeyError):
+            GraphNode.resolve("nonexistent_type_xyz")
+
+    def test_graphnode_subclass_auto_sets_type(self) -> None:
+        """Subclass instances get type auto-set from registration."""
+
+        class _AutoNode(GraphNode, node_type="auto_test_t1"):
+            ...
+
+        node = _AutoNode(id="A1", content="hello", created="2026-01-01")
+        assert node.type == "auto_test_t1"
+
+    def test_graphnode_model_dump_includes_type(self) -> None:
+        """model_dump() includes the auto-set type field."""
+
+        class _DumpNode(GraphNode, node_type="dump_test_t1"):
+            ...
+
+        node = _DumpNode(id="D1", content="test", created="2026-01-01")
+        dumped = node.model_dump()
+        assert dumped["type"] == "dump_test_t1"
+
+    def test_graphnode_explicit_type_preserved(self) -> None:
+        """Explicitly provided type is not overwritten by auto-default."""
+
+        class _ExplicitNode(GraphNode, node_type="explicit_test_t1"):
+            ...
+
+        node = _ExplicitNode(
+            id="E1", type="custom_override", content="test", created="2026-01-01"
+        )
+        assert node.type == "custom_override"
+
+    def test_graphnode_base_no_auto_type(self) -> None:
+        """GraphNode base itself requires explicit type (no __node_type__)."""
+        node = GraphNode(id="B1", type="anything", content="test", created="2026-01-01")
+        assert node.type == "anything"
+
+    def test_graphnode_subclass_without_node_type_not_registered(self) -> None:
+        """Subclass without node_type kwarg is NOT registered."""
+
+        class _PlainSubclass(GraphNode):
+            extra: str = "value"
+
+        # Should not appear in registry
+        assert "_PlainSubclass" not in str(GraphNode.registered_types())
+
+
+class TestCoreNodeTypes:
+    """Tests for 18 core node type subclasses."""
+
+    EXPECTED_CORE_TYPES = {
+        "pattern",
+        "calibration",
+        "session",
+        "principle",
+        "requirement",
+        "outcome",
+        "project",
+        "epic",
+        "story",
+        "skill",
+        "decision",
+        "guardrail",
+        "term",
+        "component",
+        "module",
+        "architecture",
+        "bounded_context",
+        "layer",
+        "release",
+    }
+
+    def test_all_18_core_types_registered(self) -> None:
+        """All 18 core types appear in the registry."""
+        registered = set(GraphNode.registered_types().keys())
+        missing = self.EXPECTED_CORE_TYPES - registered
+        assert not missing, f"Missing core types: {missing}"
+
+    def test_epic_node_creates_with_correct_type(self) -> None:
+        """EpicNode auto-sets type to 'epic'."""
+        node = EpicNode(id="E1", content="test epic", created="2026-01-01")
+        assert node.type == "epic"
+        assert isinstance(node, GraphNode)
+
+    def test_pattern_node_creates_with_correct_type(self) -> None:
+        """PatternNode auto-sets type to 'pattern'."""
+        node = PatternNode(id="PAT-1", content="test", created="2026-01-01")
+        assert node.type == "pattern"
+
+    def test_conceptnode_alias_is_graphnode(self) -> None:
+        """ConceptNode is an alias for GraphNode."""
+        assert ConceptNode is GraphNode
+
+    def test_conceptnode_backward_compat(self) -> None:
+        """ConceptNode still works with explicit type for backward compat."""
+        node = ConceptNode(
+            id="X", type="epic", content="test", created="2026-01-01"
+        )
+        assert isinstance(node, GraphNode)
+        assert node.type == "epic"
+
+    def test_nodetype_is_str(self) -> None:
+        """NodeType is str (open type system)."""
+        assert NodeType is str
+
+    def test_conceptedge_alias_is_graphedge(self) -> None:
+        """ConceptEdge is an alias for GraphEdge."""
+        assert ConceptEdge is GraphEdge
+
+    def test_core_edge_types_constants(self) -> None:
+        """CoreEdgeTypes provides string constants for built-in edges."""
+        assert CoreEdgeTypes.LEARNED_FROM == "learned_from"
+        assert CoreEdgeTypes.PART_OF == "part_of"
+        assert CoreEdgeTypes.CONSTRAINED_BY == "constrained_by"
 
 
 class TestConceptEdge:
@@ -203,11 +293,11 @@ class TestConceptEdge:
         )
         assert edge.weight == 0.5
 
-    def test_invalid_edge_type_rejected(self) -> None:
-        """Test that invalid edge types are rejected."""
-        with pytest.raises(ValueError):
-            ConceptEdge(
-                source="A",
-                target="B",
-                type="invalid_type",  # type: ignore[arg-type]
-            )
+    def test_any_edge_type_accepted(self) -> None:
+        """Test that any string edge type is accepted (open type system)."""
+        edge = ConceptEdge(
+            source="A",
+            target="B",
+            type="jira.blocks",
+        )
+        assert edge.type == "jira.blocks"

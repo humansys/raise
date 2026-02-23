@@ -9,9 +9,12 @@ import re
 from pathlib import Path
 from typing import Any
 
+from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
+from rai_cli.context.models import GraphNode
 from rai_cli.core.text import sanitize_id
 from rai_cli.governance.models import Concept, ConceptType
+from rai_cli.governance.parsers._convert import concept_to_node
 
 
 def extract_principles(
@@ -99,3 +102,18 @@ def extract_principles(
             concepts.append(concept)
 
     return concepts
+
+
+class ConstitutionParser:
+    """GovernanceParser wrapper for Constitution principles."""
+
+    def can_parse(self, locator: ArtifactLocator) -> bool:
+        """Match Constitution artifact type."""
+        return locator.artifact_type == CoreArtifactType.CONSTITUTION
+
+    def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
+        """Parse Constitution file into GraphNode list."""
+        root = Path(locator.metadata["project_root"])
+        path = root / locator.path
+        concepts = extract_principles(path, root)
+        return [concept_to_node(c) for c in concepts]

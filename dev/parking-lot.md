@@ -14,6 +14,23 @@
 
 ---
 
+## Process
+
+- [ ] **Testing strategy: coverage target vs. mutation testing** — (SES-246, 2026-02-22)
+  - **Insight:** 90% coverage gate is Goodhart's Law — optimizes for line execution, not confidence. Evidence from S211.2: ~12 of 20 new tests exist for the metric, not for catching bugs. Constant assertions (`"x" == "x"`), mock-implementation tests (verify `_discover` called), and magic-number counts (`__all__ == 21`) are muda.
+  - **Alternative:** Coverage as alarm (warn <70%), not gate. Mutation testing (mutmut/cosmic-ray) as the real gate: if you mutate code and tests stay green, the tests don't work.
+  - **Principle:** "Each test justifies its existence" > "hit a number."
+  - **Scope:** Affects CI config, guardrails, all future stories. Needs spike + data.
+  - **Priority:** Medium — not blocking, but accumulates muda per story.
+
+- [ ] **Quality review skill (`/rai-quality-review`)** — (SES-246, 2026-02-22)
+  - **Insight:** Builder verifying own work is a known lean anti-pattern. S211.2 manual review caught 5 issues that the automated gates missed: type lies, tautological tests, unused imports, fragile counts, muda tests.
+  - **Mechanism:** Single parametrized skill (not one per phase). Acts as "external auditor with LLM eyes." Prompt: "If someone audits this with Codex/Grok, what would they find?"
+  - **Integration:** Embed as mandatory gate in `/rai-story-implement` T(final), not a separate optional step. Poka-yoke: can't skip because it's a plan task.
+  - **Priority:** Medium — value proven in S211.2, needs design before implementation.
+
+---
+
 ## Urgent
 
 - [x] **WorkLifecycle phase mismatch** — ✓ Fixed SES-136

@@ -38,6 +38,7 @@ from rai_cli.context.query import (
     wilson_lower_bound,
 )
 from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
+from rai_cli.graph.filesystem_backend import get_active_backend
 from rai_cli.memory import (
     CalibrationInput,
     MemoryScope,
@@ -510,9 +511,10 @@ def build(
     output_path = output or default_output
 
     # Load old graph for diff (before building new one)
-    old_graph: UnifiedGraph | None = None
+    backend = get_active_backend(output_path)
+    old_graph = None
     if not no_diff and output_path.exists():
-        old_graph = UnifiedGraph.load(output_path)
+        old_graph = backend.load()
 
     # Build unified graph
     builder = UnifiedGraphBuilder()
@@ -528,9 +530,8 @@ def build(
     for edge in graph.iter_relationships():
         edge_counts[edge.type] = edge_counts.get(edge.type, 0) + 1
 
-    # Save graph
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    graph.save(output_path)
+    # Save graph via backend
+    backend.persist(graph)
 
     # Compute and persist diff
     diff: GraphDiff | None = None
@@ -618,7 +619,7 @@ def validate(
         )
 
     console.print(f"\nLoading index from [cyan]{index_path}[/cyan]...")
-    graph = UnifiedGraph.load(index_path)
+    graph = get_active_backend(index_path).load()
     console.print(
         f"  ✓ Loaded index with {graph.node_count} concepts, {graph.edge_count} relationships"
     )
@@ -910,7 +911,7 @@ def list_memory(
 
     # Load unified graph
     try:
-        graph = UnifiedGraph.load(unified_path)
+        graph = get_active_backend(unified_path).load()
     except Exception as e:
         cli_error(f"Error loading memory index: {e}")
 

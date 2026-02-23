@@ -15,7 +15,15 @@ from __future__ import annotations
 from rai_cli.context.builder import UnifiedGraphBuilder
 from rai_cli.context.diff import GraphDiff, NodeChange, diff_graphs
 from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptEdge, ConceptNode, EdgeType, NodeType
+from rai_cli.context.models import (
+    ConceptEdge,
+    ConceptNode,
+    CoreEdgeTypes,
+    EdgeType,
+    GraphEdge,
+    GraphNode,
+    NodeType,
+)
 from rai_cli.context.query import (
     UnifiedQuery,
     UnifiedQueryEngine,
@@ -27,8 +35,11 @@ from rai_cli.context.query import (
 __all__ = [
     "ConceptEdge",
     "ConceptNode",
+    "CoreEdgeTypes",
     "EdgeType",
     "GraphDiff",
+    "GraphEdge",
+    "GraphNode",
     "NodeChange",
     "NodeType",
     "UnifiedGraph",
