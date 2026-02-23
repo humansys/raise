@@ -362,8 +362,10 @@ class TestPatternReinforceCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_reinforce_with_from_flag(self, tmp_path: Path, patterns_file: Path) -> None:
-        """Test reinforce with --from story ID for traceability."""
+    def test_reinforce_with_from_flag_updates_score(
+        self, tmp_path: Path, patterns_file: Path
+    ) -> None:
+        """Test reinforce with --from updates the score (story_id is traceability-only, not stored in v1)."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
@@ -383,5 +385,7 @@ class TestPatternReinforceCommand:
             )
 
             assert result.exit_code == 0
+            # Fixture starts with positives=1; a second positive vote → positives=2
+            assert "positives=2" in result.stdout
         finally:
             os.chdir(original_cwd)
