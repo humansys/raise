@@ -20,8 +20,9 @@ to which concern, our solution maps each command to exactly one bounded context.
 - **Lagging:** RAISE-248 (Hooks & Gates) wires events without renaming; skill update sweep (S8) is mechanical find-replace with zero ambiguity
 
 ## Appetite
-L — 8 implementable stories (S1-S8), S9 deferred to future release cycle.
-Estimated ~4-5 hours across 2 sessions.
+M — 6 stories (S1-S6), down from 8 after architecture review.
+S1-S5 are independent (parallel). S6 (sweep) depends on all.
+Estimated ~3-4 hours across 1-2 sessions.
 
 ## Scope Boundaries
 ### In (MUST)
@@ -38,12 +39,14 @@ Estimated ~4-5 hours across 2 sessions.
 - Registry migration from filesystem state on first run
 
 ### No-Gos
-- Removing backward-compat aliases (S9, deferred to future release)
+- Removing backward-compat aliases (deferred to future release)
+- Skill Registry (deferred to RAISE-242 — no custom skills in production yet)
+- Absorbing `discover build` into `graph build` (coupling risk, arch review R2)
 - `rai skill pull` / org skill sources (parking lot)
 - Skill marketplace integration
 - Changing `adapters` group (E211, already well-bounded)
 
 ### Rabbit Holes
-- Over-designing the skill registry — it's a JSON file with Pydantic models, not a database
-- Trying to make `signal emit` support future event types not yet defined
+- Unifying signal subcommands into one command with type argument (different signatures, arch review R1)
 - Attempting cross-cutting refactors beyond the CLI command layer (internals stay stable)
+- Renaming internal paths (`.raise/rai/memory/`) — CLI surface only
