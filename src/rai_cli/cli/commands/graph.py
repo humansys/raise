@@ -165,8 +165,8 @@ def query(
         query=query_str,
         strategy=query_strategy,
         max_depth=1,
-        types=types_list,  # type: ignore[arg-type]
-        edge_types=edge_types_list,  # type: ignore[arg-type]
+        types=types_list,
+        edge_types=edge_types_list,
         limit=limit,
     )
 
@@ -502,7 +502,7 @@ def _format_build_result(
     diff: GraphDiff | None = None,
 ) -> None:
     """Format and print graph build results."""
-    console.print("\n[cyan]Building memory index...[/cyan]")
+    console.print("\n[cyan]Building graph index...[/cyan]")
 
     # Display node counts
     console.print("\n[bold]Concepts by type:[/bold]")
@@ -631,38 +631,34 @@ def validate(
 
 
 def _detect_cycles(graph: UnifiedGraph, edges: list[ConceptEdge]) -> list[list[str]]:
-    """Detect cycles in a set of edges using DFS."""
-    # Build adjacency list from edges
+    """Detect cycles in a set of edges using iterative DFS.
+
+    Iterative (not recursive) to avoid RecursionError on large graphs.
+    Complexity: O(V + E).
+    """
     adj: dict[str, list[str]] = {}
     for edge in edges:
         adj.setdefault(edge.source, []).append(edge.target)
 
     cycles: list[list[str]] = []
-    visited: set[str] = set()
-    rec_stack: set[str] = set()
-
-    def dfs(node: str, path: list[str]) -> None:
-        visited.add(node)
-        rec_stack.add(node)
-        path.append(node)
-
-        for neighbor in adj.get(node, []):
-            if neighbor not in visited:
-                dfs(neighbor, path[:])
-            elif neighbor in rec_stack:
-                # Cycle detected
-                cycle_start = path.index(neighbor)
-                cycle = path[cycle_start:] + [neighbor]
-                cycles.append(cycle)
-
-        rec_stack.remove(node)
-
-    # Get all node IDs
     node_ids = {node.id for node in graph.iter_concepts()}
 
-    for node in node_ids:
-        if node not in visited and node in adj:
-            dfs(node, [])
+    for start in node_ids:
+        if start not in adj:
+            continue
+        visited: set[str] = set()
+        stack: list[tuple[str, list[str]]] = [(start, [start])]
+        while stack:
+            node, path = stack.pop()
+            if node in visited:
+                continue
+            visited.add(node)
+            for neighbor in adj.get(node, []):
+                if neighbor in path:
+                    cycle_start = path.index(neighbor)
+                    cycles.append(path[cycle_start:] + [neighbor])
+                else:
+                    stack.append((neighbor, path + [neighbor]))
 
     return cycles
 
