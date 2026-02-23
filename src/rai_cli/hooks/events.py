@@ -78,6 +78,17 @@ class SessionStartEvent(HookEvent):
 
 
 @dataclass(frozen=True)
+class SessionCloseEvent(HookEvent):
+    """Emitted after a session closes."""
+
+    event_name: Literal["session:close"] = field(  # type: ignore[assignment]
+        default="session:close", init=False
+    )
+    session_id: str = ""
+    outcome: str = ""
+
+
+@dataclass(frozen=True)
 class GraphBuildEvent(HookEvent):
     """Emitted after a graph build completes."""
 
@@ -87,6 +98,76 @@ class GraphBuildEvent(HookEvent):
     project_path: Path = field(default_factory=lambda: Path("."))
     node_count: int = 0
     edge_count: int = 0
+
+
+@dataclass(frozen=True)
+class PatternAddedEvent(HookEvent):
+    """Emitted after a pattern is added to memory."""
+
+    event_name: Literal["pattern:added"] = field(  # type: ignore[assignment]
+        default="pattern:added", init=False
+    )
+    pattern_id: str = ""
+    content: str = ""
+    context: str = ""
+
+
+@dataclass(frozen=True)
+class DiscoverScanEvent(HookEvent):
+    """Emitted after a discovery scan completes."""
+
+    event_name: Literal["discover:scan"] = field(  # type: ignore[assignment]
+        default="discover:scan", init=False
+    )
+    project_path: Path = field(default_factory=lambda: Path("."))
+    language: str = ""
+    component_count: int = 0
+
+
+@dataclass(frozen=True)
+class InitCompleteEvent(HookEvent):
+    """Emitted after project initialization completes."""
+
+    event_name: Literal["init:complete"] = field(  # type: ignore[assignment]
+        default="init:complete", init=False
+    )
+    project_path: Path = field(default_factory=lambda: Path("."))
+    project_name: str = ""
+
+
+@dataclass(frozen=True)
+class AdapterLoadedEvent(HookEvent):
+    """Emitted after an adapter is successfully loaded from entry points."""
+
+    event_name: Literal["adapter:loaded"] = field(  # type: ignore[assignment]
+        default="adapter:loaded", init=False
+    )
+    adapter_name: str = ""
+    group: str = ""
+    adapter_type: str = ""
+
+
+@dataclass(frozen=True)
+class AdapterFailedEvent(HookEvent):
+    """Emitted when an adapter fails to load from entry points."""
+
+    event_name: Literal["adapter:failed"] = field(  # type: ignore[assignment]
+        default="adapter:failed", init=False
+    )
+    adapter_name: str = ""
+    group: str = ""
+    error: str = ""
+
+
+@dataclass(frozen=True)
+class ReleasePublishEvent(HookEvent):
+    """Emitted after a release is published."""
+
+    event_name: Literal["release:publish"] = field(  # type: ignore[assignment]
+        default="release:publish", init=False
+    )
+    version: str = ""
+    project_path: Path = field(default_factory=lambda: Path("."))
 
 
 # ---------------------------------------------------------------------------
