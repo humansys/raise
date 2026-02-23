@@ -9,19 +9,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from rai_cli.adapters.registry import (
-    EP_DOC_TARGETS,
     EP_GOVERNANCE_PARSERS,
-    EP_GOVERNANCE_SCHEMAS,
-    EP_GRAPH_BACKENDS,
     EP_PM_ADAPTERS,
     _discover,
-    get_doc_targets,
     get_governance_parsers,
-    get_governance_schemas,
     get_graph_backends,
     get_pm_adapters,
 )
-
 
 # --- Helpers ---
 
@@ -83,9 +77,8 @@ class TestDiscover:
         with patch(
             "rai_cli.adapters.registry.entry_points",
             return_value=[good_ep, bad_ep],
-        ):
-            with caplog.at_level(logging.WARNING):
-                result = _discover("rai.adapters.pm")
+        ), caplog.at_level(logging.WARNING):
+            result = _discover("rai.adapters.pm")
 
         assert result == {"good": good_cls}
         assert "bad" in caplog.text
@@ -104,9 +97,8 @@ class TestDiscover:
 
         with patch(
             "rai_cli.adapters.registry.entry_points", return_value=eps
-        ):
-            with caplog.at_level(logging.WARNING):
-                result = _discover("rai.test.group")
+        ), caplog.at_level(logging.WARNING):
+            result = _discover("rai.test.group")
 
         assert result == {"a": cls_a, "c": cls_c}
         assert "b" in caplog.text
@@ -120,9 +112,8 @@ class TestDiscover:
 
         with patch(
             "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
-        ):
-            with caplog.at_level(logging.WARNING):
-                result = _discover("rai.adapters.pm")
+        ), caplog.at_level(logging.WARNING):
+            result = _discover("rai.adapters.pm")
 
         assert result == {}
         assert "not_a_class" in caplog.text

@@ -224,7 +224,7 @@ class TestSkillSyncUpgrade:
         skill_md.write_text("old content from previous version", encoding="utf-8")
         data["skills"][skill_name]["sha256"] = (
             __import__("hashlib")
-            .sha256("old content from previous version".encode())
+            .sha256(b"old content from previous version")
             .hexdigest()
         )
         manifest_path.write_text(json.dumps(data), encoding="utf-8")
@@ -316,7 +316,7 @@ class TestSkillSyncUpgrade:
         skill_md.write_text("old version content", encoding="utf-8")
         data["skills"][skill_name]["sha256"] = (
             __import__("hashlib")
-            .sha256("old version content".encode())
+            .sha256(b"old version content")
             .hexdigest()
         )
         manifest_path.write_text(json.dumps(data), encoding="utf-8")

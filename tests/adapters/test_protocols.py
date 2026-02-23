@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -22,7 +21,6 @@ from rai_cli.adapters.protocols import (
     ProjectManagementAdapter,
 )
 from rai_cli.context.models import GraphNode
-
 
 # --- Conforming stubs ---
 
@@ -73,7 +71,7 @@ class StubGraphBackend:
     def persist(self, graph: Any) -> None:
         pass
 
-    def load(self, path: Path) -> Any:
+    def load(self) -> Any:
         return None
 
     def health(self) -> BackendHealth:
