@@ -1,8 +1,8 @@
 ---
 epic: RAISE-247
 title: "CLI Ontology Restructuring"
-status: scoped
-branch: v2
+status: in-progress
+branch: epic/e247/cli-ontology
 adr: ADR-038
 date: 2026-02-21
 size: L
@@ -12,16 +12,17 @@ size: L
 
 ## Objective
 
-Restructure the `rai` CLI from 10 groups / 36 commands to 9 groups / 27 commands by
+Restructure the `rai` CLI from 11 groups / 41 commands to 10 groups / 30 commands by
 decomposing the `memory` God Object into bounded contexts, killing redundancies, and
 merging overlapping groups. The CLI is consumed by agents executing skills, not by
 humans directly — precision and prevention of concern leakage take priority over
 anthropomorphic naming.
 
-## Current State
+## Current State (post-E211)
 
 ```
 rai init
+rai adapters   (2 commands)     ← NEW from E211, clean
 rai session    (3 commands)     ← clean
 rai memory     (15 commands)    ← GOD OBJECT: graph + patterns + telemetry + deprecated
 rai discover   (4 commands)     ← has graph merge step that belongs elsewhere
@@ -46,6 +47,7 @@ rai graph build|validate|query|    # Knowledge graph structure
 rai pattern add|reinforce          # Learned knowledge
 rai signal emit                    # Process telemetry
 
+rai adapters list|check            # Adapter inspection (from E211)
 rai discover scan|analyze|drift    # Codebase understanding
 rai skill list|validate|           # Skill governance
        check-name|scaffold
@@ -208,8 +210,8 @@ S9 is deferred to a future release cycle.
    `project-onboard` skills for on-demand governance extraction.
 2. **`pattern list` deferred.** Not day-one. `graph list --types pattern` covers it.
    Add when pattern curation becomes a real workflow.
-3. **Branch model:** Stories branch directly from `v2` (branchless epic pattern, same
-   as RAISE-144 Engineering Health).
+3. **Branch model:** Stories branch from `epic/e247/cli-ontology` (standard epic pattern).
+4. **`adapters` group unchanged** — newly created in E211, already well-bounded. Stays as-is.
 
 ## Verification Gate
 
