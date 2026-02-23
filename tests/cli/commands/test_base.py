@@ -1,4 +1,4 @@
-"""Tests for raise base CLI commands."""
+"""Tests for rai info command (formerly base show)."""
 
 from __future__ import annotations
 
@@ -12,19 +12,19 @@ from rai_cli.cli.main import app
 runner = CliRunner()
 
 
-class TestBaseShow:
-    """Tests for raise base show command."""
+class TestInfo:
+    """Tests for rai info command."""
 
     def test_shows_base_version(self) -> None:
         """Should display base Rai version."""
-        result = runner.invoke(app, ["base", "show"])
+        result = runner.invoke(app, ["info"])
 
         assert result.exit_code == 0
         assert "1.0.0" in result.output
 
     def test_shows_bundled_contents(self) -> None:
         """Should show identity files, patterns, methodology."""
-        result = runner.invoke(app, ["base", "show"])
+        result = runner.invoke(app, ["info"])
 
         assert result.exit_code == 0
         assert "identity" in result.output.lower() or "Identity" in result.output
@@ -38,9 +38,9 @@ class TestBaseShow:
         (identity_dir / "core.md").write_text("# Rai")
 
         with patch(
-            "rai_cli.cli.commands.base._get_project_root", return_value=tmp_path
+            "rai_cli.cli.commands.info._get_project_root", return_value=tmp_path
         ):
-            result = runner.invoke(app, ["base", "show"])
+            result = runner.invoke(app, ["info"])
 
         assert result.exit_code == 0
         assert "installed" in result.output.lower()
@@ -48,9 +48,9 @@ class TestBaseShow:
     def test_shows_not_installed_when_missing(self, tmp_path: Path) -> None:
         """Should show not installed when .raise/rai/ doesn't exist."""
         with patch(
-            "rai_cli.cli.commands.base._get_project_root", return_value=tmp_path
+            "rai_cli.cli.commands.info._get_project_root", return_value=tmp_path
         ):
-            result = runner.invoke(app, ["base", "show"])
+            result = runner.invoke(app, ["info"])
 
         assert result.exit_code == 0
         assert "not installed" in result.output.lower()

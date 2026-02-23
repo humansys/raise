@@ -106,20 +106,16 @@ class TestProfileShowCommand:
         assert "skip_praise: true" in result.output
 
 
-class TestProfileHelp:
-    """Tests for profile command help."""
+class TestProfileNoSubcommand:
+    """Tests for rai profile (no subcommand) showing profile directly."""
 
-    def test_profile_no_args_shows_help(self) -> None:
-        """Profile without subcommand shows help."""
-        result = runner.invoke(app, ["profile"])
+    def test_profile_no_args_shows_profile_or_message(self, mock_home: Path) -> None:
+        """Profile without subcommand shows profile data or helpful message."""
+        mock_home.mkdir(parents=True, exist_ok=True)
 
-        # no_args_is_help=True causes exit code 0 or 2
-        assert result.exit_code in (0, 2)
-        assert "show" in result.output
-
-    def test_profile_show_help(self) -> None:
-        """Profile show --help shows usage."""
-        result = runner.invoke(app, ["profile", "show", "--help"])
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(app, ["profile"], catch_exceptions=False)
 
         assert result.exit_code == 0
-        assert "Display the developer profile" in result.output
+        # Should show helpful message (no profile exists), not help text
+        assert "no developer profile found" in result.output.lower()
