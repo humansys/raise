@@ -21,13 +21,13 @@ from typing import Annotated
 import typer
 
 from rai_cli.cli.error_handler import cli_error
+from rai_cli.exceptions import RaiSessionNotFoundError
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import (
     BeforeSessionCloseEvent,
     SessionCloseEvent,
     SessionStartEvent,
 )
-from rai_cli.exceptions import RaiSessionNotFoundError
 from rai_cli.memory.writer import get_next_id, validate_session_index
 from rai_cli.onboarding.profile import (
     DeveloperProfile,

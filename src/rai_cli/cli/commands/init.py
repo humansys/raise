@@ -25,9 +25,9 @@ from rich.console import Console
 from rich.panel import Panel
 
 from rai_cli.config.agent_registry import AgentRegistry, load_registry
+from rai_cli.config.agents import AgentChoice, AgentConfig
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import InitCompleteEvent
-from rai_cli.config.agents import AgentChoice, AgentConfig
 from rai_cli.onboarding.bootstrap import BootstrapResult
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type

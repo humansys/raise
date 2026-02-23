@@ -24,8 +24,6 @@ from rich.console import Console
 from rich.table import Table
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import GraphBuildEvent
 from rai_cli.compat import to_file_uri
 from rai_cli.config.paths import get_memory_dir, get_personal_dir
 from rai_cli.context import UnifiedGraph, UnifiedGraphBuilder
@@ -40,6 +38,8 @@ from rai_cli.context.query import (
 )
 from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
 from rai_cli.graph.filesystem_backend import get_active_backend
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import GraphBuildEvent
 
 # Default index file name
 INDEX_FILE = "index.json"
