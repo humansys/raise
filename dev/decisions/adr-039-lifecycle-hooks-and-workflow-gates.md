@@ -67,8 +67,9 @@ class GraphBuildEvent(HookEvent):
     edge_count: int
 ```
 
-Events have `before:` and `after:` variants. `before:` hooks can abort; `after:` hooks
-observe only.
+Only events with documented abort use cases get `before:` variants (`release:publish`,
+`session:close`). All others are `after:` only. Add `before:` to others when a consumer
+exists (YAGNI).
 
 ### 3. Entry point discovery (same as RAISE-211)
 
@@ -87,7 +88,33 @@ An exception in a hook is caught, logged, and skipped. The operation continues.
 Gates run all-must-pass at a given workflow point. A single failure blocks the operation
 with a reason message.
 
-### 5. Side effects move to hooks; inputs stay in skills
+### 5. Standalone gates with bridge hook
+
+Gates are standalone validators invoked via `rai gate check`. They have **no dependency
+on the event emitter**. A built-in `GateBridgeHook` (a LifecycleHook implementation)
+connects gates to `before:` events for auto-enforcement.
+
+```python
+class GateBridgeHook:
+    """Wires standalone gates into before: events. Poka-yoke for auto-enforcement."""
+    events = ["before:release:publish", "before:session:close"]
+
+    def handle(self, event: HookEvent) -> HookResult:
+        gates = get_gates_for_point(event.name)
+        results = [g.evaluate(context) for g in gates]
+        if any(not r.passed for r in results):
+            return HookResult(status="abort", message=format_failures(results))
+        return HookResult(status="ok")
+```
+
+This means:
+- Gates are testeable standalone (`rai gate check` works without the event bus)
+- Auto-enforcement exists via the bridge (poka-yoke)
+- No semantic overlap between hook-abort and gate-block — the bridge adapts
+- PRO replaces the bridge with richer logic (gate results → backend metrics)
+- The bridge is a real consumer of the LifecycleHook Protocol (dogfooding)
+
+### 6. Side effects move to hooks; inputs stay in skills
 
 Skills lose: `rai signal emit`, `rai memory emit-work`, prerequisite checks.
 Skills keep: `rai graph query`, `rai graph context`, `rai pattern add`.
@@ -104,6 +131,9 @@ If it's a side effect invisible to the agent, hooks/gates absorb it.
 | ✅ Positive | PRO/Enterprise extend via same mechanism (install hook, higher priority) |
 | ✅ Positive | Consistent extension model — adapters, hooks, gates all use entry points |
 | ✅ Positive | Skills become pure process instructions — easier to generate (RAISE-242) |
+| ✅ Positive | Gates testeable standalone without event bus (AD-5) |
+| ✅ Positive | GateBridgeHook dogfoods the hook Protocol |
+| ✅ Positive | Selective `before:` reduces event surface from 18 to 11 |
 | ⚠️ Negative | Two new protocols to understand for adapter authors |
 | ⚠️ Negative | S248.7 touches 22 skills — large blast radius |
 | ⚠️ Negative | Hook timeout tuning needs empirical calibration |
@@ -116,6 +146,9 @@ If it's a side effect invisible to the agent, hooks/gates absorb it.
 | Config-based hooks (shell commands in YAML) | Scripting model, not extensibility. No typing, no validation, no IDE support. Has its place (Claude Code uses it) but doesn't build the typed extension layer E248 needs. |
 | Async hooks with event loop | CLI is execute-and-terminate, not a server. Async adds complexity (async def, event loop mgmt) with no benefit for local I/O or short HTTP calls. |
 | `rai skill prepare` pre-processor | Couples skills to CLI. Skills should be readable markdown, not programs that need a build step. Hooks solve the same problem without coupling. |
+| Gates as event-driven | Couples gates to event emitter. Creates overlap with hook-abort semantics. Prevents parallel track execution. |
+| Gates as standalone only (no bridge) | No auto-enforcement. Skills still need "run gate check" instructions. Misses poka-yoke opportunity. |
+| `before:` for all events | Doubles surface area (18 variants). No documented abort consumer for most events. YAGNI. |
 
 ---
 

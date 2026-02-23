@@ -34,12 +34,12 @@ adapters use for their own cross-cutting concerns.
 
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
-| S248.1 | Event emitter infrastructure | M | Pending | Core event bus with typed dataclass events and before/after pattern |
+| S248.1 | Event emitter infrastructure | M | Pending | Core event bus with typed dataclass events; `before:` only for release/session |
 | S248.2 | Hook Protocol and registry | M | Pending | `LifecycleHook` Protocol, entry point discovery, priority dispatch |
 | S248.3 | Built-in TelemetryHook | S | Pending | COMMUNITY hook that replaces manual `rai signal emit` in skills |
 | S248.4 | Wire events into CLI commands | M | Pending | Add `emit()` calls to 8 CLI command groups |
-| S248.5 | WorkflowGate Protocol and registry | M | Pending | `WorkflowGate` Protocol, gate composition, `rai gate check` command |
-| S248.6 | Built-in gates | S | Pending | tests, types, lint, coverage — executable guardrails |
+| S248.5 | WorkflowGate Protocol and registry | M | Pending | Standalone `WorkflowGate` Protocol, `rai gate check` command, no event dependency |
+| S248.6 | Built-in gates + GateBridgeHook | S | Pending | 4 quality gates + bridge hook that wires gates into `before:` events |
 | S248.7 | Remove ceremony from skills | M | Pending | Strip telemetry/prerequisite steps from all 22 skills |
 
 **Total:** 7 stories (4M + 2S + 1M), estimated 5-7 days
@@ -49,12 +49,14 @@ adapters use for their own cross-cutting concerns.
 ## In Scope
 
 **MUST:**
-- Event emitter with typed dataclass events (frozen, with before/after variants)
+- Event emitter with typed frozen dataclass events
+- `before:` variants only for events with documented abort use cases (`release:publish`, `session:close`)
 - `LifecycleHook` Protocol with entry point discovery (`rai.hooks`)
-- `WorkflowGate` Protocol with entry point discovery (`rai.gates`)
+- `WorkflowGate` Protocol with entry point discovery (`rai.gates`) — standalone, no event dependency
+- `GateBridgeHook` that wires gates into `before:` events (auto-enforcement poka-yoke)
 - Built-in TelemetryHook (COMMUNITY) replacing manual emit calls
 - Built-in quality gates (tests, types, lint, coverage)
-- `rai gate check <gate-id>` CLI command
+- `rai gate check <gate-id>` CLI command for manual/CI invocation
 - Ceremony removal from all 22 skills in `skills_base/`
 - Hook error isolation (exception → log + continue, never crash CLI)
 
@@ -111,6 +113,36 @@ adapters use for their own cross-cutting concerns.
 
 **Rationale:** The dividing line is whether the agent needs the result in its context. Graph queries are inputs the agent reads and uses for decisions. Signal emissions are side effects invisible to the agent. Gates replace prerequisite checks that skills currently do manually.
 
+### AD-5: Standalone gates with bridge hook (architecture review Q1/Q2)
+
+**Decision:** Gates are standalone validators invoked via `rai gate check`. A `GateBridgeHook` (built-in LifecycleHook) connects gates to `before:` events for auto-enforcement.
+
+**Rationale (from architecture review):**
+- **Gates don't depend on the event emitter.** S248.5-S248.6 parallelize with S248.1-S248.2.
+- **No semantic overlap.** Hooks react (observer), gates validate (guard), bridge adapts between them. Each has one job.
+- **Testeable standalone.** `rai gate check gate-tests` works without the event bus.
+- **Dogfooding.** The bridge hook is a real consumer of the LifecycleHook Protocol.
+- **PRO extensibility.** PRO replaces the bridge hook with richer logic (e.g., gate results → backend metrics).
+
+**Rejected:**
+- Gates as event-driven (couples gates to emitter, creates overlap with hook abort semantics)
+- Gates as standalone only (no auto-enforcement, skills still need "run gate check" instructions)
+
+### AD-6: Selective `before:` variants (architecture review R2)
+
+**Decision:** Only events with a documented abort use case get `before:` variants. All others are `after:` only.
+
+**Events with `before:`:** `release:publish`, `session:close`
+**Events `after:` only:** `session:start`, `graph:build`, `pattern:added`, `discover:scan`, `init:complete`, `adapter:loaded`, `adapter:failed`
+
+**Rationale:** Doubles the event surface from 9 to 18 with no consumer for most `before:` variants. Add `before:` to others when a consumer exists. YAGNI.
+
+### AD-7: Drop `signal:emitted` from event catalog (architecture review R1)
+
+**Decision:** Remove `signal:emitted` from the initial event catalog.
+
+**Rationale:** S248.7 removes all `rai signal emit` calls from skills — the primary consumer of the command. The event exists for manual/script use only, and no hook subscribes to it. Add it back if a consumer appears.
+
 ---
 
 ## Done Criteria
@@ -135,16 +167,18 @@ adapters use for their own cross-cutting concerns.
 ## Dependency Order
 
 ```
-S248.1 (event emitter) → S248.2 (hook protocol) → S248.3 (telemetry hook)
-                                                 → S248.4 (wire events)
-                          S248.5 (gate protocol) → S248.6 (built-in gates)
-                                                            ↓
-                                                 S248.7 (remove ceremony)
+Track A (hooks):    S248.1 (event emitter) → S248.2 (hook protocol) → S248.3 (telemetry hook)
+                                                                    → S248.4 (wire events)
+
+Track B (gates):    S248.5 (gate protocol) → S248.6 (built-in gates + GateBridgeHook)
+                                                ↑ needs S248.2 for bridge hook only
+
+Both tracks complete → S248.7 (remove ceremony)
 ```
 
-- S248.1–S248.2: infrastructure (sequential)
-- S248.3–S248.6: can partially parallelize after S248.2
-- S248.5 depends on S248.1 (uses same event model) but NOT on S248.2
+- **Track A** (S248.1→S248.2→S248.3/S248.4) and **Track B** (S248.5→S248.6) run in parallel
+- S248.5 is fully independent — gates have no event dependency (AD-5)
+- S248.6 includes the GateBridgeHook, which needs S248.2 (hook Protocol) to exist
 - S248.7 goes last — requires S248.3, S248.4, S248.6 all complete
 
 ---
