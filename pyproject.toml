@@ -67,6 +67,7 @@ glossary = "rai_cli.governance.parsers.glossary:GlossaryParser"
 
 [project.entry-points."rai.hooks"]
 telemetry = "rai_cli.hooks.builtin.telemetry:TelemetryHook"
+gate-bridge = "rai_cli.hooks.builtin.gate_bridge:GateBridgeHook"
 
 [project.entry-points."rai.gates"]
 tests = "rai_cli.gates.builtin.tests:TestGate"
