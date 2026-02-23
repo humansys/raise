@@ -162,8 +162,9 @@ CLI Quick Reference and README.
 
 ### Deferred (not in this epic)
 
-- **S7 (was): Local Skill Registry** → Deferred to RAISE-242 (Skill Ecosystem).
-  No custom skills in production yet; S6 can sweep directly. (Arch review Q1)
+- **S7 (was): Local Skill Registry** → Deferred to RAISE-242/S0 (Skill Ecosystem).
+  No custom skills in production yet; S6 can sweep directly. Trigger to promote:
+  first custom skill in a client project. (Arch review Q1)
 - **S9 (was): Remove backward-compat aliases** → Future release cycle.
 - **S6 (was): Absorb discover build** → Kept in discover group.
   Coupling risk outweighs 1-command reduction. (Arch review R2)
@@ -229,6 +230,77 @@ rai release list
 rai info
 rai profile
 ```
+
+---
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-23
+
+### Execution Order
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|:------------:|:---------:|-----------|
+| 1 | S1: Create `graph` group | M | None | M1 | Largest extraction (7 cmds), proves the pattern |
+| 2 | S2: Create `pattern` group | S | None | M1 | Same pattern as S1, smaller (2 cmds) |
+| 3 | S3: Create `signal` group | S | None | M1 | Same pattern, 3 subcommands |
+| 4 | S4: Kill redundancies | XS | None | M2 | Quick win — remove 3 dead commands |
+| 5 | S5: Merge publish+release | S | None | M2 | Different pattern (merge, not extract) |
+| 6 | S6: Skill + docs sweep | M | S1-S5 | M3 | Must go last — uses new names |
+
+**Note:** S1-S5 are independent and could run in any order. Sequential execution
+chosen for clean commits and incremental validation. S1 first because it's the
+largest and establishes the extraction pattern (new file, register, backward-compat
+shim) that S2-S3 replicate at smaller scale.
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: God Object Decomposed** | S1, S2, S3 | `memory` has 0 active commands. `graph` (7), `pattern` (2), `signal` (3) work. Backward-compat aliases work. |
+| **M2: Clean Taxonomy** | S4, S5 | 3 dead commands removed. `publish` merged into `release`. `base`/`profile` flattened. |
+| **M3: Epic Complete** | S6 | 0 stale refs in skills_base/ + CLAUDE.md. Verification gate passes. Ready for `/rai-epic-close`. |
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+S1 (graph) → S2 (pattern) → S3 (signal) → S4 (kill) → S5 (merge) → S6 (sweep)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+        M1 ─────────────────┘    M2 ──────┘   M3 ┘
+```
+
+Single-stream sequential. S1-S5 *could* parallelize but the extraction pattern
+is the same for S1-S3 — doing S1 first establishes it, then S2-S3 are mechanical.
+Context switching between parallel branches adds merge overhead that exceeds the
+time saved for these small stories.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S1: graph group | M | Pending | - | - | |
+| S2: pattern group | S | Pending | - | - | |
+| S3: signal group | S | Pending | - | - | |
+| S4: kill redundancies | XS | Pending | - | - | |
+| S5: merge+flatten | S | Pending | - | - | |
+| S6: skill sweep | M | Pending | - | - | |
+
+**Milestones:**
+- [ ] M1: God Object Decomposed
+- [ ] M2: Clean Taxonomy
+- [ ] M3: Epic Complete
+
+### Risks
+
+| Risk | L | I | Mitigation |
+|------|:-:|:-:|------------|
+| PAT-E-151: rename long tail (stale refs missed) | M | M | Grep verification gate in S6 + backward-compat aliases as safety net |
+| Typer backward-compat: alias routing may have edge cases | L | M | Test each alias in S1 (first story validates the approach) |
+| 22-skill sweep in S6 is tedious and error-prone | M | L | Mechanical find-replace + grep gate. No judgment needed. |
+
+---
 
 ## References
 
