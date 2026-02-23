@@ -15,20 +15,19 @@ from __future__ import annotations
 import logging
 from collections import defaultdict
 from collections.abc import Callable
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
-
-from rai_cli.hooks.events import EmitResult, HookEvent, HookResult
-
-logger = logging.getLogger(__name__)
-
-HandlerFn = Callable[[HookEvent], HookResult]
-
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FuturesTimeoutError
 from typing import TYPE_CHECKING
 
+from rai_cli.hooks.events import EmitResult, HookEvent, HookResult
 from rai_cli.hooks.protocol import LifecycleHook
 
 if TYPE_CHECKING:
     from rai_cli.hooks.registry import HookRegistry
+
+logger = logging.getLogger(__name__)
+
+HandlerFn = Callable[[HookEvent], HookResult]
 
 
 class EventEmitter:
