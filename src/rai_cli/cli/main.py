@@ -18,10 +18,10 @@ from rai_cli.cli.commands.init import init_command
 from rai_cli.cli.commands.memory import memory_app
 from rai_cli.cli.commands.pattern import pattern_app
 from rai_cli.cli.commands.profile import profile_app
-from rai_cli.cli.commands.signal import signal_app
 from rai_cli.cli.commands.publish import publish_app
 from rai_cli.cli.commands.release import release_app
 from rai_cli.cli.commands.session import session_app
+from rai_cli.cli.commands.signal import signal_app
 from rai_cli.cli.commands.skill import skill_app
 from rai_cli.config import RaiSettings
 

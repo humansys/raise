@@ -1021,3 +1021,72 @@ class TestMemoryEmitCalibrationCommand:
             os.chdir(original_cwd)
 
 
+class TestMemoryEmitSignalShims:
+    """Tests for `rai memory emit-*` deprecation shims (extracted to signal group)."""
+
+    def test_emit_work_deprecation_warning(self, tmp_path: Path) -> None:
+        """Test that rai memory emit-work shows deprecation warning with correct target."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            telemetry_dir = tmp_path / ".raise" / "rai" / "telemetry"
+            telemetry_dir.mkdir(parents=True)
+
+            result = runner.invoke(
+                app,
+                ["memory", "emit-work", "story", "S1", "-e", "start", "-p", "design"],
+            )
+
+            assert result.exit_code == 0
+            assert "DEPRECATED" in result.output
+            assert "rai signal emit-work" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_emit_session_deprecation_warning(self, tmp_path: Path) -> None:
+        """Test that rai memory emit-session shows deprecation warning with correct target."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            telemetry_dir = tmp_path / ".raise" / "rai" / "telemetry"
+            telemetry_dir.mkdir(parents=True)
+
+            result = runner.invoke(
+                app,
+                ["memory", "emit-session", "-t", "story", "-o", "success"],
+            )
+
+            assert result.exit_code == 0
+            assert "DEPRECATED" in result.output
+            assert "rai signal emit-session" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_emit_calibration_deprecation_warning(self, tmp_path: Path) -> None:
+        """Test that rai memory emit-calibration shows deprecation warning with correct target."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            telemetry_dir = tmp_path / ".raise" / "rai" / "telemetry"
+            telemetry_dir.mkdir(parents=True)
+
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "emit-calibration",
+                    "S1",
+                    "-s",
+                    "S",
+                    "-e",
+                    "30",
+                    "-a",
+                    "22",
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "DEPRECATED" in result.output
+            assert "rai signal emit-calibration" in result.output
+        finally:
+            os.chdir(original_cwd)
