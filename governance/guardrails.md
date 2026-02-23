@@ -36,7 +36,7 @@ Derived from Solution Vision:
 1. **Type Safety First** — Pydantic AI requires strict typing; we embrace it everywhere
 2. **Single Tool per Job** — Ruff for linting+formatting, not multiple tools
 3. **Security by Default** — No secrets, no vulnerabilities, audit-ready
-4. **Test What Matters** — >90% coverage, property-based tests for critical paths
+4. **Test What Matters** — Cover domain logic and edge cases, not glue/wrappers
 5. **Modern Python** — pyproject.toml, uv, Python 3.12+ features
 6. **Inference Economy** — Treat AI inference as scarce; offload gathering to deterministic tools
 
@@ -58,7 +58,7 @@ Derived from Solution Vision:
 
 | ID | Level | Guardrail | Verificación | Derivado de |
 |----|-------|-----------|--------------|-------------|
-| `MUST-TEST-001` | MUST | >90% test coverage | `pytest --cov` ≥ 90% | Solution Vision §Quality |
+| `MUST-TEST-001` | MUST | Cover domain logic and edge cases | `pytest --cov` (informative, no fixed gate) | Solution Vision §Quality |
 | `MUST-TEST-002` | MUST | All tests pass | `pytest` exits 0 | Best practices |
 | `SHOULD-TEST-001` | SHOULD | Property-based tests for parsers/validators | hypothesis tests exist for Pydantic models | Best practices |
 | `SHOULD-TEST-003` | SHOULD | Integration tests for external services | Mark with `@pytest.mark.integration`, skip by default, document prerequisites (env vars), include cleanup | Best practices |
@@ -258,29 +258,29 @@ class MVCResult(BaseModel):
 
 ---
 
-### MUST-TEST-001: >90% Test Coverage
+### MUST-TEST-001: Cover Domain Logic and Edge Cases
 
-**Regla:** Test coverage must be at least 90% for the core codebase.
+**Regla:** Cover domain logic, algorithms, and edge cases. Do not write tests for glue, wrappers, or CLI plumbing. Coverage is a diagnostic metric, not a gate.
 
 **Contexto (Golden Context para Agentes):**
 ```
 When writing code for RaiSE:
-- Write tests for all new functionality
+- TDD mandatory for: domain logic, algorithms, state machines, data transformations
+- TDD optional for: CLI wrappers, shims, config, formatting, one-liner delegations
+- Delete tests that only verify: "command exists", "framework routes", "output has format"
 - Place tests in `tests/` mirroring `src/` structure
 - Use pytest fixtures for setup/teardown
 - Mock external dependencies (git, ast-grep, ripgrep)
-- Test edge cases and error conditions
 ```
 
 **Verificación:**
 ```yaml
 check: coverage
-command: pytest --cov=src --cov-report=term-missing --cov-fail-under=90
-threshold: 90
-blocking: true
+command: pytest --cov=src --cov-report=term-missing
+blocking: false
 on_failure:
-  message: "Test coverage below 90%."
-  recovery: "Add tests for uncovered code paths."
+  message: "Review coverage report for gaps in domain logic."
+  recovery: "Add tests for uncovered business logic, not for glue code."
 ```
 
 ---

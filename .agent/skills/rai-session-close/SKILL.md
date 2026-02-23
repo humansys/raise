@@ -43,12 +43,14 @@ Use inference to reflect on the session:
 7. **Current work:** Release, epic, story, phase, branch for continuity
 8. **Pending:** Decisions, blockers, next actions
 9. **Narrative:** Session context for cross-session continuity — decisions (with WHY), research conclusions, artifacts created, branch state. Goal: make next session "immediately resumable." (~300-500 tokens, 2-3 sentences per section)
-10. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
+10. **Next session prompt:** Forward-looking guidance from Rai to her future self. What should the next session prioritize? What should Rai watch for or remind the human about? What context will be critical? (~100-200 tokens, actionable and specific)
+11. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
 
 Write the structured output as a YAML state file:
 
 ```yaml
-# /tmp/session-output.yaml
+# /tmp/session-output-{SES-ID}.yaml
+session_id: "{SES-ID}"                    # REQUIRED — prevents race condition (RAISE-201)
 summary: "Session protocol implementation"
 type: feature
 outcomes:
@@ -100,13 +102,17 @@ narrative: |                               # Cross-session continuity (2-3 sente
   ## Branch State
   - Current branch and commits ahead of base
   - Story branch status (created/not yet/merged)
+next_session_prompt: |                    # Forward-looking guidance to future Rai (~100-200 tokens)
+  Verify that [specific thing] works after [change made this session].
+  The developer mentioned interest in [topic] — if they bring it up, [context].
+  Watch for [potential issue] in [area].
 notes: "Any free-form notes"
 ```
 
 ### Step 2: Feed CLI
 
 ```bash
-rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
+rai session close --state-file /tmp/session-output-{SES-ID}.yaml --session {SES-ID} --project "$(pwd)"
 ```
 
 This single command atomically:
@@ -159,12 +165,12 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 - State file is the richest path; CLI flags are for simple/quick closes
 - Calibration (if stories completed): still run separately:
   ```bash
-  rai memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
+  rai signal emit-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
   ```
 
 ## References
 
-- Complement: ``rai-session-start``
+- Complement: `/rai-session-start`
 - Session state: `.raise/rai/session-state.yaml`
 - Memory: `.raise/rai/memory/`
 - Tangents: `dev/parking-lot.md`

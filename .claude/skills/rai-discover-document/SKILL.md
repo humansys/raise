@@ -231,12 +231,12 @@ application_layer: { modules: [...] }
 ### Step 7: Rebuild Graph
 
 ```bash
-rai memory build
+rai graph build
 ```
 
 Verify module nodes appear in graph:
 ```bash
-rai memory query "module dependencies"
+rai graph query "module dependencies"
 ```
 
 ## YAML Frontmatter Schema

@@ -24,7 +24,7 @@ metadata:
 
 ## Purpose
 
-Guide a developer through brownfield project onboarding by combining codebase discovery with conversation. Analyze what exists (structure, conventions, components), ask what code can't tell us (vision, goals, intent), then fill governance templates with parser-compatible content. Final gate: `rai memory build` produces 30+ governance nodes, making `/rai-session-start` immediately useful.
+Guide a developer through brownfield project onboarding by combining codebase discovery with conversation. Analyze what exists (structure, conventions, components), ask what code can't tell us (vision, goals, intent), then fill governance templates with parser-compatible content. Final gate: `rai graph build` produces 30+ governance nodes, making `/rai-session-start` immediately useful.
 
 **Key difference from `/rai-project-create`:** This skill starts from WHAT EXISTS (discovery), then asks WHY. `/rai-project-create` starts from WHAT YOU WANT (pure conversation).
 
@@ -499,7 +499,7 @@ version: "1.0.0"
 Run the graph builder, then check **coverage** across 4 dimensions — not a node count.
 
 ```bash
-rai memory build
+rai graph build
 ```
 
 #### G1: Governance Structure
@@ -648,7 +648,7 @@ Present what was created and what to do next.
 | Item | Destination |
 |------|-------------|
 | Filled governance docs | `governance/` (prd.md, vision.md, guardrails.md, backlog.md, architecture/) |
-| Knowledge graph | `.raise/rai/memory/index.json` (via `rai memory build`) |
+| Knowledge graph | `.raise/rai/memory/index.json` (via `rai graph build`) |
 | Summary | Displayed to user |
 
 ## Notes
@@ -684,7 +684,7 @@ Documentation discovery (Step 2.5) ← NEW
 Conversation (gap-filling only)
   → Only what wasn't found in code or docs
 
-Combined → 6 governance docs → rai memory build → 30+ nodes
+Combined → 6 governance docs → rai graph build → 30+ nodes
 ```
 
 ## References

@@ -55,10 +55,10 @@ Reflect on the completed feature to extract learnings, identify process improvem
 Record the start of the review phase:
 
 ```bash
-rai memory emit-work story {story_id} --event start --phase review
+rai signal emit-work story {story_id} --event start --phase review
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e start -p review`
+**Example:** `rai signal emit-work story S15.1 -e start -p review`
 
 ### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
@@ -72,7 +72,7 @@ uv run pytest --tb=no -q || {
 }
 
 # Query retrospective patterns and calibration data
-rai memory query "retrospective learnings velocity" --types pattern,calibration --limit 5
+rai graph query "retrospective learnings velocity" --types pattern,calibration --limit 5
 ```
 
 **From tests:**
@@ -137,7 +137,7 @@ If improvements identified:
 For learnings worth preserving across sessions, add to memory via CLI:
 
 ```bash
-rai memory add-pattern "Pattern description" \
+rai pattern add "Pattern description" \
   -c "context,keywords" \
   -t process \
   --from {story_id}
@@ -152,10 +152,10 @@ rai memory add-pattern "Pattern description" \
 **Examples:**
 ```bash
 # Process pattern
-rai memory add-pattern "HITL before commits" -c "git,workflow" -t process --from F12.6
+rai pattern add "HITL before commits" -c "git,workflow" -t process --from F12.6
 
 # Technical pattern
-rai memory add-pattern "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
+rai pattern add "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
 ```
 
 **Decision:**
@@ -182,16 +182,16 @@ decay scoring system (RAISE-170).
 
 **Command per pattern:**
 ```bash
-rai memory reinforce {pattern_id} --vote {1|0|-1} --from {story_id}
+rai pattern reinforce {pattern_id} --vote {1|0|-1} --from {story_id}
 ```
 
 **Example batch (RAISE-170 patterns):**
 ```bash
-rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170   # Grounding over speed — applied
-rai memory reinforce PAT-E-153 --vote 1 --from RAISE-170   # JSONL backward compat — applied
-rai memory reinforce PAT-E-186 --vote 1 --from RAISE-170   # Design not optional — applied
-rai memory reinforce PAT-E-150 --vote 0 --from RAISE-170   # Drift review — N/A this story
-rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170   # Large renames — N/A this story
+rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170   # Grounding over speed — applied
+rai pattern reinforce PAT-E-153 --vote 1 --from RAISE-170   # JSONL backward compat — applied
+rai pattern reinforce PAT-E-186 --vote 1 --from RAISE-170   # Design not optional — applied
+rai pattern reinforce PAT-E-150 --vote 0 --from RAISE-170   # Drift review — N/A this story
+rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170   # Large renames — N/A this story
 ```
 
 **Decision heuristic per pattern:**
@@ -224,7 +224,7 @@ Create retrospective document:
 Record the calibration signal for velocity tracking:
 
 ```bash
-rai memory emit-calibration {story_id} \
+rai signal emit-calibration {story_id} \
   --size {XS|S|M|L} \
   --estimated {minutes} \
   --actual {minutes}
@@ -238,7 +238,7 @@ rai memory emit-calibration {story_id} \
 
 **Example:**
 ```bash
-rai memory emit-calibration F9.4 -s S -e 30 -a 15
+rai signal emit-calibration F9.4 -s S -e 30 -a 15
 ```
 
 **Verification:** Command shows velocity and "Calibration event recorded".
@@ -250,10 +250,10 @@ rai memory emit-calibration F9.4 -s S -e 30 -a 15
 Record the completion of the entire story lifecycle:
 
 ```bash
-rai memory emit-work story {story_id} --event complete --phase review
+rai signal emit-work story {story_id} --event complete --phase review
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e complete -p review`
+**Example:** `rai signal emit-work story S15.1 -e complete -p review`
 
 **Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
 

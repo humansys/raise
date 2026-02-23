@@ -51,7 +51,7 @@ def graph_project(tmp_path: Path) -> Path:
     return tmp_path
 
 
-class TestMemoryVizCommand:
+class TestGraphVizCommand:
     """Tests for `raise memory viz` CLI command."""
 
     def test_viz_no_graph(self, tmp_path: Path) -> None:
@@ -59,10 +59,10 @@ class TestMemoryVizCommand:
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
-            result = runner.invoke(app, ["memory", "viz", "--no-open"])
+            result = runner.invoke(app, ["graph", "viz", "--no-open"])
 
             assert result.exit_code == 4
-            assert "Memory index not found" in result.output
+            assert "index not found" in result.output.lower()
         finally:
             os.chdir(original_cwd)
 
@@ -71,7 +71,7 @@ class TestMemoryVizCommand:
         original_cwd = os.getcwd()
         try:
             os.chdir(graph_project)
-            result = runner.invoke(app, ["memory", "viz", "--no-open"])
+            result = runner.invoke(app, ["graph", "viz", "--no-open"])
 
             assert result.exit_code == 0
             assert "Written to" in result.output
@@ -91,7 +91,7 @@ class TestMemoryVizCommand:
             os.chdir(graph_project)
             output = graph_project / "custom" / "viz.html"
             result = runner.invoke(
-                app, ["memory", "viz", "--no-open", "--output", str(output)]
+                app, ["graph", "viz", "--no-open", "--output", str(output)]
             )
 
             assert result.exit_code == 0

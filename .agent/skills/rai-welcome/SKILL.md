@@ -7,7 +7,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: onboarding
+  raise.work_cycle: utility
   raise.frequency: once-per-developer
   raise.fase: "setup"
   raise.prerequisites: ""
@@ -54,7 +54,7 @@ ls .raise/ 2>/dev/null && echo "RAISE_EXISTS" || echo "NO_RAISE"
 If `.raise/` doesn't exist, this project hasn't been initialized with RaiSE yet.
 
 **Tell the user:**
-> This project isn't set up with RaiSE yet. Run `rai init` first to initialize the project structure, then run ``rai-welcome`` again.
+> This project isn't set up with RaiSE yet. Run `rai init` first to initialize the project structure, then run `/rai-welcome` again.
 
 **Stop here.** Do not proceed with profile creation — it needs a project context.
 
@@ -100,7 +100,7 @@ ls .raise/rai/memory/index.json 2>/dev/null && echo "GRAPH_EXISTS" || echo "NO_G
 If missing, build it:
 
 ```bash
-rai memory build
+rai graph build
 ```
 
 **Verify:** `.raise/rai/memory/index.json` exists after build.
@@ -111,7 +111,7 @@ If `CLAUDE.local.md` doesn't exist in the project root, create it with minimal c
 
 ```markdown
 # RaiSE Project — {project_directory_name}
-Run ``rai-session-start`` for context.
+Run `/rai-session-start` for context.
 ```
 
 **DO NOT** overwrite an existing `CLAUDE.local.md`.
@@ -195,7 +195,7 @@ Setup complete:
 - Local config: CLAUDE.local.md
 
 Next steps:
-- Run `rai-session-start` to begin your first working session
+- Run /rai-session-start to begin your first working session
 - To change preferences later: edit ~/.rai/developer.yaml
 - To learn about the workflow: check governance/architecture/
 ```
@@ -217,11 +217,11 @@ When no personalization is chosen, these defaults apply:
 
 - **One-time skill:** Run once per developer per machine. Subsequent runs verify setup.
 - **No `rai init`:** Project initialization is a separate concern. This skill assumes `.raise/` exists or tells you to create it.
-- **Implicit learning:** The coaching context in `developer.yaml` learns from ``rai-session-close`` reflections over time. No need to self-categorize upfront.
+- **Implicit learning:** The coaching context in `developer.yaml` learns from `/rai-session-close` reflections over time. No need to self-categorize upfront.
 - **File-based personalization:** Consistent with industry pattern (Cursor, Aider, Claude Code, Copilot all use config files, not wizards).
 
 ## References
 
 - Profile model: `src/rai_cli/onboarding/profile.py`
-- Session start: `.claude/skills`rai-session-start`/SKILL.md`
+- Session start: `.claude/skills/rai-session-start/SKILL.md`
 - Fer's checklist (replaced): `work/stories/S-MULTIDEV/fer-first-pull.md`
