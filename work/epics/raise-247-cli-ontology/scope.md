@@ -69,7 +69,7 @@ rai release check|publish|list     # Release management
 | S2 | Create `pattern` group | S | ✅ Done | None | Extract add-pattern + reinforce from memory.py |
 | S3 | Create `signal` group | S | ✅ Done | None | Extract emit-work/session/calibration as 3 subcommands |
 | S4 | Kill redundancies | XS | ✅ Done | None | Remove generate, add-session, add-calibration + coverage gate |
-| S5 | Merge publish+release, flatten singletons | S | Pending | None | Consolidate release mgmt, flatten base/profile |
+| S5 | Merge publish+release, flatten singletons | S | ✅ Done | None | Consolidate release mgmt, flatten base/profile |
 | S6 | Update all skills and generated docs | M | Pending | S1-S5 | Mechanical find-replace across 22 skills + CLAUDE.md |
 
 **Total:** 6 stories (down from 8 after arch review)
@@ -284,12 +284,12 @@ time saved for these small stories.
 | S2: pattern group | S | ✅ Done | 45 min | 1.33x | PAT-E-440/441 |
 | S3: signal group | S | ✅ Done | 21 min | 2.86x | PAT-E-442, M1 complete |
 | S4: kill redundancies | XS | ✅ Done | 25 min | 0.8x | RAISE-253, PAT-E-444 |
-| S5: merge+flatten | S | Pending | - | - | RAISE-254 |
+| S5: merge+flatten | S | ✅ Done | 29 min | 2.07x | RAISE-254, PAT-E-446/447 |
 | S6: skill sweep | M | Pending | - | - | RAISE-255 |
 
 **Milestones:**
 - [x] M1: God Object Decomposed (S1+S2+S3 — 2026-02-23)
-- [ ] M2: Clean Taxonomy
+- [x] M2: Clean Taxonomy (S4+S5 — 2026-02-23)
 - [ ] M3: Epic Complete
 
 ### Risks
