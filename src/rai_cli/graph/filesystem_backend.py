@@ -73,14 +73,14 @@ class FilesystemGraphBackend:
         )
 
 
-# TODO(S211.5): When TierContext exists, get_active_backend should cache
-# the instance per path to avoid repeated instantiation. Not urgent for
-# stateless FilesystemGraphBackend, but will matter for Supabase connections.
+# TODO(raise-pro): Add tier-based backend selection via TierContext +
+# entry point discovery. Cache instance per path for stateful backends
+# (e.g., SupabaseBackend with connection pooling).
 def get_active_backend(path: Path) -> FilesystemGraphBackend:
     """Resolve the active graph backend for the given path.
 
-    Returns FilesystemGraphBackend (COMMUNITY). S211.5 (TierContext)
-    will add tier-based selection via entry point discovery.
+    Returns FilesystemGraphBackend (COMMUNITY). raise-pro will add
+    tier-based selection via TierContext + entry point discovery.
 
     Args:
         path: Path to the graph JSON file.
