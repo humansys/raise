@@ -1,17 +1,16 @@
 """Unified context graph implementation.
 
 This module provides the UnifiedGraph class that wraps NetworkX MultiDiGraph
-for storing and querying cross-domain concepts.
+for storing and querying cross-domain concepts. This is a pure in-memory graph;
+persistence is handled by KnowledgeGraphBackend implementations (ADR-036).
 
 Architecture: ADR-019 Unified Context Graph Architecture
 """
 
 from __future__ import annotations
 
-import json
 import logging
 from collections.abc import Iterator
-from pathlib import Path
 from typing import Any
 
 import networkx as nx  # type: ignore[import-untyped]
@@ -280,41 +279,3 @@ class UnifiedGraph:
         """
         return self.graph.number_of_edges()
 
-    def save(self, path: Path) -> None:
-        """Save graph to JSON file.
-
-        Uses NetworkX node_link_data format for serialization.
-
-        Args:
-            path: Path to save the JSON file.
-
-        Examples:
-            >>> graph.save(Path(".raise/graph/unified.json"))
-        """
-        data: dict[str, Any] = nx.node_link_data(self.graph)  # type: ignore[assignment]
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
-
-    @classmethod
-    def load(cls, path: Path) -> UnifiedGraph:
-        """Load graph from JSON file.
-
-        Args:
-            path: Path to the JSON file.
-
-        Returns:
-            UnifiedGraph instance with loaded data.
-
-        Raises:
-            FileNotFoundError: If the file doesn't exist.
-            json.JSONDecodeError: If the file is not valid JSON.
-
-        Examples:
-            >>> graph = UnifiedGraph.load(Path(".raise/graph/unified.json"))
-            >>> graph.node_count
-            50
-        """
-        loaded_data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
-        instance = cls()
-        instance.graph = nx.node_link_graph(loaded_data, directed=True, multigraph=True)
-        return instance
