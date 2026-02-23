@@ -16,6 +16,7 @@ from rai_cli.cli.commands.discover import discover_app
 from rai_cli.cli.commands.graph import graph_app
 from rai_cli.cli.commands.init import init_command
 from rai_cli.cli.commands.memory import memory_app
+from rai_cli.cli.commands.pattern import pattern_app
 from rai_cli.cli.commands.profile import profile_app
 from rai_cli.cli.commands.publish import publish_app
 from rai_cli.cli.commands.release import release_app
@@ -50,6 +51,7 @@ app.add_typer(base_app, name="base")
 app.add_typer(discover_app, name="discover")
 app.add_typer(graph_app, name="graph")
 app.add_typer(memory_app, name="memory")
+app.add_typer(pattern_app, name="pattern")
 app.add_typer(profile_app, name="profile")
 app.add_typer(publish_app, name="publish")
 app.add_typer(release_app, name="release")
