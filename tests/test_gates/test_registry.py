@@ -91,6 +91,15 @@ class TestGateRegistryBasics:
         assert gates1 is not gates2
         assert len(gates1) == len(gates2)
 
+    def test_duplicate_gate_id_replaces(self) -> None:
+        reg = GateRegistry()
+        gate1 = _TestGate()
+        gate2 = _TestGate()
+        reg.register(gate1)
+        reg.register(gate2)
+        assert len(reg.gates) == 1
+        assert reg.gates[0] is gate2
+
 
 # ---------------------------------------------------------------------------
 # Lookup methods

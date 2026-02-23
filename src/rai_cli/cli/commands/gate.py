@@ -16,6 +16,7 @@ import typer
 from rich.console import Console
 
 from rai_cli.gates.models import GateContext, GateResult
+from rai_cli.gates.protocol import WorkflowGate
 from rai_cli.gates.registry import GateRegistry
 
 logger = logging.getLogger(__name__)
@@ -36,14 +37,14 @@ def _get_registry() -> GateRegistry:
     return reg
 
 
-def _run_gate(gate: object, context: GateContext) -> GateResult:
+def _run_gate(gate: WorkflowGate, context: GateContext) -> GateResult:
     """Run a single gate with error isolation.
 
     Gate exceptions are caught and converted to a failed GateResult.
     Gates never crash the CLI.
     """
     try:
-        return gate.evaluate(context)  # type: ignore[union-attr]
+        return gate.evaluate(context)
     except Exception as exc:  # noqa: BLE001
         msg = f"{type(exc).__name__}: {exc}"
         logger.warning("Gate '%s' raised: %s", context.gate_id, msg)
