@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import time
 from pathlib import Path
+from typing import ClassVar
 
 from rai_cli.hooks.emitter import EventEmitter
 from rai_cli.hooks.events import (
@@ -13,6 +15,7 @@ from rai_cli.hooks.events import (
     HookResult,
     SessionStartEvent,
 )
+from rai_cli.hooks.registry import HookRegistry
 
 
 def _ok_handler(event: HookEvent) -> HookResult:
@@ -209,3 +212,266 @@ class TestBeforeEventAbortFlow:
         emitter.emit(BeforeReleasePublishEvent(version="2.1.0", project_path=Path(".")))
 
         assert calls == ["abort", "ok"]
+
+
+# --- Test hook classes for registry integration ---
+
+
+class _TrackingHook:
+    events: ClassVar[list[str]] = ["session:start"]
+    priority: ClassVar[int] = 0
+
+    def __init__(self) -> None:
+        self.calls: list[HookEvent] = []
+
+    def handle(self, event: HookEvent) -> HookResult:
+        self.calls.append(event)
+        return HookResult(status="ok")
+
+
+class _SlowHook:
+    events: ClassVar[list[str]] = ["session:start"]
+    priority: ClassVar[int] = 0
+    timeout: ClassVar[float] = 0.1  # 100ms for test speed
+
+    def handle(self, event: HookEvent) -> HookResult:
+        time.sleep(1.0)  # exceeds 100ms timeout
+        return HookResult(status="ok")
+
+
+class _FastHookAfterSlow:
+    events: ClassVar[list[str]] = ["session:start"]
+    priority: ClassVar[int] = -1  # lower priority, runs after slow
+
+    def __init__(self) -> None:
+        self.called = False
+
+    def handle(self, event: HookEvent) -> HookResult:
+        self.called = True
+        return HookResult(status="ok")
+
+
+class TestEmitterWithRegistry:
+    """EventEmitter + HookRegistry integration."""
+
+    def test_emitter_without_registry_still_works(self) -> None:
+        """Backward compat: no registry, bare handlers."""
+        emitter = EventEmitter()
+        emitter.register("session:start", _ok_handler)
+        result = emitter.emit(SessionStartEvent(session_id="SES-1", developer="e"))
+        assert not result.aborted
+
+    def test_emitter_with_registry_dispatches_hooks(self) -> None:
+        registry = HookRegistry()
+        hook = _TrackingHook()
+        registry.register(hook)
+
+        emitter = EventEmitter(registry=registry)
+        event = SessionStartEvent(session_id="SES-1", developer="emilio")
+        emitter.emit(event)
+
+        assert len(hook.calls) == 1
+        assert hook.calls[0] is event
+
+    def test_emitter_with_registry_priority_order(self) -> None:
+        """Hooks dispatch in priority order (highest first)."""
+        call_order: list[str] = []
+
+        class HighHook:
+            events: ClassVar[list[str]] = ["session:start"]
+            priority: ClassVar[int] = 100
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_order.append("high")
+                return HookResult(status="ok")
+
+        class LowHook:
+            events: ClassVar[list[str]] = ["session:start"]
+            priority: ClassVar[int] = 0
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_order.append("low")
+                return HookResult(status="ok")
+
+        registry = HookRegistry()
+        # Register low first, high second — priority should override
+        registry.register(LowHook())
+        registry.register(HighHook())
+
+        emitter = EventEmitter(registry=registry)
+        emitter.emit(SessionStartEvent(session_id="SES-1", developer="emilio"))
+
+        assert call_order == ["high", "low"]
+
+    def test_emitter_with_registry_and_manual_handlers(self) -> None:
+        """Registry hooks + manual handlers coexist."""
+        registry = HookRegistry()
+        hook = _TrackingHook()
+        registry.register(hook)
+
+        emitter = EventEmitter(registry=registry)
+
+        manual_calls: list[HookEvent] = []
+
+        def manual_handler(event: HookEvent) -> HookResult:
+            manual_calls.append(event)
+            return HookResult(status="ok")
+
+        emitter.register("session:start", manual_handler)
+
+        event = SessionStartEvent(session_id="SES-1", developer="emilio")
+        emitter.emit(event)
+
+        # Both fired
+        assert len(hook.calls) == 1
+        assert len(manual_calls) == 1
+
+    def test_emitter_with_empty_registry(self) -> None:
+        registry = HookRegistry()
+        emitter = EventEmitter(registry=registry)
+        result = emitter.emit(SessionStartEvent(session_id="SES-1", developer="e"))
+        assert not result.aborted
+        assert result.handler_errors == ()
+
+
+class TestEmitterTimeout:
+    """Per-hook timeout enforcement."""
+
+    def test_slow_hook_times_out(self) -> None:
+        registry = HookRegistry()
+        registry.register(_SlowHook())
+
+        emitter = EventEmitter(registry=registry)
+        result = emitter.emit(SessionStartEvent(session_id="SES-1", developer="e"))
+
+        assert len(result.handler_errors) == 1
+        assert "timeout" in result.handler_errors[0].lower()
+
+    def test_fast_hook_runs_after_slow_hook_timeout(self) -> None:
+        """Error isolation: slow hook times out, fast hook still runs."""
+        registry = HookRegistry()
+        registry.register(_SlowHook())
+        fast_hook = _FastHookAfterSlow()
+        registry.register(fast_hook)
+
+        emitter = EventEmitter(registry=registry)
+        emitter.emit(SessionStartEvent(session_id="SES-1", developer="e"))
+
+        assert fast_hook.called
+
+    def test_default_timeout_is_five_seconds(self) -> None:
+        """Hooks without timeout attribute use 5s default."""
+        hook = _TrackingHook()
+        assert not hasattr(hook, "timeout")
+        # Default is enforced in emitter, not on hook — just verify the constant
+        assert EventEmitter.DEFAULT_TIMEOUT == 5.0
+
+
+class TestE2EPipeline:
+    """End-to-end integration: Protocol → Registry → Emitter → Hook execution."""
+
+    def test_full_pipeline_priority_dispatch_and_error_isolation(self) -> None:
+        """Multi-hook pipeline with priority ordering, timeout, and error isolation."""
+        call_log: list[str] = []
+
+        class HighPriorityHook:
+            events: ClassVar[list[str]] = ["session:start", "graph:build"]
+            priority: ClassVar[int] = 100
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_log.append(f"high:{event.event_name}")
+                return HookResult(status="ok")
+
+        class MediumBrokenHook:
+            events: ClassVar[list[str]] = ["session:start"]
+            priority: ClassVar[int] = 50
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_log.append("medium:broken")
+                msg = "intentional failure"
+                raise RuntimeError(msg)
+
+        class LowPriorityHook:
+            events: ClassVar[list[str]] = ["session:start"]
+            priority: ClassVar[int] = 0
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_log.append(f"low:{event.event_name}")
+                return HookResult(status="ok")
+
+        # Protocol conformance
+        from rai_cli.hooks.protocol import LifecycleHook
+
+        assert isinstance(HighPriorityHook(), LifecycleHook)
+        assert isinstance(MediumBrokenHook(), LifecycleHook)
+        assert isinstance(LowPriorityHook(), LifecycleHook)
+
+        # Registry
+        registry = HookRegistry()
+        registry.register(LowPriorityHook())
+        registry.register(HighPriorityHook())
+        registry.register(MediumBrokenHook())
+
+        # Verify priority sorting
+        hooks = registry.get_hooks_for_event("session:start")
+        priorities = [h.priority for h in hooks]
+        assert priorities == [100, 50, 0]
+
+        # Emitter with registry
+        emitter = EventEmitter(registry=registry)
+
+        # Emit session:start — all 3 hooks fire
+        result = emitter.emit(SessionStartEvent(session_id="SES-99", developer="test"))
+
+        # Priority order: high (100) → medium broken (50) → low (0)
+        assert call_log == ["high:session:start", "medium:broken", "low:session:start"]
+        # Error from broken hook captured
+        assert len(result.handler_errors) == 1
+        assert "intentional failure" in result.handler_errors[0]
+        # Not aborted (after: event)
+        assert not result.aborted
+
+        # Emit graph:build — only high hook subscribes
+        call_log.clear()
+        result = emitter.emit(
+            GraphBuildEvent(project_path=Path("/tmp"), node_count=10, edge_count=5)
+        )
+        assert call_log == ["high:graph:build"]
+        assert result.handler_errors == ()
+
+    def test_full_pipeline_before_event_with_abort(self) -> None:
+        """Before: event with abort + registry hooks."""
+
+        class ComplianceHook:
+            events: ClassVar[list[str]] = ["before:release:publish"]
+            priority: ClassVar[int] = 100
+
+            def handle(self, event: HookEvent) -> HookResult:
+                return HookResult(status="abort", message="Not compliant")
+
+        class AuditHook:
+            events: ClassVar[list[str]] = ["before:release:publish"]
+            priority: ClassVar[int] = 0
+
+            def __init__(self) -> None:
+                self.called = False
+
+            def handle(self, event: HookEvent) -> HookResult:
+                self.called = True
+                return HookResult(status="ok")
+
+        registry = HookRegistry()
+        registry.register(ComplianceHook())
+        audit = AuditHook()
+        registry.register(audit)
+
+        emitter = EventEmitter(registry=registry)
+        result = emitter.emit(
+            BeforeReleasePublishEvent(version="3.0.0", project_path=Path("."))
+        )
+
+        # Aborted by compliance hook
+        assert result.aborted
+        assert result.abort_message == "Not compliant"
+        # Audit hook still ran (all-notify semantics)
+        assert audit.called
