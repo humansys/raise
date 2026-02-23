@@ -100,7 +100,7 @@ ls .raise/rai/memory/index.json 2>/dev/null && echo "GRAPH_EXISTS" || echo "NO_G
 If missing, build it:
 
 ```bash
-rai memory build
+rai graph build
 ```
 
 **Verify:** `.raise/rai/memory/index.json` exists after build.

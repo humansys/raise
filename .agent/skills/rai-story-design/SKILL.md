@@ -2,7 +2,7 @@
 name: rai-story-design
 description: >
   Create lean story specifications optimized for both human understanding
-  and AI alignment. Design is not optional (PAT-186) — use before `rai-story-plan`
+  and AI alignment. Design is not optional (PAT-186) — use before /rai-story-plan
   for every story to ground integration decisions.
 
 license: MIT
@@ -44,7 +44,7 @@ Create a lean story specification that optimizes for both human understanding (q
 - When AI will generate significant code from the specification
 
 **When to skip:**
-- Simple features (<3 components, <5 SP, obvious implementation) → Go directly to ``rai-story-plan``
+- Simple features (<3 components, <5 SP, obvious implementation) → Go directly to `/rai-story-plan`
 - Infrastructure/scaffolding work where implementation is self-evident
 - Bug fixes (use issue tracker instead)
 - Refactoring (unless substantial architectural change)
@@ -65,10 +65,10 @@ Create a lean story specification that optimizes for both human understanding (q
 Record the start of the design phase:
 
 ```bash
-rai memory emit-work story {story_id} --event start --phase design
+rai signal emit-work story {story_id} --event start --phase design
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e start -p design`
+**Example:** `rai signal emit-work story S15.1 -e start -p design`
 
 ### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
@@ -79,13 +79,13 @@ Run these in parallel (all independent):
 ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic context"
 
 # Query architecture patterns and ADRs
-rai memory query "architecture patterns ADR" --types pattern,decision --limit 5
+rai graph query "architecture patterns ADR" --types pattern,decision --limit 5
 ```
 
 **From epic check:**
 - Epic exists → Continue, reference in design
 - Epic missing + simple feature → Continue with note
-- Epic missing + complex feature → Suggest ``rai-story-start`` first
+- Epic missing + complex feature → Suggest `/rai-story-start` first
 
 **Skip condition:** Standalone bugfixes or experiments without epic.
 
@@ -95,15 +95,15 @@ rai memory query "architecture patterns ADR" --types pattern,decision --limit 5
 
 **Verification:** Epic context loaded OR explicitly standalone; patterns noted.
 
-> **If you can't continue:** Complex feature without epic → Run ``rai-story-start`` first.
+> **If you can't continue:** Complex feature without epic → Run `/rai-story-start` first.
 
 ### Step 0.2: Load Architectural Context
 
 Identify the primary module(s) this story affects, then load their architectural context:
 
 ```bash
-rai memory context mod-<name>
-# Example: rai memory context mod-memory
+rai graph context mod-<name>
+# Example: rai graph context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -144,7 +144,7 @@ Determine if feature needs a specification document.
 | State management | Stateless | Multiple states | Complex state machine |
 
 **Decision**:
-- **Simple** → Skip design, go to ``rai-story-plan``
+- **Simple** → Skip design, go to `/rai-story-plan`
 - **Moderate** → Create spec, use core sections only
 - **Complex** → Create spec, include optional sections as needed
 
@@ -177,11 +177,11 @@ grep -i "high risk\|HIGH RISK" work/epics/e*-*/scope.md 2>/dev/null | grep -i "{
 
 **Rationale:** Risk conversations before implementation clarify scope and build confidence. The doubt informs how we act, not whether we act.
 
-> **If you can't continue:** Risks too unclear → Consider ``rai-research`` skill first, or timebox a spike.
+> **If you can't continue:** Risks too unclear → Consider `/rai-research` skill first, or timebox a spike.
 
 ### Step 1.7: Research Gate for UX-Facing Stories (Conditional)
 
-**If the story touches human interaction**, consider running ``rai-research`` before designing.
+**If the story touches human interaction**, consider running `/rai-research` before designing.
 
 **A story is "UX-facing" when it:**
 - Introduces or changes user-facing workflows (onboarding, wizards, prompts)
@@ -192,7 +192,7 @@ grep -i "high risk\|HIGH RISK" work/epics/e*-*/scope.md 2>/dev/null | grep -i "{
 **Why:** In S-WELCOME (SES-142), 10 minutes of research prevented building the wrong thing entirely. Industry evidence on Dunning-Kruger, imposter syndrome, and zero-config convergence overturned the initial design instinct (mandatory wizard → sensible defaults). Cost is low (~10 min); value is high when it redirects.
 
 **If UX-facing:**
-> "This story touches human interaction. I recommend running ``rai-research`` to ground the design in evidence before proceeding. ~10 min investment. Want to do that first?"
+> "This story touches human interaction. I recommend running `/rai-research` to ground the design in evidence before proceeding. ~10 min investment. Want to do that first?"
 
 **Skip condition:** Story is purely technical (internal APIs, data processing, infrastructure, refactoring).
 
@@ -300,17 +300,17 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-rai memory emit-work story {story_id} --event complete --phase design
+rai signal emit-work story {story_id} --event complete --phase design
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e complete -p design`
+**Example:** `rai signal emit-work story S15.1 -e complete -p design`
 
 ## Output
 
 - **Artifact**: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
 - **Telemetry**: `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-story-v2.md`
-- **Next**: ``rai-story-plan``
+- **Next**: `/rai-story-plan`
 
 ## Quality Standards
 
@@ -339,4 +339,4 @@ rai memory emit-work story {story_id} --event complete --phase design
 ## References
 
 - Template: `references/tech-design-story-v2.md`
-- Next skill: ``rai-story-plan``
+- Next skill: `/rai-story-plan`
