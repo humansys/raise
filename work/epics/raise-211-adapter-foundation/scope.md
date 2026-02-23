@@ -29,7 +29,7 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 | S211.1 | Protocol contracts | S | Done ✓ | S211.0 | PM, Governance, DocTarget Protocols + Pydantic models (IssueSpec, ArtifactLocator, etc.) |
 | S211.2 | Entry point registry | S | Done ✓ | S211.1 | `importlib.metadata` discovery: `get_pm_adapters()`, `get_governance_schemas()`, etc. |
 | S211.3 | rai memory build → registry | M | Done ✓ | S211.0, S211.2 | 9 parser wrappers, entry points, extractor refactor. First consumer of adapter contracts. |
-| S211.4 | KnowledgeGraphBackend | M | Pending | S211.0, S211.2 | Protocol + FilesystemGraphBackend (refactor current persistence) |
+| S211.4 | KnowledgeGraphBackend | M | Done ✓ | S211.0, S211.2 | FilesystemGraphBackend + full call-site migration. UnifiedGraph pure in-memory. |
 | S211.5 | TierContext | S | Pending | S211.1 | Tier detection from manifest, Capability enum, progressive enrichment |
 | S211.6 | rai adapters list/check | S | Pending | S211.2, S211.5 | CLI surface for adapter discovery and validation |
 
