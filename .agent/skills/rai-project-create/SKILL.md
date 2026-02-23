@@ -23,7 +23,7 @@ metadata:
 
 ## Purpose
 
-Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `rai memory build` produces 30+ governance nodes, making ``rai-session-start`` immediately useful.
+Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `rai graph build` produces 30+ governance nodes, making `/rai-session-start` immediately useful.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -42,7 +42,7 @@ Guide a developer through greenfield project setup via conversation. Collect pro
 
 **When to skip:**
 - Project already has filled governance docs (non-placeholder content)
-- Brownfield project with existing code → use ``rai-project-onboard`` instead
+- Brownfield project with existing code → use `/rai-project-onboard` instead
 - Project not yet initialized → run `rai init` first
 
 **Inputs required:**
@@ -52,7 +52,7 @@ Guide a developer through greenfield project setup via conversation. Collect pro
 **Output:**
 - 6 governance docs filled with project-specific content
 - Knowledge graph with 30+ governance nodes
-- Project ready for ``rai-session-start``
+- Project ready for `/rai-session-start`
 
 ## Steps
 
@@ -84,7 +84,7 @@ Files without HTML comment placeholders likely have real content already.
 ls src/ lib/ app/ *.py *.ts *.js 2>/dev/null | head -5
 ```
 
-If source code exists, suggest: "This looks like an existing project. Consider ``rai-project-onboard`` instead for brownfield analysis."
+If source code exists, suggest: "This looks like an existing project. Consider `/rai-project-onboard` instead for brownfield analysis."
 
 **Verification:** Governance templates exist and are ready to fill.
 
@@ -401,14 +401,14 @@ version: "1.0.0"
 Run the graph builder and verify the 30+ node gate.
 
 ```bash
-rai memory build
+rai graph build
 ```
 
 **Expected output:** The build should show governance nodes extracted from each doc.
 
 **Verification gate:**
 ```bash
-rai memory query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
+rai graph query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
 ```
 
 Count the governance nodes. You need **30+ total** across these types:
@@ -423,7 +423,7 @@ Count the governance nodes. You need **30+ total** across these types:
 - 30+ nodes → **Gate passed.** Continue to summary.
 - <30 nodes → Investigate which docs didn't parse. Check format against parser contract in Step 6. Fix and rebuild.
 
-**Verification:** `rai memory build` succeeds and produces 30+ governance nodes.
+**Verification:** `rai graph build` succeeds and produces 30+ governance nodes.
 
 > **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header. Fix the specific doc and rebuild.
 
@@ -446,9 +446,9 @@ Present what was created and what to do next.
 **Graph:** {total} governance nodes extracted
 
 **Next steps:**
-1. Run ``rai-session-start`` to begin your first working session
+1. Run `/rai-session-start` to begin your first working session
 2. Review the generated governance docs and refine as needed
-3. Start your first epic with ``rai-epic-design``
+3. Start your first epic with `/rai-epic-design`
 ```
 
 **Verification:** Summary displayed with node counts.
@@ -460,7 +460,7 @@ Present what was created and what to do next.
 | Item | Destination |
 |------|-------------|
 | Filled governance docs | `governance/` (prd.md, vision.md, guardrails.md, backlog.md, architecture/) |
-| Knowledge graph | `.raise/rai/memory/index.json` (via `rai memory build`) |
+| Knowledge graph | `.raise/rai/memory/index.json` (via `rai graph build`) |
 | Summary | Displayed to user |
 
 ## Notes
@@ -475,12 +475,12 @@ The skill checks for existing non-placeholder content before writing. Docs that 
 
 ### Greenfield vs Brownfield
 
-This skill is for **greenfield** projects only. It asks "what do you want to build?" — a creative conversation. For brownfield projects that need "what do you already have?", use ``rai-project-onboard`` (S7.3).
+This skill is for **greenfield** projects only. It asks "what do you want to build?" — a creative conversation. For brownfield projects that need "what do you already have?", use `/rai-project-onboard` (S7.3).
 
 ## References
 
 - Prerequisite: `rai init` (governance scaffolding from S7.1)
-- Next: ``rai-session-start``
-- Sibling: ``rai-project-onboard`` (brownfield)
+- Next: `/rai-session-start`
+- Sibling: `/rai-project-onboard` (brownfield)
 - Parser sources: `src/rai_cli/governance/parsers/*.py`
 - Template sources: `src/rai_cli/rai_base/governance/*.md`

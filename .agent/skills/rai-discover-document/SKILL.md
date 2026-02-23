@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
   raise.visibility: public
 ---
 
@@ -65,12 +65,29 @@ Read `work/discovery/components-validated.json` and count components per module.
 
 ### Step 2: Analyze Module Structure
 
-For each directory under `src/<package>/` with `__init__.py`:
+First, check `work/discovery/context.yaml` for the detected language(s).
+
+**Python projects** — for each directory under `src/<package>/` with `__init__.py`:
 1. Read `__init__.py` docstring for self-described purpose
 2. Scan imports to build dependency map (`from <package>.X import`)
 3. Count components from validated JSON
 4. Identify entry points (CLI commands that import this module)
 5. List key files and public API
+
+**C# / .NET projects** — Python has `__init__.py` as module markers; C# uses namespaces.
+Use the following strategy:
+1. Read `.csproj` files to identify the root namespace and project structure
+2. Treat each top-level layer directory as a module: `Application/`, `Domain/`,
+   `Infrastructure/`, `Api/` (Clean Architecture convention). If not present, use the
+   top-level namespace segments instead
+3. For each layer/module: count components from validated JSON that match that namespace
+4. Identify key files (entry point controllers, handlers, or `Program.cs`)
+5. List public interfaces and key abstractions (e.g., `I*Repository`, `I*Service`)
+
+**PHP / Symfony projects** — use namespace directories from `composer.json` autoload map:
+1. Read `composer.json` `autoload.psr-4` to identify namespace → directory mappings
+2. Treat each top-level namespace segment as a module
+3. Apply same steps 3–5 as C# above
 
 ### Step 3: Generate Module Docs
 
@@ -114,7 +131,9 @@ After module docs are complete, generate the C4 Context and Container docs. Thes
 
 #### 5a: System Context (`system-context.md`)
 
-Read `governance/vision.md` and `framework/reference/constitution.md`. Write `governance/architecture/system-context.md` with:
+Read `governance/vision.md`. If `framework/reference/constitution.md` exists, read it too
+(it is only bootstrapped in projects initialized with `rai init`, not in all brownfield repos).
+Write `governance/architecture/system-context.md` with:
 
 **YAML frontmatter:**
 ```yaml
@@ -154,7 +173,8 @@ status: current
 layers: [...]
 architectural_decisions: [...]
 guardrails_reference: "governance/guardrails.md"
-constitution_reference: "framework/reference/constitution.md"
+# constitution_reference is optional — only include if the file exists:
+# constitution_reference: "framework/reference/constitution.md"
 ---
 ```
 
@@ -211,12 +231,12 @@ application_layer: { modules: [...] }
 ### Step 7: Rebuild Graph
 
 ```bash
-rai memory build
+rai graph build
 ```
 
 Verify module nodes appear in graph:
 ```bash
-rai memory query "module dependencies"
+rai graph query "module dependencies"
 ```
 
 ## YAML Frontmatter Schema
@@ -259,7 +279,7 @@ rai memory query "module dependencies"
 | layers | list[object] | Yes | Layer definitions with modules |
 | architectural_decisions | list[str] | No | ADR references |
 | guardrails_reference | string | Yes | Path to guardrails doc |
-| constitution_reference | string | Yes | Path to constitution doc |
+| constitution_reference | string | No | Path to constitution doc (omit if file does not exist) |
 
 ### Domain Model
 

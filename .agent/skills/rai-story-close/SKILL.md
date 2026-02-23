@@ -36,7 +36,7 @@ Complete a feature by verifying the retrospective is done, merging to the parent
 ## Context
 
 **When to use:**
-- After ``rai-story-review`` retrospective is complete
+- After `/rai-story-review` retrospective is complete
 - Feature implementation is verified and tests pass
 - Ready to merge work into parent branch
 
@@ -65,7 +65,7 @@ Retrospective and tests are required before closing:
 RETRO="work/epics/e{N}-{name}/stories/{story_id}/retrospective.md"
 if [ ! -f "$RETRO" ]; then
     echo "ERROR: Retrospective not found: $RETRO"
-    echo "Run `rai-story-review` first"
+    echo "Run /rai-story-review first"
     exit 4  # ArtifactNotFoundError
 fi
 
@@ -80,7 +80,7 @@ uv run pytest --tb=no -q || {
 
 **Verification:** Retrospective exists and tests pass.
 
-> **If you can't continue:** Run ``rai-story-review`` first. No exceptions.
+> **If you can't continue:** Run `/rai-story-review` first. No exceptions.
 
 ### Step 1: Verify Feature Ready
 
@@ -259,10 +259,10 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 Record the completion of the entire story lifecycle:
 
 ```bash
-rai memory emit-work story {story_id} --event complete --phase review
+rai signal emit-work story {story_id} --event complete --phase review
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e complete -p review`
+**Example:** `rai signal emit-work story S15.1 -e complete -p review`
 
 **Verification:** Telemetry emitted.
 
@@ -322,17 +322,17 @@ Feature lifecycle complete.
 ### Feature Lifecycle Summary
 
 ```
-`rai-story-start` (fase 3)
+/rai-story-start (fase 3)
       ↓
-`rai-story-design` (fase 4)
+/rai-story-design (fase 4)
       ↓
-`rai-story-plan` (fase 5)
+/rai-story-plan (fase 5)
       ↓
-`rai-story-implement` (fase 6)
+/rai-story-implement (fase 6)
       ↓
-`rai-story-review` (fase 7)
+/rai-story-review (fase 7)
       ↓
-`rai-story-close` (fase 8) ← YOU ARE HERE
+/rai-story-close (fase 8) ← YOU ARE HERE
 ```
 
 ### Branch Hygiene Philosophy
@@ -363,6 +363,6 @@ If feature is abandoned (not completed):
 
 ## References
 
-- Previous skill: ``rai-story-review``
-- Complement: ``rai-story-start``
+- Previous skill: `/rai-story-review`
+- Complement: `/rai-story-start`
 - Epic scope: `work/epics/e{N}-{name}/scope.md`

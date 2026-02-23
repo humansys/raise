@@ -52,7 +52,7 @@ This single command:
 rai session start --name "Name" --project "$(pwd)" --context
 ```
 
-**If graph unavailable:** Run `rai memory build` first, then retry.
+**If graph unavailable:** Run `rai graph build` first, then retry.
 
 The bundle output includes an `# Available Context` manifest listing sections by name, item count, and token estimate. Use this to decide what to load in Step 2.
 
@@ -98,7 +98,9 @@ With orientation from Step 1 and priming from Step 2, use inference to:
    - Pending decisions or blockers → address first
    - Communication preferences (language, style, skip_praise, redirect) → adapt tone accordingly
 
-2. **Propose session focus** based on:
+2. **Check parking lot:** If `dev/parking-lot.md` exists, scan for stale items (>2 weeks).
+
+3. **Propose session focus** based on:
    - Pending items from previous session (highest priority)
    - Current story/phase (continue where left off)
    - Deadlines (urgency modulation)
@@ -142,4 +144,5 @@ Go.
 - Profile: `~/.rai/developer.yaml`
 - Session state: `.raise/rai/session-state.yaml`
 - Memory graph: `.raise/rai/memory/index.json`
+- Parking lot: `dev/parking-lot.md`
 - Complement: `/rai-session-close`

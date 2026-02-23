@@ -15,7 +15,7 @@ metadata:
   raise.next: story-implement
   raise.gate: gate-plan
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "1.0.0"
   raise.visibility: public
 ---
 
@@ -42,11 +42,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 
 **Inputs required:**
 - User stories for the feature to implement
-- Story Design (Contract 4) — `design.md` with Gemba state, Target Interfaces, and Integration Points
-- Acceptance Criteria — from `story.md` (Gherkin) or `design.md` § AC
+- Technical Design for architectural context (if complex)
 
 **Output:**
-- SDLD Task Blueprints: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
+- Implementation plan: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
 
 ## Steps
 
@@ -55,10 +54,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-rai memory emit-work story {story_id} --event start --phase plan
+rai signal emit-work story {story_id} --event start --phase plan
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e start -p plan`
+**Example:** `rai signal emit-work story S15.1 -e start -p plan`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -84,22 +83,22 @@ ls work/epics/e*/stories/{story_id}/design.md 2>/dev/null || echo "INFO: No desi
 Load relevant patterns and calibration from unified context:
 
 ```bash
-rai memory query "planning estimation calibration" --types pattern,calibration --limit 5
+rai graph query "planning estimation calibration" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Key patterns inform task structure and sizing.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai graph build` first, or proceed without patterns.
 
 ### Step 0.6: Load Architectural Context
 
 Identify the primary module(s) this story affects, then load their architectural context:
 
 ```bash
-rai memory context mod-<name>
-# Example: rai memory context mod-memory
+rai graph context mod-<name>
+# Example: rai graph context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -158,74 +157,24 @@ Divide story into atomic tasks:
 
 *Duration tracked for calibration, not commitment. AI-assisted velocity varies.
 
-**IMPORTANT:** Derive task deliverables from `design.md` § Target Interfaces. Each function signature becomes a task. Each Gherkin scenario becomes a test spec. File paths come from § Gemba. If no design exists (simple features), use the lightweight format.
-
-**Task structure — SDLD Blueprint (M+ stories):**
-
+**Task structure:**
 ```markdown
-### Task N: [descriptive name]
-
-**Objective:** [one sentence — what this task delivers]
-
-**RED — Write Failing Test:**
-- **File:** `tests/path/to/test_file.ext`
-- **Test function:** `test_descriptive_name`
-- **Setup:** [Given — from Gherkin scenario]
-- **Action:** [When — from Gherkin scenario]
-- **Assertion:** [Then — from Gherkin scenario]
-```
-// Test sketch in project language (adapt to your stack):
-// TypeScript:  describe('feature', () => { it('should ...', () => { ... }) })
-// Python:     def test_descriptive_name(): ...
-// C#:         [Fact] public void DescriptiveName() { ... }
-// PHP:        public function testDescriptiveName(): void { ... }
-// Dart:       test('descriptive name', () { ... });
+### Task N: [Name]
+- **Description:** What to do
+- **Files:** Files to create/modify
+- **TDD Cycle:** RED (write failing test) → GREEN (implement) → REFACTOR
+- **Verification:** How to verify completion (test command)
+- **Size:** XS/S/M/L
+- **Dependencies:** None / Task N
 ```
 
-**GREEN — Implement:**
-- **File:** `src/path/to/module.ext`
-- **Function/Class:** [signature from design § Target Interfaces]
-```
-// Implementation signature (adapt to your stack):
-// TypeScript:  function newFeature(param: Type): ReturnType
-// Python:     def new_feature(param: Type) -> ReturnType
-// C#:         public ReturnType NewFeature(Type param)
-// PHP:        public function newFeature(Type $param): ReturnType
-// Dart:       ReturnType newFeature(Type param)
-```
-- **Integration:** [how this connects — from design § Integration Points]
-
-**Verification:**
-```bash
-# Run with your project's test runner:
-# TypeScript:  npx jest tests/path/test_file.test.ts
-# Python:     pytest tests/path/test_file.py::test_name -v
-# C#:         dotnet test --filter DescriptiveName
-# PHP:        phpunit tests/path/TestFile.php --filter testName
-# Dart:       flutter test test/path/test_file_test.dart
-```
-
-**Size:** S
-**Dependencies:** None
-**AC Reference:** Scenario "name" from story.md / design.md § AC
-```
-
-**Blueprint depth heuristic — adapt detail to story size:**
-
-| Story Size | RED Section | GREEN Section |
-|------------|-------------|---------------|
-| XS (1-2 SP) | Test name + assertion only | Function name + file only |
-| S (3-5 SP) | Test sketch (Given/When/Then) | Signature + file + integration |
-| M (5-8 SP) | Full test code sketch | Full signature + imports + integration |
-| L (8+ SP) | Full test code sketch | Full signature + imports + integration (consider splitting story) |
-
-**TDD Guidance:**
+**TDD Guidance (RED/GREEN cycles):**
 - **RED:** Write a failing test first that defines expected behavior
 - **GREEN:** Write minimal code to make the test pass
 - **REFACTOR:** Clean up while keeping tests green
-- For infrastructure/setup tasks (no testable behavior), TDD cycle may be optional — use a lightweight task format without RED/GREEN sections
+- For infrastructure/setup tasks, TDD cycle may be optional
 
-**Verification:** Each task is atomic and verifiable. RED/GREEN sections trace to design § Target Interfaces.
+**Verification:** Each task is atomic and verifiable.
 
 > **If you can't continue:** Tasks too large → Divide until atomic. But avoid over-decomposition for simple features.
 
@@ -281,37 +230,18 @@ Create plan document with:
 - Dependencies
 - Verifications
 - Duration tracking table (filled during implementation)
-- **Traceability table** (required for M+ stories)
 
-**Traceability table format:**
-
-```markdown
-## Traceability
-
-| AC Scenario | Task(s) | Design § |
-|-------------|---------|----------|
-| "happy path: user exports session" | T1, T2 | Target Interfaces → exportSession |
-| "error: missing session" | T3 | Target Interfaces → exportSession (error path) |
-```
-
-**Rules:**
-- Every AC scenario from `story.md` or `design.md` § AC **MUST** map to at least one task
-- Every task **MUST** reference an AC scenario (via `AC Reference` field)
-- `Design §` column traces back to the design section that grounds this task
-
-**Skip condition:** XS/S stories without formal AC can omit the traceability table.
-
-**Verification:** Plan documented and complete. Traceability table covers all AC scenarios (M+ stories).
+**Verification:** Plan documented and complete.
 
 ### Step 7: Emit Feature Complete (Telemetry)
 
 Record the completion of the plan phase:
 
 ```bash
-rai memory emit-work story {story_id} --event complete --phase plan
+rai signal emit-work story {story_id} --event complete --phase plan
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e complete -p plan`
+**Example:** `rai signal emit-work story S15.1 -e complete -p plan`
 
 ## Output
 
@@ -326,19 +256,32 @@ rai memory emit-work story {story_id} --event complete --phase plan
 # Implementation Plan: {Feature Name}
 
 ## Overview
-- **Story:** {story-id}
-- **Size:** XS/S/M/L
-- **Tasks:** N
-- **Derived from:** design.md § Target Interfaces
+- **Feature:** {feature-id}
+- **Story Points:** N SP
+- **Feature Size:** XS/S/M/L
 - **Created:** YYYY-MM-DD
 
 ## Tasks
 
-[Use SDLD Blueprint task format from Step 2. Apply depth heuristic for story size.]
+### Task 1: {Name}
+- **Description:** ...
+- **Files:** ...
+- **TDD Cycle:** RED → GREEN → REFACTOR
+- **Verification:** `pytest tests/test_X.py`
+- **Size:** S
+- **Dependencies:** None
 
-### Task N (Final): Integration Verification
-- **Objective:** Validate story works end-to-end
-- **Verification:** Run all story tests + manual demo
+### Task 2: {Name}
+- **Description:** ...
+- **Files:** ...
+- **TDD Cycle:** RED → GREEN → REFACTOR
+- **Verification:** `ruff check src/`
+- **Size:** XS
+- **Dependencies:** Task 1
+
+### Task N (Final): Manual Integration Test
+- **Description:** Validate story works end-to-end with running software
+- **Verification:** Demo the story working interactively
 - **Size:** XS
 - **Dependencies:** All previous tasks
 
@@ -346,14 +289,7 @@ rai memory emit-work story {story_id} --event complete --phase plan
 1. Task 1 (foundation)
 2. Task 2 (depends on 1)
 3. Task 3, Task 4 (parallel)
-4. Task N — Integration verification (final)
-
-## Traceability
-
-| AC Scenario | Task(s) | Design § |
-|-------------|---------|----------|
-| "happy path" | T1, T2 | Target Interfaces → function_x |
-| "edge case" | T3 | Target Interfaces → function_y |
+4. Task N - Manual Integration Test (final validation)
 
 ## Risks
 - {Risk 1}: {Mitigation}
@@ -363,7 +299,7 @@ rai memory emit-work story {story_id} --event complete --phase plan
 |------|------|--------|-------|
 | 1 | S | -- | (filled during implementation) |
 | 2 | XS | -- | |
-| N | XS | -- | Integration verification |
+| N | XS | -- | Integration test |
 ```
 
 ## References

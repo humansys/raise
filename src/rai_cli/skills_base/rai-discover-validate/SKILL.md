@@ -309,7 +309,7 @@ After validation, export the validated components to JSON for graph integration.
 
 **Graph Integration:**
 ```bash
-rai memory build --input work/discovery/components-validated.json
+rai graph build
 ```
 
 **Architecture Documentation:**
@@ -324,7 +324,7 @@ Run `/rai-discover-document` to generate module docs from discovery data.
   - Updated `work/discovery/components-draft.yaml`
   - `work/discovery/components-validated.json` — Final component catalog
 - **Telemetry:** `skill_event` via Stop hook
-- **Next:** `rai memory build` (graph integration) or `/rai-discover-document` (architecture docs)
+- **Next:** `rai graph build` (graph integration) or `/rai-discover-document` (architecture docs)
 
 ## Confidence Tiers
 
@@ -369,6 +369,6 @@ If too many components are medium/low on a well-documented codebase:
 ## References
 
 - Previous skill: `/rai-discover-scan`
-- Next: `rai memory build` (graph integration) or `/rai-discover-document` (architecture docs)
+- Next: `rai graph build` (graph integration) or `/rai-discover-document` (architecture docs)
 - CLI: `rai discover analyze --help`
 - Analyzer: `src/rai_cli/discovery/analyzer.py`

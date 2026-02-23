@@ -23,7 +23,7 @@ metadata:
 
 ## Purpose
 
-Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `rai memory build` produces 30+ governance nodes, making `/rai-session-start` immediately useful.
+Guide a developer through greenfield project setup via conversation. Collect project identity, requirements, constraints, and architecture context, then fill governance templates with parser-compatible content. Final gate: `rai graph build` produces 30+ governance nodes, making `/rai-session-start` immediately useful.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -401,14 +401,14 @@ version: "1.0.0"
 Run the graph builder and verify the 30+ node gate.
 
 ```bash
-rai memory build
+rai graph build
 ```
 
 **Expected output:** The build should show governance nodes extracted from each doc.
 
 **Verification gate:**
 ```bash
-rai memory query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
+rai graph query "requirement outcome guardrail" --types requirement,outcome,guardrail --limit 50
 ```
 
 Count the governance nodes. You need **30+ total** across these types:
@@ -423,7 +423,7 @@ Count the governance nodes. You need **30+ total** across these types:
 - 30+ nodes → **Gate passed.** Continue to summary.
 - <30 nodes → Investigate which docs didn't parse. Check format against parser contract in Step 6. Fix and rebuild.
 
-**Verification:** `rai memory build` succeeds and produces 30+ governance nodes.
+**Verification:** `rai graph build` succeeds and produces 30+ governance nodes.
 
 > **If you can't continue:** Nodes too low → Most common cause is format mismatch. Check RF-XX headings, bold-pipe tables, guardrail IDs, backlog header. Fix the specific doc and rebuild.
 
@@ -460,7 +460,7 @@ Present what was created and what to do next.
 | Item | Destination |
 |------|-------------|
 | Filled governance docs | `governance/` (prd.md, vision.md, guardrails.md, backlog.md, architecture/) |
-| Knowledge graph | `.raise/rai/memory/index.json` (via `rai memory build`) |
+| Knowledge graph | `.raise/rai/memory/index.json` (via `rai graph build`) |
 | Summary | Displayed to user |
 
 ## Notes
