@@ -218,6 +218,86 @@ rai gate check gate-types
 
 ---
 
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-23
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S248.1: Event emitter | M | None | M1 | Foundation — typed events, emit(), before/after dispatch. Everything else builds on this. |
+| 2 | S248.2: Hook Protocol | M | S248.1 | M1 | Completes the hook pipeline: Protocol + entry points + priority dispatch + error isolation. |
+| 3 | S248.5: Gate Protocol | M | None | M1 | Standalone (AD-5) — can start in parallel with S1/S2. Protocol + `rai gate check` command. |
+| 4 | S248.3: TelemetryHook | S | S248.2 | M2 | First real hook — proves the system works E2E. Replaces manual emit calls. |
+| 5 | S248.4: Wire events | M | S248.2 | M2 | Inserts `emit()` calls into 8 CLI command groups. TelemetryHook starts auto-firing. |
+| 6 | S248.6: Built-in gates + bridge | S | S248.5, S248.2 | M2 | 4 quality gates + GateBridgeHook. Gates become executable, bridge wires them to before: events. |
+| 7 | S248.7: Remove ceremony | M | S248.3, S248.4, S248.6 | M3 | Strip telemetry/prerequisite steps from all 22 skills. Last because it depends on everything. |
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Track A:  S248.1 (emitter) → S248.2 (hook protocol) → S248.3 (telemetry) → S248.4 (wire)
+                                          ↓ enables bridge hook
+Track B:  S248.5 (gate protocol) ────────→ S248.6 (gates + bridge)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                                                              ↓
+                                                    S248.7 (remove ceremony)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+- **Track A** (critical path): S248.1 → S248.2 → S248.3 → S248.4
+- **Track B** (parallel): S248.5 starts immediately, S248.6 waits for S248.2 (bridge hook needs hook Protocol)
+- **Merge point:** S248.7 requires both tracks complete
+- **Realistic parallelism:** Solo developer — tracks alternate, not truly concurrent. But S248.5 can start during any pause in Track A.
+
+### Milestones
+
+| Milestone | Stories | Success Criteria | Demo |
+|-----------|---------|------------------|------|
+| **M1: Walking Skeleton** | S248.1, S248.2, S248.5 | Hook Protocol works E2E (emit event → hook handles it). Gate Protocol works standalone (`rai gate check`). | Emit a test event, see hook fire. Run `rai gate check gate-tests`. |
+| **M2: Auto-firing** | +S248.3, S248.4, S248.6 | `rai graph build` auto-emits telemetry (no manual call). `rai gate check` runs 4 built-in gates. GateBridgeHook wires gates to `before:release:publish`. | Run `rai graph build -v` → see "hook:telemetry fired". |
+| **M3: Ceremony-free skills** | +S248.7 | Zero `rai signal emit` / `rai memory emit-work` in `skills_base/`. Skills work identically but are shorter. | Diff a skill before/after — ceremony steps gone, behavior identical. |
+| **M4: Epic Complete** | — | All done criteria met. Architecture review passed. Retrospective done. | `/rai-epic-close` ready. |
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| S248.1 event model doesn't scale to all 9 events | Low | High | TDD — start with 2 events (session:start, graph:build), validate pattern, then expand |
+| S248.4 wiring breaks existing CLI commands | Medium | Medium | Each command wired individually with test coverage. Rollback is removing 2-3 lines per command. |
+| S248.7 skill edits introduce regressions | Medium | Low | Grep gate (zero remaining emit calls) + spot-check 3-4 skills. Skills are markdown — changes are deletions, not new logic. |
+| S248.6 bridge hook creates double-execution | Low | Medium | Test: emit `before:release:publish` → verify gates run exactly once. Bridge hook is the only path. |
+
+### Velocity Assumptions
+
+- **Reference:** E211 completed 7 stories (3M + 4S) in 2 calendar days. E247 averaged 1.93x velocity across 6 stories.
+- **E248 adjustment:** Similar scope (7 stories, 4M + 2S + 1M). Infrastructure work like E211 but with established patterns (entry points, Protocols). Expect comparable velocity.
+- **Buffer:** 25% for integration testing between hooks/gates/skills.
+- **Estimate:** 3-4 calendar days for full epic.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S248.1 | M | Pending | — | — | |
+| S248.2 | M | Pending | — | — | |
+| S248.5 | M | Pending | — | — | |
+| S248.3 | S | Pending | — | — | |
+| S248.4 | M | Pending | — | — | |
+| S248.6 | S | Pending | — | — | |
+| S248.7 | M | Pending | — | — | |
+
+**Milestones:**
+- [ ] M1: Walking Skeleton
+- [ ] M2: Auto-firing
+- [ ] M3: Ceremony-free skills
+- [ ] M4: Epic Complete
+
+---
+
 ## Epic Dependency Chain
 
 ```
