@@ -7,7 +7,7 @@ to skill content.
 Architecture: ADR-039 (Lifecycle Hooks & Workflow Gates)
 """
 
-from rai_cli.hooks.emitter import EventEmitter
+from rai_cli.hooks.emitter import EventEmitter, create_emitter
 from rai_cli.hooks.events import (
     AdapterFailedEvent,
     AdapterLoadedEvent,
@@ -37,6 +37,7 @@ __all__ = [
     "HookRegistry",
     # Emitter
     "EventEmitter",
+    "create_emitter",
     # After-events (9)
     "SessionStartEvent",
     "SessionCloseEvent",

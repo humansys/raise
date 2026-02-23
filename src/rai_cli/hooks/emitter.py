@@ -169,3 +169,16 @@ class EventEmitter:
         ):
             return True, result.message
         return aborted, abort_message
+
+
+def create_emitter() -> EventEmitter:
+    """Create an EventEmitter with a discovered HookRegistry.
+
+    Convenience factory that avoids repeating registry setup in every
+    CLI command. Discovers hooks from ``rai.hooks`` entry points.
+    """
+    from rai_cli.hooks.registry import HookRegistry
+
+    registry = HookRegistry()
+    registry.discover()
+    return EventEmitter(registry=registry)
