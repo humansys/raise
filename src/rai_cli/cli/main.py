@@ -18,6 +18,7 @@ from rai_cli.cli.commands.init import init_command
 from rai_cli.cli.commands.memory import memory_app
 from rai_cli.cli.commands.pattern import pattern_app
 from rai_cli.cli.commands.profile import profile_app
+from rai_cli.cli.commands.signal import signal_app
 from rai_cli.cli.commands.publish import publish_app
 from rai_cli.cli.commands.release import release_app
 from rai_cli.cli.commands.session import session_app
@@ -56,6 +57,7 @@ app.add_typer(profile_app, name="profile")
 app.add_typer(publish_app, name="publish")
 app.add_typer(release_app, name="release")
 app.add_typer(session_app, name="session")
+app.add_typer(signal_app, name="signal")
 app.add_typer(skill_app, name="skill")
 
 # Register standalone commands

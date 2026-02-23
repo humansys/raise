@@ -126,6 +126,14 @@ def emit_work(...) -> None:
 # same pattern for emit-session → emit_session, emit-calibration → emit_calibration
 ```
 
+- **`memory.py` dead imports cleanup (arch review R1):** Remove imports that only the emit-* bodies used:
+  - `from datetime import UTC, datetime` → delete line
+  - `Literal` from `from typing import Annotated, Literal` → keep only `Annotated`
+  - `CalibrationEvent, SessionEvent, WorkLifecycle` from `telemetry.schemas` → delete block
+  - `emit` from `telemetry.writer` → delete line
+  - `resolve_session_id_optional` from `session.resolver` → delete line
+  - **Keep:** `get_personal_dir` (used by add-session), `Annotated` (used by add-calibration/add-session)
+
 **Verification:**
 ```bash
 pytest tests/cli/commands/test_memory.py::TestMemoryEmitSignalShims -v
