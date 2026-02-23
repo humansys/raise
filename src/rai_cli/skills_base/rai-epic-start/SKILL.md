@@ -162,7 +162,7 @@ Also update the summary line below the table to reflect the new count.
 ### Step 6: Emit Telemetry
 
 ```bash
-rai memory emit-work epic E{N} --event start --phase init
+rai signal emit-work epic E{N} --event start --phase init
 ```
 
 **Verification:** Telemetry emitted.
