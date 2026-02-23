@@ -31,7 +31,7 @@ Implement ADR-033/034/035/036/037 as Python code — Protocol contracts, entry p
 | S211.3 | rai memory build → registry | M | Done ✓ | S211.0, S211.2 | 9 parser wrappers, entry points, extractor refactor. First consumer of adapter contracts. |
 | S211.4 | KnowledgeGraphBackend | M | Done ✓ | S211.0, S211.2 | FilesystemGraphBackend + full call-site migration. UnifiedGraph pure in-memory. |
 | S211.5 | TierContext | S | Done ✓ | S211.1 | Tier detection from manifest, Capability enum, progressive enrichment |
-| S211.6 | rai adapters list/check | S | Pending | S211.2, S211.5 | CLI surface for adapter discovery and validation |
+| S211.6 | rai adapters list/check | S | Done ✓ | S211.2, S211.5 | CLI surface for adapter discovery and validation |
 
 **Total:** 7 stories (M epic)
 
