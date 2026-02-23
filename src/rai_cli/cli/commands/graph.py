@@ -24,6 +24,8 @@ from rich.console import Console
 from rich.table import Table
 
 from rai_cli.cli.error_handler import cli_error
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import GraphBuildEvent
 from rai_cli.compat import to_file_uri
 from rai_cli.config.paths import get_memory_dir, get_personal_dir
 from rai_cli.context import UnifiedGraph, UnifiedGraphBuilder
@@ -473,6 +475,14 @@ def build(
 
     # Save graph via backend
     backend.persist(graph)
+
+    # Emit graph:build event
+    emitter = create_emitter()
+    emitter.emit(GraphBuildEvent(
+        project_path=output_path.parent,
+        node_count=graph.node_count,
+        edge_count=graph.edge_count,
+    ))
 
     # Compute and persist diff
     diff: GraphDiff | None = None
