@@ -1,14 +1,22 @@
 """Governance concept extractor orchestrator.
 
 Coordinates multiple parsers to extract concepts from governance files.
+Supports two paths:
+- extract_all() → registry-based, returns list[GraphNode] (new)
+- extract_with_result() → legacy direct imports, returns ExtractionResult (backward compat)
 """
 
 from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any
 
+from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
+from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType, ExtractionResult
+
+# Legacy imports — used only by extract_with_result() and extract_from_file()
 from rai_cli.governance.parsers.adr import extract_all_decisions
 from rai_cli.governance.parsers.backlog import extract_epics, extract_project
 from rai_cli.governance.parsers.constitution import extract_principles
@@ -25,8 +33,10 @@ logger = logging.getLogger(__name__)
 class GovernanceExtractor:
     """Orchestrates extraction of concepts from governance markdown files.
 
-    Coordinates multiple parsers to extract requirements, outcomes, and
-    principles from their respective governance documents.
+    Two extraction paths:
+    - extract_all(): Uses registry-discovered parsers, returns list[GraphNode].
+    - extract_with_result(): Legacy path with direct imports, returns ExtractionResult
+      with list[Concept]. Maintained for backward compat with ``rai memory extract`` CLI.
 
     Attributes:
         project_root: Project root directory for relative path calculation.
@@ -34,22 +44,151 @@ class GovernanceExtractor:
     Examples:
         >>> from pathlib import Path
         >>> extractor = GovernanceExtractor()
-        >>> concepts = extractor.extract_all()
-        >>> len(concepts) >= 20
+        >>> nodes = extractor.extract_all()
+        >>> len(nodes) >= 20
         True
-        >>> prd_concepts = extractor.extract_from_file(
-        ...     Path("governance/prd.md"),
-        ...     ConceptType.REQUIREMENT
-        ... )
     """
 
-    def __init__(self, project_root: Path | None = None) -> None:
+    def __init__(
+        self,
+        project_root: Path | None = None,
+        parsers: dict[str, type] | None = None,
+    ) -> None:
         """Initialize the governance extractor.
 
         Args:
             project_root: Project root directory. If None, uses current directory.
+            parsers: Optional parser classes for DI/testing. If None, discovers
+                via entry points at call time.
         """
         self.project_root = project_root or Path.cwd()
+        self._parser_classes = parsers
+
+    # --- New registry path ---
+
+    def extract_all(self) -> list[GraphNode]:
+        """Extract all governance concepts via registry parsers.
+
+        Builds ArtifactLocators for known artifact locations, discovers
+        parsers via entry points, and delegates parsing to matching parsers.
+
+        Returns:
+            List of GraphNode from all governance artifacts.
+        """
+        locators = self._build_locators()
+        parser_classes = self._get_parser_classes()
+
+        # Instantiate parser classes
+        parsers: list[Any] = []
+        for name, cls in parser_classes.items():
+            try:
+                parsers.append(cls())
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Failed to instantiate parser '%s': %s", name, exc)
+
+        nodes: list[GraphNode] = []
+        for locator in locators:
+            parser = self._find_parser(locator, parsers)
+            if parser is None:
+                logger.debug(
+                    "No parser found for artifact type '%s' at '%s'",
+                    locator.artifact_type,
+                    locator.path,
+                )
+                continue
+            try:
+                result = parser.parse(locator)
+                nodes.extend(result)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning(
+                    "Error parsing '%s' with %s: %s",
+                    locator.path,
+                    type(parser).__name__,
+                    exc,
+                )
+
+        return nodes
+
+    def _build_locators(self) -> list[ArtifactLocator]:
+        """Build ArtifactLocators for all known governance artifact locations.
+
+        Hardcodes paths (same locations as the legacy path). For ADR and
+        epic_scope, globs to produce one locator per file.
+
+        Returns:
+            List of ArtifactLocators for existing files.
+        """
+        root = self.project_root
+        meta = {"project_root": str(root)}
+        locators: list[ArtifactLocator] = []
+
+        # Single-file artifacts
+        single_files: list[tuple[str, str]] = [
+            (CoreArtifactType.PRD, "governance/prd.md"),
+            (CoreArtifactType.VISION, "governance/vision.md"),
+            (CoreArtifactType.CONSTITUTION, "framework/reference/constitution.md"),
+            (CoreArtifactType.ROADMAP, "governance/roadmap.md"),
+            (CoreArtifactType.BACKLOG, "governance/backlog.md"),
+            (CoreArtifactType.GUARDRAILS, "governance/guardrails.md"),
+            (CoreArtifactType.GLOSSARY, "framework/reference/glossary.md"),
+        ]
+
+        for artifact_type, rel_path in single_files:
+            if (root / rel_path).exists():
+                locators.append(
+                    ArtifactLocator(
+                        path=rel_path,
+                        artifact_type=artifact_type,
+                        metadata=dict(meta),
+                    )
+                )
+
+        # ADR files — one locator per file (two directories)
+        for adr_dir in ["dev/decisions", "dev/decisions/v2"]:
+            full_dir = root / adr_dir
+            if full_dir.exists():
+                for adr_file in sorted(full_dir.glob("adr-*.md")):
+                    rel = str(adr_file.relative_to(root))
+                    locators.append(
+                        ArtifactLocator(
+                            path=rel,
+                            artifact_type=CoreArtifactType.ADR,
+                            metadata=dict(meta),
+                        )
+                    )
+
+        # Epic scope files — one locator per scope.md
+        for scope_file in sorted(root.glob("work/epics/*/scope.md")):
+            rel = str(scope_file.relative_to(root))
+            locators.append(
+                ArtifactLocator(
+                    path=rel,
+                    artifact_type=CoreArtifactType.EPIC_SCOPE,
+                    metadata=dict(meta),
+                )
+            )
+
+        return locators
+
+    def _find_parser(
+        self, locator: ArtifactLocator, parsers: list[Any]
+    ) -> Any | None:
+        """Find first parser that can_parse this locator."""
+        for parser in parsers:
+            if parser.can_parse(locator):
+                return parser
+        return None
+
+    def _get_parser_classes(self) -> dict[str, type]:
+        """Get parser classes from DI or entry point discovery."""
+        if self._parser_classes is not None:
+            return self._parser_classes
+
+        from rai_cli.adapters.registry import get_governance_parsers
+
+        return get_governance_parsers()
+
+    # --- Legacy path (backward compat) ---
 
     def extract_from_file(
         self, file_path: Path, concept_type: ConceptType | None = None
@@ -65,21 +204,14 @@ class GovernanceExtractor:
 
         Raises:
             ValueError: If concept_type is None and cannot be inferred from file path.
-
-        Examples:
-            >>> extractor = GovernanceExtractor()
-            >>> prd_path = Path("governance/prd.md")
-            >>> concepts = extractor.extract_from_file(prd_path, ConceptType.REQUIREMENT)
         """
         if not file_path.exists():
             logger.warning(f"File not found, skipping: {file_path}")
             return []
 
-        # Infer concept type from file path if not provided
         if concept_type is None:
             concept_type = self._infer_concept_type(file_path)
 
-        # Route to appropriate parser
         if concept_type == ConceptType.REQUIREMENT:
             return extract_requirements(file_path, self.project_root)
         elif concept_type == ConceptType.OUTCOME:
@@ -90,46 +222,15 @@ class GovernanceExtractor:
             logger.warning(f"Unsupported concept type: {concept_type}")
             return []
 
-    def extract_all(self) -> list[Concept]:
-        """Extract all concepts from standard governance file locations.
-
-        Extracts from:
-        - governance/prd.md (requirements)
-        - governance/vision.md (outcomes)
-        - framework/reference/constitution.md (principles)
-        - governance/backlog.md (epics)
-        - work/epics/*/scope.md (stories)
-        - dev/decisions/adr-*.md (decisions)
-        - governance/guardrails.md (guardrails)
-        - framework/reference/glossary.md (terms)
-
-        Returns:
-            List of all extracted concepts.
-
-        Examples:
-            >>> extractor = GovernanceExtractor()
-            >>> all_concepts = extractor.extract_all()
-            >>> len(all_concepts) >= 20
-            True
-        """
-        result = self.extract_with_result()
-        for error in result.errors:
-            logger.error(error)
-        return result.concepts
-
     def extract_with_result(self) -> ExtractionResult:
         """Extract all concepts and return detailed result.
 
+        Legacy path: uses direct parser imports, returns ExtractionResult
+        with list[Concept]. Maintained for ``rai memory extract`` CLI which
+        depends on Concept fields (file, section, lines).
+
         Returns:
             ExtractionResult with concepts, counts, and errors.
-
-        Examples:
-            >>> extractor = GovernanceExtractor()
-            >>> result = extractor.extract_with_result()
-            >>> result.total >= 20
-            True
-            >>> result.files_processed >= 3
-            True
         """
         concepts: list[Concept] = []
         errors: list[str] = []
@@ -172,7 +273,6 @@ class GovernanceExtractor:
         # Extract work concepts (E8)
         work_concepts = self._extract_work_concepts()
         concepts.extend(work_concepts)
-        # Count backlog and epic scope files as processed
         backlog_file = self.project_root / "governance" / "backlog.md"
         backlog_count = 1 if backlog_file.exists() else 0
         epic_count = len(list(self.project_root.glob("work/epics/*/scope.md")))
@@ -182,7 +282,6 @@ class GovernanceExtractor:
         try:
             adr_concepts = extract_all_decisions(self.project_root)
             concepts.extend(adr_concepts)
-            # Count ADR files processed
             adr_root_count = len(list(self.project_root.glob("dev/decisions/adr-*.md")))
             adr_v2_count = len(
                 list(self.project_root.glob("dev/decisions/v2/adr-*.md"))
@@ -240,17 +339,14 @@ class GovernanceExtractor:
         """
         concepts: list[Concept] = []
 
-        # Extract from backlog
         backlog_file = self.project_root / "governance" / "backlog.md"
         if backlog_file.exists():
             try:
-                # Extract Project concept
                 project = extract_project(backlog_file, self.project_root)
                 if project:
                     concepts.append(project)
                     logger.info(f"Extracted project from {backlog_file.name}")
 
-                # Extract Epic index concepts
                 epic_index = extract_epics(backlog_file, self.project_root)
                 concepts.extend(epic_index)
                 logger.info(
@@ -259,26 +355,20 @@ class GovernanceExtractor:
             except Exception as e:
                 logger.error(f"Error extracting from {backlog_file}: {e}")
 
-        # Extract from epic scope documents
         for scope_file in self.project_root.glob("work/epics/*/scope.md"):
             try:
-                # Extract detailed Epic concept
                 epic_detail = extract_epic_details(scope_file, self.project_root)
                 if epic_detail:
-                    # Merge with index if exists, otherwise add
-                    # (scope doc has more detail than backlog index)
                     existing = next(
                         (c for c in concepts if c.id == epic_detail.id), None
                     )
                     if existing:
-                        # Update existing with scope doc details
                         existing.metadata.update(epic_detail.metadata)
                         existing.content = epic_detail.content
                     else:
                         concepts.append(epic_detail)
                     logger.info(f"Extracted epic details from {scope_file.name}")
 
-                # Extract Story concepts
                 stories = extract_stories(scope_file, self.project_root)
                 concepts.extend(stories)
                 logger.info(f"Extracted {len(stories)} stories from {scope_file.name}")

@@ -13,8 +13,11 @@ from typing import Any, cast
 
 import yaml
 
+from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
+from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType
+from rai_cli.governance.parsers._convert import concept_to_node
 
 
 def _parse_frontmatter(text: str) -> tuple[dict[str, Any], str, int]:
@@ -254,3 +257,18 @@ def extract_all_decisions(project_root: Path | None = None) -> list[Concept]:
     # Note: v1 is intentionally skipped (legacy format without frontmatter)
 
     return concepts
+
+
+class AdrParser:
+    """GovernanceParser wrapper for ADR decisions. Per-file parsing."""
+
+    def can_parse(self, locator: ArtifactLocator) -> bool:
+        """Match ADR artifact type."""
+        return locator.artifact_type == CoreArtifactType.ADR
+
+    def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
+        """Parse single ADR file pointed to by locator."""
+        root = Path(locator.metadata["project_root"])
+        path = root / locator.path
+        concept = extract_decision_from_file(path, root)
+        return [concept_to_node(concept)] if concept else []
