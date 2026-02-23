@@ -285,12 +285,12 @@ time saved for these small stories.
 | S3: signal group | S | ✅ Done | 21 min | 2.86x | PAT-E-442, M1 complete |
 | S4: kill redundancies | XS | ✅ Done | 25 min | 0.8x | RAISE-253, PAT-E-444 |
 | S5: merge+flatten | S | ✅ Done | 29 min | 2.07x | RAISE-254, PAT-E-446/447 |
-| S6: skill sweep | M | Pending | - | - | RAISE-255 |
+| S6: skill sweep | M | ✅ Done | 30 min | 3.0x | RAISE-255, PAT-E-450/451 |
 
 **Milestones:**
 - [x] M1: God Object Decomposed (S1+S2+S3 — 2026-02-23)
 - [x] M2: Clean Taxonomy (S4+S5 — 2026-02-23)
-- [ ] M3: Epic Complete
+- [x] M3: Epic Complete (S6 — 2026-02-23)
 
 ### Risks
 
