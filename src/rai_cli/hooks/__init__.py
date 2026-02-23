@@ -24,12 +24,17 @@ from rai_cli.hooks.events import (
     SessionCloseEvent,
     SessionStartEvent,
 )
+from rai_cli.hooks.protocol import LifecycleHook
+from rai_cli.hooks.registry import HookRegistry
 
 __all__ = [
     # Base types
     "HookEvent",
     "HookResult",
     "EmitResult",
+    # Protocol + Registry
+    "LifecycleHook",
+    "HookRegistry",
     # Emitter
     "EventEmitter",
     # After-events (9)
