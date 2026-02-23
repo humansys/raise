@@ -163,10 +163,6 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 - **One CLI call** does all data plumbing — no separate add-session/add-pattern/emit-session
 - Idempotent: can close multiple times (second close overwrites with more current data)
 - State file is the richest path; CLI flags are for simple/quick closes
-- Calibration (if stories completed): still run separately:
-  ```bash
-  rai memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
-  ```
 
 ## References
 

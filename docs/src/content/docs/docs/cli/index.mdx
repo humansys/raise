@@ -293,56 +293,6 @@ rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170
 rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170
 ```
 
-### `rai memory add-calibration`
-
-Add calibration data for a completed story. Tracks estimate vs. actual duration for velocity analysis.
-
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--name` | | Story name (required) |
-| `--size` | `-s` | T-shirt size: `XS`, `S`, `M`, `L`, `XL` (required) |
-| `--actual` | `-a` | Actual minutes spent (required) |
-| `--estimated` | `-e` | Estimated minutes |
-| `--sp` | | Story points |
-| `--kata` / `--no-kata` | | Whether kata cycle was followed (default: yes) |
-| `--notes` | `-n` | Additional notes |
-| `--scope` | `-s` | Memory scope: `global`, `project`, `personal` |
-| `--memory-dir` | `-m` | Memory directory path |
-
-```bash
-# Basic calibration
-rai memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20
-
-# With estimate for velocity calculation
-rai memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60
-
-# Full details
-rai memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
-```
-
-### `rai memory add-session`
-
-Add a session record to memory. Sessions are developer-specific and always written to the personal directory.
-
-| Flag | Short | Description |
-|------|-------|-------------|
-| `--outcomes` | `-o` | Session outcomes (comma-separated) |
-| `--type` | `-t` | Session type (default: `story`) |
-| `--log` | `-l` | Path to session log file |
-| `--memory-dir` | `-m` | Memory directory path |
-
-```bash
-# Basic session
-rai memory add-session "S3.5 Skills Integration"
-
-# With outcomes
-rai memory add-session "S3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
-
-# Full details
-rai memory add-session "S3.5 Skills Integration" -t story -o "Writer API,Hooks" \
-  -l "dev/sessions/2026-02-02-s3.5.md"
-```
-
 ### `rai memory emit-work`
 
 Emit a work lifecycle event for Lean flow analysis. Tracks work items (epics, stories) through normalized phases to enable lead time, wait time, WIP, and bottleneck analysis.
@@ -425,12 +375,6 @@ rai memory viz --output graph.html
 # Generate without opening
 rai memory viz --no-open
 ```
-
-### `rai memory generate`
-
-:::caution[Deprecated]
-`memory generate` is deprecated. Use [`rai memory build`](#rai-memory-build) instead. The memory graph is now the single source of truth — context is delivered via `rai session start --context`.
-:::
 
 ---
 

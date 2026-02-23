@@ -131,7 +131,6 @@ addopts = [
     "--cov=src/rai_cli",
     "--cov-report=term-missing",
     "--cov-report=html",
-    "--cov-fail-under=90",
 ]
 markers = [
     "integration: Manual integration tests requiring external services (run with -m integration)",

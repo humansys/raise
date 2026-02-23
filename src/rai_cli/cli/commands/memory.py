@@ -1,13 +1,12 @@
-"""CLI commands for Rai's memory: calibration and session storage.
+"""Backward-compatible aliases for commands extracted to graph, pattern, and signal groups.
 
-Memory commands own the persistent knowledge that lives in JSONL files:
-- Calibration (estimation data)
-- Sessions (work history)
+All active commands have been extracted to dedicated groups (RAISE-247):
+- Graph: query, context, build, validate, extract, list, viz
+- Pattern: add-pattern, reinforce
+- Signal: emit-work, emit-session, emit-calibration
 
-Graph-structure commands have been extracted to the `graph` group (RAISE-247).
-Pattern commands have been extracted to the `pattern` group (RAISE-247).
-Signal/telemetry commands have been extracted to the `signal` group (RAISE-247).
-Backward-compatible aliases remain here and will be removed in a future release.
+These aliases print deprecation warnings and delegate to the canonical commands.
+They will be removed in a future release (RAISE-247/S9).
 """
 
 from __future__ import annotations
@@ -18,24 +17,11 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
-from rai_cli.cli.error_handler import cli_error
-from rai_cli.config.paths import get_personal_dir
-from rai_cli.memory import (
-    CalibrationInput,
-    MemoryScope,
-    SessionInput,
-    append_calibration,
-    append_session,
-    get_memory_dir_for_scope,
-)
-
 memory_app = typer.Typer(
     name="memory",
     help="Query and manage Rai's memory",
     no_args_is_help=True,
 )
-
-console = Console()
 
 
 # =============================================================================
@@ -245,41 +231,8 @@ def viz(
 
 
 # =============================================================================
-# Generate MEMORY.md (deprecated, kept for compat)
-# =============================================================================
-
-
-@memory_app.command("generate")
-def generate_memory(
-    path: Annotated[
-        Path | None,
-        typer.Option(
-            "--path", "-p", help="Project root (defaults to current directory)"
-        ),
-    ] = None,
-) -> None:
-    """Generate MEMORY.md for AI editors (deprecated).
-
-    MEMORY.md generation is no longer needed — the memory graph is the
-    single source of truth. Context is delivered via `raise session start
-    --context` which assembles a token-optimized bundle from the graph.
-
-    Use `rai graph build` to rebuild the graph instead.
-
-    Examples:
-        # Build the memory graph (recommended)
-        $ rai graph build
-    """
-    console.print("\n[yellow]Skipped:[/yellow] MEMORY.md generation is deprecated.")
-    console.print("  The memory graph is the single source of truth.")
-    console.print(
-        "  Context is delivered via [cyan]raise session start --context[/cyan]."
-    )
-    console.print("  Use [cyan]rai graph build[/cyan] to rebuild the graph.\n")
-
-
-# =============================================================================
-# Append Commands (Add to memory)
+# Backward-Compat Aliases: pattern commands (extracted to pattern.py in RAISE-247)
+# These wrappers will be removed in a future release (RAISE-247/S9).
 # =============================================================================
 
 
@@ -358,178 +311,6 @@ def add_pattern(
         scope=scope,
         memory_dir=memory_dir,
     )
-
-
-@memory_app.command("add-calibration")
-def add_calibration_cmd(
-    story: Annotated[str, typer.Argument(help="Story ID (e.g., F3.5)")],
-    name: Annotated[
-        str,
-        typer.Option("--name", help="Story name (required)"),
-    ],
-    size: Annotated[
-        str,
-        typer.Option("--size", "-s", help="T-shirt size: XS, S, M, L, XL (required)"),
-    ],
-    actual: Annotated[
-        int,
-        typer.Option("--actual", "-a", help="Actual minutes spent (required)"),
-    ],
-    estimated: Annotated[
-        int | None,
-        typer.Option("--estimated", "-e", help="Estimated minutes"),
-    ] = None,
-    sp: Annotated[
-        int | None,
-        typer.Option("--sp", help="Story points"),
-    ] = None,
-    kata: Annotated[
-        bool,
-        typer.Option("--kata/--no-kata", help="Kata cycle followed (default: yes)"),
-    ] = True,
-    notes: Annotated[
-        str | None,
-        typer.Option("--notes", "-n", help="Additional notes"),
-    ] = None,
-    scope: Annotated[
-        str,
-        typer.Option("--scope", help="Memory scope (global, project, personal)"),
-    ] = "personal",
-    memory_dir: Annotated[
-        Path | None,
-        typer.Option(
-            "--memory-dir", "-m", help="Memory directory path (overrides scope)"
-        ),
-    ] = None,
-) -> None:
-    """Add calibration data for a completed story.
-
-    Examples:
-        # Basic calibration (default: personal scope)
-        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20
-
-        # With estimate for velocity calculation
-        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60
-
-        # Full details
-        $ rai memory add-calibration F3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
-
-        # Add to project scope (shared)
-        $ rai memory add-calibration F3.5 --name "Skills" -s XS -a 20 --scope project
-    """
-    # Parse scope
-    try:
-        memory_scope = MemoryScope(scope)
-    except ValueError:
-        cli_error(
-            f"Invalid scope: {scope}",
-            hint="Valid scopes: global, project, personal",
-            exit_code=7,
-        )
-        return  # cli_error exits, but this satisfies pyright
-
-    # Determine directory (explicit dir overrides scope)
-    mem_dir = memory_dir or get_memory_dir_for_scope(memory_scope)
-    if not mem_dir.exists():
-        mem_dir.mkdir(parents=True, exist_ok=True)
-
-    # Validate size
-    valid_sizes = ["XS", "S", "M", "L", "XL"]
-    if size.upper() not in valid_sizes:
-        cli_error(
-            f"Invalid size: {size}",
-            hint=f"Valid sizes: {', '.join(valid_sizes)}",
-            exit_code=7,
-        )
-        return  # cli_error exits, but this satisfies pyright
-
-    input_data = CalibrationInput(
-        story=story,
-        name=name,
-        size=size.upper(),
-        sp=sp,
-        estimated_min=estimated,
-        actual_min=actual,
-        kata_cycle=kata,
-        notes=notes,
-    )
-
-    result = append_calibration(mem_dir, input_data, scope=memory_scope)
-
-    if result.success:
-        console.print(f"\n[green]✓[/green] {result.message}")
-        console.print(f"  ID: [cyan]{result.id}[/cyan]")
-        console.print(f"  Story: {story} ({name})")
-        console.print(f"  Size: {size.upper()}, Actual: {actual}min")
-        if estimated:
-            ratio = round(estimated / actual, 1)
-            console.print(f"  Velocity: {ratio}x (estimated {estimated}min)")
-        console.print("\n[dim]Index will rebuild on next query.[/dim]\n")
-    else:
-        cli_error(result.message)
-
-
-@memory_app.command("add-session")
-def add_session_cmd(
-    topic: Annotated[str, typer.Argument(help="Session topic")],
-    outcomes: Annotated[
-        str,
-        typer.Option("--outcomes", "-o", help="Session outcomes (comma-separated)"),
-    ] = "",
-    session_type: Annotated[
-        str,
-        typer.Option("--type", "-t", help="Session type (story, research, etc.)"),
-    ] = "story",
-    log_path: Annotated[
-        str | None,
-        typer.Option("--log", "-l", help="Path to session log file"),
-    ] = None,
-    memory_dir: Annotated[
-        Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path"),
-    ] = None,
-) -> None:
-    """Add a session record to memory (personal scope).
-
-    Sessions are developer-specific and always written to personal directory.
-
-    Examples:
-        # Basic session
-        $ raise memory add-session "F3.5 Skills Integration"
-
-        # With outcomes
-        $ raise memory add-session "F3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
-
-        # Full details
-        $ raise memory add-session "F3.5 Skills Integration" -t story -o "Writer API,Hooks" -l "dev/sessions/2026-02-02-f3.5.md"
-    """
-    # Sessions always go to personal directory (developer-specific)
-    mem_dir = memory_dir or get_personal_dir()
-    if not mem_dir.exists():
-        mem_dir.mkdir(parents=True, exist_ok=True)
-
-    # Parse outcomes
-    outcomes_list = [o.strip() for o in outcomes.split(",") if o.strip()]
-
-    input_data = SessionInput(
-        topic=topic,
-        session_type=session_type,
-        outcomes=outcomes_list,
-        log_path=log_path,
-    )
-
-    result = append_session(mem_dir, input_data)
-
-    if result.success:
-        console.print(f"\n[green]✓[/green] {result.message}")
-        console.print(f"  ID: [cyan]{result.id}[/cyan]")
-        console.print(f"  Topic: {topic}")
-        console.print(f"  Type: {session_type}")
-        if outcomes_list:
-            console.print(f"  Outcomes: {', '.join(outcomes_list[:3])}")
-        console.print("\n[dim]Index will rebuild on next query.[/dim]\n")
-    else:
-        cli_error(result.message)
 
 
 # =============================================================================
