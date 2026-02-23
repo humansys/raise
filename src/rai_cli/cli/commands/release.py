@@ -46,8 +46,7 @@ def list_releases(
         )
 
     try:
-        backend = get_active_backend()
-        graph = backend.load(graph_path)
+        graph = get_active_backend(graph_path).load()
     except Exception as e:
         cli_error(f"Error loading memory index: {e}")
 

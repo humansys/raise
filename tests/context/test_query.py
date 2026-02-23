@@ -679,7 +679,7 @@ class TestUnifiedQueryEngineFromFile:
     def test_from_file(self, sample_graph: UnifiedGraph, tmp_path: Path) -> None:
         """Engine can be loaded from file."""
         graph_path = tmp_path / "unified.json"
-        FilesystemGraphBackend().persist(sample_graph, graph_path)
+        FilesystemGraphBackend(graph_path).persist(sample_graph)
 
         engine = UnifiedQueryEngine.from_file(graph_path)
         assert engine.graph.node_count == sample_graph.node_count

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import difflib
-from pathlib import Path
 from unittest.mock import patch
 
 from rai_cli.onboarding.skill_conflict import (

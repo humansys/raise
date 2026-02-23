@@ -347,8 +347,7 @@ def build_command(
     from rai_cli.graph.filesystem_backend import get_active_backend
 
     graph_path = root / ".raise" / "graph" / "unified.json"
-    backend = get_active_backend()
-    backend.persist(graph, graph_path)
+    get_active_backend(graph_path).persist(graph)
 
     # Count component nodes in graph
     component_nodes = [n for n in graph.iter_concepts() if n.type == "component"]

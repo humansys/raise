@@ -52,7 +52,7 @@ class TestBuildWithDiff:
         # Save old graph as the "existing" index
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        FilesystemGraphBackend().persist(old_graph, index_path)
+        FilesystemGraphBackend(index_path).persist(old_graph)
 
         # Mock builder to return new graph
         mock_builder_cls.return_value.build.return_value = new_graph
@@ -95,7 +95,7 @@ class TestBuildWithDiff:
 
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        FilesystemGraphBackend().persist(old_graph, index_path)
+        FilesystemGraphBackend(index_path).persist(old_graph)
 
         mock_builder_cls.return_value.build.return_value = new_graph
 
@@ -156,7 +156,7 @@ class TestBuildWithDiff:
 
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        FilesystemGraphBackend().persist(graph, index_path)
+        FilesystemGraphBackend(index_path).persist(graph)
 
         mock_builder_cls.return_value.build.return_value = graph
 
@@ -192,7 +192,7 @@ class TestNoDiffFlag:
 
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        FilesystemGraphBackend().persist(old_graph, index_path)
+        FilesystemGraphBackend(index_path).persist(old_graph)
 
         mock_builder_cls.return_value.build.return_value = new_graph
 

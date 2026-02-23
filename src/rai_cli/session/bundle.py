@@ -50,8 +50,7 @@ def get_foundational_patterns(project_path: Path) -> list[ConceptNode]:
         return []
 
     try:
-        backend = get_active_backend()
-        graph = backend.load(graph_path)
+        graph = get_active_backend(graph_path).load()
     except Exception:
         logger.warning("Failed to load graph: %s", graph_path)
         return []
@@ -78,8 +77,7 @@ def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
         return []
 
     try:
-        backend = get_active_backend()
-        graph = backend.load(graph_path)
+        graph = get_active_backend(graph_path).load()
     except Exception:
         logger.warning("Failed to load graph: %s", graph_path)
         return []

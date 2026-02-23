@@ -203,9 +203,9 @@ class TestUnifiedGraphPersistence:
 
     def test_save_and_load(self, sample_graph: UnifiedGraph, tmp_path: Path) -> None:
         """Test saving and loading a graph via backend."""
-        backend = FilesystemGraphBackend()
         save_path = tmp_path / "test_graph.json"
-        backend.persist(sample_graph, save_path)
+        backend = FilesystemGraphBackend(save_path)
+        backend.persist(sample_graph)
         assert save_path.exists()
 
         # Verify JSON structure
@@ -214,7 +214,7 @@ class TestUnifiedGraphPersistence:
         assert "edges" in data or "links" in data  # NetworkX 3.x uses "edges"
 
         # Load
-        loaded = backend.load(save_path)
+        loaded = backend.load()
         assert loaded.node_count == sample_graph.node_count
         assert loaded.edge_count == sample_graph.edge_count
 
@@ -227,26 +227,26 @@ class TestUnifiedGraphPersistence:
         self, empty_graph: UnifiedGraph, tmp_path: Path
     ) -> None:
         """Test that persist creates parent directories."""
-        backend = FilesystemGraphBackend()
         save_path = tmp_path / "nested" / "dir" / "graph.json"
-        backend.persist(empty_graph, save_path)
+        backend = FilesystemGraphBackend(save_path)
+        backend.persist(empty_graph)
         assert save_path.exists()
 
     def test_load_file_not_found(self, tmp_path: Path) -> None:
         """Test loading non-existent file raises error."""
-        backend = FilesystemGraphBackend()
+        backend = FilesystemGraphBackend(tmp_path / "nonexistent.json")
         with pytest.raises(FileNotFoundError):
-            backend.load(tmp_path / "nonexistent.json")
+            backend.load()
 
     def test_load_preserves_metadata(
         self, sample_graph: UnifiedGraph, tmp_path: Path
     ) -> None:
         """Test that node metadata is preserved on load."""
-        backend = FilesystemGraphBackend()
         save_path = tmp_path / "test_graph.json"
-        backend.persist(sample_graph, save_path)
+        backend = FilesystemGraphBackend(save_path)
+        backend.persist(sample_graph)
 
-        loaded = backend.load(save_path)
+        loaded = backend.load()
         pat = loaded.get_concept("PAT-001")
         assert pat is not None
         assert pat.metadata.get("sub_type") == "codebase"
@@ -343,7 +343,8 @@ class TestGraphNodeDeserialization:
         self, tmp_path: Path
     ) -> None:
         """Persist → load → get_concept returns correct subclass."""
-        backend = FilesystemGraphBackend()
+        path = tmp_path / "graph.json"
+        backend = FilesystemGraphBackend(path)
         graph = UnifiedGraph()
         graph.add_concept(
             EpicNode(
@@ -353,10 +354,9 @@ class TestGraphNodeDeserialization:
                 metadata={"key": "RAISE-211"},
             )
         )
-        path = tmp_path / "graph.json"
-        backend.persist(graph, path)
+        backend.persist(graph)
 
-        loaded = backend.load(path)
+        loaded = backend.load()
         retrieved = loaded.get_concept("E1")
         assert retrieved is not None
         assert isinstance(retrieved, EpicNode)

@@ -47,15 +47,17 @@ def _make_sample_graph() -> UnifiedGraph:
 class TestFilesystemGraphBackend:
     """Tests for FilesystemGraphBackend class."""
 
-    def test_implements_protocol(self) -> None:
-        assert isinstance(FilesystemGraphBackend(), KnowledgeGraphBackend)
+    def test_implements_protocol(self, tmp_path: Path) -> None:
+        assert isinstance(
+            FilesystemGraphBackend(tmp_path / "g.json"), KnowledgeGraphBackend
+        )
 
     def test_persist_saves_graph_to_json(self, tmp_path: Path) -> None:
-        backend = FilesystemGraphBackend()
-        graph = _make_sample_graph()
         out = tmp_path / "index.json"
+        backend = FilesystemGraphBackend(out)
+        graph = _make_sample_graph()
 
-        backend.persist(graph, out)
+        backend.persist(graph)
 
         assert out.exists()
         data = json.loads(out.read_text(encoding="utf-8"))
@@ -63,32 +65,32 @@ class TestFilesystemGraphBackend:
         assert "edges" in data or "links" in data
 
     def test_persist_creates_parent_dirs(self, tmp_path: Path) -> None:
-        backend = FilesystemGraphBackend()
-        graph = _make_sample_graph()
         out = tmp_path / "nested" / "deep" / "index.json"
+        backend = FilesystemGraphBackend(out)
+        graph = _make_sample_graph()
 
-        backend.persist(graph, out)
+        backend.persist(graph)
 
         assert out.exists()
 
     def test_load_reads_graph_from_json(self, tmp_path: Path) -> None:
-        backend = FilesystemGraphBackend()
-        graph = _make_sample_graph()
         out = tmp_path / "index.json"
-        backend.persist(graph, out)
+        backend = FilesystemGraphBackend(out)
+        graph = _make_sample_graph()
+        backend.persist(graph)
 
-        loaded = backend.load(out)
+        loaded = backend.load()
 
         assert loaded.node_count == 2
         assert loaded.edge_count == 1
 
     def test_persist_load_roundtrip(self, tmp_path: Path) -> None:
-        backend = FilesystemGraphBackend()
-        graph = _make_sample_graph()
         out = tmp_path / "index.json"
+        backend = FilesystemGraphBackend(out)
+        graph = _make_sample_graph()
 
-        backend.persist(graph, out)
-        loaded = backend.load(out)
+        backend.persist(graph)
+        loaded = backend.load()
 
         # Same structure
         assert loaded.node_count == graph.node_count
@@ -103,21 +105,21 @@ class TestFilesystemGraphBackend:
         assert loaded_node.type == original_node.type
 
     def test_load_nonexistent_raises(self, tmp_path: Path) -> None:
-        backend = FilesystemGraphBackend()
+        backend = FilesystemGraphBackend(tmp_path / "nonexistent.json")
 
         with pytest.raises(FileNotFoundError):
-            backend.load(tmp_path / "nonexistent.json")
+            backend.load()
 
     def test_load_invalid_json_raises(self, tmp_path: Path) -> None:
-        backend = FilesystemGraphBackend()
         bad_file = tmp_path / "bad.json"
         bad_file.write_text("not json", encoding="utf-8")
+        backend = FilesystemGraphBackend(bad_file)
 
         with pytest.raises(json.JSONDecodeError):
-            backend.load(bad_file)
+            backend.load()
 
-    def test_health_returns_healthy(self) -> None:
-        backend = FilesystemGraphBackend()
+    def test_health_returns_healthy(self, tmp_path: Path) -> None:
+        backend = FilesystemGraphBackend(tmp_path / "g.json")
 
         result = backend.health()
 
@@ -133,12 +135,11 @@ class TestFilesystemGraphBackend:
         """Verify output format matches what UnifiedGraph.save() produced."""
         import networkx as nx  # type: ignore[import-untyped]
 
-        backend = FilesystemGraphBackend()
+        backend_path = tmp_path / "backend.json"
+        backend = FilesystemGraphBackend(backend_path)
         graph = _make_sample_graph()
 
-        # Persist via backend
-        backend_path = tmp_path / "backend.json"
-        backend.persist(graph, backend_path)
+        backend.persist(graph)
 
         # Manually serialize the same way the old save() did
         old_data = nx.node_link_data(graph.graph)
@@ -152,10 +153,15 @@ class TestFilesystemGraphBackend:
 class TestGetActiveBackend:
     """Tests for get_active_backend helper."""
 
-    def test_returns_filesystem_backend(self) -> None:
-        backend = get_active_backend()
+    def test_returns_filesystem_backend(self, tmp_path: Path) -> None:
+        backend = get_active_backend(tmp_path / "index.json")
         assert isinstance(backend, FilesystemGraphBackend)
 
-    def test_returns_protocol_compatible(self) -> None:
-        backend = get_active_backend()
+    def test_returns_protocol_compatible(self, tmp_path: Path) -> None:
+        backend = get_active_backend(tmp_path / "index.json")
         assert isinstance(backend, KnowledgeGraphBackend)
+
+    def test_backend_has_correct_path(self, tmp_path: Path) -> None:
+        path = tmp_path / "custom.json"
+        backend = get_active_backend(path)
+        assert backend.path == path

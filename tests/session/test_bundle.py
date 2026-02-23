@@ -455,7 +455,7 @@ class TestGetAlwaysOnPrimes:
         )
 
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        FilesystemGraphBackend().persist(graph, graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         result = get_always_on_primes(tmp_path)
         assert len(result) == 2
@@ -480,7 +480,7 @@ class TestGetAlwaysOnPrimes:
         )
 
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        FilesystemGraphBackend().persist(graph, graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         result = get_always_on_primes(tmp_path)
         assert result == []
@@ -745,7 +745,7 @@ class TestBundleReleaseContext:
             ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        FilesystemGraphBackend().persist(graph, graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
@@ -816,7 +816,7 @@ class TestBundleReleaseContext:
             )
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        FilesystemGraphBackend().persist(graph, graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
@@ -1052,7 +1052,7 @@ class TestGetFoundationalPatterns:
         )
 
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        FilesystemGraphBackend().persist(graph, graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         result = get_foundational_patterns(tmp_path)
         assert len(result) == 1

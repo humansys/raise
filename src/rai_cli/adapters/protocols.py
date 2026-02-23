@@ -9,7 +9,6 @@ Precedent: ``context.analyzers.protocol.CodeAnalyzer``
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 from rai_cli.adapters.models import (
@@ -90,6 +89,6 @@ class KnowledgeGraphBackend(Protocol):
 
     def persist(self, graph: UnifiedGraph) -> None: ...
 
-    def load(self, path: Path) -> UnifiedGraph: ...
+    def load(self) -> UnifiedGraph: ...
 
     def health(self) -> BackendHealth: ...
