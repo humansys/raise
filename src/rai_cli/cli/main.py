@@ -14,6 +14,7 @@ from rai_cli.cli.commands.backlog import backlog_app
 from rai_cli.cli.commands.base import base_app
 from rai_cli.cli.commands.discover import discover_app
 from rai_cli.cli.commands.graph import graph_app
+from rai_cli.cli.commands.info import info_command
 from rai_cli.cli.commands.init import init_command
 from rai_cli.cli.commands.memory import memory_app
 from rai_cli.cli.commands.pattern import pattern_app
@@ -61,6 +62,7 @@ app.add_typer(signal_app, name="signal")
 app.add_typer(skill_app, name="skill")
 
 # Register standalone commands
+app.command("info")(info_command)
 app.command("init")(init_command)
 
 console = Console()
