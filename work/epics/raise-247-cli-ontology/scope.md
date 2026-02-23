@@ -67,7 +67,7 @@ rai release check|publish|list     # Release management
 |----|-------|:----:|:------:|:------------:|-------------|
 | S1 | Create `graph` group | M | ✅ Done | None | Extract 7 graph commands from memory.py |
 | S2 | Create `pattern` group | S | ✅ Done | None | Extract add-pattern + reinforce from memory.py |
-| S3 | Create `signal` group | S | Pending | None | Extract emit-work/session/calibration as 3 subcommands |
+| S3 | Create `signal` group | S | ✅ Done | None | Extract emit-work/session/calibration as 3 subcommands |
 | S4 | Kill redundancies | XS | Pending | None | Remove generate, add-session, add-calibration |
 | S5 | Merge publish+release, flatten singletons | S | Pending | None | Consolidate release mgmt, flatten base/profile |
 | S6 | Update all skills and generated docs | M | Pending | S1-S5 | Mechanical find-replace across 22 skills + CLAUDE.md |
@@ -282,13 +282,13 @@ time saved for these small stories.
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S1: graph group | M | ✅ Done | 150 min | 1.6x | PAT-E-434/435/436 |
 | S2: pattern group | S | ✅ Done | 45 min | 1.33x | PAT-E-440/441 |
-| S3: signal group | S | Pending | - | - | |
-| S4: kill redundancies | XS | Pending | - | - | |
-| S5: merge+flatten | S | Pending | - | - | |
-| S6: skill sweep | M | Pending | - | - | |
+| S3: signal group | S | ✅ Done | 21 min | 2.86x | PAT-E-442, M1 complete |
+| S4: kill redundancies | XS | Pending | - | - | RAISE-253 |
+| S5: merge+flatten | S | Pending | - | - | RAISE-254 |
+| S6: skill sweep | M | Pending | - | - | RAISE-255 |
 
 **Milestones:**
-- [ ] M1: God Object Decomposed
+- [x] M1: God Object Decomposed (S1+S2+S3 — 2026-02-23)
 - [ ] M2: Clean Taxonomy
 - [ ] M3: Epic Complete
 
