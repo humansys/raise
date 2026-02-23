@@ -46,6 +46,8 @@ Load (6):
 - `src/rai_cli/session/bundle.py` — **modify** (2 call sites)
 - `src/rai_cli/context/query.py` — **modify** (1 call site)
 - `pyproject.toml` — **modify** (add entry point)
+- `src/rai_cli/context/graph.py` — **modify** (remove save/load, move to backend)
+- `tests/` — **modify** (~15 test files: replace graph.save()/UnifiedGraph.load() with backend)
 - `tests/` — **create** (backend tests)
 
 ## 3. Gemba: Current State
@@ -54,7 +56,7 @@ Load (6):
 |------|------------------|--------------|------------|
 | `src/rai_cli/adapters/protocols.py:85-95` | `KnowledgeGraphBackend` Protocol with `persist(graph)`, `load(path)`, `health()` | No change — Protocol already has the right shape | All methods |
 | `src/rai_cli/adapters/models.py` | `BackendHealth` model already exists | No change | Model definition |
-| `src/rai_cli/context/graph.py:283-320` | `UnifiedGraph.save(path)` and `UnifiedGraph.load(path)` | Stay as-is — backend wraps them | Both methods unchanged |
+| `src/rai_cli/context/graph.py:283-320` | `UnifiedGraph.save(path)` and `UnifiedGraph.load(path)` | Remove public methods — persistence moves entirely to backend | Graph operations (add, get, iterate) |
 | `src/rai_cli/cli/commands/memory.py:509-533` | `build()` calls `graph.save(output_path)` and `UnifiedGraph.load(output_path)` | Replace with `backend.persist(graph)` and `backend.load(path)` | Build orchestration, diff logic, formatting |
 | `src/rai_cli/cli/commands/memory.py:621` | `query()` calls `UnifiedGraph.load(index_path)` | Replace with `backend.load(path)` | Query logic |
 | `src/rai_cli/cli/commands/memory.py:913` | `context()` calls `UnifiedGraph.load(unified_path)` | Replace with `backend.load(path)` | Context logic |
@@ -126,9 +128,10 @@ graph = backend.load(path)
 ### Integration Points
 - All production save/load sites use `get_active_backend()` to obtain the backend
 - `get_active_backend()` returns `FilesystemGraphBackend` directly (no entry point discovery yet — trivial until S211.5)
-- `FilesystemGraphBackend` delegates to `UnifiedGraph.save()`/`load()` internally
+- `FilesystemGraphBackend` owns the serialization logic (moved from `UnifiedGraph.save()`/`load()`)
 - Entry point `local` registered in `pyproject.toml` under `rai.graph.backends`
-- `UnifiedGraph.save()`/`load()` remain public for test code and backward compat
+- `UnifiedGraph` no longer has save/load — it's a pure in-memory graph. Persistence is the backend's job.
+- Test fixtures use `backend.persist()`/`backend.load()` for setup
 
 ## 5. Acceptance Criteria
 
@@ -136,7 +139,7 @@ See: `story.md` § Acceptance Criteria
 
 ## 6. Constraints
 
-- **Zero regression:** All 1610+ tests must pass without modification
+- **Zero regression:** All 1610+ tests must pass (test code updated to use backend)
 - **Identical output:** `rai memory build` produces byte-identical `index.json`
 - **No TierContext dependency:** Backend selection is simple (always local) until S211.5
-- **Backward compat:** `UnifiedGraph.save()`/`load()` remain public — used extensively in test code
+- **Clean separation:** `UnifiedGraph` = in-memory graph operations. `FilesystemGraphBackend` = persistence. No overlap.
