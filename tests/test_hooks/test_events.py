@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -35,13 +35,13 @@ class TestHookEvent:
             event.event_name = "other"  # type: ignore[misc]
 
     def test_hook_event_has_timestamp(self) -> None:
-        before = datetime.now(timezone.utc)
+        before = datetime.now(UTC)
         event = SessionStartEvent(session_id="SES-1", developer="emilio")
-        after = datetime.now(timezone.utc)
+        after = datetime.now(UTC)
         assert before <= event.timestamp <= after
 
     def test_hook_event_accepts_explicit_timestamp(self) -> None:
-        ts = datetime(2026, 2, 23, 12, 0, 0, tzinfo=timezone.utc)
+        ts = datetime(2026, 2, 23, 12, 0, 0, tzinfo=UTC)
         event = SessionStartEvent(
             session_id="SES-1", developer="emilio", timestamp=ts
         )
@@ -275,7 +275,7 @@ class TestAllEvents:
     def test_has_timestamp(
         self, cls: type[HookEvent], expected_name: str, kwargs: dict[str, object]
     ) -> None:
-        before = datetime.now(timezone.utc)
+        before = datetime.now(UTC)
         event = cls(**kwargs)
-        after = datetime.now(timezone.utc)
+        after = datetime.now(UTC)
         assert before <= event.timestamp <= after
