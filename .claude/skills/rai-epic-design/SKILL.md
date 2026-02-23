@@ -16,7 +16,7 @@ metadata:
   raise.next: epic-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.2.0"
+  raise.version: "1.0.0"
   raise.visibility: public
 ---
 
@@ -61,8 +61,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - Constraints (timeline, resources, dependencies)
 
 **Outputs:**
-- Epic scope document: `work/epics/e{N}-{name}/scope.md` — WHAT/WHY (Contract 2a)
-- Epic design document: `work/epics/e{N}-{name}/design.md` — HOW/Interfaces (Contract 2b)
+- Epic scope document: `work/epics/e{N}-{name}/scope.md`
 - ADRs for significant architectural decisions (`dev/decisions/adr-*.md`)
 - Feature list with sizes, dependencies, and sequencing
 - Updated parking lot with deferred items
@@ -74,18 +73,18 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-rai memory emit-work epic {epic_id} --event start --phase design
+rai signal emit-work epic {epic_id} --event start --phase design
 ```
 
-**Example:** `rai memory emit-work epic E9 -e start -p design`
+**Example:** `rai signal emit-work epic E9 -e start -p design`
 
 ### Step 0.5: Query Context
 
 Load relevant architecture decisions, prior epic patterns, and release context from unified context:
 
 ```bash
-rai memory query "architecture ADR epic" --types pattern,decision --limit 5
-rai memory query "release" --types release --limit 3
+rai graph query "architecture ADR epic" --types pattern,decision --limit 5
+rai graph query "release" --types release --limit 3
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions. The release query identifies which release this epic belongs to — use this to frame the objective and timeline in Step 1.
@@ -97,15 +96,15 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 **Verification:** Context loaded; relevant patterns noted; release association identified (if any).
 
-> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai graph build` first, or proceed without patterns.
 
 ### Step 0.6: Load Architectural Context
 
 For each candidate module the epic might touch, load its architectural context:
 
 ```bash
-rai memory context mod-<name>
-# Example: rai memory context mod-memory
+rai graph context mod-<name>
+# Example: rai graph context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -384,58 +383,26 @@ Identify what could go wrong and how to address it.
 
 ---
 
-### Step 10: Create Epic Scope Document (Contract 2a — WHAT/WHY)
+### Step 10: Create Epic Scope Document
 
-Create the scope document with project management content only. This artifact is consumed by `/rai-epic-plan` for sequencing.
+Consolidate all design work into the epic scope document.
 
 **Location:** `work/epics/e{N}-{name}/scope.md`
 
 **Required sections:**
 1. Objective (from Step 1)
-2. Stories table with sizes and dependencies (from Step 4)
-3. In Scope / Out of Scope (from Step 2)
+2. In Scope / Out of Scope (from Step 2)
+3. Features table with sizes and dependencies (from Step 4)
 4. Done Criteria (from Step 7)
 5. Dependencies (from Step 6)
+6. Notes (risks, assumptions, timeline)
 
 **Optional sections:**
-- Architecture references (if ADRs created — summary only, detail goes in design.md)
-- Notes (risks, assumptions, timeline)
+- Architecture references (if ADRs created)
+- Success metrics (if quantifiable)
+- Migration/rollout plan (if applicable)
 
-**What does NOT go here:** Gemba analysis, component interfaces, key contracts, migration paths — these belong in `design.md` (Step 10.5).
-
-**Verification:** Scope document is reviewable in <10 minutes. Contains WHAT/WHY, not HOW.
-
----
-
-### Step 10.5: Create Epic Design Document (Contract 2b — HOW/Interfaces)
-
-Create the design document with engineering content. This artifact is consumed by `/rai-story-design` for grounding story-level interfaces.
-
-**Location:** `work/epics/e{N}-{name}/design.md`
-
-**Required sections:**
-1. Affected Surface — Gemba Walk (from Step 3)
-2. Target Components — responsibility, key interface, consumes/produces
-3. Key Contracts — actual types, not pseudocode (use project language)
-
-**Optional sections:**
-- Migration Path (if restructuring — backward compat strategy, consumer changes)
-- What Does NOT Change (explicit preservation list)
-
-**Depth heuristic by epic size:**
-
-| Epic Size | Design Depth |
-|-----------|-------------|
-| S (2-4 stories) | Gemba table + component list |
-| M (5-7 stories) | Full: Gemba + components + contracts |
-| L (8-10 stories) | Full + migration path + preservation list |
-
-**How `/rai-story-design` consumes `design.md`:**
-- Target Components → identifies which component a story implements
-- Key Contracts → provides component-level interface to refine to function level
-- Migration Path → informs backward compatibility requirements
-
-**Verification:** Design document contains HOW at component level. Story-design could ground interfaces from it.
+**Verification:** Scope document is reviewable in <10 minutes.
 
 ---
 
@@ -467,8 +434,7 @@ Self-review checklist before proceeding:
 - [ ] Done criteria defined (feature + epic level)
 - [ ] Estimates are realistic for timeline
 - [ ] Top risks have mitigations
-- [ ] Scope document (WHAT/WHY) reviewable in <10 minutes
-- [ ] Design document (HOW/interfaces) reviewable in <10 minutes
+- [ ] Scope document reviewable in <10 minutes
 - [ ] Parking lot updated with deferred items
 
 **Validation questions:**
@@ -483,36 +449,30 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-rai memory emit-work epic {epic_id} --event complete --phase design
+rai signal emit-work epic {epic_id} --event complete --phase design
 ```
 
-**Example:** `rai memory emit-work epic E9 -e complete -p design`
+**Example:** `rai signal emit-work epic E9 -e complete -p design`
 
 ---
 
 ## Output
 
-- **Primary:** `work/epics/e{N}-{name}/scope.md` — WHAT/WHY (Contract 2a, consumed by `/rai-epic-plan`)
-- **Primary:** `work/epics/e{N}-{name}/design.md` — HOW/Interfaces (Contract 2b, consumed by `/rai-story-design`)
+- **Primary:** `work/epics/e{N}-{name}/scope.md`
 - **Secondary:** `dev/decisions/adr-*.md` - ADRs for architectural decisions (0-3 typical)
 - **Updated:** `dev/parking-lot.md` - Deferred items captured
 - **Next:** `/rai-epic-plan` (sequence features, plan milestones)
 
-## Epic Scope Template (Contract 2a — WHAT/WHY)
+## Epic Scope Template
 
 ```markdown
----
-epic_id: "{EPIC-ID}"
-title: "{Epic Name}"
-status: "in_progress"
-stories_count: {N}
----
-
-# Epic Scope: {Epic Name}
+# Epic E{N}: {Epic Name} - Scope
 
 > **Status:** IN PROGRESS
-> **Branch:** `epic/{epic-slug}`
-> **Created:** YYYY-MM-DD
+> **Release:** REL-{id} ({release name}, target {release date})
+> Branch: `feature/e{n}/{epic-slug}`
+> Created: YYYY-MM-DD
+> Target: YYYY-MM-DD (deadline or milestone)
 
 ---
 
@@ -524,15 +484,15 @@ stories_count: {N}
 
 ---
 
-## Stories
+## Features ({X} SP estimated)
 
-| ID | Story | Size | Status | Dependencies | Description |
-|----|-------|:----:|:------:|--------------|-------------|
-| S1 | {Story Name} | S | Pending | None | {1-line description} |
-| S2 | {Story Name} | M | Pending | S1 | {1-line description} |
-| S3 | {Story Name} | S | Pending | None | {1-line description} |
+| ID | Feature | Size | Status | Description |
+|----|---------|:----:|:------:|-------------|
+| F{N}.1 | {Feature Name} | S | Pending | {1-line description} |
+| F{N}.2 | {Feature Name} | M | Pending | {1-line description} |
+| F{N}.3 | {Feature Name} | S | Pending | {1-line description} |
 
-**Total:** {X} stories
+**Total:** {X} features, {Y} SP estimated
 
 ---
 
@@ -541,44 +501,62 @@ stories_count: {N}
 **MUST:**
 - {Non-negotiable deliverable 1}
 - {Non-negotiable deliverable 2}
+- {Non-negotiable deliverable 3}
 
 **SHOULD:**
 - {Nice-to-have 1}
+- {Nice-to-have 2}
 
-## Out of Scope
+---
+
+## Out of Scope (defer to {destination})
 
 - {Excluded item 1} → {Why excluded, where deferred}
+- {Excluded item 2} → {Why excluded, where deferred}
 
 ---
 
 ## Done Criteria
 
-### Per Story
-- [ ] Skill/code updated per story scope
-- [ ] Tests pass (if applicable)
-- [ ] Retrospective complete
+### Per Feature
+- [ ] Code implemented with type annotations
+- [ ] Docstrings on all public APIs (Google-style)
+- [ ] Component catalog updated (`dev/components.md`)
+- [ ] ADR created if architectural decision (`dev/decisions/`)
+- [ ] Unit tests passing (>90% coverage on feature code)
+- [ ] All quality checks pass (ruff, pyright, bandit)
 
 ### Epic Complete
-- [ ] All planned stories complete
+- [ ] All planned features complete (F{N}.1-F{N}.X)
 - [ ] {Epic-specific success criterion 1}
-- [ ] Epic retrospective completed
-- [ ] Merged to {target branch}
+- [ ] {Epic-specific success criterion 2}
+- [ ] Architecture guide updated (`dev/architecture-overview.md`)
+- [ ] Epic merged to {target branch}
 
 ---
 
 ## Dependencies
 
 ```
-S1 (foundation)
+F{N}.1 (foundation)
   ↓
-S2 ──┐
-  ↓  │ (parallel possible)
-S3 ◄─┘
+F{N}.2 ──┐
+  ↓      │ (parallel possible)
+F{N}.3 ◄─┘
   ↓
-S4
+F{N}.4
 ```
 
 **External blockers:** {None / List external dependencies}
+
+---
+
+## Architecture References
+
+| Decision | Document | Key Insight |
+|----------|----------|-------------|
+| {Decision 1} | ADR-{XXX} | {One-line summary} |
+| {Decision 2} | ADR-{YYY} | {One-line summary} |
 
 ---
 
@@ -586,55 +564,20 @@ S4
 
 ### Why This Epic
 - {Context for why this work is happening now}
+- {Alignment to solution vision or business case}
 
 ### Key Risks
 - {Risk 1}: {Mitigation}
+- {Risk 2}: {Mitigation}
+
+### Velocity Assumption
+- {Expected velocity based on calibration data}
+- {Factors that might affect velocity}
 
 ---
 
+*Epic tracking - update per story completion*
 *Created: YYYY-MM-DD*
-```
-
-## Epic Design Template (Contract 2b — HOW/Interfaces)
-
-```markdown
----
-epic_id: "{EPIC-ID}"
-grounded_in: "Gemba of [files/modules read]"
----
-
-# Epic Design: {Epic Name}
-
-## Affected Surface (Gemba)
-
-| Module/File | Current State | Changes | Stays |
-|-------------|--------------|---------|-------|
-| `path/to/module` | {current behavior} | {what changes} | {what stays} |
-
-## Target Components
-
-| Component | Responsibility | Key Interface | Consumes | Produces |
-|-----------|---------------|---------------|----------|----------|
-| {Component} | {what it does} | {main function/class} | {input from} | {output to} |
-
-## Key Contracts
-
-```
-// Use the project's language. Actual types, not pseudocode.
-// Examples:
-//   Python:     class EpicBrief(BaseModel): ...
-//   TypeScript: interface EpicBrief { ... }
-//   C#:         public record EpicBrief(...);
-```
-
-## Migration Path (if restructuring)
-
-- **Backward compat:** {strategy}
-- **Consumer changes:** {what downstream must update}
-
-## What Does NOT Change
-
-- {Module/component} — {why it stays}
 ```
 
 ## Quality Standards
@@ -699,7 +642,6 @@ Project Level
 ---
 
 **Status:** Active
-**Version:** 1.2.0
+**Version:** 1.0
 **Created:** 2026-02-01
-**Updated:** 2026-02-22 (S249.4: scope/design split — Contract 2)
 **Author:** Rai + Emilio

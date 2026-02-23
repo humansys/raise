@@ -9,7 +9,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: tools
+  raise.work_cycle: utility
   raise.frequency: as-needed
   raise.fase: "0"
   raise.prerequisites: ""
@@ -19,7 +19,6 @@ metadata:
   raise.version: "1.2.0"
   raise.visibility: public
 
-# RaiSE Observable Workflow hooks
 ---
 
 # Research: Evidence-Based Investigation
@@ -81,14 +80,14 @@ Engineering-specific evidence hierarchy:
 If unified graph is available, query for prior research and methodology patterns:
 
 ```bash
-rai memory query "research methodology evidence" --types pattern,session --limit 5
+rai graph query "research methodology evidence" --types pattern,session --limit 5
 ```
 
 Review returned patterns to avoid duplicating prior research.
 
 **Verification:** Context loaded or graph not available (proceed without).
 
-> **If context unavailable:** Run `rai memory build` first, or skip to Step 1.
+> **If context unavailable:** Run `rai graph build` first, or skip to Step 1.
 
 ### Step 1: Frame the Question
 

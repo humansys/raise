@@ -14,7 +14,7 @@ metadata:
   raise.next: epic-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "1.0.0"
   raise.visibility: public
 ---
 
@@ -47,7 +47,6 @@ Initialize an epic with a dedicated branch from `{dev_branch}` and a scope commi
 **Output:**
 - Epic branch created from `{dev_branch}`
 - Scope commit documenting boundaries
-- Epic Brief artifact (`brief.md`) with SAFe hypothesis + Shape Up boundaries
 - Telemetry recorded
 
 **Branch model:**
@@ -121,64 +120,9 @@ Document what's in and out of scope:
 
 **Verification:** Scope documented.
 
-### Step 3.5: Create Epic Brief Artifact (Contract 1)
-
-Produce a structured Epic Brief that `/rai-epic-design` consumes as input. This defines the hypothesis (SAFe Lean Startup), success metrics, appetite (Shape Up), and explicit scope boundaries.
-
-**Artifact location:** `work/epics/{epic-id}/brief.md`
-
-**Template:**
-
-```markdown
----
-epic_id: "{epic_id}"
-title: "{epic title}"
-status: "draft"
-created: "{YYYY-MM-DD}"
----
-
-# Epic Brief: {title}
-
-## Hypothesis
-For [target users] who [have this need/pain],
-the [solution] is a [category]
-that [delivers this value].
-Unlike [current state], our solution [key differentiator].
-
-## Success Metrics
-- **Leading:** [early signal measurable in first story]
-- **Lagging:** [outcome measurable after epic complete]
-
-## Appetite
-[S/M/L] — [what this means: S=2-4 stories, M=5-7, L=8-10]
-
-## Scope Boundaries
-### In (MUST)
-- [non-negotiable 1]
-
-### In (SHOULD)
-- [nice-to-have 1]
-
-### No-Gos
-- [explicit exclusion with rationale]
-
-### Rabbit Holes
-- [attractive trap to avoid]
-```
-
-**How `/rai-epic-design` consumes this artifact:**
-- **Hypothesis** → frames objective and success criteria
-- **Appetite** → constrains feature count
-- **No-Gos** → direct to Out of Scope
-- **Rabbit Holes** → direct to Risks
-
-**Verification:** `brief.md` created with YAML frontmatter + all sections populated.
-
-> **If you can't continue:** Hypothesis unclear → Discuss with stakeholder. Consider `/rai-problem-shape` for problem definition.
-
 ### Step 4: Create Scope Commit
 
-Create the initial commit (includes scope documentation and `brief.md` from Step 3.5):
+Create the initial commit:
 
 ```bash
 git add -A
@@ -218,7 +162,7 @@ Also update the summary line below the table to reflect the new count.
 ### Step 6: Emit Telemetry
 
 ```bash
-rai memory emit-work epic E{N} --event start --phase init
+rai signal emit-work epic E{N} --event start --phase init
 ```
 
 **Verification:** Telemetry emitted.
@@ -247,7 +191,6 @@ rai memory emit-work epic E{N} --event start --phase init
 
 - **Branch:** `epic/e{N}/{slug}` created from `{dev_branch}`
 - **Commit:** Scope commit with objective and boundaries
-- **Brief:** `work/epics/{epic-id}/brief.md` — Contract 1 artifact (SAFe hypothesis + Shape Up boundaries)
 - **Telemetry:** Epic start recorded
 - **Next:** `/rai-epic-design`
 
@@ -265,7 +208,6 @@ rai memory emit-work epic E{N} --event start --phase init
 **Objective:** {1-line}
 **Features:** {count} planned
 **Done when:** All features + retrospective + merge
-**Brief:** `brief.md` created
 
 ### Next
 → `/rai-epic-design` to formalize scope and features

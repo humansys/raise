@@ -48,10 +48,10 @@ Design an epic that bridges strategic objectives to executable features. Create 
 - When multiple features need coordination or share dependencies
 
 **When to skip:**
-- Single-story work (go directly to ``rai-story-design``)
+- Single-story work (go directly to `/rai-story-design`)
 - Bug fixes or maintenance (use issue tracker)
 - Infrastructure tasks with obvious implementation
-- Exploratory spikes (use ``rai-research`` skill first)
+- Exploratory spikes (use `/rai-research` skill first)
 
 **Inputs required:**
 - Project backlog with candidate features
@@ -73,18 +73,18 @@ Design an epic that bridges strategic objectives to executable features. Create 
 Record the start of the design phase:
 
 ```bash
-rai memory emit-work epic {epic_id} --event start --phase design
+rai signal emit-work epic {epic_id} --event start --phase design
 ```
 
-**Example:** `rai memory emit-work epic E9 -e start -p design`
+**Example:** `rai signal emit-work epic E9 -e start -p design`
 
 ### Step 0.5: Query Context
 
 Load relevant architecture decisions, prior epic patterns, and release context from unified context:
 
 ```bash
-rai memory query "architecture ADR epic" --types pattern,decision --limit 5
-rai memory query "release" --types release --limit 3
+rai graph query "architecture ADR epic" --types pattern,decision --limit 5
+rai graph query "release" --types release --limit 3
 ```
 
 Review returned patterns and prior ADRs before proceeding. Prior architectural decisions inform scope decisions. The release query identifies which release this epic belongs to — use this to frame the objective and timeline in Step 1.
@@ -96,15 +96,15 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 **Verification:** Context loaded; relevant patterns noted; release association identified (if any).
 
-> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai graph build` first, or proceed without patterns.
 
 ### Step 0.6: Load Architectural Context
 
 For each candidate module the epic might touch, load its architectural context:
 
 ```bash
-rai memory context mod-<name>
-# Example: rai memory context mod-memory
+rai graph context mod-<name>
+# Example: rai graph context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -129,6 +129,26 @@ rai memory context mod-<name>
 **If module not found:** The module may not be in the graph yet. Continue without architectural context but note the gap.
 
 **Verification:** Architectural context loaded for key modules OR gaps noted.
+
+### Step 0.7: Load Problem Brief (Optional)
+
+Check if a Problem Brief exists from a prior `/rai-problem-shape` session:
+
+```bash
+ls work/problem-briefs/*.md 2>/dev/null | sort | tail -1
+```
+
+**If a Brief exists:**
+- Read the most recent one
+- Use it as pre-populated input for Step 1 (Objective) — skip asking for the business objective verbally
+- Note in the epic scope: `> Problem Brief: work/problem-briefs/{filename}`
+
+**If no Brief exists:**
+- Continue normally — Step 1 will gather the objective conversationally
+
+**This step is non-blocking.** A missing Problem Brief is not an error; it just means Step 1 starts from scratch.
+
+**Verification:** Problem Brief loaded OR confirmed absent.
 
 ### Step 1: Frame the Epic Objective
 
@@ -182,7 +202,7 @@ Determine if architectural decisions are needed before feature breakdown.
 4. Is there significant technical uncertainty?
 
 **If "yes" to any:**
-- Conduct spike`rai-research` if needed (2-4 hours max, not days)
+- Conduct spike/rai-research if needed (2-4 hours max, not days)
 - Document findings for ADR creation in Step 5
 - Note: "Gut-check before full spike" — validate hypothesis quickly
 
@@ -298,7 +318,7 @@ Establish clear completion criteria at both feature and epic levels.
 - [ ] All planned features complete
 - [ ] Architecture documentation updated
 - [ ] Success metrics validated
-- [ ] Epic retrospective completed (``rai-epic-close``)
+- [ ] Epic retrospective completed (`/rai-epic-close`)
 
 **Customize based on epic nature:**
 - User-facing epic: Add UX validation criteria
@@ -429,10 +449,10 @@ Self-review checklist before proceeding:
 Record the completion of the design phase:
 
 ```bash
-rai memory emit-work epic {epic_id} --event complete --phase design
+rai signal emit-work epic {epic_id} --event complete --phase design
 ```
 
-**Example:** `rai memory emit-work epic E9 -e complete -p design`
+**Example:** `rai signal emit-work epic E9 -e complete -p design`
 
 ---
 
@@ -441,7 +461,7 @@ rai memory emit-work epic {epic_id} --event complete --phase design
 - **Primary:** `work/epics/e{N}-{name}/scope.md`
 - **Secondary:** `dev/decisions/adr-*.md` - ADRs for architectural decisions (0-3 typical)
 - **Updated:** `dev/parking-lot.md` - Deferred items captured
-- **Next:** ``rai-epic-plan`` (sequence features, plan milestones)
+- **Next:** `/rai-epic-plan` (sequence features, plan milestones)
 
 ## Epic Scope Template
 
@@ -578,7 +598,7 @@ F{N}.4
 4. **Too few features** — If <3 features, consider if this is really an epic
 5. **ADRs for everything** — Only document significant decisions; implementation details don't need ADRs
 6. **No ADRs at all** — Architectural decisions without documentation are lost knowledge
-7. **Over-specifying features** — Save details for ``rai-story-design``; epic level is high-level
+7. **Over-specifying features** — Save details for `/rai-story-design`; epic level is high-level
 8. **Ignoring dependencies** — Unmapped dependencies cause blocked work during implementation
 9. **Unclear done criteria** — "We'll know it when we see it" is not a done criterion
 
@@ -599,9 +619,9 @@ This skill supports the three-layer memory model:
 
 - **Epic Scope Examples:** `work/epics/e01-foundation/scope.md`, `work/epics/e02-governance/scope.md`
 - **ADR Template:** `.raise/templates/architecture/adr.md`
-- **Feature Design:** ``rai-story-design`` (next level down)
-- **Epic Plan:** ``rai-epic-plan`` (sequence features after design)
-- **Epic Close:** ``rai-epic-close`` (retrospective after completion)
+- **Feature Design:** `/rai-story-design` (next level down)
+- **Epic Plan:** `/rai-epic-plan` (sequence features after design)
+- **Epic Close:** `/rai-epic-close` (retrospective after completion)
 - **Constitution:** `framework/reference/constitution.md` (principles governing design)
 - **Parking Lot:** `dev/parking-lot.md` (capture deferred items)
 
@@ -610,13 +630,13 @@ This skill supports the three-layer memory model:
 ```
 Project Level
     ↓
-`rai-epic-design`  ← YOU ARE HERE
+/rai-epic-design  ← YOU ARE HERE
     ↓
-`rai-epic-plan`    ← Sequence features, milestones
+/rai-epic-plan    ← Sequence features, milestones
     ↓
-`rai-story-design` → `rai-story-plan` → `rai-story-implement` → `rai-story-review`
+/rai-story-design → /rai-story-plan → /rai-story-implement → /rai-story-review
     ↓
-`rai-epic-close`   ← Retrospective, learnings
+/rai-epic-close   ← Retrospective, learnings
 ```
 
 ---
