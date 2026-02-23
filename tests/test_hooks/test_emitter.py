@@ -475,3 +475,24 @@ class TestE2EPipeline:
         assert result.abort_message == "Not compliant"
         # Audit hook still ran (all-notify semantics)
         assert audit.called
+
+
+class TestCreateEmitter:
+    """Tests for the create_emitter() factory."""
+
+    def test_create_emitter_returns_event_emitter(self) -> None:
+        from rai_cli.hooks.emitter import create_emitter
+
+        emitter = create_emitter()
+        assert isinstance(emitter, EventEmitter)
+
+    def test_create_emitter_has_registry(self) -> None:
+        from rai_cli.hooks.emitter import create_emitter
+
+        emitter = create_emitter()
+        assert emitter._registry is not None
+
+    def test_create_emitter_exported_from_package(self) -> None:
+        from rai_cli.hooks import create_emitter
+
+        assert callable(create_emitter)
