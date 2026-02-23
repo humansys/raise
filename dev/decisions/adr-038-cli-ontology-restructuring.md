@@ -78,17 +78,18 @@ Patterns are RaiSE's core differentiator — what Rai learns from each story. Th
 first-class citizenship, not burial inside a God Object. Future commands (`list`, `prune`,
 `curate`) have a natural home.
 
-**`rai signal`** — Process telemetry (1 command with type argument)
+**`rai signal`** — Process telemetry (3 subcommands)
 
 ```
-rai signal emit work {id} --event start --phase design
-rai signal emit session --type feature --outcome success
-rai signal emit calibration {story} -s S -e 30 -a 15
+rai signal emit-work epic E9 --event start --phase design
+rai signal emit-session --type feature --outcome success
+rai signal emit-calibration S1 -s S -e 30 -a 15
 ```
 
-Unifies the three `emit-*` commands into one with a positional type argument. "Signal" (6
-chars) chosen over "telemetry" (9 chars) — these are lifecycle signals, and brevity matters
-for a command that appears in 10 of 22 skills.
+Three subcommands with their original signatures — no artificial unification. The three
+emit commands have different parameter shapes; unifying into `rai signal emit <type>` adds
+Typer complexity for marginal gain. "Signal" (6 chars) chosen over "telemetry" (9 chars) —
+these are lifecycle signals, and brevity matters for a command that appears in 10 of 22 skills.
 
 ### 2. Kill redundancies
 
@@ -142,7 +143,8 @@ rai session start|context|close    # Temporal work state
 rai graph build|validate|query|    # Knowledge graph structure
       context|list|viz|extract
 rai pattern add|reinforce          # Learned knowledge
-rai signal emit                    # Process telemetry
+rai signal emit-work|              # Process telemetry
+       emit-session|emit-calibration
 
 rai adapters list|check            # Adapter inspection (E211)
 rai discover scan|analyze|drift    # Codebase understanding
@@ -152,7 +154,7 @@ rai backlog auth|pull|push|status  # External sync
 rai release check|publish|list     # Release management
 ```
 
-10 groups + 2 top-level = 30 commands. 27% reduction in surface area.
+10 groups + 2 top-level = 31 commands. 24% reduction in surface area.
 
 ### Migration strategy
 
