@@ -16,7 +16,6 @@ from rai_cli.context.models import (
 )
 
 
-
 class TestConceptNode:
     """Tests for ConceptNode model."""
 

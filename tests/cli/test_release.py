@@ -89,7 +89,7 @@ def _build_graph_with_releases(project_path: Path) -> None:
     )
 
     graph_path = project_path / ".raise" / "rai" / "memory" / "index.json"
-    FilesystemGraphBackend().persist(graph, graph_path)
+    FilesystemGraphBackend(graph_path).persist(graph)
 
 
 class TestReleaseList:
@@ -134,7 +134,7 @@ class TestReleaseList:
             )
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        FilesystemGraphBackend().persist(graph, graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         result = runner.invoke(app, ["release", "list", "--project", str(tmp_path)])
         assert result.exit_code == 0

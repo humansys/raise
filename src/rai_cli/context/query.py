@@ -346,8 +346,7 @@ class UnifiedQueryEngine:
             )
         from rai_cli.graph.filesystem_backend import get_active_backend
 
-        backend = get_active_backend()
-        graph = backend.load(path)
+        graph = get_active_backend(path).load()
         return cls(graph)
 
     def query(self, query: UnifiedQuery) -> UnifiedQueryResult:
