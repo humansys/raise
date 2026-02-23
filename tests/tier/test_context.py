@@ -23,29 +23,24 @@ from rai_cli.tier.context import (
 class TestCapabilityEnum:
     """Tests for Capability StrEnum."""
 
-    def test_has_seven_members(self) -> None:
-        assert len(Capability) == 7
-
-    def test_values_are_lowercase_snake_case(self) -> None:
-        for cap in Capability:
-            assert cap.value == cap.value.lower()
-            assert " " not in cap.value
+    def test_expected_members(self) -> None:
+        expected = {
+            "shared_memory",
+            "semantic_search",
+            "team_awareness",
+            "jira_integration",
+            "docs_publish",
+            "org_governance",
+            "audit_logging",
+        }
+        assert {c.value for c in Capability} == expected
 
 
 class TestTierLevelEnum:
     """Tests for TierLevel StrEnum."""
 
-    def test_community(self) -> None:
-        assert TierLevel.COMMUNITY == "community"
-
-    def test_pro(self) -> None:
-        assert TierLevel.PRO == "pro"
-
-    def test_enterprise(self) -> None:
-        assert TierLevel.ENTERPRISE == "enterprise"
-
-    def test_has_three_members(self) -> None:
-        assert len(TierLevel) == 3
+    def test_expected_members(self) -> None:
+        assert {t.value for t in TierLevel} == {"community", "pro", "enterprise"}
 
 
 class TestTierContextCommunity:
