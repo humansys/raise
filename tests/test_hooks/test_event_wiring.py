@@ -318,3 +318,121 @@ class TestPatternAddedEvent:
 
         pat_events = [e for e in captured_events if isinstance(e, PatternAddedEvent)]
         assert len(pat_events) == 0
+
+
+class TestDiscoverScanEvent:
+    """discover:scan event wiring."""
+
+    def test_discover_scan_emits_event(
+        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.discover import discover_app
+
+        runner = CliRunner()
+
+        mock_result = MagicMock()
+        mock_result.symbols = [MagicMock(), MagicMock(), MagicMock()]
+        mock_result.files_scanned = 5
+        mock_result.errors = []
+
+        with (
+            patch("rai_cli.cli.commands.discover.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.discover.scan_directory", return_value=mock_result),
+            patch("rai_cli.cli.commands.discover.format_scan_result"),
+        ):
+            result = runner.invoke(discover_app, ["scan", str(tmp_path)])
+
+        assert result.exit_code == 0
+        scan_events = [e for e in captured_events if isinstance(e, DiscoverScanEvent)]
+        assert len(scan_events) == 1
+        assert scan_events[0].component_count == 3
+        assert scan_events[0].language == "auto"
+
+
+class TestInitCompleteEvent:
+    """init:complete event wiring."""
+
+    def test_init_emits_event(
+        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.init import init_command
+
+        # Create a Typer app just for testing
+        import typer
+
+        app = typer.Typer()
+        app.command()(init_command)
+
+        runner = CliRunner()
+
+        mock_profile = MagicMock()
+        mock_profile.name = "Test"
+        mock_profile.experience_level = MagicMock()
+        mock_profile.experience_level.value = "ha"
+        mock_profile.projects = []
+        mock_profile.get_pattern_prefix.return_value = "E"
+
+        from rai_cli.onboarding.detection import ProjectType
+
+        mock_detection = MagicMock()
+        mock_detection.project_type = ProjectType.GREENFIELD
+        mock_detection.code_file_count = 0
+
+        mock_config = MagicMock()
+        mock_config.agent_type = "claude"
+        mock_config.skills_dir = ".claude/skills"
+        mock_config.instructions_file = "CLAUDE.md"
+
+        mock_registry = MagicMock()
+        mock_registry.get_config.return_value = mock_config
+        mock_registry.get_plugin.return_value = MagicMock()
+
+        mock_skills_result = MagicMock()
+        mock_skills_result.already_existed = True
+        mock_skills_result.skills_copied = 0
+        mock_skills_result.skills_installed = []
+        mock_skills_result.skills_updated = []
+        mock_skills_result.skills_conflicted = []
+        mock_skills_result.skills_kept = []
+        mock_skills_result.skills_overwritten = []
+        mock_skills_result.skills_current = []
+
+        mock_gov_result = MagicMock()
+        mock_gov_result.already_existed = True
+        mock_gov_result.files_created = 0
+
+        mock_bootstrap = MagicMock()
+        mock_bootstrap.already_existed = True
+
+        with (
+            patch("rai_cli.cli.commands.init.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.init.load_developer_profile", return_value=mock_profile),
+            patch("rai_cli.cli.commands.init.save_developer_profile"),
+            patch("rai_cli.cli.commands.init.detect_project_type", return_value=mock_detection),
+            patch("rai_cli.cli.commands.init.load_registry", return_value=mock_registry),
+            patch("rai_cli.cli.commands.init.save_manifest"),
+            patch("rai_cli.onboarding.bootstrap.bootstrap_rai_base", return_value=mock_bootstrap),
+            patch("rai_cli.onboarding.governance.scaffold_governance", return_value=mock_gov_result),
+            patch("rai_cli.onboarding.memory_md.generate_memory_md", return_value="# Memory"),
+            patch("rai_cli.config.paths.get_memory_dir", return_value=tmp_path / "memory"),
+            patch("rai_cli.config.paths.get_framework_dir", return_value=tmp_path / "framework"),
+            patch("rai_cli.config.paths.get_claude_memory_path", return_value=tmp_path / "claude" / "MEMORY.md"),
+            patch("rai_cli.onboarding.skills.scaffold_skills", return_value=mock_skills_result),
+            patch("rai_cli.onboarding.workflows.scaffold_workflows"),
+        ):
+            # Create necessary dirs
+            (tmp_path / "memory").mkdir(parents=True, exist_ok=True)
+            (tmp_path / "claude").mkdir(parents=True, exist_ok=True)
+            (tmp_path / "framework").mkdir(parents=True, exist_ok=True)
+            (tmp_path / "framework" / "methodology.yaml").write_text("")
+
+            result = runner.invoke(app, ["--path", str(tmp_path)])
+
+        assert result.exit_code == 0, result.output
+        init_events = [e for e in captured_events if isinstance(e, InitCompleteEvent)]
+        assert len(init_events) == 1
+        assert init_events[0].project_name == tmp_path.name
