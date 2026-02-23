@@ -284,32 +284,17 @@ class TestMemoryDeprecationWrappers:
     """Tests for backward-compat deprecation wrappers on memory group."""
 
     def test_memory_build_deprecated(self, tmp_path: Path) -> None:
-        """rai memory build prints DEPRECATED and still works."""
-        from unittest.mock import MagicMock, patch
+        """rai memory build prints DEPRECATED warning."""
+        # Only verify the wrapper prints the deprecation warning.
+        # Functional behavior is covered by TestGraphBuildCommand::test_build_basic.
+        from unittest.mock import patch
 
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.context.models import ConceptNode
+        with patch("rai_cli.cli.commands.graph.build") as mock_build:
+            mock_build.return_value = None
+            result = runner.invoke(app, ["memory", "build"])
 
-        graph = UnifiedGraph()
-        graph.add_concept(
-            ConceptNode(id="PAT-001", type="pattern", content="test", created="2026-01-31")
-        )
-        output_path = tmp_path / "index.json"
-
-        with patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder") as mock_cls:
-            mock_builder = MagicMock()
-            mock_builder.build.return_value = graph
-            mock_cls.return_value = mock_builder
-
-            with patch("rai_cli.cli.commands.graph.get_active_backend") as mock_backend_fn:
-                mock_backend = MagicMock()
-                mock_backend.load.side_effect = FileNotFoundError
-                mock_backend_fn.return_value = mock_backend
-
-                result = runner.invoke(app, ["memory", "build", "--output", str(output_path)])
-
-        assert result.exit_code == 0
         assert "DEPRECATED" in result.output
+        mock_build.assert_called_once()
 
     def test_memory_query_deprecated(self, sample_graph: Path, tmp_path: Path) -> None:
         """rai memory query prints DEPRECATED and still works."""
@@ -348,10 +333,10 @@ class TestMemoryDeprecationWrappers:
 
     def test_memory_viz_deprecated(self, tmp_path: Path) -> None:
         """rai memory viz prints DEPRECATED (missing index still errors)."""
-        original_cwd = __import__("os").getcwd()
+        original_cwd = os.getcwd()
         try:
-            __import__("os").chdir(tmp_path)
+            os.chdir(tmp_path)
             result = runner.invoke(app, ["memory", "viz", "--no-open"])
         finally:
-            __import__("os").chdir(original_cwd)
+            os.chdir(original_cwd)
         assert "DEPRECATED" in result.output
