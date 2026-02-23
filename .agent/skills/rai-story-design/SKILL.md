@@ -221,6 +221,8 @@ Describe WHAT you're building and WHY this approach, not detailed HOW.
 - Solution approach (1-2 sentences)
 - Components affected (list with change type: create/modify/delete)
 
+**For refactoring stories:** grep for ALL call sites of the function/method being abstracted or replaced. Count them, list them. A half-migration (abstracting 1 of N call sites) is worse than none.
+
 **Focus on WHAT, not HOW** — trust AI to determine implementation details.
 
 > **If you can't continue:** Too many unknowns → Spike needed; create research task
