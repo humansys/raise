@@ -344,7 +344,10 @@ class UnifiedQueryEngine:
                 f"Memory index not found: {path}\n"
                 f"Run 'raise memory build' to create the index first."
             )
-        graph = UnifiedGraph.load(path)
+        from rai_cli.graph.filesystem_backend import get_active_backend
+
+        backend = get_active_backend()
+        graph = backend.load(path)
         return cls(graph)
 
     def query(self, query: UnifiedQuery) -> UnifiedQueryResult:
