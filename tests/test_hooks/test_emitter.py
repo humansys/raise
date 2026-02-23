@@ -229,30 +229,6 @@ class _TrackingHook:
         return HookResult(status="ok")
 
 
-class _HighPriorityTrackingHook:
-    events: ClassVar[list[str]] = ["session:start"]
-    priority: ClassVar[int] = 100
-
-    def __init__(self) -> None:
-        self.call_order: list[str] = []
-
-    def handle(self, event: HookEvent) -> HookResult:
-        self.call_order.append("high")
-        return HookResult(status="ok")
-
-
-class _LowPriorityTrackingHook:
-    events: ClassVar[list[str]] = ["session:start"]
-    priority: ClassVar[int] = 0
-
-    def __init__(self) -> None:
-        self.call_order: list[str] = []
-
-    def handle(self, event: HookEvent) -> HookResult:
-        self.call_order.append("low")
-        return HookResult(status="ok")
-
-
 class _SlowHook:
     events: ClassVar[list[str]] = ["session:start"]
     priority: ClassVar[int] = 0
@@ -369,7 +345,7 @@ class TestEmitterTimeout:
         result = emitter.emit(SessionStartEvent(session_id="SES-1", developer="e"))
 
         assert len(result.handler_errors) == 1
-        assert "timeout" in result.handler_errors[0].lower() or "Timeout" in result.handler_errors[0]
+        assert "timeout" in result.handler_errors[0].lower()
 
     def test_fast_hook_runs_after_slow_hook_timeout(self) -> None:
         """Error isolation: slow hook times out, fast hook still runs."""

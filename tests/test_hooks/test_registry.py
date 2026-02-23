@@ -9,7 +9,6 @@ from rai_cli.hooks.events import HookEvent, HookResult
 from rai_cli.hooks.protocol import LifecycleHook
 from rai_cli.hooks.registry import EP_HOOKS, HookRegistry
 
-
 # --- Test hook classes ---
 
 
