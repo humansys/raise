@@ -139,3 +139,13 @@ class TestReleaseList:
         result = runner.invoke(app, ["release", "list", "--project", str(tmp_path)])
         assert result.exit_code == 0
         assert "no release" in result.output.lower()
+
+
+class TestReleasePublish:
+    """Tests for rai release publish command (absorbed from publish group)."""
+
+    def test_publish_requires_bump_or_version(self) -> None:
+        """rai release publish without --bump or --version exits non-zero with message."""
+        result = runner.invoke(app, ["release", "publish"])
+        assert result.exit_code != 0
+        assert "bump" in result.output.lower() or "version" in result.output.lower()

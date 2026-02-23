@@ -55,10 +55,10 @@ Execute the implementation plan task by task, verifying each step, and producing
 Record the start of the implement phase:
 
 ```bash
-rai memory emit-work story {story_id} --event start --phase implement
+rai signal emit-work story {story_id} --event start --phase implement
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e start -p implement`
+**Example:** `rai signal emit-work story S15.1 -e start -p implement`
 
 ### Step 0.1: Verify Prerequisites (REQUIRED - No Skip)
 
@@ -84,7 +84,7 @@ fi
 Load relevant codebase patterns from unified context:
 
 ```bash
-rai memory query "testing coverage type annotations security" --types pattern,guardrail --limit 5
+rai graph query "testing coverage type annotations security" --types pattern,guardrail --limit 5
 ```
 
 Review returned patterns and guardrails before proceeding. Key patterns inform implementation approach; guardrails ensure code standards compliance.
@@ -95,7 +95,7 @@ Review returned patterns and guardrails before proceeding. Key patterns inform i
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai graph build` first, or proceed without patterns.
 
 ### Step 1: Load Plan and Context
 
@@ -191,10 +191,10 @@ If all tasks completed → execute code gate.
 Record the completion of the implement phase:
 
 ```bash
-rai memory emit-work story {story_id} --event complete --phase implement
+rai signal emit-work story {story_id} --event complete --phase implement
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e complete -p implement`
+**Example:** `rai signal emit-work story S15.1 -e complete -p implement`
 
 ## Output
 

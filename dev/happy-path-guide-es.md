@@ -273,8 +273,6 @@ CLAUDE.local.md                       # Config personal de Claude Code (gitignor
 | `rai session close` | `personal/sessions/`, `personal/session-state.yaml` | sesión activa |
 | `rai memory build` | `memory/index.json` | JSONL + governance/ + architecture/ + work/ |
 | `rai memory add-pattern` | `memory/patterns.jsonl` | — |
-| `rai memory add-calibration` | `personal/calibration.jsonl` | — |
-| `rai memory add-session` | `personal/sessions/index.jsonl` | — |
 | `rai memory emit-work` | `personal/telemetry/signals.jsonl` | — |
 | `rai memory emit-calibration` | `personal/telemetry/signals.jsonl` | — |
 | `rai memory query` | — (solo lectura) | `memory/index.json` |

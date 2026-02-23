@@ -27,12 +27,10 @@ from rai_cli.memory.models import (
     PatternSubType,
 )
 from rai_cli.memory.writer import (
-    CalibrationInput,
     PatternInput,
     ReinforceResult,
     SessionInput,
     WriteResult,
-    append_calibration,
     append_pattern,
     append_session,
     get_memory_dir_for_scope,
@@ -40,7 +38,6 @@ from rai_cli.memory.writer import (
 )
 
 __all__ = [
-    "CalibrationInput",
     "MemoryConcept",
     "MemoryConceptType",
     "MemoryRelationship",
@@ -52,7 +49,6 @@ __all__ = [
     "ReinforceResult",
     "SessionInput",
     "WriteResult",
-    "append_calibration",
     "append_pattern",
     "append_session",
     "get_memory_dir_for_scope",

@@ -1,12 +1,13 @@
 """CLI commands for developer profile management.
 
-This module provides the `raise profile` command group for viewing
+This module provides the `rai profile` command for viewing
 the developer profile stored in ~/.rai/developer.yaml.
 
-For session management, use `raise session start/close`.
+For session management, use `rai session start/close`.
 
 Example:
-    $ raise profile show          # View current profile in YAML format
+    $ rai profile              # View current profile in YAML format
+    $ rai profile show         # Same (backward-compat subcommand)
 """
 
 from __future__ import annotations
@@ -21,8 +22,14 @@ from rai_cli.onboarding.profile import (
 profile_app = typer.Typer(
     name="profile",
     help="View developer profile",
-    no_args_is_help=True,
 )
+
+
+@profile_app.callback(invoke_without_command=True)
+def profile_callback(ctx: typer.Context) -> None:
+    """View developer profile. Runs 'show' when called without subcommand."""
+    if ctx.invoked_subcommand is None:
+        show()
 
 
 @profile_app.command()
@@ -33,7 +40,8 @@ def show() -> None:
     If no profile exists, shows a helpful message guiding the user to create one.
 
     Examples:
-        $ raise profile show
+        $ rai profile
+        $ rai profile show
     """
     profile = load_developer_profile()
 

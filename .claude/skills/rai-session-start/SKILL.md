@@ -52,7 +52,7 @@ This single command:
 rai session start --name "Name" --project "$(pwd)" --context
 ```
 
-**If graph unavailable:** Run `rai memory build` first, then retry.
+**If graph unavailable:** Run `rai graph build` first, then retry.
 
 The bundle output includes an `# Available Context` manifest listing sections by name, item count, and token estimate. Use this to decide what to load in Step 2.
 

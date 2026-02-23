@@ -226,7 +226,7 @@ class TestMemoryMdGeneratorPart1:
         result = gen.generate(methodology_path=sample_methodology_yaml)
 
         assert "*Last updated:" in result
-        assert "raise memory generate" in result
+        assert "rai graph build" in result
 
 
 # =============================================================================

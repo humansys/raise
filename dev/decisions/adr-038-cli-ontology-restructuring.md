@@ -2,14 +2,14 @@
 id: "ADR-038"
 title: "CLI Ontology Restructuring — Bounded Contexts for Agent Consumption"
 date: "2026-02-21"
-status: "Proposed"
+status: "Accepted"
 ---
 
 # ADR-038: CLI Ontology Restructuring
 
 ## Context
 
-The `rai` CLI has 10 command groups and 36 subcommands. The primary consumer of the CLI
+The `rai` CLI has 11 command groups and 41 subcommands (post-E211, which added `adapters`). The primary consumer of the CLI
 is not the human developer — it is the AI agent executing skills. Skills are authored by
 the skill creator skill and reviewed by humans (HITL). This means the CLI namespace must
 optimize for:
@@ -50,7 +50,8 @@ Additional issues outside `memory`:
 
 ### Principle: each CLI group = one bounded context
 
-Restructure from 10 groups / 36 commands to 9 groups / 27 commands.
+Restructure from 11 groups / 41 commands to 10 groups / 30 commands. The `adapters` group
+(added in E211) is already well-bounded and unchanged.
 
 ### 1. `memory` → split into `graph`, `pattern`, `signal`
 
@@ -77,17 +78,18 @@ Patterns are RaiSE's core differentiator — what Rai learns from each story. Th
 first-class citizenship, not burial inside a God Object. Future commands (`list`, `prune`,
 `curate`) have a natural home.
 
-**`rai signal`** — Process telemetry (1 command with type argument)
+**`rai signal`** — Process telemetry (3 subcommands)
 
 ```
-rai signal emit work {id} --event start --phase design
-rai signal emit session --type feature --outcome success
-rai signal emit calibration {story} -s S -e 30 -a 15
+rai signal emit-work epic E9 --event start --phase design
+rai signal emit-session --type feature --outcome success
+rai signal emit-calibration S1 -s S -e 30 -a 15
 ```
 
-Unifies the three `emit-*` commands into one with a positional type argument. "Signal" (6
-chars) chosen over "telemetry" (9 chars) — these are lifecycle signals, and brevity matters
-for a command that appears in 10 of 22 skills.
+Three subcommands with their original signatures — no artificial unification. The three
+emit commands have different parameter shapes; unifying into `rai signal emit <type>` adds
+Typer complexity for marginal gain. "Signal" (6 chars) chosen over "telemetry" (9 chars) —
+these are lifecycle signals, and brevity matters for a command that appears in 10 of 22 skills.
 
 ### 2. Kill redundancies
 
@@ -125,6 +127,7 @@ rai info               # Display package info (absorbs `base show`)
 ### Unchanged groups
 
 - `rai init` — clean, single responsibility
+- `rai adapters` — clean (list, check) — added in E211
 - `rai session` — clean (start, context, close)
 - `rai skill` — clean (list, validate, check-name, scaffold)
 - `rai backlog` — clean (auth, pull, push, status)
@@ -140,8 +143,10 @@ rai session start|context|close    # Temporal work state
 rai graph build|validate|query|    # Knowledge graph structure
       context|list|viz|extract
 rai pattern add|reinforce          # Learned knowledge
-rai signal emit                    # Process telemetry
+rai signal emit-work|              # Process telemetry
+       emit-session|emit-calibration
 
+rai adapters list|check            # Adapter inspection (E211)
 rai discover scan|analyze|drift    # Codebase understanding
 rai skill list|validate|           # Skill governance
        check-name|scaffold
@@ -149,7 +154,7 @@ rai backlog auth|pull|push|status  # External sync
 rai release check|publish|list     # Release management
 ```
 
-9 groups + 2 top-level = 27 commands. 25% reduction in surface area.
+10 groups + 2 top-level = 31 commands. 24% reduction in surface area.
 
 ### Migration strategy
 
@@ -208,15 +213,14 @@ Three distribution locations update automatically via `rai init`:
   only, not storage layer.
 - Historical work artifacts retain old command names. They are records, not instructions.
 
-## Open Questions
+## Open Questions (Resolved)
 
-1. **Should `graph extract` survive?** If only `graph build` consumes its output, it's
-   internal and can become a `--extract-only` flag on `build`.
-2. **Should `pattern list` exist from day one?** Currently patterns are listed via
-   `graph list --types pattern`. A dedicated `pattern list` would be more discoverable
-   but adds a command.
-3. **Timing.** This is a clean break. Should it ship as a dedicated story under RAISE-144
-   (Engineering Health), or as part of a larger epic?
+1. **`graph extract` survives.** Used in `project-create` and `project-onboard` skills
+   for on-demand governance extraction. Not internal-only.
+2. **`pattern list` deferred.** Not day-one. `graph list --types pattern` covers it.
+   Add when pattern curation becomes a real workflow.
+3. **Timing: dedicated epic RAISE-247.** Decided SES-234: shipped as v2.1 before
+   RAISE-248 (Hooks & Gates), which depends on the new ontology.
 
 ## References
 

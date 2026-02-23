@@ -6,9 +6,12 @@ status: current
 depends_on: [config]
 depended_by: [cli, context, session]
 entry_points:
-  - "rai memory add"
+  - "rai pattern add"
+  - "rai pattern reinforce"
   - "rai memory emit"
   - "rai memory emit-work"
+  - "rai memory add-pattern (deprecated → rai pattern add)"
+  - "rai memory reinforce (deprecated → rai pattern reinforce)"
 public_api:
   - "CalibrationInput"
   - "MemoryConcept"
