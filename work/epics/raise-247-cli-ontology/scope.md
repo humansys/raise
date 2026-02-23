@@ -68,7 +68,7 @@ rai release check|publish|list     # Release management
 | S1 | Create `graph` group | M | ✅ Done | None | Extract 7 graph commands from memory.py |
 | S2 | Create `pattern` group | S | ✅ Done | None | Extract add-pattern + reinforce from memory.py |
 | S3 | Create `signal` group | S | ✅ Done | None | Extract emit-work/session/calibration as 3 subcommands |
-| S4 | Kill redundancies | XS | Pending | None | Remove generate, add-session, add-calibration |
+| S4 | Kill redundancies | XS | ✅ Done | None | Remove generate, add-session, add-calibration + coverage gate |
 | S5 | Merge publish+release, flatten singletons | S | Pending | None | Consolidate release mgmt, flatten base/profile |
 | S6 | Update all skills and generated docs | M | Pending | S1-S5 | Mechanical find-replace across 22 skills + CLAUDE.md |
 
@@ -244,7 +244,7 @@ rai profile
 | 1 | S1: Create `graph` group | M | None | M1 | Largest extraction (7 cmds), proves the pattern |
 | 2 | S2: Create `pattern` group | S | None | M1 | Same pattern as S1, smaller (2 cmds) |
 | 3 | S3: Create `signal` group | S | None | M1 | Same pattern, 3 subcommands |
-| 4 | S4: Kill redundancies | XS | None | M2 | Quick win — remove 3 dead commands |
+| 4 | S4: Kill redundancies | XS | None | M2 | ✅ Done — removed 3 commands + coverage gate |
 | 5 | S5: Merge publish+release | S | None | M2 | Different pattern (merge, not extract) |
 | 6 | S6: Skill + docs sweep | M | S1-S5 | M3 | Must go last — uses new names |
 
@@ -283,7 +283,7 @@ time saved for these small stories.
 | S1: graph group | M | ✅ Done | 150 min | 1.6x | PAT-E-434/435/436 |
 | S2: pattern group | S | ✅ Done | 45 min | 1.33x | PAT-E-440/441 |
 | S3: signal group | S | ✅ Done | 21 min | 2.86x | PAT-E-442, M1 complete |
-| S4: kill redundancies | XS | Pending | - | - | RAISE-253 |
+| S4: kill redundancies | XS | ✅ Done | 25 min | 0.8x | RAISE-253, PAT-E-444 |
 | S5: merge+flatten | S | Pending | - | - | RAISE-254 |
 | S6: skill sweep | M | Pending | - | - | RAISE-255 |
 
