@@ -11,7 +11,7 @@ from rai_cli.adapters.models import BackendHealth
 from rai_cli.adapters.protocols import KnowledgeGraphBackend
 from rai_cli.context.graph import UnifiedGraph
 from rai_cli.context.models import ConceptEdge, ConceptNode
-from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+from rai_cli.graph.filesystem_backend import FilesystemGraphBackend, get_active_backend
 
 
 def _make_sample_graph() -> UnifiedGraph:
@@ -147,3 +147,15 @@ class TestFilesystemGraphBackend:
         # Compare
         backend_json = backend_path.read_text(encoding="utf-8")
         assert backend_json == old_json
+
+
+class TestGetActiveBackend:
+    """Tests for get_active_backend helper."""
+
+    def test_returns_filesystem_backend(self) -> None:
+        backend = get_active_backend()
+        assert isinstance(backend, FilesystemGraphBackend)
+
+    def test_returns_protocol_compatible(self) -> None:
+        backend = get_active_backend()
+        assert isinstance(backend, KnowledgeGraphBackend)
