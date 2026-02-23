@@ -58,7 +58,7 @@ breakage until the S6 skill sweep.
 | Utility | Location | Used By |
 |---------|----------|---------|
 | `_get_default_index_path()` | Moves to graph.py | graph commands + memory wrappers (import from graph) |
-| `MEMORY_TYPES` | Stays in memory.py | `list_memory` filter (graph.py imports if needed) |
+| `MEMORY_TYPES` | Inlined in `list_graph()` | Single-use, no constant needed (arch review Q1) |
 | `INDEX_FILE` | Moves to graph.py | `_get_default_index_path()` |
 | `console` | Both files get own instance | Independent |
 
@@ -73,12 +73,8 @@ graph_app = typer.Typer(
     no_args_is_help=True,
 )
 
-# Shared helper
-def _deprecation_warning(cmd: str) -> None:
-    """Print deprecation warning to stderr."""
-    ...
-
 # 7 commands — same signatures as current memory.py
+# Note: _deprecation_warning lives in memory.py only (arch review R1)
 def query(query_str: str, format: str = "human", ...) -> None: ...
 def context_cmd(module_id: str, format: str = "human") -> None: ...
 def build(output: Path | None = None, no_diff: bool = False) -> None: ...
@@ -141,3 +137,12 @@ See: `story.md` § Acceptance Criteria
 - **MUST** print deprecation warning to stderr (not stdout) so piped output isn't affected
 - **MUST NOT** change any library-layer code — this is purely CLI restructuring
 - **SHOULD** keep wrappers minimal (< 5 lines each excluding signature)
+- **MUST** update hint messages in graph.py to say `'rai graph ...'` not `'raise memory ...'` (arch review Q3)
+
+## 7. Architecture Review Resolutions
+
+| Finding | Resolution |
+|---------|-----------|
+| R1: `_deprecation_warning` in graph.py unnecessary | Removed — lives only in memory.py |
+| Q1: `MEMORY_TYPES` location | Inlined in `list_graph()` — single-use, no constant needed |
+| Q3: Hint messages say `raise memory` | Updated to `rai graph` in graph.py during extraction |
