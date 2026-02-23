@@ -1,8 +1,8 @@
 ---
 epic: RAISE-248
 title: "Lifecycle Hooks & Workflow Gates"
-status: scoped
-branch: v2
+status: in-progress
+branch: epic/e248/hooks-gates
 rfc: RFC-001
 date: 2026-02-21
 size: L
