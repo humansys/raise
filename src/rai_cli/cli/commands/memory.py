@@ -1,20 +1,19 @@
-"""CLI commands for Rai's memory: patterns, calibration, sessions, and telemetry.
+"""CLI commands for Rai's memory: calibration and session storage.
 
 Memory commands own the persistent knowledge that lives in JSONL files:
-- Patterns (learned behaviors and best practices)
 - Calibration (estimation data)
 - Sessions (work history)
 
-Graph-structure commands (build, validate, query, context, list, viz, extract)
-have been extracted to the `graph` group (RAISE-247, ADR-038).
+Graph-structure commands have been extracted to the `graph` group (RAISE-247).
+Pattern commands have been extracted to the `pattern` group (RAISE-247).
+Signal/telemetry commands have been extracted to the `signal` group (RAISE-247).
 Backward-compatible aliases remain here and will be removed in a future release.
 """
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated
 
 import typer
 from rich.console import Console
@@ -29,13 +28,6 @@ from rai_cli.memory import (
     append_session,
     get_memory_dir_for_scope,
 )
-from rai_cli.session.resolver import resolve_session_id_optional
-from rai_cli.telemetry.schemas import (
-    CalibrationEvent,
-    SessionEvent,
-    WorkLifecycle,
-)
-from rai_cli.telemetry.writer import emit
 
 memory_app = typer.Typer(
     name="memory",
@@ -541,7 +533,8 @@ def add_session_cmd(
 
 
 # =============================================================================
-# Emit Commands (Telemetry signals)
+# Backward-Compat Aliases: signal commands (extracted to signal.py in RAISE-247)
+# These wrappers will be removed in a future release (RAISE-247/S9).
 # =============================================================================
 
 
@@ -581,129 +574,18 @@ def emit_work(
         ),
     ] = None,
 ) -> None:
-    """Emit a work lifecycle event for Lean flow analysis.
+    """Deprecated: use 'rai signal emit-work'."""
+    _deprecation_warning("emit-work", "signal")
+    from rai_cli.cli.commands.signal import emit_work as _emit_work
 
-    Tracks work items (epics, stories) through normalized phases to enable:
-    - Lead time: total time from start to complete
-    - Wait time: gaps between phases
-    - WIP: work started but not completed
-    - Bottlenecks: which phase takes longest
-    - Cross-level analysis: compare epic vs story flow
-
-    Phases (normalized across all work types):
-    - design: Scope definition and specification
-    - plan: Task/story decomposition and sequencing
-    - implement: Active development work
-    - review: Retrospective and learnings
-
-    Examples:
-        # Epic lifecycle
-        $ raise memory emit-work epic E9 --event start --phase design
-        $ raise memory emit-work epic E9 -e complete -p design
-        $ raise memory emit-work epic E9 -e start -p plan
-
-        # Story lifecycle
-        $ raise memory emit-work story F9.4 --event start --phase design
-        $ raise memory emit-work story F9.4 -e complete -p implement
-        $ raise memory emit-work story F9.4 -e start -p review
-
-        # Work blocked
-        $ raise memory emit-work story F9.4 -e blocked -p plan -b "unclear requirements"
-
-        # Work unblocked
-        $ raise memory emit-work story F9.4 -e unblocked -p plan
-    """
-    # Validate work type
-    valid_work_types: list[Literal["epic", "story"]] = ["epic", "story"]
-    work_type_lower = work_type.lower()
-    if work_type_lower not in valid_work_types:
-        cli_error(
-            f"Invalid work type: {work_type}",
-            hint=f"Valid types: {', '.join(valid_work_types)}",
-            exit_code=7,
-        )
-
-    # Validate event type
-    valid_events: list[
-        Literal["start", "complete", "blocked", "unblocked", "abandoned"]
-    ] = [
-        "start",
-        "complete",
-        "blocked",
-        "unblocked",
-        "abandoned",
-    ]
-    if event_type not in valid_events:
-        cli_error(
-            f"Invalid event: {event_type}",
-            hint=f"Valid events: {', '.join(valid_events)}",
-            exit_code=7,
-        )
-
-    # Validate phase
-    valid_phases: list[
-        Literal["init", "design", "plan", "implement", "review", "close"]
-    ] = [
-        "init",
-        "design",
-        "plan",
-        "implement",
-        "review",
-        "close",
-    ]
-    if phase not in valid_phases:
-        cli_error(
-            f"Invalid phase: {phase}",
-            hint=f"Valid phases: {', '.join(valid_phases)}",
-            exit_code=7,
-        )
-
-    # Blocker is required for blocked events
-    blocker_value = blocker if blocker else None
-    if event_type == "blocked" and not blocker_value:
-        console.print(
-            "[yellow]Warning:[/yellow] No blocker description provided for blocked event"
-        )
-
-    # Create event
-    lifecycle_event = WorkLifecycle(
-        timestamp=datetime.now(UTC),
-        work_type=work_type_lower,  # type: ignore[arg-type]
+    _emit_work(
+        work_type=work_type,
         work_id=work_id,
-        event=event_type,  # type: ignore[arg-type]
-        phase=phase,  # type: ignore[arg-type]
-        blocker=blocker_value,
+        event_type=event_type,
+        phase=phase,
+        blocker=blocker,
+        session=session,
     )
-
-    # Resolve optional session ID
-    import os
-
-    session_id = resolve_session_id_optional(session, os.environ.get("RAI_SESSION_ID"))
-
-    # Emit signal
-    result = emit(lifecycle_event, session_id=session_id)
-
-    if result.success:
-        # Format label based on work type
-        label = f"{work_type_lower.capitalize()} {work_id}"
-
-        # Format output based on event type
-        if event_type == "start":
-            console.print(f"\n[green]▶[/green] {label} → {phase} started")
-        elif event_type == "complete":
-            console.print(f"\n[green]✓[/green] {label} → {phase} complete")
-        elif event_type == "blocked":
-            console.print(f"\n[red]⏸[/red] {label} → {phase} blocked")
-            if blocker_value:
-                console.print(f"  Blocker: {blocker_value}")
-        elif event_type == "unblocked":
-            console.print(f"\n[green]▶[/green] {label} → {phase} unblocked")
-        elif event_type == "abandoned":
-            console.print(f"\n[yellow]✗[/yellow] {label} → {phase} abandoned")
-
-        console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
-    else:
-        cli_error(result.error or "Failed to emit work lifecycle event")
 
 
 @memory_app.command("emit-session")
@@ -738,64 +620,17 @@ def emit_session_event(
         ),
     ] = None,
 ) -> None:
-    """Emit a session event to telemetry.
+    """Deprecated: use 'rai signal emit-session'."""
+    _deprecation_warning("emit-session", "signal")
+    from rai_cli.cli.commands.signal import emit_session as _emit_session
 
-    Records a session completion signal for local learning and insights.
-    Called at the end of /rai-session-close to capture session metadata.
-
-    Examples:
-        # Basic session complete
-        $ raise memory emit-session --type story --outcome success
-
-        # With duration and stories
-        $ raise memory emit-session -t story -o success -d 45 -f F9.1,F9.2,F9.3
-
-        # Research session
-        $ raise memory emit-session --type research --outcome partial --duration 90
-    """
-    # Validate outcome
-    valid_outcomes: list[Literal["success", "partial", "abandoned"]] = [
-        "success",
-        "partial",
-        "abandoned",
-    ]
-    if outcome not in valid_outcomes:
-        cli_error(
-            f"Invalid outcome: {outcome}",
-            hint=f"Valid outcomes: {', '.join(valid_outcomes)}",
-            exit_code=7,
-        )
-
-    # Parse stories
-    stories_list = [f.strip() for f in stories.split(",") if f.strip()]
-
-    # Create event
-    event = SessionEvent(
-        timestamp=datetime.now(UTC),
+    _emit_session(
         session_type=session_type,
-        outcome=outcome,  # type: ignore[arg-type]
-        duration_min=duration,
-        stories=stories_list,
+        outcome=outcome,
+        duration=duration,
+        stories=stories,
+        session=session,
     )
-
-    # Resolve optional session ID
-    import os
-
-    session_id = resolve_session_id_optional(session, os.environ.get("RAI_SESSION_ID"))
-
-    # Emit signal
-    result = emit(event, session_id=session_id)
-
-    if result.success:
-        console.print("\n[green]✓[/green] Session event recorded")
-        console.print(f"  Type: {session_type}")
-        console.print(f"  Outcome: {outcome}")
-        console.print(f"  Duration: {duration} min")
-        if stories_list:
-            console.print(f"  Stories: {', '.join(stories_list)}")
-        console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
-    else:
-        cli_error(result.error or "Failed to emit session event")
 
 
 @memory_app.command("emit-calibration")
@@ -824,75 +659,14 @@ def emit_calibration_event(
         ),
     ] = None,
 ) -> None:
-    """Emit a calibration event to telemetry.
+    """Deprecated: use 'rai signal emit-calibration'."""
+    _deprecation_warning("emit-calibration", "signal")
+    from rai_cli.cli.commands.signal import emit_calibration as _emit_calibration
 
-    Records estimate vs actual for velocity tracking and pattern detection.
-    Called at the end of /rai-story-review to capture calibration data.
-
-    Velocity is calculated automatically: estimated / actual.
-    - velocity > 1.0 means faster than estimated
-    - velocity < 1.0 means slower than estimated
-
-    Examples:
-        # Story completed faster than estimated
-        $ raise memory emit-calibration F9.4 --size S --estimated 30 --actual 15
-
-        # Story took longer
-        $ raise memory emit-calibration F9.4 -s M -e 60 -a 90
-
-        # Short form
-        $ raise memory emit-calibration F9.4 -s S -e 30 -a 15
-    """
-    # Validate size
-    valid_sizes = ["XS", "S", "M", "L", "XL"]
-    size_upper = size.upper()
-    if size_upper not in valid_sizes:
-        cli_error(
-            f"Invalid size: {size}",
-            hint=f"Valid sizes: {', '.join(valid_sizes)}",
-            exit_code=7,
-        )
-
-    # Validate durations
-    if estimated <= 0:
-        cli_error("Estimated duration must be > 0", exit_code=7)
-    if actual <= 0:
-        cli_error("Actual duration must be > 0", exit_code=7)
-
-    # Calculate velocity
-    velocity = round(estimated / actual, 2)
-
-    # Create event
-    event = CalibrationEvent(
-        timestamp=datetime.now(UTC),
-        story_id=story,
-        story_size=size_upper,
-        estimated_min=estimated,
-        actual_min=actual,
-        velocity=velocity,
+    _emit_calibration(
+        story=story,
+        size=size,
+        estimated=estimated,
+        actual=actual,
+        session=session,
     )
-
-    # Resolve optional session ID
-    import os
-
-    session_id = resolve_session_id_optional(session, os.environ.get("RAI_SESSION_ID"))
-
-    # Emit signal
-    result = emit(event, session_id=session_id)
-
-    if result.success:
-        console.print("\n[green]✓[/green] Calibration event recorded")
-        console.print(f"  Story: {story}")
-        console.print(f"  Size: {size_upper}")
-        console.print(f"  Estimated: {estimated} min")
-        console.print(f"  Actual: {actual} min")
-        console.print(f"  Velocity: {velocity}x", end="")
-        if velocity > 1.0:
-            console.print(" [green](faster than estimated)[/green]")
-        elif velocity < 1.0:
-            console.print(" [yellow](slower than estimated)[/yellow]")
-        else:
-            console.print(" (on target)")
-        console.print(f"\n[dim]Saved to: {result.path}[/dim]\n")
-    else:
-        cli_error(result.error or "Failed to emit calibration event")
