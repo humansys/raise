@@ -54,11 +54,12 @@ console = Console()
 _stderr_console = Console(stderr=True)
 
 
-def _deprecation_warning(old_cmd: str, new_group: str = "graph") -> None:
+def _deprecation_warning(old_cmd: str, new_group: str = "graph", new_cmd: str | None = None) -> None:
     """Print deprecation warning to stderr."""
+    target = new_cmd or old_cmd
     _stderr_console.print(
         f"[yellow]DEPRECATED:[/yellow] 'rai memory {old_cmd}' → "
-        f"use 'rai {new_group} {old_cmd}' instead",
+        f"use 'rai {new_group} {target}' instead",
     )
 
 
@@ -354,7 +355,7 @@ def add_pattern(
     ] = None,
 ) -> None:
     """Deprecated: use 'rai pattern add'."""
-    _deprecation_warning("add-pattern", "pattern")
+    _deprecation_warning("add-pattern", "pattern", new_cmd="add")
     from rai_cli.cli.commands.pattern import add_pattern as _add
 
     _add(
