@@ -17,6 +17,9 @@ import networkx as nx  # type: ignore[import-untyped]
 from rai_cli.adapters.models import BackendHealth
 from rai_cli.context.graph import UnifiedGraph
 
+# Re-export for convenience
+__all__ = ["FilesystemGraphBackend", "get_active_backend"]
+
 
 class FilesystemGraphBackend:
     """Built-in graph backend — persists to local filesystem.
@@ -61,3 +64,12 @@ class FilesystemGraphBackend:
             message="Filesystem backend operational",
             metadata={"backend": "filesystem"},
         )
+
+
+def get_active_backend() -> FilesystemGraphBackend:
+    """Resolve the active graph backend.
+
+    Returns FilesystemGraphBackend (COMMUNITY). S211.5 (TierContext)
+    will add tier-based selection via entry point discovery.
+    """
+    return FilesystemGraphBackend()
