@@ -43,14 +43,14 @@
 | [RAISE-173](https://humansys.atlassian.net/browse/RAISE-173) | **Team Enablement & Operational Readiness** | 🚀 In Progress | — | P1 |
 | [RAISE-211](https://humansys.atlassian.net/browse/RAISE-211) | **Adapter Foundation** | ✅ Complete | `work/epics/raise-211-adapter-foundation/scope.md` | — |
 | [RAISE-242](https://humansys.atlassian.net/browse/RAISE-242) | **Skill Ecosystem** | 📋 Backlog | — | P1 (v2.1 partial, v2.3 full) |
-| [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | 🚀 In Progress | `work/epics/raise-247-cli-ontology/scope.md` | P0 (v2.1) |
+| [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | ✅ Complete | `work/epics/raise-247-cli-ontology/scope.md` | — |
 | [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | 📋 Backlog | `work/epics/raise-248-hooks-gates/scope.md` | P1 (v2.2) |
 | [RAISE-249](https://humansys.atlassian.net/browse/RAISE-249) | **Artifact Ontology & Contract Chain** | ✅ Complete | `work/epics/raise-249-artifact-ontology/scope.md` | — |
 
 ### Release Roadmap (decided SES-234, 2026-02-21)
 
 **v2.1 — CLI Professional** (~10 stories)
-- RAISE-247: CLI Ontology Restructuring (complete — 9 stories)
+- RAISE-247: CLI Ontology Restructuring ✅ (6 stories, 1.94x avg velocity)
 - RAISE-242/S1: Semantic Validator (1 story from Skill Ecosystem)
 - Outcome: clean CLI, skill registry with ownership, semantic validation
 
