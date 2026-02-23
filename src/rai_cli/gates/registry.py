@@ -91,6 +91,14 @@ class GateRegistry:
                 )
                 continue
 
+            existing = self.get_gate(instance.gate_id)
+            if existing is not None:
+                logger.warning(
+                    "Duplicate gate_id '%s' from entry point '%s' — replacing previous",
+                    instance.gate_id,
+                    ep.name,
+                )
+                self._gates = [g for g in self._gates if g.gate_id != instance.gate_id]
             self._gates.append(instance)
             logger.debug(
                 "Loaded gate '%s' (id=%s, point=%s)",
@@ -102,7 +110,7 @@ class GateRegistry:
     def register(self, gate: WorkflowGate | Any) -> None:
         """Manually register a gate instance (useful for testing).
 
-        Silently skips non-compliant objects.
+        Silently skips non-compliant objects. Warns on duplicate gate IDs.
         """
         if not isinstance(gate, WorkflowGate):
             logger.warning(
@@ -110,6 +118,15 @@ class GateRegistry:
                 type(gate).__name__,
             )
             return
+        existing = self.get_gate(gate.gate_id)
+        if existing is not None:
+            logger.warning(
+                "Duplicate gate_id '%s': replacing %s with %s",
+                gate.gate_id,
+                type(existing).__name__,
+                type(gate).__name__,
+            )
+            self._gates = [g for g in self._gates if g.gate_id != gate.gate_id]
         self._gates.append(gate)
 
     def get_gate(self, gate_id: str) -> WorkflowGate | None:
