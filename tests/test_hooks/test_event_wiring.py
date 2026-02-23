@@ -436,3 +436,65 @@ class TestInitCompleteEvent:
         init_events = [e for e in captured_events if isinstance(e, InitCompleteEvent)]
         assert len(init_events) == 1
         assert init_events[0].project_name == tmp_path.name
+
+
+class TestAdapterEvents:
+    """adapter:loaded and adapter:failed event wiring."""
+
+    def test_adapter_check_emits_loaded_event(
+        self, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.adapters import adapters_app
+
+        runner = CliRunner()
+
+        # Create a mock entry point that loads successfully
+        mock_ep = MagicMock()
+        mock_ep.name = "test-adapter"
+        mock_ep.load.return_value = type("FakeAdapter", (), {})  # a class
+        mock_ep.dist = MagicMock()
+        mock_ep.dist.name = "test-pkg"
+
+        with (
+            patch("rai_cli.cli.commands.adapters.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]),
+            patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch("rai_cli.cli.commands.adapters.format_check_human"),
+        ):
+            result = runner.invoke(adapters_app, ["check"])
+
+        assert result.exit_code == 0
+        loaded_events = [e for e in captured_events if isinstance(e, AdapterLoadedEvent)]
+        assert len(loaded_events) >= 1
+        assert loaded_events[0].adapter_name == "test-adapter"
+
+    def test_adapter_check_emits_failed_event(
+        self, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.adapters import adapters_app
+
+        runner = CliRunner()
+
+        mock_ep = MagicMock()
+        mock_ep.name = "broken-adapter"
+        mock_ep.load.side_effect = ImportError("missing dep")
+        mock_ep.dist = MagicMock()
+        mock_ep.dist.name = "broken-pkg"
+
+        with (
+            patch("rai_cli.cli.commands.adapters.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]),
+            patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch("rai_cli.cli.commands.adapters.format_check_human"),
+        ):
+            result = runner.invoke(adapters_app, ["check"])
+
+        assert result.exit_code == 0
+        failed_events = [e for e in captured_events if isinstance(e, AdapterFailedEvent)]
+        assert len(failed_events) >= 1
+        assert failed_events[0].adapter_name == "broken-adapter"
+        assert "missing dep" in failed_events[0].error

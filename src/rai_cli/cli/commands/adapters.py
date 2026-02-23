@@ -16,6 +16,9 @@ from typing import Annotated, Any
 import typer
 from rich.console import Console
 
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import AdapterFailedEvent, AdapterLoadedEvent
+
 from rai_cli.adapters.protocols import (
     DocumentationTarget,
     GovernanceParser,
@@ -138,12 +141,18 @@ def check_command(
         $ rai adapters check --format json
     """
     results: list[dict[str, Any]] = []
+    emitter = create_emitter()
 
     for group, (proto_name, proto_cls) in ADAPTER_GROUPS.items():
         for ep in entry_points(group=group):
             try:
                 loaded: Any = ep.load()
             except Exception as exc:  # noqa: BLE001
+                emitter.emit(AdapterFailedEvent(
+                    adapter_name=ep.name,
+                    group=group,
+                    error=str(exc),
+                ))
                 results.append(
                     {
                         "group": group,
@@ -158,6 +167,11 @@ def check_command(
 
             compliant = inspect.isclass(loaded) and issubclass(loaded, proto_cls)
             error = None if compliant else f"Not a {proto_name} subclass"
+            emitter.emit(AdapterLoadedEvent(
+                adapter_name=ep.name,
+                group=group,
+                adapter_type=type(loaded).__name__,
+            ))
             results.append(
                 {
                     "group": group,
