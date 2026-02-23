@@ -68,6 +68,9 @@ glossary = "rai_cli.governance.parsers.glossary:GlossaryParser"
 [project.entry-points."rai.hooks"]
 telemetry = "rai_cli.hooks.builtin.telemetry:TelemetryHook"
 
+[project.entry-points."rai.gates"]
+# Built-in gates registered by S248.6
+
 [project.entry-points."rai.graph.backends"]
 local = "rai_cli.graph.filesystem_backend:FilesystemGraphBackend"
 
