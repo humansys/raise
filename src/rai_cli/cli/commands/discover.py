@@ -21,9 +21,9 @@ import typer
 from rich.console import Console
 
 from rai_cli.cli.error_handler import cli_error
+from rai_cli.discovery.scanner import Language, ScanResult, scan_directory
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import DiscoverScanEvent
-from rai_cli.discovery.scanner import Language, ScanResult, scan_directory
 from rai_cli.output.formatters.discover import (
     format_analyze_result,
     format_build_result,

@@ -16,9 +16,6 @@ from typing import Annotated, Any
 import typer
 from rich.console import Console
 
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import AdapterFailedEvent, AdapterLoadedEvent
-
 from rai_cli.adapters.protocols import (
     DocumentationTarget,
     GovernanceParser,
@@ -33,6 +30,8 @@ from rai_cli.adapters.registry import (
     EP_GRAPH_BACKENDS,
     EP_PM_ADAPTERS,
 )
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import AdapterFailedEvent, AdapterLoadedEvent
 from rai_cli.output.formatters.adapters import (
     format_check_human,
     format_check_json,
