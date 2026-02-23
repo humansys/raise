@@ -7,13 +7,10 @@ Architecture: ADR-039 §5 (Built-in gates), S248.6
 
 from __future__ import annotations
 
-import logging
 import subprocess
 from typing import ClassVar
 
 from rai_cli.gates.models import GateContext, GateResult
-
-logger = logging.getLogger(__name__)
 
 
 class LintGate:
