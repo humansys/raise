@@ -280,7 +280,7 @@ time saved for these small stories.
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S1: graph group | M | Pending | - | - | |
+| S1: graph group | M | ✅ Done | 150 min | 1.6x | PAT-E-434/435/436 |
 | S2: pattern group | S | Pending | - | - | |
 | S3: signal group | S | Pending | - | - | |
 | S4: kill redundancies | XS | Pending | - | - | |
