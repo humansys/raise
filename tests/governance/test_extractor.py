@@ -1,10 +1,14 @@
 """Tests for GovernanceExtractor."""
 
+from __future__ import annotations
+
+import logging
 from pathlib import Path
 from textwrap import dedent
 
 import pytest
 
+from rai_cli.context.models import GraphNode
 from rai_cli.governance.extractor import GovernanceExtractor
 from rai_cli.governance.models import ConceptType
 
@@ -156,20 +160,23 @@ class TestGovernanceExtractor:
         with pytest.raises(ValueError, match="Cannot infer concept type"):
             extractor._infer_concept_type(Path("unknown.md"))
 
-    def test_extract_all(self, tmp_governance_structure: Path) -> None:
-        """Should extract all concepts from standard locations."""
+    def test_extract_all_returns_graph_nodes(
+        self, tmp_governance_structure: Path
+    ) -> None:
+        """extract_all() returns list[GraphNode] via registry path."""
         extractor = GovernanceExtractor(tmp_governance_structure)
 
-        concepts = extractor.extract_all()
+        nodes = extractor.extract_all()
 
         # Should have extracted 2 requirements + 1 outcome + 1 principle = 4 total
-        assert len(concepts) == 4
+        assert len(nodes) == 4
+        assert all(isinstance(n, GraphNode) for n in nodes)
 
-        # Check types are present
-        types = {c.type for c in concepts}
-        assert ConceptType.REQUIREMENT in types
-        assert ConceptType.OUTCOME in types
-        assert ConceptType.PRINCIPLE in types
+        # Check types are present (string values, not ConceptType enum)
+        types = {n.type for n in nodes}
+        assert "requirement" in types
+        assert "outcome" in types
+        assert "principle" in types
 
     def test_extract_with_result(self, tmp_governance_structure: Path) -> None:
         """Should return ExtractionResult with metadata."""
@@ -206,11 +213,9 @@ class TestGovernanceExtractor:
         assert concept_type == ConceptType.RELEASE
 
     def test_integration_with_real_governance(self) -> None:
-        """Should extract concepts from real raise-cli governance files."""
-        # This test runs against actual project files
+        """Should extract GraphNodes from real raise-cli governance files."""
         extractor = GovernanceExtractor()
 
-        # Check if real files exist
         prd_exists = (Path.cwd() / "governance" / "prd.md").exists()
         vision_exists = (Path.cwd() / "governance" / "vision.md").exists()
         constitution_exists = (
@@ -220,25 +225,79 @@ class TestGovernanceExtractor:
         if not (prd_exists and vision_exists and constitution_exists):
             pytest.skip("Real governance files not found")
 
-        concepts = extractor.extract_all()
+        nodes = extractor.extract_all()
 
-        # Should extract 20+ concepts from raise-commons
-        assert len(concepts) >= 20
+        # Should extract 20+ nodes from raise-commons
+        assert len(nodes) >= 20
+        assert all(isinstance(n, GraphNode) for n in nodes)
 
-        # Should have all three types
-        types = {c.type for c in concepts}
-        assert ConceptType.REQUIREMENT in types
-        assert ConceptType.OUTCOME in types
-        assert ConceptType.PRINCIPLE in types
+        # Should have core types
+        types = {n.type for n in nodes}
+        assert "requirement" in types
+        assert "outcome" in types
+        assert "principle" in types
 
-        # All concepts should have required fields
-        for concept in concepts:
-            assert len(concept.id) > 0
-            assert len(concept.file) > 0
-            assert len(concept.section) > 0
-            assert len(concept.content) > 0
-            assert concept.lines[0] > 0
-            assert concept.lines[1] >= concept.lines[0]
+        # All nodes should have required fields
+        for node in nodes:
+            assert len(node.id) > 0
+            assert len(node.content) > 0
+
+
+class TestRegistryPath:
+    """Tests for the registry-based extract_all() path."""
+
+    def test_extract_all_with_broken_parser(
+        self,
+        tmp_governance_structure: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Broken parser logs warning, others still produce nodes."""
+        from rai_cli.adapters.models import ArtifactLocator
+        from rai_cli.context.models import GraphNode as GN
+
+        class BrokenParser:
+            def can_parse(self, locator: ArtifactLocator) -> bool:
+                return locator.artifact_type == "prd"
+
+            def parse(self, locator: ArtifactLocator) -> list[GN]:
+                raise RuntimeError("parser exploded")
+
+        class GoodParser:
+            def can_parse(self, locator: ArtifactLocator) -> bool:
+                return locator.artifact_type == "constitution"
+
+            def parse(self, locator: ArtifactLocator) -> list[GN]:
+                return [GN(id="test-1", type="principle", content="ok", created="now")]
+
+        extractor = GovernanceExtractor(
+            tmp_governance_structure,
+            parsers={"prd": BrokenParser, "constitution": GoodParser},
+        )
+
+        with caplog.at_level(logging.WARNING):
+            nodes = extractor.extract_all()
+
+        # Good parser produced nodes; broken parser didn't crash the build
+        assert any(n.id == "test-1" for n in nodes)
+        assert "parser exploded" in caplog.text or "Error" in caplog.text
+
+    def test_extract_with_result_backward_compat(
+        self, tmp_governance_structure: Path
+    ) -> None:
+        """extract_with_result() still returns ExtractionResult with Concept objects."""
+        extractor = GovernanceExtractor(tmp_governance_structure)
+
+        result = extractor.extract_with_result()
+
+        # Must return Concept objects, not GraphNode
+        assert result.total >= 1
+        for concept in result.concepts:
+            assert hasattr(concept, "file")
+            assert hasattr(concept, "section")
+            assert hasattr(concept, "lines")
+            assert hasattr(concept, "type")
+            # type should be ConceptType enum, not string
+            assert isinstance(concept.type, ConceptType)
 
 
 class TestRoadmapExtraction:

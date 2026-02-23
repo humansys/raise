@@ -140,15 +140,15 @@ class UnifiedGraphBuilder:
     def load_governance(self) -> list[ConceptNode]:
         """Load concepts from governance documents.
 
-        Uses GovernanceExtractor to parse constitution, PRD, and vision.
+        Uses GovernanceExtractor with registry-discovered parsers.
+        extract_all() returns list[GraphNode] directly — no conversion needed.
 
         Returns:
             List of ConceptNode for governance concepts.
         """
         try:
             extractor = self._get_governance_extractor()
-            concepts = extractor.extract_all()
-            return [self._concept_to_node(c) for c in concepts]
+            return extractor.extract_all()
         except Exception:
             # Graceful degradation if governance extraction fails
             return []
