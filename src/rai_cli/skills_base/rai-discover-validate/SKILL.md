@@ -309,7 +309,7 @@ After validation, export the validated components to JSON for graph integration.
 
 **Graph Integration:**
 ```bash
-rai graph build --input work/discovery/components-validated.json
+rai graph build
 ```
 
 **Architecture Documentation:**
