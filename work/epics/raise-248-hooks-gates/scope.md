@@ -287,12 +287,12 @@ Track B:  S248.5 (gate protocol) ────────→ S248.6 (gates + bri
 | S248.5 | M | Done | 20 min | 3.0x | 47 tests, quality review embedded |
 | S248.3 | S | Done | 15 min | 2.0x | 22 tests, first real hook E2E |
 | S248.4 | M | Done | 19 min | 4.74x | Quality review caught adapter semantics bug |
-| S248.6 | S | Pending | — | — | |
+| S248.6 | S | Done | 10 min | 3.0x | 46 new tests, bridge pattern validated |
 | S248.7 | M | Pending | — | — | |
 
 **Milestones:**
 - [x] M1: Walking Skeleton
-- [ ] M2: Auto-firing
+- [x] M2: Auto-firing
 - [ ] M3: Ceremony-free skills
 - [ ] M4: Epic Complete
 
