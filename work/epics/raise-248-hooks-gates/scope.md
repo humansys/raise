@@ -37,7 +37,7 @@ adapters use for their own cross-cutting concerns.
 | S248.1 | Event emitter infrastructure | M | Done | Core event bus with typed dataclass events; `before:` only for release/session |
 | S248.2 | Hook Protocol and registry | M | Done | `LifecycleHook` Protocol, entry point discovery, priority dispatch |
 | S248.3 | Built-in TelemetryHook | S | Done | COMMUNITY hook that replaces manual `rai signal emit` in skills |
-| S248.4 | Wire events into CLI commands | M | Pending | Add `emit()` calls to 8 CLI command groups |
+| S248.4 | Wire events into CLI commands | M | Done | Add `emit()` calls to 6 CLI command files, 9 event types |
 | S248.5 | WorkflowGate Protocol and registry | M | Done | Standalone `WorkflowGate` Protocol, `rai gate check` command, no event dependency |
 | S248.6 | Built-in gates + GateBridgeHook | S | Pending | 4 quality gates + bridge hook that wires gates into `before:` events |
 | S248.7 | Remove ceremony from skills | M | Pending | Strip telemetry/prerequisite steps from all 22 skills |
@@ -286,7 +286,7 @@ Track B:  S248.5 (gate protocol) ────────→ S248.6 (gates + bri
 | S248.2 | M | Done | 25 min | 2.4x | 32 new tests, ThreadPoolExecutor timeout fix |
 | S248.5 | M | Done | 20 min | 3.0x | 47 tests, quality review embedded |
 | S248.3 | S | Done | 15 min | 2.0x | 22 tests, first real hook E2E |
-| S248.4 | M | Pending | — | — | |
+| S248.4 | M | Done | 19 min | 4.74x | Quality review caught adapter semantics bug |
 | S248.6 | S | Pending | — | — | |
 | S248.7 | M | Pending | — | — | |
 
