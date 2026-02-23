@@ -9,8 +9,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
+from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType
+from rai_cli.governance.parsers._convert import concept_to_node
 
 # Sections that contain term definitions (extract from these)
 DEFINITION_SECTIONS = {
@@ -296,3 +299,18 @@ def extract_all_terms(project_root: Path | None = None) -> list[Concept]:
         return extract_glossary_terms(glossary_file, project_root)
 
     return []
+
+
+class GlossaryParser:
+    """GovernanceParser wrapper for glossary terms."""
+
+    def can_parse(self, locator: ArtifactLocator) -> bool:
+        """Match Glossary artifact type."""
+        return locator.artifact_type == CoreArtifactType.GLOSSARY
+
+    def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
+        """Parse Glossary file into GraphNode list."""
+        root = Path(locator.metadata["project_root"])
+        path = root / locator.path
+        concepts = extract_glossary_terms(path, root)
+        return [concept_to_node(c) for c in concepts]
