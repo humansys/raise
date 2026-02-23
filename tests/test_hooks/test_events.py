@@ -9,6 +9,8 @@ from pathlib import Path
 import pytest
 
 from rai_cli.hooks.events import (
+    BeforeReleasePublishEvent,
+    BeforeSessionCloseEvent,
     EmitResult,
     GraphBuildEvent,
     HookEvent,
@@ -122,3 +124,45 @@ class TestEmitResult:
         result = EmitResult()
         with pytest.raises(FrozenInstanceError):
             result.aborted = True  # type: ignore[misc]
+
+
+class TestBeforeSessionCloseEvent:
+    """BeforeSessionCloseEvent tests."""
+
+    def test_event_name(self) -> None:
+        event = BeforeSessionCloseEvent(session_id="SES-1", outcome="success")
+        assert event.event_name == "before:session:close"
+
+    def test_payload_fields(self) -> None:
+        event = BeforeSessionCloseEvent(session_id="SES-42", outcome="partial")
+        assert event.session_id == "SES-42"
+        assert event.outcome == "partial"
+
+    def test_is_frozen(self) -> None:
+        event = BeforeSessionCloseEvent(session_id="SES-1", outcome="success")
+        with pytest.raises(FrozenInstanceError):
+            event.session_id = "other"  # type: ignore[misc]
+
+    def test_is_hook_event(self) -> None:
+        event = BeforeSessionCloseEvent(session_id="SES-1", outcome="success")
+        assert isinstance(event, HookEvent)
+
+
+class TestBeforeReleasePublishEvent:
+    """BeforeReleasePublishEvent tests."""
+
+    def test_event_name(self) -> None:
+        event = BeforeReleasePublishEvent(version="2.1.0", project_path=Path("/tmp"))
+        assert event.event_name == "before:release:publish"
+
+    def test_payload_fields(self) -> None:
+        event = BeforeReleasePublishEvent(
+            version="2.1.0", project_path=Path("/home/proj")
+        )
+        assert event.version == "2.1.0"
+        assert event.project_path == Path("/home/proj")
+
+    def test_is_frozen(self) -> None:
+        event = BeforeReleasePublishEvent(version="2.1.0", project_path=Path("/tmp"))
+        with pytest.raises(FrozenInstanceError):
+            event.version = "3.0.0"  # type: ignore[misc]
