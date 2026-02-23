@@ -8,8 +8,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
+from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType
+from rai_cli.governance.parsers._convert import concept_to_node
 from rai_cli.governance.parsers.backlog import normalize_status
 
 
@@ -298,3 +301,23 @@ def extract_stories(file_path: Path, project_root: Path | None = None) -> list[C
             concepts.append(concept)
 
     return concepts
+
+
+class EpicScopeParser:
+    """GovernanceParser wrapper for Epic scope docs (details + stories)."""
+
+    def can_parse(self, locator: ArtifactLocator) -> bool:
+        """Match Epic scope artifact type."""
+        return locator.artifact_type == CoreArtifactType.EPIC_SCOPE
+
+    def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
+        """Parse Epic scope file into GraphNode list (epic + stories)."""
+        root = Path(locator.metadata["project_root"])
+        path = root / locator.path
+        nodes: list[GraphNode] = []
+        epic_detail = extract_epic_details(path, root)
+        if epic_detail:
+            nodes.append(concept_to_node(epic_detail))
+        stories = extract_stories(path, root)
+        nodes.extend(concept_to_node(s) for s in stories)
+        return nodes

@@ -8,8 +8,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
+from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType
+from rai_cli.governance.parsers._convert import concept_to_node
 
 
 def normalize_status(raw: str) -> str:
@@ -303,3 +306,23 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
             concepts.append(concept)
 
     return concepts
+
+
+class BacklogParser:
+    """GovernanceParser wrapper for Backlog (project + epics)."""
+
+    def can_parse(self, locator: ArtifactLocator) -> bool:
+        """Match Backlog artifact type."""
+        return locator.artifact_type == CoreArtifactType.BACKLOG
+
+    def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
+        """Parse Backlog file into GraphNode list (project + epics)."""
+        root = Path(locator.metadata["project_root"])
+        path = root / locator.path
+        nodes: list[GraphNode] = []
+        project = extract_project(path, root)
+        if project:
+            nodes.append(concept_to_node(project))
+        epics = extract_epics(path, root)
+        nodes.extend(concept_to_node(e) for e in epics)
+        return nodes

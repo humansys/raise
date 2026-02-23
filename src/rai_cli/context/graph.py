@@ -1,21 +1,29 @@
 """Unified context graph implementation.
 
 This module provides the UnifiedGraph class that wraps NetworkX MultiDiGraph
-for storing and querying cross-domain concepts.
+for storing and querying cross-domain concepts. This is a pure in-memory graph;
+persistence is handled by KnowledgeGraphBackend implementations (ADR-036).
 
 Architecture: ADR-019 Unified Context Graph Architecture
 """
 
 from __future__ import annotations
 
-import json
+import logging
 from collections.abc import Iterator
-from pathlib import Path
 from typing import Any
 
 import networkx as nx  # type: ignore[import-untyped]
 
-from rai_cli.context.models import ConceptEdge, ConceptNode, EdgeType, NodeType
+from rai_cli.context.models import (
+    ConceptEdge,
+    ConceptNode,
+    EdgeType,
+    GraphNode,
+    NodeType,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class UnifiedGraph:
@@ -43,6 +51,21 @@ class UnifiedGraph:
     def __init__(self) -> None:
         """Initialize an empty unified graph."""
         self.graph: nx.MultiDiGraph[str] = nx.MultiDiGraph()
+
+    def _reconstruct_node(self, node_id: str, data: dict[str, Any]) -> GraphNode:
+        """Reconstruct a typed GraphNode from serialized dict."""
+        data["id"] = node_id
+        node_type = data.get("type", "")
+        cls = GraphNode.registered_types().get(node_type)
+        if cls:
+            return cls.model_validate(data)
+        if node_type:
+            logger.warning(
+                "Node type '%s' not registered (missing plugin?). "
+                "Run 'rai memory build' to regenerate graph.",
+                node_type,
+            )
+        return GraphNode.model_validate(data)
 
     def add_concept(self, node: ConceptNode) -> None:
         """Add a concept node to the graph.
@@ -106,9 +129,7 @@ class UnifiedGraph:
         if concept_id not in self.graph.nodes:
             return None
         data = dict(self.graph.nodes[concept_id])
-        # Ensure id is present (may be missing after load)
-        data["id"] = concept_id
-        return ConceptNode.model_validate(data)
+        return self._reconstruct_node(concept_id, data)
 
     def get_concepts_by_type(self, node_type: NodeType) -> list[ConceptNode]:
         """Get all concepts of a specific type.
@@ -129,8 +150,7 @@ class UnifiedGraph:
         for node_id in self.graph.nodes:
             data: dict[str, Any] = dict(self.graph.nodes[node_id])
             if data.get("type") == node_type:
-                data["id"] = node_id  # Ensure id is present
-                concepts.append(ConceptNode.model_validate(data))
+                concepts.append(self._reconstruct_node(node_id, data))
         return concepts
 
     def get_neighbors(
@@ -211,8 +231,7 @@ class UnifiedGraph:
         node_id: str
         for node_id in self.graph.nodes:
             data: dict[str, Any] = dict(self.graph.nodes[node_id])
-            data["id"] = node_id  # Ensure id is present
-            yield ConceptNode.model_validate(data)
+            yield self._reconstruct_node(node_id, data)
 
     def iter_relationships(self) -> Iterator[ConceptEdge]:
         """Iterate over all relationships in the graph.
@@ -237,7 +256,7 @@ class UnifiedGraph:
             yield ConceptEdge(
                 source=source,
                 target=target,
-                type=edge_type,  # type: ignore[arg-type]
+                type=edge_type,
                 weight=weight,
                 metadata=metadata,
             )
@@ -260,41 +279,3 @@ class UnifiedGraph:
         """
         return self.graph.number_of_edges()
 
-    def save(self, path: Path) -> None:
-        """Save graph to JSON file.
-
-        Uses NetworkX node_link_data format for serialization.
-
-        Args:
-            path: Path to save the JSON file.
-
-        Examples:
-            >>> graph.save(Path(".raise/graph/unified.json"))
-        """
-        data: dict[str, Any] = nx.node_link_data(self.graph)  # type: ignore[assignment]
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
-
-    @classmethod
-    def load(cls, path: Path) -> UnifiedGraph:
-        """Load graph from JSON file.
-
-        Args:
-            path: Path to the JSON file.
-
-        Returns:
-            UnifiedGraph instance with loaded data.
-
-        Raises:
-            FileNotFoundError: If the file doesn't exist.
-            json.JSONDecodeError: If the file is not valid JSON.
-
-        Examples:
-            >>> graph = UnifiedGraph.load(Path(".raise/graph/unified.json"))
-            >>> graph.node_count
-            50
-        """
-        loaded_data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
-        instance = cls()
-        instance.graph = nx.node_link_graph(loaded_data, directed=True, multigraph=True)
-        return instance

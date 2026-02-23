@@ -14,6 +14,7 @@ from rai_cli.onboarding.manifest import (
     IdeManifest,
     ProjectInfo,
     ProjectManifest,
+    TierConfig,
     load_manifest,
     save_manifest,
 )
@@ -460,3 +461,76 @@ class TestManifestBackwardCompat:
         loaded = load_manifest(tmp_path)
         assert loaded is not None
         assert loaded.agents.types == ["claude", "cursor"]
+
+
+# =============================================================================
+# TierConfig (S211.5)
+# =============================================================================
+
+
+class TestTierConfig:
+    """Tests for TierConfig model — optional tier section in manifest."""
+
+    def test_defaults(self) -> None:
+        cfg = TierConfig()
+        assert cfg.level == "community"
+        assert cfg.backend_url is None
+        assert cfg.capabilities == []
+
+    def test_pro_config(self) -> None:
+        cfg = TierConfig(
+            level="pro",
+            backend_url="https://api.example.com",
+            capabilities=["shared_memory"],
+        )
+        assert cfg.level == "pro"
+        assert cfg.backend_url == "https://api.example.com"
+        assert cfg.capabilities == ["shared_memory"]
+
+
+class TestManifestWithTier:
+    """Tests for ProjectManifest with optional tier config."""
+
+    def test_manifest_without_tier(self) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        manifest = ProjectManifest(project=project)
+        assert manifest.tier is None
+
+    def test_manifest_with_tier(self) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        tier = TierConfig(level="pro", capabilities=["shared_memory"])
+        manifest = ProjectManifest(project=project, tier=tier)
+        assert manifest.tier is not None
+        assert manifest.tier.level == "pro"
+
+    def test_roundtrip_with_tier(self, tmp_path: Path) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        tier = TierConfig(
+            level="pro",
+            backend_url="https://api.example.com",
+            capabilities=["shared_memory", "semantic_search"],
+        )
+        manifest = ProjectManifest(project=project, tier=tier)
+        save_manifest(manifest, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.tier is not None
+        assert loaded.tier.level == "pro"
+        assert loaded.tier.backend_url == "https://api.example.com"
+        assert loaded.tier.capabilities == ["shared_memory", "semantic_search"]
+
+    def test_loads_manifest_without_tier_field(self, tmp_path: Path) -> None:
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 5\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.tier is None

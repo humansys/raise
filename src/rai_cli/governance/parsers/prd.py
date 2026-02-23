@@ -8,8 +8,11 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
+from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType
+from rai_cli.governance.parsers._convert import concept_to_node
 
 
 def extract_requirements(
@@ -92,3 +95,18 @@ def extract_requirements(
             concepts.append(concept)
 
     return concepts
+
+
+class PrdParser:
+    """GovernanceParser wrapper for PRD requirements."""
+
+    def can_parse(self, locator: ArtifactLocator) -> bool:
+        """Match PRD artifact type."""
+        return locator.artifact_type == CoreArtifactType.PRD
+
+    def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
+        """Parse PRD file into GraphNode list."""
+        root = Path(locator.metadata["project_root"])
+        path = root / locator.path
+        concepts = extract_requirements(path, root)
+        return [concept_to_node(c) for c in concepts]

@@ -54,6 +54,20 @@ csharp = [
 [project.scripts]
 rai = "rai_cli.cli.main:app"
 
+[project.entry-points."rai.governance.parsers"]
+prd = "rai_cli.governance.parsers.prd:PrdParser"
+vision = "rai_cli.governance.parsers.vision:VisionParser"
+constitution = "rai_cli.governance.parsers.constitution:ConstitutionParser"
+roadmap = "rai_cli.governance.parsers.roadmap:RoadmapParser"
+backlog = "rai_cli.governance.parsers.backlog:BacklogParser"
+epic_scope = "rai_cli.governance.parsers.epic:EpicScopeParser"
+adr = "rai_cli.governance.parsers.adr:AdrParser"
+guardrails = "rai_cli.governance.parsers.guardrails:GuardrailsParser"
+glossary = "rai_cli.governance.parsers.glossary:GlossaryParser"
+
+[project.entry-points."rai.graph.backends"]
+local = "rai_cli.graph.filesystem_backend:FilesystemGraphBackend"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
