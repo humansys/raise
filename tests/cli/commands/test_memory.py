@@ -239,6 +239,69 @@ class TestMemoryAddPatternCommand:
         finally:
             os.chdir(original_cwd)
 
+    def test_add_pattern_deprecation_warning(self, tmp_path: Path) -> None:
+        """Test that rai memory add-pattern emits a deprecation warning."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                ["memory", "add-pattern", "Test deprecation"],
+            )
+
+            assert result.exit_code == 0
+            assert "DEPRECATED" in result.output
+            assert "rai pattern add" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+
+class TestMemoryReinforceCommand:
+    """Tests for `rai memory reinforce` deprecation shim."""
+
+    def test_reinforce_deprecation_warning(self, tmp_path: Path) -> None:
+        """Test that rai memory reinforce emits a deprecation warning."""
+        import json
+
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            pattern_data = {
+                "id": "PAT-E-001",
+                "content": "Test pattern",
+                "sub_type": "process",
+                "context": [],
+                "positives": 0,
+                "negatives": 0,
+                "evaluations": 0,
+                "created": "2026-01-01",
+                "learned_from": None,
+            }
+            (memory_dir / "patterns.jsonl").write_text(
+                json.dumps(pattern_data) + "\n", encoding="utf-8"
+            )
+
+            result = runner.invoke(
+                app,
+                [
+                    "memory",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "1",
+                    "--memory-dir",
+                    str(memory_dir),
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "DEPRECATED" in result.output
+            assert "rai pattern reinforce" in result.output
+        finally:
+            os.chdir(original_cwd)
+
 
 class TestMemoryAddCalibrationCommand:
     """Tests for `raise memory add-calibration` command."""
