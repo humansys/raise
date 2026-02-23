@@ -16,6 +16,16 @@
 
 ## Process
 
+- [ ] **Skill optimization: reduce ceremony overhead** — (SES-260, 2026-02-23)
+  - **Context:** User request after E247 epic close. Skills have accumulated verbosity — some SKILL.md files are 300+ lines with repetitive boilerplate (telemetry emit, prerequisites, verification).
+  - **Goal:** Leaner skills that execute faster, consume fewer tokens, maintain quality.
+  - **Approach ideas:** Extract common patterns (telemetry, prerequisites) into shared preamble; reduce template depth for S/XS stories; trim Shu-level verbosity for Ha/Ri users.
+  - **Priority:** High — directly impacts every session's token cost and execution speed.
+
+- [ ] **rai init manifest.yaml overwrite bug** — (SES-260, 2026-02-23)
+  - **Bug:** `rai init` overwrites `branches.development` to `main` even when `v2` is configured. Also doesn't propagate SKILL.md content changes when YAML frontmatter format drifts (PAT-E-451).
+  - **Priority:** Medium — workaround exists (manual restore + direct cp).
+
 - [ ] **Testing strategy: coverage target vs. mutation testing** — (SES-246, 2026-02-22)
   - **Insight:** 90% coverage gate is Goodhart's Law — optimizes for line execution, not confidence. Evidence from S211.2: ~12 of 20 new tests exist for the metric, not for catching bugs. Constant assertions (`"x" == "x"`), mock-implementation tests (verify `_discover` called), and magic-number counts (`__all__ == 21`) are muda.
   - **Alternative:** Coverage as alarm (warn <70%), not gate. Mutation testing (mutmut/cosmic-ray) as the real gate: if you mutate code and tests stay green, the tests don't work.
