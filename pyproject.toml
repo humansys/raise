@@ -69,7 +69,10 @@ glossary = "rai_cli.governance.parsers.glossary:GlossaryParser"
 telemetry = "rai_cli.hooks.builtin.telemetry:TelemetryHook"
 
 [project.entry-points."rai.gates"]
-# Built-in gates registered by S248.6
+tests = "rai_cli.gates.builtin.tests:TestGate"
+types = "rai_cli.gates.builtin.types:TypeGate"
+lint = "rai_cli.gates.builtin.lint:LintGate"
+coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
 
 [project.entry-points."rai.graph.backends"]
 local = "rai_cli.graph.filesystem_backend:FilesystemGraphBackend"
