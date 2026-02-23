@@ -15,9 +15,15 @@ import pytest
 
 from rai_cli.hooks.emitter import EventEmitter
 from rai_cli.hooks.events import (
+    AdapterFailedEvent,
+    AdapterLoadedEvent,
     BeforeSessionCloseEvent,
+    DiscoverScanEvent,
     EmitResult,
+    GraphBuildEvent,
     HookEvent,
+    InitCompleteEvent,
+    PatternAddedEvent,
     SessionCloseEvent,
     SessionStartEvent,
 )
@@ -215,3 +221,44 @@ class TestSessionCloseEvents:
         after_events = [e for e in abort_calls if isinstance(e, SessionCloseEvent)]
         assert len(before_events) == 1
         assert len(after_events) == 0
+
+
+class TestGraphBuildEvent:
+    """graph:build event wiring."""
+
+    def test_graph_build_emits_event(
+        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.graph import graph_app
+
+        runner = CliRunner()
+
+        # Create a mock graph with node_count and edge_count
+        mock_graph = MagicMock()
+        mock_graph.node_count = 42
+        mock_graph.edge_count = 15
+        mock_graph.iter_concepts.return_value = []
+        mock_graph.iter_relationships.return_value = []
+
+        mock_backend = MagicMock()
+        mock_backend.load.return_value = None
+
+        with (
+            patch("rai_cli.cli.commands.graph.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.graph.get_active_backend", return_value=mock_backend),
+            patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder") as mock_builder_cls,
+            patch("rai_cli.cli.commands.graph._get_default_index_path", return_value=tmp_path / "index.json"),
+        ):
+            mock_builder = MagicMock()
+            mock_builder.build.return_value = mock_graph
+            mock_builder_cls.return_value = mock_builder
+
+            result = runner.invoke(graph_app, ["build", "--no-diff"])
+
+        assert result.exit_code == 0
+        graph_events = [e for e in captured_events if isinstance(e, GraphBuildEvent)]
+        assert len(graph_events) == 1
+        assert graph_events[0].node_count == 42
+        assert graph_events[0].edge_count == 15
