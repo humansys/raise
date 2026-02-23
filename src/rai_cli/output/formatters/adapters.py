@@ -59,6 +59,10 @@ def format_check_human(
         results: List of dicts with group, name, protocol_name, compliant, error keys.
         console: Rich console for output.
     """
+    if not results:
+        console.print("No adapters registered.")
+        return
+
     console.print("Checking adapters...\n")
 
     current_group = ""
