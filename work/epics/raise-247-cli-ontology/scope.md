@@ -70,7 +70,7 @@ rai release check|publish|list     # Release management
 | S3 | Create `signal` group | S | ✅ Done | None | Extract emit-work/session/calibration as 3 subcommands |
 | S4 | Kill redundancies | XS | ✅ Done | None | Remove generate, add-session, add-calibration + coverage gate |
 | S5 | Merge publish+release, flatten singletons | S | ✅ Done | None | Consolidate release mgmt, flatten base/profile |
-| S6 | Update all skills and generated docs | M | Pending | S1-S5 | Mechanical find-replace across 22 skills + CLAUDE.md |
+| S6 | Update all skills and generated docs | M | ✅ Done | S1-S5 | Mechanical find-replace across 22 skills + CLAUDE.md |
 
 **Total:** 6 stories (down from 8 after arch review)
 
