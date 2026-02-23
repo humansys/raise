@@ -52,17 +52,17 @@ Stream 2 (Parallel):       S5 ◄──┘  S4 ────────┘
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S211.0 | M | Done ✓ | ~45 min | 2.5x | Pydantic + __init_subclass__ validated |
 | S211.1 | S | Done ✓ | ~18 min | 3.3x | Clean greenfield, full ceremony |
-| S211.2 | S | Pending | — | — | |
-| S211.5 | S | Pending | — | — | |
-| S211.3 | M | Pending | — | — | |
-| S211.4 | M | Pending | — | — | |
+| S211.2 | S | Done ✓ | — | — | Entry points + registry |
+| S211.5 | S | Done ✓ | ~20 min | 1.5x | Arch review pre-implementation, quality review post |
+| S211.3 | M | Done ✓ | — | — | 9 parser wrappers, extractor refactor |
+| S211.4 | M | Done ✓ | — | — | FilesystemGraphBackend + call-site migration |
 | S211.6 | S | Pending | — | — | |
 
 **Milestone Progress:**
 - [x] M1: Foundation (S211.0 + S211.1 done)
-- [ ] M2: Registry
-- [ ] M3: Integration
-- [ ] M4: Complete
+- [x] M2: Registry (S211.2 + S211.5 done)
+- [x] M3: Integration (S211.3 + S211.4 done)
+- [ ] M4: Complete (S211.6 pending)
 
 ## Sequencing Risks
 
