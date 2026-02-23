@@ -6,6 +6,8 @@ from pathlib import Path
 
 from rai_cli.hooks.emitter import EventEmitter
 from rai_cli.hooks.events import (
+    BeforeReleasePublishEvent,
+    BeforeSessionCloseEvent,
     GraphBuildEvent,
     HookEvent,
     HookResult,
@@ -125,3 +127,85 @@ class TestEmitterErrorIsolation:
             SessionStartEvent(session_id="SES-1", developer="emilio")
         )
         assert len(result.handler_errors) == 2
+
+
+class TestBeforeEventAbortFlow:
+    """Tests for before: event abort semantics."""
+
+    def test_abort_on_before_event_sets_aborted(self) -> None:
+        emitter = EventEmitter()
+
+        def abort_handler(event: HookEvent) -> HookResult:
+            return HookResult(status="abort", message="Compliance failed")
+
+        emitter.register("before:release:publish", abort_handler)
+
+        event = BeforeReleasePublishEvent(version="2.1.0", project_path=Path("/tmp"))
+        result = emitter.emit(event)
+
+        assert result.aborted
+        assert result.abort_message == "Compliance failed"
+
+    def test_all_ok_on_before_event_not_aborted(self) -> None:
+        emitter = EventEmitter()
+
+        emitter.register("before:session:close", _ok_handler)
+        emitter.register("before:session:close", _ok_handler)
+
+        event = BeforeSessionCloseEvent(session_id="SES-1", outcome="success")
+        result = emitter.emit(event)
+
+        assert not result.aborted
+
+    def test_abort_on_after_event_is_ignored(self) -> None:
+        """Abort status only meaningful for before: events."""
+        emitter = EventEmitter()
+
+        def abort_handler(event: HookEvent) -> HookResult:
+            return HookResult(status="abort", message="should be ignored")
+
+        emitter.register("session:start", abort_handler)
+
+        event = SessionStartEvent(session_id="SES-1", developer="emilio")
+        result = emitter.emit(event)
+
+        assert not result.aborted
+
+    def test_first_abort_message_wins(self) -> None:
+        """Multiple aborts — first message is captured."""
+        emitter = EventEmitter()
+
+        def abort_a(event: HookEvent) -> HookResult:
+            return HookResult(status="abort", message="first")
+
+        def abort_b(event: HookEvent) -> HookResult:
+            return HookResult(status="abort", message="second")
+
+        emitter.register("before:release:publish", abort_a)
+        emitter.register("before:release:publish", abort_b)
+
+        event = BeforeReleasePublishEvent(version="2.1.0", project_path=Path("/tmp"))
+        result = emitter.emit(event)
+
+        assert result.aborted
+        assert result.abort_message == "first"
+
+    def test_all_handlers_called_even_after_abort(self) -> None:
+        """All handlers run even if one aborts (all-notify semantics)."""
+        emitter = EventEmitter()
+        calls: list[str] = []
+
+        def abort_handler(event: HookEvent) -> HookResult:
+            calls.append("abort")
+            return HookResult(status="abort", message="blocked")
+
+        def ok_handler(event: HookEvent) -> HookResult:
+            calls.append("ok")
+            return HookResult(status="ok")
+
+        emitter.register("before:release:publish", abort_handler)
+        emitter.register("before:release:publish", ok_handler)
+
+        emitter.emit(BeforeReleasePublishEvent(version="2.1.0", project_path=Path(".")))
+
+        assert calls == ["abort", "ok"]

@@ -62,7 +62,7 @@ class EmitResult:
 
 
 # ---------------------------------------------------------------------------
-# Concrete events — S248.1 initial set (2 of 9 after-events)
+# Concrete events
 # ---------------------------------------------------------------------------
 
 
@@ -87,3 +87,30 @@ class GraphBuildEvent(HookEvent):
     project_path: Path = field(default_factory=lambda: Path("."))
     node_count: int = 0
     edge_count: int = 0
+
+
+# ---------------------------------------------------------------------------
+# Before-variant events (AD-6: only release:publish and session:close)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class BeforeSessionCloseEvent(HookEvent):
+    """Emitted before a session closes. Handlers can abort."""
+
+    event_name: Literal["before:session:close"] = field(  # type: ignore[assignment]
+        default="before:session:close", init=False
+    )
+    session_id: str = ""
+    outcome: str = ""
+
+
+@dataclass(frozen=True)
+class BeforeReleasePublishEvent(HookEvent):
+    """Emitted before a release is published. Handlers can abort."""
+
+    event_name: Literal["before:release:publish"] = field(  # type: ignore[assignment]
+        default="before:release:publish", init=False
+    )
+    version: str = ""
+    project_path: Path = field(default_factory=lambda: Path("."))
