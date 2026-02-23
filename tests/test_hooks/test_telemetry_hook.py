@@ -20,6 +20,7 @@ from rai_cli.hooks.events import (
     SessionStartEvent,
 )
 from rai_cli.hooks.protocol import LifecycleHook
+from rai_cli.hooks.registry import HookRegistry
 from rai_cli.telemetry.writer import EmitResult
 
 
@@ -164,3 +165,27 @@ class TestErrorIsolation:
 
         assert isinstance(result, HookResult)
         assert result.status == "error"
+
+
+# ---------------------------------------------------------------------------
+# Entry point discovery
+# ---------------------------------------------------------------------------
+
+
+class TestEntryPointDiscovery:
+    """TelemetryHook is discoverable via rai.hooks entry point."""
+
+    def test_registry_discovers_telemetry_hook(self) -> None:
+        registry = HookRegistry()
+        registry.discover()
+        hook_types = [type(h).__name__ for h in registry.hooks]
+        assert "TelemetryHook" in hook_types
+
+    def test_discovered_hook_is_functional(self) -> None:
+        registry = HookRegistry()
+        registry.discover()
+        telemetry_hooks = [h for h in registry.hooks if type(h).__name__ == "TelemetryHook"]
+        assert len(telemetry_hooks) == 1
+        hook = telemetry_hooks[0]
+        assert hook.events == TelemetryHook.events
+        assert hook.priority == 0
