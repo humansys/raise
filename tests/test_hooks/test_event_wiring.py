@@ -39,7 +39,6 @@ def captured_events() -> list[HookEvent]:
 def mock_emitter(captured_events: list[HookEvent]) -> EventEmitter:
     """EventEmitter that captures events instead of dispatching."""
     emitter = EventEmitter()
-    original_emit = emitter.emit
 
     def tracking_emit(event: HookEvent) -> EmitResult:
         captured_events.append(event)
@@ -47,16 +46,6 @@ def mock_emitter(captured_events: list[HookEvent]) -> EventEmitter:
 
     emitter.emit = tracking_emit  # type: ignore[assignment]
     return emitter
-
-
-@pytest.fixture()
-def patch_create_emitter(mock_emitter: EventEmitter):
-    """Patch create_emitter in the command module being tested."""
-    # Returns a context manager factory for patching specific modules
-    def _patch(module_path: str):
-        return patch(f"{module_path}.create_emitter", return_value=mock_emitter)
-
-    return _patch
 
 
 class TestSessionStartEvent:
@@ -441,7 +430,7 @@ class TestInitCompleteEvent:
 class TestAdapterEvents:
     """adapter:loaded and adapter:failed event wiring."""
 
-    def test_adapter_check_emits_loaded_event(
+    def test_adapter_check_emits_loaded_for_compliant(
         self, captured_events: list[HookEvent], mock_emitter: EventEmitter
     ) -> None:
         from typer.testing import CliRunner
@@ -450,16 +439,27 @@ class TestAdapterEvents:
 
         runner = CliRunner()
 
-        # Create a mock entry point that loads successfully
+        # Create a compliant adapter (subclass of GovernanceParser)
+        from rai_cli.adapters.protocols import GovernanceParser
+
+        compliant_cls = type("FakeParser", (GovernanceParser,), {})
         mock_ep = MagicMock()
         mock_ep.name = "test-adapter"
-        mock_ep.load.return_value = type("FakeAdapter", (), {})  # a class
+        mock_ep.load.return_value = compliant_cls
         mock_ep.dist = MagicMock()
         mock_ep.dist.name = "test-pkg"
 
+        # Only return entries for the governance_parsers group
+        from rai_cli.adapters.registry import EP_GOVERNANCE_PARSERS
+
+        def selective_entry_points(group: str) -> list[Any]:
+            if group == EP_GOVERNANCE_PARSERS:
+                return [mock_ep]
+            return []
+
         with (
             patch("rai_cli.cli.commands.adapters.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]),
+            patch("rai_cli.cli.commands.adapters.entry_points", side_effect=selective_entry_points),
             patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
             patch("rai_cli.cli.commands.adapters.format_check_human"),
         ):
@@ -467,10 +467,52 @@ class TestAdapterEvents:
 
         assert result.exit_code == 0
         loaded_events = [e for e in captured_events if isinstance(e, AdapterLoadedEvent)]
-        assert len(loaded_events) >= 1
+        assert len(loaded_events) == 1
         assert loaded_events[0].adapter_name == "test-adapter"
+        # Non-compliant should NOT emit loaded
+        failed_events = [e for e in captured_events if isinstance(e, AdapterFailedEvent)]
+        assert len(failed_events) == 0
 
-    def test_adapter_check_emits_failed_event(
+    def test_adapter_check_emits_failed_for_non_compliant(
+        self, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.adapters import adapters_app
+
+        runner = CliRunner()
+
+        # Non-compliant: loads a class but not a Protocol subclass
+        mock_ep = MagicMock()
+        mock_ep.name = "bad-adapter"
+        mock_ep.load.return_value = type("NotAParser", (), {})
+        mock_ep.dist = MagicMock()
+        mock_ep.dist.name = "bad-pkg"
+
+        from rai_cli.adapters.registry import EP_GOVERNANCE_PARSERS
+
+        def selective_entry_points(group: str) -> list[Any]:
+            if group == EP_GOVERNANCE_PARSERS:
+                return [mock_ep]
+            return []
+
+        with (
+            patch("rai_cli.cli.commands.adapters.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.adapters.entry_points", side_effect=selective_entry_points),
+            patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch("rai_cli.cli.commands.adapters.format_check_human"),
+        ):
+            result = runner.invoke(adapters_app, ["check"])
+
+        assert result.exit_code == 0
+        # Non-compliant adapters emit failed, not loaded
+        failed_events = [e for e in captured_events if isinstance(e, AdapterFailedEvent)]
+        assert len(failed_events) == 1
+        assert failed_events[0].adapter_name == "bad-adapter"
+        loaded_events = [e for e in captured_events if isinstance(e, AdapterLoadedEvent)]
+        assert len(loaded_events) == 0
+
+    def test_adapter_check_emits_failed_on_load_error(
         self, captured_events: list[HookEvent], mock_emitter: EventEmitter
     ) -> None:
         from typer.testing import CliRunner
