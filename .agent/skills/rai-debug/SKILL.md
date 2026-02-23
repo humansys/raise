@@ -8,7 +8,7 @@ description: >
 license: MIT
 
 metadata:
-  raise.work_cycle: tools
+  raise.work_cycle: utility
   raise.frequency: as-needed
   raise.fase: "0"
   raise.prerequisites: ""
@@ -45,7 +45,7 @@ Systematically identify and fix the root cause of defects, errors, or unexpected
 **When NOT to use:**
 - Obvious typos or simple syntax errors
 - Well-documented known issues
-- Feature requests (use ``rai-story-plan`` instead)
+- Feature requests (use `/rai-story-plan` instead)
 
 **Inputs required:**
 - Clear problem statement
@@ -274,7 +274,7 @@ This skill implements Jidoka principle: **Stop and fix quality issues immediatel
 
 When you detect a defect during any skill:
 1. Stop the current work
-2. Invoke ``rai-debug`` to find root cause
+2. Invoke `/rai-debug` to find root cause
 3. Fix the root cause
 4. Resume original work
 

@@ -274,7 +274,7 @@ Mark the epic complete in `governance/backlog.md`:
 Record the epic completion:
 
 ```bash
-rai memory emit-work epic {epic_id} --event complete
+rai signal emit-work epic {epic_id} --event complete
 ```
 
 **Verification:** Telemetry emitted.

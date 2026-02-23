@@ -274,7 +274,7 @@ Mark the epic complete in `governance/backlog.md`:
 Record the epic completion:
 
 ```bash
-rai memory emit-work epic {epic_id} --event complete
+rai signal emit-work epic {epic_id} --event complete
 ```
 
 **Verification:** Telemetry emitted.
@@ -352,13 +352,13 @@ Skipping retrospectives loses compound learning.
 ### Epic Lifecycle Summary
 
 ```
-`rai-epic-design` (scope, features, architecture)
+/rai-epic-design (scope, features, architecture)
       ↓
-`rai-epic-plan` (sequence, milestones, dependencies)
+/rai-epic-plan (sequence, milestones, dependencies)
       ↓
 [Feature cycles: start → design → plan → implement → review → close]
       ↓
-`rai-epic-close` (retrospective, merge, cleanup) ← YOU ARE HERE
+/rai-epic-close (retrospective, merge, cleanup) ← YOU ARE HERE
 ```
 
 ### Branch Hygiene
@@ -378,7 +378,7 @@ If epic is abandoned (not completed):
 
 ## References
 
-- Previous: All feature ``rai-story-close`` completions
+- Previous: All feature `/rai-story-close` completions
 - Epic scope: `work/epics/e{N}-{name}/scope.md`
 - Backlog: `governance/backlog.md`
-- Next: ``rai-epic-design`` for next epic
+- Next: `/rai-epic-design` for next epic

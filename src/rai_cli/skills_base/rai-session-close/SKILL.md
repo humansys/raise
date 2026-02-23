@@ -165,7 +165,7 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 - State file is the richest path; CLI flags are for simple/quick closes
 - Calibration (if stories completed): still run separately:
   ```bash
-  rai memory add-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
+  rai signal emit-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
   ```
 
 ## References

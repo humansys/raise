@@ -2,7 +2,7 @@
 name: rai-story-plan
 description: >
   Decompose user stories into atomic executable tasks, identify dependencies,
-  and create a deterministic implementation plan. Use after `rai-story-design`
+  and create a deterministic implementation plan. Use after /rai-story-design
   has grounded the story's integration decisions.
 
 license: MIT
@@ -54,10 +54,10 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 Record the start of the plan phase:
 
 ```bash
-rai memory emit-work story {story_id} --event start --phase plan
+rai signal emit-work story {story_id} --event start --phase plan
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e start -p plan`
+**Example:** `rai signal emit-work story S15.1 -e start -p plan`
 
 ### Step 0.1: Verify Prerequisites (Deterministic)
 
@@ -70,35 +70,35 @@ ls work/epics/e*/stories/{story_id}/design.md 2>/dev/null || echo "INFO: No desi
 **Decision:**
 - design.md exists → Load and reference
 - design.md missing + Simple feature → Continue (design optional)
-- design.md missing + Moderate/Complex → Suggest ``rai-story-design`` first
+- design.md missing + Moderate/Complex → Suggest `/rai-story-design` first
 
-**Skip condition:** Simple features (per complexity matrix in `rai-story-design`).
+**Skip condition:** Simple features (per complexity matrix in /rai-story-design).
 
 **Verification:** Design loaded OR simple feature confirmed.
 
-> **If you can't continue:** Complex feature without design → Run ``rai-story-design`` first.
+> **If you can't continue:** Complex feature without design → Run `/rai-story-design` first.
 
 ### Step 0.5: Query Context
 
 Load relevant patterns and calibration from unified context:
 
 ```bash
-rai memory query "planning estimation calibration" --types pattern,calibration --limit 5
+rai graph query "planning estimation calibration" --types pattern,calibration --limit 5
 ```
 
 Review returned patterns before proceeding. Key patterns inform task structure and sizing.
 
 **Verification:** Context loaded; relevant patterns noted.
 
-> **If context unavailable:** Run `rai memory build` first, or proceed without patterns.
+> **If context unavailable:** Run `rai graph build` first, or proceed without patterns.
 
 ### Step 0.6: Load Architectural Context
 
 Identify the primary module(s) this story affects, then load their architectural context:
 
 ```bash
-rai memory context mod-<name>
-# Example: rai memory context mod-memory
+rai graph context mod-<name>
+# Example: rai graph context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -238,17 +238,17 @@ Create plan document with:
 Record the completion of the plan phase:
 
 ```bash
-rai memory emit-work story {story_id} --event complete --phase plan
+rai signal emit-work story {story_id} --event complete --phase plan
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e complete -p plan`
+**Example:** `rai signal emit-work story S15.1 -e complete -p plan`
 
 ## Output
 
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
 - **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
-- **Next:** ``rai-story-implement``
+- **Next:** `/rai-story-implement`
 
 ## Plan Template
 
@@ -305,4 +305,4 @@ rai memory emit-work story {story_id} --event complete --phase plan
 ## References
 
 - Gate: `gates/gate-plan.md`
-- Next skill: ``rai-story-implement``
+- Next skill: `/rai-story-implement`
