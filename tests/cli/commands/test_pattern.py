@@ -1,0 +1,387 @@
+"""Tests for pattern CLI commands.
+
+The pattern group owns commands that write to pattern memory: add, reinforce.
+These were extracted from memory.py in S247.2 (RAISE-247).
+"""
+
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+import pytest
+from typer.testing import CliRunner
+
+from rai_cli.cli.main import app
+
+runner = CliRunner()
+
+
+@pytest.fixture
+def patterns_file(tmp_path: Path) -> Path:
+    """Create a patterns.jsonl file with one pattern for reinforce tests."""
+    memory_dir = tmp_path / ".raise" / "rai" / "memory"
+    memory_dir.mkdir(parents=True)
+    pattern_data = {
+        "id": "PAT-E-001",
+        "content": "Test pattern for reinforcement",
+        "sub_type": "process",
+        "context": ["testing"],
+        "positives": 1,
+        "negatives": 0,
+        "evaluations": 1,
+        "created": "2026-01-01",
+        "learned_from": None,
+    }
+    pf = memory_dir / "patterns.jsonl"
+    pf.write_text(json.dumps(pattern_data) + "\n", encoding="utf-8")
+    return pf
+
+
+# =============================================================================
+# rai pattern add
+# =============================================================================
+
+
+class TestPatternAddCommand:
+    """Tests for `rai pattern add` command."""
+
+    def test_add_pattern_basic(self, tmp_path: Path) -> None:
+        """Test basic pattern add command."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            (memory_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["pattern", "add", "Test pattern content", "-c", "testing,python"],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            assert "Test pattern content" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_with_type(self, tmp_path: Path) -> None:
+        """Test pattern add with explicit type."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            (memory_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["pattern", "add", "Architecture pattern", "-t", "architecture"],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_invalid_type(self, tmp_path: Path) -> None:
+        """Test pattern add with invalid type fails."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            (memory_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["pattern", "add", "Test", "-t", "invalid_type"],
+            )
+
+            assert result.exit_code == 7
+            assert "Invalid pattern type" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_creates_missing_dir(self, tmp_path: Path) -> None:
+        """Test pattern add auto-creates memory directory if missing."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(app, ["pattern", "add", "Test pattern"])
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            assert memory_dir.exists()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_with_scope_global(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Test pattern add with --scope global writes to global dir."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            global_rai = tmp_path / "global_rai"
+            global_rai.mkdir()
+            monkeypatch.setenv("RAI_HOME", str(global_rai))
+            (global_rai / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["pattern", "add", "Global pattern", "--scope", "global"],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            patterns_file = global_rai / "patterns.jsonl"
+            content = patterns_file.read_text(encoding="utf-8")
+            assert "Global pattern" in content
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_with_scope_personal(self, tmp_path: Path) -> None:
+        """Test pattern add with --scope personal writes to personal dir."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            personal_dir = tmp_path / ".raise" / "rai" / "personal"
+            personal_dir.mkdir(parents=True)
+            (personal_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["pattern", "add", "Personal pattern", "--scope", "personal"],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            patterns_file = personal_dir / "patterns.jsonl"
+            content = patterns_file.read_text(encoding="utf-8")
+            assert "Personal pattern" in content
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_invalid_scope(self, tmp_path: Path) -> None:
+        """Test pattern add with invalid scope fails."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            memory_dir = tmp_path / ".raise" / "rai" / "memory"
+            memory_dir.mkdir(parents=True)
+            (memory_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["pattern", "add", "Test", "--scope", "invalid"],
+            )
+
+            assert result.exit_code == 7
+            assert "Invalid scope" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+
+# =============================================================================
+# rai pattern reinforce
+# =============================================================================
+
+
+class TestPatternReinforceCommand:
+    """Tests for `rai pattern reinforce` command."""
+
+    def test_reinforce_positive_vote(self, tmp_path: Path, patterns_file: Path) -> None:
+        """Test reinforce with positive vote updates scores."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "1",
+                    "--memory-dir",
+                    str(patterns_file.parent),
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-E-001" in result.stdout
+            assert "positives" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_reinforce_negative_vote(self, tmp_path: Path, patterns_file: Path) -> None:
+        """Test reinforce with negative vote updates scores."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "-1",
+                    "--memory-dir",
+                    str(patterns_file.parent),
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-E-001" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_reinforce_not_applicable_vote(
+        self, tmp_path: Path, patterns_file: Path
+    ) -> None:
+        """Test reinforce with vote=0 (N/A) does not update evaluations."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "0",
+                    "--memory-dir",
+                    str(patterns_file.parent),
+                ],
+            )
+
+            assert result.exit_code == 0
+            assert "N/A (not counted)" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+    def test_reinforce_invalid_vote(self, tmp_path: Path, patterns_file: Path) -> None:
+        """Test reinforce with invalid vote value fails."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "2",
+                    "--memory-dir",
+                    str(patterns_file.parent),
+                ],
+            )
+
+            assert result.exit_code == 7
+            assert "Invalid vote" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_reinforce_pattern_not_found(self, tmp_path: Path, patterns_file: Path) -> None:
+        """Test reinforce with non-existent pattern ID fails."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-NOT-EXIST",
+                    "--vote",
+                    "1",
+                    "--memory-dir",
+                    str(patterns_file.parent),
+                ],
+            )
+
+            assert result.exit_code == 4
+            assert "not found" in result.output.lower()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_reinforce_patterns_file_missing(self, tmp_path: Path) -> None:
+        """Test reinforce fails when patterns file does not exist."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            empty_dir = tmp_path / "empty"
+            empty_dir.mkdir()
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "1",
+                    "--memory-dir",
+                    str(empty_dir),
+                ],
+            )
+
+            assert result.exit_code == 4
+            assert "not found" in result.output.lower()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_reinforce_invalid_scope(self, tmp_path: Path, patterns_file: Path) -> None:
+        """Test reinforce with invalid scope fails."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "1",
+                    "--scope",
+                    "invalid",
+                    "--memory-dir",
+                    str(patterns_file.parent),
+                ],
+            )
+
+            assert result.exit_code == 7
+            assert "Invalid scope" in result.output
+        finally:
+            os.chdir(original_cwd)
+
+    def test_reinforce_with_from_flag(self, tmp_path: Path, patterns_file: Path) -> None:
+        """Test reinforce with --from story ID for traceability."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(
+                app,
+                [
+                    "pattern",
+                    "reinforce",
+                    "PAT-E-001",
+                    "--vote",
+                    "1",
+                    "--from",
+                    "S247.2",
+                    "--memory-dir",
+                    str(patterns_file.parent),
+                ],
+            )
+
+            assert result.exit_code == 0
+        finally:
+            os.chdir(original_cwd)
