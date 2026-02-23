@@ -166,11 +166,18 @@ def check_command(
 
             compliant = inspect.isclass(loaded) and issubclass(loaded, proto_cls)
             error = None if compliant else f"Not a {proto_name} subclass"
-            emitter.emit(AdapterLoadedEvent(
-                adapter_name=ep.name,
-                group=group,
-                adapter_type=type(loaded).__name__,
-            ))
+            if compliant:
+                emitter.emit(AdapterLoadedEvent(
+                    adapter_name=ep.name,
+                    group=group,
+                    adapter_type=type(loaded).__name__,
+                ))
+            else:
+                emitter.emit(AdapterFailedEvent(
+                    adapter_name=ep.name,
+                    group=group,
+                    error=error or "",
+                ))
             results.append(
                 {
                     "group": group,
