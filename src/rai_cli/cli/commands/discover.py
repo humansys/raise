@@ -343,11 +343,12 @@ def build_command(
     builder = UnifiedGraphBuilder(project_root=root)
     graph = builder.build()
 
-    # Save graph
-    graph_dir = root / ".raise" / "graph"
-    graph_dir.mkdir(parents=True, exist_ok=True)
-    graph_path = graph_dir / "unified.json"
-    graph.save(graph_path)
+    # Save graph via backend
+    from rai_cli.graph.filesystem_backend import get_active_backend
+
+    graph_path = root / ".raise" / "graph" / "unified.json"
+    backend = get_active_backend()
+    backend.persist(graph, graph_path)
 
     # Count component nodes in graph
     component_nodes = [n for n in graph.iter_concepts() if n.type == "component"]

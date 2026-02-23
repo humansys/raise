@@ -20,8 +20,8 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from rai_cli.context.graph import UnifiedGraph
 from rai_cli.context.models import ConceptNode
+from rai_cli.graph.filesystem_backend import get_active_backend
 from rai_cli.onboarding.profile import DeveloperProfile
 from rai_cli.schemas.session_state import SessionState
 
@@ -50,7 +50,8 @@ def get_foundational_patterns(project_path: Path) -> list[ConceptNode]:
         return []
 
     try:
-        graph = UnifiedGraph.load(graph_path)
+        backend = get_active_backend()
+        graph = backend.load(graph_path)
     except Exception:
         logger.warning("Failed to load graph: %s", graph_path)
         return []
@@ -77,7 +78,8 @@ def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
         return []
 
     try:
-        graph = UnifiedGraph.load(graph_path)
+        backend = get_active_backend()
+        graph = backend.load(graph_path)
     except Exception:
         logger.warning("Failed to load graph: %s", graph_path)
         return []
