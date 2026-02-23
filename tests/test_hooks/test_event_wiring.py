@@ -262,3 +262,59 @@ class TestGraphBuildEvent:
         assert len(graph_events) == 1
         assert graph_events[0].node_count == 42
         assert graph_events[0].edge_count == 15
+
+
+class TestPatternAddedEvent:
+    """pattern:added event wiring."""
+
+    def test_pattern_add_emits_event_on_success(
+        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.pattern import pattern_app
+
+        runner = CliRunner()
+
+        mock_result = MagicMock()
+        mock_result.success = True
+        mock_result.id = "PAT-E-999"
+        mock_result.message = "Pattern added"
+
+        with (
+            patch("rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.pattern.get_memory_dir_for_scope", return_value=tmp_path),
+            patch("rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result),
+            patch("rai_cli.cli.commands.pattern.load_developer_profile", return_value=None),
+        ):
+            result = runner.invoke(pattern_app, ["add", "Test pattern", "-c", "testing"])
+
+        assert result.exit_code == 0
+        pat_events = [e for e in captured_events if isinstance(e, PatternAddedEvent)]
+        assert len(pat_events) == 1
+        assert pat_events[0].pattern_id == "PAT-E-999"
+        assert pat_events[0].content == "Test pattern"
+
+    def test_pattern_add_no_event_on_failure(
+        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+    ) -> None:
+        from typer.testing import CliRunner
+
+        from rai_cli.cli.commands.pattern import pattern_app
+
+        runner = CliRunner()
+
+        mock_result = MagicMock()
+        mock_result.success = False
+        mock_result.message = "Failed"
+
+        with (
+            patch("rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.cli.commands.pattern.get_memory_dir_for_scope", return_value=tmp_path),
+            patch("rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result),
+            patch("rai_cli.cli.commands.pattern.load_developer_profile", return_value=None),
+        ):
+            result = runner.invoke(pattern_app, ["add", "Test pattern"])
+
+        pat_events = [e for e in captured_events if isinstance(e, PatternAddedEvent)]
+        assert len(pat_events) == 0
