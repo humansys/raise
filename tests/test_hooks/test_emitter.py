@@ -389,3 +389,113 @@ class TestEmitterTimeout:
         assert not hasattr(hook, "timeout")
         # Default is enforced in emitter, not on hook — just verify the constant
         assert EventEmitter.DEFAULT_TIMEOUT == 5.0
+
+
+class TestE2EPipeline:
+    """End-to-end integration: Protocol → Registry → Emitter → Hook execution."""
+
+    def test_full_pipeline_priority_dispatch_and_error_isolation(self) -> None:
+        """Multi-hook pipeline with priority ordering, timeout, and error isolation."""
+        call_log: list[str] = []
+
+        class HighPriorityHook:
+            events: ClassVar[list[str]] = ["session:start", "graph:build"]
+            priority: ClassVar[int] = 100
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_log.append(f"high:{event.event_name}")
+                return HookResult(status="ok")
+
+        class MediumBrokenHook:
+            events: ClassVar[list[str]] = ["session:start"]
+            priority: ClassVar[int] = 50
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_log.append("medium:broken")
+                msg = "intentional failure"
+                raise RuntimeError(msg)
+
+        class LowPriorityHook:
+            events: ClassVar[list[str]] = ["session:start"]
+            priority: ClassVar[int] = 0
+
+            def handle(self, event: HookEvent) -> HookResult:
+                call_log.append(f"low:{event.event_name}")
+                return HookResult(status="ok")
+
+        # Protocol conformance
+        from rai_cli.hooks.protocol import LifecycleHook
+
+        assert isinstance(HighPriorityHook(), LifecycleHook)
+        assert isinstance(MediumBrokenHook(), LifecycleHook)
+        assert isinstance(LowPriorityHook(), LifecycleHook)
+
+        # Registry
+        registry = HookRegistry()
+        registry.register(LowPriorityHook())
+        registry.register(HighPriorityHook())
+        registry.register(MediumBrokenHook())
+
+        # Verify priority sorting
+        hooks = registry.get_hooks_for_event("session:start")
+        priorities = [h.priority for h in hooks]
+        assert priorities == [100, 50, 0]
+
+        # Emitter with registry
+        emitter = EventEmitter(registry=registry)
+
+        # Emit session:start — all 3 hooks fire
+        result = emitter.emit(SessionStartEvent(session_id="SES-99", developer="test"))
+
+        # Priority order: high (100) → medium broken (50) → low (0)
+        assert call_log == ["high:session:start", "medium:broken", "low:session:start"]
+        # Error from broken hook captured
+        assert len(result.handler_errors) == 1
+        assert "intentional failure" in result.handler_errors[0]
+        # Not aborted (after: event)
+        assert not result.aborted
+
+        # Emit graph:build — only high hook subscribes
+        call_log.clear()
+        result = emitter.emit(
+            GraphBuildEvent(project_path=Path("/tmp"), node_count=10, edge_count=5)
+        )
+        assert call_log == ["high:graph:build"]
+        assert result.handler_errors == ()
+
+    def test_full_pipeline_before_event_with_abort(self) -> None:
+        """Before: event with abort + registry hooks."""
+
+        class ComplianceHook:
+            events: ClassVar[list[str]] = ["before:release:publish"]
+            priority: ClassVar[int] = 100
+
+            def handle(self, event: HookEvent) -> HookResult:
+                return HookResult(status="abort", message="Not compliant")
+
+        class AuditHook:
+            events: ClassVar[list[str]] = ["before:release:publish"]
+            priority: ClassVar[int] = 0
+
+            def __init__(self) -> None:
+                self.called = False
+
+            def handle(self, event: HookEvent) -> HookResult:
+                self.called = True
+                return HookResult(status="ok")
+
+        registry = HookRegistry()
+        registry.register(ComplianceHook())
+        audit = AuditHook()
+        registry.register(audit)
+
+        emitter = EventEmitter(registry=registry)
+        result = emitter.emit(
+            BeforeReleasePublishEvent(version="3.0.0", project_path=Path("."))
+        )
+
+        # Aborted by compliance hook
+        assert result.aborted
+        assert result.abort_message == "Not compliant"
+        # Audit hook still ran (all-notify semantics)
+        assert audit.called
