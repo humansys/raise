@@ -76,7 +76,7 @@ class TestProtocolConformance:
 class TestTestGate:
     """TestGate runs pytest -x --tb=short."""
 
-    def test_pass(self, tmp_path: object) -> None:
+    def test_pass(self) -> None:
         from rai_cli.gates.builtin.tests import TestGate
 
         gate = TestGate()
