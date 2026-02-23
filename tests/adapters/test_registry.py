@@ -173,3 +173,16 @@ class TestPublicFunctions:
 
         mock_eps.assert_called_once_with(group=EP_GOVERNANCE_PARSERS)
         assert result == {"backlog": fake_cls}
+
+
+class TestGovernanceParsersDiscovery:
+    """Integration test: real entry point discovery (requires pip install -e .)."""
+
+    def test_governance_parsers_discovered(self) -> None:
+        """All 9 built-in parsers are discoverable via entry points."""
+        parsers = get_governance_parsers()
+        expected = {
+            "prd", "vision", "constitution", "roadmap", "backlog",
+            "epic_scope", "adr", "guardrails", "glossary",
+        }
+        assert expected.issubset(parsers.keys())

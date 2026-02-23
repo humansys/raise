@@ -44,25 +44,21 @@ class TestUnifiedGraphBuilderInit:
 class TestLoadGovernance:
     """Tests for load_governance method."""
 
-    def test_converts_concepts_to_nodes(self, tmp_path: Path) -> None:
-        """Should convert governance Concept to ConceptNode."""
-        # Create mock concept
-        from rai_cli.governance.models import Concept, ConceptType
-
-        mock_concept = Concept(
+    def test_returns_graph_nodes_from_extractor(self, tmp_path: Path) -> None:
+        """Extractor returns GraphNode directly — no conversion needed."""
+        mock_node = ConceptNode(
             id="principle-1",
-            type=ConceptType.PRINCIPLE,
-            file="framework/reference/constitution.md",
-            section="§1 Core Principle",
-            lines=(10, 20),
+            type="principle",
             content="This is a core principle.",
+            source_file="framework/reference/constitution.md",
+            created="2026-01-01T00:00:00+00:00",
             metadata={"principle_number": "§1"},
         )
 
         builder = UnifiedGraphBuilder(project_root=tmp_path)
 
         with patch.object(builder, "_get_governance_extractor") as mock_extractor:
-            mock_extractor.return_value.extract_all.return_value = [mock_concept]
+            mock_extractor.return_value.extract_all.return_value = [mock_node]
             nodes = builder.load_governance()
 
         assert len(nodes) == 1
