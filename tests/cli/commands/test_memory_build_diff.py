@@ -16,6 +16,7 @@ from rai_cli.cli.main import app
 from rai_cli.context.diff import GraphDiff
 from rai_cli.context.graph import UnifiedGraph
 from rai_cli.context.models import ConceptNode
+from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
 runner = CliRunner()
 
@@ -51,7 +52,7 @@ class TestBuildWithDiff:
         # Save old graph as the "existing" index
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        old_graph.save(index_path)
+        FilesystemGraphBackend().persist(old_graph, index_path)
 
         # Mock builder to return new graph
         mock_builder_cls.return_value.build.return_value = new_graph
@@ -94,7 +95,7 @@ class TestBuildWithDiff:
 
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        old_graph.save(index_path)
+        FilesystemGraphBackend().persist(old_graph, index_path)
 
         mock_builder_cls.return_value.build.return_value = new_graph
 
@@ -155,7 +156,7 @@ class TestBuildWithDiff:
 
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        graph.save(index_path)
+        FilesystemGraphBackend().persist(graph, index_path)
 
         mock_builder_cls.return_value.build.return_value = graph
 
@@ -191,7 +192,7 @@ class TestNoDiffFlag:
 
         index_path = tmp_path / "memory" / "index.json"
         index_path.parent.mkdir(parents=True)
-        old_graph.save(index_path)
+        FilesystemGraphBackend().persist(old_graph, index_path)
 
         mock_builder_cls.return_value.build.return_value = new_graph
 

@@ -9,6 +9,7 @@ from typer.testing import CliRunner
 from rai_cli.cli.main import app
 from rai_cli.context.graph import UnifiedGraph
 from rai_cli.context.models import ConceptEdge, ConceptNode
+from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
 runner = CliRunner()
 
@@ -88,7 +89,7 @@ def _build_graph_with_releases(project_path: Path) -> None:
     )
 
     graph_path = project_path / ".raise" / "rai" / "memory" / "index.json"
-    graph.save(graph_path)
+    FilesystemGraphBackend().persist(graph, graph_path)
 
 
 class TestReleaseList:
@@ -133,7 +134,7 @@ class TestReleaseList:
             )
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        graph.save(graph_path)
+        FilesystemGraphBackend().persist(graph, graph_path)
 
         result = runner.invoke(app, ["release", "list", "--project", str(tmp_path)])
         assert result.exit_code == 0
