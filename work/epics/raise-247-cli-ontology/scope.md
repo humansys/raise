@@ -65,8 +65,8 @@ rai release check|publish|list     # Release management
 
 | ID | Story | Size | Status | Dependencies | Description |
 |----|-------|:----:|:------:|:------------:|-------------|
-| S1 | Create `graph` group | M | Pending | None | Extract 7 graph commands from memory.py |
-| S2 | Create `pattern` group | S | Pending | None | Extract add-pattern + reinforce from memory.py |
+| S1 | Create `graph` group | M | ✅ Done | None | Extract 7 graph commands from memory.py |
+| S2 | Create `pattern` group | S | ✅ Done | None | Extract add-pattern + reinforce from memory.py |
 | S3 | Create `signal` group | S | Pending | None | Extract emit-work/session/calibration as 3 subcommands |
 | S4 | Kill redundancies | XS | Pending | None | Remove generate, add-session, add-calibration |
 | S5 | Merge publish+release, flatten singletons | S | Pending | None | Consolidate release mgmt, flatten base/profile |
@@ -281,7 +281,7 @@ time saved for these small stories.
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S1: graph group | M | ✅ Done | 150 min | 1.6x | PAT-E-434/435/436 |
-| S2: pattern group | S | Pending | - | - | |
+| S2: pattern group | S | ✅ Done | 45 min | 1.33x | PAT-E-440/441 |
 | S3: signal group | S | Pending | - | - | |
 | S4: kill redundancies | XS | Pending | - | - | |
 | S5: merge+flatten | S | Pending | - | - | |
