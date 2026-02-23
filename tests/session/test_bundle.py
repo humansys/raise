@@ -435,6 +435,7 @@ class TestGetAlwaysOnPrimes:
     def test_returns_always_on_nodes(self, tmp_path: Path) -> None:
         """Returns all nodes with always_on=true metadata."""
         from rai_cli.context.graph import UnifiedGraph
+        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
         graph = UnifiedGraph()
         graph.add_concept(
@@ -454,7 +455,7 @@ class TestGetAlwaysOnPrimes:
         )
 
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        graph.save(graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         result = get_always_on_primes(tmp_path)
         assert len(result) == 2
@@ -465,6 +466,7 @@ class TestGetAlwaysOnPrimes:
     def test_excludes_non_always_on(self, tmp_path: Path) -> None:
         """Nodes without always_on=true are excluded."""
         from rai_cli.context.graph import UnifiedGraph
+        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
         graph = UnifiedGraph()
         graph.add_concept(
@@ -478,7 +480,7 @@ class TestGetAlwaysOnPrimes:
         )
 
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        graph.save(graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         result = get_always_on_primes(tmp_path)
         assert result == []
@@ -713,6 +715,7 @@ class TestBundleReleaseContext:
         # Build a graph with epic→release edge
         from rai_cli.context.graph import UnifiedGraph
         from rai_cli.context.models import ConceptEdge
+        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
         graph = UnifiedGraph()
         graph.add_concept(
@@ -742,7 +745,7 @@ class TestBundleReleaseContext:
             ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        graph.save(graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
@@ -800,6 +803,7 @@ class TestBundleReleaseContext:
 
         # Graph exists but epic has no release edge
         from rai_cli.context.graph import UnifiedGraph
+        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
         graph = UnifiedGraph()
         graph.add_concept(
@@ -812,7 +816,7 @@ class TestBundleReleaseContext:
             )
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        graph.save(graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
@@ -1016,6 +1020,7 @@ class TestGetFoundationalPatterns:
     def test_returns_foundational_patterns_from_graph(self, tmp_path: Path) -> None:
         """Returns patterns with foundational=true from graph."""
         from rai_cli.context.graph import UnifiedGraph
+        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
         graph = UnifiedGraph()
         graph.add_concept(
@@ -1047,7 +1052,7 @@ class TestGetFoundationalPatterns:
         )
 
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
-        graph.save(graph_path)
+        FilesystemGraphBackend(graph_path).persist(graph)
 
         result = get_foundational_patterns(tmp_path)
         assert len(result) == 1
