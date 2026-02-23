@@ -65,10 +65,10 @@ Create a lean story specification that optimizes for both human understanding (q
 Record the start of the design phase:
 
 ```bash
-rai memory emit-work story {story_id} --event start --phase design
+rai signal emit-work story {story_id} --event start --phase design
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e start -p design`
+**Example:** `rai signal emit-work story S15.1 -e start -p design`
 
 ### Step 0.1: Verify Prerequisites & Load Context (Parallel)
 
@@ -79,7 +79,7 @@ Run these in parallel (all independent):
 ls work/epics/e{N}-*/scope.md 2>/dev/null || echo "WARN: No epic context"
 
 # Query architecture patterns and ADRs
-rai memory query "architecture patterns ADR" --types pattern,decision --limit 5
+rai graph query "architecture patterns ADR" --types pattern,decision --limit 5
 ```
 
 **From epic check:**
@@ -102,8 +102,8 @@ rai memory query "architecture patterns ADR" --types pattern,decision --limit 5
 Identify the primary module(s) this story affects, then load their architectural context:
 
 ```bash
-rai memory context mod-<name>
-# Example: rai memory context mod-memory
+rai graph context mod-<name>
+# Example: rai graph context mod-memory
 ```
 
 **How to identify the relevant module(s):**
@@ -300,10 +300,10 @@ Self-review checklist:
 Record the completion of the design phase:
 
 ```bash
-rai memory emit-work story {story_id} --event complete --phase design
+rai signal emit-work story {story_id} --event complete --phase design
 ```
 
-**Example:** `rai memory emit-work story S15.1 -e complete -p design`
+**Example:** `rai signal emit-work story S15.1 -e complete -p design`
 
 ## Output
 

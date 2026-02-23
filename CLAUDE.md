@@ -57,18 +57,18 @@ Stories merge to epic, epics merge to v2, v2 merges to main at release.
 - cmd: rai init | sig: [--name TEXT] [--path PATH] [--detect] | notes: --detect analyzes conventions
 - cmd: rai session start | sig: [--name TEXT] [--project TEXT] [--agent TEXT] [--context] | notes: --name first-time only, --context for bundle
 - cmd: rai session close | sig: [--summary TEXT] [--type TEXT] [--pattern TEXT] [--state-file TEXT] [--session TEXT] | notes: --state-file for structured close, --pattern repeatable
-- cmd: rai memory build | sig: [--output PATH] [--no-diff] | notes: NO --project flag, runs from CWD
-- cmd: rai memory query | sig: QUERY_STR [--types TYPE] [--strategy keyword_search|concept_lookup] [--limit N] [--format human|json|compact] | notes: QUERY_STR positional
-- cmd: rai memory add-pattern | sig: CONTENT [--context KEYWORDS] [--type TYPE] [--from STORY_ID] [--scope SCOPE] | notes: CONTENT positional, --from NOT --source
-- cmd: rai memory emit-work | sig: WORK_TYPE WORK_ID [--event EVENT] [--phase PHASE] | notes: WORK_TYPE=epic|story, EVENT=start|complete|blocked
-- cmd: rai memory context | sig: MODULE_ID [--format human|json] | notes: MODULE_ID positional (e.g. mod-memory)
+- cmd: rai graph build | sig: [--output PATH] [--no-diff] | notes: NO --project flag, runs from CWD
+- cmd: rai graph query | sig: QUERY_STR [--types TYPE] [--strategy keyword_search|concept_lookup] [--limit N] [--format human|json|compact] | notes: QUERY_STR positional
+- cmd: rai graph context | sig: MODULE_ID [--format human|json] | notes: MODULE_ID positional (e.g. mod-memory)
+- cmd: rai pattern add | sig: CONTENT [--context KEYWORDS] [--type TYPE] [--from STORY_ID] [--scope SCOPE] | notes: CONTENT positional, --from NOT --source
+- cmd: rai signal emit-work | sig: WORK_TYPE WORK_ID [--event EVENT] [--phase PHASE] | notes: WORK_TYPE=epic|story, EVENT=start|complete|blocked
 - cmd: rai discover scan | sig: [PATH] [--language LANG] [--output human|json|summary] [--exclude PATTERN] | notes: PATH positional, --exclude repeatable
 - cmd: rai skill list|validate|check-name|scaffold | sig: [SKILL_NAME] | notes: validate checks skill structure
 
 ### Common Mistakes
-- wrong: rai memory build --project . | right: rai memory build | why: no --project flag
-- wrong: rai memory add-pattern --content "..." | right: rai memory add-pattern "..." | why: CONTENT positional
-- wrong: rai memory add-pattern --source F1 | right: --from F1 | why: flag is --from
+- wrong: rai graph build --project . | right: rai graph build | why: no --project flag
+- wrong: rai pattern add --content "..." | right: rai pattern add "..." | why: CONTENT positional
+- wrong: rai pattern add --source F1 | right: --from F1 | why: flag is --from
 - wrong: rai discover scan --input dir | right: rai discover scan dir | why: PATH positional
 
 ## External Integrations
