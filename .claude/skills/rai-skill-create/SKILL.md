@@ -27,7 +27,7 @@ Guide the creation of a new RaiSE skill through conversation, composing existing
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Follow all 8 steps in sequence. Ask explicit questions at each stage. Show reference skill excerpts when designing content.
+**Shu (守)**: Follow all 9 steps in sequence. Ask explicit questions at each stage. Show reference skill excerpts when designing content.
 
 **Ha (破)**: Collapse steps when the user provides detailed upfront intent. Infer lifecycle metadata when domain is clear.
 
@@ -400,7 +400,25 @@ rai skill validate .claude/skills/{name}/SKILL.md
 
 > **If you can't continue:** Persistent validation errors → Read `rai skill validate --help` for schema details. Compare against a known-good skill (e.g., rai-debug).
 
-### Step 8: Present Summary and Next Steps
+### Step 8: Index in Memory
+
+Rebuild the knowledge graph so the new skill is discoverable via `rai memory query`.
+
+```bash
+rai memory build
+```
+
+**Why:** The graph builder scans `.claude/skills/*/SKILL.md` via filesystem glob (no cache). Until this runs, the new skill exists on disk and in `rai skill list`, but is invisible to `rai memory query` and session context loading.
+
+**Verification:** The new skill appears in query results:
+
+```bash
+rai memory query "{name}" --types skill --format compact
+```
+
+> **If you can't continue:** Build fails → Check that `index.json` parent directory exists (`.raise/rai/memory/`). Run `mkdir -p .raise/rai/memory/` and retry.
+
+### Step 9: Present Summary and Next Steps
 
 Present what was created and what to do next.
 
@@ -417,6 +435,7 @@ Present what was created and what to do next.
 - Purpose: {one-line summary}
 - Steps: {N} steps
 - Validation: passed
+- Memory: indexed
 
 ### Reference Skills Used
 - {skill 1} — {what was borrowed}
