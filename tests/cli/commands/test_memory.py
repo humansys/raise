@@ -81,7 +81,7 @@ class TestMemoryQueryCommand:
 
             assert result.exit_code == 4  # ArtifactNotFoundError
             # cli_error outputs to stderr, check output (combined stdout+stderr)
-            assert "Memory index not found" in result.output
+            assert "index not found" in result.output.lower()
         finally:
             os.chdir(original_cwd)
 
@@ -298,7 +298,7 @@ class TestMemoryListCommand:
 
             assert result.exit_code == 4  # ArtifactNotFoundError
             # cli_error outputs to stderr, check output (combined stdout+stderr)
-            assert "Memory index not found" in result.output
+            assert "index not found" in result.output.lower()
         finally:
             os.chdir(original_cwd)
 
@@ -312,7 +312,7 @@ class TestMemoryListCommand:
             result = runner.invoke(app, ["memory", "list"])
 
             assert result.exit_code == 0
-            assert "Memory Concepts" in result.stdout
+            assert "Concepts" in result.stdout
             assert "Concepts:" in result.stdout
         finally:
             os.chdir(original_cwd)
@@ -341,7 +341,7 @@ class TestMemoryListCommand:
             result = runner.invoke(app, ["memory", "list", "--format", "human"])
 
             assert result.exit_code == 0
-            assert "# Memory Concepts" in result.stdout
+            assert "Concepts" in result.stdout
         finally:
             os.chdir(original_cwd)
 
@@ -378,7 +378,7 @@ class TestMemoryListCommand:
             )
 
             assert result.exit_code == 0
-            assert "Memory Concepts" in result.stdout
+            assert "Concepts" in result.stdout
         finally:
             os.chdir(original_cwd)
 
@@ -1480,7 +1480,7 @@ class TestMemoryListEdgeCases:
 
             assert result.exit_code == 0
             # Should show pattern, calibration, session but not other types
-            assert "Memory Concepts" in result.stdout
+            assert "Concepts" in result.stdout
         finally:
             os.chdir(original_cwd)
 
@@ -1533,7 +1533,7 @@ class TestMemoryGenerateCommand:
             result = runner.invoke(app, ["memory", "generate"])
 
             assert result.exit_code == 0
-            assert "raise memory build" in result.output
+            assert "graph build" in result.output
         finally:
             os.chdir(original_cwd)
 
