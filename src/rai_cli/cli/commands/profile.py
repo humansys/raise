@@ -22,7 +22,6 @@ from rai_cli.onboarding.profile import (
 profile_app = typer.Typer(
     name="profile",
     help="View developer profile",
-    invoke_without_command=True,
 )
 
 
