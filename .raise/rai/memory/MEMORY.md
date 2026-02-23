@@ -104,25 +104,18 @@ main (stable)
 
 ## Key Patterns (from memory)
 
-- **PAT-E-320:** Flat file as transient buffer between sessions — close writes to flat file for cross-session continuity, next start migrates to per-session dir for isolation. Two lifecycle roles require two storage locations.
-- **PAT-T-001:** Existing content in other repos should be audited before writing new docs — raise-gtm had 9 high-quality bilingual docs pages that only need migration and updating, not rewriting
-- **PAT-T-002:** Sync scripts that modify source files can introduce syntax errors (skills_base/__init__.py duplicated list assignment) — always run quality gates after sync
-- **PAT-T-003:** Verify subagent bulk transforms before committing — grep for expected changes and residual old values. Subagents doing find-and-replace across many files frequently miss edge cases (code blocks, headings, anchor links).
-- **PAT-T-004:** Verify subagent bulk transforms before committing — grep for expected changes and residual old values. Subagents doing find-and-replace across many files frequently miss edge cases.
-- **PAT-T-005:** CLI --help shows all commands including internal/PRO — use memory cli-reference.md as authoritative scope for public docs, not raw --help output. Core commands: init, session, memory, discover, skill, profile, base, release. PRO/internal: backlog, publish.
-- **PAT-F-002:** Official Atlassian Rovo MCP has severe token verbosity (24k tokens for trivial queries, 80k+ for edits). Community alternative sooperset/mcp-atlassian is more practical for daily use. aashari TOON format offers 30-60% token savings but uses generic HTTP tools.
-- **PAT-F-003:** Discovery del propio sistema requiere leer código fuente como fuente de verdad, no docs — el código revela la arquitectura real (17 NodeTypes, 11 EdgeTypes, 3 memory tiers)
-- **PAT-F-004:** Portability is distribution, not content: when the core artifact format (SKILL.md) is already cross-compatible, multi-platform support reduces to a path-mapping problem in the scaffolding layer
-- **PAT-F-005:** Verify claims against primary sources before synthesizing: initial research mixed .antigravity/ with .agent/, skills with workflows, .md with .toml — second pass against official docs corrected 4 factual errors
-- **PAT-F-006:** scaffold_skills() idempotency blocks upgrades — no mechanism to sync skills after pip upgrade. Version tracking exists in frontmatter but is not compared.
-- **PAT-F-007:** Pydantic v2 frozen models: use model_config = ConfigDict(frozen=True), not class keyword frozen=True — pyright strict mode rejects the class keyword form
-- **PAT-F-008:** from __future__ import annotations breaks Typer runtime type inspection for custom types (Enum, Literal). Typer needs real types at runtime, not string annotations. Remove __future__ import from CLI command modules.
-- **PAT-F-009:** uv tool install creates a global install separate from project editable install. During development, uv run ensures project code is used. Bare command uses global tool.
-- **PAT-F-010:** Typer CliRunner resolves types differently than real CLI — tests can pass while actual CLI is broken. E2E tests via CliRunner give false confidence for type-resolution bugs.
-- **PAT-F-015:** Deterministic vs inference split is a core teaching concept for RaiSE adoption. CLI = facts (rai init --detect, rai memory build). Skills = judgment (/rai-project-onboard, /rai-epic-design). Users need to understand this boundary to trust the system.
-- **PAT-F-016:** Reopening a closed epic for new milestones preserves traceability — same domain, same JIRA parent, new branch. Better than creating a new epic for continuation work.
+- **PAT-E-440:** _deprecation_warning new_cmd param: cuando el nombre del subcomando canónico difiere del legado (add-pattern→add), pasar new_cmd explícito para mensaje correcto
+- **PAT-E-441:** import location trap: get_memory_dir_for_scope vive en rai_cli.memory, no en rai_cli.config.paths — verificar imports en Gemba antes de copiar de memoria
+- **PAT-E-442:** Repetitive extractions compound: 1st establishes pattern, 2nd refines, 3rd is mechanical. Plan decompositions in 3+ reps. (E247: 1.6x→1.33x→2.86x)
+- **PAT-E-443:** Extraction compounding — repetitive God Object extractions show compounding velocity: first establishes pattern (M, 1.6x), second refines (S, 1.33x), third is mechanical (S, 2.86x). Plan decompositions in 3+ reps.
+- **PAT-E-444:** Fixed coverage gates (e.g. --cov-fail-under=90) create Goodhart dynamics: penalize cleanup, incentivize test muda. Use coverage as diagnostic, not gate. Cover domain logic and edge cases, not glue/wrappers.
+- **PAT-E-445:** For deletion stories, the grep gate IS the design — blast radius discovery replaces formal design
+- **PAT-E-446:** Typer RED test gotcha: exit_code \!= 0 passes for both 'command doesnt exist' and 'command validation error'. Always add content assertions alongside exit code checks.
+- **PAT-E-447:** Pre-implementation arch review + test muda analysis: run together, integrate muda cleanup into implementation tasks. Avoids separate cleanup stories and catches waste before its written.
+- **PAT-E-448:** Typer RED test gotcha: exit_code != 0 passes for both command-not-found and validation-error. Always add content assertions.
+- **PAT-E-449:** Pre-implementation arch review + test muda analysis as combo. Integrate cleanup into implementation tasks.
 
 ---
 
-*Last updated: 2026-02-20*
-*Generated by `raise memory generate`*
+*Last updated: 2026-02-23*
+*Generated by `rai graph build`*
