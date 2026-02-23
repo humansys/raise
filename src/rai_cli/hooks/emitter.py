@@ -127,10 +127,10 @@ class EventEmitter:
         timeout: float = getattr(hook, "timeout", self.DEFAULT_TIMEOUT)
         hook_name = type(hook).__name__
 
+        executor = ThreadPoolExecutor(max_workers=1)
         try:
-            with ThreadPoolExecutor(max_workers=1) as executor:
-                future = executor.submit(hook.handle, event)
-                return future.result(timeout=timeout)
+            future = executor.submit(hook.handle, event)
+            return future.result(timeout=timeout)
         except FuturesTimeoutError:
             error_msg = f"TimeoutError: {hook_name} exceeded {timeout}s timeout"
             errors.append(error_msg)
@@ -151,6 +151,8 @@ class EventEmitter:
                 event.event_name,
             )
             return None
+        finally:
+            executor.shutdown(wait=False, cancel_futures=True)
 
     @staticmethod
     def _check_abort(
