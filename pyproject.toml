@@ -65,6 +65,16 @@ adr = "rai_cli.governance.parsers.adr:AdrParser"
 guardrails = "rai_cli.governance.parsers.guardrails:GuardrailsParser"
 glossary = "rai_cli.governance.parsers.glossary:GlossaryParser"
 
+[project.entry-points."rai.hooks"]
+telemetry = "rai_cli.hooks.builtin.telemetry:TelemetryHook"
+gate-bridge = "rai_cli.hooks.builtin.gate_bridge:GateBridgeHook"
+
+[project.entry-points."rai.gates"]
+tests = "rai_cli.gates.builtin.tests:TestGate"
+types = "rai_cli.gates.builtin.types:TypeGate"
+lint = "rai_cli.gates.builtin.lint:LintGate"
+coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
+
 [project.entry-points."rai.graph.backends"]
 local = "rai_cli.graph.filesystem_backend:FilesystemGraphBackend"
 

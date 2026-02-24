@@ -38,6 +38,8 @@ from rai_cli.context.query import (
 )
 from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
 from rai_cli.graph.filesystem_backend import get_active_backend
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import GraphBuildEvent
 
 # Default index file name
 INDEX_FILE = "index.json"
@@ -473,6 +475,14 @@ def build(
 
     # Save graph via backend
     backend.persist(graph)
+
+    # Emit graph:build event
+    emitter = create_emitter()
+    emitter.emit(GraphBuildEvent(
+        project_path=output_path.parent,
+        node_count=graph.node_count,
+        edge_count=graph.edge_count,
+    ))
 
     # Compute and persist diff
     diff: GraphDiff | None = None

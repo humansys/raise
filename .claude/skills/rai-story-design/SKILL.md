@@ -60,17 +60,7 @@ Create a lean story specification that optimizes for both human understanding (q
 
 ## Steps
 
-### Step 0: Emit Feature Start (Telemetry)
-
-Record the start of the design phase:
-
-```bash
-rai signal emit-work story {story_id} --event start --phase design
-```
-
-**Example:** `rai signal emit-work story S15.1 -e start -p design`
-
-### Step 0.1: Verify Prerequisites & Load Context (Parallel)
+### Step 0: Verify Prerequisites & Load Context (Parallel)
 
 Run these in parallel (all independent):
 
@@ -97,7 +87,7 @@ rai graph query "architecture patterns ADR" --types pattern,decision --limit 5
 
 > **If you can't continue:** Complex feature without epic → Run `/rai-story-start` first.
 
-### Step 0.2: Load Architectural Context
+### Step 0.1: Load Architectural Context
 
 Identify the primary module(s) this story affects, then load their architectural context:
 
@@ -295,20 +285,9 @@ Self-review checklist:
 - [ ] Spec reviewable in <5 minutes
 - [ ] Spec creation took <30 minutes
 
-### Step 9: Emit Feature Complete (Telemetry)
-
-Record the completion of the design phase:
-
-```bash
-rai signal emit-work story {story_id} --event complete --phase design
-```
-
-**Example:** `rai signal emit-work story S15.1 -e complete -p design`
-
 ## Output
 
 - **Artifact**: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/design.md`
-- **Telemetry**: `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: design start/complete)
 - **Template**: `references/tech-design-story-v2.md`
 - **Next**: `/rai-story-plan`
 

@@ -30,6 +30,8 @@ from rai_cli.adapters.registry import (
     EP_GRAPH_BACKENDS,
     EP_PM_ADAPTERS,
 )
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import AdapterFailedEvent, AdapterLoadedEvent
 from rai_cli.output.formatters.adapters import (
     format_check_human,
     format_check_json,
@@ -138,12 +140,18 @@ def check_command(
         $ rai adapters check --format json
     """
     results: list[dict[str, Any]] = []
+    emitter = create_emitter()
 
     for group, (proto_name, proto_cls) in ADAPTER_GROUPS.items():
         for ep in entry_points(group=group):
             try:
                 loaded: Any = ep.load()
             except Exception as exc:  # noqa: BLE001
+                emitter.emit(AdapterFailedEvent(
+                    adapter_name=ep.name,
+                    group=group,
+                    error=str(exc),
+                ))
                 results.append(
                     {
                         "group": group,
@@ -158,6 +166,18 @@ def check_command(
 
             compliant = inspect.isclass(loaded) and issubclass(loaded, proto_cls)
             error = None if compliant else f"Not a {proto_name} subclass"
+            if compliant:
+                emitter.emit(AdapterLoadedEvent(
+                    adapter_name=ep.name,
+                    group=group,
+                    adapter_type=type(loaded).__name__,
+                ))
+            else:
+                emitter.emit(AdapterFailedEvent(
+                    adapter_name=ep.name,
+                    group=group,
+                    error=error or "",
+                ))
             results.append(
                 {
                     "group": group,
