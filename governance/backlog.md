@@ -46,7 +46,7 @@
 | [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | ✅ Complete | `work/epics/raise-247-cli-ontology/scope.md` | — |
 | [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | ✅ Complete | `work/epics/raise-248-hooks-gates/scope.md` | — |
 | [RAISE-249](https://humansys.atlassian.net/browse/RAISE-249) | **Artifact Ontology & Contract Chain** | ✅ Complete | `work/epics/raise-249-artifact-ontology/scope.md` | — |
-| RAISE-250 | **Skill Excellence** | 🚀 In Progress | `work/epics/raise-250-skill-excellence/scope.md` | P1 (v2.3) |
+| RAISE-250 | **Skill Excellence** | ✅ Complete | `work/epics/raise-250-skill-excellence/scope.md` | — |
 
 ### Release Roadmap (decided SES-234, 2026-02-21)
 
@@ -70,7 +70,7 @@ with no dependencies. v2.2 builds the extensibility infrastructure that PRO need
 completes the skill ecosystem on top of the final infrastructure. Each release is
 self-contained and delivers shippable value.
 
-**Summary:** 18 of 19 internal epics complete. RAISE-144 (Engineering Health) is a
+**Summary:** 19 of 20 internal epics complete. RAISE-144 (Engineering Health) is a
 permanent rolling epic. 4 new epics scoped (SES-234), distributed across v2.1–v2.3.
 
 ---
@@ -136,13 +136,13 @@ rai profile       — Developer profile
 rai base          — Base Rai package info
 ```
 
-### Skills (20 total)
+### Skills (27 total, all ADR-040 compliant)
 
-Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (3)
+Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (10)
 
 ### Metrics
 
-- **Tests:** 1610 passing, 92.61% coverage
+- **Tests:** 2770 passing
 - **Graph:** 345+ nodes across governance, memory, work, code, identity
 - **Modules:** 15 source modules
 
@@ -318,6 +318,7 @@ E-DEMO learnings feed into RAISE-141 (backlog backends).
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 2.5.0 | 2026-02-23 | Rai | E250 Skill Excellence complete: 27/27 skills ADR-040 compliant (7 sections, ≤150 lines), ~65% total line reduction, validator + scaffold updated, sync pipeline verified |
 | 2.4.0 | 2026-02-16 | Rai | RAISE-153 complete, RAISE-144 activated with Kurigage-driven stories (RAISE-158/160/161), SES-MIGRATED + test leakage fixes |
 | 2.3.0 | 2026-02-15 | Rai | Full JIRA sync: E10/E19-E22 → RAISE-140-143, Engineering Health epic (RAISE-144), RAISE-134/136 bugs, RAISE-137-139 urgent stories, Fix Version strategy |
 | 2.2.0 | 2026-02-14 | Rai | Added Demo & Commercial Strategy section (§7), documented demo/atlassian-webinar branch |
@@ -331,4 +332,4 @@ E-DEMO learnings feed into RAISE-141 (backlog backends).
 ---
 
 *Updated by: Rai + Emilio*
-*Last sync: 2026-02-15*
+*Last sync: 2026-02-23*
