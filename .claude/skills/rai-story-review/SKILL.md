@@ -50,17 +50,7 @@ Reflect on the completed feature to extract learnings, identify process improvem
 
 ## Steps
 
-### Step 0: Emit Feature Start (Telemetry)
-
-Record the start of the review phase:
-
-```bash
-rai signal emit-work story {story_id} --event start --phase review
-```
-
-**Example:** `rai signal emit-work story S15.1 -e start -p review`
-
-### Step 0.1: Verify Prerequisites & Load Context (Parallel)
+### Step 0: Verify Prerequisites & Load Context (Parallel)
 
 Run these in parallel (all independent):
 
@@ -245,23 +235,10 @@ rai signal emit-calibration F9.4 -s S -e 30 -a 15
 
 > **If you can't continue:** CLI not available → Skip; telemetry is optional.
 
-### Step 7: Emit Feature Complete (Telemetry)
-
-Record the completion of the entire story lifecycle:
-
-```bash
-rai signal emit-work story {story_id} --event complete --phase review
-```
-
-**Example:** `rai signal emit-work story S15.1 -e complete -p review`
-
-**Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
-
 ## Output
 
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
 - **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
-- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
 - **Gate:** None
 - **Next:** Next feature or continuous improvement
 
