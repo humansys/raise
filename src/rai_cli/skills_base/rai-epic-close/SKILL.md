@@ -15,357 +15,134 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "2.0.0"
   raise.visibility: public
 ---
 
-# Epic Close: Epic Completion & Retrospective
-
-## Branch Configuration
-
-**Read `branches.development` from `.raise/manifest.yaml`** to determine the project's development branch. All references to `{dev_branch}` below use this value. Default: `main`.
+# Epic Close
 
 ## Purpose
 
-Complete an epic by conducting a retrospective, capturing metrics, cleaning up all branches, and merging to the development branch. This formally closes the epic lifecycle with learnings captured for continuous improvement.
-
-**CRITICAL:** Never merge an epic without running this skill. The retrospective captures learnings that compound across epics.
+Complete an epic by conducting a retrospective, merging to the development branch, and cleaning up all branches.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Follow all steps, complete full retrospective, clean all branches.
-
-**Ha (破)**: Adjust retrospective depth based on epic complexity; batch small epics.
-
-**Ri (離)**: Integrate with release workflows; automate metrics extraction.
+- **Shu**: Follow all steps, complete full retrospective template
+- **Ha**: Adjust retrospective depth based on epic complexity
+- **Ri**: Integrate with release workflows, automate metrics extraction
 
 ## Context
 
-**When to use:**
-- All features in the epic are complete (merged to epic branch)
-- Ready to merge epic work into development branch (`{dev_branch}`)
-- Want to capture learnings before moving to next epic
+**When to use:** All stories complete and merged to epic branch. Ready to close the epic lifecycle.
 
-**When to skip:**
-- Epic abandoned (document why, delete branches, no merge)
-- Epic continuing (not all stories done yet)
+**When to skip:** Epic abandoned (document why, delete branches without merge, update backlog as "Abandoned").
 
-**Inputs required:**
-- Epic scope document: `work/epics/e{N}-{name}/scope.md`
-- All features complete with retrospectives
-- Epic branch with all work merged
-- Passing tests
+**Inputs:** Epic scope document, all story retrospectives, passing test suite.
 
-**Output:**
-- Epic retrospective document
-- Epic merged to development branch
-- All epic and story branches deleted
-- Backlog updated (epic marked complete)
-- Telemetry emitted
+**Branch config:** Read `branches.development` from `.raise/manifest.yaml` for `{dev_branch}`. Default: `main`.
 
 ## Steps
 
-### Step 1: Verify All Features Complete (REQUIRED)
+### Step 1: Verify Stories Complete
 
-Check that all stories are done:
+Check all stories are done in the epic scope document:
 
 ```bash
-SCOPE="work/epics/e{N}-{name}/scope.md"
-
-# Review epic scope for feature checklist
-cat "$SCOPE" | grep -E "^\s*-\s*\[.\]"
-
-# Verify no incomplete features
-if grep -E "^\s*-\s*\[ \]" "$SCOPE" | grep -i "F{epic_id}"; then
-    echo "ERROR: Incomplete features found"
-    exit 4
-fi
+grep -E "^\s*-\s*\[ \]" "work/epics/e{N}-{name}/scope.md"
 ```
 
-**Verification:** All features marked complete in epic scope.
+| Condition | Action |
+|-----------|--------|
+| All stories checked | Continue |
+| Incomplete stories | Complete them first or explicitly descope |
 
-> **If you can't continue:** Incomplete features → Complete them first or explicitly descope.
+<verification>
+All stories marked complete in epic scope.
+</verification>
 
-### Step 2: Run Full Test Suite (REQUIRED)
-
-Verify everything works together:
+### Step 2: Run Tests & Write Retrospective
 
 ```bash
 uv run pytest --tb=short
 ```
 
-**Expected:** All tests pass.
+Create retrospective at `work/epics/e{N}-{name}/retrospective.md` using `templates/retrospective.md`. Fill from story retrospectives and git history.
 
-**Verification:** Test suite green.
+<verification>
+Tests green. Retrospective created with metrics, patterns, and process insights.
+</verification>
 
-> **If you can't continue:** Tests failing → Fix before merge.
+<if-blocked>
+Tests failing → fix before merge.
+</if-blocked>
 
-### Step 3: Create Epic Retrospective (REQUIRED)
-
-Create retrospective: `work/epics/e{N}-{name}/retrospective.md`
-
-Template:
-
-```markdown
-# Epic Retrospective: E{N} {Epic Name}
-
-**Completed:** YYYY-MM-DD
-**Duration:** X days (started YYYY-MM-DD)
-**Features:** N features delivered
-
----
-
-## Summary
-
-[2-3 sentence summary of what was delivered and its impact]
-
----
-
-## Metrics
-
-| Metric | Value | Notes |
-|--------|-------|-------|
-| Features Delivered | N | |
-| Story Points | X SP | |
-| Tests Added | N | |
-| Average Velocity | X.Xx | vs baseline |
-| Calendar Days | N | |
-
-### Feature Breakdown
-
-| Feature | Size | SP | Velocity | Key Learning |
-|---------|:----:|:--:|:--------:|--------------|
-| F{N}.1 | S | 2 | 2.5x | [learning] |
-| F{N}.2 | M | 3 | 3.0x | [learning] |
-
----
-
-## What Went Well
-
-- [Positive outcome 1]
-- [Positive outcome 2]
-
-## What Could Be Improved
-
-- [Improvement area 1]
-- [Improvement area 2]
-
-## Patterns Discovered
-
-| ID | Pattern | Context |
-|----|---------|---------|
-| PAT-XXX | [pattern description] | [when to apply] |
-
-## Process Insights
-
-- [Insight about RaiSE methodology]
-- [Insight about collaboration]
-
----
-
-## Artifacts
-
-- **Scope:** `work/epics/e{N}-{name}/scope.md`
-- **Features:** `work/epics/e{N}-{name}/stories/`
-- **ADRs:** [list any ADRs created]
-- **Tests:** N new tests
-
----
-
-## Release Impact
-
-**Release:** REL-{id} ({release name})
-**Epic progress:** {N}/{total} epics complete for this release
-**Remaining epics:** [list remaining epic IDs]
-
-> Include this section when the epic belongs to a release. Shows how epic completion advances the release.
-
-## Next Steps
-
-- [What follows this epic]
-- [Dependencies unblocked]
-
----
-
-*Epic retrospective - captures learning for continuous improvement*
-```
-
-**Verification:** Retrospective document created with metrics and learnings.
-
-> **If you can't continue:** No data → Review story retrospectives and git history.
-
-### Step 4: Merge Epic to Development Branch (REQUIRED)
-
-Merge the epic branch to `{dev_branch}`:
+### Step 3: Merge & Clean Up Branches
 
 ```bash
-# Ensure on epic branch with latest
-git checkout epic/{epic_id}/{name}
-git pull origin epic/{epic_id}/{name} 2>/dev/null || true
+git checkout {dev_branch} && git pull origin {dev_branch}
+git merge --no-ff epic/e{N}/{name} -m "Merge epic/e{N}/{name}: {Epic Name}
 
-# Switch to development branch
-git checkout {dev_branch}
-git pull origin {dev_branch}
-
-# Merge with descriptive commit
-git merge --no-ff epic/{epic_id}/{name} -m "Merge epic/{epic_id}/{name}: {Epic Name}
-
-Delivered:
-- [Key deliverable 1]
-- [Key deliverable 2]
-- [Key deliverable 3]
-
-Features: N features, X SP
-Tests: N new tests
-Velocity: X.Xx average
-
-Retrospective: dev/epic-{epic_id}-retrospective.md
+Delivered: [key deliverables]
+Stories: N stories, X SP, X.Xx velocity
 
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
-**Verification:** Merge commit created on `{dev_branch}`.
-
-> **If you can't continue:** Merge conflicts → Resolve carefully, preserving all epic work.
-
-### Step 5: Clean Up All Branches (REQUIRED)
-
-Delete the epic branch and any remaining story branches:
+Delete epic and story branches (local and remote):
 
 ```bash
-# List all branches for this epic
-git branch | grep -E "(epic|feature).*{epic_id}"
-
-# Delete epic branch (local and remote)
-git branch -D epic/{epic_id}/{name}
-git push origin --delete epic/{epic_id}/{name} 2>/dev/null || echo "No remote epic branch"
-
-# Delete any remaining story branches
-for branch in $(git branch | grep "feature.*{epic_id}"); do
-    git branch -D $branch
-    git push origin --delete $branch 2>/dev/null || true
+git branch -D epic/e{N}/{name}
+git push origin --delete epic/e{N}/{name} 2>/dev/null || true
+for branch in $(git branch | grep "story.*s{N}"); do
+    git branch -D $branch && git push origin --delete $branch 2>/dev/null || true
 done
 ```
 
-**Why clean all:** Prevents branch accumulation. The merge commit preserves history.
+<verification>
+Merge commit on `{dev_branch}`. No epic/story branches remain.
+</verification>
 
-**Verification:** No branches remain for this epic (local or remote).
+<if-blocked>
+Merge conflicts → resolve preserving epic work.
+</if-blocked>
 
-> **If you can't continue:** Branch deletion fails → Ensure you're on `{dev_branch}`, not a branch being deleted.
+### Step 4: Update Backlog & Context
 
-### Step 6: Update Backlog (REQUIRED)
+1. Mark epic complete in `governance/backlog.md` (status → `✅ Complete`)
+2. Update `CLAUDE.local.md` to reflect completion and next epic
+3. Emit telemetry:
 
-Mark the epic complete in `governance/backlog.md`:
-
-```markdown
-## Epics
-
-| ID | Name | Status | Scope |
-|----|------|--------|-------|
-| E{N} | {Name} | ✅ Complete | `dev/epic-{id}-scope.md` |
+```bash
+rai signal emit-work epic E{N} --event complete
 ```
 
-**Verification:** Backlog reflects epic completion.
-
-> **Release tracking:** If the epic belongs to a release, note the release progress (e.g., "REL-V3.0: 1/4 epics complete"). This helps future sessions understand release velocity.
-
-### Step 7: Update Local Context
-
-Update `CLAUDE.local.md`:
-
-```markdown
-## Current Focus
-
-| Field | Value |
-|-------|-------|
-| Epic | **E{N+1} {Next Epic}** |
-| Completed Epics | E1 ✓, E2 ✓, ... E{N} ✓ |
-```
-
-**Verification:** Local context reflects completion and next epic.
+<verification>
+Backlog reflects completion. Local context updated.
+</verification>
 
 ## Output
 
-- **Retrospective:** `work/epics/e{N}-{name}/retrospective.md`
-- **Merge:** Epic merged to `{dev_branch}` with `--no-ff`
-- **Cleanup:** All epic and story branches deleted (local and remote)
-- **Backlog:** Epic marked complete
-- **Context:** `CLAUDE.local.md` updated
+| Item | Destination |
+|------|-------------|
+| Retrospective | `work/epics/e{N}-{name}/retrospective.md` |
+| Merge commit | `{dev_branch}` with `--no-ff` |
+| Branch cleanup | All epic/story branches deleted |
+| Backlog update | `governance/backlog.md` |
+| Context update | `CLAUDE.local.md` |
 
-## Epic Close Summary Template
+## Quality Checklist
 
-```markdown
-## Epic Closed: E{N} {Epic Name}
-
-**Branch:** `epic/{epic_id}/{name}` → merged to `{dev_branch}`
-**Merge commit:** {commit_hash}
-**Duration:** X days
-
-### Delivered
-- N features
-- X story points
-- N new tests
-- X.Xx average velocity
-
-### Key Learnings
-- [Learning 1]
-- [Learning 2]
-
-### Patterns Captured
-- PAT-XXX: [description]
-
-### Branches Cleaned
-- epic/{epic_id}/{name} ✓
-- [any story branches] ✓
-
-### Next
-- E{N+1}: {Next Epic Name}
-
-Epic lifecycle complete.
-```
-
-## Notes
-
-### Why Retrospectives Are Mandatory
-
-The retrospective captures:
-1. **Velocity data** — Calibrates future estimates
-2. **Patterns** — Reusable insights for other work
-3. **Process improvements** — Makes RaiSE better
-4. **Team memory** — Learnings persist beyond individuals
-
-Skipping retrospectives loses compound learning.
-
-### Epic Lifecycle Summary
-
-```
-/rai-epic-design (scope, features, architecture)
-      ↓
-/rai-epic-plan (sequence, milestones, dependencies)
-      ↓
-[Feature cycles: start → design → plan → implement → review → close]
-      ↓
-/rai-epic-close (retrospective, merge, cleanup) ← YOU ARE HERE
-```
-
-### Branch Hygiene
-
-**Clean as you go.** After this skill:
-- No `epic/{epic_id}/*` branches should exist
-- No `feature/{epic_id}/*` branches should exist
-- All work is in `{dev_branch}` via merge commit
-
-### Abandoned Epics
-
-If epic is abandoned (not completed):
-1. Document why in a note
-2. Delete all branches without merge
-3. Update backlog with status "Abandoned: [reason]"
-4. Capture any partial learnings
+- [ ] All stories complete before merge (gate)
+- [ ] Tests pass on epic branch before merge
+- [ ] Retrospective captures metrics, patterns, and process insights
+- [ ] Merge uses `--no-ff` to preserve epic history
+- [ ] All epic and story branches deleted after merge
+- [ ] Backlog updated with completion status
+- [ ] NEVER merge without retrospective — learnings compound across epics
 
 ## References
 
-- Previous: All feature `/rai-story-close` completions
-- Epic scope: `work/epics/e{N}-{name}/scope.md`
+- Retrospective template: `templates/retrospective.md`
+- Previous: All `/rai-story-close` completions
 - Backlog: `governance/backlog.md`
 - Next: `/rai-epic-design` for next epic

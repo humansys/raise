@@ -12,686 +12,154 @@ metadata:
   raise.work_cycle: utility
   raise.frequency: on-demand
   raise.fase: ""
-  raise.prerequisites: "raise init --detect"
+  raise.prerequisites: "rai init --detect"
   raise.next: "session-start"
-  raise.gate: "raise memory build produces 30+ governance nodes"
+  raise.gate: "4-dimensional coverage gate"
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "2.0.0"
   raise.visibility: public
 ---
 
-# Project Onboard: Brownfield Onboarding
+# Project Onboard
 
 ## Purpose
 
-Guide a developer through brownfield project onboarding by combining codebase discovery with conversation. Analyze what exists (structure, conventions, components), ask what code can't tell us (vision, goals, intent), then fill governance templates with parser-compatible content. Final gate: `rai graph build` produces 30+ governance nodes, making `/rai-session-start` immediately useful.
-
-**Key difference from `/rai-project-create`:** This skill starts from WHAT EXISTS (discovery), then asks WHY. `/rai-project-create` starts from WHAT YOU WANT (pure conversation).
+Guide brownfield project onboarding by combining codebase discovery with conversation. Analyze what exists, ask what code can't tell us, fill 6 governance templates. Gate: 4-dimensional coverage check.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Walk through every step with explanations. Show discovery results in detail. Confirm each governance doc before writing.
-
-**Ha (破)**: Run discovery, present summary, collect missing info in one exchange. Write all docs. Confirm before graph build.
-
-**Ri (離)**: Run discovery, collect intent in 1 exchange. Write all docs. Build graph. Done.
+- **Shu**: Walk through every step, show discovery results, confirm each doc
+- **Ha**: Run discovery, present summary, collect gaps in one exchange
+- **Ri**: Discovery + 1 exchange + write all docs + build graph
 
 ## Context
 
-**When to use:**
-- After `rai init --detect` on an existing (brownfield) project
-- When `governance/` exists and `guardrails.md` has detected conventions
-- When onboarding a project that already has source code
+**When to use:** After `rai init --detect` on an existing project with source code.
 
-**When to skip:**
-- Greenfield project with no source code → use `/rai-project-create` instead
-- Project not yet initialized → run `rai init --detect` first
-- Project already has filled governance docs (non-placeholder content)
+**When to skip:** Greenfield project → `/rai-project-create`. Not initialized → `rai init --detect` first. Governance already filled.
 
-**Inputs required:**
-- A project with `rai init --detect` already completed
-- The existing codebase to analyze
+**Key difference from `/rai-project-create`:** Starts from WHAT EXISTS (discovery), then asks WHY. Create starts from WHAT YOU WANT.
 
-**Output:**
-- 6 governance docs filled with discovery + conversational content
-- Knowledge graph with 30+ governance nodes
-- Project ready for `/rai-session-start`
+**Inputs:** Project with `rai init --detect` completed, existing codebase.
 
 ## Steps
 
-### Step 1: Verify Prerequisites (Poka-Yoke)
-
-Check that the project is ready for brownfield onboarding.
+### Step 1: Verify Prerequisites
 
 ```bash
-# Verify manifest exists (raise init was run)
-ls .raise/manifest.yaml 2>/dev/null || echo "MISSING: manifest"
-
-# Verify governance templates exist
-ls governance/prd.md governance/vision.md governance/guardrails.md governance/backlog.md governance/architecture/system-context.md governance/architecture/system-design.md 2>/dev/null | wc -l
-
-# Verify conventions were detected (--detect flag was used)
-# guardrails.md should have non-placeholder content from raise init --detect
-grep -c "must-\|should-" governance/guardrails.md 2>/dev/null || echo "0"
+ls .raise/manifest.yaml 2>/dev/null || echo "MISSING"
+ls governance/prd.md governance/vision.md governance/guardrails.md 2>/dev/null | wc -l
+grep -ciE "must-|should-" governance/guardrails.md 2>/dev/null || echo "0"
 ```
 
-**Decision:**
-- Manifest + 6 governance files + guardrails with conventions → Continue
-- No manifest → **STOP.** Tell the user: "Run `rai init --detect` first."
-- Manifest but guardrails are placeholders → Suggest: "Run `rai init --detect` (with `--detect` flag) to analyze your conventions first."
-- No source code found → Suggest: "This looks like a greenfield project. Consider `/rai-project-create` instead."
+| Result | Action |
+|--------|--------|
+| Manifest + 6 files + conventions detected | Continue |
+| No manifest | Stop: "Run `rai init --detect` first." |
+| No conventions in guardrails | Suggest re-running with `--detect` flag |
+| No source code | Suggest `/rai-project-create` instead |
 
-**Verification:** Manifest exists, governance templates exist, conventions detected.
+<verification>
+Manifest exists, governance templates exist, conventions detected.
+</verification>
 
-> **If you can't continue:** No manifest → Run `rai init --detect` first. Always.
-
-### Step 2: Run Discovery Pipeline
-
-Analyze the codebase structure using the discovery CLI.
+### Step 2: Run Discovery & Check Docs
 
 ```bash
-# Scan for code symbols
-rai discover scan . -o json > /tmp/scan-result.json
-
-# Analyze with confidence scoring and module grouping
-rai discover analyze -i /tmp/scan-result.json -o json > /tmp/analysis-result.json
-
-# Also get summary for presentation
-rai discover analyze -i /tmp/scan-result.json -o summary
+rai discover scan . -o json | rai discover analyze -o summary
 ```
 
-**What you get:**
-- Modules with file counts, classes, functions
-- Confidence scores per component
-- Category groupings (core, api, models, tests, etc.)
-
-**Also load detected conventions:**
-```bash
-# Read the guardrails already generated by raise init --detect
-cat governance/guardrails.md
-```
-
-**Verification:** Discovery scan and analysis completed successfully.
-
-> **If you can't continue:** Scan fails → Check if source files exist. Try `rai discover scan . -o summary` to diagnose.
-
-### Step 2.5: Discover Existing Documentation
-
-Before asking the user anything, check if the repo already has documentation that can answer governance questions.
+Also search for existing documentation:
 
 ```bash
-# Look for documentation directories and markdown files
-find . -maxdepth 3 \
-  -not -path "./.git/*" \
-  -not -path "./.raise/*" \
-  -not -path "./governance/*" \
-  -not -path "./.claude/*" \
-  -not -path "./.agent/*" \
-  \( -name "*.md" -o -name "*.rst" -o -name "*.txt" \) \
-  | sort | head -40
-
-# Also check for known doc directories
-ls -d docs/ documentation/ doc/ .docs/ wiki/ pages/ 2>/dev/null
+find . -maxdepth 3 -not -path "./.git/*" -not -path "./.raise/*" -not -path "./governance/*" \( -name "*.md" -o -name "*.rst" \) | head -40
 ```
 
-**Present findings to the user:**
+If docs found, ask user: "Read these to pre-populate governance?" Build coverage map of what's answered vs gaps.
 
-```
-## Documentation found in your repo:
+<verification>
+Discovery complete. Documentation coverage map built.
+</verification>
 
-📁 docs/ — {N} files
-  - {filename}: {one-line description if inferable from name}
-  - ...
+### Step 3: Present Discovery & Fill Gaps
 
-📄 Root markdown files:
-  - README.md
-  - CONTRIBUTING.md
-  - ...
+Present discovery summary (modules, conventions, architecture signals). Ask user to confirm/correct.
 
-Should I read these to pre-populate governance? This will save you from answering questions that are already documented.
-```
+Then ask ONLY for fields not found in code or docs:
+- **Vision:** description, who uses it, why it exists
+- **Capabilities:** 3-5 core things it does → 5-8 RF-XX requirements
+- **Architecture gaps:** external actors/systems, interfaces, branch model
 
-**If no docs found:** Skip directly to Step 3. Proceed with conversational flow.
+<verification>
+All governance fields covered (from discovery + docs + conversation).
+</verification>
 
-**If docs found and user says yes:** Read the relevant files. For each file, extract and map to governance fields:
+### Step 4: Write 6 Governance Docs
 
-| Governance field | Look for in docs |
-|-----------------|-----------------|
-| Vision / description | README intro, project overview, `docs/overview.*`, `docs/intro.*` |
-| Requirements / capabilities | User Stories, `docs/requirements.*`, `docs/features.*`, backlog files |
-| Success criteria / goals | OKRs, acceptance criteria, `docs/goals.*` |
-| Architecture / components | ADRs, `docs/architecture.*`, `docs/design.*`, system docs |
-| External interfaces | API docs, integration docs, `docs/integrations.*` |
-| Guardrails / conventions | CONTRIBUTING, coding standards, `docs/development.*` |
+Same parser contracts as `/rai-project-create`:
+- `vision.md`: `| **{Bold Name}** | {description} |`
+- `prd.md`: `### RF-XX: Title`
+- `guardrails.md`: MERGE detected conventions (don't overwrite), YAML frontmatter `type: guardrails`
+- `backlog.md`: `# Backlog: {name}`, `| E{N} | ... |`
+- `system-context.md`: external interfaces table
+- `system-design.md`: components from DISCOVERED modules (enriched by discovery)
 
-**Track what's been answered:**
+Update `.raise/manifest.yaml` with branch configuration.
 
-After reading docs, build a coverage map:
-```
-✅ Vision: found in README.md (paragraph 1)
-✅ Core capabilities: found in docs/user-stories/ (5 stories)
-✅ Success criteria: found in docs/okrs.md
-❓ External interfaces: not found — will ask
-❓ Branch model: not found — will ask
-```
+<verification>
+All 6 docs written. Detected conventions preserved in guardrails.
+</verification>
 
-**Verification:** User confirmed whether to use existing docs. Coverage map built.
-
-> **If you can't continue:** Docs exist but user says no → Proceed with normal conversational flow from Step 3.
-
-### Step 3: Present Discovery Summary
-
-Present what was discovered to the user for confirmation and correction.
-
-**Display:**
-```
-## Codebase Analysis: {project_name}
-
-**Project type:** Brownfield ({file_count} code files)
-
-**Detected Modules:**
-| Module | Files | Classes | Functions |
-|--------|-------|---------|-----------|
-| {module} | {N} | {N} | {N} |
-
-**Detected Conventions** (from `rai init --detect`):
-- {convention 1 — e.g., "Type hints: 78% coverage"}
-- {convention 2 — e.g., "Testing: pytest, 65% coverage"}
-- {convention 3 — e.g., "Linting: ruff configured"}
-
-**Architecture signals:**
-- {signal 1 — e.g., "FastAPI app with SQLAlchemy models"}
-- {signal 2 — e.g., "CLI with Typer"}
-
-Does this look right? Anything to add or correct?
-```
-
-**Architecture signals** are inferred from discovery data — look for:
-- Web frameworks (FastAPI, Flask, Django, Express, Next.js)
-- ORM/database patterns (SQLAlchemy, Prisma, TypeORM)
-- CLI frameworks (Typer, Click, Commander)
-- Testing frameworks (pytest, jest, vitest)
-- Build tools, CI patterns, deployment signals
-
-**Verification:** User confirms or corrects discovery summary.
-
-> **If you can't continue:** User disagrees significantly → Re-run discovery with different options, or note corrections for manual inclusion.
-
-### Step 4: Fill Gaps (What Code and Docs Can't Tell Us)
-
-Use the coverage map from Step 2.5. Only ask for fields that weren't found in existing documentation.
-
-**If coverage map shows gaps**, ask only for those:
-
-> "I read your documentation and code. A few things I couldn't find:
-> {for each gap, one targeted question}
->
-> Example gaps:
-> - **Description**: what is {project_name} for, who uses it, why it exists? (1 paragraph)
-> - **Success criteria**: how do you know it's working well?
-> - **Core capabilities**: what are the 3-5 main things it does?"
-
-**If coverage map shows no gaps**, skip this step entirely and go to Step 5.
-
-**What you need from this:**
-- Description paragraph → `vision.md` Identity section
-- Core capabilities → RF-XX requirements in `prd.md`
-- Success criteria → PRD Goals section
-- Key outcomes → `vision.md` Outcomes table
-
-**Verification:** All governance fields covered (from docs + this conversation).
-
-> **If you can't continue:** User gives vague answer → Ask: "Who uses this? What problem does it solve for them?"
-
-### Step 5: Fill Architecture Gaps
-
-Use coverage map from Step 2.5. Only ask for architecture fields not found in existing docs.
-
-**If architecture docs were found** (ADRs, system design docs, API docs): extract external interfaces, actors, and components from them. Only ask for what's genuinely missing.
-
-**If architecture gaps remain**, ask only those:
-
-> "Based on the code and your docs, I see: {list from discovery + docs}.
-> {only ask what's missing from the coverage map}:
-> - **Who/what uses {project_name}?** (if not found)
-> - **What external systems does it talk to?** (if not found)
-> - **Anything I missed?** (always ask this)"
-
-**What you need:**
-- External actors and systems → `system-context.md`
-- External interfaces with direction and protocol → `system-context.md` table
-- Confirmation/correction of internal components → `system-design.md` (enriched with discovery data)
-
-**Verification:** External actors, interfaces, and component list confirmed — from docs or conversation.
-
-> **If you can't continue:** User hasn't thought about external boundaries → Help: "If someone drew a box around {project_name}, what arrows go in and out?"
-
-### Step 5.5: Collect Branch Configuration
-
-Ask about the project's branch model. This is stored in `.raise/manifest.yaml` and used by all workflow skills.
-
-**Ask:**
-> "What's your branch model?
-> 1. **Main/stable branch name** — e.g., `main`, `master`
-> 2. **Development/integration branch name** — e.g., `main`, `develop`, `dev`
->
-> If you work directly on `main` with no separate development branch, both are `main`."
-
-**Defaults:** If the user is unsure, default both to `main` (simplest model).
-
-**What you need:**
-- `branches.main` — the stable branch (default: `main`)
-- `branches.development` — the integration branch (default: `main`)
-
-**Update manifest:**
-```bash
-# The manifest was created by rai init. Update it with branch config.
-# Add to .raise/manifest.yaml:
-# branches:
-#   development: {dev_branch}
-#   main: {main_branch}
-```
-
-**Verification:** Branch names captured. Manifest updated.
-
-> **If you can't continue:** User unsure → Default both to `main`. Can change later.
-
-### Step 6: Generate and Write Governance Docs
-
-Write all 6 governance docs using combined discovery + conversation data. **CRITICAL:** Follow the exact format for each doc — the graph parsers use regex patterns to extract nodes.
-
-**IMPORTANT:** For brownfield, `guardrails.md` was already generated by `rai init --detect`. In Step 6c, MERGE detected conventions with any additional guardrails from the conversation rather than overwriting.
-
-#### 6a: Write `governance/vision.md`
-
-```markdown
-# Solution Vision: {project_name}
-
-> Solution vision
-
-## Identity
-
-### Description
-
-{One-paragraph description from Step 4}
-
-## Outcomes
-
-| **Outcome** | **Description** |
-|-------------|-----------------|
-| **{Outcome 1 Name}** | {Description from Step 4} |
-| **{Outcome 2 Name}** | {Description from Step 4} |
-| **{Outcome 3 Name}** | {Description from Step 4} |
-```
-
-**IMPORTANT — Parser contract for vision.md:**
-- Outcomes table MUST have `| **Outcome** |` as header (bold first column)
-- Each data row MUST be `| **{Bold Name}** | {description} |`
-- Parser regex: `\|\s*\*\*([^*]+)\*\*\s*\|\s*(.+?)\s*\|`
-- Aim for 3-5 outcome rows
-
-#### 6b: Write `governance/prd.md`
-
-```markdown
-# PRD: {project_name}
-
-> Product Requirements Document
-
----
-
-## Problem
-
-{Problem description — 2-3 sentences, informed by what you see in the code AND user's stated intent}
-
-## Goals
-
-{Success criteria from Step 4 — bullet list}
-
----
-
-## Requirements
-
-### RF-01: {Requirement 1 Title}
-
-{2-3 sentence description. Cross-reference with discovered modules/components.}
-
-### RF-02: {Requirement 2 Title}
-
-{2-3 sentence description}
-
-### RF-03: {Requirement 3 Title}
-
-{2-3 sentence description}
-```
-
-**IMPORTANT — Parser contract for prd.md:**
-- Each requirement MUST be `### RF-XX: Title` (### heading, RF- prefix, dash-digits, colon, space, title)
-- Parser regex: `^### (RF-\d+):\s*(.+)$`
-- Content below the heading is captured as the requirement body (up to next ### or 20 lines)
-- Aim for 5-8 requirements (RF-01 through RF-08), decomposing user's 3-5 capabilities into specific requirements
-
-#### 6c: Write `governance/guardrails.md`
-
-**For brownfield:** `guardrails.md` was already generated by `rai init --detect` with detected conventions. Read the existing content and MERGE:
-- Keep all guardrails detected from conventions (they reflect actual codebase standards)
-- Add any additional guardrails from the conversation (Step 4 of `/rai-project-create` equivalent, if user mentioned quality concerns)
-- Ensure the file has proper YAML frontmatter and parser-compatible format
-
-If the existing `guardrails.md` from `--detect` already has proper format, you may only need minor additions. Don't overwrite detected conventions.
-
-```markdown
----
-type: guardrails
-version: "1.0.0"
----
-
-# Guardrails: {project_name}
-
-> Code and architecture guardrails
-
----
-
-## Guardrails Activos
-
-### Code Quality
-
-| ID | Level | Guardrail | Verification | Derived from |
-|----|-------|-----------|--------------|--------------|
-| must-code-001 | MUST | {from detected conventions} | {command} | RF-01 |
-| must-code-002 | MUST | {from detected conventions} | {command} | RF-01 |
-
-### Testing
-
-| ID | Level | Guardrail | Verification | Derived from |
-|----|-------|-----------|--------------|--------------|
-| must-test-001 | MUST | {from detected conventions} | {command} | RF-01 |
-```
-
-**IMPORTANT — Parser contract for guardrails.md:**
-- MUST have YAML frontmatter with `type: guardrails`
-- Table under `### {Section Name}` heading
-- Table MUST have header: `| ID | Level | Guardrail | Verification | Derived from |`
-- ID format: `{level}-{category}-{NNN}` (e.g., `must-code-001`, `should-perf-001`)
-- Level: `MUST` or `SHOULD`
-- Aim for 5-10 guardrails across 2-4 sections
-
-#### 6d: Write `governance/backlog.md`
-
-```markdown
-# Backlog: {project_name}
-
-> **Status**: Draft
-
-## Epics
-
-| ID | Epic | Status | Scope | Priority |
-|----|------|--------|-------|----------|
-| E1 | {First epic name} | Draft | — | P1 |
-| E2 | {Second epic name} | Draft | — | P2 |
-```
-
-**IMPORTANT — Parser contract for backlog.md:**
-- Header MUST be `# Backlog: {project_name}` (exact format)
-- Epic table rows: `| E{N} | Name | Status | Scope | Priority |`
-- Parser regex for header: `^# Backlog:\s*(.+)$`
-- Parser regex for epics: `^\|\s*(E\d+)\s*\|`
-- Aim for 2-4 epics derived from the requirements
-
-#### 6e: Write `governance/architecture/system-context.md`
-
-```markdown
-# System Context: {project_name}
-
-> C4 Level 1 — System Context diagram and description
-
-## Overview
-
-{High-level description — what is this system and who uses it? Informed by discovery + conversation.}
-
-## Context Diagram
-
-```
-┌──────────┐       ┌──────────────┐       ┌──────────┐
-│  {Actor}  │──────►│ {project_name} │◄──────│ {System} │
-│          │       │              │       │          │
-└──────────┘       └──────────────┘       └──────────┘
-```
-
-## External Interfaces
-
-| System | Direction | Protocol | Description |
-|--------|-----------|----------|-------------|
-| {System 1} | {Inbound/Outbound/Both} | {HTTP/CLI/SQL/etc} | {What it does} |
-| {System 2} | {Direction} | {Protocol} | {Description} |
-```
-
-#### 6f: Write `governance/architecture/system-design.md`
-
-**For brownfield:** This doc is ENRICHED by discovery data. Components come from actual modules found in the code, not just user description.
-
-```markdown
-# System Design: {project_name}
-
-> C4 Level 2 — Container/component decomposition
-
-## Architecture Overview
-
-{Architecture description — synthesized from discovery analysis and user confirmation from Step 5}
-
-## Components
-
-| Component | Responsibility | Technology |
-|-----------|---------------|------------|
-| {Discovered Module 1} | {Responsibility from analysis + user} | {Detected tech} |
-| {Discovered Module 2} | {Responsibility} | {Tech} |
-
-## Key Decisions
-
-- {Any architectural decisions from conversation or visible in code structure}
-```
-
-**Verification:** All 6 governance docs written with project-specific content. No HTML comment placeholders remain.
-
-> **If you can't continue:** Write fails → Check file permissions. Governance dir should be writable.
-
-### Step 7: Build Graph and Verify (Coverage Gate)
-
-Run the graph builder, then check **coverage** across 4 dimensions — not a node count.
+### Step 5: 4-Dimensional Coverage Gate
 
 ```bash
 rai graph build
 ```
 
-#### G1: Governance Structure
+| Gate | Check | Pass criteria |
+|------|-------|---------------|
+| G1: Governance structure | Parser-extractable content per doc | ≥2 outcomes, ≥3 RF-XX, ≥3 guardrails, ≥1 epic |
+| G2: Module coverage | Discovered modules in governance | ≥80% modules referenced |
+| G3: Doc coverage | Docs read → governance elements | 100% of docs read contributed |
+| G4: Traceability | Guardrails→RF-XX, RF-XX→body text | ≥80% linked |
 
-For each of the 6 docs, verify parser-extractable content exists (not placeholders):
+Present gate results. If PARTIAL (1-2 items): fix specific items. If FAIL: fix docs, rebuild.
 
-```bash
-# vision.md — outcomes table with bold-pipe rows
-grep -c "| \*\*" governance/vision.md
+<verification>
+All 4 gate dimensions pass (or user accepts documented exceptions).
+</verification>
 
-# prd.md — RF-XX requirements
-grep -c "^### RF-" governance/prd.md
+### Step 6: Summary
 
-# guardrails.md — guardrail table rows (must-/should- IDs, case-insensitive)
-grep -ciE "\| (must|should)-" governance/guardrails.md
-
-# backlog.md — epic table rows
-grep -c "| E[0-9]" governance/backlog.md
-
-# system-context.md — external interfaces table
-grep -c "| System\|Inbound\|Outbound\|Both" governance/architecture/system-context.md
-
-# system-design.md — components table
-grep -c "| Component\|[A-Z][a-z].*|" governance/architecture/system-design.md
-```
-
-**Pass criteria:**
-- vision.md: ≥ 2 outcome rows
-- prd.md: ≥ 3 RF-XX requirements
-- guardrails.md: ≥ 3 guardrail rows
-- backlog.md: ≥ 1 epic row
-- system-context.md: interfaces table present
-- system-design.md: ≥ 2 component rows
-
-#### G2: Module Coverage (Code → Governance)
-
-Cross-reference discovered modules against governance:
-
-```bash
-# Get discovered modules
-rai discover scan . -o summary 2>/dev/null | grep "Module:" | awk '{print $2}'
-
-# Check how many appear in system-design.md or prd.md
-# For each module name: grep -i "{module}" governance/architecture/system-design.md governance/prd.md
-```
-
-Count: `covered_modules / total_modules`. **Pass: ≥ 80%.**
-
-If below 80%: list the uncovered modules explicitly — the user decides if they're intentionally excluded (e.g., test utilities) or genuinely missing from governance.
-
-#### G3: Documentation Coverage (Docs Read → Governance)
-
-For each file read in Step 2.5, verify at least one governance element traces back to it:
-
-- Check that content extracted from each doc made it into at least one governance doc
-- This is an inference check — use your reading of both the source docs and the written governance
-- Flag any doc that was read but appears to have contributed nothing
-
-**Pass: 100% of docs read → at least one governance element.**
-
-#### G4: Internal Traceability
-
-```bash
-# Guardrails have Derived from populated (not empty or placeholder)
-grep -A1 "| must-\|should-" governance/guardrails.md | grep -c "RF-"
-
-# Requirements have body content (not just heading)
-# Read prd.md and check each RF-XX heading has ≥1 sentence below it
-```
-
-**Pass criteria:**
-- ≥ 80% of guardrails have `Derived from` with a valid RF-XX
-- All RF-XX requirements have body text (not just heading)
-
----
-
-**Present gate results:**
-
-```
-## Quality Gate
-
-G1 Governance structure:
-  ✅ vision.md — {N} outcomes
-  ✅ prd.md — {N} requirements (RF-01 to RF-{N})
-  ❌ guardrails.md — 0 rows (format issue)
-  ✅ backlog.md — {N} epics
-  ✅ system-context.md — interfaces table present
-  ✅ system-design.md — {N} components
-
-G2 Module coverage: {N}/{M} modules in governance ({%})
-  {✅ or ⚠️ list of uncovered modules if any}
-
-G3 Doc coverage: {N}/{M} docs read → mapped to governance
-  {✅ or ❌ list any docs that contributed nothing}
-
-G4 Traceability:
-  {N}/{M} guardrails have Derived from
-  {N}/{M} requirements have body content
-
-Gate: {PASS / PARTIAL / FAIL} — {specific fix instructions if not PASS}
-```
-
-**Decision:**
-- All green → **Gate passed.** Continue to Step 8.
-- PARTIAL (1-2 items failing) → Fix specific items, re-run affected checks. Do NOT rebuild full graph unless structure changed.
-- FAIL (G1 failures or G3 failures) → Fix docs, rebuild graph, re-run gate.
-
-**Verification:** Gate results presented. All 4 dimensions pass or user accepts documented exceptions.
-
-> **If you can't continue:** G2 below 80% → Ask user: "These modules have no governance coverage — intentional or missing?" Proceed based on their answer.
-
-### Step 8: Summary and Next Steps
-
-Present what was created and what to do next.
-
-**Display:**
 ```
 ## Project Onboarded: {project_name}
-
-**Discovery:**
-- {N} modules analyzed, {N} components detected
-- {N} conventions detected and encoded as guardrails
-
-**Governance docs filled:**
-- governance/vision.md — {N} outcomes
-- governance/prd.md — {N} requirements
-- governance/guardrails.md — {N} guardrails (from detected conventions + conversation)
-- governance/backlog.md — {N} epics
-- governance/architecture/system-context.md — context diagram + interfaces
-- governance/architecture/system-design.md — {N} components (from discovery)
-
-**Graph:** {total} governance nodes extracted
-
-**Next steps:**
-1. Run `/rai-session-start` to begin your first working session
-2. Review the generated governance docs and refine as needed
-3. Start your first epic with `/rai-epic-design`
+Discovery: {N} modules, {N} components, {N} conventions
+Governance: {N} outcomes, {N} requirements, {N} guardrails, {N} epics
+Graph: {total} governance nodes
+Next: /rai-session-start
 ```
-
-**Verification:** Summary displayed with node counts.
-
-> **If you can't continue:** Everything should be done by now. If graph is still <30 nodes after fixes, proceed anyway with a warning — the user can refine docs later.
 
 ## Output
 
 | Item | Destination |
 |------|-------------|
-| Filled governance docs | `governance/` (prd.md, vision.md, guardrails.md, backlog.md, architecture/) |
-| Knowledge graph | `.raise/rai/memory/index.json` (via `rai graph build`) |
-| Summary | Displayed to user |
+| Governance docs | `governance/` (6 files) |
+| Knowledge graph | `.raise/rai/memory/index.json` |
+| Next | `/rai-session-start` |
 
-## Notes
+## Quality Checklist
 
-### Parser Contract
-
-Generated content **MUST** match parser regex patterns exactly. The graph parsers extract nodes from specific Markdown structures — if the format is wrong, nodes won't be extracted and the 30+ gate will fail. The contracts are identical to `/rai-project-create`.
-
-### Idempotency
-
-The skill checks for existing non-placeholder content before writing. For brownfield, `guardrails.md` likely already has real content from `--detect` — merge, don't overwrite.
-
-### Brownfield vs Greenfield
-
-This skill is for **brownfield** projects — existing codebases with source files. It asks "what do you already have?" first (discovery), then "what's your intent?" (conversation). For greenfield projects starting from scratch, use `/rai-project-create`.
-
-### Discovery Data Flow
-
-```
-rai init --detect
-  → .raise/manifest.yaml (project type, file count)
-  → governance/guardrails.md (detected conventions)
-  → CLAUDE.md (project context)
-
-rai discover scan + analyze
-  → Modules, classes, functions, components
-  → Architecture signals (frameworks, patterns)
-
-Documentation discovery (Step 2.5) ← NEW
-  → docs/, README.md, user stories, ADRs, specs
-  → Coverage map: what's answered vs. what's a gap
-
-Conversation (gap-filling only)
-  → Only what wasn't found in code or docs
-
-Combined → 6 governance docs → rai graph build → 30+ nodes
-```
+- [ ] Discovery run before asking questions (code-first, not conversation-first)
+- [ ] Existing docs checked before asking user (minimize redundant questions)
+- [ ] Detected conventions MERGED into guardrails (not overwritten)
+- [ ] Parser contracts followed exactly (same as `/rai-project-create`)
+- [ ] 4-dimensional gate checked (not just node count)
+- [ ] NEVER overwrite `guardrails.md` conventions from `--detect`
 
 ## References
 
-- Prerequisite: `rai init --detect` (convention detection from S7.1)
-- Discovery: `rai discover scan`, `rai discover analyze`
-- Next: `/rai-session-start`
+- Prerequisite: `rai init --detect`
 - Sibling: `/rai-project-create` (greenfield)
+- Discovery: `rai discover scan`, `rai discover analyze`
 - Parser sources: `src/rai_cli/governance/parsers/*.py`
-- Template sources: `src/rai_cli/rai_base/governance/*.md`
+- Next: `/rai-session-start`

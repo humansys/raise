@@ -1,8 +1,9 @@
 """Validator for SKILL.md files.
 
-Validates skill structure against RaiSE schema including:
+Validates skill structure against ADR-040 contract including:
 - Required fields (name, description, metadata)
-- Required sections (Purpose, Context, Steps, Output)
+- Required sections (7 canonical: Purpose through References)
+- Line count target (≤150 body lines)
 - Naming conventions ({domain}-{action})
 - Hook paths (warns if script not found)
 """
@@ -53,8 +54,19 @@ class ValidationResult(BaseModel):
         return len(self.warnings)
 
 
-# Required sections in skill body (case-insensitive match)
-REQUIRED_SECTIONS = ["Purpose", "Context", "Steps", "Output"]
+# ADR-040 canonical sections (7, fixed order)
+REQUIRED_SECTIONS = [
+    "Purpose",
+    "Mastery Levels",
+    "Context",
+    "Steps",
+    "Output",
+    "Quality Checklist",
+    "References",
+]
+
+# ADR-040 line count target for skill body
+MAX_BODY_LINES = 150
 
 # Pattern for {domain}-{action} naming convention
 NAMING_PATTERN = re.compile(r"^[a-z]+-[a-z]+(-[a-z]+)*$")
@@ -73,14 +85,23 @@ def _validate_required_fields(skill: Skill, errors: list[str]) -> None:
 
 
 def _validate_required_sections(skill: Skill, errors: list[str]) -> None:
-    """Check required sections in body."""
+    """Check required sections in body (ADR-040: 7 canonical sections)."""
     body_lower = skill.body.lower()
 
     for section in REQUIRED_SECTIONS:
-        # Look for ## Section (case-insensitive)
+        # Match "## Section" with optional suffix (e.g., "## Mastery Levels (ShuHaRi)")
         pattern = f"## {section.lower()}"
         if pattern not in body_lower:
             errors.append(f"Missing required section: {section}")
+
+
+def _validate_line_count(skill: Skill, warnings: list[str]) -> None:
+    """Warn if skill body exceeds ADR-040 line count target."""
+    body_lines = len(skill.body.strip().splitlines())
+    if body_lines > MAX_BODY_LINES:
+        warnings.append(
+            f"Body has {body_lines} lines (target: ≤{MAX_BODY_LINES})"
+        )
 
 
 def _validate_naming_convention(skill: Skill, warnings: list[str]) -> None:
@@ -130,6 +151,7 @@ def validate_skill(skill: Skill) -> ValidationResult:
 
     _validate_required_fields(skill, errors)
     _validate_required_sections(skill, errors)
+    _validate_line_count(skill, warnings)
     _validate_naming_convention(skill, warnings)
     _validate_hook_paths(skill, warnings)
 

@@ -3,8 +3,7 @@ name: rai-quality-review
 description: >
   Critical code review with external auditor perspective. Catches what linters,
   type checkers, and coverage gates miss: semantic bugs, type lies, test muda,
-  API design issues, and security concerns. Grounded in evidence from ICSE
-  research, Google testing practices, and OWASP.
+  API design issues, and security concerns.
 
 license: MIT
 
@@ -12,152 +11,104 @@ metadata:
   raise.work_cycle: story
   raise.frequency: on-demand
   raise.prerequisites: story-implement
-  raise.distribution: internal
+  raise.version: "1.0.0"
+  raise.visibility: internal
 ---
 
 # Quality Review
 
 ## Purpose
 
-Act as an external auditor reviewing code that just passed all automated gates (pyright strict, ruff, pytest, coverage). Find what the machines missed. Semantic bugs account for 51% of all missed bugs in code review (ICSE, arxiv 2205.09428) — linters catch 0% of these.
+Act as an external auditor reviewing code that passed all automated gates. Find what the machines missed — semantic bugs account for 51% of all missed bugs in code review (ICSE, arxiv 2205.09428).
 
-**Core question:** "If someone audits this code with an LLM, what would they find?"
+## Mastery Levels (ShuHaRi)
 
-## When to Use
+- **Shu**: Apply all audit categories systematically, explain each finding
+- **Ha**: Focus on highest-risk areas (type honesty, test muda), skip low-risk
+- **Ri**: Pattern-match to known vulnerability classes, minimal ceremony
 
-- After `/rai-story-implement` completes and all gates pass
-- Before `/rai-story-review` (catch issues before they become retrospective items)
-- On-demand for any code that feels "too clean" — that's when assumptions hide
+## Context
 
-## Inputs
+| Condition | Action |
+|-----------|--------|
+| After `/rai-story-implement`, all gates pass | Run quality review |
+| Before `/rai-story-review` | Catch issues before retrospective |
+| Code feels "too clean" | Assumptions may be hiding — review |
 
-- Story ID (to find changed files)
-- Passing gates (pyright, ruff, pytest) — prerequisite, not sufficient
+**Inputs:** Story ID (to find changed files), passing gates (pyright, ruff, pytest).
 
 ## Steps
 
 ### Step 1: Identify Changed Files
 
 ```bash
-# Files changed in this story (commits on current branch vs parent)
 git diff --name-only $(git merge-base HEAD v2)..HEAD -- '*.py'
 ```
 
-Read every changed file. You cannot review code you haven't read (PAT-E-187: Code as Gemba).
+Read every changed file. You cannot review code you haven't read.
 
 ### Step 2: Semantic Correctness Audit
 
-For each changed file, check:
+**Type honesty:** Check `type: ignore` comments (each is a potential lie), `cast()` honesty, annotations claiming more specific types than runtime provides.
 
-**Type honesty:**
-- Are there `type: ignore` comments? Each one is a potential lie. Is the ignore justified or hiding a real mismatch?
-- Does any annotation claim a more specific type than the runtime provides? (e.g., annotating `Any` as `type`, `str` as `Literal`)
-- Are `cast()` calls honest? Does the cast match what actually flows through at runtime?
+**Logic correctness:** Inverted conditionals (#1 semantic bug), off-by-one in ranges/slices, wrong variable in expressions (copy-paste), unhandled edge cases (empty, None, zero-length).
 
-**Logic correctness:**
-- Could any conditional be inverted? (The #1 semantic bug pattern)
-- Are there off-by-one risks in ranges, slices, or boundary checks?
-- Is the right variable used in every expression? (Copy-paste errors with similar names)
-- Are edge cases handled? Empty inputs, None, zero-length collections, missing keys
-
-**Error handling:**
-- Are exceptions too broad (`except Exception`) without justification?
-- Are exceptions swallowed silently (bare `except:` or `except: pass`)?
-- Is error information preserved in re-raises? (`raise X from exc`)
+**Error handling:** Overly broad `except Exception`, swallowed exceptions, missing `raise X from exc`.
 
 ### Step 3: Test Quality Audit
 
-Apply these 7 evidence-based heuristics to every test file:
+Apply these heuristics to every test file:
 
-| # | Heuristic | Question to ask | Red flag |
-|---|-----------|-----------------|----------|
-| 1 | **Mutation Survival** | "If I changed the code's behavior (flip a conditional, change a return value), would this test fail?" | Test passes regardless of code change |
-| 2 | **Refactoring Resilience** | "If I refactored internals without changing the public contract, would this test break?" | Test asserts on internal calls, not behavior |
-| 3 | **Behavior Specification** | "Does this test name describe a behavior (given-when-then) or a structural element (test_method_X)?" | Name mirrors code structure, not behavior |
-| 4 | **Magic Literal** | "Is this assertion against a hardcoded value copied from the implementation?" | `assert len(__all__) == 21`, `assert X == "literal_from_source"` |
-| 5 | **Mock Depth** | "Does the test mock more than one layer? Does mock setup encode implementation knowledge?" | Mock returns mock returns mock |
-| 6 | **Deletion** | "If I deleted this test entirely, what bug could escape that no other test catches?" | No unique bug coverage |
-| 7 | **Spec Independence** | "Can I write this assertion from the requirements/docstring alone, without reading the implementation?" | Assertion requires reading source to understand |
+| # | Heuristic | Red Flag |
+|---|-----------|----------|
+| 1 | Mutation Survival | Test passes regardless of code behavior change |
+| 2 | Refactoring Resilience | Test asserts on internals, not behavior |
+| 3 | Behavior Specification | Name mirrors code structure, not behavior |
+| 4 | Magic Literal | Assertion against hardcoded value from implementation |
+| 5 | Mock Depth | Mock returns mock returns mock |
+| 6 | Deletion | No unique bug coverage if test deleted |
+| 7 | Spec Independence | Assertion requires reading source to understand |
 
-**Classify each finding:**
-- **Muda** (waste): Test exists for coverage, not confidence. Recommend deletion or replacement.
-- **Fragile**: Test will break on refactor. Recommend rewriting as behavior test.
-- **Valuable**: Test catches real bugs. Leave as-is.
+Classify: **Muda** (waste, recommend deletion) / **Fragile** (breaks on refactor) / **Valuable** (leave as-is).
 
-### Step 4: API Surface Audit
+### Step 4: API Surface & Security Audit
 
-For any module with `__all__` or public exports:
+**API:** Lean `__all__`, clear naming, no internal leaks, backward compatibility.
 
-- **Lean API**: Does `__all__` expose only what consumers need? Every export is a maintenance commitment.
-- **Naming clarity**: Do public names communicate intent? Would a new developer understand what `get_pm_adapters()` returns from the name alone?
-- **Internal leak**: Are `_private` functions accidentally exposed? Are implementation details leaking through type hints?
-- **Backward compatibility**: Could any change break existing consumers? (relevant for published packages)
+**Security:** Entry point trust model, input validation at boundaries, dependency justification, no secret exposure in logs/errors.
 
-### Step 5: Security & Supply Chain Audit
-
-For code that loads external code, handles user input, or crosses trust boundaries:
-
-- **Entry points**: Does `ep.load()` execute arbitrary code? Is the trust model documented? (Checkmarx Oct 2024: entry points are a supply chain vector)
-- **Input validation**: Is user/external input validated at the boundary?
-- **Dependency trust**: Are new dependencies justified? Could they be avoided?
-- **Secret exposure**: Are secrets, tokens, or credentials at risk of logging or error messages?
-
-### Step 6: Present Findings
-
-Structure findings as:
+### Step 5: Present Findings
 
 ```markdown
 ## Quality Review: {story_id}
 
 ### Critical (fix before merge)
-- [Finding with file:line, explanation, and fix suggestion]
-
 ### Recommended (improve code quality)
-- [Finding with explanation and suggested alternative]
-
 ### Observations (no action needed)
-- [Patterns noted for future reference]
-
 ### Verdict
-- [ ] PASS — No critical findings
-- [ ] PASS WITH RECOMMENDATIONS — Fix recommended items
-- [ ] FAIL — Critical findings must be addressed
+- [ ] PASS / PASS WITH RECOMMENDATIONS / FAIL
 ```
 
-**Rules for findings:**
-- Every finding must reference a specific file:line
-- Every finding must explain WHY it matters (not just WHAT is wrong)
-- Every finding must suggest a concrete fix
-- Do NOT flag style issues that ruff/pyright already catch
-- Do NOT add findings just to have findings — "no issues found" is a valid outcome
+Every finding: specific file:line, WHY it matters, concrete fix suggestion.
 
-## What This Skill Does NOT Do
+## Output
 
-- Replace linters (ruff handles style, pyright handles types)
-- Replace tests (pytest validates behavior)
-- Replace the retrospective (`/rai-story-review` captures learnings)
-- Generate code (this is review only — implementation is separate)
+| Item | Destination |
+|------|-------------|
+| Review findings | Presented inline, saved if requested |
+| Verdict | PASS, PASS WITH RECOMMENDATIONS, or FAIL |
+| Next | `/rai-story-review` |
 
-## Quality Standards
+## Quality Checklist
 
-| Metric | Target |
-|--------|--------|
-| Review time | <15 minutes per story |
-| False positive rate | <20% (findings should be actionable) |
-| Coverage | All changed .py files read |
-
-## Evidence Base
-
-This skill's heuristics are grounded in:
-- **ICSE research**: Semantic bugs = 51% of missed bugs (arxiv 2205.09428)
-- **Google Testing Blog**: "Test behavior, not implementation" (2013); coverage as signal not gate (2020); mutation testing at scale (2021)
-- **TDD founders**: Beck, Fowler, Cooper — convergent on behavior-based testing
-- **Checkmarx**: Entry point supply chain attacks (Oct 2024)
-- **testsmells.org**: 20+ cataloged test smells (Garousi et al., 166 sources)
-
-Full evidence catalog: `work/research/quality-review/evidence-catalog.md`
+- [ ] All changed .py files read before reviewing
+- [ ] Every finding cites specific file:line
+- [ ] Every finding explains WHY (not just WHAT)
+- [ ] Style issues already caught by ruff/pyright are excluded
+- [ ] "No issues found" is a valid outcome — do not invent findings
 
 ## References
 
 - Evidence: `work/research/quality-review/evidence-catalog.md`
-- Complements: `/rai-story-implement` (before), `/rai-story-review` (after)
+- Complements: `/rai-architecture-review` (proportionality), `/rai-story-review` (retrospective)
+- Research: ICSE semantic bugs (arxiv 2205.09428), Google Testing Blog, OWASP
