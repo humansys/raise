@@ -221,6 +221,9 @@ class UnifiedGraph:
     def iter_concepts(self) -> Iterator[ConceptNode]:
         """Iterate over all concepts in the graph.
 
+        Skips nodes that fail deserialization (e.g. schema drift from a removed
+        plugin) and emits a warning instead of crashing. See RAISE-136.
+
         Yields:
             ConceptNode instances for each node.
 
@@ -231,7 +234,15 @@ class UnifiedGraph:
         node_id: str
         for node_id in self.graph.nodes:
             data: dict[str, Any] = dict(self.graph.nodes[node_id])
-            yield self._reconstruct_node(node_id, data)
+            try:
+                yield self._reconstruct_node(node_id, data)
+            except Exception as e:
+                logger.warning(
+                    "Skipping node '%s' (type=%s): %s",
+                    node_id,
+                    data.get("type", "unknown"),
+                    e,
+                )
 
     def iter_relationships(self) -> Iterator[ConceptEdge]:
         """Iterate over all relationships in the graph.

@@ -385,3 +385,40 @@ class TestGraphNodeDeserialization:
         assert type(retrieved) is GraphNode  # exact type, not subclass
         assert retrieved.type == "jira.sprint"
         assert "not registered" in caplog.text
+
+    def test_iter_concepts_skips_invalid_node(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        """iter_concepts skips nodes with schema drift and emits a warning.
+
+        Simulates a node saved by a now-removed plugin that lacks required fields.
+        The valid node must still be returned; the invalid one must be skipped,
+        not crash the process.
+        """
+        import logging
+
+        graph = UnifiedGraph()
+        # Valid node
+        graph.add_concept(
+            ConceptNode(
+                id="PAT-001",
+                type="pattern",
+                content="good node",
+                created="2026-01-01",
+            )
+        )
+        # Invalid node — missing required fields (content, created), simulating
+        # schema drift from a removed plugin.
+        graph.graph.add_node(
+            "BAD-001",
+            type="removed.plugin.type",
+        )
+
+        with caplog.at_level(logging.WARNING):
+            concepts = list(graph.iter_concepts())
+
+        # Invalid node skipped — does not raise
+        assert len(concepts) == 1
+        assert concepts[0].id == "PAT-001"
+        # Warning emitted containing the bad node's ID
+        assert "BAD-001" in caplog.text
