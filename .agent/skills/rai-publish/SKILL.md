@@ -123,7 +123,7 @@ This will:
 
 ```bash
 # Check GitHub Actions
-echo "Verify release at: https://github.com/humansys-io/raise-commons/actions"
+echo "Verify release at: https://github.com/humansys/raise/actions"
 ```
 
 ## Notes

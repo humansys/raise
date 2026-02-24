@@ -94,7 +94,7 @@ Bumps version, updates CHANGELOG.md, creates commit + tag, pushes to origin.
 
 ### Step 7: Verify
 
-Direct to GitHub Actions: `https://github.com/humansys-io/raise-commons/actions`
+Direct to GitHub Actions: `https://github.com/humansys/raise/actions`
 
 ## Output
 
