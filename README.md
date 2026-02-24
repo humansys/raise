@@ -57,7 +57,7 @@ rai --help
 # 1. Clone and checkout the development branch
 git clone https://gitlab.com/humansys-demos/product/raise1/raise-commons.git
 cd raise-commons
-git checkout v2
+git checkout dev
 
 # 2. Install in development mode
 uv pip install -e ".[dev]"
@@ -302,14 +302,14 @@ raise-commons/
 
 ```
 main (stable releases)
-  └── v2 (development)
+  └── dev (development)
         └── epic/e{N}/{name}
               └── story/s{N}.{M}/{name}
 ```
 
-- Work on `v2` (development branch)
-- Stories branch from and merge back to their epic or `v2`
-- `main` receives releases from `v2`
+- Work on `dev` (development branch)
+- Stories branch from and merge back to their epic or `dev`
+- `main` receives releases from `dev`
 
 ---
 

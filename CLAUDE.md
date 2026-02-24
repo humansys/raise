@@ -50,8 +50,8 @@ SESSION: /rai-session-start → [work] → /rai-session-close
 - Simple first — simple heuristics over complex solutions
 
 ## Branch Model
-main (stable) → v2 (development) → epic/e{N}/{name} → story/s{N}.{M}/{name}
-Stories merge to epic, epics merge to v2, v2 merges to main at release.
+main (stable) → dev (development) → epic/e{N}/{name} → story/s{N}.{M}/{name}
+Stories merge to epic, epics merge to dev, dev merges to main at release.
 
 ## CLI Quick Reference
 - cmd: rai init | sig: [--name TEXT] [--path PATH] [--detect] | notes: --detect analyzes conventions
