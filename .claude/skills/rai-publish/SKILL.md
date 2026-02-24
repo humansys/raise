@@ -63,7 +63,7 @@ Present suggestion and ask for confirmation.
 ### Step 3: Run Quality Gates
 
 ```bash
-rai publish check
+rai release check
 ```
 
 If any gates fail, stop and help fix them before proceeding.
@@ -79,7 +79,7 @@ If changes, commit: `git commit -m "chore: sync public skills for distribution"`
 ### Step 5: Dry Run Release
 
 ```bash
-rai publish release --bump {type} --dry-run
+rai release publish --bump {type} --dry-run
 ```
 
 Present the plan. Ask for confirmation before executing.
@@ -87,7 +87,7 @@ Present the plan. Ask for confirmation before executing.
 ### Step 6: Execute Release
 
 ```bash
-rai publish release --bump {type}
+rai release publish --bump {type}
 ```
 
 Bumps version, updates CHANGELOG.md, creates commit + tag, pushes to origin.
@@ -115,6 +115,6 @@ Direct to GitHub Actions: `https://github.com/humansys-io/raise-commons/actions`
 
 ## References
 
-- CLI: `rai publish check`, `rai publish release`
+- CLI: `rai release check`, `rai release publish`
 - GitHub Actions: `.github/workflows/release.yml`
 - Sync script: `scripts/sync-skills.py`

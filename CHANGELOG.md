@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-02-24
+
+### Added
+- Skill Excellence (E250): 27 ADR-040 compliant skills, ~65% line reduction across all skill definitions
+- `/rai-debug` v2.1.0: triage tier (quick/standard/deep) for proportionate root cause analysis
+- `/rai-architecture-review`: evaluate design proportionality and necessity using Beck's four rules
+- `/rai-quality-review`: critical code review with external auditor perspective
+- `/rai-problem-shape`: guided problem definition at portfolio level (RAISE-200)
+- `/rai-framework-sync`: sync framework files across locations after architectural decisions
+- `/rai-publish`: structured release workflow with quality gates
+
+### Fixed
+- `iter_concepts`: graceful degradation on unknown `NodeType` — graph queries no longer crash on unrecognized node types (RAISE-136)
+- CI: `uv sync --extra dev` ensures `pytest` is installed in pipeline (RAISE-256)
+
+### Breaking Changes
+- `rai memory generate` removed — functionality integrated into `rai graph build`
+- `rai memory add-calibration` removed — use `rai signal emit-calibration`
+- `rai memory add-session` removed — use `rai signal emit-session`
+- All 27 skills updated (E250): re-run `rai init` in existing projects to get updated skill definitions
+
 ## [2.0.4] - 2026-02-20
 
 ### Fixed
@@ -94,7 +115,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys-io/raise-commons/compare/v2.0.3...HEAD
+[Unreleased]: https://github.com/humansys-io/raise-commons/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/humansys-io/raise-commons/compare/v2.0.4...v2.1.0
+[2.0.4]: https://github.com/humansys-io/raise-commons/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a9...v2.0.3
 [2.0.0a9]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a8...v2.0.0a9
 [2.0.0a8]: https://github.com/humansys-io/raise-commons/compare/v2.0.0a6...v2.0.0a8
