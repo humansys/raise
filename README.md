@@ -42,11 +42,10 @@ RaiSE is a methodology + toolkit for professional developers who use AI assistan
 ### Quick Install (from PyPI)
 
 ```bash
-# Current release is alpha — requires --pre flag
-pip install --pre rai-cli
+pip install rai-cli
 
 # Or with uv:
-uv pip install --prerelease=allow rai-cli
+uv pip install rai-cli
 
 # Verify
 rai --help
@@ -197,14 +196,36 @@ Skills are structured processes that guide AI-assisted development. Run them as 
 | `/rai-epic-plan` | Sequence stories into plans |
 | `/rai-epic-close` | Epic retrospective and merge |
 
-### Other Skills
+### Discovery Skills
+| Skill | Purpose |
+|-------|---------|
+| `/rai-discover-start` | Initialize codebase discovery |
+| `/rai-discover-scan` | Extract and describe components |
+| `/rai-discover-validate` | Validate synthesized descriptions with human review |
+| `/rai-discover-document` | Generate architecture docs from discovery data |
+
+### Project Skills
+| Skill | Purpose |
+|-------|---------|
+| `/rai-welcome` | One-time developer onboarding |
+| `/rai-project-create` | Guide greenfield project setup |
+| `/rai-project-onboard` | Guide brownfield project onboarding |
+
+### Analysis & Quality
 | Skill | Purpose |
 |-------|---------|
 | `/rai-research` | Epistemologically rigorous research |
 | `/rai-debug` | Root cause analysis (5 Whys, Ishikawa) |
+| `/rai-quality-review` | Critical code review with external auditor perspective |
+| `/rai-architecture-review` | Evaluate design proportionality and necessity |
+| `/rai-problem-shape` | Guided problem definition at portfolio level |
+
+### Maintenance
+| Skill | Purpose |
+|-------|---------|
 | `/rai-docs-update` | Sync architecture docs with code |
-| `/rai-discover-start` | Initialize codebase discovery |
-| `/rai-discover-scan` | Extract and describe components |
+| `/rai-framework-sync` | Sync framework files across locations |
+| `/rai-publish` | Structured release workflow with quality gates |
 
 ---
 
@@ -214,20 +235,20 @@ The `rai` CLI provides deterministic operations:
 
 ```bash
 # Build Rai's knowledge graph from project artifacts
-rai memory build
+rai graph build
 
 # Query governance concepts
-rai memory context mod-session
+rai graph context mod-session
 
 # Query Rai's memory
-rai memory query "velocity patterns"
+rai graph query "velocity patterns"
 
 # Validate the memory graph (structural + completeness)
-rai memory validate
+rai graph validate
 
 # Visualize the memory graph as interactive HTML
-rai memory viz                    # Opens in browser
-rai memory viz --output graph.html  # Custom output path
+rai graph viz                    # Opens in browser
+rai graph viz --output graph.html  # Custom output path
 
 # List releases and their associated epics
 rai release list
@@ -245,7 +266,7 @@ rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 
 ```
 raise-commons/
-├── .claude/skills/      # Claude Code skills (24 skills)
+├── .claude/skills/      # Claude Code skills (27 skills)
 │
 ├── framework/           # Public textbook (concepts, reference)
 │   ├── reference/       #   Constitution, glossary, philosophy
@@ -321,7 +342,7 @@ From the [Constitution](framework/reference/constitution.md):
 
 ## Status
 
-This is a pre-release (`v2.0.0-alpha`). The framework is being used in production but the API may change.
+Current stable release: `v2.1.0`. The framework is being used in production.
 
 We value your feedback:
 
