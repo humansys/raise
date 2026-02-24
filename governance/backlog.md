@@ -44,7 +44,7 @@
 | [RAISE-211](https://humansys.atlassian.net/browse/RAISE-211) | **Adapter Foundation** | ✅ Complete | `work/epics/raise-211-adapter-foundation/scope.md` | — |
 | [RAISE-242](https://humansys.atlassian.net/browse/RAISE-242) | **Skill Ecosystem** | 📋 Backlog | — | P1 (v2.1 partial, v2.3 full) |
 | [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | ✅ Complete | `work/epics/raise-247-cli-ontology/scope.md` | — |
-| [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | 🚀 In Progress | `work/epics/raise-248-hooks-gates/scope.md` | P1 (v2.2) |
+| [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | ✅ Complete | `work/epics/raise-248-hooks-gates/scope.md` | — |
 | [RAISE-249](https://humansys.atlassian.net/browse/RAISE-249) | **Artifact Ontology & Contract Chain** | ✅ Complete | `work/epics/raise-249-artifact-ontology/scope.md` | — |
 
 ### Release Roadmap (decided SES-234, 2026-02-21)
@@ -56,7 +56,7 @@
 
 **v2.2 — Extensibility** (~13 stories)
 - RAISE-211: Adapter Foundation ✅ (7 stories — Protocol contracts, entry points, TierContext, CLI)
-- RAISE-248: Hooks & Gates (7 stories — event system, telemetry hook, built-in gates)
+- RAISE-248: Hooks & Gates ✅ (7 stories, 3.07x avg velocity)
 - Outcome: pluggable architecture, skills lose 68% ceremony overhead
 
 **v2.3 — Skill Ecosystem** (~2+ stories)
