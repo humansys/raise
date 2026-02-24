@@ -30,11 +30,8 @@ Load context bundle from CLI, interpret signals, and propose focused work for th
 - **Ha**: Explain only new or non-obvious signals
 - **Ri**: Minimal output — context line, focus, signals, "Go."
 
-## Context
-
 **When to use:** At the start of every working session.
-
-**First-time user:** If no profile exists, ask for the developer's name and pass `--name "Name"`.
+If no profile exists, ask for the developer's name and pass `--name "Name"`.
 
 ## Steps
 
@@ -44,31 +41,9 @@ Load context bundle from CLI, interpret signals, and propose focused work for th
 rai session start --project "$(pwd)" --context
 ```
 
-This loads the developer profile, session state, and assembles the orientation bundle with an available context manifest.
+Loads developer profile, session state, and orientation bundle. If graph unavailable: run `rai graph build` first.
 
-If graph unavailable: run `rai graph build` first.
-
-### Step 2: Load Task-Relevant Context
-
-Based on the manifest from Step 1, load priming sections:
-
-```bash
-rai session context --sections governance,behavioral --project "$(pwd)"
-```
-
-| Session type | Recommended sections |
-|-------------|---------------------|
-| Feature work | `governance,behavioral` |
-| Research/ideation | `behavioral` |
-| Maintenance/bugs | `governance` |
-| First session / new project | `governance,behavioral,coaching` |
-| Near deadline (<7 days) | Add `deadlines,progress` to above |
-
-Adapt based on manifest counts (skip empty sections) and what the human says they want to work on.
-
-Skip this step if continuity from the narrative is sufficient.
-
-### Step 3: Interpret & Present
+### Step 2: Interpret & Present
 
 1. **Check signals** (priority order):
    - Next session prompt → guidance from your past self, highest-priority continuity
@@ -77,11 +52,9 @@ Skip this step if continuity from the narrative is sufficient.
    - Pending decisions or blockers → address first
    - Communication preferences → adapt tone
 
-2. **Check parking lot** (`dev/parking-lot.md`) for stale items (>2 weeks)
+2. **Propose session focus** from: pending items > current story/phase > deadlines
 
-3. **Propose session focus** from: pending items > current story/phase > deadlines
-
-4. **Present** (adapt verbosity to developer level):
+3. **Present** (adapt verbosity to developer level):
 
 ```
 ## Session: YYYY-MM-DD
@@ -91,25 +64,8 @@ Skip this step if continuity from the narrative is sufficient.
 **Signals:** [any, or "None"]
 ```
 
-## Output
-
-| Item | Destination |
-|------|-------------|
-| Session summary | Displayed (not saved) |
-| Signals | Displayed |
-| Session state | `~/.rai/developer.yaml` (via CLI in Step 1) |
-
-## Quality Checklist
-
-- [ ] Bundle loaded and manifest reviewed
-- [ ] Priming sections match session type
-- [ ] Next session prompt addressed (if present)
-- [ ] Stale parking lot items flagged (if any)
-- [ ] Session focus proposed with clear goal
-
 ## References
 
 - Profile: `~/.rai/developer.yaml`
 - Session state: `.raise/rai/session-state.yaml`
-- Parking lot: `dev/parking-lot.md`
 - Complement: `/rai-session-close`
