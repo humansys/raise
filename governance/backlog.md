@@ -46,7 +46,7 @@
 | [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | ✅ Complete | `work/epics/raise-247-cli-ontology/scope.md` | — |
 | [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | ✅ Complete | `work/epics/raise-248-hooks-gates/scope.md` | — |
 | [RAISE-249](https://humansys.atlassian.net/browse/RAISE-249) | **Artifact Ontology & Contract Chain** | ✅ Complete | `work/epics/raise-249-artifact-ontology/scope.md` | — |
-| RAISE-250 | **Skill Excellence** | ✅ Complete | `work/epics/raise-250-skill-excellence/scope.md` | — |
+| [RAISE-257](https://humansys.atlassian.net/browse/RAISE-257) | **Skill Excellence** | ✅ Complete | `work/epics/raise-250-skill-excellence/scope.md` | — |
 
 ### Release Roadmap (decided SES-234, 2026-02-21)
 
@@ -154,7 +154,7 @@ Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (10)
 
 | ID | Title | Description | Status | Priority | Found In | Target |
 |----|-------|-------------|--------|----------|----------|--------|
-| [RAISE-134](https://humansys.atlassian.net/browse/RAISE-134) | Context leak: session data cross-project | CLI resolves project from CWD; `session close` from wrong directory writes to wrong `.raise/`. Poka-yoke needed. | 🔴 Selected for Dev | P1 | v2.0.0a1 | v2.1 |
+| [RAISE-134](https://humansys.atlassian.net/browse/RAISE-134) | Context leak: session data cross-project | Fixed by RAISE-139 (CWD poka-yoke guard on session close). | ✅ Done | P1 | v2.0.0a1 | v2.1 |
 | [RAISE-136](https://humansys.atlassian.net/browse/RAISE-136) | Graph schema crash on unknown NodeType | `NodeType` Literal rejects unknown types at deserialization. Need graceful degradation (skip + warn). | 🔴 Selected for Dev | P1 | v2.0.0a1 | v2.0.0a6 |
 | **HF-3** | Type annotations incomplete in governance models | `governance/models.py:131` - ExtractionResult.concepts field has partial type `list[Unknown]`. Causes pyright errors in strict mode. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
 | **HF-4** | Type annotations incomplete in profile schema | `onboarding/profile.py:168,216` - CoachingState.corrections and deadlines fields have partial types `list[Unknown]`. Pyright strict mode failures. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
@@ -318,6 +318,7 @@ E-DEMO learnings feed into RAISE-141 (backlog backends).
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 2.6.0 | 2026-02-24 | Rai | JIRA sync: RAISE-128/153/168/211/247/248/249 → Done, RAISE-134 → Done (was stale), RAISE-236 → Done (sync-skills bug fixed today). Skill Excellence assigned RAISE-257 (was local-only RAISE-250). |
 | 2.5.0 | 2026-02-23 | Rai | E250 Skill Excellence complete: 27/27 skills ADR-040 compliant (7 sections, ≤150 lines), ~65% total line reduction, validator + scaffold updated, sync pipeline verified |
 | 2.4.0 | 2026-02-16 | Rai | RAISE-153 complete, RAISE-144 activated with Kurigage-driven stories (RAISE-158/160/161), SES-MIGRATED + test leakage fixes |
 | 2.3.0 | 2026-02-15 | Rai | Full JIRA sync: E10/E19-E22 → RAISE-140-143, Engineering Health epic (RAISE-144), RAISE-134/136 bugs, RAISE-137-139 urgent stories, Fix Version strategy |
@@ -332,4 +333,4 @@ E-DEMO learnings feed into RAISE-141 (backlog backends).
 ---
 
 *Updated by: Rai + Emilio*
-*Last sync: 2026-02-23*
+*Last sync: 2026-02-24*
