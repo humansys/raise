@@ -39,8 +39,8 @@ adapters use for their own cross-cutting concerns.
 | S248.3 | Built-in TelemetryHook | S | Done | COMMUNITY hook that replaces manual `rai signal emit` in skills |
 | S248.4 | Wire events into CLI commands | M | Done | Add `emit()` calls to 6 CLI command files, 9 event types |
 | S248.5 | WorkflowGate Protocol and registry | M | Done | Standalone `WorkflowGate` Protocol, `rai gate check` command, no event dependency |
-| S248.6 | Built-in gates + GateBridgeHook | S | Pending | 4 quality gates + bridge hook that wires gates into `before:` events |
-| S248.7 | Remove ceremony from skills | M | Pending | Strip telemetry/prerequisite steps from all 22 skills |
+| S248.6 | Built-in gates + GateBridgeHook | S | Done | 4 quality gates + bridge hook that wires gates into `before:` events |
+| S248.7 | Remove ceremony from skills | M | Done | Strip telemetry/prerequisite steps from all 22 skills |
 
 **Total:** 7 stories (4M + 2S + 1M), estimated 5-7 days
 
@@ -288,12 +288,12 @@ Track B:  S248.5 (gate protocol) ────────→ S248.6 (gates + bri
 | S248.3 | S | Done | 15 min | 2.0x | 22 tests, first real hook E2E |
 | S248.4 | M | Done | 19 min | 4.74x | Quality review caught adapter semantics bug |
 | S248.6 | S | Done | 10 min | 3.0x | 46 new tests, bridge pattern validated |
-| S248.7 | M | Pending | — | — | |
+| S248.7 | M | Done | 12 min | 3.75x | 195 lines deleted, ceremony-free skills |
 
 **Milestones:**
 - [x] M1: Walking Skeleton
 - [x] M2: Auto-firing
-- [ ] M3: Ceremony-free skills
+- [x] M3: Ceremony-free skills
 - [ ] M4: Epic Complete
 
 ---
