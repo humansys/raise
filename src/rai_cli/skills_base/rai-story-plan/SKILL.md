@@ -15,7 +15,7 @@ metadata:
   raise.next: story-implement
   raise.gate: gate-plan
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.1.0"
   raise.visibility: public
 ---
 
@@ -71,6 +71,7 @@ Divide story into atomic, individually verifiable tasks. One commit per task.
 **Per task:**
 - Description, files to create/modify
 - TDD cycle: RED (failing test) → GREEN (minimal code) → REFACTOR
+- AC reference: link to `story.md` Gherkin scenario (if exists)
 - Verification command (`pytest`, `ruff check`, `pyright`)
 - Size (XS/S/M/L) and dependencies
 

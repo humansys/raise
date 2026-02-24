@@ -15,7 +15,7 @@ metadata:
   raise.next: story-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.1.0"
   raise.visibility: public
 ---
 
@@ -81,9 +81,10 @@ On story branch (or epic branch with skip stated).
 
 ### Step 3: Define Scope & Commit
 
-Create `work/epics/e{N}-{name}/stories/s{N}.{M}-scope.md` with:
-- In scope / out of scope
-- Done criteria (observable outcomes)
+Create TWO artifacts:
+
+1. `work/epics/e{N}-{name}/stories/s{N}.{M}-story.md` using `templates/story.md` — user story (Connextra), Gherkin AC, SbE examples. For XS stories, informal AC is acceptable.
+2. `work/epics/e{N}-{name}/stories/s{N}.{M}-scope.md` — in scope/out of scope, done criteria (observable outcomes).
 
 Commit:
 
@@ -118,12 +119,14 @@ Show the developer:
 | Item | Destination |
 |------|-------------|
 | Story branch | `story/s{N}.{M}/{slug}` (or epic branch for S/XS) |
+| User Story | `stories/s{N}.{M}-story.md` (Connextra + Gherkin AC) |
 | Scope commit | On story branch |
 | Next | `/rai-story-design` |
 
 ## Quality Checklist
 
 - [ ] Epic branch verified before creating story branch
+- [ ] User Story created from `templates/story.md` (Connextra + Gherkin AC)
 - [ ] Scope commit documents in/out boundaries and done criteria
 - [ ] Story listed in epic scope document
 - [ ] NEVER create story branch without verifying epic branch exists
