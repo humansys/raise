@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `/rai-problem-shape`: guided problem definition at portfolio level (RAISE-200)
 - `/rai-framework-sync`: sync framework files across locations after architectural decisions
 - `/rai-publish`: structured release workflow with quality gates
+- Contract Chain restored (RAISE-266): typed artifact handoff between lifecycle skills — `brief.md`, `story.md`, `design.md` templates with producer/consumer references across 5 skills
 
 ### Fixed
 - `iter_concepts`: graceful degradation on unknown `NodeType` — graph queries no longer crash on unrecognized node types (RAISE-136)
