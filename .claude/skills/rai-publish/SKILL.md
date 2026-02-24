@@ -24,44 +24,31 @@ metadata:
 
 Guide the human through a structured release workflow with quality gates, version bumping, changelog management, and PyPI publishing via GitHub Actions.
 
+## Mastery Levels (ShuHaRi)
+
+- **Shu**: Follow all steps, explain each gate and action
+- **Ha**: Skip explanations, focus on decisions (bump type, changelog entries)
+- **Ri**: Minimal prompts — present summary, confirm, execute
+
 ## Context
 
-**When to use:**
-- When ready to publish a new version to PyPI
-- When you want to verify release readiness
-- Before creating a release tag
+**When to use:** When ready to publish a new version to PyPI, verify release readiness, or create a release tag.
 
-**Inputs required:**
-- Clean working tree (no uncommitted changes)
-- Passing quality gates
-
-**Output:**
-- Version bumped in pyproject.toml and __init__.py
-- CHANGELOG.md updated with versioned section
-- Git commit + tag created
-- Push triggers GitHub Actions for PyPI upload
+**Inputs:** Clean working tree (no uncommitted changes), passing quality gates.
 
 ## Steps
 
 ### Step 1: Review Changes Since Last Release
 
 ```bash
-# Show last tag and changes since
 LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "none")
 echo "Last release: $LAST_TAG"
-
-if [ "$LAST_TAG" != "none" ]; then
-    git log "$LAST_TAG"..HEAD --oneline
-else
-    git log --oneline -20
-fi
+[ "$LAST_TAG" != "none" ] && git log "$LAST_TAG"..HEAD --oneline || git log --oneline -20
 ```
 
-Present a summary of what changed. This helps the human decide the bump type.
+Present a summary of what changed to help decide bump type.
 
 ### Step 2: Suggest Bump Type
-
-Based on the changes, suggest a bump type:
 
 | Change Type | Suggested Bump |
 |-------------|---------------|
@@ -71,8 +58,7 @@ Based on the changes, suggest a bump type:
 | Pre-release iteration | `alpha`, `beta`, or `rc` |
 | Pre-release to stable | `release` |
 
-Present suggestion and ask for confirmation:
-> "Based on the changes, I suggest a **minor** bump (new features, no breaking changes). Agree?"
+Present suggestion and ask for confirmation.
 
 ### Step 3: Run Quality Gates
 
@@ -82,25 +68,17 @@ rai publish check
 
 If any gates fail, stop and help fix them before proceeding.
 
-### Step 4: Sync Public Skills to Distribution
+### Step 4: Sync Public Skills
 
 ```bash
-# Filter skills for PyPI distribution (exclude internal skills)
 python scripts/sync-skills.py
 ```
 
-This syncs only public skills from `.claude/skills/` to `src/rai_cli/skills_base/`, excluding internal tools (rai-framework-sync, rai-publish). Check the output confirms 22 public skills synced.
+If changes, commit: `git commit -m "chore: sync public skills for distribution"`
 
-If changes were made, commit them:
-```bash
-git add src/rai_cli/skills_base/
-git commit -m "chore: sync public skills for distribution"
-```
-
-### Step 5: Execute Release (Dry Run First)
+### Step 5: Dry Run Release
 
 ```bash
-# Show what will happen
 rai publish release --bump {type} --dry-run
 ```
 
@@ -112,29 +90,31 @@ Present the plan. Ask for confirmation before executing.
 rai publish release --bump {type}
 ```
 
-This will:
-1. Bump version in pyproject.toml and __init__.py
-2. Update CHANGELOG.md (promote [Unreleased] to versioned section)
-3. Create release commit
-4. Create version tag
-5. Push to origin (triggers GitHub Actions for PyPI upload)
+Bumps version, updates CHANGELOG.md, creates commit + tag, pushes to origin.
 
 ### Step 7: Verify
 
-```bash
-# Check GitHub Actions
-echo "Verify release at: https://github.com/humansys-io/raise-commons/actions"
-```
+Direct to GitHub Actions: `https://github.com/humansys-io/raise-commons/actions`
 
-## Notes
+## Output
 
-- **Never publishes directly to PyPI** — GitHub Actions handles that via Trusted Publishers
-- The `release.yml` workflow triggers on `v*` tags
-- Use `--skip-check` only in emergencies (requires explicit confirmation)
-- `--dry-run` is always safe and shows the full plan
+| Item | Destination |
+|------|-------------|
+| Version bumped | `pyproject.toml`, `__init__.py` |
+| Changelog updated | `CHANGELOG.md` |
+| Release commit + tag | Git history |
+| PyPI upload | Triggered via GitHub Actions |
+
+## Quality Checklist
+
+- [ ] All quality gates pass before release
+- [ ] Public skills synced to distribution
+- [ ] Dry run reviewed and confirmed by human
+- [ ] NEVER publish directly to PyPI — GitHub Actions handles it
+- [ ] NEVER skip gates without explicit human confirmation
 
 ## References
 
 - CLI: `rai publish check`, `rai publish release`
 - GitHub Actions: `.github/workflows/release.yml`
-- Research: `work/research/RES-PUBLISH-001/`
+- Sync script: `scripts/sync-skills.py`
