@@ -10,8 +10,8 @@ from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 
 TOTAL_SKILLS = len(DISTRIBUTABLE_SKILLS)
 
-# Skills that include reference subdirectories (more than just SKILL.md)
-SKILLS_WITH_REFERENCES = {"rai-epic-plan", "rai-research", "rai-story-design"}
+# Extra files beyond SKILL.md (templates/, references/, _references/)
+EXTRA_SKILL_FILES = 6  # epic-close:1, epic-design:1, epic-plan:2, research:1, story-design:1
 
 
 class TestScaffoldSkills:
@@ -79,8 +79,8 @@ class TestScaffoldSkills:
         """Should list all copied files in result."""
         result = scaffold_skills(tmp_path)
 
-        # 17 skills × 1 SKILL.md + 3 reference files = 20 files
-        expected_files = TOTAL_SKILLS + len(SKILLS_WITH_REFERENCES)
+        # N skills × 1 SKILL.md + extra files (templates, references)
+        expected_files = TOTAL_SKILLS + EXTRA_SKILL_FILES
         assert len(result.files_copied) == expected_files
         assert len(result.files_skipped) == 0
         assert not result.already_existed
