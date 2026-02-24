@@ -61,36 +61,6 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-docs-update",
     # Tools
     "rai-debug",
-    "rai-research",
-] = [
-    # Session lifecycle
-    "rai-session-close",
-    "rai-session-start",
-    # Story lifecycle
-    "rai-story-close",
-    "rai-story-design",
-    "rai-story-implement",
-    "rai-story-plan",
-    "rai-story-review",
-    "rai-story-start",
-    # Epic lifecycle
-    "rai-epic-close",
-    "rai-epic-design",
-    "rai-epic-plan",
-    "rai-epic-start",
-    # Discovery
-    "rai-discover-document",
-    "rai-discover-scan",
-    "rai-discover-start",
-    "rai-discover-validate",
-    # Onboarding
-    "rai-project-create",
-    "rai-project-onboard",
-    "rai-welcome",
-    # Governance
-    "rai-docs-update",
-    # Tools
-    "rai-debug",
     "rai-problem-shape",
     "rai-research",
 ]
