@@ -159,15 +159,7 @@ Also update the summary line below the table to reflect the new count.
 
 > **Why this matters:** The backlog is the authoritative epic index. Epics created without a backlog entry become invisible to the ontology graph — release edges, queries, and planning all depend on epic nodes existing.
 
-### Step 6: Emit Telemetry
-
-```bash
-rai signal emit-work epic E{N} --event start --phase init
-```
-
-**Verification:** Telemetry emitted.
-
-### Step 7: Display Lifecycle
+### Step 6: Display Lifecycle
 
 ```markdown
 ## Epic Lifecycle
@@ -191,7 +183,6 @@ rai signal emit-work epic E{N} --event start --phase init
 
 - **Branch:** `epic/e{N}/{slug}` created from `{dev_branch}`
 - **Commit:** Scope commit with objective and boundaries
-- **Telemetry:** Epic start recorded
 - **Next:** `/rai-epic-design`
 
 ## Summary Template
