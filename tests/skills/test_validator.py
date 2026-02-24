@@ -195,6 +195,27 @@ class TestValidateSkillFile:
         assert not result.is_valid
         assert any("not found" in e.lower() for e in result.errors)
 
+    def test_pydantic_validation_error_surfaces_as_error(self, tmp_path: Path) -> None:
+        """ValidationError during Pydantic model construction returns error, not unhandled exception."""
+        # metadata has work_cycle but missing version (required field) — valid YAML, invalid schema
+        skill_content = """\
+---
+name: session-start
+description: Test skill.
+metadata:
+  raise.work_cycle: session
+---
+
+# Test
+"""
+        skill_file = tmp_path / "SKILL.md"
+        skill_file.write_text(skill_content)
+
+        result = validate_skill_file(skill_file)
+
+        assert not result.is_valid
+        assert any("schema" in e.lower() or "validation" in e.lower() for e in result.errors)
+
     def test_invalid_yaml(self, tmp_path: Path) -> None:
         """Invalid YAML frontmatter returns error."""
         skill_content = """\

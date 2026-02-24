@@ -14,7 +14,7 @@ import re
 from enum import Enum
 from pathlib import Path
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from rai_cli.skills.parser import ParseError, parse_skill
 from rai_cli.skills.schema import Skill
@@ -188,6 +188,11 @@ def validate_skill_file(path: str | Path) -> ValidationResult:
         return ValidationResult(
             path=str_path,
             errors=[f"Parse error: {e}"],
+        )
+    except ValidationError as e:
+        return ValidationResult(
+            path=str_path,
+            errors=[f"Schema error: {e}"],
         )
 
     # Validate the parsed skill
