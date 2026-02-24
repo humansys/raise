@@ -11,7 +11,7 @@ from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
 TOTAL_SKILLS = len(DISTRIBUTABLE_SKILLS)
 
 # Extra files beyond SKILL.md (templates/, references/, _references/)
-EXTRA_SKILL_FILES = 6  # epic-close:1, epic-design:1, epic-plan:2, research:1, story-design:1
+EXTRA_SKILL_FILES = 9  # epic-close:1, epic-design:2, epic-plan:2, epic-start:1, research:1, story-design:1, story-start:1
 
 
 class TestScaffoldSkills:
