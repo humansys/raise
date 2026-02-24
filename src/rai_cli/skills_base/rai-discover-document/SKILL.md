@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "2.0.0"
   raise.visibility: public
 ---
 
@@ -23,291 +23,104 @@ metadata:
 
 ## Purpose
 
-Generate architecture documentation from discovery data. Produces a complete documentation set: high-level system docs (C4 Context + Container), per-module docs with YAML frontmatter, and a compact index for AI context loading.
+Generate architecture documentation from discovery data: system-level C4 docs, per-module docs with YAML frontmatter, domain model, and a compact index for AI context loading.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu**: Generate all levels, explain each section.
-**Ha**: Generate with targeted updates for changed modules.
-**Ri**: Incremental regeneration, preserve human sections.
+- **Shu**: Generate all levels, explain each section
+- **Ha**: Targeted updates for changed modules only
+- **Ri**: Incremental regeneration, preserve human-written sections
 
 ## Context
 
-**When to use:**
-- After `rai discover scan` + `rai discover analyze` pipeline
-- When architecture has changed significantly
-- When onboarding new contributors
+**When to use:** After discover-scan + discover-validate pipeline completes, or when architecture changes significantly.
 
-**When to skip:**
-- Minor code changes that don't affect module structure
-- Within same epic unless modules added/removed
+**When to skip:** Minor code changes that don't affect module structure.
 
-**Inputs required:**
-- `work/discovery/components-validated.json` — validated component catalog
-- Source tree at `src/rai_cli/` — module structure and imports
-- Module `__init__.py` docstrings — self-described purpose
-- `governance/guardrails.md` — quality constraints (for system-design doc)
-- `framework/reference/constitution.md` — design principles (for system-design doc)
-- `governance/vision.md` — system identity (for system-context doc)
-
-**Output:**
-- `governance/architecture/system-context.md` — C4 Context level (what, who, why)
-- `governance/architecture/system-design.md` — C4 Container level (how, constraints, drift)
-- `governance/architecture/domain-model.md` — DDD bounded contexts, context map, decision guidance
-- `governance/architecture/index.md` — compact index (<2K tokens)
-- `governance/architecture/modules/*.md` — per-module docs with YAML frontmatter
+**Inputs:** `work/discovery/components-validated.json`, source tree, governance docs (`guardrails.md`, `vision.md`, optionally `constitution.md`).
 
 ## Steps
 
-### Step 1: Load Discovery Data
+### Step 1: Analyze Module Structure
 
-Read `work/discovery/components-validated.json` and count components per module.
+Check `work/discovery/context.yaml` for detected language, then for each module:
 
-### Step 2: Analyze Module Structure
+| Language | Module marker | Strategy |
+|----------|--------------|----------|
+| Python | `__init__.py` | Read docstring, scan `from pkg.X import` |
+| C# | `.csproj` + namespaces | Group by top-level layer directory |
+| PHP | `composer.json` PSR-4 | Group by namespace segment |
 
-First, check `work/discovery/context.yaml` for the detected language(s).
+Per module: count components, build dependency map, identify entry points, list public API.
 
-**Python projects** — for each directory under `src/<package>/` with `__init__.py`:
-1. Read `__init__.py` docstring for self-described purpose
-2. Scan imports to build dependency map (`from <package>.X import`)
-3. Count components from validated JSON
-4. Identify entry points (CLI commands that import this module)
-5. List key files and public API
+<verification>
+All modules identified with dependency data.
+</verification>
 
-**C# / .NET projects** — Python has `__init__.py` as module markers; C# uses namespaces.
-Use the following strategy:
-1. Read `.csproj` files to identify the root namespace and project structure
-2. Treat each top-level layer directory as a module: `Application/`, `Domain/`,
-   `Infrastructure/`, `Api/` (Clean Architecture convention). If not present, use the
-   top-level namespace segments instead
-3. For each layer/module: count components from validated JSON that match that namespace
-4. Identify key files (entry point controllers, handlers, or `Program.cs`)
-5. List public interfaces and key abstractions (e.g., `I*Repository`, `I*Service`)
+### Step 2: Generate Module Docs
 
-**PHP / Symfony projects** — use namespace directories from `composer.json` autoload map:
-1. Read `composer.json` `autoload.psr-4` to identify namespace → directory mappings
-2. Treat each top-level namespace segment as a module
-3. Apply same steps 3–5 as C# above
+Write `governance/architecture/modules/{name}.md` per module:
 
-### Step 3: Generate Module Docs
+**YAML frontmatter:** type, name, purpose, status, depends_on, depended_by, components.
 
-For each module, write `governance/architecture/modules/<name>.md` with:
+**Body sections:** Purpose (2-3 sentences), Architecture, Key Files, Dependencies table, Conventions.
 
-**YAML frontmatter** (machine-parseable):
-```yaml
----
-type: module
-name: <module_name>
-purpose: "<one-line purpose>"
-status: current
-depends_on: [<list of module names>]
-depended_by: [<list of module names>]
-components: <count>
----
-```
+Write genuine explanatory prose — a new contributor should understand the module's role.
 
-**Markdown body** (human-readable):
-- **Purpose** — What this module does and why it exists (2-3 sentences)
-- **Architecture** — How it works internally, key data flows
-- **Key Files** — Important files with one-line descriptions
-- **Dependencies** — Table of what it depends on and why
-- **Conventions** — Module-specific patterns and rules
+<verification>
+All modules have docs with valid YAML frontmatter.
+</verification>
 
-Write genuine explanatory prose. A new contributor should understand the module's role, constraints, and how to work with it.
+### Step 3: Generate System Docs & Index
 
-### Step 4: Generate Compact Index
+**System Context** (`system-context.md`): From `governance/vision.md` — what, who, why, external systems, non-goals.
 
-Write `governance/architecture/index.md` with:
-- System overview (2-3 sentences)
-- Module map table (name, purpose, depends_on, components)
-- Data flow diagram (text-based)
-- Key constraints
+**System Design** (`system-design.md`): From `governance/guardrails.md` + module deps — layers, data flows, constraints, drift detection.
 
-Target: under 2K tokens for session-loadable context.
+**Domain Model** (`domain-model.md`): From module deps + component catalog — bounded contexts, context map, design decision guidance.
 
-### Step 5: Generate High-Level Architecture Docs
+**Index** (`index.md`): System overview, module map table, data flow diagram, key constraints. Target: <2K tokens.
 
-After module docs are complete, generate the C4 Context and Container docs. These ground both humans and AI on the system's identity, boundaries, and constraints.
+<verification>
+All 4 system-level docs exist. Index under 2K tokens.
+</verification>
 
-#### 5a: System Context (`system-context.md`)
+### Step 4: Validate & Rebuild Graph
 
-Read `governance/vision.md`. If `framework/reference/constitution.md` exists, read it too
-(it is only bootstrapped in projects initialized with `rai init`, not in all brownfield repos).
-Write `governance/architecture/system-context.md` with:
-
-**YAML frontmatter:**
-```yaml
----
-type: architecture_context
-project: <project_name>
-version: <current_version>
-status: current
-tech_stack: { ... }
-external_dependencies: [...]
-users: [...]
-governed_by: [...]
----
-```
-
-**Markdown body:**
-- **What Is <project>** — 2-3 sentences: identity, what it does, what it is NOT
-- **The RaiSE Triad** — How this system fits in the human-AI-methodology collaboration
-- **Who Uses It** — Table of actors and how they interact
-- **External Systems** — Diagram showing system boundary and integrations
-- **What It Does** — Command domains with brief descriptions
-- **What It Does NOT Do** — Explicit non-goals (prevents scope creep and drift)
-- **Design Philosophy** — Constitution principles that shape this system
-- **Quality Attributes** — Measurable targets from guardrails
-- **Governance Traceability** — Links to source governance docs
-
-#### 5b: System Design (`system-design.md`)
-
-Read `governance/guardrails.md`, module docs (for dependency data), and relevant ADRs. Write `governance/architecture/system-design.md` with:
-
-**YAML frontmatter:**
-```yaml
----
-type: architecture_design
-project: <project_name>
-status: current
-layers: [...]
-architectural_decisions: [...]
-guardrails_reference: "governance/guardrails.md"
-# constitution_reference is optional — only include if the file exists:
-# constitution_reference: "framework/reference/constitution.md"
----
-```
-
-**Markdown body:**
-- **Layered Architecture** — Diagram of all layers with modules in each
-- **Data Flows** — The 3 core flows: Knowledge Graph Construction, Codebase Discovery, Session Lifecycle
-- **Architectural Constraints** — Tables of structural, design, quality, and constitution constraints
-- **Key Patterns** — Recurring patterns: Extract→Structure→Query, YAML frontmatter as schema, three-tier memory, skills+toolkit
-- **What Constitutes Drift** — Explicit table of drift types, examples, and detection methods
-- **Directory Layout** — Annotated tree with layer assignments
-- **Governance Traceability** — Links to ADRs, guardrails, constitution
-
-**Why this matters:** These docs are the **intentional architecture**. Deviating from them is drift. Guardrails are not just code quality rules — they are architectural constraints that shape how every module is written. The constitution principles are not aspirational — they constrain every design decision.
-
-#### 5c: Domain Model (`domain-model.md`)
-
-Using module docs (dependency data, purposes, public APIs), component catalog, and import analysis, write `governance/architecture/domain-model.md` with:
-
-**YAML frontmatter:**
-```yaml
----
-type: architecture_domain_model
-project: <project_name>
-status: current
-bounded_contexts: [...]
-shared_kernel: { modules: [...] }
-application_layer: { modules: [...] }
----
-```
-
-**Markdown body:**
-- **Bounded Contexts** — Diagram showing all contexts and their modules. For each context:
-  - What it owns (and what it does NOT own)
-  - Aggregate roots (main entry point classes/functions)
-  - Domain vocabulary table (terms with context-specific meanings)
-  - Invariants (rules that must always hold)
-- **Context Map** — How contexts communicate: diagram + pattern table (supplier-consumer, file-based integration, anti-corruption layer, fire-and-forget)
-- **Design Decision Guidance** — "If you're adding X, it belongs in Y because Z" table. Include guidance for: when to create a new module, when to add a new NodeType/EdgeType
-- **Domain Boundaries to Protect** — Table of intentional boundaries and what crossing them prevents
-- **Open Questions** — Areas where intent can't be inferred from code — flag for human validation
-
-**How to derive this:** The module docs provide dependency data and public APIs. The component catalog provides internal structure. Import analysis reveals actual communication patterns. The domain model synthesizes this structural data into DDD concepts. **Humans validate the intent** — especially bounded context naming, boundary rationale, and decision guidance.
-
-### Step 6: Validate
-
-- All modules documented
-- System-context and system-design docs exist and are current
-- YAML frontmatter parses cleanly
-- Index under 2K tokens
-- Dependency map is accurate (cross-check with imports)
-- Guardrails referenced in system-design match current `guardrails.md`
-- Constitution principles referenced match current `constitution.md`
-
-### Step 7: Rebuild Graph
+- All modules documented, frontmatter parses cleanly
+- Dependency map matches actual imports
+- Guardrails/constitution references are current
 
 ```bash
 rai graph build
-```
-
-Verify module nodes appear in graph:
-```bash
 rai graph query "module dependencies"
 ```
 
-## YAML Frontmatter Schema
+<verification>
+Module nodes appear in graph. No stale references.
+</verification>
 
-### Module Docs
+## Output
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| type | string | Yes | Always "module" |
-| name | string | Yes | Module name (directory name) |
-| purpose | string | Yes | One-line purpose description |
-| status | string | No | "current", "deprecated", or "planned" |
-| depends_on | list[str] | Yes | Module names this depends on |
-| depended_by | list[str] | No | Module names that depend on this |
-| entry_points | list[str] | No | CLI commands using this module |
-| public_api | list[str] | No | Key exported symbols |
-| components | int | No | Component count from discovery |
-| constraints | list[str] | No | Architectural constraints |
+| Item | Destination |
+|------|-------------|
+| Module docs | `governance/architecture/modules/*.md` |
+| System context | `governance/architecture/system-context.md` |
+| System design | `governance/architecture/system-design.md` |
+| Domain model | `governance/architecture/domain-model.md` |
+| Index | `governance/architecture/index.md` |
 
-### System Context
+## Quality Checklist
 
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| type | string | Yes | Always "architecture_context" |
-| project | string | Yes | Project name |
-| version | string | No | Current version |
-| status | string | Yes | "current" or "deprecated" |
-| tech_stack | object | Yes | Technology stack map |
-| external_dependencies | list[str] | Yes | External systems |
-| users | list[str] | Yes | Who uses this system |
-| governed_by | list[str] | Yes | Paths to governance docs |
-
-### System Design
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| type | string | Yes | Always "architecture_design" |
-| project | string | Yes | Project name |
-| status | string | Yes | "current" or "deprecated" |
-| layers | list[object] | Yes | Layer definitions with modules |
-| architectural_decisions | list[str] | No | ADR references |
-| guardrails_reference | string | Yes | Path to guardrails doc |
-| constitution_reference | string | No | Path to constitution doc (omit if file does not exist) |
-
-### Domain Model
-
-| Field | Type | Required | Description |
-|-------|------|----------|-------------|
-| type | string | Yes | Always "architecture_domain_model" |
-| project | string | Yes | Project name |
-| status | string | Yes | "current" or "deprecated" |
-| bounded_contexts | list[object] | Yes | Context definitions (name, modules, description) |
-| shared_kernel | object | Yes | Shared kernel modules |
-| application_layer | object | Yes | Application layer modules |
-
-## Notes
-
-- **No AI inference in CLI** — the CLI graph builder parses frontmatter deterministically
-- **AI synthesizes prose** — this skill generates the human-readable sections
-- **Preserve human edits** — on re-run, check for sections not in template and append them
-- **Skip placeholders** — modules with no real code (engines, handlers) can be omitted
-- **High-level docs are intentional architecture** — deviating from them is drift
-- **Guardrails are architectural** — they shape code structure, not just code style
-- **Dual-purpose docs** — serve human onboarding AND AI grounding; both must understand the system from these docs alone
+- [ ] Module frontmatter includes all required fields (type, name, purpose, depends_on)
+- [ ] Prose explains WHY, not just WHAT (new contributor test)
+- [ ] Index under 2K tokens for session-loadable context
+- [ ] On re-run, preserve human-edited sections (append, don't overwrite)
+- [ ] NEVER generate placeholder docs for modules with no real code
 
 ## References
 
+- Previous: `/rai-discover-validate`
 - Graph builder: `src/rai_cli/context/builder.py` (`load_architecture()`)
 - Components: `work/discovery/components-validated.json`
-- Design: `work/stories/discover-document/design.md`
-- Research: `work/research/architecture-knowledge-layer/`
-- Constitution: `framework/reference/constitution.md`
-- Guardrails: `governance/guardrails.md`
-- Vision: `governance/vision.md`
+- Governance: `governance/guardrails.md`, `governance/vision.md`
