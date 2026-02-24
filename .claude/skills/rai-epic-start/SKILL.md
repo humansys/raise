@@ -14,7 +14,7 @@ metadata:
   raise.next: epic-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.1.0"
   raise.visibility: public
 ---
 
@@ -78,11 +78,10 @@ On new epic branch.
 
 ### Step 3: Define Scope & Commit
 
-Create `work/epics/e{N}-{name}/scope.md` with:
-- Objective (1-2 sentences)
-- In scope / out of scope
-- Planned stories (S{N}.1, S{N}.2, ...)
-- Done criteria
+Create TWO artifacts:
+
+1. `work/epics/e{N}-{name}/brief.md` using `templates/brief.md` — hypothesis, success metrics, appetite, rabbit holes.
+2. `work/epics/e{N}-{name}/scope.md` — objective, in/out scope, planned stories, done criteria.
 
 Commit:
 
@@ -121,6 +120,7 @@ Show the developer:
 | Item | Destination |
 |------|-------------|
 | Epic branch | `epic/e{N}/{slug}` from `{dev_branch}` |
+| Epic Brief | `work/epics/e{N}-{name}/brief.md` |
 | Scope commit | On epic branch |
 | Backlog entry | `governance/backlog.md` |
 | Next | `/rai-epic-design` |
@@ -128,6 +128,7 @@ Show the developer:
 ## Quality Checklist
 
 - [ ] Branch created from `{dev_branch}` (not from another epic or story branch)
+- [ ] Epic Brief created from `templates/brief.md`
 - [ ] Scope commit includes objective and boundaries
 - [ ] Epic registered in `governance/backlog.md`
 - [ ] NEVER create epic branch from wrong base — causes merge pain

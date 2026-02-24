@@ -15,7 +15,7 @@ metadata:
   raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.1.0"
   raise.visibility: public
 ---
 
@@ -37,7 +37,7 @@ Create a lean story specification optimized for both human review (clear intent)
 
 **When to skip:** Simple stories (<3 components, obvious implementation) → go to `/rai-story-plan`.
 
-**Inputs:** Story from backlog (ID, description, acceptance criteria), epic scope document.
+**Inputs:** Story from backlog, User Story artifact (`story.md` from `/rai-story-start`), epic scope/design documents.
 
 ## Steps
 
@@ -65,6 +65,8 @@ Complexity assessed. Risk/UX gates evaluated.
 </verification>
 
 ### Step 2: Frame What & Why
+
+Load `story.md` (from `/rai-story-start`) if it exists — use its User Story as starting frame.
 
 - **Problem**: What gap does this fill? (1-2 sentences)
 - **Value**: Why does this matter? (1-2 sentences, measurable or observable)
@@ -107,6 +109,8 @@ Can't envision examples → approach not concrete enough, return to Step 3.
 </if-blocked>
 
 ### Step 5: Define Acceptance Criteria
+
+If `story.md` has Gherkin AC, reference them here — refine, don't duplicate. If no `story.md`, define from scratch:
 
 - **MUST**: Required for completion (3-5 items, specific and testable)
 - **SHOULD**: Nice-to-have (1-3 items)
