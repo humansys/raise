@@ -53,7 +53,6 @@ Initialize a feature with verified context, dedicated branch, and scope commit. 
 **Output:**
 - Feature branch created and checked out
 - Scope commit with in/out criteria
-- Telemetry emitted for feature start
 
 ## Steps
 
@@ -213,25 +212,10 @@ Show the story lifecycle for orientation:
 
 **Verification:** Lifecycle displayed; next step clear.
 
-### Step 8: Emit Feature Start (Telemetry)
-
-Record the start of the story lifecycle:
-
-```bash
-rai signal emit-work story {story_id} --event start --phase design
-```
-
-**Example:** `rai signal emit-work story S15.1 -e start -p design`
-
-**Verification:** Telemetry emitted.
-
-> **If you can't continue:** CLI not available → Skip; telemetry is optional.
-
 ## Output
 
 - **Branch:** `feature/{epic_id}/{story_id}` created and active (or epic branch for S/XS)
 - **Commit:** Scope commit with in/out and done criteria (optional for S/XS on epic branch)
-- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: start)
 - **Next:** `/rai-story-design`
 
 ## Feature Start Summary Template
@@ -279,7 +263,6 @@ The scope commit serves multiple purposes:
 For urgency, minimum viable start:
 1. Create branch
 2. Commit with one-line scope
-3. Emit telemetry
 
 Full scope documentation can follow in `/rai-story-design` or `/rai-story-plan`.
 
