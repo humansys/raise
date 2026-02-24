@@ -198,7 +198,7 @@ In practice, likely sequential within a single session — but designed for para
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S250.1 | M | ✅ Done | — | — | 148→96, 176→115, 236→91. Preamble + template created. |
-| S250.2 | M | Pending | — | — | |
+| S250.2 | M | ✅ Done | 45 min | 5.33x | 9 skills, 3423→1299 lines (-62%), 3 templates extracted |
 | S250.3 | S | Pending | — | — | |
 | S250.4 | XS | Pending | — | — | |
 
