@@ -163,6 +163,12 @@ def valid_skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path
 
         Load context and propose work.
 
+        ## Mastery Levels (ShuHaRi)
+
+        - **Shu**: Full explanation
+        - **Ha**: Brief
+        - **Ri**: Minimal
+
         ## Context
 
         When to use this skill.
@@ -174,6 +180,14 @@ def valid_skill_project(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path
         ## Output
 
         What this produces.
+
+        ## Quality Checklist
+
+        - [ ] Check 1
+
+        ## References
+
+        - Link 1
     """)
     )
 
@@ -280,6 +294,10 @@ class TestSkillValidate:
 
             Test.
 
+            ## Mastery Levels (ShuHaRi)
+
+            - **Shu**: Test
+
             ## Context
 
             Test.
@@ -291,6 +309,14 @@ class TestSkillValidate:
             ## Output
 
             Test.
+
+            ## Quality Checklist
+
+            - [ ] Test
+
+            ## References
+
+            - Test
         """)
         )
 
