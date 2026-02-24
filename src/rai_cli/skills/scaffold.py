@@ -92,19 +92,19 @@ def _generate_skill_content(
 
         [TODO: Describe the purpose of this skill]
 
+        ## Mastery Levels (ShuHaRi)
+
+        - **Shu**: [TODO: Beginner behavior]
+        - **Ha**: [TODO: Intermediate behavior]
+        - **Ri**: [TODO: Expert behavior]
+
         ## Context
 
-        **When to use:**
-        - [TODO: Add trigger conditions]
+        **When to use:** [TODO: Add trigger conditions]
 
-        **When to skip:**
-        - [TODO: Add skip conditions]
+        **When to skip:** [TODO: Add skip conditions]
 
-        **Inputs required:**
-        - [TODO: Add required inputs]
-
-        **Output:**
-        - [TODO: Add expected outputs]
+        **Inputs:** [TODO: Add required inputs]
 
         ## Steps
 
@@ -124,9 +124,9 @@ def _generate_skill_content(
         |------|-------------|
         | [TODO] | [TODO] |
 
-        ## Notes
+        ## Quality Checklist
 
-        [TODO: Add any additional notes]
+        - [ ] [TODO: Add verification items]
 
         ## References
 
