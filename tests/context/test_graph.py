@@ -386,6 +386,57 @@ class TestGraphNodeDeserialization:
         assert retrieved.type == "jira.sprint"
         assert "not registered" in caplog.text
 
+    def test_iter_concepts_skips_invalid_node_from_backend(
+        self, caplog: pytest.LogCaptureFixture, tmp_path: Path
+    ) -> None:
+        """iter_concepts survives corrupt graph JSON loaded via FilesystemGraphBackend.
+
+        Mirrors the actual crash path in `rai graph build`:
+          backend.load() → diff_graphs(old_graph, new) → old_graph.iter_concepts()
+        """
+        import json
+        import logging
+
+        import networkx as nx
+
+        # Build a graph JSON with one valid node and one invalid node
+        # (missing required fields — simulates removed plugin or schema drift)
+        valid_node = {
+            "id": "PAT-001",
+            "type": "pattern",
+            "content": "valid content",
+            "created": "2026-01-01",
+            "source_file": None,
+            "metadata": {},
+        }
+        invalid_node = {
+            "id": "BAD-001",
+            "type": "removed.plugin.type",
+            # missing content and created — will fail model_validate
+        }
+
+        # Build networkx node_link_data format directly
+        graph_data: dict[str, object] = {
+            "directed": True,
+            "multigraph": True,
+            "graph": {},
+            "nodes": [valid_node, invalid_node],
+            "edges": [],
+        }
+        graph_path = tmp_path / "graph.json"
+        graph_path.write_text(json.dumps(graph_data), encoding="utf-8")
+
+        backend = FilesystemGraphBackend(graph_path)
+        loaded = backend.load()
+
+        with caplog.at_level(logging.WARNING):
+            concepts = list(loaded.iter_concepts())
+
+        # Valid node returned; invalid node skipped without raising
+        assert len(concepts) == 1
+        assert concepts[0].id == "PAT-001"
+        assert "BAD-001" in caplog.text
+
     def test_iter_concepts_skips_invalid_node(
         self, caplog: pytest.LogCaptureFixture
     ) -> None:
