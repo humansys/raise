@@ -397,7 +397,6 @@ class TestGraphNodeDeserialization:
         import json
         import logging
 
-        import networkx as nx
 
         # Build a graph JSON with one valid node and one invalid node
         # (missing required fields — simulates removed plugin or schema drift)
