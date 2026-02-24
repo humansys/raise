@@ -46,7 +46,7 @@
 | [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | ✅ Complete | `work/epics/raise-247-cli-ontology/scope.md` | — |
 | [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | ✅ Complete | `work/epics/raise-248-hooks-gates/scope.md` | — |
 | [RAISE-249](https://humansys.atlassian.net/browse/RAISE-249) | **Artifact Ontology & Contract Chain** | ✅ Complete | `work/epics/raise-249-artifact-ontology/scope.md` | — |
-| [RAISE-257](https://humansys.atlassian.net/browse/RAISE-257) | **Skill Excellence** | ✅ Complete | `work/epics/raise-250-skill-excellence/scope.md` | — |
+| [RAISE-257](https://humansys.atlassian.net/browse/RAISE-257) | **Skill Excellence** | ✅ Complete | `work/epics/raise-257-skill-excellence/scope.md` | — |
 
 ### Release Roadmap (decided SES-234, 2026-02-21)
 
