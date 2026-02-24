@@ -1,8 +1,8 @@
 ---
 epic: RAISE-248
 title: "Lifecycle Hooks & Workflow Gates"
-status: scoped
-branch: v2
+status: in-progress
+branch: epic/e248/hooks-gates
 rfc: RFC-001
 date: 2026-02-21
 size: L
@@ -11,11 +11,177 @@ depends_on: [RAISE-211, RAISE-247]
 
 # RAISE-248: Lifecycle Hooks & Workflow Gates
 
+> **Status:** IN PROGRESS
+> Branch: `epic/e248/hooks-gates`
+> Created: 2026-02-21
+> Depends on: RAISE-211 (complete), RAISE-247 (complete)
+
+---
+
 ## Objective
 
-Implement the lifecycle hooks and workflow gates defined in RFC-001. Cross-cutting
-concerns (telemetry, notifications, compliance) move from skill content to CLI
-infrastructure. Skills lose their ceremony overhead and become pure process instructions.
+Move cross-cutting concerns (telemetry, notifications, compliance) from skill content
+to CLI infrastructure via lifecycle hooks and workflow gates. Skills lose ceremony
+overhead and become pure process instructions.
+
+**Value proposition:** ~1,000 fewer tokens per skill invocation, 100% telemetry coverage
+(no gaps from forgotten emit calls), and the extensibility mechanism PRO/Enterprise
+adapters use for their own cross-cutting concerns.
+
+---
+
+## Stories (7)
+
+| ID | Story | Size | Status | Description |
+|----|-------|:----:|:------:|-------------|
+| S248.1 | Event emitter infrastructure | M | Done | Core event bus with typed dataclass events; `before:` only for release/session |
+| S248.2 | Hook Protocol and registry | M | Done | `LifecycleHook` Protocol, entry point discovery, priority dispatch |
+| S248.3 | Built-in TelemetryHook | S | Done | COMMUNITY hook that replaces manual `rai signal emit` in skills |
+| S248.4 | Wire events into CLI commands | M | Done | Add `emit()` calls to 6 CLI command files, 9 event types |
+| S248.5 | WorkflowGate Protocol and registry | M | Done | Standalone `WorkflowGate` Protocol, `rai gate check` command, no event dependency |
+| S248.6 | Built-in gates + GateBridgeHook | S | Done | 4 quality gates + bridge hook that wires gates into `before:` events |
+| S248.7 | Remove ceremony from skills | M | Done | Strip telemetry/prerequisite steps from all 22 skills |
+
+**Total:** 7 stories (4M + 2S + 1M), estimated 5-7 days
+
+---
+
+## In Scope
+
+**MUST:**
+- Event emitter with typed frozen dataclass events
+- `before:` variants only for events with documented abort use cases (`release:publish`, `session:close`)
+- `LifecycleHook` Protocol with entry point discovery (`rai.hooks`)
+- `WorkflowGate` Protocol with entry point discovery (`rai.gates`) — standalone, no event dependency
+- `GateBridgeHook` that wires gates into `before:` events (auto-enforcement poka-yoke)
+- Built-in TelemetryHook (COMMUNITY) replacing manual emit calls
+- Built-in quality gates (tests, types, lint, coverage)
+- `rai gate check <gate-id>` CLI command for manual/CI invocation
+- Ceremony removal from all 22 skills in `skills_base/`
+- Hook error isolation (exception → log + continue, never crash CLI)
+
+**SHOULD:**
+- Verbose mode showing hook execution (`rai graph build -v` shows hook:telemetry fired)
+- `rai hooks list` / `rai gates list` commands for discoverability
+
+---
+
+## Out of Scope (deferred)
+
+- **Context providers** (`rai.providers.context`) → RAISE-242 (Skill Builder). Would eliminate `rai graph query` from skills by pre-loading context. Requires knowing what context each skill needs.
+- **Output formatters** (`rai.providers.output`) → Future epic. Low priority.
+- **Scaffold providers** (`rai.providers.scaffold`) → Future epic. Useful for `rai init` customization.
+- **`rai skill prepare`** → Rejected. Couples skills to CLI. Hooks solve the same problem without coupling.
+- **Async hooks** → Not needed for CLI tool. Fire-and-forget to daemon is future scope (parking lot: Local Rai Runtime).
+
+---
+
+## Architecture Decisions
+
+### AD-1: Sync execution, typed events, before/after pattern (ADR-039)
+
+**Decision:** Events are synchronous, typed as frozen dataclasses, with `before:` and `after:` variants.
+
+**Rationale:**
+- **Sync** — CLI executes and terminates. No server, no open connections. Async adds event loop complexity with no benefit for local I/O or short HTTP calls. Timeout (5s) handles slow hooks.
+- **Typed** — Each event is a frozen dataclass with specific payload fields. Follows RAISE-211 pattern (Pydantic models for boundary objects). IDE autocompletion + pyright validation for adapter authors.
+- **before/after** — `before:` hooks can abort operations (compliance, validation). `after:` hooks observe results (telemetry, notifications). Clear separation of intent.
+
+### AD-2: Entry point discovery (same as RAISE-211)
+
+**Decision:** Hooks and gates use `importlib.metadata` entry points, identical to RAISE-211 adapter discovery.
+
+**Rationale:** One model mental for all extensions. `adapters/registry.py` already has the pattern. Adding `get_hooks()` and `get_gates()` is mechanical. Same security model (`rai adapter enable`). Same priority-based dispatch.
+
+**Rejected:** Config-based registration (`.raise/hooks.yaml`). This is a scripting model, not an extensibility model. Shell hooks have their place (Claude Code uses them), but E248 builds typed, validated, Python-level extension points.
+
+### AD-3: Two separate protocols (Hook vs Gate)
+
+**Decision:** `LifecycleHook` and `WorkflowGate` are separate protocols with separate entry point groups.
+
+**Rationale:**
+- **Different questions:** Hook = "what happened?" (react). Gate = "is this allowed?" (validate).
+- **Different failure semantics:** Hook failure → log + continue. Gate failure → block operation.
+- **Different composition:** Hooks are independent (one fails, others run). Gates are all-must-pass (one fails, operation blocked).
+- **Different UX:** Gate failures need actionable messages ("Tests failing. Run `pytest`"). Hook failures need warnings ("Telemetry hook failed, continuing").
+
+**Rejected:** Single protocol with `blocking: bool` flag. Mixes semantics, forces dispatcher to branch on type at runtime, confuses adapter authors about intent.
+
+### AD-4: Side effects → hooks, inputs/outputs → skills
+
+**Decision:** Skills keep `rai graph query`, `rai graph context`, `rai pattern add`. Skills lose `rai signal emit`, `rai memory emit-work`, prerequisite checks.
+
+**Rationale:** The dividing line is whether the agent needs the result in its context. Graph queries are inputs the agent reads and uses for decisions. Signal emissions are side effects invisible to the agent. Gates replace prerequisite checks that skills currently do manually.
+
+### AD-5: Standalone gates with bridge hook (architecture review Q1/Q2)
+
+**Decision:** Gates are standalone validators invoked via `rai gate check`. A `GateBridgeHook` (built-in LifecycleHook) connects gates to `before:` events for auto-enforcement.
+
+**Rationale (from architecture review):**
+- **Gates don't depend on the event emitter.** S248.5-S248.6 parallelize with S248.1-S248.2.
+- **No semantic overlap.** Hooks react (observer), gates validate (guard), bridge adapts between them. Each has one job.
+- **Testeable standalone.** `rai gate check gate-tests` works without the event bus.
+- **Dogfooding.** The bridge hook is a real consumer of the LifecycleHook Protocol.
+- **PRO extensibility.** PRO replaces the bridge hook with richer logic (e.g., gate results → backend metrics).
+
+**Rejected:**
+- Gates as event-driven (couples gates to emitter, creates overlap with hook abort semantics)
+- Gates as standalone only (no auto-enforcement, skills still need "run gate check" instructions)
+
+### AD-6: Selective `before:` variants (architecture review R2)
+
+**Decision:** Only events with a documented abort use case get `before:` variants. All others are `after:` only.
+
+**Events with `before:`:** `release:publish`, `session:close`
+**Events `after:` only:** `session:start`, `graph:build`, `pattern:added`, `discover:scan`, `init:complete`, `adapter:loaded`, `adapter:failed`
+
+**Rationale:** Doubles the event surface from 9 to 18 with no consumer for most `before:` variants. Add `before:` to others when a consumer exists. YAGNI.
+
+### AD-7: Drop `signal:emitted` from event catalog (architecture review R1)
+
+**Decision:** Remove `signal:emitted` from the initial event catalog.
+
+**Rationale:** S248.7 removes all `rai signal emit` calls from skills — the primary consumer of the command. The event exists for manual/script use only, and no hook subscribes to it. Add it back if a consumer appears.
+
+---
+
+## Done Criteria
+
+### Per Story
+- [ ] Code implemented with type annotations
+- [ ] Unit tests passing (>90% coverage on story code)
+- [ ] All quality checks pass (ruff, pyright, bandit)
+- [ ] TDD cycle followed (red-green-refactor)
+
+### Epic Complete
+- [ ] All 7 stories complete (S248.1–S248.7)
+- [ ] Zero `rai signal emit` / `rai memory emit-work` calls remain in `skills_base/`
+- [ ] TelemetryHook produces same signals.jsonl output as manual emit calls
+- [ ] Hook error isolation verified (broken hook doesn't crash CLI)
+- [ ] `rai gate check` works for all 4 built-in gates
+- [ ] Architecture docs updated
+- [ ] Epic merged to `v2`
+
+---
+
+## Dependency Order
+
+```
+Track A (hooks):    S248.1 (event emitter) → S248.2 (hook protocol) → S248.3 (telemetry hook)
+                                                                    → S248.4 (wire events)
+
+Track B (gates):    S248.5 (gate protocol) → S248.6 (built-in gates + GateBridgeHook)
+                                                ↑ needs S248.2 for bridge hook only
+
+Both tracks complete → S248.7 (remove ceremony)
+```
+
+- **Track A** (S248.1→S248.2→S248.3/S248.4) and **Track B** (S248.5→S248.6) run in parallel
+- S248.5 is fully independent — gates have no event dependency (AD-5)
+- S248.6 includes the GateBridgeHook, which needs S248.2 (hook Protocol) to exist
+- S248.7 goes last — requires S248.3, S248.4, S248.6 all complete
+
+---
 
 ## Problem
 
@@ -23,187 +189,21 @@ Every lifecycle skill repeats the same pattern:
 
 ```
 Step 0:    rai signal emit work ... --event start     ← telemetry (in every skill)
-Step 0.1:  rai graph query "..."                      ← context loading (in every skill)
-Step 0.2:  rai graph context mod-X                    ← context loading (in every skill)
+Step 0.x:  rai graph query "..."                      ← context loading (in every skill)
 Step N:    [actual work]
 Step N+1:  rai signal emit work ... --event complete   ← telemetry (in every skill)
 ```
 
-68% of CLI calls in skills are this ceremony. It wastes ~1,000 tokens and ~2 seconds
-per skill invocation. It's also fragile — if a skill forgets to emit, telemetry has gaps.
+68% of CLI calls in skills are this ceremony. ~1,000 tokens and ~2 seconds per skill
+invocation. Fragile — if a skill forgets to emit, telemetry has gaps.
 
-## Solution
-
-The CLI emits typed events at command boundaries. Hooks listen and react. Skills don't
-need to know telemetry exists.
-
-```
-# Without hooks (today):
-skill calls → rai signal emit work ... --event start     (explicit, in skill content)
-
-# With hooks:
-rai graph build → CLI emits after:graph:build event
-  → TelemetryHook writes to signals.jsonl              (automatic, invisible to skill)
-  → SlackNotifyHook posts to channel                   (PRO, if installed)
-  → AuditHook logs to compliance system                (Enterprise, if installed)
-```
-
-## Stories
-
-### S1: Event emitter infrastructure
-
-**What:** Core event bus that CLI commands use to emit typed events.
-
-**Includes:**
-- `HookEvent` base dataclass (timestamp, project_path, event name)
-- Typed event dataclasses for each event in the catalog (see below)
-- `emit(event)` function that dispatches to registered hooks
-- Graceful degradation: if no hooks registered, emit is a no-op (~0ms overhead)
-
-**Event catalog (from RFC-001):**
-
-| Event | Emitted when | Context payload |
-|-------|-------------|-----------------|
-| `session:start` | Session begins | session_id, project, agent |
-| `session:close` | Session ends | session_id, summary, duration, patterns |
-| `graph:build` | Knowledge graph rebuilt | project_path, node_count, edge_count |
-| `pattern:added` | New pattern recorded | pattern_id, content, context |
-| `signal:emitted` | Work/session/calibration signal | signal_type, work_id, event, phase |
-| `discover:scan` | Code scan completes | language, file_count, symbol_count |
-| `init:complete` | Project initialized | project_path, detected_conventions |
-| `release:publish` | Release published | version, channel |
-| `adapter:loaded` | Adapter passes validation | adapter_name, extension_point |
-| `adapter:failed` | Adapter fails validation | adapter_name, error |
-
-Each event has `before:` and `after:` variants. `before:` hooks can abort.
-
-**Size:** M
-
-### S2: Hook Protocol and registry
-
-**What:** The `LifecycleHook` Protocol and hook discovery via entry points.
-
-**Includes:**
-- `LifecycleHook` Protocol (events list, handle method)
-- `HookResult` dataclass (ok/error/abort status)
-- Hook discovery via `rai.hooks` entry point group (same mechanism as RAISE-211 adapters)
-- Hook execution: sequential, priority-ordered, with timeout (5s default)
-- Error isolation: hook exception → log warning, continue. Hooks never crash the CLI.
-- `before:*` abort handling: hook returns abort → operation cancelled with reason
-
-**Size:** M
-
-### S3: Built-in TelemetryHook (COMMUNITY)
-
-**What:** A hook bundled with raise-core that replaces manual `rai signal emit` calls
-in skills by automatically writing to `signals.jsonl` on relevant events.
-
-**Listens to:**
-- `after:session:start` → emit session start signal
-- `after:session:close` → emit session close signal
-- `after:graph:build` → emit build signal
-- `after:pattern:added` → emit pattern signal
-
-**What this enables:**
-- Skills no longer need `rai signal emit` calls — telemetry is automatic
-- Telemetry coverage is complete — no gaps from forgotten emit calls
-- The same hook mechanism PRO/Enterprise use for their own telemetry
-
-**Size:** S
-
-### S4: Wire events into existing CLI commands
-
-**What:** Add `emit()` calls to the CLI commands that should produce events.
-
-**Commands to wire:**
-- `rai session start` → `before:session:start` / `after:session:start`
-- `rai session close` → `before:session:close` / `after:session:close`
-- `rai graph build` → `before:graph:build` / `after:graph:build`
-- `rai pattern add` → `after:pattern:added`
-- `rai signal emit` → `after:signal:emitted`
-- `rai discover scan` → `after:discover:scan`
-- `rai init` → `after:init:complete`
-- `rai release publish` → `before:release:publish` / `after:release:publish`
-
-**Note:** Uses RAISE-247 command names (`graph`, `pattern`, `signal`). If RAISE-247
-is not yet complete, wire under current `memory` names and update in RAISE-247 S8.
-
-**Size:** M
-
-### S5: WorkflowGate Protocol and registry
-
-**What:** The `WorkflowGate` Protocol for declarative transition validation.
-
-**Includes:**
-- `WorkflowGate` Protocol (gate_id, check method returning GateResult)
-- `GateResult` dataclass (passed/failed/skipped, message, details)
-- Gate discovery via `rai.gates` entry point group
-- `rai gate check <gate-id>` command for manual gate verification
-- Gate composition: multiple gates run for same checkpoint, all must pass
-
-**Distinct from hooks:** Gates guard transitions (validate, block). Hooks react to events
-(observe, log). A gate failure prevents the operation. A hook failure is logged and skipped.
-
-**Size:** M
-
-### S6: Built-in gates (COMMUNITY)
-
-**What:** Basic gates bundled with raise-core.
-
-**Gates:**
-- `gate-tests` — `pytest` exits 0
-- `gate-types` — `pyright` exits 0
-- `gate-lint` — `ruff check .` exits 0
-- `gate-coverage` — `pytest --cov` meets threshold
-
-**These already exist as guardrails in governance docs** — this makes them executable
-and composable via the gate protocol instead of manual checks in skills.
-
-**Size:** S
-
-### S7: Remove ceremony from skills
-
-**What:** After hooks and gates are wired, remove the ceremony steps from all 22
-skills in `skills_base/`.
-
-**Removes from skills:**
-- All `rai signal emit` / `rai memory emit-work` calls (TelemetryHook handles it)
-- Prerequisite checks that gates now handle (graph exists, tests pass)
-
-**Keeps in skills:**
-- `rai graph query` / `rai graph context` — context loading is input the agent needs,
-  not a side effect a hook can replace (unless a ContextProvider exists — deferred)
-- `rai pattern add` / `rai pattern reinforce` — knowledge capture is skill substance
-
-**Size:** M
-
-## Dependency Order
-
-```
-S1 (event emitter) → S2 (hook protocol) → S3 (telemetry hook) → S4 (wire events)
-                                        → S5 (gate protocol) → S6 (built-in gates)
-                                                                         ↓
-                                                              S7 (remove ceremony)
-```
-
-S1-S2 are infrastructure. S3-S6 can partially parallelize. S7 goes last.
-
-## What This Does NOT Include
-
-- **Context providers** (`rai.providers.context`) — Deferred. Would eliminate
-  `rai graph query` from skills by pre-loading context. Requires the Skill Builder
-  (RAISE-242) to know what context each skill needs. Future epic.
-- **Output formatters** (`rai.providers.output`) — Deferred. Low priority.
-- **Scaffold providers** (`rai.providers.scaffold`) — Deferred. Useful for `rai init`
-  customization but not urgent.
-- **`rai skill prepare`** — Rejected (couples skills to CLI). Hooks solve the same
-  problem without coupling.
+---
 
 ## Verification Gate
 
 ```bash
 # Hooks fire on CLI commands
-rai graph build 2>&1 | grep -q "hook:telemetry"  # with -v flag
+rai graph build -v 2>&1 | grep -q "hook:telemetry"
 
 # No emit calls in skills
 grep -r "signal emit\|memory emit" src/rai_cli/skills_base/ && exit 1
@@ -216,18 +216,135 @@ rai gate check gate-types
 # (test that a broken hook doesn't crash the CLI)
 ```
 
+---
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-23
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S248.1: Event emitter | M | None | M1 | Foundation — typed events, emit(), before/after dispatch. Everything else builds on this. |
+| 2 | S248.2: Hook Protocol | M | S248.1 | M1 | Completes the hook pipeline: Protocol + entry points + priority dispatch + error isolation. |
+| 3 | S248.5: Gate Protocol | M | None | M1 | Standalone (AD-5) — can start in parallel with S1/S2. Protocol + `rai gate check` command. |
+| 4 | S248.3: TelemetryHook | S | S248.2 | M2 | First real hook — proves the system works E2E. Replaces manual emit calls. |
+| 5 | S248.4: Wire events | M | S248.2 | M2 | Inserts `emit()` calls into 8 CLI command groups. TelemetryHook starts auto-firing. |
+| 6 | S248.6: Built-in gates + bridge | S | S248.5, S248.2 | M2 | 4 quality gates + GateBridgeHook. Gates become executable, bridge wires them to before: events. |
+| 7 | S248.7: Remove ceremony | M | S248.3, S248.4, S248.6 | M3 | Strip telemetry/prerequisite steps from all 22 skills. Last because it depends on everything. |
+
+### Parallel Work Streams
+
+```
+Time →
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Track A:  S248.1 (emitter) → S248.2 (hook protocol) → S248.3 (telemetry) → S248.4 (wire)
+                                          ↓ enables bridge hook
+Track B:  S248.5 (gate protocol) ────────→ S248.6 (gates + bridge)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                                                              ↓
+                                                    S248.7 (remove ceremony)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+- **Track A** (critical path): S248.1 → S248.2 → S248.3 → S248.4
+- **Track B** (parallel): S248.5 starts immediately, S248.6 waits for S248.2 (bridge hook needs hook Protocol)
+- **Merge point:** S248.7 requires both tracks complete
+- **Realistic parallelism:** Solo developer — tracks alternate, not truly concurrent. But S248.5 can start during any pause in Track A.
+
+### Milestones
+
+| Milestone | Stories | Success Criteria | Demo |
+|-----------|---------|------------------|------|
+| **M1: Walking Skeleton** | S248.1, S248.2, S248.5 | Hook Protocol works E2E (emit event → hook handles it). Gate Protocol works standalone (`rai gate check`). | Emit a test event, see hook fire. Run `rai gate check gate-tests`. |
+| **M2: Auto-firing** | +S248.3, S248.4, S248.6 | `rai graph build` auto-emits telemetry (no manual call). `rai gate check` runs 4 built-in gates. GateBridgeHook wires gates to `before:release:publish`. | Run `rai graph build -v` → see "hook:telemetry fired". |
+| **M3: Ceremony-free skills** | +S248.7 | Zero `rai signal emit` / `rai memory emit-work` in `skills_base/`. Skills work identically but are shorter. | Diff a skill before/after — ceremony steps gone, behavior identical. |
+| **M4: Epic Complete** | — | All done criteria met. Architecture review passed. Retrospective done. | `/rai-epic-close` ready. |
+
+### Sequencing Risks
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|:----------:|:------:|------------|
+| S248.1 event model doesn't scale to all 9 events | Low | High | TDD — start with 2 events (session:start, graph:build), validate pattern, then expand |
+| S248.4 wiring breaks existing CLI commands | Medium | Medium | Each command wired individually with test coverage. Rollback is removing 2-3 lines per command. |
+| S248.7 skill edits introduce regressions | Medium | Low | Grep gate (zero remaining emit calls) + spot-check 3-4 skills. Skills are markdown — changes are deletions, not new logic. |
+| S248.6 bridge hook creates double-execution | Low | Medium | Test: emit `before:release:publish` → verify gates run exactly once. Bridge hook is the only path. |
+
+### Velocity Assumptions
+
+- **Reference:** E211 completed 7 stories (3M + 4S) in 2 calendar days. E247 averaged 1.93x velocity across 6 stories.
+- **E248 adjustment:** Similar scope (7 stories, 4M + 2S + 1M). Infrastructure work like E211 but with established patterns (entry points, Protocols). Expect comparable velocity.
+- **Buffer:** 25% for integration testing between hooks/gates/skills.
+- **Estimate:** 3-4 calendar days for full epic.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S248.1 | M | Done | 30 min | 2.0x | 78 tests, 100% cov |
+| S248.2 | M | Done | 25 min | 2.4x | 32 new tests, ThreadPoolExecutor timeout fix |
+| S248.5 | M | Done | 20 min | 3.0x | 47 tests, quality review embedded |
+| S248.3 | S | Done | 15 min | 2.0x | 22 tests, first real hook E2E |
+| S248.4 | M | Done | 19 min | 4.74x | Quality review caught adapter semantics bug |
+| S248.6 | S | Done | 10 min | 3.0x | 46 new tests, bridge pattern validated |
+| S248.7 | M | Done | 12 min | 3.75x | 195 lines deleted, ceremony-free skills |
+
+**Milestones:**
+- [x] M1: Walking Skeleton
+- [x] M2: Auto-firing
+- [x] M3: Ceremony-free skills
+- [ ] M4: Epic Complete
+
+---
+
 ## Epic Dependency Chain
 
 ```
-RAISE-211 (Adapter Foundation — entry points, TierContext)
-  → RAISE-247 (CLI Ontology — rename commands)
+RAISE-211 (Adapter Foundation — entry points, TierContext) ✅
+  → RAISE-247 (CLI Ontology — rename commands) ✅
     → RAISE-248 (THIS — hooks + gates on new ontology)
       → RAISE-242 (Skill Builder — generates skills without ceremony)
 ```
+
+---
+
+## Architecture References
+
+| Decision | Document | Key Insight |
+|----------|----------|-------------|
+| Adapter architecture | ADR-033 | Protocol + entry points pattern E248 reuses |
+| Governance extensibility | ADR-034 | Schema/parser/target extension points |
+| Hooks & Gates architecture | ADR-039 | Sync, typed, two protocols, side-effect boundary |
+
+---
+
+## Notes
+
+### Key Risks
+- **S248.7 blast radius:** Touching 22 skills is a large surface. Mitigate with grep gate (zero remaining emit calls) and manual spot-check of 3-4 skills.
+- **Hook timeout tuning:** 5s default may be too long for fast CLI commands, too short for HTTP hooks. Mitigate by making it configurable per-hook and starting conservative.
+- **Backward compat:** Skills that explicitly call `rai signal emit` still work (the command exists). But double-emit could occur if both skill and TelemetryHook fire. Mitigate: S248.7 removes skill calls before TelemetryHook is widely deployed.
+
+### Why This Epic Now
+- RAISE-211 and RAISE-247 are complete — the infrastructure foundation is ready
+- Ceremony overhead is the #1 token cost in skill execution
+- PRO/Enterprise extensibility requires the hook mechanism to exist
+- Skill Builder (RAISE-242) needs hooks to exist before it can generate ceremony-free skills
+
+---
 
 ## References
 
 - RFC-001: `dev/rfcs/rfc-001-extensibility-architecture.md` (full design)
 - RFC-002: `dev/rfcs/rfc-002-skill-builder-vision.md` (ceremony analysis)
-- ADR-038: CLI Ontology Restructuring
+- ADR-033: Open-Core Adapter Architecture
+- ADR-034: Governance Extensibility
+- ADR-039: Lifecycle Hooks & Workflow Gates
 - SES-234: Ontological analysis session (2026-02-21)
+
+---
+
+*Epic tracking — update per story completion*
+*Created: 2026-02-21*
+*Design complete: 2026-02-23*

@@ -21,6 +21,8 @@ from rai_cli.context.query import (
     SCORING_LOW_WILSON_THRESHOLD,
     wilson_lower_bound,
 )
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import PatternAddedEvent
 from rai_cli.memory import (
     MemoryScope,
     PatternInput,
@@ -224,6 +226,12 @@ def add_pattern(
     )
 
     if result.success:
+        emitter = create_emitter()
+        emitter.emit(PatternAddedEvent(
+            pattern_id=result.id or "",
+            content=content,
+            context=context,
+        ))
         console.print(f"\n[green]✓[/green] {result.message}")
         console.print(f"  ID: [cyan]{result.id}[/cyan]")
         console.print(f"  Content: {content[:60]}...")

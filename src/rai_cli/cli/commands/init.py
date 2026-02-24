@@ -26,6 +26,8 @@ from rich.panel import Panel
 
 from rai_cli.config.agent_registry import AgentRegistry, load_registry
 from rai_cli.config.agents import AgentChoice, AgentConfig
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import InitCompleteEvent
 from rai_cli.onboarding.bootstrap import BootstrapResult
 from rai_cli.onboarding.conventions import detect_conventions
 from rai_cli.onboarding.detection import ProjectType, detect_project_type
@@ -589,6 +591,13 @@ def init_command(
             or first_skills_result.skills_conflicted
         )
         raise typer.Exit(code=0 if not has_updates else 1)
+
+    # Emit init:complete event
+    emitter = create_emitter()
+    emitter.emit(InitCompleteEvent(
+        project_path=project_path,
+        project_name=project_name,
+    ))
 
     # AGENTS.md on --detect
     if detect:

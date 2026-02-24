@@ -22,6 +22,12 @@ import typer
 
 from rai_cli.cli.error_handler import cli_error
 from rai_cli.exceptions import RaiSessionNotFoundError
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import (
+    BeforeSessionCloseEvent,
+    SessionCloseEvent,
+    SessionStartEvent,
+)
 from rai_cli.memory.writer import get_next_id, validate_session_index
 from rai_cli.onboarding.profile import (
     DeveloperProfile,
@@ -195,6 +201,13 @@ def start(
             typer.echo("Consider closing these sessions with: rai session close --session <ID>\n")
 
     save_developer_profile(updated)
+
+    # Emit session:start event
+    emitter = create_emitter()
+    emitter.emit(SessionStartEvent(
+        session_id=session_id or "",
+        developer=updated.name,
+    ))
 
     # Format agent for output
     agent_name = agent if agent else "unknown"
@@ -380,8 +393,23 @@ def close(
         # CWD poka-yoke (RAISE-139): reject if project mismatch
         _check_cwd_guard(profile, resolved_session_id, legacy_project)
 
+        # Emit before:session:close — hooks can abort
+        emitter = create_emitter()
+        before_result = emitter.emit(BeforeSessionCloseEvent(
+            session_id=resolved_session_id,
+            outcome="legacy",
+        ))
+        if before_result.aborted:
+            typer.echo(f"Session close aborted: {before_result.abort_message}")
+            raise typer.Exit(1)
+
         updated = end_session(profile, session_id=resolved_session_id)
         save_developer_profile(updated)
+
+        emitter.emit(SessionCloseEvent(
+            session_id=resolved_session_id,
+            outcome="legacy",
+        ))
         typer.echo(f"Session {resolved_session_id} closed.")
         return
 
@@ -440,6 +468,17 @@ def close(
     if guard_session_id:
         _check_cwd_guard(profile, guard_session_id, project_path)
 
+    # Emit before:session:close — hooks can abort
+    emitter = create_emitter()
+    close_sid = guard_session_id or resolved_session_id or ""
+    before_result = emitter.emit(BeforeSessionCloseEvent(
+        session_id=close_sid,
+        outcome="structured",
+    ))
+    if before_result.aborted:
+        typer.echo(f"Session close aborted: {before_result.abort_message}")
+        raise typer.Exit(1)
+
     # Process close (pass session_id for per-session state writes)
     close_result = process_session_close(close_input, profile, project_path, session_id=resolved_session_id)
 
@@ -447,6 +486,12 @@ def close(
     cleanup_session_id = resolved_session_id or close_result.session_id
     if cleanup_session_id:
         cleanup_session_dir(project_path, cleanup_session_id)
+
+    # Emit session:close event
+    emitter.emit(SessionCloseEvent(
+        session_id=close_result.session_id,
+        outcome="structured",
+    ))
 
     # Output summary
     typer.echo(f"Session {close_result.session_id} closed.")

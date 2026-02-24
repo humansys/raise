@@ -68,17 +68,7 @@ Design an epic that bridges strategic objectives to executable features. Create 
 
 ## Steps
 
-### Step 0: Emit Epic Start (Telemetry)
-
-Record the start of the design phase:
-
-```bash
-rai signal emit-work epic {epic_id} --event start --phase design
-```
-
-**Example:** `rai signal emit-work epic E9 -e start -p design`
-
-### Step 0.5: Query Context
+### Step 0: Query Context
 
 Load relevant architecture decisions, prior epic patterns, and release context from unified context:
 
@@ -98,7 +88,7 @@ Review returned patterns and prior ADRs before proceeding. Prior architectural d
 
 > **If context unavailable:** Run `rai graph build` first, or proceed without patterns.
 
-### Step 0.6: Load Architectural Context
+### Step 0.1: Load Architectural Context
 
 For each candidate module the epic might touch, load its architectural context:
 
@@ -130,7 +120,7 @@ rai graph context mod-<name>
 
 **Verification:** Architectural context loaded for key modules OR gaps noted.
 
-### Step 0.7: Load Problem Brief (Optional)
+### Step 0.2: Load Problem Brief (Optional)
 
 Check if a Problem Brief exists from a prior `/rai-problem-shape` session:
 
@@ -443,16 +433,6 @@ Self-review checklist before proceeding:
 3. Are architectural decisions documented, not assumed?
 
 ---
-
-### Step 13: Emit Epic Complete (Telemetry)
-
-Record the completion of the design phase:
-
-```bash
-rai signal emit-work epic {epic_id} --event complete --phase design
-```
-
-**Example:** `rai signal emit-work epic E9 -e complete -p design`
 
 ---
 
