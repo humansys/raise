@@ -254,21 +254,7 @@ git push origin --delete {feature_branch} 2>/dev/null || echo "No remote branch 
 
 > **If you can't continue:** Branch deletion fails → Check you're not on the story branch (should be on parent after Step 4).
 
-### Step 7: Emit Feature Complete (Telemetry)
-
-Record the completion of the entire story lifecycle:
-
-```bash
-rai signal emit-work story {story_id} --event complete --phase review
-```
-
-**Example:** `rai signal emit-work story S15.1 -e complete -p review`
-
-**Verification:** Telemetry emitted.
-
-> **If you can't continue:** CLI not available → Skip; telemetry is optional.
-
-### Step 8: Update Local Context
+### Step 7: Update Local Context
 
 Update `CLAUDE.local.md` to reflect completion:
 
@@ -288,7 +274,6 @@ Update `CLAUDE.local.md` to reflect completion:
 - **Merge:** Feature merged to parent branch with `--no-ff`
 - **Cleanup:** Feature branch deleted locally
 - **Epic:** Feature marked complete in epic scope
-- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (story complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Feature Close Summary Template

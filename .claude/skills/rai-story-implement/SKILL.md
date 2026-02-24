@@ -50,17 +50,7 @@ Execute the implementation plan task by task, verifying each step, and producing
 
 ## Steps
 
-### Step 0: Emit Feature Start (Telemetry)
-
-Record the start of the implement phase:
-
-```bash
-rai signal emit-work story {story_id} --event start --phase implement
-```
-
-**Example:** `rai signal emit-work story S15.1 -e start -p implement`
-
-### Step 0.1: Verify Prerequisites (REQUIRED - No Skip)
+### Step 0: Verify Prerequisites (REQUIRED - No Skip)
 
 Implementation plan is mandatory:
 
@@ -79,7 +69,7 @@ fi
 
 > **If you can't continue:** Run `/rai-story-plan`. No exceptions.
 
-### Step 0.5: Query Context
+### Step 0.1: Query Context
 
 Load relevant codebase patterns from unified context:
 
@@ -186,21 +176,10 @@ If all tasks completed → execute code gate.
 
 > **If you can't continue:** Tasks blocked → Document and escalate.
 
-### Step 8: Emit Feature Complete (Telemetry)
-
-Record the completion of the implement phase:
-
-```bash
-rai signal emit-work story {story_id} --event complete --phase implement
-```
-
-**Example:** `rai signal emit-work story S15.1 -e complete -p implement`
-
 ## Output
 
 - **Artifact:** Implemented code
 - **Location:** Per project architecture
-- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: implement start/complete)
 - **Gate:** `gates/gate-code.md`
 - **Next:** `/rai-story-review`
 

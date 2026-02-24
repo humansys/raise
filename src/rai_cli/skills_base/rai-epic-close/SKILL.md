@@ -269,19 +269,7 @@ Mark the epic complete in `governance/backlog.md`:
 
 > **Release tracking:** If the epic belongs to a release, note the release progress (e.g., "REL-V3.0: 1/4 epics complete"). This helps future sessions understand release velocity.
 
-### Step 7: Emit Epic Complete Telemetry
-
-Record the epic completion:
-
-```bash
-rai signal emit-work epic {epic_id} --event complete
-```
-
-**Verification:** Telemetry emitted.
-
-> **If you can't continue:** CLI not available → Skip; telemetry is optional.
-
-### Step 8: Update Local Context
+### Step 7: Update Local Context
 
 Update `CLAUDE.local.md`:
 
@@ -302,7 +290,6 @@ Update `CLAUDE.local.md`:
 - **Merge:** Epic merged to `{dev_branch}` with `--no-ff`
 - **Cleanup:** All epic and story branches deleted (local and remote)
 - **Backlog:** Epic marked complete
-- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (epic complete)
 - **Context:** `CLAUDE.local.md` updated
 
 ## Epic Close Summary Template

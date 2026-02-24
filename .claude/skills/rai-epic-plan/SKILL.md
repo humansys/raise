@@ -66,17 +66,7 @@ Transform the feature list from `/rai-epic-design` into a sequenced implementati
 
 ## Steps
 
-### Step 0: Emit Epic Start (Telemetry)
-
-Record the start of the plan phase:
-
-```bash
-rai signal emit-work epic {epic_id} --event start --phase plan
-```
-
-**Example:** `rai signal emit-work epic E9 -e start -p plan`
-
-### Step 0.5: Query Context
+### Step 0: Query Context
 
 Load relevant sequencing patterns and calibration from unified context:
 
@@ -496,16 +486,6 @@ Self-review checklist before starting implementation.
 > **If you can't continue:** Validation fails → Address gaps before starting implementation.
 
 ---
-
-### Step 12: Emit Epic Complete (Telemetry)
-
-Record the completion of the plan phase:
-
-```bash
-rai signal emit-work epic {epic_id} --event complete --phase plan
-```
-
-**Example:** `rai signal emit-work epic E9 -e complete -p plan`
 
 ---
 

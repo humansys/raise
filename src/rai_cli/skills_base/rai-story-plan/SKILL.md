@@ -49,17 +49,7 @@ Decompose user stories into atomic executable tasks, identify dependencies, and 
 
 ## Steps
 
-### Step 0: Emit Feature Start (Telemetry)
-
-Record the start of the plan phase:
-
-```bash
-rai signal emit-work story {story_id} --event start --phase plan
-```
-
-**Example:** `rai signal emit-work story S15.1 -e start -p plan`
-
-### Step 0.1: Verify Prerequisites (Deterministic)
+### Step 0: Verify Prerequisites (Deterministic)
 
 Check design document for complex features:
 
@@ -78,7 +68,7 @@ ls work/epics/e*/stories/{story_id}/design.md 2>/dev/null || echo "INFO: No desi
 
 > **If you can't continue:** Complex feature without design → Run `/rai-story-design` first.
 
-### Step 0.5: Query Context
+### Step 0.1: Query Context
 
 Load relevant patterns and calibration from unified context:
 
@@ -92,7 +82,7 @@ Review returned patterns before proceeding. Key patterns inform task structure a
 
 > **If context unavailable:** Run `rai graph build` first, or proceed without patterns.
 
-### Step 0.6: Load Architectural Context
+### Step 0.2: Load Architectural Context
 
 Identify the primary module(s) this story affects, then load their architectural context:
 
@@ -233,20 +223,9 @@ Create plan document with:
 
 **Verification:** Plan documented and complete.
 
-### Step 7: Emit Feature Complete (Telemetry)
-
-Record the completion of the plan phase:
-
-```bash
-rai signal emit-work story {story_id} --event complete --phase plan
-```
-
-**Example:** `rai signal emit-work story S15.1 -e complete -p plan`
-
 ## Output
 
 - **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/plan.md`
-- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: plan start/complete)
 - **Gate:** `gates/gate-plan.md`
 - **Next:** `/rai-story-implement`
 
