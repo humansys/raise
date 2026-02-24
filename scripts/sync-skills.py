@@ -167,8 +167,11 @@ def update_distributable_list(
             if s in ("rai-project-create", "rai-project-onboard", "rai-welcome")
         ],
         "Governance": [s for s in public_skills if s in ("rai-docs-update",)],
-        "Tools": [s for s in public_skills if s in ("rai-research", "rai-debug")],
     }
+
+    # Catch-all: anything not covered by the named categories goes to Tools
+    categorized = {s for skills in skills_by_category.values() for s in skills}
+    skills_by_category["Tools"] = [s for s in public_skills if s not in categorized]
 
     # Generate formatted list
     lines = ["DISTRIBUTABLE_SKILLS: list[str] = ["]
