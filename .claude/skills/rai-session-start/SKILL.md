@@ -30,8 +30,13 @@ Load context bundle from CLI, interpret signals, and propose focused work for th
 - **Ha**: Explain only new or non-obvious signals
 - **Ri**: Minimal output — context line, focus, signals, "Go."
 
+## Context
+
 **When to use:** At the start of every working session.
-If no profile exists, ask for the developer's name and pass `--name "Name"`.
+
+**When to skip:** Continuation of an active session (context already loaded).
+
+**Inputs:** Developer profile (`~/.rai/developer.yaml`). If no profile exists, ask for the developer's name and pass `--name "Name"`.
 
 ## Steps
 
@@ -63,6 +68,21 @@ Loads developer profile, session state, and orientation bundle. If graph unavail
 **Focus:** [goal]
 **Signals:** [any, or "None"]
 ```
+
+## Output
+
+| Item | Destination |
+|------|-------------|
+| Session initialized | CLI session state updated |
+| Focus proposed | Presented to developer |
+| Next | Begin work on proposed focus |
+
+## Quality Checklist
+
+- [ ] Orientation bundle loaded successfully
+- [ ] Signals interpreted in priority order
+- [ ] Session focus proposed from pending work
+- [ ] Verbosity adapted to developer ShuHaRi level
 
 ## References
 
