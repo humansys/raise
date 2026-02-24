@@ -12,10 +12,10 @@ metadata:
   raise.frequency: as-needed
   raise.fase: "0"
   raise.prerequisites: ""
-  raise.next: ""
+  raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.1.0"
   raise.visibility: public
 ---
 
@@ -27,95 +27,110 @@ Systematically identify and fix the root cause of defects using lean methods. St
 
 ## Mastery Levels (ShuHaRi)
 
-- **Shu**: Follow the 5 Whys method strictly; document each step
+- **Shu**: Follow triage → method → fix strictly; document each step
 - **Ha**: Combine methods (Ishikawa + 5 Whys); adapt depth to complexity
-- **Ri**: Develop domain-specific diagnostic patterns; teach methods
+- **Ri**: Develop domain-specific diagnostic patterns; feed recurring patterns to graph
 
 ## Context
 
-**When to use:** Unexpected behavior, unclear test failures, integration issues, performance problems.
+**When to use:** Unexpected behavior, unclear test failures, integration issues, performance problems, bug fix stories.
 
-**When to skip:** Obvious typos, simple syntax errors, well-documented known issues.
+**When to skip:** Obvious typos, simple syntax errors — go directly to fix.
 
-**Inputs:** Problem statement, steps to reproduce, error messages/symptoms.
-
-**Method selection:**
-
-| Method | Use when | Time |
-|--------|----------|------|
-| 5 Whys | Single causal chain | 5-10 min |
-| Ishikawa (fishbone) | Multiple possible causes | 15-30 min |
-| Gemba | Need to observe actual behavior | Variable |
-
-**Time boxing:** Simple (15 min), Medium (30 min), Complex (60 min). Escalate if exceeded.
+**Inputs:** Problem statement, steps to reproduce, error messages/symptoms. **Time boxing:** XS (5 min), S (15 min), M (30 min), L (60 min). Escalate if exceeded.
 
 ## Steps
 
+### Step 0: Triage — Classify Complexity
+
+Before choosing a method, classify the bug:
+
+| Tier | Criteria | Method | Output |
+|------|----------|--------|--------|
+| **XS** | Cause evident, fix obvious | Skip to Step 3 | One-liner in scope/commit |
+| **S** | Cause obscure, single causal chain | 5 Whys (Step 2) | Summary block |
+| **M/L** | Multiple possible causes | Ishikawa (Step 2b) | `analysis.md` |
+
+State the tier explicitly before proceeding.
+
+<verification>
+Tier declared. Method selected.
+</verification>
+
 ### Step 1: Define the Problem (Genchi Genbutsu)
 
-Go see the actual problem. Reproduce, capture evidence, write problem statement:
+Go see the actual problem. Reproduce it, capture evidence:
 
 ```
-WHAT: [specific behavior]
-WHEN: [conditions/triggers]
-WHERE: [location in code/system]
-EXPECTED: [what should happen]
+WHAT:     [specific behavior observed]
+WHEN:     [conditions / triggers]
+WHERE:    [file:line or component]
+EXPECTED: [what should happen instead]
 ```
 
 <verification>
-Problem is specific and reproducible.
+Problem is specific and reproducible (or minimal fixture built).
 </verification>
 
 <if-blocked>
-Cannot reproduce → gather more information, check logs.
+Cannot reproduce → gather logs, add instrumentation, build minimal fixture.
 </if-blocked>
 
-### Step 2: Apply 5 Whys
+### Step 2: Root Cause Analysis (S bugs — 5 Whys)
 
 Ask "Why?" five times, staying on one factual causal chain:
 
-```markdown
-**Problem:** [statement]
+```
+Problem: [statement]
 1. Why? → [first-level cause, with evidence]
 2. Why? → [second-level cause]
 3. Why? → [third-level cause]
 4. Why? → [fourth-level cause]
 5. Why? → [root cause]
-**Countermeasure:** [fix]
+Countermeasure: [fix]
 ```
 
-Rules: each answer factual (not speculative), stop when you reach something changeable, "human error" is never a root cause.
+Rules:
+- Each answer must be factual, not speculative
+- Stop when you reach something actionable and changeable
+- "Human error" is never a root cause — ask why the error was possible
 
 <verification>
 Root cause is actionable and explains all symptoms.
 </verification>
 
 <if-blocked>
-Chain branches → switch to Ishikawa (Step 3).
+Chain branches → switch to Ishikawa (Step 2b).
 </if-blocked>
 
-### Step 3: Ishikawa Diagram (if needed)
+### Step 2b: Ishikawa Diagram (M/L bugs — multiple causes)
 
-For multiple possible causes, explore 6 M's: Method (algorithm, edge case), Machine (resources, platform), Material (input, deps, config), Measurement (errors, logs), Manpower (docs, requirements), Milieu (env, config drift).
+Explore 6 M's: Method, Machine, Material, Measurement, Manpower, Milieu (env/config drift).
 
-Identify top 2-3 causes, investigate systematically:
+Identify top 2-3 hypotheses, investigate systematically:
 
 | Hypothesis | Test | Result | Conclusion |
 |------------|------|--------|------------|
-| [Cause 1] | [How tested] | [What happened] | Confirmed/Eliminated |
+| [Cause 1]  | [How tested] | [What happened] | Confirmed/Eliminated |
 
 <verification>
-Root cause confirmed with evidence.
+Root cause confirmed with evidence. Competing hypotheses eliminated.
 </verification>
 
-### Step 4: Fix & Prevent
+### Step 3: Fix & Prevent
 
-Fix the root cause (not symptoms):
+Fix the root cause (not symptoms). Write the regression test first (RED), then fix (GREEN).
+
 - [ ] Fix addresses confirmed root cause
+- [ ] Regression test written (RED → GREEN)
 - [ ] Original problem no longer reproduces
-- [ ] Tests pass
+- [ ] All existing tests pass
 
-Optional prevention: regression test, input validation, documentation, lint rule, process update.
+Prevention (choose what applies):
+- Regression test (always for S+)
+- Input validation at boundary
+- Documentation or ADR update
+- `rai pattern add` for recurring systemic issues
 
 <verification>
 Problem resolved. Tests pass.
@@ -125,26 +140,32 @@ Problem resolved. Tests pass.
 Fix incomplete → document partial fix, create follow-up task.
 </if-blocked>
 
+**Feed `/rai-story-plan`** — after fixing, name the tasks explicitly:
+- Fix task, regression test task, prevention task (if any)
+- Systemic finding: `rai pattern add "[statement]" --context "[keywords]" --type behavioral`
+
 ## Output
 
-| Item | Destination |
-|------|-------------|
-| Analysis | `work/debug/{issue-name}/analysis.md` (complex issues only) |
-| Fix | Implemented code changes |
-| Prevention | Test, validation, or documentation (optional) |
+| Tier | Artifact | Destination |
+|------|----------|-------------|
+| XS | One-liner root cause + fix | Scope commit or inline |
+| S | Summary block (root cause, fix, prevention) | Story scope doc |
+| M/L | Full analysis | `work/debug/{issue-name}/analysis.md` |
+| Any | Story plan tasks | Fed to `/rai-story-plan` |
 
 ## Quality Checklist
 
-- [ ] Problem statement is specific and reproducible
+- [ ] Tier declared before any analysis
+- [ ] Problem is specific and reproducible
 - [ ] Root cause identified with evidence (not speculation)
 - [ ] Fix addresses root cause, not symptoms
+- [ ] Regression test written (RED before GREEN)
 - [ ] Time box respected — escalate if exceeded
-- [ ] NEVER guess — formulate hypothesis, then test it
-- [ ] NEVER say "human error" — ask why the error was possible
+- [ ] Story plan tasks named
+- [ ] NEVER guess — hypothesis first, then test. NEVER say "human error" — ask why the error was possible
 
 ## References
 
 - 5 Whys: Taiichi Ohno, Toyota Production System
 - Ishikawa: Kaoru Ishikawa, "Guide to Quality Control"
-- Gemba: "Go and see" — observe actual work
-- Jidoka: stop on defects, fix immediately
+- Gemba: "Go and see" — Jidoka: stop on defects, fix immediately

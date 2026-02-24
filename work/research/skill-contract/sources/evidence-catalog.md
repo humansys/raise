@@ -9,6 +9,7 @@
 ## Primary Sources (Very High Evidence)
 
 ### S1: Anthropic — Claude 4 Best Practices
+
 - **URL**: https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/claude-4-best-practices
 - **Type**: Primary (vendor documentation)
 - **Evidence Level**: Very High
@@ -26,6 +27,7 @@
   - Explicit "avoid over-engineering" needed (Claude 4.6 tendency)
 
 ### S2: Anthropic — Effective Context Engineering for AI Agents
+
 - **URL**: https://anthropic.com/engineering/effective-context-engineering-for-ai-agents
 - **Type**: Primary (vendor engineering blog)
 - **Evidence Level**: Very High
@@ -41,6 +43,7 @@
   - Anti-patterns: exhaustive edge-case lists, bloated tool sets, pre-loading all data
 
 ### S3: OpenAI — GPT-4.1 Prompting Guide
+
 - **URL**: https://cookbook.openai.com/examples/gpt4-1_prompting_guide
 - **Type**: Primary (vendor documentation)
 - **Evidence Level**: Very High
@@ -55,6 +58,7 @@
   - Audit failure modes: misunderstood intent, insufficient context, incomplete reasoning
 
 ### S4: OpenAI — GPT-5 Prompting Guide
+
 - **URL**: https://cookbook.openai.com/examples/gpt-5/gpt-5_prompting_guide
 - **Type**: Primary (vendor documentation)
 - **Evidence Level**: Very High
@@ -69,6 +73,7 @@
   - Metaprompting: use the model to optimize its own prompts
 
 ### S5: Lost in the Middle (Liu et al., TACL 2024)
+
 - **URL**: https://arxiv.org/abs/2307.03172
 - **Type**: Primary (peer-reviewed, TACL)
 - **Evidence Level**: Very High
@@ -76,6 +81,7 @@
 - **Data**: >30% accuracy drop for middle-positioned information
 
 ### S6: Same Task, More Tokens (Levy et al., ACL 2024)
+
 - **URL**: https://arxiv.org/abs/2402.14848
 - **Type**: Primary (peer-reviewed, ACL)
 - **Evidence Level**: Very High
@@ -83,6 +89,7 @@
 - **Data**: Accuracy dropped 0.92 → 0.68 at 3K tokens. Even relevant padding causes degradation.
 
 ### S7: IFScale — How Many Instructions Can LLMs Follow? (2025)
+
 - **URL**: https://arxiv.org/abs/2507.11538
 - **Type**: Primary (academic)
 - **Evidence Level**: Very High
@@ -90,18 +97,21 @@
 - **Data**: Reasoning models maintain near-perfect compliance until ~150 instructions, then cliff. Omission-to-modification error ratio: 34.88x.
 
 ### S8: Design Patterns for Securing LLM Agents (2025)
+
 - **URL**: https://arxiv.org/html/2506.08837v1
 - **Type**: Primary (academic)
 - **Evidence Level**: Very High
 - **Key Finding**: Structural separation of data and instructions. Context minimization after parsing.
 
 ### S9: OWASP LLM Prompt Injection Prevention
+
 - **URL**: https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html
 - **Type**: Secondary (industry standard)
 - **Evidence Level**: Very High
 - **Key Finding**: Layered defense required. No single technique sufficient.
 
 ### S10: Prompt Repetition Improves Non-Reasoning LLMs (Google Research, 2024)
+
 - **URL**: https://arxiv.org/abs/2512.14982
 - **Type**: Primary (peer-reviewed)
 - **Evidence Level**: Very High
@@ -112,41 +122,49 @@
 ## Secondary Sources (High Evidence)
 
 ### S11: Lakera — Prompt Engineering Guide 2026
+
 - **URL**: https://www.lakera.ai/blog/prompt-engineering-guide
 - **Evidence Level**: High
 - **Key Finding**: Prompt compression can reduce tokens 40-65% without quality loss. Conflicting instructions are top failure mode.
 
 ### S12: Elements.cloud — Agent Instruction Patterns and Anti-Patterns
+
 - **URL**: https://elements.cloud/blog/agent-instruction-patterns-and-antipatterns
 - **Evidence Level**: High (production Salesforce analysis)
 - **Key Finding**: 10 anti-patterns identified. Negative phrasing confuses agents. Overlapping conditions, inconsistent terminology harm compliance.
 
 ### S13: Lilian Weng (OpenAI) — Prompt Engineering
+
 - **URL**: https://lilianweng.github.io/posts/2023-03-15-prompt-engineering/
 - **Evidence Level**: High
 - **Key Finding**: Examples communicate intent more effectively than rules.
 
 ### S14: IFEval (Google, 2023)
+
 - **URL**: https://arxiv.org/abs/2311.07911
 - **Evidence Level**: Very High
 - **Key Finding**: Standard benchmark for instruction-following. Format/constraint instructions most testable.
 
 ### S15: InFoBench (ACL 2024)
+
 - **URL**: https://aclanthology.org/2024.findings-acl.772/
 - **Evidence Level**: High
 - **Key Finding**: Decomposing complex instructions into atomic criteria enables detailed compliance analysis.
 
 ### S16: Code Prompting Elicits Conditional Reasoning (2024)
+
 - **URL**: https://arxiv.org/html/2401.10065v1
 - **Evidence Level**: High
 - **Key Finding**: Structured code representations improve conditional reasoning accuracy over prose.
 
 ### S17: The Few-shot Dilemma: Over-prompting LLMs (2025)
+
 - **URL**: https://arxiv.org/html/2509.13196v1
 - **Evidence Level**: High
 - **Key Finding**: Diminishing returns past 2-5 examples. Over-prompting degrades performance.
 
 ### S18: MLOps Community — Impact of Prompt Bloat
+
 - **URL**: https://mlops.community/the-impact-of-prompt-bloat-on-llm-output-quality/
 - **Evidence Level**: High
 - **Key Finding**: Semantically similar noise is MORE damaging than random noise. CoT doesn't mitigate length degradation.
@@ -156,26 +174,32 @@
 ## Framework Evidence (High Evidence)
 
 ### S19: CrewAI — Task/Agent Structure
+
 - **Evidence Level**: High
 - **Key Finding**: Role/Goal/Backstory triad. Prompt slices for specialized behavior. Tasks have `description` + `expected_output`.
 
 ### S20: LangChain/LangGraph — Agent Structure
+
 - **Evidence Level**: High
 - **Key Finding**: System/Human/AI message roles. Tools auto-described from function signatures. State through typed schemas.
 
 ### S21: AutoGen (Microsoft) — Agent Structure
+
 - **Evidence Level**: High
 - **Key Finding**: Minimal flat structure: name + system_message + tools. `description` for orchestration (separate from system_message).
 
 ### S22: Claude Code — System Prompt Architecture
+
 - **Evidence Level**: High
 - **Key Finding**: 110+ prompt strings in 5 categories. Layered CLAUDE.md override system. Skills as Markdown loaded on demand. Mid-conversation system reminders.
 
 ### S23: OpenAI Agents SDK / Codex
+
 - **Evidence Level**: High
 - **Key Finding**: First-class guardrails (InputGuardrail/OutputGuardrail) separate from instructions. AGENTS.md with directory-based precedence. Dynamic instructions via functions.
 
 ---
 
 ## Source Count: 23 sources (10 Very High, 10 High, 3 Medium)
+
 ## Cross-references: 45+ triangulation points
