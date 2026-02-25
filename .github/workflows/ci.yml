@@ -25,6 +25,8 @@ jobs:
         run: uv sync --extra dev
       - name: Run tests
         run: uv run pytest --tb=short -q
+        env:
+          COLUMNS: "200"
       - name: Lint
         run: uv run ruff check src/ tests/
       - name: Format check
