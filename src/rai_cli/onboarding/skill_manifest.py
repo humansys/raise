@@ -14,7 +14,7 @@ import hashlib
 import json
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
@@ -24,7 +24,7 @@ from rai_cli.config.paths import MANIFESTS_SUBDIR, SKILLS_MANIFEST_FILE, get_rai
 logger = logging.getLogger(__name__)
 
 
-class SkillSyncAction(str, Enum):
+class SkillSyncAction(StrEnum):
     """Classification of a skill's sync state using dpkg three-hash model."""
 
     CURRENT = "current"

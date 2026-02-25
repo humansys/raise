@@ -12,10 +12,10 @@ from __future__ import annotations
 
 import difflib
 import sys
-from enum import Enum
+from enum import StrEnum
 
 
-class ConflictAction(str, Enum):
+class ConflictAction(StrEnum):
     """User's chosen action for a conflicting skill file."""
 
     KEEP = "keep"

@@ -245,7 +245,7 @@ class TestSkillSyncUpgrade:
         skill_md = tmp_path / ".claude" / "skills" / "rai-debug" / "SKILL.md"
         skill_md.write_text("# My custom debug skill", encoding="utf-8")
 
-        result = scaffold_skills(tmp_path)
+        scaffold_skills(tmp_path)
 
         # Should be classified as current (upstream didn't change)
         assert skill_md.read_text(encoding="utf-8") == "# My custom debug skill"
@@ -308,7 +308,7 @@ class TestSkillSyncUpgrade:
         # Simulate upstream change with untouched file
         manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
         data = json.loads(manifest_path.read_text(encoding="utf-8"))
-        old_hash = data["skills"][skill_name]["sha256"]
+        data["skills"][skill_name]["sha256"]
         data["skills"][skill_name]["sha256"] = "b" * 64
         manifest_path.write_text(json.dumps(data), encoding="utf-8")
 

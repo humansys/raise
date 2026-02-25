@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, date, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import yaml
@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, ValidationError
 logger = logging.getLogger(__name__)
 
 
-class ExperienceLevel(str, Enum):
+class ExperienceLevel(StrEnum):
     """Developer experience level with RaiSE (Shu-Ha-Ri model).
 
     Determines interaction verbosity and explanation depth.
@@ -33,7 +33,7 @@ class ExperienceLevel(str, Enum):
     RI = "ri"
 
 
-class CommunicationStyle(str, Enum):
+class CommunicationStyle(StrEnum):
     """Communication style preference.
 
     Determines how much explanation Rai provides by default.

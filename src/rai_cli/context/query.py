@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import time
 from datetime import date
-from enum import Enum
+from enum import StrEnum
 from math import exp, log, sqrt
 from pathlib import Path
 from typing import Any
@@ -29,7 +29,7 @@ SCORING_WILSON_Z: float = 1.96
 SCORING_LOW_WILSON_THRESHOLD: float = 0.15
 
 
-class UnifiedQueryStrategy(str, Enum):
+class UnifiedQueryStrategy(StrEnum):
     """Query strategy for unified context retrieval.
 
     Attributes:

@@ -8,7 +8,6 @@ from unittest.mock import MagicMock, patch
 from rai_cli.gates.models import GateContext, GateResult
 from rai_cli.gates.registry import EP_GATES, GateRegistry
 
-
 # ---------------------------------------------------------------------------
 # Test gate implementations
 # ---------------------------------------------------------------------------
