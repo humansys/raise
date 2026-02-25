@@ -1,8 +1,8 @@
-"""Unified context graph implementation.
+"""Knowledge graph engine.
 
-This module provides the UnifiedGraph class that wraps NetworkX MultiDiGraph
-for storing and querying cross-domain concepts. This is a pure in-memory graph;
-persistence is handled by KnowledgeGraphBackend implementations (ADR-036).
+Wraps NetworkX MultiDiGraph for storing and querying cross-domain concepts.
+This is a pure in-memory graph; persistence is handled by
+KnowledgeGraphBackend implementations (ADR-036).
 
 Architecture: ADR-019 Unified Context Graph Architecture
 """
@@ -15,10 +15,11 @@ from typing import Any
 
 import networkx as nx  # type: ignore[import-untyped]
 
-from rai_cli.context.models import (
+from rai_core.graph.models import (
     ConceptEdge,
     ConceptNode,
     EdgeType,
+    GraphEdge,
     GraphNode,
     NodeType,
 )
@@ -26,8 +27,8 @@ from rai_cli.context.models import (
 logger = logging.getLogger(__name__)
 
 
-class UnifiedGraph:
-    """NetworkX-based unified context graph.
+class Graph:
+    """NetworkX-based knowledge graph.
 
     Wraps a NetworkX MultiDiGraph to provide typed operations for adding,
     retrieving, and persisting concepts and relationships.
@@ -36,20 +37,20 @@ class UnifiedGraph:
         graph: The underlying NetworkX MultiDiGraph.
 
     Examples:
-        >>> graph = UnifiedGraph()
-        >>> node = ConceptNode(
+        >>> g = Graph()
+        >>> node = GraphNode(
         ...     id="PAT-001",
         ...     type="pattern",
         ...     content="Test pattern",
         ...     created="2026-02-03"
         ... )
-        >>> graph.add_concept(node)
-        >>> graph.node_count
+        >>> g.add_concept(node)
+        >>> g.node_count
         1
     """
 
     def __init__(self) -> None:
-        """Initialize an empty unified graph."""
+        """Initialize an empty graph."""
         self.graph: nx.MultiDiGraph[str] = nx.MultiDiGraph()
 
     def _reconstruct_node(self, node_id: str, data: dict[str, Any]) -> GraphNode:
@@ -72,18 +73,6 @@ class UnifiedGraph:
 
         Args:
             node: The concept node to add.
-
-        Examples:
-            >>> graph = UnifiedGraph()
-            >>> node = ConceptNode(
-            ...     id="PAT-001",
-            ...     type="pattern",
-            ...     content="Test",
-            ...     created="2026-02-03"
-            ... )
-            >>> graph.add_concept(node)
-            >>> graph.get_concept("PAT-001") is not None
-            True
         """
         self.graph.add_node(node.id, **node.model_dump())
 
@@ -92,17 +81,6 @@ class UnifiedGraph:
 
         Args:
             edge: The concept edge to add.
-
-        Examples:
-            >>> graph = UnifiedGraph()
-            >>> edge = ConceptEdge(
-            ...     source="PAT-001",
-            ...     target="SES-015",
-            ...     type="learned_from"
-            ... )
-            >>> graph.add_relationship(edge)
-            >>> graph.edge_count
-            1
         """
         self.graph.add_edge(
             edge.source,
@@ -119,12 +97,7 @@ class UnifiedGraph:
             concept_id: The unique concept identifier.
 
         Returns:
-            The ConceptNode if found, None otherwise.
-
-        Examples:
-            >>> node = graph.get_concept("PAT-001")
-            >>> node.type if node else None
-            'pattern'
+            The GraphNode if found, None otherwise.
         """
         if concept_id not in self.graph.nodes:
             return None
@@ -138,12 +111,7 @@ class UnifiedGraph:
             node_type: The node type to filter by.
 
         Returns:
-            List of ConceptNode instances matching the type.
-
-        Examples:
-            >>> patterns = graph.get_concepts_by_type("pattern")
-            >>> all(p.type == "pattern" for p in patterns)
-            True
+            List of GraphNode instances matching the type.
         """
         concepts: list[ConceptNode] = []
         node_id: str
@@ -167,12 +135,7 @@ class UnifiedGraph:
             edge_types: Optional filter for edge types.
 
         Returns:
-            List of neighboring ConceptNode instances.
-
-        Examples:
-            >>> neighbors = graph.get_neighbors("PAT-001", depth=2)
-            >>> len(neighbors) >= 0
-            True
+            List of neighboring GraphNode instances.
         """
         if concept_id not in self.graph.nodes:
             return []
@@ -208,7 +171,7 @@ class UnifiedGraph:
                         next_level.add(source)
             current_level = next_level
 
-        # Convert to ConceptNode instances
+        # Convert to GraphNode instances
         node_id: str
         for node_id in visited:
             if node_id != concept_id:
@@ -225,11 +188,7 @@ class UnifiedGraph:
         plugin) and emits a warning instead of crashing. See RAISE-136.
 
         Yields:
-            ConceptNode instances for each node.
-
-        Examples:
-            >>> for concept in graph.iter_concepts():
-            ...     print(concept.id)
+            GraphNode instances for each node.
         """
         node_id: str
         for node_id in self.graph.nodes:
@@ -248,11 +207,7 @@ class UnifiedGraph:
         """Iterate over all relationships in the graph.
 
         Yields:
-            ConceptEdge instances for each edge.
-
-        Examples:
-            >>> for edge in graph.iter_relationships():
-            ...     print(f"{edge.source} -> {edge.target}")
+            GraphEdge instances for each edge.
         """
         edge_tuple: tuple[str, str, dict[str, Any]]
         for edge_tuple in self.graph.edges(data=True):
@@ -264,7 +219,7 @@ class UnifiedGraph:
             metadata: dict[str, Any] = {
                 k: v for k, v in data.items() if k not in ("type", "weight")
             }
-            yield ConceptEdge(
+            yield GraphEdge(
                 source=source,
                 target=target,
                 type=edge_type,
@@ -274,19 +229,14 @@ class UnifiedGraph:
 
     @property
     def node_count(self) -> int:
-        """Get the number of nodes in the graph.
-
-        Returns:
-            Number of concept nodes.
-        """
+        """Get the number of nodes in the graph."""
         return self.graph.number_of_nodes()
 
     @property
     def edge_count(self) -> int:
-        """Get the number of edges in the graph.
-
-        Returns:
-            Number of relationship edges.
-        """
+        """Get the number of edges in the graph."""
         return self.graph.number_of_edges()
 
+
+# Backward compat alias
+UnifiedGraph = Graph

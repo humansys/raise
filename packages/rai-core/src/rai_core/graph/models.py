@@ -1,8 +1,8 @@
-"""Pydantic models for unified context graph.
+"""Pydantic models for the knowledge graph.
 
-This module defines the core data structures for the unified context graph
-that merges governance, memory, and work concepts into a single queryable
-structure.
+Core data structures: nodes, edges, type systems. All knowledge in RaiSE
+(patterns, governance, discovery, sessions) is represented as typed nodes
+and directed edges in a queryable graph.
 
 Architecture: ADR-019 Unified Context Graph Architecture
 """
@@ -156,8 +156,9 @@ class ReleaseNode(GraphNode, node_type="release"):
     """Release milestones. Extension: changelog, artifact URLs."""
 
 
-# Backward compat alias — all existing code uses ConceptNode
+# Backward compat aliases
 ConceptNode = GraphNode
+ConceptEdge: type  # forward declaration, assigned after GraphEdge
 
 
 # --- Edge type system (open for plugins, flat — no hierarchy needed) ---
@@ -181,7 +182,7 @@ class CoreEdgeTypes:
 
 
 class GraphEdge(BaseModel):
-    """An edge in the unified context graph. Open type system.
+    """An edge in the knowledge graph. Open type system.
 
     Represents a directed relationship between two concepts.
 
@@ -208,5 +209,5 @@ class GraphEdge(BaseModel):
     )
 
 
-# Backward compat alias
+# Assign backward compat alias
 ConceptEdge = GraphEdge

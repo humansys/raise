@@ -21,7 +21,6 @@ from rich.console import Console
 from rich.table import Table
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.graph.filesystem_backend import get_active_backend
 from rai_cli.publish.check import CheckResult, run_checks
 from rai_cli.publish.version import (
     BumpType,
@@ -29,6 +28,7 @@ from rai_cli.publish.version import (
     is_pep440,
     sync_version_files,
 )
+from rai_core.graph.backends.filesystem import get_active_backend
 
 release_app = typer.Typer(help="Release management commands")
 console = Console()
