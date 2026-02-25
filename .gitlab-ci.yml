@@ -1,5 +1,10 @@
 # GitLab CI/CD for raise-commons
 # Source of truth pipeline — security scanning + quality gates
+# Trigger: MR targeting dev only. Direct commits to dev do not run the pipeline.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
 
 stages:
   - test
@@ -21,8 +26,7 @@ test:
     - uv run ruff format --check src/ tests/
     - uv run pyright
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "dev"
+    - when: always
 
 # --- Snyk Stage ---
 
@@ -43,8 +47,7 @@ snyk:sca:
       - snyk-sca-report.json
     expire_in: 30 days
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "dev"
+    - when: always
 
 snyk:sast:
   stage: snyk
@@ -59,8 +62,7 @@ snyk:sast:
       - snyk-sast-report.json
     expire_in: 30 days
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "dev"
+    - when: always
 
 snyk:iac:
   stage: snyk
@@ -75,8 +77,7 @@ snyk:iac:
       - snyk-iac-report.json
     expire_in: 30 days
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "dev"
+    - when: always
 
 # --- Security Stage (GitLab templates + SonarQube) ---
 
@@ -97,8 +98,7 @@ sonarqube:scan:
     - sonar-scanner
   allow_failure: true
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "dev"
+    - when: always
 
 include:
   - template: Jobs/SAST.gitlab-ci.yml
