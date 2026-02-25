@@ -11,7 +11,6 @@ import pytest
 from rai_cli.gates.models import GateContext, GateResult
 from rai_cli.gates.protocol import WorkflowGate
 
-
 # ---------------------------------------------------------------------------
 # Fixtures — conformant and non-conformant gate implementations
 # ---------------------------------------------------------------------------

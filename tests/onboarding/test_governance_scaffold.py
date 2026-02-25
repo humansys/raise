@@ -191,9 +191,9 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """Scaffolded prd.md should produce requirement nodes in graph."""
-        from rai_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import GraphBuilder
 
-        builder = UnifiedGraphBuilder(scaffolded_project)
+        builder = GraphBuilder(scaffolded_project)
         graph = builder.build()
 
         requirements = graph.get_concepts_by_type("requirement")
@@ -208,9 +208,9 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """Scaffolded vision.md should produce outcome nodes in graph."""
-        from rai_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import GraphBuilder
 
-        builder = UnifiedGraphBuilder(scaffolded_project)
+        builder = GraphBuilder(scaffolded_project)
         graph = builder.build()
 
         outcomes = graph.get_concepts_by_type("outcome")
@@ -227,7 +227,7 @@ class TestScaffoldToBuildIntegration:
         and filled by /rai-project-onboard (RAISE-219). We add a row manually here
         to test the graph builder pipeline independent of the template content.
         """
-        from rai_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import GraphBuilder
 
         # Add a guardrail row — in real usage this is done by rai-project-onboard
         guardrails_path = scaffolded_project / "governance" / "guardrails.md"
@@ -235,7 +235,7 @@ class TestScaffoldToBuildIntegration:
         row = "| must-code-001 | MUST | Use consistent code style | linter | RF-01 |\n"
         guardrails_path.write_text(content + row, encoding="utf-8")
 
-        builder = UnifiedGraphBuilder(scaffolded_project)
+        builder = GraphBuilder(scaffolded_project)
         graph = builder.build()
 
         guardrails = graph.get_concepts_by_type("guardrail")
@@ -249,7 +249,7 @@ class TestScaffoldToBuildIntegration:
         Scaffold alone produces requirements and outcomes from templates.
         Guardrails require onboard to add tech-stack rows (RAISE-219).
         """
-        from rai_cli.context.builder import UnifiedGraphBuilder
+        from rai_cli.context.builder import GraphBuilder
 
         # Simulate onboard adding a guardrail row
         guardrails_path = scaffolded_project / "governance" / "guardrails.md"
@@ -257,7 +257,7 @@ class TestScaffoldToBuildIntegration:
         row = "| must-code-001 | MUST | Use consistent code style | linter | RF-01 |\n"
         guardrails_path.write_text(content + row, encoding="utf-8")
 
-        builder = UnifiedGraphBuilder(scaffolded_project)
+        builder = GraphBuilder(scaffolded_project)
         graph = builder.build()
 
         gov_types: set[str] = set()

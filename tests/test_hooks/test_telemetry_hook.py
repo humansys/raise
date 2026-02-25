@@ -26,7 +26,6 @@ from rai_cli.hooks.protocol import LifecycleHook
 from rai_cli.hooks.registry import HookRegistry
 from rai_cli.telemetry.writer import EmitResult
 
-
 # ---------------------------------------------------------------------------
 # Protocol conformance
 # ---------------------------------------------------------------------------
@@ -202,7 +201,7 @@ class TestEntryPointDiscovery:
 class TestE2EIntegration:
     """Full pipeline: emit event through registry, verify signal on disk."""
 
-    def test_emit_event_writes_signal_to_disk(self, tmp_path: "Path") -> None:
+    def test_emit_event_writes_signal_to_disk(self, tmp_path: Path) -> None:
         """Emit a real event through the full pipeline and verify the signal file."""
         # Wire up: registry discovers TelemetryHook, emitter uses registry
         registry = HookRegistry()
@@ -230,7 +229,7 @@ class TestE2EIntegration:
         assert signal["command"] == "graph"
         assert signal["subcommand"] == "build"
 
-    def test_multiple_events_append_signals(self, tmp_path: "Path") -> None:
+    def test_multiple_events_append_signals(self, tmp_path: Path) -> None:
         """Multiple events produce multiple signal lines."""
         registry = HookRegistry()
         registry.discover()
@@ -256,14 +255,14 @@ class TestE2EIntegration:
         assert commands == [("session", "start"), ("graph", "build"), ("pattern", "added")]
 
 
-def _emit_to_tmpdir(tmp_path: "Path"):  # type: ignore[type-arg]
+def _emit_to_tmpdir(tmp_path: Path):  # type: ignore[type-arg]
     """Create a wrapper that writes CommandUsage to tmp_path/signals.jsonl."""
     from datetime import UTC, datetime
 
     from rai_cli.telemetry.schemas import CommandUsage
     from rai_cli.telemetry.writer import emit
 
-    def _wrapper(command: str, subcommand: str | None = None) -> "EmitResult":
+    def _wrapper(command: str, subcommand: str | None = None) -> EmitResult:
         signal = CommandUsage(
             timestamp=datetime.now(UTC),
             command=command,
