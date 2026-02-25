@@ -596,6 +596,34 @@
   - **Decision needed:** Keep work/ in repo for git history? Move to Confluence only? Hybrid (summaries in repo, full content in Confluence)?
   - **Priority:** Medium — blocked by research-to-Confluence skill adaptation.
 
+---
+
+### RAISE-275 Epic Design — Parking Lot (2026-02-25)
+
+- [ ] **RLS (Row-Level Security) for multi-tenant isolation** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Currently using WHERE clause filtering by org_id. RLS enforces isolation at DB level.
+  - **When:** Enterprise tier with strict data isolation requirements.
+  - **Priority:** Low — WHERE clause sufficient for single-org and early multi-org.
+
+- [ ] **JWT/OAuth auth upgrade** — (RAISE-275 design, 2026-02-25)
+  - **Context:** API key per org sufficient for POC. JWT adds per-user granularity and scopes.
+  - **When:** User management needed (multiple users per org with different permissions).
+  - **Priority:** Low — API key works for POC + first Pro customers.
+
+- [ ] **Pattern promotion workflow (PERSONAL → PROJECT → ORG)** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Research defined the scope model. Promotion requires HITL validation and CLI commands.
+  - **What:** `rai pattern promote` command, classification heuristics, architect validation for ORG scope.
+  - **Priority:** Medium — needed for team intelligence, but not for initial backend.
+
+- [ ] **Graph algorithms Phase 2: PPR, spreading activation** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Research validated PPR (~10 lines) and spreading activation (SA-RAG, 25-39% improvement).
+  - **When:** After backend is stable and has enough data to benchmark.
+  - **Priority:** Medium — enhances relevance but current keyword + BFS works.
+
+- [ ] **pgAdmin in Docker Compose** — (RAISE-275 design, 2026-02-25)
+  - **What:** Add pgAdmin service for visual DB inspection during development.
+  - **Priority:** Low — nice-to-have, `psql` CLI sufficient.
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-25 (SES-281: repo clutter, research-to-Confluence, work/ location)*
+*Last updated: 2026-02-25 (RAISE-275: deferred design decisions)*
