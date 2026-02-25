@@ -13,7 +13,7 @@ test:
   image: python:3.12-slim
   before_script:
     - pip install uv
-    - uv sync --dev
+    - uv sync --extra dev
   script:
     - uv run pytest --tb=short -q
     - uv run ruff check src/ tests/
