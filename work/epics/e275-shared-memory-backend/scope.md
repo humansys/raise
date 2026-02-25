@@ -16,15 +16,15 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 
 ## Stories (7 stories estimated)
 
-| ID | Story | Size | Status | Description |
-|----|-------|:----:|:------:|-------------|
-| S275.1 | Extract rai-core package | S | Pending | Move 6 files (models, graph, query, protocols, backends) to rai_core. Re-exports for backward compat. ~30 import updates. |
-| S275.2 | PostgreSQL schema + Alembic | S | Pending | 4 tables (orgs, api_keys, graph_nodes, graph_edges). Docker Compose with PG. Alembic initial migration. |
-| S275.3 | FastAPI server bootstrap | M | Pending | App skeleton, config (env vars), auth middleware (API key → OrgContext), health endpoint. Dockerfile.server. |
-| S275.4 | Graph CRUD endpoints | M | Pending | 6 endpoints: single + batch for nodes and edges, get node by id. SQLAlchemy async queries. |
-| S275.5 | Query + Subgraph endpoints | S | Pending | 2 endpoints: keyword query with scope/type filtering, BFS subgraph extraction. OpenAPI spec auto-generated. |
-| S275.6 | ApiGraphBackend + DualWrite | M | Pending | `ApiGraphBackend` (httpx client), `DualWriteBackend` (local + remote). `get_active_backend()` selection via env vars. |
-| S275.7 | Dogfood + offline fallback | S | Pending | Test with raise-commons real graph. pending_sync marker for offline writes. Sync-on-reconnect. |
+| ID | JIRA | Story | Size | Status | Description |
+|----|------|-------|:----:|:------:|-------------|
+| S275.1 | [RAISE-276](https://humansys.atlassian.net/browse/RAISE-276) | Extract rai-core package | S | Pending | Move 6 files (models, graph, query, protocols, backends) to rai_core. Re-exports for backward compat. ~30 import updates. |
+| S275.2 | [RAISE-277](https://humansys.atlassian.net/browse/RAISE-277) | PostgreSQL schema + Alembic | S | Pending | 4 tables (orgs, api_keys, graph_nodes, graph_edges). Docker Compose with PG. Alembic initial migration. |
+| S275.3 | [RAISE-278](https://humansys.atlassian.net/browse/RAISE-278) | FastAPI server bootstrap | M | Pending | App skeleton, config (env vars), auth middleware (API key → OrgContext), health endpoint. Dockerfile.server. |
+| S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph CRUD endpoints | M | Pending | 6 endpoints: single + batch for nodes and edges, get node by id. SQLAlchemy async queries. |
+| S275.5 | [RAISE-280](https://humansys.atlassian.net/browse/RAISE-280) | Query + Subgraph endpoints | S | Pending | 2 endpoints: keyword query with scope/type filtering, BFS subgraph extraction. OpenAPI spec auto-generated. |
+| S275.6 | [RAISE-281](https://humansys.atlassian.net/browse/RAISE-281) | ApiGraphBackend + DualWrite | M | Pending | `ApiGraphBackend` (httpx client), `DualWriteBackend` (local + remote). `get_active_backend()` selection via env vars. |
+| S275.7 | [RAISE-282](https://humansys.atlassian.net/browse/RAISE-282) | Dogfood + offline fallback | S | Pending | Test with raise-commons real graph. pending_sync marker for offline writes. Sync-on-reconnect. |
 
 **Total:** 7 stories (2S + 3M + 2S = estimated M appetite)
 
@@ -115,6 +115,67 @@ S275.7 (dogfood + offline)
 | Timeline too tight for 7 stories in ~7 days | M/H | Critical path delivers OpenAPI spec by S275.5 (~day 4). Fernando unblocked even if S275.6-7 slip. |
 | rai-core extraction breaks existing tests | L/M | Re-export layer ensures backward compat. Run full test suite after extraction. |
 | Docker Compose differences across dev machines | L/L | Standard PG image, pinned versions, documented env vars. |
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-25
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S275.1 — Extract rai-core | S | None | M1 | **Risk-first.** Refactor with ~30 import changes. Must pass full test suite before anything else builds on it. Unblocks both server and CLI integration. |
+| 2 | S275.2 — PG schema + Docker | S | S275.1 | M1 | **Walking skeleton base.** DB + Docker Compose = infrastructure foundation. rai-server package created here. |
+| 3 | S275.3 — FastAPI bootstrap | M | S275.2 | M1 | **Skeleton complete.** Health endpoint + auth middleware + config. Proves the server runs, connects to DB, validates API keys. |
+| 4a | S275.4 — CRUD endpoints | M | S275.3 | M2 | **Core value.** Nodes and edges CRUD. After this, data can be persisted and retrieved. |
+| 4b | S275.5 — Query + Subgraph | S | S275.3 | M2 | **Parallel with S275.4.** Query endpoints don't depend on CRUD implementation, only on DB schema (S275.2) and app skeleton (S275.3). OpenAPI spec deliverable to Fernando. |
+| 5 | S275.6 — ApiGraphBackend | M | S275.1 + S275.4 + S275.5 | M3 | **CLI integration.** Needs rai-core (protocols) and working endpoints. DualWriteBackend connects CLI to server. |
+| 6 | S275.7 — Dogfood + offline | S | S275.6 | M4 | **Validation.** Real graph data through the full pipeline. Offline fallback. Epic done criteria verified. |
+
+### Milestones
+
+| Milestone | Stories | Target | Success Criteria |
+|-----------|---------|--------|------------------|
+| **M1: Walking Skeleton** | S275.1, S275.2, S275.3 | Day 3 (~Feb 27) | `docker compose up` → server running, `/health` returns 200, API key validated, all existing tests pass. |
+| **M2: API Complete** | +S275.4, S275.5 | Day 5 (~Mar 1) | POST node → GET node works. Query returns results. **OpenAPI spec delivered to Fernando.** |
+| **M3: CLI Connected** | +S275.6 | Day 6 (~Mar 2) | CLI with `RAI_SERVER_URL` set → `rai graph build` persists to both local and server. |
+| **M4: Epic Complete** | +S275.7 | Day 7 (~Mar 3) | Real raise-commons graph in shared server. Offline fallback works. Done criteria met. Retro done. |
+
+### Parallel Work Streams
+
+```
+Time →  Day 1    Day 2    Day 3    Day 4    Day 5    Day 6    Day 7
+        ──────   ──────   ──────   ──────   ──────   ──────   ──────
+Main:   S275.1 → S275.2 → S275.3 → S275.4 ──────→ S275.6 → S275.7
+                                     ↓                ↑
+Parallel:                          S275.5 ────────────┘
+                                     ↓
+                              OpenAPI spec → Fernando
+```
+
+**Merge point:** S275.6 needs both S275.4 and S275.5 complete before starting.
+
+**Fernando unblock:** After S275.5 (target Day 5 / Mar 1). He gets the OpenAPI spec and can start Forge actions immediately, even if S275.6-7 slip.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S275.1 — Extract rai-core | S | Pending | — | — | |
+| S275.2 — PG schema + Docker | S | Pending | — | — | |
+| S275.3 — FastAPI bootstrap | M | Pending | — | — | |
+| S275.4 — CRUD endpoints | M | Pending | — | — | |
+| S275.5 — Query + Subgraph | S | Pending | — | — | Parallel with S275.4 |
+| S275.6 — ApiGraphBackend | M | Pending | — | — | |
+| S275.7 — Dogfood + offline | S | Pending | — | — | |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| S275.1 extraction takes longer than 1 day (hidden deps) | L/H | Gemba already mapped blast radius: 6 files, 0 circular deps, ~30 mechanical imports. Re-exports eliminate risk of breaking existing code. |
+| S275.4+5 parallel creates merge conflicts | L/L | Different endpoint files, no shared code. Only merge point is router registration. |
+| Fernando needs spec before Mar 1 | M/H | S275.5 can produce a hand-written OpenAPI spec as fallback even if server isn't running yet. FastAPI auto-generates spec once endpoints exist. |
 
 ## Parking Lot
 
