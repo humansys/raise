@@ -3,6 +3,7 @@
 
 stages:
   - test
+  - snyk
   - security
 
 # --- Test Stage ---
@@ -18,6 +19,28 @@ test:
     - uv run ruff check src/ tests/
     - uv run ruff format --check src/ tests/
     - uv run pyright
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "dev"
+
+# --- Snyk Stage ---
+
+snyk:sca:
+  stage: snyk
+  image: node:20-slim
+  before_script:
+    - npm install -g snyk
+    - apt-get update -qq && apt-get install -y -qq python3 python3-pip
+    - pip3 install uv --break-system-packages
+    - uv sync --dev
+  script:
+    - snyk auth $SNYK_TOKEN
+    - snyk test --all-projects --json-file-output=snyk-sca-report.json || true
+    - snyk monitor --all-projects
+  artifacts:
+    paths:
+      - snyk-sca-report.json
+    expire_in: 30 days
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "dev"
