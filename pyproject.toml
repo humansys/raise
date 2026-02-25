@@ -83,7 +83,7 @@ lint = "rai_cli.gates.builtin.lint:LintGate"
 coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
 
 [project.entry-points."rai.graph.backends"]
-local = "rai_cli.graph.filesystem_backend:FilesystemGraphBackend"
+local = "rai_core.graph.backends.filesystem:FilesystemGraphBackend"
 
 [build-system]
 requires = ["hatchling"]

@@ -2,6 +2,12 @@ version = 1
 revision = 3
 requires-python = ">=3.12"
 
+[manifest]
+members = [
+    "rai-cli",
+    "rai-core",
+]
+
 [[package]]
 name = "annotated-types"
 version = "0.7.0"
@@ -663,7 +669,7 @@ wheels = [
 
 [[package]]
 name = "rai-cli"
-version = "2.0.4"
+version = "2.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "atlassian-python-api" },
@@ -673,6 +679,7 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pyyaml" },
+    { name = "rai-core" },
     { name = "rich" },
     { name = "tree-sitter" },
     { name = "tree-sitter-javascript" },
@@ -708,6 +715,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.0.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.1.0" },
     { name = "pyyaml", specifier = ">=6.0.1" },
+    { name = "rai-core", editable = "packages/rai-core" },
     { name = "rich", specifier = ">=13.7.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.1" },
@@ -721,6 +729,21 @@ requires-dist = [
     { name = "typer", specifier = ">=0.12.0" },
 ]
 provides-extras = ["dev", "csharp"]
+
+[[package]]
+name = "rai-core"
+version = "2.1.0"
+source = { editable = "packages/rai-core" }
+dependencies = [
+    { name = "networkx" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "networkx", specifier = ">=3.6.1" },
+    { name = "pydantic", specifier = ">=2.6.0" },
+]
 
 [[package]]
 name = "requests"

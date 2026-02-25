@@ -12,7 +12,7 @@ class TestConceptToNode:
     """Tests for concept_to_node conversion."""
 
     def test_basic_conversion(self) -> None:
-        """Given a Concept, returns ConceptNode with mapped fields."""
+        """Given a Concept, returns GraphNode with mapped fields."""
         concept = Concept(
             id="req-rf-01",
             type=ConceptType.REQUIREMENT,

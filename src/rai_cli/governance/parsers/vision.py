@@ -10,10 +10,10 @@ from pathlib import Path
 
 from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
-from rai_cli.context.models import GraphNode
 from rai_cli.core.text import sanitize_id
 from rai_cli.governance.models import Concept, ConceptType
 from rai_cli.governance.parsers._convert import concept_to_node
+from rai_core.graph.models import GraphNode
 
 
 def extract_outcomes(

@@ -14,8 +14,8 @@ from typing import Any
 
 import networkx as nx  # type: ignore[import-untyped]
 
-from rai_cli.adapters.models import BackendHealth
-from rai_cli.context.graph import UnifiedGraph
+from rai_core.graph.backends.models import BackendHealth
+from rai_core.graph.engine import Graph
 
 __all__ = ["FilesystemGraphBackend", "get_active_backend"]
 
@@ -33,11 +33,11 @@ class FilesystemGraphBackend:
     def __init__(self, path: Path) -> None:
         self.path = path
 
-    def persist(self, graph: UnifiedGraph) -> None:
+    def persist(self, graph: Graph) -> None:
         """Save graph to JSON file using NetworkX node_link_data format.
 
         Args:
-            graph: The unified graph to persist.
+            graph: The graph to persist.
         """
         data: dict[str, Any] = nx.node_link_data(graph.graph)  # type: ignore[assignment]
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -45,11 +45,11 @@ class FilesystemGraphBackend:
             json.dumps(data, indent=2, default=str), encoding="utf-8"
         )
 
-    def load(self) -> UnifiedGraph:
+    def load(self) -> Graph:
         """Load graph from the configured path.
 
         Returns:
-            UnifiedGraph instance with loaded data.
+            Graph instance with loaded data.
 
         Raises:
             FileNotFoundError: If the file doesn't exist.
@@ -58,7 +58,7 @@ class FilesystemGraphBackend:
         loaded_data: dict[str, Any] = json.loads(
             self.path.read_text(encoding="utf-8")
         )
-        instance = UnifiedGraph()
+        instance = Graph()
         instance.graph = nx.node_link_graph(
             loaded_data, directed=True, multigraph=True
         )
@@ -73,14 +73,11 @@ class FilesystemGraphBackend:
         )
 
 
-# TODO(raise-pro): Add tier-based backend selection via TierContext +
-# entry point discovery. Cache instance per path for stateful backends
-# (e.g., SupabaseBackend with connection pooling).
 def get_active_backend(path: Path) -> FilesystemGraphBackend:
     """Resolve the active graph backend for the given path.
 
-    Returns FilesystemGraphBackend (COMMUNITY). raise-pro will add
-    tier-based selection via TierContext + entry point discovery.
+    Returns FilesystemGraphBackend (COMMUNITY). Future: tier-based
+    selection via env vars (DualWriteBackend when RAI_SERVER_URL set).
 
     Args:
         path: Path to the graph JSON file.
