@@ -7,18 +7,21 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.adapters.models import BackendHealth
-from rai_cli.adapters.protocols import KnowledgeGraphBackend
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptEdge, ConceptNode
-from rai_cli.graph.filesystem_backend import FilesystemGraphBackend, get_active_backend
+from rai_core.graph.backends.filesystem import (
+    FilesystemGraphBackend,
+    get_active_backend,
+)
+from rai_core.graph.backends.models import BackendHealth
+from rai_core.graph.backends.protocol import KnowledgeGraphBackend
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphEdge, GraphNode
 
 
-def _make_sample_graph() -> UnifiedGraph:
+def _make_sample_graph() -> Graph:
     """Create a graph with nodes and edges for testing."""
-    graph = UnifiedGraph()
+    graph = Graph()
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="PAT-001",
             type="pattern",
             content="Test pattern content",
@@ -26,7 +29,7 @@ def _make_sample_graph() -> UnifiedGraph:
         )
     )
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="SES-001",
             type="session",
             content="Test session content",
@@ -34,7 +37,7 @@ def _make_sample_graph() -> UnifiedGraph:
         )
     )
     graph.add_relationship(
-        ConceptEdge(
+        GraphEdge(
             source="PAT-001",
             target="SES-001",
             type="learned_from",
@@ -132,7 +135,7 @@ class TestFilesystemGraphBackend:
     def test_persist_format_identical_to_networkx_node_link(
         self, tmp_path: Path
     ) -> None:
-        """Verify output format matches what UnifiedGraph.save() produced."""
+        """Verify output format matches what Graph.save() produced."""
         import networkx as nx  # type: ignore[import-untyped]
 
         backend_path = tmp_path / "backend.json"

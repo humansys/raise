@@ -237,7 +237,7 @@ class TestGraphBuildEvent:
         with (
             patch("rai_cli.cli.commands.graph.create_emitter", return_value=mock_emitter),
             patch("rai_cli.cli.commands.graph.get_active_backend", return_value=mock_backend),
-            patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder") as mock_builder_cls,
+            patch("rai_cli.cli.commands.graph.GraphBuilder") as mock_builder_cls,
             patch("rai_cli.cli.commands.graph._get_default_index_path", return_value=tmp_path / "index.json"),
         ):
             mock_builder = MagicMock()
@@ -346,12 +346,11 @@ class TestInitCompleteEvent:
     def test_init_emits_event(
         self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
     ) -> None:
+        # Create a Typer app just for testing
+        import typer
         from typer.testing import CliRunner
 
         from rai_cli.cli.commands.init import init_command
-
-        # Create a Typer app just for testing
-        import typer
 
         app = typer.Typer()
         app.command()(init_command)
