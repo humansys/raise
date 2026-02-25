@@ -18,7 +18,7 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 from rai_core.graph.engine import Graph
-from rai_core.graph.models import ConceptNode, EdgeType, GraphNode, NodeType
+from rai_core.graph.models import EdgeType, GraphNode, NodeType
 
 # --- Scoring constants ---
 SCORING_HALF_LIFE_DAYS: int = 30
@@ -289,13 +289,13 @@ class QueryEngine:
 
     def _keyword_search(
         self, query: Query
-    ) -> tuple[list[ConceptNode], int]:
+    ) -> tuple[list[GraphNode], int]:
         """Execute keyword search strategy."""
         keywords = query.query.lower().split()
         if not keywords:
             return [], 0
 
-        scored_concepts: list[tuple[float, ConceptNode]] = []
+        scored_concepts: list[tuple[float, GraphNode]] = []
 
         for concept in self.graph.iter_concepts():
             # Apply type filter
@@ -327,7 +327,7 @@ class QueryEngine:
 
     def _concept_lookup(
         self, query: Query
-    ) -> tuple[list[ConceptNode], int]:
+    ) -> tuple[list[GraphNode], int]:
         """Execute concept lookup strategy."""
         concept_id = query.query
 
@@ -338,7 +338,7 @@ class QueryEngine:
 
         # Apply type filter to main concept
         if query.types and concept.type not in query.types:
-            concepts: list[ConceptNode] = []
+            concepts: list[GraphNode] = []
         else:
             concepts = [concept]
 
@@ -361,7 +361,7 @@ class QueryEngine:
     def _calculate_metadata(
         self,
         query: Query,
-        concepts: list[ConceptNode],
+        concepts: list[GraphNode],
         execution_time_ms: float,
         total_available: int,
     ) -> QueryMetadata:
@@ -388,7 +388,7 @@ class QueryEngine:
     # Architectural Context Helpers
     # =========================================================================
 
-    def find_domain_for(self, module_id: str) -> ConceptNode | None:
+    def find_domain_for(self, module_id: str) -> GraphNode | None:
         """Find the bounded context a module belongs to."""
         neighbors = self.graph.get_neighbors(
             module_id, depth=1, edge_types=["belongs_to"]
@@ -398,7 +398,7 @@ class QueryEngine:
                 return node
         return None
 
-    def find_layer_for(self, module_id: str) -> ConceptNode | None:
+    def find_layer_for(self, module_id: str) -> GraphNode | None:
         """Find the architectural layer a module belongs to."""
         neighbors = self.graph.get_neighbors(
             module_id, depth=1, edge_types=["in_layer"]
@@ -408,7 +408,7 @@ class QueryEngine:
                 return node
         return None
 
-    def find_constraints_for(self, module_id: str) -> list[ConceptNode]:
+    def find_constraints_for(self, module_id: str) -> list[GraphNode]:
         """Find all guardrails that constrain a module."""
         domain = self.find_domain_for(module_id)
         if domain is None:
@@ -419,7 +419,7 @@ class QueryEngine:
         )
         return [n for n in neighbors if n.type == "guardrail"]
 
-    def find_release_for(self, epic_id: str) -> ConceptNode | None:
+    def find_release_for(self, epic_id: str) -> GraphNode | None:
         """Find the release an epic belongs to."""
         neighbors = self.graph.get_neighbors(
             epic_id, depth=1, edge_types=["part_of"]
@@ -453,11 +453,3 @@ class QueryEngine:
             constraints=constraints,
             dependencies=dependencies,
         )
-
-
-# Backward compat aliases
-UnifiedQueryEngine = QueryEngine
-UnifiedQuery = Query
-UnifiedQueryResult = QueryResult
-UnifiedQueryMetadata = QueryMetadata
-UnifiedQueryStrategy = QueryStrategy

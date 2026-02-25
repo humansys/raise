@@ -16,8 +16,6 @@ from typing import Any
 import networkx as nx  # type: ignore[import-untyped]
 
 from rai_core.graph.models import (
-    ConceptEdge,
-    ConceptNode,
     EdgeType,
     GraphEdge,
     GraphNode,
@@ -68,7 +66,7 @@ class Graph:
             )
         return GraphNode.model_validate(data)
 
-    def add_concept(self, node: ConceptNode) -> None:
+    def add_concept(self, node: GraphNode) -> None:
         """Add a concept node to the graph.
 
         Args:
@@ -76,7 +74,7 @@ class Graph:
         """
         self.graph.add_node(node.id, **node.model_dump())
 
-    def add_relationship(self, edge: ConceptEdge) -> None:
+    def add_relationship(self, edge: GraphEdge) -> None:
         """Add a relationship edge to the graph.
 
         Args:
@@ -90,7 +88,7 @@ class Graph:
             **edge.metadata,
         )
 
-    def get_concept(self, concept_id: str) -> ConceptNode | None:
+    def get_concept(self, concept_id: str) -> GraphNode | None:
         """Get a concept by ID.
 
         Args:
@@ -104,7 +102,7 @@ class Graph:
         data = dict(self.graph.nodes[concept_id])
         return self._reconstruct_node(concept_id, data)
 
-    def get_concepts_by_type(self, node_type: NodeType) -> list[ConceptNode]:
+    def get_concepts_by_type(self, node_type: NodeType) -> list[GraphNode]:
         """Get all concepts of a specific type.
 
         Args:
@@ -113,7 +111,7 @@ class Graph:
         Returns:
             List of GraphNode instances matching the type.
         """
-        concepts: list[ConceptNode] = []
+        concepts: list[GraphNode] = []
         node_id: str
         for node_id in self.graph.nodes:
             data: dict[str, Any] = dict(self.graph.nodes[node_id])
@@ -126,7 +124,7 @@ class Graph:
         concept_id: str,
         depth: int = 1,
         edge_types: list[EdgeType] | None = None,
-    ) -> list[ConceptNode]:
+    ) -> list[GraphNode]:
         """Get neighboring concepts via BFS traversal.
 
         Args:
@@ -142,7 +140,7 @@ class Graph:
 
         visited: set[str] = {concept_id}
         current_level: set[str] = {concept_id}
-        neighbors: list[ConceptNode] = []
+        neighbors: list[GraphNode] = []
 
         for _ in range(depth):
             next_level: set[str] = set()
@@ -181,7 +179,7 @@ class Graph:
 
         return neighbors
 
-    def iter_concepts(self) -> Iterator[ConceptNode]:
+    def iter_concepts(self) -> Iterator[GraphNode]:
         """Iterate over all concepts in the graph.
 
         Skips nodes that fail deserialization (e.g. schema drift from a removed
@@ -203,7 +201,7 @@ class Graph:
                     e,
                 )
 
-    def iter_relationships(self) -> Iterator[ConceptEdge]:
+    def iter_relationships(self) -> Iterator[GraphEdge]:
         """Iterate over all relationships in the graph.
 
         Yields:
@@ -236,7 +234,3 @@ class Graph:
     def edge_count(self) -> int:
         """Get the number of edges in the graph."""
         return self.graph.number_of_edges()
-
-
-# Backward compat alias
-UnifiedGraph = Graph
