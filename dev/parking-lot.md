@@ -624,6 +624,20 @@
   - **What:** Add pgAdmin service for visual DB inspection during development.
   - **Priority:** Low — nice-to-have, `psql` CLI sufficient.
 
+- [ ] **Skill ↔ Jira backlog sync — skills drive Jira transitions automatically** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Los skills del lifecycle (epic-start, story-start, story-close, epic-close) ya saben en qué fase estamos. Jira debería reflejar eso automáticamente, no depender de que alguien se acuerde de mover el ticket.
+  - **Mapping:** epic-start → In Progress, epic-plan → crea stories hijas, story-start → In Progress, story-close → Done, epic-close → Done.
+  - **La "magia":** Esto convierte a los skills en el backlog manager — el equipo deja de mantener Jira manualmente. El workflow del skill ES el workflow de Jira. Fernando ve progreso real sin preguntar. El PM ve burndown sin perseguir developers.
+  - **Alcance:** Una transición Jira al final de cada skill (no micro-updates). Leer workflow config de `.raise/jira.yaml` (ya existe). Graceful degradation si Jira no está configurado.
+  - **Relación:** Evolución natural de los Jira MCP tools que ya usamos ad-hoc. Podría ser un hook (E248 architecture) en vez de código dentro de cada skill.
+  - **Priority:** High — alto impacto en experiencia de equipo, bajo esfuerzo incremental (1 MCP call por skill).
+
+- [ ] **Epic docs refresh gate — update brief/scope/design when decisions change** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Epic brief se escribe en epic-start, scope y design en epic-design, pero durante story-design e implementation se toman decisiones que invalidan esos documentos. Hoy no hay gate que los actualice.
+  - **What:** Agregar paso en `/rai-story-close` o `/rai-epic-plan` que compare decisiones tomadas durante stories contra los docs de épica (brief, scope, design). Si hay drift, actualizar antes de cerrar.
+  - **Scope:** Podría ser un step en story-close ("¿cambió alguna decisión de épica?") o un skill dedicado `/rai-epic-refresh`.
+  - **Priority:** Medium — los docs de épica son el contrato del equipo, si driftan pierden valor.
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
 *Last updated: 2026-02-25 (RAISE-275: deferred design decisions)*
