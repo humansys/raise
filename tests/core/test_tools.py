@@ -82,7 +82,9 @@ class TestRunTool:
 
     def test_captures_stderr(self) -> None:
         # Using python3 to write to stderr — guaranteed available in CI image
-        result = run_tool(["python3", "-c", "import sys; sys.stderr.write('error'); sys.exit(1)"])
+        result = run_tool(
+            ["python3", "-c", "import sys; sys.stderr.write('error'); sys.exit(1)"]
+        )
         assert result.returncode != 0
         assert result.stderr != ""
 

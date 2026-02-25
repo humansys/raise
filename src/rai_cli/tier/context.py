@@ -109,7 +109,9 @@ class TierContext(BaseModel):
         try:
             tier_level = TierLevel(tier_cfg.level)
         except ValueError:
-            logger.warning("Unknown tier level '%s', defaulting to community", tier_cfg.level)
+            logger.warning(
+                "Unknown tier level '%s', defaulting to community", tier_cfg.level
+            )
             tier_level = TierLevel.COMMUNITY
 
         # Parse capabilities, skip unknown ones.

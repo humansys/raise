@@ -170,9 +170,7 @@ class GovernanceExtractor:
 
         return locators
 
-    def _find_parser(
-        self, locator: ArtifactLocator, parsers: list[Any]
-    ) -> Any | None:
+    def _find_parser(self, locator: ArtifactLocator, parsers: list[Any]) -> Any | None:
         """Find first parser that can_parse this locator."""
         for parser in parsers:
             if parser.can_parse(locator):

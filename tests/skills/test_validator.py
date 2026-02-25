@@ -131,7 +131,7 @@ class TestValidateSkillFile:
     def test_missing_metadata(self, tmp_path: Path) -> None:
         """Missing metadata section is an error."""
         skill_content = COMPLIANT_SKILL.replace(
-            "\nmetadata:\n  raise.work_cycle: session\n  raise.version: \"1.0.0\"\n",
+            '\nmetadata:\n  raise.work_cycle: session\n  raise.version: "1.0.0"\n',
             "\n",
         )
         skill_file = tmp_path / "SKILL.md"
@@ -158,9 +158,7 @@ class TestValidateSkillFile:
 
     def test_invalid_naming_convention(self, tmp_path: Path) -> None:
         """Name not following {domain}-{action} pattern is a warning."""
-        skill_content = COMPLIANT_SKILL.replace(
-            "name: session-start", "name: badname"
-        )
+        skill_content = COMPLIANT_SKILL.replace("name: session-start", "name: badname")
         skill_file = tmp_path / "SKILL.md"
         skill_file.write_text(skill_content)
 
@@ -175,8 +173,8 @@ class TestValidateSkillFile:
     def test_hook_path_not_found(self, tmp_path: Path) -> None:
         """Hook referencing non-existent script is a warning."""
         skill_content = COMPLIANT_SKILL.replace(
-            "metadata:\n  raise.work_cycle: session\n  raise.version: \"1.0.0\"",
-            "metadata:\n  raise.work_cycle: session\n  raise.version: \"1.0.0\"\n\nhooks:\n  Stop:\n    - hooks:\n        - type: command\n          command: \"/nonexistent/script.sh\"",
+            'metadata:\n  raise.work_cycle: session\n  raise.version: "1.0.0"',
+            'metadata:\n  raise.work_cycle: session\n  raise.version: "1.0.0"\n\nhooks:\n  Stop:\n    - hooks:\n        - type: command\n          command: "/nonexistent/script.sh"',
         )
         skill_file = tmp_path / "SKILL.md"
         skill_file.write_text(skill_content)
@@ -214,7 +212,9 @@ metadata:
         result = validate_skill_file(skill_file)
 
         assert not result.is_valid
-        assert any("schema" in e.lower() or "validation" in e.lower() for e in result.errors)
+        assert any(
+            "schema" in e.lower() or "validation" in e.lower() for e in result.errors
+        )
 
     def test_invalid_yaml(self, tmp_path: Path) -> None:
         """Invalid YAML frontmatter returns error."""
@@ -306,9 +306,7 @@ class TestADR040Contract:
 
     def test_missing_references_is_error(self, tmp_path: Path) -> None:
         """Missing References section is an error."""
-        skill_content = COMPLIANT_SKILL.replace(
-            "## References\n\n- Link 1\n", ""
-        )
+        skill_content = COMPLIANT_SKILL.replace("## References\n\n- Link 1\n", "")
         skill_file = tmp_path / "SKILL.md"
         skill_file.write_text(skill_content)
 

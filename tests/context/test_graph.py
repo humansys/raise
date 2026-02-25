@@ -312,15 +312,9 @@ class TestGraphNodeDeserialization:
     def test_get_concepts_by_type_returns_subclasses(self) -> None:
         """get_concepts_by_type returns correct subclass instances."""
         graph = UnifiedGraph()
-        graph.add_concept(
-            PatternNode(id="P1", content="pat1", created="2026-01-01")
-        )
-        graph.add_concept(
-            PatternNode(id="P2", content="pat2", created="2026-01-01")
-        )
-        graph.add_concept(
-            EpicNode(id="E1", content="epic1", created="2026-01-01")
-        )
+        graph.add_concept(PatternNode(id="P1", content="pat1", created="2026-01-01"))
+        graph.add_concept(PatternNode(id="P2", content="pat2", created="2026-01-01"))
+        graph.add_concept(EpicNode(id="E1", content="epic1", created="2026-01-01"))
         patterns = graph.get_concepts_by_type("pattern")
         assert len(patterns) == 2
         assert all(isinstance(p, PatternNode) for p in patterns)
@@ -328,20 +322,14 @@ class TestGraphNodeDeserialization:
     def test_iter_concepts_yields_subclasses(self) -> None:
         """iter_concepts yields correct subclass instances."""
         graph = UnifiedGraph()
-        graph.add_concept(
-            EpicNode(id="E1", content="epic", created="2026-01-01")
-        )
-        graph.add_concept(
-            SessionNode(id="S1", content="session", created="2026-01-01")
-        )
+        graph.add_concept(EpicNode(id="E1", content="epic", created="2026-01-01"))
+        graph.add_concept(SessionNode(id="S1", content="session", created="2026-01-01"))
         concepts = list(graph.iter_concepts())
         types_found = {type(c).__name__ for c in concepts}
         assert "EpicNode" in types_found
         assert "SessionNode" in types_found
 
-    def test_save_load_roundtrip_preserves_subclass(
-        self, tmp_path: Path
-    ) -> None:
+    def test_save_load_roundtrip_preserves_subclass(self, tmp_path: Path) -> None:
         """Persist → load → get_concept returns correct subclass."""
         path = tmp_path / "graph.json"
         backend = FilesystemGraphBackend(path)
@@ -396,7 +384,6 @@ class TestGraphNodeDeserialization:
         """
         import json
         import logging
-
 
         # Build a graph JSON with one valid node and one invalid node
         # (missing required fields — simulates removed plugin or schema drift)

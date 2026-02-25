@@ -262,7 +262,6 @@ class TestUnifiedQueryEngineConceptLookup:
         assert "PAT-001" in ids
         assert "SES-001" in ids
 
-
     def test_concept_lookup_does_not_fallback_to_keyword(
         self, engine: UnifiedQueryEngine
     ) -> None:

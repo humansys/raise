@@ -30,7 +30,13 @@ def memory_dir(tmp_path: Path) -> Path:
     d = tmp_path / "memory"
     _make_patterns_file(
         d,
-        [{"id": "PAT-E-001", "content": "planning estimation", "created": "2026-02-01"}],
+        [
+            {
+                "id": "PAT-E-001",
+                "content": "planning estimation",
+                "created": "2026-02-01",
+            }
+        ],
     )
     return d
 
@@ -42,7 +48,15 @@ class TestReinforceCommand:
         """--vote 1 updates pattern and prints summary."""
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-001", "--vote", "1", "--memory-dir", str(memory_dir)],
+            [
+                "memory",
+                "reinforce",
+                "PAT-E-001",
+                "--vote",
+                "1",
+                "--memory-dir",
+                str(memory_dir),
+            ],
         )
         assert result.exit_code == 0, result.output
         assert "PAT-E-001" in result.output
@@ -53,7 +67,15 @@ class TestReinforceCommand:
         """--vote -1 updates pattern and prints summary."""
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-001", "--vote", "-1", "--memory-dir", str(memory_dir)],
+            [
+                "memory",
+                "reinforce",
+                "PAT-E-001",
+                "--vote",
+                "-1",
+                "--memory-dir",
+                str(memory_dir),
+            ],
         )
         assert result.exit_code == 0, result.output
         assert "negatives=1" in result.output
@@ -66,7 +88,15 @@ class TestReinforceCommand:
 
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-001", "--vote", "0", "--memory-dir", str(memory_dir)],
+            [
+                "memory",
+                "reinforce",
+                "PAT-E-001",
+                "--vote",
+                "0",
+                "--memory-dir",
+                str(memory_dir),
+            ],
         )
         assert result.exit_code == 0, result.output
         assert "N/A" in result.output
@@ -77,10 +107,15 @@ class TestReinforceCommand:
         result = runner.invoke(
             app,
             [
-                "memory", "reinforce", "PAT-E-001",
-                "--vote", "1",
-                "--from", "RAISE-170",
-                "--memory-dir", str(memory_dir),
+                "memory",
+                "reinforce",
+                "PAT-E-001",
+                "--vote",
+                "1",
+                "--from",
+                "RAISE-170",
+                "--memory-dir",
+                str(memory_dir),
             ],
         )
         assert result.exit_code == 0, result.output
@@ -89,7 +124,15 @@ class TestReinforceCommand:
         """Unknown pattern ID exits with non-zero code."""
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-999", "--vote", "1", "--memory-dir", str(memory_dir)],
+            [
+                "memory",
+                "reinforce",
+                "PAT-E-999",
+                "--vote",
+                "1",
+                "--memory-dir",
+                str(memory_dir),
+            ],
         )
         assert result.exit_code != 0
 
@@ -97,7 +140,15 @@ class TestReinforceCommand:
         """Invalid vote value exits with non-zero code."""
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-001", "--vote", "2", "--memory-dir", str(memory_dir)],
+            [
+                "memory",
+                "reinforce",
+                "PAT-E-001",
+                "--vote",
+                "2",
+                "--memory-dir",
+                str(memory_dir),
+            ],
         )
         assert result.exit_code != 0
 
@@ -119,7 +170,15 @@ class TestReinforceCommand:
         )
         result = runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-BAD", "--vote", "-1", "--memory-dir", str(d)],
+            [
+                "memory",
+                "reinforce",
+                "PAT-E-BAD",
+                "--vote",
+                "-1",
+                "--memory-dir",
+                str(d),
+            ],
         )
         assert result.exit_code == 0, result.output
         assert "consider" in result.output.lower()
@@ -128,8 +187,18 @@ class TestReinforceCommand:
         """File is rewritten with updated counts after --vote 1."""
         runner.invoke(
             app,
-            ["memory", "reinforce", "PAT-E-001", "--vote", "1", "--memory-dir", str(memory_dir)],
+            [
+                "memory",
+                "reinforce",
+                "PAT-E-001",
+                "--vote",
+                "1",
+                "--memory-dir",
+                str(memory_dir),
+            ],
         )
-        data = json.loads((memory_dir / "patterns.jsonl").read_text(encoding="utf-8").strip())
+        data = json.loads(
+            (memory_dir / "patterns.jsonl").read_text(encoding="utf-8").strip()
+        )
         assert data["positives"] == 1
         assert data["evaluations"] == 1

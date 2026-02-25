@@ -267,7 +267,11 @@ class TestRegistryPath:
                 return locator.artifact_type == "constitution"
 
             def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
-                return [GraphNode(id="test-1", type="principle", content="ok", created="now")]
+                return [
+                    GraphNode(
+                        id="test-1", type="principle", content="ok", created="now"
+                    )
+                ]
 
         extractor = GovernanceExtractor(
             tmp_governance_structure,
@@ -335,9 +339,7 @@ class TestRoadmapExtraction:
 
         result = extractor.extract_with_result()
 
-        release_concepts = [
-            c for c in result.concepts if c.type == ConceptType.RELEASE
-        ]
+        release_concepts = [c for c in result.concepts if c.type == ConceptType.RELEASE]
         assert len(release_concepts) == 2
 
     def test_release_ids_in_extraction(self, project_with_roadmap: Path) -> None:

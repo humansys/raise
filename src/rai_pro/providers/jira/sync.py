@@ -277,9 +277,7 @@ def push_stories(
             description=story.description or None,
             labels=story.labels,
         )
-        jira_story = client.create_story(
-            epic_key=jira_epic_key, story=story_create
-        )
+        jira_story = client.create_story(epic_key=jira_epic_key, story=story_create)
 
         # Set entity property
         _set_sync_metadata(

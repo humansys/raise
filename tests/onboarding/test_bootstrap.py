@@ -67,7 +67,9 @@ class TestBootstrapRaiBase:
 
         base = files("rai_cli.rai_base")
         original = (base / "identity" / "core.md").read_text(encoding="utf-8")
-        copied = (tmp_path / ".raise" / "rai" / "identity" / "core.md").read_text(encoding="utf-8")
+        copied = (tmp_path / ".raise" / "rai" / "identity" / "core.md").read_text(
+            encoding="utf-8"
+        )
         assert copied == original
 
 
@@ -101,7 +103,9 @@ class TestBootstrapIdempotency:
         # Second bootstrap
         result = bootstrap_rai_base(tmp_path)
 
-        assert '{"id": "PAT-001", "custom": true}' in patterns_path.read_text(encoding="utf-8")
+        assert '{"id": "PAT-001", "custom": true}' in patterns_path.read_text(
+            encoding="utf-8"
+        )
         assert not result.patterns_copied
 
     def test_does_not_overwrite_methodology(self, tmp_path: Path) -> None:

@@ -241,7 +241,9 @@ def publish_command(
         )
         all_passed = _display_results(results)
         if not all_passed:
-            console.print("\n[red]Quality gates failed. Fix issues or use --skip-check.[/red]")
+            console.print(
+                "\n[red]Quality gates failed. Fix issues or use --skip-check.[/red]"
+            )
             raise typer.Exit(1)
         console.print()
 
@@ -268,7 +270,9 @@ def publish_command(
     console.print("  Steps:")
     console.print(f"    1. Update pyproject.toml: {current} → {new_version}")
     console.print(f"    2. Update __init__.py: {current} → {new_version}")
-    console.print(f"    3. Update CHANGELOG.md: [Unreleased] → [{new_version}] - {today}")
+    console.print(
+        f"    3. Update CHANGELOG.md: [Unreleased] → [{new_version}] - {today}"
+    )
     console.print(f"    4. Commit: release: v{new_version}")
     console.print(f"    5. Tag: v{new_version}")
     console.print("    6. Push commit + tag → triggers GitHub Actions release")

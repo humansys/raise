@@ -289,7 +289,9 @@ class TestPatternReinforceCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_reinforce_pattern_not_found(self, tmp_path: Path, patterns_file: Path) -> None:
+    def test_reinforce_pattern_not_found(
+        self, tmp_path: Path, patterns_file: Path
+    ) -> None:
         """Test reinforce with non-existent pattern ID fails."""
         original_cwd = os.getcwd()
         try:
