@@ -20,7 +20,7 @@ test:
     - uv run pyright
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "v2"
+    - if: $CI_COMMIT_BRANCH == "dev"
 
 # --- Security Stage (GitLab templates) ---
 
