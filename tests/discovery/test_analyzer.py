@@ -288,7 +288,9 @@ class TestMatchPathCategory:
         assert result == "controller"
 
     def test_csharp_repositories_path(self) -> None:
-        result = match_path_category("src/Infrastructure/Repositories/ProfileRepository.cs")
+        result = match_path_category(
+            "src/Infrastructure/Repositories/ProfileRepository.cs"
+        )
         assert result == "repository"
 
     def test_csharp_handlers_path(self) -> None:
@@ -670,10 +672,23 @@ class TestConstants:
 
     def test_name_category_overrides_has_expected_keys(self) -> None:
         expected = [
-            "Error", "Warning", "Settings", "Config", "Test", "test_",
+            "Error",
+            "Warning",
+            "Settings",
+            "Config",
+            "Test",
+            "test_",
             # C#/.NET suffixes (RAISE-228, RAISE-232)
-            "Handler", "Repository", "RepositoryAsync", "Command", "Query",
-            "Validator", "Controller", "Middleware", "Extension", "Factory",
+            "Handler",
+            "Repository",
+            "RepositoryAsync",
+            "Command",
+            "Query",
+            "Validator",
+            "Controller",
+            "Middleware",
+            "Extension",
+            "Factory",
         ]
         for key in expected:
             assert key in NAME_CATEGORY_OVERRIDES, f"Missing key: {key}"
@@ -1040,7 +1055,9 @@ class TestDetermineCategory:
         assert determine_category("ProfileRepository", "class", None) == "repository"
 
     def test_csharp_repository_async_suffix(self) -> None:
-        assert determine_category("ProfileRepositoryAsync", "class", None) == "repository"
+        assert (
+            determine_category("ProfileRepositoryAsync", "class", None) == "repository"
+        )
 
     def test_csharp_command_suffix(self) -> None:
         assert determine_category("UpdateProfileCommand", "class", None) == "command"
@@ -1058,7 +1075,9 @@ class TestDetermineCategory:
         assert determine_category("AuthMiddleware", "class", None) == "middleware"
 
     def test_csharp_extension_suffix(self) -> None:
-        assert determine_category("ServiceCollectionExtension", "class", None) == "utility"
+        assert (
+            determine_category("ServiceCollectionExtension", "class", None) == "utility"
+        )
 
     def test_csharp_factory_suffix(self) -> None:
         assert determine_category("ProfileFactory", "class", None) == "utility"

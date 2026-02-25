@@ -244,10 +244,14 @@ class TestSessionNarrative:
     def test_narrative_round_trip(self) -> None:
         """SessionState with narrative round-trips through dict."""
         state = SessionState(
-            current_work=CurrentWork(epic="E21", story="S21.1", phase="implement", branch="epic/e21"),
+            current_work=CurrentWork(
+                epic="E21", story="S21.1", phase="implement", branch="epic/e21"
+            ),
             last_session=LastSession(
-                id="SES-159", date=date(2026, 2, 14),
-                developer="Emilio", summary="test",
+                id="SES-159",
+                date=date(2026, 2, 14),
+                developer="Emilio",
+                summary="test",
             ),
             narrative="## Decisions\n- Architecture = sync model\n\n## Artifacts\n- scope.md created",
         )

@@ -86,9 +86,7 @@ class TestReleaseNodesInGraph:
 class TestReleasePartOfEdges:
     """Tests for epic → release part_of edges."""
 
-    def test_epic_to_release_edges_created(
-        self, project_with_releases: Path
-    ) -> None:
+    def test_epic_to_release_edges_created(self, project_with_releases: Path) -> None:
         """Should create part_of edges from epics to releases."""
         builder = UnifiedGraphBuilder(project_with_releases)
         graph = builder.build()

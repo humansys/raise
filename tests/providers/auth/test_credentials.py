@@ -102,8 +102,12 @@ class TestCredentialsStorage:
         store_token("jira", jira_token, credentials_path)
         store_token("gitlab", gitlab_token, credentials_path)
 
-        assert load_token("jira", credentials_path)["access_token"] == "ya29.a0AfH6SMBx..."
-        assert load_token("gitlab", credentials_path)["access_token"] == "gitlab_token_xyz"
+        assert (
+            load_token("jira", credentials_path)["access_token"] == "ya29.a0AfH6SMBx..."
+        )
+        assert (
+            load_token("gitlab", credentials_path)["access_token"] == "gitlab_token_xyz"
+        )
 
     def test_encryption_key_derivation_is_deterministic(
         self, credentials_path: Path, sample_token: dict[str, Any]

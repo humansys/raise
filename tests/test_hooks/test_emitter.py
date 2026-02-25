@@ -126,9 +126,7 @@ class TestEmitterErrorIsolation:
         emitter.register("session:start", broken_a)
         emitter.register("session:start", broken_b)
 
-        result = emitter.emit(
-            SessionStartEvent(session_id="SES-1", developer="emilio")
-        )
+        result = emitter.emit(SessionStartEvent(session_id="SES-1", developer="emilio"))
         assert len(result.handler_errors) == 2
 
 

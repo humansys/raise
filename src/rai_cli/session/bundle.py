@@ -159,11 +159,13 @@ def _format_work_section(
             release_parts.append(f"— Target: {target}")
         lines.append(" ".join(release_parts))
 
-    lines.extend([
-        f"Story: {state.current_work.story} [{state.current_work.phase}]",
-        f"Epic: {state.current_work.epic}",
-        f"Branch: {state.current_work.branch}",
-    ])
+    lines.extend(
+        [
+            f"Story: {state.current_work.story} [{state.current_work.phase}]",
+            f"Epic: {state.current_work.epic}",
+            f"Branch: {state.current_work.branch}",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -223,7 +225,6 @@ def _format_governance_primes(always_on_nodes: list[ConceptNode]) -> str:
             content = content[:77] + "..."
         lines.append(f"- {n.id}: {content}")
     return "\n".join(lines)
-
 
 
 def _format_progress(state: SessionState | None) -> str:
@@ -412,10 +413,13 @@ class SectionManifest(BaseModel):
 def _count_governance(project_path: Path) -> int:
     """Count governance items (always_on nodes minus identity)."""
     nodes = get_always_on_primes(project_path)
-    return len([
-        n for n in nodes
-        if not n.id.startswith("RAI-VAL-") and not n.id.startswith("RAI-BND-")
-    ])
+    return len(
+        [
+            n
+            for n in nodes
+            if not n.id.startswith("RAI-VAL-") and not n.id.startswith("RAI-BND-")
+        ]
+    )
 
 
 def _count_behavioral(project_path: Path) -> int:
@@ -479,7 +483,9 @@ def count_section_items(
         ValueError: If section name is not in SECTION_REGISTRY.
     """
     if section not in SECTION_REGISTRY:
-        raise ValueError(f"Unknown section: '{section}'. Valid: {sorted(SECTION_REGISTRY.keys())}")
+        raise ValueError(
+            f"Unknown section: '{section}'. Valid: {sorted(SECTION_REGISTRY.keys())}"
+        )
 
     if section == "governance":
         return _count_governance(project_path)
@@ -537,8 +543,7 @@ def assemble_sections(
     for name in sections:
         if name not in SECTION_REGISTRY:
             raise ValueError(
-                f"Unknown section: '{name}'. "
-                f"Valid: {sorted(SECTION_REGISTRY.keys())}"
+                f"Unknown section: '{name}'. Valid: {sorted(SECTION_REGISTRY.keys())}"
             )
 
     parts: list[str] = []
@@ -679,11 +684,13 @@ def assemble_context_bundle(
     for section_name in SECTION_REGISTRY:
         count = count_section_items(section_name, project_path, profile, state)
         tokens = count * _TOKENS_PER_ITEM.get(section_name, 20)
-        manifests.append(SectionManifest(
-            name=section_name,
-            count=count,
-            token_estimate=tokens,
-        ))
+        manifests.append(
+            SectionManifest(
+                name=section_name,
+                count=count,
+                token_estimate=tokens,
+            )
+        )
 
     manifest = _format_manifest(manifests)
 

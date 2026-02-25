@@ -315,9 +315,7 @@ class TestSkillSyncUpgrade:
         # Write content matching the fake old hash
         skill_md.write_text("old version content", encoding="utf-8")
         data["skills"][skill_name]["sha256"] = (
-            __import__("hashlib")
-            .sha256(b"old version content")
-            .hexdigest()
+            __import__("hashlib").sha256(b"old version content").hexdigest()
         )
         manifest_path.write_text(json.dumps(data), encoding="utf-8")
 

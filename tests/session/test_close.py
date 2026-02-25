@@ -219,7 +219,9 @@ class TestProcessSessionClose:
         from rai_cli.onboarding.profile import save_developer_profile, start_session
 
         # Session ID must match what append_session will generate (SES-001 for first session)
-        active, _ = start_session(profile, session_id="SES-001", project_path=str(project), agent="test")
+        active, _ = start_session(
+            profile, session_id="SES-001", project_path=str(project), agent="test"
+        )
         save_developer_profile(active)
 
         close_input = CloseInput(summary="done")
@@ -484,7 +486,8 @@ class TestLoadStateFileNarrative:
         assert "sync model" in result.narrative
 
     def test_loads_state_file_without_narrative_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """State file without narrative defaults to empty string."""
         state_file = tmp_path / "state.yaml"
@@ -505,7 +508,8 @@ class TestProcessSessionCloseNarrative:
         return project
 
     def test_close_persists_narrative_in_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close persists narrative in session-state.yaml."""
         import pytest
@@ -537,7 +541,8 @@ class TestProcessSessionCloseNarrative:
         mp.undo()
 
     def test_close_without_narrative_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without narrative leaves empty string."""
         import pytest
@@ -571,7 +576,8 @@ class TestProcessSessionCloseRelease:
         return project
 
     def test_close_persists_release_in_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close persists release field in session-state.yaml."""
         import pytest
@@ -604,7 +610,8 @@ class TestProcessSessionCloseRelease:
         mp.undo()
 
     def test_close_without_release_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without release defaults to empty string."""
         import pytest
@@ -651,7 +658,8 @@ class TestLoadStateFileNextSessionPrompt:
         assert "encoding fix" in result.next_session_prompt
 
     def test_loads_state_file_without_next_session_prompt_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """State file without next_session_prompt defaults to empty string."""
         state_file = tmp_path / "state.yaml"
@@ -672,7 +680,8 @@ class TestProcessSessionCloseNextSessionPrompt:
         return project
 
     def test_close_persists_next_session_prompt_in_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close persists next_session_prompt in session-state.yaml."""
         import pytest
@@ -705,7 +714,8 @@ class TestProcessSessionCloseNextSessionPrompt:
         mp.undo()
 
     def test_close_without_next_session_prompt_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without next_session_prompt leaves empty string."""
         import pytest
@@ -746,7 +756,8 @@ class TestLoadStateFileSessionId:
         assert result.session_id == "SES-219"
 
     def test_loads_state_file_without_session_id_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """State file without session_id defaults to empty string."""
         state_file = tmp_path / "state.yaml"

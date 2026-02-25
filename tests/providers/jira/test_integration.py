@@ -126,11 +126,11 @@ def test_jira_client_integration():
 
     elapsed = time.time() - start
     expected_min = 1.8  # 20 requests / 10 req/sec = 2s, allow 10% tolerance
-    assert (
-        elapsed >= expected_min
-    ), f"Rate limiting not enforced: {elapsed:.2f}s < {expected_min}s"
+    assert elapsed >= expected_min, (
+        f"Rate limiting not enforced: {elapsed:.2f}s < {expected_min}s"
+    )
     print(f"   ✓ Total time: {elapsed:.2f}s (≥{expected_min}s)")
-    print(f"   ✓ Rate limiting working: ~{20/elapsed:.1f} req/sec")
+    print(f"   ✓ Rate limiting working: ~{20 / elapsed:.1f} req/sec")
 
     # Test 7: Cleanup - Delete test story
     print("\n7. Cleaning up test story...")

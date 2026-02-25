@@ -44,7 +44,9 @@ class StubSchemaProvider:
         return ["backlog", "adr"]
 
     def locate(self, artifact_type: str) -> list[ArtifactLocator]:
-        return [ArtifactLocator(path="governance/backlog.md", artifact_type=artifact_type)]
+        return [
+            ArtifactLocator(path="governance/backlog.md", artifact_type=artifact_type)
+        ]
 
 
 class StubParser:
@@ -52,9 +54,7 @@ class StubParser:
         return locator.artifact_type == "backlog"
 
     def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
-        return [
-            GraphNode(id="test-1", content="Test concept", created="2026-01-01")
-        ]
+        return [GraphNode(id="test-1", content="Test concept", created="2026-01-01")]
 
 
 class StubDocTarget:

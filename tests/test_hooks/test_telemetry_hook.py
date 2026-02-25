@@ -115,9 +115,7 @@ class TestEventMapping:
         expected_subcommand: str,
     ) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.return_value = EmitResult(success=True)
             result = hook.handle(event)
 
@@ -135,9 +133,7 @@ class TestErrorIsolation:
 
     def test_emit_failure_returns_error_status(self) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.return_value = EmitResult(
                 success=False, error="Permission denied"
             )
@@ -148,9 +144,7 @@ class TestErrorIsolation:
 
     def test_emit_exception_returns_error_status(self) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.side_effect = OSError("disk full")
             result = hook.handle(SessionStartEvent(session_id="SES-1"))
 
@@ -159,9 +153,7 @@ class TestErrorIsolation:
 
     def test_handle_never_raises(self) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.side_effect = RuntimeError("unexpected")
             result = hook.handle(SessionStartEvent(session_id="SES-1"))
 
@@ -186,7 +178,9 @@ class TestEntryPointDiscovery:
     def test_discovered_hook_is_functional(self) -> None:
         registry = HookRegistry()
         registry.discover()
-        telemetry_hooks = [h for h in registry.hooks if type(h).__name__ == "TelemetryHook"]
+        telemetry_hooks = [
+            h for h in registry.hooks if type(h).__name__ == "TelemetryHook"
+        ]
         assert len(telemetry_hooks) == 1
         hook = telemetry_hooks[0]
         assert hook.events == TelemetryHook.events
@@ -220,7 +214,9 @@ class TestE2EIntegration:
         assert result.handler_errors == ()
 
         # Verify signal landed on disk
-        signals_file = tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        signals_file = (
+            tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        )
         assert signals_file.exists()
         lines = signals_file.read_text().strip().splitlines()
         assert len(lines) == 1
@@ -248,11 +244,20 @@ class TestE2EIntegration:
             for event in events:
                 emitter.emit(event)
 
-        signals_file = tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        signals_file = (
+            tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        )
         lines = signals_file.read_text().strip().splitlines()
         assert len(lines) == 3
-        commands = [(json.loads(line)["command"], json.loads(line)["subcommand"]) for line in lines]
-        assert commands == [("session", "start"), ("graph", "build"), ("pattern", "added")]
+        commands = [
+            (json.loads(line)["command"], json.loads(line)["subcommand"])
+            for line in lines
+        ]
+        assert commands == [
+            ("session", "start"),
+            ("graph", "build"),
+            ("pattern", "added"),
+        ]
 
 
 def _emit_to_tmpdir(tmp_path: Path):  # type: ignore[type-arg]

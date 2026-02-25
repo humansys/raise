@@ -246,8 +246,12 @@ class DeveloperProfile(BaseModel):
     first_session: date | None = None
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
-    current_session: CurrentSession | None = None  # DEPRECATED: migrated to active_sessions
-    active_sessions: list[ActiveSession] = Field(default_factory=lambda: list[ActiveSession]())
+    current_session: CurrentSession | None = (
+        None  # DEPRECATED: migrated to active_sessions
+    )
+    active_sessions: list[ActiveSession] = Field(
+        default_factory=lambda: list[ActiveSession]()
+    )
     coaching: CoachingContext = Field(default_factory=CoachingContext)
     deadlines: list[Deadline] = Field(default_factory=lambda: list[Deadline]())
 

@@ -99,9 +99,7 @@ def _validate_line_count(skill: Skill, warnings: list[str]) -> None:
     """Warn if skill body exceeds ADR-040 line count target."""
     body_lines = len(skill.body.strip().splitlines())
     if body_lines > MAX_BODY_LINES:
-        warnings.append(
-            f"Body has {body_lines} lines (target: ≤{MAX_BODY_LINES})"
-        )
+        warnings.append(f"Body has {body_lines} lines (target: ≤{MAX_BODY_LINES})")
 
 
 def _validate_naming_convention(skill: Skill, warnings: list[str]) -> None:

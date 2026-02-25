@@ -147,11 +147,13 @@ def check_command(
             try:
                 loaded: Any = ep.load()
             except Exception as exc:  # noqa: BLE001
-                emitter.emit(AdapterFailedEvent(
-                    adapter_name=ep.name,
-                    group=group,
-                    error=str(exc),
-                ))
+                emitter.emit(
+                    AdapterFailedEvent(
+                        adapter_name=ep.name,
+                        group=group,
+                        error=str(exc),
+                    )
+                )
                 results.append(
                     {
                         "group": group,
@@ -167,17 +169,21 @@ def check_command(
             compliant = inspect.isclass(loaded) and issubclass(loaded, proto_cls)
             error = None if compliant else f"Not a {proto_name} subclass"
             if compliant:
-                emitter.emit(AdapterLoadedEvent(
-                    adapter_name=ep.name,
-                    group=group,
-                    adapter_type=type(loaded).__name__,
-                ))
+                emitter.emit(
+                    AdapterLoadedEvent(
+                        adapter_name=ep.name,
+                        group=group,
+                        adapter_type=type(loaded).__name__,
+                    )
+                )
             else:
-                emitter.emit(AdapterFailedEvent(
-                    adapter_name=ep.name,
-                    group=group,
-                    error=error or "",
-                ))
+                emitter.emit(
+                    AdapterFailedEvent(
+                        adapter_name=ep.name,
+                        group=group,
+                        error=error or "",
+                    )
+                )
             results.append(
                 {
                     "group": group,

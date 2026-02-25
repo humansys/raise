@@ -311,7 +311,11 @@ def release_graph() -> UnifiedGraph:
             content="V3.0 Commercial Launch",
             source_file="governance/roadmap.md",
             created="2026-02-11",
-            metadata={"release_id": "REL-V3.0", "name": "V3.0 Commercial Launch", "target": "2026-03-14"},
+            metadata={
+                "release_id": "REL-V3.0",
+                "name": "V3.0 Commercial Launch",
+                "target": "2026-03-14",
+            },
         )
     )
     graph.add_concept(
@@ -361,7 +365,9 @@ def release_engine(release_graph: UnifiedGraph) -> UnifiedQueryEngine:
 class TestFindReleaseFor:
     """Tests for find_release_for helper."""
 
-    def test_finds_release_via_part_of(self, release_engine: UnifiedQueryEngine) -> None:
+    def test_finds_release_via_part_of(
+        self, release_engine: UnifiedQueryEngine
+    ) -> None:
         """Finds release node via part_of edge from epic."""
         release = release_engine.find_release_for("epic-e19")
         assert release is not None

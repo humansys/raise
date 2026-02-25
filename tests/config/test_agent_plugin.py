@@ -78,6 +78,7 @@ class TestAgentPluginProtocol:
 
     def test_default_plugin_satisfies_protocol(self) -> None:
         from rai_cli.config.agent_plugin import AgentPlugin
+
         plugin: AgentPlugin = DefaultAgentPlugin()
         # Type checker confirms; runtime just calls the methods
         result = plugin.transform_instructions("x", _claude_config())

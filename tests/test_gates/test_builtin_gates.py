@@ -16,7 +16,9 @@ from rai_cli.gates.registry import GateRegistry
 # ---------------------------------------------------------------------------
 
 
-def _completed_process(returncode: int, stdout: str = "", stderr: str = "") -> subprocess.CompletedProcess[str]:
+def _completed_process(
+    returncode: int, stdout: str = "", stderr: str = ""
+) -> subprocess.CompletedProcess[str]:
     return subprocess.CompletedProcess(
         args=[], returncode=returncode, stdout=stdout, stderr=stderr
     )
@@ -81,7 +83,9 @@ class TestTestGate:
 
         gate = TestGate()
         ctx = GateContext(gate_id="gate-tests")
-        with patch("subprocess.run", return_value=_completed_process(0, stdout="4 passed")) as mock:
+        with patch(
+            "subprocess.run", return_value=_completed_process(0, stdout="4 passed")
+        ) as mock:
             result = gate.evaluate(ctx)
         assert result.passed is True
         assert result.gate_id == "gate-tests"
@@ -94,7 +98,10 @@ class TestTestGate:
 
         gate = TestGate()
         ctx = GateContext(gate_id="gate-tests")
-        with patch("subprocess.run", return_value=_completed_process(1, stdout="FAILED test_foo")):
+        with patch(
+            "subprocess.run",
+            return_value=_completed_process(1, stdout="FAILED test_foo"),
+        ):
             result = gate.evaluate(ctx)
         assert result.passed is False
         assert result.details != ()
@@ -145,7 +152,9 @@ class TestTypeGate:
 
         gate = TypeGate()
         ctx = GateContext(gate_id="gate-types")
-        with patch("subprocess.run", return_value=_completed_process(1, stdout="1 error")):
+        with patch(
+            "subprocess.run", return_value=_completed_process(1, stdout="1 error")
+        ):
             result = gate.evaluate(ctx)
         assert result.passed is False
 
@@ -154,7 +163,9 @@ class TestTypeGate:
 
         gate = TypeGate()
         ctx = GateContext(gate_id="gate-types")
-        with patch("subprocess.run", side_effect=FileNotFoundError("pyright not found")):
+        with patch(
+            "subprocess.run", side_effect=FileNotFoundError("pyright not found")
+        ):
             result = gate.evaluate(ctx)
         assert result.passed is False
         assert "pyright not found" in result.message
@@ -184,7 +195,10 @@ class TestLintGate:
 
         gate = LintGate()
         ctx = GateContext(gate_id="gate-lint")
-        with patch("subprocess.run", return_value=_completed_process(1, stdout="E501 line too long")):
+        with patch(
+            "subprocess.run",
+            return_value=_completed_process(1, stdout="E501 line too long"),
+        ):
             result = gate.evaluate(ctx)
         assert result.passed is False
 
@@ -222,7 +236,9 @@ class TestCoverageGate:
 
         gate = CoverageGate()
         ctx = GateContext(gate_id="gate-coverage")
-        with patch("subprocess.run", return_value=_completed_process(1, stdout="TOTAL 45%")):
+        with patch(
+            "subprocess.run", return_value=_completed_process(1, stdout="TOTAL 45%")
+        ):
             result = gate.evaluate(ctx)
         assert result.passed is False
 

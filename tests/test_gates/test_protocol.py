@@ -51,8 +51,6 @@ class _MissingEvaluate:
     workflow_point: ClassVar[str] = "before:release:publish"
 
 
-
-
 # ---------------------------------------------------------------------------
 # WorkflowGate Protocol conformance
 # ---------------------------------------------------------------------------
