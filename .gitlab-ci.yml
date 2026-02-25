@@ -45,6 +45,22 @@ snyk:sca:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == "dev"
 
+snyk:sast:
+  stage: snyk
+  image: node:20-slim
+  before_script:
+    - npm install -g snyk
+  script:
+    - snyk auth $SNYK_TOKEN
+    - snyk code test src/ --json-file-output=snyk-sast-report.json || true
+  artifacts:
+    paths:
+      - snyk-sast-report.json
+    expire_in: 30 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == "dev"
+
 # --- Security Stage (GitLab templates) ---
 
 include:
