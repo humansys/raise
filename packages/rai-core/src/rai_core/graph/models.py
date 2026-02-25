@@ -156,11 +156,6 @@ class ReleaseNode(GraphNode, node_type="release"):
     """Release milestones. Extension: changelog, artifact URLs."""
 
 
-# Backward compat aliases
-ConceptNode = GraphNode
-ConceptEdge: type  # forward declaration, assigned after GraphEdge
-
-
 # --- Edge type system (open for plugins, flat — no hierarchy needed) ---
 EdgeType = str
 
@@ -207,7 +202,3 @@ class GraphEdge(BaseModel):
     metadata: dict[str, Any] = Field(
         default_factory=dict, description="Additional relationship attributes"
     )
-
-
-# Assign backward compat alias
-ConceptEdge = GraphEdge
