@@ -18,7 +18,7 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 
 | ID | JIRA | Story | Size | Status | Description |
 |----|------|-------|:----:|:------:|-------------|
-| S275.1 | [RAISE-276](https://humansys.atlassian.net/browse/RAISE-276) | Extract rai-core package | S | Pending | Create `rai-core` as uv workspace package. Move graph domain (models, engine, query, scoring, backends protocol+filesystem) to `rai_core/graph/`. Partial move: only `KnowledgeGraphBackend` + `BackendHealth` from adapters. Drop "Unified" prefix ([RAISE-145](https://humansys.atlassian.net/browse/RAISE-145)). Re-exports for backward compat. Placeholder dirs for `workflow/` and `governance/`. ~30 import updates. |
+| S275.1 | [RAISE-276](https://humansys.atlassian.net/browse/RAISE-276) | Extract rai-core package | S | Done ✓ | Created `rai-core` as uv workspace package. Moved graph domain (6 files), renamed 6 classes (dropped "Unified" prefix, RAISE-145). ~50 import updates. No backward compat shims — clean cut. Quality reviewed, dead aliases removed. TN-003 published. |
 | S275.2 | [RAISE-277](https://humansys.atlassian.net/browse/RAISE-277) | PostgreSQL schema + Alembic | S | Pending | 4 tables (orgs, api_keys, graph_nodes, graph_edges). Docker Compose with PG. Alembic initial migration. |
 | S275.3 | [RAISE-278](https://humansys.atlassian.net/browse/RAISE-278) | FastAPI server bootstrap | M | Pending | App skeleton, config (env vars), auth middleware (API key → OrgContext), health endpoint. Dockerfile.server. |
 | S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph CRUD endpoints | M | Pending | 6 endpoints: single + batch for nodes and edges, get node by id. SQLAlchemy async queries. |
@@ -167,7 +167,7 @@ Parallel:                          S275.5 ────────────�
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S275.1 — Extract rai-core | S | Pending | — | — | |
+| S275.1 — Extract rai-core | S | Done ✓ | ~3h | 1.3x | Quality review + TN-003 |
 | S275.2 — PG schema + Docker | S | Pending | — | — | |
 | S275.3 — FastAPI bootstrap | M | Pending | — | — | |
 | S275.4 — CRUD endpoints | M | Pending | — | — | |
