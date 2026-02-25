@@ -638,6 +638,43 @@
   - **Scope:** Podría ser un step en story-close ("¿cambió alguna decisión de épica?") o un skill dedicado `/rai-epic-refresh`.
   - **Priority:** Medium — los docs de épica son el contrato del equipo, si driftan pierden valor.
 
+---
+
+### RAISE-275 Architecture Review — Parking Lot (2026-02-25)
+
+- [ ] **rai-core domain expansion: Workflow engine with per-org extensibility** — (E275 arch review, 2026-02-25)
+  - **Context:** Architecture review discovered that `rai-core` needs to be the shared RaiSE domain, not just a graph library. Work management (epic/story/task lifecycles) requires a workflow engine with customizable state machines.
+  - **Requirements:**
+    - Core defines schema base: WorkItemType, State, Transition, Gate
+    - Core provides default RaiSE workflow (out of the box)
+    - Per-org/repo override via config (`.raise/workflows/*.yaml` or similar)
+    - Each stage = skill + quality gates
+    - Versionado: upgrades never break custom workflows; migration path when breaking
+  - **DDD grounding:** Currently workflow lives implicitly in skills (markdown) and `.raise/jira.yaml` (transition IDs). No explicit domain model in code.
+  - **Priority:** High strategic — foundation for Pro/Enterprise. Separate epic after E275.
+
+- [ ] **rai-core domain expansion: Extensible governance schema** — (E275 arch review, 2026-02-25)
+  - **Context:** Kurigage dev (Sofi) gave Rai coding standards → placed in `/governance/` correctly, but no parser exists → won't enter the graph → Rai can't use them in queries or share with team.
+  - **Requirements:**
+    - Extensible artifact types beyond fixed `CoreArtifactType` enum
+    - Generic parser (or parser plugin system) for custom governance docs
+    - Custom artifact types shareable via server (whole team benefits)
+    - Schema versionado + migrations (same pattern as workflows)
+  - **DDD grounding:** `CoreArtifactType` is governance context vocabulary. Server receives translated `ConceptNode`, doesn't need parsing. But the SCHEMA of what types exist needs to be extensible and shareable.
+  - **Priority:** High — directly impacts customer onboarding experience.
+
+- [ ] **rai-core structure accommodates three domain axes** — (E275 arch review, 2026-02-25)
+  - **Decision for S275.1:** `rai_core/` package structure should accommodate graph (E275), workflow (future), and governance schema (future) even though only graph is implemented now.
+  - **Proposed structure:**
+    ```
+    rai_core/
+    ├── graph/           # E275 — implemented
+    ├── workflow/        # placeholder with docstring
+    ├── governance/      # placeholder with docstring
+    └── __init__.py
+    ```
+  - **Rationale:** Avoid refactoring when expanding core. "Sentar las bases."
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-25 (RAISE-275: deferred design decisions)*
+*Last updated: 2026-02-25 (RAISE-275: architecture review findings)*
