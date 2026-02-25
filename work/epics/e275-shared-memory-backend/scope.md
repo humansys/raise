@@ -18,7 +18,7 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 
 | ID | JIRA | Story | Size | Status | Description |
 |----|------|-------|:----:|:------:|-------------|
-| S275.1 | [RAISE-276](https://humansys.atlassian.net/browse/RAISE-276) | Extract rai-core package | S | Pending | Move 6 files (models, graph, query, protocols, backends) to rai_core. Re-exports for backward compat. ~30 import updates. |
+| S275.1 | [RAISE-276](https://humansys.atlassian.net/browse/RAISE-276) | Extract rai-core package | S | Pending | Create `rai-core` as uv workspace package. Move graph domain (models, engine, query, scoring, backends protocol+filesystem) to `rai_core/graph/`. Partial move: only `KnowledgeGraphBackend` + `BackendHealth` from adapters. Drop "Unified" prefix ([RAISE-145](https://humansys.atlassian.net/browse/RAISE-145)). Re-exports for backward compat. Placeholder dirs for `workflow/` and `governance/`. ~30 import updates. |
 | S275.2 | [RAISE-277](https://humansys.atlassian.net/browse/RAISE-277) | PostgreSQL schema + Alembic | S | Pending | 4 tables (orgs, api_keys, graph_nodes, graph_edges). Docker Compose with PG. Alembic initial migration. |
 | S275.3 | [RAISE-278](https://humansys.atlassian.net/browse/RAISE-278) | FastAPI server bootstrap | M | Pending | App skeleton, config (env vars), auth middleware (API key → OrgContext), health endpoint. Dockerfile.server. |
 | S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph CRUD endpoints | M | Pending | 6 endpoints: single + batch for nodes and edges, get node by id. SQLAlchemy async queries. |
@@ -31,7 +31,9 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 ## Scope
 
 **In scope (MUST):**
-- `rai-core` package extraction (shared models, protocols, backends)
+- `rai-core` package extraction (shared RaiSE domain — graph implemented, workflow/governance placeholders)
+- Three-package monorepo: rai-core + rai-cli (COMMUNITY, lockstep PyPI), rai-server (PRO, separate)
+- Drop "Unified" prefix during extraction (RAISE-145, absorbed into S275.1)
 - PostgreSQL with nodes/edges + JSONB, Alembic migrations
 - FastAPI server with 8 REST endpoints
 - API key authentication per org
@@ -97,7 +99,11 @@ S275.7 (dogfood + offline)
 
 | Decision | Summary |
 |----------|---------|
-| Repo structure | `rai-core` + `rai-server` in monorepo (uv workspaces) |
+| Repo structure | 3 packages in monorepo (uv workspaces): rai-core (domain) + rai-cli (community) + rai-server (PRO) |
+| rai-core scope | Shared RaiSE domain: `graph/` (E275), `workflow/` (placeholder), `governance/` (placeholder) |
+| Version strategy | rai-core + rai-cli lockstep (exact pin), rai-server independent (range pin) |
+| Extraction boundary | Only graph domain to core: `KnowledgeGraphBackend` + `BackendHealth`. Governance/PM protocols stay in CLI |
+| Rename | Drop "Unified" prefix (RAISE-145): `Graph`, `QueryEngine`, `Query`, etc. Re-exports for compat |
 | Auth | API key per org (`rsk_` prefix), hash in DB |
 | DB | PostgreSQL 16 + 2 tables (nodes/edges) + JSONB + GIN indexes |
 | API | 8 REST endpoints, FastAPI, SQLAlchemy 2.0 async |
@@ -124,7 +130,7 @@ S275.7 (dogfood + offline)
 
 | Order | Story | Size | Dependencies | Milestone | Rationale |
 |:-----:|-------|:----:|--------------|-----------|-----------|
-| 1 | S275.1 — Extract rai-core | S | None | M1 | **Risk-first.** Refactor with ~30 import changes. Must pass full test suite before anything else builds on it. Unblocks both server and CLI integration. |
+| 1 | S275.1 — Extract rai-core | S | None | M1 | **Risk-first.** Create rai-core package, move graph domain (partial: only graph models/engine/query/scoring + KnowledgeGraphBackend + BackendHealth + FilesystemBackend). Drop "Unified" prefix (RAISE-145). Re-exports for compat. ~30 import updates. Must pass full test suite. |
 | 2 | S275.2 — PG schema + Docker | S | S275.1 | M1 | **Walking skeleton base.** DB + Docker Compose = infrastructure foundation. rai-server package created here. |
 | 3 | S275.3 — FastAPI bootstrap | M | S275.2 | M1 | **Skeleton complete.** Health endpoint + auth middleware + config. Proves the server runs, connects to DB, validates API keys. |
 | 4a | S275.4 — CRUD endpoints | M | S275.3 | M2 | **Core value.** Nodes and edges CRUD. After this, data can be persisted and retrieved. |
