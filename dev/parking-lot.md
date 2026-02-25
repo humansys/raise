@@ -577,6 +577,25 @@
   - **Acción inmediata:** Marcar `rai skill scaffold` como deprecated en el CLI help text.
   - **Priority:** Baja — scaffold se usa poco, PAT-E-400 cubre el gap de platform agnosticism en sesiones
 
+---
+
+### SES-281 — Parking Lot (2026-02-25)
+
+- [ ] **Repo clutter in MRs — non-code directories make reviews hard** — (SES-281, 2026-02-25)
+  - **Context:** Technical user reviewing MRs reports difficulty finding actual code changes among `work/`, `.raise/`, `governance/` directory changes.
+  - **Options:** `.gitattributes` to mark paths as generated/docs (GitHub collapses them in diff), separate research/work to a different branch or repo, CODEOWNERS to route non-code changes to different reviewers.
+  - **Priority:** Medium — affects adoption experience for teams using RaiSE on real repos.
+
+- [ ] **Adapt /rai-research skill to publish to Confluence** — (SES-281, 2026-02-25)
+  - **Context:** Research currently produces local markdown files. Should also publish to Confluence for team visibility.
+  - **What:** Add Step 6 to research skill: publish report + evidence catalog to Confluence under a Research parent page.
+  - **Priority:** Medium — manual publishing works but adds friction.
+
+- [ ] **Move all research to Confluence, evaluate if work/ stays in repo** — (SES-281, 2026-02-25)
+  - **Context:** Related to repo clutter feedback. Research artifacts are valuable for team but inflate repo diffs.
+  - **Decision needed:** Keep work/ in repo for git history? Move to Confluence only? Hybrid (summaries in repo, full content in Confluence)?
+  - **Priority:** Medium — blocked by research-to-Confluence skill adaptation.
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-21 (S249.1: scaffold deprecation candidate)*
+*Last updated: 2026-02-25 (SES-281: repo clutter, research-to-Confluence, work/ location)*
