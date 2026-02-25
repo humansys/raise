@@ -121,7 +121,8 @@ class TestGetEntityProperty:
     def test_get_entity_property_not_found_returns_none(self) -> None:
         """Test that 404 (property not set) returns None."""
         mock_client = Mock(spec=JiraClient)
-        mock_client._jira = Mock(); mock_client._jira.get = Mock(
+        mock_client._jira = Mock()
+        mock_client._jira.get = Mock(
             side_effect=JiraApiError(status_code=404, message="Property not found")
         )
 
@@ -133,7 +134,8 @@ class TestGetEntityProperty:
     def test_get_entity_property_other_error_raises(self) -> None:
         """Test that non-404 errors are raised."""
         mock_client = Mock(spec=JiraClient)
-        mock_client._jira = Mock(); mock_client._jira.get = Mock(
+        mock_client._jira = Mock()
+        mock_client._jira.get = Mock(
             side_effect=JiraApiError(status_code=500, message="Internal Server Error")
         )
 
@@ -157,7 +159,8 @@ class TestGetEntityProperty:
                 }
             }
         }
-        mock_client._jira = Mock(); mock_client._jira.get = Mock(return_value=mock_response)
+        mock_client._jira = Mock()
+        mock_client._jira.get = Mock(return_value=mock_response)
 
         with pytest.raises(ValidationError):
             get_entity_property(mock_client, "DEMO-123")
@@ -179,7 +182,8 @@ class TestGetEntityProperty:
                 "unknown_field": "should_fail",  # Unknown at EntityProperty level
             }
         }
-        mock_client._jira = Mock(); mock_client._jira.get = Mock(return_value=mock_response)
+        mock_client._jira = Mock()
+        mock_client._jira.get = Mock(return_value=mock_response)
 
         with pytest.raises(ValidationError):
             get_entity_property(mock_client, "DEMO-123")
@@ -214,7 +218,8 @@ class TestHasRaiMetadata:
     def test_has_rai_metadata_false_when_property_not_set(self) -> None:
         """Test returns False when entity property not set (404)."""
         mock_client = Mock(spec=JiraClient)
-        mock_client._jira = Mock(); mock_client._jira.get = Mock(
+        mock_client._jira = Mock()
+        mock_client._jira.get = Mock(
             side_effect=JiraApiError(status_code=404, message="Property not found")
         )
 

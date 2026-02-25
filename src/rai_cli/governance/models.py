@@ -6,13 +6,13 @@ concepts extracted from governance markdown files.
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Any, Self
 
 from pydantic import BaseModel, Field, model_validator
 
 
-class ConceptType(str, Enum):
+class ConceptType(StrEnum):
     """Types of concepts extracted from governance documents.
 
     Attributes:

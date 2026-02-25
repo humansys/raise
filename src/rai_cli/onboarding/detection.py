@@ -7,7 +7,7 @@ by counting source code files while excluding common non-project directories.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from rai_cli.core.files import EXCLUDED_DIRS, should_exclude_dir
@@ -76,7 +76,7 @@ CODE_EXTENSIONS: frozenset[str] = frozenset(
 )
 
 
-class ProjectType(str, Enum):
+class ProjectType(StrEnum):
     """Type of project based on existing code.
 
     Values:

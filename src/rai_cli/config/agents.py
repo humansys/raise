@@ -10,7 +10,7 @@ Architecture decision: ADR-032 (Multi-agent skill distribution).
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
@@ -18,7 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field
 BuiltinAgentType = Literal["claude", "cursor", "windsurf", "copilot", "antigravity", "roo"]
 
 
-class AgentChoice(str, Enum):
+class AgentChoice(StrEnum):
     """Typer-compatible enum for --agent CLI option."""
 
     claude = "claude"

@@ -7,6 +7,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from rai_pro.providers.jira.sync_state import (
     SyncMapping,
@@ -35,7 +36,7 @@ class TestSyncMapping:
 
     def test_mapping_requires_fields(self) -> None:
         """Missing required fields raises validation error."""
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             SyncMapping(local_id="E-DEMO")  # type: ignore[call-arg]
 
 
@@ -83,7 +84,7 @@ class TestSyncState:
 
     def test_state_rejects_extra_fields(self) -> None:
         """Extra fields rejected (strict mode)."""
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             SyncState(
                 cloud_id="abc",
                 project_key="DEMO",
