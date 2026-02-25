@@ -1,3 +1,9 @@
+[tool.uv.workspace]
+members = ["packages/*"]
+
+[tool.uv.sources]
+rai-core = { workspace = true }
+
 [project]
 name = "rai-cli"
 version = "2.1.0"
@@ -20,6 +26,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "rai-core==2.1.0",
     "atlassian-python-api>=3.41.0",
     "authlib>=1.3.0",
     "cryptography>=42.0.0",
@@ -96,7 +103,7 @@ include = [
 [tool.ruff]
 line-length = 88
 target-version = "py312"
-src = ["src"]
+src = ["src", "packages/rai-core/src"]
 
 [tool.ruff.lint]
 select = [
@@ -121,7 +128,7 @@ indent-style = "space"
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
-include = ["src"]
+include = ["src", "packages/rai-core/src"]
 exclude = [
     "**/__pycache__",
     "**/node_modules",
@@ -139,6 +146,7 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--cov=src/rai_cli",
+    "--cov=packages/rai-core/src/rai_core",
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
@@ -147,7 +155,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["src/rai_cli"]
+source = ["src/rai_cli", "packages/rai-core/src/rai_core"]
 omit = [
     "*/tests/*",
     "*/__main__.py",
