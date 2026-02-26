@@ -29,9 +29,9 @@ from rai_cli.config.paths import get_memory_dir, get_personal_dir
 from rai_cli.context import Graph, GraphBuilder
 from rai_cli.context.diff import GraphDiff, diff_graphs
 from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
+from rai_cli.graph.backends import get_active_backend
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import GraphBuildEvent
-from rai_core.graph.backends.filesystem import get_active_backend
 from rai_core.graph.models import GraphEdge, GraphNode
 from rai_core.graph.query import (
     ArchitecturalContext,
