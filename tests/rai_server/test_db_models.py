@@ -6,12 +6,6 @@ types, foreign keys, indexes, and constraints.
 
 from __future__ import annotations
 
-import uuid
-from datetime import datetime
-
-from sqlalchemy import inspect
-from sqlalchemy.dialects.postgresql import JSONB, UUID
-
 from rai_server.db.models import (
     ApiKey,
     Base,
@@ -19,7 +13,8 @@ from rai_server.db.models import (
     GraphNodeRow,
     Organization,
 )
-
+from sqlalchemy import inspect
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 
 # --- Table registration ---
 
