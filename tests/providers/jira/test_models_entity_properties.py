@@ -90,7 +90,9 @@ class TestRaiSyncMetadata:
         assert len(errors) == 1
         assert errors[0]["loc"] == ("task_status",)
         # Verify error mentions valid literal values
-        assert "pending" in str(errors[0]["msg"]).lower() or "in_progress" in str(errors[0]["msg"])
+        assert "pending" in str(errors[0]["msg"]).lower() or "in_progress" in str(
+            errors[0]["msg"]
+        )
 
     def test_invalid_sync_direction_raises_validation_error(self) -> None:
         """Test that invalid sync_direction literal raises ValidationError."""
@@ -214,7 +216,9 @@ class TestEntityProperty:
 
         assert entity_prop.rai_sync.epic_id == "E-DEMO"
         assert entity_prop.rai_sync.story_id == "S-DEMO.4"
-        assert entity_prop.rai_sync.last_sync_at == datetime(2026, 2, 14, 10, 0, 0, tzinfo=UTC)
+        assert entity_prop.rai_sync.last_sync_at == datetime(
+            2026, 2, 14, 10, 0, 0, tzinfo=UTC
+        )
 
     def test_entity_property_strict_validation_rejects_malformed_data(self) -> None:
         """Test strict validation rejects malformed JIRA response."""

@@ -41,9 +41,7 @@ class FilesystemGraphBackend:
         """
         data: dict[str, Any] = nx.node_link_data(graph.graph)  # type: ignore[assignment]
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(
-            json.dumps(data, indent=2, default=str), encoding="utf-8"
-        )
+        self.path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
 
     def load(self) -> UnifiedGraph:
         """Load graph from the configured path.
@@ -55,13 +53,9 @@ class FilesystemGraphBackend:
             FileNotFoundError: If the file doesn't exist.
             json.JSONDecodeError: If the file is not valid JSON.
         """
-        loaded_data: dict[str, Any] = json.loads(
-            self.path.read_text(encoding="utf-8")
-        )
+        loaded_data: dict[str, Any] = json.loads(self.path.read_text(encoding="utf-8"))
         instance = UnifiedGraph()
-        instance.graph = nx.node_link_graph(
-            loaded_data, directed=True, multigraph=True
-        )
+        instance.graph = nx.node_link_graph(loaded_data, directed=True, multigraph=True)
         return instance
 
     def health(self) -> BackendHealth:

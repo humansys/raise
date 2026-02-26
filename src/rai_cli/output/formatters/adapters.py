@@ -76,9 +76,7 @@ def format_check_human(
                 f"  [green]\u2713[/green] {r['name']:<20s}{r['protocol_name']} compliant"
             )
         else:
-            console.print(
-                f"  [red]\u2717[/red] {r['name']:<20s}{r['error']}"
-            )
+            console.print(f"  [red]\u2717[/red] {r['name']:<20s}{r['error']}")
 
     passed = sum(1 for r in results if r["compliant"])
     total = len(results)

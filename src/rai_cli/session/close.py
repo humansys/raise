@@ -57,8 +57,12 @@ class CloseInput:
     summary: str = ""
     session_type: str = "feature"
     outcomes: list[str] = field(default_factory=lambda: list[str]())
-    patterns: list[dict[str, str]] = field(default_factory=lambda: list[dict[str, str]]())
-    corrections: list[dict[str, str]] = field(default_factory=lambda: list[dict[str, str]]())
+    patterns: list[dict[str, str]] = field(
+        default_factory=lambda: list[dict[str, str]]()
+    )
+    corrections: list[dict[str, str]] = field(
+        default_factory=lambda: list[dict[str, str]]()
+    )
     current_work: dict[str, str] | None = None
     pending: dict[str, list[str]] | None = None
     progress: dict[str, int | str] | None = None
@@ -215,9 +219,7 @@ def process_session_close(
             branch=cw.get("branch", ""),
         )
     else:
-        current_work = CurrentWork(
-            release="", epic="", story="", phase="", branch=""
-        )
+        current_work = CurrentWork(release="", epic="", story="", phase="", branch="")
 
     pending = PendingItems()
     if close_input.pending:
@@ -246,10 +248,9 @@ def process_session_close(
             date=date.today(),
             developer=profile.name,
             summary=close_input.summary,
-            patterns_captured=[
-                f"PAT-{result.session_id}"
-                for _ in close_input.patterns
-            ] if close_input.patterns else [],
+            patterns_captured=[f"PAT-{result.session_id}" for _ in close_input.patterns]
+            if close_input.patterns
+            else [],
         ),
         pending=pending,
         notes=close_input.notes,

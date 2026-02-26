@@ -119,7 +119,9 @@ def _resolve_plugin(plugin_path: str | None) -> AgentPlugin:
     try:
         return cls()
     except Exception as e:
-        logger.warning("Could not instantiate %r from %r: %s", class_name, plugin_path, e)
+        logger.warning(
+            "Could not instantiate %r from %r: %s", class_name, plugin_path, e
+        )
         return _DEFAULT_PLUGIN
 
 

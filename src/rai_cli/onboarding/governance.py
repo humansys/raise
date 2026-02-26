@@ -10,7 +10,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 from datetime import date
-from enum import Enum
+from enum import StrEnum
 from importlib.resources import files
 from pathlib import Path
 
@@ -24,7 +24,7 @@ from rai_cli.onboarding.conventions import (
 logger = logging.getLogger(__name__)
 
 
-class GuardrailLevel(str, Enum):
+class GuardrailLevel(StrEnum):
     """Guardrail enforcement level.
 
     Maps to MoSCoW prioritization:

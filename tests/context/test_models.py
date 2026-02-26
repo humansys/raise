@@ -95,8 +95,7 @@ class TestGraphNode:
     def test_graphnode_subclass_registers_type(self) -> None:
         """Subclass with node_type registers in the global registry."""
 
-        class _TestRegNode(GraphNode, node_type="test_reg_t1"):
-            ...
+        class _TestRegNode(GraphNode, node_type="test_reg_t1"): ...
 
         assert "test_reg_t1" in GraphNode.registered_types()
         assert GraphNode.resolve("test_reg_t1") is _TestRegNode
@@ -109,8 +108,7 @@ class TestGraphNode:
     def test_graphnode_subclass_auto_sets_type(self) -> None:
         """Subclass instances get type auto-set from registration."""
 
-        class _AutoNode(GraphNode, node_type="auto_test_t1"):
-            ...
+        class _AutoNode(GraphNode, node_type="auto_test_t1"): ...
 
         node = _AutoNode(id="A1", content="hello", created="2026-01-01")
         assert node.type == "auto_test_t1"
@@ -118,8 +116,7 @@ class TestGraphNode:
     def test_graphnode_model_dump_includes_type(self) -> None:
         """model_dump() includes the auto-set type field."""
 
-        class _DumpNode(GraphNode, node_type="dump_test_t1"):
-            ...
+        class _DumpNode(GraphNode, node_type="dump_test_t1"): ...
 
         node = _DumpNode(id="D1", content="test", created="2026-01-01")
         dumped = node.model_dump()
@@ -128,8 +125,7 @@ class TestGraphNode:
     def test_graphnode_explicit_type_preserved(self) -> None:
         """Explicitly provided type is not overwritten by auto-default."""
 
-        class _ExplicitNode(GraphNode, node_type="explicit_test_t1"):
-            ...
+        class _ExplicitNode(GraphNode, node_type="explicit_test_t1"): ...
 
         node = _ExplicitNode(
             id="E1", type="custom_override", content="test", created="2026-01-01"
@@ -199,9 +195,7 @@ class TestCoreNodeTypes:
 
     def test_conceptnode_backward_compat(self) -> None:
         """ConceptNode still works with explicit type for backward compat."""
-        node = ConceptNode(
-            id="X", type="epic", content="test", created="2026-01-01"
-        )
+        node = ConceptNode(id="X", type="epic", content="test", created="2026-01-01")
         assert isinstance(node, GraphNode)
         assert node.type == "epic"
 

@@ -26,7 +26,6 @@ from rai_cli.hooks.protocol import LifecycleHook
 from rai_cli.hooks.registry import HookRegistry
 from rai_cli.telemetry.writer import EmitResult
 
-
 # ---------------------------------------------------------------------------
 # Protocol conformance
 # ---------------------------------------------------------------------------
@@ -116,9 +115,7 @@ class TestEventMapping:
         expected_subcommand: str,
     ) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.return_value = EmitResult(success=True)
             result = hook.handle(event)
 
@@ -136,9 +133,7 @@ class TestErrorIsolation:
 
     def test_emit_failure_returns_error_status(self) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.return_value = EmitResult(
                 success=False, error="Permission denied"
             )
@@ -149,9 +144,7 @@ class TestErrorIsolation:
 
     def test_emit_exception_returns_error_status(self) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.side_effect = OSError("disk full")
             result = hook.handle(SessionStartEvent(session_id="SES-1"))
 
@@ -160,9 +153,7 @@ class TestErrorIsolation:
 
     def test_handle_never_raises(self) -> None:
         hook = TelemetryHook()
-        with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage"
-        ) as mock_emit:
+        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.side_effect = RuntimeError("unexpected")
             result = hook.handle(SessionStartEvent(session_id="SES-1"))
 
@@ -187,7 +178,9 @@ class TestEntryPointDiscovery:
     def test_discovered_hook_is_functional(self) -> None:
         registry = HookRegistry()
         registry.discover()
-        telemetry_hooks = [h for h in registry.hooks if type(h).__name__ == "TelemetryHook"]
+        telemetry_hooks = [
+            h for h in registry.hooks if type(h).__name__ == "TelemetryHook"
+        ]
         assert len(telemetry_hooks) == 1
         hook = telemetry_hooks[0]
         assert hook.events == TelemetryHook.events
@@ -202,7 +195,7 @@ class TestEntryPointDiscovery:
 class TestE2EIntegration:
     """Full pipeline: emit event through registry, verify signal on disk."""
 
-    def test_emit_event_writes_signal_to_disk(self, tmp_path: "Path") -> None:
+    def test_emit_event_writes_signal_to_disk(self, tmp_path: Path) -> None:
         """Emit a real event through the full pipeline and verify the signal file."""
         # Wire up: registry discovers TelemetryHook, emitter uses registry
         registry = HookRegistry()
@@ -221,7 +214,9 @@ class TestE2EIntegration:
         assert result.handler_errors == ()
 
         # Verify signal landed on disk
-        signals_file = tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        signals_file = (
+            tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        )
         assert signals_file.exists()
         lines = signals_file.read_text().strip().splitlines()
         assert len(lines) == 1
@@ -230,7 +225,7 @@ class TestE2EIntegration:
         assert signal["command"] == "graph"
         assert signal["subcommand"] == "build"
 
-    def test_multiple_events_append_signals(self, tmp_path: "Path") -> None:
+    def test_multiple_events_append_signals(self, tmp_path: Path) -> None:
         """Multiple events produce multiple signal lines."""
         registry = HookRegistry()
         registry.discover()
@@ -249,21 +244,30 @@ class TestE2EIntegration:
             for event in events:
                 emitter.emit(event)
 
-        signals_file = tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        signals_file = (
+            tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
+        )
         lines = signals_file.read_text().strip().splitlines()
         assert len(lines) == 3
-        commands = [(json.loads(l)["command"], json.loads(l)["subcommand"]) for l in lines]
-        assert commands == [("session", "start"), ("graph", "build"), ("pattern", "added")]
+        commands = [
+            (json.loads(line)["command"], json.loads(line)["subcommand"])
+            for line in lines
+        ]
+        assert commands == [
+            ("session", "start"),
+            ("graph", "build"),
+            ("pattern", "added"),
+        ]
 
 
-def _emit_to_tmpdir(tmp_path: "Path"):  # type: ignore[type-arg]
+def _emit_to_tmpdir(tmp_path: Path):  # type: ignore[type-arg]
     """Create a wrapper that writes CommandUsage to tmp_path/signals.jsonl."""
     from datetime import UTC, datetime
 
     from rai_cli.telemetry.schemas import CommandUsage
     from rai_cli.telemetry.writer import emit
 
-    def _wrapper(command: str, subcommand: str | None = None) -> "EmitResult":
+    def _wrapper(command: str, subcommand: str | None = None) -> EmitResult:
         signal = CommandUsage(
             timestamp=datetime.now(UTC),
             command=command,

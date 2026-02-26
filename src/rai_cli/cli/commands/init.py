@@ -264,9 +264,7 @@ def _get_project_message(
             )
         governance_msg = ""
         if governance_result is not None and not governance_result.already_existed:
-            governance_msg = (
-                f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
-            )
+            governance_msg = f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
         return (
             PROJECT_DETECTED_RI.format(
                 project_type=project_type.capitalize(),
@@ -382,9 +380,7 @@ def _generate_agents_md(
     content = (
         f"# {project_name}\n\n"
         f"> RaiSE-governed project. {session_instruction}\n\n"
-        f"## Active Agents\n\n"
-        + "\n".join(f"- {a}" for a in agent_types)
-        + "\n\n"
+        f"## Active Agents\n\n" + "\n".join(f"- {a}" for a in agent_types) + "\n\n"
         "## Process\n\n"
         "This project follows the RaiSE methodology. "
         "See `.raise/` for governance artifacts and `rai --help` for CLI.\n"
@@ -564,8 +560,12 @@ def init_command(
 
         # Skills
         skills_result = scaffold_skills(
-            project_path, agent_config=config, plugin=plugin,
-            force=force, skip_updates=skip_updates, dry_run=dry_run,
+            project_path,
+            agent_config=config,
+            plugin=plugin,
+            force=force,
+            skip_updates=skip_updates,
+            dry_run=dry_run,
         )
         if agent_type == valid_agent_types[0]:
             first_skills_result = skills_result
@@ -594,10 +594,12 @@ def init_command(
 
     # Emit init:complete event
     emitter = create_emitter()
-    emitter.emit(InitCompleteEvent(
-        project_path=project_path,
-        project_name=project_name,
-    ))
+    emitter.emit(
+        InitCompleteEvent(
+            project_path=project_path,
+            project_name=project_name,
+        )
+    )
 
     # AGENTS.md on --detect
     if detect:

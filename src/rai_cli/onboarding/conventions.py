@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 import time
 from collections import Counter
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
@@ -18,7 +18,7 @@ from pydantic import BaseModel, Field
 from rai_cli.core.files import should_exclude_dir
 
 
-class Confidence(str, Enum):
+class Confidence(StrEnum):
     """Confidence level for a detected convention.
 
     Confidence is based on both consistency ratio and sample size:

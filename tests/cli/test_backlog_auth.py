@@ -96,9 +96,10 @@ class TestBacklogAuthCommand:
         result = runner.invoke(app, ["backlog", "auth", "--provider", "gitlab"])
 
         assert result.exit_code != 0
-        assert "not supported" in result.stdout.lower() or "not supported" in str(
-            result.exception
-        ).lower()
+        assert (
+            "not supported" in result.stdout.lower()
+            or "not supported" in str(result.exception).lower()
+        )
 
     def test_auth_missing_provider(self) -> None:
         """Require --provider flag."""
@@ -142,6 +143,4 @@ class TestBacklogAuthCommand:
         result = runner.invoke(app, ["backlog", "auth", "--provider", "jira"])
 
         assert result.exit_code != 0
-        assert (
-            "network" in result.stdout.lower() or "error" in result.stdout.lower()
-        )
+        assert "network" in result.stdout.lower() or "error" in result.stdout.lower()

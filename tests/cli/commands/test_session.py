@@ -113,7 +113,9 @@ class TestSessionStart:
             ),
             patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
-            result = runner.invoke(app, ["session", "start", "--project", str(project_path)])
+            result = runner.invoke(
+                app, ["session", "start", "--project", str(project_path)]
+            )
 
         assert result.exit_code == 0
         assert "Stale sessions detected" in result.output
@@ -262,9 +264,7 @@ class TestSessionClose:
             ),
             patch("rai_cli.cli.commands.session.save_developer_profile") as mock_save,
         ):
-            result = runner.invoke(
-                app, ["session", "close", "--project", str(project)]
-            )
+            result = runner.invoke(app, ["session", "close", "--project", str(project)])
 
         assert result.exit_code == 0
         assert "Session SES-100 closed" in result.output
@@ -561,7 +561,9 @@ class TestSessionContext:
             ),
             patch(
                 "rai_cli.cli.commands.session.assemble_sections",
-                side_effect=ValueError("Unknown section: 'bogus'. Valid: ['behavioral', 'coaching', 'deadlines', 'governance', 'progress']"),
+                side_effect=ValueError(
+                    "Unknown section: 'bogus'. Valid: ['behavioral', 'coaching', 'deadlines', 'governance', 'progress']"
+                ),
             ),
             patch(
                 "rai_cli.cli.commands.session.load_session_state",
@@ -643,7 +645,9 @@ class TestSessionStartCreatesDir:
 
         assert result.exit_code == 0
         # Per-session directory should exist
-        session_dir = project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        session_dir = (
+            project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        )
         assert session_dir.exists(), "Per-session directory should be created on start"
         assert session_dir.is_dir()
 
@@ -677,12 +681,18 @@ class TestSessionStartCreatesDir:
 
         assert result.exit_code == 0
         # Flat files should be moved to per-session dir
-        session_dir = project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        session_dir = (
+            project_path / ".raise" / "rai" / "personal" / "sessions" / "SES-001"
+        )
         assert (session_dir / "state.yaml").exists()
         assert (session_dir / "signals.jsonl").exists()
         # Old flat files should be removed
-        assert not flat_state.exists(), "Flat state file should be removed after migration"
-        assert not flat_signals.exists(), "Flat signals file should be removed after migration"
+        assert not flat_state.exists(), (
+            "Flat state file should be removed after migration"
+        )
+        assert not flat_signals.exists(), (
+            "Flat signals file should be removed after migration"
+        )
 
 
 class TestSessionStartWithAgent:
@@ -702,7 +712,15 @@ class TestSessionStartWithAgent:
             patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
             result = runner.invoke(
-                app, ["session", "start", "--project", str(project_path), "--agent", "claude-code"]
+                app,
+                [
+                    "session",
+                    "start",
+                    "--project",
+                    str(project_path),
+                    "--agent",
+                    "claude-code",
+                ],
             )
 
         assert result.exit_code == 0
@@ -722,7 +740,9 @@ class TestSessionStartWithAgent:
             ),
             patch("rai_cli.cli.commands.session.save_developer_profile"),
         ):
-            result = runner.invoke(app, ["session", "start", "--project", str(project_path)])
+            result = runner.invoke(
+                app, ["session", "start", "--project", str(project_path)]
+            )
 
         assert result.exit_code == 0
         assert "(unknown)" in result.output  # Default agent
@@ -801,7 +821,10 @@ class TestSessionCloseCwdGuard:
                 "rai_cli.cli.commands.session.process_session_close",
                 return_value=close_result,
             ),
-            patch("rai_cli.cli.commands.session.resolve_session_id", return_value="SES-050"),
+            patch(
+                "rai_cli.cli.commands.session.resolve_session_id",
+                return_value="SES-050",
+            ),
         ):
             result = runner.invoke(
                 app,
@@ -870,9 +893,7 @@ class TestSessionCloseCwdGuard:
                 return_value=profile,
             ),
             patch("rai_cli.cli.commands.session.save_developer_profile"),
-            patch(
-                "rai_cli.cli.commands.session.Path"
-            ) as mock_path_cls,
+            patch("rai_cli.cli.commands.session.Path") as mock_path_cls,
         ):
             # Mock Path.cwd() to return wrong project
             mock_path_cls.cwd.return_value = wrong_project
@@ -917,16 +938,15 @@ class TestSessionCloseWithSessionFlag:
         # Should succeed (legacy close behavior for now)
         assert result.exit_code == 0
         # Resolver was called during session ID resolution
-        mock_resolve.assert_called_once_with(
-            session_flag="SES-177", env_var=None
-        )
+        mock_resolve.assert_called_once_with(session_flag="SES-177", env_var=None)
 
 
 class TestSessionCloseCoherenceValidation:
     """Tests for session close state file coherence validation (RAISE-201)."""
 
     def test_rejects_state_file_with_mismatched_session_id(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """CLI rejects state file when session_id doesn't match --session."""
         import yaml
@@ -935,11 +955,15 @@ class TestSessionCloseCoherenceValidation:
 
         # Write state file with SES-217 data
         state_file = tmp_path / "session-output.yaml"
-        state_file.write_text(yaml.dump({
-            "session_id": "SES-217",
-            "summary": "wrong session data",
-            "type": "feature",
-        }))
+        state_file.write_text(
+            yaml.dump(
+                {
+                    "session_id": "SES-217",
+                    "summary": "wrong session data",
+                    "type": "feature",
+                }
+            )
+        )
 
         with (
             patch(
@@ -968,7 +992,8 @@ class TestSessionCloseCoherenceValidation:
         assert "SES-219" in result.output
 
     def test_accepts_state_file_with_matching_session_id(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """CLI accepts state file when session_id matches --session."""
         import yaml
@@ -981,11 +1006,15 @@ class TestSessionCloseCoherenceValidation:
         (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
 
         state_file = tmp_path / "session-output.yaml"
-        state_file.write_text(yaml.dump({
-            "session_id": "SES-219",
-            "summary": "correct session",
-            "type": "feature",
-        }))
+        state_file.write_text(
+            yaml.dump(
+                {
+                    "session_id": "SES-219",
+                    "summary": "correct session",
+                    "type": "feature",
+                }
+            )
+        )
 
         with (
             patch(
@@ -1017,7 +1046,8 @@ class TestSessionCloseCoherenceValidation:
         assert "SES-219 closed" in result.output
 
     def test_skips_validation_when_state_file_has_no_session_id(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """CLI proceeds when state file has no session_id (backwards compat)."""
         import yaml
@@ -1029,10 +1059,14 @@ class TestSessionCloseCoherenceValidation:
         (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
 
         state_file = tmp_path / "session-output.yaml"
-        state_file.write_text(yaml.dump({
-            "summary": "old format without session_id",
-            "type": "feature",
-        }))
+        state_file.write_text(
+            yaml.dump(
+                {
+                    "summary": "old format without session_id",
+                    "type": "feature",
+                }
+            )
+        )
 
         with (
             patch(
