@@ -303,7 +303,7 @@ class TestPatternAddedEvent:
             patch("rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result),
             patch("rai_cli.cli.commands.pattern.load_developer_profile", return_value=None),
         ):
-            result = runner.invoke(pattern_app, ["add", "Test pattern"])
+            runner.invoke(pattern_app, ["add", "Test pattern"])
 
         pat_events = [e for e in captured_events if isinstance(e, PatternAddedEvent)]
         assert len(pat_events) == 0

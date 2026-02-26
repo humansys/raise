@@ -39,7 +39,7 @@ def _make_client(
     app = FastAPI()
 
     @app.get("/api/v1/protected")
-    async def protected(ctx: OrgContext = Depends(verify_api_key)) -> dict[str, str]:
+    async def protected(ctx: OrgContext = Depends(verify_api_key)) -> dict[str, str]:  # noqa: B008
         return {"org_id": str(ctx.org_id), "org_name": ctx.org_name}
 
     # Mock the DB lookup
