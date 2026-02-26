@@ -132,7 +132,7 @@ class TestApiGraphBackendPersist:
         )
 
         # Check that the client has the auth header
-        assert backend._client.headers["x-api-key"] == "rsk_test_abc"
+        assert backend._client.headers["authorization"] == "Bearer rsk_test_abc"
 
 
 class TestApiGraphBackendHealth:
