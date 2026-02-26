@@ -76,7 +76,7 @@ that multiple components (CLI, server, Forge, future UIs) need to agree on.
 | Component | Responsibility | Key Interface |
 |-----------|---------------|---------------|
 | `rai_core.graph` | Shared models, graph engine, query, backends | `GraphNode`, `Graph`, `KnowledgeGraphBackend` protocol |
-| `rai_server` | FastAPI API server over PostgreSQL | 8 REST endpoints at `/api/v1/graph/*` |
+| `rai_server` | FastAPI API server over PostgreSQL | Domain-level REST endpoints at `/api/v1/` |
 | `rai_server.db` | SQLAlchemy models + Alembic migrations | `GraphNodeRow`, `GraphEdgeRow`, `OrgRow`, `ApiKeyRow` |
 | `rai_server.api.v1` | Route handlers + auth dependency | `verify_api_key() → OrgContext` |
 | `rai_core.graph.backends.api` | HTTP client backend for CLI→Server | `ApiGraphBackend`, `DualWriteBackend` |
@@ -112,15 +112,59 @@ class DualWriteBackend:
 
 ### rai_server — API Endpoints
 
+Two levels: **internal** CRUD (used by ApiGraphBackend and service layer) and
+**domain** endpoints (the public API that Rovo agents, Forge actions, and external
+consumers call). The principle: **server is smart, clients are simple.**
+
+Aligned with RAISE-273 walking skeleton (DA-9): "El backend es el core del producto."
+
+#### Public (domain-level) endpoints
+
 ```
-GET  /health                          → {status, version, db_ok}
-POST /api/v1/graph/nodes              → create single node
-GET  /api/v1/graph/nodes/{id}         → get node by id
-POST /api/v1/graph/nodes/batch        → create/upsert multiple nodes
-POST /api/v1/graph/edges              → create single edge
-POST /api/v1/graph/edges/batch        → create/upsert multiple edges
-GET  /api/v1/graph/query?q=&types=    → keyword search with scope filtering
-GET  /api/v1/graph/subgraph?root_id=  → BFS subgraph for NetworkX client-side
+GET  /health                              → {status, version, db_ok}
+
+# --- Graph Operations ---
+POST /api/v1/graph/sync                   → full graph upsert (CLI DualWrite)
+     Input:  { repo_id, nodes: [...], edges: [...] }
+     Output: { synced: true, nodes_upserted, edges_upserted }
+     Notes:  Idempotent. Replaces batch CRUD as the CLI-facing write surface.
+
+GET  /api/v1/graph/query                  → keyword search with scope/type filtering
+     Input:  ?q=...&types=concept,adr&scope=project-x
+     Output: { nodes: [...], edges: [...] }
+
+GET  /api/v1/graph/trace                  → trazabilidad upstream/downstream
+     Input:  ?from=ADR-003&direction=downstream|upstream&depth=3
+     Output: { chain: [{node, relation, node}, ...] }
+
+GET  /api/v1/graph/impact                 → análisis de impacto
+     Input:  ?node=ADR-003&change=deprecate|modify
+     Output: { affected: [{node, risk_level, reason}], total_impact }
+
+# --- Dev Guidance ---
+GET  /api/v1/dev/constraints              → ADRs, standards, patterns for a module
+     Input:  ?module=mod-auth&project=project-x
+     Output: { adrs: [...], standards: [...], patterns: [...] }
+```
+
+#### Internal (CRUD) — service layer, not routed publicly
+
+```
+# Used internally by /graph/sync, /graph/query, etc.
+# Not exposed as public endpoints — no direct node/edge manipulation from clients.
+upsert_nodes(nodes: list[GraphNodeRow]) → list[UUID]
+upsert_edges(edges: list[GraphEdgeRow]) → list[UUID]
+get_node(node_id: UUID) → GraphNodeRow | None
+query_nodes(q: str, types: list, scope: str) → list[GraphNodeRow]
+bfs_subgraph(root_id: UUID, depth: int) → tuple[list[GraphNodeRow], list[GraphEdgeRow]]
+```
+
+#### Future (post-epic, aligned with RAISE-273 DA-9)
+
+```
+POST /api/v1/graph/index                  → index a Confluence document into the graph
+POST /api/v1/governance/validate          → validate document against graph
+POST /api/v1/governance/check-consistency → cross-document consistency check
 ```
 
 ### rai_server — Auth
@@ -195,7 +239,7 @@ graph_edges (id UUID PK, org_id FK, source_id FK, target_id FK, edge_type, weigh
 | Q1 | Package structure | 3 packages (core+cli lockstep on PyPI, server PRO separate) |
 | Q2 | `query.py` in core | Yes, without `from_file()`. Engine receives Graph, no I/O. |
 | Q3 | DualWriteBackend necessity | Justified — real resilience logic (fallback, best-effort) |
-| Q4 | 8 endpoints vs batch-only | 8 justified — batch for CLI, single for Forge/API consumers |
+| Q4 | CRUD vs domain-level API | **REVISED** — domain-level public endpoints (sync, query, trace, impact, constraints). CRUD is internal service layer. Rovo/Forge agents get high-level operations; server holds the intelligence. Aligned with RAISE-273 DA-9. |
 | Rename | Drop "Unified" prefix | During S275.1 extraction, re-exports for backward compat |
 | Scope | rai-core is shared domain, not just graph | Structure accommodates graph + workflow + governance axes |
 
