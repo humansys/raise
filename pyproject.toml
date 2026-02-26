@@ -3,6 +3,7 @@ members = ["packages/*"]
 
 [tool.uv.sources]
 rai-core = { workspace = true }
+rai-server = { workspace = true }
 
 [project]
 name = "rai-cli"
@@ -52,6 +53,8 @@ dev = [
     "ruff>=0.4.0",
     "pyright>=1.1.350",
     "bandit>=1.7.8",
+    "rai-server",
+    "httpx>=0.27.0",
 ]
 csharp = [
     "tree-sitter-c-sharp>=0.23.1",
@@ -128,12 +131,14 @@ indent-style = "space"
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
-include = ["src", "packages/rai-core/src"]
+include = ["src", "packages/rai-core/src", "packages/rai-server/src"]
 exclude = [
     "**/__pycache__",
     "**/node_modules",
     ".venv",
 ]
+venvPath = "."
+venv = ".venv"
 reportMissingTypeStubs = false
 reportUnknownMemberType = false
 
@@ -147,6 +152,7 @@ addopts = [
     "--strict-config",
     "--cov=src/rai_cli",
     "--cov=packages/rai-core/src/rai_core",
+    "--cov=packages/rai-server/src/rai_server",
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
@@ -155,7 +161,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["src/rai_cli", "packages/rai-core/src/rai_core"]
+source = ["src/rai_cli", "packages/rai-core/src/rai_core", "packages/rai-server/src/rai_server"]
 omit = [
     "*/tests/*",
     "*/__main__.py",
