@@ -38,17 +38,6 @@ class TestProtocolConformance:
         hook = TelemetryHook()
         assert isinstance(hook, LifecycleHook)
 
-    def test_has_events_classvar(self) -> None:
-        assert isinstance(TelemetryHook.events, list)
-        assert len(TelemetryHook.events) == 9
-
-    def test_has_priority_classvar(self) -> None:
-        assert TelemetryHook.priority == 0
-
-    def test_has_handle_method(self) -> None:
-        hook = TelemetryHook()
-        assert callable(hook.handle)
-
 
 # ---------------------------------------------------------------------------
 # Event subscription
@@ -175,16 +164,7 @@ class TestEntryPointDiscovery:
         hook_types = [type(h).__name__ for h in registry.hooks]
         assert "TelemetryHook" in hook_types
 
-    def test_discovered_hook_is_functional(self) -> None:
-        registry = HookRegistry()
-        registry.discover()
-        telemetry_hooks = [
-            h for h in registry.hooks if type(h).__name__ == "TelemetryHook"
-        ]
-        assert len(telemetry_hooks) == 1
-        hook = telemetry_hooks[0]
-        assert hook.events == TelemetryHook.events
-        assert hook.priority == 0
+
 
 
 # ---------------------------------------------------------------------------

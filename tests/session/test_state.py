@@ -58,14 +58,6 @@ class TestSessionStateSchema:
         assert work.phase == ""
         assert work.branch == ""
 
-    def test_current_work_valid(self) -> None:
-        """CurrentWork accepts all required fields."""
-        work = CurrentWork(
-            epic="E15", story="S15.7", phase="design", branch="story/s15.7/x"
-        )
-        assert work.epic == "E15"
-        assert work.story == "S15.7"
-
     def test_last_session_requires_core_fields(self) -> None:
         """LastSession requires id, date, developer, summary."""
         with pytest.raises(ValidationError):
@@ -105,15 +97,6 @@ class TestSessionStateSchema:
         )
         assert state.pending.decisions == []
         assert state.notes == ""
-
-    def test_session_state_full(self) -> None:
-        """SessionState accepts all fields including notes."""
-        state = _make_session_state()
-        assert state.current_work.epic == "E15"
-        assert state.last_session.id == "SES-097"
-        assert len(state.pending.next_actions) == 1
-        assert state.notes == "ADR-024 created."
-
 
 class TestGetSessionStatePath:
     """Tests for get_session_state_path."""

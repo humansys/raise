@@ -6,6 +6,17 @@
 
 ---
 
+## E292 Session SES-004 — 2026-02-26
+
+- **RAISE-293 worktree limitation:** El worktree e292 comparte el venv del repo principal. Tests que referencian símbolos renombrados en la rama (e.g. `UnifiedGraphBuilder`) fallan en colección porque el módulo cargado es el del repo principal (`GraphBuilder`). No son ventanas rotas — se resolverán en el merge. Solución estructural: instalar el worktree en venv propio (`uv pip install -e raise-commons-e292`). Documentar en RAISE-293 como limitación conocida del experimento.
+
+## E292 Session SES-003 — 2026-02-26
+
+- **context/test_builder.py (2734 líneas):** No analizado en E292 — demasiado grande sin story dedicada. Candidato para Gemba más profundo en épica futura de cleanup.
+- **RAISE-294:** Test infrastructure migration — mover tests/graph/ → packages/rai-core/tests/ y tests/providers/ → rai_pro. Requiere setup de pytest en rai-core.
+
+---
+
 ## Pre-Release (before first PyPI publish) — DONE
 
 - [x] **S-RENAME:** ✓ Already published as `rai-cli` with `rai` entry point
@@ -26,7 +37,7 @@
   - **Bug:** `rai init` overwrites `branches.development` to `main` even when `v2` is configured. Also doesn't propagate SKILL.md content changes when YAML frontmatter format drifts (PAT-E-451).
   - **Priority:** Medium — workaround exists (manual restore + direct cp).
 
-- [ ] **Testing strategy: coverage target vs. mutation testing** — (SES-246, 2026-02-22)
+- [x] **Testing strategy: coverage target vs. mutation testing** — (SES-246, 2026-02-22) → Promoted to RAISE-292
   - **Insight:** 90% coverage gate is Goodhart's Law — optimizes for line execution, not confidence. Evidence from S211.2: ~12 of 20 new tests exist for the metric, not for catching bugs. Constant assertions (`"x" == "x"`), mock-implementation tests (verify `_discover` called), and magic-number counts (`__all__ == 21`) are muda.
   - **Alternative:** Coverage as alarm (warn <70%), not gate. Mutation testing (mutmut/cosmic-ray) as the real gate: if you mutate code and tests stay green, the tests don't work.
   - **Principle:** "Each test justifies its existence" > "hit a number."

@@ -39,7 +39,7 @@ SESSION: /rai-session-start → [work] → /rai-session-close
 - Epic retrospective complete before epic merge
 
 ### Critical Rules
-- TDD always (red-green-refactor, no exceptions)
+- TDD always (red-green-refactor, no exceptions) — each test must justify its existence by asserting behavior, not hitting a coverage number
 - Commit after each completed task, not just story end
 - Full skill cycle even for small stories
 - Ask before spawning subagents

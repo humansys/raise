@@ -41,11 +41,6 @@ class TestResolveSessionId:
         result = resolve_session_id(session_flag=None, env_var="178")
         assert result == "SES-178"
 
-    def test_accepts_already_normalized_format(self) -> None:
-        """resolve_session_id accepts 'SES-177' format without modification."""
-        result = resolve_session_id(session_flag="SES-177", env_var=None)
-        assert result == "SES-177"
-
     def test_normalizes_lowercase_prefix(self) -> None:
         """resolve_session_id normalizes 'ses-177' to 'SES-177'."""
         result = resolve_session_id(session_flag="ses-177", env_var=None)
