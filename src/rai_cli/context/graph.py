@@ -289,4 +289,3 @@ class UnifiedGraph:
             Number of relationship edges.
         """
         return self.graph.number_of_edges()
-

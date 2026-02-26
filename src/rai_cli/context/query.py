@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import time
 from datetime import date
-from enum import Enum
+from enum import StrEnum
 from math import exp, log, sqrt
 from pathlib import Path
 from typing import Any
@@ -29,7 +29,7 @@ SCORING_WILSON_Z: float = 1.96
 SCORING_LOW_WILSON_THRESHOLD: float = 0.15
 
 
-class UnifiedQueryStrategy(str, Enum):
+class UnifiedQueryStrategy(StrEnum):
     """Query strategy for unified context retrieval.
 
     Attributes:
@@ -233,7 +233,9 @@ def wilson_lower_bound(
         raise ValueError("Cannot compute Wilson lower bound with 0 observations")
     p_hat = positives / n
     z2 = z * z
-    numerator = p_hat + z2 / (2 * n) - z * sqrt((p_hat * (1 - p_hat) + z2 / (4 * n)) / n)
+    numerator = (
+        p_hat + z2 / (2 * n) - z * sqrt((p_hat * (1 - p_hat) + z2 / (4 * n)) / n)
+    )
     denominator = 1 + z2 / n
     return numerator / denominator
 
@@ -375,9 +377,7 @@ class UnifiedQueryEngine:
 
         return UnifiedQueryResult(concepts=concepts, metadata=metadata)
 
-    def _keyword_search(
-        self, query: UnifiedQuery
-    ) -> tuple[list[ConceptNode], int]:
+    def _keyword_search(self, query: UnifiedQuery) -> tuple[list[ConceptNode], int]:
         """Execute keyword search strategy.
 
         Matches keywords against node content, returns top N by relevance.
@@ -422,9 +422,7 @@ class UnifiedQueryEngine:
         limited = [concept for _, concept in scored_concepts[: query.limit]]
         return limited, total_available
 
-    def _concept_lookup(
-        self, query: UnifiedQuery
-    ) -> tuple[list[ConceptNode], int]:
+    def _concept_lookup(self, query: UnifiedQuery) -> tuple[list[ConceptNode], int]:
         """Execute concept lookup strategy.
 
         Direct ID lookup with optional BFS neighbor traversal.
@@ -579,17 +577,13 @@ class UnifiedQueryEngine:
         Returns:
             The release node, or None if not found.
         """
-        neighbors = self.graph.get_neighbors(
-            epic_id, depth=1, edge_types=["part_of"]
-        )
+        neighbors = self.graph.get_neighbors(epic_id, depth=1, edge_types=["part_of"])
         for node in neighbors:
             if node.type == "release":
                 return node
         return None
 
-    def get_architectural_context(
-        self, module_id: str
-    ) -> ArchitecturalContext | None:
+    def get_architectural_context(self, module_id: str) -> ArchitecturalContext | None:
         """Get full architectural context for a module.
 
         Combines domain, layer, constraints, and dependencies into a

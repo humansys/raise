@@ -94,6 +94,8 @@ def scaffold_workflows(
         result.workflows_created += 1
         logger.debug("Created: %s", workflow_file)
 
-    result.already_existed = result.workflows_created == 0 and len(result.files_skipped) > 0
+    result.already_existed = (
+        result.workflows_created == 0 and len(result.files_skipped) > 0
+    )
 
     return result

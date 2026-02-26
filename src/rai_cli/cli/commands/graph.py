@@ -478,11 +478,13 @@ def build(
 
     # Emit graph:build event
     emitter = create_emitter()
-    emitter.emit(GraphBuildEvent(
-        project_path=output_path.parent,
-        node_count=graph.node_count,
-        edge_count=graph.edge_count,
-    ))
+    emitter.emit(
+        GraphBuildEvent(
+            project_path=output_path.parent,
+            node_count=graph.node_count,
+            edge_count=graph.edge_count,
+        )
+    )
 
     # Compute and persist diff
     diff: GraphDiff | None = None
@@ -860,7 +862,8 @@ def list_graph(
     # Filter to memory types only if requested (inlined — single-use constant)
     if memory_only:
         concepts = [
-            c for c in graph.iter_concepts()
+            c
+            for c in graph.iter_concepts()
             if c.type in ["pattern", "calibration", "session"]
         ]
     else:

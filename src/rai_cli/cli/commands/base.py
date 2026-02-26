@@ -24,8 +24,7 @@ _stderr_console = Console(stderr=True)
 def show() -> None:
     """Deprecated: use 'rai info'."""
     _stderr_console.print(
-        "[yellow]DEPRECATED:[/yellow] 'rai base show' → "
-        "use 'rai info' instead",
+        "[yellow]DEPRECATED:[/yellow] 'rai base show' → use 'rai info' instead",
     )
     from rai_cli.cli.commands.info import info_command
 

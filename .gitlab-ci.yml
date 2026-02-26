@@ -1,8 +1,14 @@
 # GitLab CI/CD for raise-commons
 # Source of truth pipeline — security scanning + quality gates
+# Trigger: MR targeting dev only. Direct commits to dev do not run the pipeline.
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
 
 stages:
   - test
+  - snyk
   - security
 
 # --- Test Stage ---
@@ -11,18 +17,88 @@ test:
   stage: test
   image: python:3.12-slim
   before_script:
+    - apt-get update -qq && apt-get install -y -qq libatomic1
     - pip install uv
-    - uv sync --dev
+    - uv sync --extra dev
   script:
     - uv run pytest --tb=short -q
     - uv run ruff check src/ tests/
     - uv run ruff format --check src/ tests/
     - uv run pyright
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH == "v2"
+    - when: always
 
-# --- Security Stage (GitLab templates) ---
+# --- Snyk Stage ---
+
+snyk:sca:
+  stage: snyk
+  image: node:20-slim
+  dependencies: []
+  before_script:
+    - npm install -g snyk
+    - apt-get update -qq && apt-get install -y -qq python3 python3-pip
+    - pip3 install uv --break-system-packages
+    - uv sync --dev
+  script:
+    - snyk test --all-projects --json-file-output=snyk-sca-report.json || true
+    - snyk monitor --all-projects
+  artifacts:
+    paths:
+      - snyk-sca-report.json
+    expire_in: 30 days
+  rules:
+    - when: always
+
+snyk:sast:
+  stage: snyk
+  image: node:20-slim
+  dependencies: []
+  before_script:
+    - npm install -g snyk
+  script:
+    - snyk code test src/ --json-file-output=snyk-sast-report.json || true
+  artifacts:
+    paths:
+      - snyk-sast-report.json
+    expire_in: 30 days
+  rules:
+    - when: always
+
+snyk:iac:
+  stage: snyk
+  image: node:20-slim
+  dependencies: []
+  before_script:
+    - npm install -g snyk
+  script:
+    - snyk iac test .gitlab-ci.yml pyproject.toml --json-file-output=snyk-iac-report.json || true
+  artifacts:
+    paths:
+      - snyk-iac-report.json
+    expire_in: 30 days
+  rules:
+    - when: always
+
+# --- Security Stage (GitLab templates + SonarQube) ---
+
+sonarqube:scan:
+  stage: security
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  dependencies: []
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script:
+    - sonar-scanner
+  allow_failure: true
+  rules:
+    - when: always
 
 include:
   - template: Jobs/SAST.gitlab-ci.yml

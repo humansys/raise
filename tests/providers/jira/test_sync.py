@@ -88,7 +88,9 @@ def state_with_stories() -> SyncState:
 class TestPullEpic:
     """Tests for pull_epic function."""
 
-    def test_pull_new_epic(self, mock_client: MagicMock, empty_state: SyncState) -> None:
+    def test_pull_new_epic(
+        self, mock_client: MagicMock, empty_state: SyncState
+    ) -> None:
         """Pull epic not in state creates new mapping."""
         mock_client.read_epic.return_value = JiraEpic(
             key="DEMO-1",

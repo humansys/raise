@@ -95,7 +95,9 @@ def _build_graph_with_releases(project_path: Path) -> None:
 class TestReleaseList:
     """Tests for rai release list command."""
 
-    def test_lists_releases_from_graph(self, tmp_path: Path, monkeypatch: object) -> None:
+    def test_lists_releases_from_graph(
+        self, tmp_path: Path, monkeypatch: object
+    ) -> None:
         """rai release list shows releases from graph."""
         import pytest
 
@@ -119,7 +121,9 @@ class TestReleaseList:
         set_error_console(None)  # Reset singleton to avoid test ordering leaks
         result = runner.invoke(app, ["release", "list", "--project", str(tmp_path)])
         assert result.exit_code != 0
-        assert "build" in result.output.lower() or "build" in (result.stderr or "").lower()
+        assert (
+            "build" in result.output.lower() or "build" in (result.stderr or "").lower()
+        )
 
     def test_shows_empty_message_when_no_releases(self, tmp_path: Path) -> None:
         """rai release list shows message when graph has no release nodes."""

@@ -28,9 +28,7 @@ SESSION_STATE_REL_PATH = Path(".raise") / "rai" / "personal" / "session-state.ya
 _LEGACY_SESSION_STATE_REL_PATH = Path(".raise") / "rai" / "session-state.yaml"
 
 
-def get_session_state_path(
-    project_path: Path, session_id: str | None = None
-) -> Path:
+def get_session_state_path(project_path: Path, session_id: str | None = None) -> Path:
     """Get the absolute path to session state file.
 
     When session_id is provided, returns per-session path:
@@ -101,7 +99,9 @@ def migrate_flat_to_session(project_path: Path, session_id: str) -> bool:
 
     if flat_signals.exists():
         shutil.move(str(flat_signals), str(session_dir / "signals.jsonl"))
-        logger.info("Migrated signals: %s → %s/signals.jsonl", flat_signals, session_dir)
+        logger.info(
+            "Migrated signals: %s → %s/signals.jsonl", flat_signals, session_dir
+        )
 
     return True
 

@@ -118,7 +118,9 @@ class ProjectManifest(BaseModel):
         if "agents" not in typed and "ide" in typed:
             raw_ide: object = typed["ide"]
             if isinstance(raw_ide, dict):
-                raw_type: object = cast(dict[str, object], raw_ide).get("type", "claude")
+                raw_type: object = cast(dict[str, object], raw_ide).get(
+                    "type", "claude"
+                )
                 ide_type: str = str(raw_type) if raw_type is not None else "claude"
             else:
                 ide_type = "claude"

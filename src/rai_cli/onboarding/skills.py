@@ -135,7 +135,11 @@ def _copy_skill_tree(
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
             raw_content = item.read_text(encoding="utf-8")
-            if plugin is not None and agent_config is not None and item.name == "SKILL.md":
+            if (
+                plugin is not None
+                and agent_config is not None
+                and item.name == "SKILL.md"
+            ):
                 raw_content = _apply_plugin_transform(raw_content, plugin, agent_config)
             dest.write_text(raw_content, encoding="utf-8")
             result.files_copied.append(str(dest))
@@ -143,7 +147,11 @@ def _copy_skill_tree(
             logger.debug("Copied: %s", dest)
         elif item.is_dir():
             copied += _copy_skill_tree(
-                item, dest, result, plugin=plugin, agent_config=agent_config,
+                item,
+                dest,
+                result,
+                plugin=plugin,
+                agent_config=agent_config,
                 overwrite=overwrite,
             )
     return copied
@@ -214,11 +222,16 @@ def scaffold_skills(
         if not skill_md.exists():
             if not dry_run:
                 copied = _copy_skill_tree(
-                    source, skill_dest, result,
-                    plugin=plugin, agent_config=config, overwrite=True,
+                    source,
+                    skill_dest,
+                    result,
+                    plugin=plugin,
+                    agent_config=config,
+                    overwrite=True,
                 )
                 manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_new, version=cli_version,
+                    sha256=hash_new,
+                    version=cli_version,
                 )
                 if copied > 0:
                     result.skills_copied += 1
@@ -226,9 +239,7 @@ def scaffold_skills(
             continue
 
         # --- Skill exists on disk → classify with three-hash ---
-        hash_on_disk = compute_content_hash(
-            skill_md.read_text(encoding="utf-8")
-        )
+        hash_on_disk = compute_content_hash(skill_md.read_text(encoding="utf-8"))
         entry = manifest.skills.get(skill_name)
         hash_distributed = entry.sha256 if entry else None
 
@@ -239,7 +250,8 @@ def scaffold_skills(
             # Ensure manifest entry exists (legacy fixup)
             if skill_name not in manifest.skills:
                 manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_on_disk, version=cli_version,
+                    sha256=hash_on_disk,
+                    version=cli_version,
                 )
 
         elif action == SkillSyncAction.AUTO_UPDATE:
@@ -252,11 +264,16 @@ def scaffold_skills(
                 result.files_copied.append(str(skill_md))
                 # Also update reference files
                 _copy_skill_tree(
-                    source, skill_dest, result,
-                    plugin=plugin, agent_config=config, overwrite=True,
+                    source,
+                    skill_dest,
+                    result,
+                    plugin=plugin,
+                    agent_config=config,
+                    overwrite=True,
                 )
                 manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_new, version=cli_version,
+                    sha256=hash_new,
+                    version=cli_version,
                 )
                 result.skills_updated.append(skill_name)
             else:
@@ -272,11 +289,16 @@ def scaffold_skills(
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
                     _copy_skill_tree(
-                        source, skill_dest, result,
-                        plugin=plugin, agent_config=config, overwrite=True,
+                        source,
+                        skill_dest,
+                        result,
+                        plugin=plugin,
+                        agent_config=config,
+                        overwrite=True,
                     )
                     manifest.skills[skill_name] = SkillEntry(
-                        sha256=hash_new, version=cli_version,
+                        sha256=hash_new,
+                        version=cli_version,
                     )
                 result.skills_overwritten.append(skill_name)
             elif skip_updates or batch_keep:
@@ -293,7 +315,9 @@ def scaffold_skills(
 
                 on_disk_content = skill_md.read_text(encoding="utf-8")
                 user_action = prompt_skill_conflict(
-                    skill_name, on_disk_content, bundled_content,
+                    skill_name,
+                    on_disk_content,
+                    bundled_content,
                 )
 
                 if user_action == ConflictAction.KEEP:
@@ -308,11 +332,16 @@ def scaffold_skills(
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
                     _copy_skill_tree(
-                        source, skill_dest, result,
-                        plugin=plugin, agent_config=config, overwrite=True,
+                        source,
+                        skill_dest,
+                        result,
+                        plugin=plugin,
+                        agent_config=config,
+                        overwrite=True,
                     )
                     manifest.skills[skill_name] = SkillEntry(
-                        sha256=hash_new, version=cli_version,
+                        sha256=hash_new,
+                        version=cli_version,
                     )
                     result.skills_overwritten.append(skill_name)
                     if user_action == ConflictAction.OVERWRITE_ALL:
@@ -324,11 +353,16 @@ def scaffold_skills(
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
                     _copy_skill_tree(
-                        source, skill_dest, result,
-                        plugin=plugin, agent_config=config, overwrite=True,
+                        source,
+                        skill_dest,
+                        result,
+                        plugin=plugin,
+                        agent_config=config,
+                        overwrite=True,
                     )
                     manifest.skills[skill_name] = SkillEntry(
-                        sha256=hash_new, version=cli_version,
+                        sha256=hash_new,
+                        version=cli_version,
                     )
                     result.skills_overwritten.append(skill_name)
 
@@ -337,12 +371,14 @@ def scaffold_skills(
             if hash_on_disk == hash_new:
                 # File matches bundled — safe to record
                 manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_new, version=cli_version,
+                    sha256=hash_new,
+                    version=cli_version,
                 )
             else:
                 # File differs — treat as customized, record on-disk hash
                 manifest.skills[skill_name] = SkillEntry(
-                    sha256=hash_on_disk, version=cli_version,
+                    sha256=hash_on_disk,
+                    version=cli_version,
                 )
             result.skills_current.append(skill_name)
             result.files_skipped.append(str(skill_md))

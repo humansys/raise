@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, date, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import yaml
@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, ValidationError
 logger = logging.getLogger(__name__)
 
 
-class ExperienceLevel(str, Enum):
+class ExperienceLevel(StrEnum):
     """Developer experience level with RaiSE (Shu-Ha-Ri model).
 
     Determines interaction verbosity and explanation depth.
@@ -33,7 +33,7 @@ class ExperienceLevel(str, Enum):
     RI = "ri"
 
 
-class CommunicationStyle(str, Enum):
+class CommunicationStyle(StrEnum):
     """Communication style preference.
 
     Determines how much explanation Rai provides by default.
@@ -246,8 +246,12 @@ class DeveloperProfile(BaseModel):
     first_session: date | None = None
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
-    current_session: CurrentSession | None = None  # DEPRECATED: migrated to active_sessions
-    active_sessions: list[ActiveSession] = Field(default_factory=lambda: list[ActiveSession]())
+    current_session: CurrentSession | None = (
+        None  # DEPRECATED: migrated to active_sessions
+    )
+    active_sessions: list[ActiveSession] = Field(
+        default_factory=lambda: list[ActiveSession]()
+    )
     coaching: CoachingContext = Field(default_factory=CoachingContext)
     deadlines: list[Deadline] = Field(default_factory=lambda: list[Deadline]())
 

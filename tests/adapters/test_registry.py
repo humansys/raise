@@ -48,9 +48,7 @@ class TestDiscover:
         fake_cls = type("FakeAdapter", (), {})
         mock_ep = _make_entry_point("test_adapter", fake_cls)
 
-        with patch(
-            "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
-        ):
+        with patch("rai_cli.adapters.registry.entry_points", return_value=[mock_ep]):
             result = _discover("rai.adapters.pm")
 
         assert result == {"test_adapter": fake_cls}
@@ -60,9 +58,7 @@ class TestDiscover:
         cls_b = type("AdapterB", (), {})
         eps = [_make_entry_point("a", cls_a), _make_entry_point("b", cls_b)]
 
-        with patch(
-            "rai_cli.adapters.registry.entry_points", return_value=eps
-        ):
+        with patch("rai_cli.adapters.registry.entry_points", return_value=eps):
             result = _discover("rai.adapters.pm")
 
         assert result == {"a": cls_a, "b": cls_b}
@@ -74,10 +70,13 @@ class TestDiscover:
         good_ep = _make_entry_point("good", good_cls)
         bad_ep = _make_broken_entry_point("bad", ImportError("missing dep"))
 
-        with patch(
-            "rai_cli.adapters.registry.entry_points",
-            return_value=[good_ep, bad_ep],
-        ), caplog.at_level(logging.WARNING):
+        with (
+            patch(
+                "rai_cli.adapters.registry.entry_points",
+                return_value=[good_ep, bad_ep],
+            ),
+            caplog.at_level(logging.WARNING),
+        ):
             result = _discover("rai.adapters.pm")
 
         assert result == {"good": good_cls}
@@ -95,9 +94,10 @@ class TestDiscover:
             _make_entry_point("c", cls_c),
         ]
 
-        with patch(
-            "rai_cli.adapters.registry.entry_points", return_value=eps
-        ), caplog.at_level(logging.WARNING):
+        with (
+            patch("rai_cli.adapters.registry.entry_points", return_value=eps),
+            caplog.at_level(logging.WARNING),
+        ):
             result = _discover("rai.test.group")
 
         assert result == {"a": cls_a, "c": cls_c}
@@ -110,9 +110,10 @@ class TestDiscover:
         a_function = lambda: None  # noqa: E731
         mock_ep = _make_entry_point("not_a_class", a_function)
 
-        with patch(
-            "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
-        ), caplog.at_level(logging.WARNING):
+        with (
+            patch("rai_cli.adapters.registry.entry_points", return_value=[mock_ep]),
+            caplog.at_level(logging.WARNING),
+        ):
             result = _discover("rai.adapters.pm")
 
         assert result == {}
@@ -173,7 +174,14 @@ class TestGovernanceParsersDiscovery:
         """All 9 built-in parsers are discoverable via entry points."""
         parsers = get_governance_parsers()
         expected = {
-            "prd", "vision", "constitution", "roadmap", "backlog",
-            "epic_scope", "adr", "guardrails", "glossary",
+            "prd",
+            "vision",
+            "constitution",
+            "roadmap",
+            "backlog",
+            "epic_scope",
+            "adr",
+            "guardrails",
+            "glossary",
         }
         assert expected.issubset(parsers.keys())

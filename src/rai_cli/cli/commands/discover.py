@@ -108,7 +108,14 @@ def scan_command(
     # Validate language if provided
     lang: Language | None = None
     if language:
-        if language not in ("python", "typescript", "javascript", "php", "svelte", "csharp"):
+        if language not in (
+            "python",
+            "typescript",
+            "javascript",
+            "php",
+            "svelte",
+            "csharp",
+        ):
             cli_error(
                 f"Unsupported language: {language}",
                 hint="Supported: python, typescript, javascript, php, svelte, csharp",
@@ -128,11 +135,13 @@ def scan_command(
 
     # Emit discover:scan event
     emitter = create_emitter()
-    emitter.emit(DiscoverScanEvent(
-        project_path=path,
-        language=lang or "auto",
-        component_count=len(result.symbols),
-    ))
+    emitter.emit(
+        DiscoverScanEvent(
+            project_path=path,
+            language=lang or "auto",
+            component_count=len(result.symbols),
+        )
+    )
 
     format_scan_result(result, path, output, language=lang)
 

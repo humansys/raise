@@ -42,9 +42,7 @@ class TestHookEvent:
 
     def test_hook_event_accepts_explicit_timestamp(self) -> None:
         ts = datetime(2026, 2, 23, 12, 0, 0, tzinfo=UTC)
-        event = SessionStartEvent(
-            session_id="SES-1", developer="emilio", timestamp=ts
-        )
+        event = SessionStartEvent(session_id="SES-1", developer="emilio", timestamp=ts)
         assert event.timestamp == ts
 
 
@@ -205,7 +203,11 @@ _ALL_EVENTS = [
     (
         AdapterLoadedEvent,
         "adapter:loaded",
-        {"adapter_name": "jira", "group": "rai.adapters.pm", "adapter_type": "JiraAdapter"},
+        {
+            "adapter_name": "jira",
+            "group": "rai.adapters.pm",
+            "adapter_type": "JiraAdapter",
+        },
     ),
     (
         AdapterFailedEvent,
