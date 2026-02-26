@@ -24,8 +24,7 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DATABASE_URL: postgresql+asyncpg://rai:rai_dev@postgres:5432/rai
-    # Functional after S275.3 (FastAPI bootstrap)
+      RAI_DATABASE_URL: postgresql+asyncpg://rai:rai_dev@postgres:5432/rai
 
 volumes:
   pgdata:
