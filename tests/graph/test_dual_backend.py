@@ -185,3 +185,86 @@ class TestDualWriteBackendHealth:
         health = backend.health()
 
         assert health.metadata["backend"] == "dual"
+
+
+class TestDualWriteBackendPendingSync:
+    """Pending sync marker integration with DualWriteBackend."""
+
+    def test_remote_failure_creates_marker(self, tmp_path: object) -> None:
+        from pathlib import Path
+
+        from rai_cli.graph.backends.dual import DualWriteBackend
+        from rai_cli.graph.backends.pending import read_pending_marker
+
+        raise_dir = Path(str(tmp_path)) / ".raise"
+        raise_dir.mkdir()
+        local = _make_mock_backend()
+        remote = _make_mock_backend(persist_error=ConnectionError("refused"))
+        backend = DualWriteBackend(local=local, remote=remote, raise_dir=raise_dir)
+
+        backend.persist(_make_sample_graph())
+
+        marker = read_pending_marker(raise_dir)
+        assert marker is not None
+        assert marker.error == "refused"
+        assert marker.node_count == 1
+        assert marker.edge_count == 0
+
+    def test_remote_success_clears_existing_marker(self, tmp_path: object) -> None:
+        from pathlib import Path
+
+        from rai_cli.graph.backends.dual import DualWriteBackend
+        from rai_cli.graph.backends.pending import (
+            PendingSyncMarker,
+            read_pending_marker,
+            write_pending_marker,
+        )
+
+        raise_dir = Path(str(tmp_path)) / ".raise"
+        raise_dir.mkdir()
+        # Pre-existing marker from previous failure
+        from datetime import datetime, timezone
+
+        write_pending_marker(
+            raise_dir,
+            PendingSyncMarker(
+                timestamp=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                graph_path="old",
+                node_count=1,
+                edge_count=0,
+                error="old",
+            ),
+        )
+        local = _make_mock_backend()
+        remote = _make_mock_backend()  # succeeds
+        backend = DualWriteBackend(local=local, remote=remote, raise_dir=raise_dir)
+
+        backend.persist(_make_sample_graph())
+
+        assert read_pending_marker(raise_dir) is None
+
+    def test_remote_success_no_marker_is_noop(self, tmp_path: object) -> None:
+        from pathlib import Path
+
+        from rai_cli.graph.backends.dual import DualWriteBackend
+        from rai_cli.graph.backends.pending import read_pending_marker
+
+        raise_dir = Path(str(tmp_path)) / ".raise"
+        raise_dir.mkdir()
+        local = _make_mock_backend()
+        remote = _make_mock_backend()
+        backend = DualWriteBackend(local=local, remote=remote, raise_dir=raise_dir)
+
+        backend.persist(_make_sample_graph())
+
+        assert read_pending_marker(raise_dir) is None
+
+    def test_no_raise_dir_skips_marker(self) -> None:
+        """When raise_dir is None, marker behavior is skipped entirely."""
+        from rai_cli.graph.backends.dual import DualWriteBackend
+
+        local = _make_mock_backend()
+        remote = _make_mock_backend(persist_error=ConnectionError("refused"))
+        backend = DualWriteBackend(local=local, remote=remote)
+
+        backend.persist(_make_sample_graph())  # should not raise
