@@ -8,8 +8,10 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from rai_server import __version__
+from rai_server.api.v1.agent import router as agent_router
 from rai_server.api.v1.graph import router as graph_router
 from rai_server.api.v1.health import router as health_router
+from rai_server.api.v1.memory import router as memory_router
 from rai_server.config import ServerConfig
 from rai_server.db.session import create_engine, create_session_factory
 
@@ -41,4 +43,6 @@ def create_app(config: ServerConfig | None = None) -> FastAPI:
     app.state.config = config
     app.include_router(health_router)
     app.include_router(graph_router)
+    app.include_router(agent_router)
+    app.include_router(memory_router)
     return app
