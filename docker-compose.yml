@@ -1,0 +1,31 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: rai
+      POSTGRES_USER: rai
+      POSTGRES_PASSWORD: rai_dev
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rai"]
+      interval: 5s
+      retries: 5
+
+  server:
+    build:
+      context: .
+      dockerfile: packages/rai-server/Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://rai:rai_dev@postgres:5432/rai
+    # Functional after S275.3 (FastAPI bootstrap)
+
+volumes:
+  pgdata:
