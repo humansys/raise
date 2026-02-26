@@ -38,6 +38,10 @@ class ApiGraphBackend:
             timeout=httpx.Timeout(connect=5.0, read=30.0, write=30.0, pool=5.0),
         )
 
+    def close(self) -> None:
+        """Close the underlying HTTP connection pool."""
+        self._client.close()
+
     def persist(self, graph: Graph) -> None:
         """Send graph to server via POST /api/v1/graph/sync.
 
@@ -112,7 +116,7 @@ class ApiGraphBackend:
                 message=f"Server returned {response.status_code}",
                 metadata={"backend": "api", "server_url": self.server_url},
             )
-        except (httpx.ConnectError, httpx.TimeoutException) as e:
+        except httpx.HTTPError as e:
             return BackendHealth(
                 status="unavailable",
                 message=f"Connection failed: {e}",

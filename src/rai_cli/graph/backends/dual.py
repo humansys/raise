@@ -48,8 +48,16 @@ class DualWriteBackend:
         try:
             self.remote.persist(graph)
         except Exception as e:
+            detail = ""
+            try:
+                import httpx
+
+                if isinstance(e, httpx.HTTPStatusError):
+                    detail = f" Response: {e.response.text[:200]}"
+            except ImportError:
+                pass
             logger.warning(
-                "Remote sync failed: %s. Graph saved locally only.", e
+                "Remote sync failed: %s.%s Graph saved locally only.", e, detail
             )
 
     def load(self) -> Graph:

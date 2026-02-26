@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -95,6 +94,25 @@ class TestDualWriteBackendPersist:
 
         local.persist.assert_called_once()
         assert "refused" in caplog.text.lower() or "remote" in caplog.text.lower()
+
+    def test_persist_http_error_logs_response_body(self, caplog: pytest.LogCaptureFixture) -> None:
+        import httpx
+        from rai_cli.graph.backends.dual import DualWriteBackend
+
+        local = _make_mock_backend()
+        remote = _make_mock_backend()
+        mock_response = MagicMock()
+        mock_response.status_code = 422
+        mock_response.text = '{"detail":"validation error: node_id missing"}'
+        remote.persist.side_effect = httpx.HTTPStatusError(
+            "422", request=MagicMock(), response=mock_response
+        )
+        backend = DualWriteBackend(local=local, remote=remote)
+
+        with caplog.at_level(logging.WARNING):
+            backend.persist(_make_sample_graph())
+
+        assert "validation error" in caplog.text.lower()
 
     def test_persist_local_failure_does_raise(self) -> None:
         """Local failure is not swallowed — it's critical."""
