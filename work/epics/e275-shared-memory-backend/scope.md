@@ -21,7 +21,7 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 | S275.1 | [RAISE-276](https://humansys.atlassian.net/browse/RAISE-276) | Extract rai-core package | S | Done ✓ | Created `rai-core` as uv workspace package. Moved graph domain (6 files), renamed 6 classes (dropped "Unified" prefix, RAISE-145). ~50 import updates. No backward compat shims — clean cut. Quality reviewed, dead aliases removed. TN-003 published. |
 | S275.2 | [RAISE-277](https://humansys.atlassian.net/browse/RAISE-277) | PostgreSQL schema + Alembic | S | Done ✓ | `rai-server` uv workspace package. 4 SA 2.0 models (Organization, ApiKey, GraphNodeRow, GraphEdgeRow). Alembic async migration. Docker Compose (PG 16 + server placeholder). 24 tests. Quality reviewed — server_default consistency fixed. 1.15x velocity. |
 | S275.3 | [RAISE-278](https://humansys.atlassian.net/browse/RAISE-278) | FastAPI server bootstrap | M | Done ✓ | App factory, pydantic-settings config, API key auth (OrgContext), health endpoint, Dockerfile, Docker Compose. Epic design revised: domain-level API + subgraph-on-demand (4 research studies, 47 sources). QR: 6 findings fixed. 18 tests. 1.5x velocity. |
-| S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph sync + query endpoints | M | Pending | Domain-level endpoints: `POST /graph/sync` (full graph upsert), `GET /graph/query` (keyword search). Internal CRUD service layer. OpenAPI spec auto-generated. |
+| S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph sync + query endpoints | M | Done ✓ | Three-layer architecture (routes → services → db/queries). `POST /graph/sync` (idempotent upsert + edge replace + orphan prune). `GET /graph/query` (GIN full-text via to_tsvector). QR: 6 findings fixed (edges_skipped, nodes_upserted, validation). 40 tests. 1.1x velocity. |
 | S275.5 | [RAISE-280](https://humansys.atlassian.net/browse/RAISE-280) | Trace, impact + dev constraints | S | Pending | Domain-level endpoints: `GET /graph/trace`, `GET /graph/impact`, `GET /dev/constraints`. High-value operations for Rovo agents and Forge. |
 | S275.6 | [RAISE-281](https://humansys.atlassian.net/browse/RAISE-281) | ApiGraphBackend + DualWrite | M | Pending | `ApiGraphBackend` (httpx client), `DualWriteBackend` (local + remote). `get_active_backend()` selection via env vars. |
 | S275.7 | [RAISE-282](https://humansys.atlassian.net/browse/RAISE-282) | Dogfood + offline fallback | S | Pending | Test with raise-commons real graph. pending_sync marker for offline writes. Sync-on-reconnect. |
@@ -170,7 +170,7 @@ Main:   S275.1 → S275.2 → S275.3 → S275.4 → S275.5 → S275.6 → S275.7
 | S275.1 — Extract rai-core | S | Done ✓ | ~3h | 1.3x | Quality review + TN-003 |
 | S275.2 — PG schema + Docker | S | Done ✓ | ~1.1h | 1.15x | QR caught server_default bugs |
 | S275.3 — FastAPI bootstrap | M | Done ✓ | ~1h impl, ~3h total | 1.5x | Epic design revised + 4 research studies. QR: 6 fixes. |
-| S275.4 — Graph sync + query | M | Pending | — | — | Internal CRUD + domain endpoints |
+| S275.4 — Graph sync + query | M | Done ✓ | ~90 min | 1.1x | QR: 6 fixes. 40 tests. Skill improvement (PAT-E-523). |
 | S275.5 — Trace, impact, constraints | S | Pending | — | — | Depends on S275.4 service layer |
 | S275.6 — ApiGraphBackend | M | Pending | — | — | |
 | S275.7 — Dogfood + offline | S | Pending | — | — | |
