@@ -86,8 +86,9 @@ class TestSyncGraph:
             mock_upsert.assert_called_once()
             mock_replace.assert_called_once()
             mock_prune.assert_called_once()
-            assert result.nodes_created == 2
+            assert result.nodes_upserted == 2
             assert result.edges_created == 1
+            assert result.edges_skipped == 0
             assert result.nodes_pruned == 0
             assert result.project_id == "raise-commons"
 
@@ -108,7 +109,38 @@ class TestSyncGraph:
             mock_prune.return_value = 0
 
             result = await sync_graph(factory, org_id, empty_request)
-            assert result.nodes_created == 0
+            assert result.nodes_upserted == 0
+            assert result.edges_created == 0
+            assert result.edges_skipped == 0
+
+    @pytest.mark.anyio()
+    async def test_edges_skipped_when_node_missing(self, org_id: uuid.UUID) -> None:
+        """Edges referencing nodes not in the payload are skipped, not silently lost."""
+        from rai_server.services.graph import sync_graph
+
+        factory = _mock_session_factory()
+        request = GraphSyncRequest(
+            project_id="test",
+            nodes=[NodeInput(node_id="mod-a", node_type="module", content="A")],
+            edges=[
+                EdgeInput(source_node_id="mod-a", target_node_id="mod-MISSING", edge_type="depends_on"),
+            ],
+        )
+
+        with (
+            patch("rai_server.services.graph.upsert_nodes", new_callable=AsyncMock) as mock_upsert,
+            patch("rai_server.services.graph.replace_edges", new_callable=AsyncMock) as mock_replace,
+            patch("rai_server.services.graph.prune_orphan_nodes", new_callable=AsyncMock) as mock_prune,
+            patch("rai_server.services.graph.resolve_node_ids", new_callable=AsyncMock) as mock_resolve,
+        ):
+            mock_upsert.return_value = {"created": 1, "updated": 0}
+            # Only mod-a resolved, mod-MISSING not found
+            mock_resolve.return_value = {"mod-a": uuid.uuid4()}
+            mock_replace.return_value = {"created": 0}
+            mock_prune.return_value = 0
+
+            result = await sync_graph(factory, org_id, request)
+            assert result.edges_skipped == 1
             assert result.edges_created == 0
 
 

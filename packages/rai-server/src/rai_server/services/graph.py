@@ -79,6 +79,8 @@ async def sync_graph(
                         "properties": e.properties,
                     })
 
+        edges_skipped = len(request.edges) - len(edge_dicts)
+
         # 3. Replace edges
         edge_result = await replace_edges(session, org_id, repo_id, edge_dicts)
 
@@ -87,9 +89,9 @@ async def sync_graph(
 
     return GraphSyncResponse(
         project_id=repo_id,
-        nodes_created=upsert_result["created"],
-        nodes_updated=upsert_result["updated"],
+        nodes_upserted=upsert_result["created"] + upsert_result["updated"],
         edges_created=edge_result["created"],
+        edges_skipped=edges_skipped,
         nodes_pruned=pruned,
     )
 

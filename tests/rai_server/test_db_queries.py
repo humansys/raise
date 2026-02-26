@@ -170,5 +170,11 @@ class TestSearchNodes:
         session.execute.return_value = mock_result
 
         await search_nodes(session, org_id, "test", limit=5)
-        # Verify execute was called (SQL contains LIMIT)
-        session.execute.assert_called_once()
+        # Verify the SQL statement includes a LIMIT clause
+        call_args = session.execute.call_args
+        stmt = call_args[0][0]
+        compiled = str(stmt.compile())
+        assert "LIMIT" in compiled.upper()
+        # Verify limit value is bound as parameter
+        params = stmt.compile().params
+        assert params.get("param_1") == 5 or any(v == 5 for v in params.values())
