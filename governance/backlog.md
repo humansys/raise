@@ -51,7 +51,7 @@
 | [RAISE-274](https://humansys.atlassian.net/browse/RAISE-274) | **Governance Copilot POC — Forge** | 🚀 In Progress | — | P0 (Demo) |
 | [RAISE-275](https://humansys.atlassian.net/browse/RAISE-275) | **Shared Memory Backend** | ✅ Complete | `work/epics/e275-shared-memory-backend/scope.md` | — |
 | [RAISE-283](https://humansys.atlassian.net/browse/RAISE-283) | **CI/CD Security Pipeline** | ✅ Complete | — | — |
-| [RAISE-292](https://humansys.atlassian.net/browse/RAISE-292) | **TDD Policy Reform** | 📋 Backlog | — | P2 |
+| [RAISE-292](https://humansys.atlassian.net/browse/RAISE-292) | **TDD Policy Reform** | ✅ Complete | `work/epics/e292-tdd-policy-reform/scope.md` | — |
 | [RAISE-293](https://humansys.atlassian.net/browse/RAISE-293) | **Workstream Concept (Worktrees)** | 📋 Backlog | — | P2 |
 | [RAISE-294](https://humansys.atlassian.net/browse/RAISE-294) | **Test Infrastructure Migration** | 📋 Backlog | — | P2 |
 | [RAISE-295](https://humansys.atlassian.net/browse/RAISE-295) | **Security Fixes (Snyk/SAST/Sonar)** | 📋 Backlog | — | P2 |
