@@ -6,7 +6,6 @@ from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
-from rai_cli.context.models import ConceptNode
 from rai_cli.onboarding.profile import (
     CoachingContext,
     CommunicationPreferences,
@@ -38,6 +37,7 @@ from rai_cli.session.bundle import (
     get_always_on_primes,
     get_foundational_patterns,
 )
+from rai_core.graph.models import GraphNode
 
 
 def _make_profile() -> DeveloperProfile:
@@ -91,9 +91,9 @@ def _make_state() -> SessionState:
     )
 
 
-def _make_pattern(pat_id: str, content: str) -> ConceptNode:
+def _make_pattern(pat_id: str, content: str) -> GraphNode:
     """Create a mock foundational pattern node."""
-    return ConceptNode(
+    return GraphNode(
         id=pat_id,
         type="pattern",
         content=content,
@@ -318,9 +318,9 @@ class TestAssembleContextBundle:
         assert "Session: SES-177" in bundle
 
 
-def _make_always_on_node(node_id: str, node_type: str, content: str) -> ConceptNode:
+def _make_always_on_node(node_id: str, node_type: str, content: str) -> GraphNode:
     """Create a mock always_on node."""
-    return ConceptNode(
+    return GraphNode(
         id=node_id,
         type=node_type,
         content=content,
@@ -434,10 +434,10 @@ class TestGetAlwaysOnPrimes:
 
     def test_returns_always_on_nodes(self, tmp_path: Path) -> None:
         """Returns all nodes with always_on=true metadata."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
             _make_always_on_node("guardrail-must-code-001", "guardrail", "Type hints")
         )
@@ -445,7 +445,7 @@ class TestGetAlwaysOnPrimes:
             _make_always_on_node("RAI-VAL-1", "principle", "Honesty over agreement")
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="Not always_on",
@@ -465,12 +465,12 @@ class TestGetAlwaysOnPrimes:
 
     def test_excludes_non_always_on(self, tmp_path: Path) -> None:
         """Nodes without always_on=true are excluded."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="guardrail-should-001",
                 type="guardrail",
                 content="Optional rule",
@@ -713,13 +713,13 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Build a graph with epic→release edge
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.context.models import ConceptEdge
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
+        from rai_core.graph.models import GraphEdge
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="rel-v3.0",
                 type="release",
                 content="V3.0 Commercial Launch",
@@ -733,7 +733,7 @@ class TestBundleReleaseContext:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="epic-e19",
                 type="epic",
                 content="V3 Product Design",
@@ -742,7 +742,7 @@ class TestBundleReleaseContext:
             )
         )
         graph.add_relationship(
-            ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
+            GraphEdge(source="epic-e19", target="rel-v3.0", type="part_of")
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
         FilesystemGraphBackend(graph_path).persist(graph)
@@ -810,12 +810,12 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Graph exists but epic has no release edge
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="epic-e18",
                 type="epic",
                 content="V2 Open Core",
@@ -1045,12 +1045,12 @@ class TestGetFoundationalPatterns:
 
     def test_returns_foundational_patterns_from_graph(self, tmp_path: Path) -> None:
         """Returns patterns with foundational=true from graph."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-187",
                 type="pattern",
                 content="Code as Gemba",
@@ -1059,7 +1059,7 @@ class TestGetFoundationalPatterns:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="Not foundational",
@@ -1068,7 +1068,7 @@ class TestGetFoundationalPatterns:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="guardrail-001",
                 type="guardrail",
                 content="Not a pattern",

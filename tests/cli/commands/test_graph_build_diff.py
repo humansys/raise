@@ -14,19 +14,19 @@ from typer.testing import CliRunner
 
 from rai_cli.cli.main import app
 from rai_cli.context.diff import GraphDiff
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptNode
-from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphNode
 
 runner = CliRunner()
 
 
-def _make_graph(*nodes: tuple[str, str, str]) -> UnifiedGraph:
-    """Build a UnifiedGraph from (id, type, content) tuples."""
-    graph = UnifiedGraph()
+def _make_graph(*nodes: tuple[str, str, str]) -> Graph:
+    """Build a Graph from (id, type, content) tuples."""
+    graph = Graph()
     for node_id, node_type, content in nodes:
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id=node_id,
                 type=node_type,  # type: ignore[arg-type]
                 content=content,
@@ -39,7 +39,7 @@ def _make_graph(*nodes: tuple[str, str, str]) -> UnifiedGraph:
 class TestBuildWithDiff:
     """Build command diffs by default."""
 
-    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.GraphBuilder")
     def test_diff_computed_and_saved(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:
@@ -85,7 +85,7 @@ class TestBuildWithDiff:
         assert diff.impact == "module"
         assert "mod-x" in diff.affected_modules
 
-    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.GraphBuilder")
     def test_diff_summary_in_output(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:
@@ -117,7 +117,7 @@ class TestBuildWithDiff:
         assert result.exit_code == 0, result.output
         assert "1 nodes changed" in result.output
 
-    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.GraphBuilder")
     def test_first_build_no_old_graph(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:
@@ -149,7 +149,7 @@ class TestBuildWithDiff:
         diff_path = personal_dir / "last-diff.json"
         assert not diff_path.exists()
 
-    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.GraphBuilder")
     def test_no_changes_diff(self, mock_builder_cls: MagicMock, tmp_path: Path) -> None:
         """Identical graphs produce 'no changes' diff."""
         graph = _make_graph(("PAT-001", "pattern", "same"))
@@ -182,7 +182,7 @@ class TestBuildWithDiff:
 class TestNoDiffFlag:
     """--no-diff skips diff computation."""
 
-    @patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder")
+    @patch("rai_cli.cli.commands.graph.GraphBuilder")
     def test_no_diff_flag_skips_diff(
         self, mock_builder_cls: MagicMock, tmp_path: Path
     ) -> None:

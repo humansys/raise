@@ -308,7 +308,6 @@ class TestSkillSyncUpgrade:
         # Simulate upstream change with untouched file
         manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
         data = json.loads(manifest_path.read_text(encoding="utf-8"))
-        data["skills"][skill_name]["sha256"]
         data["skills"][skill_name]["sha256"] = "b" * 64
         manifest_path.write_text(json.dumps(data), encoding="utf-8")
 

@@ -1,7 +1,7 @@
 """Skill metadata extraction from SKILL.md frontmatter.
 
 This module extracts skill metadata from YAML frontmatter in SKILL.md files
-and converts them to ConceptNode for the unified context graph.
+and converts them to GraphNode for the unified context graph.
 """
 
 from __future__ import annotations
@@ -13,20 +13,20 @@ from typing import Any, cast
 
 import yaml
 
-from rai_cli.context.models import ConceptNode
+from rai_core.graph.models import GraphNode
 
 # Regex to match YAML frontmatter between --- markers
 FRONTMATTER_PATTERN = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)
 
 
-def extract_skill_metadata(skill_path: Path) -> ConceptNode | None:
+def extract_skill_metadata(skill_path: Path) -> GraphNode | None:
     """Extract metadata from SKILL.md YAML frontmatter.
 
     Args:
         skill_path: Path to SKILL.md file.
 
     Returns:
-        ConceptNode for the skill, or None if parsing fails or file doesn't exist.
+        GraphNode for the skill, or None if parsing fails or file doesn't exist.
 
     Examples:
         >>> node = extract_skill_metadata(Path(".claude/skills/rai-story-plan/SKILL.md"))
@@ -82,7 +82,7 @@ def extract_skill_metadata(skill_path: Path) -> ConceptNode | None:
     except OSError:
         created = datetime.now(tz=UTC).isoformat()
 
-    return ConceptNode(
+    return GraphNode(
         id=f"/{name}",
         type="skill",
         content=description,
@@ -92,7 +92,7 @@ def extract_skill_metadata(skill_path: Path) -> ConceptNode | None:
     )
 
 
-def extract_all_skills(skills_dir: Path) -> list[ConceptNode]:
+def extract_all_skills(skills_dir: Path) -> list[GraphNode]:
     """Extract metadata from all skills in a directory.
 
     Searches for SKILL.md files in subdirectories of the given path.
@@ -101,7 +101,7 @@ def extract_all_skills(skills_dir: Path) -> list[ConceptNode]:
         skills_dir: Path to skills directory (e.g., .claude/skills/).
 
     Returns:
-        List of ConceptNode for each valid skill found.
+        List of GraphNode for each valid skill found.
 
     Examples:
         >>> nodes = extract_all_skills(Path(".claude/skills"))
@@ -111,7 +111,7 @@ def extract_all_skills(skills_dir: Path) -> list[ConceptNode]:
     if not skills_dir.exists():
         return []
 
-    nodes: list[ConceptNode] = []
+    nodes: list[GraphNode] = []
 
     for skill_md in skills_dir.glob("*/SKILL.md"):
         node = extract_skill_metadata(skill_md)

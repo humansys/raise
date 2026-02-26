@@ -8,7 +8,6 @@ import pytest
 
 from rai_cli.adapters.models import (
     ArtifactLocator,
-    BackendHealth,
     IssueRef,
     IssueSpec,
     PublishResult,
@@ -17,10 +16,11 @@ from rai_cli.adapters.protocols import (
     DocumentationTarget,
     GovernanceParser,
     GovernanceSchemaProvider,
-    KnowledgeGraphBackend,
     ProjectManagementAdapter,
 )
-from rai_cli.context.models import GraphNode
+from rai_core.graph.backends.models import BackendHealth
+from rai_core.graph.backends.protocol import KnowledgeGraphBackend
+from rai_core.graph.models import GraphNode
 
 # --- Conforming stubs ---
 

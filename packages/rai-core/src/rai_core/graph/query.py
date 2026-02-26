@@ -1,8 +1,8 @@
-"""Unified context query engine.
+"""Knowledge graph query engine.
 
-This module provides query capabilities for the unified context graph,
-enabling skills to retrieve relevant patterns, calibration data, governance
-principles, and work items.
+Provides query capabilities for the knowledge graph, enabling skills to
+retrieve relevant patterns, calibration data, governance principles,
+and work items.
 
 Architecture: ADR-019 Unified Context Graph Architecture
 """
@@ -13,13 +13,12 @@ import time
 from datetime import date
 from enum import StrEnum
 from math import exp, log, sqrt
-from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel, Field
 
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptNode, EdgeType, NodeType
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import EdgeType, GraphNode, NodeType
 
 # --- Scoring constants ---
 SCORING_HALF_LIFE_DAYS: int = 30
@@ -29,8 +28,8 @@ SCORING_WILSON_Z: float = 1.96
 SCORING_LOW_WILSON_THRESHOLD: float = 0.15
 
 
-class UnifiedQueryStrategy(StrEnum):
-    """Query strategy for unified context retrieval.
+class QueryStrategy(StrEnum):
+    """Query strategy for context retrieval.
 
     Attributes:
         KEYWORD_SEARCH: Match keywords in node content, return top N by relevance.
@@ -41,8 +40,8 @@ class UnifiedQueryStrategy(StrEnum):
     CONCEPT_LOOKUP = "concept_lookup"
 
 
-class UnifiedQuery(BaseModel):
-    """Query parameters for unified context retrieval.
+class Query(BaseModel):
+    """Query parameters for context retrieval.
 
     Attributes:
         query: Query string (keywords or concept ID).
@@ -52,17 +51,17 @@ class UnifiedQuery(BaseModel):
         limit: Maximum number of results.
 
     Examples:
-        >>> query = UnifiedQuery(query="planning estimation")
-        >>> query = UnifiedQuery(
+        >>> query = Query(query="planning estimation")
+        >>> query = Query(
         ...     query="PAT-001",
-        ...     strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+        ...     strategy=QueryStrategy.CONCEPT_LOOKUP,
         ...     max_depth=2,
         ... )
     """
 
     query: str = Field(..., description="Query string (keywords or concept ID)")
-    strategy: UnifiedQueryStrategy = Field(
-        default=UnifiedQueryStrategy.KEYWORD_SEARCH,
+    strategy: QueryStrategy = Field(
+        default=QueryStrategy.KEYWORD_SEARCH,
         description="Query execution strategy",
     )
     max_depth: int = Field(
@@ -92,31 +91,17 @@ class ArchitecturalContext(BaseModel):
 
     Combines domain (bounded context), layer, constraints (guardrails),
     and dependencies into a single structured result.
-
-    Attributes:
-        module: The module node.
-        domain: Bounded context the module belongs to (via belongs_to edge).
-        layer: Architectural layer (via in_layer edge).
-        constraints: Guardrails applicable via the module's bounded context.
-        dependencies: Modules this module depends on (via depends_on edge).
-
-    Examples:
-        >>> ctx = engine.get_architectural_context("mod-memory")
-        >>> ctx.module.id
-        'mod-memory'
-        >>> ctx.domain.id if ctx.domain else None
-        'bc-ontology'
     """
 
-    module: ConceptNode
-    domain: ConceptNode | None = None
-    layer: ConceptNode | None = None
-    constraints: list[ConceptNode] = Field(default_factory=lambda: [])
-    dependencies: list[ConceptNode] = Field(default_factory=lambda: [])
+    module: GraphNode
+    domain: GraphNode | None = None
+    layer: GraphNode | None = None
+    constraints: list[GraphNode] = Field(default_factory=lambda: [])
+    dependencies: list[GraphNode] = Field(default_factory=lambda: [])
 
 
-class UnifiedQueryMetadata(BaseModel):
-    """Metadata about unified query result.
+class QueryMetadata(BaseModel):
+    """Metadata about query result.
 
     Attributes:
         query: Original query string.
@@ -126,21 +111,10 @@ class UnifiedQueryMetadata(BaseModel):
         token_estimate: Estimated token count for result.
         execution_time_ms: Query execution time in milliseconds.
         types_found: Count of concepts by type.
-
-    Examples:
-        >>> metadata = UnifiedQueryMetadata(
-        ...     query="planning",
-        ...     strategy=UnifiedQueryStrategy.KEYWORD_SEARCH,
-        ...     total_concepts=5,
-        ...     total_available=12,
-        ...     token_estimate=320,
-        ...     execution_time_ms=8.5,
-        ...     types_found={"pattern": 2, "calibration": 2, "skill": 1},
-        ... )
     """
 
     query: str = Field(..., description="Original query string")
-    strategy: UnifiedQueryStrategy = Field(..., description="Strategy used")
+    strategy: QueryStrategy = Field(..., description="Strategy used")
     total_concepts: int = Field(..., description="Number of concepts returned")
     total_available: int = Field(
         0, description="Total matching concepts before limit applied"
@@ -153,43 +127,27 @@ class UnifiedQueryMetadata(BaseModel):
     )
 
 
-class UnifiedQueryResult(BaseModel):
-    """Result of unified context query.
+class QueryResult(BaseModel):
+    """Result of context query.
 
     Attributes:
         concepts: Concepts matching the query.
         metadata: Query result metadata.
-
-    Examples:
-        >>> result = engine.query(UnifiedQuery(query="planning"))
-        >>> for concept in result.concepts:
-        ...     print(f"{concept.id}: {concept.content[:50]}...")
     """
 
-    concepts: list[ConceptNode] = Field(
+    concepts: list[GraphNode] = Field(
         default_factory=lambda: [],
         description="Concepts matching the query",
     )
-    metadata: UnifiedQueryMetadata = Field(..., description="Query metadata")
+    metadata: QueryMetadata = Field(..., description="Query metadata")
 
     def to_json(self) -> str:
-        """Serialize result to JSON.
-
-        Returns:
-            JSON string representation.
-        """
+        """Serialize result to JSON."""
         return self.model_dump_json(indent=2)
 
     @classmethod
-    def from_json(cls, json_str: str) -> UnifiedQueryResult:
-        """Deserialize result from JSON.
-
-        Args:
-            json_str: JSON string representation.
-
-        Returns:
-            Reconstructed UnifiedQueryResult instance.
-        """
+    def from_json(cls, json_str: str) -> QueryResult:
+        """Deserialize result from JSON."""
         return cls.model_validate_json(json_str)
 
 
@@ -197,12 +155,6 @@ def estimate_tokens(text: str) -> int:
     """Estimate token count for text.
 
     Uses heuristic: character count // 4 (roughly 4 chars per token).
-
-    Args:
-        text: Text to estimate tokens for.
-
-    Returns:
-        Estimated token count.
     """
     return len(text) // 4
 
@@ -254,16 +206,6 @@ def calculate_relevance_score(
 
     Where recency uses half-life exponential decay (H=30d) and wilson_modifier
     is the Wilson score lower bound of positive evaluations.
-
-    Args:
-        content: Concept content text.
-        keywords: Query keywords to match.
-        created: ISO date string when concept was created.
-        metadata: Concept metadata dict. Reads: foundational, base, evaluations,
-            positives, negatives. Missing fields default to 0 / neutral.
-
-    Returns:
-        Relevance score in [0, 1] range, rounded to 4 decimal places.
     """
     if metadata is None:
         metadata = {}
@@ -305,65 +247,35 @@ def calculate_relevance_score(
     return round(base * modifier, 4)
 
 
-class UnifiedQueryEngine:
-    """Query engine for unified context graph.
+class QueryEngine:
+    """Query engine for the knowledge graph.
 
     Provides keyword search and concept lookup capabilities for
-    retrieving relevant context from the unified graph.
+    retrieving relevant context from the graph.
 
     Attributes:
-        graph: The unified context graph to query.
+        graph: The knowledge graph to query.
 
     Examples:
-        >>> engine = UnifiedQueryEngine.from_file(Path(".raise/graph/unified.json"))
-        >>> result = engine.query(UnifiedQuery(query="planning estimation"))
+        >>> engine = QueryEngine(graph)
+        >>> result = engine.query(Query(query="planning estimation"))
         >>> print(f"Found {len(result.concepts)} concepts")
     """
 
-    def __init__(self, graph: UnifiedGraph) -> None:
+    def __init__(self, graph: Graph) -> None:
         """Initialize query engine with graph.
 
         Args:
-            graph: Unified context graph to query.
+            graph: Knowledge graph to query.
         """
         self.graph = graph
 
-    @classmethod
-    def from_file(cls, path: Path) -> UnifiedQueryEngine:
-        """Load query engine from graph file.
-
-        Args:
-            path: Path to unified graph JSON file.
-
-        Returns:
-            Initialized query engine.
-
-        Raises:
-            FileNotFoundError: If graph file doesn't exist.
-        """
-        if not path.exists():
-            raise FileNotFoundError(
-                f"Memory index not found: {path}\n"
-                f"Run 'raise memory build' to create the index first."
-            )
-        from rai_cli.graph.filesystem_backend import get_active_backend
-
-        graph = get_active_backend(path).load()
-        return cls(graph)
-
-    def query(self, query: UnifiedQuery) -> UnifiedQueryResult:
-        """Execute query and return results.
-
-        Args:
-            query: Query parameters.
-
-        Returns:
-            Query result with concepts and metadata.
-        """
+    def query(self, query: Query) -> QueryResult:
+        """Execute query and return results."""
         start_time = time.time()
 
         # Execute strategy
-        if query.strategy == UnifiedQueryStrategy.KEYWORD_SEARCH:
+        if query.strategy == QueryStrategy.KEYWORD_SEARCH:
             concepts, total_available = self._keyword_search(query)
         else:  # CONCEPT_LOOKUP
             concepts, total_available = self._concept_lookup(query)
@@ -375,9 +287,11 @@ class UnifiedQueryEngine:
             query, concepts, execution_time_ms, total_available
         )
 
-        return UnifiedQueryResult(concepts=concepts, metadata=metadata)
+        return QueryResult(concepts=concepts, metadata=metadata)
 
-    def _keyword_search(self, query: UnifiedQuery) -> tuple[list[ConceptNode], int]:
+    def _keyword_search(
+        self, query: Query
+    ) -> tuple[list[GraphNode], int]:
         """Execute keyword search strategy.
 
         Matches keywords against node content, returns top N by relevance.
@@ -392,7 +306,7 @@ class UnifiedQueryEngine:
         if not keywords:
             return [], 0
 
-        scored_concepts: list[tuple[float, ConceptNode]] = []
+        scored_concepts: list[tuple[float, GraphNode]] = []
 
         for concept in self.graph.iter_concepts():
             # Apply type filter
@@ -422,7 +336,9 @@ class UnifiedQueryEngine:
         limited = [concept for _, concept in scored_concepts[: query.limit]]
         return limited, total_available
 
-    def _concept_lookup(self, query: UnifiedQuery) -> tuple[list[ConceptNode], int]:
+    def _concept_lookup(
+        self, query: Query
+    ) -> tuple[list[GraphNode], int]:
         """Execute concept lookup strategy.
 
         Direct ID lookup with optional BFS neighbor traversal.
@@ -442,8 +358,7 @@ class UnifiedQueryEngine:
 
         # Apply type filter to main concept
         if query.types and concept.type not in query.types:
-            # Still try to get neighbors that match
-            concepts: list[ConceptNode] = []
+            concepts: list[GraphNode] = []
         else:
             concepts = [concept]
 
@@ -453,7 +368,6 @@ class UnifiedQueryEngine:
                 concept_id, depth=query.max_depth, edge_types=query.edge_types
             )
             for neighbor in neighbors:
-                # Apply type filter
                 if query.types and neighbor.type not in query.types:
                     continue
                 if neighbor.id not in [c.id for c in concepts]:
@@ -466,33 +380,21 @@ class UnifiedQueryEngine:
 
     def _calculate_metadata(
         self,
-        query: UnifiedQuery,
-        concepts: list[ConceptNode],
+        query: Query,
+        concepts: list[GraphNode],
         execution_time_ms: float,
         total_available: int,
-    ) -> UnifiedQueryMetadata:
-        """Calculate metadata for query result.
-
-        Args:
-            query: Original query.
-            concepts: Concepts in result.
-            execution_time_ms: Execution time in milliseconds.
-            total_available: Total matching concepts before limit applied.
-
-        Returns:
-            Query result metadata.
-        """
-        # Token estimate
+    ) -> QueryMetadata:
+        """Calculate metadata for query result."""
         total_text = " ".join(c.content for c in concepts)
         token_estimate = estimate_tokens(total_text)
 
-        # Count types
         types_found: dict[str, int] = {}
         for concept in concepts:
             node_type = concept.type
             types_found[node_type] = types_found.get(node_type, 0) + 1
 
-        return UnifiedQueryMetadata(
+        return QueryMetadata(
             query=query.query,
             strategy=query.strategy,
             total_concepts=len(concepts),
@@ -503,20 +405,11 @@ class UnifiedQueryEngine:
         )
 
     # =========================================================================
-    # Architectural Context Helpers (S15.5)
+    # Architectural Context Helpers
     # =========================================================================
 
-    def find_domain_for(self, module_id: str) -> ConceptNode | None:
-        """Find the bounded context a module belongs to.
-
-        Follows outgoing ``belongs_to`` edge from the module node.
-
-        Args:
-            module_id: Module node ID (e.g., ``"mod-memory"``).
-
-        Returns:
-            The bounded context node, or None if not found.
-        """
+    def find_domain_for(self, module_id: str) -> GraphNode | None:
+        """Find the bounded context a module belongs to."""
         neighbors = self.graph.get_neighbors(
             module_id, depth=1, edge_types=["belongs_to"]
         )
@@ -525,17 +418,8 @@ class UnifiedQueryEngine:
                 return node
         return None
 
-    def find_layer_for(self, module_id: str) -> ConceptNode | None:
-        """Find the architectural layer a module belongs to.
-
-        Follows outgoing ``in_layer`` edge from the module node.
-
-        Args:
-            module_id: Module node ID (e.g., ``"mod-memory"``).
-
-        Returns:
-            The layer node, or None if not found.
-        """
+    def find_layer_for(self, module_id: str) -> GraphNode | None:
+        """Find the architectural layer a module belongs to."""
         neighbors = self.graph.get_neighbors(
             module_id, depth=1, edge_types=["in_layer"]
         )
@@ -544,18 +428,8 @@ class UnifiedQueryEngine:
                 return node
         return None
 
-    def find_constraints_for(self, module_id: str) -> list[ConceptNode]:
-        """Find all guardrails that constrain a module.
-
-        Two-hop traversal: module → ``belongs_to`` → bounded context →
-        ``constrained_by`` → guardrails.
-
-        Args:
-            module_id: Module node ID (e.g., ``"mod-memory"``).
-
-        Returns:
-            List of guardrail nodes. Empty if module has no domain.
-        """
+    def find_constraints_for(self, module_id: str) -> list[GraphNode]:
+        """Find all guardrails that constrain a module."""
         domain = self.find_domain_for(module_id)
         if domain is None:
             return []
@@ -565,7 +439,7 @@ class UnifiedQueryEngine:
         )
         return [n for n in neighbors if n.type == "guardrail"]
 
-    def find_release_for(self, epic_id: str) -> ConceptNode | None:
+    def find_release_for(self, epic_id: str) -> GraphNode | None:
         """Find the release an epic belongs to.
 
         Follows outgoing ``part_of`` edge from the epic node to find
@@ -577,13 +451,17 @@ class UnifiedQueryEngine:
         Returns:
             The release node, or None if not found.
         """
-        neighbors = self.graph.get_neighbors(epic_id, depth=1, edge_types=["part_of"])
+        neighbors = self.graph.get_neighbors(
+            epic_id, depth=1, edge_types=["part_of"]
+        )
         for node in neighbors:
             if node.type == "release":
                 return node
         return None
 
-    def get_architectural_context(self, module_id: str) -> ArchitecturalContext | None:
+    def get_architectural_context(
+        self, module_id: str
+    ) -> ArchitecturalContext | None:
         """Get full architectural context for a module.
 
         Combines domain, layer, constraints, and dependencies into a
@@ -604,7 +482,6 @@ class UnifiedQueryEngine:
         layer = self.find_layer_for(module_id)
         constraints = self.find_constraints_for(module_id)
 
-        # Dependencies: modules connected via depends_on
         dep_neighbors = self.graph.get_neighbors(
             module_id, depth=1, edge_types=["depends_on"]
         )

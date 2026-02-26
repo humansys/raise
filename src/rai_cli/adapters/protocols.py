@@ -3,25 +3,21 @@
 Defines the typed interfaces that adapter implementations must satisfy.
 All Protocols are ``@runtime_checkable`` for isinstance() checks.
 
-Architecture: ADR-033 (PM), ADR-034 (Governance), ADR-036 (Graph Backend)
-Precedent: ``context.analyzers.protocol.CodeAnalyzer``
+Architecture: ADR-033 (PM), ADR-034 (Governance)
+Note: KnowledgeGraphBackend moved to rai_core.graph.backends.protocol (E275)
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
+from typing import Any, Protocol, runtime_checkable
 
 from rai_cli.adapters.models import (
     ArtifactLocator,
-    BackendHealth,
     IssueRef,
     IssueSpec,
     PublishResult,
 )
-from rai_cli.context.models import GraphNode
-
-if TYPE_CHECKING:
-    from rai_cli.context.graph import UnifiedGraph
+from rai_core.graph.models import GraphNode
 
 
 @runtime_checkable
@@ -76,17 +72,3 @@ class DocumentationTarget(Protocol):
     def publish(
         self, doc_type: str, content: str, metadata: dict[str, Any]
     ) -> PublishResult: ...
-
-
-@runtime_checkable
-class KnowledgeGraphBackend(Protocol):
-    """ADR-036: Graph storage abstraction.
-
-    Implementations: FilesystemGraphBackend (S211.4), SupabaseBackend (raise-pro).
-    """
-
-    def persist(self, graph: UnifiedGraph) -> None: ...
-
-    def load(self) -> UnifiedGraph: ...
-
-    def health(self) -> BackendHealth: ...

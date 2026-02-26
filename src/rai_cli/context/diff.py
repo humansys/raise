@@ -1,6 +1,6 @@
 """Graph diff engine for detecting changes between unified graph builds.
 
-Compares two UnifiedGraph instances by node presence and semantic fields
+Compares two Graph instances by node presence and semantic fields
 (content, type, metadata). Produces a structured GraphDiff with impact
 classification and affected module list.
 
@@ -13,8 +13,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptNode, NodeType
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphNode, NodeType
 
 # Node types that indicate module-level impact
 _MODULE_IMPACT_TYPES: frozenset[NodeType] = frozenset({"module", "component"})
@@ -41,8 +41,8 @@ class NodeChange(BaseModel):
 
     node_id: str
     change_type: Literal["added", "removed", "modified"]
-    old_value: ConceptNode | None = None
-    new_value: ConceptNode | None = None
+    old_value: GraphNode | None = None
+    new_value: GraphNode | None = None
     changed_fields: list[str] = Field(default_factory=list)
 
 
@@ -62,7 +62,7 @@ class GraphDiff(BaseModel):
     summary: str = "no changes"
 
 
-def diff_graphs(old: UnifiedGraph, new: UnifiedGraph) -> GraphDiff:
+def diff_graphs(old: Graph, new: Graph) -> GraphDiff:
     """Compare two unified graphs and return structured diff.
 
     Compares nodes by presence (added/removed) and by semantic fields
@@ -141,7 +141,7 @@ def diff_graphs(old: UnifiedGraph, new: UnifiedGraph) -> GraphDiff:
     )
 
 
-def _compare_nodes(old: ConceptNode, new: ConceptNode) -> list[str]:
+def _compare_nodes(old: GraphNode, new: GraphNode) -> list[str]:
     """Compare two nodes on semantic fields only.
 
     Returns list of field names that differ. Ignores created and source_file.

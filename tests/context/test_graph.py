@@ -1,4 +1,4 @@
-"""Tests for UnifiedGraph class."""
+"""Tests for Graph class."""
 
 from __future__ import annotations
 
@@ -7,58 +7,57 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import (
-    ConceptEdge,
-    ConceptNode,
+from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import (
     EpicNode,
+    GraphEdge,
     GraphNode,
     PatternNode,
     SessionNode,
 )
-from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
 
 @pytest.fixture
-def empty_graph() -> UnifiedGraph:
+def empty_graph() -> Graph:
     """Create an empty graph."""
-    return UnifiedGraph()
+    return Graph()
 
 
 @pytest.fixture
-def sample_graph() -> UnifiedGraph:
+def sample_graph() -> Graph:
     """Create a graph with sample data."""
-    graph = UnifiedGraph()
+    graph = Graph()
 
     # Add nodes
     nodes = [
-        ConceptNode(
+        GraphNode(
             id="PAT-001",
             type="pattern",
             content="Singleton pattern for testing",
             created="2026-01-31",
             metadata={"sub_type": "codebase"},
         ),
-        ConceptNode(
+        GraphNode(
             id="PAT-002",
             type="pattern",
             content="Risk-first sequencing pattern",
             created="2026-02-01",
             metadata={"sub_type": "process"},
         ),
-        ConceptNode(
+        GraphNode(
             id="SES-015",
             type="session",
             content="E11 Unified Context Architecture Design",
             created="2026-02-03",
         ),
-        ConceptNode(
+        GraphNode(
             id="§2",
             type="principle",
             content="Governance as Code",
             created="2026-01-01",
         ),
-        ConceptNode(
+        GraphNode(
             id="/story-plan",
             type="skill",
             content="Decompose user stories into tasks",
@@ -70,10 +69,10 @@ def sample_graph() -> UnifiedGraph:
 
     # Add edges
     edges = [
-        ConceptEdge(source="PAT-001", target="SES-015", type="learned_from"),
-        ConceptEdge(source="PAT-002", target="SES-015", type="learned_from"),
-        ConceptEdge(source="PAT-002", target="/story-plan", type="applies_to"),
-        ConceptEdge(source="/story-plan", target="§2", type="governed_by"),
+        GraphEdge(source="PAT-001", target="SES-015", type="learned_from"),
+        GraphEdge(source="PAT-002", target="SES-015", type="learned_from"),
+        GraphEdge(source="PAT-002", target="/story-plan", type="applies_to"),
+        GraphEdge(source="/story-plan", target="§2", type="governed_by"),
     ]
     for edge in edges:
         graph.add_relationship(edge)
@@ -81,17 +80,17 @@ def sample_graph() -> UnifiedGraph:
     return graph
 
 
-class TestUnifiedGraphBasics:
-    """Basic UnifiedGraph tests."""
+class TestGraphBasics:
+    """Basic Graph tests."""
 
-    def test_empty_graph(self, empty_graph: UnifiedGraph) -> None:
+    def test_empty_graph(self, empty_graph: Graph) -> None:
         """Test empty graph initialization."""
         assert empty_graph.node_count == 0
         assert empty_graph.edge_count == 0
 
-    def test_add_concept(self, empty_graph: UnifiedGraph) -> None:
+    def test_add_concept(self, empty_graph: Graph) -> None:
         """Test adding a concept."""
-        node = ConceptNode(
+        node = GraphNode(
             id="PAT-001",
             type="pattern",
             content="Test pattern",
@@ -100,9 +99,9 @@ class TestUnifiedGraphBasics:
         empty_graph.add_concept(node)
         assert empty_graph.node_count == 1
 
-    def test_add_relationship(self, empty_graph: UnifiedGraph) -> None:
+    def test_add_relationship(self, empty_graph: Graph) -> None:
         """Test adding a relationship."""
-        edge = ConceptEdge(
+        edge = GraphEdge(
             source="A",
             target="B",
             type="related_to",
@@ -110,7 +109,7 @@ class TestUnifiedGraphBasics:
         empty_graph.add_relationship(edge)
         assert empty_graph.edge_count == 1
 
-    def test_get_concept(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_concept(self, sample_graph: Graph) -> None:
         """Test getting a concept by ID."""
         node = sample_graph.get_concept("PAT-001")
         assert node is not None
@@ -118,32 +117,32 @@ class TestUnifiedGraphBasics:
         assert node.type == "pattern"
         assert "Singleton" in node.content
 
-    def test_get_concept_not_found(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_concept_not_found(self, sample_graph: Graph) -> None:
         """Test getting a non-existent concept."""
         node = sample_graph.get_concept("NONEXISTENT")
         assert node is None
 
-    def test_sample_graph_counts(self, sample_graph: UnifiedGraph) -> None:
+    def test_sample_graph_counts(self, sample_graph: Graph) -> None:
         """Test sample graph has expected counts."""
         assert sample_graph.node_count == 5
         assert sample_graph.edge_count == 4
 
 
-class TestUnifiedGraphQueries:
+class TestGraphQueries:
     """Query-related tests."""
 
-    def test_get_concepts_by_type(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_concepts_by_type(self, sample_graph: Graph) -> None:
         """Test getting concepts by type."""
         patterns = sample_graph.get_concepts_by_type("pattern")
         assert len(patterns) == 2
         assert all(p.type == "pattern" for p in patterns)
 
-    def test_get_concepts_by_type_empty(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_concepts_by_type_empty(self, sample_graph: Graph) -> None:
         """Test getting concepts of type with no matches."""
         calibrations = sample_graph.get_concepts_by_type("calibration")
         assert len(calibrations) == 0
 
-    def test_get_neighbors_depth_1(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_neighbors_depth_1(self, sample_graph: Graph) -> None:
         """Test getting neighbors at depth 1."""
         neighbors = sample_graph.get_neighbors("SES-015", depth=1)
         # SES-015 has incoming edges from PAT-001 and PAT-002
@@ -152,7 +151,7 @@ class TestUnifiedGraphQueries:
         assert "PAT-001" in neighbor_ids
         assert "PAT-002" in neighbor_ids
 
-    def test_get_neighbors_depth_2(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_neighbors_depth_2(self, sample_graph: Graph) -> None:
         """Test getting neighbors at depth 2."""
         neighbors = sample_graph.get_neighbors("SES-015", depth=2)
         # Depth 2 should also include /story-plan (via PAT-002)
@@ -161,7 +160,7 @@ class TestUnifiedGraphQueries:
         assert "PAT-002" in neighbor_ids
         assert "/story-plan" in neighbor_ids
 
-    def test_get_neighbors_with_edge_filter(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_neighbors_with_edge_filter(self, sample_graph: Graph) -> None:
         """Test getting neighbors with edge type filter."""
         neighbors = sample_graph.get_neighbors(
             "PAT-002", depth=1, edge_types=["applies_to"]
@@ -171,16 +170,16 @@ class TestUnifiedGraphQueries:
         # Should not include SES-015 (learned_from edge)
         assert "SES-015" not in neighbor_ids
 
-    def test_get_neighbors_not_found(self, sample_graph: UnifiedGraph) -> None:
+    def test_get_neighbors_not_found(self, sample_graph: Graph) -> None:
         """Test getting neighbors of non-existent node."""
         neighbors = sample_graph.get_neighbors("NONEXISTENT")
         assert len(neighbors) == 0
 
 
-class TestUnifiedGraphIteration:
+class TestGraphIteration:
     """Iteration tests."""
 
-    def test_iter_concepts(self, sample_graph: UnifiedGraph) -> None:
+    def test_iter_concepts(self, sample_graph: Graph) -> None:
         """Test iterating over all concepts."""
         concepts = list(sample_graph.iter_concepts())
         assert len(concepts) == 5
@@ -188,7 +187,7 @@ class TestUnifiedGraphIteration:
         assert "PAT-001" in concept_ids
         assert "SES-015" in concept_ids
 
-    def test_iter_relationships(self, sample_graph: UnifiedGraph) -> None:
+    def test_iter_relationships(self, sample_graph: Graph) -> None:
         """Test iterating over all relationships."""
         edges = list(sample_graph.iter_relationships())
         assert len(edges) == 4
@@ -198,10 +197,10 @@ class TestUnifiedGraphIteration:
         assert "governed_by" in edge_types
 
 
-class TestUnifiedGraphPersistence:
+class TestGraphPersistence:
     """Persistence tests via FilesystemGraphBackend."""
 
-    def test_save_and_load(self, sample_graph: UnifiedGraph, tmp_path: Path) -> None:
+    def test_save_and_load(self, sample_graph: Graph, tmp_path: Path) -> None:
         """Test saving and loading a graph via backend."""
         save_path = tmp_path / "test_graph.json"
         backend = FilesystemGraphBackend(save_path)
@@ -224,7 +223,7 @@ class TestUnifiedGraphPersistence:
         assert pat.type == "pattern"
 
     def test_save_creates_parent_dirs(
-        self, empty_graph: UnifiedGraph, tmp_path: Path
+        self, empty_graph: Graph, tmp_path: Path
     ) -> None:
         """Test that persist creates parent directories."""
         save_path = tmp_path / "nested" / "dir" / "graph.json"
@@ -239,7 +238,7 @@ class TestUnifiedGraphPersistence:
             backend.load()
 
     def test_load_preserves_metadata(
-        self, sample_graph: UnifiedGraph, tmp_path: Path
+        self, sample_graph: Graph, tmp_path: Path
     ) -> None:
         """Test that node metadata is preserved on load."""
         save_path = tmp_path / "test_graph.json"
@@ -252,18 +251,18 @@ class TestUnifiedGraphPersistence:
         assert pat.metadata.get("sub_type") == "codebase"
 
 
-class TestUnifiedGraphEdgeCases:
+class TestGraphEdgeCases:
     """Edge case tests."""
 
-    def test_duplicate_node_overwrites(self, empty_graph: UnifiedGraph) -> None:
+    def test_duplicate_node_overwrites(self, empty_graph: Graph) -> None:
         """Test that adding duplicate node ID overwrites."""
-        node1 = ConceptNode(
+        node1 = GraphNode(
             id="PAT-001",
             type="pattern",
             content="Original",
             created="2026-02-01",
         )
-        node2 = ConceptNode(
+        node2 = GraphNode(
             id="PAT-001",
             type="pattern",
             content="Updated",
@@ -277,9 +276,9 @@ class TestUnifiedGraphEdgeCases:
         assert retrieved is not None
         assert retrieved.content == "Updated"
 
-    def test_self_referential_edge(self, empty_graph: UnifiedGraph) -> None:
+    def test_self_referential_edge(self, empty_graph: Graph) -> None:
         """Test self-referential edge."""
-        edge = ConceptEdge(
+        edge = GraphEdge(
             source="A",
             target="A",
             type="related_to",
@@ -287,10 +286,10 @@ class TestUnifiedGraphEdgeCases:
         empty_graph.add_relationship(edge)
         assert empty_graph.edge_count == 1
 
-    def test_multiple_edges_same_nodes(self, empty_graph: UnifiedGraph) -> None:
+    def test_multiple_edges_same_nodes(self, empty_graph: Graph) -> None:
         """Test multiple edges between same nodes (MultiDiGraph)."""
-        edge1 = ConceptEdge(source="A", target="B", type="related_to")
-        edge2 = ConceptEdge(source="A", target="B", type="implements")
+        edge1 = GraphEdge(source="A", target="B", type="related_to")
+        edge2 = GraphEdge(source="A", target="B", type="implements")
         empty_graph.add_relationship(edge1)
         empty_graph.add_relationship(edge2)
         assert empty_graph.edge_count == 2
@@ -301,7 +300,7 @@ class TestGraphNodeDeserialization:
 
     def test_get_concept_returns_correct_subclass(self) -> None:
         """Adding an EpicNode and retrieving it returns EpicNode instance."""
-        graph = UnifiedGraph()
+        graph = Graph()
         node = EpicNode(id="E1", content="test epic", created="2026-01-01")
         graph.add_concept(node)
         retrieved = graph.get_concept("E1")
@@ -311,19 +310,29 @@ class TestGraphNodeDeserialization:
 
     def test_get_concepts_by_type_returns_subclasses(self) -> None:
         """get_concepts_by_type returns correct subclass instances."""
-        graph = UnifiedGraph()
-        graph.add_concept(PatternNode(id="P1", content="pat1", created="2026-01-01"))
-        graph.add_concept(PatternNode(id="P2", content="pat2", created="2026-01-01"))
-        graph.add_concept(EpicNode(id="E1", content="epic1", created="2026-01-01"))
+        graph = Graph()
+        graph.add_concept(
+            PatternNode(id="P1", content="pat1", created="2026-01-01")
+        )
+        graph.add_concept(
+            PatternNode(id="P2", content="pat2", created="2026-01-01")
+        )
+        graph.add_concept(
+            EpicNode(id="E1", content="epic1", created="2026-01-01")
+        )
         patterns = graph.get_concepts_by_type("pattern")
         assert len(patterns) == 2
         assert all(isinstance(p, PatternNode) for p in patterns)
 
     def test_iter_concepts_yields_subclasses(self) -> None:
         """iter_concepts yields correct subclass instances."""
-        graph = UnifiedGraph()
-        graph.add_concept(EpicNode(id="E1", content="epic", created="2026-01-01"))
-        graph.add_concept(SessionNode(id="S1", content="session", created="2026-01-01"))
+        graph = Graph()
+        graph.add_concept(
+            EpicNode(id="E1", content="epic", created="2026-01-01")
+        )
+        graph.add_concept(
+            SessionNode(id="S1", content="session", created="2026-01-01")
+        )
         concepts = list(graph.iter_concepts())
         types_found = {type(c).__name__ for c in concepts}
         assert "EpicNode" in types_found
@@ -333,7 +342,7 @@ class TestGraphNodeDeserialization:
         """Persist → load → get_concept returns correct subclass."""
         path = tmp_path / "graph.json"
         backend = FilesystemGraphBackend(path)
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
             EpicNode(
                 id="E1",
@@ -357,7 +366,7 @@ class TestGraphNodeDeserialization:
         """Node with unregistered type loads as GraphNode base with warning."""
         import logging
 
-        graph = UnifiedGraph()
+        graph = Graph()
         # Manually inject a node with unknown type via NetworkX
         graph.graph.add_node(
             "U1",
@@ -434,10 +443,10 @@ class TestGraphNodeDeserialization:
         """
         import logging
 
-        graph = UnifiedGraph()
+        graph = Graph()
         # Valid node
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="good node",

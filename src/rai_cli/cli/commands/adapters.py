@@ -20,7 +20,6 @@ from rai_cli.adapters.protocols import (
     DocumentationTarget,
     GovernanceParser,
     GovernanceSchemaProvider,
-    KnowledgeGraphBackend,
     ProjectManagementAdapter,
 )
 from rai_cli.adapters.registry import (
@@ -39,6 +38,7 @@ from rai_cli.output.formatters.adapters import (
     format_list_json,
 )
 from rai_cli.tier.context import TierContext
+from rai_core.graph.backends.protocol import KnowledgeGraphBackend
 
 adapters_app = typer.Typer(
     name="adapters",

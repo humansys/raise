@@ -17,10 +17,6 @@ import typer
 from rich.console import Console
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.context.query import (
-    SCORING_LOW_WILSON_THRESHOLD,
-    wilson_lower_bound,
-)
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import PatternAddedEvent
 from rai_cli.memory import (
@@ -33,6 +29,10 @@ from rai_cli.memory import (
     reinforce_pattern,
 )
 from rai_cli.onboarding.profile import load_developer_profile
+from rai_core.graph.query import (
+    SCORING_LOW_WILSON_THRESHOLD,
+    wilson_lower_bound,
+)
 
 pattern_app = typer.Typer(
     name="pattern",

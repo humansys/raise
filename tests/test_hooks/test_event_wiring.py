@@ -271,7 +271,7 @@ class TestGraphBuildEvent:
                 "rai_cli.cli.commands.graph.get_active_backend",
                 return_value=mock_backend,
             ),
-            patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder") as mock_builder_cls,
+            patch("rai_cli.cli.commands.graph.GraphBuilder") as mock_builder_cls,
             patch(
                 "rai_cli.cli.commands.graph._get_default_index_path",
                 return_value=tmp_path / "index.json",

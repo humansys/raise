@@ -8,9 +8,9 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.context.models import GraphNode
 from rai_cli.governance.extractor import GovernanceExtractor
 from rai_cli.governance.models import ConceptType
+from rai_core.graph.models import GraphNode
 
 
 @pytest.fixture
@@ -253,7 +253,7 @@ class TestRegistryPath:
     ) -> None:
         """Broken parser logs warning, others still produce nodes."""
         from rai_cli.adapters.models import ArtifactLocator
-        from rai_cli.context.models import GraphNode
+        from rai_core.graph.models import GraphNode
 
         class BrokenParser:
             def can_parse(self, locator: ArtifactLocator) -> bool:
