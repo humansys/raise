@@ -37,6 +37,12 @@ class TestMemoryPatternCreate:
         with pytest.raises(ValidationError):
             MemoryPatternCreate(content="")
 
+    def test_content_max_length(self) -> None:
+        from rai_server.schemas.memory import MemoryPatternCreate
+
+        with pytest.raises(ValidationError):
+            MemoryPatternCreate(content="x" * 10001)
+
 
 class TestMemoryPatternResponse:
     """MemoryPatternResponse returns id and status."""
@@ -65,11 +71,11 @@ class TestMemoryPatternItem:
 
 
 class TestMemoryPatternListResponse:
-    """MemoryPatternListResponse wraps pattern list with total."""
+    """MemoryPatternListResponse wraps pattern list with count."""
 
     def test_empty_list(self) -> None:
         from rai_server.schemas.memory import MemoryPatternListResponse
 
-        resp = MemoryPatternListResponse(patterns=[], total=0)
+        resp = MemoryPatternListResponse(patterns=[], count=0)
         assert resp.patterns == []
-        assert resp.total == 0
+        assert resp.count == 0

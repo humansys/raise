@@ -34,9 +34,10 @@ async def add_pattern(
 async def get_patterns(
     session_factory: async_sessionmaker[AsyncSession],
     org_id: uuid.UUID,
+    limit: int = 50,
 ) -> MemoryPatternListResponse:
-    """List all patterns for an org."""
+    """List patterns for an org."""
     async with session_factory() as session:
-        rows = await list_patterns(session, org_id)
+        rows = await list_patterns(session, org_id, limit=limit)
     patterns = [MemoryPatternItem(**r) for r in rows]
-    return MemoryPatternListResponse(patterns=patterns, total=len(patterns))
+    return MemoryPatternListResponse(patterns=patterns, count=len(patterns))

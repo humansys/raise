@@ -40,6 +40,13 @@ class TestAgentEventCreate:
         with pytest.raises(ValidationError):
             AgentEventCreate(event_type="x" * 101)
 
+    def test_payload_size_limit(self) -> None:
+        from rai_server.schemas.agent import AgentEventCreate
+
+        big_payload = {"data": "x" * 200_000}
+        with pytest.raises(ValidationError):
+            AgentEventCreate(event_type="test", payload=big_payload)
+
 
 class TestAgentEventResponse:
     """AgentEventResponse returns id and status."""
@@ -67,11 +74,11 @@ class TestAgentEventItem:
 
 
 class TestAgentEventListResponse:
-    """AgentEventListResponse wraps event list with total."""
+    """AgentEventListResponse wraps event list with count."""
 
     def test_empty_list(self) -> None:
         from rai_server.schemas.agent import AgentEventListResponse
 
-        resp = AgentEventListResponse(events=[], total=0)
+        resp = AgentEventListResponse(events=[], count=0)
         assert resp.events == []
-        assert resp.total == 0
+        assert resp.count == 0

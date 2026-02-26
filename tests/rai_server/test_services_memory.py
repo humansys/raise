@@ -74,7 +74,7 @@ class TestGetPatterns:
         ):
             result = await get_patterns(factory, org_id)
 
-        assert result.total == 1
+        assert result.count == 1
         assert result.patterns[0].content == "pat"
 
     @pytest.mark.anyio()
@@ -90,5 +90,5 @@ class TestGetPatterns:
         ):
             result = await get_patterns(factory, org_id)
 
-        assert result.total == 0
+        assert result.count == 0
         assert result.patterns == []

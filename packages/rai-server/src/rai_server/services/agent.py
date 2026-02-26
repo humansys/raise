@@ -38,4 +38,4 @@ async def get_events(
     async with session_factory() as session:
         rows = await list_events(session, org_id, limit=limit)
     events = [AgentEventItem(**r) for r in rows]
-    return AgentEventListResponse(events=events, total=len(events))
+    return AgentEventListResponse(events=events, count=len(events))

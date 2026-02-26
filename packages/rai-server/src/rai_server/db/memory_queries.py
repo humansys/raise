@@ -40,6 +40,7 @@ async def insert_pattern(
 async def list_patterns(
     session: AsyncSession,
     org_id: uuid.UUID,
+    limit: int = 50,
 ) -> list[dict[str, Any]]:
     """List all patterns for an org, newest first."""
     stmt = (  # type: ignore[var-annotated]  # SA JSONB propagates Unknown through select
@@ -52,6 +53,7 @@ async def list_patterns(
         )
         .where(MemoryPatternRow.org_id == org_id)
         .order_by(MemoryPatternRow.created_at.desc())
+        .limit(limit)
     )
     result: Result[Any] = await session.execute(stmt)  # type: ignore[arg-type]  # SA JSONB type variance
     return [dict(row) for row in result.mappings().all()]

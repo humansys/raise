@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 class MemoryPatternCreate(BaseModel):
     """Incoming learned pattern from a Rovo agent or CLI."""
 
-    content: str = Field(min_length=1)
+    content: str = Field(min_length=1, max_length=10000)
     context: list[str] = Field(default_factory=list)
     properties: dict[str, Any] = Field(default_factory=dict)
 
@@ -38,4 +38,4 @@ class MemoryPatternListResponse(BaseModel):
     """List of memory patterns."""
 
     patterns: list[MemoryPatternItem]
-    total: int
+    count: int
