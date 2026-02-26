@@ -9,7 +9,6 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
-
 from rai_server.auth import OrgContext, verify_api_key
 
 
