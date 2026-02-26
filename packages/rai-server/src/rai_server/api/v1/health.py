@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Request
 from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+
+from rai_server import __version__
+from rai_server.deps import get_engine
 
 router = APIRouter()
 
@@ -11,13 +15,11 @@ router = APIRouter()
 async def _check_db(request: Request) -> bool:
     """Ping the database with SELECT 1."""
     try:
-        from rai_server.app import get_engine
-
         engine = get_engine(request.app)
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
         return True
-    except Exception:
+    except (OSError, SQLAlchemyError):
         return False
 
 
@@ -28,5 +30,5 @@ async def health(request: Request) -> dict[str, str]:
     return {
         "status": "ok",
         "database": "connected" if db_ok else "disconnected",
-        "version": "0.1.0",
+        "version": __version__,
     }

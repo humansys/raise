@@ -14,6 +14,7 @@ from pydantic import BaseModel
 from sqlalchemy import select
 
 from rai_server.db.models import ApiKey, Organization
+from rai_server.deps import get_session_factory
 
 
 class OrgContext(BaseModel):
@@ -37,8 +38,6 @@ async def verify_api_key(request: Request) -> OrgContext:
 
     raw_key = auth_header.removeprefix("Bearer ")
     key_hash = hashlib.sha256(raw_key.encode()).hexdigest()
-
-    from rai_server.app import get_session_factory
 
     session_factory = get_session_factory(request.app)
     async with session_factory() as session:

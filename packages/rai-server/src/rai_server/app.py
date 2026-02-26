@@ -6,8 +6,8 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
-from sqlalchemy.ext.asyncio import AsyncEngine, async_sessionmaker, AsyncSession
 
+from rai_server import __version__
 from rai_server.api.v1.health import router as health_router
 from rai_server.config import ServerConfig
 from rai_server.db.session import create_engine, create_session_factory
@@ -34,21 +34,9 @@ def create_app(config: ServerConfig | None = None) -> FastAPI:
         config = ServerConfig()  # type: ignore[call-arg]  # pydantic-settings reads env
     app = FastAPI(
         title="RaiSE Server",
-        version="0.1.0",
+        version=__version__,
         lifespan=lifespan,
     )
     app.state.config = config
     app.include_router(health_router)
     return app
-
-
-def get_engine(app: FastAPI) -> AsyncEngine:
-    """Extract the engine from app.state (typed accessor)."""
-    engine: AsyncEngine = app.state.engine  # type: ignore[has-type]
-    return engine
-
-
-def get_session_factory(app: FastAPI) -> async_sessionmaker[AsyncSession]:
-    """Extract the session factory from app.state (typed accessor)."""
-    factory: async_sessionmaker[AsyncSession] = app.state.session_factory  # type: ignore[has-type]
-    return factory
