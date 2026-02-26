@@ -34,7 +34,7 @@ class ApiGraphBackend:
         self.project_id = project_id
         self._client = httpx.Client(
             base_url=server_url,
-            headers={"x-api-key": api_key},
+            headers={"Authorization": f"Bearer {api_key}"},
             timeout=httpx.Timeout(connect=5.0, read=30.0, write=30.0, pool=5.0),
         )
 
