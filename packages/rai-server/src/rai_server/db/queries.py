@@ -29,37 +29,43 @@ async def upsert_nodes(
     if not nodes:
         return {"created": 0, "updated": 0}
 
-    values = [
-        {
-            "org_id": org_id,
-            "repo_id": repo_id,
-            "node_id": n["node_id"],
-            "node_type": n["node_type"],
-            "scope": n["scope"],
-            "content": n["content"],
-            "source_file": n["source_file"],
-            "properties": n["properties"],
-        }
-        for n in nodes
-    ]
+    # asyncpg limits query params to 32767. Each node has 8 params,
+    # so batch at ~4000 nodes per INSERT to stay safely under the limit.
+    batch_size = 4000
+    total = 0
+    for i in range(0, len(nodes), batch_size):
+        batch = nodes[i : i + batch_size]
+        values = [
+            {
+                "org_id": org_id,
+                "repo_id": repo_id,
+                "node_id": n["node_id"],
+                "node_type": n["node_type"],
+                "scope": n["scope"],
+                "content": n["content"],
+                "source_file": n["source_file"],
+                "properties": n["properties"],
+            }
+            for n in batch
+        ]
 
-    stmt = pg_insert(GraphNodeRow).values(values)
-    stmt = stmt.on_conflict_do_update(
-        constraint="uq_node_org_repo_nodeid",
-        set_={
-            "node_type": stmt.excluded.node_type,
-            "scope": stmt.excluded.scope,
-            "content": stmt.excluded.content,
-            "source_file": stmt.excluded.source_file,
-            "properties": stmt.excluded.properties,
-            "updated_at": func.now(),
-        },
-    )
+        stmt = pg_insert(GraphNodeRow).values(values)
+        stmt = stmt.on_conflict_do_update(
+            constraint="uq_node_org_repo_nodeid",
+            set_={
+                "node_type": stmt.excluded.node_type,
+                "scope": stmt.excluded.scope,
+                "content": stmt.excluded.content,
+                "source_file": stmt.excluded.source_file,
+                "properties": stmt.excluded.properties,
+                "updated_at": func.now(),
+            },
+        )
 
-    result = await session.execute(stmt)
-    total: int = result.rowcount  # type: ignore[assignment]  # CursorResult.rowcount is int at runtime
+        result = await session.execute(stmt)
+        total += result.rowcount  # type: ignore[operator]  # CursorResult.rowcount is int
+
     # PG ON CONFLICT doesn't distinguish created vs updated in rowcount.
-    # We report all as created; the service layer can refine if needed.
     return {"created": total, "updated": 0}
 
 
@@ -87,21 +93,27 @@ async def replace_edges(
     if not edges:
         return {"created": 0}
 
-    values = [
-        {
-            "org_id": org_id,
-            "repo_id": repo_id,
-            "source_id": e["source_id"],
-            "target_id": e["target_id"],
-            "edge_type": e["edge_type"],
-            "weight": e["weight"],
-            "properties": e["properties"],
-        }
-        for e in edges
-    ]
+    # asyncpg limits query params to 32767. Each edge has 7 params,
+    # so batch at ~4000 edges per INSERT to stay safely under the limit.
+    batch_size = 4000
+    created = 0
+    for i in range(0, len(edges), batch_size):
+        batch = edges[i : i + batch_size]
+        values = [
+            {
+                "org_id": org_id,
+                "repo_id": repo_id,
+                "source_id": e["source_id"],
+                "target_id": e["target_id"],
+                "edge_type": e["edge_type"],
+                "weight": e["weight"],
+                "properties": e["properties"],
+            }
+            for e in batch
+        ]
+        result = await session.execute(pg_insert(GraphEdgeRow).values(values))
+        created += result.rowcount  # type: ignore[operator]  # CursorResult.rowcount is int
 
-    result = await session.execute(pg_insert(GraphEdgeRow).values(values))
-    created: int = result.rowcount  # type: ignore[assignment]  # CursorResult.rowcount
     return {"created": created}
 
 
