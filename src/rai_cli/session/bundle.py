@@ -20,10 +20,10 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from rai_cli.context.models import ConceptNode
-from rai_cli.graph.filesystem_backend import get_active_backend
+from rai_cli.graph.backends import get_active_backend
 from rai_cli.onboarding.profile import DeveloperProfile
 from rai_cli.schemas.session_state import SessionState
+from rai_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
@@ -35,14 +35,14 @@ SESSIONS_INDEX_REL_PATH = (
 )
 
 
-def get_foundational_patterns(project_path: Path) -> list[ConceptNode]:
+def get_foundational_patterns(project_path: Path) -> list[GraphNode]:
     """Query memory graph for foundational patterns.
 
     Args:
         project_path: Absolute path to the project root.
 
     Returns:
-        List of pattern ConceptNodes with foundational=true metadata.
+        List of pattern GraphNodes with foundational=true metadata.
     """
     graph_path = project_path / GRAPH_REL_PATH
     if not graph_path.exists():
@@ -62,14 +62,14 @@ def get_foundational_patterns(project_path: Path) -> list[ConceptNode]:
     ]
 
 
-def get_always_on_primes(project_path: Path) -> list[ConceptNode]:
+def get_always_on_primes(project_path: Path) -> list[GraphNode]:
     """Query memory graph for all always_on nodes (governance + identity).
 
     Args:
         project_path: Absolute path to the project root.
 
     Returns:
-        List of ConceptNodes with always_on=true metadata.
+        List of GraphNodes with always_on=true metadata.
     """
     graph_path = project_path / GRAPH_REL_PATH
     if not graph_path.exists():
@@ -111,7 +111,7 @@ def _format_developer_section(profile: DeveloperProfile) -> str:
 
 def _find_release_for_current_epic(
     project_path: Path, epic_id: str
-) -> ConceptNode | None:
+) -> GraphNode | None:
     """Find release node for the current epic from the memory graph.
 
     Args:
@@ -119,7 +119,7 @@ def _find_release_for_current_epic(
         epic_id: Epic identifier (e.g., "E19").
 
     Returns:
-        The release ConceptNode, or None if not found or graph unavailable.
+        The release GraphNode, or None if not found or graph unavailable.
     """
     if not epic_id:
         return None
@@ -129,9 +129,11 @@ def _find_release_for_current_epic(
         return None
 
     try:
-        from rai_cli.context.query import UnifiedQueryEngine
+        from rai_cli.graph.backends import get_active_backend
+        from rai_core.graph.query import QueryEngine
 
-        engine = UnifiedQueryEngine.from_file(graph_path)
+        graph = get_active_backend(graph_path).load()
+        engine = QueryEngine(graph)
         return engine.find_release_for(f"epic-{epic_id.lower()}")
     except Exception:
         logger.debug("Failed to query release for epic %s", epic_id)
@@ -140,7 +142,7 @@ def _find_release_for_current_epic(
 
 def _format_work_section(
     state: SessionState | None,
-    release_node: ConceptNode | None = None,
+    release_node: GraphNode | None = None,
 ) -> str:
     """Format current work state."""
     if state is None:
@@ -201,7 +203,7 @@ def _format_deadlines(profile: DeveloperProfile) -> str:
     return "\n".join(lines)
 
 
-def _format_governance_primes(always_on_nodes: list[ConceptNode]) -> str:
+def _format_governance_primes(always_on_nodes: list[GraphNode]) -> str:
     """Format governance primes (guardrails + non-identity principles).
 
     Args:
@@ -326,7 +328,7 @@ def _format_next_session_prompt(state: SessionState | None) -> str:
     return f"# Next Session Prompt\n{state.next_session_prompt}"
 
 
-def _format_primes(patterns: list[ConceptNode]) -> str:
+def _format_primes(patterns: list[GraphNode]) -> str:
     """Format foundational patterns as behavioral primes."""
     if not patterns:
         return ""
@@ -612,7 +614,7 @@ def assemble_orientation(
         Plain text orientation context.
     """
     # Resolve release context for current epic
-    release_node: ConceptNode | None = None
+    release_node: GraphNode | None = None
     if state and state.current_work.epic:
         release_node = _find_release_for_current_epic(
             project_path, state.current_work.epic

@@ -357,13 +357,13 @@ def build_command(
         )
 
     # Build unified graph (includes components automatically)
-    from rai_cli.context.builder import UnifiedGraphBuilder
+    from rai_cli.context.builder import GraphBuilder
 
-    builder = UnifiedGraphBuilder(project_root=root)
+    builder = GraphBuilder(project_root=root)
     graph = builder.build()
 
     # Save graph via backend
-    from rai_cli.graph.filesystem_backend import get_active_backend
+    from rai_cli.graph.backends import get_active_backend
 
     graph_path = root / ".raise" / "graph" / "unified.json"
     get_active_backend(graph_path).persist(graph)

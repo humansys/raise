@@ -4,9 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.context.models import (
-    ConceptEdge,
-    ConceptNode,
+from rai_core.graph.models import (
     CoreEdgeTypes,
     EpicNode,
     GraphEdge,
@@ -16,12 +14,12 @@ from rai_cli.context.models import (
 )
 
 
-class TestConceptNode:
-    """Tests for ConceptNode model."""
+class TestGraphNodeBasic:
+    """Tests for GraphNode model."""
 
     def test_create_pattern_node(self) -> None:
         """Test creating a pattern node."""
-        node = ConceptNode(
+        node = GraphNode(
             id="PAT-001",
             type="pattern",
             content="Singleton with get/set/configure pattern",
@@ -37,7 +35,7 @@ class TestConceptNode:
 
     def test_create_principle_node(self) -> None:
         """Test creating a principle node."""
-        node = ConceptNode(
+        node = GraphNode(
             id="§2",
             type="principle",
             content="Governance as Code - Standards versioned in Git",
@@ -50,7 +48,7 @@ class TestConceptNode:
 
     def test_create_module_node(self) -> None:
         """Test creating a module node for architecture knowledge."""
-        node = ConceptNode(
+        node = GraphNode(
             id="mod-discovery",
             type="module",
             content="Codebase analysis — scanning, confidence scoring, validation",
@@ -70,7 +68,7 @@ class TestConceptNode:
 
     def test_token_estimate(self) -> None:
         """Test token estimation."""
-        node = ConceptNode(
+        node = GraphNode(
             id="PAT-001",
             type="pattern",
             content="A" * 100,  # 100 characters
@@ -80,7 +78,7 @@ class TestConceptNode:
 
     def test_invalid_node_type_rejected(self) -> None:
         """Test that any string type is accepted (open type system)."""
-        node = ConceptNode(
+        node = GraphNode(
             id="TEST-001",
             type="custom.plugin_type",
             content="Test",
@@ -190,12 +188,14 @@ class TestCoreNodeTypes:
         assert node.type == "pattern"
 
     def test_conceptnode_alias_is_graphnode(self) -> None:
-        """ConceptNode is an alias for GraphNode."""
-        assert ConceptNode is GraphNode
+        """GraphNode is an alias for GraphNode."""
+        assert GraphNode is GraphNode
 
     def test_conceptnode_backward_compat(self) -> None:
-        """ConceptNode still works with explicit type for backward compat."""
-        node = ConceptNode(id="X", type="epic", content="test", created="2026-01-01")
+        """GraphNode still works with explicit type for backward compat."""
+        node = GraphNode(
+            id="X", type="epic", content="test", created="2026-01-01"
+        )
         assert isinstance(node, GraphNode)
         assert node.type == "epic"
 
@@ -204,8 +204,8 @@ class TestCoreNodeTypes:
         assert NodeType is str
 
     def test_conceptedge_alias_is_graphedge(self) -> None:
-        """ConceptEdge is an alias for GraphEdge."""
-        assert ConceptEdge is GraphEdge
+        """GraphEdge is an alias for GraphEdge."""
+        assert GraphEdge is GraphEdge
 
     def test_core_edge_types_constants(self) -> None:
         """CoreEdgeTypes provides string constants for built-in edges."""
@@ -214,12 +214,12 @@ class TestCoreNodeTypes:
         assert CoreEdgeTypes.CONSTRAINED_BY == "constrained_by"
 
 
-class TestConceptEdge:
-    """Tests for ConceptEdge model."""
+class TestGraphEdge:
+    """Tests for GraphEdge model."""
 
     def test_create_learned_from_edge(self) -> None:
         """Test creating a learned_from edge."""
-        edge = ConceptEdge(
+        edge = GraphEdge(
             source="PAT-001",
             target="SES-015",
             type="learned_from",
@@ -234,7 +234,7 @@ class TestConceptEdge:
 
     def test_create_governed_by_edge(self) -> None:
         """Test creating a governed_by edge."""
-        edge = ConceptEdge(
+        edge = GraphEdge(
             source="RF-05",
             target="§2",
             type="governed_by",
@@ -247,7 +247,7 @@ class TestConceptEdge:
 
     def test_create_depends_on_edge(self) -> None:
         """Test creating a depends_on edge between modules."""
-        edge = ConceptEdge(
+        edge = GraphEdge(
             source="mod-discovery",
             target="mod-core",
             type="depends_on",
@@ -270,7 +270,7 @@ class TestConceptEdge:
             "depends_on",
         ]
         for edge_type in edge_types:
-            edge = ConceptEdge(
+            edge = GraphEdge(
                 source="A",
                 target="B",
                 type=edge_type,  # type: ignore[arg-type]
@@ -279,7 +279,7 @@ class TestConceptEdge:
 
     def test_custom_weight(self) -> None:
         """Test custom edge weight."""
-        edge = ConceptEdge(
+        edge = GraphEdge(
             source="A",
             target="B",
             type="related_to",
@@ -289,7 +289,7 @@ class TestConceptEdge:
 
     def test_any_edge_type_accepted(self) -> None:
         """Test that any string edge type is accepted (open type system)."""
-        edge = ConceptEdge(
+        edge = GraphEdge(
             source="A",
             target="B",
             type="jira.blocks",

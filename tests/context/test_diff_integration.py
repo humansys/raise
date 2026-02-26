@@ -7,18 +7,18 @@ diff_graphs detects them accurately. Decoupled from live codebase state.
 from __future__ import annotations
 
 from rai_cli.context.diff import diff_graphs
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptNode
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphNode
 
 
 class TestDiffWithFixtureGraph:
     """Diff against a deterministic fixture graph."""
 
-    def _build_fixture_graph(self) -> UnifiedGraph:
+    def _build_fixture_graph(self) -> Graph:
         """Build a deterministic graph for diff testing."""
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="mod-alpha",
                 type="module",
                 content="Alpha module for testing",
@@ -27,7 +27,7 @@ class TestDiffWithFixtureGraph:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="mod-beta",
                 type="module",
                 content="Beta module for testing",
@@ -36,7 +36,7 @@ class TestDiffWithFixtureGraph:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="Test pattern one",
@@ -44,7 +44,7 @@ class TestDiffWithFixtureGraph:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-002",
                 type="pattern",
                 content="Test pattern two",
@@ -52,7 +52,7 @@ class TestDiffWithFixtureGraph:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="guard-001",
                 type="guardrail",
                 content="Test guardrail",
@@ -74,7 +74,7 @@ class TestDiffWithFixtureGraph:
         old_graph = self._build_fixture_graph()
         new_graph = self._build_fixture_graph()
 
-        fake_module = ConceptNode(
+        fake_module = GraphNode(
             id="mod-gamma",
             type="module",
             content="Gamma module added in new graph",
@@ -98,7 +98,7 @@ class TestDiffWithFixtureGraph:
         mod_node = new_graph.get_concept("mod-alpha")
         assert mod_node is not None, "mod-alpha should exist in fixture graph"
 
-        modified_node = ConceptNode(
+        modified_node = GraphNode(
             id=mod_node.id,
             type=mod_node.type,
             content=mod_node.content,
@@ -122,7 +122,7 @@ class TestDiffWithFixtureGraph:
         new_graph = self._build_fixture_graph()
 
         # Add a node to old graph only (simulates removal)
-        extra_node = ConceptNode(
+        extra_node = GraphNode(
             id="PAT-999",
             type="pattern",
             content="Pattern that gets removed",

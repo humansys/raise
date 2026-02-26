@@ -7,12 +7,12 @@ from pydantic import BaseModel, ValidationError
 
 from rai_cli.adapters.models import (
     ArtifactLocator,
-    BackendHealth,
     CoreArtifactType,
     IssueRef,
     IssueSpec,
     PublishResult,
 )
+from rai_core.graph.backends.models import BackendHealth
 
 
 class TestCoreArtifactType:

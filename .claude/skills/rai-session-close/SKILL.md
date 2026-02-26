@@ -93,7 +93,19 @@ next_session_prompt: |
 
 **Capture tangents:** Check conversation for ideas → add to `dev/parking-lot.md`.
 
-### Step 2: Feed CLI
+### Step 2: Clean Working Tree
+
+Before closing, ensure no uncommitted changes are left behind:
+
+1. Run `git status`
+2. If working tree is clean → proceed to Step 3
+3. If there are uncommitted changes → present them to the human with options:
+   - **Commit**: stage and commit with a descriptive message
+   - **Discard**: `git restore` the files (confirm first)
+   - **Leave**: explicitly acknowledge the leftovers in the handoff
+4. Do NOT close the session with a dirty working tree unless the human explicitly chooses "Leave"
+
+### Step 3: Feed CLI
 
 ```bash
 rai session close --state-file /tmp/session-output-{SES-ID}.yaml --session {SES-ID} --project "$(pwd)"
@@ -106,6 +118,7 @@ Present a brief handoff:
 ## Next Session
 **Continue:** [next step]
 **Open:** [unresolved questions, if any]
+**Working tree:** clean | N files left uncommitted (reason)
 ```
 
 ## Output
@@ -125,6 +138,7 @@ Present a brief handoff:
 - [ ] Narrative enables next session to resume immediately
 - [ ] Next session prompt is actionable and specific
 - [ ] Tangents captured in parking lot (if any)
+- [ ] Working tree clean (or leftovers explicitly acknowledged)
 - [ ] CLI close command executed successfully
 
 ## References

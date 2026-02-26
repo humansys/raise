@@ -596,6 +596,85 @@
   - **Decision needed:** Keep work/ in repo for git history? Move to Confluence only? Hybrid (summaries in repo, full content in Confluence)?
   - **Priority:** Medium — blocked by research-to-Confluence skill adaptation.
 
+---
+
+### RAISE-275 Epic Design — Parking Lot (2026-02-25)
+
+- [ ] **RLS (Row-Level Security) for multi-tenant isolation** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Currently using WHERE clause filtering by org_id. RLS enforces isolation at DB level.
+  - **When:** Enterprise tier with strict data isolation requirements.
+  - **Priority:** Low — WHERE clause sufficient for single-org and early multi-org.
+
+- [ ] **JWT/OAuth auth upgrade** — (RAISE-275 design, 2026-02-25)
+  - **Context:** API key per org sufficient for POC. JWT adds per-user granularity and scopes.
+  - **When:** User management needed (multiple users per org with different permissions).
+  - **Priority:** Low — API key works for POC + first Pro customers.
+
+- [ ] **Pattern promotion workflow (PERSONAL → PROJECT → ORG)** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Research defined the scope model. Promotion requires HITL validation and CLI commands.
+  - **What:** `rai pattern promote` command, classification heuristics, architect validation for ORG scope.
+  - **Priority:** Medium — needed for team intelligence, but not for initial backend.
+
+- [ ] **Graph algorithms Phase 2: PPR, spreading activation** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Research validated PPR (~10 lines) and spreading activation (SA-RAG, 25-39% improvement).
+  - **When:** After backend is stable and has enough data to benchmark.
+  - **Priority:** Medium — enhances relevance but current keyword + BFS works.
+
+- [ ] **pgAdmin in Docker Compose** — (RAISE-275 design, 2026-02-25)
+  - **What:** Add pgAdmin service for visual DB inspection during development.
+  - **Priority:** Low — nice-to-have, `psql` CLI sufficient.
+
+- [ ] **Skill ↔ Jira backlog sync — skills drive Jira transitions automatically** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Los skills del lifecycle (epic-start, story-start, story-close, epic-close) ya saben en qué fase estamos. Jira debería reflejar eso automáticamente, no depender de que alguien se acuerde de mover el ticket.
+  - **Mapping:** epic-start → In Progress, epic-plan → crea stories hijas, story-start → In Progress, story-close → Done, epic-close → Done.
+  - **La "magia":** Esto convierte a los skills en el backlog manager — el equipo deja de mantener Jira manualmente. El workflow del skill ES el workflow de Jira. Fernando ve progreso real sin preguntar. El PM ve burndown sin perseguir developers.
+  - **Alcance:** Una transición Jira al final de cada skill (no micro-updates). Leer workflow config de `.raise/jira.yaml` (ya existe). Graceful degradation si Jira no está configurado.
+  - **Relación:** Evolución natural de los Jira MCP tools que ya usamos ad-hoc. Podría ser un hook (E248 architecture) en vez de código dentro de cada skill.
+  - **Priority:** High — alto impacto en experiencia de equipo, bajo esfuerzo incremental (1 MCP call por skill).
+
+- [ ] **Epic docs refresh gate — update brief/scope/design when decisions change** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Epic brief se escribe en epic-start, scope y design en epic-design, pero durante story-design e implementation se toman decisiones que invalidan esos documentos. Hoy no hay gate que los actualice.
+  - **What:** Agregar paso en `/rai-story-close` o `/rai-epic-plan` que compare decisiones tomadas durante stories contra los docs de épica (brief, scope, design). Si hay drift, actualizar antes de cerrar.
+  - **Scope:** Podría ser un step en story-close ("¿cambió alguna decisión de épica?") o un skill dedicado `/rai-epic-refresh`.
+  - **Priority:** Medium — los docs de épica son el contrato del equipo, si driftan pierden valor.
+
+---
+
+### RAISE-275 Architecture Review — Parking Lot (2026-02-25)
+
+- [ ] **rai-core domain expansion: Workflow engine with per-org extensibility** — (E275 arch review, 2026-02-25)
+  - **Context:** Architecture review discovered that `rai-core` needs to be the shared RaiSE domain, not just a graph library. Work management (epic/story/task lifecycles) requires a workflow engine with customizable state machines.
+  - **Requirements:**
+    - Core defines schema base: WorkItemType, State, Transition, Gate
+    - Core provides default RaiSE workflow (out of the box)
+    - Per-org/repo override via config (`.raise/workflows/*.yaml` or similar)
+    - Each stage = skill + quality gates
+    - Versionado: upgrades never break custom workflows; migration path when breaking
+  - **DDD grounding:** Currently workflow lives implicitly in skills (markdown) and `.raise/jira.yaml` (transition IDs). No explicit domain model in code.
+  - **Priority:** High strategic — foundation for Pro/Enterprise. Separate epic after E275.
+
+- [ ] **rai-core domain expansion: Extensible governance schema** — (E275 arch review, 2026-02-25)
+  - **Context:** Kurigage dev (Sofi) gave Rai coding standards → placed in `/governance/` correctly, but no parser exists → won't enter the graph → Rai can't use them in queries or share with team.
+  - **Requirements:**
+    - Extensible artifact types beyond fixed `CoreArtifactType` enum
+    - Generic parser (or parser plugin system) for custom governance docs
+    - Custom artifact types shareable via server (whole team benefits)
+    - Schema versionado + migrations (same pattern as workflows)
+  - **DDD grounding:** `CoreArtifactType` is governance context vocabulary. Server receives translated `ConceptNode`, doesn't need parsing. But the SCHEMA of what types exist needs to be extensible and shareable.
+  - **Priority:** High — directly impacts customer onboarding experience.
+
+- [ ] **rai-core structure accommodates three domain axes** — (E275 arch review, 2026-02-25)
+  - **Decision for S275.1:** `rai_core/` package structure should accommodate graph (E275), workflow (future), and governance schema (future) even though only graph is implemented now.
+  - **Proposed structure:**
+    ```
+    rai_core/
+    ├── graph/           # E275 — implemented
+    ├── workflow/        # placeholder with docstring
+    ├── governance/      # placeholder with docstring
+    └── __init__.py
+    ```
+  - **Rationale:** Avoid refactoring when expanding core. "Sentar las bases."
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-25 (SES-281: repo clutter, research-to-Confluence, work/ location)*
+*Last updated: 2026-02-25 (RAISE-275: architecture review findings)*

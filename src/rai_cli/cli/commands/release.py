@@ -21,7 +21,7 @@ from rich.console import Console
 from rich.table import Table
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.graph.filesystem_backend import get_active_backend
+from rai_cli.graph.backends import get_active_backend
 from rai_cli.publish.check import CheckResult, run_checks
 from rai_cli.publish.version import (
     BumpType,

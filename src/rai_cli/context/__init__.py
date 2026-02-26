@@ -1,53 +1,42 @@
-"""Unified context graph for cross-domain knowledge retrieval.
+"""Context module for cross-domain knowledge retrieval.
 
-This module provides the unified context graph that merges governance,
-memory, and work graphs into a single queryable structure.
-
-Components:
-    - models: ConceptNode, ConceptEdge, NodeType, EdgeType
-    - graph: UnifiedGraph class wrapping NetworkX
-    - query: UnifiedQueryEngine for context retrieval
-    - diff: Graph diffing for change detection
+Re-exports graph domain types from rai_core and local context components.
 """
 
 from __future__ import annotations
 
-from rai_cli.context.builder import UnifiedGraphBuilder
+from rai_cli.context.builder import GraphBuilder
 from rai_cli.context.diff import GraphDiff, NodeChange, diff_graphs
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import (
-    ConceptEdge,
-    ConceptNode,
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import (
     CoreEdgeTypes,
     EdgeType,
     GraphEdge,
     GraphNode,
     NodeType,
 )
-from rai_cli.context.query import (
-    UnifiedQuery,
-    UnifiedQueryEngine,
-    UnifiedQueryMetadata,
-    UnifiedQueryResult,
-    UnifiedQueryStrategy,
+from rai_core.graph.query import (
+    Query,
+    QueryEngine,
+    QueryMetadata,
+    QueryResult,
+    QueryStrategy,
 )
 
 __all__ = [
-    "ConceptEdge",
-    "ConceptNode",
     "CoreEdgeTypes",
     "EdgeType",
+    "Graph",
     "GraphDiff",
     "GraphEdge",
     "GraphNode",
     "NodeChange",
     "NodeType",
-    "UnifiedGraph",
-    "UnifiedGraphBuilder",
+    "Query",
+    "QueryEngine",
+    "QueryMetadata",
+    "QueryResult",
+    "QueryStrategy",
+    "GraphBuilder",
     "diff_graphs",
-    "UnifiedQuery",
-    "UnifiedQueryEngine",
-    "UnifiedQueryMetadata",
-    "UnifiedQueryResult",
-    "UnifiedQueryStrategy",
 ]
