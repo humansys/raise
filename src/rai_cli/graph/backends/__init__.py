@@ -35,13 +35,16 @@ def get_active_backend(path: Path) -> KnowledgeGraphBackend:
         from rai_cli.graph.backends.dual import DualWriteBackend
 
         project_id = Path.cwd().name
+        raise_dir = Path.cwd() / ".raise"
         local = FilesystemGraphBackend(path=path)
         remote = ApiGraphBackend(
             server_url=server_url,
             api_key=api_key,
             project_id=project_id,
         )
-        return DualWriteBackend(local=local, remote=remote)
+        return DualWriteBackend(
+            local=local, remote=remote, raise_dir=raise_dir if raise_dir.exists() else None
+        )
 
     if server_url and not api_key:
         logger.warning(
