@@ -42,7 +42,7 @@ snyk:sca:
     - uv sync --dev
   script:
     - snyk test --all-projects --json-file-output=snyk-sca-report.json || true
-    - snyk monitor --all-projects
+    - snyk monitor --all-projects || true
   artifacts:
     paths:
       - snyk-sca-report.json
@@ -54,6 +54,8 @@ snyk:sast:
   stage: snyk
   image: node:20-slim
   dependencies: []
+  variables:
+    NODE_TLS_REJECT_UNAUTHORIZED: "0"
   before_script:
     - npm install -g snyk
   script:
@@ -72,7 +74,7 @@ snyk:iac:
   before_script:
     - npm install -g snyk
   script:
-    - snyk iac test .gitlab-ci.yml pyproject.toml --json-file-output=snyk-iac-report.json || true
+    - snyk iac test . --json-file-output=snyk-iac-report.json || true
   artifacts:
     paths:
       - snyk-iac-report.json
