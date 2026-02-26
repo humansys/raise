@@ -37,7 +37,7 @@ async def list_events(
     limit: int = 20,
 ) -> list[dict[str, Any]]:
     """List recent events for an org, newest first."""
-    stmt = (
+    stmt = (  # type: ignore[var-annotated]  # SA JSONB propagates Unknown through select
         select(
             AgentEventRow.id,
             AgentEventRow.event_type,
@@ -48,5 +48,5 @@ async def list_events(
         .order_by(AgentEventRow.created_at.desc())
         .limit(limit)
     )
-    result: Result[Any] = await session.execute(stmt)
+    result: Result[Any] = await session.execute(stmt)  # type: ignore[arg-type]  # SA JSONB type variance
     return [dict(row) for row in result.mappings().all()]
