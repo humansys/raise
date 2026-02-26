@@ -12,8 +12,8 @@ class NodeInput(BaseModel):
 
     node_id: str = Field(min_length=1)
     node_type: str = Field(min_length=1)
-    scope: str = "project"
-    content: str
+    scope: str = Field(default="project", max_length=20)
+    content: str = Field(min_length=1)
     source_file: str | None = None
     properties: dict[str, Any] = Field(default_factory=dict)
 
@@ -41,9 +41,9 @@ class GraphSyncResponse(BaseModel):
 
     status: str = "ok"
     project_id: str
-    nodes_created: int
-    nodes_updated: int
+    nodes_upserted: int
     edges_created: int
+    edges_skipped: int
     nodes_pruned: int
 
 

@@ -35,12 +35,24 @@ class TestNodeInput:
         assert node.source_file == "src/graph/__init__.py"
         assert node.properties["language"] == "python"
 
-    def test_missing_required_field(self) -> None:
+    def test_missing_content_field(self) -> None:
         from rai_server.schemas.graph import NodeInput
 
         with pytest.raises(ValidationError) as exc_info:
             NodeInput(node_id="mod-x", node_type="module")  # type: ignore[call-arg]
         assert "content" in str(exc_info.value)
+
+    def test_empty_content_rejected(self) -> None:
+        from rai_server.schemas.graph import NodeInput
+
+        with pytest.raises(ValidationError):
+            NodeInput(node_id="mod-x", node_type="module", content="")
+
+    def test_scope_too_long_rejected(self) -> None:
+        from rai_server.schemas.graph import NodeInput
+
+        with pytest.raises(ValidationError):
+            NodeInput(node_id="x", node_type="t", content="c", scope="a" * 21)
 
     def test_empty_node_id_rejected(self) -> None:
         from rai_server.schemas.graph import NodeInput
@@ -119,14 +131,15 @@ class TestGraphSyncResponse:
 
         resp = GraphSyncResponse(
             project_id="raise-commons",
-            nodes_created=10,
-            nodes_updated=2,
+            nodes_upserted=12,
             edges_created=8,
+            edges_skipped=1,
             nodes_pruned=1,
         )
         data = resp.model_dump()
         assert data["status"] == "ok"
-        assert data["nodes_created"] == 10
+        assert data["nodes_upserted"] == 12
+        assert data["edges_skipped"] == 1
         assert data["nodes_pruned"] == 1
 
 

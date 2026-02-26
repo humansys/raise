@@ -48,9 +48,9 @@ class TestSyncEndpoint:
     def test_sync_returns_200_with_counts(self, client: TestClient) -> None:
         mock_response = GraphSyncResponse(
             project_id="raise-commons",
-            nodes_created=5,
-            nodes_updated=0,
+            nodes_upserted=5,
             edges_created=3,
+            edges_skipped=0,
             nodes_pruned=1,
         )
         with (
@@ -68,8 +68,9 @@ class TestSyncEndpoint:
         assert resp.status_code == 200
         body = resp.json()
         assert body["status"] == "ok"
-        assert body["nodes_created"] == 5
+        assert body["nodes_upserted"] == 5
         assert body["edges_created"] == 3
+        assert body["edges_skipped"] == 0
         assert body["nodes_pruned"] == 1
 
     def test_sync_requires_auth(self, client: TestClient) -> None:

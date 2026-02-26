@@ -113,6 +113,10 @@ async def prune_orphan_nodes(
 ) -> int:
     """Delete nodes for (org_id, repo_id) whose node_id is NOT in keep_node_ids.
 
+    PRECONDITION: Edges referencing these nodes must be deleted first
+    (graph_edges.source_id/target_id FK has no ON DELETE CASCADE).
+    In sync_graph, replace_edges runs before prune to satisfy this.
+
     Returns the number of pruned nodes.
     """
     stmt = delete(GraphNodeRow).where(
