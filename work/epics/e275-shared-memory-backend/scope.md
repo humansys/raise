@@ -19,7 +19,7 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 | ID | JIRA | Story | Size | Status | Description |
 |----|------|-------|:----:|:------:|-------------|
 | S275.1 | [RAISE-276](https://humansys.atlassian.net/browse/RAISE-276) | Extract rai-core package | S | Done ✓ | Created `rai-core` as uv workspace package. Moved graph domain (6 files), renamed 6 classes (dropped "Unified" prefix, RAISE-145). ~50 import updates. No backward compat shims — clean cut. Quality reviewed, dead aliases removed. TN-003 published. |
-| S275.2 | [RAISE-277](https://humansys.atlassian.net/browse/RAISE-277) | PostgreSQL schema + Alembic | S | Pending | 4 tables (orgs, api_keys, graph_nodes, graph_edges). Docker Compose with PG. Alembic initial migration. |
+| S275.2 | [RAISE-277](https://humansys.atlassian.net/browse/RAISE-277) | PostgreSQL schema + Alembic | S | Done ✓ | `rai-server` uv workspace package. 4 SA 2.0 models (Organization, ApiKey, GraphNodeRow, GraphEdgeRow). Alembic async migration. Docker Compose (PG 16 + server placeholder). 24 tests. Quality reviewed — server_default consistency fixed. 1.15x velocity. |
 | S275.3 | [RAISE-278](https://humansys.atlassian.net/browse/RAISE-278) | FastAPI server bootstrap | M | Pending | App skeleton, config (env vars), auth middleware (API key → OrgContext), health endpoint. Dockerfile.server. |
 | S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph CRUD endpoints | M | Pending | 6 endpoints: single + batch for nodes and edges, get node by id. SQLAlchemy async queries. |
 | S275.5 | [RAISE-280](https://humansys.atlassian.net/browse/RAISE-280) | Query + Subgraph endpoints | S | Pending | 2 endpoints: keyword query with scope/type filtering, BFS subgraph extraction. OpenAPI spec auto-generated. |
@@ -168,7 +168,7 @@ Parallel:                          S275.5 ────────────�
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S275.1 — Extract rai-core | S | Done ✓ | ~3h | 1.3x | Quality review + TN-003 |
-| S275.2 — PG schema + Docker | S | Pending | — | — | |
+| S275.2 — PG schema + Docker | S | Done ✓ | ~1.1h | 1.15x | QR caught server_default bugs |
 | S275.3 — FastAPI bootstrap | M | Pending | — | — | |
 | S275.4 — CRUD endpoints | M | Pending | — | — | |
 | S275.5 — Query + Subgraph | S | Pending | — | — | Parallel with S275.4 |
