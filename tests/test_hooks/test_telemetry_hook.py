@@ -251,7 +251,7 @@ class TestE2EIntegration:
         signals_file = tmp_path / ".raise" / "rai" / "personal" / "telemetry" / "signals.jsonl"
         lines = signals_file.read_text().strip().splitlines()
         assert len(lines) == 3
-        commands = [(json.loads(l)["command"], json.loads(l)["subcommand"]) for l in lines]
+        commands = [(json.loads(line)["command"], json.loads(line)["subcommand"]) for line in lines]
         assert commands == [("session", "start"), ("graph", "build"), ("pattern", "added")]
 
 

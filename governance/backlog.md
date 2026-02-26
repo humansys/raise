@@ -48,6 +48,7 @@
 | [RAISE-249](https://humansys.atlassian.net/browse/RAISE-249) | **Artifact Ontology & Contract Chain** | ✅ Complete | `work/epics/raise-249-artifact-ontology/scope.md` | — |
 | [RAISE-257](https://humansys.atlassian.net/browse/RAISE-257) | **Skill Excellence** | ✅ Complete | `work/epics/raise-257-skill-excellence/scope.md` | — |
 | [RAISE-275](https://humansys.atlassian.net/browse/RAISE-275) | **Shared Memory Backend** | 🚀 In Progress | `work/epics/e275-shared-memory-backend/scope.md` | P0 (Demo) |
+| [RAISE-292](https://humansys.atlassian.net/browse/RAISE-292) | **TDD Policy Reform** | 📋 Backlog | — | P2 |
 
 ### Release Roadmap (decided SES-234, 2026-02-21)
 
@@ -203,6 +204,7 @@ See `dev/parking-lot.md` for full idea backlog.
 | 2 | [RAISE-161](https://humansys.atlassian.net/browse/RAISE-161) | Windows compatibility verification | XS | P0 | ✅ Done |
 | 3 | [RAISE-160](https://humansys.atlassian.net/browse/RAISE-160) | Flutter/Dart discovery scanner | S | P2 (before Track 2) | ✅ Done |
 | 4 | [RAISE-145](https://humansys.atlassian.net/browse/RAISE-145) | "Unified" prefix rename | S | Post-F&F | 📋 Backlog |
+| 5 | [RAISE-291](https://humansys.atlassian.net/browse/RAISE-291) | Bandit security gate — integrate SAST into quality pipeline | XS | P2 | 📋 Backlog |
 
 **Completed:**
 - **HF-SES-MIGRATED**: SES-MIGRATED zombie blocks session close — migration clears stale session + CWD guard filters by project (v2.0.1)
