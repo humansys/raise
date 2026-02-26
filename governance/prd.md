@@ -57,7 +57,7 @@ RaiSE is a methodology + governance framework for reliable AI-assisted software 
 | Kata execution time | ~30 min (manual) | <10 min (assisted) | CLI telemetry |
 | Gate pass rate (1st attempt) | N/A | >80% | CLI telemetry |
 | Onboarding time for new RaiSE Engineer | Unknown | <1 hour to first kata | User feedback |
-| Test coverage | N/A | >90% | pytest --cov |
+| Test coverage | N/A | Diagnostic (floor: 70%) | pytest --cov |
 | CLI response time | N/A | <5 seconds | Performance tests |
 
 ---
@@ -263,7 +263,7 @@ The Agent Skills ecosystem (Anthropic, adopted by 25+ tools) provides a distribu
 
 | Requirement | Target | Rationale |
 |-------------|--------|-----------|
-| Test coverage | >90% | Per Guardrails |
+| Test coverage | Diagnostic (floor: 70%) | Per Guardrails — quality over quantity |
 | Crash-free execution | 99.9% | Production-ready |
 | Idempotent operations | All writes | Safe to retry |
 

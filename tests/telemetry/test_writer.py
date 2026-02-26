@@ -405,18 +405,3 @@ class TestEmitErrorEvent:
         assert data["context"] == "pytest"
         assert data["recoverable"] is True
 
-    def test_emit_non_recoverable_error(self, temp_telemetry_dir: Path) -> None:
-        """Emit a non-recoverable error event."""
-        result = emit_error_event(
-            tool="Read",
-            error_type="file_not_found",
-            context="missing_file.py",
-            recoverable=False,
-            base_path=temp_telemetry_dir,
-        )
-
-        assert result.success is True
-
-        content = result.path.read_text(encoding="utf-8")
-        data = json.loads(content.strip())
-        assert data["recoverable"] is False

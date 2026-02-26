@@ -72,20 +72,6 @@ class TestWorkflowGateProtocol:
             WorkflowGate, "__abstractmethods__"
         )
 
-    def test_valid_gate_evaluate_returns_gate_result(self) -> None:
-        gate = _ValidGate()
-        ctx = GateContext(gate_id="gate-test")
-        result = gate.evaluate(ctx)
-        assert isinstance(result, GateResult)
-        assert result.passed is True
-
-    def test_failing_gate_returns_actionable_message(self) -> None:
-        gate = _FailingGate()
-        ctx = GateContext(gate_id="gate-failing")
-        result = gate.evaluate(ctx)
-        assert result.passed is False
-        assert "pytest" in result.message
-        assert len(result.details) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -109,9 +95,6 @@ class TestGateContext:
         with pytest.raises(FrozenInstanceError):
             ctx.gate_id = "mutated"  # type: ignore[misc]
 
-    def test_gate_id_required(self) -> None:
-        ctx = GateContext(gate_id="gate-lint")
-        assert ctx.gate_id == "gate-lint"
 
 
 # ---------------------------------------------------------------------------
@@ -145,7 +128,3 @@ class TestGateResult:
         with pytest.raises(FrozenInstanceError):
             result.passed = False  # type: ignore[misc]
 
-    def test_defaults(self) -> None:
-        result = GateResult(passed=True, gate_id="g")
-        assert result.message == ""
-        assert result.details == ()

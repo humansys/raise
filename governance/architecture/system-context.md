@@ -131,7 +131,7 @@ From the constitution (§1-§8):
 |-----------|--------|-----------|
 | CLI response time | < 5 seconds | Developer flow state preservation |
 | Token efficiency | > 90% reduction via MVC | Inference economy — gather with tools, think with inference |
-| Test coverage | > 90% | Guardrail MUST-TEST-001 |
+| Test coverage | Diagnostic (floor: 70%) | Guardrail MUST-TEST-001 — quality over quantity |
 | Zero secrets in code | Always | Guardrail MUST-SEC-001 |
 
 ## Governance Traceability

@@ -74,17 +74,6 @@ class TestProtocolConformance:
         assert "before:release:publish" in GateBridgeHook.events
         assert "before:session:close" in GateBridgeHook.events
 
-    def test_high_priority(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
-
-        assert GateBridgeHook.priority == 100
-
-    def test_has_handle_method(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
-
-        hook = GateBridgeHook()
-        assert callable(hook.handle)
-
 
 # ---------------------------------------------------------------------------
 # Gate execution

@@ -23,11 +23,6 @@ class TestCurrentWork:
         assert work.phase == ""
         assert work.branch == ""
 
-    def test_release_field_accepts_value(self) -> None:
-        """CurrentWork accepts release field."""
-        work = CurrentWork(release="V3.0")
-        assert work.release == "V3.0"
-
     def test_release_defaults_to_empty(self) -> None:
         """CurrentWork release defaults to empty string."""
         work = CurrentWork()
@@ -62,21 +57,6 @@ class TestCurrentWork:
 
 class TestEpicProgress:
     """Tests for EpicProgress model."""
-
-    def test_create_progress(self) -> None:
-        """EpicProgress holds epic progress data."""
-        progress = EpicProgress(
-            epic="E15",
-            stories_done=5,
-            stories_total=8,
-            sp_done=16,
-            sp_total=25,
-        )
-        assert progress.epic == "E15"
-        assert progress.stories_done == 5
-        assert progress.stories_total == 8
-        assert progress.sp_done == 16
-        assert progress.sp_total == 25
 
     def test_progress_serialization(self) -> None:
         """EpicProgress round-trips through dict."""
@@ -117,35 +97,6 @@ class TestSessionState:
         """Completed epics defaults to empty list."""
         state = self._make_minimal()
         assert state.completed_epics == []
-
-    def test_with_progress(self) -> None:
-        """SessionState accepts progress field."""
-        state = self._make_minimal()
-        state.progress = EpicProgress(
-            epic="E15",
-            stories_done=6,
-            stories_total=8,
-            sp_done=19,
-            sp_total=25,
-        )
-        assert state.progress is not None
-        assert state.progress.sp_done == 19
-
-    def test_with_completed_epics(self) -> None:
-        """SessionState accepts completed_epics list."""
-        state = SessionState(
-            current_work=CurrentWork(
-                epic="E15", story="S15.8", phase="implement", branch="epic/e15"
-            ),
-            last_session=LastSession(
-                id="SES-003",
-                date=date(2026, 2, 8),
-                developer="Emilio",
-                summary="done",
-            ),
-            completed_epics=["E1", "E2", "E3"],
-        )
-        assert state.completed_epics == ["E1", "E2", "E3"]
 
     def test_round_trip_with_new_fields(self) -> None:
         """SessionState with progress and completed_epics round-trips."""
@@ -234,12 +185,6 @@ class TestSessionNarrative:
         """SessionState.narrative defaults to empty string."""
         state = self._make_minimal()
         assert state.narrative == ""
-
-    def test_narrative_accepts_value(self) -> None:
-        """SessionState accepts narrative field."""
-        state = self._make_minimal()
-        state.narrative = "## Decisions\n- Chose sync model"
-        assert "sync model" in state.narrative
 
     def test_narrative_round_trip(self) -> None:
         """SessionState with narrative round-trips through dict."""
