@@ -30,7 +30,7 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 | S275.3 | [RAISE-278](https://humansys.atlassian.net/browse/RAISE-278) | FastAPI server bootstrap | M | Done ✓ | App factory, pydantic-settings config, API key auth (OrgContext), health endpoint, Dockerfile, Docker Compose. Epic design revised: domain-level API + subgraph-on-demand (4 research studies, 47 sources). QR: 6 findings fixed. 18 tests. 1.5x velocity. |
 | S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph sync + query endpoints | M | Done ✓ | Three-layer architecture (routes → services → db/queries). `POST /graph/sync` (idempotent upsert + edge replace + orphan prune). `GET /graph/query` (GIN full-text via to_tsvector). QR: 6 findings fixed (edges_skipped, nodes_upserted, validation). 40 tests. 1.1x velocity. |
 | S275.5 | [RAISE-280](https://humansys.atlassian.net/browse/RAISE-280) | Agent telemetry + memory endpoints | S | Done ✓ | Redefined 2x after Rovo research. POST/GET agent/events + POST/GET memory/patterns. Alembic 002 migration. QR: 4 fixes (count rename, limit param, max_length, payload size). 137 tests. 2.7x impl velocity. |
-| S275.6 | [RAISE-281](https://humansys.atlassian.net/browse/RAISE-281) | ApiGraphBackend + DualWrite | M | Pending | `ApiGraphBackend` (httpx client), `DualWriteBackend` (local + remote). `get_active_backend()` selection via env vars. |
+| S275.6 | [RAISE-281](https://humansys.atlassian.net/browse/RAISE-281) | ApiGraphBackend + DualWrite | M | Done ✓ | `ApiGraphBackend` (httpx sync in rai-cli), `DualWriteBackend` (local + remote best-effort). CLI factory via RAI_SERVER_URL + RAI_API_KEY. QR: 5 fixes. 27 tests. 1.2x velocity. |
 | S275.7 | [RAISE-282](https://humansys.atlassian.net/browse/RAISE-282) | Dogfood + offline fallback | S | Pending | Test with raise-commons real graph. pending_sync marker for offline writes. Sync-on-reconnect. |
 
 **Total:** 7 stories (2S + 3M + 2S = estimated M appetite)
@@ -172,7 +172,7 @@ S275.7 (dogfood + offline)
 | S275.3 — FastAPI bootstrap | M | Done ✓ | ~1h impl, ~3h total | 1.5x | Epic design revised + 4 research studies. QR: 6 fixes. |
 | S275.4 — Graph sync + query | M | Done ✓ | ~90 min | 1.1x | QR: 6 fixes. 40 tests. Skill improvement (PAT-E-523). |
 | S275.5 — Agent telemetry + memory | S | Done ✓ | ~30 min impl, ~2h total | 2.7x impl | QR: 4 fixes. 2 pivots (Rovo research). 2 patterns (PAT-E-530, 531). |
-| S275.6 — ApiGraphBackend | M | Pending | — | — | |
+| S275.6 — ApiGraphBackend | M | Done ✓ | ~50 min | 1.2x | QR: 5 fixes. 27 tests. Design revised (deps in rai-cli). |
 | S275.7 — Dogfood + offline | S | Pending | — | — | |
 
 ### Sequencing Risks
