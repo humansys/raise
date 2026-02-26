@@ -1,10 +1,11 @@
 # GitLab CI/CD for raise-commons
 # Source of truth pipeline — security scanning + quality gates
-# Trigger: MR targeting dev only. Direct commits to dev do not run the pipeline.
+# Trigger: MR targeting dev, or direct commits to dev.
 
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+    # - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+    - if: $CI_COMMIT_BRANCH == "dev"
 
 stages:
   - test
