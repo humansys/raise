@@ -60,8 +60,10 @@ Create a lean story specification optimized for both human review (clear intent)
 
 **UX gate:** If story touches human interaction (workflows, prompts, DX), recommend `/rai-research` first (~10 min, PAT-E-263).
 
+**Integration gate (PAT-E-539):** If story name includes "dogfood", "E2E", or "integration", OR if epic has separate client/server stories developed with mocks — AC MUST include at least one scenario that runs with **real infrastructure** (docker compose, actual DB, real HTTP calls). Unit tests with mocks cannot catch cross-component contract mismatches (auth headers, payload validation, parameter limits).
+
 <verification>
-Complexity assessed. Risk/UX gates evaluated.
+Complexity assessed. Risk/UX/Integration gates evaluated.
 </verification>
 
 ### Step 2: Frame What & Why
@@ -137,7 +139,7 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 - [ ] What & Why clear in <2 minutes
 - [ ] Examples are concrete and runnable (100% coverage)
 - [ ] Acceptance criteria specific and testable (3-5 MUST items)
-- [ ] Risk/UX gates evaluated before designing
+- [ ] Risk/UX/Integration gates evaluated before designing (PAT-E-539)
 - [ ] Data mutation stories declare missing-entity strategy (PAT-E-523)
 - [ ] Spec creation <30 minutes, review <5 minutes
 - [ ] NEVER over-specify HOW — trust AI for implementation details
