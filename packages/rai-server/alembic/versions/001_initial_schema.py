@@ -57,7 +57,7 @@ def upgrade() -> None:
         ),
         sa.Column("key_hash", sa.String(128), nullable=False),
         sa.Column("prefix", sa.String(12), nullable=False),
-        sa.Column("is_active", sa.Boolean, default=True, nullable=False),
+        sa.Column("is_active", sa.Boolean, server_default=sa.true(), nullable=False),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -142,7 +142,7 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column("edge_type", sa.String(50), nullable=False, index=True),
-        sa.Column("weight", sa.Float, default=1.0, nullable=False),
+        sa.Column("weight", sa.Float, server_default="1.0", nullable=False),
         sa.Column("properties", postgresql.JSONB, nullable=False, server_default="{}"),
         sa.Column(
             "created_at",
