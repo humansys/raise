@@ -190,6 +190,22 @@ class TestApiGraphBackendHealth:
 
         assert health.status == "unavailable"
 
+    def test_health_returns_unavailable_on_read_error(self) -> None:
+        from rai_cli.graph.backends.api import ApiGraphBackend
+
+        backend = ApiGraphBackend(
+            server_url="http://localhost:8000",
+            api_key="rsk_test_abc",
+            project_id="test-project",
+        )
+
+        with patch.object(
+            backend._client, "get", side_effect=httpx.ReadError("connection reset")
+        ):
+            health = backend.health()
+
+        assert health.status == "unavailable"
+
 
 class TestApiGraphBackendLoad:
     """load() raises NotImplementedError."""
