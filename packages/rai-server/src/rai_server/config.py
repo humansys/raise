@@ -12,7 +12,6 @@ class ServerConfig(BaseSettings):
     """RaiSE server configuration. All fields map to RAI_* env vars."""
 
     database_url: str
-    api_key_hash_algorithm: str = "sha256"
     log_level: str = "INFO"
     host: str = "0.0.0.0"
     port: int = 8000

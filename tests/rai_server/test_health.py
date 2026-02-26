@@ -7,14 +7,15 @@ from unittest.mock import AsyncMock, patch
 import pytest
 from fastapi.testclient import TestClient
 
+from rai_server.app import create_app
+from rai_server.config import ServerConfig
+
 
 @pytest.fixture()
-def client(monkeypatch: pytest.MonkeyPatch) -> TestClient:
-    """Create test client with minimal config."""
-    monkeypatch.setenv("RAI_DATABASE_URL", "postgresql+asyncpg://u:p@h/db")
-    from rai_server.app import create_app
-
-    app = create_app()
+def client() -> TestClient:
+    """Create test client with explicit config (no env vars needed)."""
+    config = ServerConfig(database_url="postgresql+asyncpg://u:p@h/db")
+    app = create_app(config=config)
     return TestClient(app)
 
 
@@ -52,13 +53,3 @@ class TestHealthEndpoint:
         body = resp.json()
         assert resp.status_code == 200
         assert body["database"] == "disconnected"
-
-    def test_health_no_auth_required(self, client: TestClient) -> None:
-        """Health is public — no Authorization header needed."""
-        with patch(
-            "rai_server.api.v1.health._check_db",
-            new_callable=AsyncMock,
-            return_value=True,
-        ):
-            resp = client.get("/health")
-        assert resp.status_code == 200
