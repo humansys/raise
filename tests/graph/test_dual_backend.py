@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from unittest.mock import MagicMock
 
 import pytest
@@ -190,13 +191,11 @@ class TestDualWriteBackendHealth:
 class TestDualWriteBackendPendingSync:
     """Pending sync marker integration with DualWriteBackend."""
 
-    def test_remote_failure_creates_marker(self, tmp_path: object) -> None:
-        from pathlib import Path
-
+    def test_remote_failure_creates_marker(self, tmp_path: Path) -> None:
         from rai_cli.graph.backends.dual import DualWriteBackend
         from rai_cli.graph.backends.pending import read_pending_marker
 
-        raise_dir = Path(str(tmp_path)) / ".raise"
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         local = _make_mock_backend()
         remote = _make_mock_backend(persist_error=ConnectionError("refused"))
@@ -210,9 +209,7 @@ class TestDualWriteBackendPendingSync:
         assert marker.node_count == 1
         assert marker.edge_count == 0
 
-    def test_remote_success_clears_existing_marker(self, tmp_path: object) -> None:
-        from pathlib import Path
-
+    def test_remote_success_clears_existing_marker(self, tmp_path: Path) -> None:
         from rai_cli.graph.backends.dual import DualWriteBackend
         from rai_cli.graph.backends.pending import (
             PendingSyncMarker,
@@ -220,7 +217,7 @@ class TestDualWriteBackendPendingSync:
             write_pending_marker,
         )
 
-        raise_dir = Path(str(tmp_path)) / ".raise"
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         # Pre-existing marker from previous failure
         from datetime import datetime, timezone
@@ -243,13 +240,11 @@ class TestDualWriteBackendPendingSync:
 
         assert read_pending_marker(raise_dir) is None
 
-    def test_remote_success_no_marker_is_noop(self, tmp_path: object) -> None:
-        from pathlib import Path
-
+    def test_remote_success_no_marker_is_noop(self, tmp_path: Path) -> None:
         from rai_cli.graph.backends.dual import DualWriteBackend
         from rai_cli.graph.backends.pending import read_pending_marker
 
-        raise_dir = Path(str(tmp_path)) / ".raise"
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         local = _make_mock_backend()
         remote = _make_mock_backend()

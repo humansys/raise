@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 
 from rai_cli.graph.backends.pending import (
     PendingSyncMarker,
@@ -45,10 +46,8 @@ class TestPendingSyncMarker:
 class TestWritePendingMarker:
     """write_pending_marker creates file."""
 
-    def test_creates_marker_file(self, tmp_path: object) -> None:
-        from pathlib import Path
-
-        raise_dir = Path(str(tmp_path)) / ".raise"
+    def test_creates_marker_file(self, tmp_path: Path) -> None:
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         marker = PendingSyncMarker(
             timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
@@ -64,10 +63,8 @@ class TestWritePendingMarker:
         assert data["node_count"] == 42
         assert data["error"] == "Connection refused"
 
-    def test_overwrites_existing_marker(self, tmp_path: object) -> None:
-        from pathlib import Path
-
-        raise_dir = Path(str(tmp_path)) / ".raise"
+    def test_overwrites_existing_marker(self, tmp_path: Path) -> None:
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         old = PendingSyncMarker(
             timestamp=datetime(2026, 2, 26, 14, 0, tzinfo=timezone.utc),
@@ -93,17 +90,13 @@ class TestWritePendingMarker:
 class TestReadPendingMarker:
     """read_pending_marker returns model or None."""
 
-    def test_returns_none_when_missing(self, tmp_path: object) -> None:
-        from pathlib import Path
-
-        raise_dir = Path(str(tmp_path)) / ".raise"
+    def test_returns_none_when_missing(self, tmp_path: Path) -> None:
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         assert read_pending_marker(raise_dir) is None
 
-    def test_returns_marker_when_present(self, tmp_path: object) -> None:
-        from pathlib import Path
-
-        raise_dir = Path(str(tmp_path)) / ".raise"
+    def test_returns_marker_when_present(self, tmp_path: Path) -> None:
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         marker = PendingSyncMarker(
             timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
@@ -117,10 +110,8 @@ class TestReadPendingMarker:
         assert result is not None
         assert result.node_count == 5
 
-    def test_returns_none_on_corrupt_json(self, tmp_path: object) -> None:
-        from pathlib import Path
-
-        raise_dir = Path(str(tmp_path)) / ".raise"
+    def test_returns_none_on_corrupt_json(self, tmp_path: Path) -> None:
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         (raise_dir / "pending_sync.json").write_text("not json")
         assert read_pending_marker(raise_dir) is None
@@ -129,10 +120,8 @@ class TestReadPendingMarker:
 class TestClearPendingMarker:
     """clear_pending_marker deletes file."""
 
-    def test_returns_true_when_file_exists(self, tmp_path: object) -> None:
-        from pathlib import Path
-
-        raise_dir = Path(str(tmp_path)) / ".raise"
+    def test_returns_true_when_file_exists(self, tmp_path: Path) -> None:
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         marker = PendingSyncMarker(
             timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
@@ -145,9 +134,7 @@ class TestClearPendingMarker:
         assert clear_pending_marker(raise_dir) is True
         assert not (raise_dir / "pending_sync.json").exists()
 
-    def test_returns_false_when_no_file(self, tmp_path: object) -> None:
-        from pathlib import Path
-
-        raise_dir = Path(str(tmp_path)) / ".raise"
+    def test_returns_false_when_no_file(self, tmp_path: Path) -> None:
+        raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         assert clear_pending_marker(raise_dir) is False
