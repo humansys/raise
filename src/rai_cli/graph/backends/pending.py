@@ -62,7 +62,7 @@ def read_pending_marker(raise_dir: Path) -> PendingSyncMarker | None:
     try:
         data = json.loads(path.read_text())
         return PendingSyncMarker.model_validate(data)
-    except (json.JSONDecodeError, Exception):
+    except (json.JSONDecodeError, ValueError):
         logger.warning("Corrupt pending_sync marker at %s, ignoring", path)
         return None
 

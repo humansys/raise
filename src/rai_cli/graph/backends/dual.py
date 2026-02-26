@@ -86,7 +86,7 @@ class DualWriteBackend:
 
         marker = PendingSyncMarker(
             timestamp=datetime.now(tz=UTC),
-            graph_path=str(getattr(self.local, "_path", "unknown")),
+            graph_path=str(getattr(self.local, "path", "unknown")),
             node_count=graph.node_count,
             edge_count=graph.edge_count,
             error=error,
