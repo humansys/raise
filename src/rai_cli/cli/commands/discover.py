@@ -354,7 +354,7 @@ def build_command(
     graph = builder.build()
 
     # Save graph via backend
-    from rai_core.graph.backends.filesystem import get_active_backend
+    from rai_cli.graph.backends import get_active_backend
 
     graph_path = root / ".raise" / "graph" / "unified.json"
     get_active_backend(graph_path).persist(graph)
