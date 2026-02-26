@@ -22,7 +22,7 @@ Pro tier, and provides the API contract Fernando needs for RAISE-274.
 | S275.2 | [RAISE-277](https://humansys.atlassian.net/browse/RAISE-277) | PostgreSQL schema + Alembic | S | Done ✓ | `rai-server` uv workspace package. 4 SA 2.0 models (Organization, ApiKey, GraphNodeRow, GraphEdgeRow). Alembic async migration. Docker Compose (PG 16 + server placeholder). 24 tests. Quality reviewed — server_default consistency fixed. 1.15x velocity. |
 | S275.3 | [RAISE-278](https://humansys.atlassian.net/browse/RAISE-278) | FastAPI server bootstrap | M | Done ✓ | App factory, pydantic-settings config, API key auth (OrgContext), health endpoint, Dockerfile, Docker Compose. Epic design revised: domain-level API + subgraph-on-demand (4 research studies, 47 sources). QR: 6 findings fixed. 18 tests. 1.5x velocity. |
 | S275.4 | [RAISE-279](https://humansys.atlassian.net/browse/RAISE-279) | Graph sync + query endpoints | M | Done ✓ | Three-layer architecture (routes → services → db/queries). `POST /graph/sync` (idempotent upsert + edge replace + orphan prune). `GET /graph/query` (GIN full-text via to_tsvector). QR: 6 findings fixed (edges_skipped, nodes_upserted, validation). 40 tests. 1.1x velocity. |
-| S275.5 | [RAISE-280](https://humansys.atlassian.net/browse/RAISE-280) | Trace, impact + dev constraints | S | Pending | Domain-level endpoints: `GET /graph/trace`, `GET /graph/impact`, `GET /dev/constraints`. High-value operations for Rovo agents and Forge. |
+| S275.5 | [RAISE-280](https://humansys.atlassian.net/browse/RAISE-280) | Skills & Templates sync + serve | S | In Progress | Redefined after Rovo research: serve skills (prompts) and templates via API for Forge tools. Sync from CLI, serve to Rovo agents. Original trace/impact/constraints → parking lot. |
 | S275.6 | [RAISE-281](https://humansys.atlassian.net/browse/RAISE-281) | ApiGraphBackend + DualWrite | M | Pending | `ApiGraphBackend` (httpx client), `DualWriteBackend` (local + remote). `get_active_backend()` selection via env vars. |
 | S275.7 | [RAISE-282](https://humansys.atlassian.net/browse/RAISE-282) | Dogfood + offline fallback | S | Pending | Test with raise-commons real graph. pending_sync marker for offline writes. Sync-on-reconnect. |
 
@@ -191,3 +191,5 @@ Main:   S275.1 → S275.2 → S275.3 → S275.4 → S275.5 → S275.6 → S275.7
 - Graph algorithms (PPR, spreading activation) → phase 2 after backend stable
 - pgAdmin in Docker Compose → nice-to-have, add if debugging needed
 - Graph sync rollback / snapshot versioning → store pre-sync snapshot, allow restore. Natural mitigation: graph is regenerable from code via `rai graph build`
+- Trace/impact endpoints (GET /graph/trace, GET /graph/impact) → deferred after Rovo research; not needed for POC
+- Dev constraints endpoint (GET /dev/constraints) → deferred; Rovo uses skills/templates pattern instead
