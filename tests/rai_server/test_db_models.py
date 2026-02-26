@@ -7,10 +7,12 @@ types, foreign keys, indexes, and constraints.
 from __future__ import annotations
 
 from rai_server.db.models import (
+    AgentEventRow,
     ApiKey,
     Base,
     GraphEdgeRow,
     GraphNodeRow,
+    MemoryPatternRow,
     Organization,
 )
 from sqlalchemy import inspect
@@ -24,7 +26,14 @@ class TestTableRegistration:
 
     def test_all_tables_registered(self) -> None:
         tables = set(Base.metadata.tables.keys())
-        assert tables == {"organizations", "api_keys", "graph_nodes", "graph_edges"}
+        assert tables == {
+            "organizations",
+            "api_keys",
+            "graph_nodes",
+            "graph_edges",
+            "agent_events",
+            "memory_patterns",
+        }
 
 
 # --- Organization ---
@@ -194,3 +203,83 @@ class TestGraphEdgeRowModel:
         mapper = inspect(GraphEdgeRow)
         col = mapper.columns["edge_type"]
         assert col.index
+
+
+# --- AgentEventRow ---
+
+
+class TestAgentEventRowModel:
+    def test_tablename(self) -> None:
+        assert AgentEventRow.__tablename__ == "agent_events"
+
+    def test_columns_exist(self) -> None:
+        mapper = inspect(AgentEventRow)
+        cols = {c.key for c in mapper.columns}
+        assert cols == {"id", "org_id", "event_type", "payload", "created_at"}
+
+    def test_id_is_uuid_primary_key(self) -> None:
+        mapper = inspect(AgentEventRow)
+        col = mapper.columns["id"]
+        assert isinstance(col.type, UUID)
+        assert col.primary_key
+
+    def test_org_id_foreign_key(self) -> None:
+        mapper = inspect(AgentEventRow)
+        col = mapper.columns["org_id"]
+        fk_targets = {fk.target_fullname for fk in col.foreign_keys}
+        assert "organizations.id" in fk_targets
+
+    def test_org_id_indexed(self) -> None:
+        mapper = inspect(AgentEventRow)
+        col = mapper.columns["org_id"]
+        assert col.index
+
+    def test_event_type_indexed(self) -> None:
+        mapper = inspect(AgentEventRow)
+        col = mapper.columns["event_type"]
+        assert col.index
+
+    def test_payload_is_jsonb(self) -> None:
+        mapper = inspect(AgentEventRow)
+        col = mapper.columns["payload"]
+        assert isinstance(col.type, JSONB)
+
+
+# --- MemoryPatternRow ---
+
+
+class TestMemoryPatternRowModel:
+    def test_tablename(self) -> None:
+        assert MemoryPatternRow.__tablename__ == "memory_patterns"
+
+    def test_columns_exist(self) -> None:
+        mapper = inspect(MemoryPatternRow)
+        cols = {c.key for c in mapper.columns}
+        assert cols == {"id", "org_id", "content", "context", "properties", "created_at"}
+
+    def test_id_is_uuid_primary_key(self) -> None:
+        mapper = inspect(MemoryPatternRow)
+        col = mapper.columns["id"]
+        assert isinstance(col.type, UUID)
+        assert col.primary_key
+
+    def test_org_id_foreign_key(self) -> None:
+        mapper = inspect(MemoryPatternRow)
+        col = mapper.columns["org_id"]
+        fk_targets = {fk.target_fullname for fk in col.foreign_keys}
+        assert "organizations.id" in fk_targets
+
+    def test_org_id_indexed(self) -> None:
+        mapper = inspect(MemoryPatternRow)
+        col = mapper.columns["org_id"]
+        assert col.index
+
+    def test_context_is_jsonb(self) -> None:
+        mapper = inspect(MemoryPatternRow)
+        col = mapper.columns["context"]
+        assert isinstance(col.type, JSONB)
+
+    def test_properties_is_jsonb(self) -> None:
+        mapper = inspect(MemoryPatternRow)
+        col = mapper.columns["properties"]
+        assert isinstance(col.type, JSONB)
