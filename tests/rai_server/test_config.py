@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from rai_server.config import ServerConfig
+from pydantic import ValidationError
 
+from rai_server.config import ServerConfig
 
 _DB_URL = "postgresql+asyncpg://u:p@h/db"
 
@@ -59,5 +60,5 @@ class TestServerConfigValidation:
     def test_missing_database_url_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.delenv("RAI_DATABASE_URL", raising=False)
         monkeypatch.delenv("DATABASE_URL", raising=False)
-        with pytest.raises(Exception):  # ValidationError
+        with pytest.raises(ValidationError):
             ServerConfig()  # type: ignore[call-arg]

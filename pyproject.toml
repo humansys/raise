@@ -107,6 +107,7 @@ include = [
 line-length = 88
 target-version = "py312"
 src = ["src", "packages/rai-core/src"]
+exclude = ["dev/experiments"]
 
 [tool.ruff.lint]
 select = [

@@ -6,7 +6,6 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-
 from rai_server.app import create_app
 from rai_server.config import ServerConfig
 
