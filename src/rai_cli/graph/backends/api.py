@@ -51,17 +51,22 @@ class ApiGraphBackend:
         Args:
             graph: The graph to persist.
         """
-        nodes: list[dict[str, Any]] = [
-            {
+        skipped = 0
+        nodes: list[dict[str, Any]] = []
+        for node in graph.iter_concepts():
+            if not node.content:
+                skipped += 1
+                continue
+            nodes.append({
                 "node_id": node.id,
                 "node_type": node.type,
                 "scope": "project",
                 "content": node.content,
                 "source_file": node.source_file,
                 "properties": node.metadata,
-            }
-            for node in graph.iter_concepts()
-        ]
+            })
+        if skipped:
+            logger.info("Skipped %d nodes with empty content", skipped)
         edges: list[dict[str, Any]] = [
             {
                 "source_node_id": edge.source,
