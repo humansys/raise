@@ -190,3 +190,4 @@ Main:   S275.1 → S275.2 → S275.3 → S275.4 → S275.5 → S275.6 → S275.7
 - Pattern promotion workflow (PERSONAL → PROJECT → ORG) → separate story post-epic
 - Graph algorithms (PPR, spreading activation) → phase 2 after backend stable
 - pgAdmin in Docker Compose → nice-to-have, add if debugging needed
+- Graph sync rollback / snapshot versioning → store pre-sync snapshot, allow restore. Natural mitigation: graph is regenerable from code via `rai graph build`

@@ -83,6 +83,8 @@ Document WHAT you're building and WHY this approach (not detailed HOW):
 
 **For refactoring:** grep all call sites of the target. A half-migration is worse than none.
 
+**For data mutations:** What happens when inputs reference missing entities? Declare the strategy explicitly: reject with error, skip + report count, partial success with warnings. Silent drops are semantic bugs (PAT-E-523).
+
 For complex stories, add: scenarios (Gherkin), algorithm pseudocode, constraints, testing strategy.
 
 <verification>
@@ -136,6 +138,7 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 - [ ] Examples are concrete and runnable (100% coverage)
 - [ ] Acceptance criteria specific and testable (3-5 MUST items)
 - [ ] Risk/UX gates evaluated before designing
+- [ ] Data mutation stories declare missing-entity strategy (PAT-E-523)
 - [ ] Spec creation <30 minutes, review <5 minutes
 - [ ] NEVER over-specify HOW — trust AI for implementation details
 - [ ] NEVER skip examples — they are the most important section
