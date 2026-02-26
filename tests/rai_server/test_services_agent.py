@@ -74,7 +74,7 @@ class TestGetEvents:
         ):
             result = await get_events(factory, org_id, limit=10)
 
-        assert result.total == 1
+        assert result.count == 1
         assert result.events[0].event_type == "ping"
 
     @pytest.mark.anyio()
@@ -90,5 +90,5 @@ class TestGetEvents:
         ):
             result = await get_events(factory, org_id)
 
-        assert result.total == 0
+        assert result.count == 0
         assert result.events == []

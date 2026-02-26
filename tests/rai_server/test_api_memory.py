@@ -68,7 +68,7 @@ class TestCreatePatternEndpoint:
 
 class TestListPatternsEndpoint:
     def test_returns_200_with_patterns(self, client: TestClient) -> None:
-        mock_response = MemoryPatternListResponse(patterns=[], total=0)
+        mock_response = MemoryPatternListResponse(patterns=[], count=0)
         with (
             _override_auth(client),
             patch("rai_server.api.v1.memory.get_patterns", new_callable=AsyncMock, return_value=mock_response),
@@ -76,7 +76,7 @@ class TestListPatternsEndpoint:
             resp = client.get("/api/v1/memory/patterns")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["total"] == 0
+        assert data["count"] == 0
         assert data["patterns"] == []
 
     def test_requires_auth(self, client: TestClient) -> None:

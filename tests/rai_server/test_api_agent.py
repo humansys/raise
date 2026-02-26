@@ -68,7 +68,7 @@ class TestCreateEventEndpoint:
 
 class TestListEventsEndpoint:
     def test_returns_200_with_events(self, client: TestClient) -> None:
-        mock_response = AgentEventListResponse(events=[], total=0)
+        mock_response = AgentEventListResponse(events=[], count=0)
         with (
             _override_auth(client),
             patch("rai_server.api.v1.agent.get_events", new_callable=AsyncMock, return_value=mock_response),
@@ -76,7 +76,7 @@ class TestListEventsEndpoint:
             resp = client.get("/api/v1/agent/events")
         assert resp.status_code == 200
         data = resp.json()
-        assert data["total"] == 0
+        assert data["count"] == 0
         assert data["events"] == []
 
     def test_requires_auth(self, client: TestClient) -> None:
