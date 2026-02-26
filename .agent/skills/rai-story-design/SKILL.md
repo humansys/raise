@@ -223,6 +223,8 @@ Describe WHAT you're building and WHY this approach, not detailed HOW.
 
 **For refactoring stories:** grep for ALL call sites of the function/method being abstracted or replaced. Count them, list them. A half-migration (abstracting 1 of N call sites) is worse than none.
 
+**For data mutation stories:** What happens when inputs reference missing entities? Declare the strategy explicitly: reject with error, skip + report count, partial success with warnings. Silent drops are semantic bugs (PAT-E-523).
+
 **Focus on WHAT, not HOW** — trust AI to determine implementation details.
 
 > **If you can't continue:** Too many unknowns → Spike needed; create research task
@@ -292,6 +294,7 @@ Self-review checklist:
 - [ ] **Examples are concrete and runnable**
 - [ ] Acceptance criteria specific and testable
 - [ ] Optional sections justified by complexity
+- [ ] Data mutation stories declare missing-entity strategy (PAT-E-523)
 - [ ] Spec reviewable in <5 minutes
 - [ ] Spec creation took <30 minutes
 
@@ -331,6 +334,7 @@ rai signal emit-work story {story_id} --event complete --phase design
 4. **Filling optional sections "just because"** — Match to complexity
 5. **Skipping spec for complex features** — Trust the complexity assessment
 6. **Skipping risk discussion for HIGH RISK features** — The doubt clarifies scope
+7. **Silent data drops in mutation stories** — Always declare what happens when inputs reference missing entities (PAT-E-523)
 
 ## Known Limitations
 
