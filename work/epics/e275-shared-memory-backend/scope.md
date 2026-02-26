@@ -108,6 +108,7 @@ S275.7 (dogfood + offline)
 | Auth | API key per org (`rsk_` prefix), hash in DB |
 | DB | PostgreSQL 16 + 2 tables (nodes/edges) + JSONB + GIN indexes |
 | API | Domain-level REST endpoints (sync, query, trace, impact, constraints). Internal CRUD service layer. FastAPI, SQLAlchemy 2.0 async. Aligned with RAISE-273 DA-9. |
+| Server architecture | Subgraph-on-demand (Option B) — PG loads subgraphs → rai-core domain logic. Research-grounded (4 studies, 47 sources). |
 | CLI integration | `DualWriteBackend` via `KnowledgeGraphBackend` protocol |
 | Dev env | Docker Compose (PG + server) |
 | Portability | 12-factor (env vars), Docker image, no cloud-specific services |

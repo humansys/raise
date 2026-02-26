@@ -71,15 +71,88 @@ DDD grounding: rai-core maps to the **Ontology bounded context** from `governanc
 — "the ontological backbone of RaiSE" — plus shared domain models for workflow and governance
 that multiple components (CLI, server, Forge, future UIs) need to agree on.
 
+## Server Architecture: Subgraph-on-Demand (Option B)
+
+**Decision:** The server loads subgraphs from PostgreSQL into rai-core `Graph` objects
+and executes domain logic (traversal, scoring, impact) using rai-core's engine.
+rai-core is both the shared vocabulary AND the execution engine.
+
+**Rationale:** One implementation of domain logic, zero semantic duplication. At our
+scale (hundreds to low-thousands of nodes per org/repo), loading subgraphs per request
+is milliseconds. Trace/impact naturally work on subgraphs (BFS from a root node with
+bounded depth). Full-text query is the exception — uses PG GIN indexes directly.
+
+**Grounded in research (2026-02-25):**
+- RES-API-ONTOLOGY-001: Agentic tool design (12 sources) — intent-based ops, not CRUD
+- RES-API-ONTOLOGY-002: MCP server patterns (12 sources) — shared service layer for REST+MCP
+- RES-API-ONTOLOGY-003: Rovo actions (11 sources) — <5 actions/agent, flat params, stateless
+- RES-API-ONTOLOGY-004: GitLab Duo (12 sources) — MCP native (GA), HTTP transport
+
+**Execution model per endpoint:**
+
+| Endpoint | PG Role | rai-core Role |
+|----------|---------|---------------|
+| `POST /graph/sync` | Persist (upsert rows) | Validate/transform input → domain models |
+| `GET /graph/query` | GIN index full-text search | Wrap results as GraphNode objects |
+| `GET /graph/trace` | Load subgraph (BFS SQL) | `Graph` traversal, chain building |
+| `GET /graph/impact` | Load subgraph (BFS SQL) | `Graph` traversal + risk heuristics |
+| `GET /dev/constraints` | Load related nodes by module | Filter/format using domain types |
+
+**Three-layer architecture:**
+
+```
+┌─────────────────────────────────────────┐
+│         Transport Layer                  │
+│  REST (FastAPI routes)                  │
+│  MCP Server (future — same services)    │
+├─────────────────────────────────────────┤
+│         Service Layer (rai_server)       │
+│  services/graph.py   — sync, query      │
+│  services/trace.py   — lineage          │
+│  services/impact.py  — impact analysis  │
+│  services/constraints.py — dev guidance │
+│                                         │
+│  Orchestrates: PG queries → rai-core    │
+│  domain objects → domain logic → response│
+├─────────────────────────────────────────┤
+│         Domain Layer (rai-core)          │
+│  Graph, GraphNode, GraphEdge            │
+│  QueryEngine, scoring, traversal        │
+│  NodeType, EdgeType, enums              │
+│  KnowledgeGraphBackend protocol         │
+└─────────────────────────────────────────┘
+```
+
+**Server package structure:**
+
+```
+packages/rai-server/src/rai_server/
+├── db/              # persistence (S275.2 — done)
+│   ├── models.py    # SQLAlchemy rows
+│   ├── session.py   # async engine + session factory
+│   └── queries.py   # specialized SQL (GIN search, BFS load)
+├── services/        # application layer (S275.4+)
+│   ├── graph.py     # sync_graph, query_graph
+│   ├── trace.py     # trace_lineage (loads subgraph → rai-core BFS)
+│   ├── impact.py    # analyze_impact (loads subgraph → rai-core traversal)
+│   └── constraints.py  # dev_constraints
+├── api/v1/          # transport REST (S275.4+)
+│   ├── graph.py     # routes → services
+│   └── dev.py       # routes → services
+├── auth.py          # API key middleware (S275.3)
+├── config.py        # pydantic-settings (S275.3)
+└── app.py           # factory + lifespan (S275.3)
+```
+
 ## Target Components
 
 | Component | Responsibility | Key Interface |
 |-----------|---------------|---------------|
-| `rai_core.graph` | Shared models, graph engine, query, backends | `GraphNode`, `Graph`, `KnowledgeGraphBackend` protocol |
-| `rai_server` | FastAPI API server over PostgreSQL | Domain-level REST endpoints at `/api/v1/` |
-| `rai_server.db` | SQLAlchemy models + Alembic migrations | `GraphNodeRow`, `GraphEdgeRow`, `OrgRow`, `ApiKeyRow` |
-| `rai_server.api.v1` | Route handlers + auth dependency | `verify_api_key() → OrgContext` |
-| `rai_core.graph.backends.api` | HTTP client backend for CLI→Server | `ApiGraphBackend`, `DualWriteBackend` |
+| `rai_core.graph` | Domain models, engine, query, traversal, scoring | `GraphNode`, `Graph`, `QueryEngine`, `KnowledgeGraphBackend` protocol |
+| `rai_server.services` | Application layer — orchestrates PG↔rai-core | `sync_graph()`, `query_graph()`, `trace_lineage()`, `analyze_impact()` |
+| `rai_server.db` | Persistence — SQLAlchemy models + queries | `GraphNodeRow`, `GraphEdgeRow`, `OrgRow`, `ApiKeyRow` |
+| `rai_server.api.v1` | Transport — thin REST routes | Routes call services, return JSON |
+| `rai_core.graph.backends.api` | CLI→Server HTTP client | `ApiGraphBackend`, `DualWriteBackend` |
 | Docker Compose | PG + server dev environment | `docker compose up` |
 
 ## Key Contracts
@@ -112,13 +185,12 @@ class DualWriteBackend:
 
 ### rai_server — API Endpoints
 
-Two levels: **internal** CRUD (used by ApiGraphBackend and service layer) and
-**domain** endpoints (the public API that Rovo agents, Forge actions, and external
-consumers call). The principle: **server is smart, clients are simple.**
+**Principle:** Server is smart, clients are simple. Domain-level intent operations,
+not CRUD. Designed for agentic consumers (Rovo, GitLab Duo, MCP clients).
 
-Aligned with RAISE-273 walking skeleton (DA-9): "El backend es el core del producto."
+Aligned with RAISE-273 DA-9 and API ontology research (4 studies, 47 sources).
 
-#### Public (domain-level) endpoints
+#### Public endpoints
 
 ```
 GET  /health                              → {status, version, db_ok}
@@ -127,36 +199,46 @@ GET  /health                              → {status, version, db_ok}
 POST /api/v1/graph/sync                   → full graph upsert (CLI DualWrite)
      Input:  { repo_id, nodes: [...], edges: [...] }
      Output: { synced: true, nodes_upserted, edges_upserted }
-     Notes:  Idempotent. Replaces batch CRUD as the CLI-facing write surface.
+     Service: validates → upserts to PG
+     Notes:  Idempotent. The CLI-facing write surface.
 
 GET  /api/v1/graph/query                  → keyword search with scope/type filtering
      Input:  ?q=...&types=concept,adr&scope=project-x
      Output: { nodes: [...], edges: [...] }
+     Service: PG GIN index search → wrap as rai-core GraphNode objects
+     Notes:  Only endpoint that queries PG directly (full-text needs GIN).
 
 GET  /api/v1/graph/trace                  → trazabilidad upstream/downstream
      Input:  ?from=ADR-003&direction=downstream|upstream&depth=3
      Output: { chain: [{node, relation, node}, ...] }
+     Service: SQL loads subgraph → rai-core Graph BFS traversal
+     Notes:  Bounded depth. Subgraph typically tens-hundreds of nodes.
 
 GET  /api/v1/graph/impact                 → análisis de impacto
      Input:  ?node=ADR-003&change=deprecate|modify
      Output: { affected: [{node, risk_level, reason}], total_impact }
+     Service: SQL loads subgraph → rai-core Graph traversal + risk heuristics
+     Notes:  Uses same subgraph loading as trace, different analysis.
 
 # --- Dev Guidance ---
 GET  /api/v1/dev/constraints              → ADRs, standards, patterns for a module
      Input:  ?module=mod-auth&project=project-x
      Output: { adrs: [...], standards: [...], patterns: [...] }
+     Service: SQL loads related nodes → filter by domain types
 ```
 
-#### Internal (CRUD) — service layer, not routed publicly
+#### Internal (db/queries.py) — not routed publicly
 
 ```
-# Used internally by /graph/sync, /graph/query, etc.
-# Not exposed as public endpoints — no direct node/edge manipulation from clients.
-upsert_nodes(nodes: list[GraphNodeRow]) → list[UUID]
-upsert_edges(edges: list[GraphEdgeRow]) → list[UUID]
-get_node(node_id: UUID) → GraphNodeRow | None
-query_nodes(q: str, types: list, scope: str) → list[GraphNodeRow]
-bfs_subgraph(root_id: UUID, depth: int) → tuple[list[GraphNodeRow], list[GraphEdgeRow]]
+# Persistence
+upsert_nodes(session, nodes: list[GraphNodeRow]) → list[UUID]
+upsert_edges(session, edges: list[GraphEdgeRow]) → list[UUID]
+
+# Subgraph loading (used by trace, impact)
+load_subgraph(session, root_id: UUID, depth: int) → tuple[list[GraphNodeRow], list[GraphEdgeRow]]
+
+# Full-text search (used by query — PG GIN, not rai-core)
+search_nodes(session, q: str, types: list, scope: str) → list[GraphNodeRow]
 ```
 
 #### Future (post-epic, aligned with RAISE-273 DA-9)
@@ -165,6 +247,14 @@ bfs_subgraph(root_id: UUID, depth: int) → tuple[list[GraphNodeRow], list[Graph
 POST /api/v1/graph/index                  → index a Confluence document into the graph
 POST /api/v1/governance/validate          → validate document against graph
 POST /api/v1/governance/check-consistency → cross-document consistency check
+```
+
+#### MCP Server (future — same service layer)
+
+```
+# Same services, different transport. MCP tools compose services into
+# agent-friendly operations. Tool count: 4-6 per agent persona.
+# Research: work/research/api-ontology-mcp-patterns/
 ```
 
 ### rai_server — Auth
@@ -243,8 +333,29 @@ graph_edges (id UUID PK, org_id FK, source_id FK, target_id FK, edge_type, weigh
 | Rename | Drop "Unified" prefix | During S275.1 extraction, re-exports for backward compat |
 | Scope | rai-core is shared domain, not just graph | Structure accommodates graph + workflow + governance axes |
 
+### API Ontology Research (2026-02-25)
+
+| ID | Topic | Sources | Key Finding |
+|----|-------|:-------:|-------------|
+| RES-API-ONTOLOGY-001 | Agentic tool design | 12 | Intent-based ops, not CRUD. 12-15 tools in 4 groups. Self-documenting params. |
+| RES-API-ONTOLOGY-002 | MCP server patterns | 12 | REST ≠ MCP. Shared service layer. Outcome-oriented tools. <40 tools. |
+| RES-API-ONTOLOGY-003 | Rovo actions | 11 | <5 actions/agent. Flat primitives only. Stateless. Description = routing signal. |
+| RES-API-ONTOLOGY-004 | GitLab Duo | 12 | MCP native (GA since Jan 2026). HTTP transport. CRUD naming in their tools. |
+
+**Convergence:** All 4 studies converge on domain-level intent operations over CRUD.
+Server-side intelligence, simple clients. Shared service layer serves REST and MCP.
+
+**Architecture decision:** Subgraph-on-demand (Option B). Server loads subgraphs from PG,
+executes domain logic via rai-core engine. Single implementation, zero semantic duplication.
+Full-text query is the exception (PG GIN directly).
+
+Research artifacts: `work/research/api-ontology-*/`
+
 ### Parking lot items captured
 
+- MCP server as second transport layer (post-epic, same service layer)
+- Rovo Forge actions wrapping REST/MCP (RAISE-274, Fernando)
+- GitLab Duo MCP integration (future partner epic)
 - Workflow engine with per-org extensibility (future epic)
 - Extensible governance schema for custom artifact types (future epic)
 - rai-core three-axis structure (graph/workflow/governance placeholders in S275.1)
