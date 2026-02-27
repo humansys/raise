@@ -148,24 +148,37 @@ class McpJiraAdapter:
 
 ### Session Lifecycle — Connection Management
 
+> Revised after arch review AR-2: `_run_sync()` creates a new event loop per call
+> via `asyncio.run()`. A cached session belongs to the previous (dead) loop.
+> Lazy session is a fiction in sync CLI context.
+
+**Reality by context:**
+
+| Context | What happens | Session behavior |
+|---------|-------------|-----------------|
+| **CLI (sync)** | `_run_sync()` → `asyncio.run()` per call → loop created and destroyed | Per-call: connect → call → disconnect each time |
+| **CLI batch** | `_run_sync()` → `asyncio.run(batch_transition())` → single loop for N calls | One session for the batch, bridge connects once |
+| **Async (server)** | Caller owns the event loop, adapter lives across calls | Lazy session with auto-reconnect (true D3) |
+
+**Bridge implementation:** The bridge always attempts lazy caching, but in CLI context
+`asyncio.run()` destroys the loop after each top-level call, so the cached session is
+invalidated. The bridge detects this (closed transport) and reconnects. Net effect:
+per-call in CLI, lazy in async — same code, different runtime behavior.
+
+**Batch optimization:** `batch_transition` groups N calls inside one async method,
+so `_run_sync()` creates one loop for all N calls — one connection, N tool calls:
+```python
+async def batch_transition(self, keys: list[str], status: str) -> BatchResult:
+    # Single asyncio.run() wraps this whole method → one session for N calls
+    results = []
+    for key in keys:
+        result = await self._bridge.call("jira_transition_issue", {...})
+        results.append(result)
+    return BatchResult(succeeded=results)
 ```
-Option A: Per-call session (simple, some overhead)
-  Each adapter method: connect → initialize → call_tool → disconnect
 
-Option B: Shared session per adapter instance (efficient, complex)
-  __init__: connect + initialize (keep session alive)
-  methods: call_tool (reuse session)
-  __del__ or context manager: disconnect
-
-Option C: Lazy session with auto-reconnect (balanced)
-  First call: connect + initialize + cache session
-  Subsequent calls: reuse cached session
-  On error: reconnect once, then raise
-```
-
-**Recommendation:** Option C (lazy with auto-reconnect). Avoids overhead of per-call
-connections while handling disconnects gracefully. The bridge manages this internally —
-adapters don't see it.
+**Overhead:** ~200-500ms per connection. CLI commands do 1-3 calls typically.
+Imperceptible at human speed.
 
 ### Entry Points Registration
 
@@ -180,6 +193,24 @@ confluence = "rai_cli.adapters.mcp_confluence:McpConfluenceAdapter"
 
 Note: entry points register the **class**, not an instance. `resolve_adapter()` calls
 `cls()` (no-arg constructor). The adapter reads its own config in `__init__`.
+
+**Auto-wrap for sync consumption (AR-1):** Entry points register async adapter classes
+(e.g., `McpJiraAdapter` implements `AsyncProjectManagementAdapter`). `resolve_adapter()`
+detects async instances and auto-wraps with `SyncPMAdapter` for CLI consumption:
+
+```python
+# In resolve_adapter() — ~3 lines added
+from rai_cli.adapters.protocols import AsyncProjectManagementAdapter
+from rai_cli.adapters.sync import SyncPMAdapter
+
+instance = cls()
+if isinstance(instance, AsyncProjectManagementAdapter):
+    instance = SyncPMAdapter(instance)
+return instance
+```
+
+This keeps entry points clean (register the real adapter class) and the CLI unaware
+of async/sync distinction. Async consumers (rai-server) use the adapter directly.
 
 ### MCP Server Discovery — How does the bridge find mcp-atlassian?
 
@@ -211,9 +242,8 @@ is not installed (no-op shim). Full OTel export when user installs `logfire`.
 import logfire
 
 class McpBridge:
-    @logfire.instrument("mcp_bridge.call {tool_name}")
     async def call(self, tool_name: str, arguments: dict[str, Any]) -> McpToolResult:
-        with logfire.span("mcp.tool_call",
+        with logfire.span("mcp.tool_call",  # AR-5: single span, no decorator
                           mcp_server=self._server_command,
                           mcp_tool=tool_name,
                           _tags=["mcp", "adapter"]) as span:
@@ -306,12 +336,17 @@ Could import `JiraFetcher` directly.
 **Fallback:** If MCP bridge proves fundamentally broken, `atlassian-python-api` direct
 path exists (already a project dependency).
 
-### D3: Lazy session with auto-reconnect
+### D3: Context-dependent session lifecycle (revised, AR-2)
 
 **Context:** Options A (per-call), B (shared), C (lazy) for session lifecycle.
-**Decision:** Option C — lazy initialization on first call, cache session, auto-reconnect on error.
-**Rationale:** Balances simplicity (adapters don't manage connections) with efficiency
-(single connection per adapter lifetime). Auto-reconnect handles transient failures.
+`_run_sync()` in CLI creates/destroys event loop per call, invalidating cached sessions.
+**Decision:** Bridge implements lazy caching internally. Behavior varies by runtime:
+- CLI sync: effectively per-call (loop destroyed, session invalidated, bridge reconnects)
+- CLI batch: one session per batch (single `asyncio.run()` wraps N calls)
+- Async server: true lazy session with auto-reconnect across calls
+**Rationale:** Same bridge code, no branching. CLI overhead (~200-500ms/connection) is
+imperceptible at human speed. Batch operations are optimized by grouping calls.
+The lazy session's value materializes in async contexts (rai-server, future hooks).
 
 ### D4: Telemetry via logfire-api (OTel-native from day 1)
 
@@ -346,7 +381,7 @@ system for a single entry. When second adapter arrives (S301.5), evaluate if pat
    → resolve_adapter(None)
    → registry discovers McpJiraAdapter via entry point "rai.adapters.pm"
    → instantiates McpJiraAdapter() (reads .raise/jira.yaml + env vars)
-   → wraps in SyncPMAdapter
+   → AR-1: detects AsyncProjectManagementAdapter → auto-wraps in SyncPMAdapter
 
 2. SyncPMAdapter.transition_issue("RAISE-301", "done")
    → _run_sync(async_adapter.transition_issue("RAISE-301", "done"))
@@ -387,20 +422,54 @@ system for a single entry. When second adapter arrives (S301.5), evaluate if pat
     Then configure: export JIRA_URL=... JIRA_USERNAME=... JIRA_API_TOKEN=..."
 ```
 
+## Architecture Review Findings (SES-298)
+
+| ID | Finding | Severity | Resolution |
+|----|---------|----------|------------|
+| AR-1 | resolve_adapter() returns sync, adapter is async | High | Auto-wrap with SyncPMAdapter in resolver (~3 lines). See Entry Points section. |
+| AR-2 | _run_sync + lazy session = per-call in CLI | Medium | Accept per-call as CLI reality. Batch ops optimized via single asyncio.run(). See Session Lifecycle section. |
+| AR-3 | JiraSyncHook doesn't satisfy LifecycleHook protocol | Low | Fix in S301.6 story design. Hook must use `handle(event: HookEvent)`, not `on_signal()`. |
+| AR-4 | mcp optional dep + entry point imports | Medium | Registry try/except already handles this. Entry point fails gracefully, resolver shows "No adapter installed." |
+| AR-5 | Double span in telemetry (decorator + context manager) | Low | Removed decorator, keep only `with logfire.span()`. See Telemetry section. |
+| AR-6 | Status name vs transition ID mapping gap | Low | Add `status_mapping` to jira.yaml. Resolve in S301.3 story design. |
+
+### AR-6 Resolution: Status Mapping in jira.yaml
+
+The protocol receives human-readable status names (`"done"`, `"in-progress"`).
+The MCP tool needs Jira transition IDs. Add explicit mapping to `.raise/jira.yaml`:
+
+```yaml
+# Existing lifecycle_mapping (hook → transition ID for auto-sync S301.6)
+lifecycle_mapping:
+    story_start: 31
+    story_close: 41
+
+# NEW: status_mapping (CLI status name → transition ID for rai backlog)
+status_mapping:
+    backlog: 11
+    selected: 21
+    in-progress: 31
+    done: 41
+```
+
+`McpJiraAdapter._resolve_transition_id(status)` reads `status_mapping`.
+`JiraSyncHook` (S301.6) reads `lifecycle_mapping`. Different consumers, different maps.
+
 ## Open Questions (for story-level design)
 
 1. **`mcp` SDK as dependency or optional?** Adding `mcp>=1.26,<2` to pyproject.toml
    makes it mandatory. Alternative: optional dependency group `[mcp]`.
    Recommendation: optional group — keeps base install light, adapters are opt-in.
+   AR-4 confirms registry handles missing import gracefully.
 
 2. **How to handle `mcp-atlassian` env vars?** The MCP server reads `JIRA_URL`,
    `JIRA_USERNAME`, `JIRA_API_TOKEN` from env. Bridge passes env to subprocess.
    Should we read from `.env` file? From `.raise/jira.yaml`? Both?
    Recommendation: env vars (standard), with `.env` file loading as convenience.
 
-3. **Batch operations via bridge?** `batch_transition` calls 1 MCP tool per key.
-   Should bridge support concurrent calls within a session?
-   Recommendation: sequential for MVP, concurrent for Phase 2.
+3. **Batch operations via bridge?** `batch_transition` groups N calls in one
+   `asyncio.run()` — one session, N sequential calls (AR-2 resolution).
+   Concurrent calls within a session → Phase 2.
 
 4. **Test strategy for McpBridge?** Can't easily mock an MCP server process in unit tests.
    Options: (a) mock at ClientSession level, (b) use FastMCP in-process test server,
@@ -414,6 +483,8 @@ system for a single entry. When second adapter arrives (S301.5), evaluate if pat
 | `pyproject.toml` | Add optional `[mcp]` dep group + entry points | S301.3 |
 | `src/rai_cli/adapters/mcp_bridge.py` | NEW: McpBridge (~150 LOC) | S301.3 |
 | `src/rai_cli/adapters/mcp_jira.py` | NEW: McpJiraAdapter (~200 LOC) | S301.3 |
+| `src/rai_cli/cli/commands/_adapter_resolve.py` | MODIFY: auto-wrap async→sync (AR-1, ~3 lines) | S301.3 |
+| `.raise/jira.yaml` | ADD: status_mapping section (AR-6) | S301.3 |
 | `src/rai_cli/adapters/mcp_confluence.py` | NEW: McpConfluenceAdapter (~150 LOC) | S301.5 |
 | `src/rai_cli/cli/commands/_docs_resolve.py` | NEW: resolve_docs_target() | S301.4 |
 | `src/rai_cli/cli/commands/docs.py` | NEW: rai docs CLI group | S301.4 |
