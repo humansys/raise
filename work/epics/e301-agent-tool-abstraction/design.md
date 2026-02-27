@@ -202,23 +202,62 @@ Priority order:
 **For MVP:** hardcode `mcp-atlassian` as the server command in adapter `__init__`.
 Config-based discovery is a SHOULD, not MUST.
 
-### Telemetry Layer
+### Telemetry Layer — Logfire/OTel
 
-Each `McpBridge.call()` emits:
+Telemetry uses `logfire-api` (Pydantic's OTel wrapper). Zero overhead when `logfire`
+is not installed (no-op shim). Full OTel export when user installs `logfire`.
 
 ```python
-@dataclass
-class McpCallTelemetry:
-    server: str          # "mcp-atlassian"
-    tool: str            # "jira_transition_issue"
-    success: bool
-    duration_ms: int
-    error: str | None
-    timestamp: str       # ISO 8601
+import logfire
+
+class McpBridge:
+    @logfire.instrument("mcp_bridge.call {tool_name}")
+    async def call(self, tool_name: str, arguments: dict[str, Any]) -> McpToolResult:
+        with logfire.span("mcp.tool_call",
+                          mcp_server=self._server_command,
+                          mcp_tool=tool_name,
+                          _tags=["mcp", "adapter"]) as span:
+            start = time.monotonic()
+            try:
+                result = await self._session.call_tool(tool_name, arguments)
+                elapsed = int((time.monotonic() - start) * 1000)
+                span.set_attribute("duration_ms", elapsed)
+                span.set_attribute("success", True)
+                logfire.info("MCP call {tool} OK ({ms}ms)",
+                            tool=tool_name, ms=elapsed)
+                return self._parse_result(result)
+            except Exception as exc:
+                elapsed = int((time.monotonic() - start) * 1000)
+                span.set_attribute("duration_ms", elapsed)
+                span.set_attribute("success", False)
+                span.record_exception(exc)
+                logfire.error("MCP call {tool} FAILED: {err}",
+                             tool=tool_name, err=str(exc))
+                raise
 ```
 
-For MVP: log to structured logger. Phase 2: emit as RaiSE telemetry event
-(rai signal emit-work), align with OTel when conventions stabilize.
+**Dependency strategy:**
+```toml
+# pyproject.toml
+dependencies = [
+    "logfire-api>=4.0",          # no-op shim, MIT, zero weight (~no deps)
+]
+
+[project.optional-dependencies]
+observability = [
+    "logfire>=4.0",              # full SDK, MIT, OTel export to any backend
+]
+```
+
+**User experience:**
+- `pip install rai-cli` → telemetry calls are no-ops, zero overhead
+- `pip install rai-cli[observability]` → full OTel spans, export to any OTLP backend
+- `send_to_logfire=False` → no data goes to Pydantic's cloud, ever
+- Logfire Cloud is optional SaaS with free tier — not required
+
+**No custom telemetry model needed.** The `McpCallTelemetry` dataclass from the
+original design is eliminated. Logfire spans capture the same data as OTel attributes
+(server, tool, duration_ms, success, error). Standard, queryable, exportable.
 
 ### Auto-Sync Hook (S301.6)
 
@@ -274,12 +313,21 @@ path exists (already a project dependency).
 **Rationale:** Balances simplicity (adapters don't manage connections) with efficiency
 (single connection per adapter lifetime). Auto-reconnect handles transient failures.
 
-### D4: Telemetry as structured logging (MVP)
+### D4: Telemetry via logfire-api (OTel-native from day 1)
 
-**Context:** OTel semantic conventions for agents are emerging but not stable (F9).
-**Decision:** Log `McpCallTelemetry` via Python structured logging. Phase 2: OTel.
-**Rationale:** Ship telemetry now, standardize later. Logs are queryable and sufficient
-for MVP observability. Avoids premature commitment to unstable OTel conventions.
+**Context:** OTel semantic conventions for agents are emerging (F9). Pydantic's `logfire`
+is an opinionated OTel wrapper with a no-op shim (`logfire-api`) for library authors.
+**Decision:** Use `logfire-api` as base dependency (no-op, zero weight). Full `logfire`
+SDK as optional `[observability]` extra. All telemetry is OTel-native from day 1.
+**Rationale:**
+- `logfire-api` is MIT, zero dependencies, no-op when `logfire` not installed
+- When `logfire` is installed, spans are standard OTel — export to any OTLP backend
+- No vendor lock-in: `send_to_logfire=False` disables Pydantic's cloud entirely
+- Eliminates need for custom `McpCallTelemetry` model — OTel attributes suffice
+- Aligns with PydanticAI ecosystem (future `instrument_pydantic_ai()` integration)
+- No Phase 2 migration needed — we're OTel from the start
+**Trade-off:** `logfire` full SDK pulls in OTel dependencies (~15MB). Acceptable as
+optional extra. Users who don't want observability pay zero cost via no-op shim.
 
 ### D5: Server command hardcoded per adapter (MVP)
 
@@ -309,9 +357,9 @@ system for a single entry. When second adapter arrives (S301.5), evaluate if pat
 
 4. McpBridge.call(...)
    → lazy: if no session, start mcp-atlassian via stdio, initialize ClientSession
-   → telemetry: start timer
+   → logfire.span("mcp.tool_call", server="mcp-atlassian", tool="jira_transition_issue")
    → session.call_tool("jira_transition_issue", {...})
-   → telemetry: record duration, success
+   → span records: duration_ms, success=True
    → parse CallToolResult → McpToolResult
 
 5. McpJiraAdapter

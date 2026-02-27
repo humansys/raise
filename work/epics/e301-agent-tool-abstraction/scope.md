@@ -63,7 +63,7 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 - Offline queue / pending sync for backlog → Phase 2
 - Entity properties for sync metadata → Phase 2
 - raise-pro repo separation (RAISE-207) → deferred, adapters live in raise-commons for MVP
-- OTel semantic conventions for telemetry → Phase 2, align when standards stabilize (F9)
+- `logfire` full SDK auto-instrumentation (`instrument_pydantic_ai()`) → Phase 2 when PydanticAI agent layer is adopted
 
 ## Done Criteria
 
