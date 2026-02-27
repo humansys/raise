@@ -141,11 +141,11 @@ RAISE-244 (bugfix — validation client)
 | Story | Size | Status | Notes |
 |-------|:----:|:------:|-------|
 | RAISE-243 | M | ✅ Done | 1.33x velocity (original) + ADR-040 compliance 0.83x (reopen) |
-| RAISE-244 | S | Pending | |
+| RAISE-244 | S | ✅ Done | 0.67x velocity — design pivot (single vs family) + language-agnostic fix |
 
 **Milestones:**
 - [x] M1: Creator works (2026-02-20)
-- [ ] M2: Epic complete
+- [x] M2: Epic complete (2026-02-27)
 
 ---
 
@@ -168,3 +168,4 @@ Best patterns to study: `rai-debug` (utility, methodology-driven), `rai-research
 | 2026-02-20 | Rai | Initial scope |
 | 2026-02-26 | Rai | RAISE-243 reopened for ADR-040 compliance (E257): 508 → 150 lines |
 | 2026-02-27 | Rai | RAISE-243 closed (ADR-040 iteration) |
+| 2026-02-27 | Rai | RAISE-244 closed — rai-bugfix created via rai-skill-create, M2 achieved |
