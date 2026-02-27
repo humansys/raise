@@ -8,6 +8,8 @@ from pydantic import BaseModel
 class TestPublicAPIExportsAllProtocols:
     def test_import_all_protocols(self) -> None:
         from rai_cli.adapters import (
+            AsyncDocumentationTarget,
+            AsyncProjectManagementAdapter,
             DocumentationTarget,
             GovernanceParser,
             GovernanceSchemaProvider,
@@ -17,9 +19,11 @@ class TestPublicAPIExportsAllProtocols:
 
         protocols = [
             ProjectManagementAdapter,
+            AsyncProjectManagementAdapter,
             GovernanceSchemaProvider,
             GovernanceParser,
             DocumentationTarget,
+            AsyncDocumentationTarget,
             KnowledgeGraphBackend,
         ]
         for proto in protocols:
@@ -29,20 +33,52 @@ class TestPublicAPIExportsAllProtocols:
 class TestPublicAPIExportsAllModels:
     def test_import_all_models(self) -> None:
         from rai_cli.adapters import (
+            AdapterHealth,
             ArtifactLocator,
             BackendHealth,
+            BatchResult,
+            Comment,
+            CommentRef,
             CoreArtifactType,
+            FailureDetail,
+            IssueDetail,
             IssueRef,
             IssueSpec,
+            IssueSummary,
+            PageContent,
+            PageSummary,
             PublishResult,
         )
 
-        models = [ArtifactLocator, BackendHealth, IssueRef, IssueSpec, PublishResult]
+        models = [
+            AdapterHealth,
+            ArtifactLocator,
+            BackendHealth,
+            BatchResult,
+            Comment,
+            CommentRef,
+            FailureDetail,
+            IssueDetail,
+            IssueRef,
+            IssueSpec,
+            IssueSummary,
+            PageContent,
+            PageSummary,
+            PublishResult,
+        ]
         for model_cls in models:
             assert issubclass(model_cls, BaseModel)
 
         # CoreArtifactType is StrEnum, not BaseModel
         assert issubclass(CoreArtifactType, str)
+
+
+class TestPublicAPIExportsSyncWrappers:
+    def test_import_sync_wrappers(self) -> None:
+        from rai_cli.adapters import SyncDocsAdapter, SyncPMAdapter
+
+        assert SyncPMAdapter is not None
+        assert SyncDocsAdapter is not None
 
 
 class TestDunderAll:
@@ -51,3 +87,10 @@ class TestDunderAll:
 
         for name in adapters.__all__:
             assert hasattr(adapters, name), f"{name} in __all__ but not importable"
+
+    def test_all_count(self) -> None:
+        """Guardrail: __all__ has expected number of exports."""
+        import rai_cli.adapters as adapters
+
+        # 7 protocols + 2 wrappers + 15 models + 5 registry fns + 5 constants = 34
+        assert len(adapters.__all__) == 34
