@@ -1,123 +1,123 @@
-# Story Design: RAISE-244 rai-bug-* lifecycle
+# Story Design: RAISE-244 rai-bugfix
 
 > **Epic:** RAISE-242 (Skill Ecosystem)
 > **Story:** RAISE-244
-> **Size:** M ← adjusted from S (see Scope below)
+> **Size:** S
 
 ---
 
 ## Complexity Assessment
 
-**Moderate** — 6 components (one per lifecycle phase), no novel algorithms, but establishing a new lifecycle domain with consistent cross-skill conventions.
+**Simple/Moderate** — one skill, six internal phases. No novel algorithms. UX matters (workflow design). Fits S — single `rai-skill-create` invocation.
 
-**UX gate:** Yes — this is a workflow skill family. The interaction design of each phase matters.
-**Risk gate:** Low — all skills created via `rai-skill-create` (validates the creator).
+**UX gate:** Yes — the phase structure is the entire design. Each step must be clear and produce a verifiable artifact.
+**Risk gate:** Low — rai-skill-create handles creation; this is its E2E validation.
 
 ---
 
 ## What & Why
 
-**Problem:** RaiSE has no formal bug fix lifecycle. Bugs tracked in Jira get fixed ad-hoc — no branch convention, no root cause artifact, no traceability from reproduction to close. Developers reach for `rai-debug` (a utility, not a lifecycle) or invent their own process.
+**Problem:** RaiSE has no formal bug fix lifecycle. Bugs get fixed ad-hoc — no branch convention, no root cause artifact, no traceability from reproduction to close. Developers reach for `rai-debug` (a utility, not a lifecycle) or invent their own process.
 
-**Value:** A formal `rai-bug-*` lifecycle makes bug fixes first-class work items — traceable, reproducible, retrospectable — exactly like stories.
+**Value:** `rai-bugfix` makes bug fixes first-class work — same formality as a story, single skill to invoke, six phases with clear outputs.
 
 ---
 
 ## Approach
 
-Establish a **bug lifecycle** that mirrors the story lifecycle phase-for-phase, under a new `bug` domain. Six skills, each corresponding to a story counterpart:
+A **single skill** (`rai-bugfix`) with six internal steps that mirror the story lifecycle phase-for-phase:
 
-| Phase | Skill | Story Counterpart | Purpose |
-|-------|-------|-------------------|---------|
-| 1 | `rai-bug-start` | `rai-story-start` | Branch, reproduce, define scope |
-| 2 | `rai-bug-analyse` | `rai-story-design` | Root cause evidence, causal chain |
-| 3 | `rai-bug-plan` | `rai-story-plan` | Fix tasks + test plan |
-| 4 | `rai-bug-fix` | `rai-story-implement` | Implement fix + tests (TDD) |
-| 5 | `rai-bug-review` | `rai-story-review` | Quality gates + retrospective |
-| 6 | `rai-bug-close` | `rai-story-close` | Merge + cleanup + tracking update |
+| Step | Phase | Story Counterpart | Output Artifact |
+|------|-------|-------------------|-----------------|
+| 1 | Start | `rai-story-start` | `bug-{N}-scope.md` + branch |
+| 2 | Analyse | `rai-story-design` | `bug-{N}-analysis.md` |
+| 3 | Plan | `rai-story-plan` | `bug-{N}-plan.md` |
+| 4 | Fix | `rai-story-implement` | code + commits |
+| 5 | Review | `rai-story-review` | `bug-{N}-retro.md` |
+| 6 | Close | `rai-story-close` | merge + branch deleted |
 
-**All six skills are created via `rai-skill-create`** — this IS the E2E validation of RAISE-243.
+The developer invokes `/rai-bugfix BUG-ID` and follows the skill through all six steps sequentially. Each step has a `<verification>` gate and clear `<if-blocked>` guidance — same structural conventions as story skills.
 
-**Domain:** `bug` (new lifecycle domain, not a standard one — expected, `rai skill check-name` confirms valid with advisory warning).
+**Created via one invocation of `rai-skill-create`** — this IS the E2E validation of RAISE-243.
 
-**Relationship to `rai-debug`:** `rai-debug` is a utility — reactive, no git lifecycle, used any time something unexpected happens during any work. `rai-bug-*` is a lifecycle — proactive, for tracked defects that become work items. They compose: `rai-bug-analyse` MAY call `rai-debug` internally for RCA depth.
-
----
-
-## Scope Adjustment
-
-Original RAISE-244 scope was S (one skill). Creating 6 skills makes this **M**. Each individual skill is XS–S, but the total breadth is M. The epic scope still fits — this is explicitly the validation client for `rai-skill-create`.
+**Relationship to `rai-debug`:** `rai-debug` is reactive and utility-grade (no git lifecycle). `rai-bugfix` is proactive and lifecycle-grade (tracked work item). Step 2 (Analyse) may delegate to `/rai-debug` for deep RCA when needed — they compose.
 
 ---
 
-## Lifecycle Detail
+## Phase Detail
 
-### `rai-bug-start`
-Mirrors `rai-story-start`. Creates `bug/raise-{N}/{slug}` branch from dev. Produces `bug-{N}-scope.md` with:
-- Bug description (WHAT, WHEN, WHERE, EXPECTED)
-- Reproduction steps verified
-- Done criteria
+### Step 1 — Start (mirrors `rai-story-start`)
+- Read `branches.development` from `.raise/manifest.yaml`
+- Create `bug/{dev_branch_slug}/raise-{N}/{bug-slug}` branch
+- Reproduce the bug — confirm it's observable
+- Write `bug-{N}-scope.md`: WHAT / WHEN / WHERE / EXPECTED + done criteria
+- Commit scope
 
-### `rai-bug-analyse`
-Mirrors `rai-story-design`. Root cause analysis artifact `bug-{N}-analysis.md`:
-- Evidence gathered (logs, stack traces, minimal repro)
-- Causal chain documented (5 Whys or Ishikawa depending on tier)
-- Hypothesis stated and confirmed
-- Fix approach decided (NOT implemented here)
+### Step 2 — Analyse (mirrors `rai-story-design`)
+- Triage tier (XS/S/M/L) determines method depth
+- Gather evidence: logs, stack traces, minimal repro
+- Document causal chain — 5 Whys (S) or Ishikawa (M/L)
+- State hypothesis; confirm it before moving on
+- Write `bug-{N}-analysis.md`; do NOT implement yet
+- For deeper RCA: invoke `/rai-debug`
 
-### `rai-bug-plan`
-Mirrors `rai-story-plan`. Task list `bug-{N}-plan.md`:
-- Atomic fix tasks (TDD order: test first)
-- Regression test tasks
-- Commit strategy
+### Step 3 — Plan (mirrors `rai-story-plan`)
+- Decompose into atomic tasks (TDD order: test first)
+- Include regression test task
+- Write `bug-{N}-plan.md`
 
-### `rai-bug-fix`
-Mirrors `rai-story-implement`. Execute plan task by task:
-- Red → green → refactor
+### Step 4 — Fix (mirrors `rai-story-implement`)
+- Execute plan task by task: RED → GREEN → REFACTOR
+- Run verification gates per task: `pytest`, `ruff check`, `pyright`
 - Commit after each task
-- Verification gates before proceeding
 
-### `rai-bug-review`
-Mirrors `rai-story-review`. Retrospective `bug-{N}-retro.md`:
-- Root cause confirmed (fix addresses cause, not symptom)
-- Regression coverage verified
-- Pattern extraction (could this class of bug recur?)
-- Emit pattern if applicable
+### Step 5 — Review (mirrors `rai-story-review`)
+- Confirm fix addresses root cause (not symptom)
+- Verify regression coverage
+- Extract pattern if the bug class is recurring — `rai pattern add`
+- Write `bug-{N}-retro.md`
 
-### `rai-bug-close`
-Mirrors `rai-story-close`. Merge to parent branch, delete bug branch, update tracking.
+### Step 6 — Close (mirrors `rai-story-close`)
+- All gates pass
+- Merge to `{dev_branch}` (not `main`)
+- Delete bug branch
+- Update Jira/tracking
 
 ---
 
 ## Branch Convention
 
 ```
-{dev} → bug/raise-{N}/{slug}
+{dev_branch} → bug/raise-{N}/{slug}
 ```
 
-Merge target: `{dev}` (not `main`). Follows same model as story branches.
+Merge target: `{dev_branch}`. Matches story branch model.
 
 ---
 
 ## Examples
 
 ```bash
-# Name validation
-rai skill check-name rai-bug-start
-# → valid (domain warning expected — new lifecycle)
+# Single invocation — developer follows all 6 steps
+/rai-bugfix RAISE-251
 
-# Invocation flow
-/rai-bug-start RAISE-251   # branches, defines scope
-/rai-bug-analyse            # RCA, causal chain
-/rai-bug-plan               # tasks
-/rai-bug-fix                # implement
-/rai-bug-review             # gates + retro
-/rai-bug-close              # merge + cleanup
+# Name check (run by rai-skill-create internally)
+rai skill check-name rai-bugfix
+# → valid (domain advisory expected)
 
-# Validation after creation
-rai skill validate .claude/skills/rai-bug-start/SKILL.md
-rai skill validate .claude/skills/rai-bug-analyse/SKILL.md
-# ... etc for all 6
+# Validate after creation
+rai skill validate .claude/skills/rai-bugfix/SKILL.md
+# → all checks pass
+```
+
+**Step artifact sequence for RAISE-251:**
+```
+bug-251-scope.md       → after Step 1
+bug-251-analysis.md    → after Step 2
+bug-251-plan.md        → after Step 3
+[commits]              → during Step 4
+bug-251-retro.md       → after Step 5
+[merge + delete]       → Step 6
 ```
 
 ---
@@ -125,16 +125,17 @@ rai skill validate .claude/skills/rai-bug-analyse/SKILL.md
 ## Acceptance Criteria
 
 **MUST:**
-- [ ] All 6 `rai-bug-*` skills exist in `.claude/skills/`
-- [ ] All 6 pass `rai skill validate` without errors
-- [ ] All 6 created via `rai-skill-create` (one invocation per skill)
-- [ ] Each skill references its story counterpart and maps phase clearly
-- [ ] `rai-bug-start` creates `bug/raise-{N}/{slug}` branch from dev
+- [ ] `rai-bugfix` SKILL.md exists at `.claude/skills/rai-bugfix/SKILL.md`
+- [ ] Passes `rai skill validate` without errors
+- [ ] Created via `rai-skill-create` (one invocation)
+- [ ] Six internal phases present, each with verification gate
+- [ ] Each phase maps explicitly to its story counterpart
+- [ ] Step 1 creates `bug/raise-{N}/{slug}` branch from dev
 
 **SHOULD:**
-- [ ] `rai-bug-analyse` notes when `rai-debug` can be used for deeper RCA
-- [ ] Lifecycle documented in a single `rai-bug-*-lifecycle.md` reference
+- [ ] Step 2 mentions `/rai-debug` as optional compose for deep RCA
+- [ ] ShuHaRi section present (verbosity adapts to developer level)
 
 **MUST NOT:**
-- [ ] No CLI code changes — skills are pure orchestration
-- [ ] `rai-debug` NOT deprecated — it serves a different purpose
+- [ ] No CLI code changes — pure orchestration
+- [ ] `rai-debug` not deprecated — different purpose, different scope
