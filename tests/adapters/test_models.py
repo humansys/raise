@@ -22,7 +22,6 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from rai_core.graph.backends.models import BackendHealth
 
 
 class TestCoreArtifactType:

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 
 from rai_cli.adapters.models import (
@@ -159,3 +160,25 @@ class TestSyncDocsAdapter:
         wrapper = SyncDocsAdapter(FakeAsyncDocs())
         h = wrapper.health()
         assert h.healthy is True
+
+
+class TestRunSyncFromAsyncContext:
+    """C1 fix: verify wrappers work when called from within a running event loop."""
+
+    def test_pm_wrapper_from_async_context(self) -> None:
+        async def _inner() -> IssueDetail:
+            wrapper = SyncPMAdapter(FakeAsyncPM())
+            return wrapper.get_issue("R-1")
+
+        detail = asyncio.run(_inner())
+        assert detail.key == "R-1"
+        assert detail.summary == "Wrapped"
+
+    def test_docs_wrapper_from_async_context(self) -> None:
+        async def _inner() -> PageContent:
+            wrapper = SyncDocsAdapter(FakeAsyncDocs())
+            return wrapper.get_page("42")
+
+        page = asyncio.run(_inner())
+        assert page.id == "42"
+        assert page.title == "Wrapped Page"

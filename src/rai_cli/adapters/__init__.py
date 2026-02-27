@@ -1,6 +1,6 @@
 """Adapter contracts and registry for raise-cli extensibility.
 
-Public API: 6 Protocols + 14 boundary models + 2 sync wrappers
+Public API: 7 Protocols + 15 boundary models + 2 sync wrappers
 + 5 registry functions + 5 group constants.
 KnowledgeGraphBackend + BackendHealth moved to rai_core (E275).
 
