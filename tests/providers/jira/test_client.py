@@ -261,7 +261,9 @@ class TestJiraClient:
 
         # Should be generic JiraError, not a subclass
         assert isinstance(exc_info.value, JiraError)
-        assert not isinstance(exc_info.value, (JiraAuthError, JiraNotFoundError, JiraRateLimitError))
+        assert not isinstance(
+            exc_info.value, (JiraAuthError, JiraNotFoundError, JiraRateLimitError)
+        )
 
 
 class TestJiraClientWriteOperations:
@@ -307,7 +309,10 @@ class TestJiraClientWriteOperations:
         assert isinstance(created_story, JiraStory)
         assert created_story.key == "DEMO-124"
         assert created_story.summary == "Implement value metrics"
-        assert created_story.description == "Design and implement value measurement framework"
+        assert (
+            created_story.description
+            == "Design and implement value measurement framework"
+        )
         assert created_story.status == "To Do"
         assert created_story.labels == ["governance", "metrics"]
         assert created_story.epic_key == "DEMO-123"

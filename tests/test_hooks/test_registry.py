@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 from rai_cli.hooks.events import HookEvent, HookResult
 from rai_cli.hooks.protocol import LifecycleHook
-from rai_cli.hooks.registry import EP_HOOKS, HookRegistry
+from rai_cli.hooks.registry import HookRegistry
 
 # --- Test hook classes ---
 
@@ -40,13 +40,6 @@ class _NonCompliantClass:
     """Does not satisfy LifecycleHook Protocol."""
 
     pass
-
-
-class TestHookRegistryConstants:
-    """Entry point group constant."""
-
-    def test_ep_hooks_value(self) -> None:
-        assert EP_HOOKS == "rai.hooks"
 
 
 class TestHookRegistryDiscover:

@@ -1,6 +1,6 @@
 # Walking Skeleton Design: RaiSE Governance Copilot on Atlassian Forge
 
-**RAISE-273** | **Date:** 2026-02-24 | **Type:** Architecture Spike
+**RAISE-274** | **Updated:** 2026-02-26 (post-E275) | **Type:** Architecture + Implementation Guide
 **Constraint:** Must support scale from day 1 — no throwaway demo
 
 ---
@@ -10,8 +10,8 @@
 Un sistema de governance organizacional con tres capas:
 
 - **Confluence** = Content Store (documentos, skills, standards)
-- **RaiSE Backend** = Knowledge Layer (grafo neuro-simbólico, determinista)
-- **Forge App** = UI Layer (Rovo Agent como copiloto contextual)
+- **RaiSE Backend** = Knowledge Layer (grafo neuro-simbólico, determinista) — **EXISTS (E275)**
+- **Forge App** = UI Layer (Rovo Agent como copiloto contextual) — **THIS EPIC**
 
 Jira orquesta el proceso. Confluence almacena el contenido. RaiSE garantiza
 determinismo, trazabilidad y consistencia. Rai asiste a cada humano según
@@ -34,17 +34,20 @@ su rol y fase — tanto governance como desarrollo.
                     ┌──────────────────────────┐
                     │    RaiSE Backend          │
                     │  (Knowledge Layer)        │
+                    │  ✅ DONE (E275)           │
                     │                           │
                     │  Knowledge Graph          │
                     │  (neuro-simbólico,        │
                     │   determinista)           │
                     │                           │
-                    │  Validation Engine        │
-                    │  Traceability Engine      │
+                    │  POST /graph/sync         │
+                    │  GET  /graph/query        │
+                    │  POST/GET /agent/events   │
+                    │  POST/GET /memory/patterns│
                     └─────────┬────────────────┘
                               │
                     queries deterministas,
-                    validación, impacto
+                    telemetría, patrones
                               │
                     ┌─────────┴────────────────┐
                     │                           │
@@ -91,6 +94,273 @@ governance validates. The RaiSE knowledge graph closes the loop deterministicall
 
 ---
 
+## User Journeys & Sequence Diagrams
+
+### Personas
+
+| Persona | Rol | Herramienta | Qué necesita |
+|---------|-----|------------|--------------|
+| **Ana** | Product Owner | Confluence + Rovo Chat | Crear documentos de governance (LBC, Problem Scope) con guía paso a paso |
+| **Rodo** | Architect / Reviewer | Confluence + Rovo Chat | Revisar documentos contra estándares, ADRs y el knowledge graph |
+| **Carlos** | Developer | IDE + Jira (+ Rovo Chat opcional) | Saber qué ADRs, standards y constraints aplican antes de codear |
+
+### Test Case 1: Ana crea un Lean Business Case
+
+**Precondiciones:**
+- Jira Automation ya creó: Epic "Iniciativa Piloto" + Story "LBC" + Confluence page vacía (from template)
+- Story "LBC" está In Progress, assigned to Ana
+- La página de Confluence está linkeada a la Story via remote link
+
+**Flujo (lo que Ana experimenta):**
+
+1. Ana abre Confluence, navega a la página "LBC: Iniciativa Piloto"
+2. La página tiene el template vacío
+3. Ana abre el chat de Rovo (ícono en la barra lateral o `/ai` en el editor)
+4. Ana dice: *"Necesito trabajar en este Lean Business Case. Tengo notas de la reunión con el cliente."* y pega el transcript
+5. Rai responde:
+   - *"Estoy en la story PROJ-45, LBC, In Progress. La página existe pero está vacía."*
+   - *"Cargué el skill 'Lean Business Case'. Necesito: ✅ Transcript (lo tengo), ❓ Costo del status quo, ❓ Sponsor ejecutivo"*
+6. Ana responde con los datos faltantes
+7. Rai actualiza la página de Confluence — Ana VE el contenido aparecer en la página
+8. Rai confirma: *"Draft creado. Secciones completas: ✅✅✅. Pendientes: ⚠️❌. Indexé en el knowledge graph."*
+9. Ana revisa el documento, pide ajustes conversacionales
+10. Cuando está lista, Ana mueve la Story a "In Review" (manual o le pide a Rai)
+
+**Lo que Ana NO ve:** graph-sync, report-event, API calls al backend. Solo ve la página actualizarse y confirmaciones de Rai.
+
+```
+┌─────┐          ┌──────────┐       ┌──────────┐        ┌──────────┐
+│ Ana │          │Rai (Rovo)│       │Confluence│        │  Backend │
+└──┬──┘          └────┬─────┘       └────┬─────┘        └────┬─────┘
+   │                  │                  │                    │
+   │  "Trabajar en    │                  │                    │
+   │   el LBC..."     │                  │                    │
+   │─────────────────►│                  │                    │
+   │                  │                  │                    │
+   │                  │  read-jira-ctx   │                    │
+   │                  │─────────────────►│ (via Jira API)     │
+   │                  │  ◄── story ctx ──│                    │
+   │                  │                  │                    │
+   │                  │  read-page       │                    │
+   │                  │─────────────────►│                    │
+   │                  │  ◄── vacío ──────│                    │
+   │                  │                  │                    │
+   │                  │  find-skill-page │                    │
+   │                  │─────────────────►│                    │
+   │                  │  ◄── skill def ──│                    │
+   │                  │                  │                    │
+   │  "Te faltan      │                  │                    │
+   │   estos datos"   │                  │                    │
+   │◄─────────────────│                  │                    │
+   │                  │                  │                    │
+   │  "Status quo     │                  │                    │
+   │   $150K/mes..."  │                  │                    │
+   │─────────────────►│                  │                    │
+   │                  │                  │                    │
+   │                  │  update-page     │                    │
+   │                  │─────────────────►│                    │
+   │                  │                  │                    │
+   │                  │  graph-sync      │                    │
+   │                  │──────────────────┼───────────────────►│
+   │                  │                  │    ◄── ok ─────────│
+   │                  │                  │                    │
+   │                  │  report-event    │                    │
+   │                  │──────────────────┼───────────────────►│
+   │                  │                  │                    │
+   │  "Draft creado.  │                  │                    │
+   │   ✅✅✅ ⚠️❌"  │                  │                    │
+   │◄─────────────────│                  │                    │
+   │                  │                  │                    │
+```
+
+### Test Case 2: Rodo revisa el LBC
+
+**Precondiciones:**
+- Ana completó el draft y movió la Story a "In Review"
+- Rodo es reviewer (puede ser assignee o simplemente abre la página)
+
+**Flujo (lo que Rodo experimenta):**
+
+1. Rodo recibe notificación de Jira: "LBC movido a In Review"
+2. Abre la página de Confluence "LBC: Iniciativa Piloto"
+3. Lee el documento — el contenido ya está ahí
+4. Abre Rovo Chat: *"Quiero revisar este LBC"*
+5. Rai responde:
+   - *"LBC en Review. Mi análisis combinando el grafo y el documento:"*
+   - *"✅ Problem Statement: hypothesis format correcto"*
+   - *"✅ Financial Impact: cuantificado ($1.8M/año)"*
+   - *"⚠️ Risks: mencionados pero sin cuantificar"*
+   - *"❌ Auth approach: no hay ADR que respalde la decisión de autenticación"*
+6. Rodo dice: *"Agrega comentarios de revisión y crea un ADR para auth"*
+7. Rai agrega 2 comentarios EN LA PÁGINA (visibles para Ana)
+8. Rai crea nueva página "ADR-003: OAuth2" y la indexa en el grafo
+9. Rai devuelve la Story a "In Progress"
+10. Rodo confirma y cierra
+
+**Lo que Rodo VE:** análisis con ✅⚠️❌, comentarios en la página, nuevo ADR creado. Todo trazable.
+
+```
+┌──────┐         ┌──────────┐       ┌──────────┐        ┌──────────┐
+│ Rodo │         │Rai (Rovo)│       │Confluence│        │  Backend │
+└──┬───┘         └────┬─────┘       └────┬─────┘        └────┬─────┘
+   │                  │                  │                    │
+   │  "Revisar el     │                  │                    │
+   │   LBC"           │                  │                    │
+   │─────────────────►│                  │                    │
+   │                  │                  │                    │
+   │                  │  read-jira-ctx   │                    │
+   │                  │─────────────────►│                    │
+   │                  │  read-page       │                    │
+   │                  │─────────────────►│                    │
+   │                  │                  │                    │
+   │                  │  graph-query     │                    │
+   │                  │  "auth piloto"   │                    │
+   │                  │──────────────────┼───────────────────►│
+   │                  │                  │  ◄── nodos ────────│
+   │                  │                  │                    │
+   │  "✅✅ ⚠️ ❌    │                  │                    │
+   │   Auth sin ADR"  │                  │                    │
+   │◄─────────────────│                  │                    │
+   │                  │                  │                    │
+   │  "Agrega         │                  │                    │
+   │   comentarios    │                  │                    │
+   │   y crea ADR"    │                  │                    │
+   │─────────────────►│                  │                    │
+   │                  │                  │                    │
+   │                  │  add-comment x2  │                    │
+   │                  │─────────────────►│                    │
+   │                  │                  │                    │
+   │                  │  find-skill-page │                    │
+   │                  │  ("ADR")         │                    │
+   │                  │─────────────────►│                    │
+   │                  │                  │                    │
+   │                  │  create-page     │                    │
+   │                  │  (ADR-003)       │                    │
+   │                  │─────────────────►│                    │
+   │                  │                  │                    │
+   │                  │  graph-sync      │                    │
+   │                  │  (ADR + rels)    │                    │
+   │                  │──────────────────┼───────────────────►│
+   │                  │                  │                    │
+   │                  │  transition-jira │                    │
+   │                  │  → In Progress   │                    │
+   │                  │─────────────────►│ (Jira)             │
+   │                  │                  │                    │
+   │  "2 comentarios  │                  │                    │
+   │   + ADR-003      │                  │                    │
+   │   creado"        │                  │                    │
+   │◄─────────────────│                  │                    │
+   │                  │                  │                    │
+```
+
+### Test Case 3: Carlos (Dev) consulta constraints antes de codear
+
+**Precondiciones:**
+- LBC aprobado, ADR-003 creado e indexado en el grafo
+- Story "Implement Auth" asignada a Carlos, In Progress
+
+**Flujo (lo que Carlos experimenta):**
+
+1. Carlos abre Rovo Chat (desde Confluence, Jira, o el IDE si tiene el plugin)
+2. Carlos dice: *"Voy a implementar el módulo de auth para Iniciativa Piloto"*
+3. Rai Dev responde:
+   - *"Antes de empezar, estos constraints de governance aplican:"*
+   - *"📋 ADR-003 (mandatory): OAuth2 con JWT"*
+   - *"📋 STD-SEC-01: OWASP Top 10 compliance"*
+   - *"📋 From LBC: capacity 50K concurrent users"*
+   - *"Estos son verificables — si tu código no cumple ADR-003, lo voy a flag."*
+4. Carlos procede a implementar
+5. Si Carlos intenta usar session-based auth, Rai Dev:
+   - *"⛔ Esto usa session auth, pero ADR-003 requiere OAuth2 con JWT. ¿Refactorizo o quieres desafiar el ADR?"*
+
+**Lo que Carlos VE:** constraints claros ANTES de codear, con fuente citada. Si viola uno, flag inmediato con referencia al documento de governance.
+
+```
+┌────────┐       ┌──────────┐                            ┌──────────┐
+│ Carlos │       │Rai Dev   │                            │  Backend │
+│  (Dev) │       │  (Rovo)  │                            │          │
+└───┬────┘       └────┬─────┘                            └────┬─────┘
+    │                 │                                       │
+    │  "Implementar   │                                       │
+    │   auth para     │                                       │
+    │   Piloto"       │                                       │
+    │────────────────►│                                       │
+    │                 │                                       │
+    │                 │  read-jira-ctx                        │
+    │                 │──────────────────────────────────────►│(Jira)
+    │                 │  ◄── story + epic ctx ────────────────│
+    │                 │                                       │
+    │                 │  graph-query                          │
+    │                 │  "auth piloto"                        │
+    │                 │──────────────────────────────────────►│
+    │                 │  ◄── ADR-003, STD-SEC-01, LBC data ──│
+    │                 │                                       │
+    │  "📋 ADR-003:   │                                       │
+    │   OAuth2+JWT    │                                       │
+    │   📋 STD-SEC-01 │                                       │
+    │   📋 LBC: 50K"  │                                       │
+    │◄────────────────│                                       │
+    │                 │                                       │
+    │  [implementa    │                                       │
+    │   con session   │                                       │
+    │   auth]         │                                       │
+    │────────────────►│                                       │
+    │                 │                                       │
+    │  "⛔ ADR-003    │                                       │
+    │   requiere      │                                       │
+    │   OAuth2+JWT"   │                                       │
+    │◄────────────────│                                       │
+    │                 │                                       │
+```
+
+### Test Case 4: Extensibilidad — Nuevo tipo de documento sin código
+
+**Precondiciones:**
+- Fase 5 del plan. El agente ya funciona con Problem Scope.
+
+**Flujo:**
+
+1. Emilio crea una página en Confluence: "Skill: Lean Business Case"
+   - Usa el formato de skill page (Description, Inputs, Process, Outputs, Template, Validation Rules, Graph Relations)
+2. Ana abre Rovo Chat: *"Necesito crear un Lean Business Case para Iniciativa Beta"*
+3. Rai:
+   - Busca `find-skill-page("Lean Business Case")` → **lo encuentra** (es una página nueva)
+   - Lee el skill, extrae inputs/process/outputs
+   - Ejecuta el skill igual que antes — mismas acciones, mismo flujo
+4. **ZERO código cambiado. ZERO deploy. Solo una página de Confluence.**
+
+```
+┌────────┐       ┌──────────┐       ┌──────────┐
+│ Emilio │       │Confluence│       │Rai (Rovo)│
+└───┬────┘       └────┬─────┘       └────┬─────┘
+    │                 │                   │
+    │  Crea página    │                   │
+    │  "Skill: LBC"   │                   │
+    │────────────────►│                   │
+    │                 │                   │
+    │                 │    (tiempo pasa)  │
+    │                 │                   │
+    │                 │   Ana: "Crear     │
+    │                 │    LBC para Beta" │
+    │                 │◄──────────────────│(user message)
+    │                 │                   │
+    │                 │  find-skill-page  │
+    │                 │  ("LBC")         │
+    │                 │◄──────────────────│
+    │                 │──── found! ──────►│
+    │                 │                   │
+    │                 │  (mismo flujo     │
+    │                 │   que Test Case 1)│
+    │                 │                   │
+    │                 │  ZERO code change │
+    │                 │  ZERO deploy      │
+    │                 │                   │
+```
+
+**Este ES el killer demo para Coppel:** "¿Quieren agregar un nuevo proceso de governance? Creen una página en Confluence. Listo."
+
+---
+
 ## 1. Decisiones Arquitectónicas
 
 ### DA-1: Tres Capas, Tres Responsabilidades
@@ -99,7 +369,7 @@ governance validates. The RaiSE knowledge graph closes the loop deterministicall
 |------|----------------|------------|--------------|
 | **UI** | Interacción con humanos | Forge App (Rovo Agents) | No (LLM) |
 | **Content** | Almacén de documentos | Confluence + Jira | N/A (storage) |
-| **Knowledge** | Relaciones, validación, trazabilidad | RaiSE Backend (knowledge graph) | **Sí** |
+| **Knowledge** | Relaciones, validación, trazabilidad | RaiSE Backend ✅ | **Sí** |
 
 **Por qué tres capas:**
 - Confluence es buen content store pero mal knowledge graph (no tiene relaciones tipadas)
@@ -107,11 +377,6 @@ governance validates. The RaiSE knowledge graph closes the loop deterministicall
 - RaiSE knowledge graph es neuro-simbólico: nodos tipados, relaciones explícitas, traversal determinista
 - La UI (Rovo) es donde vive el LLM — la parte no-determinista está contenida aquí
 - El backend es donde vive el determinismo — validación, trazabilidad, consistencia
-
-**Evidencia:**
-- Teamwork Graph: search/RAG over content, no typed relationships ([Rovo docs](https://developer.atlassian.com/platform/forge/manifest-reference/modules/rovo-agent/), S3)
-- RaiSE graph: `rai graph query` returns typed nodes with explicit edges (existing codebase)
-- Forge external fetch: can call HTTPS backends with declared domains (S8, S9)
 
 ### DA-2: Un Agente Contextual que Ejecuta Skills de Confluence
 
@@ -147,15 +412,9 @@ Governance Hub (Space)
 **Agregar un nuevo proceso de governance = crear una página en Confluence.**
 No code, no deploy.
 
-**Evidencia:**
-- Multiple agents per app supported (S23)
-- Prompts from file resources (S22)
-- Content properties for structured metadata (S12)
-
 ### DA-3: Skills como Páginas de Confluence
 
-**Decisión:** Cada skill es una página con estructura parseable que el agente lee
-y ejecuta. El formato es determinista para que el agente pueda seguirlo fielmente.
+Cada skill es una página con estructura parseable que el agente lee y ejecuta.
 
 **Skill Page Format:**
 
@@ -206,7 +465,7 @@ crear cuando se indexa el documento. Esto es lo que Teamwork Graph NO hace.
 
 ### DA-4: Acciones como Primitivas de Tres Dominios
 
-**Decisión:** Las acciones cubren tres dominios (Confluence, Jira, RaiSE Backend).
+Las acciones cubren tres dominios (Confluence, Jira, RaiSE Backend).
 El agente las compone según las instrucciones del skill.
 
 #### Confluence Actions
@@ -229,14 +488,17 @@ El agente las compone según las instrucciones del skill.
 
 #### RaiSE Backend Actions
 
-| Acción | Verbo | Qué hace |
-|--------|-------|----------|
-| `graph-index` | CREATE | Indexa documento de Confluence en el knowledge graph |
-| `graph-query` | GET | Query determinista sobre el grafo |
-| `graph-trace` | GET | Trazabilidad: de dónde viene, a dónde va |
-| `graph-impact` | GET | Análisis de impacto: qué afecta si cambia |
-| `governance-validate` | GET | Valida documento contra el grafo |
-| `dev-constraints` | GET | Retorna ADRs, standards, patterns que gobiernan un módulo |
+| Acción | Verbo | Backend Endpoint | Qué hace |
+|--------|-------|-----------------|----------|
+| `graph-sync` | CREATE | `POST /api/v1/graph/sync` | Envía nodos/edges parseados del documento al grafo |
+| `graph-query` | GET | `GET /api/v1/graph/query` | Búsqueda keyword en el grafo (determinista) |
+| `report-event` | CREATE | `POST /api/v1/agent/events` | Rovo reporta acciones ejecutadas |
+| `share-pattern` | CREATE | `POST /api/v1/memory/patterns` | Rovo comparte patrones aprendidos |
+
+**Nota:** Los endpoints `governance/validate`, `dev/constraints`, `graph/trace` y
+`graph/impact` están deferred para post-POC. Para el POC, la validación se hace
+combinando LLM + `graph/query`, y los constraints se consultan via `graph/query`
+con filtro por tipo de nodo.
 
 #### Ephemeral State
 
@@ -257,8 +519,8 @@ El agente las compone según las instrucciones del skill.
 | Feedback de revisión | Page comments | Comentarios nativos |
 | **Relaciones entre documentos** | **RaiSE knowledge graph** | **Nodos tipados + edges** |
 | **Trazabilidad** | **RaiSE knowledge graph** | **Graph traversal** |
-| **Validación de consistencia** | **RaiSE knowledge graph** | **Deterministic queries** |
-| **Constraints para devs** | **RaiSE knowledge graph** | **dev-constraints endpoint** |
+| **Validación de consistencia** | **RaiSE knowledge graph** | **Queries deterministas** |
+| **Constraints para devs** | **RaiSE knowledge graph** | **graph/query con filtros** |
 | Borrador pre-publicación | Forge Storage | Efímero, se borra al publicar |
 
 **Principio:** Confluence almacena **contenido**. RaiSE almacena **conocimiento**.
@@ -273,8 +535,8 @@ Confluence responde "¿qué dice el documento?". RaiSE responde "¿qué signific
 | Documento draft + user es assignee | **ELABORATE** | Ayuda a llenar/mejorar |
 | Documento in review + user es reviewer | **REVIEW** | Evalúa contra grafo + standards |
 | Hay comentarios sin resolver | **REFINE** | Muestra feedback, ayuda a resolver |
-| User pide validación explícita | **VALIDATE** | Invoca backend: consistencia + trazabilidad |
-| User es dev + pide guidance | **GUIDE** | Retorna constraints del grafo para el módulo |
+| User pide validación explícita | **VALIDATE** | Invoca graph/query: busca gaps y conflictos |
+| User es dev + pide guidance | **GUIDE** | Query al grafo por ADRs, standards, patterns del módulo |
 
 ### DA-7: Jira como Orquestador
 
@@ -311,71 +573,69 @@ Comparten las mismas acciones. Diferentes prompts, diferentes modos.
 - **Rai Governance:** CREATE, ELABORATE, REVIEW, REFINE, VALIDATE
 - **Rai Dev:** GUIDE (consulta constraints del grafo antes de generar código)
 
-### DA-9: Backend RaiSE — El Diferenciador
+### DA-9: Backend RaiSE — Disponible (E275)
 
-El backend es **el core del producto**, no un add-on.
+El backend **ya existe** (Epic RAISE-275, merged to dev 2026-02-26).
 
-**API Endpoints:**
+**Endpoints disponibles:**
 
 ```
 # === Graph Operations ===
 
-POST /api/v1/graph/index
-  Input:  { source: "confluence", pageId, spaceKey, documentType, content,
-            relations: [{from, relation, to}] }
-  Output: { indexed: true, node_id, nodes_created: [...], relations: [...] }
-  Notes:  Indexa contenido de Confluence como nodo tipado.
-          Crea relaciones según la sección "Graph Relations" del skill.
+POST /api/v1/graph/sync
+  Input:  { project_id: str, nodes: [{node_id, node_type, scope, content,
+            source_file?, properties?}], edges: [{source_node_id,
+            target_node_id, edge_type, weight?, properties?}] }
+  Output: { status, project_id, nodes_upserted, edges_created,
+            edges_skipped, nodes_pruned }
+  Notes:  Idempotent upsert. Replaces all nodes/edges for a project.
+          Forge action pre-parses Confluence doc into nodes/edges.
 
 GET  /api/v1/graph/query
-  Input:  ?query=...&types=concept,adr,module,standard&scope=project-x
-  Output: { nodes: [{id, type, title, properties}], edges: [{from, relation, to}] }
-  Notes:  Query determinista. Mismo input → mismo output. Siempre.
+  Input:  ?q=...&limit=N
+  Output: { results: [{node_id, node_type, scope, content, source_file,
+            properties, rank}], total, query, limit }
+  Notes:  GIN full-text search. Deterministic. Same input → same output.
 
-GET  /api/v1/graph/trace
-  Input:  ?from=ADR-003&direction=downstream|upstream&depth=3
-  Output: { chain: [{node, relation, node}, ...] }
-  Notes:  Trazabilidad. "¿De dónde viene esta decisión?"
-          "¿Qué código implementa este ADR?"
+# === Agent Telemetry ===
 
-GET  /api/v1/graph/impact
-  Input:  ?node=ADR-003&change=deprecate|modify
-  Output: { affected: [{node, risk_level, reason}], total_impact: "high" }
-  Notes:  Análisis de impacto. "Si cambio ADR-003, ¿qué se rompe?"
+POST /api/v1/agent/events
+  Input:  { agent_id, event_type, payload }
+  Output: { id, agent_id, event_type, created_at }
+  Notes:  Rovo reports actions executed (create, update, review, validate).
 
-# === Governance Validation ===
+GET  /api/v1/agent/events
+  Input:  ?agent_id=...&limit=N
+  Output: { events: [...], total }
 
-POST /api/v1/governance/validate
-  Input:  { documentType, content, projectScope }
-  Output: { valid: bool, completeness: 0-100,
-            gaps: [{section, severity, suggestion}],
-            conflicts: [{with_document, field, description}],
-            coverage: {adrs: "3/3", standards: "2/4"} }
-  Notes:  Valida documento contra el grafo. Determinista.
-          Verifica: ¿están todos los concerns cubiertos?
-          ¿hay contradicciones con otros documentos?
+# === Memory / Patterns ===
 
-POST /api/v1/governance/check-consistency
-  Input:  { documents: [pageId1, pageId2, ...] }
-  Output: { consistent: bool, contradictions: [...], missing_links: [...] }
-  Notes:  Consistencia cruzada. "¿El LBC y el ADR dicen lo mismo sobre auth?"
+POST /api/v1/memory/patterns
+  Input:  { content, context, pattern_type, source }
+  Output: { id, content, created_at }
+  Notes:  Rovo shares patterns learned during governance workflows.
 
-# === Dev Guidance ===
-
-GET  /api/v1/dev/constraints
-  Input:  ?module=mod-auth&project=project-x
-  Output: { adrs: [{id, title, status, key_requirement}],
-            standards: [{id, title, rules: [...]}],
-            patterns: [{id, title, when_to_use}] }
-  Notes:  Todo lo que gobierna un módulo. Para Rai Dev / rai-cli.
-          Determinista: mismo módulo → mismas constraints.
+GET  /api/v1/memory/patterns
+  Input:  ?limit=N
+  Output: { patterns: [...], total }
 ```
+
+**Auth:** `Authorization: Bearer rsk_...` (API key per org, hash in DB).
+**Infrastructure:** Docker Compose (PG 16 + FastAPI). `docker compose up` in raise-commons.
+**OpenAPI spec:** Auto-generated at `http://localhost:8000/docs`.
+**Validated:** E2E with 1589 nodes + 33k edges from real raise-commons graph.
+
+**Endpoints deferred (post-POC):**
+- `POST /governance/validate` — POC uses LLM + graph/query combo
+- `GET /dev/constraints` — POC uses graph/query with type filtering
+- `GET /graph/trace` — trazabilidad upstream/downstream
+- `GET /graph/impact` — análisis de impacto
 
 ### DA-10: Entornos y Testing
 
 **Forge:** dev/staging/production desde el día 1.
-**Backend:** equivalente (dev/staging/prod con graphs separados).
-**Testing:** Jest para actions, Rovo Studio para prompts, E2E manual con tunnel.
+**Backend:** Docker Compose for dev. Future: staging/prod with separate DBs.
+**Testing:** Jest for actions, Rovo Studio for prompts, E2E manual with tunnel.
 
 ---
 
@@ -389,13 +649,13 @@ GET  /api/v1/dev/constraints
 | 2 | Rai lee el skill page | UI | `find-skill-page` + `read-confluence-page` |
 | 3 | Rai guía creación de documento | UI | Ejecución de skill conversacional |
 | 4 | Documento se crea en Confluence | Content | `create-confluence-page` + properties + labels |
-| 5 | **Backend indexa el documento en el grafo** | **Knowledge** | **`graph-index` funciona** |
+| 5 | **Backend indexa el documento en el grafo** | **Knowledge** | **`graph-sync` funciona** |
 | 6 | PO elabora con Rai, página se actualiza | UI+Content | `update-confluence-page` + version messages |
 | 7 | PO manda a review, Jira transiciona | Content | `transition-jira-issue` |
 | 8 | Architect revisa con Rai | UI | Modo REVIEW, agrega comentarios |
-| 9 | **Rai valida contra el grafo** | **Knowledge** | **`governance-validate` determinista** |
+| 9 | **Rai valida contra el grafo** | **Knowledge** | **`graph-query` + LLM analysis** |
 | 10 | PO refina basado en feedback | UI+Content | Modo REFINE, actualiza doc |
-| 11 | **Dev pide constraints, grafo responde** | **Knowledge** | **`dev-constraints` determinista** |
+| 11 | **Dev pide constraints, grafo responde** | **Knowledge** | **`graph-query` con filtro por tipo** |
 | 12 | Documento se aprueba, ciclo cierra | All | Loop completo funciona |
 
 ### Flujo Visual
@@ -442,12 +702,14 @@ Ana abre Story "LBC" en Jira, habla con Rai:
 │    d. Set content property: rai-governance                   │
 │    e. Add labels: rai-generated, lean-business-case          │
 │                                                              │
-│ 5. graph-index(pageId, documentType, relations)     ◄── KG   │
+│ 5. graph-sync(project_id, nodes, edges)              ◄── KG  │
 │    → Backend indexa LBC como nodo tipado                     │
 │    → Crea: LBC --traces-to--> Epic "Piloto"                 │
 │    → Crea: LBC --requires--> concept:auth                   │
 │                                                              │
-│ 6. Reporta a Ana: "Documento creado, v2. Link: ..."         │
+│ 6. report-event(agent_id, "document-created", {...}) ◄── Tel │
+│                                                              │
+│ 7. Reporta a Ana: "Documento creado, v2. Link: ..."         │
 └─────────────────────────────────────────────────────────────┘
                          │
                     Confluence
@@ -475,21 +737,22 @@ Rodo abre la misma Story, habla con Rai:
 │ 2. read-confluence-page → LBC content + property             │
 │ 3. MODE: REVIEW                                              │
 │                                                              │
-│ 4. governance-validate(lbc, content, "piloto")      ◄── KG   │
-│    → Backend traverses graph:                                │
+│ 4. graph-query(q="auth piloto", limit=20)            ◄── KG  │
+│    → LLM analiza resultados del grafo:                       │
 │      ✅ Problem statement: hypothesis format                 │
 │      ✅ Stakeholders: identified                             │
 │      ⚠️ Risks: mentioned but not quantified                 │
 │      ❌ No ADR for auth approach mentioned in solution       │
 │      Coverage: ADRs 0/1, Standards 2/3                       │
 │                                                              │
-│ 5. Rai presents findings to Rodo (deterministic, from graph) │
+│ 5. Rai presents findings to Rodo (graph facts + LLM analysis)│
 │                                                              │
 │ 6. add-page-comment(review feedback)                         │
 │    → "Review (Rodo via Rai): Risks need quantification..."   │
 │    → "Review (Rodo via Rai): Auth approach needs ADR..."     │
 │                                                              │
 │ 7. transition-jira-issue → back to In Progress               │
+│ 8. report-event(agent_id, "document-reviewed", {...})        │
 └─────────────────────────────────────────────────────────────┘
 
 
@@ -511,12 +774,12 @@ Ana vuelve, habla con Rai:
 │       version msg: "Rai: Quantified risks per Rodo's review" │
 │    b. Notes ADR gap → suggests creating ADR for auth         │
 │                                                              │
-│ 5. graph-index(updated content, new relations)      ◄── KG   │
+│ 5. graph-sync(updated nodes + new relations)         ◄── KG  │
 │    → Updates LBC node, adds: LBC --needs-adr--> concept:auth │
 │                                                              │
 │ 6. Ana moves to Review again                                 │
 │    → Rodo approves → Story: Done → Page status: Approved     │
-│    → graph-index updates: LBC step = "approved"              │
+│    → graph-sync updates: LBC step = "approved"               │
 └─────────────────────────────────────────────────────────────┘
 
 
@@ -531,8 +794,8 @@ Dev implementing auth for Iniciativa Piloto:
 │                                                              │
 │ 1. read-jira-context → Story "Implement auth", epic: Piloto  │
 │                                                              │
-│ 2. dev-constraints(module: "auth", project: "piloto") ◄── KG │
-│    → DETERMINISTIC response:                                 │
+│ 2. graph-query(q="auth piloto", limit=20)            ◄── KG  │
+│    → DETERMINISTIC results:                                  │
 │      ADRs: [ADR-003: "Must use OAuth2 with JWT"]             │
 │      Standards: [STD-SEC-01: "OWASP Top 10 compliance"]      │
 │      Patterns: [PAT-001: "JWT validation middleware"]        │
@@ -572,7 +835,8 @@ Ana:  El status quo cuesta $150K/mes en retrabajo. El sponsor
 
 Rai:  [update-confluence-page → draft con version message
        "Rai: Initial LBC from session transcript + clarifications"]
-      [graph-index → indexa LBC, crea relaciones al epic]
+      [graph-sync → indexa LBC, crea relaciones al epic]
+      [report-event → "document-created"]
 
       Creé el draft. Secciones:
       ✅ Problem Statement (hypothesis format)
@@ -594,22 +858,18 @@ Rodo: Quiero revisar el LBC de Iniciativa Piloto.
 
 Rai:  [read-jira-context → In Review, Rodo]
       [read-confluence-page → LBC content + property]
-      [governance-validate → query al grafo]
+      [graph-query → busca nodos relacionados a "auth piloto"]
 
-      El LBC está en Review. Mi validación contra el grafo
-      de governance:
+      El LBC está en Review. Mi análisis combinando el grafo
+      y el contenido del documento:
 
       ✅ Problem Statement: hypothesis format correcto
       ✅ Financial Impact: cuantificado ($1.8M/año)
       ⚠️ Risks: mencionados pero sin cuantificar
          (probabilidad × impacto ausentes)
       ❌ Auth approach: el documento menciona "autenticación
-         para 50K usuarios" pero NO hay ADR que la respalde.
-         Se necesita ADR para la decisión de auth.
-      Coverage: ADRs 0/1 requeridos, Standards 2/3 cubiertos
-
-      Esto viene del knowledge graph, no es mi opinión —
-      son gaps verificables.
+         para 50K usuarios" pero el grafo no tiene ADR que
+         la respalde. Se necesita ADR para la decisión de auth.
 
       ¿Agrego comentarios de revisión?
 
@@ -619,8 +879,8 @@ Rodo: Sí, agrega los comentarios. Y crea un ADR para auth
 Rai:  [add-page-comment → 2 comentarios de revisión]
       [find-skill-page → lee "Skill: ADR"]
       [create-confluence-page → nuevo ADR con datos del LBC]
-      [graph-index → indexa ADR, crea: ADR-003 --governs--> concept:auth,
-       ADR-003 --traces-to--> LBC-Piloto]
+      [graph-sync → indexa ADR, crea relaciones]
+      [report-event → "document-reviewed", "document-created"]
 
       Hecho:
       - 2 comentarios de revisión en el LBC
@@ -640,7 +900,7 @@ Dev:  Voy a implementar el módulo de auth para Iniciativa
 
 Rai Dev:
       [read-jira-context → Story "Implement Auth", epic: Piloto]
-      [dev-constraints → query al grafo]
+      [graph-query → busca "auth" + "piloto" en el grafo]
 
       Antes de empezar, estos son los constraints de governance
       para auth en Iniciativa Piloto:
@@ -675,8 +935,8 @@ modules:
       description: >
         Governance copilot for Lean Portfolio Management.
         Reads skill definitions from Confluence, executes them
-        conversationally, and validates against the RaiSE
-        knowledge graph for deterministic governance.
+        conversationally, and queries the RaiSE knowledge graph
+        for deterministic governance validation.
       prompt: resource:static-resources;prompts/rai-governance.txt
       conversationStarters:
         - Help me work on a governance document
@@ -692,9 +952,10 @@ modules:
         - add-page-comment
         - read-jira-context
         - transition-jira-issue
-        - graph-index
+        - graph-sync
         - graph-query
-        - governance-validate
+        - report-event
+        - share-pattern
         - save-draft-state
         - load-draft-state
 
@@ -713,7 +974,7 @@ modules:
         - read-confluence-page
         - read-jira-context
         - graph-query
-        - dev-constraints
+        - report-event
 
   action:
     # === Confluence: Skills ===
@@ -768,7 +1029,7 @@ modules:
       actionVerb: CREATE
       description: >
         Creates a new Confluence page with content, governance
-        metadata, and labels. Also triggers graph indexing.
+        metadata, and labels.
       inputs:
         spaceKey:
           title: Space Key
@@ -898,102 +1159,102 @@ modules:
           required: true
           description: "Target status name (e.g. 'In Review')"
 
-    # === RaiSE Backend: Knowledge Graph ===
-    - key: graph-index
-      name: Index in Knowledge Graph
-      function: graphIndex
+    # === RaiSE Backend ===
+    - key: graph-sync
+      name: Sync to Knowledge Graph
+      function: graphSync
       actionVerb: CREATE
       description: >
-        Indexes a Confluence document into the RaiSE knowledge
-        graph as a typed node with explicit relationships.
-        Call after creating or significantly updating a document.
+        Sends parsed document nodes and edges to the RaiSE
+        knowledge graph. Call after creating or significantly
+        updating a governance document. The Forge action
+        pre-parses Confluence content into typed nodes and
+        relation edges before calling the backend.
       inputs:
-        pageId:
-          title: Page ID
+        projectId:
+          title: Project ID
           type: string
           required: true
-          description: "Confluence page ID to index"
-        documentType:
-          title: Document Type
+          description: "Project identifier for graph scoping"
+        nodes:
+          title: Graph Nodes
           type: string
           required: true
-          description: "Type: problem-scope, lbc, adr, standard, skill"
-        relations:
-          title: Graph Relations
+          description: "JSON array of {node_id, node_type, scope, content, source_file?, properties?}"
+        edges:
+          title: Graph Edges
           type: string
           required: false
-          description: "JSON array of {from, relation, to} to create"
+          description: "JSON array of {source_node_id, target_node_id, edge_type, weight?, properties?}"
 
     - key: graph-query
       name: Query Knowledge Graph
       function: graphQuery
       actionVerb: GET
       description: >
-        Deterministic query on the RaiSE knowledge graph.
-        Returns typed nodes and explicit relationships.
+        Keyword search on the RaiSE knowledge graph.
+        Returns typed nodes ranked by relevance.
         Same input always produces same output.
       inputs:
         query:
           title: Query
           type: string
           required: true
-          description: "What to query (e.g. 'auth in project piloto')"
-        types:
-          title: Node Types
-          type: string
+          description: "Search keywords (e.g. 'auth piloto')"
+        limit:
+          title: Max Results
+          type: number
           required: false
-          description: "Filter by types: concept,adr,module,standard,lbc"
-        scope:
-          title: Project Scope
-          type: string
-          required: false
-          description: "Scope to project (e.g. 'piloto')"
+          description: "Maximum results to return (default: 20)"
 
-    - key: governance-validate
-      name: Validate Governance Document
-      function: governanceValidate
-      actionVerb: GET
+    - key: report-event
+      name: Report Agent Event
+      function: reportEvent
+      actionVerb: CREATE
       description: >
-        Validates a document against the knowledge graph.
-        Returns deterministic results: gaps, conflicts,
-        coverage. NOT an opinion — verifiable facts from
-        the graph.
+        Reports an agent action to RaiSE telemetry.
+        Call after significant actions (document created,
+        reviewed, validated).
       inputs:
-        pageId:
-          title: Page ID
+        agentId:
+          title: Agent ID
           type: string
           required: true
-          description: "Document to validate"
-        documentType:
-          title: Document Type
+          description: "Agent identifier (e.g. 'rai-governance')"
+        eventType:
+          title: Event Type
           type: string
           required: true
-          description: "Type: problem-scope, lbc, adr"
-        projectScope:
-          title: Project Scope
+          description: "Action type (e.g. 'document-created', 'document-reviewed')"
+        payload:
+          title: Event Payload
           type: string
           required: false
-          description: "Project to validate against"
+          description: "JSON with event details"
 
-    - key: dev-constraints
-      name: Get Dev Constraints
-      function: devConstraints
-      actionVerb: GET
+    - key: share-pattern
+      name: Share Pattern
+      function: sharePattern
+      actionVerb: CREATE
       description: >
-        Returns all governance constraints for a module:
-        ADRs, standards, patterns. Deterministic — same
-        module always returns same constraints.
+        Shares a learned pattern with the team via the
+        RaiSE memory system.
       inputs:
-        module:
-          title: Module
+        content:
+          title: Pattern
           type: string
           required: true
-          description: "Module name or concept (e.g. 'auth', 'payments')"
-        project:
-          title: Project
+          description: "Pattern description"
+        context:
+          title: Context
           type: string
           required: false
-          description: "Project scope"
+          description: "Keywords for when this pattern applies"
+        patternType:
+          title: Type
+          type: string
+          required: false
+          description: "Pattern type (e.g. 'governance', 'process')"
 
     # === Ephemeral State ===
     - key: save-draft-state
@@ -1049,14 +1310,14 @@ modules:
     - key: transitionIssue
       handler: src/actions/jira.transitionIssue
     # RaiSE Backend
-    - key: graphIndex
-      handler: src/actions/raise.graphIndex
+    - key: graphSync
+      handler: src/actions/raise.graphSync
     - key: graphQuery
       handler: src/actions/raise.graphQuery
-    - key: governanceValidate
-      handler: src/actions/raise.governanceValidate
-    - key: devConstraints
-      handler: src/actions/raise.devConstraints
+    - key: reportEvent
+      handler: src/actions/raise.reportEvent
+    - key: sharePattern
+      handler: src/actions/raise.sharePattern
     # State
     - key: saveDraft
       handler: src/actions/state.saveDraft
@@ -1102,7 +1363,6 @@ import api, { route } from '@forge/api';
 export async function findSkill(payload) {
   const { skillName, spaceKey = 'GOV' } = payload;
 
-  // Search for skill page by title in the governance space
   const cql = `space = "${spaceKey}" AND title ~ "Skill: ${skillName}" AND type = page`;
   const res = await api.asUser().requestConfluence(
     route`/wiki/rest/api/content/search?cql=${encodeURIComponent(cql)}&expand=body.storage`
@@ -1398,11 +1658,15 @@ export async function transitionIssue(payload) {
 import api from '@forge/api';
 
 const BACKEND_URL = process.env.RAISE_BACKEND_URL || 'https://raise-api.humansys.ai';
+const API_KEY = process.env.RAISE_API_KEY || '';
 
 async function callBackend(method, path, body = null) {
   const options = {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
+    },
   };
   if (body) options.body = JSON.stringify(body);
 
@@ -1413,52 +1677,56 @@ async function callBackend(method, path, body = null) {
   return await res.json();
 }
 
-// === Graph Index ===
+// === Graph Sync ===
+// POST /api/v1/graph/sync — idempotent upsert of nodes + edges
 
-export async function graphIndex(payload) {
-  const { pageId, documentType, relations } = payload;
+export async function graphSync(payload) {
+  const { projectId, nodes, edges } = payload;
 
-  return await callBackend('POST', '/api/v1/graph/index', {
-    source: 'confluence',
-    pageId,
-    documentType,
-    relations: relations ? JSON.parse(relations) : [],
+  return await callBackend('POST', '/api/v1/graph/sync', {
+    project_id: projectId,
+    nodes: JSON.parse(nodes),
+    edges: edges ? JSON.parse(edges) : [],
   });
 }
 
 // === Graph Query ===
+// GET /api/v1/graph/query — GIN full-text keyword search
 
 export async function graphQuery(payload) {
-  const { query, types, scope } = payload;
+  const { query, limit } = payload;
 
-  const params = new URLSearchParams({ query });
-  if (types) params.set('types', types);
-  if (scope) params.set('scope', scope);
+  const params = new URLSearchParams({ q: query });
+  if (limit) params.set('limit', String(limit));
 
   return await callBackend('GET', `/api/v1/graph/query?${params}`);
 }
 
-// === Governance Validate ===
+// === Agent Telemetry ===
+// POST /api/v1/agent/events — report agent action
 
-export async function governanceValidate(payload) {
-  const { pageId, documentType, projectScope } = payload;
+export async function reportEvent(payload) {
+  const { agentId, eventType, payload: eventPayload } = payload;
 
-  return await callBackend('POST', '/api/v1/governance/validate', {
-    pageId,
-    documentType,
-    projectScope,
+  return await callBackend('POST', '/api/v1/agent/events', {
+    agent_id: agentId,
+    event_type: eventType,
+    payload: eventPayload ? JSON.parse(eventPayload) : {},
   });
 }
 
-// === Dev Constraints ===
+// === Memory Patterns ===
+// POST /api/v1/memory/patterns — share learned pattern
 
-export async function devConstraints(payload) {
-  const { module: moduleName, project } = payload;
+export async function sharePattern(payload) {
+  const { content, context, patternType } = payload;
 
-  const params = new URLSearchParams({ module: moduleName });
-  if (project) params.set('project', project);
-
-  return await callBackend('GET', `/api/v1/dev/constraints?${params}`);
+  return await callBackend('POST', '/api/v1/memory/patterns', {
+    content,
+    context: context || '',
+    pattern_type: patternType || 'governance',
+    source: 'rovo-agent',
+  });
 }
 ```
 
@@ -1501,14 +1769,15 @@ templates, and processes come from SKILL PAGES in Confluence. You are
 an execution engine — you read skills and follow them.
 
 Your deterministic backbone is the RaiSE Knowledge Graph. When you
-validate, trace, or check consistency, you query the graph. Graph
-results are FACTS, not opinions. Present them as such.
+need to check what exists, search for related documents, or find
+constraints, you query the graph via graph-query. Graph results are
+FACTS, not opinions. Present them as such.
 
 ## Identity
 - Direct, honest, no praise
 - Distinguish between your interpretation (LLM, fallible) and
   graph results (deterministic, verifiable)
-- Say "The knowledge graph shows..." for deterministic facts
+- Say "The knowledge graph shows..." for graph query results
 - Say "I think..." or "Based on the text..." for interpretation
 - Say "I don't know" when you don't
 
@@ -1527,27 +1796,28 @@ results are FACTS, not opinions. Present them as such.
    CREATE — No document exists or page is empty/template
    → Find the matching skill page (find-skill-page)
    → Follow skill's Process section step by step
-   → Create document, index in graph (graph-index)
+   → Create document, sync to graph (graph-sync)
 
    ELABORATE — Document draft, user is working on it
    → Read current document + skill for reference
    → Help fill sections, improve content
    → Update page with version messages
-   → Re-index after significant changes (graph-index)
+   → Re-sync after significant changes (graph-sync)
 
    REVIEW — Document in review, or user asks to review
    → Read document
-   → governance-validate against knowledge graph (DETERMINISTIC)
-   → Present graph findings: ✅ ⚠️ ❌
+   → graph-query to find related docs, ADRs, standards
+   → Analyze coverage using graph results + document content
+   → Present findings: ✅ ⚠️ ❌
    → Add comments if reviewer agrees
 
    REFINE — Unresolved comments exist
    → read-page-comments, show grouped by section
    → Work through each, update page
-   → Re-index after changes
+   → Re-sync after changes
 
    VALIDATE — User asks for explicit validation
-   → governance-validate (full graph check)
+   → graph-query for related governance docs
    → Report: gaps, conflicts, coverage, traceability
 
 4. Tell user your mode and why.
@@ -1569,26 +1839,26 @@ When you need to execute a governance skill:
    - Set governance metadata (content property)
    - Add labels
    - Use version message: "Rai: {what was done}"
-5. Index in knowledge graph:
-   - graph-index with documentType and relations from skill
-6. Validate:
+5. Sync to knowledge graph:
+   - graph-sync with nodes and edges from skill's Graph Relations
+6. Report action:
+   - report-event with what was done
+7. Validate:
    - Check each Validation Rule
    - Report status to user
 
 ## Graph Operations
 
 ### After creating/updating a document:
-→ graph-index: index the document as a typed node
+→ graph-sync: send parsed nodes and edges to backend
    Include relations from the skill's "Graph Relations" section
 
 ### When reviewing:
-→ governance-validate: deterministic check against graph
-   Results are FACTS: "ADR-003 governs auth but no ADR exists
-   for data residency" — this is verifiable, not interpretation
+→ graph-query: search for related ADRs, standards, patterns
+   Combine graph results with document analysis to find gaps
 
-### When user asks about impact:
-→ graph-query: "what depends on this document?"
-   "If you change ADR-003, these modules are affected: [...]"
+### When user asks about dependencies:
+→ graph-query: "what documents relate to this topic?"
 
 ## Version Messages
 ALWAYS descriptive:
@@ -1604,7 +1874,7 @@ Maintain on every governance document:
   "createdBy": "rai",
   "lastAgentAction": "created|updated|reviewed",
   "jiraIssueKey": "PROJ-123",
-  "graphNodeId": "{node-id-from-backend}"
+  "graphProjectId": "{project-id}"
 }
 
 ## Boundaries
@@ -1640,7 +1910,7 @@ not suggestions.
 
 1. read-jira-context for the current story/issue
 2. Identify the module/concept being worked on
-3. dev-constraints(module, project) → DETERMINISTIC constraints
+3. graph-query for related ADRs, standards, patterns
 
 4. Present constraints before any code:
    "Before we start, these governance constraints apply:
@@ -1676,84 +1946,60 @@ governance process, not to ignore it in code.
 
 ## 6. Plan de Implementación
 
-### Fase 0: Infrastructure Setup (1-2 días)
-- [ ] Fernando: Install Forge CLI, `forge create`
-- [ ] Fernando: Configure dev environment + install on test site
-- [ ] Fernando: Verify Rai appears in Rovo Chat
-- [ ] Emilio: Create Jira project with workflow (To Do → In Progress → In Review → Done)
-- [ ] Emilio: Create Confluence space "Governance Hub" with folder structure
-- [ ] Emilio: Create first skill page "Skill: Problem Scope"
-- [ ] Emilio: Setup Jira Automation (intake → epic + stories + pages)
+### Fase 0: Content Setup (Emilio, 1-2 días)
+- [ ] Create Confluence space "Governance Hub" with folder structure
+- [ ] Create skill page "Skill: Problem Scope"
+- [ ] Create skill page "Skill: Lean Business Case"
+- [ ] Create Jira project with workflow (To Do → In Progress → In Review → Done)
+- [ ] Setup Jira Automation (intake → epic + stories + pages)
+- [ ] Deploy backend via Docker Compose + ngrok for dev access
 
-### Fase 1: Forge Actions — Confluence + Jira (2-3 días)
-- [ ] Fernando: Implement Confluence actions (read, create, update, comments, findSkill)
-- [ ] Fernando: Implement Jira actions (readContext, transition)
-- [ ] Fernando: Implement Forge Storage actions (save/load draft)
-- [ ] Fernando: Implement rai-governance prompt
-- [ ] **Test: Rai reads skill page, creates document, updates with version messages**
+### Fase 1: Forge Actions — Confluence + Jira (Fernando, 2-3 días)
+- [ ] `forge create` + dev environment + install on test site
+- [ ] Implement Confluence actions (read, create, update, comments, findSkill)
+- [ ] Implement Jira actions (readContext, transition)
+- [ ] Implement Forge Storage actions (save/load draft)
+- [ ] Implement `rai-governance` prompt
+- [ ] **Gate: Rai reads skill page, creates document, updates with version messages**
 
-### Fase 2: RaiSE Backend — Knowledge Layer (3-4 días)
-- [ ] Emilio: Design graph schema for governance nodes (ADR, LBC, PS, standard, concept)
-- [ ] Emilio: FastAPI skeleton with /graph/index, /graph/query, /governance/validate
-- [ ] Emilio: Deploy with ngrok for dev
-- [ ] Fernando: Implement raise.js actions (graphIndex, graphQuery, governanceValidate, devConstraints)
-- [ ] **Test: Create document → backend indexes → query returns deterministic result**
+### Fase 2: Backend Integration (Fernando, 1-2 días)
+- [ ] Implement `raise.js` actions (graphSync, graphQuery, reportEvent, sharePattern)
+- [ ] Configure `RAISE_BACKEND_URL` + `RAISE_API_KEY` env vars
+- [ ] **Gate: Create document → graph-sync → graph-query returns indexed result**
 
-### Fase 3: E2E Cycle (2-3 días)
-- [ ] Full cycle: CREATE → ELABORATE → REVIEW (with graph validate) → REFINE → APPROVE
-- [ ] Graph indexing on every create/update
-- [ ] Governance validation returns deterministic gaps/conflicts
+### Fase 3: E2E Governance Cycle (Fernando + Emilio, 2-3 días)
+- [ ] Full cycle: CREATE → ELABORATE → REVIEW → REFINE → APPROVE
+- [ ] Graph sync on every create/update
 - [ ] Content properties + version messages + labels working
-- [ ] **Test: Full skeleton conversation (Ana → Rodo → Ana → Dev)**
+- [ ] **Gate: Full skeleton conversation (Ana → Rodo → Ana → Dev)**
 
-### Fase 4: Rai Dev Agent (1-2 días)
-- [ ] Fernando: Add rai-dev agent to manifest
-- [ ] Fernando: Implement rai-dev prompt
-- [ ] **Test: Dev asks for constraints → graph returns ADRs + standards deterministically**
-- [ ] **Test: Dev tries to violate ADR → Rai Dev flags it**
+### Fase 4: Rai Dev Agent (Fernando, 1-2 días)
+- [ ] Add `rai-dev` agent to manifest
+- [ ] Implement `rai-dev` prompt
+- [ ] **Gate: Dev asks for constraints → graph-query returns ADRs + standards**
 
-### Fase 5: Second Document Type — Validate Scale (1 día)
-- [ ] Emilio: Create skill page "Skill: Lean Business Case" in Confluence
-- [ ] **Test: Same agent, same actions, new document type — zero code change**
-- [ ] This IS the killer demo: "New governance process = new Confluence page"
+### Fase 5: Second Document Type (Emilio, 1 día)
+- [ ] Verify "Skill: Lean Business Case" page works with existing agent
+- [ ] **Gate: Same agent, same actions, new doc type — ZERO code change**
+- [ ] THIS is the killer demo: "New governance process = new Confluence page"
 
-### Fase 6: CI/CD + Staging (1-2 días)
-- [ ] Jest tests for all actions
-- [ ] Pipeline: lint + test + forge deploy
-- [ ] Promote to staging
-- [ ] E2E test on staging
+### Timeline
 
----
+| Phase | Owner | Est. | Target |
+|-------|-------|------|--------|
+| 0 | Emilio | 1-2d | Feb 27 |
+| 1 | Fernando | 2-3d | Mar 1 |
+| 2 | Fernando | 1-2d | Mar 2 |
+| 3 | Fernando + Emilio | 2-3d | Mar 4 (Coppel demo) |
+| 4 | Fernando | 1-2d | Mar 7 |
+| 5 | Emilio | 1d | Mar 8 |
 
-## 7. Mapa de Escalamiento
-
-```
-Fase 0-1          Fase 2-3           Fase 4-5          Futuro
-─────────          ──────            ──────             ──────
-
-UI Layer:          UI Layer:          UI Layer:          UI Layer:
-Rai Governance →   + graph actions → + Rai Dev       → N agents
-(skill executor)   (index, query,    (dev guidance)    (per need)
-                    validate)
-
-Content Layer:     Content Layer:    Content Layer:     Content Layer:
-Confluence      →  + properties   → + CQL queries   → Dashboard
-(pages, skills)    + version msgs    + search           de governance
-
-Knowledge Layer:   Knowledge Layer:  Knowledge Layer:   Knowledge Layer:
-(none)          →  RaiSE Backend  → + dev-constraints→ Full KG
-                   graph/index       + impact analysis  + generation
-                   graph/query                          + prediction
-                   gov/validate
-
-Determinism:       Determinism:      Determinism:       Determinism:
-0%              →  validation     → dev constraints  → full governance
-(LLM only)         is deterministic  are deterministic  automation
-```
+**Coppel demo (Mar 4):** Phases 0-3 = Rovo Agent creating governance docs + graph integration.
+**Atlassian webinar (Mar 14):** + Phase 4-5 = Rai Dev + zero-code extensibility.
 
 ---
 
-## 8. FREE vs PRO
+## 7. FREE vs PRO
 
 ```
 RaiSE FREE (rai-cli):

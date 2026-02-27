@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated, Literal
 
 import typer
@@ -70,7 +70,7 @@ app.command("init")(init_command)
 console = Console()
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Output format options."""
 
     human = "human"

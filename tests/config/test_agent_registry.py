@@ -143,7 +143,9 @@ class TestProjectOverride:
         assert config.agent_type == "codex-cli"
         assert config.instructions_file == "AGENTS.md"
 
-    def test_project_override_does_not_affect_other_agents(self, tmp_path: Path) -> None:
+    def test_project_override_does_not_affect_other_agents(
+        self, tmp_path: Path
+    ) -> None:
         _write_yaml(
             tmp_path / ".raise" / "agents" / "claude.yaml",
             {

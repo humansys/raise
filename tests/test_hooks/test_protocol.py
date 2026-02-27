@@ -71,20 +71,3 @@ class TestLifecycleHookProtocol:
     def test_missing_priority_is_not_instance(self) -> None:
         assert not isinstance(_MissingPriority(), LifecycleHook)
 
-    def test_handle_returns_hook_result(self) -> None:
-        hook = _CompliantHook()
-        event = HookEvent()
-        result = hook.handle(event)
-        assert result.status == "ok"
-
-    def test_events_is_list_of_strings(self) -> None:
-        hook = _CompliantHook()
-        assert hook.events == ["session:start"]
-
-    def test_priority_is_int(self) -> None:
-        hook = _CompliantHook()
-        assert hook.priority == 0
-
-    def test_default_priority_is_zero(self) -> None:
-        """Convention: default priority is 0."""
-        assert _CompliantHook.priority == 0

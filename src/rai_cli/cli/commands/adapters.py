@@ -20,7 +20,6 @@ from rai_cli.adapters.protocols import (
     DocumentationTarget,
     GovernanceParser,
     GovernanceSchemaProvider,
-    KnowledgeGraphBackend,
     ProjectManagementAdapter,
 )
 from rai_cli.adapters.registry import (
@@ -39,6 +38,7 @@ from rai_cli.output.formatters.adapters import (
     format_list_json,
 )
 from rai_cli.tier.context import TierContext
+from rai_core.graph.backends.protocol import KnowledgeGraphBackend
 
 adapters_app = typer.Typer(
     name="adapters",
@@ -147,11 +147,13 @@ def check_command(
             try:
                 loaded: Any = ep.load()
             except Exception as exc:  # noqa: BLE001
-                emitter.emit(AdapterFailedEvent(
-                    adapter_name=ep.name,
-                    group=group,
-                    error=str(exc),
-                ))
+                emitter.emit(
+                    AdapterFailedEvent(
+                        adapter_name=ep.name,
+                        group=group,
+                        error=str(exc),
+                    )
+                )
                 results.append(
                     {
                         "group": group,
@@ -167,17 +169,21 @@ def check_command(
             compliant = inspect.isclass(loaded) and issubclass(loaded, proto_cls)
             error = None if compliant else f"Not a {proto_name} subclass"
             if compliant:
-                emitter.emit(AdapterLoadedEvent(
-                    adapter_name=ep.name,
-                    group=group,
-                    adapter_type=type(loaded).__name__,
-                ))
+                emitter.emit(
+                    AdapterLoadedEvent(
+                        adapter_name=ep.name,
+                        group=group,
+                        adapter_type=type(loaded).__name__,
+                    )
+                )
             else:
-                emitter.emit(AdapterFailedEvent(
-                    adapter_name=ep.name,
-                    group=group,
-                    error=error or "",
-                ))
+                emitter.emit(
+                    AdapterFailedEvent(
+                        adapter_name=ep.name,
+                        group=group,
+                        error=error or "",
+                    )
+                )
             results.append(
                 {
                     "group": group,

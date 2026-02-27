@@ -1,0 +1,16 @@
+# Evidence Catalog — Rovo AI Capabilities for Forge Integration
+
+## Sources
+
+| # | Source | Type | Evidence Level | Key Finding |
+|---|--------|------|---------------|-------------|
+| 1 | [Forge Rovo Agent manifest reference](https://developer.atlassian.com/platform/forge/manifest-reference/modules/rovo-agent/) | Primary (official docs) | Very High | Agent defined by prompt + actions in manifest. Prompt can be inline or file. Actions are Forge functions the agent can invoke. |
+| 2 | [Forge Rovo Action manifest reference](https://developer.atlassian.com/platform/forge/manifest-reference/modules/rovo-action/) | Primary (official docs) | Very High | Actions support GET/CREATE/UPDATE/DELETE/TRIGGER verbs. Inputs: string/integer/number/boolean. Can call external APIs via Forge fetch. 5MB data limit. Agent uses description field to decide when to invoke. |
+| 3 | [Hello World Rovo Agent tutorial](https://developer.atlassian.com/platform/forge/build-a-hello-world-rovo-agent/) | Primary (official tutorial) | Very High | Simple agent: prompt instructs behavior, action is a JS function. Agent receives context (current page/issue). Flow: user prompt → agent reasons → invokes action → returns result. |
+| 4 | [Jira Issue Analyst agent tutorial](https://developer.atlassian.com/platform/forge/build-a-jira-issue-analyst-rovo-agent/) | Primary (official tutorial) | Very High | More complex: single fetch action → agent analyzes data in its inference. NOT multi-action chaining. Sequential: validate → fetch → analyze → respond. |
+| 5 | [Confluence Q&A Agent tutorial](https://developer.atlassian.com/platform/forge/build-a-q-and-a-rovo-agent-for-confluence/) | Primary (official tutorial) | Very High | Multi-step: fetch-content → generate Q&A → register each pair → insert macro. Agent calls actions multiple times in sequence. Shows Rovo CAN do multi-step with human approval gates. |
+| 6 | [No-Code Rovo + Forge Actions](https://community.atlassian.com/forums/Atlassian-AI-Rovo-articles/No-Code-Rovo-Agents-Forge-Actions-Real-World-AI-Workflows/ba-p/3068132) | Secondary (community) | Medium | Real-world: HR agent queries Personio + Moco via Forge actions. Actions as "connectors to external systems". Suited for retrieval + analysis, not complex multi-stage workflows. |
+| 7 | [Rovo agents overview](https://support.atlassian.com/rovo/docs/agents/) | Primary (official docs) | Very High | Agents accessible in Chat, automations, Confluence/Jira editors. Can use plugins and access data from connected apps. |
+| 8 | [Rovo review: what it can and can't do](https://www.eesel.ai/blog/rovo) | Secondary (third-party) | Medium | Limitation: "can't do a long string of tasks" — updating several fields + comment + ping in one go. More like "smart reusable prompts" than autonomous agents. |
+| 9 | [Rovo agent governance](https://www.eesel.ai/blog/rovo-agent-governance) | Secondary (third-party) | Medium | Permission model: agents act with user's permissions. Admin controls for enabling/disabling. |
+| 10 | [Forge Rovo modules index](https://developer.atlassian.com/platform/forge/manifest-reference/modules/rovo-index/) | Primary (official docs) | Very High | Two modules: rovo:agent (defines agent) and action (defines tool). Actions can use `function` (hosted) or `endpoint` (remote). |

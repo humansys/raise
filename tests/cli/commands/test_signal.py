@@ -27,7 +27,16 @@ class TestSignalEmitWork:
 
             result = runner.invoke(
                 app,
-                ["signal", "emit-work", "story", "S247.3", "-e", "start", "-p", "design"],
+                [
+                    "signal",
+                    "emit-work",
+                    "story",
+                    "S247.3",
+                    "-e",
+                    "start",
+                    "-p",
+                    "design",
+                ],
             )
 
             assert result.exit_code == 0

@@ -3,9 +3,9 @@
 This module provides infrastructure for loading, querying, and managing
 Rai's accumulated memories stored in JSONL format.
 
-For queries, use the UnifiedGraph from rai_cli.context:
+For queries, use the Graph from rai_cli.context:
 - CLI: `raise context query "keywords" --types pattern,calibration,session`
-- Programmatic: `UnifiedQueryEngine` from `rai_cli.context.query`
+- Programmatic: `QueryEngine` from `rai_cli.context.query`
 
 The JSONL files (.raise/rai/memory/*.jsonl) remain the source of truth.
 The unified graph consolidates memory with governance, skills, and work items.

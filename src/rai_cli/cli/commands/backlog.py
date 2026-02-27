@@ -177,9 +177,7 @@ def auth(
 
         # Run OAuth flow
         try:
-            console.print(
-                f"[bold]Authenticating with {provider.upper()}...[/bold]"
-            )
+            console.print(f"[bold]Authenticating with {provider.upper()}...[/bold]")
 
             token = authenticate(
                 client_id=client_id,
@@ -221,18 +219,12 @@ def pull(
     source: str = typer.Option(
         ..., "--source", "-s", help="Provider to pull from (jira)"
     ),
-    epic: str = typer.Option(
-        ..., "--epic", "-e", help="JIRA epic key (e.g., DEMO-1)"
-    ),
+    epic: str = typer.Option(..., "--epic", "-e", help="JIRA epic key (e.g., DEMO-1)"),
     epic_id: str = typer.Option(
         "", "--epic-id", help="Local epic ID to assign (default: auto-generate)"
     ),
-    dry_run: bool = typer.Option(
-        False, "--dry-run", help="Preview without executing"
-    ),
-    project: str = typer.Option(
-        ".", "--project", "-p", help="Project root path"
-    ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview without executing"),
+    project: str = typer.Option(".", "--project", "-p", help="Project root path"),
 ) -> None:
     """Pull epic and stories from JIRA to local sync state.
 
@@ -287,7 +279,7 @@ def pull(
     console.print(f"\n{prefix}[bold]Pulling from JIRA...[/bold]\n")
     status_label = "new" if result.epic_imported else "updated"
     console.print(
-        f"Epic: {result.epic_key} \"{result.epic_summary}\" "
+        f'Epic: {result.epic_key} "{result.epic_summary}" '
         f"[{result.epic_status}] → {local_epic_id} ({status_label})"
     )
 
@@ -298,7 +290,7 @@ def pull(
             s_icon = "✓" if s_action == "imported" else "↻"
             console.print(
                 f"  {s_icon} {detail.get('jira_key', '?')}: "
-                f"\"{detail.get('summary', '')}\" "
+                f'"{detail.get("summary", "")}" '
                 f"[{detail.get('status', '?')}] → {detail.get('local_id', '?')}"
             )
 
@@ -317,18 +309,12 @@ def push(
     source: str = typer.Option(
         ..., "--source", "-s", help="Provider to push to (jira)"
     ),
-    epic: str = typer.Option(
-        ..., "--epic", "-e", help="Local epic ID (e.g., E-DEMO)"
-    ),
+    epic: str = typer.Option(..., "--epic", "-e", help="Local epic ID (e.g., E-DEMO)"),
     stories_input: str = typer.Option(
         "", "--stories", help="Comma-separated story definitions: id:title,id:title"
     ),
-    dry_run: bool = typer.Option(
-        False, "--dry-run", help="Preview without executing"
-    ),
-    project: str = typer.Option(
-        ".", "--project", "-p", help="Project root path"
-    ),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Preview without executing"),
+    project: str = typer.Option(".", "--project", "-p", help="Project root path"),
 ) -> None:
     """Push local stories to JIRA under mapped epic.
 
@@ -408,9 +394,7 @@ def push(
         console.print(f"{label}:")
         for detail in result.created_details:
             jira_key = detail.get("jira_key", "pending")
-            console.print(
-                f"  ✓ {detail['story_id']}: \"{detail['title']}\" → {jira_key}"
-            )
+            console.print(f'  ✓ {detail["story_id"]}: "{detail["title"]}" → {jira_key}')
 
     if result.skipped_details:
         console.print("\nSkipped (already synced):")
@@ -419,9 +403,7 @@ def push(
             key_str = jira_key.jira_key if jira_key else "?"
             console.print(f"  - {sid} ({key_str})")
 
-    console.print(
-        f"\nSummary: {result.created} created, {result.skipped} skipped."
-    )
+    console.print(f"\nSummary: {result.created} created, {result.skipped} skipped.")
 
     if not dry_run:
         save_state(state, sync_dir)
@@ -430,12 +412,8 @@ def push(
 
 @backlog_app.command()
 def status(
-    epic: str = typer.Option(
-        ..., "--epic", "-e", help="Local epic ID (e.g., E-DEMO)"
-    ),
-    project: str = typer.Option(
-        ".", "--project", "-p", help="Project root path"
-    ),
+    epic: str = typer.Option(..., "--epic", "-e", help="Local epic ID (e.g., E-DEMO)"),
+    project: str = typer.Option(".", "--project", "-p", help="Project root path"),
 ) -> None:
     """Show sync and authorization status for epic stories.
 

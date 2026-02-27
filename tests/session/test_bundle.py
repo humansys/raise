@@ -6,7 +6,6 @@ from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
-from rai_cli.context.models import ConceptNode
 from rai_cli.onboarding.profile import (
     CoachingContext,
     CommunicationPreferences,
@@ -38,6 +37,7 @@ from rai_cli.session.bundle import (
     get_always_on_primes,
     get_foundational_patterns,
 )
+from rai_core.graph.models import GraphNode
 
 
 def _make_profile() -> DeveloperProfile:
@@ -91,9 +91,9 @@ def _make_state() -> SessionState:
     )
 
 
-def _make_pattern(pat_id: str, content: str) -> ConceptNode:
+def _make_pattern(pat_id: str, content: str) -> GraphNode:
     """Create a mock foundational pattern node."""
-    return ConceptNode(
+    return GraphNode(
         id=pat_id,
         type="pattern",
         content=content,
@@ -318,9 +318,9 @@ class TestAssembleContextBundle:
         assert "Session: SES-177" in bundle
 
 
-def _make_always_on_node(node_id: str, node_type: str, content: str) -> ConceptNode:
+def _make_always_on_node(node_id: str, node_type: str, content: str) -> GraphNode:
     """Create a mock always_on node."""
-    return ConceptNode(
+    return GraphNode(
         id=node_id,
         type=node_type,
         content=content,
@@ -434,10 +434,10 @@ class TestGetAlwaysOnPrimes:
 
     def test_returns_always_on_nodes(self, tmp_path: Path) -> None:
         """Returns all nodes with always_on=true metadata."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
             _make_always_on_node("guardrail-must-code-001", "guardrail", "Type hints")
         )
@@ -445,7 +445,7 @@ class TestGetAlwaysOnPrimes:
             _make_always_on_node("RAI-VAL-1", "principle", "Honesty over agreement")
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="Not always_on",
@@ -465,12 +465,12 @@ class TestGetAlwaysOnPrimes:
 
     def test_excludes_non_always_on(self, tmp_path: Path) -> None:
         """Nodes without always_on=true are excluded."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="guardrail-should-001",
                 type="guardrail",
                 content="Optional rule",
@@ -713,13 +713,13 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Build a graph with epic→release edge
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.context.models import ConceptEdge
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
+        from rai_core.graph.models import GraphEdge
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="rel-v3.0",
                 type="release",
                 content="V3.0 Commercial Launch",
@@ -733,7 +733,7 @@ class TestBundleReleaseContext:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="epic-e19",
                 type="epic",
                 content="V3 Product Design",
@@ -742,7 +742,7 @@ class TestBundleReleaseContext:
             )
         )
         graph.add_relationship(
-            ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
+            GraphEdge(source="epic-e19", target="rel-v3.0", type="part_of")
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
         FilesystemGraphBackend(graph_path).persist(graph)
@@ -750,12 +750,16 @@ class TestBundleReleaseContext:
         profile = DeveloperProfile(name="Test")
         state = SessionState(
             current_work=CurrentWork(
-                epic="E19", story="S19.3", phase="implement",
+                epic="E19",
+                story="S19.3",
+                phase="implement",
                 branch="epic/e19/v3",
             ),
             last_session=LastSession(
-                id="SES-100", date=date(2026, 2, 13),
-                developer="Test", summary="test",
+                id="SES-100",
+                date=date(2026, 2, 13),
+                developer="Test",
+                summary="test",
             ),
         )
 
@@ -778,12 +782,16 @@ class TestBundleReleaseContext:
         profile = DeveloperProfile(name="Test")
         state = SessionState(
             current_work=CurrentWork(
-                epic="E19", story="S19.3", phase="implement",
+                epic="E19",
+                story="S19.3",
+                phase="implement",
                 branch="epic/e19/v3",
             ),
             last_session=LastSession(
-                id="SES-100", date=date(2026, 2, 13),
-                developer="Test", summary="test",
+                id="SES-100",
+                date=date(2026, 2, 13),
+                developer="Test",
+                summary="test",
             ),
         )
 
@@ -802,12 +810,12 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Graph exists but epic has no release edge
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="epic-e18",
                 type="epic",
                 content="V2 Open Core",
@@ -821,12 +829,16 @@ class TestBundleReleaseContext:
         profile = DeveloperProfile(name="Test")
         state = SessionState(
             current_work=CurrentWork(
-                epic="E18", story="S18.1", phase="implement",
+                epic="E18",
+                story="S18.1",
+                phase="implement",
                 branch="epic/e18/v2",
             ),
             last_session=LastSession(
-                id="SES-100", date=date(2026, 2, 13),
-                developer="Test", summary="test",
+                id="SES-100",
+                date=date(2026, 2, 13),
+                developer="Test",
+                summary="test",
             ),
         )
 
@@ -854,8 +866,10 @@ class TestFormatNarrative:
                 epic="E21", story="S21.1", phase="implement", branch="epic/e21"
             ),
             last_session=LastSession(
-                id="SES-159", date=date(2026, 2, 14),
-                developer="Test", summary="test session",
+                id="SES-159",
+                date=date(2026, 2, 14),
+                developer="Test",
+                summary="test session",
             ),
             narrative="## Decisions\n- Architecture = sync model\n\n## Artifacts\n- scope.md created",
         )
@@ -882,8 +896,10 @@ class TestFormatNarrative:
                 epic="E15", story="S15.7", phase="design", branch="main"
             ),
             last_session=LastSession(
-                id="SES-001", date=date(2026, 2, 8),
-                developer="Test", summary="test",
+                id="SES-001",
+                date=date(2026, 2, 8),
+                developer="Test",
+                summary="test",
             ),
         )
         bundle = assemble_context_bundle(profile, state, Path("/project"))
@@ -901,7 +917,9 @@ class TestFormatNarrative:
         mock_patterns.return_value = []
         mock_always_on.return_value = []
 
-        long_narrative = "## Decisions\n" + "- Decision line that is quite long and detailed " * 20
+        long_narrative = (
+            "## Decisions\n" + "- Decision line that is quite long and detailed " * 20
+        )
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
@@ -909,8 +927,10 @@ class TestFormatNarrative:
                 epic="E21", story="S21.1", phase="implement", branch="epic/e21"
             ),
             last_session=LastSession(
-                id="SES-159", date=date(2026, 2, 14),
-                developer="Test", summary="test",
+                id="SES-159",
+                date=date(2026, 2, 14),
+                developer="Test",
+                summary="test",
             ),
             narrative=long_narrative,
         )
@@ -930,7 +950,9 @@ class TestFormatNarrative:
         assert callable(mock_always_on)
         mock_patterns.return_value = []
         mock_always_on.return_value = [
-            _make_always_on_node("guardrail-must-code-001", "guardrail", "[MUST] Type hints"),
+            _make_always_on_node(
+                "guardrail-must-code-001", "guardrail", "[MUST] Type hints"
+            ),
         ]
 
         profile = DeveloperProfile(name="Test")
@@ -939,8 +961,10 @@ class TestFormatNarrative:
                 epic="E21", story="S21.1", phase="implement", branch="epic/e21"
             ),
             last_session=LastSession(
-                id="SES-159", date=date(2026, 2, 14),
-                developer="Test", summary="test session",
+                id="SES-159",
+                date=date(2026, 2, 14),
+                developer="Test",
+                summary="test session",
             ),
             narrative="## Decisions\n- Chose sync model",
         )
@@ -969,12 +993,12 @@ class TestFormatNextSessionPrompt:
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
-            current_work=CurrentWork(
-                epic="RAISE-144", story="", phase="", branch="v2"
-            ),
+            current_work=CurrentWork(epic="RAISE-144", story="", phase="", branch="v2"),
             last_session=LastSession(
-                id="SES-200", date=date(2026, 2, 17),
-                developer="Test", summary="test session",
+                id="SES-200",
+                date=date(2026, 2, 17),
+                developer="Test",
+                summary="test session",
             ),
             next_session_prompt="Verify encoding fix covers discovery tests. Check backlog abstraction interest.",
         )
@@ -1000,8 +1024,10 @@ class TestFormatNextSessionPrompt:
                 epic="E15", story="S15.7", phase="design", branch="main"
             ),
             last_session=LastSession(
-                id="SES-001", date=date(2026, 2, 8),
-                developer="Test", summary="test",
+                id="SES-001",
+                date=date(2026, 2, 8),
+                developer="Test",
+                summary="test",
             ),
         )
         bundle = assemble_context_bundle(profile, state, Path("/project"))
@@ -1019,12 +1045,12 @@ class TestGetFoundationalPatterns:
 
     def test_returns_foundational_patterns_from_graph(self, tmp_path: Path) -> None:
         """Returns patterns with foundational=true from graph."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-187",
                 type="pattern",
                 content="Code as Gemba",
@@ -1033,7 +1059,7 @@ class TestGetFoundationalPatterns:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="Not foundational",
@@ -1042,7 +1068,7 @@ class TestGetFoundationalPatterns:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="guardrail-001",
                 type="guardrail",
                 content="Not a pattern",
@@ -1101,7 +1127,9 @@ class TestCountSectionItems:
             _make_always_on_node("guardrail-must-002", "guardrail", "Ruff"),
             _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
         ]
-        result = count_section_items("governance", Path("/project"), _make_profile(), _make_state())
+        result = count_section_items(
+            "governance", Path("/project"), _make_profile(), _make_state()
+        )
         assert result == 2  # 3 always_on minus 1 identity
 
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -1112,31 +1140,41 @@ class TestCountSectionItems:
             _make_pattern("PAT-1", "Pattern one"),
             _make_pattern("PAT-2", "Pattern two"),
         ]
-        result = count_section_items("behavioral", Path("/project"), _make_profile(), _make_state())
+        result = count_section_items(
+            "behavioral", Path("/project"), _make_profile(), _make_state()
+        )
         assert result == 2
 
     def test_count_coaching_with_content(self) -> None:
         """Counts coaching as 1 when content exists."""
         profile = _make_profile()
-        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "coaching", Path("/project"), profile, _make_state()
+        )
         assert result == 1
 
     def test_count_coaching_empty(self) -> None:
         """Counts coaching as 0 when no content."""
         profile = DeveloperProfile(name="New")
-        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "coaching", Path("/project"), profile, _make_state()
+        )
         assert result == 0
 
     def test_count_deadlines(self) -> None:
         """Counts deadlines from profile."""
         profile = _make_profile()  # has 2 deadlines
-        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "deadlines", Path("/project"), profile, _make_state()
+        )
         assert result == 2
 
     def test_count_deadlines_empty(self) -> None:
         """Counts deadlines as 0 when none."""
         profile = DeveloperProfile(name="New")
-        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "deadlines", Path("/project"), profile, _make_state()
+        )
         assert result == 0
 
     def test_count_progress_with_data(self) -> None:
@@ -1145,19 +1183,26 @@ class TestCountSectionItems:
         state.progress = EpicProgress(
             epic="E15", stories_done=2, stories_total=5, sp_done=6, sp_total=15
         )
-        result = count_section_items("progress", Path("/project"), _make_profile(), state)
+        result = count_section_items(
+            "progress", Path("/project"), _make_profile(), state
+        )
         assert result == 1
 
     def test_count_progress_without_data(self) -> None:
         """Counts progress as 0 when no progress data."""
-        result = count_section_items("progress", Path("/project"), _make_profile(), _make_state())
+        result = count_section_items(
+            "progress", Path("/project"), _make_profile(), _make_state()
+        )
         assert result == 0
 
     def test_count_unknown_section_raises(self) -> None:
         """Unknown section name raises ValueError."""
         import pytest
+
         with pytest.raises(ValueError, match="Unknown section"):
-            count_section_items("unknown", Path("/project"), _make_profile(), _make_state())
+            count_section_items(
+                "unknown", Path("/project"), _make_profile(), _make_state()
+            )
 
 
 class TestAssembleOrientation:
@@ -1182,7 +1227,9 @@ class TestAssembleOrientation:
         state = _make_state()
         state.narrative = "## Decisions\n- Chose sync model"
         state.next_session_prompt = "Continue with RAISE-169"
-        result = assemble_orientation(profile, state, Path("/project"), session_id="SES-210")
+        result = assemble_orientation(
+            profile, state, Path("/project"), session_id="SES-210"
+        )
 
         # Always-on sections present
         assert "# Session Context" in result
@@ -1331,6 +1378,7 @@ class TestAssembleSections:
     def test_unknown_section_raises(self) -> None:
         """Unknown section name raises ValueError with valid names."""
         import pytest
+
         with pytest.raises(ValueError, match="Unknown section"):
             assemble_sections(
                 ["unknown"],

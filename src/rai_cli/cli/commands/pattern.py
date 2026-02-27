@@ -17,10 +17,6 @@ import typer
 from rich.console import Console
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.context.query import (
-    SCORING_LOW_WILSON_THRESHOLD,
-    wilson_lower_bound,
-)
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import PatternAddedEvent
 from rai_cli.memory import (
@@ -33,6 +29,10 @@ from rai_cli.memory import (
     reinforce_pattern,
 )
 from rai_cli.onboarding.profile import load_developer_profile
+from rai_core.graph.query import (
+    SCORING_LOW_WILSON_THRESHOLD,
+    wilson_lower_bound,
+)
 
 pattern_app = typer.Typer(
     name="pattern",
@@ -45,14 +45,22 @@ console = Console()
 
 @pattern_app.command("reinforce")
 def reinforce_cmd(
-    pattern_id: Annotated[str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")],
+    pattern_id: Annotated[
+        str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")
+    ],
     vote: Annotated[
         int,
-        typer.Option("--vote", "-v", help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)"),
+        typer.Option(
+            "--vote",
+            "-v",
+            help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)",
+        ),
     ],
     story_id: Annotated[
         str | None,
-        typer.Option("--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"),
+        typer.Option(
+            "--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"
+        ),
     ] = None,
     scope: Annotated[
         str,
@@ -60,7 +68,9 @@ def reinforce_cmd(
     ] = "project",
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
+        typer.Option(
+            "--memory-dir", "-m", help="Memory directory path (overrides scope)"
+        ),
     ] = None,
 ) -> None:
     """Reinforce a pattern with a vote signal.
@@ -227,11 +237,13 @@ def add_pattern(
 
     if result.success:
         emitter = create_emitter()
-        emitter.emit(PatternAddedEvent(
-            pattern_id=result.id or "",
-            content=content,
-            context=context,
-        ))
+        emitter.emit(
+            PatternAddedEvent(
+                pattern_id=result.id or "",
+                content=content,
+                context=context,
+            )
+        )
         console.print(f"\n[green]✓[/green] {result.message}")
         console.print(f"  ID: [cyan]{result.id}[/cyan]")
         console.print(f"  Content: {content[:60]}...")

@@ -26,8 +26,7 @@ _stderr_console = Console(stderr=True)
 def _deprecation_warning(old_cmd: str, new_cmd: str) -> None:
     """Print deprecation warning to stderr."""
     _stderr_console.print(
-        f"[yellow]DEPRECATED:[/yellow] 'rai {old_cmd}' → "
-        f"use 'rai {new_cmd}' instead",
+        f"[yellow]DEPRECATED:[/yellow] 'rai {old_cmd}' → use 'rai {new_cmd}' instead",
     )
 
 

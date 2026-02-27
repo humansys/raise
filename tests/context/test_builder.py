@@ -1,4 +1,4 @@
-"""Tests for UnifiedGraphBuilder."""
+"""Tests for GraphBuilder."""
 
 from __future__ import annotations
 
@@ -10,33 +10,33 @@ from unittest.mock import patch
 import pytest
 
 from rai_cli.config.agents import get_agent_config
-from rai_cli.context.builder import UnifiedGraphBuilder
-from rai_cli.context.models import ConceptNode
+from rai_cli.context.builder import GraphBuilder
+from rai_core.graph.models import GraphNode
 
 
-class TestUnifiedGraphBuilderInit:
-    """Tests for UnifiedGraphBuilder initialization."""
+class TestGraphBuilderInit:
+    """Tests for GraphBuilder initialization."""
 
     def test_initializes_with_project_root(self, tmp_path: Path) -> None:
         """Should accept project root path."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         assert builder.project_root == tmp_path
 
     def test_uses_cwd_when_no_root_provided(self) -> None:
         """Should use current directory when no root provided."""
-        builder = UnifiedGraphBuilder()
+        builder = GraphBuilder()
         assert builder.project_root == Path.cwd()
 
     def test_initializes_with_ide_config(self, tmp_path: Path) -> None:
         """Should accept and store IDE configuration."""
         config = get_agent_config("antigravity")
-        builder = UnifiedGraphBuilder(project_root=tmp_path, agent_config=config)
+        builder = GraphBuilder(project_root=tmp_path, agent_config=config)
         assert builder.ide_config.agent_type == "antigravity"
         assert builder.ide_config.skills_dir == ".agent/skills"
 
     def test_defaults_to_claude_ide_config(self, tmp_path: Path) -> None:
         """Should default to Claude IDE config when none provided."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         assert builder.ide_config.agent_type == "claude"
         assert builder.ide_config.skills_dir == ".claude/skills"
 
@@ -46,7 +46,7 @@ class TestLoadGovernance:
 
     def test_returns_graph_nodes_from_extractor(self, tmp_path: Path) -> None:
         """Extractor returns GraphNode directly — no conversion needed."""
-        mock_node = ConceptNode(
+        mock_node = GraphNode(
             id="principle-1",
             type="principle",
             content="This is a core principle.",
@@ -55,7 +55,7 @@ class TestLoadGovernance:
             metadata={"principle_number": "§1"},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with patch.object(builder, "_get_governance_extractor") as mock_extractor:
             mock_extractor.return_value.extract_all.return_value = [mock_node]
@@ -70,7 +70,7 @@ class TestLoadGovernance:
 
     def test_handles_empty_extraction(self, tmp_path: Path) -> None:
         """Should return empty list when no concepts extracted."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with patch.object(builder, "_get_governance_extractor") as mock_extractor:
             mock_extractor.return_value.extract_all.return_value = []
@@ -102,7 +102,7 @@ class TestLoadMemory:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -133,7 +133,7 @@ class TestLoadMemory:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -162,7 +162,7 @@ class TestLoadMemory:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -173,7 +173,7 @@ class TestLoadMemory:
 
     def test_handles_missing_memory_directory(self, tmp_path: Path) -> None:
         """Should return empty list if .raise/rai/memory doesn't exist."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert nodes == []
@@ -216,7 +216,7 @@ class TestLoadMemory:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 3
@@ -230,7 +230,7 @@ class TestLoadMemoryBaseVersion:
     def test_base_pattern_preserves_base_version_in_metadata(
         self, tmp_path: Path
     ) -> None:
-        """Base pattern fields should pass through to ConceptNode metadata."""
+        """Base pattern fields should pass through to GraphNode metadata."""
         memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
 
@@ -249,7 +249,7 @@ class TestLoadMemoryBaseVersion:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -274,7 +274,7 @@ class TestLoadMemoryBaseVersion:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -307,7 +307,7 @@ class TestLoadMemoryMultiSource:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -332,7 +332,7 @@ class TestLoadMemoryMultiSource:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -357,7 +357,7 @@ class TestLoadMemoryMultiSource:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -415,7 +415,7 @@ class TestLoadMemoryMultiSource:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 3
@@ -443,7 +443,7 @@ class TestLoadMemoryMultiSource:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         assert len(nodes) == 1
@@ -482,7 +482,7 @@ class TestLoadMemoryMultiSource:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         # Should only have personal session
@@ -527,7 +527,7 @@ class TestPrecedenceLogic:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         # Should only have one PAT-001, from personal
@@ -571,7 +571,7 @@ class TestPrecedenceLogic:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         # Should only have one PAT-002, from project
@@ -615,7 +615,7 @@ class TestPrecedenceLogic:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         # Should only have one PAT-003, from personal
@@ -674,7 +674,7 @@ class TestPrecedenceLogic:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_memory()
 
         # All three should be preserved
@@ -687,7 +687,7 @@ class TestLoadWork:
     """Tests for load_work method."""
 
     def test_converts_epics_to_nodes(self, tmp_path: Path) -> None:
-        """Should convert epic Concept to ConceptNode."""
+        """Should convert epic Concept to GraphNode."""
         from rai_cli.governance.models import Concept, ConceptType
 
         mock_epic = Concept(
@@ -700,7 +700,7 @@ class TestLoadWork:
             metadata={"status": "In Progress"},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with patch.object(builder, "_extract_epics") as mock_extract:
             mock_extract.return_value = [mock_epic]
@@ -714,7 +714,7 @@ class TestLoadWork:
         assert node.type == "epic"
 
     def test_converts_features_to_nodes(self, tmp_path: Path) -> None:
-        """Should convert feature Concept to ConceptNode."""
+        """Should convert feature Concept to GraphNode."""
         from rai_cli.governance.models import Concept, ConceptType
 
         mock_feature = Concept(
@@ -727,7 +727,7 @@ class TestLoadWork:
             metadata={"size": "M", "status": "Pending"},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with patch.object(builder, "_extract_epics") as mock_epics:
             mock_epics.return_value = []
@@ -759,7 +759,7 @@ class TestLoadSkills:
         """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_skills()
 
         assert len(nodes) == 1
@@ -768,7 +768,7 @@ class TestLoadSkills:
 
     def test_handles_missing_skills_directory(self, tmp_path: Path) -> None:
         """Should return empty list if .claude/skills doesn't exist."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_skills()
 
         assert nodes == []
@@ -789,7 +789,7 @@ class TestLoadSkills:
         )
 
         config = get_agent_config("antigravity")
-        builder = UnifiedGraphBuilder(project_root=tmp_path, agent_config=config)
+        builder = GraphBuilder(project_root=tmp_path, agent_config=config)
         nodes = builder.load_skills()
 
         assert len(nodes) == 1
@@ -843,7 +843,7 @@ class TestLoadComponents:
             )
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_components()
 
         assert len(nodes) == 2
@@ -855,7 +855,7 @@ class TestLoadComponents:
 
     def test_handles_missing_components_file(self, tmp_path: Path) -> None:
         """Should return empty list if components-validated.json doesn't exist."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_components()
 
         assert nodes == []
@@ -875,7 +875,7 @@ class TestLoadComponents:
             )
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_components()
 
         assert nodes == []
@@ -888,7 +888,7 @@ class TestLoadComponents:
         validated_file = discovery_dir / "components-validated.json"
         validated_file.write_text("not valid json")
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_components()
 
         assert nodes == []
@@ -920,7 +920,7 @@ class TestLoadArchitecture:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert len(nodes) == 1
@@ -955,7 +955,7 @@ class TestLoadArchitecture:
                 """)
             )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert len(nodes) == 3
@@ -964,7 +964,7 @@ class TestLoadArchitecture:
 
     def test_handles_missing_architecture_directory(self, tmp_path: Path) -> None:
         """Should return empty list if governance/architecture/ doesn't exist."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert nodes == []
@@ -985,7 +985,7 @@ class TestLoadArchitecture:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert nodes == []
@@ -997,7 +997,7 @@ class TestLoadArchitecture:
 
         (modules_dir / "broken.md").write_text("No frontmatter here, just text.")
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert nodes == []
@@ -1047,7 +1047,7 @@ class TestLoadArchitecture:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
         edges = builder.infer_relationships(nodes)
 
@@ -1077,7 +1077,7 @@ class TestLoadArchitecture:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1128,7 +1128,7 @@ class TestLoadArchitectureDocTypes:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.type == "architecture"]
@@ -1177,7 +1177,7 @@ class TestLoadArchitectureDocTypes:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.type == "architecture"]
@@ -1225,7 +1225,7 @@ class TestLoadArchitectureDocTypes:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.type == "architecture"]
@@ -1261,7 +1261,7 @@ class TestLoadArchitectureDocTypes:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert nodes == []
@@ -1305,7 +1305,7 @@ class TestLoadArchitectureDocTypes:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert len(nodes) == 2
@@ -1338,7 +1338,7 @@ class TestLoadArchitectureDocTypes:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         assert len(nodes) == 1
@@ -1356,7 +1356,7 @@ class TestBuild:
     """Tests for build method."""
 
     def test_builds_graph_with_all_sources(self, tmp_path: Path) -> None:
-        """Should combine all sources into UnifiedGraph."""
+        """Should combine all sources into Graph."""
         # Setup minimal fixtures
         memory_dir = tmp_path / ".raise/rai" / "memory"
         memory_dir.mkdir(parents=True)
@@ -1384,7 +1384,7 @@ class TestBuild:
         """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         # Mock governance, work, and components loaders
         with patch.object(builder, "load_governance") as mock_gov:
@@ -1399,10 +1399,10 @@ class TestBuild:
         assert graph.node_count >= 2
 
     def test_build_returns_unified_graph(self, tmp_path: Path) -> None:
-        """Should return UnifiedGraph instance."""
-        from rai_cli.context.graph import UnifiedGraph
+        """Should return Graph instance."""
+        from rai_core.graph.engine import Graph
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1413,7 +1413,7 @@ class TestBuild:
         ):
             graph = builder.build()
 
-        assert isinstance(graph, UnifiedGraph)
+        assert isinstance(graph, Graph)
 
     def test_build_includes_components(self, tmp_path: Path) -> None:
         """Should include components in the built graph."""
@@ -1440,7 +1440,7 @@ class TestBuild:
             )
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1462,16 +1462,16 @@ class TestBuild:
         """Should warn when duplicate node IDs are detected during build."""
         import logging
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         duplicate_nodes = [
-            ConceptNode(
+            GraphNode(
                 id="comp-test-Foo",
                 type="component",
                 content="First Foo",
                 created="2026-02-09",
             ),
-            ConceptNode(
+            GraphNode(
                 id="comp-test-Foo",
                 type="component",
                 content="Second Foo (collision)",
@@ -1500,7 +1500,7 @@ class TestInferRelationships:
 
     def test_infers_learned_from_edges(self, tmp_path: Path) -> None:
         """Should create learned_from edges from pattern.learned_from field."""
-        pattern = ConceptNode(
+        pattern = GraphNode(
             id="PAT-001",
             type="pattern",
             content="Test pattern",
@@ -1508,7 +1508,7 @@ class TestInferRelationships:
             created="2026-01-31",
             metadata={"learned_from": "F1.5"},
         )
-        session = ConceptNode(
+        session = GraphNode(
             id="SES-010",
             type="session",
             content="F1.5 session",
@@ -1517,7 +1517,7 @@ class TestInferRelationships:
             metadata={"topic": "F1.5 Output Module"},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([pattern, session])
 
         learned_edges = [e for e in edges if e.type == "learned_from"]
@@ -1528,7 +1528,7 @@ class TestInferRelationships:
 
     def test_infers_part_of_edges(self, tmp_path: Path) -> None:
         """Should create part_of edges from feature to epic."""
-        feature = ConceptNode(
+        feature = GraphNode(
             id="F11.2",
             type="story",
             content="Graph Builder",
@@ -1536,7 +1536,7 @@ class TestInferRelationships:
             created="2026-02-03",
             metadata={},
         )
-        epic = ConceptNode(
+        epic = GraphNode(
             id="E11",
             type="epic",
             content="Unified Context",
@@ -1545,7 +1545,7 @@ class TestInferRelationships:
             metadata={},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([feature, epic])
 
         part_of_edges = [e for e in edges if e.type == "part_of"]
@@ -1556,7 +1556,7 @@ class TestInferRelationships:
 
     def test_infers_skill_prerequisite_edges(self, tmp_path: Path) -> None:
         """Should create needs_context edges from skill prerequisites."""
-        skill = ConceptNode(
+        skill = GraphNode(
             id="/story-plan",
             type="skill",
             content="Plan implementation tasks",
@@ -1564,7 +1564,7 @@ class TestInferRelationships:
             created="2026-02-03",
             metadata={"raise.prerequisites": "project-backlog"},
         )
-        prereq = ConceptNode(
+        prereq = GraphNode(
             id="/project-backlog",
             type="skill",
             content="Manage project backlog",
@@ -1573,7 +1573,7 @@ class TestInferRelationships:
             metadata={},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([skill, prereq])
 
         needs_edges = [e for e in edges if e.type == "needs_context"]
@@ -1584,7 +1584,7 @@ class TestInferRelationships:
 
     def test_infers_skill_next_edges(self, tmp_path: Path) -> None:
         """Should create related_to edges from skill.raise/raise.next."""
-        skill = ConceptNode(
+        skill = GraphNode(
             id="/rai-story-plan",
             type="skill",
             content="Plan tasks",
@@ -1592,7 +1592,7 @@ class TestInferRelationships:
             created="2026-02-03",
             metadata={"raise.next": "rai-story-implement"},
         )
-        next_skill = ConceptNode(
+        next_skill = GraphNode(
             id="/rai-story-implement",
             type="skill",
             content="Implement feature",
@@ -1601,7 +1601,7 @@ class TestInferRelationships:
             metadata={},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([skill, next_skill])
 
         next_edges = [
@@ -1615,7 +1615,7 @@ class TestInferRelationships:
 
     def test_infers_related_to_by_shared_keywords(self, tmp_path: Path) -> None:
         """Should create related_to edges for concepts with shared keywords."""
-        pattern = ConceptNode(
+        pattern = GraphNode(
             id="PAT-012",
             type="pattern",
             content="Design-first eliminates ambiguity in implementation planning",
@@ -1623,7 +1623,7 @@ class TestInferRelationships:
             created="2026-01-31",
             metadata={"context": ["planning", "implementation"]},
         )
-        skill = ConceptNode(
+        skill = GraphNode(
             id="/story-plan",
             type="skill",
             content="Planning implementation tasks for feature development",
@@ -1632,7 +1632,7 @@ class TestInferRelationships:
             metadata={},
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([pattern, skill])
 
         related_edges = [e for e in edges if e.type == "related_to"]
@@ -1644,7 +1644,7 @@ class TestInferRelationships:
 
     def test_returns_empty_for_no_nodes(self, tmp_path: Path) -> None:
         """Should return empty list when no nodes provided."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         edges = builder.infer_relationships([])
 
         assert edges == []
@@ -1687,7 +1687,7 @@ class TestInferRelationships:
             + "\n"
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1748,7 +1748,7 @@ class TestLoadIdentity:
     def test_extracts_values_as_principle_nodes(self, tmp_path: Path) -> None:
         """Should extract 5 values as principle nodes with always_on=True."""
         self._write_identity(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_identity()
 
         value_nodes = [n for n in nodes if n.id.startswith("RAI-VAL-")]
@@ -1761,7 +1761,7 @@ class TestLoadIdentity:
     def test_extracts_boundaries_as_principle_nodes(self, tmp_path: Path) -> None:
         """Should extract boundaries (I Will + I Won't) as principle nodes."""
         self._write_identity(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_identity()
 
         boundary_nodes = [n for n in nodes if n.id.startswith("RAI-BND-")]
@@ -1774,7 +1774,7 @@ class TestLoadIdentity:
     def test_value_node_content(self, tmp_path: Path) -> None:
         """Value nodes should have 'Title — first bullet' content."""
         self._write_identity(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_identity()
 
         val1 = next(n for n in nodes if n.id == "RAI-VAL-1")
@@ -1783,7 +1783,7 @@ class TestLoadIdentity:
     def test_boundary_node_content(self, tmp_path: Path) -> None:
         """Boundary nodes should have the boundary text as content."""
         self._write_identity(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_identity()
 
         bnd_nodes = [n for n in nodes if n.id.startswith("RAI-BND-")]
@@ -1792,14 +1792,14 @@ class TestLoadIdentity:
 
     def test_returns_empty_when_no_identity_file(self, tmp_path: Path) -> None:
         """Should return empty list when identity/core.md doesn't exist."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_identity()
         assert nodes == []
 
     def test_build_includes_identity_nodes(self, tmp_path: Path) -> None:
         """Build should include identity nodes in the graph."""
         self._write_identity(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1911,7 +1911,7 @@ class TestExtractBoundedContexts:
     def test_creates_bounded_context_nodes(self, tmp_path: Path) -> None:
         """Should create bounded_context nodes from domain model metadata."""
         self._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1936,7 +1936,7 @@ class TestExtractBoundedContexts:
     def test_bc_nodes_have_correct_content(self, tmp_path: Path) -> None:
         """BC node content should come from the description field."""
         self._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1955,7 +1955,7 @@ class TestExtractBoundedContexts:
     def test_shared_kernel_has_bc_type_metadata(self, tmp_path: Path) -> None:
         """Shared kernel should have bc_type='shared_kernel' in metadata."""
         self._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -1973,7 +1973,7 @@ class TestExtractBoundedContexts:
     def test_creates_belongs_to_edges(self, tmp_path: Path) -> None:
         """Should create belongs_to edges from modules to their BC."""
         self._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2015,7 +2015,7 @@ class TestExtractBoundedContexts:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2034,7 +2034,7 @@ class TestExtractBoundedContexts:
 
     def test_graceful_when_no_domain_model(self, tmp_path: Path) -> None:
         """Should produce no BC nodes when arch-domain-model is absent."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2056,7 +2056,7 @@ class TestExtractLayers:
         """Should create layer nodes from system design metadata."""
         # Reuse the fixture builder from TestExtractBoundedContexts
         TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2081,7 +2081,7 @@ class TestExtractLayers:
     def test_layer_nodes_have_correct_content(self, tmp_path: Path) -> None:
         """Layer node content should come from the description field."""
         TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2099,7 +2099,7 @@ class TestExtractLayers:
     def test_creates_in_layer_edges(self, tmp_path: Path) -> None:
         """Should create in_layer edges from modules to their layer."""
         TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2119,7 +2119,7 @@ class TestExtractLayers:
     def test_no_in_layer_for_distribution_modules(self, tmp_path: Path) -> None:
         """Distribution modules (rai_base) should NOT get in_layer edges."""
         TestExtractBoundedContexts()._build_arch_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2136,7 +2136,7 @@ class TestExtractLayers:
 
     def test_graceful_when_no_design_doc(self, tmp_path: Path) -> None:
         """Should produce no layer nodes when arch-design is absent."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2201,7 +2201,7 @@ class TestExtractConstraints:
     ) -> None:
         """Universal guardrails (default) create edges to all BCs."""
         self._build_constraint_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
@@ -2221,7 +2221,7 @@ class TestExtractConstraints:
     ) -> None:
         """Override guardrails create edges only to specified targets."""
         self._build_constraint_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
@@ -2250,7 +2250,7 @@ class TestExtractConstraints:
     ) -> None:
         """Layer-targeted guardrails create edges to layer nodes."""
         self._build_constraint_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
@@ -2269,7 +2269,7 @@ class TestExtractConstraints:
 
     def test_no_constraint_edges_without_guardrails(self, tmp_path: Path) -> None:
         """No constraint edges when no guardrail nodes exist."""
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2302,7 +2302,7 @@ class TestExtractConstraints:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
@@ -2369,7 +2369,7 @@ class TestExtractConstraints:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
@@ -2469,7 +2469,7 @@ class TestLoadCodeStructure:
     def test_enriches_module_nodes_with_code_imports(self, tmp_path: Path) -> None:
         """Module nodes should gain code_imports metadata from ast analysis."""
         self._build_code_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2488,7 +2488,7 @@ class TestLoadCodeStructure:
     def test_enriches_module_nodes_with_code_exports(self, tmp_path: Path) -> None:
         """Module nodes should gain code_exports metadata from __init__.py."""
         self._build_code_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2507,7 +2507,7 @@ class TestLoadCodeStructure:
     def test_enriches_module_nodes_with_code_components(self, tmp_path: Path) -> None:
         """Module nodes should gain code_components count from ast."""
         self._build_code_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2527,7 +2527,7 @@ class TestLoadCodeStructure:
     def test_preserves_frontmatter_data(self, tmp_path: Path) -> None:
         """Existing frontmatter fields (depends_on, components) should be preserved."""
         self._build_code_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2569,7 +2569,7 @@ class TestLoadCodeStructure:
         # Create empty src dir so analyzer runs but finds no modules
         (tmp_path / "src" / "rai_cli").mkdir(parents=True)
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2603,7 +2603,7 @@ class TestLoadCodeStructure:
             """)
         )
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2622,7 +2622,7 @@ class TestLoadCodeStructure:
     def test_build_calls_load_code_structure(self, tmp_path: Path) -> None:
         """build() should call load_code_structure() in its pipeline."""
         self._build_code_fixtures(tmp_path)
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
@@ -2660,13 +2660,15 @@ class TestRaiBaseTemplateContract:
     ) -> None:
         """system-context.md template must parse into arch-context node."""
         src = self._get_rai_base_arch_dir() / "system-context.md"
-        content = src.read_text(encoding="utf-8").replace("{project_name}", "test-project")
+        content = src.read_text(encoding="utf-8").replace(
+            "{project_name}", "test-project"
+        )
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
         (dest_dir / "system-context.md").write_text(content)
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.id == "arch-context"]
@@ -2677,13 +2679,15 @@ class TestRaiBaseTemplateContract:
     def test_system_design_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
         """system-design.md template must parse into arch-design node."""
         src = self._get_rai_base_arch_dir() / "system-design.md"
-        content = src.read_text(encoding="utf-8").replace("{project_name}", "test-project")
+        content = src.read_text(encoding="utf-8").replace(
+            "{project_name}", "test-project"
+        )
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
         (dest_dir / "system-design.md").write_text(content)
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.id == "arch-design"]
@@ -2694,13 +2698,15 @@ class TestRaiBaseTemplateContract:
     def test_domain_model_template_has_valid_frontmatter(self, tmp_path: Path) -> None:
         """domain-model.md template must parse into arch-domain-model node."""
         src = self._get_rai_base_arch_dir() / "domain-model.md"
-        content = src.read_text(encoding="utf-8").replace("{project_name}", "test-project")
+        content = src.read_text(encoding="utf-8").replace(
+            "{project_name}", "test-project"
+        )
 
         dest_dir = tmp_path / "governance" / "architecture"
         dest_dir.mkdir(parents=True)
         (dest_dir / "domain-model.md").write_text(content)
 
-        builder = UnifiedGraphBuilder(project_root=tmp_path)
+        builder = GraphBuilder(project_root=tmp_path)
         nodes = builder.load_architecture()
 
         arch_nodes = [n for n in nodes if n.id == "arch-domain-model"]
