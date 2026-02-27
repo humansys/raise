@@ -22,7 +22,7 @@ skills drive Jira transitions automatically.
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
 | S301.1 | Protocols + Models | M | Done ✓ | Extended PM (11 methods) + Docs (5 methods), async primary + sync wrapper, 9 models, `_run_sync()` helper. 103 tests, 1.5x velocity. |
-| S301.2 | `rai backlog` CLI group | M | Pending | Commands: create, transition, update, link, comment, search, batch-transition. Compact output (~200 tokens vs 8K raw MCP). Delegates to adapter registry. |
+| S301.2 | `rai backlog` CLI group | M | Done ✓ | 7 commands (create, transition, update, link, comment, search, batch-transition). Auto-detect adapter, open-core Pattern B. 16 tests, 1.25x velocity. |
 | S301.3 | JiraAdapter | L | Pending | Concrete ProjectManagementAdapter using httpx + Jira REST API. Config from `.raise/jira.yaml` (already exists with lifecycle_mapping, team identifiers, transition IDs). Rate limiting, field filtering. |
 | S301.4 | `rai docs` CLI group | S | Pending | Commands: publish, get, search. Compact output. Delegates to DocumentationTarget registry. |
 | S301.5 | ConfluenceTarget | M | Pending | Concrete DocumentationTarget using httpx + Confluence REST API. Page ID mapping, space routing, template support. Config from `.raise/adapters/confluence.yaml`. |
