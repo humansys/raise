@@ -46,10 +46,7 @@ Guide the developer through a formal 6-phase bug fix lifecycle — branch, analy
 
 ### Step 1: Start *(mirrors `rai-story-start`)*
 
-```bash
-git checkout {dev_branch}
-git checkout -b bug/raise-{N}/{bug-slug}
-```
+`git checkout {dev_branch} && git checkout -b bug/raise-{N}/{bug-slug}`
 
 Reproduce the bug — confirm it is observable. Write `bug-{N}-scope.md`:
 
@@ -73,7 +70,16 @@ On `bug/raise-{N}/{slug}` branch. Bug reproduces. Scope artifact committed.
 | S | Single causal chain | 5 Whys |
 | M/L | Multiple possible causes | Ishikawa |
 
-Apply method. For deeper RCA, delegate to `/rai-debug`. Write `bug-{N}-analysis.md`: hypothesis confirmed with evidence, fix approach decided.
+**5 Whys (S):** Trace one factual causal chain — ask "Why?" five times, each answer evidenced. Stop at actionable root cause. Record: `Problem → Why1 → Why2 → Why3 → Why4 → Root cause → Countermeasure`.
+
+**Ishikawa (M/L):** Explore 6 M's: Method, Machine, Material, Measurement, Manpower, Milieu. State each hypothesis, test it, confirm or eliminate:
+
+| Hypothesis | Test | Result | Conclusion |
+|------------|------|--------|------------|
+
+Rule for both: "Human error" is never a root cause — ask why the error was possible.
+
+Write `bug-{N}-analysis.md`: confirmed root cause + fix approach.
 
 <verification>
 Root cause stated with evidence. Fix approach decided — not implemented yet.
@@ -109,11 +115,7 @@ All tasks committed. All gates pass. Bug no longer reproduces.
 
 Verify: fix addresses root cause (not symptom), regression test green, no regressions introduced. Write `bug-{N}-retro.md`.
 
-If bug class could recur:
-
-```bash
-rai pattern add "{causal insight}" --context "{keywords}" --type behavioral --from RAISE-{N}
-```
+If recurring: `rai pattern add "{causal insight}" --context "{keywords}" --type behavioral --from RAISE-{N}`
 
 <verification>
 Retro written. Pattern emitted if applicable. All gates green.
@@ -161,10 +163,5 @@ Merged to `{dev_branch}`. Branch deleted. Jira updated.
 
 ## References
 
-- Step 1 mirrors: `/rai-story-start`
-- Step 2 mirrors: `/rai-story-design` · deep RCA: `/rai-debug`
-- Step 3 mirrors: `/rai-story-plan`
-- Step 4 mirrors: `/rai-story-implement`
-- Step 5 mirrors: `/rai-story-review`
-- Step 6 mirrors: `/rai-story-close`
+- Lifecycle mirrors (Steps 1→6): `/rai-story-start` · `/rai-story-design` · `/rai-story-plan` · `/rai-story-implement` · `/rai-story-review` · `/rai-story-close`
 - Branch model: `CLAUDE.md` § Branch Model
