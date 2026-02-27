@@ -21,7 +21,7 @@ skills drive Jira transitions automatically.
 
 | ID | Story | Size | Status | Description |
 |----|-------|:----:|:------:|-------------|
-| S301.1 | Protocols + Models | S | Pending | Extend ProjectManagementAdapter and DocumentationTarget with real-world operations: batch, comments, links, search, read. New models: IssueDetail, IssueSummary, Comment, BatchResult, PageContent, PageSummary. |
+| S301.1 | Protocols + Models | M | Done ✓ | Extended PM (11 methods) + Docs (5 methods), async primary + sync wrapper, 9 models, `_run_sync()` helper. 103 tests, 1.5x velocity. |
 | S301.2 | `rai backlog` CLI group | M | Pending | Commands: create, transition, update, link, comment, search, batch-transition. Compact output (~200 tokens vs 8K raw MCP). Delegates to adapter registry. |
 | S301.3 | JiraAdapter | L | Pending | Concrete ProjectManagementAdapter using httpx + Jira REST API. Config from `.raise/jira.yaml` (already exists with lifecycle_mapping, team identifiers, transition IDs). Rate limiting, field filtering. |
 | S301.4 | `rai docs` CLI group | S | Pending | Commands: publish, get, search. Compact output. Delegates to DocumentationTarget registry. |
@@ -287,7 +287,7 @@ Integration:                                              S301.7 (E2E)
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
-| S301.1 — Protocols + Models | S | Pending | — | — | |
+| S301.1 — Protocols + Models | M | Done ✓ | 60min | 1.5x | Upgraded S→M by arch review. 4 protocols, 9 models, 2 wrappers, 103 tests. QR: _run_sync fix. |
 | S301.2 — `rai backlog` CLI | M | Pending | — | — | |
 | S301.3 — JiraAdapter | L | Pending | — | — | Highest risk |
 | S301.4 — `rai docs` CLI | S | Pending | — | — | Parallel with S301.3 |
