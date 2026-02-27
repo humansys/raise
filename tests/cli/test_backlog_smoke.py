@@ -29,9 +29,7 @@ class TestBacklogSmoke:
 
     def test_no_demo_commands_registered(self) -> None:
         """Demo commands (auth, pull, push) are not registered as subcommands."""
-        result = runner.invoke(app, ["backlog", "--help"])
-        # Check that demo commands don't appear as clickable subcommands.
-        # We check each by invoking directly — should get "No such command".
+        # Check each by invoking directly — should get "No such command".
         for cmd in ["auth", "pull", "push"]:
             cmd_result = runner.invoke(app, ["backlog", cmd])
             assert cmd_result.exit_code != 0, f"Demo command '{cmd}' still registered"
