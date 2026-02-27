@@ -204,7 +204,9 @@ def _check_all(registry: GateRegistry, fmt: str) -> None:
             }
             for r in results
         ]
-        typer.echo(json.dumps({"gates": data, "all_passed": len(failed) == 0}, indent=2))
+        typer.echo(
+            json.dumps({"gates": data, "all_passed": len(failed) == 0}, indent=2)
+        )
     else:
         for r in results:
             _print_result(r)

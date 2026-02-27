@@ -93,7 +93,15 @@ class TestGraphQueryCommand:
         """Query with --format json returns valid JSON."""
         result = runner.invoke(
             app,
-            ["graph", "query", "testing", "--index", str(sample_graph), "--format", "json"],
+            [
+                "graph",
+                "query",
+                "testing",
+                "--index",
+                str(sample_graph),
+                "--format",
+                "json",
+            ],
         )
         assert result.exit_code == 0
 
@@ -119,7 +127,15 @@ class TestGraphQueryCommand:
         """Query with --format compact returns compact output."""
         result = runner.invoke(
             app,
-            ["graph", "query", "pattern", "--index", str(sample_graph), "--format", "compact"],
+            [
+                "graph",
+                "query",
+                "pattern",
+                "--index",
+                str(sample_graph),
+                "--format",
+                "compact",
+            ],
         )
         assert result.exit_code == 0
 
@@ -147,12 +163,12 @@ class TestGraphBuildCommand:
         """Build creates a graph index."""
         from unittest.mock import MagicMock, patch
 
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.context.models import ConceptNode
+        from rai_core.graph.engine import Graph
+        from rai_core.graph.models import GraphNode
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="test pattern",
@@ -162,17 +178,21 @@ class TestGraphBuildCommand:
 
         output_path = tmp_path / "index.json"
 
-        with patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder") as mock_cls:
+        with patch("rai_cli.cli.commands.graph.GraphBuilder") as mock_cls:
             mock_builder = MagicMock()
             mock_builder.build.return_value = graph
             mock_cls.return_value = mock_builder
 
-            with patch("rai_cli.cli.commands.graph.get_active_backend") as mock_backend_fn:
+            with patch(
+                "rai_cli.cli.commands.graph.get_active_backend"
+            ) as mock_backend_fn:
                 mock_backend = MagicMock()
                 mock_backend.load.side_effect = FileNotFoundError
                 mock_backend_fn.return_value = mock_backend
 
-                result = runner.invoke(app, ["graph", "build", "--output", str(output_path)])
+                result = runner.invoke(
+                    app, ["graph", "build", "--output", str(output_path)]
+                )
 
         assert result.exit_code == 0
 
@@ -306,7 +326,9 @@ class TestMemoryDeprecationWrappers:
 
     def test_memory_validate_deprecated(self, sample_graph: Path) -> None:
         """rai memory validate prints DEPRECATED and still works."""
-        result = runner.invoke(app, ["memory", "validate", "--index", str(sample_graph)])
+        result = runner.invoke(
+            app, ["memory", "validate", "--index", str(sample_graph)]
+        )
         assert result.exit_code == 0
         assert "DEPRECATED" in result.output
 

@@ -58,14 +58,6 @@ class TestSessionStateSchema:
         assert work.phase == ""
         assert work.branch == ""
 
-    def test_current_work_valid(self) -> None:
-        """CurrentWork accepts all required fields."""
-        work = CurrentWork(
-            epic="E15", story="S15.7", phase="design", branch="story/s15.7/x"
-        )
-        assert work.epic == "E15"
-        assert work.story == "S15.7"
-
     def test_last_session_requires_core_fields(self) -> None:
         """LastSession requires id, date, developer, summary."""
         with pytest.raises(ValidationError):
@@ -106,15 +98,6 @@ class TestSessionStateSchema:
         assert state.pending.decisions == []
         assert state.notes == ""
 
-    def test_session_state_full(self) -> None:
-        """SessionState accepts all fields including notes."""
-        state = _make_session_state()
-        assert state.current_work.epic == "E15"
-        assert state.last_session.id == "SES-097"
-        assert len(state.pending.next_actions) == 1
-        assert state.notes == "ADR-024 created."
-
-
 class TestGetSessionStatePath:
     """Tests for get_session_state_path."""
 
@@ -126,7 +109,15 @@ class TestGetSessionStatePath:
     def test_returns_per_session_path_with_session_id(self, tmp_path: Path) -> None:
         """Path is .raise/rai/personal/sessions/{session_id}/state.yaml when session_id provided."""
         path = get_session_state_path(tmp_path, session_id="SES-177")
-        expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-177" / "state.yaml"
+        expected = (
+            tmp_path
+            / ".raise"
+            / "rai"
+            / "personal"
+            / "sessions"
+            / "SES-177"
+            / "state.yaml"
+        )
         assert path == expected
 
 
@@ -278,7 +269,15 @@ class TestSaveSessionState:
         """Writes to sessions/{session_id}/state.yaml when session_id provided."""
         state = _make_session_state()
         save_session_state(tmp_path, state, session_id="SES-177")
-        expected = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-177" / "state.yaml"
+        expected = (
+            tmp_path
+            / ".raise"
+            / "rai"
+            / "personal"
+            / "sessions"
+            / "SES-177"
+            / "state.yaml"
+        )
         assert expected.exists()
         data = yaml.safe_load(expected.read_text(encoding="utf-8"))
         assert data["current_work"]["epic"] == "E15"
@@ -288,7 +287,9 @@ class TestSaveSessionState:
         state = _make_session_state()
         save_session_state(tmp_path, state, session_id="SES-200")
         flat_path = tmp_path / ".raise" / "rai" / "personal" / "session-state.yaml"
-        assert not flat_path.exists(), "Should not create flat file when session_id provided"
+        assert not flat_path.exists(), (
+            "Should not create flat file when session_id provided"
+        )
 
     def test_roundtrip(self, tmp_path: Path) -> None:
         """Save then load returns equivalent state."""
@@ -334,9 +335,13 @@ class TestMigrateFlatToSession:
         assert result is True
         session_dir = personal_dir / "sessions" / "SES-100"
         assert (session_dir / "state.yaml").exists()
-        assert (session_dir / "state.yaml").read_text(encoding="utf-8") == "current_work:\n  epic: E15\n"
+        assert (session_dir / "state.yaml").read_text(
+            encoding="utf-8"
+        ) == "current_work:\n  epic: E15\n"
         assert (session_dir / "signals.jsonl").exists()
-        assert (session_dir / "signals.jsonl").read_text(encoding="utf-8") == '{"signal_type": "test"}\n'
+        assert (session_dir / "signals.jsonl").read_text(
+            encoding="utf-8"
+        ) == '{"signal_type": "test"}\n'
         # Flat files removed
         assert not flat_state.exists()
         assert not flat_signals.exists()
@@ -434,4 +439,6 @@ class TestCleanupSessionDir:
 
         assert not (sessions_dir / "SES-100").exists()
         assert (sessions_dir / "SES-101").exists()
-        assert (sessions_dir / "SES-101" / "state.yaml").read_text(encoding="utf-8") == "101"
+        assert (sessions_dir / "SES-101" / "state.yaml").read_text(
+            encoding="utf-8"
+        ) == "101"

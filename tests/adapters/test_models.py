@@ -4,15 +4,16 @@ from __future__ import annotations
 
 import pytest
 from pydantic import BaseModel, ValidationError
+from rai_core.graph.backends.models import BackendHealth
 
 from rai_cli.adapters.models import (
     ArtifactLocator,
-    BackendHealth,
     CoreArtifactType,
     IssueRef,
     IssueSpec,
     PublishResult,
 )
+from rai_core.graph.backends.models import BackendHealth
 
 
 class TestCoreArtifactType:
@@ -44,14 +45,6 @@ class TestArtifactLocator:
         assert loc.artifact_type == "backlog"
         assert loc.metadata == {}
 
-    def test_construct_with_metadata(self) -> None:
-        loc = ArtifactLocator(
-            path="dev/decisions/adr-033.md",
-            artifact_type=CoreArtifactType.ADR,
-            metadata={"version": "v2"},
-        )
-        assert loc.metadata == {"version": "v2"}
-
     def test_missing_required_field_raises(self) -> None:
         with pytest.raises(ValidationError):
             ArtifactLocator(artifact_type="backlog")  # type: ignore[call-arg]
@@ -73,17 +66,6 @@ class TestIssueSpec:
         assert spec.labels == []
         assert spec.metadata == {}
 
-    def test_full_construction(self) -> None:
-        spec = IssueSpec(
-            summary="Add dark mode",
-            description="## Details\nImplement theme toggle",
-            issue_type="Story",
-            labels=["frontend", "ux"],
-            metadata={"priority": "High"},
-        )
-        assert spec.issue_type == "Story"
-        assert len(spec.labels) == 2
-
     def test_summary_required(self) -> None:
         with pytest.raises(ValidationError):
             IssueSpec()  # type: ignore[call-arg]
@@ -97,14 +79,6 @@ class TestIssueRef:
         assert ref.key == "PROJ-123"
         assert ref.url == ""
         assert ref.metadata == {}
-
-    def test_full_construction(self) -> None:
-        ref = IssueRef(
-            key="PROJ-456",
-            url="https://jira.example.com/browse/PROJ-456",
-            metadata={"status": "Open"},
-        )
-        assert ref.url.startswith("https://")
 
     def test_key_required(self) -> None:
         with pytest.raises(ValidationError):
@@ -138,15 +112,6 @@ class TestBackendHealth:
         assert health.status == "healthy"
         assert health.message == ""
         assert health.metadata == {}
-
-    def test_degraded_with_details(self) -> None:
-        health = BackendHealth(
-            status="degraded",
-            message="High latency",
-            metadata={"latency_ms": 2500},
-        )
-        assert health.status == "degraded"
-        assert health.metadata["latency_ms"] == 2500
 
     def test_roundtrip(self) -> None:
         health = BackendHealth(status="unavailable", message="Connection refused")

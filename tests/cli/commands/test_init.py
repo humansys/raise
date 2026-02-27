@@ -819,7 +819,9 @@ class TestInitIdeFlag:
 
         assert result.exit_code == 0
         # Claude structure
-        assert (greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
         assert not (greenfield_project / ".agent").exists()
 
     def test_explicit_claude_identical_to_default(
@@ -836,7 +838,9 @@ class TestInitIdeFlag:
             )
 
         assert result.exit_code == 0
-        assert (greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
         assert not (greenfield_project / ".agent").exists()
 
     def test_antigravity_produces_agent_structure(
@@ -854,7 +858,9 @@ class TestInitIdeFlag:
 
         assert result.exit_code == 0
         # Antigravity skills structure
-        assert (greenfield_project / ".agent" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".agent" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
         # Workflows directory created by scaffold_workflows
         assert (greenfield_project / ".agent" / "workflows").is_dir()
         # No Claude structure
@@ -869,9 +875,7 @@ class TestInitIdeFlag:
 
         with (
             patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home),
-            patch(
-                "rai_cli.config.paths.get_claude_memory_path"
-            ) as mock_claude_mem,
+            patch("rai_cli.config.paths.get_claude_memory_path") as mock_claude_mem,
         ):
             result = runner.invoke(
                 app,
@@ -897,8 +901,10 @@ class TestInitIdeFlag:
                 app,
                 [
                     "init",
-                    "--path", str(brownfield_project),
-                    "--ide", "antigravity",
+                    "--path",
+                    str(brownfield_project),
+                    "--ide",
+                    "antigravity",
                     "--detect",
                 ],
                 catch_exceptions=False,
@@ -919,7 +925,9 @@ class TestInitIdeFlag:
         for ide in ("claude", "antigravity"):
             project = greenfield_project / ide
             project.mkdir()
-            with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            with patch(
+                "rai_cli.onboarding.profile.get_rai_home", return_value=mock_home
+            ):
                 result = runner.invoke(
                     app,
                     ["init", "--path", str(project), "--ide", ide],
@@ -980,9 +988,12 @@ class TestInitAgentFlag:
                 app,
                 [
                     "init",
-                    "--path", str(greenfield_project),
-                    "--agent", "claude",
-                    "--agent", "cursor",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "claude",
+                    "--agent",
+                    "cursor",
                 ],
                 catch_exceptions=False,
             )
@@ -1006,9 +1017,12 @@ class TestInitAgentFlag:
                 app,
                 [
                     "init",
-                    "--path", str(greenfield_project),
-                    "--agent", "claude",
-                    "--agent", "cursor",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "claude",
+                    "--agent",
+                    "cursor",
                 ],
                 catch_exceptions=False,
             )
@@ -1029,9 +1043,12 @@ class TestInitAgentFlag:
                 app,
                 [
                     "init",
-                    "--path", str(greenfield_project),
-                    "--agent", "cursor",
-                    "--ide", "antigravity",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "cursor",
+                    "--ide",
+                    "antigravity",
                 ],
                 catch_exceptions=False,
             )
@@ -1072,7 +1089,9 @@ class TestInitAgentFlag:
             )
 
         assert result.exit_code == 0
-        assert (greenfield_project / ".roo" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".roo" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
 
     def test_agent_roo_detect_generates_instructions(
         self, greenfield_project: Path, mock_home: Path
@@ -1083,7 +1102,14 @@ class TestInitAgentFlag:
         with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["init", "--path", str(greenfield_project), "--agent", "roo", "--detect"],
+                [
+                    "init",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "roo",
+                    "--detect",
+                ],
                 catch_exceptions=False,
             )
 

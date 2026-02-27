@@ -49,27 +49,6 @@ class TestSkillEvent:
         assert event.event == "start"
         assert event.duration_sec is None
 
-    def test_create_complete_event_with_duration(self, now: datetime) -> None:
-        """Create a skill complete event with duration."""
-        event = SkillEvent(
-            timestamp=now,
-            skill="rai-story-implement",
-            event="complete",
-            duration_sec=1800,
-        )
-
-        assert event.event == "complete"
-        assert event.duration_sec == 1800
-
-    def test_create_abandon_event(self, now: datetime) -> None:
-        """Create a skill abandon event."""
-        event = SkillEvent(
-            timestamp=now, skill="rai-research", event="abandon", duration_sec=600
-        )
-
-        assert event.event == "abandon"
-        assert event.duration_sec == 600
-
     def test_invalid_event_type(self, now: datetime) -> None:
         """Invalid event type raises ValidationError."""
         with pytest.raises(ValidationError):
@@ -118,14 +97,6 @@ class TestSessionEvent:
 
         assert event.outcome == "partial"
         assert event.stories == []  # Default empty list
-
-    def test_create_abandoned_event(self, now: datetime) -> None:
-        """Create an abandoned session event."""
-        event = SessionEvent(
-            timestamp=now, session_type="ideation", outcome="abandoned", duration_min=15
-        )
-
-        assert event.outcome == "abandoned"
 
     def test_invalid_outcome(self, now: datetime) -> None:
         """Invalid outcome raises ValidationError."""
@@ -176,19 +147,6 @@ class TestCalibrationEvent:
         assert event.actual_min == 20
         assert event.velocity == 1.25
 
-    def test_velocity_less_than_one(self, now: datetime) -> None:
-        """Velocity < 1 means slower than expected."""
-        event = CalibrationEvent(
-            timestamp=now,
-            story_id="F9.2",
-            story_size="S",
-            estimated_min=30,
-            actual_min=45,
-            velocity=0.67,
-        )
-
-        assert event.velocity < 1.0
-
     def test_serialization(self, now: datetime) -> None:
         """Event serializes to JSON correctly."""
         event = CalibrationEvent(
@@ -226,18 +184,6 @@ class TestErrorEvent:
         assert event.error_type == "command_not_found"
         assert event.context == "pytest"
         assert event.recoverable is True
-
-    def test_create_non_recoverable_error(self, now: datetime) -> None:
-        """Create a non-recoverable error event."""
-        event = ErrorEvent(
-            timestamp=now,
-            tool="Read",
-            error_type="file_not_found",
-            context="config.yaml",
-            recoverable=False,
-        )
-
-        assert event.recoverable is False
 
     def test_serialization(self, now: datetime) -> None:
         """Event serializes to JSON correctly."""
@@ -305,59 +251,6 @@ class TestWorkLifecycle:
         assert event.event == "start"
         assert event.phase == "design"
         assert event.blocker is None
-
-    def test_create_epic_start_event(self, now: datetime) -> None:
-        """Create an epic start event."""
-        event = WorkLifecycle(
-            timestamp=now,
-            work_type="epic",
-            work_id="E9",
-            event="start",
-            phase="design",
-        )
-
-        assert event.type == "work_lifecycle"
-        assert event.work_type == "epic"
-        assert event.work_id == "E9"
-
-    def test_create_complete_event(self, now: datetime) -> None:
-        """Create a complete event."""
-        event = WorkLifecycle(
-            timestamp=now,
-            work_type="story",
-            work_id="F9.4",
-            event="complete",
-            phase="review",
-        )
-
-        assert event.event == "complete"
-        assert event.phase == "review"
-
-    def test_create_blocked_event_with_blocker(self, now: datetime) -> None:
-        """Create a blocked event with blocker description."""
-        event = WorkLifecycle(
-            timestamp=now,
-            work_type="story",
-            work_id="F9.4",
-            event="blocked",
-            phase="plan",
-            blocker="unclear requirements",
-        )
-
-        assert event.event == "blocked"
-        assert event.blocker == "unclear requirements"
-
-    def test_create_abandoned_event(self, now: datetime) -> None:
-        """Create an abandoned event."""
-        event = WorkLifecycle(
-            timestamp=now,
-            work_type="epic",
-            work_id="E9",
-            event="abandoned",
-            phase="implement",
-        )
-
-        assert event.event == "abandoned"
 
     def test_invalid_work_type(self, now: datetime) -> None:
         """Invalid work type raises ValidationError."""

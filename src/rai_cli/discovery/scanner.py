@@ -40,7 +40,9 @@ SymbolKind = Literal[
 ]
 
 # Supported languages for scanning
-Language = Literal["python", "typescript", "javascript", "php", "svelte", "csharp", "dart"]
+Language = Literal[
+    "python", "typescript", "javascript", "php", "svelte", "csharp", "dart"
+]
 
 # File extension to language mapping
 EXTENSION_TO_LANGUAGE: dict[str, Language] = {
@@ -1398,9 +1400,7 @@ def _extract_dart_symbols_from_tree(
         # Method inside a container
         if node_type == "method_signature" and parent_name is not None:
             # method_signature contains function_signature or getter_signature
-            inner = _find_child_by_type(
-                node, "function_signature", "getter_signature"
-            )
+            inner = _find_child_by_type(node, "function_signature", "getter_signature")
             method_name = _get_name(inner) if inner else _get_name(node)
 
             symbols.append(

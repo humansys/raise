@@ -7,8 +7,8 @@ impact classification, and affected_modules derivation.
 from __future__ import annotations
 
 from rai_cli.context.diff import GraphDiff, NodeChange, diff_graphs
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptNode
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphNode
 
 
 def _make_node(
@@ -16,9 +16,9 @@ def _make_node(
     type: str = "pattern",
     content: str = "test content",
     metadata: dict | None = None,
-) -> ConceptNode:
-    """Helper to create a ConceptNode with minimal boilerplate."""
-    return ConceptNode(
+) -> GraphNode:
+    """Helper to create a GraphNode with minimal boilerplate."""
+    return GraphNode(
         id=id,
         type=type,  # type: ignore[arg-type]
         content=content,
@@ -31,16 +31,16 @@ class TestDiffGraphsIdenticalGraphs:
     """Diffing identical graphs produces no changes."""
 
     def test_empty_graphs(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         diff = diff_graphs(old, new)
         assert diff.node_changes == []
         assert diff.impact == "none"
         assert diff.affected_modules == []
 
     def test_identical_nodes(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         node = _make_node("PAT-001", content="some pattern")
         old.add_concept(node)
         new.add_concept(node)
@@ -49,8 +49,8 @@ class TestDiffGraphsIdenticalGraphs:
         assert diff.impact == "none"
 
     def test_identical_modules(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         node = _make_node(
             "mod-memory",
             type="module",
@@ -68,8 +68,8 @@ class TestDiffGraphsAddedNodes:
     """Nodes in new graph but not old are 'added'."""
 
     def test_single_added_node(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("PAT-001"))
         diff = diff_graphs(old, new)
         assert len(diff.node_changes) == 1
@@ -80,16 +80,16 @@ class TestDiffGraphsAddedNodes:
         assert change.new_value is not None
 
     def test_added_module_affects_modules(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("mod-new", type="module", content="new module"))
         diff = diff_graphs(old, new)
         assert "mod-new" in diff.affected_modules
         assert diff.impact == "module"
 
     def test_added_pattern_no_module_impact(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("PAT-999"))
         diff = diff_graphs(old, new)
         assert diff.affected_modules == []
@@ -100,8 +100,8 @@ class TestDiffGraphsRemovedNodes:
     """Nodes in old graph but not new are 'removed'."""
 
     def test_single_removed_node(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         old.add_concept(_make_node("PAT-001"))
         diff = diff_graphs(old, new)
         assert len(diff.node_changes) == 1
@@ -112,8 +112,8 @@ class TestDiffGraphsRemovedNodes:
         assert change.new_value is None
 
     def test_removed_module_affects_modules(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         old.add_concept(_make_node("mod-old", type="module", content="old module"))
         diff = diff_graphs(old, new)
         assert "mod-old" in diff.affected_modules
@@ -124,8 +124,8 @@ class TestDiffGraphsModifiedNodes:
     """Nodes with same ID but different content/type/metadata are 'modified'."""
 
     def test_content_change(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         old.add_concept(_make_node("PAT-001", content="old content"))
         new.add_concept(_make_node("PAT-001", content="new content"))
         diff = diff_graphs(old, new)
@@ -135,8 +135,8 @@ class TestDiffGraphsModifiedNodes:
         assert "content" in change.changed_fields
 
     def test_metadata_change(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         old.add_concept(
             _make_node("mod-ctx", type="module", metadata={"code_imports": ["config"]})
         )
@@ -155,8 +155,8 @@ class TestDiffGraphsModifiedNodes:
         assert "mod-ctx" in diff.affected_modules
 
     def test_type_change(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         old.add_concept(_make_node("X-001", type="pattern"))
         new.add_concept(_make_node("X-001", type="calibration"))
         diff = diff_graphs(old, new)
@@ -164,16 +164,16 @@ class TestDiffGraphsModifiedNodes:
         assert "type" in diff.node_changes[0].changed_fields
 
     def test_ignores_created_field(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
-        node_old = ConceptNode(
+        old = Graph()
+        new = Graph()
+        node_old = GraphNode(
             id="PAT-001",
             type="pattern",
             content="same",
             created="2026-01-01",
             metadata={},
         )
-        node_new = ConceptNode(
+        node_new = GraphNode(
             id="PAT-001",
             type="pattern",
             content="same",
@@ -186,9 +186,9 @@ class TestDiffGraphsModifiedNodes:
         assert diff.node_changes == []
 
     def test_ignores_source_file_field(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
-        node_old = ConceptNode(
+        old = Graph()
+        new = Graph()
+        node_old = GraphNode(
             id="PAT-001",
             type="pattern",
             content="same",
@@ -196,7 +196,7 @@ class TestDiffGraphsModifiedNodes:
             source_file="old/path.md",
             metadata={},
         )
-        node_new = ConceptNode(
+        node_new = GraphNode(
             id="PAT-001",
             type="pattern",
             content="same",
@@ -214,48 +214,48 @@ class TestImpactClassification:
     """Impact is derived from the types of changed nodes."""
 
     def test_no_changes_is_none(self) -> None:
-        diff = diff_graphs(UnifiedGraph(), UnifiedGraph())
+        diff = diff_graphs(Graph(), Graph())
         assert diff.impact == "none"
 
     def test_pattern_changes_is_none(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("PAT-001"))
         new.add_concept(_make_node("SES-001", type="session"))
         diff = diff_graphs(old, new)
         assert diff.impact == "none"
 
     def test_module_change_is_module(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("mod-x", type="module"))
         diff = diff_graphs(old, new)
         assert diff.impact == "module"
 
     def test_component_change_is_module(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("comp-x", type="component"))
         diff = diff_graphs(old, new)
         assert diff.impact == "module"
 
     def test_bounded_context_change_is_architectural(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("bc-ontology", type="bounded_context"))
         diff = diff_graphs(old, new)
         assert diff.impact == "architectural"
 
     def test_layer_change_is_architectural(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("lyr-leaf", type="layer"))
         diff = diff_graphs(old, new)
         assert diff.impact == "architectural"
 
     def test_architectural_trumps_module(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("mod-x", type="module"))
         new.add_concept(_make_node("bc-new", type="bounded_context"))
         diff = diff_graphs(old, new)
@@ -266,22 +266,22 @@ class TestAffectedModules:
     """affected_modules lists module IDs from changed nodes."""
 
     def test_module_node_added(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("mod-memory", type="module"))
         diff = diff_graphs(old, new)
         assert diff.affected_modules == ["mod-memory"]
 
     def test_non_module_not_in_affected(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("PAT-001"))
         diff = diff_graphs(old, new)
         assert diff.affected_modules == []
 
     def test_multiple_modules_sorted(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("mod-context", type="module"))
         new.add_concept(_make_node("mod-memory", type="module"))
         diff = diff_graphs(old, new)
@@ -292,12 +292,12 @@ class TestSummary:
     """Summary is a deterministic template string."""
 
     def test_no_changes(self) -> None:
-        diff = diff_graphs(UnifiedGraph(), UnifiedGraph())
+        diff = diff_graphs(Graph(), Graph())
         assert diff.summary == "no changes"
 
     def test_changes_summary_format(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         new.add_concept(_make_node("mod-x", type="module"))
         new.add_concept(_make_node("PAT-001"))
         diff = diff_graphs(old, new)
@@ -306,8 +306,8 @@ class TestSummary:
         assert "mod-x" in diff.summary
 
     def test_mixed_changes(self) -> None:
-        old = UnifiedGraph()
-        new = UnifiedGraph()
+        old = Graph()
+        new = Graph()
         old.add_concept(_make_node("PAT-001", content="old"))
         new.add_concept(_make_node("PAT-001", content="new"))
         new.add_concept(_make_node("PAT-002"))

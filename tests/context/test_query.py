@@ -6,28 +6,30 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptNode
-from rai_cli.context.query import (
-    UnifiedQuery,
-    UnifiedQueryEngine,
-    UnifiedQueryMetadata,
-    UnifiedQueryResult,
-    UnifiedQueryStrategy,
+from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphEdge, GraphNode
+from rai_core.graph.query import (
+    Query,
+    QueryEngine,
+    QueryMetadata,
+    QueryResult,
+    QueryStrategy,
+    calculate_relevance_score,
+    wilson_lower_bound,
 )
-from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
 
 # --- Fixtures ---
 
 
 @pytest.fixture
-def sample_graph() -> UnifiedGraph:
+def sample_graph() -> Graph:
     """Create a sample graph for testing."""
-    graph = UnifiedGraph()
+    graph = Graph()
 
     # Add pattern nodes
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="PAT-001",
             type="pattern",
             content="Apply 0.5x multiplier to estimates when using full kata cycle",
@@ -37,7 +39,7 @@ def sample_graph() -> UnifiedGraph:
         )
     )
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="PAT-002",
             type="pattern",
             content="Use singleton pattern with get/set/configure methods",
@@ -49,7 +51,7 @@ def sample_graph() -> UnifiedGraph:
 
     # Add calibration nodes
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="CAL-001",
             type="calibration",
             content="F2.1 Concept Extraction: Size S, Est 180m, Actual 52m, Velocity 3.5x",
@@ -61,7 +63,7 @@ def sample_graph() -> UnifiedGraph:
 
     # Add skill nodes
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="/story-plan",
             type="skill",
             content="Decompose user stories into atomic executable tasks",
@@ -73,7 +75,7 @@ def sample_graph() -> UnifiedGraph:
 
     # Add session node
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="SES-001",
             type="session",
             content="E3 Implementation Plan session with epic-plan skill",
@@ -86,51 +88,51 @@ def sample_graph() -> UnifiedGraph:
 
 
 @pytest.fixture
-def engine(sample_graph: UnifiedGraph) -> UnifiedQueryEngine:
+def engine(sample_graph: Graph) -> QueryEngine:
     """Create query engine with sample graph."""
-    return UnifiedQueryEngine(sample_graph)
+    return QueryEngine(sample_graph)
 
 
 # --- Model Tests ---
 
 
-class TestUnifiedQuery:
-    """Tests for UnifiedQuery model."""
+class TestQuery:
+    """Tests for Query model."""
 
     def test_default_strategy(self) -> None:
         """Default strategy is keyword_search."""
-        query = UnifiedQuery(query="planning")
-        assert query.strategy == UnifiedQueryStrategy.KEYWORD_SEARCH
+        query = Query(query="planning")
+        assert query.strategy == QueryStrategy.KEYWORD_SEARCH
 
     def test_default_max_depth(self) -> None:
         """Default max_depth is 1."""
-        query = UnifiedQuery(query="planning")
+        query = Query(query="planning")
         assert query.max_depth == 1
 
     def test_types_filter(self) -> None:
         """Types filter is optional list."""
-        query = UnifiedQuery(query="planning", types=["pattern", "calibration"])
+        query = Query(query="planning", types=["pattern", "calibration"])
         assert query.types == ["pattern", "calibration"]
 
     def test_max_depth_validation(self) -> None:
         """Max depth must be between 0 and 5."""
         with pytest.raises(ValueError):
-            UnifiedQuery(query="test", max_depth=6)
+            Query(query="test", max_depth=6)
 
     def test_limit_default(self) -> None:
         """Default limit is 10."""
-        query = UnifiedQuery(query="test")
+        query = Query(query="test")
         assert query.limit == 10
 
 
-class TestUnifiedQueryMetadata:
-    """Tests for UnifiedQueryMetadata model."""
+class TestQueryMetadata:
+    """Tests for QueryMetadata model."""
 
     def test_types_found_dict(self) -> None:
         """Types found is a dict of type -> count."""
-        metadata = UnifiedQueryMetadata(
+        metadata = QueryMetadata(
             query="test",
-            strategy=UnifiedQueryStrategy.KEYWORD_SEARCH,
+            strategy=QueryStrategy.KEYWORD_SEARCH,
             total_concepts=5,
             token_estimate=320,
             execution_time_ms=8.5,
@@ -139,19 +141,19 @@ class TestUnifiedQueryMetadata:
         assert metadata.types_found["pattern"] == 2
 
 
-class TestUnifiedQueryResult:
-    """Tests for UnifiedQueryResult model."""
+class TestQueryResult:
+    """Tests for QueryResult model."""
 
-    def test_to_json(self, sample_graph: UnifiedGraph) -> None:
+    def test_to_json(self, sample_graph: Graph) -> None:
         """Result can be serialized to JSON."""
         concept = sample_graph.get_concept("PAT-001")
         assert concept is not None
 
-        result = UnifiedQueryResult(
+        result = QueryResult(
             concepts=[concept],
-            metadata=UnifiedQueryMetadata(
+            metadata=QueryMetadata(
                 query="test",
-                strategy=UnifiedQueryStrategy.KEYWORD_SEARCH,
+                strategy=QueryStrategy.KEYWORD_SEARCH,
                 total_concepts=1,
                 token_estimate=50,
                 execution_time_ms=5.0,
@@ -166,94 +168,93 @@ class TestUnifiedQueryResult:
 # --- Engine Tests ---
 
 
-class TestUnifiedQueryEngineKeywordSearch:
+class TestQueryEngineKeywordSearch:
     """Tests for keyword search strategy."""
 
-    def test_single_keyword_match(self, engine: UnifiedQueryEngine) -> None:
+    def test_single_keyword_match(self, engine: QueryEngine) -> None:
         """Single keyword matches content."""
-        result = engine.query(UnifiedQuery(query="multiplier"))
+        result = engine.query(Query(query="multiplier"))
         assert len(result.concepts) >= 1
         assert any(c.id == "PAT-001" for c in result.concepts)
 
-    def test_multiple_keywords_match(self, engine: UnifiedQueryEngine) -> None:
+    def test_multiple_keywords_match(self, engine: QueryEngine) -> None:
         """Multiple keywords all match."""
-        result = engine.query(UnifiedQuery(query="kata cycle"))
+        result = engine.query(Query(query="kata cycle"))
         assert len(result.concepts) >= 1
         assert any(c.id == "PAT-001" for c in result.concepts)
 
-    def test_case_insensitive(self, engine: UnifiedQueryEngine) -> None:
+    def test_case_insensitive(self, engine: QueryEngine) -> None:
         """Search is case-insensitive."""
-        result = engine.query(UnifiedQuery(query="MULTIPLIER"))
+        result = engine.query(Query(query="MULTIPLIER"))
         assert len(result.concepts) >= 1
         assert any(c.id == "PAT-001" for c in result.concepts)
 
-    def test_no_match_returns_empty(self, engine: UnifiedQueryEngine) -> None:
+    def test_no_match_returns_empty(self, engine: QueryEngine) -> None:
         """No matches returns empty list."""
-        result = engine.query(UnifiedQuery(query="xyznonexistent"))
+        result = engine.query(Query(query="xyznonexistent"))
         assert len(result.concepts) == 0
 
-    def test_type_filter(self, engine: UnifiedQueryEngine) -> None:
+    def test_type_filter(self, engine: QueryEngine) -> None:
         """Type filter limits results."""
-        result = engine.query(UnifiedQuery(query="pattern", types=["calibration"]))
+        result = engine.query(Query(query="pattern", types=["calibration"]))
         # Should only return calibration nodes, not pattern nodes
         for concept in result.concepts:
             assert concept.type == "calibration"
 
-    def test_limit_results(self, engine: UnifiedQueryEngine) -> None:
+    def test_limit_results(self, engine: QueryEngine) -> None:
         """Limit caps result count."""
-        result = engine.query(UnifiedQuery(query="a", limit=2))
+        result = engine.query(Query(query="a", limit=2))
         assert len(result.concepts) <= 2
 
-    def test_relevance_scoring(self, engine: UnifiedQueryEngine) -> None:
+    def test_relevance_scoring(self, engine: QueryEngine) -> None:
         """More keyword hits rank higher."""
-        result = engine.query(UnifiedQuery(query="kata cycle multiplier"))
+        result = engine.query(Query(query="kata cycle multiplier"))
         if len(result.concepts) > 0:
             # PAT-001 has all three keywords, should be first
             assert result.concepts[0].id == "PAT-001"
 
 
-class TestUnifiedQueryEngineConceptLookup:
+class TestQueryEngineConceptLookup:
     """Tests for concept lookup strategy."""
 
-    def test_direct_lookup(self, engine: UnifiedQueryEngine) -> None:
+    def test_direct_lookup(self, engine: QueryEngine) -> None:
         """Direct ID lookup returns concept."""
         result = engine.query(
-            UnifiedQuery(
+            Query(
                 query="PAT-001",
-                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
             )
         )
         assert len(result.concepts) >= 1
         assert any(c.id == "PAT-001" for c in result.concepts)
 
-    def test_lookup_not_found(self, engine: UnifiedQueryEngine) -> None:
+    def test_lookup_not_found(self, engine: QueryEngine) -> None:
         """Non-existent ID returns empty."""
         result = engine.query(
-            UnifiedQuery(
+            Query(
                 query="NONEXISTENT-999",
-                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
             )
         )
         assert len(result.concepts) == 0
 
-    def test_lookup_with_neighbors(self, sample_graph: UnifiedGraph) -> None:
+    def test_lookup_with_neighbors(self, sample_graph: Graph) -> None:
         """Lookup with depth > 0 includes neighbors."""
-        from rai_cli.context.models import ConceptEdge
 
         # Add relationship
         sample_graph.add_relationship(
-            ConceptEdge(
+            GraphEdge(
                 source="PAT-001",
                 target="SES-001",
                 type="learned_from",
             )
         )
 
-        engine = UnifiedQueryEngine(sample_graph)
+        engine = QueryEngine(sample_graph)
         result = engine.query(
-            UnifiedQuery(
+            Query(
                 query="PAT-001",
-                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
                 max_depth=1,
             )
         )
@@ -262,59 +263,57 @@ class TestUnifiedQueryEngineConceptLookup:
         assert "PAT-001" in ids
         assert "SES-001" in ids
 
-
     def test_concept_lookup_does_not_fallback_to_keyword(
-        self, engine: UnifiedQueryEngine
+        self, engine: QueryEngine
     ) -> None:
         """concept_lookup with non-existent ID returns empty, no fallback."""
         result = engine.query(
-            UnifiedQuery(
+            Query(
                 query="singleton",  # exists as keyword but not as ID
-                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
             )
         )
         # Must return empty — no silent fallback to keyword_search
         assert len(result.concepts) == 0
-        assert result.metadata.strategy == UnifiedQueryStrategy.CONCEPT_LOOKUP
+        assert result.metadata.strategy == QueryStrategy.CONCEPT_LOOKUP
 
 
-class TestUnifiedQueryEngineEdgeTypeFilter:
+class TestQueryEngineEdgeTypeFilter:
     """Tests for edge-type filtering in concept lookup."""
 
     def test_edge_types_field_default_none(self) -> None:
         """edge_types defaults to None."""
-        query = UnifiedQuery(query="test")
+        query = Query(query="test")
         assert query.edge_types is None
 
     def test_edge_types_field_accepts_list(self) -> None:
         """edge_types accepts a list of EdgeType values."""
-        query = UnifiedQuery(
+        query = Query(
             query="test",
             edge_types=["constrained_by", "depends_on"],
         )
         assert query.edge_types == ["constrained_by", "depends_on"]
 
     def test_concept_lookup_with_edge_type_filter(
-        self, sample_graph: UnifiedGraph
+        self, sample_graph: Graph
     ) -> None:
         """Concept lookup with edge_types only returns neighbors via matching edges."""
-        from rai_cli.context.models import ConceptEdge
 
         # Add two different edge types from PAT-001
         sample_graph.add_relationship(
-            ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")
+            GraphEdge(source="PAT-001", target="SES-001", type="learned_from")
         )
         sample_graph.add_relationship(
-            ConceptEdge(source="PAT-001", target="/story-plan", type="applies_to")
+            GraphEdge(source="PAT-001", target="/story-plan", type="applies_to")
         )
 
-        engine = UnifiedQueryEngine(sample_graph)
+        engine = QueryEngine(sample_graph)
 
         # Filter to learned_from only
         result = engine.query(
-            UnifiedQuery(
+            Query(
                 query="PAT-001",
-                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
                 max_depth=1,
                 edge_types=["learned_from"],
             )
@@ -325,24 +324,23 @@ class TestUnifiedQueryEngineEdgeTypeFilter:
         assert "/story-plan" not in ids  # connected via applies_to, filtered out
 
     def test_concept_lookup_with_multiple_edge_types(
-        self, sample_graph: UnifiedGraph
+        self, sample_graph: Graph
     ) -> None:
         """Multiple edge types returns neighbors matching any of them."""
-        from rai_cli.context.models import ConceptEdge
 
         sample_graph.add_relationship(
-            ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")
+            GraphEdge(source="PAT-001", target="SES-001", type="learned_from")
         )
         sample_graph.add_relationship(
-            ConceptEdge(source="PAT-001", target="/story-plan", type="applies_to")
+            GraphEdge(source="PAT-001", target="/story-plan", type="applies_to")
         )
 
-        engine = UnifiedQueryEngine(sample_graph)
+        engine = QueryEngine(sample_graph)
 
         result = engine.query(
-            UnifiedQuery(
+            Query(
                 query="PAT-001",
-                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
                 max_depth=1,
                 edge_types=["learned_from", "applies_to"],
             )
@@ -352,24 +350,23 @@ class TestUnifiedQueryEngineEdgeTypeFilter:
         assert "/story-plan" in ids
 
     def test_concept_lookup_without_edge_types_returns_all(
-        self, sample_graph: UnifiedGraph
+        self, sample_graph: Graph
     ) -> None:
         """No edge_types filter returns all neighbors (backward compat)."""
-        from rai_cli.context.models import ConceptEdge
 
         sample_graph.add_relationship(
-            ConceptEdge(source="PAT-001", target="SES-001", type="learned_from")
+            GraphEdge(source="PAT-001", target="SES-001", type="learned_from")
         )
         sample_graph.add_relationship(
-            ConceptEdge(source="PAT-001", target="/story-plan", type="applies_to")
+            GraphEdge(source="PAT-001", target="/story-plan", type="applies_to")
         )
 
-        engine = UnifiedQueryEngine(sample_graph)
+        engine = QueryEngine(sample_graph)
 
         result = engine.query(
-            UnifiedQuery(
+            Query(
                 query="PAT-001",
-                strategy=UnifiedQueryStrategy.CONCEPT_LOOKUP,
+                strategy=QueryStrategy.CONCEPT_LOOKUP,
                 max_depth=1,
                 edge_types=None,
             )
@@ -379,39 +376,39 @@ class TestUnifiedQueryEngineEdgeTypeFilter:
         assert "/story-plan" in ids
 
 
-class TestUnifiedQueryEngineMetadata:
+class TestQueryEngineMetadata:
     """Tests for query metadata."""
 
-    def test_token_estimate(self, engine: UnifiedQueryEngine) -> None:
+    def test_token_estimate(self, engine: QueryEngine) -> None:
         """Token estimate is calculated."""
-        result = engine.query(UnifiedQuery(query="multiplier"))
+        result = engine.query(Query(query="multiplier"))
         assert result.metadata.token_estimate > 0
 
-    def test_execution_time(self, engine: UnifiedQueryEngine) -> None:
+    def test_execution_time(self, engine: QueryEngine) -> None:
         """Execution time is recorded."""
-        result = engine.query(UnifiedQuery(query="multiplier"))
+        result = engine.query(Query(query="multiplier"))
         assert result.metadata.execution_time_ms >= 0
 
-    def test_types_found(self, engine: UnifiedQueryEngine) -> None:
+    def test_types_found(self, engine: QueryEngine) -> None:
         """Types found is populated."""
-        result = engine.query(UnifiedQuery(query="pattern singleton"))
+        result = engine.query(Query(query="pattern singleton"))
         if len(result.concepts) > 0:
             assert len(result.metadata.types_found) > 0
 
     def test_total_available_equals_total_when_no_truncation(
-        self, engine: UnifiedQueryEngine
+        self, engine: QueryEngine
     ) -> None:
         """total_available equals total_concepts when results fit within limit."""
-        result = engine.query(UnifiedQuery(query="multiplier", limit=50))
+        result = engine.query(Query(query="multiplier", limit=50))
         assert result.metadata.total_available == result.metadata.total_concepts
 
     def test_total_available_exceeds_total_when_truncated(
-        self, sample_graph: UnifiedGraph
+        self, sample_graph: Graph
     ) -> None:
         """total_available > total_concepts when limit truncates results."""
         # Add extra nodes that share a keyword to guarantee truncation
         sample_graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-EXTRA-1",
                 type="pattern",
                 content="velocity tracking for estimation",
@@ -420,7 +417,7 @@ class TestUnifiedQueryEngineMetadata:
             )
         )
         sample_graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-EXTRA-2",
                 type="pattern",
                 content="velocity calibration method",
@@ -428,8 +425,8 @@ class TestUnifiedQueryEngineMetadata:
                 created="2026-02-01",
             )
         )
-        eng = UnifiedQueryEngine(sample_graph)
-        result = eng.query(UnifiedQuery(query="velocity", limit=1))
+        eng = QueryEngine(sample_graph)
+        result = eng.query(Query(query="velocity", limit=1))
         assert result.metadata.total_concepts == 1
         assert result.metadata.total_available >= 2
 
@@ -439,35 +436,30 @@ class TestWilsonLowerBound:
 
     def test_all_positive_high_score(self) -> None:
         """All positive evaluations gives high Wilson score."""
-        from rai_cli.context.query import wilson_lower_bound
 
         score = wilson_lower_bound(10, 0)
         assert score > 0.7
 
     def test_all_negative_low_score(self) -> None:
         """All negative evaluations gives low Wilson score."""
-        from rai_cli.context.query import wilson_lower_bound
 
         score = wilson_lower_bound(0, 10)
         assert score < 0.1
 
     def test_majority_negative_approx(self) -> None:
         """3 pos / 7 neg (design example) gives ~0.10."""
-        from rai_cli.context.query import wilson_lower_bound
 
         score = wilson_lower_bound(3, 7)
         assert 0.05 < score < 0.20
 
     def test_zero_total_raises(self) -> None:
         """Zero total observations raises ValueError."""
-        from rai_cli.context.query import wilson_lower_bound
 
         with pytest.raises(ValueError):
             wilson_lower_bound(0, 0)
 
     def test_single_positive_is_conservative(self) -> None:
         """Single positive is conservative — Wilson lower bound < 0.9."""
-        from rai_cli.context.query import wilson_lower_bound
 
         score = wilson_lower_bound(1, 0)
         assert 0 < score < 0.9
@@ -478,7 +470,6 @@ class TestCalculateRelevanceScore:
 
     def test_foundational_true_exempt_from_decay(self) -> None:
         """foundational=True patterns skip decay — score = keyword_relevance only."""
-        from rai_cli.context.query import calculate_relevance_score
 
         score = calculate_relevance_score(
             content="planning estimation calibration",
@@ -490,7 +481,6 @@ class TestCalculateRelevanceScore:
 
     def test_base_true_also_exempt(self) -> None:
         """base=True (writer.py legacy key) also skips decay."""
-        from rai_cli.context.query import calculate_relevance_score
 
         score = calculate_relevance_score(
             content="planning estimation calibration",
@@ -504,7 +494,6 @@ class TestCalculateRelevanceScore:
         """evaluations=0 → modifier=1.0, no penalty for un-evaluated patterns."""
         from datetime import date
 
-        from rai_cli.context.query import calculate_relevance_score
 
         score = calculate_relevance_score(
             content="planning",
@@ -520,7 +509,6 @@ class TestCalculateRelevanceScore:
         """Pattern at exactly 30d has recency=0.5 (half-life)."""
         from datetime import date, timedelta
 
-        from rai_cli.context.query import calculate_relevance_score
 
         created = (date.today() - timedelta(days=30)).isoformat()
         score = calculate_relevance_score(
@@ -537,7 +525,6 @@ class TestCalculateRelevanceScore:
         """Wilson modifier significantly reduces score for mostly-negative patterns."""
         from datetime import date
 
-        from rai_cli.context.query import calculate_relevance_score
 
         today = date.today().isoformat()
         score_negative = calculate_relevance_score(
@@ -558,7 +545,6 @@ class TestCalculateRelevanceScore:
         """No keyword hits → score = w_recency * recency (today = 0.3)."""
         from datetime import date
 
-        from rai_cli.context.query import calculate_relevance_score
 
         score = calculate_relevance_score(
             content="totally unrelated content here",
@@ -573,7 +559,6 @@ class TestCalculateRelevanceScore:
         """Empty keywords list returns a float without crashing."""
         from datetime import date
 
-        from rai_cli.context.query import calculate_relevance_score
 
         score = calculate_relevance_score(
             content="anything",
@@ -585,7 +570,6 @@ class TestCalculateRelevanceScore:
 
     def test_invalid_date_defaults_gracefully(self) -> None:
         """Invalid date string does not crash — defaults to age=0."""
-        from rai_cli.context.query import calculate_relevance_score
 
         score = calculate_relevance_score(
             content="planning",
@@ -599,7 +583,6 @@ class TestCalculateRelevanceScore:
         """None metadata is handled safely."""
         from datetime import date
 
-        from rai_cli.context.query import calculate_relevance_score
 
         score = calculate_relevance_score(
             content="planning",
@@ -615,9 +598,9 @@ class TestKeywordSearchOrdering:
 
     def test_foundational_beats_heavily_decayed(self) -> None:
         """Foundational pattern outscores a heavily decayed pattern with same keywords."""
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-DECAYED",
                 type="pattern",
                 content="planning estimation velocity",
@@ -627,7 +610,7 @@ class TestKeywordSearchOrdering:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-FOUND",
                 type="pattern",
                 content="planning estimation velocity",
@@ -636,8 +619,8 @@ class TestKeywordSearchOrdering:
                 metadata={"foundational": True},
             )
         )
-        engine = UnifiedQueryEngine(graph)
-        result = engine.query(UnifiedQuery(query="planning estimation velocity"))
+        engine = QueryEngine(graph)
+        result = engine.query(Query(query="planning estimation velocity"))
         ids = [c.id for c in result.concepts]
         assert ids.index("PAT-FOUND") < ids.index("PAT-DECAYED")
 
@@ -646,9 +629,9 @@ class TestKeywordSearchOrdering:
         from datetime import date, timedelta
 
         today = date.today()
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-NEW",
                 type="pattern",
                 content="planning estimation",
@@ -658,7 +641,7 @@ class TestKeywordSearchOrdering:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-OLD",
                 type="pattern",
                 content="planning estimation",
@@ -667,24 +650,27 @@ class TestKeywordSearchOrdering:
                 metadata={},
             )
         )
-        engine = UnifiedQueryEngine(graph)
-        result = engine.query(UnifiedQuery(query="planning estimation"))
+        engine = QueryEngine(graph)
+        result = engine.query(Query(query="planning estimation"))
         ids = [c.id for c in result.concepts]
         assert ids.index("PAT-NEW") < ids.index("PAT-OLD")
 
 
-class TestUnifiedQueryEngineFromFile:
-    """Tests for loading engine from file."""
+class TestQueryEngineFromFile:
+    """Tests for loading engine from persisted file."""
 
-    def test_from_file(self, sample_graph: UnifiedGraph, tmp_path: Path) -> None:
-        """Engine can be loaded from file."""
+    def test_load_from_file(self, sample_graph: Graph, tmp_path: Path) -> None:
+        """Engine can be created from a persisted graph file."""
         graph_path = tmp_path / "unified.json"
-        FilesystemGraphBackend(graph_path).persist(sample_graph)
+        backend = FilesystemGraphBackend(graph_path)
+        backend.persist(sample_graph)
 
-        engine = UnifiedQueryEngine.from_file(graph_path)
+        loaded_graph = backend.load()
+        engine = QueryEngine(loaded_graph)
         assert engine.graph.node_count == sample_graph.node_count
 
-    def test_from_file_not_found(self, tmp_path: Path) -> None:
+    def test_load_not_found(self, tmp_path: Path) -> None:
         """FileNotFoundError if file doesn't exist."""
+        backend = FilesystemGraphBackend(tmp_path / "nonexistent.json")
         with pytest.raises(FileNotFoundError):
-            UnifiedQueryEngine.from_file(tmp_path / "nonexistent.json")
+            backend.load()
