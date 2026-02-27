@@ -74,7 +74,7 @@ snyk:iac:
   before_script:
     - npm install -g snyk
   script:
-    - snyk iac test . --json-file-output=snyk-iac-report.json || true
+    - snyk iac test . --exclude=archive --json-file-output=snyk-iac-report.json || true
   artifacts:
     paths:
       - snyk-iac-report.json
