@@ -98,9 +98,9 @@ Regression test task listed first. Each task independently committable.
 Execute plan tasks in order. Per task: RED (failing regression test) → GREEN (minimal fix) → REFACTOR. Verify and commit before moving on:
 
 ```bash
-uv run pytest --tb=short
-uv run ruff check src/
-uv run pyright
+<test-runner>     # e.g. uv run pytest, npm test, go test ./..., cargo test
+<linter>          # e.g. ruff check src/, eslint src/, golangci-lint run
+<type-checker>    # e.g. pyright, tsc --noEmit, mypy src/
 ```
 
 <verification>
