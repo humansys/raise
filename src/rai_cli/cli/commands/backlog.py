@@ -12,7 +12,7 @@ Architecture: E301 (Agent Tool Abstraction), ADR-033 (PM Adapter)
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import Annotated, Any
 
 import typer
 from rich.console import Console
@@ -81,7 +81,7 @@ def update(
 ) -> None:
     """Update fields on a backlog item."""
     pm = resolve_adapter(adapter)
-    fields: dict[str, object] = {}
+    fields: dict[str, Any] = {}
     if summary is not None:
         fields["summary"] = summary
     if labels is not None:

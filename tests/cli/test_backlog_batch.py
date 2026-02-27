@@ -25,9 +25,9 @@ class TestBatchKeyParsing:
         assert result == expected
 
     def test_empty_string_yields_nothing(self) -> None:
-        result = [k.strip() for k in "".split(",") if k.strip()]
+        result = [k.strip() for k in [""] if k.strip()]
         assert result == []
 
     def test_only_commas_yields_nothing(self) -> None:
-        result = [k.strip() for k in ",,,".split(",") if k.strip()]
+        result = [k.strip() for k in ["", "", "", ""] if k.strip()]
         assert result == []

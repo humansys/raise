@@ -18,7 +18,6 @@ from rai_cli.adapters.models import (
 )
 from rai_cli.adapters.protocols import ProjectManagementAdapter
 
-
 # --- Stub adapter for tests ---
 
 
