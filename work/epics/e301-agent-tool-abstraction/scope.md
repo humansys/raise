@@ -228,3 +228,77 @@ class AdapterHealth(BaseModel):
 - `rai backlog reconcile --dry-run` → Phase 2, Merkle tree comparison
 - raise-pro extraction (RAISE-207) → post-MVP, when commercial packaging decided
 - Custom field mapping → Phase 2, extensible via IssueSpec.metadata
+- Server-side agent consuming adapters via Python SDK/HTTP API → propio agent con inferencia propia, mismos protocolos, diferente interfaz de invocación
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-02-27
+
+### Sequencing Strategy
+
+**Walking skeleton** — prove abstract backlog operations E2E against real Jira first
+(highest daily friction), then extend to docs. Two parallel streams after foundation.
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S301.1 — Protocols + Models | S | None | M1 | Foundation — unblocks both streams. Extend existing protocols in-place, add models. Low risk, high leverage. |
+| 2 | S301.2 — `rai backlog` CLI | M | S301.1 | M1 | CLI surface before adapter — test with mock adapter, validate UX and compact output format. |
+| 3 | S301.3 — JiraAdapter | L | S301.1 | M1 | Highest risk story (L, external API). Tackle early while energy is high. Proves architecture against real Jira. |
+| 4 | S301.4 — `rai docs` CLI | S | S301.1 | M2 | **Parallel with S301.3.** Same pattern as S301.2 but for docs. Independent codebase area. |
+| 5 | S301.5 — ConfluenceTarget | M | S301.4 | M2 | **Parallel with S301.6.** Concrete docs adapter. Same httpx pattern as JiraAdapter (compounding). |
+| 6 | S301.6 — Skill auto-sync hooks | S | S301.3 | M3 | **Parallel with S301.5.** Hooks wire lifecycle skills to JiraAdapter. Config already in jira.yaml. |
+| 7 | S301.7 — E2E dogfood | S | S301.3, S301.5 | M4 | Integration checkpoint (PAT-E-539). Full cycle on raise-commons without MCP calls. Validates seams. |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Backlog Walking Skeleton** | S301.1, S301.2, S301.3 | `rai backlog transition RAISE-XXX done` works against Jira Cloud. `rai backlog search "project=RAISE AND status=Done"` returns compact output. `rai backlog create --type Story --parent RAISE-301 "Test story"` creates in Jira. |
+| **M2: Docs MVP** | S301.4, S301.5 | `rai docs publish governance/roadmap.md` creates/updates Confluence page. `rai docs get <page-id>` returns markdown content. |
+| **M3: Automation** | S301.6 | `/rai-story-start` auto-transitions Jira issue to In Progress. `/rai-story-close` auto-transitions to Done + adds retrospective comment. Graceful no-op when Jira unconfigured. |
+| **M4: Epic Complete** | S301.7 + retro | Agent completes full story lifecycle (start→design→plan→implement→review→close) with zero raw MCP calls. Token reduction ≥10x validated. Epic retrospective done. Merged to dev. |
+
+### Parallel Work Streams
+
+```
+Time →
+
+Stream 1 (Backlog):  S301.1 ─► S301.2 ─► S301.3 ─► S301.6 (auto-sync)
+                                          ║                    │
+                              ═══════════M1═══════            M3
+                                          ║                    │
+Stream 2 (Docs):              S301.4 ─────╫──► S301.5 ────────┤
+                                          ║         │          │
+                                         M1    ════M2═══      │
+                                                               ▼
+Integration:                                              S301.7 (E2E)
+                                                          ════M4════
+```
+
+**Merge points:**
+- After S301.1: split into parallel streams (backlog vs docs)
+- S301.4 can start as soon as S301.1 is done (no need to wait for S301.2/S301.3)
+- Before S301.7: both adapters must work independently before integration test
+- S301.5 and S301.6 are fully parallel (different concerns, different codebase areas)
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|:----:|:------:|:------:|:--------:|-------|
+| S301.1 — Protocols + Models | S | Pending | — | — | |
+| S301.2 — `rai backlog` CLI | M | Pending | — | — | |
+| S301.3 — JiraAdapter | L | Pending | — | — | Highest risk |
+| S301.4 — `rai docs` CLI | S | Pending | — | — | Parallel with S301.3 |
+| S301.5 — ConfluenceTarget | M | Pending | — | — | Parallel with S301.6 |
+| S301.6 — Skill auto-sync hooks | S | Pending | — | — | Parallel with S301.5 |
+| S301.7 — E2E dogfood | S | Pending | — | — | Integration checkpoint |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| JiraAdapter (L) blocks both auto-sync and E2E | M/H | Tackle in position 3 (risk-first). Mock adapter available from S301.2 tests unblocks CLI development. |
+| Jira rate limit changes (Mar 2) mid-epic | M/M | Research complete, field filtering + token bucket designed. Monitor X-RateLimit headers from first real call. |
+| Parallel streams diverge in patterns | L/M | S301.3 establishes httpx + config pattern. S301.5 follows same pattern (compounding effect, PAT-E-442). |
