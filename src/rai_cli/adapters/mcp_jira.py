@@ -12,6 +12,7 @@ Architecture: S301.3 design, AR-S3-2, AR-S3-5
 from __future__ import annotations
 
 import json
+import os
 import time
 from pathlib import Path
 from typing import Any
@@ -46,7 +47,8 @@ class McpJiraAdapter:
         root = project_root or Path.cwd()
         config = self._load_jira_config(root)
 
-        status_mapping = config.get("status_mapping")
+        workflow = config.get("workflow", {})
+        status_mapping = workflow.get("status_mapping")
         if not status_mapping:
             msg = (
                 "Missing 'status_mapping' in .raise/jira.yaml. "
@@ -55,7 +57,28 @@ class McpJiraAdapter:
             raise ValueError(msg)
 
         self._status_mapping: dict[str, int] = status_mapping
-        self._bridge = McpBridge(server_command="mcp-atlassian")
+        self._bridge = self._create_bridge()
+
+    @staticmethod
+    def _create_bridge() -> McpBridge:
+        """Create McpBridge with server args from environment variables.
+
+        Reads JIRA_URL, JIRA_USERNAME, and JIRA_API_TOKEN (or JIRA_TOKEN)
+        from environment and passes them as CLI args to mcp-atlassian.
+        """
+        server_args: list[str] = ["mcp-atlassian"]
+        jira_url = os.environ.get("JIRA_URL")
+        if jira_url:
+            server_args.extend(["--jira-url", jira_url])
+        jira_username = os.environ.get("JIRA_USERNAME")
+        if jira_username:
+            server_args.extend(["--jira-username", jira_username])
+        jira_token = os.environ.get("JIRA_API_TOKEN") or os.environ.get(
+            "JIRA_TOKEN"
+        )
+        if jira_token:
+            server_args.extend(["--jira-token", jira_token])
+        return McpBridge(server_command="uvx", server_args=server_args)
 
     @staticmethod
     def _load_jira_config(root: Path) -> dict[str, Any]:
@@ -111,7 +134,7 @@ class McpJiraAdapter:
 
     async def get_issue(self, key: str) -> IssueDetail:
         result = await self._bridge.call(
-            "jira_get_issue", {"issue_key": key}
+            "jira_get_issue", {"issue_key": key, "fields": "*all"}
         )
         return self._parse_issue_detail(result)
 
@@ -239,21 +262,58 @@ class McpJiraAdapter:
     # ----- Response parsers -----
 
     @staticmethod
+    def _extract_type_name(raw: Any) -> str:
+        """Extract issue type name from raw response field."""
+        if isinstance(raw, dict):
+            name: str = str(raw.get("name", ""))  # type: ignore[union-attr]
+            return name
+        return str(raw) if raw else ""
+
+    @staticmethod
     def _parse_issue_ref(result: McpToolResult) -> IssueRef:
         """Parse McpToolResult into IssueRef."""
-        key = result.data.get("key", "")
-        url = result.data.get("self", "")
+        data = result.data
+        key = data.get("key", "")
+        url = data.get("url", data.get("self", ""))
         return IssueRef(key=key, url=str(url))
 
     @staticmethod
     def _parse_issue_detail(result: McpToolResult) -> IssueDetail:
-        """Parse McpToolResult into IssueDetail."""
+        """Parse McpToolResult into IssueDetail.
+
+        Supports both sooperset mcp-atlassian format (top-level fields,
+        ``issue_type``, ``display_name``) and raw Jira API format
+        (nested ``fields``, ``issuetype``, ``displayName``).
+        """
         data = result.data
         fields = data.get("fields", {})
+        # Sooperset: top-level; raw Jira API: nested under fields
+        is_flat = "summary" in data and "fields" not in data
+
+        if is_flat:
+            assignee = data.get("assignee")
+            priority = data.get("priority")
+            parent = data.get("parent")
+            type_name = McpJiraAdapter._extract_type_name(data.get("issue_type"))
+            return IssueDetail(
+                key=data.get("key", ""),
+                url=data.get("url", ""),
+                summary=data.get("summary", ""),
+                description=data.get("description", ""),
+                status=data.get("status", {}).get("name", ""),
+                issue_type=type_name,
+                parent_key=parent.get("key") if parent else None,
+                labels=data.get("labels", []),
+                assignee=str(assignee.get("display_name", assignee.get("displayName", ""))) if assignee else None,
+                priority=priority.get("name") if priority else None,
+                created=data.get("created", ""),
+                updated=data.get("updated", ""),
+            )
+
+        # Raw Jira API format (nested fields)
         parent = fields.get("parent")
         assignee = fields.get("assignee")
         priority = fields.get("priority")
-
         return IssueDetail(
             key=data.get("key", ""),
             summary=fields.get("summary", ""),
@@ -270,16 +330,25 @@ class McpJiraAdapter:
 
     @staticmethod
     def _parse_comments(result: McpToolResult) -> list[Comment]:
-        """Parse comments from jira_get_issue response."""
-        fields = result.data.get("fields", {})
-        comment_data = fields.get("comment", {})
-        comments_list = comment_data.get("comments", [])
+        """Parse comments from jira_get_issue response.
+
+        Sooperset: ``data.comments`` list.
+        Raw Jira: ``data.fields.comment.comments`` list.
+        """
+        data = result.data
+        # Sooperset format: top-level comments list
+        comments_list = data.get("comments", [])
+        if not comments_list:
+            # Raw Jira API format
+            fields = data.get("fields", {})
+            comment_data = fields.get("comment", {})
+            comments_list = comment_data.get("comments", [])
 
         return [
             Comment(
                 id=str(c.get("id", "")),
                 body=c.get("body", ""),
-                author=c.get("author", {}).get("displayName", ""),
+                author=c.get("author", {}).get("display_name", c.get("author", {}).get("displayName", "")),
                 created=c.get("created", ""),
             )
             for c in comments_list
@@ -287,19 +356,34 @@ class McpJiraAdapter:
 
     @staticmethod
     def _parse_search_results(result: McpToolResult) -> list[IssueSummary]:
-        """Parse search results into IssueSummary list."""
+        """Parse search results into IssueSummary list.
+
+        Sooperset: issues have top-level fields (``summary``, ``status.name``).
+        Raw Jira: issues have nested ``fields`` dict.
+        """
         issues = result.data.get("issues", [])
-        return [
-            IssueSummary(
-                key=issue.get("key", ""),
-                summary=issue.get("fields", {}).get("summary", ""),
-                status=issue.get("fields", {}).get("status", {}).get("name", ""),
-                issue_type=issue.get("fields", {}).get("issuetype", {}).get("name", ""),
-                parent_key=(
-                    issue.get("fields", {}).get("parent", {}).get("key")
-                    if issue.get("fields", {}).get("parent")
-                    else None
-                ),
-            )
-            for issue in issues
-        ]
+        summaries: list[IssueSummary] = []
+        for issue in issues:
+            fields = issue.get("fields", {})
+            is_flat = "summary" in issue and "fields" not in issue
+
+            if is_flat:
+                type_name = McpJiraAdapter._extract_type_name(issue.get("issue_type"))
+                parent = issue.get("parent")
+                summaries.append(IssueSummary(
+                    key=issue.get("key", ""),
+                    summary=issue.get("summary", ""),
+                    status=issue.get("status", {}).get("name", ""),
+                    issue_type=type_name,
+                    parent_key=parent.get("key") if parent else None,
+                ))
+            else:
+                parent = fields.get("parent")
+                summaries.append(IssueSummary(
+                    key=issue.get("key", ""),
+                    summary=fields.get("summary", ""),
+                    status=fields.get("status", {}).get("name", ""),
+                    issue_type=fields.get("issuetype", {}).get("name", ""),
+                    parent_key=parent.get("key") if parent else None,
+                ))
+        return summaries
