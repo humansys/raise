@@ -92,6 +92,9 @@ types = "rai_cli.gates.builtin.types:TypeGate"
 lint = "rai_cli.gates.builtin.lint:LintGate"
 coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
 
+[project.entry-points."rai.adapters.pm"]
+jira = "rai_cli.adapters.mcp_jira:McpJiraAdapter"
+
 [project.entry-points."rai.graph.backends"]
 local = "rai_core.graph.backends.filesystem:FilesystemGraphBackend"
 
