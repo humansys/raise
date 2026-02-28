@@ -61,11 +61,11 @@ workflow:
     story_start: 31
     story_close: 41
 
-status_mapping:
-  backlog: 11
-  selected: 21
-  in-progress: 31
-  done: 41
+  status_mapping:
+    backlog: 11
+    selected: 21
+    in-progress: 31
+    done: 41
 
 team:
   - name: Emilio Osorio
@@ -224,22 +224,21 @@ class TestCreateIssue:
 
 class TestGetIssue:
     def test_get_issue_parses_into_issue_detail(self, tmp_path: Path) -> None:
-        """get_issue parses McpToolResult.data into IssueDetail."""
+        """get_issue parses McpToolResult.data into IssueDetail (sooperset format)."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok({
             "key": "RAISE-301",
-            "fields": {
-                "summary": "Test story",
-                "description": "Some desc",
-                "status": {"name": "In Progress"},
-                "issuetype": {"name": "Story"},
-                "parent": {"key": "RAISE-275"},
-                "labels": ["backend"],
-                "assignee": {"displayName": "Emilio"},
-                "priority": {"name": "High"},
-                "created": "2026-02-28T10:00:00.000+0000",
-                "updated": "2026-02-28T12:00:00.000+0000",
-            },
+            "summary": "Test story",
+            "description": "Some desc",
+            "status": {"name": "In Progress", "category": "In Progress", "color": "blue"},
+            "issue_type": {"name": "Story"},
+            "parent": {"key": "RAISE-275"},
+            "labels": ["backend"],
+            "assignee": {"display_name": "Emilio", "name": "Emilio", "email": None},
+            "priority": {"name": "High"},
+            "created": "2026-02-28T10:00:00.000+0000",
+            "updated": "2026-02-28T12:00:00.000+0000",
+            "url": "https://humansys.atlassian.net/rest/api/2/issue/10301",
         })
 
         async def run() -> IssueDetail:
@@ -283,21 +282,17 @@ class TestSearch:
             "issues": [
                 {
                     "key": "RAISE-1",
-                    "fields": {
-                        "summary": "First",
-                        "status": {"name": "Done"},
-                        "issuetype": {"name": "Story"},
-                        "parent": None,
-                    },
+                    "summary": "First",
+                    "status": {"name": "Done", "category": "Done"},
+                    "issue_type": {"name": "Story"},
+                    "parent": None,
                 },
                 {
                     "key": "RAISE-2",
-                    "fields": {
-                        "summary": "Second",
-                        "status": {"name": "In Progress"},
-                        "issuetype": {"name": "Bug"},
-                        "parent": {"key": "RAISE-144"},
-                    },
+                    "summary": "Second",
+                    "status": {"name": "In Progress", "category": "In Progress"},
+                    "issue_type": {"name": "Bug"},
+                    "parent": {"key": "RAISE-144"},
                 },
             ]
         })
@@ -323,24 +318,20 @@ class TestGetComments:
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok({
             "key": "RAISE-301",
-            "fields": {
-                "comment": {
-                    "comments": [
-                        {
-                            "id": "10001",
-                            "body": "First comment",
-                            "author": {"displayName": "Emilio"},
-                            "created": "2026-02-28T10:00:00.000+0000",
-                        },
-                        {
-                            "id": "10002",
-                            "body": "Second comment",
-                            "author": {"displayName": "Aquiles"},
-                            "created": "2026-02-28T11:00:00.000+0000",
-                        },
-                    ]
-                }
-            },
+            "comments": [
+                {
+                    "id": "10001",
+                    "body": "First comment",
+                    "author": {"display_name": "Emilio", "name": "Emilio"},
+                    "created": "2026-02-28T10:00:00.000+0000",
+                },
+                {
+                    "id": "10002",
+                    "body": "Second comment",
+                    "author": {"display_name": "Aquiles", "name": "Aquiles"},
+                    "created": "2026-02-28T11:00:00.000+0000",
+                },
+            ],
         })
 
         async def run() -> list[Comment]:
