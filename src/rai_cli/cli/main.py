@@ -12,6 +12,7 @@ from rai_cli import __version__
 from rai_cli.cli.commands.adapters import adapters_app
 from rai_cli.cli.commands.backlog import backlog_app
 from rai_cli.cli.commands.base import base_app
+from rai_cli.cli.commands.docs import docs_app
 from rai_cli.cli.commands.discover import discover_app
 from rai_cli.cli.commands.gate import gate_app
 from rai_cli.cli.commands.graph import graph_app
@@ -51,6 +52,7 @@ app = typer.Typer(
 app.add_typer(adapters_app, name="adapters")
 app.add_typer(backlog_app, name="backlog")
 app.add_typer(base_app, name="base")
+app.add_typer(docs_app, name="docs")
 app.add_typer(discover_app, name="discover")
 app.add_typer(gate_app, name="gate")
 app.add_typer(graph_app, name="graph")
