@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import contextlib
 import json
+import logging
+import os
 import time
 from contextlib import AsyncExitStack
 from typing import Any
@@ -21,6 +23,8 @@ from mcp.types import TextContent
 from pydantic import BaseModel, Field
 
 from rai_cli.adapters.models import AdapterHealth
+
+logger = logging.getLogger(__name__)
 
 
 class McpBridgeError(Exception):
@@ -152,8 +156,12 @@ class McpBridge:
         )
         stack = AsyncExitStack()
         try:
+            # Redirect MCP server stderr to devnull to suppress banner/warning noise.
+            # Server errors are captured via MCP protocol (isError), not stderr.
+            errlog = open(os.devnull, "w")  # noqa: SIM115, ASYNC230
+            stack.callback(errlog.close)
             read, write = await stack.enter_async_context(
-                stdio_client(params)
+                stdio_client(params, errlog=errlog)
             )
             session = await stack.enter_async_context(
                 ClientSession(read, write)
