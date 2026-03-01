@@ -34,6 +34,12 @@ AdapterOption = Annotated[
     typer.Option("--adapter", "-a", help="Adapter name override (auto-detect if omitted)"),
 ]
 
+# Output format option (S325.3: ACI)
+FormatOption = Annotated[
+    str,
+    typer.Option("--format", "-f", help="Output format (human or agent)"),
+]
+
 
 @backlog_app.command()
 def create(
@@ -44,6 +50,7 @@ def create(
     parent: Annotated[str | None, typer.Option("--parent", help="Parent issue key")] = None,
     description: Annotated[str | None, typer.Option("--description", "-d", help="Issue description (markdown)")] = None,
     adapter: AdapterOption = None,
+    format: FormatOption = "human",
 ) -> None:
     """Create a new backlog item."""
     pm = resolve_adapter(adapter)
@@ -55,7 +62,10 @@ def create(
         metadata={"parent": parent} if parent else {},
     )
     ref = pm.create_issue(project, spec)
-    console.print(f"Created: {ref.key}")
+    if format == "agent":
+        print(ref.key)
+    else:
+        console.print(f"Created: {ref.key}")
 
 
 @backlog_app.command()
@@ -129,15 +139,21 @@ def search(
     query: Annotated[str, typer.Argument(help="Search query (format depends on adapter, e.g., JQL for Jira)")],
     limit: Annotated[int, typer.Option("--limit", "-n", help="Max results")] = 50,
     adapter: AdapterOption = None,
+    format: FormatOption = "human",
 ) -> None:
     """Search backlog items. Query format is adapter-specific (AR5)."""
     pm = resolve_adapter(adapter)
     results = pm.search(query, limit=limit)
     if not results:
-        console.print("No results.")
+        if format != "agent":
+            console.print("No results.")
         return
-    for issue in results:
-        console.print(f"{issue.key} {issue.status:<12} {issue.summary}")
+    if format == "agent":
+        for issue in results:
+            print(f"{issue.key}|{issue.status}|{issue.summary}")
+    else:
+        for issue in results:
+            console.print(f"{issue.key} {issue.status:<12} {issue.summary}")
 
 
 @backlog_app.command("batch-transition")
