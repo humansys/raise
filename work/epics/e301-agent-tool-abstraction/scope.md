@@ -34,7 +34,7 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 | S301.4 | `rai docs` CLI group | S | Done ✓ | 3 commands (publish, get, search). Generic resolver refactor (DRY). Artifact type → path convention. 23 tests, 2.2x velocity. Design v3 after KISS/YAGNI review. PAT-E-572/573/574. |
 | S301.5 | McpConfluenceAdapter | S | Done ✓ | 5 AsyncDocumentationTarget methods via McpBridge. Publish with metadata tracking + auto-heal. Bridge array parsing. Entry point `rai.docs.targets`. QR: 3 fixes. 20 tests, 2.0x velocity. |
 | S301.6 | Skill auto-sync hooks | S | Done ✓ | WorkStartEvent + WorkCloseEvent, JiraSyncHook (LifecycleHook impl), reads lifecycle_mapping from jira.yaml, entry point jira-sync. Graceful no-op/error. 22 tests, 1.67x velocity. |
-| S301.7 | E2E dogfood | S | Pending | Full story lifecycle on raise-commons without direct MCP calls: create story in Jira, link to epic, transition, add comments, publish doc to Confluence. Validate token reduction. |
+| S301.7 | E2E dogfood | S | Done ✓ | Jira lifecycle 6/6 commands pass. Confluence publish+get pass. Token reduction ~27x CRUD. Bug: CQL ignores mixed-case space key → fixed (rAIse→RaiSE1). QR: 2 fixes. 3 patterns, 0.78x velocity. |
 | S301.8 | Complete backlog CLI | S | Pending | RAISE-313. Add missing CLI commands (get, get-comments) and new adapter methods (versions, sprints, dev-info, projects). Gap analysis: 7 CLI commands vs 48 MCP tools available. |
 | S301.9 | FilesystemPMAdapter | S | Pending | RAISE-316. Open-core default: read/write governance/backlog.md. Fallback when no pro adapter configured. Parser exists (read-only), needs writer. |
 
