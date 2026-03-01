@@ -125,6 +125,72 @@ def comment(
 
 
 @backlog_app.command()
+def get(
+    key: Annotated[str, typer.Argument(help="Issue key (e.g., RAISE-123)")],
+    adapter: AdapterOption = None,
+) -> None:
+    """Retrieve details for a single backlog item."""
+    pm = resolve_adapter(adapter)
+    try:
+        detail = pm.get_issue(key)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    # Header: key, status, type
+    console.print(f"{detail.key}  {detail.status}  {detail.issue_type}")
+    console.print(detail.summary)
+
+    # Optional fields — only show when non-empty
+    if detail.assignee:
+        console.print(f"Assignee: {detail.assignee}")
+    if detail.labels:
+        console.print(f"Labels:   {', '.join(detail.labels)}")
+    if detail.parent_key:
+        console.print(f"Parent:   {detail.parent_key}")
+    if detail.priority:
+        console.print(f"Priority: {detail.priority}")
+    if detail.created:
+        console.print(f"Created:  {detail.created}")
+
+    # Description
+    if detail.description:
+        console.print()
+        desc = detail.description
+        if len(desc) > 500:
+            desc = desc[:500] + "..."
+        console.print(desc)
+
+
+@backlog_app.command("get-comments")
+def get_comments(
+    key: Annotated[str, typer.Argument(help="Issue key (e.g., RAISE-123)")],
+    limit: Annotated[int, typer.Option("--limit", "-n", help="Max comments")] = 10,
+    adapter: AdapterOption = None,
+) -> None:
+    """Retrieve comments for a backlog item."""
+    pm = resolve_adapter(adapter)
+    try:
+        comments = pm.get_comments(key, limit=limit)
+    except Exception as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    if not comments:
+        console.print("No comments.")
+        return
+
+    for c in comments:
+        # Truncate timestamp to date+time (drop timezone for compactness)
+        ts = c.created[:19].replace("T", " ") if c.created else ""
+        console.print(f"[{ts}] {c.author}:")
+        # Indent comment body
+        for line in c.body.splitlines():
+            console.print(f"  {line}")
+        console.print()
+
+
+@backlog_app.command()
 def search(
     query: Annotated[str, typer.Argument(help="Search query (format depends on adapter, e.g., JQL for Jira)")],
     limit: Annotated[int, typer.Option("--limit", "-n", help="Max results")] = 50,
