@@ -94,6 +94,7 @@ lint = "rai_cli.gates.builtin.lint:LintGate"
 coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
 
 [project.entry-points."rai.adapters.pm"]
+filesystem = "rai_cli.adapters.filesystem:FilesystemPMAdapter"
 jira = "rai_cli.adapters.mcp_jira:McpJiraAdapter"
 
 [project.entry-points."rai.docs.targets"]
