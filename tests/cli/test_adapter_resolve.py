@@ -17,8 +17,46 @@ from rai_cli.adapters.models import (
     IssueSummary,
 )
 from rai_cli.adapters.protocols import ProjectManagementAdapter
+from rai_cli.adapters.sync import SyncPMAdapter
 
-# --- Stub adapter for tests ---
+# --- Stub adapters for tests ---
+
+
+class _StubAsyncPM:
+    """Minimal async PM stub — satisfies AsyncProjectManagementAdapter."""
+
+    async def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
+        return IssueRef(key=f"{project_key}-1")
+
+    async def get_issue(self, key: str) -> IssueDetail:
+        return IssueDetail(key=key, summary="Test", status="Open", issue_type="Task")
+
+    async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
+        return IssueRef(key=key)
+
+    async def transition_issue(self, key: str, status: str) -> IssueRef:
+        return IssueRef(key=key)
+
+    async def batch_transition(self, keys: list[str], status: str) -> BatchResult:
+        return BatchResult(succeeded=[IssueRef(key=k) for k in keys])
+
+    async def link_to_parent(self, child_key: str, parent_key: str) -> None:
+        pass
+
+    async def link_issues(self, source: str, target: str, link_type: str) -> None:
+        pass
+
+    async def add_comment(self, key: str, body: str) -> CommentRef:
+        return CommentRef(id="1")
+
+    async def get_comments(self, key: str, limit: int = 10) -> list[Comment]:
+        return []
+
+    async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
+        return []
+
+    async def health(self) -> AdapterHealth:
+        return AdapterHealth(name="async-stub", healthy=True)
 
 
 class _StubPM:
@@ -124,3 +162,31 @@ class TestResolveAdapter:
         with pytest.raises(SystemExit) as exc_info:
             resolve_adapter("nonexistent")
         assert exc_info.value.code == 1
+
+    def test_async_adapter_gets_auto_wrapped(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Async adapter gets auto-wrapped to SyncPMAdapter (AR-1)."""
+        monkeypatch.setattr(
+            "rai_cli.cli.commands._adapter_resolve.get_pm_adapters",
+            lambda: {"async-jira": _StubAsyncPM},
+        )
+        from rai_cli.cli.commands._adapter_resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, SyncPMAdapter)
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+    def test_sync_adapter_not_wrapped(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Sync adapter is NOT wrapped — no regression."""
+        monkeypatch.setattr(
+            "rai_cli.cli.commands._adapter_resolve.get_pm_adapters",
+            lambda: {"sync-stub": _StubPM},
+        )
+        from rai_cli.cli.commands._adapter_resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, _StubPM)
+        assert not isinstance(adapter, SyncPMAdapter)
