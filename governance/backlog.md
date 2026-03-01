@@ -59,6 +59,8 @@
 | [RAISE-208](https://humansys.atlassian.net/browse/RAISE-208) | **[PRO] Jira Adapter** | 📋 Backlog | — | P1 (Pro) |
 | [RAISE-209](https://humansys.atlassian.net/browse/RAISE-209) | **[PRO] Team/Org Memory** | 📋 Backlog | — | P1 (Pro) |
 | [RAISE-210](https://humansys.atlassian.net/browse/RAISE-210) | **[PRO] Jira-first UI** | 📋 Backlog | — | P2 (Pro) |
+| [RAISE-301](https://humansys.atlassian.net/browse/RAISE-301) | **Agent Tool Abstraction** | ✅ Complete | `work/epics/e301-agent-tool-abstraction/scope.md` | — |
+| [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | 🚀 In Progress | `work/epics/e325-agent-orchestrated-workflow/scope.md` | P0 |
 
 ### Release Roadmap (revised SES-294, 2026-02-26)
 
