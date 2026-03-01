@@ -43,7 +43,7 @@ Load context bundle from CLI, interpret signals, and propose focused work for th
 ### Step 1: Load Orientation Bundle
 
 ```bash
-rai session start --project "$(pwd)" --context
+rai session start --project . --context
 ```
 
 Loads developer profile, session state, and orientation bundle. If graph unavailable: run `rai graph build` first.

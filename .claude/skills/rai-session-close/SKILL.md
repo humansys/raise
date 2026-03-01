@@ -36,7 +36,7 @@ Close a session by reflecting on outcomes and feeding structured data to the CLI
 
 **Quick close:** For short sessions, use CLI flags directly instead of a state file:
 ```bash
-rai session close --summary "Quick fix session" --type maintenance --project "$(pwd)"
+rai session close --summary "Quick fix session" --type maintenance --project .
 ```
 
 ## Steps
@@ -108,7 +108,7 @@ Before closing, ensure no uncommitted changes are left behind:
 ### Step 3: Feed CLI
 
 ```bash
-rai session close --state-file .raise/rai/personal/session-output.yaml --session {SES-ID} --project "$(pwd)"
+rai session close --state-file .raise/rai/personal/session-output.yaml --session {SES-ID} --project .
 ```
 
 This atomically: records session in index, appends patterns, updates coaching, writes session state, clears active session.
