@@ -83,7 +83,7 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 - [x] Agent (Rai) completes a full story lifecycle without raw MCP calls (S301.7)
 - [x] Token reduction validated (27x vs 10x target) (S301.7)
 - [x] Epic retrospective done
-- [ ] Merged to `dev`
+- [x] Merged to `dev`
 
 ## Dependencies
 
