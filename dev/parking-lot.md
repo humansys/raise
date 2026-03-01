@@ -6,6 +6,16 @@
 
 ---
 
+## E301 Session SES-300 — 2026-02-28
+
+- [ ] **`rai mcp call` — agent-agnostic MCP access from skills**
+  - **Context:** S301.3 smoke test revealed McpBridge already solves 80% of the problem. A thin CLI wrapper (`rai mcp call <server> <tool> <args>`) would let any skill invoke any MCP server without the agent having MCP configured. Agent-agnostic MCP Porter built into rai.
+  - **Value:** Skills become portable across agents (Claude, Roo, Cursor). MCP config lives in rai, not per-agent settings.
+  - **Scope:** Spike first (validate UX + latency), then Story if viable.
+  - **Depends on:** McpBridge (S301.3, done)
+
+---
+
 ## E292 Session SES-004 — 2026-02-26
 
 - **RAISE-293 worktree limitation:** El worktree e292 comparte el venv del repo principal. Tests que referencian símbolos renombrados en la rama (e.g. `UnifiedGraphBuilder`) fallan en colección porque el módulo cargado es el del repo principal (`GraphBuilder`). No son ventanas rotas — se resolverán en el merge. Solución estructural: instalar el worktree en venv propio (`uv pip install -e raise-commons-e292`). Documentar en RAISE-293 como limitación conocida del experimento.
