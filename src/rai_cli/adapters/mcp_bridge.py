@@ -227,6 +227,8 @@ class McpBridge:
                 parsed: Any = json.loads(text)
                 if isinstance(parsed, dict):
                     data = parsed  # type: ignore[assignment]
+                elif isinstance(parsed, list):
+                    data = {"items": parsed}
             except json.JSONDecodeError:
                 pass
 
