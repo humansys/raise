@@ -70,19 +70,19 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 ## Done Criteria
 
 **Per story:**
-- [ ] Code with type annotations
-- [ ] Tests passing (TDD, red-green-refactor)
-- [ ] Quality checks pass (ruff, pyright)
-- [ ] Retrospective complete
+- [x] Code with type annotations
+- [x] Tests passing (TDD, red-green-refactor)
+- [x] Quality checks pass (ruff, pyright)
+- [x] Retrospective complete
 
 **Epic complete:**
-- [ ] All stories complete (S301.1–S301.7)
-- [ ] `rai backlog transition RAISE-XXX done` works against Jira Cloud
-- [ ] `rai docs publish governance/roadmap.md` publishes to Confluence
-- [ ] Lifecycle skills auto-transition Jira issues (story-start → In Progress, story-close → Done)
-- [ ] Agent (Rai) completes a full story lifecycle without raw MCP calls
-- [ ] Token reduction validated (≥10x vs raw MCP for equivalent operations)
-- [ ] Epic retrospective done
+- [x] All stories complete (S301.1–S301.9)
+- [x] `rai backlog transition RAISE-XXX done` works against Jira Cloud (S301.7)
+- [x] `rai docs publish governance/roadmap.md` publishes to Confluence (S301.7)
+- [x] Lifecycle skills auto-transition Jira issues (S301.6)
+- [x] Agent (Rai) completes a full story lifecycle without raw MCP calls (S301.7)
+- [x] Token reduction validated (27x vs 10x target) (S301.7)
+- [x] Epic retrospective done
 - [ ] Merged to `dev`
 
 ## Dependencies
