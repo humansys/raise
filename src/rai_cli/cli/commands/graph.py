@@ -173,13 +173,21 @@ def query(
         limit=limit,
     )
 
-    console.print(f"\nQuerying memory for: [cyan]{query_str}[/cyan]")
-    console.print(f"Strategy: [yellow]{query_strategy.value}[/yellow]\n")
+    if format != "agent":
+        console.print(f"\nQuerying memory for: [cyan]{query_str}[/cyan]")
+        console.print(f"Strategy: [yellow]{query_strategy.value}[/yellow]\n")
 
     result = engine.query(unified_query)
 
     # Format output
-    if format == "json":
+    if format == "agent":
+        output_text = _format_agent(result)
+        if output:
+            output.write_text(output_text, encoding="utf-8")
+        else:
+            print(output_text, end="" if not output_text else "\n" if not output_text.endswith("\n") else "")
+        return
+    elif format == "json":
         output_text = _format_json(result)
     elif format == "compact":
         output_text = _format_compact(result)
@@ -308,6 +316,20 @@ def _format_compact(result: QueryResult) -> str:
     return "\n".join(lines)
 
 
+def _format_agent(result: QueryResult) -> str:
+    """Format query result as pipe-delimited lines for agent consumption.
+
+    One line per concept: type|id|content (no truncation, no markdown).
+    Empty string when no results.
+    """
+    if not result.concepts:
+        return ""
+    lines: list[str] = []
+    for concept in result.concepts:
+        lines.append(f"{concept.type}|{concept.id}|{concept.content}")
+    return "\n".join(lines)
+
+
 def _format_json(result: QueryResult) -> str:
     """Format query result as JSON."""
     return result.to_json()
@@ -364,10 +386,37 @@ def context_cmd(
         )
         return  # cli_error exits, but this satisfies pyright
 
-    if format == "json":
+    if format == "agent":
+        print(_format_context_agent(ctx))
+    elif format == "json":
         console.print(_format_context_json(ctx))
     else:
         _print_context_human(ctx)
+
+
+def _format_context_agent(ctx: ArchitecturalContext) -> str:
+    """Format architectural context as pipe-delimited lines for agent consumption."""
+    lines: list[str] = []
+    lines.append(f"module|{ctx.module.id}|{ctx.module.content}")
+
+    if ctx.domain:
+        lines.append(f"domain|{ctx.domain.id}|{ctx.domain.content}")
+
+    if ctx.layer:
+        lines.append(f"layer|{ctx.layer.id}|{ctx.layer.content}")
+
+    if ctx.constraints:
+        must = [c for c in ctx.constraints if "MUST" in c.content]
+        should = [c for c in ctx.constraints if "SHOULD" in c.content]
+        if must:
+            lines.append(f"must|{','.join(c.id for c in must)}")
+        if should:
+            lines.append(f"should|{','.join(c.id for c in should)}")
+
+    if ctx.dependencies:
+        lines.append(f"dependencies|{','.join(d.id for d in ctx.dependencies)}")
+
+    return "\n".join(lines)
 
 
 def _format_context_json(ctx: ArchitecturalContext) -> str:
@@ -871,6 +920,17 @@ def list_graph(
     else:
         concepts = list(graph.iter_concepts())
 
+    # Agent format: type|count summary, skip Rich headers
+    if format == "agent":
+        output_text = _format_concepts_agent(concepts)
+        if output:
+            output.write_text(output_text, encoding="utf-8")
+        elif output_text:
+            print(output_text)
+        else:
+            print("empty")
+        return
+
     console.print(f"\nGraph from: [cyan]{unified_path}[/cyan]")
     console.print(f"Concepts: [yellow]{len(concepts)}[/yellow]\n")
 
@@ -896,6 +956,16 @@ def list_graph(
         console.print(f"✓ Graph written to [cyan]{output}[/cyan]\n")
     elif format != "table":
         console.print(output_text)
+
+
+def _format_concepts_agent(concepts: list[GraphNode]) -> str:
+    """Format concepts as type|count summary for agent consumption."""
+    if not concepts:
+        return ""
+    by_type: dict[str, int] = {}
+    for c in concepts:
+        by_type[c.type] = by_type.get(c.type, 0) + 1
+    return "\n".join(f"{t}|{n}" for t, n in sorted(by_type.items(), key=lambda x: -x[1]))
 
 
 def _format_concepts_markdown(concepts: list[GraphNode]) -> str:
