@@ -76,7 +76,7 @@ class McpConfluenceAdapter:
         if not config_path.exists():
             msg = f"Confluence config not found: {config_path}"
             raise FileNotFoundError(msg)
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             data: dict[str, Any] = yaml.safe_load(f)
         return data or {}
 
@@ -86,7 +86,7 @@ class McpConfluenceAdapter:
         """Load cached page ID for a doc type from confluence-pages.yaml."""
         if not self._pages_path.exists():
             return None
-        with open(self._pages_path) as f:
+        with open(self._pages_path, encoding="utf-8") as f:
             pages: dict[str, str] = yaml.safe_load(f) or {}
         return pages.get(doc_type)
 
@@ -94,20 +94,20 @@ class McpConfluenceAdapter:
         """Save page ID for a doc type to confluence-pages.yaml."""
         pages: dict[str, str] = {}
         if self._pages_path.exists():
-            with open(self._pages_path) as f:
+            with open(self._pages_path, encoding="utf-8") as f:
                 pages = yaml.safe_load(f) or {}
         pages[doc_type] = page_id
-        with open(self._pages_path, "w") as f:
+        with open(self._pages_path, "w", encoding="utf-8") as f:
             yaml.dump(pages, f, default_flow_style=False)
 
     def _remove_page_id(self, doc_type: str) -> None:
         """Remove a stale page ID entry from confluence-pages.yaml."""
         if not self._pages_path.exists():
             return
-        with open(self._pages_path) as f:
+        with open(self._pages_path, encoding="utf-8") as f:
             pages: dict[str, str] = yaml.safe_load(f) or {}
         pages.pop(doc_type, None)
-        with open(self._pages_path, "w") as f:
+        with open(self._pages_path, "w", encoding="utf-8") as f:
             yaml.dump(pages, f, default_flow_style=False)
 
     # ----- DocumentationTarget methods -----
@@ -131,9 +131,13 @@ class McpConfluenceAdapter:
                     {"page_id": page_id, "title": title, "content": content},
                 )
                 return self._parse_publish_result(result)
-            except (McpBridgeError, Exception):
-                # Auto-heal: page was deleted — remove stale entry, fall through to create
-                self._remove_page_id(doc_type)
+            except McpBridgeError as exc:
+                # Auto-heal only when page was deleted — not on auth/network errors
+                err = str(exc).lower()
+                if "not found" in err or "404" in err or "does not exist" in err:
+                    self._remove_page_id(doc_type)
+                else:
+                    raise
 
         # Create new page
         result = await self._bridge.call(
@@ -201,6 +205,8 @@ class McpConfluenceAdapter:
 
         Format: {"message": "...", "page": {"id": "...", "url": "...", ...}}
         """
+        if result.is_error:
+            return PublishResult(success=False, message=result.error_message)
         page = result.data.get("page", {})
         url = page.get("url", "")
         return PublishResult(success=True, url=url)

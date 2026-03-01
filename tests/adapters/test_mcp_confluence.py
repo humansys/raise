@@ -215,6 +215,25 @@ class TestPublish:
         args = call_args[0][1]
         assert args["page_id"] == "3087892481"
 
+    def test_publish_reraises_non_notfound_errors(self, tmp_path: Path) -> None:
+        """publish re-raises errors that are not page-not-found (QR-1)."""
+        adapter = _make_adapter(tmp_path)
+        import yaml
+
+        pages_path = tmp_path / ".raise" / "confluence-pages.yaml"
+        pages_path.write_text(yaml.dump({"roadmap": "SOME_ID"}))
+
+        adapter._bridge.call.side_effect = McpBridgeError("401 Unauthorized")
+
+        async def run() -> PublishResult:
+            return await adapter.publish("roadmap", "content", {"title": "Roadmap"})
+
+        with pytest.raises(McpBridgeError, match="401 Unauthorized"):
+            _run(run())
+        # Verify yaml NOT cleared (page_id preserved)
+        pages = yaml.safe_load(pages_path.read_text())
+        assert pages["roadmap"] == "SOME_ID"
+
     def test_publish_auto_heals_on_deleted_page(self, tmp_path: Path) -> None:
         """publish auto-heals when cached page was deleted — removes entry, creates new."""
         adapter = _make_adapter(tmp_path)
@@ -223,7 +242,7 @@ class TestPublish:
         pages_path = tmp_path / ".raise" / "confluence-pages.yaml"
         pages_path.write_text(yaml.dump({"roadmap": "OLD_DELETED_ID"}))
 
-        # First call (update) fails, second call (create) succeeds
+        # First call (update) fails with not-found, second call (create) succeeds
         adapter._bridge.call.side_effect = [
             McpBridgeError("Page not found"),
             _ok({
@@ -248,6 +267,21 @@ class TestPublish:
         # Verify yaml updated with new ID
         pages = yaml.safe_load(pages_path.read_text())
         assert pages["roadmap"] == "NEW_PAGE_ID"
+
+
+    def test_publish_returns_failure_on_is_error(self, tmp_path: Path) -> None:
+        """publish returns success=False when bridge result has is_error (QR-3)."""
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call.return_value = McpToolResult(
+            is_error=True, error_message="Permission denied"
+        )
+
+        async def run() -> PublishResult:
+            return await adapter.publish("roadmap", "content", {"title": "Roadmap"})
+
+        result = _run(run())
+        assert result.success is False
+        assert "Permission denied" in result.message
 
 
 # =============================================================================
