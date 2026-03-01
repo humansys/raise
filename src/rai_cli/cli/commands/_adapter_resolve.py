@@ -12,12 +12,14 @@ responsibility (e.g., JiraAdapter reads env vars in __init__).
 
 from __future__ import annotations
 
+import inspect
 import sys
 
 from rich.console import Console
 
 from rai_cli.adapters.protocols import ProjectManagementAdapter
 from rai_cli.adapters.registry import get_pm_adapters
+from rai_cli.adapters.sync import SyncPMAdapter
 
 console = Console()
 
@@ -69,5 +71,9 @@ def resolve_adapter(adapter_name: str | None) -> ProjectManagementAdapter:
             f"[red]Error:[/red] Failed to instantiate adapter '{adapter_name or next(iter(adapters))}': {exc}"
         )
         sys.exit(1)
+
+    # Auto-wrap async adapters for sync CLI consumption (AR-1)
+    if inspect.iscoroutinefunction(getattr(instance, "get_issue", None)):
+        instance = SyncPMAdapter(instance)
 
     return instance  # type: ignore[return-value]
