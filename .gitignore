@@ -7,6 +7,7 @@ CLAUDE.local.md
 
 # RaiSE generated/cache files
 .raise/cache/
+.raise/confluence-pages.yaml
 
 # RaiSE derived artifacts (rebuild with `rai memory build`)
 .raise/rai/memory/index.json
