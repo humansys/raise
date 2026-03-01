@@ -372,6 +372,36 @@ Config-based discovery is parking lot.
 **Rationale:** YAGNI for MVP — we have exactly one MCP server. Don't build a discovery
 system for a single entry. When second adapter arrives (S301.5), evaluate if pattern repeats.
 
+### D6: PM Adapter justificado por lógica de dominio, no pass-through (SES-300)
+
+**Context:** Smoke test de S301.3 reveló que para operaciones simples (search,
+get_issue), el adapter es pass-through al bridge — no agrega valor. Un futuro
+`rai mcp call <server> <tool> <args>` daría acceso directo desde skills sin
+programar adapters.
+
+**Decision:** El PM Adapter se justifica cuando orquesta lógica de dominio que
+no es 1:1 con un tool MCP. Para operaciones simples, considerar `rai mcp call`
+como alternativa agent-agnostic.
+
+**Cuándo el adapter aporta valor:**
+- `create_release()` → crea version + bulk transition + changelog + fix versions
+- `plan_sprint()` → busca backlog, prioriza, asigna
+- `close_epic()` → valida stories done, merge, release notes
+- `batch_transition()` → loop con captura de errores individuales
+- `transition_issue()` → resolución status name → transition ID via config
+
+**Cuándo NO aporta (candidatos a `rai mcp call` directo):**
+- `search()` → pass-through a jira_search
+- `get_issue()` → pass-through a jira_get_issue
+- `add_comment()` → pass-through a jira_add_comment
+
+**Implicación:** El adapter evolucionará hacia operaciones de negocio complejas
+(releases, sprint planning) que justifiquen la capa. Las operaciones simples
+podrían eventualmente ser `rai mcp call` directo desde skills.
+
+**Parking lot:** `rai mcp call` como CLI wrapper del McpBridge — spike para
+evaluar UX y latencia. Ver `dev/parking-lot.md`.
+
 ## Data Flow
 
 ### Happy Path: `rai backlog transition RAISE-301 done`
