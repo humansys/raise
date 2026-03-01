@@ -241,6 +241,12 @@ class McpJiraAdapter:
         )
         return self._parse_search_results(result)
 
+    # ----- Lifecycle -----
+
+    async def aclose(self) -> None:
+        """Close the underlying MCP bridge (RAISE-324)."""
+        await self._bridge.aclose()
+
     # ----- Health -----
 
     async def health(self) -> AdapterHealth:

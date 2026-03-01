@@ -184,13 +184,21 @@ class McpBridge:
         self._cm_stack = stack
         return session
 
-    async def _cleanup(self) -> None:
-        """Close session and exit stack."""
+    async def aclose(self) -> None:
+        """Close session and exit stack.
+
+        Must be called within the same event loop that created the session.
+        Prevents asyncgen finalizer tracebacks from stdio_client (RAISE-324).
+        """
         if self._cm_stack:
             with contextlib.suppress(Exception):
                 await self._cm_stack.aclose()
         self._session = None
         self._cm_stack = None
+
+    async def _cleanup(self) -> None:
+        """Alias for aclose() — used internally by _ensure_session."""
+        await self.aclose()
 
     @staticmethod
     def _parse_result(result: Any) -> McpToolResult:
