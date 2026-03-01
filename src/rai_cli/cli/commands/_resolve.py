@@ -1,0 +1,120 @@
+"""Generic entry-point resolver for adapters and targets.
+
+Parametrized auto-detect logic:
+- 1 registered → auto-select
+- 0 registered → error with install guidance
+- 2+ registered → error listing names, request flag
+- flag → select by name (override)
+
+Auto-wraps async implementations with the provided sync wrapper.
+
+Replaces ``_adapter_resolve.py`` (S301.4, D7 — DRY).
+"""
+
+from __future__ import annotations
+
+import inspect
+import sys
+from collections.abc import Callable
+from typing import Any
+
+from rich.console import Console
+
+from rai_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
+from rai_cli.adapters.registry import get_doc_targets, get_pm_adapters
+from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
+
+console = Console()
+
+
+def resolve_entrypoint(
+    discover: Callable[[], dict[str, type]],
+    sync_wrapper: type | None,
+    async_check_method: str,
+    group_label: str,
+    flag_name: str,
+    selected: str | None,
+) -> Any:
+    """Resolve and instantiate an adapter/target from entry points.
+
+    Args:
+        discover: Function returning {name: class} from entry points.
+        sync_wrapper: Wrapper class for async→sync bridging (or None).
+        async_check_method: Method name to check for async (e.g., "get_issue").
+        group_label: Human label for error messages (e.g., "PM adapter").
+        flag_name: CLI flag name for error messages (e.g., "--adapter").
+        selected: Explicit selection by name, or None for auto-detect.
+
+    Returns:
+        An instantiated adapter/target, wrapped if async.
+
+    Raises:
+        SystemExit: If resolution fails.
+    """
+    entries = discover()
+
+    if selected is not None:
+        cls = entries.get(selected)
+        if cls is None:
+            available = ", ".join(sorted(entries)) if entries else "none"
+            console.print(
+                f"[red]Error:[/red] {group_label} '{selected}' not found. "
+                f"Available: {available}"
+            )
+            sys.exit(1)
+    elif len(entries) == 0:
+        console.print(
+            f"[red]Error:[/red] No {group_label} installed.\n"
+            f"Install one or register via entry points. Use {flag_name} to select."
+        )
+        sys.exit(1)
+    elif len(entries) == 1:
+        cls = next(iter(entries.values()))
+    else:
+        names = ", ".join(sorted(entries))
+        console.print(
+            f"[red]Error:[/red] Multiple {group_label}s found: {names}.\n"
+            f"Use {flag_name} <name> to select."
+        )
+        sys.exit(1)
+
+    try:
+        instance = cls()
+    except Exception as exc:
+        name = selected or next(iter(entries))
+        console.print(
+            f"[red]Error:[/red] Failed to instantiate {group_label} '{name}': {exc}"
+        )
+        sys.exit(1)
+
+    # Auto-wrap async implementations for sync CLI consumption
+    if sync_wrapper and inspect.iscoroutinefunction(
+        getattr(instance, async_check_method, None)
+    ):
+        instance = sync_wrapper(instance)
+
+    return instance
+
+
+def resolve_adapter(adapter_name: str | None) -> ProjectManagementAdapter:
+    """Resolve a ProjectManagementAdapter from entry points."""
+    return resolve_entrypoint(
+        discover=get_pm_adapters,
+        sync_wrapper=SyncPMAdapter,
+        async_check_method="get_issue",
+        group_label="PM adapter",
+        flag_name="--adapter",
+        selected=adapter_name,
+    )
+
+
+def resolve_docs_target(target_name: str | None) -> DocumentationTarget:
+    """Resolve a DocumentationTarget from entry points."""
+    return resolve_entrypoint(
+        discover=get_doc_targets,
+        sync_wrapper=SyncDocsAdapter,
+        async_check_method="get_page",
+        group_label="docs target",
+        flag_name="--target",
+        selected=target_name,
+    )

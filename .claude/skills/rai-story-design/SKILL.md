@@ -15,7 +15,7 @@ metadata:
   raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.1.0"
+  raise.version: "2.2.0"
   raise.visibility: public
 ---
 
@@ -87,10 +87,12 @@ Document WHAT you're building and WHY this approach (not detailed HOW):
 
 **For data mutations:** What happens when inputs reference missing entities? Declare the strategy explicitly: reject with error, skip + report count, partial success with warnings. Silent drops are semantic bugs (PAT-E-523).
 
+**Value preservation gate (PAT-E-572):** Before finalizing components, ask: "What domain knowledge does this layer provide that a generic pass-through wouldn't?" If the answer is "none", the design may be over-abstracted. If the answer involves config/resolution/mapping that an existing pattern handles differently, check where that responsibility lives in the proven pattern. KISS means simplest that serves the purpose — removing domain intelligence to reduce LOC removes the value proposition.
+
 For complex stories, add: scenarios (Gherkin), algorithm pseudocode, constraints, testing strategy.
 
 <verification>
-Approach is concrete enough to envision examples.
+Approach is concrete enough to envision examples. Value preservation gate passed.
 </verification>
 
 ### Step 4: Create Examples (MOST IMPORTANT)
@@ -141,6 +143,7 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 - [ ] Acceptance criteria specific and testable (3-5 MUST items)
 - [ ] Risk/UX/Integration gates evaluated before designing (PAT-E-539)
 - [ ] Data mutation stories declare missing-entity strategy (PAT-E-523)
+- [ ] Value preservation gate: domain intelligence preserved, not simplified away (PAT-E-572)
 - [ ] Spec creation <30 minutes, review <5 minutes
 - [ ] NEVER over-specify HOW — trust AI for implementation details
 - [ ] NEVER skip examples — they are the most important section
@@ -150,3 +153,4 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 - Next: `/rai-story-plan`
 - Risk assessment: PAT-186 (design not optional)
 - UX research gate: PAT-E-263
+- Value preservation gate: PAT-E-572

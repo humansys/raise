@@ -42,6 +42,14 @@ workflow:
       category: Done
       description: Completed and verified
 
+  # Status name → transition ID mapping for McpJiraAdapter
+  # Used by McpJiraAdapter._resolve_transition_id() for programmatic transitions.
+  status_mapping:
+    backlog: 11
+    selected: 21
+    in-progress: 31
+    done: 41
+
   # Mapping from RaiSE lifecycle to Jira transitions
   lifecycle_mapping:
     story_start: 31        # → In Progress
