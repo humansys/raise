@@ -19,7 +19,7 @@ metadata:
   raise.visibility: public
   raise.inputs: |
     - design_md: file_path, optional, previous_skill
-    - story_md: file_path, required, previous_skill
+    - story_md: file_path, required, story-start
   raise.outputs: |
     - plan_md: file_path, next_skill
 ---
