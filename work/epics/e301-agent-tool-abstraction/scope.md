@@ -30,7 +30,7 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 |----|-------|:----:|:------:|-------------|
 | S301.1 | Protocols + Models | M | Done ✓ | Extended PM (11 methods) + Docs (5 methods), async primary + sync wrapper, 9 models, `_run_sync()` helper. 103 tests, 1.5x velocity. |
 | S301.2 | `rai backlog` CLI group | M | Done ✓ | 7 commands (create, transition, update, link, comment, search, batch-transition). Auto-detect adapter, open-core Pattern B. 16 tests, 1.25x velocity. |
-| S301.3 | McpBridge + McpJiraAdapter | M | Pending | Generic McpBridge using MCP Python SDK `ClientSession` (async, stdio transport) with RaiSE telemetry (timing, success/fail, call tracing). McpJiraAdapter maps 11 PM protocol methods to `mcp-atlassian` Jira tools via bridge. Registered as entry point `rai.adapters.pm`. |
+| S301.3 | McpBridge + McpJiraAdapter | M | Done ✓ | Generic McpBridge (async, stdio, telemetry). McpJiraAdapter maps 11 PM methods to mcp-atlassian. Auto-wrap async→sync. Entry point registered. Dual-format parsers (sooperset + raw Jira). D6: adapter for domain logic, `rai mcp call` for pass-through. 44 tests, 0.8x velocity. |
 | S301.4 | `rai docs` CLI group | S | Pending | Commands: publish, get, search. Compact output. Delegates to DocumentationTarget registry. |
 | S301.5 | McpConfluenceAdapter | S | Pending | Maps 5 DocumentationTarget methods to `mcp-atlassian` Confluence tools via McpBridge. Same bridge, thin mapping layer. Registered as entry point `rai.docs.targets`. |
 | S301.6 | Skill auto-sync hooks | S | Pending | Lifecycle skills (epic-start, story-start, story-close, epic-close) emit Jira transitions + comments via E248 hook system. Config from `.raise/jira.yaml` lifecycle_mapping. Graceful degradation if unconfigured. |
@@ -87,7 +87,7 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 
 ```
 S301.1 ✓ (protocols + models)
-  ├──→ S301.2 ✓ (rai backlog CLI) ──→ S301.3 (McpBridge + McpJiraAdapter) ──→ S301.6 (auto-sync)
+  ├──→ S301.2 ✓ (rai backlog CLI) ──→ S301.3 ✓ (McpBridge + McpJiraAdapter) ──→ S301.6 (auto-sync)
   │                                      │                                    ╲
   └──→ S301.4 (rai docs CLI) ───────────╳──→ S301.5 (McpConfluenceAdapter) ──→ S301.7 (E2E)
                                          │                                     ╱
@@ -262,7 +262,7 @@ built in S301.3 and reused in S301.5 (compounding, PAT-E-442).
 |:-----:|-------|:----:|--------------|-----------|-----------|
 | 1 | S301.1 — Protocols + Models | M | None | M1 | Foundation — unblocks both streams. Done ✓ |
 | 2 | S301.2 — `rai backlog` CLI | M | S301.1 | M1 | CLI surface before adapter. Done ✓ |
-| 3 | S301.3 — McpBridge + McpJiraAdapter | M | S301.2 | M1 | Bridge infra + first concrete adapter. Proves architecture against real Jira. |
+| 3 | S301.3 — McpBridge + McpJiraAdapter | M | S301.2 | M1 | Bridge infra + first concrete adapter. Proves architecture against real Jira. Done ✓ |
 | 4 | S301.4 — `rai docs` CLI | S | S301.1 | M2 | **Parallel with S301.3.** Same pattern as S301.2 but for docs. |
 | 5 | S301.5 — McpConfluenceAdapter | S | S301.3, S301.4 | M2 | Reuses McpBridge (compounding). Thin mapping layer only. |
 | 6 | S301.6 — Skill auto-sync hooks | S | S301.3 | M3 | **Parallel with S301.5.** Hooks wire lifecycle skills to adapter. |
@@ -272,7 +272,7 @@ built in S301.3 and reused in S301.5 (compounding, PAT-E-442).
 
 | Milestone | Stories | Success Criteria |
 |-----------|---------|------------------|
-| **M1: Backlog Walking Skeleton** | S301.1 ✓, S301.2 ✓, S301.3 | `rai backlog transition RAISE-XXX done` works against Jira Cloud via McpBridge. Telemetry captures call timing. |
+| **M1: Backlog Walking Skeleton** | S301.1 ✓, S301.2 ✓, S301.3 ✓ | `rai backlog transition RAISE-XXX done` works against Jira Cloud via McpBridge. Telemetry captures call timing. **COMPLETE.** |
 | **M2: Docs MVP** | S301.4, S301.5 | `rai docs publish governance/roadmap.md` creates/updates Confluence page. `rai docs get <page-id>` returns markdown. |
 | **M3: Automation** | S301.6 | `/rai-story-start` auto-transitions to In Progress. `/rai-story-close` auto-transitions to Done. Graceful no-op when unconfigured. |
 | **M4: Epic Complete** | S301.7 + retro | Full story lifecycle with zero raw MCP calls. Token reduction ≥10x validated. Merged to dev. |
@@ -282,7 +282,7 @@ built in S301.3 and reused in S301.5 (compounding, PAT-E-442).
 ```
 Time →
 
-Stream 1 (Backlog):  S301.1 ✓ ─► S301.2 ✓ ─► S301.3 (bridge+jira) ─► S301.6 (auto-sync)
+Stream 1 (Backlog):  S301.1 ✓ ─► S301.2 ✓ ─► S301.3 ✓ (bridge+jira) ─► S301.6 (auto-sync)
                                                 ║                          │
                                     ═══════════M1══════                   M3
                                                 ║                          │
@@ -300,7 +300,7 @@ Integration:                                                          S301.7 (E2
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S301.1 — Protocols + Models | M | Done ✓ | 60min | 1.5x | 4 protocols, 9 models, 2 wrappers, 103 tests. |
 | S301.2 — `rai backlog` CLI | M | Done ✓ | ~60min | 1.25x | 7 commands, clean rewrite, 16 tests. |
-| S301.3 — McpBridge + McpJiraAdapter | M | Pending | — | — | Bridge infra + Jira mapping |
+| S301.3 — McpBridge + McpJiraAdapter | M | Done ✓ | 150min | 0.8x | Bridge + adapter + auto-wrap + smoke test. 44 tests. PAT-E-565/566/567. |
 | S301.4 — `rai docs` CLI | S | Pending | — | — | Parallel with S301.3 |
 | S301.5 — McpConfluenceAdapter | S | Pending | — | — | Reuses bridge from S301.3 |
 | S301.6 — Skill auto-sync hooks | S | Pending | — | — | Parallel with S301.5 |
