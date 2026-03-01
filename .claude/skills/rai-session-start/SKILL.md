@@ -48,6 +48,8 @@ rai session start --project "$(pwd)" --context
 
 Loads developer profile, session state, and orientation bundle. If graph unavailable: run `rai graph build` first.
 
+**IMPORTANT:** This is the ONLY CLI command in this skill. The context bundle output is complete — do NOT invent additional flags (e.g. `--section`), sub-commands (e.g. `rai context load`), or follow-up CLI calls to "fetch more". If the bundle mentions available context sections, that information is for display only. All interpretation happens in Step 2 using inference, not additional tool calls.
+
 ### Step 2: Interpret & Present
 
 1. **Check signals** (priority order):
