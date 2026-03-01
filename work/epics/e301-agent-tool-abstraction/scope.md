@@ -31,7 +31,7 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 | S301.1 | Protocols + Models | M | Done ✓ | Extended PM (11 methods) + Docs (5 methods), async primary + sync wrapper, 9 models, `_run_sync()` helper. 103 tests, 1.5x velocity. |
 | S301.2 | `rai backlog` CLI group | M | Done ✓ | 7 commands (create, transition, update, link, comment, search, batch-transition). Auto-detect adapter, open-core Pattern B. 16 tests, 1.25x velocity. |
 | S301.3 | McpBridge + McpJiraAdapter | M | Done ✓ | Generic McpBridge (async, stdio, telemetry). McpJiraAdapter maps 11 PM methods to mcp-atlassian. Auto-wrap async→sync. Entry point registered. Dual-format parsers (sooperset + raw Jira). D6: adapter for domain logic, `rai mcp call` for pass-through. 44 tests, 0.8x velocity. |
-| S301.4 | `rai docs` CLI group | S | Pending | Commands: publish, get, search. Compact output. Delegates to DocumentationTarget registry. |
+| S301.4 | `rai docs` CLI group | S | Done ✓ | 3 commands (publish, get, search). Generic resolver refactor (DRY). Artifact type → path convention. 23 tests, 2.2x velocity. Design v3 after KISS/YAGNI review. PAT-E-572/573/574. |
 | S301.5 | McpConfluenceAdapter | S | Pending | Maps 5 DocumentationTarget methods to `mcp-atlassian` Confluence tools via McpBridge. Same bridge, thin mapping layer. Registered as entry point `rai.docs.targets`. |
 | S301.6 | Skill auto-sync hooks | S | Pending | Lifecycle skills (epic-start, story-start, story-close, epic-close) emit Jira transitions + comments via E248 hook system. Config from `.raise/jira.yaml` lifecycle_mapping. Graceful degradation if unconfigured. |
 | S301.7 | E2E dogfood | S | Pending | Full story lifecycle on raise-commons without direct MCP calls: create story in Jira, link to epic, transition, add comments, publish doc to Confluence. Validate token reduction. |
@@ -303,7 +303,7 @@ Integration:                                                          S301.7 (E2
 | S301.1 — Protocols + Models | M | Done ✓ | 60min | 1.5x | 4 protocols, 9 models, 2 wrappers, 103 tests. |
 | S301.2 — `rai backlog` CLI | M | Done ✓ | ~60min | 1.25x | 7 commands, clean rewrite, 16 tests. |
 | S301.3 — McpBridge + McpJiraAdapter | M | Done ✓ | 150min | 0.8x | Bridge + adapter + auto-wrap + smoke test. 44 tests. PAT-E-565/566/567. |
-| S301.4 — `rai docs` CLI | S | Pending | — | — | Parallel with S301.3 |
+| S301.4 — `rai docs` CLI | S | Done ✓ | 25min | 2.2x | 3 commands, generic resolver, 23 tests. Design 3 iterations (PAT-E-572). |
 | S301.5 — McpConfluenceAdapter | S | Pending | — | — | Reuses bridge from S301.3 |
 | S301.6 — Skill auto-sync hooks | S | Pending | — | — | Parallel with S301.5 |
 | S301.7 — E2E dogfood | S | Pending | — | — | Integration checkpoint |
