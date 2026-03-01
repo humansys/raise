@@ -18,7 +18,7 @@ import typer
 from rich.console import Console
 
 from rai_cli.adapters.models import IssueSpec
-from rai_cli.cli.commands._adapter_resolve import resolve_adapter
+from rai_cli.cli.commands._resolve import resolve_adapter
 
 backlog_app = typer.Typer(
     name="backlog",
