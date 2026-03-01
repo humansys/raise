@@ -153,7 +153,11 @@ class McpJiraAdapter:
             "jira_transition_issue",
             {"issue_key": key, "transition_id": tid},
         )
-        return self._parse_issue_ref(result)
+        ref = self._parse_issue_ref(result)
+        # MCP transition tool returns no data — use the key we already have
+        if not ref.key:
+            ref = IssueRef(key=key, url=ref.url)
+        return ref
 
     # ----- Batch -----
 
@@ -170,7 +174,10 @@ class McpJiraAdapter:
                     "jira_transition_issue",
                     {"issue_key": key, "transition_id": tid},
                 )
-                succeeded.append(self._parse_issue_ref(result))
+                ref = self._parse_issue_ref(result)
+                if not ref.key:
+                    ref = IssueRef(key=key, url=ref.url)
+                succeeded.append(ref)
             except (McpBridgeError, Exception) as exc:
                 failed.append(FailureDetail(key=key, error=str(exc)))
 
@@ -271,8 +278,15 @@ class McpJiraAdapter:
 
     @staticmethod
     def _parse_issue_ref(result: McpToolResult) -> IssueRef:
-        """Parse McpToolResult into IssueRef."""
+        """Parse McpToolResult into IssueRef.
+
+        Handles both flat format (key at top level) and wrapped format
+        (key nested under ``issue`` — used by create_issue, update_issue).
+        """
         data = result.data
+        # Wrapped format: {"message": "...", "issue": {"key": "..."}}
+        if "issue" in data and isinstance(data["issue"], dict):
+            data = data["issue"]
         key = data.get("key", "")
         url = data.get("url", data.get("self", ""))
         return IssueRef(key=key, url=str(url))
