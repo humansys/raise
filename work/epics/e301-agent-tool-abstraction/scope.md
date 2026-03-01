@@ -36,8 +36,9 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 | S301.6 | Skill auto-sync hooks | S | Pending | Lifecycle skills (epic-start, story-start, story-close, epic-close) emit Jira transitions + comments via E248 hook system. Config from `.raise/jira.yaml` lifecycle_mapping. Graceful degradation if unconfigured. |
 | S301.7 | E2E dogfood | S | Pending | Full story lifecycle on raise-commons without direct MCP calls: create story in Jira, link to epic, transition, add comments, publish doc to Confluence. Validate token reduction. |
 | S301.8 | Complete backlog CLI | S | Pending | RAISE-313. Add missing CLI commands (get, get-comments) and new adapter methods (versions, sprints, dev-info, projects). Gap analysis: 7 CLI commands vs 48 MCP tools available. |
+| S301.9 | FilesystemPMAdapter | S | Pending | RAISE-316. Open-core default: read/write governance/backlog.md. Fallback when no pro adapter configured. Parser exists (read-only), needs writer. |
 
-**Total:** 8 stories (2M + 6S)
+**Total:** 9 stories (2M + 7S)
 
 ## Scope
 
