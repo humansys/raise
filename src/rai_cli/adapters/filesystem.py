@@ -129,23 +129,177 @@ class FilesystemPMAdapter:
             message=f"governance/backlog.md ({len(epics)} epics)",
         )
 
+    # -- Write helpers ------------------------------------------------------
+
+    _STATUS_TO_DISPLAY: dict[str, str] = {
+        "complete": "✅ Complete",
+        "in_progress": "🚀 In Progress",
+        "pending": "📋 Backlog",
+        "backlog": "📋 Backlog",
+        "draft": "📋 DRAFT",
+        "deferred": "→ Deferred",
+        "planning": "📋 Planning",
+    }
+
+    def _next_epic_id(self) -> str:
+        """Find max E{N} in table and return E{N+1}."""
+        epics = self._parse_epics()
+        max_n = 0
+        for e in epics:
+            m = re.match(r"E(\d+)", e.key)
+            if m:
+                max_n = max(max_n, int(m.group(1)))
+        return f"E{max_n + 1}"
+
+    def _find_table_end(self, lines: list[str]) -> int:
+        """Find the line index after the last table row in Epics Overview."""
+        in_table = False
+        last_row = -1
+        for i, line in enumerate(lines):
+            if re.match(r"^\|\s*-+", line):
+                in_table = True
+                continue
+            if in_table and line.startswith("|"):
+                last_row = i
+            elif in_table and not line.startswith("|"):
+                break
+        return last_row + 1 if last_row >= 0 else -1
+
+    def _format_row(
+        self,
+        epic_id: str,
+        name: str,
+        status_display: str,
+        scope_doc: str | None,
+        priority: str | None,
+    ) -> str:
+        scope = f"`{scope_doc}`" if scope_doc else "—"
+        prio = priority or "—"
+        return f"| {epic_id} | **{name}** | {status_display} | {scope} | {prio} |"
+
+    def _find_epic_row(self, lines: list[str], key: str) -> int:
+        """Find the line index of a specific epic row. Returns -1 if not found."""
+        pattern = re.compile(rf"^\|\s*{re.escape(key)}\s*\|")
+        for i, line in enumerate(lines):
+            if pattern.match(line):
+                return i
+        return -1
+
+    def _parse_row(self, line: str) -> dict[str, str]:
+        """Parse a table row into named fields."""
+        cols = [c.strip() for c in line.split("|")]
+        # Split produces: ['', 'ID', 'Name', 'Status', 'Scope', 'Priority', '']
+        # Strip empty edges
+        cols = [c for c in cols if c or cols.index(c) not in (0, len(cols) - 1)]
+        # Robust: just take inner columns
+        inner = [c.strip() for c in line.strip("|").split("|")]
+        if len(inner) < 5:
+            return {}
+        name = inner[1].strip()
+        # Remove bold markers
+        name = re.sub(r"^\*\*(.+)\*\*$", r"\1", name)
+        return {
+            "id": inner[0].strip(),
+            "name": name,
+            "status_display": inner[2].strip(),
+            "scope_doc": inner[3].strip(),
+            "priority": inner[4].strip(),
+        }
+
+    def _write_lines(self, lines: list[str]) -> None:
+        self._backlog_path.write_text("\n".join(lines), encoding="utf-8")
+
     # -- Write operations ---------------------------------------------------
 
     def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
         """Append a new epic row to the backlog table."""
-        raise NotImplementedError  # T2
+        text = self._backlog_path.read_text(encoding="utf-8")
+        lines = text.split("\n")
+
+        epic_id = self._next_epic_id()
+        status_display = self._STATUS_TO_DISPLAY.get("pending", "📋 Backlog")
+        meta = issue.metadata or {}
+        row = self._format_row(
+            epic_id,
+            issue.summary,
+            status_display,
+            meta.get("scope_doc"),
+            meta.get("priority"),
+        )
+
+        insert_at = self._find_table_end(lines)
+        if insert_at < 0:
+            raise ValueError("Cannot find epic table in backlog.md")
+
+        lines.insert(insert_at, row)
+        self._write_lines(lines)
+        return IssueRef(key=epic_id)
 
     def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
         """Update fields in an existing epic row."""
-        raise NotImplementedError  # T2
+        text = self._backlog_path.read_text(encoding="utf-8")
+        lines = text.split("\n")
+
+        row_idx = self._find_epic_row(lines, key)
+        if row_idx < 0:
+            raise KeyError(key)
+
+        parsed = self._parse_row(lines[row_idx])
+        name = fields.get("summary", parsed.get("name", ""))
+        status_display = parsed.get("status_display", "📋 Backlog")
+        scope_raw = parsed.get("scope_doc", "—")
+        # Extract scope_doc value from backticks
+        scope_match = re.match(r"`(.+)`", scope_raw)
+        scope_doc = scope_match.group(1) if scope_match else None
+        priority_raw = parsed.get("priority", "—")
+        priority = priority_raw if priority_raw != "—" else None
+
+        if "priority" in fields:
+            priority = fields["priority"]
+        if "scope_doc" in fields:
+            scope_doc = fields["scope_doc"]
+
+        lines[row_idx] = self._format_row(key, name, status_display, scope_doc, priority)
+        self._write_lines(lines)
+        return IssueRef(key=key)
 
     def transition_issue(self, key: str, status: str) -> IssueRef:
         """Update status column in epic row."""
-        raise NotImplementedError  # T2
+        text = self._backlog_path.read_text(encoding="utf-8")
+        lines = text.split("\n")
+
+        row_idx = self._find_epic_row(lines, key)
+        if row_idx < 0:
+            raise KeyError(key)
+
+        parsed = self._parse_row(lines[row_idx])
+        status_display = self._STATUS_TO_DISPLAY.get(
+            status.lower(), f"📋 {status.title()}"
+        )
+        name = parsed.get("name", "")
+        scope_raw = parsed.get("scope_doc", "—")
+        scope_match = re.match(r"`(.+)`", scope_raw)
+        scope_doc = scope_match.group(1) if scope_match else None
+        priority_raw = parsed.get("priority", "—")
+        priority = priority_raw if priority_raw != "—" else None
+
+        lines[row_idx] = self._format_row(key, name, status_display, scope_doc, priority)
+        self._write_lines(lines)
+        return IssueRef(key=key)
 
     def batch_transition(self, keys: list[str], status: str) -> BatchResult:
         """Transition multiple epics."""
-        raise NotImplementedError  # T2
+        from rai_cli.adapters.models import FailureDetail
+
+        succeeded: list[IssueRef] = []
+        failed: list[FailureDetail] = []
+        for key in keys:
+            try:
+                ref = self.transition_issue(key, status)
+                succeeded.append(ref)
+            except KeyError:
+                failed.append(FailureDetail(key=key, error=f"Epic {key} not found"))
+        return BatchResult(succeeded=succeeded, failed=failed)
 
     # -- No-ops (no md structure for these) ---------------------------------
 

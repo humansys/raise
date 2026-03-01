@@ -7,7 +7,15 @@ from pathlib import Path
 import pytest
 
 from rai_cli.adapters.filesystem import FilesystemPMAdapter
-from rai_cli.adapters.models import AdapterHealth, IssueDetail, IssueSummary
+from rai_cli.adapters.models import (
+    AdapterHealth,
+    BatchResult,
+    CommentRef,
+    IssueDetail,
+    IssueRef,
+    IssueSpec,
+    IssueSummary,
+)
 from rai_cli.adapters.protocols import ProjectManagementAdapter
 
 SAMPLE_BACKLOG = """\
@@ -111,3 +119,102 @@ class TestGetComments:
     def test_always_empty(self, adapter: FilesystemPMAdapter) -> None:
         comments = adapter.get_comments("E1")
         assert comments == []
+
+
+class TestCreateIssue:
+    def test_append_row_with_auto_id(self, adapter: FilesystemPMAdapter) -> None:
+        ref = adapter.create_issue(
+            "TEST",
+            IssueSpec(
+                summary="New Feature",
+                issue_type="Epic",
+                metadata={"priority": "P1", "scope_doc": "new-scope.md"},
+            ),
+        )
+        assert isinstance(ref, IssueRef)
+        assert ref.key == "E5"  # next after E4
+
+        # Verify it's searchable
+        results = adapter.search("New Feature")
+        assert len(results) == 1
+        assert results[0].key == "E5"
+
+    def test_preserves_table_format(self, backlog_dir: Path) -> None:
+        a = FilesystemPMAdapter(project_root=backlog_dir)
+        a.create_issue("TEST", IssueSpec(summary="Another", issue_type="Epic"))
+
+        content = (backlog_dir / "governance" / "backlog.md").read_text(encoding="utf-8")
+        # New row should have bold name and proper columns
+        assert "| E5 | **Another** |" in content
+
+    def test_default_status_is_backlog(self, adapter: FilesystemPMAdapter) -> None:
+        adapter.create_issue("TEST", IssueSpec(summary="New Epic"))
+        detail = adapter.get_issue("E5")
+        # normalize_status("📋 Backlog") → "draft" (📋 emoji match)
+        assert detail.status == "draft"
+
+
+class TestTransitionIssue:
+    def test_transition_to_complete(self, adapter: FilesystemPMAdapter) -> None:
+        ref = adapter.transition_issue("E3", "complete")
+        assert isinstance(ref, IssueRef)
+        assert ref.key == "E3"
+
+        detail = adapter.get_issue("E3")
+        assert detail.status == "complete"
+
+    def test_transition_to_in_progress(self, adapter: FilesystemPMAdapter) -> None:
+        adapter.transition_issue("E3", "in_progress")
+        detail = adapter.get_issue("E3")
+        assert detail.status == "in_progress"
+
+    def test_transition_missing_epic(self, adapter: FilesystemPMAdapter) -> None:
+        with pytest.raises(KeyError, match="E99"):
+            adapter.transition_issue("E99", "complete")
+
+    def test_emoji_preserved_in_file(self, backlog_dir: Path) -> None:
+        a = FilesystemPMAdapter(project_root=backlog_dir)
+        a.transition_issue("E3", "complete")
+        content = (backlog_dir / "governance" / "backlog.md").read_text(encoding="utf-8")
+        assert "✅ Complete" in content
+
+
+class TestUpdateIssue:
+    def test_update_summary(self, adapter: FilesystemPMAdapter) -> None:
+        ref = adapter.update_issue("E3", {"summary": "New Frontend"})
+        assert isinstance(ref, IssueRef)
+        assert ref.key == "E3"
+
+        detail = adapter.get_issue("E3")
+        assert detail.summary == "New Frontend"
+
+    def test_update_missing_epic(self, adapter: FilesystemPMAdapter) -> None:
+        with pytest.raises(KeyError, match="E99"):
+            adapter.update_issue("E99", {"summary": "x"})
+
+
+class TestBatchTransition:
+    def test_batch_success(self, adapter: FilesystemPMAdapter) -> None:
+        result = adapter.batch_transition(["E3", "E4"], "complete")
+        assert isinstance(result, BatchResult)
+        assert len(result.succeeded) == 2
+        assert len(result.failed) == 0
+
+    def test_batch_partial_failure(self, adapter: FilesystemPMAdapter) -> None:
+        result = adapter.batch_transition(["E3", "E99"], "complete")
+        assert len(result.succeeded) == 1
+        assert len(result.failed) == 1
+        assert result.failed[0].key == "E99"
+
+
+class TestNoOps:
+    def test_add_comment_returns_empty_ref(self, adapter: FilesystemPMAdapter) -> None:
+        ref = adapter.add_comment("E1", "hello")
+        assert isinstance(ref, CommentRef)
+        assert ref.id == ""
+
+    def test_link_to_parent_is_noop(self, adapter: FilesystemPMAdapter) -> None:
+        adapter.link_to_parent("E1", "E2")  # should not raise
+
+    def test_link_issues_is_noop(self, adapter: FilesystemPMAdapter) -> None:
+        adapter.link_issues("E1", "E2", "blocks")  # should not raise
