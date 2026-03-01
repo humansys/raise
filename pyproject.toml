@@ -95,6 +95,9 @@ coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
 [project.entry-points."rai.adapters.pm"]
 jira = "rai_cli.adapters.mcp_jira:McpJiraAdapter"
 
+[project.entry-points."rai.docs.targets"]
+confluence = "rai_cli.adapters.mcp_confluence:McpConfluenceAdapter"
+
 [project.entry-points."rai.graph.backends"]
 local = "rai_core.graph.backends.filesystem:FilesystemGraphBackend"
 
