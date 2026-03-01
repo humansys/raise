@@ -317,3 +317,80 @@ class TestConfigReaders:
         ):
             name = _resolve_status_name(999)
         assert name == "999"
+
+
+# ---------------------------------------------------------------------------
+# Integration: EventEmitter + JiraSyncHook
+# ---------------------------------------------------------------------------
+
+
+class TestEmitterIntegration:
+    """Test JiraSyncHook dispatched through EventEmitter."""
+
+    def test_emitter_dispatches_to_jira_sync_hook(self) -> None:
+        """Full path: emitter → hook → adapter.transition_issue()."""
+        from rai_cli.hooks.emitter import EventEmitter
+        from rai_cli.hooks.registry import HookRegistry
+
+        registry = HookRegistry()
+        registry.register(JiraSyncHook())
+        emitter = EventEmitter(registry=registry)
+
+        event = WorkStartEvent(
+            work_type="story", work_id="S301.6", issue_key="RAISE-301"
+        )
+        mock_adapter = MagicMock()
+        with (
+            patch(
+                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                return_value={"story_start": 31},
+            ),
+            patch(
+                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                return_value="in-progress",
+            ),
+            patch(
+                "rai_cli.cli.commands._resolve.resolve_adapter",
+                return_value=mock_adapter,
+            ),
+        ):
+            result = emitter.emit(event)
+
+        assert not result.aborted
+        assert result.handler_errors == ()
+        mock_adapter.transition_issue.assert_called_once_with(
+            "RAISE-301", "in-progress"
+        )
+
+    def test_emitter_error_isolation(self) -> None:
+        """Adapter failure is caught by hook, emitter sees no handler_errors."""
+        from rai_cli.hooks.emitter import EventEmitter
+        from rai_cli.hooks.registry import HookRegistry
+
+        registry = HookRegistry()
+        registry.register(JiraSyncHook())
+        emitter = EventEmitter(registry=registry)
+
+        event = WorkStartEvent(
+            work_type="story", work_id="S301.6", issue_key="RAISE-301"
+        )
+        with (
+            patch(
+                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                return_value={"story_start": 31},
+            ),
+            patch(
+                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                return_value="in-progress",
+            ),
+            patch(
+                "rai_cli.cli.commands._resolve.resolve_adapter",
+                side_effect=RuntimeError("No adapter"),
+            ),
+        ):
+            result = emitter.emit(event)
+
+        # Hook catches internally → returns HookResult(error), doesn't raise
+        # Emitter sees no handler_errors because the hook didn't raise
+        assert not result.aborted
+        assert result.handler_errors == ()
