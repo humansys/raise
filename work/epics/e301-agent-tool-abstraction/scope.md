@@ -36,7 +36,7 @@ thin mapping layer (~50-100 LOC) over existing MCP servers.
 | S301.6 | Skill auto-sync hooks | S | Done ✓ | WorkStartEvent + WorkCloseEvent, JiraSyncHook (LifecycleHook impl), reads lifecycle_mapping from jira.yaml, entry point jira-sync. Graceful no-op/error. 22 tests, 1.67x velocity. |
 | S301.7 | E2E dogfood | S | Done ✓ | Jira lifecycle 6/6 commands pass. Confluence publish+get pass. Token reduction ~27x CRUD. Bug: CQL ignores mixed-case space key → fixed (rAIse→RaiSE1). QR: 2 fixes. 3 patterns, 0.78x velocity. |
 | S301.8 | Complete backlog CLI | S | Done ✓ | Added `get` (compact multi-line, ~80 tokens) and `get-comments` (author/timestamp, --limit). 10 tests, clean QR, 1.25x velocity. Backlog CLI: 7→9 commands. |
-| S301.9 | FilesystemPMAdapter | S | Pending | RAISE-316. Open-core default: read/write governance/backlog.md. Fallback when no pro adapter configured. Parser exists (read-only), needs writer. |
+| S301.9 | FilesystemPMAdapter | S | Done ✓ | Sync adapter over governance/backlog.md. Read (search, get, health) + write (create, transition, update, batch). Entry point `filesystem`. Reuses BacklogParser. QR: 2 fixes. 26 tests, 1.5x velocity. |
 
 **Total:** 9 stories (2M + 7S)
 
