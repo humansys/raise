@@ -17,6 +17,11 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - tests_passing: boolean, required, cli
+  raise.outputs: |
+    - retrospective_md: file_path, next_skill
+    - patterns: list, cli
 ---
 
 # Story Review

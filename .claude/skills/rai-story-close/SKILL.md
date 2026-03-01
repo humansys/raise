@@ -17,6 +17,11 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - retrospective_md: file_path, required, previous_skill
+    - tests_passing: boolean, required, cli
+  raise.outputs: |
+    - merge_commit: string, git
 ---
 
 # Story Close

@@ -16,6 +16,11 @@ metadata:
   raise.adaptable: "true"
   raise.version: "4.0.0"
   raise.visibility: public
+  raise.inputs: |
+    - session_id: string, required, previous_skill
+  raise.outputs: |
+    - session_record: file_path, file
+    - patterns: list, cli
 ---
 
 # Session Close

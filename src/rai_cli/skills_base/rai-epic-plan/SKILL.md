@@ -17,6 +17,10 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - scope: file_path, required, previous_skill
+  raise.outputs: |
+    - scope: file_path, next_skill
 ---
 
 # Epic Plan
