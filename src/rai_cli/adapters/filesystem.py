@@ -178,8 +178,14 @@ class FilesystemPMAdapter:
         return f"| {epic_id} | **{name}** | {status_display} | {scope} | {prio} |"
 
     def _find_epic_row(self, lines: list[str], key: str) -> int:
-        """Find the line index of a specific epic row. Returns -1 if not found."""
-        pattern = re.compile(rf"^\|\s*{re.escape(key)}\s*\|")
+        """Find the line index of a specific epic row. Returns -1 if not found.
+
+        Matches both simple (E1) and Jira link ([RAISE-301](url)) formats.
+        """
+        esc = re.escape(key)
+        pattern = re.compile(
+            rf"^\|\s*(?:{esc}|\[{esc}\]\([^)]+\))\s*\|"
+        )
         for i, line in enumerate(lines):
             if pattern.match(line):
                 return i
@@ -251,6 +257,7 @@ class FilesystemPMAdapter:
             raise KeyError(key)
 
         parsed = self._parse_row(lines[row_idx])
+        raw_id = parsed.get("id", key)
         name = fields.get("summary", parsed.get("name", ""))
         status_display = parsed.get("status_display", "📋 Backlog")
         scope_doc, priority = self._extract_scope_priority(parsed)
@@ -260,7 +267,7 @@ class FilesystemPMAdapter:
         if "scope_doc" in fields:
             scope_doc = fields["scope_doc"]
 
-        lines[row_idx] = self._format_row(key, name, status_display, scope_doc, priority)
+        lines[row_idx] = self._format_row(raw_id, name, status_display, scope_doc, priority)
         self._write_lines(lines)
         return IssueRef(key=key)
 
@@ -274,13 +281,14 @@ class FilesystemPMAdapter:
             raise KeyError(key)
 
         parsed = self._parse_row(lines[row_idx])
+        raw_id = parsed.get("id", key)
         status_display = self._STATUS_TO_DISPLAY.get(
             status.lower(), f"📋 {status.title()}"
         )
         name = parsed.get("name", "")
         scope_doc, priority = self._extract_scope_priority(parsed)
 
-        lines[row_idx] = self._format_row(key, name, status_display, scope_doc, priority)
+        lines[row_idx] = self._format_row(raw_id, name, status_display, scope_doc, priority)
         self._write_lines(lines)
         return IssueRef(key=key)
 

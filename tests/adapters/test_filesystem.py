@@ -207,6 +207,58 @@ class TestBatchTransition:
         assert result.failed[0].key == "E99"
 
 
+MIXED_BACKLOG = """\
+# Backlog: test-project
+
+> **Status**: Active
+
+---
+
+## 1. Epics Overview
+
+| ID | Epic | Status | Scope Doc | Priority |
+|----|------|--------|-----------|----------|
+| E1 | **Core Foundation** | ✅ Complete | `scope.md` | — |
+| [RAISE-301](https://example.com/RAISE-301) | **Agent Tool Abstraction** | 🚀 In Progress | `e301/scope.md` | P0 |
+| [RAISE-325](https://example.com/RAISE-325) | **Orchestrated Workflow** | 📋 Backlog | — | P1 |
+"""
+
+
+class TestJiraLinkFormat:
+    @pytest.fixture()
+    def mixed_dir(self, tmp_path: Path) -> Path:
+        gov = tmp_path / "governance"
+        gov.mkdir()
+        (gov / "backlog.md").write_text(MIXED_BACKLOG, encoding="utf-8")
+        return tmp_path
+
+    @pytest.fixture()
+    def mixed_adapter(self, mixed_dir: Path) -> FilesystemPMAdapter:
+        return FilesystemPMAdapter(project_root=mixed_dir)
+
+    def test_search_includes_jira_link_epics(self, mixed_adapter: FilesystemPMAdapter) -> None:
+        results = mixed_adapter.search("", limit=50)
+        keys = {r.key for r in results}
+        assert "E1" in keys
+        assert "RAISE-301" in keys
+        assert "RAISE-325" in keys
+        assert len(results) == 3
+
+    def test_get_jira_link_epic(self, mixed_adapter: FilesystemPMAdapter) -> None:
+        detail = mixed_adapter.get_issue("RAISE-301")
+        assert detail.summary == "Agent Tool Abstraction"
+        assert detail.status == "in_progress"
+
+    def test_transition_jira_link_epic(self, mixed_adapter: FilesystemPMAdapter) -> None:
+        mixed_adapter.transition_issue("RAISE-301", "complete")
+        detail = mixed_adapter.get_issue("RAISE-301")
+        assert detail.status == "complete"
+
+    def test_health_counts_all_formats(self, mixed_adapter: FilesystemPMAdapter) -> None:
+        h = mixed_adapter.health()
+        assert "3 epics" in h.message
+
+
 class TestNoOps:
     def test_add_comment_returns_empty_ref(self, adapter: FilesystemPMAdapter) -> None:
         ref = adapter.add_comment("E1", "hello")
