@@ -15,7 +15,7 @@ metadata:
   raise.next: story-review
   raise.gate: gate-code
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
 ---
 

@@ -12,10 +12,10 @@ metadata:
   raise.frequency: per-epic
   raise.fase: "4"
   raise.prerequisites: epic-design
-  raise.next: story-design
+  raise.next: story-start
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
 ---
 

@@ -15,7 +15,7 @@ metadata:
   raise.next: story-review
   raise.gate: gate-code
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
 ---
 
@@ -46,7 +46,7 @@ Execute the implementation plan task by task with TDD, producing verified code t
 Load the implementation plan and query relevant patterns:
 
 ```bash
-rai graph query "testing quality behavior patterns" --types pattern,guardrail --limit 5
+rai graph query "testing coverage type annotations" --types pattern,guardrail --limit 5
 ```
 
 If a design document exists, restate the design intent in 2-3 sentences and confirm with the human before proceeding. One unvalidated assumption can waste an entire task cycle.
@@ -60,14 +60,6 @@ For the next uncompleted task in plan order:
 3. **REFACTOR** — Clean up while keeping tests green
 
 Follow project rules, guardrails, and established patterns.
-
-**Test quality heuristic:** Each test must assert observable behavior, not implementation details.
-
-**Anti-patterns to avoid (muda):**
-- Constant assertions: `assert "x" == "x"` — always passes, catches nothing
-- Mock-implementation tests: only verify an internal call was made, not the outcome
-- Magic-number counts: `assert len(items) == 21` — brittle, not behavioral
-- Happy-path-only: missing boundary cases (empty input, one item, many items, error)
 
 ### Step 3: Verify Task
 
@@ -104,7 +96,7 @@ If verification fails: fix and re-verify (max 3 attempts before escalating).
 ## Quality Checklist
 
 - [ ] Plan loaded and design intent confirmed (if design exists)
-- [ ] TDD cycle followed for each task (RED → GREEN → REFACTOR) — each test asserts observable behavior
+- [ ] TDD cycle followed for each task (RED → GREEN → REFACTOR)
 - [ ] Each task committed individually (not batched at story end)
 - [ ] All verifications pass (tests, lint, types)
 - [ ] Progress log updated with actuals
