@@ -65,7 +65,7 @@ def _make_list_tools_result(tools: list[Any]) -> Any:
 
 
 @asynccontextmanager
-async def _mock_stdio_client(params: Any):
+async def _mock_stdio_client(params: Any, **kwargs: Any):
     """Mock stdio_client context manager yielding (read, write) streams."""
     yield (MagicMock(), MagicMock())
 
@@ -255,7 +255,7 @@ class TestMcpBridgeSessionErrors:
         """FileNotFoundError from subprocess → McpBridgeError with install guidance."""
 
         @asynccontextmanager
-        async def failing_stdio(params: Any):
+        async def failing_stdio(params: Any, **kwargs: Any):
             raise FileNotFoundError("mcp-nonexistent")
             yield  # pragma: no cover  # noqa: E115
 
@@ -326,7 +326,7 @@ class TestMcpBridgeHealth:
         """health() returns unhealthy AdapterHealth when connection fails."""
 
         @asynccontextmanager
-        async def failing_stdio(params: Any):
+        async def failing_stdio(params: Any, **kwargs: Any):
             raise FileNotFoundError("mcp-test")
             yield  # pragma: no cover  # noqa: E115
 
