@@ -187,11 +187,6 @@ class FilesystemPMAdapter:
 
     def _parse_row(self, line: str) -> dict[str, str]:
         """Parse a table row into named fields."""
-        cols = [c.strip() for c in line.split("|")]
-        # Split produces: ['', 'ID', 'Name', 'Status', 'Scope', 'Priority', '']
-        # Strip empty edges
-        cols = [c for c in cols if c or cols.index(c) not in (0, len(cols) - 1)]
-        # Robust: just take inner columns
         inner = [c.strip() for c in line.strip("|").split("|")]
         if len(inner) < 5:
             return {}
@@ -205,6 +200,17 @@ class FilesystemPMAdapter:
             "scope_doc": inner[3].strip(),
             "priority": inner[4].strip(),
         }
+
+    def _extract_scope_priority(
+        self, parsed: dict[str, str]
+    ) -> tuple[str | None, str | None]:
+        """Extract scope_doc and priority values from parsed row."""
+        scope_raw = parsed.get("scope_doc", "—")
+        scope_match = re.match(r"`(.+)`", scope_raw)
+        scope_doc = scope_match.group(1) if scope_match else None
+        priority_raw = parsed.get("priority", "—")
+        priority = priority_raw if priority_raw != "—" else None
+        return scope_doc, priority
 
     def _write_lines(self, lines: list[str]) -> None:
         self._backlog_path.write_text("\n".join(lines), encoding="utf-8")
@@ -247,12 +253,7 @@ class FilesystemPMAdapter:
         parsed = self._parse_row(lines[row_idx])
         name = fields.get("summary", parsed.get("name", ""))
         status_display = parsed.get("status_display", "📋 Backlog")
-        scope_raw = parsed.get("scope_doc", "—")
-        # Extract scope_doc value from backticks
-        scope_match = re.match(r"`(.+)`", scope_raw)
-        scope_doc = scope_match.group(1) if scope_match else None
-        priority_raw = parsed.get("priority", "—")
-        priority = priority_raw if priority_raw != "—" else None
+        scope_doc, priority = self._extract_scope_priority(parsed)
 
         if "priority" in fields:
             priority = fields["priority"]
@@ -277,11 +278,7 @@ class FilesystemPMAdapter:
             status.lower(), f"📋 {status.title()}"
         )
         name = parsed.get("name", "")
-        scope_raw = parsed.get("scope_doc", "—")
-        scope_match = re.match(r"`(.+)`", scope_raw)
-        scope_doc = scope_match.group(1) if scope_match else None
-        priority_raw = parsed.get("priority", "—")
-        priority = priority_raw if priority_raw != "—" else None
+        scope_doc, priority = self._extract_scope_priority(parsed)
 
         lines[row_idx] = self._format_row(key, name, status_display, scope_doc, priority)
         self._write_lines(lines)
