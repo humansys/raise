@@ -171,6 +171,35 @@ class ReleasePublishEvent(HookEvent):
 
 
 # ---------------------------------------------------------------------------
+# Work lifecycle events (S301.6: auto-sync hooks)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class WorkStartEvent(HookEvent):
+    """Emitted when a work item (story/epic) starts."""
+
+    event_name: Literal["work:start"] = field(  # type: ignore[assignment]
+        default="work:start", init=False
+    )
+    work_type: str = ""
+    work_id: str = ""
+    issue_key: str = ""
+
+
+@dataclass(frozen=True)
+class WorkCloseEvent(HookEvent):
+    """Emitted when a work item (story/epic) closes."""
+
+    event_name: Literal["work:close"] = field(  # type: ignore[assignment]
+        default="work:close", init=False
+    )
+    work_type: str = ""
+    work_id: str = ""
+    issue_key: str = ""
+
+
+# ---------------------------------------------------------------------------
 # Before-variant events (AD-6: only release:publish and session:close)
 # ---------------------------------------------------------------------------
 
