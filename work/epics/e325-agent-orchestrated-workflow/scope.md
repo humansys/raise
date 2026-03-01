@@ -144,6 +144,7 @@ Stream 2 (Parallel):                                   S325.5 ──────
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|:----:|:------:|:------:|:--------:|-------|
 | S325.1 | S | Done | S | 2.0x | I/O contracts on 12 skills, QR 2 fixes, PAT-E-585+586 |
+| S325.S1 | S | Done | S | 1.0x | Spike: journal for compaction resilience, 4 bug layers, pivot hooks→instructions |
 | S325.3 | S | Pending | — | — | |
 | S325.2 | S | Pending | — | — | |
 | S325.4 | M | Pending | — | — | |
