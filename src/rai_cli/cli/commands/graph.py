@@ -184,8 +184,8 @@ def query(
         output_text = _format_agent(result)
         if output:
             output.write_text(output_text, encoding="utf-8")
-        else:
-            print(output_text, end="" if not output_text else "\n" if not output_text.endswith("\n") else "")
+        elif output_text:
+            print(output_text)
         return
     elif format == "json":
         output_text = _format_json(result)
@@ -316,17 +316,22 @@ def _format_compact(result: QueryResult) -> str:
     return "\n".join(lines)
 
 
+def _sanitize_pipe(value: str) -> str:
+    """Replace pipe characters in value to preserve agent format field boundaries."""
+    return value.replace("|", "¦")
+
+
 def _format_agent(result: QueryResult) -> str:
     """Format query result as pipe-delimited lines for agent consumption.
 
     One line per concept: type|id|content (no truncation, no markdown).
-    Empty string when no results.
+    Empty string when no results. Pipes in content replaced with ¦.
     """
     if not result.concepts:
         return ""
     lines: list[str] = []
     for concept in result.concepts:
-        lines.append(f"{concept.type}|{concept.id}|{concept.content}")
+        lines.append(f"{concept.type}|{concept.id}|{_sanitize_pipe(concept.content)}")
     return "\n".join(lines)
 
 
@@ -397,17 +402,18 @@ def context_cmd(
 def _format_context_agent(ctx: ArchitecturalContext) -> str:
     """Format architectural context as pipe-delimited lines for agent consumption."""
     lines: list[str] = []
-    lines.append(f"module|{ctx.module.id}|{ctx.module.content}")
+    lines.append(f"module|{ctx.module.id}|{_sanitize_pipe(ctx.module.content)}")
 
     if ctx.domain:
-        lines.append(f"domain|{ctx.domain.id}|{ctx.domain.content}")
+        lines.append(f"domain|{ctx.domain.id}|{_sanitize_pipe(ctx.domain.content)}")
 
     if ctx.layer:
-        lines.append(f"layer|{ctx.layer.id}|{ctx.layer.content}")
+        lines.append(f"layer|{ctx.layer.id}|{_sanitize_pipe(ctx.layer.content)}")
 
     if ctx.constraints:
-        must = [c for c in ctx.constraints if "MUST" in c.content]
-        should = [c for c in ctx.constraints if "SHOULD" in c.content]
+        # Classify by ID convention (more robust than content string matching)
+        must = [c for c in ctx.constraints if "-must-" in c.id]
+        should = [c for c in ctx.constraints if "-should-" in c.id]
         if must:
             lines.append(f"must|{','.join(c.id for c in must)}")
         if should:

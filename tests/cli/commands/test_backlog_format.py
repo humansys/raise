@@ -95,3 +95,47 @@ class TestBacklogCreateFormat:
             )
         assert result.exit_code == 0
         assert "Created: RAISE-99" in result.output
+
+
+class TestBacklogFormatValidation:
+    """Tests for format option validation (QR-3)."""
+
+    def test_search_invalid_format_rejected(self) -> None:
+        """Invalid format value exits with error."""
+        adapter = _mock_adapter()
+        adapter.search.return_value = []
+        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
+            result = runner.invoke(app, ["backlog", "search", "project=RAISE", "--format", "banana"])
+        assert result.exit_code == 1
+        assert "Invalid format" in result.output
+
+    def test_create_invalid_format_rejected(self) -> None:
+        """Invalid format value exits with error."""
+        adapter = _mock_adapter()
+        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
+            result = runner.invoke(
+                app, ["backlog", "create", "Test", "-p", "RAISE", "--format", "json"]
+            )
+        assert result.exit_code == 1
+        assert "Invalid format" in result.output
+
+
+class TestBacklogPipeSanitization:
+    """Tests for pipe character sanitization in agent format (QR-1)."""
+
+    def test_search_pipe_in_summary_sanitized(self) -> None:
+        """Pipe in summary is replaced to preserve field boundaries."""
+        adapter = _mock_adapter()
+        adapter.search.return_value = [
+            IssueSummary(key="RAISE-1", summary="Fix auth | retry logic", status="Done", issue_type="Task"),
+        ]
+        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
+            result = runner.invoke(app, ["backlog", "search", "project=RAISE", "--format", "agent"])
+        assert result.exit_code == 0
+        line = result.output.strip()
+        # Exactly 3 fields when split on pipe
+        parts = line.split("|")
+        assert len(parts) == 3
+        assert parts[0] == "RAISE-1"
+        assert parts[1] == "Done"
+        assert "auth" in parts[2]

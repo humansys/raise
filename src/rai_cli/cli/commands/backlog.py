@@ -28,6 +28,8 @@ backlog_app = typer.Typer(
 
 console = Console()
 
+_VALID_FORMATS = ("human", "agent")
+
 # Common option for adapter override (D3)
 AdapterOption = Annotated[
     str | None,
@@ -39,6 +41,19 @@ FormatOption = Annotated[
     str,
     typer.Option("--format", "-f", help="Output format (human or agent)"),
 ]
+
+
+def _sanitize_pipe(value: str) -> str:
+    """Replace pipe characters in value to preserve agent format field boundaries."""
+    return value.replace("|", "¦")
+
+
+def _validate_format(format: str) -> None:
+    """Validate format option, exit with error if invalid."""
+    if format not in _VALID_FORMATS:
+        console.print(f"[red]Error:[/red] Invalid format: {format}")
+        console.print(f"Valid formats: {', '.join(_VALID_FORMATS)}")
+        raise typer.Exit(1)
 
 
 @backlog_app.command()
@@ -53,6 +68,7 @@ def create(
     format: FormatOption = "human",
 ) -> None:
     """Create a new backlog item."""
+    _validate_format(format)
     pm = resolve_adapter(adapter)
     spec = IssueSpec(
         summary=summary,
@@ -142,6 +158,7 @@ def search(
     format: FormatOption = "human",
 ) -> None:
     """Search backlog items. Query format is adapter-specific (AR5)."""
+    _validate_format(format)
     pm = resolve_adapter(adapter)
     results = pm.search(query, limit=limit)
     if not results:
@@ -150,7 +167,7 @@ def search(
         return
     if format == "agent":
         for issue in results:
-            print(f"{issue.key}|{issue.status}|{issue.summary}")
+            print(f"{issue.key}|{_sanitize_pipe(issue.status)}|{_sanitize_pipe(issue.summary)}")
     else:
         for issue in results:
             console.print(f"{issue.key} {issue.status:<12} {issue.summary}")
