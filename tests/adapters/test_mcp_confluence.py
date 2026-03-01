@@ -21,6 +21,9 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
+from rai_cli.adapters.protocols import AsyncDocumentationTarget, DocumentationTarget
+from rai_cli.adapters.registry import get_doc_targets
+from rai_cli.adapters.sync import SyncDocsAdapter
 
 # --- Helpers ---
 
@@ -373,3 +376,35 @@ class TestHealth:
         assert result.name == "confluence"
         assert result.healthy is False
         assert "Connection failed" in result.message
+
+
+# =============================================================================
+# Integration: entry point discovery + protocol compliance
+# =============================================================================
+
+
+class TestEntryPointDiscovery:
+    def test_entry_point_discoverable(self) -> None:
+        """get_doc_targets() discovers 'confluence' entry point."""
+        targets = get_doc_targets()
+        assert "confluence" in targets
+
+    def test_entry_point_loads_correct_class(self) -> None:
+        """Entry point loads McpConfluenceAdapter class."""
+        from rai_cli.adapters.mcp_confluence import McpConfluenceAdapter
+
+        targets = get_doc_targets()
+        assert targets["confluence"] is McpConfluenceAdapter
+
+
+class TestProtocolCompliance:
+    def test_async_protocol(self, tmp_path: Path) -> None:
+        """McpConfluenceAdapter satisfies AsyncDocumentationTarget."""
+        adapter = _make_adapter(tmp_path)
+        assert isinstance(adapter, AsyncDocumentationTarget)
+
+    def test_sync_wrapper_satisfies_protocol(self, tmp_path: Path) -> None:
+        """SyncDocsAdapter(McpConfluenceAdapter) satisfies DocumentationTarget."""
+        adapter = _make_adapter(tmp_path)
+        sync = SyncDocsAdapter(adapter)
+        assert isinstance(sync, DocumentationTarget)
