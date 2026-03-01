@@ -23,6 +23,8 @@ from rai_cli.hooks.events import (
     ReleasePublishEvent,
     SessionCloseEvent,
     SessionStartEvent,
+    WorkCloseEvent,
+    WorkStartEvent,
 )
 
 
@@ -115,11 +117,21 @@ _ALL_EVENTS = [
         "before:release:publish",
         {"version": "2.1.0", "project_path": Path("/tmp")},
     ),
+    (
+        WorkStartEvent,
+        "work:start",
+        {"work_type": "story", "work_id": "S301.6", "issue_key": "RAISE-301"},
+    ),
+    (
+        WorkCloseEvent,
+        "work:close",
+        {"work_type": "story", "work_id": "S301.6", "issue_key": "RAISE-301"},
+    ),
 ]
 
 
 class TestAllEvents:
-    """Parametrized tests covering all 11 event classes."""
+    """Parametrized tests covering all 13 event classes."""
 
     @pytest.mark.parametrize(
         ("cls", "expected_name", "kwargs"),
