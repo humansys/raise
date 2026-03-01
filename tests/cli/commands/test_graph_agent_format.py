@@ -259,3 +259,96 @@ class TestGraphListAgentFormat:
         assert result.exit_code == 0
         # Default is table format
         assert "Graph Concepts" in result.output or "mod-memory" in result.output
+
+
+class TestGraphAgentPipeSanitization:
+    """Tests for pipe character sanitization in agent format (QR-1)."""
+
+    def test_query_pipe_in_content_sanitized(self, tmp_path: Path) -> None:
+        """Pipe in concept content is replaced to preserve field boundaries."""
+        memory_dir = tmp_path / ".raise" / "rai" / "memory"
+        memory_dir.mkdir(parents=True)
+        graph_data: dict[str, Any] = {
+            "nodes": [
+                {
+                    "id": "PAT-PIPE",
+                    "type": "pattern",
+                    "content": "Use X | Y pattern for fallback",
+                    "source_file": "test.md",
+                    "created": "2026-01-31",
+                    "metadata": {},
+                },
+            ],
+            "edges": [],
+            "metadata": {"version": "1.0"},
+        }
+        index_path = memory_dir / "index.json"
+        index_path.write_text(json.dumps(graph_data, indent=2))
+
+        result = runner.invoke(
+            app, ["graph", "query", "fallback", "--index", str(index_path), "--format", "agent"]
+        )
+        assert result.exit_code == 0
+        lines = [l for l in result.output.strip().split("\n") if l]
+        assert len(lines) >= 1
+        # Exactly 3 fields when split on pipe
+        parts = lines[0].split("|")
+        assert len(parts) == 3
+        assert parts[0] == "pattern"
+        assert parts[1] == "PAT-PIPE"
+
+
+class TestGraphContextSeverityClassification:
+    """Tests for ID-based constraint severity classification (QR-4)."""
+
+    def test_context_agent_classifies_by_id_not_content(self, tmp_path: Path) -> None:
+        """Constraints are classified by ID convention (-must-/-should-), not content."""
+        memory_dir = tmp_path / ".raise" / "rai" / "memory"
+        memory_dir.mkdir(parents=True)
+        graph_data: dict[str, Any] = {
+            "nodes": [
+                {
+                    "id": "mod-test",
+                    "type": "module",
+                    "content": "Test module",
+                    "source_file": "test.md",
+                    "created": "2026-02-08",
+                    "metadata": {},
+                },
+                {
+                    "id": "bc-test",
+                    "type": "bounded_context",
+                    "content": "Test domain",
+                    "source_file": "test.md",
+                    "created": "2026-02-08",
+                    "metadata": {},
+                },
+                {
+                    "id": "guardrail-must-tricky-001",
+                    "type": "guardrail",
+                    "content": "You SHOULD also consider this MUST rule",
+                    "source_file": "test.md",
+                    "created": "2026-02-08",
+                    "metadata": {},
+                },
+            ],
+            "edges": [
+                {"source": "mod-test", "target": "bc-test", "type": "belongs_to", "weight": 1.0},
+                {"source": "bc-test", "target": "guardrail-must-tricky-001", "type": "constrained_by", "weight": 1.0},
+            ],
+            "metadata": {"version": "1.0"},
+        }
+        index_path = memory_dir / "index.json"
+        index_path.write_text(json.dumps(graph_data, indent=2))
+
+        result = runner.invoke(
+            app, ["graph", "context", "mod-test", "--index", str(index_path), "--format", "agent"]
+        )
+        assert result.exit_code == 0
+        lines = result.output.strip().split("\n")
+        must_lines = [l for l in lines if l.startswith("must|")]
+        should_lines = [l for l in lines if l.startswith("should|")]
+        # ID has -must-, so classified as must despite content mentioning SHOULD
+        assert len(must_lines) == 1
+        assert "guardrail-must-tricky-001" in must_lines[0]
+        assert len(should_lines) == 0
