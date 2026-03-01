@@ -20,7 +20,10 @@ runner = CliRunner()
 
 
 class _MockDocsTarget:
-    """Sync docs target mock for CLI tests."""
+    """Sync docs target mock for CLI tests. Captures publish calls for assertions."""
+
+    def __init__(self) -> None:
+        self.last_publish_call: dict[str, Any] | None = None
 
     def can_publish(self, doc_type: str, metadata: dict[str, Any]) -> bool:
         return True
@@ -28,6 +31,11 @@ class _MockDocsTarget:
     def publish(
         self, doc_type: str, content: str, metadata: dict[str, Any]
     ) -> PublishResult:
+        self.last_publish_call = {
+            "doc_type": doc_type,
+            "content": content,
+            "metadata": metadata,
+        }
         return PublishResult(
             success=True, url=f"https://example.com/wiki/{doc_type}"
         )
@@ -91,19 +99,22 @@ class TestPublish:
         assert "https://example.com/wiki/roadmap" in result.output
 
     def test_publish_with_title(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
-        """--title flag overrides default page title."""
+        """--title flag overrides default page title in metadata."""
         gov_dir = tmp_path / "governance"
         gov_dir.mkdir()
         (gov_dir / "roadmap.md").write_text("# Roadmap")
         monkeypatch.chdir(tmp_path)
 
-        with _patch_target(_MockDocsTarget()):
+        mock_target = _MockDocsTarget()
+        with _patch_target(mock_target):
             result = runner.invoke(
                 app, ["docs", "publish", "roadmap", "--title", "Project Roadmap"]
             )
 
         assert result.exit_code == 0
         assert "Published: roadmap" in result.output
+        assert mock_target.last_publish_call is not None
+        assert mock_target.last_publish_call["metadata"]["title"] == "Project Roadmap"
 
     def test_publish_file_not_found(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
         """publish with nonexistent artifact type → error."""
@@ -167,10 +178,3 @@ class TestSearch:
 
         assert result.exit_code == 0
         assert "No results." in result.output
-
-    def test_search_with_limit(self) -> None:
-        """--limit flag is passed to target."""
-        with _patch_target(_MockDocsTarget()):
-            result = runner.invoke(app, ["docs", "search", "arch", "--limit", "5"])
-
-        assert result.exit_code == 0

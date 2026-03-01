@@ -68,7 +68,7 @@ def publish(
 ) -> None:
     """Publish a governance artifact to a documentation target."""
     path = _resolve_artifact_path(artifact_type)
-    content = path.read_text()
+    content = path.read_text(encoding="utf-8")
     doc_target = resolve_docs_target(target)
 
     page_title = title or artifact_type
