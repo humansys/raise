@@ -405,3 +405,52 @@ class TestMcpBridgeTelemetry:
                 mock_span.set_attribute.assert_any_call("success", False)
 
         _run(run())
+
+
+# =============================================================================
+# McpBridge.aclose() — RAISE-324 fix
+# =============================================================================
+
+
+class TestMcpBridgeAclose:
+    def test_aclose_resets_session_and_stack(self) -> None:
+        """aclose() clears session and cm_stack."""
+        bridge, p1, p2, _ = _patched_bridge(
+            call_tool_return=_make_call_result(texts=["ok"])
+        )
+
+        async def run() -> None:
+            with p1, p2:
+                await bridge.call("some_tool", {})
+                assert bridge._session is not None
+                assert bridge._cm_stack is not None
+                await bridge.aclose()
+                assert bridge._session is None
+                assert bridge._cm_stack is None
+
+        _run(run())
+
+    def test_aclose_idempotent(self) -> None:
+        """aclose() is safe to call multiple times."""
+        bridge = McpBridge(server_command="mcp-test")
+
+        async def run() -> None:
+            await bridge.aclose()  # No session — should not raise
+            await bridge.aclose()
+
+        _run(run())
+
+    def test_cleanup_delegates_to_aclose(self) -> None:
+        """_cleanup() delegates to aclose()."""
+        bridge, p1, p2, _ = _patched_bridge(
+            call_tool_return=_make_call_result(texts=["ok"])
+        )
+
+        async def run() -> None:
+            with p1, p2:
+                await bridge.call("some_tool", {})
+                assert bridge._session is not None
+                await bridge._cleanup()
+                assert bridge._session is None
+
+        _run(run())

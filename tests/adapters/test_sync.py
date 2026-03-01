@@ -22,7 +22,7 @@ from rai_cli.adapters.protocols import (
     DocumentationTarget,
     ProjectManagementAdapter,
 )
-from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
+from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter, _run_sync
 
 
 # --- Async mocks for wrapping ---
@@ -160,6 +160,76 @@ class TestSyncDocsAdapter:
         wrapper = SyncDocsAdapter(FakeAsyncDocs())
         h = wrapper.health()
         assert h.healthy is True
+
+
+class TestRunSyncCloseable:
+    """RAISE-324: _run_sync calls aclose() on closeable within the same event loop."""
+
+    def test_aclose_called_on_success(self) -> None:
+        """closeable.aclose() is called after successful coroutine."""
+        calls: list[str] = []
+
+        class Closeable:
+            async def aclose(self) -> None:
+                calls.append("closed")
+
+        async def _work() -> str:
+            return "done"
+
+        result = _run_sync(_work(), closeable=Closeable())
+        assert result == "done"
+        assert calls == ["closed"]
+
+    def test_aclose_called_on_failure(self) -> None:
+        """closeable.aclose() is called even when coroutine raises."""
+        calls: list[str] = []
+
+        class Closeable:
+            async def aclose(self) -> None:
+                calls.append("closed")
+
+        async def _fail() -> None:
+            msg = "boom"
+            raise RuntimeError(msg)
+
+        import pytest
+
+        with pytest.raises(RuntimeError, match="boom"):
+            _run_sync(_fail(), closeable=Closeable())
+        assert calls == ["closed"]
+
+    def test_no_closeable_still_works(self) -> None:
+        """_run_sync works without closeable (backwards compat)."""
+
+        async def _work() -> int:
+            return 42
+
+        assert _run_sync(_work()) == 42
+
+    def test_closeable_without_aclose_ignored(self) -> None:
+        """Objects without aclose() are silently ignored."""
+
+        async def _work() -> str:
+            return "ok"
+
+        result = _run_sync(_work(), closeable=object())
+        assert result == "ok"
+
+    def test_pm_wrapper_calls_aclose(self) -> None:
+        """SyncPMAdapter passes adapter as closeable so aclose() runs."""
+        calls: list[str] = []
+        fake = FakeAsyncPM()
+        original_search = fake.search
+
+        async def _aclose() -> None:
+            calls.append("closed")
+
+        fake.aclose = _aclose  # type: ignore[attr-defined]
+
+        wrapper = SyncPMAdapter(fake)
+        results = wrapper.search("project = RAISE")
+        assert len(results) == 1
+        assert calls == ["closed"]
 
 
 class TestRunSyncFromAsyncContext:
