@@ -16,6 +16,14 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.1.0"
   raise.visibility: public
+  raise.inputs: |
+    - epic_id: string, required, argument
+    - epic_slug: string, required, argument
+    - dev_branch: string, required, config
+  raise.outputs: |
+    - epic_branch: string, next_skill
+    - brief: file_path, next_skill
+    - scope: file_path, next_skill
 ---
 
 # Epic Start

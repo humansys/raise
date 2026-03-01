@@ -17,6 +17,13 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - scope: file_path, required, previous_skill
+    - all_retrospectives: boolean, required, git
+    - dev_branch: string, required, config
+  raise.outputs: |
+    - retrospective: file_path, file
+    - merge_commit: string, git
 ---
 
 # Epic Close

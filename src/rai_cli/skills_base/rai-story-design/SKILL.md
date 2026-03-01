@@ -17,6 +17,11 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - story_md: file_path, required, previous_skill
+    - scope: file_path, optional, previous_skill
+  raise.outputs: |
+    - design_md: file_path, next_skill
 ---
 
 # Story Design

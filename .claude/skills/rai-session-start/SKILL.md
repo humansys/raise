@@ -16,6 +16,12 @@ metadata:
   raise.adaptable: "true"
   raise.version: "5.0.0"
   raise.visibility: public
+  raise.inputs: |
+    - project_path: string, required, argument
+    - developer_profile: file_path, required, config
+  raise.outputs: |
+    - session_id: string, next_skill
+    - context_bundle: string, cli
 ---
 
 # Session Start
