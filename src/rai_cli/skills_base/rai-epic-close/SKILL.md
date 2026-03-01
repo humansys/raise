@@ -10,12 +10,12 @@ license: MIT
 metadata:
   raise.work_cycle: epic
   raise.frequency: per-epic
-  raise.fase: "epic-close"
+  raise.fase: "9"
   raise.prerequisites: all stories complete
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
 ---
 
