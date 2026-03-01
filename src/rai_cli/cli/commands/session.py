@@ -46,11 +46,14 @@ from rai_cli.session.state import (
     migrate_flat_to_session,
 )
 
+from rai_cli.cli.commands.journal import journal_app
+
 session_app = typer.Typer(
     name="session",
     help="Manage working sessions",
     no_args_is_help=True,
 )
+session_app.add_typer(journal_app, name="journal")
 
 
 def _check_cwd_guard(
