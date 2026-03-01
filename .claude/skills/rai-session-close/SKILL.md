@@ -46,7 +46,7 @@ rai session close --summary "Quick fix session" --type maintenance --project "$(
 Use inference to reflect on the session and write a YAML state file:
 
 ```yaml
-# /tmp/session-output-{SES-ID}.yaml
+# .raise/rai/personal/session-output.yaml
 session_id: "{SES-ID}"
 summary: "What was accomplished"
 type: feature  # feature | research | maintenance | infrastructure | ideation
@@ -108,7 +108,7 @@ Before closing, ensure no uncommitted changes are left behind:
 ### Step 3: Feed CLI
 
 ```bash
-rai session close --state-file /tmp/session-output-{SES-ID}.yaml --session {SES-ID} --project "$(pwd)"
+rai session close --state-file .raise/rai/personal/session-output.yaml --session {SES-ID} --project "$(pwd)"
 ```
 
 This atomically: records session in index, appends patterns, updates coaching, writes session state, clears active session.
