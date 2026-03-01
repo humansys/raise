@@ -364,6 +364,60 @@ class TestMcpBridgeHealth:
 # =============================================================================
 
 
+# =============================================================================
+# _parse_result — JSON array handling (D6, S301.5)
+# =============================================================================
+
+
+class TestParseResultArrays:
+    def test_json_array_wrapped_in_items(self) -> None:
+        """JSON array response is wrapped in {"items": [...]} for dict access."""
+        pages = [
+            {"id": "123", "title": "Page A"},
+            {"id": "456", "title": "Page B"},
+        ]
+        bridge, p1, p2, _ = _patched_bridge(
+            call_tool_return=_make_call_result(texts=[json.dumps(pages)])
+        )
+
+        async def run() -> McpToolResult:
+            with p1, p2:
+                return await bridge.call("confluence_search", {"query": "test"})
+
+        result = _run(run())
+        assert result.data["items"] == pages
+        assert len(result.data["items"]) == 2
+        assert result.data["items"][0]["title"] == "Page A"
+
+    def test_json_dict_still_works(self) -> None:
+        """Regression: dict responses remain unchanged after array support."""
+        data = {"key": "RAISE-1", "summary": "Test"}
+        bridge, p1, p2, _ = _patched_bridge(
+            call_tool_return=_make_call_result(texts=[json.dumps(data)])
+        )
+
+        async def run() -> McpToolResult:
+            with p1, p2:
+                return await bridge.call("jira_get_issue", {"issue_key": "RAISE-1"})
+
+        result = _run(run())
+        assert result.data == data
+        assert "items" not in result.data
+
+    def test_empty_array_wrapped(self) -> None:
+        """Empty JSON array is wrapped as {"items": []}."""
+        bridge, p1, p2, _ = _patched_bridge(
+            call_tool_return=_make_call_result(texts=["[]"])
+        )
+
+        async def run() -> McpToolResult:
+            with p1, p2:
+                return await bridge.call("confluence_search", {"query": "nothing"})
+
+        result = _run(run())
+        assert result.data == {"items": []}
+
+
 class TestMcpBridgeTelemetry:
     def test_span_attributes_on_success(self) -> None:
         """Successful call sets mcp_server, mcp_tool, duration_ms, success."""
