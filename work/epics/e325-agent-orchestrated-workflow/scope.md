@@ -148,7 +148,7 @@ Stream 2 (Parallel):                                   S325.5 ──────
 | S325.3 | S | Done | S | 2.0x | --format agent on 5 cmds, QR 4 fixes, PAT-E-590+591+592 |
 | S325.2 | S | Done | S | 3.0x | DelegationLevel enum + DelegationConfig + resolve, QR 1 fix, PAT-E-593+594 |
 | S325.4 | M | Done | M | 1.5x | BacklogHook via emit-work events, 21 tests, QR 1 fix, PAT-E-595+596+597 |
-| S325.5 | M | Pending | — | — | |
+| S325.5 | M | Done | M | 1.7x | Unified /rai-discover replaces 5 skills, 80% HITL reduction, PAT-E-598+599 |
 | S325.6 | M | Pending | — | — | |
 | S325.7 | L | Pending | — | — | |
 
