@@ -71,3 +71,43 @@ Enable integration of any MCP server via declarative YAML config (~50-80 lines) 
 | Expression evaluator insufficient for edge cases | Low | Medium | `| json` filter as escape hatch; extend evaluator incrementally |
 | MCP server response format varies unpredictably | Medium | Medium | `items_path` + `fields` mapping handle nesting; fallback to raw bridge |
 | Registry collision between YAML and entry point names | Low | Low | Entry points have priority (D4); warn on collision |
+
+---
+
+## Implementation Plan
+
+### Sequence
+
+| # | Story | Size | Strategy | Rationale |
+|---|-------|------|----------|-----------|
+| 1 | S337.1: Expression evaluator + YAML schema | S | Walking skeleton | Foundation — every other story imports these. Well-defined from research, zero risk. |
+| 2 | S337.2: DeclarativeMcpAdapter (PM) | M | Risk-first | Core architectural bet. If dispatch-table-over-YAML doesn't work, pivot early. Largest story, most unknowns. |
+| 3a | S337.3: YAML discovery in resolver | S | Dependency-driven | Unblocks E2E: `rai backlog --adapter github` works with YAML. Critical path. |
+| 3b | S337.4: Docs protocol support | S | Parallel (with 3a) | Independent — extends adapter.py with 5 docs methods. Same dispatch pattern from S337.2. |
+| 4 | S337.5: Reference config + validation CLI | S | Quick win | Capstone — validates whole stack E2E with real github.yaml. |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Walking Skeleton** | S337.1 + S337.2 | Adapter instantiated from YAML fixture, mocked bridge returns parsed IssueRef. All 11 PM methods dispatch or raise NotImplementedError. |
+| **M2: E2E Integration** | + S337.3 | `rai backlog search --adapter github "query"` resolves YAML adapter → creates bridge → calls tool → returns IssueSummary list. Existing adapters (jira, filesystem) unaffected. |
+| **M3: Epic Complete** | + S337.4 + S337.5 | Reference github.yaml documented. `rai adapter validate` catches invalid configs. Docs protocol works. All done criteria met. |
+
+### Progress Tracking
+
+| Story | Status | Velocity | Notes |
+|-------|--------|----------|-------|
+| S337.1 | pending | — | |
+| S337.2 | pending | — | |
+| S337.3 | pending | — | |
+| S337.4 | pending | — | |
+| S337.5 | pending | — | |
+
+### Sequencing Risks
+
+| Risk | Mitigation |
+|------|------------|
+| S337.2 (M) takes longer than expected due to response parsing edge cases | Timebox response mapping to known protocol models; complex cases use `| json` filter |
+| S337.3 factory closure breaks `_resolve.py` type assumptions | Type change is minimal; test with both entry point and YAML adapters in same run |
+| Parallel S337.3/S337.4 creates merge conflicts in adapter.py | S337.4 only adds methods, S337.3 doesn't touch adapter.py — no overlap |
