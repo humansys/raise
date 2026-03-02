@@ -116,11 +116,21 @@ Infer RaiSE integrations from lifecycle metadata — present rationale, don't as
 | Pattern persistence | skill produces learnings | `rai pattern add` |
 | HITL checkpoint | always | pause after analysis, before writes |
 
-Write using ADR-040 contract (7 sections, ≤150 body lines). Present design summary for HITL review before writing. Then create file:
+Write using ADR-040 contract (7 sections, ≤150 body lines). Present design summary for HITL review before writing.
+
+**Target directory** depends on whether creating for a skill set:
+- Default: `.claude/skills/{name}/SKILL.md`
+- With `--set`: `.raise/skills/{set}/{name}/SKILL.md`
+- Customize builtin: `rai skill scaffold {name} --set {set} --from-builtin`
 
 ```bash
+# Default (no skill set)
 mkdir -p .claude/skills/{name}
 # Write .claude/skills/{name}/SKILL.md using Write tool
+
+# With skill set
+mkdir -p .raise/skills/{set}/{name}
+# Write .raise/skills/{set}/{name}/SKILL.md using Write tool
 ```
 
 <verification>
@@ -147,7 +157,7 @@ rai graph query "{name}" --types skill --format compact
 
 | Item | Destination |
 |------|-------------|
-| SKILL.md | `.claude/skills/{name}/SKILL.md` |
+| SKILL.md | `.claude/skills/{name}/SKILL.md` (default) or `.raise/skills/{set}/{name}/SKILL.md` (with --set) |
 | Validation | `rai skill validate` passes |
 | Graph index | `rai graph build` run — skill queryable |
 
