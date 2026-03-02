@@ -1,8 +1,10 @@
 ---
 name: rai-mcp-status
 description: >
-  Health overview of all registered MCP servers. Lists servers,
-  runs health checks, and presents a summary table.
+  Health overview of all registered MCP servers plus stack-aware
+  recommendations for missing capabilities. Lists servers, runs
+  health checks, detects project stack, and suggests relevant
+  servers from the governance catalog.
 
 license: MIT
 
@@ -85,6 +87,40 @@ If any unhealthy, suggest: "Run `/rai-mcp-add` to reinstall problematic servers,
 Summary presented with actionable guidance for issues.
 </verification>
 
+### Step 4: Recommend Missing Capabilities
+
+Read the governance catalog at `.raise/mcp/catalog.yaml`. If catalog is missing, skip this step gracefully.
+
+**Detect project languages:**
+1. Read `work/discovery/analysis.json` if it exists — derive languages from file extensions in `components[].file`
+2. If no analysis artifact, glob for source files: `**/*.py`, `**/*.ts`, `**/*.js`, `**/*.php`, `**/*.cs`, `**/*.dart`
+3. Map extensions to languages using scanner's `EXTENSION_TO_LANGUAGE`
+
+**Filter recommendations:**
+1. For each catalog server, check `recommended_for`:
+   - `all` → always recommend
+   - List of languages → recommend if any detected language matches
+   - Empty list `[]` → never recommend (opt-in only)
+2. Exclude servers already registered in `.raise/mcp/`
+3. If no recommendations remain: skip section silently
+
+**Present recommendations:**
+
+```
+Recommended for your stack ({detected_languages}):
+
+| Server | Description                  | Add with              |
+|--------|------------------------------|-----------------------|
+| github | GitHub repository operations | /rai-mcp-add github   |
+| fetch  | HTTP fetch for web content   | /rai-mcp-add fetch    |
+
+Use /rai-mcp-add <name> to install.
+```
+
+<verification>
+Recommendations shown (or skipped if none). Already-registered servers excluded.
+</verification>
+
 ## Output
 
 | Item | Destination |
@@ -98,9 +134,14 @@ Summary presented with actionable guidance for issues.
 - [ ] Unhealthy servers show error details
 - [ ] Actionable guidance provided for issues
 - [ ] Empty state handled gracefully
+- [ ] Catalog read from `.raise/mcp/catalog.yaml` (graceful if missing)
+- [ ] Already-registered servers excluded from recommendations
+- [ ] Languages detected from discovery artifact or file glob fallback
 
 ## References
 
 - CLI: `rai mcp list`, `rai mcp health`
+- Catalog: `.raise/mcp/catalog.yaml` (governance — known servers + stack mapping)
+- Discovery: `work/discovery/analysis.json` (stack detection source)
 - Complement: `/rai-mcp-add`, `/rai-mcp-remove`
 - Epic: E338 MCP Platform
