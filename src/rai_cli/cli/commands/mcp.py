@@ -188,7 +188,7 @@ def call(
     ] = "{}",
     verbose: Annotated[
         bool,
-        typer.Option("--verbose", "-v", help="Show call details on stderr"),
+        typer.Option("--verbose", help="Show call details on stderr"),
     ] = False,
 ) -> None:
     """Invoke a tool on a registered MCP server.
