@@ -102,7 +102,7 @@ Enable integration of any MCP server via declarative YAML config (~50-80 lines) 
 | S337.2 | done | 1.8x | DeclarativeMcpAdapter, 11 PM methods, 35 tests |
 | S337.3 | done | 1.6x | YAML discovery + resolver integration, 14 tests, QR 2 fixes |
 | S337.4 | done | 1.3x | Docs protocol, 4 methods, protocol-aware search, QR 1 fix |
-| S337.5 | pending | — | |
+| S337.5 | done | 1.6x | Reference github.yaml + validate CLI, adapter→adapter rename, 9 tests, QR 2 fixes |
 
 ### Sequencing Risks
 
