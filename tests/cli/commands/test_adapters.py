@@ -1,4 +1,4 @@
-"""Tests for rai adapters CLI commands."""
+"""Tests for rai adapter CLI commands."""
 
 from __future__ import annotations
 
@@ -19,10 +19,10 @@ def _make_entry_point(name: str, group: str, value: str) -> EntryPoint:
 
 
 class TestAdaptersList:
-    """Tests for `rai adapters list`."""
+    """Tests for `rai adapter list`."""
 
     def test_list_shows_registered_parsers(self) -> None:
-        result = runner.invoke(app, ["adapters", "list"])
+        result = runner.invoke(app, ["adapter", "list"])
         assert result.exit_code == 0
         # Built-in governance parsers from pyproject.toml
         assert "prd" in result.output
@@ -31,24 +31,24 @@ class TestAdaptersList:
         assert "GovernanceParser" in result.output
 
     def test_list_shows_graph_backends_group(self) -> None:
-        result = runner.invoke(app, ["adapters", "list"])
+        result = runner.invoke(app, ["adapter", "list"])
         assert result.exit_code == 0
         assert "KnowledgeGraphBackend" in result.output
 
     def test_list_shows_empty_groups(self) -> None:
-        result = runner.invoke(app, ["adapters", "list"])
+        result = runner.invoke(app, ["adapter", "list"])
         assert result.exit_code == 0
         # PM adapters group exists but has no registrations
         assert "ProjectManagementAdapter" in result.output
         assert "(none)" in result.output
 
     def test_list_shows_tier(self) -> None:
-        result = runner.invoke(app, ["adapters", "list"])
+        result = runner.invoke(app, ["adapter", "list"])
         assert result.exit_code == 0
         assert "Tier:" in result.output
 
     def test_list_json_format(self) -> None:
-        result = runner.invoke(app, ["adapters", "list", "--format", "json"])
+        result = runner.invoke(app, ["adapter", "list", "--format", "json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "tier" in data
@@ -60,7 +60,7 @@ class TestAdaptersList:
         assert "rai.graph.backends" in group_names
 
     def test_list_json_contains_adapter_details(self) -> None:
-        result = runner.invoke(app, ["adapters", "list", "--format", "json"])
+        result = runner.invoke(app, ["adapter", "list", "--format", "json"])
         data = json.loads(result.output)
         parsers_group = next(
             g for g in data["groups"] if g["group"] == "rai.governance.parsers"
@@ -72,16 +72,16 @@ class TestAdaptersList:
 
 
 class TestAdaptersCheck:
-    """Tests for `rai adapters check`."""
+    """Tests for `rai adapter check`."""
 
     def test_check_builtins_pass(self) -> None:
-        result = runner.invoke(app, ["adapters", "check"])
+        result = runner.invoke(app, ["adapter", "check"])
         assert result.exit_code == 0
         # All built-in adapters should be compliant
         assert "compliant" in result.output or "passed" in result.output
 
     def test_check_json_format(self) -> None:
-        result = runner.invoke(app, ["adapters", "check", "--format", "json"])
+        result = runner.invoke(app, ["adapter", "check", "--format", "json"])
         assert result.exit_code == 0
         data = json.loads(result.output)
         assert "results" in data
@@ -90,7 +90,7 @@ class TestAdaptersCheck:
         assert isinstance(data["results"], list)
 
     def test_check_json_all_builtins_compliant(self) -> None:
-        result = runner.invoke(app, ["adapters", "check", "--format", "json"])
+        result = runner.invoke(app, ["adapter", "check", "--format", "json"])
         data = json.loads(result.output)
         for r in data["results"]:
             assert r["compliant"] is True, f"{r['name']} in {r['group']} not compliant"
@@ -116,7 +116,7 @@ class TestAdaptersCheck:
             "rai_cli.cli.commands.adapters.entry_points",
             side_effect=patched_entry_points,
         ):
-            result = runner.invoke(app, ["adapters", "check", "--format", "json"])
+            result = runner.invoke(app, ["adapter", "check", "--format", "json"])
 
         assert result.exit_code == 0
         data = json.loads(result.output)
