@@ -28,17 +28,17 @@ console = Console()
 
 
 def resolve_entrypoint(
-    discover: Callable[[], dict[str, type]],
+    discover: Callable[[], dict[str, Callable[[], Any]]],
     sync_wrapper: type | None,
     async_check_method: str,
     group_label: str,
     flag_name: str,
     selected: str | None,
 ) -> Any:
-    """Resolve and instantiate an adapter/target from entry points.
+    """Resolve and instantiate an adapter/target from entry points and YAML configs.
 
     Args:
-        discover: Function returning {name: class} from entry points.
+        discover: Function returning {name: factory} from entry points and/or YAML.
         sync_wrapper: Wrapper class for async→sync bridging (or None).
         async_check_method: Method name to check for async (e.g., "get_issue").
         group_label: Human label for error messages (e.g., "PM adapter").
@@ -96,10 +96,24 @@ def resolve_entrypoint(
     return instance
 
 
+def _discover_pm() -> dict[str, Callable[[], Any]]:
+    """Merge YAML and entry point PM adapters. EP wins on name collision."""
+    from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+
+    return {**discover_yaml_adapters("pm"), **get_pm_adapters()}
+
+
+def _discover_docs() -> dict[str, Callable[[], Any]]:
+    """Merge YAML and entry point docs targets. EP wins on name collision."""
+    from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+
+    return {**discover_yaml_adapters("docs"), **get_doc_targets()}
+
+
 def resolve_adapter(adapter_name: str | None) -> ProjectManagementAdapter:
-    """Resolve a ProjectManagementAdapter from entry points."""
+    """Resolve a ProjectManagementAdapter from entry points and YAML configs."""
     return resolve_entrypoint(
-        discover=get_pm_adapters,
+        discover=_discover_pm,
         sync_wrapper=SyncPMAdapter,
         async_check_method="get_issue",
         group_label="PM adapter",
@@ -109,9 +123,9 @@ def resolve_adapter(adapter_name: str | None) -> ProjectManagementAdapter:
 
 
 def resolve_docs_target(target_name: str | None) -> DocumentationTarget:
-    """Resolve a DocumentationTarget from entry points."""
+    """Resolve a DocumentationTarget from entry points and YAML configs."""
     return resolve_entrypoint(
-        discover=get_doc_targets,
+        discover=_discover_docs,
         sync_wrapper=SyncDocsAdapter,
         async_check_method="get_page",
         group_label="docs target",
