@@ -19,7 +19,7 @@ from typing import Any
 
 import yaml
 
-from rai_cli.adapters.mcp_bridge import McpBridge, McpBridgeError, McpToolResult
+from rai_cli.mcp.bridge import McpBridge, McpBridgeError, McpToolResult
 from rai_cli.adapters.models import (
     AdapterHealth,
     PageContent,
