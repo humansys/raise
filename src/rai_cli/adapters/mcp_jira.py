@@ -19,7 +19,6 @@ from typing import Any
 
 import yaml
 
-from rai_cli.mcp.bridge import McpBridge, McpBridgeError, McpToolResult
 from rai_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
@@ -31,6 +30,7 @@ from rai_cli.adapters.models import (
     IssueSpec,
     IssueSummary,
 )
+from rai_cli.mcp.bridge import McpBridge, McpBridgeError, McpToolResult
 
 
 class McpJiraAdapter:
