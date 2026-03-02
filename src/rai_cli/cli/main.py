@@ -49,7 +49,7 @@ app = typer.Typer(
 )
 
 # Register command groups
-app.add_typer(adapters_app, name="adapters")
+app.add_typer(adapters_app, name="adapter")
 app.add_typer(backlog_app, name="backlog")
 app.add_typer(base_app, name="base")
 app.add_typer(docs_app, name="docs")

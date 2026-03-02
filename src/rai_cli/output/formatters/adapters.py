@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from rich.console import Console
+
+if TYPE_CHECKING:
+    from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
 
 
 def format_list_human(
@@ -107,3 +110,26 @@ def format_check_json(results: list[dict[str, Any]]) -> str:
         },
         indent=2,
     )
+
+
+def format_validate_human(
+    config: DeclarativeAdapterConfig,
+    console: Console,
+) -> None:
+    """Display validation success for a declarative adapter config.
+
+    Args:
+        config: Validated adapter configuration.
+        console: Rich console for output.
+    """
+    mapped = sum(1 for v in config.methods.values() if v is not None)
+    unsupported = sum(1 for v in config.methods.values() if v is None)
+    server_cmd = f"{config.server.command} {' '.join(config.server.args)}".strip()
+
+    console.print("[green]✓ Valid adapter config[/green]")
+    console.print(f"  Name:        {config.adapter.name}")
+    console.print(f"  Protocol:    {config.adapter.protocol}")
+    if config.adapter.description:
+        console.print(f"  Description: {config.adapter.description}")
+    console.print(f"  Methods:     {mapped} mapped, {unsupported} unsupported")
+    console.print(f"  Server:      {server_cmd}")
