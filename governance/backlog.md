@@ -63,7 +63,7 @@
 | [RAISE-301](https://humansys.atlassian.net/browse/RAISE-301) | **Agent Tool Abstraction** | ✅ Complete | `work/epics/e301-agent-tool-abstraction/scope.md` | — |
 | [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | 🚀 In Progress | `work/epics/e325-agent-orchestrated-workflow/scope.md` | P0 |
 | [RAISE-337](https://humansys.atlassian.net/browse/RAISE-337) | **Declarative MCP Adapter Framework** | ✅ Complete | `work/epics/e337-declarative-mcp-adapter/scope.md` | — |
-| RAISE-338 | **MCP Platform** | 🚀 In Progress | `work/epics/e338-mcp-platform/scope.md` | P1 |
+| RAISE-338 | **MCP Platform** | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
 
 ### Release Roadmap (revised SES-294, 2026-02-26)
 
