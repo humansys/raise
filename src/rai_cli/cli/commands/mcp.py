@@ -10,12 +10,15 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import time
 from typing import Annotated, Any
 
 import typer
 from rich.console import Console
 from rich.table import Table
 
+from rai_cli.hooks.emitter import create_emitter
+from rai_cli.hooks.events import McpCallEvent
 from rai_cli.mcp.bridge import McpBridge, McpBridgeError
 from rai_cli.mcp.models import McpHealthResult
 from rai_cli.mcp.registry import discover_mcp_servers
@@ -183,6 +186,10 @@ def call(
         str,
         typer.Option("--args", help="Tool arguments as JSON string"),
     ] = "{}",
+    verbose: Annotated[
+        bool,
+        typer.Option("--verbose", "-v", help="Show call details on stderr"),
+    ] = False,
 ) -> None:
     """Invoke a tool on a registered MCP server.
 
@@ -202,9 +209,30 @@ def call(
     except json.JSONDecodeError as exc:
         console.print(f"Error: Invalid JSON in --args: {exc}")
         raise typer.Exit(1) from exc
+
+    # Call tool with latency measurement
+    emitter = create_emitter()
+    start = time.monotonic()
     try:
         result = asyncio.run(_call_tool(config, tool, arguments))
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+        emitter.emit(McpCallEvent(
+            server=server, tool=tool, success=True, latency_ms=elapsed_ms,
+        ))
+        if verbose:
+            console.print(
+                f"mcp:call {server}/{tool} — ok ({elapsed_ms}ms)"
+            )
     except Exception as exc:
+        elapsed_ms = int((time.monotonic() - start) * 1000)
+        emitter.emit(McpCallEvent(
+            server=server, tool=tool, success=False,
+            latency_ms=elapsed_ms, error=str(exc),
+        ))
+        if verbose:
+            console.print(
+                f"mcp:call {server}/{tool} — error ({elapsed_ms}ms): {exc}"
+            )
         console.print(f"Error: {exc}")
         raise typer.Exit(1) from exc
 
