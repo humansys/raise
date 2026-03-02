@@ -157,7 +157,7 @@ Sequential execution recommended (solo developer), but parallel is safe.
 | S338.4 | Telemetry hooks | S | done | 1.5x |
 | S338.5 | Declarative adapter `server.ref` | S | done | 1.25x |
 | S338.7 | `rai mcp scaffold` | S | done | 1.33x |
-| S338.6 | `rai mcp install` | M | pending | — |
+| S338.6 | `rai mcp install` | M | done | 1.2x |
 
 ### Sequencing Risks
 
