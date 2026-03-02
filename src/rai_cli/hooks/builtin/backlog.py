@@ -97,7 +97,7 @@ def resolve_adapter() -> Any:
         resolve_adapter as _resolve,
     )
 
-    return _resolve(None)
+    return _resolve("jira")
 
 
 class BacklogHook:
@@ -111,6 +111,7 @@ class BacklogHook:
 
     events: ClassVar[list[str]] = ["work:lifecycle"]
     priority: ClassVar[int] = 0
+    timeout: ClassVar[float] = 30.0  # MCP bridge cold start needs >5s
 
     def __init__(self, project_root: Path | None = None) -> None:
         self._project_root = project_root or Path(".")
