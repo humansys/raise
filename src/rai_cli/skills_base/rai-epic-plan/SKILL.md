@@ -12,11 +12,15 @@ metadata:
   raise.frequency: per-epic
   raise.fase: "4"
   raise.prerequisites: epic-design
-  raise.next: story-design
+  raise.next: story-start
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - scope: file_path, required, previous_skill
+  raise.outputs: |
+    - scope: file_path, next_skill
 ---
 
 # Epic Plan

@@ -79,3 +79,13 @@ Stories merge to epic, epics merge to dev, dev merges to main at release.
 - Use read tool first, then edit/write tools
 - Never assume file context is loaded from previous turns
 - After `/clear`, re-read all files you need to modify
+
+## Post-Compaction Context Restoration
+When you detect context was compacted (continuation summary present), restore working state:
+1. Read the session journal: `uv run rai session journal show --compact --project .`
+2. Read the current epic/story scope doc if referenced in journal
+3. Summarize: where we are, what was decided, what's next
+4. Continue work — do NOT re-run `/rai-session-start` (session is already active)
+
+The PreCompact hook logs journal state before compaction (side-effect only).
+Post-compaction injection via hooks is broken (Claude Code bugs #12671, #15174).

@@ -55,6 +55,7 @@
 | [RAISE-293](https://humansys.atlassian.net/browse/RAISE-293) | **Workstream Concept (Worktrees)** | 📋 Backlog | — | P2 |
 | [RAISE-294](https://humansys.atlassian.net/browse/RAISE-294) | **Test Infrastructure Migration** | 📋 Backlog | — | P2 |
 | [RAISE-295](https://humansys.atlassian.net/browse/RAISE-295) | **Security Fixes (Snyk/SAST/Sonar)** | 📋 Backlog | — | P2 |
+| [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | 🚀 In Progress | `work/epics/e325-agent-orchestrated-workflow/scope.md` | P1 |
 | [RAISE-156](https://humansys.atlassian.net/browse/RAISE-156) | **GTM Website** | 📋 Backlog | — | P2 |
 | [RAISE-208](https://humansys.atlassian.net/browse/RAISE-208) | **[PRO] Jira Adapter** | 📋 Backlog | — | P1 (Pro) |
 | [RAISE-209](https://humansys.atlassian.net/browse/RAISE-209) | **[PRO] Team/Org Memory** | 📋 Backlog | — | P1 (Pro) |
