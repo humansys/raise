@@ -305,7 +305,7 @@ class TestMcpBridgeSessionErrors:
 
 class TestMcpBridgeHealth:
     def test_health_returns_healthy(self) -> None:
-        """health() returns AdapterHealth with tool count when server responds."""
+        """health() returns McpHealthResult with tool count when server responds."""
         tools = [_make_tool("tool_a", "desc A"), _make_tool("tool_b", "desc B")]
         bridge, p1, p2, _ = _patched_bridge(
             list_tools_return=_make_list_tools_result(tools)
@@ -317,13 +317,14 @@ class TestMcpBridgeHealth:
 
         health = _run(run())
         assert health.healthy is True
-        assert health.name == "mcp-test"
+        assert health.server_name == "mcp-test"
         assert "2 tools" in health.message
         assert health.latency_ms is not None
         assert health.latency_ms >= 0
+        assert health.tool_count == 2
 
     def test_health_returns_unhealthy_on_error(self) -> None:
-        """health() returns unhealthy AdapterHealth when connection fails."""
+        """health() returns unhealthy McpHealthResult when connection fails."""
 
         @asynccontextmanager
         async def failing_stdio(params: Any, **kwargs: Any):
