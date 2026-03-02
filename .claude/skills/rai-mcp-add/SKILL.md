@@ -67,14 +67,11 @@ Based on the intent, determine:
 4. **Environment variables** — ask: "Does this server need any API keys or tokens? (e.g. GITHUB_TOKEN)"
 5. **Python module** (pip only) — ask: "What's the Python module name to run? (e.g. mcp_server_fetch)"
 
-**For well-known servers, suggest defaults:**
+**For known servers, read `.raise/mcp/catalog.yaml`:**
 
-| Intent matches | Package | Type | Name |
-|---------------|---------|------|------|
-| context7, documentation | `@upstash/context7-mcp` | npx | context7 |
-| github | `@modelcontextprotocol/server-github` | npx | github |
-| filesystem, files | `@modelcontextprotocol/server-filesystem` | npx | filesystem |
-| fetch, http | `mcp-server-fetch` | pip | fetch |
+If the developer's intent matches a server name in the catalog, pre-fill all fields (package, type, env, module) from the catalog entry. No need to ask questions already answered by governance data.
+
+If the catalog is missing or the server isn't in it, ask the developer for each field individually.
 
 If uncertain, ask. Never guess package names.
 
@@ -163,7 +160,7 @@ Result reported. Developer knows the server is ready (or what to fix).
 ## Quality Checklist
 
 - [ ] Intent captured before asking technical details
-- [ ] Suggested defaults for well-known servers
+- [ ] Catalog read from `.raise/mcp/catalog.yaml` for known server defaults
 - [ ] Confirmation shown before running install
 - [ ] Health check result reported
 - [ ] Available tools listed after successful install
@@ -173,6 +170,7 @@ Result reported. Developer knows the server is ready (or what to fix).
 ## References
 
 - CLI: `rai mcp install`, `rai mcp scaffold`, `rai mcp health`, `rai mcp tools`
+- Catalog: `.raise/mcp/catalog.yaml` (governance — known servers + package details)
 - Complement: `/rai-mcp-remove`, `/rai-mcp-status`
 - Pattern: PAT-E-608 (CLI = agent tools, Skills = human interface)
 - Epic: E338 MCP Platform
