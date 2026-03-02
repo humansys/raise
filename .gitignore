@@ -91,3 +91,4 @@ dmypy.json
 credentials.json
 *.sqlite
 .netrc
+.raise/mcp/
