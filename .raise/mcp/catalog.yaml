@@ -37,3 +37,18 @@ servers:
     module: "mcp_server_fetch"
     description: "HTTP fetch for web content retrieval"
     recommended_for: [python]
+
+  # --- DevSecOps ---
+
+  semgrep:
+    package: "semgrep-mcp"
+    type: uvx
+    env: [SEMGREP_APP_TOKEN]
+    description: "SAST + SCA + secret detection via Semgrep (security pipeline)"
+    recommended_for: all
+
+  sonatype:
+    package: "@sonatype/mcp-server"
+    type: npx
+    description: "Dependency intelligence — CVE scanning, license compliance, version guidance"
+    recommended_for: all
