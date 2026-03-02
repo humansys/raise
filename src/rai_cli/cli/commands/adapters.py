@@ -41,7 +41,7 @@ from rai_cli.tier.context import TierContext
 from rai_core.graph.backends.protocol import KnowledgeGraphBackend
 
 adapters_app = typer.Typer(
-    name="adapters",
+    name="adapter",
     help="Inspect and validate registered adapters",
     no_args_is_help=True,
 )
