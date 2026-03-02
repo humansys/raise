@@ -1,321 +1,149 @@
 ---
-name: rai-story-review
-description: >
-  Reflect on completed stories to extract learnings, identify process
-  improvements, and update the framework with insights gained. Use after
-  implementation is complete to close the development cycle.
+description: 'Reflect on completed stories to extract learnings, identify process
+  improvements, and update the framework with insights gained. Use after implementation
+  is complete to close the development cycle.
 
+  '
 license: MIT
-
 metadata:
-  raise.work_cycle: story
+  raise.adaptable: 'true'
+  raise.fase: '7'
   raise.frequency: per-story
-  raise.fase: "7"
-  raise.prerequisites: story-implement
+  raise.gate: ''
   raise.next: story-close
-  raise.gate: ""
-  raise.adaptable: "true"
-  raise.version: "1.2.0"
+  raise.prerequisites: story-implement
+  raise.version: 2.0.0
   raise.visibility: public
+  raise.work_cycle: story
+name: rai-story-review
 ---
 
-# Review: Retrospective & Learning
+# Story Review
 
 ## Purpose
 
-Reflect on the completed feature to extract learnings, identify process improvements, and update the framework with insights gained.
+Reflect on the completed story to extract learnings, persist patterns, reinforce behavioral signals, and emit calibration telemetry.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Follow standard retrospective questions faithfully.
-
-**Ha (破)**: Adapt questions to team context and project specifics.
-
-**Ri (離)**: Create custom review patterns for specific domains or contexts.
+- **Shu**: Follow all steps, answer all checkpoint questions with specific examples
+- **Ha**: Adapt depth to story complexity, batch small story reviews
+- **Ri**: Custom review patterns, integrate with team retrospectives
 
 ## Context
 
-**When to use:**
-- After completing a feature
-- Before starting the next feature
-- As closure for the development cycle
+**When to use:** After implementation is complete and tests pass. Before `/rai-story-close`.
 
-**Inputs required:**
-- Completed feature
-- Progress log: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/progress.md`
-- Team feedback (if available)
-
-**Output:**
-- Retrospective: `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
+**Inputs:** Completed story, progress log, passing test suite.
 
 ## Steps
 
-### Step 0: Emit Feature Start (Telemetry)
-
-Record the start of the review phase:
+### Step 1: Verify Tests Pass
 
 ```bash
-rai signal emit-work story {story_id} --event start --phase review
+uv run pytest --tb=short
 ```
 
-**Example:** `rai signal emit-work story S15.1 -e start -p review`
+| Condition | Action |
+|-----------|--------|
+| Tests green | Continue |
+| Tests failing | Fix first — review requires green tests |
 
-### Step 0.1: Verify Prerequisites & Load Context (Parallel)
+<verification>
+All tests passing.
+</verification>
 
-Run these in parallel (all independent):
+### Step 2: Gather Data & Reflect
 
-```bash
-# Verify tests pass
-uv run pytest --tb=no -q || {
-    echo "ERROR: Tests must pass before review"
-    exit 10  # GateFailedError
-}
+Review the story development: actual vs estimated time, blockers, plan deviations.
 
-# Query retrospective patterns and calibration data
-rai graph query "retrospective learnings velocity" --types pattern,calibration --limit 5
-```
-
-**From tests:**
-- Tests pass → Continue with review
-- Tests fail → Fix tests first, then review
-
-**From memory query:**
-- Process patterns from prior retrospectives
-- Calibration data (feature completion times for velocity comparison)
-
-**Verification:** All tests passing; patterns noted.
-
-> **If you can't continue:** Fix failing tests. Review requires green tests.
-
-### Step 1: Gather Data
-
-Review the feature development:
-- Actual time vs estimated
-- Blockers encountered
-- Deviations from plan
-
-**Verification:** Feature data collected.
-
-> **If you can't continue:** No data → Reconstruct timeline from commits/PRs.
-
-### Step 2: Heutagogical Checkpoint
-
-Answer the four questions:
+**Heutagogical checkpoint** — answer with specific examples:
 1. What did you learn?
 2. What would you change about the process?
 3. Are there improvements for the framework?
 4. What are you more capable of now?
 
-**Verification:** All four questions answered with specific examples.
+Identify concrete improvements to skills, guardrails, or templates. Apply small improvements immediately; create issues for complex ones.
 
-> **If you can't continue:** Vague answers → Be more specific with concrete examples.
+<verification>
+All four questions answered. Improvements identified (or celebrated that none needed).
+</verification>
 
-### Step 3: Identify Process Improvements
+### Step 3: Persist Patterns & Reinforce
 
-List concrete improvements:
-- To skills/katas
-- To guardrails
-- To templates
-
-**Verification:** Improvements identified with owner.
-
-> **If you can't continue:** No improvements → Celebrate the process and continue.
-
-### Step 4: Update Framework
-
-If improvements identified:
-- Update relevant skills
-- Create or modify guardrails
-- Document decisions (ADRs if significant)
-
-**Verification:** Improvements applied to framework.
-
-> **If you can't continue:** Complex improvement → Create issue for future.
-
-### Step 4.5: Persist Patterns to Memory
-
-For learnings worth preserving across sessions, add to memory via CLI:
+**Add new patterns** worth preserving across sessions:
 
 ```bash
-rai pattern add "Pattern description" \
-  -c "context,keywords" \
-  -t process \
-  --from {story_id}
+rai pattern add "Pattern description" -c "context,keywords" -t process --from S{N}.{M}
 ```
 
-**Pattern types:**
-- `process` — How to work (workflow, collaboration)
-- `technical` — Code techniques, gotchas, APIs
-- `architecture` — Design decisions, module patterns
-- `codebase` — Project-specific conventions
+Types: `process`, `technical`, `architecture`, `codebase`.
 
-**Examples:**
+**Reinforce existing patterns** — evaluate behavioral patterns loaded at session start:
+
 ```bash
-# Process pattern
-rai pattern add "HITL before commits" -c "git,workflow" -t process --from F12.6
-
-# Technical pattern
-rai pattern add "capsys.readouterr() for stdout tests" -c "pytest,testing" -t technical --from F12.6
+rai pattern reinforce {pattern_id} --vote {1|0|-1} --from S{N}.{M}
 ```
 
-**Decision:**
-- Pattern is project-agnostic or reusable → Add to memory
-- Pattern is one-off or context-specific → Document in retrospective only
+| Vote | Meaning |
+|:----:|---------|
+| `1` | Implementation followed the pattern |
+| `0` | Pattern not relevant to this story (does NOT count toward evaluations) |
+| `-1` | Implementation contradicted the pattern |
 
-**Verification:** Patterns persisted via CLI (or explicitly skipped).
+Only evaluate patterns you consciously considered. `0` is correct for most patterns in any story.
 
-> **If you can't continue:** CLI not available → Add patterns manually to `.raise/rai/memory/patterns.jsonl`.
+<verification>
+New patterns persisted. Behavioral patterns evaluated (or explicitly skipped).
+</verification>
 
-### Step 4.6: Evaluate Behavioral Patterns (Reinforcement Signal)
+### Step 4: Document Retrospective
 
-Evaluate the patterns that were loaded at story-start against what actually happened
-during implementation. This is the primary signal collection point for the temporal
-decay scoring system (RAISE-170).
-
-**When to run:** After implementation is complete and the code is working.
-**Source of patterns:** The behavioral section loaded at session start (`rai session context --sections behavioral`).
-
-**Votes:**
-- `1` = implementation **followed** the pattern (applied, reinforced)
-- `0` = pattern **not relevant** to this story (N/A — does NOT count toward evaluations)
-- `-1` = implementation **contradicted** the pattern (violated, worked against it)
-
-**Command per pattern:**
-```bash
-rai pattern reinforce {pattern_id} --vote {1|0|-1} --from {story_id}
-```
-
-**Example batch (RAISE-170 patterns):**
-```bash
-rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170   # Grounding over speed — applied
-rai pattern reinforce PAT-E-153 --vote 1 --from RAISE-170   # JSONL backward compat — applied
-rai pattern reinforce PAT-E-186 --vote 1 --from RAISE-170   # Design not optional — applied
-rai pattern reinforce PAT-E-150 --vote 0 --from RAISE-170   # Drift review — N/A this story
-rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170   # Large renames — N/A this story
-```
-
-**Decision heuristic per pattern:**
-- Did the implementation explicitly use, follow, or validate this pattern? → `1`
-- Was the pattern loaded but this story simply wasn't the relevant context? → `0`
-- Did the implementation go against what the pattern recommends? → `-1`
-
-**Output interpretation:**
-- `wilson≈0.XX` — current confidence score after update
-- `↓ consider reviewing` — Wilson score < 0.15, pattern may need revision
-
-**Note:** Only evaluate patterns you consciously considered during implementation.
-Do NOT force votes. `0` is the right choice for most patterns in any given story.
-
-**Verification:** All loaded behavioral patterns evaluated (or explicitly skipped with reason).
-
-> **If you can't continue:** CLI unavailable → Document evaluations in retrospective manually.
-
-### Step 5: Document Retrospective
-
-Create retrospective document:
-- Feature summary
-- Key learnings
+Create `work/epics/e{N}-{name}/stories/s{N}.{M}-retrospective.md` with:
+- Summary (story ID, dates, estimated vs actual time)
+- What went well / what to improve
+- Heutagogical checkpoint answers
 - Improvements applied
+- Patterns added/reinforced
 
-**Verification:** Retrospective documented.
+<verification>
+Retrospective document created.
+</verification>
 
-### Step 6: Emit Calibration Telemetry
-
-Record the calibration signal for velocity tracking:
-
-```bash
-rai signal emit-calibration {story_id} \
-  --size {XS|S|M|L} \
-  --estimated {minutes} \
-  --actual {minutes}
-```
-
-**Parameters:**
-- `story_id`: Feature ID from the plan (e.g., F9.4)
-- `--size`: T-shirt size from the plan
-- `--estimated`: Total estimated minutes from the plan
-- `--actual`: Total actual minutes from progress log
-
-**Example:**
-```bash
-rai signal emit-calibration F9.4 -s S -e 30 -a 15
-```
-
-**Verification:** Command shows velocity and "Calibration event recorded".
-
-> **If you can't continue:** CLI not available → Skip; telemetry is optional.
-
-### Step 7: Emit Feature Complete (Telemetry)
-
-Record the completion of the entire story lifecycle:
+### Step 5: Emit Calibration Telemetry
 
 ```bash
-rai signal emit-work story {story_id} --event complete --phase review
+rai signal emit-calibration S{N}.{M} --size {XS|S|M|L} --estimated {minutes} --actual {minutes}
 ```
 
-**Example:** `rai signal emit-work story S15.1 -e complete -p review`
+This feeds the velocity tracking system for future estimation accuracy.
 
-**Note:** This marks the feature as fully complete through all phases (design → plan → implement → review).
+<verification>
+Calibration event recorded (or skipped if CLI unavailable).
+</verification>
 
 ## Output
 
-- **Artifact:** `work/epics/e{N}-{name}/stories/f{N}.{M}-{name}/retrospective.md`
-- **Memory:** `.raise/rai/memory/patterns.jsonl` (patterns persisted via CLI)
-- **Telemetry:** `.raise/rai/personal/telemetry/signals.jsonl` (feature_lifecycle: review start/complete, calibration)
-- **Gate:** None
-- **Next:** Next feature or continuous improvement
+| Item | Destination |
+|------|-------------|
+| Retrospective | `work/epics/e{N}-{name}/stories/s{N}.{M}-retrospective.md` |
+| Patterns | `.raise/rai/memory/patterns.jsonl` |
+| Calibration | Via `rai signal emit-calibration` |
+| Next | `/rai-story-close` |
 
-## Retrospective Template
+## Quality Checklist
 
-```markdown
-# Retrospective: {Feature Name}
-
-## Summary
-- **Feature:** {feature-id}
-- **Started:** YYYY-MM-DD
-- **Completed:** YYYY-MM-DD
-- **Estimated:** X hours
-- **Actual:** Y hours
-
-## What Went Well
-- {Positive aspects}
-
-## What Could Improve
-- {Areas for improvement}
-
-## Heutagogical Checkpoint
-
-### What did you learn?
-- {Specific learnings}
-
-### What would you change about the process?
-- {Process improvements}
-
-### Are there improvements for the framework?
-- {Framework enhancements}
-
-### What are you more capable of now?
-- {Capability growth}
-
-## Improvements Applied
-- {List of changes made to framework}
-
-## Action Items
-- [ ] {Future improvements to implement}
-```
-
-## Notes
-
-### Kaizen
-
-This skill implements the Kaizen principle of continuous improvement. Each retrospective should produce at least one concrete improvement.
-
-### Closing the Loop
-
-The retrospective completes the story cycle and feeds learnings back into the framework, enabling organic evolution.
+- [ ] Tests pass before review (gate)
+- [ ] Heutagogical checkpoint answered with specific examples
+- [ ] New patterns persisted via `rai pattern add`
+- [ ] Behavioral patterns reinforced via `rai pattern reinforce`
+- [ ] Calibration telemetry emitted
+- [ ] Retrospective document created
+- [ ] NEVER skip pattern reinforce — scoring system depends on it (RAISE-170)
+- [ ] NEVER give vague checkpoint answers — be specific with concrete examples
 
 ## References
 
-- Heutagogical Checkpoint: `framework/reference/glossary.md`
-- Kaizen: Toyota Production System
-- Previous skill: `/rai-story-implement`
+- Previous: `/rai-story-implement`
+- Next: `/rai-story-close`
+- Pattern scoring: RAISE-170 (temporal decay + Wilson scorer)

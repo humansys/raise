@@ -1232,6 +1232,7 @@ source = { editable = "." }
 dependencies = [
     { name = "atlassian-python-api" },
     { name = "authlib" },
+    { name = "certifi" },
     { name = "cryptography" },
     { name = "logfire-api" },
     { name = "networkx" },
@@ -1239,6 +1240,7 @@ dependencies = [
     { name = "pydantic-settings" },
     { name = "pyyaml" },
     { name = "rai-core" },
+    { name = "requests" },
     { name = "rich" },
     { name = "tree-sitter" },
     { name = "tree-sitter-javascript" },
@@ -1247,6 +1249,7 @@ dependencies = [
     { name = "tree-sitter-svelte" },
     { name = "tree-sitter-typescript" },
     { name = "typer" },
+    { name = "urllib3" },
 ]
 
 [package.optional-dependencies]
@@ -1274,7 +1277,8 @@ requires-dist = [
     { name = "atlassian-python-api", specifier = ">=3.41.0" },
     { name = "authlib", specifier = ">=1.3.0" },
     { name = "bandit", marker = "extra == 'dev'", specifier = ">=1.7.8" },
-    { name = "cryptography", specifier = ">=42.0.0" },
+    { name = "certifi", specifier = ">=2024.7.4" },
+    { name = "cryptography", specifier = ">=46.0.5" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.27.0" },
     { name = "logfire", marker = "extra == 'observability'", specifier = ">=4.0" },
     { name = "logfire-api", specifier = ">=4.0" },
@@ -1288,6 +1292,7 @@ requires-dist = [
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "rai-core", editable = "packages/rai-core" },
     { name = "rai-server", marker = "extra == 'dev'", editable = "packages/rai-server" },
+    { name = "requests", specifier = ">=2.32.4" },
     { name = "rich", specifier = ">=13.7.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.1" },
@@ -1299,6 +1304,7 @@ requires-dist = [
     { name = "tree-sitter-svelte", specifier = ">=1.0.2" },
     { name = "tree-sitter-typescript", specifier = ">=0.23.2" },
     { name = "typer", specifier = ">=0.12.0" },
+    { name = "urllib3", specifier = ">=2.6.3" },
 ]
 provides-extras = ["dev", "mcp", "observability", "csharp"]
 
