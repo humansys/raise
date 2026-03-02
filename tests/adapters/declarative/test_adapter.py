@@ -537,3 +537,22 @@ class TestDocsUnmappedMethod:
 
         with pytest.raises(NotImplementedError, match="get_page"):
             _run(adapter.get_page("42"))
+
+
+# --- Protocol compliance (S337.4 T2) ---
+
+
+class TestProtocolCompliance:
+    def test_satisfies_async_pm_protocol(self) -> None:
+        from rai_cli.adapters.protocols import AsyncProjectManagementAdapter
+
+        bridge = _mock_bridge()
+        adapter = _make_adapter(bridge)
+        assert isinstance(adapter, AsyncProjectManagementAdapter)
+
+    def test_satisfies_async_docs_protocol(self) -> None:
+        from rai_cli.adapters.protocols import AsyncDocumentationTarget
+
+        bridge = _mock_bridge()
+        adapter = _make_docs_adapter(bridge)
+        assert isinstance(adapter, AsyncDocumentationTarget)
