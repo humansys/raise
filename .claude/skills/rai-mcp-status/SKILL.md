@@ -97,10 +97,10 @@ Read the governance catalog at `.raise/mcp/catalog.yaml`. If catalog is missing,
 3. Map extensions to languages using scanner's `EXTENSION_TO_LANGUAGE`
 
 **Filter recommendations:**
-1. For each catalog server, check `recommended_for`:
-   - `all` → always recommend
-   - List of languages → recommend if any detected language matches
-   - Empty list `[]` → never recommend (opt-in only)
+1. For each catalog server, check `recommended_for` (note: value is either the string `all` or a list):
+   - String `all` → always recommend regardless of detected languages
+   - List of languages (e.g. `[python, typescript]`) → recommend if any detected language matches
+   - Empty list `[]` → never recommend (opt-in only, must use `/rai-mcp-add` explicitly)
 2. Exclude servers already registered in `.raise/mcp/`
 3. If no recommendations remain: skip section silently
 
