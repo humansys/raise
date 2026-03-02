@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 from rai_cli.adapters.models import IssueRef, IssueSummary
 from rai_cli.cli.main import app
 from rai_cli.hooks.builtin.backlog import BacklogHook
-from rai_cli.hooks.events import HookResult, WorkLifecycleEvent
+from rai_cli.hooks.events import WorkLifecycleEvent
 
 runner = CliRunner()
 
@@ -52,10 +52,12 @@ class TestEmitWorkBridge:
     def test_emit_work_fires_hook_event(self) -> None:
         """emit-work CLI command dispatches WorkLifecycleEvent after telemetry write."""
         mock_emitter = MagicMock()
-        with patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter):
-            with patch("rai_cli.telemetry.writer.emit") as mock_emit:
-                mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
-                result = runner.invoke(app, ["signal", "emit-work", "story", "S325.4", "--event", "start", "--phase", "design"])
+        with (
+            patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.telemetry.writer.emit") as mock_emit,
+        ):
+            mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
+            result = runner.invoke(app, ["signal", "emit-work", "story", "S325.4", "--event", "start", "--phase", "design"])
 
         assert result.exit_code == 0
         # Verify hook event was fired
@@ -70,10 +72,12 @@ class TestEmitWorkBridge:
     def test_emit_work_fires_for_epic(self) -> None:
         """emit-work fires WorkLifecycleEvent for epic work type."""
         mock_emitter = MagicMock()
-        with patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter):
-            with patch("rai_cli.telemetry.writer.emit") as mock_emit:
-                mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
-                result = runner.invoke(app, ["signal", "emit-work", "epic", "E325", "--event", "complete", "--phase", "close"])
+        with (
+            patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.telemetry.writer.emit") as mock_emit,
+        ):
+            mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
+            result = runner.invoke(app, ["signal", "emit-work", "epic", "E325", "--event", "complete", "--phase", "close"])
 
         assert result.exit_code == 0
         fired_event = mock_emitter.emit.call_args[0][0]
@@ -85,10 +89,12 @@ class TestEmitWorkBridge:
         """If hook emit raises, CLI still succeeds (telemetry was written)."""
         mock_emitter = MagicMock()
         mock_emitter.emit.side_effect = RuntimeError("hook system exploded")
-        with patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter):
-            with patch("rai_cli.telemetry.writer.emit") as mock_emit:
-                mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
-                result = runner.invoke(app, ["signal", "emit-work", "story", "S1", "--event", "start"])
+        with (
+            patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
+            patch("rai_cli.telemetry.writer.emit") as mock_emit,
+        ):
+            mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
+            result = runner.invoke(app, ["signal", "emit-work", "story", "S1", "--event", "start"])
 
         # CLI should still succeed — hook failure is non-fatal
         assert result.exit_code == 0
@@ -284,3 +290,56 @@ class TestBacklogHookGracefulDegradation:
 
         assert result.status == "error"
         adapter.transition_issue.assert_not_called()
+
+
+class TestBacklogHookDiscovery:
+    """Tests for entry point discovery."""
+
+    def test_backlog_hook_discovered_via_registry(self) -> None:
+        """BacklogHook is found by HookRegistry.discover()."""
+        from rai_cli.hooks.registry import HookRegistry
+
+        registry = HookRegistry()
+        registry.discover()
+        hook_types = [type(h).__name__ for h in registry.hooks]
+        assert "BacklogHook" in hook_types
+
+    def test_backlog_hook_subscribes_to_work_lifecycle(self) -> None:
+        """BacklogHook subscribes to work:lifecycle event."""
+        from rai_cli.hooks.registry import HookRegistry
+
+        registry = HookRegistry()
+        registry.discover()
+        handlers = registry.get_hooks_for_event("work:lifecycle")
+        handler_types = [type(h).__name__ for h in handlers]
+        assert "BacklogHook" in handler_types
+
+
+class TestBacklogHookEndToEnd:
+    """End-to-end: emit-work → hook system → adapter calls."""
+
+    def test_emit_work_start_triggers_create_and_transition(self, tmp_path: Path) -> None:
+        """Full flow: emit-work story start → BacklogHook → create + transition."""
+        root = _jira_yaml(tmp_path)
+        adapter = MagicMock()
+        adapter.search.return_value = []
+        adapter.create_issue.return_value = IssueRef(key="RAISE-99")
+        adapter.transition_issue.return_value = IssueRef(key="RAISE-99")
+
+        # Patch BacklogHook to use our test root and mock adapter
+        with (
+            patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter),
+            patch.object(BacklogHook, "__init__", lambda self, **kw: setattr(self, "_project_root", root)),
+            patch("rai_cli.telemetry.writer.emit") as mock_telemetry,
+        ):
+            mock_telemetry.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
+            result = runner.invoke(app, [
+                "signal", "emit-work", "story", "S99.1",
+                "--event", "start", "--phase", "design",
+            ])
+
+        assert result.exit_code == 0
+        # Adapter was called by BacklogHook via hook system
+        adapter.search.assert_called_once()
+        adapter.create_issue.assert_called_once()
+        adapter.transition_issue.assert_called_once_with("RAISE-99", "in-progress")
