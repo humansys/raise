@@ -6,6 +6,7 @@ Replaces test_adapter_resolve.py after _adapter_resolve.py → _resolve.py refac
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -287,3 +288,103 @@ class TestResolveDocsTarget:
         target = resolve_docs_target(None)
         assert isinstance(target, _StubDocs)
         assert not isinstance(target, SyncDocsAdapter)
+
+
+# --- YAML + entry point mixed tests (S337.3) ---
+
+_DISCOVER_MOD = "rai_cli.adapters.declarative.discovery"
+
+
+class TestResolveAdapterWithYaml:
+    """resolve_adapter() — YAML adapter discovery merged with entry points."""
+
+    def test_yaml_only_auto_selects(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """YAML adapter auto-selected when no entry points registered."""
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"yaml-stub": _StubPM} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+    def test_yaml_selected_by_name(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """YAML adapter selected by explicit --adapter flag."""
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"github": _StubPM} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter("github")
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+    def test_entrypoint_wins_on_collision(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Entry point takes priority over YAML when names collide."""
+
+        class _EpStub(_StubPM):
+            """Entry point stub — distinguishable from YAML stub."""
+
+        class _YamlStub(_StubPM):
+            """YAML stub — should lose on collision."""
+
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _EpStub})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"jira": _YamlStub} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter("jira")
+        assert isinstance(adapter, _EpStub)
+
+    def test_mixed_yaml_and_ep_no_collision(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Both YAML and EP adapters available, no name collision."""
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _StubPM})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"github": _StubPM} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        # Multiple adapters without flag → error listing both
+        with pytest.raises(SystemExit):
+            resolve_adapter(None)
+
+        # With flag → selects the named one
+        adapter = resolve_adapter("github")
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+
+class TestResolveAdapterE2E:
+    """End-to-end: YAML file on disk → resolve_adapter → working adapter."""
+
+    def test_yaml_file_to_adapter_instance(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Full path: YAML config file → discover → resolve → instantiate."""
+        import shutil
+
+        fixtures = Path(__file__).parents[1] / "adapters" / "declarative" / "fixtures"
+        adapters_dir = tmp_path / ".raise" / "adapters"
+        adapters_dir.mkdir(parents=True)
+        shutil.copy(fixtures / "minimal.yaml", adapters_dir / "minimal.yaml")
+
+        # Patch EP to empty so only YAML is found
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        # Patch discover to use our tmp dir
+        from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: discover_yaml_adapters(protocol, adapters_dir=adapters_dir),
+        )
+
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        # Should be wrapped in SyncPMAdapter since DeclarativeMcpAdapter is async
+        assert isinstance(adapter, SyncPMAdapter)
