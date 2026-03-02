@@ -18,6 +18,12 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.1.0"
   raise.visibility: public
+  raise.inputs: |
+    - brief: file_path, optional, previous_skill
+    - scope: file_path, required, previous_skill
+  raise.outputs: |
+    - scope: file_path, next_skill
+    - design: file_path, optional, next_skill
 ---
 
 # Epic Design

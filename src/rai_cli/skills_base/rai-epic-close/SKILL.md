@@ -10,13 +10,20 @@ license: MIT
 metadata:
   raise.work_cycle: epic
   raise.frequency: per-epic
-  raise.fase: "epic-close"
+  raise.fase: "9"
   raise.prerequisites: all stories complete
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - scope: file_path, required, previous_skill
+    - all_retrospectives: boolean, required, git
+    - dev_branch: string, required, config
+  raise.outputs: |
+    - retrospective: file_path, file
+    - merge_commit: string, git
 ---
 
 # Epic Close
