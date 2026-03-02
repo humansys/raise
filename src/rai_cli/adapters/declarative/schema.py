@@ -4,7 +4,7 @@ Validates the YAML structure used by DeclarativeMcpAdapter.
 No ``model`` field in ResponseMapping — the adapter infers
 the return type from the protocol method name (AR-R1).
 
-Architecture: ADR-041, E337
+Architecture: ADR-041, E337, E338 (AR-C2: shared ServerConnection)
 """
 
 from __future__ import annotations
@@ -12,6 +12,8 @@ from __future__ import annotations
 from typing import Literal
 
 from pydantic import BaseModel, Field
+
+from rai_cli.mcp.schema import ServerConnection
 
 
 class AdapterMeta(BaseModel):
@@ -23,19 +25,6 @@ class AdapterMeta(BaseModel):
     )
     description: str | None = Field(
         default=None, description="Human-readable description"
-    )
-
-
-class ServerConfig(BaseModel):
-    """MCP server connection configuration."""
-
-    command: str = Field(..., description="Server command (e.g. 'uvx', 'npx')")
-    args: list[str] = Field(
-        default_factory=list, description="Server command arguments"
-    )
-    env: list[str] | None = Field(
-        default=None,
-        description="Env var names to pass to server subprocess (AR-R2)",
     )
 
 
@@ -74,7 +63,7 @@ class DeclarativeAdapterConfig(BaseModel):
     """
 
     adapter: AdapterMeta
-    server: ServerConfig
+    server: ServerConnection
     methods: dict[str, MethodMapping | None] = Field(
         default_factory=dict,
         description="Protocol method → MCP tool mapping. None = unsupported.",

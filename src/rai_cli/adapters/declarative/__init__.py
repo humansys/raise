@@ -12,8 +12,8 @@ from rai_cli.adapters.declarative.schema import (
     DeclarativeAdapterConfig,
     MethodMapping,
     ResponseMapping,
-    ServerConfig,
 )
+from rai_cli.mcp.schema import ServerConnection
 
 __all__ = [
     "AdapterMeta",
@@ -22,5 +22,5 @@ __all__ = [
     "ExpressionEvaluator",
     "MethodMapping",
     "ResponseMapping",
-    "ServerConfig",
+    "ServerConnection",
 ]
