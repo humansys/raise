@@ -1,227 +1,133 @@
 ---
-name: rai-welcome
-description: >
-  Conversational developer onboarding for RaiSE. Detects scenario,
-  sets up profile and graph, offers optional personalization.
+description: 'Conversational developer onboarding for RaiSE. Detects scenario, sets
+  up profile and graph, offers optional personalization.
 
+  '
 license: MIT
-
 metadata:
-  raise.work_cycle: utility
+  raise.adaptable: 'true'
+  raise.fase: setup
   raise.frequency: once-per-developer
-  raise.fase: "setup"
-  raise.prerequisites: ""
-  raise.next: "rai-session-start"
-  raise.gate: ""
-  raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.gate: ''
+  raise.next: rai-session-start
+  raise.prerequisites: ''
+  raise.version: 2.0.0
   raise.visibility: public
+  raise.work_cycle: utility
+name: rai-welcome
 ---
 
-# Welcome — Developer Onboarding
+# Welcome
 
 ## Purpose
 
-Get a developer fully set up in a RaiSE project through a guided flow that detects their situation and only asks what's needed. Replaces the manual checklist with a single skill invocation.
+Get a developer fully set up in a RaiSE project through a guided flow that detects their situation and only asks what's needed.
 
-**Design principle:** Works immediately with sensible defaults. Personalization is optional.
+## Mastery Levels (ShuHaRi)
+
+- **Shu**: Follow all steps, explain what each governance doc is for
+- **Ha**: Detect scenario and fast-path through known setups
+- **Ri**: One-shot setup with minimal questions
+
+## Context
+
+**When to use:** First time a developer works in a RaiSE project. Subsequent runs verify setup.
+
+**When to skip:** Developer is already set up (profile exists, graph exists, CLAUDE.local.md exists).
+
+**Inputs:** A project with `.raise/` directory (from `rai init`).
 
 ## Steps
 
 ### Step 1: Detect Scenario
 
-Check two things to determine the onboarding scenario:
-
 ```bash
-# Check for developer profile
 ls ~/.rai/developer.yaml 2>/dev/null && echo "PROFILE_EXISTS" || echo "NO_PROFILE"
-
-# Check for RaiSE project
 ls .raise/ 2>/dev/null && echo "RAISE_EXISTS" || echo "NO_RAISE"
 ```
 
-**Scenario matrix:**
+| Profile? | `.raise/`? | Action |
+|----------|------------|--------|
+| No | Yes | Full setup (Steps 2-5) |
+| Yes | Yes | Verify only (Step 4) |
+| Any | No | Stop: "Run `rai init` first, then `/rai-welcome` again." |
 
-| Profile? | `.raise/`? | Scenario | Action |
-|----------|------------|----------|--------|
-| No | Yes | **New dev, RaiSE repo** | Full setup (Step 2-6) |
-| Yes | No | **RaiSE dev, new repo** | Guard rail (Step 1b) |
-| Yes | Yes | **RaiSE dev, RaiSE repo** | Verify only (Step 5) |
-| No | No | **Brand new** | Guard rail (Step 1b) |
+<verification>
+Scenario detected. `.raise/` exists.
+</verification>
 
-### Step 1b: Guard Rail — No `.raise/` Directory
+### Step 2: Create Profile (if needed)
 
-If `.raise/` doesn't exist, this project hasn't been initialized with RaiSE yet.
-
-**Tell the user:**
-> This project isn't set up with RaiSE yet. Run `rai init` first to initialize the project structure, then run `/rai-welcome` again.
-
-**Stop here.** Do not proceed with profile creation — it needs a project context.
-
-### Step 2: Ask Name (If No Profile)
-
-**Only if `~/.rai/developer.yaml` does not exist.**
-
-Use AskUserQuestion to ask:
-- **Question:** "What's your name?"
-- This is the only mandatory question.
-
-Then derive the pattern prefix (first letter of name, uppercased) and confirm:
-
-Use AskUserQuestion:
-- **Question:** "Your pattern prefix will be '{X}' (used for pattern IDs like PAT-{X}-001). Good?"
-- **Options:** "Yes, use '{X}'" / "Choose different letter"
-
-If they choose different, ask which letter they prefer.
-
-### Step 3: Create Profile
-
-Run the CLI to create the developer profile:
+Ask developer's name (only mandatory question). Derive pattern prefix (first letter, uppercased), confirm.
 
 ```bash
 rai session start --name "{name}" --project "$(pwd)"
 ```
 
-Then set the pattern prefix by editing `~/.rai/developer.yaml`:
-- Read the file
-- Add or update the `pattern_prefix` field with the confirmed letter
-- Write the file back
+Edit `~/.rai/developer.yaml` to add confirmed `pattern_prefix`.
 
-**Verify:** Read `~/.rai/developer.yaml` and confirm `name` and `pattern_prefix` are set.
+<verification>
+`~/.rai/developer.yaml` exists with name and pattern_prefix.
+</verification>
 
-### Step 4: Build Graph (If Missing)
+### Step 3: Optional Personalization
 
-Check if the knowledge graph exists:
+Frame as skippable: "Want to customize? Or skip — defaults work well."
 
-```bash
-ls .raise/rai/memory/index.json 2>/dev/null && echo "GRAPH_EXISTS" || echo "NO_GRAPH"
-```
+If customize, ask up to 3 questions:
+1. **Language:** English / Spanish / Other → `communication.language`
+2. **Style:** Detailed / Balanced / Direct → `communication.style`
+3. **Focus guidance:** Yes / No → `communication.redirect_when_dispersing`
 
-If missing, build it:
+Defaults: `shu`, `balanced`, `en`, `detailed_explanations: true`, `redirect_when_dispersing: false`.
 
-```bash
-rai graph build
-```
+<verification>
+Preferences saved or defaults accepted.
+</verification>
 
-**Verify:** `.raise/rai/memory/index.json` exists after build.
+### Step 4: Verify Setup
 
-### Step 4b: Scaffold CLAUDE.local.md (If Missing)
-
-If `CLAUDE.local.md` doesn't exist in the project root, create it with minimal content:
-
-```markdown
-# RaiSE Project — {project_directory_name}
-Run `/rai-session-start` for context.
-```
-
-**DO NOT** overwrite an existing `CLAUDE.local.md`.
-
-### Step 5: Verify Setup
-
-Run the context bundle to confirm everything works:
+Build graph if missing (`rai graph build`). Scaffold `CLAUDE.local.md` if missing. Run context bundle:
 
 ```bash
 rai session start --project "$(pwd)" --context
 ```
 
-**Check the output for:**
-- Developer name appears
-- Session count is shown
-- No errors about missing graph or profile
+Check: developer name appears, session count shown, no errors.
 
-If this is the **"RaiSE dev, RaiSE repo"** scenario (both profile and `.raise/` exist), also check:
-- `pattern_prefix` is set in `~/.rai/developer.yaml` (if missing, ask and set it)
-- Graph exists (rebuild if missing)
-- `CLAUDE.local.md` exists (scaffold if missing)
+<verification>
+Profile, graph, and local config all present and functional.
+</verification>
 
-**Present results:**
-> Setup verified:
-> - Profile: {name}, prefix {X}
-> - Graph: {N} concepts loaded
-> - Local config: CLAUDE.local.md {present/created}
-
-### Step 6: Optional Personalization
-
-**IMPORTANT:** This step is entirely optional. Frame it clearly as skippable.
-
-Use AskUserQuestion:
-- **Question:** "Want to customize how Rai works with you? (language, communication style) Or skip — defaults work well and you can change later."
-- **Options:** "Customize" / "Skip, use defaults"
-
-**If Skip:** Go directly to Step 7.
-
-**If Customize:** Ask up to 3 preference questions using AskUserQuestion:
-
-**Question 1 — Language:**
-- "Preferred language for Rai's responses?"
-- Options: "English" / "Spanish" / "Other"
-- Maps to: `communication.language` in `~/.rai/developer.yaml`
-
-**Question 2 — Communication style:**
-- "How should Rai communicate?"
-- Options:
-  - "Detailed — explain concepts, show reasoning" → `style: explanatory`, `detailed_explanations: true`
-  - "Balanced — explain new things, be efficient on known" → `style: balanced`, `detailed_explanations: true`
-  - "Direct — minimal explanation, maximum efficiency" → `style: direct`, `detailed_explanations: false`
-
-**Question 3 — Focus guidance:**
-- "Can Rai redirect you if you drift off-topic during work?"
-- Options: "Yes, keep me focused" / "No, let me explore"
-- Maps to: `communication.redirect_when_dispersing` (true/false)
-
-After collecting answers, update `~/.rai/developer.yaml` with the preferences:
-- Read the current file
-- Update the `communication` section with chosen values
-- Write back
-
-**DO NOT ask about:**
-- Experience level or skill categorization
-- "Are you a beginner/intermediate/expert?"
-- Lean/TDD familiarity
-- AI-assisted development comfort level
-
-These are learned implicitly through the coaching context over working sessions.
-
-### Step 7: Welcome Message
-
-Present the completion summary:
+### Step 5: Welcome Message
 
 ```
 Welcome to RaiSE, {name}!
-
-Setup complete:
-- Profile: ~/.rai/developer.yaml (prefix {X})
-- Graph: .raise/rai/memory/index.json ({N} concepts)
-- Local config: CLAUDE.local.md
-
-Next steps:
-- Run /rai-session-start to begin your first working session
-- To change preferences later: edit ~/.rai/developer.yaml
-- To learn about the workflow: check governance/architecture/
+Setup: Profile ({prefix}), Graph ({N} concepts), CLAUDE.local.md
+Next: /rai-session-start
 ```
 
-## Sensible Defaults
+## Output
 
-When no personalization is chosen, these defaults apply:
+| Item | Destination |
+|------|-------------|
+| Developer profile | `~/.rai/developer.yaml` |
+| Knowledge graph | `.raise/rai/memory/index.json` |
+| Local config | `CLAUDE.local.md` |
+| Next | `/rai-session-start` |
 
-| Field | Default | Why |
-|-------|---------|-----|
-| `experience_level` | `shu` | More guidance is safer than less for new setup |
-| `communication.style` | `balanced` | Middle ground |
-| `communication.language` | `en` | Most common |
-| `communication.skip_praise` | `false` | Default expectation |
-| `communication.detailed_explanations` | `true` | Better to over-explain initially |
-| `communication.redirect_when_dispersing` | `false` | Permission must be granted |
+## Quality Checklist
 
-## Notes
-
-- **One-time skill:** Run once per developer per machine. Subsequent runs verify setup.
-- **No `rai init`:** Project initialization is a separate concern. This skill assumes `.raise/` exists or tells you to create it.
-- **Implicit learning:** The coaching context in `developer.yaml` learns from `/rai-session-close` reflections over time. No need to self-categorize upfront.
-- **File-based personalization:** Consistent with industry pattern (Cursor, Aider, Claude Code, Copilot all use config files, not wizards).
+- [ ] Scenario detected before asking any questions
+- [ ] Name is the only mandatory question
+- [ ] Personalization clearly framed as optional
+- [ ] Graph built if missing (not assumed)
+- [ ] Context bundle runs successfully after setup
+- [ ] NEVER overwrite existing CLAUDE.local.md
+- [ ] NEVER ask about experience level — learned implicitly through coaching
 
 ## References
 
 - Profile model: `src/rai_cli/onboarding/profile.py`
-- Session start: `.claude/skills/rai-session-start/SKILL.md`
-- Fer's checklist (replaced): `work/stories/S-MULTIDEV/fer-first-pull.md`
+- Next: `/rai-session-start`
+- One-time skill: subsequent runs verify, not recreate

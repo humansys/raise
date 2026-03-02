@@ -1,21 +1,22 @@
 ---
-description: 'Systematic root cause analysis using lean methods (5 Whys, Ishikawa,
-  Gemba). Use when encountering unexpected behavior, errors, or defects to find and
+name: rai-debug
+description: >
+  Systematic root cause analysis using lean methods (5 Whys, Ishikawa, Gemba).
+  Use when encountering unexpected behavior, errors, or defects to find and
   fix the true root cause rather than symptoms.
 
-  '
 license: MIT
+
 metadata:
-  raise.adaptable: 'true'
-  raise.fase: '0'
-  raise.frequency: as-needed
-  raise.gate: ''
-  raise.next: story-plan
-  raise.prerequisites: ''
-  raise.version: 2.1.0
-  raise.visibility: public
   raise.work_cycle: utility
-name: rai-debug
+  raise.frequency: as-needed
+  raise.fase: "0"
+  raise.prerequisites: ""
+  raise.next: story-plan
+  raise.gate: ""
+  raise.adaptable: "true"
+  raise.version: "2.1.0"
+  raise.visibility: public
 ---
 
 # Debug
