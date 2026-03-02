@@ -110,6 +110,39 @@ class TestMcpCallSuccess:
         mock_bridge.call.assert_called_once_with("ping", {})
 
 
+class TestMcpCallToolError:
+    """Tool returns is_error=True → exit 0 + JSON with is_error flag."""
+
+    def test_tool_error_in_result(self) -> None:
+        mock_result = McpToolResult(
+            text="",
+            data={},
+            is_error=True,
+            error_message="Library not found",
+        )
+        mock_bridge = AsyncMock()
+        mock_bridge.call.return_value = mock_result
+        mock_bridge.aclose.return_value = None
+
+        with (
+            patch(
+                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                return_value={"test-server": _FAKE_SERVER},
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.McpBridge",
+                return_value=mock_bridge,
+            ),
+        ):
+            result = runner.invoke(
+                app, ["mcp", "call", "test-server", "query-docs", "--args", "{}"]
+            )
+        assert result.exit_code == 0
+        output = json.loads(result.output)
+        assert output["is_error"] is True
+        assert output["error_message"] == "Library not found"
+
+
 class TestMcpCallBridgeError:
     """Bridge error → exit 1 + error message."""
 
