@@ -514,7 +514,7 @@ class TestDocsSearch:
         )
         adapter = _make_docs_adapter(bridge)
 
-        result = _run(adapter.docs_search("design", limit=10))
+        result = _run(adapter.search("design", limit=10))
         assert len(result) == 2
         assert isinstance(result[0], PageSummary)
         assert result[0].id == "1"
@@ -524,7 +524,7 @@ class TestDocsSearch:
         bridge = _mock_bridge(wiki_search={"data": {"results": []}})
         adapter = _make_docs_adapter(bridge)
 
-        result = _run(adapter.docs_search("nothing", limit=5))
+        result = _run(adapter.search("nothing", limit=5))
         assert result == []
 
 
