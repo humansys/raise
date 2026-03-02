@@ -6,6 +6,15 @@
 
 ---
 
+## E337 Deferred Items — 2026-03-01
+
+- [ ] **Level 3: Auto-discovery + BM25 tool search** — connect to MCP server, introspect tools, auto-generate YAML scaffold. Promote when 3+ YAML adapters exist and patterns stabilize.
+- [ ] **Jinja2 migration** — if expression evaluator hits ceiling (>6 filters), consider Jinja2. Current 4 filters cover all known cases.
+- [ ] **MCP server installation management** — `rai adapter install github` to auto-install uvx/npx packages. Orthogonal to adapter framework.
+- [ ] **Adapter scaffolding CLI** — `rai adapter scaffold <mcp-server>` to generate YAML from server's tool list. Depends on Level 3 discovery.
+
+---
+
 ## ~~Cross-Worktree Message from E325 — 2026-03-01~~ RESOLVED
 
 > **From:** Rai (e325 worktree, SES-305)
