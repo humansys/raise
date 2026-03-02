@@ -1,7 +1,7 @@
-"""Tests for DeclarativeMcpAdapter (PM protocol).
+"""Tests for DeclarativeMcpAdapter (PM + Docs protocols).
 
 Mocks at McpBridge.call() level. Uses asyncio.run() (no pytest-asyncio).
-AC refs: s337.2-story.md scenarios 1-7.
+AC refs: s337.2-story.md scenarios 1-7, s337.4-story.md scenarios 1-5.
 """
 
 from __future__ import annotations
@@ -20,6 +20,9 @@ from rai_cli.adapters.models import (
     AdapterHealth,
     IssueRef,
     IssueSpec,
+    PageContent,
+    PageSummary,
+    PublishResult,
 )
 
 VALID_YAML = """\
@@ -366,3 +369,171 @@ class TestComments:
         assert len(result) == 2
         assert result[0].body == "Hello"
         assert result[0].author == "alice"
+
+
+# --- Docs protocol tests (S337.4) ---
+
+DOCS_YAML = """\
+adapter:
+  name: test-wiki
+  protocol: docs
+  description: "Test docs adapter"
+
+server:
+  command: echo
+  args: [test]
+
+methods:
+  can_publish:
+    tool: wiki_can_publish
+    args:
+      doc_type: "{{ doc_type }}"
+    response:
+      fields:
+        result: "{{ data.allowed }}"
+
+  publish:
+    tool: wiki_publish
+    args:
+      doc_type: "{{ doc_type }}"
+      content: "{{ content }}"
+      title: "{{ metadata.title | default('Untitled') }}"
+    response:
+      fields:
+        success: "{{ data.ok }}"
+        url: "{{ data.url | default('') }}"
+        message: "{{ data.message | default('') }}"
+
+  get_page:
+    tool: wiki_get_page
+    args:
+      page_id: "{{ identifier }}"
+    response:
+      fields:
+        id: "{{ data.id | str }}"
+        title: "{{ data.title }}"
+        content: "{{ data.body }}"
+        url: "{{ data.url | default('') }}"
+
+  search:
+    tool: wiki_search
+    args:
+      query: "{{ query }}"
+      limit: "{{ limit }}"
+    response:
+      items_path: data.results
+      fields:
+        id: "{{ item.id | str }}"
+        title: "{{ item.title }}"
+        url: "{{ item.url | default('') }}"
+
+  get_page_children: null
+"""
+
+
+def _make_docs_adapter(mock_bridge: AsyncMock) -> DeclarativeMcpAdapter:
+    """Create docs adapter from YAML config with injected mock bridge."""
+    data = yaml.safe_load(DOCS_YAML)
+    config = DeclarativeAdapterConfig(**data)
+    adapter = DeclarativeMcpAdapter(config)
+    adapter._bridge = mock_bridge  # type: ignore[assignment]
+    return adapter
+
+
+class TestCanPublish:
+    def test_returns_true(self) -> None:
+        bridge = _mock_bridge(wiki_can_publish={"allowed": True})
+        adapter = _make_docs_adapter(bridge)
+
+        result = _run(adapter.can_publish("page", {"title": "Test"}))
+        assert result is True
+        bridge.call.assert_called_once_with(
+            "wiki_can_publish", {"doc_type": "page"},
+        )
+
+    def test_returns_false(self) -> None:
+        bridge = _mock_bridge(wiki_can_publish={"allowed": False})
+        adapter = _make_docs_adapter(bridge)
+
+        result = _run(adapter.can_publish("restricted", {}))
+        assert result is False
+
+
+class TestPublish:
+    def test_returns_publish_result(self) -> None:
+        bridge = _mock_bridge(
+            wiki_publish={"ok": True, "url": "https://wiki.example.com/page/1", "message": "Created"}
+        )
+        adapter = _make_docs_adapter(bridge)
+
+        result = _run(adapter.publish("page", "# Hello", {"title": "My Page"}))
+        assert isinstance(result, PublishResult)
+        assert result.success is True
+        assert result.url == "https://wiki.example.com/page/1"
+        bridge.call.assert_called_once_with(
+            "wiki_publish",
+            {"doc_type": "page", "content": "# Hello", "title": "My Page"},
+        )
+
+    def test_default_fields(self) -> None:
+        bridge = _mock_bridge(wiki_publish={"ok": False})
+        adapter = _make_docs_adapter(bridge)
+
+        result = _run(adapter.publish("page", "content", {}))
+        assert result.success is False
+        assert result.url == ""
+
+
+class TestGetPage:
+    def test_returns_page_content(self) -> None:
+        bridge = _mock_bridge(
+            wiki_get_page={
+                "id": 42, "title": "Design Doc",
+                "body": "# Design", "url": "https://wiki.example.com/42",
+            }
+        )
+        adapter = _make_docs_adapter(bridge)
+
+        result = _run(adapter.get_page("42"))
+        assert isinstance(result, PageContent)
+        assert result.id == "42"
+        assert result.title == "Design Doc"
+        assert result.content == "# Design"
+        assert result.url == "https://wiki.example.com/42"
+
+
+class TestDocsSearch:
+    def test_returns_page_summaries(self) -> None:
+        bridge = _mock_bridge(
+            wiki_search={
+                "data": {"results": [
+                    {"id": 1, "title": "Page A", "url": "https://wiki/1"},
+                    {"id": 2, "title": "Page B", "url": "https://wiki/2"},
+                ]}
+            }
+        )
+        adapter = _make_docs_adapter(bridge)
+
+        result = _run(adapter.docs_search("design", limit=10))
+        assert len(result) == 2
+        assert isinstance(result[0], PageSummary)
+        assert result[0].id == "1"
+        assert result[0].title == "Page A"
+
+    def test_empty_results(self) -> None:
+        bridge = _mock_bridge(wiki_search={"data": {"results": []}})
+        adapter = _make_docs_adapter(bridge)
+
+        result = _run(adapter.docs_search("nothing", limit=5))
+        assert result == []
+
+
+class TestDocsUnmappedMethod:
+    def test_unmapped_docs_method_raises(self) -> None:
+        data = yaml.safe_load(DOCS_YAML)
+        data["methods"] = {}
+        config = DeclarativeAdapterConfig(**data)
+        adapter = DeclarativeMcpAdapter(config)
+
+        with pytest.raises(NotImplementedError, match="get_page"):
+            _run(adapter.get_page("42"))

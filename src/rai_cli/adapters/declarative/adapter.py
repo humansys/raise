@@ -1,8 +1,9 @@
 """Generic declarative MCP adapter driven by YAML config.
 
-Implements ``AsyncProjectManagementAdapter`` by dispatching each protocol
-method to the MCP tool specified in the YAML config. Expression templates
-in args are evaluated against a context dict built from method parameters.
+Implements ``AsyncProjectManagementAdapter`` and ``AsyncDocumentationTarget``
+by dispatching each protocol method to the MCP tool specified in the YAML
+config. Expression templates in args are evaluated against a context dict
+built from method parameters. One class serves both protocols (AR-Q1).
 
 Architecture: ADR-041, E337, AR-C1/C2/R1/Q1
 """
@@ -26,16 +27,20 @@ from rai_cli.adapters.models import (
     IssueRef,
     IssueSpec,
     IssueSummary,
+    PageContent,
+    PageSummary,
+    PublishResult,
 )
 
 logger = logging.getLogger(__name__)
 
 
 class DeclarativeMcpAdapter:
-    """Async PM adapter driven by YAML config.
+    """Async adapter driven by YAML config — serves PM or Docs protocol.
 
-    Implements ``AsyncProjectManagementAdapter`` protocol via structural typing.
-    Each protocol method dispatches to the MCP tool declared in config.methods.
+    Implements ``AsyncProjectManagementAdapter`` and ``AsyncDocumentationTarget``
+    via structural typing. Each protocol method dispatches to the MCP tool
+    declared in config.methods. One class, both protocols (AR-Q1).
 
     Args:
         config: Parsed YAML adapter configuration.
@@ -204,6 +209,43 @@ class DeclarativeMcpAdapter:
         result = await self._dispatch("search", ctx)
         items = self._parse_list("search", result)
         return [IssueSummary(**item) for item in items]
+
+    # ----- Docs: Documentation Target (AR-Q1) -----
+
+    async def can_publish(
+        self, doc_type: str, metadata: dict[str, Any]
+    ) -> bool:
+        ctx = {"doc_type": doc_type, "metadata": metadata}
+        result = await self._dispatch("can_publish", ctx)
+        fields = self._parse_single("can_publish", result, ctx)
+        return bool(fields.get("result", False))
+
+    async def publish(
+        self, doc_type: str, content: str, metadata: dict[str, Any]
+    ) -> PublishResult:
+        ctx = {"doc_type": doc_type, "content": content, "metadata": metadata}
+        result = await self._dispatch("publish", ctx)
+        fields = self._parse_single("publish", result, ctx)
+        return PublishResult(**fields)
+
+    async def get_page(self, identifier: str) -> PageContent:
+        ctx = {"identifier": identifier}
+        result = await self._dispatch("get_page", ctx)
+        fields = self._parse_single("get_page", result, ctx)
+        return PageContent(**fields)
+
+    async def docs_search(
+        self, query: str, limit: int = 10
+    ) -> list[PageSummary]:
+        """Docs-specific search returning PageSummary list.
+
+        Uses the same 'search' key in YAML methods config. Separate method
+        name avoids return-type conflict with PM search.
+        """
+        ctx = {"query": query, "limit": limit}
+        result = await self._dispatch("search", ctx)
+        items = self._parse_list("search", result)
+        return [PageSummary(**item) for item in items]
 
     # ----- Lifecycle -----
 
