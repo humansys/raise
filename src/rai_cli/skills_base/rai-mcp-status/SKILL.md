@@ -1,0 +1,106 @@
+---
+name: rai-mcp-status
+description: >
+  Health overview of all registered MCP servers. Lists servers,
+  runs health checks, and presents a summary table.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: utility
+  raise.frequency: on-demand
+  raise.fase: ""
+  raise.prerequisites: ""
+  raise.next: ""
+  raise.gate: ""
+  raise.adaptable: "true"
+  raise.version: "1.0.0"
+  raise.visibility: public
+  raise.inputs: |
+    - server_name: string, optional, argument (check single server)
+  raise.outputs: |
+    - status_report: text (markdown table)
+---
+
+# MCP Status
+
+## Purpose
+
+Show the health and availability of all registered MCP servers in one view.
+
+## Mastery Levels (ShuHaRi)
+
+- **Shu**: Explain each server's status and what it means
+- **Ha**: Show summary table, explain only issues
+- **Ri**: Table only, no explanation unless problems found
+
+## Context
+
+**When to use:** Developer wants to check if their MCP servers are working.
+
+**When to skip:** Checking a single server — use `rai mcp health <name>` directly.
+
+## Steps
+
+### Step 1: Discover Servers
+
+Run `rai mcp list` to get all registered servers.
+
+If no servers registered: "No MCP servers registered. Use `/rai-mcp-add` to add one."
+
+<verification>
+Server list retrieved (or empty state handled).
+</verification>
+
+### Step 2: Health Check Each Server
+
+For each registered server, run `rai mcp health <name>`.
+
+Collect: status (healthy/unhealthy), tool count, latency, error message (if any).
+
+<verification>
+All servers checked.
+</verification>
+
+### Step 3: Present Summary
+
+Present a markdown table:
+
+```
+MCP Server Status:
+
+| Server   | Status    | Tools | Latency | Notes        |
+|----------|-----------|-------|---------|--------------|
+| context7 | ✓ healthy | 2     | 1.2s    |              |
+| github   | ✗ error   | —     | —       | timeout      |
+
+{healthy_count}/{total_count} servers healthy.
+```
+
+If all healthy: "{count} servers, all healthy."
+
+If any unhealthy, suggest: "Run `/rai-mcp-add` to reinstall problematic servers, or check environment variables."
+
+<verification>
+Summary presented with actionable guidance for issues.
+</verification>
+
+## Output
+
+| Item | Destination |
+|------|-------------|
+| Status report | Displayed inline |
+| Next | Fix unhealthy servers via `/rai-mcp-add` or manual troubleshooting |
+
+## Quality Checklist
+
+- [ ] All registered servers checked (not just a subset)
+- [ ] Unhealthy servers show error details
+- [ ] Actionable guidance provided for issues
+- [ ] Empty state handled gracefully
+
+## References
+
+- CLI: `rai mcp list`, `rai mcp health`
+- Complement: `/rai-mcp-add`, `/rai-mcp-remove`
+- Epic: E338 MCP Platform
