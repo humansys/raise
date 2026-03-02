@@ -16,23 +16,21 @@ upgrades. Market differentiator — no AI coding tool offers this.
 ## Value
 
 After this epic, a tech lead can:
-1. Run `rai init` → gets builtins in `.raise/skills/default/`
-2. Create `.raise/skills/my-company/rai-story-run/SKILL.md` with custom steps
-3. Run `rai init --skill-set my-company` → team gets customized story-run
-4. Upgrade rai-cli → `default/` updates safely, `my-company/` untouched
+1. Create `.raise/skills/my-company/rai-story-run/SKILL.md` with custom steps
+2. Run `rai init --skill-set my-company` → team gets customized story-run
+3. Upgrade rai-cli → builtins update normally, `my-company/` untouched
 
 ## In Scope (MUST)
 
-- `.raise/skills/default/` populated from builtins on `rai init`
-- Three-hash upgrade on `.raise/skills/default/`
 - `--skill-set` flag on `rai init` for overlay deployment
-- Same-name-wins override (overlay replaces default, no merge)
+- Same-name-wins override (overlay replaces builtin in `.claude/skills/`)
+- `.raise/skills/{set}/` as user-owned overlay directory
 - Manifest tracks `origin` per skill (framework vs project)
 - `/rai-skill-create` targets `.raise/skills/{set}/`
 
 ## In Scope (SHOULD)
 
-- "Customize builtin" mode in `/rai-skill-create` (copy from default as base)
+- "Customize builtin" mode in `/rai-skill-create` (copy builtin as base)
 - `rai skill scaffold --set` parameter
 
 ## Out of Scope
@@ -42,65 +40,63 @@ After this epic, a tech lead can:
 - Per-section override (whole-skill granularity only)
 - Remote skill set URLs
 - Multi-IDE simultaneous deployment
+- Intermediate `.raise/skills/default/` directory (deferred to v2.3 — AR Q2)
 
 ## Architecture
 
-### Model: Oh My Zsh + Helm Hybrid (Research-Grounded)
+### Model: Overlay-Only (AR-simplified from two-hop)
 
-5 convergent patterns from 14 projects. See `work/research/skill-set-patterns/`.
+Architecture review (Q2) determined that two-hop (builtins → `default/` →
+`.claude/skills/`) adds complexity disproportionate for first public release.
+Overlay-only preserves the existing builtin flow and adds team customization
+on top.
 
 ### Directory Layout
 
 ```
 .raise/skills/
-  default/                    ← builtin set (rai init populates, three-hash managed)
-    rai-session-start/
-      SKILL.md
-    rai-story-run/
-      SKILL.md
-    ...
   my-company/                 ← team set (user-owned, never auto-updated)
-    rai-story-run/            ← overrides default (same-name wins)
+    rai-story-run/            ← overrides builtin (same-name wins)
       SKILL.md
-    company-review/           ← team-only skill
+    company-review/           ← team-only skill (no builtin equivalent)
       SKILL.md
 
-.claude/skills/               ← deployment target (derived from merged set)
+.claude/skills/               ← deployment target (builtins + overlay merged)
+  rai-session-start/SKILL.md  ← from builtin (no override)
+  rai-story-run/SKILL.md      ← from my-company (override won)
+  company-review/SKILL.md     ← from my-company (addition)
 ```
 
 ### Deployment Flow
 
 ```
-rai init --skill-set <name>   (default: "default")
+rai init --skill-set <name>   (default: none — builtins only, same as today)
 
-1. Builtins → .raise/skills/default/     (three-hash sync)
-2. If skill-set != "default":
-   Load default/ as base
-   Load {set}/ as overlay
-   Same-name in overlay replaces base
-3. Deploy merged → .claude/skills/        (plugin transforms applied here)
-4. Update manifest with origin per skill
+1. Builtins → .claude/skills/           (existing three-hash flow, unchanged)
+2. If --skill-set provided:
+   Read .raise/skills/{name}/
+   For each skill in overlay:
+     Copy to .claude/skills/ (overwrite, no three-hash — user owns overlay)
+   Mark overlay skills with origin: "project" in manifest
 ```
 
 ### Key Decisions
 
 | ID | Decision | Rationale | Evidence |
 |----|----------|-----------|----------|
-| D1 | Directory separation | Oh My Zsh (175k stars), all AI tools trending | C1 in evidence catalog |
-| D2 | Same-name = full replacement | No merge complexity, most battle-tested | C2: Oh My Zsh, Helm, ESLint, Ansible |
-| D3 | Three-hash only on default/ | Overlays are user-owned, never auto-updated | C3: universal across 14 projects |
+| D1 | Overlay-only (no intermediate default/) | AR Q2: simpler for first release, two-hop can be added later | Proportionality |
+| D2 | Same-name = full replacement | No merge, most battle-tested | C2: Oh My Zsh, Helm, ESLint, Ansible |
+| D3 | Overlay skills NOT three-hash managed | User-owned, never auto-updated by framework | C3: universal across 14 projects |
 | D4 | `--skill-set` flag (explicit) | No magic detection, clear mental model | C5: market gap |
-| D5 | No registry | YAGNI for open core | Constraint from brief |
-| D6 | Plugin transforms at deployment | Builtins stored raw, transforms per-agent | Gemba: `_apply_plugin_transform` |
-| D7 | Path-based copy for overlay | `_copy_skill_tree` uses Traversable for bundled; need parallel for filesystem | Gemba: skills.py L104-157 |
+| D5 | No registry | YAGNI for open core | Brief constraint |
+| D6 | Unify `_copy_skill_tree` to accept `Path | Traversable` | AR R1: avoid duplicate function | H7/H9 |
 
 ## Stories
 
 | ID | Story | Size | Description |
 |----|-------|------|-------------|
-| S340.1 | Populate default skill set | S | `scaffold_skills()` writes builtins to `.raise/skills/default/` then deploys to `.claude/skills/`. Three-hash applies to default set. Backward compat for existing projects. |
-| S340.2 | Overlay deployment | M | `rai init --skill-set X` merges default + overlay → `.claude/skills/`. Same-name wins. Manifest tracks origin. New `_copy_skill_tree_path()` for filesystem overlay. |
-| S340.3 | Skill creation targets sets | S | `/rai-skill-create` generates into `.raise/skills/{set}/`. `rai skill scaffold --set`. "Customize builtin" mode. |
+| S340.1 | Skill set overlay deployment | S | Add `--skill-set` to `rai init`. After builtin deployment, overlay `.raise/skills/{set}/` → `.claude/skills/`. Same-name wins. Manifest tracks origin. Unify `_copy_skill_tree` (AR R1). |
+| S340.2 | Skill creation targets sets | S | `/rai-skill-create` generates into `.raise/skills/{set}/`. `rai skill scaffold --set`. "Customize builtin" mode copies installed builtin as base. |
 
 ## Plan
 
@@ -108,42 +104,44 @@ rai init --skill-set <name>   (default: "default")
 
 | M# | Milestone | Stories | Gate |
 |----|-----------|---------|------|
-| M1 | Default set population | S340.1 | `rai init` creates `.raise/skills/default/` with 23 builtins |
-| M2 | Overlay deployment | S340.2 | `rai init --skill-set X` produces correct merged `.claude/skills/` |
-| M3 | Skill creation UX | S340.3 | `/rai-skill-create --set X` generates into `.raise/skills/{set}/` |
+| M1 | Overlay deployment | S340.1 | `rai init --skill-set X` produces correct merged `.claude/skills/` |
+| M2 | Skill creation UX | S340.2 | `/rai-skill-create --set X` generates into `.raise/skills/{set}/` |
 
 ### Sequence
 
 ```
-S340.1 (S) → S340.2 (M) → S340.3 (S)
-  M1           M2           M3
+S340.1 (S) → S340.2 (S)
+  M1           M2
 ```
 
-Linear: S340.2 needs `default/` from S340.1. S340.3 needs set concept from S340.2.
+Linear: S340.2 needs `--skill-set` concept from S340.1.
 
 ### Progress Tracking
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|------|--------|--------|----------|-------|
 | S340.1 | S | Pending | — | — | — |
-| S340.2 | M | Pending | — | — | — |
-| S340.3 | S | Pending | — | — | — |
+| S340.2 | S | Pending | — | — | — |
 
 ## Done Criteria
 
-- [ ] `rai init` populates `.raise/skills/default/` with 23 builtins
-- [ ] `rai init --skill-set X` deploys merged default + overlay
-- [ ] Three-hash upgrade works on `.raise/skills/default/`
-- [ ] Same-name-wins override verified (overlay skill replaces default)
+- [ ] `rai init --skill-set X` deploys builtins + overlay merged to `.claude/skills/`
+- [ ] Same-name-wins override verified (overlay skill replaces builtin)
+- [ ] Overlay skills NOT touched by subsequent `rai init` without `--skill-set`
 - [ ] `/rai-skill-create` generates into `.raise/skills/{set}/`
-- [ ] Existing projects without `.raise/skills/default/` handle LEGACY gracefully
-- [ ] All tests pass + new tests per story
+- [ ] Manifest tracks `origin: "project"` for overlay skills
+- [ ] All existing tests pass + new tests per story
 - [ ] Retrospective complete
 
 ## Risks
 
 | Risk | L | I | Mitigation |
 |------|---|---|------------|
-| Backward compat: existing `.claude/skills/` without `.raise/skills/default/` | High | Med | LEGACY detection: first run creates default/ from builtins, treats existing `.claude/skills/` as user-modified |
-| Plugin transforms on two-hop path | Low | Med | D6: transforms at deployment only, builtins stored raw |
-| `_copy_skill_tree` uses Traversable not Path | Med | Low | D7: new `_copy_skill_tree_path()` for overlay (filesystem Path source) |
+| Overlay skill left in `.claude/skills/` after removing `--skill-set` | Med | Low | Document: user must re-run `rai init` without `--skill-set` to clean |
+| `_copy_skill_tree` typing change (`Path | Traversable`) | Low | Low | Both types share the same interface; test both paths |
+
+## Architecture Review
+
+Formal AR completed pre-implementation. Verdict: **PASS WITH QUESTIONS**.
+Key resolution: Q2 → overlay-only for v2.2 (two-hop deferred to v2.3).
+Adopted: R1 (unify copy function), R2/R3 (deferred — not needed for overlay-only).
