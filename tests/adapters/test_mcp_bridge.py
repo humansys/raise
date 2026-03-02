@@ -103,11 +103,11 @@ def _patched_bridge(
     )
     bridge = McpBridge(server_command=server)
     p1 = patch(
-        "rai_cli.adapters.mcp_bridge.stdio_client",
+        "rai_cli.mcp.bridge.stdio_client",
         side_effect=_mock_stdio_client,
     )
     p2 = patch(
-        "rai_cli.adapters.mcp_bridge.ClientSession",
+        "rai_cli.mcp.bridge.ClientSession",
         side_effect=session_cm,
     )
     return bridge, p1, p2, session  # type: ignore[return-value]
@@ -262,7 +262,7 @@ class TestMcpBridgeSessionErrors:
         bridge = McpBridge(server_command="mcp-nonexistent")
 
         async def run() -> None:
-            with patch("rai_cli.adapters.mcp_bridge.stdio_client", side_effect=failing_stdio):
+            with patch("rai_cli.mcp.bridge.stdio_client", side_effect=failing_stdio):
                 await bridge.call("any_tool", {})
 
         with pytest.raises(McpBridgeError, match="not found"):
@@ -279,7 +279,7 @@ class TestMcpBridgeSessionErrors:
         bridge = McpBridge(server_command="mcp-broken")
 
         async def run() -> None:
-            with patch("rai_cli.adapters.mcp_bridge.stdio_client", side_effect=failing_stdio):
+            with patch("rai_cli.mcp.bridge.stdio_client", side_effect=failing_stdio):
                 await bridge.call("any_tool", {})
 
         with pytest.raises(McpBridgeError, match="mcp-broken"):
@@ -305,7 +305,7 @@ class TestMcpBridgeSessionErrors:
 
 class TestMcpBridgeHealth:
     def test_health_returns_healthy(self) -> None:
-        """health() returns AdapterHealth with tool count when server responds."""
+        """health() returns McpHealthResult with tool count when server responds."""
         tools = [_make_tool("tool_a", "desc A"), _make_tool("tool_b", "desc B")]
         bridge, p1, p2, _ = _patched_bridge(
             list_tools_return=_make_list_tools_result(tools)
@@ -317,13 +317,14 @@ class TestMcpBridgeHealth:
 
         health = _run(run())
         assert health.healthy is True
-        assert health.name == "mcp-test"
+        assert health.server_name == "mcp-test"
         assert "2 tools" in health.message
         assert health.latency_ms is not None
         assert health.latency_ms >= 0
+        assert health.tool_count == 2
 
     def test_health_returns_unhealthy_on_error(self) -> None:
-        """health() returns unhealthy AdapterHealth when connection fails."""
+        """health() returns unhealthy McpHealthResult when connection fails."""
 
         @asynccontextmanager
         async def failing_stdio(params: Any, **kwargs: Any):
@@ -333,7 +334,7 @@ class TestMcpBridgeHealth:
         bridge = McpBridge(server_command="mcp-test")
 
         async def run():  # type: ignore[return]
-            with patch("rai_cli.adapters.mcp_bridge.stdio_client", side_effect=failing_stdio):
+            with patch("rai_cli.mcp.bridge.stdio_client", side_effect=failing_stdio):
                 return await bridge.health()
 
         health = _run(run())
@@ -428,7 +429,7 @@ class TestMcpBridgeTelemetry:
         )
 
         async def run() -> None:
-            with p1, p2, patch("rai_cli.adapters.mcp_bridge.logfire") as mock_logfire:
+            with p1, p2, patch("rai_cli.mcp.bridge.logfire") as mock_logfire:
                 mock_span = MagicMock()
                 mock_logfire.span.return_value.__enter__ = MagicMock(return_value=mock_span)
                 mock_logfire.span.return_value.__exit__ = MagicMock(return_value=False)
@@ -448,7 +449,7 @@ class TestMcpBridgeTelemetry:
         session.call_tool.side_effect = RuntimeError("boom")
 
         async def run() -> None:
-            with p1, p2, patch("rai_cli.adapters.mcp_bridge.logfire") as mock_logfire:
+            with p1, p2, patch("rai_cli.mcp.bridge.logfire") as mock_logfire:
                 mock_span = MagicMock()
                 mock_logfire.span.return_value.__enter__ = MagicMock(return_value=mock_span)
                 mock_logfire.span.return_value.__exit__ = MagicMock(return_value=False)

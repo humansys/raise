@@ -17,8 +17,8 @@ from rai_cli.adapters.declarative.schema import (
     DeclarativeAdapterConfig,
     MethodMapping,
     ResponseMapping,
-    ServerConfig,
 )
+from rai_cli.mcp.schema import ServerConnection
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -142,15 +142,15 @@ class TestAdapterMeta:
         assert meta.description == "A test"
 
 
-class TestServerConfig:
+class TestServerConnection:
     def test_required_fields(self) -> None:
-        server = ServerConfig(command="uvx", args=["mcp-test"])
+        server = ServerConnection(command="uvx", args=["mcp-test"])
         assert server.command == "uvx"
         assert server.args == ["mcp-test"]
         assert server.env is None
 
     def test_with_env(self) -> None:
-        server = ServerConfig(command="uvx", args=["mcp-test"], env=["TOKEN", "URL"])
+        server = ServerConnection(command="uvx", args=["mcp-test"], env=["TOKEN", "URL"])
         assert server.env == ["TOKEN", "URL"]
 
 
