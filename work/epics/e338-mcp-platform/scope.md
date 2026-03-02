@@ -90,7 +90,7 @@ Expose McpBridge as independent infrastructure so developers can register, manag
 - [x] `rai mcp list` shows all registered servers with tool counts
 - [x] `/rai-mcp-add` guides human through MCP server registration conversationally
 - [x] Stack-aware recommendations after discovery scan
-- [ ] MCP status visible at session start
+- [x] MCP status visible at session start
 - [ ] Retrospective completed
 
 ## Risks
@@ -179,7 +179,7 @@ Sequential execution recommended (solo developer), but parallel is safe.
 | S338.6 | `rai mcp install` | M | done | 1.2x |
 | S338.8 | MCP Skills (add/remove/status) | M | done | 1.8x |
 | S338.9 | Stack-aware MCP recommendations | S | done | 1.4x |
-| S338.10 | MCP health in session start | XS | pending | — |
+| S338.10 | MCP health in session start | XS | done | 1.25x |
 
 ### Sequencing Risks
 
