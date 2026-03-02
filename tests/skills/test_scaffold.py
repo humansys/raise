@@ -151,3 +151,59 @@ class TestScaffoldSkill:
 
         assert result.created
         assert (tmp_path / ".claude" / "skills" / "test-skill" / "SKILL.md").exists()
+
+
+class TestScaffoldSkillSet:
+    """Tests for scaffold_skill --set parameter (S340.2)."""
+
+    def test_scaffold_to_skill_set(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Scaffold with --set creates in .raise/skills/{set}/."""
+        monkeypatch.chdir(tmp_path)
+
+        result = scaffold_skill("team-review", skill_set="my-team")
+
+        assert result.created
+        expected = tmp_path / ".raise" / "skills" / "my-team" / "team-review" / "SKILL.md"
+        assert expected.exists()
+
+    def test_scaffold_set_does_not_create_in_claude(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Scaffold with --set should NOT create in .claude/skills/."""
+        monkeypatch.chdir(tmp_path)
+
+        scaffold_skill("team-review", skill_set="my-team")
+
+        assert not (tmp_path / ".claude" / "skills" / "team-review").exists()
+
+    def test_scaffold_set_default_unchanged(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Without --set, scaffold goes to .claude/skills/ as before."""
+        skills = tmp_path / ".claude" / "skills"
+        skills.mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        result = scaffold_skill("test-skill")
+
+        assert result.created
+        assert (skills / "test-skill" / "SKILL.md").exists()
+
+    def test_scaffold_customize_builtin(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Scaffold with --set and --from-builtin copies existing skill."""
+        # Create a "builtin" skill in .claude/skills/
+        builtin_dir = tmp_path / ".claude" / "skills" / "rai-debug"
+        builtin_dir.mkdir(parents=True)
+        (builtin_dir / "SKILL.md").write_text("# Original Debug", encoding="utf-8")
+        monkeypatch.chdir(tmp_path)
+
+        result = scaffold_skill("rai-debug", skill_set="my-team", from_builtin=True)
+
+        assert result.created
+        expected = tmp_path / ".raise" / "skills" / "my-team" / "rai-debug" / "SKILL.md"
+        assert expected.exists()
+        assert expected.read_text(encoding="utf-8") == "# Original Debug"

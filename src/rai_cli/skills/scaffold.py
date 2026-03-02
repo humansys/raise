@@ -142,29 +142,56 @@ def scaffold_skill(
     lifecycle: str | None = None,
     after: str | None = None,
     before: str | None = None,
+    skill_set: str | None = None,
+    from_builtin: bool = False,
 ) -> ScaffoldResult:
     """Scaffold a new skill with proper structure.
+
+    When ``skill_set`` is provided, creates the skill in
+    ``.raise/skills/{skill_set}/{name}/`` instead of the default
+    IDE skill directory. When ``from_builtin`` is also True, copies
+    the existing deployed skill as a starting point. (S340.2)
 
     Args:
         name: Skill name (e.g., 'story-validate').
         lifecycle: Lifecycle category. If not specified, inferred from name.
         after: Skill that should come before this one (prerequisites).
         before: Skill that should come after this one (next).
+        skill_set: Skill set name (e.g., 'my-team'). Creates in .raise/skills/{set}/.
+        from_builtin: Copy from deployed .claude/skills/{name}/ as starting point.
 
     Returns:
         ScaffoldResult with creation status and path or error.
     """
-    # Get or create skill directory
-    skill_dir = get_default_skill_dir()
+    from pathlib import Path
+
+    # Determine target directory
+    if skill_set is not None:
+        skill_dir = Path.cwd() / ".raise" / "skills" / skill_set
+    else:
+        skill_dir = get_default_skill_dir()
     if not skill_dir.exists():
         skill_dir.mkdir(parents=True)
 
-    # Check if skill already exists
+    # Check if skill already exists in target
     skill_path = skill_dir / name
     if skill_path.exists():
         return ScaffoldResult(
             created=False,
             error=f"Skill '{name}' already exists at {skill_path}",
+        )
+
+    # "Customize builtin" mode: copy from deployed skill
+    if from_builtin and skill_set is not None:
+        deployed = get_default_skill_dir() / name / "SKILL.md"
+        if deployed.exists():
+            skill_path.mkdir(parents=True, exist_ok=True)
+            skill_file = skill_path / "SKILL.md"
+            skill_file.write_text(deployed.read_text(encoding="utf-8"), encoding="utf-8")
+            return ScaffoldResult(created=True, path=str(skill_file))
+        return ScaffoldResult(
+            created=False,
+            error=f"Builtin '{name}' not found at {deployed}",
         )
 
     # Infer lifecycle if not specified
