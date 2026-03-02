@@ -54,14 +54,14 @@ After completion: developer says "implement story X" and the agent executes the 
 
 ## Done Criteria
 
-- [ ] Developer says "implement story X" → agent executes full cycle with HITL only at pre-agreed gates
-- [ ] Delegation profile loaded at session-start, respected by orchestrator skills
-- [ ] Lifecycle skills call `rai backlog` at key points (Jira reflects state without manual intervention)
-- [ ] CLI output follows ACI principles (simple, compact, informative)
-- [ ] Discovery/onboard completes with ≤50% of current manual steps
-- [ ] Manual skill invocation still works (backward compatible)
-- [ ] Design portable: all orchestration logic in SKILL.md + rai CLI, no proprietary runtime APIs
-- [ ] Architecture docs updated, retrospective complete
+- [x] Developer says "implement story X" → agent executes full cycle with HITL only at pre-agreed gates ✓ `/rai-story-run` + `/rai-epic-run`
+- [x] Delegation profile loaded at session-start, respected by orchestrator skills ✓ S325.2 DelegationConfig + resolve_delegation()
+- [x] Lifecycle skills call `rai backlog` at key points (Jira reflects state without manual intervention) ✓ S325.4 BacklogHook + emit-work
+- [x] CLI output follows ACI principles (simple, compact, informative) ✓ S325.3 --format agent on 5 commands
+- [x] Discovery/onboard completes with ≤50% of current manual steps ✓ S325.5 unified /rai-discover (80% reduction)
+- [x] Manual skill invocation still works (backward compatible) ✓ All individual skills unchanged
+- [x] Design portable: all orchestration logic in SKILL.md + rai CLI, no proprietary runtime APIs ✓ No Claude Code-specific APIs
+- [x] Architecture docs updated, retrospective complete ✓ retrospective.md
 
 ## Risks
 
