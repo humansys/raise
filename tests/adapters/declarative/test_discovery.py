@@ -81,6 +81,17 @@ class TestDiscoverYamlAdapters:
         result = discover_yaml_adapters("pm", adapters_dir=adapters_dir)
         assert result == {}
 
+    def test_duplicate_name_skipped_with_warning(
+        self, adapters_dir: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
+        shutil.copy(FIXTURES / "minimal.yaml", adapters_dir / "first.yaml")
+        # Second file with same adapter.name = "minimal"
+        shutil.copy(FIXTURES / "minimal.yaml", adapters_dir / "second.yaml")
+        result = discover_yaml_adapters("pm", adapters_dir=adapters_dir)
+        assert "minimal" in result
+        assert len(result) == 1
+        assert any("already defined" in r.message for r in caplog.records)
+
     def test_multiple_yaml_files(self, adapters_dir: Path) -> None:
         shutil.copy(FIXTURES / "minimal.yaml", adapters_dir / "adapter1.yaml")
         # Create a second PM adapter with different name

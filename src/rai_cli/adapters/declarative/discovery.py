@@ -22,6 +22,17 @@ from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
 logger = logging.getLogger(__name__)
 
 
+def _make_factory(cfg: DeclarativeAdapterConfig) -> Callable[[], Any]:
+    """AR-C1: factory closure captures config for no-arg instantiation."""
+
+    def factory() -> Any:
+        from rai_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
+
+        return DeclarativeMcpAdapter(cfg)
+
+    return factory
+
+
 def discover_yaml_adapters(
     protocol: str,
     *,
@@ -67,15 +78,15 @@ def discover_yaml_adapters(
         if config.adapter.protocol != protocol:
             continue
 
-        # AR-C1: factory closure captures config
-        def _make_factory(cfg: DeclarativeAdapterConfig) -> Callable[[], Any]:
-            def factory() -> Any:
-                from rai_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
+        name = config.adapter.name
+        if name in result:
+            logger.warning(
+                "Skipping %s: adapter name '%s' already defined by another YAML file",
+                yaml_path.name,
+                name,
+            )
+            continue
 
-                return DeclarativeMcpAdapter(cfg)
-
-            return factory
-
-        result[config.adapter.name] = _make_factory(config)
+        result[name] = _make_factory(config)
 
     return result

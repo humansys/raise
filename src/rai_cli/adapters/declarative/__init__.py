@@ -6,7 +6,6 @@ Architecture: ADR-041, E337
 """
 
 from rai_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
-from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
 from rai_cli.adapters.declarative.expressions import ExpressionEvaluator
 from rai_cli.adapters.declarative.schema import (
     AdapterMeta,
@@ -24,5 +23,4 @@ __all__ = [
     "MethodMapping",
     "ResponseMapping",
     "ServerConfig",
-    "discover_yaml_adapters",
 ]
