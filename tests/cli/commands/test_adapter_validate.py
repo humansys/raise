@@ -110,3 +110,21 @@ class TestValidateCommand:
         cfg.write_text("<<<not yaml>>>: [[[")
         result = runner.invoke(app, ["adapter", "validate", str(cfg)])
         assert result.exit_code == 1
+
+
+class TestValidateE2E:
+    """End-to-end: validate shipped reference config via CLI."""
+
+    def test_validate_reference_github_yaml(self) -> None:
+        """Full path: shipped github.yaml → CLI validate → success output."""
+        ref_dir = resources.files("rai_cli.adapters.declarative.reference")
+        yaml_path = ref_dir / "github.yaml"
+        result = runner.invoke(app, ["adapter", "validate", str(yaml_path)])
+        assert result.exit_code == 0
+        assert "Valid" in result.output
+        assert "github" in result.output
+        assert "pm" in result.output
+        assert "GitHub Issues" in result.output  # description
+        # All 11 methods: 7 mapped + 4 null (batch_transition, link_to_parent, link_issues, health)
+        assert "7 mapped" in result.output
+        assert "4 unsupported" in result.output
