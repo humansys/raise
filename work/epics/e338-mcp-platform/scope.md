@@ -89,7 +89,7 @@ Expose McpBridge as independent infrastructure so developers can register, manag
 - [x] Declarative adapters (E337) can reference registry servers by name
 - [x] `rai mcp list` shows all registered servers with tool counts
 - [x] `/rai-mcp-add` guides human through MCP server registration conversationally
-- [ ] Stack-aware recommendations after discovery scan
+- [x] Stack-aware recommendations after discovery scan
 - [ ] MCP status visible at session start
 - [ ] Retrospective completed
 
@@ -178,7 +178,7 @@ Sequential execution recommended (solo developer), but parallel is safe.
 | S338.7 | `rai mcp scaffold` | S | done | 1.33x |
 | S338.6 | `rai mcp install` | M | done | 1.2x |
 | S338.8 | MCP Skills (add/remove/status) | M | done | 1.8x |
-| S338.9 | Stack-aware MCP recommendations | S | pending | — |
+| S338.9 | Stack-aware MCP recommendations | S | done | 1.4x |
 | S338.10 | MCP health in session start | XS | pending | — |
 
 ### Sequencing Risks
