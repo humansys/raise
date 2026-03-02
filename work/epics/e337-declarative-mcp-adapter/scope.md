@@ -10,14 +10,13 @@ Enable integration of any MCP server via declarative YAML config (~50-80 lines) 
 
 - Mini expression evaluator (dot-access, type coercion, default, pluck, json filters)
 - Pydantic models for YAML adapter config validation
-- Generic `DeclarativeMcpAdapter` class implementing PM protocol via YAML mapping
-- YAML discovery in adapter registry (`.raise/adapters/*.yaml`)
-- CLI validation command (`rai adapter validate`)
+- Generic `DeclarativeMcpAdapter` class implementing both PM and Docs protocols via YAML mapping
+- YAML discovery integrated in `_resolve.py` (not in `registry.py` — keeps core stable)
+- Reference config (github.yaml) + CLI validation command (`rai adapter validate`)
 
 ## In Scope (SHOULD)
 
-- Docs protocol support extension (`AsyncDocumentationTarget`)
-- Reference config (github.yaml as working example)
+- Docs protocol support in same adapter class (5 additional methods)
 
 ## Out of Scope
 
@@ -27,22 +26,34 @@ Enable integration of any MCP server via declarative YAML config (~50-80 lines) 
 | Jinja2 or complex template engine | 4 filters suffice, zero deps | Extend evaluator if needed |
 | Changes to existing adapters | Not needed — entry points have priority | N/A |
 | Changes to McpBridge | Already stable (E301) | N/A |
+| Changes to `registry.py` | Stable core, discovery goes in `_resolve.py` instead (AR-Q2) | N/A |
 | MCP server installation/management | Orthogonal concern | Toolchain epic |
 
 ## Stories
 
 | # | Story | Size | Description | Depends On |
 |---|-------|------|-------------|------------|
-| S337.1 | Expression evaluator | S | `ExpressionEvaluator` class: `{{ var }}`, dot-access, 4 filters (`str`, `default`, `pluck`, `json`), ~100 LOC | — |
-| S337.2 | YAML schema models | S | `DeclarativeAdapterConfig` Pydantic models: adapter/server/methods sections, validation | S337.1 |
-| S337.3 | DeclarativeMcpAdapter (PM) | M | Generic adapter class implementing all 11 `AsyncProjectManagementAdapter` methods via YAML mapping + McpBridge | S337.2 |
-| S337.4 | YAML discovery in registry | S | `_discover_yaml_adapters()` in registry.py, merge with entry point discovery, integration tests | S337.3 |
-| S337.5 | Docs protocol support | S | Extend adapter for `AsyncDocumentationTarget` (5 methods: can_publish, publish, get_page, search, health) | S337.3 |
-| S337.6 | CLI validation command | XS | `rai adapter validate <file>` — parse YAML, validate schema, report errors | S337.3 |
-| S337.7 | Reference config + docs | XS | Working `github.yaml` with documentation, adapter authoring guide | S337.4 |
+| S337.1 | Expression evaluator + YAML schema | S | `ExpressionEvaluator` (~100 LOC) + `DeclarativeAdapterConfig` Pydantic models (~80 LOC). Merged: tightly coupled, no artificial boundary (AR-R3). | — |
+| S337.2 | DeclarativeMcpAdapter (PM) | M | Generic adapter class, 11 `AsyncProjectManagementAdapter` methods via YAML dispatch. Single shared McpBridge (AR-C2). Response model inferred from method name, not YAML (AR-R1). | S337.1 |
+| S337.3 | YAML discovery in resolver | S | `discover_yaml_adapters()` in `_resolve.py`, merge with entry point results. Factory closure for no-arg instantiation (AR-C1). | S337.2 |
+| S337.4 | Docs protocol support | S | Extend same adapter class for `AsyncDocumentationTarget` (5 methods). One class, both protocols (AR-Q1). | S337.2 |
+| S337.5 | Reference config + validation CLI | S | Working `github.yaml`, `rai adapter validate <file>`, authoring docs. Merged: validate without reference has no user (AR-Q3). | S337.3 |
 
-**Critical path:** S337.1 → S337.2 → S337.3 → S337.4 → S337.7
-**Parallel after S337.3:** S337.5, S337.6
+**Critical path:** S337.1 → S337.2 → S337.3 → S337.5
+**Parallel after S337.2:** S337.3, S337.4
+
+## Architecture Review Decisions (AR-*)
+
+| ID | Decision | Rationale |
+|----|----------|-----------|
+| AR-C1 | Factory closure for YAML adapters (not `type`) | `_resolve.py:82` calls `cls()` with no args; YAML adapter needs config at construction |
+| AR-C2 | Single shared McpBridge per adapter lifetime | Bridge creates subprocess — must reuse, not create per-call |
+| AR-R1 | Eliminate `model` field from ResponseMapping | Adapter knows return type per protocol method — no string→class registry needed |
+| AR-R2 | Simplify `env` to list of var names | Most MCP servers read env vars directly; `env→flag` conversion is rare edge case |
+| AR-R3 | Merge expression evaluator + schema into one story | ~180 LOC combined, tightly coupled, still S size |
+| AR-Q1 | One class for PM + Docs | Dispatch table, not logic — two classes would duplicate constructor + dispatch |
+| AR-Q2 | Discovery in `_resolve.py`, not `registry.py` | Registry is stable core (91 LOC, stdlib). Keeps dependency direction correct. |
+| AR-Q3 | Merge validation CLI + reference config | Validate command without example has no user |
 
 ## Done Criteria
 

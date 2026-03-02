@@ -1,6 +1,7 @@
 # Epic Design: E337 — Declarative MCP Adapter Framework
 
 > Architecture: ADR-041 | Research: `dev/research/declarative-mcp-adapter-design.md`
+> Architecture Review: PASS WITH QUESTIONS (all resolved — see scope.md AR-* table)
 
 ## Gemba: Current State
 
@@ -16,6 +17,7 @@ mcp_confluence.py     → McpConfluenceTarget (~similar pattern)
 filesystem.py         → FilesystemPMAdapter (local JSON files)
 sync.py               → SyncPMAdapter / SyncDocsAdapter wrappers
 registry.py           → Entry point discovery (rai.adapters.pm, rai.docs.targets)
+_resolve.py           → Generic resolver: discover → select → instantiate → wrap
 ```
 
 **Pain point:** Each new MCP adapter duplicates the same pattern: create bridge → build args → call tool → parse response → return model. `McpJiraAdapter` is 410 LOC of this plumbing.
@@ -29,11 +31,13 @@ NEW: src/rai_cli/adapters/declarative/
   schema.py                → Pydantic config models (~80 LOC)
   adapter.py               → DeclarativeMcpAdapter (~200 LOC)
 
-MODIFIED: src/rai_cli/adapters/registry.py
-  + _discover_yaml_adapters() → scans .raise/adapters/*.yaml
-  + merge into get_pm_adapters() / get_doc_targets() (entry points take priority)
+MODIFIED: src/rai_cli/cli/commands/_resolve.py
+  + discover_yaml_adapters() → scans .raise/adapters/*.yaml
+  + merge YAML results into entry point results (entry points take priority)
+  (AR-Q2: here, NOT in registry.py — keeps stable core untouched)
 
-UNCHANGED: mcp_bridge.py, protocols.py, models.py, sync.py, mcp_jira.py, mcp_confluence.py, filesystem.py
+UNCHANGED: registry.py, mcp_bridge.py, protocols.py, models.py, sync.py,
+           mcp_jira.py, mcp_confluence.py, filesystem.py
 ```
 
 ## Target Components
@@ -66,7 +70,8 @@ Pydantic models validating YAML structure.
 class ServerConfig(BaseModel):
     command: str                          # e.g. "uvx"
     args: list[str]                       # e.g. ["mcp-github"]
-    env: list[EnvMapping] | None = None   # env var → CLI flag mapping
+    env: list[str] | None = None          # env var names to pass to subprocess
+                                          # (AR-R2: simple list, not env→flag mapping)
 
 class MethodMapping(BaseModel):
     tool: str                             # MCP tool name
@@ -74,7 +79,7 @@ class MethodMapping(BaseModel):
     response: ResponseMapping | None      # how to parse response
 
 class ResponseMapping(BaseModel):
-    model: str                            # target Pydantic model name
+    # (AR-R1: no `model` field — adapter infers return type from method name)
     fields: dict[str, str]                # field → expression mapping
     items_path: str | None = None         # dot-path to list in response
 
@@ -86,36 +91,45 @@ class DeclarativeAdapterConfig(BaseModel):
 
 ### 3. DeclarativeMcpAdapter (`adapter.py`)
 
-Generic class instantiated from YAML config. Implements `AsyncProjectManagementAdapter` and/or `AsyncDocumentationTarget` based on `adapter.protocol`.
+Generic class instantiated from YAML config. Implements both `AsyncProjectManagementAdapter` and `AsyncDocumentationTarget` based on `adapter.protocol` (AR-Q1: one class, dispatch table).
 
 **Key design:**
-- One class handles both PM and Docs protocols
+- One class handles both PM and Docs protocols (AR-Q1)
 - `adapter.protocol` field determines which methods are expected
 - `@runtime_checkable` isinstance() validates protocol compliance
 - Methods declared as `null` in YAML → `NotImplementedError`
 - `batch_transition` auto-loops over `transition_issue` if not explicitly declared
+- Single shared `McpBridge` per adapter lifetime (AR-C2)
 
 **Contract:**
 ```python
 class DeclarativeMcpAdapter:
     def __init__(self, config: DeclarativeAdapterConfig, project_root: Path | None = None): ...
     # All 11 PM methods + 5 Docs methods, dispatched via config.methods
+    async def aclose(self) -> None: ...  # delegates to bridge.aclose()
 ```
 
-### 4. Registry Extension (`registry.py`)
+### 4. Discovery in Resolver (`_resolve.py`)
+
+Discovery goes in `_resolve.py`, NOT in `registry.py` (AR-Q2: keeps stable core untouched).
 
 ```python
-def _discover_yaml_adapters(protocol: str) -> dict[str, type]:
-    """Scan .raise/adapters/*.yaml, return factory functions keyed by adapter name."""
+def discover_yaml_adapters(protocol: str) -> dict[str, Callable[[], Any]]:
+    """Scan .raise/adapters/*.yaml, return factory closures keyed by adapter name.
 
-def get_pm_adapters() -> dict[str, type]:
-    result = _discover(EP_PM_ADAPTERS)       # entry points first (priority)
-    yaml_adapters = _discover_yaml_adapters("pm")
-    for name, cls in yaml_adapters.items():
-        if name not in result:               # entry points override
-            result[name] = cls
-    return result
+    Each closure captures the parsed config and returns a new DeclarativeMcpAdapter
+    when called with no arguments (AR-C1: compatible with resolve_entrypoint).
+    """
+    ...
+
+def resolve_adapter(adapter_name: str | None) -> ProjectManagementAdapter:
+    return resolve_entrypoint(
+        discover=lambda: {**get_pm_adapters(), **discover_yaml_adapters("pm")},
+        ...
+    )
 ```
+
+**Note:** `resolve_entrypoint` currently types `discover` as `Callable[[], dict[str, type]]`. The YAML factories are closures, not types. Either relax the type to `Callable[[], dict[str, Callable[[], Any]]]` or keep `type` and use `type(...)` trick. Resolve during S337.3 implementation.
 
 ## Key Contracts
 
@@ -124,9 +138,9 @@ def get_pm_adapters() -> dict[str, type]:
 | `AsyncProjectManagementAdapter` | `SyncPMAdapter` → CLI commands | `DeclarativeMcpAdapter` (new) |
 | `AsyncDocumentationTarget` | `SyncDocsAdapter` → CLI commands | `DeclarativeMcpAdapter` (new) |
 | `McpBridge.call()` | `DeclarativeMcpAdapter` | `McpBridge` (unchanged) |
-| `registry.get_pm_adapters()` | `backlog` CLI group | `registry.py` (extended) |
+| `_resolve.py` discover functions | `resolve_adapter()`, `resolve_docs_target()` | Entry points + YAML discovery |
 
-## YAML Config Example (GitHub)
+## YAML Config Example (GitHub, post-AR)
 
 ```yaml
 adapter:
@@ -137,9 +151,7 @@ adapter:
 server:
   command: uvx
   args: [mcp-github]
-  env:
-    - env: GITHUB_TOKEN
-      flag: --token
+  env: [GITHUB_TOKEN]            # AR-R2: simple list
 
 methods:
   create_issue:
@@ -148,8 +160,7 @@ methods:
       title: "{{ issue.summary }}"
       body: "{{ issue.description }}"
       repo: "{{ project_key }}"
-    response:
-      model: IssueRef
+    response:                      # AR-R1: no `model` field
       fields:
         key: "{{ data.number | str }}"
         url: "{{ data.html_url }}"
@@ -160,7 +171,6 @@ methods:
       query: "{{ query }}"
       per_page: "{{ limit }}"
     response:
-      model: list[IssueSummary]
       items_path: data.items
       fields:
         key: "{{ item.number | str }}"
@@ -172,14 +182,12 @@ methods:
   link_issues: null
 ```
 
-## Dependency Graph
+## Dependency Graph (post-AR, 5 stories)
 
 ```
-S337.1 (Expression evaluator)
-  └── S337.2 (YAML schema models)
-        └── S337.3 (DeclarativeMcpAdapter PM)
-              ├── S337.4 (YAML discovery in registry)
-              │     └── S337.7 (Reference config + docs)
-              ├── S337.5 (Docs protocol support)
-              └── S337.6 (CLI validation command)
+S337.1 (Expression evaluator + YAML schema)    [S]
+  └── S337.2 (DeclarativeMcpAdapter PM)         [M]
+        ├── S337.3 (YAML discovery in resolver)  [S]
+        │     └── S337.5 (Reference config + validation CLI)  [S]
+        └── S337.4 (Docs protocol support)       [S]
 ```
