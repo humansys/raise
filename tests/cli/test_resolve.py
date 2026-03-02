@@ -287,3 +287,72 @@ class TestResolveDocsTarget:
         target = resolve_docs_target(None)
         assert isinstance(target, _StubDocs)
         assert not isinstance(target, SyncDocsAdapter)
+
+
+# --- YAML + entry point mixed tests (S337.3) ---
+
+_DISCOVER_MOD = "rai_cli.adapters.declarative.discovery"
+
+
+class TestResolveAdapterWithYaml:
+    """resolve_adapter() — YAML adapter discovery merged with entry points."""
+
+    def test_yaml_only_auto_selects(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """YAML adapter auto-selected when no entry points registered."""
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"yaml-stub": _StubPM} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+    def test_yaml_selected_by_name(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """YAML adapter selected by explicit --adapter flag."""
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"github": _StubPM} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter("github")
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+    def test_entrypoint_wins_on_collision(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Entry point takes priority over YAML when names collide."""
+
+        class _EpStub(_StubPM):
+            """Entry point stub — distinguishable from YAML stub."""
+
+        class _YamlStub(_StubPM):
+            """YAML stub — should lose on collision."""
+
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _EpStub})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"jira": _YamlStub} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter("jira")
+        assert isinstance(adapter, _EpStub)
+
+    def test_mixed_yaml_and_ep_no_collision(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Both YAML and EP adapters available, no name collision."""
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _StubPM})
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {"github": _StubPM} if protocol == "pm" else {},
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        # Multiple adapters without flag → error listing both
+        with pytest.raises(SystemExit):
+            resolve_adapter(None)
+
+        # With flag → selects the named one
+        adapter = resolve_adapter("github")
+        assert isinstance(adapter, ProjectManagementAdapter)
