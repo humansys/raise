@@ -42,10 +42,20 @@ _STATUS_MAP: dict[str, str] = {
 }
 
 
-def _load_lifecycle_mapping(project_root: Path) -> dict[str, int] | None:
-    """Load lifecycle_mapping from .raise/jira.yaml.
+class _JiraConfig:
+    """Parsed jira.yaml config relevant to BacklogHook."""
 
-    Returns None if file missing or mapping not found.
+    __slots__ = ("project_key", "lifecycle_mapping")
+
+    def __init__(self, project_key: str, lifecycle_mapping: dict[str, int]) -> None:
+        self.project_key = project_key
+        self.lifecycle_mapping = lifecycle_mapping
+
+
+def _load_jira_config(project_root: Path) -> _JiraConfig | None:
+    """Load project key and lifecycle_mapping from .raise/jira.yaml.
+
+    Returns None if file missing, unparseable, or missing required sections.
     """
     config_path = project_root / ".raise" / "jira.yaml"
     if not config_path.exists():
@@ -55,14 +65,20 @@ def _load_lifecycle_mapping(project_root: Path) -> dict[str, int] | None:
             data: dict[str, Any] = yaml.safe_load(f)
         workflow = data.get("workflow", {})
         mapping: dict[str, int] | None = workflow.get("lifecycle_mapping")
-        return mapping
+        if mapping is None:
+            return None
+        projects = data.get("projects", {})
+        project_key = next(iter(projects), None) if projects else None
+        if project_key is None:
+            return None
+        return _JiraConfig(project_key=project_key, lifecycle_mapping=mapping)
     except Exception:  # noqa: BLE001
         logger.warning("Failed to parse .raise/jira.yaml")
         return None
 
 
 def _resolve_jira_key(
-    adapter: Any, work_id: str, project_key: str = "RAISE"
+    adapter: Any, work_id: str, project_key: str
 ) -> str | None:
     """Search for Jira issue by work_id in summary.
 
@@ -111,9 +127,9 @@ class BacklogHook:
         if event.event not in _ACTIONABLE_EVENTS:
             return HookResult(status="ok")
 
-        # Load lifecycle mapping
-        mapping = _load_lifecycle_mapping(self._project_root)
-        if mapping is None:
+        # Load jira config
+        config = _load_jira_config(self._project_root)
+        if config is None:
             return HookResult(status="error", message="no jira.yaml or lifecycle_mapping")
 
         # Determine lifecycle key
@@ -129,7 +145,7 @@ class BacklogHook:
 
         # Resolve Jira key
         try:
-            jira_key = _resolve_jira_key(adapter, event.work_id)
+            jira_key = _resolve_jira_key(adapter, event.work_id, config.project_key)
         except Exception as exc:  # noqa: BLE001
             return HookResult(status="error", message=f"search failed: {exc}")
 
@@ -144,7 +160,7 @@ class BacklogHook:
                         summary=f"{event.work_id}",
                         issue_type=issue_type,
                     )
-                    ref = adapter.create_issue("RAISE", spec)
+                    ref = adapter.create_issue(config.project_key, spec)
                     jira_key = ref.key
                 except Exception as exc:  # noqa: BLE001
                     return HookResult(status="error", message=f"create failed: {exc}")
