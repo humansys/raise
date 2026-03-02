@@ -1,9 +1,8 @@
 ---
 name: rai-skill-create
 description: >
-  Guided skill creation through conversation and CLI composition. Walks through
-  purpose definition, naming, lifecycle positioning, reference pattern reading,
-  content design, writing, and validation. Produces a complete SKILL.md.
+  Guided skill creation with skill set management. Detects existing sets,
+  offers to create/extend them, then walks through design and validation.
 
 license: MIT
 
@@ -15,7 +14,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "3.0.0"
   raise.visibility: internal
 ---
 
@@ -23,158 +22,137 @@ metadata:
 
 ## Purpose
 
-Guide the creation of a new RaiSE skill through conversation and CLI composition, producing a complete ADR-040-compliant SKILL.md with real content — no TODO placeholders.
+Guide creation of RaiSE skills through conversation and CLI. Detects skill sets, offers team-level management, produces ADR-040-compliant SKILL.md.
 
 ## Mastery Levels (ShuHaRi)
 
-- **Shu**: Follow all steps sequentially; ask explicit questions at each stage
-- **Ha**: Collapse steps when user provides detailed upfront intent; infer lifecycle metadata when domain is clear
-- **Ri**: Create skill families in a single pass; propose decomposition when scope is too broad
+- **Shu**: Follow all steps; ask at each stage
+- **Ha**: Collapse steps when intent is clear; infer lifecycle
+- **Ri**: Manage full skill sets; create families in one pass
 
 ## Context
 
-**When to use:** Creating a new skill or converting an ad-hoc workflow into a repeatable process.
+**When to use:** Creating a skill, customizing a builtin for your team, or setting up a skill set.
 
-**When to skip:** Modifying an existing skill (edit SKILL.md directly). Writing CLI commands in `src/`.
-
-**Inputs:** What the skill should do. Optionally: lifecycle position.
+**When to skip:** Editing an existing skill directly.
 
 ## Steps
 
-### Step 1: Understand Purpose
+### Step 0: Detect Skill Sets and Determine Target
 
-Ask: *"What does this skill do? What problem does it solve and when would someone reach for it?"*
+```bash
+ls -d .raise/skills/*/ 2>/dev/null || echo "No skill sets found"
+```
 
-Extract: **What** (core action), **Why** (problem solved), **When** (trigger).
+**Sets exist** → ask: (1) create in existing set, (2) new set, (3) standalone in `.claude/skills/`
 
-If scope covers multiple distinct workflows: propose decomposition into 2-3 focused skills.
+**No sets** → ask: (1) new skill set for your team, (2) standalone
+
+**If "new set":**
+
+1. Ask set name (e.g., "my-company")
+2. Ask: *"Copy all builtins as base to customize?"*
+3. If yes, for each builtin: `rai skill scaffold {name} --set {set-name} --from-builtin`
+4. Confirm creation, then ask: *"Customize an existing skill or create a new one?"*
+
+**If "customize builtin" in existing set:**
+
+```bash
+rai skill scaffold {builtin-name} --set {set-name} --from-builtin
+```
+
+Record `target_set` for Step 5.
 
 <verification>
-Purpose statable in one sentence.
+Target determined: standalone, existing set, or new set created.
 </verification>
+
+### Step 1: Understand Purpose
+
+Ask: *"What does this skill do? What problem does it solve?"*
+
+If customizing a builtin, read it first:
+
+```bash
+cat .raise/skills/{set}/{name}/SKILL.md   # or .claude/skills/{name}/SKILL.md
+```
+
+<verification>Purpose statable in one sentence.</verification>
 
 ### Step 2: Derive and Validate Name
 
-Naming pattern: `rai-{domain}-{action}`. Propose 2-3 candidates, then validate:
+Pattern: `rai-{domain}-{action}` (framework) or `{team}-{action}` (team skills).
 
 ```bash
 rai skill check-name {chosen-name}
 ```
 
-Known domains: `debug`, `discover`, `docs`, `epic`, `framework`, `project`, `research`, `session`, `skill`, `story`. If domain is new, confirm intent.
-
-<verification>
-`rai skill check-name` passes with no errors.
-</verification>
+<verification>`rai skill check-name` passes.</verification>
 
 ### Step 3: Determine Lifecycle Position
 
-| Metadata | Options |
-|----------|---------|
+| Field | Options |
+|-------|---------|
 | `work_cycle` | `story` · `epic` · `discovery` · `session` · `utility` · `meta` |
-| `frequency` | `per-story` · `per-epic` · `per-project` · `per-session` · `as-needed` · `on-demand` |
-| `fase` | Story: 3–8 · Epic: 2–4 · Discovery: 1–5 · Utility/meta: `"0"` |
-| `visibility` | `public` (distributed with rai) · `internal` (project-specific) |
+| `frequency` | `per-story` · `per-epic` · `per-project` · `per-session` · `on-demand` |
 
-If lifecycle is unclear: default to `utility`, `as-needed`, `"0"`. Adjust after.
+Default: `utility`, `on-demand` if unclear.
 
-<verification>
-All metadata fields have values.
-</verification>
+<verification>Metadata fields set.</verification>
 
-### Step 4: Discover CLI Tools and Reference Skills
-
-Drill into groups relevant to the skill's domain:
+### Step 4: Discover CLI Tools and References
 
 ```bash
-rai --help                            # all command groups
-rai {group} --help                    # subcommands (groups related to work_cycle)
-rai {group} {subcommand} --help       # flags (commands to include in skill steps)
-```
-
-List skills and read 2-3 with the same `work_cycle` or adjacent lifecycle position:
-
-```bash
+rai --help
+rai {group} --help
 rai skill list --format json
 ```
 
-Classify pattern: pure inference (0% CLI) · hybrid (20–50%) · CLI-heavy (50–70%).
+Read 2-3 reference skills with same `work_cycle`.
 
-<verification>
-CLI tools known. 2-3 reference skills read. Pattern type determined.
-</verification>
+<verification>CLI tools known. References read.</verification>
 
-### Step 5: Design and Write SKILL.md
+### Step 5: Write SKILL.md
 
-Infer RaiSE integrations from lifecycle metadata — present rationale, don't ask:
-
-| Integration | Include when | Command |
-|-------------|-------------|---------|
-| Telemetry start/end | `work_cycle` is `story` or `epic` | `rai signal emit-work` |
-| Context loading | skill queries prior learnings | `rai graph query` |
-| Architectural context | skill modifies specific modules | `rai graph context mod-{name}` |
-| Pattern persistence | skill produces learnings | `rai pattern add` |
-| HITL checkpoint | always | pause after analysis, before writes |
-
-Write using ADR-040 contract (7 sections, ≤150 body lines). Present design summary for HITL review before writing.
-
-**Target directory** depends on whether creating for a skill set:
-- Default: `.claude/skills/{name}/SKILL.md`
-- With `--set`: `.raise/skills/{set}/{name}/SKILL.md`
-- Customize builtin: `rai skill scaffold {name} --set {set} --from-builtin`
+ADR-040 contract: 7 sections, ≤150 body lines. HITL review before writing.
 
 ```bash
-# Default (no skill set)
+# Standalone
 mkdir -p .claude/skills/{name}
-# Write .claude/skills/{name}/SKILL.md using Write tool
 
-# With skill set
+# In a skill set
 mkdir -p .raise/skills/{set}/{name}
-# Write .raise/skills/{set}/{name}/SKILL.md using Write tool
 ```
 
-<verification>
-No TODO placeholders. CLI commands verified against --help output. Verification in every step.
-</verification>
+<verification>No TODO placeholders.</verification>
 
-<if-blocked>
-Write fails → run `mkdir -p .claude/skills/{name}` first.
-</if-blocked>
-
-### Step 6: Validate, Index, and Present
+### Step 6: Validate and Deploy
 
 ```bash
-rai skill validate .claude/skills/{name}/SKILL.md
-rai graph build
-rai graph query "{name}" --types skill --format compact
+rai skill validate {path-to-SKILL.md}
 ```
 
-<verification>
-`rai skill validate` exits 0. Skill appears in graph query. Present: name, path, lifecycle, steps, status.
-</verification>
+If in a skill set, remind: *"To deploy: `rai init --skill-set {set}`"*
+
+<verification>`rai skill validate` exits 0.</verification>
 
 ## Output
 
 | Item | Destination |
 |------|-------------|
-| SKILL.md | `.claude/skills/{name}/SKILL.md` (default) or `.raise/skills/{set}/{name}/SKILL.md` (with --set) |
-| Validation | `rai skill validate` passes |
-| Graph index | `rai graph build` run — skill queryable |
+| SKILL.md | `.claude/skills/{name}/` or `.raise/skills/{set}/{name}/` |
+| Deploy hint | `rai init --skill-set {set}` (if in set) |
 
 ## Quality Checklist
 
-- [ ] Purpose statable in one sentence before naming
-- [ ] Name validated with `rai skill check-name` before writing
-- [ ] 2-3 reference skills read for domain patterns
-- [ ] RaiSE integrations inferred from lifecycle metadata (not asked)
-- [ ] ADR-040 contract followed: 7 sections, ≤150 body lines
-- [ ] Graph indexed after writing (`rai graph build`)
-- [ ] NEVER leave TODO placeholders in generated SKILL.md
-- [ ] NEVER hardcode CLI commands — discover via `rai --help` at creation time
+- [ ] Skill sets detected before asking what to create
+- [ ] Purpose before naming
+- [ ] Name validated with CLI
+- [ ] ADR-040: 7 sections, ≤150 lines
+- [ ] No TODO placeholders
+- [ ] Deploy reminder when in skill set
 
 ## References
 
-- Contract: `src/rai_cli/skills_base/contract-template.md`
-- Preamble: `src/rai_cli/skills_base/preamble.md`
 - ADR-040: `dev/decisions/adr-040-skill-contract.md`
-- Naming: PAT-E-216 · Auto-discovery: PAT-E-264
+- CLI: `rai skill scaffold --help`, `rai init --skill-set --help`
