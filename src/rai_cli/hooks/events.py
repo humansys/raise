@@ -170,6 +170,23 @@ class ReleasePublishEvent(HookEvent):
     project_path: Path = field(default_factory=lambda: Path("."))
 
 
+@dataclass(frozen=True)
+class WorkLifecycleEvent(HookEvent):
+    """Emitted when a work lifecycle signal is recorded.
+
+    Bridges ``rai signal emit-work`` to the hook system so hooks like
+    BacklogHook can react to story/epic lifecycle transitions.
+    """
+
+    event_name: Literal["work:lifecycle"] = field(  # type: ignore[assignment]
+        default="work:lifecycle", init=False
+    )
+    work_type: str = ""  # "story" or "epic"
+    work_id: str = ""  # e.g. "S325.4", "E325"
+    event: str = ""  # "start", "complete", "blocked", etc.
+    phase: str = ""  # "design", "plan", "implement", "review", "close"
+
+
 # ---------------------------------------------------------------------------
 # Before-variant events (AD-6: only release:publish and session:close)
 # ---------------------------------------------------------------------------
