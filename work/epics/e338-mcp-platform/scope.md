@@ -153,7 +153,7 @@ Sequential execution recommended (solo developer), but parallel is safe.
 |---|-------|------|--------|----------|
 | S338.1 | MCP infrastructure + registry | M | done | 1.33x |
 | S338.3 | `rai mcp call` | S | done | 1.8x |
-| S338.2 | `rai mcp list/health/tools` | S | pending | — |
+| S338.2 | `rai mcp list/health/tools` | S | done | 2.25x |
 | S338.4 | Telemetry hooks | S | pending | — |
 | S338.5 | Declarative adapter `server.ref` | S | pending | — |
 | S338.7 | `rai mcp scaffold` | S | pending | — |
