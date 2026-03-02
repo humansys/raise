@@ -120,7 +120,7 @@ Linear: S340.2 needs `--skill-set` concept from S340.1.
 
 | Story | Size | Status | Actual | Velocity | Notes |
 |-------|------|--------|--------|----------|-------|
-| S340.1 | S | Pending | — | — | — |
+| S340.1 | S | Done | S | 1.0x | 8 tests, overlay-only, AR R1 adopted |
 | S340.2 | S | Pending | — | — | — |
 
 ## Done Criteria
