@@ -98,9 +98,9 @@ Enable integration of any MCP server via declarative YAML config (~50-80 lines) 
 
 | Story | Status | Velocity | Notes |
 |-------|--------|----------|-------|
-| S337.1 | pending | — | |
-| S337.2 | pending | — | |
-| S337.3 | pending | — | |
+| S337.1 | done | 1.5x | Expression evaluator + schema, 26 tests |
+| S337.2 | done | 1.8x | DeclarativeMcpAdapter, 11 PM methods, 35 tests |
+| S337.3 | done | 1.6x | YAML discovery + resolver integration, 14 tests, QR 2 fixes |
 | S337.4 | pending | — | |
 | S337.5 | pending | — | |
 
