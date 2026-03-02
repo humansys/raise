@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from rai_cli.onboarding.profile import (
     DelegationConfig,
@@ -53,7 +54,7 @@ class TestDelegationConfig:
 
     def test_config_validates_override_values(self) -> None:
         """Override values must be valid DelegationLevel."""
-        with pytest.raises(Exception):
+        with pytest.raises(ValidationError):
             DelegationConfig(
                 default_level=DelegationLevel.AUTO,
                 overrides={"rai-story-design": "banana"},  # type: ignore[dict-item]
