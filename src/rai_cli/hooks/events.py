@@ -224,3 +224,22 @@ class BeforeReleasePublishEvent(HookEvent):
     )
     version: str = ""
     project_path: Path = field(default_factory=lambda: Path("."))
+
+
+# ---------------------------------------------------------------------------
+# MCP events (E338: MCP Platform)
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class McpCallEvent(HookEvent):
+    """Emitted after an MCP tool call completes (success or failure)."""
+
+    event_name: Literal["mcp:call"] = field(  # type: ignore[assignment]
+        default="mcp:call", init=False
+    )
+    server: str = ""
+    tool: str = ""
+    success: bool = True
+    latency_ms: int = 0
+    error: str = ""
