@@ -1,9 +1,9 @@
 """CLI commands for adapter discovery and validation.
 
-Provides `rai adapters list` and `rai adapters check` for inspecting
-registered adapter entry points and validating Protocol compliance.
+Provides `rai adapter list`, `rai adapter check`, and `rai adapter validate`
+for inspecting, checking, and validating adapter configurations.
 
-Architecture: ADR-033 (PM), ADR-034 (Governance), ADR-036 (Graph Backend)
+Architecture: ADR-033 (PM), ADR-034 (Governance), ADR-036 (Graph Backend), ADR-041 (Declarative)
 """
 
 from __future__ import annotations
@@ -36,12 +36,13 @@ from rai_cli.output.formatters.adapters import (
     format_check_json,
     format_list_human,
     format_list_json,
+    format_validate_human,
 )
 from rai_cli.tier.context import TierContext
 from rai_core.graph.backends.protocol import KnowledgeGraphBackend
 
 adapters_app = typer.Typer(
-    name="adapters",
+    name="adapter",
     help="Inspect and validate registered adapters",
     no_args_is_help=True,
 )
@@ -107,8 +108,8 @@ def list_command(
     their source package.
 
     Examples:
-        $ rai adapters list
-        $ rai adapters list --format json
+        $ rai adapter list
+        $ rai adapter list --format json
     """
     tier = _get_tier()
     groups = _collect_groups()
@@ -136,8 +137,8 @@ def check_command(
     against its corresponding @runtime_checkable Protocol.
 
     Examples:
-        $ rai adapters check
-        $ rai adapters check --format json
+        $ rai adapter check
+        $ rai adapter check --format json
     """
     results: list[dict[str, Any]] = []
     emitter = create_emitter()
@@ -199,3 +200,54 @@ def check_command(
         typer.echo(format_check_json(results))
     else:
         format_check_human(results, console)
+
+
+@adapters_app.command("validate")
+def validate_command(
+    file: Annotated[
+        Path,
+        typer.Argument(help="Path to YAML adapter config file"),
+    ],
+) -> None:
+    """Validate a declarative YAML adapter config.
+
+    Checks that the YAML file conforms to the DeclarativeAdapterConfig
+    schema. Reports adapter name, protocol, and method counts on success,
+    or specific field errors on failure.
+
+    Examples:
+        $ rai adapter validate .raise/adapters/github.yaml
+        $ rai adapter validate my-adapter.yaml
+    """
+    import yaml
+    from pydantic import ValidationError
+
+    from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
+
+    if not file.exists():
+        console.print(f"[red]Error:[/red] File not found: {file}")
+        raise typer.Exit(1)
+
+    try:
+        raw = yaml.safe_load(file.read_text(encoding="utf-8"))
+    except yaml.YAMLError as exc:
+        console.print(f"[red]✗ Invalid adapter config:[/red] {file.name}")
+        console.print(f"  Cannot parse YAML: {exc}")
+        raise typer.Exit(1) from None
+
+    if not isinstance(raw, dict):
+        console.print(f"[red]✗ Invalid adapter config:[/red] {file.name}")
+        console.print("  YAML content is not a mapping")
+        raise typer.Exit(1)
+
+    try:
+        config = DeclarativeAdapterConfig.model_validate(raw)
+    except ValidationError as exc:
+        console.print(f"[red]✗ Invalid adapter config:[/red] {file.name}")
+        for err in exc.errors():
+            loc = ".".join(str(p) for p in err["loc"])
+            console.print(f"  {loc}")
+            console.print(f"    {err['msg']}")
+        raise typer.Exit(1) from None
+
+    format_validate_human(config, console)
