@@ -49,6 +49,17 @@ class TestRefResolution:
         assert adapter._bridge._server_command == "npx"
         assert adapter._bridge._server_args == ["-y", "@upstash/context7-mcp"]
 
+    def test_ref_resolves_env_from_registry(self) -> None:
+        config = _make_config(ref="context7")
+        with patch(
+            "rai_cli.adapters.declarative.adapter.discover_mcp_servers",
+            return_value={"context7": _REGISTRY_SERVER},
+        ):
+            adapter = DeclarativeMcpAdapter(config)
+        # Bridge env should include the registry server's env vars
+        assert adapter._bridge._env is not None
+        assert "C7_TOKEN" in adapter._bridge._env
+
 
 class TestRefNotFound:
     """AC Scenario 4: ref to nonexistent server raises McpBridgeError."""
