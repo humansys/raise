@@ -150,7 +150,7 @@ Stream 2 (Parallel):                                   S325.5 ──────
 | S325.4 | M | Done | M | 1.5x | BacklogHook via emit-work events, 21 tests, QR 1 fix, PAT-E-595+596+597 |
 | S325.5 | M | Done | M | 1.7x | Unified /rai-discover replaces 5 skills, 80% HITL reduction, PAT-E-598+599 |
 | S325.6 | M | Done | M | 2.4x | /rai-story-run orchestrator, phase detection + delegation gates, PAT-E-602+603 |
-| S325.7 | L | Pending | — | — | |
+| S325.7 | L | Done | M | 3.0x | /rai-epic-run orchestrator, story iteration + phase detection, PAT-E-604 |
 
 ### Sequencing Risks
 
