@@ -64,6 +64,9 @@ class SkillManifest(BaseModel):
     schema_version: str = "1.0"
     rai_cli_version: str = Field(default_factory=lambda: _get_cli_version())
     distributed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    skill_set: str | None = Field(
+        default=None, description="Skill set name last deployed (None = builtins only)"
+    )
     skills: dict[str, SkillEntry] = Field(default_factory=dict)
 
 
