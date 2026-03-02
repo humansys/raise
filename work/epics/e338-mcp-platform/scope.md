@@ -91,7 +91,7 @@ Expose McpBridge as independent infrastructure so developers can register, manag
 - [x] `/rai-mcp-add` guides human through MCP server registration conversationally
 - [x] Stack-aware recommendations after discovery scan
 - [x] MCP status visible at session start
-- [ ] Retrospective completed
+- [x] Retrospective completed
 
 ## Risks
 
