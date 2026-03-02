@@ -17,6 +17,7 @@ from rich.console import Console
 from rich.table import Table
 
 from rai_cli.mcp.bridge import McpBridge, McpBridgeError
+from rai_cli.mcp.models import McpHealthResult
 from rai_cli.mcp.registry import discover_mcp_servers
 from rai_cli.mcp.schema import McpServerConfig
 
@@ -108,28 +109,28 @@ def health(
     servers = discover_mcp_servers()
     config = _lookup_server(server, servers)
 
-    async def _check() -> None:
+    async def _check() -> McpHealthResult:
         bridge = McpBridge(
             server_command=config.server.command,
             server_args=config.server.args,
             env=_resolve_env(config),
         )
         try:
-            result = await bridge.health()
-            if result.healthy:
-                Console().print(
-                    f"[green]{config.name}[/green]: healthy "
-                    f"({result.tool_count} tools, {result.latency_ms}ms)"
-                )
-            else:
-                console.print(
-                    f"[red]{config.name}[/red]: unhealthy — {result.message}"
-                )
-                raise typer.Exit(1)
+            return await bridge.health()
         finally:
             await bridge.aclose()
 
-    asyncio.run(_check())
+    result = asyncio.run(_check())
+    if result.healthy:
+        Console().print(
+            f"[green]{config.name}[/green]: healthy "
+            f"({result.tool_count} tools, {result.latency_ms}ms)"
+        )
+    else:
+        console.print(
+            f"[red]{config.name}[/red]: unhealthy — {result.message}"
+        )
+        raise typer.Exit(1)
 
 
 @mcp_app.command()
@@ -203,9 +204,6 @@ def call(
         raise typer.Exit(1) from exc
     try:
         result = asyncio.run(_call_tool(config, tool, arguments))
-    except McpBridgeError as exc:
-        console.print(f"Error: {exc}")
-        raise typer.Exit(1) from exc
     except Exception as exc:
         console.print(f"Error: {exc}")
         raise typer.Exit(1) from exc
