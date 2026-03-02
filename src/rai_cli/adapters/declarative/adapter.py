@@ -16,7 +16,7 @@ from typing import Any, cast
 
 from rai_cli.adapters.declarative.expressions import ExpressionEvaluator
 from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig, MethodMapping
-from rai_cli.adapters.mcp_bridge import McpBridge, McpBridgeError, McpToolResult
+from rai_cli.mcp.bridge import McpBridge, McpBridgeError, McpToolResult
 from rai_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
