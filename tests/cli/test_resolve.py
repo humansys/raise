@@ -6,6 +6,7 @@ Replaces test_adapter_resolve.py after _adapter_resolve.py → _resolve.py refac
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -356,3 +357,34 @@ class TestResolveAdapterWithYaml:
         # With flag → selects the named one
         adapter = resolve_adapter("github")
         assert isinstance(adapter, ProjectManagementAdapter)
+
+
+class TestResolveAdapterE2E:
+    """End-to-end: YAML file on disk → resolve_adapter → working adapter."""
+
+    def test_yaml_file_to_adapter_instance(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Full path: YAML config file → discover → resolve → instantiate."""
+        import shutil
+
+        fixtures = Path(__file__).parents[1] / "adapters" / "declarative" / "fixtures"
+        adapters_dir = tmp_path / ".raise" / "adapters"
+        adapters_dir.mkdir(parents=True)
+        shutil.copy(fixtures / "minimal.yaml", adapters_dir / "minimal.yaml")
+
+        # Patch EP to empty so only YAML is found
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        # Patch discover to use our tmp dir
+        from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: discover_yaml_adapters(protocol, adapters_dir=adapters_dir),
+        )
+
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        # Should be wrapped in SyncPMAdapter since DeclarativeMcpAdapter is async
+        assert isinstance(adapter, SyncPMAdapter)
