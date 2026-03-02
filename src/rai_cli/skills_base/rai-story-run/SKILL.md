@@ -2,9 +2,9 @@
 name: rai-story-run
 description: >
   Chain the full story lifecycle (start → design → plan → implement →
-  review → close) in one invocation. Resumes from last completed phase
-  using git-derived artifact detection. Delegation profile controls
-  pause behavior at natural gates.
+  architecture review → quality review → review → close) in one
+  invocation. Resumes from last completed phase using git-derived
+  artifact detection. Delegation profile controls pause behavior.
 
 license: MIT
 
@@ -88,7 +88,7 @@ Delegation level resolved.
 Run each skill from the detected phase forward. Between skills, show progress:
 
 ```
-── Phase {N}/6: {skill_name} ──
+── Phase {N}/8: {skill_name} ──
 ```
 
 **Chain order:**
@@ -99,8 +99,10 @@ Run each skill from the detected phase forward. Between skills, show progress:
 | 2 | `/rai-story-design {story_id}` | **POST-DESIGN** |
 | 3 | `/rai-story-plan {story_id}` | — |
 | 4 | `/rai-story-implement {story_id}` | **POST-IMPLEMENT** |
-| 5 | `/rai-story-review {story_id}` | — |
-| 6 | `/rai-story-close {story_id}` | — |
+| 5 | `/rai-architecture-review {story_id} story` | **POST-AR** |
+| 6 | `/rai-quality-review {story_id}` | **POST-QR** |
+| 7 | `/rai-story-review {story_id}` | — |
+| 8 | `/rai-story-close {story_id}` | — |
 
 Each skill invocation follows its own SKILL.md completely — the orchestrator delegates, it does not override individual skill behavior.
 
@@ -114,16 +116,20 @@ Skill fails → STOP immediately. Report which phase failed and why. The develop
 
 ### Step 3: Apply Delegation Gates
 
-After **phase 2 (design)** and **phase 4 (implement)**, apply the delegation gate:
+After **phase 2 (design)**, **phase 4 (implement)**, **phase 5 (AR)**, and **phase 6 (QR)**, apply the delegation gate:
 
 | Level | Behavior |
 |-------|----------|
 | REVIEW | Present summary of completed phase. Wait for explicit approval before continuing. |
 | NOTIFY | Present summary. Continue after 3 seconds unless user intervenes. |
-| AUTO | Continue immediately. Gates still stop on test/lint/type failure. |
+| AUTO | Continue immediately. Gates still stop on test/lint/type failure or AR/QR SIMPLIFY/FAIL verdict. |
 
 **Post-design summary:** Approach, components affected, key decisions.
 **Post-implement summary:** Tasks completed, tests passing, files changed.
+**Post-AR summary:** Verdict (PASS/PASS WITH QUESTIONS/SIMPLIFY), findings count, key heuristics triggered.
+**Post-QR summary:** Verdict (PASS/PASS WITH RECOMMENDATIONS/FAIL), findings count, fixes applied.
+
+If AR verdict is SIMPLIFY or QR verdict is FAIL, STOP regardless of delegation level. Fixes must be applied before proceeding.
 
 <verification>
 Gate applied. Approval received (REVIEW) or notification shown (NOTIFY/AUTO).
@@ -161,14 +167,14 @@ All phases complete. Story merged and branch cleaned up.
 - [ ] Phase detection checked in reverse order (most advanced first)
 - [ ] Delegation resolved from profile before starting chain
 - [ ] Each skill invoked completely (not partially or overridden)
-- [ ] Gates applied only at post-design and post-implement
+- [ ] Gates applied at post-design, post-implement, post-AR, and post-QR
 - [ ] Failure stops immediately — no cascading to next phase
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip a skill in the chain (even if developer says "just close it")
 
 ## References
 
-- Skills: `/rai-story-start`, `/rai-story-design`, `/rai-story-plan`, `/rai-story-implement`, `/rai-story-review`, `/rai-story-close`
+- Skills: `/rai-story-start`, `/rai-story-design`, `/rai-story-plan`, `/rai-story-implement`, `/rai-architecture-review`, `/rai-quality-review`, `/rai-story-review`, `/rai-story-close`
 - Delegation: `~/.rai/developer.yaml`, S325.2
 - BacklogHook: S325.4 (fires on `rai signal emit-work` in start/close)
 - Design: `s325.6-design.md` (decisions D1-D2-D3)

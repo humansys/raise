@@ -1,10 +1,10 @@
 ---
 name: rai-epic-run
 description: >
-  Chain the full epic lifecycle (start → design → plan → story iterations →
-  close) in one invocation. Resumes from last completed phase using
-  git-derived artifact detection. Stories iterate via /rai-story-run.
-  Delegation profile controls pause behavior at natural gates.
+  Chain the full epic lifecycle (start → design → architecture review →
+  plan → story iterations → close) in one invocation. Resumes from last
+  completed phase. Stories iterate via /rai-story-run. Delegation
+  profile controls pause behavior at natural gates.
 
 license: MIT
 
@@ -83,15 +83,16 @@ Delegation level resolved.
 
 ### Step 2: Execute Epic Skill Chain
 
-Run each epic skill from the detected phase forward. Show `── Phase {N}/5: {skill_name} ──` between phases.
+Run each epic skill from the detected phase forward. Show `── Phase {N}/6: {skill_name} ──` between phases.
 
 | Phase | Skill | Gate after? |
 |:-----:|-------|:-----------:|
 | 1 | `/rai-epic-start {epic_id}` | — |
 | 2 | `/rai-epic-design {epic_id}` | **POST-DESIGN** |
-| 3 | `/rai-epic-plan {epic_id}` | **POST-PLAN** |
-| 4 | Story iteration (see Step 3) | — |
-| 5 | `/rai-epic-close {epic_id}` | — |
+| 3 | `/rai-architecture-review {epic_id} epic` | **POST-AR** |
+| 4 | `/rai-epic-plan {epic_id}` | **POST-PLAN** |
+| 5 | Story iteration (see Step 3) | — |
+| 6 | `/rai-epic-close {epic_id}` | — |
 
 Each skill invocation follows its own SKILL.md completely.
 
@@ -115,16 +116,19 @@ All stories completed. Progress Tracking shows all "Done".
 
 ### Step 4: Apply Delegation Gates
 
-After **phase 2 (design)** and **phase 3 (plan)**, apply the delegation gate:
+After **phase 2 (design)**, **phase 3 (AR)**, and **phase 4 (plan)**, apply the delegation gate:
 
 | Level | Behavior |
 |-------|----------|
 | REVIEW | Present summary. Wait for explicit approval. |
 | NOTIFY | Present summary. Continue unless user intervenes. |
-| AUTO | Continue immediately. |
+| AUTO | Continue immediately. AR SIMPLIFY verdict stops regardless. |
 
 **Post-design summary:** Story count, sizes, key architectural decisions.
+**Post-AR summary:** Verdict (PASS/PASS WITH QUESTIONS/SIMPLIFY), proportionality findings, systemic heuristics (H13-H16).
 **Post-plan summary:** Milestones, story sequence, estimated timeline.
+
+If AR verdict is SIMPLIFY, STOP regardless of delegation level. Design must be revised before planning.
 
 No gate between stories — each `/rai-story-run` has its own internal gates.
 
@@ -155,14 +159,14 @@ All phases complete. Epic merged.
 - [ ] `### Progress Tracking` heading used as plan presence marker
 - [ ] Story iteration filters Status != "Done" (handles spikes naturally)
 - [ ] Each skill and story invoked completely (not overridden)
-- [ ] Gates applied only at post-design and post-plan
+- [ ] Gates applied at post-design, post-AR, and post-plan
 - [ ] Failure stops immediately — no cascading
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip stories or reorder them — table order is plan order
 
 ## References
 
-- Epic skills: `/rai-epic-start`, `/rai-epic-design`, `/rai-epic-plan`, `/rai-epic-close`
+- Epic skills: `/rai-epic-start`, `/rai-epic-design`, `/rai-architecture-review`, `/rai-epic-plan`, `/rai-epic-close`
 - Story orchestrator: `/rai-story-run` (S325.6)
 - Delegation: `~/.rai/developer.yaml`, S325.2
 - BacklogHook: S325.4 (fires on `rai signal emit-work` in start/close)

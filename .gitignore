@@ -91,3 +91,5 @@ dmypy.json
 credentials.json
 *.sqlite
 .netrc
+.raise/mcp/
+!.raise/mcp/catalog.yaml
