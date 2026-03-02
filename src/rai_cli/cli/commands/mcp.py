@@ -10,6 +10,8 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import subprocess
+import sys
 import time
 from pathlib import Path
 from typing import Annotated, Any
@@ -355,3 +357,133 @@ def scaffold(
         source="scaffold",
     )
     Console().print(f"Created {out_path} ({len(tool_names)} tools discovered)")
+
+
+# --- Type strategies for install ---
+
+_TYPE_STRATEGIES: dict[str, tuple[str, list[str]]] = {
+    "npx": ("npx", ["-y"]),
+    "uvx": ("uvx", []),
+}
+
+
+def _build_server_config(
+    pkg_type: str, package: str, module: str | None,
+) -> tuple[str, list[str]]:
+    """Return (command, args) for the given package type."""
+    if pkg_type == "pip":
+        assert module is not None  # validated before calling
+        return "python", ["-m", module]
+    base_cmd, base_args = _TYPE_STRATEGIES[pkg_type]
+    return base_cmd, [*base_args, package]
+
+
+@mcp_app.command()
+def install(
+    package: Annotated[str, typer.Argument(help="Package identifier (e.g. '@upstash/context7-mcp')")],
+    pkg_type: Annotated[
+        str,
+        typer.Option("--type", help="Package type: uvx, npx, or pip"),
+    ],
+    name: Annotated[str, typer.Option("--name", help="Server name for config file")],
+    env: Annotated[
+        str,
+        typer.Option("--env", help="Comma-separated env var names"),
+    ] = "",
+    module: Annotated[
+        str,
+        typer.Option("--module", help="Python module name (required for --type pip)"),
+    ] = "",
+    force: Annotated[
+        bool,
+        typer.Option("--force", help="Overwrite existing config file"),
+    ] = False,
+    mcp_dir: Annotated[
+        str,
+        typer.Option("--mcp-dir", help="MCP config directory", hidden=True),
+    ] = "",
+) -> None:
+    """Install an MCP server package and generate config.
+
+    Installs the package (pip only), verifies connectivity via health check,
+    and generates .raise/mcp/<name>.yaml.
+
+    Examples:
+        rai mcp install @upstash/context7-mcp --type npx --name context7
+        rai mcp install mcp-github --type uvx --name github --env GITHUB_TOKEN
+        rai mcp install mcp-server-fetch --type pip --name fetch --module mcp_server_fetch
+    """
+    # Validate type
+    valid_types: set[str] = {"uvx", "npx", "pip"}
+    if pkg_type not in valid_types:
+        console.print(f"Error: Invalid --type '{pkg_type}'. Must be one of: {', '.join(sorted(valid_types))}")
+        raise typer.Exit(1)
+
+    # Validate pip requires --module
+    if pkg_type == "pip" and not module:
+        console.print("Error: --module is required when --type is pip")
+        raise typer.Exit(1)
+
+    out_dir = Path(mcp_dir) if mcp_dir else Path.cwd() / ".raise" / "mcp"
+
+    # Early overwrite check
+    out_path = out_dir / f"{name}.yaml"
+    if out_path.exists() and not force:
+        console.print(f"Error: {out_path} already exists. Use --force to overwrite.")
+        raise typer.Exit(1)
+
+    # pip: install package first
+    if pkg_type == "pip":
+        console.print(f"Installing {package} via pip...")
+        pip_result = subprocess.run(
+            [sys.executable, "-m", "pip", "install", package],
+            capture_output=True,
+            text=True,
+        )
+        if pip_result.returncode != 0:
+            console.print(f"Error: pip install failed: {pip_result.stderr}")
+            raise typer.Exit(1)
+
+    # Build command/args from type strategy
+    server_command, server_args = _build_server_config(
+        pkg_type, package, module or None,
+    )
+    env_list = [e.strip() for e in env.split(",") if e.strip()] or None
+
+    # Health check — non-fatal
+    tool_names: list[str] = []
+    health_ok = True
+
+    async def _check() -> list[str]:
+        bridge = McpBridge(
+            server_command=server_command,
+            server_args=server_args,
+        )
+        try:
+            tools = await bridge.list_tools()
+            return [t.name for t in tools]
+        finally:
+            await bridge.aclose()
+
+    try:
+        tool_names = asyncio.run(_check())
+    except Exception as exc:
+        health_ok = False
+        console.print(f"Warning: Health check failed: {exc}")
+
+    # Write config
+    written = _write_mcp_config(
+        name=name,
+        server_command=server_command,
+        server_args=server_args,
+        env_list=env_list,
+        tool_names=tool_names,
+        out_dir=out_dir,
+        force=True,  # already checked above
+        source="install",
+    )
+
+    status = "healthy" if health_ok else "unhealthy (check config)"
+    Console().print(
+        f"Created {written} ({len(tool_names)} tools, {status})"
+    )
