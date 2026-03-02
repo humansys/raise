@@ -75,7 +75,7 @@ Expose McpBridge as independent infrastructure so developers can register, manag
 
 ## Done Criteria
 
-- [ ] McpBridge lives in `rai_cli.mcp.bridge`, all existing consumers unbroken
+- [x] McpBridge lives in `rai_cli.mcp.bridge`, all existing consumers unbroken
 - [ ] Context7 registered and callable via `rai mcp call` E2E
 - [ ] Telemetry events emitted for every bridge call
 - [ ] Declarative adapters (E337) can reference registry servers by name
@@ -151,7 +151,7 @@ Sequential execution recommended (solo developer), but parallel is safe.
 
 | # | Story | Size | Status | Velocity |
 |---|-------|------|--------|----------|
-| S338.1 | MCP infrastructure + registry | M | pending | — |
+| S338.1 | MCP infrastructure + registry | M | done | 1.33x |
 | S338.3 | `rai mcp call` | S | pending | — |
 | S338.2 | `rai mcp list/health/tools` | S | pending | — |
 | S338.4 | Telemetry hooks | S | pending | — |
