@@ -4,14 +4,14 @@ Validates the YAML structure used by DeclarativeMcpAdapter.
 No ``model`` field in ResponseMapping — the adapter infers
 the return type from the protocol method name (AR-R1).
 
-Architecture: ADR-041, E337
+Architecture: ADR-041, E337, E338 (AR-C2: shared ServerConnection)
 """
 
 from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class AdapterMeta(BaseModel):
@@ -23,19 +23,6 @@ class AdapterMeta(BaseModel):
     )
     description: str | None = Field(
         default=None, description="Human-readable description"
-    )
-
-
-class ServerConfig(BaseModel):
-    """MCP server connection configuration."""
-
-    command: str = Field(..., description="Server command (e.g. 'uvx', 'npx')")
-    args: list[str] = Field(
-        default_factory=list, description="Server command arguments"
-    )
-    env: list[str] | None = Field(
-        default=None,
-        description="Env var names to pass to server subprocess (AR-R2)",
     )
 
 
@@ -67,6 +54,38 @@ class MethodMapping(BaseModel):
     )
 
 
+class ServerRef(BaseModel):
+    """Server config: reference MCP registry OR inline connection.
+
+    Either ``ref`` (name in ``.raise/mcp/`` registry) or ``command``
+    (inline connection) must be provided. Both may be set but ref
+    takes precedence at resolution time.
+
+    Architecture: E338 S338.5 — Option B (separate from ServerConnection).
+    """
+
+    ref: str | None = Field(
+        default=None, description="Name in .raise/mcp/ registry"
+    )
+    command: str | None = Field(
+        default=None, description="Server command (e.g. 'uvx', 'npx')"
+    )
+    args: list[str] = Field(
+        default_factory=list, description="Server command arguments"
+    )
+    env: list[str] | None = Field(
+        default=None,
+        description="Env var names to pass to server subprocess",
+    )
+
+    @model_validator(mode="after")
+    def _ref_or_command(self) -> ServerRef:
+        if self.ref is None and self.command is None:
+            msg = "Either 'ref' or 'command' must be provided"
+            raise ValueError(msg)
+        return self
+
+
 class DeclarativeAdapterConfig(BaseModel):
     """Root config model for a declarative MCP adapter.
 
@@ -74,7 +93,7 @@ class DeclarativeAdapterConfig(BaseModel):
     """
 
     adapter: AdapterMeta
-    server: ServerConfig
+    server: ServerRef
     methods: dict[str, MethodMapping | None] = Field(
         default_factory=dict,
         description="Protocol method → MCP tool mapping. None = unsupported.",

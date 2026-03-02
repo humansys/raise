@@ -18,6 +18,7 @@ from rai_cli.cli.commands.gate import gate_app
 from rai_cli.cli.commands.graph import graph_app
 from rai_cli.cli.commands.info import info_command
 from rai_cli.cli.commands.init import init_command
+from rai_cli.cli.commands.mcp import mcp_app
 from rai_cli.cli.commands.memory import memory_app
 from rai_cli.cli.commands.pattern import pattern_app
 from rai_cli.cli.commands.profile import profile_app
@@ -56,6 +57,7 @@ app.add_typer(docs_app, name="docs")
 app.add_typer(discover_app, name="discover")
 app.add_typer(gate_app, name="gate")
 app.add_typer(graph_app, name="graph")
+app.add_typer(mcp_app, name="mcp")
 app.add_typer(memory_app, name="memory")
 app.add_typer(pattern_app, name="pattern")
 app.add_typer(profile_app, name="profile")

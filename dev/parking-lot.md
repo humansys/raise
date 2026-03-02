@@ -6,12 +6,19 @@
 
 ---
 
+## E338 Deferred Items — 2026-03-01
+
+- [ ] **BM25 tool search (Level 3)** — semantic tool matching for large MCP servers. Promote when 3+ servers registered and patterns stabilize.
+- [ ] **Remote MCP servers (SSE/HTTP)** — McpBridge is stdio-only. Add transport options when needed.
+- [ ] **Agent config export** — generate claude_desktop_config.json, .cursor/, .roo/ from `.raise/mcp/` registry. Ties to RAISE-128.
+- [ ] **MCP server versioning** — track installed versions, detect updates, migration paths.
+
 ## E337 Deferred Items — 2026-03-01
 
-- [ ] **Level 3: Auto-discovery + BM25 tool search** — connect to MCP server, introspect tools, auto-generate YAML scaffold. Promote when 3+ YAML adapters exist and patterns stabilize.
 - [ ] **Jinja2 migration** — if expression evaluator hits ceiling (>6 filters), consider Jinja2. Current 4 filters cover all known cases.
-- [ ] **MCP server installation management** — `rai adapter install github` to auto-install uvx/npx packages. Orthogonal to adapter framework.
-- [ ] **Adapter scaffolding CLI** — `rai adapter scaffold <mcp-server>` to generate YAML from server's tool list. Depends on Level 3 discovery.
+- [x] ~~**MCP server installation management**~~ — promoted to E338 S338.6
+- [x] ~~**Adapter scaffolding CLI**~~ — promoted to E338 S338.7
+- [x] ~~**Level 3: Auto-discovery + BM25 tool search**~~ — partially promoted (introspection to E338 S338.7, BM25 deferred)
 
 ---
 
@@ -47,11 +54,7 @@ Full e301 merge to dev done (commit `7d051f4`). You now have on dev:
 
 ## E301 Session SES-300 — 2026-02-28
 
-- [ ] **`rai mcp call` — agent-agnostic MCP access from skills**
-  - **Context:** S301.3 smoke test revealed McpBridge already solves 80% of the problem. A thin CLI wrapper (`rai mcp call <server> <tool> <args>`) would let any skill invoke any MCP server without the agent having MCP configured. Agent-agnostic MCP Porter built into rai.
-  - **Value:** Skills become portable across agents (Claude, Roo, Cursor). MCP config lives in rai, not per-agent settings.
-  - **Scope:** Spike first (validate UX + latency), then Story if viable.
-  - **Depends on:** McpBridge (S301.3, done)
+- [x] ~~**`rai mcp call` — agent-agnostic MCP access from skills**~~ — promoted to E338 S338.3
 
 ---
 
