@@ -11,6 +11,7 @@ Commands:
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import Annotated, Literal
 
@@ -25,6 +26,8 @@ from rai_cli.telemetry.schemas import (
     WorkLifecycle,
 )
 from rai_cli.telemetry.writer import emit
+
+logger = logging.getLogger(__name__)
 
 signal_app = typer.Typer(
     name="signal",
@@ -172,6 +175,25 @@ def emit_work(
 
     # Emit signal
     result = emit(lifecycle_event, session_id=session_id)
+
+    # Bridge: fire WorkLifecycleEvent to hook system (non-fatal)
+    if result.success:
+        try:
+            from rai_cli.hooks.emitter import create_emitter
+            from rai_cli.hooks.events import WorkLifecycleEvent
+
+            emitter = create_emitter()
+            emitter.emit(
+                WorkLifecycleEvent(
+                    work_type=work_type_lower,
+                    work_id=work_id,
+                    event=event_type,
+                    phase=phase,
+                )
+            )
+        except Exception:  # noqa: BLE001
+            # Hook failure is non-fatal — telemetry was already written
+            logger.warning("Hook dispatch failed for work:lifecycle event")
 
     if result.success:
         # Format label based on work type
