@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
 
@@ -166,3 +166,126 @@ class TestMcpCallBridgeError:
             )
         assert result.exit_code != 0
         assert "Connection refused" in result.output
+
+
+class TestMcpCallEmitsEvent:
+    """McpCallEvent emitted on success and failure."""
+
+    def test_emits_event_on_success(self) -> None:
+        mock_result = McpToolResult(text="ok", data={})
+        mock_bridge = AsyncMock()
+        mock_bridge.call.return_value = mock_result
+        mock_bridge.aclose.return_value = None
+        mock_emitter = MagicMock()
+
+        with (
+            patch(
+                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                return_value={"test-server": _FAKE_SERVER},
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.McpBridge",
+                return_value=mock_bridge,
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.create_emitter",
+                return_value=mock_emitter,
+            ),
+        ):
+            result = runner.invoke(
+                app, ["mcp", "call", "test-server", "ping"]
+            )
+        assert result.exit_code == 0
+        mock_emitter.emit.assert_called_once()
+        event = mock_emitter.emit.call_args[0][0]
+        assert event.event_name == "mcp:call"
+        assert event.server == "test-server"
+        assert event.tool == "ping"
+        assert event.success is True
+        assert event.latency_ms >= 0
+
+    def test_emits_event_on_failure(self) -> None:
+        mock_bridge = AsyncMock()
+        mock_bridge.call.side_effect = Exception("timeout")
+        mock_bridge.aclose.return_value = None
+        mock_emitter = MagicMock()
+
+        with (
+            patch(
+                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                return_value={"test-server": _FAKE_SERVER},
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.McpBridge",
+                return_value=mock_bridge,
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.create_emitter",
+                return_value=mock_emitter,
+            ),
+        ):
+            result = runner.invoke(
+                app, ["mcp", "call", "test-server", "bad-tool"]
+            )
+        assert result.exit_code != 0
+        mock_emitter.emit.assert_called_once()
+        event = mock_emitter.emit.call_args[0][0]
+        assert event.success is False
+        assert "timeout" in event.error
+
+
+class TestMcpCallVerbose:
+    """--verbose flag shows call details on stderr."""
+
+    def test_verbose_success(self) -> None:
+        mock_result = McpToolResult(text="ok", data={})
+        mock_bridge = AsyncMock()
+        mock_bridge.call.return_value = mock_result
+        mock_bridge.aclose.return_value = None
+
+        with (
+            patch(
+                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                return_value={"test-server": _FAKE_SERVER},
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.McpBridge",
+                return_value=mock_bridge,
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.create_emitter",
+                return_value=MagicMock(),
+            ),
+        ):
+            result = runner.invoke(
+                app, ["mcp", "call", "test-server", "ping", "--verbose"]
+            )
+        assert result.exit_code == 0
+        assert "test-server" in result.output
+        assert "ping" in result.output
+        assert "ok" in result.output.lower() or "ms" in result.output
+
+    def test_verbose_failure(self) -> None:
+        mock_bridge = AsyncMock()
+        mock_bridge.call.side_effect = Exception("Connection refused")
+        mock_bridge.aclose.return_value = None
+
+        with (
+            patch(
+                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                return_value={"test-server": _FAKE_SERVER},
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.McpBridge",
+                return_value=mock_bridge,
+            ),
+            patch(
+                "rai_cli.cli.commands.mcp.create_emitter",
+                return_value=MagicMock(),
+            ),
+        ):
+            result = runner.invoke(
+                app, ["mcp", "call", "test-server", "tool", "--verbose"]
+            )
+        assert result.exit_code != 0
+        assert "test-server" in result.output
