@@ -108,8 +108,8 @@ def list_command(
     their source package.
 
     Examples:
-        $ rai adapters list
-        $ rai adapters list --format json
+        $ rai adapter list
+        $ rai adapter list --format json
     """
     tier = _get_tier()
     groups = _collect_groups()
@@ -137,8 +137,8 @@ def check_command(
     against its corresponding @runtime_checkable Protocol.
 
     Examples:
-        $ rai adapters check
-        $ rai adapters check --format json
+        $ rai adapter check
+        $ rai adapter check --format json
     """
     results: list[dict[str, Any]] = []
     emitter = create_emitter()

@@ -19,7 +19,7 @@ def _make_entry_point(name: str, group: str, value: str) -> EntryPoint:
 
 
 class TestAdaptersList:
-    """Tests for `rai adapters list`."""
+    """Tests for `rai adapter list`."""
 
     def test_list_shows_registered_parsers(self) -> None:
         result = runner.invoke(app, ["adapter", "list"])
@@ -72,7 +72,7 @@ class TestAdaptersList:
 
 
 class TestAdaptersCheck:
-    """Tests for `rai adapters check`."""
+    """Tests for `rai adapter check`."""
 
     def test_check_builtins_pass(self) -> None:
         result = runner.invoke(app, ["adapter", "check"])
