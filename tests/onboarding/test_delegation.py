@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from rai_cli.onboarding.profile import (
@@ -9,7 +11,9 @@ from rai_cli.onboarding.profile import (
     DelegationLevel,
     DeveloperProfile,
     ExperienceLevel,
+    load_developer_profile,
     resolve_delegation,
+    save_developer_profile,
 )
 
 
@@ -113,3 +117,35 @@ class TestResolveDelegation:
             ),
         )
         assert resolve_delegation(profile, "rai-story-close") == DelegationLevel.NOTIFY
+
+
+class TestDelegationYamlRoundTrip:
+    """Tests for YAML persistence of delegation config."""
+
+    def test_save_and_load_with_delegation(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Profile with delegation round-trips through YAML."""
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: tmp_path)
+        profile = DeveloperProfile(
+            name="Dev",
+            experience_level=ExperienceLevel.RI,
+            delegation=DelegationConfig(
+                default_level=DelegationLevel.AUTO,
+                overrides={"rai-story-design": DelegationLevel.REVIEW},
+            ),
+        )
+        save_developer_profile(profile)
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert loaded.delegation is not None
+        assert loaded.delegation.default_level == DelegationLevel.AUTO
+        assert loaded.delegation.overrides["rai-story-design"] == DelegationLevel.REVIEW
+
+    def test_load_without_delegation_backward_compat(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Profile YAML without delegation key loads fine."""
+        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: tmp_path)
+        profile = DeveloperProfile(name="Dev", experience_level=ExperienceLevel.HA)
+        save_developer_profile(profile)
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert loaded.delegation is None
+        assert resolve_delegation(loaded, "any-skill") == DelegationLevel.NOTIFY
