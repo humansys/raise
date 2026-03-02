@@ -102,6 +102,33 @@ rai init --skill-set <name>   (default: "default")
 | S340.2 | Overlay deployment | M | `rai init --skill-set X` merges default + overlay → `.claude/skills/`. Same-name wins. Manifest tracks origin. New `_copy_skill_tree_path()` for filesystem overlay. |
 | S340.3 | Skill creation targets sets | S | `/rai-skill-create` generates into `.raise/skills/{set}/`. `rai skill scaffold --set`. "Customize builtin" mode. |
 
+## Plan
+
+### Milestones
+
+| M# | Milestone | Stories | Gate |
+|----|-----------|---------|------|
+| M1 | Default set population | S340.1 | `rai init` creates `.raise/skills/default/` with 23 builtins |
+| M2 | Overlay deployment | S340.2 | `rai init --skill-set X` produces correct merged `.claude/skills/` |
+| M3 | Skill creation UX | S340.3 | `/rai-skill-create --set X` generates into `.raise/skills/{set}/` |
+
+### Sequence
+
+```
+S340.1 (S) → S340.2 (M) → S340.3 (S)
+  M1           M2           M3
+```
+
+Linear: S340.2 needs `default/` from S340.1. S340.3 needs set concept from S340.2.
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Velocity | Notes |
+|-------|------|--------|--------|----------|-------|
+| S340.1 | S | Pending | — | — | — |
+| S340.2 | M | Pending | — | — | — |
+| S340.3 | S | Pending | — | — | — |
+
 ## Done Criteria
 
 - [ ] `rai init` populates `.raise/skills/default/` with 23 builtins
