@@ -122,7 +122,7 @@ Linear: S340.2 needs `--skill-set` concept from S340.1.
 |-------|------|--------|--------|----------|-------|
 | S340.1 | S | Done | S | 1.0x | 8 tests, overlay-only, AR R1 adopted |
 | S340.2 | S | Done | S | 1.0x | 4 tests, scaffold --set + --from-builtin |
-| S340.3 | S | Pending | — | — | Conversational skill set UX in /rai-skill-create |
+| S340.3 | S | Done | S | 1.0x | Step 0 skill set detection, ADR-040 valid |
 
 ## Done Criteria
 
