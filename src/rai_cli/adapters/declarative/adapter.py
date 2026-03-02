@@ -32,6 +32,7 @@ from rai_cli.adapters.models import (
 )
 from rai_cli.mcp.bridge import McpBridge, McpBridgeError, McpToolResult
 from rai_cli.mcp.registry import discover_mcp_servers
+from rai_cli.mcp.schema import ServerConnection
 
 logger = logging.getLogger(__name__)
 
@@ -66,9 +67,9 @@ class DeclarativeMcpAdapter:
                 raise McpBridgeError(msg)
             conn = registry[server.ref].server
         else:
-            from rai_cli.mcp.schema import ServerConnection
+            assert server.command is not None  # guaranteed by ServerRef validator
             conn = ServerConnection(
-                command=server.command,  # type: ignore[arg-type]  # validator guarantees non-None
+                command=server.command,
                 args=server.args,
                 env=server.env,
             )
