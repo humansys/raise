@@ -36,6 +36,9 @@ Expose McpBridge as independent infrastructure so developers can register, manag
 
 - `rai mcp install <server> --type uvx|npx|pip` — install server, generate config template
 - `rai mcp scaffold <server>` — connect, introspect tools, generate `.raise/mcp/<name>.yaml`
+- MCP skills (`/rai-mcp-add`, `/rai-mcp-remove`, `/rai-mcp-status`) — guided human interface for MCP management
+- Stack-aware MCP recommendations after discovery scan
+- MCP health visibility in `/rai-session-start`
 
 ## Out of Scope
 
@@ -60,10 +63,14 @@ Expose McpBridge as independent infrastructure so developers can register, manag
 | S338.5 | Declarative adapter `server.ref` | S | Declarative adapters can reference `.raise/mcp/` servers by name instead of inline config. Backwards compat preserved. | S338.1 |
 | S338.6 | `rai mcp install` | M | Install server via explicit `--type uvx|npx|pip` (AR-R3), verify with health, generate config template. | S338.2 |
 | S338.7 | `rai mcp scaffold` | S | Connect to running server, introspect tools, generate `.raise/mcp/<name>.yaml`. | S338.2 |
+| S338.8 | MCP Skills (`/rai-mcp-add`, `/rai-mcp-remove`, `/rai-mcp-status`) | M | Guided conversational MCP management. Human never constructs CLI commands. Skills orchestrate CLI underneath. | S338.6, S338.7 |
+| S338.9 | Stack-aware MCP recommendations | S | After `/rai-discover-scan`, suggest relevant MCP servers based on detected languages/frameworks. | S338.8 |
+| S338.10 | MCP health in `/rai-session-start` | XS | Show MCP server status at session start. Warn about unhealthy servers. Makes MCP visible without dev asking. | S338.2 |
 
 **Critical path:** S338.1 → S338.2 → S338.3 → S338.4
 **Parallel after S338.1:** S338.2, S338.3, S338.5
 **Parallel after S338.2:** S338.6, S338.7
+**After M3:** S338.8, S338.10 (parallel). S338.9 after S338.8.
 
 ## Milestones
 
@@ -72,14 +79,18 @@ Expose McpBridge as independent infrastructure so developers can register, manag
 | M1: Registry + CLI | S338.1, S338.2, S338.3 | `rai mcp call context7 resolve-library-id` works E2E |
 | M2: Integration | S338.4, S338.5 | Telemetry events emitted, declarative adapters use `server.ref` |
 | M3: Full platform | S338.6, S338.7 | `rai mcp install` + `rai mcp scaffold` generate working config |
+| M4: Developer Experience | S338.8, S338.9, S338.10 | Human can add MCP server via `/rai-mcp-add` without knowing CLI syntax |
 
 ## Done Criteria
 
 - [x] McpBridge lives in `rai_cli.mcp.bridge`, all existing consumers unbroken
-- [ ] Context7 registered and callable via `rai mcp call` E2E
-- [ ] Telemetry events emitted for every bridge call
-- [ ] Declarative adapters (E337) can reference registry servers by name
-- [ ] `rai mcp list` shows all registered servers with tool counts
+- [x] Context7 registered and callable via `rai mcp call` E2E
+- [x] Telemetry events emitted for every bridge call
+- [x] Declarative adapters (E337) can reference registry servers by name
+- [x] `rai mcp list` shows all registered servers with tool counts
+- [ ] `/rai-mcp-add` guides human through MCP server registration conversationally
+- [ ] Stack-aware recommendations after discovery scan
+- [ ] MCP status visible at session start
 - [ ] Retrospective completed
 
 ## Risks
@@ -143,9 +154,17 @@ Sequential execution recommended (solo developer), but parallel is safe.
 
 #### M3: Full Platform (S338.6 + S338.7)
 
-- [ ] `rai mcp scaffold context7` generates valid `.raise/mcp/context7.yaml`
-- [ ] `rai mcp install @upstash/context7-mcp --type npx` installs and generates config
-- [ ] Health check passes after install
+- [x] `rai mcp scaffold context7` generates valid `.raise/mcp/context7.yaml`
+- [x] `rai mcp install @upstash/context7-mcp --type npx` installs and generates config
+- [x] Health check passes after install
+
+#### M4: Developer Experience (S338.8 + S338.9 + S338.10)
+
+- [ ] `/rai-mcp-add` guides human from "I want Context7" to working config — zero CLI knowledge required
+- [ ] `/rai-mcp-remove` checks adapter dependencies before removing
+- [ ] `/rai-mcp-status` shows health of all registered servers
+- [ ] After discover scan, Rai suggests relevant MCP servers for detected stack
+- [ ] `/rai-session-start` shows MCP server status when servers are registered
 
 ### Progress Tracking
 
@@ -158,6 +177,9 @@ Sequential execution recommended (solo developer), but parallel is safe.
 | S338.5 | Declarative adapter `server.ref` | S | done | 1.25x |
 | S338.7 | `rai mcp scaffold` | S | done | 1.33x |
 | S338.6 | `rai mcp install` | M | done | 1.2x |
+| S338.8 | MCP Skills (add/remove/status) | M | pending | — |
+| S338.9 | Stack-aware MCP recommendations | S | pending | — |
+| S338.10 | MCP health in session start | XS | pending | — |
 
 ### Sequencing Risks
 
