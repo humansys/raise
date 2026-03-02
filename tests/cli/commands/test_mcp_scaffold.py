@@ -118,7 +118,8 @@ class TestScaffoldOverwriteProtection:
     def test_refuses_overwrite(self, tmp_path: Path) -> None:
         mcp_dir = tmp_path / ".raise" / "mcp"
         mcp_dir.mkdir(parents=True)
-        (mcp_dir / "existing.yaml").write_text("name: existing\n")
+        original = "name: existing\n"
+        (mcp_dir / "existing.yaml").write_text(original)
 
         result = runner.invoke(
             app,
@@ -130,6 +131,8 @@ class TestScaffoldOverwriteProtection:
         )
         assert result.exit_code != 0
         assert "already exists" in result.output.lower()
+        # File content preserved
+        assert (mcp_dir / "existing.yaml").read_text() == original
 
     def test_force_overwrites(self, tmp_path: Path) -> None:
         mcp_dir = tmp_path / ".raise" / "mcp"
