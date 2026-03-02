@@ -42,6 +42,9 @@ def discover_mcp_servers(
     result: dict[str, McpServerConfig] = {}
 
     for yaml_path in sorted(mcp_dir.glob("*.yaml")):
+        if yaml_path.name == "catalog.yaml":
+            continue
+
         try:
             raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
         except Exception as exc:  # noqa: BLE001

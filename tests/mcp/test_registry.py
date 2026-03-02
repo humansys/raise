@@ -93,6 +93,23 @@ class TestDiscoverMcpServers:
         assert result["dupe"].server.command == "first"
         assert "already defined" in caplog.text
 
+    def test_skips_catalog_yaml(self, mcp_dir: Path) -> None:
+        from rai_cli.mcp.registry import discover_mcp_servers
+
+        _write_yaml(mcp_dir / "catalog.yaml", {
+            "servers": {
+                "context7": {"package": "@upstash/context7-mcp", "type": "npx"},
+            },
+        })
+        _write_yaml(mcp_dir / "context7.yaml", {
+            "name": "context7",
+            "server": {"command": "npx", "args": ["-y", "@upstash/context7-mcp"]},
+        })
+
+        result = discover_mcp_servers(mcp_dir=mcp_dir)
+        assert len(result) == 1
+        assert "context7" in result
+
     def test_ignores_non_yaml_files(self, mcp_dir: Path) -> None:
         from rai_cli.mcp.registry import discover_mcp_servers
 
