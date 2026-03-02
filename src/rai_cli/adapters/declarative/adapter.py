@@ -31,6 +31,7 @@ from rai_cli.adapters.models import (
     PublishResult,
 )
 from rai_cli.mcp.bridge import McpBridge, McpBridgeError, McpToolResult
+from rai_cli.mcp.registry import discover_mcp_servers
 
 logger = logging.getLogger(__name__)
 
@@ -52,17 +53,34 @@ class DeclarativeMcpAdapter:
         self._bridge = self._create_bridge()
 
     def _create_bridge(self) -> McpBridge:
-        """Create McpBridge from server config (AR-C2: shared per lifetime)."""
+        """Create McpBridge from server config.
+
+        Resolves ``server.ref`` via MCP registry if set, otherwise
+        uses inline connection fields. (S338.5, AR-C2)
+        """
         server = self._config.server
+        if server.ref is not None:
+            registry = discover_mcp_servers()
+            if server.ref not in registry:
+                msg = f"Server ref '{server.ref}' not found in MCP registry"
+                raise McpBridgeError(msg)
+            conn = registry[server.ref].server
+        else:
+            from rai_cli.mcp.schema import ServerConnection
+            conn = ServerConnection(
+                command=server.command,  # type: ignore[arg-type]  # validator guarantees non-None
+                args=server.args,
+                env=server.env,
+            )
         env: dict[str, str] | None = None
-        if server.env:
+        if conn.env:
             env = {
                 **os.environ,
-                **{k: os.environ.get(k, "") for k in server.env},
+                **{k: os.environ.get(k, "") for k in conn.env},
             }
         return McpBridge(
-            server_command=server.command,
-            server_args=server.args,
+            server_command=conn.command,
+            server_args=conn.args,
             env=env,
         )
 
