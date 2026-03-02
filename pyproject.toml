@@ -86,6 +86,7 @@ glossary = "rai_cli.governance.parsers.glossary:GlossaryParser"
 telemetry = "rai_cli.hooks.builtin.telemetry:TelemetryHook"
 gate-bridge = "rai_cli.hooks.builtin.gate_bridge:GateBridgeHook"
 jira-sync = "rai_cli.hooks.builtin.jira_sync:JiraSyncHook"
+backlog = "rai_cli.hooks.builtin.backlog:BacklogHook"
 
 [project.entry-points."rai.gates"]
 tests = "rai_cli.gates.builtin.tests:TestGate"

@@ -20,6 +20,8 @@ metadata:
 
 # Discovery Start
 
+> **Deprecated:** Use `/rai-discover` instead, which runs the full pipeline (detect → extract → describe → document → build) in one pass. This skill is kept for backward compatibility.
+
 ## Purpose
 
 Initialize codebase discovery by detecting languages, key directories, and entry points. Creates the context file that all subsequent discovery skills depend on.

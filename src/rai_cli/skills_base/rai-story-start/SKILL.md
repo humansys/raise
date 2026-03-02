@@ -17,6 +17,13 @@ metadata:
   raise.adaptable: "true"
   raise.version: "2.1.0"
   raise.visibility: public
+  raise.inputs: |
+    - story_id: string, required, argument
+    - epic_branch: string, required, git
+  raise.outputs: |
+    - story_branch: string, next_skill
+    - story_md: file_path, next_skill
+    - scope_md: file_path, next_skill
 ---
 
 # Story Start
