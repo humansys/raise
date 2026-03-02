@@ -20,31 +20,14 @@ import logfire_api as logfire
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
-from pydantic import BaseModel, Field
 
-from rai_cli.adapters.models import AdapterHealth
+from rai_cli.mcp.models import McpHealthResult, McpToolInfo, McpToolResult
 
 logger = logging.getLogger(__name__)
 
 
 class McpBridgeError(Exception):
     """Raised when MCP bridge operations fail."""
-
-
-class McpToolResult(BaseModel):
-    """Parsed result from an MCP tool call."""
-
-    text: str = ""
-    data: dict[str, Any] = Field(default_factory=dict)
-    is_error: bool = False
-    error_message: str = ""
-
-
-class McpToolInfo(BaseModel):
-    """Tool metadata from server discovery."""
-
-    name: str
-    description: str = ""
 
 
 class McpBridge:
@@ -119,22 +102,23 @@ class McpBridge:
             for t in result.tools
         ]
 
-    async def health(self) -> AdapterHealth:
+    async def health(self) -> McpHealthResult:
         """Check server connectivity and tool availability."""
         start = time.monotonic()
         try:
             tools = await self.list_tools()
             elapsed_ms = int((time.monotonic() - start) * 1000)
-            return AdapterHealth(
-                name=self._server_command,
+            return McpHealthResult(
+                server_name=self._server_command,
                 healthy=True,
                 message=f"OK, {len(tools)} tools",
                 latency_ms=elapsed_ms,
+                tool_count=len(tools),
             )
         except (McpBridgeError, Exception) as exc:
             elapsed_ms = int((time.monotonic() - start) * 1000)
-            return AdapterHealth(
-                name=self._server_command,
+            return McpHealthResult(
+                server_name=self._server_command,
                 healthy=False,
                 message=str(exc),
                 latency_ms=elapsed_ms,
