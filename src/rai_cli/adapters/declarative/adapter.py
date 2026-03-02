@@ -204,10 +204,17 @@ class DeclarativeMcpAdapter:
 
     async def search(
         self, query: str, limit: int = 50
-    ) -> list[IssueSummary]:
+    ) -> list[IssueSummary] | list[PageSummary]:
+        """Protocol-aware search: returns IssueSummary (PM) or PageSummary (docs).
+
+        SyncDocsAdapter calls .search() — must return the right type based on
+        the adapter's configured protocol (QR-C1 fix).
+        """
         ctx = {"query": query, "limit": limit}
         result = await self._dispatch("search", ctx)
         items = self._parse_list("search", result)
+        if self._config.adapter.protocol == "docs":
+            return [PageSummary(**item) for item in items]
         return [IssueSummary(**item) for item in items]
 
     # ----- Docs: Documentation Target (AR-Q1) -----
@@ -233,19 +240,6 @@ class DeclarativeMcpAdapter:
         result = await self._dispatch("get_page", ctx)
         fields = self._parse_single("get_page", result, ctx)
         return PageContent(**fields)
-
-    async def docs_search(
-        self, query: str, limit: int = 10
-    ) -> list[PageSummary]:
-        """Docs-specific search returning PageSummary list.
-
-        Uses the same 'search' key in YAML methods config. Separate method
-        name avoids return-type conflict with PM search.
-        """
-        ctx = {"query": query, "limit": limit}
-        result = await self._dispatch("search", ctx)
-        items = self._parse_list("search", result)
-        return [PageSummary(**item) for item in items]
 
     # ----- Lifecycle -----
 
