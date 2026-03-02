@@ -17,6 +17,7 @@ from rai_cli.adapters.declarative.schema import (
     DeclarativeAdapterConfig,
     MethodMapping,
     ResponseMapping,
+    ServerRef,
 )
 from rai_cli.mcp.schema import ServerConnection
 
@@ -89,13 +90,13 @@ class TestInvalidConfig:
         with pytest.raises(ValidationError, match="name"):
             DeclarativeAdapterConfig(**data)
 
-    def test_missing_server_command_raises(self) -> None:
+    def test_missing_server_ref_and_command_raises(self) -> None:
         data = {
             "adapter": {"name": "test", "protocol": "pm"},
             "server": {"args": ["test"]},
             "methods": {},
         }
-        with pytest.raises(ValidationError, match="command"):
+        with pytest.raises(ValidationError, match="ref.*command|command.*ref"):
             DeclarativeAdapterConfig(**data)
 
     def test_invalid_protocol_raises(self) -> None:
@@ -152,6 +153,44 @@ class TestServerConnection:
     def test_with_env(self) -> None:
         server = ServerConnection(command="uvx", args=["mcp-test"], env=["TOKEN", "URL"])
         assert server.env == ["TOKEN", "URL"]
+
+
+class TestServerRef:
+    """S338.5: ServerRef model — ref-only, inline-only, neither rejected."""
+
+    def test_inline_only(self) -> None:
+        """Inline command works — backwards compat."""
+        ref = ServerRef(command="uvx", args=["mcp-test"])
+        assert ref.command == "uvx"
+        assert ref.ref is None
+
+    def test_ref_only(self) -> None:
+        """Ref-only works — no command needed."""
+        ref = ServerRef(ref="context7")
+        assert ref.ref == "context7"
+        assert ref.command is None
+
+    def test_neither_ref_nor_command_raises(self) -> None:
+        """Neither ref nor command → ValidationError."""
+        with pytest.raises(ValidationError, match="ref.*command|command.*ref"):
+            ServerRef(args=["test"])
+
+    def test_ref_with_no_args(self) -> None:
+        """Ref-only with defaults for args/env."""
+        ref = ServerRef(ref="my-server")
+        assert ref.args == []
+        assert ref.env is None
+
+    def test_config_with_server_ref(self) -> None:
+        """DeclarativeAdapterConfig accepts server.ref."""
+        data = {
+            "adapter": {"name": "test", "protocol": "pm"},
+            "server": {"ref": "context7"},
+            "methods": {},
+        }
+        config = DeclarativeAdapterConfig(**data)
+        assert config.server.ref == "context7"
+        assert config.server.command is None
 
 
 class TestResponseMapping:
