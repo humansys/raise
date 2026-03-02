@@ -115,7 +115,7 @@ class McpBridge:
                 latency_ms=elapsed_ms,
                 tool_count=len(tools),
             )
-        except (McpBridgeError, Exception) as exc:
+        except Exception as exc:
             elapsed_ms = int((time.monotonic() - start) * 1000)
             return McpHealthResult(
                 server_name=self._server_command,

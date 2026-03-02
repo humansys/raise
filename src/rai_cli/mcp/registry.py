@@ -48,6 +48,10 @@ def discover_mcp_servers(
             logger.warning("Skipping %s: YAML parse error: %s", yaml_path.name, exc)
             continue
 
+        if not isinstance(raw, dict):
+            logger.warning("Skipping %s: YAML content is not a mapping", yaml_path.name)
+            continue
+
         try:
             config = McpServerConfig.model_validate(raw)
         except ValidationError as exc:
