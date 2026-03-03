@@ -30,4 +30,34 @@ El desarrollador guiando a Rai **no puede confiar en el estado del backlog, oper
 Al iniciar sesión, Rai sabe exactamente dónde estamos sin que el desarrollador corrija datos stale.
 
 ## 6. Hipótesis
-Si unificamos el backlog para que `rai backlog` sincronice estado bidireccionalmente con Jira y archivos locales, entonces Rai tendrá contexto preciso al inicio de cada sesión para el desarrollador, medido por cero correcciones manuales de estado stale en las primeras 4 semanas.
+Si hacemos que `rai backlog` sea el único path para leer y escribir estado de trabajo — transparente al consumidor, confiable siempre — entonces Rai tendrá contexto preciso al inicio de cada sesión, medido por cero correcciones manuales de estado stale en las primeras 4 semanas.
+
+## 7. Decisiones de Diseño (del problem shaping)
+
+| Decisión | Elección | Rationale |
+|----------|----------|-----------|
+| Offline mode (Jira down) | **Fail fast** | Zero divergence. Una fuente de verdad. No cache local. |
+| backlog.md cuando hay Jira | **Mirror read-only** | Se regenera vía `rai backlog sync`, nunca se edita directo. |
+| Skill → backlog | **Vía CLI (`rai backlog`)** | Un solo path, auditable, consistente. Skills no saben qué adapter hay. |
+| Session-start → estado | **Query live vía `rai backlog`** | Estado real, no snapshot stale. Falla explícita si adapter no responde. |
+| Adapter default | **Configurable en manifest.yaml** | Auto-detect si uno solo, default si configurado, `-a` para override. |
+
+### Principio arquitectónico
+
+**El adapter protocol es la abstracción.** Skills, hooks, session-start y humanos solo hablan con `rai backlog` CLI. No saben ni les importa si detrás hay Jira, FileAdapter, o cualquier otro backend. El contrato es: siempre responde o falla explícitamente.
+
+```
+Consumidor (skill/hook/session/humano)
+        ↓
+   rai backlog CLI
+        ↓
+   Adapter resolution (manifest.yaml default / auto-detect / -a flag)
+        ↓
+   ┌─────────────────┬──────────────────┐
+   │ McpJiraAdapter   │ FilesystemAdapter │
+   │ (Jira = verdad)  │ (backlog.md = verdad) │
+   └─────────────────┴──────────────────┘
+```
+
+Con Jira: Jira es fuente de verdad, backlog.md es mirror read-only.
+Sin Jira: backlog.md es fuente de verdad (open source default).
