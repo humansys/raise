@@ -94,7 +94,13 @@ Run each epic skill from the detected phase forward. Show `── Phase {N}/6: {
 | 5 | Story iteration (see Step 3) | — |
 | 6 | `/rai-epic-close {epic_id}` | — |
 
-Each skill invocation follows its own SKILL.md completely.
+**Full execution rule:** For each phase, you MUST:
+1. Load the skill's SKILL.md (read the file, don't rely on memory)
+2. Execute every step in the skill's SKILL.md sequentially — no compression, no skipping
+3. Produce all artifacts the skill specifies
+4. Only then move to the next phase
+
+The orchestrator delegates — it does not summarize, compress, or shortcut individual skill behavior. A skill invoked through the orchestrator must produce the same output as when invoked standalone.
 
 <if-blocked>
 Skill fails → STOP immediately. Report which phase failed and why. Developer re-invokes `/rai-epic-run` after fixing — phase detection resumes automatically.
@@ -102,13 +108,13 @@ Skill fails → STOP immediately. Report which phase failed and why. Developer r
 
 ### Step 3: Iterate Stories
 
-When reaching phase 4, read the `### Progress Tracking` table from `scope.md`:
+When reaching phase 5 (story iteration), read the `### Progress Tracking` table from `scope.md`:
 
 1. Parse rows — columns: Story, Size, Status, Actual, Velocity, Notes
 2. Filter rows where Status != "Done"
 3. Execute in table order (plan already resolved dependencies)
 
-For each pending story, show `── Story {N}/{total}: {story_id} ──` and invoke `/rai-story-run {story_id}`. After each completes, `/rai-story-close` updates scope.md. When all done, proceed to phase 5.
+For each pending story, show `── Story {N}/{total}: {story_id} ──` and invoke `/rai-story-run {story_id}`. After each completes, `/rai-story-close` updates scope.md. When all done, proceed to phase 6 (epic-close).
 
 <verification>
 All stories completed. Progress Tracking shows all "Done".
@@ -158,11 +164,13 @@ All phases complete. Epic merged.
 - [ ] Phase detection checked in reverse order (most advanced first)
 - [ ] `### Progress Tracking` heading used as plan presence marker
 - [ ] Story iteration filters Status != "Done" (handles spikes naturally)
-- [ ] Each skill and story invoked completely (not overridden)
+- [ ] Each skill's SKILL.md was loaded (read from file) before execution
+- [ ] Every step in each skill executed — no compression or shortcuts
 - [ ] Gates applied at post-design, post-AR, and post-plan
 - [ ] Failure stops immediately — no cascading
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip stories or reorder them — table order is plan order
+- [ ] NEVER compress a skill's steps into a summary — execute each step fully
 
 ## References
 
