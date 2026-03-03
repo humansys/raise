@@ -1,28 +1,36 @@
 ---
-description: 'Complete an epic with retrospective, metrics capture, branch cleanup,
-  and merge to development branch. Use after all stories are done to formally close
-  the epic lifecycle.
-
-  '
-license: MIT
-metadata:
-  raise.adaptable: 'true'
-  raise.fase: epic-close
-  raise.frequency: per-epic
-  raise.gate: ''
-  raise.next: ''
-  raise.prerequisites: all stories complete
-  raise.version: 2.0.0
-  raise.visibility: public
-  raise.work_cycle: epic
 name: rai-epic-close
+description: >
+  Complete an epic with retrospective, metrics capture, and tracking update.
+  No branch merge — epics are logical containers. Story branches merge
+  directly to the development branch during story-close.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: epic
+  raise.frequency: per-epic
+  raise.fase: "9"
+  raise.prerequisites: all stories complete
+  raise.next: ""
+  raise.gate: ""
+  raise.adaptable: "true"
+  raise.version: "3.0.0"
+  raise.visibility: public
+  raise.inputs: |
+    - scope: file_path, required, previous_skill
+    - all_retrospectives: boolean, required, git
+    - dev_branch: string, required, config
+  raise.outputs: |
+    - retrospective: file_path, file
+    - tag: string, git
 ---
 
 # Epic Close
 
 ## Purpose
 
-Complete an epic by conducting a retrospective, merging to the development branch, and cleaning up all branches.
+Complete an epic by conducting a retrospective, tagging the milestone, and updating tracking. No branch merge needed — stories already merged to the development branch during story-close.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -32,9 +40,9 @@ Complete an epic by conducting a retrospective, merging to the development branc
 
 ## Context
 
-**When to use:** All stories complete and merged to epic branch. Ready to close the epic lifecycle.
+**When to use:** All stories complete and merged to `{dev_branch}`. Ready to close the epic lifecycle.
 
-**When to skip:** Epic abandoned (document why, delete branches without merge, update backlog as "Abandoned").
+**When to skip:** Epic abandoned (document why, update backlog as "Abandoned").
 
 **Inputs:** Epic scope document, all story retrospectives, passing test suite.
 
@@ -72,38 +80,34 @@ Tests green. Retrospective created with metrics, patterns, and process insights.
 </verification>
 
 <if-blocked>
-Tests failing → fix before merge.
+Tests failing → fix before closing.
 </if-blocked>
 
-### Step 3: Merge & Clean Up Branches
+### Step 3: Tag Epic Milestone
+
+Tag the current `{dev_branch}` HEAD to mark epic completion:
 
 ```bash
-git checkout {dev_branch} && git pull origin {dev_branch}
-git merge --no-ff epic/e{N}/{name} -m "Merge epic/e{N}/{name}: {Epic Name}
+git tag -a "epic/e{N}-complete" -m "Epic E{N}: {Epic Name} complete
 
 Delivered: [key deliverables]
-Stories: N stories, X SP, X.Xx velocity
+Stories: N stories
 
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
-Delete epic and story branches (local and remote):
+Commit retrospective and any final artifacts:
 
 ```bash
-git branch -D epic/e{N}/{name}
-git push origin --delete epic/e{N}/{name} 2>/dev/null || true
-for branch in $(git branch | grep "story.*s{N}"); do
-    git branch -D $branch && git push origin --delete $branch 2>/dev/null || true
-done
+git add -A
+git commit -m "epic(e{N}): close with retrospective
+
+Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
 <verification>
-Merge commit on `{dev_branch}`. No epic/story branches remain.
+Tag created. Retrospective committed.
 </verification>
-
-<if-blocked>
-Merge conflicts → resolve preserving epic work.
-</if-blocked>
 
 ### Step 4: Update Backlog & Context
 
@@ -124,20 +128,19 @@ Backlog reflects completion. Local context updated.
 | Item | Destination |
 |------|-------------|
 | Retrospective | `work/epics/e{N}-{name}/retrospective.md` |
-| Merge commit | `{dev_branch}` with `--no-ff` |
-| Branch cleanup | All epic/story branches deleted |
+| Tag | `epic/e{N}-complete` on `{dev_branch}` |
 | Backlog update | `governance/backlog.md` |
 | Context update | `CLAUDE.local.md` |
 
 ## Quality Checklist
 
-- [ ] All stories complete before merge (gate)
-- [ ] Tests pass on epic branch before merge
+- [ ] All stories complete before closing (gate)
+- [ ] Tests pass before closing
 - [ ] Retrospective captures metrics, patterns, and process insights
-- [ ] Merge uses `--no-ff` to preserve epic history
-- [ ] All epic and story branches deleted after merge
+- [ ] Epic milestone tagged on `{dev_branch}`
 - [ ] Backlog updated with completion status
-- [ ] NEVER merge without retrospective — learnings compound across epics
+- [ ] No epic branch to clean up — epics are logical containers
+- [ ] NEVER close without retrospective — learnings compound across epics
 
 ## References
 
