@@ -2,7 +2,6 @@
 
 > **Status:** IN PROGRESS
 > **Release:** REL-{id} ({release name})
-> **Branch:** `epic/e{N}/{slug}`
 > **Created:** YYYY-MM-DD
 
 ## Objective
