@@ -117,7 +117,7 @@ Scope commit on epic branch. Epic visible in backlog.
 </verification>
 
 <if-blocked>
-No adapter configured → set `backlog.adapter_default` in `.raise/manifest.yaml`. Epic already exists → update status only.
+No adapter configured → set `backlog.adapter_default` in `.raise/manifest.yaml`. Epic already exists → update status only. Create fails → log warning and continue. Backlog errors are **non-blocking** for lifecycle.
 </if-blocked>
 
 ### Step 4: Present Next Steps
