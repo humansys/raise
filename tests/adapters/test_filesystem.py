@@ -393,6 +393,101 @@ class TestYamlStoreBatch:
         assert result.failed[0].key == "S999.1"
 
 
+# ── T6: comments + links over YAML store ───────────────────────────────
+
+
+class TestYamlStoreComments:
+    """T6: add_comment() and get_comments() over YAML store."""
+
+    def test_add_comment_returns_ref(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        ref = yaml_adapter.add_comment("E1", "Started work")
+        assert isinstance(ref, CommentRef)
+        assert ref.id == "E1-1"
+
+    def test_add_comment_persists(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        yaml_adapter.add_comment("E1", "Started work")
+        detail = yaml_adapter.get_issue("E1")
+        # Reload via get_comments
+        comments = yaml_adapter.get_comments("E1")
+        assert len(comments) == 1
+        assert comments[0].body == "Started work"
+        assert comments[0].author == "rai"
+        assert comments[0].created != ""
+
+    def test_add_second_comment_sequential_id(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        yaml_adapter.add_comment("E1", "First")
+        ref2 = yaml_adapter.add_comment("E1", "Second")
+        assert ref2.id == "E1-2"
+
+    def test_add_comment_missing_raises(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        with pytest.raises(KeyError, match="S999.1"):
+            yaml_adapter.add_comment("S999.1", "text")
+
+    def test_get_comments_returns_all(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        yaml_adapter.add_comment("E1", "First")
+        yaml_adapter.add_comment("E1", "Second")
+        comments = yaml_adapter.get_comments("E1")
+        assert len(comments) == 2
+
+    def test_get_comments_respects_limit(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        yaml_adapter.add_comment("E1", "First")
+        yaml_adapter.add_comment("E1", "Second")
+        comments = yaml_adapter.get_comments("E1", limit=1)
+        assert len(comments) == 1
+
+    def test_get_comments_missing_returns_empty(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        comments = yaml_adapter.get_comments("S999.1")
+        assert comments == []
+
+
+class TestYamlStoreLinks:
+    """T6: link_issues() and link_to_parent() over YAML store."""
+
+    def test_link_issues_adds_link(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        yaml_adapter.link_issues("E1", "E2", "blocks")
+        detail = yaml_adapter.get_issue("E1")
+        # Check via raw load
+        item = yaml_adapter._load_item("E1")
+        assert len(item.links) == 1
+        assert item.links[0].target == "E2"
+        assert item.links[0].link_type == "blocks"
+
+    def test_link_issues_appends(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        yaml_adapter.link_issues("E1", "E2", "blocks")
+        yaml_adapter.link_issues("E1", "S1.1", "relates_to")
+        item = yaml_adapter._load_item("E1")
+        assert len(item.links) == 2
+
+    def test_link_issues_missing_raises(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        with pytest.raises(KeyError, match="S999.1"):
+            yaml_adapter.link_issues("S999.1", "E1", "blocks")
+
+    def test_link_to_parent_sets_parent(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        yaml_adapter.link_to_parent("S1.1", "E2")
+        detail = yaml_adapter.get_issue("S1.1")
+        assert detail.parent_key == "E2"
+
+    def test_link_to_parent_missing_raises(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        with pytest.raises(KeyError, match="S999.1"):
+            yaml_adapter.link_to_parent("S999.1", "E1")
+
+
 # ── Legacy markdown tests (to be removed in T7) ────────────────────────
 
 SAMPLE_BACKLOG = """\
