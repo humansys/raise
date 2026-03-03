@@ -51,9 +51,10 @@ def _run_command(command: str, cwd: Path) -> tuple[bool, str]:
         Tuple of (passed, message).
     """
     try:
+        import shlex
+
         result = subprocess.run(
-            command,
-            shell=True,  # noqa: S602  # nosec B602 - commands are hardcoded, not user input
+            shlex.split(command),
             cwd=cwd,
             capture_output=True,
             text=True,
