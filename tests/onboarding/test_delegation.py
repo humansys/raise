@@ -123,7 +123,9 @@ class TestResolveDelegation:
 class TestDelegationYamlRoundTrip:
     """Tests for YAML persistence of delegation config."""
 
-    def test_save_and_load_with_delegation(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_save_and_load_with_delegation(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Profile with delegation round-trips through YAML."""
         monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: tmp_path)
         profile = DeveloperProfile(
@@ -141,7 +143,9 @@ class TestDelegationYamlRoundTrip:
         assert loaded.delegation.default_level == DelegationLevel.AUTO
         assert loaded.delegation.overrides["rai-story-design"] == DelegationLevel.REVIEW
 
-    def test_load_without_delegation_backward_compat(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_load_without_delegation_backward_compat(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Profile YAML without delegation key loads fine."""
         monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: tmp_path)
         profile = DeveloperProfile(name="Dev", experience_level=ExperienceLevel.HA)

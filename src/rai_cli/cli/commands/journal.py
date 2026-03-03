@@ -162,4 +162,6 @@ def show(
             return
         for entry in entries:
             tag_suffix = f" [{', '.join(entry.tags)}]" if entry.tags else ""
-            typer.echo(f"[{entry.id}] {entry.entry_type.value}: {entry.content}{tag_suffix}")
+            typer.echo(
+                f"[{entry.id}] {entry.entry_type.value}: {entry.content}{tag_suffix}"
+            )

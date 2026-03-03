@@ -57,14 +57,16 @@ class ApiGraphBackend:
             if not node.content:
                 skipped += 1
                 continue
-            nodes.append({
-                "node_id": node.id,
-                "node_type": node.type,
-                "scope": "project",
-                "content": node.content,
-                "source_file": node.source_file,
-                "properties": node.metadata,
-            })
+            nodes.append(
+                {
+                    "node_id": node.id,
+                    "node_type": node.type,
+                    "scope": "project",
+                    "content": node.content,
+                    "source_file": node.source_file,
+                    "properties": node.metadata,
+                }
+            )
         if skipped:
             logger.info("Skipped %d nodes with empty content", skipped)
         edges: list[dict[str, Any]] = [

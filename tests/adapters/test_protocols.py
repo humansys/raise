@@ -6,9 +6,6 @@ import asyncio
 from typing import Any
 
 import pytest
-from rai_core.graph.backends.models import BackendHealth
-from rai_core.graph.backends.protocol import KnowledgeGraphBackend
-from rai_core.graph.models import GraphNode
 
 from rai_cli.adapters.models import (
     AdapterHealth,
@@ -16,7 +13,6 @@ from rai_cli.adapters.models import (
     BatchResult,
     Comment,
     CommentRef,
-    FailureDetail,
     IssueDetail,
     IssueRef,
     IssueSpec,
@@ -33,6 +29,9 @@ from rai_cli.adapters.protocols import (
     GovernanceSchemaProvider,
     ProjectManagementAdapter,
 )
+from rai_core.graph.backends.models import BackendHealth
+from rai_core.graph.backends.protocol import KnowledgeGraphBackend
+from rai_core.graph.models import GraphNode
 
 # --- Conforming sync stubs (updated signatures) ---
 

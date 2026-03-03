@@ -45,7 +45,11 @@ class TestCreateEventEndpoint:
         mock_response = AgentEventResponse(id=uuid.uuid4())
         with (
             _override_auth(client),
-            patch("rai_server.api.v1.agent.record_event", new_callable=AsyncMock, return_value=mock_response),
+            patch(
+                "rai_server.api.v1.agent.record_event",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
         ):
             resp = client.post(
                 "/api/v1/agent/events",
@@ -71,7 +75,11 @@ class TestListEventsEndpoint:
         mock_response = AgentEventListResponse(events=[], count=0)
         with (
             _override_auth(client),
-            patch("rai_server.api.v1.agent.get_events", new_callable=AsyncMock, return_value=mock_response),
+            patch(
+                "rai_server.api.v1.agent.get_events",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
         ):
             resp = client.get("/api/v1/agent/events")
         assert resp.status_code == 200

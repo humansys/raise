@@ -25,11 +25,22 @@ class TestBacklogSearchFormat:
         """Agent format produces key|status|summary lines."""
         adapter = _mock_adapter()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-1", summary="First issue", status="Done", issue_type="Task"),
-            IssueSummary(key="RAISE-2", summary="Second issue", status="In Progress", issue_type="Story"),
+            IssueSummary(
+                key="RAISE-1", summary="First issue", status="Done", issue_type="Task"
+            ),
+            IssueSummary(
+                key="RAISE-2",
+                summary="Second issue",
+                status="In Progress",
+                issue_type="Story",
+            ),
         ]
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
-            result = runner.invoke(app, ["backlog", "search", "project=RAISE", "--format", "agent"])
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = runner.invoke(
+                app, ["backlog", "search", "project=RAISE", "--format", "agent"]
+            )
         assert result.exit_code == 0
         lines = result.output.strip().split("\n")
         assert lines[0] == "RAISE-1|Done|First issue"
@@ -39,8 +50,12 @@ class TestBacklogSearchFormat:
         """Agent format with no results produces empty output."""
         adapter = _mock_adapter()
         adapter.search.return_value = []
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
-            result = runner.invoke(app, ["backlog", "search", "project=RAISE", "--format", "agent"])
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = runner.invoke(
+                app, ["backlog", "search", "project=RAISE", "--format", "agent"]
+            )
         assert result.exit_code == 0
         assert result.output.strip() == ""
 
@@ -48,9 +63,13 @@ class TestBacklogSearchFormat:
         """Human format (default) produces same output as before."""
         adapter = _mock_adapter()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-1", summary="First issue", status="Done", issue_type="Task"),
+            IssueSummary(
+                key="RAISE-1", summary="First issue", status="Done", issue_type="Task"
+            ),
         ]
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
             result = runner.invoke(app, ["backlog", "search", "project=RAISE"])
         assert result.exit_code == 0
         # Original format uses padded status, not pipe-delimited
@@ -63,10 +82,16 @@ class TestBacklogSearchFormat:
         long_summary = "A" * 200
         adapter = _mock_adapter()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-1", summary=long_summary, status="Done", issue_type="Task"),
+            IssueSummary(
+                key="RAISE-1", summary=long_summary, status="Done", issue_type="Task"
+            ),
         ]
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
-            result = runner.invoke(app, ["backlog", "search", "project=RAISE", "--format", "agent"])
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = runner.invoke(
+                app, ["backlog", "search", "project=RAISE", "--format", "agent"]
+            )
         assert result.exit_code == 0
         assert long_summary in result.output
 
@@ -78,9 +103,12 @@ class TestBacklogCreateFormat:
         """Agent format returns only the created key."""
         adapter = _mock_adapter()
         adapter.create_issue.return_value = IssueRef(key="RAISE-99")
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
             result = runner.invoke(
-                app, ["backlog", "create", "Test issue", "-p", "RAISE", "--format", "agent"]
+                app,
+                ["backlog", "create", "Test issue", "-p", "RAISE", "--format", "agent"],
             )
         assert result.exit_code == 0
         assert result.output.strip() == "RAISE-99"
@@ -89,7 +117,9 @@ class TestBacklogCreateFormat:
         """Human format (default) produces 'Created: KEY'."""
         adapter = _mock_adapter()
         adapter.create_issue.return_value = IssueRef(key="RAISE-99")
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
             result = runner.invoke(
                 app, ["backlog", "create", "Test issue", "-p", "RAISE"]
             )
@@ -104,15 +134,21 @@ class TestBacklogFormatValidation:
         """Invalid format value exits with error."""
         adapter = _mock_adapter()
         adapter.search.return_value = []
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
-            result = runner.invoke(app, ["backlog", "search", "project=RAISE", "--format", "banana"])
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = runner.invoke(
+                app, ["backlog", "search", "project=RAISE", "--format", "banana"]
+            )
         assert result.exit_code == 1
         assert "Invalid format" in result.output
 
     def test_create_invalid_format_rejected(self) -> None:
         """Invalid format value exits with error."""
         adapter = _mock_adapter()
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
             result = runner.invoke(
                 app, ["backlog", "create", "Test", "-p", "RAISE", "--format", "json"]
             )
@@ -127,10 +163,19 @@ class TestBacklogPipeSanitization:
         """Pipe in summary is replaced to preserve field boundaries."""
         adapter = _mock_adapter()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-1", summary="Fix auth | retry logic", status="Done", issue_type="Task"),
+            IssueSummary(
+                key="RAISE-1",
+                summary="Fix auth | retry logic",
+                status="Done",
+                issue_type="Task",
+            ),
         ]
-        with patch("rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter):
-            result = runner.invoke(app, ["backlog", "search", "project=RAISE", "--format", "agent"])
+        with patch(
+            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = runner.invoke(
+                app, ["backlog", "search", "project=RAISE", "--format", "agent"]
+            )
         assert result.exit_code == 0
         line = result.output.strip()
         # Exactly 3 fields when split on pipe

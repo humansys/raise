@@ -86,11 +86,36 @@ def _create_graph(tmp_path: Path) -> Path:
             },
         ],
         "edges": [
-            {"source": "mod-memory", "target": "bc-ontology", "type": "belongs_to", "weight": 1.0},
-            {"source": "mod-memory", "target": "lyr-domain", "type": "in_layer", "weight": 1.0},
-            {"source": "bc-ontology", "target": "guardrail-must-code-001", "type": "constrained_by", "weight": 1.0},
-            {"source": "bc-ontology", "target": "guardrail-should-test-001", "type": "constrained_by", "weight": 1.0},
-            {"source": "mod-memory", "target": "mod-context", "type": "depends_on", "weight": 1.0},
+            {
+                "source": "mod-memory",
+                "target": "bc-ontology",
+                "type": "belongs_to",
+                "weight": 1.0,
+            },
+            {
+                "source": "mod-memory",
+                "target": "lyr-domain",
+                "type": "in_layer",
+                "weight": 1.0,
+            },
+            {
+                "source": "bc-ontology",
+                "target": "guardrail-must-code-001",
+                "type": "constrained_by",
+                "weight": 1.0,
+            },
+            {
+                "source": "bc-ontology",
+                "target": "guardrail-should-test-001",
+                "type": "constrained_by",
+                "weight": 1.0,
+            },
+            {
+                "source": "mod-memory",
+                "target": "mod-context",
+                "type": "depends_on",
+                "weight": 1.0,
+            },
         ],
         "metadata": {"version": "1.0"},
     }
@@ -107,10 +132,19 @@ class TestGraphQueryAgentFormat:
         """Agent format produces type|id|content lines."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "query", "memory", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "query",
+                "memory",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
-        lines = [l for l in result.output.strip().split("\n") if "|" in l]
+        lines = [ln for ln in result.output.strip().split("\n") if "|" in ln]
         assert len(lines) >= 1
         # Each line: type|id|content
         parts = lines[0].split("|")
@@ -120,7 +154,16 @@ class TestGraphQueryAgentFormat:
         """Agent format has no markdown decorations."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "query", "memory", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "query",
+                "memory",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
         assert "**" not in result.output
@@ -131,7 +174,16 @@ class TestGraphQueryAgentFormat:
         """Agent format does not truncate content."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "query", "Singleton", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "query",
+                "Singleton",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
         assert "Singleton pattern with get/set for module state" in result.output
@@ -140,18 +192,36 @@ class TestGraphQueryAgentFormat:
         """Agent format with no results produces empty output."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "query", "xyznonexistent", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "query",
+                "xyznonexistent",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
         # No pipe-delimited lines in output
-        lines = [l for l in result.output.strip().split("\n") if "|" in l]
+        lines = [ln for ln in result.output.strip().split("\n") if "|" in ln]
         assert len(lines) == 0
 
     def test_query_compact_still_works(self, tmp_path: Path) -> None:
         """Compact format (backward compat) still works."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "query", "memory", "--index", str(index_path), "--format", "compact"]
+            app,
+            [
+                "graph",
+                "query",
+                "memory",
+                "--index",
+                str(index_path),
+                "--format",
+                "compact",
+            ],
         )
         assert result.exit_code == 0
 
@@ -163,28 +233,46 @@ class TestGraphContextAgentFormat:
         """Agent format produces pipe-delimited lines for each section."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "context", "mod-memory", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "context",
+                "mod-memory",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
         output = result.output.strip()
         lines = output.split("\n")
         # Must contain module, domain, layer, must, should, dependencies
-        assert any(l.startswith("module|") for l in lines)
-        assert any(l.startswith("domain|") for l in lines)
-        assert any(l.startswith("layer|") for l in lines)
-        assert any(l.startswith("dependencies|") for l in lines)
+        assert any(ln.startswith("module|") for ln in lines)
+        assert any(ln.startswith("domain|") for ln in lines)
+        assert any(ln.startswith("layer|") for ln in lines)
+        assert any(ln.startswith("dependencies|") for ln in lines)
 
     def test_context_agent_constraints_by_severity(self, tmp_path: Path) -> None:
         """Agent format groups constraints by MUST/SHOULD."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "context", "mod-memory", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "context",
+                "mod-memory",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
         output = result.output.strip()
         lines = output.split("\n")
-        must_lines = [l for l in lines if l.startswith("must|")]
-        should_lines = [l for l in lines if l.startswith("should|")]
+        must_lines = [ln for ln in lines if ln.startswith("must|")]
+        should_lines = [ln for ln in lines if ln.startswith("should|")]
         assert len(must_lines) == 1
         assert "guardrail-must-code-001" in must_lines[0]
         assert len(should_lines) == 1
@@ -194,7 +282,16 @@ class TestGraphContextAgentFormat:
         """Agent format has no Rich markup."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "context", "mod-memory", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "context",
+                "mod-memory",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
         assert "[bold]" not in result.output
@@ -204,7 +301,16 @@ class TestGraphContextAgentFormat:
         """Agent format for nonexistent module produces error."""
         index_path = _create_graph(tmp_path)
         result = runner.invoke(
-            app, ["graph", "context", "mod-nonexistent", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "context",
+                "mod-nonexistent",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         # Either exit code != 0, or error|message in output
         assert result.exit_code != 0 or "not found" in result.output.lower()
@@ -233,11 +339,11 @@ class TestGraphListAgentFormat:
         output = result.output.strip()
         lines = output.split("\n")
         # Should have type|count lines
-        pipe_lines = [l for l in lines if "|" in l]
+        pipe_lines = [ln for ln in lines if "|" in ln]
         assert len(pipe_lines) >= 1
         # Check a known type
-        assert any("module|2" in l for l in pipe_lines)
-        assert any("guardrail|2" in l for l in pipe_lines)
+        assert any("module|2" in ln for ln in pipe_lines)
+        assert any("guardrail|2" in ln for ln in pipe_lines)
 
     def test_list_agent_no_rich_table(self, tmp_path: Path) -> None:
         """Agent format has no Rich table decorations."""
@@ -253,9 +359,7 @@ class TestGraphListAgentFormat:
     def test_list_table_format_unchanged(self, tmp_path: Path) -> None:
         """Table format (default) is unchanged."""
         index_path = _create_graph(tmp_path)
-        result = runner.invoke(
-            app, ["graph", "list", "--index", str(index_path)]
-        )
+        result = runner.invoke(app, ["graph", "list", "--index", str(index_path)])
         assert result.exit_code == 0
         # Default is table format
         assert "Graph Concepts" in result.output or "mod-memory" in result.output
@@ -286,10 +390,19 @@ class TestGraphAgentPipeSanitization:
         index_path.write_text(json.dumps(graph_data, indent=2))
 
         result = runner.invoke(
-            app, ["graph", "query", "fallback", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "query",
+                "fallback",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
-        lines = [l for l in result.output.strip().split("\n") if l]
+        lines = [ln for ln in result.output.strip().split("\n") if ln]
         assert len(lines) >= 1
         # Exactly 3 fields when split on pipe
         parts = lines[0].split("|")
@@ -333,8 +446,18 @@ class TestGraphContextSeverityClassification:
                 },
             ],
             "edges": [
-                {"source": "mod-test", "target": "bc-test", "type": "belongs_to", "weight": 1.0},
-                {"source": "bc-test", "target": "guardrail-must-tricky-001", "type": "constrained_by", "weight": 1.0},
+                {
+                    "source": "mod-test",
+                    "target": "bc-test",
+                    "type": "belongs_to",
+                    "weight": 1.0,
+                },
+                {
+                    "source": "bc-test",
+                    "target": "guardrail-must-tricky-001",
+                    "type": "constrained_by",
+                    "weight": 1.0,
+                },
             ],
             "metadata": {"version": "1.0"},
         }
@@ -342,12 +465,21 @@ class TestGraphContextSeverityClassification:
         index_path.write_text(json.dumps(graph_data, indent=2))
 
         result = runner.invoke(
-            app, ["graph", "context", "mod-test", "--index", str(index_path), "--format", "agent"]
+            app,
+            [
+                "graph",
+                "context",
+                "mod-test",
+                "--index",
+                str(index_path),
+                "--format",
+                "agent",
+            ],
         )
         assert result.exit_code == 0
         lines = result.output.strip().split("\n")
-        must_lines = [l for l in lines if l.startswith("must|")]
-        should_lines = [l for l in lines if l.startswith("should|")]
+        must_lines = [ln for ln in lines if ln.startswith("must|")]
+        should_lines = [ln for ln in lines if ln.startswith("should|")]
         # ID has -must-, so classified as must despite content mentioning SHOULD
         assert len(must_lines) == 1
         assert "guardrail-must-tricky-001" in must_lines[0]

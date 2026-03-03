@@ -8,7 +8,7 @@ from __future__ import annotations
 import uuid
 from typing import Any
 
-from sqlalchemy import Result, delete, func, literal, select
+from sqlalchemy import Result, delete, func, literal, select, text
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -152,7 +152,9 @@ async def search_nodes(
 
     Returns list of dicts with node fields + rank score.
     """
-    ts_query = func.plainto_tsquery("english", query)
+    # Use OR semantics so partial keyword matches work across languages
+    or_query = " | ".join(query.split())
+    ts_query = func.to_tsquery("english", or_query)
     searchable = func.concat(
         GraphNodeRow.node_id, literal(" "),
         GraphNodeRow.node_type, literal(" "),

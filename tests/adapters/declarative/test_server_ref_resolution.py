@@ -19,7 +19,9 @@ from rai_cli.mcp.bridge import McpBridgeError
 from rai_cli.mcp.schema import McpServerConfig, ServerConnection
 
 
-def _make_config(*, ref: str | None = None, command: str | None = None) -> DeclarativeAdapterConfig:
+def _make_config(
+    *, ref: str | None = None, command: str | None = None
+) -> DeclarativeAdapterConfig:
     """Build a minimal DeclarativeAdapterConfig for testing."""
     return DeclarativeAdapterConfig(
         adapter=AdapterMeta(name="test-adapter", protocol="pm"),
@@ -31,7 +33,9 @@ def _make_config(*, ref: str | None = None, command: str | None = None) -> Decla
 _REGISTRY_SERVER = McpServerConfig(
     name="context7",
     description="Context7 docs server",
-    server=ServerConnection(command="npx", args=["-y", "@upstash/context7-mcp"], env=["C7_TOKEN"]),
+    server=ServerConnection(
+        command="npx", args=["-y", "@upstash/context7-mcp"], env=["C7_TOKEN"]
+    ),
 )
 
 

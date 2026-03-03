@@ -41,10 +41,15 @@ class TestInstallNpx:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "install", "@upstash/context7-mcp",
-                    "--type", "npx",
-                    "--name", "context7",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "install",
+                    "@upstash/context7-mcp",
+                    "--type",
+                    "npx",
+                    "--name",
+                    "context7",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0, result.output
@@ -68,11 +73,17 @@ class TestInstallUvx:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "install", "mcp-github",
-                    "--type", "uvx",
-                    "--name", "github",
-                    "--env", "GITHUB_TOKEN",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "install",
+                    "mcp-github",
+                    "--type",
+                    "uvx",
+                    "--name",
+                    "github",
+                    "--env",
+                    "GITHUB_TOKEN",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0, result.output
@@ -102,11 +113,17 @@ class TestInstallPip:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "install", "mcp-server-fetch",
-                    "--type", "pip",
-                    "--name", "fetch",
-                    "--module", "mcp_server_fetch",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "install",
+                    "mcp-server-fetch",
+                    "--type",
+                    "pip",
+                    "--name",
+                    "fetch",
+                    "--module",
+                    "mcp_server_fetch",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0, result.output
@@ -122,10 +139,15 @@ class TestInstallPip:
         result = runner.invoke(
             app,
             [
-                "mcp", "install", "mcp-server-fetch",
-                "--type", "pip",
-                "--name", "fetch",
-                "--mcp-dir", str(mcp_dir),
+                "mcp",
+                "install",
+                "mcp-server-fetch",
+                "--type",
+                "pip",
+                "--name",
+                "fetch",
+                "--mcp-dir",
+                str(mcp_dir),
             ],
         )
         assert result.exit_code != 0
@@ -141,11 +163,17 @@ class TestInstallPip:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "install", "bad-pkg",
-                    "--type", "pip",
-                    "--name", "bad",
-                    "--module", "bad_pkg",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "install",
+                    "bad-pkg",
+                    "--type",
+                    "pip",
+                    "--name",
+                    "bad",
+                    "--module",
+                    "bad_pkg",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code != 0
@@ -168,10 +196,15 @@ class TestInstallHealthFailure:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "install", "flaky-server",
-                    "--type", "uvx",
-                    "--name", "flaky",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "install",
+                    "flaky-server",
+                    "--type",
+                    "uvx",
+                    "--name",
+                    "flaky",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         # Exit 0 — install succeeded even though health failed
@@ -193,10 +226,15 @@ class TestInstallOverwrite:
         result = runner.invoke(
             app,
             [
-                "mcp", "install", "pkg",
-                "--type", "uvx",
-                "--name", "existing",
-                "--mcp-dir", str(mcp_dir),
+                "mcp",
+                "install",
+                "pkg",
+                "--type",
+                "uvx",
+                "--name",
+                "existing",
+                "--mcp-dir",
+                str(mcp_dir),
             ],
         )
         assert result.exit_code != 0
@@ -215,11 +253,16 @@ class TestInstallOverwrite:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "install", "new-pkg",
-                    "--type", "uvx",
-                    "--name", "existing",
+                    "mcp",
+                    "install",
+                    "new-pkg",
+                    "--type",
+                    "uvx",
+                    "--name",
+                    "existing",
                     "--force",
-                    "--mcp-dir", str(mcp_dir),
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0

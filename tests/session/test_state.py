@@ -98,6 +98,7 @@ class TestSessionStateSchema:
         assert state.pending.decisions == []
         assert state.notes == ""
 
+
 class TestGetSessionStatePath:
     """Tests for get_session_state_path."""
 

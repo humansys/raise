@@ -37,7 +37,9 @@ class TestInsertEvent:
         mock_result.scalar_one.return_value = expected_id
         session.execute.return_value = mock_result
 
-        result = await insert_event(session, org_id, "skill_executed", {"skill": "test"})
+        result = await insert_event(
+            session, org_id, "skill_executed", {"skill": "test"}
+        )
         assert result == expected_id
         session.execute.assert_called_once()
 
@@ -64,7 +66,12 @@ class TestListEvents:
         session = _mock_session()
         mock_mappings = MagicMock()
         mock_mappings.all.return_value = [
-            {"id": uuid.uuid4(), "event_type": "a", "payload": {}, "created_at": "2026-01-01"},
+            {
+                "id": uuid.uuid4(),
+                "event_type": "a",
+                "payload": {},
+                "created_at": "2026-01-01",
+            },
         ]
         mock_result = MagicMock()
         mock_result.mappings.return_value = mock_mappings

@@ -165,8 +165,6 @@ class TestEntryPointDiscovery:
         assert "TelemetryHook" in hook_types
 
 
-
-
 # ---------------------------------------------------------------------------
 # E2E integration: emitter → registry → hook → signals.jsonl
 # ---------------------------------------------------------------------------

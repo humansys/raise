@@ -36,9 +36,7 @@ class _MockDocsTarget:
             "content": content,
             "metadata": metadata,
         }
-        return PublishResult(
-            success=True, url=f"https://example.com/wiki/{doc_type}"
-        )
+        return PublishResult(success=True, url=f"https://example.com/wiki/{doc_type}")
 
     def get_page(self, identifier: str) -> PageContent:
         return PageContent(
@@ -55,10 +53,16 @@ class _MockDocsTarget:
             return []
         return [
             PageSummary(
-                id="123", title="ADR-033", url="https://example.com/1", space_key="RAISE"
+                id="123",
+                title="ADR-033",
+                url="https://example.com/1",
+                space_key="RAISE",
             ),
             PageSummary(
-                id="456", title="ADR-034", url="https://example.com/2", space_key="RAISE"
+                id="456",
+                title="ADR-034",
+                url="https://example.com/2",
+                space_key="RAISE",
             ),
         ]
 
@@ -84,7 +88,9 @@ def _patch_target(target_instance: Any):  # noqa: ANN401
 
 
 class TestPublish:
-    def test_publish_success(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_publish_success(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """publish resolves artifact type to governance/{type}.md and publishes."""
         gov_dir = tmp_path / "governance"
         gov_dir.mkdir()
@@ -98,7 +104,9 @@ class TestPublish:
         assert "Published: roadmap" in result.output
         assert "https://example.com/wiki/roadmap" in result.output
 
-    def test_publish_with_title(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_publish_with_title(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """--title flag overrides default page title in metadata."""
         gov_dir = tmp_path / "governance"
         gov_dir.mkdir()
@@ -116,7 +124,9 @@ class TestPublish:
         assert mock_target.last_publish_call is not None
         assert mock_target.last_publish_call["metadata"]["title"] == "Project Roadmap"
 
-    def test_publish_file_not_found(self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_publish_file_not_found(
+        self, tmp_path: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """publish with nonexistent artifact type → error."""
         monkeypatch.chdir(tmp_path)
 
