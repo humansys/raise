@@ -20,6 +20,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
+from rai_cli.cli.commands._resolve import resolve_adapter
 from rai_cli.graph.backends import get_active_backend
 from rai_cli.onboarding.profile import DeveloperProfile
 from rai_cli.schemas.session_state import SessionState
@@ -56,8 +57,55 @@ def _fetch_live_status(
     if not epic_key and not story_key:
         return LiveBacklogStatus()
 
-    # Full implementation in T2
-    return LiveBacklogStatus()
+    try:
+        adapter = resolve_adapter(None)
+    except (SystemExit, Exception) as exc:
+        logger.debug("Adapter unavailable: %s", exc)
+        return LiveBacklogStatus(
+            warning="Backlog adapter unavailable — showing cached state"
+        )
+
+    return _query_adapter(adapter, epic_key, story_key, timeout)
+
+
+def _query_adapter(
+    adapter: object,
+    epic_key: str,
+    story_key: str,
+    timeout: float,
+) -> LiveBacklogStatus:
+    """Run adapter queries with timeout. Never raises."""
+    from concurrent.futures import ThreadPoolExecutor
+    from concurrent.futures import TimeoutError as FuturesTimeoutError
+
+    from rai_cli.adapters.models import IssueDetail
+
+    def _do_fetch() -> LiveBacklogStatus:
+        result = LiveBacklogStatus()
+        if epic_key:
+            detail: IssueDetail = adapter.get_issue(epic_key)  # type: ignore[union-attr]
+            result.epic_status = detail.status
+            result.epic_summary = detail.summary
+        if story_key:
+            detail = adapter.get_issue(story_key)  # type: ignore[union-attr]
+            result.story_status = detail.status
+            result.story_summary = detail.summary
+        return result
+
+    try:
+        with ThreadPoolExecutor(max_workers=1) as pool:
+            future = pool.submit(_do_fetch)
+            return future.result(timeout=timeout)
+    except FuturesTimeoutError:
+        logger.debug("Live status fetch timed out after %.1fs", timeout)
+        return LiveBacklogStatus(
+            warning=f"Backlog query timeout ({timeout:.0f}s) — showing cached state"
+        )
+    except Exception as exc:
+        logger.debug("Live status fetch failed: %s", exc)
+        return LiveBacklogStatus(
+            warning=f"Backlog query error: {exc} — showing cached state"
+        )
 
 
 # Graph path relative to project root
