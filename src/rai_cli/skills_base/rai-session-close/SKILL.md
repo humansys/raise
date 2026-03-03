@@ -14,7 +14,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "4.0.0"
+  raise.version: "4.1.0"
   raise.visibility: public
   raise.inputs: |
     - session_id: string, required, previous_skill
@@ -46,14 +46,25 @@ rai session close --summary "Quick fix session" --type maintenance --project .
 
 ## Steps
 
-### Step 1: Reflect & Produce State File
+### Step 1: Craft Session Title
+
+Generate a concise session title (max 60 chars) that captures what was accomplished — not planned, accomplished. Use the format: `SES-{ID}: {title}`.
+
+Examples:
+- `SES-316: Backlog sync + Semgrep MCP investigation`
+- `SES-315: E346 Skill Lifecycle Hardening complete`
+- `SES-311: Jira backlog review + declarative adapter research`
+
+The title will be used in the `summary` field of the state file AND presented to the human for `/rename`.
+
+### Step 2: Reflect & Produce State File
 
 Use inference to reflect on the session and write a YAML state file:
 
 ```yaml
 # .raise/rai/personal/session-output.yaml
 session_id: "{SES-ID}"
-summary: "What was accomplished"
+summary: "{session_title}"  # The concise title from Step 1
 type: feature  # feature | research | maintenance | infrastructure | ideation
 outcomes:
   - "Concrete deliverable 1"
@@ -98,7 +109,7 @@ next_session_prompt: |
 
 **Capture tangents:** Check conversation for ideas → add to `dev/parking-lot.md`.
 
-### Step 2: Clean Working Tree
+### Step 3: Clean Working Tree
 
 Before closing, ensure no uncommitted changes are left behind:
 
@@ -110,7 +121,7 @@ Before closing, ensure no uncommitted changes are left behind:
    - **Leave**: explicitly acknowledge the leftovers in the handoff
 4. Do NOT close the session with a dirty working tree unless the human explicitly chooses "Leave"
 
-### Step 3: Feed CLI
+### Step 4: Feed CLI
 
 ```bash
 rai session close --state-file .raise/rai/personal/session-output.yaml --session {SES-ID} --project .
@@ -118,12 +129,20 @@ rai session close --state-file .raise/rai/personal/session-output.yaml --session
 
 This atomically: records session in index, appends patterns, updates coaching, writes session state, clears active session.
 
-Present a brief handoff:
+Present the closing card:
+
 ```
-## Next Session
+## Session Closed: SES-{ID} {session_title}
+
+**Type:** {type}
+**Outcomes:**
+- {outcome 1}
+- {outcome 2}
+**Patterns:** {N new} | **Working tree:** {clean | N files uncommitted}
+
+### Next Session
 **Continue:** [next step]
 **Open:** [unresolved questions, if any]
-**Working tree:** clean | N files left uncommitted (reason)
 ```
 
 ## Output
