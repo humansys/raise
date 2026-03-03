@@ -235,6 +235,90 @@ class TestYamlStoreSearch:
         assert keys == sorted(keys)
 
 
+# ── T4: create_issue + key generation over YAML store ──────────────────
+
+
+class TestYamlStoreCreate:
+    """T4: create_issue() over YAML store."""
+
+    def test_create_epic_next_key(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        ref = yaml_adapter.create_issue(
+            "PROJ", IssueSpec(summary="New Epic", issue_type="Epic")
+        )
+        assert isinstance(ref, IssueRef)
+        assert ref.key == "E3"  # next after E2
+
+    def test_create_epic_persisted(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        yaml_adapter.create_issue(
+            "PROJ", IssueSpec(summary="New Epic", issue_type="Epic")
+        )
+        detail = yaml_adapter.get_issue("E3")
+        assert detail.summary == "New Epic"
+        assert detail.status == "pending"
+        assert detail.issue_type == "Epic"
+        assert detail.created != ""
+        assert detail.updated != ""
+
+    def test_create_story_under_parent(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        ref = yaml_adapter.create_issue(
+            "PROJ",
+            IssueSpec(
+                summary="New Story",
+                issue_type="Story",
+                metadata={"parent_key": "E1"},
+            ),
+        )
+        assert ref.key == "S1.2"  # next after S1.1
+        detail = yaml_adapter.get_issue("S1.2")
+        assert detail.parent_key == "E1"
+        assert detail.issue_type == "Story"
+
+    def test_create_story_without_parent_raises(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        with pytest.raises(KeyError, match="Story creation requires parent_key"):
+            yaml_adapter.create_issue(
+                "PROJ", IssueSpec(summary="Orphan Story", issue_type="Story")
+            )
+
+    def test_create_first_epic_in_empty_store(self, tmp_path: Path) -> None:
+        items = tmp_path / ".raise" / "backlog" / "items"
+        items.mkdir(parents=True)
+        a = FilesystemPMAdapter(project_root=tmp_path)
+        ref = a.create_issue("PROJ", IssueSpec(summary="First", issue_type="Epic"))
+        assert ref.key == "E1"
+
+    def test_create_first_story_under_epic(self, tmp_path: Path) -> None:
+        items = tmp_path / ".raise" / "backlog" / "items"
+        items.mkdir(parents=True)
+        # Create epic E1 first
+        (items / "E1.yaml").write_text(
+            "key: E1\nsummary: Epic\nissue_type: Epic\nstatus: pending\n",
+            encoding="utf-8",
+        )
+        a = FilesystemPMAdapter(project_root=tmp_path)
+        ref = a.create_issue(
+            "PROJ",
+            IssueSpec(
+                summary="First Story",
+                issue_type="Story",
+                metadata={"parent_key": "E1"},
+            ),
+        )
+        assert ref.key == "S1.1"
+
+    def test_create_epic_yaml_file_exists(
+        self, yaml_store: Path, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        yaml_adapter.create_issue(
+            "PROJ", IssueSpec(summary="New Epic", issue_type="Epic")
+        )
+        path = yaml_store / ".raise" / "backlog" / "items" / "E3.yaml"
+        assert path.exists()
+
+
 # ── Legacy markdown tests (to be removed in T7) ────────────────────────
 
 SAMPLE_BACKLOG = """\
