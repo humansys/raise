@@ -8,6 +8,7 @@ Architecture: S347.6 (E347 Backlog Automation)
 
 from __future__ import annotations
 
+import os
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -71,6 +72,11 @@ def sync_backlog(
     )
 
 
+def _escape_pipe(value: str) -> str:
+    """Escape pipe characters in markdown table cell values."""
+    return value.replace("|", "\\|")
+
+
 def _format_markdown(
     epics: list[IssueSummary], adapter_name: str, timestamp: str
 ) -> str:
@@ -87,14 +93,23 @@ def _format_markdown(
         "|-----|------|--------|------|",
     ]
     for epic in epics:
-        lines.append(f"| {epic.key} | {epic.summary} | {epic.status} | {epic.issue_type} |")
+        summary = _escape_pipe(epic.summary)
+        status = _escape_pipe(epic.status)
+        issue_type = _escape_pipe(epic.issue_type)
+        lines.append(f"| {epic.key} | {summary} | {status} | {issue_type} |")
     lines.append("")  # trailing newline
     return "\n".join(lines)
 
 
 def _atomic_write(path: Path, content: str) -> None:
-    """Write content to path atomically via temp file + rename."""
+    """Write content to path atomically via temp file + rename.
+
+    Uses ``str(path) + ".tmp"`` to preserve the original suffix
+    (e.g., ``backlog.md.tmp`` not ``backlog.tmp``).
+    Uses :func:`os.replace` instead of :meth:`Path.rename` for
+    cross-platform atomicity (``rename`` fails on Windows when target exists).
+    """
     path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".tmp")
+    tmp = Path(str(path) + ".tmp")
     tmp.write_text(content, encoding="utf-8")
-    tmp.rename(path)
+    os.replace(tmp, path)
