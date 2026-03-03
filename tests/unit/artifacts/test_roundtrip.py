@@ -4,20 +4,36 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from rai_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
+from rai_cli.artifacts.models import ArtifactRefs, ArtifactType
 from rai_cli.artifacts.reader import read_artifact
+from rai_cli.artifacts.story_design import (
+    AcceptanceCriterion,
+    Complexity,
+    Decision,
+    StoryDesignArtifact,
+    StoryDesignContent,
+)
 from rai_cli.artifacts.writer import write_artifact
 
 
 def test_roundtrip_integrity(project_root, sample_created: datetime) -> None:
-    original = SkillArtifact(
-        artifact_type=ArtifactType.STORY_DESIGN,
+    original = StoryDesignArtifact(
         version=1,
         skill="rai-story-design",
         created=sample_created,
         story="S354.1",
         epic="E354",
-        content={"summary": "test", "complexity": "small"},
+        content=StoryDesignContent(
+            summary="Round-trip test",
+            complexity=Complexity.SIMPLE,
+            acceptance_criteria=[
+                AcceptanceCriterion(id="AC1", description="Validates"),
+                AcceptanceCriterion(id="AC2", description="Persists"),
+            ],
+            decisions=[
+                Decision(id="D1", choice="Registry", rationale="Simple dispatch"),
+            ],
+        ),
         refs=ArtifactRefs(
             backlog_item="RAISE-402",
             epic_scope="work/epics/e354/scope.md",
@@ -29,7 +45,8 @@ def test_roundtrip_integrity(project_root, sample_created: datetime) -> None:
     path = write_artifact(original, project_root)
     loaded = read_artifact(path)
 
-    assert loaded.artifact_type == original.artifact_type
+    assert isinstance(loaded, StoryDesignArtifact)
+    assert loaded.artifact_type == ArtifactType.STORY_DESIGN
     assert loaded.version == original.version
     assert loaded.skill == original.skill
     assert loaded.created == original.created
