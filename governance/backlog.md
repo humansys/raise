@@ -65,7 +65,7 @@
 | [RAISE-384](https://humansys.atlassian.net/browse/RAISE-384) | **MCP Platform** (E338) | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
 | [RAISE-340](https://humansys.atlassian.net/browse/RAISE-340) | **Skill Set Ecosystem** | ✅ Complete | `work/epics/e340-skill-set-ecosystem/scope.md` | — |
 | [RAISE-346](https://humansys.atlassian.net/browse/RAISE-346) | **Skill Lifecycle Hardening** | ✅ Complete | `work/epics/e346-skill-lifecycle-hardening/scope.md` | — |
-| [RAISE-347](https://humansys.atlassian.net/browse/RAISE-347) | **Backlog Automation** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-347](https://humansys.atlassian.net/browse/RAISE-347) | **Backlog Automation** | 🚀 In Progress | `work/epics/e347-backlog-automation/scope.md` | P0 (v2.2) |
 | [RAISE-348](https://humansys.atlassian.net/browse/RAISE-348) | **Documentation Refresh** | 📋 Backlog | — | P0 (v2.2) |
 | [RAISE-349](https://humansys.atlassian.net/browse/RAISE-349) | **Adapter Integration Validation** | 📋 Backlog | — | P0 (v2.2) |
 | [RAISE-364](https://humansys.atlassian.net/browse/RAISE-364) | **Rai Experience Portability** | 📋 Backlog | — | P0 (v2.2) |
