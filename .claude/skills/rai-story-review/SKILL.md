@@ -46,9 +46,23 @@ Reflect on the completed story to extract learnings, persist patterns, reinforce
 
 ### Step 1: Verify Tests Pass
 
-```bash
-uv run pytest --tb=short
-```
+Detect the project language and run the appropriate test command:
+
+1. **Check `.raise/manifest.yaml`** for `project.project_type` or language hints
+2. **Fallback:** Scan file extensions of changed files (`git diff --name-only`) and pick the dominant language
+
+| Language | Extensions | Test Command |
+|----------|-----------|--------------|
+| Python | `.py`, `.pyi` | `uv run pytest --tb=short` |
+| TypeScript | `.ts`, `.tsx` | `npx vitest run` or `npm test` |
+| JavaScript | `.js`, `.jsx` | `npx vitest run` or `npm test` |
+| C# | `.cs` | `dotnet test --verbosity quiet` |
+| Go | `.go` | `go test ./...` |
+| PHP | `.php` | `vendor/bin/phpunit` |
+| Dart | `.dart` | `flutter test` |
+| Unknown | — | Look for common test runner configs and ask developer |
+
+If the project defines a custom test command (e.g., in `package.json` scripts, `Makefile`, or `.raise/manifest.yaml`), prefer it over the table defaults.
 
 | Condition | Action |
 |-----------|--------|
@@ -56,7 +70,7 @@ uv run pytest --tb=short
 | Tests failing | Fix first — review requires green tests |
 
 <verification>
-All tests passing.
+Project language detected. Tests passing with appropriate runner.
 </verification>
 
 ### Step 2: Gather Data & Reflect
@@ -139,7 +153,8 @@ Calibration event recorded (or skipped if CLI unavailable).
 
 ## Quality Checklist
 
-- [ ] Tests pass before review (gate)
+- [ ] Project language detected before running tests
+- [ ] Tests pass with language-appropriate runner (gate)
 - [ ] Heutagogical checkpoint answered with specific examples
 - [ ] New patterns persisted via `rai pattern add`
 - [ ] Behavioral patterns reinforced via `rai pattern reinforce`
