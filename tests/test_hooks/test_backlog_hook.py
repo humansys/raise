@@ -393,6 +393,54 @@ class TestJiraLabelFirstSearch:
         assert adapter.search.call_count == 2
         adapter.transition_issue.assert_not_called()
 
+class TestFilesystemAdapterDirectSearch:
+    """T3: FileAdapter uses direct key search, no JQL (S347.4)."""
+
+    def test_filesystem_adapter_uses_direct_search(self, tmp_path: Path) -> None:
+        """FilesystemPMAdapter search is called with plain work_id, not JQL."""
+        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+
+        # Create a mock that passes isinstance check
+        adapter = MagicMock(spec=FilesystemPMAdapter)
+        adapter.search.return_value = [
+            IssueSummary(key="S99.1", summary="S99.1 — Test", status="pending", issue_type="Story"),
+        ]
+        adapter.transition_issue.return_value = IssueRef(key="S99.1")
+
+        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
+        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        # Direct search: called with plain work_id, not JQL
+        adapter.search.assert_called_once_with("S99.1", limit=1)
+        adapter.transition_issue.assert_called_once_with("S99.1", "in-progress")
+
+    def test_filesystem_adapter_no_match_returns_none(self, tmp_path: Path) -> None:
+        """FilesystemPMAdapter search returns empty → create is attempted."""
+        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+
+        adapter = MagicMock(spec=FilesystemPMAdapter)
+        adapter.search.return_value = []
+        adapter.create_issue.return_value = IssueRef(key="S99.1")
+        adapter.transition_issue.return_value = IssueRef(key="S99.1")
+
+        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
+        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        # Only ONE search call (direct), no label/summary fallback
+        adapter.search.assert_called_once_with("S99.1", limit=1)
+        adapter.create_issue.assert_called_once()
+
+
 class TestBacklogHookDiscovery:
     """Tests for entry point discovery."""
 
