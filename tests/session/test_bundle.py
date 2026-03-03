@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+import time
 from datetime import date
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 from rai_cli.onboarding.profile import (
     CoachingContext,
@@ -25,11 +26,14 @@ from rai_cli.schemas.session_state import (
 )
 from rai_cli.session.bundle import (
     SECTION_REGISTRY,
+    LiveBacklogStatus,
     SectionManifest,
+    _fetch_live_status,
     _format_governance_primes,
     _format_manifest,
     _format_progress,
     _format_recent_sessions,
+    _format_work_section,
     assemble_context_bundle,
     assemble_orientation,
     assemble_sections,
@@ -1423,3 +1427,222 @@ class TestAssembleSections:
             _make_state(),
         )
         assert result == ""
+
+
+class TestLiveBacklogStatus:
+    """Tests for LiveBacklogStatus model and _fetch_live_status()."""
+
+    def test_fetch_live_status_no_work(self) -> None:
+        """When current_work has no epic/story keys, return empty status immediately."""
+        state = SessionState(
+            current_work=CurrentWork(epic="", story="", phase="", branch=""),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _fetch_live_status(state)
+        assert result == LiveBacklogStatus()
+        assert result.epic_status == ""
+        assert result.story_status == ""
+        assert result.warning == ""
+
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    def test_fetch_live_status_success(self, mock_resolve: MagicMock) -> None:
+        """When adapter returns IssueDetail, populate status/summary fields."""
+        from rai_cli.adapters.models import IssueDetail
+
+        mock_adapter = MagicMock()
+        mock_resolve.return_value = mock_adapter
+
+        epic_detail = IssueDetail(
+            key="RAISE-347",
+            summary="Backlog Automation",
+            status="in_progress",
+            issue_type="Epic",
+        )
+        story_detail = IssueDetail(
+            key="RAISE-390",
+            summary="Session-start live query",
+            status="selected_for_development",
+            issue_type="Story",
+        )
+        mock_adapter.get_issue.side_effect = lambda k: (
+            epic_detail if k == "RAISE-347" else story_detail
+        )
+
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="RAISE-347",
+                story="RAISE-390",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _fetch_live_status(state, timeout=5.0)
+        assert result.epic_status == "in_progress"
+        assert result.epic_summary == "Backlog Automation"
+        assert result.story_status == "selected_for_development"
+        assert result.story_summary == "Session-start live query"
+        assert result.warning == ""
+
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    def test_fetch_live_status_timeout(self, mock_resolve: MagicMock) -> None:
+        """When adapter.get_issue hangs, return warning with 'timeout'."""
+        mock_adapter = MagicMock()
+        mock_resolve.return_value = mock_adapter
+
+        def slow_get_issue(key: str) -> None:
+            time.sleep(10)
+
+        mock_adapter.get_issue.side_effect = slow_get_issue
+
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="RAISE-347",
+                story="",
+                phase="implement",
+                branch="epic/e347/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        # Use very short timeout to trigger quickly
+        result = _fetch_live_status(state, timeout=0.1)
+        assert "timeout" in result.warning.lower()
+
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    def test_fetch_live_status_unavailable(self, mock_resolve: MagicMock) -> None:
+        """When resolve_adapter raises SystemExit, return warning with 'unavailable'."""
+        mock_resolve.side_effect = SystemExit(1)
+
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="RAISE-347",
+                story="RAISE-390",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _fetch_live_status(state)
+        assert "unavailable" in result.warning.lower()
+
+    def test_format_work_section_with_live_status(self) -> None:
+        """Live status adds annotation to epic and story lines."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        live = LiveBacklogStatus(
+            epic_status="in_progress",
+            epic_summary="Backlog Automation",
+            story_status="selected_for_development",
+            story_summary="Session-start live query",
+        )
+        result = _format_work_section(state, live=live)
+        assert "in_progress (live)" in result
+        assert "selected_for_development (live)" in result
+
+    def test_format_work_section_with_live_warning(self) -> None:
+        """Warning line appended when live has warning."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        live = LiveBacklogStatus(
+            warning="Backlog adapter unavailable — showing cached state"
+        )
+        result = _format_work_section(state, live=live)
+        assert "⚠" in result
+        assert "unavailable" in result.lower()
+
+    def test_format_work_section_no_live(self) -> None:
+        """Existing behavior unchanged when live=None."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _format_work_section(state, live=None)
+        assert "(live)" not in result
+        assert "⚠" not in result
+        assert "Story: S347.5 [implement]" in result
+        assert "Epic: E347" in result
+
+    @patch("rai_cli.session.bundle._fetch_live_status")
+    @patch("rai_cli.session.bundle._find_release_for_current_epic")
+    def test_assemble_orientation_calls_live_status(
+        self, mock_release: MagicMock, mock_fetch: MagicMock
+    ) -> None:
+        """assemble_orientation calls _fetch_live_status and includes annotation."""
+        mock_release.return_value = None
+        mock_fetch.return_value = LiveBacklogStatus(
+            epic_status="in_progress",
+            story_status="done",
+        )
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        profile = DeveloperProfile(name="Test")
+        result = assemble_orientation(profile, state, Path("/project"))
+        mock_fetch.assert_called_once_with(state)
+        assert "in_progress (live)" in result
+        assert "done (live)" in result
