@@ -224,10 +224,10 @@ principles:
 branches:
   structure: |
     main (stable)
-      └── v2 (development)
+      └── {development_branch} (development)
             └── story/s{N}.{M}/{name}
 
   flow:
-    - Stories branch from and merge to development branch (v2)
-    - Development merges to main at release
-    - Epics are logical containers (directory + tracker), not branches
+    - "Stories branch from and merge to {development_branch}"
+    - "{development_branch} merges to main at release"
+    - "Epics are logical containers (directory + tracker), not branches"
