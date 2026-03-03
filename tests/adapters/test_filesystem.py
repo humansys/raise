@@ -406,8 +406,6 @@ class TestYamlStoreComments:
 
     def test_add_comment_persists(self, yaml_adapter: FilesystemPMAdapter) -> None:
         yaml_adapter.add_comment("E1", "Started work")
-        detail = yaml_adapter.get_issue("E1")
-        # Reload via get_comments
         comments = yaml_adapter.get_comments("E1")
         assert len(comments) == 1
         assert comments[0].body == "Started work"
@@ -455,8 +453,6 @@ class TestYamlStoreLinks:
 
     def test_link_issues_adds_link(self, yaml_adapter: FilesystemPMAdapter) -> None:
         yaml_adapter.link_issues("E1", "E2", "blocks")
-        detail = yaml_adapter.get_issue("E1")
-        # Check via raw load
         item = yaml_adapter._load_item("E1")
         assert len(item.links) == 1
         assert item.links[0].target == "E2"
@@ -486,6 +482,80 @@ class TestYamlStoreLinks:
     ) -> None:
         with pytest.raises(KeyError, match="S999.1"):
             yaml_adapter.link_to_parent("S999.1", "E1")
+
+
+# ── T7: Protocol compliance + integration ──────────────────────────────
+
+
+class TestYamlProtocolCompliance:
+    """T7: YAML adapter satisfies ProjectManagementAdapter protocol."""
+
+    def test_isinstance_check(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        assert isinstance(yaml_adapter, ProjectManagementAdapter)
+
+
+class TestYamlIntegration:
+    """T7: End-to-end scenario over YAML store."""
+
+    def test_full_lifecycle(self, tmp_path: Path) -> None:
+        """create epic -> create story -> transition -> comment -> search."""
+        items = tmp_path / ".raise" / "backlog" / "items"
+        items.mkdir(parents=True)
+        a = FilesystemPMAdapter(project_root=tmp_path)
+
+        # 1. Create epic
+        epic_ref = a.create_issue(
+            "PROJ", IssueSpec(summary="Integration Epic", issue_type="Epic")
+        )
+        assert epic_ref.key == "E1"
+
+        # 2. Create story under epic
+        story_ref = a.create_issue(
+            "PROJ",
+            IssueSpec(
+                summary="Integration Story",
+                issue_type="Story",
+                metadata={"parent_key": "E1"},
+            ),
+        )
+        assert story_ref.key == "S1.1"
+
+        # 3. Transition story
+        a.transition_issue("S1.1", "in_progress")
+        detail = a.get_issue("S1.1")
+        assert detail.status == "in_progress"
+        assert detail.parent_key == "E1"
+
+        # 4. Add comment to story
+        cref = a.add_comment("S1.1", "Work started")
+        assert cref.id == "S1.1-1"
+
+        # 5. Search returns both
+        results = a.search("")
+        assert len(results) == 2
+        keys = {r.key for r in results}
+        assert keys == {"E1", "S1.1"}
+
+        # 6. Get issue reflects comment count
+        comments = a.get_comments("S1.1")
+        assert len(comments) == 1
+        assert comments[0].body == "Work started"
+
+        # 7. Link issues
+        a.link_issues("S1.1", "E1", "depends_on")
+        item = a._load_item("S1.1")
+        assert len(item.links) == 1
+
+        # 8. Update issue
+        a.update_issue("E1", {"summary": "Renamed Epic", "priority": "P0"})
+        epic = a.get_issue("E1")
+        assert epic.summary == "Renamed Epic"
+        assert epic.priority == "P0"
+
+        # 9. Batch transition
+        result = a.batch_transition(["E1", "S1.1"], "complete")
+        assert len(result.succeeded) == 2
+        assert len(result.failed) == 0
 
 
 # ── Legacy markdown tests (to be removed in T7) ────────────────────────
