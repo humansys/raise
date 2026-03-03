@@ -157,6 +157,7 @@ class TestResolveAdapter:
 
     def test_zero_adapters_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         from rai_cli.cli.commands._resolve import resolve_adapter
 
         with pytest.raises(SystemExit) as exc_info:
@@ -165,6 +166,7 @@ class TestResolveAdapter:
 
     def test_single_adapter_auto_selects(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"stub": _StubPM})
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         from rai_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
@@ -177,6 +179,7 @@ class TestResolveAdapter:
             f"{_RESOLVE_MOD}.get_pm_adapters",
             lambda: {"jira": _StubPM, "github": _StubPM},
         )
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         from rai_cli.cli.commands._resolve import resolve_adapter
 
         with pytest.raises(SystemExit) as exc_info:
@@ -205,6 +208,7 @@ class TestResolveAdapter:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"async-jira": _StubAsyncPM}
         )
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         from rai_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
@@ -215,6 +219,7 @@ class TestResolveAdapter:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"sync-stub": _StubPM}
         )
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         from rai_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
@@ -301,6 +306,7 @@ class TestResolveAdapterWithYaml:
     def test_yaml_only_auto_selects(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """YAML adapter auto-selected when no entry points registered."""
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         monkeypatch.setattr(
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {"yaml-stub": _StubPM} if protocol == "pm" else {},
@@ -344,6 +350,7 @@ class TestResolveAdapterWithYaml:
     def test_mixed_yaml_and_ep_no_collision(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Both YAML and EP adapters available, no name collision."""
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _StubPM})
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         monkeypatch.setattr(
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {"github": _StubPM} if protocol == "pm" else {},
@@ -483,6 +490,59 @@ class TestResolveAdapterManifestDefault:
         adapter = resolve_adapter(None)
         assert isinstance(adapter, ProjectManagementAdapter)
 
+    def test_manifest_default_not_registered_errors(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Manifest default points to adapter that isn't registered → clear error."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters",
+            lambda: {"jira": _StubPM, "filesystem": _StubPM},
+        )
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {},
+        )
+        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+
+        _fake_manifest = ProjectManifest(
+            project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
+            backlog=BacklogConfig(adapter_default="linear"),
+        )
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        with pytest.raises(SystemExit) as exc_info:
+            resolve_adapter(None)
+        assert exc_info.value.code == 1
+
+    def test_manifest_empty_string_default_falls_through(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Manifest adapter_default: '' treated as no default → auto-detect."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _StubPM}
+        )
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {},
+        )
+        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+
+        _fake_manifest = ProjectManifest(
+            project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
+            backlog=BacklogConfig(adapter_default=""),
+        )
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        # Empty string → falls through to auto-detect → single adapter selected
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, ProjectManagementAdapter)
+
 
 class TestResolveAdapterE2E:
     """End-to-end: YAML file on disk → resolve_adapter → working adapter."""
@@ -500,6 +560,7 @@ class TestResolveAdapterE2E:
 
         # Patch EP to empty so only YAML is found
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         # Patch discover to use our tmp dir
         from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
 
