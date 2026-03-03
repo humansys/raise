@@ -85,11 +85,31 @@ Delegation level resolved.
 
 ### Step 2: Execute Skill Chain
 
-Run each skill from the detected phase forward. Between skills, show progress:
+Run each skill from the detected phase forward.
 
+**Phase banner (before starting):**
 ```
 ── Phase {N}/8: {skill_name} ──
 ```
+
+**Completion banner (after finishing each phase):**
+```
+┌─ ✔ Phase {N}/8: {skill_name} ─────────────────────────
+│ Files:
+│   + path/to/new-file.md          (created)
+│   ~ path/to/modified-file.py     (modified)
+│   ~ path/to/test-file.py         (modified)
+│ Commits: {count} ({short_hashes})
+│ Tests: {pass_count} passed
+└────────────────────────────────────────────────────────
+```
+
+Rules for the completion banner:
+- `+` prefix for files created in this phase, `~` for modified
+- Only list files the skill actually touched (not inherited from prior phases)
+- Commits: count and short hashes from this phase only
+- Tests: latest test count after this phase
+- If phase produced no file changes (e.g., close is just merge), show the merge commit instead
 
 **Chain order:**
 
@@ -150,8 +170,25 @@ After all phases complete, present:
 
 **Phases:** {start_phase} → close ({N} phases executed)
 **Delegation:** {level}
-**Artifacts:** story.md, design.md, plan.md, retrospective.md
 **Result:** Merged to {parent_branch}
+
+### Artifacts
+| Phase | File | Type |
+|-------|------|------|
+| start | stories/s{N}.{M}-story.md | created |
+| start | stories/s{N}.{M}-scope.md | created |
+| design | stories/s{N}.{M}-design.md | created |
+| plan | stories/s{N}.{M}-plan.md | created |
+| implement | src/path/to/file.py | modified |
+| implement | tests/path/to/test.py | modified |
+| review | stories/s{N}.{M}-retrospective.md | created |
+
+### Metrics
+| Metric | Value |
+|--------|-------|
+| Tests | {count} passed |
+| Commits | {count} |
+| Patterns | {list} |
 ```
 
 <verification>
