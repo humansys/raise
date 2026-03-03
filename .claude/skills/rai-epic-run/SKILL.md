@@ -1,10 +1,10 @@
 ---
 name: rai-epic-run
 description: >
-  Chain the full epic lifecycle (start → design → architecture review →
-  plan → story iterations → close) in one invocation. Resumes from last
-  completed phase. Stories iterate via /rai-story-run. Delegation
-  profile controls pause behavior at natural gates.
+  Execute epic lifecycle phases (start → design → AR → plan → close),
+  pausing at story iteration for human-driven /rai-story-run execution.
+  Resumes from last completed phase. Delegation profile controls pause
+  behavior at natural gates.
 
 license: MIT
 
@@ -16,7 +16,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.1.0"
+  raise.version: "2.0.0"
   raise.visibility: public
   raise.inputs: |
     - epic_id: string, required, argument (e.g. "E325")
@@ -30,7 +30,7 @@ metadata:
 
 ## Purpose
 
-Execute the full epic lifecycle in one invocation — including iterating all stories via `/rai-story-run` — pausing only at delegation gates and resuming automatically from the last completed phase.
+Execute the epic lifecycle phases (start → design → AR → plan → close), pausing at delegation gates and at story iteration for human-driven `/rai-story-run` execution. Resumes automatically from the last completed phase.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -106,42 +106,42 @@ The orchestrator delegates — it does not summarize, compress, or shortcut indi
 Skill fails → STOP immediately. Report which phase failed and why. Developer re-invokes `/rai-epic-run` after fixing — phase detection resumes automatically.
 </if-blocked>
 
-### Step 3: Iterate Stories
+### Step 3: Hand Off Stories
 
 When reaching phase 5 (story iteration), read the `### Progress Tracking` table from `scope.md`:
 
 1. Parse rows — columns: Story, Size, Status, Actual, Velocity, Notes
 2. Filter rows where Status != "Done"
-3. Execute in table order (plan already resolved dependencies)
+3. Present in table order (plan already resolved dependencies)
 
-> **F5 Constraint — story-run MUST execute inline (main thread).**
-> story-run forks its heavy phases via Agent tool (depth 1). If epic-run
-> forked story-run as a subagent, story-run would be at depth 1 and its
-> own forks would need depth 2 — blocked by the F5 limit (subagents
-> cannot spawn subagents). Always invoke story-run via Skill tool, never
-> via Agent tool.
+> **Quality rule — epic-run NEVER executes story-run.**
+> Each `/rai-story-run` must run in a fresh session/context so it can
+> fork its heavy phases via Agent tool with full context budget.
+> Running story-run inside epic-run would accumulate context across
+> stories, degrading quality in later stories — the exact problem
+> Checkpoint & Fork (ADR-043) was designed to eliminate.
+> We never operate at known lower quality levels.
 
-For each pending story (Status != "Done"), in table order:
+**Present the pending stories and STOP:**
 
-1. Show `── Story {N}/{total}: {story_id} ──`
-2. Invoke `/rai-story-run {story_id}` via **Skill tool** (inline, main thread)
-3. story-run executes — it forks its own heavy phases via Agent tool
-4. **Checkpoint** (after story-run returns):
-   a. Read the story's retrospective (`s{N}.{M}-retrospective.md`) or scope for summary
-   b. Verify and fill the `### Progress Tracking` table in `scope.md`: confirm Status is "Done" (story-close may have already set it), fill any missing Actual/Velocity/Notes
-   c. Present one-line summary: "Story {story_id}: Done — {key outcome}"
-5. Proceed to next story
+```markdown
+## Stories Ready for Execution
 
-When all stories are done, proceed to phase 6 (epic-close).
+| # | Story | Size | Status |
+|:-:|-------|:----:|--------|
+| 1 | S{N}.1 — {name} | S | Pending |
+| 2 | S{N}.2 — {name} | M | Pending |
 
-**Context management:** The main thread accumulates only checkpoint
-summaries between stories — not the full tool-call history of each
-phase (those live in forked subagent contexts that are discarded after
-each phase). This keeps the orchestrator responsive through multi-story
-epics.
+**Next:** Run each story independently with `/rai-story-run {story_id}`
+**Resume:** Re-invoke `/rai-epic-run {epic_id}` when all stories are Done → resumes at close
+```
+
+**STOP here.** Do not proceed to phase 6. Do not invoke story-run.
+The developer runs each story in a separate session with fresh context.
+When all stories are Done, re-invoking `/rai-epic-run` detects phase=close and proceeds.
 
 <verification>
-All stories completed. Progress Tracking shows all "Done".
+Pending stories presented. Execution paused for human-driven story iteration.
 </verification>
 
 ### Step 4: Apply Delegation Gates
@@ -160,7 +160,7 @@ After **phase 2 (design)**, **phase 3 (AR)**, and **phase 4 (plan)**, apply the 
 
 If AR verdict is SIMPLIFY, STOP regardless of delegation level. Design must be revised before planning.
 
-No gate between stories — each `/rai-story-run` has its own internal gates.
+Story iteration is a mandatory STOP — stories run in separate sessions (see Step 3).
 
 <verification>
 Gate applied. Approval received (REVIEW) or notification shown (NOTIFY/AUTO).
@@ -195,8 +195,8 @@ All phases complete. Epic merged.
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip stories or reorder them — table order is plan order
 - [ ] NEVER compress a skill's steps into a summary — execute each step fully
-- [ ] Story-run invoked via Skill tool (inline), NEVER via Agent tool (F5 constraint)
-- [ ] Checkpoint between stories: summary read + progress update + one-line report
+- [ ] NEVER invoke story-run from epic-run — present list and STOP (ADR-043 quality rule)
+- [ ] Stories run in separate sessions with fresh context
 
 ## References
 
