@@ -1,26 +1,27 @@
 # Epic Design: Skill Set Ecosystem
 
-| Field | Value |
-|-------|-------|
-| Scope | `scope.md` |
-| Research | `work/research/skill-set-patterns/` |
-| AR | PASS WITH QUESTIONS → overlay-only (Q2 resolved) |
+| Field    | Value                                             |
+| -------- | ------------------------------------------------- |
+| Scope    | `scope.md`                                      |
+| Research | `work/research/skill-set-patterns/`             |
+| AR       | PASS WITH QUESTIONS → overlay-only (Q2 resolved) |
 
 ## Gemba: Current State
 
 ### Files to Modify
 
-| File | Role | Changes |
-|------|------|---------|
-| `src/rai_cli/onboarding/skills.py` | Main scaffolding logic | Add overlay step after builtin deploy |
-| `src/rai_cli/onboarding/skill_manifest.py` | Manifest model | Add `skill_set` field |
-| `src/rai_cli/cli/commands/init.py` | CLI entry point | Add `--skill-set` option |
-| `.claude/skills/rai-skill-create/SKILL.md` | Skill creation | Target `.raise/skills/{set}/` |
-| `src/rai_cli/cli/commands/skill.py` | Scaffold CLI | Add `--set` option |
+| File                                         | Role                   | Changes                               |
+| -------------------------------------------- | ---------------------- | ------------------------------------- |
+| `src/rai_cli/onboarding/skills.py`         | Main scaffolding logic | Add overlay step after builtin deploy |
+| `src/rai_cli/onboarding/skill_manifest.py` | Manifest model         | Add `skill_set` field               |
+| `src/rai_cli/cli/commands/init.py`         | CLI entry point        | Add `--skill-set` option            |
+| `.claude/skills/rai-skill-create/SKILL.md` | Skill creation         | Target `.raise/skills/{set}/`       |
+| `src/rai_cli/cli/commands/skill.py`        | Scaffold CLI           | Add `--set` option                  |
 
 ### Key Contracts
 
 **`scaffold_skills()` new signature:**
+
 ```python
 def scaffold_skills(
     project_root: Path,
@@ -35,6 +36,7 @@ def scaffold_skills(
 ```
 
 **Unified `_copy_skill_tree` (AR R1):**
+
 ```python
 def _copy_skill_tree(
     source_dir: Path | Traversable,    # CHANGED — accept both
@@ -48,6 +50,7 @@ def _copy_skill_tree(
 ```
 
 **Manifest extension:**
+
 ```python
 class SkillManifest(BaseModel):
     skill_set: str | None = None   # NEW: which set was last deployed
