@@ -378,3 +378,31 @@ class TestSessionLiveQuery:
             adapter = resolve_adapter(None)
 
         assert isinstance(adapter, FilesystemPMAdapter)
+
+
+# ---------------------------------------------------------------------------
+# T4: Sync guard — sync_backlog rejects FilesystemPMAdapter
+# ---------------------------------------------------------------------------
+
+
+class TestSyncGuard:
+    """Integration: sync_backlog guard rejects real FilesystemPMAdapter instance."""
+
+    def test_sync_rejects_filesystem_adapter(
+        self, file_adapter: FilesystemPMAdapter, tmp_path: Path
+    ) -> None:
+        """sync_backlog raises ValueError for FilesystemPMAdapter (source of truth)."""
+        from rai_cli.backlog.sync import sync_backlog
+
+        output_path = tmp_path / "governance" / "backlog.md"
+
+        with pytest.raises(ValueError, match="source of truth"):
+            sync_backlog(
+                adapter=file_adapter,
+                adapter_name="filesystem",
+                project_filter=None,
+                output_path=output_path,
+            )
+
+        # Verify output file was NOT created (guard fires before write)
+        assert not output_path.exists()
