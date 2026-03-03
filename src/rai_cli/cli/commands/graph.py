@@ -971,7 +971,9 @@ def _format_concepts_agent(concepts: list[GraphNode]) -> str:
     by_type: dict[str, int] = {}
     for c in concepts:
         by_type[c.type] = by_type.get(c.type, 0) + 1
-    return "\n".join(f"{t}|{n}" for t, n in sorted(by_type.items(), key=lambda x: -x[1]))
+    return "\n".join(
+        f"{t}|{n}" for t, n in sorted(by_type.items(), key=lambda x: -x[1])
+    )
 
 
 def _format_concepts_markdown(concepts: list[GraphNode]) -> str:

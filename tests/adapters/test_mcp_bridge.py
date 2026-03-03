@@ -172,7 +172,9 @@ class TestMcpBridgeCall:
     def test_call_with_error_result(self) -> None:
         """call() returns error McpToolResult when isError=True."""
         bridge, p1, p2, _ = _patched_bridge(
-            call_tool_return=_make_call_result(texts=["401 Unauthorized"], is_error=True)
+            call_tool_return=_make_call_result(
+                texts=["401 Unauthorized"], is_error=True
+            )
         )
 
         async def run() -> McpToolResult:
@@ -431,7 +433,9 @@ class TestMcpBridgeTelemetry:
         async def run() -> None:
             with p1, p2, patch("rai_cli.mcp.bridge.logfire") as mock_logfire:
                 mock_span = MagicMock()
-                mock_logfire.span.return_value.__enter__ = MagicMock(return_value=mock_span)
+                mock_logfire.span.return_value.__enter__ = MagicMock(
+                    return_value=mock_span
+                )
                 mock_logfire.span.return_value.__exit__ = MagicMock(return_value=False)
                 await bridge.call("jira_get_issue", {"issue_key": "RAISE-1"})
 
@@ -451,7 +455,9 @@ class TestMcpBridgeTelemetry:
         async def run() -> None:
             with p1, p2, patch("rai_cli.mcp.bridge.logfire") as mock_logfire:
                 mock_span = MagicMock()
-                mock_logfire.span.return_value.__enter__ = MagicMock(return_value=mock_span)
+                mock_logfire.span.return_value.__enter__ = MagicMock(
+                    return_value=mock_span
+                )
                 mock_logfire.span.return_value.__exit__ = MagicMock(return_value=False)
 
                 with pytest.raises(McpBridgeError):

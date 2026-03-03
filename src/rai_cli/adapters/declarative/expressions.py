@@ -132,7 +132,9 @@ class ExpressionEvaluator:
             if filter_arg is None:
                 msg = "pluck requires a field argument"
                 raise ValueError(msg)
-            return [self._pluck_item(item, filter_arg) for item in cast(list[Any], value)]
+            return [
+                self._pluck_item(item, filter_arg) for item in cast(list[Any], value)
+            ]
 
         msg = f"Unknown filter: {filter_name}"
         raise ValueError(msg)

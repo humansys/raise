@@ -88,7 +88,10 @@ class TestBacklogGet:
         """Get omits assignee/labels/parent/priority when empty."""
         adapter = MagicMock()
         adapter.get_issue.return_value = _make_detail(
-            assignee=None, labels=[], parent_key=None, priority=None,
+            assignee=None,
+            labels=[],
+            parent_key=None,
+            priority=None,
         )
         mock_resolve.return_value = adapter
 
@@ -127,7 +130,9 @@ class TestBacklogGetComments:
     """Tests for `rai backlog get-comments KEY`."""
 
     @patch("rai_cli.cli.commands.backlog.resolve_adapter")
-    def test_get_comments_displays_author_and_body(self, mock_resolve: MagicMock) -> None:
+    def test_get_comments_displays_author_and_body(
+        self, mock_resolve: MagicMock
+    ) -> None:
         """get-comments shows author and comment body."""
         adapter = MagicMock()
         adapter.get_comments.return_value = [

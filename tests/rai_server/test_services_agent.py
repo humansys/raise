@@ -8,7 +8,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -50,7 +50,9 @@ class TestRecordEvent:
             new_callable=AsyncMock,
             return_value=expected_id,
         ):
-            body = AgentEventCreate(event_type="skill_executed", payload={"skill": "test"})
+            body = AgentEventCreate(
+                event_type="skill_executed", payload={"skill": "test"}
+            )
             result = await record_event(factory, org_id, body)
 
         assert result.id == expected_id
@@ -64,7 +66,12 @@ class TestGetEvents:
 
         factory = _mock_session_factory()
         mock_rows = [
-            {"id": uuid.uuid4(), "event_type": "ping", "payload": {}, "created_at": datetime.now(tz=timezone.utc)},
+            {
+                "id": uuid.uuid4(),
+                "event_type": "ping",
+                "payload": {},
+                "created_at": datetime.now(tz=UTC),
+            },
         ]
 
         with patch(

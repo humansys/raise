@@ -466,5 +466,3 @@ class TestE2EPipeline:
         assert result.abort_message == "Not compliant"
         # Audit hook still ran (all-notify semantics)
         assert audit.called
-
-

@@ -166,7 +166,9 @@ def extract_project(
 
     # Count epics in table (both E{N} and [RAISE-XXX](url) formats)
     epic_count = len(
-        re.findall(r"^\|\s*(?:E\d+|\[[A-Z]+-\d+\])\s*(?:\([^)]+\)\s*)?\|", text, re.MULTILINE)
+        re.findall(
+            r"^\|\s*(?:E\d+|\[[A-Z]+-\d+\])\s*(?:\([^)]+\)\s*)?\|", text, re.MULTILINE
+        )
     )
 
     # Calculate relative file path

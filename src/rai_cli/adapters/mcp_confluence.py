@@ -155,9 +155,7 @@ class McpConfluenceAdapter:
 
     async def get_page(self, identifier: str) -> PageContent:
         """Retrieve a page by ID from Confluence."""
-        result = await self._bridge.call(
-            "confluence_get_page", {"page_id": identifier}
-        )
+        result = await self._bridge.call("confluence_get_page", {"page_id": identifier})
         return self._parse_page_content(result)
 
     async def search(self, query: str, limit: int = 10) -> list[PageSummary]:

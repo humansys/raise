@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -68,7 +68,7 @@ class TestAgentEventItem:
             id=uuid.uuid4(),
             event_type="skill_executed",
             payload={"skill": "test"},
-            created_at=datetime.now(tz=timezone.utc),
+            created_at=datetime.now(tz=UTC),
         )
         assert item.event_type == "skill_executed"
 

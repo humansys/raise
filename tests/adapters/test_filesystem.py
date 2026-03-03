@@ -143,7 +143,9 @@ class TestCreateIssue:
         a = FilesystemPMAdapter(project_root=backlog_dir)
         a.create_issue("TEST", IssueSpec(summary="Another", issue_type="Epic"))
 
-        content = (backlog_dir / "governance" / "backlog.md").read_text(encoding="utf-8")
+        content = (backlog_dir / "governance" / "backlog.md").read_text(
+            encoding="utf-8"
+        )
         # New row should have bold name and proper columns
         assert "| E5 | **Another** |" in content
 
@@ -175,7 +177,9 @@ class TestTransitionIssue:
     def test_emoji_preserved_in_file(self, backlog_dir: Path) -> None:
         a = FilesystemPMAdapter(project_root=backlog_dir)
         a.transition_issue("E3", "complete")
-        content = (backlog_dir / "governance" / "backlog.md").read_text(encoding="utf-8")
+        content = (backlog_dir / "governance" / "backlog.md").read_text(
+            encoding="utf-8"
+        )
         assert "✅ Complete" in content
 
 
@@ -236,7 +240,9 @@ class TestJiraLinkFormat:
     def mixed_adapter(self, mixed_dir: Path) -> FilesystemPMAdapter:
         return FilesystemPMAdapter(project_root=mixed_dir)
 
-    def test_search_includes_jira_link_epics(self, mixed_adapter: FilesystemPMAdapter) -> None:
+    def test_search_includes_jira_link_epics(
+        self, mixed_adapter: FilesystemPMAdapter
+    ) -> None:
         results = mixed_adapter.search("", limit=50)
         keys = {r.key for r in results}
         assert "E1" in keys
@@ -249,12 +255,16 @@ class TestJiraLinkFormat:
         assert detail.summary == "Agent Tool Abstraction"
         assert detail.status == "in_progress"
 
-    def test_transition_jira_link_epic(self, mixed_adapter: FilesystemPMAdapter) -> None:
+    def test_transition_jira_link_epic(
+        self, mixed_adapter: FilesystemPMAdapter
+    ) -> None:
         mixed_adapter.transition_issue("RAISE-301", "complete")
         detail = mixed_adapter.get_issue("RAISE-301")
         assert detail.status == "complete"
 
-    def test_health_counts_all_formats(self, mixed_adapter: FilesystemPMAdapter) -> None:
+    def test_health_counts_all_formats(
+        self, mixed_adapter: FilesystemPMAdapter
+    ) -> None:
         h = mixed_adapter.health()
         assert "3 epics" in h.message
 

@@ -40,7 +40,10 @@ class TestGetActiveBackendFactory:
         assert isinstance(backend, DualWriteBackend)
 
     def test_url_without_key_falls_back_to_filesystem(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+        self,
+        tmp_path: Path,
+        monkeypatch: pytest.MonkeyPatch,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         from rai_cli.graph.backends import get_active_backend
 
@@ -91,4 +94,5 @@ class TestGetActiveBackendFactory:
         assert isinstance(backend, DualWriteBackend)
         # Remote should be ApiGraphBackend with project_id derived from cwd
         from rai_cli.graph.backends.api import ApiGraphBackend
+
         assert isinstance(backend.remote, ApiGraphBackend)

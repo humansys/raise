@@ -44,7 +44,9 @@ class TestSimpleSubstitution:
 
 class TestDotAccess:
     def test_single_level(self, evaluator: ExpressionEvaluator) -> None:
-        result = evaluator.evaluate("{{ issue.summary }}", {"issue": {"summary": "Fix bug"}})
+        result = evaluator.evaluate(
+            "{{ issue.summary }}", {"issue": {"summary": "Fix bug"}}
+        )
         assert result == "Fix bug"
 
     def test_nested_levels(self, evaluator: ExpressionEvaluator) -> None:
@@ -56,7 +58,9 @@ class TestDotAccess:
         with pytest.raises(KeyError):
             evaluator.evaluate("{{ a.b.missing }}", {"a": {"b": {"c": 1}}})
 
-    def test_dot_access_on_non_dict_raises(self, evaluator: ExpressionEvaluator) -> None:
+    def test_dot_access_on_non_dict_raises(
+        self, evaluator: ExpressionEvaluator
+    ) -> None:
         with pytest.raises((KeyError, TypeError)):
             evaluator.evaluate("{{ a.b }}", {"a": "string"})
 
@@ -90,8 +94,12 @@ class TestFilterDefault:
         result = evaluator.evaluate("{{ val | default('fallback') }}", {"val": None})
         assert result == "fallback"
 
-    def test_present_value_ignores_default(self, evaluator: ExpressionEvaluator) -> None:
-        result = evaluator.evaluate("{{ val | default('fallback') }}", {"val": "actual"})
+    def test_present_value_ignores_default(
+        self, evaluator: ExpressionEvaluator
+    ) -> None:
+        result = evaluator.evaluate(
+            "{{ val | default('fallback') }}", {"val": "actual"}
+        )
         assert result == "actual"
 
     def test_empty_string_is_not_none(self, evaluator: ExpressionEvaluator) -> None:
@@ -178,6 +186,8 @@ class TestCombined:
         result = evaluator.evaluate("{{ data.number | str }}", {"data": {"number": 42}})
         assert result == "42"
 
-    def test_dot_access_with_default_filter(self, evaluator: ExpressionEvaluator) -> None:
+    def test_dot_access_with_default_filter(
+        self, evaluator: ExpressionEvaluator
+    ) -> None:
         result = evaluator.evaluate("{{ data.missing | default('n/a') }}", {"data": {}})
         assert result == "n/a"

@@ -76,9 +76,7 @@ class TestMcpHealth:
         assert "Connection refused" in result.output
 
     def test_health_server_not_found(self) -> None:
-        with patch(
-            "rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}
-        ):
+        with patch("rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
             result = runner.invoke(app, ["mcp", "health", "nonexistent"])
         assert result.exit_code != 0
         assert "not found" in result.output.lower()

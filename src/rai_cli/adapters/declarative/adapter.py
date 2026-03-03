@@ -145,9 +145,7 @@ class DeclarativeMcpAdapter:
 
     # ----- CRUD -----
 
-    async def create_issue(
-        self, project_key: str, issue: IssueSpec
-    ) -> IssueRef:
+    async def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
         ctx = {"project_key": project_key, "issue": issue.model_dump()}
         result = await self._dispatch("create_issue", ctx)
         fields = self._parse_single("create_issue", result, ctx)
@@ -159,9 +157,7 @@ class DeclarativeMcpAdapter:
         fields = self._parse_single("get_issue", result, ctx)
         return IssueDetail(**fields)
 
-    async def update_issue(
-        self, key: str, fields: dict[str, Any]
-    ) -> IssueRef:
+    async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
         ctx = {"key": key, "fields": fields}
         result = await self._dispatch("update_issue", ctx)
         parsed = self._parse_single("update_issue", result, ctx)
@@ -175,9 +171,7 @@ class DeclarativeMcpAdapter:
 
     # ----- Batch -----
 
-    async def batch_transition(
-        self, keys: list[str], status: str
-    ) -> BatchResult:
+    async def batch_transition(self, keys: list[str], status: str) -> BatchResult:
         """Auto-loops over transition_issue (AR design D6)."""
         succeeded: list[IssueRef] = []
         failed: list[FailureDetail] = []
@@ -197,9 +191,7 @@ class DeclarativeMcpAdapter:
         ctx = {"child_key": child_key, "parent_key": parent_key}
         await self._dispatch("link_to_parent", ctx)
 
-    async def link_issues(
-        self, source: str, target: str, link_type: str
-    ) -> None:
+    async def link_issues(self, source: str, target: str, link_type: str) -> None:
         ctx = {"source": source, "target": target, "link_type": link_type}
         await self._dispatch("link_issues", ctx)
 
@@ -211,9 +203,7 @@ class DeclarativeMcpAdapter:
         fields = self._parse_single("add_comment", result, ctx)
         return CommentRef(**fields)
 
-    async def get_comments(
-        self, key: str, limit: int = 10
-    ) -> list[Comment]:
+    async def get_comments(self, key: str, limit: int = 10) -> list[Comment]:
         ctx = {"key": key, "limit": limit}
         result = await self._dispatch("get_comments", ctx)
         items = self._parse_list("get_comments", result)
@@ -238,9 +228,7 @@ class DeclarativeMcpAdapter:
 
     # ----- Docs: Documentation Target (AR-Q1) -----
 
-    async def can_publish(
-        self, doc_type: str, metadata: dict[str, Any]
-    ) -> bool:
+    async def can_publish(self, doc_type: str, metadata: dict[str, Any]) -> bool:
         ctx = {"doc_type": doc_type, "metadata": metadata}
         result = await self._dispatch("can_publish", ctx)
         fields = self._parse_single("can_publish", result, ctx)

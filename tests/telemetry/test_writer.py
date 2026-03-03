@@ -404,4 +404,3 @@ class TestEmitErrorEvent:
         assert data["error_type"] == "command_not_found"
         assert data["context"] == "pytest"
         assert data["recoverable"] is True
-

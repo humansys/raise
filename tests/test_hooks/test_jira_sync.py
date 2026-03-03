@@ -143,9 +143,7 @@ class TestTransitions:
 
     def test_epic_start_transitions(self) -> None:
         hook = JiraSyncHook()
-        event = WorkStartEvent(
-            work_type="epic", work_id="E301", issue_key="RAISE-301"
-        )
+        event = WorkStartEvent(work_type="epic", work_id="E301", issue_key="RAISE-301")
         mock_adapter = MagicMock()
         with (
             patch(
@@ -282,7 +280,12 @@ class TestConfigReaders:
             jira_yaml,
         ):
             mapping = _load_lifecycle_mapping()
-        assert mapping == {"story_start": 31, "story_close": 41, "epic_start": 31, "epic_close": 41}
+        assert mapping == {
+            "story_start": 31,
+            "story_close": 41,
+            "epic_start": 31,
+            "epic_close": 41,
+        }
 
     def test_load_lifecycle_mapping_missing_file(self, tmp_path: Path) -> None:
         with patch(

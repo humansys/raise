@@ -184,9 +184,7 @@ class TestFindDomainFor:
         domain = engine.find_domain_for("mod-orphan")
         assert domain is None
 
-    def test_returns_none_for_nonexistent_module(
-        self, engine: QueryEngine
-    ) -> None:
+    def test_returns_none_for_nonexistent_module(self, engine: QueryEngine) -> None:
         """Returns None for non-existent module ID."""
         domain = engine.find_domain_for("mod-nonexistent")
         assert domain is None
@@ -210,9 +208,7 @@ class TestFindLayerFor:
         layer = engine.find_layer_for("mod-orphan")
         assert layer is None
 
-    def test_returns_none_for_nonexistent_module(
-        self, engine: QueryEngine
-    ) -> None:
+    def test_returns_none_for_nonexistent_module(self, engine: QueryEngine) -> None:
         """Returns None for non-existent module ID."""
         layer = engine.find_layer_for("mod-nonexistent")
         assert layer is None
@@ -243,9 +239,7 @@ class TestFindConstraintsFor:
         constraints = engine.find_constraints_for("mod-orphan")
         assert constraints == []
 
-    def test_returns_empty_for_nonexistent_module(
-        self, engine: QueryEngine
-    ) -> None:
+    def test_returns_empty_for_nonexistent_module(self, engine: QueryEngine) -> None:
         """Returns empty list for non-existent module ID."""
         constraints = engine.find_constraints_for("mod-nonexistent")
         assert constraints == []
@@ -270,9 +264,7 @@ class TestGetArchitecturalContext:
         assert len(ctx.dependencies) == 1
         assert ctx.dependencies[0].id == "mod-context"
 
-    def test_returns_partial_context_for_orphan(
-        self, engine: QueryEngine
-    ) -> None:
+    def test_returns_partial_context_for_orphan(self, engine: QueryEngine) -> None:
         """Returns ArchitecturalContext with None/empty for unconnected module."""
         ctx = engine.get_architectural_context("mod-orphan")
         assert ctx is not None
@@ -282,9 +274,7 @@ class TestGetArchitecturalContext:
         assert ctx.constraints == []
         assert ctx.dependencies == []
 
-    def test_returns_none_for_nonexistent_module(
-        self, engine: QueryEngine
-    ) -> None:
+    def test_returns_none_for_nonexistent_module(self, engine: QueryEngine) -> None:
         """Returns None when module doesn't exist in graph."""
         ctx = engine.get_architectural_context("mod-nonexistent")
         assert ctx is None

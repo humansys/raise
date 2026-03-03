@@ -72,7 +72,9 @@ def discover_yaml_adapters(
         try:
             config = DeclarativeAdapterConfig.model_validate(raw)
         except ValidationError as exc:
-            logger.warning("Skipping %s: schema validation error: %s", yaml_path.name, exc)
+            logger.warning(
+                "Skipping %s: schema validation error: %s", yaml_path.name, exc
+            )
             continue
 
         if config.adapter.protocol != protocol:

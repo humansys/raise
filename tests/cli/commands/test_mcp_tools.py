@@ -47,9 +47,7 @@ class TestMcpTools:
         assert "Resolve lib ID" in result.output
 
     def test_tools_server_not_found(self) -> None:
-        with patch(
-            "rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}
-        ):
+        with patch("rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
             result = runner.invoke(app, ["mcp", "tools", "nonexistent"])
         assert result.exit_code != 0
         assert "not found" in result.output.lower()

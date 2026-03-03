@@ -134,9 +134,7 @@ def health(
             f"({result.tool_count} tools, {result.latency_ms}ms)"
         )
     else:
-        console.print(
-            f"[red]{config.name}[/red]: unhealthy — {result.message}"
-        )
+        console.print(f"[red]{config.name}[/red]: unhealthy — {result.message}")
         raise typer.Exit(1)
 
 
@@ -220,23 +218,29 @@ def call(
     try:
         result = asyncio.run(_call_tool(config, tool, arguments))
         elapsed_ms = int((time.monotonic() - start) * 1000)
-        emitter.emit(McpCallEvent(
-            server=server, tool=tool, success=True, latency_ms=elapsed_ms,
-        ))
-        if verbose:
-            console.print(
-                f"mcp:call {server}/{tool} — ok ({elapsed_ms}ms)"
+        emitter.emit(
+            McpCallEvent(
+                server=server,
+                tool=tool,
+                success=True,
+                latency_ms=elapsed_ms,
             )
+        )
+        if verbose:
+            console.print(f"mcp:call {server}/{tool} — ok ({elapsed_ms}ms)")
     except Exception as exc:
         elapsed_ms = int((time.monotonic() - start) * 1000)
-        emitter.emit(McpCallEvent(
-            server=server, tool=tool, success=False,
-            latency_ms=elapsed_ms, error=str(exc),
-        ))
-        if verbose:
-            console.print(
-                f"mcp:call {server}/{tool} — error ({elapsed_ms}ms): {exc}"
+        emitter.emit(
+            McpCallEvent(
+                server=server,
+                tool=tool,
+                success=False,
+                latency_ms=elapsed_ms,
+                error=str(exc),
             )
+        )
+        if verbose:
+            console.print(f"mcp:call {server}/{tool} — error ({elapsed_ms}ms): {exc}")
         console.print(f"Error: {exc}")
         raise typer.Exit(1) from exc
 
@@ -290,15 +294,21 @@ def _write_mcp_config(
 
 @mcp_app.command()
 def scaffold(
-    name: Annotated[str, typer.Argument(help="Server name (used as filename and config name)")],
-    command: Annotated[str, typer.Option("--command", help="Server command (e.g. 'npx', 'uvx')")],
+    name: Annotated[
+        str, typer.Argument(help="Server name (used as filename and config name)")
+    ],
+    command: Annotated[
+        str, typer.Option("--command", help="Server command (e.g. 'npx', 'uvx')")
+    ],
     args: Annotated[
         str,
         typer.Option("--args", help="Server arguments as space-separated string"),
     ] = "",
     env: Annotated[
         str,
-        typer.Option("--env", help="Comma-separated env var names (e.g. 'TOKEN,API_KEY')"),
+        typer.Option(
+            "--env", help="Comma-separated env var names (e.g. 'TOKEN,API_KEY')"
+        ),
     ] = "",
     force: Annotated[
         bool,
@@ -368,7 +378,9 @@ _TYPE_STRATEGIES: dict[str, tuple[str, list[str]]] = {
 
 
 def _build_server_config(
-    pkg_type: str, package: str, module: str | None,
+    pkg_type: str,
+    package: str,
+    module: str | None,
 ) -> tuple[str, list[str]]:
     """Return (command, args) for the given package type."""
     if pkg_type == "pip":
@@ -380,7 +392,9 @@ def _build_server_config(
 
 @mcp_app.command()
 def install(
-    package: Annotated[str, typer.Argument(help="Package identifier (e.g. '@upstash/context7-mcp')")],
+    package: Annotated[
+        str, typer.Argument(help="Package identifier (e.g. '@upstash/context7-mcp')")
+    ],
     pkg_type: Annotated[
         str,
         typer.Option("--type", help="Package type: uvx, npx, or pip"),
@@ -416,7 +430,9 @@ def install(
     # Validate type
     valid_types: set[str] = {"uvx", "npx", "pip"}
     if pkg_type not in valid_types:
-        console.print(f"Error: Invalid --type '{pkg_type}'. Must be one of: {', '.join(sorted(valid_types))}")
+        console.print(
+            f"Error: Invalid --type '{pkg_type}'. Must be one of: {', '.join(sorted(valid_types))}"
+        )
         raise typer.Exit(1)
 
     # Validate pip requires --module
@@ -446,7 +462,9 @@ def install(
 
     # Build command/args from type strategy
     server_command, server_args = _build_server_config(
-        pkg_type, package, module or None,
+        pkg_type,
+        package,
+        module or None,
     )
     env_list = [e.strip() for e in env.split(",") if e.strip()] or None
 
@@ -484,6 +502,4 @@ def install(
     )
 
     status = "healthy" if health_ok else "unhealthy (check config)"
-    Console().print(
-        f"Created {written} ({len(tool_names)} tools, {status})"
-    )
+    Console().print(f"Created {written} ({len(tool_names)} tools, {status})")

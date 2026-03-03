@@ -66,7 +66,13 @@ class TestListPatterns:
         session = _mock_session()
         mock_mappings = MagicMock()
         mock_mappings.all.return_value = [
-            {"id": uuid.uuid4(), "content": "pat", "context": [], "properties": {}, "created_at": "2026-01-01"},
+            {
+                "id": uuid.uuid4(),
+                "content": "pat",
+                "context": [],
+                "properties": {},
+                "created_at": "2026-01-01",
+            },
         ]
         mock_result = MagicMock()
         mock_result.mappings.return_value = mock_mappings

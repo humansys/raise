@@ -33,7 +33,9 @@ _VALID_FORMATS = ("human", "agent")
 # Common option for adapter override (D3)
 AdapterOption = Annotated[
     str | None,
-    typer.Option("--adapter", "-a", help="Adapter name override (auto-detect if omitted)"),
+    typer.Option(
+        "--adapter", "-a", help="Adapter name override (auto-detect if omitted)"
+    ),
 ]
 
 # Output format option (S325.3: ACI)
@@ -59,11 +61,22 @@ def _validate_format(format: str) -> None:
 @backlog_app.command()
 def create(
     summary: Annotated[str, typer.Argument(help="Issue title")],
-    project: Annotated[str, typer.Option("--project", "-p", help="Project key (e.g., RAISE)")],
-    issue_type: Annotated[str, typer.Option("--type", "-t", help="Issue type")] = "Task",
-    labels: Annotated[str | None, typer.Option("--labels", "-l", help="Comma-separated labels")] = None,
-    parent: Annotated[str | None, typer.Option("--parent", help="Parent issue key")] = None,
-    description: Annotated[str | None, typer.Option("--description", "-d", help="Issue description (markdown)")] = None,
+    project: Annotated[
+        str, typer.Option("--project", "-p", help="Project key (e.g., RAISE)")
+    ],
+    issue_type: Annotated[
+        str, typer.Option("--type", "-t", help="Issue type")
+    ] = "Task",
+    labels: Annotated[
+        str | None, typer.Option("--labels", "-l", help="Comma-separated labels")
+    ] = None,
+    parent: Annotated[
+        str | None, typer.Option("--parent", help="Parent issue key")
+    ] = None,
+    description: Annotated[
+        str | None,
+        typer.Option("--description", "-d", help="Issue description (markdown)"),
+    ] = None,
     adapter: AdapterOption = None,
     format: FormatOption = "human",
 ) -> None:
@@ -99,10 +112,18 @@ def transition(
 @backlog_app.command()
 def update(
     key: Annotated[str, typer.Argument(help="Issue key (e.g., RAISE-123)")],
-    summary: Annotated[str | None, typer.Option("--summary", "-s", help="New summary")] = None,
-    labels: Annotated[str | None, typer.Option("--labels", "-l", help="Comma-separated labels")] = None,
-    priority: Annotated[str | None, typer.Option("--priority", help="Priority name")] = None,
-    assignee: Annotated[str | None, typer.Option("--assignee", help="Assignee identifier")] = None,
+    summary: Annotated[
+        str | None, typer.Option("--summary", "-s", help="New summary")
+    ] = None,
+    labels: Annotated[
+        str | None, typer.Option("--labels", "-l", help="Comma-separated labels")
+    ] = None,
+    priority: Annotated[
+        str | None, typer.Option("--priority", help="Priority name")
+    ] = None,
+    assignee: Annotated[
+        str | None, typer.Option("--assignee", help="Assignee identifier")
+    ] = None,
     adapter: AdapterOption = None,
 ) -> None:
     """Update fields on a backlog item."""
@@ -129,7 +150,9 @@ def update(
 def link(
     source: Annotated[str, typer.Argument(help="Source issue key")],
     target: Annotated[str, typer.Argument(help="Target issue key")],
-    link_type: Annotated[str, typer.Argument(help="Link type (e.g., 'blocks', 'relates')")],
+    link_type: Annotated[
+        str, typer.Argument(help="Link type (e.g., 'blocks', 'relates')")
+    ],
     adapter: AdapterOption = None,
 ) -> None:
     """Link two backlog items (AR4: uses link_issues only)."""
@@ -218,7 +241,12 @@ def get_comments(
 
 @backlog_app.command()
 def search(
-    query: Annotated[str, typer.Argument(help="Search query (format depends on adapter, e.g., JQL for Jira)")],
+    query: Annotated[
+        str,
+        typer.Argument(
+            help="Search query (format depends on adapter, e.g., JQL for Jira)"
+        ),
+    ],
     limit: Annotated[int, typer.Option("--limit", "-n", help="Max results")] = 50,
     adapter: AdapterOption = None,
     format: FormatOption = "human",
@@ -233,7 +261,9 @@ def search(
         return
     if format == "agent":
         for issue in results:
-            print(f"{issue.key}|{_sanitize_pipe(issue.status)}|{_sanitize_pipe(issue.summary)}")
+            print(
+                f"{issue.key}|{_sanitize_pipe(issue.status)}|{_sanitize_pipe(issue.summary)}"
+            )
     else:
         for issue in results:
             console.print(f"{issue.key} {issue.status:<12} {issue.summary}")
@@ -241,7 +271,9 @@ def search(
 
 @backlog_app.command("batch-transition")
 def batch_transition(
-    keys: Annotated[str, typer.Argument(help="Comma-separated issue keys (e.g., RAISE-1,RAISE-2)")],
+    keys: Annotated[
+        str, typer.Argument(help="Comma-separated issue keys (e.g., RAISE-1,RAISE-2)")
+    ],
     status: Annotated[str, typer.Argument(help="Target status")],
     adapter: AdapterOption = None,
 ) -> None:

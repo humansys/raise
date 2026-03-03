@@ -3,10 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime
 from pathlib import Path
-
-import pytest
 
 from rai_cli.schemas.journal import JournalEntry, JournalEntryType
 from rai_cli.session.journal import append_journal_entry, read_journal

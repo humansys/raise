@@ -40,7 +40,9 @@ class TestMcpServerConfig:
         config = McpServerConfig(
             name="context7",
             description="Library docs via Context7",
-            server=ServerConnection(command="npx", args=["-y", "@upstash/context7-mcp"]),
+            server=ServerConnection(
+                command="npx", args=["-y", "@upstash/context7-mcp"]
+            ),
         )
         assert config.name == "context7"
         assert config.description == "Library docs via Context7"
@@ -73,7 +75,11 @@ class TestDeclarativeBackwardsCompat:
 
         raw = {
             "adapter": {"name": "github", "protocol": "pm"},
-            "server": {"command": "uvx", "args": ["mcp-github"], "env": ["GITHUB_TOKEN"]},
+            "server": {
+                "command": "uvx",
+                "args": ["mcp-github"],
+                "env": ["GITHUB_TOKEN"],
+            },
             "methods": {},
         }
         config = DeclarativeAdapterConfig.model_validate(raw)
