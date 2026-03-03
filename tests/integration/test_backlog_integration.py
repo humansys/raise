@@ -5,6 +5,24 @@ Only ``resolve_adapter()`` is patched to inject the real FileAdapter —
 all other calls are genuine (real YAML files, real Pydantic validation).
 
 Architecture: S347.7 (E347 Backlog Automation)
+
+Dogfood Review — E347 Lifecycle Evidence
+=========================================
+This epic (E347: Backlog Automation) was managed using the tools it built:
+
+- S347.1: FilesystemPMAdapter — YAML store for backlog items
+- S347.2: FileAdapter protocol parity — all 11 methods implemented
+- S347.3: BacklogHook — auto-sync on work lifecycle events
+- S347.4: Hook wiring — BacklogHook -> resolve_adapter -> FileAdapter
+- S347.5: Session-start live query — _fetch_live_status with real adapter
+- S347.6: Sync guard — sync_backlog rejects FilesystemPMAdapter
+- S347.7: This module — integration tests proving components work together
+
+Test categories:
+  TestProtocolParity    — Full lifecycle round-trip through real FileAdapter
+  TestHookAdapterFlow   — BacklogHook.handle() with real FileAdapter (no mocks)
+  TestSessionLiveQuery  — _fetch_live_status with real YAML items
+  TestSyncGuard         — sync_backlog rejects FilesystemPMAdapter
 """
 
 from __future__ import annotations
@@ -16,7 +34,6 @@ import pytest
 
 from rai_cli.adapters.filesystem import FilesystemPMAdapter
 from rai_cli.adapters.models import IssueSpec
-
 
 # ---------------------------------------------------------------------------
 # T1: Protocol parity — full lifecycle round-trip
@@ -290,10 +307,9 @@ class TestSessionLiveQuery:
         backlog_dir: Path,
     ) -> None:
         """Pre-populated YAML items -> correct LiveBacklogStatus fields."""
-        from tests.integration.conftest import write_yaml_item
-
         from rai_cli.schemas.session_state import CurrentWork, LastSession, SessionState
         from rai_cli.session.bundle import _fetch_live_status
+        from tests.integration.conftest import write_yaml_item
 
         # Write YAML items on disk
         write_yaml_item(
