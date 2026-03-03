@@ -10,6 +10,7 @@ import yaml
 from rai_cli.onboarding.detection import ProjectType
 from rai_cli.onboarding.manifest import (
     AgentsManifest,
+    BacklogConfig,
     BranchConfig,
     IdeManifest,
     ProjectInfo,
@@ -596,3 +597,72 @@ class TestManifestWithTier:
         loaded = load_manifest(tmp_path)
         assert loaded is not None
         assert loaded.tier is None
+
+
+# =============================================================================
+# BacklogConfig (S347.1)
+# =============================================================================
+
+
+class TestBacklogConfig:
+    """Tests for BacklogConfig model — optional backlog section in manifest."""
+
+    def test_defaults(self) -> None:
+        cfg = BacklogConfig()
+        assert cfg.adapter_default is None
+
+    def test_with_adapter_default(self) -> None:
+        cfg = BacklogConfig(adapter_default="jira")
+        assert cfg.adapter_default == "jira"
+
+
+class TestManifestWithBacklog:
+    """Tests for ProjectManifest with optional backlog config."""
+
+    def test_manifest_without_backlog(self) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        manifest = ProjectManifest(project=project)
+        assert manifest.backlog is None
+
+    def test_manifest_with_backlog(self) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        backlog = BacklogConfig(adapter_default="jira")
+        manifest = ProjectManifest(project=project, backlog=backlog)
+        assert manifest.backlog is not None
+        assert manifest.backlog.adapter_default == "jira"
+
+    def test_roundtrip_with_backlog(self, tmp_path: Path) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        backlog = BacklogConfig(adapter_default="filesystem")
+        manifest = ProjectManifest(project=project, backlog=backlog)
+        save_manifest(manifest, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.backlog is not None
+        assert loaded.backlog.adapter_default == "filesystem"
+
+    def test_loads_manifest_without_backlog_field(self, tmp_path: Path) -> None:
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 5\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.backlog is None
+
+    def test_saved_yaml_contains_backlog_section(self, tmp_path: Path) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        backlog = BacklogConfig(adapter_default="jira")
+        manifest = ProjectManifest(project=project, backlog=backlog)
+
+        save_manifest(manifest, tmp_path)
+
+        data = yaml.safe_load((tmp_path / ".raise" / "manifest.yaml").read_text())
+        assert data["backlog"]["adapter_default"] == "jira"

@@ -79,6 +79,16 @@ class AgentsManifest(BaseModel):
     types: list[str] = Field(default_factory=lambda: ["claude"])
 
 
+class BacklogConfig(BaseModel):
+    """Backlog configuration from manifest (optional section).
+
+    Attributes:
+        adapter_default: Default PM adapter name (e.g., 'jira', 'filesystem').
+    """
+
+    adapter_default: str | None = None
+
+
 class TierConfig(BaseModel):
     """Tier configuration from manifest (optional section).
 
@@ -111,6 +121,7 @@ class ProjectManifest(BaseModel):
     ide: IdeManifest = Field(default_factory=IdeManifest)
     agents: AgentsManifest = Field(default_factory=AgentsManifest)
     tier: TierConfig | None = None
+    backlog: BacklogConfig | None = None
 
     @model_validator(mode="before")
     @classmethod
