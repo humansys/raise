@@ -27,10 +27,12 @@ Test categories:
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+import yaml
 
 from rai_cli.adapters.filesystem import FilesystemPMAdapter
 from rai_cli.adapters.models import IssueSpec
@@ -189,12 +191,11 @@ class TestProtocolParity:
 
         adapter.link_issues("S1.1", "E1", "blocks")
 
-        # Reload from disk to verify persistence
-        fresh = FilesystemPMAdapter(project_root=backlog_dir.parent.parent.parent)
-        item = fresh._load_item("S1.1")
-        assert len(item.links) == 1
-        assert item.links[0].target == "E1"
-        assert item.links[0].link_type == "blocks"
+        # Reload from disk to verify persistence (read YAML directly, no private API)
+        raw = yaml.safe_load((backlog_dir / "S1.1.yaml").read_text(encoding="utf-8"))
+        assert len(raw["links"]) == 1
+        assert raw["links"][0]["target"] == "E1"
+        assert raw["links"][0]["link_type"] == "blocks"
 
 
 # ---------------------------------------------------------------------------
@@ -305,11 +306,11 @@ class TestSessionLiveQuery:
         self,
         tmp_path: Path,
         backlog_dir: Path,
+        write_yaml_item: Callable[..., None],
     ) -> None:
         """Pre-populated YAML items -> correct LiveBacklogStatus fields."""
         from rai_cli.schemas.session_state import CurrentWork, LastSession, SessionState
         from rai_cli.session.bundle import _fetch_live_status
-        from tests.integration.conftest import write_yaml_item
 
         # Write YAML items on disk
         write_yaml_item(
