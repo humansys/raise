@@ -133,13 +133,13 @@ S340.5 depends on S340.4 (skill uses CLI).
 
 ## Done Criteria
 
-- [ ] `rai init --skill-set X` deploys builtins + overlay merged to `.claude/skills/`
-- [ ] Same-name-wins override verified (overlay skill replaces builtin)
-- [ ] Overlay skills NOT touched by subsequent `rai init` without `--skill-set`
-- [ ] `/rai-skill-create` generates into `.raise/skills/{set}/`
-- [ ] Manifest tracks `origin: "project"` for overlay skills
-- [ ] All existing tests pass + new tests per story
-- [ ] Retrospective complete
+- [x] `rai init --skill-set X` deploys builtins + overlay merged to `.claude/skills/`
+- [x] Same-name-wins override verified (overlay skill replaces builtin)
+- [x] Overlay skills NOT touched by subsequent `rai init` without `--skill-set`
+- [x] `/rai-skill-create` generates into `.raise/skills/{set}/`
+- [x] Manifest tracks `origin: "project"` for overlay skills
+- [x] All existing tests pass + new tests per story (3367 passing)
+- [x] Retrospective complete
 
 ## Risks
 
