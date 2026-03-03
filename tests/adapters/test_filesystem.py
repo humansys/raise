@@ -319,6 +319,80 @@ class TestYamlStoreCreate:
         assert path.exists()
 
 
+# ── T5: transition + update + batch over YAML store ────────────────────
+
+
+class TestYamlStoreTransition:
+    """T5: transition_issue() over YAML store."""
+
+    def test_transition_returns_ref(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        ref = yaml_adapter.transition_issue("E1", "in_progress")
+        assert isinstance(ref, IssueRef)
+        assert ref.key == "E1"
+
+    def test_transition_updates_status(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        yaml_adapter.transition_issue("E1", "in_progress")
+        detail = yaml_adapter.get_issue("E1")
+        assert detail.status == "in_progress"
+
+    def test_transition_updates_timestamp(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        original = yaml_adapter.get_issue("E1")
+        yaml_adapter.transition_issue("E1", "in_progress")
+        updated = yaml_adapter.get_issue("E1")
+        assert updated.updated != original.updated
+
+    def test_transition_missing_raises(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        with pytest.raises(KeyError, match="S999.1"):
+            yaml_adapter.transition_issue("S999.1", "done")
+
+
+class TestYamlStoreUpdate:
+    """T5: update_issue() over YAML store."""
+
+    def test_update_summary(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        ref = yaml_adapter.update_issue("E1", {"summary": "New Name"})
+        assert isinstance(ref, IssueRef)
+        detail = yaml_adapter.get_issue("E1")
+        assert detail.summary == "New Name"
+
+    def test_update_priority(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        yaml_adapter.update_issue("E1", {"priority": "P0"})
+        detail = yaml_adapter.get_issue("E1")
+        assert detail.priority == "P0"
+
+    def test_update_preserves_other_fields(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        yaml_adapter.update_issue("E1", {"summary": "New Name"})
+        detail = yaml_adapter.get_issue("E1")
+        assert detail.status == "complete"  # unchanged
+        assert detail.issue_type == "Epic"  # unchanged
+
+    def test_update_missing_raises(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        with pytest.raises(KeyError, match="S999.1"):
+            yaml_adapter.update_issue("S999.1", {"summary": "x"})
+
+
+class TestYamlStoreBatch:
+    """T5: batch_transition() over YAML store."""
+
+    def test_batch_all_succeed(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        result = yaml_adapter.batch_transition(["E1", "E2"], "complete")
+        assert isinstance(result, BatchResult)
+        assert len(result.succeeded) == 2
+        assert len(result.failed) == 0
+
+    def test_batch_partial_failure(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        result = yaml_adapter.batch_transition(["E1", "S999.1"], "complete")
+        assert len(result.succeeded) == 1
+        assert len(result.failed) == 1
+        assert result.failed[0].key == "S999.1"
+
+
 # ── Legacy markdown tests (to be removed in T7) ────────────────────────
 
 SAMPLE_BACKLOG = """\
