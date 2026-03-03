@@ -1,8 +1,8 @@
 ---
 name: rai-skill-create
 description: >
-  Guided skill creation with skill set management. Detects existing sets,
-  offers to create/extend them, then walks through design and validation.
+  Guided skill creation through conversation and CLI composition. Walks through
+  purpose definition, naming, lifecycle, design, writing, and validation.
 
 license: MIT
 
@@ -22,59 +22,32 @@ metadata:
 
 ## Purpose
 
-Guide creation of RaiSE skills through conversation and CLI. Detects skill sets, offers team-level management, produces ADR-040-compliant SKILL.md.
+Guide creation of a new RaiSE skill through conversation and CLI, producing a complete ADR-040-compliant SKILL.md — no TODO placeholders.
 
 ## Mastery Levels (ShuHaRi)
 
 - **Shu**: Follow all steps; ask at each stage
 - **Ha**: Collapse steps when intent is clear; infer lifecycle
-- **Ri**: Manage full skill sets; create families in one pass
+- **Ri**: Create skill families in a single pass
 
 ## Context
 
-**When to use:** Creating a skill, customizing a builtin for your team, or setting up a skill set.
+**When to use:** Creating a new skill or customizing a builtin for a skill set.
 
-**When to skip:** Editing an existing skill directly.
+**When to skip:** Managing skill sets (use `/rai-skillset-manage`). Editing an existing skill directly.
+
+**Inputs:** What the skill should do. Optionally: `--set` for skill set target.
 
 ## Steps
-
-### Step 0: Detect Skill Sets and Determine Target
-
-```bash
-ls -d .raise/skills/*/ 2>/dev/null || echo "No skill sets found"
-```
-
-**Sets exist** → ask: (1) create in existing set, (2) new set, (3) standalone in `.claude/skills/`
-
-**No sets** → ask: (1) new skill set for your team, (2) standalone
-
-**If "new set":**
-
-1. Ask set name (e.g., "my-company")
-2. Ask: *"Copy all builtins as base to customize?"*
-3. If yes, for each builtin: `rai skill scaffold {name} --set {set-name} --from-builtin`
-4. Confirm creation, then ask: *"Customize an existing skill or create a new one?"*
-
-**If "customize builtin" in existing set:**
-
-```bash
-rai skill scaffold {builtin-name} --set {set-name} --from-builtin
-```
-
-Record `target_set` for Step 5.
-
-<verification>
-Target determined: standalone, existing set, or new set created.
-</verification>
 
 ### Step 1: Understand Purpose
 
 Ask: *"What does this skill do? What problem does it solve?"*
 
-If customizing a builtin, read it first:
+If customizing a builtin for a skill set, read it first:
 
 ```bash
-cat .raise/skills/{set}/{name}/SKILL.md   # or .claude/skills/{name}/SKILL.md
+cat .claude/skills/{name}/SKILL.md
 ```
 
 <verification>Purpose statable in one sentence.</verification>
@@ -117,11 +90,14 @@ Read 2-3 reference skills with same `work_cycle`.
 ADR-040 contract: 7 sections, ≤150 body lines. HITL review before writing.
 
 ```bash
-# Standalone
+# Standalone (default)
 mkdir -p .claude/skills/{name}
 
 # In a skill set
 mkdir -p .raise/skills/{set}/{name}
+
+# Customize builtin into a set
+rai skill scaffold {name} --set {set} --from-builtin
 ```
 
 <verification>No TODO placeholders.</verification>
@@ -145,9 +121,8 @@ If in a skill set, remind: *"To deploy: `rai init --skill-set {set}`"*
 
 ## Quality Checklist
 
-- [ ] Skill sets detected before asking what to create
 - [ ] Purpose before naming
-- [ ] Name validated with CLI
+- [ ] Name validated with `rai skill check-name`
 - [ ] ADR-040: 7 sections, ≤150 lines
 - [ ] No TODO placeholders
 - [ ] Deploy reminder when in skill set
@@ -155,4 +130,5 @@ If in a skill set, remind: *"To deploy: `rai init --skill-set {set}`"*
 ## References
 
 - ADR-040: `dev/decisions/adr-040-skill-contract.md`
-- CLI: `rai skill scaffold --help`, `rai init --skill-set --help`
+- Skill sets: `/rai-skillset-manage`, `rai skill set --help`
+- CLI: `rai skill scaffold --help`
