@@ -101,6 +101,26 @@ Target: Issues carry work_id in a label or custom field. Resolution by exact mat
 
 Decision deferred to S347.4 story design.
 
+## Workflow as Abstraction (ADR-043)
+
+Skills speak in **workflow phases**, not adapter statuses. Three layers:
+
+```
+Skill: "transition to designing"
+        ↓
+Workflow Definition (.raise/workflow.yaml)
+  → validates phase exists and transition is valid
+        ↓
+Phase-to-Status Mapping (.raise/jira.yaml)
+  → translates "designing" → Jira transition ID "31"
+        ↓
+Adapter: executes transition on backend
+```
+
+RaiSE ships a default workflow (backlog → started → designing → planning → implementing → reviewing → done). Teams override with their own phases, mappings, and skills per phase.
+
+See `dev/decisions/adr-043-workflow-as-abstraction.md` for full decision.
+
 ## Key Contracts
 
 ### No Protocol Changes
