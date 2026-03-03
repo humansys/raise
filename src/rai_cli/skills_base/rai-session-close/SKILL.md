@@ -48,12 +48,16 @@ rai session close --summary "Quick fix session" --type maintenance --project .
 
 ### Step 1: Craft Session Title
 
-Generate a concise session title (max 60 chars) that captures what was accomplished — not planned, accomplished. Use the format: `SES-{ID}: {title}`.
+Generate a descriptive session title (max 80 chars) that captures what was accomplished — not planned, accomplished. Include the **epic/story name** (not just the number) so the title is self-explanatory without looking up Jira. Use the format: `SES-{ID}: {title}`.
 
-Examples:
+**Good** (descriptive, includes context):
+- `SES-321: E355 Branch Model Evolution cerrado + backlog review y priorización E354`
+- `SES-318: E347 Backlog Automation — epic completo, 7 stories, merge a dev`
 - `SES-316: Backlog sync + Semgrep MCP investigation`
-- `SES-315: E346 Skill Lifecycle Hardening complete`
-- `SES-311: Jira backlog review + declarative adapter research`
+
+**Bad** (too terse, requires lookup):
+- `SES-321: E355 complete + backlog review`
+- `SES-318: E347 done`
 
 The title will be used in the `summary` field of the state file AND presented to the human for `/rename`.
 
