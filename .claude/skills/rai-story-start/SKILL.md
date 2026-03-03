@@ -114,6 +114,24 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 Scope commit on story branch with boundaries documented.
 </verification>
 
+### Step 3b: Update Backlog Status
+
+If the story has a backlog ticket (Jira key or local key):
+
+```bash
+rai backlog transition {story_key} in_progress
+```
+
+| Condition | Action |
+|-----------|--------|
+| Story has ticket | Transition to `in_progress` |
+| No ticket found | Skip (not all stories are tracked externally) |
+| Transition fails | Log warning and continue — backlog errors are **non-blocking** for lifecycle |
+
+<if-blocked>
+Adapter not configured or transition fails → log and continue. Backlog sync is best-effort; it must never block story work.
+</if-blocked>
+
 ### Step 4: Present Next Steps
 
 Show the developer:
@@ -128,6 +146,7 @@ Show the developer:
 | Story branch | `story/s{N}.{M}/{slug}` (or epic branch for S/XS) |
 | User Story | `stories/s{N}.{M}-story.md` (Connextra + Gherkin AC) |
 | Scope commit | On story branch |
+| Backlog update | via `rai backlog transition` (best-effort) |
 | Next | `/rai-story-design` |
 
 ## Quality Checklist
