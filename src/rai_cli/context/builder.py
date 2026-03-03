@@ -78,6 +78,7 @@ class GraphBuilder:
         all_nodes.extend(self.load_work())
         all_nodes.extend(self.load_skills())
         all_nodes.extend(self.load_components())
+        all_nodes.extend(self.load_artifacts())
         all_nodes.extend(self.load_architecture())
         all_nodes.extend(self.load_identity())
 
@@ -340,6 +341,51 @@ class GraphBuilder:
             return nodes
         except (json.JSONDecodeError, KeyError):
             return []
+
+    def load_artifacts(self) -> list[GraphNode]:
+        """Load typed skill artifacts from ``.raise/artifacts/``.
+
+        Each artifact becomes a GraphNode with type ``artifact``.
+
+        Returns:
+            List of GraphNode for artifact concepts.
+        """
+        from rai_cli.artifacts.reader import read_all_artifacts
+        from rai_cli.artifacts.writer import _artifact_filename
+
+        artifacts_dir = self.project_root / ".raise" / "artifacts"
+        artifacts = read_all_artifacts(artifacts_dir)
+
+        nodes: list[GraphNode] = []
+        for artifact in artifacts:
+            work_id = (artifact.story or artifact.epic or "unknown").lower()
+            node_id = f"artifact-{work_id}-{artifact.artifact_type.value}"
+
+            # Extract summary from content (typed or dict)
+            if isinstance(artifact.content, dict):
+                summary = artifact.content.get("summary", str(artifact.content))
+            else:
+                summary = getattr(artifact.content, "summary", str(artifact.content))
+
+            filename = _artifact_filename(artifact)
+
+            node = GraphNode(
+                id=node_id,
+                type="artifact",
+                content=summary,
+                source_file=f".raise/artifacts/{filename}",
+                created=artifact.created.isoformat(),
+                metadata={
+                    "artifact_type": artifact.artifact_type.value,
+                    "skill": artifact.skill,
+                    "story": artifact.story,
+                    "epic": artifact.epic,
+                    "version": artifact.version,
+                },
+            )
+            nodes.append(node)
+
+        return nodes
 
     def load_architecture(self) -> list[GraphNode]:
         """Load architecture nodes from documentation.
