@@ -121,20 +121,18 @@ Rules for the completion banner:
 
 | Phase | Skill | Execution | Gate after? |
 |:-----:|-------|:---------:|:-----------:|
-| 1 | `/rai-story-start {story_id}` | **inline** | — |
+| 1 | `/rai-story-start {story_id}` | **fork** | — |
 | 2 | `/rai-story-design {story_id}` | **fork** | POST-DESIGN |
 | 3 | `/rai-story-plan {story_id}` | **fork** | — |
 | 4 | `/rai-story-implement {story_id}` | **fork** | POST-IMPLEMENT |
 | 5 | `/rai-architecture-review {story_id} story` | **fork** | POST-AR |
 | 6 | `/rai-quality-review {story_id}` | **fork** | POST-QR |
 | 7 | `/rai-story-review {story_id}` | **fork** | — |
-| 8 | `/rai-story-close {story_id}` | **inline** | — |
+| 8 | `/rai-story-close {story_id}` | **fork** | — |
 
-#### Inline phases (start, close)
+**All phases fork.** The orchestrator is a pure coordinator — it never executes skill logic directly. This keeps the terminal output clean (subagent output is contained) and the orchestrator context minimal.
 
-Execute the skill directly in the current context. Load the skill's SKILL.md, execute every step sequentially — no compression, no skipping. Produce all artifacts the skill specifies.
-
-#### Fork phases (design, plan, implement, AR, QR, review)
+#### Fork phases (all 8)
 
 Each fork phase runs in a **fresh-context subagent** via the Agent tool. This eliminates context saturation that degrades quality in later phases.
 
@@ -146,8 +144,9 @@ Each fork phase runs in a **fresh-context subagent** via the Agent tool. This el
    - `prompt`: the agent prompt template below, filled with skill content and story context
 3. **Wait** for agent completion
 4. **Verify** output:
-   - Artifact-producing phases (design, plan, implement, review): confirm file exists on disk
-   - Inline-only phases (AR, QR): read verdict from agent return value
+   - Artifact-producing phases (start, design, plan, implement, review): confirm file exists on disk
+   - Verdict phases (AR, QR): read verdict from agent return value
+   - Close: confirm merge commit from agent return value
 5. **Show** completion banner in main thread
 6. **Apply** delegation gate if applicable (in main thread)
 
@@ -265,8 +264,7 @@ All phases complete. Story merged and branch cleaned up.
 
 - [ ] Phase detection checked in reverse order (most advanced first)
 - [ ] Delegation resolved from profile before starting chain
-- [ ] Fork phases spawn Agent tool subagent with full SKILL.md as prompt
-- [ ] Inline phases (start, close) execute directly in current context
+- [ ] All 8 phases spawn Agent tool subagent with full SKILL.md as prompt
 - [ ] Each subagent gets fresh context — no conversation history passed
 - [ ] Artifact-producing forks verified by checking file on disk
 - [ ] AR/QR verdicts read from agent return value
