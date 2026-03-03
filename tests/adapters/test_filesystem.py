@@ -5,10 +5,14 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
 
 from rai_cli.adapters.filesystem import FilesystemPMAdapter
 from rai_cli.adapters.models import (
     AdapterHealth,
+    BacklogComment,
+    BacklogItem,
+    BacklogLink,
     BatchResult,
     CommentRef,
     IssueDetail,
@@ -17,6 +21,62 @@ from rai_cli.adapters.models import (
     IssueSummary,
 )
 from rai_cli.adapters.protocols import ProjectManagementAdapter
+
+# ── T1: Pydantic models ────────────────────────────────────────────────
+
+
+class TestBacklogModels:
+    """T1: BacklogItem, BacklogComment, BacklogLink validation."""
+
+    def test_backlog_item_validates(self) -> None:
+        item = BacklogItem(
+            key="E1", summary="Test", issue_type="Epic", status="pending"
+        )
+        assert item.key == "E1"
+        assert item.status == "pending"
+
+    def test_backlog_item_missing_required_field_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            BacklogItem(key="E1", summary="Test")  # type: ignore[call-arg]
+
+    def test_backlog_comment_validates(self) -> None:
+        c = BacklogComment(
+            id="E1-1", body="text", author="rai", created="2026-03-03T10:00:00Z"
+        )
+        assert c.id == "E1-1"
+        assert c.author == "rai"
+
+    def test_backlog_link_validates(self) -> None:
+        link = BacklogLink(target="E2", link_type="blocks")
+        assert link.target == "E2"
+        assert link.link_type == "blocks"
+
+    def test_backlog_item_round_trip(self) -> None:
+        item = BacklogItem(
+            key="E1",
+            summary="Test",
+            issue_type="Epic",
+            status="pending",
+            labels=["v2.2"],
+        )
+        data = item.model_dump()
+        restored = BacklogItem(**data)
+        assert restored == item
+
+    def test_comments_and_links_default_empty(self) -> None:
+        item = BacklogItem(
+            key="E1", summary="Test", issue_type="Epic", status="pending"
+        )
+        assert item.comments == []
+        assert item.links == []
+
+    def test_optional_fields_default_none(self) -> None:
+        item = BacklogItem(
+            key="E1", summary="Test", issue_type="Epic", status="pending"
+        )
+        assert item.parent is None
+        assert item.priority is None
+        assert item.assignee is None
 
 SAMPLE_BACKLOG = """\
 # Backlog: test-project
