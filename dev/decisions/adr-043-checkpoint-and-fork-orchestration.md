@@ -42,16 +42,18 @@ Las fuerzas en tensión son: (1) los orchestrators deben coordinar múltiples fa
 
 ### Fases clasificadas
 
+**Todas las fases fork.** El orchestrator es un coordinador puro — nunca ejecuta lógica de skill directamente. Esto mantiene la terminal limpia (output del subagente contenido) y el contexto del orchestrator mínimo.
+
 | Phase | Classification | Rationale |
 |-------|---------------|-----------|
-| start | Light (inline) | Branch + scope commit, minimal reasoning |
-| design | Heavy (fork) | Creative reasoning, reads scope, writes design.md |
-| plan | Heavy (fork) | Decomposition, reads design.md, writes plan.md |
-| implement | Heavy (fork) | Code generation, TDD, reads plan.md |
-| AR | Heavy (fork) | Architecture analysis, reads all prior artifacts |
-| QR | Heavy (fork) | Quality analysis, reads all prior artifacts |
-| review | Heavy (fork) | Retrospective synthesis, reads all artifacts |
-| close | Light (inline) | Merge + cleanup, minimal reasoning |
+| start | Fork | Branch + scope commit. Fork for clean terminal output. |
+| design | Fork | Creative reasoning, reads scope, writes design.md |
+| plan | Fork | Decomposition, reads design.md, writes plan.md |
+| implement | Fork | Code generation, TDD, reads plan.md |
+| AR | Fork | Architecture analysis, reads all prior artifacts |
+| QR | Fork | Quality analysis, reads all prior artifacts |
+| review | Fork | Retrospective synthesis, reads all artifacts |
+| close | Fork | Merge + cleanup. Fork for clean terminal output. |
 
 ## Consecuencias
 
