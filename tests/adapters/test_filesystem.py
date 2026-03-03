@@ -177,6 +177,64 @@ class TestYamlStoreHealth:
         assert h.healthy is False
 
 
+# ── T3: search over YAML store ──────────────────────────────────────────
+
+
+class TestYamlStoreSearch:
+    """T3: search() over YAML store."""
+
+    def test_search_all(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        results = yaml_adapter.search("")
+        assert len(results) == 3
+        assert all(isinstance(r, IssueSummary) for r in results)
+
+    def test_search_by_key_substring(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        results = yaml_adapter.search("E1")
+        assert len(results) == 1
+        assert results[0].key == "E1"
+
+    def test_search_by_summary_case_insensitive(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        results = yaml_adapter.search("core foundation")
+        assert len(results) == 1
+        assert results[0].key == "E1"
+
+    def test_search_status_field_value(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        results = yaml_adapter.search("status=complete")
+        assert len(results) == 1
+        assert results[0].key == "E1"
+
+    def test_search_status_whitespace_tolerant(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        results = yaml_adapter.search("status = in_progress")
+        assert len(results) == 1
+        assert results[0].key == "E2"
+
+    def test_search_limit(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        results = yaml_adapter.search("", limit=1)
+        assert len(results) == 1
+
+    def test_search_empty_store(self, tmp_path: Path) -> None:
+        a = FilesystemPMAdapter(project_root=tmp_path)
+        results = a.search("")
+        assert results == []
+
+    def test_search_no_match(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        results = yaml_adapter.search("nonexistent")
+        assert results == []
+
+    def test_search_results_sorted_by_key(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        results = yaml_adapter.search("")
+        keys = [r.key for r in results]
+        assert keys == sorted(keys)
+
+
 # ── Legacy markdown tests (to be removed in T7) ────────────────────────
 
 SAMPLE_BACKLOG = """\
