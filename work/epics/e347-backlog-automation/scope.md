@@ -132,7 +132,7 @@ S347.6 ──────────────────────┘
 
 | Story | Status | Actual | Velocity | Notes |
 |-------|--------|--------|----------|-------|
-| S347.1 | Pending | | | |
+| S347.1 | ✅ Done | 20min | 1.5x | BacklogConfig + resolve_adapter manifest default |
 | S347.2 | Pending | | | |
 | S347.5 | Pending | | | |
 | S347.3 | Pending | | | |
