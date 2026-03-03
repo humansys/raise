@@ -1,100 +1,149 @@
 ---
 id: ADR-043
-title: "Workflow as Abstraction — Configurable Lifecycle Phases"
+title: "Work Item Ontology — Structure Fixed, Content Configurable"
 status: "accepted"
 date: "2026-03-03"
 epic: "E347"
 decision_makers: ["Emilio"]
+supersedes: null
+research: "work/research/workflow-adapter-patterns/workflow-adapter-patterns-report.md"
 ---
 
-# ADR-043: Workflow as Abstraction
+# ADR-043: Work Item Ontology
 
 ## Context
 
-RaiSE has a well-defined skill lifecycle for epics and stories (start → design → plan → implement → review → close). Backlog adapters (Jira, FileAdapter) have their own status models. Currently, BacklogHook hardcodes status names ("in-progress", "done") and skills don't interact with backlog statuses at all.
+RaiSE needs to manage work items (epics, stories, tasks) across multiple backends (Jira, local files, future: GitHub Issues, Linear). Each backend has its own status model, transitions, and issue types.
 
-With E347 making `rai backlog` the single channel for work state, we need to decide how lifecycle phases map to backlog statuses.
+The original design proposed "workflow phases" mapping to adapter statuses, with hardcoded state categories (like Azure DevOps's Proposed/InProgress/Resolved/Complete). Architecture review and research (9 sources, see evidence catalog) revealed:
 
-Additionally, teams like Kurigage will have their own Jira workflows with custom statuses and transitions. RaiSE should not force its lifecycle on them.
+1. Azure DevOps can hardcode categories because it IS the tool. RaiSE is a LAYER on top of tools — forcing a canonical vocabulary limits teams that already have their own workflows.
+2. The Anti-Corruption Layer (DDD, Eric Evans) is the correct pattern: domain model protected by adapter boundary.
+3. Nango (unified API platform): "Use YOUR internal data model as the unified schema."
+4. Counter-argument (Harsanyi, InfoQ): canonical models become bloated and shift coupling. Mitigated by keeping our scope narrow and making content configurable.
 
 ## Decision
 
-**Workflow is an abstraction layer between skills and adapter statuses.**
+**RaiSE defines the STRUCTURE of work items (ontology). Teams define the CONTENT (states, transitions, types). The adapter translates between team vocabulary and backend operations.**
 
-Three layers:
+### What is Fixed (Structure/Grammar)
 
-1. **Workflow Definition** — what phases exist and in what order (configurable per project)
-2. **Phase-to-Status Mapping** — how phases translate to adapter-specific statuses/transitions (in adapter config)
-3. **Skill Binding** — which skill runs at each phase (optional, enables custom skills per phase)
+- An **issue** has a **type** (e.g., epic, story, bug)
+- A **type** has a **workflow**
+- A **workflow** has **states** with an ordering
+- Each state has a **terminal** flag (is the work done?)
+- The **adapter** translates states to/from backend-specific representations
 
-RaiSE ships a default workflow. Teams can override it.
+### What is Configurable (Content/Vocabulary)
 
-### Default Workflow
+- Which types exist and what they're called
+- Which states each type's workflow has
+- How those states map to the backend (Jira transition IDs, file emojis, etc.)
+- Which states are terminal
+
+### Default Configuration
+
+RaiSE ships a sensible default that works out-of-the-box with zero config:
 
 ```yaml
-# .raise/workflow.yaml
+# .raise/workflows.yaml — ships with rai init, teams can override
 workflows:
-  epic:
-    phases: [backlog, started, designing, planning, implementing, reviewing, done]
-    default_skills:
-      started: rai-epic-start
-      designing: rai-epic-design
-      planning: rai-epic-plan
-      reviewing: rai-architecture-review
-      done: rai-epic-close
+  defaults:
+    states: [backlog, in_progress, done]
+    terminal: [done]
+
+  # Per-type overrides (optional)
   story:
-    phases: [backlog, started, designing, planning, implementing, reviewing, done]
-    default_skills:
-      started: rai-story-start
-      designing: rai-story-design
-      planning: rai-story-plan
-      implementing: rai-story-implement
-      reviewing: rai-story-review
-      done: rai-story-close
+    states: [backlog, in_progress, in_review, done]
+    terminal: [done]
+  epic:
+    states: [backlog, in_progress, done]
+    terminal: [done]
+```
+
+A team like Kurigage can define their own:
+
+```yaml
+workflows:
+  story:
+    states: [backlog, analysis, development, qa, uat, done]
+    terminal: [done]
+  bug:
+    states: [triage, confirmed, fixing, verified, closed]
+    terminal: [closed]
 ```
 
 ### Adapter Mapping
 
+Each adapter config maps team states to backend operations:
+
 ```yaml
-# .raise/jira.yaml
+# .raise/jira.yaml (extends existing file)
 workflow:
-  status_mapping:
-    backlog: "11"       # Jira transition IDs
-    started: "21"
-    designing: "31"
-    planning: "31"      # multiple phases can map to same Jira status
-    implementing: "31"
-    reviewing: "41"
-    done: "51"
+  state_mapping:
+    backlog: 11        # Jira transition ID
+    in_progress: 31
+    in_review: 31      # multiple states can map to same Jira status
+    done: 41
+```
+
+FileAdapter maps states to display strings (built-in, no config):
+```
+backlog → "📋 Backlog"
+in_progress → "🚀 In Progress"
+done → "✅ Complete"
 ```
 
 ### Interaction Model
 
-- Skills transition by phase name: `rai backlog transition S347.1 designing`
-- Adapter translates phase → backend-specific status/transition
-- Session-start reads backend status, reverse-maps to phase name
-- Teams customize by editing workflow.yaml and adapter mapping
+```
+Skill: "rai backlog transition S347.1 in_progress"
+        ↓
+CLI: validates state exists in workflow config
+        ↓
+Adapter: translates "in_progress" → Jira transition ID 31
+        ↓
+Backend: executes transition
+
+Read path (reverse):
+Backend: returns Jira status "In Progress"
+        ↓
+Adapter: translates to team state "in_progress" (via reverse mapping in jira.yaml)
+        ↓
+Consumer: sees "in_progress" — RaiSE vocabulary, not Jira's
+```
+
+### What RaiSE Needs to Function
+
+Minimal requirements from the workflow config:
+- **State name** — to display and transition
+- **Terminal flag** — to know if work is done (for burndowns, progress, session-start)
+- **State ordering** — to validate forward/backward transitions
+
+Skills don't need to understand the states. A skill like `rai-story-close` transitions to the terminal state for that type. It doesn't hardcode "done" — it reads the workflow config.
 
 ## Consequences
 
 ### Positive
-- Teams can define their own workflows without forking skills
-- Jira workflows of any complexity can be mapped
-- Skills are decoupled from adapter status models
-- Enables future: teams create custom skills per phase of their workflow
+- Teams define their own workflow vocabulary — RaiSE doesn't force its model
+- Adapters are pure translators (ACL pattern)
+- No reverse-mapping ambiguity — adapter config is explicit in both directions
+- Default works out-of-the-box for teams that don't need customization
+- Extensible to any future backend without changing the ontology
 
 ### Negative
-- One more config file (workflow.yaml) to manage
-- Reverse mapping (Jira status → phase) can be ambiguous when multiple phases share a Jira status
-- More indirection in the transition path
+- One config file (workflows.yaml) to manage
+- Skills need to read workflow config instead of hardcoding state names
+- Teams must maintain jira.yaml mapping when they customize workflows
 
 ### Mitigations
-- Default workflow ships with `rai init`, zero config for standard use
-- Reverse mapping uses phase order as tiebreaker (later phase wins)
-- Config validation at `rai adapter check` time
+- Default ships with `rai init`, zero config for standard use
+- `rai adapter check` validates mapping completeness
+- Skills reference states by role ("terminal state") not by name
 
 ## Alternatives Considered
 
-1. **Hardcode lifecycle statuses** — simpler but locks teams into RaiSE's workflow. Rejected.
-2. **Only map to Jira statuses, no workflow layer** — works for Jira but doesn't generalize. Rejected.
-3. **Full workflow engine (BPMN-like)** — over-engineering. Rejected. YAML config is sufficient.
+1. **Hardcode state categories (Azure DevOps model)** — Works for Azure because they ARE the tool. RaiSE is a layer; hardcoding limits teams. Rejected.
+2. **No workflow abstraction (pass-through to adapter)** — Skills would need to know Jira concepts. Violates ACL. Rejected.
+3. **Full workflow engine (BPMN-like)** — Over-engineering for current needs. YAML config sufficient. Rejected.
+4. **Skill binding per state** — Speculative, no consumer in E347. Deferred to parking lot.

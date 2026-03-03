@@ -12,6 +12,7 @@
 - [ ] **Bidirectional Jira ↔ files sync** — explicitly rejected. One source of truth model. Revisit only if fail-fast proves too restrictive.
 - [ ] **Auto-sync backlog.md on every write** — only manual `rai backlog sync` for now. Promote if mirror staleness becomes a problem.
 - [ ] **Backlog TUI/dashboard** — out of scope. Promote if CLI output proves insufficient for overview.
+- [ ] **Skill binding per workflow state** — run specific skills when entering a state. Speculative, no consumer yet. Promote when teams request it.
 
 ## E346 Deferred Items — 2026-03-02
 
