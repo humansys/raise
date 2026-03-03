@@ -135,6 +135,7 @@ Story branch deleted (local and remote).
 
 1. Update `CLAUDE.local.md` to reflect completion and next story
 2. Emit telemetry: `rai signal emit-work story S{N}.{M} --event complete`
+3. If the story has a backlog ticket: `rai backlog transition {story_key} done`
 
 <verification>
 Local context updated. Telemetry emitted.
