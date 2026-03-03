@@ -96,7 +96,10 @@ rai init --skill-set <name>   (default: none — builtins only, same as today)
 | ID | Story | Size | Description |
 |----|-------|------|-------------|
 | S340.1 | Skill set overlay deployment | S | Add `--skill-set` to `rai init`. After builtin deployment, overlay `.raise/skills/{set}/` → `.claude/skills/`. Same-name wins. Manifest tracks origin. Unify `_copy_skill_tree` (AR R1). |
-| S340.2 | Skill creation targets sets | S | `/rai-skill-create` generates into `.raise/skills/{set}/`. `rai skill scaffold --set`. "Customize builtin" mode copies installed builtin as base. |
+| S340.2 | Skill creation targets sets | S | `rai skill scaffold --set`. "Customize builtin" mode copies installed builtin as base. |
+| S340.3 | Refactor /rai-skill-create | S | Remove Step 0 skill set management. Clean SRP: skill creation only, delegate set management to /rai-skillset-manage. |
+| S340.4 | `rai skill set` CLI group | M | `rai skill set create/list/diff` — observable CLI for skill set management. |
+| S340.5 | `/rai-skillset-manage` skill | S | Conversational skill that uses `rai skill set` CLI to create, extend, and inspect skill sets. |
 
 ## Plan
 
@@ -105,16 +108,18 @@ rai init --skill-set <name>   (default: none — builtins only, same as today)
 | M# | Milestone | Stories | Gate |
 |----|-----------|---------|------|
 | M1 | Overlay deployment | S340.1 | `rai init --skill-set X` produces correct merged `.claude/skills/` |
-| M2 | Skill creation UX | S340.2 | `/rai-skill-create --set X` generates into `.raise/skills/{set}/` |
+| M2 | Skill creation UX | S340.2, S340.3 | `rai skill scaffold --set`, clean `/rai-skill-create` |
+| M3 | Skill set management | S340.4, S340.5 | `rai skill set create/list/diff` + conversational skill |
 
 ### Sequence
 
 ```
-S340.1 (S) → S340.2 (S)
-  M1           M2
+S340.1 (S) → S340.2 (S) → S340.3 (S) → S340.4 (M) → S340.5 (S)
+  M1           M2           M2           M3            M3
 ```
 
-Linear: S340.2 needs `--skill-set` concept from S340.1.
+S340.3 depends on S340.2 (clean separation after scaffold works).
+S340.5 depends on S340.4 (skill uses CLI).
 
 ### Progress Tracking
 
@@ -122,7 +127,9 @@ Linear: S340.2 needs `--skill-set` concept from S340.1.
 |-------|------|--------|--------|----------|-------|
 | S340.1 | S | Done | S | 1.0x | 8 tests, overlay-only, AR R1 adopted |
 | S340.2 | S | Done | S | 1.0x | 4 tests, scaffold --set + --from-builtin |
-| S340.3 | S | Done | S | 1.0x | Step 0 skill set detection, ADR-040 valid |
+| S340.3 | S | Done | S | 1.0x | SRP refactor, removed Step 0 |
+| S340.4 | M | Pending | — | — | — |
+| S340.5 | S | Pending | — | — | — |
 
 ## Done Criteria
 
