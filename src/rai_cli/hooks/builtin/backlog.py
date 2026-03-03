@@ -82,10 +82,19 @@ def _resolve_issue_key(
 ) -> str | None:
     """Search for a backlog issue by work_id.
 
+    Strategy: label-first (``rai:{work_id}``), then summary fallback.
     Returns the issue key if found, None otherwise.
     """
-    query = f'project = "{project_key}" AND summary ~ "{work_id}"'
-    results = adapter.search(query, limit=1)
+    # Label-first search
+    label_query = f'project = "{project_key}" AND labels = "rai:{work_id}"'
+    results = adapter.search(label_query, limit=1)
+    if results:
+        return results[0].key
+
+    # Summary fallback with warning
+    logger.warning("No label match for %s — falling back to summary search", work_id)
+    summary_query = f'project = "{project_key}" AND summary ~ "{work_id}"'
+    results = adapter.search(summary_query, limit=1)
     if results:
         return results[0].key
     return None
