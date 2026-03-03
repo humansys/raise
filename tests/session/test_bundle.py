@@ -29,6 +29,7 @@ from rai_cli.session.bundle import (
     LiveBacklogStatus,
     SectionManifest,
     _fetch_live_status,
+    _format_work_section,
     _format_governance_primes,
     _format_manifest,
     _format_progress,
@@ -1543,3 +1544,105 @@ class TestLiveBacklogStatus:
         )
         result = _fetch_live_status(state)
         assert "unavailable" in result.warning.lower()
+
+    def test_format_work_section_with_live_status(self) -> None:
+        """Live status adds annotation to epic and story lines."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        live = LiveBacklogStatus(
+            epic_status="in_progress",
+            epic_summary="Backlog Automation",
+            story_status="selected_for_development",
+            story_summary="Session-start live query",
+        )
+        result = _format_work_section(state, live=live)
+        assert "in_progress (live)" in result
+        assert "selected_for_development (live)" in result
+
+    def test_format_work_section_with_live_warning(self) -> None:
+        """Warning line appended when live has warning."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        live = LiveBacklogStatus(
+            warning="Backlog adapter unavailable — showing cached state"
+        )
+        result = _format_work_section(state, live=live)
+        assert "⚠" in result
+        assert "unavailable" in result.lower()
+
+    def test_format_work_section_no_live(self) -> None:
+        """Existing behavior unchanged when live=None."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _format_work_section(state, live=None)
+        assert "(live)" not in result
+        assert "⚠" not in result
+        assert "Story: S347.5 [implement]" in result
+        assert "Epic: E347" in result
+
+    @patch("rai_cli.session.bundle._fetch_live_status")
+    @patch("rai_cli.session.bundle._find_release_for_current_epic")
+    def test_assemble_orientation_calls_live_status(
+        self, mock_release: MagicMock, mock_fetch: MagicMock
+    ) -> None:
+        """assemble_orientation calls _fetch_live_status and includes annotation."""
+        mock_release.return_value = None
+        mock_fetch.return_value = LiveBacklogStatus(
+            epic_status="in_progress",
+            story_status="done",
+        )
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        profile = DeveloperProfile(name="Test")
+        result = assemble_orientation(profile, state, Path("/project"))
+        mock_fetch.assert_called_once_with(state)
+        assert "in_progress (live)" in result
+        assert "done (live)" in result
