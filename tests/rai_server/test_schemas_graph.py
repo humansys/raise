@@ -12,7 +12,9 @@ class TestNodeInput:
     def test_minimal_valid(self) -> None:
         from rai_server.schemas.graph import NodeInput
 
-        node = NodeInput(node_id="mod-memory", node_type="module", content="Memory management")
+        node = NodeInput(
+            node_id="mod-memory", node_type="module", content="Memory management"
+        )
         assert node.node_id == "mod-memory"
         assert node.node_type == "module"
         assert node.content == "Memory management"
@@ -67,7 +69,9 @@ class TestEdgeInput:
     def test_minimal_valid(self) -> None:
         from rai_server.schemas.graph import EdgeInput
 
-        edge = EdgeInput(source_node_id="mod-a", target_node_id="mod-b", edge_type="depends_on")
+        edge = EdgeInput(
+            source_node_id="mod-a", target_node_id="mod-b", edge_type="depends_on"
+        )
         assert edge.source_node_id == "mod-a"
         assert edge.target_node_id == "mod-b"
         assert edge.weight == 1.0
@@ -76,7 +80,9 @@ class TestEdgeInput:
     def test_custom_weight(self) -> None:
         from rai_server.schemas.graph import EdgeInput
 
-        edge = EdgeInput(source_node_id="a", target_node_id="b", edge_type="contains", weight=0.5)
+        edge = EdgeInput(
+            source_node_id="a", target_node_id="b", edge_type="contains", weight=0.5
+        )
         assert edge.weight == 0.5
 
     def test_missing_edge_type(self) -> None:
@@ -96,7 +102,13 @@ class TestGraphSyncRequest:
         req = GraphSyncRequest(
             project_id="raise-commons",
             nodes=[NodeInput(node_id="mod-a", node_type="module", content="Module A")],
-            edges=[EdgeInput(source_node_id="mod-a", target_node_id="mod-b", edge_type="depends_on")],
+            edges=[
+                EdgeInput(
+                    source_node_id="mod-a",
+                    target_node_id="mod-b",
+                    edge_type="depends_on",
+                )
+            ],
         )
         assert req.project_id == "raise-commons"
         assert len(req.nodes) == 1
@@ -166,8 +178,13 @@ class TestNodeResult:
         from rai_server.schemas.graph import NodeResult
 
         result = NodeResult(
-            node_id="x", node_type="t", scope="project",
-            content="c", source_file=None, properties={}, rank=0.1,
+            node_id="x",
+            node_type="t",
+            scope="project",
+            content="c",
+            source_file=None,
+            properties={},
+            rank=0.1,
         )
         assert result.source_file is None
 
@@ -181,8 +198,13 @@ class TestGraphQueryResponse:
         resp = GraphQueryResponse(
             results=[
                 NodeResult(
-                    node_id="mod-memory", node_type="module", scope="project",
-                    content="Memory", source_file=None, properties={}, rank=0.5,
+                    node_id="mod-memory",
+                    node_type="module",
+                    scope="project",
+                    content="Memory",
+                    source_file=None,
+                    properties={},
+                    rank=0.5,
                 ),
             ],
             total=1,

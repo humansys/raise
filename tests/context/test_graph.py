@@ -222,9 +222,7 @@ class TestGraphPersistence:
         assert pat is not None
         assert pat.type == "pattern"
 
-    def test_save_creates_parent_dirs(
-        self, empty_graph: Graph, tmp_path: Path
-    ) -> None:
+    def test_save_creates_parent_dirs(self, empty_graph: Graph, tmp_path: Path) -> None:
         """Test that persist creates parent directories."""
         save_path = tmp_path / "nested" / "dir" / "graph.json"
         backend = FilesystemGraphBackend(save_path)
@@ -237,9 +235,7 @@ class TestGraphPersistence:
         with pytest.raises(FileNotFoundError):
             backend.load()
 
-    def test_load_preserves_metadata(
-        self, sample_graph: Graph, tmp_path: Path
-    ) -> None:
+    def test_load_preserves_metadata(self, sample_graph: Graph, tmp_path: Path) -> None:
         """Test that node metadata is preserved on load."""
         save_path = tmp_path / "test_graph.json"
         backend = FilesystemGraphBackend(save_path)
@@ -311,15 +307,9 @@ class TestGraphNodeDeserialization:
     def test_get_concepts_by_type_returns_subclasses(self) -> None:
         """get_concepts_by_type returns correct subclass instances."""
         graph = Graph()
-        graph.add_concept(
-            PatternNode(id="P1", content="pat1", created="2026-01-01")
-        )
-        graph.add_concept(
-            PatternNode(id="P2", content="pat2", created="2026-01-01")
-        )
-        graph.add_concept(
-            EpicNode(id="E1", content="epic1", created="2026-01-01")
-        )
+        graph.add_concept(PatternNode(id="P1", content="pat1", created="2026-01-01"))
+        graph.add_concept(PatternNode(id="P2", content="pat2", created="2026-01-01"))
+        graph.add_concept(EpicNode(id="E1", content="epic1", created="2026-01-01"))
         patterns = graph.get_concepts_by_type("pattern")
         assert len(patterns) == 2
         assert all(isinstance(p, PatternNode) for p in patterns)
@@ -327,12 +317,8 @@ class TestGraphNodeDeserialization:
     def test_iter_concepts_yields_subclasses(self) -> None:
         """iter_concepts yields correct subclass instances."""
         graph = Graph()
-        graph.add_concept(
-            EpicNode(id="E1", content="epic", created="2026-01-01")
-        )
-        graph.add_concept(
-            SessionNode(id="S1", content="session", created="2026-01-01")
-        )
+        graph.add_concept(EpicNode(id="E1", content="epic", created="2026-01-01"))
+        graph.add_concept(SessionNode(id="S1", content="session", created="2026-01-01"))
         concepts = list(graph.iter_concepts())
         types_found = {type(c).__name__ for c in concepts}
         assert "EpicNode" in types_found

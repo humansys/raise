@@ -73,9 +73,7 @@ class McpJiraAdapter:
         jira_username = os.environ.get("JIRA_USERNAME")
         if jira_username:
             server_args.extend(["--jira-username", jira_username])
-        jira_token = os.environ.get("JIRA_API_TOKEN") or os.environ.get(
-            "JIRA_TOKEN"
-        )
+        jira_token = os.environ.get("JIRA_API_TOKEN") or os.environ.get("JIRA_TOKEN")
         if jira_token:
             server_args.extend(["--jira-token", jira_token])
         return McpBridge(server_command="uvx", server_args=server_args)
@@ -112,9 +110,7 @@ class McpJiraAdapter:
 
     # ----- CRUD -----
 
-    async def create_issue(
-        self, project_key: str, issue: IssueSpec
-    ) -> IssueRef:
+    async def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
         args: dict[str, Any] = {
             "project_key": project_key,
             "summary": issue.summary,
@@ -138,9 +134,7 @@ class McpJiraAdapter:
         )
         return self._parse_issue_detail(result)
 
-    async def update_issue(
-        self, key: str, fields: dict[str, Any]
-    ) -> IssueRef:
+    async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
         result = await self._bridge.call(
             "jira_update_issue",
             {"issue_key": key, "fields": json.dumps(fields)},
@@ -161,9 +155,7 @@ class McpJiraAdapter:
 
     # ----- Batch -----
 
-    async def batch_transition(
-        self, keys: list[str], status: str
-    ) -> BatchResult:
+    async def batch_transition(self, keys: list[str], status: str) -> BatchResult:
         tid = self._resolve_transition_id(status)
         succeeded: list[IssueRef] = []
         failed: list[FailureDetail] = []
@@ -185,9 +177,7 @@ class McpJiraAdapter:
 
     # ----- Relationships -----
 
-    async def link_to_parent(
-        self, child_key: str, parent_key: str
-    ) -> None:
+    async def link_to_parent(self, child_key: str, parent_key: str) -> None:
         """Link child to parent via jira_update_issue (AR-S3-2)."""
         await self._bridge.call(
             "jira_update_issue",
@@ -197,9 +187,7 @@ class McpJiraAdapter:
             },
         )
 
-    async def link_issues(
-        self, source: str, target: str, link_type: str
-    ) -> None:
+    async def link_issues(self, source: str, target: str, link_type: str) -> None:
         await self._bridge.call(
             "jira_create_issue_link",
             {
@@ -220,9 +208,7 @@ class McpJiraAdapter:
         url = result.data.get("self", "")
         return CommentRef(id=str(comment_id), url=str(url))
 
-    async def get_comments(
-        self, key: str, limit: int = 10
-    ) -> list[Comment]:
+    async def get_comments(self, key: str, limit: int = 10) -> list[Comment]:
         """Get comments via jira_get_issue with comment_limit (AR-S3-5)."""
         result = await self._bridge.call(
             "jira_get_issue",
@@ -232,9 +218,7 @@ class McpJiraAdapter:
 
     # ----- Query -----
 
-    async def search(
-        self, query: str, limit: int = 50
-    ) -> list[IssueSummary]:
+    async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
         result = await self._bridge.call(
             "jira_search",
             {"jql": query, "limit": limit},
@@ -324,7 +308,11 @@ class McpJiraAdapter:
                 issue_type=type_name,
                 parent_key=parent.get("key") if parent else None,
                 labels=data.get("labels", []),
-                assignee=str(assignee.get("display_name", assignee.get("displayName", ""))) if assignee else None,
+                assignee=str(
+                    assignee.get("display_name", assignee.get("displayName", ""))
+                )
+                if assignee
+                else None,
                 priority=priority.get("name") if priority else None,
                 created=data.get("created", ""),
                 updated=data.get("updated", ""),
@@ -368,7 +356,9 @@ class McpJiraAdapter:
             Comment(
                 id=str(c.get("id", "")),
                 body=c.get("body", ""),
-                author=c.get("author", {}).get("display_name", c.get("author", {}).get("displayName", "")),
+                author=c.get("author", {}).get(
+                    "display_name", c.get("author", {}).get("displayName", "")
+                ),
                 created=c.get("created", ""),
             )
             for c in comments_list
@@ -390,20 +380,24 @@ class McpJiraAdapter:
             if is_flat:
                 type_name = McpJiraAdapter._extract_type_name(issue.get("issue_type"))
                 parent = issue.get("parent")
-                summaries.append(IssueSummary(
-                    key=issue.get("key", ""),
-                    summary=issue.get("summary", ""),
-                    status=issue.get("status", {}).get("name", ""),
-                    issue_type=type_name,
-                    parent_key=parent.get("key") if parent else None,
-                ))
+                summaries.append(
+                    IssueSummary(
+                        key=issue.get("key", ""),
+                        summary=issue.get("summary", ""),
+                        status=issue.get("status", {}).get("name", ""),
+                        issue_type=type_name,
+                        parent_key=parent.get("key") if parent else None,
+                    )
+                )
             else:
                 parent = fields.get("parent")
-                summaries.append(IssueSummary(
-                    key=issue.get("key", ""),
-                    summary=fields.get("summary", ""),
-                    status=fields.get("status", {}).get("name", ""),
-                    issue_type=fields.get("issuetype", {}).get("name", ""),
-                    parent_key=parent.get("key") if parent else None,
-                ))
+                summaries.append(
+                    IssueSummary(
+                        key=issue.get("key", ""),
+                        summary=fields.get("summary", ""),
+                        status=fields.get("status", {}).get("name", ""),
+                        issue_type=fields.get("issuetype", {}).get("name", ""),
+                        parent_key=parent.get("key") if parent else None,
+                    )
+                )
         return summaries

@@ -193,9 +193,7 @@ class TestCoreNodeTypes:
 
     def test_conceptnode_backward_compat(self) -> None:
         """GraphNode still works with explicit type for backward compat."""
-        node = GraphNode(
-            id="X", type="epic", content="test", created="2026-01-01"
-        )
+        node = GraphNode(id="X", type="epic", content="test", created="2026-01-01")
         assert isinstance(node, GraphNode)
         assert node.type == "epic"
 

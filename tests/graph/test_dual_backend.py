@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import UTC
 from pathlib import Path
 from unittest.mock import MagicMock
 
@@ -83,7 +84,9 @@ class TestDualWriteBackendPersist:
 
         assert call_order == ["local", "remote"]
 
-    def test_persist_remote_failure_does_not_raise(self, caplog: pytest.LogCaptureFixture) -> None:
+    def test_persist_remote_failure_does_not_raise(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
         from rai_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
@@ -96,8 +99,11 @@ class TestDualWriteBackendPersist:
         local.persist.assert_called_once()
         assert "refused" in caplog.text.lower() or "remote" in caplog.text.lower()
 
-    def test_persist_http_error_logs_response_body(self, caplog: pytest.LogCaptureFixture) -> None:
+    def test_persist_http_error_logs_response_body(
+        self, caplog: pytest.LogCaptureFixture
+    ) -> None:
         import httpx
+
         from rai_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
@@ -220,12 +226,12 @@ class TestDualWriteBackendPendingSync:
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         # Pre-existing marker from previous failure
-        from datetime import datetime, timezone
+        from datetime import datetime
 
         write_pending_marker(
             raise_dir,
             PendingSyncMarker(
-                timestamp=datetime(2026, 1, 1, tzinfo=timezone.utc),
+                timestamp=datetime(2026, 1, 1, tzinfo=UTC),
                 graph_path="old",
                 node_count=1,
                 edge_count=0,

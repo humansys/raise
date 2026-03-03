@@ -20,6 +20,7 @@ from typing import Annotated
 
 import typer
 
+from rai_cli.cli.commands.journal import journal_app
 from rai_cli.cli.error_handler import cli_error
 from rai_cli.exceptions import RaiSessionNotFoundError
 from rai_cli.hooks.emitter import create_emitter
@@ -45,8 +46,6 @@ from rai_cli.session.state import (
     load_session_state,
     migrate_flat_to_session,
 )
-
-from rai_cli.cli.commands.journal import journal_app
 
 session_app = typer.Typer(
     name="session",

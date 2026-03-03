@@ -70,4 +70,3 @@ class TestLifecycleHookProtocol:
 
     def test_missing_priority_is_not_instance(self) -> None:
         assert not isinstance(_MissingPriority(), LifecycleHook)
-

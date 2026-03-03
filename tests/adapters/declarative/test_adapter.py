@@ -160,7 +160,11 @@ class TestCreateIssue:
         )
         adapter = _make_adapter(bridge)
 
-        result = _run(adapter.create_issue("PROJ", IssueSpec(summary="Bug", description="Details")))
+        result = _run(
+            adapter.create_issue(
+                "PROJ", IssueSpec(summary="Bug", description="Details")
+            )
+        )
 
         bridge.call.assert_called_once_with(
             "test_create_issue",
@@ -186,8 +190,12 @@ class TestGetIssue:
     def test_returns_issue_detail(self) -> None:
         bridge = _mock_bridge(
             test_get_issue={
-                "number": 42, "html_url": "https://...",
-                "title": "Bug", "body": "Details", "state": "open", "type": "Bug",
+                "number": 42,
+                "html_url": "https://...",
+                "title": "Bug",
+                "body": "Details",
+                "state": "open",
+                "type": "Bug",
             }
         )
         adapter = _make_adapter(bridge)
@@ -201,7 +209,9 @@ class TestGetIssue:
 
 class TestUpdateIssue:
     def test_returns_issue_ref(self) -> None:
-        bridge = _mock_bridge(test_update_issue={"number": 42, "html_url": "https://..."})
+        bridge = _mock_bridge(
+            test_update_issue={"number": 42, "html_url": "https://..."}
+        )
         adapter = _make_adapter(bridge)
 
         result = _run(adapter.update_issue("42", {"title": "Updated"}))
@@ -262,10 +272,17 @@ class TestSearch:
     def test_returns_list_of_summaries(self) -> None:
         bridge = _mock_bridge(
             test_search_issues={
-                "data": {"items": [
-                    {"number": 1, "title": "Bug", "state": "open", "type": "Bug"},
-                    {"number": 2, "title": "Feature", "state": "closed", "type": "Story"},
-                ]}
+                "data": {
+                    "items": [
+                        {"number": 1, "title": "Bug", "state": "open", "type": "Bug"},
+                        {
+                            "number": 2,
+                            "title": "Feature",
+                            "state": "closed",
+                            "type": "Story",
+                        },
+                    ]
+                }
             }
         )
         adapter = _make_adapter(bridge)
@@ -358,8 +375,18 @@ class TestComments:
         bridge = _mock_bridge(
             test_get_comments={
                 "data": [
-                    {"id": 1, "body": "Hello", "user": "alice", "created_at": "2026-01-01"},
-                    {"id": 2, "body": "World", "user": "bob", "created_at": "2026-01-02"},
+                    {
+                        "id": 1,
+                        "body": "Hello",
+                        "user": "alice",
+                        "created_at": "2026-01-01",
+                    },
+                    {
+                        "id": 2,
+                        "body": "World",
+                        "user": "bob",
+                        "created_at": "2026-01-02",
+                    },
                 ]
             }
         )
@@ -448,7 +475,8 @@ class TestCanPublish:
         result = _run(adapter.can_publish("page", {"title": "Test"}))
         assert result is True
         bridge.call.assert_called_once_with(
-            "wiki_can_publish", {"doc_type": "page"},
+            "wiki_can_publish",
+            {"doc_type": "page"},
         )
 
     def test_returns_false(self) -> None:
@@ -462,7 +490,11 @@ class TestCanPublish:
 class TestPublish:
     def test_returns_publish_result(self) -> None:
         bridge = _mock_bridge(
-            wiki_publish={"ok": True, "url": "https://wiki.example.com/page/1", "message": "Created"}
+            wiki_publish={
+                "ok": True,
+                "url": "https://wiki.example.com/page/1",
+                "message": "Created",
+            }
         )
         adapter = _make_docs_adapter(bridge)
 
@@ -488,8 +520,10 @@ class TestGetPage:
     def test_returns_page_content(self) -> None:
         bridge = _mock_bridge(
             wiki_get_page={
-                "id": 42, "title": "Design Doc",
-                "body": "# Design", "url": "https://wiki.example.com/42",
+                "id": 42,
+                "title": "Design Doc",
+                "body": "# Design",
+                "url": "https://wiki.example.com/42",
             }
         )
         adapter = _make_docs_adapter(bridge)
@@ -506,10 +540,12 @@ class TestDocsSearch:
     def test_returns_page_summaries(self) -> None:
         bridge = _mock_bridge(
             wiki_search={
-                "data": {"results": [
-                    {"id": 1, "title": "Page A", "url": "https://wiki/1"},
-                    {"id": 2, "title": "Page B", "url": "https://wiki/2"},
-                ]}
+                "data": {
+                    "results": [
+                        {"id": 1, "title": "Page A", "url": "https://wiki/1"},
+                        {"id": 2, "title": "Page B", "url": "https://wiki/2"},
+                    ]
+                }
             }
         )
         adapter = _make_docs_adapter(bridge)

@@ -45,7 +45,11 @@ class TestCreatePatternEndpoint:
         mock_response = MemoryPatternResponse(id=uuid.uuid4())
         with (
             _override_auth(client),
-            patch("rai_server.api.v1.memory.add_pattern", new_callable=AsyncMock, return_value=mock_response),
+            patch(
+                "rai_server.api.v1.memory.add_pattern",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
         ):
             resp = client.post(
                 "/api/v1/memory/patterns",
@@ -71,7 +75,11 @@ class TestListPatternsEndpoint:
         mock_response = MemoryPatternListResponse(patterns=[], count=0)
         with (
             _override_auth(client),
-            patch("rai_server.api.v1.memory.get_patterns", new_callable=AsyncMock, return_value=mock_response),
+            patch(
+                "rai_server.api.v1.memory.get_patterns",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
         ):
             resp = client.get("/api/v1/memory/patterns")
         assert resp.status_code == 200

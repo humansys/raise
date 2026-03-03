@@ -55,9 +55,7 @@ class McpBridge:
         self._session: ClientSession | None = None
         self._cm_stack: AsyncExitStack | None = None
 
-    async def call(
-        self, tool_name: str, arguments: dict[str, Any]
-    ) -> McpToolResult:
+    async def call(self, tool_name: str, arguments: dict[str, Any]) -> McpToolResult:
         """Call a tool on the MCP server.
 
         Wraps ClientSession.call_tool() with telemetry and error handling.
@@ -89,9 +87,7 @@ class McpBridge:
                 elapsed_ms = int((time.monotonic() - start) * 1000)
                 span.set_attribute("duration_ms", elapsed_ms)
                 span.set_attribute("success", False)
-                raise McpBridgeError(
-                    f"Tool call '{tool_name}' failed: {exc}"
-                ) from exc
+                raise McpBridgeError(f"Tool call '{tool_name}' failed: {exc}") from exc
 
     async def list_tools(self) -> list[McpToolInfo]:
         """List available tools on the server."""
@@ -147,9 +143,7 @@ class McpBridge:
             read, write = await stack.enter_async_context(
                 stdio_client(params, errlog=errlog)
             )
-            session = await stack.enter_async_context(
-                ClientSession(read, write)
-            )
+            session = await stack.enter_async_context(ClientSession(read, write))
             await session.initialize()
         except FileNotFoundError as exc:
             await stack.aclose()
@@ -160,8 +154,7 @@ class McpBridge:
         except Exception as exc:
             await stack.aclose()
             raise McpBridgeError(
-                f"Failed to connect to MCP server "
-                f"'{self._server_command}': {exc}"
+                f"Failed to connect to MCP server '{self._server_command}': {exc}"
             ) from exc
 
         self._session = session
@@ -192,16 +185,12 @@ class McpBridge:
         isError flag, and JSON auto-parsing.
         """
         if result.isError:
-            texts = [
-                c.text for c in result.content if isinstance(c, TextContent)
-            ]
+            texts = [c.text for c in result.content if isinstance(c, TextContent)]
             error_text = "\n".join(texts) if texts else "Unknown error"
             return McpToolResult(is_error=True, error_message=error_text)
 
         # Collect all text content, ignore non-text
-        texts = [
-            c.text for c in result.content if isinstance(c, TextContent)
-        ]
+        texts = [c.text for c in result.content if isinstance(c, TextContent)]
         text = "\n".join(texts) if texts else ""
 
         # Try parse as JSON for structured access

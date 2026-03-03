@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
@@ -65,7 +65,7 @@ class TestMemoryPatternItem:
             content="Test pattern",
             context=["testing"],
             properties={"source": "rovo"},
-            created_at=datetime.now(tz=timezone.utc),
+            created_at=datetime.now(tz=UTC),
         )
         assert item.content == "Test pattern"
 

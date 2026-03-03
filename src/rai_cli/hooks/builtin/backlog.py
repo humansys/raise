@@ -77,9 +77,7 @@ def _load_jira_config(project_root: Path) -> _JiraConfig | None:
         return None
 
 
-def _resolve_jira_key(
-    adapter: Any, work_id: str, project_key: str
-) -> str | None:
+def _resolve_jira_key(adapter: Any, work_id: str, project_key: str) -> str | None:
     """Search for Jira issue by work_id in summary.
 
     Returns the issue key if found, None otherwise.
@@ -131,7 +129,9 @@ class BacklogHook:
         # Load jira config
         config = _load_jira_config(self._project_root)
         if config is None:
-            return HookResult(status="error", message="no jira.yaml or lifecycle_mapping")
+            return HookResult(
+                status="error", message="no jira.yaml or lifecycle_mapping"
+            )
 
         # Determine lifecycle key
         lifecycle_key = _LIFECYCLE_KEY_MAP.get((event.work_type, event.event))
@@ -176,7 +176,9 @@ class BacklogHook:
         # Handle complete: transition existing issue
         if event.event == "complete":
             if jira_key is None:
-                return HookResult(status="error", message=f"no Jira issue found for {event.work_id}")
+                return HookResult(
+                    status="error", message=f"no Jira issue found for {event.work_id}"
+                )
 
             try:
                 adapter.transition_issue(jira_key, target_status)

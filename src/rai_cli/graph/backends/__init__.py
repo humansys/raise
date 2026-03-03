@@ -43,7 +43,9 @@ def get_active_backend(path: Path) -> KnowledgeGraphBackend:
             project_id=project_id,
         )
         return DualWriteBackend(
-            local=local, remote=remote, raise_dir=raise_dir if raise_dir.exists() else None
+            local=local,
+            remote=remote,
+            raise_dir=raise_dir if raise_dir.exists() else None,
         )
 
     if server_url and not api_key:

@@ -150,7 +150,9 @@ class TestGraphNodeRowModel:
             if col_names == {"org_id", "repo_id", "node_id"}:
                 found = True
                 break
-        assert found, "Missing composite unique constraint on (org_id, repo_id, node_id)"
+        assert found, (
+            "Missing composite unique constraint on (org_id, repo_id, node_id)"
+        )
 
 
 # --- GraphEdgeRow ---
@@ -255,7 +257,14 @@ class TestMemoryPatternRowModel:
     def test_columns_exist(self) -> None:
         mapper = inspect(MemoryPatternRow)
         cols = {c.key for c in mapper.columns}
-        assert cols == {"id", "org_id", "content", "context", "properties", "created_at"}
+        assert cols == {
+            "id",
+            "org_id",
+            "content",
+            "context",
+            "properties",
+            "created_at",
+        }
 
     def test_id_is_uuid_primary_key(self) -> None:
         mapper = inspect(MemoryPatternRow)

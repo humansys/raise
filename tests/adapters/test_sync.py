@@ -24,7 +24,6 @@ from rai_cli.adapters.protocols import (
 )
 from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter, _run_sync
 
-
 # --- Async mocks for wrapping ---
 
 
@@ -56,10 +55,14 @@ class FakeAsyncPM:
         return CommentRef(id="42", url=f"https://jira.example.com/{key}/comment/42")
 
     async def get_comments(self, key: str, limit: int = 10) -> list[Comment]:
-        return [Comment(id="1", body="Hello", author="rai", created="2026-02-27T10:00:00Z")]
+        return [
+            Comment(id="1", body="Hello", author="rai", created="2026-02-27T10:00:00Z")
+        ]
 
     async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
-        return [IssueSummary(key="R-1", summary="Found", status="Open", issue_type="Task")]
+        return [
+            IssueSummary(key="R-1", summary="Found", status="Open", issue_type="Task")
+        ]
 
     async def health(self) -> AdapterHealth:
         return AdapterHealth(name="fake-jira", healthy=True, latency_ms=10)
@@ -219,7 +222,6 @@ class TestRunSyncCloseable:
         """SyncPMAdapter passes adapter as closeable so aclose() runs."""
         calls: list[str] = []
         fake = FakeAsyncPM()
-        original_search = fake.search
 
         async def _aclose() -> None:
             calls.append("closed")

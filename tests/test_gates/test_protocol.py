@@ -73,7 +73,6 @@ class TestWorkflowGateProtocol:
         )
 
 
-
 # ---------------------------------------------------------------------------
 # GateContext dataclass
 # ---------------------------------------------------------------------------
@@ -94,7 +93,6 @@ class TestGateContext:
         ctx = GateContext(gate_id="gate-test")
         with pytest.raises(FrozenInstanceError):
             ctx.gate_id = "mutated"  # type: ignore[misc]
-
 
 
 # ---------------------------------------------------------------------------
@@ -127,4 +125,3 @@ class TestGateResult:
         result = GateResult(passed=True, gate_id="gate-test")
         with pytest.raises(FrozenInstanceError):
             result.passed = False  # type: ignore[misc]
-

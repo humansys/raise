@@ -40,9 +40,7 @@ def _ok(data: dict[str, Any]) -> McpToolResult:
 
 def _ok_items(items: list[dict[str, Any]]) -> McpToolResult:
     """Create a successful McpToolResult with array data (bridge-wrapped)."""
-    return McpToolResult(
-        text=json.dumps(items), data={"items": items}
-    )
+    return McpToolResult(text=json.dumps(items), data={"items": items})
 
 
 # Sample confluence.yaml content
@@ -88,7 +86,9 @@ class TestMcpConfluenceAdapterInit:
         with pytest.raises(ValueError, match="space_key"):
             McpConfluenceAdapter(project_root=tmp_path)
 
-    def test_init_space_key_from_env(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_init_space_key_from_env(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """__init__ falls back to CONFLUENCE_SPACE_KEY env var."""
         (tmp_path / ".raise").mkdir()
         (tmp_path / ".raise" / "confluence.yaml").write_text(CONFLUENCE_YAML_NO_SPACE)
@@ -152,20 +152,24 @@ class TestPublish:
     def test_publish_creates_new_page(self, tmp_path: Path) -> None:
         """publish calls confluence_create_page when no page_id cached."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok({
-            "message": "Page created successfully",
-            "page": {
-                "id": "3087892481",
-                "title": "Roadmap",
-                "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
-                "space": {"key": "rAIse", "name": "rAIse"},
-                "version": 1,
-                "content": {"value": "# Roadmap", "format": "markdown"},
-            },
-        })
+        adapter._bridge.call.return_value = _ok(
+            {
+                "message": "Page created successfully",
+                "page": {
+                    "id": "3087892481",
+                    "title": "Roadmap",
+                    "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
+                    "space": {"key": "rAIse", "name": "rAIse"},
+                    "version": 1,
+                    "content": {"value": "# Roadmap", "format": "markdown"},
+                },
+            }
+        )
 
         async def run() -> PublishResult:
-            return await adapter.publish("roadmap", "# Roadmap\n\nContent", {"title": "Roadmap"})
+            return await adapter.publish(
+                "roadmap", "# Roadmap\n\nContent", {"title": "Roadmap"}
+            )
 
         result = _run(run())
         assert result.success is True
@@ -193,20 +197,24 @@ class TestPublish:
         pages_path = tmp_path / ".raise" / "confluence-pages.yaml"
         pages_path.write_text(yaml.dump({"roadmap": "3087892481"}))
 
-        adapter._bridge.call.return_value = _ok({
-            "message": "Page updated successfully",
-            "page": {
-                "id": "3087892481",
-                "title": "Roadmap",
-                "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
-                "space": {"key": "rAIse", "name": "rAIse"},
-                "version": 2,
-                "content": {"value": "# Roadmap v2", "format": "markdown"},
-            },
-        })
+        adapter._bridge.call.return_value = _ok(
+            {
+                "message": "Page updated successfully",
+                "page": {
+                    "id": "3087892481",
+                    "title": "Roadmap",
+                    "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
+                    "space": {"key": "rAIse", "name": "rAIse"},
+                    "version": 2,
+                    "content": {"value": "# Roadmap v2", "format": "markdown"},
+                },
+            }
+        )
 
         async def run() -> PublishResult:
-            return await adapter.publish("roadmap", "# Roadmap v2", {"title": "Roadmap"})
+            return await adapter.publish(
+                "roadmap", "# Roadmap v2", {"title": "Roadmap"}
+            )
 
         result = _run(run())
         assert result.success is True
@@ -245,17 +253,19 @@ class TestPublish:
         # First call (update) fails with not-found, second call (create) succeeds
         adapter._bridge.call.side_effect = [
             McpBridgeError("Page not found"),
-            _ok({
-                "message": "Page created successfully",
-                "page": {
-                    "id": "NEW_PAGE_ID",
-                    "title": "Roadmap",
-                    "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/NEW_PAGE_ID",
-                    "space": {"key": "rAIse"},
-                    "version": 1,
-                    "content": {"value": "# Roadmap", "format": "markdown"},
-                },
-            }),
+            _ok(
+                {
+                    "message": "Page created successfully",
+                    "page": {
+                        "id": "NEW_PAGE_ID",
+                        "title": "Roadmap",
+                        "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/NEW_PAGE_ID",
+                        "space": {"key": "rAIse"},
+                        "version": 1,
+                        "content": {"value": "# Roadmap", "format": "markdown"},
+                    },
+                }
+            ),
         ]
 
         async def run() -> PublishResult:
@@ -267,7 +277,6 @@ class TestPublish:
         # Verify yaml updated with new ID
         pages = yaml.safe_load(pages_path.read_text())
         assert pages["roadmap"] == "NEW_PAGE_ID"
-
 
     def test_publish_returns_failure_on_is_error(self, tmp_path: Path) -> None:
         """publish returns success=False when bridge result has is_error (QR-3)."""
@@ -293,19 +302,21 @@ class TestGetPage:
     def test_get_page_parses_metadata_format(self, tmp_path: Path) -> None:
         """get_page parses mcp-atlassian metadata-wrapped response."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok({
-            "metadata": {
-                "id": "9240577",
-                "title": "Guardrails",
-                "url": "https://humansys.atlassian.net/wiki/spaces/LA/pages/9240577",
-                "space": {"key": "LA", "name": "Lean-Agile"},
-                "version": 3,
-                "content": {
-                    "value": "# Guardrails\n\nContent here.",
-                    "format": "markdown",
+        adapter._bridge.call.return_value = _ok(
+            {
+                "metadata": {
+                    "id": "9240577",
+                    "title": "Guardrails",
+                    "url": "https://humansys.atlassian.net/wiki/spaces/LA/pages/9240577",
+                    "space": {"key": "LA", "name": "Lean-Agile"},
+                    "version": 3,
+                    "content": {
+                        "value": "# Guardrails\n\nContent here.",
+                        "format": "markdown",
+                    },
                 },
-            },
-        })
+            }
+        )
 
         async def run() -> PageContent:
             return await adapter.get_page("9240577")
@@ -332,22 +343,24 @@ class TestSearch:
     def test_search_parses_array_results(self, tmp_path: Path) -> None:
         """search parses bridge-wrapped array into list[PageSummary]."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok_items([
-            {
-                "id": "3087892481",
-                "title": "Roadmap",
-                "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
-                "space": {"key": "rAIse", "name": "rAIse"},
-                "updated": "",
-            },
-            {
-                "id": "9240577",
-                "title": "Guardrails",
-                "url": "https://humansys.atlassian.net/wiki/spaces/LA/pages/9240577",
-                "space": {"key": "LA", "name": "Lean-Agile"},
-                "updated": "",
-            },
-        ])
+        adapter._bridge.call.return_value = _ok_items(
+            [
+                {
+                    "id": "3087892481",
+                    "title": "Roadmap",
+                    "url": "https://humansys.atlassian.net/wiki/spaces/rAIse/pages/3087892481",
+                    "space": {"key": "rAIse", "name": "rAIse"},
+                    "updated": "",
+                },
+                {
+                    "id": "9240577",
+                    "title": "Guardrails",
+                    "url": "https://humansys.atlassian.net/wiki/spaces/LA/pages/9240577",
+                    "space": {"key": "LA", "name": "Lean-Agile"},
+                    "updated": "",
+                },
+            ]
+        )
 
         async def run() -> list[PageSummary]:
             return await adapter.search("roadmap", limit=5)
@@ -385,9 +398,9 @@ class TestHealth:
     def test_health_returns_healthy(self, tmp_path: Path) -> None:
         """health returns AdapterHealth with healthy=True when search succeeds."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok_items([
-            {"id": "1", "title": "Any page", "url": "", "space": {"key": "X"}}
-        ])
+        adapter._bridge.call.return_value = _ok_items(
+            [{"id": "1", "title": "Any page", "url": "", "space": {"key": "X"}}]
+        )
 
         async def run() -> AdapterHealth:
             return await adapter.health()

@@ -304,9 +304,7 @@ _SHUHARI_DELEGATION: dict[ExperienceLevel, DelegationLevel] = {
 }
 
 
-def resolve_delegation(
-    profile: DeveloperProfile, skill_name: str
-) -> DelegationLevel:
+def resolve_delegation(profile: DeveloperProfile, skill_name: str) -> DelegationLevel:
     """Resolve the effective delegation level for a skill.
 
     Precedence: per-skill override > explicit default_level > ShuHaRi derivation.

@@ -24,9 +24,7 @@ class TestMcpCallServerNotFound:
     """Server not in registry → exit 1 + error."""
 
     def test_server_not_found(self) -> None:
-        with patch(
-            "rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}
-        ):
+        with patch("rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
             result = runner.invoke(app, ["mcp", "call", "nonexistent", "tool"])
         assert result.exit_code != 0
         assert "nonexistent" in result.output
@@ -75,8 +73,12 @@ class TestMcpCallSuccess:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "call", "test-server", "some-tool",
-                    "--args", '{"query": "test"}',
+                    "mcp",
+                    "call",
+                    "test-server",
+                    "some-tool",
+                    "--args",
+                    '{"query": "test"}',
                 ],
             )
         assert result.exit_code == 0
@@ -100,9 +102,7 @@ class TestMcpCallSuccess:
                 return_value=mock_bridge,
             ),
         ):
-            result = runner.invoke(
-                app, ["mcp", "call", "test-server", "ping"]
-            )
+            result = runner.invoke(app, ["mcp", "call", "test-server", "ping"])
         assert result.exit_code == 0
         output = json.loads(result.output)
         assert output["text"] == "ok"
@@ -161,9 +161,7 @@ class TestMcpCallBridgeError:
                 return_value=mock_bridge,
             ),
         ):
-            result = runner.invoke(
-                app, ["mcp", "call", "test-server", "tool"]
-            )
+            result = runner.invoke(app, ["mcp", "call", "test-server", "tool"])
         assert result.exit_code != 0
         assert "Connection refused" in result.output
 
@@ -192,9 +190,7 @@ class TestMcpCallEmitsEvent:
                 return_value=mock_emitter,
             ),
         ):
-            result = runner.invoke(
-                app, ["mcp", "call", "test-server", "ping"]
-            )
+            result = runner.invoke(app, ["mcp", "call", "test-server", "ping"])
         assert result.exit_code == 0
         mock_emitter.emit.assert_called_once()
         event = mock_emitter.emit.call_args[0][0]
@@ -224,9 +220,7 @@ class TestMcpCallEmitsEvent:
                 return_value=mock_emitter,
             ),
         ):
-            result = runner.invoke(
-                app, ["mcp", "call", "test-server", "bad-tool"]
-            )
+            result = runner.invoke(app, ["mcp", "call", "test-server", "bad-tool"])
         assert result.exit_code != 0
         mock_emitter.emit.assert_called_once()
         event = mock_emitter.emit.call_args[0][0]
