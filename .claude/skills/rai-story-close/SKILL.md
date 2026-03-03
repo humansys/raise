@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.version: "2.3.0"
   raise.visibility: public
   raise.inputs: |
     - retrospective_md: file_path, required, previous_skill
@@ -69,7 +69,25 @@ Check for structural drift: if this story added modules or changed directory str
 Retrospective exists. Tests pass. No undocumented structural changes.
 </verification>
 
-### Step 2: Merge to Parent Branch
+### Step 2: Verify Clean Working Tree
+
+```bash
+git status --short
+```
+
+| Condition | Action |
+|-----------|--------|
+| Working tree clean | Continue to merge |
+| Uncommitted changes from this story | **Commit them** before merge — artifacts must not be orphaned |
+| Unrelated changes | Stash or commit separately with `chore:` prefix |
+
+**NEVER merge with uncommitted story artifacts.** Files created during design, plan, or implementation that aren't committed will be silently lost or orphaned on the target branch.
+
+<verification>
+`git status` shows clean working tree (or only unrelated files explicitly acknowledged).
+</verification>
+
+### Step 3: Merge to Parent Branch
 
 Determine parent: `story/s{N}.{M}/...` → `epic/e{N}/...` (or `{dev_branch}` for standalone).
 
@@ -92,7 +110,7 @@ Merge commit created on parent branch.
 Merge conflicts → resolve preserving story work.
 </if-blocked>
 
-### Step 3: Update Epic Scope
+### Step 4: Update Epic Scope
 
 Mark story complete in `work/epics/e{N}-{name}/scope.md`:
 - Check the story checkbox: `- [x] S{N}.{M} {name} ✓`
@@ -102,7 +120,7 @@ Mark story complete in `work/epics/e{N}-{name}/scope.md`:
 Epic scope reflects story completion.
 </verification>
 
-### Step 4: Delete Story Branch
+### Step 5: Delete Story Branch
 
 ```bash
 git branch -D story/s{N}.{M}/{slug}
@@ -113,7 +131,7 @@ git push origin --delete story/s{N}.{M}/{slug} 2>/dev/null || true
 Story branch deleted (local and remote).
 </verification>
 
-### Step 5: Update Context & Emit
+### Step 6: Update Context & Emit
 
 1. Update `CLAUDE.local.md` to reflect completion and next story
 2. Emit telemetry: `rai signal emit-work story S{N}.{M} --event complete`
@@ -138,6 +156,7 @@ Local context updated. Telemetry emitted.
 - [ ] Merge uses `--no-ff` to preserve story history
 - [ ] Story branch deleted after merge
 - [ ] Epic scope updated with completion status
+- [ ] Working tree clean before merge — no orphaned artifacts
 - [ ] NEVER merge without retrospective — learnings compound
 - [ ] NEVER leave stale branches — clean as you go
 

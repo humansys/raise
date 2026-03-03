@@ -15,7 +15,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.version: "2.3.0"
   raise.visibility: public
   raise.inputs: |
     - scope: file_path, required, previous_skill
@@ -83,7 +83,25 @@ Tests green. Retrospective created with metrics, patterns, and process insights.
 Tests failing → fix before merge.
 </if-blocked>
 
-### Step 3: Merge & Clean Up Branches
+### Step 3: Verify Clean Working Tree
+
+```bash
+git status --short
+```
+
+| Condition | Action |
+|-----------|--------|
+| Working tree clean | Continue to merge |
+| Uncommitted epic artifacts (design docs, research, scope edits) | **Commit them** before merge |
+| Unrelated changes | Stash or commit separately with `chore:` prefix |
+
+**NEVER merge with uncommitted artifacts.** Design docs, research files, scope edits, and story artifacts that aren't committed will be orphaned on the target branch after the epic branch is deleted.
+
+<verification>
+`git status` shows clean working tree (or only unrelated files explicitly acknowledged).
+</verification>
+
+### Step 4: Merge & Clean Up Branches
 
 ```bash
 git checkout {dev_branch} && git pull origin {dev_branch}
@@ -113,7 +131,7 @@ Merge commit on `{dev_branch}`. No epic/story branches remain.
 Merge conflicts → resolve preserving epic work.
 </if-blocked>
 
-### Step 4: Update Backlog & Context
+### Step 5: Update Backlog & Context
 
 1. Mark epic complete in `governance/backlog.md` (status → `✅ Complete`)
 2. Update `CLAUDE.local.md` to reflect completion and next epic
@@ -143,6 +161,7 @@ Backlog reflects completion. Local context updated.
 - [ ] Tests pass on epic branch before merge
 - [ ] Retrospective captures metrics, patterns, and process insights
 - [ ] Merge uses `--no-ff` to preserve epic history
+- [ ] Working tree clean before merge — no orphaned artifacts
 - [ ] All epic and story branches deleted after merge
 - [ ] Backlog updated with completion status
 - [ ] NEVER merge without retrospective — learnings compound across epics
