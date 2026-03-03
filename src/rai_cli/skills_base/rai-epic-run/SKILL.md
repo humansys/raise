@@ -128,7 +128,7 @@ For each pending story (Status != "Done"), in table order:
 3. story-run executes — it forks its own heavy phases via Agent tool
 4. **Checkpoint** (after story-run returns):
    a. Read the story's retrospective (`s{N}.{M}-retrospective.md`) or scope for summary
-   b. Update the `### Progress Tracking` table in `scope.md`: set Status → "Done", fill Actual/Velocity/Notes
+   b. Verify and fill the `### Progress Tracking` table in `scope.md`: confirm Status is "Done" (story-close may have already set it), fill any missing Actual/Velocity/Notes
    c. Present one-line summary: "Story {story_id}: Done — {key outcome}"
 5. Proceed to next story
 
