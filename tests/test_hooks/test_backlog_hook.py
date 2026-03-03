@@ -1,4 +1,4 @@
-"""Tests for BacklogHook and WorkLifecycleEvent (S325.4)."""
+"""Tests for BacklogHook and WorkLifecycleEvent (S325.4, S347.4)."""
 
 from __future__ import annotations
 
@@ -290,6 +290,41 @@ class TestBacklogHookGracefulDegradation:
 
         assert result.status == "error"
         adapter.transition_issue.assert_not_called()
+
+
+class TestAdapterAgnosticRenames:
+    """T1: Verify adapter-agnostic renames (S347.4)."""
+
+    def test_resolve_jira_key_no_longer_exists(self) -> None:
+        """Old _resolve_jira_key function is removed."""
+        import rai_cli.hooks.builtin.backlog as mod
+
+        assert not hasattr(mod, "_resolve_jira_key"), "_resolve_jira_key should be renamed to _resolve_issue_key"
+
+    def test_resolve_issue_key_exists(self) -> None:
+        """New _resolve_issue_key function exists."""
+        import rai_cli.hooks.builtin.backlog as mod
+
+        assert hasattr(mod, "_resolve_issue_key"), "_resolve_issue_key should exist"
+
+    def test_resolve_adapter_called_with_none(self, tmp_path: Path) -> None:
+        """resolve_adapter uses None (manifest-aware) instead of hardcoded 'jira'."""
+        with patch("rai_cli.cli.commands._resolve.resolve_adapter") as mock_resolve:
+            mock_resolve.return_value = MagicMock()
+            from rai_cli.hooks.builtin.backlog import resolve_adapter
+
+            resolve_adapter()
+        mock_resolve.assert_called_once_with(None)
+
+    def test_module_docstring_adapter_agnostic(self) -> None:
+        """Module docstring says 'backlog state', not 'Jira state'."""
+        import rai_cli.hooks.builtin.backlog as mod
+
+        assert "backlog state" in (mod.__doc__ or "").lower()
+
+    def test_class_docstring_adapter_agnostic(self) -> None:
+        """BacklogHook class docstring says 'backlog state', not 'Jira state'."""
+        assert "backlog state" in (BacklogHook.__doc__ or "").lower()
 
 
 class TestBacklogHookDiscovery:

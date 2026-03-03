@@ -1,12 +1,12 @@
-"""Built-in BacklogHook — syncs Jira state on work lifecycle events.
+"""Built-in BacklogHook — syncs backlog state on work lifecycle events.
 
 Listens to ``work:lifecycle`` events (fired by ``rai signal emit-work``)
-and calls the ProjectManagementAdapter to create/transition Jira issues.
+and calls the resolved ProjectManagementAdapter to create/transition issues.
 
 Error isolation: ``handle()`` never raises. Adapter or config failures are
 logged and returned as ``HookResult(status="error")``.
 
-Architecture: ADR-039 §5 (Built-in hooks), S325.4
+Architecture: ADR-039 §5 (Built-in hooks), S325.4, S347.4
 """
 
 from __future__ import annotations
@@ -77,10 +77,10 @@ def _load_jira_config(project_root: Path) -> _JiraConfig | None:
         return None
 
 
-def _resolve_jira_key(
+def _resolve_issue_key(
     adapter: Any, work_id: str, project_key: str
 ) -> str | None:
-    """Search for Jira issue by work_id in summary.
+    """Search for a backlog issue by work_id.
 
     Returns the issue key if found, None otherwise.
     """
@@ -92,16 +92,16 @@ def _resolve_jira_key(
 
 
 def resolve_adapter() -> Any:
-    """Resolve ProjectManagementAdapter. Separated for testability."""
+    """Resolve ProjectManagementAdapter via manifest default. Separated for testability."""
     from rai_cli.cli.commands._resolve import (
         resolve_adapter as _resolve,
     )
 
-    return _resolve("jira")
+    return _resolve(None)
 
 
 class BacklogHook:
-    """Syncs Jira state on work lifecycle events.
+    """Syncs backlog state on work lifecycle events.
 
     Subscribes to ``work:lifecycle`` events and maps them to
     ``rai backlog`` actions using ``.raise/jira.yaml`` lifecycle_mapping.
@@ -146,7 +146,7 @@ class BacklogHook:
 
         # Resolve Jira key
         try:
-            jira_key = _resolve_jira_key(adapter, event.work_id, config.project_key)
+            jira_key = _resolve_issue_key(adapter, event.work_id, config.project_key)
         except Exception as exc:  # noqa: BLE001
             return HookResult(status="error", message=f"search failed: {exc}")
 
