@@ -90,6 +90,38 @@ class TestSyncBacklog:
 
         assert output.exists()
 
+    def test_sync_escapes_pipe_in_summary(self, tmp_path: Path) -> None:
+        """Pipe chars in summary/status are escaped to preserve table structure."""
+        issues = [
+            IssueSummary(
+                key="PROJ-1",
+                summary="Fix | broken pipe",
+                status="In | Progress",
+                issue_type="Epic",
+            ),
+        ]
+        adapter = _make_adapter(issues)
+        output = tmp_path / "backlog.md"
+
+        sync_backlog(adapter, "test", project_filter=None, output_path=output)
+
+        content = output.read_text()
+        assert "Fix \\| broken pipe" in content
+        assert "In \\| Progress" in content
+
+    def test_atomic_write_temp_suffix_preserves_extension(self, tmp_path: Path) -> None:
+        """Temp file uses .md.tmp not .tmp (suffix append, not replace)."""
+        adapter = _make_adapter([])
+        output = tmp_path / "backlog.md"
+
+        sync_backlog(adapter, "test", project_filter=None, output_path=output)
+
+        # After successful sync, temp file must be gone (renamed to target)
+        assert output.exists()
+        assert not Path(str(output) + ".tmp").exists()
+        # The old buggy path should also not exist
+        assert not (tmp_path / "backlog.tmp").exists()
+
 
 class TestFilesystemDetection:
     """Filesystem adapter detection — T2."""
