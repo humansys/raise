@@ -12,12 +12,14 @@ Architecture: E301 (Agent Tool Abstraction), ADR-033 (PM Adapter)
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated, Any
 
 import typer
 from rich.console import Console
 
 from rai_cli.adapters.models import IssueSpec
+from rai_cli.backlog.sync import sync_backlog
 from rai_cli.cli.commands._resolve import resolve_adapter
 
 backlog_app = typer.Typer(
@@ -260,3 +262,40 @@ def batch_transition(
     console.print(f"{succeeded}/{total} transitioned \u2192 {status}")
     for failure in result.failed:
         console.print(f"  [red]\u2717[/red] {failure.key}: {failure.error}")
+
+
+@backlog_app.command()
+def sync(
+    project: Annotated[
+        str | None,
+        typer.Option("--project", "-p", help="Project key filter (e.g., RAISE)"),
+    ] = None,
+    adapter: AdapterOption = None,
+) -> None:
+    """Regenerate governance/backlog.md from a remote adapter."""
+    pm = resolve_adapter(adapter)
+
+    # Derive adapter name for display
+    adapter_name = adapter or type(pm).__name__.lower().replace("pmadapter", "").replace("adapter", "") or "unknown"
+
+    output_path = Path.cwd() / "governance" / "backlog.md"
+
+    try:
+        result = sync_backlog(
+            pm,
+            adapter_name,
+            project_filter=project,
+            output_path=output_path,
+        )
+    except ValueError as exc:
+        # Filesystem adapter no-op
+        console.print(f"[yellow]{exc}[/yellow]")
+        raise typer.Exit(0) from exc
+    except RuntimeError as exc:
+        console.print(f"[red]Error:[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+    console.print(
+        f"Synced {result.output_path} from {result.adapter_name} "
+        f"({result.epic_count} epics, {result.timestamp})"
+    )
