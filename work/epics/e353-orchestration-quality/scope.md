@@ -24,7 +24,7 @@ Eliminate the 4.6x quality gap in orchestrated skill execution by implementing t
 |----|-------|:----:|:------:|-------------|
 | S353.1 | Checkpoint contract | XS | Pending | Define artifact I/O contract per phase and update skill prerequisites |
 | S353.2 | story-run fork | S | Pending | Modify rai-story-run to fork heavy phases via Agent tool |
-| S353.3 | epic-run fork | S | Pending | Modify rai-epic-run to fork story-run invocations via Agent tool |
+| S353.3 | epic-run checkpoint | S | Pending | Modify rai-epic-run to checkpoint between stories and keep main thread thin for story-run forks |
 | S353.4 | Quality validation | S | Pending | Measure orchestrated vs standalone quality parity (>80% target) |
 
 **Total:** 4 stories
@@ -33,7 +33,7 @@ Eliminate the 4.6x quality gap in orchestrated skill execution by implementing t
 
 **In scope (MUST):**
 - Modify rai-story-run to fork heavy phases (design, plan, implement, AR, QR, review) to subagents
-- Modify rai-epic-run to fork story-run invocations to subagents
+- Modify rai-epic-run to keep story-run inline (main thread) with thin checkpoints between stories
 - Existing artifacts (design.md, plan.md, etc.) serve as phase-to-phase contracts
 - Phase detection (git-derived artifact scan) unchanged
 - Delegation gates unchanged (main thread between forks)
@@ -58,7 +58,7 @@ Eliminate the 4.6x quality gap in orchestrated skill execution by implementing t
 
 **Epic complete:**
 - [ ] story-run forks heavy phases to subagents (when standalone)
-- [ ] epic-run forks story-run invocations to subagents
+- [ ] epic-run invokes story-run inline (main thread) with thin checkpoints between stories
 - [ ] Quality measurement shows >80% parity with standalone execution
 - [ ] Delegation gates still work correctly (main thread)
 - [ ] Phase detection and resume still work correctly (artifact-based)
@@ -93,7 +93,7 @@ S353.4 (validation — after S353.2 + S353.3)
 | Risk | L/I | Mitigation |
 |------|:---:|------------|
 | Subagent doesn't have enough context for phase | M/M | Each skill already reads prior artifacts from disk; add explicit prereq list per phase |
-| F5 constraint: story-run in epic-run can't fork phases | H/L | By design — epic-level isolation is the primary win; story-level inline is acceptable when nested |
+| Main thread context grows across stories in epic-run | M/L | Epic-run is thin (summaries only between stories); heavy phase output lives in discarded subagent contexts |
 | Agent tool behavior changes in Claude Code update | L/H | Pattern is simple (spawn agent with prompt + file reads); easy to adapt |
 
 ## Implementation Plan
@@ -106,7 +106,7 @@ Prove the fork pattern on story-run first (where the 4.6x gap was measured), the
 |:-:|-------|----------|-----------|---------|
 | 1 | S353.1 — Checkpoint contract | Quick win | Foundation: defines phase I/O contracts. XS effort, unblocks everything. | S353.2, S353.3 |
 | 2 | S353.2 — story-run fork | Risk-first | Primary quality fix. The 4.6x gap was measured here. Proves the pattern. | S353.3, S353.4 |
-| 3 | S353.3 — epic-run fork | Dependency-driven | Extends proven pattern to epic level. Reuses spawn pattern from S353.2. | S353.4 |
+| 3 | S353.3 — epic-run checkpoint | Dependency-driven | Keeps story-run in main thread (so it can fork) with thin checkpoint between stories. | S353.4 |
 | 4 | S353.4 — Quality validation | Verification | Validates both orchestrators against >80% parity target. | Epic close |
 
 **Critical path:** S353.1 → S353.2 → S353.4
@@ -125,7 +125,7 @@ Prove the fork pattern on story-run first (where the 4.6x gap was measured), the
 |-------|:------:|---------|-----------|-------|
 | S353.1 — Checkpoint contract | Pending | — | — | |
 | S353.2 — story-run fork | Pending | — | — | |
-| S353.3 — epic-run fork | Pending | — | — | |
+| S353.3 — epic-run checkpoint | Pending | — | — | |
 | S353.4 — Quality validation | Pending | — | — | |
 
 ### Sequencing Risks

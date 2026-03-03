@@ -11,7 +11,7 @@ grounded_in: "Gemba of src/rai_cli/skills_base/rai-story-run/SKILL.md, src/rai_c
 |-------------|---------------|---------|
 | `src/rai_cli/skills_base/rai-story-run/SKILL.md` | 234 lines. Invokes phases inline via `/rai-story-{phase}` directives. Phase detection via artifact reverse-scan. 4 delegation gates. | Fork heavy phases (design, plan, implement, AR, QR, review) via Agent tool. Keep start/close inline. Add summary protocol. |
 | `.claude/skills/rai-story-run/SKILL.md` | Deployment copy of above | Mirror changes from builtin |
-| `src/rai_cli/skills_base/rai-epic-run/SKILL.md` | 181 lines. Invokes `/rai-story-run` per story inline. Phase detection via scope.md artifacts. 3 delegation gates. | Fork each story-run as Agent tool subagent. Keep epic-level phases (start, design, AR, plan, close) inline. |
+| `src/rai_cli/skills_base/rai-epic-run/SKILL.md` | 181 lines. Invokes `/rai-story-run` per story inline. Phase detection via scope.md artifacts. 3 delegation gates. | Keep story-run invocation inline (main thread) so story-run can fork its phases. Epic-level phases (start, design, AR, plan, close) stay inline. Add thin checkpoint between stories (summary + progress update). |
 | `.claude/skills/rai-epic-run/SKILL.md` | Deployment copy of above | Mirror changes from builtin |
 
 ## Target Components
@@ -19,7 +19,7 @@ grounded_in: "Gemba of src/rai_cli/skills_base/rai-story-run/SKILL.md, src/rai_c
 | Component | Responsibility | Key Interface |
 |-----------|---------------|---------------|
 | story-run orchestrator | Coordinate story lifecycle phases | Agent tool spawn per heavy phase; artifact read/write |
-| epic-run orchestrator | Coordinate epic lifecycle across stories | Agent tool spawn per story-run invocation |
+| epic-run orchestrator | Coordinate epic lifecycle across stories | Skill tool invocation of story-run (inline, main thread); thin checkpoint between stories |
 | Phase skills (unchanged) | Execute individual phases | Read artifacts from disk, write artifacts to disk, return summary |
 
 ## Key Contracts
@@ -54,32 +54,44 @@ For each heavy phase:
 6. Proceed or pause
 ```
 
-### Agent tool spawn pattern (epic-run, story iteration)
+### Epic-run story iteration (inline, NOT forked)
 
 ```
 For each story in progress tracking:
-1. Spawn Agent tool with:
-   - prompt: "Run /rai-story-run for {story_id}. Story scope: {path}. Epic: {epic_id}."
-   - subagent_type: "general-purpose"
-2. Agent runs full story lifecycle inline (can't fork further — F5 constraint)
-3. Orchestrator reads story completion status
-4. Update progress tracking in scope.md
+1. Invoke /rai-story-run {story_id} via Skill tool (inline, main thread)
+2. story-run executes in main thread → CAN fork its heavy phases via Agent tool
+3. Each heavy phase gets fresh context (depth 1)
+4. After story completes, epic-run reads summary + updates progress tracking
 5. Proceed to next story
 ```
 
-### Nesting depth constraint (F5)
+**Critical rule:** epic-run MUST NOT fork story-run as a subagent. Forking
+would make story-run a subagent (depth 1), preventing it from forking its
+own phases (would need depth 2, blocked by F5). We never operate at known
+lower quality levels.
+
+**Context management:** The main thread accumulates context across stories,
+but epic-run is thin — it only sees summaries between stories, not the full
+tool call history of each phase (those live in forked subagent contexts that
+are discarded). This keeps the main thread lightweight enough for multi-story
+epics.
+
+### Execution depth model
 
 ```
-Main thread (epic-run)
-  └── Subagent (story-run) — depth 1
-       └── Cannot fork further — phases run inline
-
-Main thread (story-run standalone)
+Main thread (story-run standalone OR story-run inside epic-run)
   └── Subagent (heavy phase) — depth 1
-       └── Cannot fork further — skill runs inline
+       └── Skill runs in fresh context, writes artifacts to disk
+
+Main thread (epic-run)
+  ├── story-run A (inline, main thread)
+  │   └── Subagent (heavy phase) — depth 1
+  ├── story-run B (inline, main thread)
+  │   └── Subagent (heavy phase) — depth 1
+  └── ...
 ```
 
-Max depth is always 1. This is enforced by Claude Code, not by our code.
+Max depth is always 1. story-run always runs in main thread so it can fork.
 
 ## Migration Path
 
