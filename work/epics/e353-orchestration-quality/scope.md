@@ -96,6 +96,46 @@ S353.4 (validation — after S353.2 + S353.3)
 | F5 constraint: story-run in epic-run can't fork phases | H/L | By design — epic-level isolation is the primary win; story-level inline is acceptable when nested |
 | Agent tool behavior changes in Claude Code update | L/H | Pattern is simple (spawn agent with prompt + file reads); easy to adapt |
 
+## Implementation Plan
+
+### Sequencing Strategy: Walking Skeleton
+
+Prove the fork pattern on story-run first (where the 4.6x gap was measured), then extend to epic-run, then validate.
+
+| # | Story | Strategy | Rationale | Enables |
+|:-:|-------|----------|-----------|---------|
+| 1 | S353.1 — Checkpoint contract | Quick win | Foundation: defines phase I/O contracts. XS effort, unblocks everything. | S353.2, S353.3 |
+| 2 | S353.2 — story-run fork | Risk-first | Primary quality fix. The 4.6x gap was measured here. Proves the pattern. | S353.3, S353.4 |
+| 3 | S353.3 — epic-run fork | Dependency-driven | Extends proven pattern to epic level. Reuses spawn pattern from S353.2. | S353.4 |
+| 4 | S353.4 — Quality validation | Verification | Validates both orchestrators against >80% parity target. | Epic close |
+
+**Critical path:** S353.1 → S353.2 → S353.4
+**Parallel opportunities:** S353.3 could run parallel to S353.2 (different files), but sequential is safer for 4 stories — marginal benefit vs coordination cost.
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|------------------|
+| **M1: Pattern Proven** | S353.1 + S353.2 | story-run forks heavy phase via Agent tool, produces artifact on disk, manual smoke test shows quality improvement |
+| **M2: Epic Complete** | S353.3 + S353.4 | Both orchestrators fork. Quality measurement >80% parity. All done criteria met. |
+
+### Progress Tracking
+
+| Story | Status | Started | Completed | Notes |
+|-------|:------:|---------|-----------|-------|
+| S353.1 — Checkpoint contract | Pending | — | — | |
+| S353.2 — story-run fork | Pending | — | — | |
+| S353.3 — epic-run fork | Pending | — | — | |
+| S353.4 — Quality validation | Pending | — | — | |
+
+### Sequencing Risks
+
+| Risk | Mitigation |
+|------|------------|
+| Agent tool spawn prompt too complex → subagent misinterprets instructions | Start with simplest heavy phase (design) in S353.2, iterate prompt before tackling implement |
+| Smoke testing is subjective (how to judge "quality improvement"?) | S353.4 defines objective metrics (tool calls, output volume, artifact depth) |
+| S353.1 contract becomes speculative without testing | Keep contract lightweight — document current reality, not aspirational format |
+
 ## Parking Lot
 
 - Parallel phase execution (AR + QR simultaneously) → future epic if needed
