@@ -92,8 +92,8 @@ Critical path: S354.1 → S354.2 → S354.4 → S354.5
 | S354.2 story-design schema | done | M1 |
 | S354.3 Graph ingestion | done | M2 |
 | S354.4 Doc generation | done | M2 |
-| S354.5 Pilot wiring | in progress | M3 |
-| S354.6 rai artifact validate | pending | M3 |
+| S354.5 Pilot wiring | done | M3 |
+| S354.6 rai artifact validate | done | M3 |
 
 ### Sequencing Risks
 
