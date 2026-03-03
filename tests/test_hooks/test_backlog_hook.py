@@ -20,12 +20,16 @@ class TestWorkLifecycleEvent:
 
     def test_event_name(self) -> None:
         """Event name is work:lifecycle."""
-        event = WorkLifecycleEvent(work_type="story", work_id="S325.4", event="start", phase="design")
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S325.4", event="start", phase="design"
+        )
         assert event.event_name == "work:lifecycle"
 
     def test_fields(self) -> None:
         """Event carries work_type, work_id, event, phase."""
-        event = WorkLifecycleEvent(work_type="epic", work_id="E325", event="complete", phase="close")
+        event = WorkLifecycleEvent(
+            work_type="epic", work_id="E325", event="complete", phase="close"
+        )
         assert event.work_type == "epic"
         assert event.work_id == "E325"
         assert event.event == "complete"
@@ -33,7 +37,9 @@ class TestWorkLifecycleEvent:
 
     def test_frozen(self) -> None:
         """Event is immutable."""
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="start", phase="design")
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="start", phase="design"
+        )
         try:
             event.work_id = "S2"  # type: ignore[misc]
             raise AssertionError("Should not allow mutation")
@@ -42,7 +48,9 @@ class TestWorkLifecycleEvent:
 
     def test_has_timestamp(self) -> None:
         """Event has a timestamp from HookEvent base."""
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="start", phase="design")
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="start", phase="design"
+        )
         assert event.timestamp is not None
 
 
@@ -57,7 +65,19 @@ class TestEmitWorkBridge:
             patch("rai_cli.telemetry.writer.emit") as mock_emit,
         ):
             mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
-            result = runner.invoke(app, ["signal", "emit-work", "story", "S325.4", "--event", "start", "--phase", "design"])
+            result = runner.invoke(
+                app,
+                [
+                    "signal",
+                    "emit-work",
+                    "story",
+                    "S325.4",
+                    "--event",
+                    "start",
+                    "--phase",
+                    "design",
+                ],
+            )
 
         assert result.exit_code == 0
         # Verify hook event was fired
@@ -77,7 +97,19 @@ class TestEmitWorkBridge:
             patch("rai_cli.telemetry.writer.emit") as mock_emit,
         ):
             mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
-            result = runner.invoke(app, ["signal", "emit-work", "epic", "E325", "--event", "complete", "--phase", "close"])
+            result = runner.invoke(
+                app,
+                [
+                    "signal",
+                    "emit-work",
+                    "epic",
+                    "E325",
+                    "--event",
+                    "complete",
+                    "--phase",
+                    "close",
+                ],
+            )
 
         assert result.exit_code == 0
         fired_event = mock_emitter.emit.call_args[0][0]
@@ -94,7 +126,9 @@ class TestEmitWorkBridge:
             patch("rai_cli.telemetry.writer.emit") as mock_emit,
         ):
             mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
-            result = runner.invoke(app, ["signal", "emit-work", "story", "S1", "--event", "start"])
+            result = runner.invoke(
+                app, ["signal", "emit-work", "story", "S1", "--event", "start"]
+            )
 
         # CLI should still succeed — hook failure is non-fatal
         assert result.exit_code == 0
@@ -136,8 +170,12 @@ class TestBacklogHookMapping:
         adapter.create_issue.return_value = IssueRef(key="RAISE-99")
         adapter.transition_issue.return_value = IssueRef(key="RAISE-99")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S325.4", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S325.4", event="start", phase="design"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -151,12 +189,21 @@ class TestBacklogHookMapping:
         hook = _make_hook(root)
         adapter = MagicMock()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-333", summary="S325.4 — Backlog-Aware", status="Backlog", issue_type="Story"),
+            IssueSummary(
+                key="RAISE-333",
+                summary="S325.4 — Backlog-Aware",
+                status="Backlog",
+                issue_type="Story",
+            ),
         ]
         adapter.transition_issue.return_value = IssueRef(key="RAISE-333")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S325.4", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S325.4", event="start", phase="design"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -169,12 +216,21 @@ class TestBacklogHookMapping:
         hook = _make_hook(root)
         adapter = MagicMock()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-333", summary="S325.4", status="In Progress", issue_type="Story"),
+            IssueSummary(
+                key="RAISE-333",
+                summary="S325.4",
+                status="In Progress",
+                issue_type="Story",
+            ),
         ]
         adapter.transition_issue.return_value = IssueRef(key="RAISE-333")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S325.4", event="complete", phase="close")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S325.4", event="complete", phase="close"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -189,8 +245,12 @@ class TestBacklogHookMapping:
         adapter.create_issue.return_value = IssueRef(key="RAISE-50")
         adapter.transition_issue.return_value = IssueRef(key="RAISE-50")
 
-        event = WorkLifecycleEvent(work_type="epic", work_id="E325", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="epic", work_id="E325", event="start", phase="design"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -203,12 +263,18 @@ class TestBacklogHookMapping:
         hook = _make_hook(root)
         adapter = MagicMock()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-50", summary="E325", status="In Progress", issue_type="Epic"),
+            IssueSummary(
+                key="RAISE-50", summary="E325", status="In Progress", issue_type="Epic"
+            ),
         ]
         adapter.transition_issue.return_value = IssueRef(key="RAISE-50")
 
-        event = WorkLifecycleEvent(work_type="epic", work_id="E325", event="complete", phase="close")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="epic", work_id="E325", event="complete", phase="close"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -219,7 +285,9 @@ class TestBacklogHookMapping:
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="blocked", phase="implement")
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="blocked", phase="implement"
+        )
         with patch("rai_cli.hooks.builtin.backlog.resolve_adapter") as mock_resolve:
             result = hook.handle(event)
 
@@ -231,7 +299,9 @@ class TestBacklogHookMapping:
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="unblocked", phase="implement")
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="unblocked", phase="implement"
+        )
         with patch("rai_cli.hooks.builtin.backlog.resolve_adapter") as mock_resolve:
             result = hook.handle(event)
 
@@ -247,8 +317,13 @@ class TestBacklogHookGracefulDegradation:
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", side_effect=RuntimeError("no adapter")):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="start", phase="design"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter",
+            side_effect=RuntimeError("no adapter"),
+        ):
             result = hook.handle(event)
 
         assert result.status == "error"
@@ -258,7 +333,9 @@ class TestBacklogHookGracefulDegradation:
         """Missing jira.yaml → error result, no crash."""
         hook = _make_hook(tmp_path)  # no jira.yaml created
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="start", phase="design")
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="start", phase="design"
+        )
         result = hook.handle(event)
 
         assert result.status == "error"
@@ -271,8 +348,12 @@ class TestBacklogHookGracefulDegradation:
         adapter = MagicMock()
         adapter.search.side_effect = RuntimeError("search exploded")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="start", phase="design"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "error"
@@ -284,8 +365,12 @@ class TestBacklogHookGracefulDegradation:
         adapter = MagicMock()
         adapter.search.return_value = []
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S1", event="complete", phase="close")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S1", event="complete", phase="close"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "error"
@@ -318,7 +403,9 @@ class TestBacklogHookDiscovery:
 class TestBacklogHookEndToEnd:
     """End-to-end: emit-work → hook system → adapter calls."""
 
-    def test_emit_work_start_triggers_create_and_transition(self, tmp_path: Path) -> None:
+    def test_emit_work_start_triggers_create_and_transition(
+        self, tmp_path: Path
+    ) -> None:
         """Full flow: emit-work story start → BacklogHook → create + transition."""
         root = _jira_yaml(tmp_path)
         adapter = MagicMock()
@@ -328,15 +415,32 @@ class TestBacklogHookEndToEnd:
 
         # Patch BacklogHook to use our test root and mock adapter
         with (
-            patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter),
-            patch.object(BacklogHook, "__init__", lambda self, **kw: setattr(self, "_project_root", root)),
+            patch(
+                "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            ),
+            patch.object(
+                BacklogHook,
+                "__init__",
+                lambda self, **kw: setattr(self, "_project_root", root),
+            ),
             patch("rai_cli.telemetry.writer.emit") as mock_telemetry,
         ):
-            mock_telemetry.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
-            result = runner.invoke(app, [
-                "signal", "emit-work", "story", "S99.1",
-                "--event", "start", "--phase", "design",
-            ])
+            mock_telemetry.return_value = MagicMock(
+                success=True, path="/tmp/test.jsonl"
+            )
+            result = runner.invoke(
+                app,
+                [
+                    "signal",
+                    "emit-work",
+                    "story",
+                    "S99.1",
+                    "--event",
+                    "start",
+                    "--phase",
+                    "design",
+                ],
+            )
 
         assert result.exit_code == 0
         # Adapter was called by BacklogHook via hook system

@@ -183,9 +183,7 @@ class FilesystemPMAdapter:
         Matches both simple (E1) and Jira link ([RAISE-301](url)) formats.
         """
         esc = re.escape(key)
-        pattern = re.compile(
-            rf"^\|\s*(?:{esc}|\[{esc}\]\([^)]+\))\s*\|"
-        )
+        pattern = re.compile(rf"^\|\s*(?:{esc}|\[{esc}\]\([^)]+\))\s*\|")
         for i, line in enumerate(lines):
             if pattern.match(line):
                 return i
@@ -267,7 +265,9 @@ class FilesystemPMAdapter:
         if "scope_doc" in fields:
             scope_doc = fields["scope_doc"]
 
-        lines[row_idx] = self._format_row(raw_id, name, status_display, scope_doc, priority)
+        lines[row_idx] = self._format_row(
+            raw_id, name, status_display, scope_doc, priority
+        )
         self._write_lines(lines)
         return IssueRef(key=key)
 
@@ -288,7 +288,9 @@ class FilesystemPMAdapter:
         name = parsed.get("name", "")
         scope_doc, priority = self._extract_scope_priority(parsed)
 
-        lines[row_idx] = self._format_row(raw_id, name, status_display, scope_doc, priority)
+        lines[row_idx] = self._format_row(
+            raw_id, name, status_display, scope_doc, priority
+        )
         self._write_lines(lines)
         return IssueRef(key=key)
 

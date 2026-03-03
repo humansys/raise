@@ -197,7 +197,10 @@ class TestCreateIssue:
         """create_issue maps IssueSpec fields to jira_create_issue args."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok(
-            {"key": "RAISE-400", "self": "https://humansys.atlassian.net/rest/api/2/issue/10400"}
+            {
+                "key": "RAISE-400",
+                "self": "https://humansys.atlassian.net/rest/api/2/issue/10400",
+            }
         )
 
         spec = IssueSpec(
@@ -226,20 +229,26 @@ class TestGetIssue:
     def test_get_issue_parses_into_issue_detail(self, tmp_path: Path) -> None:
         """get_issue parses McpToolResult.data into IssueDetail (sooperset format)."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok({
-            "key": "RAISE-301",
-            "summary": "Test story",
-            "description": "Some desc",
-            "status": {"name": "In Progress", "category": "In Progress", "color": "blue"},
-            "issue_type": {"name": "Story"},
-            "parent": {"key": "RAISE-275"},
-            "labels": ["backend"],
-            "assignee": {"display_name": "Emilio", "name": "Emilio", "email": None},
-            "priority": {"name": "High"},
-            "created": "2026-02-28T10:00:00.000+0000",
-            "updated": "2026-02-28T12:00:00.000+0000",
-            "url": "https://humansys.atlassian.net/rest/api/2/issue/10301",
-        })
+        adapter._bridge.call.return_value = _ok(
+            {
+                "key": "RAISE-301",
+                "summary": "Test story",
+                "description": "Some desc",
+                "status": {
+                    "name": "In Progress",
+                    "category": "In Progress",
+                    "color": "blue",
+                },
+                "issue_type": {"name": "Story"},
+                "parent": {"key": "RAISE-275"},
+                "labels": ["backend"],
+                "assignee": {"display_name": "Emilio", "name": "Emilio", "email": None},
+                "priority": {"name": "High"},
+                "created": "2026-02-28T10:00:00.000+0000",
+                "updated": "2026-02-28T12:00:00.000+0000",
+                "url": "https://humansys.atlassian.net/rest/api/2/issue/10301",
+            }
+        )
 
         async def run() -> IssueDetail:
             return await adapter.get_issue("RAISE-301")
@@ -278,24 +287,26 @@ class TestSearch:
     def test_search_passes_jql_and_limit(self, tmp_path: Path) -> None:
         """search passes JQL and limit to jira_search."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok({
-            "issues": [
-                {
-                    "key": "RAISE-1",
-                    "summary": "First",
-                    "status": {"name": "Done", "category": "Done"},
-                    "issue_type": {"name": "Story"},
-                    "parent": None,
-                },
-                {
-                    "key": "RAISE-2",
-                    "summary": "Second",
-                    "status": {"name": "In Progress", "category": "In Progress"},
-                    "issue_type": {"name": "Bug"},
-                    "parent": {"key": "RAISE-144"},
-                },
-            ]
-        })
+        adapter._bridge.call.return_value = _ok(
+            {
+                "issues": [
+                    {
+                        "key": "RAISE-1",
+                        "summary": "First",
+                        "status": {"name": "Done", "category": "Done"},
+                        "issue_type": {"name": "Story"},
+                        "parent": None,
+                    },
+                    {
+                        "key": "RAISE-2",
+                        "summary": "Second",
+                        "status": {"name": "In Progress", "category": "In Progress"},
+                        "issue_type": {"name": "Bug"},
+                        "parent": {"key": "RAISE-144"},
+                    },
+                ]
+            }
+        )
 
         async def run() -> list[IssueSummary]:
             return await adapter.search('project = "RAISE"', limit=5)
@@ -316,23 +327,25 @@ class TestGetComments:
     def test_get_comments_passes_limit_as_comment_limit(self, tmp_path: Path) -> None:
         """get_comments passes limit as comment_limit to jira_get_issue (AR-S3-5)."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok({
-            "key": "RAISE-301",
-            "comments": [
-                {
-                    "id": "10001",
-                    "body": "First comment",
-                    "author": {"display_name": "Emilio", "name": "Emilio"},
-                    "created": "2026-02-28T10:00:00.000+0000",
-                },
-                {
-                    "id": "10002",
-                    "body": "Second comment",
-                    "author": {"display_name": "Aquiles", "name": "Aquiles"},
-                    "created": "2026-02-28T11:00:00.000+0000",
-                },
-            ],
-        })
+        adapter._bridge.call.return_value = _ok(
+            {
+                "key": "RAISE-301",
+                "comments": [
+                    {
+                        "id": "10001",
+                        "body": "First comment",
+                        "author": {"display_name": "Emilio", "name": "Emilio"},
+                        "created": "2026-02-28T10:00:00.000+0000",
+                    },
+                    {
+                        "id": "10002",
+                        "body": "Second comment",
+                        "author": {"display_name": "Aquiles", "name": "Aquiles"},
+                        "created": "2026-02-28T11:00:00.000+0000",
+                    },
+                ],
+            }
+        )
 
         async def run() -> list[Comment]:
             return await adapter.get_comments("RAISE-301", limit=5)
@@ -388,10 +401,12 @@ class TestAddComment:
     def test_add_comment_calls_jira_add_comment(self, tmp_path: Path) -> None:
         """add_comment calls jira_add_comment and returns CommentRef."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok({
-            "id": "10099",
-            "self": "https://humansys.atlassian.net/rest/api/2/issue/10301/comment/10099",
-        })
+        adapter._bridge.call.return_value = _ok(
+            {
+                "id": "10099",
+                "self": "https://humansys.atlassian.net/rest/api/2/issue/10301/comment/10099",
+            }
+        )
 
         async def run() -> CommentRef:
             return await adapter.add_comment("RAISE-301", "Test comment")
@@ -446,10 +461,12 @@ class TestHealth:
     def test_health_returns_adapter_health(self, tmp_path: Path) -> None:
         """health returns AdapterHealth from JQL probe."""
         adapter = _make_adapter(tmp_path)
-        adapter._bridge.call.return_value = _ok({
-            "total": 42,
-            "issues": [],
-        })
+        adapter._bridge.call.return_value = _ok(
+            {
+                "total": 42,
+                "issues": [],
+            }
+        )
 
         async def run() -> AdapterHealth:
             return await adapter.health()

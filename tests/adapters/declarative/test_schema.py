@@ -151,7 +151,9 @@ class TestServerConnection:
         assert server.env is None
 
     def test_with_env(self) -> None:
-        server = ServerConnection(command="uvx", args=["mcp-test"], env=["TOKEN", "URL"])
+        server = ServerConnection(
+            command="uvx", args=["mcp-test"], env=["TOKEN", "URL"]
+        )
         assert server.env == ["TOKEN", "URL"]
 
 

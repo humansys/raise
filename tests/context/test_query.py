@@ -294,9 +294,7 @@ class TestQueryEngineEdgeTypeFilter:
         )
         assert query.edge_types == ["constrained_by", "depends_on"]
 
-    def test_concept_lookup_with_edge_type_filter(
-        self, sample_graph: Graph
-    ) -> None:
+    def test_concept_lookup_with_edge_type_filter(self, sample_graph: Graph) -> None:
         """Concept lookup with edge_types only returns neighbors via matching edges."""
 
         # Add two different edge types from PAT-001
@@ -323,9 +321,7 @@ class TestQueryEngineEdgeTypeFilter:
         assert "SES-001" in ids  # connected via learned_from
         assert "/story-plan" not in ids  # connected via applies_to, filtered out
 
-    def test_concept_lookup_with_multiple_edge_types(
-        self, sample_graph: Graph
-    ) -> None:
+    def test_concept_lookup_with_multiple_edge_types(self, sample_graph: Graph) -> None:
         """Multiple edge types returns neighbors matching any of them."""
 
         sample_graph.add_relationship(
@@ -494,7 +490,6 @@ class TestCalculateRelevanceScore:
         """evaluations=0 → modifier=1.0, no penalty for un-evaluated patterns."""
         from datetime import date
 
-
         score = calculate_relevance_score(
             content="planning",
             keywords=["planning"],
@@ -508,7 +503,6 @@ class TestCalculateRelevanceScore:
     def test_thirty_day_half_life_decay(self) -> None:
         """Pattern at exactly 30d has recency=0.5 (half-life)."""
         from datetime import date, timedelta
-
 
         created = (date.today() - timedelta(days=30)).isoformat()
         score = calculate_relevance_score(
@@ -524,7 +518,6 @@ class TestCalculateRelevanceScore:
     def test_high_negatives_reduces_score(self) -> None:
         """Wilson modifier significantly reduces score for mostly-negative patterns."""
         from datetime import date
-
 
         today = date.today().isoformat()
         score_negative = calculate_relevance_score(
@@ -545,7 +538,6 @@ class TestCalculateRelevanceScore:
         """No keyword hits → score = w_recency * recency (today = 0.3)."""
         from datetime import date
 
-
         score = calculate_relevance_score(
             content="totally unrelated content here",
             keywords=["planning", "estimation"],
@@ -558,7 +550,6 @@ class TestCalculateRelevanceScore:
     def test_empty_keywords_no_crash(self) -> None:
         """Empty keywords list returns a float without crashing."""
         from datetime import date
-
 
         score = calculate_relevance_score(
             content="anything",
@@ -582,7 +573,6 @@ class TestCalculateRelevanceScore:
     def test_none_metadata_treated_as_empty(self) -> None:
         """None metadata is handled safely."""
         from datetime import date
-
 
         score = calculate_relevance_score(
             content="planning",

@@ -32,7 +32,9 @@ console = Console()
 # Common option for target override (D5)
 TargetOption = Annotated[
     str | None,
-    typer.Option("--target", "-t", help="Target name override (auto-detect if omitted)"),
+    typer.Option(
+        "--target", "-t", help="Target name override (auto-detect if omitted)"
+    ),
 ]
 
 # Convention: governance artifacts live at governance/{type}.md
@@ -62,8 +64,12 @@ def _resolve_artifact_path(artifact_type: str) -> Path:
 
 @docs_app.command()
 def publish(
-    artifact_type: Annotated[str, typer.Argument(help="Governance artifact type (e.g., roadmap, adr)")],
-    title: Annotated[str | None, typer.Option("--title", help="Page title (default: artifact type)")] = None,
+    artifact_type: Annotated[
+        str, typer.Argument(help="Governance artifact type (e.g., roadmap, adr)")
+    ],
+    title: Annotated[
+        str | None, typer.Option("--title", help="Page title (default: artifact type)")
+    ] = None,
     target: TargetOption = None,
 ) -> None:
     """Publish a governance artifact to a documentation target."""
@@ -74,7 +80,9 @@ def publish(
     page_title = title or artifact_type
     metadata = {"title": page_title, "path": str(path)}
 
-    result = doc_target.publish(doc_type=artifact_type, content=content, metadata=metadata)
+    result = doc_target.publish(
+        doc_type=artifact_type, content=content, metadata=metadata
+    )
     if result.success:
         console.print(f"Published: {artifact_type} → {result.url}")
     else:

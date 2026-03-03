@@ -64,9 +64,7 @@ class ServerRef(BaseModel):
     Architecture: E338 S338.5 — Option B (separate from ServerConnection).
     """
 
-    ref: str | None = Field(
-        default=None, description="Name in .raise/mcp/ registry"
-    )
+    ref: str | None = Field(default=None, description="Name in .raise/mcp/ registry")
     command: str | None = Field(
         default=None, description="Server command (e.g. 'uvx', 'npx')"
     )

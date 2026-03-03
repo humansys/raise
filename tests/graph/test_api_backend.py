@@ -76,7 +76,9 @@ class TestApiGraphBackendPersist:
         mock_response.status_code = 200
         mock_response.raise_for_status = MagicMock()
 
-        with patch.object(backend._client, "post", return_value=mock_response) as mock_post:
+        with patch.object(
+            backend._client, "post", return_value=mock_response
+        ) as mock_post:
             backend.persist(graph)
 
             mock_post.assert_called_once()
@@ -97,7 +99,9 @@ class TestApiGraphBackendPersist:
         mock_response.status_code = 200
         mock_response.raise_for_status = MagicMock()
 
-        with patch.object(backend._client, "post", return_value=mock_response) as mock_post:
+        with patch.object(
+            backend._client, "post", return_value=mock_response
+        ) as mock_post:
             backend.persist(graph)
 
             payload = mock_post.call_args.kwargs["json"]
@@ -172,7 +176,9 @@ class TestApiGraphBackendHealth:
             health = backend.health()
 
         assert health.status == "unavailable"
-        assert "refused" in health.message.lower() or "connect" in health.message.lower()
+        assert (
+            "refused" in health.message.lower() or "connect" in health.message.lower()
+        )
 
     def test_health_returns_unavailable_on_timeout(self) -> None:
         from rai_cli.graph.backends.api import ApiGraphBackend

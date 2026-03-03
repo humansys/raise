@@ -8,12 +8,12 @@ Stored in .raise/rai/personal/sessions/{session_id}/journal.jsonl.
 from __future__ import annotations
 
 from datetime import datetime
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class JournalEntryType(str, Enum):
+class JournalEntryType(StrEnum):
     """Types of journal entries.
 
     Attributes:

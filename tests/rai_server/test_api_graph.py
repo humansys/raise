@@ -55,13 +55,19 @@ class TestSyncEndpoint:
         )
         with (
             _override_auth(client),
-            patch("rai_server.api.v1.graph.sync_graph", new_callable=AsyncMock, return_value=mock_response),
+            patch(
+                "rai_server.api.v1.graph.sync_graph",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
         ):
             resp = client.post(
                 "/api/v1/graph/sync",
                 json={
                     "project_id": "raise-commons",
-                    "nodes": [{"node_id": "mod-a", "node_type": "module", "content": "A"}],
+                    "nodes": [
+                        {"node_id": "mod-a", "node_type": "module", "content": "A"}
+                    ],
                     "edges": [],
                 },
             )
@@ -119,7 +125,11 @@ class TestQueryEndpoint:
         )
         with (
             _override_auth(client),
-            patch("rai_server.api.v1.graph.query_graph", new_callable=AsyncMock, return_value=mock_response),
+            patch(
+                "rai_server.api.v1.graph.query_graph",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
         ):
             resp = client.get("/api/v1/graph/query?q=memory&limit=10")
         assert resp.status_code == 200
@@ -137,10 +147,16 @@ class TestQueryEndpoint:
         assert resp.status_code == 422
 
     def test_query_empty_results(self, client: TestClient) -> None:
-        mock_response = GraphQueryResponse(results=[], total=0, query="nonexistent", limit=20)
+        mock_response = GraphQueryResponse(
+            results=[], total=0, query="nonexistent", limit=20
+        )
         with (
             _override_auth(client),
-            patch("rai_server.api.v1.graph.query_graph", new_callable=AsyncMock, return_value=mock_response),
+            patch(
+                "rai_server.api.v1.graph.query_graph",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
         ):
             resp = client.get("/api/v1/graph/query?q=nonexistent")
         assert resp.status_code == 200

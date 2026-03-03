@@ -34,7 +34,9 @@ class TestUpsertNodes:
     """upsert_nodes inserts new nodes and updates existing via ON CONFLICT."""
 
     @pytest.mark.anyio()
-    async def test_returns_created_and_updated_counts(self, org_id: uuid.UUID, repo_id: str) -> None:
+    async def test_returns_created_and_updated_counts(
+        self, org_id: uuid.UUID, repo_id: str
+    ) -> None:
         from rai_server.db.queries import upsert_nodes
 
         session = _mock_session()
@@ -44,8 +46,22 @@ class TestUpsertNodes:
         session.execute.return_value = mock_result
 
         nodes = [
-            {"node_id": "mod-a", "node_type": "module", "scope": "project", "content": "A", "source_file": None, "properties": {}},
-            {"node_id": "mod-b", "node_type": "module", "scope": "project", "content": "B", "source_file": "b.py", "properties": {"lang": "py"}},
+            {
+                "node_id": "mod-a",
+                "node_type": "module",
+                "scope": "project",
+                "content": "A",
+                "source_file": None,
+                "properties": {},
+            },
+            {
+                "node_id": "mod-b",
+                "node_type": "module",
+                "scope": "project",
+                "content": "B",
+                "source_file": "b.py",
+                "properties": {"lang": "py"},
+            },
         ]
         result = await upsert_nodes(session, org_id, repo_id, nodes)
         assert session.execute.called
@@ -81,15 +97,29 @@ class TestReplaceEdges:
         node_a_id = uuid.uuid4()
         node_b_id = uuid.uuid4()
         edges = [
-            {"source_id": node_a_id, "target_id": node_b_id, "edge_type": "depends_on", "weight": 1.0, "properties": {}},
-            {"source_id": node_b_id, "target_id": node_a_id, "edge_type": "contains", "weight": 0.5, "properties": {}},
+            {
+                "source_id": node_a_id,
+                "target_id": node_b_id,
+                "edge_type": "depends_on",
+                "weight": 1.0,
+                "properties": {},
+            },
+            {
+                "source_id": node_b_id,
+                "target_id": node_a_id,
+                "edge_type": "contains",
+                "weight": 0.5,
+                "properties": {},
+            },
         ]
         result = await replace_edges(session, org_id, repo_id, edges)
         assert session.execute.call_count == 2  # delete + insert
         assert result["created"] == 2
 
     @pytest.mark.anyio()
-    async def test_empty_edges_still_deletes_old(self, org_id: uuid.UUID, repo_id: str) -> None:
+    async def test_empty_edges_still_deletes_old(
+        self, org_id: uuid.UUID, repo_id: str
+    ) -> None:
         from rai_server.db.queries import replace_edges
 
         session = _mock_session()
@@ -106,7 +136,9 @@ class TestPruneOrphanNodes:
     """prune_orphan_nodes deletes nodes not in the incoming set."""
 
     @pytest.mark.anyio()
-    async def test_deletes_nodes_not_in_keep_set(self, org_id: uuid.UUID, repo_id: str) -> None:
+    async def test_deletes_nodes_not_in_keep_set(
+        self, org_id: uuid.UUID, repo_id: str
+    ) -> None:
         from rai_server.db.queries import prune_orphan_nodes
 
         session = _mock_session()
@@ -120,7 +152,9 @@ class TestPruneOrphanNodes:
         session.execute.assert_called_once()
 
     @pytest.mark.anyio()
-    async def test_empty_keep_set_deletes_all(self, org_id: uuid.UUID, repo_id: str) -> None:
+    async def test_empty_keep_set_deletes_all(
+        self, org_id: uuid.UUID, repo_id: str
+    ) -> None:
         from rai_server.db.queries import prune_orphan_nodes
 
         session = _mock_session()

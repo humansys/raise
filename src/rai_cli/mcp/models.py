@@ -39,9 +39,5 @@ class McpHealthResult(BaseModel):
     server_name: str = Field(..., description="MCP server identifier")
     healthy: bool = Field(..., description="Whether server responded")
     message: str = Field(default="", description="Status or error message")
-    latency_ms: int | None = Field(
-        default=None, description="Response latency in ms"
-    )
-    tool_count: int = Field(
-        default=0, description="Number of tools discovered"
-    )
+    latency_ms: int | None = Field(default=None, description="Response latency in ms")
+    tool_count: int = Field(default=0, description="Number of tools discovered")

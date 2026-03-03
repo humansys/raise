@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 from rai_cli.graph.backends.pending import (
@@ -19,7 +19,7 @@ class TestPendingSyncMarker:
 
     def test_model_fields(self) -> None:
         marker = PendingSyncMarker(
-            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=UTC),
             graph_path=".raise/rai/graph-index.json",
             node_count=42,
             edge_count=67,
@@ -32,7 +32,7 @@ class TestPendingSyncMarker:
 
     def test_model_serializes_to_json(self) -> None:
         marker = PendingSyncMarker(
-            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=UTC),
             graph_path=".raise/rai/graph-index.json",
             node_count=10,
             edge_count=5,
@@ -50,7 +50,7 @@ class TestWritePendingMarker:
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         marker = PendingSyncMarker(
-            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=UTC),
             graph_path=".raise/rai/graph-index.json",
             node_count=42,
             edge_count=67,
@@ -67,7 +67,7 @@ class TestWritePendingMarker:
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         old = PendingSyncMarker(
-            timestamp=datetime(2026, 2, 26, 14, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 2, 26, 14, 0, tzinfo=UTC),
             graph_path="old",
             node_count=1,
             edge_count=1,
@@ -75,7 +75,7 @@ class TestWritePendingMarker:
         )
         write_pending_marker(raise_dir, old)
         new = PendingSyncMarker(
-            timestamp=datetime(2026, 2, 26, 15, 0, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 2, 26, 15, 0, tzinfo=UTC),
             graph_path="new",
             node_count=99,
             edge_count=88,
@@ -99,7 +99,7 @@ class TestReadPendingMarker:
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         marker = PendingSyncMarker(
-            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=UTC),
             graph_path="test",
             node_count=5,
             edge_count=3,
@@ -124,7 +124,7 @@ class TestClearPendingMarker:
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
         marker = PendingSyncMarker(
-            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=timezone.utc),
+            timestamp=datetime(2026, 2, 26, 14, 30, tzinfo=UTC),
             graph_path="test",
             node_count=1,
             edge_count=1,

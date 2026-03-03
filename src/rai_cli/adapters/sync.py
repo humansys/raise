@@ -18,7 +18,7 @@ from __future__ import annotations
 import asyncio
 import concurrent.futures
 from collections.abc import Coroutine
-from typing import Any, TypeVar
+from typing import Any
 
 from rai_cli.adapters.models import (
     AdapterHealth,
@@ -38,10 +38,8 @@ from rai_cli.adapters.protocols import (
     AsyncProjectManagementAdapter,
 )
 
-T = TypeVar("T")
 
-
-def _run_sync(coro: Coroutine[Any, Any, T], closeable: Any = None) -> T:
+def _run_sync[T](coro: Coroutine[Any, Any, T], closeable: Any = None) -> T:
     """Run a coroutine synchronously, safe from both sync and async contexts.
 
     - **No running loop:** uses ``asyncio.run()`` directly.
@@ -137,7 +135,9 @@ class SyncDocsAdapter:
     def publish(
         self, doc_type: str, content: str, metadata: dict[str, Any]
     ) -> PublishResult:
-        return _run_sync(self._target.publish(doc_type, content, metadata), self._target)
+        return _run_sync(
+            self._target.publish(doc_type, content, metadata), self._target
+        )
 
     def get_page(self, identifier: str) -> PageContent:
         return _run_sync(self._target.get_page(identifier), self._target)

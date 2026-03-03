@@ -40,10 +40,15 @@ class TestScaffoldSuccess:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "scaffold", "context7",
-                    "--command", "npx",
-                    "--args", "-y @upstash/context7-mcp",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "scaffold",
+                    "context7",
+                    "--command",
+                    "npx",
+                    "--args",
+                    "-y @upstash/context7-mcp",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0, result.output
@@ -73,9 +78,13 @@ class TestScaffoldSuccess:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "scaffold", "myserver",
-                    "--command", "echo",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "scaffold",
+                    "myserver",
+                    "--command",
+                    "echo",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0
@@ -102,9 +111,13 @@ class TestScaffoldCreatesDirectory:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "scaffold", "test-server",
-                    "--command", "echo",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "scaffold",
+                    "test-server",
+                    "--command",
+                    "echo",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0
@@ -124,9 +137,13 @@ class TestScaffoldOverwriteProtection:
         result = runner.invoke(
             app,
             [
-                "mcp", "scaffold", "existing",
-                "--command", "echo",
-                "--mcp-dir", str(mcp_dir),
+                "mcp",
+                "scaffold",
+                "existing",
+                "--command",
+                "echo",
+                "--mcp-dir",
+                str(mcp_dir),
             ],
         )
         assert result.exit_code != 0
@@ -150,10 +167,14 @@ class TestScaffoldOverwriteProtection:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "scaffold", "existing",
-                    "--command", "echo",
+                    "mcp",
+                    "scaffold",
+                    "existing",
+                    "--command",
+                    "echo",
                     "--force",
-                    "--mcp-dir", str(mcp_dir),
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0
@@ -177,9 +198,13 @@ class TestScaffoldServerError:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "scaffold", "bad-server",
-                    "--command", "nonexistent",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "scaffold",
+                    "bad-server",
+                    "--command",
+                    "nonexistent",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code != 0
@@ -202,10 +227,15 @@ class TestScaffoldWithEnv:
             result = runner.invoke(
                 app,
                 [
-                    "mcp", "scaffold", "myserver",
-                    "--command", "uvx",
-                    "--env", "GITHUB_TOKEN,API_KEY",
-                    "--mcp-dir", str(mcp_dir),
+                    "mcp",
+                    "scaffold",
+                    "myserver",
+                    "--command",
+                    "uvx",
+                    "--env",
+                    "GITHUB_TOKEN,API_KEY",
+                    "--mcp-dir",
+                    str(mcp_dir),
                 ],
             )
         assert result.exit_code == 0

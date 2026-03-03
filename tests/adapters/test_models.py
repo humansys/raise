@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 from pydantic import BaseModel, ValidationError
-from rai_core.graph.backends.models import BackendHealth
 
 from rai_cli.adapters.models import (
     AdapterHealth,
@@ -22,6 +21,7 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
+from rai_core.graph.backends.models import BackendHealth
 
 
 class TestCoreArtifactType:
@@ -155,9 +155,7 @@ class TestIssueDetail:
 
     def test_liskov_substitution(self) -> None:
         """IssueDetail is a valid IssueRef — Liskov holds."""
-        detail = IssueDetail(
-            key="R-1", summary="X", status="Open", issue_type="Story"
-        )
+        detail = IssueDetail(key="R-1", summary="X", status="Open", issue_type="Story")
         ref: IssueRef = detail
         assert isinstance(ref, IssueRef)
         assert ref.key == "R-1"
@@ -202,7 +200,10 @@ class TestComment:
 
     def test_construction(self) -> None:
         comment = Comment(
-            id="10001", body="Looks good", author="emilio", created="2026-02-27T10:00:00Z"
+            id="10001",
+            body="Looks good",
+            author="emilio",
+            created="2026-02-27T10:00:00Z",
         )
         assert comment.id == "10001"
         assert comment.body == "Looks good"
@@ -313,7 +314,9 @@ class TestAdapterHealth:
         assert h.latency_ms == 42
 
     def test_unhealthy(self) -> None:
-        h = AdapterHealth(name="confluence", healthy=False, message="Connection refused")
+        h = AdapterHealth(
+            name="confluence", healthy=False, message="Connection refused"
+        )
         assert h.healthy is False
         assert h.latency_ms is None
 

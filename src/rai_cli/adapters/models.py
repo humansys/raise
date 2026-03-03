@@ -129,9 +129,7 @@ class BatchResult(BaseModel):
     """Result of a batch operation."""
 
     succeeded: list[IssueRef] = Field(default_factory=lambda: list[IssueRef]())
-    failed: list[FailureDetail] = Field(
-        default_factory=lambda: list[FailureDetail]()
-    )
+    failed: list[FailureDetail] = Field(default_factory=lambda: list[FailureDetail]())
 
 
 class PageContent(BaseModel):
