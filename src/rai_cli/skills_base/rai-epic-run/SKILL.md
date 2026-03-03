@@ -55,7 +55,7 @@ Resolve the epic path from `epic_id`. Check artifacts in **reverse order** — t
 | 4 | `### Progress Tracking` exists AND all rows Status = "Done" | **close** |
 | 3 | `### Progress Tracking` exists AND any row Status != "Done" | **stories** |
 | 2 | `scope.md` exists, no `### Progress Tracking` heading | **plan** |
-| 1 | epic branch exists, no `scope.md` | **design** |
+| 1 | epic directory exists, no `scope.md` | **design** |
 | 0 | (nothing) | **start** |
 
 Present: "Phase detection: resuming at **{phase}**" with context (e.g., "3/5 stories done, 2 remaining").
