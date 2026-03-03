@@ -5,6 +5,7 @@ Architecture: S347.7 (E347 Backlog Automation)
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -51,7 +52,7 @@ def jira_yaml_setup(tmp_path: Path) -> Path:
     return config_path
 
 
-def write_yaml_item(path: Path, **fields: Any) -> None:
+def _write_yaml_item(path: Path, **fields: Any) -> None:
     """Write a BacklogItem-compatible YAML file to disk."""
     defaults: dict[str, Any] = {
         "key": "E1",
@@ -63,3 +64,9 @@ def write_yaml_item(path: Path, **fields: Any) -> None:
     }
     defaults.update(fields)
     path.write_text(yaml.safe_dump(defaults, sort_keys=False), encoding="utf-8")
+
+
+@pytest.fixture()
+def write_yaml_item() -> Callable[..., None]:
+    """Fixture providing a helper to write BacklogItem YAML files to disk."""
+    return _write_yaml_item
