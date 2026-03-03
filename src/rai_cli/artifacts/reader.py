@@ -8,15 +8,36 @@ import yaml
 
 from rai_cli.artifacts.models import SkillArtifact
 
+# Lazy import to avoid circular dependency
+_ARTIFACT_REGISTRY: dict[str, type[SkillArtifact]] | None = None
+
+
+def _get_registry() -> dict[str, type[SkillArtifact]]:
+    """Build the artifact type registry on first access."""
+    global _ARTIFACT_REGISTRY  # noqa: PLW0603
+    if _ARTIFACT_REGISTRY is None:
+        from rai_cli.artifacts.story_design import StoryDesignArtifact
+
+        _ARTIFACT_REGISTRY = {
+            "story-design": StoryDesignArtifact,
+        }
+    return _ARTIFACT_REGISTRY
+
 
 def read_artifact(path: Path) -> SkillArtifact:
     """Load and validate a single artifact from a YAML file.
+
+    Dispatches to the correct model subclass based on ``artifact_type``.
+    Falls back to ``SkillArtifact`` (base) for unknown types.
 
     Raises:
         pydantic.ValidationError: If the YAML doesn't match the schema.
     """
     data = yaml.safe_load(path.read_text())
-    return SkillArtifact.model_validate(data)
+    artifact_type = data.get("artifact_type", "")
+    registry = _get_registry()
+    model_class = registry.get(artifact_type, SkillArtifact)
+    return model_class.model_validate(data)
 
 
 def read_all_artifacts(artifacts_dir: Path) -> list[SkillArtifact]:
