@@ -43,3 +43,41 @@ Reinforce orchestrator skills, genericize review skills for language-agnosticism
 - Story-review test verification is language-agnostic
 - AR and QR exist in builtin with identical deployment copies
 - All references updated (CLAUDE.md, skill manifests, etc.)
+
+---
+
+## Implementation Plan
+
+### Sequencing
+
+| Order | Story | Size | Rationale | Depends On | Enables |
+|-------|-------|------|-----------|------------|---------|
+| 1 | S346.1 | S | Risk-first: audit may reveal gaps affecting later stories | — | S346.2, S346.3 (informational) |
+| 2 | S346.2 | M | Critical path: QR has heaviest Python bias, S346.4 blocks on it | S346.1 (soft) | S346.4 (hard) |
+| 3 | S346.3 | S | Quick win: story-review changes are small and isolated | S346.1 (soft) | S346.4 (soft) |
+| 4 | S346.4 | S | Dependency-driven: promote only when content is final | S346.2 (hard) | — |
+
+### Milestones
+
+**M1: Audit + Core Genericization** (S346.1 + S346.2)
+- Orchestrator gaps documented (or confirmed clean)
+- quality-review works on Python, JS/TS, .NET codebases
+- Success: QR skill references language detection, not hardcoded `*.py`
+
+**M2: Epic Complete** (S346.3 + S346.4)
+- story-review uses project-aware test runner
+- AR and QR exist in `src/rai_cli/skills_base/` with identical deployment copies
+- All done criteria met
+
+### Parallel Opportunities
+
+S346.2 and S346.3 touch different skills and could run in parallel with multiple developers. In single-developer mode, sequential is fine — S346.3 is small enough that parallelization overhead exceeds benefit.
+
+### Progress Tracking
+
+| Story | Status | Actual Size | Velocity |
+|-------|--------|-------------|----------|
+| S346.1 | pending | — | — |
+| S346.2 | pending | — | — |
+| S346.3 | pending | — | — |
+| S346.4 | pending | — | — |
