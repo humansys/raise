@@ -115,3 +115,40 @@ class TestFilesystemDetection:
             sync_backlog(adapter, "filesystem", project_filter=None, output_path=output)
 
         assert not output.exists()
+
+
+class TestAdapterErrorHandling:
+    """Adapter error handling — T4: file untouched on search() failure."""
+
+    def test_error_does_not_create_new_file(self, tmp_path: Path) -> None:
+        """When search() raises, output file must not be created."""
+        adapter = MagicMock()
+        adapter.search.side_effect = ConnectionError("timeout")
+        output = tmp_path / "backlog.md"
+
+        with pytest.raises(RuntimeError, match="failed"):
+            sync_backlog(adapter, "jira", project_filter=None, output_path=output)
+
+        assert not output.exists()
+
+    def test_error_preserves_existing_file(self, tmp_path: Path) -> None:
+        """When search() raises, existing file retains original content."""
+        adapter = MagicMock()
+        adapter.search.side_effect = ConnectionError("timeout")
+        output = tmp_path / "backlog.md"
+        original_content = "# Original backlog\nDo not touch."
+        output.write_text(original_content)
+
+        with pytest.raises(RuntimeError):
+            sync_backlog(adapter, "jira", project_filter=None, output_path=output)
+
+        assert output.read_text() == original_content
+
+    def test_error_wraps_as_runtime_error(self, tmp_path: Path) -> None:
+        """Adapter exceptions are wrapped in RuntimeError with adapter name."""
+        adapter = MagicMock()
+        adapter.search.side_effect = ValueError("bad query")
+        output = tmp_path / "backlog.md"
+
+        with pytest.raises(RuntimeError, match="jira"):
+            sync_backlog(adapter, "jira", project_filter=None, output_path=output)
