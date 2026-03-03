@@ -133,7 +133,7 @@ Merge conflicts → resolve preserving epic work.
 
 ### Step 5: Update Backlog & Context
 
-1. Mark epic complete in `governance/backlog.md` (status → `✅ Complete`)
+1. Mark epic complete: `rai backlog transition {epic_key} done`
 2. Update `CLAUDE.local.md` to reflect completion and next epic
 3. Emit telemetry:
 
@@ -141,9 +141,18 @@ Merge conflicts → resolve preserving epic work.
 rai signal emit-work epic E{N} --event complete
 ```
 
+| Condition | Action |
+|-----------|--------|
+| Transition succeeds | Continue |
+| Transition fails | Log warning and continue — backlog errors are **non-blocking** for lifecycle |
+
 <verification>
 Backlog reflects completion. Local context updated.
 </verification>
+
+<if-blocked>
+Adapter not configured or transition fails → log and continue. Backlog sync is best-effort; it must never block epic close.
+</if-blocked>
 
 ## Output
 
@@ -152,7 +161,7 @@ Backlog reflects completion. Local context updated.
 | Retrospective | `work/epics/e{N}-{name}/retrospective.md` |
 | Merge commit | `{dev_branch}` with `--no-ff` |
 | Branch cleanup | All epic/story branches deleted |
-| Backlog update | `governance/backlog.md` |
+| Backlog update | via `rai backlog transition` |
 | Context update | `CLAUDE.local.md` |
 
 ## Quality Checklist
@@ -170,5 +179,5 @@ Backlog reflects completion. Local context updated.
 
 - Retrospective template: `templates/retrospective.md`
 - Previous: All `/rai-story-close` completions
-- Backlog: `governance/backlog.md`
+- Backlog: via `rai backlog` CLI
 - Next: `/rai-epic-design` for next epic

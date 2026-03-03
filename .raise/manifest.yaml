@@ -17,3 +17,5 @@ agents:
   types:
   - claude
 tier: null
+backlog:
+  adapter_default: jira

@@ -106,14 +106,18 @@ In scope:
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
-Register epic in `governance/backlog.md` — add or update the row with status `In Progress`.
+Register epic in the backlog:
+
+```bash
+rai backlog create "{Epic title}" -p {PROJECT} -t Epic
+```
 
 <verification>
 Scope commit on epic branch. Epic visible in backlog.
 </verification>
 
 <if-blocked>
-Backlog file missing → create it. Row already exists → update status only.
+No adapter configured → set `backlog.adapter_default` in `.raise/manifest.yaml`. Epic already exists → update status only. Create fails → log warning and continue. Backlog errors are **non-blocking** for lifecycle.
 </if-blocked>
 
 ### Step 4: Present Next Steps
@@ -130,7 +134,7 @@ Show the developer:
 | Epic branch | `epic/e{N}/{slug}` from `{dev_branch}` |
 | Epic Brief | `work/epics/e{N}-{name}/brief.md` |
 | Scope commit | On epic branch |
-| Backlog entry | `governance/backlog.md` |
+| Backlog entry | via `rai backlog create` |
 | Next | `/rai-epic-design` |
 
 ## Quality Checklist
@@ -138,7 +142,7 @@ Show the developer:
 - [ ] Branch created from `{dev_branch}` (not from another epic or story branch)
 - [ ] Epic Brief created from `templates/brief.md`
 - [ ] Scope commit includes objective and boundaries
-- [ ] Epic registered in `governance/backlog.md`
+- [ ] Epic registered via `rai backlog create`
 - [ ] NEVER create epic branch from wrong base — causes merge pain
 
 ## References
