@@ -10,7 +10,7 @@
 
 - [ ] **Parallel phase execution (AR + QR)** — AR and QR read overlapping but independent inputs; could run simultaneously. Promote when sequential execution is a latency bottleneck.
 - [ ] **`context: fork` frontmatter support** — investigate when Claude Code adds `context: fork` for Skill tool invocations; may simplify the Agent tool spawn pattern.
-- [ ] **Nested fork depth >1** — Claude Code constraint (F5): subagents can't spawn subagents. If lifted, story-run inside epic-run could fork phases for maximum quality.
+- [ ] **Nested fork depth >1** — Claude Code constraint (F5): subagents can't spawn subagents. Current design avoids this by keeping story-run in main thread. If F5 is lifted, alternative architectures become possible.
 
 ## E346 Deferred Items — 2026-03-02
 

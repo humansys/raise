@@ -33,11 +33,12 @@ Las fuerzas en tensión son: (1) los orchestrators deben coordinar múltiples fa
 
 ### Aplicación por nivel
 
-| Orchestrator | Fork unit | Mechanism | Subagent depth |
-|-------------|-----------|-----------|----------------|
-| `rai-story-run` (standalone) | Per heavy phase | Agent tool | 1 (main → phase) |
-| `rai-epic-run` | Per story-run | Agent tool | 1 (main → story) |
-| `rai-story-run` (inside epic-run) | None (inline) | Direct execution | N/A (already subagent) |
+| Orchestrator | Runs in | Fork unit | Mechanism | Subagent depth |
+|-------------|---------|-----------|-----------|----------------|
+| `rai-story-run` | Main thread (always) | Per heavy phase | Agent tool | 1 (main → phase) |
+| `rai-epic-run` | Main thread | Delegates to story-run | Skill tool (inline) | 0 (story-run inherits main thread) |
+
+**Regla crítica:** `rai-epic-run` invoca `rai-story-run` inline en el main thread (via Skill tool), NO como subagente. Esto permite que story-run forkee sus fases pesadas. Forkear story-run como subagente lo degradaría a ejecución inline sin forks — exactamente el problema que queremos eliminar. No operamos en niveles de calidad conocidamente inferiores.
 
 ### Fases clasificadas
 
@@ -62,7 +63,7 @@ Las fuerzas en tensión son: (1) los orchestrators deben coordinar múltiples fa
 | Positivo | Usa mecanismos probados de Claude Code (Agent tool), no infraestructura custom |
 | Negativo | Subagente no ve historial conversacional de fases previas (by design) |
 | Negativo | Latencia adicional ~150-250ms por fork (negligible vs quality gain) |
-| Negativo | story-run dentro de epic-run no puede forkear fases (constraint de profundidad) |
+| Negativo | Main thread acumula resúmenes entre stories en epic-run (mitigado: orchestrator thin, solo resúmenes) |
 
 ## Alternativas Consideradas
 
