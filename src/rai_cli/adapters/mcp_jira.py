@@ -15,7 +15,7 @@ import json
 import os
 import time
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import yaml
 
@@ -276,7 +276,7 @@ class McpJiraAdapter:
         data = result.data
         # Wrapped format: {"message": "...", "issue": {"key": "..."}}
         if "issue" in data and isinstance(data["issue"], dict):
-            data = data["issue"]
+            data = cast(dict[str, Any], data["issue"])
         key = data.get("key", "")
         url = data.get("url", data.get("self", ""))
         return IssueRef(key=key, url=str(url))
