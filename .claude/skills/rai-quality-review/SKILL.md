@@ -35,25 +35,78 @@ Act as an external auditor reviewing code that passed all automated gates. Find 
 | Before `/rai-story-review` | Catch issues before retrospective |
 | Code feels "too clean" | Assumptions may be hiding — review |
 
-**Inputs:** Story ID (to find changed files), passing gates (pyright, ruff, pytest).
+**Inputs:** Story ID (to find changed files), passing gates (language-appropriate linters, type checkers, test runners).
 
 ## Steps
+
+### Step 0: Detect Project Language
+
+Determine the primary language of changed files:
+
+1. **Check `.raise/manifest.yaml`** for `project.project_type` or file extension patterns
+2. **Fallback:** Scan extensions of changed files (`git diff --name-only`) and pick the dominant language
+
+| Language | Extensions | Type Checker | Linter | Test Runner |
+|----------|-----------|--------------|--------|-------------|
+| Python | `.py`, `.pyi` | pyright/mypy | ruff | pytest |
+| TypeScript | `.ts`, `.tsx` | tsc --noEmit | eslint | jest/vitest |
+| JavaScript | `.js`, `.jsx` | — | eslint | jest/vitest |
+| C# | `.cs` | dotnet build | dotnet format | xunit/nunit |
+| Java | `.java` | javac | checkstyle | JUnit |
+| Go | `.go` | go vet | golangci-lint | go test |
+| PHP | `.php` | phpstan | php-cs-fixer | phpunit |
+| Dart | `.dart` | dart analyze | dart fix | flutter test |
+
+If mixed languages, review each language group separately using its section below.
 
 ### Step 1: Identify Changed Files
 
 ```bash
-git diff --name-only $(git merge-base HEAD v2)..HEAD -- '*.py'
+# Use the parent branch (epic or dev) as merge base — not a hardcoded branch name
+git diff --name-only $(git merge-base HEAD <parent-branch>)..HEAD -- '<extensions>'
 ```
+
+Replace `<extensions>` with language-appropriate patterns from Step 0 (e.g., `'*.py' '*.pyi'` for Python, `'*.ts' '*.tsx'` for TypeScript).
 
 Read every changed file. You cannot review code you haven't read.
 
 ### Step 2: Semantic Correctness Audit
 
-**Type honesty:** Check `type: ignore` comments (each is a potential lie), `cast()` honesty, annotations claiming more specific types than runtime provides.
+#### Universal Checks (all languages)
 
-**Logic correctness:** Inverted conditionals (#1 semantic bug), off-by-one in ranges/slices, wrong variable in expressions (copy-paste), unhandled edge cases (empty, None, zero-length).
+**Logic correctness:** Inverted conditionals (#1 semantic bug), off-by-one errors, wrong variable in expressions (copy-paste), unhandled edge cases (empty, null/None, zero-length).
 
-**Error handling:** Overly broad `except Exception`, swallowed exceptions, missing `raise X from exc`.
+#### Language-Specific Checks
+
+**Python:**
+- **Type honesty:** `type: ignore` comments (each is a potential lie), `cast()` honesty, annotations claiming more specific types than runtime provides
+- **Error handling:** Overly broad `except Exception`, swallowed exceptions, missing `raise X from exc`
+- **Idioms:** Mutable default arguments, late binding closures in loops
+
+**TypeScript/JavaScript:**
+- **Type honesty:** `as` type assertions (bypasses type checking), `any` types (defeats type safety), `@ts-ignore`/`@ts-expect-error` comments
+- **Error handling:** Unhandled promise rejections, missing `.catch()`, overly broad `catch(e)` without type narrowing
+- **Idioms:** `==` vs `===`, truthiness traps (`0`, `""`, `[]` are falsy), implicit `any` from untyped imports
+
+**C#/.NET:**
+- **Type honesty:** Null-forgiving operator `!` (suppresses null warnings), unchecked casts vs pattern matching, `dynamic` type usage
+- **Error handling:** Empty `catch` blocks, catching `System.Exception` broadly, missing `using`/`await using` for `IDisposable`
+- **Idioms:** `async void` methods (fire-and-forget), missing `ConfigureAwait`, LINQ deferred execution surprises
+
+**PHP:**
+- **Type honesty:** Missing type declarations, `@` error suppression operator, loose comparison (`==` vs `===`)
+- **Error handling:** Silenced errors, missing null checks on database results
+- **Idioms:** Uninitialized properties, reference parameter side effects
+
+**Go:**
+- **Type honesty:** Unchecked type assertions (use comma-ok pattern), interface satisfaction without tests
+- **Error handling:** Ignored error returns (`_`), error wrapping without `%w`
+- **Idioms:** Goroutine leaks, unbuffered channel deadlocks, deferred close on writable resources
+
+**Dart/Flutter:**
+- **Type honesty:** `as` casts without `is` checks, `dynamic` type usage, `!` null assertion operator
+- **Error handling:** Uncaught `Future` errors, missing error handling in `StreamBuilder`
+- **Idioms:** `setState` after dispose, missing `const` constructors, build method side effects
 
 ### Step 3: Test Quality Audit
 
@@ -73,9 +126,18 @@ Classify: **Muda** (waste, recommend deletion) / **Fragile** (breaks on refactor
 
 ### Step 4: API Surface & Security Audit
 
-**API:** Lean `__all__`, clear naming, no internal leaks, backward compatibility.
+**API (language-adaptive):**
 
-**Security:** Entry point trust model, input validation at boundaries, dependency justification, no secret exposure in logs/errors.
+| Language | Visibility Mechanism | Leak Detection |
+|----------|---------------------|----------------|
+| Python | Lean `__all__`, `_`-prefixed internals | Internal symbols in public API |
+| TypeScript | `export` discipline, barrel files | Re-exporting internals, `export *` |
+| C# | `internal` vs `public`, `[assembly: InternalsVisibleTo]` | Public types that should be internal |
+| Go | Capitalization (exported vs unexported) | Exported helpers that should be internal |
+| PHP | `private`/`protected` vs `public` | Public methods that should be protected |
+| Dart | `_`-prefixed private, `export` directives | Part-of files leaking implementation |
+
+**Security (universal):** Entry point trust model, input validation at boundaries, dependency justification, no secret exposure in logs/errors.
 
 ### Step 5: Present Findings
 
@@ -101,10 +163,12 @@ Every finding: specific file:line, WHY it matters, concrete fix suggestion.
 
 ## Quality Checklist
 
-- [ ] All changed .py files read before reviewing
+- [ ] Project language detected (Step 0) before reviewing
+- [ ] All changed files for detected language read before reviewing
 - [ ] Every finding cites specific file:line
 - [ ] Every finding explains WHY (not just WHAT)
-- [ ] Style issues already caught by ruff/pyright are excluded
+- [ ] Style issues already caught by language-appropriate linters are excluded
+- [ ] Language-specific checks applied from correct section
 - [ ] "No issues found" is a valid outcome — do not invent findings
 
 ## References
