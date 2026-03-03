@@ -10,6 +10,7 @@ Architecture: S347.7 (E347 Backlog Automation)
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
@@ -177,3 +178,99 @@ class TestProtocolParity:
         assert len(item.links) == 1
         assert item.links[0].target == "E1"
         assert item.links[0].link_type == "blocks"
+
+
+# ---------------------------------------------------------------------------
+# T2: BacklogHook -> FileAdapter flow
+# ---------------------------------------------------------------------------
+
+
+class TestHookAdapterFlow:
+    """Integration: BacklogHook.handle() with real FilesystemPMAdapter."""
+
+    def test_hook_start_event_creates_and_transitions_epic(
+        self,
+        tmp_path: Path,
+        backlog_dir: Path,
+        jira_yaml_setup: Path,
+    ) -> None:
+        """Epic start event -> creates YAML item and transitions to in-progress."""
+        from rai_cli.hooks.builtin.backlog import BacklogHook
+        from rai_cli.hooks.events import WorkLifecycleEvent
+
+        adapter = FilesystemPMAdapter(project_root=tmp_path)
+        hook = BacklogHook(project_root=tmp_path)
+        event = WorkLifecycleEvent(
+            work_type="epic", work_id="E99", event="start", phase="design"
+        )
+
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+
+        # Verify YAML file created on disk
+        items = list(backlog_dir.glob("*.yaml"))
+        assert len(items) == 1
+
+        # Verify issue was transitioned to in-progress
+        detail = adapter.get_issue(items[0].stem)
+        assert detail.status == "in-progress"
+        assert detail.summary == "E99"
+
+    def test_hook_complete_event_transitions_to_done(
+        self,
+        tmp_path: Path,
+        backlog_dir: Path,
+        jira_yaml_setup: Path,
+    ) -> None:
+        """Complete event -> transitions existing issue to done."""
+        from rai_cli.hooks.builtin.backlog import BacklogHook
+        from rai_cli.hooks.events import WorkLifecycleEvent
+
+        adapter = FilesystemPMAdapter(project_root=tmp_path)
+
+        # Pre-create an epic so complete can find it
+        adapter.create_issue("TEST", IssueSpec(summary="E99", issue_type="Epic"))
+        adapter.transition_issue("E1", "in-progress")
+
+        hook = BacklogHook(project_root=tmp_path)
+        event = WorkLifecycleEvent(
+            work_type="epic", work_id="E99", event="complete", phase="close"
+        )
+
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+
+        # Verify status is now done
+        detail = adapter.get_issue("E1")
+        assert detail.status == "done"
+
+    def test_hook_with_unavailable_adapter_returns_error(
+        self,
+        tmp_path: Path,
+        jira_yaml_setup: Path,
+    ) -> None:
+        """BacklogHook degrades gracefully when adapter raises."""
+        from rai_cli.hooks.builtin.backlog import BacklogHook
+        from rai_cli.hooks.events import WorkLifecycleEvent
+
+        hook = BacklogHook(project_root=tmp_path)
+        event = WorkLifecycleEvent(
+            work_type="epic", work_id="E1", event="start", phase="design"
+        )
+
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter",
+            side_effect=RuntimeError("MCP bridge down"),
+        ):
+            result = hook.handle(event)
+
+        assert result.status == "error"
+        assert "adapter" in result.message.lower()
