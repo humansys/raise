@@ -97,14 +97,45 @@ S347.6 ──────────────────────┘
 | FileAdapter stories complicates backlog.md format | Low | Medium | Separate section or per-epic file |
 | Rewritten skills break existing flow | Medium | High | Dogfood in S347.7 on real epic before merge |
 
+## Implementation Plan
+
+### Sequencing Strategy: Walking Skeleton + Risk-First
+
+| Pos | Story | Size | Rationale | Enables |
+|-----|-------|------|-----------|---------|
+| 1 | S347.1 Adapter default + workflows.yaml | S | Foundation — everything depends on this. Walking skeleton. | S347.2-6 |
+| 2 | S347.2 FileAdapter parity | M | Risk-first — markdown format for stories is biggest uncertainty. | S347.7 |
+| 3 | S347.5 Session-start live query | S | Quick win, highest user impact — resolves stale state problem. | Dogfood |
+| 4 | S347.3 Skills vía CLI | M | Core MVP — skills stop editing backlog.md directly. | S347.7 |
+| 5 | S347.4 BacklogHook adapter-aware | S | Cleanup existing hook. Low risk after foundation. | S347.7 |
+| 6 | S347.6 `rai backlog sync` | S | New command, independent. Low risk. | S347.7 |
+| 7 | S347.7 Integration tests + dogfood | M | Validates everything. E2E with both adapters. | Epic close |
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|-----------------|
+| **M1: Foundation** | S347.1 | `rai backlog` works without `-a`. workflows.yaml loaded. State validation on transition. |
+| **M2: Core Value** | S347.2, S347.5, S347.3 | Session-start shows live state. Skills use CLI. FileAdapter handles stories. Original problem solved. |
+| **M3: Complete** | S347.4, S347.6 | Hook respects default. Sync command works. All pieces in place. |
+| **M4: Validated** | S347.7 | Test suite passes both adapters. Dogfooded on real epic. Done criteria met. |
+
+### Sequencing Risks
+
+| Risk | Mitigation |
+|------|------------|
+| S347.1 scope creep (workflows.yaml + adapter default + state validation) | Timebox: only load config + validate, no workflow engine |
+| S347.3 breaks existing skill flow during transition | Dogfood each rewritten skill before committing |
+| S347.7 finds integration issues late | M2 includes manual dogfood of session-start + skills |
+
 ## Progress
 
-| Story | Status | Notes |
-|-------|--------|-------|
-| S347.1 | Pending | |
-| S347.2 | Pending | |
-| S347.3 | Pending | |
-| S347.4 | Pending | |
-| S347.5 | Pending | |
-| S347.6 | Pending | |
-| S347.7 | Pending | |
+| Story | Status | Actual | Velocity | Notes |
+|-------|--------|--------|----------|-------|
+| S347.1 | Pending | | | |
+| S347.2 | Pending | | | |
+| S347.5 | Pending | | | |
+| S347.3 | Pending | | | |
+| S347.4 | Pending | | | |
+| S347.6 | Pending | | | |
+| S347.7 | Pending | | | |
