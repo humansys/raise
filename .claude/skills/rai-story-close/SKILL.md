@@ -1,9 +1,9 @@
 ---
 name: rai-story-close
 description: >
-  Complete a story with retrospective verification, merge, cleanup,
-  and tracking update. Use after review to formally close the story
-  lifecycle.
+  Complete a story with retrospective verification, merge to dev,
+  cleanup, and tracking update. Use after review to formally close
+  the story lifecycle.
 
 license: MIT
 
@@ -15,11 +15,12 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.3.0"
+  raise.version: "3.0.0"
   raise.visibility: public
   raise.inputs: |
     - retrospective_md: file_path, required, previous_skill
     - tests_passing: boolean, required, cli
+    - dev_branch: string, required, config
   raise.outputs: |
     - merge_commit: string, git
 ---
@@ -28,7 +29,7 @@ metadata:
 
 ## Purpose
 
-Complete a story by verifying the retrospective, merging to the parent branch, cleaning up branches, and updating epic tracking.
+Complete a story by verifying the retrospective, merging to the development branch, cleaning up the story branch, and updating epic tracking.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -87,13 +88,13 @@ git status --short
 `git status` shows clean working tree (or only unrelated files explicitly acknowledged).
 </verification>
 
-### Step 3: Merge to Parent Branch
+### Step 3: Merge to Development Branch
 
-Determine parent: `story/s{N}.{M}/...` → `epic/e{N}/...` (or `{dev_branch}` for standalone).
+Always merge to `{dev_branch}`:
 
 ```bash
-git checkout {parent_branch}
-git pull origin {parent_branch}
+git checkout {dev_branch}
+git pull origin {dev_branch}
 git merge --no-ff {story_branch} -m "feat(s{N}.{M}): merge {story-name}
 
 Completed:
@@ -103,7 +104,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
 <verification>
-Merge commit created on parent branch.
+Merge commit created on `{dev_branch}`.
 </verification>
 
 <if-blocked>
@@ -144,7 +145,7 @@ Local context updated. Telemetry emitted.
 
 | Item | Destination |
 |------|-------------|
-| Merge commit | Parent branch with `--no-ff` |
+| Merge commit | `{dev_branch}` with `--no-ff` |
 | Epic update | `work/epics/e{N}-{name}/scope.md` |
 | Branch cleanup | Story branch deleted |
 | Context update | `CLAUDE.local.md` |
@@ -157,6 +158,7 @@ Local context updated. Telemetry emitted.
 - [ ] Story branch deleted after merge
 - [ ] Epic scope updated with completion status
 - [ ] Working tree clean before merge — no orphaned artifacts
+- [ ] Always merge to `{dev_branch}` — never to an epic branch
 - [ ] NEVER merge without retrospective — learnings compound
 - [ ] NEVER leave stale branches — clean as you go
 
