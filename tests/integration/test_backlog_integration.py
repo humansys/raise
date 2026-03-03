@@ -274,3 +274,107 @@ class TestHookAdapterFlow:
 
         assert result.status == "error"
         assert "adapter" in result.message.lower()
+
+
+# ---------------------------------------------------------------------------
+# T3: Session-start live query with real FileAdapter
+# ---------------------------------------------------------------------------
+
+
+class TestSessionLiveQuery:
+    """Integration: _fetch_live_status() with real YAML items via FileAdapter."""
+
+    def test_fetch_live_status_with_file_adapter(
+        self,
+        tmp_path: Path,
+        backlog_dir: Path,
+    ) -> None:
+        """Pre-populated YAML items -> correct LiveBacklogStatus fields."""
+        from tests.integration.conftest import write_yaml_item
+
+        from rai_cli.schemas.session_state import CurrentWork, LastSession, SessionState
+        from rai_cli.session.bundle import _fetch_live_status
+
+        # Write YAML items on disk
+        write_yaml_item(
+            backlog_dir / "E1.yaml",
+            key="E1",
+            summary="My Epic",
+            status="in_progress",
+            issue_type="Epic",
+        )
+        write_yaml_item(
+            backlog_dir / "S1.1.yaml",
+            key="S1.1",
+            summary="My Story",
+            status="in_progress",
+            issue_type="Story",
+            parent="E1",
+        )
+
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E1",
+                story="S1.1",
+                branch="story/s1.1/test",
+                phase="implement",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date="2026-03-03",
+                developer="test",
+                summary="test session",
+            ),
+        )
+
+        adapter = FilesystemPMAdapter(project_root=tmp_path)
+
+        with patch(
+            "rai_cli.cli.commands._resolve.resolve_adapter", return_value=adapter
+        ):
+            live = _fetch_live_status(state, timeout=10.0)
+
+        assert live.epic_status == "in_progress"
+        assert live.epic_summary == "My Epic"
+        assert live.story_status == "in_progress"
+        assert live.story_summary == "My Story"
+        assert live.warning == ""
+
+    def test_fetch_live_status_with_no_work_returns_empty(self) -> None:
+        """No current work -> empty LiveBacklogStatus without adapter call."""
+        from rai_cli.session.bundle import LiveBacklogStatus, _fetch_live_status
+
+        result = _fetch_live_status(None)
+        assert result == LiveBacklogStatus()
+
+    def test_manifest_adapter_default_selects_filesystem(
+        self, tmp_path: Path, backlog_dir: Path
+    ) -> None:
+        """manifest.yaml with backlog.adapter_default=filesystem selects FileAdapter."""
+        from rai_cli.cli.commands._resolve import resolve_adapter
+        from rai_cli.onboarding.manifest import load_manifest
+
+        # Write manifest.yaml
+        manifest_dir = tmp_path / ".raise"
+        manifest_dir.mkdir(exist_ok=True)
+        (manifest_dir / "manifest.yaml").write_text(
+            "project:\n  name: test\nbacklog:\n  adapter_default: filesystem\n"
+        )
+
+        # Patch CWD for manifest loading and entry points
+        with (
+            patch("rai_cli.cli.commands._resolve.load_manifest") as mock_manifest,
+            patch("rai_cli.cli.commands._resolve._discover_pm") as mock_discover,
+        ):
+            # Simulate manifest returning adapter_default=filesystem
+            manifest = load_manifest(tmp_path)
+            mock_manifest.return_value = manifest
+
+            # Simulate entry points including filesystem
+            mock_discover.return_value = {
+                "filesystem": lambda: FilesystemPMAdapter(project_root=tmp_path),
+            }
+
+            adapter = resolve_adapter(None)
+
+        assert isinstance(adapter, FilesystemPMAdapter)
