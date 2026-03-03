@@ -20,7 +20,7 @@ test:
   before_script:
     - apt-get update -qq && apt-get install -y -qq libatomic1
     - pip install uv
-    - uv sync --extra dev
+    - uv sync --extra dev --extra mcp
   script:
     - uv run pytest --tb=short -q
     - uv run ruff check src/ tests/
