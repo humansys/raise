@@ -136,6 +136,6 @@ S347.6 ──────────────────────┘
 | S347.2 | ✅ Done | 45min | 1.3x | Full protocol parity: 7 ops, round-trip YAML, atomic writes |
 | S347.5 | ✅ Done | 35min | 1.7x | Live JQL in session-start, adapter-aware query, graceful degradation |
 | S347.3 | ✅ Done | 40min | 1.5x | Skills use `rai backlog` CLI: epic-start, epic-close, story-start, story-close |
-| S347.4 | Pending | | | |
+| S347.4 | ✅ Done | 30min | 1.7x | Adapter-aware hook dispatch, exact key resolution, respects manifest default |
 | S347.6 | Pending | | | |
 | S347.7 | Pending | | | |
