@@ -16,7 +16,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "2.0.0"
   raise.visibility: public
   raise.inputs: |
     - story_id: string, required, argument (e.g. "S325.6")
@@ -119,24 +119,71 @@ Rules for the completion banner:
 
 **Chain order:**
 
-| Phase | Skill | Gate after? |
-|:-----:|-------|:-----------:|
-| 1 | `/rai-story-start {story_id}` | — |
-| 2 | `/rai-story-design {story_id}` | **POST-DESIGN** |
-| 3 | `/rai-story-plan {story_id}` | — |
-| 4 | `/rai-story-implement {story_id}` | **POST-IMPLEMENT** |
-| 5 | `/rai-architecture-review {story_id} story` | **POST-AR** |
-| 6 | `/rai-quality-review {story_id}` | **POST-QR** |
-| 7 | `/rai-story-review {story_id}` | — |
-| 8 | `/rai-story-close {story_id}` | — |
+| Phase | Skill | Execution | Gate after? |
+|:-----:|-------|:---------:|:-----------:|
+| 1 | `/rai-story-start {story_id}` | **inline** | — |
+| 2 | `/rai-story-design {story_id}` | **fork** | POST-DESIGN |
+| 3 | `/rai-story-plan {story_id}` | **fork** | — |
+| 4 | `/rai-story-implement {story_id}` | **fork** | POST-IMPLEMENT |
+| 5 | `/rai-architecture-review {story_id} story` | **fork** | POST-AR |
+| 6 | `/rai-quality-review {story_id}` | **fork** | POST-QR |
+| 7 | `/rai-story-review {story_id}` | **fork** | — |
+| 8 | `/rai-story-close {story_id}` | **inline** | — |
 
-**Full execution rule:** For each phase, you MUST:
-1. Load the skill's SKILL.md (read the file, don't rely on memory)
-2. Execute every step in the skill's SKILL.md sequentially — no compression, no skipping
-3. Produce all artifacts the skill specifies
-4. Only then move to the next phase
+#### Inline phases (start, close)
 
-The orchestrator delegates — it does not summarize, compress, or shortcut individual skill behavior. A skill invoked through the orchestrator must produce the same output as when invoked standalone.
+Execute the skill directly in the current context. Load the skill's SKILL.md, execute every step sequentially — no compression, no skipping. Produce all artifacts the skill specifies.
+
+#### Fork phases (design, plan, implement, AR, QR, review)
+
+Each fork phase runs in a **fresh-context subagent** via the Agent tool. This eliminates context saturation that degrades quality in later phases.
+
+**For each fork phase:**
+
+1. **Read** the skill's SKILL.md from `src/rai_cli/skills_base/rai-{skill-name}/SKILL.md`
+2. **Spawn** an Agent tool subagent with:
+   - `subagent_type: "general-purpose"`
+   - `prompt`: the agent prompt template below, filled with skill content and story context
+3. **Wait** for agent completion
+4. **Verify** output:
+   - Artifact-producing phases (design, plan, implement, review): confirm file exists on disk
+   - Inline-only phases (AR, QR): read verdict from agent return value
+5. **Show** completion banner in main thread
+6. **Apply** delegation gate if applicable (in main thread)
+
+**Agent prompt template:**
+
+```
+Execute the following skill for story {story_id}.
+
+## Skill Instructions
+
+{paste the full SKILL.md content here}
+
+## Story Context
+
+- Story ID: {story_id}
+- Epic: {epic_id}
+- Epic path: work/epics/{epic_slug}/
+- Stories path: work/epics/{epic_slug}/stories/
+- Prior artifacts on disk: {list each file that exists for this story, e.g. s353.2-story.md, s353.2-design.md}
+
+## Your Task
+
+1. Read CLAUDE.md for project-level context and rules
+2. Read the prior artifacts listed above from disk
+3. Execute every step in the Skill Instructions — no compression, no skipping
+4. Write all output artifacts to the correct paths
+5. When done, return a brief summary: what you did, artifacts created, and any verdicts or decisions
+
+ARGUMENTS: {story_id}
+```
+
+**Critical rules for fork execution:**
+- The subagent gets the SKILL.md as its prompt — it executes the full skill naturally in fresh context
+- Do NOT pass conversation history or prior phase results to the subagent — only disk artifacts and SKILL.md
+- The orchestrator stays thin — it only reads summaries and checks for artifacts between forks
+- A skill invoked through fork must produce the same output as when invoked standalone
 
 <verification>
 Each skill's SKILL.md was loaded and all its steps executed before proceeding.
@@ -218,13 +265,16 @@ All phases complete. Story merged and branch cleaned up.
 
 - [ ] Phase detection checked in reverse order (most advanced first)
 - [ ] Delegation resolved from profile before starting chain
-- [ ] Each skill's SKILL.md was loaded (read from file) before execution
-- [ ] Every step in each skill executed — no compression or shortcuts
-- [ ] Gates applied at post-design, post-implement, post-AR, and post-QR
+- [ ] Fork phases spawn Agent tool subagent with full SKILL.md as prompt
+- [ ] Inline phases (start, close) execute directly in current context
+- [ ] Each subagent gets fresh context — no conversation history passed
+- [ ] Artifact-producing forks verified by checking file on disk
+- [ ] AR/QR verdicts read from agent return value
+- [ ] Gates applied at post-design, post-implement, post-AR, and post-QR (in main thread)
 - [ ] Failure stops immediately — no cascading to next phase
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip a skill in the chain (even if developer says "just close it")
-- [ ] NEVER compress a skill's steps into a summary — execute each step fully
+- [ ] NEVER pass conversation context to forked subagent — only disk artifacts + SKILL.md
 
 ## References
 
