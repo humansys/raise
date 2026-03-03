@@ -372,6 +372,22 @@ class TestYamlStoreUpdate:
         assert detail.status == "complete"  # unchanged
         assert detail.issue_type == "Epic"  # unchanged
 
+    def test_update_ignores_key_mutation(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        """Mutating 'key' via update_issue must be silently ignored (C1 guard)."""
+        yaml_adapter.update_issue("E1", {"key": "EVIL"})
+        detail = yaml_adapter.get_issue("E1")
+        assert detail.key == "E1"  # unchanged
+
+    def test_update_ignores_created_mutation(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
+        original = yaml_adapter.get_issue("E1")
+        yaml_adapter.update_issue("E1", {"created": "1970-01-01T00:00:00Z"})
+        detail = yaml_adapter.get_issue("E1")
+        assert detail.created == original.created
+
     def test_update_missing_raises(self, yaml_adapter: FilesystemPMAdapter) -> None:
         with pytest.raises(KeyError, match="S999.1"):
             yaml_adapter.update_issue("S999.1", {"summary": "x"})

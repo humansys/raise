@@ -13,6 +13,7 @@ Architecture: S347.2 (E347 Backlog Automation)
 from __future__ import annotations
 
 import re
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -20,10 +21,13 @@ import yaml
 
 from rai_cli.adapters.models import (
     AdapterHealth,
+    BacklogComment,
     BacklogItem,
+    BacklogLink,
     BatchResult,
     Comment,
     CommentRef,
+    FailureDetail,
     IssueDetail,
     IssueRef,
     IssueSpec,
@@ -355,8 +359,6 @@ class FilesystemPMAdapter:
     def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef:
         """Create a new issue."""
         if self._use_yaml:
-            from datetime import UTC, datetime
-
             meta = issue.metadata or {}
             now = datetime.now(UTC).isoformat()
             itype = issue.issue_type.lower()
@@ -405,13 +407,18 @@ class FilesystemPMAdapter:
         self._write_lines(lines)
         return IssueRef(key=epic_id)
 
+    # Fields that must not be mutated via update_issue()
+    _IMMUTABLE_FIELDS: frozenset[str] = frozenset(
+        {"key", "created", "comments", "links"}
+    )
+
     def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
         """Update fields on an existing issue."""
         if self._use_yaml:
-            from datetime import UTC, datetime
-
             item = self._load_item(key)
             for field_name, value in fields.items():
+                if field_name in self._IMMUTABLE_FIELDS:
+                    continue
                 if hasattr(item, field_name):
                     setattr(item, field_name, value)
             item.updated = datetime.now(UTC).isoformat()
@@ -440,8 +447,6 @@ class FilesystemPMAdapter:
     def transition_issue(self, key: str, status: str) -> IssueRef:
         """Update issue status."""
         if self._use_yaml:
-            from datetime import UTC, datetime
-
             item = self._load_item(key)
             item.status = status
             item.updated = datetime.now(UTC).isoformat()
@@ -467,8 +472,6 @@ class FilesystemPMAdapter:
 
     def batch_transition(self, keys: list[str], status: str) -> BatchResult:
         """Transition multiple issues."""
-        from rai_cli.adapters.models import FailureDetail
-
         succeeded: list[IssueRef] = []
         failed: list[FailureDetail] = []
         for key in keys:
@@ -484,8 +487,6 @@ class FilesystemPMAdapter:
     def link_to_parent(self, child_key: str, parent_key: str) -> None:
         """Set parent field on child issue."""
         if self._use_yaml:
-            from datetime import UTC, datetime
-
             item = self._load_item(child_key)
             item.parent = parent_key
             item.updated = datetime.now(UTC).isoformat()
@@ -496,10 +497,6 @@ class FilesystemPMAdapter:
     def link_issues(self, source: str, target: str, link_type: str) -> None:
         """Add a link from source to target."""
         if self._use_yaml:
-            from datetime import UTC, datetime
-
-            from rai_cli.adapters.models import BacklogLink
-
             item = self._load_item(source)
             item.links.append(BacklogLink(target=target, link_type=link_type))
             item.updated = datetime.now(UTC).isoformat()
@@ -510,10 +507,6 @@ class FilesystemPMAdapter:
     def add_comment(self, key: str, body: str) -> CommentRef:
         """Add a comment to an issue."""
         if self._use_yaml:
-            from datetime import UTC, datetime
-
-            from rai_cli.adapters.models import BacklogComment
-
             item = self._load_item(key)
             next_n = len(item.comments) + 1
             comment_id = f"{key}-{next_n}"
