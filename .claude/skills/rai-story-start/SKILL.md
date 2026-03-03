@@ -126,6 +126,11 @@ rai backlog transition {story_key} in_progress
 |-----------|--------|
 | Story has ticket | Transition to `in_progress` |
 | No ticket found | Skip (not all stories are tracked externally) |
+| Transition fails | Log warning and continue — backlog errors are **non-blocking** for lifecycle |
+
+<if-blocked>
+Adapter not configured or transition fails → log and continue. Backlog sync is best-effort; it must never block story work.
+</if-blocked>
 
 ### Step 4: Present Next Steps
 
@@ -141,6 +146,7 @@ Show the developer:
 | Story branch | `story/s{N}.{M}/{slug}` (or epic branch for S/XS) |
 | User Story | `stories/s{N}.{M}-story.md` (Connextra + Gherkin AC) |
 | Scope commit | On story branch |
+| Backlog update | via `rai backlog transition` (best-effort) |
 | Next | `/rai-story-design` |
 
 ## Quality Checklist

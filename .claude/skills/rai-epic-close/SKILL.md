@@ -141,9 +141,18 @@ Merge conflicts → resolve preserving epic work.
 rai signal emit-work epic E{N} --event complete
 ```
 
+| Condition | Action |
+|-----------|--------|
+| Transition succeeds | Continue |
+| Transition fails | Log warning and continue — backlog errors are **non-blocking** for lifecycle |
+
 <verification>
 Backlog reflects completion. Local context updated.
 </verification>
+
+<if-blocked>
+Adapter not configured or transition fails → log and continue. Backlog sync is best-effort; it must never block epic close.
+</if-blocked>
 
 ## Output
 
