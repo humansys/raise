@@ -101,7 +101,7 @@ def _read_bundled_content(
     return raw
 
 
-def _copy_skill_tree(
+def copy_skill_tree(
     source_dir: Path | Traversable,
     dest_dir: Path,
     result: SkillScaffoldResult,
@@ -150,7 +150,7 @@ def _copy_skill_tree(
             copied += 1
             logger.debug("Copied: %s", dest)
         elif item.is_dir():
-            copied += _copy_skill_tree(
+            copied += copy_skill_tree(
                 item,
                 dest,
                 result,
@@ -232,7 +232,7 @@ def scaffold_skills(
         # --- Case: skill doesn't exist on disk → install ---
         if not skill_md.exists():
             if not dry_run:
-                copied = _copy_skill_tree(
+                copied = copy_skill_tree(
                     source,
                     skill_dest,
                     result,
@@ -274,7 +274,7 @@ def scaffold_skills(
                 skill_md.write_text(bundled_content, encoding="utf-8")
                 result.files_copied.append(str(skill_md))
                 # Also update reference files
-                _copy_skill_tree(
+                copy_skill_tree(
                     source,
                     skill_dest,
                     result,
@@ -299,7 +299,7 @@ def scaffold_skills(
                 if not dry_run:
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
-                    _copy_skill_tree(
+                    copy_skill_tree(
                         source,
                         skill_dest,
                         result,
@@ -342,7 +342,7 @@ def scaffold_skills(
                 ):
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
-                    _copy_skill_tree(
+                    copy_skill_tree(
                         source,
                         skill_dest,
                         result,
@@ -363,7 +363,7 @@ def scaffold_skills(
                     backup_path.write_text(on_disk_content, encoding="utf-8")
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
-                    _copy_skill_tree(
+                    copy_skill_tree(
                         source,
                         skill_dest,
                         result,
@@ -406,7 +406,7 @@ def scaffold_skills(
                     continue
                 if not (skill_dir / "SKILL.md").exists():
                     continue
-                _copy_skill_tree(
+                copy_skill_tree(
                     skill_dir,
                     skills_dir / skill_dir.name,
                     result,

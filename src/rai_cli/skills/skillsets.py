@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field
 
 from rai_cli.config.paths import get_raise_dir
 from rai_cli.onboarding.skill_manifest import compute_content_hash
-from rai_cli.onboarding.skills import _copy_skill_tree
+from rai_cli.onboarding.skills import copy_skill_tree
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +101,7 @@ def create_skill_set(
     for skill_name in DISTRIBUTABLE_SKILLS:
         source = base / skill_name
         dest = set_dir / skill_name
-        _copy_skill_tree(source, dest, result, overwrite=True)
+        copy_skill_tree(source, dest, result, overwrite=True)
 
     return CreateResult(
         created=True,

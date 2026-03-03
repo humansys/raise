@@ -465,11 +465,11 @@ class TestSkillSetOverlay:
 
 
 class TestCopySkillTreePath:
-    """Tests for _copy_skill_tree accepting Path source (AR R1)."""
+    """Tests for copy_skill_tree accepting Path source (AR R1)."""
 
     def test_copy_from_path_source(self, tmp_path: Path) -> None:
-        """_copy_skill_tree should work with Path source, not just Traversable."""
-        from rai_cli.onboarding.skills import _copy_skill_tree
+        """copy_skill_tree should work with Path source, not just Traversable."""
+        from rai_cli.onboarding.skills import copy_skill_tree
 
         source = tmp_path / "source" / "my-skill"
         source.mkdir(parents=True)
@@ -478,7 +478,7 @@ class TestCopySkillTreePath:
         dest = tmp_path / "dest" / "my-skill"
         result = SkillScaffoldResult()
 
-        copied = _copy_skill_tree(source, dest, result, overwrite=True)
+        copied = copy_skill_tree(source, dest, result, overwrite=True)
 
         assert copied == 1
         assert (dest / "SKILL.md").read_text(encoding="utf-8") == "# Test Skill"
