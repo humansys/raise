@@ -71,6 +71,7 @@
 | [RAISE-364](https://humansys.atlassian.net/browse/RAISE-364) | **Rai Experience Portability** | 📋 Backlog | — | P0 (v2.2) |
 | [RAISE-369](https://humansys.atlassian.net/browse/RAISE-369) | **Open Source Readiness Audit** | 📋 Backlog | — | P0 (v2.2) |
 | [RAISE-378](https://humansys.atlassian.net/browse/RAISE-378) | **rai doctor — Diagnostic & Bug Reporting** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-402](https://humansys.atlassian.net/browse/RAISE-402) | **Typed Skill Artifacts** (E354) | 🚀 In Progress | `work/epics/e354-typed-skill-artifacts/scope.md` | P1 |
 
 ### Release Roadmap (revised SES-294, 2026-02-26)
 
