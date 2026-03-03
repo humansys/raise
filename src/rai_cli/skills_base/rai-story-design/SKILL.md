@@ -15,13 +15,16 @@ metadata:
   raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.2.0"
+  raise.version: "2.3.0"
   raise.visibility: public
+  raise.output_type: story-design
   raise.inputs: |
     - story_md: file_path, required, previous_skill
     - scope_md: file_path, optional, previous_skill
   raise.outputs: |
-    - design_md: file_path, next_skill
+    - design_yaml: file_path, .raise/artifacts/
+    - design_md: file_path, work/docs/
+    - design_md_legacy: file_path, next_skill
 ---
 
 # Story Design
@@ -135,9 +138,54 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 
 ## Output
 
+After completing all steps, produce the design in three locations:
+
+### 1. Typed artifact (source of truth)
+
+Write a YAML artifact to `.raise/artifacts/s{N}.{M}-design.yaml` with this structure:
+
+```yaml
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '{ISO 8601 timestamp}'
+story: 'S{N}.{M}'
+epic: 'E{N}'
+content:
+  summary: '{Problem + Value in 1-2 sentences}'
+  complexity: simple|moderate|complex
+  acceptance_criteria:
+    - id: AC1
+      description: '{criterion text}'
+      verifiable: true
+  integration_points:
+    - module: '{dotted.module.path}'
+      change_type: new|modification|deletion
+      files: ['{relative/path.py}']
+  decisions:
+    - id: D1
+      choice: '{what was chosen}'
+      rationale: '{why}'
+      alternatives_considered: ['{alt1}', '{alt2}']
+refs:
+  backlog_item: '{RAISE-NNN}'
+  epic_scope: 'work/epics/e{N}-{name}/scope.md'
+metadata: {}
+```
+
+### 2. Generated Markdown
+
+Write human-readable Markdown to `work/docs/s{N}.{M}-design.md` with: title, metadata, summary, acceptance criteria, integration points, decisions.
+
+### 3. Legacy copy
+
+Also write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` for compatibility with other skills that reference this path.
+
 | Item | Destination |
 |------|-------------|
-| Design spec | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
+| Typed artifact | `.raise/artifacts/s{N}.{M}-design.yaml` |
+| Generated docs | `work/docs/s{N}.{M}-design.md` |
+| Legacy copy | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
 | Next | `/rai-story-plan` |
 
 ## Quality Checklist
