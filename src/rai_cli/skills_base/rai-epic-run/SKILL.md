@@ -16,7 +16,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "1.1.0"
   raise.visibility: public
   raise.inputs: |
     - epic_id: string, required, argument (e.g. "E325")
@@ -114,7 +114,31 @@ When reaching phase 5 (story iteration), read the `### Progress Tracking` table 
 2. Filter rows where Status != "Done"
 3. Execute in table order (plan already resolved dependencies)
 
-For each pending story, show `── Story {N}/{total}: {story_id} ──` and invoke `/rai-story-run {story_id}`. After each completes, `/rai-story-close` updates scope.md. When all done, proceed to phase 6 (epic-close).
+> **F5 Constraint — story-run MUST execute inline (main thread).**
+> story-run forks its heavy phases via Agent tool (depth 1). If epic-run
+> forked story-run as a subagent, story-run would be at depth 1 and its
+> own forks would need depth 2 — blocked by the F5 limit (subagents
+> cannot spawn subagents). Always invoke story-run via Skill tool, never
+> via Agent tool.
+
+For each pending story (Status != "Done"), in table order:
+
+1. Show `── Story {N}/{total}: {story_id} ──`
+2. Invoke `/rai-story-run {story_id}` via **Skill tool** (inline, main thread)
+3. story-run executes — it forks its own heavy phases via Agent tool
+4. **Checkpoint** (after story-run returns):
+   a. Read the story's retrospective (`s{N}.{M}-retrospective.md`) or scope for summary
+   b. Verify and fill the `### Progress Tracking` table in `scope.md`: confirm Status is "Done" (story-close may have already set it), fill any missing Actual/Velocity/Notes
+   c. Present one-line summary: "Story {story_id}: Done — {key outcome}"
+5. Proceed to next story
+
+When all stories are done, proceed to phase 6 (epic-close).
+
+**Context management:** The main thread accumulates only checkpoint
+summaries between stories — not the full tool-call history of each
+phase (those live in forked subagent contexts that are discarded after
+each phase). This keeps the orchestrator responsive through multi-story
+epics.
 
 <verification>
 All stories completed. Progress Tracking shows all "Done".
@@ -171,6 +195,8 @@ All phases complete. Epic merged.
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip stories or reorder them — table order is plan order
 - [ ] NEVER compress a skill's steps into a summary — execute each step fully
+- [ ] Story-run invoked via Skill tool (inline), NEVER via Agent tool (F5 constraint)
+- [ ] Checkpoint between stories: summary read + progress update + one-line report
 
 ## References
 
@@ -179,3 +205,4 @@ All phases complete. Epic merged.
 - Delegation: `~/.rai/developer.yaml`, S325.2
 - BacklogHook: S325.4 (fires on `rai signal emit-work` in start/close)
 - Design: `s325.7-design.md` (decisions D1-D2-D3-D4)
+- F5 constraint & checkpoint protocol: E353 (ADR-043), S353.2, S353.3
