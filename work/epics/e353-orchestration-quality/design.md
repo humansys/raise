@@ -1,6 +1,6 @@
 ---
 epic_id: "E353"
-grounded_in: "Gemba of src/rai_cli/skills_base/rai-story-run/SKILL.md, src/rai_cli/skills_base/rai-epic-run/SKILL.md"
+grounded_in: "Gemba of all 8 phase skills + rai-story-run + rai-epic-run in src/rai_cli/skills_base/"
 ---
 
 # Epic Design: Orchestration Quality — Checkpoint & Fork
@@ -24,18 +24,28 @@ grounded_in: "Gemba of src/rai_cli/skills_base/rai-story-run/SKILL.md, src/rai_c
 
 ## Key Contracts
 
-### Artifact I/O per phase (story-run)
+### Artifact I/O per phase (story-run) — Gemba-verified
 
-| Phase | Reads from disk | Writes to disk |
-|-------|----------------|----------------|
-| start (inline) | — | `s{N}.{M}-story.md`, `s{N}.{M}-scope.md`, branch |
-| design (fork) | `s{N}.{M}-story.md`, `s{N}.{M}-scope.md` | `s{N}.{M}-design.md` |
-| plan (fork) | `s{N}.{M}-design.md` | `s{N}.{M}-plan.md` |
-| implement (fork) | `s{N}.{M}-plan.md`, source code | source code, tests, commits |
-| AR (fork) | `s{N}.{M}-design.md`, source code | AR verdict + findings (in review artifacts or inline) |
-| QR (fork) | source code, tests | QR verdict + findings |
-| review (fork) | all story artifacts | `s{N}.{M}-retrospective.md` |
-| close (inline) | `s{N}.{M}-retrospective.md` | merge, branch cleanup |
+| Phase | Classification | Reads from disk | Writes to disk | Returns inline |
+|-------|:-------------:|----------------|----------------|----------------|
+| start | Light (inline) | `.raise/manifest.yaml`, epic `scope.md` | `s{N}.{M}-story.md`, `s{N}.{M}-scope.md` | branch name |
+| design | Heavy (fork) | `s{N}.{M}-story.md`, epic `scope.md` (optional) | `s{N}.{M}-design.md` | — |
+| plan | Heavy (fork) | `s{N}.{M}-design.md` (optional), `s{N}.{M}-story.md` | `s{N}.{M}-plan.md` | — |
+| implement | Heavy (fork) | `s{N}.{M}-plan.md`, `s{N}.{M}-design.md`, `.raise/manifest.yaml` | source code, tests, commits, `progress.md` | task completion summary |
+| AR | Heavy (fork) | `s{N}.{M}-design.md`, `.raise/manifest.yaml`, git diff | **nothing** | verdict (PASS/PASS WITH QUESTIONS/SIMPLIFY) + findings |
+| QR | Heavy (fork) | `.raise/manifest.yaml`, git diff | **nothing** | verdict (PASS/PASS WITH RECOMMENDATIONS/FAIL) + findings |
+| review | Heavy (fork) | story artifacts, `.raise/manifest.yaml`, behavioral patterns | `s{N}.{M}-retrospective.md` | patterns emitted via CLI |
+| close | Light (inline) | `s{N}.{M}-retrospective.md`, `.raise/manifest.yaml`, epic `scope.md` | epic scope update | merge commit |
+
+### Subagent return contract
+
+For phases that write artifacts, the orchestrator confirms success by checking the file exists on disk.
+For AR/QR (inline-only, no persistent output), the orchestrator reads the verdict from the Agent tool return value.
+
+| Phase type | Success signal | Orchestrator reads |
+|-----------|---------------|-------------------|
+| Artifact-producing (design, plan, implement, review) | File exists on disk | File path confirmation from agent return |
+| Inline-only (AR, QR) | Agent return contains verdict | Verdict + findings from return value |
 
 ### Agent tool spawn pattern (story-run)
 
