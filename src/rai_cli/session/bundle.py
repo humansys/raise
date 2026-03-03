@@ -20,7 +20,6 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from rai_cli.cli.commands._resolve import resolve_adapter
 from rai_cli.graph.backends import get_active_backend
 from rai_cli.onboarding.profile import DeveloperProfile
 from rai_cli.schemas.session_state import SessionState
@@ -57,37 +56,36 @@ def _fetch_live_status(
     if not epic_key and not story_key:
         return LiveBacklogStatus()
 
-    try:
-        adapter = resolve_adapter(None)
-    except (SystemExit, Exception) as exc:
-        logger.debug("Adapter unavailable: %s", exc)
-        return LiveBacklogStatus(
-            warning="Backlog adapter unavailable — showing cached state"
-        )
-
-    return _query_adapter(adapter, epic_key, story_key, timeout)
+    return _query_adapter(epic_key, story_key, timeout)
 
 
 def _query_adapter(
-    adapter: object,
     epic_key: str,
     story_key: str,
     timeout: float,
 ) -> LiveBacklogStatus:
-    """Run adapter queries with timeout. Never raises."""
+    """Resolve adapter and run queries with timeout. Never raises.
+
+    The entire operation (adapter resolution + issue fetches) runs inside
+    the ThreadPoolExecutor so that the timeout covers everything, including
+    slow adapter startup (e.g., MCP bridge initialization).
+    """
     from concurrent.futures import ThreadPoolExecutor
     from concurrent.futures import TimeoutError as FuturesTimeoutError
 
     from rai_cli.adapters.models import IssueDetail
+    from rai_cli.adapters.protocols import ProjectManagementAdapter
+    from rai_cli.cli.commands._resolve import resolve_adapter
 
     def _do_fetch() -> LiveBacklogStatus:
+        adapter: ProjectManagementAdapter = resolve_adapter(None)
         result = LiveBacklogStatus()
         if epic_key:
-            detail: IssueDetail = adapter.get_issue(epic_key)  # type: ignore[union-attr]
+            detail: IssueDetail = adapter.get_issue(epic_key)
             result.epic_status = detail.status
             result.epic_summary = detail.summary
         if story_key:
-            detail = adapter.get_issue(story_key)  # type: ignore[union-attr]
+            detail = adapter.get_issue(story_key)
             result.story_status = detail.status
             result.story_summary = detail.summary
         return result
@@ -100,6 +98,13 @@ def _query_adapter(
         logger.debug("Live status fetch timed out after %.1fs", timeout)
         return LiveBacklogStatus(
             warning=f"Backlog query timeout ({timeout:.0f}s) — showing cached state"
+        )
+    except SystemExit:
+        # resolve_adapter() uses sys.exit() on failure; SystemExit is
+        # BaseException, not Exception, so we catch it explicitly.
+        logger.debug("Adapter unavailable (SystemExit)")
+        return LiveBacklogStatus(
+            warning="Backlog adapter unavailable — showing cached state"
         )
     except Exception as exc:
         logger.debug("Live status fetch failed: %s", exc)

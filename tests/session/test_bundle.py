@@ -29,11 +29,11 @@ from rai_cli.session.bundle import (
     LiveBacklogStatus,
     SectionManifest,
     _fetch_live_status,
-    _format_work_section,
     _format_governance_primes,
     _format_manifest,
     _format_progress,
     _format_recent_sessions,
+    _format_work_section,
     assemble_context_bundle,
     assemble_orientation,
     assemble_sections,
@@ -1449,7 +1449,7 @@ class TestLiveBacklogStatus:
         assert result.story_status == ""
         assert result.warning == ""
 
-    @patch("rai_cli.session.bundle.resolve_adapter")
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
     def test_fetch_live_status_success(self, mock_resolve: MagicMock) -> None:
         """When adapter returns IssueDetail, populate status/summary fields."""
         from rai_cli.adapters.models import IssueDetail
@@ -1494,7 +1494,7 @@ class TestLiveBacklogStatus:
         assert result.story_summary == "Session-start live query"
         assert result.warning == ""
 
-    @patch("rai_cli.session.bundle.resolve_adapter")
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
     def test_fetch_live_status_timeout(self, mock_resolve: MagicMock) -> None:
         """When adapter.get_issue hangs, return warning with 'timeout'."""
         mock_adapter = MagicMock()
@@ -1523,7 +1523,7 @@ class TestLiveBacklogStatus:
         result = _fetch_live_status(state, timeout=0.1)
         assert "timeout" in result.warning.lower()
 
-    @patch("rai_cli.session.bundle.resolve_adapter")
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
     def test_fetch_live_status_unavailable(self, mock_resolve: MagicMock) -> None:
         """When resolve_adapter raises SystemExit, return warning with 'unavailable'."""
         mock_resolve.side_effect = SystemExit(1)
