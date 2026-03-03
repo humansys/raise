@@ -6,6 +6,11 @@
 
 ---
 
+## E346 Deferred Items — 2026-03-02
+
+- [ ] **`rai init --detect` populates toolchain commands** — scanner already detects languages; extend it to detect test runners (`pytest.ini`, `package.json` scripts, `.csproj` test projects) and write `test_command`, `lint_command`, `type_check_command` to manifest automatically. Origin: S346.3 configuration-over-convention.
+- [ ] **`rai init` (greenfield) asks for toolchain commands** — during interactive setup, prompt developer: "What's your test command?" / "Lint command?" / "Type check command?" and write to manifest. Origin: S346.3 configuration-over-convention.
+
 ## E338 Deferred Items — 2026-03-01
 
 - [ ] **BM25 tool search (Level 3)** — semantic tool matching for large MCP servers. Promote when 3+ servers registered and patterns stabilize.
