@@ -114,6 +114,19 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 Scope commit on story branch with boundaries documented.
 </verification>
 
+### Step 3b: Update Backlog Status
+
+If the story has a backlog ticket (Jira key or local key):
+
+```bash
+rai backlog transition {story_key} in_progress
+```
+
+| Condition | Action |
+|-----------|--------|
+| Story has ticket | Transition to `in_progress` |
+| No ticket found | Skip (not all stories are tracked externally) |
+
 ### Step 4: Present Next Steps
 
 Show the developer:
