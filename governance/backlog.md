@@ -64,6 +64,13 @@
 | [RAISE-337](https://humansys.atlassian.net/browse/RAISE-337) | **Declarative MCP Adapter Framework** | ✅ Complete | `work/epics/e337-declarative-mcp-adapter/scope.md` | — |
 | RAISE-338 | **MCP Platform** | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
 | [RAISE-340](https://humansys.atlassian.net/browse/RAISE-340) | **Skill Set Ecosystem** | ✅ Complete | `work/epics/e340-skill-set-ecosystem/scope.md` | — |
+| [RAISE-346](https://humansys.atlassian.net/browse/RAISE-346) | **Skill Lifecycle Hardening** | 🚀 In Progress | `work/epics/e346-skill-lifecycle-hardening/scope.md` | P0 (v2.2) |
+| [RAISE-347](https://humansys.atlassian.net/browse/RAISE-347) | **Backlog Automation** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-348](https://humansys.atlassian.net/browse/RAISE-348) | **Documentation Refresh** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-349](https://humansys.atlassian.net/browse/RAISE-349) | **Adapter Integration Validation** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-364](https://humansys.atlassian.net/browse/RAISE-364) | **Rai Experience Portability** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-369](https://humansys.atlassian.net/browse/RAISE-369) | **Open Source Readiness Audit** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-378](https://humansys.atlassian.net/browse/RAISE-378) | **rai doctor — Diagnostic & Bug Reporting** | 📋 Backlog | — | P0 (v2.2) |
 
 ### Release Roadmap (revised SES-294, 2026-02-26)
 

@@ -46,9 +46,31 @@ Reflect on the completed story to extract learnings, persist patterns, reinforce
 
 ### Step 1: Verify Tests Pass
 
-```bash
-uv run pytest --tb=short
+Determine which test command to run using this priority chain:
+
+1. **Check `.raise/manifest.yaml`** for `project.test_command` — if set, use it directly (configuration over convention)
+2. **Detect language** from `project.project_type` in manifest, or scan file extensions of changed files (`git diff --name-only`)
+3. **Map language to default** using the table below
+
+```yaml
+# .raise/manifest.yaml — example
+project:
+  test_command: "cargo test --quiet"   # explicit override, highest priority
+  project_type: rust
 ```
+
+| Language | Extensions | Default Test Command |
+|----------|-----------|----------------------|
+| Python | `.py`, `.pyi` | `uv run pytest --tb=short` |
+| TypeScript | `.ts`, `.tsx` | `npx vitest run` or `npm test` |
+| JavaScript | `.js`, `.jsx` | `npx vitest run` or `npm test` |
+| C# | `.cs` | `dotnet test --verbosity quiet` |
+| Go | `.go` | `go test ./...` |
+| PHP | `.php` | `vendor/bin/phpunit` |
+| Dart | `.dart` | `flutter test` |
+| Unknown | — | Ask developer |
+
+The table is a **fallback** — `project.test_command` always wins when present.
 
 | Condition | Action |
 |-----------|--------|
@@ -56,7 +78,7 @@ uv run pytest --tb=short
 | Tests failing | Fix first — review requires green tests |
 
 <verification>
-All tests passing.
+Project language detected. Tests passing with appropriate runner.
 </verification>
 
 ### Step 2: Gather Data & Reflect
@@ -139,7 +161,8 @@ Calibration event recorded (or skipped if CLI unavailable).
 
 ## Quality Checklist
 
-- [ ] Tests pass before review (gate)
+- [ ] Project language detected before running tests
+- [ ] Tests pass with language-appropriate runner (gate)
 - [ ] Heutagogical checkpoint answered with specific examples
 - [ ] New patterns persisted via `rai pattern add`
 - [ ] Behavioral patterns reinforced via `rai pattern reinforce`

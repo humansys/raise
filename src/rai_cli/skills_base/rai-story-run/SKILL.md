@@ -104,10 +104,16 @@ Run each skill from the detected phase forward. Between skills, show progress:
 | 7 | `/rai-story-review {story_id}` | — |
 | 8 | `/rai-story-close {story_id}` | — |
 
-Each skill invocation follows its own SKILL.md completely — the orchestrator delegates, it does not override individual skill behavior.
+**Full execution rule:** For each phase, you MUST:
+1. Load the skill's SKILL.md (read the file, don't rely on memory)
+2. Execute every step in the skill's SKILL.md sequentially — no compression, no skipping
+3. Produce all artifacts the skill specifies
+4. Only then move to the next phase
+
+The orchestrator delegates — it does not summarize, compress, or shortcut individual skill behavior. A skill invoked through the orchestrator must produce the same output as when invoked standalone.
 
 <verification>
-Each skill completes successfully before proceeding to the next.
+Each skill's SKILL.md was loaded and all its steps executed before proceeding.
 </verification>
 
 <if-blocked>
@@ -166,11 +172,13 @@ All phases complete. Story merged and branch cleaned up.
 
 - [ ] Phase detection checked in reverse order (most advanced first)
 - [ ] Delegation resolved from profile before starting chain
-- [ ] Each skill invoked completely (not partially or overridden)
+- [ ] Each skill's SKILL.md was loaded (read from file) before execution
+- [ ] Every step in each skill executed — no compression or shortcuts
 - [ ] Gates applied at post-design, post-implement, post-AR, and post-QR
 - [ ] Failure stops immediately — no cascading to next phase
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip a skill in the chain (even if developer says "just close it")
+- [ ] NEVER compress a skill's steps into a summary — execute each step fully
 
 ## References
 
