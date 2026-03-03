@@ -1,8 +1,8 @@
 # Backlog: raise-cli
 
 > **Status**: Active
-> **Date**: 2026-02-26
-> **Version**: 2.1.0
+> **Date**: 2026-03-03
+> **Version**: 2.2.0-dev
 > **Related**: PRD v1.1.0, Vision v1.0.0, Design v1.1.0
 
 ---
@@ -62,7 +62,7 @@
 | [RAISE-301](https://humansys.atlassian.net/browse/RAISE-301) | **Agent Tool Abstraction** | ✅ Complete | `work/epics/e301-agent-tool-abstraction/scope.md` | — |
 | [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | ✅ Complete | `work/epics/e325-agent-orchestrated-workflow/scope.md` | — |
 | [RAISE-337](https://humansys.atlassian.net/browse/RAISE-337) | **Declarative MCP Adapter Framework** | ✅ Complete | `work/epics/e337-declarative-mcp-adapter/scope.md` | — |
-| RAISE-338 | **MCP Platform** | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
+| [RAISE-384](https://humansys.atlassian.net/browse/RAISE-384) | **MCP Platform** (E338) | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
 | [RAISE-340](https://humansys.atlassian.net/browse/RAISE-340) | **Skill Set Ecosystem** | ✅ Complete | `work/epics/e340-skill-set-ecosystem/scope.md` | — |
 | [RAISE-346](https://humansys.atlassian.net/browse/RAISE-346) | **Skill Lifecycle Hardening** | ✅ Complete | `work/epics/e346-skill-lifecycle-hardening/scope.md` | — |
 | [RAISE-347](https://humansys.atlassian.net/browse/RAISE-347) | **Backlog Automation** | 📋 Backlog | — | P0 (v2.2) |
