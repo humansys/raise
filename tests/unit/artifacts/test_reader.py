@@ -7,19 +7,30 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from rai_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
+from rai_cli.artifacts.models import ArtifactRefs, ArtifactType
 from rai_cli.artifacts.reader import read_all_artifacts, read_artifact
+from rai_cli.artifacts.story_design import (
+    AcceptanceCriterion,
+    Complexity,
+    StoryDesignArtifact,
+    StoryDesignContent,
+)
 from rai_cli.artifacts.writer import write_artifact
 
 
-def _make_artifact(created: datetime) -> SkillArtifact:
-    return SkillArtifact(
-        artifact_type=ArtifactType.STORY_DESIGN,
+def _make_artifact(created: datetime) -> StoryDesignArtifact:
+    return StoryDesignArtifact(
         skill="rai-story-design",
         created=created,
         story="S354.1",
         epic="E354",
-        content={"summary": "test"},
+        content=StoryDesignContent(
+            summary="test",
+            complexity=Complexity.SIMPLE,
+            acceptance_criteria=[
+                AcceptanceCriterion(id="AC1", description="Works"),
+            ],
+        ),
         refs=ArtifactRefs(backlog_item="RAISE-402"),
     )
 
@@ -45,12 +56,17 @@ class TestReadAllArtifacts:
         self, project_root, sample_created
     ) -> None:
         a1 = _make_artifact(sample_created)
-        a2 = SkillArtifact(
-            artifact_type=ArtifactType.STORY_DESIGN,
+        a2 = StoryDesignArtifact(
             skill="rai-story-design",
             created=sample_created,
             story="S354.2",
-            content={"summary": "second"},
+            content=StoryDesignContent(
+                summary="second",
+                complexity=Complexity.SIMPLE,
+                acceptance_criteria=[
+                    AcceptanceCriterion(id="AC1", description="Also works"),
+                ],
+            ),
         )
         write_artifact(a1, project_root)
         write_artifact(a2, project_root)
