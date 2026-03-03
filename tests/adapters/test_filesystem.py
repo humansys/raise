@@ -78,6 +78,107 @@ class TestBacklogModels:
         assert item.priority is None
         assert item.assignee is None
 
+# ── T2: YAML store fixtures ─────────────────────────────────────────────
+
+
+@pytest.fixture()
+def yaml_store(tmp_path: Path) -> Path:
+    """Create a temp project with .raise/backlog/items/ YAML files."""
+    items = tmp_path / ".raise" / "backlog" / "items"
+    items.mkdir(parents=True)
+    (items / "E1.yaml").write_text(
+        "key: E1\n"
+        "summary: Core Foundation\n"
+        "issue_type: Epic\n"
+        "status: complete\n"
+        'created: "2026-01-01T00:00:00Z"\n'
+        'updated: "2026-02-01T00:00:00Z"\n',
+        encoding="utf-8",
+    )
+    (items / "E2.yaml").write_text(
+        "key: E2\n"
+        "summary: API Layer\n"
+        "issue_type: Epic\n"
+        "status: in_progress\n"
+        'created: "2026-01-15T00:00:00Z"\n'
+        'updated: "2026-02-15T00:00:00Z"\n',
+        encoding="utf-8",
+    )
+    (items / "S1.1.yaml").write_text(
+        "key: S1.1\n"
+        "summary: First Story\n"
+        "issue_type: Story\n"
+        "status: pending\n"
+        "parent: E1\n"
+        'created: "2026-02-01T00:00:00Z"\n'
+        'updated: "2026-02-01T00:00:00Z"\n',
+        encoding="utf-8",
+    )
+    return tmp_path
+
+
+@pytest.fixture()
+def yaml_adapter(yaml_store: Path) -> FilesystemPMAdapter:
+    return FilesystemPMAdapter(project_root=yaml_store)
+
+
+class TestYamlStoreGetIssue:
+    """T2: get_issue over YAML store."""
+
+    def test_get_epic(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        detail = yaml_adapter.get_issue("E1")
+        assert isinstance(detail, IssueDetail)
+        assert detail.key == "E1"
+        assert detail.summary == "Core Foundation"
+        assert detail.status == "complete"
+        assert detail.issue_type == "Epic"
+
+    def test_get_story_with_parent(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        detail = yaml_adapter.get_issue("S1.1")
+        assert detail.key == "S1.1"
+        assert detail.issue_type == "Story"
+        assert detail.parent_key == "E1"
+
+    def test_get_missing_raises_key_error(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        with pytest.raises(KeyError, match="S999.1"):
+            yaml_adapter.get_issue("S999.1")
+
+    def test_malformed_yaml_raises(self, yaml_store: Path) -> None:
+        items = yaml_store / ".raise" / "backlog" / "items"
+        (items / "BAD.yaml").write_text(
+            "key: BAD\nsummary: x\nissue_type: X\n", encoding="utf-8"
+        )
+        a = FilesystemPMAdapter(project_root=yaml_store)
+        with pytest.raises(ValidationError):
+            a.get_issue("BAD")
+
+
+class TestYamlStoreHealth:
+    """T2: health() over YAML store."""
+
+    def test_healthy_with_items(self, yaml_adapter: FilesystemPMAdapter) -> None:
+        h = yaml_adapter.health()
+        assert isinstance(h, AdapterHealth)
+        assert h.name == "filesystem"
+        assert h.healthy is True
+        assert "3 items" in h.message
+
+    def test_healthy_empty_store(self, tmp_path: Path) -> None:
+        items = tmp_path / ".raise" / "backlog" / "items"
+        items.mkdir(parents=True)
+        a = FilesystemPMAdapter(project_root=tmp_path)
+        h = a.health()
+        assert h.healthy is True
+        assert "0 items" in h.message
+
+    def test_unhealthy_missing_dir(self, tmp_path: Path) -> None:
+        a = FilesystemPMAdapter(project_root=tmp_path)
+        h = a.health()
+        assert h.healthy is False
+
+
+# ── Legacy markdown tests (to be removed in T7) ────────────────────────
+
 SAMPLE_BACKLOG = """\
 # Backlog: test-project
 
