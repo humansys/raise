@@ -101,8 +101,8 @@ def _read_bundled_content(
     return raw
 
 
-def _copy_skill_tree(
-    source_dir: Traversable,
+def copy_skill_tree(
+    source_dir: Path | Traversable,
     dest_dir: Path,
     result: SkillScaffoldResult,
     *,
@@ -112,8 +112,12 @@ def _copy_skill_tree(
 ) -> int:
     """Recursively copy skill files from source to destination.
 
+    Accepts both importlib Traversable (for bundled skills) and Path
+    (for filesystem overlay skills). Both types support iterdir(),
+    is_file(), is_dir(), read_text(), and name. (AR R1, S340.1)
+
     Args:
-        source_dir: Traversable resource directory.
+        source_dir: Resource directory (Traversable or Path).
         dest_dir: Target directory on filesystem.
         result: Result object to track copied/skipped files.
         plugin: Optional plugin to transform SKILL.md files.
@@ -146,7 +150,7 @@ def _copy_skill_tree(
             copied += 1
             logger.debug("Copied: %s", dest)
         elif item.is_dir():
-            copied += _copy_skill_tree(
+            copied += copy_skill_tree(
                 item,
                 dest,
                 result,
@@ -175,6 +179,7 @@ def scaffold_skills(
     force: bool = False,
     skip_updates: bool = False,
     dry_run: bool = False,
+    skill_set: str | None = None,
 ) -> SkillScaffoldResult:
     """Copy bundled skills to project skill directory with version-aware sync.
 
@@ -183,6 +188,10 @@ def scaffold_skills(
     - Customized files are preserved (user's version kept)
     - Conflicts (both changed) default to keep in non-interactive mode
 
+    When ``skill_set`` is provided, overlay skills from
+    ``.raise/skills/{skill_set}/`` are copied on top of builtins
+    after the standard deployment. Same-name overlay wins. (S340.1)
+
     Args:
         project_root: Project root directory.
         agent_config: Agent configuration. Defaults to Claude.
@@ -190,6 +199,8 @@ def scaffold_skills(
         force: If True, overwrite all files without prompting.
         skip_updates: If True, only install new skills (legacy behavior).
         dry_run: If True, compute actions but don't write files.
+        skill_set: Skill set name for overlay (e.g. "my-team").
+            None = builtins only.
 
     Returns:
         SkillScaffoldResult with details of what was done.
@@ -221,7 +232,7 @@ def scaffold_skills(
         # --- Case: skill doesn't exist on disk → install ---
         if not skill_md.exists():
             if not dry_run:
-                copied = _copy_skill_tree(
+                copied = copy_skill_tree(
                     source,
                     skill_dest,
                     result,
@@ -263,7 +274,7 @@ def scaffold_skills(
                 skill_md.write_text(bundled_content, encoding="utf-8")
                 result.files_copied.append(str(skill_md))
                 # Also update reference files
-                _copy_skill_tree(
+                copy_skill_tree(
                     source,
                     skill_dest,
                     result,
@@ -288,7 +299,7 @@ def scaffold_skills(
                 if not dry_run:
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
-                    _copy_skill_tree(
+                    copy_skill_tree(
                         source,
                         skill_dest,
                         result,
@@ -331,7 +342,7 @@ def scaffold_skills(
                 ):
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
-                    _copy_skill_tree(
+                    copy_skill_tree(
                         source,
                         skill_dest,
                         result,
@@ -352,7 +363,7 @@ def scaffold_skills(
                     backup_path.write_text(on_disk_content, encoding="utf-8")
                     skill_md.write_text(bundled_content, encoding="utf-8")
                     result.files_copied.append(str(skill_md))
-                    _copy_skill_tree(
+                    copy_skill_tree(
                         source,
                         skill_dest,
                         result,
@@ -383,6 +394,35 @@ def scaffold_skills(
             result.skills_current.append(skill_name)
             result.files_skipped.append(str(skill_md))
             result.skills_skipped_names.append(skill_name)
+
+    # --- Skill set overlay (S340.1) ---
+    if skill_set is not None and not dry_run:
+        from rai_cli.config.paths import get_raise_dir
+
+        overlay_dir = get_raise_dir(project_root) / "skills" / skill_set
+        if overlay_dir.is_dir():
+            for skill_dir in sorted(overlay_dir.iterdir()):
+                if not skill_dir.is_dir():
+                    continue
+                if not (skill_dir / "SKILL.md").exists():
+                    continue
+                copy_skill_tree(
+                    skill_dir,
+                    skills_dir / skill_dir.name,
+                    result,
+                    plugin=plugin,
+                    agent_config=config,
+                    overwrite=True,
+                )
+                overlay_content = (skill_dir / "SKILL.md").read_text(encoding="utf-8")
+                manifest.skills[skill_dir.name] = SkillEntry(
+                    sha256=compute_content_hash(overlay_content),
+                    version=cli_version,
+                    origin="project",
+                )
+            manifest.skill_set = skill_set
+        else:
+            logger.warning("Skill set '%s' not found at %s", skill_set, overlay_dir)
 
     # Update backward-compat flag
     result.already_existed = (

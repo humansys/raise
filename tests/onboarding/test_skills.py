@@ -372,6 +372,118 @@ class TestSkillSyncUpgrade:
         assert (skill_dir / "SKILL.md").exists()
 
 
+class TestSkillSetOverlay:
+    """Tests for --skill-set overlay deployment (S340.1)."""
+
+    def _create_overlay(self, project: Path, set_name: str, skills: dict[str, str]) -> None:
+        """Helper: create .raise/skills/{set}/{name}/SKILL.md files."""
+        for name, content in skills.items():
+            skill_dir = project / ".raise" / "skills" / set_name / name
+            skill_dir.mkdir(parents=True, exist_ok=True)
+            (skill_dir / "SKILL.md").write_text(content, encoding="utf-8")
+
+    def test_overlay_adds_new_skill(self, tmp_path: Path) -> None:
+        """Overlay skill not in builtins should be added to deployment."""
+        self._create_overlay(tmp_path, "my-team", {
+            "team-review": "# Team Review Skill",
+        })
+
+        result = scaffold_skills(tmp_path, skill_set="my-team")
+
+        deployed = tmp_path / ".claude" / "skills" / "team-review" / "SKILL.md"
+        assert deployed.exists()
+        assert deployed.read_text(encoding="utf-8") == "# Team Review Skill"
+
+    def test_overlay_overrides_builtin(self, tmp_path: Path) -> None:
+        """Overlay skill with same name as builtin should replace it."""
+        custom_content = "# Custom Debug Skill\n\nMy team's version."
+        self._create_overlay(tmp_path, "my-team", {
+            "rai-debug": custom_content,
+        })
+
+        scaffold_skills(tmp_path, skill_set="my-team")
+
+        deployed = tmp_path / ".claude" / "skills" / "rai-debug" / "SKILL.md"
+        assert deployed.read_text(encoding="utf-8") == custom_content
+
+    def test_overlay_marks_origin_project(self, tmp_path: Path) -> None:
+        """Overlay skills should have origin='project' in manifest."""
+        import json
+
+        self._create_overlay(tmp_path, "my-team", {
+            "team-review": "# Team Review",
+        })
+
+        scaffold_skills(tmp_path, skill_set="my-team")
+
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        assert data["skills"]["team-review"]["origin"] == "project"
+
+    def test_no_skill_set_works_as_before(self, tmp_path: Path) -> None:
+        """Without --skill-set, behavior is unchanged."""
+        result = scaffold_skills(tmp_path)
+
+        assert result.skills_copied == TOTAL_SKILLS
+        assert (tmp_path / ".claude" / "skills" / "rai-debug" / "SKILL.md").exists()
+
+    def test_nonexistent_skill_set_warns(self, tmp_path: Path) -> None:
+        """Nonexistent skill set directory should not crash."""
+        result = scaffold_skills(tmp_path, skill_set="does-not-exist")
+
+        # Builtins should still be deployed
+        assert result.skills_copied == TOTAL_SKILLS
+
+    def test_manifest_records_skill_set(self, tmp_path: Path) -> None:
+        """Manifest should record which skill set was deployed."""
+        import json
+
+        self._create_overlay(tmp_path, "my-team", {
+            "team-review": "# Team Review",
+        })
+
+        scaffold_skills(tmp_path, skill_set="my-team")
+
+        manifest_path = tmp_path / ".raise" / "manifests" / "skills.json"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        assert data["skill_set"] == "my-team"
+
+    def test_overlay_copies_subdirectories(self, tmp_path: Path) -> None:
+        """Overlay skills with subdirs (templates/, references/) should copy them."""
+        overlay_dir = tmp_path / ".raise" / "skills" / "my-team" / "team-review"
+        overlay_dir.mkdir(parents=True)
+        (overlay_dir / "SKILL.md").write_text("# Team Review", encoding="utf-8")
+        refs_dir = overlay_dir / "references"
+        refs_dir.mkdir()
+        (refs_dir / "guide.md").write_text("# Guide", encoding="utf-8")
+
+        scaffold_skills(tmp_path, skill_set="my-team")
+
+        deployed_ref = tmp_path / ".claude" / "skills" / "team-review" / "references" / "guide.md"
+        assert deployed_ref.exists()
+        assert deployed_ref.read_text(encoding="utf-8") == "# Guide"
+
+
+class TestCopySkillTreePath:
+    """Tests for copy_skill_tree accepting Path source (AR R1)."""
+
+    def test_copy_from_path_source(self, tmp_path: Path) -> None:
+        """copy_skill_tree should work with Path source, not just Traversable."""
+        from rai_cli.onboarding.skills import copy_skill_tree
+
+        source = tmp_path / "source" / "my-skill"
+        source.mkdir(parents=True)
+        (source / "SKILL.md").write_text("# Test Skill", encoding="utf-8")
+
+        dest = tmp_path / "dest" / "my-skill"
+        result = SkillScaffoldResult()
+
+        copied = copy_skill_tree(source, dest, result, overwrite=True)
+
+        assert copied == 1
+        assert (dest / "SKILL.md").read_text(encoding="utf-8") == "# Test Skill"
+
+
 class TestSkillScaffoldResult:
     """Tests for SkillScaffoldResult model."""
 
