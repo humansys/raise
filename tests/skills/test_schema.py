@@ -63,6 +63,21 @@ class TestSkillMetadata:
         assert metadata.adaptable is True
         assert metadata.version == "2.0.0"
 
+    def test_output_type_default_none(self) -> None:
+        """output_type defaults to None when not provided."""
+        metadata = SkillMetadata(work_cycle="story", version="1.0.0")
+        assert metadata.output_type is None
+
+    def test_output_type_from_raw(self) -> None:
+        """Parse output_type from raw YAML dict."""
+        raw = {
+            "raise.work_cycle": "story",
+            "raise.version": "2.2.0",
+            "raise.output_type": "story-design",
+        }
+        metadata = SkillMetadata.from_raw(raw)
+        assert metadata.output_type == "story-design"
+
 
 class TestSkillHook:
     """Tests for SkillHook models."""
