@@ -87,6 +87,35 @@ class FilesystemPMAdapter:
             items.append(BacklogItem.model_validate(raw))
         return items
 
+    # -- Key generation helpers -----------------------------------------------
+
+    def _next_epic_key(self) -> str:
+        """Scan existing E{N}.yaml files and return E{N+1}."""
+        max_n = 0
+        if self._items_dir.is_dir():
+            for path in self._items_dir.glob("E*.yaml"):
+                m = re.match(r"E(\d+)\.yaml$", path.name)
+                if m:
+                    max_n = max(max_n, int(m.group(1)))
+        return f"E{max_n + 1}"
+
+    def _next_story_key(self, parent_key: str) -> str:
+        """Scan existing S{epic_num}.{M}.yaml and return S{epic_num}.{M+1}.
+
+        Requires the parent epic key (e.g., 'E1') to derive the epic number.
+        """
+        m = re.match(r"E(\d+)", parent_key)
+        if not m:
+            raise ValueError(f"Cannot derive epic number from parent key: {parent_key}")
+        epic_num = m.group(1)
+        max_m = 0
+        if self._items_dir.is_dir():
+            for path in self._items_dir.glob(f"S{epic_num}.*.yaml"):
+                sm = re.match(rf"S{epic_num}\.(\d+)\.yaml$", path.name)
+                if sm:
+                    max_m = max(max_m, int(sm.group(1)))
+        return f"S{epic_num}.{max_m + 1}"
+
     # -- Legacy markdown helpers (fallback) ----------------------------------
 
     def _parse_epics(self) -> list[IssueSummary]:
@@ -330,9 +359,19 @@ class FilesystemPMAdapter:
 
             meta = issue.metadata or {}
             now = datetime.now(UTC).isoformat()
-            # Key generation delegated to T4 — placeholder for now
+            itype = issue.issue_type.lower()
+            if itype == "epic":
+                key = self._next_epic_key()
+            elif itype in ("story", "subtask"):
+                parent_key = meta.get("parent_key")
+                if not parent_key:
+                    raise KeyError("Story creation requires parent_key")
+                key = self._next_story_key(parent_key)
+            else:
+                # Default to epic-style key for Task and other types
+                key = self._next_epic_key()
             new_item = BacklogItem(
-                key="TODO",
+                key=key,
                 summary=issue.summary,
                 issue_type=issue.issue_type,
                 status="pending",
