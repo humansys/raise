@@ -6,6 +6,12 @@
 
 ---
 
+## E353 Deferred Items — 2026-03-03
+
+- [ ] **Parallel phase execution (AR + QR)** — AR and QR read overlapping but independent inputs; could run simultaneously. Promote when sequential execution is a latency bottleneck.
+- [ ] **`context: fork` frontmatter support** — investigate when Claude Code adds `context: fork` for Skill tool invocations; may simplify the Agent tool spawn pattern.
+- [ ] **Nested fork depth >1** — Claude Code constraint (F5): subagents can't spawn subagents. If lifted, story-run inside epic-run could fork phases for maximum quality.
+
 ## E346 Deferred Items — 2026-03-02
 
 - [x] ~~**`rai init` populates toolchain commands**~~ — done in S346.3. `detect_project_type` now auto-detects language and writes `test_command`, `lint_command`, `type_check_command` to manifest based on dominant file extensions. 14 languages supported.
