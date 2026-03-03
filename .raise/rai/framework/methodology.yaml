@@ -226,10 +226,9 @@ branches:
   structure: |
     main (stable)
       └── v2 (development)
-            └── epic/e{N}/{name}
-                  └── story/s{N}.{M}/{name}
+            └── story/s{N}.{M}/{name}
 
   flow:
-    - Stories merge to epic branch
-    - Epics merge to development branch (v2)
+    - Stories branch from and merge to development branch (v2)
     - Development merges to main at release
+    - Epics are logical containers (directory + tracker), not branches

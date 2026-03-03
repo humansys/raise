@@ -31,12 +31,11 @@ STORY: /rai-story-start → /rai-story-design → /rai-story-plan → /rai-story
 SESSION: /rai-session-start → [work] → /rai-session-close
 
 ### Gates
-- Epic branch exists before epic design
 - Story branch and scope commit before story work
 - Plan exists before implementation
 - Tests + types + lint pass before any commit
 - Retrospective complete before story close
-- Epic retrospective complete before epic merge
+- Epic retrospective complete before epic close
 
 ### Critical Rules
 - TDD always (red-green-refactor, no exceptions) — each test must justify its existence by asserting behavior, not hitting a coverage number
@@ -50,8 +49,8 @@ SESSION: /rai-session-start → [work] → /rai-session-close
 - Simple first — simple heuristics over complex solutions
 
 ## Branch Model
-main (stable) → dev (development) → epic/e{N}/{name} → story/s{N}.{M}/{name}
-Stories merge to epic, epics merge to dev, dev merges to main at release.
+main (stable) → dev (development) → story/s{N}.{M}/{name}
+Stories merge to dev. Dev merges to main at release. Epics are logical containers (directory + tracker), not branches.
 
 ## CLI Quick Reference
 
