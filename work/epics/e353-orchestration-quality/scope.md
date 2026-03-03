@@ -24,7 +24,7 @@ Eliminate the 4.6x quality gap in orchestrated skill execution by implementing t
 |----|-------|:----:|:------:|-------------|
 | S353.1 | Checkpoint contract | XS | Done | Define artifact I/O contract per phase and update skill prerequisites |
 | S353.2 | story-run fork | S | Done | Modify rai-story-run to fork heavy phases via Agent tool |
-| S353.3 | epic-run checkpoint | S | Pending | Modify rai-epic-run to checkpoint between stories and keep main thread thin for story-run forks |
+| S353.3 | epic-run checkpoint | S | Done | Modify rai-epic-run to checkpoint between stories and keep main thread thin for story-run forks |
 | S353.4 | Quality validation | S | Pending | Measure orchestrated vs standalone quality parity (>80% target) |
 
 **Total:** 4 stories
@@ -125,7 +125,7 @@ Prove the fork pattern on story-run first (where the 4.6x gap was measured), the
 |-------|:------:|---------|-----------|-------|
 | S353.1 — Checkpoint contract | Done | 2026-03-03 | 2026-03-03 | Gemba found 5 discrepancies, AR/QR inline-only finding |
 | S353.2 — story-run fork | Done | 2026-03-03 | 2026-03-03 | v2.0.0, 6 fork + 2 inline, Agent prompt template |
-| S353.3 — epic-run checkpoint | Pending | — | — | |
+| S353.3 — epic-run checkpoint | Done | 2026-03-03 | 2026-03-03 | F5 constraint, checkpoint protocol, verify-and-fill pattern |
 | S353.4 — Quality validation | Pending | — | — | |
 
 ### Sequencing Risks
