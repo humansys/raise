@@ -27,6 +27,39 @@ from rai_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
+
+class LiveBacklogStatus(BaseModel):
+    """Live status fetched from backlog adapter during session-start."""
+
+    epic_status: str = ""
+    epic_summary: str = ""
+    story_status: str = ""
+    story_summary: str = ""
+    warning: str = ""
+
+
+def _fetch_live_status(
+    state: SessionState | None,
+    timeout: float = 5.0,
+) -> LiveBacklogStatus:
+    """Query backlog adapter for live epic/story status.
+
+    Returns LiveBacklogStatus with warning on any failure.
+    Never raises — all errors are caught and surfaced as warnings.
+    """
+    if state is None:
+        return LiveBacklogStatus()
+
+    epic_key = state.current_work.epic
+    story_key = state.current_work.story
+
+    if not epic_key and not story_key:
+        return LiveBacklogStatus()
+
+    # Full implementation in T2
+    return LiveBacklogStatus()
+
+
 # Graph path relative to project root
 GRAPH_REL_PATH = Path(".raise") / "rai" / "memory" / "index.json"
 # Sessions index path relative to project root (personal = developer-specific)
