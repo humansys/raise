@@ -134,7 +134,7 @@ S347.6 ──────────────────────┘
 |-------|--------|--------|----------|-------|
 | S347.1 | ✅ Done | 20min | 1.5x | BacklogConfig + resolve_adapter manifest default |
 | S347.2 | ✅ Done | 45min | 1.3x | Full protocol parity: 7 ops, round-trip YAML, atomic writes |
-| S347.5 | Pending | | | |
+| S347.5 | ✅ Done | 35min | 1.7x | Live JQL in session-start, adapter-aware query, graceful degradation |
 | S347.3 | Pending | | | |
 | S347.4 | Pending | | | |
 | S347.6 | Pending | | | |
