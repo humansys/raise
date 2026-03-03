@@ -37,6 +37,9 @@ class SkillMetadata(BaseModel):
     adaptable: bool = Field(
         default=True, description="Whether skill can be adapted by mastery level"
     )
+    output_type: str | None = Field(
+        default=None, description="Artifact type this skill produces (e.g., story-design)"
+    )
 
     @classmethod
     def from_raw(cls, raw: dict[str, Any]) -> SkillMetadata:
