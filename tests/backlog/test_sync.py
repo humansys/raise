@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import pytest
+
 from rai_cli.adapters.models import IssueSummary
 from rai_cli.backlog.sync import SyncResult, sync_backlog
 
@@ -87,3 +89,29 @@ class TestSyncBacklog:
         sync_backlog(adapter, "jira", project_filter=None, output_path=output)
 
         assert output.exists()
+
+
+class TestFilesystemDetection:
+    """Filesystem adapter detection — T2."""
+
+    def test_filesystem_adapter_raises_valueerror(self, tmp_path: Path) -> None:
+        """Passing a FilesystemPMAdapter raises ValueError with clear message."""
+        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+
+        adapter = FilesystemPMAdapter(project_root=tmp_path)
+        output = tmp_path / "backlog.md"
+
+        with pytest.raises(ValueError, match="source of truth"):
+            sync_backlog(adapter, "filesystem", project_filter=None, output_path=output)
+
+    def test_filesystem_adapter_does_not_write_file(self, tmp_path: Path) -> None:
+        """File must not be created when filesystem adapter is rejected."""
+        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+
+        adapter = FilesystemPMAdapter(project_root=tmp_path)
+        output = tmp_path / "backlog.md"
+
+        with pytest.raises(ValueError):
+            sync_backlog(adapter, "filesystem", project_filter=None, output_path=output)
+
+        assert not output.exists()
