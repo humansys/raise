@@ -47,13 +47,14 @@ Transform skill outputs from free-form Markdown to typed YAML artifacts with Pyd
 
 ## Stories
 
-| ID | Story | Size | Depends |
-|----|-------|------|---------|
-| S354.1 | Base artifact model + storage (SkillArtifact, ArtifactType, reader/writer) | S | — |
-| S354.2 | story-design schema + Pydantic governance validators | S | S354.1 |
-| S354.3 | Graph ingestion (load_artifacts in GraphBuilder) | S | S354.1 |
-| S354.4 | Doc generation (YAML → Markdown renderer) | S | S354.2 |
-| S354.5 | Pilot: wire rai-story-design to produce typed artifact | M | S354.2, S354.4 |
+| ID | Jira | Story | Size | Depends |
+|----|------|-------|------|---------|
+| S354.1 | [RAISE-418](https://humansys.atlassian.net/browse/RAISE-418) | Base artifact model + storage | S | — |
+| S354.2 | [RAISE-419](https://humansys.atlassian.net/browse/RAISE-419) | story-design schema + governance validators | S | S354.1 |
+| S354.3 | [RAISE-420](https://humansys.atlassian.net/browse/RAISE-420) | Graph ingestion (load_artifacts in GraphBuilder) | S | S354.1 |
+| S354.4 | [RAISE-421](https://humansys.atlassian.net/browse/RAISE-421) | Doc generation (YAML → Markdown renderer) | S | S354.2 |
+| S354.5 | [RAISE-422](https://humansys.atlassian.net/browse/RAISE-422) | Pilot: wire rai-story-design to produce typed artifact | M | S354.2, S354.4 |
+| S354.6 | [RAISE-423](https://humansys.atlassian.net/browse/RAISE-423) | `rai artifact validate` CLI command | S | S354.2 |
 
 S354.3 and S354.4 can run in parallel (independent consumers).
 
@@ -87,11 +88,12 @@ Critical path: S354.1 → S354.2 → S354.4 → S354.5
 
 | Story | Status | Milestone |
 |-------|--------|-----------|
-| S354.1 Base model + storage | pending | M1 |
-| S354.2 story-design schema | pending | M1 |
-| S354.3 Graph ingestion | pending | M2 |
-| S354.4 Doc generation | pending | M2 |
-| S354.5 Pilot wiring | pending | M3 |
+| S354.1 Base model + storage | done | M1 |
+| S354.2 story-design schema | done | M1 |
+| S354.3 Graph ingestion | done | M2 |
+| S354.4 Doc generation | done | M2 |
+| S354.5 Pilot wiring | in progress | M3 |
+| S354.6 rai artifact validate | pending | M3 |
 
 ### Sequencing Risks
 
