@@ -138,4 +138,4 @@ S347.6 ──────────────────────┘
 | S347.3 | ✅ Done | 40min | 1.5x | Skills use `rai backlog` CLI: epic-start, epic-close, story-start, story-close |
 | S347.4 | ✅ Done | 30min | 1.7x | Adapter-aware hook dispatch, exact key resolution, respects manifest default |
 | S347.6 | ✅ Done | 40min | 1.5x | BacklogSyncService dual-write, adapter type guard, CLI subcommand, atomic writes |
-| S347.7 | Pending | | | |
+| S347.7 | ✅ Done | 50min | 1.4x | Protocol parity tests, flow integration, session-start live query, sync guard, full suite dogfood |
