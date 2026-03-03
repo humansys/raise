@@ -6,8 +6,11 @@ from pathlib import Path
 
 from rai_cli.onboarding.detection import (
     CODE_EXTENSIONS,
+    LANGUAGE_TOOLCHAIN,
     ProjectType,
+    ToolchainInfo,
     count_code_files,
+    detect_language,
     detect_project_type,
 )
 
@@ -136,3 +139,129 @@ class TestCodeExtensions:
         """Includes other common language extensions."""
         common = {".java", ".go", ".rs", ".rb", ".c", ".cpp", ".cs"}
         assert common.issubset(CODE_EXTENSIONS)
+
+
+class TestDetectLanguage:
+    """Tests for detect_language function."""
+
+    def test_empty_directory_returns_none(self, tmp_path: Path) -> None:
+        """No code files returns None."""
+        result = detect_language(tmp_path)
+        assert result is None
+
+    def test_python_project(self, tmp_path: Path) -> None:
+        """Detects Python as dominant language."""
+        for i in range(5):
+            (tmp_path / f"mod_{i}.py").write_text(f"# mod {i}")
+        result = detect_language(tmp_path)
+        assert result is not None
+        assert result.language == "python"
+        assert result.test_command == "uv run pytest --tb=short"
+        assert result.lint_command == "uv run ruff check"
+        assert result.type_check_command == "uv run pyright"
+
+    def test_typescript_project(self, tmp_path: Path) -> None:
+        """Detects TypeScript as dominant language."""
+        for i in range(5):
+            (tmp_path / f"component_{i}.tsx").write_text(f"// comp {i}")
+        (tmp_path / "config.ts").write_text("// config")
+        result = detect_language(tmp_path)
+        assert result is not None
+        assert result.language == "typescript"
+        assert result.test_command == "npx vitest run"
+
+    def test_csharp_project(self, tmp_path: Path) -> None:
+        """Detects C# as dominant language."""
+        for i in range(3):
+            (tmp_path / f"Service{i}.cs").write_text(f"// svc {i}")
+        result = detect_language(tmp_path)
+        assert result is not None
+        assert result.language == "csharp"
+        assert result.test_command == "dotnet test --verbosity quiet"
+
+    def test_go_project(self, tmp_path: Path) -> None:
+        """Detects Go as dominant language."""
+        (tmp_path / "main.go").write_text("package main")
+        (tmp_path / "handler.go").write_text("package main")
+        result = detect_language(tmp_path)
+        assert result is not None
+        assert result.language == "go"
+        assert result.test_command == "go test ./..."
+
+    def test_mixed_languages_picks_dominant(self, tmp_path: Path) -> None:
+        """With mixed languages, picks the one with most files."""
+        for i in range(5):
+            (tmp_path / f"mod_{i}.py").write_text(f"# py {i}")
+        (tmp_path / "config.ts").write_text("// ts")
+        (tmp_path / "util.js").write_text("// js")
+        result = detect_language(tmp_path)
+        assert result is not None
+        assert result.language == "python"
+
+    def test_unknown_language_returns_no_toolchain(self, tmp_path: Path) -> None:
+        """Language without toolchain entry returns ToolchainInfo with no commands."""
+        for i in range(3):
+            (tmp_path / f"mod_{i}.lua").write_text(f"-- lua {i}")
+        result = detect_language(tmp_path)
+        assert result is not None
+        assert result.language == "lua"
+        assert result.test_command is None
+        assert result.lint_command is None
+
+    def test_rust_project(self, tmp_path: Path) -> None:
+        """Detects Rust as dominant language."""
+        (tmp_path / "main.rs").write_text("fn main() {}")
+        (tmp_path / "lib.rs").write_text("pub mod foo;")
+        result = detect_language(tmp_path)
+        assert result is not None
+        assert result.language == "rust"
+        assert result.test_command == "cargo test"
+
+
+class TestDetectProjectTypeWithLanguage:
+    """Tests for detect_project_type including language detection."""
+
+    def test_greenfield_has_no_language(self, tmp_path: Path) -> None:
+        """Greenfield project has no language detected."""
+        result = detect_project_type(tmp_path)
+        assert result.language is None
+        assert result.toolchain is None
+
+    def test_brownfield_detects_language(self, tmp_path: Path) -> None:
+        """Brownfield project detects dominant language."""
+        for i in range(3):
+            (tmp_path / f"mod_{i}.py").write_text(f"# py {i}")
+        result = detect_project_type(tmp_path)
+        assert result.project_type == ProjectType.BROWNFIELD
+        assert result.language == "python"
+        assert result.toolchain is not None
+        assert result.toolchain.test_command == "uv run pytest --tb=short"
+
+    def test_brownfield_with_typescript(self, tmp_path: Path) -> None:
+        """Brownfield TypeScript project gets correct toolchain."""
+        (tmp_path / "app.ts").write_text("// app")
+        (tmp_path / "index.tsx").write_text("// index")
+        result = detect_project_type(tmp_path)
+        assert result.language == "typescript"
+        assert result.toolchain is not None
+        assert result.toolchain.test_command == "npx vitest run"
+
+
+class TestLanguageToolchain:
+    """Tests for LANGUAGE_TOOLCHAIN mapping."""
+
+    def test_has_core_languages(self) -> None:
+        """Toolchain mapping includes core languages."""
+        core = {"python", "typescript", "javascript", "csharp", "go", "php", "dart"}
+        assert core.issubset(set(LANGUAGE_TOOLCHAIN.keys()))
+
+    def test_all_entries_have_test_command(self) -> None:
+        """Every toolchain entry has a test command."""
+        for lang, info in LANGUAGE_TOOLCHAIN.items():
+            assert info.test_command is not None, f"{lang} missing test_command"
+
+    def test_toolchain_info_is_frozen(self) -> None:
+        """ToolchainInfo is a frozen dataclass."""
+        info = ToolchainInfo(language="test")
+        assert info.language == "test"
+        assert info.test_command is None

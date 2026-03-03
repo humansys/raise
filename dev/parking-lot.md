@@ -6,6 +6,11 @@
 
 ---
 
+## E346 Deferred Items — 2026-03-02
+
+- [x] ~~**`rai init` populates toolchain commands**~~ — done in S346.3. `detect_project_type` now auto-detects language and writes `test_command`, `lint_command`, `type_check_command` to manifest based on dominant file extensions. 14 languages supported.
+- [ ] **`rai init` greenfield interactive toolchain prompt** — during interactive setup for greenfield projects, prompt developer: "What's your test command?" Origin: S346.3. Low priority since greenfield has no files to detect from.
+
 ## E338 Deferred Items — 2026-03-01
 
 - [ ] **BM25 tool search (Level 3)** — semantic tool matching for large MCP servers. Promote when 3+ servers registered and patterns stabilize.

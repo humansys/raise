@@ -512,11 +512,17 @@ def init_command(
     if not valid_agent_types:
         valid_agent_types = ["claude"]
 
-    # Create and save manifest with agent types
+    # Create and save manifest with agent types and toolchain
     project_info = ProjectInfo(
         name=project_name,
         project_type=detection.project_type,
         code_file_count=detection.code_file_count,
+        language=detection.language,
+        test_command=detection.toolchain.test_command if detection.toolchain else None,
+        lint_command=detection.toolchain.lint_command if detection.toolchain else None,
+        type_check_command=(
+            detection.toolchain.type_check_command if detection.toolchain else None
+        ),
     )
     manifest = ProjectManifest(
         project=project_info,
