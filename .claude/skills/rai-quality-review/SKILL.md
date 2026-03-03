@@ -41,10 +41,21 @@ Act as an external auditor reviewing code that passed all automated gates. Find 
 
 ### Step 0: Detect Project Language
 
-Determine the primary language of changed files:
+Determine the primary language and toolchain using this priority chain:
 
-1. **Check `.raise/manifest.yaml`** for `project.project_type` or file extension patterns
-2. **Fallback:** Scan extensions of changed files (`git diff --name-only`) and pick the dominant language
+1. **Check `.raise/manifest.yaml`** for explicit overrides (`project.test_command`, `project.lint_command`, `project.type_check_command`) — configuration over convention
+2. **Detect language** from `project.project_type` in manifest, or scan extensions of changed files (`git diff --name-only`)
+3. **Map language to defaults** using the table below
+
+```yaml
+# .raise/manifest.yaml — example overrides
+project:
+  test_command: "npm run test:ci"       # overrides Test Runner column
+  lint_command: "biome check"           # overrides Linter column
+  type_check_command: "tsc --noEmit"    # overrides Type Checker column
+```
+
+Manifest commands always win when present. The table is a **fallback**:
 
 | Language | Extensions | Type Checker | Linter | Test Runner |
 |----------|-----------|--------------|--------|-------------|

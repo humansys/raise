@@ -46,13 +46,21 @@ Reflect on the completed story to extract learnings, persist patterns, reinforce
 
 ### Step 1: Verify Tests Pass
 
-Detect the project language and run the appropriate test command:
+Determine which test command to run using this priority chain:
 
-1. **Check `.raise/manifest.yaml`** for `project.project_type` or language hints
-2. **Fallback:** Scan file extensions of changed files (`git diff --name-only`) and pick the dominant language
+1. **Check `.raise/manifest.yaml`** for `project.test_command` — if set, use it directly (configuration over convention)
+2. **Detect language** from `project.project_type` in manifest, or scan file extensions of changed files (`git diff --name-only`)
+3. **Map language to default** using the table below
 
-| Language | Extensions | Test Command |
-|----------|-----------|--------------|
+```yaml
+# .raise/manifest.yaml — example
+project:
+  test_command: "cargo test --quiet"   # explicit override, highest priority
+  project_type: rust
+```
+
+| Language | Extensions | Default Test Command |
+|----------|-----------|----------------------|
 | Python | `.py`, `.pyi` | `uv run pytest --tb=short` |
 | TypeScript | `.ts`, `.tsx` | `npx vitest run` or `npm test` |
 | JavaScript | `.js`, `.jsx` | `npx vitest run` or `npm test` |
@@ -60,9 +68,9 @@ Detect the project language and run the appropriate test command:
 | Go | `.go` | `go test ./...` |
 | PHP | `.php` | `vendor/bin/phpunit` |
 | Dart | `.dart` | `flutter test` |
-| Unknown | — | Look for common test runner configs and ask developer |
+| Unknown | — | Ask developer |
 
-If the project defines a custom test command (e.g., in `package.json` scripts, `Makefile`, or `.raise/manifest.yaml`), prefer it over the table defaults.
+The table is a **fallback** — `project.test_command` always wins when present.
 
 | Condition | Action |
 |-----------|--------|
