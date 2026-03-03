@@ -128,7 +128,7 @@ S340.5 depends on S340.4 (skill uses CLI).
 | S340.1 | S | Done | S | 1.0x | 8 tests, overlay-only, AR R1 adopted |
 | S340.2 | S | Done | S | 1.0x | 4 tests, scaffold --set + --from-builtin |
 | S340.3 | S | Done | S | 1.0x | SRP refactor, removed Step 0 |
-| S340.4 | M | Pending | — | — | — |
+| S340.4 | M | Done | M | 1.0x | 10 tests, create/list/diff CLI, 1 QR fix |
 | S340.5 | S | Pending | — | — | — |
 
 ## Done Criteria
