@@ -82,10 +82,21 @@ def _resolve_issue_key(
 ) -> str | None:
     """Search for a backlog issue by work_id.
 
-    Strategy: label-first (``rai:{work_id}``), then summary fallback.
+    Strategy depends on adapter type:
+    - FilesystemPMAdapter: direct key lookup (no JQL)
+    - Jira/MCP: label-first (``rai:{work_id}``), then summary fallback
+
     Returns the issue key if found, None otherwise.
     """
-    # Label-first search
+    # Import inside function to avoid circular imports
+    from rai_cli.adapters.filesystem import FilesystemPMAdapter
+
+    if isinstance(adapter, FilesystemPMAdapter):
+        # FileAdapter: direct key lookup, no JQL
+        results = adapter.search(work_id, limit=1)
+        return results[0].key if results else None
+
+    # Jira/MCP: label-first search
     label_query = f'project = "{project_key}" AND labels = "rai:{work_id}"'
     results = adapter.search(label_query, limit=1)
     if results:
