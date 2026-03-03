@@ -224,8 +224,9 @@ def _find_release_for_current_epic(
 def _format_work_section(
     state: SessionState | None,
     release_node: GraphNode | None = None,
+    live: LiveBacklogStatus | None = None,
 ) -> str:
-    """Format current work state."""
+    """Format current work state with optional live backlog annotations."""
     if state is None:
         return "Work: (no previous session state)"
 
@@ -242,13 +243,24 @@ def _format_work_section(
             release_parts.append(f"— Target: {target}")
         lines.append(" ".join(release_parts))
 
-    lines.extend(
-        [
-            f"Story: {state.current_work.story} [{state.current_work.phase}]",
-            f"Epic: {state.current_work.epic}",
-            f"Branch: {state.current_work.branch}",
-        ]
-    )
+    # Story line with optional live annotation
+    story_line = f"Story: {state.current_work.story} [{state.current_work.phase}]"
+    if live and live.story_status:
+        story_line += f" — {live.story_status} (live)"
+    lines.append(story_line)
+
+    # Epic line with optional live annotation
+    epic_line = f"Epic: {state.current_work.epic}"
+    if live and live.epic_status:
+        epic_line += f" — {live.epic_status} (live)"
+    lines.append(epic_line)
+
+    lines.append(f"Branch: {state.current_work.branch}")
+
+    # Warning line for degraded live status
+    if live and live.warning:
+        lines.append(f"⚠ {live.warning}")
+
     return "\n".join(lines)
 
 
@@ -711,7 +723,10 @@ def assemble_orientation(
     if session_id:
         sections.append(f"Session: {session_id}")
 
-    sections.append(_format_work_section(state, release_node=release_node))
+    # Fetch live backlog status (never blocks — degrades gracefully)
+    live = _fetch_live_status(state)
+
+    sections.append(_format_work_section(state, release_node=release_node, live=live))
 
     # Last session + recent sessions
     sections.append(_format_last_session(state))
