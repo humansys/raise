@@ -85,11 +85,37 @@ Delegation level resolved.
 
 ### Step 2: Execute Skill Chain
 
-Run each skill from the detected phase forward. Between skills, show progress:
+Run each skill from the detected phase forward.
+
+**Phase banner (before starting):**
 
 ```
 ── Phase {N}/8: {skill_name} ──
 ```
+
+**Completion banner (after finishing each phase):**
+
+Use a markdown heading + table so that file paths are clickable in the terminal:
+
+```markdown
+### ✔ Phase {N}/8 — {skill_name}
+
+| | File | Status |
+|---|---|---|
+| + | `path/to/new-file.md` | created |
+| ~ | `path/to/modified-file.py` | modified |
+
+**Commits:** 1 (`abc1234`) · **Tests:** 3463 passed
+```
+
+Rules for the completion banner:
+- Use markdown table (NOT ASCII box-drawing) so file paths are clickable
+- File paths in backticks, relative to project root
+- `+` for created, `~` for modified, `-` for deleted
+- Only list files the skill actually touched (not inherited from prior phases)
+- Commits and tests on a single summary line below the table
+- For gate phases (design, implement, AR, QR), add verdict/summary on a separate line
+- If phase produced no file changes (e.g., close is just merge), show merge commit hash instead of file table
 
 **Chain order:**
 
@@ -150,9 +176,29 @@ After all phases complete, present:
 
 **Phases:** {start_phase} → close ({N} phases executed)
 **Delegation:** {level}
-**Artifacts:** story.md, design.md, plan.md, retrospective.md
-**Result:** Merged to {parent_branch}
+**Result:** Merged to `{parent_branch}` (`{merge_commit_hash}`)
+
+### Artifacts
+| Phase | File | Op |
+|-------|------|:--:|
+| start | `work/epics/.../stories/s{N}.{M}-story.md` | + |
+| start | `work/epics/.../stories/s{N}.{M}-scope.md` | + |
+| design | `work/epics/.../stories/s{N}.{M}-design.md` | + |
+| plan | `work/epics/.../stories/s{N}.{M}-plan.md` | + |
+| implement | `src/path/to/file.py` | ~ |
+| implement | `tests/path/to/test.py` | ~ |
+| review | `work/epics/.../stories/s{N}.{M}-retrospective.md` | + |
+
+### Metrics
+| Metric | Value |
+|--------|-------|
+| Tests | {count} passed |
+| Commits | {total_count} across {phases_count} phases |
+| Patterns | {PAT-IDs or "none"} |
+| Jira | {ticket} → {status} |
 ```
+
+File paths MUST use backticks so they are clickable in the terminal. Use actual paths, not placeholders — the table above is a template.
 
 <verification>
 All phases complete. Story merged and branch cleaned up.

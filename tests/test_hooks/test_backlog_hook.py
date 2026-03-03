@@ -1,4 +1,4 @@
-"""Tests for BacklogHook and WorkLifecycleEvent (S325.4)."""
+"""Tests for BacklogHook and WorkLifecycleEvent (S325.4, S347.4)."""
 
 from __future__ import annotations
 
@@ -166,7 +166,7 @@ class TestBacklogHookMapping:
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
-        adapter.search.return_value = []  # no existing issue
+        adapter.search.side_effect = [[], []]  # label miss, summary miss
         adapter.create_issue.return_value = IssueRef(key="RAISE-99")
         adapter.transition_issue.return_value = IssueRef(key="RAISE-99")
 
@@ -179,7 +179,7 @@ class TestBacklogHookMapping:
             result = hook.handle(event)
 
         assert result.status == "ok"
-        adapter.search.assert_called_once()
+        assert adapter.search.call_count == 2  # label + summary fallback
         adapter.create_issue.assert_called_once()
         adapter.transition_issue.assert_called_once_with("RAISE-99", "in-progress")
 
@@ -215,7 +215,7 @@ class TestBacklogHookMapping:
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
-        adapter.search.return_value = [
+        adapter.search.return_value = [  # label search finds it
             IssueSummary(
                 key="RAISE-333",
                 summary="S325.4",
@@ -241,7 +241,7 @@ class TestBacklogHookMapping:
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
-        adapter.search.return_value = []
+        adapter.search.side_effect = [[], []]  # label miss, summary miss
         adapter.create_issue.return_value = IssueRef(key="RAISE-50")
         adapter.transition_issue.return_value = IssueRef(key="RAISE-50")
 
@@ -254,6 +254,7 @@ class TestBacklogHookMapping:
             result = hook.handle(event)
 
         assert result.status == "ok"
+        assert adapter.search.call_count == 2  # label + summary fallback
         adapter.create_issue.assert_called_once()
         adapter.transition_issue.assert_called_once_with("RAISE-50", "in-progress")
 
@@ -359,11 +360,11 @@ class TestBacklogHookGracefulDegradation:
         assert result.status == "error"
 
     def test_complete_without_existing_issue_warns(self, tmp_path: Path) -> None:
-        """complete event but no Jira issue found → error (can't transition nothing)."""
+        """complete event but no issue found → error (can't transition nothing)."""
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
         adapter = MagicMock()
-        adapter.search.return_value = []
+        adapter.search.side_effect = [[], []]  # label miss, summary miss
 
         event = WorkLifecycleEvent(
             work_type="story", work_id="S1", event="complete", phase="close"
@@ -375,6 +376,154 @@ class TestBacklogHookGracefulDegradation:
 
         assert result.status == "error"
         adapter.transition_issue.assert_not_called()
+
+
+class TestAdapterAgnosticRenames:
+    """T1: Verify adapter-agnostic renames (S347.4)."""
+
+    def test_resolve_jira_key_no_longer_exists(self) -> None:
+        """Old _resolve_jira_key function is removed."""
+        import rai_cli.hooks.builtin.backlog as mod
+
+        assert not hasattr(mod, "_resolve_jira_key"), "_resolve_jira_key should be renamed to _resolve_issue_key"
+
+    def test_resolve_issue_key_exists(self) -> None:
+        """New _resolve_issue_key function exists."""
+        import rai_cli.hooks.builtin.backlog as mod
+
+        assert hasattr(mod, "_resolve_issue_key"), "_resolve_issue_key should exist"
+
+    def test_resolve_adapter_called_with_none(self, tmp_path: Path) -> None:
+        """resolve_adapter uses None (manifest-aware) instead of hardcoded 'jira'."""
+        with patch("rai_cli.cli.commands._resolve.resolve_adapter") as mock_resolve:
+            mock_resolve.return_value = MagicMock()
+            from rai_cli.hooks.builtin.backlog import resolve_adapter
+
+            resolve_adapter()
+        mock_resolve.assert_called_once_with(None)
+
+    def test_module_docstring_adapter_agnostic(self) -> None:
+        """Module docstring says 'backlog state', not 'Jira state'."""
+        import rai_cli.hooks.builtin.backlog as mod
+
+        assert "backlog state" in (mod.__doc__ or "").lower()
+
+    def test_class_docstring_adapter_agnostic(self) -> None:
+        """BacklogHook class docstring says 'backlog state', not 'Jira state'."""
+        assert "backlog state" in (BacklogHook.__doc__ or "").lower()
+
+
+class TestJiraLabelFirstSearch:
+    """T2: Jira label-first search with summary fallback (S347.4)."""
+
+    def test_jira_label_search_finds_issue(self, tmp_path: Path) -> None:
+        """Label-first search finds issue on first try — no summary fallback."""
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+        adapter = MagicMock()
+        adapter.search.return_value = [
+            IssueSummary(key="RAISE-100", summary="S99.1", status="Backlog", issue_type="Story"),
+        ]
+        adapter.transition_issue.return_value = IssueRef(key="RAISE-100")
+
+        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
+        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        # Only ONE search call (label query), not two
+        assert adapter.search.call_count == 1
+        label_query = adapter.search.call_args_list[0][0][0]
+        assert 'labels = "rai:S99.1"' in label_query
+        adapter.transition_issue.assert_called_once_with("RAISE-100", "in-progress")
+
+    def test_jira_label_miss_falls_back_to_summary(self, tmp_path: Path) -> None:
+        """Label search returns nothing, summary fallback finds issue + warning logged."""
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+        adapter = MagicMock()
+        # First call (label) returns nothing, second call (summary) returns match
+        adapter.search.side_effect = [
+            [],
+            [IssueSummary(key="RAISE-200", summary="S99.1", status="Backlog", issue_type="Story")],
+        ]
+        adapter.transition_issue.return_value = IssueRef(key="RAISE-200")
+
+        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
+        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        assert adapter.search.call_count == 2
+        # First call: label query
+        label_q = adapter.search.call_args_list[0][0][0]
+        assert 'labels = "rai:S99.1"' in label_q
+        # Second call: summary query
+        summary_q = adapter.search.call_args_list[1][0][0]
+        assert 'summary ~ "S99.1"' in summary_q
+        adapter.transition_issue.assert_called_once_with("RAISE-200", "in-progress")
+
+    def test_jira_both_searches_miss_returns_none(self, tmp_path: Path) -> None:
+        """Both label and summary searches miss — no issue created on complete."""
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+        adapter = MagicMock()
+        adapter.search.side_effect = [[], []]  # label miss, summary miss
+
+        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="complete", phase="close")
+        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+            result = hook.handle(event)
+
+        assert result.status == "error"
+        assert adapter.search.call_count == 2
+        adapter.transition_issue.assert_not_called()
+
+class TestFilesystemAdapterDirectSearch:
+    """T3: FileAdapter uses direct key search, no JQL (S347.4)."""
+
+    def test_filesystem_adapter_uses_direct_search(self, tmp_path: Path) -> None:
+        """FilesystemPMAdapter search is called with plain work_id, not JQL."""
+        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+
+        # Create a mock that passes isinstance check
+        adapter = MagicMock(spec=FilesystemPMAdapter)
+        adapter.search.return_value = [
+            IssueSummary(key="S99.1", summary="S99.1 — Test", status="pending", issue_type="Story"),
+        ]
+        adapter.transition_issue.return_value = IssueRef(key="S99.1")
+
+        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
+        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        # Direct search: called with plain work_id, not JQL
+        adapter.search.assert_called_once_with("S99.1", limit=1)
+        adapter.transition_issue.assert_called_once_with("S99.1", "in-progress")
+
+    def test_filesystem_adapter_no_match_returns_none(self, tmp_path: Path) -> None:
+        """FilesystemPMAdapter search returns empty → create is attempted."""
+        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+
+        adapter = MagicMock(spec=FilesystemPMAdapter)
+        adapter.search.return_value = []
+        adapter.create_issue.return_value = IssueRef(key="S99.1")
+        adapter.transition_issue.return_value = IssueRef(key="S99.1")
+
+        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
+        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        # Only ONE search call (direct), no label/summary fallback
+        adapter.search.assert_called_once_with("S99.1", limit=1)
+        adapter.create_issue.assert_called_once()
 
 
 class TestBacklogHookDiscovery:
@@ -409,7 +558,7 @@ class TestBacklogHookEndToEnd:
         """Full flow: emit-work story start → BacklogHook → create + transition."""
         root = _jira_yaml(tmp_path)
         adapter = MagicMock()
-        adapter.search.return_value = []
+        adapter.search.side_effect = [[], []]  # label miss, summary miss
         adapter.create_issue.return_value = IssueRef(key="RAISE-99")
         adapter.transition_issue.return_value = IssueRef(key="RAISE-99")
 
@@ -444,6 +593,6 @@ class TestBacklogHookEndToEnd:
 
         assert result.exit_code == 0
         # Adapter was called by BacklogHook via hook system
-        adapter.search.assert_called_once()
+        assert adapter.search.call_count == 2  # label + summary fallback
         adapter.create_issue.assert_called_once()
         adapter.transition_issue.assert_called_once_with("RAISE-99", "in-progress")
