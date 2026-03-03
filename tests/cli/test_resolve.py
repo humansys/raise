@@ -359,6 +359,131 @@ class TestResolveAdapterWithYaml:
         assert isinstance(adapter, ProjectManagementAdapter)
 
 
+class TestResolveAdapterManifestDefault:
+    """resolve_adapter() — manifest default resolution (S347.1)."""
+
+    def test_manifest_default_used_when_no_flag(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Manifest adapter_default selects adapter when no -a flag."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters",
+            lambda: {"jira": _StubPM, "filesystem": _StubPM},
+        )
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {},
+        )
+        # Simulate manifest with backlog.adapter_default = "jira"
+        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+
+        _fake_manifest = ProjectManifest(
+            project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
+            backlog=BacklogConfig(adapter_default="jira"),
+        )
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+    def test_explicit_flag_overrides_manifest_default(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Explicit -a flag wins over manifest default."""
+
+        class _JiraStub(_StubPM):
+            pass
+
+        class _FsStub(_StubPM):
+            pass
+
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters",
+            lambda: {"jira": _JiraStub, "filesystem": _FsStub},
+        )
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {},
+        )
+        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+
+        _fake_manifest = ProjectManifest(
+            project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
+            backlog=BacklogConfig(adapter_default="jira"),
+        )
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter("filesystem")
+        assert isinstance(adapter, _FsStub)
+
+    def test_no_manifest_falls_through_to_autodetect(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """No manifest → auto-detect still works for single adapter."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _StubPM}
+        )
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {},
+        )
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _path: None)
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+    def test_no_manifest_multiple_adapters_errors(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """No manifest + multiple adapters + no flag → error."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters",
+            lambda: {"jira": _StubPM, "filesystem": _StubPM},
+        )
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {},
+        )
+        monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _path: None)
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        with pytest.raises(SystemExit) as exc_info:
+            resolve_adapter(None)
+        assert exc_info.value.code == 1
+
+    def test_manifest_without_backlog_section(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Manifest exists but no backlog section → falls through."""
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _StubPM}
+        )
+        monkeypatch.setattr(
+            f"{_DISCOVER_MOD}.discover_yaml_adapters",
+            lambda protocol, **kw: {},
+        )
+        from rai_cli.onboarding.manifest import ProjectManifest
+
+        _fake_manifest = ProjectManifest(
+            project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
+        )
+        monkeypatch.setattr(
+            f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
+        )
+        from rai_cli.cli.commands._resolve import resolve_adapter
+
+        # Single adapter, no backlog config → auto-detect works
+        adapter = resolve_adapter(None)
+        assert isinstance(adapter, ProjectManagementAdapter)
+
+
 class TestResolveAdapterE2E:
     """End-to-end: YAML file on disk → resolve_adapter → working adapter."""
 
