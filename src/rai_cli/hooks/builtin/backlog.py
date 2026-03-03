@@ -13,7 +13,10 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
+
+if TYPE_CHECKING:
+    from rai_cli.adapters.protocols import ProjectManagementAdapter
 
 import yaml
 
@@ -78,7 +81,7 @@ def _load_jira_config(project_root: Path) -> _JiraConfig | None:
 
 
 def _resolve_issue_key(
-    adapter: Any, work_id: str, project_key: str
+    adapter: ProjectManagementAdapter, work_id: str, project_key: str
 ) -> str | None:
     """Search for a backlog issue by work_id.
 
@@ -111,7 +114,7 @@ def _resolve_issue_key(
     return None
 
 
-def resolve_adapter() -> Any:
+def resolve_adapter() -> ProjectManagementAdapter:
     """Resolve ProjectManagementAdapter via manifest default. Separated for testability."""
     from rai_cli.cli.commands._resolve import (
         resolve_adapter as _resolve,
