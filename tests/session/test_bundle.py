@@ -25,7 +25,9 @@ from rai_cli.schemas.session_state import (
 )
 from rai_cli.session.bundle import (
     SECTION_REGISTRY,
+    LiveBacklogStatus,
     SectionManifest,
+    _fetch_live_status,
     _format_governance_primes,
     _format_manifest,
     _format_progress,
@@ -1423,3 +1425,24 @@ class TestAssembleSections:
             _make_state(),
         )
         assert result == ""
+
+
+class TestLiveBacklogStatus:
+    """Tests for LiveBacklogStatus model and _fetch_live_status()."""
+
+    def test_fetch_live_status_no_work(self) -> None:
+        """When current_work has no epic/story keys, return empty status immediately."""
+        state = SessionState(
+            current_work=CurrentWork(epic="", story="", phase="", branch=""),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _fetch_live_status(state)
+        assert result == LiveBacklogStatus()
+        assert result.epic_status == ""
+        assert result.story_status == ""
+        assert result.warning == ""
