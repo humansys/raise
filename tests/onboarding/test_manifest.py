@@ -44,6 +44,68 @@ class TestProjectInfo:
         assert info.code_file_count == 47
         assert info.detected_at == now
 
+    def test_toolchain_fields_default_none(self) -> None:
+        """Toolchain fields default to None."""
+        info = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        assert info.language is None
+        assert info.test_command is None
+        assert info.lint_command is None
+        assert info.type_check_command is None
+
+    def test_toolchain_fields_set(self) -> None:
+        """Toolchain fields can be set."""
+        info = ProjectInfo(
+            name="my-py",
+            project_type=ProjectType.BROWNFIELD,
+            language="python",
+            test_command="uv run pytest --tb=short",
+            lint_command="uv run ruff check",
+            type_check_command="uv run pyright",
+        )
+        assert info.language == "python"
+        assert info.test_command == "uv run pytest --tb=short"
+        assert info.lint_command == "uv run ruff check"
+        assert info.type_check_command == "uv run pyright"
+
+    def test_toolchain_roundtrip(self, tmp_path: Path) -> None:
+        """Save and load preserves toolchain fields."""
+        project = ProjectInfo(
+            name="test",
+            project_type=ProjectType.BROWNFIELD,
+            language="typescript",
+            test_command="npx vitest run",
+            lint_command="npx eslint .",
+            type_check_command="npx tsc --noEmit",
+        )
+        original = ProjectManifest(project=project)
+        save_manifest(original, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.project.language == "typescript"
+        assert loaded.project.test_command == "npx vitest run"
+        assert loaded.project.lint_command == "npx eslint ."
+        assert loaded.project.type_check_command == "npx tsc --noEmit"
+
+    def test_loads_legacy_manifest_without_toolchain(self, tmp_path: Path) -> None:
+        """Loads manifest without toolchain fields (backward compat)."""
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 10\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.project.language is None
+        assert loaded.project.test_command is None
+        assert loaded.project.lint_command is None
+        assert loaded.project.type_check_command is None
+
 
 class TestProjectManifest:
     """Tests for ProjectManifest model."""

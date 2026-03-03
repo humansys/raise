@@ -27,12 +27,20 @@ class ProjectInfo(BaseModel):
     Attributes:
         name: Project name (usually directory name).
         project_type: Whether greenfield or brownfield.
+        language: Dominant programming language (auto-detected or user-specified).
+        test_command: Command to run tests (configuration over convention).
+        lint_command: Command to run linter (configuration over convention).
+        type_check_command: Command to run type checker (configuration over convention).
         code_file_count: Number of code files detected.
         detected_at: When the project was initialized.
     """
 
     name: str
     project_type: ProjectType
+    language: str | None = None
+    test_command: str | None = None
+    lint_command: str | None = None
+    type_check_command: str | None = None
     code_file_count: int = 0
     detected_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
