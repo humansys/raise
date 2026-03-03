@@ -23,7 +23,7 @@ def read_all_artifacts(artifacts_dir: Path) -> list[SkillArtifact]:
     """Load all artifacts from a directory.
 
     Returns an empty list if the directory doesn't exist or is empty.
-    Skips files that fail validation (logs warning).
+    Raises ``ValidationError`` if any file fails validation.
     """
     if not artifacts_dir.is_dir():
         return []
