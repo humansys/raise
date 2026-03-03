@@ -77,7 +77,7 @@ S346.2 and S346.3 touch different skills and could run in parallel with multiple
 
 | Story | Status | Actual Size | Velocity |
 |-------|--------|-------------|----------|
-| S346.1 | pending | — | — |
-| S346.2 | pending | — | — |
-| S346.3 | pending | — | — |
-| S346.4 | pending | — | — |
+| S346.1 | Done | S | ~2x |
+| S346.2 | Done | M | 1.5x |
+| S346.3 | Done | S | ~2x |
+| S346.4 | Done | S | ~3x |
