@@ -236,7 +236,11 @@ def get_session_dir(session_id: str, project_root: Path | None = None) -> Path:
     Returns:
         Path to per-session directory (e.g., .raise/rai/personal/sessions/SES-177/)
     """
-    return get_personal_dir(project_root) / SESSIONS_DIR / session_id
+    sessions_base = (get_personal_dir(project_root) / SESSIONS_DIR).resolve()
+    session_path = (sessions_base / session_id).resolve()
+    if not session_path.is_relative_to(sessions_base):
+        raise ValueError(f"Invalid session_id — path traversal detected: {session_id!r}")
+    return session_path
 
 
 def get_personal_dir(project_root: Path | None = None) -> Path:

@@ -213,6 +213,16 @@ class TestGetSessionDir:
         result = get_session_dir("SES-1", tmp_path)
         assert isinstance(result, Path)
 
+    def test_session_id_path_traversal_rejected(self, tmp_path: Path) -> None:
+        """session_id with .. components must raise ValueError."""
+        with pytest.raises(ValueError, match="path traversal"):
+            get_session_dir("../../etc/cron.d", tmp_path)
+
+    def test_session_id_deep_traversal_rejected(self, tmp_path: Path) -> None:
+        """session_id with deep traversal must raise ValueError."""
+        with pytest.raises(ValueError, match="path traversal"):
+            get_session_dir("../../../../tmp/evil", tmp_path)
+
 
 class TestEnsureGlobalRaiDir:
     """Tests for ensure_global_rai_dir() function."""
