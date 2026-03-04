@@ -1,10 +1,10 @@
 ---
 name: rai-epic-run
 description: >
-  Chain the full epic lifecycle (start → design → architecture review →
-  plan → story iterations → close) in one invocation. Resumes from last
-  completed phase. Stories iterate via /rai-story-run. Delegation
-  profile controls pause behavior at natural gates.
+  Execute epic lifecycle phases (start → design → AR → plan → close),
+  pausing at story iteration for human-driven /rai-story-run execution.
+  Resumes from last completed phase. Delegation profile controls pause
+  behavior at natural gates.
 
 license: MIT
 
@@ -16,7 +16,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "2.0.0"
   raise.visibility: public
   raise.inputs: |
     - epic_id: string, required, argument (e.g. "E325")
@@ -30,7 +30,7 @@ metadata:
 
 ## Purpose
 
-Execute the full epic lifecycle in one invocation — including iterating all stories via `/rai-story-run` — pausing only at delegation gates and resuming automatically from the last completed phase.
+Execute the epic lifecycle phases (start → design → AR → plan → close), pausing at delegation gates and at story iteration for human-driven `/rai-story-run` execution. Resumes automatically from the last completed phase.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -55,7 +55,7 @@ Resolve the epic path from `epic_id`. Check artifacts in **reverse order** — t
 | 4 | `### Progress Tracking` exists AND all rows Status = "Done" | **close** |
 | 3 | `### Progress Tracking` exists AND any row Status != "Done" | **stories** |
 | 2 | `scope.md` exists, no `### Progress Tracking` heading | **plan** |
-| 1 | epic branch exists, no `scope.md` | **design** |
+| 1 | epic directory exists, no `scope.md` | **design** |
 | 0 | (nothing) | **start** |
 
 Present: "Phase detection: resuming at **{phase}**" with context (e.g., "3/5 stories done, 2 remaining").
@@ -94,24 +94,54 @@ Run each epic skill from the detected phase forward. Show `── Phase {N}/6: {
 | 5 | Story iteration (see Step 3) | — |
 | 6 | `/rai-epic-close {epic_id}` | — |
 
-Each skill invocation follows its own SKILL.md completely.
+**Full execution rule:** For each phase, you MUST:
+1. Load the skill's SKILL.md (read the file, don't rely on memory)
+2. Execute every step in the skill's SKILL.md sequentially — no compression, no skipping
+3. Produce all artifacts the skill specifies
+4. Only then move to the next phase
+
+The orchestrator delegates — it does not summarize, compress, or shortcut individual skill behavior. A skill invoked through the orchestrator must produce the same output as when invoked standalone.
 
 <if-blocked>
 Skill fails → STOP immediately. Report which phase failed and why. Developer re-invokes `/rai-epic-run` after fixing — phase detection resumes automatically.
 </if-blocked>
 
-### Step 3: Iterate Stories
+### Step 3: Hand Off Stories
 
-When reaching phase 4, read the `### Progress Tracking` table from `scope.md`:
+When reaching phase 5 (story iteration), read the `### Progress Tracking` table from `scope.md`:
 
 1. Parse rows — columns: Story, Size, Status, Actual, Velocity, Notes
 2. Filter rows where Status != "Done"
-3. Execute in table order (plan already resolved dependencies)
+3. Present in table order (plan already resolved dependencies)
 
-For each pending story, show `── Story {N}/{total}: {story_id} ──` and invoke `/rai-story-run {story_id}`. After each completes, `/rai-story-close` updates scope.md. When all done, proceed to phase 5.
+> **Quality rule — epic-run NEVER executes story-run.**
+> Each `/rai-story-run` must run in a fresh session/context so it can
+> fork its heavy phases via Agent tool with full context budget.
+> Running story-run inside epic-run would accumulate context across
+> stories, degrading quality in later stories — the exact problem
+> Checkpoint & Fork (ADR-043) was designed to eliminate.
+> We never operate at known lower quality levels.
+
+**Present the pending stories and STOP:**
+
+```markdown
+## Stories Ready for Execution
+
+| # | Story | Size | Status |
+|:-:|-------|:----:|--------|
+| 1 | S{N}.1 — {name} | S | Pending |
+| 2 | S{N}.2 — {name} | M | Pending |
+
+**Next:** Run each story independently with `/rai-story-run {story_id}`
+**Resume:** Re-invoke `/rai-epic-run {epic_id}` when all stories are Done → resumes at close
+```
+
+**STOP here.** Do not proceed to phase 6. Do not invoke story-run.
+The developer runs each story in a separate session with fresh context.
+When all stories are Done, re-invoking `/rai-epic-run` detects phase=close and proceeds.
 
 <verification>
-All stories completed. Progress Tracking shows all "Done".
+Pending stories presented. Execution paused for human-driven story iteration.
 </verification>
 
 ### Step 4: Apply Delegation Gates
@@ -130,7 +160,7 @@ After **phase 2 (design)**, **phase 3 (AR)**, and **phase 4 (plan)**, apply the 
 
 If AR verdict is SIMPLIFY, STOP regardless of delegation level. Design must be revised before planning.
 
-No gate between stories — each `/rai-story-run` has its own internal gates.
+Story iteration is a mandatory STOP — stories run in separate sessions (see Step 3).
 
 <verification>
 Gate applied. Approval received (REVIEW) or notification shown (NOTIFY/AUTO).
@@ -158,11 +188,15 @@ All phases complete. Epic merged.
 - [ ] Phase detection checked in reverse order (most advanced first)
 - [ ] `### Progress Tracking` heading used as plan presence marker
 - [ ] Story iteration filters Status != "Done" (handles spikes naturally)
-- [ ] Each skill and story invoked completely (not overridden)
+- [ ] Each skill's SKILL.md was loaded (read from file) before execution
+- [ ] Every step in each skill executed — no compression or shortcuts
 - [ ] Gates applied at post-design, post-AR, and post-plan
 - [ ] Failure stops immediately — no cascading
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip stories or reorder them — table order is plan order
+- [ ] NEVER compress a skill's steps into a summary — execute each step fully
+- [ ] NEVER invoke story-run from epic-run — present list and STOP (ADR-043 quality rule)
+- [ ] Stories run in separate sessions with fresh context
 
 ## References
 
@@ -171,3 +205,4 @@ All phases complete. Epic merged.
 - Delegation: `~/.rai/developer.yaml`, S325.2
 - BacklogHook: S325.4 (fires on `rai signal emit-work` in start/close)
 - Design: `s325.7-design.md` (decisions D1-D2-D3-D4)
+- F5 constraint & checkpoint protocol: E353 (ADR-043), S353.2, S353.3

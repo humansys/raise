@@ -12,6 +12,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
+from rai_cli.cli.commands.skill_set import skill_set_app
 from rai_cli.output.formatters.skill import (
     format_name_check_human,
     format_name_check_json,
@@ -36,6 +37,7 @@ skill_app = typer.Typer(
     help="Manage RaiSE skills",
     no_args_is_help=True,
 )
+skill_app.add_typer(skill_set_app, name="set")
 
 console = Console()
 
@@ -200,6 +202,20 @@ def scaffold_command(
             help="Skill that should come after this one (next).",
         ),
     ] = None,
+    skill_set: Annotated[
+        str | None,
+        typer.Option(
+            "--set",
+            help="Skill set to create in (e.g., 'my-team'). Creates in .raise/skills/{set}/.",
+        ),
+    ] = None,
+    from_builtin: Annotated[
+        bool,
+        typer.Option(
+            "--from-builtin",
+            help="Copy from deployed builtin skill as starting point. Requires --set.",
+        ),
+    ] = False,
     format: Annotated[
         str,
         typer.Option(
@@ -211,9 +227,18 @@ def scaffold_command(
 ) -> None:
     """Create a new skill from template.
 
-    Generates a SKILL.md file with proper structure in .claude/skills/<name>/.
+    Generates a SKILL.md file with proper structure.
+    Without --set: creates in .claude/skills/<name>/.
+    With --set: creates in .raise/skills/<set>/<name>/.
     """
-    result = scaffold_skill(name, lifecycle=lifecycle, after=after, before=before)
+    result = scaffold_skill(
+        name,
+        lifecycle=lifecycle,
+        after=after,
+        before=before,
+        skill_set=skill_set,
+        from_builtin=from_builtin,
+    )
 
     # Output results
     if format == "json":

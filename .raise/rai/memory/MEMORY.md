@@ -28,10 +28,10 @@ SESSION LEVEL:
 - `/rai-session-close` — Capture learnings, update memory, log session
 
 ### Epic Skills
-- `/rai-epic-start` — Create epic branch from development branch
+- `/rai-epic-start` — Initialize epic scope and directory structure
 - `/rai-epic-design` — Design epic scope, stories, architecture
 - `/rai-epic-plan` — Sequence stories with milestones and dependencies
-- `/rai-epic-close` — Epic retrospective, metrics capture, merge to dev
+- `/rai-epic-close` — Epic retrospective, metrics capture, tracking update
 
 ### Story Skills
 - `/rai-story-start` — Create story branch and scope commit
@@ -60,11 +60,11 @@ SESSION LEVEL:
 
 | Gate | Required Before |
 |------|-----------------|
-| **Epic branch exists** | **Epic design** (/rai-epic-start) |
+| **Epic directory and scope initialized** | **Epic design** (/rai-epic-start) |
 | **Story branch and scope commit** | **Story work** (/rai-story-start) |
 | **Plan exists** | **Implementation** (/rai-story-plan) |
 | **Retrospective complete** | **Story close** (/rai-story-review) |
-| **Epic retrospective complete** | **Epic merge** (/rai-epic-close) |
+| **Epic retrospective complete** | **Epic close** (/rai-epic-close) |
 | Tests pass | Before any commit |
 | Type checks pass | Before any commit |
 | Linting passes | Before any commit |
@@ -91,14 +91,13 @@ SESSION LEVEL:
 
 ```
 main (stable)
-  └── v2 (development)
-        └── epic/e{N}/{name}
-              └── story/s{N}.{M}/{name}
+  └── dev (development)
+        └── story/s{N}.{M}/{name}
 ```
 
-- Stories merge to epic branch
-- Epics merge to development branch (v2)
+- Stories branch from and merge to development branch (dev)
 - Development merges to main at release
+- Epics are logical containers (directory + tracker), not branches
 
 ---
 

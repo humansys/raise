@@ -14,8 +14,10 @@ Replaces ``_adapter_resolve.py`` (S301.4, D7 — DRY).
 from __future__ import annotations
 
 import inspect
+import logging
 import sys
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 from rich.console import Console
@@ -23,6 +25,9 @@ from rich.console import Console
 from rai_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
 from rai_cli.adapters.registry import get_doc_targets, get_pm_adapters
 from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
+from rai_cli.onboarding.manifest import load_manifest
+
+logger = logging.getLogger(__name__)
 
 console = Console()
 
@@ -111,14 +116,28 @@ def _discover_docs() -> dict[str, Callable[[], Any]]:
 
 
 def resolve_adapter(adapter_name: str | None) -> ProjectManagementAdapter:
-    """Resolve a ProjectManagementAdapter from entry points and YAML configs."""
+    """Resolve a ProjectManagementAdapter from entry points and YAML configs.
+
+    Resolution priority:
+    1. Explicit adapter_name (from -a/--adapter flag) → use it
+    2. Manifest backlog.adapter_default → use it
+    3. Auto-detect (single adapter) or error (0 / 2+)
+    """
+    effective = adapter_name
+
+    if effective is None:
+        manifest = load_manifest(Path.cwd())
+        if manifest and manifest.backlog and manifest.backlog.adapter_default:
+            effective = manifest.backlog.adapter_default
+            logger.debug("Using manifest default adapter: %s", effective)
+
     return resolve_entrypoint(
         discover=_discover_pm,
         sync_wrapper=SyncPMAdapter,
         async_check_method="get_issue",
         group_label="PM adapter",
         flag_name="--adapter",
-        selected=adapter_name,
+        selected=effective,
     )
 
 
