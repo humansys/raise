@@ -6,6 +6,25 @@
 
 ---
 
+## E353 Deferred Items — 2026-03-03
+
+- [ ] **Parallel phase execution (AR + QR)** — AR and QR read overlapping but independent inputs; could run simultaneously. Promote when sequential execution is a latency bottleneck.
+- [ ] **`context: fork` frontmatter support** — investigate when Claude Code adds `context: fork` for Skill tool invocations; may simplify the Agent tool spawn pattern.
+- [ ] **Nested fork depth >1** — Claude Code constraint (F5): subagents can't spawn subagents. Current design avoids this by keeping story-run in main thread. If F5 is lifted, alternative architectures become possible.
+
+## E347 Deferred Items — 2026-03-03
+
+- [ ] **GitHub Issues adapter** — separate epic (RAISE-141). Promote when open source community requests it.
+- [ ] **Bidirectional Jira ↔ files sync** — explicitly rejected. One source of truth model. Revisit only if fail-fast proves too restrictive.
+- [ ] **Auto-sync backlog.md on every write** — only manual `rai backlog sync` for now. Promote if mirror staleness becomes a problem.
+- [ ] **Backlog TUI/dashboard** — out of scope. Promote if CLI output proves insufficient for overview.
+- [ ] **Skill binding per workflow state** — run specific skills when entering a state. Speculative, no consumer yet. Promote when teams request it.
+
+## E346 Deferred Items — 2026-03-02
+
+- [x] ~~**`rai init` populates toolchain commands**~~ — done in S346.3. `detect_project_type` now auto-detects language and writes `test_command`, `lint_command`, `type_check_command` to manifest based on dominant file extensions. 14 languages supported.
+- [ ] **`rai init` greenfield interactive toolchain prompt** — during interactive setup for greenfield projects, prompt developer: "What's your test command?" Origin: S346.3. Low priority since greenfield has no files to detect from.
+
 ## E338 Deferred Items — 2026-03-01
 
 - [ ] **BM25 tool search (Level 3)** — semantic tool matching for large MCP servers. Promote when 3+ servers registered and patterns stabilize.

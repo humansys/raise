@@ -15,11 +15,11 @@ metadata:
   raise.next: story-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.1.0"
+  raise.version: "3.0.0"
   raise.visibility: public
   raise.inputs: |
     - story_id: string, required, argument
-    - epic_branch: string, required, git
+    - dev_branch: string, required, config
   raise.outputs: |
     - story_branch: string, next_skill
     - story_md: file_path, next_skill
@@ -30,7 +30,7 @@ metadata:
 
 ## Purpose
 
-Initialize a story with a verified epic context, dedicated branch, and scope commit that documents boundaries and done criteria.
+Initialize a story with a dedicated branch from the development branch and a scope commit that documents boundaries and done criteria.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -44,46 +44,47 @@ Initialize a story with a verified epic context, dedicated branch, and scope com
 
 **When to skip:** Quick bug fixes (direct branch). Continuation of already-started story.
 
-**Inputs:** Story ID (S{N}.{M}), epic scope document, clear understanding of story scope.
+**Inputs:** Story ID (S{N}.{M}), epic scope document (if part of an epic), clear understanding of story scope.
 
 **Branch config:** Read `branches.development` from `.raise/manifest.yaml` for `{dev_branch}`. Default: `main`.
 
 ## Steps
 
-### Step 1: Verify Epic Branch
+### Step 1: Verify Epic Context (if applicable)
 
-For epic stories, verify the epic branch exists:
+If this story belongs to an epic, verify the epic directory and scope exist:
 
 ```bash
-git branch --list "epic/e{N}/*" | head -1
+ls work/epics/e{N}-{name}/scope.md
 ```
 
 | Condition | Action |
 |-----------|--------|
-| Epic branch exists | Continue |
-| Epic branch missing | Run `/rai-epic-start` first |
-| Standalone story | Branch from `{dev_branch}` directly |
-
-Also verify the story is listed in `work/epics/e{N}-{name}/scope.md`.
+| Epic scope exists | Continue — verify story is listed in scope |
+| Epic scope missing | Run `/rai-epic-start` first |
+| Standalone story | No epic verification needed |
 
 <verification>
-Epic branch exists. Story listed in scope (or documented as standalone).
+Epic context verified (or documented as standalone).
 </verification>
 
-### Step 2: Create Story Branch
+### Step 2: Create Story Branch from Dev
+
+Always branch from `{dev_branch}`:
 
 ```bash
+git checkout {dev_branch} && git pull origin {dev_branch}
 git checkout -b story/s{N}.{M}/{story-slug}
 ```
 
 | Condition | Action |
 |-----------|--------|
 | M/L story | Create dedicated `story/` branch |
-| S/XS on epic branch | Stay on epic branch, state skip explicitly |
-| Standalone | `story/standalone/{id}` from `{dev_branch}` |
+| S/XS story | Create branch anyway — all stories branch from `{dev_branch}` |
+| Standalone | Same — `story/s{N}.{M}/{slug}` from `{dev_branch}` |
 
 <verification>
-On story branch (or epic branch with skip stated).
+On story branch created from `{dev_branch}`.
 </verification>
 
 ### Step 3: Define Scope & Commit
@@ -114,6 +115,24 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 Scope commit on story branch with boundaries documented.
 </verification>
 
+### Step 3b: Update Backlog Status
+
+If the story has a backlog ticket (Jira key or local key):
+
+```bash
+rai backlog transition {story_key} in_progress
+```
+
+| Condition | Action |
+|-----------|--------|
+| Story has ticket | Transition to `in_progress` |
+| No ticket found | Skip (not all stories are tracked externally) |
+| Transition fails | Log warning and continue — backlog errors are **non-blocking** for lifecycle |
+
+<if-blocked>
+Adapter not configured or transition fails → log and continue. Backlog sync is best-effort; it must never block story work.
+</if-blocked>
+
 ### Step 4: Present Next Steps
 
 Show the developer:
@@ -125,18 +144,19 @@ Show the developer:
 
 | Item | Destination |
 |------|-------------|
-| Story branch | `story/s{N}.{M}/{slug}` (or epic branch for S/XS) |
+| Story branch | `story/s{N}.{M}/{slug}` from `{dev_branch}` |
 | User Story | `stories/s{N}.{M}-story.md` (Connextra + Gherkin AC) |
 | Scope commit | On story branch |
+| Backlog update | via `rai backlog transition` (best-effort) |
 | Next | `/rai-story-design` |
 
 ## Quality Checklist
 
-- [ ] Epic branch verified before creating story branch
+- [ ] Story branch created from `{dev_branch}` (never from an epic branch)
 - [ ] User Story created from `templates/story.md` (Connextra + Gherkin AC)
 - [ ] Scope commit documents in/out boundaries and done criteria
-- [ ] Story listed in epic scope document
-- [ ] NEVER create story branch without verifying epic branch exists
+- [ ] Story listed in epic scope document (if part of an epic)
+- [ ] NEVER create story branch from anything other than `{dev_branch}`
 
 ## References
 

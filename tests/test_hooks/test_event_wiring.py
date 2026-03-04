@@ -443,6 +443,8 @@ class TestInitCompleteEvent:
         mock_detection = MagicMock()
         mock_detection.project_type = ProjectType.GREENFIELD
         mock_detection.code_file_count = 0
+        mock_detection.language = None
+        mock_detection.toolchain = None
 
         mock_config = MagicMock()
         mock_config.agent_type = "claude"

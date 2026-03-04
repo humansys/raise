@@ -1,8 +1,8 @@
 # Backlog: raise-cli
 
 > **Status**: Active
-> **Date**: 2026-02-26
-> **Version**: 2.1.0
+> **Date**: 2026-03-03
+> **Version**: 2.2.0-dev
 > **Related**: PRD v1.1.0, Vision v1.0.0, Design v1.1.0
 
 ---
@@ -55,15 +55,23 @@
 | [RAISE-293](https://humansys.atlassian.net/browse/RAISE-293) | **Workstream Concept (Worktrees)** | 📋 Backlog | — | P2 |
 | [RAISE-294](https://humansys.atlassian.net/browse/RAISE-294) | **Test Infrastructure Migration** | 📋 Backlog | — | P2 |
 | [RAISE-295](https://humansys.atlassian.net/browse/RAISE-295) | **Security Fixes (Snyk/SAST/Sonar)** | 📋 Backlog | — | P2 |
-| [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | 🚀 In Progress | `work/epics/e325-agent-orchestrated-workflow/scope.md` | P1 |
 | [RAISE-156](https://humansys.atlassian.net/browse/RAISE-156) | **GTM Website** | 📋 Backlog | — | P2 |
 | [RAISE-208](https://humansys.atlassian.net/browse/RAISE-208) | **[PRO] Jira Adapter** | 📋 Backlog | — | P1 (Pro) |
 | [RAISE-209](https://humansys.atlassian.net/browse/RAISE-209) | **[PRO] Team/Org Memory** | 📋 Backlog | — | P1 (Pro) |
 | [RAISE-210](https://humansys.atlassian.net/browse/RAISE-210) | **[PRO] Jira-first UI** | 📋 Backlog | — | P2 (Pro) |
 | [RAISE-301](https://humansys.atlassian.net/browse/RAISE-301) | **Agent Tool Abstraction** | ✅ Complete | `work/epics/e301-agent-tool-abstraction/scope.md` | — |
-| [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | 🚀 In Progress | `work/epics/e325-agent-orchestrated-workflow/scope.md` | P0 |
+| [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | ✅ Complete | `work/epics/e325-agent-orchestrated-workflow/scope.md` | — |
 | [RAISE-337](https://humansys.atlassian.net/browse/RAISE-337) | **Declarative MCP Adapter Framework** | ✅ Complete | `work/epics/e337-declarative-mcp-adapter/scope.md` | — |
-| RAISE-338 | **MCP Platform** | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
+| [RAISE-384](https://humansys.atlassian.net/browse/RAISE-384) | **MCP Platform** (E338) | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
+| [RAISE-340](https://humansys.atlassian.net/browse/RAISE-340) | **Skill Set Ecosystem** | ✅ Complete | `work/epics/e340-skill-set-ecosystem/scope.md` | — |
+| [RAISE-346](https://humansys.atlassian.net/browse/RAISE-346) | **Skill Lifecycle Hardening** | ✅ Complete | `work/epics/e346-skill-lifecycle-hardening/scope.md` | — |
+| [RAISE-347](https://humansys.atlassian.net/browse/RAISE-347) | **Backlog Automation** | 🚀 In Progress | `work/epics/e347-backlog-automation/scope.md` | P0 (v2.2) |
+| [RAISE-348](https://humansys.atlassian.net/browse/RAISE-348) | **Documentation Refresh** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-349](https://humansys.atlassian.net/browse/RAISE-349) | **Adapter Integration Validation** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-364](https://humansys.atlassian.net/browse/RAISE-364) | **Rai Experience Portability** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-369](https://humansys.atlassian.net/browse/RAISE-369) | **Open Source Readiness Audit** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-378](https://humansys.atlassian.net/browse/RAISE-378) | **rai doctor — Diagnostic & Bug Reporting** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-402](https://humansys.atlassian.net/browse/RAISE-402) | **Typed Skill Artifacts** (E354) | 🚀 In Progress | `work/epics/e354-typed-skill-artifacts/scope.md` | P1 |
 
 ### Release Roadmap (revised SES-294, 2026-02-26)
 

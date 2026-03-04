@@ -16,7 +16,7 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "2.0.0"
   raise.visibility: public
   raise.inputs: |
     - story_id: string, required, argument (e.g. "S325.6")
@@ -85,29 +85,107 @@ Delegation level resolved.
 
 ### Step 2: Execute Skill Chain
 
-Run each skill from the detected phase forward. Between skills, show progress:
+Run each skill from the detected phase forward.
+
+**Phase banner (before starting):**
 
 ```
 ── Phase {N}/8: {skill_name} ──
 ```
 
+**Completion banner (after finishing each phase):**
+
+Use a markdown heading + table so that file paths are clickable in the terminal:
+
+```markdown
+### ✔ Phase {N}/8 — {skill_name}
+
+| | File | Status |
+|---|---|---|
+| + | `path/to/new-file.md` | created |
+| ~ | `path/to/modified-file.py` | modified |
+
+**Commits:** 1 (`abc1234`) · **Tests:** 3463 passed
+```
+
+Rules for the completion banner:
+- Use markdown table (NOT ASCII box-drawing) so file paths are clickable
+- File paths in backticks, relative to project root
+- `+` for created, `~` for modified, `-` for deleted
+- Only list files the skill actually touched (not inherited from prior phases)
+- Commits and tests on a single summary line below the table
+- For gate phases (design, implement, AR, QR), add verdict/summary on a separate line
+- If phase produced no file changes (e.g., close is just merge), show merge commit hash instead of file table
+
 **Chain order:**
 
-| Phase | Skill | Gate after? |
-|:-----:|-------|:-----------:|
-| 1 | `/rai-story-start {story_id}` | — |
-| 2 | `/rai-story-design {story_id}` | **POST-DESIGN** |
-| 3 | `/rai-story-plan {story_id}` | — |
-| 4 | `/rai-story-implement {story_id}` | **POST-IMPLEMENT** |
-| 5 | `/rai-architecture-review {story_id} story` | **POST-AR** |
-| 6 | `/rai-quality-review {story_id}` | **POST-QR** |
-| 7 | `/rai-story-review {story_id}` | — |
-| 8 | `/rai-story-close {story_id}` | — |
+| Phase | Skill | Execution | Gate after? |
+|:-----:|-------|:---------:|:-----------:|
+| 1 | `/rai-story-start {story_id}` | **fork** | — |
+| 2 | `/rai-story-design {story_id}` | **fork** | POST-DESIGN |
+| 3 | `/rai-story-plan {story_id}` | **fork** | — |
+| 4 | `/rai-story-implement {story_id}` | **fork** | POST-IMPLEMENT |
+| 5 | `/rai-architecture-review {story_id} story` | **fork** | POST-AR |
+| 6 | `/rai-quality-review {story_id}` | **fork** | POST-QR |
+| 7 | `/rai-story-review {story_id}` | **fork** | — |
+| 8 | `/rai-story-close {story_id}` | **fork** | — |
 
-Each skill invocation follows its own SKILL.md completely — the orchestrator delegates, it does not override individual skill behavior.
+**All phases fork.** The orchestrator is a pure coordinator — it never executes skill logic directly. This keeps the terminal output clean (subagent output is contained) and the orchestrator context minimal.
+
+#### Fork phases (all 8)
+
+Each fork phase runs in a **fresh-context subagent** via the Agent tool. This eliminates context saturation that degrades quality in later phases.
+
+**For each fork phase:**
+
+1. **Read** the skill's SKILL.md from `src/rai_cli/skills_base/rai-{skill-name}/SKILL.md`
+2. **Spawn** an Agent tool subagent with:
+   - `subagent_type: "general-purpose"`
+   - `prompt`: the agent prompt template below, filled with skill content and story context
+3. **Wait** for agent completion
+4. **Verify** output:
+   - Artifact-producing phases (start, design, plan, implement, review): confirm file exists on disk
+   - Verdict phases (AR, QR): read verdict from agent return value
+   - Close: confirm merge commit from agent return value
+5. **Show** completion banner in main thread
+6. **Apply** delegation gate if applicable (in main thread)
+
+**Agent prompt template:**
+
+```
+Execute the following skill for story {story_id}.
+
+## Skill Instructions
+
+{paste the full SKILL.md content here}
+
+## Story Context
+
+- Story ID: {story_id}
+- Epic: {epic_id}
+- Epic path: work/epics/{epic_slug}/
+- Stories path: work/epics/{epic_slug}/stories/
+- Prior artifacts on disk: {list each file that exists for this story, e.g. s353.2-story.md, s353.2-design.md}
+
+## Your Task
+
+1. Read CLAUDE.md for project-level context and rules
+2. Read the prior artifacts listed above from disk
+3. Execute every step in the Skill Instructions — no compression, no skipping
+4. Write all output artifacts to the correct paths
+5. When done, return a brief summary: what you did, artifacts created, and any verdicts or decisions
+
+ARGUMENTS: {story_id}
+```
+
+**Critical rules for fork execution:**
+- The subagent gets the SKILL.md as its prompt — it executes the full skill naturally in fresh context
+- Do NOT pass conversation history or prior phase results to the subagent — only disk artifacts and SKILL.md
+- The orchestrator stays thin — it only reads summaries and checks for artifacts between forks
+- A skill invoked through fork must produce the same output as when invoked standalone
 
 <verification>
-Each skill completes successfully before proceeding to the next.
+Each skill's SKILL.md was loaded and all its steps executed before proceeding.
 </verification>
 
 <if-blocked>
@@ -144,9 +222,29 @@ After all phases complete, present:
 
 **Phases:** {start_phase} → close ({N} phases executed)
 **Delegation:** {level}
-**Artifacts:** story.md, design.md, plan.md, retrospective.md
-**Result:** Merged to {parent_branch}
+**Result:** Merged to `{parent_branch}` (`{merge_commit_hash}`)
+
+### Artifacts
+| Phase | File | Op |
+|-------|------|:--:|
+| start | `work/epics/.../stories/s{N}.{M}-story.md` | + |
+| start | `work/epics/.../stories/s{N}.{M}-scope.md` | + |
+| design | `work/epics/.../stories/s{N}.{M}-design.md` | + |
+| plan | `work/epics/.../stories/s{N}.{M}-plan.md` | + |
+| implement | `src/path/to/file.py` | ~ |
+| implement | `tests/path/to/test.py` | ~ |
+| review | `work/epics/.../stories/s{N}.{M}-retrospective.md` | + |
+
+### Metrics
+| Metric | Value |
+|--------|-------|
+| Tests | {count} passed |
+| Commits | {total_count} across {phases_count} phases |
+| Patterns | {PAT-IDs or "none"} |
+| Jira | {ticket} → {status} |
 ```
+
+File paths MUST use backticks so they are clickable in the terminal. Use actual paths, not placeholders — the table above is a template.
 
 <verification>
 All phases complete. Story merged and branch cleaned up.
@@ -166,11 +264,15 @@ All phases complete. Story merged and branch cleaned up.
 
 - [ ] Phase detection checked in reverse order (most advanced first)
 - [ ] Delegation resolved from profile before starting chain
-- [ ] Each skill invoked completely (not partially or overridden)
-- [ ] Gates applied at post-design, post-implement, post-AR, and post-QR
+- [ ] All 8 phases spawn Agent tool subagent with full SKILL.md as prompt
+- [ ] Each subagent gets fresh context — no conversation history passed
+- [ ] Artifact-producing forks verified by checking file on disk
+- [ ] AR/QR verdicts read from agent return value
+- [ ] Gates applied at post-design, post-implement, post-AR, and post-QR (in main thread)
 - [ ] Failure stops immediately — no cascading to next phase
 - [ ] NEVER create a state file — phase detection is git-derived only
 - [ ] NEVER skip a skill in the chain (even if developer says "just close it")
+- [ ] NEVER pass conversation context to forked subagent — only disk artifacts + SKILL.md
 
 ## References
 

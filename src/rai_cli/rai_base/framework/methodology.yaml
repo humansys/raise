@@ -36,13 +36,13 @@ skills:
 
   epic:
     - name: /rai-epic-start
-      purpose: Create epic branch from development branch
+      purpose: Initialize epic scope and directory structure
       when: Starting a new epic
-      creates: Epic branch (poka-yoke gate for stories)
+      creates: Epic directory, scope document, tracker entry
 
     - name: /rai-epic-design
       purpose: Design epic scope, stories, architecture
-      when: After epic branch exists
+      when: After epic initialized
       creates: Epic scope document with story breakdown
 
     - name: /rai-epic-plan
@@ -51,16 +51,15 @@ skills:
       creates: Implementation roadmap
 
     - name: /rai-epic-close
-      purpose: Epic retrospective, metrics capture, merge to dev
+      purpose: Epic retrospective, metrics capture, tracking update
       when: All stories complete
-      creates: Retrospective, branch cleanup
+      creates: Retrospective, tracking update
 
   story:
     - name: /rai-story-start
       purpose: Create story branch and scope commit
       when: Starting a new story
-      creates: Story branch, scope documentation
-      verifies: Epic branch exists
+      creates: Story branch from dev, scope documentation
 
     - name: /rai-story-design
       purpose: Create lean specification for complex stories
@@ -131,9 +130,9 @@ skills:
 gates:
   blocking:
     - before: Epic design
-      require: Epic branch exists
+      require: Epic directory and scope initialized
       enforced_by: /rai-epic-start
-      rationale: Stories nest under epic branches
+      rationale: Epics need scope before design work begins
 
     - before: Story work
       require: Story branch and scope commit
@@ -150,7 +149,7 @@ gates:
       enforced_by: /rai-story-review
       rationale: Learning is part of done
 
-    - before: Epic merge
+    - before: Epic close
       require: Epic retrospective complete
       enforced_by: /rai-epic-close
       rationale: Meso-layer learning captured
@@ -226,10 +225,9 @@ branches:
   structure: |
     main (stable)
       └── {development_branch} (development)
-            └── epic/e{N}/{name}
-                  └── story/s{N}.{M}/{name}
+            └── story/s{N}.{M}/{name}
 
   flow:
-    - Stories merge to epic branch
-    - Epics merge to development branch ({development_branch})
-    - Development merges to main at release
+    - "Stories branch from and merge to {development_branch}"
+    - "{development_branch} merges to main at release"
+    - "Epics are logical containers (directory + tracker), not branches"

@@ -10,6 +10,7 @@ import yaml
 from rai_cli.onboarding.detection import ProjectType
 from rai_cli.onboarding.manifest import (
     AgentsManifest,
+    BacklogConfig,
     BranchConfig,
     IdeManifest,
     ProjectInfo,
@@ -43,6 +44,68 @@ class TestProjectInfo:
         assert info.project_type == ProjectType.BROWNFIELD
         assert info.code_file_count == 47
         assert info.detected_at == now
+
+    def test_toolchain_fields_default_none(self) -> None:
+        """Toolchain fields default to None."""
+        info = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        assert info.language is None
+        assert info.test_command is None
+        assert info.lint_command is None
+        assert info.type_check_command is None
+
+    def test_toolchain_fields_set(self) -> None:
+        """Toolchain fields can be set."""
+        info = ProjectInfo(
+            name="my-py",
+            project_type=ProjectType.BROWNFIELD,
+            language="python",
+            test_command="uv run pytest --tb=short",
+            lint_command="uv run ruff check",
+            type_check_command="uv run pyright",
+        )
+        assert info.language == "python"
+        assert info.test_command == "uv run pytest --tb=short"
+        assert info.lint_command == "uv run ruff check"
+        assert info.type_check_command == "uv run pyright"
+
+    def test_toolchain_roundtrip(self, tmp_path: Path) -> None:
+        """Save and load preserves toolchain fields."""
+        project = ProjectInfo(
+            name="test",
+            project_type=ProjectType.BROWNFIELD,
+            language="typescript",
+            test_command="npx vitest run",
+            lint_command="npx eslint .",
+            type_check_command="npx tsc --noEmit",
+        )
+        original = ProjectManifest(project=project)
+        save_manifest(original, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.project.language == "typescript"
+        assert loaded.project.test_command == "npx vitest run"
+        assert loaded.project.lint_command == "npx eslint ."
+        assert loaded.project.type_check_command == "npx tsc --noEmit"
+
+    def test_loads_legacy_manifest_without_toolchain(self, tmp_path: Path) -> None:
+        """Loads manifest without toolchain fields (backward compat)."""
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 10\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.project.language is None
+        assert loaded.project.test_command is None
+        assert loaded.project.lint_command is None
+        assert loaded.project.type_check_command is None
 
 
 class TestProjectManifest:
@@ -534,3 +597,72 @@ class TestManifestWithTier:
         loaded = load_manifest(tmp_path)
         assert loaded is not None
         assert loaded.tier is None
+
+
+# =============================================================================
+# BacklogConfig (S347.1)
+# =============================================================================
+
+
+class TestBacklogConfig:
+    """Tests for BacklogConfig model — optional backlog section in manifest."""
+
+    def test_defaults(self) -> None:
+        cfg = BacklogConfig()
+        assert cfg.adapter_default is None
+
+    def test_with_adapter_default(self) -> None:
+        cfg = BacklogConfig(adapter_default="jira")
+        assert cfg.adapter_default == "jira"
+
+
+class TestManifestWithBacklog:
+    """Tests for ProjectManifest with optional backlog config."""
+
+    def test_manifest_without_backlog(self) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        manifest = ProjectManifest(project=project)
+        assert manifest.backlog is None
+
+    def test_manifest_with_backlog(self) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        backlog = BacklogConfig(adapter_default="jira")
+        manifest = ProjectManifest(project=project, backlog=backlog)
+        assert manifest.backlog is not None
+        assert manifest.backlog.adapter_default == "jira"
+
+    def test_roundtrip_with_backlog(self, tmp_path: Path) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        backlog = BacklogConfig(adapter_default="filesystem")
+        manifest = ProjectManifest(project=project, backlog=backlog)
+        save_manifest(manifest, tmp_path)
+        loaded = load_manifest(tmp_path)
+
+        assert loaded is not None
+        assert loaded.backlog is not None
+        assert loaded.backlog.adapter_default == "filesystem"
+
+    def test_loads_manifest_without_backlog_field(self, tmp_path: Path) -> None:
+        rai_dir = tmp_path / ".raise"
+        rai_dir.mkdir()
+        (rai_dir / "manifest.yaml").write_text(
+            "version: '1.0'\n"
+            "project:\n"
+            "  name: old-project\n"
+            "  project_type: brownfield\n"
+            "  code_file_count: 5\n"
+            "  detected_at: '2026-01-01T00:00:00Z'\n"
+        )
+        loaded = load_manifest(tmp_path)
+        assert loaded is not None
+        assert loaded.backlog is None
+
+    def test_saved_yaml_contains_backlog_section(self, tmp_path: Path) -> None:
+        project = ProjectInfo(name="test", project_type=ProjectType.GREENFIELD)
+        backlog = BacklogConfig(adapter_default="jira")
+        manifest = ProjectManifest(project=project, backlog=backlog)
+
+        save_manifest(manifest, tmp_path)
+
+        data = yaml.safe_load((tmp_path / ".raise" / "manifest.yaml").read_text())
+        assert data["backlog"]["adapter_default"] == "jira"
