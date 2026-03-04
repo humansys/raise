@@ -119,6 +119,16 @@ class TestGetGlobalRaiDir:
         result = get_global_rai_dir()
         assert isinstance(result, Path)
 
+    def test_rai_home_path_traversal_resolved(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """RAI_HOME with .. traversal components must be resolved to canonical path."""
+        traversal = str(tmp_path / "safe" / ".." / "evil")
+        monkeypatch.setenv("RAI_HOME", traversal)
+        result = get_global_rai_dir()
+        assert ".." not in str(result)
+        assert result == (tmp_path / "evil").resolve()
+
 
 class TestGetIdentityDir:
     """Tests for get_identity_dir() function."""
