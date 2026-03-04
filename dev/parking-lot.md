@@ -25,6 +25,13 @@
 - [x] ~~**`rai init` populates toolchain commands**~~ — done in S346.3. `detect_project_type` now auto-detects language and writes `test_command`, `lint_command`, `type_check_command` to manifest based on dominant file extensions. 14 languages supported.
 - [ ] **`rai init` greenfield interactive toolchain prompt** — during interactive setup for greenfield projects, prompt developer: "What's your test command?" Origin: S346.3. Low priority since greenfield has no files to detect from.
 
+## SES-054 — 2026-03-03
+
+- [ ] **snyk:iac investigation** — job da SNYK-CLI-0000 genérico. Requiere correr con `-d` en el runner de CI para ver traza. Coordinar con Emilio. ¿Docker-compose soportado en la versión de Snyk en CI?
+- [ ] **Archivos bug-398-*.md en root** — mover bug-398-scope.md, bug-398-retro.md, bug-398-analysis.md a dev/issues/ para consistencia.
+
+---
+
 ## E338 Deferred Items — 2026-03-01
 
 - [ ] **BM25 tool search (Level 3)** — semantic tool matching for large MCP servers. Promote when 3+ servers registered and patterns stabilize.
