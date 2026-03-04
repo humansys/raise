@@ -168,7 +168,7 @@ def get_global_rai_dir() -> Path:
     """
     rai_home = os.environ.get("RAI_HOME")
     if rai_home:
-        return Path(rai_home)
+        return Path(rai_home).resolve()
     return Path.home() / GLOBAL_RAI_DIR
 
 
