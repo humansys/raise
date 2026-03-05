@@ -10,7 +10,6 @@ from rai_cli.artifacts.story_design import (
     StoryDesignArtifact,
     StoryDesignContent,
 )
-from rai_cli.artifacts.writer import _artifact_filename
 
 
 def _render_acceptance_criteria(content: StoryDesignContent) -> str:
@@ -105,21 +104,3 @@ def render_artifact(
     )
 
     return _remove_empty_sections(md)
-
-
-def write_doc(artifact: SkillArtifact, project_root: Path) -> Path:
-    """Write rendered Markdown to ``work/docs/``.
-
-    Returns:
-        Path to the written Markdown file.
-    """
-    docs_dir = project_root / "work" / "docs"
-    docs_dir.mkdir(parents=True, exist_ok=True)
-
-    # Same naming as YAML but with .md extension
-    yaml_name = _artifact_filename(artifact)
-    md_name = yaml_name.replace(".yaml", ".md")
-    path = docs_dir / md_name
-
-    path.write_text(render_artifact(artifact, project_root))
-    return path
