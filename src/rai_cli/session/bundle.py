@@ -396,6 +396,9 @@ def _format_narrative(state: SessionState | None) -> str:
     context (decisions, research, artifacts, branch state) that makes the
     next session immediately resumable.
 
+    Adds a staleness caveat so the reader knows to verify volatile
+    state (git status, branch, uncommitted files) before acting on it.
+
     Args:
         state: Session state (may be None).
 
@@ -405,7 +408,12 @@ def _format_narrative(state: SessionState | None) -> str:
     if state is None or not state.narrative:
         return ""
 
-    return f"# Session Narrative\n{state.narrative}"
+    captured_date = state.last_session.date
+    caveat = (
+        f"(Captured at session close on {captured_date}. "
+        "Git/branch state may be stale — verify before acting.)"
+    )
+    return f"# Session Narrative\n{caveat}\n{state.narrative}"
 
 
 def _format_next_session_prompt(state: SessionState | None) -> str:
@@ -413,6 +421,9 @@ def _format_next_session_prompt(state: SessionState | None) -> str:
 
     This is forward-looking guidance from Rai to her future self,
     written during session-close and presented at session-start.
+
+    Adds a staleness caveat so the reader knows to verify volatile
+    state (git status, branch, uncommitted files) before acting on it.
 
     Args:
         state: Session state (may be None).
@@ -423,7 +434,12 @@ def _format_next_session_prompt(state: SessionState | None) -> str:
     if state is None or not state.next_session_prompt:
         return ""
 
-    return f"# Next Session Prompt\n{state.next_session_prompt}"
+    captured_date = state.last_session.date
+    caveat = (
+        f"(Captured at session close on {captured_date}. "
+        "Git/branch state may be stale — verify before acting.)"
+    )
+    return f"# Next Session Prompt\n{caveat}\n{state.next_session_prompt}"
 
 
 def _format_primes(patterns: list[GraphNode]) -> str:
