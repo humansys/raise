@@ -44,6 +44,15 @@ class TestGetConfigDir:
         assert isinstance(result, Path)
 
 
+    def test_xdg_config_home_traversal_rejected(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """XDG_CONFIG_HOME with .. components must raise ValueError (CWE-23)."""
+        monkeypatch.setenv("XDG_CONFIG_HOME", "/tmp/safe/../evil")
+        with pytest.raises(ValueError, match="must not contain '..' path components"):
+            get_config_dir()
+
+
 class TestGetCacheDir:
     """Tests for get_cache_dir() function."""
 
@@ -67,6 +76,15 @@ class TestGetCacheDir:
         monkeypatch.delenv("XDG_CACHE_HOME", raising=False)
         result = get_cache_dir()
         assert isinstance(result, Path)
+
+
+    def test_xdg_cache_home_traversal_rejected(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """XDG_CACHE_HOME with .. components must raise ValueError (CWE-23)."""
+        monkeypatch.setenv("XDG_CACHE_HOME", "/tmp/safe/../evil")
+        with pytest.raises(ValueError, match="must not contain '..' path components"):
+            get_cache_dir()
 
 
 class TestGetDataDir:
@@ -94,6 +112,15 @@ class TestGetDataDir:
         assert isinstance(result, Path)
 
 
+    def test_xdg_data_home_traversal_rejected(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """XDG_DATA_HOME with .. components must raise ValueError (CWE-23)."""
+        monkeypatch.setenv("XDG_DATA_HOME", "/tmp/safe/../evil")
+        with pytest.raises(ValueError, match="must not contain '..' path components"):
+            get_data_dir()
+
+
 class TestGetGlobalRaiDir:
     """Tests for get_global_rai_dir() function."""
 
@@ -119,15 +146,32 @@ class TestGetGlobalRaiDir:
         result = get_global_rai_dir()
         assert isinstance(result, Path)
 
-    def test_rai_home_path_traversal_resolved(
+    def test_rai_home_path_traversal_rejected(
         self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
     ) -> None:
-        """RAI_HOME with .. traversal components must be resolved to canonical path."""
+        """RAI_HOME with .. traversal components must raise ValueError (CWE-23)."""
         traversal = str(tmp_path / "safe" / ".." / "evil")
         monkeypatch.setenv("RAI_HOME", traversal)
+        with pytest.raises(ValueError, match="must not contain '..' path components"):
+            get_global_rai_dir()
+
+    def test_rai_home_leading_traversal_rejected(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """RAI_HOME starting with .. must raise ValueError."""
+        monkeypatch.setenv("RAI_HOME", "../../../tmp/evil")
+        with pytest.raises(ValueError, match="must not contain '..' path components"):
+            get_global_rai_dir()
+
+    def test_rai_home_valid_absolute_path(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """RAI_HOME with a clean absolute path should work fine."""
+        clean = str(tmp_path / "custom-rai")
+        monkeypatch.setenv("RAI_HOME", clean)
         result = get_global_rai_dir()
-        assert ".." not in str(result)
-        assert result == (tmp_path / "evil").resolve()
+        assert result == Path(clean).resolve()
+        assert result.is_absolute()
 
 
 class TestGetIdentityDir:

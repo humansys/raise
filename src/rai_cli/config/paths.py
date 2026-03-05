@@ -149,6 +149,32 @@ GLOBAL_RAI_DIR = ".rai"
 PERSONAL_SUBDIR = "personal"
 
 
+def _sanitize_env_path(raw: str, var_name: str) -> Path:
+    """Sanitize a path read from an environment variable (CWE-23).
+
+    Validates that the raw value does not contain ``..`` path components
+    (before resolution) and that the resolved result is absolute.
+
+    Args:
+        raw: Raw environment variable value.
+        var_name: Variable name (for error messages).
+
+    Returns:
+        Resolved, absolute ``Path``.
+
+    Raises:
+        ValueError: If the path contains traversal components or is not absolute.
+    """
+    if ".." in raw.split(os.sep):
+        msg = f"${var_name} must not contain '..' path components: {raw}"
+        raise ValueError(msg)
+    resolved = Path(raw).resolve()
+    if not resolved.is_absolute():
+        msg = f"${var_name} must resolve to an absolute path: {raw}"
+        raise ValueError(msg)
+    return resolved
+
+
 def get_global_rai_dir() -> Path:
     """Get the global ~/.rai directory for cross-repo Rai state.
 
@@ -162,13 +188,16 @@ def get_global_rai_dir() -> Path:
     Returns:
         Path to global Rai directory (e.g., ~/.rai or $RAI_HOME)
 
+    Raises:
+        ValueError: If RAI_HOME contains path-traversal components.
+
     Example:
         >>> global_dir = get_global_rai_dir()
         >>> patterns_file = global_dir / "patterns.jsonl"
     """
     rai_home = os.environ.get("RAI_HOME")
     if rai_home:
-        return Path(rai_home).resolve()
+        return _sanitize_env_path(rai_home, "RAI_HOME")
     return Path.home() / GLOBAL_RAI_DIR
 
 
@@ -307,7 +336,7 @@ def _get_xdg_dir(env_var: str, fallback: str) -> Path:
         Path to the rai subdirectory within the XDG directory.
     """
     xdg_value = os.environ.get(env_var)
-    base = Path(xdg_value) if xdg_value else Path.home() / fallback
+    base = _sanitize_env_path(xdg_value, env_var) if xdg_value else Path.home() / fallback
     return base / "rai"
 
 
