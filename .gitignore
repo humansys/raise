@@ -4,6 +4,13 @@
 # Claude Code local settings (user-specific)
 .claude/settings.local.json
 CLAUDE.local.md
+.claude/worktrees/
+.claude/projects/
+
+# Claude Code legacy files (superseded, prevent re-addition)
+.claude/RAI.md
+.claude/RAI-naming.md
+.claude/rai.archive/
 
 # RaiSE generated/cache files
 .raise/cache/
