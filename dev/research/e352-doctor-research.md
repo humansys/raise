@@ -141,13 +141,85 @@ Doctor and migration are the same tool. When `rai doctor` detects config from
 an older version, it should offer to migrate — not just warn. This covers the
 upgrade path (2.1 -> 2.2) seamlessly.
 
-## 5. What NOT to do
+## 5. Bug Reporting Scheme
+
+### Competitive analysis
+
+| Tool | Approach | Verdict |
+|------|----------|---------|
+| Flutter | `flutter doctor -v` output → user pastes into GitHub issue template | Simple, transparent, manual friction |
+| brew | `brew config` + `brew doctor` + `brew gist-logs` → Gist link in issue | 3 commands, sharable via Gist |
+| OpenClaw | `openclaw doctor report` → auto-redacts secrets → GitHub issue body | **5+ critical bugs** where redaction leaked/destroyed API keys |
+| Sentry | SDK auto-captures crashes → dashboard | Zero friction but requires opt-in, infra, privacy concerns |
+
+### OpenClaw redaction failures (cautionary tale)
+
+OpenClaw had at least 5 critical bugs where automatic secret redaction:
+- Wrote `__OPENCLAW_REDACTED__` over real API keys on disk (#11268)
+- Exposed secrets in JSON during doctor/update/configure (#9627)
+- Flattened `$include` directives, inlining secrets from `.env` (#11696)
+- Redacted non-secret fields like maxTokens, crashing gateway (#16042)
+
+**Lesson: never touch secrets. Collect only non-sensitive data.**
+
+### Decision: email via mailto (D-RPT-1)
+
+**Selected approach**: Write local report → user reviews → `mailto:` link opens email client.
+
+**Security analysis**:
+
+| Vector | API direct to JSM | Email to JSM |
+|--------|-------------------|--------------|
+| Credentials in CLI | Service account extractable from source | Just an email address |
+| Spam/abuse | Direct API abuse | JSM email channel has native anti-spam |
+| Transparency | User can't see payload | User sees exact email in sent folder |
+| User identity | Anonymous via service account | Their own email = verifiable |
+| Offline | Fails | Email queues |
+
+**Flow**:
+```
+$ rai doctor report
+Diagnostic report saved to .raise/rai/personal/report-2026-03-05.md
+Review it, then:  rai doctor report --send
+
+$ rai doctor report --send
+Opening email client...
+To: support@raise.humansys.ai
+Subject: [rai-doctor] raise-commons v2.2.0a1 — 2 warnings, 1 error
+```
+
+**Implementation**: `mailto:` URI with pre-filled subject + body. Falls back to
+clipboard + printed address when no GUI / TTY. Uses `webbrowser.open()` in
+Python which handles mailto on all platforms.
+
+**What the report contains** (non-sensitive only):
+- rai-cli version, Python version, OS
+- .raise/ structure summary (file names, not contents)
+- Check results (pass/warn/error per category)
+- Graph staleness (days since last build)
+- Installed extras, MCP server names (not credentials)
+- Adapter types registered (not config values)
+
+**What the report NEVER contains**:
+- API keys, tokens, passwords
+- .env contents
+- File contents (only names/structure)
+- User code or project data
+
+### Backend: JSM email channel
+
+JSM receives emails at `support@raise.humansys.ai` → creates Service Request
+in JSM project → queue for triage. Users don't need Jira accounts.
+
+## 7. What NOT to do
 
 - Don't score dimensions (P9) in v1 — adds complexity, defer to v2
 - Don't build interactive repair wizard — `--fix` is non-interactive with backup
 - Don't check external services (Jira connectivity) by default — too slow, add `--online` flag
+- Don't auto-redact secrets — collect only non-sensitive data (lesson from OpenClaw)
+- Don't embed API credentials in CLI for report submission — use email
 
-## 6. Contrary Evidence
+## 8. Contrary Evidence
 
 - **Aider succeeds without doctor** — their docs + error messages are good enough for a technical audience. But Rai targets teams with mixed skill levels (Aquiles, Fernando) where self-service diagnostics matter more.
 - **Cursor's log dump approach** is simpler but unhelpful for end users — only useful for support teams reading logs.
