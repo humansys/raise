@@ -54,44 +54,6 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-epic-run",
     "rai-epic-start",
     # Discovery
-    "rai-discover-document",
-    "rai-discover-scan",
-    "rai-discover-start",
-    "rai-discover-validate",
-    # Onboarding
-    "rai-project-create",
-    "rai-project-onboard",
-    "rai-welcome",
-    # Governance
-    "rai-docs-update",
-    # Tools
-    "rai-debug",
-    "rai-discover",
-    "rai-doctor",
-    "rai-mcp-add",
-    "rai-mcp-remove",
-    "rai-mcp-status",
-    "rai-problem-shape",
-    "rai-research",
-] = [
-    # Session lifecycle
-    "rai-session-close",
-    "rai-session-start",
-    # Story lifecycle
-    "rai-story-close",
-    "rai-story-design",
-    "rai-story-implement",
-    "rai-story-plan",
-    "rai-story-review",
-    "rai-story-run",
-    "rai-story-start",
-    # Epic lifecycle
-    "rai-epic-close",
-    "rai-epic-design",
-    "rai-epic-plan",
-    "rai-epic-run",
-    "rai-epic-start",
-    # Discovery
     "rai-discover",
     "rai-discover-document",
     "rai-discover-scan",
