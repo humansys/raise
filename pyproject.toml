@@ -100,6 +100,7 @@ coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
 
 [project.entry-points."rai.doctor.checks"]
 environment = "rai_cli.doctor.checks.environment:EnvironmentCheck"
+project = "rai_cli.doctor.checks.project:ProjectCheck"
 
 [project.entry-points."rai.adapters.pm"]
 filesystem = "rai_cli.adapters.filesystem:FilesystemPMAdapter"
