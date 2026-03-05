@@ -31,6 +31,8 @@ from rai_cli.session.bundle import (
     _fetch_live_status,
     _format_governance_primes,
     _format_manifest,
+    _format_narrative,
+    _format_next_session_prompt,
     _format_progress,
     _format_recent_sessions,
     _format_work_section,
@@ -1646,3 +1648,82 @@ class TestLiveBacklogStatus:
         mock_fetch.assert_called_once_with(state)
         assert "in_progress (live)" in result
         assert "done (live)" in result
+
+
+class TestStalenessDisclaimer:
+    """Regression tests for RAISE-214: stale session state caveat.
+
+    next_session_prompt and narrative are captured at session close.
+    If work continues after close, they contain stale git/branch state.
+    The fix adds a staleness caveat with the capture date so the reader
+    knows to verify volatile state before acting on it.
+    """
+
+    def test_next_session_prompt_includes_staleness_caveat(self) -> None:
+        """next_session_prompt includes capture date and staleness warning."""
+        state = SessionState(
+            current_work=CurrentWork(epic="E15", story="S15.7", phase="implement", branch="dev"),
+            last_session=LastSession(
+                id="SES-300",
+                date=date(2026, 3, 1),
+                developer="Test",
+                summary="session with stale state",
+            ),
+            next_session_prompt="ADR-015 still uncommitted. Branch has 3 commits ahead of dev.",
+        )
+        result = _format_next_session_prompt(state)
+
+        assert "# Next Session Prompt" in result
+        assert "2026-03-01" in result
+        assert "stale" in result.lower()
+        assert "verify" in result.lower()
+        # Original content still present
+        assert "ADR-015 still uncommitted" in result
+
+    def test_narrative_includes_staleness_caveat(self) -> None:
+        """narrative includes capture date and staleness warning."""
+        state = SessionState(
+            current_work=CurrentWork(epic="E15", story="S15.7", phase="implement", branch="dev"),
+            last_session=LastSession(
+                id="SES-300",
+                date=date(2026, 3, 1),
+                developer="Test",
+                summary="session with stale state",
+            ),
+            narrative="## Branch State\n- 3 commits ahead of dev, ADR-015 uncommitted",
+        )
+        result = _format_narrative(state)
+
+        assert "# Session Narrative" in result
+        assert "2026-03-01" in result
+        assert "stale" in result.lower()
+        assert "verify" in result.lower()
+        # Original content still present
+        assert "ADR-015 uncommitted" in result
+
+    def test_empty_next_session_prompt_no_caveat(self) -> None:
+        """Empty next_session_prompt returns empty string — no caveat noise."""
+        state = SessionState(
+            current_work=CurrentWork(),
+            last_session=LastSession(
+                id="SES-300", date=date(2026, 3, 1), developer="Test", summary="test"
+            ),
+            next_session_prompt="",
+        )
+        assert _format_next_session_prompt(state) == ""
+
+    def test_empty_narrative_no_caveat(self) -> None:
+        """Empty narrative returns empty string — no caveat noise."""
+        state = SessionState(
+            current_work=CurrentWork(),
+            last_session=LastSession(
+                id="SES-300", date=date(2026, 3, 1), developer="Test", summary="test"
+            ),
+            narrative="",
+        )
+        assert _format_narrative(state) == ""
+
+    def test_none_state_no_caveat(self) -> None:
+        """None state returns empty string for both formatters."""
+        assert _format_next_session_prompt(None) == ""
+        assert _format_narrative(None) == ""
