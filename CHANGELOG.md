@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-03-05
+
 ### Added
 - Complete CLI reference documentation: 17 command group pages covering 72 subcommands (E348)
 - Developer extension guides: adapters, skills, MCP servers, lifecycle hooks (E348)
@@ -32,9 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Documentation site restructured: multi-file CLI reference with workflow ordering
-- Docs deployed to docs.raiseframework.ai via Cloudflare Pages
-
-## [2.1.0] - 2026-02-24
+- Docs deployed to docs.raiseframework.ai via Cloudflare Pages## [2.1.0] - 2026-02-24
 
 ### Added
 - Skill Excellence (E250): 27 ADR-040 compliant skills, ~65% line reduction across all skill definitions
@@ -143,7 +143,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys/raise/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/humansys/raise/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/humansys/raise/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/humansys/raise/compare/v2.0.4...v2.1.0
 [2.0.4]: https://github.com/humansys/raise/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/humansys/raise/compare/v2.0.0a9...v2.0.3
