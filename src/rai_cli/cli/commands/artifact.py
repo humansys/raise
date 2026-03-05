@@ -65,7 +65,7 @@ def validate_command(
     if paths is None:
         return  # Already handled (exit raised)
 
-    results: list[dict] = []
+    results: list[dict[str, object]] = []
     for path in paths:
         try:
             read_artifact(path)
