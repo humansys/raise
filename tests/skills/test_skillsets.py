@@ -5,8 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 from rai_cli.skills.skillsets import (
-    SkillSetDiff,
-    SkillSetInfo,
     create_skill_set,
     diff_skill_set,
     list_skill_sets,

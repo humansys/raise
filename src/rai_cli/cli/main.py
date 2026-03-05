@@ -14,8 +14,8 @@ from rai_cli.cli.commands.artifact import artifact_app
 from rai_cli.cli.commands.backlog import backlog_app
 from rai_cli.cli.commands.base import base_app
 from rai_cli.cli.commands.discover import discover_app
-from rai_cli.cli.commands.doctor import doctor_app
 from rai_cli.cli.commands.docs import docs_app
+from rai_cli.cli.commands.doctor import doctor_app
 from rai_cli.cli.commands.gate import gate_app
 from rai_cli.cli.commands.graph import graph_app
 from rai_cli.cli.commands.info import info_command

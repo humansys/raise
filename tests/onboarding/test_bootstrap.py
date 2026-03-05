@@ -6,7 +6,11 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from rai_cli.onboarding.bootstrap import BootstrapResult, bootstrap_rai_base, ensure_gitignore
+from rai_cli.onboarding.bootstrap import (
+    BootstrapResult,
+    bootstrap_rai_base,
+    ensure_gitignore,
+)
 
 
 class TestBootstrapRaiBase:

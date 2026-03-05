@@ -5,14 +5,18 @@ Architecture: S352.4
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 from typer.testing import CliRunner
 
-from rai_cli.doctor.fix import FIX_REGISTRY, add_gitignore_personal, rebuild_graph, run_fixes
+from rai_cli.doctor.fix import (
+    FIX_REGISTRY,
+    add_gitignore_personal,
+    rebuild_graph,
+    run_fixes,
+)
 from rai_cli.doctor.models import CheckResult, CheckStatus
 
 

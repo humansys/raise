@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import pytest
+
 from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 
@@ -35,11 +37,8 @@ class TestCheckResult:
         r = CheckResult(
             check_id="test", category="env", status=CheckStatus.PASS, message="ok"
         )
-        try:
+        with pytest.raises(AttributeError):
             r.message = "changed"  # type: ignore[misc]
-            assert False, "Should raise FrozenInstanceError"
-        except AttributeError:
-            pass
 
 
 class TestDoctorContext:
