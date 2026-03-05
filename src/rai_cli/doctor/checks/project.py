@@ -109,6 +109,7 @@ class ProjectCheck:
                 status=CheckStatus.WARN,
                 message="graph directory missing (.rai/graph/)",
                 fix_hint="run: rai graph build",
+                fix_id="rebuild-graph",
             )
 
         # Find newest file in graph dir
@@ -121,6 +122,7 @@ class ProjectCheck:
                 status=CheckStatus.WARN,
                 message="graph directory is empty",
                 fix_hint="run: rai graph build",
+                fix_id="rebuild-graph",
             )
 
         newest_graph = max(f.stat().st_mtime for f in graph_files)
@@ -134,6 +136,7 @@ class ProjectCheck:
                 status=CheckStatus.WARN,
                 message=f"graph is {days_old:.0f} days old",
                 fix_hint="run: rai graph build",
+                fix_id="rebuild-graph",
             )
 
         # Check if governance files are newer than graph
@@ -149,6 +152,7 @@ class ProjectCheck:
                         status=CheckStatus.WARN,
                         message="governance files are newer than graph",
                         fix_hint="run: rai graph build",
+                        fix_id="rebuild-graph",
                     )
 
         return CheckResult(
@@ -228,4 +232,5 @@ class ProjectCheck:
             status=CheckStatus.WARN,
             message=".raise/rai/personal/ not found in .gitignore",
             fix_hint="run: rai init",
+            fix_id="add-gitignore-personal",
         )
