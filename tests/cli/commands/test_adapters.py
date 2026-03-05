@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 from importlib.metadata import EntryPoint
+from pathlib import Path
 from unittest.mock import patch
 
 from typer.testing import CliRunner
@@ -125,3 +127,92 @@ class TestAdaptersCheck:
         assert len(broken_results) == 1
         assert broken_results[0]["compliant"] is False
         assert "Failed to load" in broken_results[0]["error"]
+
+
+class TestAdaptersStatus:
+    """Tests for `rai adapter status`."""
+
+    def test_status_shows_jira_section(self) -> None:
+        result = runner.invoke(app, ["adapter", "status"])
+        assert result.exit_code == 0
+        assert "Jira" in result.output
+
+    def test_status_shows_missing_yaml(self, tmp_path: Path) -> None:
+        """When .raise/jira.yaml does not exist, status reports it missing."""
+        orig = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            result = runner.invoke(app, ["adapter", "status"])
+        finally:
+            os.chdir(orig)
+        assert result.exit_code == 0
+        assert "not found" in result.output
+
+    def test_status_shows_missing_env_vars(self) -> None:
+        """When env vars are unset, status reports them missing."""
+        env = {k: v for k, v in os.environ.items()
+               if k not in ("JIRA_URL", "JIRA_USERNAME", "JIRA_API_TOKEN", "JIRA_TOKEN")}
+        with patch.dict(os.environ, env, clear=True):
+            result = runner.invoke(app, ["adapter", "status"])
+        assert result.exit_code == 0
+        assert "JIRA_URL" in result.output
+        assert "not set" in result.output
+
+    def test_status_json_format(self) -> None:
+        result = runner.invoke(app, ["adapter", "status", "--format", "json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert "jira" in data
+        jira = data["jira"]
+        assert "yaml_path" in jira
+        assert "yaml_exists" in jira
+        assert "env_vars" in jira
+        assert "ready" in jira
+        assert isinstance(jira["env_vars"], list)
+
+    def test_status_ready_when_all_configured(self, tmp_path: Path) -> None:
+        """When yaml exists and env vars are set, status reports ready."""
+        raise_dir = tmp_path / ".raise"
+        raise_dir.mkdir()
+        jira_yaml = raise_dir / "jira.yaml"
+        jira_yaml.write_text("workflow:\n  status_mapping:\n    done: 41\n")
+
+        env = {
+            **os.environ,
+            "JIRA_URL": "https://test.atlassian.net",
+            "JIRA_USERNAME": "test@example.com",
+            "JIRA_API_TOKEN": "test-token",
+        }
+        orig = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            with patch.dict(os.environ, env, clear=True):
+                result = runner.invoke(app, ["adapter", "status"])
+        finally:
+            os.chdir(orig)
+        assert result.exit_code == 0
+        assert "fully configured" in result.output
+
+    def test_status_json_ready_true_when_configured(self, tmp_path: Path) -> None:
+        """JSON output reports ready=true when fully configured."""
+        raise_dir = tmp_path / ".raise"
+        raise_dir.mkdir()
+        jira_yaml = raise_dir / "jira.yaml"
+        jira_yaml.write_text("workflow:\n  status_mapping:\n    done: 41\n")
+
+        env = {
+            **os.environ,
+            "JIRA_URL": "https://test.atlassian.net",
+            "JIRA_USERNAME": "test@example.com",
+            "JIRA_API_TOKEN": "test-token",
+        }
+        orig = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            with patch.dict(os.environ, env, clear=True):
+                result = runner.invoke(app, ["adapter", "status", "--format", "json"])
+        finally:
+            os.chdir(orig)
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["jira"]["ready"] is True
