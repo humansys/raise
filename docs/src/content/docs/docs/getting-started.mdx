@@ -52,19 +52,21 @@ rai init --detect
 
 ## Your first session
 
-Set up your developer profile (first time only):
+Open your AI assistant (Claude Code) in the project directory. For first-time setup, run the welcome skill:
 
-```bash
-rai session start --name "Your Name" --project .
+```
+/rai-welcome
 ```
 
-After that, start sessions with a context bundle:
+This creates your developer profile, builds the knowledge graph, and verifies everything works.
 
-```bash
-rai session start --project . --context
+After that, start every session with:
+
+```
+/rai-session-start
 ```
 
-The `--context` flag outputs a token-optimized bundle (~150 tokens) with your developer profile, session state, and memory patterns. Pass it to your AI assistant — it gives full awareness of where you are and what you're working on.
+This loads your context, memory, patterns, and proposes focused work. You work **through skills** — they orchestrate the CLI for you.
 
 ## The story lifecycle
 
@@ -89,9 +91,11 @@ Start with a small feature (XS or S sized). Get the rhythm first, then scale up.
 
 When you're done working, close the session to capture what happened:
 
-```bash
-rai session close --summary "What I accomplished" --type feature --project .
 ```
+/rai-session-close
+```
+
+This reflects on outcomes, persists patterns, and records session data for continuity.
 
 ## Build your memory
 

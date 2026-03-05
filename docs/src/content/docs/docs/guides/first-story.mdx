@@ -9,16 +9,16 @@ This guide walks you through the full story lifecycle using RaiSE skills. By the
 
 Make sure you have:
 - A [RaiSE project initialized](/docs/getting-started/)
-- A working AI assistant (Claude Code recommended)
+- An AI assistant with RaiSE skills loaded (Claude Code recommended)
 - A small feature to build (something you can finish in one session)
 
-Start a session:
+Start a session by invoking the skill in your AI assistant:
 
-```bash
-rai session start --project . --context
+```
+/rai-session-start
 ```
 
-Pass the context bundle to your AI assistant.
+This loads your context, memory, patterns, and proposes focused work. You work **through skills** — RaiSE skills orchestrate the CLI commands for you.
 
 ## Step 1: Start the Story
 
@@ -132,6 +132,16 @@ scope → design → plan → build → reflect → close
 ```
 
 Each step produces an artifact. Each artifact feeds the next step. The retrospective feeds memory, which feeds future sessions. This is how RaiSE compounds learning — not through magic, but through disciplined repetition.
+
+## Skills vs CLI
+
+In RaiSE, you interact through **skills** (slash commands in your AI assistant), not CLI commands directly:
+
+- **Skills** (`/rai-story-start`, `/rai-session-close`) — what you invoke. They orchestrate the full workflow.
+- **CLI** (`rai graph build`, `rai gate check`) — the deterministic backend. Skills call these for you.
+- **Some CLI is direct** — setup commands like `rai init`, `rai doctor`, and `rai skill list` are used directly.
+
+You can also run the entire story lifecycle in one command with `/rai-story-run S1.1`, which chains all 8 phases automatically.
 
 ## Tips
 
