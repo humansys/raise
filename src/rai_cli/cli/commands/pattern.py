@@ -1,4 +1,4 @@
-"""CLI commands for Rai's pattern memory: add and reinforce.
+"""CLI commands for Rai's pattern memory: add, reinforce, promote.
 
 The pattern group owns commands that write to pattern memory (JSONL files).
 These were extracted from the `memory` God Object in RAISE-247 (ADR-038).
@@ -6,10 +6,13 @@ These were extracted from the `memory` God Object in RAISE-247 (ADR-038).
 Commands:
 - add: Add a new learned pattern to memory
 - reinforce: Reinforce a pattern with a vote signal (applied/N/A/contradicted)
+- promote: Move a pattern from personal scope to project scope
 """
 
 from __future__ import annotations
 
+import json
+import tempfile
 from pathlib import Path
 from typing import Annotated
 
@@ -28,6 +31,7 @@ from rai_cli.memory import (
     get_memory_dir_for_scope,
     reinforce_pattern,
 )
+from rai_cli.memory.writer import _append_jsonl
 from rai_cli.onboarding.profile import load_developer_profile
 from rai_core.graph.query import (
     SCORING_LOW_WILSON_THRESHOLD,
@@ -169,7 +173,7 @@ def add_pattern(
     scope: Annotated[
         str,
         typer.Option("--scope", "-s", help="Memory scope (global, project, personal)"),
-    ] = "project",
+    ] = "personal",
     memory_dir: Annotated[
         Path | None,
         typer.Option(
@@ -180,7 +184,7 @@ def add_pattern(
     """Add a new pattern to memory.
 
     Examples:
-        # Add a process pattern (default: project scope)
+        # Add a process pattern (default: personal scope)
         $ rai pattern add "HITL before commits" -c "git,workflow"
 
         # Add a technical pattern
