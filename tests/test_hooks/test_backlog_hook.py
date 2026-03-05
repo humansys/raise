@@ -183,6 +183,48 @@ class TestBacklogHookMapping:
         adapter.create_issue.assert_called_once()
         adapter.transition_issue.assert_called_once_with("RAISE-99", "in-progress")
 
+    def test_story_start_create_includes_rai_label(self, tmp_path: Path) -> None:
+        """RAISE-417 regression: created issue includes rai:{work_id} label."""
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+        adapter = MagicMock()
+        adapter.search.side_effect = [[], []]  # label miss, summary miss
+        adapter.create_issue.return_value = IssueRef(key="RAISE-77")
+        adapter.transition_issue.return_value = IssueRef(key="RAISE-77")
+
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S417.1", event="start", phase="design"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        spec = adapter.create_issue.call_args[0][1]
+        assert "rai:S417.1" in spec.labels
+
+    def test_epic_start_create_includes_rai_label(self, tmp_path: Path) -> None:
+        """RAISE-417 regression: epic creation also includes rai:{work_id} label."""
+        root = _jira_yaml(tmp_path)
+        hook = _make_hook(root)
+        adapter = MagicMock()
+        adapter.search.side_effect = [[], []]  # label miss, summary miss
+        adapter.create_issue.return_value = IssueRef(key="RAISE-78")
+        adapter.transition_issue.return_value = IssueRef(key="RAISE-78")
+
+        event = WorkLifecycleEvent(
+            work_type="epic", work_id="E417", event="start", phase="design"
+        )
+        with patch(
+            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
+            result = hook.handle(event)
+
+        assert result.status == "ok"
+        spec = adapter.create_issue.call_args[0][1]
+        assert "rai:E417" in spec.labels
+
     def test_story_start_existing_issue_transitions_only(self, tmp_path: Path) -> None:
         """story start with existing issue → transition only, no create."""
         root = _jira_yaml(tmp_path)
