@@ -80,7 +80,7 @@ For methodology improvements or new content:
 
 1. **Open an Issue** describing the change
 2. **Fork** the repository
-3. **Create a feature branch** from `v2` (development branch)
+3. **Create a feature branch** from `dev` (development branch)
 4. **Make your changes** following the style guidelines
 5. **Run tests and quality checks** (see Development Setup)
 6. **Submit a Pull Request** referencing the issue
