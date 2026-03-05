@@ -219,9 +219,11 @@ class McpJiraAdapter:
     # ----- Query -----
 
     async def search(self, query: str, limit: int = 50) -> list[IssueSummary]:
+        # Sanitize shell-escaped operators (RAISE-435: Claude Code Bash escapes ! to \!)
+        clean_query = query.replace("\\!", "!")
         result = await self._bridge.call(
             "jira_search",
-            {"jql": query, "limit": limit},
+            {"jql": clean_query, "limit": limit},
         )
         return self._parse_search_results(result)
 
