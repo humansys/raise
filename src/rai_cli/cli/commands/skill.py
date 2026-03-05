@@ -13,6 +13,7 @@ import typer
 from rich.console import Console
 
 from rai_cli.cli.commands.skill_set import skill_set_app
+from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
 from rai_cli.output.formatters.skill import (
     format_name_check_human,
     format_name_check_json,
@@ -23,7 +24,6 @@ from rai_cli.output.formatters.skill import (
     format_validation_human,
     format_validation_json,
 )
-from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
 from rai_cli.skills.locator import SkillLocator, get_default_skill_dir
 from rai_cli.skills.name_checker import check_name
 from rai_cli.skills.scaffold import scaffold_skill

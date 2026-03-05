@@ -212,11 +212,10 @@ def _copy_patterns(
             Path(tmp_path).unlink(missing_ok=True)
             raise
         finally:
+            import contextlib
             import os
-            try:
+            with contextlib.suppress(OSError):
                 os.close(fd)
-            except OSError:
-                pass
         result.files_copied.append(str(dest))
         logger.debug("Merged base patterns into %s: %d added, %d updated", dest, added, updated)
     else:

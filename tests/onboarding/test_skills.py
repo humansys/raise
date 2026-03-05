@@ -388,7 +388,7 @@ class TestSkillSetOverlay:
             "team-review": "# Team Review Skill",
         })
 
-        result = scaffold_skills(tmp_path, skill_set="my-team")
+        scaffold_skills(tmp_path, skill_set="my-team")
 
         deployed = tmp_path / ".claude" / "skills" / "team-review" / "SKILL.md"
         assert deployed.exists()
