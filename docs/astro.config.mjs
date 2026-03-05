@@ -46,6 +46,11 @@ export default defineConfig({
           items: [
             { slug: 'docs/guides/first-story' },
             { slug: 'docs/guides/setting-up' },
+            { slug: 'docs/guides/extending' },
+            { slug: 'docs/guides/create-adapter' },
+            { slug: 'docs/guides/create-skill' },
+            { slug: 'docs/guides/register-mcp' },
+            { slug: 'docs/guides/create-hook' },
           ],
         },
         {
