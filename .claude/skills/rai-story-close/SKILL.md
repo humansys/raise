@@ -54,9 +54,26 @@ Complete a story by verifying the retrospective, merging to the development bran
 ```bash
 RETRO="work/epics/e{N}-{name}/stories/{story_id}-retrospective.md"
 [ -f "$RETRO" ] && echo "✓ Retrospective" || echo "ERROR: Run /rai-story-review first"
-
-uv run pytest --tb=short
 ```
+
+Determine which test command to run using this priority chain:
+
+1. **Check `.raise/manifest.yaml`** for `project.test_command` — if set, use it directly (configuration over convention)
+2. **Detect language** from `project.project_type` in manifest, or scan file extensions of changed files (`git diff --name-only`)
+3. **Map language to default** using the table below
+
+| Language | Extensions | Default Test Command |
+|----------|-----------|----------------------|
+| Python | `.py`, `.pyi` | `uv run pytest --tb=short` |
+| TypeScript | `.ts`, `.tsx` | `npx vitest run` or `npm test` |
+| JavaScript | `.js`, `.jsx` | `npx vitest run` or `npm test` |
+| C# | `.cs` | `dotnet test --verbosity quiet` |
+| Go | `.go` | `go test ./...` |
+| PHP | `.php` | `vendor/bin/phpunit` |
+| Dart | `.dart` | `flutter test` |
+| Unknown | — | Ask developer |
+
+The table is a **fallback** — `project.test_command` always wins when present.
 
 | Condition | Action |
 |-----------|--------|
