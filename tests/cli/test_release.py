@@ -7,19 +7,19 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from rai_cli.cli.main import app
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptEdge, ConceptNode
-from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphEdge, GraphNode
 
 runner = CliRunner()
 
 
 def _build_graph_with_releases(project_path: Path) -> None:
     """Build a graph with release nodes for testing."""
-    graph = UnifiedGraph()
+    graph = Graph()
 
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="rel-v2.0",
             type="release",
             content="V2.0 Open Core",
@@ -34,7 +34,7 @@ def _build_graph_with_releases(project_path: Path) -> None:
         )
     )
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="rel-v3.0",
             type="release",
             content="V3.0 Commercial Launch",
@@ -51,7 +51,7 @@ def _build_graph_with_releases(project_path: Path) -> None:
 
     # Add epics linked to releases
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="epic-e18",
             type="epic",
             content="V2 Open Core",
@@ -60,7 +60,7 @@ def _build_graph_with_releases(project_path: Path) -> None:
         )
     )
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="epic-e19",
             type="epic",
             content="V3 Product Design",
@@ -69,7 +69,7 @@ def _build_graph_with_releases(project_path: Path) -> None:
         )
     )
     graph.add_concept(
-        ConceptNode(
+        GraphNode(
             id="epic-e20",
             type="epic",
             content="V3 Hosted Rai",
@@ -79,13 +79,13 @@ def _build_graph_with_releases(project_path: Path) -> None:
     )
 
     graph.add_relationship(
-        ConceptEdge(source="epic-e18", target="rel-v2.0", type="part_of")
+        GraphEdge(source="epic-e18", target="rel-v2.0", type="part_of")
     )
     graph.add_relationship(
-        ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
+        GraphEdge(source="epic-e19", target="rel-v3.0", type="part_of")
     )
     graph.add_relationship(
-        ConceptEdge(source="epic-e20", target="rel-v3.0", type="part_of")
+        GraphEdge(source="epic-e20", target="rel-v3.0", type="part_of")
     )
 
     graph_path = project_path / ".raise" / "rai" / "memory" / "index.json"
@@ -95,7 +95,9 @@ def _build_graph_with_releases(project_path: Path) -> None:
 class TestReleaseList:
     """Tests for rai release list command."""
 
-    def test_lists_releases_from_graph(self, tmp_path: Path, monkeypatch: object) -> None:
+    def test_lists_releases_from_graph(
+        self, tmp_path: Path, monkeypatch: object
+    ) -> None:
         """rai release list shows releases from graph."""
         import pytest
 
@@ -119,13 +121,15 @@ class TestReleaseList:
         set_error_console(None)  # Reset singleton to avoid test ordering leaks
         result = runner.invoke(app, ["release", "list", "--project", str(tmp_path)])
         assert result.exit_code != 0
-        assert "build" in result.output.lower() or "build" in (result.stderr or "").lower()
+        assert (
+            "build" in result.output.lower() or "build" in (result.stderr or "").lower()
+        )
 
     def test_shows_empty_message_when_no_releases(self, tmp_path: Path) -> None:
         """rai release list shows message when graph has no release nodes."""
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="epic-e18",
                 type="epic",
                 content="Some epic",

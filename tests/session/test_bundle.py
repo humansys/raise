@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
+import time
 from datetime import date
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
-from rai_cli.context.models import ConceptNode
 from rai_cli.onboarding.profile import (
     CoachingContext,
     CommunicationPreferences,
@@ -26,11 +26,16 @@ from rai_cli.schemas.session_state import (
 )
 from rai_cli.session.bundle import (
     SECTION_REGISTRY,
+    LiveBacklogStatus,
     SectionManifest,
+    _fetch_live_status,
     _format_governance_primes,
     _format_manifest,
+    _format_narrative,
+    _format_next_session_prompt,
     _format_progress,
     _format_recent_sessions,
+    _format_work_section,
     assemble_context_bundle,
     assemble_orientation,
     assemble_sections,
@@ -38,6 +43,7 @@ from rai_cli.session.bundle import (
     get_always_on_primes,
     get_foundational_patterns,
 )
+from rai_core.graph.models import GraphNode
 
 
 def _make_profile() -> DeveloperProfile:
@@ -91,9 +97,9 @@ def _make_state() -> SessionState:
     )
 
 
-def _make_pattern(pat_id: str, content: str) -> ConceptNode:
+def _make_pattern(pat_id: str, content: str) -> GraphNode:
     """Create a mock foundational pattern node."""
-    return ConceptNode(
+    return GraphNode(
         id=pat_id,
         type="pattern",
         content=content,
@@ -318,9 +324,9 @@ class TestAssembleContextBundle:
         assert "Session: SES-177" in bundle
 
 
-def _make_always_on_node(node_id: str, node_type: str, content: str) -> ConceptNode:
+def _make_always_on_node(node_id: str, node_type: str, content: str) -> GraphNode:
     """Create a mock always_on node."""
-    return ConceptNode(
+    return GraphNode(
         id=node_id,
         type=node_type,
         content=content,
@@ -434,10 +440,10 @@ class TestGetAlwaysOnPrimes:
 
     def test_returns_always_on_nodes(self, tmp_path: Path) -> None:
         """Returns all nodes with always_on=true metadata."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
             _make_always_on_node("guardrail-must-code-001", "guardrail", "Type hints")
         )
@@ -445,7 +451,7 @@ class TestGetAlwaysOnPrimes:
             _make_always_on_node("RAI-VAL-1", "principle", "Honesty over agreement")
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="Not always_on",
@@ -465,12 +471,12 @@ class TestGetAlwaysOnPrimes:
 
     def test_excludes_non_always_on(self, tmp_path: Path) -> None:
         """Nodes without always_on=true are excluded."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="guardrail-should-001",
                 type="guardrail",
                 content="Optional rule",
@@ -713,13 +719,13 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Build a graph with epic→release edge
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.context.models import ConceptEdge
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
+        from rai_core.graph.models import GraphEdge
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="rel-v3.0",
                 type="release",
                 content="V3.0 Commercial Launch",
@@ -733,7 +739,7 @@ class TestBundleReleaseContext:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="epic-e19",
                 type="epic",
                 content="V3 Product Design",
@@ -742,7 +748,7 @@ class TestBundleReleaseContext:
             )
         )
         graph.add_relationship(
-            ConceptEdge(source="epic-e19", target="rel-v3.0", type="part_of")
+            GraphEdge(source="epic-e19", target="rel-v3.0", type="part_of")
         )
         graph_path = tmp_path / ".raise" / "rai" / "memory" / "index.json"
         FilesystemGraphBackend(graph_path).persist(graph)
@@ -750,12 +756,16 @@ class TestBundleReleaseContext:
         profile = DeveloperProfile(name="Test")
         state = SessionState(
             current_work=CurrentWork(
-                epic="E19", story="S19.3", phase="implement",
+                epic="E19",
+                story="S19.3",
+                phase="implement",
                 branch="epic/e19/v3",
             ),
             last_session=LastSession(
-                id="SES-100", date=date(2026, 2, 13),
-                developer="Test", summary="test",
+                id="SES-100",
+                date=date(2026, 2, 13),
+                developer="Test",
+                summary="test",
             ),
         )
 
@@ -778,12 +788,16 @@ class TestBundleReleaseContext:
         profile = DeveloperProfile(name="Test")
         state = SessionState(
             current_work=CurrentWork(
-                epic="E19", story="S19.3", phase="implement",
+                epic="E19",
+                story="S19.3",
+                phase="implement",
                 branch="epic/e19/v3",
             ),
             last_session=LastSession(
-                id="SES-100", date=date(2026, 2, 13),
-                developer="Test", summary="test",
+                id="SES-100",
+                date=date(2026, 2, 13),
+                developer="Test",
+                summary="test",
             ),
         )
 
@@ -802,12 +816,12 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Graph exists but epic has no release edge
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="epic-e18",
                 type="epic",
                 content="V2 Open Core",
@@ -821,12 +835,16 @@ class TestBundleReleaseContext:
         profile = DeveloperProfile(name="Test")
         state = SessionState(
             current_work=CurrentWork(
-                epic="E18", story="S18.1", phase="implement",
+                epic="E18",
+                story="S18.1",
+                phase="implement",
                 branch="epic/e18/v2",
             ),
             last_session=LastSession(
-                id="SES-100", date=date(2026, 2, 13),
-                developer="Test", summary="test",
+                id="SES-100",
+                date=date(2026, 2, 13),
+                developer="Test",
+                summary="test",
             ),
         )
 
@@ -854,8 +872,10 @@ class TestFormatNarrative:
                 epic="E21", story="S21.1", phase="implement", branch="epic/e21"
             ),
             last_session=LastSession(
-                id="SES-159", date=date(2026, 2, 14),
-                developer="Test", summary="test session",
+                id="SES-159",
+                date=date(2026, 2, 14),
+                developer="Test",
+                summary="test session",
             ),
             narrative="## Decisions\n- Architecture = sync model\n\n## Artifacts\n- scope.md created",
         )
@@ -882,8 +902,10 @@ class TestFormatNarrative:
                 epic="E15", story="S15.7", phase="design", branch="main"
             ),
             last_session=LastSession(
-                id="SES-001", date=date(2026, 2, 8),
-                developer="Test", summary="test",
+                id="SES-001",
+                date=date(2026, 2, 8),
+                developer="Test",
+                summary="test",
             ),
         )
         bundle = assemble_context_bundle(profile, state, Path("/project"))
@@ -901,7 +923,9 @@ class TestFormatNarrative:
         mock_patterns.return_value = []
         mock_always_on.return_value = []
 
-        long_narrative = "## Decisions\n" + "- Decision line that is quite long and detailed " * 20
+        long_narrative = (
+            "## Decisions\n" + "- Decision line that is quite long and detailed " * 20
+        )
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
@@ -909,8 +933,10 @@ class TestFormatNarrative:
                 epic="E21", story="S21.1", phase="implement", branch="epic/e21"
             ),
             last_session=LastSession(
-                id="SES-159", date=date(2026, 2, 14),
-                developer="Test", summary="test",
+                id="SES-159",
+                date=date(2026, 2, 14),
+                developer="Test",
+                summary="test",
             ),
             narrative=long_narrative,
         )
@@ -930,7 +956,9 @@ class TestFormatNarrative:
         assert callable(mock_always_on)
         mock_patterns.return_value = []
         mock_always_on.return_value = [
-            _make_always_on_node("guardrail-must-code-001", "guardrail", "[MUST] Type hints"),
+            _make_always_on_node(
+                "guardrail-must-code-001", "guardrail", "[MUST] Type hints"
+            ),
         ]
 
         profile = DeveloperProfile(name="Test")
@@ -939,8 +967,10 @@ class TestFormatNarrative:
                 epic="E21", story="S21.1", phase="implement", branch="epic/e21"
             ),
             last_session=LastSession(
-                id="SES-159", date=date(2026, 2, 14),
-                developer="Test", summary="test session",
+                id="SES-159",
+                date=date(2026, 2, 14),
+                developer="Test",
+                summary="test session",
             ),
             narrative="## Decisions\n- Chose sync model",
         )
@@ -969,12 +999,12 @@ class TestFormatNextSessionPrompt:
 
         profile = DeveloperProfile(name="Test")
         state = SessionState(
-            current_work=CurrentWork(
-                epic="RAISE-144", story="", phase="", branch="v2"
-            ),
+            current_work=CurrentWork(epic="RAISE-144", story="", phase="", branch="v2"),
             last_session=LastSession(
-                id="SES-200", date=date(2026, 2, 17),
-                developer="Test", summary="test session",
+                id="SES-200",
+                date=date(2026, 2, 17),
+                developer="Test",
+                summary="test session",
             ),
             next_session_prompt="Verify encoding fix covers discovery tests. Check backlog abstraction interest.",
         )
@@ -1000,8 +1030,10 @@ class TestFormatNextSessionPrompt:
                 epic="E15", story="S15.7", phase="design", branch="main"
             ),
             last_session=LastSession(
-                id="SES-001", date=date(2026, 2, 8),
-                developer="Test", summary="test",
+                id="SES-001",
+                date=date(2026, 2, 8),
+                developer="Test",
+                summary="test",
             ),
         )
         bundle = assemble_context_bundle(profile, state, Path("/project"))
@@ -1019,12 +1051,12 @@ class TestGetFoundationalPatterns:
 
     def test_returns_foundational_patterns_from_graph(self, tmp_path: Path) -> None:
         """Returns patterns with foundational=true from graph."""
-        from rai_cli.context.graph import UnifiedGraph
-        from rai_cli.graph.filesystem_backend import FilesystemGraphBackend
+        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
+        from rai_core.graph.engine import Graph
 
-        graph = UnifiedGraph()
+        graph = Graph()
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-187",
                 type="pattern",
                 content="Code as Gemba",
@@ -1033,7 +1065,7 @@ class TestGetFoundationalPatterns:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="PAT-001",
                 type="pattern",
                 content="Not foundational",
@@ -1042,7 +1074,7 @@ class TestGetFoundationalPatterns:
             )
         )
         graph.add_concept(
-            ConceptNode(
+            GraphNode(
                 id="guardrail-001",
                 type="guardrail",
                 content="Not a pattern",
@@ -1101,7 +1133,9 @@ class TestCountSectionItems:
             _make_always_on_node("guardrail-must-002", "guardrail", "Ruff"),
             _make_always_on_node("RAI-VAL-1", "principle", "Honesty"),
         ]
-        result = count_section_items("governance", Path("/project"), _make_profile(), _make_state())
+        result = count_section_items(
+            "governance", Path("/project"), _make_profile(), _make_state()
+        )
         assert result == 2  # 3 always_on minus 1 identity
 
     @patch("rai_cli.session.bundle.get_foundational_patterns")
@@ -1112,31 +1146,41 @@ class TestCountSectionItems:
             _make_pattern("PAT-1", "Pattern one"),
             _make_pattern("PAT-2", "Pattern two"),
         ]
-        result = count_section_items("behavioral", Path("/project"), _make_profile(), _make_state())
+        result = count_section_items(
+            "behavioral", Path("/project"), _make_profile(), _make_state()
+        )
         assert result == 2
 
     def test_count_coaching_with_content(self) -> None:
         """Counts coaching as 1 when content exists."""
         profile = _make_profile()
-        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "coaching", Path("/project"), profile, _make_state()
+        )
         assert result == 1
 
     def test_count_coaching_empty(self) -> None:
         """Counts coaching as 0 when no content."""
         profile = DeveloperProfile(name="New")
-        result = count_section_items("coaching", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "coaching", Path("/project"), profile, _make_state()
+        )
         assert result == 0
 
     def test_count_deadlines(self) -> None:
         """Counts deadlines from profile."""
         profile = _make_profile()  # has 2 deadlines
-        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "deadlines", Path("/project"), profile, _make_state()
+        )
         assert result == 2
 
     def test_count_deadlines_empty(self) -> None:
         """Counts deadlines as 0 when none."""
         profile = DeveloperProfile(name="New")
-        result = count_section_items("deadlines", Path("/project"), profile, _make_state())
+        result = count_section_items(
+            "deadlines", Path("/project"), profile, _make_state()
+        )
         assert result == 0
 
     def test_count_progress_with_data(self) -> None:
@@ -1145,19 +1189,26 @@ class TestCountSectionItems:
         state.progress = EpicProgress(
             epic="E15", stories_done=2, stories_total=5, sp_done=6, sp_total=15
         )
-        result = count_section_items("progress", Path("/project"), _make_profile(), state)
+        result = count_section_items(
+            "progress", Path("/project"), _make_profile(), state
+        )
         assert result == 1
 
     def test_count_progress_without_data(self) -> None:
         """Counts progress as 0 when no progress data."""
-        result = count_section_items("progress", Path("/project"), _make_profile(), _make_state())
+        result = count_section_items(
+            "progress", Path("/project"), _make_profile(), _make_state()
+        )
         assert result == 0
 
     def test_count_unknown_section_raises(self) -> None:
         """Unknown section name raises ValueError."""
         import pytest
+
         with pytest.raises(ValueError, match="Unknown section"):
-            count_section_items("unknown", Path("/project"), _make_profile(), _make_state())
+            count_section_items(
+                "unknown", Path("/project"), _make_profile(), _make_state()
+            )
 
 
 class TestAssembleOrientation:
@@ -1182,7 +1233,9 @@ class TestAssembleOrientation:
         state = _make_state()
         state.narrative = "## Decisions\n- Chose sync model"
         state.next_session_prompt = "Continue with RAISE-169"
-        result = assemble_orientation(profile, state, Path("/project"), session_id="SES-210")
+        result = assemble_orientation(
+            profile, state, Path("/project"), session_id="SES-210"
+        )
 
         # Always-on sections present
         assert "# Session Context" in result
@@ -1331,6 +1384,7 @@ class TestAssembleSections:
     def test_unknown_section_raises(self) -> None:
         """Unknown section name raises ValueError with valid names."""
         import pytest
+
         with pytest.raises(ValueError, match="Unknown section"):
             assemble_sections(
                 ["unknown"],
@@ -1375,3 +1429,301 @@ class TestAssembleSections:
             _make_state(),
         )
         assert result == ""
+
+
+class TestLiveBacklogStatus:
+    """Tests for LiveBacklogStatus model and _fetch_live_status()."""
+
+    def test_fetch_live_status_no_work(self) -> None:
+        """When current_work has no epic/story keys, return empty status immediately."""
+        state = SessionState(
+            current_work=CurrentWork(epic="", story="", phase="", branch=""),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _fetch_live_status(state)
+        assert result == LiveBacklogStatus()
+        assert result.epic_status == ""
+        assert result.story_status == ""
+        assert result.warning == ""
+
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    def test_fetch_live_status_success(self, mock_resolve: MagicMock) -> None:
+        """When adapter returns IssueDetail, populate status/summary fields."""
+        from rai_cli.adapters.models import IssueDetail
+
+        mock_adapter = MagicMock()
+        mock_resolve.return_value = mock_adapter
+
+        epic_detail = IssueDetail(
+            key="RAISE-347",
+            summary="Backlog Automation",
+            status="in_progress",
+            issue_type="Epic",
+        )
+        story_detail = IssueDetail(
+            key="RAISE-390",
+            summary="Session-start live query",
+            status="selected_for_development",
+            issue_type="Story",
+        )
+        mock_adapter.get_issue.side_effect = lambda k: (
+            epic_detail if k == "RAISE-347" else story_detail
+        )
+
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="RAISE-347",
+                story="RAISE-390",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _fetch_live_status(state, timeout=5.0)
+        assert result.epic_status == "in_progress"
+        assert result.epic_summary == "Backlog Automation"
+        assert result.story_status == "selected_for_development"
+        assert result.story_summary == "Session-start live query"
+        assert result.warning == ""
+
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    def test_fetch_live_status_timeout(self, mock_resolve: MagicMock) -> None:
+        """When adapter.get_issue hangs, return warning with 'timeout'."""
+        mock_adapter = MagicMock()
+        mock_resolve.return_value = mock_adapter
+
+        def slow_get_issue(key: str) -> None:
+            time.sleep(10)
+
+        mock_adapter.get_issue.side_effect = slow_get_issue
+
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="RAISE-347",
+                story="",
+                phase="implement",
+                branch="epic/e347/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        # Use very short timeout to trigger quickly
+        result = _fetch_live_status(state, timeout=0.1)
+        assert "timeout" in result.warning.lower()
+
+    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    def test_fetch_live_status_unavailable(self, mock_resolve: MagicMock) -> None:
+        """When resolve_adapter raises SystemExit, return warning with 'unavailable'."""
+        mock_resolve.side_effect = SystemExit(1)
+
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="RAISE-347",
+                story="RAISE-390",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _fetch_live_status(state)
+        assert "unavailable" in result.warning.lower()
+
+    def test_format_work_section_with_live_status(self) -> None:
+        """Live status adds annotation to epic and story lines."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        live = LiveBacklogStatus(
+            epic_status="in_progress",
+            epic_summary="Backlog Automation",
+            story_status="selected_for_development",
+            story_summary="Session-start live query",
+        )
+        result = _format_work_section(state, live=live)
+        assert "in_progress (live)" in result
+        assert "selected_for_development (live)" in result
+
+    def test_format_work_section_with_live_warning(self) -> None:
+        """Warning line appended when live has warning."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        live = LiveBacklogStatus(
+            warning="Backlog adapter unavailable — showing cached state"
+        )
+        result = _format_work_section(state, live=live)
+        assert "⚠" in result
+        assert "unavailable" in result.lower()
+
+    def test_format_work_section_no_live(self) -> None:
+        """Existing behavior unchanged when live=None."""
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        result = _format_work_section(state, live=None)
+        assert "(live)" not in result
+        assert "⚠" not in result
+        assert "Story: S347.5 [implement]" in result
+        assert "Epic: E347" in result
+
+    @patch("rai_cli.session.bundle._fetch_live_status")
+    @patch("rai_cli.session.bundle._find_release_for_current_epic")
+    def test_assemble_orientation_calls_live_status(
+        self, mock_release: MagicMock, mock_fetch: MagicMock
+    ) -> None:
+        """assemble_orientation calls _fetch_live_status and includes annotation."""
+        mock_release.return_value = None
+        mock_fetch.return_value = LiveBacklogStatus(
+            epic_status="in_progress",
+            story_status="done",
+        )
+        state = SessionState(
+            current_work=CurrentWork(
+                epic="E347",
+                story="S347.5",
+                phase="implement",
+                branch="story/s347.5/test",
+            ),
+            last_session=LastSession(
+                id="SES-001",
+                date=date(2026, 3, 3),
+                developer="Test",
+                summary="test",
+            ),
+        )
+        profile = DeveloperProfile(name="Test")
+        result = assemble_orientation(profile, state, Path("/project"))
+        mock_fetch.assert_called_once_with(state)
+        assert "in_progress (live)" in result
+        assert "done (live)" in result
+
+
+class TestStalenessDisclaimer:
+    """Regression tests for RAISE-214: stale session state caveat.
+
+    next_session_prompt and narrative are captured at session close.
+    If work continues after close, they contain stale git/branch state.
+    The fix adds a staleness caveat with the capture date so the reader
+    knows to verify volatile state before acting on it.
+    """
+
+    def test_next_session_prompt_includes_staleness_caveat(self) -> None:
+        """next_session_prompt includes capture date and staleness warning."""
+        state = SessionState(
+            current_work=CurrentWork(epic="E15", story="S15.7", phase="implement", branch="dev"),
+            last_session=LastSession(
+                id="SES-300",
+                date=date(2026, 3, 1),
+                developer="Test",
+                summary="session with stale state",
+            ),
+            next_session_prompt="ADR-015 still uncommitted. Branch has 3 commits ahead of dev.",
+        )
+        result = _format_next_session_prompt(state)
+
+        assert "# Next Session Prompt" in result
+        assert "2026-03-01" in result
+        assert "stale" in result.lower()
+        assert "verify" in result.lower()
+        # Original content still present
+        assert "ADR-015 still uncommitted" in result
+
+    def test_narrative_includes_staleness_caveat(self) -> None:
+        """narrative includes capture date and staleness warning."""
+        state = SessionState(
+            current_work=CurrentWork(epic="E15", story="S15.7", phase="implement", branch="dev"),
+            last_session=LastSession(
+                id="SES-300",
+                date=date(2026, 3, 1),
+                developer="Test",
+                summary="session with stale state",
+            ),
+            narrative="## Branch State\n- 3 commits ahead of dev, ADR-015 uncommitted",
+        )
+        result = _format_narrative(state)
+
+        assert "# Session Narrative" in result
+        assert "2026-03-01" in result
+        assert "stale" in result.lower()
+        assert "verify" in result.lower()
+        # Original content still present
+        assert "ADR-015 uncommitted" in result
+
+    def test_empty_next_session_prompt_no_caveat(self) -> None:
+        """Empty next_session_prompt returns empty string — no caveat noise."""
+        state = SessionState(
+            current_work=CurrentWork(),
+            last_session=LastSession(
+                id="SES-300", date=date(2026, 3, 1), developer="Test", summary="test"
+            ),
+            next_session_prompt="",
+        )
+        assert _format_next_session_prompt(state) == ""
+
+    def test_empty_narrative_no_caveat(self) -> None:
+        """Empty narrative returns empty string — no caveat noise."""
+        state = SessionState(
+            current_work=CurrentWork(),
+            last_session=LastSession(
+                id="SES-300", date=date(2026, 3, 1), developer="Test", summary="test"
+            ),
+            narrative="",
+        )
+        assert _format_narrative(state) == ""
+
+    def test_none_state_no_caveat(self) -> None:
+        """None state returns empty string for both formatters."""
+        assert _format_next_session_prompt(None) == ""
+        assert _format_narrative(None) == ""

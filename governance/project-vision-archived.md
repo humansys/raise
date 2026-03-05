@@ -134,7 +134,7 @@ The CLI is **the engine** that makes RaiSE governance deterministic and observab
 | CLI startup time | <1 second | pytest benchmark |
 | Command response time | <5 seconds | pytest benchmark |
 | SAR analysis time (medium repo) | <30 seconds | pytest benchmark |
-| Test coverage | >90% | pytest --cov |
+| Test coverage | Diagnostic (floor: 70%) | pytest --cov |
 | Type coverage | 100% | pyright --strict |
 
 ---

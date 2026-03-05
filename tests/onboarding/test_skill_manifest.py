@@ -60,11 +60,7 @@ class TestSaveLoadManifest:
 
     def test_save_creates_file(self, tmp_path: Path) -> None:
         manifest = SkillManifest(
-            skills={
-                "rai-session-start": SkillEntry(
-                    sha256="abc123", version="2.0.0"
-                )
-            }
+            skills={"rai-session-start": SkillEntry(sha256="abc123", version="2.0.0")}
         )
         save_skill_manifest(manifest, tmp_path)
 
@@ -73,11 +69,7 @@ class TestSaveLoadManifest:
 
     def test_save_produces_valid_json(self, tmp_path: Path) -> None:
         manifest = SkillManifest(
-            skills={
-                "rai-session-start": SkillEntry(
-                    sha256="abc123", version="2.0.0"
-                )
-            }
+            skills={"rai-session-start": SkillEntry(sha256="abc123", version="2.0.0")}
         )
         save_skill_manifest(manifest, tmp_path)
 

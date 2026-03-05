@@ -55,7 +55,9 @@ class TelemetryHook:
             result = emit_command_usage(command, subcommand)
         except Exception as exc:  # noqa: BLE001
             msg = f"{type(exc).__name__}: {exc}"
-            logger.warning("TelemetryHook emit failed for '%s': %s", event.event_name, msg)
+            logger.warning(
+                "TelemetryHook emit failed for '%s': %s", event.event_name, msg
+            )
             return HookResult(status="error", message=msg)
 
         if not result.success:

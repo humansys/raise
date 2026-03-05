@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 from typing import Annotated, Literal
 
 import typer
@@ -10,13 +10,17 @@ from rich.console import Console
 
 from rai_cli import __version__
 from rai_cli.cli.commands.adapters import adapters_app
+from rai_cli.cli.commands.artifact import artifact_app
 from rai_cli.cli.commands.backlog import backlog_app
 from rai_cli.cli.commands.base import base_app
 from rai_cli.cli.commands.discover import discover_app
+from rai_cli.cli.commands.doctor import doctor_app
+from rai_cli.cli.commands.docs import docs_app
 from rai_cli.cli.commands.gate import gate_app
 from rai_cli.cli.commands.graph import graph_app
 from rai_cli.cli.commands.info import info_command
 from rai_cli.cli.commands.init import init_command
+from rai_cli.cli.commands.mcp import mcp_app
 from rai_cli.cli.commands.memory import memory_app
 from rai_cli.cli.commands.pattern import pattern_app
 from rai_cli.cli.commands.profile import profile_app
@@ -48,12 +52,16 @@ app = typer.Typer(
 )
 
 # Register command groups
-app.add_typer(adapters_app, name="adapters")
+app.add_typer(adapters_app, name="adapter")
+app.add_typer(artifact_app, name="artifact")
 app.add_typer(backlog_app, name="backlog")
 app.add_typer(base_app, name="base")
+app.add_typer(docs_app, name="docs")
 app.add_typer(discover_app, name="discover")
+app.add_typer(doctor_app, name="doctor")
 app.add_typer(gate_app, name="gate")
 app.add_typer(graph_app, name="graph")
+app.add_typer(mcp_app, name="mcp")
 app.add_typer(memory_app, name="memory")
 app.add_typer(pattern_app, name="pattern")
 app.add_typer(profile_app, name="profile")
@@ -70,7 +78,7 @@ app.command("init")(init_command)
 console = Console()
 
 
-class OutputFormat(str, Enum):
+class OutputFormat(StrEnum):
     """Output format options."""
 
     human = "human"

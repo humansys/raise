@@ -1,1 +1,1 @@
-"""Graph backend implementations."""
+"""Graph backend implementations for rai-cli."""

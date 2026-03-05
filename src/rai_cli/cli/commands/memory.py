@@ -32,7 +32,9 @@ memory_app = typer.Typer(
 _stderr_console = Console(stderr=True)
 
 
-def _deprecation_warning(old_cmd: str, new_group: str = "graph", new_cmd: str | None = None) -> None:
+def _deprecation_warning(
+    old_cmd: str, new_group: str = "graph", new_cmd: str | None = None
+) -> None:
     """Print deprecation warning to stderr."""
     target = new_cmd or old_cmd
     _stderr_console.print(
@@ -205,7 +207,9 @@ def list_memory(
     _deprecation_warning("list")
     from rai_cli.cli.commands.graph import list_graph
 
-    list_graph(format=format, output=output, index_path=index_path, memory_only=memory_only)
+    list_graph(
+        format=format, output=output, index_path=index_path, memory_only=memory_only
+    )
 
 
 @memory_app.command("viz")
@@ -238,14 +242,22 @@ def viz(
 
 @memory_app.command("reinforce")
 def reinforce_cmd(
-    pattern_id: Annotated[str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")],
+    pattern_id: Annotated[
+        str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")
+    ],
     vote: Annotated[
         int,
-        typer.Option("--vote", "-v", help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)"),
+        typer.Option(
+            "--vote",
+            "-v",
+            help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)",
+        ),
     ],
     story_id: Annotated[
         str | None,
-        typer.Option("--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"),
+        typer.Option(
+            "--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"
+        ),
     ] = None,
     scope: Annotated[
         str,
@@ -253,7 +265,9 @@ def reinforce_cmd(
     ] = "project",
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
+        typer.Option(
+            "--memory-dir", "-m", help="Memory directory path (overrides scope)"
+        ),
     ] = None,
 ) -> None:
     """Deprecated: use 'rai pattern reinforce'."""

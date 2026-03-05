@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any
 
 from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
-from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType, ExtractionResult
 
 # Legacy imports — used only by extract_with_result() and extract_from_file()
@@ -26,6 +25,7 @@ from rai_cli.governance.parsers.guardrails import extract_all_guardrails
 from rai_cli.governance.parsers.prd import extract_requirements
 from rai_cli.governance.parsers.roadmap import extract_releases
 from rai_cli.governance.parsers.vision import extract_outcomes
+from rai_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
@@ -170,9 +170,7 @@ class GovernanceExtractor:
 
         return locators
 
-    def _find_parser(
-        self, locator: ArtifactLocator, parsers: list[Any]
-    ) -> Any | None:
+    def _find_parser(self, locator: ArtifactLocator, parsers: list[Any]) -> Any | None:
         """Find first parser that can_parse this locator."""
         for parser in parsers:
             if parser.can_parse(locator):

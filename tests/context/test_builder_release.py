@@ -1,4 +1,4 @@
-"""Tests for release node and edge integration in UnifiedGraphBuilder."""
+"""Tests for release node and edge integration in GraphBuilder."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.context.builder import UnifiedGraphBuilder
+from rai_cli.context.builder import GraphBuilder
 
 
 @pytest.fixture
@@ -56,7 +56,7 @@ class TestReleaseNodesInGraph:
 
     def test_graph_contains_release_nodes(self, project_with_releases: Path) -> None:
         """Should produce release nodes in the graph."""
-        builder = UnifiedGraphBuilder(project_with_releases)
+        builder = GraphBuilder(project_with_releases)
         graph = builder.build()
 
         release_nodes = graph.get_concepts_by_type("release")
@@ -64,7 +64,7 @@ class TestReleaseNodesInGraph:
 
     def test_release_node_ids(self, project_with_releases: Path) -> None:
         """Should produce correct release IDs."""
-        builder = UnifiedGraphBuilder(project_with_releases)
+        builder = GraphBuilder(project_with_releases)
         graph = builder.build()
 
         release_nodes = graph.get_concepts_by_type("release")
@@ -74,7 +74,7 @@ class TestReleaseNodesInGraph:
 
     def test_release_node_metadata(self, project_with_releases: Path) -> None:
         """Should carry metadata through to graph nodes."""
-        builder = UnifiedGraphBuilder(project_with_releases)
+        builder = GraphBuilder(project_with_releases)
         graph = builder.build()
 
         release_nodes = graph.get_concepts_by_type("release")
@@ -86,11 +86,9 @@ class TestReleaseNodesInGraph:
 class TestReleasePartOfEdges:
     """Tests for epic → release part_of edges."""
 
-    def test_epic_to_release_edges_created(
-        self, project_with_releases: Path
-    ) -> None:
+    def test_epic_to_release_edges_created(self, project_with_releases: Path) -> None:
         """Should create part_of edges from epics to releases."""
-        builder = UnifiedGraphBuilder(project_with_releases)
+        builder = GraphBuilder(project_with_releases)
         graph = builder.build()
 
         # E1 should be neighbor of rel-v2.0 via part_of
@@ -100,7 +98,7 @@ class TestReleasePartOfEdges:
 
     def test_missing_epic_node_skipped(self, project_with_releases: Path) -> None:
         """Should skip edges for epics not in graph (E4 not in backlog)."""
-        builder = UnifiedGraphBuilder(project_with_releases)
+        builder = GraphBuilder(project_with_releases)
         graph = builder.build()
 
         # E4 doesn't exist in backlog → no node → no edge
@@ -110,7 +108,7 @@ class TestReleasePartOfEdges:
 
     def test_multiple_epics_per_release(self, project_with_releases: Path) -> None:
         """Should create edges for all epics in a release."""
-        builder = UnifiedGraphBuilder(project_with_releases)
+        builder = GraphBuilder(project_with_releases)
         graph = builder.build()
 
         # Both E1 and E2 should be neighbors of rel-v2.0

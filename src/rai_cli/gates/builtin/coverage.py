@@ -45,6 +45,8 @@ class CoverageGate:
         return GateResult(
             passed=passed,
             gate_id=self.gate_id,
-            message="Coverage collection succeeds" if passed else "Coverage check failed",
+            message="Coverage collection succeeds"
+            if passed
+            else "Coverage check failed",
             details=(result.stdout,) if not passed else (),
         )

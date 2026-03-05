@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(rai *)"
+      "Bash(rai *)",
+      "Bash(uv run rai *)"
     ]
   }
 }

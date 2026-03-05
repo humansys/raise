@@ -7,13 +7,13 @@ memories loaded from JSONL files.
 from __future__ import annotations
 
 from datetime import date
-from enum import Enum
+from enum import StrEnum
 from typing import Any
 
 from pydantic import BaseModel, Field
 
 
-class MemoryScope(str, Enum):
+class MemoryScope(StrEnum):
     """Scope/tier for memory data.
 
     Determines where memory data is stored and its visibility:
@@ -33,7 +33,7 @@ class MemoryScope(str, Enum):
         return self.value
 
 
-class MemoryConceptType(str, Enum):
+class MemoryConceptType(StrEnum):
     """Types of memory concepts.
 
     Attributes:
@@ -47,7 +47,7 @@ class MemoryConceptType(str, Enum):
     SESSION = "session"
 
 
-class PatternSubType(str, Enum):
+class PatternSubType(StrEnum):
     """Sub-types for pattern concepts.
 
     Attributes:
@@ -63,7 +63,7 @@ class PatternSubType(str, Enum):
     TECHNICAL = "technical"
 
 
-class MemoryRelationshipType(str, Enum):
+class MemoryRelationshipType(StrEnum):
     """Types of relationships between memory concepts.
 
     Attributes:

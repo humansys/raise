@@ -52,7 +52,10 @@ class TestSessionStartEvent:
     """session:start event wiring."""
 
     def test_session_start_emits_event(
-        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+        self,
+        tmp_path: Path,
+        captured_events: list[HookEvent],
+        mock_emitter: EventEmitter,
     ) -> None:
         from typer.testing import CliRunner
 
@@ -61,7 +64,9 @@ class TestSessionStartEvent:
         runner = CliRunner()
 
         with (
-            patch("rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter),
+            patch(
+                "rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+            ),
             patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("rai_cli.cli.commands.session.save_developer_profile"),
             patch("rai_cli.cli.commands.session.increment_session") as mock_inc,
@@ -75,12 +80,17 @@ class TestSessionStartEvent:
             result = runner.invoke(session_app, ["start"])
 
         assert result.exit_code == 0
-        session_events = [e for e in captured_events if isinstance(e, SessionStartEvent)]
+        session_events = [
+            e for e in captured_events if isinstance(e, SessionStartEvent)
+        ]
         assert len(session_events) == 1
         assert session_events[0].developer == "Test"
 
     def test_session_start_with_project_emits_session_id(
-        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+        self,
+        tmp_path: Path,
+        captured_events: list[HookEvent],
+        mock_emitter: EventEmitter,
     ) -> None:
         from typer.testing import CliRunner
 
@@ -95,7 +105,9 @@ class TestSessionStartEvent:
         index.write_text("")
 
         with (
-            patch("rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter),
+            patch(
+                "rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+            ),
             patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("rai_cli.cli.commands.session.save_developer_profile"),
             patch("rai_cli.cli.commands.session.increment_session") as mock_inc,
@@ -113,7 +125,9 @@ class TestSessionStartEvent:
             result = runner.invoke(session_app, ["start", "--project", str(tmp_path)])
 
         assert result.exit_code == 0
-        session_events = [e for e in captured_events if isinstance(e, SessionStartEvent)]
+        session_events = [
+            e for e in captured_events if isinstance(e, SessionStartEvent)
+        ]
         assert len(session_events) == 1
         assert session_events[0].session_id == "SES-42"
 
@@ -131,7 +145,9 @@ class TestSessionCloseEvents:
         runner = CliRunner()
 
         with (
-            patch("rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter),
+            patch(
+                "rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+            ),
             patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("rai_cli.cli.commands.session.save_developer_profile"),
             patch("rai_cli.cli.commands.session.end_session") as mock_end,
@@ -154,14 +170,17 @@ class TestSessionCloseEvents:
             result = runner.invoke(session_app, ["close"])
 
         assert result.exit_code == 0
-        before_events = [e for e in captured_events if isinstance(e, BeforeSessionCloseEvent)]
+        before_events = [
+            e for e in captured_events if isinstance(e, BeforeSessionCloseEvent)
+        ]
         after_events = [e for e in captured_events if isinstance(e, SessionCloseEvent)]
         assert len(before_events) == 1
         assert len(after_events) == 1
         assert before_events[0].session_id == "SES-10"
 
     def test_session_close_abort_stops_execution(
-        self, captured_events: list[HookEvent],
+        self,
+        captured_events: list[HookEvent],
     ) -> None:
         from typer.testing import CliRunner
 
@@ -176,13 +195,18 @@ class TestSessionCloseEvents:
         def abort_emit(event: HookEvent) -> EmitResult:
             abort_calls.append(event)
             if event.event_name == "before:session:close":
-                return EmitResult(aborted=True, abort_message="Blocked by hook", handler_errors=())
+                return EmitResult(
+                    aborted=True, abort_message="Blocked by hook", handler_errors=()
+                )
             return EmitResult(aborted=False, abort_message="", handler_errors=())
 
         abort_emitter.emit = abort_emit  # type: ignore[assignment]
 
         with (
-            patch("rai_cli.cli.commands.session.create_emitter", return_value=abort_emitter),
+            patch(
+                "rai_cli.cli.commands.session.create_emitter",
+                return_value=abort_emitter,
+            ),
             patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("rai_cli.cli.commands.session.end_session") as mock_end,
         ):
@@ -206,7 +230,9 @@ class TestSessionCloseEvents:
         # Should exit with error
         assert result.exit_code == 1
         # before: event was emitted, but session:close was NOT
-        before_events = [e for e in abort_calls if isinstance(e, BeforeSessionCloseEvent)]
+        before_events = [
+            e for e in abort_calls if isinstance(e, BeforeSessionCloseEvent)
+        ]
         after_events = [e for e in abort_calls if isinstance(e, SessionCloseEvent)]
         assert len(before_events) == 1
         assert len(after_events) == 0
@@ -216,7 +242,10 @@ class TestGraphBuildEvent:
     """graph:build event wiring."""
 
     def test_graph_build_emits_event(
-        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+        self,
+        tmp_path: Path,
+        captured_events: list[HookEvent],
+        mock_emitter: EventEmitter,
     ) -> None:
         from typer.testing import CliRunner
 
@@ -235,10 +264,18 @@ class TestGraphBuildEvent:
         mock_backend.load.return_value = None
 
         with (
-            patch("rai_cli.cli.commands.graph.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.graph.get_active_backend", return_value=mock_backend),
-            patch("rai_cli.cli.commands.graph.UnifiedGraphBuilder") as mock_builder_cls,
-            patch("rai_cli.cli.commands.graph._get_default_index_path", return_value=tmp_path / "index.json"),
+            patch(
+                "rai_cli.cli.commands.graph.create_emitter", return_value=mock_emitter
+            ),
+            patch(
+                "rai_cli.cli.commands.graph.get_active_backend",
+                return_value=mock_backend,
+            ),
+            patch("rai_cli.cli.commands.graph.GraphBuilder") as mock_builder_cls,
+            patch(
+                "rai_cli.cli.commands.graph._get_default_index_path",
+                return_value=tmp_path / "index.json",
+            ),
         ):
             mock_builder = MagicMock()
             mock_builder.build.return_value = mock_graph
@@ -257,7 +294,10 @@ class TestPatternAddedEvent:
     """pattern:added event wiring."""
 
     def test_pattern_add_emits_event_on_success(
-        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+        self,
+        tmp_path: Path,
+        captured_events: list[HookEvent],
+        mock_emitter: EventEmitter,
     ) -> None:
         from typer.testing import CliRunner
 
@@ -271,12 +311,23 @@ class TestPatternAddedEvent:
         mock_result.message = "Pattern added"
 
         with (
-            patch("rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.pattern.get_memory_dir_for_scope", return_value=tmp_path),
-            patch("rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result),
-            patch("rai_cli.cli.commands.pattern.load_developer_profile", return_value=None),
+            patch(
+                "rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
+            ),
+            patch(
+                "rai_cli.cli.commands.pattern.get_memory_dir_for_scope",
+                return_value=tmp_path,
+            ),
+            patch(
+                "rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result
+            ),
+            patch(
+                "rai_cli.cli.commands.pattern.load_developer_profile", return_value=None
+            ),
         ):
-            result = runner.invoke(pattern_app, ["add", "Test pattern", "-c", "testing"])
+            result = runner.invoke(
+                pattern_app, ["add", "Test pattern", "-c", "testing"]
+            )
 
         assert result.exit_code == 0
         pat_events = [e for e in captured_events if isinstance(e, PatternAddedEvent)]
@@ -285,7 +336,10 @@ class TestPatternAddedEvent:
         assert pat_events[0].content == "Test pattern"
 
     def test_pattern_add_no_event_on_failure(
-        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+        self,
+        tmp_path: Path,
+        captured_events: list[HookEvent],
+        mock_emitter: EventEmitter,
     ) -> None:
         from typer.testing import CliRunner
 
@@ -298,12 +352,21 @@ class TestPatternAddedEvent:
         mock_result.message = "Failed"
 
         with (
-            patch("rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.pattern.get_memory_dir_for_scope", return_value=tmp_path),
-            patch("rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result),
-            patch("rai_cli.cli.commands.pattern.load_developer_profile", return_value=None),
+            patch(
+                "rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
+            ),
+            patch(
+                "rai_cli.cli.commands.pattern.get_memory_dir_for_scope",
+                return_value=tmp_path,
+            ),
+            patch(
+                "rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result
+            ),
+            patch(
+                "rai_cli.cli.commands.pattern.load_developer_profile", return_value=None
+            ),
         ):
-            result = runner.invoke(pattern_app, ["add", "Test pattern"])
+            runner.invoke(pattern_app, ["add", "Test pattern"])
 
         pat_events = [e for e in captured_events if isinstance(e, PatternAddedEvent)]
         assert len(pat_events) == 0
@@ -313,7 +376,10 @@ class TestDiscoverScanEvent:
     """discover:scan event wiring."""
 
     def test_discover_scan_emits_event(
-        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+        self,
+        tmp_path: Path,
+        captured_events: list[HookEvent],
+        mock_emitter: EventEmitter,
     ) -> None:
         from typer.testing import CliRunner
 
@@ -327,8 +393,13 @@ class TestDiscoverScanEvent:
         mock_result.errors = []
 
         with (
-            patch("rai_cli.cli.commands.discover.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.discover.scan_directory", return_value=mock_result),
+            patch(
+                "rai_cli.cli.commands.discover.create_emitter",
+                return_value=mock_emitter,
+            ),
+            patch(
+                "rai_cli.cli.commands.discover.scan_directory", return_value=mock_result
+            ),
             patch("rai_cli.cli.commands.discover.format_scan_result"),
         ):
             result = runner.invoke(discover_app, ["scan", str(tmp_path)])
@@ -344,14 +415,16 @@ class TestInitCompleteEvent:
     """init:complete event wiring."""
 
     def test_init_emits_event(
-        self, tmp_path: Path, captured_events: list[HookEvent], mock_emitter: EventEmitter
+        self,
+        tmp_path: Path,
+        captured_events: list[HookEvent],
+        mock_emitter: EventEmitter,
     ) -> None:
+        # Create a Typer app just for testing
+        import typer
         from typer.testing import CliRunner
 
         from rai_cli.cli.commands.init import init_command
-
-        # Create a Typer app just for testing
-        import typer
 
         app = typer.Typer()
         app.command()(init_command)
@@ -370,6 +443,8 @@ class TestInitCompleteEvent:
         mock_detection = MagicMock()
         mock_detection.project_type = ProjectType.GREENFIELD
         mock_detection.code_file_count = 0
+        mock_detection.language = None
+        mock_detection.toolchain = None
 
         mock_config = MagicMock()
         mock_config.agent_type = "claude"
@@ -396,28 +471,65 @@ class TestInitCompleteEvent:
 
         mock_bootstrap = MagicMock()
         mock_bootstrap.already_existed = True
+        mock_bootstrap.patterns_added = 0
+        mock_bootstrap.patterns_updated = 0
 
         with (
-            patch("rai_cli.cli.commands.init.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.init.load_developer_profile", return_value=mock_profile),
+            patch(
+                "rai_cli.cli.commands.init.create_emitter", return_value=mock_emitter
+            ),
+            patch(
+                "rai_cli.cli.commands.init.load_developer_profile",
+                return_value=mock_profile,
+            ),
             patch("rai_cli.cli.commands.init.save_developer_profile"),
-            patch("rai_cli.cli.commands.init.detect_project_type", return_value=mock_detection),
-            patch("rai_cli.cli.commands.init.load_registry", return_value=mock_registry),
+            patch(
+                "rai_cli.cli.commands.init.detect_project_type",
+                return_value=mock_detection,
+            ),
+            patch(
+                "rai_cli.cli.commands.init.load_registry", return_value=mock_registry
+            ),
             patch("rai_cli.cli.commands.init.save_manifest"),
-            patch("rai_cli.onboarding.bootstrap.bootstrap_rai_base", return_value=mock_bootstrap),
-            patch("rai_cli.onboarding.governance.scaffold_governance", return_value=mock_gov_result),
-            patch("rai_cli.onboarding.memory_md.generate_memory_md", return_value="# Memory"),
-            patch("rai_cli.config.paths.get_memory_dir", return_value=tmp_path / "memory"),
-            patch("rai_cli.config.paths.get_framework_dir", return_value=tmp_path / "framework"),
-            patch("rai_cli.config.paths.get_claude_memory_path", return_value=tmp_path / "claude" / "MEMORY.md"),
-            patch("rai_cli.onboarding.skills.scaffold_skills", return_value=mock_skills_result),
+            patch(
+                "rai_cli.onboarding.bootstrap.bootstrap_rai_base",
+                return_value=mock_bootstrap,
+            ),
+            patch(
+                "rai_cli.onboarding.governance.scaffold_governance",
+                return_value=mock_gov_result,
+            ),
+            patch(
+                "rai_cli.onboarding.memory_md.generate_memory_md",
+                return_value="# Memory",
+            ),
+            patch(
+                "rai_cli.config.paths.get_memory_dir", return_value=tmp_path / "memory"
+            ),
+            patch(
+                "rai_cli.config.paths.get_framework_dir",
+                return_value=tmp_path / "framework",
+            ),
+            patch(
+                "rai_cli.config.paths.get_claude_memory_path",
+                return_value=tmp_path / "claude" / "MEMORY.md",
+            ),
+            patch(
+                "rai_cli.onboarding.skills.scaffold_skills",
+                return_value=mock_skills_result,
+            ),
             patch("rai_cli.onboarding.workflows.scaffold_workflows"),
+            patch(
+                "rai_cli.cli.commands.init.generate_instructions",
+                return_value="# Test CLAUDE.md",
+            ),
         ):
             # Create necessary dirs
             (tmp_path / "memory").mkdir(parents=True, exist_ok=True)
             (tmp_path / "claude").mkdir(parents=True, exist_ok=True)
             (tmp_path / "framework").mkdir(parents=True, exist_ok=True)
             (tmp_path / "framework" / "methodology.yaml").write_text("")
+            (tmp_path / ".raise").mkdir(parents=True, exist_ok=True)
 
             result = runner.invoke(app, ["--path", str(tmp_path)])
 
@@ -458,19 +570,29 @@ class TestAdapterEvents:
             return []
 
         with (
-            patch("rai_cli.cli.commands.adapters.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.adapters.entry_points", side_effect=selective_entry_points),
+            patch(
+                "rai_cli.cli.commands.adapters.create_emitter",
+                return_value=mock_emitter,
+            ),
+            patch(
+                "rai_cli.cli.commands.adapters.entry_points",
+                side_effect=selective_entry_points,
+            ),
             patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
             patch("rai_cli.cli.commands.adapters.format_check_human"),
         ):
             result = runner.invoke(adapters_app, ["check"])
 
         assert result.exit_code == 0
-        loaded_events = [e for e in captured_events if isinstance(e, AdapterLoadedEvent)]
+        loaded_events = [
+            e for e in captured_events if isinstance(e, AdapterLoadedEvent)
+        ]
         assert len(loaded_events) == 1
         assert loaded_events[0].adapter_name == "test-adapter"
         # Non-compliant should NOT emit loaded
-        failed_events = [e for e in captured_events if isinstance(e, AdapterFailedEvent)]
+        failed_events = [
+            e for e in captured_events if isinstance(e, AdapterFailedEvent)
+        ]
         assert len(failed_events) == 0
 
     def test_adapter_check_emits_failed_for_non_compliant(
@@ -497,8 +619,14 @@ class TestAdapterEvents:
             return []
 
         with (
-            patch("rai_cli.cli.commands.adapters.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.cli.commands.adapters.entry_points", side_effect=selective_entry_points),
+            patch(
+                "rai_cli.cli.commands.adapters.create_emitter",
+                return_value=mock_emitter,
+            ),
+            patch(
+                "rai_cli.cli.commands.adapters.entry_points",
+                side_effect=selective_entry_points,
+            ),
             patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
             patch("rai_cli.cli.commands.adapters.format_check_human"),
         ):
@@ -506,10 +634,14 @@ class TestAdapterEvents:
 
         assert result.exit_code == 0
         # Non-compliant adapters emit failed, not loaded
-        failed_events = [e for e in captured_events if isinstance(e, AdapterFailedEvent)]
+        failed_events = [
+            e for e in captured_events if isinstance(e, AdapterFailedEvent)
+        ]
         assert len(failed_events) == 1
         assert failed_events[0].adapter_name == "bad-adapter"
-        loaded_events = [e for e in captured_events if isinstance(e, AdapterLoadedEvent)]
+        loaded_events = [
+            e for e in captured_events if isinstance(e, AdapterLoadedEvent)
+        ]
         assert len(loaded_events) == 0
 
     def test_adapter_check_emits_failed_on_load_error(
@@ -528,7 +660,10 @@ class TestAdapterEvents:
         mock_ep.dist.name = "broken-pkg"
 
         with (
-            patch("rai_cli.cli.commands.adapters.create_emitter", return_value=mock_emitter),
+            patch(
+                "rai_cli.cli.commands.adapters.create_emitter",
+                return_value=mock_emitter,
+            ),
             patch("rai_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]),
             patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
             patch("rai_cli.cli.commands.adapters.format_check_human"),
@@ -536,7 +671,9 @@ class TestAdapterEvents:
             result = runner.invoke(adapters_app, ["check"])
 
         assert result.exit_code == 0
-        failed_events = [e for e in captured_events if isinstance(e, AdapterFailedEvent)]
+        failed_events = [
+            e for e in captured_events if isinstance(e, AdapterFailedEvent)
+        ]
         assert len(failed_events) >= 1
         assert failed_events[0].adapter_name == "broken-adapter"
         assert "missing dep" in failed_events[0].error

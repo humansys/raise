@@ -20,6 +20,8 @@ metadata:
 
 # Discovery Scan
 
+> **Deprecated:** Use `/rai-discover` instead, which runs the full pipeline (detect → extract → describe → document → build) in one pass. This skill is kept for backward compatibility.
+
 ## Purpose
 
 Extract symbols from the codebase and synthesize meaningful descriptions for each component. Produces a draft component catalog ready for human validation.

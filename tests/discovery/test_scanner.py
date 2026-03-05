@@ -1327,7 +1327,9 @@ class TestExtractCsharpSymbols:
         cs_file.write_text("public class Form1 {}\n")
 
         designer_file = tmp_path / "Form1.Designer.cs"
-        designer_file.write_text("public partial class Form1 { private void InitializeComponent() {} }\n")
+        designer_file.write_text(
+            "public partial class Form1 { private void InitializeComponent() {} }\n"
+        )
 
         result = scan_directory(tmp_path, language="csharp")
         names = [s.name for s in result.symbols]
@@ -1338,13 +1340,15 @@ class TestExtractCsharpSymbols:
     def test_scan_directory_csharp(self, tmp_path: Path) -> None:
         """Test scan_directory finds and parses .cs files."""
         cs_file = tmp_path / "UserService.cs"
-        cs_file.write_text(dedent("""\
+        cs_file.write_text(
+            dedent("""\
             namespace MyApp {
                 public class UserService {
                     public void Process() { }
                 }
             }
-        """))
+        """)
+        )
 
         other_file = tmp_path / "main.py"
         other_file.write_text("class Main: pass\n")

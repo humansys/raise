@@ -1,0 +1,14 @@
+adapter:
+  name: wiki
+  protocol: docs
+  description: "Wiki docs target"
+
+server:
+  command: uvx
+  args: [mcp-wiki]
+
+methods:
+  search:
+    tool: wiki_search
+    args:
+      query: "{{ query }}"

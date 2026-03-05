@@ -494,3 +494,80 @@ class TestSkillScaffold:
         result = runner.invoke(app, ["skill", "scaffold", "existing-skill"])
         assert result.exit_code == 1
         assert "exists" in result.stdout.lower()
+
+
+class TestSkillSync:
+    """Tests for raise skill sync command."""
+
+    def test_skill_sync_shows_status(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Invoke `rai skill sync` and verify it outputs skill status table."""
+        from unittest.mock import patch
+
+        from rai_cli.onboarding.skills import SkillScaffoldResult
+
+        monkeypatch.chdir(tmp_path)
+
+        mock_result = SkillScaffoldResult(
+            skills_current=["rai-session-start", "rai-story-plan"],
+            skills_updated=["rai-epic-start"],
+            skills_conflicted=["rai-debug"],
+        )
+
+        with patch(
+            "rai_cli.cli.commands.skill.scaffold_skills",
+            return_value=mock_result,
+        ):
+            result = runner.invoke(app, ["skill", "sync"])
+
+        assert "rai-session-start" in result.stdout
+        assert "rai-epic-start" in result.stdout
+        assert "current" in result.stdout.lower()
+        assert "update" in result.stdout.lower()
+
+    def test_skill_sync_exits_zero_when_current(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """All skills current → exit 0."""
+        from unittest.mock import patch
+
+        from rai_cli.onboarding.skills import SkillScaffoldResult
+
+        monkeypatch.chdir(tmp_path)
+
+        mock_result = SkillScaffoldResult(
+            skills_current=["rai-session-start", "rai-story-plan"],
+        )
+
+        with patch(
+            "rai_cli.cli.commands.skill.scaffold_skills",
+            return_value=mock_result,
+        ):
+            result = runner.invoke(app, ["skill", "sync"])
+
+        assert result.exit_code == 0
+        assert "current" in result.stdout.lower()
+
+    def test_skill_sync_exits_one_when_stale(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Stale skills detected → exit 1."""
+        from unittest.mock import patch
+
+        from rai_cli.onboarding.skills import SkillScaffoldResult
+
+        monkeypatch.chdir(tmp_path)
+
+        mock_result = SkillScaffoldResult(
+            skills_current=["rai-session-start"],
+            skills_updated=["rai-epic-start"],
+        )
+
+        with patch(
+            "rai_cli.cli.commands.skill.scaffold_skills",
+            return_value=mock_result,
+        ):
+            result = runner.invoke(app, ["skill", "sync"])
+
+        assert result.exit_code == 1

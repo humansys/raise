@@ -8,9 +8,9 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.context.models import GraphNode
 from rai_cli.governance.extractor import GovernanceExtractor
 from rai_cli.governance.models import ConceptType
+from rai_core.graph.models import GraphNode
 
 
 @pytest.fixture
@@ -253,21 +253,25 @@ class TestRegistryPath:
     ) -> None:
         """Broken parser logs warning, others still produce nodes."""
         from rai_cli.adapters.models import ArtifactLocator
-        from rai_cli.context.models import GraphNode as GN
+        from rai_core.graph.models import GraphNode
 
         class BrokenParser:
             def can_parse(self, locator: ArtifactLocator) -> bool:
                 return locator.artifact_type == "prd"
 
-            def parse(self, locator: ArtifactLocator) -> list[GN]:
+            def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
                 raise RuntimeError("parser exploded")
 
         class GoodParser:
             def can_parse(self, locator: ArtifactLocator) -> bool:
                 return locator.artifact_type == "constitution"
 
-            def parse(self, locator: ArtifactLocator) -> list[GN]:
-                return [GN(id="test-1", type="principle", content="ok", created="now")]
+            def parse(self, locator: ArtifactLocator) -> list[GraphNode]:
+                return [
+                    GraphNode(
+                        id="test-1", type="principle", content="ok", created="now"
+                    )
+                ]
 
         extractor = GovernanceExtractor(
             tmp_governance_structure,
@@ -335,9 +339,7 @@ class TestRoadmapExtraction:
 
         result = extractor.extract_with_result()
 
-        release_concepts = [
-            c for c in result.concepts if c.type == ConceptType.RELEASE
-        ]
+        release_concepts = [c for c in result.concepts if c.type == ConceptType.RELEASE]
         assert len(release_concepts) == 2
 
     def test_release_ids_in_extraction(self, project_with_roadmap: Path) -> None:

@@ -69,7 +69,6 @@ def sample_unified_graph(tmp_path: Path) -> Path:
     return index_path
 
 
-
 class TestMemoryHelp:
     """Tests for memory command help."""
 

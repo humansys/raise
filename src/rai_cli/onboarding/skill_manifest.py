@@ -14,7 +14,7 @@ import hashlib
 import json
 import logging
 from datetime import UTC, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
@@ -24,7 +24,7 @@ from rai_cli.config.paths import MANIFESTS_SUBDIR, SKILLS_MANIFEST_FILE, get_rai
 logger = logging.getLogger(__name__)
 
 
-class SkillSyncAction(str, Enum):
+class SkillSyncAction(StrEnum):
     """Classification of a skill's sync state using dpkg three-hash model."""
 
     CURRENT = "current"
@@ -64,6 +64,9 @@ class SkillManifest(BaseModel):
     schema_version: str = "1.0"
     rai_cli_version: str = Field(default_factory=lambda: _get_cli_version())
     distributed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    skill_set: str | None = Field(
+        default=None, description="Skill set name last deployed (None = builtins only)"
+    )
     skills: dict[str, SkillEntry] = Field(default_factory=dict)
 
 

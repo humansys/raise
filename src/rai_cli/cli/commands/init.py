@@ -197,10 +197,22 @@ def _get_project_message(
 
         if bootstrap_result is not None:
             if bootstrap_result.already_existed:
-                lines.append(
-                    "[bold]Loaded:[/bold]  .raise/rai/  "
-                    "[dim]— Rai base already present[/dim]"
-                )
+                # Check if base patterns were synced even though everything else existed
+                if bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0:
+                    parts: list[str] = []
+                    if bootstrap_result.patterns_added > 0:
+                        parts.append(f"{bootstrap_result.patterns_added} new")
+                    if bootstrap_result.patterns_updated > 0:
+                        parts.append(f"{bootstrap_result.patterns_updated} updated")
+                    lines.append(
+                        "[bold]Synced:[/bold]  .raise/rai/memory/  "
+                        f"[dim]— {', '.join(parts)} base patterns[/dim]"
+                    )
+                else:
+                    lines.append(
+                        "[bold]Loaded:[/bold]  .raise/rai/  "
+                        "[dim]— Rai base already present[/dim]"
+                    )
             else:
                 if bootstrap_result.identity_copied:
                     lines.append(
@@ -208,9 +220,17 @@ def _get_project_message(
                         "[dim]— Rai's base identity[/dim]"
                     )
                 if bootstrap_result.patterns_copied:
+                    from importlib.resources import files as _res_files
+
+                    _base = _res_files("rai_cli.rai_base")
+                    _src = _base / "memory" / "patterns-base.jsonl"
+                    _count = len([
+                        ln for ln in _src.read_text(encoding="utf-8").strip().splitlines()
+                        if ln.strip()
+                    ])
                     lines.append(
                         "[bold]Created:[/bold] .raise/rai/memory/  "
-                        "[dim]— 20 universal patterns[/dim]"
+                        f"[dim]— {_count} base patterns[/dim]"
                     )
                 if bootstrap_result.methodology_copied:
                     lines.append(
@@ -253,10 +273,20 @@ def _get_project_message(
         )
     else:
         bootstrap_msg = ""
-        if bootstrap_result is not None and not bootstrap_result.already_existed:
-            bootstrap_msg = (
-                f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
-            )
+        if bootstrap_result is not None:
+            if not bootstrap_result.already_existed:
+                bootstrap_msg = (
+                    f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
+                )
+            elif bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0:
+                parts_ri: list[str] = []
+                if bootstrap_result.patterns_added > 0:
+                    parts_ri.append(f"{bootstrap_result.patterns_added} new")
+                if bootstrap_result.patterns_updated > 0:
+                    parts_ri.append(f"{bootstrap_result.patterns_updated} updated")
+                bootstrap_msg = (
+                    f"  Synced base patterns: {', '.join(parts_ri)}\n"
+                )
         skills_msg = ""
         if skills_result is not None and not skills_result.already_existed:
             skills_msg = (
@@ -264,9 +294,7 @@ def _get_project_message(
             )
         governance_msg = ""
         if governance_result is not None and not governance_result.already_existed:
-            governance_msg = (
-                f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
-            )
+            governance_msg = f"  Scaffolded governance/ ({governance_result.files_created} templates)\n"
         return (
             PROJECT_DETECTED_RI.format(
                 project_type=project_type.capitalize(),
@@ -382,9 +410,7 @@ def _generate_agents_md(
     content = (
         f"# {project_name}\n\n"
         f"> RaiSE-governed project. {session_instruction}\n\n"
-        f"## Active Agents\n\n"
-        + "\n".join(f"- {a}" for a in agent_types)
-        + "\n\n"
+        f"## Active Agents\n\n" + "\n".join(f"- {a}" for a in agent_types) + "\n\n"
         "## Process\n\n"
         "This project follows the RaiSE methodology. "
         "See `.raise/` for governance artifacts and `rai --help` for CLI.\n"
@@ -453,6 +479,13 @@ def init_command(
             help="Keep all existing skills, only install new ones.",
         ),
     ] = False,
+    skill_set: Annotated[
+        str | None,
+        typer.Option(
+            "--skill-set",
+            help="Overlay a skill set from .raise/skills/{name}/ on top of builtins.",
+        ),
+    ] = None,
 ) -> None:
     """Initialize a RaiSE project in the current directory.
 
@@ -509,11 +542,17 @@ def init_command(
     if not valid_agent_types:
         valid_agent_types = ["claude"]
 
-    # Create and save manifest with agent types
+    # Create and save manifest with agent types and toolchain
     project_info = ProjectInfo(
         name=project_name,
         project_type=detection.project_type,
         code_file_count=detection.code_file_count,
+        language=detection.language,
+        test_command=detection.toolchain.test_command if detection.toolchain else None,
+        lint_command=detection.toolchain.lint_command if detection.toolchain else None,
+        type_check_command=(
+            detection.toolchain.type_check_command if detection.toolchain else None
+        ),
     )
     manifest = ProjectManifest(
         project=project_info,
@@ -564,8 +603,13 @@ def init_command(
 
         # Skills
         skills_result = scaffold_skills(
-            project_path, agent_config=config, plugin=plugin,
-            force=force, skip_updates=skip_updates, dry_run=dry_run,
+            project_path,
+            agent_config=config,
+            plugin=plugin,
+            force=force,
+            skip_updates=skip_updates,
+            dry_run=dry_run,
+            skill_set=skill_set,
         )
         if agent_type == valid_agent_types[0]:
             first_skills_result = skills_result
@@ -592,12 +636,26 @@ def init_command(
         )
         raise typer.Exit(code=0 if not has_updates else 1)
 
+    # Generate CLAUDE.md (or agent-specific instructions) for RaiSE projects
+    # This runs always (not just on --detect) so CLAUDE.md stays in sync with .raise/
+    if (project_path / ".raise").is_dir():
+        instructions_content = generate_instructions(
+            project_name=project_name,
+            detection=detection,
+            project_path=project_path,
+        )
+        instructions_path = project_path / first_config.instructions_file
+        instructions_path.parent.mkdir(parents=True, exist_ok=True)
+        instructions_path.write_text(instructions_content, encoding="utf-8")
+
     # Emit init:complete event
     emitter = create_emitter()
-    emitter.emit(InitCompleteEvent(
-        project_path=project_path,
-        project_name=project_name,
-    ))
+    emitter.emit(
+        InitCompleteEvent(
+            project_path=project_path,
+            project_name=project_name,
+        )
+    )
 
     # AGENTS.md on --detect
     if detect:
@@ -648,7 +706,7 @@ def init_command(
                 )
             )
 
-    # Convention detection, guardrails, and instructions file generation
+    # Convention detection and guardrails generation (--detect only)
     instructions_path = project_path / first_config.instructions_file
     if detect and detection.project_type == ProjectType.BROWNFIELD:
         conventions = detect_conventions(project_path)
@@ -661,15 +719,6 @@ def init_command(
             guardrails_dir.mkdir(parents=True, exist_ok=True)
             guardrails_path = guardrails_dir / "guardrails.md"
             guardrails_path.write_text(guardrails_content, encoding="utf-8")
-
-            instructions_content = generate_instructions(
-                project_name=project_name,
-                detection=detection,
-                conventions=conventions,
-                agent_config=first_config,
-            )
-            instructions_path.parent.mkdir(parents=True, exist_ok=True)
-            instructions_path.write_text(instructions_content, encoding="utf-8")
 
             conf = conventions.overall_confidence.value.upper()
             if profile.experience_level == ExperienceLevel.RI:
@@ -686,18 +735,3 @@ def init_command(
                     f"  - [bold]{instructions_path}[/bold] (project context)\n\n"
                     f"[dim]Review and adjust as needed.[/dim]"
                 )
-    elif detect and detection.project_type == ProjectType.GREENFIELD:
-        instructions_content = generate_instructions(
-            project_name=project_name,
-            detection=detection,
-            conventions=None,
-            agent_config=first_config,
-        )
-        instructions_path.parent.mkdir(parents=True, exist_ok=True)
-        instructions_path.write_text(instructions_content, encoding="utf-8")
-
-        if profile.experience_level != ExperienceLevel.RI:
-            console.print(
-                f"\n[dim]Created {instructions_path}. No code to analyze yet — "
-                "guardrails will be generated when conventions are established.[/dim]"
-            )

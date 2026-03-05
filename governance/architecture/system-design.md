@@ -169,7 +169,7 @@ These guardrails from `governance/guardrails.md` are **architectural** — they 
 |-----------|-------|------------------------------|
 | MUST-CODE-001 | MUST | Complete type annotations — `pyright --strict` must pass |
 | MUST-CODE-002 | MUST | Ruff linting and formatting — consistent code style |
-| MUST-TEST-001 | MUST | >90% test coverage — tests mirror `src/` structure in `tests/` |
+| MUST-TEST-001 | MUST | Each test asserts observable behavior — tests mirror `src/` structure in `tests/` |
 | MUST-SEC-001 | MUST | No secrets in code — `detect-secrets` + `bandit` pass |
 | MUST-ARCH-002 | MUST | Pydantic models for all schemas — validated, documented data |
 | SHOULD-CLI-001 | SHOULD | Explicit `--path` parameters — testability without mocking `cwd()` |

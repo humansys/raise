@@ -566,7 +566,7 @@ class TestRaiseCommons:
         assert result.naming.functions.pattern == "snake_case"
         assert result.naming.classes.pattern == "PascalCase"
         assert result.structure.has_src_layout is True
-        assert result.structure.source_dir == "src/rai_cli"
+        assert result.structure.source_dir in ["src/rai_cli", "src/rai_pro"]
         assert result.structure.test_dir == "tests"
         # Overall confidence should be HIGH for a well-organized project
         assert result.overall_confidence in [Confidence.HIGH, Confidence.MEDIUM]

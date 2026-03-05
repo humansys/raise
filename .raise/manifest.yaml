@@ -2,10 +2,14 @@ version: '1.0'
 project:
   name: raise-commons
   project_type: brownfield
+  language: python
+  test_command: "uv run pytest --tb=short"
+  lint_command: "uv run ruff check"
+  type_check_command: "uv run pyright"
   code_file_count: 302
   detected_at: '2026-02-23T19:45:58.377711Z'
 branches:
-  development: v2
+  development: dev
   main: main
 ide:
   type: claude
@@ -13,3 +17,5 @@ agents:
   types:
   - claude
 tier: null
+backlog:
+  adapter_default: jira

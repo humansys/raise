@@ -10,9 +10,9 @@ from pathlib import Path
 
 from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.compat import portable_path
-from rai_cli.context.models import GraphNode
 from rai_cli.governance.models import Concept, ConceptType
 from rai_cli.governance.parsers._convert import concept_to_node
+from rai_core.graph.models import GraphNode
 
 
 def normalize_status(raw: str) -> str:
@@ -164,8 +164,12 @@ def extract_project(
     current_epic = _extract_current_focus(text)
     target_date = _extract_target_date(text)
 
-    # Count epics in table
-    epic_count = len(re.findall(r"^\|\s*E\d+\s*\|", text, re.MULTILINE))
+    # Count epics in table (both E{N} and [RAISE-XXX](url) formats)
+    epic_count = len(
+        re.findall(
+            r"^\|\s*(?:E\d+|\[[A-Z]+-\d+\])\s*(?:\([^)]+\)\s*)?\|", text, re.MULTILINE
+        )
+    )
 
     # Calculate relative file path
     try:
@@ -253,9 +257,13 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
     concepts: list[Concept] = []
 
     # Parse epic table rows
-    # Pattern: | E1 | **Name** or Name | Status | `scope.md` or — | Priority |
+    # Supports two ID formats:
+    #   Simple:    | E1 | **Name** | Status | ...
+    #   Jira link: | [RAISE-275](url) | **Name** | Status | ...
     epic_pattern = re.compile(
-        r"^\|\s*(E\d+)\s*\|"  # Epic ID
+        r"^\|\s*"
+        r"(?:\[([A-Z]+-\d+)\]\([^)]+\)|(E\d+))"  # Jira link OR simple ID
+        r"\s*\|"
         r"\s*\*?\*?([^|*]+?)\*?\*?\s*\|"  # Epic name (with optional bold)
         r"\s*([^|]+?)\s*\|"  # Status
         r"\s*([^|]*?)\s*\|"  # Scope doc (optional)
@@ -265,11 +273,31 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
     for i, line in enumerate(lines, 1):
         match = epic_pattern.match(line)
         if match:
-            epic_id = match.group(1).strip()
-            name = match.group(2).strip()
-            raw_status = match.group(3).strip()
-            scope_doc = match.group(4).strip()
-            priority = match.group(5).strip()
+            # Group 1 = Jira link ID (e.g., "RAISE-275"), Group 2 = simple ID (e.g., "E1")
+            epic_id = (match.group(1) or match.group(2)).strip()
+
+            # Yield to EpicScopeParser when a scope doc exists for this epic.
+            # The scope doc is the authoritative source (richer data); the backlog
+            # row is only an index entry. Without this check, both BacklogParser
+            # and EpicScopeParser produce the same node ID, causing duplicate
+            # warnings in `rai graph build`.
+            # Only applies to local epic IDs (E{N}), never to Jira keys (RAISE-275).
+            e_match = re.match(r"^E0*(\d+)$", epic_id, re.IGNORECASE)
+            if e_match:
+                canon = int(e_match.group(1))  # E08 -> 8, E1 -> 1
+                scope_hit = any(
+                    re.search(r"^e0*(\d+)", d.name, re.IGNORECASE)
+                    and int(re.search(r"^e0*(\d+)", d.name, re.IGNORECASE).group(1)) == canon  # type: ignore[union-attr]
+                    for d in project_root.glob("work/epics/e*")
+                    if (d / "scope.md").exists()
+                )
+                if scope_hit:
+                    continue
+
+            name = match.group(3).strip()
+            raw_status = match.group(4).strip()
+            scope_doc = match.group(5).strip()
+            priority = match.group(6).strip()
 
             # Clean up scope doc (remove backticks)
             scope_doc = scope_doc.strip("`").strip()

@@ -1,80 +1,71 @@
 ---
-name: rai-session-close
-description: >
-  Close a working session by reflecting on outcomes and feeding structured data to CLI.
-  CLI does all writes atomically; skill does inference reflection.
+description: 'Close a working session by reflecting on outcomes and feeding structured
+  data to CLI. CLI does all writes atomically; skill does inference reflection.
 
+  '
 license: MIT
-
 metadata:
-  raise.work_cycle: session
+  raise.adaptable: 'true'
+  raise.fase: end
   raise.frequency: per-session
-  raise.fase: "end"
-  raise.prerequisites: ""
-  raise.next: ""
-  raise.gate: ""
-  raise.adaptable: "true"
-  raise.version: "3.0.0"
+  raise.gate: ''
+  raise.next: ''
+  raise.prerequisites: ''
+  raise.version: 4.0.0
   raise.visibility: public
+  raise.work_cycle: session
+name: rai-session-close
 ---
 
 # Session Close
 
 ## Purpose
 
-Close a session by reflecting on outcomes and feeding structured data to the CLI. The CLI performs all writes atomically (session index, patterns, coaching, session state, profile). The skill only does inference: reflect and produce structured output.
+Close a session by reflecting on outcomes and feeding structured data to the CLI for atomic persistence.
 
 ## Mastery Levels (ShuHaRi)
 
-Experience level affects verbosity of the handoff message, not the operations.
+- **Shu**: Detailed handoff with explanations of what was captured
+- **Ha**: Standard handoff, explain only notable items
+- **Ri**: Minimal handoff — next step and open items only
 
-## Steps (2)
+## Context
 
-### Step 1: Reflect & Produce Structured Output
+**When to use:** At the end of every working session.
 
-Use inference to reflect on the session:
+**Quick close:** For short sessions, use CLI flags directly instead of a state file:
+```bash
+rai session close --summary "Quick fix session" --type maintenance --project "$(pwd)"
+```
 
-1. **Summary:** What was accomplished? (1-2 sentences)
-2. **Session type:** feature, research, maintenance, infrastructure, ideation
-3. **Outcomes:** List of concrete deliverables
-4. **Patterns:** Any new learnings? (check against existing — query if needed)
-5. **Corrections:** Any behavioral corrections observed? (what + lesson)
-6. **Coaching:** Reflect on the working relationship (see below)
-7. **Current work:** Release, epic, story, phase, branch for continuity
-8. **Pending:** Decisions, blockers, next actions
-9. **Narrative:** Session context for cross-session continuity — decisions (with WHY), research conclusions, artifacts created, branch state. Goal: make next session "immediately resumable." (~300-500 tokens, 2-3 sentences per section)
-10. **Next session prompt:** Forward-looking guidance from Rai to her future self. What should the next session prioritize? What should Rai watch for or remind the human about? What context will be critical? (~100-200 tokens, actionable and specific)
-11. **Tangents:** Check conversation for ideas → add to `dev/parking-lot.md`
+## Steps
 
-Write the structured output as a YAML state file:
+### Step 1: Reflect & Produce State File
+
+Use inference to reflect on the session and write a YAML state file:
 
 ```yaml
 # /tmp/session-output-{SES-ID}.yaml
-session_id: "{SES-ID}"                    # REQUIRED — prevents race condition (RAISE-201)
-summary: "Session protocol implementation"
-type: feature
+session_id: "{SES-ID}"
+summary: "What was accomplished"
+type: feature  # feature | research | maintenance | infrastructure | ideation
 outcomes:
-  - "Tasks 1-6 complete"
-  - "136 tests passing"
+  - "Concrete deliverable 1"
 patterns:
-  - description: "Pattern description here"
+  - description: "Pattern learned"
     context: "tag1,tag2"
     type: process
 corrections:
   - what: "Behavioral observation"
     lesson: "Lesson learned"
-coaching:                                # Only include fields that changed
-  trust_level: "developing"              # new → developing → established → deep
-  strengths:
-    - "structured thinking"
-    - "design discipline"
+coaching:                          # Only include fields that changed
+  trust_level: "established"
+  strengths: ["structured thinking"]
   growth_edge: "async patterns"
   autonomy: "high within defined scope"
   relationship:
-    quality: "productive"                # new → productive → established → deep
-    trajectory: "growing"                # starting → growing → stable → deepening
-  communication_notes:
-    - "prefers direct, concise"
+    quality: "productive"
+    trajectory: "stable"
 current_work:
   release: V3.0
   epic: E15
@@ -84,30 +75,22 @@ current_work:
 pending:
   decisions: []
   blockers: []
-  next_actions:
-    - "Continue with Task 7"
-narrative: |                               # Cross-session continuity (2-3 sentences per section, ~300-500 tokens total)
+  next_actions: ["Continue with Task 7"]
+narrative: |
   ## Decisions
-  - Key decisions made and WHY (rationale, not just the choice)
-  - Trade-offs accepted and alternatives rejected
-
+  - Key decisions and WHY
   ## Research
-  - Research completed + conclusions (reference file paths)
-  - Key insights that inform next session's work
-
+  - Conclusions with file paths
   ## Artifacts
-  - Files created/modified with their purpose
-  - New tests, docs, or config added
-
+  - Files created/modified
   ## Branch State
-  - Current branch and commits ahead of base
-  - Story branch status (created/not yet/merged)
-next_session_prompt: |                    # Forward-looking guidance to future Rai (~100-200 tokens)
-  Verify that [specific thing] works after [change made this session].
-  The developer mentioned interest in [topic] — if they bring it up, [context].
-  Watch for [potential issue] in [area].
-notes: "Any free-form notes"
+  - Branch and commits ahead of base
+next_session_prompt: |
+  Forward-looking guidance to future Rai. What to prioritize,
+  what to watch for, what context will be critical.
 ```
+
+**Capture tangents:** Check conversation for ideas → add to `dev/parking-lot.md`.
 
 ### Step 2: Feed CLI
 
@@ -115,31 +98,9 @@ notes: "Any free-form notes"
 rai session close --state-file /tmp/session-output-{SES-ID}.yaml --session {SES-ID} --project "$(pwd)"
 ```
 
-This single command atomically:
-- Records session in `sessions/index.jsonl`
-- Appends patterns to `patterns.jsonl`
-- Updates coaching (corrections + observations) in `~/.rai/developer.yaml`
-- Writes `.raise/rai/session-state.yaml`
-- Clears `current_session` in profile
+This atomically: records session in index, appends patterns, updates coaching, writes session state, clears active session.
 
-**Alternative (simple close):** For quick sessions without state file:
-```bash
-rai session close --summary "Quick fix session" --type maintenance --project "$(pwd)"
-```
-
-**With inline pattern/correction:**
-```bash
-rai session close \
-  --summary "Session description" \
-  --type feature \
-  --pattern "New pattern learned" \
-  --correction "What happened" \
-  --correction-lesson "What to do instead" \
-  --project "$(pwd)"
-```
-
-After the CLI call, output a brief handoff:
-
+Present a brief handoff:
 ```
 ## Next Session
 **Continue:** [next step]
@@ -147,8 +108,6 @@ After the CLI call, output a brief handoff:
 ```
 
 ## Output
-
-All writes are done by the CLI in Step 2 — the skill does NOT call separate memory/telemetry commands.
 
 | File | Update | Writer |
 |------|--------|--------|
@@ -158,19 +117,17 @@ All writes are done by the CLI in Step 2 — the skill does NOT call separate me
 | `.raise/rai/session-state.yaml` | Working state | CLI |
 | `dev/parking-lot.md` | Tangents | Skill (Edit) |
 
-## Notes
+## Quality Checklist
 
-- **One CLI call** does all data plumbing — no separate add-session/add-pattern/emit-session
-- Idempotent: can close multiple times (second close overwrites with more current data)
-- State file is the richest path; CLI flags are for simple/quick closes
-- Calibration (if stories completed): still run separately:
-  ```bash
-  rai signal emit-calibration {story_id} --name "Name" -s {size} -a {actual_mins}
-  ```
+- [ ] Session ID matches the active session from session-start
+- [ ] Summary reflects actual outcomes (not planned intent)
+- [ ] Narrative enables next session to resume immediately
+- [ ] Next session prompt is actionable and specific
+- [ ] Tangents captured in parking lot (if any)
+- [ ] CLI close command executed successfully
 
 ## References
 
 - Complement: `/rai-session-start`
 - Session state: `.raise/rai/session-state.yaml`
-- Memory: `.raise/rai/memory/`
-- Tangents: `dev/parking-lot.md`
+- Parking lot: `dev/parking-lot.md`

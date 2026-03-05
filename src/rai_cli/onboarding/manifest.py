@@ -27,12 +27,20 @@ class ProjectInfo(BaseModel):
     Attributes:
         name: Project name (usually directory name).
         project_type: Whether greenfield or brownfield.
+        language: Dominant programming language (auto-detected or user-specified).
+        test_command: Command to run tests (configuration over convention).
+        lint_command: Command to run linter (configuration over convention).
+        type_check_command: Command to run type checker (configuration over convention).
         code_file_count: Number of code files detected.
         detected_at: When the project was initialized.
     """
 
     name: str
     project_type: ProjectType
+    language: str | None = None
+    test_command: str | None = None
+    lint_command: str | None = None
+    type_check_command: str | None = None
     code_file_count: int = 0
     detected_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -71,6 +79,16 @@ class AgentsManifest(BaseModel):
     types: list[str] = Field(default_factory=lambda: ["claude"])
 
 
+class BacklogConfig(BaseModel):
+    """Backlog configuration from manifest (optional section).
+
+    Attributes:
+        adapter_default: Default PM adapter name (e.g., 'jira', 'filesystem').
+    """
+
+    adapter_default: str | None = None
+
+
 class TierConfig(BaseModel):
     """Tier configuration from manifest (optional section).
 
@@ -103,6 +121,7 @@ class ProjectManifest(BaseModel):
     ide: IdeManifest = Field(default_factory=IdeManifest)
     agents: AgentsManifest = Field(default_factory=AgentsManifest)
     tier: TierConfig | None = None
+    backlog: BacklogConfig | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -118,7 +137,9 @@ class ProjectManifest(BaseModel):
         if "agents" not in typed and "ide" in typed:
             raw_ide: object = typed["ide"]
             if isinstance(raw_ide, dict):
-                raw_type: object = cast(dict[str, object], raw_ide).get("type", "claude")
+                raw_type: object = cast(dict[str, object], raw_ide).get(
+                    "type", "claude"
+                )
                 ide_type: str = str(raw_type) if raw_type is not None else "claude"
             else:
                 ide_type = "claude"

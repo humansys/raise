@@ -1,7 +1,7 @@
 """Unified graph builder for context integration.
 
-This module provides the UnifiedGraphBuilder class that merges governance,
-memory, work, and skills into a single UnifiedGraph for context queries.
+This module provides the GraphBuilder class that merges governance,
+memory, work, and skills into a single Graph for context queries.
 
 Architecture: ADR-019 Unified Context Graph Architecture
 """
@@ -18,17 +18,17 @@ from rai_cli.compat import portable_path
 from rai_cli.config.agents import AgentConfig, get_agent_config
 from rai_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
 from rai_cli.context.extractors.skills import extract_all_skills
-from rai_cli.context.graph import UnifiedGraph
-from rai_cli.context.models import ConceptEdge, ConceptNode
 from rai_cli.core.text import STOPWORDS
 from rai_cli.memory.models import MemoryScope
+from rai_core.graph.engine import Graph
+from rai_core.graph.models import GraphEdge, GraphNode
 
 if TYPE_CHECKING:
     from rai_cli.governance.extractor import GovernanceExtractor
     from rai_cli.governance.models import Concept
 
 
-class UnifiedGraphBuilder:
+class GraphBuilder:
     """Builds unified context graph from all sources.
 
     Merges governance documents, memory JSONL files, work tracking,
@@ -38,7 +38,7 @@ class UnifiedGraphBuilder:
         project_root: Root directory for the project.
 
     Examples:
-        >>> builder = UnifiedGraphBuilder(Path("."))
+        >>> builder = GraphBuilder(Path("."))
         >>> graph = builder.build()
         >>> graph.node_count
         50
@@ -59,25 +59,25 @@ class UnifiedGraphBuilder:
         self.project_root = project_root or Path.cwd()
         self.ide_config = agent_config or get_agent_config()
 
-    def build(self) -> UnifiedGraph:
+    def build(self) -> Graph:
         """Build unified graph from all sources.
 
         Loads concepts from governance, memory, work, skills, and components,
-        then builds a UnifiedGraph with all nodes. After all nodes are loaded,
+        then builds a Graph with all nodes. After all nodes are loaded,
         extracts structural nodes (bounded contexts, layers) and their edges.
 
         Returns:
-            UnifiedGraph containing all concepts.
+            Graph containing all concepts.
         """
-        graph = UnifiedGraph()
+        graph = Graph()
 
         # Load all sources
-        all_nodes: list[ConceptNode] = []
+        all_nodes: list[GraphNode] = []
         all_nodes.extend(self.load_governance())
         all_nodes.extend(self.load_memory())
-        all_nodes.extend(self.load_work())
         all_nodes.extend(self.load_skills())
         all_nodes.extend(self.load_components())
+        all_nodes.extend(self.load_artifacts())
         all_nodes.extend(self.load_architecture())
         all_nodes.extend(self.load_identity())
 
@@ -103,9 +103,9 @@ class UnifiedGraphBuilder:
 
         # Extract structural nodes and edges (E15 — bounded contexts, layers)
         # Runs after all nodes loaded so module nodes exist for edge safety
-        node_by_id: dict[str, ConceptNode] = {n.id: n for n in all_nodes}
-        structural_nodes: list[ConceptNode] = []
-        structural_edges: list[ConceptEdge] = []
+        node_by_id: dict[str, GraphNode] = {n.id: n for n in all_nodes}
+        structural_nodes: list[GraphNode] = []
+        structural_edges: list[GraphEdge] = []
 
         bc_nodes, bc_edges = self._extract_bounded_contexts(all_nodes, node_by_id)
         structural_nodes.extend(bc_nodes)
@@ -137,14 +137,14 @@ class UnifiedGraphBuilder:
 
         return graph
 
-    def load_governance(self) -> list[ConceptNode]:
+    def load_governance(self) -> list[GraphNode]:
         """Load concepts from governance documents.
 
         Uses GovernanceExtractor with registry-discovered parsers.
         extract_all() returns list[GraphNode] directly — no conversion needed.
 
         Returns:
-            List of ConceptNode for governance concepts.
+            List of GraphNode for governance concepts.
         """
         try:
             extractor = self._get_governance_extractor()
@@ -153,7 +153,7 @@ class UnifiedGraphBuilder:
             # Graceful degradation if governance extraction fails
             return []
 
-    def load_memory(self) -> list[ConceptNode]:
+    def load_memory(self) -> list[GraphNode]:
         """Load concepts from memory JSONL files across all tiers.
 
         Loads from three directories with scope tracking:
@@ -164,9 +164,9 @@ class UnifiedGraphBuilder:
         Sessions are only loaded from personal directory (developer-specific).
 
         Returns:
-            List of ConceptNode for memory concepts with scope metadata.
+            List of GraphNode for memory concepts with scope metadata.
         """
-        nodes: list[ConceptNode] = []
+        nodes: list[GraphNode] = []
 
         # 1. Load from global directory (~/.rai/)
         global_dir = get_global_rai_dir()
@@ -203,7 +203,7 @@ class UnifiedGraphBuilder:
         memory_dir: Path,
         scope: MemoryScope,
         sessions: bool = True,
-    ) -> list[ConceptNode]:
+    ) -> list[GraphNode]:
         """Load memory concepts from a single directory with scope.
 
         Args:
@@ -212,9 +212,9 @@ class UnifiedGraphBuilder:
             sessions: Whether to load sessions from this directory.
 
         Returns:
-            List of ConceptNode with scope in metadata.
+            List of GraphNode with scope in metadata.
         """
-        nodes: list[ConceptNode] = []
+        nodes: list[GraphNode] = []
 
         # Load patterns
         patterns_file = memory_dir / "patterns.jsonl"
@@ -234,7 +234,7 @@ class UnifiedGraphBuilder:
 
         return nodes
 
-    def _deduplicate_by_precedence(self, nodes: list[ConceptNode]) -> list[ConceptNode]:
+    def _deduplicate_by_precedence(self, nodes: list[GraphNode]) -> list[GraphNode]:
         """Deduplicate nodes by ID using scope precedence.
 
         When the same ID appears in multiple tiers, keep only the
@@ -254,7 +254,7 @@ class UnifiedGraphBuilder:
         }
 
         # Track best node for each ID
-        best_by_id: dict[str, ConceptNode] = {}
+        best_by_id: dict[str, GraphNode] = {}
 
         for node in nodes:
             node_scope = node.metadata.get("scope", MemoryScope.PROJECT.value)
@@ -273,45 +273,25 @@ class UnifiedGraphBuilder:
 
         return list(best_by_id.values())
 
-    def load_work(self) -> list[ConceptNode]:
-        """Load concepts from work tracking (backlog, epics).
-
-        Uses E8 parsers to extract epics and stories.
-
-        Returns:
-            List of ConceptNode for work concepts.
-        """
-        nodes: list[ConceptNode] = []
-
-        # Load epics from backlog
-        epics = self._extract_epics()
-        nodes.extend(self._concept_to_node(e) for e in epics)
-
-        # Load stories from epic scopes
-        stories = self._extract_stories()
-        nodes.extend(self._concept_to_node(s) for s in stories)
-
-        return nodes
-
-    def load_skills(self) -> list[ConceptNode]:
+    def load_skills(self) -> list[GraphNode]:
         """Load concepts from skill YAML frontmatter.
 
         Parses SKILL.md files in the IDE's skill directory.
 
         Returns:
-            List of ConceptNode for skill concepts.
+            List of GraphNode for skill concepts.
         """
         raw_skills_dir = self.ide_config.skills_dir or ".claude/skills"
         skills_dir = self.project_root / raw_skills_dir
         return extract_all_skills(skills_dir)
 
-    def load_components(self) -> list[ConceptNode]:
+    def load_components(self) -> list[GraphNode]:
         """Load discovered components from validated JSON.
 
         Reads components-validated.json from work/discovery directory.
 
         Returns:
-            List of ConceptNode for component concepts.
+            List of GraphNode for component concepts.
         """
         validated_file = (
             self.project_root / "work" / "discovery" / "components-validated.json"
@@ -320,14 +300,18 @@ class UnifiedGraphBuilder:
             return []
 
         try:
-            data: dict[str, Any] = json.loads(
+            raw: Any = json.loads(
                 validated_file.read_text(encoding="utf-8")
             )
-            components_list: list[dict[str, Any]] = data.get("components", [])
+            # Accept both {"components": [...]} wrapper and bare [...] array
+            if isinstance(raw, list):
+                components_list: list[dict[str, Any]] = raw  # type: ignore[assignment]
+            else:
+                components_list = raw.get("components", [])
 
-            nodes: list[ConceptNode] = []
+            nodes: list[GraphNode] = []
             for comp in components_list:
-                node = ConceptNode(
+                node = GraphNode(
                     id=comp.get("id", ""),
                     type="component",
                     content=comp.get("content", ""),
@@ -341,7 +325,52 @@ class UnifiedGraphBuilder:
         except (json.JSONDecodeError, KeyError):
             return []
 
-    def load_architecture(self) -> list[ConceptNode]:
+    def load_artifacts(self) -> list[GraphNode]:
+        """Load typed skill artifacts from ``.raise/artifacts/``.
+
+        Each artifact becomes a GraphNode with type ``artifact``.
+
+        Returns:
+            List of GraphNode for artifact concepts.
+        """
+        from rai_cli.artifacts.reader import read_all_artifacts
+        from rai_cli.artifacts.writer import _artifact_filename
+
+        artifacts_dir = self.project_root / ".raise" / "artifacts"
+        artifacts = read_all_artifacts(artifacts_dir)
+
+        nodes: list[GraphNode] = []
+        for artifact in artifacts:
+            work_id = (artifact.story or artifact.epic or "unknown").lower()
+            node_id = f"artifact-{work_id}-{artifact.artifact_type.value}"
+
+            # Extract summary from content (typed or dict)
+            if isinstance(artifact.content, dict):
+                summary = artifact.content.get("summary", str(artifact.content))
+            else:
+                summary = getattr(artifact.content, "summary", str(artifact.content))
+
+            filename = _artifact_filename(artifact)
+
+            node = GraphNode(
+                id=node_id,
+                type="artifact",
+                content=summary,
+                source_file=f".raise/artifacts/{filename}",
+                created=artifact.created.isoformat(),
+                metadata={
+                    "artifact_type": artifact.artifact_type.value,
+                    "skill": artifact.skill,
+                    "story": artifact.story,
+                    "epic": artifact.epic,
+                    "version": artifact.version,
+                },
+            )
+            nodes.append(node)
+
+        return nodes
+
+    def load_architecture(self) -> list[GraphNode]:
         """Load architecture nodes from documentation.
 
         Scans both governance/architecture/*.md (architecture docs) and
@@ -349,13 +378,13 @@ class UnifiedGraphBuilder:
         by frontmatter ``type`` field.
 
         Returns:
-            List of ConceptNode for architecture and module concepts.
+            List of GraphNode for architecture and module concepts.
         """
         arch_dir = self.project_root / "governance" / "architecture"
         if not arch_dir.exists():
             return []
 
-        nodes: list[ConceptNode] = []
+        nodes: list[GraphNode] = []
 
         # Scan parent directory for architecture docs
         for md_file in sorted(arch_dir.glob("*.md")):
@@ -373,14 +402,14 @@ class UnifiedGraphBuilder:
 
         return nodes
 
-    def load_identity(self) -> list[ConceptNode]:
+    def load_identity(self) -> list[GraphNode]:
         """Load Rai identity values and boundaries from core.md.
 
         Extracts values (### N. Title) and boundaries (### I Will / ### I Won't)
         as principle nodes tagged with always_on=True.
 
         Returns:
-            List of ConceptNode for identity concepts.
+            List of GraphNode for identity concepts.
         """
         identity_file = self.project_root / ".raise" / "rai" / "identity" / "core.md"
         if not identity_file.exists():
@@ -397,14 +426,14 @@ class UnifiedGraphBuilder:
             source_file = str(identity_file)
 
         now = datetime.now(tz=UTC).isoformat()
-        nodes: list[ConceptNode] = []
+        nodes: list[GraphNode] = []
 
         nodes.extend(self._extract_identity_values(text, source_file, now))
         nodes.extend(self._extract_identity_boundaries(text, source_file, now))
 
         return nodes
 
-    def load_code_structure(self, all_nodes: list[ConceptNode]) -> None:
+    def load_code_structure(self, all_nodes: list[GraphNode]) -> None:
         """Enrich module nodes with real code analysis data.
 
         Runs detected analyzers against the project source and merges
@@ -447,7 +476,7 @@ class UnifiedGraphBuilder:
 
     def _extract_identity_values(
         self, text: str, source_file: str, now: str
-    ) -> list[ConceptNode]:
+    ) -> list[GraphNode]:
         """Extract values from identity core.md.
 
         Matches ### N. Title patterns under ## Values section.
@@ -458,11 +487,11 @@ class UnifiedGraphBuilder:
             now: ISO timestamp.
 
         Returns:
-            List of value ConceptNodes.
+            List of value GraphNodes.
         """
         import re
 
-        nodes: list[ConceptNode] = []
+        nodes: list[GraphNode] = []
 
         # Find values section
         values_match = re.search(r"^## Values\b", text, re.MULTILINE)
@@ -495,7 +524,7 @@ class UnifiedGraphBuilder:
             content = f"{title} — {description}" if description else title
 
             nodes.append(
-                ConceptNode(
+                GraphNode(
                     id=f"RAI-VAL-{num}",
                     type="principle",
                     content=content,
@@ -514,7 +543,7 @@ class UnifiedGraphBuilder:
 
     def _extract_identity_boundaries(
         self, text: str, source_file: str, now: str
-    ) -> list[ConceptNode]:
+    ) -> list[GraphNode]:
         """Extract boundaries from identity core.md.
 
         Matches ### I Will and ### I Won't sections, extracts bullet items.
@@ -525,11 +554,11 @@ class UnifiedGraphBuilder:
             now: ISO timestamp.
 
         Returns:
-            List of boundary ConceptNodes.
+            List of boundary GraphNodes.
         """
         import re
 
-        nodes: list[ConceptNode] = []
+        nodes: list[GraphNode] = []
 
         # Find boundaries section
         boundaries_match = re.search(r"^## Boundaries\b", text, re.MULTILINE)
@@ -556,7 +585,7 @@ class UnifiedGraphBuilder:
 
             for bullet in re.finditer(r"^- (.+)$", will_text, re.MULTILINE):
                 nodes.append(
-                    ConceptNode(
+                    GraphNode(
                         id=f"RAI-BND-{counter}",
                         type="principle",
                         content=bullet.group(1).strip(),
@@ -580,7 +609,7 @@ class UnifiedGraphBuilder:
 
             for bullet in re.finditer(r"^- (.+)$", wont_text, re.MULTILINE):
                 nodes.append(
-                    ConceptNode(
+                    GraphNode(
                         id=f"RAI-BND-{counter}",
                         type="principle",
                         content=bullet.group(1).strip(),
@@ -597,8 +626,8 @@ class UnifiedGraphBuilder:
 
         return nodes
 
-    def _parse_architecture_doc(self, file_path: Path) -> ConceptNode | None:
-        """Parse an architecture doc's YAML frontmatter into a ConceptNode.
+    def _parse_architecture_doc(self, file_path: Path) -> GraphNode | None:
+        """Parse an architecture doc's YAML frontmatter into a GraphNode.
 
         Dispatches by frontmatter ``type`` field to produce the appropriate
         node type (module or architecture).
@@ -607,7 +636,7 @@ class UnifiedGraphBuilder:
             file_path: Path to the markdown file.
 
         Returns:
-            ConceptNode if valid frontmatter found, None otherwise.
+            GraphNode if valid frontmatter found, None otherwise.
         """
         try:
             text = file_path.read_text(encoding="utf-8")
@@ -657,7 +686,7 @@ class UnifiedGraphBuilder:
 
     def _parse_module_doc(
         self, frontmatter: dict[str, Any], source_file: str
-    ) -> ConceptNode | None:
+    ) -> GraphNode | None:
         """Parse a module-type architecture doc.
 
         Args:
@@ -665,7 +694,7 @@ class UnifiedGraphBuilder:
             source_file: Relative path to the source file.
 
         Returns:
-            ConceptNode with type "module", or None if invalid.
+            GraphNode with type "module", or None if invalid.
         """
         name = frontmatter.get("name", "")
         if not name:
@@ -684,7 +713,7 @@ class UnifiedGraphBuilder:
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
-        return ConceptNode(
+        return GraphNode(
             id=f"mod-{name}",
             type="module",
             content=frontmatter.get("purpose", ""),
@@ -695,7 +724,7 @@ class UnifiedGraphBuilder:
 
     def _parse_architecture_context(
         self, frontmatter: dict[str, Any], source_file: str
-    ) -> ConceptNode:
+    ) -> GraphNode:
         """Parse an architecture_context doc (system-context.md).
 
         Synthesizes content from tech stack and external dependencies.
@@ -705,7 +734,7 @@ class UnifiedGraphBuilder:
             source_file: Relative path to the source file.
 
         Returns:
-            ConceptNode with type "architecture".
+            GraphNode with type "architecture".
         """
         # Synthesize content from tech stack
         tech_stack: dict[str, str] = frontmatter.get("tech_stack", {})
@@ -733,7 +762,7 @@ class UnifiedGraphBuilder:
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
-        return ConceptNode(
+        return GraphNode(
             id="arch-context",
             type="architecture",
             content=content,
@@ -744,7 +773,7 @@ class UnifiedGraphBuilder:
 
     def _parse_architecture_design(
         self, frontmatter: dict[str, Any], source_file: str
-    ) -> ConceptNode:
+    ) -> GraphNode:
         """Parse an architecture_design doc (system-design.md).
 
         Synthesizes content from layers and their module assignments.
@@ -754,7 +783,7 @@ class UnifiedGraphBuilder:
             source_file: Relative path to the source file.
 
         Returns:
-            ConceptNode with type "architecture".
+            GraphNode with type "architecture".
         """
         # Synthesize content from layers
         layers: list[dict[str, Any]] = frontmatter.get("layers", [])
@@ -784,7 +813,7 @@ class UnifiedGraphBuilder:
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
-        return ConceptNode(
+        return GraphNode(
             id="arch-design",
             type="architecture",
             content=content,
@@ -795,7 +824,7 @@ class UnifiedGraphBuilder:
 
     def _parse_architecture_domain_model(
         self, frontmatter: dict[str, Any], source_file: str
-    ) -> ConceptNode:
+    ) -> GraphNode:
         """Parse an architecture_domain_model doc (domain-model.md).
 
         Synthesizes content from bounded contexts and shared kernel.
@@ -805,11 +834,11 @@ class UnifiedGraphBuilder:
             source_file: Relative path to the source file.
 
         Returns:
-            ConceptNode with type "architecture".
+            GraphNode with type "architecture".
         """
         # Synthesize content from bounded contexts
-        bcs: list[dict[str, Any]] = frontmatter.get("bounded_contexts", [])
-        bc_names = [bc.get("name", "unknown") for bc in bcs]
+        bcs: list[Any] = frontmatter.get("bounded_contexts", [])
+        bc_names: list[str] = [bc.get("name", "unknown") if isinstance(bc, dict) else str(bc) for bc in bcs]
         bc_summary = ", ".join(bc_names) if bc_names else "none defined"
 
         shared: dict[str, Any] = frontmatter.get("shared_kernel", {})
@@ -834,7 +863,7 @@ class UnifiedGraphBuilder:
             if key in frontmatter:
                 metadata[key] = frontmatter[key]
 
-        return ConceptNode(
+        return GraphNode(
             id="arch-domain-model",
             type="architecture",
             content=content,
@@ -845,9 +874,9 @@ class UnifiedGraphBuilder:
 
     def _extract_bounded_contexts(
         self,
-        all_nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> tuple[list[ConceptNode], list[ConceptEdge]]:
+        all_nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> tuple[list[GraphNode], list[GraphEdge]]:
         """Extract bounded context nodes and belongs_to edges from domain model.
 
         Reads the arch-domain-model node's metadata to create bounded_context
@@ -861,8 +890,8 @@ class UnifiedGraphBuilder:
         Returns:
             Tuple of (bounded_context nodes, belongs_to edges).
         """
-        nodes: list[ConceptNode] = []
-        edges: list[ConceptEdge] = []
+        nodes: list[GraphNode] = []
+        edges: list[GraphEdge] = []
 
         # Find the arch-domain-model node
         dm_node = node_by_id.get("arch-domain-model")
@@ -879,7 +908,7 @@ class UnifiedGraphBuilder:
                 continue
             bc_id = f"bc-{bc_name}"
             nodes.append(
-                ConceptNode(
+                GraphNode(
                     id=bc_id,
                     type="bounded_context",
                     content=bc.get("description", ""),
@@ -897,7 +926,7 @@ class UnifiedGraphBuilder:
                 mod_id = f"mod-{mod_name}"
                 if mod_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=mod_id, target=bc_id, type="belongs_to", weight=1.0
                         )
                     )
@@ -906,7 +935,7 @@ class UnifiedGraphBuilder:
         shared: dict[str, Any] = dm_node.metadata.get("shared_kernel", {})
         if shared:
             nodes.append(
-                ConceptNode(
+                GraphNode(
                     id="bc-shared-kernel",
                     type="bounded_context",
                     content=shared.get("description", ""),
@@ -922,7 +951,7 @@ class UnifiedGraphBuilder:
                 mod_id = f"mod-{mod_name}"
                 if mod_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=mod_id,
                             target="bc-shared-kernel",
                             type="belongs_to",
@@ -934,7 +963,7 @@ class UnifiedGraphBuilder:
         app_layer: dict[str, Any] = dm_node.metadata.get("application_layer", {})
         if app_layer:
             nodes.append(
-                ConceptNode(
+                GraphNode(
                     id="bc-application-layer",
                     type="bounded_context",
                     content=app_layer.get("description", ""),
@@ -950,7 +979,7 @@ class UnifiedGraphBuilder:
                 mod_id = f"mod-{mod_name}"
                 if mod_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=mod_id,
                             target="bc-application-layer",
                             type="belongs_to",
@@ -962,7 +991,7 @@ class UnifiedGraphBuilder:
         dist: dict[str, Any] = dm_node.metadata.get("distribution", {})
         if dist:
             nodes.append(
-                ConceptNode(
+                GraphNode(
                     id="bc-distribution",
                     type="bounded_context",
                     content=dist.get("description", ""),
@@ -978,7 +1007,7 @@ class UnifiedGraphBuilder:
                 mod_id = f"mod-{mod_name}"
                 if mod_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=mod_id,
                             target="bc-distribution",
                             type="belongs_to",
@@ -990,9 +1019,9 @@ class UnifiedGraphBuilder:
 
     def _extract_layers(
         self,
-        all_nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> tuple[list[ConceptNode], list[ConceptEdge]]:
+        all_nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> tuple[list[GraphNode], list[GraphEdge]]:
         """Extract layer nodes and in_layer edges from system design.
 
         Reads the arch-design node's metadata to create layer nodes and
@@ -1005,8 +1034,8 @@ class UnifiedGraphBuilder:
         Returns:
             Tuple of (layer nodes, in_layer edges).
         """
-        nodes: list[ConceptNode] = []
-        edges: list[ConceptEdge] = []
+        nodes: list[GraphNode] = []
+        edges: list[GraphEdge] = []
 
         # Find the arch-design node
         design_node = node_by_id.get("arch-design")
@@ -1022,7 +1051,7 @@ class UnifiedGraphBuilder:
                 continue
             layer_id = f"lyr-{layer_name}"
             nodes.append(
-                ConceptNode(
+                GraphNode(
                     id=layer_id,
                     type="layer",
                     content=layer.get("description", ""),
@@ -1037,7 +1066,7 @@ class UnifiedGraphBuilder:
                 mod_id = f"mod-{mod_name}"
                 if mod_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=mod_id, target=layer_id, type="in_layer", weight=1.0
                         )
                     )
@@ -1046,9 +1075,9 @@ class UnifiedGraphBuilder:
 
     def _extract_constraints(
         self,
-        all_nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> list[ConceptEdge]:
+        all_nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> list[GraphEdge]:
         """Extract constrained_by edges from guardrail scope metadata.
 
         Reads ``constraint_scope`` from each guardrail node's metadata
@@ -1063,7 +1092,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of constrained_by edges.
         """
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
         bc_ids = [n.id for n in node_by_id.values() if n.type == "bounded_context"]
 
         for node in all_nodes:
@@ -1083,7 +1112,7 @@ class UnifiedGraphBuilder:
 
             for target_id in targets:
                 edges.append(
-                    ConceptEdge(
+                    GraphEdge(
                         source=target_id,
                         target=node.id,
                         type="constrained_by",
@@ -1103,16 +1132,16 @@ class UnifiedGraphBuilder:
 
         return GovernanceExtractor(project_root=self.project_root)
 
-    def _concept_to_node(self, concept: Concept) -> ConceptNode:
-        """Convert governance Concept to ConceptNode.
+    def _concept_to_node(self, concept: Concept) -> GraphNode:
+        """Convert governance Concept to GraphNode.
 
         Args:
             concept: Governance concept to convert.
 
         Returns:
-            ConceptNode with mapped fields.
+            GraphNode with mapped fields.
         """
-        return ConceptNode(
+        return GraphNode(
             id=concept.id,
             type=concept.type.value,  # type: ignore[arg-type]
             content=concept.content,
@@ -1126,7 +1155,7 @@ class UnifiedGraphBuilder:
         file_path: Path,
         node_type: str,
         scope: MemoryScope = MemoryScope.PROJECT,
-    ) -> list[ConceptNode]:
+    ) -> list[GraphNode]:
         """Load concepts from a JSONL file.
 
         Args:
@@ -1135,9 +1164,9 @@ class UnifiedGraphBuilder:
             scope: Memory scope to assign to loaded concepts.
 
         Returns:
-            List of ConceptNode parsed from file.
+            List of GraphNode parsed from file.
         """
-        nodes: list[ConceptNode] = []
+        nodes: list[GraphNode] = []
 
         # Try to make path relative, fallback to absolute
         try:
@@ -1166,8 +1195,8 @@ class UnifiedGraphBuilder:
         node_type: str,
         source_file: str,
         scope: MemoryScope = MemoryScope.PROJECT,
-    ) -> ConceptNode | None:
-        """Convert memory JSONL record to ConceptNode.
+    ) -> GraphNode | None:
+        """Convert memory JSONL record to GraphNode.
 
         Args:
             record: Parsed JSON record.
@@ -1176,7 +1205,7 @@ class UnifiedGraphBuilder:
             scope: Memory scope for this concept.
 
         Returns:
-            ConceptNode or None if record is invalid.
+            GraphNode or None if record is invalid.
         """
         record_id = record.get("id")
         if not record_id:
@@ -1211,7 +1240,7 @@ class UnifiedGraphBuilder:
         # Add scope to metadata
         metadata["scope"] = scope.value
 
-        return ConceptNode(
+        return GraphNode(
             id=str(record_id),
             type=node_type,  # type: ignore[arg-type]
             content=str(content),
@@ -1220,77 +1249,7 @@ class UnifiedGraphBuilder:
             metadata=metadata,
         )
 
-    def _extract_epics(self) -> list[Concept]:
-        """Extract epics from backlog files.
-
-        Returns:
-            List of epic Concept objects.
-        """
-        from rai_cli.governance.parsers.backlog import extract_epics
-
-        epics: list[Concept] = []
-
-        # Find backlog files
-        for backlog_path in self._find_backlogs():
-            try:
-                extracted = extract_epics(backlog_path, self.project_root)
-                epics.extend(extracted)
-            except Exception:
-                continue
-
-        return epics
-
-    def _extract_stories(self) -> list[Concept]:
-        """Extract stories from epic scope files.
-
-        Returns:
-            List of story Concept objects.
-        """
-        from rai_cli.governance.parsers.epic import extract_stories
-
-        stories: list[Concept] = []
-
-        # Find epic scope files
-        for epic_path in self._find_epic_scopes():
-            try:
-                extracted = extract_stories(epic_path, self.project_root)
-                stories.extend(extracted)
-            except Exception:
-                continue
-
-        return stories
-
-    def _find_backlogs(self) -> list[Path]:
-        """Find backlog.md files in project.
-
-        Returns:
-            List of paths to backlog files.
-        """
-        backlogs: list[Path] = []
-
-        # Check governance/backlog.md
-        backlog_file = self.project_root / "governance" / "backlog.md"
-        if backlog_file.exists():
-            backlogs.append(backlog_file)
-
-        return backlogs
-
-    def _find_epic_scopes(self) -> list[Path]:
-        """Find epic scope files in project.
-
-        Returns:
-            List of paths to epic-*.md files.
-        """
-        scopes: list[Path] = []
-
-        # Check dev/epic-*.md
-        dev_dir = self.project_root / "dev"
-        if dev_dir.exists():
-            scopes.extend(dev_dir.glob("epic-*-scope.md"))
-
-        return scopes
-
-    def infer_relationships(self, nodes: list[ConceptNode]) -> list[ConceptEdge]:
+    def infer_relationships(self, nodes: list[GraphNode]) -> list[GraphEdge]:
         """Infer relationships between concepts.
 
         Creates explicit edges (weight=1.0) from known fields and
@@ -1300,15 +1259,15 @@ class UnifiedGraphBuilder:
             nodes: List of concept nodes to analyze.
 
         Returns:
-            List of inferred ConceptEdge objects.
+            List of inferred GraphEdge objects.
         """
         if not nodes:
             return []
 
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
 
         # Build lookup by ID for target resolution
-        node_by_id: dict[str, ConceptNode] = {n.id: n for n in nodes}
+        node_by_id: dict[str, GraphNode] = {n.id: n for n in nodes}
 
         # Infer explicit edges
         edges.extend(self._infer_learned_from(nodes, node_by_id))
@@ -1324,9 +1283,9 @@ class UnifiedGraphBuilder:
 
     def _infer_learned_from(
         self,
-        nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> list[ConceptEdge]:
+        nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> list[GraphEdge]:
         """Infer learned_from edges from pattern metadata.
 
         Args:
@@ -1336,7 +1295,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of learned_from edges.
         """
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
 
         for node in nodes:
             if node.type != "pattern":
@@ -1354,7 +1313,7 @@ class UnifiedGraphBuilder:
                 # Check if session topic mentions the story
                 if str(learned_from) in candidate.content:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=node.id,
                             target=candidate.id,
                             type="learned_from",
@@ -1367,9 +1326,9 @@ class UnifiedGraphBuilder:
 
     def _infer_part_of(
         self,
-        nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> list[ConceptEdge]:
+        nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> list[GraphEdge]:
         """Infer part_of edges from story to epic.
 
         Args:
@@ -1379,7 +1338,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of part_of edges.
         """
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
 
         for node in nodes:
             if node.type != "story":
@@ -1394,7 +1353,7 @@ class UnifiedGraphBuilder:
                     epic_id = f"E{parts[0]}"
                     if epic_id in node_by_id:
                         edges.append(
-                            ConceptEdge(
+                            GraphEdge(
                                 source=node.id,
                                 target=epic_id,
                                 type="part_of",
@@ -1406,9 +1365,9 @@ class UnifiedGraphBuilder:
 
     def _infer_skill_edges(
         self,
-        nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> list[ConceptEdge]:
+        nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> list[GraphEdge]:
         """Infer edges from skill metadata (prerequisites, next).
 
         Args:
@@ -1418,7 +1377,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of skill relationship edges.
         """
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
 
         for node in nodes:
             if node.type != "skill":
@@ -1430,7 +1389,7 @@ class UnifiedGraphBuilder:
                 prereq_id = f"/{prereq}" if not str(prereq).startswith("/") else prereq
                 if prereq_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=node.id,
                             target=prereq_id,
                             type="needs_context",
@@ -1448,7 +1407,7 @@ class UnifiedGraphBuilder:
                 )
                 if next_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=node.id,
                             target=next_id,
                             type="related_to",
@@ -1460,9 +1419,9 @@ class UnifiedGraphBuilder:
 
     def _infer_depends_on(
         self,
-        nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> list[ConceptEdge]:
+        nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> list[GraphEdge]:
         """Infer depends_on edges from module metadata.
 
         Args:
@@ -1472,7 +1431,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of depends_on edges between modules.
         """
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
 
         for node in nodes:
             if node.type != "module":
@@ -1487,7 +1446,7 @@ class UnifiedGraphBuilder:
                 target_id = f"mod-{dep_name}"
                 if target_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=node.id,
                             target=target_id,
                             type="depends_on",
@@ -1499,9 +1458,9 @@ class UnifiedGraphBuilder:
 
     def _infer_release_part_of(
         self,
-        nodes: list[ConceptNode],
-        node_by_id: dict[str, ConceptNode],
-    ) -> list[ConceptEdge]:
+        nodes: list[GraphNode],
+        node_by_id: dict[str, GraphNode],
+    ) -> list[GraphEdge]:
         """Infer part_of edges from epics to releases.
 
         Uses the ``epics`` list in release node metadata to create
@@ -1514,7 +1473,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of part_of edges from epic to release.
         """
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
 
         for node in nodes:
             if node.type != "release":
@@ -1528,7 +1487,7 @@ class UnifiedGraphBuilder:
                 epic_id = f"epic-{epic_ref.lower()}"
                 if epic_id in node_by_id:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=epic_id,
                             target=node.id,
                             type="part_of",
@@ -1540,8 +1499,8 @@ class UnifiedGraphBuilder:
 
     def _infer_keyword_relationships(
         self,
-        nodes: list[ConceptNode],
-    ) -> list[ConceptEdge]:
+        nodes: list[GraphNode],
+    ) -> list[GraphEdge]:
         """Infer related_to edges from shared keywords.
 
         Args:
@@ -1550,7 +1509,7 @@ class UnifiedGraphBuilder:
         Returns:
             List of keyword-based relationship edges.
         """
-        edges: list[ConceptEdge] = []
+        edges: list[GraphEdge] = []
 
         # Extract keywords for each node
         node_keywords: dict[str, set[str]] = {}
@@ -1566,7 +1525,7 @@ class UnifiedGraphBuilder:
                 shared = node_keywords[id1] & node_keywords[id2]
                 if len(shared) >= 2:
                     edges.append(
-                        ConceptEdge(
+                        GraphEdge(
                             source=id1,
                             target=id2,
                             type="related_to",
@@ -1577,7 +1536,7 @@ class UnifiedGraphBuilder:
 
         return edges
 
-    def _extract_keywords(self, node: ConceptNode) -> set[str]:
+    def _extract_keywords(self, node: GraphNode) -> set[str]:
         """Extract keywords from a concept node.
 
         Args:

@@ -4,9 +4,17 @@
 # Claude Code local settings (user-specific)
 .claude/settings.local.json
 CLAUDE.local.md
+.claude/worktrees/
+.claude/projects/
+
+# Claude Code legacy files (superseded, prevent re-addition)
+.claude/RAI.md
+.claude/RAI-naming.md
+.claude/rai.archive/
 
 # RaiSE generated/cache files
 .raise/cache/
+.raise/confluence-pages.yaml
 
 # RaiSE derived artifacts (rebuild with `rai memory build`)
 .raise/rai/memory/index.json
@@ -90,3 +98,5 @@ dmypy.json
 credentials.json
 *.sqlite
 .netrc
+.raise/mcp/
+!.raise/mcp/catalog.yaml

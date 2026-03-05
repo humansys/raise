@@ -1,0 +1,54 @@
+# MCP Server Catalog — known servers and stack recommendations
+# Governance: missing servers impact agent capabilities
+#
+# Fields:
+#   package:         Package identifier for installation
+#   type:            npx | uvx | pip
+#   module:          Python module name (pip only)
+#   env:             Required environment variable names
+#   description:     Human-readable purpose
+#   recommended_for: Language list, or "all" for universal tools
+#
+# Detected languages: python, typescript, javascript, php, svelte, csharp, dart
+
+servers:
+  context7:
+    package: "@upstash/context7-mcp"
+    type: npx
+    description: "Documentation lookups for any library via Context7"
+    recommended_for: all
+
+  github:
+    package: "@modelcontextprotocol/server-github"
+    type: npx
+    env: [GITHUB_TOKEN]
+    description: "GitHub repository operations (issues, PRs, code search)"
+    recommended_for: all
+
+  filesystem:
+    package: "@modelcontextprotocol/server-filesystem"
+    type: npx
+    description: "Local file system access for agents"
+    recommended_for: []
+
+  fetch:
+    package: "mcp-server-fetch"
+    type: pip
+    module: "mcp_server_fetch"
+    description: "HTTP fetch for web content retrieval"
+    recommended_for: [python]
+
+  # --- DevSecOps ---
+
+  semgrep:
+    package: "semgrep-mcp"
+    type: uvx
+    env: [SEMGREP_APP_TOKEN]
+    description: "SAST + SCA + secret detection via Semgrep (security pipeline)"
+    recommended_for: all
+
+  sonatype:
+    package: "@sonatype/mcp-server"
+    type: npx
+    description: "Dependency intelligence — CVE scanning, license compliance, version guidance"
+    recommended_for: all

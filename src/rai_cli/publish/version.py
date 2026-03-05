@@ -105,7 +105,9 @@ def bump_version(current: str, bump_type: BumpType) -> str:
 
     if bump_type == "alpha":
         if v.pre_type == "a":
-            return str(VersionInfo(v.major, v.minor, v.patch, "a", (v.pre_num or 0) + 1))
+            return str(
+                VersionInfo(v.major, v.minor, v.patch, "a", (v.pre_num or 0) + 1)
+            )
         # From stable or other pre-release: next patch alpha
         if v.pre_type is None:
             return str(VersionInfo(v.major, v.minor, v.patch + 1, "a", 1))
@@ -113,7 +115,9 @@ def bump_version(current: str, bump_type: BumpType) -> str:
 
     if bump_type == "beta":
         if v.pre_type == "b":
-            return str(VersionInfo(v.major, v.minor, v.patch, "b", (v.pre_num or 0) + 1))
+            return str(
+                VersionInfo(v.major, v.minor, v.patch, "b", (v.pre_num or 0) + 1)
+            )
         return str(VersionInfo(v.major, v.minor, v.patch, "b", 1))
 
     if bump_type == "rc":

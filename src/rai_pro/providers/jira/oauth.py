@@ -221,7 +221,9 @@ class _CallbackHandler(http.server.BaseHTTPRequestHandler):
             error_desc = params.get("error_description", ["Unknown error"])[0]
             self.send_response(400)
             self.end_headers()
-            self.wfile.write(f"<h1>Authorization Failed</h1><p>{error_desc}</p>".encode())
+            self.wfile.write(
+                f"<h1>Authorization Failed</h1><p>{error_desc}</p>".encode()
+            )
             _CallbackHandler.callback_data = {"error": error_desc}
             return
 
@@ -277,8 +279,15 @@ def _start_callback_server(port: int = 8080, timeout: int = 300) -> dict[str, st
             if time.time() - start_time > timeout:
                 raise OAuthError(f"OAuth callback timeout after {timeout} seconds")
 
-    if _CallbackHandler.callback_data is None or "error" in _CallbackHandler.callback_data:
-        error = _CallbackHandler.callback_data.get("error", "Unknown error") if _CallbackHandler.callback_data else "No callback data received"
+    if (
+        _CallbackHandler.callback_data is None
+        or "error" in _CallbackHandler.callback_data
+    ):
+        error = (
+            _CallbackHandler.callback_data.get("error", "Unknown error")
+            if _CallbackHandler.callback_data
+            else "No callback data received"
+        )
         raise OAuthError(f"OAuth authorization failed: {error}")
 
     return _CallbackHandler.callback_data
@@ -393,8 +402,7 @@ def refresh_access_token(
     # Verify refresh_token exists
     if "refresh_token" not in token:
         raise OAuthError(
-            "Cannot refresh token: no refresh_token found. "
-            "Re-authentication required."
+            "Cannot refresh token: no refresh_token found. Re-authentication required."
         )
 
     # Exchange refresh token for new access token

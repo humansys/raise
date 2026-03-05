@@ -14,7 +14,7 @@
 | Pydantic | BaseModel at boundaries, not everywhere |
 | CLI | Flags over positional, multi-format output |
 | Security | Never eval/exec, subprocess shell=False |
-| Testing | AAA pattern, factory fixtures, >90% coverage |
+| Testing | AAA pattern, factory fixtures, each test asserts behavior |
 | DRY/SOLID | Rule of Three, composition over inheritance |
 
 ---
@@ -494,13 +494,19 @@ def test_notify(mocker):
     mock_send.assert_called_once()
 ```
 
-### 4.7 Coverage Is Not Enough
+### 4.7 Test Quality Over Coverage
 
-**Do:** Pair coverage with mutation testing (mutmut).
+**Do:** Write tests that catch real defects. Each test must assert observable behavior.
 
-**Target:** >90% line coverage + >85% branch coverage.
+**Coverage:** Diagnostic only — no fixed target. Floor: if coverage drops below 70%, investigate gaps in domain logic.
 
-**Don't:** Trust 100% coverage alone (tests may not assert correctly).
+**Anti-patterns (muda):**
+- Constant assertions: `assert "x" == "x"` (always passes, catches nothing)
+- Mock-implementation tests: only verify an internal method was called, not the outcome
+- Magic-number counts: `assert len(items) == 21` (brittle, not behavioral)
+- Happy-path-only: no boundary tests (empty, one, many, error cases)
+
+**Don't:** Write tests to hit a coverage number. If a test doesn't catch a real bug, it's waste.
 
 ---
 
@@ -664,7 +670,8 @@ Quick validation during `/story-review`:
 - [ ] AAA pattern with single Act?
 - [ ] Fixtures over setup/teardown?
 - [ ] Factory fixtures for multiple instances?
-- [ ] Coverage >90%?
+- [ ] Each test asserts observable behavior (not implementation details)?
+- [ ] No muda: no constant assertions, no mock-implementation tests, no magic counts?
 
 ### DRY/SOLID
 - [ ] Rule of Three applied (not premature abstraction)?

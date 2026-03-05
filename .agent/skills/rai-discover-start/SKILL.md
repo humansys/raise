@@ -1,178 +1,113 @@
 ---
-name: rai-discover-start
-description: >
-  Initialize codebase discovery by detecting project type, languages, and
-  key directories. Creates context file for subsequent discovery skills.
+description: 'Initialize codebase discovery by detecting project type, languages,
+  and key directories. Creates context file for subsequent discovery skills.
 
+  '
 license: MIT
-
 metadata:
-  raise.work_cycle: discovery
+  raise.adaptable: 'true'
+  raise.fase: '1'
   raise.frequency: per-project
-  raise.fase: "1"
-  raise.prerequisites: ""
+  raise.gate: ''
   raise.next: discover-scan
-  raise.gate: ""
-  raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.prerequisites: ''
+  raise.version: 2.0.0
   raise.visibility: public
+  raise.work_cycle: discovery
+name: rai-discover-start
 ---
 
-# Discovery Start: Initialize Codebase Discovery
+# Discovery Start
 
 ## Purpose
 
-Initialize codebase discovery by detecting project type, identifying key directories, and creating a context file that subsequent discovery skills will use. This is the first step in building a component catalog.
+Initialize codebase discovery by detecting languages, key directories, and entry points. Creates the context file that all subsequent discovery skills depend on.
 
 ## Mastery Levels (ShuHaRi)
 
-**Shu (守)**: Follow all steps, detect all languages, create complete context file.
-
-**Ha (破)**: Focus on primary language only for targeted discovery.
-
-**Ri (離)**: Integrate with project-specific conventions or monorepo structures.
+- **Shu**: Follow all steps, detect all languages, create complete context file
+- **Ha**: Focus on primary language only for targeted discovery
+- **Ri**: Integrate with monorepo structures or custom conventions
 
 ## Context
 
-**When to use:**
-- Starting discovery on a new codebase
-- After significant structural changes to the project
-- When component catalog needs refresh
+**When to use:** Starting discovery on a new or significantly changed codebase.
 
-**When to skip:**
-- `work/discovery/context.yaml` already exists and is current
-- Quick re-scan of specific directory (use `/rai-discover-scan` directly with path)
+**When to skip:** `work/discovery/context.yaml` already exists and is current. For targeted re-scan, use `/rai-discover-scan` directly with path.
 
-**Inputs required:**
-- Access to project root directory
-- Ability to list files and detect extensions
-
-**Output:**
-- `work/discovery/context.yaml` — Project context for discovery
-- Ready for `/rai-discover-scan`
+**Inputs:** Access to project root directory.
 
 ## Steps
 
-### Step 1: Detect Languages Present
+### Step 1: Detect Languages
 
-Scan the project for source files and identify languages.
-
-**Important:** Exclude generated/build directories to avoid false positives: `.raise/`, `obj/`, `bin/`, `node_modules/`, `.git/`.
-
-Run these counts in parallel (all independent):
+Scan for source files by extension (exclude `.raise/`, `node_modules/`, `.git/`, `obj/`, `bin/`):
 
 ```bash
-# Count files by extension — exclude generated dirs (run in parallel)
-find . -type f -name "*.py" \
-  ! -path "./.raise/*" ! -path "./node_modules/*" ! -path "./.git/*" | wc -l    # Python
-find . -type f \( -name "*.ts" -o -name "*.tsx" \) \
-  ! -path "./.raise/*" ! -path "./node_modules/*" ! -path "./.git/*" | wc -l    # TypeScript
-find . -type f \( -name "*.js" -o -name "*.jsx" \) \
-  ! -path "./.raise/*" ! -path "./node_modules/*" ! -path "./.git/*" | wc -l    # JavaScript
-find . -type f \( -name "*.cs" -o -name "*.csproj" \) \
-  ! -path "./obj/*" ! -path "./bin/*" ! -path "./.raise/*" ! -path "./.git/*" | wc -l    # C#/.NET
-find . -type f -name "*.php" \
-  ! -path "./vendor/*" ! -path "./.raise/*" ! -path "./.git/*" | wc -l    # PHP
-find . -type f -name "*.dart" \
-  ! -path "./.dart_tool/*" ! -path "./.raise/*" ! -path "./.git/*" | wc -l    # Dart/Flutter
+find . -type f -name "*.py" ! -path "./.raise/*" ! -path "./node_modules/*" ! -path "./.git/*" | wc -l
+# Repeat for: *.ts/*.tsx, *.js/*.jsx, *.cs/*.csproj, *.php, *.dart
 ```
 
-**Supported languages:**
-- `python` — `.py` files
-- `typescript` — `.ts`, `.tsx` files
-- `javascript` — `.js`, `.jsx` files
-- `csharp` — `.cs`, `.csproj` files
-- `php` — `.php` files
-- `dart` — `.dart` files
+| Language | Extensions |
+|----------|-----------|
+| python | `.py` |
+| typescript | `.ts`, `.tsx` |
+| javascript | `.js`, `.jsx` |
+| csharp | `.cs`, `.csproj` |
+| php | `.php` |
+| dart | `.dart` |
 
-**Record:** List of detected languages with file counts.
+<verification>
+At least one supported language detected.
+</verification>
 
-**Verification:** At least one supported language detected.
+<if-blocked>
+No supported languages → discovery not applicable to this codebase.
+</if-blocked>
 
-> **If you can't continue:** No supported languages → Discovery not applicable to this codebase.
+### Step 2: Identify Directories & Entry Points
 
-### Step 2: Identify Root Directories
+**Directories:** Check for `src/`, `lib/`, `app/`, `packages/`.
 
-Find the main source directories:
+**Entry points** by language:
 
-**Common patterns:**
-- `src/` — Standard source directory
-- `lib/` — Library code
-- `app/` — Application code (Next.js, Rails, etc.)
-- `packages/` — Monorepo packages
+| Language | Entry points |
+|----------|-------------|
+| python | `src/*/cli/main.py`, `src/*/__main__.py`, `main.py` |
+| typescript/js | `src/index.ts`, `src/main.ts`, `package.json` main field |
+| csharp | `Program.cs`, `Startup.cs`, `*.sln` |
+| php | `public/index.php`, `bin/console` |
+| dart | `lib/main.dart` |
 
-```bash
-for d in src/ lib/ app/ packages/; do [ -d "$d" ] && echo "$d"; done
-```
+<verification>
+At least one scannable directory identified.
+</verification>
 
-**Record:** List of root directories to scan.
+<if-blocked>
+No clear source directory → ask user to specify.
+</if-blocked>
 
-**Verification:** At least one scannable directory identified.
+### Step 3: Create Context File
 
-> **If you can't continue:** No clear source directory → Ask user to specify.
-
-### Step 3: Identify Entry Points
-
-Find main entry points for context:
-
-**Python:**
-- `src/*/cli/main.py` — CLI entry
-- `src/*/__main__.py` — Module entry
-- `main.py` — Root entry
-
-**TypeScript/JavaScript:**
-- `src/index.ts` — Library entry
-- `src/main.ts` — App entry
-- `package.json` main field
-
-**C#/.NET:**
-- `Program.cs` — .NET 6+ minimal API / console entry
-- `Startup.cs` — ASP.NET Core startup
-- `*.sln` — Solution file (multi-project)
-- `src/*/Program.cs` — Clean Architecture entry
-
-**PHP:**
-- `public/index.php` — Web entry
-- `bin/console` — Symfony CLI entry
-
-**Dart/Flutter:**
-- `lib/main.dart` — Flutter app entry
-
-**Record:** Entry point paths (informational, helps Rai understand structure).
-
-**Verification:** Entry points identified (optional, proceed if not found).
-
-### Step 4: Create Context File
-
-Create `work/discovery/context.yaml` with detected information:
+Write `work/discovery/context.yaml`:
 
 ```yaml
-# work/discovery/context.yaml
-# Generated by /rai-discover-start
-# Do not edit manually — regenerate with /rai-discover-start
-
 project:
-  name: {project_name}  # From directory name or package.json/pyproject.toml
-  languages:
-    - python           # List detected languages
-  root_dirs:
-    - src/rai_cli    # Directories to scan
-  entry_points:
-    - src/rai_cli/cli/main.py  # Main entry points
+  name: {from pyproject.toml/package.json/directory name}
+  languages: [python]
+  root_dirs: [src/rai_cli]
+  entry_points: [src/rai_cli/cli/main.py]
   detected_at: {ISO_TIMESTAMP}
-
 status: initialized
 ```
 
-**Write the file** using the Write tool.
+Project name priority: `pyproject.toml` → `package.json` → directory name.
 
-**Verification:** File created at `work/discovery/context.yaml`.
+<verification>
+File created at `work/discovery/context.yaml`.
+</verification>
 
-> **If you can't continue:** Write permission error → Check directory permissions.
-
-### Step 5: Display Summary
-
-Present the discovery context to the user:
+### Step 4: Display Summary
 
 ```markdown
 ## Discovery Initialized
@@ -181,59 +116,27 @@ Present the discovery context to the user:
 **Languages:** {list}
 **Directories:** {list}
 **Entry Points:** {list}
-
 **Context file:** `work/discovery/context.yaml`
 
-### Next Step
-
-Run `/rai-discover-scan` to extract symbols and synthesize descriptions.
-
-Or specify a subdirectory for targeted scan:
-> /rai-discover-scan src/specific/module
+**Next:** `/rai-discover-scan`
 ```
-
-**Verification:** Summary displayed; user knows next step.
 
 ## Output
 
-- **Artifact:** `work/discovery/context.yaml`
-- **Telemetry:** `skill_event` via Stop hook
-- **Next:** `/rai-discover-scan`
+| Item | Destination |
+|------|-------------|
+| Context file | `work/discovery/context.yaml` |
+| Next | `/rai-discover-scan` |
 
-## Discovery Context Schema
+## Quality Checklist
 
-```yaml
-project:
-  name: string           # Project name
-  languages: string[]    # Detected languages
-  root_dirs: string[]    # Directories to scan
-  entry_points: string[] # Main entry points (informational)
-  detected_at: string    # ISO timestamp
-
-status: string           # initialized | scanning | validated | complete
-```
-
-## Notes
-
-### Project Name Detection
-
-Priority order:
-1. `pyproject.toml` → `[project].name`
-2. `package.json` → `name`
-3. Directory name (fallback)
-
-### Monorepo Support
-
-For monorepos with `packages/`:
-- List each package as separate root_dir
-- Or focus on specific package if user specifies
-
-### Re-initialization
-
-Running `/rai-discover-start` again will overwrite `context.yaml`. This is intentional — use when project structure changes significantly.
+- [ ] All supported languages detected (not just primary)
+- [ ] Generated directories exclude build/vendor paths
+- [ ] Context file is valid YAML with all required fields
+- [ ] Monorepo: each package listed as separate root_dir
+- [ ] NEVER include generated/build directories in root_dirs
 
 ## References
 
-- Next skill: `/rai-discover-scan`
-- Design: `work/stories/f13.3/design.md`
-- Epic: E13 Discovery
+- Next: `/rai-discover-scan`
+- Pipeline: discover-start → discover-scan → discover-validate → discover-document

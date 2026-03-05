@@ -49,7 +49,7 @@ rai publish check
 ```
 
 **Quality gates (10 total):**
-1. Tests pass (>90% coverage required)
+1. Tests pass (coverage diagnostic — floor 70%, each test asserts behavior)
 2. Type checks clean (pyright --strict)
 3. Lint clean (ruff)
 4. Security scan (bandit)

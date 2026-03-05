@@ -119,8 +119,7 @@ def sync_skills(
 
     # Remove all existing skill directories (except __pycache__)
     for item in target_dir.iterdir():
-        if item.is_dir() and item.name not in ("__pycache__", "__init__.py"):
-            if item.name.startswith("rai-"):
+        if item.is_dir() and item.name not in ("__pycache__", "__init__.py") and item.name.startswith("rai-"):
                 if dry_run:
                     print(f"[DRY RUN] Would remove: {item.name}")
                 else:
@@ -186,7 +185,6 @@ def update_distributable_list(
 
     # Replace existing DISTRIBUTABLE_SKILLS
     start_marker = "DISTRIBUTABLE_SKILLS: list[str] = ["
-    end_marker = "]"
 
     start_idx = content.find(start_marker)
     if start_idx == -1:

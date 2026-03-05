@@ -106,7 +106,7 @@ class TestPatternAddCommand:
             os.chdir(original_cwd)
 
     def test_add_pattern_creates_missing_dir(self, tmp_path: Path) -> None:
-        """Test pattern add auto-creates memory directory if missing."""
+        """Test pattern add auto-creates personal directory if missing (default scope)."""
         original_cwd = os.getcwd()
         try:
             os.chdir(tmp_path)
@@ -114,8 +114,8 @@ class TestPatternAddCommand:
 
             assert result.exit_code == 0
             assert "PAT-" in result.stdout
-            memory_dir = tmp_path / ".raise" / "rai" / "memory"
-            assert memory_dir.exists()
+            personal_dir = tmp_path / ".raise" / "rai" / "personal"
+            assert personal_dir.exists()
         finally:
             os.chdir(original_cwd)
 
@@ -163,6 +163,38 @@ class TestPatternAddCommand:
             patterns_file = personal_dir / "patterns.jsonl"
             content = patterns_file.read_text(encoding="utf-8")
             assert "Personal pattern" in content
+        finally:
+            os.chdir(original_cwd)
+
+    def test_add_pattern_defaults_to_personal_scope(self, tmp_path: Path) -> None:
+        """Test pattern add without --scope writes to personal dir, not project."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            # Create both dirs so we can check which one gets written to
+            personal_dir = tmp_path / ".raise" / "rai" / "personal"
+            personal_dir.mkdir(parents=True)
+            (personal_dir / "patterns.jsonl").write_text("")
+            project_dir = tmp_path / ".raise" / "rai" / "memory"
+            project_dir.mkdir(parents=True)
+            (project_dir / "patterns.jsonl").write_text("")
+
+            result = runner.invoke(
+                app,
+                ["pattern", "add", "Default scope test", "-c", "test"],
+            )
+
+            assert result.exit_code == 0
+            assert "PAT-" in result.stdout
+            # Should write to personal, not project
+            personal_content = (personal_dir / "patterns.jsonl").read_text(
+                encoding="utf-8"
+            )
+            project_content = (project_dir / "patterns.jsonl").read_text(
+                encoding="utf-8"
+            )
+            assert "Default scope test" in personal_content
+            assert "Default scope test" not in project_content
         finally:
             os.chdir(original_cwd)
 
@@ -289,7 +321,9 @@ class TestPatternReinforceCommand:
         finally:
             os.chdir(original_cwd)
 
-    def test_reinforce_pattern_not_found(self, tmp_path: Path, patterns_file: Path) -> None:
+    def test_reinforce_pattern_not_found(
+        self, tmp_path: Path, patterns_file: Path
+    ) -> None:
         """Test reinforce with non-existent pattern ID fails."""
         original_cwd = os.getcwd()
         try:
@@ -387,5 +421,113 @@ class TestPatternReinforceCommand:
             assert result.exit_code == 0
             # Fixture starts with positives=1; a second positive vote → positives=2
             assert "positives=2" in result.stdout
+        finally:
+            os.chdir(original_cwd)
+
+
+# =============================================================================
+# rai pattern promote
+# =============================================================================
+
+
+class TestPatternPromoteCommand:
+    """Tests for `rai pattern promote` command."""
+
+    def test_promote_pattern_moves_to_project(self, tmp_path: Path) -> None:
+        """Happy path: pattern in personal, after promote it's in project and not in personal."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            personal_dir = tmp_path / ".raise" / "rai" / "personal"
+            personal_dir.mkdir(parents=True)
+            project_dir = tmp_path / ".raise" / "rai" / "memory"
+            project_dir.mkdir(parents=True)
+
+            pattern_data = {
+                "id": "PAT-E-042",
+                "content": "Always validate inputs at boundaries",
+                "sub_type": "process",
+                "context": ["validation"],
+                "positives": 3,
+                "negatives": 0,
+                "evaluations": 3,
+                "created": "2026-01-15",
+                "learned_from": "S100.1",
+            }
+            other_pattern = {
+                "id": "PAT-E-043",
+                "content": "Another pattern that stays",
+                "sub_type": "technical",
+                "context": ["other"],
+                "positives": 1,
+                "negatives": 0,
+                "evaluations": 1,
+                "created": "2026-01-16",
+                "learned_from": None,
+            }
+            personal_file = personal_dir / "patterns.jsonl"
+            personal_file.write_text(
+                json.dumps(pattern_data) + "\n" + json.dumps(other_pattern) + "\n",
+                encoding="utf-8",
+            )
+            project_file = project_dir / "patterns.jsonl"
+            project_file.write_text("", encoding="utf-8")
+
+            result = runner.invoke(app, ["pattern", "promote", "PAT-E-042"])
+
+            assert result.exit_code == 0
+            assert "PAT-E-042" in result.stdout
+            assert "Always validate" in result.stdout
+
+            # Pattern should be in project file
+            project_content = project_file.read_text(encoding="utf-8")
+            assert "PAT-E-042" in project_content
+            assert "Always validate inputs at boundaries" in project_content
+
+            # Pattern should NOT be in personal file
+            personal_content = personal_file.read_text(encoding="utf-8")
+            assert "PAT-E-042" not in personal_content
+            # Other pattern should still be there
+            assert "PAT-E-043" in personal_content
+        finally:
+            os.chdir(original_cwd)
+
+    def test_promote_pattern_not_found(self, tmp_path: Path) -> None:
+        """Pattern ID doesn't exist in personal, exits with error."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            personal_dir = tmp_path / ".raise" / "rai" / "personal"
+            personal_dir.mkdir(parents=True)
+            personal_file = personal_dir / "patterns.jsonl"
+            personal_file.write_text(
+                json.dumps({"id": "PAT-E-099", "content": "other"}) + "\n",
+                encoding="utf-8",
+            )
+            project_dir = tmp_path / ".raise" / "rai" / "memory"
+            project_dir.mkdir(parents=True)
+            (project_dir / "patterns.jsonl").write_text("", encoding="utf-8")
+
+            result = runner.invoke(app, ["pattern", "promote", "PAT-E-999"])
+
+            assert result.exit_code != 0
+            assert "not found" in result.output.lower()
+        finally:
+            os.chdir(original_cwd)
+
+    def test_promote_pattern_no_personal_file(self, tmp_path: Path) -> None:
+        """Personal patterns.jsonl doesn't exist, exits with error."""
+        original_cwd = os.getcwd()
+        try:
+            os.chdir(tmp_path)
+            # Create project dir but NOT personal dir
+            project_dir = tmp_path / ".raise" / "rai" / "memory"
+            project_dir.mkdir(parents=True)
+            (project_dir / "patterns.jsonl").write_text("", encoding="utf-8")
+
+            result = runner.invoke(app, ["pattern", "promote", "PAT-E-001"])
+
+            assert result.exit_code != 0
+            assert "not found" in result.output.lower()
         finally:
             os.chdir(original_cwd)

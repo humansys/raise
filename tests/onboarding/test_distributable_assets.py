@@ -91,7 +91,8 @@ class TestSkillsBaseTemplates:
                     # Allow in author credits (lines with "author", "credit", "@")
                     lower = line.lower()
                     is_credit = any(
-                        word in lower for word in ("author", "credit", "@", "created by")
+                        word in lower
+                        for word in ("author", "credit", "@", "created by")
                     )
                     assert is_credit, (
                         f"{skill_dir.name}/SKILL.md line {i + 1} references 'Emilio' "
