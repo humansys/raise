@@ -155,7 +155,7 @@ Merged to `{dev_branch}`. Branch deleted. Jira updated.
 - [ ] Bug reproduces before any fix (Step 1)
 - [ ] Root cause confirmed with evidence (Step 2)
 - [ ] Regression test written RED-first (Step 4)
-- [ ] All gates pass: pytest, ruff, pyright (Step 4)
+- [ ] All gates pass: test runner, linter, type checker (Step 4)
 - [ ] Fix verified against root cause — not symptom (Step 5)
 - [ ] Branch deleted after merge (Step 6)
 - [ ] NEVER fix before analysing — symptoms recur without root cause
