@@ -43,6 +43,8 @@ class BootstrapResult(BaseModel):
     already_existed: bool = False
     files_copied: list[str] = Field(default_factory=list)
     files_skipped: list[str] = Field(default_factory=list)
+    patterns_added: int = 0
+    patterns_updated: int = 0
 
 
 def bootstrap_rai_base(project_root: Path) -> BootstrapResult:
@@ -117,29 +119,106 @@ def _copy_identity(
 def _copy_patterns(
     base: Traversable, project_root: Path, result: BootstrapResult
 ) -> None:
-    """Copy base patterns to .raise/rai/memory/patterns.jsonl.
+    """Copy or merge base patterns to .raise/rai/memory/patterns.jsonl.
+
+    First init: copies all base patterns (fresh install).
+    Re-init: merges base patterns — adds new, updates versioned, preserves project patterns.
 
     Args:
         base: importlib.resources Traversable for rai_base package.
         project_root: Project root directory.
         result: BootstrapResult to update.
     """
+    import json
+    import tempfile
+
     memory_dir = get_memory_dir(project_root)
     dest = memory_dir / "patterns.jsonl"
+    source = base / "memory" / "patterns-base.jsonl"
 
-    if dest.exists():
-        result.files_skipped.append(str(dest))
-        logger.debug("Skipped (exists): %s", dest)
+    if not dest.exists():
+        # Fresh install: copy all base patterns
+        content = source.read_text(encoding="utf-8")
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(content, encoding="utf-8")
+        result.files_copied.append(str(dest))
+        result.patterns_copied = True
+        logger.debug("Copied: %s", dest)
         return
 
-    source = base / "memory" / "patterns-base.jsonl"
-    content = source.read_text(encoding="utf-8")
+    # Re-init: merge base patterns into existing file
+    existing_lines = dest.read_text(encoding="utf-8").strip().splitlines()
+    existing_patterns: list[dict[str, object]] = []
+    existing_by_id: dict[str, int] = {}  # id -> index in existing_patterns
 
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.write_text(content, encoding="utf-8")
-    result.files_copied.append(str(dest))
-    result.patterns_copied = True
-    logger.debug("Copied: %s", dest)
+    for line in existing_lines:
+        line = line.strip()
+        if not line:
+            continue
+        pattern = json.loads(line)
+        idx = len(existing_patterns)
+        existing_patterns.append(pattern)
+        pid = str(pattern.get("id", ""))
+        if pid:
+            existing_by_id[pid] = idx
+
+    # Read base patterns from package
+    base_lines = source.read_text(encoding="utf-8").strip().splitlines()
+    added = 0
+    updated = 0
+
+    for line in base_lines:
+        line = line.strip()
+        if not line:
+            continue
+        base_pattern = json.loads(line)
+        pid = str(base_pattern.get("id", ""))
+        if not pid:
+            continue
+
+        if pid not in existing_by_id:
+            # New base pattern — append
+            existing_patterns.append(base_pattern)
+            existing_by_id[pid] = len(existing_patterns) - 1
+            added += 1
+            logger.debug("Added base pattern: %s", pid)
+        else:
+            # Existing — check version for upgrade
+            idx = existing_by_id[pid]
+            existing_version = int(str(existing_patterns[idx].get("version", 0)))
+            package_version = int(str(base_pattern.get("version", 0)))
+            if package_version > existing_version:
+                existing_patterns[idx] = base_pattern
+                updated += 1
+                logger.debug("Updated base pattern: %s v%d → v%d", pid, existing_version, package_version)
+
+    result.patterns_added = added
+    result.patterns_updated = updated
+
+    if added > 0 or updated > 0:
+        # Write atomically: temp file + rename
+        merged_content = "\n".join(json.dumps(p) for p in existing_patterns) + "\n"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp_path = tempfile.mkstemp(
+            dir=str(dest.parent), suffix=".tmp", prefix="patterns_"
+        )
+        try:
+            Path(tmp_path).write_text(merged_content, encoding="utf-8")
+            Path(tmp_path).replace(dest)
+        except Exception:
+            Path(tmp_path).unlink(missing_ok=True)
+            raise
+        finally:
+            import os
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        result.files_copied.append(str(dest))
+        logger.debug("Merged base patterns into %s: %d added, %d updated", dest, added, updated)
+    else:
+        result.files_skipped.append(str(dest))
+        logger.debug("Base patterns already current: %s", dest)
 
 
 def _copy_methodology(
