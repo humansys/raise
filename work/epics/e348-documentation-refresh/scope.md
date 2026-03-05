@@ -127,7 +127,7 @@ Stream B:          S348.3    S348.5 ─┘
 | 2' | S348.3: llms.txt + AGENTS.md | Done | S | llms.txt created, AGENTS.md rewritten from placeholder |
 | 3 | S348.4: Developer extension guides | Done | M | 5 guide pages (extending, adapter, skill, mcp, hook) |
 | 3' | S348.5: README + community files | Done | S | Version, URLs, branch model, skill count fixed |
-| 4 | S348.6: Docs validation | Pending | — | — |
+| 4 | S348.6: Docs validation | Done | S | All rai memory refs replaced, 66 pages build clean |
 
 ## Risks
 
