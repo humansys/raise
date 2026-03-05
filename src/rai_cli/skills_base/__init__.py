@@ -16,9 +16,12 @@ Contents:
                         rai-discover-validate, rai-discover-document
     Onboarding:         rai-project-create, rai-project-onboard, rai-welcome
     Governance:         rai-docs-update
-    Tools:              rai-research, rai-debug
+    Quality:            rai-architecture-review, rai-quality-review
+    MCP:                rai-mcp-add, rai-mcp-remove, rai-mcp-status
+    Tools:              rai-research, rai-debug, rai-doctor, rai-problem-shape
 
-Note: Internal skills (rai-framework-sync, rai-publish) are excluded from distribution.
+Note: Internal skills (rai-framework-sync, rai-publish, rai-skillset-manage,
+      rai-bugfix) are excluded from distribution.
 
 Usage:
     from importlib.resources import files
@@ -42,13 +45,16 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-story-implement",
     "rai-story-plan",
     "rai-story-review",
+    "rai-story-run",
     "rai-story-start",
     # Epic lifecycle
     "rai-epic-close",
     "rai-epic-design",
     "rai-epic-plan",
+    "rai-epic-run",
     "rai-epic-start",
     # Discovery
+    "rai-discover",
     "rai-discover-document",
     "rai-discover-scan",
     "rai-discover-start",
@@ -59,8 +65,16 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-welcome",
     # Governance
     "rai-docs-update",
+    # Quality
+    "rai-architecture-review",
+    "rai-quality-review",
+    # MCP
+    "rai-mcp-add",
+    "rai-mcp-remove",
+    "rai-mcp-status",
     # Tools
     "rai-debug",
+    "rai-doctor",
     "rai-problem-shape",
     "rai-research",
 ]
