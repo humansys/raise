@@ -185,6 +185,7 @@ class BacklogHook:
                     spec = IssueSpec(
                         summary=f"{event.work_id}",
                         issue_type=issue_type,
+                        labels=[f"rai:{event.work_id}"],
                     )
                     ref = adapter.create_issue(config.project_key, spec)
                     jira_key = ref.key
