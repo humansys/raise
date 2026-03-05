@@ -23,7 +23,12 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from rai_cli.config.paths import get_framework_dir, get_identity_dir, get_memory_dir
+from rai_cli.config.paths import (
+    get_framework_dir,
+    get_identity_dir,
+    get_memory_dir,
+    get_personal_dir,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,6 +71,9 @@ def bootstrap_rai_base(project_root: Path) -> BootstrapResult:
 
     # Copy methodology
     _copy_methodology(base, project_root, result)
+
+    # Ensure personal directory exists with .gitkeep
+    _ensure_personal_dir(project_root)
 
     # Determine if everything already existed
     result.already_existed = len(result.files_copied) == 0
@@ -160,3 +168,21 @@ def _copy_methodology(
     result.files_copied.append(str(dest))
     result.methodology_copied = True
     logger.debug("Copied: %s", dest)
+
+
+def _ensure_personal_dir(project_root: Path) -> None:
+    """Ensure .raise/rai/personal/ exists with a .gitkeep file.
+
+    The personal directory is gitignored and stores per-developer data
+    (sessions, telemetry, calibration). The .gitkeep ensures the directory
+    structure exists after `rai init` before any subsystem creates files.
+
+    Args:
+        project_root: Project root directory.
+    """
+    personal_dir = get_personal_dir(project_root)
+    personal_dir.mkdir(parents=True, exist_ok=True)
+    gitkeep = personal_dir / ".gitkeep"
+    if not gitkeep.exists():
+        gitkeep.touch()
+        logger.debug("Created: %s", gitkeep)

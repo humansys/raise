@@ -572,6 +572,24 @@ class TestInitBootstrap:
         assert "RaiSE Framework Process" in content
 
 
+    def test_init_creates_personal_dir_with_gitkeep(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should create .raise/rai/personal/.gitkeep for developer workspace."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        personal_dir = greenfield_project / ".raise" / "rai" / "personal"
+        assert personal_dir.is_dir()
+        gitkeep = personal_dir / ".gitkeep"
+        assert gitkeep.exists(), ".raise/rai/personal/.gitkeep should be created by init"
+
+
 class TestInitMemoryMdBranches:
     """Tests for MEMORY.md branch substitution during init."""
 
