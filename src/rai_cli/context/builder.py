@@ -334,7 +334,7 @@ class GraphBuilder:
             List of GraphNode for artifact concepts.
         """
         from rai_cli.artifacts.reader import read_all_artifacts
-        from rai_cli.artifacts.writer import _artifact_filename
+        from rai_cli.artifacts.writer import _artifact_filename  # pyright: ignore[reportPrivateUsage]
 
         artifacts_dir = self.project_root / ".raise" / "artifacts"
         artifacts = read_all_artifacts(artifacts_dir)
@@ -345,7 +345,7 @@ class GraphBuilder:
             node_id = f"artifact-{work_id}-{artifact.artifact_type.value}"
 
             # Extract summary from content (typed or dict)
-            if isinstance(artifact.content, dict):
+            if isinstance(artifact.content, dict):  # pyright: ignore[reportUnnecessaryIsInstance]
                 summary = artifact.content.get("summary", str(artifact.content))
             else:
                 summary = getattr(artifact.content, "summary", str(artifact.content))
