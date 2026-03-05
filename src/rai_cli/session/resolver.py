@@ -17,13 +17,26 @@ def _normalize_session_id(session_id: str) -> str:
     - "ses-177" (lowercase prefix)
     - "177" (numeric only)
 
+    Rejects values containing path traversal components (CWE-23) since
+    session IDs are used to construct file paths.
+
     Returns:
         Normalized session ID in format "SES-NNN".
+
+    Raises:
+        ValueError: If session_id contains '..' or path separator characters.
     """
     session_id = session_id.strip()
 
     if not session_id:
         return session_id  # Empty string, caller will handle
+
+    # CWE-23: Reject path traversal components before any path construction.
+    # Session IDs flow from env vars (RAI_SESSION_ID) into get_session_dir().
+    if ".." in session_id or "/" in session_id or "\\" in session_id:
+        raise ValueError(
+            f"Invalid session ID — path traversal characters detected: {session_id!r}"
+        )
 
     # Already normalized (case-insensitive check)
     if session_id.upper().startswith("SES-"):

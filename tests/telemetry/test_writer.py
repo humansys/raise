@@ -209,6 +209,36 @@ class TestEmit:
         assert data3["command"] == "memory"
 
 
+class TestEmitPathTraversal:
+    """CWE-23 regression: emit must reject traversal session IDs."""
+
+    def test_emit_rejects_traversal_session_id(
+        self, temp_telemetry_dir: Path, now: datetime
+    ) -> None:
+        """emit() rejects session_id with path traversal via get_session_dir."""
+        event = SkillEvent(timestamp=now, skill="test", event="start")
+
+        with pytest.raises(ValueError, match="path traversal"):
+            emit(
+                event,
+                base_path=temp_telemetry_dir,
+                session_id="../../etc",
+            )
+
+    def test_emit_rejects_slash_session_id(
+        self, temp_telemetry_dir: Path, now: datetime
+    ) -> None:
+        """emit() rejects session_id containing forward slashes."""
+        event = SkillEvent(timestamp=now, skill="test", event="start")
+
+        with pytest.raises(ValueError, match="path traversal"):
+            emit(
+                event,
+                base_path=temp_telemetry_dir,
+                session_id="SES-1/../../tmp/pwned",
+            )
+
+
 class TestEmitPerSession:
     """Tests for per-session telemetry writes."""
 
