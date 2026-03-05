@@ -126,7 +126,7 @@ M1: Git-safe        M2: Context alive    M3: Patterns    M4: Full portability
 | S350.4 Patterns | L | Done | M | Merged 8221619f |
 | S350.5 Enhanced init | M | Pending | — | |
 | S350.6 Skill sync | S | Pending | — | |
-| S350.7 Jira creds | S | Pending | — | |
+| S350.7 Jira creds | S | Done | XS | Already resolved -- credentials in .env, jira.yaml clean |
 
 ### Sequencing Risks
 
