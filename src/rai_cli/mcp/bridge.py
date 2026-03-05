@@ -16,7 +16,10 @@ import time
 from contextlib import AsyncExitStack
 from typing import Any
 
-import logfire_api as logfire
+try:
+    import logfire_api as logfire
+except ModuleNotFoundError:  # pragma: no cover
+    logfire = None  # type: ignore[assignment]
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
@@ -70,23 +73,30 @@ class McpBridge:
         Raises:
             McpBridgeError: On connection or tool call failure.
         """
-        with logfire.span(
-            "mcp.tool_call",
-            mcp_server=self._server_command,
-            mcp_tool=tool_name,
-        ) as span:
+        span_cm = (
+            logfire.span(
+                "mcp.tool_call",
+                mcp_server=self._server_command,
+                mcp_tool=tool_name,
+            )
+            if logfire is not None
+            else contextlib.nullcontext()
+        )
+        with span_cm as span:
             start = time.monotonic()
             session = await self._ensure_session()
             try:
                 result = await session.call_tool(tool_name, arguments)
                 elapsed_ms = int((time.monotonic() - start) * 1000)
-                span.set_attribute("duration_ms", elapsed_ms)
-                span.set_attribute("success", not result.isError)
+                if span is not None:
+                    span.set_attribute("duration_ms", elapsed_ms)
+                    span.set_attribute("success", not result.isError)
                 return self._parse_result(result)
             except Exception as exc:
                 elapsed_ms = int((time.monotonic() - start) * 1000)
-                span.set_attribute("duration_ms", elapsed_ms)
-                span.set_attribute("success", False)
+                if span is not None:
+                    span.set_attribute("duration_ms", elapsed_ms)
+                    span.set_attribute("success", False)
                 raise McpBridgeError(f"Tool call '{tool_name}' failed: {exc}") from exc
 
     async def list_tools(self) -> list[McpToolInfo]:

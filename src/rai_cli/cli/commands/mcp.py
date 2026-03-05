@@ -23,7 +23,6 @@ from rich.table import Table
 
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import McpCallEvent
-from rai_cli.mcp.bridge import McpBridge, McpBridgeError
 from rai_cli.mcp.models import McpHealthResult
 from rai_cli.mcp.registry import discover_mcp_servers
 from rai_cli.mcp.schema import McpServerConfig, ServerConnection
@@ -35,6 +34,24 @@ mcp_app = typer.Typer(
 )
 
 console = Console(stderr=True)
+
+
+def _lazy_bridge(
+    server_command: str,
+    server_args: list[str] | None = None,
+    env: dict[str, str] | None = None,
+) -> Any:
+    """Lazy-import McpBridge and instantiate. Avoids requiring mcp SDK at CLI startup."""
+    from rai_cli.mcp.bridge import McpBridge
+
+    return McpBridge(server_command=server_command, server_args=server_args, env=env)
+
+
+def _lazy_bridge_error() -> type:
+    """Lazy-import McpBridgeError."""
+    from rai_cli.mcp.bridge import McpBridgeError
+
+    return McpBridgeError
 
 
 def _resolve_env(config: McpServerConfig) -> dict[str, str] | None:
@@ -52,7 +69,7 @@ async def _call_tool(
     config: McpServerConfig, tool_name: str, arguments: dict[str, Any]
 ) -> dict[str, Any]:
     """Connect to MCP server, call tool, return result as dict."""
-    bridge = McpBridge(
+    bridge = _lazy_bridge(
         server_command=config.server.command,
         server_args=config.server.args,
         env=_resolve_env(config),
@@ -117,7 +134,7 @@ def health(
     config = _lookup_server(server, servers)
 
     async def _check() -> McpHealthResult:
-        bridge = McpBridge(
+        bridge = _lazy_bridge(
             server_command=config.server.command,
             server_args=config.server.args,
             env=_resolve_env(config),
@@ -151,7 +168,7 @@ def tools(
     config = _lookup_server(server, servers)
 
     async def _list() -> list[tuple[str, str]]:
-        bridge = McpBridge(
+        bridge = _lazy_bridge(
             server_command=config.server.command,
             server_args=config.server.args,
             env=_resolve_env(config),
@@ -164,9 +181,11 @@ def tools(
 
     try:
         tool_info = asyncio.run(_list())
-    except McpBridgeError as exc:
-        console.print(f"Error: {exc}")
-        raise typer.Exit(1) from exc
+    except Exception as exc:
+        if isinstance(exc, _lazy_bridge_error()):
+            console.print(f"Error: {exc}")
+            raise typer.Exit(1) from exc
+        raise
 
     if not tool_info:
         Console().print(f"No tools found on {config.name}")
@@ -340,7 +359,7 @@ def scaffold(
 
     # Connect and introspect
     async def _introspect() -> list[str]:
-        bridge = McpBridge(
+        bridge = _lazy_bridge(
             server_command=command,
             server_args=server_args,
         )
@@ -473,7 +492,7 @@ def install(
     health_ok = True
 
     async def _check() -> list[str]:
-        bridge = McpBridge(
+        bridge = _lazy_bridge(
             server_command=server_command,
             server_args=server_args,
         )

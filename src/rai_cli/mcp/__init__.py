@@ -4,12 +4,22 @@ Provides generic MCP server management: bridge, models, schema, registry.
 Domain adapters (PM, Docs) live in ``rai_cli.adapters`` and consume this layer.
 
 Architecture: ADR-042, E338
+
+Note: Bridge imports are lazy because the ``mcp`` SDK and ``logfire-api``
+are optional dependencies. Eager import would crash CLI startup when
+these packages are not installed.
 """
 
-from rai_cli.mcp.bridge import McpBridge, McpBridgeError
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from rai_cli.mcp.models import McpHealthResult, McpToolInfo, McpToolResult
 from rai_cli.mcp.registry import discover_mcp_servers
 from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+
+if TYPE_CHECKING:
+    from rai_cli.mcp.bridge import McpBridge, McpBridgeError
 
 __all__ = [
     "McpBridge",

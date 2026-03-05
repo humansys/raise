@@ -36,7 +36,7 @@ class TestMcpTools:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):

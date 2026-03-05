@@ -101,7 +101,7 @@ class McpJiraAdapter:
         Raises:
             ValueError: If status is not in status_mapping.
         """
-        tid = self._status_mapping.get(status)
+        tid = self._status_mapping.get(status.lower())
         if tid is None:
             available = ", ".join(sorted(self._status_mapping.keys()))
             msg = f"Unknown status '{status}'. Available: {available}"
