@@ -492,8 +492,11 @@ def start_session(
         agent=agent,
     )
 
-    # Add to active_sessions list
-    updated_sessions = [*profile.active_sessions, new_session]
+    # Remove existing session for same project (idempotency — RAISE-155)
+    updated_sessions = [
+        s for s in profile.active_sessions if s.project != project_path
+    ]
+    updated_sessions.append(new_session)
     updated = profile.model_copy(update={"active_sessions": updated_sessions})
 
     return updated, stale_sessions
