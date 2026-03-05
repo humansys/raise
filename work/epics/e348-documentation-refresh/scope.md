@@ -122,7 +122,7 @@ Stream B:          S348.3    S348.5 ─┘
 
 | # | Story | Status | Actual Size | Notes |
 |---|-------|--------|-------------|-------|
-| 1 | S348.1: Documentation audit | Pending | — | — |
+| 1 | S348.1: Documentation audit | Done | XS | Gap analysis complete; removed work/docs/ redundancy |
 | 2 | S348.2: CLI reference completion | Pending | — | — |
 | 2' | S348.3: llms.txt + AGENTS.md | Pending | — | — |
 | 3 | S348.4: Developer extension guides | Pending | — | — |
