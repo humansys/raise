@@ -124,9 +124,9 @@ Stream B:          S348.3    S348.5 ─┘
 |---|-------|--------|-------------|-------|
 | 1 | S348.1: Documentation audit | Done | XS | Gap analysis complete; removed work/docs/ redundancy |
 | 2 | S348.2: CLI reference completion | Done | M | 17 command group pages, 72 subcommands documented |
-| 2' | S348.3: llms.txt + AGENTS.md | Pending | — | — |
-| 3 | S348.4: Developer extension guides | Pending | — | — |
-| 3' | S348.5: README + community files | Pending | — | — |
+| 2' | S348.3: llms.txt + AGENTS.md | Done | S | llms.txt created, AGENTS.md rewritten from placeholder |
+| 3 | S348.4: Developer extension guides | Done | M | 5 guide pages (extending, adapter, skill, mcp, hook) |
+| 3' | S348.5: README + community files | Done | S | Version, URLs, branch model, skill count fixed |
 | 4 | S348.6: Docs validation | Pending | — | — |
 
 ## Risks
