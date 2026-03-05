@@ -683,64 +683,6 @@ class TestPrecedenceLogic:
         assert ids == {"PAT-G1", "PAT-P1", "PAT-L1"}
 
 
-class TestLoadWork:
-    """Tests for load_work method."""
-
-    def test_converts_epics_to_nodes(self, tmp_path: Path) -> None:
-        """Should convert epic Concept to GraphNode."""
-        from rai_cli.governance.models import Concept, ConceptType
-
-        mock_epic = Concept(
-            id="E11",
-            type=ConceptType.EPIC,
-            file="governance/backlog.md",
-            section="E11: Unified Context",
-            lines=(50, 60),
-            content="Unified context architecture epic",
-            metadata={"status": "In Progress"},
-        )
-
-        builder = GraphBuilder(project_root=tmp_path)
-
-        with patch.object(builder, "_extract_epics") as mock_extract:
-            mock_extract.return_value = [mock_epic]
-            with patch.object(builder, "_extract_stories") as mock_features:
-                mock_features.return_value = []
-                nodes = builder.load_work()
-
-        assert len(nodes) == 1
-        node = nodes[0]
-        assert node.id == "E11"
-        assert node.type == "epic"
-
-    def test_converts_features_to_nodes(self, tmp_path: Path) -> None:
-        """Should convert feature Concept to GraphNode."""
-        from rai_cli.governance.models import Concept, ConceptType
-
-        mock_feature = Concept(
-            id="F11.2",
-            type=ConceptType.STORY,
-            file="dev/epic-e11-scope.md",
-            section="F11.2: Graph Builder",
-            lines=(70, 80),
-            content="Build unified graph from sources",
-            metadata={"size": "M", "status": "Pending"},
-        )
-
-        builder = GraphBuilder(project_root=tmp_path)
-
-        with patch.object(builder, "_extract_epics") as mock_epics:
-            mock_epics.return_value = []
-            with patch.object(builder, "_extract_stories") as mock_extract:
-                mock_extract.return_value = [mock_feature]
-                nodes = builder.load_work()
-
-        assert len(nodes) == 1
-        node = nodes[0]
-        assert node.id == "F11.2"
-        assert node.type == "story"
-
-
 class TestLoadSkills:
     """Tests for load_skills method."""
 
@@ -1082,7 +1024,6 @@ class TestLoadArchitecture:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -1386,14 +1327,12 @@ class TestBuild:
 
         builder = GraphBuilder(project_root=tmp_path)
 
-        # Mock governance, work, and components loaders
+        # Mock governance and components loaders
         with patch.object(builder, "load_governance") as mock_gov:
             mock_gov.return_value = []
-            with patch.object(builder, "load_work") as mock_work:
-                mock_work.return_value = []
-                with patch.object(builder, "load_components") as mock_comp:
-                    mock_comp.return_value = []
-                    graph = builder.build()
+            with patch.object(builder, "load_components") as mock_comp:
+                mock_comp.return_value = []
+                graph = builder.build()
 
         # Should have memory + skills
         assert graph.node_count >= 2
@@ -1407,7 +1346,6 @@ class TestBuild:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -1445,7 +1383,6 @@ class TestBuild:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
         ):
             graph = builder.build()
@@ -1482,7 +1419,6 @@ class TestBuild:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=duplicate_nodes),
             caplog.at_level(logging.WARNING),
@@ -1691,7 +1627,6 @@ class TestInferRelationships:
 
         with (
             patch.object(builder, "load_governance", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -1804,7 +1739,6 @@ class TestLoadIdentity:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -1916,7 +1850,6 @@ class TestExtractBoundedContexts:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -1941,7 +1874,6 @@ class TestExtractBoundedContexts:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -1960,7 +1892,6 @@ class TestExtractBoundedContexts:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -1978,7 +1909,6 @@ class TestExtractBoundedContexts:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2020,7 +1950,6 @@ class TestExtractBoundedContexts:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2039,7 +1968,6 @@ class TestExtractBoundedContexts:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2061,7 +1989,6 @@ class TestExtractLayers:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2086,7 +2013,6 @@ class TestExtractLayers:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2104,7 +2030,6 @@ class TestExtractLayers:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2124,7 +2049,6 @@ class TestExtractLayers:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2141,7 +2065,6 @@ class TestExtractLayers:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2205,7 +2128,6 @@ class TestExtractConstraints:
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2225,7 +2147,6 @@ class TestExtractConstraints:
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2254,7 +2175,6 @@ class TestExtractConstraints:
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2274,7 +2194,6 @@ class TestExtractConstraints:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2306,7 +2225,6 @@ class TestExtractConstraints:
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2373,7 +2291,6 @@ class TestExtractConstraints:
 
         with (
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2474,7 +2391,6 @@ class TestLoadCodeStructure:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2493,7 +2409,6 @@ class TestLoadCodeStructure:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2512,7 +2427,6 @@ class TestLoadCodeStructure:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2532,7 +2446,6 @@ class TestLoadCodeStructure:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2574,7 +2487,6 @@ class TestLoadCodeStructure:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2608,7 +2520,6 @@ class TestLoadCodeStructure:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
         ):
@@ -2627,7 +2538,6 @@ class TestLoadCodeStructure:
         with (
             patch.object(builder, "load_governance", return_value=[]),
             patch.object(builder, "load_memory", return_value=[]),
-            patch.object(builder, "load_work", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=[]),
             patch.object(
