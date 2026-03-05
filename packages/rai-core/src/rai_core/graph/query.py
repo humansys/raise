@@ -313,9 +313,9 @@ class QueryEngine:
             if query.types and concept.type not in query.types:
                 continue
 
-            # Check if any keyword matches
-            content_lower = concept.content.lower()
-            if not any(kw in content_lower for kw in keywords):
+            # Check if any keyword matches (include node type in searchable text)
+            searchable = f"{concept.type} {concept.content}".lower()
+            if not any(kw in searchable for kw in keywords):
                 continue
 
             # Calculate relevance score

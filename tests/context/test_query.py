@@ -206,6 +206,25 @@ class TestQueryEngineKeywordSearch:
         result = engine.query(Query(query="a", limit=2))
         assert len(result.concepts) <= 2
 
+    def test_type_keyword_matches_node_type(self) -> None:
+        """Keyword matching includes node_type so --types + type keyword works (RAISE-310)."""
+        graph = Graph()
+        graph.add_concept(
+            GraphNode(
+                id="REQ-001",
+                type="requirement",
+                content="The system shall support SSO authentication",
+                source_file="test",
+                created="2026-03-01",
+            )
+        )
+        engine = QueryEngine(graph)
+        result = engine.query(
+            Query(query="requirement", types=["requirement"])
+        )
+        assert len(result.concepts) == 1
+        assert result.concepts[0].id == "REQ-001"
+
     def test_relevance_scoring(self, engine: QueryEngine) -> None:
         """More keyword hits rank higher."""
         result = engine.query(Query(query="kata cycle multiplier"))
