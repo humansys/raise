@@ -9,7 +9,13 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-import httpx
+try:
+    import httpx
+except ModuleNotFoundError as exc:
+    raise ModuleNotFoundError(
+        "httpx is required for the API graph backend. "
+        "Install with: pip install 'rai-cli[dev]'"
+    ) from exc
 
 from rai_core.graph.backends.models import BackendHealth
 from rai_core.graph.engine import Graph
