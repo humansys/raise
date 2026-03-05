@@ -13,6 +13,7 @@ Architecture: S350.3 (MEMORY.md sync hook)
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 from typing import ClassVar
 
 from rai_cli.config.paths import (
