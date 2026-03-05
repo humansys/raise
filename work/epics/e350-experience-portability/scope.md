@@ -120,7 +120,7 @@ M1: Git-safe        M2: Context alive    M3: Patterns    M4: Full portability
 
 | Story | Size | Status | Actual | Notes |
 |-------|:----:|:------:|:------:|-------|
-| S350.1 Inventory | S | Pending | — | |
+| S350.1 Inventory | S | Done | S | Merged 3326fdac |
 | S350.2 Git sanitize | S | Pending | — | |
 | S350.3 Regeneration | M | Pending | — | |
 | S350.4 Patterns | L | Pending | — | |
