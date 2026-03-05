@@ -271,6 +271,13 @@ When writing code for RaiSE:
 - Place tests in `tests/` mirroring `src/` structure
 - Use pytest fixtures for setup/teardown
 - Mock external dependencies (git, ast-grep, ripgrep)
+- Coverage is diagnostic only — no fixed target. Floor at 70% for domain logic.
+
+Anti-patterns to avoid (test muda):
+- Constant assertions: assert "x" == "x" (always passes, catches nothing)
+- Mock-implementation tests: only verify an internal call was made, not the outcome
+- Magic-number counts: assert len(items) == 21 (brittle, not behavioral)
+- Happy-path-only: no boundary tests (empty input, one item, many items, error cases)
 ```
 
 **Verificación:**

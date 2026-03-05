@@ -6,6 +6,102 @@
 
 ---
 
+## E352 Deferred Items — 2026-03-05
+
+- [ ] **Dimensional scoring** — score per area (safety, config, deps) instead of just pass/fail. Promote after v2.2 user feedback. (Research P9)
+- [ ] **Interactive repair wizard** — guided fix flow for complex issues. Promote after open source community feedback.
+- [ ] **Plugin checks** — validate third-party extensions. Promote after plugin ecosystem exists.
+- [ ] **Config migration engine** — auto-migrate .raise/ between major versions. Promote when version gap exists (2.x -> 3.x).
+
+## E353 Deferred Items — 2026-03-03
+
+- [ ] **Parallel phase execution (AR + QR)** — AR and QR read overlapping but independent inputs; could run simultaneously. Promote when sequential execution is a latency bottleneck.
+- [ ] **`context: fork` frontmatter support** — investigate when Claude Code adds `context: fork` for Skill tool invocations; may simplify the Agent tool spawn pattern.
+- [ ] **Nested fork depth >1** — Claude Code constraint (F5): subagents can't spawn subagents. Current design avoids this by keeping story-run in main thread. If F5 is lifted, alternative architectures become possible.
+
+## E347 Deferred Items — 2026-03-03
+
+- [ ] **GitHub Issues adapter** — separate epic (RAISE-141). Promote when open source community requests it.
+- [ ] **Bidirectional Jira ↔ files sync** — explicitly rejected. One source of truth model. Revisit only if fail-fast proves too restrictive.
+- [ ] **Auto-sync backlog.md on every write** — only manual `rai backlog sync` for now. Promote if mirror staleness becomes a problem.
+- [ ] **Backlog TUI/dashboard** — out of scope. Promote if CLI output proves insufficient for overview.
+- [ ] **Skill binding per workflow state** — run specific skills when entering a state. Speculative, no consumer yet. Promote when teams request it.
+
+## E346 Deferred Items — 2026-03-02
+
+- [x] ~~**`rai init` populates toolchain commands**~~ — done in S346.3. `detect_project_type` now auto-detects language and writes `test_command`, `lint_command`, `type_check_command` to manifest based on dominant file extensions. 14 languages supported.
+- [ ] **`rai init` greenfield interactive toolchain prompt** — during interactive setup for greenfield projects, prompt developer: "What's your test command?" Origin: S346.3. Low priority since greenfield has no files to detect from.
+
+## SES-054 — 2026-03-03
+
+- [ ] **snyk:iac investigation** — job da SNYK-CLI-0000 genérico. Requiere correr con `-d` en el runner de CI para ver traza. Coordinar con Emilio. ¿Docker-compose soportado en la versión de Snyk en CI?
+- [ ] **Archivos bug-398-*.md en root** — mover bug-398-scope.md, bug-398-retro.md, bug-398-analysis.md a dev/issues/ para consistencia.
+
+---
+
+## E338 Deferred Items — 2026-03-01
+
+- [ ] **BM25 tool search (Level 3)** — semantic tool matching for large MCP servers. Promote when 3+ servers registered and patterns stabilize.
+- [ ] **Remote MCP servers (SSE/HTTP)** — McpBridge is stdio-only. Add transport options when needed.
+- [ ] **Agent config export** — generate claude_desktop_config.json, .cursor/, .roo/ from `.raise/mcp/` registry. Ties to RAISE-128.
+- [ ] **MCP server versioning** — track installed versions, detect updates, migration paths.
+
+## E337 Deferred Items — 2026-03-01
+
+- [ ] **Jinja2 migration** — if expression evaluator hits ceiling (>6 filters), consider Jinja2. Current 4 filters cover all known cases.
+- [x] ~~**MCP server installation management**~~ — promoted to E338 S338.6
+- [x] ~~**Adapter scaffolding CLI**~~ — promoted to E338 S338.7
+- [x] ~~**Level 3: Auto-discovery + BM25 tool search**~~ — partially promoted (introspection to E338 S338.7, BM25 deferred)
+
+---
+
+## ~~Cross-Worktree Message from E325 — 2026-03-01~~ RESOLVED
+
+> **From:** Rai (e325 worktree, SES-305)
+> **To:** Rai (e301 worktree)
+> **Re:** Partial merge of e301 backlog CLI to dev
+
+~~E325 stories S325.3 and S325.4 depend on `rai backlog` commands only in e301.~~
+
+**RESOLVED 2026-03-01 (SES-306):** Full merge of e301 to dev completed. All 7 backlog commands available (`search`, `transition`, `create`, `comment`, `link`, `update`, `batch_transition`) + MCP adapters (Jira, Confluence, Bridge) + docs CLI. 3036 tests passing. E325 can rebase on dev.
+
+---
+
+## Cross-Worktree Message from E301 — 2026-03-01
+
+> **From:** Rai (e301 worktree, SES-306)
+> **To:** Rai (e325 worktree)
+> **Re:** E301 merged to dev — your dependency is unblocked
+
+Full e301 merge to dev done (commit `7d051f4`). You now have on dev:
+
+- `rai backlog search/transition/create/comment/link/update/batch_transition`
+- `rai docs publish/get/search`
+- MCP adapters: `McpJiraAdapter`, `McpConfluenceAdapter`, `McpBridge`
+- Generic entry-point resolver (`_resolve.py`)
+- Adapter protocols + models + sync wrapper
+
+**Action needed:** Rebase e325 on dev (`git rebase dev`) to pick up all changes. 3036 tests passing on dev post-merge.
+
+---
+
+## E301 Session SES-300 — 2026-02-28
+
+- [x] ~~**`rai mcp call` — agent-agnostic MCP access from skills**~~ — promoted to E338 S338.3
+
+---
+
+## E292 Session SES-004 — 2026-02-26
+
+- **RAISE-293 worktree limitation:** El worktree e292 comparte el venv del repo principal. Tests que referencian símbolos renombrados en la rama (e.g. `UnifiedGraphBuilder`) fallan en colección porque el módulo cargado es el del repo principal (`GraphBuilder`). No son ventanas rotas — se resolverán en el merge. Solución estructural: instalar el worktree en venv propio (`uv pip install -e raise-commons-e292`). Documentar en RAISE-293 como limitación conocida del experimento.
+
+## E292 Session SES-003 — 2026-02-26
+
+- **context/test_builder.py (2734 líneas):** No analizado en E292 — demasiado grande sin story dedicada. Candidato para Gemba más profundo en épica futura de cleanup.
+- **RAISE-294:** Test infrastructure migration — mover tests/graph/ → packages/rai-core/tests/ y tests/providers/ → rai_pro. Requiere setup de pytest en rai-core.
+
+---
+
 ## Pre-Release (before first PyPI publish) — DONE
 
 - [x] **S-RENAME:** ✓ Already published as `rai-cli` with `rai` entry point
@@ -26,7 +122,7 @@
   - **Bug:** `rai init` overwrites `branches.development` to `main` even when `v2` is configured. Also doesn't propagate SKILL.md content changes when YAML frontmatter format drifts (PAT-E-451).
   - **Priority:** Medium — workaround exists (manual restore + direct cp).
 
-- [ ] **Testing strategy: coverage target vs. mutation testing** — (SES-246, 2026-02-22)
+- [x] **Testing strategy: coverage target vs. mutation testing** — (SES-246, 2026-02-22) → Promoted to RAISE-292
   - **Insight:** 90% coverage gate is Goodhart's Law — optimizes for line execution, not confidence. Evidence from S211.2: ~12 of 20 new tests exist for the metric, not for catching bugs. Constant assertions (`"x" == "x"`), mock-implementation tests (verify `_discover` called), and magic-number counts (`__all__ == 21`) are muda.
   - **Alternative:** Coverage as alarm (warn <70%), not gate. Mutation testing (mutmut/cosmic-ray) as the real gate: if you mutate code and tests stay green, the tests don't work.
   - **Principle:** "Each test justifies its existence" > "hit a number."
@@ -577,6 +673,104 @@
   - **Acción inmediata:** Marcar `rai skill scaffold` como deprecated en el CLI help text.
   - **Priority:** Baja — scaffold se usa poco, PAT-E-400 cubre el gap de platform agnosticism en sesiones
 
+---
+
+### SES-281 — Parking Lot (2026-02-25)
+
+- [ ] **Repo clutter in MRs — non-code directories make reviews hard** — (SES-281, 2026-02-25)
+  - **Context:** Technical user reviewing MRs reports difficulty finding actual code changes among `work/`, `.raise/`, `governance/` directory changes.
+  - **Options:** `.gitattributes` to mark paths as generated/docs (GitHub collapses them in diff), separate research/work to a different branch or repo, CODEOWNERS to route non-code changes to different reviewers.
+  - **Priority:** Medium — affects adoption experience for teams using RaiSE on real repos.
+
+- [ ] **Adapt /rai-research skill to publish to Confluence** — (SES-281, 2026-02-25)
+  - **Context:** Research currently produces local markdown files. Should also publish to Confluence for team visibility.
+  - **What:** Add Step 6 to research skill: publish report + evidence catalog to Confluence under a Research parent page.
+  - **Priority:** Medium — manual publishing works but adds friction.
+
+- [ ] **Move all research to Confluence, evaluate if work/ stays in repo** — (SES-281, 2026-02-25)
+  - **Context:** Related to repo clutter feedback. Research artifacts are valuable for team but inflate repo diffs.
+  - **Decision needed:** Keep work/ in repo for git history? Move to Confluence only? Hybrid (summaries in repo, full content in Confluence)?
+  - **Priority:** Medium — blocked by research-to-Confluence skill adaptation.
+
+---
+
+### RAISE-275 Epic Design — Parking Lot (2026-02-25)
+
+- [ ] **RLS (Row-Level Security) for multi-tenant isolation** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Currently using WHERE clause filtering by org_id. RLS enforces isolation at DB level.
+  - **When:** Enterprise tier with strict data isolation requirements.
+  - **Priority:** Low — WHERE clause sufficient for single-org and early multi-org.
+
+- [ ] **JWT/OAuth auth upgrade** — (RAISE-275 design, 2026-02-25)
+  - **Context:** API key per org sufficient for POC. JWT adds per-user granularity and scopes.
+  - **When:** User management needed (multiple users per org with different permissions).
+  - **Priority:** Low — API key works for POC + first Pro customers.
+
+- [ ] **Pattern promotion workflow (PERSONAL → PROJECT → ORG)** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Research defined the scope model. Promotion requires HITL validation and CLI commands.
+  - **What:** `rai pattern promote` command, classification heuristics, architect validation for ORG scope.
+  - **Priority:** Medium — needed for team intelligence, but not for initial backend.
+
+- [ ] **Graph algorithms Phase 2: PPR, spreading activation** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Research validated PPR (~10 lines) and spreading activation (SA-RAG, 25-39% improvement).
+  - **When:** After backend is stable and has enough data to benchmark.
+  - **Priority:** Medium — enhances relevance but current keyword + BFS works.
+
+- [ ] **pgAdmin in Docker Compose** — (RAISE-275 design, 2026-02-25)
+  - **What:** Add pgAdmin service for visual DB inspection during development.
+  - **Priority:** Low — nice-to-have, `psql` CLI sufficient.
+
+- [ ] **Skill ↔ Jira backlog sync — skills drive Jira transitions automatically** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Los skills del lifecycle (epic-start, story-start, story-close, epic-close) ya saben en qué fase estamos. Jira debería reflejar eso automáticamente, no depender de que alguien se acuerde de mover el ticket.
+  - **Mapping:** epic-start → In Progress, epic-plan → crea stories hijas, story-start → In Progress, story-close → Done, epic-close → Done.
+  - **La "magia":** Esto convierte a los skills en el backlog manager — el equipo deja de mantener Jira manualmente. El workflow del skill ES el workflow de Jira. Fernando ve progreso real sin preguntar. El PM ve burndown sin perseguir developers.
+  - **Alcance:** Una transición Jira al final de cada skill (no micro-updates). Leer workflow config de `.raise/jira.yaml` (ya existe). Graceful degradation si Jira no está configurado.
+  - **Relación:** Evolución natural de los Jira MCP tools que ya usamos ad-hoc. Podría ser un hook (E248 architecture) en vez de código dentro de cada skill.
+  - **Priority:** High — alto impacto en experiencia de equipo, bajo esfuerzo incremental (1 MCP call por skill).
+
+- [ ] **Epic docs refresh gate — update brief/scope/design when decisions change** — (RAISE-275 design, 2026-02-25)
+  - **Context:** Epic brief se escribe en epic-start, scope y design en epic-design, pero durante story-design e implementation se toman decisiones que invalidan esos documentos. Hoy no hay gate que los actualice.
+  - **What:** Agregar paso en `/rai-story-close` o `/rai-epic-plan` que compare decisiones tomadas durante stories contra los docs de épica (brief, scope, design). Si hay drift, actualizar antes de cerrar.
+  - **Scope:** Podría ser un step en story-close ("¿cambió alguna decisión de épica?") o un skill dedicado `/rai-epic-refresh`.
+  - **Priority:** Medium — los docs de épica son el contrato del equipo, si driftan pierden valor.
+
+---
+
+### RAISE-275 Architecture Review — Parking Lot (2026-02-25)
+
+- [ ] **rai-core domain expansion: Workflow engine with per-org extensibility** — (E275 arch review, 2026-02-25)
+  - **Context:** Architecture review discovered that `rai-core` needs to be the shared RaiSE domain, not just a graph library. Work management (epic/story/task lifecycles) requires a workflow engine with customizable state machines.
+  - **Requirements:**
+    - Core defines schema base: WorkItemType, State, Transition, Gate
+    - Core provides default RaiSE workflow (out of the box)
+    - Per-org/repo override via config (`.raise/workflows/*.yaml` or similar)
+    - Each stage = skill + quality gates
+    - Versionado: upgrades never break custom workflows; migration path when breaking
+  - **DDD grounding:** Currently workflow lives implicitly in skills (markdown) and `.raise/jira.yaml` (transition IDs). No explicit domain model in code.
+  - **Priority:** High strategic — foundation for Pro/Enterprise. Separate epic after E275.
+
+- [ ] **rai-core domain expansion: Extensible governance schema** — (E275 arch review, 2026-02-25)
+  - **Context:** Kurigage dev (Sofi) gave Rai coding standards → placed in `/governance/` correctly, but no parser exists → won't enter the graph → Rai can't use them in queries or share with team.
+  - **Requirements:**
+    - Extensible artifact types beyond fixed `CoreArtifactType` enum
+    - Generic parser (or parser plugin system) for custom governance docs
+    - Custom artifact types shareable via server (whole team benefits)
+    - Schema versionado + migrations (same pattern as workflows)
+  - **DDD grounding:** `CoreArtifactType` is governance context vocabulary. Server receives translated `ConceptNode`, doesn't need parsing. But the SCHEMA of what types exist needs to be extensible and shareable.
+  - **Priority:** High — directly impacts customer onboarding experience.
+
+- [ ] **rai-core structure accommodates three domain axes** — (E275 arch review, 2026-02-25)
+  - **Decision for S275.1:** `rai_core/` package structure should accommodate graph (E275), workflow (future), and governance schema (future) even though only graph is implemented now.
+  - **Proposed structure:**
+    ```
+    rai_core/
+    ├── graph/           # E275 — implemented
+    ├── workflow/        # placeholder with docstring
+    ├── governance/      # placeholder with docstring
+    └── __init__.py
+    ```
+  - **Rationale:** Avoid refactoring when expanding core. "Sentar las bases."
+
 *Created: 2026-01-31*
 *Last reviewed: 2026-02-12*
-*Last updated: 2026-02-21 (S249.1: scaffold deprecation candidate)*
+*Last updated: 2026-02-25 (RAISE-275: architecture review findings)*

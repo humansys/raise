@@ -134,9 +134,7 @@ class TestGateDiscoveryE2E:
     def test_discover_and_check_all_mixed(self) -> None:
         ep1 = self._make_ep("pass", _AlwaysPassGate)
         ep2 = self._make_ep("fail", _AlwaysFailGate)
-        with patch(
-            "rai_cli.gates.registry.entry_points", return_value=[ep1, ep2]
-        ):
+        with patch("rai_cli.gates.registry.entry_points", return_value=[ep1, ep2]):
             result = runner.invoke(app, ["gate", "check", "--all"])
         assert result.exit_code == 1
         assert "gate-pass" in result.output

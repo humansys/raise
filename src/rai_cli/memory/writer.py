@@ -285,7 +285,9 @@ class ReinforceResult(BaseModel):
     positives: int = Field(..., description="Positive evaluation count")
     negatives: int = Field(..., description="Negative evaluation count")
     evaluations: int = Field(..., description="Total evaluation count")
-    last_evaluated: str | None = Field(default=None, description="ISO date of last evaluation")
+    last_evaluated: str | None = Field(
+        default=None, description="ISO date of last evaluation"
+    )
     was_updated: bool = Field(..., description="False when vote=0 (file not modified)")
 
 
@@ -459,8 +461,12 @@ def reinforce_pattern(
         if record.get("id") == pattern_id:
             found = True
             if vote != 0:
-                record["positives"] = (record.get("positives") or 0) + (1 if vote == 1 else 0)
-                record["negatives"] = (record.get("negatives") or 0) + (1 if vote == -1 else 0)
+                record["positives"] = (record.get("positives") or 0) + (
+                    1 if vote == 1 else 0
+                )
+                record["negatives"] = (record.get("negatives") or 0) + (
+                    1 if vote == -1 else 0
+                )
                 record["evaluations"] = (record.get("evaluations") or 0) + 1
                 record["last_evaluated"] = date.today().isoformat()
         records.append(record)

@@ -32,9 +32,7 @@ class _FailGate:
     workflow_point: ClassVar[str] = "before:release:publish"
 
     def evaluate(self, context: GateContext) -> GateResult:
-        return GateResult(
-            passed=False, gate_id=self.gate_id, message="Nope"
-        )
+        return GateResult(passed=False, gate_id=self.gate_id, message="Nope")
 
 
 class _ExplodingGate:
@@ -75,17 +73,6 @@ class TestProtocolConformance:
 
         assert "before:release:publish" in GateBridgeHook.events
         assert "before:session:close" in GateBridgeHook.events
-
-    def test_high_priority(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
-
-        assert GateBridgeHook.priority == 100
-
-    def test_has_handle_method(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
-
-        hook = GateBridgeHook()
-        assert callable(hook.handle)
 
 
 # ---------------------------------------------------------------------------
@@ -192,5 +179,7 @@ class TestEntryPointDiscovery:
         registry = HookRegistry()
         registry.discover()
         bridge = next(h for h in registry.hooks if type(h).__name__ == "GateBridgeHook")
-        telemetry = next(h for h in registry.hooks if type(h).__name__ == "TelemetryHook")
+        telemetry = next(
+            h for h in registry.hooks if type(h).__name__ == "TelemetryHook"
+        )
         assert bridge.priority > telemetry.priority

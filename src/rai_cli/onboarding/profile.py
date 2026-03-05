@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, date, datetime
-from enum import Enum
+from enum import StrEnum
 from pathlib import Path
 
 import yaml
@@ -17,7 +17,23 @@ from pydantic import BaseModel, Field, ValidationError
 logger = logging.getLogger(__name__)
 
 
-class ExperienceLevel(str, Enum):
+class DelegationLevel(StrEnum):
+    """Delegation level for orchestrator HITL decisions.
+
+    Controls when the orchestrator pauses for human review.
+
+    Levels:
+        REVIEW: Pause and show work for approval before continuing.
+        NOTIFY: Show summary and continue unless human intervenes.
+        AUTO: Continue without pausing (only hard gates stop execution).
+    """
+
+    REVIEW = "review"
+    NOTIFY = "notify"
+    AUTO = "auto"
+
+
+class ExperienceLevel(StrEnum):
     """Developer experience level with RaiSE (Shu-Ha-Ri model).
 
     Determines interaction verbosity and explanation depth.
@@ -33,7 +49,7 @@ class ExperienceLevel(str, Enum):
     RI = "ri"
 
 
-class CommunicationStyle(str, Enum):
+class CommunicationStyle(StrEnum):
     """Communication style preference.
 
     Determines how much explanation Rai provides by default.
@@ -67,6 +83,21 @@ class CommunicationPreferences(BaseModel):
     skip_praise: bool = False
     detailed_explanations: bool = True
     redirect_when_dispersing: bool = False
+
+
+class DelegationConfig(BaseModel):
+    """Delegation preferences for orchestrator HITL control.
+
+    Stored in developer.yaml under the 'delegation' key. When absent,
+    defaults are derived from the developer's ShuHaRi experience level.
+
+    Attributes:
+        default_level: Default delegation level for all skills.
+        overrides: Per-skill overrides (skill name → delegation level).
+    """
+
+    default_level: DelegationLevel
+    overrides: dict[str, DelegationLevel] = Field(default_factory=dict)
 
 
 class CurrentSession(BaseModel):
@@ -246,9 +277,14 @@ class DeveloperProfile(BaseModel):
     first_session: date | None = None
     last_session: date | None = None
     projects: list[str] = Field(default_factory=list)
-    current_session: CurrentSession | None = None  # DEPRECATED: migrated to active_sessions
-    active_sessions: list[ActiveSession] = Field(default_factory=lambda: list[ActiveSession]())
+    current_session: CurrentSession | None = (
+        None  # DEPRECATED: migrated to active_sessions
+    )
+    active_sessions: list[ActiveSession] = Field(
+        default_factory=lambda: list[ActiveSession]()
+    )
     coaching: CoachingContext = Field(default_factory=CoachingContext)
+    delegation: DelegationConfig | None = None
     deadlines: list[Deadline] = Field(default_factory=lambda: list[Deadline]())
 
     def get_pattern_prefix(self) -> str:
@@ -259,6 +295,32 @@ class DeveloperProfile(BaseModel):
         if self.pattern_prefix:
             return self.pattern_prefix.upper()
         return self.name[0].upper() if self.name else "X"
+
+
+_SHUHARI_DELEGATION: dict[ExperienceLevel, DelegationLevel] = {
+    ExperienceLevel.SHU: DelegationLevel.REVIEW,
+    ExperienceLevel.HA: DelegationLevel.NOTIFY,
+    ExperienceLevel.RI: DelegationLevel.AUTO,
+}
+
+
+def resolve_delegation(profile: DeveloperProfile, skill_name: str) -> DelegationLevel:
+    """Resolve the effective delegation level for a skill.
+
+    Precedence: per-skill override > explicit default_level > ShuHaRi derivation.
+
+    Args:
+        profile: Developer profile with optional delegation config.
+        skill_name: Name of the skill (e.g., "rai-story-design").
+
+    Returns:
+        The effective delegation level for the given skill.
+    """
+    if profile.delegation is not None:
+        if skill_name in profile.delegation.overrides:
+            return profile.delegation.overrides[skill_name]
+        return profile.delegation.default_level
+    return _SHUHARI_DELEGATION[profile.experience_level]
 
 
 # Constants
@@ -430,8 +492,11 @@ def start_session(
         agent=agent,
     )
 
-    # Add to active_sessions list
-    updated_sessions = [*profile.active_sessions, new_session]
+    # Remove existing session for same project (idempotency — RAISE-155)
+    updated_sessions = [
+        s for s in profile.active_sessions if s.project != project_path
+    ]
+    updated_sessions.append(new_session)
     updated = profile.model_copy(update={"active_sessions": updated_sessions})
 
     return updated, stale_sessions

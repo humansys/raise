@@ -98,7 +98,7 @@ rai init --detect                     # Detecta convenciones existentes
 ## Fase 2: Ciclo de Epic (cuerpo de trabajo grande, 3-10 features)
 
 ```
-/rai-epic-start                       # Crea branch: epic/eN/nombre
+/rai-epic-start                       # Inicializa directorio y scope del epic
                                       #   -> Scope commit
                                       #   -> Telemetría: rai memory emit-work epic --phase init
 
@@ -117,9 +117,8 @@ rai init --detect                     # Detecta convenciones existentes
 
 /rai-epic-close                       # Cierra el epic:
                                       #   -> Retrospectiva + métricas (planeado vs real)
-                                      #   -> git merge --no-ff a branch de desarrollo (v2)
-                                      #   -> git branch -D epic/eN/nombre
-                                      #   -> Actualiza backlog
+                                      #   -> Actualiza backlog/tracker
+                                      #   -> No hay merge de branch (epics son contenedores lógicos)
 ```
 
 ---
@@ -128,7 +127,7 @@ rai init --detect                     # Detecta convenciones existentes
 
 ```
 /rai-story-start                      # Crea branch: story/sN.M/nombre
-                                      #   -> Hijo de branch de epic (o v2 para bugfixes)
+                                      #   -> Siempre desde dev
                                       #   -> Scope commit: work/stories/S-NOMBRE/scope.md
 
 /rai-story-design                     # Especificación lean (PAT-186: el diseño NO es opcional):
@@ -155,7 +154,7 @@ rai init --detect                     # Detecta convenciones existentes
 /rai-story-close                      # Cierra la story:
                                       #   -> Verificación final (tests, lint, types)
                                       #   -> Ejecuta /rai-docs-update (coherencia código<->docs)
-                                      #   -> git merge --no-ff a branch de epic
+                                      #   -> git merge --no-ff a dev
                                       #   -> git branch -D story/sN.M/nombre
                                       #   -> Actualiza scope del epic
 ```
@@ -213,13 +212,14 @@ rai discover drift
 
 ```
 main (releases estables)
-  └── v2 (desarrollo)
-        ├── epic/e18/nombre
-        │     ├── story/s18.1/nombre
-        │     ├── story/s18.2/nombre
-        │     └── story/s18.3/nombre
-        └── story/sBF-1/bugfix       <- bugfixes se branchen directo de v2
+  └── dev (desarrollo)
+        ├── story/s18.1/nombre
+        ├── story/s18.2/nombre
+        ├── story/s18.3/nombre
+        └── story/sBF-1/bugfix
 ```
+
+Las stories siempre se crean desde y mergean a dev. Los epics son contenedores lógicos (directorio + Jira tracker), no branches.
 
 ---
 

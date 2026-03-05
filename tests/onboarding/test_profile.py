@@ -834,9 +834,7 @@ class TestActiveSession:
 class TestBackwardCompatMigration:
     """Tests for backward compatibility migration."""
 
-    def test_migrates_current_session_clears_stale(
-        self, tmp_path: Path
-    ) -> None:
+    def test_migrates_current_session_clears_stale(self, tmp_path: Path) -> None:
         """load_developer_profile clears stale current_session on migration."""
         # Create old format YAML with current_session (dict)
         old_data = {
@@ -916,7 +914,10 @@ class TestStartSessionWithActiveSessions:
         """start_session adds ActiveSession to active_sessions list."""
         profile = DeveloperProfile(name="Test")
         updated, stale = start_session(
-            profile, session_id="SES-177", project_path="/test/project", agent="claude-code"
+            profile,
+            session_id="SES-177",
+            project_path="/test/project",
+            agent="claude-code",
         )
         assert len(updated.active_sessions) == 1
         assert updated.active_sessions[0].session_id == "SES-177"
@@ -934,7 +935,9 @@ class TestStartSessionWithActiveSessions:
         """start_session can add multiple sessions for concurrent work."""
         profile = DeveloperProfile(name="Test")
         profile, _ = start_session(profile, session_id="SES-100", project_path="/proj1")
-        profile, _ = start_session(profile, session_id="SES-101", project_path="/proj2", agent="cursor")
+        profile, _ = start_session(
+            profile, session_id="SES-101", project_path="/proj2", agent="cursor"
+        )
         assert len(profile.active_sessions) == 2
         assert profile.active_sessions[0].session_id == "SES-100"
         assert profile.active_sessions[1].session_id == "SES-101"

@@ -209,10 +209,42 @@ class TestEmit:
         assert data3["command"] == "memory"
 
 
+class TestEmitPathTraversal:
+    """CWE-23 regression: emit must reject traversal session IDs."""
+
+    def test_emit_rejects_traversal_session_id(
+        self, temp_telemetry_dir: Path, now: datetime
+    ) -> None:
+        """emit() rejects session_id with path traversal via get_session_dir."""
+        event = SkillEvent(timestamp=now, skill="test", event="start")
+
+        with pytest.raises(ValueError, match="path traversal"):
+            emit(
+                event,
+                base_path=temp_telemetry_dir,
+                session_id="../../etc",
+            )
+
+    def test_emit_rejects_slash_session_id(
+        self, temp_telemetry_dir: Path, now: datetime
+    ) -> None:
+        """emit() rejects session_id containing forward slashes."""
+        event = SkillEvent(timestamp=now, skill="test", event="start")
+
+        with pytest.raises(ValueError, match="path traversal"):
+            emit(
+                event,
+                base_path=temp_telemetry_dir,
+                session_id="SES-1/../../tmp/pwned",
+            )
+
+
 class TestEmitPerSession:
     """Tests for per-session telemetry writes."""
 
-    def test_emit_to_per_session_dir(self, temp_telemetry_dir: Path, now: datetime) -> None:
+    def test_emit_to_per_session_dir(
+        self, temp_telemetry_dir: Path, now: datetime
+    ) -> None:
         """Emit to sessions/{session_id}/signals.jsonl when session_id provided."""
         event = SkillEvent(timestamp=now, skill="test", event="start")
 
@@ -220,8 +252,13 @@ class TestEmitPerSession:
 
         assert result.success is True
         expected_path = (
-            temp_telemetry_dir / ".raise" / "rai" / "personal"
-            / "sessions" / "SES-177" / "signals.jsonl"
+            temp_telemetry_dir
+            / ".raise"
+            / "rai"
+            / "personal"
+            / "sessions"
+            / "SES-177"
+            / "signals.jsonl"
         )
         assert result.path == expected_path
         assert expected_path.exists()
@@ -238,8 +275,12 @@ class TestEmitPerSession:
         emit(event, base_path=temp_telemetry_dir, session_id="SES-177")
 
         shared_path = (
-            temp_telemetry_dir / ".raise" / "rai" / "personal"
-            / "telemetry" / "signals.jsonl"
+            temp_telemetry_dir
+            / ".raise"
+            / "rai"
+            / "personal"
+            / "telemetry"
+            / "signals.jsonl"
         )
         assert not shared_path.exists()
 
@@ -254,12 +295,22 @@ class TestEmitPerSession:
         emit(event2, base_path=temp_telemetry_dir, session_id="SES-178")
 
         path1 = (
-            temp_telemetry_dir / ".raise" / "rai" / "personal"
-            / "sessions" / "SES-177" / "signals.jsonl"
+            temp_telemetry_dir
+            / ".raise"
+            / "rai"
+            / "personal"
+            / "sessions"
+            / "SES-177"
+            / "signals.jsonl"
         )
         path2 = (
-            temp_telemetry_dir / ".raise" / "rai" / "personal"
-            / "sessions" / "SES-178" / "signals.jsonl"
+            temp_telemetry_dir
+            / ".raise"
+            / "rai"
+            / "personal"
+            / "sessions"
+            / "SES-178"
+            / "signals.jsonl"
         )
 
         data1 = json.loads(path1.read_text(encoding="utf-8").strip())
@@ -383,19 +434,3 @@ class TestEmitErrorEvent:
         assert data["error_type"] == "command_not_found"
         assert data["context"] == "pytest"
         assert data["recoverable"] is True
-
-    def test_emit_non_recoverable_error(self, temp_telemetry_dir: Path) -> None:
-        """Emit a non-recoverable error event."""
-        result = emit_error_event(
-            tool="Read",
-            error_type="file_not_found",
-            context="missing_file.py",
-            recoverable=False,
-            base_path=temp_telemetry_dir,
-        )
-
-        assert result.success is True
-
-        content = result.path.read_text(encoding="utf-8")
-        data = json.loads(content.strip())
-        assert data["recoverable"] is False

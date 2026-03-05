@@ -1,4 +1,4 @@
-"""CLI commands for Rai's pattern memory: add and reinforce.
+"""CLI commands for Rai's pattern memory: add, reinforce, promote.
 
 The pattern group owns commands that write to pattern memory (JSONL files).
 These were extracted from the `memory` God Object in RAISE-247 (ADR-038).
@@ -6,10 +6,13 @@ These were extracted from the `memory` God Object in RAISE-247 (ADR-038).
 Commands:
 - add: Add a new learned pattern to memory
 - reinforce: Reinforce a pattern with a vote signal (applied/N/A/contradicted)
+- promote: Move a pattern from personal scope to project scope
 """
 
 from __future__ import annotations
 
+import json
+import tempfile
 from pathlib import Path
 from typing import Annotated
 
@@ -17,10 +20,6 @@ import typer
 from rich.console import Console
 
 from rai_cli.cli.error_handler import cli_error
-from rai_cli.context.query import (
-    SCORING_LOW_WILSON_THRESHOLD,
-    wilson_lower_bound,
-)
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import PatternAddedEvent
 from rai_cli.memory import (
@@ -33,6 +32,10 @@ from rai_cli.memory import (
     reinforce_pattern,
 )
 from rai_cli.onboarding.profile import load_developer_profile
+from rai_core.graph.query import (
+    SCORING_LOW_WILSON_THRESHOLD,
+    wilson_lower_bound,
+)
 
 pattern_app = typer.Typer(
     name="pattern",
@@ -45,14 +48,22 @@ console = Console()
 
 @pattern_app.command("reinforce")
 def reinforce_cmd(
-    pattern_id: Annotated[str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")],
+    pattern_id: Annotated[
+        str, typer.Argument(help="Pattern ID to reinforce (e.g., PAT-E-183)")
+    ],
     vote: Annotated[
         int,
-        typer.Option("--vote", "-v", help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)"),
+        typer.Option(
+            "--vote",
+            "-v",
+            help="Vote: 1 (applied), 0 (N/A — not counted), -1 (contradicted)",
+        ),
     ],
     story_id: Annotated[
         str | None,
-        typer.Option("--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"),
+        typer.Option(
+            "--from", "-f", help="Story ID for traceability (e.g., RAISE-170)"
+        ),
     ] = None,
     scope: Annotated[
         str,
@@ -60,7 +71,9 @@ def reinforce_cmd(
     ] = "project",
     memory_dir: Annotated[
         Path | None,
-        typer.Option("--memory-dir", "-m", help="Memory directory path (overrides scope)"),
+        typer.Option(
+            "--memory-dir", "-m", help="Memory directory path (overrides scope)"
+        ),
     ] = None,
 ) -> None:
     """Reinforce a pattern with a vote signal.
@@ -159,7 +172,7 @@ def add_pattern(
     scope: Annotated[
         str,
         typer.Option("--scope", "-s", help="Memory scope (global, project, personal)"),
-    ] = "project",
+    ] = "personal",
     memory_dir: Annotated[
         Path | None,
         typer.Option(
@@ -170,7 +183,7 @@ def add_pattern(
     """Add a new pattern to memory.
 
     Examples:
-        # Add a process pattern (default: project scope)
+        # Add a process pattern (default: personal scope)
         $ rai pattern add "HITL before commits" -c "git,workflow"
 
         # Add a technical pattern
@@ -227,11 +240,13 @@ def add_pattern(
 
     if result.success:
         emitter = create_emitter()
-        emitter.emit(PatternAddedEvent(
-            pattern_id=result.id or "",
-            content=content,
-            context=context,
-        ))
+        emitter.emit(
+            PatternAddedEvent(
+                pattern_id=result.id or "",
+                content=content,
+                context=context,
+            )
+        )
         console.print(f"\n[green]✓[/green] {result.message}")
         console.print(f"  ID: [cyan]{result.id}[/cyan]")
         console.print(f"  Content: {content[:60]}...")
@@ -240,3 +255,94 @@ def add_pattern(
         console.print("\n[dim]Index will rebuild on next query.[/dim]\n")
     else:
         cli_error(result.message)
+
+
+@pattern_app.command("promote")
+def promote_pattern(
+    pattern_id: Annotated[
+        str, typer.Argument(help="Pattern ID to promote (e.g., PAT-E-123)")
+    ],
+    memory_dir: Annotated[
+        Path | None,
+        typer.Option(
+            "--memory-dir",
+            "-m",
+            help="Memory directory path (overrides default)",
+        ),
+    ] = None,
+) -> None:
+    """Promote a pattern from personal scope to project scope.
+
+    Moves the pattern entry from personal patterns.jsonl to project patterns.jsonl.
+    The pattern ID is preserved.
+
+    Examples:
+        $ rai pattern promote PAT-E-123
+    """
+    personal_dir = memory_dir or get_memory_dir_for_scope(MemoryScope.PERSONAL)
+    personal_file = personal_dir / "patterns.jsonl"
+
+    if not personal_file.exists():
+        cli_error(
+            f"Personal patterns file not found: {personal_file}",
+            hint="No personal patterns to promote. Add patterns first with 'rai pattern add'.",
+            exit_code=4,
+        )
+        return
+
+    # Read all personal patterns and find the target
+    lines = personal_file.read_text(encoding="utf-8").strip().splitlines()
+    target: dict[str, object] | None = None
+    remaining: list[str] = []
+
+    for line in lines:
+        if not line.strip():
+            continue
+        entry = json.loads(line)
+        if entry.get("id") == pattern_id:
+            target = entry
+        else:
+            remaining.append(line)
+
+    if target is None:
+        cli_error(
+            f"Pattern '{pattern_id}' not found in personal patterns",
+            hint="Check the pattern ID. Only personal-scope patterns can be promoted.",
+            exit_code=4,
+        )
+        return
+
+    # Append to project patterns
+    project_dir = get_memory_dir_for_scope(MemoryScope.PROJECT)
+    project_dir.mkdir(parents=True, exist_ok=True)
+    project_file = project_dir / "patterns.jsonl"
+    with project_file.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(dict(target)) + "\n")
+
+    # Rewrite personal file without the promoted pattern (atomic: temp + rename)
+    tmp_fd, tmp_path = tempfile.mkstemp(
+        dir=personal_file.parent, suffix=".tmp"
+    )
+    try:
+        with open(tmp_fd, "w", encoding="utf-8") as tmp_f:
+            for line in remaining:
+                tmp_f.write(line + "\n")
+        Path(tmp_path).replace(personal_file)
+    except Exception:
+        Path(tmp_path).unlink(missing_ok=True)
+        raise
+
+    # Emit hook
+    content_str = str(target.get("content", ""))
+    emitter = create_emitter()
+    emitter.emit(
+        PatternAddedEvent(
+            pattern_id=pattern_id,
+            content=content_str,
+            context=str(target.get("context", "")),
+        )
+    )
+
+    console.print(f"\n[green]✓[/green] Promoted {pattern_id} to project scope")
+    console.print(f"  Content: {content_str[:60]}")
+    console.print()

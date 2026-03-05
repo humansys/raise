@@ -32,7 +32,9 @@ _COMMAND_GATES: list[Gate] = [
     Gate(name="Type checks clean", command="uv run pyright src/"),
     Gate(name="Lint clean", command="uv run ruff check src/"),
     Gate(name="Security scan", command="uv run bandit -r src/ -q -ll"),
-    Gate(name="Coverage threshold", command="uv run pytest --cov --cov-fail-under=90 -q"),
+    Gate(
+        name="Coverage threshold", command="uv run pytest --cov --cov-fail-under=90 -q"
+    ),
     Gate(name="Build succeeds", command="uv build"),
     Gate(name="Package validates", command="uv run twine check dist/*"),
 ]
@@ -49,9 +51,10 @@ def _run_command(command: str, cwd: Path) -> tuple[bool, str]:
         Tuple of (passed, message).
     """
     try:
+        import shlex
+
         result = subprocess.run(
-            command,
-            shell=True,  # noqa: S602  # nosec B602 - commands are hardcoded, not user input
+            shlex.split(command),
             cwd=cwd,
             capture_output=True,
             text=True,
@@ -122,7 +125,9 @@ def run_checks(
             CheckResult(
                 gate="CHANGELOG has unreleased entries",
                 passed=has_entries,
-                message="Unreleased entries found" if has_entries else "No unreleased entries",
+                message="Unreleased entries found"
+                if has_entries
+                else "No unreleased entries",
             )
         )
     else:
@@ -135,9 +140,7 @@ def run_checks(
         )
 
     # 9: Version is PEP 440 compliant
-    pyproject_version = _extract_version(
-        pyproject_path, r'version\s*=\s*"([^"]*)"'
-    )
+    pyproject_version = _extract_version(pyproject_path, r'version\s*=\s*"([^"]*)"')
     if pyproject_version and is_pep440(pyproject_version):
         results.append(
             CheckResult(

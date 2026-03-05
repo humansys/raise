@@ -787,7 +787,9 @@ class TestReinforcePattern:
         reinforce_pattern(f, "PAT-E-002", vote=1)
 
         lines = [
-            json.loads(line) for line in f.read_text(encoding="utf-8").splitlines() if line.strip()
+            json.loads(line)
+            for line in f.read_text(encoding="utf-8").splitlines()
+            if line.strip()
         ]
         assert len(lines) == 3
         assert lines[0]["id"] == "PAT-E-001"

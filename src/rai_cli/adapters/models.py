@@ -73,13 +73,134 @@ class PublishResult(BaseModel):
     message: str = Field(default="", description="Status or error message")
 
 
-class BackendHealth(BaseModel):
-    """Health check result for a graph backend."""
+class IssueDetail(IssueRef):
+    """Full issue details — extends IssueRef (inherits key, url, metadata).
 
-    status: str = Field(
-        ..., description="'healthy', 'degraded', or 'unavailable'"
+    Timestamps use ISO 8601 format (e.g. ``2026-02-27T10:30:00Z``).
+    Empty string means timestamp not available.
+    """
+
+    summary: str = Field(..., description="Issue title")
+    description: str = Field(default="", description="Issue body (markdown)")
+    status: str = Field(..., description="Current status name")
+    issue_type: str = Field(..., description="Issue type (e.g., 'Story', 'Bug')")
+    parent_key: str | None = Field(default=None, description="Parent issue key")
+    labels: list[str] = Field(default_factory=list)
+    assignee: str | None = Field(default=None, description="Assignee identifier")
+    priority: str | None = Field(default=None, description="Priority name")
+    created: str = Field(default="", description="ISO 8601 creation timestamp")
+    updated: str = Field(default="", description="ISO 8601 last update timestamp")
+
+
+class IssueSummary(BaseModel):
+    """Compact issue for search results and listings."""
+
+    key: str = Field(..., description="Issue key (e.g., 'PROJ-123')")
+    summary: str = Field(..., description="Issue title")
+    status: str = Field(..., description="Current status name")
+    issue_type: str = Field(..., description="Issue type name")
+    parent_key: str | None = Field(default=None, description="Parent issue key")
+
+
+class Comment(BaseModel):
+    """Issue comment. Timestamps use ISO 8601 format."""
+
+    id: str = Field(..., description="Comment ID")
+    body: str = Field(..., description="Comment body (markdown)")
+    author: str = Field(..., description="Author identifier")
+    created: str = Field(..., description="ISO 8601 creation timestamp")
+
+
+class CommentRef(BaseModel):
+    """Reference to a created comment."""
+
+    id: str = Field(..., description="Comment ID")
+    url: str = Field(default="", description="Web URL to the comment")
+
+
+class FailureDetail(BaseModel):
+    """A single failure in a batch operation."""
+
+    key: str = Field(..., description="Issue key that failed")
+    error: str = Field(..., description="Error description")
+
+
+class BatchResult(BaseModel):
+    """Result of a batch operation."""
+
+    succeeded: list[IssueRef] = Field(default_factory=lambda: list[IssueRef]())
+    failed: list[FailureDetail] = Field(default_factory=lambda: list[FailureDetail]())
+
+
+class PageContent(BaseModel):
+    """Full page content from documentation target."""
+
+    id: str = Field(..., description="Page ID")
+    title: str = Field(..., description="Page title")
+    content: str = Field(..., description="Page content (markdown)")
+    url: str = Field(default="", description="Web URL to the page")
+    space_key: str = Field(default="", description="Space key (e.g., 'DEV')")
+    version: int = Field(default=1, description="Page version number")
+
+
+class PageSummary(BaseModel):
+    """Compact page for search results. Timestamps use ISO 8601 format."""
+
+    id: str = Field(..., description="Page ID")
+    title: str = Field(..., description="Page title")
+    url: str = Field(default="", description="Web URL to the page")
+    space_key: str = Field(default="", description="Space key")
+    updated: str = Field(default="", description="ISO 8601 last update timestamp")
+
+
+class AdapterHealth(BaseModel):
+    """Health check result for an adapter."""
+
+    name: str = Field(..., description="Adapter name (e.g., 'jira')")
+    healthy: bool = Field(..., description="Whether the adapter is healthy")
+    message: str = Field(default="", description="Status or error message")
+    latency_ms: int | None = Field(
+        default=None, description="Response latency in milliseconds"
     )
-    message: str = Field(default="", description="Human-readable status detail")
-    metadata: dict[str, Any] = Field(
-        default_factory=dict, description="Backend-specific diagnostics"
-    )
+
+
+# ---------------------------------------------------------------------------
+# YAML store models (S347.2 — FileAdapter parity)
+# ---------------------------------------------------------------------------
+
+
+class BacklogLink(BaseModel):
+    """Link from one backlog item to another."""
+
+    target: str = Field(..., description="Target issue key")
+    link_type: str = Field(..., description="Relationship type (blocks, depends_on, relates_to)")
+
+
+class BacklogComment(BaseModel):
+    """Comment embedded in a backlog item YAML file."""
+
+    id: str = Field(..., description="Comment ID ({KEY}-{N})")
+    body: str = Field(..., description="Comment body text")
+    author: str = Field(..., description="Author identifier")
+    created: str = Field(..., description="ISO 8601 creation timestamp")
+
+
+class BacklogItem(BaseModel):
+    """Single backlog item stored as .raise/backlog/items/{KEY}.yaml."""
+
+    key: str = Field(..., description="Issue key (E1, S1.1, etc.)")
+    summary: str = Field(..., description="Issue title")
+    issue_type: str = Field(..., description="Epic, Story, Task")
+    status: str = Field(..., description="pending, in_progress, complete")
+    parent: str | None = Field(default=None, description="Parent issue key")
+    description: str = Field(default="", description="Issue description")
+    labels: list[str] = Field(default_factory=list)
+    priority: str | None = Field(default=None, description="Priority level")
+    assignee: str | None = Field(default=None, description="Assignee identifier")
+    comments: list[BacklogComment] = Field(default_factory=list)
+    links: list[BacklogLink] = Field(default_factory=list)
+    created: str = Field(default="", description="ISO 8601 creation timestamp")
+    updated: str = Field(default="", description="ISO 8601 last update timestamp")
+
+
+# BackendHealth moved to rai_core.graph.backends.models (E275)

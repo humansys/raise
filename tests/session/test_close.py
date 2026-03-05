@@ -219,7 +219,9 @@ class TestProcessSessionClose:
         from rai_cli.onboarding.profile import save_developer_profile, start_session
 
         # Session ID must match what append_session will generate (SES-001 for first session)
-        active, _ = start_session(profile, session_id="SES-001", project_path=str(project), agent="test")
+        active, _ = start_session(
+            profile, session_id="SES-001", project_path=str(project), agent="test"
+        )
         save_developer_profile(active)
 
         close_input = CloseInput(summary="done")
@@ -484,7 +486,8 @@ class TestLoadStateFileNarrative:
         assert "sync model" in result.narrative
 
     def test_loads_state_file_without_narrative_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """State file without narrative defaults to empty string."""
         state_file = tmp_path / "state.yaml"
@@ -505,7 +508,8 @@ class TestProcessSessionCloseNarrative:
         return project
 
     def test_close_persists_narrative_in_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close persists narrative in session-state.yaml."""
         import pytest
@@ -537,7 +541,8 @@ class TestProcessSessionCloseNarrative:
         mp.undo()
 
     def test_close_without_narrative_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without narrative leaves empty string."""
         import pytest
@@ -571,7 +576,8 @@ class TestProcessSessionCloseRelease:
         return project
 
     def test_close_persists_release_in_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close persists release field in session-state.yaml."""
         import pytest
@@ -604,7 +610,8 @@ class TestProcessSessionCloseRelease:
         mp.undo()
 
     def test_close_without_release_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without release defaults to empty string."""
         import pytest
@@ -651,7 +658,8 @@ class TestLoadStateFileNextSessionPrompt:
         assert "encoding fix" in result.next_session_prompt
 
     def test_loads_state_file_without_next_session_prompt_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """State file without next_session_prompt defaults to empty string."""
         state_file = tmp_path / "state.yaml"
@@ -672,7 +680,8 @@ class TestProcessSessionCloseNextSessionPrompt:
         return project
 
     def test_close_persists_next_session_prompt_in_session_state(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close persists next_session_prompt in session-state.yaml."""
         import pytest
@@ -705,7 +714,8 @@ class TestProcessSessionCloseNextSessionPrompt:
         mp.undo()
 
     def test_close_without_next_session_prompt_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """process_session_close without next_session_prompt leaves empty string."""
         import pytest
@@ -746,7 +756,8 @@ class TestLoadStateFileSessionId:
         assert result.session_id == "SES-219"
 
     def test_loads_state_file_without_session_id_defaults_empty(
-        self, tmp_path: Path,
+        self,
+        tmp_path: Path,
     ) -> None:
         """State file without session_id defaults to empty string."""
         state_file = tmp_path / "state.yaml"
@@ -898,4 +909,78 @@ class TestProcessSessionCloseProgress:
         assert state is not None
         assert state.progress is None
         assert state.completed_epics == []
+        mp.undo()
+
+
+class TestProcessSessionCloseRemovesActiveSession:
+    """Regression tests for RAISE-327 and RAISE-155."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_close_removes_session_with_divergent_id(self, tmp_path: Path) -> None:
+        """RAISE-327: close must use active session_id, not append_session's new ID."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+
+        from rai_cli.onboarding.profile import save_developer_profile, start_session
+
+        # Start a session — gets a real session_id like SES-177
+        active_session_id = "SES-177"
+        active, _ = start_session(
+            profile, session_id=active_session_id, project_path=str(project), agent="test"
+        )
+        save_developer_profile(active)
+        assert len(active.active_sessions) == 1
+
+        # Pre-populate some sessions so append_session generates SES-003 (not SES-177)
+        index_file = project / ".raise" / "rai" / "personal" / "sessions" / "index.jsonl"
+        index_file.write_text('{"id":"SES-001"}\n{"id":"SES-002"}\n')
+
+        close_input = CloseInput(summary="done")
+        # Pass the actual active session_id
+        process_session_close(close_input, active, project, session_id=active_session_id)
+
+        from rai_cli.onboarding.profile import load_developer_profile
+
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert len(loaded.active_sessions) == 0, (
+            f"Session {active_session_id} should have been removed but "
+            f"active_sessions still has: {[s.session_id for s in loaded.active_sessions]}"
+        )
+        mp.undo()
+
+    def test_start_session_is_idempotent_per_project(self, tmp_path: Path) -> None:
+        """RAISE-155: starting twice for same project should not duplicate entries."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        from rai_cli.onboarding.profile import start_session
+
+        profile = DeveloperProfile(name="Test")
+        project_path = str(tmp_path / "project")
+
+        # Start same project twice
+        updated1, _ = start_session(profile, session_id="SES-1", project_path=project_path, agent="test")
+        updated2, _ = start_session(updated1, session_id="SES-2", project_path=project_path, agent="test")
+
+        assert len(updated2.active_sessions) == 1, (
+            f"Expected 1 session but got {len(updated2.active_sessions)}: "
+            f"{[s.session_id for s in updated2.active_sessions]}"
+        )
+        # Should keep the newer session
+        assert updated2.active_sessions[0].session_id == "SES-2"
         mp.undo()

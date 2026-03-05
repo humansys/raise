@@ -20,6 +20,7 @@ from typing import Annotated
 
 import typer
 
+from rai_cli.cli.commands.journal import journal_app
 from rai_cli.cli.error_handler import cli_error
 from rai_cli.exceptions import RaiSessionNotFoundError
 from rai_cli.hooks.emitter import create_emitter
@@ -51,6 +52,7 @@ session_app = typer.Typer(
     help="Manage working sessions",
     no_args_is_help=True,
 )
+session_app.add_typer(journal_app, name="journal")
 
 
 def _check_cwd_guard(
@@ -184,7 +186,9 @@ def start(
         migrate_flat_to_session(Path(project), session_id)
 
         # Ensure per-session directory exists (migration may have created it)
-        session_dir = Path(project) / ".raise" / "rai" / "personal" / "sessions" / session_id
+        session_dir = (
+            Path(project) / ".raise" / "rai" / "personal" / "sessions" / session_id
+        )
         session_dir.mkdir(parents=True, exist_ok=True)
 
         # Add to active_sessions (with stale warning)
@@ -197,17 +201,23 @@ def start(
         if stale_sessions:
             typer.echo("⚠ Warning: Stale sessions detected (started >24h ago):")
             for stale in stale_sessions:
-                typer.echo(f"  - {stale.session_id} (started {stale.started_at.date()}, project: {stale.project})")
-            typer.echo("Consider closing these sessions with: rai session close --session <ID>\n")
+                typer.echo(
+                    f"  - {stale.session_id} (started {stale.started_at.date()}, project: {stale.project})"
+                )
+            typer.echo(
+                "Consider closing these sessions with: rai session close --session <ID>\n"
+            )
 
     save_developer_profile(updated)
 
     # Emit session:start event
     emitter = create_emitter()
-    emitter.emit(SessionStartEvent(
-        session_id=session_id or "",
-        developer=updated.name,
-    ))
+    emitter.emit(
+        SessionStartEvent(
+            session_id=session_id or "",
+            developer=updated.name,
+        )
+    )
 
     # Format agent for output
     agent_name = agent if agent else "unknown"
@@ -217,7 +227,9 @@ def start(
         # Load state from per-session dir (migration moved flat file there)
         # Falls back to flat file if no session_id
         state = load_session_state(project_path, session_id=session_id)
-        bundle = assemble_context_bundle(updated, state, project_path, session_id=session_id)
+        bundle = assemble_context_bundle(
+            updated, state, project_path, session_id=session_id
+        )
         typer.echo(bundle)
     else:
         if session_id:
@@ -365,7 +377,9 @@ def close(
         import os
 
         try:
-            resolved_session_id = resolve_session_id(session_flag=session, env_var=os.getenv("RAI_SESSION_ID"))
+            resolved_session_id = resolve_session_id(
+                session_flag=session, env_var=os.getenv("RAI_SESSION_ID")
+            )
         except RaiSessionNotFoundError as e:
             cli_error(str(e))
             return
@@ -380,7 +394,10 @@ def close(
             # No session specified — find active session for THIS project
             resolved_project = legacy_project.resolve()
             for active in profile.active_sessions:
-                if active.project and Path(active.project).resolve() == resolved_project:
+                if (
+                    active.project
+                    and Path(active.project).resolve() == resolved_project
+                ):
                     resolved_session_id = active.session_id
                     break
             if not resolved_session_id:
@@ -395,10 +412,12 @@ def close(
 
         # Emit before:session:close — hooks can abort
         emitter = create_emitter()
-        before_result = emitter.emit(BeforeSessionCloseEvent(
-            session_id=resolved_session_id,
-            outcome="legacy",
-        ))
+        before_result = emitter.emit(
+            BeforeSessionCloseEvent(
+                session_id=resolved_session_id,
+                outcome="legacy",
+            )
+        )
         if before_result.aborted:
             typer.echo(f"Session close aborted: {before_result.abort_message}")
             raise typer.Exit(1)
@@ -406,10 +425,12 @@ def close(
         updated = end_session(profile, session_id=resolved_session_id)
         save_developer_profile(updated)
 
-        emitter.emit(SessionCloseEvent(
-            session_id=resolved_session_id,
-            outcome="legacy",
-        ))
+        emitter.emit(
+            SessionCloseEvent(
+                session_id=resolved_session_id,
+                outcome="legacy",
+            )
+        )
         typer.echo(f"Session {resolved_session_id} closed.")
         return
 
@@ -471,16 +492,20 @@ def close(
     # Emit before:session:close — hooks can abort
     emitter = create_emitter()
     close_sid = guard_session_id or resolved_session_id or ""
-    before_result = emitter.emit(BeforeSessionCloseEvent(
-        session_id=close_sid,
-        outcome="structured",
-    ))
+    before_result = emitter.emit(
+        BeforeSessionCloseEvent(
+            session_id=close_sid,
+            outcome="structured",
+        )
+    )
     if before_result.aborted:
         typer.echo(f"Session close aborted: {before_result.abort_message}")
         raise typer.Exit(1)
 
     # Process close (pass session_id for per-session state writes)
-    close_result = process_session_close(close_input, profile, project_path, session_id=resolved_session_id)
+    close_result = process_session_close(
+        close_input, profile, project_path, session_id=resolved_session_id
+    )
 
     # Cleanup per-session directory
     cleanup_session_id = resolved_session_id or close_result.session_id
@@ -488,10 +513,12 @@ def close(
         cleanup_session_dir(project_path, cleanup_session_id)
 
     # Emit session:close event
-    emitter.emit(SessionCloseEvent(
-        session_id=close_result.session_id,
-        outcome="structured",
-    ))
+    emitter.emit(
+        SessionCloseEvent(
+            session_id=close_result.session_id,
+            outcome="structured",
+        )
+    )
 
     # Output summary
     typer.echo(f"Session {close_result.session_id} closed.")

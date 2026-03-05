@@ -14,8 +14,13 @@ metadata:
   raise.next: ""
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "4.0.0"
+  raise.version: "4.1.0"
   raise.visibility: public
+  raise.inputs: |
+    - session_id: string, required, previous_skill
+  raise.outputs: |
+    - session_record: file_path, file
+    - patterns: list, cli
 ---
 
 # Session Close
@@ -36,19 +41,34 @@ Close a session by reflecting on outcomes and feeding structured data to the CLI
 
 **Quick close:** For short sessions, use CLI flags directly instead of a state file:
 ```bash
-rai session close --summary "Quick fix session" --type maintenance --project "$(pwd)"
+rai session close --summary "Quick fix session" --type maintenance --project .
 ```
 
 ## Steps
 
-### Step 1: Reflect & Produce State File
+### Step 1: Craft Session Title
+
+Generate a descriptive session title (max 80 chars) that captures what was accomplished — not planned, accomplished. Include the **epic/story name** (not just the number) so the title is self-explanatory without looking up Jira. Use the format: `SES-{ID}: {title}`.
+
+**Good** (descriptive, includes context):
+- `SES-321: E355 Branch Model Evolution cerrado + backlog review y priorización E354`
+- `SES-318: E347 Backlog Automation — epic completo, 7 stories, merge a dev`
+- `SES-316: Backlog sync + Semgrep MCP investigation`
+
+**Bad** (too terse, requires lookup):
+- `SES-321: E355 complete + backlog review`
+- `SES-318: E347 done`
+
+The title will be used in the `summary` field of the state file AND presented to the human for `/rename`.
+
+### Step 2: Reflect & Produce State File
 
 Use inference to reflect on the session and write a YAML state file:
 
 ```yaml
-# /tmp/session-output-{SES-ID}.yaml
+# .raise/rai/personal/session-output.yaml
 session_id: "{SES-ID}"
-summary: "What was accomplished"
+summary: "{session_title}"  # The concise title from Step 1
 type: feature  # feature | research | maintenance | infrastructure | ideation
 outcomes:
   - "Concrete deliverable 1"
@@ -93,17 +113,38 @@ next_session_prompt: |
 
 **Capture tangents:** Check conversation for ideas → add to `dev/parking-lot.md`.
 
-### Step 2: Feed CLI
+### Step 3: Clean Working Tree
+
+Before closing, ensure no uncommitted changes are left behind:
+
+1. Run `git status`
+2. If working tree is clean → proceed to Step 3
+3. If there are uncommitted changes → present them to the human with options:
+   - **Commit**: stage and commit with a descriptive message
+   - **Discard**: `git restore` the files (confirm first)
+   - **Leave**: explicitly acknowledge the leftovers in the handoff
+4. Do NOT close the session with a dirty working tree unless the human explicitly chooses "Leave"
+
+### Step 4: Feed CLI
 
 ```bash
-rai session close --state-file /tmp/session-output-{SES-ID}.yaml --session {SES-ID} --project "$(pwd)"
+rai session close --state-file .raise/rai/personal/session-output.yaml --session {SES-ID} --project .
 ```
 
 This atomically: records session in index, appends patterns, updates coaching, writes session state, clears active session.
 
-Present a brief handoff:
+Present the closing card:
+
 ```
-## Next Session
+## Session Closed: SES-{ID} {session_title}
+
+**Type:** {type}
+**Outcomes:**
+- {outcome 1}
+- {outcome 2}
+**Patterns:** {N new} | **Working tree:** {clean | N files uncommitted}
+
+### Next Session
 **Continue:** [next step]
 **Open:** [unresolved questions, if any]
 ```
@@ -125,6 +166,7 @@ Present a brief handoff:
 - [ ] Narrative enables next session to resume immediately
 - [ ] Next session prompt is actionable and specific
 - [ ] Tangents captured in parking lot (if any)
+- [ ] Working tree clean (or leftovers explicitly acknowledged)
 - [ ] CLI close command executed successfully
 
 ## References

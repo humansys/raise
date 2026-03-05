@@ -1,8 +1,8 @@
 # Backlog: raise-cli
 
 > **Status**: Active
-> **Date**: 2026-02-15
-> **Version**: 2.0.0
+> **Date**: 2026-03-03
+> **Version**: 2.2.0-dev
 > **Related**: PRD v1.1.0, Vision v1.0.0, Design v1.1.0
 
 ---
@@ -42,36 +42,52 @@
 | [RAISE-168](https://humansys.atlassian.net/browse/RAISE-168) | **Neurosymbolic Memory Density** | ✅ Complete | `work/epics/raise-168-neurosymbolic-memory-density/scope.md` | — |
 | [RAISE-173](https://humansys.atlassian.net/browse/RAISE-173) | **Team Enablement & Operational Readiness** | 🚀 In Progress | — | P1 |
 | [RAISE-211](https://humansys.atlassian.net/browse/RAISE-211) | **Adapter Foundation** | ✅ Complete | `work/epics/raise-211-adapter-foundation/scope.md` | — |
-| [RAISE-242](https://humansys.atlassian.net/browse/RAISE-242) | **Skill Ecosystem** | 📋 Backlog | — | P1 (v2.1 partial, v2.3 full) |
+| [RAISE-242](https://humansys.atlassian.net/browse/RAISE-242) | **Skill Ecosystem** | ✅ Complete | `work/epics/raise-242-skill-ecosystem/scope.md` | P1 (v2.1 partial, v2.3 full) |
 | [RAISE-247](https://humansys.atlassian.net/browse/RAISE-247) | **CLI Ontology Restructuring** | ✅ Complete | `work/epics/raise-247-cli-ontology/scope.md` | — |
 | [RAISE-248](https://humansys.atlassian.net/browse/RAISE-248) | **Lifecycle Hooks & Workflow Gates** | ✅ Complete | `work/epics/raise-248-hooks-gates/scope.md` | — |
 | [RAISE-249](https://humansys.atlassian.net/browse/RAISE-249) | **Artifact Ontology & Contract Chain** | ✅ Complete | `work/epics/raise-249-artifact-ontology/scope.md` | — |
 | [RAISE-257](https://humansys.atlassian.net/browse/RAISE-257) | **Skill Excellence** | ✅ Complete | `work/epics/raise-257-skill-excellence/scope.md` | — |
+| [RAISE-258](https://humansys.atlassian.net/browse/RAISE-258) | **Telcel Collect Skill** | 🚀 In Progress | — | P1 (Client) |
+| [RAISE-274](https://humansys.atlassian.net/browse/RAISE-274) | **Governance Copilot POC — Forge** | 🚀 In Progress | — | P0 (Demo) |
+| [RAISE-275](https://humansys.atlassian.net/browse/RAISE-275) | **Shared Memory Backend** | ✅ Complete | `work/epics/e275-shared-memory-backend/scope.md` | — |
+| [RAISE-283](https://humansys.atlassian.net/browse/RAISE-283) | **CI/CD Security Pipeline** | ✅ Complete | — | — |
+| [RAISE-292](https://humansys.atlassian.net/browse/RAISE-292) | **TDD Policy Reform** | ✅ Complete | `work/epics/e292-tdd-policy-reform/scope.md` | — |
+| [RAISE-293](https://humansys.atlassian.net/browse/RAISE-293) | **Workstream Concept (Worktrees)** | 📋 Backlog | — | P2 |
+| [RAISE-294](https://humansys.atlassian.net/browse/RAISE-294) | **Test Infrastructure Migration** | 📋 Backlog | — | P2 |
+| [RAISE-295](https://humansys.atlassian.net/browse/RAISE-295) | **Security Fixes (Snyk/SAST/Sonar)** | 📋 Backlog | — | P2 |
+| [RAISE-156](https://humansys.atlassian.net/browse/RAISE-156) | **GTM Website** | 📋 Backlog | — | P2 |
+| [RAISE-208](https://humansys.atlassian.net/browse/RAISE-208) | **[PRO] Jira Adapter** | 📋 Backlog | — | P1 (Pro) |
+| [RAISE-209](https://humansys.atlassian.net/browse/RAISE-209) | **[PRO] Team/Org Memory** | 📋 Backlog | — | P1 (Pro) |
+| [RAISE-210](https://humansys.atlassian.net/browse/RAISE-210) | **[PRO] Jira-first UI** | 📋 Backlog | — | P2 (Pro) |
+| [RAISE-301](https://humansys.atlassian.net/browse/RAISE-301) | **Agent Tool Abstraction** | ✅ Complete | `work/epics/e301-agent-tool-abstraction/scope.md` | — |
+| [RAISE-325](https://humansys.atlassian.net/browse/RAISE-325) | **Agent-Orchestrated Workflow** | ✅ Complete | `work/epics/e325-agent-orchestrated-workflow/scope.md` | — |
+| [RAISE-337](https://humansys.atlassian.net/browse/RAISE-337) | **Declarative MCP Adapter Framework** | ✅ Complete | `work/epics/e337-declarative-mcp-adapter/scope.md` | — |
+| [RAISE-384](https://humansys.atlassian.net/browse/RAISE-384) | **MCP Platform** (E338) | ✅ Complete | `work/epics/e338-mcp-platform/scope.md` | — |
+| [RAISE-340](https://humansys.atlassian.net/browse/RAISE-340) | **Skill Set Ecosystem** | ✅ Complete | `work/epics/e340-skill-set-ecosystem/scope.md` | — |
+| [RAISE-346](https://humansys.atlassian.net/browse/RAISE-346) | **Skill Lifecycle Hardening** | ✅ Complete | `work/epics/e346-skill-lifecycle-hardening/scope.md` | — |
+| [RAISE-347](https://humansys.atlassian.net/browse/RAISE-347) | **Backlog Automation** | 🚀 In Progress | `work/epics/e347-backlog-automation/scope.md` | P0 (v2.2) |
+| [RAISE-348](https://humansys.atlassian.net/browse/RAISE-348) | **Documentation Refresh** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-349](https://humansys.atlassian.net/browse/RAISE-349) | **Adapter Integration Validation** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-364](https://humansys.atlassian.net/browse/RAISE-364) | **Rai Experience Portability** (E350) | ✅ Complete | `work/epics/e350-experience-portability/scope.md` | — |
+| [RAISE-369](https://humansys.atlassian.net/browse/RAISE-369) | **Open Source Readiness Audit** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-378](https://humansys.atlassian.net/browse/RAISE-378) | **rai doctor — Diagnostic & Bug Reporting** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-402](https://humansys.atlassian.net/browse/RAISE-402) | **Typed Skill Artifacts** (E354) | ✅ Complete | `work/epics/e354-typed-skill-artifacts/scope.md` | P1 |
 
-### Release Roadmap (decided SES-234, 2026-02-21)
+### Release Roadmap (revised SES-294, 2026-02-26)
 
-**v2.1 — CLI Professional** (~10 stories)
-- RAISE-247: CLI Ontology Restructuring ✅ (6 stories, 1.94x avg velocity)
-- RAISE-242/S1: Semantic Validator (1 story from Skill Ecosystem)
-- Outcome: clean CLI, skill registry with ownership, semantic validation
+See `governance/roadmap.md` for full roadmap with 10 releases.
 
-**v2.2 — Extensibility** (~13 stories)
-- RAISE-211: Adapter Foundation ✅ (7 stories — Protocol contracts, entry points, TierContext, CLI)
-- RAISE-248: Hooks & Gates ✅ (7 stories, 3.07x avg velocity)
-- Outcome: pluggable architecture, skills lose 68% ceremony overhead
+**MVP — Mar 15, 2026 (Atlassian Webinar)**
+- RAISE-274: Governance Copilot POC (Forge) — Jira + Confluence integration
+- RAISE-275: Shared Memory Backend ✅ — rai-server + PostgreSQL + API
+- E-GOV-FOUNDATION: Governance Foundation (needs /rai-epic-design)
 
-**v2.3 — Skill Ecosystem** (~2+ stories)
-- RAISE-242/S2-S3: Skill Builder + rai-debug (2 stories)
-- Providers (context, output, scaffold) if needed
-- Outcome: anyone can create correct skills, ecosystem ready
+**Post-MVP releases:** Guardrails (Q2), Portfolio Health (Q2), Patterns/OrgIntel/Forge (Q3)
 
-**Rationale:** v2.1 delivers immediate value (clean CLI, skill registry for Kurigage)
-with no dependencies. v2.2 builds the extensibility infrastructure that PRO needs. v2.3
-completes the skill ecosystem on top of the final infrastructure. Each release is
-self-contained and delivers shippable value.
+**Category:** AI Agentic Governance — "When AI agents build your software, RaiSE ensures they follow your rules."
 
-**Summary:** 19 of 20 internal epics complete. RAISE-144 (Engineering Health) is a
-permanent rolling epic. 4 new epics scoped (SES-234), distributed across v2.1–v2.3.
+**Summary:** 22+ internal epics complete. RAISE-144 (Engineering Health) is permanent.
+MVP focus is governance + shared memory + Atlassian integration.
 
 ---
 
@@ -155,7 +171,7 @@ Session (2), Epic (4), Story (6), Discovery (4), Meta (1), Other (10)
 | ID | Title | Description | Status | Priority | Found In | Target |
 |----|-------|-------------|--------|----------|----------|--------|
 | [RAISE-134](https://humansys.atlassian.net/browse/RAISE-134) | Context leak: session data cross-project | Fixed by RAISE-139 (CWD poka-yoke guard on session close). | ✅ Done | P1 | v2.0.0a1 | v2.1 |
-| [RAISE-136](https://humansys.atlassian.net/browse/RAISE-136) | Graph schema crash on unknown NodeType | `NodeType` Literal rejects unknown types at deserialization. Need graceful degradation (skip + warn). | 🔴 Selected for Dev | P1 | v2.0.0a1 | v2.0.0a6 |
+| [RAISE-136](https://humansys.atlassian.net/browse/RAISE-136) | Graph schema crash on unknown NodeType | Graceful degradation in iter_concepts — skip + warn on unknown types. | ✅ Done | P1 | v2.0.0a1 | v2.0.0a6 |
 | **HF-3** | Type annotations incomplete in governance models | `governance/models.py:131` - ExtractionResult.concepts field has partial type `list[Unknown]`. Causes pyright errors in strict mode. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
 | **HF-4** | Type annotations incomplete in profile schema | `onboarding/profile.py:168,216` - CoachingState.corrections and deadlines fields have partial types `list[Unknown]`. Pyright strict mode failures. | 🔴 Open | P2 | v2.0.0a7 | v2.0.0a9 |
 | **HF-5** | Extend governance extractor to parse SOPs | Governance extractor currently parses principles, requirements, terms, glossary, ADRs, but not SOPs. Need to add SOP parsing support for `governance/sops/*.md` files. | 🔴 Open | P3 | v2.0.0a8 | v2.0.0a10 |
@@ -202,6 +218,9 @@ See `dev/parking-lot.md` for full idea backlog.
 | 2 | [RAISE-161](https://humansys.atlassian.net/browse/RAISE-161) | Windows compatibility verification | XS | P0 | ✅ Done |
 | 3 | [RAISE-160](https://humansys.atlassian.net/browse/RAISE-160) | Flutter/Dart discovery scanner | S | P2 (before Track 2) | ✅ Done |
 | 4 | [RAISE-145](https://humansys.atlassian.net/browse/RAISE-145) | "Unified" prefix rename | S | Post-F&F | 📋 Backlog |
+| 5 | [RAISE-291](https://humansys.atlassian.net/browse/RAISE-291) | Bandit security gate — integrate SAST into quality pipeline | XS | P2 | 📋 Backlog |
+| 6 | [RAISE-256](https://humansys.atlassian.net/browse/RAISE-256) | CI: uv sync --extra dev fix | XS | P0 | ✅ Done |
+| 7 | [RAISE-136](https://humansys.atlassian.net/browse/RAISE-136) | Graph schema crash — graceful degradation | XS | P1 | ✅ Done |
 
 **Completed:**
 - **HF-SES-MIGRATED**: SES-MIGRATED zombie blocks session close — migration clears stale session + CWD guard filters by project (v2.0.1)
@@ -214,7 +233,7 @@ See `dev/parking-lot.md` for full idea backlog.
 Each feature is complete when:
 
 - [ ] Code implemented with type annotations
-- [ ] Unit tests passing (>90% coverage on feature)
+- [ ] Unit tests passing — each test asserts observable behavior, not implementation details
 - [ ] Integration tests for CLI commands
 - [ ] Error handling with proper exception types
 - [ ] Code passes `ruff check` and `pyright`
@@ -318,6 +337,7 @@ E-DEMO learnings feed into RAISE-141 (backlog backends).
 
 | Version | Date | Author | Change |
 |---------|------|--------|--------|
+| 2.7.0 | 2026-02-26 | Rai | Full Jira sync: 11 stories closed (E275 S1-S7, RAISE-136, RAISE-256, RAISE-266, RAISE-283). Added 10 missing epics (258, 274, 283, 293-295, 156, 208-210). RAISE-275 → Done. Merge conflict resolved. Roadmap updated to SES-294 MVP Mar 15. |
 | 2.6.0 | 2026-02-24 | Rai | JIRA sync: RAISE-128/153/168/211/247/248/249 → Done, RAISE-134 → Done (was stale), RAISE-236 → Done (sync-skills bug fixed today). Skill Excellence assigned RAISE-257 (was local-only RAISE-250). |
 | 2.5.0 | 2026-02-23 | Rai | E250 Skill Excellence complete: 27/27 skills ADR-040 compliant (7 sections, ≤150 lines), ~65% total line reduction, validator + scaffold updated, sync pipeline verified |
 | 2.4.0 | 2026-02-16 | Rai | RAISE-153 complete, RAISE-144 activated with Kurigage-driven stories (RAISE-158/160/161), SES-MIGRATED + test leakage fixes |
@@ -333,4 +353,4 @@ E-DEMO learnings feed into RAISE-141 (backlog backends).
 ---
 
 *Updated by: Rai + Emilio*
-*Last sync: 2026-02-24*
+*Last sync: 2026-02-26*

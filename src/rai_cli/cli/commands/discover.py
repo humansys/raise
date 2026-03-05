@@ -108,7 +108,14 @@ def scan_command(
     # Validate language if provided
     lang: Language | None = None
     if language:
-        if language not in ("python", "typescript", "javascript", "php", "svelte", "csharp"):
+        if language not in (
+            "python",
+            "typescript",
+            "javascript",
+            "php",
+            "svelte",
+            "csharp",
+        ):
             cli_error(
                 f"Unsupported language: {language}",
                 hint="Supported: python, typescript, javascript, php, svelte, csharp",
@@ -128,11 +135,13 @@ def scan_command(
 
     # Emit discover:scan event
     emitter = create_emitter()
-    emitter.emit(DiscoverScanEvent(
-        project_path=path,
-        language=lang or "auto",
-        component_count=len(result.symbols),
-    ))
+    emitter.emit(
+        DiscoverScanEvent(
+            project_path=path,
+            language=lang or "auto",
+            component_count=len(result.symbols),
+        )
+    )
 
     format_scan_result(result, path, output, language=lang)
 
@@ -348,13 +357,13 @@ def build_command(
         )
 
     # Build unified graph (includes components automatically)
-    from rai_cli.context.builder import UnifiedGraphBuilder
+    from rai_cli.context.builder import GraphBuilder
 
-    builder = UnifiedGraphBuilder(project_root=root)
+    builder = GraphBuilder(project_root=root)
     graph = builder.build()
 
     # Save graph via backend
-    from rai_cli.graph.filesystem_backend import get_active_backend
+    from rai_cli.graph.backends import get_active_backend
 
     graph_path = root / ".raise" / "graph" / "unified.json"
     get_active_backend(graph_path).persist(graph)

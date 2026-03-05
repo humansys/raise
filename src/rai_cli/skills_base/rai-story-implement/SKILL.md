@@ -15,8 +15,12 @@ metadata:
   raise.next: story-review
   raise.gate: gate-code
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - plan_md: file_path, required, previous_skill
+  raise.outputs: |
+    - code_commits: list, git
 ---
 
 # Implement: Development Workflow

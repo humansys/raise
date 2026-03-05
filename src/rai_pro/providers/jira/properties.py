@@ -11,7 +11,6 @@ Functions:
 Property key: com.humansys.raise.sync (namespaced to avoid collisions)
 """
 
-
 from typing import Any
 
 from rai_pro.providers.jira.client import JiraClient

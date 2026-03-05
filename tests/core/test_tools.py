@@ -40,8 +40,8 @@ class TestCheckTool:
     """Tests for check_tool function."""
 
     def test_returns_true_for_existing_tool(self) -> None:
-        # git should exist on any dev machine
-        assert check_tool("git") is True
+        # python3 is guaranteed to exist in the CI image (python:3.12-slim)
+        assert check_tool("python3") is True
 
     def test_returns_false_for_nonexistent_tool(self) -> None:
         assert check_tool("nonexistent_tool_12345") is False
@@ -51,7 +51,7 @@ class TestRequireTool:
     """Tests for require_tool function."""
 
     def test_does_not_raise_for_existing_tool(self) -> None:
-        require_tool("git")  # Should not raise
+        require_tool("python3")  # Should not raise
 
     def test_raises_dependency_error_for_missing_tool(self) -> None:
         with pytest.raises(DependencyError) as exc_info:
@@ -81,8 +81,10 @@ class TestRunTool:
         assert result.returncode == 0
 
     def test_captures_stderr(self) -> None:
-        # Using a command that writes to stderr
-        result = run_tool(["git", "status", "--invalid-flag-xyz"])
+        # Using python3 to write to stderr — guaranteed available in CI image
+        result = run_tool(
+            ["python3", "-c", "import sys; sys.stderr.write('error'); sys.exit(1)"]
+        )
         assert result.returncode != 0
         assert result.stderr != ""
 

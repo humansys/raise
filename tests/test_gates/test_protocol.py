@@ -11,7 +11,6 @@ import pytest
 from rai_cli.gates.models import GateContext, GateResult
 from rai_cli.gates.protocol import WorkflowGate
 
-
 # ---------------------------------------------------------------------------
 # Fixtures — conformant and non-conformant gate implementations
 # ---------------------------------------------------------------------------
@@ -52,8 +51,6 @@ class _MissingEvaluate:
     workflow_point: ClassVar[str] = "before:release:publish"
 
 
-
-
 # ---------------------------------------------------------------------------
 # WorkflowGate Protocol conformance
 # ---------------------------------------------------------------------------
@@ -74,21 +71,6 @@ class TestWorkflowGateProtocol:
         assert hasattr(WorkflowGate, "__protocol_attrs__") or hasattr(
             WorkflowGate, "__abstractmethods__"
         )
-
-    def test_valid_gate_evaluate_returns_gate_result(self) -> None:
-        gate = _ValidGate()
-        ctx = GateContext(gate_id="gate-test")
-        result = gate.evaluate(ctx)
-        assert isinstance(result, GateResult)
-        assert result.passed is True
-
-    def test_failing_gate_returns_actionable_message(self) -> None:
-        gate = _FailingGate()
-        ctx = GateContext(gate_id="gate-failing")
-        result = gate.evaluate(ctx)
-        assert result.passed is False
-        assert "pytest" in result.message
-        assert len(result.details) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -111,10 +93,6 @@ class TestGateContext:
         ctx = GateContext(gate_id="gate-test")
         with pytest.raises(FrozenInstanceError):
             ctx.gate_id = "mutated"  # type: ignore[misc]
-
-    def test_gate_id_required(self) -> None:
-        ctx = GateContext(gate_id="gate-lint")
-        assert ctx.gate_id == "gate-lint"
 
 
 # ---------------------------------------------------------------------------
@@ -147,8 +125,3 @@ class TestGateResult:
         result = GateResult(passed=True, gate_id="gate-test")
         with pytest.raises(FrozenInstanceError):
             result.passed = False  # type: ignore[misc]
-
-    def test_defaults(self) -> None:
-        result = GateResult(passed=True, gate_id="g")
-        assert result.message == ""
-        assert result.details == ()

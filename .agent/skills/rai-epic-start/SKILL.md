@@ -1,8 +1,9 @@
 ---
 name: rai-epic-start
 description: >
-  Initialize an epic with branch and scope commit.
-  Creates the epic branch from the development branch that story branches will nest under.
+  Initialize an epic with scope artifacts and tracker entry.
+  Epics are logical containers — no epic branch is created.
+  Story branches are created directly from the development branch.
 
 license: MIT
 
@@ -14,115 +15,66 @@ metadata:
   raise.next: epic-design
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "1.0.0"
+  raise.version: "3.0.0"
   raise.visibility: public
+  raise.inputs: |
+    - epic_id: string, required, argument
+    - epic_slug: string, required, argument
+    - dev_branch: string, required, config
+  raise.outputs: |
+    - brief: file_path, next_skill
+    - scope: file_path, next_skill
 ---
 
-# Start: Epic Initialization
-
-## Branch Configuration
-
-**Read `branches.development` from `.raise/manifest.yaml`** to determine the project's development branch. All references to `{dev_branch}` below use this value. Default: `main`.
+# Epic Start
 
 ## Purpose
 
-Initialize an epic with a dedicated branch from `{dev_branch}` and a scope commit. Feature branches will be created as sub-branches of this epic branch.
+Initialize an epic with scope artifacts and a tracker entry. Epics are logical containers (directory + tracker), not branches. Story branches are created directly from the development branch.
+
+## Mastery Levels (ShuHaRi)
+
+- **Shu**: Follow all steps, verify each before proceeding
+- **Ha**: Streamline scope for well-understood epics
+- **Ri**: Integrate with release workflows and automated setup
 
 ## Context
 
-**When to use:**
-- Starting a new body of work (3-10 features)
-- Beginning a planned epic from the backlog
-- Creating isolation for a significant capability
+**When to use:** Starting a new body of work (3-10 stories), beginning a planned epic from the backlog.
 
-**When to skip:**
-- Small fixes or single features (use story branch from `{dev_branch}`)
-- Continuation of existing epic (branch already exists)
+**When to skip:** Small fixes or single stories (no epic needed). Continuation of existing epic.
 
-**Inputs required:**
-- Epic number (E{N})
-- Epic name/slug
-- High-level objective
+**Inputs:** Epic number (E{N}), epic name/slug, high-level objective.
 
-**Output:**
-- Epic branch created from `{dev_branch}`
-- Scope commit documenting boundaries
-- Telemetry recorded
-
-**Branch model:**
-```
-main (stable)
-  └── {dev_branch} (development)
-        └── epic/e{N}/{name}        ← THIS SKILL CREATES
-              └── feature/f{N}.{M}/{name}  ← /rai-story-start creates
-```
+**Branch config:** Read `branches.development` from `.raise/manifest.yaml` for `{dev_branch}`. Default: `main`.
 
 ## Steps
 
-### Step 1: Verify on Development Branch
+### Step 1: Verify Development Branch
 
-Ensure we're starting from the development branch (`{dev_branch}`):
+Ensure on `{dev_branch}` (for creating scope artifacts):
 
 ```bash
 git branch --show-current
 ```
 
-**Decision:**
-- On `{dev_branch}` → Continue
-- On other branch → `git checkout {dev_branch} && git pull`
+| Condition | Action |
+|-----------|--------|
+| On `{dev_branch}` | Continue |
+| On other branch | `git checkout {dev_branch} && git pull` |
 
-**Verification:** On `{dev_branch}` branch, up to date.
+<verification>
+On `{dev_branch}`, up to date with remote.
+</verification>
 
-> **Poka-yoke:** Epic branches MUST branch from `{dev_branch}`. Starting from wrong branch causes merge pain.
+### Step 2: Define Scope & Commit
 
-### Step 2: Create Epic Branch
+Create TWO artifacts:
 
-Create the epic branch:
+1. `work/epics/e{N}-{name}/brief.md` using `templates/brief.md` — hypothesis, success metrics, appetite, rabbit holes.
+2. `work/epics/e{N}-{name}/scope.md` — objective, in/out scope, planned stories, done criteria.
 
-```bash
-git checkout -b epic/e{N}/{epic-slug}
-```
-
-**Naming convention:**
-- `epic/e14/rai-distribution`
-- `epic/e15/telemetry-insights`
-
-**Verification:** On new epic branch.
-
-> **If branch exists:** `git checkout epic/e{N}/{slug}` and verify scope commit exists.
-
-### Step 3: Define Epic Scope
-
-Document what's in and out of scope:
-
-```markdown
-## Epic Scope: E{N} {Name}
-
-**Release:** REL-{id} ({name}, target {date})
-**Objective:** {1-2 sentences}
-
-**In Scope:**
-- [Deliverable 1]
-- [Deliverable 2]
-
-**Out of Scope:**
-- [Exclusion 1] → {where deferred}
-
-**Features (planned):**
-- F{N}.1: {name}
-- F{N}.2: {name}
-
-**Done when:**
-- [ ] All features complete
-- [ ] Epic retrospective done
-- [ ] Merged to `{dev_branch}`
-```
-
-**Verification:** Scope documented.
-
-### Step 4: Create Scope Commit
-
-Create the initial commit:
+Commit:
 
 ```bash
 git add -A
@@ -134,108 +86,47 @@ In scope:
 - {item 1}
 - {item 2}
 
-Out of scope:
-- {item 1}
-
 Co-Authored-By: Rai <rai@humansys.ai>"
 ```
 
-**Verification:** Scope commit created on epic branch.
+Register epic in `governance/backlog.md` — add or update the row with status `In Progress`.
 
-### Step 5: Register Epic in Backlog (REQUIRED)
+<verification>
+Scope commit on `{dev_branch}`. Epic visible in backlog.
+</verification>
 
-Add or update the epic row in `governance/backlog.md`:
+<if-blocked>
+Backlog file missing → create it. Row already exists → update status only.
+</if-blocked>
 
-```markdown
-| E{N} | **{Epic Name}** | In Progress | — | {Priority} |
-```
+### Step 3: Present Next Steps
 
-**If the row already exists:** Update its status to `In Progress`.
-**If the row doesn't exist:** Add it to the Epics Overview table.
-
-Also update the summary line below the table to reflect the new count.
-
-**Verification:** Epic appears in `governance/backlog.md` with correct status.
-
-> **Why this matters:** The backlog is the authoritative epic index. Epics created without a backlog entry become invisible to the ontology graph — release edges, queries, and planning all depend on epic nodes existing.
-
-### Step 6: Emit Telemetry
-
-```bash
-rai signal emit-work epic E{N} --event start --phase init
-```
-
-**Verification:** Telemetry emitted.
-
-### Step 7: Display Lifecycle
-
-```markdown
-## Epic Lifecycle
-
-```
-/rai-epic-start  ← YOU ARE HERE
-     ↓
-/rai-epic-design (scope, features, ADRs)
-     ↓
-/rai-epic-plan (sequence, milestones)
-     ↓
-[features via /rai-story-start → ... → /rai-story-close]
-     ↓
-/rai-epic-close (retrospective, merge to {dev_branch})
-```
-
-**Next:** `/rai-epic-design` to formalize scope and features.
-```
+Show the developer:
+- Commit hash and epic directory path
+- Quick scope summary (objective + story count)
+- **Next:** `/rai-epic-design` to formalize scope and stories
 
 ## Output
 
-- **Branch:** `epic/e{N}/{slug}` created from `{dev_branch}`
-- **Commit:** Scope commit with objective and boundaries
-- **Telemetry:** Epic start recorded
-- **Next:** `/rai-epic-design`
+| Item | Destination |
+|------|-------------|
+| Epic Brief | `work/epics/e{N}-{name}/brief.md` |
+| Scope | `work/epics/e{N}-{name}/scope.md` |
+| Scope commit | On `{dev_branch}` |
+| Backlog entry | `governance/backlog.md` |
+| Next | `/rai-epic-design` |
 
-## Summary Template
+## Quality Checklist
 
-```markdown
-## Epic Started: E{N} {Name}
-
-**Release:** REL-{id} ({name}, target {date})
-**Branch:** `epic/e{N}/{slug}`
-**Commit:** {hash}
-**Base:** `{dev_branch}`
-
-### Quick Scope
-**Objective:** {1-line}
-**Features:** {count} planned
-**Done when:** All features + retrospective + merge
-
-### Next
-→ `/rai-epic-design` to formalize scope and features
-```
-
-## Notes
-
-### Why Epic Branches Matter
-
-1. **Isolation** — Epic work isolated from other epics
-2. **Feature nesting** — Features branch from epic, merge to epic
-3. **Clean merge** — Epic merges as unit to `{dev_branch}`
-4. **Rollback** — Can abandon entire epic if needed
-
-### Branch Lifecycle
-
-```
-{dev_branch} ──┬── epic/e14/rai-distribution
-     │         ├── feature/f14.1/base-identity
-     │         ├── feature/f14.2/base-patterns
-     │         └── (features merge back to epic)
-     │
-     └── (epic merges to {dev_branch} at /rai-epic-close)
-```
+- [ ] Epic Brief created from `templates/brief.md`
+- [ ] Scope commit includes objective and boundaries
+- [ ] Epic registered in `governance/backlog.md`
+- [ ] No epic branch created — epics are logical containers only
+- [ ] NEVER create epic branches — story branches go directly from `{dev_branch}`
 
 ## References
 
 - Next: `/rai-epic-design`
-- Features: `/rai-story-start` (verifies epic branch exists)
+- Stories: `/rai-story-start` (branches from `{dev_branch}`)
 - Close: `/rai-epic-close`
-- Branch model: `CLAUDE.md` § Git Practices
+- Branch model: `CLAUDE.md` § Branch Model

@@ -5,7 +5,11 @@ from __future__ import annotations
 import pytest
 
 from rai_cli.exceptions import RaiSessionNotFoundError
-from rai_cli.session.resolver import resolve_session_id
+from rai_cli.session.resolver import (
+    _normalize_session_id,
+    resolve_session_id,
+    resolve_session_id_optional,
+)
 
 
 class TestResolveSessionId:
@@ -41,11 +45,6 @@ class TestResolveSessionId:
         result = resolve_session_id(session_flag=None, env_var="178")
         assert result == "SES-178"
 
-    def test_accepts_already_normalized_format(self) -> None:
-        """resolve_session_id accepts 'SES-177' format without modification."""
-        result = resolve_session_id(session_flag="SES-177", env_var=None)
-        assert result == "SES-177"
-
     def test_normalizes_lowercase_prefix(self) -> None:
         """resolve_session_id normalizes 'ses-177' to 'SES-177'."""
         result = resolve_session_id(session_flag="ses-177", env_var=None)
@@ -70,3 +69,43 @@ class TestResolveSessionId:
         """resolve_session_id strips whitespace from env var value."""
         result = resolve_session_id(session_flag=None, env_var="  SES-178  ")
         assert result == "SES-178"
+
+
+class TestNormalizeSessionIdPathTraversal:
+    """CWE-23 regression tests: session IDs must not contain path traversal."""
+
+    def test_rejects_dotdot_in_session_id(self) -> None:
+        """_normalize_session_id rejects '..' path traversal."""
+        with pytest.raises(ValueError, match="path traversal"):
+            _normalize_session_id("../../../etc/passwd")
+
+    def test_rejects_forward_slash_in_session_id(self) -> None:
+        """_normalize_session_id rejects forward slashes."""
+        with pytest.raises(ValueError, match="path traversal"):
+            _normalize_session_id("SES-177/../../etc")
+
+    def test_rejects_backslash_in_session_id(self) -> None:
+        """_normalize_session_id rejects backslashes."""
+        with pytest.raises(ValueError, match="path traversal"):
+            _normalize_session_id("SES-177\\..\\..\\etc")
+
+    def test_rejects_dotdot_via_resolve_session_id(self) -> None:
+        """resolve_session_id propagates traversal rejection from flag."""
+        with pytest.raises(ValueError, match="path traversal"):
+            resolve_session_id(session_flag="../escape", env_var=None)
+
+    def test_rejects_dotdot_via_env_var(self) -> None:
+        """resolve_session_id propagates traversal rejection from env var."""
+        with pytest.raises(ValueError, match="path traversal"):
+            resolve_session_id(session_flag=None, env_var="../escape")
+
+    def test_rejects_dotdot_via_resolve_optional(self) -> None:
+        """resolve_session_id_optional propagates traversal rejection."""
+        with pytest.raises(ValueError, match="path traversal"):
+            resolve_session_id_optional(session_flag=None, env_var="../escape")
+
+    def test_accepts_valid_session_id(self) -> None:
+        """Valid session IDs are not rejected."""
+        assert _normalize_session_id("SES-177") == "SES-177"
+        assert _normalize_session_id("177") == "SES-177"
+        assert _normalize_session_id("ses-42") == "SES-42"

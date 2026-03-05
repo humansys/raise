@@ -34,9 +34,7 @@ def jira_client() -> JiraClient:
     token = os.getenv("JIRA_API_TOKEN")
 
     if not cloud_id or not token:
-        pytest.skip(
-            "JIRA_CLOUD_ID and JIRA_API_TOKEN environment variables required"
-        )
+        pytest.skip("JIRA_CLOUD_ID and JIRA_API_TOKEN environment variables required")
 
     return JiraClient(cloud_id=cloud_id, access_token=token)
 
@@ -51,7 +49,9 @@ def test_issue_key() -> str:
 
 
 @pytest.mark.integration
-def test_roundtrip_entity_property(jira_client: JiraClient, test_issue_key: str) -> None:
+def test_roundtrip_entity_property(
+    jira_client: JiraClient, test_issue_key: str
+) -> None:
     """Test: Create metadata, set property, get property, verify match."""
     # Create test metadata
     original_metadata = RaiSyncMetadata(
@@ -104,9 +104,7 @@ def test_404_handling(jira_client: JiraClient) -> None:
 
 
 @pytest.mark.integration
-def test_has_rai_metadata_true(
-    jira_client: JiraClient, test_issue_key: str
-) -> None:
+def test_has_rai_metadata_true(jira_client: JiraClient, test_issue_key: str) -> None:
     """Test: has_rai_metadata returns True for synced issue."""
     # First ensure metadata exists
     metadata = RaiSyncMetadata(

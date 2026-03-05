@@ -15,8 +15,16 @@ metadata:
   raise.next: story-plan
   raise.gate: ""
   raise.adaptable: "true"
-  raise.version: "2.1.0"
+  raise.version: "2.3.0"
   raise.visibility: public
+  raise.output_type: story-design
+  raise.inputs: |
+    - story_md: file_path, required, previous_skill
+    - scope_md: file_path, optional, previous_skill
+  raise.outputs: |
+    - design_yaml: file_path, .raise/artifacts/
+    - design_md: file_path, work/docs/
+    - design_md_legacy: file_path, next_skill
 ---
 
 # Story Design
@@ -60,8 +68,10 @@ Create a lean story specification optimized for both human review (clear intent)
 
 **UX gate:** If story touches human interaction (workflows, prompts, DX), recommend `/rai-research` first (~10 min, PAT-E-263).
 
+**Integration gate (PAT-E-539):** If story name includes "dogfood", "E2E", or "integration", OR if epic has separate client/server stories developed with mocks — AC MUST include at least one scenario that runs with **real infrastructure** (docker compose, actual DB, real HTTP calls). Unit tests with mocks cannot catch cross-component contract mismatches (auth headers, payload validation, parameter limits).
+
 <verification>
-Complexity assessed. Risk/UX gates evaluated.
+Complexity assessed. Risk/UX/Integration gates evaluated.
 </verification>
 
 ### Step 2: Frame What & Why
@@ -83,10 +93,14 @@ Document WHAT you're building and WHY this approach (not detailed HOW):
 
 **For refactoring:** grep all call sites of the target. A half-migration is worse than none.
 
+**For data mutations:** What happens when inputs reference missing entities? Declare the strategy explicitly: reject with error, skip + report count, partial success with warnings. Silent drops are semantic bugs (PAT-E-523).
+
+**Value preservation gate (PAT-E-572):** Before finalizing components, ask: "What domain knowledge does this layer provide that a generic pass-through wouldn't?" If the answer is "none", the design may be over-abstracted. If the answer involves config/resolution/mapping that an existing pattern handles differently, check where that responsibility lives in the proven pattern. KISS means simplest that serves the purpose — removing domain intelligence to reduce LOC removes the value proposition.
+
 For complex stories, add: scenarios (Gherkin), algorithm pseudocode, constraints, testing strategy.
 
 <verification>
-Approach is concrete enough to envision examples.
+Approach is concrete enough to envision examples. Value preservation gate passed.
 </verification>
 
 ### Step 4: Create Examples (MOST IMPORTANT)
@@ -124,9 +138,54 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 
 ## Output
 
+After completing all steps, produce the design in three locations:
+
+### 1. Typed artifact (source of truth)
+
+Write a YAML artifact to `.raise/artifacts/s{N}.{M}-design.yaml` with this structure:
+
+```yaml
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: '{ISO 8601 timestamp}'
+story: 'S{N}.{M}'
+epic: 'E{N}'
+content:
+  summary: '{Problem + Value in 1-2 sentences}'
+  complexity: simple|moderate|complex
+  acceptance_criteria:
+    - id: AC1
+      description: '{criterion text}'
+      verifiable: true
+  integration_points:
+    - module: '{dotted.module.path}'
+      change_type: new|modification|deletion
+      files: ['{relative/path.py}']
+  decisions:
+    - id: D1
+      choice: '{what was chosen}'
+      rationale: '{why}'
+      alternatives_considered: ['{alt1}', '{alt2}']
+refs:
+  backlog_item: '{RAISE-NNN}'
+  epic_scope: 'work/epics/e{N}-{name}/scope.md'
+metadata: {}
+```
+
+### 2. Generated Markdown
+
+Write human-readable Markdown to `work/docs/s{N}.{M}-design.md` with: title, metadata, summary, acceptance criteria, integration points, decisions.
+
+### 3. Legacy copy
+
+Also write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` for compatibility with other skills that reference this path.
+
 | Item | Destination |
 |------|-------------|
-| Design spec | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
+| Typed artifact | `.raise/artifacts/s{N}.{M}-design.yaml` |
+| Generated docs | `work/docs/s{N}.{M}-design.md` |
+| Legacy copy | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
 | Next | `/rai-story-plan` |
 
 ## Quality Checklist
@@ -135,7 +194,9 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 - [ ] What & Why clear in <2 minutes
 - [ ] Examples are concrete and runnable (100% coverage)
 - [ ] Acceptance criteria specific and testable (3-5 MUST items)
-- [ ] Risk/UX gates evaluated before designing
+- [ ] Risk/UX/Integration gates evaluated before designing (PAT-E-539)
+- [ ] Data mutation stories declare missing-entity strategy (PAT-E-523)
+- [ ] Value preservation gate: domain intelligence preserved, not simplified away (PAT-E-572)
 - [ ] Spec creation <30 minutes, review <5 minutes
 - [ ] NEVER over-specify HOW — trust AI for implementation details
 - [ ] NEVER skip examples — they are the most important section
@@ -145,3 +206,4 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 - Next: `/rai-story-plan`
 - Risk assessment: PAT-186 (design not optional)
 - UX research gate: PAT-E-263
+- Value preservation gate: PAT-E-572

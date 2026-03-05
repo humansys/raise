@@ -28,10 +28,10 @@ SESSION LEVEL:
 - `/rai-session-close` — Capture learnings, update memory, log session
 
 ### Epic Skills
-- `/rai-epic-start` — Create epic branch from development branch
+- `/rai-epic-start` — Initialize epic scope and directory structure
 - `/rai-epic-design` — Design epic scope, stories, architecture
 - `/rai-epic-plan` — Sequence stories with milestones and dependencies
-- `/rai-epic-close` — Epic retrospective, metrics capture, merge to dev
+- `/rai-epic-close` — Epic retrospective, metrics capture, tracking update
 
 ### Story Skills
 - `/rai-story-start` — Create story branch and scope commit
@@ -60,11 +60,11 @@ SESSION LEVEL:
 
 | Gate | Required Before |
 |------|-----------------|
-| **Epic branch exists** | **Epic design** (/rai-epic-start) |
+| **Epic directory and scope initialized** | **Epic design** (/rai-epic-start) |
 | **Story branch and scope commit** | **Story work** (/rai-story-start) |
 | **Plan exists** | **Implementation** (/rai-story-plan) |
 | **Retrospective complete** | **Story close** (/rai-story-review) |
-| **Epic retrospective complete** | **Epic merge** (/rai-epic-close) |
+| **Epic retrospective complete** | **Epic close** (/rai-epic-close) |
 | Tests pass | Before any commit |
 | Type checks pass | Before any commit |
 | Linting passes | Before any commit |
@@ -91,31 +91,30 @@ SESSION LEVEL:
 
 ```
 main (stable)
-  └── v2 (development)
-        └── epic/e{N}/{name}
-              └── story/s{N}.{M}/{name}
+  └── dev (development)
+        └── story/s{N}.{M}/{name}
 ```
 
-- Stories merge to epic branch
-- Epics merge to development branch (v2)
+- Stories branch from and merge to development branch (dev)
 - Development merges to main at release
+- Epics are logical containers (directory + tracker), not branches
 
 ---
 
 ## Key Patterns (from memory)
 
-- **PAT-E-440:** _deprecation_warning new_cmd param: cuando el nombre del subcomando canónico difiere del legado (add-pattern→add), pasar new_cmd explícito para mensaje correcto
-- **PAT-E-441:** import location trap: get_memory_dir_for_scope vive en rai_cli.memory, no en rai_cli.config.paths — verificar imports en Gemba antes de copiar de memoria
-- **PAT-E-442:** Repetitive extractions compound: 1st establishes pattern, 2nd refines, 3rd is mechanical. Plan decompositions in 3+ reps. (E247: 1.6x→1.33x→2.86x)
-- **PAT-E-443:** Extraction compounding — repetitive God Object extractions show compounding velocity: first establishes pattern (M, 1.6x), second refines (S, 1.33x), third is mechanical (S, 2.86x). Plan decompositions in 3+ reps.
-- **PAT-E-444:** Fixed coverage gates (e.g. --cov-fail-under=90) create Goodhart dynamics: penalize cleanup, incentivize test muda. Use coverage as diagnostic, not gate. Cover domain logic and edge cases, not glue/wrappers.
-- **PAT-E-445:** For deletion stories, the grep gate IS the design — blast radius discovery replaces formal design
-- **PAT-E-446:** Typer RED test gotcha: exit_code \!= 0 passes for both 'command doesnt exist' and 'command validation error'. Always add content assertions alongside exit code checks.
-- **PAT-E-447:** Pre-implementation arch review + test muda analysis: run together, integrate muda cleanup into implementation tasks. Avoids separate cleanup stories and catches waste before its written.
-- **PAT-E-448:** Typer RED test gotcha: exit_code != 0 passes for both command-not-found and validation-error. Always add content assertions.
-- **PAT-E-449:** Pre-implementation arch review + test muda analysis as combo. Integrate cleanup into implementation tasks.
+- **PAT-E-480:** Sync script integration test: after running sync-skills.py, always run full test suite (not just validator tests) because the sync modifies __init__.py which other tests import
+- **PAT-E-481:** Silent parse failures in validator: skills that fail Pydantic validation during parse are silently skipped by rai skill validate. When auditing all skills, also check for parse errors separately
+- **PAT-E-482:** Sync script integration test: after running sync-skills.py, always run full test suite
+- **PAT-E-483:** Silent parse failures in validator: skills failing Pydantic validation are silently skipped
+- **PAT-E-484:** Gate check: run ruff on both src/ and tests/ — not just changed source files. Unused imports in tests slip through when only src/ is linted.
+- **PAT-E-485:** Bug report mechanism ≠ root cause: bug descriptions often name the symptom or a historical mechanism. Always go to code (Genchi Genbutsu) before forming the fix hypothesis. In RAISE-136 the bug said 'NodeType Literal rejects' but Literal had already been changed to str — real crash was missing required fields in fallback model_validate.
+- **PAT-E-486:** Gate check: run ruff on both src/ and tests/ — not just changed source files. Unused imports in tests slip through when only src/ is linted.
+- **PAT-E-487:** Bug report mechanism != root cause: bug descriptions name the symptom or a historical mechanism. Always go to code (Genchi Genbutsu) before forming the fix hypothesis.
+- **PAT-E-488:** Pre-publish verification should include: README command audit, CHANGELOG entry, deprecated CLI refs grep in skills
+- **PAT-E-489:** Contract chain preservation: when compressing skills, verify inter-skill artifact contracts survive. Templates externalize format; skills reference.
 
 ---
 
-*Last updated: 2026-02-23*
+*Last updated: 2026-03-02*
 *Generated by `rai graph build`*

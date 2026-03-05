@@ -16,6 +16,12 @@ metadata:
   raise.adaptable: "true"
   raise.version: "5.0.0"
   raise.visibility: public
+  raise.inputs: |
+    - project_path: string, required, argument
+    - developer_profile: file_path, required, config
+  raise.outputs: |
+    - session_id: string, next_skill
+    - context_bundle: string, cli
 ---
 
 # Session Start
@@ -43,10 +49,12 @@ Load context bundle from CLI, interpret signals, and propose focused work for th
 ### Step 1: Load Orientation Bundle
 
 ```bash
-rai session start --project "$(pwd)" --context
+rai session start --project . --context
 ```
 
 Loads developer profile, session state, and orientation bundle. If graph unavailable: run `rai graph build` first.
+
+**IMPORTANT:** This is the ONLY CLI command in this skill. The context bundle output is complete — do NOT invent additional flags (e.g. `--section`), sub-commands (e.g. `rai context load`), or follow-up CLI calls to "fetch more". If the bundle mentions available context sections, that information is for display only. All interpretation happens in Step 2 using inference, not additional tool calls.
 
 ### Step 2: Interpret & Present
 
@@ -57,17 +65,26 @@ Loads developer profile, session state, and orientation bundle. If graph unavail
    - Pending decisions or blockers → address first
    - Communication preferences → adapt tone
 
-2. **Propose session focus** from: pending items > current story/phase > deadlines
+2. **Check MCP health** (non-blocking):
+   - Run `rai mcp list` to detect registered servers
+   - If no servers registered: skip silently (no output)
+   - If servers found: run `rai mcp health <name>` for each
+   - Collect status: healthy count, unhealthy count, total
 
-3. **Present** (adapt verbosity to developer level):
+3. **Propose session focus** from: pending items > current story/phase > deadlines
+
+4. **Present** (adapt verbosity to developer level):
 
 ```
 ## Session: YYYY-MM-DD
 
 **Context:** [Release →] [Epic] → [Story], [phase]
 **Focus:** [goal]
+**MCP:** [{total} servers, all healthy] or [{total} servers, {unhealthy} unhealthy — run /rai-mcp-status]
 **Signals:** [any, or "None"]
 ```
+
+Omit the **MCP:** line entirely if no servers are registered.
 
 ## Output
 
@@ -83,9 +100,11 @@ Loads developer profile, session state, and orientation bundle. If graph unavail
 - [ ] Signals interpreted in priority order
 - [ ] Session focus proposed from pending work
 - [ ] Verbosity adapted to developer ShuHaRi level
+- [ ] MCP health checked when servers registered (silent skip if none)
 
 ## References
 
 - Profile: `~/.rai/developer.yaml`
 - Session state: `.raise/rai/session-state.yaml`
+- MCP: `rai mcp list`, `rai mcp health`, `/rai-mcp-status`
 - Complement: `/rai-session-close`

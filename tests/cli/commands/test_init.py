@@ -416,10 +416,10 @@ class Handler{i}:
         claude_md_path = python_project / "CLAUDE.md"
         assert claude_md_path.exists(), f"Expected {claude_md_path} to exist"
 
-    def test_detect_claude_md_contains_conventions(
+    def test_detect_claude_md_contains_raise_content(
         self, python_project: Path, mock_home: Path
     ) -> None:
-        """Generated CLAUDE.md contains convention summary."""
+        """Generated CLAUDE.md contains RaiSE content (init creates .raise/)."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
@@ -433,17 +433,15 @@ class Handler{i}:
         claude_md_path = python_project / "CLAUDE.md"
         content = claude_md_path.read_text(encoding="utf-8")
 
-        # Should contain project name
-        assert "my-api" in content
-        # Should contain conventions summary
-        assert "Conventions" in content or "convention" in content.lower()
-        # Should reference guardrails
-        assert "guardrails" in content.lower()
+        # After init, .raise/ exists so CLAUDE.md is generated from .raise/ sources
+        assert "Generated from .raise/ canonical source" in content
+        assert "## Rai Identity" in content
+        assert "## Process Rules" in content
 
     def test_detect_greenfield_generates_claude_md(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
-        """--detect on greenfield generates minimal CLAUDE.md."""
+        """--detect on greenfield generates CLAUDE.md from .raise/ sources."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
         with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
@@ -457,7 +455,8 @@ class Handler{i}:
         claude_md_path = greenfield_project / "CLAUDE.md"
         assert claude_md_path.exists()
         content = claude_md_path.read_text(encoding="utf-8")
-        assert "greenfield" in content.lower()
+        # After init, .raise/ exists so CLAUDE.md is generated from .raise/ sources
+        assert "Generated from .raise/ canonical source" in content
 
 
 class TestInitBootstrap:
@@ -570,6 +569,51 @@ class TestInitBootstrap:
         content = canonical.read_text(encoding="utf-8")
         assert "# Rai Memory" in content
         assert "RaiSE Framework Process" in content
+
+
+    def test_init_generates_claude_md_for_raise_project(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init (without --detect) generates CLAUDE.md with Rai sections when .raise/ exists."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+
+        # After init, .raise/ exists (created by bootstrap), so CLAUDE.md should be generated
+        claude_md = greenfield_project / "CLAUDE.md"
+        assert claude_md.exists(), "CLAUDE.md should be generated for RaiSE projects"
+        content = claude_md.read_text(encoding="utf-8")
+
+        # Should have the generated header comment
+        assert "Generated from .raise/ canonical source" in content
+        # Should have Rai-specific sections
+        assert "## Rai Identity" in content
+        assert "## Process Rules" in content
+        assert "## CLI Quick Reference" in content
+        assert "## File Operations" in content
+        assert "## Post-Compaction Context Restoration" in content
+
+    def test_init_creates_personal_dir_with_gitkeep(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """Init should create .raise/rai/personal/.gitkeep for developer workspace."""
+        mock_home.mkdir(parents=True, exist_ok=True)
+
+        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app, ["init", "--path", str(greenfield_project)], catch_exceptions=False
+            )
+
+        assert result.exit_code == 0
+        personal_dir = greenfield_project / ".raise" / "rai" / "personal"
+        assert personal_dir.is_dir()
+        gitkeep = personal_dir / ".gitkeep"
+        assert gitkeep.exists(), ".raise/rai/personal/.gitkeep should be created by init"
 
 
 class TestInitMemoryMdBranches:
@@ -819,7 +863,9 @@ class TestInitIdeFlag:
 
         assert result.exit_code == 0
         # Claude structure
-        assert (greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
         assert not (greenfield_project / ".agent").exists()
 
     def test_explicit_claude_identical_to_default(
@@ -836,7 +882,9 @@ class TestInitIdeFlag:
             )
 
         assert result.exit_code == 0
-        assert (greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
         assert not (greenfield_project / ".agent").exists()
 
     def test_antigravity_produces_agent_structure(
@@ -854,7 +902,9 @@ class TestInitIdeFlag:
 
         assert result.exit_code == 0
         # Antigravity skills structure
-        assert (greenfield_project / ".agent" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".agent" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
         # Workflows directory created by scaffold_workflows
         assert (greenfield_project / ".agent" / "workflows").is_dir()
         # No Claude structure
@@ -869,9 +919,7 @@ class TestInitIdeFlag:
 
         with (
             patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home),
-            patch(
-                "rai_cli.config.paths.get_claude_memory_path"
-            ) as mock_claude_mem,
+            patch("rai_cli.config.paths.get_claude_memory_path") as mock_claude_mem,
         ):
             result = runner.invoke(
                 app,
@@ -897,8 +945,10 @@ class TestInitIdeFlag:
                 app,
                 [
                     "init",
-                    "--path", str(brownfield_project),
-                    "--ide", "antigravity",
+                    "--path",
+                    str(brownfield_project),
+                    "--ide",
+                    "antigravity",
                     "--detect",
                 ],
                 catch_exceptions=False,
@@ -919,7 +969,9 @@ class TestInitIdeFlag:
         for ide in ("claude", "antigravity"):
             project = greenfield_project / ide
             project.mkdir()
-            with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            with patch(
+                "rai_cli.onboarding.profile.get_rai_home", return_value=mock_home
+            ):
                 result = runner.invoke(
                     app,
                     ["init", "--path", str(project), "--ide", ide],
@@ -980,9 +1032,12 @@ class TestInitAgentFlag:
                 app,
                 [
                     "init",
-                    "--path", str(greenfield_project),
-                    "--agent", "claude",
-                    "--agent", "cursor",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "claude",
+                    "--agent",
+                    "cursor",
                 ],
                 catch_exceptions=False,
             )
@@ -1006,9 +1061,12 @@ class TestInitAgentFlag:
                 app,
                 [
                     "init",
-                    "--path", str(greenfield_project),
-                    "--agent", "claude",
-                    "--agent", "cursor",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "claude",
+                    "--agent",
+                    "cursor",
                 ],
                 catch_exceptions=False,
             )
@@ -1029,9 +1087,12 @@ class TestInitAgentFlag:
                 app,
                 [
                     "init",
-                    "--path", str(greenfield_project),
-                    "--agent", "cursor",
-                    "--ide", "antigravity",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "cursor",
+                    "--ide",
+                    "antigravity",
                 ],
                 catch_exceptions=False,
             )
@@ -1072,7 +1133,9 @@ class TestInitAgentFlag:
             )
 
         assert result.exit_code == 0
-        assert (greenfield_project / ".roo" / "skills" / "rai-session-start" / "SKILL.md").exists()
+        assert (
+            greenfield_project / ".roo" / "skills" / "rai-session-start" / "SKILL.md"
+        ).exists()
 
     def test_agent_roo_detect_generates_instructions(
         self, greenfield_project: Path, mock_home: Path
@@ -1083,7 +1146,14 @@ class TestInitAgentFlag:
         with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(
                 app,
-                ["init", "--path", str(greenfield_project), "--agent", "roo", "--detect"],
+                [
+                    "init",
+                    "--path",
+                    str(greenfield_project),
+                    "--agent",
+                    "roo",
+                    "--detect",
+                ],
                 catch_exceptions=False,
             )
 
