@@ -24,7 +24,7 @@ class TestDoctorCLI:
         assert result.exit_code == 0
 
     def test_doctor_unknown_category(self) -> None:
-        result = runner.invoke(app, ["doctor", "nonexistent"])
+        result = runner.invoke(app, ["doctor", "--category", "nonexistent"])
         assert result.exit_code == 1
         assert "Unknown category" in result.output
 

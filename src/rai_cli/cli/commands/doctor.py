@@ -57,7 +57,7 @@ def doctor(
     ] = False,
     category: Annotated[
         str | None,
-        typer.Argument(help="Run only this check category"),
+        typer.Option("--category", "-c", help="Run only this check category"),
     ] = None,
 ) -> None:
     """Run diagnostic checks on your RaiSE setup."""
@@ -139,3 +139,39 @@ def doctor(
 
     if errors > 0:
         raise typer.Exit(1)
+
+
+@doctor_app.command()
+def report(
+    send: Annotated[
+        bool, typer.Option("--send", help="Open email client with report"),
+    ] = False,
+) -> None:
+    """Generate diagnostic report, optionally send via email."""
+    from rai_cli.doctor.report import (
+        SUPPORT_EMAIL,
+        generate_report,
+        open_mailto,
+        save_report,
+    )
+
+    registry = CheckRegistry()
+    registry.discover()
+    context = DoctorContext(working_dir=Path.cwd())
+    results = run_checks(registry, context)
+
+    report_data = generate_report(results, Path.cwd())
+    saved = save_report(report_data, Path.cwd())
+    out = Console()
+    out.print(f"Report saved to {saved}")
+
+    if send:
+        opened = open_mailto(report_data)
+        if opened:
+            out.print("Email client opened. Review and send.")
+        else:
+            out.print("Could not open email client.")
+            out.print(f"Email to: {SUPPORT_EMAIL}")
+            out.print(f"Attach or paste the report from: {saved}")
+    else:
+        out.print("To send: rai doctor report --send")
