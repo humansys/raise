@@ -55,7 +55,7 @@ rai --help
 
 ```bash
 # 1. Clone and checkout the development branch
-git clone https://gitlab.com/humansys-demos/product/raise1/raise-commons.git
+git clone https://github.com/humansys-ai/raise-commons.git
 cd raise-commons
 git checkout dev
 
@@ -169,7 +169,7 @@ Each session builds on the last. Over time, Rai becomes a more effective collabo
 
 ## Available Skills
 
-Skills are structured processes that guide AI-assisted development. Run them as `/skill-name` in Claude Code.
+Skills are structured processes that guide AI-assisted development. Run them as `/skill-name` in Claude Code. There are currently 37 skills.
 
 ### Session Lifecycle
 | Skill | Purpose |
@@ -187,18 +187,21 @@ Skills are structured processes that guide AI-assisted development. Run them as 
 | `/rai-story-implement` | Execute with TDD and validation gates |
 | `/rai-story-review` | Retrospective and learnings |
 | `/rai-story-close` | Merge, cleanup, tracking |
+| `/rai-story-run` | Chain the full story lifecycle |
 
 ### Epic Lifecycle
 | Skill | Purpose |
 |-------|---------|
-| `/rai-epic-start` | Initialize an epic with branch |
+| `/rai-epic-start` | Initialize an epic scope and directory |
 | `/rai-epic-design` | Design multi-story epics |
 | `/rai-epic-plan` | Sequence stories into plans |
-| `/rai-epic-close` | Epic retrospective and merge |
+| `/rai-epic-close` | Epic retrospective and metrics |
+| `/rai-epic-run` | Execute epic lifecycle phases |
 
 ### Discovery Skills
 | Skill | Purpose |
 |-------|---------|
+| `/rai-discover` | Run the full discovery pipeline |
 | `/rai-discover-start` | Initialize codebase discovery |
 | `/rai-discover-scan` | Extract and describe components |
 | `/rai-discover-validate` | Validate synthesized descriptions with human review |
@@ -216,9 +219,18 @@ Skills are structured processes that guide AI-assisted development. Run them as 
 |-------|---------|
 | `/rai-research` | Epistemologically rigorous research |
 | `/rai-debug` | Root cause analysis (5 Whys, Ishikawa) |
+| `/rai-bugfix` | Structured bugfix workflow |
 | `/rai-quality-review` | Critical code review with external auditor perspective |
 | `/rai-architecture-review` | Evaluate design proportionality and necessity |
 | `/rai-problem-shape` | Guided problem definition at portfolio level |
+| `/rai-doctor` | Diagnose and fix RaiSE project health issues |
+
+### MCP Integration
+| Skill | Purpose |
+|-------|---------|
+| `/rai-mcp-add` | Add an MCP server to the project |
+| `/rai-mcp-remove` | Remove an MCP server from the project |
+| `/rai-mcp-status` | Check MCP server health and status |
 
 ### Maintenance
 | Skill | Purpose |
@@ -226,6 +238,8 @@ Skills are structured processes that guide AI-assisted development. Run them as 
 | `/rai-docs-update` | Sync architecture docs with code |
 | `/rai-framework-sync` | Sync framework files across locations |
 | `/rai-publish` | Structured release workflow with quality gates |
+| `/rai-skill-create` | Create new skills with framework integration |
+| `/rai-skillset-manage` | Manage skill sets |
 
 ---
 
@@ -266,7 +280,7 @@ rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 
 ```
 raise-commons/
-├── .claude/skills/      # Claude Code skills (27 skills)
+├── .claude/skills/      # Claude Code skills (37 skills)
 │
 ├── framework/           # Public textbook (concepts, reference)
 │   ├── reference/       #   Constitution, glossary, philosophy
@@ -289,7 +303,7 @@ raise-commons/
 ├── src/rai_cli/         # CLI toolkit (Python)
 │
 ├── work/                # Work in progress
-│   └── stories/         #   Story artifacts (scope, design, plan, retro)
+│   └── epics/           #   Epic directories containing story artifacts
 │
 └── dev/                 # Framework maintenance
     ├── decisions/       #   ADRs (Architecture Decision Records)
@@ -303,12 +317,12 @@ raise-commons/
 ```
 main (stable releases)
   └── dev (development)
-        └── epic/e{N}/{name}
-              └── story/s{N}.{M}/{name}
+        └── story/s{N}.{M}/{name}
 ```
 
 - Work on `dev` (development branch)
-- Stories branch from and merge back to their epic or `dev`
+- Stories branch from and merge to `dev`
+- Epics are logical containers (directory + tracker), not branches
 - `main` receives releases from `dev`
 
 ---
@@ -342,12 +356,14 @@ From the [Constitution](framework/reference/constitution.md):
 
 ## Status
 
-Current stable release: `v2.1.0`. The framework is being used in production.
+Current stable release: `v2.2.0`. The framework is being used in production.
+
+For CLI reference documentation, see the [CLI Quick Reference](framework/reference/cli-reference.md).
 
 We value your feedback:
 
-- **Questions?** Open an [issue](https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/issues)
-- **Found a bug?** Open an [issue](https://gitlab.com/humansys-demos/product/raise1/raise-commons/-/issues) with reproduction steps
+- **Questions?** Open an [issue](https://github.com/humansys-ai/raise-commons/issues)
+- **Found a bug?** Open an [issue](https://github.com/humansys-ai/raise-commons/issues) with reproduction steps
 - **Ideas?** We want to hear them — open an issue or reach out directly
 
 ---
