@@ -1,0 +1,87 @@
+---
+title: Wire a Lifecycle Hook
+description: How to create Claude Code lifecycle hooks for RaiSE — shell scripts that run on agent events.
+---
+
+Lifecycle hooks are shell scripts that run on Claude Code events. They enable side effects — logging, journal snapshots, notifications — without blocking the main workflow.
+
+## Hook Configuration
+
+Hooks are configured in `.claude/settings.json` or `.claude/settings.local.json` under a `hooks` key (when supported), or placed as scripts in `.claude/scripts/` and referenced from Claude Code's hook system.
+
+## Available Hook Points
+
+Claude Code supports these hook events:
+
+| Hook | Fires When | Can Block? |
+|------|-----------|------------|
+| `PreToolUse` | Before a tool executes | Yes (stdout = decision) |
+| `PostToolUse` | After a tool completes | No |
+| `PreCompact` | Before context compaction | No (stdout ignored) |
+
+- **PreToolUse** hooks can return `ALLOW`, `DENY`, or `ASK` to control tool execution.
+- **PostToolUse** and **PreCompact** hooks are fire-and-forget — their stdout is ignored.
+
+## Creating a Hook Script
+
+Hook scripts are standard bash scripts. Place them in `.claude/scripts/`:
+
+```bash
+#!/bin/bash
+# .claude/scripts/pre-compact-journal.sh
+# Log journal state before context compaction
+
+PROJECT_DIR="/path/to/your/project"
+LOG="/tmp/rai-hook-pre-compact.log"
+
+exec 2>"$LOG"
+echo "=== pre-compact-journal.sh ===" >&2
+echo "date: $(date)" >&2
+
+export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:$PATH"
+
+OUTPUT=$(uv run --project "$PROJECT_DIR" \
+  rai session journal show --compact --project "$PROJECT_DIR" 2>&1)
+echo "journal snapshot: $OUTPUT" >&2
+```
+
+Make it executable:
+
+```bash
+chmod +x .claude/scripts/pre-compact-journal.sh
+```
+
+## Error Isolation
+
+Hooks follow error isolation principles:
+
+- A failing hook does not crash the agent session
+- Errors are logged but do not block the main workflow
+- Use `exec 2>"$LOG"` to capture stderr for debugging
+- Always set PATH explicitly — hook environment is unpredictable
+
+## Design Guidelines
+
+1. **Keep hooks fast.** They run synchronously before/after tool calls. Slow hooks degrade the agent experience.
+2. **Log to files, not stdout.** For PreCompact and PostToolUse, stdout is ignored anyway. For PreToolUse, stdout controls the decision.
+3. **Hardcode paths.** The hook environment does not reliably inherit shell variables. Use absolute paths.
+4. **Fail silently.** A broken hook should not break the workflow. Wrap risky operations in error handling.
+
+## Example: PreToolUse Gate
+
+A hook that blocks dangerous commands:
+
+```bash
+#!/bin/bash
+# .claude/scripts/block-force-push.sh
+# Deny git push --force to main
+
+INPUT=$(cat -)
+if echo "$INPUT" | grep -q "push.*--force.*main"; then
+  echo "DENY: force push to main is not allowed"
+  exit 0
+fi
+echo "ALLOW"
+```
+
+This prevents the AI from force-pushing to main, even if instructed to do so.
