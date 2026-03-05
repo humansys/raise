@@ -7,7 +7,6 @@ of adapters regardless of their concrete implementation.
 Architecture: ADR-033 (Open-core adapter architecture), ADR-034 (Governance extensibility)
 """
 
-from __future__ import annotations
 
 from enum import StrEnum
 from typing import Any
@@ -197,8 +196,8 @@ class BacklogItem(BaseModel):
     labels: list[str] = Field(default_factory=list)
     priority: str | None = Field(default=None, description="Priority level")
     assignee: str | None = Field(default=None, description="Assignee identifier")
-    comments: list[BacklogComment] = Field(default_factory=list)
-    links: list[BacklogLink] = Field(default_factory=list)
+    comments: list[BacklogComment] = Field(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
+    links: list[BacklogLink] = Field(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
     created: str = Field(default="", description="ISO 8601 creation timestamp")
     updated: str = Field(default="", description="ISO 8601 last update timestamp")
 

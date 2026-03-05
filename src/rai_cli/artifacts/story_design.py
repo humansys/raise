@@ -1,7 +1,5 @@
 """Story-design artifact schema and governance validators."""
 
-from __future__ import annotations
-
 from enum import StrEnum
 from typing import Literal
 
@@ -52,11 +50,11 @@ class StoryDesignContent(BaseModel):
     summary: str
     complexity: Complexity
     acceptance_criteria: list[AcceptanceCriterion] = Field(min_length=1, max_length=10)
-    integration_points: list[IntegrationPoint] = Field(default_factory=list)
-    decisions: list[Decision] = Field(default_factory=list)
+    integration_points: list[IntegrationPoint] = Field(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
+    decisions: list[Decision] = Field(default_factory=list)  # pyright: ignore[reportUnknownVariableType]
 
     @model_validator(mode="after")
-    def _validate_decisions_have_rationale(self) -> StoryDesignContent:
+    def _validate_decisions_have_rationale(self) -> "StoryDesignContent":
         for decision in self.decisions:
             if not decision.rationale.strip():
                 msg = f"Decision {decision.id}: rationale must not be empty"
@@ -67,5 +65,5 @@ class StoryDesignContent(BaseModel):
 class StoryDesignArtifact(SkillArtifact):
     """A story-design artifact with typed content."""
 
-    artifact_type: Literal[ArtifactType.STORY_DESIGN] = ArtifactType.STORY_DESIGN
-    content: StoryDesignContent
+    artifact_type: Literal[ArtifactType.STORY_DESIGN] = ArtifactType.STORY_DESIGN  # pyright: ignore[reportIncompatibleVariableOverride]
+    content: StoryDesignContent  # pyright: ignore[reportIncompatibleVariableOverride,reportGeneralTypeIssues]

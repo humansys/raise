@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Complete CLI reference documentation: 17 command group pages covering 72 subcommands (E348)
+- Developer extension guides: adapters, skills, MCP servers, lifecycle hooks (E348)
+- `llms.txt` and `llms-full.txt` for AI agent documentation discovery (E348)
+- AGENTS.md rewritten with comprehensive agent instructions (E348)
+- `/rai-doctor` skill: conversational wrapper for CLI diagnostics (E352)
+- `/rai-story-run` and `/rai-epic-run`: orchestrator skills for full lifecycle automation
+- `/rai-bugfix`: formal 6-phase bug fix lifecycle with traceability
+- `/rai-mcp-add`, `/rai-mcp-remove`, `/rai-mcp-status`: MCP server management skills
+- `/rai-skill-create`, `/rai-skillset-manage`: skill authoring and set management
+- 9 missing skills added to `DISTRIBUTABLE_SKILLS` registry
+- `ArtifactNode` graph node type for work artifacts
+- Doctor report generation and email via mailto (E352)
+- Doctor `--fix` auto-remediation with backup (E352)
+
+### Fixed
+- README: version v2.2.0, branch model (no epic branches), GitHub URLs, 37 skills count
+- CONTRIBUTING: branch reference `v2` → `dev`
+- Install docs: Python 3.12-3.13 requirement, pipx recommended, macOS system Python warning
+- All doc site pages updated from deprecated `rai memory` to current `rai graph`/`rai pattern`/`rai signal` commands
+- Pyright errors in artifacts module (Pydantic/pyright compatibility)
+- Consolidated story-design skill output from 3 locations to 2 (removed `work/docs/` redundancy)
+
+### Changed
+- Documentation site restructured: multi-file CLI reference with workflow ordering
+- Docs deployed to docs.raiseframework.ai via Cloudflare Pages
+
 ## [2.1.0] - 2026-02-24
 
 ### Added
