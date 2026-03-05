@@ -11,7 +11,7 @@ from __future__ import annotations
 import contextlib
 import json
 import logging
-import os
+import subprocess
 import time
 from contextlib import AsyncExitStack
 from typing import Any
@@ -148,10 +148,10 @@ class McpBridge:
         try:
             # Redirect MCP server stderr to devnull to suppress banner/warning noise.
             # Server errors are captured via MCP protocol (isError), not stderr.
-            errlog = open(os.devnull, "w")  # noqa: SIM115, ASYNC230
-            stack.callback(errlog.close)
+            # subprocess.DEVNULL is an int constant (-3) accepted by anyio.open_process;
+            # avoids sync open() in async context (RAISE-436).
             read, write = await stack.enter_async_context(
-                stdio_client(params, errlog=errlog)
+                stdio_client(params, errlog=subprocess.DEVNULL)  # type: ignore[arg-type]
             )
             session = await stack.enter_async_context(ClientSession(read, write))
             await session.initialize()
