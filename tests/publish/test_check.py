@@ -190,5 +190,5 @@ class TestRunChecks:
                 changelog_path=Path(changelog),  # type: ignore[arg-type]
             )
 
-        # Should have 10 gates per design
-        assert len(results) == 10
+        # 6 command gates + 3 file checks = 9
+        assert len(results) == 9
