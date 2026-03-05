@@ -471,6 +471,8 @@ class TestInitCompleteEvent:
 
         mock_bootstrap = MagicMock()
         mock_bootstrap.already_existed = True
+        mock_bootstrap.patterns_added = 0
+        mock_bootstrap.patterns_updated = 0
 
         with (
             patch(
@@ -517,12 +519,17 @@ class TestInitCompleteEvent:
                 return_value=mock_skills_result,
             ),
             patch("rai_cli.onboarding.workflows.scaffold_workflows"),
+            patch(
+                "rai_cli.cli.commands.init.generate_instructions",
+                return_value="# Test CLAUDE.md",
+            ),
         ):
             # Create necessary dirs
             (tmp_path / "memory").mkdir(parents=True, exist_ok=True)
             (tmp_path / "claude").mkdir(parents=True, exist_ok=True)
             (tmp_path / "framework").mkdir(parents=True, exist_ok=True)
             (tmp_path / "framework" / "methodology.yaml").write_text("")
+            (tmp_path / ".raise").mkdir(parents=True, exist_ok=True)
 
             result = runner.invoke(app, ["--path", str(tmp_path)])
 
