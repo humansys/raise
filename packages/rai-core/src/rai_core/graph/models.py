@@ -156,6 +156,10 @@ class ReleaseNode(GraphNode, node_type="release"):
     """Release milestones. Extension: changelog, artifact URLs."""
 
 
+class ArtifactNode(GraphNode, node_type="artifact"):
+    """Work artifacts (scope, design, plan docs). Extension: versioning, approval status."""
+
+
 # --- Edge type system (open for plugins, flat — no hierarchy needed) ---
 EdgeType = str
 
