@@ -910,3 +910,77 @@ class TestProcessSessionCloseProgress:
         assert state.progress is None
         assert state.completed_epics == []
         mp.undo()
+
+
+class TestProcessSessionCloseRemovesActiveSession:
+    """Regression tests for RAISE-327 and RAISE-155."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_close_removes_session_with_divergent_id(self, tmp_path: Path) -> None:
+        """RAISE-327: close must use active session_id, not append_session's new ID."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Test")
+
+        from rai_cli.onboarding.profile import save_developer_profile, start_session
+
+        # Start a session — gets a real session_id like SES-177
+        active_session_id = "SES-177"
+        active, _ = start_session(
+            profile, session_id=active_session_id, project_path=str(project), agent="test"
+        )
+        save_developer_profile(active)
+        assert len(active.active_sessions) == 1
+
+        # Pre-populate some sessions so append_session generates SES-003 (not SES-177)
+        index_file = project / ".raise" / "rai" / "personal" / "sessions" / "index.jsonl"
+        index_file.write_text('{"id":"SES-001"}\n{"id":"SES-002"}\n')
+
+        close_input = CloseInput(summary="done")
+        # Pass the actual active session_id
+        process_session_close(close_input, active, project, session_id=active_session_id)
+
+        from rai_cli.onboarding.profile import load_developer_profile
+
+        loaded = load_developer_profile()
+        assert loaded is not None
+        assert len(loaded.active_sessions) == 0, (
+            f"Session {active_session_id} should have been removed but "
+            f"active_sessions still has: {[s.session_id for s in loaded.active_sessions]}"
+        )
+        mp.undo()
+
+    def test_start_session_is_idempotent_per_project(self, tmp_path: Path) -> None:
+        """RAISE-155: starting twice for same project should not duplicate entries."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        from rai_cli.onboarding.profile import start_session
+
+        profile = DeveloperProfile(name="Test")
+        project_path = str(tmp_path / "project")
+
+        # Start same project twice
+        updated1, _ = start_session(profile, session_id="SES-1", project_path=project_path, agent="test")
+        updated2, _ = start_session(updated1, session_id="SES-2", project_path=project_path, agent="test")
+
+        assert len(updated2.active_sessions) == 1, (
+            f"Expected 1 session but got {len(updated2.active_sessions)}: "
+            f"{[s.session_id for s in updated2.active_sessions]}"
+        )
+        # Should keep the newer session
+        assert updated2.active_sessions[0].session_id == "SES-2"
+        mp.undo()
