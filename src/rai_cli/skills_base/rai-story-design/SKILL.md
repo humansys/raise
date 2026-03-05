@@ -23,8 +23,7 @@ metadata:
     - scope_md: file_path, optional, previous_skill
   raise.outputs: |
     - design_yaml: file_path, .raise/artifacts/
-    - design_md: file_path, work/docs/
-    - design_md_legacy: file_path, next_skill
+    - design_md: file_path, next_skill
 ---
 
 # Story Design
@@ -138,7 +137,7 @@ Criteria are specific, testable, and traceable. Spec reviewable in <5 minutes.
 
 ## Output
 
-After completing all steps, produce the design in three locations:
+After completing all steps, produce the design in two locations:
 
 ### 1. Typed artifact (source of truth)
 
@@ -173,19 +172,14 @@ refs:
 metadata: {}
 ```
 
-### 2. Generated Markdown
+### 2. Human-readable Markdown
 
-Write human-readable Markdown to `work/docs/s{N}.{M}-design.md` with: title, metadata, summary, acceptance criteria, integration points, decisions.
-
-### 3. Legacy copy
-
-Also write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` for compatibility with other skills that reference this path.
+Write the design as `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` — colocated with other story artifacts (story.md, scope.md, plan.md, retrospective.md).
 
 | Item | Destination |
 |------|-------------|
 | Typed artifact | `.raise/artifacts/s{N}.{M}-design.yaml` |
-| Generated docs | `work/docs/s{N}.{M}-design.md` |
-| Legacy copy | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
+| Design document | `work/epics/e{N}-{name}/stories/s{N}.{M}-design.md` |
 | Next | `/rai-story-plan` |
 
 ## Quality Checklist

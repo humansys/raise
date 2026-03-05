@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from pathlib import Path
 
-from rai_cli.artifacts.renderer import render_artifact, write_doc
+from rai_cli.artifacts.renderer import render_artifact
 from rai_cli.artifacts.story_design import (
     AcceptanceCriterion,
     Complexity,
@@ -104,20 +103,3 @@ class TestRenderArtifact:
         md = render_artifact(_make_minimal_artifact())
         assert "## Acceptance Criteria" in md
         assert "1. [AC1] It works" in md
-
-
-class TestWriteDoc:
-    def test_creates_file(self, project_root) -> None:
-        path = write_doc(_make_full_artifact(), project_root)
-        assert path.exists()
-        assert path.name == "s354.1-design.md"
-        assert path.parent.name == "docs"
-
-    def test_creates_directory(self, tmp_path: Path) -> None:
-        write_doc(_make_full_artifact(), tmp_path)
-        assert (tmp_path / "work" / "docs").is_dir()
-
-    def test_content_matches_render(self, project_root) -> None:
-        artifact = _make_full_artifact()
-        path = write_doc(artifact, project_root)
-        assert path.read_text() == render_artifact(artifact)
