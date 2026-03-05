@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from rai_cli.onboarding.bootstrap import BootstrapResult, bootstrap_rai_base
+from rai_cli.onboarding.bootstrap import BootstrapResult, bootstrap_rai_base, ensure_gitignore
 
 
 class TestBootstrapRaiBase:
@@ -285,6 +285,69 @@ class TestBasePatternMerge:
         assert first_content == second_content
         assert result2.patterns_added == 0
         assert result2.patterns_updated == 0
+
+
+class TestEnsureGitignore:
+    """Tests for ensure_gitignore() — adds .raise/rai/personal/ to .gitignore."""
+
+    def test_creates_gitignore_when_missing(self, tmp_path: Path) -> None:
+        """Should create .gitignore with personal entry when file does not exist."""
+        result = ensure_gitignore(tmp_path)
+
+        gitignore = tmp_path / ".gitignore"
+        assert gitignore.exists()
+        assert result is True
+        content = gitignore.read_text(encoding="utf-8")
+        assert ".raise/rai/personal/" in content
+
+    def test_appends_to_existing_gitignore(self, tmp_path: Path) -> None:
+        """Should append entry to existing .gitignore without clobbering."""
+        gitignore = tmp_path / ".gitignore"
+        gitignore.write_text("node_modules/\n.env\n", encoding="utf-8")
+
+        result = ensure_gitignore(tmp_path)
+
+        assert result is True
+        content = gitignore.read_text(encoding="utf-8")
+        assert "node_modules/" in content
+        assert ".env" in content
+        assert ".raise/rai/personal/" in content
+
+    def test_idempotent_no_duplicates(self, tmp_path: Path) -> None:
+        """Running twice should not duplicate entries."""
+        ensure_gitignore(tmp_path)
+        result = ensure_gitignore(tmp_path)
+
+        assert result is False
+        content = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        assert content.count(".raise/rai/personal/") == 1
+
+    def test_skips_when_entry_already_present(self, tmp_path: Path) -> None:
+        """Should not add entry if it already exists in .gitignore."""
+        gitignore = tmp_path / ".gitignore"
+        gitignore.write_text("# existing\n.raise/rai/personal/\n", encoding="utf-8")
+
+        result = ensure_gitignore(tmp_path)
+
+        assert result is False
+        content = gitignore.read_text(encoding="utf-8")
+        assert content.count(".raise/rai/personal/") == 1
+
+    def test_adds_comment_before_entry(self, tmp_path: Path) -> None:
+        """Should include a descriptive comment before the entry."""
+        ensure_gitignore(tmp_path)
+
+        content = (tmp_path / ".gitignore").read_text(encoding="utf-8")
+        assert "# RaiSE personal directory" in content
+
+    def test_bootstrap_calls_ensure_gitignore(self, tmp_path: Path) -> None:
+        """bootstrap_rai_base should add .gitignore entries."""
+        bootstrap_rai_base(tmp_path)
+
+        gitignore = tmp_path / ".gitignore"
+        assert gitignore.exists()
+        content = gitignore.read_text(encoding="utf-8")
+        assert ".raise/rai/personal/" in content
 
 
 class TestBootstrapResult:
