@@ -606,6 +606,18 @@ def init_command(
         )
         raise typer.Exit(code=0 if not has_updates else 1)
 
+    # Generate CLAUDE.md (or agent-specific instructions) for RaiSE projects
+    # This runs always (not just on --detect) so CLAUDE.md stays in sync with .raise/
+    if (project_path / ".raise").is_dir():
+        instructions_content = generate_instructions(
+            project_name=project_name,
+            detection=detection,
+            project_path=project_path,
+        )
+        instructions_path = project_path / first_config.instructions_file
+        instructions_path.parent.mkdir(parents=True, exist_ok=True)
+        instructions_path.write_text(instructions_content, encoding="utf-8")
+
     # Emit init:complete event
     emitter = create_emitter()
     emitter.emit(
@@ -666,6 +678,9 @@ def init_command(
 
     # Convention detection, guardrails, and instructions file generation
     instructions_path = project_path / first_config.instructions_file
+    # RaiSE projects already have CLAUDE.md generated from .raise/ sources above;
+    # the --detect block should still produce guardrails but not overwrite CLAUDE.md
+    raise_instructions_written = (project_path / ".raise").is_dir()
     if detect and detection.project_type == ProjectType.BROWNFIELD:
         conventions = detect_conventions(project_path)
 
@@ -678,14 +693,15 @@ def init_command(
             guardrails_path = guardrails_dir / "guardrails.md"
             guardrails_path.write_text(guardrails_content, encoding="utf-8")
 
-            instructions_content = generate_instructions(
-                project_name=project_name,
-                detection=detection,
-                conventions=conventions,
-                agent_config=first_config,
-            )
-            instructions_path.parent.mkdir(parents=True, exist_ok=True)
-            instructions_path.write_text(instructions_content, encoding="utf-8")
+            if not raise_instructions_written:
+                instructions_content = generate_instructions(
+                    project_name=project_name,
+                    detection=detection,
+                    conventions=conventions,
+                    agent_config=first_config,
+                )
+                instructions_path.parent.mkdir(parents=True, exist_ok=True)
+                instructions_path.write_text(instructions_content, encoding="utf-8")
 
             conf = conventions.overall_confidence.value.upper()
             if profile.experience_level == ExperienceLevel.RI:
@@ -702,7 +718,7 @@ def init_command(
                     f"  - [bold]{instructions_path}[/bold] (project context)\n\n"
                     f"[dim]Review and adjust as needed.[/dim]"
                 )
-    elif detect and detection.project_type == ProjectType.GREENFIELD:
+    elif detect and detection.project_type == ProjectType.GREENFIELD and not raise_instructions_written:
         instructions_content = generate_instructions(
             project_name=project_name,
             detection=detection,
