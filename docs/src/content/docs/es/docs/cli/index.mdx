@@ -127,7 +127,7 @@ rai session context --sections governance,behavioral,coaching --project .
 
 ## Memoria
 
-### `rai memory query`
+### `rai graph query`
 
 Busca en la memoria unificada conceptos relevantes. La memoria contiene todas las fuentes de contexto: gobernanza (principios, requisitos, términos), memoria (patrones, calibración, sesiones), skills (metadatos de workflow) y trabajo (epics, stories, decisiones).
 
@@ -143,19 +143,19 @@ Busca en la memoria unificada conceptos relevantes. La memoria contiene todas la
 
 ```bash
 # Buscar por palabras clave
-rai memory query "planning estimation"
+rai graph query "planning estimation"
 
 # Filtrar solo patrones
-rai memory query "testing" --types pattern,calibration
+rai graph query "testing" --types pattern,calibration
 
 # Buscar concepto específico por ID
-rai memory query "PAT-001" --strategy concept_lookup
+rai graph query "PAT-001" --strategy concept_lookup
 
 # Salida en JSON
-rai memory query "velocity" --format json
+rai graph query "velocity" --format json
 ```
 
-### `rai memory context`
+### `rai graph context`
 
 Muestra el contexto arquitectónico completo de un módulo. Retorna el bounded context (dominio), capa arquitectónica, guardrails aplicables (restricciones) y dependencias del módulo.
 
@@ -166,13 +166,13 @@ Muestra el contexto arquitectónico completo de un módulo. Retorna el bounded c
 
 ```bash
 # Mostrar contexto del módulo de memoria
-rai memory context mod-memory
+rai graph context mod-memory
 
 # Salida en JSON
-rai memory context mod-memory --format json
+rai graph context mod-memory --format json
 ```
 
-### `rai memory build`
+### `rai graph build`
 
 Construye el índice de memoria unificado desde todas las fuentes: documentos de gobernanza, memoria (patrones, calibración, sesiones), seguimiento de trabajo (epics, stories), skills y componentes de discovery.
 
@@ -182,13 +182,13 @@ Construye el índice de memoria unificado desde todas las fuentes: documentos de
 
 ```bash
 # Construir índice en ubicación por defecto
-rai memory build
+rai graph build
 
 # Guardar en ubicación personalizada
-rai memory build --output custom_index.json
+rai graph build --output custom_index.json
 ```
 
-### `rai memory validate`
+### `rai graph validate`
 
 Valida la estructura y relaciones del índice de memoria. Verifica ciclos en relaciones `depends_on`, tipos de relación válidos y que todos los targets de edges existan como nodos.
 
@@ -198,13 +198,13 @@ Valida la estructura y relaciones del índice de memoria. Verifica ciclos en rel
 
 ```bash
 # Validar índice por defecto
-rai memory validate
+rai graph validate
 
 # Validar archivo específico
-rai memory validate --index custom_index.json
+rai graph validate --index custom_index.json
 ```
 
-### `rai memory list`
+### `rai graph list`
 
 Lista los conceptos en el índice de memoria. Muestra conceptos para inspección y debugging.
 
@@ -217,16 +217,16 @@ Lista los conceptos en el índice de memoria. Muestra conceptos para inspección
 
 ```bash
 # Mostrar tabla resumen
-rai memory list
+rai graph list
 
 # Mostrar solo patrones/calibraciones/sesiones
-rai memory list --memory-only
+rai graph list --memory-only
 
 # Exportar como JSON
-rai memory list --format json --output memory.json
+rai graph list --format json --output memory.json
 ```
 
-### `rai memory extract`
+### `rai graph extract`
 
 Extrae conceptos de archivos markdown de gobernanza. Si no se provee ruta, extrae de todas las ubicaciones estándar de gobernanza (`governance/prd.md`, `governance/vision.md`, `framework/reference/constitution.md`).
 
@@ -236,13 +236,13 @@ Extrae conceptos de archivos markdown de gobernanza. Si no se provee ruta, extra
 
 ```bash
 # Extraer de todos los archivos de gobernanza
-rai memory extract
+rai graph extract
 
 # Extraer de archivo específico
-rai memory extract governance/prd.md
+rai graph extract governance/prd.md
 ```
 
-### `rai memory add-pattern`
+### `rai pattern add`
 
 Agrega un nuevo patrón a la memoria. Los patrones capturan aprendizajes del desarrollo — mejoras de proceso, descubrimientos técnicos, decisiones arquitectónicas.
 
@@ -256,19 +256,19 @@ Agrega un nuevo patrón a la memoria. Los patrones capturan aprendizajes del des
 
 ```bash
 # Agregar patrón de proceso
-rai memory add-pattern "HITL before commits" -c "git,workflow"
+rai pattern add "HITL before commits" -c "git,workflow"
 
 # Agregar patrón técnico
-rai memory add-pattern "Use capsys for stdout tests" -t technical -c "pytest,testing"
+rai pattern add "Use capsys for stdout tests" -t technical -c "pytest,testing"
 
 # Agregar con referencia de origen
-rai memory add-pattern "BFS reuse across modules" -t architecture --from S2.3
+rai pattern add "BFS reuse across modules" -t architecture --from S2.3
 
 # Agregar a scope personal
-rai memory add-pattern "My workflow preference" --scope personal
+rai pattern add "My workflow preference" --scope personal
 ```
 
-### `rai memory reinforce`
+### `rai pattern reinforce`
 
 Registra una señal de refuerzo para un patrón. Se llama al revisar una story para indicar si el patrón fue aplicado (`1`), no fue relevante (`0`), o fue contradicho (`-1`). El voto `0` (N/A) no cuenta hacia el total de evaluaciones — úsalo libremente para patrones irrelevantes.
 
@@ -281,16 +281,16 @@ Registra una señal de refuerzo para un patrón. Se llama al revisar una story p
 
 ```bash
 # El patrón fue seguido durante la implementación
-rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170
+rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170
 
 # El patrón no fue relevante para esta story
-rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170
+rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170
 
 # El patrón fue contradicho
-rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170
+rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170
 ```
 
-### `rai memory add-calibration`
+### `rai signal emit-calibration`
 
 Agrega datos de calibración para una story completada. Registra estimación vs. duración real para análisis de velocidad.
 
@@ -308,16 +308,16 @@ Agrega datos de calibración para una story completada. Registra estimación vs.
 
 ```bash
 # Calibración básica
-rai memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20
+rai signal emit-calibration S3.5 --name "Skills Integration" -s XS -a 20
 
 # Con estimación para cálculo de velocidad
-rai memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60
+rai signal emit-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60
 
 # Detalles completos
-rai memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
+rai signal emit-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
 ```
 
-### `rai memory add-session`
+### `rai signal emit-session`
 
 Agrega un registro de sesión a la memoria. Las sesiones son específicas del desarrollador y siempre se escriben en el directorio personal.
 
@@ -330,17 +330,17 @@ Agrega un registro de sesión a la memoria. Las sesiones son específicas del de
 
 ```bash
 # Sesión básica
-rai memory add-session "S3.5 Skills Integration"
+rai signal emit-session "S3.5 Skills Integration"
 
 # Con resultados
-rai memory add-session "S3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
+rai signal emit-session "S3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
 
 # Detalles completos
-rai memory add-session "S3.5 Skills Integration" -t story -o "Writer API,Hooks" \
+rai signal emit-session "S3.5 Skills Integration" -t story -o "Writer API,Hooks" \
   -l "dev/sessions/2026-02-02-s3.5.md"
 ```
 
-### `rai memory emit-work`
+### `rai signal emit-work`
 
 Emite un evento de ciclo de vida de trabajo para análisis de flujo Lean. Registra ítems de trabajo (epics, stories) a través de fases normalizadas para habilitar análisis de lead time, wait time, WIP y cuellos de botella.
 
@@ -354,18 +354,18 @@ Fases: `design`, `plan`, `implement`, `review`.
 
 ```bash
 # Ciclo de vida de epic
-rai memory emit-work epic E9 --event start --phase design
-rai memory emit-work epic E9 -e complete -p design
+rai signal emit-work epic E9 --event start --phase design
+rai signal emit-work epic E9 -e complete -p design
 
 # Ciclo de vida de story
-rai memory emit-work story S9.4 --event start --phase implement
-rai memory emit-work story S9.4 -e complete -p implement
+rai signal emit-work story S9.4 --event start --phase implement
+rai signal emit-work story S9.4 -e complete -p implement
 
 # Trabajo bloqueado
-rai memory emit-work story S9.4 -e blocked -p plan -b "requisitos poco claros"
+rai signal emit-work story S9.4 -e blocked -p plan -b "requisitos poco claros"
 ```
 
-### `rai memory emit-session`
+### `rai signal emit-session`
 
 Emite un evento de sesión a telemetría. Registra la completitud de una sesión para aprendizaje local e insights.
 
@@ -378,13 +378,13 @@ Emite un evento de sesión a telemetría. Registra la completitud de una sesión
 
 ```bash
 # Sesión completada básica
-rai memory emit-session --type story --outcome success
+rai signal emit-session --type story --outcome success
 
 # Con duración y stories
-rai memory emit-session -t story -o success -d 45 -f S9.1,S9.2,S9.3
+rai signal emit-session -t story -o success -d 45 -f S9.1,S9.2,S9.3
 ```
 
-### `rai memory emit-calibration`
+### `rai signal emit-calibration`
 
 Emite un evento de calibración a telemetría. Registra estimación vs. real para seguimiento de velocidad. La velocidad se calcula automáticamente: `estimated / actual` (>1.0 = más rápido de lo estimado).
 
@@ -396,13 +396,13 @@ Emite un evento de calibración a telemetría. Registra estimación vs. real par
 
 ```bash
 # Story completada más rápido de lo estimado
-rai memory emit-calibration S9.4 --size S --estimated 30 --actual 15
+rai signal emit-calibration S9.4 --size S --estimated 30 --actual 15
 
 # Story tomó más tiempo
-rai memory emit-calibration S9.4 -s M -e 60 -a 90
+rai signal emit-calibration S9.4 -s M -e 60 -a 90
 ```
 
-### `rai memory viz`
+### `rai graph viz`
 
 Genera una visualización HTML interactiva del grafo de memoria. Crea un archivo HTML autocontenido con un grafo de fuerza dirigida D3.js. Los nodos están coloreados por tipo, son filtrables, tienen zoom y búsqueda.
 
@@ -414,19 +414,19 @@ Genera una visualización HTML interactiva del grafo de memoria. Crea un archivo
 
 ```bash
 # Generar y abrir en navegador
-rai memory viz
+rai graph viz
 
 # Generar en ruta específica
-rai memory viz --output graph.html
+rai graph viz --output graph.html
 
 # Generar sin abrir
-rai memory viz --no-open
+rai graph viz --no-open
 ```
 
 ### `rai memory generate`
 
 :::caution[Deprecado]
-`memory generate` está deprecado. Usa [`rai memory build`](#rai-memory-build) en su lugar. El grafo de memoria es ahora la fuente única de verdad — el contexto se entrega vía `rai session start --context`.
+`memory generate` está deprecado. Usa [`rai graph build`](#rai-graph-build) en su lugar. El grafo de memoria es ahora la fuente única de verdad — el contexto se entrega vía `rai session start --context`.
 :::
 
 ---
@@ -483,7 +483,7 @@ rai discover analyze --input scan-result.json --output summary
 
 ### `rai discover build`
 
-Construye el grafo unificado con componentes descubiertos. Lee componentes validados desde JSON y los integra en el grafo de contexto unificado, haciéndolos consultables vía `rai memory context`.
+Construye el grafo unificado con componentes descubiertos. Lee componentes validados desde JSON y los integra en el grafo de contexto unificado, haciéndolos consultables vía `rai graph context`.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|

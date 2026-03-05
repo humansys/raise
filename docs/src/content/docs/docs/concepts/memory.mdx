@@ -24,7 +24,7 @@ When the same concept exists in multiple scopes, **personal overrides project, p
 Patterns are learnings captured during development. They represent what worked, what didn't, and what to remember next time.
 
 ```bash
-rai memory add-pattern "Use fixtures for database setup in tests" \
+rai pattern add "Use fixtures for database setup in tests" \
   -t technical -c "pytest,testing" --from S3.5
 ```
 
@@ -39,7 +39,7 @@ Patterns have sub-types:
 Calibration tracks how long stories actually take versus estimates. Over time, this builds a velocity profile that helps predict future work more accurately.
 
 ```bash
-rai memory add-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
+rai signal emit-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
 ```
 
 This records: story S3.5 was estimated at 60 minutes (size M) but actually took 45 — a velocity of 1.33x.
@@ -49,7 +49,7 @@ This records: story S3.5 was estimated at 60 minutes (size M) but actually took 
 Sessions are a chronological record of what happened. Each session captures: what you worked on, what you accomplished, and what patterns you learned.
 
 ```bash
-rai memory add-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
+rai signal emit-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
 ```
 
 ## Pattern Scoring
@@ -69,9 +69,9 @@ score = (0.3 × recency + 0.7 × keyword_relevance) × wilson_modifier
 At every story-review, evaluate the patterns that were loaded at session start:
 
 ```bash
-rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170   # applied
-rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170   # N/A
-rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170  # contradicted
+rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170   # applied
+rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170   # N/A
+rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170  # contradicted
 ```
 
 Vote `0` (N/A) does not count toward evaluations — use it freely. The system is deliberately conservative with small sample sizes: a pattern with 1 positive evaluation scores ~0.21, not 1.0. Confidence builds gradually through real usage.
@@ -93,13 +93,13 @@ All memory sources merge into a single queryable index:
 
 ```bash
 # Build the unified index
-rai memory build
+rai graph build
 
 # Query it
-rai memory query "testing patterns" --types pattern
+rai graph query "testing patterns" --types pattern
 
 # List all concepts
-rai memory list --memory-only
+rai graph list --memory-only
 ```
 
 The index is a JSON file (`.raise/rai/memory/index.json`) that combines patterns, calibration, sessions, governance, work tracking, and skills into one graph. See [Knowledge Graph](/docs/concepts/knowledge-graph/) for how this graph works.
@@ -108,14 +108,14 @@ The index is a JSON file (`.raise/rai/memory/index.json`) that combines patterns
 
 | Command | What it does |
 |---------|-------------|
-| `rai memory build` | Build unified index from all sources |
-| `rai memory query` | Search memory for relevant concepts |
-| `rai memory query --format compact` | High-density output for AI context windows |
-| `rai memory reinforce --vote 1\|0\|-1` | Record reinforcement signal for a pattern |
-| `rai memory list` | List all concepts in the index |
-| `rai memory add-pattern` | Record a learned pattern |
-| `rai memory add-calibration` | Record story timing data |
-| `rai memory add-session` | Record a session |
-| `rai memory validate` | Check index integrity |
+| `rai graph build` | Build unified index from all sources |
+| `rai graph query` | Search memory for relevant concepts |
+| `rai graph query --format compact` | High-density output for AI context windows |
+| `rai pattern reinforce --vote 1\|0\|-1` | Record reinforcement signal for a pattern |
+| `rai graph list` | List all concepts in the index |
+| `rai pattern add` | Record a learned pattern |
+| `rai signal emit-calibration` | Record story timing data |
+| `rai signal emit-session` | Record a session |
+| `rai graph validate` | Check index integrity |
 
 See the [CLI Reference](/docs/cli/) for full details on each command.
