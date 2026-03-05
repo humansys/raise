@@ -23,6 +23,7 @@ from rai_cli.output.formatters.skill import (
     format_validation_human,
     format_validation_json,
 )
+from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
 from rai_cli.skills.locator import SkillLocator, get_default_skill_dir
 from rai_cli.skills.name_checker import check_name
 from rai_cli.skills.scaffold import scaffold_skill
@@ -248,4 +249,102 @@ def scaffold_command(
 
     # Exit with error code if creation failed
     if not result.created:
+        raise typer.Exit(code=1)
+
+
+def _print_sync_table(result: SkillScaffoldResult) -> None:
+    """Print a summary table of skill sync status."""
+    from rich.table import Table
+
+    try:
+        from rai_cli.skills_base import __version__ as cli_version
+    except ImportError:
+        cli_version = "unknown"
+
+    console.print(f"\n[bold]Skill sync check: rai-cli {cli_version}[/bold]\n")
+
+    rows: list[tuple[str, str]] = []
+    for name in result.skills_installed:
+        rows.append((name, "[green]new — not deployed[/green]"))
+    for name in result.skills_updated:
+        rows.append((name, "[yellow]outdated — update available[/yellow]"))
+    for name in result.skills_conflicted:
+        rows.append((name, "[yellow]conflict — both changed[/yellow]"))
+    for name in result.skills_current:
+        rows.append((name, "[green]current[/green]"))
+
+    rows.sort(key=lambda r: r[0])
+
+    table = Table(show_header=True)
+    table.add_column("Skill", style="bold")
+    table.add_column("Status")
+    for name, status in rows:
+        table.add_row(name, status)
+
+    console.print(table)
+
+    n_stale = (
+        len(result.skills_updated)
+        + len(result.skills_installed)
+        + len(result.skills_conflicted)
+    )
+    n_current = len(result.skills_current)
+    if n_stale == 0:
+        console.print(f"\n  All {n_current} skills are current.\n")
+    else:
+        console.print(
+            f"\n  {n_stale} skill(s) need attention, "
+            f"{n_current} current. Run [bold]rai init[/bold] to update.\n"
+        )
+
+
+@skill_app.command("sync")
+def sync_cmd(
+    path: Annotated[
+        Path | None, typer.Option("--path", "-p", help="Project path")
+    ] = None,
+) -> None:
+    """Check skill freshness against installed package version.
+
+    Reports which skills are current, outdated, or have conflicts.
+    Exit code 0 = all current, 1 = updates available.
+
+    Examples:
+        $ rai skill sync
+        $ rai skill sync --path /path/to/project
+    """
+    from rai_cli.config.agent_registry import load_registry
+
+    project_path = (path or Path.cwd()).resolve()
+    registry = load_registry(project_root=project_path)
+
+    # Determine agent type from manifest, fall back to "claude"
+    agent_type = "claude"
+    try:
+        from rai_cli.onboarding.manifest import load_manifest
+
+        manifest = load_manifest(project_path)
+        if manifest and manifest.agents.types:
+            agent_type = manifest.agents.types[0]
+    except Exception:
+        pass
+
+    config = registry.get_config(agent_type)
+    plugin = registry.get_plugin(agent_type)
+
+    result = scaffold_skills(
+        project_path,
+        agent_config=config,
+        plugin=plugin,
+        dry_run=True,
+    )
+
+    _print_sync_table(result)
+
+    has_updates = bool(
+        result.skills_updated
+        or result.skills_installed
+        or result.skills_conflicted
+    )
+    if has_updates:
         raise typer.Exit(code=1)
