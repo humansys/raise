@@ -75,7 +75,6 @@ class GraphBuilder:
         all_nodes: list[GraphNode] = []
         all_nodes.extend(self.load_governance())
         all_nodes.extend(self.load_memory())
-        all_nodes.extend(self.load_work())
         all_nodes.extend(self.load_skills())
         all_nodes.extend(self.load_components())
         all_nodes.extend(self.load_artifacts())
@@ -273,26 +272,6 @@ class GraphBuilder:
                     best_by_id[node.id] = node
 
         return list(best_by_id.values())
-
-    def load_work(self) -> list[GraphNode]:
-        """Load concepts from work tracking (backlog, epics).
-
-        Uses E8 parsers to extract epics and stories.
-
-        Returns:
-            List of GraphNode for work concepts.
-        """
-        nodes: list[GraphNode] = []
-
-        # Load epics from backlog
-        epics = self._extract_epics()
-        nodes.extend(self._concept_to_node(e) for e in epics)
-
-        # Load stories from epic scopes
-        stories = self._extract_stories()
-        nodes.extend(self._concept_to_node(s) for s in stories)
-
-        return nodes
 
     def load_skills(self) -> list[GraphNode]:
         """Load concepts from skill YAML frontmatter.
@@ -1269,76 +1248,6 @@ class GraphBuilder:
             created=str(created),
             metadata=metadata,
         )
-
-    def _extract_epics(self) -> list[Concept]:
-        """Extract epics from backlog files.
-
-        Returns:
-            List of epic Concept objects.
-        """
-        from rai_cli.governance.parsers.backlog import extract_epics
-
-        epics: list[Concept] = []
-
-        # Find backlog files
-        for backlog_path in self._find_backlogs():
-            try:
-                extracted = extract_epics(backlog_path, self.project_root)
-                epics.extend(extracted)
-            except Exception:
-                continue
-
-        return epics
-
-    def _extract_stories(self) -> list[Concept]:
-        """Extract stories from epic scope files.
-
-        Returns:
-            List of story Concept objects.
-        """
-        from rai_cli.governance.parsers.epic import extract_stories
-
-        stories: list[Concept] = []
-
-        # Find epic scope files
-        for epic_path in self._find_epic_scopes():
-            try:
-                extracted = extract_stories(epic_path, self.project_root)
-                stories.extend(extracted)
-            except Exception:
-                continue
-
-        return stories
-
-    def _find_backlogs(self) -> list[Path]:
-        """Find backlog.md files in project.
-
-        Returns:
-            List of paths to backlog files.
-        """
-        backlogs: list[Path] = []
-
-        # Check governance/backlog.md
-        backlog_file = self.project_root / "governance" / "backlog.md"
-        if backlog_file.exists():
-            backlogs.append(backlog_file)
-
-        return backlogs
-
-    def _find_epic_scopes(self) -> list[Path]:
-        """Find epic scope files in project.
-
-        Returns:
-            List of paths to epic-*.md files.
-        """
-        scopes: list[Path] = []
-
-        # Check dev/epic-*.md
-        dev_dir = self.project_root / "dev"
-        if dev_dir.exists():
-            scopes.extend(dev_dir.glob("epic-*-scope.md"))
-
-        return scopes
 
     def infer_relationships(self, nodes: list[GraphNode]) -> list[GraphEdge]:
         """Infer relationships between concepts.
