@@ -84,11 +84,13 @@ This creates the unified knowledge graph from all your governance documents, mak
 
 ### First Session
 
-```bash
-rai session start --project . --context
+Open your AI assistant (Claude Code) in the project directory and run:
+
+```
+/rai-session-start
 ```
 
-Your AI partner now has your project's governance, memory, and skills loaded. You're ready to work.
+This loads your project's governance, memory, and skills into context. You're ready to work. From here, you interact through **skills** (`/rai-story-start`, `/rai-story-plan`, etc.) — they orchestrate the CLI for you.
 
 ## Brownfield: Existing Project
 
@@ -130,7 +132,7 @@ Discovery extracts your codebase's structure — classes, functions, modules —
 
 RaiSE adds structure alongside your existing tools:
 
-- **Git**: RaiSE uses standard Git branching. Story branches nest under epic branches, which nest under your development branch.
+- **Git**: RaiSE uses standard Git branching. Story branches are created from your development branch (`dev`). Epics are logical containers (directories), not branches.
 - **CI/CD**: RaiSE doesn't touch your pipeline. Guardrails are enforced at the AI level, not the CI level.
 - **Editor**: Skills are invoked through your AI assistant (e.g., `/rai-story-start` in Claude Code). No editor plugin needed.
 
