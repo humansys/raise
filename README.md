@@ -35,20 +35,34 @@ RaiSE is a methodology + toolkit for professional developers who use AI assistan
 
 ### Prerequisites
 
-- Python 3.12+
-- [uv](https://github.com/astral-sh/uv) (recommended) or pip
+- **Python 3.12 or 3.13** (3.14 not yet supported)
 - [Claude Code](https://claude.ai/claude-code) CLI installed and configured
+- Git
 
-### Quick Install (from PyPI)
+### Quick Install
 
 ```bash
+# Recommended: pipx (isolates dependencies)
+pipx install rai-cli
+
+# Alternative: pip (use a virtual environment)
 pip install rai-cli
 
-# Or with uv:
-uv pip install rai-cli
+# Alternative: uv
+uv tool install rai-cli
 
 # Verify
-rai --help
+rai --version
+```
+
+**macOS:** Don't use the system Python. Install Python 3.12+ via `brew install python@3.13` or pyenv first.
+
+**Windows:** Use WSL (Ubuntu/Debian):
+```bash
+sudo apt update && sudo apt install pipx -y
+pipx ensurepath
+# Close and reopen terminal
+pipx install rai-cli
 ```
 
 ### Development Setup
@@ -59,30 +73,11 @@ git clone https://github.com/humansys-ai/raise-commons.git
 cd raise-commons
 git checkout dev
 
-# 2. Install in development mode
-uv pip install -e ".[dev]"
-
-If error "No virtual environment found."
-run `uv venv` to create an environment.
+# 2. Create venv and install in development mode
+uv venv && uv pip install -e ".[dev]"
 
 # 3. Verify installation
 rai --help
-```
-
-Windows WSL (Ubuntu/Debian).
-```bash
-# 1 — Use pipx
-
-sudo apt update
-sudo apt install pipx -y
-pipx ensurepath
-
-
-# 2 Close and new terminal WSL.
-
-# 3 Install:
-
-pipx install rai-cli
 ```
 
 ### Onboarding with Rai
