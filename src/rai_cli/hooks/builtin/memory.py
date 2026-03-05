@@ -93,13 +93,12 @@ class MemoryMdSyncHook:
         return HookResult(status="ok")
 
     @staticmethod
-    def _load_project_info(project_path: object) -> tuple[str, str]:
+    def _load_project_info(project_path: Path) -> tuple[str, str]:
         """Load project name and development branch from manifest.
 
         Returns:
             Tuple of (project_name, development_branch) with defaults.
         """
-        from pathlib import Path
 
         project_name = "project"
         dev_branch = "main"
