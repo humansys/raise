@@ -68,3 +68,70 @@ Unblocks parallel development (sprint 4+). Eliminates dependency on Emilio's mac
 | Pattern destillation takes longer than estimated | M | M | Timebox 3h, archive when in doubt |
 | Generated CLAUDE.md loses valuable info from current | L | H | Diff before overwrite, backup |
 | Hook side-effects in graph build | L | M | Tests, isolated hook module |
+
+---
+
+## Implementation Plan
+
+> Added by `/rai-epic-plan` — 2026-03-04
+
+### Strategy
+**Dependency-driven + quick wins.** S350.1 (inventory) unlocks everything — it's the foundation. After that, three streams can run in parallel. Quick wins first (git sanitize) to unblock Gustavo immediately.
+
+### Story Sequence
+
+| Order | Story | Size | Dependencies | Milestone | Rationale |
+|:-----:|-------|:----:|--------------|-----------|-----------|
+| 1 | S350.1: Inventory & classify | S | None | M1 | Foundation — every other story needs the classification |
+| 2 | S350.2: Sanitize git state | S | S350.1 | M1 | Quick win — unblocks multi-dev immediately |
+| 3‖ | S350.3: MEMORY.md + CLAUDE.md regen | M | S350.1 | M2 | Parallel with S350.2 — fixes the reported bug |
+| 3‖ | S350.4: Pattern destillation | L | S350.1 | M3 | Parallel with S350.2/3 — longest story, start early |
+| 4 | S350.7: Jira credentials separation | S | S350.2 | M2 | Quick win after git sanitize — independent stream |
+| 5 | S350.5: Enhanced rai init | M | S350.3, S350.4 | M4 | Merge point — integrates regeneration + patterns |
+| 6 | S350.6: rai skill sync | S | S350.5 | M4 | Capstone — last piece of idempotent init |
+
+### Parallel Work Streams
+
+```
+Time →
+
+Stream A (Git):    S350.1 ──► S350.2 ──► S350.7
+                      │
+Stream B (Context):   ├────► S350.3 ──────────┐
+                      │                        ├──► S350.5 ──► S350.6
+Stream C (Patterns):  └────► S350.4 ──────────┘
+
+M1: Git-safe        M2: Context alive    M3: Patterns    M4: Full portability
+(S350.1+2)          (+S350.3+7)          (+S350.4)       (+S350.5+6)
+```
+
+**Merge point:** S350.5 (Enhanced init) cannot start until both S350.3 and S350.4 complete. This is the integration story that wires everything together.
+
+### Milestones
+
+| Milestone | Stories | Success Criteria |
+|-----------|---------|-----------------|
+| **M1: Git-safe** | S350.1, S350.2 | New dev clones repo without receiving personal artifacts. `.gitignore` clean. Inventory documented. |
+| **M2: Context alive** | +S350.3, S350.7 | `rai graph build` regenerates MEMORY.md. `rai init` regenerates CLAUDE.md. Jira creds separated. |
+| **M3: Patterns portable** | +S350.4 | Base patterns ship with package. `rai pattern add` → personal. `rai pattern promote` → project. 727 patterns classified. |
+| **M4: Full portability** | +S350.5, S350.6 | `git clone` + `rai init` + `rai graph build` = full Rai experience. Skill sync detects drift. All done criteria met. |
+
+### Progress Tracking
+
+| Story | Size | Status | Actual | Notes |
+|-------|:----:|:------:|:------:|-------|
+| S350.1 Inventory | S | Pending | — | |
+| S350.2 Git sanitize | S | Pending | — | |
+| S350.3 Regeneration | M | Pending | — | |
+| S350.4 Patterns | L | Pending | — | |
+| S350.5 Enhanced init | M | Pending | — | |
+| S350.6 Skill sync | S | Pending | — | |
+| S350.7 Jira creds | S | Pending | — | |
+
+### Sequencing Risks
+
+| Risk | L/I | Mitigation |
+|------|:---:|------------|
+| S350.4 (patterns, L) delays merge point for S350.5 | M/H | Start early in parallel; timebox destillation |
+| S350.3 and S350.4 touch overlapping code (memory/patterns) | L/M | Different modules; review merge conflicts at S350.5 |
+| Jira stories need updating to match new breakdown | L/L | Update in bulk before starting S350.1 |
