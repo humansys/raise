@@ -6,6 +6,13 @@
 
 ---
 
+## E352 Deferred Items — 2026-03-05
+
+- [ ] **Dimensional scoring** — score per area (safety, config, deps) instead of just pass/fail. Promote after v2.2 user feedback. (Research P9)
+- [ ] **Interactive repair wizard** — guided fix flow for complex issues. Promote after open source community feedback.
+- [ ] **Plugin checks** — validate third-party extensions. Promote after plugin ecosystem exists.
+- [ ] **Config migration engine** — auto-migrate .raise/ between major versions. Promote when version gap exists (2.x -> 3.x).
+
 ## E353 Deferred Items — 2026-03-03
 
 - [ ] **Parallel phase execution (AR + QR)** — AR and QR read overlapping but independent inputs; could run simultaneously. Promote when sequential execution is a latency bottleneck.
