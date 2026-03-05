@@ -170,8 +170,9 @@ def check_command(
 ) -> None:
     """Run all quality gates before publishing.
 
-    Runs 10 quality checks: tests, types, lint, security, coverage,
-    build, package validation, changelog, PEP 440 version, and version sync.
+    Runs 9 quality checks: tests (with coverage diagnostic), types, lint,
+    security, build, package validation, changelog, PEP 440 version, and
+    version sync. Coverage is reported but not a blocking gate.
 
     Exits with code 0 if all pass, 1 if any fail.
 
