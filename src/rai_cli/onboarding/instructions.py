@@ -192,23 +192,34 @@ class InstructionsGenerator:
         """Extract value name + summary pairs from identity core.md.
 
         Looks for ### N. Name headings followed by bullet points.
-        Condenses the bullets into a short summary.
+        Condenses all bullets into a comma-separated summary.
         """
         values: list[tuple[str, str]] = []
-        # Match ### N. Name followed by bullet list
+        # Match ### N. Name followed by bullet list (within Values section)
         pattern = r"###\s+\d+\.\s+(.+)\n((?:- .+\n)*)"
         for match in re.finditer(pattern, text):
             name = match.group(1).strip()
             bullets = match.group(2).strip()
-            # Condense bullets into a short summary
+            # Condense ALL bullets into a comma-separated short summary
             bullet_texts = [
                 b.lstrip("- ").strip() for b in bullets.split("\n") if b.strip()
             ]
             if bullet_texts:
-                summary = bullet_texts[0].rstrip(".")
-                # Lower-case the first char for inline style
-                if summary and summary[0].isupper():
-                    summary = summary[0].lower() + summary[1:]
+                # Strip leading pronouns and clean up each bullet
+                cleaned: list[str] = []
+                for bt in bullet_texts:
+                    # Remove "I'll " / "I'm " prefix for conciseness
+                    bt = re.sub(r"^I'll\s+", "", bt)
+                    bt = re.sub(r"^I'm not .+ — I'm ", "", bt)
+                    bt = bt.rstrip(".")
+                    # Remove surrounding quotes (only if both present)
+                    if bt.startswith('"') and bt.endswith('"'):
+                        bt = bt[1:-1]
+                    # Lower-case the first char for inline style
+                    if bt and bt[0].isupper():
+                        bt = bt[0].lower() + bt[1:]
+                    cleaned.append(bt)
+                summary = ", ".join(cleaned)
             else:
                 summary = name
             values.append((name, summary))
@@ -251,11 +262,26 @@ class InstructionsGenerator:
     ) -> list[tuple[str, str]]:
         """Extract principles from the Internalized Philosophy table."""
         principles: list[tuple[str, str]] = []
+        # Find the "Internalized Philosophy" section first to avoid
+        # matching other tables (e.g. comparison tables) in the file
+        philosophy_match = re.search(
+            r"##\s+Internalized Philosophy\s*\n(.*?)(?=\n---|\n##|\Z)",
+            text,
+            re.DOTALL,
+        )
+        if not philosophy_match:
+            return principles
+
+        section_text = philosophy_match.group(1)
+
         # Look for table rows with | **Name** | description |
         pattern = r"\|\s*\*\*(.+?)\*\*\s*\|\s*(.+?)\s*\|"
-        for match in re.finditer(pattern, text):
+        for match in re.finditer(pattern, section_text):
             name = match.group(1).strip()
             desc = match.group(2).strip()
+            # Skip table header separators
+            if name.startswith("-"):
+                continue
             # Clean up description
             desc = desc.rstrip(".")
             if desc.startswith("I "):
