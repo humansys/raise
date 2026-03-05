@@ -1,7 +1,7 @@
 ---
 epic_id: "E350"
 tracker: "RAISE-364"
-status: "in_progress"
+status: "done"
 release: "2.2.0a1"
 adr: "ADR-044"
 ---
@@ -55,12 +55,12 @@ Unblocks parallel development (sprint 4+). Eliminates dependency on Emilio's mac
 | S350.7 | RAISE-223 | Jira credentials separation — per-dev vs per-repo | S | S350.2 |
 
 ## Done Criteria
-- [ ] New developer runs `git clone` + `rai init` + `rai graph build` → full Rai experience
-- [ ] `rai graph build` regenerates MEMORY.md automatically
-- [ ] `rai init` regenerates CLAUDE.md from `.raise/` sources
-- [ ] Patterns in 3 levels (base + project + personal), base destilled
-- [ ] `.gitignore` prevents personal state from leaking
-- [ ] Zero merge conflicts on patterns during parallel work
+- [x] New developer runs `git clone` + `rai init` + `rai graph build` → full Rai experience
+- [x] `rai graph build` regenerates MEMORY.md automatically
+- [x] `rai init` regenerates CLAUDE.md from `.raise/` sources
+- [x] Patterns in 3 levels (base + project + personal), base destilled
+- [x] `.gitignore` prevents personal state from leaking
+- [x] Zero merge conflicts on patterns during parallel work
 
 ## Risks
 | Risk | L | I | Mitigation |
@@ -125,7 +125,7 @@ M1: Git-safe        M2: Context alive    M3: Patterns    M4: Full portability
 | S350.3 Regeneration | M | Done | M | Merged 217a42f9 |
 | S350.4 Patterns | L | Done | M | Merged 8221619f |
 | S350.5 Enhanced init | M | Done | S | Merged to dev |
-| S350.6 Skill sync | S | Pending | — | |
+| S350.6 Skill sync | S | Done | XS | Merged to dev |
 | S350.7 Jira creds | S | Done | XS | Already resolved -- credentials in .env, jira.yaml clean |
 
 ### Sequencing Risks
