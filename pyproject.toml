@@ -99,7 +99,7 @@ lint = "rai_cli.gates.builtin.lint:LintGate"
 coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
 
 [project.entry-points."rai.doctor.checks"]
-# Checks registered in S352.2 (environment) and S352.3 (project)
+environment = "rai_cli.doctor.checks.environment:EnvironmentCheck"
 
 [project.entry-points."rai.adapters.pm"]
 filesystem = "rai_cli.adapters.filesystem:FilesystemPMAdapter"
