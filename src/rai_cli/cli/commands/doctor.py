@@ -108,7 +108,9 @@ def doctor(
                 continue
             out.print(_format_result_line(r.category, r.message, r.status))
             if r.fix_hint:
-                out.print(f"       hint: {r.fix_hint}")
+                from rich.markup import escape
+
+                out.print(f"       hint: {escape(r.fix_hint)}")
 
         if warns == 0 and errors == 0:
             out.print("\n[green]All checks passed.[/green]")
