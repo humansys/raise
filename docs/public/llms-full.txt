@@ -1,0 +1,3163 @@
+# RaiSE
+
+> Reliable AI Software Engineering — methodology + toolkit for professional developers using AI assistants.
+
+## Overview
+
+### RaiSE Documentation
+
+Welcome to the RaiSE documentation.
+
+RaiSE combines a **lean methodology** with a **deterministic CLI toolkit** to make AI-assisted software engineering reliable, traceable, and repeatable.
+
+## What you'll find here
+
+- **[Getting Started](/docs/getting-started/)** — Install the CLI and run your first session
+- **[Concepts](/docs/concepts/memory/)** — Memory, Skills, Governance, Knowledge Graph
+- **[Guides](/docs/guides/first-story/)** — Your First Story, Setting Up a Project
+- **[CLI Reference](/docs/cli/)** — Every command, flag, and option
+
+## Quick install
+
+```bash
+pip install rai-cli
+rai init
+rai session start --project . --context
+```
+
+---
+
+## Getting Started
+
+### Getting Started
+
+RaiSE is a methodology and toolkit for **reliable AI software engineering**. It turns AI coding assistants from unpredictable generators into disciplined collaborators — through governance, memory, and structured workflows.
+
+## The Triad
+
+RaiSE works through three collaborating parts:
+
+```
+    You (Strategy, Judgment, Ownership)
+         │
+         │ collaborates with
+         ▼
+      Rai (AI Partner — Execution + Memory)
+         │
+         │ governed by
+         ▼
+      RaiSE (Methodology + Toolkit)
+```
+
+**You** decide *what* to build and *why*. **Rai** executes with accumulated memory and calibrated judgment. **RaiSE** provides the discipline — skills, governance, and quality gates — that makes the collaboration reliable.
+
+The result: AI that learns from your project, follows your rules, and compounds knowledge across sessions instead of starting fresh every time.
+
+## Prerequisites
+
+- **Python 3.12 or 3.13** (3.14 is not yet supported — many dependencies lack wheels)
+- **Git** initialized in your project
+- An AI assistant with RaiSE skills: [Claude Code](https://claude.ai/claude-code) (recommended), Cursor, or Windsurf
+
+## Install
+
+The recommended method is **pipx** (isolates RaiSE in its own environment):
+
+```bash
+pipx install rai-cli
+```
+
+Alternatives:
+
+```bash
+# With pip (use a virtual environment)
+pip install rai-cli
+
+# With uv
+uv tool install rai-cli
+```
+
+**macOS note:** Do not use the system Python that ships with macOS. Install Python 3.12 or 3.13 via [Homebrew](https://brew.sh/) (`brew install python@3.13`) or [pyenv](https://github.com/pyenv/pyenv) first.
+
+**Windows:** Use WSL (Ubuntu/Debian):
+
+```bash
+sudo apt update && sudo apt install pipx -y
+pipx ensurepath
+# Close and reopen terminal
+pipx install rai-cli
+```
+
+Verify:
+
+```bash
+rai --version
+```
+
+### Troubleshooting
+
+| Problem | Cause | Fix |
+|---------|-------|-----|
+| Build errors during install | Python 3.14 or missing C compiler | Use Python 3.12 or 3.13 |
+| `command not found: rai` | pipx/pip bin not in PATH | Run `pipx ensurepath` or add `~/.local/bin` to PATH |
+| Permission errors | Installing to system Python | Use `pipx` instead of `pip`, or use a virtual environment |
+
+## Initialize a project
+
+Navigate to your project directory first — `rai init` works on the **current directory**:
+
+```bash
+cd your-project    # You MUST be in the project root
+rai init
+```
+
+This creates the `.raise/` directory with governance templates, memory structure, and a project manifest. For existing codebases, add `--detect` to analyze your conventions automatically:
+
+```bash
+rai init --detect
+```
+
+## Your first session
+
+Open your AI assistant (Claude Code) in the project directory. For first-time setup, run the welcome skill:
+
+```
+/rai-welcome
+```
+
+This creates your developer profile, builds the knowledge graph, and verifies everything works.
+
+After that, start every session with:
+
+```
+/rai-session-start
+```
+
+This loads your context, memory, patterns, and proposes focused work. You work **through skills** — they orchestrate the CLI for you.
+
+## The story lifecycle
+
+This is the core rhythm of working with RaiSE. Every piece of work follows six steps:
+
+```
+/rai-story-start     → Scope: what are we building?
+/rai-story-design    → Spec: how will it work?
+/rai-story-plan      → Tasks: what are the steps?
+/rai-story-implement → Build: test, code, verify, commit
+/rai-story-review    → Reflect: what did we learn?
+/rai-story-close     → Merge: clean up and ship
+```
+
+Each step produces an artifact that feeds the next. The review feeds memory, which feeds future sessions. This is how learning compounds — not through magic, but through disciplined repetition.
+
+Start with a small feature (XS or S sized). Get the rhythm first, then scale up.
+
+→ **[Walk through the full lifecycle](/docs/guides/first-story/)** for a step-by-step guide.
+
+## End a session
+
+When you're done working, close the session to capture what happened:
+
+```
+/rai-session-close
+```
+
+This reflects on outcomes, persists patterns, and records session data for continuity.
+
+## Build your memory
+
+As you work, RaiSE accumulates knowledge — patterns, calibration data, governance. Build the unified memory index to make it queryable:
+
+```bash
+rai graph build
+```
+
+Then query it:
+
+```bash
+rai graph query "testing patterns"
+```
+
+## What's next
+
+- **[Your First Story](/docs/guides/first-story/)** — Full story lifecycle walkthrough
+- **[Setting Up a Project](/docs/guides/setting-up/)** — Greenfield and brownfield setup in depth
+- **[CLI Reference](/docs/cli/)** — All commands, flags, and examples
+- **[Core Concepts](/docs/concepts/)** — Memory, Skills, Governance, Knowledge Graph
+
+---
+
+## Concepts
+
+### Governance
+
+Governance is how RaiSE ensures your AI partner doesn't drift. It's a layered system: high-level principles flow down into concrete requirements, which become enforceable guardrails. The AI loads these at session start and follows them throughout.
+
+## The Three Layers
+
+### Constitution (Principles)
+
+The highest level — foundational principles that don't change often. These express *values* and *philosophy*.
+
+Example principles:
+- "Simple heuristics over complex ML"
+- "Tests alongside implementation, not after"
+- "Honesty over agreement"
+
+Constitution lives in `governance/constitution.md` (or equivalent). Principles get IDs like `§1`, `§2`, etc.
+
+### PRD (Requirements)
+
+The middle layer — concrete requirements derived from principles. These express *what the project must do*.
+
+Example requirements:
+- `RF-01`: Marketing website with craftsman tone
+- `RF-02`: Content strategy with hypothesis testing
+- `RF-05`: Onboarding flow from discovery to productivity
+
+Requirements live in `governance/prd.md` and link back to the principles they implement.
+
+### Guardrails (Enforcement)
+
+The bottom layer — specific, verifiable rules. These express *what you must and must not do*.
+
+Guardrails have two levels:
+
+| Level | Meaning | Example |
+|-------|---------|---------|
+| **MUST** | Non-negotiable. Violation is a defect. | "Every content piece has a documented hypothesis" |
+| **SHOULD** | Recommended. Skip with justification. | "SEO-optimized headings and meta descriptions" |
+
+Guardrails live in `governance/guardrails.md` and each links to the requirement it enforces.
+
+## How Governance Flows
+
+```
+Principles (§)     →  "Why we do things this way"
+     ↓
+Requirements (RF)  →  "What we need to build"
+     ↓
+Guardrails (GR)    →  "What rules to follow"
+     ↓
+Code / Content     →  "What we actually produce"
+```
+
+Each layer is traceable to the one above. When someone asks "why do we have this guardrail?" you can trace it: guardrail → requirement → principle.
+
+## Governance in Practice
+
+When you run `rai session start --context`, the context bundle includes governance primes — the active guardrails relevant to your current work. Your AI partner sees these at the start of every session and applies them throughout.
+
+For example, if you're working on content, the context bundle might include:
+
+```
+# Governance Primes
+- must-content-001: Every content piece has a documented hypothesis
+- must-content-002: One core idea per content piece
+- must-brand-001: Consistent craftsman voice — no hype, no buzzwords
+```
+
+The AI doesn't need to remember these — they're loaded fresh every session from the governance files.
+
+## Project Structure
+
+After `rai init`, your governance directory looks like:
+
+```
+governance/
+├── constitution.md    # Principles (or vision.md)
+├── prd.md             # Requirements
+├── guardrails.md      # Enforceable rules
+├── backlog.md         # Work items
+└── architecture/
+    ├── system-context.md
+    └── system-design.md
+```
+
+## Convention Detection
+
+For existing projects, `rai init --detect` analyzes your codebase and generates guardrails automatically:
+
+```bash
+rai init --detect
+```
+
+This scans for patterns like:
+- Coding conventions (naming, formatting, imports)
+- Testing patterns (framework, directory structure)
+- Architecture patterns (module organization, dependency direction)
+
+The generated guardrails are a starting point — review and adjust them to match your team's actual standards.
+
+## Key Idea
+
+Governance isn't about control. It's about **consistency**. When your AI partner follows the same rules every session, you get predictable output. When the rules are explicit and traceable, you can evolve them deliberately instead of hoping for the best.
+
+---
+
+### The RaiSE Methodology
+
+AI coding assistants are powerful. They're also unreliable.
+
+They hallucinate APIs. They forget your conventions between sessions. They optimize for speed over correctness. They don't know when to stop. Left ungoverned, they produce code that *looks* right but subtly isn't — and the longer you work with them, the more technical debt accumulates invisibly.
+
+RaiSE exists because we believe AI-assisted engineering can be **reliable** — but only with discipline.
+
+## The core problem
+
+Most AI coding tools treat the developer as a prompt writer and the AI as a code generator. The workflow looks like this:
+
+```
+Developer writes prompt → AI generates code → Developer reviews → Repeat
+```
+
+This works for small tasks. It falls apart for real projects because:
+
+- **No memory.** Each session starts fresh. The AI doesn't remember what it learned yesterday.
+- **No rules.** The AI follows general best practices, not *your* rules. Your naming conventions, architecture decisions, and quality standards exist only in your head.
+- **No process.** There's no structured way to decompose work, verify results, or learn from mistakes. It's just prompt → generate → hope.
+- **No accountability.** When things go wrong, there's no traceability. Why was this decision made? Who approved it? What was the original requirement?
+
+RaiSE addresses all four.
+
+## The Triad
+
+RaiSE is built on a collaboration model we call the Triad:
+
+```
+    You (Strategy, Judgment, Ownership)
+         │
+         │ collaborates with
+         ▼
+      Rai (AI Partner — Execution + Memory)
+         │
+         │ governed by
+         ▼
+      RaiSE (Methodology + Toolkit)
+```
+
+**You** are the engineer. You define what to build, why it matters, and what quality looks like. You make judgment calls the AI can't make — prioritization, trade-offs, user empathy, business context. You own the outcome.
+
+**Rai** is the AI partner. Not a generic assistant — a collaborator trained in the discipline of RaiSE. Rai executes with accumulated memory, follows your governance rules, and stops when something doesn't look right (rather than generating more code and hoping you'll catch the error).
+
+**RaiSE** is the methodology and toolkit. It provides the structure — skills that define how to work, governance that defines the rules, memory that persists across sessions, and quality gates that catch defects early.
+
+None of the three is sufficient alone. You without Rai is slow. Rai without RaiSE is unreliable. RaiSE without you has no judgment. Together, they produce something none can achieve independently: **AI speed with human reliability**.
+
+## Principles
+
+RaiSE borrows from Lean Manufacturing — specifically from the Toyota Production System. These aren't metaphors; they're direct applications.
+
+### Jidoka: Stop on defects
+
+In Toyota factories, any worker can pull the cord to stop the production line when they spot a defect. The principle: **it's cheaper to stop and fix now than to let a defect propagate.**
+
+In RaiSE, this means:
+- Verification gates at every step. If tests fail, you don't proceed.
+- Rai stops when it detects incoherence, ambiguity, or drift — rather than generating more output.
+- Quality is built in, not inspected after.
+
+### Kaizen: Continuous improvement
+
+Every story ends with a retrospective. Every retrospective produces at least one concrete improvement. Patterns get captured in memory. Memory feeds future sessions.
+
+This isn't just process — it's a **compounding effect**. Session 1 is slow because you're discovering everything. Session 50 is fast because patterns, calibration data, and governance have accumulated. The system gets better the more you use it.
+
+### Poka-yoke: Mistake-proofing
+
+Poka-yoke means designing systems so errors can't happen in the first place. In RaiSE:
+- Story branches can't be created without an epic branch (the tooling prevents it).
+- Implementation can't start without a plan (the skill checks for it).
+- Merging can't happen without a retrospective (the gate requires it).
+
+These aren't bureaucratic checkboxes. They're structural constraints that make the wrong thing hard to do.
+
+### Humans define, machines execute
+
+This is the fundamental separation. You write governance in natural language — Markdown files that express your principles, requirements, and guardrails. The CLI reads these deterministically. The AI interprets them in context. The machinery is transparent and inspectable.
+
+You specify the *what*. RaiSE handles the *how*.
+
+## The four pillars
+
+### 1. Governance
+
+Governance is a layered rule system that flows from abstract to concrete:
+
+```
+Principles (§)     →  "Why we do things this way"
+     ↓
+Requirements (RF)  →  "What we need to build"
+     ↓
+Guardrails (GR)    →  "What rules to follow"
+     ↓
+Code               →  "What we actually produce"
+```
+
+Each layer is traceable to the one above. When someone asks "why do we have this rule?" you can follow the chain: guardrail → requirement → principle. Nothing exists without justification.
+
+Governance is loaded at session start and enforced throughout. It's not documentation that sits in a folder — it's active context that shapes every decision.
+
+→ **[Read more about Governance](/docs/concepts/governance/)**
+
+### 2. Skills
+
+Skills are process-as-code. Each skill is a structured workflow — a Markdown file — that guides both you and Rai through a specific engineering activity. Think of them as runbooks your AI follows, not just reads.
+
+The most important skill chain is the **story lifecycle**:
+
+```
+/rai-story-start     → Scope and branch
+/rai-story-design    → Lean specification
+/rai-story-plan      → Atomic task decomposition
+/rai-story-implement → TDD execution with verification gates
+/rai-story-review    → Retrospective and pattern capture
+/rai-story-close     → Merge and cleanup
+```
+
+Each step produces an artifact. Each artifact feeds the next. The whole chain is repeatable, verifiable, and traceable.
+
+Skills also support mastery levels (Shu-Ha-Ri): beginners get detailed guidance, experts get minimal prompts. The same skill adapts to your experience.
+
+→ **[Read more about Skills](/docs/concepts/skills/)**
+
+### 3. Memory
+
+Memory is what makes the AI learn. Without it, every session starts from zero. With RaiSE memory, your AI carries forward:
+
+- **Patterns** — learnings from development ("use fixtures for database tests", "commit after each task")
+- **Calibration** — how long things actually take versus estimates (velocity tracking)
+- **Sessions** — chronological record of what happened and what was accomplished
+
+Memory lives in three scopes: **global** (all projects), **project** (shared via git), and **personal** (your private session history). It compounds over time — session 1 is discovery, session 50 is expertise.
+
+→ **[Read more about Memory](/docs/concepts/memory/)**
+
+### 4. Knowledge Graph
+
+The Knowledge Graph connects everything — governance, memory, skills, work tracking, and discovered code components — into a single queryable structure.
+
+Nodes are concepts (patterns, principles, modules, stories). Edges are relationships (governed by, depends on, learned from). When the CLI assembles your session context, it traverses this graph to deliver exactly the right information for your current work.
+
+This is how Rai knows which guardrails apply to which module, which patterns were learned in which story, and what the architectural constraints are for the code you're touching.
+
+→ **[Read more about the Knowledge Graph](/docs/concepts/knowledge-graph/)**
+
+## How it all connects
+
+Here's the full picture:
+
+```
+Governance files (Markdown)
+     │
+     ├── Parsed by CLI into Knowledge Graph
+     │
+     ├── Loaded at session start as governance primes
+     │
+     └── Enforced by skills via verification gates
+
+Memory (JSONL + YAML)
+     │
+     ├── Patterns, calibration, sessions
+     │
+     ├── Merged into Knowledge Graph
+     │
+     └── Loaded at session start as behavioral primes
+
+Skills (SKILL.md)
+     │
+     ├── Define the workflow (steps + gates)
+     │
+     ├── Reference governance (constraints)
+     │
+     └── Produce artifacts that feed memory
+
+Session start
+     │
+     ├── CLI traverses the graph
+     │
+     ├── Assembles ~150 token context bundle
+     │
+     └── AI partner has full awareness
+```
+
+The cycle is: **govern → work → learn → compound**. Governance defines the rules. Skills structure the work. Memory captures what happened. The next session starts smarter than the last.
+
+## What RaiSE is not
+
+- **Not a code generator.** RaiSE doesn't write code for you. It structures how you and your AI partner write code together.
+- **Not platform-specific.** It works where Git works. No GitHub, GitLab, or Bitbucket dependency.
+- **Not heavyweight.** The governance files are Markdown. The memory is JSONL. The skills are Markdown. Everything is human-readable, diffable, and version-controlled.
+- **Not magic.** The compounding effect is real but gradual. Session 1 is slower than vibe coding. Session 50 is faster and more reliable. You're investing in a system, not getting a shortcut.
+
+## Next steps
+
+- **[Getting Started](/docs/getting-started/)** — Install and run your first session
+- **[Your First Story](/docs/guides/first-story/)** — Experience the full story lifecycle
+- **[CLI Reference](/docs/cli/)** — Every command, flag, and option
+
+---
+
+### Knowledge Graph
+
+The Knowledge Graph is the backbone of RaiSE's context system. It merges everything — memory patterns, governance documents, skills metadata, work tracking, and discovered components — into a single graph of connected concepts.
+
+## What It Is
+
+A directed graph where:
+- **Nodes** are concepts — patterns, principles, requirements, skills, stories, components, modules
+- **Edges** are relationships — "learned from", "governed by", "depends on", "constrained by"
+
+When you run `rai graph build`, the CLI traverses all project sources and assembles this graph. When you query with `rai graph query` or `rai graph context`, you're searching this graph.
+
+## Node Types
+
+| Type | ID Pattern | Source | Example |
+|------|-----------|--------|---------|
+| Pattern | `PAT-*`, `BASE-*` | Memory JSONL files | "Use fixtures for database tests" |
+| Calibration | `CAL-*` | Calibration records | Story S3.5: M size, 45 min actual |
+| Session | `SES-*` | Session history | "Implemented auth module" |
+| Principle | `§N` | Constitution | "Simple heuristics over complex ML" |
+| Requirement | `RF-*` | PRD | "Marketing website with craftsman tone" |
+| Guardrail | `GR-*` | Guardrails | "MUST: No vanity metrics as goals" |
+| Skill | `/name` | SKILL.md files | `/rai-story-plan` — decompose into tasks |
+| Story | `S*.*` | Work tracking | S8.6: Docs Getting Started |
+| Epic | `E*` | Epic scopes | E8: Website v1 + Docs |
+| Component | `comp-*` | Discovery scan | `SessionManager` class |
+| Module | `mod-*` | Discovery analysis | `mod-memory` — memory subsystem |
+| Decision | `ADR-*` | Architecture decisions | ADR-019: Unified context graph |
+
+## Edge Types
+
+Edges express how concepts relate:
+
+| Edge | Meaning | Example |
+|------|---------|---------|
+| `learned_from` | Pattern came from this session | PAT-042 → SES-015 |
+| `governed_by` | Requirement implements a principle | RF-01 → §2 |
+| `implements` | Story implements a requirement | S8.6 → RF-05 |
+| `part_of` | Story belongs to an epic | S8.6 → E8 |
+| `depends_on` | Module depends on another | mod-session → mod-memory |
+| `belongs_to` | Module belongs to a domain | mod-memory → bc-core |
+| `constrained_by` | Domain is constrained by a guardrail | bc-core → GR-015 |
+| `applies_to` | Pattern applies to a skill | PAT-001 → /rai-story-implement |
+
+## Building the Graph
+
+```bash
+rai graph build
+```
+
+This merges all sources:
+1. **Governance**: principles, requirements, guardrails from `governance/`
+2. **Memory**: patterns, calibration, sessions from `.raise/rai/memory/`
+3. **Work**: epic and story scopes from `work/epics/`
+4. **Skills**: metadata from `.claude/skills/*/SKILL.md`
+5. **Components**: discovered code from `work/discovery/`
+
+The output is `.raise/rai/memory/index.json`.
+
+## Querying the Graph
+
+### Keyword Search
+
+Find concepts by content:
+
+```bash
+rai graph query "testing patterns"
+```
+
+### Concept Lookup
+
+Find a specific concept by ID:
+
+```bash
+rai graph query "PAT-001" --strategy concept_lookup
+```
+
+### Module Context
+
+Get the full architectural context for a module — its domain, layer, constraints, and dependencies:
+
+```bash
+rai graph context mod-memory
+```
+
+This returns:
+- **Bounded context**: which domain the module belongs to
+- **Layer**: its position in the architecture (leaf, domain, integration, orchestration)
+- **Constraints**: applicable guardrails (MUST and SHOULD)
+- **Dependencies**: what it depends on and what depends on it
+
+### Validation
+
+Check the graph for structural issues:
+
+```bash
+rai graph validate
+```
+
+This detects cycles in dependency relationships, invalid edge types, and dangling references.
+
+## Why a Graph
+
+The graph structure enables **contextual queries** — not just "find this keyword" but "show me everything related to this module, including the rules that constrain it and the patterns learned while building it."
+
+When your AI partner runs `rai session start --context`, the CLI assembles a context bundle by traversing this graph. The result is a compressed view of everything relevant to your current work — not a dump of all files, but a curated selection of the most important nodes and their relationships.
+
+---
+
+### Memory
+
+Memory is what makes your AI partner learn. Without it, every session starts from zero. With RaiSE memory, your AI carries forward patterns it learned, calibration data from past work, and a full session history — so it gets better the more you work together.
+
+## The Three Scopes
+
+Memory lives in three places, each with a different purpose:
+
+| Scope | Location | Visibility | What goes here |
+|-------|----------|------------|----------------|
+| **Global** | `~/.rai/` | All projects | Universal patterns that apply everywhere |
+| **Project** | `.raise/rai/memory/` | Shared (committed to repo) | Project-specific patterns, calibration, team knowledge |
+| **Personal** | `.raise/rai/personal/` | You only (gitignored) | Your session history, telemetry, personal learnings |
+
+When the same concept exists in multiple scopes, **personal overrides project, project overrides global**. This means a team can share project patterns while each developer keeps their own session history.
+
+## The Three Types
+
+### Patterns
+
+Patterns are learnings captured during development. They represent what worked, what didn't, and what to remember next time.
+
+```bash
+rai pattern add "Use fixtures for database setup in tests" \
+  -t technical -c "pytest,testing" --from S3.5
+```
+
+Patterns have sub-types:
+- **Process** — workflow and collaboration patterns (e.g., "commit after each task")
+- **Technical** — code techniques and gotchas (e.g., "use capsys for stdout tests")
+- **Architecture** — design decisions and module patterns
+- **Codebase** — project-specific conventions
+
+### Calibration
+
+Calibration tracks how long stories actually take versus estimates. Over time, this builds a velocity profile that helps predict future work more accurately.
+
+```bash
+rai signal emit-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
+```
+
+This records: story S3.5 was estimated at 60 minutes (size M) but actually took 45 — a velocity of 1.33x.
+
+### Sessions
+
+Sessions are a chronological record of what happened. Each session captures: what you worked on, what you accomplished, and what patterns you learned.
+
+```bash
+rai signal emit-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
+```
+
+## Pattern Scoring
+
+Not all patterns are equal. Patterns that have been validated through real implementation should surface before untested ones. RaiSE uses a **composite score** to rank patterns in every query:
+
+```
+score = (0.3 × recency + 0.7 × keyword_relevance) × wilson_modifier
+```
+
+**Recency** decays over time using a 30-day half-life — a pattern from yesterday scores higher than one from 3 months ago, all else equal. **Foundational patterns** (marked `foundational: true`) are exempt from decay and always score on keyword relevance alone.
+
+**Wilson modifier** adjusts the score based on reinforcement history. Patterns with many positive evaluations get a boost; patterns that have been contradicted in practice rank lower.
+
+### Reinforcement Loop
+
+At every story-review, evaluate the patterns that were loaded at session start:
+
+```bash
+rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170   # applied
+rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170   # N/A
+rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170  # contradicted
+```
+
+Vote `0` (N/A) does not count toward evaluations — use it freely. The system is deliberately conservative with small sample sizes: a pattern with 1 positive evaluation scores ~0.21, not 1.0. Confidence builds gradually through real usage.
+
+## How Memory Compounds
+
+This is the key insight: memory creates a **compounding effect**.
+
+1. **Session 1**: You discover that fixtures are better than inline setup for database tests
+2. **Pattern captured**: "Use fixtures for database setup" (technical pattern)
+3. **Session 5**: Your AI partner applies this pattern automatically — it's in the context bundle
+4. **Session 20**: Your velocity has improved because patterns eliminate repeated discovery
+
+The more sessions you run, the smarter the system gets. This isn't ML or fine-tuning — it's structured knowledge that flows into your AI's context at session start.
+
+## The Memory Index
+
+All memory sources merge into a single queryable index:
+
+```bash
+# Build the unified index
+rai graph build
+
+# Query it
+rai graph query "testing patterns" --types pattern
+
+# List all concepts
+rai graph list --memory-only
+```
+
+The index is a JSON file (`.raise/rai/memory/index.json`) that combines patterns, calibration, sessions, governance, work tracking, and skills into one graph. See [Knowledge Graph](/docs/concepts/knowledge-graph/) for how this graph works.
+
+## Key Commands
+
+| Command | What it does |
+|---------|-------------|
+| `rai graph build` | Build unified index from all sources |
+| `rai graph query` | Search memory for relevant concepts |
+| `rai graph query --format compact` | High-density output for AI context windows |
+| `rai pattern reinforce --vote 1\|0\|-1` | Record reinforcement signal for a pattern |
+| `rai graph list` | List all concepts in the index |
+| `rai pattern add` | Record a learned pattern |
+| `rai signal emit-calibration` | Record story timing data |
+| `rai signal emit-session` | Record a session |
+| `rai graph validate` | Check index integrity |
+
+See the [CLI Reference](/docs/cli/) for full details on each command.
+
+---
+
+### Skills
+
+Skills are RaiSE's process-as-code. Each skill is a structured workflow — a `SKILL.md` file — that guides both you and your AI partner through a specific engineering activity. Think of them as runbooks that your AI can follow, not just read.
+
+## What a Skill Looks Like
+
+A skill is a markdown file in `.claude/skills/<name>/SKILL.md` with:
+
+- **Purpose** — what this skill does and when to use it
+- **Steps** — ordered sequence with verification gates at each step
+- **Mastery levels** — Shu (follow exactly), Ha (adapt), Ri (create your own)
+- **Inputs and outputs** — what it needs, what it produces
+
+When you invoke a skill (e.g., `/rai-story-plan`), your AI loads the SKILL.md and follows its steps — checking prerequisites, executing each step, verifying results, and producing documented output.
+
+## The Story Lifecycle
+
+The most important skill chain is the story lifecycle — the sequence that takes a feature from idea to merged code:
+
+```
+/rai-story-start    → Create branch and scope commit
+      ↓
+/rai-story-design   → Design the specification
+      ↓
+/story-plan     → Decompose into atomic tasks
+      ↓
+/rai-story-implement → Execute tasks with TDD
+      ↓
+/rai-story-review   → Retrospective and learnings
+      ↓
+/rai-story-close    → Verify, merge, cleanup
+```
+
+Each step produces an artifact (scope.md, design.md, plan.md, progress.md, retrospective.md) and has verification gates that must pass before proceeding. This isn't bureaucracy — it's how you ensure consistency and traceability across sessions.
+
+## Skill Lifecycles
+
+Skills are organized by the work lifecycle they belong to:
+
+| Lifecycle | Skills | When |
+|-----------|--------|------|
+| **Session** | `/rai-session-start`, `/rai-session-close` | Every working session |
+| **Story** | `/rai-story-start` through `/rai-story-close` | For each feature |
+| **Epic** | `/rai-epic-start` through `/rai-epic-close` | For multi-story bodies of work |
+| **Discovery** | `/rai-discover-start` through `/rai-discover-document` | When analyzing a codebase |
+
+## Skills vs. CLI
+
+This distinction matters:
+
+- **Skills** guide the *process* — they tell you and your AI what to do, in what order, with what verification
+- **CLI** handles the *data* — it reads, writes, builds, and queries deterministically
+
+A skill like `/rai-story-plan` tells the AI to decompose a story into tasks. The CLI command `rai signal emit-work` records the event. The skill orchestrates; the CLI executes.
+
+## Mastery Levels (ShuHaRi)
+
+Every skill supports three mastery levels, borrowed from martial arts:
+
+- **Shu (守)** — Follow the form exactly. For new practitioners or new skill types.
+- **Ha (破)** — Adapt the form. Skip optional steps, adjust to context. For experienced practitioners.
+- **Ri (離)** — Transcend the form. Create custom patterns. For experts who understand the principles deeply enough to improvise.
+
+Your experience level is tracked in your developer profile and included in the context bundle. At Shu level, skills provide detailed explanations. At Ri level, they show essentials only.
+
+## Verification Gates
+
+Every skill step has a verification criterion — a concrete check that the step was completed correctly. If verification fails, the skill stops (Jidoka principle: stop on defects, don't accumulate errors).
+
+Examples of verification gates:
+- "Epic branch exists" before creating a story branch
+- "Plan exists" before starting implementation
+- "Tests pass" before committing
+- "Retrospective complete" before merging
+
+## Managing Skills
+
+```bash
+# List all skills
+rai skill list
+
+# Validate skill structure
+rai skill validate
+
+# Create a new skill from template
+rai skill scaffold my-new-skill --lifecycle story
+
+# Check naming conventions
+rai skill check-name my-new-skill
+```
+
+See the [CLI Reference](/docs/cli/) for full details.
+
+---
+
+## Guides
+
+### Create a Custom Adapter
+
+Adapters connect RaiSE to external services. They implement Python Protocol contracts and are discovered via entry points.
+
+## Protocol Contracts
+
+RaiSE defines two primary adapter protocols in `rai_cli.adapters.protocols`:
+
+**ProjectManagementAdapter** — for issue trackers:
+
+```python
+from typing import Protocol, runtime_checkable
+
+@runtime_checkable
+class ProjectManagementAdapter(Protocol):
+    def create_issue(self, project_key: str, issue: IssueSpec) -> IssueRef: ...
+    def get_issue(self, key: str) -> IssueDetail: ...
+    def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef: ...
+    def transition_issue(self, key: str, status: str) -> IssueRef: ...
+    def search(self, query: str, limit: int = 50) -> list[IssueSummary]: ...
+    def health(self) -> AdapterHealth: ...
+```
+
+**DocumentationTarget** — for docs platforms:
+
+```python
+@runtime_checkable
+class DocumentationTarget(Protocol):
+    def can_publish(self, doc_type: str, metadata: dict[str, Any]) -> bool: ...
+    def publish(self, doc_type: str, content: str, metadata: dict[str, Any]) -> PublishResult: ...
+    def get_page(self, identifier: str) -> PageContent: ...
+    def search(self, query: str, limit: int = 10) -> list[PageSummary]: ...
+    def health(self) -> AdapterHealth: ...
+```
+
+Both are `@runtime_checkable`, so RaiSE verifies compliance with `isinstance()`.
+
+## Async-First Architecture
+
+Concrete adapters implement the async variants (`AsyncProjectManagementAdapter`, `AsyncDocumentationTarget`). The CLI consumes sync wrappers:
+
+```python
+from rai_cli.adapters.sync import SyncPMAdapter
+
+class MyTrackerAsync:
+    async def create_issue(self, project_key, issue):
+        # Your async implementation
+        ...
+
+# CLI consumption
+adapter = SyncPMAdapter(MyTrackerAsync())
+```
+
+## Entry Point Registration
+
+Register your adapter in `pyproject.toml`:
+
+```toml
+[project.entry-points."rai.adapters.pm"]
+my-tracker = "my_package.adapter:MyTrackerAdapter"
+
+[project.entry-points."rai.docs.targets"]
+my-docs = "my_package.docs:MyDocsTarget"
+```
+
+The entry point group names are stable contracts:
+- `rai.adapters.pm` — project management
+- `rai.docs.targets` — documentation
+- `rai.governance.schemas` — governance schemas
+- `rai.governance.parsers` — governance parsers
+- `rai.graph.backends` — graph storage
+
+## Validation
+
+After registration, verify your adapter:
+
+```bash
+# List all discovered adapters
+rai adapter list
+
+# Check Protocol compliance
+rai adapter check
+
+# Validate declarative YAML config
+rai adapter validate .raise/adapters/my-tracker.yaml
+```
+
+`rai adapter check` loads every registered entry point and runs `isinstance()` against the Protocol contract. Failures show which methods are missing.
+
+---
+
+### Wire a Lifecycle Hook
+
+Lifecycle hooks let you react to RaiSE events — session start, graph build, pattern added, work lifecycle, and more. They follow the same extension model as adapters: a Python Protocol contract discovered via entry points.
+
+## The LifecycleHook Protocol
+
+Every hook implements this contract:
+
+```python
+from typing import ClassVar, Protocol, runtime_checkable
+from rai_cli.hooks.events import HookEvent
+from rai_cli.hooks.protocol import HookResult
+
+@runtime_checkable
+class LifecycleHook(Protocol):
+    events: ClassVar[list[str]]   # Events to subscribe to
+    priority: ClassVar[int]       # Higher runs first (default 0)
+
+    def handle(self, event: HookEvent) -> HookResult: ...
+```
+
+Hooks are `@runtime_checkable` — no explicit inheritance needed, just implement the interface.
+
+## Available Events
+
+RaiSE emits 18 typed events as frozen dataclasses:
+
+| Event | Fires when |
+|-------|-----------|
+| `session:start` | Session begins |
+| `session:close` | Session ends |
+| `graph:build` | Knowledge graph rebuilt |
+| `pattern:added` | New pattern recorded |
+| `discover:scan` | Codebase scan completes |
+| `init:complete` | Project initialized |
+| `adapter:loaded` / `adapter:failed` | Adapter discovery |
+| `release:publish` | Release published |
+| `work:start` / `work:close` | Story/epic lifecycle |
+| `mcp:call` | MCP tool invocation |
+| `before:session:close` | Before session close (can abort) |
+| `before:release:publish` | Before release (can abort) |
+
+`before:` events can return `HookResult.abort("reason")` to cancel the operation.
+
+## Example: A Custom Hook
+
+```python
+# my_package/hooks.py
+from typing import ClassVar
+from rai_cli.hooks.events import HookEvent, PatternAddedEvent
+from rai_cli.hooks.protocol import HookResult
+
+class NotifyOnPatternHook:
+    """Send a notification when a new pattern is added."""
+
+    events: ClassVar[list[str]] = ["pattern:added"]
+    priority: ClassVar[int] = 0
+
+    def handle(self, event: HookEvent) -> HookResult:
+        if isinstance(event, PatternAddedEvent):
+            print(f"New pattern: {event.pattern_id}")
+        return HookResult.ok()
+```
+
+## Entry Point Registration
+
+Register your hook in `pyproject.toml`:
+
+```toml
+[project.entry-points."rai.hooks"]
+my-notify = "my_package.hooks:NotifyOnPatternHook"
+```
+
+RaiSE discovers hooks at runtime from the `rai.hooks` entry point group — the same mechanism used for adapters.
+
+## Built-in Hooks
+
+RaiSE ships with 5 built-in hooks:
+
+| Hook | Events | Purpose |
+|------|--------|---------|
+| `TelemetryHook` | All 9 after-events | Records `CommandUsage` signals |
+| `MemoryMdSyncHook` | `graph:build` | Regenerates MEMORY.md |
+| `JiraSyncHook` | `work:start`, `work:close` | Auto-transitions Jira issues |
+| `BacklogHook` | Work lifecycle | Creates/transitions backlog items |
+| `GateBridgeHook` | `before:release:publish` | Runs quality gates before release |
+
+## Error Isolation
+
+Hooks follow strict error isolation:
+
+- A failing hook never crashes the CLI
+- Exceptions are caught, logged, and skipped
+- Each hook has a 5-second timeout (configurable)
+- Even if one hook aborts, all others still run (all-notify semantics)
+
+## Validation
+
+Verify your hook is discovered:
+
+```bash
+rai adapter list    # hooks appear in rai.hooks entry point group
+```
+
+**See also:** [`rai adapter check`](/docs/cli/adapter/), [Create a Custom Adapter](/docs/guides/create-adapter/)
+
+---
+
+### Create a Custom Skill
+
+Skills are structured instructions that guide your AI assistant through repeatable workflows. Each skill is a SKILL.md file with YAML frontmatter and markdown sections.
+
+## Skill Structure
+
+A skill lives in its own directory under `.claude/skills/` (project-level) or is distributed from `src/rai_cli/skills_base/` (framework-level).
+
+```
+.claude/skills/
+  my-custom-skill/
+    SKILL.md
+```
+
+## Required Frontmatter
+
+Every SKILL.md starts with YAML frontmatter:
+
+```yaml
+---
+name: rai-my-skill
+description: >
+  One-paragraph description of what this skill does and when to use it.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: utility       # utility | epic | story | session
+  raise.frequency: as-needed      # always | as-needed | once
+  raise.fase: "0"                 # ShuHaRi phase
+  raise.prerequisites: ""         # Required prior skills
+  raise.next: ""                  # Suggested next skill
+  raise.gate: ""                  # Gate to check before running
+  raise.adaptable: "true"         # Can be customized per project
+  raise.version: "2.1.0"          # Framework version
+  raise.visibility: public        # public | private
+---
+```
+
+## Required Sections
+
+After frontmatter, include these markdown sections:
+
+1. **Purpose** — What the skill does and why it exists
+2. **Context** — When to use, when to skip, inputs needed, time boxing
+3. **Steps** — Numbered steps with `<verification>` blocks after each
+4. **Output** — What artifacts the skill produces
+5. **Quality Checklist** — Verification criteria as a checkbox list
+
+### Verification Blocks
+
+Each step should end with a verification gate:
+
+```markdown
+### Step 1: Do the Thing
+
+Instructions for this step.
+
+<verification>
+Expected outcome that confirms step completion.
+</verification>
+
+<if-blocked>
+What to do if this step fails.
+</if-blocked>
+```
+
+## Naming Conventions
+
+Skill names follow `{domain}-{action}` pattern:
+- `rai-story-start` — story domain, start action
+- `rai-debug` — utility domain, single action
+- `rai-discover-scan` — discovery domain, scan action
+
+Validate a name before creating:
+
+```bash
+rai skill check-name my-skill-name
+```
+
+## Scaffold a Skill
+
+Use the CLI to generate the skeleton:
+
+```bash
+rai skill scaffold my-custom-skill
+```
+
+This creates the directory and a SKILL.md template with all required sections.
+
+## Skill Sets
+
+Skill sets let teams customize which skills are active:
+
+```bash
+# List available skill sets
+rai skill set list
+
+# Create a custom set
+rai skill set create my-team-set
+
+# Compare sets
+rai skill set diff default my-team-set
+```
+
+## Validate
+
+Check that your skill meets structural requirements:
+
+```bash
+rai skill validate my-custom-skill
+```
+
+This verifies frontmatter fields, required sections, and naming conventions.
+
+---
+
+### Extending RaiSE
+
+RaiSE is designed to be extended. There are four extension points, each serving a different purpose.
+
+## Adapters
+
+Adapters connect RaiSE to external services — project management tools, documentation platforms, and knowledge graph backends. They follow Python Protocol contracts with entry point discovery.
+
+RaiSE ships with adapters for Jira and Confluence. You can add your own for any service.
+
+**Entry point groups:**
+- `rai.adapters.pm` — project management (issues, sprints, backlog)
+- `rai.docs.targets` — documentation publishing (pages, search)
+- `rai.governance.schemas` — governance artifact type definitions
+- `rai.governance.parsers` — governance artifact parsers
+- `rai.graph.backends` — knowledge graph storage
+
+[Create a custom adapter](/docs/guides/create-adapter/)
+
+## Skills
+
+Skills are structured instructions that guide your AI assistant through repeatable workflows. They are SKILL.md files with YAML frontmatter and step-by-step sections.
+
+RaiSE ships with lifecycle skills (session, epic, story) and utility skills (debug, research). You can create project-specific skills for your team's workflows.
+
+[Create a custom skill](/docs/guides/create-skill/)
+
+## MCP Servers
+
+MCP (Model Context Protocol) servers give your AI assistant access to external tools — documentation lookups, security scanners, repository operations. RaiSE manages MCP server registration and health checking.
+
+[Register an MCP server](/docs/guides/register-mcp/)
+
+## Lifecycle Hooks
+
+Hooks are shell commands that run on Claude Code events — before tool use, after tool use, or before context compaction. They enable side effects like journal logging without blocking the main workflow.
+
+[Wire a lifecycle hook](/docs/guides/create-hook/)
+
+## Validation
+
+After extending RaiSE, verify your setup:
+
+```bash
+# Check adapter registration and Protocol compliance
+rai adapter check
+
+# Validate a declarative adapter config
+rai adapter validate .raise/adapters/my-adapter.yaml
+
+# Check skill structure
+rai skill validate my-skill
+
+# Verify MCP server health
+rai mcp health my-server
+```
+
+---
+
+### Your First Story
+
+This guide walks you through the full story lifecycle using RaiSE skills. By the end, you'll have experienced the rhythm that makes AI-assisted engineering reliable and repeatable.
+
+## Before You Start
+
+Make sure you have:
+- A [RaiSE project initialized](/docs/getting-started/)
+- An AI assistant with RaiSE skills loaded (Claude Code recommended)
+- A small feature to build (something you can finish in one session)
+
+Start a session by invoking the skill in your AI assistant:
+
+```
+/rai-session-start
+```
+
+This loads your context, memory, patterns, and proposes focused work. You work **through skills** — RaiSE skills orchestrate the CLI commands for you.
+
+## Step 1: Start the Story
+
+Every story begins with `/rai-story-start`. This creates a branch and documents what you're building.
+
+```
+/rai-story-start S1.1 Add user greeting
+```
+
+Your AI will:
+1. Create a story branch (`story/s1.1/add-user-greeting`)
+2. Write a scope document with in/out criteria
+3. Create the scope commit
+
+The scope document captures what's **in scope**, what's **out of scope**, and what **done** looks like. This prevents scope creep — a feature that was "just a greeting" doesn't become an authentication system.
+
+## Step 2: Design the Specification
+
+Next, `/rai-story-design` creates a lean specification.
+
+```
+/rai-story-design S1.1 Add user greeting
+```
+
+Your AI will:
+1. Assess complexity (simple, moderate, complex)
+2. Frame the problem and value
+3. Describe the approach
+4. Write concrete examples
+5. Define acceptance criteria
+
+The design document is optimized for both human review and AI implementation. The examples are the most important part — concrete, runnable examples tell the AI exactly what to build.
+
+For simple features, you can skip design and go directly to planning.
+
+## Step 3: Plan the Implementation
+
+`/rai-story-plan` decomposes the story into atomic tasks.
+
+```
+/rai-story-plan S1.1 Add user greeting
+```
+
+Your AI will:
+1. Break the feature into small, independent tasks
+2. Define verification criteria for each task
+3. Map dependencies between tasks
+4. Set execution order
+
+Each task should be individually committable and verifiable. The plan includes a TDD cycle: write a failing test (RED), make it pass (GREEN), clean up (REFACTOR).
+
+## Step 4: Implement
+
+`/rai-story-implement` executes the plan task by task.
+
+```
+/rai-story-implement S1.1 Add user greeting
+```
+
+Your AI will:
+1. Pick the next task from the plan
+2. Write the failing test
+3. Implement the minimal code to pass
+4. Verify (tests, linting, type checks)
+5. Commit
+6. Pause for your review (HITL checkpoint)
+7. Repeat until all tasks complete
+
+The key rhythm here: **implement → verify → commit → pause**. After each task, your AI stops and shows you what was done. You review, approve, and it moves to the next task.
+
+## Step 5: Review
+
+After implementation, `/rai-story-review` captures learnings.
+
+```
+/rai-story-review S1.1 Add user greeting
+```
+
+Your AI will:
+1. Gather data: actual time vs. estimated, deviations from plan
+2. Answer four heutagogical questions:
+   - What did you learn?
+   - What would you change about the process?
+   - Are there improvements for the framework?
+   - What are you more capable of now?
+3. Identify process improvements
+4. Persist valuable patterns to memory
+
+This is where memory compounds. A pattern learned here shows up in future sessions.
+
+## Step 6: Close
+
+Finally, `/rai-story-close` merges and cleans up.
+
+```
+/rai-story-close S1.1 Add user greeting
+```
+
+Your AI will:
+1. Verify all done criteria are met
+2. Merge the story branch to the epic (or development) branch
+3. Delete the story branch
+4. Update tracking
+
+## The Rhythm
+
+After a few stories, the rhythm becomes natural:
+
+```
+scope → design → plan → build → reflect → close
+```
+
+Each step produces an artifact. Each artifact feeds the next step. The retrospective feeds memory, which feeds future sessions. This is how RaiSE compounds learning — not through magic, but through disciplined repetition.
+
+## Skills vs CLI
+
+In RaiSE, you interact through **skills** (slash commands in your AI assistant), not CLI commands directly:
+
+- **Skills** (`/rai-story-start`, `/rai-session-close`) — what you invoke. They orchestrate the full workflow.
+- **CLI** (`rai graph build`, `rai gate check`) — the deterministic backend. Skills call these for you.
+- **Some CLI is direct** — setup commands like `rai init`, `rai doctor`, and `rai skill list` are used directly.
+
+You can also run the entire story lifecycle in one command with `/rai-story-run S1.1`, which chains all 8 phases automatically.
+
+## Tips
+
+- **Start small.** Your first story should be XS or S sized. Get the rhythm first, then scale up.
+- **Don't skip review.** The retrospective is where learning happens. It's tempting to skip when you're excited to start the next feature — resist that impulse.
+- **Trust the gates.** Verification gates exist for a reason. When a gate fails, fix the issue before proceeding.
+- **Commit after each task.** Not at the end of the story. Each task gets its own commit. This creates a clean history and makes debugging easier.
+
+---
+
+### Register an MCP Server
+
+MCP (Model Context Protocol) servers extend your AI assistant with external tools. RaiSE manages server registration, configuration, and health checking through the `rai mcp` command group.
+
+## Two Registration Methods
+
+### Method 1: Install a Package
+
+For published MCP servers, use `rai mcp install`:
+
+```bash
+# npx package (Node.js)
+rai mcp install "@upstash/context7-mcp" --type npx --name context7
+
+# uvx package (Python)
+rai mcp install "semgrep-mcp" --type uvx --name semgrep --env SEMGREP_APP_TOKEN
+
+# pip package (Python module)
+rai mcp install "mcp-server-fetch" --type pip --name fetch --module mcp_server_fetch
+```
+
+### Method 2: Scaffold Manually
+
+For custom or local servers, use `rai mcp scaffold`:
+
+```bash
+rai mcp scaffold my-server \
+  --command "node" \
+  --args "path/to/server.js" \
+  --env "MY_API_KEY"
+```
+
+## Config File Format
+
+Both methods create a YAML config in `.raise/mcp/`. The catalog format:
+
+```yaml
+# .raise/mcp/catalog.yaml
+servers:
+  context7:
+    package: "@upstash/context7-mcp"
+    type: npx
+    description: "Documentation lookups for any library via Context7"
+    recommended_for: all
+
+  github:
+    package: "@modelcontextprotocol/server-github"
+    type: npx
+    env: [GITHUB_TOKEN]
+    description: "GitHub repository operations"
+    recommended_for: all
+
+  semgrep:
+    package: "semgrep-mcp"
+    type: uvx
+    env: [SEMGREP_APP_TOKEN]
+    description: "SAST + SCA + secret detection"
+    recommended_for: all
+```
+
+Config fields:
+- `package` — Package identifier for installation
+- `type` — `npx`, `uvx`, or `pip`
+- `module` — Python module name (pip only)
+- `env` — Required environment variable names
+- `description` — Human-readable purpose
+- `recommended_for` — Language list, or `all` for universal
+
+## Verification
+
+After registration, verify your server works:
+
+```bash
+# List registered servers
+rai mcp list
+
+# Check server health
+rai mcp health context7
+
+# List available tools on a server
+rai mcp tools context7
+
+# Call a specific tool
+rai mcp call context7 resolve-library-id --args '{"libraryName": "react"}'
+```
+
+## Example: Registering Context7
+
+Context7 provides documentation lookups for any library. Here is the full flow:
+
+```bash
+# Install
+rai mcp install "@upstash/context7-mcp" --type npx --name context7
+
+# Verify
+rai mcp health context7
+rai mcp tools context7
+```
+
+No environment variables needed. The server is immediately available to your AI assistant for documentation queries.
+
+---
+
+### Setting Up a Project
+
+This guide covers how to set up a RaiSE project — whether you're starting from scratch (greenfield) or adding RaiSE to an existing codebase (brownfield).
+
+## Greenfield: New Project
+
+### Initialize
+
+```bash
+mkdir my-project && cd my-project
+git init
+rai init --name my-project
+```
+
+This creates the `.raise/` directory:
+
+```
+.raise/
+├── manifest.yaml          # Project metadata
+└── rai/
+    ├── memory/
+    │   ├── patterns.jsonl  # Learned patterns
+    │   └── index.json      # Unified memory index
+    ├── session-state.yaml  # Current session state
+    ├── identity/
+    │   ├── core.md         # Rai's identity
+    │   └── perspective.md  # Rai's perspective
+    └── personal/           # Your private data (gitignored)
+        ├── sessions/
+        └── telemetry/
+```
+
+### Set Up Governance
+
+RaiSE creates a `governance/` directory with templates:
+
+```
+governance/
+├── constitution.md     # Your principles
+├── prd.md              # Your requirements
+├── guardrails.md       # Your rules
+├── backlog.md          # Your work items
+└── architecture/
+    ├── system-context.md
+    └── system-design.md
+```
+
+Fill these in with your project's specifics:
+
+1. **Constitution** — What are your non-negotiable principles? "Type annotations on all code." "Tests before implementation." Write 5-10 of these.
+
+2. **PRD** — What are you building? Define 3-5 requirements at the feature level.
+
+3. **Guardrails** — What rules must your code follow? Use MUST for non-negotiable, SHOULD for recommended. Link each guardrail to a requirement.
+
+You don't need to fill everything at once. Start with a few principles and guardrails. Add more as you learn what matters for your project.
+
+### Set Up Skills
+
+Skills live in `.claude/skills/`. RaiSE comes with a standard set of lifecycle skills. To see what's available:
+
+```bash
+rai skill list
+```
+
+You can create project-specific skills:
+
+```bash
+rai skill scaffold my-custom-skill --lifecycle utility
+```
+
+### Build Memory
+
+After filling governance files, build the memory index:
+
+```bash
+rai graph build
+```
+
+This creates the unified knowledge graph from all your governance documents, making them queryable and loadable into your AI's context.
+
+### First Session
+
+Open your AI assistant (Claude Code) in the project directory and run:
+
+```
+/rai-session-start
+```
+
+This loads your project's governance, memory, and skills into context. You're ready to work. From here, you interact through **skills** (`/rai-story-start`, `/rai-story-plan`, etc.) — they orchestrate the CLI for you.
+
+## Brownfield: Existing Project
+
+### Initialize with Detection
+
+For existing codebases, use `--detect` to analyze conventions:
+
+```bash
+cd existing-project
+rai init --detect
+```
+
+This does everything `rai init` does, plus:
+- Scans your source code for patterns
+- Identifies coding conventions (naming, formatting, imports)
+- Detects testing patterns and frameworks
+- Generates guardrails from detected conventions
+
+Review the generated `governance/guardrails.md` — it's a starting point, not gospel. Adjust to match your team's actual standards.
+
+### Discovery Scan
+
+For deeper analysis, run the discovery pipeline:
+
+```bash
+# Scan source code
+rai discover scan src/ --language python
+
+# Analyze with confidence scoring
+rai discover scan src/ -l python -o json | rai discover analyze
+
+# Check for architectural drift later
+rai discover drift
+```
+
+Discovery extracts your codebase's structure — classes, functions, modules — and builds a component map. This feeds into the knowledge graph, giving your AI partner architectural awareness.
+
+### Integrate with Existing Workflow
+
+RaiSE adds structure alongside your existing tools:
+
+- **Git**: RaiSE uses standard Git branching. Story branches are created from your development branch (`dev`). Epics are logical containers (directories), not branches.
+- **CI/CD**: RaiSE doesn't touch your pipeline. Guardrails are enforced at the AI level, not the CI level.
+- **Editor**: Skills are invoked through your AI assistant (e.g., `/rai-story-start` in Claude Code). No editor plugin needed.
+
+## Project Structure Reference
+
+A fully set up RaiSE project looks like:
+
+```
+my-project/
+├── .raise/                    # RaiSE runtime
+│   ├── manifest.yaml
+│   └── rai/
+│       ├── memory/            # Shared memory (committed)
+│       ├── personal/          # Private data (gitignored)
+│       ├── session-state.yaml
+│       └── identity/
+├── .claude/
+│   └── skills/                # Skill definitions
+│       ├── session-start/
+│       ├── story-start/
+│       └── ...
+├── governance/                # Project governance
+│   ├── constitution.md
+│   ├── prd.md
+│   ├── guardrails.md
+│   └── architecture/
+├── work/                      # Work tracking
+│   └── epics/
+│       └── e01-my-epic/
+│           ├── SCOPE.md
+│           └── stories/
+├── src/                       # Your code
+└── tests/                     # Your tests
+```
+
+## What to Commit
+
+| Directory | Commit? | Why |
+|-----------|---------|-----|
+| `.raise/rai/memory/` | Yes | Shared patterns and calibration |
+| `.raise/rai/personal/` | No | Developer-specific, gitignored |
+| `.raise/manifest.yaml` | Yes | Project metadata |
+| `governance/` | Yes | Shared governance documents |
+| `.claude/skills/` | Yes | Shared skill definitions |
+| `work/epics/` | Yes | Work tracking and retrospectives |
+
+---
+
+## CLI Reference
+
+### rai adapter
+
+Inspect and validate registered adapters. Adapters connect RaiSE to external services (Jira, Confluence, GitHub, etc.) via typed Protocol contracts.
+
+## `rai adapter list`
+
+List all registered adapters by entry point group. Shows each group with its registered adapters and source package.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai adapter list
+rai adapter list --format json
+```
+
+---
+
+## `rai adapter check`
+
+Validate adapters against their Protocol contracts. Loads each registered adapter and checks compliance via `isinstance()` against its `@runtime_checkable` Protocol.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai adapter check
+rai adapter check --format json
+```
+
+---
+
+## `rai adapter validate`
+
+Validate a declarative YAML adapter config. Checks that the YAML file conforms to `DeclarativeAdapterConfig` schema.
+
+| Argument | Description |
+|----------|-------------|
+| `FILE` | Path to YAML adapter config file (**required**) |
+
+```bash
+rai adapter validate .raise/adapters/github.yaml
+```
+
+---
+
+## `rai adapter status`
+
+Show configuration status for known adapters. Checks that required config files exist and environment variables are set.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai adapter status
+rai adapter status --format json
+```
+
+**See also:** [`rai backlog`](/docs/cli/backlog/), [`rai docs`](/docs/cli/docs/)
+
+---
+
+### rai artifact
+
+Manage skill artifacts. Artifacts are typed YAML files in `.raise/artifacts/` that serve as the source of truth for skill outputs (designs, plans, etc.).
+
+## `rai artifact validate`
+
+Validate YAML artifacts against their Pydantic schemas. Reads all `.yaml` files from `.raise/artifacts/` (or a single file with `--file`) and validates each against the type registry.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--file` | | Path to a single artifact file to validate |
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Validate all artifacts
+rai artifact validate
+
+# Validate a specific artifact
+rai artifact validate --file .raise/artifacts/s354.1-design.yaml
+
+# JSON output
+rai artifact validate --format json
+```
+
+**Exit codes:** 0 all pass, 1 any fail.
+
+**See also:** [`rai skill validate`](/docs/cli/skill/)
+
+---
+
+### rai backlog
+
+Manage backlog items via `ProjectManagementAdapter`. The query format is adapter-specific (e.g., JQL for Jira). Use `-a` to select an adapter when multiple are registered.
+
+## `rai backlog create`
+
+Create a new backlog item.
+
+| Argument | Description |
+|----------|-------------|
+| `SUMMARY` | Issue title (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project key, e.g. `RAISE` (**required**) |
+| `--type` | `-t` | Issue type. Default: `Task` |
+| `--labels` | `-l` | Comma-separated labels |
+| `--parent` | | Parent issue key |
+| `--description` | `-d` | Issue description (markdown) |
+| `--adapter` | `-a` | Adapter name override |
+| `--format` | `-f` | Output format: `human`, `agent`. Default: `human` |
+
+```bash
+# Create a task
+rai backlog create "Add CLI docs" -p RAISE
+
+# Create with labels and parent
+rai backlog create "Fix login bug" -p RAISE -t Bug -l "priority,frontend" --parent RAISE-100
+```
+
+---
+
+## `rai backlog get`
+
+Retrieve details for a single backlog item.
+
+| Argument | Description |
+|----------|-------------|
+| `KEY` | Issue key, e.g. `RAISE-123` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog get RAISE-123
+```
+
+---
+
+## `rai backlog get-comments`
+
+Retrieve comments for a backlog item.
+
+| Argument | Description |
+|----------|-------------|
+| `KEY` | Issue key (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--limit` | `-n` | Max comments. Default: `10` |
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog get-comments RAISE-123
+rai backlog get-comments RAISE-123 --limit 5
+```
+
+---
+
+## `rai backlog search`
+
+Search backlog items. Query format is adapter-specific (JQL for Jira).
+
+| Argument | Description |
+|----------|-------------|
+| `QUERY` | Search query (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--limit` | `-n` | Max results. Default: `50` |
+| `--adapter` | `-a` | Adapter name override |
+| `--format` | `-f` | Output format: `human`, `agent`. Default: `human` |
+
+```bash
+# JQL search
+rai backlog search "project = RAISE AND status = 'In Progress'"
+
+# Limit results
+rai backlog search "project = RAISE" -n 10
+```
+
+---
+
+## `rai backlog transition`
+
+Transition a backlog item to a new status.
+
+| Argument | Description |
+|----------|-------------|
+| `KEY` | Issue key (**required**) |
+| `STATUS` | Target status (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog transition RAISE-123 in-progress
+rai backlog transition RAISE-123 done
+```
+
+---
+
+## `rai backlog batch-transition`
+
+Transition multiple backlog items at once.
+
+| Argument | Description |
+|----------|-------------|
+| `KEYS` | Comma-separated issue keys (**required**) |
+| `STATUS` | Target status (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog batch-transition RAISE-1,RAISE-2,RAISE-3 done
+```
+
+---
+
+## `rai backlog update`
+
+Update fields on a backlog item.
+
+| Argument | Description |
+|----------|-------------|
+| `KEY` | Issue key (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--summary` | `-s` | New summary |
+| `--labels` | `-l` | Comma-separated labels |
+| `--priority` | | Priority name |
+| `--assignee` | | Assignee identifier |
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog update RAISE-123 -s "Updated title" -l "urgent"
+rai backlog update RAISE-123 --priority High --assignee alice
+```
+
+---
+
+## `rai backlog link`
+
+Link two backlog items.
+
+| Argument | Description |
+|----------|-------------|
+| `SOURCE` | Source issue key (**required**) |
+| `TARGET` | Target issue key (**required**) |
+| `LINK_TYPE` | Link type, e.g. `blocks`, `relates` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog link RAISE-100 RAISE-101 blocks
+rai backlog link RAISE-200 RAISE-201 relates
+```
+
+---
+
+## `rai backlog comment`
+
+Add a comment to a backlog item.
+
+| Argument | Description |
+|----------|-------------|
+| `KEY` | Issue key (**required**) |
+| `BODY` | Comment text in markdown (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog comment RAISE-123 "Implementation complete, ready for review."
+```
+
+---
+
+## `rai backlog sync`
+
+Regenerate `governance/backlog.md` from a remote adapter.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project key filter (e.g., `RAISE`) |
+| `--adapter` | `-a` | Adapter name override |
+
+```bash
+rai backlog sync -p RAISE
+```
+
+**See also:** [`rai adapter`](/docs/cli/adapter/)
+
+---
+
+### rai discover
+
+Codebase discovery and analysis commands. Extract code symbols, analyze architecture, build the knowledge graph, and detect drift.
+
+## `rai discover scan`
+
+Scan a directory and extract code symbols (classes, functions, methods, interfaces, module docstrings). Supports Python, TypeScript, JavaScript, PHP, Svelte, and C#.
+
+| Argument | Description |
+|----------|-------------|
+| `PATH` | Directory to scan. Default: `.` |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--language` | `-l` | Language: `python`, `typescript`, `javascript`, `php`, `svelte`, `csharp` (auto-detect if not set) |
+| `--output` | `-o` | Output format: `human`, `json`, `summary`. Default: `human` |
+| `--pattern` | `-p` | Glob pattern for files |
+| `--exclude` | `-e` | Patterns to exclude (repeatable) |
+
+```bash
+# Scan current directory (auto-detect languages)
+rai discover scan
+
+# Scan Python files only
+rai discover scan src/ --language python
+
+# JSON output for piping
+rai discover scan src/ -l python -o json
+
+# Exclude tests
+rai discover scan . --exclude "**/test_*" --exclude "**/__tests__/**"
+```
+
+---
+
+## `rai discover analyze`
+
+Analyze scan results with confidence scoring and module grouping. All analysis is deterministic — no AI inference required.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--input` | `-i` | Path to scan result JSON (reads stdin if not provided) |
+| `--output` | `-o` | Output format: `human`, `json`, `summary`. Default: `human` |
+| `--category-map` | `-c` | YAML file with custom path-to-category mappings |
+
+```bash
+# Analyze from file
+rai discover analyze --input scan-result.json
+
+# Pipe from scan
+rai discover scan src/ -l python -o json | rai discover analyze
+
+# Summary only
+rai discover analyze --input scan-result.json --output summary
+```
+
+---
+
+## `rai discover build`
+
+Build unified graph with discovered components. Integrates validated components into the knowledge graph.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--input` | `-i` | Path to validated components JSON |
+| `--project-root` | `-r` | Project root directory. Default: `.` |
+| `--output` | `-o` | Output format: `human`, `json`, `summary`. Default: `human` |
+
+```bash
+# Build with default input
+rai discover build
+
+# Build with custom input
+rai discover build --input my-components.json
+```
+
+---
+
+## `rai discover drift`
+
+Check for architectural drift against baseline components. Compares scanned code against validated baseline to detect files in wrong locations, naming violations, and missing documentation.
+
+| Argument | Description |
+|----------|-------------|
+| `PATH` | Directory to scan for drift. Default: `src/` |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project-root` | `-r` | Project root directory. Default: `.` |
+| `--output` | `-o` | Output format: `human`, `json`, `summary`. Default: `human` |
+
+```bash
+# Check entire project
+rai discover drift
+
+# Check specific directory
+rai discover drift src/new_module/
+
+# JSON output
+rai discover drift --output json
+```
+
+**Exit codes:** 0 no drift, 1 drift warnings found.
+
+**See also:** [`rai graph build`](/docs/cli/graph/)
+
+---
+
+### rai docs
+
+Manage governance documentation via `DocumentationTarget` adapters (e.g., Confluence). Publish governance artifacts and retrieve/search remote documentation.
+
+## `rai docs publish`
+
+Publish a governance artifact to a documentation target.
+
+| Argument | Description |
+|----------|-------------|
+| `ARTIFACT_TYPE` | Governance artifact type, e.g. `roadmap`, `adr` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--title` | | Page title (defaults to artifact type) |
+| `--target` | `-t` | Target name override (auto-detect if omitted) |
+
+```bash
+rai docs publish roadmap
+rai docs publish adr --title "ADR-001: Graph Architecture"
+```
+
+---
+
+## `rai docs get`
+
+Retrieve a page from the documentation target.
+
+| Argument | Description |
+|----------|-------------|
+| `IDENTIFIER` | Page ID on the remote target (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--target` | `-t` | Target name override |
+
+```bash
+rai docs get 12345678
+```
+
+---
+
+## `rai docs search`
+
+Search documentation pages on the remote target.
+
+| Argument | Description |
+|----------|-------------|
+| `QUERY` | Search query (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--limit` | `-n` | Max results. Default: `10` |
+| `--target` | `-t` | Target name override |
+
+```bash
+rai docs search "architecture decisions"
+rai docs search "roadmap" -n 5
+```
+
+**See also:** [`rai adapter`](/docs/cli/adapter/)
+
+---
+
+### rai doctor
+
+Diagnose RaiSE setup, report problems, and auto-fix common issues. Checks project structure, knowledge graph, adapters, MCP servers, and more.
+
+## `rai doctor`
+
+Run all diagnostic checks. By default shows only failures; use `--verbose` to show passing checks too.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--verbose` | `-v` | Show all checks including passing |
+| `--json` | | JSON output for CI |
+| `--fix` | | Auto-fix common issues (creates backups before modifying) |
+| `--online` | | Include online checks (MCP, adapter connectivity) |
+| `--category` | `-c` | Run only this check category |
+
+```bash
+# Quick check
+rai doctor
+
+# Verbose output
+rai doctor --verbose
+
+# Auto-fix common issues
+rai doctor --fix
+
+# Include online connectivity checks
+rai doctor --online
+
+# JSON for CI pipelines
+rai doctor --json
+
+# Check specific category
+rai doctor -c graph
+```
+
+**Exit codes:** 0 all checks pass, 1 any check fails.
+
+---
+
+## `rai doctor report`
+
+Generate a diagnostic report, optionally send via email.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--send` | | Open email client with report |
+
+```bash
+# Generate report to stdout
+rai doctor report
+
+# Open email client with report
+rai doctor report --send
+```
+
+**See also:** [`rai gate check`](/docs/cli/gate/)
+
+---
+
+### rai gate
+
+Discover and run workflow gates. Gates are quality checks that run at specific points in the development workflow (pre-commit, pre-merge, pre-release).
+
+## `rai gate list`
+
+List all discovered workflow gates. Shows each gate's ID, description, and workflow point.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai gate list
+rai gate list --format json
+```
+
+---
+
+## `rai gate check`
+
+Run workflow gates and report results. Check a specific gate by ID, or use `--all` to run every discovered gate.
+
+| Argument | Description |
+|----------|-------------|
+| `GATE_ID` | Gate ID to check (optional — use `--all` to run all) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--all` | `-a` | Run all discovered gates |
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Check a specific gate
+rai gate check gate-tests
+
+# Run all gates
+rai gate check --all
+
+# JSON output for CI
+rai gate check --all --format json
+```
+
+**Exit codes:** 0 all gates pass, 1 any gate fails.
+
+**See also:** [`rai release check`](/docs/cli/release/)
+
+---
+
+### rai graph
+
+Build, query, and manage the knowledge graph. The graph is a unified index of all context sources: governance, memory (patterns, calibration, sessions), skills, work tracking, and discovered components.
+
+## `rai graph build`
+
+Build the graph index from all sources. By default, diffs against the previous build and saves the diff to `.raise/rai/personal/last-diff.json`.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--output` | `-o` | Path to save index JSON |
+| `--no-diff` | | Skip diff computation |
+
+```bash
+# Build index to default location
+rai graph build
+
+# Build without diff
+rai graph build --no-diff
+
+# Save to custom location
+rai graph build --output custom_index.json
+```
+
+**Exit codes:** 0 success.
+
+---
+
+## `rai graph query`
+
+Search the knowledge graph for relevant concepts.
+
+| Argument | Description |
+|----------|-------------|
+| `QUERY_STR` | Query string — keywords or concept ID (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+| `--output` | `-o` | Output file path (default: stdout) |
+| `--strategy` | `-s` | Query strategy: `keyword_search`, `concept_lookup` |
+| `--types` | `-t` | Filter by types (comma-separated: `pattern`, `calibration`, `principle`, etc.) |
+| `--edge-types` | | Filter by edge types (comma-separated: `constrained_by`, `depends_on`, etc.) |
+| `--limit` | `-l` | Maximum number of results. Default: `10` |
+| `--index` | `-i` | Graph index path |
+
+```bash
+# Search by keywords
+rai graph query "planning estimation"
+
+# Filter to patterns only
+rai graph query "testing" --types pattern,calibration
+
+# Lookup specific concept by ID
+rai graph query "PAT-001" --strategy concept_lookup
+
+# Compact JSON output
+rai graph query "velocity" --format json
+```
+
+---
+
+## `rai graph context`
+
+Show full architectural context for a module. Returns bounded context (domain), architectural layer, guardrails, and dependencies.
+
+| Argument | Description |
+|----------|-------------|
+| `MODULE_ID` | Module ID, e.g. `mod-memory` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+| `--index` | `-i` | Graph index path |
+
+```bash
+# Show context for memory module
+rai graph context mod-memory
+
+# JSON output
+rai graph context mod-memory --format json
+```
+
+---
+
+## `rai graph validate`
+
+Validate graph index structure and relationships. Checks for cycles in `depends_on` relationships, valid relationship types, and that all edge targets exist as nodes.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--index` | `-i` | Path to index JSON file |
+
+```bash
+# Validate default index
+rai graph validate
+
+# Validate specific index file
+rai graph validate --index custom_index.json
+```
+
+**Exit codes:** 0 valid, 1 validation errors found.
+
+---
+
+## `rai graph extract`
+
+Extract concepts from governance markdown files. Without arguments, extracts from all standard governance locations (`governance/prd.md`, `governance/vision.md`, `framework/reference/constitution.md`).
+
+| Argument | Description |
+|----------|-------------|
+| `FILE_PATH` | Path to governance file (optional — extracts all if omitted) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Extract from all governance files
+rai graph extract
+
+# Extract from specific file
+rai graph extract governance/prd.md
+```
+
+---
+
+## `rai graph list`
+
+List concepts in the knowledge graph.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`, `table`. Default: `table` |
+| `--output` | `-o` | Output file path (default: stdout) |
+| `--index` | `-i` | Graph index path |
+| `--memory-only` / `--all` | | Show only memory types (pattern, calibration, session) or all. Default: `--all` |
+
+```bash
+# Show summary table
+rai graph list
+
+# Show only patterns/calibrations/sessions
+rai graph list --memory-only
+
+# Export as JSON
+rai graph list --format json --output graph.json
+```
+
+---
+
+## `rai graph viz`
+
+Generate an interactive HTML visualization of the knowledge graph. Creates a self-contained HTML file with a D3.js force-directed graph. Nodes are color-coded by type, filterable, zoomable, and searchable.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--output` | `-o` | Output HTML file path |
+| `--index` | `-i` | Graph index path |
+| `--open` / `--no-open` | | Open in browser after generating. Default: `--open` |
+
+```bash
+# Generate and open in browser
+rai graph viz
+
+# Generate to specific path
+rai graph viz --output graph.html
+
+# Generate without opening
+rai graph viz --no-open
+```
+
+**See also:** [`rai graph build`](#rai-graph-build), [`rai pattern`](/docs/cli/pattern/)
+
+---
+
+### CLI Reference
+
+Complete reference for the `rai` command-line interface. Commands are organized in workflow order — from project setup through release.
+
+## Global Options
+
+These options are available on all commands:
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--version` | `-V` | Show version and exit |
+| `--format` | `-f` | Output format: `human`, `json`, or `table` |
+| `--verbose` | `-v` | Increase verbosity (`-v`, `-vv`, `-vvv`) |
+| `--quiet` | `-q` | Suppress non-error output |
+| `--help` | | Show help and exit |
+
+## Command Groups
+
+| Group | Description |
+|-------|-------------|
+| [init](/docs/cli/init/) | Initialize a RaiSE project |
+| [session](/docs/cli/session/) | Manage working sessions |
+| [graph](/docs/cli/graph/) | Build, query, and manage the knowledge graph |
+| [pattern](/docs/cli/pattern/) | Manage learned patterns |
+| [signal](/docs/cli/signal/) | Emit lifecycle and telemetry signals |
+| [backlog](/docs/cli/backlog/) | Manage backlog items via adapters |
+| [skill](/docs/cli/skill/) | Manage RaiSE skills and skill sets |
+| [discover](/docs/cli/discover/) | Codebase discovery and analysis |
+| [adapter](/docs/cli/adapter/) | Inspect and validate adapters |
+| [mcp](/docs/cli/mcp/) | Manage MCP servers |
+| [gate](/docs/cli/gate/) | Discover and run workflow gates |
+| [doctor](/docs/cli/doctor/) | Diagnose setup and auto-fix issues |
+| [docs](/docs/cli/docs/) | Publish and retrieve documentation |
+| [artifact](/docs/cli/artifact/) | Manage skill artifacts |
+| [release](/docs/cli/release/) | Release management |
+| [info](/docs/cli/info/) | Display package information |
+| [profile](/docs/cli/profile/) | View developer profile |
+
+---
+
+### rai info
+
+Display base Rai package information. Shows the bundled base version, contents (identity, patterns, methodology), and whether it has been installed in the current project.
+
+## Usage
+
+```bash
+rai info
+```
+
+No flags — displays package info and exits.
+
+**See also:** [`rai init`](/docs/cli/init/)
+
+---
+
+### rai init
+
+Initialize a RaiSE project. Detects project type (greenfield/brownfield), creates `.raise/manifest.yaml`, and scaffolds skills/workflows for each target agent.
+
+## Usage
+
+```bash
+rai init [OPTIONS]
+```
+
+## Options
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--name` | `-n` | Project name (defaults to directory name) |
+| `--path` | `-p` | Project path (defaults to current directory) |
+| `--detect` | `-d` | Auto-detect installed agents from project markers. Also generates `AGENTS.md` |
+| `--agent` | | Target agent(s): `claude`, `cursor`, `windsurf`, `copilot`, `antigravity`. Repeatable |
+| `--ide` | | Deprecated — use `--agent` instead |
+| `--dry-run` | | Preview skill updates without writing files |
+| `--force` | | Overwrite all skill files without prompting |
+| `--skip-updates` | | Keep all existing skills, only install new ones |
+| `--skill-set` | | Overlay a skill set from `.raise/skills/{name}/` on top of builtins |
+
+## Examples
+
+```bash
+# New project (defaults to claude agent)
+rai init
+
+# Named project
+rai init --name my-api
+
+# Existing project with convention detection
+rai init --detect
+
+# Multi-agent setup
+rai init --agent claude --agent cursor
+
+# Preview what would change
+rai init --dry-run
+
+# Apply a custom skill set
+rai init --skill-set my-team
+```
+
+**See also:** [`rai skill sync`](/docs/cli/skill/), [`rai info`](/docs/cli/info/)
+
+---
+
+### rai mcp
+
+Manage and invoke MCP (Model Context Protocol) servers. Servers are registered in `.raise/mcp/*.yaml` and provide tools to AI agents.
+
+## `rai mcp list`
+
+List all registered MCP servers. Shows servers with their names, descriptions, and commands.
+
+```bash
+rai mcp list
+```
+
+---
+
+## `rai mcp health`
+
+Check connectivity of a registered MCP server. Connects, lists tools, and reports status, latency, and tool count.
+
+| Argument | Description |
+|----------|-------------|
+| `SERVER` | Registered MCP server name (**required**) |
+
+```bash
+rai mcp health context7
+```
+
+---
+
+## `rai mcp tools`
+
+List available tools on a registered MCP server.
+
+| Argument | Description |
+|----------|-------------|
+| `SERVER` | Registered MCP server name (**required**) |
+
+```bash
+rai mcp tools context7
+```
+
+---
+
+## `rai mcp call`
+
+Invoke a tool on a registered MCP server. Prints the result as JSON to stdout.
+
+| Argument | Description |
+|----------|-------------|
+| `SERVER` | Registered MCP server name (**required**) |
+| `TOOL` | Tool name to invoke (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--args` | | Tool arguments as JSON string. Default: `{}` |
+| `--verbose` | | Show call details on stderr |
+
+```bash
+rai mcp call context7 resolve-library-id --args '{"query":"next.js","libraryName":"next.js"}'
+```
+
+---
+
+## `rai mcp scaffold`
+
+Connect to an MCP server, introspect tools, and generate config. Creates `.raise/mcp/<name>.yaml` by connecting, discovering tools, and writing a valid config.
+
+| Argument | Description |
+|----------|-------------|
+| `NAME` | Server name (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--command` | | Server command, e.g. `npx`, `uvx` (**required**) |
+| `--args` | | Server arguments as space-separated string |
+| `--env` | | Comma-separated env var names |
+| `--force` | | Overwrite existing config file |
+
+```bash
+rai mcp scaffold context7 --command npx --args "-y @upstash/context7-mcp"
+```
+
+---
+
+## `rai mcp install`
+
+Install an MCP server package and generate config. Installs the package, verifies connectivity, and generates `.raise/mcp/<name>.yaml`.
+
+| Argument | Description |
+|----------|-------------|
+| `PACKAGE` | Package identifier (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--type` | | Package type: `uvx`, `npx`, `pip` (**required**) |
+| `--name` | | Server name for config file (**required**) |
+| `--env` | | Comma-separated env var names |
+| `--module` | | Python module name (required for `--type pip`) |
+| `--force` | | Overwrite existing config file |
+
+```bash
+# NPX package
+rai mcp install @upstash/context7-mcp --type npx --name context7
+
+# UVX package with env vars
+rai mcp install mcp-github --type uvx --name github --env GITHUB_TOKEN
+
+# Pip package with module
+rai mcp install mcp-server-fetch --type pip --name fetch --module mcp_server_fetch
+```
+
+**See also:** [`rai adapter`](/docs/cli/adapter/)
+
+---
+
+### rai pattern
+
+Manage learned patterns. Patterns capture learnings from development — process improvements, technical discoveries, and architectural decisions.
+
+## `rai pattern add`
+
+Add a new pattern to memory.
+
+| Argument | Description |
+|----------|-------------|
+| `CONTENT` | Pattern description (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--context` | `-c` | Context keywords (comma-separated) |
+| `--type` | `-t` | Pattern type: `codebase`, `process`, `architecture`, `technical`. Default: `process` |
+| `--from` | `-f` | Story/session where learned |
+| `--scope` | `-s` | Memory scope: `global`, `project`, `personal`. Default: `personal` |
+| `--memory-dir` | `-m` | Memory directory path (overrides scope) |
+
+```bash
+# Add a process pattern
+rai pattern add "HITL before commits" -c "git,workflow"
+
+# Add a technical pattern with source
+rai pattern add "Use capsys for stdout tests" -t technical -c "pytest,testing"
+
+# Add with source reference
+rai pattern add "BFS reuse across modules" -t architecture --from S2.3
+```
+
+---
+
+## `rai pattern reinforce`
+
+Record a reinforcement signal for a pattern. Called at story-review to indicate whether a pattern was applied (`1`), not relevant (`0`), or contradicted (`-1`). Vote `0` (N/A) does not count toward the evaluation total.
+
+| Argument | Description |
+|----------|-------------|
+| `PATTERN_ID` | Pattern ID to reinforce, e.g. `PAT-E-183` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--vote` | `-v` | Vote: `1` (applied), `0` (N/A), `-1` (contradicted) (**required**) |
+| `--from` | `-f` | Story ID for traceability |
+| `--scope` | `-s` | Memory scope: `global`, `project`, `personal`. Default: `project` |
+| `--memory-dir` | `-m` | Memory directory path (overrides scope) |
+
+```bash
+# Pattern was applied
+rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170
+
+# Pattern not relevant
+rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170
+
+# Pattern contradicted
+rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170
+```
+
+---
+
+## `rai pattern promote`
+
+Promote a pattern from personal scope to project scope. Moves the pattern entry from personal `patterns.jsonl` to project `patterns.jsonl`. The pattern ID is preserved.
+
+| Argument | Description |
+|----------|-------------|
+| `PATTERN_ID` | Pattern ID to promote, e.g. `PAT-E-123` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--memory-dir` | `-m` | Memory directory path (overrides default) |
+
+```bash
+rai pattern promote PAT-E-123
+```
+
+**See also:** [`rai graph query`](/docs/cli/graph/), [`rai signal emit-work`](/docs/cli/signal/)
+
+---
+
+### rai profile
+
+View the developer profile stored at `~/.rai/developer.yaml`.
+
+## `rai profile show`
+
+Display the developer profile in YAML format. If no profile exists, shows a message guiding you to create one via `rai session start --name`.
+
+```bash
+rai profile show
+```
+
+No flags — displays profile and exits.
+
+**See also:** [`rai session start`](/docs/cli/session/)
+
+---
+
+### rai release
+
+Release management commands. Run quality gates, bump versions, generate changelogs, and publish releases.
+
+## `rai release list`
+
+List releases from the knowledge graph. Shows all release nodes with status, target date, and associated epics.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project root path. Default: `.` |
+
+```bash
+rai release list
+```
+
+---
+
+## `rai release check`
+
+Run all quality gates before publishing. Runs 10 checks: tests, types, lint, security, coverage, build, package validation, changelog, PEP 440 version, and version sync.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--project` | `-p` | Project root path. Default: `.` |
+
+```bash
+rai release check
+```
+
+**Exit codes:** 0 all pass, 1 any fail.
+
+---
+
+## `rai release publish`
+
+Orchestrate a full release: check → bump → changelog → commit → tag → push. Either `--bump` or `--version` is required.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--bump` | `-b` | Version bump type: `major`, `minor`, `patch`, `alpha`, `beta`, `rc`, `release` |
+| `--version` | `-v` | Explicit version (overrides `--bump`) |
+| `--dry-run` | | Show what would happen without executing |
+| `--skip-check` | | Skip quality gates (dangerous) |
+| `--project` | `-p` | Project root path. Default: `.` |
+
+```bash
+# Alpha release
+rai release publish --bump alpha
+
+# Minor release (dry run)
+rai release publish --bump minor --dry-run
+
+# Explicit version
+rai release publish --version 2.1.0
+```
+
+**See also:** [`rai gate check`](/docs/cli/gate/)
+
+---
+
+### rai session
+
+Manage working sessions. Sessions track developer activity, enable context loading for AI agents, and capture incremental decisions via the journal.
+
+## `rai session start`
+
+Start a new working session. Increments the session counter and sets active session state. Checks for orphaned sessions and warns if found.
+
+With `--context`, outputs a token-optimized context bundle (~150 tokens) from the developer profile, session state, and knowledge graph.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--name` | `-n` | Your name (required for first-time setup) |
+| `--project` | `-p` | Project path to associate with this session |
+| `--agent` | | Agent type (e.g., `claude-code`, `cursor`). Default: `unknown` |
+| `--context` | | Output a context bundle for AI consumption |
+
+```bash
+# First-time setup
+rai session start --name "Alice" --project .
+
+# Start session with context bundle
+rai session start --project . --context
+
+# Simple start
+rai session start
+```
+
+---
+
+## `rai session close`
+
+End the current working session. With `--summary` or `--state-file`, performs a full structured close — records session, patterns, corrections, and updates state. All writes are atomic.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--summary` | `-s` | Session summary |
+| `--type` | `-t` | Session type (`feature`, `research`, `maintenance`, etc.) |
+| `--pattern` | | Pattern description to record |
+| `--correction` | | Coaching correction observed |
+| `--correction-lesson` | | Lesson from the correction |
+| `--state-file` | | YAML file with full structured session output |
+| `--session` | | Session ID to close (e.g., `SES-177`). Falls back to `RAI_SESSION_ID` env var |
+| `--project` | `-p` | Project path |
+
+```bash
+# Simple close
+rai session close
+
+# Close with summary
+rai session close --summary "Implemented auth module" --type feature
+
+# Close with pattern learned
+rai session close --summary "Refactored tests" --type maintenance \
+  --pattern "Use fixtures for database setup"
+```
+
+---
+
+## `rai session context`
+
+Load task-relevant context priming sections. Use after `rai session start --context` to load detailed priming for a specific work type.
+
+Available sections: `governance`, `behavioral`, `coaching`, `deadlines`, `progress`.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--sections` | `-s` | Comma-separated section names to load (**required**) |
+| `--project` | `-p` | Project path (**required**) |
+
+```bash
+# Feature work: governance + behavioral patterns
+rai session context -s governance,behavioral -p .
+
+# Near a deadline: check urgency
+rai session context -s deadlines,progress -p .
+```
+
+---
+
+## `rai session journal add`
+
+Add a journal entry to the current session. Entries capture decisions, insights, and completed tasks incrementally.
+
+| Argument | Description |
+|----------|-------------|
+| `CONTENT` | Content to persist (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--type` | `-t` | Entry type: `decision`, `insight`, `task_done`, `note`. Default: `note` |
+| `--tags` | | Comma-separated tags (e.g., `arch,spike`) |
+| `--project` | `-p` | Project path |
+
+```bash
+# Record a decision
+rai session journal add "Use JSONL for journal" --type decision
+
+# Record completed task
+rai session journal add "T1 complete" --type task_done
+
+# Record an insight with tags
+rai session journal add "Compaction loses rationale" --type insight --tags "compaction,memory"
+```
+
+---
+
+## `rai session journal show`
+
+Show journal entries for the current session.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--last` | `-n` | Show only the last N entries |
+| `--compact` | | Output compact format for context injection |
+| `--project` | `-p` | Project path |
+
+```bash
+# Show all entries
+rai session journal show
+
+# Show last 5 entries
+rai session journal show --last 5
+
+# Compact format for post-compaction restore
+rai session journal show --compact
+```
+
+**See also:** [`rai session start`](#rai-session-start), [`rai signal emit-session`](/docs/cli/signal/)
+
+---
+
+### rai signal
+
+Emit lifecycle and telemetry signals. Signals feed local analytics for lead time, velocity, and bottleneck detection.
+
+## `rai signal emit-work`
+
+Emit a work lifecycle event for Lean flow analysis. Tracks work items (epics, stories) through normalized phases.
+
+| Argument | Description |
+|----------|-------------|
+| `WORK_TYPE` | Work type: `epic`, `story` (**required**) |
+| `WORK_ID` | Work ID, e.g. `E9`, `S9.4` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--event` | `-e` | Event: `start`, `complete`, `blocked`, `unblocked`, `abandoned`. Default: `start` |
+| `--phase` | `-p` | Phase: `design`, `plan`, `implement`, `review`. Default: `design` |
+| `--blocker` | `-b` | Blocker description (for `blocked` events) |
+| `--session` | | Session ID (falls back to `RAI_SESSION_ID` env var) |
+
+```bash
+# Epic lifecycle
+rai signal emit-work epic E9 --event start --phase design
+rai signal emit-work epic E9 -e complete -p design
+
+# Story lifecycle
+rai signal emit-work story S9.4 --event start --phase implement
+rai signal emit-work story S9.4 -e complete -p implement
+
+# Work blocked
+rai signal emit-work story S9.4 -e blocked -p plan -b "unclear requirements"
+```
+
+---
+
+## `rai signal emit-session`
+
+Emit a session event to telemetry. Records session completion for local learning and insights.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--type` | `-t` | Session type: `story`, `research`, `maintenance`, etc. Default: `story` |
+| `--outcome` | `-o` | Outcome: `success`, `partial`, `abandoned`. Default: `success` |
+| `--duration` | `-d` | Session duration in minutes. Default: `0` |
+| `--stories` | `-f` | Stories worked on (comma-separated) |
+| `--session` | | Session ID (falls back to `RAI_SESSION_ID` env var) |
+
+```bash
+# Basic session complete
+rai signal emit-session --type story --outcome success
+
+# With duration and stories
+rai signal emit-session -t story -o success -d 45 -f S9.1,S9.2,S9.3
+```
+
+---
+
+## `rai signal emit-calibration`
+
+Emit a calibration event to telemetry. Records estimate vs. actual for velocity tracking. Velocity is calculated automatically: `estimated / actual` (>1.0 = faster than estimated).
+
+| Argument | Description |
+|----------|-------------|
+| `STORY` | Story ID, e.g. `S9.4` (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--size` | `-s` | T-shirt size: `XS`, `S`, `M`, `L`. Default: `S` |
+| `--estimated` | `-e` | Estimated duration in minutes. Default: `0` |
+| `--actual` | `-a` | Actual duration in minutes. Default: `0` |
+| `--session` | | Session ID (falls back to `RAI_SESSION_ID` env var) |
+
+```bash
+# Story completed faster than estimated
+rai signal emit-calibration S9.4 --size S --estimated 30 --actual 15
+
+# Story took longer
+rai signal emit-calibration S9.4 -s M -e 60 -a 90
+```
+
+**See also:** [`rai session close`](/docs/cli/session/), [`rai pattern reinforce`](/docs/cli/pattern/)
+
+---
+
+### rai skill
+
+Manage RaiSE skills. Skills are structured workflows (SKILL.md files) that guide AI agents through development lifecycle phases.
+
+## `rai skill list`
+
+List all skills in the skill directory. Shows skills grouped by lifecycle with version and description.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai skill list
+rai skill list --format json
+```
+
+---
+
+## `rai skill validate`
+
+Validate skill structure against the RaiSE schema. Checks frontmatter, required fields, sections, and naming conventions.
+
+| Argument | Description |
+|----------|-------------|
+| `PATH` | Path to skill file or directory (optional — validates all if omitted) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Validate all skills
+rai skill validate
+
+# Validate specific skill
+rai skill validate .claude/skills/rai-story-start/SKILL.md
+```
+
+**Exit codes:** 0 all valid, 1 validation errors found.
+
+---
+
+## `rai skill check-name`
+
+Check a proposed skill name against naming conventions. Validates `{domain}-{action}` pattern, checks for conflicts with existing skills or CLI commands, and verifies the lifecycle domain.
+
+| Argument | Description |
+|----------|-------------|
+| `NAME` | Proposed skill name (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai skill check-name story-validate
+```
+
+---
+
+## `rai skill scaffold`
+
+Create a new skill from template. Generates a `SKILL.md` file with proper structure.
+
+| Argument | Description |
+|----------|-------------|
+| `NAME` | Skill name to create (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--lifecycle` | `-l` | Lifecycle: `session`, `epic`, `story`, `discovery`, `utility`, `meta`. Inferred from name if not set |
+| `--after` | | Skill that should come before this one |
+| `--before` | | Skill that should come after this one |
+| `--set` | | Skill set to create in (creates in `.raise/skills/{set}/`) |
+| `--from-builtin` | | Copy from deployed builtin skill as starting point (requires `--set`) |
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Create a new story skill
+rai skill scaffold story-validate
+
+# With lifecycle and ordering
+rai skill scaffold story-validate --lifecycle story --after story-implement --before story-close
+
+# Create in a skill set from a builtin
+rai skill scaffold story-validate --set my-team --from-builtin
+```
+
+---
+
+## `rai skill sync`
+
+Check skill freshness against installed package version. Reports which skills are current, outdated, or have conflicts.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--path` | `-p` | Project path |
+
+```bash
+rai skill sync
+rai skill sync --path /path/to/project
+```
+
+**Exit codes:** 0 all current, 1 updates available.
+
+---
+
+## `rai skill set create`
+
+Create a new skill set from builtins. Copies all builtin skills to `.raise/skills/<name>/` as a starting base for customization.
+
+| Argument | Description |
+|----------|-------------|
+| `NAME` | Skill set name (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--empty` | | Create empty set (no builtins copied) |
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+# Create from builtins
+rai skill set create my-team
+
+# Create empty set
+rai skill set create my-team --empty
+```
+
+---
+
+## `rai skill set list`
+
+List all skill sets in `.raise/skills/`.
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai skill set list
+```
+
+---
+
+## `rai skill set diff`
+
+Compare a skill set against builtins. Shows which skills are added, modified, or unchanged.
+
+| Argument | Description |
+|----------|-------------|
+| `NAME` | Skill set name to compare (**required**) |
+
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--format` | `-f` | Output format: `human`, `json`. Default: `human` |
+
+```bash
+rai skill set diff my-team
+```
+
+**See also:** [`rai init --skill-set`](/docs/cli/init/)
+
+---
