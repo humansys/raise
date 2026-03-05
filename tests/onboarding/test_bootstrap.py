@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 
 from rai_cli.onboarding.bootstrap import BootstrapResult, bootstrap_rai_base
 
@@ -182,6 +184,109 @@ class TestBootstrapPartialState:
         assert result.methodology_copied
 
 
+class TestBasePatternMerge:
+    """Tests for merging base patterns on re-init."""
+
+    def _write_patterns(self, path: Path, patterns: Sequence[dict[str, Any]]) -> None:
+        """Helper: write pattern dicts as JSONL."""
+        import json
+
+        lines = [json.dumps(p) for p in patterns]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    def _read_patterns(self, path: Path) -> list[dict[str, object]]:
+        """Helper: read JSONL patterns from file."""
+        import json
+
+        lines = path.read_text(encoding="utf-8").strip().splitlines()
+        return [json.loads(line) for line in lines if line.strip()]
+
+    def test_copy_patterns_merges_new_base_on_reinit(self, tmp_path: Path) -> None:
+        """Existing patterns.jsonl with BASE-001 + PAT-E-001, package adds BASE-002+.
+
+        After merge: BASE-001 preserved, PAT-E-001 preserved, new BASE-* appended.
+        """
+        patterns_file = tmp_path / ".raise" / "rai" / "memory" / "patterns.jsonl"
+        self._write_patterns(
+            patterns_file,
+            [
+                {"id": "BASE-001", "content": "existing base", "base": True, "version": 1},
+                {"id": "PAT-E-001", "content": "project pattern", "version": 1},
+            ],
+        )
+
+        result = bootstrap_rai_base(tmp_path)
+
+        merged = self._read_patterns(patterns_file)
+        ids = [p["id"] for p in merged]
+
+        # PAT-E-001 must survive
+        assert "PAT-E-001" in ids
+        # BASE-001 must survive
+        assert "BASE-001" in ids
+        # New base patterns from package should be added
+        assert result.patterns_added > 0
+        # Total should be 2 original + however many new base patterns
+        assert len(merged) > 2
+
+    def test_copy_patterns_updates_versioned_base(self, tmp_path: Path) -> None:
+        """Existing BASE-007 v1 should be updated to v2 from package."""
+        patterns_file = tmp_path / ".raise" / "rai" / "memory" / "patterns.jsonl"
+        self._write_patterns(
+            patterns_file,
+            [
+                {"id": "BASE-007", "content": "old content", "base": True, "version": 1},
+            ],
+        )
+
+        result = bootstrap_rai_base(tmp_path)
+
+        merged = self._read_patterns(patterns_file)
+        base007 = [p for p in merged if p["id"] == "BASE-007"][0]
+
+        # Package has BASE-007 v2, so it should be updated
+        assert base007["version"] == 2
+        assert base007["content"] != "old content"
+        assert result.patterns_updated >= 1
+
+    def test_copy_patterns_preserves_project_patterns(self, tmp_path: Path) -> None:
+        """All PAT-E-* patterns must be preserved untouched."""
+        patterns_file = tmp_path / ".raise" / "rai" / "memory" / "patterns.jsonl"
+        project_patterns = [
+            {"id": f"PAT-E-{i:03d}", "content": f"project pattern {i}", "version": 1}
+            for i in range(1, 6)
+        ]
+        self._write_patterns(patterns_file, project_patterns)
+
+        bootstrap_rai_base(tmp_path)
+
+        merged = self._read_patterns(patterns_file)
+        pat_e_entries = [p for p in merged if str(p["id"]).startswith("PAT-E-")]
+
+        assert len(pat_e_entries) == 5
+        for i, p in enumerate(pat_e_entries, start=1):
+            assert p["content"] == f"project pattern {i}"
+
+    def test_copy_patterns_idempotent(self, tmp_path: Path) -> None:
+        """Running merge twice produces the same result."""
+        patterns_file = tmp_path / ".raise" / "rai" / "memory" / "patterns.jsonl"
+        self._write_patterns(
+            patterns_file,
+            [{"id": "PAT-E-001", "content": "project", "version": 1}],
+        )
+
+        bootstrap_rai_base(tmp_path)
+        first_content = patterns_file.read_text(encoding="utf-8")
+
+        result2 = bootstrap_rai_base(tmp_path)
+        second_content = patterns_file.read_text(encoding="utf-8")
+
+        assert first_content == second_content
+        assert result2.patterns_added == 0
+        assert result2.patterns_updated == 0
+
+
 class TestBootstrapResult:
     """Tests for BootstrapResult model."""
 
@@ -196,3 +301,5 @@ class TestBootstrapResult:
         assert not result.already_existed
         assert result.files_copied == []
         assert result.files_skipped == []
+        assert result.patterns_added == 0
+        assert result.patterns_updated == 0
