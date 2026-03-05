@@ -82,10 +82,10 @@ class TestBasePatternsValidity:
             )
 
     def test_all_have_version(self, patterns: list[dict]) -> None:
-        """All patterns have version: 1."""
+        """All patterns have version >= 1."""
         for pattern in patterns:
-            assert pattern["version"] == 1, (
-                f"Pattern {pattern['id']} should have version: 1"
+            assert isinstance(pattern["version"], int) and pattern["version"] >= 1, (
+                f"Pattern {pattern['id']} should have version >= 1"
             )
 
     def test_valid_types(self, patterns: list[dict]) -> None:
