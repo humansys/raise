@@ -73,6 +73,62 @@ Evidence catalog: `work/research/e348-documentation-practices/`
 - [ ] Pages are self-contained and <5000 chars where practical (agent-friendly)
 - [ ] Retrospective complete
 
+## Implementation Plan
+
+### Sequence
+
+| # | Story | Size | Rationale | Enables |
+|---|-------|------|-----------|---------|
+| 1 | S348.1: Documentation audit | XS | Quick win — maps all gaps, informs every other story | All stories |
+| 2 | S348.2: CLI reference completion | M | Critical path — biggest content gap, most value per effort | S348.4, S348.5, S348.6 |
+| 2' | S348.3: llms.txt + AGENTS.md | S | **Parallel with S348.2** — only needs audit output, not CLI ref | S348.6 |
+| 3 | S348.4: Developer extension guides | M | Depends on CLI ref for cross-links to commands | S348.6 |
+| 3' | S348.5: README + community files | S | **Parallel with S348.4** — depends on CLI ref for feature list | S348.6 |
+| 4 | S348.6: Docs validation | S | Final — validates everything, fixes cross-links | Epic close |
+
+### Critical Path
+
+```
+S348.1 → S348.2 → S348.4 → S348.6
+```
+
+### Parallel Streams
+
+```
+Stream A:  S348.1 → S348.2 → S348.4 ──→ S348.6
+                  ↘                   ↗
+Stream B:          S348.3    S348.5 ─┘
+```
+
+### Milestones
+
+**M1: Reference Foundation** (after S348.1 + S348.2 + S348.3)
+- All CLI commands documented
+- llms.txt indexes docs
+- Success: `rai --help` output matches docs for every command
+
+**M2: Feature Complete** (after S348.4 + S348.5)
+- Extension guides for 4 extension points
+- README reflects v2.2
+- Success: New developer can find how to extend RaiSE using only docs
+
+**M3: Epic Complete** (after S348.6)
+- All docs validated against actual CLI
+- Cross-links verified, pages self-contained
+- Retrospective complete
+- Success: All done criteria met
+
+### Progress Tracking
+
+| # | Story | Status | Actual Size | Notes |
+|---|-------|--------|-------------|-------|
+| 1 | S348.1: Documentation audit | Pending | — | — |
+| 2 | S348.2: CLI reference completion | Pending | — | — |
+| 2' | S348.3: llms.txt + AGENTS.md | Pending | — | — |
+| 3 | S348.4: Developer extension guides | Pending | — | — |
+| 3' | S348.5: README + community files | Pending | — | — |
+| 4 | S348.6: Docs validation | Pending | — | — |
+
 ## Risks
 
 | Risk | Likelihood | Impact | Mitigation |
