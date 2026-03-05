@@ -124,7 +124,7 @@ M1: Git-safe        M2: Context alive    M3: Patterns    M4: Full portability
 | S350.2 Git sanitize | S | Done | S | Merged c69a9315 |
 | S350.3 Regeneration | M | Done | M | Merged 217a42f9 |
 | S350.4 Patterns | L | Done | M | Merged 8221619f |
-| S350.5 Enhanced init | M | Pending | — | |
+| S350.5 Enhanced init | M | Done | S | Merged to dev |
 | S350.6 Skill sync | S | Pending | — | |
 | S350.7 Jira creds | S | Done | XS | Already resolved -- credentials in .env, jira.yaml clean |
 
