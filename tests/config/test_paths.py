@@ -119,6 +119,16 @@ class TestGetGlobalRaiDir:
         result = get_global_rai_dir()
         assert isinstance(result, Path)
 
+    def test_rai_home_path_traversal_resolved(
+        self, monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    ) -> None:
+        """RAI_HOME with .. traversal components must be resolved to canonical path."""
+        traversal = str(tmp_path / "safe" / ".." / "evil")
+        monkeypatch.setenv("RAI_HOME", traversal)
+        result = get_global_rai_dir()
+        assert ".." not in str(result)
+        assert result == (tmp_path / "evil").resolve()
+
 
 class TestGetIdentityDir:
     """Tests for get_identity_dir() function."""
@@ -202,6 +212,16 @@ class TestGetSessionDir:
         """Should return a Path object."""
         result = get_session_dir("SES-1", tmp_path)
         assert isinstance(result, Path)
+
+    def test_session_id_path_traversal_rejected(self, tmp_path: Path) -> None:
+        """session_id with .. components must raise ValueError."""
+        with pytest.raises(ValueError, match="path traversal"):
+            get_session_dir("../../etc/cron.d", tmp_path)
+
+    def test_session_id_deep_traversal_rejected(self, tmp_path: Path) -> None:
+        """session_id with deep traversal must raise ValueError."""
+        with pytest.raises(ValueError, match="path traversal"):
+            get_session_dir("../../../../tmp/evil", tmp_path)
 
 
 class TestEnsureGlobalRaiDir:
