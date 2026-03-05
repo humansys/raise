@@ -24,7 +24,7 @@ Cuando el mismo concepto existe en múltiples scopes, **personal sobreescribe pr
 Los patrones son aprendizajes capturados durante el desarrollo. Representan qué funcionó, qué no y qué recordar la próxima vez.
 
 ```bash
-rai memory add-pattern "Usar fixtures para setup de base de datos en tests" \
+rai pattern add "Usar fixtures para setup de base de datos en tests" \
   -t technical -c "pytest,testing" --from S3.5
 ```
 
@@ -39,7 +39,7 @@ Los patrones tienen sub-tipos:
 La calibración registra cuánto tardan realmente las stories vs. las estimaciones. Con el tiempo, esto construye un perfil de velocidad que ayuda a predecir trabajo futuro con más precisión.
 
 ```bash
-rai memory add-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
+rai signal emit-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
 ```
 
 Esto registra: la story S3.5 se estimó en 60 minutos (talla M) pero realmente tomó 45 — una velocidad de 1.33x.
@@ -49,7 +49,7 @@ Esto registra: la story S3.5 se estimó en 60 minutos (talla M) pero realmente t
 Las sesiones son un registro cronológico de lo que sucedió. Cada sesión captura: en qué trabajaste, qué lograste y qué patrones aprendiste.
 
 ```bash
-rai memory add-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
+rai signal emit-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
 ```
 
 ## Scoring de Patrones
@@ -69,9 +69,9 @@ El **modificador Wilson** ajusta el score basado en el historial de refuerzo. Lo
 En cada revisión de story, evalúa los patrones que fueron cargados al inicio de la sesión:
 
 ```bash
-rai memory reinforce PAT-E-183 --vote 1 --from RAISE-170   # aplicado
-rai memory reinforce PAT-E-151 --vote 0 --from RAISE-170   # N/A
-rai memory reinforce PAT-E-094 --vote -1 --from RAISE-170  # contradicho
+rai pattern reinforce PAT-E-183 --vote 1 --from RAISE-170   # aplicado
+rai pattern reinforce PAT-E-151 --vote 0 --from RAISE-170   # N/A
+rai pattern reinforce PAT-E-094 --vote -1 --from RAISE-170  # contradicho
 ```
 
 El voto `0` (N/A) no cuenta hacia las evaluaciones — úsalo libremente. El sistema es deliberadamente conservador con muestras pequeñas: un patrón con 1 evaluación positiva puntúa ~0.21, no 1.0. La confianza se construye gradualmente a través del uso real.
@@ -93,13 +93,13 @@ Todas las fuentes de memoria se fusionan en un índice consultable:
 
 ```bash
 # Construir el índice unificado
-rai memory build
+rai graph build
 
 # Consultarlo
-rai memory query "testing patterns" --types pattern
+rai graph query "testing patterns" --types pattern
 
 # Listar todos los conceptos
-rai memory list --memory-only
+rai graph list --memory-only
 ```
 
 El índice es un archivo JSON (`.raise/rai/memory/index.json`) que combina patrones, calibración, sesiones, gobernanza, seguimiento de trabajo y skills en un solo grafo. Ver [Knowledge Graph](/es/docs/concepts/knowledge-graph/) para cómo funciona este grafo.
@@ -108,14 +108,14 @@ El índice es un archivo JSON (`.raise/rai/memory/index.json`) que combina patro
 
 | Comando | Qué hace |
 |---------|----------|
-| `rai memory build` | Construir índice unificado desde todas las fuentes |
-| `rai memory query` | Buscar conceptos relevantes en la memoria |
-| `rai memory query --format compact` | Salida de alta densidad para ventanas de contexto de IA |
-| `rai memory reinforce --vote 1\|0\|-1` | Registrar señal de refuerzo para un patrón |
-| `rai memory list` | Listar todos los conceptos en el índice |
-| `rai memory add-pattern` | Registrar un patrón aprendido |
-| `rai memory add-calibration` | Registrar datos de timing de una story |
-| `rai memory add-session` | Registrar una sesión |
-| `rai memory validate` | Verificar integridad del índice |
+| `rai graph build` | Construir índice unificado desde todas las fuentes |
+| `rai graph query` | Buscar conceptos relevantes en la memoria |
+| `rai graph query --format compact` | Salida de alta densidad para ventanas de contexto de IA |
+| `rai pattern reinforce --vote 1\|0\|-1` | Registrar señal de refuerzo para un patrón |
+| `rai graph list` | Listar todos los conceptos en el índice |
+| `rai pattern add` | Registrar un patrón aprendido |
+| `rai signal emit-calibration` | Registrar datos de timing de una story |
+| `rai signal emit-session` | Registrar una sesión |
+| `rai graph validate` | Verificar integridad del índice |
 
 Ver la [Referencia CLI](/es/docs/cli/) para detalles completos de cada comando.
