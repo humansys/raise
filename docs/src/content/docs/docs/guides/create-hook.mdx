@@ -1,87 +1,108 @@
 ---
 title: Wire a Lifecycle Hook
-description: How to create Claude Code lifecycle hooks for RaiSE — shell scripts that run on agent events.
+description: How to create a RaiSE lifecycle hook — typed events, Protocol contract, entry point registration.
 ---
 
-Lifecycle hooks are shell scripts that run on Claude Code events. They enable side effects — logging, journal snapshots, notifications — without blocking the main workflow.
+Lifecycle hooks let you react to RaiSE events — session start, graph build, pattern added, work lifecycle, and more. They follow the same extension model as adapters: a Python Protocol contract discovered via entry points.
 
-## Hook Configuration
+## The LifecycleHook Protocol
 
-Hooks are configured in `.claude/settings.json` or `.claude/settings.local.json` under a `hooks` key (when supported), or placed as scripts in `.claude/scripts/` and referenced from Claude Code's hook system.
+Every hook implements this contract:
 
-## Available Hook Points
+```python
+from typing import ClassVar, Protocol, runtime_checkable
+from rai_cli.hooks.events import HookEvent
+from rai_cli.hooks.protocol import HookResult
 
-Claude Code supports these hook events:
+@runtime_checkable
+class LifecycleHook(Protocol):
+    events: ClassVar[list[str]]   # Events to subscribe to
+    priority: ClassVar[int]       # Higher runs first (default 0)
 
-| Hook | Fires When | Can Block? |
-|------|-----------|------------|
-| `PreToolUse` | Before a tool executes | Yes (stdout = decision) |
-| `PostToolUse` | After a tool completes | No |
-| `PreCompact` | Before context compaction | No (stdout ignored) |
-
-- **PreToolUse** hooks can return `ALLOW`, `DENY`, or `ASK` to control tool execution.
-- **PostToolUse** and **PreCompact** hooks are fire-and-forget — their stdout is ignored.
-
-## Creating a Hook Script
-
-Hook scripts are standard bash scripts. Place them in `.claude/scripts/`:
-
-```bash
-#!/bin/bash
-# .claude/scripts/pre-compact-journal.sh
-# Log journal state before context compaction
-
-PROJECT_DIR="/path/to/your/project"
-LOG="/tmp/rai-hook-pre-compact.log"
-
-exec 2>"$LOG"
-echo "=== pre-compact-journal.sh ===" >&2
-echo "date: $(date)" >&2
-
-export PATH="$HOME/.local/bin:$HOME/.cargo/bin:/usr/local/bin:$PATH"
-
-OUTPUT=$(uv run --project "$PROJECT_DIR" \
-  rai session journal show --compact --project "$PROJECT_DIR" 2>&1)
-echo "journal snapshot: $OUTPUT" >&2
+    def handle(self, event: HookEvent) -> HookResult: ...
 ```
 
-Make it executable:
+Hooks are `@runtime_checkable` — no explicit inheritance needed, just implement the interface.
 
-```bash
-chmod +x .claude/scripts/pre-compact-journal.sh
+## Available Events
+
+RaiSE emits 18 typed events as frozen dataclasses:
+
+| Event | Fires when |
+|-------|-----------|
+| `session:start` | Session begins |
+| `session:close` | Session ends |
+| `graph:build` | Knowledge graph rebuilt |
+| `pattern:added` | New pattern recorded |
+| `discover:scan` | Codebase scan completes |
+| `init:complete` | Project initialized |
+| `adapter:loaded` / `adapter:failed` | Adapter discovery |
+| `release:publish` | Release published |
+| `work:start` / `work:close` | Story/epic lifecycle |
+| `mcp:call` | MCP tool invocation |
+| `before:session:close` | Before session close (can abort) |
+| `before:release:publish` | Before release (can abort) |
+
+`before:` events can return `HookResult.abort("reason")` to cancel the operation.
+
+## Example: A Custom Hook
+
+```python
+# my_package/hooks.py
+from typing import ClassVar
+from rai_cli.hooks.events import HookEvent, PatternAddedEvent
+from rai_cli.hooks.protocol import HookResult
+
+class NotifyOnPatternHook:
+    """Send a notification when a new pattern is added."""
+
+    events: ClassVar[list[str]] = ["pattern:added"]
+    priority: ClassVar[int] = 0
+
+    def handle(self, event: HookEvent) -> HookResult:
+        if isinstance(event, PatternAddedEvent):
+            print(f"New pattern: {event.pattern_id}")
+        return HookResult.ok()
 ```
+
+## Entry Point Registration
+
+Register your hook in `pyproject.toml`:
+
+```toml
+[project.entry-points."rai.hooks"]
+my-notify = "my_package.hooks:NotifyOnPatternHook"
+```
+
+RaiSE discovers hooks at runtime from the `rai.hooks` entry point group — the same mechanism used for adapters.
+
+## Built-in Hooks
+
+RaiSE ships with 5 built-in hooks:
+
+| Hook | Events | Purpose |
+|------|--------|---------|
+| `TelemetryHook` | All 9 after-events | Records `CommandUsage` signals |
+| `MemoryMdSyncHook` | `graph:build` | Regenerates MEMORY.md |
+| `JiraSyncHook` | `work:start`, `work:close` | Auto-transitions Jira issues |
+| `BacklogHook` | Work lifecycle | Creates/transitions backlog items |
+| `GateBridgeHook` | `before:release:publish` | Runs quality gates before release |
 
 ## Error Isolation
 
-Hooks follow error isolation principles:
+Hooks follow strict error isolation:
 
-- A failing hook does not crash the agent session
-- Errors are logged but do not block the main workflow
-- Use `exec 2>"$LOG"` to capture stderr for debugging
-- Always set PATH explicitly — hook environment is unpredictable
+- A failing hook never crashes the CLI
+- Exceptions are caught, logged, and skipped
+- Each hook has a 5-second timeout (configurable)
+- Even if one hook aborts, all others still run (all-notify semantics)
 
-## Design Guidelines
+## Validation
 
-1. **Keep hooks fast.** They run synchronously before/after tool calls. Slow hooks degrade the agent experience.
-2. **Log to files, not stdout.** For PreCompact and PostToolUse, stdout is ignored anyway. For PreToolUse, stdout controls the decision.
-3. **Hardcode paths.** The hook environment does not reliably inherit shell variables. Use absolute paths.
-4. **Fail silently.** A broken hook should not break the workflow. Wrap risky operations in error handling.
-
-## Example: PreToolUse Gate
-
-A hook that blocks dangerous commands:
+Verify your hook is discovered:
 
 ```bash
-#!/bin/bash
-# .claude/scripts/block-force-push.sh
-# Deny git push --force to main
-
-INPUT=$(cat -)
-if echo "$INPUT" | grep -q "push.*--force.*main"; then
-  echo "DENY: force push to main is not allowed"
-  exit 0
-fi
-echo "ALLOW"
+rai adapter list    # hooks appear in rai.hooks entry point group
 ```
 
-This prevents the AI from force-pushing to main, even if instructed to do so.
+**See also:** [`rai adapter check`](/docs/cli/adapter/), [Create a Custom Adapter](/docs/guides/create-adapter/)
