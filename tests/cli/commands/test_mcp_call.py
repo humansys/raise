@@ -66,7 +66,7 @@ class TestMcpCallSuccess:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -98,7 +98,7 @@ class TestMcpCallSuccess:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -130,7 +130,7 @@ class TestMcpCallToolError:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -157,7 +157,7 @@ class TestMcpCallBridgeError:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -182,7 +182,7 @@ class TestMcpCallEmitsEvent:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(
@@ -212,7 +212,7 @@ class TestMcpCallEmitsEvent:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(
@@ -243,7 +243,7 @@ class TestMcpCallVerbose:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(
@@ -270,7 +270,7 @@ class TestMcpCallVerbose:
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(

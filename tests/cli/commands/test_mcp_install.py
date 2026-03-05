@@ -35,7 +35,7 @@ class TestInstallNpx:
         mcp_dir = tmp_path / ".raise" / "mcp"
 
         with patch(
-            "rai_cli.cli.commands.mcp.McpBridge",
+            "rai_cli.mcp.bridge.McpBridge",
             return_value=_healthy_bridge(),
         ):
             result = runner.invoke(
@@ -67,7 +67,7 @@ class TestInstallUvx:
         mcp_dir = tmp_path / ".raise" / "mcp"
 
         with patch(
-            "rai_cli.cli.commands.mcp.McpBridge",
+            "rai_cli.mcp.bridge.McpBridge",
             return_value=_healthy_bridge(),
         ):
             result = runner.invoke(
@@ -105,7 +105,7 @@ class TestInstallPip:
                 "rai_cli.cli.commands.mcp.subprocess.run",
             ) as mock_pip,
             patch(
-                "rai_cli.cli.commands.mcp.McpBridge",
+                "rai_cli.mcp.bridge.McpBridge",
                 return_value=_healthy_bridge(),
             ),
         ):
@@ -190,7 +190,7 @@ class TestInstallHealthFailure:
         mock_bridge.aclose.return_value = None
 
         with patch(
-            "rai_cli.cli.commands.mcp.McpBridge",
+            "rai_cli.mcp.bridge.McpBridge",
             return_value=mock_bridge,
         ):
             result = runner.invoke(
@@ -247,7 +247,7 @@ class TestInstallOverwrite:
         (mcp_dir / "existing.yaml").write_text("name: existing\n")
 
         with patch(
-            "rai_cli.cli.commands.mcp.McpBridge",
+            "rai_cli.mcp.bridge.McpBridge",
             return_value=_healthy_bridge(),
         ):
             result = runner.invoke(
