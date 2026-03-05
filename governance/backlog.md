@@ -68,7 +68,7 @@
 | [RAISE-347](https://humansys.atlassian.net/browse/RAISE-347) | **Backlog Automation** | 🚀 In Progress | `work/epics/e347-backlog-automation/scope.md` | P0 (v2.2) |
 | [RAISE-348](https://humansys.atlassian.net/browse/RAISE-348) | **Documentation Refresh** | 📋 Backlog | — | P0 (v2.2) |
 | [RAISE-349](https://humansys.atlassian.net/browse/RAISE-349) | **Adapter Integration Validation** | 📋 Backlog | — | P0 (v2.2) |
-| [RAISE-364](https://humansys.atlassian.net/browse/RAISE-364) | **Rai Experience Portability** | 📋 Backlog | — | P0 (v2.2) |
+| [RAISE-364](https://humansys.atlassian.net/browse/RAISE-364) | **Rai Experience Portability** (E350) | 🚀 In Progress | `work/epics/e350-experience-portability/scope.md` | P0 (v2.2) |
 | [RAISE-369](https://humansys.atlassian.net/browse/RAISE-369) | **Open Source Readiness Audit** | 📋 Backlog | — | P0 (v2.2) |
 | [RAISE-378](https://humansys.atlassian.net/browse/RAISE-378) | **rai doctor — Diagnostic & Bug Reporting** | 📋 Backlog | — | P0 (v2.2) |
 | [RAISE-402](https://humansys.atlassian.net/browse/RAISE-402) | **Typed Skill Artifacts** (E354) | ✅ Complete | `work/epics/e354-typed-skill-artifacts/scope.md` | P1 |
