@@ -334,7 +334,9 @@ class GraphBuilder:
             List of GraphNode for artifact concepts.
         """
         from rai_cli.artifacts.reader import read_all_artifacts
-        from rai_cli.artifacts.writer import _artifact_filename  # pyright: ignore[reportPrivateUsage]
+        from rai_cli.artifacts.writer import (
+            _artifact_filename,  # pyright: ignore[reportPrivateUsage]
+        )
 
         artifacts_dir = self.project_root / ".raise" / "artifacts"
         artifacts = read_all_artifacts(artifacts_dir)
