@@ -37,6 +37,7 @@ class CheckResult:
     status: CheckStatus
     message: str
     fix_hint: str = ""
+    fix_id: str = ""
     details: tuple[str, ...] = ()
 
 

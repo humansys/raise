@@ -47,6 +47,10 @@ def doctor(
         bool,
         typer.Option("--json", help="JSON output for CI"),
     ] = False,
+    fix: Annotated[
+        bool,
+        typer.Option("--fix", help="Auto-fix common issues (with backup)"),
+    ] = False,
     online: Annotated[
         bool,
         typer.Option("--online", help="Include online checks (MCP, adapter connectivity)"),
@@ -121,6 +125,17 @@ def doctor(
             if errors:
                 parts.append(f"{errors} error{'s' if errors > 1 else ''}")
             out.print(f"\n{', '.join(parts)}.")
+
+    if fix:
+        fixable = [r for r in results if r.fix_id and r.status != CheckStatus.PASS]
+        if fixable:
+            from rai_cli.doctor.fix import run_fixes
+
+            out = Console()
+            outcomes = run_fixes(fixable, Path.cwd())
+            for fix_id, success in outcomes:
+                status_label = "[green]fixed[/green]" if success else "[red]failed[/red]"
+                out.print(f"  fix: {fix_id} -- {status_label}")
 
     if errors > 0:
         raise typer.Exit(1)
