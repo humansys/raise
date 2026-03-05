@@ -1,7 +1,5 @@
 """Render typed artifacts to human-readable Markdown."""
 
-from __future__ import annotations
-
 import re
 from pathlib import Path
 
@@ -14,7 +12,7 @@ from rai_cli.artifacts.story_design import (
 
 def _render_acceptance_criteria(content: StoryDesignContent) -> str:
     """Render AC as a numbered list."""
-    lines = []
+    lines: list[str] = []
     for i, ac in enumerate(content.acceptance_criteria, 1):
         lines.append(f"{i}. [{ac.id}] {ac.description}")
     return "\n".join(lines)
@@ -24,9 +22,9 @@ def _render_integration_points(content: StoryDesignContent) -> str:
     """Render integration points as bullet list."""
     if not content.integration_points:
         return ""
-    lines = []
+    lines: list[str] = []
     for ip in content.integration_points:
-        files = ", ".join(f"`{f}`" for f in ip.files) if ip.files else ""
+        files = ", ".join(f"`{f}`" for f in ip.files) if ip.files else ""  # pyright: ignore[reportUnknownArgumentType]
         line = f"- `{ip.module}` — {ip.change_type}"
         if files:
             line += f": {files}"
@@ -38,12 +36,12 @@ def _render_decisions(content: StoryDesignContent) -> str:
     """Render decisions with rationale and alternatives."""
     if not content.decisions:
         return ""
-    blocks = []
+    blocks: list[str] = []
     for d in content.decisions:
         block = f"### {d.id}: {d.choice}\n"
         block += f"**Rationale:** {d.rationale}\n"
         if d.alternatives_considered:
-            alts = ", ".join(d.alternatives_considered)
+            alts = ", ".join(d.alternatives_considered)  # pyright: ignore[reportUnknownArgumentType]
             block += f"**Alternatives:** {alts}"
         blocks.append(block)
     return "\n\n".join(blocks)
