@@ -197,10 +197,22 @@ def _get_project_message(
 
         if bootstrap_result is not None:
             if bootstrap_result.already_existed:
-                lines.append(
-                    "[bold]Loaded:[/bold]  .raise/rai/  "
-                    "[dim]— Rai base already present[/dim]"
-                )
+                # Check if base patterns were synced even though everything else existed
+                if bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0:
+                    parts: list[str] = []
+                    if bootstrap_result.patterns_added > 0:
+                        parts.append(f"{bootstrap_result.patterns_added} new")
+                    if bootstrap_result.patterns_updated > 0:
+                        parts.append(f"{bootstrap_result.patterns_updated} updated")
+                    lines.append(
+                        "[bold]Synced:[/bold]  .raise/rai/memory/  "
+                        f"[dim]— {', '.join(parts)} base patterns[/dim]"
+                    )
+                else:
+                    lines.append(
+                        "[bold]Loaded:[/bold]  .raise/rai/  "
+                        "[dim]— Rai base already present[/dim]"
+                    )
             else:
                 if bootstrap_result.identity_copied:
                     lines.append(
@@ -208,9 +220,17 @@ def _get_project_message(
                         "[dim]— Rai's base identity[/dim]"
                     )
                 if bootstrap_result.patterns_copied:
+                    from importlib.resources import files as _res_files
+
+                    _base = _res_files("rai_cli.rai_base")
+                    _src = _base / "memory" / "patterns-base.jsonl"
+                    _count = len([
+                        ln for ln in _src.read_text(encoding="utf-8").strip().splitlines()
+                        if ln.strip()
+                    ])
                     lines.append(
                         "[bold]Created:[/bold] .raise/rai/memory/  "
-                        "[dim]— 20 universal patterns[/dim]"
+                        f"[dim]— {_count} base patterns[/dim]"
                     )
                 if bootstrap_result.methodology_copied:
                     lines.append(
@@ -253,10 +273,20 @@ def _get_project_message(
         )
     else:
         bootstrap_msg = ""
-        if bootstrap_result is not None and not bootstrap_result.already_existed:
-            bootstrap_msg = (
-                f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
-            )
+        if bootstrap_result is not None:
+            if not bootstrap_result.already_existed:
+                bootstrap_msg = (
+                    f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
+                )
+            elif bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0:
+                parts_ri: list[str] = []
+                if bootstrap_result.patterns_added > 0:
+                    parts_ri.append(f"{bootstrap_result.patterns_added} new")
+                if bootstrap_result.patterns_updated > 0:
+                    parts_ri.append(f"{bootstrap_result.patterns_updated} updated")
+                bootstrap_msg = (
+                    f"  Synced base patterns: {', '.join(parts_ri)}\n"
+                )
         skills_msg = ""
         if skills_result is not None and not skills_result.already_existed:
             skills_msg = (
