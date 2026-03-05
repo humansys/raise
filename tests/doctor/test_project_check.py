@@ -102,21 +102,12 @@ class TestGraphStaleness:
         assert "missing" in graph_result.message
         assert graph_result.fix_hint == "run: rai graph build"
 
-    def test_empty_graph_dir_is_warn(
-        self, check: ProjectCheck, ctx: DoctorContext
-    ) -> None:
-        (ctx.working_dir / ".rai" / "graph").mkdir(parents=True)
-        results = check.evaluate(ctx)
-        graph_result = _find(results, "project-graph")
-        assert graph_result.status == CheckStatus.WARN
-        assert "empty" in graph_result.message
-
     def test_fresh_graph_is_pass(
         self, check: ProjectCheck, ctx: DoctorContext
     ) -> None:
-        graph_dir = ctx.working_dir / ".rai" / "graph"
-        graph_dir.mkdir(parents=True)
-        (graph_dir / "nodes.json").write_text("{}")
+        graph_dir = ctx.working_dir / ".raise" / "rai" / "memory"
+        graph_dir.mkdir(parents=True, exist_ok=True)
+        (graph_dir / "index.json").write_text("{}")
         results = check.evaluate(ctx)
         graph_result = _find(results, "project-graph")
         assert graph_result.status == CheckStatus.PASS
@@ -124,9 +115,9 @@ class TestGraphStaleness:
     def test_stale_graph_is_warn(
         self, check: ProjectCheck, ctx: DoctorContext
     ) -> None:
-        graph_dir = ctx.working_dir / ".rai" / "graph"
-        graph_dir.mkdir(parents=True)
-        graph_file = graph_dir / "nodes.json"
+        graph_dir = ctx.working_dir / ".raise" / "rai" / "memory"
+        graph_dir.mkdir(parents=True, exist_ok=True)
+        graph_file = graph_dir / "index.json"
         graph_file.write_text("{}")
         # Set mtime to 10 days ago
         old_time = time.time() - (10 * 86400)
@@ -141,9 +132,9 @@ class TestGraphStaleness:
     def test_governance_newer_than_graph_is_warn(
         self, check: ProjectCheck, ctx: DoctorContext
     ) -> None:
-        graph_dir = ctx.working_dir / ".rai" / "graph"
-        graph_dir.mkdir(parents=True)
-        graph_file = graph_dir / "nodes.json"
+        graph_dir = ctx.working_dir / ".raise" / "rai" / "memory"
+        graph_dir.mkdir(parents=True, exist_ok=True)
+        graph_file = graph_dir / "index.json"
         graph_file.write_text("{}")
         # Set graph mtime to 1 day ago
         import os
@@ -256,9 +247,9 @@ class TestAllPass:
         (raise_dir / "manifest.yaml").write_text("name: test\n")
         (raise_dir / "jira.yaml").write_text("project: TEST\n")
 
-        graph_dir = tmp_path / ".rai" / "graph"
-        graph_dir.mkdir(parents=True)
-        (graph_dir / "nodes.json").write_text("{}")
+        graph_dir = tmp_path / ".raise" / "rai" / "memory"
+        graph_dir.mkdir(parents=True, exist_ok=True)
+        (graph_dir / "index.json").write_text("{}")
 
         skill_dir = tmp_path / ".claude" / "skills" / "my-skill"
         skill_dir.mkdir(parents=True)

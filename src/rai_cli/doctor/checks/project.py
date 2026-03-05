@@ -100,21 +100,23 @@ class ProjectCheck:
         )
 
     def _check_graph_staleness(self, root: Path) -> CheckResult:
-        """Check if graph directory exists and is not stale."""
-        graph_dir = root / ".rai" / "graph"
-        if not graph_dir.is_dir():
+        """Check if graph index exists and is not stale."""
+        # Graph is stored at .raise/rai/memory/index.json (rai graph build output)
+        graph_index = root / ".raise" / "rai" / "memory" / "index.json"
+        if not graph_index.is_file():
             return CheckResult(
                 check_id="project-graph",
                 category=self.category,
                 status=CheckStatus.WARN,
-                message="graph directory missing (.rai/graph/)",
+                message="graph not built (.raise/rai/memory/index.json missing)",
                 fix_hint="run: rai graph build",
                 fix_id="rebuild-graph",
             )
 
-        # Find newest file in graph dir
-        graph_files = list(graph_dir.rglob("*"))
-        graph_files = [f for f in graph_files if f.is_file()]
+        graph_files = [graph_index]
+        # Also check for additional graph files in the directory
+        graph_dir = graph_index.parent
+        graph_files.extend(f for f in graph_dir.rglob("*") if f.is_file() and f != graph_index)
         if not graph_files:
             return CheckResult(
                 check_id="project-graph",
