@@ -275,6 +275,25 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
         if match:
             # Group 1 = Jira link ID (e.g., "RAISE-275"), Group 2 = simple ID (e.g., "E1")
             epic_id = (match.group(1) or match.group(2)).strip()
+
+            # Yield to EpicScopeParser when a scope doc exists for this epic.
+            # The scope doc is the authoritative source (richer data); the backlog
+            # row is only an index entry. Without this check, both BacklogParser
+            # and EpicScopeParser produce the same node ID, causing duplicate
+            # warnings in `rai graph build`.
+            # Only applies to local epic IDs (E{N}), never to Jira keys (RAISE-275).
+            e_match = re.match(r"^E0*(\d+)$", epic_id, re.IGNORECASE)
+            if e_match:
+                canon = int(e_match.group(1))  # E08 -> 8, E1 -> 1
+                scope_hit = any(
+                    re.search(r"^e0*(\d+)", d.name, re.IGNORECASE)
+                    and int(re.search(r"^e0*(\d+)", d.name, re.IGNORECASE).group(1)) == canon  # type: ignore[union-attr]
+                    for d in project_root.glob("work/epics/e*")
+                    if (d / "scope.md").exists()
+                )
+                if scope_hit:
+                    continue
+
             name = match.group(3).strip()
             raw_status = match.group(4).strip()
             scope_doc = match.group(5).strip()

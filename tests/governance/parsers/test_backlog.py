@@ -351,6 +351,97 @@ class TestJiraLinkFormat:
         assert project.metadata["epic_count"] == 4
 
 
+class TestScopeDocSkipLogic:
+    """Tests for RAISE-456: skip backlog epics when scope doc exists."""
+
+    def test_skips_simple_id_when_scope_exists(self, tmp_path: Path) -> None:
+        """E1 in backlog should be skipped when work/epics/e1-*/scope.md exists."""
+        backlog = tmp_path / "governance" / "backlog.md"
+        backlog.parent.mkdir(parents=True)
+        backlog.write_text(dedent("""\
+            # Backlog: test
+
+            | ID | Epic | Status | Scope Doc | Priority |
+            |----|------|--------|-----------|----------|
+            | E1 | **Feature One** | Active | — | P0 |
+            | E2 | **Feature Two** | Active | — | P1 |
+        """))
+        # Only E1 has a scope doc
+        scope = tmp_path / "work" / "epics" / "e1-feature" / "scope.md"
+        scope.parent.mkdir(parents=True)
+        scope.write_text("# Epic E1: Feature One - Scope\n")
+
+        epics = extract_epics(backlog, tmp_path)
+        epic_ids = {e.metadata["epic_id"] for e in epics}
+        assert "E1" not in epic_ids, "E1 should be skipped — scope doc exists"
+        assert "E2" in epic_ids, "E2 should remain — no scope doc"
+
+    def test_skips_padded_id_when_dir_has_no_leading_zero(self, tmp_path: Path) -> None:
+        """E08 in backlog + dir e8-feature/ (no leading zero) should still skip.
+
+        EpicScopeParser normalizes e08 → E8 (int strips leading zero).
+        BacklogParser must canonicalize the same way to detect the collision.
+        """
+        backlog = tmp_path / "governance" / "backlog.md"
+        backlog.parent.mkdir(parents=True)
+        backlog.write_text(dedent("""\
+            # Backlog: test
+
+            | ID | Epic | Status | Scope Doc | Priority |
+            |----|------|--------|-----------|----------|
+            | E08 | **Padded Epic** | Active | — | P0 |
+        """))
+        # Dir named e8-feature (no leading zero) — still the same epic
+        scope = tmp_path / "work" / "epics" / "e8-feature" / "scope.md"
+        scope.parent.mkdir(parents=True)
+        scope.write_text("# Epic E8: Padded Epic - Scope\n")
+
+        epics = extract_epics(backlog, tmp_path)
+        epic_ids = {e.metadata["epic_id"] for e in epics}
+        assert "E08" not in epic_ids, "E08 should be skipped — e8-feature/scope.md covers same epic"
+
+    def test_no_skip_for_jira_key_even_if_num_matches(self, tmp_path: Path) -> None:
+        """RAISE-275 should NOT be skipped even if e275-*/scope.md exists.
+
+        Jira keys produce a different node ID namespace (epic-raise-275 vs epic-e275).
+        The naive re.sub(r'\\D', '', id) approach wrongly extracts '275' and skips.
+        """
+        backlog = tmp_path / "governance" / "backlog.md"
+        backlog.parent.mkdir(parents=True)
+        backlog.write_text(dedent("""\
+            # Backlog: test
+
+            | ID | Epic | Status | Scope Doc | Priority |
+            |----|------|--------|-----------|----------|
+            | [RAISE-275](https://jira.example.com/RAISE-275) | **Jira Epic** | Active | — | P0 |
+        """))
+        # Coincidental e275 dir exists
+        scope = tmp_path / "work" / "epics" / "e275-something" / "scope.md"
+        scope.parent.mkdir(parents=True)
+        scope.write_text("# Epic E275\n")
+
+        epics = extract_epics(backlog, tmp_path)
+        epic_ids = {e.metadata["epic_id"] for e in epics}
+        assert "RAISE-275" in epic_ids, "Jira key should never be skipped by scope doc logic"
+
+    def test_no_skip_when_no_scope_doc(self, tmp_path: Path) -> None:
+        """E1 without scope doc should NOT be skipped."""
+        backlog = tmp_path / "governance" / "backlog.md"
+        backlog.parent.mkdir(parents=True)
+        backlog.write_text(dedent("""\
+            # Backlog: test
+
+            | ID | Epic | Status | Scope Doc | Priority |
+            |----|------|--------|-----------|----------|
+            | E1 | **No Scope Yet** | Draft | — | P0 |
+        """))
+        # No scope docs at all
+
+        epics = extract_epics(backlog, tmp_path)
+        assert len(epics) == 1
+        assert epics[0].metadata["epic_id"] == "E1"
+
+
 class TestIntegrationWithRealBacklog:
     """Integration tests with real raise-cli backlog."""
 
@@ -374,7 +465,11 @@ class TestIntegrationWithRealBacklog:
         )
 
     def test_extract_epics_from_real_backlog(self) -> None:
-        """Should extract all epics from real raise-cli backlog."""
+        """Should extract epics without scope docs from real raise-cli backlog.
+
+        Epics with scope docs (work/epics/e{N}-*/scope.md) are delegated to
+        EpicScopeParser and correctly skipped here.
+        """
         backlog_path = Path("governance/backlog.md")
 
         if not backlog_path.exists():
@@ -382,18 +477,19 @@ class TestIntegrationWithRealBacklog:
 
         epics = extract_epics(backlog_path)
 
-        # Should have at least 12 epics (E1-E12+)
-        assert len(epics) >= 12
+        # Some epics should be extracted (those without scope docs)
+        assert len(epics) >= 1
 
-        # Verify specific epics
+        # Epics with scope docs should NOT appear (delegated to EpicScopeParser)
         epic_ids = {e.metadata["epic_id"] for e in epics}
-        assert "E1" in epic_ids
-        assert "E8" in epic_ids
-        assert "E12" in epic_ids
+        scope_dirs = list(Path("work/epics").glob("e*"))
+        for scope_dir in scope_dirs:
+            if (scope_dir / "scope.md").exists():
+                import re as _re
 
-        # Verify statuses
-        e1 = next(e for e in epics if e.metadata["epic_id"] == "E1")
-        assert e1.metadata["status"] == "complete"
-
-        e8 = next(e for e in epics if e.metadata["epic_id"] == "E8")
-        assert e8.metadata["status"] == "complete"
+                m = _re.search(r"^e0*(\d+)", scope_dir.name, _re.IGNORECASE)
+                if m:
+                    local_id = f"E{int(m.group(1))}"
+                    assert local_id not in epic_ids, (
+                        f"{local_id} has scope doc — should be skipped"
+                    )
