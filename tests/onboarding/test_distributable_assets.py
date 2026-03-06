@@ -2,7 +2,7 @@
 
 These tests guard against raise-commons-specific values (branch names,
 developer names, etc.) leaking into assets that get distributed to
-end users via rai-cli (PyPI).
+end users via raise-cli (PyPI).
 
 See: RAISE-203
 """

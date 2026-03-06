@@ -1,4 +1,4 @@
-"""Tests for rai-cli get_active_backend factory."""
+"""Tests for raise-cli get_active_backend factory."""
 
 from __future__ import annotations
 

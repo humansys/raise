@@ -19,7 +19,7 @@ class AgentPlugin(Protocol):
     """Protocol for custom agent connectors.
 
     Implementors add agent-specific transformation logic without modifying
-    the rai-cli engine. A plugin only needs to implement the methods it uses —
+    the raise-cli engine. A plugin only needs to implement the methods it uses —
     duck typing, no forced inheritance.
 
     Example (minimal plugin):

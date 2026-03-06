@@ -40,7 +40,7 @@ class SkillEntry(BaseModel):
 
     Attributes:
         sha256: SHA256 hex digest of the SKILL.md content as written to disk.
-        version: rai-cli version that distributed this skill.
+        version: raise-cli version that distributed this skill.
         origin: Who distributed this skill ('framework' or 'org').
         distributed_at: When this skill was last written.
     """
@@ -71,7 +71,7 @@ class SkillManifest(BaseModel):
 
 
 def _get_cli_version() -> str:
-    """Get the current rai-cli version."""
+    """Get the current raise-cli version."""
     try:
         from raise_cli.skills_base import __version__
 

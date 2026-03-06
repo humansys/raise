@@ -261,7 +261,7 @@ def _print_sync_table(result: SkillScaffoldResult) -> None:
     except ImportError:
         cli_version = "unknown"
 
-    console.print(f"\n[bold]Skill sync check: rai-cli {cli_version}[/bold]\n")
+    console.print(f"\n[bold]Skill sync check: raise-cli {cli_version}[/bold]\n")
 
     rows: list[tuple[str, str]] = []
     for name in result.skills_installed:

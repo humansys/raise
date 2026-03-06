@@ -23,14 +23,14 @@ def test_version_flag() -> None:
     """Test --version flag shows version."""
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "rai-cli version" in result.stdout
+    assert "raise-cli version" in result.stdout
 
 
 def test_version_short_flag() -> None:
     """Test -V short flag shows version."""
     result = runner.invoke(app, ["-V"])
     assert result.exit_code == 0
-    assert "rai-cli version" in result.stdout
+    assert "raise-cli version" in result.stdout
 
 
 def test_invalid_format_rejected() -> None:
