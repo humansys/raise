@@ -15,7 +15,10 @@ import os
 from typing import Any, cast
 
 from raise_cli.adapters.declarative.expressions import ExpressionEvaluator
-from raise_cli.adapters.declarative.schema import DeclarativeAdapterConfig, MethodMapping
+from raise_cli.adapters.declarative.schema import (
+    DeclarativeAdapterConfig,
+    MethodMapping,
+)
 from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,

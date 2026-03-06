@@ -31,7 +31,10 @@ from raise_cli.hooks.events import InitCompleteEvent
 from raise_cli.onboarding.bootstrap import BootstrapResult
 from raise_cli.onboarding.conventions import detect_conventions
 from raise_cli.onboarding.detection import ProjectType, detect_project_type
-from raise_cli.onboarding.governance import GovernanceScaffoldResult, generate_guardrails
+from raise_cli.onboarding.governance import (
+    GovernanceScaffoldResult,
+    generate_guardrails,
+)
 from raise_cli.onboarding.instructions import generate_instructions
 from raise_cli.onboarding.manifest import (
     AgentsManifest,
