@@ -11,7 +11,7 @@ Un grafo dirigido donde:
 - **Nodos** son conceptos — patrones, principios, requisitos, skills, stories, componentes, módulos
 - **Edges** son relaciones — "aprendido de", "gobernado por", "depende de", "restringido por"
 
-Cuando ejecutas `raise memory build`, el CLI recorre todas las fuentes del proyecto y ensambla este grafo. Cuando consultas con `raise memory query` o `raise memory context`, estás buscando en este grafo.
+Cuando ejecutas `rai graph build`, el CLI recorre todas las fuentes del proyecto y ensambla este grafo. Cuando consultas con `rai graph query` o `rai graph context`, estás buscando en este grafo.
 
 ## Tipos de Nodos
 
@@ -48,7 +48,7 @@ Los edges expresan cómo se relacionan los conceptos:
 ## Construir el Grafo
 
 ```bash
-raise memory build
+rai graph build
 ```
 
 Esto fusiona todas las fuentes:
@@ -67,7 +67,7 @@ La salida es `.raise/rai/memory/index.json`.
 Encontrar conceptos por contenido:
 
 ```bash
-raise memory query "testing patterns"
+rai graph query "testing patterns"
 ```
 
 ### Búsqueda por Concepto
@@ -75,7 +75,7 @@ raise memory query "testing patterns"
 Encontrar un concepto específico por ID:
 
 ```bash
-raise memory query "PAT-001" --strategy concept_lookup
+rai graph query "PAT-001" --strategy concept_lookup
 ```
 
 ### Contexto de Módulo
@@ -83,7 +83,7 @@ raise memory query "PAT-001" --strategy concept_lookup
 Obtener el contexto arquitectónico completo de un módulo — su dominio, capa, restricciones y dependencias:
 
 ```bash
-raise memory context mod-memory
+rai graph context mod-memory
 ```
 
 Esto retorna:
@@ -97,7 +97,7 @@ Esto retorna:
 Verificar el grafo por problemas estructurales:
 
 ```bash
-raise memory validate
+rai graph validate
 ```
 
 Esto detecta ciclos en relaciones de dependencia, tipos de edge inválidos y referencias colgantes.
@@ -106,4 +106,4 @@ Esto detecta ciclos en relaciones de dependencia, tipos de edge inválidos y ref
 
 La estructura de grafo habilita **consultas contextuales** — no solo "buscar esta palabra clave" sino "muéstrame todo lo relacionado con este módulo, incluyendo las reglas que lo restringen y los patrones aprendidos al construirlo."
 
-Cuando tu partner de IA ejecuta `raise session start --context`, el CLI ensambla un bundle de contexto recorriendo este grafo. El resultado es una vista comprimida de todo lo relevante a tu trabajo actual — no un dump de todos los archivos, sino una selección curada de los nodos más importantes y sus relaciones.
+Cuando tu partner de IA ejecuta `rai session start --context`, el CLI ensambla un bundle de contexto recorriendo este grafo. El resultado es una vista comprimida de todo lo relevante a tu trabajo actual — no un dump de todos los archivos, sino una selección curada de los nodos más importantes y sus relaciones.

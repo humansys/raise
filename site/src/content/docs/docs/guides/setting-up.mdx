@@ -12,7 +12,7 @@ This guide covers how to set up a RaiSE project — whether you're starting from
 ```bash
 mkdir my-project && cd my-project
 git init
-raise init --name my-project
+rai init --name my-project
 ```
 
 This creates the `.raise/` directory:
@@ -63,13 +63,13 @@ You don't need to fill everything at once. Start with a few principles and guard
 Skills live in `.claude/skills/`. RaiSE comes with a standard set of lifecycle skills. To see what's available:
 
 ```bash
-raise skill list
+rai skill list
 ```
 
 You can create project-specific skills:
 
 ```bash
-raise skill scaffold my-custom-skill --lifecycle utility
+rai skill scaffold my-custom-skill --lifecycle utility
 ```
 
 ### Build Memory
@@ -77,7 +77,7 @@ raise skill scaffold my-custom-skill --lifecycle utility
 After filling governance files, build the memory index:
 
 ```bash
-raise memory build
+rai graph build
 ```
 
 This creates the unified knowledge graph from all your governance documents, making them queryable and loadable into your AI's context.
@@ -85,7 +85,7 @@ This creates the unified knowledge graph from all your governance documents, mak
 ### First Session
 
 ```bash
-raise session start --project . --context
+rai session start --project . --context
 ```
 
 Your AI partner now has your project's governance, memory, and skills loaded. You're ready to work.
@@ -98,10 +98,10 @@ For existing codebases, use `--detect` to analyze conventions:
 
 ```bash
 cd existing-project
-raise init --detect
+rai init --detect
 ```
 
-This does everything `raise init` does, plus:
+This does everything `rai init` does, plus:
 - Scans your source code for patterns
 - Identifies coding conventions (naming, formatting, imports)
 - Detects testing patterns and frameworks
@@ -115,13 +115,13 @@ For deeper analysis, run the discovery pipeline:
 
 ```bash
 # Scan source code
-raise discover scan src/ --language python
+rai discover scan src/ --language python
 
 # Analyze with confidence scoring
-raise discover scan src/ -l python -o json | raise discover analyze
+rai discover scan src/ -l python -o json | rai discover analyze
 
 # Check for architectural drift later
-raise discover drift
+rai discover drift
 ```
 
 Discovery extracts your codebase's structure — classes, functions, modules — and builds a component map. This feeds into the knowledge graph, giving your AI partner architectural awareness.

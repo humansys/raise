@@ -58,7 +58,7 @@ Cada capa es trazable a la superior. Cuando alguien pregunta "¿por qué tenemos
 
 ## Gobernanza en la Práctica
 
-Cuando ejecutas `raise session start --context`, el bundle de contexto incluye primes de gobernanza — los guardrails activos relevantes a tu trabajo actual. Tu partner de IA los ve al inicio de cada sesión y los aplica durante todo el trabajo.
+Cuando ejecutas `rai session start --context`, el bundle de contexto incluye primes de gobernanza — los guardrails activos relevantes a tu trabajo actual. Tu partner de IA los ve al inicio de cada sesión y los aplica durante todo el trabajo.
 
 Por ejemplo, si estás trabajando en contenido, el bundle de contexto podría incluir:
 
@@ -73,7 +73,7 @@ La IA no necesita recordar estos — se cargan frescos cada sesión desde los ar
 
 ## Estructura del Proyecto
 
-Después de `raise init`, tu directorio de gobernanza luce así:
+Después de `rai init`, tu directorio de gobernanza luce así:
 
 ```
 governance/
@@ -88,10 +88,10 @@ governance/
 
 ## Detección de Convenciones
 
-Para proyectos existentes, `raise init --detect` analiza tu codebase y genera guardrails automáticamente:
+Para proyectos existentes, `rai init --detect` analiza tu codebase y genera guardrails automáticamente:
 
 ```bash
-raise init --detect
+rai init --detect
 ```
 
 Esto escanea en busca de patrones como:
