@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.governance.models import Concept, ConceptType
-from rai_cli.governance.parsers._convert import concept_to_node
+from raise_cli.governance.models import Concept, ConceptType
+from raise_cli.governance.parsers._convert import concept_to_node
 
 
 class TestConceptToNode:

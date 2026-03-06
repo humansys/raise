@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.exceptions import RaiSessionNotFoundError
-from rai_cli.session.resolver import (
+from raise_cli.exceptions import RaiSessionNotFoundError
+from raise_cli.session.resolver import (
     _normalize_session_id,
     resolve_session_id,
     resolve_session_id_optional,

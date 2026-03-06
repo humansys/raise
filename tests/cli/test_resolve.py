@@ -11,7 +11,7 @@ from typing import Any
 
 import pytest
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
     Comment,
@@ -24,13 +24,13 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from rai_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
-from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
+from raise_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
+from raise_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
 
 # --- Stub adapters for tests ---
 
 # Monkeypatch target for the generic resolver
-_RESOLVE_MOD = "rai_cli.cli.commands._resolve"
+_RESOLVE_MOD = "raise_cli.cli.commands._resolve"
 
 
 class _StubAsyncPM:
@@ -158,7 +158,7 @@ class TestResolveAdapter:
     def test_zero_adapters_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         with pytest.raises(SystemExit) as exc_info:
             resolve_adapter(None)
@@ -169,7 +169,7 @@ class TestResolveAdapter:
             f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"stub": _StubPM}
         )
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
         assert isinstance(adapter, ProjectManagementAdapter)
@@ -182,7 +182,7 @@ class TestResolveAdapter:
             lambda: {"jira": _StubPM, "github": _StubPM},
         )
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         with pytest.raises(SystemExit) as exc_info:
             resolve_adapter(None)
@@ -193,7 +193,7 @@ class TestResolveAdapter:
             f"{_RESOLVE_MOD}.get_pm_adapters",
             lambda: {"jira": _StubPM, "github": _StubPM},
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter("jira")
         assert isinstance(adapter, ProjectManagementAdapter)
@@ -202,7 +202,7 @@ class TestResolveAdapter:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"jira": _StubPM}
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         with pytest.raises(SystemExit) as exc_info:
             resolve_adapter("nonexistent")
@@ -213,7 +213,7 @@ class TestResolveAdapter:
             f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"async-jira": _StubAsyncPM}
         )
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
         assert isinstance(adapter, SyncPMAdapter)
@@ -224,7 +224,7 @@ class TestResolveAdapter:
             f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {"sync-stub": _StubPM}
         )
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
         assert isinstance(adapter, _StubPM)
@@ -239,7 +239,7 @@ class TestResolveDocsTarget:
 
     def test_zero_targets_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_doc_targets", lambda: {})
-        from rai_cli.cli.commands._resolve import resolve_docs_target
+        from raise_cli.cli.commands._resolve import resolve_docs_target
 
         with pytest.raises(SystemExit) as exc_info:
             resolve_docs_target(None)
@@ -249,7 +249,7 @@ class TestResolveDocsTarget:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.get_doc_targets", lambda: {"confluence": _StubDocs}
         )
-        from rai_cli.cli.commands._resolve import resolve_docs_target
+        from raise_cli.cli.commands._resolve import resolve_docs_target
 
         target = resolve_docs_target(None)
         assert isinstance(target, DocumentationTarget)
@@ -261,7 +261,7 @@ class TestResolveDocsTarget:
             f"{_RESOLVE_MOD}.get_doc_targets",
             lambda: {"confluence": _StubDocs, "notion": _StubDocs},
         )
-        from rai_cli.cli.commands._resolve import resolve_docs_target
+        from raise_cli.cli.commands._resolve import resolve_docs_target
 
         with pytest.raises(SystemExit) as exc_info:
             resolve_docs_target(None)
@@ -272,7 +272,7 @@ class TestResolveDocsTarget:
             f"{_RESOLVE_MOD}.get_doc_targets",
             lambda: {"confluence": _StubDocs, "notion": _StubDocs},
         )
-        from rai_cli.cli.commands._resolve import resolve_docs_target
+        from raise_cli.cli.commands._resolve import resolve_docs_target
 
         target = resolve_docs_target("confluence")
         assert isinstance(target, DocumentationTarget)
@@ -282,7 +282,7 @@ class TestResolveDocsTarget:
             f"{_RESOLVE_MOD}.get_doc_targets",
             lambda: {"async-confluence": _StubAsyncDocs},
         )
-        from rai_cli.cli.commands._resolve import resolve_docs_target
+        from raise_cli.cli.commands._resolve import resolve_docs_target
 
         target = resolve_docs_target(None)
         assert isinstance(target, SyncDocsAdapter)
@@ -292,7 +292,7 @@ class TestResolveDocsTarget:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.get_doc_targets", lambda: {"sync-stub": _StubDocs}
         )
-        from rai_cli.cli.commands._resolve import resolve_docs_target
+        from raise_cli.cli.commands._resolve import resolve_docs_target
 
         target = resolve_docs_target(None)
         assert isinstance(target, _StubDocs)
@@ -301,7 +301,7 @@ class TestResolveDocsTarget:
 
 # --- YAML + entry point mixed tests (S337.3) ---
 
-_DISCOVER_MOD = "rai_cli.adapters.declarative.discovery"
+_DISCOVER_MOD = "raise_cli.adapters.declarative.discovery"
 
 
 class TestResolveAdapterWithYaml:
@@ -315,7 +315,7 @@ class TestResolveAdapterWithYaml:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {"yaml-stub": _StubPM} if protocol == "pm" else {},
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
         assert isinstance(adapter, ProjectManagementAdapter)
@@ -327,7 +327,7 @@ class TestResolveAdapterWithYaml:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {"github": _StubPM} if protocol == "pm" else {},
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter("github")
         assert isinstance(adapter, ProjectManagementAdapter)
@@ -350,7 +350,7 @@ class TestResolveAdapterWithYaml:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {"jira": _YamlStub} if protocol == "pm" else {},
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter("jira")
         assert isinstance(adapter, _EpStub)
@@ -367,7 +367,7 @@ class TestResolveAdapterWithYaml:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {"github": _StubPM} if protocol == "pm" else {},
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         # Multiple adapters without flag → error listing both
         with pytest.raises(SystemExit):
@@ -394,7 +394,7 @@ class TestResolveAdapterManifestDefault:
             lambda protocol, **kw: {},
         )
         # Simulate manifest with backlog.adapter_default = "jira"
-        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+        from raise_cli.onboarding.manifest import BacklogConfig, ProjectManifest
 
         _fake_manifest = ProjectManifest(
             project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
@@ -403,7 +403,7 @@ class TestResolveAdapterManifestDefault:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
         assert isinstance(adapter, ProjectManagementAdapter)
@@ -427,7 +427,7 @@ class TestResolveAdapterManifestDefault:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {},
         )
-        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+        from raise_cli.onboarding.manifest import BacklogConfig, ProjectManifest
 
         _fake_manifest = ProjectManifest(
             project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
@@ -436,7 +436,7 @@ class TestResolveAdapterManifestDefault:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter("filesystem")
         assert isinstance(adapter, _FsStub)
@@ -453,7 +453,7 @@ class TestResolveAdapterManifestDefault:
             lambda protocol, **kw: {},
         )
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _path: None)
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
         assert isinstance(adapter, ProjectManagementAdapter)
@@ -471,7 +471,7 @@ class TestResolveAdapterManifestDefault:
             lambda protocol, **kw: {},
         )
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _path: None)
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         with pytest.raises(SystemExit) as exc_info:
             resolve_adapter(None)
@@ -488,7 +488,7 @@ class TestResolveAdapterManifestDefault:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {},
         )
-        from rai_cli.onboarding.manifest import ProjectManifest
+        from raise_cli.onboarding.manifest import ProjectManifest
 
         _fake_manifest = ProjectManifest(
             project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
@@ -496,7 +496,7 @@ class TestResolveAdapterManifestDefault:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         # Single adapter, no backlog config → auto-detect works
         adapter = resolve_adapter(None)
@@ -514,7 +514,7 @@ class TestResolveAdapterManifestDefault:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {},
         )
-        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+        from raise_cli.onboarding.manifest import BacklogConfig, ProjectManifest
 
         _fake_manifest = ProjectManifest(
             project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
@@ -523,7 +523,7 @@ class TestResolveAdapterManifestDefault:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         with pytest.raises(SystemExit) as exc_info:
             resolve_adapter(None)
@@ -540,7 +540,7 @@ class TestResolveAdapterManifestDefault:
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
             lambda protocol, **kw: {},
         )
-        from rai_cli.onboarding.manifest import BacklogConfig, ProjectManifest
+        from raise_cli.onboarding.manifest import BacklogConfig, ProjectManifest
 
         _fake_manifest = ProjectManifest(
             project={"name": "test", "project_type": "brownfield"},  # type: ignore[arg-type]
@@ -549,7 +549,7 @@ class TestResolveAdapterManifestDefault:
         monkeypatch.setattr(
             f"{_RESOLVE_MOD}.load_manifest", lambda _path: _fake_manifest
         )
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         # Empty string → falls through to auto-detect → single adapter selected
         adapter = resolve_adapter(None)
@@ -574,7 +574,7 @@ class TestResolveAdapterE2E:
         monkeypatch.setattr(f"{_RESOLVE_MOD}.get_pm_adapters", lambda: {})
         monkeypatch.setattr(f"{_RESOLVE_MOD}.load_manifest", lambda _: None)
         # Patch discover to use our tmp dir
-        from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+        from raise_cli.adapters.declarative.discovery import discover_yaml_adapters
 
         monkeypatch.setattr(
             f"{_DISCOVER_MOD}.discover_yaml_adapters",
@@ -583,7 +583,7 @@ class TestResolveAdapterE2E:
             ),
         )
 
-        from rai_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.cli.commands._resolve import resolve_adapter
 
         adapter = resolve_adapter(None)
         # Should be wrapped in SyncPMAdapter since DeclarativeMcpAdapter is async

@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from rai_cli.core.tools import (
+from raise_cli.core.tools import (
     GitStatus,
     SearchMatch,
     ToolResult,
@@ -21,7 +21,7 @@ from rai_cli.core.tools import (
     run_tool,
     sg_search,
 )
-from rai_cli.exceptions import DependencyError
+from raise_cli.exceptions import DependencyError
 
 
 class TestToolResult:
@@ -60,7 +60,7 @@ class TestRequireTool:
         assert "not installed" in str(exc_info.value)
 
     def test_provides_hint_for_known_tools(self) -> None:
-        with patch("rai_cli.core.tools.check_tool", return_value=False):
+        with patch("raise_cli.core.tools.check_tool", return_value=False):
             with pytest.raises(DependencyError) as exc_info:
                 require_tool("git")
 
@@ -100,7 +100,7 @@ class TestGitRoot:
         # Create a git repo
         (tmp_path / ".git").mkdir()
 
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=0,
                 stdout=str(tmp_path),
@@ -111,7 +111,7 @@ class TestGitRoot:
         assert root == tmp_path
 
     def test_raises_when_not_in_repo(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=128,
                 stdout="",
@@ -126,7 +126,7 @@ class TestGitBranch:
     """Tests for git_branch function."""
 
     def test_returns_branch_name(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=0,
                 stdout="main",
@@ -137,7 +137,7 @@ class TestGitBranch:
         assert branch == "main"
 
     def test_raises_on_failure(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=128,
                 stdout="",
@@ -152,7 +152,7 @@ class TestGitStatus:
     """Tests for git_status function."""
 
     def test_parses_staged_files(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.side_effect = [
                 ToolResult(returncode=0, stdout="main", stderr=""),  # git_branch
                 ToolResult(
@@ -167,7 +167,7 @@ class TestGitStatus:
         assert "modified.py" in status.staged
 
     def test_parses_modified_files(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.side_effect = [
                 ToolResult(returncode=0, stdout="main", stderr=""),
                 ToolResult(
@@ -181,7 +181,7 @@ class TestGitStatus:
         assert "unstaged.py" in status.modified
 
     def test_parses_untracked_files(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.side_effect = [
                 ToolResult(returncode=0, stdout="main", stderr=""),
                 ToolResult(
@@ -195,7 +195,7 @@ class TestGitStatus:
         assert "untracked.py" in status.untracked
 
     def test_includes_branch(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.side_effect = [
                 ToolResult(returncode=0, stdout="feature/test", stderr=""),
                 ToolResult(returncode=0, stdout="", stderr=""),
@@ -205,7 +205,7 @@ class TestGitStatus:
         assert status.branch == "feature/test"
 
     def test_handles_branch_failure(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.side_effect = [
                 ToolResult(
                     returncode=128, stdout="", stderr="fatal"
@@ -217,7 +217,7 @@ class TestGitStatus:
         assert status.branch == ""
 
     def test_handles_status_failure(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.side_effect = [
                 ToolResult(returncode=0, stdout="main", stderr=""),
                 ToolResult(returncode=128, stdout="", stderr="fatal"),  # status fails
@@ -228,7 +228,7 @@ class TestGitStatus:
         assert status.staged == []
 
     def test_skips_short_lines(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.side_effect = [
                 ToolResult(returncode=0, stdout="main", stderr=""),
                 ToolResult(
@@ -245,7 +245,7 @@ class TestGitDiff:
     """Tests for git_diff function."""
 
     def test_returns_diff_output(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=0,
                 stdout="diff --git a/file.py b/file.py\n+new line",
@@ -256,7 +256,7 @@ class TestGitDiff:
         assert "new line" in diff
 
     def test_staged_flag(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(returncode=0, stdout="", stderr="")
             git_diff(staged=True)
 
@@ -268,7 +268,7 @@ class TestRgSearch:
     """Tests for rg_search function."""
 
     def test_parses_matches(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=0,
                 stdout="src/file.py:10:def hello():",
@@ -282,7 +282,7 @@ class TestRgSearch:
         assert matches[0].text == "def hello():"
 
     def test_returns_empty_on_no_matches(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=1,  # rg returns 1 on no matches
                 stdout="",
@@ -293,7 +293,7 @@ class TestRgSearch:
         assert matches == []
 
     def test_glob_filter(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(returncode=0, stdout="", stderr="")
             rg_search("pattern", glob="*.py")
 
@@ -302,7 +302,7 @@ class TestRgSearch:
         assert "*.py" in args
 
     def test_ignore_case(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(returncode=0, stdout="", stderr="")
             rg_search("pattern", ignore_case=True)
 
@@ -314,7 +314,7 @@ class TestSgSearch:
     """Tests for sg_search function."""
 
     def test_parses_matches(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=0,
                 stdout="src/file.py:5:1:def foo():",
@@ -327,7 +327,7 @@ class TestSgSearch:
         assert matches[0].line == 5
 
     def test_lang_filter(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(returncode=0, stdout="", stderr="")
             sg_search("pattern", lang="python")
 
@@ -336,7 +336,7 @@ class TestSgSearch:
         assert "python" in args
 
     def test_returns_empty_on_no_matches(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=1,
                 stdout="",
@@ -347,7 +347,7 @@ class TestSgSearch:
         assert matches == []
 
     def test_skips_malformed_output(self) -> None:
-        with patch("rai_cli.core.tools.run_tool") as mock_run:
+        with patch("raise_cli.core.tools.run_tool") as mock_run:
             mock_run.return_value = ToolResult(
                 returncode=0,
                 stdout="file.py:notanumber:1:text\nvalid.py:5:1:def foo():",

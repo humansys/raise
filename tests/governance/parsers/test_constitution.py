@@ -5,8 +5,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.governance.models import ConceptType
-from rai_cli.governance.parsers.constitution import extract_principles
+from raise_cli.governance.models import ConceptType
+from raise_cli.governance.parsers.constitution import extract_principles
 
 # Note: sanitize_id tests are in tests/core/test_text.py
 

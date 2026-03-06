@@ -6,7 +6,7 @@ from pathlib import Path
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
+from raise_cli.cli.main import app
 from raise_core.graph.backends.filesystem import FilesystemGraphBackend
 from raise_core.graph.engine import Graph
 from raise_core.graph.models import GraphEdge, GraphNode
@@ -116,7 +116,7 @@ class TestReleaseList:
 
     def test_shows_error_when_no_graph(self, tmp_path: Path) -> None:
         """rai release list shows error when graph doesn't exist."""
-        from rai_cli.cli.error_handler import set_error_console
+        from raise_cli.cli.error_handler import set_error_console
 
         set_error_console(None)  # Reset singleton to avoid test ordering leaks
         result = runner.invoke(app, ["release", "list", "--project", str(tmp_path)])

@@ -8,7 +8,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.hooks.events import (
+from raise_cli.hooks.events import (
     AdapterFailedEvent,
     AdapterLoadedEvent,
     BeforeReleasePublishEvent,

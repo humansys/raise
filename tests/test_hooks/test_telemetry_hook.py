@@ -8,9 +8,9 @@ from unittest.mock import patch
 
 import pytest
 
-from rai_cli.hooks.builtin.telemetry import TelemetryHook
-from rai_cli.hooks.emitter import EventEmitter
-from rai_cli.hooks.events import (
+from raise_cli.hooks.builtin.telemetry import TelemetryHook
+from raise_cli.hooks.emitter import EventEmitter
+from raise_cli.hooks.events import (
     AdapterFailedEvent,
     AdapterLoadedEvent,
     DiscoverScanEvent,
@@ -22,9 +22,9 @@ from rai_cli.hooks.events import (
     SessionCloseEvent,
     SessionStartEvent,
 )
-from rai_cli.hooks.protocol import LifecycleHook
-from rai_cli.hooks.registry import HookRegistry
-from rai_cli.telemetry.writer import EmitResult
+from raise_cli.hooks.protocol import LifecycleHook
+from raise_cli.hooks.registry import HookRegistry
+from raise_cli.telemetry.writer import EmitResult
 
 # ---------------------------------------------------------------------------
 # Protocol conformance
@@ -104,7 +104,7 @@ class TestEventMapping:
         expected_subcommand: str,
     ) -> None:
         hook = TelemetryHook()
-        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
+        with patch("raise_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.return_value = EmitResult(success=True)
             result = hook.handle(event)
 
@@ -122,7 +122,7 @@ class TestErrorIsolation:
 
     def test_emit_failure_returns_error_status(self) -> None:
         hook = TelemetryHook()
-        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
+        with patch("raise_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.return_value = EmitResult(
                 success=False, error="Permission denied"
             )
@@ -133,7 +133,7 @@ class TestErrorIsolation:
 
     def test_emit_exception_returns_error_status(self) -> None:
         hook = TelemetryHook()
-        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
+        with patch("raise_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.side_effect = OSError("disk full")
             result = hook.handle(SessionStartEvent(session_id="SES-1"))
 
@@ -142,7 +142,7 @@ class TestErrorIsolation:
 
     def test_handle_never_raises(self) -> None:
         hook = TelemetryHook()
-        with patch("rai_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
+        with patch("raise_cli.hooks.builtin.telemetry.emit_command_usage") as mock_emit:
             mock_emit.side_effect = RuntimeError("unexpected")
             result = hook.handle(SessionStartEvent(session_id="SES-1"))
 
@@ -183,7 +183,7 @@ class TestE2EIntegration:
         # Emit a real event, pointing telemetry at tmp_path
         event = GraphBuildEvent(node_count=42, edge_count=10)
         with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage",
+            "raise_cli.hooks.builtin.telemetry.emit_command_usage",
             wraps=_emit_to_tmpdir(tmp_path),
         ):
             result = emitter.emit(event)
@@ -216,7 +216,7 @@ class TestE2EIntegration:
         ]
 
         with patch(
-            "rai_cli.hooks.builtin.telemetry.emit_command_usage",
+            "raise_cli.hooks.builtin.telemetry.emit_command_usage",
             wraps=_emit_to_tmpdir(tmp_path),
         ):
             for event in events:
@@ -242,8 +242,8 @@ def _emit_to_tmpdir(tmp_path: Path):  # type: ignore[type-arg]
     """Create a wrapper that writes CommandUsage to tmp_path/signals.jsonl."""
     from datetime import UTC, datetime
 
-    from rai_cli.telemetry.schemas import CommandUsage
-    from rai_cli.telemetry.writer import emit
+    from raise_cli.telemetry.schemas import CommandUsage
+    from raise_cli.telemetry.writer import emit
 
     def _wrapper(command: str, subcommand: str | None = None) -> EmitResult:
         signal = CommandUsage(

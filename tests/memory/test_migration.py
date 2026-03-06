@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.memory.migration import (
+from raise_cli.memory.migration import (
     MigrationResult,
     migrate_to_personal,
     needs_migration,

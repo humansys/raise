@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.config.agents import get_agent_config
-from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
-from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
+from raise_cli.config.agents import get_agent_config
+from raise_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
+from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
 
 TOTAL_SKILLS = len(DISTRIBUTABLE_SKILLS)
 
@@ -57,7 +57,7 @@ class TestScaffoldSkills:
 
         scaffold_skills(tmp_path)
 
-        base = files("rai_cli.skills_base")
+        base = files("raise_cli.skills_base")
         original = (base / "rai-session-start" / "SKILL.md").read_text(encoding="utf-8")
         copied = (
             tmp_path / ".claude" / "skills" / "rai-session-start" / "SKILL.md"
@@ -469,7 +469,7 @@ class TestCopySkillTreePath:
 
     def test_copy_from_path_source(self, tmp_path: Path) -> None:
         """copy_skill_tree should work with Path source, not just Traversable."""
-        from rai_cli.onboarding.skills import copy_skill_tree
+        from raise_cli.onboarding.skills import copy_skill_tree
 
         source = tmp_path / "source" / "my-skill"
         source.mkdir(parents=True)

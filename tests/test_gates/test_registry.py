@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Any, ClassVar
 from unittest.mock import MagicMock, patch
 
-from rai_cli.gates.models import GateContext, GateResult
-from rai_cli.gates.registry import EP_GATES, GateRegistry
+from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.registry import EP_GATES, GateRegistry
 
 # ---------------------------------------------------------------------------
 # Test gate implementations
@@ -143,7 +143,7 @@ class TestGateRegistryLookup:
 class TestGateRegistryDiscover:
     def test_discover_loads_conformant_gates(self) -> None:
         ep = _make_entry_point("tests", _TestGate)
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep]):
             reg = GateRegistry()
             reg.discover()
         assert len(reg.gates) == 1
@@ -152,14 +152,14 @@ class TestGateRegistryDiscover:
     def test_discover_skips_non_class(self) -> None:
         ep = _make_entry_point("func", _TestGate)
         ep.load.return_value = "not-a-class"  # not a class
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep]):
             reg = GateRegistry()
             reg.discover()
         assert len(reg.gates) == 0
 
     def test_discover_skips_non_conformant(self) -> None:
         ep = _make_entry_point("broken", _NotAGate)
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep]):
             reg = GateRegistry()
             reg.discover()
         assert len(reg.gates) == 0
@@ -167,14 +167,14 @@ class TestGateRegistryDiscover:
     def test_discover_skips_import_error(self) -> None:
         ep = _make_entry_point("bad", _TestGate)
         ep.load.side_effect = ImportError("missing module")
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep]):
             reg = GateRegistry()
             reg.discover()
         assert len(reg.gates) == 0
 
     def test_discover_uses_correct_group(self) -> None:
         assert EP_GATES == "rai.gates"
-        with patch("rai_cli.gates.registry.entry_points", return_value=[]) as mock_ep:
+        with patch("raise_cli.gates.registry.entry_points", return_value=[]) as mock_ep:
             reg = GateRegistry()
             reg.discover()
         mock_ep.assert_called_once_with(group="rai.gates")
@@ -182,7 +182,7 @@ class TestGateRegistryDiscover:
     def test_discover_multiple_gates(self) -> None:
         ep1 = _make_entry_point("tests", _TestGate)
         ep2 = _make_entry_point("lint", _LintGate)
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep1, ep2]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep1, ep2]):
             reg = GateRegistry()
             reg.discover()
         assert len(reg.gates) == 2

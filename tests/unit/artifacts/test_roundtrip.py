@@ -4,16 +4,16 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from rai_cli.artifacts.models import ArtifactRefs, ArtifactType
-from rai_cli.artifacts.reader import read_artifact
-from rai_cli.artifacts.story_design import (
+from raise_cli.artifacts.models import ArtifactRefs, ArtifactType
+from raise_cli.artifacts.reader import read_artifact
+from raise_cli.artifacts.story_design import (
     AcceptanceCriterion,
     Complexity,
     Decision,
     StoryDesignArtifact,
     StoryDesignContent,
 )
-from rai_cli.artifacts.writer import write_artifact
+from raise_cli.artifacts.writer import write_artifact
 
 
 def test_roundtrip_integrity(project_root, sample_created: datetime) -> None:

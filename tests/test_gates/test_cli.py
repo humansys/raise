@@ -7,9 +7,9 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.gates.models import GateContext, GateResult
-from rai_cli.gates.registry import GateRegistry
+from raise_cli.cli.main import app
+from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.registry import GateRegistry
 
 runner = CliRunner()
 
@@ -67,7 +67,7 @@ def _registry_with(*gates: object) -> GateRegistry:
 class TestGateList:
     def test_list_no_gates(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(),
         ):
             result = runner.invoke(app, ["gate", "list"])
@@ -76,7 +76,7 @@ class TestGateList:
 
     def test_list_shows_gates(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate(), _FailingGate()),
         ):
             result = runner.invoke(app, ["gate", "list"])
@@ -87,7 +87,7 @@ class TestGateList:
 
     def test_list_json(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate()),
         ):
             result = runner.invoke(app, ["gate", "list", "--format", "json"])
@@ -104,7 +104,7 @@ class TestGateList:
 class TestGateCheckSingle:
     def test_check_passing_gate(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "gate-tests"])
@@ -113,7 +113,7 @@ class TestGateCheckSingle:
 
     def test_check_failing_gate(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_FailingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "gate-types"])
@@ -123,7 +123,7 @@ class TestGateCheckSingle:
 
     def test_check_unknown_gate(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "nonexistent"])
@@ -132,7 +132,7 @@ class TestGateCheckSingle:
 
     def test_check_exploding_gate_isolated(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_ExplodingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "gate-explode"])
@@ -148,7 +148,7 @@ class TestGateCheckSingle:
 class TestGateCheckAll:
     def test_all_pass(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "--all"])
@@ -157,7 +157,7 @@ class TestGateCheckAll:
 
     def test_some_fail(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate(), _FailingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "--all"])
@@ -167,7 +167,7 @@ class TestGateCheckAll:
 
     def test_no_gates(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(),
         ):
             result = runner.invoke(app, ["gate", "check", "--all"])
@@ -176,7 +176,7 @@ class TestGateCheckAll:
 
     def test_check_all_json(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate(), _FailingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "--all", "--format", "json"])
@@ -185,7 +185,7 @@ class TestGateCheckAll:
 
     def test_exploding_gate_in_all(self) -> None:
         with patch(
-            "rai_cli.cli.commands.gate._get_registry",
+            "raise_cli.cli.commands.gate._get_registry",
             return_value=_registry_with(_PassingGate(), _ExplodingGate()),
         ):
             result = runner.invoke(app, ["gate", "check", "--all"])

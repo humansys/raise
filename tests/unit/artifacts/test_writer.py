@@ -6,8 +6,8 @@ from datetime import datetime
 
 import yaml
 
-from rai_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
-from rai_cli.artifacts.writer import write_artifact
+from raise_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
+from raise_cli.artifacts.writer import write_artifact
 
 
 def _make_artifact(created: datetime) -> SkillArtifact:

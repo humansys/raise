@@ -7,15 +7,15 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from rai_cli.artifacts.models import ArtifactRefs, ArtifactType
-from rai_cli.artifacts.reader import read_all_artifacts, read_artifact
-from rai_cli.artifacts.story_design import (
+from raise_cli.artifacts.models import ArtifactRefs, ArtifactType
+from raise_cli.artifacts.reader import read_all_artifacts, read_artifact
+from raise_cli.artifacts.story_design import (
     AcceptanceCriterion,
     Complexity,
     StoryDesignArtifact,
     StoryDesignContent,
 )
-from rai_cli.artifacts.writer import write_artifact
+from raise_cli.artifacts.writer import write_artifact
 
 
 def _make_artifact(created: datetime) -> StoryDesignArtifact:

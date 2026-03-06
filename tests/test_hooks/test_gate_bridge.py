@@ -5,12 +5,12 @@ from __future__ import annotations
 from typing import ClassVar
 from unittest.mock import patch
 
-from rai_cli.gates.models import GateContext, GateResult
-from rai_cli.hooks.events import (
+from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.hooks.events import (
     BeforeReleasePublishEvent,
     BeforeSessionCloseEvent,
 )
-from rai_cli.hooks.protocol import LifecycleHook
+from raise_cli.hooks.protocol import LifecycleHook
 
 # ---------------------------------------------------------------------------
 # Test gates for bridge tests
@@ -63,13 +63,13 @@ class TestProtocolConformance:
     """GateBridgeHook must implement LifecycleHook Protocol."""
 
     def test_isinstance_check(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
+        from raise_cli.hooks.builtin.gate_bridge import GateBridgeHook
 
         hook = GateBridgeHook()
         assert isinstance(hook, LifecycleHook)
 
     def test_subscribes_to_before_events(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
+        from raise_cli.hooks.builtin.gate_bridge import GateBridgeHook
 
         assert "before:release:publish" in GateBridgeHook.events
         assert "before:session:close" in GateBridgeHook.events
@@ -84,12 +84,12 @@ class TestGateExecution:
     """Bridge runs matching gates and returns abort/ok."""
 
     def test_all_pass_returns_ok(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
+        from raise_cli.hooks.builtin.gate_bridge import GateBridgeHook
 
         hook = GateBridgeHook()
         event = BeforeReleasePublishEvent(version="1.0")
 
-        with patch("rai_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
+        with patch("raise_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
             instance = mock_reg.return_value
             instance.discover.return_value = None
             instance.get_gates_for_point.return_value = [_PassGate()]
@@ -98,12 +98,12 @@ class TestGateExecution:
         assert result.status == "ok"
 
     def test_one_fail_returns_abort(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
+        from raise_cli.hooks.builtin.gate_bridge import GateBridgeHook
 
         hook = GateBridgeHook()
         event = BeforeReleasePublishEvent(version="1.0")
 
-        with patch("rai_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
+        with patch("raise_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
             instance = mock_reg.return_value
             instance.discover.return_value = None
             instance.get_gates_for_point.return_value = [_PassGate(), _FailGate()]
@@ -113,12 +113,12 @@ class TestGateExecution:
         assert "gate-fail" in result.message
 
     def test_no_matching_gates_returns_ok(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
+        from raise_cli.hooks.builtin.gate_bridge import GateBridgeHook
 
         hook = GateBridgeHook()
         event = BeforeReleasePublishEvent(version="1.0")
 
-        with patch("rai_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
+        with patch("raise_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
             instance = mock_reg.return_value
             instance.discover.return_value = None
             instance.get_gates_for_point.return_value = []
@@ -127,12 +127,12 @@ class TestGateExecution:
         assert result.status == "ok"
 
     def test_gate_exception_treated_as_failure(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
+        from raise_cli.hooks.builtin.gate_bridge import GateBridgeHook
 
         hook = GateBridgeHook()
         event = BeforeReleasePublishEvent(version="1.0")
 
-        with patch("rai_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
+        with patch("raise_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
             instance = mock_reg.return_value
             instance.discover.return_value = None
             instance.get_gates_for_point.return_value = [_ExplodingGate()]
@@ -142,12 +142,12 @@ class TestGateExecution:
         assert "gate-explode" in result.message
 
     def test_maps_event_name_to_workflow_point(self) -> None:
-        from rai_cli.hooks.builtin.gate_bridge import GateBridgeHook
+        from raise_cli.hooks.builtin.gate_bridge import GateBridgeHook
 
         hook = GateBridgeHook()
         event = BeforeSessionCloseEvent(session_id="SES-1")
 
-        with patch("rai_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
+        with patch("raise_cli.hooks.builtin.gate_bridge.GateRegistry") as mock_reg:
             instance = mock_reg.return_value
             instance.discover.return_value = None
             instance.get_gates_for_point.return_value = [_SessionGate()]
@@ -166,7 +166,7 @@ class TestEntryPointDiscovery:
     """GateBridgeHook is discoverable via rai.hooks entry point."""
 
     def test_registry_discovers_bridge(self) -> None:
-        from rai_cli.hooks.registry import HookRegistry
+        from raise_cli.hooks.registry import HookRegistry
 
         registry = HookRegistry()
         registry.discover()
@@ -174,7 +174,7 @@ class TestEntryPointDiscovery:
         assert "GateBridgeHook" in hook_types
 
     def test_bridge_has_higher_priority_than_telemetry(self) -> None:
-        from rai_cli.hooks.registry import HookRegistry
+        from raise_cli.hooks.registry import HookRegistry
 
         registry = HookRegistry()
         registry.discover()

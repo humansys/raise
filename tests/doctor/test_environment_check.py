@@ -7,8 +7,8 @@ from types import ModuleType
 from typing import Any
 from unittest.mock import patch
 
-from rai_cli.doctor.checks.environment import EnvironmentCheck
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.checks.environment import EnvironmentCheck
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 
 def _ctx() -> DoctorContext:

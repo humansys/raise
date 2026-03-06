@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 from typing import Any
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
     Comment,
@@ -18,11 +18,11 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from rai_cli.adapters.protocols import (
+from raise_cli.adapters.protocols import (
     DocumentationTarget,
     ProjectManagementAdapter,
 )
-from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter, _run_sync
+from raise_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter, _run_sync
 
 # --- Async mocks for wrapping ---
 

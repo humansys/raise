@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import ClassVar
 
-from rai_cli.hooks.events import HookEvent, HookResult
-from rai_cli.hooks.protocol import LifecycleHook
+from raise_cli.hooks.events import HookEvent, HookResult
+from raise_cli.hooks.protocol import LifecycleHook
 
 
 class _CompliantHook:

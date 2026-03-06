@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.memory.loader import (
+from raise_cli.memory.loader import (
     load_calibration,
     load_jsonl_file,
     load_memory_from_directory,
@@ -13,7 +13,7 @@ from rai_cli.memory.loader import (
     load_session,
     parse_date,
 )
-from rai_cli.memory.models import MemoryConceptType, MemoryScope
+from raise_cli.memory.models import MemoryConceptType, MemoryScope
 
 
 class TestParseDate:

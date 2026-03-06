@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
-from rai_cli.onboarding.bootstrap import (
+from raise_cli.onboarding.bootstrap import (
     BootstrapResult,
     bootstrap_rai_base,
     ensure_gitignore,
@@ -71,7 +71,7 @@ class TestBootstrapRaiBase:
 
         bootstrap_rai_base(tmp_path)
 
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         original = (base / "identity" / "core.md").read_text(encoding="utf-8")
         copied = (tmp_path / ".raise" / "rai" / "identity" / "core.md").read_text(
             encoding="utf-8"

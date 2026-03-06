@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import dataclasses
 
-from rai_cli.hooks.events import HookEvent, McpCallEvent
+from raise_cli.hooks.events import HookEvent, McpCallEvent
 
 
 class TestMcpCallEvent:

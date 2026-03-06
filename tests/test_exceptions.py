@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.exceptions import (
+from raise_cli.exceptions import (
     ArtifactNotFoundError,
     ConfigurationError,
     DependencyError,
@@ -216,7 +216,7 @@ class TestExceptionExports:
 
     def test_all_exceptions_in_all(self) -> None:
         """All exceptions are listed in __all__."""
-        from rai_cli import exceptions
+        from raise_cli import exceptions
 
         expected = {
             "RaiError",

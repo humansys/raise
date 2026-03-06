@@ -5,8 +5,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from rai_cli.schemas.journal import JournalEntry, JournalEntryType
-from rai_cli.session.journal import append_journal_entry, read_journal
+from raise_cli.schemas.journal import JournalEntry, JournalEntryType
+from raise_cli.session.journal import append_journal_entry, read_journal
 
 
 class TestJournalEntry:
@@ -133,7 +133,7 @@ class TestReadJournal:
             content="T1 complete",
         )
 
-        from rai_cli.session.journal import format_journal_compact
+        from raise_cli.session.journal import format_journal_compact
 
         output = format_journal_compact(read_journal(session_dir))
         assert "DECISION:" in output

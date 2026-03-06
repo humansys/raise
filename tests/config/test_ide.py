@@ -5,7 +5,7 @@ Verifies that old names still work as aliases for the new agent types.
 
 from __future__ import annotations
 
-from rai_cli.config.ide import (
+from raise_cli.config.ide import (
     IDE_CONFIGS,
     IdeConfig,
     IdeType,
@@ -18,25 +18,25 @@ class TestIdeBackwardCompat:
 
     def test_ide_config_is_agent_config(self) -> None:
         """IdeConfig should be an alias for AgentConfig."""
-        from rai_cli.config.agents import AgentConfig
+        from raise_cli.config.agents import AgentConfig
 
         assert IdeConfig is AgentConfig
 
     def test_ide_type_is_builtin_agent_type(self) -> None:
         """IdeType should be an alias for BuiltinAgentType."""
-        from rai_cli.config.agents import BuiltinAgentType
+        from raise_cli.config.agents import BuiltinAgentType
 
         assert IdeType is BuiltinAgentType
 
     def test_ide_configs_is_builtin_agents(self) -> None:
         """IDE_CONFIGS should be the same dict as BUILTIN_AGENTS."""
-        from rai_cli.config.agents import BUILTIN_AGENTS
+        from raise_cli.config.agents import BUILTIN_AGENTS
 
         assert IDE_CONFIGS is BUILTIN_AGENTS
 
     def test_get_ide_config_is_get_agent_config(self) -> None:
         """get_ide_config should be the same function as get_agent_config."""
-        from rai_cli.config.agents import get_agent_config
+        from raise_cli.config.agents import get_agent_config
 
         assert get_ide_config is get_agent_config
 

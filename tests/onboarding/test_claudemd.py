@@ -7,8 +7,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.onboarding.claudemd import ClaudeMdGenerator, generate_claude_md
-from rai_cli.onboarding.detection import DetectionResult, ProjectType
+from raise_cli.onboarding.claudemd import ClaudeMdGenerator, generate_claude_md
+from raise_cli.onboarding.detection import DetectionResult, ProjectType
 
 # =============================================================================
 # Fixtures

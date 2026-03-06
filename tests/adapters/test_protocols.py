@@ -7,7 +7,7 @@ from typing import Any
 
 import pytest
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     ArtifactLocator,
     BatchResult,
@@ -21,7 +21,7 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from rai_cli.adapters.protocols import (
+from raise_cli.adapters.protocols import (
     AsyncDocumentationTarget,
     AsyncProjectManagementAdapter,
     DocumentationTarget,

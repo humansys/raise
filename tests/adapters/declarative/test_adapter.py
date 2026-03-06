@@ -13,10 +13,10 @@ from unittest.mock import AsyncMock
 import pytest
 import yaml
 
-from rai_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
-from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
-from rai_cli.adapters.mcp_bridge import McpToolResult
-from rai_cli.adapters.models import (
+from raise_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
+from raise_cli.adapters.declarative.schema import DeclarativeAdapterConfig
+from raise_cli.adapters.mcp_bridge import McpToolResult
+from raise_cli.adapters.models import (
     AdapterHealth,
     IssueRef,
     IssueSpec,
@@ -580,14 +580,14 @@ class TestDocsUnmappedMethod:
 
 class TestProtocolCompliance:
     def test_satisfies_async_pm_protocol(self) -> None:
-        from rai_cli.adapters.protocols import AsyncProjectManagementAdapter
+        from raise_cli.adapters.protocols import AsyncProjectManagementAdapter
 
         bridge = _mock_bridge()
         adapter = _make_adapter(bridge)
         assert isinstance(adapter, AsyncProjectManagementAdapter)
 
     def test_satisfies_async_docs_protocol(self) -> None:
-        from rai_cli.adapters.protocols import AsyncDocumentationTarget
+        from raise_cli.adapters.protocols import AsyncDocumentationTarget
 
         bridge = _mock_bridge()
         adapter = _make_docs_adapter(bridge)

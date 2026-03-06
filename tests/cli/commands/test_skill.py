@@ -9,7 +9,7 @@ from textwrap import dedent
 import pytest
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
+from raise_cli.cli.main import app
 
 
 @pytest.fixture
@@ -505,7 +505,7 @@ class TestSkillSync:
         """Invoke `rai skill sync` and verify it outputs skill status table."""
         from unittest.mock import patch
 
-        from rai_cli.onboarding.skills import SkillScaffoldResult
+        from raise_cli.onboarding.skills import SkillScaffoldResult
 
         monkeypatch.chdir(tmp_path)
 
@@ -516,7 +516,7 @@ class TestSkillSync:
         )
 
         with patch(
-            "rai_cli.cli.commands.skill.scaffold_skills",
+            "raise_cli.cli.commands.skill.scaffold_skills",
             return_value=mock_result,
         ):
             result = runner.invoke(app, ["skill", "sync"])
@@ -532,7 +532,7 @@ class TestSkillSync:
         """All skills current → exit 0."""
         from unittest.mock import patch
 
-        from rai_cli.onboarding.skills import SkillScaffoldResult
+        from raise_cli.onboarding.skills import SkillScaffoldResult
 
         monkeypatch.chdir(tmp_path)
 
@@ -541,7 +541,7 @@ class TestSkillSync:
         )
 
         with patch(
-            "rai_cli.cli.commands.skill.scaffold_skills",
+            "raise_cli.cli.commands.skill.scaffold_skills",
             return_value=mock_result,
         ):
             result = runner.invoke(app, ["skill", "sync"])
@@ -555,7 +555,7 @@ class TestSkillSync:
         """Stale skills detected → exit 1."""
         from unittest.mock import patch
 
-        from rai_cli.onboarding.skills import SkillScaffoldResult
+        from raise_cli.onboarding.skills import SkillScaffoldResult
 
         monkeypatch.chdir(tmp_path)
 
@@ -565,7 +565,7 @@ class TestSkillSync:
         )
 
         with patch(
-            "rai_cli.cli.commands.skill.scaffold_skills",
+            "raise_cli.cli.commands.skill.scaffold_skills",
             return_value=mock_result,
         ):
             result = runner.invoke(app, ["skill", "sync"])

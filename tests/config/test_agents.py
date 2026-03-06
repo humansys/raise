@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.config.agents import (
+from raise_cli.config.agents import (
     BUILTIN_AGENTS,
     AgentChoice,
     AgentConfig,
@@ -55,9 +55,9 @@ class TestAgentConfig:
             instructions_file=".github/copilot-instructions.md",
             workflows_dir=".github/prompts",
             detection_markers=[".github/copilot-instructions.md"],
-            plugin="rai_cli.agents.copilot_plugin",
+            plugin="raise_cli.agents.copilot_plugin",
         )
-        assert config.plugin == "rai_cli.agents.copilot_plugin"
+        assert config.plugin == "raise_cli.agents.copilot_plugin"
         assert config.detection_markers == [".github/copilot-instructions.md"]
 
     def test_skills_dir_can_be_none(self) -> None:
@@ -156,7 +156,7 @@ class TestBuiltinAgents:
         assert config.instructions_file == ".github/copilot-instructions.md"
         assert config.workflows_dir == ".github/prompts"
         assert config.detection_markers == [".github/copilot-instructions.md"]
-        assert config.plugin == "rai_cli.agents.copilot_plugin"
+        assert config.plugin == "raise_cli.agents.copilot_plugin"
 
     def test_antigravity_registry_values(self) -> None:
         """Antigravity registry entry has correct values."""

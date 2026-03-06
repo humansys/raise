@@ -6,7 +6,7 @@ diff_graphs detects them accurately. Decoupled from live codebase state.
 
 from __future__ import annotations
 
-from rai_cli.context.diff import diff_graphs
+from raise_cli.context.diff import diff_graphs
 from raise_core.graph.engine import Graph
 from raise_core.graph.models import GraphNode
 

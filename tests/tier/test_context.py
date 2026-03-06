@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from rai_cli.tier.context import (
+from raise_cli.tier.context import (
     Capability,
     TierCapabilityError,
     TierContext,

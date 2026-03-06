@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import ClassVar
 from unittest.mock import MagicMock, patch
 
-from rai_cli.hooks.events import HookEvent, HookResult
-from rai_cli.hooks.protocol import LifecycleHook
-from rai_cli.hooks.registry import HookRegistry
+from raise_cli.hooks.events import HookEvent, HookResult
+from raise_cli.hooks.protocol import LifecycleHook
+from raise_cli.hooks.registry import HookRegistry
 
 # --- Test hook classes ---
 
@@ -47,7 +47,7 @@ class TestHookRegistryDiscover:
 
     def test_discover_returns_empty_when_no_entry_points(self) -> None:
         registry = HookRegistry()
-        with patch("rai_cli.hooks.registry.entry_points", return_value=[]):
+        with patch("raise_cli.hooks.registry.entry_points", return_value=[]):
             registry.discover()
         assert registry.hooks == []
 
@@ -57,7 +57,7 @@ class TestHookRegistryDiscover:
         ep.load.return_value = _LowPriorityHook
 
         registry = HookRegistry()
-        with patch("rai_cli.hooks.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.hooks.registry.entry_points", return_value=[ep]):
             registry.discover()
 
         assert len(registry.hooks) == 1
@@ -71,7 +71,7 @@ class TestHookRegistryDiscover:
         ep.dist.name = "bad-pkg"
 
         registry = HookRegistry()
-        with patch("rai_cli.hooks.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.hooks.registry.entry_points", return_value=[ep]):
             registry.discover()
 
         assert registry.hooks == []
@@ -84,7 +84,7 @@ class TestHookRegistryDiscover:
         ep.dist.name = "broken-pkg"
 
         registry = HookRegistry()
-        with patch("rai_cli.hooks.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.hooks.registry.entry_points", return_value=[ep]):
             registry.discover()
 
         assert registry.hooks == []
@@ -97,7 +97,7 @@ class TestHookRegistryDiscover:
         ep.dist.name = "crash-pkg"
 
         registry = HookRegistry()
-        with patch("rai_cli.hooks.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.hooks.registry.entry_points", return_value=[ep]):
             registry.discover()
 
         assert registry.hooks == []
@@ -113,7 +113,7 @@ class TestHookRegistryDiscover:
 
         registry = HookRegistry()
         with patch(
-            "rai_cli.hooks.registry.entry_points", return_value=[ep_low, ep_high]
+            "raise_cli.hooks.registry.entry_points", return_value=[ep_low, ep_high]
         ):
             registry.discover()
 

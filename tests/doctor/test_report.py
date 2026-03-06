@@ -8,9 +8,9 @@ from unittest.mock import patch
 import pytest
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.doctor.models import CheckResult, CheckStatus
-from rai_cli.doctor.report import (
+from raise_cli.cli.main import app
+from raise_cli.doctor.models import CheckResult, CheckStatus
+from raise_cli.doctor.report import (
     DiagnosticReport,
     generate_report,
     open_mailto,
@@ -226,7 +226,7 @@ class TestOpenMailto:
             os_info="Linux 6.17.0 (x86_64)",
             check_results=_sample_results(),
         )
-        with patch("rai_cli.doctor.report.webbrowser.open") as mock_open:
+        with patch("raise_cli.doctor.report.webbrowser.open") as mock_open:
             mock_open.return_value = True
             result = open_mailto(report)
 
@@ -246,7 +246,7 @@ class TestOpenMailto:
             os_info="Linux 6.17.0 (x86_64)",
             check_results=_sample_results(),
         )
-        with patch("rai_cli.doctor.report.webbrowser.open") as mock_open:
+        with patch("raise_cli.doctor.report.webbrowser.open") as mock_open:
             mock_open.return_value = True
             open_mailto(report)
 
@@ -274,7 +274,7 @@ class TestOpenMailto:
             os_info="Linux 6.17.0 (x86_64)",
             check_results=results,
         )
-        with patch("rai_cli.doctor.report.webbrowser.open") as mock_open:
+        with patch("raise_cli.doctor.report.webbrowser.open") as mock_open:
             mock_open.return_value = True
             open_mailto(report)
 
@@ -291,7 +291,7 @@ class TestOpenMailto:
             os_info="Linux 6.17.0 (x86_64)",
             check_results=[],
         )
-        with patch("rai_cli.doctor.report.webbrowser.open", side_effect=OSError("no browser")):
+        with patch("raise_cli.doctor.report.webbrowser.open", side_effect=OSError("no browser")):
             result = open_mailto(report)
         assert result is False
 
@@ -311,7 +311,7 @@ class TestOpenMailto:
                 ),
             ],
         )
-        with patch("rai_cli.doctor.report.webbrowser.open") as mock_open:
+        with patch("raise_cli.doctor.report.webbrowser.open") as mock_open:
             mock_open.return_value = True
             open_mailto(report)
 

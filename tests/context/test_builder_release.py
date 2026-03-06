@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.context.builder import GraphBuilder
+from raise_cli.context.builder import GraphBuilder
 
 
 @pytest.fixture

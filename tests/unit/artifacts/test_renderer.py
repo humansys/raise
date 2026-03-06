@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from rai_cli.artifacts.renderer import render_artifact
-from rai_cli.artifacts.story_design import (
+from raise_cli.artifacts.renderer import render_artifact
+from raise_cli.artifacts.story_design import (
     AcceptanceCriterion,
     Complexity,
     Decision,
@@ -30,9 +30,9 @@ def _make_full_artifact() -> StoryDesignArtifact:
             ],
             integration_points=[
                 IntegrationPoint(
-                    module="rai_cli.artifacts",
+                    module="raise_cli.artifacts",
                     change_type="new",
-                    files=["src/rai_cli/artifacts/models.py"],
+                    files=["src/raise_cli/artifacts/models.py"],
                 ),
             ],
             decisions=[
@@ -85,7 +85,7 @@ class TestRenderArtifact:
     def test_integration_points(self) -> None:
         md = render_artifact(_make_full_artifact())
         assert "## Integration Points" in md
-        assert "`rai_cli.artifacts`" in md
+        assert "`raise_cli.artifacts`" in md
         assert "new" in md
 
     def test_decisions_with_rationale(self) -> None:

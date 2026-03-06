@@ -8,8 +8,8 @@ from pathlib import Path
 import yaml
 from typer.testing import CliRunner
 
-from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
-from rai_cli.cli.main import app
+from raise_cli.adapters.declarative.schema import DeclarativeAdapterConfig
+from raise_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -34,7 +34,7 @@ class TestReferenceConfig:
 
     def test_reference_yaml_validates(self) -> None:
         """Reference config parses into a valid DeclarativeAdapterConfig."""
-        ref_dir = resources.files("rai_cli.adapters.declarative.reference")
+        ref_dir = resources.files("raise_cli.adapters.declarative.reference")
         yaml_path = ref_dir / "github.yaml"
         raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))  # type: ignore[union-attr]
         config = DeclarativeAdapterConfig.model_validate(raw)
@@ -43,7 +43,7 @@ class TestReferenceConfig:
 
     def test_reference_covers_all_pm_methods(self) -> None:
         """Reference config has entries for all 11 PM protocol methods."""
-        ref_dir = resources.files("rai_cli.adapters.declarative.reference")
+        ref_dir = resources.files("raise_cli.adapters.declarative.reference")
         yaml_path = ref_dir / "github.yaml"
         raw = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))  # type: ignore[union-attr]
         config = DeclarativeAdapterConfig.model_validate(raw)
@@ -117,7 +117,7 @@ class TestValidateE2E:
 
     def test_validate_reference_github_yaml(self) -> None:
         """Full path: shipped github.yaml → CLI validate → success output."""
-        ref_dir = resources.files("rai_cli.adapters.declarative.reference")
+        ref_dir = resources.files("raise_cli.adapters.declarative.reference")
         yaml_path = ref_dir / "github.yaml"
         result = runner.invoke(app, ["adapter", "validate", str(yaml_path)])
         assert result.exit_code == 0

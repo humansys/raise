@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.agents.copilot_plugin import CopilotPlugin
-from rai_cli.config.agents import BUILTIN_AGENTS
+from raise_cli.agents.copilot_plugin import CopilotPlugin
+from raise_cli.config.agents import BUILTIN_AGENTS
 
 
 def _copilot_config():

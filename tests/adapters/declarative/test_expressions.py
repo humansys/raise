@@ -10,7 +10,7 @@ import json
 
 import pytest
 
-from rai_cli.adapters.declarative.expressions import ExpressionEvaluator
+from raise_cli.adapters.declarative.expressions import ExpressionEvaluator
 
 
 @pytest.fixture

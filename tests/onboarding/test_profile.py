@@ -9,7 +9,7 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from rai_cli.onboarding.profile import (
+from raise_cli.onboarding.profile import (
     CORRECTIONS_MAX,
     ActiveSession,
     CoachingContext,
@@ -229,7 +229,7 @@ class TestLoadDeveloperProfile:
     ) -> None:
         """load_developer_profile returns None if file doesn't exist."""
         monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: tmp_path / ".rai"
+            "raise_cli.onboarding.profile.get_rai_home", lambda: tmp_path / ".rai"
         )
         result = load_developer_profile()
         assert result is None
@@ -240,7 +240,7 @@ class TestLoadDeveloperProfile:
         """load_developer_profile returns None if ~/.rai/ doesn't exist."""
         fake_home = tmp_path / "nonexistent" / ".rai"
         monkeypatch.setattr(
-            "rai_cli.onboarding.profile.get_rai_home", lambda: fake_home
+            "raise_cli.onboarding.profile.get_rai_home", lambda: fake_home
         )
         result = load_developer_profile()
         assert result is None
@@ -254,7 +254,7 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Fer\nexperience_level: shu\n")
 
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
 
         assert result is not None
@@ -270,7 +270,7 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("invalid: yaml: content: [")
 
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
         assert result is None
 
@@ -283,7 +283,7 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("not_a_name: Test\n")  # Missing required 'name' field
 
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
         assert result is None
 
@@ -296,7 +296,7 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """save_developer_profile creates ~/.rai/ if it doesn't exist."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         profile = DeveloperProfile(name="Test")
         save_developer_profile(profile)
@@ -309,7 +309,7 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """save_developer_profile writes valid YAML file."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         profile = DeveloperProfile(name="Fer", experience_level=ExperienceLevel.HA)
         save_developer_profile(profile)
@@ -326,7 +326,7 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """Saved profile can be loaded back correctly."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         communication = CommunicationPreferences(
             style=CommunicationStyle.DIRECT,
@@ -366,7 +366,7 @@ class TestSaveDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Old\n")
 
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
 
         profile = DeveloperProfile(name="New")
         save_developer_profile(profile)
@@ -549,7 +549,7 @@ class TestProfileBackwardCompat:
             "name: LegacyUser\nexperience_level: ha\n"
             "skills_mastered:\n- rai-session-start\n"
         )
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         result = load_developer_profile()
         assert result is not None
         assert result.name == "LegacyUser"
@@ -561,7 +561,7 @@ class TestProfileBackwardCompat:
     ) -> None:
         """Profile with coaching survives save/load roundtrip."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("rai_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
         coaching = CoachingContext(
             strengths=["architecture", "naming"],
             growth_edge="speed over process",
@@ -850,7 +850,7 @@ class TestBackwardCompatMigration:
             yaml.dump(old_data, f)
 
         # Mock get_rai_home to return tmp_path
-        import rai_cli.onboarding.profile as profile_module
+        import raise_cli.onboarding.profile as profile_module
 
         original_get_rai_home = profile_module.get_rai_home
         profile_module.get_rai_home = lambda: tmp_path
@@ -892,7 +892,7 @@ class TestBackwardCompatMigration:
         with open(profile_path, "w") as f:
             yaml.dump(new_data, f)
 
-        import rai_cli.onboarding.profile as profile_module
+        import raise_cli.onboarding.profile as profile_module
 
         original_get_rai_home = profile_module.get_rai_home
         profile_module.get_rai_home = lambda: tmp_path

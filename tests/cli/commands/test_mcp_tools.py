@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.mcp.models import McpToolInfo
-from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+from raise_cli.cli.main import app
+from raise_cli.mcp.models import McpToolInfo
+from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
 runner = CliRunner()
 
@@ -32,11 +32,11 @@ class TestMcpTools:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -47,7 +47,7 @@ class TestMcpTools:
         assert "Resolve lib ID" in result.output
 
     def test_tools_server_not_found(self) -> None:
-        with patch("rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
+        with patch("raise_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
             result = runner.invoke(app, ["mcp", "tools", "nonexistent"])
         assert result.exit_code != 0
         assert "not found" in result.output.lower()
