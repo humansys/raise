@@ -98,8 +98,8 @@ Write `work/discovery/context.yaml`:
 project:
   name: {from pyproject.toml/package.json/directory name}
   languages: [python]
-  root_dirs: [src/rai_cli]
-  entry_points: [src/rai_cli/cli/main.py]
+  root_dirs: [src/raise_cli]
+  entry_points: [src/raise_cli/cli/main.py]
   detected_at: {ISO_TIMESTAMP}
 status: initialized
 ```

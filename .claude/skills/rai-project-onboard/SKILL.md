@@ -158,5 +158,5 @@ Next: /rai-session-start
 - Prerequisite: `rai init --detect`
 - Sibling: `/rai-project-create` (greenfield)
 - Discovery: `/rai-discover` (unified pipeline)
-- Parser sources: `src/rai_cli/governance/parsers/*.py`
+- Parser sources: `src/raise_cli/governance/parsers/*.py`
 - Next: `/rai-session-start`

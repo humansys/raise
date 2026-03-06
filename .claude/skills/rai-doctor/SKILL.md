@@ -27,7 +27,7 @@ Diagnose RaiSE setup health, explain issues in plain language, and guide the use
 
 ## Context
 
-**When to use:** User reports something isn't working, after `rai init`, after upgrading rai-cli, or proactively at session start when setup feels off.
+**When to use:** User reports something isn't working, after `rai init`, after upgrading raise-cli, or proactively at session start when setup feels off.
 
 **When to skip:** The issue is clearly in user code, not RaiSE configuration.
 
