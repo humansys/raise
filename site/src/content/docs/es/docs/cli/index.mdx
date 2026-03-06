@@ -1,0 +1,540 @@
+---
+title: Referencia CLI
+description: Referencia completa de todos los comandos del CLI de RaiSE — flags, opciones y ejemplos.
+---
+
+Referencia completa de la interfaz de línea de comandos `raise`.
+
+## Opciones Globales
+
+Estas opciones están disponibles en todos los comandos:
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--version` | `-V` | Mostrar versión y salir |
+| `--format` | `-f` | Formato de salida: `human`, `json` o `table` |
+| `--verbose` | `-v` | Aumentar verbosidad (`-v`, `-vv`, `-vvv`) |
+| `--quiet` | `-q` | Suprimir salida no-error |
+| `--help` | | Mostrar ayuda y salir |
+
+---
+
+## Proyecto
+
+### `raise init`
+
+Inicializa un proyecto RaiSE en el directorio actual. Detecta el tipo de proyecto (greenfield o brownfield), crea `.raise/manifest.yaml` y configura la estructura del proyecto.
+
+Con `--detect`, también analiza las convenciones de código y genera guardrails.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--name` | `-n` | Nombre del proyecto (por defecto: nombre del directorio) |
+| `--path` | `-p` | Ruta del proyecto (por defecto: directorio actual) |
+| `--detect` | `-d` | Detectar convenciones y generar `guardrails.md` |
+
+```bash
+# Proyecto nuevo
+raise init
+
+# Proyecto con nombre
+raise init --name mi-api
+
+# Proyecto existente con detección de convenciones
+raise init --detect
+```
+
+---
+
+## Sesión
+
+### `raise session start`
+
+Inicia una nueva sesión de trabajo. Incrementa el contador de sesiones y establece el estado de sesión activa. Verifica sesiones huérfanas (iniciadas pero no cerradas) y avisa si las encuentra.
+
+Con `--context`, genera un bundle de contexto optimizado en tokens (~150 tokens) ensamblado desde tu perfil de desarrollador, estado de sesión y grafo de memoria.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--name` | `-n` | Tu nombre (requerido en la primera configuración) |
+| `--project` | `-p` | Ruta del proyecto a asociar con esta sesión |
+| `--context` | | Generar bundle de contexto para consumo de IA |
+
+```bash
+# Primera configuración
+raise session start --name "Alice" --project .
+
+# Iniciar sesión con bundle de contexto
+raise session start --project . --context
+
+# Inicio simple
+raise session start
+```
+
+### `raise session close`
+
+Finaliza la sesión de trabajo actual. Con `--summary` o `--state-file`, realiza un cierre estructurado completo — registra sesión, patrones, correcciones y actualiza el estado.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--summary` | `-s` | Resumen de la sesión |
+| `--type` | `-t` | Tipo de sesión (feature, research, maintenance, etc.) |
+| `--pattern` | | Descripción del patrón a registrar |
+| `--correction` | | Corrección de coaching observada |
+| `--correction-lesson` | | Lección de la corrección |
+| `--state-file` | | Archivo YAML con salida estructurada completa |
+| `--project` | `-p` | Ruta del proyecto |
+
+```bash
+# Cierre simple
+raise session close
+
+# Cierre con resumen
+raise session close --summary "Implementé módulo de auth" --type feature
+
+# Cierre con patrón aprendido
+raise session close --summary "Refactoricé tests" --type maintenance \
+  --pattern "Usar fixtures para setup de base de datos"
+```
+
+---
+
+## Memoria
+
+### `raise memory query`
+
+Busca en la memoria unificada conceptos relevantes. La memoria contiene todas las fuentes de contexto: gobernanza (principios, requisitos, términos), memoria (patrones, calibración, sesiones), skills (metadatos de workflow) y trabajo (epics, stories, decisiones).
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human` o `json` |
+| `--output` | `-o` | Archivo de salida (por defecto: stdout) |
+| `--strategy` | `-s` | Estrategia de búsqueda: `keyword_search` o `concept_lookup` |
+| `--types` | `-t` | Filtrar por tipos (separados por coma: `pattern`, `calibration`, `principle`, etc.) |
+| `--edge-types` | | Filtrar por tipos de relación (separados por coma: `constrained_by`, `depends_on`, etc.) |
+| `--limit` | `-l` | Número máximo de resultados (por defecto: 10) |
+| `--index` | `-i` | Ruta del índice de memoria |
+
+```bash
+# Buscar por palabras clave
+raise memory query "planning estimation"
+
+# Filtrar solo patrones
+raise memory query "testing" --types pattern,calibration
+
+# Buscar concepto específico por ID
+raise memory query "PAT-001" --strategy concept_lookup
+
+# Salida en JSON
+raise memory query "velocity" --format json
+```
+
+### `raise memory context`
+
+Muestra el contexto arquitectónico completo de un módulo. Retorna el bounded context (dominio), capa arquitectónica, guardrails aplicables (restricciones) y dependencias del módulo.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human` o `json` |
+| `--index` | `-i` | Ruta del índice de memoria |
+
+```bash
+# Mostrar contexto del módulo de memoria
+raise memory context mod-memory
+
+# Salida en JSON
+raise memory context mod-memory --format json
+```
+
+### `raise memory build`
+
+Construye el índice de memoria unificado desde todas las fuentes: documentos de gobernanza, memoria (patrones, calibración, sesiones), seguimiento de trabajo (epics, stories), skills y componentes de discovery.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--output` | `-o` | Ruta para guardar el JSON del índice |
+
+```bash
+# Construir índice en ubicación por defecto
+raise memory build
+
+# Guardar en ubicación personalizada
+raise memory build --output custom_index.json
+```
+
+### `raise memory validate`
+
+Valida la estructura y relaciones del índice de memoria. Verifica ciclos en relaciones `depends_on`, tipos de relación válidos y que todos los targets de edges existan como nodos.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--index` | `-i` | Ruta al archivo JSON del índice |
+
+```bash
+# Validar índice por defecto
+raise memory validate
+
+# Validar archivo específico
+raise memory validate --index custom_index.json
+```
+
+### `raise memory list`
+
+Lista los conceptos en el índice de memoria. Muestra conceptos para inspección y debugging.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human`, `json` o `table` |
+| `--output` | `-o` | Archivo de salida (por defecto: stdout) |
+| `--index` | `-i` | Ruta del índice de memoria |
+| `--memory-only` / `--all` | | Mostrar solo tipos de memoria (pattern, calibration, session) o todos |
+
+```bash
+# Mostrar tabla resumen
+raise memory list
+
+# Mostrar solo patrones/calibraciones/sesiones
+raise memory list --memory-only
+
+# Exportar como JSON
+raise memory list --format json --output memory.json
+```
+
+### `raise memory extract`
+
+Extrae conceptos de archivos markdown de gobernanza. Si no se provee ruta, extrae de todas las ubicaciones estándar de gobernanza (`governance/prd.md`, `governance/vision.md`, `framework/reference/constitution.md`).
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human` o `json` |
+
+```bash
+# Extraer de todos los archivos de gobernanza
+raise memory extract
+
+# Extraer de archivo específico
+raise memory extract governance/prd.md
+```
+
+### `raise memory add-pattern`
+
+Agrega un nuevo patrón a la memoria. Los patrones capturan aprendizajes del desarrollo — mejoras de proceso, descubrimientos técnicos, decisiones arquitectónicas.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--context` | `-c` | Palabras clave de contexto (separadas por coma) |
+| `--type` | `-t` | Tipo de patrón: `codebase`, `process`, `architecture`, `technical` (por defecto: `process`) |
+| `--from` | `-f` | Story/sesión donde se aprendió |
+| `--scope` | `-s` | Alcance de memoria: `global`, `project`, `personal` (por defecto: `project`) |
+| `--memory-dir` | `-m` | Ruta del directorio de memoria (sobreescribe scope) |
+
+```bash
+# Agregar patrón de proceso
+raise memory add-pattern "HITL before commits" -c "git,workflow"
+
+# Agregar patrón técnico
+raise memory add-pattern "Use capsys for stdout tests" -t technical -c "pytest,testing"
+
+# Agregar con referencia de origen
+raise memory add-pattern "BFS reuse across modules" -t architecture --from S2.3
+
+# Agregar a scope personal
+raise memory add-pattern "My workflow preference" --scope personal
+```
+
+### `raise memory add-calibration`
+
+Agrega datos de calibración para una story completada. Registra estimación vs. duración real para análisis de velocidad.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--name` | | Nombre de la story (requerido) |
+| `--size` | `-s` | Talla: `XS`, `S`, `M`, `L`, `XL` (requerido) |
+| `--actual` | `-a` | Minutos reales (requerido) |
+| `--estimated` | `-e` | Minutos estimados |
+| `--sp` | | Story points |
+| `--kata` / `--no-kata` | | Si se siguió el ciclo kata (por defecto: sí) |
+| `--notes` | `-n` | Notas adicionales |
+| `--scope` | `-s` | Alcance de memoria: `global`, `project`, `personal` |
+| `--memory-dir` | `-m` | Ruta del directorio de memoria |
+
+```bash
+# Calibración básica
+raise memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20
+
+# Con estimación para cálculo de velocidad
+raise memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60
+
+# Detalles completos
+raise memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
+```
+
+### `raise memory add-session`
+
+Agrega un registro de sesión a la memoria. Las sesiones son específicas del desarrollador y siempre se escriben en el directorio personal.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--outcomes` | `-o` | Resultados de la sesión (separados por coma) |
+| `--type` | `-t` | Tipo de sesión (por defecto: `story`) |
+| `--log` | `-l` | Ruta al archivo de log de sesión |
+| `--memory-dir` | `-m` | Ruta del directorio de memoria |
+
+```bash
+# Sesión básica
+raise memory add-session "S3.5 Skills Integration"
+
+# Con resultados
+raise memory add-session "S3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
+
+# Detalles completos
+raise memory add-session "S3.5 Skills Integration" -t story -o "Writer API,Hooks" \
+  -l "dev/sessions/2026-02-02-s3.5.md"
+```
+
+### `raise memory emit-work`
+
+Emite un evento de ciclo de vida de trabajo para análisis de flujo Lean. Registra ítems de trabajo (epics, stories) a través de fases normalizadas para habilitar análisis de lead time, wait time, WIP y cuellos de botella.
+
+Fases: `design`, `plan`, `implement`, `review`.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--event` | `-e` | Tipo de evento: `start`, `complete`, `blocked`, `unblocked`, `abandoned` (por defecto: `start`) |
+| `--phase` | `-p` | Fase: `design`, `plan`, `implement`, `review` (por defecto: `design`) |
+| `--blocker` | `-b` | Descripción del bloqueante (para eventos `blocked`) |
+
+```bash
+# Ciclo de vida de epic
+raise memory emit-work epic E9 --event start --phase design
+raise memory emit-work epic E9 -e complete -p design
+
+# Ciclo de vida de story
+raise memory emit-work story S9.4 --event start --phase implement
+raise memory emit-work story S9.4 -e complete -p implement
+
+# Trabajo bloqueado
+raise memory emit-work story S9.4 -e blocked -p plan -b "requisitos poco claros"
+```
+
+### `raise memory emit-session`
+
+Emite un evento de sesión a telemetría. Registra la completitud de una sesión para aprendizaje local e insights.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--type` | `-t` | Tipo de sesión: `story`, `research`, `maintenance`, etc. (por defecto: `story`) |
+| `--outcome` | `-o` | Resultado: `success`, `partial`, `abandoned` (por defecto: `success`) |
+| `--duration` | `-d` | Duración de la sesión en minutos |
+| `--stories` | `-f` | Stories trabajadas (separadas por coma) |
+
+```bash
+# Sesión completada básica
+raise memory emit-session --type story --outcome success
+
+# Con duración y stories
+raise memory emit-session -t story -o success -d 45 -f S9.1,S9.2,S9.3
+```
+
+### `raise memory emit-calibration`
+
+Emite un evento de calibración a telemetría. Registra estimación vs. real para seguimiento de velocidad. La velocidad se calcula automáticamente: `estimated / actual` (>1.0 = más rápido de lo estimado).
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--size` | `-s` | Talla: `XS`, `S`, `M`, `L` (por defecto: `S`) |
+| `--estimated` | `-e` | Duración estimada en minutos |
+| `--actual` | `-a` | Duración real en minutos |
+
+```bash
+# Story completada más rápido de lo estimado
+raise memory emit-calibration S9.4 --size S --estimated 30 --actual 15
+
+# Story tomó más tiempo
+raise memory emit-calibration S9.4 -s M -e 60 -a 90
+```
+
+### `raise memory generate`
+
+:::caution[Deprecado]
+`memory generate` está deprecado. Usa [`raise memory build`](#raise-memory-build) en su lugar. El grafo de memoria es ahora la fuente única de verdad — el contexto se entrega vía `raise session start --context`.
+:::
+
+---
+
+## Discovery
+
+Comandos para escanear, analizar y rastrear la arquitectura de tu codebase.
+
+### `raise discover scan`
+
+Escanea un directorio y extrae símbolos de código (clases, funciones, métodos, interfaces, docstrings de módulos). Soporta Python, TypeScript y JavaScript.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--language` | `-l` | Lenguaje: `python`, `typescript`, `javascript` (auto-detección si no se especifica) |
+| `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
+| `--pattern` | `-p` | Patrón glob para archivos |
+| `--exclude` | `-e` | Patrones a excluir (se puede repetir) |
+
+```bash
+# Escanear directorio actual
+raise discover scan
+
+# Escanear solo archivos Python
+raise discover scan src/ --language python
+
+# Salida JSON para pipe a analyze
+raise discover scan src/ -l python -o json
+
+# Excluir tests
+raise discover scan . --exclude "**/test_*" --exclude "**/__tests__/**"
+```
+
+### `raise discover analyze`
+
+Analiza resultados de escaneo con scoring de confianza y agrupación por módulos. Toma la salida de scan y produce un análisis con auto-categorización, folding jerárquico y agrupación por módulos. Todo el análisis es determinístico — no requiere inferencia de IA.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--input` | `-i` | Ruta al JSON de resultado de scan (lee stdin si no se provee) |
+| `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
+| `--category-map` | `-c` | Archivo YAML con mapeos personalizados de ruta a categoría |
+
+```bash
+# Analizar desde archivo
+raise discover analyze --input scan-result.json
+
+# Pipe desde scan
+raise discover scan src/ -l python -o json | raise discover analyze
+
+# Solo resumen
+raise discover analyze --input scan-result.json --output summary
+```
+
+### `raise discover build`
+
+Construye el grafo unificado con componentes descubiertos. Lee componentes validados desde JSON y los integra en el grafo de contexto unificado, haciéndolos consultables vía `raise memory context`.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--input` | `-i` | Ruta al JSON de componentes validados |
+| `--project-root` | `-r` | Directorio raíz del proyecto (por defecto: `.`) |
+| `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
+
+```bash
+# Construir con archivo de entrada por defecto
+raise discover build
+
+# Construir con entrada personalizada
+raise discover build --input my-components.json
+```
+
+### `raise discover drift`
+
+Verifica drift arquitectónico contra el baseline de componentes. Compara código escaneado contra el baseline de componentes validados para identificar drift potencial (archivos en ubicaciones incorrectas, violaciones de convenciones de naming, documentación faltante).
+
+Códigos de salida: `0` = sin drift, `1` = advertencias de drift encontradas.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--project-root` | `-r` | Directorio raíz del proyecto (por defecto: `.`) |
+| `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
+
+```bash
+# Verificar proyecto completo
+raise discover drift
+
+# Verificar directorio específico
+raise discover drift src/new_module/
+
+# Salida en JSON
+raise discover drift --output json
+```
+
+---
+
+## Skills
+
+### `raise skill list`
+
+Lista todos los skills en el directorio de skills. Muestra skills agrupados por ciclo de vida con versión y descripción.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human` o `json` |
+
+```bash
+raise skill list
+```
+
+### `raise skill validate`
+
+Valida la estructura de un skill contra el schema de RaiSE. Verifica frontmatter, campos requeridos, secciones y convenciones de naming.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human` o `json` |
+
+```bash
+# Validar todos los skills
+raise skill validate
+
+# Validar skill específico
+raise skill validate .claude/skills/story-start/SKILL.md
+```
+
+### `raise skill scaffold`
+
+Crea un nuevo skill desde plantilla. Genera un archivo `SKILL.md` con la estructura apropiada en `.claude/skills/<nombre>/`.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--lifecycle` | `-l` | Ciclo de vida: `session`, `epic`, `story`, `discovery`, `utility`, `meta` |
+| `--after` | | Skill que debe ir antes (prerequisito) |
+| `--before` | | Skill que debe ir después (siguiente) |
+| `--format` | `-f` | Formato de salida: `human` o `json` |
+
+```bash
+# Crear nuevo skill de story
+raise skill scaffold story-validate
+
+# Con ciclo de vida y ordenamiento
+raise skill scaffold story-validate --lifecycle story --after story-implement --before story-close
+```
+
+### `raise skill check-name`
+
+Verifica un nombre propuesto de skill contra convenciones de naming. Valida el patrón `{dominio}-{acción}`, verifica conflictos con skills existentes o comandos CLI, y confirma el dominio de ciclo de vida.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human` o `json` |
+
+```bash
+raise skill check-name story-validate
+```
+
+---
+
+## Profile
+
+### `raise profile show`
+
+Muestra el perfil de desarrollador en formato YAML. Muestra el contenido de `~/.rai/developer.yaml`. Si no existe perfil, muestra un mensaje guía para crear uno.
+
+```bash
+raise profile show
+```
+
+---
+
+## Base
+
+### `raise base show`
+
+Muestra información del paquete base de Rai. Muestra la versión del base incluido, contenidos (identidad, patrones, metodología) y si ha sido instalado en el proyecto actual.
+
+```bash
+raise base show
+```

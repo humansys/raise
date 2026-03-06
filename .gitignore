@@ -100,3 +100,8 @@ credentials.json
 .netrc
 .raise/mcp/
 !.raise/mcp/catalog.yaml
+
+# Website (Astro)
+site/node_modules/
+site/dist/
+site/.astro/
