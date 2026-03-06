@@ -29,7 +29,7 @@ Guide teams through skill set lifecycle — create, inspect, compare, and mainta
 
 - **Shu**: Follow all steps; explain each CLI output
 - **Ha**: Skip detection when user states intent; batch operations
-- **Ri**: Proactive drift detection; suggest set updates after rai-cli upgrades
+- **Ri**: Proactive drift detection; suggest set updates after raise-cli upgrades
 
 ## Context
 

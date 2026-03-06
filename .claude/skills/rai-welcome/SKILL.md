@@ -129,6 +129,6 @@ Next: /rai-session-start
 
 ## References
 
-- Profile model: `src/rai_cli/onboarding/profile.py`
+- Profile model: `src/raise_cli/onboarding/profile.py`
 - Next: `/rai-session-start`
 - One-time skill: subsequent runs verify, not recreate

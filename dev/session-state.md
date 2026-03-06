@@ -44,8 +44,8 @@
 
 ### 1. F1.4 Exception Hierarchy (3 SP) ✓
 
-- `src/rai_cli/exceptions.py` - 9 exception classes
-- `src/rai_cli/cli/error_handler.py` - Rich + JSON output
+- `src/raise_cli/exceptions.py` - 9 exception classes
+- `src/raise_cli/cli/error_handler.py` - Rich + JSON output
 - 77 new tests, 140 total, 91% coverage
 
 ### 2. Jidoka: Skills Discovery Fix ✓
