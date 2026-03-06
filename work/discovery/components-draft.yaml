@@ -1390,12 +1390,12 @@ components:
   validated: true
   validated_by: human
   validated_at: '2026-02-09T16:33:30.539105+00:00'
-- id: comp-query-UnifiedQueryStrategy
-  name: UnifiedQueryStrategy
+- id: comp-query-QueryStrategy
+  name: QueryStrategy
   kind: class
   file: context/query.py
   line: 22
-  signature: class UnifiedQueryStrategy(str, Enum)
+  signature: class QueryStrategy(str, Enum)
   module: context.query
   confidence_tier: medium
   confidence_score: 65
@@ -1406,12 +1406,12 @@ components:
   validated: true
   validated_by: human
   validated_at: '2026-02-09T16:33:30.539105+00:00'
-- id: comp-query-UnifiedQuery
-  name: UnifiedQuery
+- id: comp-query-Query
+  name: Query
   kind: class
   file: context/query.py
   line: 34
-  signature: class UnifiedQuery(BaseModel)
+  signature: class Query(BaseModel)
   module: context.query
   confidence_tier: high
   confidence_score: 75
@@ -1438,12 +1438,12 @@ components:
   validated: true
   validated_by: auto
   validated_at: '2026-02-09T16:32:06.678285+00:00'
-- id: comp-query-UnifiedQueryMetadata
-  name: UnifiedQueryMetadata
+- id: comp-query-QueryMetadata
+  name: QueryMetadata
   kind: class
   file: context/query.py
   line: 108
-  signature: class UnifiedQueryMetadata(BaseModel)
+  signature: class QueryMetadata(BaseModel)
   module: context.query
   confidence_tier: high
   confidence_score: 75
@@ -1454,12 +1454,12 @@ components:
   validated: true
   validated_by: auto
   validated_at: '2026-02-09T16:32:06.678285+00:00'
-- id: comp-query-UnifiedQueryResult
-  name: UnifiedQueryResult
+- id: comp-query-QueryResult
+  name: QueryResult
   kind: class
   file: context/query.py
   line: 141
-  signature: class UnifiedQueryResult(BaseModel)
+  signature: class QueryResult(BaseModel)
   module: context.query
   confidence_tier: high
   confidence_score: 75
@@ -1473,12 +1473,12 @@ components:
   validated: true
   validated_by: auto
   validated_at: '2026-02-09T16:32:06.678285+00:00'
-- id: comp-query-UnifiedQueryEngine
-  name: UnifiedQueryEngine
+- id: comp-query-QueryEngine
+  name: QueryEngine
   kind: class
   file: context/query.py
   line: 225
-  signature: class UnifiedQueryEngine
+  signature: class QueryEngine
   module: context.query
   confidence_tier: medium
   confidence_score: 65
@@ -1492,7 +1492,7 @@ components:
   purpose: Query engine for unified context graph providing keyword search and concept lookup with BFS traversal.
   category: service
   depends_on:
-  - UnifiedGraph
+  - Graph
   - ConceptNode
   - EdgeType
   - NodeType
@@ -1500,12 +1500,12 @@ components:
   validated: true
   validated_by: human
   validated_at: '2026-02-09T16:33:30.539105+00:00'
-- id: comp-graph-UnifiedGraph
-  name: UnifiedGraph
+- id: comp-graph-Graph
+  name: Graph
   kind: class
   file: context/graph.py
   line: 21
-  signature: class UnifiedGraph
+  signature: class Graph
   module: context.graph
   confidence_tier: medium
   confidence_score: 65
@@ -1532,12 +1532,12 @@ components:
   validated: true
   validated_by: human
   validated_at: '2026-02-09T16:33:30.539105+00:00'
-- id: comp-builder-UnifiedGraphBuilder
-  name: UnifiedGraphBuilder
+- id: comp-builder-GraphBuilder
+  name: GraphBuilder
   kind: class
   file: context/builder.py
   line: 28
-  signature: class UnifiedGraphBuilder
+  signature: class GraphBuilder
   module: context.builder
   confidence_tier: medium
   confidence_score: 65
@@ -1556,7 +1556,7 @@ components:
     components, architecture, and identity.
   category: builder
   depends_on:
-  - UnifiedGraph
+  - Graph
   - ConceptNode
   - GovernanceExtractor
   internal: false
@@ -2196,7 +2196,7 @@ components:
   purpose: Assembles token-optimized context bundle from profile, state, memory graph, and sessions.
   category: builder
   depends_on:
-  - UnifiedGraph
+  - Graph
   - DeveloperProfile
   - SessionState
   internal: false
@@ -2215,7 +2215,7 @@ components:
   purpose: Queries graph for foundational patterns tagged foundational=true.
   category: service
   depends_on:
-  - UnifiedGraph
+  - Graph
   internal: false
   validated: true
   validated_by: human
@@ -2232,7 +2232,7 @@ components:
   purpose: Queries graph for all always_on governance and identity primes.
   category: service
   depends_on:
-  - UnifiedGraph
+  - Graph
   internal: false
   validated: true
   validated_by: human
@@ -2251,7 +2251,7 @@ components:
   depends_on:
   - DeveloperProfile
   - SessionState
-  - UnifiedGraph
+  - Graph
   internal: false
   validated: true
   validated_by: human
@@ -3762,7 +3762,7 @@ components:
   module: context.query
   confidence_tier: high
   confidence_score: 90
-  purpose: Unified context query engine.
+  purpose: Context query engine.
   category: builder
   depends_on: []
   internal: false
@@ -3810,7 +3810,7 @@ components:
   module: context.graph
   confidence_tier: medium
   confidence_score: 60
-  purpose: Provides UnifiedGraph class wrapping NetworkX MultiDiGraph for storing and querying cross-domain concepts.
+  purpose: Provides Graph class wrapping NetworkX MultiDiGraph for storing and querying cross-domain concepts.
   category: model
   depends_on:
   - ConceptEdge
@@ -3828,10 +3828,10 @@ components:
   module: context.builder
   confidence_tier: medium
   confidence_score: 60
-  purpose: Provides the UnifiedGraphBuilder class that merges governance, memory, work, and skills into a single UnifiedGraph.
+  purpose: Provides the GraphBuilder class that merges governance, memory, work, and skills into a single Graph.
   category: builder
   depends_on:
-  - UnifiedGraph
+  - Graph
   - GovernanceExtractor
   internal: false
   validated: true
