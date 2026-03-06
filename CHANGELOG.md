@@ -133,7 +133,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Version sync between pyproject.toml and __init__.py## [2.0.0a6] - 2026-02-12
 
 ### Added
-- Initial public release of rai-cli
+- Initial public release of raise-cli
 - 24 RaiSE skills for AI-assisted software engineering
 - Codebase discovery with multi-language support (Python, TypeScript, JavaScript, PHP, Svelte)
 - Knowledge graph for project context and memory

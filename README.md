@@ -43,13 +43,13 @@ RaiSE is a methodology + toolkit for professional developers who use AI assistan
 
 ```bash
 # Recommended: pipx (isolates dependencies)
-pipx install rai-cli
+pipx install raise-cli
 
 # Alternative: pip (use a virtual environment)
-pip install rai-cli
+pip install raise-cli
 
 # Alternative: uv
-uv tool install rai-cli
+uv tool install raise-cli
 
 # Verify
 rai --version
@@ -62,7 +62,7 @@ rai --version
 sudo apt update && sudo apt install pipx -y
 pipx ensurepath
 # Close and reopen terminal
-pipx install rai-cli
+pipx install raise-cli
 ```
 
 ### Development Setup
@@ -295,7 +295,7 @@ raise-commons/
 │   ├── architecture/    #   Module docs, system design
 │   └── solution/        #   Vision, guardrails, business case
 │
-├── src/rai_cli/         # CLI toolkit (Python)
+├── src/raise_cli/         # CLI toolkit (Python)
 │
 ├── work/                # Work in progress
 │   └── epics/           #   Epic directories containing story artifacts

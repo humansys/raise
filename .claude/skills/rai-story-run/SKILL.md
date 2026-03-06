@@ -138,7 +138,7 @@ Each fork phase runs in a **fresh-context subagent** via the Agent tool. This el
 
 **For each fork phase:**
 
-1. **Read** the skill's SKILL.md from `src/rai_cli/skills_base/rai-{skill-name}/SKILL.md`
+1. **Read** the skill's SKILL.md from `src/raise_cli/skills_base/rai-{skill-name}/SKILL.md`
 2. **Spawn** an Agent tool subagent with:
    - `subagent_type: "general-purpose"`
    - `prompt`: the agent prompt template below, filled with skill content and story context

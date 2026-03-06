@@ -12,9 +12,9 @@
 - [Claude Code](https://claude.ai/claude-code) CLI instalado y configurado
 
 ```bash
-# Instalar rai-cli (alpha — requiere flag --pre)
-pip install --pre rai-cli
-# o: uv pip install --prerelease=allow rai-cli
+# Instalar raise-cli (alpha — requiere flag --pre)
+pip install --pre raise-cli
+# o: uv pip install --prerelease=allow raise-cli
 
 # Verificar
 rai --help

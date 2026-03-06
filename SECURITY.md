@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in RaiSE Commons or rai-cli, please report it responsibly.
+If you discover a security vulnerability in RaiSE Commons or raise-cli, please report it responsibly.
 
 **Contact:** emilio@humansys.ai
 
@@ -33,9 +33,9 @@ We consider security research conducted in good faith to be authorized. We will 
 ## Scope
 
 This policy applies to:
-- The `rai-cli` Python package
+- The `raise-cli` Python package
 - The RaiSE framework files in this repository
-- The official distribution on PyPI (`pip install rai-cli`)
+- The official distribution on PyPI (`pip install raise-cli`)
 
 ## Supported Versions
 
