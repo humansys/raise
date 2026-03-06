@@ -2,7 +2,7 @@
 members = ["packages/*"]
 
 [tool.uv.sources]
-rai-core = { workspace = true }
+raise-core = { workspace = true }
 rai-server = { workspace = true }
 
 [project]
@@ -27,7 +27,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "rai-core==2.1.0",
+    "raise-core==2.1.0",
     "atlassian-python-api>=3.41.0",
     "authlib>=1.3.0",
     "cryptography>=46.0.5",
@@ -110,7 +110,7 @@ jira = "rai_cli.adapters.mcp_jira:McpJiraAdapter"
 confluence = "rai_cli.adapters.mcp_confluence:McpConfluenceAdapter"
 
 [project.entry-points."rai.graph.backends"]
-local = "rai_core.graph.backends.filesystem:FilesystemGraphBackend"
+local = "raise_core.graph.backends.filesystem:FilesystemGraphBackend"
 
 [build-system]
 requires = ["hatchling"]
@@ -130,7 +130,7 @@ include = [
 [tool.ruff]
 line-length = 88
 target-version = "py312"
-src = ["src", "packages/rai-core/src"]
+src = ["src", "packages/raise-core/src"]
 exclude = ["dev/experiments"]
 
 [tool.ruff.lint]
@@ -156,7 +156,7 @@ indent-style = "space"
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
-include = ["src", "packages/rai-core/src", "packages/rai-server/src"]
+include = ["src", "packages/raise-core/src", "packages/rai-server/src"]
 exclude = [
     "**/__pycache__",
     "**/node_modules",
@@ -176,7 +176,7 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--cov=src/rai_cli",
-    "--cov=packages/rai-core/src/rai_core",
+    "--cov=packages/raise-core/src/raise_core",
     "--cov=packages/rai-server/src/rai_server",
     "--cov-report=term-missing",
     "--cov-report=html",
@@ -186,7 +186,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["src/rai_cli", "packages/rai-core/src/rai_core", "packages/rai-server/src/rai_server"]
+source = ["src/rai_cli", "packages/raise-core/src/raise_core", "packages/rai-server/src/rai_server"]
 omit = [
     "*/tests/*",
     "*/__main__.py",
