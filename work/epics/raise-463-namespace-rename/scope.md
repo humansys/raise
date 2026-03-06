@@ -25,7 +25,7 @@ collision with Robotec.AI's `rai-core`. CLI command remains `rai`.
 
 ## Stories
 
-- [ ] S463.1: Rename raise-core (S) — dir, namespace, pyproject, imports, 11 src + 38 test files
+- [x] S463.1: Rename raise-core (S) — dir, namespace, pyproject, imports, 11 src + 38 test files
 - [ ] S463.2: Rename raise-server (S) — dir, namespace, pyproject, imports, Dockerfile, alembic, 25 src + 33 test files. Depends: S463.1
 - [ ] S463.3: Rename raise-cli (M) — dir rename (197 src files), namespace, imports, importlib.resources, 329 mock paths, conftest. Depends: S463.1
 - [ ] S463.4: Config and CI (S) — root pyproject.toml, uv.lock, CI workflows, docker-compose, README, CHANGELOG, skills, dev docs. Depends: S463.1-3
@@ -73,7 +73,7 @@ safer — avoids merge conflicts in config files.
 
 | Story | Status | Notes |
 |-------|--------|-------|
-| S463.1 raise-core | Pending | |
+| S463.1 raise-core | Done | 4 checkpoints, 3699 tests pass |
 | S463.2 raise-server | Pending | |
 | S463.3 raise-cli | Pending | |
 | S463.4 Config/CI | Pending | |
