@@ -4,7 +4,7 @@ This module provides a unified output interface that respects the --format flag,
 supporting human-readable (Rich), JSON, and table formats.
 
 Example:
-    >>> from rai_cli.output import get_console
+    >>> from raise_cli.output import get_console
     >>>
     >>> console = get_console()
     >>> console.print_message("Processing...")

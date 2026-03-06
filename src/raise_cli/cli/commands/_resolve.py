@@ -22,10 +22,10 @@ from typing import Any
 
 from rich.console import Console
 
-from rai_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
-from rai_cli.adapters.registry import get_doc_targets, get_pm_adapters
-from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
-from rai_cli.onboarding.manifest import load_manifest
+from raise_cli.adapters.protocols import DocumentationTarget, ProjectManagementAdapter
+from raise_cli.adapters.registry import get_doc_targets, get_pm_adapters
+from raise_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
+from raise_cli.onboarding.manifest import load_manifest
 
 logger = logging.getLogger(__name__)
 
@@ -103,14 +103,14 @@ def resolve_entrypoint(
 
 def _discover_pm() -> dict[str, Callable[[], Any]]:
     """Merge YAML and entry point PM adapters. EP wins on name collision."""
-    from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+    from raise_cli.adapters.declarative.discovery import discover_yaml_adapters
 
     return {**discover_yaml_adapters("pm"), **get_pm_adapters()}
 
 
 def _discover_docs() -> dict[str, Callable[[], Any]]:
     """Merge YAML and entry point docs targets. EP wins on name collision."""
-    from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+    from raise_cli.adapters.declarative.discovery import discover_yaml_adapters
 
     return {**discover_yaml_adapters("docs"), **get_doc_targets()}
 

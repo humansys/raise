@@ -6,7 +6,7 @@ fallback when an event loop is already running.
 
 Usage::
 
-    from rai_cli.adapters.sync import SyncPMAdapter
+    from raise_cli.adapters.sync import SyncPMAdapter
 
     async_adapter = JiraAdapter(config)
     sync_adapter = SyncPMAdapter(async_adapter)
@@ -20,7 +20,7 @@ import concurrent.futures
 from collections.abc import Coroutine
 from typing import Any
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
     Comment,
@@ -33,7 +33,7 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from rai_cli.adapters.protocols import (
+from raise_cli.adapters.protocols import (
     AsyncDocumentationTarget,
     AsyncProjectManagementAdapter,
 )

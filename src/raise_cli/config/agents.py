@@ -85,7 +85,7 @@ BUILTIN_AGENTS: dict[BuiltinAgentType, AgentConfig] = {
         instructions_file=".github/copilot-instructions.md",
         workflows_dir=".github/prompts",
         detection_markers=[".github/copilot-instructions.md"],
-        plugin="rai_cli.agents.copilot_plugin",
+        plugin="raise_cli.agents.copilot_plugin",
     ),
     "antigravity": AgentConfig(
         name="Antigravity",

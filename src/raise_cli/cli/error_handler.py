@@ -4,8 +4,8 @@ This module provides error display for raise-cli, supporting both
 human-friendly Rich output and JSON format for scripting.
 
 Example:
-    >>> from rai_cli.exceptions import KataNotFoundError
-    >>> from rai_cli.cli.error_handler import handle_error
+    >>> from raise_cli.exceptions import KataNotFoundError
+    >>> from raise_cli.cli.error_handler import handle_error
     >>>
     >>> error = KataNotFoundError("Kata 'foo' not found", hint="Check .raise/katas/")
     >>> exit_code = handle_error(error, format="human")
@@ -21,7 +21,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 if TYPE_CHECKING:
-    from rai_cli.exceptions import RaiError
+    from raise_cli.exceptions import RaiError
 
 # Stderr console for error output
 _error_console: Console | None = None

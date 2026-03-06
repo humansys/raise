@@ -16,8 +16,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from rai_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
-from rai_cli.memory.models import MemoryScope, PatternSubType
+from raise_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
+from raise_cli.memory.models import MemoryScope, PatternSubType
 
 
 @dataclass

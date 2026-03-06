@@ -13,9 +13,9 @@ from rich.console import Console
 from rich.table import Table
 
 if TYPE_CHECKING:
-    from rai_cli.discovery.analyzer import AnalysisResult
-    from rai_cli.discovery.drift import DriftWarning
-    from rai_cli.discovery.scanner import ScanResult
+    from raise_cli.discovery.analyzer import AnalysisResult
+    from raise_cli.discovery.drift import DriftWarning
+    from raise_cli.discovery.scanner import ScanResult
 
 # Module-level console for output
 _console = Console()

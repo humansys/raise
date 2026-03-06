@@ -6,7 +6,7 @@ This package provides:
 
 from __future__ import annotations
 
-from rai_cli.core.tools import (
+from raise_cli.core.tools import (
     GitStatus,
     SearchMatch,
     ToolResult,

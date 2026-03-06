@@ -8,7 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from rai_cli.context.analyzers.models import ModuleInfo
+from raise_cli.context.analyzers.models import ModuleInfo
 
 
 @runtime_checkable

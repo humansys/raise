@@ -7,7 +7,7 @@ KnowledgeGraphBackend + BackendHealth moved to raise_core (E275).
 Architecture: ADR-033 (PM), ADR-034 (Governance)
 """
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     ArtifactLocator,
     BatchResult,
@@ -23,7 +23,7 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from rai_cli.adapters.protocols import (
+from raise_cli.adapters.protocols import (
     AsyncDocumentationTarget,
     AsyncProjectManagementAdapter,
     DocumentationTarget,
@@ -31,7 +31,7 @@ from rai_cli.adapters.protocols import (
     GovernanceSchemaProvider,
     ProjectManagementAdapter,
 )
-from rai_cli.adapters.registry import (
+from raise_cli.adapters.registry import (
     EP_DOC_TARGETS,
     EP_GOVERNANCE_PARSERS,
     EP_GOVERNANCE_SCHEMAS,
@@ -43,7 +43,7 @@ from rai_cli.adapters.registry import (
     get_graph_backends,
     get_pm_adapters,
 )
-from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
+from raise_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
 from raise_core.graph.backends.models import BackendHealth
 from raise_core.graph.backends.protocol import KnowledgeGraphBackend
 

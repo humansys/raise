@@ -13,9 +13,9 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from rai_cli.config.paths import get_raise_dir
-from rai_cli.onboarding.skill_manifest import compute_content_hash
-from rai_cli.onboarding.skills import copy_skill_tree
+from raise_cli.config.paths import get_raise_dir
+from raise_cli.onboarding.skill_manifest import compute_content_hash
+from raise_cli.onboarding.skills import copy_skill_tree
 
 logger = logging.getLogger(__name__)
 
@@ -78,8 +78,8 @@ def create_skill_set(
     Returns:
         CreateResult with creation status.
     """
-    from rai_cli.onboarding.skills import SkillScaffoldResult
-    from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
+    from raise_cli.onboarding.skills import SkillScaffoldResult
+    from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
 
     set_dir = _skills_dir(project_root) / name
 
@@ -96,7 +96,7 @@ def create_skill_set(
         return CreateResult(created=True, name=name, path=str(set_dir), skill_count=0)
 
     # Copy builtins
-    base = files("rai_cli.skills_base")
+    base = files("raise_cli.skills_base")
     result = SkillScaffoldResult()
     for skill_name in DISTRIBUTABLE_SKILLS:
         source = base / skill_name
@@ -150,13 +150,13 @@ def diff_skill_set(
     Returns:
         SkillSetDiff with added/modified/unchanged, or None if set doesn't exist.
     """
-    from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
+    from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
 
     set_dir = _skills_dir(project_root) / name
     if not set_dir.is_dir():
         return None
 
-    base = files("rai_cli.skills_base")
+    base = files("raise_cli.skills_base")
     builtin_names = set(DISTRIBUTABLE_SKILLS)
 
     added: list[str] = []

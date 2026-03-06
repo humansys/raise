@@ -1,6 +1,6 @@
 """Scaffold bundled skills into a project with version-aware sync.
 
-Copies RaiSE skills from the rai_cli.skills_base package to the project's
+Copies RaiSE skills from the raise_cli.skills_base package to the project's
 IDE skill directory during `rai init`. Uses the dpkg three-hash algorithm
 to safely update skills: auto-update untouched files, keep customized,
 prompt on conflict.
@@ -9,7 +9,7 @@ Uses importlib.resources to read bundled skill files (Python 3.9+).
 Handles reference subdirectories (e.g., references/, _references/).
 
 Example:
-    from rai_cli.onboarding.skills import scaffold_skills
+    from raise_cli.onboarding.skills import scaffold_skills
 
     result = scaffold_skills(project_path)
     if result.skills_updated:
@@ -25,9 +25,9 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from rai_cli.config.agent_plugin import AgentPlugin
-from rai_cli.config.agents import AgentConfig, get_agent_config
-from rai_cli.onboarding.skill_manifest import (
+from raise_cli.config.agent_plugin import AgentPlugin
+from raise_cli.config.agents import AgentConfig, get_agent_config
+from raise_cli.onboarding.skill_manifest import (
     SkillEntry,
     SkillManifest,
     SkillSyncAction,
@@ -67,7 +67,7 @@ def _apply_plugin_transform(
     """Apply plugin.transform_skill to a SKILL.md content string."""
     import yaml
 
-    from rai_cli.skills.parser import parse_frontmatter
+    from raise_cli.skills.parser import parse_frontmatter
 
     fm, body = parse_frontmatter(content)
     fm_out, body_out = plugin.transform_skill(fm, body, agent_config)
@@ -164,7 +164,7 @@ def copy_skill_tree(
 def _get_cli_version() -> str:
     """Get current skills_base version for manifest."""
     try:
-        from rai_cli.skills_base import __version__
+        from raise_cli.skills_base import __version__
 
         return __version__
     except ImportError:
@@ -205,13 +205,13 @@ def scaffold_skills(
     Returns:
         SkillScaffoldResult with details of what was done.
     """
-    from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
+    from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
 
     config = agent_config or get_agent_config()
     if config.skills_dir is None:
         return SkillScaffoldResult()
 
-    base = files("rai_cli.skills_base")
+    base = files("raise_cli.skills_base")
     skills_dir = project_root / config.skills_dir
     result = SkillScaffoldResult()
     manifest = load_skill_manifest(project_root) or SkillManifest()
@@ -319,7 +319,7 @@ def scaffold_skills(
                 result.skills_conflicted.append(skill_name)
             else:
                 # Interactive conflict resolution
-                from rai_cli.onboarding.skill_conflict import (
+                from raise_cli.onboarding.skill_conflict import (
                     ConflictAction,
                     prompt_skill_conflict,
                 )
@@ -397,7 +397,7 @@ def scaffold_skills(
 
     # --- Skill set overlay (S340.1) ---
     if skill_set is not None and not dry_run:
-        from rai_cli.config.paths import get_raise_dir
+        from raise_cli.config.paths import get_raise_dir
 
         overlay_dir = get_raise_dir(project_root) / "skills" / skill_set
         if overlay_dir.is_dir():
@@ -431,7 +431,7 @@ def scaffold_skills(
 
     # Persist manifest
     if not dry_run:
-        manifest.rai_cli_version = cli_version
+        manifest.raise_cli_version = cli_version
         save_skill_manifest(manifest, project_root)
 
     return result

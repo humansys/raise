@@ -20,11 +20,11 @@ from typing import Annotated, Any
 import typer
 from rich.console import Console
 
-from rai_cli.cli.error_handler import cli_error
-from rai_cli.discovery.scanner import Language, ScanResult, scan_directory
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import DiscoverScanEvent
-from rai_cli.output.formatters.discover import (
+from raise_cli.cli.error_handler import cli_error
+from raise_cli.discovery.scanner import Language, ScanResult, scan_directory
+from raise_cli.hooks.emitter import create_emitter
+from raise_cli.hooks.events import DiscoverScanEvent
+from raise_cli.output.formatters.discover import (
     format_analyze_result,
     format_build_result,
     format_drift_result,
@@ -196,7 +196,7 @@ def analyze_command(
     """
     import sys
 
-    from rai_cli.discovery.analyzer import analyze
+    from raise_cli.discovery.analyzer import analyze
 
     # Load scan result JSON
     scan_json: str = ""
@@ -229,7 +229,7 @@ def analyze_command(
             errors=scan_data.get("errors", []),
         )
         # Parse symbols from JSON
-        from rai_cli.discovery.scanner import Symbol
+        from raise_cli.discovery.scanner import Symbol
 
         for sym_data in scan_data.get("symbols", []):
             scan_result.symbols.append(Symbol.model_validate(sym_data))
@@ -357,13 +357,13 @@ def build_command(
         )
 
     # Build unified graph (includes components automatically)
-    from rai_cli.context.builder import GraphBuilder
+    from raise_cli.context.builder import GraphBuilder
 
     builder = GraphBuilder(project_root=root)
     graph = builder.build()
 
     # Save graph via backend
-    from rai_cli.graph.backends import get_active_backend
+    from raise_cli.graph.backends import get_active_backend
 
     graph_path = root / ".raise" / "graph" / "unified.json"
     get_active_backend(graph_path).persist(graph)
@@ -446,7 +446,7 @@ def drift_command(
         # Output as JSON
         raise discover drift --output json
     """
-    from rai_cli.discovery.drift import BaselineComponent, DriftWarning, detect_drift
+    from raise_cli.discovery.drift import BaselineComponent, DriftWarning, detect_drift
 
     root = project_root.resolve()
     scan_path = path.resolve() if path else root / "src"

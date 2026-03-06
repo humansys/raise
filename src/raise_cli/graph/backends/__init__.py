@@ -31,8 +31,8 @@ def get_active_backend(path: Path) -> KnowledgeGraphBackend:
     api_key = os.environ.get("RAI_API_KEY", "").strip()
 
     if server_url and api_key:
-        from rai_cli.graph.backends.api import ApiGraphBackend
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         project_id = Path.cwd().name
         raise_dir = Path.cwd() / ".raise"

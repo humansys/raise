@@ -19,7 +19,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
-from rai_cli.cli.commands._resolve import resolve_docs_target
+from raise_cli.cli.commands._resolve import resolve_docs_target
 
 docs_app = typer.Typer(
     name="docs",

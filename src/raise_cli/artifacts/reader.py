@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from rai_cli.artifacts.models import SkillArtifact
+from raise_cli.artifacts.models import SkillArtifact
 
 # Lazy import to avoid circular dependency
 _artifact_registry: dict[str, type[SkillArtifact]] | None = None
@@ -16,7 +16,7 @@ def _get_registry() -> dict[str, type[SkillArtifact]]:
     """Build the artifact type registry on first access."""
     global _artifact_registry  # noqa: PLW0603
     if _artifact_registry is None:
-        from rai_cli.artifacts.story_design import StoryDesignArtifact
+        from raise_cli.artifacts.story_design import StoryDesignArtifact
 
         _artifact_registry = {
             "story-design": StoryDesignArtifact,

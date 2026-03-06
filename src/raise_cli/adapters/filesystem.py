@@ -19,7 +19,7 @@ from typing import Any
 
 import yaml
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     BacklogComment,
     BacklogItem,
@@ -33,7 +33,7 @@ from rai_cli.adapters.models import (
     IssueSpec,
     IssueSummary,
 )
-from rai_cli.governance.parsers.backlog import extract_epics
+from raise_cli.governance.parsers.backlog import extract_epics
 
 
 class FilesystemPMAdapter:

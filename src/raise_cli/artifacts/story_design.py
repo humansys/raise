@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-from rai_cli.artifacts.models import ArtifactType, SkillArtifact
+from raise_cli.artifacts.models import ArtifactType, SkillArtifact
 
 
 class Complexity(StrEnum):

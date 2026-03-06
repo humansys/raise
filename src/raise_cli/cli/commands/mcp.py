@@ -21,11 +21,11 @@ import yaml
 from rich.console import Console
 from rich.table import Table
 
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import McpCallEvent
-from rai_cli.mcp.models import McpHealthResult
-from rai_cli.mcp.registry import discover_mcp_servers
-from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+from raise_cli.hooks.emitter import create_emitter
+from raise_cli.hooks.events import McpCallEvent
+from raise_cli.mcp.models import McpHealthResult
+from raise_cli.mcp.registry import discover_mcp_servers
+from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
 mcp_app = typer.Typer(
     name="mcp",
@@ -42,14 +42,14 @@ def _lazy_bridge(
     env: dict[str, str] | None = None,
 ) -> Any:
     """Lazy-import McpBridge and instantiate. Avoids requiring mcp SDK at CLI startup."""
-    from rai_cli.mcp.bridge import McpBridge
+    from raise_cli.mcp.bridge import McpBridge
 
     return McpBridge(server_command=server_command, server_args=server_args, env=env)
 
 
 def _lazy_bridge_error() -> type:
     """Lazy-import McpBridgeError."""
-    from rai_cli.mcp.bridge import McpBridgeError
+    from raise_cli.mcp.bridge import McpBridgeError
 
     return McpBridgeError
 

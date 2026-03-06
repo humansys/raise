@@ -16,11 +16,11 @@ from typing import Annotated
 
 import typer
 
-from rai_cli.cli.error_handler import cli_error
-from rai_cli.config.paths import get_personal_dir
-from rai_cli.onboarding.profile import load_developer_profile
-from rai_cli.schemas.journal import JournalEntryType
-from rai_cli.session.journal import (
+from raise_cli.cli.error_handler import cli_error
+from raise_cli.config.paths import get_personal_dir
+from raise_cli.onboarding.profile import load_developer_profile
+from raise_cli.schemas.journal import JournalEntryType
+from raise_cli.session.journal import (
     append_journal_entry,
     format_journal_compact,
     read_journal,

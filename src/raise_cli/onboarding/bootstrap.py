@@ -1,13 +1,13 @@
 """Bootstrap bundled base Rai assets into a project.
 
-Copies identity, patterns, and methodology from the rai_cli.rai_base
+Copies identity, patterns, and methodology from the raise_cli.rai_base
 package to the project's .raise/rai/ directory during `raise init`.
 
 Uses importlib.resources to read bundled files (Python 3.9+).
 Per-file idempotency: existing files are never overwritten.
 
 Example:
-    from rai_cli.onboarding.bootstrap import bootstrap_rai_base
+    from raise_cli.onboarding.bootstrap import bootstrap_rai_base
 
     result = bootstrap_rai_base(project_path)
     if result.identity_copied:
@@ -23,7 +23,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from rai_cli.config.paths import (
+from raise_cli.config.paths import (
     get_framework_dir,
     get_identity_dir,
     get_memory_dir,
@@ -51,7 +51,7 @@ def bootstrap_rai_base(project_root: Path) -> BootstrapResult:
     """Copy bundled base Rai assets to project .raise/rai/ directory.
 
     Copies identity files, base patterns, and methodology definition
-    from the installed rai_cli.rai_base package. Uses per-file
+    from the installed raise_cli.rai_base package. Uses per-file
     idempotency — existing files are never overwritten.
 
     Args:
@@ -60,9 +60,9 @@ def bootstrap_rai_base(project_root: Path) -> BootstrapResult:
     Returns:
         BootstrapResult with details of what was copied or skipped.
     """
-    from rai_cli.rai_base import __version__ as base_version
+    from raise_cli.rai_base import __version__ as base_version
 
-    base = files("rai_cli.rai_base")
+    base = files("raise_cli.rai_base")
     result = BootstrapResult(base_version=base_version)
 
     # Copy identity files

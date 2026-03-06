@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import ClassVar, Protocol, runtime_checkable
 
-from rai_cli.doctor.models import CheckResult, DoctorContext
+from raise_cli.doctor.models import CheckResult, DoctorContext
 
 
 @runtime_checkable

@@ -11,15 +11,15 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-from rai_cli.compat import portable_path
-from rai_cli.context.analyzers.models import ModuleInfo
+from raise_cli.compat import portable_path
+from raise_cli.context.analyzers.models import ModuleInfo
 
 
 class PythonAnalyzer:
     """Analyzes Python modules using ast to extract structure.
 
     Attributes:
-        src_dir: Relative path to the source directory (e.g., 'src/rai_cli').
+        src_dir: Relative path to the source directory (e.g., 'src/raise_cli').
     """
 
     def __init__(self, src_dir: str) -> None:
@@ -216,7 +216,7 @@ class _ImportVisitor(ast.NodeVisitor):
     """AST visitor that extracts imports while skipping TYPE_CHECKING blocks.
 
     Attributes:
-        package_name: Top-level package name (e.g., 'rai_cli').
+        package_name: Top-level package name (e.g., 'raise_cli').
         module_name: Current module name (to exclude self-imports).
         imports: Set of discovered sibling module names.
     """

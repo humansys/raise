@@ -13,7 +13,7 @@ import platform
 import sys
 from typing import ClassVar
 
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 _MIN_PYTHON: tuple[int, int] = (3, 11)
 
@@ -64,7 +64,7 @@ class EnvironmentCheck:
 
     @staticmethod
     def _check_rai_version() -> CheckResult:
-        from rai_cli import __version__
+        from raise_cli import __version__
 
         return CheckResult(
             check_id="env-rai-version",

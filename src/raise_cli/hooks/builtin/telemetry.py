@@ -14,8 +14,8 @@ from __future__ import annotations
 import logging
 from typing import ClassVar
 
-from rai_cli.hooks.events import HookEvent, HookResult
-from rai_cli.telemetry.writer import emit_command_usage
+from raise_cli.hooks.events import HookEvent, HookResult
+from raise_cli.telemetry.writer import emit_command_usage
 
 logger = logging.getLogger(__name__)
 

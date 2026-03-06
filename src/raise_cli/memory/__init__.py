@@ -3,9 +3,9 @@
 This module provides infrastructure for loading, querying, and managing
 Rai's accumulated memories stored in JSONL format.
 
-For queries, use the Graph from rai_cli.context:
+For queries, use the Graph from raise_cli.context:
 - CLI: `raise context query "keywords" --types pattern,calibration,session`
-- Programmatic: `QueryEngine` from `rai_cli.context.query`
+- Programmatic: `QueryEngine` from `raise_cli.context.query`
 
 The JSONL files (.raise/rai/memory/*.jsonl) remain the source of truth.
 The unified graph consolidates memory with governance, skills, and work items.
@@ -13,12 +13,12 @@ The unified graph consolidates memory with governance, skills, and work items.
 
 from __future__ import annotations
 
-from rai_cli.memory.migration import (
+from raise_cli.memory.migration import (
     MigrationResult,
     migrate_to_personal,
     needs_migration,
 )
-from rai_cli.memory.models import (
+from raise_cli.memory.models import (
     MemoryConcept,
     MemoryConceptType,
     MemoryRelationship,
@@ -26,7 +26,7 @@ from rai_cli.memory.models import (
     MemoryScope,
     PatternSubType,
 )
-from rai_cli.memory.writer import (
+from raise_cli.memory.writer import (
     PatternInput,
     ReinforceResult,
     SessionInput,

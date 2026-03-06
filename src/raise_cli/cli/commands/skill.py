@@ -12,9 +12,9 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
-from rai_cli.cli.commands.skill_set import skill_set_app
-from rai_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
-from rai_cli.output.formatters.skill import (
+from raise_cli.cli.commands.skill_set import skill_set_app
+from raise_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
+from raise_cli.output.formatters.skill import (
     format_name_check_human,
     format_name_check_json,
     format_scaffold_human,
@@ -24,10 +24,10 @@ from rai_cli.output.formatters.skill import (
     format_validation_human,
     format_validation_json,
 )
-from rai_cli.skills.locator import SkillLocator, get_default_skill_dir
-from rai_cli.skills.name_checker import check_name
-from rai_cli.skills.scaffold import scaffold_skill
-from rai_cli.skills.validator import (
+from raise_cli.skills.locator import SkillLocator, get_default_skill_dir
+from raise_cli.skills.name_checker import check_name
+from raise_cli.skills.scaffold import scaffold_skill
+from raise_cli.skills.validator import (
     ValidationResult,
     validate_skill,
     validate_skill_file,
@@ -257,7 +257,7 @@ def _print_sync_table(result: SkillScaffoldResult) -> None:
     from rich.table import Table
 
     try:
-        from rai_cli.skills_base import __version__ as cli_version
+        from raise_cli.skills_base import __version__ as cli_version
     except ImportError:
         cli_version = "unknown"
 
@@ -313,7 +313,7 @@ def sync_cmd(
         $ rai skill sync
         $ rai skill sync --path /path/to/project
     """
-    from rai_cli.config.agent_registry import load_registry
+    from raise_cli.config.agent_registry import load_registry
 
     project_path = (path or Path.cwd()).resolve()
     registry = load_registry(project_root=project_path)
@@ -321,7 +321,7 @@ def sync_cmd(
     # Determine agent type from manifest, fall back to "claude"
     agent_type = "claude"
     try:
-        from rai_cli.onboarding.manifest import load_manifest
+        from raise_cli.onboarding.manifest import load_manifest
 
         manifest = load_manifest(project_path)
         if manifest and manifest.agents.types:

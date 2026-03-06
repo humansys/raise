@@ -8,10 +8,10 @@ from typing import Any
 from rich.console import Console
 from rich.table import Table
 
-from rai_cli.skills.name_checker import NameCheckResult
-from rai_cli.skills.scaffold import ScaffoldResult
-from rai_cli.skills.schema import Skill
-from rai_cli.skills.validator import ValidationResult
+from raise_cli.skills.name_checker import NameCheckResult
+from raise_cli.skills.scaffold import ScaffoldResult
+from raise_cli.skills.schema import Skill
+from raise_cli.skills.validator import ValidationResult
 
 
 def format_skill_list_human(

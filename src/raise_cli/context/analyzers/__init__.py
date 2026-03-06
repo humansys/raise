@@ -9,8 +9,8 @@ Architecture: S16.1 — Code-Aware Graph
 
 from __future__ import annotations
 
-from rai_cli.context.analyzers.models import ModuleInfo
-from rai_cli.context.analyzers.protocol import CodeAnalyzer
-from rai_cli.context.analyzers.python import PythonAnalyzer
+from raise_cli.context.analyzers.models import ModuleInfo
+from raise_cli.context.analyzers.protocol import CodeAnalyzer
+from raise_cli.context.analyzers.python import PythonAnalyzer
 
 __all__ = ["CodeAnalyzer", "ModuleInfo", "PythonAnalyzer"]

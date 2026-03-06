@@ -79,7 +79,7 @@ class DualWriteBackend:
         """Create pending_sync marker on remote failure."""
         if self._raise_dir is None:
             return
-        from rai_cli.graph.backends.pending import (
+        from raise_cli.graph.backends.pending import (
             PendingSyncMarker,
             write_pending_marker,
         )
@@ -97,7 +97,7 @@ class DualWriteBackend:
         """Clear pending_sync marker on remote success."""
         if self._raise_dir is None:
             return
-        from rai_cli.graph.backends.pending import clear_pending_marker
+        from raise_cli.graph.backends.pending import clear_pending_marker
 
         clear_pending_marker(self._raise_dir)
 

@@ -16,7 +16,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from rai_cli.onboarding.conventions import (
+from raise_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
 )
@@ -420,7 +420,7 @@ def scaffold_governance(
         GovernanceScaffoldResult with details of what was created.
     """
     gov_dir = project_path / "governance"
-    base = files("rai_cli.rai_base") / "governance"
+    base = files("raise_cli.rai_base") / "governance"
     result = GovernanceScaffoldResult(path=gov_dir)
 
     for src_rel, dest_rel in _GOVERNANCE_TEMPLATES:

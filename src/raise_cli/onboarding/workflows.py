@@ -16,8 +16,8 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field
 
-from rai_cli.config.agents import AgentConfig, get_agent_config
-from rai_cli.skills.parser import parse_frontmatter
+from raise_cli.config.agents import AgentConfig, get_agent_config
+from raise_cli.skills.parser import parse_frontmatter
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def scaffold_workflows(
     Returns:
         WorkflowScaffoldResult with details of what was created or skipped.
     """
-    from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
+    from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
 
     config = agent_config or get_agent_config()
     result = WorkflowScaffoldResult()
@@ -59,7 +59,7 @@ def scaffold_workflows(
         result.skipped_no_workflows_dir = True
         return result
 
-    base = files("rai_cli.skills_base")
+    base = files("raise_cli.skills_base")
     workflows_dir = project_root / config.workflows_dir
     workflows_dir.mkdir(parents=True, exist_ok=True)
 

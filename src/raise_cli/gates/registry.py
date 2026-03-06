@@ -14,7 +14,7 @@ import logging
 from importlib.metadata import entry_points
 from typing import Any
 
-from rai_cli.gates.protocol import WorkflowGate
+from raise_cli.gates.protocol import WorkflowGate
 
 logger = logging.getLogger(__name__)
 

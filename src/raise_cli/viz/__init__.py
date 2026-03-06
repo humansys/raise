@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from rai_cli.viz.generator import generate_viz_html
+from raise_cli.viz.generator import generate_viz_html
 
 __all__ = ["generate_viz_html"]

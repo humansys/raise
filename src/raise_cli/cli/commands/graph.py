@@ -23,15 +23,15 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from rai_cli.cli.error_handler import cli_error
-from rai_cli.compat import to_file_uri
-from rai_cli.config.paths import get_memory_dir, get_personal_dir
-from rai_cli.context import Graph, GraphBuilder
-from rai_cli.context.diff import GraphDiff, diff_graphs
-from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
-from rai_cli.graph.backends import get_active_backend
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import GraphBuildEvent
+from raise_cli.cli.error_handler import cli_error
+from raise_cli.compat import to_file_uri
+from raise_cli.config.paths import get_memory_dir, get_personal_dir
+from raise_cli.context import Graph, GraphBuilder
+from raise_cli.context.diff import GraphDiff, diff_graphs
+from raise_cli.governance import Concept, ConceptType, GovernanceExtractor
+from raise_cli.graph.backends import get_active_backend
+from raise_cli.hooks.emitter import create_emitter
+from raise_cli.hooks.events import GraphBuildEvent
 from raise_core.graph.models import GraphEdge, GraphNode
 from raise_core.graph.query import (
     ArchitecturalContext,
@@ -1065,7 +1065,7 @@ def viz(
     """
     import webbrowser
 
-    from rai_cli.viz import generate_viz_html
+    from raise_cli.viz import generate_viz_html
 
     unified_path = index_path or _get_default_index_path()
     if not unified_path.exists():

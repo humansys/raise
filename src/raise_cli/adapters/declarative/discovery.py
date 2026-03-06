@@ -17,7 +17,7 @@ from typing import Any
 import yaml
 from pydantic import ValidationError
 
-from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
+from raise_cli.adapters.declarative.schema import DeclarativeAdapterConfig
 
 logger = logging.getLogger(__name__)
 
@@ -26,7 +26,7 @@ def _make_factory(cfg: DeclarativeAdapterConfig) -> Callable[[], Any]:
     """AR-C1: factory closure captures config for no-arg instantiation."""
 
     def factory() -> Any:
-        from rai_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
+        from raise_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
 
         return DeclarativeMcpAdapter(cfg)
 

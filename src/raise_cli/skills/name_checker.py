@@ -13,7 +13,7 @@ import re
 
 from pydantic import BaseModel, Field
 
-from rai_cli.skills.locator import SkillLocator, get_default_skill_dir
+from raise_cli.skills.locator import SkillLocator, get_default_skill_dir
 
 # Pattern for {domain}-{action} naming convention
 NAMING_PATTERN = re.compile(r"^[a-z]+-[a-z]+(-[a-z]+)*$")

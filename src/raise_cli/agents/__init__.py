@@ -9,6 +9,6 @@ Contains YAML config files for the 5 Tier-1 built-in agents:
 
 Usage:
     from importlib.resources import files
-    agents_pkg = files("rai_cli.agents")
+    agents_pkg = files("raise_cli.agents")
     claude_yaml = (agents_pkg / "claude.yaml").read_text(encoding="utf-8")
 """

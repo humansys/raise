@@ -15,7 +15,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from rai_cli.skills.skillsets import (
+from raise_cli.skills.skillsets import (
     create_skill_set,
     diff_skill_set,
     list_skill_sets,

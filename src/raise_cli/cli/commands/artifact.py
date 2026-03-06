@@ -15,7 +15,7 @@ import typer
 from pydantic import ValidationError
 from rich.console import Console
 
-from rai_cli.artifacts.reader import read_artifact
+from raise_cli.artifacts.reader import read_artifact
 
 artifact_app = typer.Typer(
     name="artifact",

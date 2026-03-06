@@ -16,8 +16,8 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from rai_cli.config.paths import get_session_dir
-from rai_cli.schemas.session_state import SessionState
+from raise_cli.config.paths import get_session_dir
+from raise_cli.schemas.session_state import SessionState
 
 logger = logging.getLogger(__name__)
 

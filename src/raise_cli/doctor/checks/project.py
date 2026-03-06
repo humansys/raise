@@ -14,7 +14,7 @@ from typing import ClassVar
 
 import yaml
 
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 
 class ProjectCheck:

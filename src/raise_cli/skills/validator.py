@@ -16,8 +16,8 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
 
-from rai_cli.skills.parser import ParseError, parse_skill
-from rai_cli.skills.schema import Skill
+from raise_cli.skills.parser import ParseError, parse_skill
+from raise_cli.skills.schema import Skill
 
 
 class ValidationSeverity(Enum):

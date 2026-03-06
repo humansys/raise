@@ -26,7 +26,7 @@ Note: Internal skills (rai-framework-sync, rai-publish, rai-skillset-manage,
 Usage:
     from importlib.resources import files
 
-    base_skills = files("rai_cli.skills_base")
+    base_skills = files("raise_cli.skills_base")
     session_start = base_skills / "rai-session-start" / "SKILL.md"
     content = session_start.read_text(encoding="utf-8")
 """

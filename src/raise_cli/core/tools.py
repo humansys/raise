@@ -8,7 +8,7 @@ This module provides typed interfaces for external tools used by raise-cli:
 Each wrapper checks tool availability and raises DependencyError if missing.
 
 Example:
-    >>> from rai_cli.core.tools import git_root, check_tool
+    >>> from raise_cli.core.tools import git_root, check_tool
     >>> if check_tool("git"):
     ...     root = git_root()
     ...     print(f"Git root: {root}")
@@ -21,7 +21,7 @@ import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from rai_cli.exceptions import DependencyError
+from raise_cli.exceptions import DependencyError
 
 
 @dataclass
@@ -105,7 +105,7 @@ def require_tool(name: str) -> None:
         >>> require_tool("nonexistent")
         Traceback (most recent call last):
             ...
-        rai_cli.exceptions.DependencyError: ...
+        raise_cli.exceptions.DependencyError: ...
     """
     if not check_tool(name):
         hints = {

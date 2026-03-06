@@ -10,7 +10,7 @@ from __future__ import annotations
 import subprocess
 from typing import ClassVar
 
-from rai_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.models import GateContext, GateResult
 
 
 class TestGate:

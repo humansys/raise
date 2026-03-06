@@ -5,7 +5,7 @@ A governance framework for AI-assisted software development.
 
 from __future__ import annotations
 
-from rai_cli.exceptions import (
+from raise_cli.exceptions import (
     ArtifactNotFoundError,
     ConfigurationError,
     DependencyError,

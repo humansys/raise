@@ -9,7 +9,7 @@ Drift types detected:
 - Documentation drift: Missing docstrings on public APIs
 
 Example:
-    >>> from rai_cli.discovery.drift import detect_drift
+    >>> from raise_cli.discovery.drift import detect_drift
     >>> warnings = detect_drift(baseline=components, scanned=symbols)
     >>> for w in warnings:
     ...     print(f"{w.severity}: {w.issue}")
@@ -22,7 +22,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from rai_cli.discovery.scanner import Symbol
+from raise_cli.discovery.scanner import Symbol
 
 # Severity levels for drift warnings
 DriftSeverity = Literal["info", "warning", "error"]
@@ -42,7 +42,7 @@ class DriftWarning(BaseModel):
         ...     file="src/new.py",
         ...     issue="File in unexpected location",
         ...     severity="warning",
-        ...     suggestion="Move to src/rai_cli/",
+        ...     suggestion="Move to src/raise_cli/",
         ... )
     """
 

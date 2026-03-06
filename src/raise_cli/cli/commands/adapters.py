@@ -18,29 +18,29 @@ from typing import Annotated, Any
 import typer
 from rich.console import Console
 
-from rai_cli.adapters.protocols import (
+from raise_cli.adapters.protocols import (
     DocumentationTarget,
     GovernanceParser,
     GovernanceSchemaProvider,
     ProjectManagementAdapter,
 )
-from rai_cli.adapters.registry import (
+from raise_cli.adapters.registry import (
     EP_DOC_TARGETS,
     EP_GOVERNANCE_PARSERS,
     EP_GOVERNANCE_SCHEMAS,
     EP_GRAPH_BACKENDS,
     EP_PM_ADAPTERS,
 )
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import AdapterFailedEvent, AdapterLoadedEvent
-from rai_cli.output.formatters.adapters import (
+from raise_cli.hooks.emitter import create_emitter
+from raise_cli.hooks.events import AdapterFailedEvent, AdapterLoadedEvent
+from raise_cli.output.formatters.adapters import (
     format_check_human,
     format_check_json,
     format_list_human,
     format_list_json,
     format_validate_human,
 )
-from rai_cli.tier.context import TierContext
+from raise_cli.tier.context import TierContext
 from raise_core.graph.backends.protocol import KnowledgeGraphBackend
 
 adapters_app = typer.Typer(
@@ -224,7 +224,7 @@ def validate_command(
     import yaml
     from pydantic import ValidationError
 
-    from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
+    from raise_cli.adapters.declarative.schema import DeclarativeAdapterConfig
 
     if not file.exists():
         console.print(f"[red]Error:[/red] File not found: {file}")

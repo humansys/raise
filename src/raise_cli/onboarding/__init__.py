@@ -5,7 +5,7 @@ Handles developer profile management, project initialization, and convention det
 
 from __future__ import annotations
 
-from rai_cli.onboarding.conventions import (
+from raise_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
     IndentationConvention,
@@ -17,34 +17,34 @@ from rai_cli.onboarding.conventions import (
     StyleConventions,
     detect_conventions,
 )
-from rai_cli.onboarding.detection import (
+from raise_cli.onboarding.detection import (
     CODE_EXTENSIONS,
     DetectionResult,
     ProjectType,
     count_code_files,
     detect_project_type,
 )
-from rai_cli.onboarding.governance import (
+from raise_cli.onboarding.governance import (
     GeneratedGuardrail,
     GuardrailGenerator,
     GuardrailLevel,
     generate_guardrails,
 )
-from rai_cli.onboarding.instructions import (
+from raise_cli.onboarding.instructions import (
     ClaudeMdGenerator,
     InstructionsGenerator,
     generate_claude_md,
     generate_instructions,
 )
-from rai_cli.onboarding.manifest import (
+from raise_cli.onboarding.manifest import (
     BranchConfig,
     ProjectInfo,
     ProjectManifest,
     load_manifest,
     save_manifest,
 )
-from rai_cli.onboarding.migration import migrate_developer_profile
-from rai_cli.onboarding.profile import (
+from raise_cli.onboarding.migration import migrate_developer_profile
+from raise_cli.onboarding.profile import (
     CommunicationPreferences,
     CommunicationStyle,
     DeveloperProfile,

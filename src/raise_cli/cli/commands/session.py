@@ -20,17 +20,17 @@ from typing import Annotated
 
 import typer
 
-from rai_cli.cli.commands.journal import journal_app
-from rai_cli.cli.error_handler import cli_error
-from rai_cli.exceptions import RaiSessionNotFoundError
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import (
+from raise_cli.cli.commands.journal import journal_app
+from raise_cli.cli.error_handler import cli_error
+from raise_cli.exceptions import RaiSessionNotFoundError
+from raise_cli.hooks.emitter import create_emitter
+from raise_cli.hooks.events import (
     BeforeSessionCloseEvent,
     SessionCloseEvent,
     SessionStartEvent,
 )
-from rai_cli.memory.writer import get_next_id, validate_session_index
-from rai_cli.onboarding.profile import (
+from raise_cli.memory.writer import get_next_id, validate_session_index
+from raise_cli.onboarding.profile import (
     DeveloperProfile,
     end_session,
     increment_session,
@@ -38,10 +38,10 @@ from rai_cli.onboarding.profile import (
     save_developer_profile,
     start_session,
 )
-from rai_cli.session.bundle import assemble_context_bundle, assemble_sections
-from rai_cli.session.close import CloseInput, load_state_file, process_session_close
-from rai_cli.session.resolver import resolve_session_id
-from rai_cli.session.state import (
+from raise_cli.session.bundle import assemble_context_bundle, assemble_sections
+from raise_cli.session.close import CloseInput, load_state_file, process_session_close
+from raise_cli.session.resolver import resolve_session_id
+from raise_cli.session.state import (
     cleanup_session_dir,
     load_session_state,
     migrate_flat_to_session,

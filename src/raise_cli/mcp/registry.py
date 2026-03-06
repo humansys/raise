@@ -14,7 +14,7 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
-from rai_cli.mcp.schema import McpServerConfig
+from raise_cli.mcp.schema import McpServerConfig
 
 logger = logging.getLogger(__name__)
 

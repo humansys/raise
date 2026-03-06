@@ -7,8 +7,8 @@ parallel AI synthesis. No AI inference required — all signals are deterministi
 Architecture: E13 Discovery improvement (discover-validate-scaling story)
 
 Example:
-    >>> from rai_cli.discovery.analyzer import compute_confidence, match_path_category
-    >>> from rai_cli.discovery.scanner import Symbol
+    >>> from raise_cli.discovery.analyzer import compute_confidence, match_path_category
+    >>> from raise_cli.discovery.scanner import Symbol
     >>> sym = Symbol(name="Foo", kind="class", file="src/schemas/foo.py",
     ...             line=1, signature="class Foo(BaseModel)")
     >>> cat = match_path_category(sym.file)
@@ -24,7 +24,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from rai_cli.discovery.scanner import ScanResult, Symbol
+from raise_cli.discovery.scanner import ScanResult, Symbol
 
 # ── Type aliases ──────────────────────────────────────────────────────────
 
@@ -234,14 +234,14 @@ def match_path_category(
         Category string if a match is found, None otherwise.
 
     Example:
-        >>> match_path_category("src/rai_cli/cli/commands/discover.py")
+        >>> match_path_category("src/raise_cli/cli/commands/discover.py")
         'command'
-        >>> match_path_category("src/rai_cli/unknown/foo.py")
+        >>> match_path_category("src/raise_cli/unknown/foo.py")
     """
     categories = category_map if category_map is not None else DEFAULT_CATEGORY_MAP
 
     # Match on directory boundaries: pattern must be preceded by "/" or be at
-    # the start of the path. This prevents "cli/" matching "rai_cli/".
+    # the start of the path. This prevents "cli/" matching "raise_cli/".
     # Check all occurrences of the pattern (not just the first).
     best_match: str | None = None
     best_length = 0
@@ -464,11 +464,11 @@ def _file_to_module(file_path: str) -> str:
     extensions (.py, .php, .ts, .tsx, .js, .jsx, .svelte).
 
     Args:
-        file_path: Relative file path (e.g., "src/rai_cli/discovery/scanner.py"
+        file_path: Relative file path (e.g., "src/raise_cli/discovery/scanner.py"
             or "app/Http/Controllers/UserController.php").
 
     Returns:
-        Dotted module path (e.g., "rai_cli.discovery.scanner"
+        Dotted module path (e.g., "raise_cli.discovery.scanner"
             or "Http.Controllers.UserController").
     """
     # Normalize Windows backslashes before PurePosixPath — paths may arrive

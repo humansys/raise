@@ -16,12 +16,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar
 
 if TYPE_CHECKING:
-    from rai_cli.adapters.protocols import ProjectManagementAdapter
+    from raise_cli.adapters.protocols import ProjectManagementAdapter
 
 import yaml
 
-from rai_cli.adapters.models import IssueSpec
-from rai_cli.hooks.events import HookEvent, HookResult, WorkLifecycleEvent
+from raise_cli.adapters.models import IssueSpec
+from raise_cli.hooks.events import HookEvent, HookResult, WorkLifecycleEvent
 
 logger = logging.getLogger(__name__)
 
@@ -92,7 +92,7 @@ def _resolve_issue_key(
     Returns the issue key if found, None otherwise.
     """
     # Import inside function to avoid circular imports
-    from rai_cli.adapters.filesystem import FilesystemPMAdapter
+    from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
     if isinstance(adapter, FilesystemPMAdapter):
         # FileAdapter: direct key lookup, no JQL
@@ -116,7 +116,7 @@ def _resolve_issue_key(
 
 def resolve_adapter() -> ProjectManagementAdapter:
     """Resolve ProjectManagementAdapter via manifest default. Separated for testability."""
-    from rai_cli.cli.commands._resolve import (
+    from raise_cli.cli.commands._resolve import (
         resolve_adapter as _resolve,
     )
 

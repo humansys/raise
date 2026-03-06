@@ -13,7 +13,7 @@ import logging
 from importlib.metadata import entry_points
 from typing import Any
 
-from rai_cli.doctor.protocol import DoctorCheck
+from raise_cli.doctor.protocol import DoctorCheck
 
 logger = logging.getLogger(__name__)
 

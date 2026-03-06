@@ -15,10 +15,10 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-from rai_cli.adapters.models import IssueSummary
+from raise_cli.adapters.models import IssueSummary
 
 if TYPE_CHECKING:
-    from rai_cli.adapters.protocols import ProjectManagementAdapter
+    from raise_cli.adapters.protocols import ProjectManagementAdapter
 
 
 class SyncResult(BaseModel):
@@ -43,7 +43,7 @@ def sync_backlog(
         RuntimeError: If adapter query fails (file left untouched).
     """
     # Guard: filesystem adapter is source of truth
-    from rai_cli.adapters.filesystem import FilesystemPMAdapter
+    from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
     if isinstance(adapter, FilesystemPMAdapter):
         raise ValueError("Filesystem adapter is source of truth — nothing to sync.")

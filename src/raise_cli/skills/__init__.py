@@ -12,13 +12,13 @@ This module provides:
 
 from __future__ import annotations
 
-from rai_cli.skills.locator import (
+from raise_cli.skills.locator import (
     SkillLocator,
     get_default_skill_dir,
     list_skills,
 )
-from rai_cli.skills.parser import ParseError, parse_frontmatter, parse_skill
-from rai_cli.skills.schema import (
+from raise_cli.skills.parser import ParseError, parse_frontmatter, parse_skill
+from raise_cli.skills.schema import (
     Skill,
     SkillFrontmatter,
     SkillHook,

@@ -6,7 +6,7 @@ following priority order: flag > env var > error (or None for optional).
 
 from __future__ import annotations
 
-from rai_cli.exceptions import RaiSessionNotFoundError
+from raise_cli.exceptions import RaiSessionNotFoundError
 
 
 def _normalize_session_id(session_id: str) -> str:

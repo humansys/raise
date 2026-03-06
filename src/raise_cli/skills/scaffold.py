@@ -10,7 +10,7 @@ from textwrap import dedent
 
 from pydantic import BaseModel, Field
 
-from rai_cli.skills.locator import get_default_skill_dir
+from raise_cli.skills.locator import get_default_skill_dir
 
 # Mapping from domain prefix to lifecycle
 DOMAIN_TO_LIFECYCLE = {

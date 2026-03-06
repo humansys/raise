@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from rai_cli.artifacts.models import SkillArtifact
+from raise_cli.artifacts.models import SkillArtifact
 
 
 def _artifact_filename(artifact: SkillArtifact) -> str:
