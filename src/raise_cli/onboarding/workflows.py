@@ -89,7 +89,7 @@ def scaffold_workflows(
             f"Run the `{skill_name}` skill from `{skills_path}`.\n"
         )
 
-        workflow_file.write_text(workflow_content)
+        workflow_file.write_text(workflow_content, encoding="utf-8")
         result.files_created.append(str(workflow_file))
         result.workflows_created += 1
         logger.debug("Created: %s", workflow_file)

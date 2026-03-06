@@ -10,7 +10,7 @@ from typer.testing import CliRunner
 
 from raise_cli.cli.main import app
 from raise_cli.onboarding.detection import ProjectType
-from raise_cli.onboarding.manifest import load_manifest
+from raise_cli.onboarding.manifest import BranchConfig, load_manifest, save_manifest
 from raise_cli.onboarding.profile import (
     DeveloperProfile,
     ExperienceLevel,
@@ -1249,3 +1249,60 @@ class TestInitDetectAgents:
         manifest = load_manifest(greenfield_project)
         assert manifest is not None
         assert "roo" in manifest.agents.types
+
+
+class TestInitPreservesExistingManifest:
+    """Regression tests for RAISE-376: rai init must preserve existing manifest config."""
+
+    def test_preserves_branches_development(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """rai init preserves existing branches.development value."""
+        from raise_cli.onboarding.manifest import AgentsManifest, ProjectInfo, ProjectManifest
+
+        existing = ProjectManifest(
+            project=ProjectInfo(name="test", project_type="brownfield"),
+            agents=AgentsManifest(types=["claude"]),
+            branches=BranchConfig(development="dev", main="main"),
+        )
+        save_manifest(existing, greenfield_project)
+
+        mock_home.mkdir(parents=True, exist_ok=True)
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert manifest.branches.development == "dev"
+
+    def test_preserves_tier_config(
+        self, greenfield_project: Path, mock_home: Path
+    ) -> None:
+        """rai init preserves existing tier value."""
+        from raise_cli.onboarding.manifest import AgentsManifest, ProjectInfo, ProjectManifest, TierConfig
+
+        existing = ProjectManifest(
+            project=ProjectInfo(name="test", project_type="brownfield"),
+            agents=AgentsManifest(types=["claude"]),
+            tier=TierConfig(level="enterprise"),
+        )
+        save_manifest(existing, greenfield_project)
+
+        mock_home.mkdir(parents=True, exist_ok=True)
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+            result = runner.invoke(
+                app,
+                ["init", "--path", str(greenfield_project)],
+                catch_exceptions=False,
+            )
+
+        assert result.exit_code == 0
+        manifest = load_manifest(greenfield_project)
+        assert manifest is not None
+        assert manifest.tier is not None
+        assert manifest.tier.level == "enterprise"

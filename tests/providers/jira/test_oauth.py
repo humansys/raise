@@ -15,7 +15,7 @@ def oauth_config() -> dict[str, str]:
     """Provide OAuth configuration for JIRA."""
     return {
         "client_id": "test-client-id",
-        "client_secret": "test-client-secret",
+        "client_secret": "fake-client-secret-for-testing",
         "redirect_uri": "http://localhost:8080/callback",
         "authorization_url": "https://auth.atlassian.com/authorize",
         "token_url": "https://auth.atlassian.com/oauth/token",
