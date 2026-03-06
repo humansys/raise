@@ -24,7 +24,7 @@ When the same concept exists in multiple scopes, **personal overrides project, p
 Patterns are learnings captured during development. They represent what worked, what didn't, and what to remember next time.
 
 ```bash
-raise memory add-pattern "Use fixtures for database setup in tests" \
+rai pattern add "Use fixtures for database setup in tests" \
   -t technical -c "pytest,testing" --from S3.5
 ```
 
@@ -39,7 +39,7 @@ Patterns have sub-types:
 Calibration tracks how long stories actually take versus estimates. Over time, this builds a velocity profile that helps predict future work more accurately.
 
 ```bash
-raise memory add-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
+rai signal emit-calibration S3.5 --size M --actual 45 --estimated 60
 ```
 
 This records: story S3.5 was estimated at 60 minutes (size M) but actually took 45 — a velocity of 1.33x.
@@ -49,7 +49,7 @@ This records: story S3.5 was estimated at 60 minutes (size M) but actually took 
 Sessions are a chronological record of what happened. Each session captures: what you worked on, what you accomplished, and what patterns you learned.
 
 ```bash
-raise memory add-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
+rai signal emit-session --type story --outcome success --stories S3.5
 ```
 
 ## How Memory Compounds
@@ -69,13 +69,13 @@ All memory sources merge into a single queryable index:
 
 ```bash
 # Build the unified index
-raise memory build
+rai graph build
 
 # Query it
-raise memory query "testing patterns" --types pattern
+rai graph query "testing patterns" --types pattern
 
 # List all concepts
-raise memory list --memory-only
+rai graph list --memory-only
 ```
 
 The index is a JSON file (`.raise/rai/memory/index.json`) that combines patterns, calibration, sessions, governance, work tracking, and skills into one graph. See [Knowledge Graph](/docs/concepts/knowledge-graph/) for how this graph works.
@@ -84,12 +84,12 @@ The index is a JSON file (`.raise/rai/memory/index.json`) that combines patterns
 
 | Command | What it does |
 |---------|-------------|
-| `raise memory build` | Build unified index from all sources |
-| `raise memory query` | Search memory for relevant concepts |
-| `raise memory list` | List all concepts in the index |
-| `raise memory add-pattern` | Record a learned pattern |
-| `raise memory add-calibration` | Record story timing data |
-| `raise memory add-session` | Record a session |
-| `raise memory validate` | Check index integrity |
+| `rai graph build` | Build unified index from all sources |
+| `rai graph query` | Search memory for relevant concepts |
+| `rai graph list` | List all concepts in the index |
+| `rai graph validate` | Check index integrity |
+| `rai pattern add` | Record a learned pattern |
+| `rai signal emit-calibration` | Record story timing data |
+| `rai signal emit-session` | Record a session event |
 
 See the [CLI Reference](/docs/cli/) for full details on each command.
