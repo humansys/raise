@@ -41,5 +41,5 @@ This policy applies to:
 
 | Version | Supported |
 |---------|-----------|
-| 2.0.0-alpha.x | Yes (current) |
+| 2.x | Yes (current) |
 | < 2.0.0 | No |
