@@ -88,3 +88,58 @@ S369.4 ──── after S369.1-2 (builds on cleaned state)
 - No secrets or internal references in published artifacts
 - `rai release check` passes
 - Ready to bump 2.2.1 and publish to PyPI
+
+---
+
+## Implementation Plan
+
+### Sequencing Strategy: Quick Wins
+
+All stories are low-risk, well-understood changes. Sequence for fast momentum:
+fix what's visible first (docs, metadata), then harden infrastructure (CI, secrets).
+
+### Story Sequence
+
+| # | Story | Size | Strategy | Enables | Hard Deps |
+|---|-------|------|----------|---------|-----------|
+| 1 | S369.1 — Documentation Polish | XS | Quick win | Accurate first contact | None |
+| 2 | S369.2 — Package Metadata & Deps | XS | Quick win | Professional PyPI listing | None |
+| 3 | S369.3 — CI Hardening | S | Dependency-driven | CI badge in README works | S369.1 (badge URL) |
+| 4 | S369.4 — Secrets & Hygiene Scan | S | Risk-first (last) | Publish confidence | S369.1-2 (clean state) |
+
+**Parallel opportunities:** S369.1 and S369.2 are fully independent — can run in same session.
+S369.3 has soft dep on S369.1 (badge URL must match workflow name).
+
+**Critical path:** S369.1 → S369.3 → S369.4
+
+### Milestones
+
+**M1: Docs & Metadata Clean (after S369.1 + S369.2)**
+- All community docs accurate, no stale references
+- PyPI metadata complete with project URLs
+- Dead dependency removed
+- Verify: `grep -r "rai-cli\|rai_cli\|humansys/raise" *.md pyproject.toml` returns nothing
+
+**M2: Epic Complete (after S369.3 + S369.4)**
+- CI tests Python 3.12 + 3.13
+- CI badge visible in README
+- No secrets in repo or published artifacts
+- `rai release check` passes
+- Verify: ready for 2.2.1 version bump and PyPI publish
+
+### Progress Tracking
+
+| Story | Status | Notes |
+|-------|--------|-------|
+| S369.1 — Documentation Polish | pending | |
+| S369.2 — Package Metadata & Deps | pending | |
+| S369.3 — CI Hardening | pending | |
+| S369.4 — Secrets & Hygiene Scan | pending | |
+
+### Sequencing Risks
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| pip-audit finds critical vuln requiring major dep change | Delays S369.2 | Upgrade if simple, document as accepted risk if complex |
+| Secrets found in git history | Blocks publish | Assess scope — if limited, BFG rewrite; if widespread, defer to separate story |
+| CI fails on Python 3.13 | Delays S369.3 | Fix or drop 3.13 claim from README |
