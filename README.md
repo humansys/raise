@@ -1,6 +1,6 @@
 # RaiSE
 
-[![CI](https://github.com/humansys-ai/raise-commons/actions/workflows/ci.yml/badge.svg)](https://github.com/humansys-ai/raise-commons/actions/workflows/ci.yml)
+[![CI](https://github.com/humansys/raise/actions/workflows/ci.yml/badge.svg)](https://github.com/humansys/raise/actions/workflows/ci.yml)
 
 **Reliable AI Software Engineering** — Ship quality software at AI speed.
 
@@ -71,7 +71,7 @@ pipx install raise-cli
 
 ```bash
 # 1. Clone and checkout the development branch
-git clone https://github.com/humansys-ai/raise-commons.git
+git clone https://github.com/humansys/raise.git
 cd raise-commons
 git checkout dev
 
@@ -359,8 +359,8 @@ For CLI reference documentation, see the [CLI Quick Reference](framework/referen
 
 We value your feedback:
 
-- **Questions?** Open an [issue](https://github.com/humansys-ai/raise-commons/issues)
-- **Found a bug?** Open an [issue](https://github.com/humansys-ai/raise-commons/issues) with reproduction steps
+- **Questions?** Open an [issue](https://github.com/humansys/raise/issues)
+- **Found a bug?** Open an [issue](https://github.com/humansys/raise/issues) with reproduction steps
 - **Ideas?** We want to hear them — open an issue or reach out directly
 
 ---

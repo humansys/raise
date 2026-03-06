@@ -5,7 +5,7 @@
 > **Date:** 2026-02-20
 > **Audience:** Community contributors, adapter developers, enterprise evaluators
 > **Canonical:** [Confluence](https://humansys.atlassian.net/wiki/spaces/RaiSE1/pages/3071606785)
-> **Feedback:** [open an issue](https://github.com/humansys-ai/raise-commons/issues) or comment on the shared document
+> **Feedback:** [open an issue](https://github.com/humansys/raise/issues) or comment on the shared document
 
 ---
 
@@ -694,7 +694,7 @@ Should raise-core define a packaging convention for bundles that combine adapter
 
 ## How to Give Feedback
 
-* **GitHub Issues:** Open an issue with the tag `rfc-001` at [github.com/humansys-ai/raise-commons](https://github.com/humansys-ai/raise-commons/issues)
+* **GitHub Issues:** Open an issue with the tag `rfc-001` at [github.com/humansys/raise](https://github.com/humansys/raise/issues)
 * **Comments:** Comment directly on the shared document
 * **Email:** [emilio@humansys.ai](mailto:emilio@humansys.ai)
 

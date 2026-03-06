@@ -151,11 +151,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys-ai/raise-commons/compare/v2.2.0...HEAD
-[2.2.0]: https://github.com/humansys-ai/raise-commons/compare/v2.1.0...v2.2.0
-[2.1.0]: https://github.com/humansys-ai/raise-commons/compare/v2.0.4...v2.1.0
-[2.0.4]: https://github.com/humansys-ai/raise-commons/compare/v2.0.3...v2.0.4
-[2.0.3]: https://github.com/humansys-ai/raise-commons/compare/v2.0.0a9...v2.0.3
-[2.0.0a9]: https://github.com/humansys-ai/raise-commons/compare/v2.0.0a8...v2.0.0a9
-[2.0.0a8]: https://github.com/humansys-ai/raise-commons/compare/v2.0.0a6...v2.0.0a8
-[2.0.0a6]: https://github.com/humansys-ai/raise-commons/releases/tag/v2.0.0a6
+[Unreleased]: https://github.com/humansys/raise/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/humansys/raise/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/humansys/raise/compare/v2.0.4...v2.1.0
+[2.0.4]: https://github.com/humansys/raise/compare/v2.0.3...v2.0.4
+[2.0.3]: https://github.com/humansys/raise/compare/v2.0.0a9...v2.0.3
+[2.0.0a9]: https://github.com/humansys/raise/compare/v2.0.0a8...v2.0.0a9
+[2.0.0a8]: https://github.com/humansys/raise/compare/v2.0.0a6...v2.0.0a8
+[2.0.0a6]: https://github.com/humansys/raise/releases/tag/v2.0.0a6
