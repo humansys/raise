@@ -208,3 +208,6 @@ output_format = "human"
 color = true
 verbosity = 0
 
+[tool.logfire]
+ignore_no_config = true
+
