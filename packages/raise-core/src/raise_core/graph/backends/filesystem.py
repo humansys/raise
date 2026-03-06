@@ -14,8 +14,8 @@ from typing import Any
 
 import networkx as nx  # type: ignore[import-untyped]
 
-from rai_core.graph.backends.models import BackendHealth
-from rai_core.graph.engine import Graph
+from raise_core.graph.backends.models import BackendHealth
+from raise_core.graph.engine import Graph
 
 __all__ = ["FilesystemGraphBackend", "get_active_backend"]
 

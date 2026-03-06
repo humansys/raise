@@ -7,10 +7,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from rai_core.graph.backends.models import BackendHealth
+from raise_core.graph.backends.models import BackendHealth
 
 if TYPE_CHECKING:
-    from rai_core.graph.engine import Graph
+    from raise_core.graph.engine import Graph
 
 
 @runtime_checkable
