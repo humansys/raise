@@ -68,7 +68,12 @@ const features = [
   <div class="sep" aria-hidden="true"></div>
 
   <!-- Metrics -->
-  <MetricsBar />
+  <MetricsBar metrics={[
+    { value: '37', label: 'Skills', highlight: true },
+    { value: '97', suffix: '%', label: 'Ahorro de tokens' },
+    { value: '15.8', label: 'Story points / día' },
+    { value: '1', label: 'Ingeniero', highlight: true },
+  ]} />
 
   <!-- Features -->
   <section class="features" id="features">
