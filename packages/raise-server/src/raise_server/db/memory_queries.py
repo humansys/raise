@@ -12,7 +12,7 @@ from sqlalchemy import Result, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from rai_server.db.models import MemoryPatternRow
+from raise_server.db.models import MemoryPatternRow
 
 
 async def insert_pattern(

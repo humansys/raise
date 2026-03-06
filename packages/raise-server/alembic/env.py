@@ -1,4 +1,4 @@
-"""Alembic environment configuration for rai-server migrations."""
+"""Alembic environment configuration for raise-server migrations."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import asyncio
 from logging.config import fileConfig
 
 from alembic import context
-from rai_server.db.models import Base
+from raise_server.db.models import Base
 from sqlalchemy import pool
 from sqlalchemy.ext.asyncio import async_engine_from_config
 

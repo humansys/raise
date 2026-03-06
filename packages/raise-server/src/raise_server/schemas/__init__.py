@@ -1,1 +1,1 @@
-"""Pydantic request/response schemas for rai-server API."""
+"""Pydantic request/response schemas for raise-server API."""

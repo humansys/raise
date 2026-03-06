@@ -7,13 +7,13 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from rai_server import __version__
-from rai_server.api.v1.agent import router as agent_router
-from rai_server.api.v1.graph import router as graph_router
-from rai_server.api.v1.health import router as health_router
-from rai_server.api.v1.memory import router as memory_router
-from rai_server.config import ServerConfig
-from rai_server.db.session import create_engine, create_session_factory
+from raise_server import __version__
+from raise_server.api.v1.agent import router as agent_router
+from raise_server.api.v1.graph import router as graph_router
+from raise_server.api.v1.health import router as health_router
+from raise_server.api.v1.memory import router as memory_router
+from raise_server.config import ServerConfig
+from raise_server.db.session import create_engine, create_session_factory
 
 
 @asynccontextmanager

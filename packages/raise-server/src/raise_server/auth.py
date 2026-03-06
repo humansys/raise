@@ -13,8 +13,8 @@ from fastapi import HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import select
 
-from rai_server.db.models import ApiKey, Organization
-from rai_server.deps import get_session_factory
+from raise_server.db.models import ApiKey, Organization
+from raise_server.deps import get_session_factory
 
 
 class OrgContext(BaseModel):
