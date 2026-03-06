@@ -99,7 +99,7 @@ Scope commit on `{dev_branch}`. Epic visible in backlog.
 </verification>
 
 <if-blocked>
-Backlog file missing → create it. Row already exists → update status only.
+CLI adapter not configured → log warning and continue. Backlog sync is best-effort.
 </if-blocked>
 
 ### Step 3: Present Next Steps

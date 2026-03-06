@@ -133,7 +133,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 git branch -D bug/raise-{N}/{slug}
 ```
 
-Update Jira: transition issue to Done.
+Update tracker: `rai backlog transition RAISE-{N} "Done" -a jira`
 
 <verification>
 Merged to `{dev_branch}`. Branch deleted. Jira updated.
