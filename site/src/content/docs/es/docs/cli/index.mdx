@@ -3,7 +3,7 @@ title: Referencia CLI
 description: Referencia completa de todos los comandos del CLI de RaiSE — flags, opciones y ejemplos.
 ---
 
-Referencia completa de la interfaz de línea de comandos `raise`.
+Referencia completa de la interfaz de línea de comandos `rai`.
 
 ## Opciones Globales
 
@@ -21,7 +21,7 @@ Estas opciones están disponibles en todos los comandos:
 
 ## Proyecto
 
-### `raise init`
+### `rai init`
 
 Inicializa un proyecto RaiSE en el directorio actual. Detecta el tipo de proyecto (greenfield o brownfield), crea `.raise/manifest.yaml` y configura la estructura del proyecto.
 
@@ -35,20 +35,20 @@ Con `--detect`, también analiza las convenciones de código y genera guardrails
 
 ```bash
 # Proyecto nuevo
-raise init
+rai init
 
 # Proyecto con nombre
-raise init --name mi-api
+rai init --name mi-api
 
 # Proyecto existente con detección de convenciones
-raise init --detect
+rai init --detect
 ```
 
 ---
 
 ## Sesión
 
-### `raise session start`
+### `rai session start`
 
 Inicia una nueva sesión de trabajo. Incrementa el contador de sesiones y establece el estado de sesión activa. Verifica sesiones huérfanas (iniciadas pero no cerradas) y avisa si las encuentra.
 
@@ -58,20 +58,21 @@ Con `--context`, genera un bundle de contexto optimizado en tokens (~150 tokens)
 |------|-------|-------------|
 | `--name` | `-n` | Tu nombre (requerido en la primera configuración) |
 | `--project` | `-p` | Ruta del proyecto a asociar con esta sesión |
+| `--agent` | | Identificador de agente |
 | `--context` | | Generar bundle de contexto para consumo de IA |
 
 ```bash
 # Primera configuración
-raise session start --name "Alice" --project .
+rai session start --name "Alice" --project .
 
 # Iniciar sesión con bundle de contexto
-raise session start --project . --context
+rai session start --project . --context
 
 # Inicio simple
-raise session start
+rai session start
 ```
 
-### `raise session close`
+### `rai session close`
 
 Finaliza la sesión de trabajo actual. Con `--summary` o `--state-file`, realiza un cierre estructurado completo — registra sesión, patrones, correcciones y actualiza el estado.
 
@@ -79,144 +80,162 @@ Finaliza la sesión de trabajo actual. Con `--summary` o `--state-file`, realiza
 |------|-------|-------------|
 | `--summary` | `-s` | Resumen de la sesión |
 | `--type` | `-t` | Tipo de sesión (feature, research, maintenance, etc.) |
-| `--pattern` | | Descripción del patrón a registrar |
-| `--correction` | | Corrección de coaching observada |
-| `--correction-lesson` | | Lección de la corrección |
+| `--pattern` | | Descripción del patrón a registrar (repetible) |
 | `--state-file` | | Archivo YAML con salida estructurada completa |
-| `--project` | `-p` | Ruta del proyecto |
+| `--session` | | Identificador de sesión |
 
 ```bash
 # Cierre simple
-raise session close
+rai session close
 
 # Cierre con resumen
-raise session close --summary "Implementé módulo de auth" --type feature
+rai session close --summary "Implementé módulo de auth" --type feature
 
 # Cierre con patrón aprendido
-raise session close --summary "Refactoricé tests" --type maintenance \
+rai session close --summary "Refactoricé tests" --type maintenance \
   --pattern "Usar fixtures para setup de base de datos"
+```
+
+### `rai session context`
+
+Carga secciones específicas de contexto para consumo de IA.
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--sections` | `-s` | Secciones a incluir (governance, behavioral, coaching, deadlines, progress) |
+| `--project` | `-p` | Ruta del proyecto |
+
+```bash
+rai session context --sections governance,progress --project .
+```
+
+### `rai session journal`
+
+Memoria incremental de sesión para decisiones, insights y tareas.
+
+```bash
+# Agregar una decisión al journal
+rai session journal add "Elegimos Pydantic sobre dataclasses" --type decision
+
+# Mostrar el journal
+rai session journal show
+
+# Vista compacta (para restaurar post-compactación)
+rai session journal show --compact
 ```
 
 ---
 
-## Memoria
+## Graph
 
-### `raise memory query`
+### `rai graph build`
 
-Busca en la memoria unificada conceptos relevantes. La memoria contiene todas las fuentes de contexto: gobernanza (principios, requisitos, términos), memoria (patrones, calibración, sesiones), skills (metadatos de workflow) y trabajo (epics, stories, decisiones).
+Construye el índice del knowledge graph desde todas las fuentes: documentos de gobernanza, memoria (patrones, calibración, sesiones), seguimiento de trabajo (epics, stories), skills y componentes de discovery.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
-| `--format` | `-f` | Formato de salida: `human` o `json` |
-| `--output` | `-o` | Archivo de salida (por defecto: stdout) |
+| `--output` | `-o` | Ruta para guardar el JSON del índice |
+| `--no-diff` | | Omitir salida de diff |
+
+```bash
+# Construir índice en ubicación por defecto
+rai graph build
+
+# Guardar en ubicación personalizada
+rai graph build --output custom_index.json
+```
+
+### `rai graph query`
+
+Busca en el knowledge graph conceptos relevantes. El grafo contiene todas las fuentes de contexto: gobernanza (principios, requisitos, términos), memoria (patrones, calibración, sesiones), skills (metadatos de workflow) y trabajo (epics, stories, decisiones).
+
+| Flag | Corto | Descripción |
+|------|-------|-------------|
+| `--format` | `-f` | Formato de salida: `human`, `json` o `compact` |
 | `--strategy` | `-s` | Estrategia de búsqueda: `keyword_search` o `concept_lookup` |
 | `--types` | `-t` | Filtrar por tipos (separados por coma: `pattern`, `calibration`, `principle`, etc.) |
-| `--edge-types` | | Filtrar por tipos de relación (separados por coma: `constrained_by`, `depends_on`, etc.) |
 | `--limit` | `-l` | Número máximo de resultados (por defecto: 10) |
-| `--index` | `-i` | Ruta del índice de memoria |
 
 ```bash
 # Buscar por palabras clave
-raise memory query "planning estimation"
+rai graph query "planning estimation"
 
 # Filtrar solo patrones
-raise memory query "testing" --types pattern,calibration
+rai graph query "testing" --types pattern,calibration
 
 # Buscar concepto específico por ID
-raise memory query "PAT-001" --strategy concept_lookup
+rai graph query "PAT-001" --strategy concept_lookup
 
 # Salida en JSON
-raise memory query "velocity" --format json
+rai graph query "velocity" --format json
 ```
 
-### `raise memory context`
+### `rai graph context`
 
 Muestra el contexto arquitectónico completo de un módulo. Retorna el bounded context (dominio), capa arquitectónica, guardrails aplicables (restricciones) y dependencias del módulo.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
 | `--format` | `-f` | Formato de salida: `human` o `json` |
-| `--index` | `-i` | Ruta del índice de memoria |
 
 ```bash
 # Mostrar contexto del módulo de memoria
-raise memory context mod-memory
+rai graph context mod-memory
 
 # Salida en JSON
-raise memory context mod-memory --format json
+rai graph context mod-memory --format json
 ```
 
-### `raise memory build`
+### `rai graph validate`
 
-Construye el índice de memoria unificado desde todas las fuentes: documentos de gobernanza, memoria (patrones, calibración, sesiones), seguimiento de trabajo (epics, stories), skills y componentes de discovery.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--output` | `-o` | Ruta para guardar el JSON del índice |
+Valida la estructura y relaciones del índice del grafo. Verifica ciclos en relaciones `depends_on`, tipos de relación válidos y que todos los targets de edges existan como nodos.
 
 ```bash
-# Construir índice en ubicación por defecto
-raise memory build
-
-# Guardar en ubicación personalizada
-raise memory build --output custom_index.json
+rai graph validate
 ```
 
-### `raise memory validate`
+### `rai graph extract`
 
-Valida la estructura y relaciones del índice de memoria. Verifica ciclos en relaciones `depends_on`, tipos de relación válidos y que todos los targets de edges existan como nodos.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--index` | `-i` | Ruta al archivo JSON del índice |
+Extrae conceptos de archivos markdown de gobernanza.
 
 ```bash
-# Validar índice por defecto
-raise memory validate
+# Extraer de todos los archivos de gobernanza
+rai graph extract
 
-# Validar archivo específico
-raise memory validate --index custom_index.json
+# Extraer de archivo específico
+rai graph extract governance/prd.md
 ```
 
-### `raise memory list`
+### `rai graph list`
 
-Lista los conceptos en el índice de memoria. Muestra conceptos para inspección y debugging.
+Lista los conceptos en el knowledge graph.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
 | `--format` | `-f` | Formato de salida: `human`, `json` o `table` |
-| `--output` | `-o` | Archivo de salida (por defecto: stdout) |
-| `--index` | `-i` | Ruta del índice de memoria |
-| `--memory-only` / `--all` | | Mostrar solo tipos de memoria (pattern, calibration, session) o todos |
+| `--memory-only` / `--all` | | Mostrar solo tipos de memoria o todos |
 
 ```bash
 # Mostrar tabla resumen
-raise memory list
+rai graph list
 
 # Mostrar solo patrones/calibraciones/sesiones
-raise memory list --memory-only
-
-# Exportar como JSON
-raise memory list --format json --output memory.json
+rai graph list --memory-only
 ```
 
-### `raise memory extract`
+### `rai graph viz`
 
-Extrae conceptos de archivos markdown de gobernanza. Si no se provee ruta, extrae de todas las ubicaciones estándar de gobernanza (`governance/prd.md`, `governance/vision.md`, `framework/reference/constitution.md`).
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--format` | `-f` | Formato de salida: `human` o `json` |
+Genera una visualización HTML interactiva del knowledge graph.
 
 ```bash
-# Extraer de todos los archivos de gobernanza
-raise memory extract
-
-# Extraer de archivo específico
-raise memory extract governance/prd.md
+rai graph viz
 ```
 
-### `raise memory add-pattern`
+---
+
+## Pattern
+
+### `rai pattern add`
 
 Agrega un nuevo patrón a la memoria. Los patrones capturan aprendizajes del desarrollo — mejoras de proceso, descubrimientos técnicos, decisiones arquitectónicas.
 
@@ -226,315 +245,396 @@ Agrega un nuevo patrón a la memoria. Los patrones capturan aprendizajes del des
 | `--type` | `-t` | Tipo de patrón: `codebase`, `process`, `architecture`, `technical` (por defecto: `process`) |
 | `--from` | `-f` | Story/sesión donde se aprendió |
 | `--scope` | `-s` | Alcance de memoria: `global`, `project`, `personal` (por defecto: `project`) |
-| `--memory-dir` | `-m` | Ruta del directorio de memoria (sobreescribe scope) |
 
 ```bash
 # Agregar patrón de proceso
-raise memory add-pattern "HITL before commits" -c "git,workflow"
+rai pattern add "HITL before commits" -c "git,workflow"
 
 # Agregar patrón técnico
-raise memory add-pattern "Use capsys for stdout tests" -t technical -c "pytest,testing"
+rai pattern add "Use capsys for stdout tests" -t technical -c "pytest,testing"
 
 # Agregar con referencia de origen
-raise memory add-pattern "BFS reuse across modules" -t architecture --from S2.3
-
-# Agregar a scope personal
-raise memory add-pattern "My workflow preference" --scope personal
+rai pattern add "BFS reuse across modules" -t architecture --from S2.3
 ```
 
-### `raise memory add-calibration`
+### `rai pattern reinforce`
 
-Agrega datos de calibración para una story completada. Registra estimación vs. duración real para análisis de velocidad.
+Refuerza un patrón con una señal de voto.
+
+```bash
+rai pattern reinforce PAT-042
+```
+
+### `rai pattern promote`
+
+Promueve un patrón de scope personal a scope de proyecto.
+
+```bash
+rai pattern promote PAT-042
+```
+
+---
+
+## Signal
+
+### `rai signal emit-work`
+
+Emite un evento de ciclo de vida de trabajo para análisis de flujo Lean. Registra ítems de trabajo (epics, stories) a través de fases normalizadas.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
-| `--name` | | Nombre de la story (requerido) |
-| `--size` | `-s` | Talla: `XS`, `S`, `M`, `L`, `XL` (requerido) |
-| `--actual` | `-a` | Minutos reales (requerido) |
-| `--estimated` | `-e` | Minutos estimados |
-| `--sp` | | Story points |
-| `--kata` / `--no-kata` | | Si se siguió el ciclo kata (por defecto: sí) |
-| `--notes` | `-n` | Notas adicionales |
-| `--scope` | `-s` | Alcance de memoria: `global`, `project`, `personal` |
-| `--memory-dir` | `-m` | Ruta del directorio de memoria |
+| `--event` | `-e` | Tipo de evento: `start`, `complete`, `blocked`, `unblocked`, `abandoned` |
+| `--phase` | `-p` | Fase: `design`, `plan`, `implement`, `review` |
 
 ```bash
-# Calibración básica
-raise memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20
-
-# Con estimación para cálculo de velocidad
-raise memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60
-
-# Detalles completos
-raise memory add-calibration S3.5 --name "Skills Integration" -s XS -a 20 -e 60 --sp 2 -n "Hook-assisted"
-```
-
-### `raise memory add-session`
-
-Agrega un registro de sesión a la memoria. Las sesiones son específicas del desarrollador y siempre se escriben en el directorio personal.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--outcomes` | `-o` | Resultados de la sesión (separados por coma) |
-| `--type` | `-t` | Tipo de sesión (por defecto: `story`) |
-| `--log` | `-l` | Ruta al archivo de log de sesión |
-| `--memory-dir` | `-m` | Ruta del directorio de memoria |
-
-```bash
-# Sesión básica
-raise memory add-session "S3.5 Skills Integration"
-
-# Con resultados
-raise memory add-session "S3.5 Skills Integration" -o "Writer API,Hooks setup,CLI commands"
-
-# Detalles completos
-raise memory add-session "S3.5 Skills Integration" -t story -o "Writer API,Hooks" \
-  -l "dev/sessions/2026-02-02-s3.5.md"
-```
-
-### `raise memory emit-work`
-
-Emite un evento de ciclo de vida de trabajo para análisis de flujo Lean. Registra ítems de trabajo (epics, stories) a través de fases normalizadas para habilitar análisis de lead time, wait time, WIP y cuellos de botella.
-
-Fases: `design`, `plan`, `implement`, `review`.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--event` | `-e` | Tipo de evento: `start`, `complete`, `blocked`, `unblocked`, `abandoned` (por defecto: `start`) |
-| `--phase` | `-p` | Fase: `design`, `plan`, `implement`, `review` (por defecto: `design`) |
-| `--blocker` | `-b` | Descripción del bloqueante (para eventos `blocked`) |
-
-```bash
-# Ciclo de vida de epic
-raise memory emit-work epic E9 --event start --phase design
-raise memory emit-work epic E9 -e complete -p design
-
 # Ciclo de vida de story
-raise memory emit-work story S9.4 --event start --phase implement
-raise memory emit-work story S9.4 -e complete -p implement
-
-# Trabajo bloqueado
-raise memory emit-work story S9.4 -e blocked -p plan -b "requisitos poco claros"
+rai signal emit-work story S9.4 --event start --phase implement
+rai signal emit-work story S9.4 -e complete -p implement
 ```
 
-### `raise memory emit-session`
+### `rai signal emit-session`
 
-Emite un evento de sesión a telemetría. Registra la completitud de una sesión para aprendizaje local e insights.
+Emite un evento de sesión a telemetría.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
-| `--type` | `-t` | Tipo de sesión: `story`, `research`, `maintenance`, etc. (por defecto: `story`) |
-| `--outcome` | `-o` | Resultado: `success`, `partial`, `abandoned` (por defecto: `success`) |
+| `--type` | `-t` | Tipo de sesión: `story`, `research`, `maintenance`, etc. |
+| `--outcome` | `-o` | Resultado: `success`, `partial`, `abandoned` |
 | `--duration` | `-d` | Duración de la sesión en minutos |
 | `--stories` | `-f` | Stories trabajadas (separadas por coma) |
 
 ```bash
-# Sesión completada básica
-raise memory emit-session --type story --outcome success
-
-# Con duración y stories
-raise memory emit-session -t story -o success -d 45 -f S9.1,S9.2,S9.3
+rai signal emit-session --type story --outcome success -d 45 --stories S9.1,S9.2
 ```
 
-### `raise memory emit-calibration`
+### `rai signal emit-calibration`
 
-Emite un evento de calibración a telemetría. Registra estimación vs. real para seguimiento de velocidad. La velocidad se calcula automáticamente: `estimated / actual` (>1.0 = más rápido de lo estimado).
+Emite un evento de calibración a telemetría. Registra estimación vs. real para seguimiento de velocidad.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
-| `--size` | `-s` | Talla: `XS`, `S`, `M`, `L` (por defecto: `S`) |
+| `--size` | `-s` | Talla: `XS`, `S`, `M`, `L` |
 | `--estimated` | `-e` | Duración estimada en minutos |
 | `--actual` | `-a` | Duración real en minutos |
 
 ```bash
-# Story completada más rápido de lo estimado
-raise memory emit-calibration S9.4 --size S --estimated 30 --actual 15
-
-# Story tomó más tiempo
-raise memory emit-calibration S9.4 -s M -e 60 -a 90
+rai signal emit-calibration S9.4 --size S --estimated 30 --actual 15
 ```
-
-### `raise memory generate`
-
-:::caution[Deprecado]
-`memory generate` está deprecado. Usa [`raise memory build`](#raise-memory-build) en su lugar. El grafo de memoria es ahora la fuente única de verdad — el contexto se entrega vía `raise session start --context`.
-:::
 
 ---
 
 ## Discovery
 
-Comandos para escanear, analizar y rastrear la arquitectura de tu codebase.
-
-### `raise discover scan`
+### `rai discover scan`
 
 Escanea un directorio y extrae símbolos de código (clases, funciones, métodos, interfaces, docstrings de módulos). Soporta Python, TypeScript y JavaScript.
 
 | Flag | Corto | Descripción |
 |------|-------|-------------|
-| `--language` | `-l` | Lenguaje: `python`, `typescript`, `javascript` (auto-detección si no se especifica) |
+| `--language` | `-l` | Lenguaje: `python`, `typescript`, `javascript` |
 | `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
-| `--pattern` | `-p` | Patrón glob para archivos |
-| `--exclude` | `-e` | Patrones a excluir (se puede repetir) |
+| `--exclude` | `-e` | Patrones a excluir (repetible) |
 
 ```bash
 # Escanear directorio actual
-raise discover scan
+rai discover scan
 
 # Escanear solo archivos Python
-raise discover scan src/ --language python
-
-# Salida JSON para pipe a analyze
-raise discover scan src/ -l python -o json
+rai discover scan src/ --language python
 
 # Excluir tests
-raise discover scan . --exclude "**/test_*" --exclude "**/__tests__/**"
+rai discover scan . --exclude "**/test_*" --exclude "**/__tests__/**"
 ```
 
-### `raise discover analyze`
+### `rai discover drift`
 
-Analiza resultados de escaneo con scoring de confianza y agrupación por módulos. Toma la salida de scan y produce un análisis con auto-categorización, folding jerárquico y agrupación por módulos. Todo el análisis es determinístico — no requiere inferencia de IA.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--input` | `-i` | Ruta al JSON de resultado de scan (lee stdin si no se provee) |
-| `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
-| `--category-map` | `-c` | Archivo YAML con mapeos personalizados de ruta a categoría |
+Verifica drift arquitectónico contra el baseline de componentes.
 
 ```bash
-# Analizar desde archivo
-raise discover analyze --input scan-result.json
-
-# Pipe desde scan
-raise discover scan src/ -l python -o json | raise discover analyze
-
-# Solo resumen
-raise discover analyze --input scan-result.json --output summary
-```
-
-### `raise discover build`
-
-Construye el grafo unificado con componentes descubiertos. Lee componentes validados desde JSON y los integra en el grafo de contexto unificado, haciéndolos consultables vía `raise memory context`.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--input` | `-i` | Ruta al JSON de componentes validados |
-| `--project-root` | `-r` | Directorio raíz del proyecto (por defecto: `.`) |
-| `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
-
-```bash
-# Construir con archivo de entrada por defecto
-raise discover build
-
-# Construir con entrada personalizada
-raise discover build --input my-components.json
-```
-
-### `raise discover drift`
-
-Verifica drift arquitectónico contra el baseline de componentes. Compara código escaneado contra el baseline de componentes validados para identificar drift potencial (archivos en ubicaciones incorrectas, violaciones de convenciones de naming, documentación faltante).
-
-Códigos de salida: `0` = sin drift, `1` = advertencias de drift encontradas.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--project-root` | `-r` | Directorio raíz del proyecto (por defecto: `.`) |
-| `--output` | `-o` | Formato de salida: `human`, `json` o `summary` |
-
-```bash
-# Verificar proyecto completo
-raise discover drift
-
-# Verificar directorio específico
-raise discover drift src/new_module/
-
-# Salida en JSON
-raise discover drift --output json
+rai discover drift
 ```
 
 ---
 
 ## Skills
 
-### `raise skill list`
+### `rai skill list`
 
 Lista todos los skills en el directorio de skills. Muestra skills agrupados por ciclo de vida con versión y descripción.
 
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--format` | `-f` | Formato de salida: `human` o `json` |
-
 ```bash
-raise skill list
+rai skill list
 ```
 
-### `raise skill validate`
+### `rai skill validate`
 
-Valida la estructura de un skill contra el schema de RaiSE. Verifica frontmatter, campos requeridos, secciones y convenciones de naming.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--format` | `-f` | Formato de salida: `human` o `json` |
+Valida la estructura de un skill contra el schema de RaiSE.
 
 ```bash
 # Validar todos los skills
-raise skill validate
+rai skill validate
 
 # Validar skill específico
-raise skill validate .claude/skills/story-start/SKILL.md
+rai skill validate .claude/skills/story-start/SKILL.md
 ```
 
-### `raise skill scaffold`
+### `rai skill scaffold`
 
-Crea un nuevo skill desde plantilla. Genera un archivo `SKILL.md` con la estructura apropiada en `.claude/skills/<nombre>/`.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--lifecycle` | `-l` | Ciclo de vida: `session`, `epic`, `story`, `discovery`, `utility`, `meta` |
-| `--after` | | Skill que debe ir antes (prerequisito) |
-| `--before` | | Skill que debe ir después (siguiente) |
-| `--format` | `-f` | Formato de salida: `human` o `json` |
+Crea un nuevo skill desde plantilla.
 
 ```bash
-# Crear nuevo skill de story
-raise skill scaffold story-validate
-
-# Con ciclo de vida y ordenamiento
-raise skill scaffold story-validate --lifecycle story --after story-implement --before story-close
+rai skill scaffold story-validate --lifecycle story --after story-implement --before story-close
 ```
 
-### `raise skill check-name`
+### `rai skill check-name`
 
-Verifica un nombre propuesto de skill contra convenciones de naming. Valida el patrón `{dominio}-{acción}`, verifica conflictos con skills existentes o comandos CLI, y confirma el dominio de ciclo de vida.
-
-| Flag | Corto | Descripción |
-|------|-------|-------------|
-| `--format` | `-f` | Formato de salida: `human` o `json` |
+Verifica un nombre propuesto de skill contra convenciones de naming.
 
 ```bash
-raise skill check-name story-validate
+rai skill check-name story-validate
 ```
 
 ---
 
 ## Profile
 
-### `raise profile show`
+### `rai profile show`
 
-Muestra el perfil de desarrollador en formato YAML. Muestra el contenido de `~/.rai/developer.yaml`. Si no existe perfil, muestra un mensaje guía para crear uno.
+Muestra el perfil de desarrollador en formato YAML. Muestra el contenido de `~/.rai/developer.yaml`.
 
 ```bash
-raise profile show
+rai profile show
+```
+
+---
+
+## Backlog
+
+Gestiona ítems de backlog vía adaptadores de gestión de proyectos (ej. Jira).
+
+### `rai backlog create`
+
+Crea un nuevo ítem de backlog. SUMMARY es posicional, proyecto es el flag `-p`.
+
+```bash
+rai backlog create "Agregar autenticación de usuario" -p MIPROYECTO -t Story
+```
+
+### `rai backlog search`
+
+Busca ítems de backlog. QUERY es posicional (JQL para Jira).
+
+```bash
+rai backlog search "project = MIPROYECTO AND status = 'In Progress'" -n 10
+```
+
+### `rai backlog get`
+
+Obtiene detalles de un issue específico.
+
+```bash
+rai backlog get PROJ-123
+```
+
+### `rai backlog transition`
+
+Transiciona un issue a un nuevo estado. Ambos argumentos son posicionales.
+
+```bash
+rai backlog transition PROJ-123 "In Progress"
+```
+
+### `rai backlog comment`
+
+Agrega un comentario a un issue. Ambos argumentos son posicionales.
+
+```bash
+rai backlog comment PROJ-123 "Implementación completa, listo para review"
+```
+
+### `rai backlog link`
+
+Vincula dos issues. Los tres argumentos son posicionales.
+
+```bash
+rai backlog link PROJ-123 PROJ-456 blocks
+```
+
+---
+
+## Gate
+
+### `rai gate list`
+
+Lista los gates de workflow descubiertos.
+
+```bash
+rai gate list
+```
+
+### `rai gate check`
+
+Ejecuta verificaciones de gates de workflow. Código de salida 0 si todos pasan, 1 si alguno falla.
+
+```bash
+# Verificar un gate específico
+rai gate check pre-commit
+
+# Verificar todos los gates
+rai gate check --all
+```
+
+---
+
+## Adapter
+
+### `rai adapter list`
+
+Lista adaptadores registrados por entry point.
+
+```bash
+rai adapter list
+```
+
+### `rai adapter check`
+
+Valida adaptadores contra contratos Protocol.
+
+```bash
+rai adapter check
+```
+
+---
+
+## MCP
+
+Gestiona e invoca servidores MCP (Model Context Protocol) registrados en `.raise/mcp/`.
+
+### `rai mcp list`
+
+Lista servidores MCP registrados.
+
+```bash
+rai mcp list
+```
+
+### `rai mcp health`
+
+Verifica el estado de un servidor MCP. SERVER es posicional.
+
+```bash
+rai mcp health mi-servidor
+```
+
+### `rai mcp tools`
+
+Lista herramientas disponibles en un servidor MCP.
+
+```bash
+rai mcp tools mi-servidor
+```
+
+### `rai mcp call`
+
+Llama a una herramienta en un servidor MCP. SERVER y TOOL son posicionales.
+
+```bash
+rai mcp call mi-servidor search --args '{"query": "test"}'
+```
+
+### `rai mcp install`
+
+Instala un paquete de servidor MCP.
+
+```bash
+rai mcp install some-package --type uvx --name mi-servidor
+```
+
+### `rai mcp scaffold`
+
+Genera configuración para un nuevo servidor MCP.
+
+```bash
+rai mcp scaffold mi-servidor --command "uvx some-tool"
+```
+
+---
+
+## Release
+
+### `rai release check`
+
+Ejecuta gates de calidad antes del release.
+
+```bash
+rai release check
+```
+
+### `rai release publish`
+
+Publica un release con bumping de versión.
+
+```bash
+# Bump de versión menor
+rai release publish --bump minor
+
+# Versión específica
+rai release publish --version 2.3.0
+
+# Dry run
+rai release publish --bump patch --dry-run
+```
+
+---
+
+## Docs
+
+Gestiona documentación de gobernanza vía targets de documentación (ej. Confluence).
+
+### `rai docs publish`
+
+Publica un artefacto a un target de documentación.
+
+```bash
+rai docs publish roadmap --title "Roadmap Q1"
+```
+
+### `rai docs get`
+
+Obtiene una página de un target de documentación.
+
+```bash
+rai docs get 12345
+```
+
+### `rai docs search`
+
+Busca en targets de documentación.
+
+```bash
+rai docs search "decisiones de arquitectura" -n 5
+```
+
+---
+
+## Doctor
+
+### `rai doctor`
+
+Diagnostica la configuración de RaiSE, reporta problemas y auto-corrige issues comunes.
+
+```bash
+rai doctor
 ```
 
 ---
 
 ## Base
 
-### `raise base show`
+### `rai base show`
 
 Muestra información del paquete base de Rai. Muestra la versión del base incluido, contenidos (identidad, patrones, metodología) y si ha sido instalado en el proyecto actual.
 
 ```bash
-raise base show
+rai base show
 ```

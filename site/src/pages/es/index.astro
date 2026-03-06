@@ -105,23 +105,15 @@ const features = [
         El resultado: una persona entrega lo que antes requería un equipo — con mayor calidad, mejores tests y trazabilidad completa.
       </p>
     </div>
-    <CodeBlock filename="session.py">
-      <Fragment set:html={`<span class="cmt"># La memoria se acumula entre sesiones</span>
-<span class="kw">from</span> raise_core <span class="kw">import</span> <span class="fn">Memory</span>, <span class="fn">Session</span>
+    <CodeBlock filename="terminal">
+      <Fragment set:html={`<span class="cmt"># Iniciar sesión con contexto completo</span>
+<span class="fn">$</span> rai session start --project . --context
 
-memory = <span class="fn">Memory</span>.<span class="fn">load</span>()
-session = <span class="fn">Session</span>.<span class="fn">start</span>(
-    project=<span class="str">"raise-commons"</span>,
-    context=memory.<span class="fn">query</span>(
-        <span class="str">"testing patterns"</span>,
-        types=[<span class="str">"pattern"</span>, <span class="str">"guardrail"</span>],
-        limit=<span class="num">5</span>
-    )
-)
+<span class="cmt"># Consultar patrones del grafo de conocimiento</span>
+<span class="fn">$</span> rai graph query <span class="str">"testing patterns"</span> --types pattern
 
-<span class="cmt"># 97% menos tokens. Cero alucinaciones.</span>
-<span class="kw">print</span>(session.context_bundle)
-<span class="cmt"># → 150 tokens vs 4,800 sin procesar</span>`} />
+<span class="cmt"># Ejecutar ciclo de vida de story</span>
+<span class="fn">$</span> /rai-story-run S356.2`} />
     </CodeBlock>
   </section>
 

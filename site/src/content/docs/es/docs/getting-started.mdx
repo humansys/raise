@@ -20,11 +20,11 @@ pip install raise-cli
 Verifica la instalación:
 
 ```bash
-raise --version
+rai --version
 ```
 
 ```
-raise-cli version 2.0.0
+rai-cli version 2.2.0
 ```
 
 ## Inicializar un proyecto
@@ -33,7 +33,7 @@ Navega al directorio de tu proyecto y ejecuta:
 
 ```bash
 cd tu-proyecto
-raise init
+rai init
 ```
 
 Esto crea el directorio `.raise/` con:
@@ -45,7 +45,7 @@ Esto crea el directorio `.raise/` con:
 Para proyectos existentes, usa `--detect` para analizar automáticamente las convenciones de tu código:
 
 ```bash
-raise init --detect
+rai init --detect
 ```
 
 ## Configura tu perfil de desarrollador
@@ -53,7 +53,7 @@ raise init --detect
 La primera vez que inicias una sesión, RaiSE crea tu perfil de desarrollador:
 
 ```bash
-raise session start --name "Tu Nombre" --project .
+rai session start --name "Tu Nombre" --project .
 ```
 
 ```
@@ -68,7 +68,7 @@ Tu perfil se almacena en `~/.rai/developer.yaml` y persiste entre proyectos. Reg
 Después de la configuración inicial, inicia sesiones con:
 
 ```bash
-raise session start --project . --context
+rai session start --project . --context
 ```
 
 El flag `--context` genera un bundle de contexto optimizado en tokens (~150 tokens) ensamblado desde:
@@ -84,7 +84,7 @@ Pasa este contexto a tu asistente de IA al inicio de cada sesión de trabajo. Le
 Cuando termines de trabajar, cierra la sesión para capturar lo que ocurrió:
 
 ```bash
-raise session close --summary "Lo que logré" --type feature --project .
+rai session close --summary "Lo que logré" --type feature --project .
 ```
 
 Esto registra la sesión en tu telemetría y actualiza el estado de sesión para la próxima vez.
@@ -94,13 +94,13 @@ Esto registra la sesión en tu telemetría y actualiza el estado de sesión para
 A medida que trabajas, RaiSE acumula conocimiento — patrones, datos de calibración, documentos de gobernanza. Construye el índice de memoria unificado para hacerlo consultable:
 
 ```bash
-raise memory build
+rai graph build
 ```
 
 Luego consúltalo:
 
 ```bash
-raise memory query "testing patterns"
+rai graph query "testing patterns"
 ```
 
 ```
