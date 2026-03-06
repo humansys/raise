@@ -86,3 +86,65 @@ Classification:
 - **How:** Manual review. Grep for module-level mutable assignments (`^[A-Z_]+ =.*\[\]` or `{}` patterns that are not `Final`). Check that concurrent access patterns are documented.
 - **Why:** Shared mutable state is the root cause of race conditions. Even in single-threaded CLI code, libraries may be used in async or threaded contexts later. Documenting the assumption prevents future bugs. (Sources: Google Style Guide [S5])
 - **Classification:** HUMAN
+
+---
+
+## D2: Readability & Idiom
+
+*Priority: High. Pythonic code communicates intent. Non-idiomatic code forces readers to reverse-engineer what the author meant.*
+
+### D2.1: Pythonic iteration
+
+- **What:** Use `enumerate()` for index+value, `zip()` for parallel iteration, tuple unpacking for structured data. Never manipulate indices manually (`for i in range(len(items))`).
+- **How:** `ruff check --select C4,SIM` catches some anti-patterns (unnecessary list comprehensions, simplifiable iterations). Manual review for index-manipulation patterns that tools miss.
+- **Why:** Index manipulation is error-prone (off-by-one), harder to read, and ignores Python's iterator protocol. "There should be one obvious way to do it" (PEP 20). (Sources: Hettinger [S9], Ramalho [S8], Slatkin [S6])
+- **Classification:** BOTH (C4/SIM partial TOOL; idiom completeness is HUMAN)
+
+### D2.2: Data model usage
+
+- **What:** Classes implement appropriate dunder methods for their role: `__repr__` for debugging, `__eq__`/`__hash__` for value semantics, `__len__`/`__iter__` for container behavior, `__enter__`/`__exit__` for resource management.
+- **How:** Manual review. For Pydantic models (per ADR-002), these are provided automatically. For non-Pydantic classes, check that protocol compliance matches usage context.
+- **Why:** Python's data model enables objects to participate in language protocols (iteration, comparison, context management). Not implementing relevant dunders forces callers into workarounds. (Sources: Ramalho [S8])
+- **Classification:** HUMAN
+
+### D2.3: Standard library collections
+
+- **What:** Use `defaultdict`, `Counter`, `deque`, `namedtuple` where appropriate. Use comprehensions for transformations. Avoid manual accumulation loops when a one-liner comprehension is clearer.
+- **How:** Manual review. Look for patterns like `d = {}; for x in items: if x not in d: d[x] = 0; d[x] += 1` that should be `Counter(items)`.
+- **Why:** Standard library collections are tested, optimized, and instantly recognizable to experienced Python developers. Reimplementing them is slower and harder to read. (Sources: Hettinger [S9], Ramalho [S8])
+- **Classification:** HUMAN
+
+### D2.4: Function size
+
+- **What:** Functions are at most 40 lines of logic (excluding docstrings, blank lines, and type annotations). Functions exceeding this threshold must be decomposed.
+- **How:** `ruff check --select C901` with `[tool.ruff.lint.mccabe] max-complexity = 10`. Manual review for functions under the complexity threshold but over 40 lines (long but simple).
+- **Why:** Long functions have multiple responsibilities, are hard to test in isolation, and force readers to hold too much context. The 40-line threshold aligns with Google's standard and fits on one screen. (Sources: Google Style Guide [S5], Augment [S15], Ruff C90 [S18])
+- **Classification:** BOTH (C901 complexity is TOOL; line count is HUMAN)
+
+### D2.5: Nesting depth
+
+- **What:** Maximum 3 levels of indentation within a function body. Use early returns, guard clauses, and extracted helper functions to flatten logic.
+- **How:** Manual review (Ruff does not enforce nesting depth directly). `wemake-python-styleguide` WPS220 can enforce this if adopted. Look for `if/for/if/for` patterns.
+- **Why:** "Flat is better than nested" (PEP 20). Deep nesting forces readers to track multiple conditions simultaneously, increasing cognitive load and bug likelihood. (Sources: PEP 20 [S1], wemake [S20])
+- **Classification:** HUMAN
+
+### D2.6: Domain naming
+
+- **What:** Variables, functions, classes, and modules use domain terminology. No generic names like `data`, `handler`, `processor`, `manager`, `item`, `result` unless in genuinely generic utility code.
+- **How:** Manual review. Check that names answer "what business concept does this represent?" not "what technical role does this play?"
+- **Why:** Generic names require reading the implementation to understand purpose. Domain names carry meaning: `backlog_item` vs `data_object`, `parse_jql_query` vs `process_input`. (Sources: DEV Community [S17], QuantifiedCode [S16])
+- **Classification:** HUMAN
+
+### D2.7: Comments explain WHY
+
+- **What:** Comments explain intent, constraints, trade-offs, or non-obvious decisions. No comments that restate the code (`# increment counter` above `counter += 1`). Inline comments are for "why this specific choice."
+- **How:** Manual review. Flag any comment that restates the next line of code. Check that non-obvious logic has a rationale comment.
+- **Why:** Code says "what." Comments should say "why." Obvious comments add noise, get stale, and signal that no human reviewed the code. (Sources: Google Style Guide [S5], Augment [S15], PEP 8 [S2])
+- **Classification:** HUMAN
+
+### D2.8: Modern Python syntax
+
+- **What:** Use `list[str]` not `List[str]`, `dict[str, int]` not `Dict[str, int]`, `X | None` not `Optional[X]`, `type Alias = X` not `Alias = TypeAlias`. Requires Python 3.10+ (raise-commons target).
+- **How:** `ruff check --select UP` (pyupgrade rules: UP006 deprecated typing imports, UP007 Optional to union). Pyright also flags deprecated forms.
+- **Why:** Modern syntax is shorter, requires no imports, and is the language direction. Old `from typing import List, Optional, Dict` is a tell that the code was generated from outdated patterns. (Sources: Meta Survey [S14], Augment [S15], Ruff UP rules [S18])
+- **Classification:** TOOL (UP rules + Pyright)
