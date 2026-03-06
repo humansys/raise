@@ -1,0 +1,101 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: "2026-03-06"
+story: S369.3
+epic: E369
+refs:
+  epic_scope: work/epics/e369-open-source-audit/scope.md
+  related_artifacts:
+    - work/epics/e369-open-source-audit/stories/s369.3-story.md
+    - work/epics/e369-open-source-audit/stories/s369.3-scope.md
+content:
+  summary: >
+    Add Python 3.13 to CI test matrix, verify CI badge URL resolves correctly,
+    and review release.yml for PyPI Trusted Publishers readiness.
+    Configuration-only changes to GitHub Actions workflows.
+  complexity: moderate
+  acceptance_criteria:
+    - id: AC-1
+      description: >
+        CI matrix includes both Python 3.12 and 3.13.
+      verifiable: true
+    - id: AC-2
+      description: >
+        CI badge URL in README resolves to a valid status page.
+      verifiable: true
+    - id: AC-3
+      description: >
+        Trusted Publishers requirements documented: what manual PyPI
+        configuration is needed to enable OIDC-based publishing.
+      verifiable: true
+    - id: AC-4
+      description: >
+        release.yml uses id-token: write permission (needed for
+        Trusted Publishers OIDC flow).
+      verifiable: true
+  integration_points:
+    - description: >
+        Badge URL must match workflow name. S369.1 may have changed
+        the README badge reference; verify consistency.
+  decisions:
+    - id: D-1
+      choice: >
+        Add 3.13 to matrix but do NOT make it required to pass initially.
+        If 3.13 fails, document and fix in a follow-up story.
+      rationale: >
+        Unblocks visibility into 3.13 compatibility without blocking
+        PRs on potential failures. Matches scope doc risk mitigation.
+      alternatives_considered:
+        - "Make 3.13 required immediately -- risk blocking PRs on unknown failures"
+        - "Skip 3.13 testing -- contradicts the 3.13 classifier added in S369.2"
+    - id: D-2
+      choice: >
+        Use continue-on-error for 3.13 in the matrix to make it
+        non-blocking while still visible.
+      rationale: >
+        GitHub Actions matrix strategy supports continue-on-error per
+        include entry. This lets 3.13 run and report without failing the
+        overall CI check.
+      alternatives_considered:
+        - "Separate workflow for 3.13 -- unnecessary complexity"
+        - "allow-failure via matrix.include -- same mechanism, less clear"
+    - id: D-3
+      choice: >
+        Document Trusted Publishers requirements in the story retrospective
+        rather than a separate ADR.
+      rationale: >
+        The requirements are a checklist of manual PyPI config steps,
+        not an architecture decision. Story retrospective is sufficient.
+      alternatives_considered:
+        - "Dedicated ADR -- overkill for a configuration checklist"
+  components:
+    - path: .github/workflows/ci.yml
+      action: modify
+      changes: >
+        Add "3.13" to python-version matrix. Add continue-on-error
+        for 3.13 via matrix include to keep it non-blocking.
+    - path: .github/workflows/release.yml
+      action: review
+      changes: >
+        Verify id-token: write permission is present (already there).
+        Verify pypi environment and gh-action-pypi-publish usage
+        are Trusted Publishers compatible. Document any gaps.
+    - path: README.md
+      action: verify
+      changes: >
+        Confirm badge URL matches workflow file name and resolves
+        to a valid GitHub Actions status page.
+metadata:
+  approach: >
+    1. Edit ci.yml: add 3.13 to matrix with continue-on-error.
+    2. Verify README badge URL resolves (workflow name = "CI", file = ci.yml).
+    3. Review release.yml against PyPI Trusted Publishers checklist.
+    4. Document Trusted Publishers requirements in retrospective.
+  no_code_changes: true
+  trusted_publishers_checklist:
+    - "id-token: write permission on publish job (PRESENT)"
+    - "environment: pypi configured on publish job (PRESENT)"
+    - "pypa/gh-action-pypi-publish@release/v1 used (PRESENT)"
+    - "MANUAL: Configure Trusted Publisher on PyPI project settings"
+    - "MANUAL: Add GitHub publisher with repo, workflow, environment"
