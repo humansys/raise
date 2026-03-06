@@ -12,9 +12,9 @@ import logging
 from datetime import UTC, datetime
 from pathlib import Path
 
-from rai_core.graph.backends.models import BackendHealth
-from rai_core.graph.backends.protocol import KnowledgeGraphBackend
-from rai_core.graph.engine import Graph
+from raise_core.graph.backends.models import BackendHealth
+from raise_core.graph.backends.protocol import KnowledgeGraphBackend
+from raise_core.graph.engine import Graph
 
 logger = logging.getLogger(__name__)
 

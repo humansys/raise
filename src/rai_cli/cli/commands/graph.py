@@ -32,8 +32,8 @@ from rai_cli.governance import Concept, ConceptType, GovernanceExtractor
 from rai_cli.graph.backends import get_active_backend
 from rai_cli.hooks.emitter import create_emitter
 from rai_cli.hooks.events import GraphBuildEvent
-from rai_core.graph.models import GraphEdge, GraphNode
-from rai_core.graph.query import (
+from raise_core.graph.models import GraphEdge, GraphNode
+from raise_core.graph.query import (
     ArchitecturalContext,
     Query,
     QueryEngine,

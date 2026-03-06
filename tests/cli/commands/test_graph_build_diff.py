@@ -14,9 +14,9 @@ from typer.testing import CliRunner
 
 from rai_cli.cli.main import app
 from rai_cli.context.diff import GraphDiff
-from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphNode
+from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphNode
 
 runner = CliRunner()
 

@@ -202,4 +202,4 @@ class BacklogItem(BaseModel):
     updated: str = Field(default="", description="ISO 8601 last update timestamp")
 
 
-# BackendHealth moved to rai_core.graph.backends.models (E275)
+# BackendHealth moved to raise_core.graph.backends.models (E275)

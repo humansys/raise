@@ -13,7 +13,7 @@ from typing import Any, cast
 
 import yaml
 
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 # Regex to match YAML frontmatter between --- markers
 FRONTMATTER_PATTERN = re.compile(r"^---\s*\n(.*?)\n---", re.DOTALL)

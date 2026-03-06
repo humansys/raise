@@ -17,8 +17,8 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import EdgeType, GraphNode, NodeType
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import EdgeType, GraphNode, NodeType
 
 # --- Scoring constants ---
 SCORING_HALF_LIFE_DAYS: int = 30

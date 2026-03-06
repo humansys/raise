@@ -13,7 +13,7 @@ import pytest
 
 from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
 from rai_cli.adapters.protocols import GovernanceParser
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 # --- Fixtures ---
 
