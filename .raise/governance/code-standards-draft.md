@@ -274,3 +274,116 @@ Classification:
 - **How:** `.importlinter` configuration in `pyproject.toml` with layered contracts. Run `lint-imports` in pre-commit and CI. Contracts define: `cli -> handlers -> engines -> core` with no reverse imports.
 - **Why:** Convention without enforcement decays. import-linter is simple (~6 lines of config), runs in seconds, and catches architectural violations at commit time. (Sources: import-linter [S19], Seddon blog [S19], ADR-001)
 - **Classification:** TOOL (import-linter)
+
+---
+
+## D5: Collaboration & Maintenance
+
+*Priority: Medium. Code is read more than written. These criteria ensure that contributions are sustainable and the codebase remains navigable.*
+
+### D5.1: Docstrings on public API
+
+- **What:** Every public module, class, function, and method has a docstring. Docstrings follow Google style with `Args:`, `Returns:`, and `Raises:` sections where applicable. Private functions (`_prefix`) may omit docstrings if the implementation is self-evident.
+- **How:** `ruff check --select D` (pydocstyle rules: D100-D107 missing docstrings, D200-D215 formatting). Manual review for content quality — docstrings that just restate the function name add no value.
+- **Why:** Docstrings are the primary documentation for library users. Args/Returns/Raises sections create a contract that IDE tooltips surface at the call site. (Sources: PEP 257 [S3], Google Style Guide [S5])
+- **Classification:** BOTH (D rules check presence; HUMAN checks quality and completeness)
+
+### D5.2: Import organization
+
+- **What:** Imports organized in three groups separated by blank lines: (1) standard library, (2) third-party packages, (3) local/project imports. No wildcard imports (`from x import *`). No unused imports.
+- **How:** `ruff check --select I` (isort rules for organization) + `ruff check --select F401` (unused imports). Ruff's formatter handles blank line separation automatically.
+- **Why:** Consistent import organization makes dependency scanning instant — a glance at the import block reveals what the module depends on. Wildcard imports pollute the namespace and hide actual dependencies. (Sources: PEP 8 [S2], Ruff I rules [S18])
+- **Classification:** TOOL (I + F401 rules)
+
+### D5.3: Test quality
+
+- **What:** Tests use specific assertions (`assert result.name == "expected"`, not `assert result is not None`). Test names describe behavior (`test_parse_jql_returns_empty_on_invalid_input`, not `test_parse`). Branch coverage >= 80%. Edge cases and error paths are tested, not just the happy path.
+- **How:** `pytest --cov --cov-branch` for coverage measurement. Manual review for assertion specificity and test naming. `ruff check --select PT` for pytest style (PT009 assertEqual -> assert, PT018 composite assertions).
+- **Why:** Vague assertions pass when the code is wrong. Behavior-spec naming makes test failures self-explanatory. Branch coverage ensures error handling and edge cases are exercised. (Sources: Augment [S15], Google [S5])
+- **Classification:** BOTH (coverage + PT rules are TOOL; assertion quality and naming are HUMAN)
+
+### D5.4: Commit discipline
+
+- **What:** Each commit represents one logical change. Commit messages follow conventional format (`feat:`, `fix:`, `refactor:`, `test:`, `docs:`). No mega-commits mixing features, fixes, and refactoring. Story commits reference the story ID.
+- **How:** Manual review of git log. Pre-commit hook can enforce message format. CI can reject commits without conventional prefix.
+- **Why:** Atomic commits enable `git bisect`, clean reverts, and meaningful changelogs. Mega-diffs are unreviewable and hide bugs in the noise. (Sources: DEV Community [S17], project convention)
+- **Classification:** BOTH (message format is TOOL via pre-commit; commit granularity is HUMAN)
+
+### D5.5: Pre-commit hooks
+
+- **What:** Pre-commit runs: Ruff format, Ruff lint, Pyright type check. CI additionally runs: tests, coverage, import-linter. No code reaches `dev` without passing all gates.
+- **How:** `.pre-commit-config.yaml` defines local hooks. CI pipeline configuration. `rai gate check --all` verifies all gates pass.
+- **Why:** Automated gates catch issues at the earliest possible point. A developer who runs `git commit` gets instant feedback, not a CI failure 5 minutes later. (Sources: Augment [S15], project convention)
+- **Classification:** TOOL (pre-commit + CI)
+
+### D5.6: Dependency justification
+
+- **What:** Every new third-party dependency added to `pyproject.toml` has a written rationale — either in the commit message, an ADR, or a comment in `pyproject.toml`. Dependencies must be actively maintained, have > 1000 GitHub stars or equivalent adoption evidence, and not duplicate existing functionality.
+- **How:** Manual review of `pyproject.toml` changes. Check that new dependencies are justified. `pip-audit` for known vulnerability scanning.
+- **Why:** Every dependency is a maintenance burden — security updates, breaking changes, transitive dependencies. The bar for adding one should be high. (Sources: Augment [S15])
+- **Classification:** HUMAN
+
+---
+
+## Appendix A: AI-Generated Code Tells
+
+*Patterns that signal "a machine wrote this, no human reviewed it." These are not errors per se, but their presence indicates lack of human judgment in the review process.*
+
+### A1: Excessive obvious comments
+
+- **Pattern:** Comments that restate the next line of code: `# Initialize the list` above `items = []`, `# Return the result` above `return result`.
+- **Detection:** Manual review. More than 2 restatement comments per function is a strong signal.
+- **Resolution:** Delete the comment. If the code needs explanation, explain WHY, not WHAT.
+
+### A2: Generic names without domain language
+
+- **Pattern:** Variables and functions named `data_handler`, `processed_item`, `result_value`, `input_data`, `output_list`, `temp_var`. No connection to the problem domain.
+- **Detection:** Manual review. Check: could this name appear in any codebase, or is it specific to ours?
+- **Resolution:** Rename using domain terminology: `backlog_item`, `jql_query`, `session_bundle`, `skill_definition`.
+
+### A3: Old typing syntax on Python 3.10+
+
+- **Pattern:** `from typing import List, Optional, Dict, Tuple, Set` when the project targets Python 3.10+. Use of `Optional[X]` instead of `X | None`.
+- **Detection:** `ruff check --select UP006,UP007`. Grep for `from typing import` with deprecated names.
+- **Resolution:** Replace with builtin generics (`list[str]`, `dict[str, int]`) and union syntax (`X | None`).
+
+### A4: Monolithic functions
+
+- **Pattern:** Functions exceeding 100 lines that fetch, transform, validate, and persist in a single body. Often with numbered comment sections (`# Step 1: ...`, `# Step 2: ...`).
+- **Detection:** `ruff check --select C901` (cyclomatic complexity). Manual review for long functions with section comments.
+- **Resolution:** Extract each step into a named function. The orchestrating function becomes a 10-line pipeline.
+
+### A5: Vague test assertions
+
+- **Pattern:** `assert result is not None`, `assert len(result) > 0`, `assert isinstance(result, dict)`. These pass for almost any non-trivial return value.
+- **Detection:** Manual review of test files. Grep for `is not None`, `> 0`, `isinstance` in assert statements.
+- **Resolution:** Assert specific values: `assert result.name == "expected_name"`, `assert len(result) == 3`, `assert result["key"] == "value"`.
+
+### A6: Suspiciously uniform structure
+
+- **Pattern:** Every class has exactly the same method layout. Every function has exactly one try/except. Every module has the same boilerplate. Real code has pragmatic compromises — some modules are simple, others complex.
+- **Detection:** Manual review. Compare several modules — if they are structurally identical despite different purposes, human judgment was not applied.
+- **Resolution:** Let each module's structure reflect its actual complexity. Simple modules should be short. Complex modules should have more structure. One size does not fit all.
+
+---
+
+## Appendix B: Summary
+
+| Dimension | Criteria | TOOL | HUMAN | BOTH |
+|-----------|----------|------|-------|------|
+| D1: Correctness & Safety | 7 | 3 | 1 | 3 |
+| D2: Readability & Idiom | 8 | 1 | 5 | 2 |
+| D3: Type Safety & API Surface | 8 | 3 | 4 | 1 |
+| D4: Architecture & Design | 8 | 2 | 4 | 2 |
+| D5: Collaboration & Maintenance | 6 | 2 | 1 | 3 |
+| **Total** | **37** | **11** | **15** | **11** |
+
+---
+
+## References
+
+- **Research report:** `work/research/code-quality-standards/code-quality-standards-report.md`
+- **Evidence catalog:** `work/research/code-quality-standards/sources/evidence-catalog.md` (24 sources, 8 triangulated claims)
+- **ADR-001:** `dev/decisions/adr-001-three-layer-architecture.md` (referenced in D4.1, D4.2, D4.8)
+- **ADR-002:** `dev/decisions/adr-002-pydantic-everywhere.md` (referenced in D3.8)
+- **Source notation:** [S1]-[S24] refer to the evidence catalog source index
