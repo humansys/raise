@@ -7,8 +7,8 @@ from pathlib import Path
 
 import pytest
 
-from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-from rai_core.graph.backends.protocol import KnowledgeGraphBackend
+from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+from raise_core.graph.backends.protocol import KnowledgeGraphBackend
 
 
 class TestGetActiveBackendFactory:

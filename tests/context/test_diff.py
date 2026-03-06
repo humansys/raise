@@ -7,8 +7,8 @@ impact classification, and affected_modules derivation.
 from __future__ import annotations
 
 from rai_cli.context.diff import GraphDiff, NodeChange, diff_graphs
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphNode
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphNode
 
 
 def _make_node(

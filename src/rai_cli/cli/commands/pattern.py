@@ -32,7 +32,7 @@ from rai_cli.memory import (
     reinforce_pattern,
 )
 from rai_cli.onboarding.profile import load_developer_profile
-from rai_core.graph.query import (
+from raise_core.graph.query import (
     SCORING_LOW_WILSON_THRESHOLD,
     wilson_lower_bound,
 )

@@ -29,9 +29,9 @@ from rai_cli.adapters.protocols import (
     GovernanceSchemaProvider,
     ProjectManagementAdapter,
 )
-from rai_core.graph.backends.models import BackendHealth
-from rai_core.graph.backends.protocol import KnowledgeGraphBackend
-from rai_core.graph.models import GraphNode
+from raise_core.graph.backends.models import BackendHealth
+from raise_core.graph.backends.protocol import KnowledgeGraphBackend
+from raise_core.graph.models import GraphNode
 
 # --- Conforming sync stubs (updated signatures) ---
 

@@ -23,7 +23,7 @@ from pydantic import BaseModel
 from rai_cli.graph.backends import get_active_backend
 from rai_cli.onboarding.profile import DeveloperProfile
 from rai_cli.schemas.session_state import SessionState
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
@@ -216,7 +216,7 @@ def _find_release_for_current_epic(
 
     try:
         from rai_cli.graph.backends import get_active_backend
-        from rai_core.graph.query import QueryEngine
+        from raise_core.graph.query import QueryEngine
 
         graph = get_active_backend(graph_path).load()
         engine = QueryEngine(graph)

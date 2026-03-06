@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphEdge, GraphNode
-from rai_core.graph.query import ArchitecturalContext, QueryEngine
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphEdge, GraphNode
+from raise_core.graph.query import ArchitecturalContext, QueryEngine
 
 # --- Fixtures ---
 

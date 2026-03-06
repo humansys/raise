@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from rai_core.graph.models import (
+from raise_core.graph.models import (
     CoreEdgeTypes,
     EpicNode,
     GraphEdge,

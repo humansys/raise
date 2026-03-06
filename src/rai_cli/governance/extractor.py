@@ -25,7 +25,7 @@ from rai_cli.governance.parsers.guardrails import extract_all_guardrails
 from rai_cli.governance.parsers.prd import extract_requirements
 from rai_cli.governance.parsers.roadmap import extract_releases
 from rai_cli.governance.parsers.vision import extract_outcomes
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
 
