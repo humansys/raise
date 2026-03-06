@@ -1,0 +1,122 @@
+---
+title: Getting Started
+description: Install RaiSE and run your first AI-assisted engineering session in under 5 minutes.
+---
+
+Get up and running with RaiSE in under 5 minutes.
+
+## Prerequisites
+
+- **Python 3.11+** — check with `python --version`
+- **pip** or **uv** — for package installation
+- **Claude Code** — RaiSE is designed to work with AI coding assistants. [Claude Code](https://docs.anthropic.com/en/docs/claude-code) is recommended.
+
+## Install
+
+```bash
+pip install raise-cli
+```
+
+Verify the installation:
+
+```bash
+raise --version
+```
+
+```
+raise-cli version 2.0.0
+```
+
+## Initialize a project
+
+Navigate to your project directory and run:
+
+```bash
+cd your-project
+raise init
+```
+
+This creates the `.raise/` directory with:
+
+- **Governance templates** — principles, requirements, and guardrails
+- **Memory structure** — patterns, calibration, and session tracking
+- **Manifest** — project metadata in `.raise/manifest.yaml`
+
+For existing projects, use `--detect` to automatically analyze your codebase conventions:
+
+```bash
+raise init --detect
+```
+
+## Set up your developer profile
+
+The first time you start a session, RaiSE creates your developer profile:
+
+```bash
+raise session start --name "Your Name" --project .
+```
+
+```
+▶ Session started (SES-001)
+Developer: Your Name
+```
+
+Your profile is stored at `~/.rai/developer.yaml` and persists across projects. It tracks your experience level, session history, and coaching data.
+
+## Your first session
+
+After the initial setup, start sessions with:
+
+```bash
+raise session start --project . --context
+```
+
+The `--context` flag outputs a token-optimized context bundle (~150 tokens) assembled from:
+
+- **Developer profile** — your name, experience level, session count
+- **Session state** — current epic/story, pending decisions, blockers
+- **Memory patterns** — learned patterns and governance primes
+
+Pass this context to your AI assistant at the start of each working session. It gives the assistant full awareness of where you are and what you're working on.
+
+## End a session
+
+When you're done working, close the session to capture what happened:
+
+```bash
+raise session close --summary "What I accomplished" --type feature --project .
+```
+
+This records the session in your telemetry and updates the session state for next time.
+
+## Build your memory
+
+As you work, RaiSE accumulates knowledge — patterns, calibration data, governance documents. Build the unified memory index to make it all queryable:
+
+```bash
+raise memory build
+```
+
+Then query it:
+
+```bash
+raise memory query "testing patterns"
+```
+
+```
+# Memory Query Results
+
+## Pattern (2)
+
+### BASE-018
+Tests alongside implementation, not after. Write the test, watch it fail,
+make it pass. Catches issues immediately.
+
+### PAT-042
+Use capsys for stdout tests in pytest. Cleaner than mocking print.
+```
+
+## What's next
+
+- Browse the [CLI Reference](/docs/cli/) for all commands, flags, and examples
+- Learn about [Core Concepts](/docs/concepts/) — Memory, Skills, Governance, Knowledge Graph *(coming soon)*
