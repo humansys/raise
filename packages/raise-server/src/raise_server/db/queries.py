@@ -12,7 +12,7 @@ from sqlalchemy import Result, delete, func, literal, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from rai_server.db.models import GraphEdgeRow, GraphNodeRow
+from raise_server.db.models import GraphEdgeRow, GraphNodeRow
 
 
 async def upsert_nodes(

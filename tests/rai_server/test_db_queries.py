@@ -37,7 +37,7 @@ class TestUpsertNodes:
     async def test_returns_created_and_updated_counts(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
-        from rai_server.db.queries import upsert_nodes
+        from raise_server.db.queries import upsert_nodes
 
         session = _mock_session()
         # Simulate: execute returns result with rowcount
@@ -71,7 +71,7 @@ class TestUpsertNodes:
 
     @pytest.mark.anyio()
     async def test_empty_nodes_is_noop(self, org_id: uuid.UUID, repo_id: str) -> None:
-        from rai_server.db.queries import upsert_nodes
+        from raise_server.db.queries import upsert_nodes
 
         session = _mock_session()
         result = await upsert_nodes(session, org_id, repo_id, [])
@@ -84,7 +84,7 @@ class TestReplaceEdges:
 
     @pytest.mark.anyio()
     async def test_deletes_then_inserts(self, org_id: uuid.UUID, repo_id: str) -> None:
-        from rai_server.db.queries import replace_edges
+        from raise_server.db.queries import replace_edges
 
         session = _mock_session()
         # First execute = delete, second = insert
@@ -120,7 +120,7 @@ class TestReplaceEdges:
     async def test_empty_edges_still_deletes_old(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
-        from rai_server.db.queries import replace_edges
+        from raise_server.db.queries import replace_edges
 
         session = _mock_session()
         delete_result = MagicMock()
@@ -139,7 +139,7 @@ class TestPruneOrphanNodes:
     async def test_deletes_nodes_not_in_keep_set(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
-        from rai_server.db.queries import prune_orphan_nodes
+        from raise_server.db.queries import prune_orphan_nodes
 
         session = _mock_session()
         mock_result = MagicMock()
@@ -155,7 +155,7 @@ class TestPruneOrphanNodes:
     async def test_empty_keep_set_deletes_all(
         self, org_id: uuid.UUID, repo_id: str
     ) -> None:
-        from rai_server.db.queries import prune_orphan_nodes
+        from raise_server.db.queries import prune_orphan_nodes
 
         session = _mock_session()
         mock_result = MagicMock()
@@ -171,7 +171,7 @@ class TestSearchNodes:
 
     @pytest.mark.anyio()
     async def test_returns_matching_nodes(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.queries import search_nodes
+        from raise_server.db.queries import search_nodes
 
         session = _mock_session()
         # Simulate rows returned
@@ -196,7 +196,7 @@ class TestSearchNodes:
 
     @pytest.mark.anyio()
     async def test_respects_limit(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.queries import search_nodes
+        from raise_server.db.queries import search_nodes
 
         session = _mock_session()
         mock_result = MagicMock()

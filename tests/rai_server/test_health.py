@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from rai_server.app import create_app
-from rai_server.config import ServerConfig
+from raise_server.app import create_app
+from raise_server.config import ServerConfig
 
 
 @pytest.fixture()
@@ -23,7 +23,7 @@ class TestHealthEndpoint:
 
     def test_health_returns_200(self, client: TestClient) -> None:
         with patch(
-            "rai_server.api.v1.health._check_db",
+            "raise_server.api.v1.health._check_db",
             new_callable=AsyncMock,
             return_value=True,
         ):
@@ -32,7 +32,7 @@ class TestHealthEndpoint:
 
     def test_health_body_when_db_connected(self, client: TestClient) -> None:
         with patch(
-            "rai_server.api.v1.health._check_db",
+            "raise_server.api.v1.health._check_db",
             new_callable=AsyncMock,
             return_value=True,
         ):
@@ -44,7 +44,7 @@ class TestHealthEndpoint:
 
     def test_health_body_when_db_disconnected(self, client: TestClient) -> None:
         with patch(
-            "rai_server.api.v1.health._check_db",
+            "raise_server.api.v1.health._check_db",
             new_callable=AsyncMock,
             return_value=False,
         ):

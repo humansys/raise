@@ -1,4 +1,4 @@
-"""Unit tests for rai_server DB models using SQLAlchemy inspection API.
+"""Unit tests for raise_server DB models using SQLAlchemy inspection API.
 
 No real database needed — tests validate model structure, columns,
 types, foreign keys, indexes, and constraints.
@@ -6,7 +6,7 @@ types, foreign keys, indexes, and constraints.
 
 from __future__ import annotations
 
-from rai_server.db.models import (
+from raise_server.db.models import (
     AgentEventRow,
     ApiKey,
     Base,

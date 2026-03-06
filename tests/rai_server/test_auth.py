@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, MagicMock
 import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
-from rai_server.auth import OrgContext, verify_api_key
+from raise_server.auth import OrgContext, verify_api_key
 
 
 @pytest.fixture()
@@ -34,7 +34,7 @@ def _make_client(
     key_exists: bool = True,
 ) -> TestClient:
     """Build a TestClient with mocked DB for auth tests."""
-    from rai_server.db.models import ApiKey, Organization
+    from raise_server.db.models import ApiKey, Organization
 
     app = FastAPI()
 
