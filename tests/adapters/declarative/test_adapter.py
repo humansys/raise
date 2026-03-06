@@ -592,3 +592,31 @@ class TestProtocolCompliance:
         bridge = _mock_bridge()
         adapter = _make_docs_adapter(bridge)
         assert isinstance(adapter, AsyncDocumentationTarget)
+
+
+class TestIsErrorPropagation:
+    """RAISE-472: DeclarativeMcpAdapter must raise McpBridgeError when result.is_error=True."""
+
+    def test_get_issue_raises_on_is_error(self) -> None:
+        from raise_cli.mcp.bridge import McpBridgeError
+
+        bridge = _mock_bridge()
+        bridge.call = AsyncMock(
+            return_value=McpToolResult(is_error=True, error_message="Jira client not available")
+        )
+        adapter = _make_adapter(bridge)
+
+        with pytest.raises(McpBridgeError, match="Jira client not available"):
+            asyncio.run(adapter.get_issue("RAISE-144"))
+
+    def test_search_raises_on_is_error(self) -> None:
+        from raise_cli.mcp.bridge import McpBridgeError
+
+        bridge = _mock_bridge()
+        bridge.call = AsyncMock(
+            return_value=McpToolResult(is_error=True, error_message="Invalid JQL")
+        )
+        adapter = _make_adapter(bridge)
+
+        with pytest.raises(McpBridgeError, match="Invalid JQL"):
+            asyncio.run(adapter.search('project = "RAISE"'))
