@@ -1238,7 +1238,7 @@ wheels = [
 
 [[package]]
 name = "raise-cli"
-version = "2.2.0"
+version = "2.2.1"
 source = { editable = "." }
 dependencies = [
     { name = "atlassian-python-api" },
@@ -1320,7 +1320,7 @@ provides-extras = ["dev", "mcp", "observability", "csharp"]
 
 [[package]]
 name = "raise-core"
-version = "2.1.0"
+version = "2.2.1"
 source = { editable = "packages/raise-core" }
 dependencies = [
     { name = "networkx" },
@@ -1335,7 +1335,7 @@ requires-dist = [
 
 [[package]]
 name = "raise-server"
-version = "0.1.0"
+version = "2.2.1"
 source = { editable = "packages/raise-server" }
 dependencies = [
     { name = "alembic" },
