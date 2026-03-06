@@ -73,8 +73,8 @@ csharp = [
 [project.urls]
 Homepage = "https://raiseframework.ai"
 Documentation = "https://docs.raiseframework.ai"
-Repository = "https://github.com/humansys-ai/raise-commons"
-Changelog = "https://github.com/humansys-ai/raise-commons/blob/main/CHANGELOG.md"
+Repository = "https://github.com/humansys/raise"
+Changelog = "https://github.com/humansys/raise/blob/main/CHANGELOG.md"
 
 [project.scripts]
 rai = "raise_cli.cli.main:app"

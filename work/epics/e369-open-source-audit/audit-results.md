@@ -61,7 +61,7 @@ SECURITY, CHANGELOG, LICENSE y CODE_OF_CONDUCT.
 | 1 | CONTRIBUTING.md | Nombre viejo del paquete: `rai-cli` | Cambiado a `raise-cli` |
 | 2 | CONTRIBUTING.md | Ruta vieja: `src/rai_cli/` | Cambiada a `src/raise_cli/` |
 | 3 | SECURITY.md | Tabla de versiones decia "2.0.0-alpha.x" | Actualizada a "2.x" |
-| 4 | CHANGELOG.md | 8 URLs de comparacion apuntaban a `humansys/raise` | Corregidas a `humansys-ai/raise-commons` |
+| 4 | CHANGELOG.md | 8 URLs de comparacion apuntaban a `humansys/raise` | Corregidas a `humansys/raise` |
 | 5-8 | CHANGELOG.md | 4 lineas en blanco faltantes entre versiones | Agregadas |
 | 9 | README.md | Sin badge de CI | Agregado badge de GitHub Actions |
 | 10 | README.md | Claim de compatibilidad con Python 3.14 | Verificado como preciso |
