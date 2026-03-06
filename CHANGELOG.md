@@ -34,7 +34,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Documentation site restructured: multi-file CLI reference with workflow ordering
-- Docs deployed to docs.raiseframework.ai via Cloudflare Pages## [2.1.0] - 2026-02-24
+- Docs deployed to docs.raiseframework.ai via Cloudflare Pages
+
+## [2.1.0] - 2026-02-24
 
 ### Added
 - Skill Excellence (E250): 27 ADR-040 compliant skills, ~65% line reduction across all skill definitions
@@ -80,7 +82,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Guardrails template: remove hardcoded Python guardrail from base template
 - `rai skill list`: 4 skills with non-standard `work_cycle` values now visible; defensive formatter fallback (RAISE-216)
 - `AGENTS.md`: cross-IDE compatible session-start instruction (RAISE-217)
-- `rai init`: warn when brownfield governance docs are empty after init (RAISE-220)## [2.0.2] - 2026-02-19
+- `rai init`: warn when brownfield governance docs are empty after init (RAISE-220)
+
+## [2.0.2] - 2026-02-19
 
 ### Added
 - Neurosymbolic Memory Density epic (RAISE-168): temporal decay scoring, Wilson confidence, pattern reinforcement via `rai memory reinforce`
@@ -121,7 +125,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Bidirectional JIRA sync: `rai backlog pull/push/status/auth` commands (PRO)
 
 ### Fixed
-- PRO import guards: all `rai backlog` commands show clear "requires rai-pro" message instead of ImportError## [2.0.0a8] - 2026-02-14
+- PRO import guards: all `rai backlog` commands show clear "requires rai-pro" message instead of ImportError
+
+## [2.0.0a8] - 2026-02-14
 
 ### Added
 - Session narrative for cross-session memory continuity (HF-1)
@@ -130,7 +136,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - PEP 440 version compliance (`2.0.0a7` format)
-- Version sync between pyproject.toml and __init__.py## [2.0.0a6] - 2026-02-12
+- Version sync between pyproject.toml and __init__.py
+
+## [2.0.0a6] - 2026-02-12
 
 ### Added
 - Initial public release of raise-cli
@@ -143,11 +151,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys/raise/compare/v2.2.0...HEAD
-[2.2.0]: https://github.com/humansys/raise/compare/v2.1.0...v2.2.0
-[2.1.0]: https://github.com/humansys/raise/compare/v2.0.4...v2.1.0
-[2.0.4]: https://github.com/humansys/raise/compare/v2.0.3...v2.0.4
-[2.0.3]: https://github.com/humansys/raise/compare/v2.0.0a9...v2.0.3
-[2.0.0a9]: https://github.com/humansys/raise/compare/v2.0.0a8...v2.0.0a9
-[2.0.0a8]: https://github.com/humansys/raise/compare/v2.0.0a6...v2.0.0a8
-[2.0.0a6]: https://github.com/humansys/raise/releases/tag/v2.0.0a6
+[Unreleased]: https://github.com/humansys-ai/raise-commons/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/humansys-ai/raise-commons/compare/v2.1.0...v2.2.0
+[2.1.0]: https://github.com/humansys-ai/raise-commons/compare/v2.0.4...v2.1.0
+[2.0.4]: https://github.com/humansys-ai/raise-commons/compare/v2.0.3...v2.0.4
+[2.0.3]: https://github.com/humansys-ai/raise-commons/compare/v2.0.0a9...v2.0.3
+[2.0.0a9]: https://github.com/humansys-ai/raise-commons/compare/v2.0.0a8...v2.0.0a9
+[2.0.0a8]: https://github.com/humansys-ai/raise-commons/compare/v2.0.0a6...v2.0.0a8
+[2.0.0a6]: https://github.com/humansys-ai/raise-commons/releases/tag/v2.0.0a6
