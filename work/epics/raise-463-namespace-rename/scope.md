@@ -31,6 +31,63 @@ collision with Robotec.AI's `rai-core`. CLI command remains `rai`.
 - [ ] S463.4: Config and CI (S) — root pyproject.toml, uv.lock, CI workflows, docker-compose, README, CHANGELOG, skills, dev docs. Depends: S463.1-3
 - [ ] S463.5: Validate and publish (S) — full test suite, type check, lint, bump to 2.2.1, PyPI publish (core → server → cli). Depends: S463.4
 
+## Implementation Plan
+
+### Sequencing Strategy: Dependency-driven
+
+Linear sequence — each package rename must complete before the next can start,
+because packages import each other. No parallelism possible.
+
+### Sequence
+
+| # | Story | Size | Rationale | Enables |
+|---|-------|------|-----------|---------|
+| 1 | S463.1: Rename raise-core | S | No deps, foundation for all others | S463.2, S463.3 |
+| 2 | S463.2: Rename raise-server | S | Depends on core, small surface | S463.4 |
+| 3 | S463.3: Rename raise-cli | M | Largest surface (197 src, 329 mocks), depends on core | S463.4 |
+| 4 | S463.4: Config and CI | S | All renames done, wire up tooling | S463.5 |
+| 5 | S463.5: Validate and publish | S | Final gate before release | Epic done |
+
+Note: S463.2 and S463.3 could theoretically run in parallel (both depend only
+on S463.1), but the shared pyproject.toml and uv workspace make sequential
+safer — avoids merge conflicts in config files.
+
+### Milestones
+
+**M1: Core renamed (after S463.1)**
+- `from raise_core.graph.models import GraphNode` works
+- Core tests pass in isolation
+- Proves the rename strategy works at small scale
+
+**M2: All packages renamed (after S463.3)**
+- All source uses `raise_*` namespaces
+- `uv run rai --version` works (smoke test)
+- No `rai_cli`/`rai_core`/`rai_server` imports in src/
+
+**M3: Epic complete (after S463.5)**
+- Full test suite green (3699+)
+- Type checks + lint pass
+- v2.2.1 published on PyPI (raise-core, raise-server, raise-cli)
+
+### Progress Tracking
+
+| Story | Status | Notes |
+|-------|--------|-------|
+| S463.1 raise-core | Pending | |
+| S463.2 raise-server | Pending | |
+| S463.3 raise-cli | Pending | |
+| S463.4 Config/CI | Pending | |
+| S463.5 Validate/publish | Pending | |
+
+### Sequencing Risks
+
+1. **Shared pyproject.toml contention** — root pyproject.toml references all 3 packages.
+   Mitigation: update root config in S463.4, not per-story.
+2. **uv workspace resolution** — renaming workspace members may confuse uv cache.
+   Mitigation: `uv cache clean` + `uv lock` after each rename.
+3. **329 mock paths** — bulk sed could miss edge cases (string concatenation, f-strings).
+   Mitigation: run full test suite after S463.3, fix stragglers manually.
+
 ## Done Criteria
 
 1. `from raise_core.graph.models import GraphNode` works
