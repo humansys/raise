@@ -78,7 +78,7 @@ class RaiSyncMetadata(BaseModel):
         last_sync_at: Last sync timestamp (ISO 8601 UTC)
         sync_version: Schema version for evolution (default: "1")
         rai_branch: Git branch (e.g., demo/atlassian-webinar)
-        local_path: Local project path (e.g., /home/emilio/Code/raise-commons)
+        local_path: Local project path (e.g., /path/to/project)
         task_status: Task workflow state (for subtasks)
         task_blocked: Is task blocked? (for subtasks)
         estimated_sp: Story points estimate (for subtasks)
