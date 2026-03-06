@@ -16,7 +16,7 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
-from rai_cli.doctor.models import CheckResult
+from raise_cli.doctor.models import CheckResult
 
 FIX_REGISTRY: dict[str, Callable[[Path], bool]] = {}
 
@@ -35,7 +35,7 @@ def register_fix(fix_id: str) -> Callable[[Callable[[Path], bool]], Callable[[Pa
 def rebuild_graph(working_dir: Path) -> bool:
     """Rebuild the knowledge graph by invoking ``rai graph build``."""
     result = subprocess.run(
-        [sys.executable, "-m", "rai_cli", "graph", "build"],
+        [sys.executable, "-m", "raise_cli", "graph", "build"],
         cwd=working_dir,
         capture_output=True,
         text=True,

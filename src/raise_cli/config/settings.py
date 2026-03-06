@@ -26,7 +26,7 @@ if sys.version_info >= (3, 11):  # noqa: UP036
 else:
     import tomli as tomllib
 
-from rai_cli.config.paths import get_config_dir
+from raise_cli.config.paths import get_config_dir
 
 
 class TomlConfigSource(PydanticBaseSettingsSource):

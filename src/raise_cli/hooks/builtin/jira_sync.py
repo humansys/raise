@@ -20,7 +20,7 @@ from typing import ClassVar
 
 import yaml
 
-from rai_cli.hooks.events import HookEvent, HookResult, WorkCloseEvent, WorkStartEvent
+from raise_cli.hooks.events import HookEvent, HookResult, WorkCloseEvent, WorkStartEvent
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +110,7 @@ class JiraSyncHook:
 
         # 6. Call adapter
         try:
-            from rai_cli.cli.commands._resolve import resolve_adapter
+            from raise_cli.cli.commands._resolve import resolve_adapter
 
             adapter = resolve_adapter(None)
             adapter.transition_issue(event.issue_key, status_name)

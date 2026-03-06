@@ -1,9 +1,9 @@
 """Typed skill artifacts: models, validation, and YAML storage."""
 
-from rai_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
-from rai_cli.artifacts.reader import read_all_artifacts, read_artifact
-from rai_cli.artifacts.renderer import render_artifact
-from rai_cli.artifacts.story_design import (
+from raise_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
+from raise_cli.artifacts.reader import read_all_artifacts, read_artifact
+from raise_cli.artifacts.renderer import render_artifact
+from raise_cli.artifacts.story_design import (
     AcceptanceCriterion,
     Complexity,
     Decision,
@@ -11,7 +11,7 @@ from rai_cli.artifacts.story_design import (
     StoryDesignArtifact,
     StoryDesignContent,
 )
-from rai_cli.artifacts.writer import write_artifact
+from raise_cli.artifacts.writer import write_artifact
 
 __all__ = [
     "AcceptanceCriterion",

@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any
 from rich.console import Console
 
 if TYPE_CHECKING:
-    from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
+    from raise_cli.adapters.declarative.schema import DeclarativeAdapterConfig
 
 
 def format_list_human(

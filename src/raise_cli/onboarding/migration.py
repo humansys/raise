@@ -12,8 +12,8 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from rai_cli.config.paths import get_memory_dir
-from rai_cli.onboarding.profile import (
+from raise_cli.config.paths import get_memory_dir
+from raise_cli.onboarding.profile import (
     CommunicationPreferences,
     CommunicationStyle,
     DeveloperProfile,

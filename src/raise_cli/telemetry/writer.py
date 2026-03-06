@@ -16,8 +16,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-from rai_cli.compat import file_lock, file_unlock
-from rai_cli.config.paths import (
+from raise_cli.compat import file_lock, file_unlock
+from raise_cli.config.paths import (
     SIGNALS_FILE,
     TELEMETRY_SUBDIR,
     get_personal_dir,
@@ -25,7 +25,7 @@ from rai_cli.config.paths import (
 )
 
 if TYPE_CHECKING:
-    from rai_cli.telemetry.schemas import Signal
+    from raise_cli.telemetry.schemas import Signal
 
 # Type alias for skill event types (matches SkillEvent.event)
 SkillEventType = Literal["start", "complete", "abandon"]
@@ -144,7 +144,7 @@ def emit_skill_event(
     Returns:
         EmitResult with success status.
     """
-    from rai_cli.telemetry.schemas import SkillEvent
+    from raise_cli.telemetry.schemas import SkillEvent
 
     signal = SkillEvent(
         timestamp=datetime.now(UTC),
@@ -173,7 +173,7 @@ def emit_command_usage(
     Returns:
         EmitResult with success status.
     """
-    from rai_cli.telemetry.schemas import CommandUsage
+    from raise_cli.telemetry.schemas import CommandUsage
 
     signal = CommandUsage(
         timestamp=datetime.now(UTC),
@@ -205,7 +205,7 @@ def emit_error_event(
     Returns:
         EmitResult with success status.
     """
-    from rai_cli.telemetry.schemas import ErrorEvent
+    from raise_cli.telemetry.schemas import ErrorEvent
 
     signal = ErrorEvent(
         timestamp=datetime.now(UTC),

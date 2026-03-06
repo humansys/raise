@@ -11,7 +11,7 @@ from datetime import date
 from pathlib import Path
 from typing import Any
 
-from rai_cli.memory.models import (
+from raise_cli.memory.models import (
     MemoryConcept,
     MemoryConceptType,
     MemoryLoadResult,

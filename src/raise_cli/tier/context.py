@@ -97,7 +97,7 @@ class TierContext(BaseModel):
 
         Falls back to COMMUNITY if no manifest or no tier section.
         """
-        from rai_cli.onboarding.manifest import load_manifest
+        from raise_cli.onboarding.manifest import load_manifest
 
         manifest = load_manifest(project_root)
         if manifest is None or manifest.tier is None:

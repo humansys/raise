@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 
-from rai_cli.core.files import EXCLUDED_DIRS, should_exclude_dir
+from raise_cli.core.files import EXCLUDED_DIRS, should_exclude_dir
 
 # Re-export for backward compatibility
 __all__ = [

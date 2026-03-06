@@ -11,9 +11,9 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
-from rai_cli.doctor.models import CheckStatus, DoctorContext
-from rai_cli.doctor.registry import CheckRegistry
-from rai_cli.doctor.runner import PIPELINE_ORDER, run_checks, summarize
+from raise_cli.doctor.models import CheckStatus, DoctorContext
+from raise_cli.doctor.registry import CheckRegistry
+from raise_cli.doctor.runner import PIPELINE_ORDER, run_checks, summarize
 
 doctor_app = typer.Typer(
     name="doctor",
@@ -129,7 +129,7 @@ def doctor(
     if fix:
         fixable = [r for r in results if r.fix_id and r.status != CheckStatus.PASS]
         if fixable:
-            from rai_cli.doctor.fix import run_fixes
+            from raise_cli.doctor.fix import run_fixes
 
             out = Console()
             outcomes = run_fixes(fixable, Path.cwd())
@@ -148,7 +148,7 @@ def report(
     ] = False,
 ) -> None:
     """Generate diagnostic report, optionally send via email."""
-    from rai_cli.doctor.report import (
+    from raise_cli.doctor.report import (
         SUPPORT_EMAIL,
         generate_report,
         open_mailto,

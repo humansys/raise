@@ -16,8 +16,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from rai_cli.memory.writer import WriteResult, get_next_id
-from rai_cli.schemas.journal import JournalEntry, JournalEntryType
+from raise_cli.memory.writer import WriteResult, get_next_id
+from raise_cli.schemas.journal import JournalEntry, JournalEntryType
 
 JOURNAL_FILE = "journal.jsonl"
 

@@ -19,11 +19,11 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FuturesTimeoutError
 from typing import TYPE_CHECKING
 
-from rai_cli.hooks.events import EmitResult, HookEvent, HookResult
-from rai_cli.hooks.protocol import LifecycleHook
+from raise_cli.hooks.events import EmitResult, HookEvent, HookResult
+from raise_cli.hooks.protocol import LifecycleHook
 
 if TYPE_CHECKING:
-    from rai_cli.hooks.registry import HookRegistry
+    from raise_cli.hooks.registry import HookRegistry
 
 logger = logging.getLogger(__name__)
 
@@ -177,7 +177,7 @@ def create_emitter() -> EventEmitter:
     Convenience factory that avoids repeating registry setup in every
     CLI command. Discovers hooks from ``rai.hooks`` entry points.
     """
-    from rai_cli.hooks.registry import HookRegistry
+    from raise_cli.hooks.registry import HookRegistry
 
     registry = HookRegistry()
     registry.discover()

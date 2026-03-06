@@ -20,10 +20,10 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from rai_cli.cli.error_handler import cli_error
-from rai_cli.graph.backends import get_active_backend
-from rai_cli.publish.check import CheckResult, run_checks
-from rai_cli.publish.version import (
+from raise_cli.cli.error_handler import cli_error
+from raise_cli.graph.backends import get_active_backend
+from raise_cli.publish.check import CheckResult, run_checks
+from raise_cli.publish.version import (
     BumpType,
     bump_version,
     is_pep440,
@@ -46,7 +46,7 @@ def _find_project_paths(project: Path) -> tuple[Path, Path, Path]:
     """Find pyproject.toml, __init__.py, and CHANGELOG.md paths."""
     pyproject_path = project / "pyproject.toml"
     changelog_path = project / "CHANGELOG.md"
-    init_path = project / "src" / "rai_cli" / "__init__.py"
+    init_path = project / "src" / "raise_cli" / "__init__.py"
     return pyproject_path, init_path, changelog_path
 
 
@@ -295,7 +295,7 @@ def publish_command(
 
     # 3: Update changelog
     if changelog_path.exists():
-        from rai_cli.publish.changelog import promote_unreleased
+        from raise_cli.publish.changelog import promote_unreleased
 
         content = changelog_path.read_text(encoding="utf-8")
         try:

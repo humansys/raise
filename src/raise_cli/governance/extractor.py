@@ -12,19 +12,19 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
-from rai_cli.governance.models import Concept, ConceptType, ExtractionResult
+from raise_cli.adapters.models import ArtifactLocator, CoreArtifactType
+from raise_cli.governance.models import Concept, ConceptType, ExtractionResult
 
 # Legacy imports — used only by extract_with_result() and extract_from_file()
-from rai_cli.governance.parsers.adr import extract_all_decisions
-from rai_cli.governance.parsers.backlog import extract_epics, extract_project
-from rai_cli.governance.parsers.constitution import extract_principles
-from rai_cli.governance.parsers.epic import extract_epic_details, extract_stories
-from rai_cli.governance.parsers.glossary import extract_all_terms
-from rai_cli.governance.parsers.guardrails import extract_all_guardrails
-from rai_cli.governance.parsers.prd import extract_requirements
-from rai_cli.governance.parsers.roadmap import extract_releases
-from rai_cli.governance.parsers.vision import extract_outcomes
+from raise_cli.governance.parsers.adr import extract_all_decisions
+from raise_cli.governance.parsers.backlog import extract_epics, extract_project
+from raise_cli.governance.parsers.constitution import extract_principles
+from raise_cli.governance.parsers.epic import extract_epic_details, extract_stories
+from raise_cli.governance.parsers.glossary import extract_all_terms
+from raise_cli.governance.parsers.guardrails import extract_all_guardrails
+from raise_cli.governance.parsers.prd import extract_requirements
+from raise_cli.governance.parsers.roadmap import extract_releases
+from raise_cli.governance.parsers.vision import extract_outcomes
 from raise_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
@@ -182,7 +182,7 @@ class GovernanceExtractor:
         if self._parser_classes is not None:
             return self._parser_classes
 
-        from rai_cli.adapters.registry import get_governance_parsers
+        from raise_cli.adapters.registry import get_governance_parsers
 
         return get_governance_parsers()
 

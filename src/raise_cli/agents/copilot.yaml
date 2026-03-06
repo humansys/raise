@@ -5,4 +5,4 @@ skills_dir: .github/agents
 workflows_dir: .github/prompts
 detection_markers:
   - .github/copilot-instructions.md
-plugin: rai_cli.agents.copilot_plugin
+plugin: raise_cli.agents.copilot_plugin

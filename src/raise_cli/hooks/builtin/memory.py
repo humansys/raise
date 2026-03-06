@@ -16,13 +16,13 @@ import logging
 from pathlib import Path
 from typing import ClassVar
 
-from rai_cli.config.paths import (
+from raise_cli.config.paths import (
     get_claude_memory_path,
     get_framework_dir,
     get_memory_dir,
 )
-from rai_cli.hooks.events import GraphBuildEvent, HookEvent, HookResult
-from rai_cli.onboarding.memory_md import generate_memory_md
+from raise_cli.hooks.events import GraphBuildEvent, HookEvent, HookResult
+from raise_cli.onboarding.memory_md import generate_memory_md
 
 logger = logging.getLogger(__name__)
 
@@ -105,7 +105,7 @@ class MemoryMdSyncHook:
         dev_branch = "main"
 
         try:
-            from rai_cli.onboarding.manifest import load_manifest
+            from raise_cli.onboarding.manifest import load_manifest
 
             manifest = load_manifest(Path(str(project_path)))
             if manifest is not None:

@@ -15,9 +15,9 @@ from __future__ import annotations
 import logging
 from typing import ClassVar
 
-from rai_cli.gates.models import GateContext, GateResult
-from rai_cli.gates.registry import GateRegistry
-from rai_cli.hooks.events import HookEvent, HookResult
+from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.registry import GateRegistry
+from raise_cli.hooks.events import HookEvent, HookResult
 
 logger = logging.getLogger(__name__)
 

@@ -5,8 +5,8 @@ Re-exports graph domain types from raise_core and local context components.
 
 from __future__ import annotations
 
-from rai_cli.context.builder import GraphBuilder
-from rai_cli.context.diff import GraphDiff, NodeChange, diff_graphs
+from raise_cli.context.builder import GraphBuilder
+from raise_cli.context.diff import GraphDiff, NodeChange, diff_graphs
 from raise_core.graph.engine import Graph
 from raise_core.graph.models import (
     CoreEdgeTypes,

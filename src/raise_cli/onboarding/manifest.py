@@ -14,9 +14,9 @@ from typing import Any, cast
 import yaml
 from pydantic import BaseModel, Field, ValidationError, model_validator
 
-from rai_cli.config.ide import IdeType
-from rai_cli.config.paths import MANIFEST_FILE, get_raise_dir
-from rai_cli.onboarding.detection import ProjectType
+from raise_cli.config.ide import IdeType
+from raise_cli.config.paths import MANIFEST_FILE, get_raise_dir
+from raise_cli.onboarding.detection import ProjectType
 
 logger = logging.getLogger(__name__)
 

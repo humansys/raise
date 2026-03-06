@@ -26,6 +26,6 @@ def show() -> None:
     _stderr_console.print(
         "[yellow]DEPRECATED:[/yellow] 'rai base show' → use 'rai info' instead",
     )
-    from rai_cli.cli.commands.info import info_command
+    from raise_cli.cli.commands.info import info_command
 
     info_command()

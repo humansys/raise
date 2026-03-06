@@ -18,9 +18,9 @@ from typing import Annotated, Any
 import typer
 from rich.console import Console
 
-from rai_cli.adapters.models import IssueSpec
-from rai_cli.backlog.sync import sync_backlog
-from rai_cli.cli.commands._resolve import resolve_adapter
+from raise_cli.adapters.models import IssueSpec
+from raise_cli.backlog.sync import sync_backlog
+from raise_cli.cli.commands._resolve import resolve_adapter
 
 backlog_app = typer.Typer(
     name="backlog",

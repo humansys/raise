@@ -2,7 +2,7 @@
 
 Discovers adapter implementations registered via Python entry points
 (``[project.entry-points]`` in pyproject.toml). Each group maps to a
-Protocol contract from ``rai_cli.adapters.protocols``.
+Protocol contract from ``raise_cli.adapters.protocols``.
 
 Trust model: entry point loading inherits the ``pip install`` trust boundary.
 If a package is installed in the environment, its entry points are trusted.

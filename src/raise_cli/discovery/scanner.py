@@ -6,7 +6,7 @@ from source files. Supports:
 - TypeScript/JavaScript (via tree-sitter)
 
 Example:
-    >>> from rai_cli.discovery.scanner import extract_python_symbols
+    >>> from raise_cli.discovery.scanner import extract_python_symbols
     >>> symbols = extract_python_symbols("class Foo: pass", "example.py")
     >>> symbols[0].name
     'Foo'
@@ -20,7 +20,7 @@ from typing import TYPE_CHECKING, Literal
 
 from pydantic import BaseModel, Field
 
-from rai_cli.compat import portable_path
+from raise_cli.compat import portable_path
 
 if TYPE_CHECKING:
     from tree_sitter import Node, Parser

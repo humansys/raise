@@ -24,35 +24,35 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
-from rai_cli.config.agent_registry import AgentRegistry, load_registry
-from rai_cli.config.agents import AgentChoice, AgentConfig
-from rai_cli.hooks.emitter import create_emitter
-from rai_cli.hooks.events import InitCompleteEvent
-from rai_cli.onboarding.bootstrap import BootstrapResult
-from rai_cli.onboarding.conventions import detect_conventions
-from rai_cli.onboarding.detection import ProjectType, detect_project_type
-from rai_cli.onboarding.governance import GovernanceScaffoldResult, generate_guardrails
-from rai_cli.onboarding.instructions import generate_instructions
-from rai_cli.onboarding.manifest import (
+from raise_cli.config.agent_registry import AgentRegistry, load_registry
+from raise_cli.config.agents import AgentChoice, AgentConfig
+from raise_cli.hooks.emitter import create_emitter
+from raise_cli.hooks.events import InitCompleteEvent
+from raise_cli.onboarding.bootstrap import BootstrapResult
+from raise_cli.onboarding.conventions import detect_conventions
+from raise_cli.onboarding.detection import ProjectType, detect_project_type
+from raise_cli.onboarding.governance import GovernanceScaffoldResult, generate_guardrails
+from raise_cli.onboarding.instructions import generate_instructions
+from raise_cli.onboarding.manifest import (
     AgentsManifest,
     ProjectInfo,
     ProjectManifest,
     save_manifest,
 )
-from rai_cli.onboarding.profile import (
+from raise_cli.onboarding.profile import (
     DeveloperProfile,
     ExperienceLevel,
     load_developer_profile,
     save_developer_profile,
 )
-from rai_cli.onboarding.skills import SkillScaffoldResult
+from raise_cli.onboarding.skills import SkillScaffoldResult
 
 console = Console()
 
 
 def _print_skill_sync_summary(result: SkillScaffoldResult) -> None:
     """Print a summary table of skill sync actions."""
-    from rai_cli.skills_base import __version__ as cli_version
+    from raise_cli.skills_base import __version__ as cli_version
 
     console.print(f"\n[bold]Skill sync: rai-cli {cli_version}[/bold]\n")
 
@@ -222,7 +222,7 @@ def _get_project_message(
                 if bootstrap_result.patterns_copied:
                     from importlib.resources import files as _res_files
 
-                    _base = _res_files("rai_cli.rai_base")
+                    _base = _res_files("raise_cli.rai_base")
                     _src = _base / "memory" / "patterns-base.jsonl"
                     _count = len([
                         ln for ln in _src.read_text(encoding="utf-8").strip().splitlines()
@@ -561,22 +561,22 @@ def init_command(
     save_manifest(manifest, project_path)
 
     # Bootstrap Rai base assets (once, agent-agnostic)
-    from rai_cli.onboarding.bootstrap import bootstrap_rai_base
+    from raise_cli.onboarding.bootstrap import bootstrap_rai_base
 
     bootstrap_result = bootstrap_rai_base(project_path)
 
     # Scaffold governance templates (once)
-    from rai_cli.onboarding.governance import scaffold_governance
+    from raise_cli.onboarding.governance import scaffold_governance
 
     governance_result = scaffold_governance(project_path, project_name)
 
     # Generate MEMORY.md canonical copy
-    from rai_cli.config.paths import (
+    from raise_cli.config.paths import (
         get_claude_memory_path,
         get_framework_dir,
         get_memory_dir,
     )
-    from rai_cli.onboarding.memory_md import generate_memory_md
+    from raise_cli.onboarding.memory_md import generate_memory_md
 
     methodology_path = get_framework_dir(project_path) / "methodology.yaml"
     patterns_path = get_memory_dir(project_path) / "patterns.jsonl"
@@ -594,8 +594,8 @@ def init_command(
     first_config = registry.get_config(valid_agent_types[0])
     first_skills_result = None
 
-    from rai_cli.onboarding.skills import scaffold_skills
-    from rai_cli.onboarding.workflows import scaffold_workflows
+    from raise_cli.onboarding.skills import scaffold_skills
+    from raise_cli.onboarding.workflows import scaffold_workflows
 
     for agent_type in valid_agent_types:
         config = registry.get_config(agent_type)

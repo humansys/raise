@@ -20,9 +20,9 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from rai_cli.graph.backends import get_active_backend
-from rai_cli.onboarding.profile import DeveloperProfile
-from rai_cli.schemas.session_state import SessionState
+from raise_cli.graph.backends import get_active_backend
+from raise_cli.onboarding.profile import DeveloperProfile
+from raise_cli.schemas.session_state import SessionState
 from raise_core.graph.models import GraphNode
 
 logger = logging.getLogger(__name__)
@@ -73,9 +73,9 @@ def _query_adapter(
     from concurrent.futures import ThreadPoolExecutor
     from concurrent.futures import TimeoutError as FuturesTimeoutError
 
-    from rai_cli.adapters.models import IssueDetail
-    from rai_cli.adapters.protocols import ProjectManagementAdapter
-    from rai_cli.cli.commands._resolve import resolve_adapter
+    from raise_cli.adapters.models import IssueDetail
+    from raise_cli.adapters.protocols import ProjectManagementAdapter
+    from raise_cli.cli.commands._resolve import resolve_adapter
 
     def _do_fetch() -> LiveBacklogStatus:
         adapter: ProjectManagementAdapter = resolve_adapter(None)
@@ -215,7 +215,7 @@ def _find_release_for_current_epic(
         return None
 
     try:
-        from rai_cli.graph.backends import get_active_backend
+        from raise_cli.graph.backends import get_active_backend
         from raise_core.graph.query import QueryEngine
 
         graph = get_active_backend(graph_path).load()

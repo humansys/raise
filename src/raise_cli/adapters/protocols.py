@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from typing import Any, Protocol, runtime_checkable
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     ArtifactLocator,
     BatchResult,

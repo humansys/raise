@@ -8,28 +8,28 @@ from typing import Annotated, Literal
 import typer
 from rich.console import Console
 
-from rai_cli import __version__
-from rai_cli.cli.commands.adapters import adapters_app
-from rai_cli.cli.commands.artifact import artifact_app
-from rai_cli.cli.commands.backlog import backlog_app
-from rai_cli.cli.commands.base import base_app
-from rai_cli.cli.commands.discover import discover_app
-from rai_cli.cli.commands.docs import docs_app
-from rai_cli.cli.commands.doctor import doctor_app
-from rai_cli.cli.commands.gate import gate_app
-from rai_cli.cli.commands.graph import graph_app
-from rai_cli.cli.commands.info import info_command
-from rai_cli.cli.commands.init import init_command
-from rai_cli.cli.commands.mcp import mcp_app
-from rai_cli.cli.commands.memory import memory_app
-from rai_cli.cli.commands.pattern import pattern_app
-from rai_cli.cli.commands.profile import profile_app
-from rai_cli.cli.commands.publish import publish_app
-from rai_cli.cli.commands.release import release_app
-from rai_cli.cli.commands.session import session_app
-from rai_cli.cli.commands.signal import signal_app
-from rai_cli.cli.commands.skill import skill_app
-from rai_cli.config import RaiSettings
+from raise_cli import __version__
+from raise_cli.cli.commands.adapters import adapters_app
+from raise_cli.cli.commands.artifact import artifact_app
+from raise_cli.cli.commands.backlog import backlog_app
+from raise_cli.cli.commands.base import base_app
+from raise_cli.cli.commands.discover import discover_app
+from raise_cli.cli.commands.docs import docs_app
+from raise_cli.cli.commands.doctor import doctor_app
+from raise_cli.cli.commands.gate import gate_app
+from raise_cli.cli.commands.graph import graph_app
+from raise_cli.cli.commands.info import info_command
+from raise_cli.cli.commands.init import init_command
+from raise_cli.cli.commands.mcp import mcp_app
+from raise_cli.cli.commands.memory import memory_app
+from raise_cli.cli.commands.pattern import pattern_app
+from raise_cli.cli.commands.profile import profile_app
+from raise_cli.cli.commands.publish import publish_app
+from raise_cli.cli.commands.release import release_app
+from raise_cli.cli.commands.session import session_app
+from raise_cli.cli.commands.signal import signal_app
+from raise_cli.cli.commands.skill import skill_app
+from raise_cli.config import RaiSettings
 
 # Module-level state for error handling
 _current_output_format: Literal["human", "json", "table"] = "human"

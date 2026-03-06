@@ -1,7 +1,7 @@
 """MCP infrastructure models — independent of domain adapters.
 
 These models belong to the MCP infrastructure layer. Domain adapters
-(PM, Docs) have their own models in ``rai_cli.adapters.models``.
+(PM, Docs) have their own models in ``raise_cli.adapters.models``.
 
 Architecture: ADR-042, E338 (AR-C1)
 """

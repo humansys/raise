@@ -10,9 +10,9 @@ from __future__ import annotations
 from collections import defaultdict
 from pathlib import Path
 
-from rai_cli.config.agents import AgentConfig, get_agent_config
-from rai_cli.skills.parser import parse_skill
-from rai_cli.skills.schema import Skill
+from raise_cli.config.agents import AgentConfig, get_agent_config
+from raise_cli.skills.parser import parse_skill
+from raise_cli.skills.schema import Skill
 
 
 def get_default_skill_dir(

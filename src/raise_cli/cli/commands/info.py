@@ -16,8 +16,8 @@ from pathlib import Path
 
 import typer
 
-from rai_cli.config.paths import get_identity_dir
-from rai_cli.rai_base import __version__ as base_version
+from raise_cli.config.paths import get_identity_dir
+from raise_cli.rai_base import __version__ as base_version
 
 
 def _get_project_root() -> Path:
@@ -27,7 +27,7 @@ def _get_project_root() -> Path:
 
 def _count_base_patterns() -> int:
     """Count patterns in the bundled base package."""
-    base = files("rai_cli.rai_base")
+    base = files("raise_cli.rai_base")
     source = base / "memory" / "patterns-base.jsonl"
     content = source.read_text(encoding="utf-8")  # type: ignore[union-attr]
     return sum(1 for line in content.splitlines() if line.strip())
@@ -53,7 +53,7 @@ def info_command() -> None:
     installed = _check_installed(project_root)
 
     # Check for methodology
-    base = files("rai_cli.rai_base")
+    base = files("raise_cli.rai_base")
     has_methodology = (base / "framework" / "methodology.yaml").is_file()
 
     # Check identity files

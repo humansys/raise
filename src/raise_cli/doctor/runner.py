@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import logging
 
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
-from rai_cli.doctor.registry import CheckRegistry
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.registry import CheckRegistry
 
 logger = logging.getLogger(__name__)
 

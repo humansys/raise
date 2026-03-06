@@ -3,7 +3,7 @@
 Manages server process lifecycle, async session, and RaiSE telemetry.
 Works with any MCP server via stdio transport.
 
-Architecture: E301 epic design (D1, D3, D4), moved to rai_cli.mcp (ADR-042, E338)
+Architecture: E301 epic design (D1, D3, D4), moved to raise_cli.mcp (ADR-042, E338)
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
 
-from rai_cli.mcp.models import McpHealthResult, McpToolInfo, McpToolResult
+from raise_cli.mcp.models import McpHealthResult, McpToolInfo, McpToolResult
 
 logger = logging.getLogger(__name__)
 

@@ -16,7 +16,7 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
-from rai_cli.publish.version import BumpType
+from raise_cli.publish.version import BumpType
 
 publish_app = typer.Typer(help="Publish and release management commands")
 
@@ -39,7 +39,7 @@ def check_shim(
 ) -> None:
     """Deprecated: use 'rai release check'."""
     _deprecation_warning("publish check", "release check")
-    from rai_cli.cli.commands.release import check_command
+    from raise_cli.cli.commands.release import check_command
 
     check_command(project=project)
 
@@ -69,7 +69,7 @@ def release_shim(
 ) -> None:
     """Deprecated: use 'rai release publish'."""
     _deprecation_warning("publish release", "release publish")
-    from rai_cli.cli.commands.release import publish_command
+    from raise_cli.cli.commands.release import publish_command
 
     publish_command(
         bump=bump,

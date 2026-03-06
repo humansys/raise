@@ -15,9 +15,9 @@ from typing import Annotated
 import typer
 from rich.console import Console
 
-from rai_cli.gates.models import GateContext, GateResult
-from rai_cli.gates.protocol import WorkflowGate
-from rai_cli.gates.registry import GateRegistry
+from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.protocol import WorkflowGate
+from raise_cli.gates.registry import GateRegistry
 
 logger = logging.getLogger(__name__)
 

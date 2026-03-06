@@ -9,7 +9,7 @@ OpenTelemetry semantic conventions for future OTLP export.
 
 from __future__ import annotations
 
-from rai_cli.telemetry.schemas import (
+from raise_cli.telemetry.schemas import (
     CalibrationEvent,
     CommandUsage,
     ErrorEvent,
@@ -18,7 +18,7 @@ from rai_cli.telemetry.schemas import (
     SkillEvent,
     WorkLifecycle,
 )
-from rai_cli.telemetry.writer import (
+from raise_cli.telemetry.writer import (
     EmitResult,
     emit,
     emit_command_usage,

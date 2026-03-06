@@ -9,10 +9,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
-from rai_cli.compat import portable_path
-from rai_cli.governance.models import Concept, ConceptType
-from rai_cli.governance.parsers._convert import concept_to_node
+from raise_cli.adapters.models import ArtifactLocator, CoreArtifactType
+from raise_cli.compat import portable_path
+from raise_cli.governance.models import Concept, ConceptType
+from raise_cli.governance.parsers._convert import concept_to_node
 from raise_core.graph.models import GraphNode
 
 # Sections that contain term definitions (extract from these)

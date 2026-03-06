@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 
-from rai_cli.doctor.models import CheckResult, CheckStatus
+from raise_cli.doctor.models import CheckResult, CheckStatus
 
 SUPPORT_EMAIL = "support@raise.humansys.ai"
 

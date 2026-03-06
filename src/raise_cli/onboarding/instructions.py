@@ -13,9 +13,9 @@ from typing import Any
 
 import yaml
 
-from rai_cli.config.agents import AgentConfig
-from rai_cli.onboarding.conventions import ConventionResult
-from rai_cli.onboarding.detection import DetectionResult
+from raise_cli.config.agents import AgentConfig
+from raise_cli.onboarding.conventions import ConventionResult
+from raise_cli.onboarding.detection import DetectionResult
 
 
 def _str_from_nested(data: dict[str, Any], key1: str, key2: str) -> str | None:

@@ -13,7 +13,7 @@ import logging
 from pathlib import Path
 from typing import Any, cast
 
-from rai_cli.config.agents import AgentConfig
+from raise_cli.config.agents import AgentConfig
 
 logger = logging.getLogger(__name__)
 

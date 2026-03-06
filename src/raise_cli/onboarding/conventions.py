@@ -15,7 +15,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from rai_cli.core.files import should_exclude_dir
+from raise_cli.core.files import should_exclude_dir
 
 
 class Confidence(StrEnum):

@@ -96,7 +96,7 @@ def query(
 ) -> None:
     """Deprecated: use 'rai graph query'."""
     _deprecation_warning("query")
-    from rai_cli.cli.commands.graph import query as graph_query
+    from raise_cli.cli.commands.graph import query as graph_query
 
     graph_query(
         query_str=query_str,
@@ -124,7 +124,7 @@ def context_cmd(
 ) -> None:
     """Deprecated: use 'rai graph context'."""
     _deprecation_warning("context")
-    from rai_cli.cli.commands.graph import context_cmd as graph_context
+    from raise_cli.cli.commands.graph import context_cmd as graph_context
 
     graph_context(module_id=module_id, format=format, index_path=index_path)
 
@@ -142,7 +142,7 @@ def build(
 ) -> None:
     """Deprecated: use 'rai graph build'."""
     _deprecation_warning("build")
-    from rai_cli.cli.commands.graph import build as graph_build
+    from raise_cli.cli.commands.graph import build as graph_build
 
     graph_build(output=output, no_diff=no_diff)
 
@@ -156,7 +156,7 @@ def validate(
 ) -> None:
     """Deprecated: use 'rai graph validate'."""
     _deprecation_warning("validate")
-    from rai_cli.cli.commands.graph import validate as graph_validate
+    from raise_cli.cli.commands.graph import validate as graph_validate
 
     graph_validate(index_file=index_file)
 
@@ -176,7 +176,7 @@ def extract(
 ) -> None:
     """Deprecated: use 'rai graph extract'."""
     _deprecation_warning("extract")
-    from rai_cli.cli.commands.graph import extract as graph_extract
+    from raise_cli.cli.commands.graph import extract as graph_extract
 
     graph_extract(file_path=file_path, format=format)
 
@@ -205,7 +205,7 @@ def list_memory(
 ) -> None:
     """Deprecated: use 'rai graph list'."""
     _deprecation_warning("list")
-    from rai_cli.cli.commands.graph import list_graph
+    from raise_cli.cli.commands.graph import list_graph
 
     list_graph(
         format=format, output=output, index_path=index_path, memory_only=memory_only
@@ -229,7 +229,7 @@ def viz(
 ) -> None:
     """Deprecated: use 'rai graph viz'."""
     _deprecation_warning("viz")
-    from rai_cli.cli.commands.graph import viz as graph_viz
+    from raise_cli.cli.commands.graph import viz as graph_viz
 
     graph_viz(output=output, index_path=index_path, open_browser=open_browser)
 
@@ -272,7 +272,7 @@ def reinforce_cmd(
 ) -> None:
     """Deprecated: use 'rai pattern reinforce'."""
     _deprecation_warning("reinforce", "pattern")
-    from rai_cli.cli.commands.pattern import reinforce_cmd as _reinforce
+    from raise_cli.cli.commands.pattern import reinforce_cmd as _reinforce
 
     _reinforce(
         pattern_id=pattern_id,
@@ -315,7 +315,7 @@ def add_pattern(
 ) -> None:
     """Deprecated: use 'rai pattern add'."""
     _deprecation_warning("add-pattern", "pattern", new_cmd="add")
-    from rai_cli.cli.commands.pattern import add_pattern as _add
+    from raise_cli.cli.commands.pattern import add_pattern as _add
 
     _add(
         content=content,
@@ -371,7 +371,7 @@ def emit_work(
 ) -> None:
     """Deprecated: use 'rai signal emit-work'."""
     _deprecation_warning("emit-work", "signal")
-    from rai_cli.cli.commands.signal import emit_work as _emit_work
+    from raise_cli.cli.commands.signal import emit_work as _emit_work
 
     _emit_work(
         work_type=work_type,
@@ -417,7 +417,7 @@ def emit_session_event(
 ) -> None:
     """Deprecated: use 'rai signal emit-session'."""
     _deprecation_warning("emit-session", "signal")
-    from rai_cli.cli.commands.signal import emit_session as _emit_session
+    from raise_cli.cli.commands.signal import emit_session as _emit_session
 
     _emit_session(
         session_type=session_type,
@@ -456,7 +456,7 @@ def emit_calibration_event(
 ) -> None:
     """Deprecated: use 'rai signal emit-calibration'."""
     _deprecation_warning("emit-calibration", "signal")
-    from rai_cli.cli.commands.signal import emit_calibration as _emit_calibration
+    from raise_cli.cli.commands.signal import emit_calibration as _emit_calibration
 
     _emit_calibration(
         story=story,

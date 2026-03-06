@@ -11,12 +11,12 @@ Architecture: Epic E13 Discovery
 
 from __future__ import annotations
 
-from rai_cli.discovery.drift import (
+from raise_cli.discovery.drift import (
     DriftSeverity,
     DriftWarning,
     detect_drift,
 )
-from rai_cli.discovery.scanner import (
+from raise_cli.discovery.scanner import (
     EXTENSION_TO_LANGUAGE,
     Language,
     ScanResult,

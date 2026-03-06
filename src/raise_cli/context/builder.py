@@ -14,18 +14,18 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
-from rai_cli.compat import portable_path
-from rai_cli.config.agents import AgentConfig, get_agent_config
-from rai_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
-from rai_cli.context.extractors.skills import extract_all_skills
-from rai_cli.core.text import STOPWORDS
-from rai_cli.memory.models import MemoryScope
+from raise_cli.compat import portable_path
+from raise_cli.config.agents import AgentConfig, get_agent_config
+from raise_cli.config.paths import get_global_rai_dir, get_memory_dir, get_personal_dir
+from raise_cli.context.extractors.skills import extract_all_skills
+from raise_cli.core.text import STOPWORDS
+from raise_cli.memory.models import MemoryScope
 from raise_core.graph.engine import Graph
 from raise_core.graph.models import GraphEdge, GraphNode
 
 if TYPE_CHECKING:
-    from rai_cli.governance.extractor import GovernanceExtractor
-    from rai_cli.governance.models import Concept
+    from raise_cli.governance.extractor import GovernanceExtractor
+    from raise_cli.governance.models import Concept
 
 
 class GraphBuilder:
@@ -333,8 +333,8 @@ class GraphBuilder:
         Returns:
             List of GraphNode for artifact concepts.
         """
-        from rai_cli.artifacts.reader import read_all_artifacts
-        from rai_cli.artifacts.writer import (
+        from raise_cli.artifacts.reader import read_all_artifacts
+        from raise_cli.artifacts.writer import (
             _artifact_filename,  # pyright: ignore[reportPrivateUsage]
         )
 
@@ -445,10 +445,10 @@ class GraphBuilder:
         Args:
             all_nodes: All nodes loaded so far (mutated in place).
         """
-        from rai_cli.context.analyzers.models import ModuleInfo
-        from rai_cli.context.analyzers.python import PythonAnalyzer
+        from raise_cli.context.analyzers.models import ModuleInfo
+        from raise_cli.context.analyzers.python import PythonAnalyzer
 
-        analyzers = [PythonAnalyzer(src_dir="src/rai_cli")]
+        analyzers = [PythonAnalyzer(src_dir="src/raise_cli")]
 
         code_modules: list[ModuleInfo] = []
         for analyzer in analyzers:
@@ -1130,7 +1130,7 @@ class GraphBuilder:
         Returns:
             GovernanceExtractor for this project.
         """
-        from rai_cli.governance.extractor import GovernanceExtractor
+        from raise_cli.governance.extractor import GovernanceExtractor
 
         return GovernanceExtractor(project_root=self.project_root)
 

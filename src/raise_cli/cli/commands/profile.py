@@ -15,7 +15,7 @@ from __future__ import annotations
 import typer
 import yaml
 
-from rai_cli.onboarding.profile import (
+from raise_cli.onboarding.profile import (
     load_developer_profile,
 )
 

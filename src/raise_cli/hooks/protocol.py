@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import ClassVar, Protocol, runtime_checkable
 
-from rai_cli.hooks.events import HookEvent, HookResult
+from raise_cli.hooks.events import HookEvent, HookResult
 
 
 @runtime_checkable

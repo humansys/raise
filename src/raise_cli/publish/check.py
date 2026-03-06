@@ -104,8 +104,8 @@ def run_checks(
     Returns:
         List of CheckResult for each gate.
     """
-    from rai_cli.publish.changelog import has_unreleased_entries
-    from rai_cli.publish.version import is_pep440
+    from raise_cli.publish.changelog import has_unreleased_entries
+    from raise_cli.publish.version import is_pep440
 
     results: list[CheckResult] = []
 

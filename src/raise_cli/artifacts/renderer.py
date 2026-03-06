@@ -3,8 +3,8 @@
 import re
 from pathlib import Path
 
-from rai_cli.artifacts.models import SkillArtifact
-from rai_cli.artifacts.story_design import (
+from raise_cli.artifacts.models import SkillArtifact
+from raise_cli.artifacts.story_design import (
     StoryDesignArtifact,
     StoryDesignContent,
 )

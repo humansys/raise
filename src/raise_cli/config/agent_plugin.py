@@ -11,7 +11,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Protocol, runtime_checkable
 
-from rai_cli.config.agents import AgentConfig
+from raise_cli.config.agents import AgentConfig
 
 
 @runtime_checkable

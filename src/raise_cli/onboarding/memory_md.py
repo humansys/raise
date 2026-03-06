@@ -7,7 +7,7 @@ The generator is IDE-independent — placement functions (in CLI commands)
 decide where to write the output.
 
 Example:
-    from rai_cli.onboarding.memory_md import MemoryMdGenerator
+    from raise_cli.onboarding.memory_md import MemoryMdGenerator
 
     gen = MemoryMdGenerator()
     content = gen.generate(

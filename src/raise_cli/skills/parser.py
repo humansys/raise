@@ -12,7 +12,7 @@ from typing import Any, cast
 
 import yaml
 
-from rai_cli.skills.schema import (
+from raise_cli.skills.schema import (
     Skill,
     SkillFrontmatter,
     SkillHook,

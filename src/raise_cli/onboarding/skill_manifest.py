@@ -19,7 +19,7 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, ValidationError
 
-from rai_cli.config.paths import MANIFESTS_SUBDIR, SKILLS_MANIFEST_FILE, get_raise_dir
+from raise_cli.config.paths import MANIFESTS_SUBDIR, SKILLS_MANIFEST_FILE, get_raise_dir
 
 logger = logging.getLogger(__name__)
 
@@ -56,13 +56,13 @@ class SkillManifest(BaseModel):
 
     Attributes:
         schema_version: Manifest format version for forward compat.
-        rai_cli_version: Which CLI version last wrote this manifest.
+        raise_cli_version: Which CLI version last wrote this manifest.
         distributed_at: When the manifest was last written.
         skills: Per-skill tracking entries keyed by skill name.
     """
 
     schema_version: str = "1.0"
-    rai_cli_version: str = Field(default_factory=lambda: _get_cli_version())
+    raise_cli_version: str = Field(default_factory=lambda: _get_cli_version())
     distributed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     skill_set: str | None = Field(
         default=None, description="Skill set name last deployed (None = builtins only)"
@@ -73,7 +73,7 @@ class SkillManifest(BaseModel):
 def _get_cli_version() -> str:
     """Get the current rai-cli version."""
     try:
-        from rai_cli.skills_base import __version__
+        from raise_cli.skills_base import __version__
 
         return __version__
     except ImportError:

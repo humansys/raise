@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import ClassVar, Protocol, runtime_checkable
 
-from rai_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.models import GateContext, GateResult
 
 
 @runtime_checkable

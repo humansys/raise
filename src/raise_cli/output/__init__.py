@@ -3,7 +3,7 @@
 Provides format-aware output (human, JSON, table) for CLI commands.
 
 Example:
-    >>> from rai_cli.output import get_console
+    >>> from raise_cli.output import get_console
     >>>
     >>> console = get_console()
     >>> console.print_success("Done!", details={"duration": "2.3s"})
@@ -11,7 +11,7 @@ Example:
 
 from __future__ import annotations
 
-from rai_cli.output.console import (
+from raise_cli.output.console import (
     OutputConsole,
     OutputFormat,
     configure_console,

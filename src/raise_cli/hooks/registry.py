@@ -14,7 +14,7 @@ import logging
 from importlib.metadata import entry_points
 from typing import Any
 
-from rai_cli.hooks.protocol import LifecycleHook
+from raise_cli.hooks.protocol import LifecycleHook
 
 logger = logging.getLogger(__name__)
 

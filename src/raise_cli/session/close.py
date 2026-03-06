@@ -19,7 +19,7 @@ from typing import cast
 
 import yaml
 
-from rai_cli.memory.writer import (
+from raise_cli.memory.writer import (
     PatternInput,
     PatternSubType,
     SessionInput,
@@ -27,21 +27,21 @@ from rai_cli.memory.writer import (
     append_pattern,
     append_session,
 )
-from rai_cli.onboarding.profile import (
+from raise_cli.onboarding.profile import (
     DeveloperProfile,
     add_correction,
     end_session,
     save_developer_profile,
     update_coaching,
 )
-from rai_cli.schemas.session_state import (
+from raise_cli.schemas.session_state import (
     CurrentWork,
     EpicProgress,
     LastSession,
     PendingItems,
     SessionState,
 )
-from rai_cli.session.state import save_session_state
+from raise_cli.session.state import save_session_state
 
 logger = logging.getLogger(__name__)
 

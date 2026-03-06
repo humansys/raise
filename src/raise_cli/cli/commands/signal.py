@@ -18,14 +18,14 @@ from typing import Annotated, Literal
 import typer
 from rich.console import Console
 
-from rai_cli.cli.error_handler import cli_error
-from rai_cli.session.resolver import resolve_session_id_optional
-from rai_cli.telemetry.schemas import (
+from raise_cli.cli.error_handler import cli_error
+from raise_cli.session.resolver import resolve_session_id_optional
+from raise_cli.telemetry.schemas import (
     CalibrationEvent,
     SessionEvent,
     WorkLifecycle,
 )
-from rai_cli.telemetry.writer import emit
+from raise_cli.telemetry.writer import emit
 
 logger = logging.getLogger(__name__)
 
@@ -179,8 +179,8 @@ def emit_work(
     # Bridge: fire WorkLifecycleEvent to hook system (non-fatal)
     if result.success:
         try:
-            from rai_cli.hooks.emitter import create_emitter
-            from rai_cli.hooks.events import WorkLifecycleEvent
+            from raise_cli.hooks.emitter import create_emitter
+            from raise_cli.hooks.events import WorkLifecycleEvent
 
             emitter = create_emitter()
             emitter.emit(

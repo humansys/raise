@@ -5,15 +5,15 @@ Provides configuration settings and XDG-compliant directory helpers.
 
 from __future__ import annotations
 
-from rai_cli.config.agents import (
+from raise_cli.config.agents import (
     BUILTIN_AGENTS,
     AgentChoice,
     AgentConfig,
     BuiltinAgentType,
     get_agent_config,
 )
-from rai_cli.config.paths import get_cache_dir, get_config_dir, get_data_dir
-from rai_cli.config.settings import RaiSettings
+from raise_cli.config.paths import get_cache_dir, get_config_dir, get_data_dir
+from raise_cli.config.settings import RaiSettings
 
 # Backward-compat aliases
 IDE_CONFIGS = BUILTIN_AGENTS

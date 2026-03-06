@@ -1,7 +1,7 @@
 """Agent registry — 3-tier YAML loading with override precedence.
 
 Loads agent configurations from:
-  1. Built-in YAML files (bundled in rai_cli.agents package)
+  1. Built-in YAML files (bundled in raise_cli.agents package)
   2. Project-level .raise/agents/*.yaml
   3. User-level ~/.rai/agents/*.yaml
 
@@ -20,8 +20,8 @@ from typing import Any, cast
 
 import yaml
 
-from rai_cli.config.agent_plugin import AgentPlugin, DefaultAgentPlugin
-from rai_cli.config.agents import AgentConfig
+from raise_cli.config.agent_plugin import AgentPlugin, DefaultAgentPlugin
+from raise_cli.config.agents import AgentConfig
 
 logger = logging.getLogger(__name__)
 
@@ -60,9 +60,9 @@ def _load_yaml_dir(directory: Path) -> dict[str, AgentConfig]:
 
 
 def _load_builtin_agents() -> dict[str, AgentConfig]:
-    """Load agent configs from the bundled rai_cli.agents package."""
+    """Load agent configs from the bundled raise_cli.agents package."""
     configs: dict[str, AgentConfig] = {}
-    agents_pkg = files("rai_cli.agents")
+    agents_pkg = files("raise_cli.agents")
     for entry in agents_pkg.iterdir():
         if not entry.name.endswith(".yaml"):
             continue
@@ -85,7 +85,7 @@ def _resolve_plugin(plugin_path: str | None) -> AgentPlugin:
     segment of the module path (PascalCase), or a class named 'Plugin'.
 
     Args:
-        plugin_path: Module path like "rai_cli.agents.copilot_plugin",
+        plugin_path: Module path like "raise_cli.agents.copilot_plugin",
                      or None for default pass-through.
 
     Returns:
@@ -203,7 +203,7 @@ def load_registry(
     """Load the 3-tier agent registry.
 
     Loading order (last-wins):
-    1. Built-in YAML files bundled in rai_cli.agents package
+    1. Built-in YAML files bundled in raise_cli.agents package
     2. Project-level .raise/agents/*.yaml (if project_root provided)
     3. User-level ~/.rai/agents/*.yaml (if user_home provided; defaults to Path.home())
 
