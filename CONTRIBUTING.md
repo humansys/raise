@@ -28,7 +28,7 @@ This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.
 ```bash
 # Clone and enter the repository
 git clone https://github.com/humansys/raise.git
-cd raise-commons
+cd raise
 
 # Install dependencies
 uv sync

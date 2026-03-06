@@ -72,7 +72,7 @@ pipx install raise-cli
 ```bash
 # 1. Clone and checkout the development branch
 git clone https://github.com/humansys/raise.git
-cd raise-commons
+cd raise
 git checkout dev
 
 # 2. Create venv and install in development mode
@@ -276,7 +276,7 @@ rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 ## Repository Structure
 
 ```
-raise-commons/
+raise/
 ├── .claude/skills/      # Claude Code skills (37 skills)
 │
 ├── framework/           # Public textbook (concepts, reference)
