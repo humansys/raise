@@ -1,0 +1,63 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: "2026-03-06"
+story: S369.1
+epic: E369
+refs:
+  epic_scope: work/epics/e369-open-source-audit/scope.md
+  related_artifacts:
+    - work/epics/e369-open-source-audit/stories/s369.1-story.md
+    - work/epics/e369-open-source-audit/stories/s369.1-scope.md
+content:
+  summary: >
+    Fix stale references in community docs (CONTRIBUTING.md, SECURITY.md,
+    CHANGELOG.md, README.md) that would undermine credibility with senior
+    devs evaluating the project. Direct text edits only.
+  complexity: simple
+  acceptance_criteria:
+    - id: AC-1
+      description: >
+        No references to `rai-cli` or `src/rai_cli/` in community docs.
+      verifiable: true
+    - id: AC-2
+      description: >
+        CHANGELOG compare URLs point to `humansys-ai/raise-commons`.
+      verifiable: true
+    - id: AC-3
+      description: >
+        SECURITY.md version table reflects 2.x (no alpha references).
+      verifiable: true
+    - id: AC-4
+      description: README has CI badge.
+      verifiable: true
+    - id: AC-5
+      description: >
+        CHANGELOG entries have consistent blank line separation.
+      verifiable: true
+  integration_points: []
+  decisions:
+    - id: D-1
+      choice: Direct text edits, no tooling or automation.
+      rationale: >
+        XS story with 4 files. Automation would be over-engineering.
+      alternatives_considered:
+        - "sed script -- overkill for 4 files"
+  components:
+    - path: CONTRIBUTING.md
+      action: modify
+      changes: "Fix package name rai-cli -> raise-cli, src/rai_cli/ -> src/raise_cli/"
+    - path: SECURITY.md
+      action: modify
+      changes: "Update version table from 2.0.0-alpha.x to current 2.x"
+    - path: CHANGELOG.md
+      action: modify
+      changes: "Fix compare URLs to humansys-ai/raise-commons, fix blank line formatting"
+    - path: README.md
+      action: modify
+      changes: "Add CI badge, verify Python 3.14 claim"
+metadata:
+  approach: >
+    Read each file, apply targeted text fixes, verify with grep that
+    no stale references remain.
+  no_code_changes: true
