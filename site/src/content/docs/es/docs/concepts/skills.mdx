@@ -54,7 +54,7 @@ Esta distinción importa:
 - **Skills** guían el *proceso* — le dicen a ti y a tu IA qué hacer, en qué orden, con qué verificación
 - **CLI** maneja los *datos* — lee, escribe, construye y consulta determinísticamente
 
-Un skill como `/story-plan` le dice a la IA que descomponga una story en tareas. El comando CLI `raise memory emit-work` registra el evento. El skill orquesta; el CLI ejecuta.
+Un skill como `/story-plan` le dice a la IA que descomponga una story en tareas. El comando CLI `rai signal emit-work` registra el evento. El skill orquesta; el CLI ejecuta.
 
 ## Niveles de Maestría (ShuHaRi)
 
@@ -80,16 +80,16 @@ Ejemplos de gates de verificación:
 
 ```bash
 # Listar todos los skills
-raise skill list
+rai skill list
 
 # Validar estructura de skills
-raise skill validate
+rai skill validate
 
 # Crear nuevo skill desde plantilla
-raise skill scaffold mi-nuevo-skill --lifecycle story
+rai skill scaffold mi-nuevo-skill --lifecycle story
 
 # Verificar convenciones de naming
-raise skill check-name mi-nuevo-skill
+rai skill check-name mi-nuevo-skill
 ```
 
 Ver la [Referencia CLI](/es/docs/cli/) para detalles completos.

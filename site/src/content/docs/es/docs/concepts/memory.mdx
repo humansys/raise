@@ -24,7 +24,7 @@ Cuando el mismo concepto existe en múltiples scopes, **personal sobreescribe pr
 Los patrones son aprendizajes capturados durante el desarrollo. Representan qué funcionó, qué no y qué recordar la próxima vez.
 
 ```bash
-raise memory add-pattern "Usar fixtures para setup de base de datos en tests" \
+rai pattern add "Usar fixtures para setup de base de datos en tests" \
   -t technical -c "pytest,testing" --from S3.5
 ```
 
@@ -39,7 +39,7 @@ Los patrones tienen sub-tipos:
 La calibración registra cuánto tardan realmente las stories vs. las estimaciones. Con el tiempo, esto construye un perfil de velocidad que ayuda a predecir trabajo futuro con más precisión.
 
 ```bash
-raise memory add-calibration S3.5 --name "Auth Module" -s M -a 45 -e 60
+rai signal emit-calibration S3.5 --size M --actual 45 --estimated 60
 ```
 
 Esto registra: la story S3.5 se estimó en 60 minutos (talla M) pero realmente tomó 45 — una velocidad de 1.33x.
@@ -49,7 +49,7 @@ Esto registra: la story S3.5 se estimó en 60 minutos (talla M) pero realmente t
 Las sesiones son un registro cronológico de lo que sucedió. Cada sesión captura: en qué trabajaste, qué lograste y qué patrones aprendiste.
 
 ```bash
-raise memory add-session "S3.5 Auth Module" -t story -o "JWT setup,Middleware,Tests"
+rai signal emit-session --type story --outcome success --stories S3.5
 ```
 
 ## Cómo la Memoria se Acumula
@@ -69,13 +69,13 @@ Todas las fuentes de memoria se fusionan en un índice consultable:
 
 ```bash
 # Construir el índice unificado
-raise memory build
+rai graph build
 
 # Consultarlo
-raise memory query "testing patterns" --types pattern
+rai graph query "testing patterns" --types pattern
 
 # Listar todos los conceptos
-raise memory list --memory-only
+rai graph list --memory-only
 ```
 
 El índice es un archivo JSON (`.raise/rai/memory/index.json`) que combina patrones, calibración, sesiones, gobernanza, seguimiento de trabajo y skills en un solo grafo. Ver [Knowledge Graph](/es/docs/concepts/knowledge-graph/) para cómo funciona este grafo.
@@ -84,12 +84,12 @@ El índice es un archivo JSON (`.raise/rai/memory/index.json`) que combina patro
 
 | Comando | Qué hace |
 |---------|----------|
-| `raise memory build` | Construir índice unificado desde todas las fuentes |
-| `raise memory query` | Buscar conceptos relevantes en la memoria |
-| `raise memory list` | Listar todos los conceptos en el índice |
-| `raise memory add-pattern` | Registrar un patrón aprendido |
-| `raise memory add-calibration` | Registrar datos de timing de una story |
-| `raise memory add-session` | Registrar una sesión |
-| `raise memory validate` | Verificar integridad del índice |
+| `rai graph build` | Construir índice unificado desde todas las fuentes |
+| `rai graph query` | Buscar conceptos relevantes en la memoria |
+| `rai graph list` | Listar todos los conceptos en el índice |
+| `rai graph validate` | Verificar integridad del índice |
+| `rai pattern add` | Registrar un patrón aprendido |
+| `rai signal emit-calibration` | Registrar datos de timing de una story |
+| `rai signal emit-session` | Registrar un evento de sesión |
 
 Ver la [Referencia CLI](/es/docs/cli/) para detalles completos de cada comando.
