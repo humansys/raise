@@ -6,8 +6,8 @@ from fastapi import APIRouter, Request
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from rai_server import __version__
-from rai_server.deps import get_engine
+from raise_server import __version__
+from raise_server.deps import get_engine
 
 router = APIRouter()
 

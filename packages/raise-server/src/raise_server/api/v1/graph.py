@@ -9,14 +9,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request
 
-from rai_server.auth import OrgContext, verify_api_key
-from rai_server.deps import get_session_factory
-from rai_server.schemas.graph import (
+from raise_server.auth import OrgContext, verify_api_key
+from raise_server.deps import get_session_factory
+from raise_server.schemas.graph import (
     GraphQueryResponse,
     GraphSyncRequest,
     GraphSyncResponse,
 )
-from rai_server.services.graph import query_graph, sync_graph
+from raise_server.services.graph import query_graph, sync_graph
 
 router = APIRouter(prefix="/api/v1/graph", tags=["graph"])
 

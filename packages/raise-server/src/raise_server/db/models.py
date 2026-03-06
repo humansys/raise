@@ -26,7 +26,7 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
-    """Shared declarative base for all rai-server models."""
+    """Shared declarative base for all raise-server models."""
 
 
 class Organization(Base):
@@ -62,7 +62,7 @@ class ApiKey(Base):
 
 
 class GraphNodeRow(Base):
-    """Persisted knowledge graph node. Maps to rai_core.graph.models.GraphNode."""
+    """Persisted knowledge graph node. Maps to raise_core.graph.models.GraphNode."""
 
     __tablename__ = "graph_nodes"
     __table_args__ = (
@@ -90,7 +90,7 @@ class GraphNodeRow(Base):
 
 
 class GraphEdgeRow(Base):
-    """Persisted knowledge graph edge. Maps to rai_core.graph.models.GraphEdge."""
+    """Persisted knowledge graph edge. Maps to raise_core.graph.models.GraphEdge."""
 
     __tablename__ = "graph_edges"
     __table_args__ = (

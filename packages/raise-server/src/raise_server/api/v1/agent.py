@@ -9,14 +9,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request
 
-from rai_server.auth import OrgContext, verify_api_key
-from rai_server.deps import get_session_factory
-from rai_server.schemas.agent import (
+from raise_server.auth import OrgContext, verify_api_key
+from raise_server.deps import get_session_factory
+from raise_server.schemas.agent import (
     AgentEventCreate,
     AgentEventListResponse,
     AgentEventResponse,
 )
-from rai_server.services.agent import get_events, record_event
+from raise_server.services.agent import get_events, record_event
 
 router = APIRouter(prefix="/api/v1/agent", tags=["agent"])
 

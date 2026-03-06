@@ -11,14 +11,14 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from rai_server.db.models import GraphNodeRow
-from rai_server.db.queries import (
+from raise_server.db.models import GraphNodeRow
+from raise_server.db.queries import (
     prune_orphan_nodes,
     replace_edges,
     search_nodes,
     upsert_nodes,
 )
-from rai_server.schemas.graph import (
+from raise_server.schemas.graph import (
     GraphQueryResponse,
     GraphSyncRequest,
     GraphSyncResponse,

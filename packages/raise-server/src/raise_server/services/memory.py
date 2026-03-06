@@ -9,8 +9,8 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from rai_server.db.memory_queries import insert_pattern, list_patterns
-from rai_server.schemas.memory import (
+from raise_server.db.memory_queries import insert_pattern, list_patterns
+from raise_server.schemas.memory import (
     MemoryPatternCreate,
     MemoryPatternItem,
     MemoryPatternListResponse,
