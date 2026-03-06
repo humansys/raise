@@ -2,7 +2,7 @@
 
 Public API: 7 Protocols + 15 boundary models + 2 sync wrappers
 + 5 registry functions + 5 group constants.
-KnowledgeGraphBackend + BackendHealth moved to rai_core (E275).
+KnowledgeGraphBackend + BackendHealth moved to raise_core (E275).
 
 Architecture: ADR-033 (PM), ADR-034 (Governance)
 """
@@ -44,11 +44,11 @@ from rai_cli.adapters.registry import (
     get_pm_adapters,
 )
 from rai_cli.adapters.sync import SyncDocsAdapter, SyncPMAdapter
-from rai_core.graph.backends.models import BackendHealth
-from rai_core.graph.backends.protocol import KnowledgeGraphBackend
+from raise_core.graph.backends.models import BackendHealth
+from raise_core.graph.backends.protocol import KnowledgeGraphBackend
 
 __all__ = [
-    # Protocols — sync (4 local + 1 from rai_core)
+    # Protocols — sync (4 local + 1 from raise_core)
     "DocumentationTarget",
     "GovernanceParser",
     "GovernanceSchemaProvider",
@@ -60,7 +60,7 @@ __all__ = [
     # Sync wrappers (2)
     "SyncDocsAdapter",
     "SyncPMAdapter",
-    # Models (14 local + 1 from rai_core)
+    # Models (14 local + 1 from raise_core)
     "AdapterHealth",
     "ArtifactLocator",
     "BackendHealth",

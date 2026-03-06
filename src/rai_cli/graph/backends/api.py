@@ -1,7 +1,7 @@
 """API-based graph backend — sends graph data to rai-server via HTTP.
 
 PRO backend. Requires RAI_SERVER_URL and RAI_API_KEY.
-Implements KnowledgeGraphBackend protocol from rai-core (ADR-036).
+Implements KnowledgeGraphBackend protocol from raise-core (ADR-036).
 """
 
 from __future__ import annotations
@@ -17,8 +17,8 @@ except ModuleNotFoundError as exc:
         "Install with: pip install 'rai-cli[dev]'"
     ) from exc
 
-from rai_core.graph.backends.models import BackendHealth
-from rai_core.graph.engine import Graph
+from raise_core.graph.backends.models import BackendHealth
+from raise_core.graph.engine import Graph
 
 logger = logging.getLogger(__name__)
 

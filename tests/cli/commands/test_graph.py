@@ -163,8 +163,8 @@ class TestGraphBuildCommand:
         """Build creates a graph index."""
         from unittest.mock import MagicMock, patch
 
-        from rai_core.graph.engine import Graph
-        from rai_core.graph.models import GraphNode
+        from raise_core.graph.engine import Graph
+        from raise_core.graph.models import GraphNode
 
         graph = Graph()
         graph.add_concept(

@@ -11,7 +11,7 @@ import pytest
 
 from rai_cli.config.agents import get_agent_config
 from rai_cli.context.builder import GraphBuilder
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 
 class TestGraphBuilderInit:
@@ -1339,7 +1339,7 @@ class TestBuild:
 
     def test_build_returns_unified_graph(self, tmp_path: Path) -> None:
         """Should return Graph instance."""
-        from rai_core.graph.engine import Graph
+        from raise_core.graph.engine import Graph
 
         builder = GraphBuilder(project_root=tmp_path)
 

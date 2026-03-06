@@ -7,14 +7,14 @@ from pathlib import Path
 
 import pytest
 
-from rai_core.graph.backends.filesystem import (
+from raise_core.graph.backends.filesystem import (
     FilesystemGraphBackend,
     get_active_backend,
 )
-from rai_core.graph.backends.models import BackendHealth
-from rai_core.graph.backends.protocol import KnowledgeGraphBackend
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphEdge, GraphNode
+from raise_core.graph.backends.models import BackendHealth
+from raise_core.graph.backends.protocol import KnowledgeGraphBackend
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphEdge, GraphNode
 
 
 def _make_sample_graph() -> Graph:

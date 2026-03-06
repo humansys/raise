@@ -20,8 +20,8 @@ from rai_cli.config.paths import get_global_rai_dir, get_memory_dir, get_persona
 from rai_cli.context.extractors.skills import extract_all_skills
 from rai_cli.core.text import STOPWORDS
 from rai_cli.memory.models import MemoryScope
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphEdge, GraphNode
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphEdge, GraphNode
 
 if TYPE_CHECKING:
     from rai_cli.governance.extractor import GovernanceExtractor
