@@ -28,7 +28,7 @@ code, making accurate documentation impossible. Colocating solves this.
 | S356.1 | ~~Migrate site to raise-commons~~ | S | ✅ Complete — merged to dev |
 | S356.2 | ~~Update website content for v2.2~~ | M | ✅ Complete — merged to dev |
 | S356.3 | ~~Cloudflare Pages deployment~~ | S | ✅ Complete — merged to dev |
-| S356.4 | Blog: v2.2 release post | XS | Announce v2.2 with key features |
+| S356.4 | ~~Blog: v2.2 release post~~ | XS | ✅ Complete — merged to dev |
 
 ## Done Criteria
 
