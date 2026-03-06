@@ -1,7 +1,7 @@
 ---
 epic_id: "E356"
 title: "Website Migration & v2.2 Update"
-status: "in_progress"
+status: "complete"
 created: "2026-03-05"
 jira: "RAISE-156"
 ---
