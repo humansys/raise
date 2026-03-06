@@ -148,3 +148,65 @@ Classification:
 - **How:** `ruff check --select UP` (pyupgrade rules: UP006 deprecated typing imports, UP007 Optional to union). Pyright also flags deprecated forms.
 - **Why:** Modern syntax is shorter, requires no imports, and is the language direction. Old `from typing import List, Optional, Dict` is a tell that the code was generated from outdated patterns. (Sources: Meta Survey [S14], Augment [S15], Ruff UP rules [S18])
 - **Classification:** TOOL (UP rules + Pyright)
+
+---
+
+## D3: Type Safety & API Surface
+
+*Priority: High. Types are contracts. A clean API surface is the difference between a library people use and one they fight.*
+
+### D3.1: Full public API annotation
+
+- **What:** Every public function, method, and class attribute has explicit type annotations for all parameters and return values. No unannotated public API.
+- **How:** Pyright strict mode (`"typeCheckingMode": "strict"`) enforces this globally. `ruff check --select ANN` can supplement for annotation presence.
+- **Why:** 86% of Python developers use type hints always or often; 93% among those with 5-10 years of experience (Meta Survey). Types enable IDE support, catch bugs at write time, and serve as executable documentation. (Sources: PEP 484 [S4], Meta Survey [S14], Pyright [S21])
+- **Classification:** TOOL (Pyright strict)
+
+### D3.2: Abstract parameter types
+
+- **What:** Function parameters accept abstract types (`Sequence`, `Mapping`, `Iterable`) rather than concrete types (`list`, `dict`). This allows callers to pass any compatible type.
+- **How:** Manual review. Check that input parameters use `collections.abc` protocols or `typing` abstractions. Exceptions: when the function genuinely mutates the container (then `list` is correct).
+- **Why:** "Accept interfaces, return concretes" is the Postel principle for types. Abstract inputs make functions more reusable and testable. (Sources: PEP 484 [S4], Slatkin [S6])
+- **Classification:** HUMAN
+
+### D3.3: Concrete return types
+
+- **What:** Function return types are concrete (`list`, `dict`, `str`, specific Pydantic model) not abstract (`Sequence`, `Mapping`). Callers should know exactly what they get.
+- **How:** Pyright strict mode enforces return type presence. Manual review for overly abstract return types that hide the actual value.
+- **Why:** Concrete returns give callers full access to the returned type's API. Returning `Sequence` when you always return `list` hides `.append()`, `.sort()`, etc. (Sources: PEP 484 [S4], Ben Hoyt [S13])
+- **Classification:** BOTH (Pyright enforces presence; HUMAN checks concreteness)
+
+### D3.4: Explicit Optional
+
+- **What:** Use `X | None` explicitly for nullable types. Never rely on `= None` default to imply Optional. Every nullable parameter and return must be annotated with `| None`.
+- **How:** Pyright strict mode flags implicit Optional. `ruff check --select UP007` converts `Optional[X]` to `X | None`.
+- **Why:** Implicit Optional hides the fact that None is a valid value. Explicit `| None` forces both the author and caller to handle the None case. (Sources: PEP 484 [S4], Pyright strict [S21])
+- **Classification:** TOOL (Pyright strict + UP007)
+
+### D3.5: No Any leakage
+
+- **What:** `Any` is not used in public API signatures. Generic code uses `TypeVar` or `ParamSpec`. Internal `Any` for third-party untyped libs is acceptable with a `# type: ignore[*]` comment explaining why.
+- **How:** Pyright strict mode (`reportUnknownMemberType`, `reportUnknownParameterType`, `reportUnknownVariableType`). Grep for `Any` in public function signatures.
+- **Why:** `Any` disables type checking at that boundary. It propagates — one `Any` input produces `Any` outputs, creating a "type hole" that Pyright cannot analyze. (Sources: Pyright strict [S21], Slatkin [S6])
+- **Classification:** TOOL (Pyright strict)
+
+### D3.6: Flat API surface
+
+- **What:** Each package exposes its public API via `__init__.py` re-exports. Users import from the package, not from internal modules. Internal modules are prefixed with `_` or excluded from `__all__`.
+- **How:** Manual review. Check that `__init__.py` files re-export the public names. Check that external code does not import from `package._internal` or `package.submodule.detail`.
+- **Why:** A flat API surface means users learn one import path. Internal reorganization does not break callers. This is how Pydantic, requests, and httpx work — clean public surface, rich internals. (Sources: Ben Hoyt [S13], Pydantic [S10])
+- **Classification:** HUMAN
+
+### D3.7: Custom exception hierarchy
+
+- **What:** The library defines a base exception (`RaiseError` or similar). All custom exceptions inherit from it. Exceptions carry contextual data as attributes, not just string messages.
+- **How:** Manual review. Check for a base exception class. Check that callers can `except RaiseError` to catch all library errors. Check that exception attributes provide programmatic access to error context.
+- **Why:** A base exception lets callers handle "any library error" without catching too broadly. Contextual attributes enable programmatic error handling beyond string parsing. (Sources: Ben Hoyt [S13], Slatkin Item 121 [S6])
+- **Classification:** HUMAN
+
+### D3.8: Pydantic for data models
+
+- **What:** All data structures that cross module boundaries use Pydantic `BaseModel`. No raw dicts for structured data. No dataclasses for validated data. Plain dataclasses acceptable only for internal, unvalidated value objects.
+- **How:** Manual review. Check that function inputs/outputs carrying structured data use Pydantic models. Per ADR-002: "Use Pydantic v2 for all data models throughout the codebase."
+- **Why:** Pydantic provides runtime validation, JSON serialization, and schema generation in one package. Raw dicts have no type safety, no validation, and are prone to typos. (Sources: ADR-002, Pydantic [S10], FastAPI [S11])
+- **Classification:** HUMAN
