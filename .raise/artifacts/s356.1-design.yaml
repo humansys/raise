@@ -1,0 +1,50 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: "2026-03-05T12:00:00Z"
+story: S356.1
+epic: E356
+refs:
+  epic_scope: work/epics/e356-website-migration/scope.md
+  related_artifacts:
+    - work/epics/e356-website-migration/stories/s356.1-story.md
+    - work/epics/e356-website-migration/stories/s356.1-scope.md
+content:
+  summary: >
+    Copy the site/ directory from ~/Code/raise-gtm/site/ into raise-commons/site/,
+    excluding build artifacts (node_modules, dist, .astro). Add gitignore entries
+    for those directories. Verify the site builds successfully. Pure migration with
+    no content changes.
+  complexity: simple
+  acceptance_criteria:
+    - id: AC-1
+      description: >
+        site/ directory exists in raise-commons with all source files from raise-gtm.
+      verifiable: true
+    - id: AC-2
+      description: >
+        node_modules/, dist/, and .astro/ are excluded from git via .gitignore entries.
+      verifiable: true
+    - id: AC-3
+      description: >
+        npm run build succeeds inside site/ after npm install.
+      verifiable: true
+  integration_points: []
+  decisions:
+    - id: D-1
+      choice: >
+        Use rsync with --exclude flags to copy site/ rather than git subtree or
+        manual cp.
+      rationale: >
+        rsync handles exclusions natively and preserves directory structure. Simpler
+        and more reliable than chaining cp with find exclusions.
+      alternatives_considered:
+        - "cp -r then rm artifacts — risk of committing node_modules before cleanup"
+        - "git subtree — overkill for a one-time copy of a non-git-tracked directory"
+metadata:
+  approach: >
+    rsync -av --exclude='node_modules' --exclude='dist' --exclude='.astro'
+    ~/Code/raise-gtm/site/ ./site/. Then add gitignore entries for
+    site/node_modules, site/dist, site/.astro. Verify with npm install && npm run build.
+  examples_provided: true
+  no_code_changes: false
