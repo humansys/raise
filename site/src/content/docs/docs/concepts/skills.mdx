@@ -54,7 +54,7 @@ This distinction matters:
 - **Skills** guide the *process* — they tell you and your AI what to do, in what order, with what verification
 - **CLI** handles the *data* — it reads, writes, builds, and queries deterministically
 
-A skill like `/story-plan` tells the AI to decompose a story into tasks. The CLI command `raise memory emit-work` records the event. The skill orchestrates; the CLI executes.
+A skill like `/story-plan` tells the AI to decompose a story into tasks. The CLI command `rai signal emit-work` records the event. The skill orchestrates; the CLI executes.
 
 ## Mastery Levels (ShuHaRi)
 
@@ -80,16 +80,16 @@ Examples of verification gates:
 
 ```bash
 # List all skills
-raise skill list
+rai skill list
 
 # Validate skill structure
-raise skill validate
+rai skill validate
 
 # Create a new skill from template
-raise skill scaffold my-new-skill --lifecycle story
+rai skill scaffold my-new-skill --lifecycle story
 
 # Check naming conventions
-raise skill check-name my-new-skill
+rai skill check-name my-new-skill
 ```
 
 See the [CLI Reference](/docs/cli/) for full details.

@@ -11,7 +11,7 @@ A directed graph where:
 - **Nodes** are concepts — patterns, principles, requirements, skills, stories, components, modules
 - **Edges** are relationships — "learned from", "governed by", "depends on", "constrained by"
 
-When you run `raise memory build`, the CLI traverses all project sources and assembles this graph. When you query with `raise memory query` or `raise memory context`, you're searching this graph.
+When you run `rai graph build`, the CLI traverses all project sources and assembles this graph. When you query with `rai graph query` or `rai graph context`, you're searching this graph.
 
 ## Node Types
 
@@ -48,7 +48,7 @@ Edges express how concepts relate:
 ## Building the Graph
 
 ```bash
-raise memory build
+rai graph build
 ```
 
 This merges all sources:
@@ -67,7 +67,7 @@ The output is `.raise/rai/memory/index.json`.
 Find concepts by content:
 
 ```bash
-raise memory query "testing patterns"
+rai graph query "testing patterns"
 ```
 
 ### Concept Lookup
@@ -75,7 +75,7 @@ raise memory query "testing patterns"
 Find a specific concept by ID:
 
 ```bash
-raise memory query "PAT-001" --strategy concept_lookup
+rai graph query "PAT-001" --strategy concept_lookup
 ```
 
 ### Module Context
@@ -83,7 +83,7 @@ raise memory query "PAT-001" --strategy concept_lookup
 Get the full architectural context for a module — its domain, layer, constraints, and dependencies:
 
 ```bash
-raise memory context mod-memory
+rai graph context mod-memory
 ```
 
 This returns:
@@ -97,7 +97,7 @@ This returns:
 Check the graph for structural issues:
 
 ```bash
-raise memory validate
+rai graph validate
 ```
 
 This detects cycles in dependency relationships, invalid edge types, and dangling references.
@@ -106,4 +106,4 @@ This detects cycles in dependency relationships, invalid edge types, and danglin
 
 The graph structure enables **contextual queries** — not just "find this keyword" but "show me everything related to this module, including the rules that constrain it and the patterns learned while building it."
 
-When your AI partner runs `raise session start --context`, the CLI assembles a context bundle by traversing this graph. The result is a compressed view of everything relevant to your current work — not a dump of all files, but a curated selection of the most important nodes and their relationships.
+When your AI partner runs `rai session start --context`, the CLI assembles a context bundle by traversing this graph. The result is a compressed view of everything relevant to your current work — not a dump of all files, but a curated selection of the most important nodes and their relationships.

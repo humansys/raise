@@ -58,7 +58,7 @@ Each layer is traceable to the one above. When someone asks "why do we have this
 
 ## Governance in Practice
 
-When you run `raise session start --context`, the context bundle includes governance primes — the active guardrails relevant to your current work. Your AI partner sees these at the start of every session and applies them throughout.
+When you run `rai session start --context`, the context bundle includes governance primes — the active guardrails relevant to your current work. Your AI partner sees these at the start of every session and applies them throughout.
 
 For example, if you're working on content, the context bundle might include:
 
@@ -73,7 +73,7 @@ The AI doesn't need to remember these — they're loaded fresh every session fro
 
 ## Project Structure
 
-After `raise init`, your governance directory looks like:
+After `rai init`, your governance directory looks like:
 
 ```
 governance/
@@ -88,10 +88,10 @@ governance/
 
 ## Convention Detection
 
-For existing projects, `raise init --detect` analyzes your codebase and generates guardrails automatically:
+For existing projects, `rai init --detect` analyzes your codebase and generates guardrails automatically:
 
 ```bash
-raise init --detect
+rai init --detect
 ```
 
 This scans for patterns like:

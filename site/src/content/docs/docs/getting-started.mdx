@@ -20,11 +20,11 @@ pip install raise-cli
 Verify the installation:
 
 ```bash
-raise --version
+rai --version
 ```
 
 ```
-raise-cli version 2.0.0
+rai-cli version 2.2.0
 ```
 
 ## Initialize a project
@@ -33,7 +33,7 @@ Navigate to your project directory and run:
 
 ```bash
 cd your-project
-raise init
+rai init
 ```
 
 This creates the `.raise/` directory with:
@@ -45,7 +45,7 @@ This creates the `.raise/` directory with:
 For existing projects, use `--detect` to automatically analyze your codebase conventions:
 
 ```bash
-raise init --detect
+rai init --detect
 ```
 
 ## Set up your developer profile
@@ -53,7 +53,7 @@ raise init --detect
 The first time you start a session, RaiSE creates your developer profile:
 
 ```bash
-raise session start --name "Your Name" --project .
+rai session start --name "Your Name" --project .
 ```
 
 ```
@@ -68,7 +68,7 @@ Your profile is stored at `~/.rai/developer.yaml` and persists across projects. 
 After the initial setup, start sessions with:
 
 ```bash
-raise session start --project . --context
+rai session start --project . --context
 ```
 
 The `--context` flag outputs a token-optimized context bundle (~150 tokens) assembled from:
@@ -84,7 +84,7 @@ Pass this context to your AI assistant at the start of each working session. It 
 When you're done working, close the session to capture what happened:
 
 ```bash
-raise session close --summary "What I accomplished" --type feature --project .
+rai session close --summary "What I accomplished" --type feature --project .
 ```
 
 This records the session in your telemetry and updates the session state for next time.
@@ -94,13 +94,13 @@ This records the session in your telemetry and updates the session state for nex
 As you work, RaiSE accumulates knowledge — patterns, calibration data, governance documents. Build the unified memory index to make it all queryable:
 
 ```bash
-raise memory build
+rai graph build
 ```
 
 Then query it:
 
 ```bash
-raise memory query "testing patterns"
+rai graph query "testing patterns"
 ```
 
 ```
@@ -119,4 +119,4 @@ Use capsys for stdout tests in pytest. Cleaner than mocking print.
 ## What's next
 
 - Browse the [CLI Reference](/docs/cli/) for all commands, flags, and examples
-- Learn about [Core Concepts](/docs/concepts/) — Memory, Skills, Governance, Knowledge Graph *(coming soon)*
+- Learn about [Core Concepts](/docs/concepts/memory/) — Memory, Skills, Governance, Knowledge Graph
