@@ -16,8 +16,8 @@ def credentials_path(tmp_path: Path) -> Path:
 def sample_token() -> dict[str, Any]:
     """Provide a sample OAuth token."""
     return {
-        "access_token": "ya29.a0AfH6SMBx...",
-        "refresh_token": "1//0gHZ9K...",
+        "access_token": "fake-access-token-for-testing",
+        "refresh_token": "fake-refresh-token-for-testing",
         "token_type": "Bearer",
         "expires_at": 1234567890,
     }
@@ -37,8 +37,8 @@ class TestCredentialsStorage:
         assert credentials_path.exists()
         # File should contain encrypted data, not plaintext token
         raw_content = credentials_path.read_text(encoding="utf-8")
-        assert "ya29.a0AfH6SMBx" not in raw_content  # Access token not in plaintext
-        assert "1//0gHZ9K" not in raw_content  # Refresh token not in plaintext
+        assert "fake-access-token-for-testing" not in raw_content  # Access token not in plaintext
+        assert "fake-refresh-token-for-testing" not in raw_content  # Refresh token not in plaintext
 
     def test_load_token_decrypts_successfully(
         self, credentials_path: Path, sample_token: dict[str, Any]
@@ -50,8 +50,8 @@ class TestCredentialsStorage:
         loaded_token = load_token("jira", credentials_path)
 
         assert loaded_token == sample_token
-        assert loaded_token["access_token"] == "ya29.a0AfH6SMBx..."
-        assert loaded_token["refresh_token"] == "1//0gHZ9K..."
+        assert loaded_token["access_token"] == "fake-access-token-for-testing"
+        assert loaded_token["refresh_token"] == "fake-refresh-token-for-testing"
 
     def test_load_token_returns_none_when_file_missing(
         self, credentials_path: Path
@@ -103,7 +103,7 @@ class TestCredentialsStorage:
         store_token("gitlab", gitlab_token, credentials_path)
 
         assert (
-            load_token("jira", credentials_path)["access_token"] == "ya29.a0AfH6SMBx..."
+            load_token("jira", credentials_path)["access_token"] == "fake-access-token-for-testing"
         )
         assert (
             load_token("gitlab", credentials_path)["access_token"] == "gitlab_token_xyz"

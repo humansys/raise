@@ -38,8 +38,10 @@ from raise_cli.onboarding.governance import (
 from raise_cli.onboarding.instructions import generate_instructions
 from raise_cli.onboarding.manifest import (
     AgentsManifest,
+    BranchConfig,
     ProjectInfo,
     ProjectManifest,
+    load_manifest,
     save_manifest,
 )
 from raise_cli.onboarding.profile import (
@@ -545,7 +547,9 @@ def init_command(
     if not valid_agent_types:
         valid_agent_types = ["claude"]
 
-    # Create and save manifest with agent types and toolchain
+    # Create and save manifest with agent types, preserving existing config
+    existing_manifest = load_manifest(project_path)
+
     project_info = ProjectInfo(
         name=project_name,
         project_type=detection.project_type,
@@ -560,6 +564,8 @@ def init_command(
     manifest = ProjectManifest(
         project=project_info,
         agents=AgentsManifest(types=valid_agent_types),
+        branches=existing_manifest.branches if existing_manifest else BranchConfig(),
+        tier=existing_manifest.tier if existing_manifest else None,
     )
     save_manifest(manifest, project_path)
 
