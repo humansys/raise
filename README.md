@@ -1,5 +1,7 @@
 # RaiSE
 
+[![CI](https://github.com/humansys-ai/raise-commons/actions/workflows/ci.yml/badge.svg)](https://github.com/humansys-ai/raise-commons/actions/workflows/ci.yml)
+
 **Reliable AI Software Engineering** — Ship quality software at AI speed.
 
 > *Raise your craft, feature by feature.*
