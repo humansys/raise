@@ -126,12 +126,16 @@ class McpJiraAdapter:
             args["additional_fields"] = json.dumps(issue.metadata)
 
         result = await self._bridge.call("jira_create_issue", args)
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
         return self._parse_issue_ref(result)
 
     async def get_issue(self, key: str) -> IssueDetail:
         result = await self._bridge.call(
             "jira_get_issue", {"issue_key": key, "fields": "*all"}
         )
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
         return self._parse_issue_detail(result)
 
     async def update_issue(self, key: str, fields: dict[str, Any]) -> IssueRef:
@@ -139,6 +143,8 @@ class McpJiraAdapter:
             "jira_update_issue",
             {"issue_key": key, "fields": json.dumps(fields)},
         )
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
         return self._parse_issue_ref(result)
 
     async def transition_issue(self, key: str, status: str) -> IssueRef:
@@ -147,6 +153,8 @@ class McpJiraAdapter:
             "jira_transition_issue",
             {"issue_key": key, "transition_id": tid},
         )
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
         ref = self._parse_issue_ref(result)
         # MCP transition tool returns no data — use the key we already have
         if not ref.key:
@@ -204,6 +212,8 @@ class McpJiraAdapter:
             "jira_add_comment",
             {"issue_key": key, "body": body},
         )
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
         comment_id = result.data.get("id", "")
         url = result.data.get("self", "")
         return CommentRef(id=str(comment_id), url=str(url))
@@ -214,6 +224,8 @@ class McpJiraAdapter:
             "jira_get_issue",
             {"issue_key": key, "comment_limit": limit},
         )
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
         return self._parse_comments(result)
 
     # ----- Query -----
@@ -225,6 +237,8 @@ class McpJiraAdapter:
             "jira_search",
             {"jql": clean_query, "limit": limit},
         )
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
         return self._parse_search_results(result)
 
     # ----- Lifecycle -----
