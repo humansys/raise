@@ -15,7 +15,7 @@ from typing import Any
 
 import networkx as nx  # type: ignore[import-untyped]
 
-from rai_core.graph.models import (
+from raise_core.graph.models import (
     EdgeType,
     GraphEdge,
     GraphNode,
