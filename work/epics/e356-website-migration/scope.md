@@ -27,12 +27,12 @@ code, making accurate documentation impossible. Colocating solves this.
 |---|-------|------|-------------|
 | S356.1 | ~~Migrate site to raise-commons~~ | S | ✅ Complete — merged to dev |
 | S356.2 | ~~Update website content for v2.2~~ | M | ✅ Complete — merged to dev |
-| S356.3 | Cloudflare Pages deployment | S | Repoint GitHub integration, verify deploy pipeline |
+| S356.3 | ~~Cloudflare Pages deployment~~ | S | ✅ Complete — merged to dev |
 | S356.4 | Blog: v2.2 release post | XS | Announce v2.2 with key features |
 
 ## Done Criteria
 
 - [x] Site builds from raise-commons (`npm run build` in site/)
-- [ ] Cloudflare Pages deploys from raise-commons
+- [x] Cloudflare Pages deploys from raise-commons
 - [x] Website content reflects v2.2 features accurately
 - [ ] raise-gtm site/ marked as deprecated/archived
