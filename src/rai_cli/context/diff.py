@@ -13,8 +13,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphNode, NodeType
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphNode, NodeType
 
 # Node types that indicate module-level impact
 _MODULE_IMPACT_TYPES: frozenset[NodeType] = frozenset({"module", "component"})

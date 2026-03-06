@@ -10,8 +10,8 @@ import logging
 import os
 from pathlib import Path
 
-from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-from rai_core.graph.backends.protocol import KnowledgeGraphBackend
+from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+from raise_core.graph.backends.protocol import KnowledgeGraphBackend
 
 logger = logging.getLogger(__name__)
 

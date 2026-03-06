@@ -11,7 +11,7 @@ All Protocols are ``@runtime_checkable`` for isinstance() checks.
   (from ``adapters.sync``) to bridge async adapters to sync consumption.
 
 Architecture: ADR-033 (PM), ADR-034 (Governance)
-Note: KnowledgeGraphBackend moved to rai_core.graph.backends.protocol (E275)
+Note: KnowledgeGraphBackend moved to raise_core.graph.backends.protocol (E275)
 """
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ from rai_cli.adapters.models import (
     PageSummary,
     PublishResult,
 )
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 # ---------------------------------------------------------------------------
 # Sync protocols (CLI consumption)

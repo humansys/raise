@@ -14,7 +14,7 @@ from rai_cli.compat import portable_path
 from rai_cli.core.text import sanitize_id
 from rai_cli.governance.models import Concept, ConceptType
 from rai_cli.governance.parsers._convert import concept_to_node
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 
 def extract_principles(

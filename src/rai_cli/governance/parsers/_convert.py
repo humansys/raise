@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from rai_cli.governance.models import Concept
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 
 def concept_to_node(concept: Concept) -> GraphNode:

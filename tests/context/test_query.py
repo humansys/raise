@@ -6,10 +6,10 @@ from pathlib import Path
 
 import pytest
 
-from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphEdge, GraphNode
-from rai_core.graph.query import (
+from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphEdge, GraphNode
+from raise_core.graph.query import (
     Query,
     QueryEngine,
     QueryMetadata,

@@ -43,7 +43,7 @@ from rai_cli.session.bundle import (
     get_always_on_primes,
     get_foundational_patterns,
 )
-from rai_core.graph.models import GraphNode
+from raise_core.graph.models import GraphNode
 
 
 def _make_profile() -> DeveloperProfile:
@@ -440,8 +440,8 @@ class TestGetAlwaysOnPrimes:
 
     def test_returns_always_on_nodes(self, tmp_path: Path) -> None:
         """Returns all nodes with always_on=true metadata."""
-        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-        from rai_core.graph.engine import Graph
+        from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+        from raise_core.graph.engine import Graph
 
         graph = Graph()
         graph.add_concept(
@@ -471,8 +471,8 @@ class TestGetAlwaysOnPrimes:
 
     def test_excludes_non_always_on(self, tmp_path: Path) -> None:
         """Nodes without always_on=true are excluded."""
-        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-        from rai_core.graph.engine import Graph
+        from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+        from raise_core.graph.engine import Graph
 
         graph = Graph()
         graph.add_concept(
@@ -719,9 +719,9 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Build a graph with epic→release edge
-        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-        from rai_core.graph.engine import Graph
-        from rai_core.graph.models import GraphEdge
+        from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+        from raise_core.graph.engine import Graph
+        from raise_core.graph.models import GraphEdge
 
         graph = Graph()
         graph.add_concept(
@@ -816,8 +816,8 @@ class TestBundleReleaseContext:
         mock_always_on.return_value = []
 
         # Graph exists but epic has no release edge
-        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-        from rai_core.graph.engine import Graph
+        from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+        from raise_core.graph.engine import Graph
 
         graph = Graph()
         graph.add_concept(
@@ -1051,8 +1051,8 @@ class TestGetFoundationalPatterns:
 
     def test_returns_foundational_patterns_from_graph(self, tmp_path: Path) -> None:
         """Returns patterns with foundational=true from graph."""
-        from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-        from rai_core.graph.engine import Graph
+        from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+        from raise_core.graph.engine import Graph
 
         graph = Graph()
         graph.add_concept(

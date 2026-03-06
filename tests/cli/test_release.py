@@ -7,9 +7,9 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from rai_cli.cli.main import app
-from rai_core.graph.backends.filesystem import FilesystemGraphBackend
-from rai_core.graph.engine import Graph
-from rai_core.graph.models import GraphEdge, GraphNode
+from raise_core.graph.backends.filesystem import FilesystemGraphBackend
+from raise_core.graph.engine import Graph
+from raise_core.graph.models import GraphEdge, GraphNode
 
 runner = CliRunner()
 
