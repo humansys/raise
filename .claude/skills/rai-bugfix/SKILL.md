@@ -48,7 +48,7 @@ Guide the developer through a formal 6-phase bug fix lifecycle — branch, analy
 
 `git checkout {dev_branch} && git checkout -b bug/raise-{N}/{bug-slug}`
 
-Reproduce the bug — confirm it is observable. Write `bug-{N}-scope.md`:
+Reproduce the bug — confirm it is observable. Write `work/bugs/RAISE-{N}/scope.md`:
 
 ```
 WHAT:      [behavior observed]
@@ -79,7 +79,7 @@ On `bug/raise-{N}/{slug}` branch. Bug reproduces. Scope artifact committed.
 
 Rule for both: "Human error" is never a root cause — ask why the error was possible.
 
-Write `bug-{N}-analysis.md`: confirmed root cause + fix approach.
+Write `work/bugs/RAISE-{N}/analysis.md`: confirmed root cause + fix approach.
 
 <verification>
 Root cause stated with evidence. Fix approach decided — not implemented yet.
@@ -87,7 +87,7 @@ Root cause stated with evidence. Fix approach decided — not implemented yet.
 
 ### Step 3: Plan *(mirrors `rai-story-plan`)*
 
-Write `bug-{N}-plan.md`: atomic tasks in TDD order (regression test task first), verification command and commit message per task.
+Write `work/bugs/RAISE-{N}/plan.md`: atomic tasks in TDD order (regression test task first), verification command and commit message per task.
 
 <verification>
 Regression test task listed first. Each task independently committable.
@@ -113,7 +113,7 @@ All tasks committed. All gates pass. Bug no longer reproduces.
 
 ### Step 5: Review *(mirrors `rai-story-review`)*
 
-Verify: fix addresses root cause (not symptom), regression test green, no regressions introduced. Write `bug-{N}-retro.md`.
+Verify: fix addresses root cause (not symptom), regression test green, no regressions introduced. Write `work/bugs/RAISE-{N}/retro.md`.
 
 If recurring: `rai pattern add "{causal insight}" --context "{keywords}" --type behavioral --from RAISE-{N}`
 
@@ -143,11 +143,11 @@ Merged to `{dev_branch}`. Branch deleted. Jira updated.
 
 | Artifact | Step | Purpose |
 |----------|------|---------|
-| `bug-{N}-scope.md` | 1 | Bug definition + done criteria |
-| `bug-{N}-analysis.md` | 2 | Root cause + fix approach |
-| `bug-{N}-plan.md` | 3 | Atomic tasks + test plan |
+| `work/bugs/RAISE-{N}/scope.md` | 1 | Bug definition + done criteria |
+| `work/bugs/RAISE-{N}/analysis.md` | 2 | Root cause + fix approach |
+| `work/bugs/RAISE-{N}/plan.md` | 3 | Atomic tasks + test plan |
 | Code + commits | 4 | Fix + regression tests |
-| `bug-{N}-retro.md` | 5 | Learnings + optional pattern |
+| `work/bugs/RAISE-{N}/retro.md` | 5 | Learnings + optional pattern |
 | Merge commit | 6 | Traceability in `{dev_branch}` |
 
 ## Quality Checklist
