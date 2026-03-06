@@ -51,7 +51,7 @@ If ADRs are unclear, ask for clarification before updating governance.
 
 | Impact Type | Document | Update Type |
 |-------------|----------|-------------|
-| Scope changed | `governance/backlog.md` | Epic/story scope, SP estimates |
+| Scope changed | Tracker via `rai backlog update` | Epic/story scope, SP estimates |
 | Terminology changed | `framework/reference/glossary.md` | Add/deprecate/update terms |
 | Ontology validated | `work/tracking/ontology-backlog.md` | Close items, update status |
 | Outcomes changed | `governance/vision.md` | Update key outcomes |
@@ -110,7 +110,7 @@ Co-Authored-By: Rai <rai@humansys.ai>"
 
 ## References
 
-- Governance: `governance/backlog.md`, `governance/vision.md`
+- Governance: `rai backlog` CLI, `governance/vision.md`
 - Glossary: `framework/reference/glossary.md`
 - Ontology: `work/tracking/ontology-backlog.md`
 - Complement: `/rai-session-close`

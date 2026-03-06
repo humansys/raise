@@ -93,14 +93,13 @@ Register epic in the backlog tracker via CLI:
 
 - **If Jira issue exists:** `rai backlog transition {JIRA_KEY} "In Progress" -a jira`
 - **If new epic (no Jira key):** `rai backlog create "{title}" -p RAISE -t Epic -l epic`
-- **Fallback (no adapter):** Edit `governance/backlog.md` directly — add or update the row with status `In Progress`.
 
 <verification>
 Scope commit on `{dev_branch}`. Epic visible in backlog.
 </verification>
 
 <if-blocked>
-Backlog file missing → create it. Row already exists → update status only.
+CLI adapter not configured → log warning and continue. Backlog sync is best-effort.
 </if-blocked>
 
 ### Step 3: Present Next Steps
@@ -117,14 +116,14 @@ Show the developer:
 | Epic Brief | `work/epics/e{N}-{name}/brief.md` |
 | Scope | `work/epics/e{N}-{name}/scope.md` |
 | Scope commit | On `{dev_branch}` |
-| Backlog entry | Tracker (Jira via `rai backlog`) or `governance/backlog.md` fallback |
+| Backlog entry | Tracker via `rai backlog` CLI |
 | Next | `/rai-epic-design` |
 
 ## Quality Checklist
 
 - [ ] Epic Brief created from `templates/brief.md`
 - [ ] Scope commit includes objective and boundaries
-- [ ] Epic registered in tracker (`rai backlog`) or `governance/backlog.md` fallback
+- [ ] Epic registered in tracker via `rai backlog` CLI
 - [ ] No epic branch created — epics are logical containers only
 - [ ] NEVER create epic branches — story branches go directly from `{dev_branch}`
 
