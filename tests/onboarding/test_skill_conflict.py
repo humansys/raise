@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-from rai_cli.onboarding.skill_conflict import (
+from raise_cli.onboarding.skill_conflict import (
     ConflictAction,
     format_skill_diff,
     prompt_skill_conflict,

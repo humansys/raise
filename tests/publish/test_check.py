@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import pytest
 
-from rai_cli.publish.check import CheckResult, Gate, run_checks
+from raise_cli.publish.check import CheckResult, Gate, run_checks
 
 
 class TestCheckResult:
@@ -51,7 +51,7 @@ class TestRunChecks:
         init_file = init_py / "__init__.py"
         init_file.write_text('__version__ = "2.0.0a7"\n')
 
-        with patch("rai_cli.publish.check._run_command") as mock_run:
+        with patch("raise_cli.publish.check._run_command") as mock_run:
             mock_run.return_value = (True, "ok")
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
@@ -83,7 +83,7 @@ class TestRunChecks:
                 return (False, "3 failed")
             return (True, "ok")
 
-        with patch("rai_cli.publish.check._run_command", side_effect=side_effect):
+        with patch("raise_cli.publish.check._run_command", side_effect=side_effect):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
@@ -105,7 +105,7 @@ class TestRunChecks:
         init_file = init_py / "__init__.py"
         init_file.write_text('__version__ = "2.0.0a7"\n')
 
-        with patch("rai_cli.publish.check._run_command", return_value=(True, "ok")):
+        with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
@@ -130,7 +130,7 @@ class TestRunChecks:
         init_file = init_py / "__init__.py"
         init_file.write_text('__version__ = "2.0.0-alpha.7"\n')
 
-        with patch("rai_cli.publish.check._run_command", return_value=(True, "ok")):
+        with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
@@ -157,7 +157,7 @@ class TestRunChecks:
         init_file = init_py / "__init__.py"
         init_file.write_text('__version__ = "2.0.0a6"\n')
 
-        with patch("rai_cli.publish.check._run_command", return_value=(True, "ok")):
+        with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]
@@ -182,7 +182,7 @@ class TestRunChecks:
         init_file = init_py / "__init__.py"
         init_file.write_text('__version__ = "2.0.0a7"\n')
 
-        with patch("rai_cli.publish.check._run_command", return_value=(True, "ok")):
+        with patch("raise_cli.publish.check._run_command", return_value=(True, "ok")):
             results = run_checks(
                 project_root=Path(project),  # type: ignore[arg-type]
                 pyproject_path=Path(pyproject),  # type: ignore[arg-type]

@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.config.settings import RaiSettings
+from raise_cli.config.settings import RaiSettings
 
 
 class TestConfigurationCascade:

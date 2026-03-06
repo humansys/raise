@@ -5,8 +5,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.governance.models import ConceptType
-from rai_cli.governance.parsers.adr import (
+from raise_cli.governance.models import ConceptType
+from raise_cli.governance.parsers.adr import (
     _extract_decision_summary,
     _parse_frontmatter,
     extract_all_decisions,

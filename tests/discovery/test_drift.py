@@ -6,14 +6,14 @@ and established component patterns.
 
 from __future__ import annotations
 
-from rai_cli.discovery.drift import (
+from raise_cli.discovery.drift import (
     BaselineComponent,
     BaselineComponentMetadata,
     DriftSeverity,
     DriftWarning,
     detect_drift,
 )
-from rai_cli.discovery.scanner import Symbol
+from raise_cli.discovery.scanner import Symbol
 
 
 class TestDriftWarning:
@@ -25,7 +25,7 @@ class TestDriftWarning:
             file="src/new_module/foo.py",
             issue="File in unexpected location",
             severity="warning",
-            suggestion="Consider moving to src/rai_cli/",
+            suggestion="Consider moving to src/raise_cli/",
         )
         assert warning.file == "src/new_module/foo.py"
         assert warning.severity == "warning"
@@ -53,7 +53,7 @@ class TestDetectDrift:
         """No warnings when new symbols follow baseline patterns."""
         baseline = [
             BaselineComponent(
-                source_file="src/rai_cli/services/user.py",
+                source_file="src/raise_cli/services/user.py",
                 metadata=BaselineComponentMetadata(name="UserService", kind="class"),
             )
         ]
@@ -61,7 +61,7 @@ class TestDetectDrift:
             Symbol(
                 name="OrderService",
                 kind="class",
-                file="src/rai_cli/services/order.py",
+                file="src/raise_cli/services/order.py",
                 line=10,
                 signature="class OrderService",
                 docstring="Handles orders.",
@@ -74,7 +74,7 @@ class TestDetectDrift:
         """Detect when file is in unexpected location."""
         baseline = [
             BaselineComponent(
-                source_file="src/rai_cli/discovery/scanner.py",
+                source_file="src/raise_cli/discovery/scanner.py",
                 metadata=BaselineComponentMetadata(name="Symbol", kind="class"),
             )
         ]
@@ -83,7 +83,7 @@ class TestDetectDrift:
             Symbol(
                 name="NewModel",
                 kind="class",
-                file="src/rai_cli/cli/new_model.py",
+                file="src/raise_cli/cli/new_model.py",
                 line=5,
                 signature="class NewModel(BaseModel)",
                 docstring="A model in wrong place.",
@@ -99,7 +99,7 @@ class TestDetectDrift:
         """Detect public class without docstring when baseline has them."""
         baseline = [
             BaselineComponent(
-                source_file="src/rai_cli/discovery/scanner.py",
+                source_file="src/raise_cli/discovery/scanner.py",
                 content="Core data model representing an extracted code symbol.",
                 metadata=BaselineComponentMetadata(name="Symbol", kind="class"),
             )
@@ -109,7 +109,7 @@ class TestDetectDrift:
             Symbol(
                 name="NewClass",
                 kind="class",
-                file="src/rai_cli/discovery/new.py",
+                file="src/raise_cli/discovery/new.py",
                 line=5,
                 signature="class NewClass",
                 docstring=None,  # Missing!
@@ -125,13 +125,13 @@ class TestDetectDrift:
         """Detect when naming doesn't follow conventions."""
         baseline = [
             BaselineComponent(
-                source_file="src/rai_cli/discovery/scanner.py",
+                source_file="src/raise_cli/discovery/scanner.py",
                 metadata=BaselineComponentMetadata(
                     name="extract_python_symbols", kind="function"
                 ),
             ),
             BaselineComponent(
-                source_file="src/rai_cli/discovery/scanner.py",
+                source_file="src/raise_cli/discovery/scanner.py",
                 metadata=BaselineComponentMetadata(
                     name="extract_typescript_symbols", kind="function"
                 ),
@@ -142,7 +142,7 @@ class TestDetectDrift:
             Symbol(
                 name="get_symbols",  # Should be extract_*
                 kind="function",
-                file="src/rai_cli/discovery/scanner.py",
+                file="src/raise_cli/discovery/scanner.py",
                 line=100,
                 signature="def get_symbols()",
                 docstring="Get symbols.",
@@ -158,7 +158,7 @@ class TestDetectDrift:
         """Private symbols (starting with _) are not checked for drift."""
         baseline = [
             BaselineComponent(
-                source_file="src/rai_cli/discovery/scanner.py",
+                source_file="src/raise_cli/discovery/scanner.py",
                 metadata=BaselineComponentMetadata(name="Symbol", kind="class"),
             )
         ]
@@ -167,7 +167,7 @@ class TestDetectDrift:
             Symbol(
                 name="_helper",
                 kind="function",
-                file="src/rai_cli/cli/commands.py",
+                file="src/raise_cli/cli/commands.py",
                 line=5,
                 signature="def _helper()",
                 docstring=None,
@@ -180,7 +180,7 @@ class TestDetectDrift:
         """Multiple drift issues can be detected at once."""
         baseline = [
             BaselineComponent(
-                source_file="src/rai_cli/services/user.py",
+                source_file="src/raise_cli/services/user.py",
                 content="User service with docstring.",
                 metadata=BaselineComponentMetadata(name="UserService", kind="class"),
             )

@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.cli.main import app
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 runner = CliRunner()
 
@@ -40,20 +40,20 @@ def _mock_discover(self: object) -> None:
 
 
 class TestDoctorCLI:
-    @patch("rai_cli.doctor.registry.CheckRegistry.discover", _mock_discover)
+    @patch("raise_cli.doctor.registry.CheckRegistry.discover", _mock_discover)
     def test_doctor_runs_without_error(self) -> None:
         """rai doctor should run without crashing."""
         result = runner.invoke(app, ["doctor"])
         assert result.exit_code == 0
 
-    @patch("rai_cli.doctor.registry.CheckRegistry.discover", _mock_discover)
+    @patch("raise_cli.doctor.registry.CheckRegistry.discover", _mock_discover)
     def test_doctor_json_output(self) -> None:
         result = runner.invoke(app, ["doctor", "--json"])
         assert result.exit_code == 0
         assert '"results"' in result.output
         assert '"summary"' in result.output
 
-    @patch("rai_cli.doctor.registry.CheckRegistry.discover", _mock_discover)
+    @patch("raise_cli.doctor.registry.CheckRegistry.discover", _mock_discover)
     def test_doctor_verbose(self) -> None:
         result = runner.invoke(app, ["doctor", "-v"])
         assert result.exit_code == 0

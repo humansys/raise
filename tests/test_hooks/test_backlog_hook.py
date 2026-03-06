@@ -7,10 +7,10 @@ from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.adapters.models import IssueRef, IssueSummary
-from rai_cli.cli.main import app
-from rai_cli.hooks.builtin.backlog import BacklogHook
-from rai_cli.hooks.events import WorkLifecycleEvent
+from raise_cli.adapters.models import IssueRef, IssueSummary
+from raise_cli.cli.main import app
+from raise_cli.hooks.builtin.backlog import BacklogHook
+from raise_cli.hooks.events import WorkLifecycleEvent
 
 runner = CliRunner()
 
@@ -61,8 +61,8 @@ class TestEmitWorkBridge:
         """emit-work CLI command dispatches WorkLifecycleEvent after telemetry write."""
         mock_emitter = MagicMock()
         with (
-            patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.telemetry.writer.emit") as mock_emit,
+            patch("raise_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
+            patch("raise_cli.telemetry.writer.emit") as mock_emit,
         ):
             mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
             result = runner.invoke(
@@ -93,8 +93,8 @@ class TestEmitWorkBridge:
         """emit-work fires WorkLifecycleEvent for epic work type."""
         mock_emitter = MagicMock()
         with (
-            patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.telemetry.writer.emit") as mock_emit,
+            patch("raise_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
+            patch("raise_cli.telemetry.writer.emit") as mock_emit,
         ):
             mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
             result = runner.invoke(
@@ -122,8 +122,8 @@ class TestEmitWorkBridge:
         mock_emitter = MagicMock()
         mock_emitter.emit.side_effect = RuntimeError("hook system exploded")
         with (
-            patch("rai_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
-            patch("rai_cli.telemetry.writer.emit") as mock_emit,
+            patch("raise_cli.hooks.emitter.create_emitter", return_value=mock_emitter),
+            patch("raise_cli.telemetry.writer.emit") as mock_emit,
         ):
             mock_emit.return_value = MagicMock(success=True, path="/tmp/test.jsonl")
             result = runner.invoke(
@@ -174,7 +174,7 @@ class TestBacklogHookMapping:
             work_type="story", work_id="S325.4", event="start", phase="design"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -196,7 +196,7 @@ class TestBacklogHookMapping:
             work_type="story", work_id="S417.1", event="start", phase="design"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -217,7 +217,7 @@ class TestBacklogHookMapping:
             work_type="epic", work_id="E417", event="start", phase="design"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -244,7 +244,7 @@ class TestBacklogHookMapping:
             work_type="story", work_id="S325.4", event="start", phase="design"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -271,7 +271,7 @@ class TestBacklogHookMapping:
             work_type="story", work_id="S325.4", event="complete", phase="close"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -291,7 +291,7 @@ class TestBacklogHookMapping:
             work_type="epic", work_id="E325", event="start", phase="design"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -316,7 +316,7 @@ class TestBacklogHookMapping:
             work_type="epic", work_id="E325", event="complete", phase="close"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -331,7 +331,7 @@ class TestBacklogHookMapping:
         event = WorkLifecycleEvent(
             work_type="story", work_id="S1", event="blocked", phase="implement"
         )
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter") as mock_resolve:
+        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter") as mock_resolve:
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -345,7 +345,7 @@ class TestBacklogHookMapping:
         event = WorkLifecycleEvent(
             work_type="story", work_id="S1", event="unblocked", phase="implement"
         )
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter") as mock_resolve:
+        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter") as mock_resolve:
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -364,7 +364,7 @@ class TestBacklogHookGracefulDegradation:
             work_type="story", work_id="S1", event="start", phase="design"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter",
+            "raise_cli.hooks.builtin.backlog.resolve_adapter",
             side_effect=RuntimeError("no adapter"),
         ):
             result = hook.handle(event)
@@ -395,7 +395,7 @@ class TestBacklogHookGracefulDegradation:
             work_type="story", work_id="S1", event="start", phase="design"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -412,7 +412,7 @@ class TestBacklogHookGracefulDegradation:
             work_type="story", work_id="S1", event="complete", phase="close"
         )
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -425,28 +425,28 @@ class TestAdapterAgnosticRenames:
 
     def test_resolve_jira_key_no_longer_exists(self) -> None:
         """Old _resolve_jira_key function is removed."""
-        import rai_cli.hooks.builtin.backlog as mod
+        import raise_cli.hooks.builtin.backlog as mod
 
         assert not hasattr(mod, "_resolve_jira_key"), "_resolve_jira_key should be renamed to _resolve_issue_key"
 
     def test_resolve_issue_key_exists(self) -> None:
         """New _resolve_issue_key function exists."""
-        import rai_cli.hooks.builtin.backlog as mod
+        import raise_cli.hooks.builtin.backlog as mod
 
         assert hasattr(mod, "_resolve_issue_key"), "_resolve_issue_key should exist"
 
     def test_resolve_adapter_called_with_none(self, tmp_path: Path) -> None:
         """resolve_adapter uses None (manifest-aware) instead of hardcoded 'jira'."""
-        with patch("rai_cli.cli.commands._resolve.resolve_adapter") as mock_resolve:
+        with patch("raise_cli.cli.commands._resolve.resolve_adapter") as mock_resolve:
             mock_resolve.return_value = MagicMock()
-            from rai_cli.hooks.builtin.backlog import resolve_adapter
+            from raise_cli.hooks.builtin.backlog import resolve_adapter
 
             resolve_adapter()
         mock_resolve.assert_called_once_with(None)
 
     def test_module_docstring_adapter_agnostic(self) -> None:
         """Module docstring says 'backlog state', not 'Jira state'."""
-        import rai_cli.hooks.builtin.backlog as mod
+        import raise_cli.hooks.builtin.backlog as mod
 
         assert "backlog state" in (mod.__doc__ or "").lower()
 
@@ -469,7 +469,7 @@ class TestJiraLabelFirstSearch:
         adapter.transition_issue.return_value = IssueRef(key="RAISE-100")
 
         event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -492,7 +492,7 @@ class TestJiraLabelFirstSearch:
         adapter.transition_issue.return_value = IssueRef(key="RAISE-200")
 
         event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -513,7 +513,7 @@ class TestJiraLabelFirstSearch:
         adapter.search.side_effect = [[], []]  # label miss, summary miss
 
         event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="complete", phase="close")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
             result = hook.handle(event)
 
         assert result.status == "error"
@@ -525,7 +525,7 @@ class TestFilesystemAdapterDirectSearch:
 
     def test_filesystem_adapter_uses_direct_search(self, tmp_path: Path) -> None:
         """FilesystemPMAdapter search is called with plain work_id, not JQL."""
-        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+        from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
@@ -538,7 +538,7 @@ class TestFilesystemAdapterDirectSearch:
         adapter.transition_issue.return_value = IssueRef(key="S99.1")
 
         event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -548,7 +548,7 @@ class TestFilesystemAdapterDirectSearch:
 
     def test_filesystem_adapter_no_match_returns_none(self, tmp_path: Path) -> None:
         """FilesystemPMAdapter search returns empty → create is attempted."""
-        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+        from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
         root = _jira_yaml(tmp_path)
         hook = _make_hook(root)
@@ -559,7 +559,7 @@ class TestFilesystemAdapterDirectSearch:
         adapter.transition_issue.return_value = IssueRef(key="S99.1")
 
         event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -573,7 +573,7 @@ class TestBacklogHookDiscovery:
 
     def test_backlog_hook_discovered_via_registry(self) -> None:
         """BacklogHook is found by HookRegistry.discover()."""
-        from rai_cli.hooks.registry import HookRegistry
+        from raise_cli.hooks.registry import HookRegistry
 
         registry = HookRegistry()
         registry.discover()
@@ -582,7 +582,7 @@ class TestBacklogHookDiscovery:
 
     def test_backlog_hook_subscribes_to_work_lifecycle(self) -> None:
         """BacklogHook subscribes to work:lifecycle event."""
-        from rai_cli.hooks.registry import HookRegistry
+        from raise_cli.hooks.registry import HookRegistry
 
         registry = HookRegistry()
         registry.discover()
@@ -607,14 +607,14 @@ class TestBacklogHookEndToEnd:
         # Patch BacklogHook to use our test root and mock adapter
         with (
             patch(
-                "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+                "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
             ),
             patch.object(
                 BacklogHook,
                 "__init__",
                 lambda self, **kw: setattr(self, "_project_root", root),
             ),
-            patch("rai_cli.telemetry.writer.emit") as mock_telemetry,
+            patch("raise_cli.telemetry.writer.emit") as mock_telemetry,
         ):
             mock_telemetry.return_value = MagicMock(
                 success=True, path="/tmp/test.jsonl"

@@ -6,8 +6,8 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+from raise_cli.cli.main import app
+from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
 runner = CliRunner()
 
@@ -30,7 +30,7 @@ class TestMcpList:
 
     def test_list_shows_servers(self) -> None:
         with patch(
-            "rai_cli.cli.commands.mcp.discover_mcp_servers",
+            "raise_cli.cli.commands.mcp.discover_mcp_servers",
             return_value=_SERVERS,
         ):
             result = runner.invoke(app, ["mcp", "list"])
@@ -41,7 +41,7 @@ class TestMcpList:
 
     def test_list_no_servers(self) -> None:
         with patch(
-            "rai_cli.cli.commands.mcp.discover_mcp_servers",
+            "raise_cli.cli.commands.mcp.discover_mcp_servers",
             return_value={},
         ):
             result = runner.invoke(app, ["mcp", "list"])

@@ -6,7 +6,7 @@ import json
 
 import pytest
 
-from rai_cli.output import (
+from raise_cli.output import (
     OutputConsole,
     configure_console,
     get_console,

@@ -8,8 +8,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import yaml
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.mcp.schema import McpServerConfig
+from raise_cli.cli.main import app
+from raise_cli.mcp.schema import McpServerConfig
 
 runner = CliRunner()
 
@@ -34,7 +34,7 @@ class TestScaffoldSuccess:
         mock_bridge.aclose.return_value = None
 
         with patch(
-            "rai_cli.mcp.bridge.McpBridge",
+            "raise_cli.mcp.bridge.McpBridge",
             return_value=mock_bridge,
         ):
             result = runner.invoke(
@@ -72,7 +72,7 @@ class TestScaffoldSuccess:
         mock_bridge.aclose.return_value = None
 
         with patch(
-            "rai_cli.mcp.bridge.McpBridge",
+            "raise_cli.mcp.bridge.McpBridge",
             return_value=mock_bridge,
         ):
             result = runner.invoke(
@@ -105,7 +105,7 @@ class TestScaffoldCreatesDirectory:
         mock_bridge.aclose.return_value = None
 
         with patch(
-            "rai_cli.mcp.bridge.McpBridge",
+            "raise_cli.mcp.bridge.McpBridge",
             return_value=mock_bridge,
         ):
             result = runner.invoke(
@@ -161,7 +161,7 @@ class TestScaffoldOverwriteProtection:
         mock_bridge.aclose.return_value = None
 
         with patch(
-            "rai_cli.mcp.bridge.McpBridge",
+            "raise_cli.mcp.bridge.McpBridge",
             return_value=mock_bridge,
         ):
             result = runner.invoke(
@@ -192,7 +192,7 @@ class TestScaffoldServerError:
         mock_bridge.aclose.return_value = None
 
         with patch(
-            "rai_cli.mcp.bridge.McpBridge",
+            "raise_cli.mcp.bridge.McpBridge",
             return_value=mock_bridge,
         ):
             result = runner.invoke(
@@ -221,7 +221,7 @@ class TestScaffoldWithEnv:
         mock_bridge.aclose.return_value = None
 
         with patch(
-            "rai_cli.mcp.bridge.McpBridge",
+            "raise_cli.mcp.bridge.McpBridge",
             return_value=mock_bridge,
         ):
             result = runner.invoke(

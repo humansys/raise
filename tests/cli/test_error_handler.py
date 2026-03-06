@@ -10,12 +10,12 @@ from unittest.mock import patch
 import pytest
 from rich.console import Console
 
-from rai_cli.cli.error_handler import (
+from raise_cli.cli.error_handler import (
     get_error_console,
     handle_error,
     set_error_console,
 )
-from rai_cli.exceptions import (
+from raise_cli.exceptions import (
     ConfigurationError,
     GateFailedError,
     KataNotFoundError,

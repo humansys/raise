@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.onboarding.conventions import (
+from raise_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
     IndentationConvention,
@@ -15,7 +15,7 @@ from rai_cli.onboarding.conventions import (
     StructureConventions,
     StyleConventions,
 )
-from rai_cli.onboarding.governance import (
+from raise_cli.onboarding.governance import (
     GeneratedGuardrail,
     GuardrailGenerator,
     GuardrailLevel,

@@ -6,8 +6,8 @@ import time
 from pathlib import Path
 from typing import ClassVar
 
-from rai_cli.hooks.emitter import EventEmitter
-from rai_cli.hooks.events import (
+from raise_cli.hooks.emitter import EventEmitter
+from raise_cli.hooks.events import (
     BeforeReleasePublishEvent,
     BeforeSessionCloseEvent,
     GraphBuildEvent,
@@ -15,7 +15,7 @@ from rai_cli.hooks.events import (
     HookResult,
     SessionStartEvent,
 )
-from rai_cli.hooks.registry import HookRegistry
+from raise_cli.hooks.registry import HookRegistry
 
 
 def _ok_handler(event: HookEvent) -> HookResult:
@@ -391,7 +391,7 @@ class TestE2EPipeline:
                 return HookResult(status="ok")
 
         # Protocol conformance
-        from rai_cli.hooks.protocol import LifecycleHook
+        from raise_cli.hooks.protocol import LifecycleHook
 
         assert isinstance(HighPriorityHook(), LifecycleHook)
         assert isinstance(MediumBrokenHook(), LifecycleHook)

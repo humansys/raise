@@ -15,7 +15,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import TypeAdapter, ValidationError
 
-from rai_cli.telemetry import (
+from raise_cli.telemetry import (
     CalibrationEvent,
     CommandUsage,
     ErrorEvent,

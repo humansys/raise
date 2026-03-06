@@ -7,7 +7,7 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.discovery.scanner import (
+from raise_cli.discovery.scanner import (
     ScanResult,
     Symbol,
     detect_language,

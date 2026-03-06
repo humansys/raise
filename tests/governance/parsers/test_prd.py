@@ -5,8 +5,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.governance.models import ConceptType
-from rai_cli.governance.parsers.prd import extract_requirements
+from raise_cli.governance.models import ConceptType
+from raise_cli.governance.parsers.prd import extract_requirements
 
 
 @pytest.fixture

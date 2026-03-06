@@ -11,13 +11,13 @@ from unittest.mock import patch
 import pytest
 from typer.testing import CliRunner
 
-from rai_cli.doctor.fix import (
+from raise_cli.doctor.fix import (
     FIX_REGISTRY,
     add_gitignore_personal,
     rebuild_graph,
     run_fixes,
 )
-from rai_cli.doctor.models import CheckResult, CheckStatus
+from raise_cli.doctor.models import CheckResult, CheckStatus
 
 
 @pytest.fixture()
@@ -33,7 +33,7 @@ class TestRebuildGraph:
         assert "rebuild-graph" in FIX_REGISTRY
 
     def test_calls_subprocess_with_graph_build(self, project_dir: Path) -> None:
-        with patch("rai_cli.doctor.fix.subprocess.run") as mock_run:
+        with patch("raise_cli.doctor.fix.subprocess.run") as mock_run:
             mock_run.return_value.returncode = 0
             result = rebuild_graph(project_dir)
         assert result is True
@@ -44,7 +44,7 @@ class TestRebuildGraph:
         assert args[1]["cwd"] == project_dir
 
     def test_returns_false_on_failure(self, project_dir: Path) -> None:
-        with patch("rai_cli.doctor.fix.subprocess.run") as mock_run:
+        with patch("raise_cli.doctor.fix.subprocess.run") as mock_run:
             mock_run.return_value.returncode = 1
             result = rebuild_graph(project_dir)
         assert result is False
@@ -162,7 +162,7 @@ class TestDoctorFixCLI:
 
     def test_fix_flag_accepted(self) -> None:
         cli_runner = CliRunner()
-        from rai_cli.cli.main import app
+        from raise_cli.cli.main import app
 
         result = cli_runner.invoke(app, ["doctor", "--fix"])
         # Should not fail with unknown option
@@ -171,7 +171,7 @@ class TestDoctorFixCLI:
 
     def test_fix_flag_in_help(self) -> None:
         cli_runner = CliRunner()
-        from rai_cli.cli.main import app
+        from raise_cli.cli.main import app
 
         result = cli_runner.invoke(app, ["doctor", "--help"])
         assert "--fix" in result.output

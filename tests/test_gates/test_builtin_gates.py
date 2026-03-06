@@ -7,9 +7,9 @@ from unittest.mock import patch
 
 import pytest
 
-from rai_cli.gates.models import GateContext, GateResult
-from rai_cli.gates.protocol import WorkflowGate
-from rai_cli.gates.registry import GateRegistry
+from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.protocol import WorkflowGate
+from raise_cli.gates.registry import GateRegistry
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -34,10 +34,10 @@ class TestProtocolConformance:
 
     @pytest.fixture(
         params=[
-            "rai_cli.gates.builtin.tests:TestGate",
-            "rai_cli.gates.builtin.types:TypeGate",
-            "rai_cli.gates.builtin.lint:LintGate",
-            "rai_cli.gates.builtin.coverage:CoverageGate",
+            "raise_cli.gates.builtin.tests:TestGate",
+            "raise_cli.gates.builtin.types:TypeGate",
+            "raise_cli.gates.builtin.lint:LintGate",
+            "raise_cli.gates.builtin.coverage:CoverageGate",
         ]
     )
     def gate_instance(self, request: pytest.FixtureRequest) -> WorkflowGate:
@@ -79,7 +79,7 @@ class TestTestGate:
     """TestGate runs pytest -x --tb=short."""
 
     def test_pass(self) -> None:
-        from rai_cli.gates.builtin.tests import TestGate
+        from raise_cli.gates.builtin.tests import TestGate
 
         gate = TestGate()
         ctx = GateContext(gate_id="gate-tests")
@@ -94,7 +94,7 @@ class TestTestGate:
         assert "pytest" in args[0][0]
 
     def test_fail(self) -> None:
-        from rai_cli.gates.builtin.tests import TestGate
+        from raise_cli.gates.builtin.tests import TestGate
 
         gate = TestGate()
         ctx = GateContext(gate_id="gate-tests")
@@ -107,7 +107,7 @@ class TestTestGate:
         assert result.details != ()
 
     def test_exception_returns_failed(self) -> None:
-        from rai_cli.gates.builtin.tests import TestGate
+        from raise_cli.gates.builtin.tests import TestGate
 
         gate = TestGate()
         ctx = GateContext(gate_id="gate-tests")
@@ -119,7 +119,7 @@ class TestTestGate:
     def test_uses_working_dir(self, tmp_path: object) -> None:
         from pathlib import Path
 
-        from rai_cli.gates.builtin.tests import TestGate
+        from raise_cli.gates.builtin.tests import TestGate
 
         gate = TestGate()
         ctx = GateContext(gate_id="gate-tests", working_dir=Path("/some/project"))
@@ -137,7 +137,7 @@ class TestTypeGate:
     """TypeGate runs pyright."""
 
     def test_pass(self) -> None:
-        from rai_cli.gates.builtin.types import TypeGate
+        from raise_cli.gates.builtin.types import TypeGate
 
         gate = TypeGate()
         ctx = GateContext(gate_id="gate-types")
@@ -148,7 +148,7 @@ class TestTypeGate:
         assert "pyright" in mock.call_args[0][0]
 
     def test_fail(self) -> None:
-        from rai_cli.gates.builtin.types import TypeGate
+        from raise_cli.gates.builtin.types import TypeGate
 
         gate = TypeGate()
         ctx = GateContext(gate_id="gate-types")
@@ -159,7 +159,7 @@ class TestTypeGate:
         assert result.passed is False
 
     def test_exception_returns_failed(self) -> None:
-        from rai_cli.gates.builtin.types import TypeGate
+        from raise_cli.gates.builtin.types import TypeGate
 
         gate = TypeGate()
         ctx = GateContext(gate_id="gate-types")
@@ -180,7 +180,7 @@ class TestLintGate:
     """LintGate runs ruff check."""
 
     def test_pass(self) -> None:
-        from rai_cli.gates.builtin.lint import LintGate
+        from raise_cli.gates.builtin.lint import LintGate
 
         gate = LintGate()
         ctx = GateContext(gate_id="gate-lint")
@@ -191,7 +191,7 @@ class TestLintGate:
         assert "ruff" in mock.call_args[0][0]
 
     def test_fail(self) -> None:
-        from rai_cli.gates.builtin.lint import LintGate
+        from raise_cli.gates.builtin.lint import LintGate
 
         gate = LintGate()
         ctx = GateContext(gate_id="gate-lint")
@@ -203,7 +203,7 @@ class TestLintGate:
         assert result.passed is False
 
     def test_exception_returns_failed(self) -> None:
-        from rai_cli.gates.builtin.lint import LintGate
+        from raise_cli.gates.builtin.lint import LintGate
 
         gate = LintGate()
         ctx = GateContext(gate_id="gate-lint")
@@ -221,7 +221,7 @@ class TestCoverageGate:
     """CoverageGate runs pytest --cov."""
 
     def test_pass(self) -> None:
-        from rai_cli.gates.builtin.coverage import CoverageGate
+        from raise_cli.gates.builtin.coverage import CoverageGate
 
         gate = CoverageGate()
         ctx = GateContext(gate_id="gate-coverage")
@@ -232,7 +232,7 @@ class TestCoverageGate:
         assert "--cov" in mock.call_args[0][0]
 
     def test_fail(self) -> None:
-        from rai_cli.gates.builtin.coverage import CoverageGate
+        from raise_cli.gates.builtin.coverage import CoverageGate
 
         gate = CoverageGate()
         ctx = GateContext(gate_id="gate-coverage")
@@ -243,7 +243,7 @@ class TestCoverageGate:
         assert result.passed is False
 
     def test_exception_returns_failed(self) -> None:
-        from rai_cli.gates.builtin.coverage import CoverageGate
+        from raise_cli.gates.builtin.coverage import CoverageGate
 
         gate = CoverageGate()
         ctx = GateContext(gate_id="gate-coverage")

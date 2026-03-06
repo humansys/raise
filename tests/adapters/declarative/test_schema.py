@@ -12,14 +12,14 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from rai_cli.adapters.declarative.schema import (
+from raise_cli.adapters.declarative.schema import (
     AdapterMeta,
     DeclarativeAdapterConfig,
     MethodMapping,
     ResponseMapping,
     ServerRef,
 )
-from rai_cli.mcp.schema import ServerConnection
+from raise_cli.mcp.schema import ServerConnection
 
 FIXTURES = Path(__file__).parent / "fixtures"
 

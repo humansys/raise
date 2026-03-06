@@ -6,9 +6,9 @@ from pathlib import Path
 
 import yaml
 
-from rai_cli.config.agents import get_agent_config
-from rai_cli.onboarding.workflows import WorkflowScaffoldResult, scaffold_workflows
-from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
+from raise_cli.config.agents import get_agent_config
+from raise_cli.onboarding.workflows import WorkflowScaffoldResult, scaffold_workflows
+from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
 
 TOTAL_SKILLS = len(DISTRIBUTABLE_SKILLS)
 

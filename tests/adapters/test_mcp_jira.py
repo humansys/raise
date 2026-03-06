@@ -14,8 +14,8 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from rai_cli.adapters.mcp_bridge import McpBridgeError, McpToolResult
-from rai_cli.adapters.models import (
+from raise_cli.adapters.mcp_bridge import McpBridgeError, McpToolResult
+from raise_cli.adapters.models import (
     AdapterHealth,
     BatchResult,
     Comment,
@@ -96,7 +96,7 @@ class TestMcpJiraAdapterInit:
         (tmp_path / ".raise").mkdir()
         (tmp_path / ".raise" / "jira.yaml").write_text(JIRA_YAML)
 
-        from rai_cli.adapters.mcp_jira import McpJiraAdapter
+        from raise_cli.adapters.mcp_jira import McpJiraAdapter
 
         adapter = McpJiraAdapter(project_root=tmp_path)
         assert adapter._status_mapping == {
@@ -111,14 +111,14 @@ class TestMcpJiraAdapterInit:
         (tmp_path / ".raise").mkdir()
         (tmp_path / ".raise" / "jira.yaml").write_text(JIRA_YAML_NO_STATUS_MAPPING)
 
-        from rai_cli.adapters.mcp_jira import McpJiraAdapter
+        from raise_cli.adapters.mcp_jira import McpJiraAdapter
 
         with pytest.raises(ValueError, match="status_mapping"):
             McpJiraAdapter(project_root=tmp_path)
 
     def test_init_raises_on_missing_jira_yaml(self, tmp_path: Path) -> None:
         """__init__ raises FileNotFoundError when jira.yaml doesn't exist."""
-        from rai_cli.adapters.mcp_jira import McpJiraAdapter
+        from raise_cli.adapters.mcp_jira import McpJiraAdapter
 
         with pytest.raises(FileNotFoundError):
             McpJiraAdapter(project_root=tmp_path)
@@ -135,7 +135,7 @@ class TestResolveTransitionId:
         (tmp_path / ".raise").mkdir()
         (tmp_path / ".raise" / "jira.yaml").write_text(JIRA_YAML)
 
-        from rai_cli.adapters.mcp_jira import McpJiraAdapter
+        from raise_cli.adapters.mcp_jira import McpJiraAdapter
 
         adapter = McpJiraAdapter(project_root=tmp_path)
         assert adapter._resolve_transition_id("done") == "41"
@@ -146,7 +146,7 @@ class TestResolveTransitionId:
         (tmp_path / ".raise").mkdir()
         (tmp_path / ".raise" / "jira.yaml").write_text(JIRA_YAML)
 
-        from rai_cli.adapters.mcp_jira import McpJiraAdapter
+        from raise_cli.adapters.mcp_jira import McpJiraAdapter
 
         adapter = McpJiraAdapter(project_root=tmp_path)
         with pytest.raises(ValueError, match="invalid") as exc_info:
@@ -166,7 +166,7 @@ def _make_adapter(tmp_path: Path) -> Any:
     (tmp_path / ".raise").mkdir(exist_ok=True)
     (tmp_path / ".raise" / "jira.yaml").write_text(JIRA_YAML)
 
-    from rai_cli.adapters.mcp_jira import McpJiraAdapter
+    from raise_cli.adapters.mcp_jira import McpJiraAdapter
 
     adapter = McpJiraAdapter(project_root=tmp_path)
     adapter._bridge = AsyncMock()

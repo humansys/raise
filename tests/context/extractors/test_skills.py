@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-from rai_cli.context.extractors.skills import (
+from raise_cli.context.extractors.skills import (
     extract_all_skills,
     extract_skill_metadata,
 )

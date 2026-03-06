@@ -34,8 +34,8 @@ from unittest.mock import patch
 import pytest
 import yaml
 
-from rai_cli.adapters.filesystem import FilesystemPMAdapter
-from rai_cli.adapters.models import IssueSpec
+from raise_cli.adapters.filesystem import FilesystemPMAdapter
+from raise_cli.adapters.models import IssueSpec
 
 # ---------------------------------------------------------------------------
 # T1: Protocol parity — full lifecycle round-trip
@@ -213,8 +213,8 @@ class TestHookAdapterFlow:
         jira_yaml_setup: Path,
     ) -> None:
         """Epic start event -> creates YAML item and transitions to in-progress."""
-        from rai_cli.hooks.builtin.backlog import BacklogHook
-        from rai_cli.hooks.events import WorkLifecycleEvent
+        from raise_cli.hooks.builtin.backlog import BacklogHook
+        from raise_cli.hooks.events import WorkLifecycleEvent
 
         adapter = FilesystemPMAdapter(project_root=tmp_path)
         hook = BacklogHook(project_root=tmp_path)
@@ -223,7 +223,7 @@ class TestHookAdapterFlow:
         )
 
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -245,8 +245,8 @@ class TestHookAdapterFlow:
         jira_yaml_setup: Path,
     ) -> None:
         """Complete event -> transitions existing issue to done."""
-        from rai_cli.hooks.builtin.backlog import BacklogHook
-        from rai_cli.hooks.events import WorkLifecycleEvent
+        from raise_cli.hooks.builtin.backlog import BacklogHook
+        from raise_cli.hooks.events import WorkLifecycleEvent
 
         adapter = FilesystemPMAdapter(project_root=tmp_path)
 
@@ -260,7 +260,7 @@ class TestHookAdapterFlow:
         )
 
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
         ):
             result = hook.handle(event)
 
@@ -276,8 +276,8 @@ class TestHookAdapterFlow:
         jira_yaml_setup: Path,
     ) -> None:
         """BacklogHook degrades gracefully when adapter raises."""
-        from rai_cli.hooks.builtin.backlog import BacklogHook
-        from rai_cli.hooks.events import WorkLifecycleEvent
+        from raise_cli.hooks.builtin.backlog import BacklogHook
+        from raise_cli.hooks.events import WorkLifecycleEvent
 
         hook = BacklogHook(project_root=tmp_path)
         event = WorkLifecycleEvent(
@@ -285,7 +285,7 @@ class TestHookAdapterFlow:
         )
 
         with patch(
-            "rai_cli.hooks.builtin.backlog.resolve_adapter",
+            "raise_cli.hooks.builtin.backlog.resolve_adapter",
             side_effect=RuntimeError("MCP bridge down"),
         ):
             result = hook.handle(event)
@@ -309,8 +309,8 @@ class TestSessionLiveQuery:
         write_yaml_item: Callable[..., None],
     ) -> None:
         """Pre-populated YAML items -> correct LiveBacklogStatus fields."""
-        from rai_cli.schemas.session_state import CurrentWork, LastSession, SessionState
-        from rai_cli.session.bundle import _fetch_live_status
+        from raise_cli.schemas.session_state import CurrentWork, LastSession, SessionState
+        from raise_cli.session.bundle import _fetch_live_status
 
         # Write YAML items on disk
         write_yaml_item(
@@ -347,7 +347,7 @@ class TestSessionLiveQuery:
         adapter = FilesystemPMAdapter(project_root=tmp_path)
 
         with patch(
-            "rai_cli.cli.commands._resolve.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands._resolve.resolve_adapter", return_value=adapter
         ):
             live = _fetch_live_status(state, timeout=10.0)
 
@@ -359,7 +359,7 @@ class TestSessionLiveQuery:
 
     def test_fetch_live_status_with_no_work_returns_empty(self) -> None:
         """No current work -> empty LiveBacklogStatus without adapter call."""
-        from rai_cli.session.bundle import LiveBacklogStatus, _fetch_live_status
+        from raise_cli.session.bundle import LiveBacklogStatus, _fetch_live_status
 
         result = _fetch_live_status(None)
         assert result == LiveBacklogStatus()
@@ -368,8 +368,8 @@ class TestSessionLiveQuery:
         self, tmp_path: Path, backlog_dir: Path
     ) -> None:
         """manifest.yaml with backlog.adapter_default=filesystem selects FileAdapter."""
-        from rai_cli.cli.commands._resolve import resolve_adapter
-        from rai_cli.onboarding.manifest import load_manifest
+        from raise_cli.cli.commands._resolve import resolve_adapter
+        from raise_cli.onboarding.manifest import load_manifest
 
         # Write manifest.yaml
         manifest_dir = tmp_path / ".raise"
@@ -380,8 +380,8 @@ class TestSessionLiveQuery:
 
         # Patch CWD for manifest loading and entry points
         with (
-            patch("rai_cli.cli.commands._resolve.load_manifest") as mock_manifest,
-            patch("rai_cli.cli.commands._resolve._discover_pm") as mock_discover,
+            patch("raise_cli.cli.commands._resolve.load_manifest") as mock_manifest,
+            patch("raise_cli.cli.commands._resolve._discover_pm") as mock_discover,
         ):
             # Simulate manifest returning adapter_default=filesystem
             manifest = load_manifest(tmp_path)
@@ -409,7 +409,7 @@ class TestSyncGuard:
         self, file_adapter: FilesystemPMAdapter, tmp_path: Path
     ) -> None:
         """sync_backlog raises ValueError for FilesystemPMAdapter (source of truth)."""
-        from rai_cli.backlog.sync import sync_backlog
+        from raise_cli.backlog.sync import sync_backlog
 
         output_path = tmp_path / "governance" / "backlog.md"
 

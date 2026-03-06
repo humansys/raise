@@ -2,9 +2,9 @@
 
 from pathlib import Path
 
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
-from rai_cli.doctor.registry import CheckRegistry
-from rai_cli.doctor.runner import run_checks, summarize
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.registry import CheckRegistry
+from raise_cli.doctor.runner import run_checks, summarize
 
 
 class _PassCheck:

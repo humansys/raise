@@ -47,7 +47,7 @@ def _make_mock_backend(
 
 class TestDualWriteBackendProtocol:
     def test_implements_protocol(self) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
         remote = _make_mock_backend()
@@ -57,7 +57,7 @@ class TestDualWriteBackendProtocol:
 
 class TestDualWriteBackendPersist:
     def test_persist_calls_both_backends(self) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
         remote = _make_mock_backend()
@@ -71,7 +71,7 @@ class TestDualWriteBackendPersist:
 
     def test_persist_local_first(self) -> None:
         """Local persist is called before remote."""
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         call_order: list[str] = []
         local = _make_mock_backend()
@@ -87,7 +87,7 @@ class TestDualWriteBackendPersist:
     def test_persist_remote_failure_does_not_raise(
         self, caplog: pytest.LogCaptureFixture
     ) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
         remote = _make_mock_backend(persist_error=ConnectionError("refused"))
@@ -104,7 +104,7 @@ class TestDualWriteBackendPersist:
     ) -> None:
         import httpx
 
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
         remote = _make_mock_backend()
@@ -123,7 +123,7 @@ class TestDualWriteBackendPersist:
 
     def test_persist_local_failure_does_raise(self) -> None:
         """Local failure is not swallowed — it's critical."""
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend(persist_error=OSError("disk full"))
         remote = _make_mock_backend()
@@ -135,7 +135,7 @@ class TestDualWriteBackendPersist:
 
 class TestDualWriteBackendLoad:
     def test_load_delegates_to_local(self) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
         remote = _make_mock_backend()
@@ -150,7 +150,7 @@ class TestDualWriteBackendLoad:
 
 class TestDualWriteBackendHealth:
     def test_health_both_healthy(self) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend(healthy=True)
         remote = _make_mock_backend(healthy=True)
@@ -161,7 +161,7 @@ class TestDualWriteBackendHealth:
         assert health.status == "healthy"
 
     def test_health_remote_unavailable_is_degraded(self) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend(healthy=True)
         remote = _make_mock_backend(healthy=False)
@@ -172,7 +172,7 @@ class TestDualWriteBackendHealth:
         assert health.status == "degraded"
 
     def test_health_local_unavailable_is_unavailable(self) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend(healthy=False)
         remote = _make_mock_backend(healthy=True)
@@ -183,7 +183,7 @@ class TestDualWriteBackendHealth:
         assert health.status == "unavailable"
 
     def test_health_metadata_has_backend_dual(self) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend(healthy=True)
         remote = _make_mock_backend(healthy=True)
@@ -198,8 +198,8 @@ class TestDualWriteBackendPendingSync:
     """Pending sync marker integration with DualWriteBackend."""
 
     def test_remote_failure_creates_marker(self, tmp_path: Path) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
-        from rai_cli.graph.backends.pending import read_pending_marker
+        from raise_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.pending import read_pending_marker
 
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
@@ -216,8 +216,8 @@ class TestDualWriteBackendPendingSync:
         assert marker.edge_count == 0
 
     def test_remote_success_clears_existing_marker(self, tmp_path: Path) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
-        from rai_cli.graph.backends.pending import (
+        from raise_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.pending import (
             PendingSyncMarker,
             read_pending_marker,
             write_pending_marker,
@@ -247,8 +247,8 @@ class TestDualWriteBackendPendingSync:
         assert read_pending_marker(raise_dir) is None
 
     def test_remote_success_no_marker_is_noop(self, tmp_path: Path) -> None:
-        from rai_cli.graph.backends.dual import DualWriteBackend
-        from rai_cli.graph.backends.pending import read_pending_marker
+        from raise_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.pending import read_pending_marker
 
         raise_dir = tmp_path / ".raise"
         raise_dir.mkdir()
@@ -262,7 +262,7 @@ class TestDualWriteBackendPendingSync:
 
     def test_no_raise_dir_skips_marker(self) -> None:
         """When raise_dir is None, marker behavior is skipped entirely."""
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         local = _make_mock_backend()
         remote = _make_mock_backend(persist_error=ConnectionError("refused"))

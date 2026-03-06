@@ -8,7 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from rai_cli.adapters.registry import (
+from raise_cli.adapters.registry import (
     EP_GOVERNANCE_PARSERS,
     EP_PM_ADAPTERS,
     _discover,
@@ -48,7 +48,7 @@ class TestDiscover:
         fake_cls = type("FakeAdapter", (), {})
         mock_ep = _make_entry_point("test_adapter", fake_cls)
 
-        with patch("rai_cli.adapters.registry.entry_points", return_value=[mock_ep]):
+        with patch("raise_cli.adapters.registry.entry_points", return_value=[mock_ep]):
             result = _discover("rai.adapters.pm")
 
         assert result == {"test_adapter": fake_cls}
@@ -58,7 +58,7 @@ class TestDiscover:
         cls_b = type("AdapterB", (), {})
         eps = [_make_entry_point("a", cls_a), _make_entry_point("b", cls_b)]
 
-        with patch("rai_cli.adapters.registry.entry_points", return_value=eps):
+        with patch("raise_cli.adapters.registry.entry_points", return_value=eps):
             result = _discover("rai.adapters.pm")
 
         assert result == {"a": cls_a, "b": cls_b}
@@ -72,7 +72,7 @@ class TestDiscover:
 
         with (
             patch(
-                "rai_cli.adapters.registry.entry_points",
+                "raise_cli.adapters.registry.entry_points",
                 return_value=[good_ep, bad_ep],
             ),
             caplog.at_level(logging.WARNING),
@@ -95,7 +95,7 @@ class TestDiscover:
         ]
 
         with (
-            patch("rai_cli.adapters.registry.entry_points", return_value=eps),
+            patch("raise_cli.adapters.registry.entry_points", return_value=eps),
             caplog.at_level(logging.WARNING),
         ):
             result = _discover("rai.test.group")
@@ -111,7 +111,7 @@ class TestDiscover:
         mock_ep = _make_entry_point("not_a_class", a_function)
 
         with (
-            patch("rai_cli.adapters.registry.entry_points", return_value=[mock_ep]),
+            patch("raise_cli.adapters.registry.entry_points", return_value=[mock_ep]),
             caplog.at_level(logging.WARNING),
         ):
             result = _discover("rai.adapters.pm")
@@ -130,13 +130,13 @@ class TestPublicFunctions:
     Tests use real _discover (not mocked) to verify end-to-end behavior.
     """
 
-    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
+    @patch("raise_cli.adapters.registry.entry_points", return_value=[])
     def test_get_pm_adapters_returns_empty_when_none_registered(
         self, _mock: MagicMock
     ) -> None:
         assert get_pm_adapters() == {}
 
-    @patch("rai_cli.adapters.registry.entry_points", return_value=[])
+    @patch("raise_cli.adapters.registry.entry_points", return_value=[])
     def test_get_graph_backends_returns_empty_when_none_registered(
         self, _mock: MagicMock
     ) -> None:
@@ -147,7 +147,7 @@ class TestPublicFunctions:
         mock_ep = _make_entry_point("jira", fake_cls)
 
         with patch(
-            "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
+            "raise_cli.adapters.registry.entry_points", return_value=[mock_ep]
         ) as mock_eps:
             result = get_pm_adapters()
 
@@ -159,7 +159,7 @@ class TestPublicFunctions:
         mock_ep = _make_entry_point("backlog", fake_cls)
 
         with patch(
-            "rai_cli.adapters.registry.entry_points", return_value=[mock_ep]
+            "raise_cli.adapters.registry.entry_points", return_value=[mock_ep]
         ) as mock_eps:
             result = get_governance_parsers()
 
