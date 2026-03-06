@@ -320,9 +320,7 @@ def promote_pattern(
         f.write(json.dumps(dict(target)) + "\n")
 
     # Rewrite personal file without the promoted pattern (atomic: temp + rename)
-    tmp_fd, tmp_path = tempfile.mkstemp(
-        dir=personal_file.parent, suffix=".tmp"
-    )
+    tmp_fd, tmp_path = tempfile.mkstemp(dir=personal_file.parent, suffix=".tmp")
     try:
         with open(tmp_fd, "w", encoding="utf-8") as tmp_f:
             for line in remaining:

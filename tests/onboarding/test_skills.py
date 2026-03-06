@@ -375,7 +375,9 @@ class TestSkillSyncUpgrade:
 class TestSkillSetOverlay:
     """Tests for --skill-set overlay deployment (S340.1)."""
 
-    def _create_overlay(self, project: Path, set_name: str, skills: dict[str, str]) -> None:
+    def _create_overlay(
+        self, project: Path, set_name: str, skills: dict[str, str]
+    ) -> None:
         """Helper: create .raise/skills/{set}/{name}/SKILL.md files."""
         for name, content in skills.items():
             skill_dir = project / ".raise" / "skills" / set_name / name
@@ -384,9 +386,13 @@ class TestSkillSetOverlay:
 
     def test_overlay_adds_new_skill(self, tmp_path: Path) -> None:
         """Overlay skill not in builtins should be added to deployment."""
-        self._create_overlay(tmp_path, "my-team", {
-            "team-review": "# Team Review Skill",
-        })
+        self._create_overlay(
+            tmp_path,
+            "my-team",
+            {
+                "team-review": "# Team Review Skill",
+            },
+        )
 
         scaffold_skills(tmp_path, skill_set="my-team")
 
@@ -397,9 +403,13 @@ class TestSkillSetOverlay:
     def test_overlay_overrides_builtin(self, tmp_path: Path) -> None:
         """Overlay skill with same name as builtin should replace it."""
         custom_content = "# Custom Debug Skill\n\nMy team's version."
-        self._create_overlay(tmp_path, "my-team", {
-            "rai-debug": custom_content,
-        })
+        self._create_overlay(
+            tmp_path,
+            "my-team",
+            {
+                "rai-debug": custom_content,
+            },
+        )
 
         scaffold_skills(tmp_path, skill_set="my-team")
 
@@ -410,9 +420,13 @@ class TestSkillSetOverlay:
         """Overlay skills should have origin='project' in manifest."""
         import json
 
-        self._create_overlay(tmp_path, "my-team", {
-            "team-review": "# Team Review",
-        })
+        self._create_overlay(
+            tmp_path,
+            "my-team",
+            {
+                "team-review": "# Team Review",
+            },
+        )
 
         scaffold_skills(tmp_path, skill_set="my-team")
 
@@ -438,9 +452,13 @@ class TestSkillSetOverlay:
         """Manifest should record which skill set was deployed."""
         import json
 
-        self._create_overlay(tmp_path, "my-team", {
-            "team-review": "# Team Review",
-        })
+        self._create_overlay(
+            tmp_path,
+            "my-team",
+            {
+                "team-review": "# Team Review",
+            },
+        )
 
         scaffold_skills(tmp_path, skill_set="my-team")
 
@@ -459,7 +477,9 @@ class TestSkillSetOverlay:
 
         scaffold_skills(tmp_path, skill_set="my-team")
 
-        deployed_ref = tmp_path / ".claude" / "skills" / "team-review" / "references" / "guide.md"
+        deployed_ref = (
+            tmp_path / ".claude" / "skills" / "team-review" / "references" / "guide.md"
+        )
         assert deployed_ref.exists()
         assert deployed_ref.read_text(encoding="utf-8") == "# Guide"
 

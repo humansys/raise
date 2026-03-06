@@ -300,9 +300,7 @@ class GraphBuilder:
             return []
 
         try:
-            raw: Any = json.loads(
-                validated_file.read_text(encoding="utf-8")
-            )
+            raw: Any = json.loads(validated_file.read_text(encoding="utf-8"))
             # Accept both {"components": [...]} wrapper and bare [...] array
             if isinstance(raw, list):
                 components_list: list[dict[str, Any]] = raw  # type: ignore[assignment]
@@ -840,7 +838,9 @@ class GraphBuilder:
         """
         # Synthesize content from bounded contexts
         bcs: list[Any] = frontmatter.get("bounded_contexts", [])
-        bc_names: list[str] = [bc.get("name", "unknown") if isinstance(bc, dict) else str(bc) for bc in bcs]
+        bc_names: list[str] = [
+            bc.get("name", "unknown") if isinstance(bc, dict) else str(bc) for bc in bcs
+        ]
         bc_summary = ", ".join(bc_names) if bc_names else "none defined"
 
         shared: dict[str, Any] = frontmatter.get("shared_kernel", {})

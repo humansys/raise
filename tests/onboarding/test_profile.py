@@ -254,7 +254,9 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Fer\nexperience_level: shu\n")
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         result = load_developer_profile()
 
         assert result is not None
@@ -270,7 +272,9 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("invalid: yaml: content: [")
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         result = load_developer_profile()
         assert result is None
 
@@ -283,7 +287,9 @@ class TestLoadDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("not_a_name: Test\n")  # Missing required 'name' field
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         result = load_developer_profile()
         assert result is None
 
@@ -296,7 +302,9 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """save_developer_profile creates ~/.rai/ if it doesn't exist."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
         profile = DeveloperProfile(name="Test")
         save_developer_profile(profile)
@@ -309,7 +317,9 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """save_developer_profile writes valid YAML file."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
         profile = DeveloperProfile(name="Fer", experience_level=ExperienceLevel.HA)
         save_developer_profile(profile)
@@ -326,7 +336,9 @@ class TestSaveDeveloperProfile:
     ) -> None:
         """Saved profile can be loaded back correctly."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
         communication = CommunicationPreferences(
             style=CommunicationStyle.DIRECT,
@@ -366,7 +378,9 @@ class TestSaveDeveloperProfile:
         profile_file = rai_home / "developer.yaml"
         profile_file.write_text("name: Old\n")
 
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
 
         profile = DeveloperProfile(name="New")
         save_developer_profile(profile)
@@ -549,7 +563,9 @@ class TestProfileBackwardCompat:
             "name: LegacyUser\nexperience_level: ha\n"
             "skills_mastered:\n- rai-session-start\n"
         )
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         result = load_developer_profile()
         assert result is not None
         assert result.name == "LegacyUser"
@@ -561,7 +577,9 @@ class TestProfileBackwardCompat:
     ) -> None:
         """Profile with coaching survives save/load roundtrip."""
         rai_home = tmp_path / ".rai"
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: rai_home
+        )
         coaching = CoachingContext(
             strengths=["architecture", "naming"],
             growth_edge="speed over process",

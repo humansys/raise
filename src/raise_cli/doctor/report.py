@@ -32,9 +32,7 @@ class DiagnosticReport:
     installed_extras: list[str] = field(default_factory=_str_list)
 
 
-def generate_report(
-    results: list[CheckResult], working_dir: Path
-) -> DiagnosticReport:
+def generate_report(results: list[CheckResult], working_dir: Path) -> DiagnosticReport:
     """Collect non-sensitive data into report."""
     # Get rai version
     try:
@@ -71,7 +69,9 @@ def generate_report(
 
 def report_to_markdown(report: DiagnosticReport) -> str:
     """Render report as markdown."""
-    extras_str = ", ".join(report.installed_extras) if report.installed_extras else "none"
+    extras_str = (
+        ", ".join(report.installed_extras) if report.installed_extras else "none"
+    )
     lines = [
         "# rai doctor report",
         "",

@@ -322,12 +322,21 @@ class TestSearch:
         assert result[0].status == "Done"
         assert result[1].parent_key == "RAISE-144"
 
-
     def test_search_sanitizes_backslash_escaped_bang(self, tmp_path: Path) -> None:
         r"""Shell-escaped \!= in JQL is sanitized to != before bridge call (RAISE-435)."""
         adapter = _make_adapter(tmp_path)
         adapter._bridge.call.return_value = _ok(
-            {"issues": [{"key": "R-1", "summary": "X", "status": {"name": "Backlog"}, "issue_type": {"name": "Bug"}, "parent": None}]}
+            {
+                "issues": [
+                    {
+                        "key": "R-1",
+                        "summary": "X",
+                        "status": {"name": "Backlog"},
+                        "issue_type": {"name": "Bug"},
+                        "parent": None,
+                    }
+                ]
+            }
         )
 
         async def run() -> list[IssueSummary]:
@@ -336,7 +345,9 @@ class TestSearch:
         _run(run())
         call_args = adapter._bridge.call.call_args
         sent_jql = call_args[0][1]["jql"]
-        assert r"\!" not in sent_jql, f"Backslash-escaped bang not sanitized: {sent_jql}"
+        assert r"\!" not in sent_jql, (
+            f"Backslash-escaped bang not sanitized: {sent_jql}"
+        )
         assert "!=" in sent_jql
 
 

@@ -358,14 +358,16 @@ class TestScopeDocSkipLogic:
         """E1 in backlog should be skipped when work/epics/e1-*/scope.md exists."""
         backlog = tmp_path / "governance" / "backlog.md"
         backlog.parent.mkdir(parents=True)
-        backlog.write_text(dedent("""\
+        backlog.write_text(
+            dedent("""\
             # Backlog: test
 
             | ID | Epic | Status | Scope Doc | Priority |
             |----|------|--------|-----------|----------|
             | E1 | **Feature One** | Active | — | P0 |
             | E2 | **Feature Two** | Active | — | P1 |
-        """))
+        """)
+        )
         # Only E1 has a scope doc
         scope = tmp_path / "work" / "epics" / "e1-feature" / "scope.md"
         scope.parent.mkdir(parents=True)
@@ -384,13 +386,15 @@ class TestScopeDocSkipLogic:
         """
         backlog = tmp_path / "governance" / "backlog.md"
         backlog.parent.mkdir(parents=True)
-        backlog.write_text(dedent("""\
+        backlog.write_text(
+            dedent("""\
             # Backlog: test
 
             | ID | Epic | Status | Scope Doc | Priority |
             |----|------|--------|-----------|----------|
             | E08 | **Padded Epic** | Active | — | P0 |
-        """))
+        """)
+        )
         # Dir named e8-feature (no leading zero) — still the same epic
         scope = tmp_path / "work" / "epics" / "e8-feature" / "scope.md"
         scope.parent.mkdir(parents=True)
@@ -398,7 +402,9 @@ class TestScopeDocSkipLogic:
 
         epics = extract_epics(backlog, tmp_path)
         epic_ids = {e.metadata["epic_id"] for e in epics}
-        assert "E08" not in epic_ids, "E08 should be skipped — e8-feature/scope.md covers same epic"
+        assert "E08" not in epic_ids, (
+            "E08 should be skipped — e8-feature/scope.md covers same epic"
+        )
 
     def test_no_skip_for_jira_key_even_if_num_matches(self, tmp_path: Path) -> None:
         """RAISE-275 should NOT be skipped even if e275-*/scope.md exists.
@@ -408,13 +414,15 @@ class TestScopeDocSkipLogic:
         """
         backlog = tmp_path / "governance" / "backlog.md"
         backlog.parent.mkdir(parents=True)
-        backlog.write_text(dedent("""\
+        backlog.write_text(
+            dedent("""\
             # Backlog: test
 
             | ID | Epic | Status | Scope Doc | Priority |
             |----|------|--------|-----------|----------|
             | [RAISE-275](https://jira.example.com/RAISE-275) | **Jira Epic** | Active | — | P0 |
-        """))
+        """)
+        )
         # Coincidental e275 dir exists
         scope = tmp_path / "work" / "epics" / "e275-something" / "scope.md"
         scope.parent.mkdir(parents=True)
@@ -422,19 +430,23 @@ class TestScopeDocSkipLogic:
 
         epics = extract_epics(backlog, tmp_path)
         epic_ids = {e.metadata["epic_id"] for e in epics}
-        assert "RAISE-275" in epic_ids, "Jira key should never be skipped by scope doc logic"
+        assert "RAISE-275" in epic_ids, (
+            "Jira key should never be skipped by scope doc logic"
+        )
 
     def test_no_skip_when_no_scope_doc(self, tmp_path: Path) -> None:
         """E1 without scope doc should NOT be skipped."""
         backlog = tmp_path / "governance" / "backlog.md"
         backlog.parent.mkdir(parents=True)
-        backlog.write_text(dedent("""\
+        backlog.write_text(
+            dedent("""\
             # Backlog: test
 
             | ID | Epic | Status | Scope Doc | Priority |
             |----|------|--------|-----------|----------|
             | E1 | **No Scope Yet** | Draft | — | P0 |
-        """))
+        """)
+        )
         # No scope docs at all
 
         epics = extract_epics(backlog, tmp_path)

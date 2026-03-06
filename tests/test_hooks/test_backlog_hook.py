@@ -427,7 +427,9 @@ class TestAdapterAgnosticRenames:
         """Old _resolve_jira_key function is removed."""
         import raise_cli.hooks.builtin.backlog as mod
 
-        assert not hasattr(mod, "_resolve_jira_key"), "_resolve_jira_key should be renamed to _resolve_issue_key"
+        assert not hasattr(mod, "_resolve_jira_key"), (
+            "_resolve_jira_key should be renamed to _resolve_issue_key"
+        )
 
     def test_resolve_issue_key_exists(self) -> None:
         """New _resolve_issue_key function exists."""
@@ -464,12 +466,18 @@ class TestJiraLabelFirstSearch:
         hook = _make_hook(root)
         adapter = MagicMock()
         adapter.search.return_value = [
-            IssueSummary(key="RAISE-100", summary="S99.1", status="Backlog", issue_type="Story"),
+            IssueSummary(
+                key="RAISE-100", summary="S99.1", status="Backlog", issue_type="Story"
+            ),
         ]
         adapter.transition_issue.return_value = IssueRef(key="RAISE-100")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S99.1", event="start", phase="design"
+        )
+        with patch(
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -487,12 +495,23 @@ class TestJiraLabelFirstSearch:
         # First call (label) returns nothing, second call (summary) returns match
         adapter.search.side_effect = [
             [],
-            [IssueSummary(key="RAISE-200", summary="S99.1", status="Backlog", issue_type="Story")],
+            [
+                IssueSummary(
+                    key="RAISE-200",
+                    summary="S99.1",
+                    status="Backlog",
+                    issue_type="Story",
+                )
+            ],
         ]
         adapter.transition_issue.return_value = IssueRef(key="RAISE-200")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S99.1", event="start", phase="design"
+        )
+        with patch(
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -512,13 +531,18 @@ class TestJiraLabelFirstSearch:
         adapter = MagicMock()
         adapter.search.side_effect = [[], []]  # label miss, summary miss
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="complete", phase="close")
-        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S99.1", event="complete", phase="close"
+        )
+        with patch(
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "error"
         assert adapter.search.call_count == 2
         adapter.transition_issue.assert_not_called()
+
 
 class TestFilesystemAdapterDirectSearch:
     """T3: FileAdapter uses direct key search, no JQL (S347.4)."""
@@ -533,12 +557,21 @@ class TestFilesystemAdapterDirectSearch:
         # Create a mock that passes isinstance check
         adapter = MagicMock(spec=FilesystemPMAdapter)
         adapter.search.return_value = [
-            IssueSummary(key="S99.1", summary="S99.1 — Test", status="pending", issue_type="Story"),
+            IssueSummary(
+                key="S99.1",
+                summary="S99.1 — Test",
+                status="pending",
+                issue_type="Story",
+            ),
         ]
         adapter.transition_issue.return_value = IssueRef(key="S99.1")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S99.1", event="start", phase="design"
+        )
+        with patch(
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"
@@ -558,8 +591,12 @@ class TestFilesystemAdapterDirectSearch:
         adapter.create_issue.return_value = IssueRef(key="S99.1")
         adapter.transition_issue.return_value = IssueRef(key="S99.1")
 
-        event = WorkLifecycleEvent(work_type="story", work_id="S99.1", event="start", phase="design")
-        with patch("raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter):
+        event = WorkLifecycleEvent(
+            work_type="story", work_id="S99.1", event="start", phase="design"
+        )
+        with patch(
+            "raise_cli.hooks.builtin.backlog.resolve_adapter", return_value=adapter
+        ):
             result = hook.handle(event)
 
         assert result.status == "ok"

@@ -211,9 +211,7 @@ class InstructionsGenerator:
         i_wont: list[str] = []
 
         # Find "### I Will" section
-        will_match = re.search(
-            r"###\s+I Will\s*\n((?:- .+\n)*)", text, re.IGNORECASE
-        )
+        will_match = re.search(r"###\s+I Will\s*\n((?:- .+\n)*)", text, re.IGNORECASE)
         if will_match:
             for line in will_match.group(1).strip().split("\n"):
                 item = line.lstrip("- ").strip()
@@ -224,9 +222,7 @@ class InstructionsGenerator:
                     i_will.append(item)
 
         # Find "### I Won't" section
-        wont_match = re.search(
-            r"###\s+I Won't\s*\n((?:- .+\n)*)", text, re.IGNORECASE
-        )
+        wont_match = re.search(r"###\s+I Won't\s*\n((?:- .+\n)*)", text, re.IGNORECASE)
         if wont_match:
             for line in wont_match.group(1).strip().split("\n"):
                 item = line.lstrip("- ").strip()
@@ -237,9 +233,7 @@ class InstructionsGenerator:
 
         return i_will, i_wont
 
-    def _extract_principles_from_identity(
-        self, text: str
-    ) -> list[tuple[str, str]]:
+    def _extract_principles_from_identity(self, text: str) -> list[tuple[str, str]]:
         """Extract principles from the Internalized Philosophy table."""
         principles: list[tuple[str, str]] = []
         # Find the "Internalized Philosophy" section first to avoid
@@ -485,15 +479,9 @@ class InstructionsGenerator:
         )
         lines.append("")
         lines.append("### MCP")
-        lines.append(
-            "- cmd: rai mcp list | notes: registered servers in .raise/mcp/"
-        )
-        lines.append(
-            "- cmd: rai mcp health | sig: SERVER | notes: SERVER positional"
-        )
-        lines.append(
-            "- cmd: rai mcp tools | sig: SERVER | notes: list tools on server"
-        )
+        lines.append("- cmd: rai mcp list | notes: registered servers in .raise/mcp/")
+        lines.append("- cmd: rai mcp health | sig: SERVER | notes: SERVER positional")
+        lines.append("- cmd: rai mcp tools | sig: SERVER | notes: list tools on server")
         lines.append(
             "- cmd: rai mcp call | sig: SERVER TOOL [--args JSON] [--verbose] "
             "| notes: both positional"
@@ -509,8 +497,7 @@ class InstructionsGenerator:
         lines.append("")
         lines.append("### Gate")
         lines.append(
-            "- cmd: rai gate list | sig: [-f FORMAT] "
-            "| notes: discovered workflow gates"
+            "- cmd: rai gate list | sig: [-f FORMAT] | notes: discovered workflow gates"
         )
         lines.append(
             "- cmd: rai gate check | sig: [GATE_ID] [--all/-a] [-f FORMAT] "
@@ -533,8 +520,7 @@ class InstructionsGenerator:
         lines.append("")
         lines.append("### Release")
         lines.append(
-            "- cmd: rai release check | sig: [-p PATH] "
-            "| notes: run 10 quality gates"
+            "- cmd: rai release check | sig: [-p PATH] | notes: run 10 quality gates"
         )
         lines.append(
             "- cmd: rai release publish | sig: --bump/-b "
@@ -549,7 +535,7 @@ class InstructionsGenerator:
             "| why: no --project flag"
         )
         lines.append(
-            "- wrong: rai pattern add --content \"...\" | right: rai pattern add \"...\" "
+            '- wrong: rai pattern add --content "..." | right: rai pattern add "..." '
             "| why: CONTENT positional"
         )
         lines.append(
@@ -561,8 +547,8 @@ class InstructionsGenerator:
             "| why: PATH positional"
         )
         lines.append(
-            "- wrong: rai backlog create RAISE --summary \"Title\" "
-            "| right: rai backlog create \"Title\" -p RAISE "
+            '- wrong: rai backlog create RAISE --summary "Title" '
+            '| right: rai backlog create "Title" -p RAISE '
             "| why: SUMMARY positional, project is -p flag"
         )
         lines.append(
@@ -571,8 +557,8 @@ class InstructionsGenerator:
             "| why: LINK_TYPE positional"
         )
         lines.append(
-            "- wrong: rai backlog update KEY --field summary=\"X\" "
-            "| right: rai backlog update KEY -s \"X\" "
+            '- wrong: rai backlog update KEY --field summary="X" '
+            '| right: rai backlog update KEY -s "X" '
             "| why: named flags (-s, -l, --priority, --assignee)"
         )
         lines.append("")

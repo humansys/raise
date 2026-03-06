@@ -83,7 +83,9 @@ class CheckRegistry:
                 continue
 
             self._checks.append(instance)
-            logger.debug("Loaded doctor check '%s' (category=%s)", ep.name, instance.category)
+            logger.debug(
+                "Loaded doctor check '%s' (category=%s)", ep.name, instance.category
+            )
 
     def register(self, check: DoctorCheck | Any) -> None:
         """Manually register a check instance (useful for testing)."""

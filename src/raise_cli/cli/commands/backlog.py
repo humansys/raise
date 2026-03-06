@@ -308,7 +308,11 @@ def sync(
     pm = resolve_adapter(adapter)
 
     # Derive adapter name for display
-    adapter_name = adapter or type(pm).__name__.lower().replace("pmadapter", "").replace("adapter", "") or "unknown"
+    adapter_name = (
+        adapter
+        or type(pm).__name__.lower().replace("pmadapter", "").replace("adapter", "")
+        or "unknown"
+    )
 
     output_path = Path.cwd() / "governance" / "backlog.md"
 

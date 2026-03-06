@@ -43,7 +43,6 @@ class TestGetConfigDir:
         result = get_config_dir()
         assert isinstance(result, Path)
 
-
     def test_xdg_config_home_traversal_rejected(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -77,7 +76,6 @@ class TestGetCacheDir:
         result = get_cache_dir()
         assert isinstance(result, Path)
 
-
     def test_xdg_cache_home_traversal_rejected(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
@@ -110,7 +108,6 @@ class TestGetDataDir:
         monkeypatch.delenv("XDG_DATA_HOME", raising=False)
         result = get_data_dir()
         assert isinstance(result, Path)
-
 
     def test_xdg_data_home_traversal_rejected(
         self, monkeypatch: pytest.MonkeyPatch

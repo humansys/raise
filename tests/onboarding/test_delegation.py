@@ -127,7 +127,9 @@ class TestDelegationYamlRoundTrip:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Profile with delegation round-trips through YAML."""
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: tmp_path)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: tmp_path
+        )
         profile = DeveloperProfile(
             name="Dev",
             experience_level=ExperienceLevel.RI,
@@ -147,7 +149,9 @@ class TestDelegationYamlRoundTrip:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Profile YAML without delegation key loads fine."""
-        monkeypatch.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: tmp_path)
+        monkeypatch.setattr(
+            "raise_cli.onboarding.profile.get_rai_home", lambda: tmp_path
+        )
         profile = DeveloperProfile(name="Dev", experience_level=ExperienceLevel.HA)
         save_developer_profile(profile)
         loaded = load_developer_profile()

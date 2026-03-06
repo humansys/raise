@@ -8,7 +8,10 @@ from textwrap import dedent
 import pytest
 
 from raise_cli.onboarding.detection import DetectionResult, ProjectType
-from raise_cli.onboarding.instructions import InstructionsGenerator, generate_instructions
+from raise_cli.onboarding.instructions import (
+    InstructionsGenerator,
+    generate_instructions,
+)
 
 # =============================================================================
 # Fixtures

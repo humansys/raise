@@ -77,6 +77,7 @@ class TestBacklogModels:
         assert item.priority is None
         assert item.assignee is None
 
+
 # ── T2: YAML store fixtures ─────────────────────────────────────────────
 
 
@@ -138,7 +139,9 @@ class TestYamlStoreGetIssue:
         assert detail.issue_type == "Story"
         assert detail.parent_key == "E1"
 
-    def test_get_missing_raises_key_error(self, yaml_adapter: FilesystemPMAdapter) -> None:
+    def test_get_missing_raises_key_error(
+        self, yaml_adapter: FilesystemPMAdapter
+    ) -> None:
         with pytest.raises(KeyError, match="S999.1"):
             yaml_adapter.get_issue("S999.1")
 
@@ -199,9 +202,7 @@ class TestYamlStoreSearch:
         assert len(results) == 1
         assert results[0].key == "E1"
 
-    def test_search_status_field_value(
-        self, yaml_adapter: FilesystemPMAdapter
-    ) -> None:
+    def test_search_status_field_value(self, yaml_adapter: FilesystemPMAdapter) -> None:
         results = yaml_adapter.search("status=complete")
         assert len(results) == 1
         assert results[0].key == "E1"
@@ -258,9 +259,7 @@ class TestYamlStoreCreate:
         assert detail.created != ""
         assert detail.updated != ""
 
-    def test_create_story_under_parent(
-        self, yaml_adapter: FilesystemPMAdapter
-    ) -> None:
+    def test_create_story_under_parent(self, yaml_adapter: FilesystemPMAdapter) -> None:
         ref = yaml_adapter.create_issue(
             "PROJ",
             IssueSpec(
@@ -342,9 +341,7 @@ class TestYamlStoreTransition:
         updated = yaml_adapter.get_issue("E1")
         assert updated.updated != original.updated
 
-    def test_transition_missing_raises(
-        self, yaml_adapter: FilesystemPMAdapter
-    ) -> None:
+    def test_transition_missing_raises(self, yaml_adapter: FilesystemPMAdapter) -> None:
         with pytest.raises(KeyError, match="S999.1"):
             yaml_adapter.transition_issue("S999.1", "done")
 
@@ -440,9 +437,7 @@ class TestYamlStoreComments:
         with pytest.raises(KeyError, match="S999.1"):
             yaml_adapter.add_comment("S999.1", "text")
 
-    def test_get_comments_returns_all(
-        self, yaml_adapter: FilesystemPMAdapter
-    ) -> None:
+    def test_get_comments_returns_all(self, yaml_adapter: FilesystemPMAdapter) -> None:
         yaml_adapter.add_comment("E1", "First")
         yaml_adapter.add_comment("E1", "Second")
         comments = yaml_adapter.get_comments("E1")

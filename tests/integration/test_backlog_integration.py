@@ -52,7 +52,9 @@ class TestProtocolParity:
         adapter = file_adapter
 
         # Create epic
-        epic = adapter.create_issue("TEST", IssueSpec(summary="Epic One", issue_type="Epic"))
+        epic = adapter.create_issue(
+            "TEST", IssueSpec(summary="Epic One", issue_type="Epic")
+        )
         assert epic.key == "E1"
 
         # Create story under epic
@@ -309,7 +311,11 @@ class TestSessionLiveQuery:
         write_yaml_item: Callable[..., None],
     ) -> None:
         """Pre-populated YAML items -> correct LiveBacklogStatus fields."""
-        from raise_cli.schemas.session_state import CurrentWork, LastSession, SessionState
+        from raise_cli.schemas.session_state import (
+            CurrentWork,
+            LastSession,
+            SessionState,
+        )
         from raise_cli.session.bundle import _fetch_live_status
 
         # Write YAML items on disk

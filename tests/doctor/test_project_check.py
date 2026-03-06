@@ -102,9 +102,7 @@ class TestGraphStaleness:
         assert "missing" in graph_result.message
         assert graph_result.fix_hint == "run: rai graph build"
 
-    def test_fresh_graph_is_pass(
-        self, check: ProjectCheck, ctx: DoctorContext
-    ) -> None:
+    def test_fresh_graph_is_pass(self, check: ProjectCheck, ctx: DoctorContext) -> None:
         graph_dir = ctx.working_dir / ".raise" / "rai" / "memory"
         graph_dir.mkdir(parents=True, exist_ok=True)
         (graph_dir / "index.json").write_text("{}")
@@ -112,9 +110,7 @@ class TestGraphStaleness:
         graph_result = _find(results, "project-graph")
         assert graph_result.status == CheckStatus.PASS
 
-    def test_stale_graph_is_warn(
-        self, check: ProjectCheck, ctx: DoctorContext
-    ) -> None:
+    def test_stale_graph_is_warn(self, check: ProjectCheck, ctx: DoctorContext) -> None:
         graph_dir = ctx.working_dir / ".raise" / "rai" / "memory"
         graph_dir.mkdir(parents=True, exist_ok=True)
         graph_file = graph_dir / "index.json"
@@ -227,9 +223,7 @@ class TestGitignore:
     def test_gitignore_with_personal_is_pass(
         self, check: ProjectCheck, ctx: DoctorContext
     ) -> None:
-        (ctx.working_dir / ".gitignore").write_text(
-            "*.pyc\n.raise/rai/personal/\n"
-        )
+        (ctx.working_dir / ".gitignore").write_text("*.pyc\n.raise/rai/personal/\n")
         results = check.evaluate(ctx)
         gi_result = _find(results, "project-gitignore")
         assert gi_result.status == CheckStatus.PASS

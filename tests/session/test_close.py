@@ -937,18 +937,25 @@ class TestProcessSessionCloseRemovesActiveSession:
         # Start a session — gets a real session_id like SES-177
         active_session_id = "SES-177"
         active, _ = start_session(
-            profile, session_id=active_session_id, project_path=str(project), agent="test"
+            profile,
+            session_id=active_session_id,
+            project_path=str(project),
+            agent="test",
         )
         save_developer_profile(active)
         assert len(active.active_sessions) == 1
 
         # Pre-populate some sessions so append_session generates SES-003 (not SES-177)
-        index_file = project / ".raise" / "rai" / "personal" / "sessions" / "index.jsonl"
+        index_file = (
+            project / ".raise" / "rai" / "personal" / "sessions" / "index.jsonl"
+        )
         index_file.write_text('{"id":"SES-001"}\n{"id":"SES-002"}\n')
 
         close_input = CloseInput(summary="done")
         # Pass the actual active session_id
-        process_session_close(close_input, active, project, session_id=active_session_id)
+        process_session_close(
+            close_input, active, project, session_id=active_session_id
+        )
 
         from raise_cli.onboarding.profile import load_developer_profile
 
@@ -974,8 +981,12 @@ class TestProcessSessionCloseRemovesActiveSession:
         project_path = str(tmp_path / "project")
 
         # Start same project twice
-        updated1, _ = start_session(profile, session_id="SES-1", project_path=project_path, agent="test")
-        updated2, _ = start_session(updated1, session_id="SES-2", project_path=project_path, agent="test")
+        updated1, _ = start_session(
+            profile, session_id="SES-1", project_path=project_path, agent="test"
+        )
+        updated2, _ = start_session(
+            updated1, session_id="SES-2", project_path=project_path, agent="test"
+        )
 
         assert len(updated2.active_sessions) == 1, (
             f"Expected 1 session but got {len(updated2.active_sessions)}: "

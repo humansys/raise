@@ -268,7 +268,9 @@ def get_session_dir(session_id: str, project_root: Path | None = None) -> Path:
     sessions_base = (get_personal_dir(project_root) / SESSIONS_DIR).resolve()
     session_path = (sessions_base / session_id).resolve()
     if not session_path.is_relative_to(sessions_base):
-        raise ValueError(f"Invalid session_id — path traversal detected: {session_id!r}")
+        raise ValueError(
+            f"Invalid session_id — path traversal detected: {session_id!r}"
+        )
     return session_path
 
 
@@ -336,7 +338,9 @@ def _get_xdg_dir(env_var: str, fallback: str) -> Path:
         Path to the rai subdirectory within the XDG directory.
     """
     xdg_value = os.environ.get(env_var)
-    base = _sanitize_env_path(xdg_value, env_var) if xdg_value else Path.home() / fallback
+    base = (
+        _sanitize_env_path(xdg_value, env_var) if xdg_value else Path.home() / fallback
+    )
     return base / "rai"
 
 

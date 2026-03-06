@@ -24,7 +24,9 @@ class TestCreateSkillSet:
         set_dir = tmp_path / ".raise" / "skills" / "my-team"
         assert set_dir.is_dir()
         for skill_name in DISTRIBUTABLE_SKILLS:
-            assert (set_dir / skill_name / "SKILL.md").exists(), f"Missing: {skill_name}"
+            assert (set_dir / skill_name / "SKILL.md").exists(), (
+                f"Missing: {skill_name}"
+            )
 
     def test_create_empty(self, tmp_path: Path) -> None:
         """--empty should create directory only."""

@@ -277,10 +277,14 @@ def _check_jira_config(project_root: Path) -> dict[str, Any]:
     env_results: list[dict[str, Any]] = []
     for var_name, description in _JIRA_ENV_VARS:
         if var_name == "JIRA_API_TOKEN":
-            is_set = bool(os.environ.get("JIRA_API_TOKEN") or os.environ.get("JIRA_TOKEN"))
+            is_set = bool(
+                os.environ.get("JIRA_API_TOKEN") or os.environ.get("JIRA_TOKEN")
+            )
         else:
             is_set = bool(os.environ.get(var_name))
-        env_results.append({"name": var_name, "set": is_set, "description": description})
+        env_results.append(
+            {"name": var_name, "set": is_set, "description": description}
+        )
 
     all_env_set = all(e["set"] for e in env_results)
     return {

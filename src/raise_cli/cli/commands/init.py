@@ -203,7 +203,10 @@ def _get_project_message(
         if bootstrap_result is not None:
             if bootstrap_result.already_existed:
                 # Check if base patterns were synced even though everything else existed
-                if bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0:
+                if (
+                    bootstrap_result.patterns_added > 0
+                    or bootstrap_result.patterns_updated > 0
+                ):
                     parts: list[str] = []
                     if bootstrap_result.patterns_added > 0:
                         parts.append(f"{bootstrap_result.patterns_added} new")
@@ -229,10 +232,15 @@ def _get_project_message(
 
                     _base = _res_files("raise_cli.rai_base")
                     _src = _base / "memory" / "patterns-base.jsonl"
-                    _count = len([
-                        ln for ln in _src.read_text(encoding="utf-8").strip().splitlines()
-                        if ln.strip()
-                    ])
+                    _count = len(
+                        [
+                            ln
+                            for ln in _src.read_text(encoding="utf-8")
+                            .strip()
+                            .splitlines()
+                            if ln.strip()
+                        ]
+                    )
                     lines.append(
                         "[bold]Created:[/bold] .raise/rai/memory/  "
                         f"[dim]— {_count} base patterns[/dim]"
@@ -283,15 +291,16 @@ def _get_project_message(
                 bootstrap_msg = (
                     f"  Bootstrapped Rai base v{bootstrap_result.base_version}\n"
                 )
-            elif bootstrap_result.patterns_added > 0 or bootstrap_result.patterns_updated > 0:
+            elif (
+                bootstrap_result.patterns_added > 0
+                or bootstrap_result.patterns_updated > 0
+            ):
                 parts_ri: list[str] = []
                 if bootstrap_result.patterns_added > 0:
                     parts_ri.append(f"{bootstrap_result.patterns_added} new")
                 if bootstrap_result.patterns_updated > 0:
                     parts_ri.append(f"{bootstrap_result.patterns_updated} updated")
-                bootstrap_msg = (
-                    f"  Synced base patterns: {', '.join(parts_ri)}\n"
-                )
+                bootstrap_msg = f"  Synced base patterns: {', '.join(parts_ri)}\n"
         skills_msg = ""
         if skills_result is not None and not skills_result.already_existed:
             skills_msg = (

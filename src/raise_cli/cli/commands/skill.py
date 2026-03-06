@@ -342,9 +342,7 @@ def sync_cmd(
     _print_sync_table(result)
 
     has_updates = bool(
-        result.skills_updated
-        or result.skills_installed
-        or result.skills_conflicted
+        result.skills_updated or result.skills_installed or result.skills_conflicted
     )
     if has_updates:
         raise typer.Exit(code=1)

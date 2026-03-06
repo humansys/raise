@@ -63,7 +63,11 @@ class TestOptionalExtras:
         assert httpx_result.status == CheckStatus.PASS
 
     def test_warn_when_missing(self) -> None:
-        original_import = __builtins__.__import__ if hasattr(__builtins__, "__import__") else __import__  # type: ignore[union-attr]
+        original_import = (
+            __builtins__.__import__
+            if hasattr(__builtins__, "__import__")
+            else __import__
+        )  # type: ignore[union-attr]
 
         def _fake_import(name: str, *args: Any, **kwargs: Any) -> ModuleType:
             if name == "mcp":

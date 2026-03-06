@@ -65,7 +65,8 @@ class TestSessionStartEvent:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.session.create_emitter",
+                return_value=mock_emitter,
             ),
             patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("raise_cli.cli.commands.session.save_developer_profile"),
@@ -106,7 +107,8 @@ class TestSessionStartEvent:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.session.create_emitter",
+                return_value=mock_emitter,
             ),
             patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("raise_cli.cli.commands.session.save_developer_profile"),
@@ -146,7 +148,8 @@ class TestSessionCloseEvents:
 
         with (
             patch(
-                "raise_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.session.create_emitter",
+                return_value=mock_emitter,
             ),
             patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
             patch("raise_cli.cli.commands.session.save_developer_profile"),
@@ -312,17 +315,20 @@ class TestPatternAddedEvent:
 
         with (
             patch(
-                "raise_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.pattern.create_emitter",
+                return_value=mock_emitter,
             ),
             patch(
                 "raise_cli.cli.commands.pattern.get_memory_dir_for_scope",
                 return_value=tmp_path,
             ),
             patch(
-                "raise_cli.cli.commands.pattern.append_pattern", return_value=mock_result
+                "raise_cli.cli.commands.pattern.append_pattern",
+                return_value=mock_result,
             ),
             patch(
-                "raise_cli.cli.commands.pattern.load_developer_profile", return_value=None
+                "raise_cli.cli.commands.pattern.load_developer_profile",
+                return_value=None,
             ),
         ):
             result = runner.invoke(
@@ -353,17 +359,20 @@ class TestPatternAddedEvent:
 
         with (
             patch(
-                "raise_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.pattern.create_emitter",
+                return_value=mock_emitter,
             ),
             patch(
                 "raise_cli.cli.commands.pattern.get_memory_dir_for_scope",
                 return_value=tmp_path,
             ),
             patch(
-                "raise_cli.cli.commands.pattern.append_pattern", return_value=mock_result
+                "raise_cli.cli.commands.pattern.append_pattern",
+                return_value=mock_result,
             ),
             patch(
-                "raise_cli.cli.commands.pattern.load_developer_profile", return_value=None
+                "raise_cli.cli.commands.pattern.load_developer_profile",
+                return_value=None,
             ),
         ):
             runner.invoke(pattern_app, ["add", "Test pattern"])
@@ -398,7 +407,8 @@ class TestDiscoverScanEvent:
                 return_value=mock_emitter,
             ),
             patch(
-                "raise_cli.cli.commands.discover.scan_directory", return_value=mock_result
+                "raise_cli.cli.commands.discover.scan_directory",
+                return_value=mock_result,
             ),
             patch("raise_cli.cli.commands.discover.format_scan_result"),
         ):
@@ -504,7 +514,8 @@ class TestInitCompleteEvent:
                 return_value="# Memory",
             ),
             patch(
-                "raise_cli.config.paths.get_memory_dir", return_value=tmp_path / "memory"
+                "raise_cli.config.paths.get_memory_dir",
+                return_value=tmp_path / "memory",
             ),
             patch(
                 "raise_cli.config.paths.get_framework_dir",
@@ -578,7 +589,9 @@ class TestAdapterEvents:
                 "raise_cli.cli.commands.adapters.entry_points",
                 side_effect=selective_entry_points,
             ),
-            patch("raise_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch(
+                "raise_cli.cli.commands.adapters._get_tier", return_value="community"
+            ),
             patch("raise_cli.cli.commands.adapters.format_check_human"),
         ):
             result = runner.invoke(adapters_app, ["check"])
@@ -627,7 +640,9 @@ class TestAdapterEvents:
                 "raise_cli.cli.commands.adapters.entry_points",
                 side_effect=selective_entry_points,
             ),
-            patch("raise_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch(
+                "raise_cli.cli.commands.adapters._get_tier", return_value="community"
+            ),
             patch("raise_cli.cli.commands.adapters.format_check_human"),
         ):
             result = runner.invoke(adapters_app, ["check"])
@@ -664,8 +679,12 @@ class TestAdapterEvents:
                 "raise_cli.cli.commands.adapters.create_emitter",
                 return_value=mock_emitter,
             ),
-            patch("raise_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]),
-            patch("raise_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch(
+                "raise_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]
+            ),
+            patch(
+                "raise_cli.cli.commands.adapters._get_tier", return_value="community"
+            ),
             patch("raise_cli.cli.commands.adapters.format_check_human"),
         ):
             result = runner.invoke(adapters_app, ["check"])

@@ -204,7 +204,9 @@ def process_session_close(
         result.messages.append("Coaching updated")
 
     # 5. Remove session from active_sessions and save profile
-    updated_profile = end_session(updated_profile, session_id=session_id or result.session_id)
+    updated_profile = end_session(
+        updated_profile, session_id=session_id or result.session_id
+    )
     save_developer_profile(updated_profile)
     result.messages.append("Profile updated")
 

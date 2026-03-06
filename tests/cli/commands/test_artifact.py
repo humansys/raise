@@ -54,7 +54,9 @@ class TestArtifactValidate:
     def test_validate_all_pass(self, project_with_artifact: Path) -> None:
         """All valid artifacts → exit 0."""
         result = runner.invoke(
-            app, ["artifact", "validate"], env={"RAI_PROJECT_ROOT": str(project_with_artifact)}
+            app,
+            ["artifact", "validate"],
+            env={"RAI_PROJECT_ROOT": str(project_with_artifact)},
         )
         assert result.exit_code == 0
         assert "s354.1-design.yaml" in result.stdout
@@ -81,7 +83,9 @@ class TestArtifactValidate:
 
     def test_validate_single_file(self, project_with_artifact: Path) -> None:
         """--file flag validates a single artifact."""
-        artifact_path = project_with_artifact / ".raise" / "artifacts" / "s354.1-design.yaml"
+        artifact_path = (
+            project_with_artifact / ".raise" / "artifacts" / "s354.1-design.yaml"
+        )
         result = runner.invoke(
             app,
             ["artifact", "validate", "--file", str(artifact_path)],
@@ -118,7 +122,9 @@ class TestArtifactValidate:
         bad = project_with_artifact / ".raise" / "artifacts" / "bad.yaml"
         bad.write_text(yaml.dump({"artifact_type": "story-design", "version": 1}))
         result = runner.invoke(
-            app, ["artifact", "validate"], env={"RAI_PROJECT_ROOT": str(project_with_artifact)}
+            app,
+            ["artifact", "validate"],
+            env={"RAI_PROJECT_ROOT": str(project_with_artifact)},
         )
         assert result.exit_code == 1
         # Both files mentioned

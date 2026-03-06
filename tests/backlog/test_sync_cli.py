@@ -52,8 +52,9 @@ class TestSyncCommand:
         runner.invoke(backlog_app, ["sync", "-p", "RAISE"])
 
         call_kwargs = mock_sync.call_args
-        assert call_kwargs[1].get("project_filter") == "RAISE" or \
-            (len(call_kwargs[0]) > 2 and call_kwargs[0][2] == "RAISE")
+        assert call_kwargs[1].get("project_filter") == "RAISE" or (
+            len(call_kwargs[0]) > 2 and call_kwargs[0][2] == "RAISE"
+        )
 
     @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     @patch("raise_cli.cli.commands.backlog.sync_backlog")
@@ -62,7 +63,9 @@ class TestSyncCommand:
     ) -> None:
         """Filesystem adapter produces no-op message, exit code 0."""
         mock_resolve.return_value = MagicMock()
-        mock_sync.side_effect = ValueError("Filesystem adapter is source of truth — nothing to sync.")
+        mock_sync.side_effect = ValueError(
+            "Filesystem adapter is source of truth — nothing to sync."
+        )
 
         result = runner.invoke(backlog_app, ["sync"])
 
@@ -76,7 +79,9 @@ class TestSyncCommand:
     ) -> None:
         """Adapter failure produces error message, exit code 1."""
         mock_resolve.return_value = MagicMock()
-        mock_sync.side_effect = RuntimeError("Adapter 'jira' failed: connection timeout")
+        mock_sync.side_effect = RuntimeError(
+            "Adapter 'jira' failed: connection timeout"
+        )
 
         result = runner.invoke(backlog_app, ["sync"])
 

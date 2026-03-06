@@ -25,9 +25,7 @@ class ProjectCheck:
 
     check_id: ClassVar[str] = "project"
     category: ClassVar[str] = "project"
-    description: ClassVar[str] = (
-        ".raise/ structure, manifest, graph staleness, config"
-    )
+    description: ClassVar[str] = ".raise/ structure, manifest, graph staleness, config"
     requires_online: ClassVar[bool] = False
 
     _GRAPH_STALENESS_DAYS: ClassVar[int] = 7
@@ -116,7 +114,9 @@ class ProjectCheck:
         graph_files = [graph_index]
         # Also check for additional graph files in the directory
         graph_dir = graph_index.parent
-        graph_files.extend(f for f in graph_dir.rglob("*") if f.is_file() and f != graph_index)
+        graph_files.extend(
+            f for f in graph_dir.rglob("*") if f.is_file() and f != graph_index
+        )
         if not graph_files:
             return CheckResult(
                 check_id="project-graph",
