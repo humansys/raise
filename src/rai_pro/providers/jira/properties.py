@@ -45,7 +45,7 @@ def set_entity_property(
         ...     story_id="S-DEMO.4",
         ...     last_sync_at=datetime.now(UTC),
         ...     rai_branch="demo/atlassian-webinar",
-        ...     local_path="/home/emilio/Code/raise-commons"
+        ...     local_path="/path/to/project"
         ... )
         >>> set_entity_property(client, "DEMO-123", metadata)
     """
