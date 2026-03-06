@@ -49,7 +49,7 @@ class TestCLISettings:
         """CLI should show version with --version."""
         result = runner.invoke(app, ["--version"])
         assert result.exit_code == 0
-        assert "rai-cli version" in result.stdout
+        assert "raise-cli version" in result.stdout
 
 
 class TestSettingsIntegration:

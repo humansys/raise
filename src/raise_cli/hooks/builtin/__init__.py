@@ -1,1 +1,1 @@
-"""Built-in lifecycle hooks for rai-cli (COMMUNITY tier)."""
+"""Built-in lifecycle hooks for raise-cli (COMMUNITY tier)."""

@@ -104,7 +104,7 @@ def doctor(
     else:
         out = Console()
         if not results:
-            out.print("No checks registered. Install rai-cli with extras for diagnostics.")
+            out.print("No checks registered. Install raise-cli with extras for diagnostics.")
             return
 
         for r in results:

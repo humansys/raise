@@ -40,7 +40,7 @@ def generate_report(
     try:
         from importlib.metadata import version
 
-        rai_ver = version("rai-cli")
+        rai_ver = version("raise-cli")
     except Exception:  # noqa: BLE001
         rai_ver = "unknown"
 
@@ -76,7 +76,7 @@ def report_to_markdown(report: DiagnosticReport) -> str:
         "# rai doctor report",
         "",
         f"**Timestamp:** {report.timestamp}",
-        f"**rai-cli:** {report.rai_version}",
+        f"**raise-cli:** {report.rai_version}",
         f"**Python:** {report.python_version}",
         f"**OS:** {report.os_info}",
         f"**Extras:** {extras_str}",

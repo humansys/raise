@@ -42,7 +42,7 @@ class TestRaiVersion:
         results = check.evaluate(_ctx())
         ver_result = _find(results, "env-rai-version")
         assert ver_result.status == CheckStatus.PASS
-        assert "rai-cli" in ver_result.message
+        assert "raise-cli" in ver_result.message
 
 
 class TestOSInfo:
@@ -81,7 +81,7 @@ class TestOptionalExtras:
 
 class TestResultStructure:
     def test_returns_five_results(self) -> None:
-        """Python + rai-cli + OS + 2 extras = 5 results."""
+        """Python + raise-cli + OS + 2 extras = 5 results."""
         check = EnvironmentCheck()
         results = check.evaluate(_ctx())
         assert len(results) == 5
