@@ -131,7 +131,7 @@ S369.3 has soft dep on S369.1 (badge URL must match workflow name).
 
 | Story | Status | Notes |
 |-------|--------|-------|
-| S369.1 — Documentation Polish | pending | |
+| S369.1 — Documentation Polish | done | |
 | S369.2 — Package Metadata & Deps | pending | |
 | S369.3 — CI Hardening | pending | |
 | S369.4 — Secrets & Hygiene Scan | pending | |
