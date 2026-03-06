@@ -210,3 +210,67 @@ Classification:
 - **How:** Manual review. Check that function inputs/outputs carrying structured data use Pydantic models. Per ADR-002: "Use Pydantic v2 for all data models throughout the codebase."
 - **Why:** Pydantic provides runtime validation, JSON serialization, and schema generation in one package. Raw dicts have no type safety, no validation, and are prone to typos. (Sources: ADR-002, Pydantic [S10], FastAPI [S11])
 - **Classification:** HUMAN
+
+---
+
+## D4: Architecture & Design
+
+*Priority: Medium-High. Architecture determines how well code ages. Bad architecture makes every future change harder.*
+
+*This dimension references [ADR-001: Three-Layer Architecture](../../dev/decisions/adr-001-three-layer-architecture.md) as the authoritative architecture model for raise-commons.*
+
+### D4.1: Dependency direction
+
+- **What:** Dependencies flow downward only: Presentation (CLI) -> Application (Handlers) -> Domain (Engines) -> Core (Schemas, Config). No layer imports from a layer above it. Engines never import from CLI or handlers.
+- **How:** `import-linter` with layered contracts enforcing: `cli | handlers | engines | core`. Run as `lint-imports`. Also verifiable via Pyright import analysis.
+- **Why:** Upward dependencies create coupling — changing the CLI breaks the engine, changing the engine breaks nothing. ADR-001 establishes this as the foundational architecture rule for raise-commons. (Sources: ADR-001, Percival & Gregory [S7], Pydantic architecture [S10], import-linter [S19])
+- **Classification:** TOOL (import-linter contracts)
+
+### D4.2: Domain purity
+
+- **What:** Domain logic (engines, core models) contains no I/O: no file reads, no network calls, no database queries, no logging side effects. I/O lives in handlers (orchestration) and adapters (infrastructure).
+- **How:** Manual review + import analysis. Domain modules should not import `pathlib.Path.read_text`, `open`, `requests`, `httpx`, or any I/O library. `import-linter` forbidden contracts can enforce this.
+- **Why:** Pure domain logic is testable without mocks, fixtures, or network. It can be reused across interfaces (CLI, MCP server, web UI) — which is exactly why ADR-001 adopted three layers. (Sources: ADR-001, Percival & Gregory [S7])
+- **Classification:** BOTH (import-linter partial TOOL; I/O-via-function-call requires HUMAN review)
+
+### D4.3: Testability by design
+
+- **What:** Domain logic is testable with plain function calls and assertions — no database, no network, no filesystem required. If a function needs I/O to test, it has too many responsibilities.
+- **How:** Manual review of test files. Check that domain tests use no `mock.patch`, no `tmp_path`, no `monkeypatch` for I/O. Handler/adapter tests may use these.
+- **Why:** If testing domain logic requires mocking, the domain is impure. Mocks test the wiring, not the logic. Pure domain + thin I/O adapters is the Percival & Gregory pattern. (Sources: Percival & Gregory [S7])
+- **Classification:** HUMAN
+
+### D4.4: Single responsibility
+
+- **What:** Each module and class has one reason to change. A module handles one concept (e.g., backlog parsing, session state, skill validation). A class represents one entity or one service.
+- **How:** Manual review. Heuristic: if the module docstring needs "and" to describe its purpose, it does too much. Check that classes have <7 public methods and modules have <15 public functions.
+- **Why:** Modules with multiple responsibilities change for multiple reasons, increasing merge conflicts, test fragility, and cognitive load. (Sources: Multiple — Percival & Gregory [S7], Google [S5], Augment [S15])
+- **Classification:** HUMAN
+
+### D4.5: Composition over inheritance
+
+- **What:** Favor delegation and composition over class inheritance. Inheritance depth should not exceed 2 levels (base + one subclass). Use protocols (`typing.Protocol`) for interface contracts instead of abstract base classes where possible.
+- **How:** Manual review. Check class hierarchies. Grep for multi-level inheritance chains. Look for "template method" patterns that could be replaced with strategy delegation.
+- **Why:** Deep inheritance hierarchies are brittle — a change in the base class ripples through all descendants. Composition allows independent evolution. Python's duck typing and Protocol support make interface inheritance unnecessary. (Sources: Ramalho [S8], Percival & Gregory [S7])
+- **Classification:** HUMAN
+
+### D4.6: Declarative over imperative
+
+- **What:** Where applicable, describe "what" rather than "how." Use Pydantic models for validation (not manual if/else chains), Typer decorators for CLI (not argparse boilerplate), and configuration-driven behavior over procedural setup.
+- **How:** Manual review. Look for long procedural setup code that could be replaced with declarative configuration or model definitions.
+- **Why:** Declarative code is shorter, less error-prone, and self-documenting. FastAPI, Typer, and Pydantic demonstrate that declarative Python is both possible and productive. (Sources: FastAPI [S11], Typer [S24], Pydantic [S10])
+- **Classification:** HUMAN
+
+### D4.7: No global mutable state
+
+- **What:** No module-level mutable data structures (non-`Final` dicts, lists, sets). Configuration via Pydantic Settings instances, not module-level dicts. Module-level constants (`Final`) are acceptable. Module-level Path constants as test seams (PAT-E-589) are acceptable with justification.
+- **How:** `ruff check --select PLW` can catch some global assignment patterns. Manual review for module-level mutable state. Grep for `^[a-z_]+ = (\\[|\\{|set\\()` at module level.
+- **Why:** Global mutable state creates invisible coupling between functions, makes testing order-dependent, and causes bugs in concurrent use. (Sources: Ben Hoyt [S13], QuantifiedCode [S16])
+- **Classification:** BOTH (partial TOOL via PLW; HUMAN for judgment on acceptable exceptions)
+
+### D4.8: Layer contracts enforced
+
+- **What:** Architecture layers from ADR-001 are enforced by automated tooling, not just convention. An `import-linter` configuration defines the allowed dependency directions and is checked in CI.
+- **How:** `.importlinter` configuration in `pyproject.toml` with layered contracts. Run `lint-imports` in pre-commit and CI. Contracts define: `cli -> handlers -> engines -> core` with no reverse imports.
+- **Why:** Convention without enforcement decays. import-linter is simple (~6 lines of config), runs in seconds, and catches architectural violations at commit time. (Sources: import-linter [S19], Seddon blog [S19], ADR-001)
+- **Classification:** TOOL (import-linter)
