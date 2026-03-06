@@ -126,7 +126,9 @@ Tag created. Retrospective committed.
 
 ### Step 4: Update Backlog & Context
 
-1. Mark epic complete in `governance/backlog.md` (status → `✅ Complete`)
+1. Mark epic complete via CLI:
+   - **If Jira issue exists:** `rai backlog transition {JIRA_KEY} "Done" -a jira`
+   - **If no Jira key:** `rai backlog search "summary ~ '{epic name}'" -a jira` to find it, then transition
 2. Update `CLAUDE.local.md` to reflect completion and next epic
 3. Emit telemetry:
 
@@ -144,7 +146,7 @@ Backlog reflects completion. Local context updated.
 |------|-------------|
 | Retrospective | `work/epics/e{N}-{name}/retrospective.md` |
 | Tag | `epic/e{N}-complete` on `{dev_branch}` |
-| Backlog update | `governance/backlog.md` |
+| Backlog update | Tracker via `rai backlog` CLI |
 | Context update | `CLAUDE.local.md` |
 
 ## Quality Checklist
@@ -153,7 +155,7 @@ Backlog reflects completion. Local context updated.
 - [ ] Tests pass before closing
 - [ ] Retrospective captures metrics, patterns, and process insights
 - [ ] Epic milestone tagged on `{dev_branch}`
-- [ ] Backlog updated with completion status
+- [ ] Backlog updated via `rai backlog transition` CLI
 - [ ] No epic branch to clean up — epics are logical containers
 - [ ] NEVER close without retrospective — learnings compound across epics
 
@@ -161,5 +163,5 @@ Backlog reflects completion. Local context updated.
 
 - Retrospective template: `templates/retrospective.md`
 - Previous: All `/rai-story-close` completions
-- Backlog: `governance/backlog.md`
+- Backlog: `rai backlog` CLI
 - Next: `/rai-epic-design` for next epic
