@@ -127,9 +127,9 @@ src/rai_cli/
 │
 ├── context/                # Unified Context Graph (E11)
 │   ├── models.py           # ConceptNode, ConceptEdge
-│   ├── graph.py            # UnifiedGraph (NetworkX wrapper)
-│   ├── builder.py          # UnifiedGraphBuilder
-│   └── query.py            # UnifiedQueryEngine
+│   ├── graph.py            # Graph (NetworkX wrapper)
+│   ├── builder.py          # GraphBuilder
+│   └── query.py            # QueryEngine
 │
 ├── governance/             # Governance parsing & queries (E2)
 │   ├── parsers/            # ADR, constitution, guardrails, etc.
@@ -169,7 +169,7 @@ src/rai_cli/
 | **Command** | 16 | `query`, `emit_session`, `scan_command` |
 | **Service** | 13 | `emit()`, `load_pattern()`, `load_calibration()` |
 | **Schema** | 7 | `SkillEvent`, `CalibrationEvent` |
-| **Builder** | 3 | `UnifiedGraphBuilder`, `MemoryGraphBuilder` |
+| **Builder** | 3 | `GraphBuilder`, `MemoryGraphBuilder` |
 | **Parser** | 1 | `GovernanceExtractor` |
 
 **Total: 154 code components indexed in Knowledge Graph**
@@ -324,14 +324,14 @@ Full ADR list (19 total):
 ### Build Phase
 ```
 Governance Files    →  Parsers  →  ConceptNodes  →
-Memory JSONL        →  Loaders  →  MemoryNodes   →  UnifiedGraph
+Memory JSONL        →  Loaders  →  MemoryNodes   →  Graph
 Skills Markdown     →  Extractor→  SkillNodes    →     ↓
 Code (Python/TS)    →  Scanner  →  Components    →  unified.json
 ```
 
 ### Query Phase
 ```
-User Query  →  UnifiedQueryEngine  →  Keyword Search  →  MVC Result
+User Query  →  QueryEngine  →  Keyword Search  →  MVC Result
                                    →  BFS Traversal   →  (minimal tokens)
 ```
 
@@ -365,7 +365,7 @@ Session Work  →  Telemetry Writer  →  signals.jsonl
 ### Adding a New Parser
 1. Create `src/rai_cli/governance/parsers/new_type.py`
 2. Implement `extract_*` functions returning `Concept` objects
-3. Register in `UnifiedGraphBuilder._extract_*` method
+3. Register in `GraphBuilder._extract_*` method
 4. Add tests in `tests/governance/parsers/`
 
 ### Adding a New Skill

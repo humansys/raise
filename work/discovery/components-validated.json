@@ -1796,16 +1796,16 @@
       }
     },
     {
-      "id": "comp-context.query-UnifiedQueryStrategy",
+      "id": "comp-context.query-QueryStrategy",
       "type": "component",
       "content": "Enum defining query strategies (KEYWORD_SEARCH, CONCEPT_LOOKUP) for retrieving context from unified graph.",
       "source_file": "context/query.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
-        "name": "UnifiedQueryStrategy",
+        "name": "QueryStrategy",
         "kind": "class",
         "line": 22,
-        "signature": "class UnifiedQueryStrategy(str, Enum)",
+        "signature": "class QueryStrategy(str, Enum)",
         "module": "context.query",
         "category": "model",
         "confidence_tier": "medium",
@@ -1817,16 +1817,16 @@
       }
     },
     {
-      "id": "comp-context.query-UnifiedQuery",
+      "id": "comp-context.query-Query",
       "type": "component",
       "content": "Query parameters for unified context retrieval.",
       "source_file": "context/query.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
-        "name": "UnifiedQuery",
+        "name": "Query",
         "kind": "class",
         "line": 34,
-        "signature": "class UnifiedQuery(BaseModel)",
+        "signature": "class Query(BaseModel)",
         "module": "context.query",
         "category": "model",
         "confidence_tier": "high",
@@ -1859,16 +1859,16 @@
       }
     },
     {
-      "id": "comp-context.query-UnifiedQueryMetadata",
+      "id": "comp-context.query-QueryMetadata",
       "type": "component",
       "content": "Metadata about unified query result.",
       "source_file": "context/query.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
-        "name": "UnifiedQueryMetadata",
+        "name": "QueryMetadata",
         "kind": "class",
         "line": 108,
-        "signature": "class UnifiedQueryMetadata(BaseModel)",
+        "signature": "class QueryMetadata(BaseModel)",
         "module": "context.query",
         "category": "model",
         "confidence_tier": "high",
@@ -1880,16 +1880,16 @@
       }
     },
     {
-      "id": "comp-context.query-UnifiedQueryResult",
+      "id": "comp-context.query-QueryResult",
       "type": "component",
       "content": "Result of unified context query.",
       "source_file": "context/query.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
-        "name": "UnifiedQueryResult",
+        "name": "QueryResult",
         "kind": "class",
         "line": 141,
-        "signature": "class UnifiedQueryResult(BaseModel)",
+        "signature": "class QueryResult(BaseModel)",
         "module": "context.query",
         "category": "model",
         "confidence_tier": "high",
@@ -1905,22 +1905,22 @@
       }
     },
     {
-      "id": "comp-context.query-UnifiedQueryEngine",
+      "id": "comp-context.query-QueryEngine",
       "type": "component",
       "content": "Query engine for unified context graph providing keyword search and concept lookup with BFS traversal.",
       "source_file": "context/query.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
-        "name": "UnifiedQueryEngine",
+        "name": "QueryEngine",
         "kind": "class",
         "line": 225,
-        "signature": "class UnifiedQueryEngine",
+        "signature": "class QueryEngine",
         "module": "context.query",
         "category": "service",
         "confidence_tier": "medium",
         "confidence_score": 65,
         "depends_on": [
-          "UnifiedGraph",
+          "Graph",
           "ConceptNode",
           "EdgeType",
           "NodeType"
@@ -1939,16 +1939,16 @@
       }
     },
     {
-      "id": "comp-context.graph-UnifiedGraph",
+      "id": "comp-context.graph-Graph",
       "type": "component",
       "content": "NetworkX-based unified context graph wrapping MultiDiGraph for typed operations on cross-domain concepts and relationships.",
       "source_file": "context/graph.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
-        "name": "UnifiedGraph",
+        "name": "Graph",
         "kind": "class",
         "line": 21,
-        "signature": "class UnifiedGraph",
+        "signature": "class Graph",
         "module": "context.graph",
         "category": "model",
         "confidence_tier": "medium",
@@ -1978,22 +1978,22 @@
       }
     },
     {
-      "id": "comp-context.builder-UnifiedGraphBuilder",
+      "id": "comp-context.builder-GraphBuilder",
       "type": "component",
       "content": "Builds unified context graph from all sources including governance, memory JSONL files, work tracking, skills, components, architecture, and identity.",
       "source_file": "context/builder.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
-        "name": "UnifiedGraphBuilder",
+        "name": "GraphBuilder",
         "kind": "class",
         "line": 28,
-        "signature": "class UnifiedGraphBuilder",
+        "signature": "class GraphBuilder",
         "module": "context.builder",
         "category": "builder",
         "confidence_tier": "medium",
         "confidence_score": 65,
         "depends_on": [
-          "UnifiedGraph",
+          "Graph",
           "ConceptNode",
           "GovernanceExtractor"
         ],
@@ -2844,7 +2844,7 @@
         "confidence_tier": "medium",
         "confidence_score": 40,
         "depends_on": [
-          "UnifiedGraph",
+          "Graph",
           "DeveloperProfile",
           "SessionState"
         ],
@@ -2869,7 +2869,7 @@
         "confidence_tier": "medium",
         "confidence_score": 55,
         "depends_on": [
-          "UnifiedGraph"
+          "Graph"
         ],
         "internal": false,
         "validated_by": "human",
@@ -2892,7 +2892,7 @@
         "confidence_tier": "medium",
         "confidence_score": 55,
         "depends_on": [
-          "UnifiedGraph"
+          "Graph"
         ],
         "internal": false,
         "validated_by": "human",
@@ -2917,7 +2917,7 @@
         "depends_on": [
           "DeveloperProfile",
           "SessionState",
-          "UnifiedGraph"
+          "Graph"
         ],
         "internal": false,
         "validated_by": "human",
@@ -4875,7 +4875,7 @@
     {
       "id": "comp-context.query-module",
       "type": "component",
-      "content": "Unified context query engine.",
+      "content": "Context query engine.",
       "source_file": "context/query.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
@@ -4938,7 +4938,7 @@
     {
       "id": "comp-context.graph-module",
       "type": "component",
-      "content": "Provides UnifiedGraph class wrapping NetworkX MultiDiGraph for storing and querying cross-domain concepts.",
+      "content": "Provides Graph class wrapping NetworkX MultiDiGraph for storing and querying cross-domain concepts.",
       "source_file": "context/graph.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
@@ -4962,7 +4962,7 @@
     {
       "id": "comp-context.builder-module",
       "type": "component",
-      "content": "Provides the UnifiedGraphBuilder class that merges governance, memory, work, and skills into a single UnifiedGraph.",
+      "content": "Provides the GraphBuilder class that merges governance, memory, work, and skills into a single Graph.",
       "source_file": "context/builder.py",
       "created": "2026-02-09T16:34:19.336899+00:00",
       "metadata": {
@@ -4975,7 +4975,7 @@
         "confidence_tier": "medium",
         "confidence_score": 60,
         "depends_on": [
-          "UnifiedGraph",
+          "Graph",
           "GovernanceExtractor"
         ],
         "internal": false,
