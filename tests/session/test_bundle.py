@@ -1662,7 +1662,9 @@ class TestStalenessDisclaimer:
     def test_next_session_prompt_includes_staleness_caveat(self) -> None:
         """next_session_prompt includes capture date and staleness warning."""
         state = SessionState(
-            current_work=CurrentWork(epic="E15", story="S15.7", phase="implement", branch="dev"),
+            current_work=CurrentWork(
+                epic="E15", story="S15.7", phase="implement", branch="dev"
+            ),
             last_session=LastSession(
                 id="SES-300",
                 date=date(2026, 3, 1),
@@ -1683,7 +1685,9 @@ class TestStalenessDisclaimer:
     def test_narrative_includes_staleness_caveat(self) -> None:
         """narrative includes capture date and staleness warning."""
         state = SessionState(
-            current_work=CurrentWork(epic="E15", story="S15.7", phase="implement", branch="dev"),
+            current_work=CurrentWork(
+                epic="E15", story="S15.7", phase="implement", branch="dev"
+            ),
             last_session=LastSession(
                 id="SES-300",
                 date=date(2026, 3, 1),

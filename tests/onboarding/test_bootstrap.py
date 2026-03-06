@@ -215,7 +215,12 @@ class TestBasePatternMerge:
         self._write_patterns(
             patterns_file,
             [
-                {"id": "BASE-001", "content": "existing base", "base": True, "version": 1},
+                {
+                    "id": "BASE-001",
+                    "content": "existing base",
+                    "base": True,
+                    "version": 1,
+                },
                 {"id": "PAT-E-001", "content": "project pattern", "version": 1},
             ],
         )
@@ -240,7 +245,12 @@ class TestBasePatternMerge:
         self._write_patterns(
             patterns_file,
             [
-                {"id": "BASE-007", "content": "old content", "base": True, "version": 1},
+                {
+                    "id": "BASE-007",
+                    "content": "old content",
+                    "base": True,
+                    "version": 1,
+                },
             ],
         )
 

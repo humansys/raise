@@ -28,7 +28,9 @@ class EnvironmentCheck:
 
     check_id: ClassVar[str] = "environment"
     category: ClassVar[str] = "environment"
-    description: ClassVar[str] = "Python version, raise-cli version, OS, installed extras"
+    description: ClassVar[str] = (
+        "Python version, raise-cli version, OS, installed extras"
+    )
     requires_online: ClassVar[bool] = False
 
     def evaluate(self, context: DoctorContext) -> list[CheckResult]:

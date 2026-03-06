@@ -165,7 +165,9 @@ class TestScaffoldSkillSet:
         result = scaffold_skill("team-review", skill_set="my-team")
 
         assert result.created
-        expected = tmp_path / ".raise" / "skills" / "my-team" / "team-review" / "SKILL.md"
+        expected = (
+            tmp_path / ".raise" / "skills" / "my-team" / "team-review" / "SKILL.md"
+        )
         assert expected.exists()
 
     def test_scaffold_set_does_not_create_in_claude(

@@ -56,10 +56,7 @@ def _count_skills(set_dir: Path) -> int:
     """Count skill directories containing SKILL.md."""
     if not set_dir.is_dir():
         return 0
-    return sum(
-        1 for d in set_dir.iterdir()
-        if d.is_dir() and (d / "SKILL.md").exists()
-    )
+    return sum(1 for d in set_dir.iterdir() if d.is_dir() and (d / "SKILL.md").exists())
 
 
 def create_skill_set(
@@ -128,11 +125,13 @@ def list_skill_sets(project_root: Path) -> list[SkillSetInfo]:
     for item in sorted(skills_root.iterdir()):
         if not item.is_dir():
             continue
-        sets.append(SkillSetInfo(
-            name=item.name,
-            path=str(item),
-            skill_count=_count_skills(item),
-        ))
+        sets.append(
+            SkillSetInfo(
+                name=item.name,
+                path=str(item),
+                skill_count=_count_skills(item),
+            )
+        )
 
     return sets
 

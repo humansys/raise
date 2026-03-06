@@ -52,9 +52,7 @@ class TestReadArtifact:
 
 
 class TestReadAllArtifacts:
-    def test_reads_all_from_directory(
-        self, project_root, sample_created
-    ) -> None:
+    def test_reads_all_from_directory(self, project_root, sample_created) -> None:
         a1 = _make_artifact(sample_created)
         a2 = StoryDesignArtifact(
             skill="rai-story-design",

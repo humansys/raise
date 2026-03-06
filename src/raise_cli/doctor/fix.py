@@ -21,7 +21,9 @@ from raise_cli.doctor.models import CheckResult
 FIX_REGISTRY: dict[str, Callable[[Path], bool]] = {}
 
 
-def register_fix(fix_id: str) -> Callable[[Callable[[Path], bool]], Callable[[Path], bool]]:
+def register_fix(
+    fix_id: str,
+) -> Callable[[Callable[[Path], bool]], Callable[[Path], bool]]:
     """Decorator to register a fix function by ID."""
 
     def decorator(fn: Callable[[Path], bool]) -> Callable[[Path], bool]:

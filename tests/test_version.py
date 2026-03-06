@@ -9,7 +9,9 @@ def test_version() -> None:
     """Test that version is defined and follows semver format."""
     assert raise_cli.__version__ is not None
     parts = raise_cli.__version__.split(".")
-    assert len(parts) >= 2, f"Version '{raise_cli.__version__}' does not look like semver"
+    assert len(parts) >= 2, (
+        f"Version '{raise_cli.__version__}' does not look like semver"
+    )
 
 
 def test_author() -> None:

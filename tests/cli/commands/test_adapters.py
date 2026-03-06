@@ -150,8 +150,11 @@ class TestAdaptersStatus:
 
     def test_status_shows_missing_env_vars(self) -> None:
         """When env vars are unset, status reports them missing."""
-        env = {k: v for k, v in os.environ.items()
-               if k not in ("JIRA_URL", "JIRA_USERNAME", "JIRA_API_TOKEN", "JIRA_TOKEN")}
+        env = {
+            k: v
+            for k, v in os.environ.items()
+            if k not in ("JIRA_URL", "JIRA_USERNAME", "JIRA_API_TOKEN", "JIRA_TOKEN")
+        }
         with patch.dict(os.environ, env, clear=True):
             result = runner.invoke(app, ["adapter", "status"])
         assert result.exit_code == 0

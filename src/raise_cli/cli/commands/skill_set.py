@@ -142,4 +142,6 @@ def diff_command(
 
     total = len(diff.added) + len(diff.modified) + len(diff.unchanged)
     added, modified = len(diff.added), len(diff.modified)
-    console.print(f"\n[bold]Total:[/bold] {total} skills ({added} added, {modified} modified)")
+    console.print(
+        f"\n[bold]Total:[/bold] {total} skills ({added} added, {modified} modified)"
+    )

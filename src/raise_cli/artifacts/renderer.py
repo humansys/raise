@@ -74,9 +74,7 @@ def _get_template(project_root: Path | None = None) -> str:
     )
 
 
-def render_artifact(
-    artifact: SkillArtifact, project_root: Path | None = None
-) -> str:
+def render_artifact(artifact: SkillArtifact, project_root: Path | None = None) -> str:
     """Render a typed artifact to Markdown.
 
     Uses the template from ``.raise/templates/artifacts/`` if available,

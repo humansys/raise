@@ -570,7 +570,6 @@ class TestInitBootstrap:
         assert "# Rai Memory" in content
         assert "RaiSE Framework Process" in content
 
-
     def test_init_generates_claude_md_for_raise_project(
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
@@ -613,7 +612,9 @@ class TestInitBootstrap:
         personal_dir = greenfield_project / ".raise" / "rai" / "personal"
         assert personal_dir.is_dir()
         gitkeep = personal_dir / ".gitkeep"
-        assert gitkeep.exists(), ".raise/rai/personal/.gitkeep should be created by init"
+        assert gitkeep.exists(), (
+            ".raise/rai/personal/.gitkeep should be created by init"
+        )
 
 
 class TestInitMemoryMdBranches:
@@ -1258,7 +1259,11 @@ class TestInitPreservesExistingManifest:
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
         """rai init preserves existing branches.development value."""
-        from raise_cli.onboarding.manifest import AgentsManifest, ProjectInfo, ProjectManifest
+        from raise_cli.onboarding.manifest import (
+            AgentsManifest,
+            ProjectInfo,
+            ProjectManifest,
+        )
 
         existing = ProjectManifest(
             project=ProjectInfo(name="test", project_type="brownfield"),
@@ -1284,7 +1289,12 @@ class TestInitPreservesExistingManifest:
         self, greenfield_project: Path, mock_home: Path
     ) -> None:
         """rai init preserves existing tier value."""
-        from raise_cli.onboarding.manifest import AgentsManifest, ProjectInfo, ProjectManifest, TierConfig
+        from raise_cli.onboarding.manifest import (
+            AgentsManifest,
+            ProjectInfo,
+            ProjectManifest,
+            TierConfig,
+        )
 
         existing = ProjectManifest(
             project=ProjectInfo(name="test", project_type="brownfield"),

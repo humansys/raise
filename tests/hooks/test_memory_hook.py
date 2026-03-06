@@ -48,10 +48,7 @@ class TestMemoryMdSyncHookHandle:
         framework_dir = raise_dir / "rai" / "framework"
         framework_dir.mkdir(parents=True)
         (framework_dir / "methodology.yaml").write_text(
-            "principles:\n"
-            "  core:\n"
-            "    - name: TDD\n"
-            "      rule: always\n",
+            "principles:\n  core:\n    - name: TDD\n      rule: always\n",
             encoding="utf-8",
         )
 
@@ -95,9 +92,7 @@ class TestMemoryMdSyncHookHandle:
             encoding="utf-8"
         )
 
-    def test_returns_error_on_generation_failure(
-        self, hook: MemoryMdSyncHook
-    ) -> None:
+    def test_returns_error_on_generation_failure(self, hook: MemoryMdSyncHook) -> None:
         event = GraphBuildEvent(project_path=Path("/nonexistent/path"))
 
         with patch(

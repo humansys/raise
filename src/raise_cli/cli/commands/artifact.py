@@ -121,7 +121,11 @@ def _resolve_all_artifacts(fmt: str) -> list[Path] | None:
 
     if not artifacts_dir.is_dir():
         if fmt == "json":
-            typer.echo(json.dumps({"results": [], "all_passed": True, "message": "No artifacts found"}))
+            typer.echo(
+                json.dumps(
+                    {"results": [], "all_passed": True, "message": "No artifacts found"}
+                )
+            )
         else:
             console.print("No artifacts found in .raise/artifacts/")
         raise typer.Exit(0)
@@ -129,7 +133,11 @@ def _resolve_all_artifacts(fmt: str) -> list[Path] | None:
     paths = sorted(artifacts_dir.glob("*.yaml"))
     if not paths:
         if fmt == "json":
-            typer.echo(json.dumps({"results": [], "all_passed": True, "message": "No artifacts found"}))
+            typer.echo(
+                json.dumps(
+                    {"results": [], "all_passed": True, "message": "No artifacts found"}
+                )
+            )
         else:
             console.print("No artifacts found in .raise/artifacts/")
         raise typer.Exit(0)

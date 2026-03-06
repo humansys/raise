@@ -24,9 +24,24 @@ class TestSyncBacklog:
     def test_sync_writes_file_with_correct_content(self, tmp_path: Path) -> None:
         """sync_backlog writes markdown with header, timestamp, and table rows."""
         issues = [
-            IssueSummary(key="RAISE-347", summary="Backlog Automation", status="In Progress", issue_type="Epic"),
-            IssueSummary(key="RAISE-348", summary="Documentation Refresh", status="Backlog", issue_type="Epic"),
-            IssueSummary(key="RAISE-349", summary="Adapter Validation", status="Selected", issue_type="Epic"),
+            IssueSummary(
+                key="RAISE-347",
+                summary="Backlog Automation",
+                status="In Progress",
+                issue_type="Epic",
+            ),
+            IssueSummary(
+                key="RAISE-348",
+                summary="Documentation Refresh",
+                status="Backlog",
+                issue_type="Epic",
+            ),
+            IssueSummary(
+                key="RAISE-349",
+                summary="Adapter Validation",
+                status="Selected",
+                issue_type="Epic",
+            ),
         ]
         adapter = _make_adapter(issues)
         output = tmp_path / "backlog.md"

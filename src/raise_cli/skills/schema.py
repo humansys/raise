@@ -38,7 +38,8 @@ class SkillMetadata(BaseModel):
         default=True, description="Whether skill can be adapted by mastery level"
     )
     output_type: str | None = Field(
-        default=None, description="Artifact type this skill produces (e.g., story-design)"
+        default=None,
+        description="Artifact type this skill produces (e.g., story-design)",
     )
 
     @classmethod

@@ -53,7 +53,9 @@ def doctor(
     ] = False,
     online: Annotated[
         bool,
-        typer.Option("--online", help="Include online checks (MCP, adapter connectivity)"),
+        typer.Option(
+            "--online", help="Include online checks (MCP, adapter connectivity)"
+        ),
     ] = False,
     category: Annotated[
         str | None,
@@ -104,7 +106,9 @@ def doctor(
     else:
         out = Console()
         if not results:
-            out.print("No checks registered. Install raise-cli with extras for diagnostics.")
+            out.print(
+                "No checks registered. Install raise-cli with extras for diagnostics."
+            )
             return
 
         for r in results:
@@ -134,7 +138,9 @@ def doctor(
             out = Console()
             outcomes = run_fixes(fixable, Path.cwd())
             for fix_id, success in outcomes:
-                status_label = "[green]fixed[/green]" if success else "[red]failed[/red]"
+                status_label = (
+                    "[green]fixed[/green]" if success else "[red]failed[/red]"
+                )
                 out.print(f"  fix: {fix_id} -- {status_label}")
 
     if errors > 0:
@@ -144,7 +150,8 @@ def doctor(
 @doctor_app.command()
 def report(
     send: Annotated[
-        bool, typer.Option("--send", help="Open email client with report"),
+        bool,
+        typer.Option("--send", help="Open email client with report"),
     ] = False,
 ) -> None:
     """Generate diagnostic report, optionally send via email."""

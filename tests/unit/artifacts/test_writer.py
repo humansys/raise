@@ -23,9 +23,7 @@ def _make_artifact(created: datetime) -> SkillArtifact:
 
 
 class TestWriteArtifact:
-    def test_creates_file_at_correct_path(
-        self, project_root, sample_created
-    ) -> None:
+    def test_creates_file_at_correct_path(self, project_root, sample_created) -> None:
         artifact = _make_artifact(sample_created)
         path = write_artifact(artifact, project_root)
         assert path.exists()
@@ -38,9 +36,7 @@ class TestWriteArtifact:
         write_artifact(artifact, project_root)
         assert (project_root / ".raise" / "artifacts").is_dir()
 
-    def test_yaml_content_matches_model(
-        self, project_root, sample_created
-    ) -> None:
+    def test_yaml_content_matches_model(self, project_root, sample_created) -> None:
         artifact = _make_artifact(sample_created)
         path = write_artifact(artifact, project_root)
         data = yaml.safe_load(path.read_text())
@@ -50,9 +46,7 @@ class TestWriteArtifact:
         assert data["content"]["summary"] == "Base artifact model"
         assert data["refs"]["backlog_item"] == "RAISE-402"
 
-    def test_filename_from_story_and_type(
-        self, project_root, sample_created
-    ) -> None:
+    def test_filename_from_story_and_type(self, project_root, sample_created) -> None:
         artifact = SkillArtifact(
             artifact_type=ArtifactType.STORY_DESIGN,
             skill="rai-story-design",

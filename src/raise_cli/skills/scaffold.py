@@ -187,7 +187,9 @@ def scaffold_skill(
         if deployed.exists():
             skill_path.mkdir(parents=True, exist_ok=True)
             skill_file = skill_path / "SKILL.md"
-            skill_file.write_text(deployed.read_text(encoding="utf-8"), encoding="utf-8")
+            skill_file.write_text(
+                deployed.read_text(encoding="utf-8"), encoding="utf-8"
+            )
             return ScaffoldResult(created=True, path=str(skill_file))
         return ScaffoldResult(
             created=False,

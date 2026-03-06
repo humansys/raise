@@ -156,9 +156,7 @@ class TestStoryDesignArtifact:
         assert isinstance(artifact.content, StoryDesignContent)
         assert artifact.content.complexity == Complexity.MODERATE
 
-    def test_model_dump_includes_typed_content(
-        self, sample_created: datetime
-    ) -> None:
+    def test_model_dump_includes_typed_content(self, sample_created: datetime) -> None:
         artifact = StoryDesignArtifact(
             skill="rai-story-design",
             created=sample_created,

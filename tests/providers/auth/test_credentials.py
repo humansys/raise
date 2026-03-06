@@ -37,8 +37,12 @@ class TestCredentialsStorage:
         assert credentials_path.exists()
         # File should contain encrypted data, not plaintext token
         raw_content = credentials_path.read_text(encoding="utf-8")
-        assert "fake-access-token-for-testing" not in raw_content  # Access token not in plaintext
-        assert "fake-refresh-token-for-testing" not in raw_content  # Refresh token not in plaintext
+        assert (
+            "fake-access-token-for-testing" not in raw_content
+        )  # Access token not in plaintext
+        assert (
+            "fake-refresh-token-for-testing" not in raw_content
+        )  # Refresh token not in plaintext
 
     def test_load_token_decrypts_successfully(
         self, credentials_path: Path, sample_token: dict[str, Any]
@@ -103,7 +107,8 @@ class TestCredentialsStorage:
         store_token("gitlab", gitlab_token, credentials_path)
 
         assert (
-            load_token("jira", credentials_path)["access_token"] == "fake-access-token-for-testing"
+            load_token("jira", credentials_path)["access_token"]
+            == "fake-access-token-for-testing"
         )
         assert (
             load_token("gitlab", credentials_path)["access_token"] == "gitlab_token_xyz"

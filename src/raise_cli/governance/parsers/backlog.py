@@ -286,8 +286,8 @@ def extract_epics(file_path: Path, project_root: Path | None = None) -> list[Con
             if e_match:
                 canon = int(e_match.group(1))  # E08 -> 8, E1 -> 1
                 scope_hit = any(
-                    re.search(r"^e0*(\d+)", d.name, re.IGNORECASE)
-                    and int(re.search(r"^e0*(\d+)", d.name, re.IGNORECASE).group(1)) == canon  # type: ignore[union-attr]
+                    (m := re.search(r"^e0*(\d+)", d.name, re.IGNORECASE))
+                    and int(m.group(1)) == canon
                     for d in project_root.glob("work/epics/e*")
                     if (d / "scope.md").exists()
                 )

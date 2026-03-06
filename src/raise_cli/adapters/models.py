@@ -7,7 +7,6 @@ of adapters regardless of their concrete implementation.
 Architecture: ADR-033 (Open-core adapter architecture), ADR-034 (Governance extensibility)
 """
 
-
 from enum import StrEnum
 from typing import Any
 
@@ -172,7 +171,9 @@ class BacklogLink(BaseModel):
     """Link from one backlog item to another."""
 
     target: str = Field(..., description="Target issue key")
-    link_type: str = Field(..., description="Relationship type (blocks, depends_on, relates_to)")
+    link_type: str = Field(
+        ..., description="Relationship type (blocks, depends_on, relates_to)"
+    )
 
 
 class BacklogComment(BaseModel):

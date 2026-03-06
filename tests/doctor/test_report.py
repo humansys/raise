@@ -291,7 +291,9 @@ class TestOpenMailto:
             os_info="Linux 6.17.0 (x86_64)",
             check_results=[],
         )
-        with patch("raise_cli.doctor.report.webbrowser.open", side_effect=OSError("no browser")):
+        with patch(
+            "raise_cli.doctor.report.webbrowser.open", side_effect=OSError("no browser")
+        ):
             result = open_mailto(report)
         assert result is False
 
@@ -322,7 +324,9 @@ class TestOpenMailto:
 class TestDoctorReportCLI:
     """CLI integration tests for rai doctor report."""
 
-    def test_report_command_runs(self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    def test_report_command_runs(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """rai doctor report runs without error."""
         monkeypatch.chdir(tmp_path)
         result = runner.invoke(app, ["doctor", "report"])

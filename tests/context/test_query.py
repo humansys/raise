@@ -219,9 +219,7 @@ class TestQueryEngineKeywordSearch:
             )
         )
         engine = QueryEngine(graph)
-        result = engine.query(
-            Query(query="requirement", types=["requirement"])
-        )
+        result = engine.query(Query(query="requirement", types=["requirement"]))
         assert len(result.concepts) == 1
         assert result.concepts[0].id == "REQ-001"
 

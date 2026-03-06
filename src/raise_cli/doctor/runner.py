@@ -79,7 +79,9 @@ def run_checks(
 
         # If any ERROR in this category, flag for downstream skip
         category_errors = [
-            r for r in results if r.category == category and r.status == CheckStatus.ERROR
+            r
+            for r in results
+            if r.category == category and r.status == CheckStatus.ERROR
         ]
         if category_errors and category == "environment":
             critical_failure = True

@@ -193,7 +193,12 @@ def _copy_patterns(
             if package_version > existing_version:
                 existing_patterns[idx] = base_pattern
                 updated += 1
-                logger.debug("Updated base pattern: %s v%d → v%d", pid, existing_version, package_version)
+                logger.debug(
+                    "Updated base pattern: %s v%d → v%d",
+                    pid,
+                    existing_version,
+                    package_version,
+                )
 
     result.patterns_added = added
     result.patterns_updated = updated
@@ -214,10 +219,13 @@ def _copy_patterns(
         finally:
             import contextlib
             import os
+
             with contextlib.suppress(OSError):
                 os.close(fd)
         result.files_copied.append(str(dest))
-        logger.debug("Merged base patterns into %s: %d added, %d updated", dest, added, updated)
+        logger.debug(
+            "Merged base patterns into %s: %d added, %d updated", dest, added, updated
+        )
     else:
         result.files_skipped.append(str(dest))
         logger.debug("Base patterns already current: %s", dest)
