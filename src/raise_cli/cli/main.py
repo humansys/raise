@@ -89,7 +89,7 @@ class OutputFormat(StrEnum):
 def version_callback(value: bool) -> None:
     """Print version and exit."""
     if value:
-        console.print(f"rai-cli version {__version__}")
+        console.print(f"raise-cli version {__version__}")
         raise typer.Exit(0)
 
 

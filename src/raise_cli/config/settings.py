@@ -1,4 +1,4 @@
-"""Configuration settings for rai-cli using Pydantic Settings.
+"""Configuration settings for raise-cli using Pydantic Settings.
 
 Implements configuration cascade with proper precedence:
 1. CLI arguments (highest priority)
@@ -75,7 +75,7 @@ class TomlConfigSource(PydanticBaseSettingsSource):
 
 
 class RaiSettings(BaseSettings):
-    """Configuration settings for rai-cli with proper cascade precedence.
+    """Configuration settings for raise-cli with proper cascade precedence.
 
     Settings are loaded in order of precedence (highest to lowest):
     1. Constructor arguments (from CLI)

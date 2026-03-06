@@ -28,7 +28,7 @@ class DoctorCheck(Protocol):
         class EnvironmentCheck:
             check_id = "environment"
             category = "environment"
-            description = "Python version, rai-cli version, OS, installed extras"
+            description = "Python version, raise-cli version, OS, installed extras"
             requires_online = False
 
             def evaluate(self, context: DoctorContext) -> list[CheckResult]:

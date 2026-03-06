@@ -1,6 +1,6 @@
 """Base skills package for distribution.
 
-This package contains the RaiSE skills that ship with rai-cli.
+This package contains the RaiSE skills that ship with raise-cli.
 On `rai init`, skill files are copied to the project's
 `.claude/skills/` directory (Claude Code) or equivalent IDE location.
 

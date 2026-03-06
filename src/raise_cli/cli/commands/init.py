@@ -59,7 +59,7 @@ def _print_skill_sync_summary(result: SkillScaffoldResult) -> None:
     """Print a summary table of skill sync actions."""
     from raise_cli.skills_base import __version__ as cli_version
 
-    console.print(f"\n[bold]Skill sync: rai-cli {cli_version}[/bold]\n")
+    console.print(f"\n[bold]Skill sync: raise-cli {cli_version}[/bold]\n")
 
     rows: list[tuple[str, str, str]] = []
     for name in result.skills_installed:

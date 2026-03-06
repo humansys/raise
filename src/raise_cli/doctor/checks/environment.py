@@ -1,6 +1,6 @@
-"""Environment diagnostic check — Python, rai-cli, OS, optional extras.
+"""Environment diagnostic check — Python, raise-cli, OS, optional extras.
 
-Reports Python version, rai-cli version, OS platform, and whether optional
+Reports Python version, raise-cli version, OS platform, and whether optional
 extras (mcp, api) are installed.
 
 Architecture: ADR-045.
@@ -18,17 +18,17 @@ from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 _MIN_PYTHON: tuple[int, int] = (3, 11)
 
 _OPTIONAL_EXTRAS: tuple[tuple[str, str, str], ...] = (
-    ("mcp", "mcp", "pip install rai-cli[mcp]"),
-    ("httpx", "httpx", "pip install rai-cli[api]"),
+    ("mcp", "mcp", "pip install raise-cli[mcp]"),
+    ("httpx", "httpx", "pip install raise-cli[api]"),
 )
 
 
 class EnvironmentCheck:
-    """Validates Python version, rai-cli version, OS, and installed extras."""
+    """Validates Python version, raise-cli version, OS, and installed extras."""
 
     check_id: ClassVar[str] = "environment"
     category: ClassVar[str] = "environment"
-    description: ClassVar[str] = "Python version, rai-cli version, OS, installed extras"
+    description: ClassVar[str] = "Python version, raise-cli version, OS, installed extras"
     requires_online: ClassVar[bool] = False
 
     def evaluate(self, context: DoctorContext) -> list[CheckResult]:
@@ -70,7 +70,7 @@ class EnvironmentCheck:
             check_id="env-rai-version",
             category="environment",
             status=CheckStatus.PASS,
-            message=f"rai-cli {__version__}",
+            message=f"raise-cli {__version__}",
         )
 
     @staticmethod

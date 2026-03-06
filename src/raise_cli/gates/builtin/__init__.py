@@ -1,1 +1,1 @@
-"""Built-in quality gates for rai-cli (COMMUNITY tier)."""
+"""Built-in quality gates for raise-cli (COMMUNITY tier)."""

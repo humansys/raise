@@ -56,7 +56,7 @@ class TestGenerateReport:
         assert report.os_info  # non-empty
 
     def test_collects_rai_version(self, tmp_path: Path) -> None:
-        """Report contains rai-cli version."""
+        """Report contains raise-cli version."""
         report = generate_report([], tmp_path)
         assert report.rai_version  # either version string or "unknown"
 
@@ -122,7 +122,7 @@ class TestReportToMarkdown:
             check_results=[],
         )
         md = report_to_markdown(report)
-        assert "**rai-cli:** 2.1.0" in md
+        assert "**raise-cli:** 2.1.0" in md
         assert "**Python:** 3.12.0" in md
         assert "**OS:** Linux" in md
 
