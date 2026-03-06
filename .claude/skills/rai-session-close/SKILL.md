@@ -63,7 +63,11 @@ The title will be used in the `summary` field of the state file AND presented to
 
 ### Step 2: Reflect & Produce State File
 
-Use inference to reflect on the session and write a YAML state file:
+Use inference to reflect on the session and write a YAML state file.
+
+**IMPORTANT:** Read `.raise/rai/personal/session-output.yaml` first if it exists — Claude Code requires reading a file before overwriting it. Same for `dev/parking-lot.md` when capturing tangents.
+
+State file structure:
 
 ```yaml
 # .raise/rai/personal/session-output.yaml
