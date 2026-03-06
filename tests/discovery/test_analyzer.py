@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import pytest
 
-from rai_cli.discovery.analyzer import (
+from raise_cli.discovery.analyzer import (
     BASE_CLASS_CATEGORIES,
     DEFAULT_CATEGORY_MAP,
     NAME_CATEGORY_OVERRIDES,
@@ -32,7 +32,7 @@ from rai_cli.discovery.analyzer import (
     group_by_module,
     match_path_category,
 )
-from rai_cli.discovery.scanner import ScanResult, Symbol
+from raise_cli.discovery.scanner import ScanResult, Symbol
 
 # ── Fixtures ──────────────────────────────────────────────────────────────
 
@@ -157,55 +157,55 @@ class TestMatchPathCategory:
     """Tests for path-to-category matching."""
 
     def test_cli_commands_path(self) -> None:
-        result = match_path_category("src/rai_cli/cli/commands/discover.py")
+        result = match_path_category("src/raise_cli/cli/commands/discover.py")
         assert result == "command"
 
     def test_cli_non_command_path(self) -> None:
-        result = match_path_category("src/rai_cli/cli/main.py")
+        result = match_path_category("src/raise_cli/cli/main.py")
         assert result == "utility"
 
     def test_schemas_path(self) -> None:
-        result = match_path_category("src/rai_cli/schemas/graph.py")
+        result = match_path_category("src/raise_cli/schemas/graph.py")
         assert result == "schema"
 
     def test_models_path(self) -> None:
-        result = match_path_category("src/rai_cli/models/user.py")
+        result = match_path_category("src/raise_cli/models/user.py")
         assert result == "model"
 
     def test_output_path(self) -> None:
-        result = match_path_category("src/rai_cli/output/formatters/discover.py")
+        result = match_path_category("src/raise_cli/output/formatters/discover.py")
         assert result == "formatter"
 
     def test_governance_path(self) -> None:
-        result = match_path_category("src/rai_cli/governance/parser.py")
+        result = match_path_category("src/raise_cli/governance/parser.py")
         assert result == "parser"
 
     def test_context_path(self) -> None:
-        result = match_path_category("src/rai_cli/context/builder.py")
+        result = match_path_category("src/raise_cli/context/builder.py")
         assert result == "builder"
 
     def test_discovery_path(self) -> None:
-        result = match_path_category("src/rai_cli/discovery/scanner.py")
+        result = match_path_category("src/raise_cli/discovery/scanner.py")
         assert result == "service"
 
     def test_memory_path(self) -> None:
-        result = match_path_category("src/rai_cli/memory/graph.py")
+        result = match_path_category("src/raise_cli/memory/graph.py")
         assert result == "service"
 
     def test_config_path(self) -> None:
-        result = match_path_category("src/rai_cli/config/settings.py")
+        result = match_path_category("src/raise_cli/config/settings.py")
         assert result == "utility"
 
     def test_core_path(self) -> None:
-        result = match_path_category("src/rai_cli/core/git.py")
+        result = match_path_category("src/raise_cli/core/git.py")
         assert result == "utility"
 
     def test_telemetry_path(self) -> None:
-        result = match_path_category("src/rai_cli/telemetry/emitter.py")
+        result = match_path_category("src/raise_cli/telemetry/emitter.py")
         assert result == "service"
 
     def test_no_match(self) -> None:
-        result = match_path_category("src/rai_cli/unknown/foo.py")
+        result = match_path_category("src/raise_cli/unknown/foo.py")
         assert result is None
 
     def test_custom_category_map(self) -> None:
@@ -215,12 +215,12 @@ class TestMatchPathCategory:
 
     def test_custom_map_does_not_use_defaults(self) -> None:
         custom = {"custom/": "widget"}
-        result = match_path_category("src/rai_cli/cli/commands/foo.py", custom)
+        result = match_path_category("src/raise_cli/cli/commands/foo.py", custom)
         assert result is None
 
     def test_most_specific_path_wins(self) -> None:
         """cli/commands/ should match before cli/."""
-        result = match_path_category("src/rai_cli/cli/commands/scan.py")
+        result = match_path_category("src/raise_cli/cli/commands/scan.py")
         assert result == "command"
 
     # ── Multi-language category patterns (S17.4) ─────────────────────────
@@ -837,13 +837,13 @@ class TestBuildHierarchy:
             _symbol(
                 name="models",
                 kind="module",
-                file="src/rai_cli/memory/models.py",
+                file="src/raise_cli/memory/models.py",
                 signature="module models",
             ),
             _symbol(
                 name="models",
                 kind="module",
-                file="src/rai_cli/governance/models.py",
+                file="src/raise_cli/governance/models.py",
                 signature="module models",
             ),
         ]
@@ -851,8 +851,8 @@ class TestBuildHierarchy:
         ids = [u.id for u in units]
         assert len(ids) == len(set(ids)), f"Duplicate IDs: {ids}"
         # Module-level entries use "module" as suffix, not the file stem
-        assert "comp-rai_cli.memory.models-module" in ids
-        assert "comp-rai_cli.governance.models-module" in ids
+        assert "comp-raise_cli.memory.models-module" in ids
+        assert "comp-raise_cli.governance.models-module" in ids
 
     def test_module_and_function_same_name_unique_ids(self) -> None:
         """Module and function with same name in same file produce unique IDs."""
@@ -973,11 +973,11 @@ class TestBuildHierarchy:
         """Module path is derived from file path."""
         symbols = [
             _symbol(
-                name="Scanner", kind="class", file="src/rai_cli/discovery/scanner.py"
+                name="Scanner", kind="class", file="src/raise_cli/discovery/scanner.py"
             ),
         ]
         units = build_hierarchy(symbols)
-        assert units[0].module == "rai_cli.discovery.scanner"
+        assert units[0].module == "raise_cli.discovery.scanner"
 
     def test_internal_flag_set(self) -> None:
         """Components with underscore-prefixed names are internal."""
@@ -1128,12 +1128,12 @@ class TestFileToModule:
 
     # Existing Python behavior (regression)
     def test_python_with_src_prefix(self) -> None:
-        result = _file_to_module("src/rai_cli/discovery/scanner.py")
-        assert result == "rai_cli.discovery.scanner"
+        result = _file_to_module("src/raise_cli/discovery/scanner.py")
+        assert result == "raise_cli.discovery.scanner"
 
     def test_python_without_src_prefix(self) -> None:
-        result = _file_to_module("rai_cli/discovery/scanner.py")
-        assert result == "rai_cli.discovery.scanner"
+        result = _file_to_module("raise_cli/discovery/scanner.py")
+        assert result == "raise_cli.discovery.scanner"
 
     # PHP paths (Laravel uses app/ prefix)
     def test_php_with_app_prefix(self) -> None:
@@ -1372,14 +1372,14 @@ class TestAnalyze:
                 _symbol(
                     name="Writer",
                     kind="class",
-                    file="src/rai_cli/memory/writer.py",
+                    file="src/raise_cli/memory/writer.py",
                     signature="class Writer",
                     docstring="Memory writer.",
                 ),
                 _symbol(
                     name="Writer",
                     kind="class",
-                    file="src/rai_cli/telemetry/writer.py",
+                    file="src/raise_cli/telemetry/writer.py",
                     signature="class Writer",
                     docstring="Telemetry writer.",
                 ),

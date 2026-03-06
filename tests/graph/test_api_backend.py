@@ -49,7 +49,7 @@ class TestApiGraphBackendProtocol:
     """ApiGraphBackend implements KnowledgeGraphBackend protocol."""
 
     def test_implements_protocol(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -63,7 +63,7 @@ class TestApiGraphBackendPersist:
     """persist() sends correct GraphSyncRequest to server."""
 
     def test_persist_sends_post_to_sync_endpoint(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -86,7 +86,7 @@ class TestApiGraphBackendPersist:
             assert call_args.kwargs["url"] == "/api/v1/graph/sync"
 
     def test_persist_sends_correct_payload(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -127,7 +127,7 @@ class TestApiGraphBackendPersist:
             assert edge["weight"] == 1.0
 
     def test_persist_includes_auth_header(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -143,7 +143,7 @@ class TestApiGraphBackendHealth:
     """health() returns status based on server availability."""
 
     def test_health_returns_healthy_when_server_responds(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -162,7 +162,7 @@ class TestApiGraphBackendHealth:
         assert health.metadata["backend"] == "api"
 
     def test_health_returns_unavailable_on_connection_error(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -181,7 +181,7 @@ class TestApiGraphBackendHealth:
         )
 
     def test_health_returns_unavailable_on_timeout(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -197,7 +197,7 @@ class TestApiGraphBackendHealth:
         assert health.status == "unavailable"
 
     def test_health_returns_unavailable_on_read_error(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -217,7 +217,7 @@ class TestApiGraphBackendLoad:
     """load() raises NotImplementedError."""
 
     def test_load_raises_not_implemented(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",
@@ -233,7 +233,7 @@ class TestApiGraphBackendTimeout:
     """Client has appropriate timeout configuration."""
 
     def test_client_has_timeout(self) -> None:
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         backend = ApiGraphBackend(
             server_url="http://localhost:8000",

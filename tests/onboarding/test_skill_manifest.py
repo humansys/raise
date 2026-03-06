@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from rai_cli.onboarding.skill_manifest import (
+from raise_cli.onboarding.skill_manifest import (
     SkillEntry,
     SkillManifest,
     SkillSyncAction,
@@ -41,7 +41,7 @@ class TestSkillManifest:
         manifest = SkillManifest()
         assert manifest.schema_version == "1.0"
         assert manifest.skills == {}
-        assert manifest.rai_cli_version is not None
+        assert manifest.raise_cli_version is not None
 
     def test_manifest_with_skills(self) -> None:
         manifest = SkillManifest(

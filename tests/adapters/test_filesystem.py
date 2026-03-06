@@ -7,8 +7,8 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from rai_cli.adapters.filesystem import FilesystemPMAdapter
-from rai_cli.adapters.models import (
+from raise_cli.adapters.filesystem import FilesystemPMAdapter
+from raise_cli.adapters.models import (
     AdapterHealth,
     BacklogComment,
     BacklogItem,
@@ -20,7 +20,7 @@ from rai_cli.adapters.models import (
     IssueSpec,
     IssueSummary,
 )
-from rai_cli.adapters.protocols import ProjectManagementAdapter
+from raise_cli.adapters.protocols import ProjectManagementAdapter
 
 # ── T1: Pydantic models ────────────────────────────────────────────────
 

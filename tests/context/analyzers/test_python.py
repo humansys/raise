@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-from rai_cli.context.analyzers.protocol import CodeAnalyzer
-from rai_cli.context.analyzers.python import PythonAnalyzer
+from raise_cli.context.analyzers.protocol import CodeAnalyzer
+from raise_cli.context.analyzers.python import PythonAnalyzer
 
 
 class TestPythonAnalyzerDetect:

@@ -7,8 +7,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.governance.models import ConceptType
-from rai_cli.governance.parsers.glossary import (
+from raise_cli.governance.models import ConceptType
+from raise_cli.governance.parsers.glossary import (
     _extract_term_content,
     _parse_term_header,
     extract_all_terms,

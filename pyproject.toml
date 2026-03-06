@@ -6,7 +6,7 @@ raise-core = { workspace = true }
 raise-server = { workspace = true }
 
 [project]
-name = "rai-cli"
+name = "raise-cli"
 version = "2.2.0"
 description = "RaiSE CLI - Reliable AI Software Engineering governance framework"
 authors = [
@@ -72,42 +72,42 @@ csharp = [
 
 
 [project.scripts]
-rai = "rai_cli.cli.main:app"
+rai = "raise_cli.cli.main:app"
 
 [project.entry-points."rai.governance.parsers"]
-prd = "rai_cli.governance.parsers.prd:PrdParser"
-vision = "rai_cli.governance.parsers.vision:VisionParser"
-constitution = "rai_cli.governance.parsers.constitution:ConstitutionParser"
-roadmap = "rai_cli.governance.parsers.roadmap:RoadmapParser"
-backlog = "rai_cli.governance.parsers.backlog:BacklogParser"
-epic_scope = "rai_cli.governance.parsers.epic:EpicScopeParser"
-adr = "rai_cli.governance.parsers.adr:AdrParser"
-guardrails = "rai_cli.governance.parsers.guardrails:GuardrailsParser"
-glossary = "rai_cli.governance.parsers.glossary:GlossaryParser"
+prd = "raise_cli.governance.parsers.prd:PrdParser"
+vision = "raise_cli.governance.parsers.vision:VisionParser"
+constitution = "raise_cli.governance.parsers.constitution:ConstitutionParser"
+roadmap = "raise_cli.governance.parsers.roadmap:RoadmapParser"
+backlog = "raise_cli.governance.parsers.backlog:BacklogParser"
+epic_scope = "raise_cli.governance.parsers.epic:EpicScopeParser"
+adr = "raise_cli.governance.parsers.adr:AdrParser"
+guardrails = "raise_cli.governance.parsers.guardrails:GuardrailsParser"
+glossary = "raise_cli.governance.parsers.glossary:GlossaryParser"
 
 [project.entry-points."rai.hooks"]
-telemetry = "rai_cli.hooks.builtin.telemetry:TelemetryHook"
-gate-bridge = "rai_cli.hooks.builtin.gate_bridge:GateBridgeHook"
-jira-sync = "rai_cli.hooks.builtin.jira_sync:JiraSyncHook"
-backlog = "rai_cli.hooks.builtin.backlog:BacklogHook"
-memory-sync = "rai_cli.hooks.builtin.memory:MemoryMdSyncHook"
+telemetry = "raise_cli.hooks.builtin.telemetry:TelemetryHook"
+gate-bridge = "raise_cli.hooks.builtin.gate_bridge:GateBridgeHook"
+jira-sync = "raise_cli.hooks.builtin.jira_sync:JiraSyncHook"
+backlog = "raise_cli.hooks.builtin.backlog:BacklogHook"
+memory-sync = "raise_cli.hooks.builtin.memory:MemoryMdSyncHook"
 
 [project.entry-points."rai.gates"]
-tests = "rai_cli.gates.builtin.tests:TestGate"
-types = "rai_cli.gates.builtin.types:TypeGate"
-lint = "rai_cli.gates.builtin.lint:LintGate"
-coverage = "rai_cli.gates.builtin.coverage:CoverageGate"
+tests = "raise_cli.gates.builtin.tests:TestGate"
+types = "raise_cli.gates.builtin.types:TypeGate"
+lint = "raise_cli.gates.builtin.lint:LintGate"
+coverage = "raise_cli.gates.builtin.coverage:CoverageGate"
 
 [project.entry-points."rai.doctor.checks"]
-environment = "rai_cli.doctor.checks.environment:EnvironmentCheck"
-project = "rai_cli.doctor.checks.project:ProjectCheck"
+environment = "raise_cli.doctor.checks.environment:EnvironmentCheck"
+project = "raise_cli.doctor.checks.project:ProjectCheck"
 
 [project.entry-points."rai.adapters.pm"]
-filesystem = "rai_cli.adapters.filesystem:FilesystemPMAdapter"
-jira = "rai_cli.adapters.mcp_jira:McpJiraAdapter"
+filesystem = "raise_cli.adapters.filesystem:FilesystemPMAdapter"
+jira = "raise_cli.adapters.mcp_jira:McpJiraAdapter"
 
 [project.entry-points."rai.docs.targets"]
-confluence = "rai_cli.adapters.mcp_confluence:McpConfluenceAdapter"
+confluence = "raise_cli.adapters.mcp_confluence:McpConfluenceAdapter"
 
 [project.entry-points."rai.graph.backends"]
 local = "raise_core.graph.backends.filesystem:FilesystemGraphBackend"
@@ -117,11 +117,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/rai_cli"]
+packages = ["src/raise_cli"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/src/rai_cli/",
+    "/src/raise_cli/",
     "/LICENSE",
     "/README.md",
     "/pyproject.toml",
@@ -175,7 +175,7 @@ python_functions = ["test_*"]
 addopts = [
     "--strict-markers",
     "--strict-config",
-    "--cov=src/rai_cli",
+    "--cov=src/raise_cli",
     "--cov=packages/raise-core/src/raise_core",
     "--cov=packages/raise-server/src/raise_server",
     "--cov-report=term-missing",
@@ -186,7 +186,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["src/rai_cli", "packages/raise-core/src/raise_core", "packages/raise-server/src/raise_server"]
+source = ["src/raise_cli", "packages/raise-core/src/raise_core", "packages/raise-server/src/raise_server"]
 omit = [
     "*/tests/*",
     "*/__main__.py",

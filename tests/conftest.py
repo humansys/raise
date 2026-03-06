@@ -21,5 +21,5 @@ def _isolate_rai_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """
     fake_rai_home = tmp_path / ".rai"
     monkeypatch.setattr(
-        "rai_cli.onboarding.profile.get_rai_home", lambda: fake_rai_home
+        "raise_cli.onboarding.profile.get_rai_home", lambda: fake_rai_home
     )

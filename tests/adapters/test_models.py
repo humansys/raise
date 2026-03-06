@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import BaseModel, ValidationError
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     ArtifactLocator,
     BatchResult,

@@ -1,1 +1,1 @@
-"""Tests for rai_cli.output module."""
+"""Tests for raise_cli.output module."""

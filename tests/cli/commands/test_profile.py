@@ -8,8 +8,8 @@ from unittest.mock import patch
 import pytest
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.onboarding.profile import (
+from raise_cli.cli.main import app
+from raise_cli.onboarding.profile import (
     DeveloperProfile,
     ExperienceLevel,
     save_developer_profile,
@@ -37,10 +37,10 @@ class TestProfileShowCommand:
             experience_level=ExperienceLevel.HA,
             projects=["/path/to/project1", "/path/to/project2"],
         )
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             save_developer_profile(profile)
 
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(app, ["profile", "show"], catch_exceptions=False)
 
         assert result.exit_code == 0
@@ -52,7 +52,7 @@ class TestProfileShowCommand:
         """Show outputs helpful message when no profile exists."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(app, ["profile", "show"], catch_exceptions=False)
 
         assert result.exit_code == 0
@@ -70,10 +70,10 @@ class TestProfileShowCommand:
             skills_mastered=["tdd", "epic-planning"],
             universal_patterns=["always-use-types"],
         )
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             save_developer_profile(profile)
 
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(app, ["profile", "show"], catch_exceptions=False)
 
         assert result.exit_code == 0
@@ -94,10 +94,10 @@ class TestProfileShowCommand:
         profile.communication.language = "es"
         profile.communication.skip_praise = True
 
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             save_developer_profile(profile)
 
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(app, ["profile", "show"], catch_exceptions=False)
 
         assert result.exit_code == 0
@@ -113,7 +113,7 @@ class TestProfileNoSubcommand:
         """Profile without subcommand shows profile data or helpful message."""
         mock_home.mkdir(parents=True, exist_ok=True)
 
-        with patch("rai_cli.onboarding.profile.get_rai_home", return_value=mock_home):
+        with patch("raise_cli.onboarding.profile.get_rai_home", return_value=mock_home):
             result = runner.invoke(app, ["profile"], catch_exceptions=False)
 
         assert result.exit_code == 0

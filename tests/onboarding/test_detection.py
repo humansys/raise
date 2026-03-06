@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.onboarding.detection import (
+from raise_cli.onboarding.detection import (
     CODE_EXTENSIONS,
     LANGUAGE_TOOLCHAIN,
     ProjectType,

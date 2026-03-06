@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.adapters.declarative.discovery import discover_yaml_adapters
+from raise_cli.adapters.declarative.discovery import discover_yaml_adapters
 
 FIXTURES = Path(__file__).parent / "fixtures"
 
@@ -36,7 +36,7 @@ class TestDiscoverYamlAdapters:
         shutil.copy(FIXTURES / "minimal.yaml", adapters_dir / "minimal.yaml")
         result = discover_yaml_adapters("pm", adapters_dir=adapters_dir)
         adapter = result["minimal"]()
-        from rai_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
+        from raise_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
 
         assert isinstance(adapter, DeclarativeMcpAdapter)
 

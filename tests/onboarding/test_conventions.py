@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from textwrap import dedent
 
-from rai_cli.onboarding.conventions import (
+from raise_cli.onboarding.conventions import (
     Confidence,
     ConventionResult,
     IndentationConvention,
@@ -161,7 +161,7 @@ class TestSchemas:
                 ),
             ),
             structure=StructureConventions(
-                source_dir="src/rai_cli",
+                source_dir="src/raise_cli",
                 test_dir="tests",
                 has_src_layout=True,
                 common_patterns=["schemas/", "cli/commands/"],
@@ -566,7 +566,7 @@ class TestRaiseCommons:
         assert result.naming.functions.pattern == "snake_case"
         assert result.naming.classes.pattern == "PascalCase"
         assert result.structure.has_src_layout is True
-        assert result.structure.source_dir in ["src/rai_cli", "src/rai_pro"]
+        assert result.structure.source_dir in ["src/raise_cli", "src/rai_pro"]
         assert result.structure.test_dir == "tests"
         # Overall confidence should be HIGH for a well-organized project
         assert result.overall_confidence in [Confidence.HIGH, Confidence.MEDIUM]

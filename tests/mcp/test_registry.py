@@ -25,13 +25,13 @@ def _write_yaml(path: Path, data: dict) -> None:
 
 class TestDiscoverMcpServers:
     def test_empty_when_dir_missing(self, tmp_path: Path) -> None:
-        from rai_cli.mcp.registry import discover_mcp_servers
+        from raise_cli.mcp.registry import discover_mcp_servers
 
         result = discover_mcp_servers(mcp_dir=tmp_path / "nonexistent")
         assert result == {}
 
     def test_discovers_valid_yaml(self, mcp_dir: Path) -> None:
-        from rai_cli.mcp.registry import discover_mcp_servers
+        from raise_cli.mcp.registry import discover_mcp_servers
 
         _write_yaml(
             mcp_dir / "context7.yaml",
@@ -59,7 +59,7 @@ class TestDiscoverMcpServers:
     def test_skips_invalid_yaml(
         self, mcp_dir: Path, caplog: pytest.LogCaptureFixture
     ) -> None:
-        from rai_cli.mcp.registry import discover_mcp_servers
+        from raise_cli.mcp.registry import discover_mcp_servers
 
         (mcp_dir / "bad.yaml").write_text("{{invalid yaml", encoding="utf-8")
         _write_yaml(
@@ -78,7 +78,7 @@ class TestDiscoverMcpServers:
     def test_skips_schema_validation_error(
         self, mcp_dir: Path, caplog: pytest.LogCaptureFixture
     ) -> None:
-        from rai_cli.mcp.registry import discover_mcp_servers
+        from raise_cli.mcp.registry import discover_mcp_servers
 
         _write_yaml(
             mcp_dir / "broken.yaml",
@@ -95,7 +95,7 @@ class TestDiscoverMcpServers:
     def test_duplicate_names_first_wins(
         self, mcp_dir: Path, caplog: pytest.LogCaptureFixture
     ) -> None:
-        from rai_cli.mcp.registry import discover_mcp_servers
+        from raise_cli.mcp.registry import discover_mcp_servers
 
         _write_yaml(
             mcp_dir / "a_first.yaml",
@@ -118,7 +118,7 @@ class TestDiscoverMcpServers:
         assert "already defined" in caplog.text
 
     def test_skips_catalog_yaml(self, mcp_dir: Path) -> None:
-        from rai_cli.mcp.registry import discover_mcp_servers
+        from raise_cli.mcp.registry import discover_mcp_servers
 
         _write_yaml(
             mcp_dir / "catalog.yaml",
@@ -141,7 +141,7 @@ class TestDiscoverMcpServers:
         assert "context7" in result
 
     def test_ignores_non_yaml_files(self, mcp_dir: Path) -> None:
-        from rai_cli.mcp.registry import discover_mcp_servers
+        from raise_cli.mcp.registry import discover_mcp_servers
 
         (mcp_dir / "readme.md").write_text("# Not YAML", encoding="utf-8")
         _write_yaml(

@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 import pytest
 
-from rai_cli.config.agents import get_agent_config
-from rai_cli.context.builder import GraphBuilder
+from raise_cli.config.agents import get_agent_config
+from raise_cli.context.builder import GraphBuilder
 from raise_core.graph.models import GraphNode
 
 
@@ -2342,19 +2342,19 @@ class TestLoadCodeStructure:
         )
 
         # Source code
-        src_dir = tmp_path / "src" / "rai_cli"
+        src_dir = tmp_path / "src" / "raise_cli"
         alpha = src_dir / "alpha"
         alpha.mkdir(parents=True)
         (alpha / "__init__.py").write_text(
             dedent("""\
-            from rai_cli.alpha.core import Foo
+            from raise_cli.alpha.core import Foo
 
             __all__ = ["Foo"]
             """)
         )
         (alpha / "core.py").write_text(
             dedent("""\
-            from rai_cli.beta import helper
+            from raise_cli.beta import helper
 
             class Foo:
                 pass
@@ -2368,7 +2368,7 @@ class TestLoadCodeStructure:
         beta.mkdir(parents=True)
         (beta / "__init__.py").write_text(
             dedent("""\
-            from rai_cli.beta.utils import helper
+            from raise_cli.beta.utils import helper
 
             __all__ = ["helper"]
             """)
@@ -2480,7 +2480,7 @@ class TestLoadCodeStructure:
 
         (tmp_path / "pyproject.toml").write_text("[project]\nname = 'test'\n")
         # Create empty src dir so analyzer runs but finds no modules
-        (tmp_path / "src" / "rai_cli").mkdir(parents=True)
+        (tmp_path / "src" / "raise_cli").mkdir(parents=True)
 
         builder = GraphBuilder(project_root=tmp_path)
 
@@ -2561,7 +2561,7 @@ class TestRaiBaseTemplateContract:
         """Get the path to bundled rai_base architecture templates."""
         from importlib.resources import files as pkg_files
 
-        base = pkg_files("rai_cli.rai_base") / "governance" / "architecture"
+        base = pkg_files("raise_cli.rai_base") / "governance" / "architecture"
         # importlib Traversable → Path
         return Path(str(base))
 

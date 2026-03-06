@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.adapters.models import IssueRef, IssueSummary
-from rai_cli.cli.main import app
+from raise_cli.adapters.models import IssueRef, IssueSummary
+from raise_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -36,7 +36,7 @@ class TestBacklogSearchFormat:
             ),
         ]
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app, ["backlog", "search", "project=RAISE", "--format", "agent"]
@@ -51,7 +51,7 @@ class TestBacklogSearchFormat:
         adapter = _mock_adapter()
         adapter.search.return_value = []
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app, ["backlog", "search", "project=RAISE", "--format", "agent"]
@@ -68,7 +68,7 @@ class TestBacklogSearchFormat:
             ),
         ]
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(app, ["backlog", "search", "project=RAISE"])
         assert result.exit_code == 0
@@ -87,7 +87,7 @@ class TestBacklogSearchFormat:
             ),
         ]
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app, ["backlog", "search", "project=RAISE", "--format", "agent"]
@@ -104,7 +104,7 @@ class TestBacklogCreateFormat:
         adapter = _mock_adapter()
         adapter.create_issue.return_value = IssueRef(key="RAISE-99")
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app,
@@ -118,7 +118,7 @@ class TestBacklogCreateFormat:
         adapter = _mock_adapter()
         adapter.create_issue.return_value = IssueRef(key="RAISE-99")
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app, ["backlog", "create", "Test issue", "-p", "RAISE"]
@@ -135,7 +135,7 @@ class TestBacklogFormatValidation:
         adapter = _mock_adapter()
         adapter.search.return_value = []
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app, ["backlog", "search", "project=RAISE", "--format", "banana"]
@@ -147,7 +147,7 @@ class TestBacklogFormatValidation:
         """Invalid format value exits with error."""
         adapter = _mock_adapter()
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app, ["backlog", "create", "Test", "-p", "RAISE", "--format", "json"]
@@ -171,7 +171,7 @@ class TestBacklogPipeSanitization:
             ),
         ]
         with patch(
-            "rai_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
+            "raise_cli.cli.commands.backlog.resolve_adapter", return_value=adapter
         ):
             result = runner.invoke(
                 app, ["backlog", "search", "project=RAISE", "--format", "agent"]

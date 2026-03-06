@@ -20,13 +20,13 @@ class TestBasePatternsPackage:
 
     def test_memory_directory_accessible(self) -> None:
         """Memory directory is accessible via importlib.resources."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         memory = base / "memory"
         assert memory.is_dir()
 
     def test_patterns_base_exists(self) -> None:
         """patterns-base.jsonl file exists and is readable."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         patterns_file = base / "memory" / "patterns-base.jsonl"
         content = patterns_file.read_text(encoding="utf-8")
         assert len(content) > 0
@@ -38,7 +38,7 @@ class TestBasePatternsValidity:
     @pytest.fixture
     def patterns(self) -> list[dict]:
         """Load and parse all base patterns."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         content = (base / "memory" / "patterns-base.jsonl").read_text(encoding="utf-8")
         patterns = []
         for line in content.strip().split("\n"):
@@ -117,7 +117,7 @@ class TestBasePatternsContent:
     @pytest.fixture
     def patterns(self) -> list[dict]:
         """Load and parse all base patterns."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         content = (base / "memory" / "patterns-base.jsonl").read_text(encoding="utf-8")
         return [
             json.loads(line) for line in content.strip().split("\n") if line.strip()

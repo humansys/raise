@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.onboarding.governance import (
+from raise_cli.onboarding.governance import (
     GovernanceScaffoldResult,
     scaffold_governance,
 )
@@ -191,7 +191,7 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """Scaffolded prd.md should produce requirement nodes in graph."""
-        from rai_cli.context.builder import GraphBuilder
+        from raise_cli.context.builder import GraphBuilder
 
         builder = GraphBuilder(scaffolded_project)
         graph = builder.build()
@@ -208,7 +208,7 @@ class TestScaffoldToBuildIntegration:
         self, scaffolded_project: Path
     ) -> None:
         """Scaffolded vision.md should produce outcome nodes in graph."""
-        from rai_cli.context.builder import GraphBuilder
+        from raise_cli.context.builder import GraphBuilder
 
         builder = GraphBuilder(scaffolded_project)
         graph = builder.build()
@@ -227,7 +227,7 @@ class TestScaffoldToBuildIntegration:
         and filled by /rai-project-onboard (RAISE-219). We add a row manually here
         to test the graph builder pipeline independent of the template content.
         """
-        from rai_cli.context.builder import GraphBuilder
+        from raise_cli.context.builder import GraphBuilder
 
         # Add a guardrail row — in real usage this is done by rai-project-onboard
         guardrails_path = scaffolded_project / "governance" / "guardrails.md"
@@ -249,7 +249,7 @@ class TestScaffoldToBuildIntegration:
         Scaffold alone produces requirements and outcomes from templates.
         Guardrails require onboard to add tech-stack rows (RAISE-219).
         """
-        from rai_cli.context.builder import GraphBuilder
+        from raise_cli.context.builder import GraphBuilder
 
         # Simulate onboard adding a guardrail row
         guardrails_path = scaffolded_project / "governance" / "guardrails.md"

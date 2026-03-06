@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from rai_cli.discovery.scanner import (
+from raise_cli.discovery.scanner import (
     detect_language,
     extract_dart_symbols,
     extract_symbols,

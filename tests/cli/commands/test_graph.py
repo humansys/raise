@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
+from raise_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -178,13 +178,13 @@ class TestGraphBuildCommand:
 
         output_path = tmp_path / "index.json"
 
-        with patch("rai_cli.cli.commands.graph.GraphBuilder") as mock_cls:
+        with patch("raise_cli.cli.commands.graph.GraphBuilder") as mock_cls:
             mock_builder = MagicMock()
             mock_builder.build.return_value = graph
             mock_cls.return_value = mock_builder
 
             with patch(
-                "rai_cli.cli.commands.graph.get_active_backend"
+                "raise_cli.cli.commands.graph.get_active_backend"
             ) as mock_backend_fn:
                 mock_backend = MagicMock()
                 mock_backend.load.side_effect = FileNotFoundError
@@ -309,7 +309,7 @@ class TestMemoryDeprecationWrappers:
         # Functional behavior is covered by TestGraphBuildCommand::test_build_basic.
         from unittest.mock import patch
 
-        with patch("rai_cli.cli.commands.graph.build") as mock_build:
+        with patch("raise_cli.cli.commands.graph.build") as mock_build:
             mock_build.return_value = None
             result = runner.invoke(app, ["memory", "build"])
 

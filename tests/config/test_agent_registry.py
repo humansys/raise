@@ -7,9 +7,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-from rai_cli.config.agent_plugin import AgentPlugin, DefaultAgentPlugin
-from rai_cli.config.agent_registry import load_registry
-from rai_cli.config.agents import AgentConfig
+from raise_cli.config.agent_plugin import AgentPlugin, DefaultAgentPlugin
+from raise_cli.config.agent_registry import load_registry
+from raise_cli.config.agents import AgentConfig
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -60,7 +60,7 @@ class TestBuiltinLoading:
     def test_copilot_has_plugin(self) -> None:
         registry = load_registry()
         config = registry.get_config("copilot")
-        assert config.plugin == "rai_cli.agents.copilot_plugin"
+        assert config.plugin == "raise_cli.agents.copilot_plugin"
 
     def test_antigravity_builtin_values(self) -> None:
         registry = load_registry()

@@ -7,7 +7,7 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from rai_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
+from raise_cli.artifacts.models import ArtifactRefs, ArtifactType, SkillArtifact
 
 
 class TestArtifactType:

@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.mcp.models import McpToolResult
-from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+from raise_cli.cli.main import app
+from raise_cli.mcp.models import McpToolResult
+from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
 runner = CliRunner()
 
@@ -24,7 +24,7 @@ class TestMcpCallServerNotFound:
     """Server not in registry → exit 1 + error."""
 
     def test_server_not_found(self) -> None:
-        with patch("rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
+        with patch("raise_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
             result = runner.invoke(app, ["mcp", "call", "nonexistent", "tool"])
         assert result.exit_code != 0
         assert "nonexistent" in result.output
@@ -36,7 +36,7 @@ class TestMcpCallInvalidJson:
 
     def test_invalid_args_json(self) -> None:
         with patch(
-            "rai_cli.cli.commands.mcp.discover_mcp_servers",
+            "raise_cli.cli.commands.mcp.discover_mcp_servers",
             return_value={"test-server": _FAKE_SERVER},
         ):
             result = runner.invoke(
@@ -62,11 +62,11 @@ class TestMcpCallSuccess:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -94,11 +94,11 @@ class TestMcpCallSuccess:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -126,11 +126,11 @@ class TestMcpCallToolError:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -153,11 +153,11 @@ class TestMcpCallBridgeError:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -178,15 +178,15 @@ class TestMcpCallEmitsEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(
-                "rai_cli.cli.commands.mcp.create_emitter",
+                "raise_cli.cli.commands.mcp.create_emitter",
                 return_value=mock_emitter,
             ),
         ):
@@ -208,15 +208,15 @@ class TestMcpCallEmitsEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(
-                "rai_cli.cli.commands.mcp.create_emitter",
+                "raise_cli.cli.commands.mcp.create_emitter",
                 return_value=mock_emitter,
             ),
         ):
@@ -239,15 +239,15 @@ class TestMcpCallVerbose:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(
-                "rai_cli.cli.commands.mcp.create_emitter",
+                "raise_cli.cli.commands.mcp.create_emitter",
                 return_value=MagicMock(),
             ),
         ):
@@ -266,15 +266,15 @@ class TestMcpCallVerbose:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
             patch(
-                "rai_cli.cli.commands.mcp.create_emitter",
+                "raise_cli.cli.commands.mcp.create_emitter",
                 return_value=MagicMock(),
             ),
         ):

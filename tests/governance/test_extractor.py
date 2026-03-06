@@ -8,8 +8,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.governance.extractor import GovernanceExtractor
-from rai_cli.governance.models import ConceptType
+from raise_cli.governance.extractor import GovernanceExtractor
+from raise_cli.governance.models import ConceptType
 from raise_core.graph.models import GraphNode
 
 
@@ -252,7 +252,7 @@ class TestRegistryPath:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Broken parser logs warning, others still produce nodes."""
-        from rai_cli.adapters.models import ArtifactLocator
+        from raise_cli.adapters.models import ArtifactLocator
         from raise_core.graph.models import GraphNode
 
         class BrokenParser:

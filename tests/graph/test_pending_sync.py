@@ -6,7 +6,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
-from rai_cli.graph.backends.pending import (
+from raise_cli.graph.backends.pending import (
     PendingSyncMarker,
     clear_pending_marker,
     read_pending_marker,

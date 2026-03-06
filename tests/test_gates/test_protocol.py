@@ -8,8 +8,8 @@ from typing import ClassVar
 
 import pytest
 
-from rai_cli.gates.models import GateContext, GateResult
-from rai_cli.gates.protocol import WorkflowGate
+from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.gates.protocol import WorkflowGate
 
 # ---------------------------------------------------------------------------
 # Fixtures — conformant and non-conformant gate implementations

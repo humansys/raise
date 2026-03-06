@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
+from raise_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -115,7 +115,7 @@ class TestAdaptersCheck:
             return list(original_entry_points(group=group))
 
         with patch(
-            "rai_cli.cli.commands.adapters.entry_points",
+            "raise_cli.cli.commands.adapters.entry_points",
             side_effect=patched_entry_points,
         ):
             result = runner.invoke(app, ["adapter", "check", "--format", "json"])

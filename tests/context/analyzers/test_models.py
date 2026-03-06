@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.context.analyzers.models import ModuleInfo
-from rai_cli.context.analyzers.protocol import CodeAnalyzer
+from raise_cli.context.analyzers.models import ModuleInfo
+from raise_cli.context.analyzers.protocol import CodeAnalyzer
 
 
 class TestModuleInfo:
@@ -16,7 +16,7 @@ class TestModuleInfo:
         info = ModuleInfo(
             name="memory",
             language="python",
-            source_path="src/rai_cli/memory",
+            source_path="src/raise_cli/memory",
             imports=["config", "context"],
             exports=["append_pattern", "PatternInput"],
             component_count=12,
@@ -24,7 +24,7 @@ class TestModuleInfo:
         )
         assert info.name == "memory"
         assert info.language == "python"
-        assert info.source_path == "src/rai_cli/memory"
+        assert info.source_path == "src/raise_cli/memory"
         assert info.imports == ["config", "context"]
         assert info.exports == ["append_pattern", "PatternInput"]
         assert info.component_count == 12
@@ -35,7 +35,7 @@ class TestModuleInfo:
         info = ModuleInfo(
             name="core",
             language="python",
-            source_path="src/rai_cli/core",
+            source_path="src/raise_cli/core",
             component_count=5,
         )
         assert info.imports == []
@@ -47,7 +47,7 @@ class TestModuleInfo:
         info = ModuleInfo(
             name="empty",
             language="python",
-            source_path="src/rai_cli/empty",
+            source_path="src/raise_cli/empty",
             component_count=0,
         )
         assert info.component_count == 0
@@ -63,7 +63,7 @@ class TestModuleInfo:
         info = ModuleInfo(
             name="config",
             language="python",
-            source_path="src/rai_cli/config",
+            source_path="src/raise_cli/config",
             imports=[],
             exports=["get_project_root"],
             component_count=3,

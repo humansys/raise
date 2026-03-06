@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 import pytest
 
-from rai_cli.hooks.builtin.memory import MemoryMdSyncHook
-from rai_cli.hooks.events import GraphBuildEvent, HookResult
+from raise_cli.hooks.builtin.memory import MemoryMdSyncHook
+from raise_cli.hooks.events import GraphBuildEvent, HookResult
 
 
 class TestMemoryMdSyncHookAttributes:
@@ -80,7 +80,7 @@ class TestMemoryMdSyncHookHandle:
         event = GraphBuildEvent(project_path=project_dir, node_count=5, edge_count=3)
 
         with patch(
-            "rai_cli.hooks.builtin.memory.get_claude_memory_path"
+            "raise_cli.hooks.builtin.memory.get_claude_memory_path"
         ) as mock_path:
             claude_memory = project_dir / ".claude" / "memory" / "MEMORY.md"
             mock_path.return_value = claude_memory
@@ -101,7 +101,7 @@ class TestMemoryMdSyncHookHandle:
         event = GraphBuildEvent(project_path=Path("/nonexistent/path"))
 
         with patch(
-            "rai_cli.hooks.builtin.memory.generate_memory_md",
+            "raise_cli.hooks.builtin.memory.generate_memory_md",
             side_effect=Exception("boom"),
         ):
             result = hook.handle(event)
@@ -114,7 +114,7 @@ class TestMemoryMdSyncHookHandle:
         event = GraphBuildEvent(project_path=Path("/nonexistent/path"))
 
         with patch(
-            "rai_cli.hooks.builtin.memory.generate_memory_md",
+            "raise_cli.hooks.builtin.memory.generate_memory_md",
             side_effect=RuntimeError("catastrophic"),
         ):
             result = hook.handle(event)

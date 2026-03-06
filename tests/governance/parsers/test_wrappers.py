@@ -11,8 +11,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.adapters.models import ArtifactLocator, CoreArtifactType
-from rai_cli.adapters.protocols import GovernanceParser
+from raise_cli.adapters.models import ArtifactLocator, CoreArtifactType
+from raise_cli.adapters.protocols import GovernanceParser
 from raise_core.graph.models import GraphNode
 
 # --- Fixtures ---
@@ -189,15 +189,15 @@ class TestProtocolConformance:
     @pytest.mark.parametrize(
         "parser_class_path",
         [
-            "rai_cli.governance.parsers.prd:PrdParser",
-            "rai_cli.governance.parsers.vision:VisionParser",
-            "rai_cli.governance.parsers.constitution:ConstitutionParser",
-            "rai_cli.governance.parsers.roadmap:RoadmapParser",
-            "rai_cli.governance.parsers.backlog:BacklogParser",
-            "rai_cli.governance.parsers.epic:EpicScopeParser",
-            "rai_cli.governance.parsers.adr:AdrParser",
-            "rai_cli.governance.parsers.guardrails:GuardrailsParser",
-            "rai_cli.governance.parsers.glossary:GlossaryParser",
+            "raise_cli.governance.parsers.prd:PrdParser",
+            "raise_cli.governance.parsers.vision:VisionParser",
+            "raise_cli.governance.parsers.constitution:ConstitutionParser",
+            "raise_cli.governance.parsers.roadmap:RoadmapParser",
+            "raise_cli.governance.parsers.backlog:BacklogParser",
+            "raise_cli.governance.parsers.epic:EpicScopeParser",
+            "raise_cli.governance.parsers.adr:AdrParser",
+            "raise_cli.governance.parsers.guardrails:GuardrailsParser",
+            "raise_cli.governance.parsers.glossary:GlossaryParser",
         ],
     )
     def test_conforms_to_protocol(self, parser_class_path: str) -> None:
@@ -221,47 +221,47 @@ class TestCanParse:
         ("parser_import", "matching_type", "non_matching_type"),
         [
             (
-                "rai_cli.governance.parsers.prd:PrdParser",
+                "raise_cli.governance.parsers.prd:PrdParser",
                 CoreArtifactType.PRD,
                 CoreArtifactType.VISION,
             ),
             (
-                "rai_cli.governance.parsers.vision:VisionParser",
+                "raise_cli.governance.parsers.vision:VisionParser",
                 CoreArtifactType.VISION,
                 CoreArtifactType.PRD,
             ),
             (
-                "rai_cli.governance.parsers.constitution:ConstitutionParser",
+                "raise_cli.governance.parsers.constitution:ConstitutionParser",
                 CoreArtifactType.CONSTITUTION,
                 CoreArtifactType.PRD,
             ),
             (
-                "rai_cli.governance.parsers.roadmap:RoadmapParser",
+                "raise_cli.governance.parsers.roadmap:RoadmapParser",
                 CoreArtifactType.ROADMAP,
                 CoreArtifactType.PRD,
             ),
             (
-                "rai_cli.governance.parsers.backlog:BacklogParser",
+                "raise_cli.governance.parsers.backlog:BacklogParser",
                 CoreArtifactType.BACKLOG,
                 CoreArtifactType.PRD,
             ),
             (
-                "rai_cli.governance.parsers.epic:EpicScopeParser",
+                "raise_cli.governance.parsers.epic:EpicScopeParser",
                 CoreArtifactType.EPIC_SCOPE,
                 CoreArtifactType.PRD,
             ),
             (
-                "rai_cli.governance.parsers.adr:AdrParser",
+                "raise_cli.governance.parsers.adr:AdrParser",
                 CoreArtifactType.ADR,
                 CoreArtifactType.PRD,
             ),
             (
-                "rai_cli.governance.parsers.guardrails:GuardrailsParser",
+                "raise_cli.governance.parsers.guardrails:GuardrailsParser",
                 CoreArtifactType.GUARDRAILS,
                 CoreArtifactType.PRD,
             ),
             (
-                "rai_cli.governance.parsers.glossary:GlossaryParser",
+                "raise_cli.governance.parsers.glossary:GlossaryParser",
                 CoreArtifactType.GLOSSARY,
                 CoreArtifactType.PRD,
             ),
@@ -295,7 +295,7 @@ class TestParse:
     """Each wrapper produces list[GraphNode] from valid input."""
 
     def test_prd_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.prd import PrdParser
+        from raise_cli.governance.parsers.prd import PrdParser
 
         parser = PrdParser()
         locator = _make_locator(CoreArtifactType.PRD, "governance/prd.md", project_root)
@@ -306,7 +306,7 @@ class TestParse:
         assert nodes[0].type == "requirement"
 
     def test_vision_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.vision import VisionParser
+        from raise_cli.governance.parsers.vision import VisionParser
 
         parser = VisionParser()
         locator = _make_locator(
@@ -319,7 +319,7 @@ class TestParse:
         assert nodes[0].type == "outcome"
 
     def test_constitution_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.constitution import ConstitutionParser
+        from raise_cli.governance.parsers.constitution import ConstitutionParser
 
         parser = ConstitutionParser()
         locator = _make_locator(
@@ -334,7 +334,7 @@ class TestParse:
         assert nodes[0].type == "principle"
 
     def test_roadmap_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.roadmap import RoadmapParser
+        from raise_cli.governance.parsers.roadmap import RoadmapParser
 
         parser = RoadmapParser()
         locator = _make_locator(
@@ -347,7 +347,7 @@ class TestParse:
         assert nodes[0].type == "release"
 
     def test_backlog_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.backlog import BacklogParser
+        from raise_cli.governance.parsers.backlog import BacklogParser
 
         parser = BacklogParser()
         locator = _make_locator(
@@ -362,7 +362,7 @@ class TestParse:
         assert node_types & {"project", "epic"}
 
     def test_epic_scope_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.epic import EpicScopeParser
+        from raise_cli.governance.parsers.epic import EpicScopeParser
 
         parser = EpicScopeParser()
         locator = _make_locator(
@@ -378,7 +378,7 @@ class TestParse:
         assert node_types & {"epic", "story"}
 
     def test_adr_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.adr import AdrParser
+        from raise_cli.governance.parsers.adr import AdrParser
 
         parser = AdrParser()
         locator = _make_locator(
@@ -393,7 +393,7 @@ class TestParse:
         assert nodes[0].metadata["adr_id"] == "ADR-001"
 
     def test_guardrails_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.guardrails import GuardrailsParser
+        from raise_cli.governance.parsers.guardrails import GuardrailsParser
 
         parser = GuardrailsParser()
         locator = _make_locator(
@@ -408,7 +408,7 @@ class TestParse:
         assert nodes[0].type == "guardrail"
 
     def test_glossary_parser(self, project_root: Path) -> None:
-        from rai_cli.governance.parsers.glossary import GlossaryParser
+        from raise_cli.governance.parsers.glossary import GlossaryParser
 
         parser = GlossaryParser()
         locator = _make_locator(
@@ -424,7 +424,7 @@ class TestParse:
 
     def test_parse_nonexistent_file_returns_empty(self, tmp_path: Path) -> None:
         """Parser returns empty list for missing file, not an exception."""
-        from rai_cli.governance.parsers.prd import PrdParser
+        from raise_cli.governance.parsers.prd import PrdParser
 
         parser = PrdParser()
         locator = _make_locator(CoreArtifactType.PRD, "nonexistent.md", tmp_path)
