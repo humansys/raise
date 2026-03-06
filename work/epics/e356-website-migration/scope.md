@@ -26,7 +26,7 @@ code, making accurate documentation impossible. Colocating solves this.
 | # | Story | Size | Description |
 |---|-------|------|-------------|
 | S356.1 | ~~Migrate site to raise-commons~~ | S | ✅ Complete — merged to dev |
-| S356.2 | Update website content for v2.2 | M | Refresh landing, features, pricing for current capabilities |
+| S356.2 | ~~Update website content for v2.2~~ | M | ✅ Complete — merged to dev |
 | S356.3 | Cloudflare Pages deployment | S | Repoint GitHub integration, verify deploy pipeline |
 | S356.4 | Blog: v2.2 release post | XS | Announce v2.2 with key features |
 
@@ -34,5 +34,5 @@ code, making accurate documentation impossible. Colocating solves this.
 
 - [x] Site builds from raise-commons (`npm run build` in site/)
 - [ ] Cloudflare Pages deploys from raise-commons
-- [ ] Website content reflects v2.2 features accurately
+- [x] Website content reflects v2.2 features accurately
 - [ ] raise-gtm site/ marked as deprecated/archived
