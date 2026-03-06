@@ -6,6 +6,11 @@
 
 ---
 
+## SES-059 Deferred Items — 2026-03-06
+
+- [ ] **`rai backlog --help` sin credenciales** — el CLI no documenta JIRA_URL, JIRA_USERNAME, JIRA_API_TOKEN requeridas. Agregar texto de ayuda o `rai backlog doctor`. Promote cuando se trabaje UX del backlog.
+- [ ] **Credential validation al inicio** — McpJiraAdapter podría verificar env vars en `__init__` y fallar rápido con mensaje claro. Simple mejora de DX.
+
 ## E348 Deferred Items — 2026-03-05
 
 - [ ] **MkDocs site migration** — replace Astro with MkDocs + Material for ecosystem alignment (Typer, FastAPI, Pydantic). Promote post-release if Astro maintenance burden grows.
