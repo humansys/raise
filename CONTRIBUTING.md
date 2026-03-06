@@ -7,7 +7,7 @@ Thank you for your interest in contributing to RaiSE Commons.
 RaiSE Commons includes both **methodology** and **tooling**:
 
 - **Framework** — Methodology, katas, templates, governance artifacts
-- **rai-cli** — CLI tool for governance operations (`src/rai_cli/`)
+- **raise-cli** — CLI tool for governance operations (`src/raise_cli/`)
 
 Contributions can focus on either area.
 
