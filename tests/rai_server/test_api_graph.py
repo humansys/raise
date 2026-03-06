@@ -9,9 +9,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from rai_server.app import create_app
-from rai_server.config import ServerConfig
-from rai_server.schemas.graph import GraphQueryResponse, GraphSyncResponse, NodeResult
+from raise_server.app import create_app
+from raise_server.config import ServerConfig
+from raise_server.schemas.graph import GraphQueryResponse, GraphSyncResponse, NodeResult
 
 _DB_URL = "postgresql+asyncpg://u:p@h/db"
 _ORG_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
@@ -21,7 +21,7 @@ _ORG_NAME = "acme"
 @contextmanager
 def _override_auth(client: TestClient) -> Generator[None, None, None]:
     """Override verify_api_key dependency to return a valid OrgContext."""
-    from rai_server.auth import OrgContext, verify_api_key
+    from raise_server.auth import OrgContext, verify_api_key
 
     async def _fake_auth() -> OrgContext:
         return OrgContext(org_id=_ORG_ID, org_name=_ORG_NAME)
@@ -56,7 +56,7 @@ class TestSyncEndpoint:
         with (
             _override_auth(client),
             patch(
-                "rai_server.api.v1.graph.sync_graph",
+                "raise_server.api.v1.graph.sync_graph",
                 new_callable=AsyncMock,
                 return_value=mock_response,
             ),
@@ -126,7 +126,7 @@ class TestQueryEndpoint:
         with (
             _override_auth(client),
             patch(
-                "rai_server.api.v1.graph.query_graph",
+                "raise_server.api.v1.graph.query_graph",
                 new_callable=AsyncMock,
                 return_value=mock_response,
             ),
@@ -153,7 +153,7 @@ class TestQueryEndpoint:
         with (
             _override_auth(client),
             patch(
-                "rai_server.api.v1.graph.query_graph",
+                "raise_server.api.v1.graph.query_graph",
                 new_callable=AsyncMock,
                 return_value=mock_response,
             ),

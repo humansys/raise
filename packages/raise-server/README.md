@@ -1,4 +1,4 @@
-# rai-server
+# raise-server
 
 Backend REST API for the RaiSE shared knowledge graph. Provides persistent storage for graph data, agent memory, and telemetry across all clients of an organization.
 
@@ -28,14 +28,14 @@ docker compose up --build
 
 Starts:
 - `postgres:16-alpine` on port `5432` (waits for healthy before server starts)
-- `rai-server` on port `8000`
+- `raise-server` on port `8000`
 
 The postgres data persists in a Docker volume (`pgdata`). To reset from scratch: `docker compose down -v`.
 
 ### 2. Run migrations (first time, or after `down -v`)
 
 ```bash
-cd packages/rai-server
+cd packages/raise-server
 RAI_DATABASE_URL=postgresql+asyncpg://rai:rai_dev@localhost:5432/rai uv run alembic upgrade head
 ```
 
@@ -46,7 +46,7 @@ Creates tables: `organizations`, `api_keys`, `graph_nodes`, `graph_edges`, `agen
 From the repo root:
 
 ```bash
-docker compose exec -T postgres psql -U rai -d rai < packages/rai-server/scripts/seed_dev.sql
+docker compose exec -T postgres psql -U rai -d rai < packages/raise-server/scripts/seed_dev.sql
 ```
 
 Creates:
@@ -239,16 +239,16 @@ Response: `{"events": [...], "count": N}`
 ```
 raise-commons/
   packages/
-    rai-core/     ← domain models, graph logic, memory abstractions
-    rai-cli/      ← CLI client (rai command)
-    rai-server/   ← this package: REST API + DB persistence
+    raise-core/     ← domain models, graph logic, memory abstractions
+    raise-cli/      ← CLI client (rai command)
+    raise-server/   ← this package: REST API + DB persistence
 ```
 
-`rai-server` depends on `rai-core` for domain models. `rai-cli` calls `rai-server` when a remote backend is configured.
+`raise-server` depends on `raise-core` for domain models. `raise-cli` calls `raise-server` when a remote backend is configured.
 
 ### Multi-tenant model
 
-All data is scoped to an `org_id`. A single rai-server instance serves multiple organizations — each org has its own API keys, graph, memory, and telemetry.
+All data is scoped to an `org_id`. A single raise-server instance serves multiple organizations — each org has its own API keys, graph, memory, and telemetry.
 
 ### Auth model
 
@@ -268,6 +268,6 @@ Managed with Alembic. Migration files live in `alembic/versions/`:
 
 To create a new migration:
 ```bash
-cd packages/rai-server
+cd packages/raise-server
 RAI_DATABASE_URL=postgresql+asyncpg://rai:rai_dev@localhost:5432/rai uv run alembic revision --autogenerate -m "description"
 ```

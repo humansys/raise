@@ -29,7 +29,7 @@ class TestInsertEvent:
 
     @pytest.mark.anyio()
     async def test_returns_uuid(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.agent_queries import insert_event
+        from raise_server.db.agent_queries import insert_event
 
         session = _mock_session()
         expected_id = uuid.uuid4()
@@ -45,7 +45,7 @@ class TestInsertEvent:
 
     @pytest.mark.anyio()
     async def test_empty_payload(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.agent_queries import insert_event
+        from raise_server.db.agent_queries import insert_event
 
         session = _mock_session()
         mock_result = MagicMock()
@@ -61,7 +61,7 @@ class TestListEvents:
 
     @pytest.mark.anyio()
     async def test_returns_list_of_dicts(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.agent_queries import list_events
+        from raise_server.db.agent_queries import list_events
 
         session = _mock_session()
         mock_mappings = MagicMock()
@@ -83,7 +83,7 @@ class TestListEvents:
 
     @pytest.mark.anyio()
     async def test_empty_result(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.agent_queries import list_events
+        from raise_server.db.agent_queries import list_events
 
         session = _mock_session()
         mock_mappings = MagicMock()

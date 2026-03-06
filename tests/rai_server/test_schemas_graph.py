@@ -10,7 +10,7 @@ class TestNodeInput:
     """NodeInput validates graph node data for sync requests."""
 
     def test_minimal_valid(self) -> None:
-        from rai_server.schemas.graph import NodeInput
+        from raise_server.schemas.graph import NodeInput
 
         node = NodeInput(
             node_id="mod-memory", node_type="module", content="Memory management"
@@ -23,7 +23,7 @@ class TestNodeInput:
         assert node.properties == {}
 
     def test_all_fields(self) -> None:
-        from rai_server.schemas.graph import NodeInput
+        from raise_server.schemas.graph import NodeInput
 
         node = NodeInput(
             node_id="mod-graph",
@@ -38,26 +38,26 @@ class TestNodeInput:
         assert node.properties["language"] == "python"
 
     def test_missing_content_field(self) -> None:
-        from rai_server.schemas.graph import NodeInput
+        from raise_server.schemas.graph import NodeInput
 
         with pytest.raises(ValidationError) as exc_info:
             NodeInput(node_id="mod-x", node_type="module")  # type: ignore[call-arg]
         assert "content" in str(exc_info.value)
 
     def test_empty_content_rejected(self) -> None:
-        from rai_server.schemas.graph import NodeInput
+        from raise_server.schemas.graph import NodeInput
 
         with pytest.raises(ValidationError):
             NodeInput(node_id="mod-x", node_type="module", content="")
 
     def test_scope_too_long_rejected(self) -> None:
-        from rai_server.schemas.graph import NodeInput
+        from raise_server.schemas.graph import NodeInput
 
         with pytest.raises(ValidationError):
             NodeInput(node_id="x", node_type="t", content="c", scope="a" * 21)
 
     def test_empty_node_id_rejected(self) -> None:
-        from rai_server.schemas.graph import NodeInput
+        from raise_server.schemas.graph import NodeInput
 
         with pytest.raises(ValidationError):
             NodeInput(node_id="", node_type="module", content="x")
@@ -67,7 +67,7 @@ class TestEdgeInput:
     """EdgeInput validates graph edge data for sync requests."""
 
     def test_minimal_valid(self) -> None:
-        from rai_server.schemas.graph import EdgeInput
+        from raise_server.schemas.graph import EdgeInput
 
         edge = EdgeInput(
             source_node_id="mod-a", target_node_id="mod-b", edge_type="depends_on"
@@ -78,7 +78,7 @@ class TestEdgeInput:
         assert edge.properties == {}
 
     def test_custom_weight(self) -> None:
-        from rai_server.schemas.graph import EdgeInput
+        from raise_server.schemas.graph import EdgeInput
 
         edge = EdgeInput(
             source_node_id="a", target_node_id="b", edge_type="contains", weight=0.5
@@ -86,7 +86,7 @@ class TestEdgeInput:
         assert edge.weight == 0.5
 
     def test_missing_edge_type(self) -> None:
-        from rai_server.schemas.graph import EdgeInput
+        from raise_server.schemas.graph import EdgeInput
 
         with pytest.raises(ValidationError) as exc_info:
             EdgeInput(source_node_id="a", target_node_id="b")  # type: ignore[call-arg]
@@ -97,7 +97,7 @@ class TestGraphSyncRequest:
     """GraphSyncRequest validates the full sync payload."""
 
     def test_valid_request(self) -> None:
-        from rai_server.schemas.graph import EdgeInput, GraphSyncRequest, NodeInput
+        from raise_server.schemas.graph import EdgeInput, GraphSyncRequest, NodeInput
 
         req = GraphSyncRequest(
             project_id="raise-commons",
@@ -115,21 +115,21 @@ class TestGraphSyncRequest:
         assert len(req.edges) == 1
 
     def test_empty_nodes_allowed(self) -> None:
-        from rai_server.schemas.graph import GraphSyncRequest
+        from raise_server.schemas.graph import GraphSyncRequest
 
         req = GraphSyncRequest(project_id="empty-project", nodes=[], edges=[])
         assert req.nodes == []
         assert req.edges == []
 
     def test_missing_project_id(self) -> None:
-        from rai_server.schemas.graph import GraphSyncRequest
+        from raise_server.schemas.graph import GraphSyncRequest
 
         with pytest.raises(ValidationError) as exc_info:
             GraphSyncRequest(nodes=[], edges=[])  # type: ignore[call-arg]
         assert "project_id" in str(exc_info.value)
 
     def test_empty_project_id_rejected(self) -> None:
-        from rai_server.schemas.graph import GraphSyncRequest
+        from raise_server.schemas.graph import GraphSyncRequest
 
         with pytest.raises(ValidationError):
             GraphSyncRequest(project_id="", nodes=[], edges=[])
@@ -139,7 +139,7 @@ class TestGraphSyncResponse:
     """GraphSyncResponse serializes sync results."""
 
     def test_serialization(self) -> None:
-        from rai_server.schemas.graph import GraphSyncResponse
+        from raise_server.schemas.graph import GraphSyncResponse
 
         resp = GraphSyncResponse(
             project_id="raise-commons",
@@ -159,7 +159,7 @@ class TestNodeResult:
     """NodeResult serializes a single query result."""
 
     def test_serialization(self) -> None:
-        from rai_server.schemas.graph import NodeResult
+        from raise_server.schemas.graph import NodeResult
 
         result = NodeResult(
             node_id="mod-memory",
@@ -175,7 +175,7 @@ class TestNodeResult:
         assert data["rank"] == 0.075
 
     def test_null_source_file(self) -> None:
-        from rai_server.schemas.graph import NodeResult
+        from raise_server.schemas.graph import NodeResult
 
         result = NodeResult(
             node_id="x",
@@ -193,7 +193,7 @@ class TestGraphQueryResponse:
     """GraphQueryResponse serializes query results."""
 
     def test_serialization(self) -> None:
-        from rai_server.schemas.graph import GraphQueryResponse, NodeResult
+        from raise_server.schemas.graph import GraphQueryResponse, NodeResult
 
         resp = GraphQueryResponse(
             results=[
@@ -217,7 +217,7 @@ class TestGraphQueryResponse:
         assert data["query"] == "memory"
 
     def test_empty_results(self) -> None:
-        from rai_server.schemas.graph import GraphQueryResponse
+        from raise_server.schemas.graph import GraphQueryResponse
 
         resp = GraphQueryResponse(results=[], total=0, query="nonexistent", limit=10)
         assert resp.results == []
