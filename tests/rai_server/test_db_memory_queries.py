@@ -29,7 +29,7 @@ class TestInsertPattern:
 
     @pytest.mark.anyio()
     async def test_returns_uuid(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.memory_queries import insert_pattern
+        from raise_server.db.memory_queries import insert_pattern
 
         session = _mock_session()
         expected_id = uuid.uuid4()
@@ -45,7 +45,7 @@ class TestInsertPattern:
 
     @pytest.mark.anyio()
     async def test_empty_context_and_properties(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.memory_queries import insert_pattern
+        from raise_server.db.memory_queries import insert_pattern
 
         session = _mock_session()
         mock_result = MagicMock()
@@ -61,7 +61,7 @@ class TestListPatterns:
 
     @pytest.mark.anyio()
     async def test_returns_list_of_dicts(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.memory_queries import list_patterns
+        from raise_server.db.memory_queries import list_patterns
 
         session = _mock_session()
         mock_mappings = MagicMock()
@@ -84,7 +84,7 @@ class TestListPatterns:
 
     @pytest.mark.anyio()
     async def test_empty_result(self, org_id: uuid.UUID) -> None:
-        from rai_server.db.memory_queries import list_patterns
+        from raise_server.db.memory_queries import list_patterns
 
         session = _mock_session()
         mock_mappings = MagicMock()

@@ -9,9 +9,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
-from rai_server.app import create_app
-from rai_server.config import ServerConfig
-from rai_server.schemas.agent import AgentEventListResponse, AgentEventResponse
+from raise_server.app import create_app
+from raise_server.config import ServerConfig
+from raise_server.schemas.agent import AgentEventListResponse, AgentEventResponse
 
 _DB_URL = "postgresql+asyncpg://u:p@h/db"
 _ORG_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
@@ -20,7 +20,7 @@ _ORG_NAME = "acme"
 
 @contextmanager
 def _override_auth(client: TestClient) -> Generator[None, None, None]:
-    from rai_server.auth import OrgContext, verify_api_key
+    from raise_server.auth import OrgContext, verify_api_key
 
     async def _fake_auth() -> OrgContext:
         return OrgContext(org_id=_ORG_ID, org_name=_ORG_NAME)
@@ -46,7 +46,7 @@ class TestCreateEventEndpoint:
         with (
             _override_auth(client),
             patch(
-                "rai_server.api.v1.agent.record_event",
+                "raise_server.api.v1.agent.record_event",
                 new_callable=AsyncMock,
                 return_value=mock_response,
             ),
@@ -76,7 +76,7 @@ class TestListEventsEndpoint:
         with (
             _override_auth(client),
             patch(
-                "rai_server.api.v1.agent.get_events",
+                "raise_server.api.v1.agent.get_events",
                 new_callable=AsyncMock,
                 return_value=mock_response,
             ),

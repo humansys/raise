@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from rai_server.schemas.memory import MemoryPatternCreate
+from raise_server.schemas.memory import MemoryPatternCreate
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 
@@ -40,13 +40,13 @@ def org_id() -> uuid.UUID:
 class TestAddPattern:
     @pytest.mark.anyio()
     async def test_returns_pattern_id(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.memory import add_pattern
+        from raise_server.services.memory import add_pattern
 
         expected_id = uuid.uuid4()
         factory = _mock_session_factory()
 
         with patch(
-            "rai_server.services.memory.insert_pattern",
+            "raise_server.services.memory.insert_pattern",
             new_callable=AsyncMock,
             return_value=expected_id,
         ):
@@ -62,7 +62,7 @@ class TestAddPattern:
 class TestGetPatterns:
     @pytest.mark.anyio()
     async def test_returns_list(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.memory import get_patterns
+        from raise_server.services.memory import get_patterns
 
         factory = _mock_session_factory()
         mock_rows = [
@@ -76,7 +76,7 @@ class TestGetPatterns:
         ]
 
         with patch(
-            "rai_server.services.memory.list_patterns",
+            "raise_server.services.memory.list_patterns",
             new_callable=AsyncMock,
             return_value=mock_rows,
         ):
@@ -87,12 +87,12 @@ class TestGetPatterns:
 
     @pytest.mark.anyio()
     async def test_empty_list(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.memory import get_patterns
+        from raise_server.services.memory import get_patterns
 
         factory = _mock_session_factory()
 
         with patch(
-            "rai_server.services.memory.list_patterns",
+            "raise_server.services.memory.list_patterns",
             new_callable=AsyncMock,
             return_value=[],
         ):
