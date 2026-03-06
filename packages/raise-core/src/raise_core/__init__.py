@@ -9,4 +9,4 @@ Domain axes:
 - governance: Extensible artifact type schema (future)
 """
 
-__version__ = "2.1.0"
+__version__ = "2.2.1"
