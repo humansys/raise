@@ -55,7 +55,7 @@
 | [RAISE-293](https://humansys.atlassian.net/browse/RAISE-293) | **Workstream Concept (Worktrees)** | 📋 Backlog | — | P2 |
 | [RAISE-294](https://humansys.atlassian.net/browse/RAISE-294) | **Test Infrastructure Migration** | 📋 Backlog | — | P2 |
 | [RAISE-295](https://humansys.atlassian.net/browse/RAISE-295) | **Security Fixes (Snyk/SAST/Sonar)** | 📋 Backlog | — | P2 |
-| [RAISE-156](https://humansys.atlassian.net/browse/RAISE-156) | **GTM Website** | 📋 Backlog | — | P2 |
+| [RAISE-156](https://humansys.atlassian.net/browse/RAISE-156) | **Website Migration & v2.2 Update** (E356) | 🚀 In Progress | `work/epics/e356-website-migration/scope.md` | P1 (v2.2) |
 | [RAISE-208](https://humansys.atlassian.net/browse/RAISE-208) | **[PRO] Jira Adapter** | 📋 Backlog | — | P1 (Pro) |
 | [RAISE-209](https://humansys.atlassian.net/browse/RAISE-209) | **[PRO] Team/Org Memory** | 📋 Backlog | — | P1 (Pro) |
 | [RAISE-210](https://humansys.atlassian.net/browse/RAISE-210) | **[PRO] Jira-first UI** | 📋 Backlog | — | P2 (Pro) |
