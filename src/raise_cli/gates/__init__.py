@@ -1,4 +1,4 @@
-"""Workflow gates infrastructure for rai-cli.
+"""Workflow gates infrastructure for raise-cli.
 
 Provides standalone quality gates that validate workflow transitions.
 Gates are independent of the event emitter (AD-5) and can be invoked

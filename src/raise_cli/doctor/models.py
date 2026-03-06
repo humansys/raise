@@ -28,7 +28,7 @@ class CheckResult:
         category: Grouping key for output (e.g. ``"environment"``).
         status: Pass, warning, or error.
         message: Human-readable summary.
-        fix_hint: Actionable suggestion (e.g. ``"run: pip install rai-cli[mcp]"``).
+        fix_hint: Actionable suggestion (e.g. ``"run: pip install raise-cli[mcp]"``).
         details: Additional detail lines.
     """
 

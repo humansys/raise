@@ -349,7 +349,7 @@ class TestSkillSyncUpgrade:
         assert (tmp_path / ".raise" / "manifests" / "skills.json").exists()
 
     def test_new_skill_added_in_upgrade(self, tmp_path: Path) -> None:
-        """Skills added in newer rai-cli should be installed on upgrade."""
+        """Skills added in newer raise-cli should be installed on upgrade."""
         scaffold_skills(tmp_path)
 
         # Remove one skill to simulate it being new in next version

@@ -1,4 +1,4 @@
-"""Centralized exception hierarchy for rai-cli.
+"""Centralized exception hierarchy for raise-cli.
 
 This module defines all exceptions used throughout raise-cli with:
 - Consistent exit codes for scripting

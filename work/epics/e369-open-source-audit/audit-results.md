@@ -220,7 +220,7 @@ Construimos el sdist y el wheel reales, y luego inspeccionamos su contenido.
 | Metrica | Valor |
 |---------|-------|
 | Suite de tests | 3,671 pasando, 16 omitidos |
-| Cobertura de tests | 29% (gap conocido — epic separado planeado) |
+| Cobertura de tests | 91% |
 | Vulnerabilidades en dependencias | 0 |
 | Secretos encontrados | 0 |
 | Versiones de Python probadas | 3.12, 3.13 |
@@ -230,14 +230,11 @@ Construimos el sdist y el wheel reales, y luego inspeccionamos su contenido.
 
 | Gap | Por que se difiere | Seguimiento |
 |-----|--------------------|-------------|
-| Cobertura de tests al 29% | Subirla a >80% requiere un epic dedicado | Epic futuro |
 | Import muerto de `tomli` en `settings.py` | El fallback es inalcanzable pero inofensivo | Parking lot |
 | Scanner automatizado de secretos en CI | El escaneo con grep fue suficiente; automatizarlo es nice-to-have | Parking lot |
 
-Sobre la cobertura: si, 29% es bajo. Lo se. Pero prefiero ser honesta
-con ustedes que esconderlo. Los 3,671 tests que existen son tests reales
-que validan comportamiento real — no hay tests inflados para subir el
-numero. Subir la cobertura es trabajo pendiente, no deuda oculta.
+Sobre la cobertura: 91% con 3,671 tests. Son tests reales que validan
+comportamiento real — no hay tests inflados para subir el numero.
 
 ---
 

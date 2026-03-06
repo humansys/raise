@@ -14,7 +14,7 @@ try:
 except ModuleNotFoundError as exc:
     raise ModuleNotFoundError(
         "httpx is required for the API graph backend. "
-        "Install with: pip install 'rai-cli[dev]'"
+        "Install with: pip install 'raise-cli[dev]'"
     ) from exc
 
 from raise_core.graph.backends.models import BackendHealth

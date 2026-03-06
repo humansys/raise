@@ -115,7 +115,7 @@ class TestGateDiscoveryE2E:
         ep.name = name
         ep.load.return_value = cls
         ep.dist = MagicMock()
-        ep.dist.name = "rai-cli"
+        ep.dist.name = "raise-cli"
         return ep
 
     def test_discover_and_list(self) -> None:

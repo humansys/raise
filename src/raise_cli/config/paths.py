@@ -1,4 +1,4 @@
-"""Path helpers for rai-cli.
+"""Path helpers for raise-cli.
 
 Includes:
 - XDG Base Directory paths (global user config/cache/data)
@@ -326,7 +326,7 @@ def get_claude_memory_path(project_root: Path) -> Path:
 
 
 def _get_xdg_dir(env_var: str, fallback: str) -> Path:
-    """Get an XDG directory for rai-cli.
+    """Get an XDG directory for raise-cli.
 
     Args:
         env_var: XDG environment variable name (e.g., "XDG_CONFIG_HOME").
@@ -341,7 +341,7 @@ def _get_xdg_dir(env_var: str, fallback: str) -> Path:
 
 
 def get_config_dir() -> Path:
-    """Get the XDG config directory for rai-cli.
+    """Get the XDG config directory for raise-cli.
 
     Returns:
         Path to config directory (e.g., ~/.config/rai/ or $XDG_CONFIG_HOME/rai/)
@@ -354,7 +354,7 @@ def get_config_dir() -> Path:
 
 
 def get_cache_dir() -> Path:
-    """Get the XDG cache directory for rai-cli.
+    """Get the XDG cache directory for raise-cli.
 
     Returns:
         Path to cache directory (e.g., ~/.cache/rai/ or $XDG_CACHE_HOME/rai/)
@@ -367,7 +367,7 @@ def get_cache_dir() -> Path:
 
 
 def get_data_dir() -> Path:
-    """Get the XDG data directory for rai-cli.
+    """Get the XDG data directory for raise-cli.
 
     Returns:
         Path to data directory (e.g., ~/.local/share/rai/ or $XDG_DATA_HOME/rai/)

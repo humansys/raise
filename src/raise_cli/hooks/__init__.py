@@ -1,4 +1,4 @@
-"""Lifecycle hooks infrastructure for rai-cli.
+"""Lifecycle hooks infrastructure for raise-cli.
 
 Provides typed event infrastructure for cross-cutting concerns (telemetry,
 notifications, compliance) to react to CLI operations without coupling
