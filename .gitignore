@@ -1,5 +1,8 @@
+# IDE / editor directories
 .specstory/
 .cursor/
+.idea/
+.vscode/
 
 # Claude Code local settings (user-specific)
 .claude/settings.local.json
