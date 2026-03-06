@@ -638,7 +638,7 @@
   - Exit code 0 (clean) or 1 (drift found)
   - JSON output for CI integration
 - **Tests:** 16 CLI integration tests
-- **Dependencies:** Scanner, Drift modules, UnifiedGraphBuilder
+- **Dependencies:** Scanner, Drift modules, GraphBuilder
 
 ---
 
