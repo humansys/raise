@@ -39,6 +39,11 @@ def _ok(data: dict[str, Any]) -> McpToolResult:
     return McpToolResult(text=json.dumps(data), data=data)
 
 
+def _err(msg: str) -> McpToolResult:
+    """Create an error McpToolResult (isError=True)."""
+    return McpToolResult(is_error=True, error_message=msg)
+
+
 # Sample jira.yaml content for tests
 JIRA_YAML = """\
 projects:
@@ -516,3 +521,60 @@ class TestHealth:
         assert result.name == "jira"
         assert result.healthy is False
         assert "Connection failed" in result.message
+
+
+class TestIsErrorPropagation:
+    """RAISE-472: McpJiraAdapter must raise McpBridgeError when result.is_error=True.
+
+    Regression tests — ensure MCP protocol errors are never silently swallowed.
+    """
+
+    def test_get_issue_raises_on_is_error(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call = AsyncMock(return_value=_err("Jira client not available"))
+
+        with pytest.raises(McpBridgeError, match="Jira client not available"):
+            _run(adapter.get_issue("RAISE-144"))
+
+    def test_create_issue_raises_on_is_error(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call = AsyncMock(return_value=_err("Auth failed"))
+        issue = IssueSpec(summary="Test", issue_type="Bug")
+
+        with pytest.raises(McpBridgeError, match="Auth failed"):
+            _run(adapter.create_issue("RAISE", issue))
+
+    def test_update_issue_raises_on_is_error(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call = AsyncMock(return_value=_err("Issue not found"))
+
+        with pytest.raises(McpBridgeError, match="Issue not found"):
+            _run(adapter.update_issue("RAISE-1", {"summary": "New"}))
+
+    def test_transition_issue_raises_on_is_error(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call = AsyncMock(return_value=_err("Transition failed"))
+
+        with pytest.raises(McpBridgeError, match="Transition failed"):
+            _run(adapter.transition_issue("RAISE-1", "done"))
+
+    def test_add_comment_raises_on_is_error(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call = AsyncMock(return_value=_err("Permission denied"))
+
+        with pytest.raises(McpBridgeError, match="Permission denied"):
+            _run(adapter.add_comment("RAISE-1", "Hello"))
+
+    def test_get_comments_raises_on_is_error(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call = AsyncMock(return_value=_err("Issue not found"))
+
+        with pytest.raises(McpBridgeError, match="Issue not found"):
+            _run(adapter.get_comments("RAISE-1"))
+
+    def test_search_raises_on_is_error(self, tmp_path: Path) -> None:
+        adapter = _make_adapter(tmp_path)
+        adapter._bridge.call = AsyncMock(return_value=_err("Invalid JQL"))
+
+        with pytest.raises(McpBridgeError, match="Invalid JQL"):
+            _run(adapter.search('project = "RAISE"'))
