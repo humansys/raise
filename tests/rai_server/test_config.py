@@ -1,10 +1,10 @@
-"""Tests for rai_server.config — ServerConfig via pydantic-settings."""
+"""Tests for raise_server.config — ServerConfig via pydantic-settings."""
 
 from __future__ import annotations
 
 import pytest
 from pydantic import ValidationError
-from rai_server.config import ServerConfig
+from raise_server.config import ServerConfig
 
 _DB_URL = "postgresql+asyncpg://u:p@h/db"
 

@@ -9,8 +9,8 @@ import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from rai_server.db.agent_queries import insert_event, list_events
-from rai_server.schemas.agent import (
+from raise_server.db.agent_queries import insert_event, list_events
+from raise_server.schemas.agent import (
     AgentEventCreate,
     AgentEventItem,
     AgentEventListResponse,

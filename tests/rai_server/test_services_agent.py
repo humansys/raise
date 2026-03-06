@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from rai_server.schemas.agent import AgentEventCreate
+from raise_server.schemas.agent import AgentEventCreate
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 
@@ -40,13 +40,13 @@ def org_id() -> uuid.UUID:
 class TestRecordEvent:
     @pytest.mark.anyio()
     async def test_returns_event_id(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.agent import record_event
+        from raise_server.services.agent import record_event
 
         expected_id = uuid.uuid4()
         factory = _mock_session_factory()
 
         with patch(
-            "rai_server.services.agent.insert_event",
+            "raise_server.services.agent.insert_event",
             new_callable=AsyncMock,
             return_value=expected_id,
         ):
@@ -62,7 +62,7 @@ class TestRecordEvent:
 class TestGetEvents:
     @pytest.mark.anyio()
     async def test_returns_list(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.agent import get_events
+        from raise_server.services.agent import get_events
 
         factory = _mock_session_factory()
         mock_rows = [
@@ -75,7 +75,7 @@ class TestGetEvents:
         ]
 
         with patch(
-            "rai_server.services.agent.list_events",
+            "raise_server.services.agent.list_events",
             new_callable=AsyncMock,
             return_value=mock_rows,
         ):
@@ -86,12 +86,12 @@ class TestGetEvents:
 
     @pytest.mark.anyio()
     async def test_empty_list(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.agent import get_events
+        from raise_server.services.agent import get_events
 
         factory = _mock_session_factory()
 
         with patch(
-            "rai_server.services.agent.list_events",
+            "raise_server.services.agent.list_events",
             new_callable=AsyncMock,
             return_value=[],
         ):

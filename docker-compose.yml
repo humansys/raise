@@ -17,7 +17,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: packages/rai-server/Dockerfile
+      dockerfile: packages/raise-server/Dockerfile
     ports:
       - "8000:8000"
     depends_on:

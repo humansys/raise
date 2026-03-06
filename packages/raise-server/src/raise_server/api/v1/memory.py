@@ -9,14 +9,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query, Request
 
-from rai_server.auth import OrgContext, verify_api_key
-from rai_server.deps import get_session_factory
-from rai_server.schemas.memory import (
+from raise_server.auth import OrgContext, verify_api_key
+from raise_server.deps import get_session_factory
+from raise_server.schemas.memory import (
     MemoryPatternCreate,
     MemoryPatternListResponse,
     MemoryPatternResponse,
 )
-from rai_server.services.memory import add_pattern, get_patterns
+from raise_server.services.memory import add_pattern, get_patterns
 
 router = APIRouter(prefix="/api/v1/memory", tags=["memory"])
 

@@ -12,7 +12,7 @@ from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from rai_server.schemas.graph import EdgeInput, GraphSyncRequest, NodeInput
+from raise_server.schemas.graph import EdgeInput, GraphSyncRequest, NodeInput
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 
@@ -65,22 +65,22 @@ class TestSyncGraph:
     async def test_calls_all_db_operations(
         self, org_id: uuid.UUID, sync_request: GraphSyncRequest
     ) -> None:
-        from rai_server.services.graph import sync_graph
+        from raise_server.services.graph import sync_graph
 
         factory = _mock_session_factory()
 
         with (
             patch(
-                "rai_server.services.graph.upsert_nodes", new_callable=AsyncMock
+                "raise_server.services.graph.upsert_nodes", new_callable=AsyncMock
             ) as mock_upsert,
             patch(
-                "rai_server.services.graph.replace_edges", new_callable=AsyncMock
+                "raise_server.services.graph.replace_edges", new_callable=AsyncMock
             ) as mock_replace,
             patch(
-                "rai_server.services.graph.prune_orphan_nodes", new_callable=AsyncMock
+                "raise_server.services.graph.prune_orphan_nodes", new_callable=AsyncMock
             ) as mock_prune,
             patch(
-                "rai_server.services.graph.resolve_node_ids", new_callable=AsyncMock
+                "raise_server.services.graph.resolve_node_ids", new_callable=AsyncMock
             ) as mock_resolve,
         ):
             mock_upsert.return_value = {"created": 2, "updated": 0}
@@ -104,20 +104,20 @@ class TestSyncGraph:
 
     @pytest.mark.anyio()
     async def test_empty_graph_sync(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.graph import sync_graph
+        from raise_server.services.graph import sync_graph
 
         factory = _mock_session_factory()
         empty_request = GraphSyncRequest(project_id="empty", nodes=[], edges=[])
 
         with (
             patch(
-                "rai_server.services.graph.upsert_nodes", new_callable=AsyncMock
+                "raise_server.services.graph.upsert_nodes", new_callable=AsyncMock
             ) as mock_upsert,
             patch(
-                "rai_server.services.graph.replace_edges", new_callable=AsyncMock
+                "raise_server.services.graph.replace_edges", new_callable=AsyncMock
             ) as mock_replace,
             patch(
-                "rai_server.services.graph.prune_orphan_nodes", new_callable=AsyncMock
+                "raise_server.services.graph.prune_orphan_nodes", new_callable=AsyncMock
             ) as mock_prune,
         ):
             mock_upsert.return_value = {"created": 0, "updated": 0}
@@ -132,7 +132,7 @@ class TestSyncGraph:
     @pytest.mark.anyio()
     async def test_edges_skipped_when_node_missing(self, org_id: uuid.UUID) -> None:
         """Edges referencing nodes not in the payload are skipped, not silently lost."""
-        from rai_server.services.graph import sync_graph
+        from raise_server.services.graph import sync_graph
 
         factory = _mock_session_factory()
         request = GraphSyncRequest(
@@ -149,16 +149,16 @@ class TestSyncGraph:
 
         with (
             patch(
-                "rai_server.services.graph.upsert_nodes", new_callable=AsyncMock
+                "raise_server.services.graph.upsert_nodes", new_callable=AsyncMock
             ) as mock_upsert,
             patch(
-                "rai_server.services.graph.replace_edges", new_callable=AsyncMock
+                "raise_server.services.graph.replace_edges", new_callable=AsyncMock
             ) as mock_replace,
             patch(
-                "rai_server.services.graph.prune_orphan_nodes", new_callable=AsyncMock
+                "raise_server.services.graph.prune_orphan_nodes", new_callable=AsyncMock
             ) as mock_prune,
             patch(
-                "rai_server.services.graph.resolve_node_ids", new_callable=AsyncMock
+                "raise_server.services.graph.resolve_node_ids", new_callable=AsyncMock
             ) as mock_resolve,
         ):
             mock_upsert.return_value = {"created": 1, "updated": 0}
@@ -177,12 +177,12 @@ class TestQueryGraph:
 
     @pytest.mark.anyio()
     async def test_returns_query_response(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.graph import query_graph
+        from raise_server.services.graph import query_graph
 
         factory = _mock_session_factory()
 
         with patch(
-            "rai_server.services.graph.search_nodes", new_callable=AsyncMock
+            "raise_server.services.graph.search_nodes", new_callable=AsyncMock
         ) as mock_search:
             mock_search.return_value = [
                 {
@@ -205,12 +205,12 @@ class TestQueryGraph:
 
     @pytest.mark.anyio()
     async def test_empty_results(self, org_id: uuid.UUID) -> None:
-        from rai_server.services.graph import query_graph
+        from raise_server.services.graph import query_graph
 
         factory = _mock_session_factory()
 
         with patch(
-            "rai_server.services.graph.search_nodes", new_callable=AsyncMock
+            "raise_server.services.graph.search_nodes", new_callable=AsyncMock
         ) as mock_search:
             mock_search.return_value = []
 

@@ -13,7 +13,7 @@ class TestMemoryPatternCreate:
     """MemoryPatternCreate validates incoming patterns."""
 
     def test_minimal_valid(self) -> None:
-        from rai_server.schemas.memory import MemoryPatternCreate
+        from raise_server.schemas.memory import MemoryPatternCreate
 
         pattern = MemoryPatternCreate(content="Always validate inputs")
         assert pattern.content == "Always validate inputs"
@@ -21,7 +21,7 @@ class TestMemoryPatternCreate:
         assert pattern.properties == {}
 
     def test_with_context_and_properties(self) -> None:
-        from rai_server.schemas.memory import MemoryPatternCreate
+        from raise_server.schemas.memory import MemoryPatternCreate
 
         pattern = MemoryPatternCreate(
             content="Use TDD for all features",
@@ -32,13 +32,13 @@ class TestMemoryPatternCreate:
         assert pattern.properties["confidence"] == 0.9
 
     def test_empty_content_rejected(self) -> None:
-        from rai_server.schemas.memory import MemoryPatternCreate
+        from raise_server.schemas.memory import MemoryPatternCreate
 
         with pytest.raises(ValidationError):
             MemoryPatternCreate(content="")
 
     def test_content_max_length(self) -> None:
-        from rai_server.schemas.memory import MemoryPatternCreate
+        from raise_server.schemas.memory import MemoryPatternCreate
 
         with pytest.raises(ValidationError):
             MemoryPatternCreate(content="x" * 10001)
@@ -48,7 +48,7 @@ class TestMemoryPatternResponse:
     """MemoryPatternResponse returns id and status."""
 
     def test_defaults(self) -> None:
-        from rai_server.schemas.memory import MemoryPatternResponse
+        from raise_server.schemas.memory import MemoryPatternResponse
 
         resp = MemoryPatternResponse(id=uuid.uuid4())
         assert resp.status == "ok"
@@ -58,7 +58,7 @@ class TestMemoryPatternItem:
     """MemoryPatternItem represents a single pattern in list response."""
 
     def test_all_fields(self) -> None:
-        from rai_server.schemas.memory import MemoryPatternItem
+        from raise_server.schemas.memory import MemoryPatternItem
 
         item = MemoryPatternItem(
             id=uuid.uuid4(),
@@ -74,7 +74,7 @@ class TestMemoryPatternListResponse:
     """MemoryPatternListResponse wraps pattern list with count."""
 
     def test_empty_list(self) -> None:
-        from rai_server.schemas.memory import MemoryPatternListResponse
+        from raise_server.schemas.memory import MemoryPatternListResponse
 
         resp = MemoryPatternListResponse(patterns=[], count=0)
         assert resp.patterns == []
