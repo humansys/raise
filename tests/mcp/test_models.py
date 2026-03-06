@@ -1,6 +1,6 @@
 """Tests for MCP infrastructure models (T2).
 
-Verifies McpHealthResult, McpToolResult, McpToolInfo live in rai_cli.mcp.models.
+Verifies McpHealthResult, McpToolResult, McpToolInfo live in raise_cli.mcp.models.
 """
 
 from __future__ import annotations
@@ -8,7 +8,7 @@ from __future__ import annotations
 
 def test_health_result_fields() -> None:
     """McpHealthResult has all required fields."""
-    from rai_cli.mcp.models import McpHealthResult
+    from raise_cli.mcp.models import McpHealthResult
 
     result = McpHealthResult(
         server_name="test-server",
@@ -26,7 +26,7 @@ def test_health_result_fields() -> None:
 
 def test_health_result_defaults() -> None:
     """McpHealthResult has sensible defaults."""
-    from rai_cli.mcp.models import McpHealthResult
+    from raise_cli.mcp.models import McpHealthResult
 
     result = McpHealthResult(server_name="x", healthy=False)
     assert result.message == ""
@@ -35,8 +35,8 @@ def test_health_result_defaults() -> None:
 
 
 def test_tool_result_in_models() -> None:
-    """McpToolResult importable from rai_cli.mcp.models."""
-    from rai_cli.mcp.models import McpToolResult
+    """McpToolResult importable from raise_cli.mcp.models."""
+    from raise_cli.mcp.models import McpToolResult
 
     result = McpToolResult(text="hello", data={"k": "v"})
     assert result.text == "hello"
@@ -44,20 +44,20 @@ def test_tool_result_in_models() -> None:
 
 
 def test_tool_info_in_models() -> None:
-    """McpToolInfo importable from rai_cli.mcp.models."""
-    from rai_cli.mcp.models import McpToolInfo
+    """McpToolInfo importable from raise_cli.mcp.models."""
+    from raise_cli.mcp.models import McpToolInfo
 
     info = McpToolInfo(name="my_tool", description="desc")
     assert info.name == "my_tool"
 
 
 def test_bridge_no_adapter_models_import() -> None:
-    """Bridge module must NOT import from rai_cli.adapters.models."""
+    """Bridge module must NOT import from raise_cli.adapters.models."""
     import inspect
 
-    from rai_cli.mcp import bridge
+    from raise_cli.mcp import bridge
 
     source = inspect.getsource(bridge)
-    assert "rai_cli.adapters.models" not in source, (
+    assert "raise_cli.adapters.models" not in source, (
         "Bridge still imports from adapters.models — must use own models"
     )

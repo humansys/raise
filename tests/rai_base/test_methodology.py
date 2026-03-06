@@ -20,13 +20,13 @@ class TestMethodologyPackage:
 
     def test_framework_directory_accessible(self) -> None:
         """Framework directory is accessible via importlib.resources."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         framework = base / "framework"
         assert framework.is_dir()
 
     def test_methodology_yaml_exists(self) -> None:
         """methodology.yaml file exists and is readable."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         methodology_file = base / "framework" / "methodology.yaml"
         content = methodology_file.read_text(encoding="utf-8")
         assert len(content) > 0
@@ -38,7 +38,7 @@ class TestMethodologyValidity:
     @pytest.fixture
     def methodology(self) -> dict:
         """Load and parse methodology.yaml."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         return yaml.safe_load(content)
 
@@ -64,7 +64,7 @@ class TestMethodologySkills:
     @pytest.fixture
     def skills(self) -> dict:
         """Load skills section."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["skills"]
@@ -120,7 +120,7 @@ class TestMethodologyGates:
     @pytest.fixture
     def gates(self) -> dict:
         """Load gates section."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["gates"]
@@ -159,7 +159,7 @@ class TestMethodologyPrinciples:
     @pytest.fixture
     def principles(self) -> dict:
         """Load principles section."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["principles"]
@@ -193,7 +193,7 @@ class TestMethodologyLifecycle:
     @pytest.fixture
     def lifecycle(self) -> dict:
         """Load lifecycle section."""
-        base = files("rai_cli.rai_base")
+        base = files("raise_cli.rai_base")
         content = (base / "framework" / "methodology.yaml").read_text(encoding="utf-8")
         methodology = yaml.safe_load(content)
         return methodology["lifecycle"]

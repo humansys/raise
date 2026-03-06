@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from pydantic import ValidationError
 
-from rai_cli.config.settings import RaiSettings
+from raise_cli.config.settings import RaiSettings
 
 
 class TestRaiSettingsDefaults:

@@ -9,14 +9,14 @@ from unittest.mock import patch
 
 import pytest
 
-from rai_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
-from rai_cli.adapters.declarative.schema import (
+from raise_cli.adapters.declarative.adapter import DeclarativeMcpAdapter
+from raise_cli.adapters.declarative.schema import (
     AdapterMeta,
     DeclarativeAdapterConfig,
     ServerRef,
 )
-from rai_cli.mcp.bridge import McpBridgeError
-from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+from raise_cli.mcp.bridge import McpBridgeError
+from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
 
 def _make_config(
@@ -45,7 +45,7 @@ class TestRefResolution:
     def test_ref_resolves_to_registry_server(self) -> None:
         config = _make_config(ref="context7")
         with patch(
-            "rai_cli.adapters.declarative.adapter.discover_mcp_servers",
+            "raise_cli.adapters.declarative.adapter.discover_mcp_servers",
             return_value={"context7": _REGISTRY_SERVER},
         ):
             adapter = DeclarativeMcpAdapter(config)
@@ -56,7 +56,7 @@ class TestRefResolution:
     def test_ref_resolves_env_from_registry(self) -> None:
         config = _make_config(ref="context7")
         with patch(
-            "rai_cli.adapters.declarative.adapter.discover_mcp_servers",
+            "raise_cli.adapters.declarative.adapter.discover_mcp_servers",
             return_value={"context7": _REGISTRY_SERVER},
         ):
             adapter = DeclarativeMcpAdapter(config)
@@ -72,7 +72,7 @@ class TestRefNotFound:
         config = _make_config(ref="nonexistent")
         with (
             patch(
-                "rai_cli.adapters.declarative.adapter.discover_mcp_servers",
+                "raise_cli.adapters.declarative.adapter.discover_mcp_servers",
                 return_value={},
             ),
             pytest.raises(McpBridgeError, match="nonexistent"),

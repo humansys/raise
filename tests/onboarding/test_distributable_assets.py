@@ -15,8 +15,8 @@ import pytest
 import yaml
 
 # Paths to distributable assets (relative to repo root)
-RAI_BASE = Path(__file__).parent.parent.parent / "src" / "rai_cli" / "rai_base"
-SKILLS_BASE = Path(__file__).parent.parent.parent / "src" / "rai_cli" / "skills_base"
+RAI_BASE = Path(__file__).parent.parent.parent / "src" / "raise_cli" / "rai_base"
+SKILLS_BASE = Path(__file__).parent.parent.parent / "src" / "raise_cli" / "skills_base"
 
 
 class TestMethodologyYaml:
@@ -105,7 +105,7 @@ class TestMigrationFunction:
 
     def test_no_emilio_function_name(self) -> None:
         """Migration module must not export 'migrate_emilio_profile'."""
-        from rai_cli.onboarding import __all__
+        from raise_cli.onboarding import __all__
 
         assert "migrate_emilio_profile" not in __all__, (
             "onboarding.__all__ still exports 'migrate_emilio_profile'"
@@ -116,7 +116,7 @@ class TestMigrationFunction:
 
     def test_migrate_developer_profile_importable(self) -> None:
         """migrate_developer_profile must be importable from onboarding."""
-        from rai_cli.onboarding import migrate_developer_profile
+        from raise_cli.onboarding import migrate_developer_profile
 
         assert callable(migrate_developer_profile)
 
@@ -124,7 +124,7 @@ class TestMigrationFunction:
         """Default name parameter must be generic, not 'Emilio'."""
         import inspect
 
-        from rai_cli.onboarding.migration import migrate_developer_profile
+        from raise_cli.onboarding.migration import migrate_developer_profile
 
         sig = inspect.signature(migrate_developer_profile)
         default_name = sig.parameters["name"].default

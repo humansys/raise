@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.config.agent_plugin import DefaultAgentPlugin
-from rai_cli.config.agents import BUILTIN_AGENTS, AgentConfig
+from raise_cli.config.agent_plugin import DefaultAgentPlugin
+from raise_cli.config.agents import BUILTIN_AGENTS, AgentConfig
 
 
 def _claude_config() -> AgentConfig:
@@ -77,7 +77,7 @@ class TestAgentPluginProtocol:
         assert files == []
 
     def test_default_plugin_satisfies_protocol(self) -> None:
-        from rai_cli.config.agent_plugin import AgentPlugin
+        from raise_cli.config.agent_plugin import AgentPlugin
 
         plugin: AgentPlugin = DefaultAgentPlugin()
         # Type checker confirms; runtime just calls the methods

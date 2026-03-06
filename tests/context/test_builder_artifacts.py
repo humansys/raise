@@ -5,15 +5,15 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from pathlib import Path
 
-from rai_cli.artifacts.models import ArtifactRefs
-from rai_cli.artifacts.story_design import (
+from raise_cli.artifacts.models import ArtifactRefs
+from raise_cli.artifacts.story_design import (
     AcceptanceCriterion,
     Complexity,
     StoryDesignArtifact,
     StoryDesignContent,
 )
-from rai_cli.artifacts.writer import write_artifact
-from rai_cli.context.builder import GraphBuilder
+from raise_cli.artifacts.writer import write_artifact
+from raise_cli.context.builder import GraphBuilder
 
 
 def _write_sample_artifact(project_root: Path) -> None:

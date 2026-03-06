@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.config.paths import (
+from raise_cli.config.paths import (
     ensure_global_rai_dir,
     get_cache_dir,
     get_config_dir,
@@ -343,7 +343,7 @@ class TestGetClaudeMemoryPath:
 
     def test_transforms_path_correctly(self) -> None:
         """Should replace / with - and prepend - for Claude Code convention."""
-        from rai_cli.config.paths import get_claude_memory_path
+        from raise_cli.config.paths import get_claude_memory_path
 
         project_root = Path("/home/user/Code/my-project")
         result = get_claude_memory_path(project_root)
@@ -360,7 +360,7 @@ class TestGetClaudeMemoryPath:
 
     def test_handles_root_path(self) -> None:
         """Should handle simple root-level paths."""
-        from rai_cli.config.paths import get_claude_memory_path
+        from raise_cli.config.paths import get_claude_memory_path
 
         project_root = Path("/myproject")
         result = get_claude_memory_path(project_root)
@@ -372,14 +372,14 @@ class TestGetClaudeMemoryPath:
 
     def test_returns_path_object(self) -> None:
         """Should return a Path object."""
-        from rai_cli.config.paths import get_claude_memory_path
+        from raise_cli.config.paths import get_claude_memory_path
 
         result = get_claude_memory_path(Path("/some/project"))
         assert isinstance(result, Path)
 
     def test_ends_with_memory_md(self) -> None:
         """Should always end with memory/MEMORY.md."""
-        from rai_cli.config.paths import get_claude_memory_path
+        from raise_cli.config.paths import get_claude_memory_path
 
         result = get_claude_memory_path(Path("/any/path"))
         assert result.name == "MEMORY.md"
@@ -387,7 +387,7 @@ class TestGetClaudeMemoryPath:
 
     def test_handles_windows_backslashes(self) -> None:
         """Should normalize Windows backslashes to dashes."""
-        from rai_cli.config.paths import get_claude_memory_path
+        from raise_cli.config.paths import get_claude_memory_path
 
         # Simulate a Windows-style path string
         project_root = Path("/C:/Users/emilio/Code/my-project")
@@ -400,7 +400,7 @@ class TestGetClaudeMemoryPath:
 
     def test_handles_windows_drive_letter(self) -> None:
         """Should strip drive letter colon for Windows paths."""
-        from rai_cli.config.paths import get_claude_memory_path
+        from raise_cli.config.paths import get_claude_memory_path
 
         # On Linux, we can't create a real Windows Path, but we can
         # test the string manipulation by passing a path-like string.

@@ -6,8 +6,8 @@ from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.adapters.models import Comment, IssueDetail
-from rai_cli.cli.main import app
+from raise_cli.adapters.models import Comment, IssueDetail
+from raise_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -47,7 +47,7 @@ def _make_comment(**overrides: object) -> Comment:
 class TestBacklogGet:
     """Tests for `rai backlog get KEY`."""
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_displays_key_status_type(self, mock_resolve: MagicMock) -> None:
         """Get shows key, status, and issue type on first line."""
         adapter = MagicMock()
@@ -61,7 +61,7 @@ class TestBacklogGet:
         assert "In Progress" in result.output
         assert "Task" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_displays_summary(self, mock_resolve: MagicMock) -> None:
         """Get shows issue summary."""
         adapter = MagicMock()
@@ -72,7 +72,7 @@ class TestBacklogGet:
 
         assert "Test issue summary" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_displays_assignee(self, mock_resolve: MagicMock) -> None:
         """Get shows assignee when present."""
         adapter = MagicMock()
@@ -83,7 +83,7 @@ class TestBacklogGet:
 
         assert "alice@example.com" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_omits_empty_fields(self, mock_resolve: MagicMock) -> None:
         """Get omits assignee/labels/parent/priority when empty."""
         adapter = MagicMock()
@@ -102,7 +102,7 @@ class TestBacklogGet:
         assert "Parent" not in result.output
         assert "Priority" not in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_displays_description(self, mock_resolve: MagicMock) -> None:
         """Get shows description text."""
         adapter = MagicMock()
@@ -113,7 +113,7 @@ class TestBacklogGet:
 
         assert "A detailed desc." in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_error_exits_nonzero(self, mock_resolve: MagicMock) -> None:
         """Get with non-existent key shows error and exits non-zero."""
         adapter = MagicMock()
@@ -129,7 +129,7 @@ class TestBacklogGet:
 class TestBacklogGetComments:
     """Tests for `rai backlog get-comments KEY`."""
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_comments_displays_author_and_body(
         self, mock_resolve: MagicMock
     ) -> None:
@@ -146,7 +146,7 @@ class TestBacklogGetComments:
         assert "alice@example.com" in result.output
         assert "First comment" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_comments_shows_timestamp(self, mock_resolve: MagicMock) -> None:
         """get-comments includes timestamp."""
         adapter = MagicMock()
@@ -159,7 +159,7 @@ class TestBacklogGetComments:
 
         assert "2026-03-01" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_comments_no_comments(self, mock_resolve: MagicMock) -> None:
         """get-comments with no comments shows message."""
         adapter = MagicMock()
@@ -171,7 +171,7 @@ class TestBacklogGetComments:
         assert result.exit_code == 0
         assert "No comments" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
     def test_get_comments_limit_flag(self, mock_resolve: MagicMock) -> None:
         """get-comments passes --limit to adapter."""
         adapter = MagicMock()

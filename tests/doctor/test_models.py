@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 
 class TestCheckStatus:

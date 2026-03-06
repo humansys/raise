@@ -7,8 +7,8 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from rai_cli.artifacts.models import ArtifactType
-from rai_cli.artifacts.story_design import (
+from raise_cli.artifacts.models import ArtifactType
+from raise_cli.artifacts.story_design import (
     AcceptanceCriterion,
     Complexity,
     Decision,
@@ -42,11 +42,11 @@ class TestAcceptanceCriterion:
 class TestIntegrationPoint:
     def test_creation(self) -> None:
         ip = IntegrationPoint(
-            module="rai_cli.artifacts",
+            module="raise_cli.artifacts",
             change_type="new",
-            files=["src/rai_cli/artifacts/story_design.py"],
+            files=["src/raise_cli/artifacts/story_design.py"],
         )
-        assert ip.module == "rai_cli.artifacts"
+        assert ip.module == "raise_cli.artifacts"
         assert ip.change_type == "new"
 
 

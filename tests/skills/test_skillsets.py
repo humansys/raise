@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from rai_cli.skills.skillsets import (
+from raise_cli.skills.skillsets import (
     create_skill_set,
     diff_skill_set,
     list_skill_sets,
@@ -16,7 +16,7 @@ class TestCreateSkillSet:
 
     def test_create_from_builtins(self, tmp_path: Path) -> None:
         """Should copy all builtins to .raise/skills/<name>/."""
-        from rai_cli.skills_base import DISTRIBUTABLE_SKILLS
+        from raise_cli.skills_base import DISTRIBUTABLE_SKILLS
 
         result = create_skill_set("my-team", tmp_path)
 

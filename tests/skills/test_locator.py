@@ -7,8 +7,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.config.agents import get_agent_config
-from rai_cli.skills.locator import (
+from raise_cli.config.agents import get_agent_config
+from raise_cli.skills.locator import (
     SkillLocator,
     get_default_skill_dir,
     list_skills,

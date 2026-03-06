@@ -1,8 +1,8 @@
 """Tests for doctor check registry."""
 
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
-from rai_cli.doctor.protocol import DoctorCheck
-from rai_cli.doctor.registry import CheckRegistry
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.protocol import DoctorCheck
+from raise_cli.doctor.registry import CheckRegistry
 
 
 class FakeCheck:

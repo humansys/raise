@@ -1,11 +1,11 @@
-"""Tests for rai_cli.compat — cross-platform compatibility layer."""
+"""Tests for raise_cli.compat — cross-platform compatibility layer."""
 
 from __future__ import annotations
 
 from pathlib import Path
 from unittest.mock import patch
 
-from rai_cli.compat import (
+from raise_cli.compat import (
     file_lock,
     file_unlock,
     portable_path,
@@ -62,7 +62,7 @@ class TestSecurePermissions:
         f = tmp_path / "secret.dat"
         f.write_bytes(b"secret")
         f.chmod(0o644)
-        with patch("rai_cli.compat.IS_WINDOWS", False):
+        with patch("raise_cli.compat.IS_WINDOWS", False):
             secure_permissions(f)
         assert f.stat().st_mode & 0o777 == 0o600
 
@@ -70,7 +70,7 @@ class TestSecurePermissions:
         f = tmp_path / "secret.dat"
         f.write_bytes(b"secret")
         original_mode = f.stat().st_mode
-        with patch("rai_cli.compat.IS_WINDOWS", True):
+        with patch("raise_cli.compat.IS_WINDOWS", True):
             secure_permissions(f)
         # Should not raise, mode unchanged conceptually
         assert f.stat().st_mode == original_mode

@@ -8,13 +8,13 @@ from unittest.mock import patch
 import pytest
 from typer.testing import CliRunner
 
-from rai_cli.adapters.models import (
+from raise_cli.adapters.models import (
     AdapterHealth,
     PageContent,
     PageSummary,
     PublishResult,
 )
-from rai_cli.cli.main import app
+from raise_cli.cli.main import app
 
 runner = CliRunner()
 
@@ -82,7 +82,7 @@ class _FailPublishTarget(_MockDocsTarget):
 def _patch_target(target_instance: Any):  # noqa: ANN401
     """Patch resolve_docs_target to return a specific target instance."""
     return patch(
-        "rai_cli.cli.commands.docs.resolve_docs_target",
+        "raise_cli.cli.commands.docs.resolve_docs_target",
         return_value=target_instance,
     )
 

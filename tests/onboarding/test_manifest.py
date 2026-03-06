@@ -7,8 +7,8 @@ from pathlib import Path
 
 import yaml
 
-from rai_cli.onboarding.detection import ProjectType
-from rai_cli.onboarding.manifest import (
+from raise_cli.onboarding.detection import ProjectType
+from raise_cli.onboarding.manifest import (
     AgentsManifest,
     BacklogConfig,
     BranchConfig,

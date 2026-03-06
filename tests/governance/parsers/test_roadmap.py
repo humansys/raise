@@ -5,8 +5,8 @@ from textwrap import dedent
 
 import pytest
 
-from rai_cli.governance.models import ConceptType
-from rai_cli.governance.parsers.roadmap import extract_releases
+from raise_cli.governance.models import ConceptType
+from raise_cli.governance.parsers.roadmap import extract_releases
 
 ROADMAP_CONTENT = dedent(
     """\

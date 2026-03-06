@@ -9,13 +9,13 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from rai_cli.schemas.session_state import (
+from raise_cli.schemas.session_state import (
     CurrentWork,
     LastSession,
     PendingItems,
     SessionState,
 )
-from rai_cli.session.state import (
+from raise_cli.session.state import (
     get_session_state_path,
     load_session_state,
     save_session_state,
@@ -319,7 +319,7 @@ class TestMigrateFlatToSession:
 
     def test_migrates_state_and_signals(self, tmp_path: Path) -> None:
         """Moves flat state and signals files into per-session directory."""
-        from rai_cli.session.state import migrate_flat_to_session
+        from raise_cli.session.state import migrate_flat_to_session
 
         personal_dir = tmp_path / ".raise" / "rai" / "personal"
         personal_dir.mkdir(parents=True)
@@ -349,7 +349,7 @@ class TestMigrateFlatToSession:
 
     def test_migrates_state_only(self, tmp_path: Path) -> None:
         """Migrates state file when no signals file exists."""
-        from rai_cli.session.state import migrate_flat_to_session
+        from raise_cli.session.state import migrate_flat_to_session
 
         personal_dir = tmp_path / ".raise" / "rai" / "personal"
         personal_dir.mkdir(parents=True)
@@ -365,14 +365,14 @@ class TestMigrateFlatToSession:
 
     def test_no_migration_when_no_flat_files(self, tmp_path: Path) -> None:
         """Returns False when no flat files exist."""
-        from rai_cli.session.state import migrate_flat_to_session
+        from raise_cli.session.state import migrate_flat_to_session
 
         result = migrate_flat_to_session(tmp_path, "SES-100")
         assert result is False
 
     def test_no_migration_when_session_dir_exists(self, tmp_path: Path) -> None:
         """Skips migration if per-session dir already exists."""
-        from rai_cli.session.state import migrate_flat_to_session
+        from raise_cli.session.state import migrate_flat_to_session
 
         personal_dir = tmp_path / ".raise" / "rai" / "personal"
         personal_dir.mkdir(parents=True)
@@ -389,7 +389,7 @@ class TestMigrateFlatToSession:
 
     def test_handles_empty_flat_files_gracefully(self, tmp_path: Path) -> None:
         """Handles empty flat files without error."""
-        from rai_cli.session.state import migrate_flat_to_session
+        from raise_cli.session.state import migrate_flat_to_session
 
         personal_dir = tmp_path / ".raise" / "rai" / "personal"
         personal_dir.mkdir(parents=True)
@@ -408,7 +408,7 @@ class TestCleanupSessionDir:
 
     def test_removes_session_directory(self, tmp_path: Path) -> None:
         """Removes the per-session directory and all contents."""
-        from rai_cli.session.state import cleanup_session_dir
+        from raise_cli.session.state import cleanup_session_dir
 
         session_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions" / "SES-100"
         session_dir.mkdir(parents=True)
@@ -421,14 +421,14 @@ class TestCleanupSessionDir:
 
     def test_noop_when_dir_missing(self, tmp_path: Path) -> None:
         """No error when session directory doesn't exist."""
-        from rai_cli.session.state import cleanup_session_dir
+        from raise_cli.session.state import cleanup_session_dir
 
         # Should not raise
         cleanup_session_dir(tmp_path, "SES-NONEXISTENT")
 
     def test_does_not_remove_sibling_sessions(self, tmp_path: Path) -> None:
         """Cleanup of one session does not affect other sessions."""
-        from rai_cli.session.state import cleanup_session_dir
+        from raise_cli.session.state import cleanup_session_dir
 
         sessions_dir = tmp_path / ".raise" / "rai" / "personal" / "sessions"
         (sessions_dir / "SES-100").mkdir(parents=True)

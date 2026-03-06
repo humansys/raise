@@ -15,7 +15,7 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "rai-cli",
+    "raise-cli",
     "raise-core",
     "raise-server",
 ]
@@ -1237,7 +1237,7 @@ wheels = [
 ]
 
 [[package]]
-name = "rai-cli"
+name = "raise-cli"
 version = "2.2.0"
 source = { editable = "." }
 dependencies = [

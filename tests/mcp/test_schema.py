@@ -10,7 +10,7 @@ import pytest
 
 class TestServerConnection:
     def test_valid_connection(self) -> None:
-        from rai_cli.mcp.schema import ServerConnection
+        from raise_cli.mcp.schema import ServerConnection
 
         conn = ServerConnection(command="npx", args=["-y", "mcp-server"], env=["TOKEN"])
         assert conn.command == "npx"
@@ -18,7 +18,7 @@ class TestServerConnection:
         assert conn.env == ["TOKEN"]
 
     def test_defaults(self) -> None:
-        from rai_cli.mcp.schema import ServerConnection
+        from raise_cli.mcp.schema import ServerConnection
 
         conn = ServerConnection(command="uvx")
         assert conn.args == []
@@ -27,7 +27,7 @@ class TestServerConnection:
     def test_missing_command_fails(self) -> None:
         from pydantic import ValidationError
 
-        from rai_cli.mcp.schema import ServerConnection
+        from raise_cli.mcp.schema import ServerConnection
 
         with pytest.raises(ValidationError):
             ServerConnection()  # type: ignore[call-arg]
@@ -35,7 +35,7 @@ class TestServerConnection:
 
 class TestMcpServerConfig:
     def test_valid_config(self) -> None:
-        from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+        from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
         config = McpServerConfig(
             name="context7",
@@ -51,7 +51,7 @@ class TestMcpServerConfig:
     def test_missing_name_fails(self) -> None:
         from pydantic import ValidationError
 
-        from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+        from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
         with pytest.raises(ValidationError):
             McpServerConfig(
@@ -59,7 +59,7 @@ class TestMcpServerConfig:
             )  # type: ignore[call-arg]
 
     def test_description_optional(self) -> None:
-        from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+        from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
         config = McpServerConfig(
             name="test",
@@ -71,7 +71,7 @@ class TestMcpServerConfig:
 class TestDeclarativeBackwardsCompat:
     def test_declarative_config_with_server_connection(self) -> None:
         """DeclarativeAdapterConfig still works after ServerConfig → ServerConnection."""
-        from rai_cli.adapters.declarative.schema import DeclarativeAdapterConfig
+        from raise_cli.adapters.declarative.schema import DeclarativeAdapterConfig
 
         raw = {
             "adapter": {"name": "github", "protocol": "pm"},

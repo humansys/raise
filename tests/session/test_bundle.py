@@ -7,7 +7,7 @@ from datetime import date
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from rai_cli.onboarding.profile import (
+from raise_cli.onboarding.profile import (
     CoachingContext,
     CommunicationPreferences,
     CommunicationStyle,
@@ -17,14 +17,14 @@ from rai_cli.onboarding.profile import (
     ExperienceLevel,
     RelationshipState,
 )
-from rai_cli.schemas.session_state import (
+from raise_cli.schemas.session_state import (
     CurrentWork,
     EpicProgress,
     LastSession,
     PendingItems,
     SessionState,
 )
-from rai_cli.session.bundle import (
+from raise_cli.session.bundle import (
     SECTION_REGISTRY,
     LiveBacklogStatus,
     SectionManifest,
@@ -112,8 +112,8 @@ def _make_pattern(pat_id: str, content: str) -> GraphNode:
 class TestAssembleContextBundle:
     """Tests for assemble_context_bundle."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_lean_bundle_has_orientation_and_manifest(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -156,8 +156,8 @@ class TestAssembleContextBundle:
         assert "# Coaching" not in bundle
         assert "# Deadlines" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_without_state(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -177,8 +177,8 @@ class TestAssembleContextBundle:
         assert "# Coaching" not in bundle
         assert "# Pending" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_no_coaching(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -194,8 +194,8 @@ class TestAssembleContextBundle:
 
         assert "# Coaching" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_no_pending(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -221,8 +221,8 @@ class TestAssembleContextBundle:
 
         assert "# Pending" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_deadline_in_manifest_not_inline(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -244,8 +244,8 @@ class TestAssembleContextBundle:
         assert "Soon" not in bundle
         assert "(today)" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_coaching_corrections_suppressed(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -273,8 +273,8 @@ class TestAssembleContextBundle:
             assert f"SES-{i:03d}" not in bundle
         assert "corrections" not in bundle.lower()
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_coaching_in_manifest_not_inline(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -303,8 +303,8 @@ class TestAssembleContextBundle:
         assert "Trust: developing" not in bundle
         assert "# Coaching" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_session_id_in_context(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -339,8 +339,8 @@ def _make_always_on_node(node_id: str, node_type: str, content: str) -> GraphNod
 class TestFormatDeveloperSection:
     """Tests for _format_developer_section communication preferences."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_includes_non_default_language(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -359,8 +359,8 @@ class TestFormatDeveloperSection:
         assert "Developer: Emilio (ri)" in bundle
         assert "language: mixed" in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_omits_default_language(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -374,8 +374,8 @@ class TestFormatDeveloperSection:
         bundle = assemble_context_bundle(profile, None, Path("/project"))
         assert "language:" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_includes_non_default_style(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -394,8 +394,8 @@ class TestFormatDeveloperSection:
         bundle = assemble_context_bundle(profile, None, Path("/project"))
         assert "style: direct" in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_includes_skip_praise(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -412,8 +412,8 @@ class TestFormatDeveloperSection:
         bundle = assemble_context_bundle(profile, None, Path("/project"))
         assert "skip_praise" in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_omits_all_defaults(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -548,8 +548,8 @@ class TestFormatGovernancePrimes:
 class TestIdentityPrimesRemoved:
     """Verify identity primes are no longer emitted (ADR-012)."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_identity_nodes_not_in_bundle(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -707,8 +707,8 @@ class TestFormatRecentSessions:
 class TestBundleReleaseContext:
     """Tests for release context in session bundle."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_includes_release_when_graph_has_release_edge(
         self, mock_patterns: object, mock_always_on: object, tmp_path: Path
     ) -> None:
@@ -774,8 +774,8 @@ class TestBundleReleaseContext:
         assert "V3.0 Commercial Launch" in bundle
         assert "2026-03-14" in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_omits_release_when_no_graph(
         self, mock_patterns: object, mock_always_on: object, tmp_path: Path
     ) -> None:
@@ -804,8 +804,8 @@ class TestBundleReleaseContext:
         bundle = assemble_context_bundle(profile, state, tmp_path)
         assert "Release:" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_omits_release_when_epic_has_no_release(
         self, mock_patterns: object, mock_always_on: object, tmp_path: Path
     ) -> None:
@@ -855,8 +855,8 @@ class TestBundleReleaseContext:
 class TestFormatNarrative:
     """Tests for narrative section in context bundle."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_includes_narrative_when_present(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -885,8 +885,8 @@ class TestFormatNarrative:
         assert "Architecture = sync model" in bundle
         assert "scope.md created" in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_omits_narrative_when_empty(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -912,8 +912,8 @@ class TestFormatNarrative:
 
         assert "# Session Narrative" not in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_narrative_not_truncated(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -946,8 +946,8 @@ class TestFormatNarrative:
         assert long_narrative in bundle
         assert "..." not in bundle.split("# Session Narrative")[1].split("#")[0]
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_narrative_appears_after_last_session(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -986,8 +986,8 @@ class TestFormatNarrative:
 class TestFormatNextSessionPrompt:
     """Tests for next_session_prompt section in context bundle."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_includes_next_session_prompt_when_present(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -1013,8 +1013,8 @@ class TestFormatNextSessionPrompt:
         assert "# Next Session Prompt" in bundle
         assert "encoding fix" in bundle
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_bundle_omits_next_session_prompt_when_empty(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -1124,7 +1124,7 @@ class TestSectionManifest:
 class TestCountSectionItems:
     """Tests for count_section_items."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
     def test_count_governance(self, mock_always_on: object) -> None:
         """Counts governance items (always_on minus identity)."""
         assert callable(mock_always_on)
@@ -1138,7 +1138,7 @@ class TestCountSectionItems:
         )
         assert result == 2  # 3 always_on minus 1 identity
 
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_count_behavioral(self, mock_patterns: object) -> None:
         """Counts behavioral items (foundational patterns)."""
         assert callable(mock_patterns)
@@ -1214,8 +1214,8 @@ class TestCountSectionItems:
 class TestAssembleOrientation:
     """Tests for assemble_orientation (always-on sections only)."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_orientation_contains_always_on_sections(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -1251,8 +1251,8 @@ class TestAssembleOrientation:
         assert "# Pending" in result
         assert "Pattern curation" in result
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_orientation_excludes_priming_sections(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -1279,8 +1279,8 @@ class TestAssembleOrientation:
         assert "# Deadlines" not in result
         assert "Progress:" not in result
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_orientation_without_state(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -1332,8 +1332,8 @@ class TestFormatManifest:
 class TestAssembleSections:
     """Tests for assemble_sections (queryable priming sections)."""
 
-    @patch("rai_cli.session.bundle.get_always_on_primes")
-    @patch("rai_cli.session.bundle.get_foundational_patterns")
+    @patch("raise_cli.session.bundle.get_always_on_primes")
+    @patch("raise_cli.session.bundle.get_foundational_patterns")
     def test_governance_and_behavioral(
         self, mock_patterns: object, mock_always_on: object
     ) -> None:
@@ -1451,10 +1451,10 @@ class TestLiveBacklogStatus:
         assert result.story_status == ""
         assert result.warning == ""
 
-    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    @patch("raise_cli.cli.commands._resolve.resolve_adapter")
     def test_fetch_live_status_success(self, mock_resolve: MagicMock) -> None:
         """When adapter returns IssueDetail, populate status/summary fields."""
-        from rai_cli.adapters.models import IssueDetail
+        from raise_cli.adapters.models import IssueDetail
 
         mock_adapter = MagicMock()
         mock_resolve.return_value = mock_adapter
@@ -1496,7 +1496,7 @@ class TestLiveBacklogStatus:
         assert result.story_summary == "Session-start live query"
         assert result.warning == ""
 
-    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    @patch("raise_cli.cli.commands._resolve.resolve_adapter")
     def test_fetch_live_status_timeout(self, mock_resolve: MagicMock) -> None:
         """When adapter.get_issue hangs, return warning with 'timeout'."""
         mock_adapter = MagicMock()
@@ -1525,7 +1525,7 @@ class TestLiveBacklogStatus:
         result = _fetch_live_status(state, timeout=0.1)
         assert "timeout" in result.warning.lower()
 
-    @patch("rai_cli.cli.commands._resolve.resolve_adapter")
+    @patch("raise_cli.cli.commands._resolve.resolve_adapter")
     def test_fetch_live_status_unavailable(self, mock_resolve: MagicMock) -> None:
         """When resolve_adapter raises SystemExit, return warning with 'unavailable'."""
         mock_resolve.side_effect = SystemExit(1)
@@ -1618,8 +1618,8 @@ class TestLiveBacklogStatus:
         assert "Story: S347.5 [implement]" in result
         assert "Epic: E347" in result
 
-    @patch("rai_cli.session.bundle._fetch_live_status")
-    @patch("rai_cli.session.bundle._find_release_for_current_epic")
+    @patch("raise_cli.session.bundle._fetch_live_status")
+    @patch("raise_cli.session.bundle._find_release_for_current_epic")
     def test_assemble_orientation_calls_live_status(
         self, mock_release: MagicMock, mock_fetch: MagicMock
     ) -> None:

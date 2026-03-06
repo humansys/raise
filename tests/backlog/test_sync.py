@@ -1,4 +1,4 @@
-"""Tests for rai_cli.backlog.sync — core sync logic."""
+"""Tests for raise_cli.backlog.sync — core sync logic."""
 
 from __future__ import annotations
 
@@ -7,8 +7,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from rai_cli.adapters.models import IssueSummary
-from rai_cli.backlog.sync import SyncResult, sync_backlog
+from raise_cli.adapters.models import IssueSummary
+from raise_cli.backlog.sync import SyncResult, sync_backlog
 
 
 def _make_adapter(issues: list[IssueSummary]) -> MagicMock:
@@ -128,7 +128,7 @@ class TestFilesystemDetection:
 
     def test_filesystem_adapter_raises_valueerror(self, tmp_path: Path) -> None:
         """Passing a FilesystemPMAdapter raises ValueError with clear message."""
-        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+        from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
         adapter = FilesystemPMAdapter(project_root=tmp_path)
         output = tmp_path / "backlog.md"
@@ -138,7 +138,7 @@ class TestFilesystemDetection:
 
     def test_filesystem_adapter_does_not_write_file(self, tmp_path: Path) -> None:
         """File must not be created when filesystem adapter is rejected."""
-        from rai_cli.adapters.filesystem import FilesystemPMAdapter
+        from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
         adapter = FilesystemPMAdapter(project_root=tmp_path)
         output = tmp_path / "backlog.md"

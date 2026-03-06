@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.mcp.models import McpHealthResult
-from rai_cli.mcp.schema import McpServerConfig, ServerConnection
+from raise_cli.cli.main import app
+from raise_cli.mcp.models import McpHealthResult
+from raise_cli.mcp.schema import McpServerConfig, ServerConnection
 
 runner = CliRunner()
 
@@ -35,11 +35,11 @@ class TestMcpHealth:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -62,11 +62,11 @@ class TestMcpHealth:
 
         with (
             patch(
-                "rai_cli.cli.commands.mcp.discover_mcp_servers",
+                "raise_cli.cli.commands.mcp.discover_mcp_servers",
                 return_value={"test-server": _FAKE_SERVER},
             ),
             patch(
-                "rai_cli.mcp.bridge.McpBridge",
+                "raise_cli.mcp.bridge.McpBridge",
                 return_value=mock_bridge,
             ),
         ):
@@ -76,7 +76,7 @@ class TestMcpHealth:
         assert "Connection refused" in result.output
 
     def test_health_server_not_found(self) -> None:
-        with patch("rai_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
+        with patch("raise_cli.cli.commands.mcp.discover_mcp_servers", return_value={}):
             result = runner.invoke(app, ["mcp", "health", "nonexistent"])
         assert result.exit_code != 0
         assert "not found" in result.output.lower()

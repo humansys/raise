@@ -17,7 +17,7 @@ class TestGetActiveBackendFactory:
     def test_no_env_vars_returns_filesystem(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        from rai_cli.graph.backends import get_active_backend
+        from raise_cli.graph.backends import get_active_backend
 
         monkeypatch.delenv("RAI_SERVER_URL", raising=False)
         monkeypatch.delenv("RAI_API_KEY", raising=False)
@@ -29,8 +29,8 @@ class TestGetActiveBackendFactory:
     def test_both_env_vars_returns_dual_write(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        from rai_cli.graph.backends import get_active_backend
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends import get_active_backend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         monkeypatch.setenv("RAI_SERVER_URL", "http://localhost:8000")
         monkeypatch.setenv("RAI_API_KEY", "rsk_test_abc")
@@ -45,7 +45,7 @@ class TestGetActiveBackendFactory:
         monkeypatch: pytest.MonkeyPatch,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
-        from rai_cli.graph.backends import get_active_backend
+        from raise_cli.graph.backends import get_active_backend
 
         monkeypatch.setenv("RAI_SERVER_URL", "http://localhost:8000")
         monkeypatch.delenv("RAI_API_KEY", raising=False)
@@ -59,7 +59,7 @@ class TestGetActiveBackendFactory:
     def test_key_without_url_returns_filesystem(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        from rai_cli.graph.backends import get_active_backend
+        from raise_cli.graph.backends import get_active_backend
 
         monkeypatch.delenv("RAI_SERVER_URL", raising=False)
         monkeypatch.setenv("RAI_API_KEY", "rsk_test_abc")
@@ -71,7 +71,7 @@ class TestGetActiveBackendFactory:
     def test_returns_protocol_compatible(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        from rai_cli.graph.backends import get_active_backend
+        from raise_cli.graph.backends import get_active_backend
 
         monkeypatch.delenv("RAI_SERVER_URL", raising=False)
         monkeypatch.delenv("RAI_API_KEY", raising=False)
@@ -83,8 +83,8 @@ class TestGetActiveBackendFactory:
     def test_dual_write_has_correct_project_id(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        from rai_cli.graph.backends import get_active_backend
-        from rai_cli.graph.backends.dual import DualWriteBackend
+        from raise_cli.graph.backends import get_active_backend
+        from raise_cli.graph.backends.dual import DualWriteBackend
 
         monkeypatch.setenv("RAI_SERVER_URL", "http://localhost:8000")
         monkeypatch.setenv("RAI_API_KEY", "rsk_test_abc")
@@ -93,6 +93,6 @@ class TestGetActiveBackendFactory:
 
         assert isinstance(backend, DualWriteBackend)
         # Remote should be ApiGraphBackend with project_id derived from cwd
-        from rai_cli.graph.backends.api import ApiGraphBackend
+        from raise_cli.graph.backends.api import ApiGraphBackend
 
         assert isinstance(backend.remote, ApiGraphBackend)

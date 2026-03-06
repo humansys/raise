@@ -12,7 +12,7 @@ from typing import Any
 import pytest
 import yaml
 
-from rai_cli.adapters.filesystem import FilesystemPMAdapter
+from raise_cli.adapters.filesystem import FilesystemPMAdapter
 
 
 @pytest.fixture()

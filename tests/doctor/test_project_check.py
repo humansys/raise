@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.doctor.checks.project import ProjectCheck
-from rai_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
+from raise_cli.doctor.checks.project import ProjectCheck
+from raise_cli.doctor.models import CheckResult, CheckStatus, DoctorContext
 
 
 @pytest.fixture()
@@ -283,7 +283,7 @@ class TestProtocolConformance:
         assert all(isinstance(r, CheckResult) for r in results)
 
     def test_conforms_to_doctor_check_protocol(self) -> None:
-        from rai_cli.doctor.protocol import DoctorCheck
+        from raise_cli.doctor.protocol import DoctorCheck
 
         assert isinstance(ProjectCheck(), DoctorCheck)
 

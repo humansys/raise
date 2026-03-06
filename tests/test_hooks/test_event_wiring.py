@@ -13,8 +13,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from rai_cli.hooks.emitter import EventEmitter
-from rai_cli.hooks.events import (
+from raise_cli.hooks.emitter import EventEmitter
+from raise_cli.hooks.events import (
     AdapterFailedEvent,
     AdapterLoadedEvent,
     BeforeSessionCloseEvent,
@@ -59,19 +59,19 @@ class TestSessionStartEvent:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.session import session_app
+        from raise_cli.cli.commands.session import session_app
 
         runner = CliRunner()
 
         with (
             patch(
-                "rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.session.create_emitter", return_value=mock_emitter
             ),
-            patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
-            patch("rai_cli.cli.commands.session.save_developer_profile"),
-            patch("rai_cli.cli.commands.session.increment_session") as mock_inc,
+            patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("raise_cli.cli.commands.session.increment_session") as mock_inc,
         ):
-            from rai_cli.onboarding.profile import DeveloperProfile
+            from raise_cli.onboarding.profile import DeveloperProfile
 
             profile = DeveloperProfile(name="Test")
             mock_load.return_value = profile
@@ -94,7 +94,7 @@ class TestSessionStartEvent:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.session import session_app
+        from raise_cli.cli.commands.session import session_app
 
         runner = CliRunner()
 
@@ -106,16 +106,16 @@ class TestSessionStartEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.session.create_emitter", return_value=mock_emitter
             ),
-            patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
-            patch("rai_cli.cli.commands.session.save_developer_profile"),
-            patch("rai_cli.cli.commands.session.increment_session") as mock_inc,
-            patch("rai_cli.cli.commands.session.get_next_id", return_value="SES-42"),
-            patch("rai_cli.cli.commands.session.start_session") as mock_start,
-            patch("rai_cli.cli.commands.session.migrate_flat_to_session"),
+            patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("raise_cli.cli.commands.session.increment_session") as mock_inc,
+            patch("raise_cli.cli.commands.session.get_next_id", return_value="SES-42"),
+            patch("raise_cli.cli.commands.session.start_session") as mock_start,
+            patch("raise_cli.cli.commands.session.migrate_flat_to_session"),
         ):
-            from rai_cli.onboarding.profile import DeveloperProfile
+            from raise_cli.onboarding.profile import DeveloperProfile
 
             profile = DeveloperProfile(name="Alice")
             mock_load.return_value = profile
@@ -140,19 +140,19 @@ class TestSessionCloseEvents:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.session import session_app
+        from raise_cli.cli.commands.session import session_app
 
         runner = CliRunner()
 
         with (
             patch(
-                "rai_cli.cli.commands.session.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.session.create_emitter", return_value=mock_emitter
             ),
-            patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
-            patch("rai_cli.cli.commands.session.save_developer_profile"),
-            patch("rai_cli.cli.commands.session.end_session") as mock_end,
+            patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch("raise_cli.cli.commands.session.end_session") as mock_end,
         ):
-            from rai_cli.onboarding.profile import ActiveSession, DeveloperProfile
+            from raise_cli.onboarding.profile import ActiveSession, DeveloperProfile
 
             profile = DeveloperProfile(
                 name="Test",
@@ -184,7 +184,7 @@ class TestSessionCloseEvents:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.session import session_app
+        from raise_cli.cli.commands.session import session_app
 
         runner = CliRunner()
 
@@ -204,13 +204,13 @@ class TestSessionCloseEvents:
 
         with (
             patch(
-                "rai_cli.cli.commands.session.create_emitter",
+                "raise_cli.cli.commands.session.create_emitter",
                 return_value=abort_emitter,
             ),
-            patch("rai_cli.cli.commands.session.load_developer_profile") as mock_load,
-            patch("rai_cli.cli.commands.session.end_session") as mock_end,
+            patch("raise_cli.cli.commands.session.load_developer_profile") as mock_load,
+            patch("raise_cli.cli.commands.session.end_session") as mock_end,
         ):
-            from rai_cli.onboarding.profile import ActiveSession, DeveloperProfile
+            from raise_cli.onboarding.profile import ActiveSession, DeveloperProfile
 
             profile = DeveloperProfile(
                 name="Test",
@@ -249,7 +249,7 @@ class TestGraphBuildEvent:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.graph import graph_app
+        from raise_cli.cli.commands.graph import graph_app
 
         runner = CliRunner()
 
@@ -265,15 +265,15 @@ class TestGraphBuildEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.graph.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.graph.create_emitter", return_value=mock_emitter
             ),
             patch(
-                "rai_cli.cli.commands.graph.get_active_backend",
+                "raise_cli.cli.commands.graph.get_active_backend",
                 return_value=mock_backend,
             ),
-            patch("rai_cli.cli.commands.graph.GraphBuilder") as mock_builder_cls,
+            patch("raise_cli.cli.commands.graph.GraphBuilder") as mock_builder_cls,
             patch(
-                "rai_cli.cli.commands.graph._get_default_index_path",
+                "raise_cli.cli.commands.graph._get_default_index_path",
                 return_value=tmp_path / "index.json",
             ),
         ):
@@ -301,7 +301,7 @@ class TestPatternAddedEvent:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.pattern import pattern_app
+        from raise_cli.cli.commands.pattern import pattern_app
 
         runner = CliRunner()
 
@@ -312,17 +312,17 @@ class TestPatternAddedEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
             ),
             patch(
-                "rai_cli.cli.commands.pattern.get_memory_dir_for_scope",
+                "raise_cli.cli.commands.pattern.get_memory_dir_for_scope",
                 return_value=tmp_path,
             ),
             patch(
-                "rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result
+                "raise_cli.cli.commands.pattern.append_pattern", return_value=mock_result
             ),
             patch(
-                "rai_cli.cli.commands.pattern.load_developer_profile", return_value=None
+                "raise_cli.cli.commands.pattern.load_developer_profile", return_value=None
             ),
         ):
             result = runner.invoke(
@@ -343,7 +343,7 @@ class TestPatternAddedEvent:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.pattern import pattern_app
+        from raise_cli.cli.commands.pattern import pattern_app
 
         runner = CliRunner()
 
@@ -353,17 +353,17 @@ class TestPatternAddedEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.pattern.create_emitter", return_value=mock_emitter
             ),
             patch(
-                "rai_cli.cli.commands.pattern.get_memory_dir_for_scope",
+                "raise_cli.cli.commands.pattern.get_memory_dir_for_scope",
                 return_value=tmp_path,
             ),
             patch(
-                "rai_cli.cli.commands.pattern.append_pattern", return_value=mock_result
+                "raise_cli.cli.commands.pattern.append_pattern", return_value=mock_result
             ),
             patch(
-                "rai_cli.cli.commands.pattern.load_developer_profile", return_value=None
+                "raise_cli.cli.commands.pattern.load_developer_profile", return_value=None
             ),
         ):
             runner.invoke(pattern_app, ["add", "Test pattern"])
@@ -383,7 +383,7 @@ class TestDiscoverScanEvent:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.discover import discover_app
+        from raise_cli.cli.commands.discover import discover_app
 
         runner = CliRunner()
 
@@ -394,13 +394,13 @@ class TestDiscoverScanEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.discover.create_emitter",
+                "raise_cli.cli.commands.discover.create_emitter",
                 return_value=mock_emitter,
             ),
             patch(
-                "rai_cli.cli.commands.discover.scan_directory", return_value=mock_result
+                "raise_cli.cli.commands.discover.scan_directory", return_value=mock_result
             ),
-            patch("rai_cli.cli.commands.discover.format_scan_result"),
+            patch("raise_cli.cli.commands.discover.format_scan_result"),
         ):
             result = runner.invoke(discover_app, ["scan", str(tmp_path)])
 
@@ -424,7 +424,7 @@ class TestInitCompleteEvent:
         import typer
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.init import init_command
+        from raise_cli.cli.commands.init import init_command
 
         app = typer.Typer()
         app.command()(init_command)
@@ -438,7 +438,7 @@ class TestInitCompleteEvent:
         mock_profile.projects = []
         mock_profile.get_pattern_prefix.return_value = "E"
 
-        from rai_cli.onboarding.detection import ProjectType
+        from raise_cli.onboarding.detection import ProjectType
 
         mock_detection = MagicMock()
         mock_detection.project_type = ProjectType.GREENFIELD
@@ -476,51 +476,51 @@ class TestInitCompleteEvent:
 
         with (
             patch(
-                "rai_cli.cli.commands.init.create_emitter", return_value=mock_emitter
+                "raise_cli.cli.commands.init.create_emitter", return_value=mock_emitter
             ),
             patch(
-                "rai_cli.cli.commands.init.load_developer_profile",
+                "raise_cli.cli.commands.init.load_developer_profile",
                 return_value=mock_profile,
             ),
-            patch("rai_cli.cli.commands.init.save_developer_profile"),
+            patch("raise_cli.cli.commands.init.save_developer_profile"),
             patch(
-                "rai_cli.cli.commands.init.detect_project_type",
+                "raise_cli.cli.commands.init.detect_project_type",
                 return_value=mock_detection,
             ),
             patch(
-                "rai_cli.cli.commands.init.load_registry", return_value=mock_registry
+                "raise_cli.cli.commands.init.load_registry", return_value=mock_registry
             ),
-            patch("rai_cli.cli.commands.init.save_manifest"),
+            patch("raise_cli.cli.commands.init.save_manifest"),
             patch(
-                "rai_cli.onboarding.bootstrap.bootstrap_rai_base",
+                "raise_cli.onboarding.bootstrap.bootstrap_rai_base",
                 return_value=mock_bootstrap,
             ),
             patch(
-                "rai_cli.onboarding.governance.scaffold_governance",
+                "raise_cli.onboarding.governance.scaffold_governance",
                 return_value=mock_gov_result,
             ),
             patch(
-                "rai_cli.onboarding.memory_md.generate_memory_md",
+                "raise_cli.onboarding.memory_md.generate_memory_md",
                 return_value="# Memory",
             ),
             patch(
-                "rai_cli.config.paths.get_memory_dir", return_value=tmp_path / "memory"
+                "raise_cli.config.paths.get_memory_dir", return_value=tmp_path / "memory"
             ),
             patch(
-                "rai_cli.config.paths.get_framework_dir",
+                "raise_cli.config.paths.get_framework_dir",
                 return_value=tmp_path / "framework",
             ),
             patch(
-                "rai_cli.config.paths.get_claude_memory_path",
+                "raise_cli.config.paths.get_claude_memory_path",
                 return_value=tmp_path / "claude" / "MEMORY.md",
             ),
             patch(
-                "rai_cli.onboarding.skills.scaffold_skills",
+                "raise_cli.onboarding.skills.scaffold_skills",
                 return_value=mock_skills_result,
             ),
-            patch("rai_cli.onboarding.workflows.scaffold_workflows"),
+            patch("raise_cli.onboarding.workflows.scaffold_workflows"),
             patch(
-                "rai_cli.cli.commands.init.generate_instructions",
+                "raise_cli.cli.commands.init.generate_instructions",
                 return_value="# Test CLAUDE.md",
             ),
         ):
@@ -547,12 +547,12 @@ class TestAdapterEvents:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.adapters import adapters_app
+        from raise_cli.cli.commands.adapters import adapters_app
 
         runner = CliRunner()
 
         # Create a compliant adapter (subclass of GovernanceParser)
-        from rai_cli.adapters.protocols import GovernanceParser
+        from raise_cli.adapters.protocols import GovernanceParser
 
         compliant_cls = type("FakeParser", (GovernanceParser,), {})
         mock_ep = MagicMock()
@@ -562,7 +562,7 @@ class TestAdapterEvents:
         mock_ep.dist.name = "test-pkg"
 
         # Only return entries for the governance_parsers group
-        from rai_cli.adapters.registry import EP_GOVERNANCE_PARSERS
+        from raise_cli.adapters.registry import EP_GOVERNANCE_PARSERS
 
         def selective_entry_points(group: str) -> list[Any]:
             if group == EP_GOVERNANCE_PARSERS:
@@ -571,15 +571,15 @@ class TestAdapterEvents:
 
         with (
             patch(
-                "rai_cli.cli.commands.adapters.create_emitter",
+                "raise_cli.cli.commands.adapters.create_emitter",
                 return_value=mock_emitter,
             ),
             patch(
-                "rai_cli.cli.commands.adapters.entry_points",
+                "raise_cli.cli.commands.adapters.entry_points",
                 side_effect=selective_entry_points,
             ),
-            patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
-            patch("rai_cli.cli.commands.adapters.format_check_human"),
+            patch("raise_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch("raise_cli.cli.commands.adapters.format_check_human"),
         ):
             result = runner.invoke(adapters_app, ["check"])
 
@@ -600,7 +600,7 @@ class TestAdapterEvents:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.adapters import adapters_app
+        from raise_cli.cli.commands.adapters import adapters_app
 
         runner = CliRunner()
 
@@ -611,7 +611,7 @@ class TestAdapterEvents:
         mock_ep.dist = MagicMock()
         mock_ep.dist.name = "bad-pkg"
 
-        from rai_cli.adapters.registry import EP_GOVERNANCE_PARSERS
+        from raise_cli.adapters.registry import EP_GOVERNANCE_PARSERS
 
         def selective_entry_points(group: str) -> list[Any]:
             if group == EP_GOVERNANCE_PARSERS:
@@ -620,15 +620,15 @@ class TestAdapterEvents:
 
         with (
             patch(
-                "rai_cli.cli.commands.adapters.create_emitter",
+                "raise_cli.cli.commands.adapters.create_emitter",
                 return_value=mock_emitter,
             ),
             patch(
-                "rai_cli.cli.commands.adapters.entry_points",
+                "raise_cli.cli.commands.adapters.entry_points",
                 side_effect=selective_entry_points,
             ),
-            patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
-            patch("rai_cli.cli.commands.adapters.format_check_human"),
+            patch("raise_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch("raise_cli.cli.commands.adapters.format_check_human"),
         ):
             result = runner.invoke(adapters_app, ["check"])
 
@@ -649,7 +649,7 @@ class TestAdapterEvents:
     ) -> None:
         from typer.testing import CliRunner
 
-        from rai_cli.cli.commands.adapters import adapters_app
+        from raise_cli.cli.commands.adapters import adapters_app
 
         runner = CliRunner()
 
@@ -661,12 +661,12 @@ class TestAdapterEvents:
 
         with (
             patch(
-                "rai_cli.cli.commands.adapters.create_emitter",
+                "raise_cli.cli.commands.adapters.create_emitter",
                 return_value=mock_emitter,
             ),
-            patch("rai_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]),
-            patch("rai_cli.cli.commands.adapters._get_tier", return_value="community"),
-            patch("rai_cli.cli.commands.adapters.format_check_human"),
+            patch("raise_cli.cli.commands.adapters.entry_points", return_value=[mock_ep]),
+            patch("raise_cli.cli.commands.adapters._get_tier", return_value="community"),
+            patch("raise_cli.cli.commands.adapters.format_check_human"),
         ):
             result = runner.invoke(adapters_app, ["check"])
 

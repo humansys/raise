@@ -11,8 +11,8 @@ from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.cli.main import app
-from rai_cli.gates import GateContext, GateRegistry, GateResult, WorkflowGate
+from raise_cli.cli.main import app
+from raise_cli.gates import GateContext, GateRegistry, GateResult, WorkflowGate
 
 runner = CliRunner()
 
@@ -120,21 +120,21 @@ class TestGateDiscoveryE2E:
 
     def test_discover_and_list(self) -> None:
         ep = self._make_ep("pass", _AlwaysPassGate)
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep]):
             result = runner.invoke(app, ["gate", "list"])
         assert result.exit_code == 0
         assert "gate-pass" in result.output
 
     def test_discover_and_check(self) -> None:
         ep = self._make_ep("pass", _AlwaysPassGate)
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep]):
             result = runner.invoke(app, ["gate", "check", "gate-pass"])
         assert result.exit_code == 0
 
     def test_discover_and_check_all_mixed(self) -> None:
         ep1 = self._make_ep("pass", _AlwaysPassGate)
         ep2 = self._make_ep("fail", _AlwaysFailGate)
-        with patch("rai_cli.gates.registry.entry_points", return_value=[ep1, ep2]):
+        with patch("raise_cli.gates.registry.entry_points", return_value=[ep1, ep2]):
             result = runner.invoke(app, ["gate", "check", "--all"])
         assert result.exit_code == 1
         assert "gate-pass" in result.output
@@ -151,7 +151,7 @@ class TestPublicAPI:
     """Verify __init__.py exports are correct."""
 
     def test_exports(self) -> None:
-        from rai_cli.gates import __all__
+        from raise_cli.gates import __all__
 
         assert "WorkflowGate" in __all__
         assert "GateContext" in __all__

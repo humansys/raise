@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.viz.generator import generate_viz_html
+from raise_cli.viz.generator import generate_viz_html
 
 
 @pytest.fixture

@@ -5,12 +5,12 @@ from __future__ import annotations
 from datetime import date
 from pathlib import Path
 
-from rai_cli.onboarding.migration import (
+from raise_cli.onboarding.migration import (
     _extract_sessions_data,
     _extract_skills_from_sessions,
     migrate_developer_profile,
 )
-from rai_cli.onboarding.profile import (
+from raise_cli.onboarding.profile import (
     CommunicationStyle,
     ExperienceLevel,
 )

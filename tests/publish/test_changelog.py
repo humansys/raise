@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from rai_cli.publish.changelog import has_unreleased_entries, promote_unreleased
+from raise_cli.publish.changelog import has_unreleased_entries, promote_unreleased
 
 SAMPLE_CHANGELOG = """\
 # Changelog

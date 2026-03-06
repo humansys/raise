@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class TestPublicAPIExportsAllProtocols:
     def test_import_all_protocols(self) -> None:
-        from rai_cli.adapters import (
+        from raise_cli.adapters import (
             AsyncDocumentationTarget,
             AsyncProjectManagementAdapter,
             DocumentationTarget,
@@ -32,7 +32,7 @@ class TestPublicAPIExportsAllProtocols:
 
 class TestPublicAPIExportsAllModels:
     def test_import_all_models(self) -> None:
-        from rai_cli.adapters import (
+        from raise_cli.adapters import (
             AdapterHealth,
             ArtifactLocator,
             BackendHealth,
@@ -75,7 +75,7 @@ class TestPublicAPIExportsAllModels:
 
 class TestPublicAPIExportsSyncWrappers:
     def test_import_sync_wrappers(self) -> None:
-        from rai_cli.adapters import SyncDocsAdapter, SyncPMAdapter
+        from raise_cli.adapters import SyncDocsAdapter, SyncPMAdapter
 
         assert SyncPMAdapter is not None
         assert SyncDocsAdapter is not None
@@ -83,14 +83,14 @@ class TestPublicAPIExportsSyncWrappers:
 
 class TestDunderAll:
     def test_all_exports_are_importable(self) -> None:
-        import rai_cli.adapters as adapters
+        import raise_cli.adapters as adapters
 
         for name in adapters.__all__:
             assert hasattr(adapters, name), f"{name} in __all__ but not importable"
 
     def test_all_count(self) -> None:
         """Guardrail: __all__ has expected number of exports."""
-        import rai_cli.adapters as adapters
+        import raise_cli.adapters as adapters
 
         # 7 protocols + 2 wrappers + 15 models + 5 registry fns + 5 constants = 34
         assert len(adapters.__all__) == 34

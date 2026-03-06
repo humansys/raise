@@ -7,8 +7,8 @@ from unittest.mock import MagicMock, patch
 
 from typer.testing import CliRunner
 
-from rai_cli.backlog.sync import SyncResult
-from rai_cli.cli.commands.backlog import backlog_app
+from raise_cli.backlog.sync import SyncResult
+from raise_cli.cli.commands.backlog import backlog_app
 
 runner = CliRunner()
 
@@ -25,8 +25,8 @@ def _mock_sync_result(tmp_path: Path) -> SyncResult:
 class TestSyncCommand:
     """CLI sync subcommand tests."""
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
-    @patch("rai_cli.cli.commands.backlog.sync_backlog")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.sync_backlog")
     def test_sync_success_output(
         self, mock_sync: MagicMock, mock_resolve: MagicMock, tmp_path: Path
     ) -> None:
@@ -40,8 +40,8 @@ class TestSyncCommand:
         assert "3" in result.output
         assert "jira" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
-    @patch("rai_cli.cli.commands.backlog.sync_backlog")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.sync_backlog")
     def test_sync_with_project_filter(
         self, mock_sync: MagicMock, mock_resolve: MagicMock, tmp_path: Path
     ) -> None:
@@ -55,8 +55,8 @@ class TestSyncCommand:
         assert call_kwargs[1].get("project_filter") == "RAISE" or \
             (len(call_kwargs[0]) > 2 and call_kwargs[0][2] == "RAISE")
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
-    @patch("rai_cli.cli.commands.backlog.sync_backlog")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.sync_backlog")
     def test_sync_filesystem_noop(
         self, mock_sync: MagicMock, mock_resolve: MagicMock
     ) -> None:
@@ -69,8 +69,8 @@ class TestSyncCommand:
         assert result.exit_code == 0
         assert "source of truth" in result.output
 
-    @patch("rai_cli.cli.commands.backlog.resolve_adapter")
-    @patch("rai_cli.cli.commands.backlog.sync_backlog")
+    @patch("raise_cli.cli.commands.backlog.resolve_adapter")
+    @patch("raise_cli.cli.commands.backlog.sync_backlog")
     def test_sync_adapter_error(
         self, mock_sync: MagicMock, mock_resolve: MagicMock
     ) -> None:

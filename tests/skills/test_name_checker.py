@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from rai_cli.skills.name_checker import (
+from raise_cli.skills.name_checker import (
     NameCheckResult,
     check_name,
 )

@@ -9,13 +9,13 @@ from unittest.mock import MagicMock, patch
 import pytest
 import yaml
 
-from rai_cli.hooks.builtin.jira_sync import (
+from raise_cli.hooks.builtin.jira_sync import (
     JiraSyncHook,
     _load_lifecycle_mapping,
     _resolve_status_name,
 )
-from rai_cli.hooks.events import WorkCloseEvent, WorkStartEvent
-from rai_cli.hooks.protocol import LifecycleHook
+from raise_cli.hooks.events import WorkCloseEvent, WorkStartEvent
+from raise_cli.hooks.protocol import LifecycleHook
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -97,15 +97,15 @@ class TestTransitions:
         mock_adapter = MagicMock()
         with (
             patch(
-                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
                 return_value=JIRA_YAML_CONTENT["workflow"]["lifecycle_mapping"],
             ),
             patch(
-                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                "raise_cli.hooks.builtin.jira_sync._resolve_status_name",
                 return_value="in-progress",
             ),
             patch(
-                "rai_cli.cli.commands._resolve.resolve_adapter",
+                "raise_cli.cli.commands._resolve.resolve_adapter",
                 return_value=mock_adapter,
             ),
         ):
@@ -124,15 +124,15 @@ class TestTransitions:
         mock_adapter = MagicMock()
         with (
             patch(
-                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
                 return_value={"story_close": 41},
             ),
             patch(
-                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                "raise_cli.hooks.builtin.jira_sync._resolve_status_name",
                 return_value="done",
             ),
             patch(
-                "rai_cli.cli.commands._resolve.resolve_adapter",
+                "raise_cli.cli.commands._resolve.resolve_adapter",
                 return_value=mock_adapter,
             ),
         ):
@@ -147,15 +147,15 @@ class TestTransitions:
         mock_adapter = MagicMock()
         with (
             patch(
-                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
                 return_value={"epic_start": 31},
             ),
             patch(
-                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                "raise_cli.hooks.builtin.jira_sync._resolve_status_name",
                 return_value="in-progress",
             ),
             patch(
-                "rai_cli.cli.commands._resolve.resolve_adapter",
+                "raise_cli.cli.commands._resolve.resolve_adapter",
                 return_value=mock_adapter,
             ),
         ):
@@ -187,7 +187,7 @@ class TestGracefulSkips:
             work_type="story", work_id="S301.6", issue_key="RAISE-301"
         )
         with patch(
-            "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+            "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
             return_value=None,
         ):
             result = hook.handle(event)
@@ -200,7 +200,7 @@ class TestGracefulSkips:
         )
         # lifecycle_mapping exists but has no story_start entry
         with patch(
-            "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+            "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
             return_value={"epic_start": 31},
         ):
             result = hook.handle(event)
@@ -224,15 +224,15 @@ class TestErrorHandling:
         mock_adapter.transition_issue.side_effect = RuntimeError("MCP server not found")
         with (
             patch(
-                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
                 return_value={"story_start": 31},
             ),
             patch(
-                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                "raise_cli.hooks.builtin.jira_sync._resolve_status_name",
                 return_value="in-progress",
             ),
             patch(
-                "rai_cli.cli.commands._resolve.resolve_adapter",
+                "raise_cli.cli.commands._resolve.resolve_adapter",
                 return_value=mock_adapter,
             ),
         ):
@@ -248,15 +248,15 @@ class TestErrorHandling:
         )
         with (
             patch(
-                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
                 return_value={"story_start": 31},
             ),
             patch(
-                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                "raise_cli.hooks.builtin.jira_sync._resolve_status_name",
                 return_value="in-progress",
             ),
             patch(
-                "rai_cli.cli.commands._resolve.resolve_adapter",
+                "raise_cli.cli.commands._resolve.resolve_adapter",
                 side_effect=RuntimeError("No adapter installed"),
             ),
         ):
@@ -276,7 +276,7 @@ class TestConfigReaders:
 
     def test_load_lifecycle_mapping(self, jira_yaml: Path, tmp_path: Path) -> None:
         with patch(
-            "rai_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
+            "raise_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
             jira_yaml,
         ):
             mapping = _load_lifecycle_mapping()
@@ -289,7 +289,7 @@ class TestConfigReaders:
 
     def test_load_lifecycle_mapping_missing_file(self, tmp_path: Path) -> None:
         with patch(
-            "rai_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
+            "raise_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
             tmp_path / ".raise" / "jira.yaml",
         ):
             mapping = _load_lifecycle_mapping()
@@ -299,7 +299,7 @@ class TestConfigReaders:
         self, jira_yaml_no_lifecycle: Path
     ) -> None:
         with patch(
-            "rai_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
+            "raise_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
             jira_yaml_no_lifecycle,
         ):
             mapping = _load_lifecycle_mapping()
@@ -307,7 +307,7 @@ class TestConfigReaders:
 
     def test_resolve_status_name_found(self, jira_yaml: Path) -> None:
         with patch(
-            "rai_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
+            "raise_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
             jira_yaml,
         ):
             name = _resolve_status_name(31)
@@ -315,7 +315,7 @@ class TestConfigReaders:
 
     def test_resolve_status_name_not_found_fallback(self, jira_yaml: Path) -> None:
         with patch(
-            "rai_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
+            "raise_cli.hooks.builtin.jira_sync._JIRA_YAML_PATH",
             jira_yaml,
         ):
             name = _resolve_status_name(999)
@@ -332,8 +332,8 @@ class TestEmitterIntegration:
 
     def test_emitter_dispatches_to_jira_sync_hook(self) -> None:
         """Full path: emitter → hook → adapter.transition_issue()."""
-        from rai_cli.hooks.emitter import EventEmitter
-        from rai_cli.hooks.registry import HookRegistry
+        from raise_cli.hooks.emitter import EventEmitter
+        from raise_cli.hooks.registry import HookRegistry
 
         registry = HookRegistry()
         registry.register(JiraSyncHook())
@@ -345,15 +345,15 @@ class TestEmitterIntegration:
         mock_adapter = MagicMock()
         with (
             patch(
-                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
                 return_value={"story_start": 31},
             ),
             patch(
-                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                "raise_cli.hooks.builtin.jira_sync._resolve_status_name",
                 return_value="in-progress",
             ),
             patch(
-                "rai_cli.cli.commands._resolve.resolve_adapter",
+                "raise_cli.cli.commands._resolve.resolve_adapter",
                 return_value=mock_adapter,
             ),
         ):
@@ -367,8 +367,8 @@ class TestEmitterIntegration:
 
     def test_emitter_error_isolation(self) -> None:
         """Adapter failure is caught by hook, emitter sees no handler_errors."""
-        from rai_cli.hooks.emitter import EventEmitter
-        from rai_cli.hooks.registry import HookRegistry
+        from raise_cli.hooks.emitter import EventEmitter
+        from raise_cli.hooks.registry import HookRegistry
 
         registry = HookRegistry()
         registry.register(JiraSyncHook())
@@ -379,15 +379,15 @@ class TestEmitterIntegration:
         )
         with (
             patch(
-                "rai_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
+                "raise_cli.hooks.builtin.jira_sync._load_lifecycle_mapping",
                 return_value={"story_start": 31},
             ),
             patch(
-                "rai_cli.hooks.builtin.jira_sync._resolve_status_name",
+                "raise_cli.hooks.builtin.jira_sync._resolve_status_name",
                 return_value="in-progress",
             ),
             patch(
-                "rai_cli.cli.commands._resolve.resolve_adapter",
+                "raise_cli.cli.commands._resolve.resolve_adapter",
                 side_effect=RuntimeError("No adapter"),
             ),
         ):
