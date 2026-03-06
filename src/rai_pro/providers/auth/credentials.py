@@ -14,7 +14,7 @@ from typing import Any, cast
 
 from cryptography.fernet import Fernet  # type: ignore[import-untyped]
 
-from rai_cli.compat import secure_permissions
+from raise_cli.compat import secure_permissions
 
 
 def _get_encryption_key() -> bytes:
