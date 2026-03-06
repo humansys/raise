@@ -22,6 +22,7 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Quality Assurance",
     "Topic :: Software Development :: Libraries :: Application Frameworks",
 ]
@@ -39,7 +40,6 @@ dependencies = [
     "pydantic>=2.6.0",
     "pydantic-settings>=2.2.0",
     "pyyaml>=6.0.1",
-    "tomli>=2.0.1; python_version < '3.11'",
     "networkx>=3.6.1",
     "tree-sitter>=0.25.2",
     "tree-sitter-typescript>=0.23.2",
@@ -70,6 +70,11 @@ csharp = [
     "tree-sitter-c-sharp>=0.23.1",
 ]
 
+[project.urls]
+Homepage = "https://raiseframework.ai"
+Documentation = "https://docs.raiseframework.ai"
+Repository = "https://github.com/humansys-ai/raise-commons"
+Changelog = "https://github.com/humansys-ai/raise-commons/blob/main/CHANGELOG.md"
 
 [project.scripts]
 rai = "raise_cli.cli.main:app"

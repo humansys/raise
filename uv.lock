@@ -1306,7 +1306,6 @@ requires-dist = [
     { name = "requests", specifier = ">=2.32.4" },
     { name = "rich", specifier = ">=13.7.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.4.0" },
-    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.1" },
     { name = "tree-sitter", specifier = ">=0.25.2" },
     { name = "tree-sitter-c-sharp", marker = "extra == 'csharp'", specifier = ">=0.23.1" },
     { name = "tree-sitter-javascript", specifier = ">=0.25.0" },
