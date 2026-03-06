@@ -97,7 +97,7 @@ components:
   - id: comp-scanner-symbol
     name: Symbol
     kind: class
-    file: src/rai_cli/discovery/scanner.py
+    file: src/raise_cli/discovery/scanner.py
     line: 44
     signature: "class Symbol(BaseModel)"
     purpose: "Represents a code symbol extracted from source files."

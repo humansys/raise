@@ -123,6 +123,6 @@ Module nodes appear in graph. No stale references.
 ## References
 
 - Previous: `/rai-discover-validate`
-- Graph builder: `src/rai_cli/context/builder.py` (`load_architecture()`)
+- Graph builder: `src/raise_cli/context/builder.py` (`load_architecture()`)
 - Components: `work/discovery/components-validated.json`
 - Governance: `governance/guardrails.md`, `governance/vision.md`

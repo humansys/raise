@@ -66,7 +66,7 @@ raise-commons/
 │   ├── prd.md           # Project-level
 │   └── ...              # All artifacts at root level
 │
-├── src/rai_cli/       # CLI implementation
+├── src/raise_cli/       # CLI implementation
 │
 ├── work/                # Active work
 │   ├── stories/        # Feature specs
@@ -114,7 +114,7 @@ Based on **ADR-012: Skills + CLI Toolkit Architecture**:
 ## 4. CLI Module Structure
 
 ```
-src/rai_cli/
+src/raise_cli/
 ├── cli/                    # Typer CLI layer
 │   ├── commands/           # Command modules
 │   │   ├── context.py      # MVC queries
@@ -363,7 +363,7 @@ Session Work  →  Telemetry Writer  →  signals.jsonl
 ## 12. Extension Points
 
 ### Adding a New Parser
-1. Create `src/rai_cli/governance/parsers/new_type.py`
+1. Create `src/raise_cli/governance/parsers/new_type.py`
 2. Implement `extract_*` functions returning `Concept` objects
 3. Register in `GraphBuilder._extract_*` method
 4. Add tests in `tests/governance/parsers/`
