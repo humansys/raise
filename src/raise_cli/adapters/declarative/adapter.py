@@ -102,7 +102,10 @@ class DeclarativeMcpAdapter:
         """Dispatch a protocol method call to the configured MCP tool."""
         mapping = self._get_method(method_name)
         args = self._evaluator.evaluate_args(mapping.args, context)
-        return await self._bridge.call(mapping.tool, args)
+        result = await self._bridge.call(mapping.tool, args)
+        if result.is_error:
+            raise McpBridgeError(result.error_message)
+        return result
 
     def _parse_single(
         self, method_name: str, result: McpToolResult, context: dict[str, Any]
