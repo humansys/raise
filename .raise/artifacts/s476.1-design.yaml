@@ -1,0 +1,106 @@
+artifact_type: story-design
+version: 1
+skill: rai-story-design
+created: "2026-03-06"
+story: S476.1
+epic: E476
+content:
+  summary: >
+    Modify 4 builtin gate classes (TestGate, LintGate, TypeGate, CoverageGate)
+    to read their subprocess commands from .raise/manifest.yaml via load_manifest(),
+    falling back to current hardcoded defaults when manifest is absent or fields
+    are missing. Same pattern applied 4 times with minor variations per gate.
+  complexity: simple
+  acceptance_criteria:
+    - id: AC1
+      description: "TestGate reads project.test_command from manifest; falls back to ['pytest', '-x', '--tb=short']"
+      verifiable: true
+    - id: AC2
+      description: "LintGate reads project.lint_command from manifest; falls back to ['ruff', 'check', '.']"
+      verifiable: true
+    - id: AC3
+      description: "TypeGate reads project.type_check_command from manifest; falls back to ['pyright']"
+      verifiable: true
+    - id: AC4
+      description: "CoverageGate reads project.test_command from manifest and wraps with coverage flags; falls back to ['pytest', '--cov', '--cov-report=term-missing', '-q']"
+      verifiable: true
+    - id: AC5
+      description: "When .raise/manifest.yaml is absent, all 4 gates behave identically to current behavior (backwards compatible)"
+      verifiable: true
+  must_not_criteria:
+    - id: MN1
+      description: "Must NOT change the manifest schema (fields already exist in ProjectInfo)"
+    - id: MN2
+      description: "Must NOT change gate_id, description, or workflow_point class vars"
+  integration_points:
+    - module: gates.builtin
+      change_type: modify
+      files:
+        - "src/raise_cli/gates/builtin/tests.py"
+        - "src/raise_cli/gates/builtin/lint.py"
+        - "src/raise_cli/gates/builtin/types.py"
+        - "src/raise_cli/gates/builtin/coverage.py"
+  decisions:
+    - id: D1
+      choice: "Extract a _get_command() helper method in each gate class"
+      rationale: >
+        Keeps evaluate() clean. The helper encapsulates manifest lookup + fallback
+        logic. Matches the pattern shown in the epic design doc.
+      alternatives_considered:
+        - "Inline manifest lookup in evaluate() — more noise, harder to test"
+        - "Shared base class with abstract default — over-engineering for 4 simple classes"
+    - id: D2
+      choice: "Use shlex.split() to parse manifest command strings into argv lists"
+      rationale: >
+        Manifest stores commands as strings (e.g. 'uv run pytest --tb=short').
+        subprocess.run needs a list. shlex.split handles quoting correctly.
+      alternatives_considered:
+        - "shell=True with string command — security risk, platform differences"
+        - "Require manifest to store lists — breaks existing schema"
+    - id: D3
+      choice: "CoverageGate reads test_command and prepends coverage flags"
+      rationale: >
+        Coverage wraps the test runner. If manifest says 'npm test', coverage gate
+        should not run 'pytest --cov'. It should either use the test command with
+        appropriate coverage tooling or fall back to the pytest default.
+        For simplicity: if manifest has test_command, CoverageGate uses shlex.split(test_command)
+        plus ['--cov', '--cov-report=term-missing', '-q'] appended. This works for pytest-based
+        commands. For non-pytest, the user would need to set a coverage-specific command
+        (future enhancement, out of scope).
+      alternatives_considered:
+        - "Add a separate coverage_command field to manifest — schema change, out of scope"
+        - "Skip coverage gate for non-pytest projects — loses functionality"
+    - id: D4
+      choice: "No shared helper module — each gate owns its manifest lookup"
+      rationale: >
+        The 4 gates each read a different field. A shared helper would just be
+        get_field(manifest, field_name) which adds indirection without value.
+        Duplication is 3 lines per gate — acceptable for clarity.
+      alternatives_considered:
+        - "Shared _manifest_command() utility in gates/__init__.py"
+  components:
+    - path: src/raise_cli/gates/builtin/tests.py
+      action: modify
+      changes: >
+        Import load_manifest and shlex. Add _get_command(context) method that
+        reads project.test_command from manifest, falls back to ['pytest', '-x', '--tb=short'].
+        Use _get_command() result in evaluate() instead of hardcoded list.
+    - path: src/raise_cli/gates/builtin/lint.py
+      action: modify
+      changes: >
+        Same pattern. Reads project.lint_command, falls back to ['ruff', 'check', '.'].
+    - path: src/raise_cli/gates/builtin/types.py
+      action: modify
+      changes: >
+        Same pattern. Reads project.type_check_command, falls back to ['pyright'].
+    - path: src/raise_cli/gates/builtin/coverage.py
+      action: modify
+      changes: >
+        Reads project.test_command, appends coverage flags ['--cov', '--cov-report=term-missing', '-q'],
+        falls back to ['pytest', '--cov', '--cov-report=term-missing', '-q'].
+refs:
+  epic_scope: work/epics/e476-skillset-evolution/scope.md
+  related_artifacts:
+    - work/epics/e476-skillset-evolution/stories/s476.1-story.md
+    - work/epics/e476-skillset-evolution/stories/s476.1-scope.md
+    - work/epics/e476-skillset-evolution/design.md
