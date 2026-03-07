@@ -253,6 +253,163 @@ class TestCoverageGate:
 
 
 # ---------------------------------------------------------------------------
+# Manifest-driven commands (RAISE-476, S476.1)
+# ---------------------------------------------------------------------------
+
+
+class TestTestGateManifest:
+    """TestGate reads test_command from manifest."""
+
+    def test_uses_manifest_command(self, tmp_path: object) -> None:
+        from raise_cli.gates.builtin.tests import TestGate
+
+        gate = TestGate()
+        ctx = GateContext(gate_id="gate-tests")
+        manifest = _manifest_with(test_command="npm test")
+        with (
+            patch("raise_cli.gates.builtin.tests.load_manifest", return_value=manifest),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == ["npm", "test"]
+
+    def test_falls_back_without_manifest(self) -> None:
+        from raise_cli.gates.builtin.tests import TestGate
+
+        gate = TestGate()
+        ctx = GateContext(gate_id="gate-tests")
+        with (
+            patch("raise_cli.gates.builtin.tests.load_manifest", return_value=None),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == ["pytest", "-x", "--tb=short"]
+
+
+class TestLintGateManifest:
+    """LintGate reads lint_command from manifest."""
+
+    def test_uses_manifest_command(self) -> None:
+        from raise_cli.gates.builtin.lint import LintGate
+
+        gate = LintGate()
+        ctx = GateContext(gate_id="gate-lint")
+        manifest = _manifest_with(lint_command="eslint src/")
+        with (
+            patch("raise_cli.gates.builtin.lint.load_manifest", return_value=manifest),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == ["eslint", "src/"]
+
+    def test_falls_back_without_manifest(self) -> None:
+        from raise_cli.gates.builtin.lint import LintGate
+
+        gate = LintGate()
+        ctx = GateContext(gate_id="gate-lint")
+        with (
+            patch("raise_cli.gates.builtin.lint.load_manifest", return_value=None),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == ["ruff", "check", "."]
+
+
+class TestTypeGateManifest:
+    """TypeGate reads type_check_command from manifest."""
+
+    def test_uses_manifest_command(self) -> None:
+        from raise_cli.gates.builtin.types import TypeGate
+
+        gate = TypeGate()
+        ctx = GateContext(gate_id="gate-types")
+        manifest = _manifest_with(type_check_command="tsc --noEmit")
+        with (
+            patch("raise_cli.gates.builtin.types.load_manifest", return_value=manifest),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == ["tsc", "--noEmit"]
+
+    def test_falls_back_without_manifest(self) -> None:
+        from raise_cli.gates.builtin.types import TypeGate
+
+        gate = TypeGate()
+        ctx = GateContext(gate_id="gate-types")
+        with (
+            patch("raise_cli.gates.builtin.types.load_manifest", return_value=None),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == ["pyright"]
+
+
+class TestCoverageGateManifest:
+    """CoverageGate reads test_command and appends coverage flags."""
+
+    def test_uses_manifest_command_with_cov_flags(self) -> None:
+        from raise_cli.gates.builtin.coverage import CoverageGate
+
+        gate = CoverageGate()
+        ctx = GateContext(gate_id="gate-coverage")
+        manifest = _manifest_with(test_command="npm test")
+        with (
+            patch(
+                "raise_cli.gates.builtin.coverage.load_manifest",
+                return_value=manifest,
+            ),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == [
+            "npm",
+            "test",
+            "--cov",
+            "--cov-report=term-missing",
+            "-q",
+        ]
+
+    def test_falls_back_without_manifest(self) -> None:
+        from raise_cli.gates.builtin.coverage import CoverageGate
+
+        gate = CoverageGate()
+        ctx = GateContext(gate_id="gate-coverage")
+        with (
+            patch(
+                "raise_cli.gates.builtin.coverage.load_manifest",
+                return_value=None,
+            ),
+            patch("subprocess.run", return_value=_completed_process(0)) as mock,
+        ):
+            gate.evaluate(ctx)
+        assert mock.call_args[0][0] == [
+            "pytest",
+            "--cov",
+            "--cov-report=term-missing",
+            "-q",
+        ]
+
+
+def _manifest_with(
+    *,
+    test_command: str | None = None,
+    lint_command: str | None = None,
+    type_check_command: str | None = None,
+) -> object:
+    """Create a minimal ProjectManifest-like object for testing."""
+    from raise_cli.onboarding.manifest import ProjectInfo, ProjectManifest
+
+    project = ProjectInfo(
+        name="test-project",
+        project_type="greenfield",
+        test_command=test_command,
+        lint_command=lint_command,
+        type_check_command=type_check_command,
+    )
+    return ProjectManifest(project=project)
+
+
+# ---------------------------------------------------------------------------
 # Entry point discovery
 # ---------------------------------------------------------------------------
 
