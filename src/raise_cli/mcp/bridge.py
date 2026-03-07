@@ -14,17 +14,28 @@ import logging
 import subprocess
 import time
 from contextlib import AsyncExitStack
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 try:
     import logfire_api as logfire
 except ModuleNotFoundError:  # pragma: no cover
     logfire = None  # type: ignore[assignment]
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
-from mcp.types import TextContent
 
 from raise_cli.mcp.models import McpHealthResult, McpToolInfo, McpToolResult
+
+_MCP_AVAILABLE = False
+
+try:
+    from mcp import ClientSession, StdioServerParameters
+    from mcp.client.stdio import stdio_client
+    from mcp.types import TextContent
+
+    _MCP_AVAILABLE = True  # pyright: ignore[reportConstantRedefinition]
+except ModuleNotFoundError:  # pragma: no cover
+    if TYPE_CHECKING:
+        from mcp import ClientSession, StdioServerParameters
+        from mcp.client.stdio import stdio_client
+        from mcp.types import TextContent
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +63,11 @@ class McpBridge:
         server_args: list[str] | None = None,
         env: dict[str, str] | None = None,
     ) -> None:
+        if not _MCP_AVAILABLE:
+            raise McpBridgeError(
+                "The 'mcp' package is required but not installed. "
+                "Install it with: pip install raise-cli[mcp]"
+            )
         self._server_command = server_command
         self._server_args = server_args or []
         self._env = env  # None = subprocess inherits os.environ
