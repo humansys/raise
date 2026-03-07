@@ -7,10 +7,14 @@ Architecture: ADR-039 §5 (Built-in gates), S248.6
 
 from __future__ import annotations
 
+import shlex
 import subprocess
 from typing import ClassVar
 
 from raise_cli.gates.models import GateContext, GateResult
+from raise_cli.onboarding.manifest import load_manifest
+
+_DEFAULT_CMD = ["pyright"]
 
 
 class TypeGate:
@@ -23,11 +27,17 @@ class TypeGate:
     description: ClassVar[str] = "No type errors"
     workflow_point: ClassVar[str] = "before:release:publish"
 
+    def _get_command(self, context: GateContext) -> list[str]:
+        manifest = load_manifest(context.working_dir)
+        if manifest and manifest.project.type_check_command:
+            return shlex.split(manifest.project.type_check_command)
+        return _DEFAULT_CMD
+
     def evaluate(self, context: GateContext) -> GateResult:
-        """Run pyright and return pass/fail result."""
+        """Run type check command and return pass/fail result."""
         try:
             result = subprocess.run(
-                ["pyright"],
+                self._get_command(context),
                 capture_output=True,
                 text=True,
                 cwd=str(context.working_dir),
