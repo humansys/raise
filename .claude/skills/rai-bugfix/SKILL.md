@@ -97,11 +97,13 @@ Regression test task listed first. Each task independently committable.
 
 Execute plan tasks in order. Per task: RED (failing regression test) → GREEN (minimal fix) → REFACTOR. Verify and commit before moving on:
 
-```bash
-<test-runner>     # e.g. uv run pytest, npm test, go test ./..., cargo test
-<linter>          # e.g. ruff check src/, eslint src/, golangci-lint run
-<type-checker>    # e.g. pyright, tsc --noEmit, mypy src/
-```
+Resolve verification commands using this priority chain:
+
+1. **Check `.raise/manifest.yaml`** for `project.test_command`, `project.lint_command`, `project.type_check_command` — if set, use directly
+2. **Detect language** from `project.project_type` in manifest, or scan file extensions
+3. **Map language to default** (see `/rai-story-implement` Step 3 for the full table)
+
+The manifest always wins when present.
 
 <verification>
 All tasks committed. All gates pass. Bug no longer reproduces.

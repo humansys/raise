@@ -15,8 +15,12 @@ metadata:
   raise.next: story-review
   raise.gate: gate-code
   raise.adaptable: "true"
-  raise.version: "2.0.0"
+  raise.version: "2.2.0"
   raise.visibility: public
+  raise.inputs: |
+    - plan_md: file_path, required, previous_skill
+  raise.outputs: |
+    - code_commits: list, git
 ---
 
 # Implement: Development Workflow
@@ -46,7 +50,7 @@ Execute the implementation plan task by task with TDD, producing verified code t
 Load the implementation plan and query relevant patterns:
 
 ```bash
-rai graph query "testing quality behavior patterns" --types pattern,guardrail --limit 5
+rai graph query "testing coverage type annotations" --types pattern,guardrail --limit 5
 ```
 
 If a design document exists, restate the design intent in 2-3 sentences and confirm with the human before proceeding. One unvalidated assumption can waste an entire task cycle.
@@ -61,20 +65,25 @@ For the next uncompleted task in plan order:
 
 Follow project rules, guardrails, and established patterns.
 
-**Test quality heuristic:** Each test must assert observable behavior, not implementation details.
-
-**Anti-patterns to avoid (muda):**
-- Constant assertions: `assert "x" == "x"` — always passes, catches nothing
-- Mock-implementation tests: only verify an internal call was made, not the outcome
-- Magic-number counts: `assert len(items) == 21` — brittle, not behavioral
-- Happy-path-only: missing boundary cases (empty input, one item, many items, error)
-
 ### Step 3: Verify Task
 
-Run the verification defined in the plan:
-- Unit tests (`pytest`)
-- Linting (`ruff check`)
-- Type checking (`pyright`)
+Run the verification defined in the plan. Resolve commands using this priority chain:
+
+1. **Check `.raise/manifest.yaml`** for `project.test_command`, `project.lint_command`, `project.type_check_command` — if set, use directly
+2. **Detect language** from `project.project_type` in manifest, or scan file extensions
+3. **Map language to default:**
+
+| Language | Test | Lint | Type Check |
+|----------|------|------|------------|
+| Python | `uv run pytest --tb=short` | `uv run ruff check` | `uv run pyright` |
+| TypeScript | `npx vitest run` | `npx eslint src/` | `npx tsc --noEmit` |
+| JavaScript | `npx vitest run` | `npx eslint src/` | — |
+| C# | `dotnet test` | `dotnet format --check` | `dotnet build` |
+| Go | `go test ./...` | `golangci-lint run` | `go vet ./...` |
+| PHP | `vendor/bin/phpunit` | `php-cs-fixer check` | `vendor/bin/phpstan` |
+| Dart | `flutter test` | `dart fix --dry-run` | `dart analyze` |
+
+The manifest always wins when present. The table is a fallback.
 
 If verification fails: fix and re-verify (max 3 attempts before escalating).
 
@@ -104,7 +113,7 @@ If verification fails: fix and re-verify (max 3 attempts before escalating).
 ## Quality Checklist
 
 - [ ] Plan loaded and design intent confirmed (if design exists)
-- [ ] TDD cycle followed for each task (RED → GREEN → REFACTOR) — each test asserts observable behavior
+- [ ] TDD cycle followed for each task (RED → GREEN → REFACTOR)
 - [ ] Each task committed individually (not batched at story end)
 - [ ] All verifications pass (tests, lint, types)
 - [ ] Progress log updated with actuals

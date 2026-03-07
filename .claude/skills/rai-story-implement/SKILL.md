@@ -67,10 +67,23 @@ Follow project rules, guardrails, and established patterns.
 
 ### Step 3: Verify Task
 
-Run the verification defined in the plan:
-- Unit tests (`pytest`)
-- Linting (`ruff check`)
-- Type checking (`pyright`)
+Run the verification defined in the plan. Resolve commands using this priority chain:
+
+1. **Check `.raise/manifest.yaml`** for `project.test_command`, `project.lint_command`, `project.type_check_command` — if set, use directly
+2. **Detect language** from `project.project_type` in manifest, or scan file extensions
+3. **Map language to default:**
+
+| Language | Test | Lint | Type Check |
+|----------|------|------|------------|
+| Python | `uv run pytest --tb=short` | `uv run ruff check` | `uv run pyright` |
+| TypeScript | `npx vitest run` | `npx eslint src/` | `npx tsc --noEmit` |
+| JavaScript | `npx vitest run` | `npx eslint src/` | — |
+| C# | `dotnet test` | `dotnet format --check` | `dotnet build` |
+| Go | `go test ./...` | `golangci-lint run` | `go vet ./...` |
+| PHP | `vendor/bin/phpunit` | `php-cs-fixer check` | `vendor/bin/phpstan` |
+| Dart | `flutter test` | `dart fix --dry-run` | `dart analyze` |
+
+The manifest always wins when present. The table is a fallback.
 
 If verification fails: fix and re-verify (max 3 attempts before escalating).
 
