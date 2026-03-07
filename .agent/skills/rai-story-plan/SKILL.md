@@ -1,21 +1,27 @@
 ---
-description: 'Decompose user stories into atomic executable tasks, identify dependencies,
-  and create a deterministic implementation plan. Use after /rai-story-design has
-  grounded the story''s integration decisions.
-
-  '
-license: MIT
-metadata:
-  raise.adaptable: 'true'
-  raise.fase: '5'
-  raise.frequency: per-story
-  raise.gate: gate-plan
-  raise.next: story-implement
-  raise.prerequisites: project-backlog
-  raise.version: 2.1.0
-  raise.visibility: public
-  raise.work_cycle: story
 name: rai-story-plan
+description: >
+  Decompose user stories into atomic executable tasks, identify dependencies,
+  and create a deterministic implementation plan. Use after /rai-story-design
+  has grounded the story's integration decisions.
+
+license: MIT
+
+metadata:
+  raise.work_cycle: story
+  raise.frequency: per-story
+  raise.fase: "5"
+  raise.prerequisites: project-backlog
+  raise.next: story-implement
+  raise.gate: gate-plan
+  raise.adaptable: "true"
+  raise.version: "2.1.0"
+  raise.visibility: public
+  raise.inputs: |
+    - design_md: file_path, optional, previous_skill
+    - story_md: file_path, required, story-start
+  raise.outputs: |
+    - plan_md: file_path, next_skill
 ---
 
 # Story Plan
@@ -71,7 +77,7 @@ Divide story into atomic, individually verifiable tasks. One commit per task.
 - Description, files to create/modify
 - TDD cycle: RED (failing test) → GREEN (minimal code) → REFACTOR
 - AC reference: link to `story.md` Gherkin scenario (if exists)
-- Verification command (`pytest`, `ruff check`, `pyright`)
+- Verification commands (resolve from `.raise/manifest.yaml` first, then language defaults — see `/rai-story-implement` Step 3 for the full priority chain)
 - Size (XS/S/M/L) and dependencies
 
 **Always include as final task:** Manual integration test — validate end-to-end with running software.
