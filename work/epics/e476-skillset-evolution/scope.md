@@ -49,3 +49,48 @@ Dependency graph: `S476.1 ──┐`  `S476.2 ──→ S476.3 ──→ S476.4`
 | Breaking existing gate behavior during refactor | Medium | High | TDD — regression tests before any change |
 | Skillset overlay mechanism not working as expected | Low | Medium | Test with actual `rai skill set create` before relying on it |
 | Manifest not available in all contexts (e.g., no .raise/) | Low | Low | Fallback to current hardcoded defaults — graceful degradation |
+
+---
+
+## Implementation Plan
+
+### Sequence
+
+| Order | Story | Rationale | Enables |
+|-------|-------|-----------|---------|
+| 1 | S476.1 — Builtin gates read manifest | Risk-first: modifying Python code (TDD), validates manifest-reading pattern | M1 |
+| 2 | S476.2 — Skills use manifest-first | Extends pattern validated in S476.1 to skill markdown | M2 |
+| 3 | S476.3 — Create raise-dev skillset | Depends on S476.2 (skills must be language-agnostic first) | M3 |
+| 4 | S476.4 — Create raise-dev-ts example | Demonstrates extensibility, depends on S476.3 | M3 |
+| 5 | S476.5 — Skillset documentation | Depends on S476.3 existing as reference | M3 |
+
+**Critical path:** S476.1 → S476.2 → S476.3 → (S476.4 + S476.5 parallel)
+
+**Parallel opportunity:** S476.4 and S476.5 are independent of each other.
+
+### Milestones
+
+#### M1: Gates Configurable
+- **Stories:** S476.1
+- **Success:** `rai gate check --all` reads manifest commands; hardcoded defaults still work when no manifest
+- **Demo:** Change `project.test_command` in manifest, `rai gate check gate-tests` uses the new command
+
+#### M2: Skills Language-Agnostic
+- **Stories:** S476.1 + S476.2
+- **Success:** Core skills (implement, plan, bugfix) reference manifest, not hardcoded tools
+- **Demo:** A non-Python project with manifest config can use `/rai-story-implement` without editing skills
+
+#### M3: Epic Complete
+- **Stories:** All (S476.1-5)
+- **Success:** All done criteria met
+- **Demo:** `raise-dev` and `raise-dev-ts` skillsets exist; documentation complete
+
+### Progress Tracking
+
+| Story | Status | Branch | Notes |
+|-------|--------|--------|-------|
+| S476.1 | pending | — | |
+| S476.2 | pending | — | |
+| S476.3 | pending | — | |
+| S476.4 | pending | — | |
+| S476.5 | pending | — | |
