@@ -9,6 +9,7 @@ All platform guards live here. Import from compat, not from fcntl/msvcrt.
 from __future__ import annotations
 
 import sys
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import IO
 
@@ -64,3 +65,31 @@ def secure_permissions(path: Path) -> None:
     """
     if not IS_WINDOWS:
         path.chmod(0o600)
+
+
+_LEGACY_PACKAGES = ("rai-cli", "rai-core")
+
+
+def check_legacy_packages() -> str | None:
+    """Detect co-installed legacy packages from pre-rename era.
+
+    Returns a warning message with uninstall instructions if legacy
+    packages are found, or None if the environment is clean.
+    """
+    found: list[str] = []
+    for pkg in _LEGACY_PACKAGES:
+        try:
+            ver = version(pkg)
+            found.append(f"{pkg}=={ver}")
+        except PackageNotFoundError:
+            continue
+
+    if not found:
+        return None
+
+    names = " ".join(pkg.split("==")[0] for pkg in found)
+    return (
+        f"Legacy packages detected: {', '.join(found)}. "
+        f"These conflict with raise-cli and cause stale entry point warnings. "
+        f"Remove them with: pip uninstall -y {names}"
+    )

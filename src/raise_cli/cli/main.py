@@ -139,6 +139,13 @@ def main(
     global _current_output_format  # noqa: PLW0603
     _current_output_format = format.value  # type: ignore[assignment]
 
+    # Check for co-installed legacy packages (RAISE-482)
+    from raise_cli.compat import check_legacy_packages
+
+    legacy_warning = check_legacy_packages()
+    if legacy_warning:
+        console.print(f"[yellow]Warning:[/yellow] {legacy_warning}")
+
     # Calculate verbosity from flags
     verbosity = -1 if quiet else min(verbose, 3)
 
