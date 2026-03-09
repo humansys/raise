@@ -1,77 +1,66 @@
 ---
-title: "RaiSE v2.2.2: The One Where We Listened"
-description: "Session tracking fixes, automatic skill sync on upgrade, graph integrity enforcement, and — the source code is now public on GitHub."
+title: "RaiSE v2.2.2: Reliability, Transparency, and Open Source"
+description: "Improved session continuity, automatic upgrades, graph integrity, and the source code is now public on GitHub."
 pubDate: 2026-03-09
-tags: ["release", "v2.2.2", "bugfixes", "open-source"]
+tags: ["release", "v2.2.2", "open-source"]
 draft: false
-author: "Rai"
+author: "Emilio Osorio"
 ---
 
 # RaiSE v2.2.2
 
-This is a patch release. No new features to announce. Just fixes for things that should have worked correctly from the start.
+RaiSE is a lean methodology and toolkit for AI-assisted software engineering. If you're new here — welcome. This is a good release to start with.
 
-We think that matters more.
+v2.2.2 focuses on reliability. No new features. Just making the ones you already use work better, especially when you change machines, upgrade, or work across multiple projects.
 
-## What broke and why
+## Seamless upgrades
 
-### Session tracking had a single point of failure
+Previously, after upgrading RaiSE (`pipx upgrade raise-cli`), your project's skills stayed at the old version until you manually ran `rai init`. Easy to forget, hard to diagnose.
 
-If you changed machines, cloned your repo fresh, or hit the gitignore at the wrong time, your session counter silently reset to `SES-001`. Pattern references pointing to `SES-009` or `SES-024` suddenly meant nothing. You wouldn't even notice — the corruption was silent.
-
-**Root cause:** `get_next_id()` derived the next session ID exclusively from `index.jsonl`. No file, no history. We added a filesystem fallback that scans sibling `SES-XXX/` directories. Your counter never resets now, even if the index file is lost.
-
-### Migration created phantom sessions
-
-The flat-to-per-session migration moved your state into the *new* session's directory instead of the *previous* session's. This created a ghost session that generated stale warnings every time you started a new one. Three warnings. Every time.
-
-**Fix:** Migration now reads `last_session.id` from your state file and puts things where they belong.
-
-### Pattern IDs were lies
-
-When you captured patterns during session close, `patterns_captured` said `["PAT-SES-024", "PAT-SES-024", "PAT-SES-024"]` — the same fake ID repeated N times. The real IDs from `append_pattern()` were being thrown away.
-
-**Fix:** Three lines changed. Now captures the actual IDs.
-
-### Graph build silently overwrote nodes
-
-Two epics sharing a numeric prefix (like `e08-prelaunch` and `e08-website`) generated the same node ID. The graph builder emitted a WARNING and kept going, silently discarding one of them.
-
-**Fix:** Duplicate node IDs are now errors. The build stops, tells you exactly which files collide, and waits for you to fix the data. This is what Jidoka means — stop on defects.
-
-## What we added
-
-### Automatic skill sync on upgrade
-
-This was the big one. After `pipx upgrade raise-cli`, your project skills stayed at the old version until you manually ran `rai init`. Most people didn't know they had to do this.
-
-Now `rai session start` detects the version mismatch and syncs automatically. The dpkg three-hash algorithm protects your customizations — if you modified a skill, it keeps your version. If you didn't, it updates silently.
+Now `rai session start` detects the mismatch and syncs automatically. If you've customized a skill, your version is preserved. If you haven't, it updates silently.
 
 ```
 $ rai session start --project . --context
 Skills synced to 2.2.2 (3 updated, 1 new)
 ```
 
-That's it. No manual steps. Your tools are always current.
+No manual steps. Your tools stay current.
 
-## The small things
+## Session continuity
 
-- Journal entry types (`decision`, `insight`, `task_done`, `note`) are now documented in the CLI quick reference. No more guessing `--type task` and getting errors.
-- MCP health check failures show "not connected" instead of Python tracebacks.
-- The bugfix and debug skills referenced `--type behavioral` for patterns — a type that doesn't exist. Fixed to `--type process`.
-- The release gate now uses system `twine` instead of requiring it as a project dependency.
+Sessions are how RaiSE maintains context between working periods — what you were doing, what patterns you've learned, what decisions were made. Three bugs were affecting this continuity:
 
-## Source code is public
+- **Counter resilience:** Changing machines or cloning fresh could reset your session counter, breaking references to previous sessions. The counter now has a filesystem fallback and never resets silently.
+- **Migration accuracy:** Moving to the new per-session storage format could create a phantom session entry, generating false warnings on every start. Fixed — migrations now preserve the correct session identity.
+- **Pattern tracking:** Patterns captured during session close were recorded with placeholder IDs instead of their real identifiers. Now tracks accurately.
 
-The [GitHub repository](https://github.com/humansys/raise) is now open. The "coming soon" placeholder in the footer was there for months. It's gone now.
+These were silent issues. You might not have noticed them, but they affected the quality of your session history.
 
-This means you can read every line of code behind every decision. The skills that guide your work, the graph builder that organizes your knowledge, the session tracking that maintains continuity — it's all there. File issues, read the tests, judge the craft.
+## Graph integrity
 
-We believe that a framework asking you to trust AI-assisted development should itself be fully transparent. Now it is.
+The knowledge graph is the backbone of RaiSE context — it connects governance documents, patterns, epics, stories, and code structure. If two source files generated the same node ID, the graph builder would silently discard one.
+
+Now it stops and tells you exactly where the collision is. We believe in [Jidoka](https://en.wikipedia.org/wiki/Jidoka) — stop on defects, don't let them propagate.
+
+## Quality of life
+
+- CLI quick reference now documents all journal entry types (`decision`, `insight`, `task_done`, `note`), so your AI agent doesn't have to guess.
+- MCP server health checks report "not connected" instead of showing raw error traces.
+- Internal skill documentation corrected for pattern type references.
+
+## Source code is now public
+
+The [GitHub repository](https://github.com/humansys/raise) is open.
+
+We believe a framework that asks you to trust AI-assisted development should itself be fully transparent. Read the code, file issues, judge the craft.
+
+Every skill, every graph builder, every session tracker — it's all there.
 
 ---
 
-**Upgrade:** `pipx upgrade raise-cli`
+**New to RaiSE?** `pipx install raise-cli && rai init`
+
+**Already using it?** `pipx upgrade raise-cli`
 
 **Full changelog:** [CHANGELOG.md](https://github.com/humansys/raise/blob/main/CHANGELOG.md)
 
