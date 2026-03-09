@@ -360,8 +360,6 @@ def get_next_id(
     # Guards against counter reset when index.jsonl is lost (RAISE-502).
     parent = file_path.parent
     if parent.is_dir():
-        import re
-
         dir_pattern = re.compile(rf"^{re.escape(full_prefix)}(\d+)$")
         for entry in parent.iterdir():
             if entry.is_dir():

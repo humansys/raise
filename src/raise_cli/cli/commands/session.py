@@ -16,7 +16,10 @@ Example:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
+
+if TYPE_CHECKING:
+    from raise_cli.onboarding.skills import SkillScaffoldResult
 
 import typer
 
@@ -48,11 +51,11 @@ from raise_cli.session.state import (
 )
 
 
-def _maybe_sync_skills(project_path: Path) -> object | None:
+def _maybe_sync_skills(project_path: Path) -> SkillScaffoldResult | None:
     """Auto-sync skills if CLI version is newer than last deployed version.
 
     Compares raise_cli.__version__ against .raise/manifests/skills.json.
-    If CLI is newer, runs scaffold_skills + regenerates CLAUDE.md.
+    If CLI is newer, runs scaffold_skills for each detected agent.
 
     Returns:
         SkillScaffoldResult if sync happened, None if skipped.
@@ -70,7 +73,7 @@ def _maybe_sync_skills(project_path: Path) -> object | None:
 
     # Version mismatch — sync skills
     from raise_cli.config.agent_registry import load_registry
-    from raise_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
+    from raise_cli.onboarding.skills import scaffold_skills
 
     registry = load_registry(project_root=project_path)
     agent_types = registry.detect_agents(project_path)
