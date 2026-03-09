@@ -37,5 +37,5 @@
 
 ## Source
 
-- [GitHub](https://github.com/humansys-ai/raise-commons): Source code
+- [GitHub](https://github.com/humansys/raise): Source code
 - [PyPI](https://pypi.org/project/rai-cli/): Python package
