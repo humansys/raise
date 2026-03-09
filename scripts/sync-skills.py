@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Sync public skills from .claude/skills/ to src/rai_cli/skills_base/
+"""Sync public skills from .claude/skills/ to src/raise_cli/skills_base/
 
 This script filters skills by visibility metadata and syncs only public skills
 to the distribution package. Internal skills (rai-framework-sync, rai-publish)
@@ -12,7 +12,7 @@ The script:
 1. Reads all skills from .claude/skills/
 2. Parses YAML frontmatter to extract raise.visibility
 3. Filters to only visibility: public skills
-4. Syncs SKILL.md files to src/rai_cli/skills_base/
+4. Syncs SKILL.md files to src/raise_cli/skills_base/
 5. Updates DISTRIBUTABLE_SKILLS list in __init__.py
 
 Exit codes:
@@ -110,7 +110,7 @@ def sync_skills(
 
     Args:
         source_dir: Path to .claude/skills/
-        target_dir: Path to src/rai_cli/skills_base/
+        target_dir: Path to src/raise_cli/skills_base/
         public_skills: List of public skill names to sync
         dry_run: If True, print actions without executing
     """
@@ -144,7 +144,7 @@ def update_distributable_list(
     """Update DISTRIBUTABLE_SKILLS list in __init__.py.
 
     Args:
-        target_dir: Path to src/rai_cli/skills_base/
+        target_dir: Path to src/raise_cli/skills_base/
         public_skills: List of public skill names
         dry_run: If True, print actions without executing
     """
@@ -227,9 +227,9 @@ def main() -> int:
     # Resolve paths relative to repo root
     repo_root = Path(__file__).parent.parent
     source_dir = repo_root / ".claude" / "skills"
-    target_dir = repo_root / "src" / "rai_cli" / "skills_base"
+    target_dir = repo_root / "src" / "raise_cli" / "skills_base"
 
-    print("🔄 Syncing skills from .claude/skills/ to src/rai_cli/skills_base/\n")
+    print("🔄 Syncing skills from .claude/skills/ to src/raise_cli/skills_base/\n")
 
     try:
         # Get public skills
