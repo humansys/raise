@@ -371,7 +371,7 @@ class InstructionsGenerator:
         )
         lines.append(
             "- cmd: rai session journal add | sig: TEXT [--type TYPE] "
-            "| notes: add decision/insight/task to session"
+            "| notes: types: decision, insight, task_done, note (default: note)"
         )
         lines.append(
             "- cmd: rai session journal show | sig: [--compact] [--project TEXT] "

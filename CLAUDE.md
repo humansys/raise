@@ -69,7 +69,7 @@ Epics are logical containers (directory + tracker), not branches
 - cmd: rai session start | sig: [--name TEXT] [--project TEXT] [--agent TEXT] [--context] | notes: --name first-time only, --context for bundle
 - cmd: rai session close | sig: [--summary TEXT] [--type TEXT] [--pattern TEXT] [--state-file TEXT] [--session TEXT] | notes: --state-file for structured close, --pattern repeatable
 - cmd: rai session context | sig: --sections/-s TEXT --project/-p TEXT | notes: sections: governance,behavioral,coaching,deadlines,progress
-- cmd: rai session journal add | sig: TEXT [--type TYPE] | notes: add decision/insight/task to session
+- cmd: rai session journal add | sig: TEXT [--type TYPE] | notes: types: decision, insight, task_done, note (default: note)
 - cmd: rai session journal show | sig: [--compact] [--project TEXT] | notes: --compact for post-compaction restore
 
 ### Graph
