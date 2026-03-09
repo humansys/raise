@@ -298,6 +298,53 @@ class TestProcessSessionClosePatternPrefix:
         mp.undo()
 
 
+class TestProcessSessionClosePatternsCaptured:
+    """Tests for patterns_captured in session state after close."""
+
+    def _setup_project(self, tmp_path: Path) -> Path:
+        """Create a project with memory and personal directories."""
+        project = tmp_path / "project"
+        (project / ".raise" / "rai" / "memory" / "sessions").mkdir(parents=True)
+        (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
+        return project
+
+    def test_patterns_captured_contains_real_unique_ids(
+        self, tmp_path: Path
+    ) -> None:
+        """patterns_captured should list actual pattern IDs, not placeholders."""
+        import pytest
+
+        mp = pytest.MonkeyPatch()
+        rai_home = tmp_path / ".rai"
+        mp.setattr("raise_cli.onboarding.profile.get_rai_home", lambda: rai_home)
+
+        project = self._setup_project(tmp_path)
+        profile = DeveloperProfile(name="Emilio", pattern_prefix="E")
+        close_input = CloseInput(
+            summary="test",
+            patterns=[
+                {"description": "First pattern", "type": "process", "context": "a"},
+                {"description": "Second pattern", "type": "technical", "context": "b"},
+                {"description": "Third pattern", "type": "architecture", "context": "c"},
+            ],
+        )
+
+        process_session_close(close_input, profile, project)
+
+        from raise_cli.session.state import load_session_state
+
+        state = load_session_state(project)
+        assert state is not None
+        captured = state.last_session.patterns_captured
+        # Should have 3 unique real IDs
+        assert len(captured) == 3
+        assert len(set(captured)) == 3  # all unique
+        # Each should be a real pattern ID, not a placeholder
+        for pid in captured:
+            assert pid.startswith("PAT-E-"), f"Expected real ID, got {pid}"
+        mp.undo()
+
+
 class TestLoadStateFileCoaching:
     """Tests for load_state_file with coaching observations."""
 
