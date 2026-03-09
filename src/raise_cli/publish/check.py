@@ -33,7 +33,7 @@ _COMMAND_GATES: list[Gate] = [
     Gate(name="Lint clean", command="uv run ruff check src/"),
     Gate(name="Security scan", command="uv run bandit -r src/ -q -ll"),
     Gate(name="Build succeeds", command="uv build"),
-    Gate(name="Package validates", command="uv run twine check dist/*"),
+    Gate(name="Package validates", command="twine check dist/*"),
 ]
 
 
