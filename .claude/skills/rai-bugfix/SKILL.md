@@ -117,7 +117,7 @@ All tasks committed. All gates pass. Bug no longer reproduces.
 
 Verify: fix addresses root cause (not symptom), regression test green, no regressions introduced. Write `work/bugs/RAISE-{N}/retro.md`.
 
-If recurring: `rai pattern add "{causal insight}" --context "{keywords}" --type behavioral --from RAISE-{N}`
+If recurring: `rai pattern add "{causal insight}" --context "{keywords}" --type process --from RAISE-{N}`
 
 <verification>
 Retro written. Pattern emitted if applicable. All gates green.

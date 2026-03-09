@@ -141,7 +141,7 @@ Fix incomplete → document partial fix, create follow-up task.
 
 **Feed `/rai-story-plan`** — after fixing, name the tasks explicitly:
 - Fix task, regression test task, prevention task (if any)
-- Systemic finding: `rai pattern add "[statement]" --context "[keywords]" --type behavioral`
+- Systemic finding: `rai pattern add "[statement]" --context "[keywords]" --type process`
 
 ## Output
 

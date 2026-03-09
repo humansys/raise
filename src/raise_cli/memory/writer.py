@@ -356,6 +356,19 @@ def get_next_id(
                 except (json.JSONDecodeError, ValueError):
                     continue
 
+    # Fallback: scan sibling directories matching {PREFIX}-{NNN} pattern.
+    # Guards against counter reset when index.jsonl is lost (RAISE-502).
+    parent = file_path.parent
+    if parent.is_dir():
+        import re
+
+        dir_pattern = re.compile(rf"^{re.escape(full_prefix)}(\d+)$")
+        for entry in parent.iterdir():
+            if entry.is_dir():
+                m = dir_pattern.match(entry.name)
+                if m:
+                    max_num = max(max_num, int(m.group(1)))
+
     if developer_prefix:
         return f"{prefix}-{developer_prefix}-{max_num + 1:03d}"
     return f"{prefix}-{max_num + 1:03d}"
