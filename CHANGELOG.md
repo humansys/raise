@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Auto-sync skills on `rai session start` when CLI version is newer than deployed skills (RAISE-509)
+
+### Fixed
+- Session counter reset when `index.jsonl` lost — `get_next_id` now scans sibling directories as fallback (RAISE-502)
+- Duplicate pattern IDs in `patterns_captured` — now collects real IDs from `append_pattern` results (RAISE-506)
+- Orphan session directory from flat-to-per-session migration — migration now targets `last_session.id` (RAISE-505)
+- Journal entry types documented in CLI quick reference — prevents agent from guessing invalid types (RAISE-485)
+- Invalid `--type behavioral` in bugfix/debug skill docs — replaced with valid `--type process` (RAISE-508)
+- MCP health check errors in session-start skill reported as "not connected" instead of tracebacks (RAISE-508)
+
 ## [2.2.0] - 2026-03-05
 
 ### Added
