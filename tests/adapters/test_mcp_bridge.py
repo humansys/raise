@@ -13,9 +13,11 @@ from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-from mcp.types import TextContent
 
-from raise_cli.adapters.mcp_bridge import (
+mcp_types = pytest.importorskip("mcp.types", reason="mcp extra not installed")
+TextContent = mcp_types.TextContent
+
+from raise_cli.adapters.mcp_bridge import (  # noqa: E402
     McpBridge,
     McpBridgeError,
     McpToolInfo,
