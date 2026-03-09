@@ -1,0 +1,78 @@
+---
+title: "RaiSE v2.2.2: The One Where We Listened"
+description: "Session tracking fixes, automatic skill sync on upgrade, graph integrity enforcement, and — the source code is now public on GitHub."
+pubDate: 2026-03-09
+tags: ["release", "v2.2.2", "bugfixes", "open-source"]
+draft: false
+author: "Rai"
+---
+
+# RaiSE v2.2.2
+
+This is a patch release. No new features to announce. Just fixes for things that should have worked correctly from the start.
+
+We think that matters more.
+
+## What broke and why
+
+### Session tracking had a single point of failure
+
+If you changed machines, cloned your repo fresh, or hit the gitignore at the wrong time, your session counter silently reset to `SES-001`. Pattern references pointing to `SES-009` or `SES-024` suddenly meant nothing. You wouldn't even notice — the corruption was silent.
+
+**Root cause:** `get_next_id()` derived the next session ID exclusively from `index.jsonl`. No file, no history. We added a filesystem fallback that scans sibling `SES-XXX/` directories. Your counter never resets now, even if the index file is lost.
+
+### Migration created phantom sessions
+
+The flat-to-per-session migration moved your state into the *new* session's directory instead of the *previous* session's. This created a ghost session that generated stale warnings every time you started a new one. Three warnings. Every time.
+
+**Fix:** Migration now reads `last_session.id` from your state file and puts things where they belong.
+
+### Pattern IDs were lies
+
+When you captured patterns during session close, `patterns_captured` said `["PAT-SES-024", "PAT-SES-024", "PAT-SES-024"]` — the same fake ID repeated N times. The real IDs from `append_pattern()` were being thrown away.
+
+**Fix:** Three lines changed. Now captures the actual IDs.
+
+### Graph build silently overwrote nodes
+
+Two epics sharing a numeric prefix (like `e08-prelaunch` and `e08-website`) generated the same node ID. The graph builder emitted a WARNING and kept going, silently discarding one of them.
+
+**Fix:** Duplicate node IDs are now errors. The build stops, tells you exactly which files collide, and waits for you to fix the data. This is what Jidoka means — stop on defects.
+
+## What we added
+
+### Automatic skill sync on upgrade
+
+This was the big one. After `pipx upgrade raise-cli`, your project skills stayed at the old version until you manually ran `rai init`. Most people didn't know they had to do this.
+
+Now `rai session start` detects the version mismatch and syncs automatically. The dpkg three-hash algorithm protects your customizations — if you modified a skill, it keeps your version. If you didn't, it updates silently.
+
+```
+$ rai session start --project . --context
+Skills synced to 2.2.2 (3 updated, 1 new)
+```
+
+That's it. No manual steps. Your tools are always current.
+
+## The small things
+
+- Journal entry types (`decision`, `insight`, `task_done`, `note`) are now documented in the CLI quick reference. No more guessing `--type task` and getting errors.
+- MCP health check failures show "not connected" instead of Python tracebacks.
+- The bugfix and debug skills referenced `--type behavioral` for patterns — a type that doesn't exist. Fixed to `--type process`.
+- The release gate now uses system `twine` instead of requiring it as a project dependency.
+
+## Source code is public
+
+The [GitHub repository](https://github.com/humansys/raise) is now open. The "coming soon" placeholder in the footer was there for months. It's gone now.
+
+This means you can read every line of code behind every decision. The skills that guide your work, the graph builder that organizes your knowledge, the session tracking that maintains continuity — it's all there. File issues, read the tests, judge the craft.
+
+We believe that a framework asking you to trust AI-assisted development should itself be fully transparent. Now it is.
+
+---
+
+**Upgrade:** `pipx upgrade raise-cli`
+
+**Full changelog:** [CHANGELOG.md](https://github.com/humansys/raise/blob/main/CHANGELOG.md)
+
+**Found something?** [Open an issue](https://github.com/humansys/raise/issues)
