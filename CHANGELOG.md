@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.2] - 2026-03-09
+
 ### Added
 - Auto-sync skills on `rai session start` when CLI version is newer than deployed skills (RAISE-509)
 
@@ -18,9 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Invalid `--type behavioral` in bugfix/debug skill docs — replaced with valid `--type process` (RAISE-508)
 - MCP health check errors in session-start skill reported as "not connected" instead of tracebacks (RAISE-508)
 - Duplicate node IDs in `rai graph build` now raise error instead of silent overwrite (RAISE-510)
-- `sync-skills.py` path fixed for `raise_cli` rename; `twine` gate uses system install (RAISE-508)
-
-## [2.2.0] - 2026-03-05
+- `sync-skills.py` path fixed for `raise_cli` rename; `twine` gate uses system install (RAISE-508)## [2.2.0] - 2026-03-05
 
 ### Added
 - Complete CLI reference documentation: 17 command group pages covering 72 subcommands (E348)
@@ -164,7 +164,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Note
 - This is an alpha release. APIs and skill interfaces may change.
 
-[Unreleased]: https://github.com/humansys/raise/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/humansys/raise/compare/v2.2.2...HEAD
+[2.2.2]: https://github.com/humansys/raise/compare/v2.2.0...v2.2.2
 [2.2.0]: https://github.com/humansys/raise/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/humansys/raise/compare/v2.0.4...v2.1.0
 [2.0.4]: https://github.com/humansys/raise/compare/v2.0.3...v2.0.4
