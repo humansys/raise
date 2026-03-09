@@ -518,7 +518,11 @@ def build(
 
     # Build unified graph
     builder = GraphBuilder()
-    graph = builder.build()
+    try:
+        graph = builder.build()
+    except ValueError as exc:
+        cli_error(str(exc), exit_code=1)
+        return  # unreachable — cli_error raises
 
     # Count nodes by type
     node_counts: dict[str, int] = {}
