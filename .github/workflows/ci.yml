@@ -27,6 +27,7 @@ jobs:
         run: uv run pytest --tb=short -q
         env:
           COLUMNS: "200"
+          NO_COLOR: "1"
       - name: Lint
         run: uv run ruff check src/ tests/
       - name: Format check
