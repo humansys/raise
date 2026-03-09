@@ -9,7 +9,6 @@ Architecture: ADR-019 Unified Context Graph Architecture
 from __future__ import annotations
 
 import json
-import logging
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -85,17 +84,23 @@ class GraphBuilder:
         # Must run before add_concept() so graph gets enriched copies
         self.load_code_structure(all_nodes)
 
-        # Warn on duplicate node IDs before adding (silent overwrites lose data)
+        # Fail on duplicate node IDs — silent overwrites lose data (RAISE-510)
         seen_ids: dict[str, str] = {}
+        duplicates: list[str] = []
         for node in all_nodes:
             if node.id in seen_ids:
-                logging.warning(
-                    "Duplicate node ID '%s' — '%s' will overwrite '%s'",
-                    node.id,
-                    node.source_file or "unknown",
-                    seen_ids[node.id],
+                duplicates.append(
+                    f"  Duplicate node ID '{node.id}' — "
+                    f"'{node.source_file or 'unknown'}' collides with "
+                    f"'{seen_ids[node.id]}'"
                 )
             seen_ids[node.id] = node.source_file or "unknown"
+
+        if duplicates:
+            raise ValueError(
+                "Duplicate node IDs detected — fix source data before building:\n"
+                + "\n".join(duplicates)
+            )
 
         # Add nodes to graph
         for node in all_nodes:
