@@ -92,9 +92,7 @@ def _maybe_sync_skills(project_path: Path) -> SkillScaffoldResult | None:
         if result.skills_installed:
             parts.append(f"{len(result.skills_installed)} new")
         if parts:
-            typer.echo(
-                f"Skills synced to {cli_version} ({', '.join(parts)})"
-            )
+            typer.echo(f"Skills synced to {cli_version} ({', '.join(parts)})")
 
     return result
 

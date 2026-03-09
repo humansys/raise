@@ -402,7 +402,6 @@ class TestMigrateFlatToSession:
         session_dir = personal_dir / "sessions" / "SES-100"
         assert (session_dir / "state.yaml").exists()
 
-
     def test_migrates_to_last_session_id_not_new_id(self, tmp_path: Path) -> None:
         """Migration target should be last_session.id from state, not the new session ID."""
         from raise_cli.session.state import migrate_flat_to_session
@@ -429,9 +428,7 @@ class TestMigrateFlatToSession:
         assert (correct_dir / "state.yaml").exists()
         assert not wrong_dir.exists()
 
-    def test_falls_back_to_passed_id_when_no_last_session(
-        self, tmp_path: Path
-    ) -> None:
+    def test_falls_back_to_passed_id_when_no_last_session(self, tmp_path: Path) -> None:
         """When flat state has no last_session.id, use the passed session_id."""
         from raise_cli.session.state import migrate_flat_to_session
 

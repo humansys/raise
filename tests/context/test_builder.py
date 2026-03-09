@@ -1393,9 +1393,7 @@ class TestBuild:
         assert node.type == "component"
         assert node.content == "Test component"
 
-    def test_build_raises_on_duplicate_node_ids(
-        self, tmp_path: Path
-    ) -> None:
+    def test_build_raises_on_duplicate_node_ids(self, tmp_path: Path) -> None:
         """Should raise ValueError when duplicate node IDs are detected (RAISE-510)."""
         builder = GraphBuilder(project_root=tmp_path)
 

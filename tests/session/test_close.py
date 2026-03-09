@@ -308,9 +308,7 @@ class TestProcessSessionClosePatternsCaptured:
         (project / ".raise" / "rai" / "personal" / "sessions").mkdir(parents=True)
         return project
 
-    def test_patterns_captured_contains_real_unique_ids(
-        self, tmp_path: Path
-    ) -> None:
+    def test_patterns_captured_contains_real_unique_ids(self, tmp_path: Path) -> None:
         """patterns_captured should list actual pattern IDs, not placeholders."""
         import pytest
 
@@ -325,7 +323,11 @@ class TestProcessSessionClosePatternsCaptured:
             patterns=[
                 {"description": "First pattern", "type": "process", "context": "a"},
                 {"description": "Second pattern", "type": "technical", "context": "b"},
-                {"description": "Third pattern", "type": "architecture", "context": "c"},
+                {
+                    "description": "Third pattern",
+                    "type": "architecture",
+                    "context": "c",
+                },
             ],
         )
 

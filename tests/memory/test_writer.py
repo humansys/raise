@@ -121,9 +121,7 @@ class TestGetNextId:
 
         assert result == "SES-031"
 
-    def test_directory_fallback_ignores_non_matching_dirs(
-        self, tmp_path: Path
-    ) -> None:
+    def test_directory_fallback_ignores_non_matching_dirs(self, tmp_path: Path) -> None:
         """Only directories matching PREFIX-NNN pattern are counted."""
         sessions_dir = tmp_path / "sessions"
         sessions_dir.mkdir()

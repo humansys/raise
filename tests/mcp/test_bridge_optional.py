@@ -27,7 +27,11 @@ def test_bridge_module_importable_without_mcp() -> None:
 
     try:
         # Block mcp imports
-        original_import = __builtins__.__import__ if hasattr(__builtins__, "__import__") else __import__  # type: ignore[union-attr]
+        original_import = (
+            __builtins__.__import__
+            if hasattr(__builtins__, "__import__")
+            else __import__
+        )  # type: ignore[union-attr]
 
         def _mock_import(name: str, *args: object, **kwargs: object) -> object:
             if name == "mcp" or name.startswith("mcp."):

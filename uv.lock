@@ -1238,7 +1238,7 @@ wheels = [
 
 [[package]]
 name = "raise-cli"
-version = "2.2.1"
+version = "2.2.2"
 source = { editable = "." }
 dependencies = [
     { name = "atlassian-python-api" },

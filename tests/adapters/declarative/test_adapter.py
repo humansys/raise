@@ -602,7 +602,9 @@ class TestIsErrorPropagation:
 
         bridge = _mock_bridge()
         bridge.call = AsyncMock(
-            return_value=McpToolResult(is_error=True, error_message="Jira client not available")
+            return_value=McpToolResult(
+                is_error=True, error_message="Jira client not available"
+            )
         )
         adapter = _make_adapter(bridge)
 
