@@ -69,6 +69,73 @@ class TestGetNextId:
 
         assert result == "CAL-006"
 
+    def test_missing_file_with_sibling_dirs_uses_directory_fallback(
+        self, tmp_path: Path
+    ) -> None:
+        """When index.jsonl missing, scan sibling dirs for max ID."""
+        sessions_dir = tmp_path / "sessions"
+        sessions_dir.mkdir()
+        (sessions_dir / "SES-001").mkdir()
+        (sessions_dir / "SES-024").mkdir()
+        file_path = sessions_dir / "index.jsonl"
+
+        result = get_next_id(file_path, "SES")
+
+        assert result == "SES-025"
+
+    def test_empty_file_with_sibling_dirs_uses_directory_fallback(
+        self, tmp_path: Path
+    ) -> None:
+        """When index.jsonl empty, scan sibling dirs for max ID."""
+        sessions_dir = tmp_path / "sessions"
+        sessions_dir.mkdir()
+        (sessions_dir / "SES-010").mkdir()
+        file_path = sessions_dir / "index.jsonl"
+        file_path.touch()
+
+        result = get_next_id(file_path, "SES")
+
+        assert result == "SES-011"
+
+    def test_index_wins_when_higher_than_dirs(self, tmp_path: Path) -> None:
+        """Index max takes precedence when higher than directory max."""
+        sessions_dir = tmp_path / "sessions"
+        sessions_dir.mkdir()
+        (sessions_dir / "SES-005").mkdir()
+        file_path = sessions_dir / "index.jsonl"
+        file_path.write_text('{"id": "SES-020", "topic": "test"}\n')
+
+        result = get_next_id(file_path, "SES")
+
+        assert result == "SES-021"
+
+    def test_dirs_win_when_higher_than_index(self, tmp_path: Path) -> None:
+        """Directory max takes precedence when higher than index max."""
+        sessions_dir = tmp_path / "sessions"
+        sessions_dir.mkdir()
+        (sessions_dir / "SES-030").mkdir()
+        file_path = sessions_dir / "index.jsonl"
+        file_path.write_text('{"id": "SES-005", "topic": "test"}\n')
+
+        result = get_next_id(file_path, "SES")
+
+        assert result == "SES-031"
+
+    def test_directory_fallback_ignores_non_matching_dirs(
+        self, tmp_path: Path
+    ) -> None:
+        """Only directories matching PREFIX-NNN pattern are counted."""
+        sessions_dir = tmp_path / "sessions"
+        sessions_dir.mkdir()
+        (sessions_dir / "SES-010").mkdir()
+        (sessions_dir / "PAT-099").mkdir()
+        (sessions_dir / "random-dir").mkdir()
+        file_path = sessions_dir / "index.jsonl"
+
+        result = get_next_id(file_path, "SES")
+
+        assert result == "SES-011"
+
 
 class TestAppendPattern:
     """Tests for append_pattern function."""
