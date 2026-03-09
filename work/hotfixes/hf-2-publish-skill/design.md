@@ -88,7 +88,7 @@ Proceed? [y/N]: y
 ✓ Pushed to origin
 
 Release v2.1.0 published. GitHub Actions will handle PyPI upload.
-Verify at: https://github.com/humansys-io/raise-commons/actions
+Verify at: https://github.com/humansys/raise/actions
 ```
 
 **Arguments:**
