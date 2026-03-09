@@ -12,6 +12,17 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
+def _disable_rich_colors(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Disable Rich/Typer ANSI output in CLI tests.
+
+    Without this, help output contains ANSI escape codes that break
+    string-match assertions (e.g. assert '--context' in result.output).
+    """
+    monkeypatch.setenv("NO_COLOR", "1")
+    monkeypatch.setenv("TERM", "dumb")
+
+
+@pytest.fixture(autouse=True)
 def _isolate_rai_home(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Redirect get_rai_home to tmp_path for every test.
 
