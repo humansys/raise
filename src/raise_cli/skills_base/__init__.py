@@ -12,16 +12,16 @@ Contents:
     Story lifecycle:    rai-story-start, rai-story-plan, rai-story-design,
                         rai-story-implement, rai-story-review, rai-story-close
     Epic lifecycle:     rai-epic-start, rai-epic-plan, rai-epic-design, rai-epic-close
-    Discovery:          rai-discover-start, rai-discover-scan,
+    Discovery:          rai-discover, rai-discover-start, rai-discover-scan,
                         rai-discover-validate, rai-discover-document
     Onboarding:         rai-project-create, rai-project-onboard, rai-welcome
     Governance:         rai-docs-update
-    Quality:            rai-architecture-review, rai-quality-review
     MCP:                rai-mcp-add, rai-mcp-remove, rai-mcp-status
     Tools:              rai-research, rai-debug, rai-doctor, rai-problem-shape
 
 Note: Internal skills (rai-framework-sync, rai-publish, rai-skillset-manage,
-      rai-bugfix) are excluded from distribution.
+      rai-bugfix, rai-skill-create, rai-architecture-review, rai-quality-review)
+      are excluded from distribution.
 
 Usage:
     from importlib.resources import files
@@ -65,9 +65,6 @@ DISTRIBUTABLE_SKILLS: list[str] = [
     "rai-welcome",
     # Governance
     "rai-docs-update",
-    # Quality
-    "rai-architecture-review",
-    "rai-quality-review",
     # MCP
     "rai-mcp-add",
     "rai-mcp-remove",
