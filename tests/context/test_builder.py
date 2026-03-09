@@ -1393,12 +1393,10 @@ class TestBuild:
         assert node.type == "component"
         assert node.content == "Test component"
 
-    def test_build_warns_on_duplicate_node_ids(
-        self, tmp_path: Path, caplog: pytest.LogCaptureFixture
+    def test_build_raises_on_duplicate_node_ids(
+        self, tmp_path: Path
     ) -> None:
-        """Should warn when duplicate node IDs are detected during build."""
-        import logging
-
+        """Should raise ValueError when duplicate node IDs are detected (RAISE-510)."""
         builder = GraphBuilder(project_root=tmp_path)
 
         duplicate_nodes = [
@@ -1421,14 +1419,9 @@ class TestBuild:
             patch.object(builder, "load_memory", return_value=[]),
             patch.object(builder, "load_skills", return_value=[]),
             patch.object(builder, "load_components", return_value=duplicate_nodes),
-            caplog.at_level(logging.WARNING),
+            pytest.raises(ValueError, match="Duplicate node ID.*comp-test-Foo"),
         ):
-            graph = builder.build()
-
-        # Graph has only 1 node (second overwrites first)
-        assert graph.node_count == 1
-        # Warning was emitted
-        assert any("comp-test-Foo" in msg for msg in caplog.messages)
+            builder.build()
 
 
 class TestInferRelationships:
