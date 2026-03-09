@@ -47,6 +47,55 @@ from raise_cli.session.state import (
     migrate_flat_to_session,
 )
 
+
+def _maybe_sync_skills(project_path: Path) -> object | None:
+    """Auto-sync skills if CLI version is newer than last deployed version.
+
+    Compares raise_cli.__version__ against .raise/manifests/skills.json.
+    If CLI is newer, runs scaffold_skills + regenerates CLAUDE.md.
+
+    Returns:
+        SkillScaffoldResult if sync happened, None if skipped.
+    """
+    from raise_cli.onboarding.skill_manifest import load_skill_manifest
+
+    manifest = load_skill_manifest(project_path)
+    if manifest is None:
+        return None
+
+    from raise_cli import __version__ as cli_version
+
+    if manifest.raise_cli_version == cli_version:
+        return None
+
+    # Version mismatch — sync skills
+    from raise_cli.config.agent_registry import load_registry
+    from raise_cli.onboarding.skills import SkillScaffoldResult, scaffold_skills
+
+    registry = load_registry(project_root=project_path)
+    agent_types = registry.detect_agents(project_path)
+    result: SkillScaffoldResult | None = None
+
+    for agent_type in agent_types:
+        config = registry.get_config(agent_type)
+        plugin = registry.get_plugin(agent_type)
+        result = scaffold_skills(project_path, agent_config=config, plugin=plugin)
+
+    # Report what happened
+    if result is not None:
+        parts: list[str] = []
+        if result.skills_updated:
+            parts.append(f"{len(result.skills_updated)} updated")
+        if result.skills_installed:
+            parts.append(f"{len(result.skills_installed)} new")
+        if parts:
+            typer.echo(
+                f"Skills synced to {cli_version} ({', '.join(parts)})"
+            )
+
+    return result
+
+
 session_app = typer.Typer(
     name="session",
     help="Manage working sessions",
@@ -171,6 +220,10 @@ def start(
             if not validation.is_valid:
                 typer.echo(f"Warning: {validation.summary()}")
                 typer.echo("Run `raise memory validate` to fix data quality issues.\n")
+
+    # Auto-sync skills if CLI was upgraded (RAISE-509)
+    if project is not None:
+        _maybe_sync_skills(Path(project))
 
     # Increment session count
     updated = increment_session(profile, project_path=project)
