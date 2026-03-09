@@ -12,6 +12,7 @@ from __future__ import annotations
 import logging
 import shutil
 from pathlib import Path
+from typing import cast
 
 import yaml
 from pydantic import ValidationError
@@ -68,12 +69,16 @@ def migrate_flat_to_session(project_path: Path, session_id: str) -> bool:
     """One-time migration from flat layout to per-session directory.
 
     Moves:
-    - personal/session-state.yaml → personal/sessions/{session_id}/state.yaml
-    - personal/telemetry/signals.jsonl → personal/sessions/{session_id}/signals.jsonl
+    - personal/session-state.yaml → personal/sessions/{target_id}/state.yaml
+    - personal/telemetry/signals.jsonl → personal/sessions/{target_id}/signals.jsonl
+
+    The target directory is determined by last_session.id in the flat state file
+    (the session the state actually belongs to). Falls back to session_id if
+    last_session.id is not available. This prevents orphan directories (RAISE-505).
 
     Args:
         project_path: Absolute path to the project root.
-        session_id: Session ID for the target per-session directory.
+        session_id: Fallback session ID when last_session.id is unavailable.
 
     Returns:
         True if migration occurred, False if nothing to migrate.
@@ -86,8 +91,22 @@ def migrate_flat_to_session(project_path: Path, session_id: str) -> bool:
     if not flat_state.exists() and not flat_signals.exists():
         return False
 
+    # Determine target ID from flat state's last_session.id
+    target_id = session_id
+    if flat_state.exists():
+        try:
+            content = yaml.safe_load(flat_state.read_text(encoding="utf-8"))
+            if isinstance(content, dict) and "last_session" in content:
+                last = cast(object, content["last_session"])
+                if isinstance(last, dict) and "id" in last:
+                    last_id = cast(object, last["id"])
+                    if isinstance(last_id, str) and last_id:
+                        target_id = last_id
+        except (yaml.YAMLError, OSError):
+            pass  # Fall back to passed session_id
+
     # Don't migrate if session dir already exists
-    session_dir = get_session_dir(session_id, project_path)
+    session_dir = get_session_dir(target_id, project_path)
     if session_dir.exists():
         return False
 
