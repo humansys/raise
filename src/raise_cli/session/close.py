@@ -154,6 +154,7 @@ def process_session_close(
     result.messages.append(f"Session {session_result.id} recorded")
 
     # 2. Append patterns
+    pattern_ids: list[str] = []
     for pat_data in close_input.patterns:
         description = pat_data.get("description", "")
         if not description:
@@ -175,6 +176,7 @@ def process_session_close(
         pat_result: WriteResult = append_pattern(
             memory_dir, pat_input, developer_prefix=profile.get_pattern_prefix()
         )
+        pattern_ids.append(pat_result.id)
         result.patterns_added += 1
         result.messages.append(f"Pattern {pat_result.id} added")
 
@@ -250,9 +252,7 @@ def process_session_close(
             date=date.today(),
             developer=profile.name,
             summary=close_input.summary,
-            patterns_captured=[f"PAT-{result.session_id}" for _ in close_input.patterns]
-            if close_input.patterns
-            else [],
+            patterns_captured=pattern_ids,
         ),
         pending=pending,
         notes=close_input.notes,
