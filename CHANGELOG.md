@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Journal entry types documented in CLI quick reference — prevents agent from guessing invalid types (RAISE-485)
 - Invalid `--type behavioral` in bugfix/debug skill docs — replaced with valid `--type process` (RAISE-508)
 - MCP health check errors in session-start skill reported as "not connected" instead of tracebacks (RAISE-508)
+- Duplicate node IDs in `rai graph build` now raise error instead of silent overwrite (RAISE-510)
+- `sync-skills.py` path fixed for `raise_cli` rename; `twine` gate uses system install (RAISE-508)
 
 ## [2.2.0] - 2026-03-05
 
