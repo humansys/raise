@@ -622,6 +622,60 @@ class TestSessionHelp:
         assert "End the current working session" in result.output
 
 
+class TestSessionStartAutoSyncSkills:
+    """Tests for auto-syncing skills on version mismatch (RAISE-509)."""
+
+    def test_syncs_skills_when_version_mismatch(self, tmp_path: Path) -> None:
+        """Session start auto-syncs skills when CLI version > manifest version."""
+        from raise_cli.onboarding.skills import SkillScaffoldResult
+
+        profile = DeveloperProfile(name="Test")
+        project_path = tmp_path / "project"
+        (project_path / ".raise" / "manifests").mkdir(parents=True)
+
+        scaffold_result = SkillScaffoldResult(
+            skills_updated=["rai-session-start"],
+            skills_installed=["rai-new-skill"],
+        )
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch(
+                "raise_cli.cli.commands.session._maybe_sync_skills",
+                return_value=scaffold_result,
+            ) as mock_sync,
+        ):
+            result = runner.invoke(
+                app, ["session", "start", "--project", str(project_path)]
+            )
+
+        assert result.exit_code == 0
+        mock_sync.assert_called_once_with(project_path)
+
+    def test_skips_sync_when_no_project(self) -> None:
+        """Session start without --project does not attempt skill sync."""
+        profile = DeveloperProfile(name="Test")
+
+        with (
+            patch(
+                "raise_cli.cli.commands.session.load_developer_profile",
+                return_value=profile,
+            ),
+            patch("raise_cli.cli.commands.session.save_developer_profile"),
+            patch(
+                "raise_cli.cli.commands.session._maybe_sync_skills",
+            ) as mock_sync,
+        ):
+            result = runner.invoke(app, ["session", "start"])
+
+        assert result.exit_code == 0
+        mock_sync.assert_not_called()
+
+
 class TestSessionStartCreatesDir:
     """Tests for session start creating per-session directory (RAISE-138)."""
 
