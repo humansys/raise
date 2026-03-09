@@ -14,7 +14,7 @@ const buildId = `${new Date().toISOString().slice(0, 16).replace('T', ' ')} UTC`
     <span class="footer-copy">&copy; {currentYear} Sistemas Humanos</span>
   </div>
   <div class="footer-links">
-    <a href={getLocalizedPath("/#cta", locale)}>{t("footer.github", locale)}</a>
+    <a href="https://github.com/humansys/raise" target="_blank" rel="noopener noreferrer">{t("footer.github", locale)}</a>
     <a href={docsHref}>{t('footer.docs', locale)}</a>
     <a href={blogHref}>{t('footer.blog', locale)}</a>
     <a href="https://pypi.org/project/rai-cli/" target="_blank" rel="noopener noreferrer">PyPI</a>
