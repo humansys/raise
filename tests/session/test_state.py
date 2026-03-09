@@ -403,6 +403,50 @@ class TestMigrateFlatToSession:
         assert (session_dir / "state.yaml").exists()
 
 
+    def test_migrates_to_last_session_id_not_new_id(self, tmp_path: Path) -> None:
+        """Migration target should be last_session.id from state, not the new session ID."""
+        from raise_cli.session.state import migrate_flat_to_session
+
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text(
+            "last_session:\n"
+            "  id: SES-024\n"
+            "  date: 2026-03-05\n"
+            "  developer: Test\n"
+            "  summary: previous session\n"
+            "current_work:\n"
+            "  epic: E15\n"
+        )
+
+        result = migrate_flat_to_session(tmp_path, "SES-025")
+
+        assert result is True
+        # State should be in SES-024's dir (the session it belongs to), not SES-025
+        correct_dir = personal_dir / "sessions" / "SES-024"
+        wrong_dir = personal_dir / "sessions" / "SES-025"
+        assert (correct_dir / "state.yaml").exists()
+        assert not wrong_dir.exists()
+
+    def test_falls_back_to_passed_id_when_no_last_session(
+        self, tmp_path: Path
+    ) -> None:
+        """When flat state has no last_session.id, use the passed session_id."""
+        from raise_cli.session.state import migrate_flat_to_session
+
+        personal_dir = tmp_path / ".raise" / "rai" / "personal"
+        personal_dir.mkdir(parents=True)
+        flat_state = personal_dir / "session-state.yaml"
+        flat_state.write_text("current_work:\n  epic: E15\n")
+
+        result = migrate_flat_to_session(tmp_path, "SES-100")
+
+        assert result is True
+        session_dir = personal_dir / "sessions" / "SES-100"
+        assert (session_dir / "state.yaml").exists()
+
+
 class TestCleanupSessionDir:
     """Tests for cleanup_session_dir (RAISE-138)."""
 
