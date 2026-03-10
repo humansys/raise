@@ -60,8 +60,11 @@ def add_gitignore_personal(working_dir: Path) -> bool:
     else:
         content = ""
 
-    with open(gitignore, "a", encoding="utf-8") as f:
-        f.write(f"\n# RaiSE personal data (sessions, telemetry)\n{entry}\n")
+    try:
+        with open(gitignore, "a", encoding="utf-8") as f:
+            f.write(f"\n# RaiSE personal data (sessions, telemetry)\n{entry}\n")
+    except OSError:
+        return False
     return True
 
 
