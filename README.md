@@ -1,6 +1,9 @@
 # RaiSE
 
 [![CI](https://github.com/humansys/raise/actions/workflows/ci.yml/badge.svg)](https://github.com/humansys/raise/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/raise-cli)](https://pypi.org/project/raise-cli/)
+[![Python](https://img.shields.io/pypi/pyversions/raise-cli)](https://pypi.org/project/raise-cli/)
+[![License](https://img.shields.io/github/license/humansys/raise)](LICENSE)
 
 **Reliable AI Software Engineering** — Ship quality software at AI speed.
 
@@ -75,8 +78,8 @@ git clone https://github.com/humansys/raise.git
 cd raise
 git checkout dev
 
-# 2. Create venv and install in development mode
-uv venv && uv pip install -e ".[dev]"
+# 2. Install in development mode
+uv sync --extra dev
 
 # 3. Verify installation
 rai --help
@@ -277,34 +280,22 @@ rai session close --state-file /tmp/session-output.yaml --project "$(pwd)"
 
 ```
 raise/
-├── .claude/skills/      # Claude Code skills (37 skills)
+├── docs/                # Documentation (.mdx files, rendered by GitHub + Starlight)
+│   ├── cli/             #   CLI command reference
+│   ├── concepts/        #   Core concepts (memory, skills, governance)
+│   ├── guides/          #   How-to guides
+│   └── es/              #   Spanish translations
 │
-├── framework/           # Public textbook (concepts, reference)
+├── framework/           # Methodology textbook (concepts, reference)
 │   ├── reference/       #   Constitution, glossary, philosophy
 │   ├── concepts/        #   Core concepts (katas, gates, artifacts)
 │   └── getting-started/ #   Greenfield/brownfield guides
 │
-├── .raise/              # Framework engine
-│   ├── rai/             #   Rai's memory and personal data
-│   │   ├── memory/      #     Patterns, knowledge graph (shared)
-│   │   └── personal/    #     Sessions, calibration (per-developer, gitignored)
-│   ├── katas/           #   Process definitions
-│   ├── gates/           #   Validation criteria
-│   ├── templates/       #   Artifact scaffolds
-│   └── skills/          #   Legacy skill definitions
+├── src/
+│   ├── raise_cli/       #   CLI toolkit (Python)
+│   └── raise_core/      #   Core domain models (graph, query engine)
 │
-├── governance/          # Project governance
-│   ├── architecture/    #   Module docs, system design
-│   └── solution/        #   Vision, guardrails, business case
-│
-├── src/raise_cli/         # CLI toolkit (Python)
-│
-├── work/                # Work in progress
-│   └── epics/           #   Epic directories containing story artifacts
-│
-└── dev/                 # Framework maintenance
-    ├── decisions/       #   ADRs (Architecture Decision Records)
-    └── parking-lot.md   #   Ideas and tangents for later
+└── tests/               # Test suite (pytest)
 ```
 
 ---
@@ -353,9 +344,9 @@ From the [Constitution](framework/reference/constitution.md):
 
 ## Status
 
-Current stable release: `v2.2.0`. The framework is being used in production.
+Current stable release: `v2.2.3`. The framework is being used in production.
 
-For CLI reference documentation, see the [CLI Quick Reference](framework/reference/cli-reference.md).
+For CLI reference documentation, see the [docs](docs/).
 
 We value your feedback:
 
