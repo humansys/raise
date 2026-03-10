@@ -460,6 +460,7 @@ def reinforce_pattern(
     Raises:
         KeyError: If pattern_id is not found in the file.
     """
+    file_path = file_path.resolve()
     lines = file_path.read_text(encoding="utf-8").splitlines()
     records: list[dict[str, Any]] = []
     found = False
