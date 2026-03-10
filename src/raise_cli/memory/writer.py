@@ -404,7 +404,7 @@ def append_pattern(
     Returns:
         WriteResult with generated ID and status.
     """
-    file_path = memory_dir / "patterns.jsonl"
+    file_path = memory_dir.resolve() / "patterns.jsonl"
     pattern_id = get_next_id(file_path, "PAT", developer_prefix=developer_prefix)
     created_date = created or date.today()
 

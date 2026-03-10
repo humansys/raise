@@ -107,7 +107,7 @@ def reinforce_cmd(
         )
         return
 
-    mem_dir = memory_dir or get_memory_dir_for_scope(memory_scope)
+    mem_dir = (memory_dir or get_memory_dir_for_scope(memory_scope)).resolve()
     patterns_file = mem_dir / "patterns.jsonl"
 
     if not patterns_file.exists():
@@ -208,7 +208,7 @@ def add_pattern(
         )
         return
 
-    mem_dir = memory_dir or get_memory_dir_for_scope(memory_scope)
+    mem_dir = (memory_dir or get_memory_dir_for_scope(memory_scope)).resolve()
     if not mem_dir.exists():
         mem_dir.mkdir(parents=True, exist_ok=True)
 
@@ -279,7 +279,9 @@ def promote_pattern(
     Examples:
         $ rai pattern promote PAT-E-123
     """
-    personal_dir = memory_dir or get_memory_dir_for_scope(MemoryScope.PERSONAL)
+    personal_dir = (
+        memory_dir or get_memory_dir_for_scope(MemoryScope.PERSONAL)
+    ).resolve()
     personal_file = personal_dir / "patterns.jsonl"
 
     if not personal_file.exists():
