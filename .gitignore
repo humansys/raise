@@ -114,3 +114,6 @@ site/.wrangler/
 dev/issues/**/*.pdf
 dev/issues/**/*.png
 dev/issues/**/*.jpg
+
+# Prevent symlink artifacts from being tracked at root
+/es/
