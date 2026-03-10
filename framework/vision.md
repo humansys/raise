@@ -29,11 +29,11 @@ changelog:
     changes: "Initial v2.3 with Context/Kata/Skill ontology"
 ---
 
-# RaiSE Framework v2.4 - Solution Vision
+# RaiSE Framework v2.5 - Solution Vision
 
 ## Resumen Ejecutivo
 
-**RaiSE v2.4** (Reliable AI Software Engineering) es un framework de gobernanza para desarrollo AI-assisted. Transforma conocimiento tribal implícito en **gobernanza explícita, versionada, y ejecutable**.
+**RaiSE v2.5** (Reliable AI Software Engineering) es un framework de gobernanza para desarrollo AI-assisted. Transforma conocimiento tribal implícito en **gobernanza explícita, versionada, y ejecutable**.
 
 ### Evolución desde v2.3
 
